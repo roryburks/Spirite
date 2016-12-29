@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -33,6 +35,7 @@ public class LayerTreePanel extends JPanel
 	MasterControl master;
 	LayerTree tree;
 
+	// :::: Initialize
 	public LayerTreePanel( MasterControl master) {
 		this.master = master;
 		initComponents();
@@ -42,16 +45,16 @@ public class LayerTreePanel extends JPanel
 	}
 	
 	private void initComponents() {
+		// Simple grid layout, fills the whole area
 		this.setLayout( new GridLayout());
 		tree = new LayerTree();
 		this.add(tree);
 		
+		// Single root is invisible, but path is visible
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		
-
 		tree.constructFromWorkspace();
-	//	tree.constructFromImage( master.getImageManager().getImage());
 	}
 
     // :::: Paint
@@ -61,7 +64,7 @@ public class LayerTreePanel extends JPanel
     }
     
     private class LayerTree extends JTree 
-    	implements TreeCellRenderer
+    	implements TreeCellRenderer, TreeSelectionListener
     {
     	DefaultMutableTreeNode root;
     	DefaultTreeModel model;
@@ -77,23 +80,27 @@ public class LayerTreePanel extends JPanel
     		model = new DefaultTreeModel(root);
     		this.setModel( model);
     		
+    		this.addTreeSelectionListener(this);
+    		
 
     	}
     	
+    	/***
+    	 * Called any time the structure of the image has changed, completely removes
+    	 * the existing tree structure and recreates it from the GroupTree data.
+    	 */
     	private void constructFromWorkspace() {
     		root.removeAllChildren();
     		
     		GroupTree.Node node = master.getImageManager().getRootNode();
 
-    		System.out.println("0");
+    		// Start the recursive tree traversal
     		_cfw_rec( node, root);
     		
-//    		root.add( new DefaultMutableTreeNode(image.getActivePart()));
     		model.nodeStructureChanged(root);
     		tree.repaint();
     	}
     	private void _cfw_rec( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
-
     		System.out.println("1");
     		for( GroupTree.Node child : group_node.getChildren()) {
     			DefaultMutableTreeNode node_to_add = new DefaultMutableTreeNode(child);
@@ -105,8 +112,9 @@ public class LayerTreePanel extends JPanel
     	}
 
     	
-
-    	
+    	/***
+    	 * 
+    	 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf,
 				int row, boolean hasFocus) {
@@ -137,12 +145,33 @@ public class LayerTreePanel extends JPanel
 			}
 			return render_panel;
 		}
+
+		/***
+		 * Called whenever the user has selected a new tree node, updates the Workspace so that the 
+		 * active part (the part that gets drawn on) is changed
+		 */
+		@Override
+		public void valueChanged(TreeSelectionEvent tse) {			
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+			
+			Object obj = node.getUserObject();
+			
+			System.out.println( obj.getClass());
+			if( obj instanceof GroupTree.RigNode) {
+				GroupTree.RigNode rn = (GroupTree.RigNode)obj;
+				
+				master.getImageManager().setActivePart(rn.getRig());
+			}
+			else
+				master.getImageManager().setActivePart(null);
+			
+		}
 		
     }
 
 	@Override
 	public void imageChanged() {
-		tree.constructFromWorkspace();
+//		tree.constructFromWorkspace();
 	}
 
 	@Override

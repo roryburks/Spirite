@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package spirite;
 
 import java.awt.Component;
@@ -21,7 +17,9 @@ import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
 
 /**
- * Root Frame
+ * While the MasterControl is "home base" for all the internals of the program, the root
+ * frame is home base for the UI.  In addition to containing the menu bar and whatever
+ * panels are attached to it, it also is the delegator for all of the Hotkeys.
  */
 public class RootFrame extends javax.swing.JFrame
         implements KeyEventDispatcher

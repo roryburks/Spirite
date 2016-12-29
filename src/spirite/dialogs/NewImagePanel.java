@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package spirite.dialogs;
 
 import java.awt.Color;
@@ -29,7 +24,7 @@ import spirite.brains.MasterControl;
 
 /**
  *
- * @author Guy
+ * @author Rory Burks
  */
 public class NewImagePanel extends javax.swing.JPanel 
     implements ActionListener

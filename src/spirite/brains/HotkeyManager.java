@@ -1,4 +1,3 @@
-// Rory Burks
 
 package spirite.brains;
 
@@ -17,6 +16,22 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 
+/***
+ * Each hotkey-able action has a text identifier of the form
+ * {context}.{action}
+ * 
+ * Not just a visual significance, the context text will be used to determine which
+ * component needs to handle the hotkey command.  The hotkey manager stores all
+ * links between the hotkey-able actions and their corresponding Hotkey (a hotkey
+ * is a key-code and its modifier, including possibly some extended modifiers).
+ * 
+ * The HotkeyManager does not actually dictate the actions to the corresponding
+ * component (that's handled in the Main Frame), it simply stores all the hotkeys
+ * and what they are linked to.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class HotkeyManager {
     Preferences prefs;
     
@@ -60,7 +75,7 @@ public class HotkeyManager {
 
     /**
      * Loads the hotkey data from preference space using a hard-coded set of key
-     * commands and default hotkeys
+     * commands and default hotkeys with their modifier 
      * @param data
      */
     private void loadHotkeys( Object[][] data) {

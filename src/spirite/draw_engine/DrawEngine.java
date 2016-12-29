@@ -14,6 +14,12 @@ import java.util.TimerTask;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 
+/***
+ * Pretty much anything which alters the image data goes through the DrawEngine
+ * 
+ * @author Rory Burks
+ *
+ */
 public class DrawEngine {
 	int old_x, old_y;
 	int new_x, new_y;

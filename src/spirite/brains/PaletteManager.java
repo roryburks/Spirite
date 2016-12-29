@@ -1,5 +1,3 @@
-// Rory Burks
-
 package spirite.brains;
 
 import java.awt.Color;
@@ -7,6 +5,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/***
+ * The PaletteManager stores both the active colors and the palette
+ * of colors stored for easy access. 
+ * 
+ * TODO: make the palettes able to be saved and loaded.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class PaletteManager {
     List<Color> active_colors;
     List<Color> palette_colors;

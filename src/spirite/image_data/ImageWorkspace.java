@@ -3,6 +3,7 @@ package spirite.image_data;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ImageWorkspace {
@@ -16,8 +17,6 @@ public class ImageWorkspace {
 	private int width = 0;
 	private int height = 0;
 	
-	SpiriteImage image;
-	
 	
 	public ImageWorkspace() {
 		parts = new ArrayList<Part>();http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=1336
@@ -26,7 +25,6 @@ public class ImageWorkspace {
 		
 		groups = new GroupTree();
 		
-		image = null;
 	}
 	
 	public int getWidth() {
@@ -39,6 +37,23 @@ public class ImageWorkspace {
 	public GroupTree.Node getRootNode() {
 		return groups.getRoot();
 	}
+
+	// :::: The activePart is the part (i.e. raw image data) which will be drawn on
+	//	when the user gives input.
+	private int selected_rig = -1;
+	
+	public Part getActivePart() {
+		if( selected_rig < 0) return null;
+		
+		Rig rig = rigs.get( selected_rig);
+		if( rig == null) return null;
+		
+		return rig.debugGetPart();
+	}
+	
+	public void setActivePart( Rig rig) {
+		selected_rig = rigs.indexOf(rig);
+	}
 	
 	// Creates a New Rig
 	public Rig newRig( int w, int h, String name, Color c) {
@@ -49,19 +64,14 @@ public class ImageWorkspace {
 		width = Math.max(width, w);
 		height = Math.max(height, h);
 		
+		setActivePart(rig);
 		return rig;
 	}
 	
-	public Part getActivePart() {
-		Rig rig = rigs.get(0);
-		if( rig == null) return null;
-		
-		return rig.debugGetPart();
-	}
 	
 	// Creates a queue of images for drawing purposes
 	public List<BufferedImage> getDrawingQueue() {
-		List<BufferedImage> queue = new ArrayList<BufferedImage>();
+		List<BufferedImage> queue = new LinkedList<BufferedImage>();
 		
 		_gdq_rec( groups.getRoot(), queue);
 		
@@ -72,7 +82,7 @@ public class ImageWorkspace {
 			if( child.isVisible()) {
 				if( child instanceof GroupTree.RigNode) {
 					// !!!! Very Debug [TODO]
-					((GroupTree.RigNode)child).getRig().debugGetPart().getData();
+					queue.add(0,((GroupTree.RigNode)child).getRig().debugGetPart().getData());
 				}
 				else {
 					_gdq_rec( child, queue);
@@ -80,19 +90,4 @@ public class ImageWorkspace {
 			}
 		}
 	}
-	
-/*	public SpiriteImage newImage( int w, int h, Color c) {
-		image = new SpiriteImage( w, h, c);
-		
-		return image;
-	}
-	
-	
-	public SpiriteImage getImage() {
-		return image;
-	}
-	public Part getActivePart() {
-		if( image == null) return null;
-		return image.getActivePart();
-	}*/
 }

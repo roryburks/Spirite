@@ -10,6 +10,13 @@ import spirite.draw_engine.DrawEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.FrameManager;
 
+/***
+ * Master Control is little more than a container for all the various components 
+ * which handle the grand internals of the program.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class MasterControl {
 	// Components
     HotkeyManager hotkeys;

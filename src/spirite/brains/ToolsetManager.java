@@ -58,7 +58,7 @@ public class ToolsetManager {
     }
 
     // Gets the position the toolset is in the icons.png image
-    // !!!! There is probably a beter place to put this and make it less
+    // !!!! TODO: There is probably a beter place to put this and make it less
     //  hard-coded, but for now I'll centralize it here
     public int getToolix( String tool) {
         int ind = Arrays.asList(toolset).indexOf(tool);

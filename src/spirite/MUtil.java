@@ -35,7 +35,11 @@ public class MUtil {
 		return true;
 	}
 	
-	// :::: UI Functions
+	/***
+	 * I found the behavior of JFormattedTextField to be inadequate so I'm implementing
+	 * my own and centralizing it here.
+	 *
+	 */
 	public static class MTextFieldNumber extends JTextField implements DocumentListener {
 		private int max = Integer.MAX_VALUE;
 		private int min = Integer.MIN_VALUE;
