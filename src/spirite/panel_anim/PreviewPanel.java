@@ -24,7 +24,7 @@ public class PreviewPanel extends JPanel
             return;
         }
 
-        BufferedImage image = master.getImageManager().getActivePart().getData();
+        BufferedImage image = master.getCurrentWorkspace().getActivePart().getData();
         g.drawImage(image, 0, 0, null);
     }
 

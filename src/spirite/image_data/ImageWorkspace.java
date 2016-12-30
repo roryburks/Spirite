@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import spirite.brains.MasterControl.MImageObserver;
+
 public class ImageWorkspace {
 	private List<Part> parts;
 	private List<Rig> rigs;
@@ -19,7 +21,7 @@ public class ImageWorkspace {
 	
 	
 	public ImageWorkspace() {
-		parts = new ArrayList<Part>();http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=1336
+		parts = new ArrayList<Part>();
 		rigs = new ArrayList<Rig>();
 		scenes = new ArrayList<Scene>();
 		
@@ -57,15 +59,27 @@ public class ImageWorkspace {
 	
 	// Creates a New Rig
 	public Rig newRig( int w, int h, String name, Color c) {
+		return 	addNewRig( null, w, h, name, c);
+	}
+	
+	public Rig addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
+
 		Rig rig = new Rig(w, h, name, c);		
-		groups.addContextual(null, rig);
+		groups.addContextual(context, rig);
 		rigs.add(rig);
 		
 		width = Math.max(width, w);
 		height = Math.max(height, h);
 		
 		setActivePart(rig);
+		
+		
+		alertStructureChanged();
 		return rig;
+	}
+	public void addTreeNode( GroupTree.Node context, String name) {
+		groups.addContextual(context, name);
+		alertStructureChanged();
 	}
 	
 	
@@ -90,4 +104,20 @@ public class ImageWorkspace {
 			}
 		}
 	}
+	
+	// :::: Observers
+    private List<MImageStructureObserver> imageStructureObservers = new ArrayList<>();
+
+    public void addImageStructureObserver( MImageStructureObserver obs) { imageStructureObservers.add(obs);}
+    public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
+    
+    private void alertStructureChanged() {
+        for( MImageStructureObserver obs : imageStructureObservers) {
+            obs.structureChanged();
+        }
+    }
+    
+    public static interface MImageStructureObserver {
+        public void structureChanged();
+    }
 }

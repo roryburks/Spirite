@@ -53,7 +53,7 @@ public class NewLayerDPanel extends JPanel {
 
 	public NewLayerDPanel( MasterControl master) {
 		this.master = master;
-		ImageWorkspace image = master.getImageManager();
+		ImageWorkspace image = master.getCurrentWorkspace();
 
 		b_selected = new BevelBorder(BevelBorder.RAISED, Color.BLACK, Color.WHITE, Color.WHITE, Color.BLACK);
 		b_unselected = new BevelBorder(BevelBorder.LOWERED, null, null, null, null);

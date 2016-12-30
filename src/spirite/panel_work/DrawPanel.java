@@ -63,7 +63,7 @@ public class DrawPanel extends JPanel
         Graphics2D g2 = (Graphics2D) g;
 
         // Draw Image
-        ImageWorkspace workspace = master.getImageManager();
+        ImageWorkspace workspace = master.getCurrentWorkspace();
         if( workspace != null) {
 
         	List<BufferedImage> drawing_queue = workspace.getDrawingQueue();

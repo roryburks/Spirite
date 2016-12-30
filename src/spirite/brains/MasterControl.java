@@ -53,7 +53,7 @@ public class MasterControl {
     public PaletteManager getPaletteManager() {
     	return palette;
     }
-    public ImageWorkspace getImageManager() {
+    public ImageWorkspace getCurrentWorkspace() {
     	return image_manager;
     }
     public FrameManager getFrameManager() {

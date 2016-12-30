@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.util.Enumeration;
 
 import javax.swing.JLabel;
@@ -23,14 +24,16 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import spirite.Globals;
+import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MImageObserver;
 import spirite.image_data.GroupTree;
+import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.image_data.Part;
 import spirite.image_data.SpiriteImage;
 
 public class LayerTreePanel extends JPanel 
-	implements MImageObserver
+	implements MImageStructureObserver
 {
 	MasterControl master;
 	LayerTree tree;
@@ -40,7 +43,7 @@ public class LayerTreePanel extends JPanel
 		this.master = master;
 		initComponents();
 		
-		master.addImageObserver( this);
+		master.getCurrentWorkspace().addImageStructureObserver(this);
 		
 	}
 	
@@ -56,12 +59,35 @@ public class LayerTreePanel extends JPanel
 		
 		tree.constructFromWorkspace();
 	}
+	
+	public GroupTree.Node getSelectedNode() {
+		TreePath path = tree.getSelectionPath();
+		
+		if( path == null)
+			return null;
+		
+		Object obj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
+		if( !(obj instanceof GroupTree.Node)) {
+			MDebug.handleWarning( MDebug.WarningType.STRUCTURAL, this, "Selected Node is not a GroupTree.Node");
+			return null;
+		}
+		
+		
+		return (GroupTree.Node)obj;
+	}
 
     // :::: Paint
     @Override
     public void paint( Graphics g) {
     	super.paint(g);
     }
+    
+    // :::: MImageStructureObserver interface
+	@Override
+	public void structureChanged() {
+		tree.constructFromWorkspace();
+		
+	}
     
     private class LayerTree extends JTree 
     	implements TreeCellRenderer, TreeSelectionListener
@@ -70,20 +96,28 @@ public class LayerTreePanel extends JPanel
     	DefaultTreeModel model;
     	LayerTreeNodePanel render_panel;
     	
+    	Color bgColor;
+    	
     	public LayerTree() {
     		render_panel = new LayerTreeNodePanel();
+    		
+    		// Link Components
     		this.setCellRenderer( this);
-    		
     		this.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
+    		this.addTreeSelectionListener(this);
     		
+    		// Create Model
     		root = new DefaultMutableTreeNode("root");
     		model = new DefaultTreeModel(root);
     		this.setModel( model);
     		
-    		this.addTreeSelectionListener(this);
     		
+    		// Make the background invisible as we will draw the background manually
+    		bgColor = this.getBackground();
+    		this.setBackground( new Color(0,0,0,0));
 
     	}
+    	
     	
     	/***
     	 * Called any time the structure of the image has changed, completely removes
@@ -92,7 +126,7 @@ public class LayerTreePanel extends JPanel
     	private void constructFromWorkspace() {
     		root.removeAllChildren();
     		
-    		GroupTree.Node node = master.getImageManager().getRootNode();
+    		GroupTree.Node node = master.getCurrentWorkspace().getRootNode();
 
     		// Start the recursive tree traversal
     		_cfw_rec( node, root);
@@ -115,14 +149,30 @@ public class LayerTreePanel extends JPanel
     	/***
     	 * 
     	 */
+    	@Override
+    	public void paint( Graphics g) {
+    		
+    		// Draw the Background manually so we can draw behind the Tree
+    		g.setColor( bgColor);
+    		g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
+
+    		// Draw a Background around the 
+    		int r = this.getRowForPath( this.getSelectionPath());
+    		Rectangle rect = this.getRowBounds(r);
+    		
+    		if( rect != null) {
+    			g.setColor( Color.GRAY);
+    			g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
+    		}
+    		
+    		// Let Swing do the heavy lifting
+    		super.paint(g);
+    		
+    	}
+    	
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf,
 				int row, boolean hasFocus) {
-
-			if( selected)
-				render_panel.setBackground(Color.RED);
-			else
-				render_panel.setBackground(Color.LIGHT_GRAY);
 				
 			render_panel.setPreferredSize( new Dimension( 128, Globals.getMetric("layerpanel.treenodes.max").width + 4));
 			
@@ -160,25 +210,15 @@ public class LayerTreePanel extends JPanel
 			if( obj instanceof GroupTree.RigNode) {
 				GroupTree.RigNode rn = (GroupTree.RigNode)obj;
 				
-				master.getImageManager().setActivePart(rn.getRig());
+				master.getCurrentWorkspace().setActivePart(rn.getRig());
 			}
 			else
-				master.getImageManager().setActivePart(null);
+				master.getCurrentWorkspace().setActivePart(null);
 			
 		}
 		
     }
 
-	@Override
-	public void imageChanged() {
-//		tree.constructFromWorkspace();
-	}
-
-	@Override
-	public void newImage() {
-		tree.constructFromWorkspace();
-		
-	}
 }
 
 

@@ -117,7 +117,7 @@ public class WorkPanel extends javax.swing.JPanel
      * window (with a little buffer determined by SCREEN_BUFFER)
      */
     private void calibrateScrolls() {
-    	ImageWorkspace image = master.getImageManager();
+    	ImageWorkspace image = master.getCurrentWorkspace();
     	
         if( image == null) {
             jscrollHorizontal.setEnabled(false);
@@ -151,7 +151,7 @@ public class WorkPanel extends javax.swing.JPanel
      * (Note, coordinates are in image-space, do not account for zoom)
      */
     private void centerAtPos( int x, int y) {
-    	ImageWorkspace image = master.getImageManager();
+    	ImageWorkspace image = master.getCurrentWorkspace();
 
         if(image == null) return;
 
@@ -214,7 +214,7 @@ public class WorkPanel extends javax.swing.JPanel
     public void newImage() {
         calibrateScrolls();
 
-    	ImageWorkspace image = master.getImageManager();
+    	ImageWorkspace image = master.getCurrentWorkspace();
         centerAtPos( image.getWidth()/2, image.getHeight()/2);
         this.repaint();
     }

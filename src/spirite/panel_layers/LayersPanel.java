@@ -10,12 +10,19 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import spirite.brains.MasterControl;
 import spirite.dialogs.NewImagePanel;
 import spirite.dialogs.NewLayerDPanel;
+import spirite.image_data.GroupTree;
+import spirite.image_data.ImageWorkspace;
 
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 public class LayersPanel extends JPanel {
 	MasterControl master;
+	
+	LayerTreePanel layerTreePanel;
+	JButton btnNewLayer;
+	JButton btnNewGroup;
 	
 	/**
 	 * Create the panel.
@@ -23,17 +30,22 @@ public class LayersPanel extends JPanel {
 	public LayersPanel(MasterControl master) {
 		this.master = master;
 		
-		JButton btnNewLayer = new JButton();
+		btnNewLayer = new JButton();
 		btnNewLayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnNewLayerPress();
 			}
 		});
 		btnNewLayer.setToolTipText("New Layer");
-		JButton button = new JButton();
-		button.setToolTipText("New Group");
+		btnNewGroup = new JButton();
+		btnNewGroup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnNewGroupPress();
+			}
+		});
+		btnNewGroup.setToolTipText("New Group");
 		
-		LayerTreePanel layerTreePanel = new LayerTreePanel(master);
+		layerTreePanel = new LayerTreePanel(master);
 		
 		
 		GroupLayout groupLayout = new GroupLayout(this);
@@ -45,7 +57,7 @@ public class LayersPanel extends JPanel {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
-							.addComponent(button, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(layerTreePanel, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
 					.addContainerGap())
 		);
@@ -57,7 +69,7 @@ public class LayersPanel extends JPanel {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-						.addComponent(button, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);
 		setLayout(groupLayout);
@@ -65,8 +77,13 @@ public class LayersPanel extends JPanel {
 	}
 	
 	private void btnNewLayerPress() {
+		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
+		
+		
+		ImageWorkspace workspace = master.getCurrentWorkspace();
         
-		NewLayerDPanel panel = new NewLayerDPanel(master);
+		master.getCurrentWorkspace().addNewRig(selected_node, workspace.getWidth(), workspace.getHeight(), "Shhh", new Color(0,0,0,0));
+/*		NewLayerDPanel panel = new NewLayerDPanel(master);
 		
 		int response = JOptionPane.showConfirmDialog(this,
 		panel,
@@ -81,6 +98,12 @@ public class LayersPanel extends JPanel {
 			String type = panel.getValueType();
 			
 //			master.getImageManager().getImage();
-		}
+		}*/
+	}
+	
+	private void btnNewGroupPress() {
+		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
+		
+		master.getCurrentWorkspace().addTreeNode(selected_node, "Test");
 	}
 }

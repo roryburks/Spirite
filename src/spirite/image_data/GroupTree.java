@@ -72,6 +72,7 @@ public class GroupTree {
 	
 	public class GroupNode extends Node {
 		private String name;
+		private boolean expanded;
 		
 		GroupNode( String name) {
 			this.name = name;

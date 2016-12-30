@@ -1,6 +1,9 @@
 package spirite.panel_layers;
 
 import javax.swing.JPanel;
+
+import java.awt.Color;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
@@ -18,6 +21,8 @@ public class LayerTreeNodePanel extends JPanel {
 	public LayerTreeNodePanel() {
 		label = new JLabel( "Name");
 		ppanel = new JPanel();
+		
+		this.setBackground( new Color(0,0,0,0));
 		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
