@@ -6,8 +6,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import spirite.brains.MasterControl.MImageObserver;
 
+/***
+ * An ImageWorkspace is 
+ * 
+ * @author Rory Burks
+ *
+ */
 public class ImageWorkspace {
 	private List<Part> parts;
 	private List<Rig> rigs;

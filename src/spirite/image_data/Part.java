@@ -32,4 +32,11 @@ public class Part {
 	public String getType() {
 		return type;
 	}
+
+	public int getCenterX() {
+		return cx;
+	}
+	public int getCenterY() {
+		return cy;
+	}
 }

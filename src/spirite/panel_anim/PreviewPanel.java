@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import spirite.brains.MasterControl.MImageObserver;
+import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.brains.MasterControl;
 
 public class PreviewPanel extends JPanel
@@ -24,7 +25,10 @@ public class PreviewPanel extends JPanel
             return;
         }
 
-        BufferedImage image = master.getCurrentWorkspace().getActivePart().getData();
+        RenderSettings settings = new RenderSettings();
+        settings.workspace = master.getCurrentWorkspace();
+        
+        BufferedImage image = master.getRenderEngine().renderImage(settings);
         g.drawImage(image, 0, 0, null);
     }
 

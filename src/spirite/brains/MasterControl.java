@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.draw_engine.DrawEngine;
+import spirite.draw_engine.RenderEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.FrameManager;
 
@@ -24,6 +25,7 @@ public class MasterControl {
     ToolsetManager toolset;
     ImageWorkspace image_manager;
     DrawEngine draw_engine;
+    RenderEngine render_engine;
     
     FrameManager frame_manager;
     
@@ -41,6 +43,7 @@ public class MasterControl {
         image_manager = new ImageWorkspace();
         frame_manager = new FrameManager( this);
         draw_engine = new DrawEngine( this);
+        render_engine = new RenderEngine( this);
     }
 
 
@@ -61,6 +64,9 @@ public class MasterControl {
     }
     public DrawEngine getDrawEngine() {
     	return draw_engine;
+    }
+    public RenderEngine getRenderEngine(){
+    	return render_engine;
     }
     
     

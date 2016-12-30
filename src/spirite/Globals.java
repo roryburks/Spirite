@@ -15,6 +15,7 @@ import java.awt.Dimension;
 public class Globals {
     private static Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
+        {"drawpanel.layer.border", new Color(16,16,16)},
         {"toolbutton.selected.background", new Color( 128,128,128)}
     };
     

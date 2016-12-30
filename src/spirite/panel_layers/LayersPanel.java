@@ -77,19 +77,13 @@ public class LayersPanel extends JPanel {
 	}
 	
 	private void btnNewLayerPress() {
-		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
-		
-		
-		ImageWorkspace workspace = master.getCurrentWorkspace();
-        
-		master.getCurrentWorkspace().addNewRig(selected_node, workspace.getWidth(), workspace.getHeight(), "Shhh", new Color(0,0,0,0));
-/*		NewLayerDPanel panel = new NewLayerDPanel(master);
+		NewLayerDPanel panel = new NewLayerDPanel(master);
 		
 		int response = JOptionPane.showConfirmDialog(this,
-		panel,
-		"New Image",
-		JOptionPane.OK_CANCEL_OPTION,
-		JOptionPane.PLAIN_MESSAGE);
+			panel,
+			"New Image",
+			JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.PLAIN_MESSAGE);
 		
 		if( response == JOptionPane.OK_OPTION) {
 			int w = panel.getValueWidth();
@@ -97,8 +91,14 @@ public class LayersPanel extends JPanel {
 			String name = panel.getValueName();
 			String type = panel.getValueType();
 			
-//			master.getImageManager().getImage();
-		}*/
+
+			// Add the new layer contextually according to the selected Node
+			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();			
+			
+			ImageWorkspace workspace = master.getCurrentWorkspace();
+	        
+			master.getCurrentWorkspace().addNewRig(selected_node, w, h, name, new Color(0,0,0,0));
+		}
 	}
 	
 	private void btnNewGroupPress() {
