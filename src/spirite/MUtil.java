@@ -68,7 +68,7 @@ public class MUtil {
 		 * Document that behaves identically to PlainDocument, but doesn't allow
 		 * you to enter non-number characters.
 		 */
-		public class MTFNDocument extends PlainDocument {
+		public static class MTFNDocument extends PlainDocument {
 			private boolean allows_negative = true;
 			private boolean allows_floats = false;
 			@Override
@@ -140,6 +140,7 @@ public class MUtil {
 		@Override public void changedUpdate(DocumentEvent e) {}
 		
 		@Override public void removeUpdate(DocumentEvent de) {
+			checkIfOOB();
 		}
 		
 		@Override

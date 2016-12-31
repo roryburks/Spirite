@@ -16,11 +16,15 @@ public class Globals {
     private static Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
         {"drawpanel.layer.border", new Color(16,16,16)},
-        {"toolbutton.selected.background", new Color( 128,128,128)}
+        {"toolbutton.selected.background", new Color( 128,128,128)},
+
+        {"layerpanel.tree.selectedBGDragging", new Color( 192,192,212)},
+        {"layerpanel.tree.selectedBackground",new Color( 160,160,196)},
     };
     
     private static Object metrics[][] = {
-    		{"layerpanel.treenodes.max", new Dimension( 40, 40)}
+    		{"layerpanel.treenodes.max", new Dimension( 40, 40)},
+    		{"layerpanel.treenodes.dragdropleniency", new Dimension( 0, 10)},
     };
 
     public static Color getColor( String id) {

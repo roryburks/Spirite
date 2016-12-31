@@ -102,15 +102,18 @@ public class DrawPanel extends JPanel
             
             // Draw Border around the active Layer
             Part active = workspace.getActivePart();
-            BufferedImage data = active.getData();
-            if( data.getWidth() != workspace.getWidth() || data.getHeight() != workspace.getHeight()) {
-                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
-                g2.setStroke(new_stroke);
-                g2.setColor(Globals.getColor("drawpanel.layer.border"));
-                g2.drawRect( context.itsX(0)-1,
-    		            context.itsY(0)-1,
-    		            (int)Math.round(data.getWidth()*context.zoom)+1,
-    		            (int)Math.round(data.getHeight()*context.zoom)+1);
+            
+            if( active != null) {
+	            BufferedImage data = active.getData();
+	            if( data.getWidth() != workspace.getWidth() || data.getHeight() != workspace.getHeight()) {
+	                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
+	                g2.setStroke(new_stroke);
+	                g2.setColor(Globals.getColor("drawpanel.layer.border"));
+	                g2.drawRect( context.itsX(0)-1,
+	    		            context.itsY(0)-1,
+	    		            (int)Math.round(data.getWidth()*context.zoom)+1,
+	    		            (int)Math.round(data.getHeight()*context.zoom)+1);
+	            }
             }
 
 

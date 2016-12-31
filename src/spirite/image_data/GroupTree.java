@@ -1,12 +1,18 @@
 package spirite.image_data;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GroupTree {
 	private GroupNode root;
+	private ImageWorkspace context;
 	
-	public GroupTree() {
+	public GroupTree( ImageWorkspace context) {
+		this.context = context;
 		root = new GroupNode(null);
 	}
 	
@@ -41,8 +47,40 @@ public class GroupTree {
 		}
 	}
 	
+	// :::: Moving Nodes
+	public void moveAbove( Node nodeToMove, Node nodeAbove) {
+		if( nodeToMove == null || nodeAbove == null || nodeAbove.parent == null || nodeToMove.parent == null)
+			return;
+
+		nodeToMove._del();
+		nodeAbove.parent._add(nodeToMove, nodeAbove, true);
+	}
+	public void moveBelow( Node nodeToMove, Node nodeUnder) {
+		if( nodeToMove == null || nodeUnder == null || nodeUnder.parent == null || nodeToMove.parent == null)
+			return;
+
+		nodeToMove._del();
+		nodeUnder.parent._add(nodeToMove, nodeUnder, false);
+	}
+	public void moveInto( Node nodeToMove, GroupNode nodeInto) {
+		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null || nodeToMove.parent == null)
+			return;
+
+		nodeToMove._del();
+		nodeInto.children.add(nodeToMove);
+		nodeToMove.parent = nodeInto;
+	}
+	public void moveIntoTop( Node nodeToMove, GroupNode nodeInto) {
+		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null || nodeToMove.parent == null)
+			return;
+
+		nodeToMove._del();
+		nodeInto.children.add(0,nodeToMove);
+		nodeToMove.parent = nodeInto;
+	}
+	
 	// ::: Nodes
-	public class Node {
+	public class Node  {
 		// !!!! TODO : Various attributes (such as oppacity) that apply to the group
 		//	or the Rig (without altering them) should go here
 		private float alpha;
@@ -67,6 +105,30 @@ public class GroupTree {
 		}
 		public void setVisible( boolean visisble) {
 			this.visible = visible;
+		}
+		
+		// For simplicity's sake (particularly regarding Observers), only the GroupTree
+		//	has direct access to add/remove commands.
+		protected void _add( Node toAdd, Node child, boolean above) {
+			if( children == null) return;
+			
+			int i = children.indexOf(child);
+			
+			if( i == -1) return;
+			
+			children.add( i + (above?0:1), toAdd);
+			toAdd.parent = this;
+		}
+		protected void _rem( Node toRem) {
+			if( children == null) return;
+			
+			children.remove(toRem);
+			if( toRem.parent == this)
+				toRem.parent = null;
+		}
+		protected void _del() {
+			if( parent == null) return;
+			parent.children.remove(this);
 		}
 	}
 	

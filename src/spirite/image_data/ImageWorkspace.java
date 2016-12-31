@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.Node;
+
 
 /***
  * An ImageWorkspace is 
@@ -30,7 +33,7 @@ public class ImageWorkspace {
 		rigs = new ArrayList<Rig>();
 		scenes = new ArrayList<Scene>();
 		
-		groups = new GroupTree();
+		groups = new GroupTree(this);
 		
 	}
 	
@@ -87,6 +90,24 @@ public class ImageWorkspace {
 		alertStructureChanged();
 	}
 	
+
+	public void moveAbove( Node nodeToMove, Node nodeAbove) {
+		groups.moveAbove(nodeToMove, nodeAbove);
+		alertStructureChanged();
+	}
+	public void moveBelow( Node nodeToMove, Node nodeUnder) {
+		groups.moveBelow(nodeToMove, nodeUnder);
+		alertStructureChanged();
+	}
+	public void moveInto( Node nodeToMove, GroupNode nodeInto) {
+		groups.moveInto(nodeToMove, nodeInto);
+		alertStructureChanged();
+	}
+	public void moveIntoTop(Node nodeToMove, GroupNode nodeInto) {
+		groups.moveIntoTop(nodeToMove, nodeInto);
+		alertStructureChanged();
+	}
+	
 	
 	// Creates a queue of images for drawing purposes
 	public List<BufferedImage> getDrawingQueue() {
@@ -116,7 +137,7 @@ public class ImageWorkspace {
     public void addImageStructureObserver( MImageStructureObserver obs) { imageStructureObservers.add(obs);}
     public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
     
-    private void alertStructureChanged() {
+    void alertStructureChanged() {
         for( MImageStructureObserver obs : imageStructureObservers) {
             obs.structureChanged();
         }
