@@ -17,6 +17,7 @@ public class Part {
 		this.type = type;
 		
         Graphics2D g2d = data.createGraphics();
+        System.out.println(bg);
         g2d.setColor( bg);
         g2d.fillRect( 0, 0, width, height);
         g2d.dispose();

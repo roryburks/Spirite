@@ -154,13 +154,13 @@ public class DrawEngine {
 			if( ix + 1 < w) {
 				queue.add( MUtil.packInt(ix+1, iy));
 			}
-			if( ix - 1 > 0) {
+			if( ix - 1 >= 0) {
 				queue.add( MUtil.packInt(ix-1, iy));
 			}
 			if( iy + 1 < h) {
 				queue.add( MUtil.packInt(ix, iy+1));
 			}
-			if( iy - 1 > 0) {
+			if( iy - 1 >= 0) {
 				queue.add( MUtil.packInt(ix, iy-1));
 			}
 		}

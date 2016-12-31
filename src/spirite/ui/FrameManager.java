@@ -12,7 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import spirite.RootFrame;
 import spirite.brains.MasterControl;
 
 public class FrameManager implements WindowListener {
@@ -48,22 +47,25 @@ public class FrameManager implements WindowListener {
 		frames.add(container);
 	}
 	
+	/***
+	 * 
+	 */
 	public void showAllFrames() {
 		for( JDialog frame : frames) {
-			frame.toFront();
+//			if( !frame.isActive())
+				frame.toFront();
 		}
 	}
 
 	
 	// :::: WindowListener
-	@Override
-	public void windowClosed(WindowEvent evt) {
-		System.out.println(frames.indexOf(evt.getWindow()));
+	@Override	public void windowClosing(WindowEvent evt) {
+		frames.remove(evt.getWindow());
 	}
-	@Override	public void windowActivated(WindowEvent arg0) {}
-	@Override	public void windowClosing(WindowEvent arg0) {}
-	@Override	public void windowDeactivated(WindowEvent arg0) {}
-	@Override	public void windowDeiconified(WindowEvent arg0) {}
-	@Override	public void windowIconified(WindowEvent arg0) {}
-	@Override	public void windowOpened(WindowEvent arg0) {}
+	@Override	public void windowActivated(WindowEvent evt) {}
+	@Override	public void windowClosed(WindowEvent evt) {}
+	@Override	public void windowDeactivated(WindowEvent evt) {}
+	@Override	public void windowDeiconified(WindowEvent evt) {System.out.println("test");}
+	@Override	public void windowIconified(WindowEvent evt) {}
+	@Override	public void windowOpened(WindowEvent evt) {}
 }

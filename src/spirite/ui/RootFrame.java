@@ -1,19 +1,33 @@
 
-package spirite;
+package spirite.ui;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JColorChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.dialogs.NewImagePanel;
 import spirite.panel_anim.AnimPanel;
@@ -27,14 +41,8 @@ import spirite.panel_work.WorkPanel;
  * panels are attached to it, it also is the delegator for all of the Hotkeys.
  */
 public class RootFrame extends javax.swing.JFrame
-        implements KeyEventDispatcher, WindowFocusListener
+        implements KeyEventDispatcher, WindowFocusListener, ActionListener
 {
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem menuNewImage;
-    
     private AnimPanel animPanel;
     private PalettePanel palettePanel;
     private ToolsPanel toolsPanel;
@@ -59,12 +67,6 @@ public class RootFrame extends javax.swing.JFrame
     	toolsPanel = new ToolsPanel( master);
     	animPanel = new AnimPanel( master);
     	palettePanel = new PalettePanel( master);
-    	
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        menuNewImage = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -72,32 +74,8 @@ public class RootFrame extends javax.swing.JFrame
 
         toolsPanel.setPreferredSize(new java.awt.Dimension(140, 140));
 
-        jMenu1.setText("File");
-
-        menuNewImage.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-        menuNewImage.setText("New Image");
-        menuNewImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuNewImageActionPerformed(evt);
-            }
-        });
-        jMenu1.add(menuNewImage);
-
-        jMenuItem1.setText("jMenuItem1");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
-
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
-
+        initMenu();
+        
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -132,8 +110,111 @@ public class RootFrame extends javax.swing.JFrame
         pack();
     }                   
 
-    private void menuNewImageActionPerformed(java.awt.event.ActionEvent evt) {                                             
-    	System.out.println("New");
+    
+    public static final int MAX_LEVEL = 10;
+    private int _imCountLevel( String s){
+    	int r = 0;
+    	while( s.charAt(r) == '.')
+    		r++;
+    	return Math.min(r, MAX_LEVEL);
+    }
+    private void initMenu() {
+    	// Each dot before the name indicates the level it should be in.  For example one dot
+    	//	means it goes inside the last zero-dot item, two dots means it should go in the last
+    	//	one-dot item, etc.
+    	// Note, there should never be any reason to skip dots and doing so will probably 
+    	//	break it.
+    	Object[][] menu_scheme = {
+    			{"File", KeyEvent.VK_F, null},
+    			{".New Image", KeyEvent.VK_N, "global.new_image"},
+    			{".Debug Color", KeyEvent.VK_C, "global.debug_color"},
+    			
+    			{"Edit", KeyEvent.VK_E, null},
+    			
+    			{"Window", KeyEvent.VK_W, null},
+    			{".Dialogs", KeyEvent.VK_D, null},
+    	};
+    	
+
+    	JMenuBar jMenuBar = new JMenuBar();
+		JMenuItem new_node;
+    	
+    	JMenuItem[] active_root_tree = new JMenuItem[MAX_LEVEL];
+    	
+    	// Atempt to construct menu from parsed data in menu_scheme
+		// !!!! TODO: note, there are very few sanity checks in here for now
+    	int active_level = 0;
+    	for( int i = 0; i < menu_scheme.length; ++i) {
+    		int level =_imCountLevel((String)menu_scheme[i][0]);
+    		menu_scheme[i][0] = ((String)menu_scheme[i][0]).substring(level);
+    		
+    		// Determine if it needs to be a Menu (which contains other options nested in it)
+    		//	or a plain MenuItem (which doesn't)
+    		if( level != 0 && (i+1 == menu_scheme.length || _imCountLevel((String)menu_scheme[i+1][0]) <= level)) {
+    			new_node = new JMenuItem( (String) menu_scheme[i][0]);
+    		}
+    		else {
+    			new_node = new JMenu( (String) menu_scheme[i][0]);
+    		}
+    		new_node.setMnemonic((int)menu_scheme[i][1]);
+
+    		if( menu_scheme[i][2] != null) {
+    			new_node.setActionCommand((String)menu_scheme[i][2]);
+    			new_node.addActionListener(  this);
+    		}
+    		
+    		// Add the MenuItem into the appropriate context
+    		if( level == 0) {
+    			jMenuBar.add( new_node);
+    		}
+    		else {
+    			active_root_tree[level-1].add(new_node);
+    		}
+    		active_root_tree[ level] = new_node;
+    	}
+    	
+
+        setJMenuBar(jMenuBar);
+    	
+    	// File
+/*    	JMenu file = new JMenu("File");
+    	file.setMnemonic( KeyEvent.VK_F);
+        
+    	// File -> New Image
+    	JMenuItem newImage = new JMenuItem("New Image", KeyEvent.VK_)
+        jMenu1.setText("File");
+
+//        menuNewImage.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        menuNewImage.setText("New Image");
+        menuNewImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuNewImageActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuNewImage);
+
+        jMenuItem1.setText("jMenuItem1");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);*/
+    }
+    
+    // :::: Menu Actions
+    
+    /***
+     * Prompts for a new image dialog and then perofms it
+     */
+    private void promptNewImage() {     
         NewImagePanel panel = new NewImagePanel(master);
 
         int response = JOptionPane.showConfirmDialog(this,
@@ -147,8 +228,11 @@ public class RootFrame extends javax.swing.JFrame
         }
     }                                            
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // TODO add your handling code here:
+    /***
+     * 
+     */
+    private void promptDebugColor() {  
+        // TODO DEBUG
         JColorChooser jcp = new JColorChooser();
         int response = JOptionPane.showConfirmDialog(this, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
@@ -160,6 +244,27 @@ public class RootFrame extends javax.swing.JFrame
 
 
 
+    /***
+     * Performs the given hotkey command string or deligates the command to the
+     * appropriate component
+     */
+    public void performCommand( String command) {
+        if( command != null) {
+            if( command.startsWith("global."))
+                globalHotkeyCommand(command.substring("global.".length()));
+            else if( command.startsWith("toolset."))
+                master.getToolsetManager().setTool(command.substring("toolset.".length()));
+            else if( command.startsWith("palette."))
+            	master.getPaletteManager().performCommand(command.substring("palette.".length()));
+            else {
+            	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
+            }
+        }
+    }
+    
+    /***
+     * Performs the given hotkey command string (should be of "global." focus)
+     */
     private void globalHotkeyCommand( String command) {
         if( command.equals("zoom_in")) {
             int zl = workPanel.getZoomLevel();
@@ -185,6 +290,13 @@ public class RootFrame extends javax.swing.JFrame
             workPanel.zoom(workPanel.getZoomLevel()-1);
         else if( command.equals("zoom_0"))
             workPanel.zoom(0);
+        else if( command.equals("new_image"))
+        	promptNewImage();
+        else if( command.equals("debug_color"))
+        	promptDebugColor();
+        else {
+        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
+        }
     }
     
     // :::: KeyEventDispatcher
@@ -193,23 +305,13 @@ public class RootFrame extends javax.swing.JFrame
         int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
 
         // Hotkeys
-        if( e.getID() == KeyEvent.KEY_RELEASED) {
+        if( e.getID() == KeyEvent.KEY_PRESSED) {
             int key = e.getKeyCode();
             int modifier = e.getModifiersEx();
 
             String command = master.getHotekyManager().getCommand( key, modifier);
 
-            // Depending on command domain, RootFrame either performs the command
-            //	itself or pass the command onto the appropriate context.
-            if( command != null) {
-                if( command.startsWith("global."))
-                    globalHotkeyCommand(command.substring("global.".length()));
-                else if( command.startsWith("toolset."))
-                    master.getToolsetManager().setTool(command.substring("toolset.".length()));
-                else if( command.startsWith("palette."))
-                	master.getPaletteManager().performCommand(command.substring("palette.".length()));
-
-            }
+            performCommand(command);
 
         }
         
@@ -219,8 +321,20 @@ public class RootFrame extends javax.swing.JFrame
     // :::: WindowFocusListener
 	@Override
 	public void windowGainedFocus(WindowEvent evt) {
-		master.getFrameManager().showAllFrames();
+		// !!!! TODO : This causes issues when you move a window to a different Desktop/Workspace
+		//	but solving this problem in pure Java will either be hacky or impossible.
+		
+		if( evt.getOppositeWindow() == null) {
+			master.getFrameManager().showAllFrames();
+			this.toFront();
+		}
 	}
 
 	@Override	public void windowLostFocus(WindowEvent arg0) {	}
+
+	// :::: ActionListener
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		performCommand(evt.getActionCommand());
+	}
 }

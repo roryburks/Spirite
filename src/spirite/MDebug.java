@@ -14,7 +14,16 @@ public class MDebug {
 		//	program design.  It indicates some potentially major oversight, but
 		//	because it should not significantly effect the performance of the
 		//	program it is just a warning.
-		STRUCTURAL,		
+		STRUCTURAL,	
+		// An initialization error means that some component (probably a dynamically
+		//	created one) could not be created for some reason.  This shouldn't
+		//	interfere with the operation of the program, but may prevent a piece of
+		//	it from being created.
+		INITIALIZATION,
+		// From action commands to properties to globals, there are a great many
+		//	thinks that are referenced by strings along the lines of "global.new_image"
+		//	Reference warnings are failures to find the corresponding data
+		REFERENCE,
 		UNSPECIFIED
 	}
 	

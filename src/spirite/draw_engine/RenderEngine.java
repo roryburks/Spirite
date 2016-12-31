@@ -117,5 +117,7 @@ public class RenderEngine
 	}
 
 	@Override
-	public void newImage() {}
+	public void newImage() {
+		imageChanged();
+	}
 }

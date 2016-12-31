@@ -90,14 +90,19 @@ public class LayersPanel extends JPanel {
 			int h = panel.getValueHeight();
 			String name = panel.getValueName();
 			String type = panel.getValueType();
+			Color c = panel.getValueColor();
 			
 
 			// Add the new layer contextually according to the selected Node
 			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();			
 			
 			ImageWorkspace workspace = master.getCurrentWorkspace();
+			
+			System.out.println(c);
 	        
-			master.getCurrentWorkspace().addNewRig(selected_node, w, h, name, new Color(0,0,0,0));
+			master.getCurrentWorkspace().addNewRig(selected_node, w, h, name, c);
+			
+			master.refreshImage();
 		}
 	}
 	
