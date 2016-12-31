@@ -32,6 +32,8 @@ import java.util.Enumeration;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -103,7 +105,7 @@ public class LayerTreePanel extends JPanel
 	
 	
     private class LayerTree extends JTree 
-    	implements TreeCellRenderer, TreeSelectionListener
+    	implements TreeCellRenderer, TreeSelectionListener, TreeExpansionListener
     {
     	DefaultMutableTreeNode root;
     	DefaultTreeModel model;
@@ -119,6 +121,7 @@ public class LayerTreePanel extends JPanel
     		this.setCellRenderer( this);
     		this.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
     		this.addTreeSelectionListener(this);
+    		this.addTreeExpansionListener(this);
     		
     		// Create Model
     		root = new DefaultMutableTreeNode("root");
@@ -170,21 +173,36 @@ public class LayerTreePanel extends JPanel
     		GroupTree.Node node = workspace.getRootNode();
 
     		// Start the recursive tree traversal
-    		_cfw_rec( node, root);
+    		_cfw_construcRecursively( node, root);
     		
     		model.nodeStructureChanged(root);
+
+    		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
     		tree.repaint();
     		
     		dragManager.changeDrag(null, 0);
     	}
-    	private void _cfw_rec( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
+    	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
     		for( GroupTree.Node child : group_node.getChildren()) {
     			DefaultMutableTreeNode node_to_add = new DefaultMutableTreeNode(child);
     			
     			tree_node.add( node_to_add);
     			
-    			_cfw_rec( child, node_to_add);
+    			_cfw_construcRecursively( child, node_to_add);
     		}
+    	}
+    	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
+    		for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
+    			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
+    			_cfw_setExpandedStateRecursively( child);
+    		}
+    		
+    		try {
+	    		if( ((GroupTree.Node)tree_node.getUserObject()).isExpanded() ) {
+	    			TreePath path =  new TreePath(tree_node.getPath());
+	    			tree.expandPath(path);
+	    		}
+    		} catch( ClassCastException e) {}
     	}
 
     	
@@ -281,6 +299,32 @@ public class LayerTreePanel extends JPanel
 			}
 			else
 				workspace.setActivePart(null);
+			
+		}
+
+		// :::: TreeExpansionListener
+		@Override
+		public void treeCollapsed(TreeExpansionEvent evt) {
+			try {
+				GroupTree.Node node = 
+						(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
+				
+				node.setExpanded(false);
+			} catch ( ClassCastException e) {
+				MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
+			}
+		}
+
+		@Override
+		public void treeExpanded(TreeExpansionEvent evt) {
+			try {
+				GroupTree.Node node = 
+						(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
+				
+				node.setExpanded(true);
+			} catch ( ClassCastException e) {
+				MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
+			}
 			
 		}
     }
@@ -443,8 +487,12 @@ public class LayerTreePanel extends JPanel
 				if( dragMode == 1) 
 					workspace.moveAbove(draggingNode, nodeInto);
 				else if( nodeInto instanceof GroupTree.GroupNode) {
-					if( dragMode == 2) 
-						workspace.moveIntoTop(draggingNode, (GroupTree.GroupNode)nodeInto);
+					if( dragMode == 2) {
+						if( tree.isExpanded(dragIntoNode))
+							workspace.moveIntoTop(draggingNode, (GroupTree.GroupNode)nodeInto);
+						else
+							workspace.moveBelow(draggingNode, nodeInto);
+					}
 					else if( dragMode == 3)
 						workspace.moveInto(draggingNode, ( GroupTree.GroupNode)nodeInto);
 				}

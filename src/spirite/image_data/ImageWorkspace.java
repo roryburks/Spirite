@@ -100,11 +100,11 @@ public class ImageWorkspace {
 		alertStructureChanged();
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto) {
-		groups.moveInto(nodeToMove, nodeInto);
+		groups.moveInto(nodeToMove, nodeInto, false);
 		alertStructureChanged();
 	}
 	public void moveIntoTop(Node nodeToMove, GroupNode nodeInto) {
-		groups.moveIntoTop(nodeToMove, nodeInto);
+		groups.moveInto(nodeToMove, nodeInto, true);
 		alertStructureChanged();
 	}
 	

@@ -49,34 +49,46 @@ public class GroupTree {
 	
 	// :::: Moving Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
-		if( nodeToMove == null || nodeAbove == null || nodeAbove.parent == null || nodeToMove.parent == null)
+		if( nodeToMove == null || nodeAbove == null || nodeAbove.parent == null 
+				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeAbove.parent))
 			return;
 
 		nodeToMove._del();
 		nodeAbove.parent._add(nodeToMove, nodeAbove, true);
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
-		if( nodeToMove == null || nodeUnder == null || nodeUnder.parent == null || nodeToMove.parent == null)
+		if( nodeToMove == null || nodeUnder == null || nodeUnder.parent == null 
+				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeUnder.parent))
 			return;
 
 		nodeToMove._del();
 		nodeUnder.parent._add(nodeToMove, nodeUnder, false);
 	}
-	public void moveInto( Node nodeToMove, GroupNode nodeInto) {
-		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null || nodeToMove.parent == null)
+	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
+		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null 
+				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeInto))
 			return;
 
+		
 		nodeToMove._del();
-		nodeInto.children.add(nodeToMove);
+		if( top)
+			nodeInto.children.add(0, nodeToMove);
+		else
+			nodeInto.children.add(nodeToMove);
+			
 		nodeToMove.parent = nodeInto;
 	}
-	public void moveIntoTop( Node nodeToMove, GroupNode nodeInto) {
-		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null || nodeToMove.parent == null)
-			return;
-
-		nodeToMove._del();
-		nodeInto.children.add(0,nodeToMove);
-		nodeToMove.parent = nodeInto;
+	
+	// To make sure you don't try to move a node into one of it's children we perform this test.
+	private boolean _isChild( Node node, Node nodeInto) {
+		Node n = nodeInto;
+		
+		while( n != root && n != null) {
+			if( n == node) return true;
+			n = n.parent;
+		}
+		
+		return false;
 	}
 	
 	// ::: Nodes
@@ -85,6 +97,7 @@ public class GroupTree {
 		//	or the Rig (without altering them) should go here
 		private float alpha;
 		private boolean visible = true;
+		private boolean expanded = true;
 
 		
 		// !!!! Note: even though RigNodes will never use it, it's still useful to have for 
@@ -105,6 +118,12 @@ public class GroupTree {
 		}
 		public void setVisible( boolean visisble) {
 			this.visible = visible;
+		}
+		public boolean isExpanded() {
+			return expanded;
+		}
+		public void setExpanded( boolean expanded) {
+			this.expanded = expanded;
 		}
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
@@ -134,7 +153,6 @@ public class GroupTree {
 	
 	public class GroupNode extends Node {
 		private String name;
-		private boolean expanded;
 		
 		GroupNode( String name) {
 			this.name = name;
