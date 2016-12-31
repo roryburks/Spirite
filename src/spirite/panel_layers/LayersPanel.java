@@ -98,8 +98,6 @@ public class LayersPanel extends JPanel {
 			
 			ImageWorkspace workspace = master.getCurrentWorkspace();
 			
-			System.out.println(c);
-	        
 			master.getCurrentWorkspace().addNewRig(selected_node, w, h, name, c);
 			
 			master.refreshImage();

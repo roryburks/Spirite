@@ -175,38 +175,6 @@ public class RootFrame extends javax.swing.JFrame
     	
 
         setJMenuBar(jMenuBar);
-    	
-    	// File
-/*    	JMenu file = new JMenu("File");
-    	file.setMnemonic( KeyEvent.VK_F);
-        
-    	// File -> New Image
-    	JMenuItem newImage = new JMenuItem("New Image", KeyEvent.VK_)
-        jMenu1.setText("File");
-
-//        menuNewImage.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-        menuNewImage.setText("New Image");
-        menuNewImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuNewImageActionPerformed(evt);
-            }
-        });
-        jMenu1.add(menuNewImage);
-
-        jMenuItem1.setText("jMenuItem1");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
-
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);*/
     }
     
     // :::: Menu Actions

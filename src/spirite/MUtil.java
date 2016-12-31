@@ -8,8 +8,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.Position;
+import javax.swing.text.Segment;
 
 public class MUtil {
 
@@ -47,11 +53,39 @@ public class MUtil {
 		private Color default_color = null;
 		private Color bad_color = Color.RED;
 		
+		private MTFNDocument mdocument;
+		
 		private boolean valid = true;
 		
 		public MTextFieldNumber() {
+			mdocument = new MTFNDocument();
+			this.setDocument(mdocument);
 			this.getDocument().addDocumentListener(this);
 		}
+		
+		
+		/***
+		 * Document that behaves identically to PlainDocument, but doesn't allow
+		 * you to enter non-number characters.
+		 */
+		public class MTFNDocument extends PlainDocument {
+			private boolean allows_negative = true;
+			private boolean allows_floats = false;
+			@Override
+			public void insertString( int offset, String str, AttributeSet a) throws BadLocationException {
+				
+				// Only allow the user to enter part of a string if it's digits.  Possibly with 
+				//	- and .  But only one - at the beginning (and only if negatives are allowed)
+				//	and only one . (if floats are allowed)
+				if( !str.matches("^-?[0-9]*\\.?[0-9]*$") 
+						|| (str.startsWith("-") && (offset !=0 || !allows_negative))
+						|| (str.contains(".") && (this.getText(0, this.getLength()).contains(".") || !allows_floats)))
+					Toolkit.getDefaultToolkit().beep();
+				else
+					super.insertString(offset, str, a);
+			}
+		}
+		
 		
 		// :::: API
 		public void setMinMax( int min, int max) {
@@ -71,7 +105,22 @@ public class MUtil {
 			return valid;
 		}
 		
-		// ::::
+		// :::: Out of bounds check
+		
+		// Turn the text field red if the data is out of bounds
+		private void checkIfOOB() {
+			String text = this.getText();
+			
+			try {
+				int i = Integer.parseInt(text);
+				if( text == "") i = 0;
+				
+				if( i < min || i > max)
+					this.outOfBounds();
+				else
+					this.inBounds();
+			}catch( Exception e) {}
+		}
 		private void outOfBounds() {
 			default_color = this.getBackground();
 			this.setBackground(bad_color);
@@ -87,66 +136,15 @@ public class MUtil {
 		
 
 
+		// :::: DocumentListener
 		@Override public void changedUpdate(DocumentEvent e) {}
 		
 		@Override public void removeUpdate(DocumentEvent de) {
-			String text = this.getText();
-			
-			try {
-				int i = Integer.parseInt(text);
-				if( text == "") i = 0;
-				
-				if( i < min || i > max)
-					this.outOfBounds();
-				else
-					this.inBounds();
-			}catch( Exception e) {}
 		}
 		
 		@Override
 		public synchronized void insertUpdate(DocumentEvent de) {
-			
-			String text = "";
-			
-			// Beep and revert insert if the user tries to enter a non-int
-			int i;
-			try {
-				text = this.getText();
-				i = Integer.parseInt( text);
-				if( text == "") i = 0;
-				
-				if( i < min || i > max)
-					this.outOfBounds();
-				else
-					this.inBounds();
-			} catch( Exception e) {
-				
-				Toolkit.getDefaultToolkit().beep();
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run() {
-						clip( de.getOffset(), de.getLength());
-					}
-				});
-				
-				return;
-			} 
-		}
-		
-		private synchronized void clip( int o, int l) {
-			try {
-				this.getDocument().remove(o, l);
-				
-				// Because even with the synchronized keyword the asynchronous nature of UI can
-				//	cause things to slip through if you're mashing buttons, so this fail-safe
-				//	exists (though it can inexplicably cause the data to be lost).
-				String text = this.getText();
-				
-				if( text.matches(".*\\D.*")) {
-					text.replaceAll("\\D", "");
-					this.setText(text);
-				}
-				
-			} catch (BadLocationException e1) {}
+			checkIfOOB();
 		}
 
 	}

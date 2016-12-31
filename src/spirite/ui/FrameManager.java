@@ -15,10 +15,10 @@ import javax.swing.JPanel;
 import spirite.brains.MasterControl;
 
 public class FrameManager implements WindowListener {
-	MasterControl master;
-	RootFrame root = null;;
+	private MasterControl master;
+	private RootFrame root = null;
 	
-	List<JDialog> frames = new ArrayList<>();
+	private List<JDialog> frames = new ArrayList<>();
 	
 	public FrameManager( MasterControl master) {
 		this.master = master;
@@ -52,8 +52,7 @@ public class FrameManager implements WindowListener {
 	 */
 	public void showAllFrames() {
 		for( JDialog frame : frames) {
-//			if( !frame.isActive())
-				frame.toFront();
+			frame.toFront();
 		}
 	}
 
@@ -65,7 +64,7 @@ public class FrameManager implements WindowListener {
 	@Override	public void windowActivated(WindowEvent evt) {}
 	@Override	public void windowClosed(WindowEvent evt) {}
 	@Override	public void windowDeactivated(WindowEvent evt) {}
-	@Override	public void windowDeiconified(WindowEvent evt) {System.out.println("test");}
+	@Override	public void windowDeiconified(WindowEvent evt) {}
 	@Override	public void windowIconified(WindowEvent evt) {}
 	@Override	public void windowOpened(WindowEvent evt) {}
 }
