@@ -4,6 +4,7 @@ package spirite;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 
 /**
  * The Globals object will centralize all globals that might have reason to
@@ -26,6 +27,24 @@ public class Globals {
     		{"layerpanel.treenodes.max", new Dimension( 40, 40)},
     		{"layerpanel.treenodes.dragdropleniency", new Dimension( 0, 10)},
     };
+    
+	// Each dot before the name indicates the level it should be in.  For example one dot
+	//	means it goes inside the last zero-dot item, two dots means it should go in the last
+	//	one-dot item, etc.
+	// Note, there should never be any reason to skip dots and doing so will probably 
+	//	break it.
+	private static Object[][] menu_scheme = {
+			{"File", KeyEvent.VK_F, null},
+			{".New Image", KeyEvent.VK_N, "global.new_image"},
+			{".Debug Color", KeyEvent.VK_C, "global.debug_color"},
+			
+			{"Edit", KeyEvent.VK_E, null},
+			
+			{"Window", KeyEvent.VK_W, null},
+			{".Dialogs", KeyEvent.VK_D, null},
+			{"..Layers", KeyEvent.VK_L, "frame.showLayerFrame"},
+			{"..Tools", KeyEvent.VK_T, "frame.showToolsFrame"},
+	};
 
     public static Color getColor( String id) {
         for( int i = 0; i < colors.length; ++i) {
@@ -44,6 +63,10 @@ public class Globals {
         }
 
         return new Dimension( 64,64);
+    }
+    
+    public static Object[][] getMenuSchem() {
+    	return menu_scheme;
     }
     
 }

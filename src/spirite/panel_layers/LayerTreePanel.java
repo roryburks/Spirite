@@ -16,7 +16,6 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceContext;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
@@ -29,19 +28,15 @@ import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -49,13 +44,9 @@ import javax.swing.tree.TreeSelectionModel;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MImageObserver;
 import spirite.image_data.GroupTree;
-import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
-import spirite.image_data.Part;
-import spirite.image_data.SpiriteImage;
 
 public class LayerTreePanel extends JPanel 
 	implements MImageStructureObserver
@@ -291,7 +282,6 @@ public class LayerTreePanel extends JPanel
 			
 			Object obj = node.getUserObject();
 			
-			System.out.println( obj.getClass());
 			if( obj instanceof GroupTree.RigNode) {
 				GroupTree.RigNode rn = (GroupTree.RigNode)obj;
 				
@@ -393,17 +383,15 @@ public class LayerTreePanel extends JPanel
 				if( action == DnDConstants.ACTION_MOVE)
 					cursor = DragSource.DefaultMoveDrop;
 				
-				System.out.println(cursor);
 				dragSource.startDrag( evt, cursor, trans, this);
 			}
-			System.out.println("gestrec");
 		}
 		
 		// :::: DragTargetListener
 		@Override		public void dragEnter(DropTargetDragEvent arg0) {}
 		@Override		public void dragExit(DropTargetEvent arg0) {}
 		@Override		public void dropActionChanged(DropTargetDragEvent arg0) {}
-
+		@Override		public void drop(DropTargetDropEvent arg0) {}
 
 		@Override
 		public void dragOver(DropTargetDragEvent evt) {
@@ -472,7 +460,6 @@ public class LayerTreePanel extends JPanel
 		}
 
 
-		@Override		public void drop(DropTargetDropEvent arg0) {}
 
 		// :::: DragSourceListener
 		@Override 		

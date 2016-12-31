@@ -27,6 +27,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.dialogs.NewImagePanel;
@@ -119,21 +120,9 @@ public class RootFrame extends javax.swing.JFrame
     	return Math.min(r, MAX_LEVEL);
     }
     private void initMenu() {
-    	// Each dot before the name indicates the level it should be in.  For example one dot
-    	//	means it goes inside the last zero-dot item, two dots means it should go in the last
-    	//	one-dot item, etc.
-    	// Note, there should never be any reason to skip dots and doing so will probably 
-    	//	break it.
-    	Object[][] menu_scheme = {
-    			{"File", KeyEvent.VK_F, null},
-    			{".New Image", KeyEvent.VK_N, "global.new_image"},
-    			{".Debug Color", KeyEvent.VK_C, "global.debug_color"},
-    			
-    			{"Edit", KeyEvent.VK_E, null},
-    			
-    			{"Window", KeyEvent.VK_W, null},
-    			{".Dialogs", KeyEvent.VK_D, null},
-    	};
+
+    	
+    	Object[][] menu_scheme = Globals.getMenuSchem();
     	
 
     	JMenuBar jMenuBar = new JMenuBar();
@@ -224,6 +213,8 @@ public class RootFrame extends javax.swing.JFrame
                 master.getToolsetManager().setTool(command.substring("toolset.".length()));
             else if( command.startsWith("palette."))
             	master.getPaletteManager().performCommand(command.substring("palette.".length()));
+            else if( command.startsWith("frame."))
+            	master.getFrameManager().performCommand(command.substring("frame.".length()));
             else {
             	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
             }

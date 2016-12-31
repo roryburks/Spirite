@@ -85,10 +85,7 @@ public class HotkeyManager {
 
             key.fromPrefString(s);
 
-            System.out.println( (String)obj[0] + ":" + key.key + ":" + InputEvent.CTRL_DOWN_MASK);
-            System.out.println( (String)obj[0] + ":" + key.key + ":" + key.modifier);
             hotkey_map.put(key, (String)obj[0]);
-            System.out.println( hotkey_map.containsKey(new Hotkey( key.key, key.modifier)));
         }
     }
     

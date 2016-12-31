@@ -28,10 +28,13 @@ import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
+import spirite.ui.FrameManager.FrameType;
+import spirite.ui.OmniFrame.OmniPanel;
 
-public class ToolsPanel extends JPanel
+public class ToolsPanel extends OmniPanel
         implements ComponentListener, MToolsetObserver
 {
+	public FrameType getFrameType() {return FrameType.TOOLS;}
     private static final int BUTTON_WIDTH = 24;
     private static final int BUTTON_HEIGHT = 24;
 
@@ -47,7 +50,6 @@ public class ToolsPanel extends JPanel
     ToolButton buttons[];
 
 
-    public ToolsPanel( ){}
     public ToolsPanel( MasterControl master) {
         this.master = master;
 
@@ -93,6 +95,7 @@ public class ToolsPanel extends JPanel
         //  manipulated directly)
         this.setLayout( new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.addComponentListener(this);
+        this.setPreferredSize(new java.awt.Dimension(140, 140));
 
         container = new JPanel();
         add(container);

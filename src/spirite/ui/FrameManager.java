@@ -18,12 +18,27 @@ public class FrameManager implements WindowListener {
 	private MasterControl master;
 	private RootFrame root = null;
 	
-	private List<JDialog> frames = new ArrayList<>();
+	private List<OmniFrame> frames = new ArrayList<>();
+	
+	public static enum FrameType {
+		BAD,
+		LAYER,
+		TOOLS
+	}
 	
 	public FrameManager( MasterControl master) {
 		this.master = master;
 	}
 	
+	// :::: API
+	public void performCommand( String command) {
+		if( command.equals("showLayerFrame"))
+			addFrame( FrameType.LAYER);
+		else if( command.equals("showToolsFrame"))
+			addFrame( FrameType.TOOLS);
+	}
+	
+	// :::: UI-related
 	public void packMainFrame() {
         root = new RootFrame( master);
         root.pack();
@@ -31,10 +46,25 @@ public class FrameManager implements WindowListener {
         root.setVisible(true);
 	}
 	
-	public void addFrame( JPanel panel) {
-		JDialog container = new JDialog();
+	/***
+	 * 
+	 * @param bit_mask Bitwise combination of 
+	 */
+	public void addFrame( FrameType frameType) {
+		// First Check to make sure the frame type isn't already open
+		//	(assuming it's not duplicateable)
+		for( OmniFrame frame : frames) {
+			if( frame.containsFrameType( frameType)) {
+				// TODO Add some visual sign of presence
+				frame.toFront();
+				
+				return;
+			}
+		}
 		
-		container.add( panel);
+		// Next create the container frame and show it
+		OmniFrame container = new OmniFrame( master, frameType);
+		
 		container.pack();
 		
 		if( root != null) {
@@ -51,11 +81,10 @@ public class FrameManager implements WindowListener {
 	 * 
 	 */
 	public void showAllFrames() {
-		for( JDialog frame : frames) {
+		for( OmniFrame frame : frames) {
 			frame.toFront();
 		}
 	}
-
 	
 	// :::: WindowListener
 	@Override	public void windowClosing(WindowEvent evt) {

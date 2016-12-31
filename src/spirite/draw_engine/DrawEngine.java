@@ -54,7 +54,6 @@ public class DrawEngine {
 		working_image = master.getCurrentWorkspace().getActivePart().getData();
 		
 		if( working_image == null ) {
-			System.out.println("s");
 			endStroke();
 			return;
 		}
@@ -90,7 +89,6 @@ public class DrawEngine {
 	
 	// :::: Stroke API
 	public void startStroke( StrokeParams s, int x, int y) {
-		System.out.println("Start");
 		old_x = x;
 		old_y = y;
 		new_x = x;

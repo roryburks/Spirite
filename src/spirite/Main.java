@@ -2,7 +2,6 @@
 
 package spirite;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import spirite.brains.MasterControl;
@@ -44,7 +43,8 @@ public class Main{
     	
     	frame_manager.packMainFrame();
     	
-    	frame_manager.addFrame( new LayersPanel( master));
+    	frame_manager.addFrame( FrameManager.FrameType.LAYER);
+    	//frame_manager.addFrame( new LayersPanel( master));
     }
 }
 
