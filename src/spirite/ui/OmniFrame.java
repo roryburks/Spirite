@@ -1,5 +1,15 @@
 package spirite.ui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -19,46 +29,95 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import spirite.brains.MasterControl;
+import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.ui.FrameManager.FrameType;
 
 public class OmniFrame extends JDialog
-{
-	private List<OmniContainer> containers = new ArrayList<>();
-	
+{	
 	private MasterControl master;
 	
+	// Components
 	private OFTransferHandler transferHandler;
-	
 	private JTabbedPane root;
+	private List<OmniContainer> containers = new ArrayList<>();
+	
+	// Drag UI States
+	private enum DragMode {
+		NOT_DRAGGING,
+		DRAG_INTO_TAB,
+		DRAG_INTO_CONTENT
+	}
+	private DragMode dragMode = DragMode.NOT_DRAGGING;
+	private int dragTab = 0;
 	
 	public OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
 
+		root = new OmniTabbedFrame();
+		root.setTabPlacement(JTabbedPane.TOP);
+		
 		//
-		transferHandler = new OFTransferHandler();
-		this.setTransferHandler(transferHandler);
+		transferHandler = new OFTransferHandler(this);
+		root.setTransferHandler(transferHandler);
 		
 		// Create TabbedPane
-		root = new JTabbedPane( JTabbedPane.TOP);
 		this.add( root);
 
 		
 		// Create the panel of the given type
 		addPanel( type);	
+		
+	}
+	
+	/***
+	 * This classes is needed because overriding a JDialog's paint method
+	 * is not nearly as effective as overriding a Component's
+	 */
+	public class OmniTabbedFrame extends JTabbedPane {
+		OmniTabbedFrame() {
+			super();
+		}
+
+		@Override
+		public void paint( Graphics g) {
+			super.paint(g);
+
+			switch( dragMode) {
+			case DRAG_INTO_TAB:
+				if( dragTab == -1) {
+					g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+				}
+				else {
+					
+					Rectangle r = root.getTabComponentAt(dragTab).getBounds();
+					
+	                Graphics2D g2 = (Graphics2D) g;
+	                Stroke oldStroke = g2.getStroke();
+					g2.setColor( Color.BLACK);
+					g2.setStroke( new BasicStroke(3));
+					g2.drawRect( r.x, r.y, r.width, r.height);
+					g2.setStroke( oldStroke);
+				}
+			}
+			
+		}
 	}
 	
 	
@@ -182,7 +241,7 @@ public class OmniFrame extends JDialog
 			return flavor.equals(FLAVOR);
 		}
 	}
-	private final static DataFlavor FLAVOR = 
+	public final static DataFlavor FLAVOR = 
 			new DataFlavor( OFTransferable.class, "OmniPanel");
 	private static DataFlavor flavors[] = {FLAVOR};
 	
@@ -197,11 +256,18 @@ public class OmniFrame extends JDialog
 		protected DragSource dragSource;
 		protected List<DragGestureRecognizer> dgrs = new ArrayList<>();
 		protected DropTarget dropTarget;
+		private OmniFrame context;
 		
-		public OFTransferHandler() {
+		public OFTransferHandler(OmniFrame context) {
+			this.context = context;
 			dragSource = DragSource.getDefaultDragSource();
 		}
 		
+		/**
+		 * Called when the tab structure changed, removes all existing
+		 * Gesture Recognizers and then adds new ones for each custom tab
+		 * component.
+		 */
 		protected void refreshGestureRecognizers() {
 			for( DragGestureRecognizer dgr : dgrs) {
 				dgr.setComponent(null);
@@ -239,29 +305,86 @@ public class OmniFrame extends JDialog
 		// :::: Import
 		@Override
 		public boolean canImport( TransferSupport support) {
-			
 			for( DataFlavor df : support.getDataFlavors()) {
-				System.out.println(df.getHumanPresentableName());
+				if( df == FLAVOR) {
+					
+					Component c = root.getComponentAt( support.getDropLocation().getDropPoint());
+					
+					
+					// !!!! Note: This is very ugly and I'm not sure that this is guarenteed
+					//	to work in all Java implementations past and pressent, but 
+					//	since JTabbedPane lacks any "getTabContainer" option or similar
+					//	this is what I have to do
+					if( c == containers.get(0).bar.getParent()) {
+						// Determine which (if any) tab you're hovered over
+						Point p = SwingUtilities.convertPoint(
+								root, 
+								support.getDropLocation().getDropPoint(), 
+								c);
+						
+						Component tab = c.getComponentAt(p);
+						
+						
+
+						dragMode = DragMode.DRAG_INTO_TAB;
+						
+						// Determine which tab is being dragged over
+						int i = 0;
+						int cnt = root.getTabCount();
+						dragTab = -1;
+						for( i = 0; i < cnt; ++i) {
+							if( tab == root.getTabComponentAt(i)) {
+								dragTab = i;
+							}
+						}
+						
+						root.repaint();
+						return true;
+					}
+
+				}
 			}
 			
 			
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean importData( TransferSupport support) {
+			dragMode = DragMode.NOT_DRAGGING;
+			root.repaint();
 			return true;
 		}
 
+		// :::: DragGestureListener
 		@Override
 		public void dragGestureRecognized(DragGestureEvent evt) {
-			System.out.println( evt.getComponent());
 			
+			// Determine which component is being Dragged (all registerred components
+			//	should be OmniBars and if they're not this object wouldn't know what
+			//	to do with them anyway)
 			for( OmniContainer container : containers) {
-				if( evt.getComponent() == container.bar) {
-					System.out.println( containers.indexOf(container));
+				if( evt.getComponent() == container.bar) {					
+					OFTransferable oftrans = new OFTransferable( context, container.panel);
+					Transferable trans = (Transferable)oftrans;
 					
-					Transferable trans = (Transferable)null;
+
+					// Set the cursor and start the drag action
+					Cursor cursor = DragSource.DefaultMoveDrop;
+					int action = evt.getDragAction();
+					if( action == DnDConstants.ACTION_MOVE)
+						cursor = DragSource.DefaultMoveDrop;
+					
+					RenderSettings set = new RenderSettings();
+					set.workspace = master.getCurrentWorkspace();
+					
+					dragSource.startDrag(
+							evt, 
+							cursor, 
+							master.getRenderEngine().renderImage( set),
+							new Point(10,10), 
+							trans, 
+							null);
 				}
 			}
 			

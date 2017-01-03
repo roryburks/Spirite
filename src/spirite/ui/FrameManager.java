@@ -79,7 +79,6 @@ public class FrameManager implements WindowListener {
 		for( OmniFrame frame : frames) {
 			if( frame.containsFrameType( frameType)) {
 				frame.toFront();
-				frame.addPanel(frameType);
 				
 				return;
 			}
@@ -88,6 +87,7 @@ public class FrameManager implements WindowListener {
 		// Next create the container frame and show it
 		OmniFrame container = new OmniFrame( master, frameType);
 		
+		container.addPanel( FrameType.TOOLS);
 		container.pack();
 		
 		if( root != null) {

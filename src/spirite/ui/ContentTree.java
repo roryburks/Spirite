@@ -235,6 +235,21 @@ public class ContentTree extends JPanel
 	
 		@Override
 		public void dragOver(DropTargetDragEvent evt) {
+			// Make sure it's the correct Flavor Type
+			DataFlavor dfs[] = evt.getCurrentDataFlavors();
+			
+			// !!! TODO Figure out how to make the ContentTree DnD not interfere
+			//	with the OmniFrame DnD while overlapping areas
+			if( dfs.length != 1 || dfs[0] != FLAVOR) {
+				if( dfs[0] != OmniFrame.FLAVOR)
+//					evt.acceptDrag(DnDConstants.M);
+					evt.rejectDrag();
+				return;
+			}
+			
+			
+			// Then Test based on Position (while updating the data
+			//	keeping track of where the tree node will be placed).
 			if(!testDrag( evt.getLocation())) {
 				evt.rejectDrag();
 			}
