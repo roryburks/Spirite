@@ -18,7 +18,7 @@ import spirite.image_data.GroupTree.Node;
  */
 public class ImageWorkspace {
 	private List<Part> parts;
-	private List<Rig> rigs;
+	private List<Layer> rigs;
 	private List<Scene> scenes;
 	private GroupTree groups;
 	
@@ -30,7 +30,7 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace() {
 		parts = new ArrayList<Part>();
-		rigs = new ArrayList<Rig>();
+		rigs = new ArrayList<Layer>();
 		scenes = new ArrayList<Scene>();
 		
 		groups = new GroupTree(this);
@@ -55,24 +55,24 @@ public class ImageWorkspace {
 	public Part getActivePart() {
 		if( selected_rig < 0) return null;
 		
-		Rig rig = rigs.get( selected_rig);
+		Layer rig = rigs.get( selected_rig);
 		if( rig == null) return null;
 		
-		return rig.debugGetPart();
+		return rig.getActivePart();
 	}
 	
-	public void setActivePart( Rig rig) {
+	public void setActivePart( Layer rig) {
 		selected_rig = rigs.indexOf(rig);
 	}
 	
 	// Creates a New Rig
-	public Rig newRig( int w, int h, String name, Color c) {
+	public Layer newRig( int w, int h, String name, Color c) {
 		return 	addNewRig( null, w, h, name, c);
 	}
 	
-	public Rig addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
+	public Layer addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
 
-		Rig rig = new Rig(w, h, name, c);		
+		Layer rig = new SimpleLayer(w, h, name, c);		
 		groups.addContextual(context, rig);
 		rigs.add(rig);
 		
@@ -106,19 +106,19 @@ public class ImageWorkspace {
 	
 	
 	// Creates a queue of images for drawing purposes
-	public List<BufferedImage> getDrawingQueue() {
-		List<BufferedImage> queue = new LinkedList<BufferedImage>();
+	public List<Layer> getDrawingQueue() {
+		List<Layer> queue = new LinkedList<Layer>();
 		
 		_gdq_rec( groups.getRoot(), queue);
 		
 		return queue;
 	}
-	private void _gdq_rec( GroupTree.Node node, List<BufferedImage>queue) {
+	private void _gdq_rec( GroupTree.Node node, List<Layer>queue) {
 		for( GroupTree.Node child : node.getChildren()) {
 			if( child.isVisible()) {
 				if( child instanceof GroupTree.RigNode) {
 					// !!!! Very Debug [TODO]
-					queue.add(0,((GroupTree.RigNode)child).getRig().debugGetPart().getData());
+					queue.add(0,((GroupTree.RigNode)child).getRig());
 				}
 				else {
 					_gdq_rec( child, queue);

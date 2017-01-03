@@ -14,15 +14,12 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.FrameManager;
 import spirite.ui.FrameManager.FrameType;
-import spirite.ui.OmniFrame.OmniPanel;
 
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
-public class LayersPanel extends OmniPanel {
-	@Override
-	public FrameType getFrameType() {return FrameType.LAYER;}
+public class LayersPanel extends JPanel {
 	
 	MasterControl master;
 	

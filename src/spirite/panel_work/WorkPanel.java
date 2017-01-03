@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import spirite.MDebug;
 import spirite.brains.MasterControl.MImageObserver;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.SpiriteImage;
 import spirite.brains.MasterControl;
 
 /**

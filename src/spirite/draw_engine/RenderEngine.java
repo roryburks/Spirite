@@ -9,6 +9,7 @@ import java.util.List;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MImageObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.Layer;
 
 public class RenderEngine 
 	implements MImageObserver
@@ -33,13 +34,15 @@ public class RenderEngine
 			
 			if( workspace == null) return null;
 			
-			List<BufferedImage> drawing_queue = workspace.getDrawingQueue();
+			List<Layer> drawing_queue = workspace.getDrawingQueue();
 			
 			image = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics g = image.getGraphics();
 	
-			for( BufferedImage img : drawing_queue) {
-				g.drawImage(img, 0, 0, null);
+			for( Layer layer : drawing_queue) {
+				// !!!! TODO Very Debug
+				if( layer.getActivePart() != null)
+					g.drawImage(layer.getActivePart().getData(), 0, 0, null);
 			}
 			
 			Cache c = new Cache();

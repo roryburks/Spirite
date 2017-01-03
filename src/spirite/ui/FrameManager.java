@@ -1,21 +1,17 @@
 package spirite.ui;
 
-import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
+import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
-import spirite.ui.OmniFrame.OmniPanel;
 
 public class FrameManager implements WindowListener {
 	private MasterControl master;
@@ -23,10 +19,14 @@ public class FrameManager implements WindowListener {
 	
 	private List<OmniFrame> frames = new ArrayList<>();
 	
+	/***
+	 * A Collection of identifiers for all the dockable Frames.
+	 */
 	public static enum FrameType {
 		BAD (""),
 		LAYER ("Layers"),
 		TOOLS ("Toolset"),
+		ANIMATION_SCHEME ("Animation Scheme"),
 		;
 		
 		private String name;
@@ -38,12 +38,18 @@ public class FrameManager implements WindowListener {
 		}
 	}
 	
-	public OmniPanel createOmniPanel( FrameType type) {
+	/***
+	 * The facroty which creates Docked panels based on their type
+	 * identifier
+	 */
+	public JPanel createOmniPanel( FrameType type) {
 		switch( type) {
 		case LAYER:
 			return new LayersPanel( master);
 		case TOOLS:
 			return new ToolsPanel(master);
+		case ANIMATION_SCHEME:
+			return new AnimationSchemePanel(master);
 		default:
 			return null;
 		}
@@ -59,6 +65,8 @@ public class FrameManager implements WindowListener {
 			addFrame( FrameType.LAYER);
 		else if( command.equals("showToolsFrame"))
 			addFrame( FrameType.TOOLS);
+		else if( command.equals("showAnimSchemeFrame"))
+			addFrame( FrameType.ANIMATION_SCHEME);
 	}
 	
 	// :::: UI-related
@@ -87,7 +95,6 @@ public class FrameManager implements WindowListener {
 		// Next create the container frame and show it
 		OmniFrame container = new OmniFrame( master, frameType);
 		
-		container.addPanel( FrameType.TOOLS);
 		container.pack();
 		
 		if( root != null) {

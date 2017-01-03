@@ -44,6 +44,8 @@ public class Globals {
 			{".Dialogs", KeyEvent.VK_D, null},
 			{"..Layers", KeyEvent.VK_L, "frame.showLayerFrame"},
 			{"..Tools", KeyEvent.VK_T, "frame.showToolsFrame"},
+			{"..-",null,null},
+			{"..Animation Scheme", KeyEvent.VK_S, "frame.showAnimSchemeFrame"},
 	};
 
     public static Color getColor( String id) {

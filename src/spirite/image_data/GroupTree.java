@@ -30,7 +30,7 @@ public class GroupTree {
 		GroupNode to_add = new GroupNode(group_name);
 		_addContextual( selected, to_add);
 	}
-	public void addContextual( Node selected, Rig rig) {
+	public void addContextual( Node selected, Layer rig) {
 		RigNode to_add = new RigNode(rig);
 		_addContextual( selected, to_add);
 	}
@@ -171,13 +171,13 @@ public class GroupTree {
 	}
 	
 	public class RigNode extends Node {
-		private Rig data;
+		private Layer data;
 		
-		RigNode( Rig data) {
+		RigNode( Layer data) {
 			this.data = data;
 		}
 		
-		public Rig getRig() {
+		public Layer getRig() {
 			return data;
 		}
 	}

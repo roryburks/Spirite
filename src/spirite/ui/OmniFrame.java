@@ -125,7 +125,7 @@ public class OmniFrame extends JDialog
 	 * Adds Panel of the given FrameType
 	 */
 	public void addPanel( FrameType type) {
-		OmniPanel panel = master.getFrameManager().createOmniPanel(type);
+		JPanel panel = master.getFrameManager().createOmniPanel(type);
 		
 		if( panel == null) return;
 		
@@ -134,7 +134,7 @@ public class OmniFrame extends JDialog
 		OmniBar bar = new OmniBar( type.getName());
 		root.setTabComponentAt(root.getTabCount()-1, bar);
 		
-		containers.add(new OmniContainer(panel, bar));
+		containers.add(new OmniContainer(panel, bar, type));
 		transferHandler.refreshGestureRecognizers();
 	}
 	
@@ -145,7 +145,7 @@ public class OmniFrame extends JDialog
 		List<FrameType> list = new ArrayList<FrameType>();
 
 		for( OmniContainer container : containers) {
-			list.add( container.panel.getFrameType());
+			list.add( container.type);
 		}
 		
 		return list;
@@ -156,7 +156,7 @@ public class OmniFrame extends JDialog
 	 */
 	public boolean containsFrameType( FrameType type) {
 		for( OmniContainer container : containers) {
-			if( container.panel.getFrameType() == type)
+			if( container.type == type)
 				return true;
 		}
 		
@@ -164,13 +164,6 @@ public class OmniFrame extends JDialog
 	}
 	
 	
-	/***
-	 * An omnipanel is just a JPanel that has a special identifier that tells WHAT
-	 * kind of panel it is.
-	 */
-	public static class OmniPanel extends JPanel {
-		public FrameType getFrameType() {return FrameType.BAD;}
-	}
 	public class OmniBar extends JPanel implements MouseListener {
 		public OmniBar( String title) {
 			add( new JLabel(title));
@@ -202,12 +195,14 @@ public class OmniFrame extends JDialog
 		@Override		public void mouseReleased(MouseEvent e) {}
 	}
 	private class OmniContainer {
-		OmniPanel panel;
+		JPanel panel;
 		OmniBar bar;
+		FrameType type;
 		
-		OmniContainer( OmniPanel panel, OmniBar bar) {
+		OmniContainer( JPanel panel, OmniBar bar, FrameType type) {
 			this.panel = panel;
 			this.bar = bar;
+			this.type = type;
 		}
 	}
 	
@@ -217,9 +212,9 @@ public class OmniFrame extends JDialog
 	 */
 	private static class OFTransferable implements Transferable {
 		OmniFrame parent;
-		OmniPanel panel;
+		OmniContainer panel;
 		
-		OFTransferable( OmniFrame parent, OmniPanel panel) {
+		OFTransferable( OmniFrame parent, OmniContainer container) {
 			this.parent = parent;
 			this.panel = panel;
 		}
@@ -365,7 +360,7 @@ public class OmniFrame extends JDialog
 			//	to do with them anyway)
 			for( OmniContainer container : containers) {
 				if( evt.getComponent() == container.bar) {					
-					OFTransferable oftrans = new OFTransferable( context, container.panel);
+					OFTransferable oftrans = new OFTransferable( context, container);
 					Transferable trans = (Transferable)oftrans;
 					
 

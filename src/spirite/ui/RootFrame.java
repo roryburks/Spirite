@@ -134,16 +134,27 @@ public class RootFrame extends javax.swing.JFrame
 		// !!!! TODO: note, there are very few sanity checks in here for now
     	int active_level = 0;
     	for( int i = 0; i < menu_scheme.length; ++i) {
-    		int level =_imCountLevel((String)menu_scheme[i][0]);
-    		menu_scheme[i][0] = ((String)menu_scheme[i][0]).substring(level);
+    		String title = (String)menu_scheme[i][0];
+    		
+    		
+    		// Determine the depth of the node and crop off the extra .'s
+    		int level =_imCountLevel(title);
+    		title = title.substring(level);
+    		
+    		// If it's - that means it's a separator
+    		if( title.equals("-")) {
+    			((JMenu)active_root_tree[level-1]).addSeparator();
+    			continue;
+    		}
+    		
     		
     		// Determine if it needs to be a Menu (which contains other options nested in it)
     		//	or a plain MenuItem (which doesn't)
     		if( level != 0 && (i+1 == menu_scheme.length || _imCountLevel((String)menu_scheme[i+1][0]) <= level)) {
-    			new_node = new JMenuItem( (String) menu_scheme[i][0]);
+    			new_node = new JMenuItem( title);
     		}
     		else {
-    			new_node = new JMenu( (String) menu_scheme[i][0]);
+    			new_node = new JMenu( title);
     		}
     		new_node.setMnemonic((int)menu_scheme[i][1]);
 

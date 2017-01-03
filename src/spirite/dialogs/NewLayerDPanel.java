@@ -17,7 +17,6 @@ import spirite.MUtil.MTextFieldNumber;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.SpiriteImage;
 
 import javax.swing.SwingConstants;
 import javax.swing.JButton;

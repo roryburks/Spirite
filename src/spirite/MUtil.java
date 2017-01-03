@@ -32,6 +32,12 @@ public class MUtil {
 		return i >>> 16;
 	}
 	
+	public static float cycle( float start, float end, float t) {
+		float diff = end - start;
+		
+		return ((t - start) % diff + diff) % diff + start;
+	}
+	
 	public static boolean coordInImage( int x, int y, BufferedImage image) {
 		if( image == null) return false;
 		
