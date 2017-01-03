@@ -99,12 +99,8 @@ public class ImageWorkspace {
 		groups.moveBelow(nodeToMove, nodeUnder);
 		alertStructureChanged();
 	}
-	public void moveInto( Node nodeToMove, GroupNode nodeInto) {
-		groups.moveInto(nodeToMove, nodeInto, false);
-		alertStructureChanged();
-	}
-	public void moveIntoTop(Node nodeToMove, GroupNode nodeInto) {
-		groups.moveInto(nodeToMove, nodeInto, true);
+	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
+		groups.moveInto(nodeToMove, nodeInto, top);
 		alertStructureChanged();
 	}
 	

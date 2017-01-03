@@ -43,42 +43,37 @@ import javax.swing.tree.TreeSelectionModel;
 
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
+import spirite.ui.ContentTree;
 
-public class LayerTreePanel extends JPanel 
-	implements MImageStructureObserver
+public class LayerTreePanel extends ContentTree 
+	implements MImageStructureObserver,
+	 TreeCellRenderer, TreeSelectionListener, TreeExpansionListener
 {
 	MasterControl master;
-	LayerTree tree;
 	ImageWorkspace workspace;
+	LayerTreeNodePanel renderPanel;
 
 	// :::: Initialize
 	public LayerTreePanel( MasterControl master) {
+		super();
+		
+		renderPanel = new LayerTreeNodePanel();
+		
 		this.master = master;
 		workspace = master.getCurrentWorkspace();
-		initComponents();
-		
 		workspace.addImageStructureObserver(this);
-	}
-	
-	private void initComponents() {
-		// Simple grid layout, fills the whole area
-		this.setLayout( new GridLayout());
-		tree = new LayerTree();
-		this.add(tree);
 		
-		// Single root is invisible, but path is visible
-		tree.setRootVisible(false);
-		tree.setShowsRootHandles(true);
+		constructFromWorkspace();
 		
-		tree.constructFromWorkspace();
-	}
-	
-	public GroupTree.Node getSelectedNode() {
-		return tree.getSelectedNode();
+		tree.setCellRenderer(this);
+		tree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.addTreeSelectionListener(this);
+		tree.addTreeExpansionListener(this);
 	}
 
     // :::: Paint
@@ -87,413 +82,179 @@ public class LayerTreePanel extends JPanel
     	super.paint(g);
     }
     
+    // :::: API
+    GroupTree.Node getSelectedNode() {
+    	TreePath path = tree.getSelectionPath();
+    	
+    	if( path != null) {
+	    	
+	    	try {
+	    		return (GroupTree.Node)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
+	    	}catch (ClassCastException c) {
+	    		MDebug.handleWarning( WarningType.STRUCTURAL, this, "Selected Tree Node isn't a GroupTree Node");
+	    	}
+    	}
+		return null;
+    }
+    
     // :::: MImageStructureObserver interface
 	@Override
 	public void structureChanged() {
-		tree.constructFromWorkspace();
+		constructFromWorkspace();
+	}
+	
+
+	/***
+	 * Called any time the structure of the image has changed, completely removes
+	 * the existing tree structure and recreates it from the GroupTree data.
+	 */
+	private void constructFromWorkspace() {
+		root.removeAllChildren();
+		
+		GroupTree.Node node = workspace.getRootNode();
+
+		// Start the recursive tree traversal
+		_cfw_construcRecursively( node, root);
+		
+		model.nodeStructureChanged(root);
+
+		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
+		repaint();
+		
+		dragManager.stopDragging();
+	}
+	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
+		for( GroupTree.Node child : group_node.getChildren()) {
+			DefaultMutableTreeNode node_to_add = new DefaultMutableTreeNode(child);
+			
+			tree_node.add( node_to_add);
+			
+			_cfw_construcRecursively( child, node_to_add);
+		}
+		
+		tree_node.setAllowsChildren( group_node instanceof GroupTree.GroupNode);
+	}
+	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
+		for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
+			_cfw_setExpandedStateRecursively( child);
+		}
+		
+		try {
+    		if( ((GroupTree.Node)tree_node.getUserObject()).isExpanded() ) {
+    			TreePath path =  new TreePath(tree_node.getPath());
+    			tree.expandPath(path);
+    		}
+		} catch( ClassCastException e) {}
 	}
     
-	
-	
-    private class LayerTree extends JTree 
-    	implements TreeCellRenderer, TreeSelectionListener, TreeExpansionListener
-    {
-    	DefaultMutableTreeNode root;
-    	DefaultTreeModel model;
-    	LayerTreeNodePanel renderPanel;
-    	LTPDragManager dragManager;
-    	
-    	Color bgColor;
-    	
-    	public LayerTree() {
-    		renderPanel = new LayerTreeNodePanel();
-    		
-    		// Link Components
-    		this.setCellRenderer( this);
-    		this.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
-    		this.addTreeSelectionListener(this);
-    		this.addTreeExpansionListener(this);
-    		
-    		// Create Model
-    		root = new DefaultMutableTreeNode("root");
-    		model = new DefaultTreeModel(root);
-    		this.setModel( model);
-    		
-    		
-    		// Make the background invisible as we will draw the background manually
-    		bgColor = this.getBackground();
-    		this.setBackground( new Color(0,0,0,0));
-    		
-    		
-    		// Initialize Drag-Drop Manager
-    		dragManager = new LTPDragManager();
+	// :::: DDTree
+	@Override
+	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {
+		try {
+			workspace.moveAbove(
+					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
+					(GroupTree.Node)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject());
+		}catch (NullPointerException|ClassCastException e) {
+			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
+		}
+	}
+	@Override
+	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {
+		try {
+			workspace.moveBelow(
+					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
+					(GroupTree.Node)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject());
+		}catch (NullPointerException|ClassCastException e) {
+			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
+		}
+	}
 
-    		dragManager.dragSource = DragSource.getDefaultDragSource();
-    		dragManager.dgr = 
-    				dragManager.dragSource.createDefaultDragGestureRecognizer( 
-    						this, 
-    						DnDConstants.ACTION_COPY_OR_MOVE, 
-    						dragManager);
-    		
-    		dragManager.dropTarget = new DropTarget(this,dragManager);
-    	}
-    	
-    	public GroupTree.Node getSelectedNode() {
-    		TreePath path = tree.getSelectionPath();
-    		
-    		if( path == null)
-    			return null;
-    		
-    		Object obj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
-    		if( !(obj instanceof GroupTree.Node)) {
-    			MDebug.handleWarning( MDebug.WarningType.STRUCTURAL, this, "Selected Node is not a GroupTree.Node");
-    			return null;
-    		}
-    		
-    		
-    		return (GroupTree.Node)obj;
-    	}
-    	
-    	/***
-    	 * Called any time the structure of the image has changed, completely removes
-    	 * the existing tree structure and recreates it from the GroupTree data.
-    	 */
-    	private void constructFromWorkspace() {
-    		root.removeAllChildren();
-    		
-    		GroupTree.Node node = workspace.getRootNode();
+	@Override
+	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {
+		try {
+			workspace.moveInto(
+					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
+					(GroupTree.GroupNode)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject(),
+					top);
+		}catch (NullPointerException|ClassCastException e) {
+			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
+		}
+	}	
 
-    		// Start the recursive tree traversal
-    		_cfw_construcRecursively( node, root);
-    		
-    		model.nodeStructureChanged(root);
-
-    		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
-    		tree.repaint();
-    		
-    		dragManager.changeDrag(null, 0);
-    	}
-    	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
-    		for( GroupTree.Node child : group_node.getChildren()) {
-    			DefaultMutableTreeNode node_to_add = new DefaultMutableTreeNode(child);
-    			
-    			tree_node.add( node_to_add);
-    			
-    			_cfw_construcRecursively( child, node_to_add);
-    		}
-    	}
-    	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
-    		for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
-    			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
-    			_cfw_setExpandedStateRecursively( child);
-    		}
-    		
-    		try {
-	    		if( ((GroupTree.Node)tree_node.getUserObject()).isExpanded() ) {
-	    			TreePath path =  new TreePath(tree_node.getPath());
-	    			tree.expandPath(path);
-	    		}
-    		} catch( ClassCastException e) {}
-    	}
-
-    	
-    	/***
-    	 * 
-    	 */
-    	@Override
-    	public void paint( Graphics g) {
-    		Component parent = this.getParent();
-    		
-    		// Draw the Background manually so we can draw behind the Tree
-    		g.setColor( bgColor);
-    		g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
-
-    		// Draw a Background around the Selected Path
-    		int r = this.getRowForPath( this.getSelectionPath());
-    		Rectangle rect = this.getRowBounds(r);
-    		
-    		if( rect != null) {
-    			if( dragManager.dragIntoNode != null)
-   					g.setColor( Globals.getColor("layerpanel.tree.selectedBGDragging"));
-    			else
-    				g.setColor( Globals.getColor("layerpanel.tree.selectedBackground"));
-    			g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
-    		}
-    		
-    		// Draw a Line/Border indicating where you're dragging and dropping
-    		if( dragManager.dragIntoNode != null) {
-    			g.setColor( Color.BLACK);
-    			
-    			rect = this.getPathBounds(dragManager.dragIntoNode);
-    			
-    			switch( dragManager.dragMode) {
-    			case 1:
-    				g.drawLine( 0, rect.y, parent.getWidth(), rect.y);
-    				break;
-    			case 2:
-    				g.drawLine( 0, rect.y+rect.height-1, parent.getWidth(), rect.y+rect.height-1);
-    				break;
-    			case 3:
-    				g.drawRect( 0, rect.y, parent.getWidth()-1, rect.height-1);
-    				break;
-    			}
-    		}
-    		
-    		// Let Swing do the heavy lifting
-    		super.paint(g);
-    		
-    		
-    	}
-    	
-		@Override
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf,
-				int row, boolean hasFocus) {
-				
-			renderPanel.setPreferredSize( new Dimension( 128, Globals.getMetric("layerpanel.treenodes.max").width + 4));
+	// :::: TreeExpansionListener
+	@Override
+	public void treeCollapsed(TreeExpansionEvent evt) {
+		try {
+			GroupTree.Node node = 
+					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
 			
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-			Object obj = node.getUserObject();
+			node.setExpanded(false);
+		} catch ( ClassCastException e) {
+			MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
+		}
+	}
 
-			// Determine what kind of data the node on the tree contains and then 
-			//	alter the node visuals accordingly
-			if( obj instanceof GroupTree.GroupNode) {
-				GroupTree.GroupNode gn = (GroupTree.GroupNode)obj;
-				
-				renderPanel.label.setText(gn.getName());
-				return renderPanel;
-			}
-			if( obj instanceof GroupTree.RigNode) {
-				GroupTree.RigNode rn = (GroupTree.RigNode)obj;
-				
+	@Override
+	public void treeExpanded(TreeExpansionEvent evt) {
+		try {
+			GroupTree.Node node = 
+					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
+			
+			node.setExpanded(true);
+		} catch ( ClassCastException e) {
+			MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
+		}
+		
+	}
 
-				renderPanel.label.setText(rn.getRig().getName());
-			}
+	// :::: TreeSelectionListener
+	/***
+	 * Called whenever the user has selected a new tree node, updates the Workspace so that the 
+	 * active part (the part that gets drawn on) is changed
+	 */
+	@Override
+	public void valueChanged(TreeSelectionEvent tse) {			
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+		
+		Object obj = node.getUserObject();
+		
+		if( obj instanceof GroupTree.RigNode) {
+			GroupTree.RigNode rn = (GroupTree.RigNode)obj;
+			
+			workspace.setActivePart(rn.getRig());
+		}
+		else
+			workspace.setActivePart(null);
+		
+	}
+
+	@Override
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf,
+			int row, boolean hasFocus) 
+	{
+			
+		renderPanel.setPreferredSize( new Dimension( 128, Globals.getMetric("layerpanel.treenodes.max").width + 4));
+		
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+		Object obj = node.getUserObject();
+
+		// Determine what kind of data the node on the tree contains and then 
+		//	alter the node visuals accordingly
+		if( obj instanceof GroupTree.GroupNode) {
+			GroupTree.GroupNode gn = (GroupTree.GroupNode)obj;
+			
+			renderPanel.label.setText(gn.getName());
 			return renderPanel;
 		}
-		
+		if( obj instanceof GroupTree.RigNode) {
+			GroupTree.RigNode rn = (GroupTree.RigNode)obj;
+			
 
-		/***
-		 * Called whenever the user has selected a new tree node, updates the Workspace so that the 
-		 * active part (the part that gets drawn on) is changed
-		 */
-		@Override
-		public void valueChanged(TreeSelectionEvent tse) {			
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
-			
-			Object obj = node.getUserObject();
-			
-			if( obj instanceof GroupTree.RigNode) {
-				GroupTree.RigNode rn = (GroupTree.RigNode)obj;
-				
-				workspace.setActivePart(rn.getRig());
-			}
-			else
-				workspace.setActivePart(null);
-			
+			renderPanel.label.setText(rn.getRig().getName());
 		}
-
-		// :::: TreeExpansionListener
-		@Override
-		public void treeCollapsed(TreeExpansionEvent evt) {
-			try {
-				GroupTree.Node node = 
-						(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
-				
-				node.setExpanded(false);
-			} catch ( ClassCastException e) {
-				MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
-			}
-		}
-
-		@Override
-		public void treeExpanded(TreeExpansionEvent evt) {
-			try {
-				GroupTree.Node node = 
-						(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
-				
-				node.setExpanded(true);
-			} catch ( ClassCastException e) {
-				MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
-			}
-			
-		}
-    }
-    
-    /*** 
-     * <b>LTPDragManager</b>
-     * 
-     * Drag-and-Drop management, handled in a separate class for aesthetic reasons
-     */
-    private class LTPDragManager 
-    	implements DragGestureListener, DropTargetListener, DragSourceListener
-    {
-    	DragSource dragSource;
-    	DragGestureRecognizer dgr;
-    	DropTarget dropTarget;
-		
-    	// 0: None, 1: Over, 2: Under, 3: Into, 4: Hovering above itself
-		protected int dragMode = 0;	
-		protected TreePath dragIntoNode = null;
-		protected GroupTree.Node draggingNode = null;
-    	
-    	public LTPDragManager() {
-		}
-    	
-
-		/***
-		 * Simple Transferable object that only acts as an identifier
-		 */
-		private class ContainerNode implements Transferable {
-			@Override
-			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-				if( flavor.equals(FLAVOR))
-					return this;
-				else throw new UnsupportedFlavorException(flavor);
-			}
-
-			@Override
-			public DataFlavor[] getTransferDataFlavors() {
-				return flavors;
-			}
-
-			@Override
-			public boolean isDataFlavorSupported(DataFlavor flavor) {
-				return flavor.equals(FLAVOR);
-			}
-			
-		}
-		final public DataFlavor FLAVOR = 
-				new DataFlavor( ContainerNode.class, "Container Node");
-		private DataFlavor flavors[] = {FLAVOR};
-		
-		// :::: DragGesterRecignizer
-		@Override
-		public void dragGestureRecognized(DragGestureEvent evt) {
-			// TODO Auto-generated method stub
-			GroupTree.Node dragNode = getSelectedNode();
-			
-			if( dragNode != null) {
-				ContainerNode containerNode = new ContainerNode();
-				draggingNode = dragNode;
-				Transferable trans = (Transferable) containerNode;
-				
-				// Set the cursor and start the drag action
-				Cursor cursor = DragSource.DefaultMoveDrop;
-				int action = evt.getDragAction();
-				if( action == DnDConstants.ACTION_MOVE)
-					cursor = DragSource.DefaultMoveDrop;
-				
-				dragSource.startDrag( evt, cursor, trans, this);
-			}
-		}
-		
-		// :::: DragTargetListener
-		@Override		public void dragEnter(DropTargetDragEvent arg0) {}
-		@Override		public void dragExit(DropTargetEvent arg0) {}
-		@Override		public void dropActionChanged(DropTargetDragEvent arg0) {}
-		@Override		public void drop(DropTargetDropEvent arg0) {}
-
-		@Override
-		public void dragOver(DropTargetDragEvent evt) {
-			if(!testDrag( evt.getLocation())) {
-				evt.rejectDrag();
-			}
-			else {
-				evt.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
-			}
-			
-		}
-		
-		/***
-		 * Tests whether the point is a valid and stores what kind of drop it would be
-		 * for visual purposes
-		 * 
-		 * @param p point to test
-		 * @return true if point is valid, false otherwise
-		 */
-		private boolean testDrag( Point p ) {
-			// Doing it like this makes it so only the vertical position is relvant
-			TreePath path = tree.getPathForRow(tree.getRowForLocation(p.x, p.y));
-			
-			if( path != null) {
-				try {
-					GroupTree.Node testNode = 
-							(GroupTree.Node)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
-				
-					Dimension d = Globals.getMetric("layerpanel.treenodes.dragdropleniency");
-					Rectangle r = tree.getPathBounds(path);
-					int offset = p.y - r.y;
-					
-					
-					if( testNode == draggingNode)
-						changeDrag( path, 4);
-					else if( (testNode instanceof GroupTree.GroupNode) &&
-							offset > d.height && offset < r.height - d.height) 
-					{
-							changeDrag( path, 3);
-					}
-					else if( offset < r.height/2)
-						changeDrag( path, 1);
-					else
-						changeDrag( path, 2);
-					
-					return true;
-					
-				}catch( ClassCastException e) {
-					MDebug.handleWarning( MDebug.WarningType.STRUCTURAL, this, "Tree node you're dragging isn't correct class.");				
-				}catch( NullPointerException e) {
-					MDebug.handleWarning( MDebug.WarningType.UNSPECIFIED, this, "NullPointer in testDrag (probably sync issue)");
-				}
-			}
-			
-			changeDrag( dragIntoNode, dragMode);
-			return false;
-		}
-		
-		protected void changeDrag( TreePath newDragInto, int newDragMode) {
-			if( newDragInto == dragIntoNode && newDragMode == dragMode)
-				return;
-			
-			dragIntoNode = newDragInto;
-			dragMode = newDragMode;
-			tree.getParent().repaint();
-		}
-
-
-
-		// :::: DragSourceListener
-		@Override 		
-		public void dragDropEnd(DragSourceDropEvent arg0) {
-			// This kind of stuff is SUPPOSED to go in the DragTargetListener drop event
-			//	but just to make absolutely sure that there are no async issues with changing
-			//	the drag settings to null and since I don't actually use the Transferable
-			//	data, I put it here.
-			if( dragIntoNode != null) {
-				GroupTree.Node nodeInto = 
-						(GroupTree.Node)((DefaultMutableTreeNode)dragIntoNode.getLastPathComponent()).getUserObject();
-				if( dragMode == 1) 
-					workspace.moveAbove(draggingNode, nodeInto);
-				else if( nodeInto instanceof GroupTree.GroupNode) {
-					if( dragMode == 2) {
-						if( tree.isExpanded(dragIntoNode))
-							workspace.moveIntoTop(draggingNode, (GroupTree.GroupNode)nodeInto);
-						else
-							workspace.moveBelow(draggingNode, nodeInto);
-					}
-					else if( dragMode == 3)
-						workspace.moveInto(draggingNode, ( GroupTree.GroupNode)nodeInto);
-				}
-				else if( dragMode == 2 || dragMode == 3) 
-					workspace.moveBelow(draggingNode, nodeInto);
-			}
-			
-			changeDrag( null, 0);
-		}
-		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
-		@Override		public void dragExit(DragSourceEvent arg0) {}
-		@Override		public void dragOver(DragSourceDragEvent evt) {}
-		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
-    }
+		return renderPanel;
+	}
 
 }
 

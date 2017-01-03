@@ -21,9 +21,18 @@ public class FrameManager implements WindowListener {
 	private List<OmniFrame> frames = new ArrayList<>();
 	
 	public static enum FrameType {
-		BAD,
-		LAYER,
-		TOOLS
+		BAD (""),
+		LAYER ("Layers"),
+		TOOLS ("Toolset"),
+		;
+		
+		private String name;
+		FrameType( String str) {
+			name = str;
+		}
+		public String getName() {
+			return name;
+		}
 	}
 	
 	public FrameManager( MasterControl master) {

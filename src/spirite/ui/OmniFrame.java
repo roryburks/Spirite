@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 import spirite.brains.MasterControl;
 import spirite.panel_layers.LayersPanel;
@@ -15,8 +16,14 @@ public class OmniFrame extends JDialog{
 	List<OmniPanel> panels = new ArrayList<OmniPanel>();
 	MasterControl master;
 	
+	JTabbedPane root;
+	
 	public OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
+		
+		root = new JTabbedPane( JTabbedPane.TOP);
+		
+		this.add( root);
 
 		OmniPanel panel = null;
 		switch( type) {
@@ -29,7 +36,7 @@ public class OmniFrame extends JDialog{
 		}
 		
 		if( panel != null) {
-			this.add(panel);
+			root.addTab(type.getName(), panel);
 			panels.add(panel);
 		}
 		

@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/***
+ * @author Rory Burks
+ *
+ */
 public class GroupTree {
 	private GroupNode root;
 	private ImageWorkspace context;
