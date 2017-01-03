@@ -13,6 +13,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
+import spirite.panel_layers.LayersPanel;
+import spirite.panel_toolset.ToolsPanel;
+import spirite.ui.OmniFrame.OmniPanel;
 
 public class FrameManager implements WindowListener {
 	private MasterControl master;
@@ -32,6 +35,17 @@ public class FrameManager implements WindowListener {
 		}
 		public String getName() {
 			return name;
+		}
+	}
+	
+	public OmniPanel createOmniPanel( FrameType type) {
+		switch( type) {
+		case LAYER:
+			return new LayersPanel( master);
+		case TOOLS:
+			return new ToolsPanel(master);
+		default:
+			return null;
 		}
 	}
 	
@@ -64,8 +78,8 @@ public class FrameManager implements WindowListener {
 		//	(assuming it's not duplicateable)
 		for( OmniFrame frame : frames) {
 			if( frame.containsFrameType( frameType)) {
-				// TODO Add some visual sign of presence
 				frame.toFront();
+				frame.addPanel(frameType);
 				
 				return;
 			}

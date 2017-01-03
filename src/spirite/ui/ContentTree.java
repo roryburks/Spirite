@@ -210,7 +210,6 @@ public class ContentTree extends JPanel
 		// :::: DragGesterRecignizer
 		@Override
 		public void dragGestureRecognized(DragGestureEvent evt) {
-			// TODO Auto-generated method stub
 			TreePath dragNode = tree.getSelectionPath();
 			
 			if( dragNode != null) {
