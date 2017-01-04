@@ -19,7 +19,7 @@ public class Layer {
 		this.name = name;
 	}*/
 	
-	public Part getActivePart() {
+	public ImageData getActiveData() {
 		return null;
 	}
 	

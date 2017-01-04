@@ -21,24 +21,9 @@ import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.Part;
+import spirite.image_data.ImageData;
 
 public class SaveEngine {
-
-	public static byte[] strToNullTerminatedByteUTF8( String str) 
-			throws UnsupportedEncodingException
-	{
-		byte b[] = (str + "\0").getBytes("UTF-8");
-		
-		// Convert non-terminating null characters to whitespace
-		for( int i = 0; i < b.length-1; ++i) {
-			if( b[i] == 0x00)
-				b[i] = 0x20;
-		}
-		
-		return b;
-	}
-	
 	public static byte[] getHeader() 
 		throws UnsupportedEncodingException
 	{
@@ -92,59 +77,83 @@ public class SaveEngine {
 	{
 		byte depth = 0;
 		ra.write( "GRPT".getBytes("UTF-8"));
+		long startPointer = ra.getFilePointer();
+		ra.writeInt(0);
 		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		_sgt_rec( root, bos, depth);
+		_sgt_rec( root, ra, depth);
+
+		long endPointer = ra.getFilePointer();
+		if( endPointer - startPointer > Integer.MAX_VALUE )
+			MDebug.handleError( ErrorType.OUT_OF_BOUNDS, null, "Image Data Too Big (>2GB).");
+		ra.seek(startPointer);
+		ra.writeInt( (int)(endPointer - startPointer - 4));
 		
-		ra.writeInt( bos.size());
-		ra.write(bos.toByteArray());
+		ra.seek(endPointer);
 	}
-	private static void _sgt_rec( GroupTree.Node node, ByteArrayOutputStream bos, byte depth) 
+	private static void _sgt_rec( GroupTree.Node node, RandomAccessFile ra, byte depth) 
 			throws UnsupportedEncodingException, IOException 
 	{
 		if( node instanceof GroupTree.GroupNode) {
 			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
 			
-			bos.write( depth);
-			bos.write( SaveLoadUtil.NODE_GROUP);
+			// [1] : Depath of Node in GroupTree
+			ra.write( depth);
+			// [1] : Node Type ID
+			ra.write( SaveLoadUtil.NODE_GROUP);
+
+			// [n] : Null-terminated UTF-8 String for Layer name
+			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8(gnode.getName()));
 			
-			bos.write( strToNullTerminatedByteUTF8(gnode.getName()));
-			
-			
+			// Go through each of the Group Node's children recursively and save them
 			for( GroupTree.Node child : node.getChildren()) {
 				if( depth == 0xFF)
 					MDebug.handleWarning( WarningType.STRUCTURAL, null, "Too many nested groups (255 limit).");
 				else {
-					_sgt_rec( child, bos, (byte) (depth+1));
+					_sgt_rec( child, ra, (byte) (depth+1));
 				}
 			}
 		}
 		else if( node instanceof GroupTree.LayerNode) {
 			GroupTree.LayerNode rnode = (GroupTree.LayerNode) node;
 			
-			bos.write( depth);
-			bos.write( SaveLoadUtil.NODE_LAYER);
+			// [1] : Depth of Node in GroupTree
+			ra.write( depth);
+			// [1] : Node Type ID
+			ra.write( SaveLoadUtil.NODE_LAYER);
 			
-			bos.write( strToNullTerminatedByteUTF8( rnode.getLayer().getName()));
+			ImageData data = rnode.getLayer().getActiveData();
+			// [4] : ID of ImageData linked to this LayerNode
+			ra.writeInt( data.getID());
+			
+			// [n] : Null-terminated UTF-8 String for Layer name
+			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8( rnode.getLayer().getName()));
 		}
 		else {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Unknown GroupTree Node type on saving.");
 		}
 	}
 	
-	private static void saveImageData( List<Part> imageData, RandomAccessFile ra) 
+	private static void saveImageData( List<ImageData> imageData, RandomAccessFile ra) 
 			throws UnsupportedEncodingException, IOException 
 	{
+		// [4] : "IMGD" tag
 		ra.write( "IMGD".getBytes("UTF-8"));
 		long filePointer = ra.getFilePointer();
+		
+		// [4] : Length of ImageData Chunk
 		ra.writeInt(0);
-
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		for( Part part : imageData) {
+		for( ImageData part : imageData) {
+			// (Foreach ImageData)
 			ImageIO.write( part.getData(), "png", bos);
+
+			// [4] : Image ID
+			ra.writeInt( part.getID());
+			// [4] : Size of Image Data
 			System.out.println(bos.size());
 			ra.writeInt( bos.size());
+			// [x] : Image Data
 			ra.write(bos.toByteArray());
 			bos.reset();
 		}
@@ -154,7 +163,7 @@ public class SaveEngine {
 		
 		if( filePointer2 - filePointer > Integer.MAX_VALUE )
 			MDebug.handleError( ErrorType.OUT_OF_BOUNDS, null, "Image Data Too Big (>2GB).");
-		ra.writeInt( (int)(filePointer2 - filePointer));
+		ra.writeInt( (int)(filePointer2 - filePointer - 4));
 		
 		ra.seek(filePointer2);
 	}

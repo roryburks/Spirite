@@ -147,6 +147,8 @@ public class LayerTreePanel extends ContentTree
     			TreePath path =  new TreePath(tree_node.getPath());
     			tree.expandPath(path);
     		}
+    		else {
+    		}
 		} catch( ClassCastException e) {}
 	}
     
@@ -187,6 +189,7 @@ public class LayerTreePanel extends ContentTree
 	// :::: TreeExpansionListener
 	@Override
 	public void treeCollapsed(TreeExpansionEvent evt) {
+		// Store the Collapsed state in the GroupTree so that the data remembers the UI state
 		try {
 			GroupTree.Node node = 
 					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
@@ -199,6 +202,7 @@ public class LayerTreePanel extends ContentTree
 
 	@Override
 	public void treeExpanded(TreeExpansionEvent evt) {
+		// Store the Expanded state in the GroupTree so that the data remembers the UI state
 		try {
 			GroupTree.Node node = 
 					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
@@ -224,10 +228,10 @@ public class LayerTreePanel extends ContentTree
 		if( obj instanceof GroupTree.LayerNode) {
 			GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
 			
-			workspace.setActivePart(rn.getLayer());
+			workspace.setActiveLayer(rn.getLayer());
 		}
 		else
-			workspace.setActivePart(null);
+			workspace.setActiveLayer(null);
 		
 	}
 
@@ -261,7 +265,10 @@ public class LayerTreePanel extends ContentTree
 	// :::: WorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged() {
+		// Remove assosciations with the old Workspace and add ones to the new
+		workspace.removeImageStructureeObserver(this);
 		workspace = master.getCurrentWorkspace();
+		workspace.addImageStructureObserver( this);
 		this.constructFromWorkspace();
 	}
 

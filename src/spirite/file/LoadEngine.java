@@ -1,40 +1,28 @@
 package spirite.file;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
+import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 
 public class LoadEngine {
-	/***
-	 * Reads the given RandomAccessFile for bytes until it reaches a null
-	 * string then converts the byte-array (minus the null string) into
-	 * a string using UTF-8 format
-	 * @throws IOException 
-	 */
-	public static String readNullTerminatedStringUTF8( RandomAccessFile ra)
-			throws IOException
-	{
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		
-		byte b = ra.readByte();
-		
-		while( b != 0x00) {
-			bos.write(b);
-			b = ra.readByte();
-		}
-		
-		return bos.toString("UTF-8");
-	}
+
 	
 	public static ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
@@ -61,7 +49,25 @@ public class LoadEngine {
 			ImageWorkspace workspace = new ImageWorkspace();
 			
 			// Load Chunks until you've reached the end
-			while( parseHeader( workspace, ra)) {}
+			List<ChunkInfo> chunks = parseChunks( ra);
+
+			System.out.println("test");
+			// First Load the Image Data
+			for( ChunkInfo ci : chunks) {
+				if( ci.header.equals("IMGD")) {
+					System.out.println("Start:" + ci.startPointer + ":" + ci.size);
+					ra.seek( ci.startPointer);
+					parseImageDataSection(workspace, ra, ci.size);
+				}
+			}
+			
+			// Next Load the Group Tree
+			for( ChunkInfo ci : chunks) {
+				if( ci.header.equals("GRPT")) {
+					ra.seek( ci.startPointer);
+					parseGroupTreeSection(workspace, ra, ci.size);
+				}
+			}
 			
 			return workspace;
 			
@@ -69,33 +75,74 @@ public class LoadEngine {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
 			throw new BadSIFFFileException("UTF-8 Format Unsupported (somehow).");
 		}catch( IOException e) {
-			throw new BadSIFFFileException("Error Reading File: " + e.getMessage());
+//			e.printStackTrace();
+			throw new BadSIFFFileException("Error Reading File: " + e.getStackTrace());
 		}
 	}
-	private static boolean parseHeader( ImageWorkspace workspace, RandomAccessFile ra) 
-			throws IOException
+	
+	private static class ChunkInfo {
+		String header;
+		long startPointer;
+		int size;
+	}
+	
+	private static List<ChunkInfo> parseChunks(RandomAccessFile ra) 
+			throws IOException 
 	{
+		List<ChunkInfo> list = new ArrayList<ChunkInfo>();
+
 		byte[] b = new byte[4];
 		
-		if( ra.read(b) < 4) return false;
-		
-		int chunkSize = ra.readInt();
-		
-		
-		
-		if( Arrays.equals( b, "GRPT".getBytes("UTF-8"))) {
-			parseGroupTreeSection( workspace, ra, chunkSize);
-		}else if( Arrays.equals( b, "IMGD".getBytes("UTF-8"))) {
-			ra.skipBytes(chunkSize);
+		while( ra.read(b) == 4) {
+			ChunkInfo ci = new ChunkInfo();
 			
-		}else {
-			MDebug.handleWarning(WarningType.UNSUPPORTED, null, 
-					"Unsupported Chunk Type in SIFF File:" + new String( b, "UTF-8"));
-			ra.skipBytes(chunkSize);
+			ci.size = ra.readInt();
+			ci.header = new String( b, "UTF-8");
+			ci.startPointer = ra.getFilePointer();
+			ra.skipBytes(ci.size);
+			
+
+			System.out.println("Header:" + ci.header + "," + ci.size);
+			list.add(ci);
 		}
 		
-		return true;
+		return list;
 	}
+
+	/***
+	 * Read ImageData Section Data
+	 * [IMGD]
+	 */
+	private static void parseImageDataSection(
+			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
+			throws IOException 
+	{
+		long startPointer = ra.getFilePointer();
+		long endPointer = ra.getFilePointer() + chunkSize;
+		int identifier;
+		int imgSize;
+		System.out.println("Parsing Image Start:"+  startPointer);
+		
+		while( ra.getFilePointer() < endPointer) {
+			identifier = ra.readInt();
+			imgSize = ra.readInt();
+
+			System.out.println("Img id:" + identifier);
+			byte[] buffer = new byte[imgSize];
+			ra.read(buffer);
+			
+			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
+			System.out.println("Img:" + img.getWidth()  + "," + img.getHeight());
+			
+			ImageData idata = new ImageData( img, identifier);
+			workspace.addImageDataDirect(idata);
+		}
+	}
+	
+	/***
+	 * Read GroupTree Section Data
+	 * [GRPT]
+	 */
 	private static void parseGroupTreeSection( 
 			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
 			throws IOException 
@@ -104,8 +151,10 @@ public class LoadEngine {
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int layer = 0;
 		int type;
-		int identifier;
+		int identifier = -1;
 		String name;
+		
+		System.out.println( "GTS: " + startPointer + " - " + endPointer);
 		
 		// Create a array that keeps track of the active layers of group
 		//	nodes (all the nested nodes leading up to the current node)
@@ -121,26 +170,26 @@ public class LoadEngine {
 			layer = ra.readUnsignedByte();			
 			type = ra.readUnsignedByte();
 			
-//			if( type == SaveLoadUtil.NODE_LAYER) 
-	//			identifier = ra.readUnsignedByte();
+			if( type == SaveLoadUtil.NODE_LAYER) 
+				identifier = ra.readInt();
 			
-			name = readNullTerminatedStringUTF8(ra);
+			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
+
+			System.out.println(name);
 			
 			// !!!! Kind of hack-y that it's even saved, but only the root node should be
 			//	layer 0 and there should only be one (and it's already created)
 			if( layer == 0) {
-				
+				System.out.println("bad:" + name);
 			}
-			
 			else {
 				if( type == SaveLoadUtil.NODE_GROUP) {
-					System.out.print( nodeLayer[layer-1].getChildren().size() + ",");
 					nodeLayer[layer] = workspace.addTreeNode( nodeLayer[layer-1], name);
-					System.out.println( nodeLayer[layer-1].getChildren().size());
+					nodeLayer[layer].setExpanded(true);
 				}
 				if( type == SaveLoadUtil.NODE_LAYER) {
 					// !!!! TODO DEBUG
-					workspace.addNewRig( nodeLayer[layer-1], 128, 128, name, new Color(0,0,0,0));
+					workspace.addNewRig( nodeLayer[layer-1], identifier, name);
 				}
 			}
 		}

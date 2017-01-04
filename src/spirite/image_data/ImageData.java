@@ -4,17 +4,18 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class Part {
+public class ImageData {
 
 	private BufferedImage data;
-	private String type;
-	public int cx, cy;
+	int id;
 	
-	public Part( int width, int height, String type, Color bg) {
-		cx = width / 2;
-		cy = height / 2;
+	public ImageData( BufferedImage img, int id) {
+		data = img;
+		this.id = id;
+	}
+	
+	public ImageData( int width, int height, Color bg) {
 		data = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
-		this.type = type;
 		
         Graphics2D g2d = data.createGraphics();
         g2d.setColor( bg);
@@ -26,17 +27,7 @@ public class Part {
 		return data;
 	}
 	
-	public void setType( String type) {
-		this.type = type;
-	}
-	public String getType() {
-		return type;
-	}
-
-	public int getCenterX() {
-		return cx;
-	}
-	public int getCenterY() {
-		return cy;
+	public int getID() {
+		return id;
 	}
 }

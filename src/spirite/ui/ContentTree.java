@@ -26,6 +26,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -39,6 +40,7 @@ public class ContentTree extends JPanel
 	protected DefaultMutableTreeNode root;
 	protected DefaultTreeModel model;
 	protected CCTDragManager dragManager;
+	protected JScrollPane scrollPane;
 	
 	protected CCTree tree;
 	protected Color bgColor;
@@ -48,8 +50,11 @@ public class ContentTree extends JPanel
 	public ContentTree() {
 		// Simple grid layout, fills the whole area
 		this.setLayout( new GridLayout());
+		
+		
 		tree = new CCTree();
-		this.add(tree);
+		scrollPane = new JScrollPane(tree);
+		this.add(scrollPane);
 		
 		// Single root is invisible, but path is visible
 		tree.setRootVisible(false);

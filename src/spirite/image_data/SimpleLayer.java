@@ -10,17 +10,22 @@ import java.awt.Color;
  */
 public class SimpleLayer extends Layer
 {
-	Part part;
+	ImageData part;
 
+	public SimpleLayer( ImageData data, String name) {
+		part = data;
+		this.name = name;
+	}
+	
 	public SimpleLayer(int x, int y, String name, Color c) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		
-		part = new Part(x, y, "simple", c);
+		part = new ImageData(x, y, c);
 	}
 
 	@Override
-	public Part getActivePart() {
+	public ImageData getActiveData() {
 		return part;
 	}
 }

@@ -32,7 +32,8 @@ public class RenderEngine
 			// Otherwise get the drawing queue and draw it
 			ImageWorkspace workspace = settings.workspace;
 			
-			if( workspace == null) return null;
+			if( workspace == null || workspace.getWidth() == 0 || workspace.getHeight() == 0) 
+				return null;
 			
 			List<Layer> drawing_queue = workspace.getDrawingQueue();
 			
@@ -41,8 +42,8 @@ public class RenderEngine
 	
 			for( Layer layer : drawing_queue) {
 				// !!!! TODO Very Debug
-				if( layer.getActivePart() != null)
-					g.drawImage(layer.getActivePart().getData(), 0, 0, null);
+				if( layer.getActiveData() != null)
+					g.drawImage(layer.getActiveData().getData(), 0, 0, null);
 			}
 			
 			Cache c = new Cache();

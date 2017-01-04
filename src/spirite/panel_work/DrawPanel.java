@@ -29,7 +29,7 @@ import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.Part;
+import spirite.image_data.ImageData;
 
 /**
  * DrawPanel is the 
@@ -85,9 +85,11 @@ public class DrawPanel extends JPanel
         	
         	BufferedImage image = master.getRenderEngine().renderImage(settings);
 
+        	if( image != null) {
             g.drawImage( image, context.itsX(0), context.itsY(0),
             		context.itsX(image.getWidth()), context.itsY(image.getHeight()),
             		0, 0, image.getWidth(), image.getHeight(), null);
+        	}
 
 
             // Draw Border around the complete image
@@ -101,7 +103,7 @@ public class DrawPanel extends JPanel
 		            (int)Math.round(workspace.getHeight()*context.zoom)+1);
             
             // Draw Border around the active Layer
-            Part active = workspace.getActivePart();
+            ImageData active = workspace.getActiveData();
             
             if( active != null) {
 	            BufferedImage data = active.getData();

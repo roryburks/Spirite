@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,19 +18,21 @@ import spirite.image_data.GroupTree.Node;
  *
  */
 public class ImageWorkspace {
-	private List<Part> parts;
+	private List<ImageData> imageData;
 	private List<Layer> layers;
 	private List<Scene> scenes;
 	private GroupTree groups;
 	
 	private GroupTree.Node selected = null;
 	
+	private int workingID = 0;
+	
 	private int width = 0;
 	private int height = 0;
 	
 	
 	public ImageWorkspace() {
-		parts = new ArrayList<Part>();
+		imageData = new ArrayList<ImageData>();
 		layers = new ArrayList<Layer>();
 		scenes = new ArrayList<Scene>();
 		
@@ -48,11 +51,11 @@ public class ImageWorkspace {
 		return groups.getRoot();
 	}
 	
-	public List<Part> getImageData() {
-		List<Part> list = new ArrayList<>(parts.size());
+	public List<ImageData> getImageData() {
+		List<ImageData> list = new ArrayList<>(imageData.size());
 		
-		for( Part part : parts) {
-			list.add( part);
+		for( ImageData data : imageData) {
+			list.add( data);
 		}
 		
 		return list;
@@ -60,19 +63,20 @@ public class ImageWorkspace {
 
 	// :::: The activePart is the part (i.e. raw image data) which will be drawn on
 	//	when the user gives input.
-	private int selected_rig = -1;
+	private int selectedLayer = -1;
 	
-	public Part getActivePart() {
-		if( selected_rig < 0) return null;
+	public ImageData getActiveData() {
+		if( selectedLayer < 0) return null;
 		
-		Layer rig = layers.get( selected_rig);
+		Layer rig = layers.get( selectedLayer);
 		if( rig == null) return null;
 		
-		return rig.getActivePart();
+		return rig.getActiveData();
 	}
 	
-	public void setActivePart( Layer rig) {
-		selected_rig = layers.indexOf(rig);
+	public void setActiveLayer( Layer rig) {
+		selectedLayer = layers.indexOf(rig);
+		System.out.println(selectedLayer);
 	}
 	
 	// Creates a New Rig
@@ -85,17 +89,43 @@ public class ImageWorkspace {
 		Layer rig = new SimpleLayer(w, h, name, c);		
 		groups.addContextual(context, rig);
 		layers.add(rig);
-		parts.add(rig.getActivePart());
+		
+		//!!!! TODO : Reimagine a better way to link Image Data to Workspace
+		imageData.add(rig.getActiveData());
+		rig.getActiveData().id = workingID++;	// PostIncrement
 		
 		width = Math.max(width, w);
 		height = Math.max(height, h);
 		
-		setActivePart(rig);
+		setActiveLayer(rig);
 		
 		
 		alertStructureChanged();
 		return rig;
 	}
+	
+	public Layer addNewRig( GroupTree.Node context, int identifier, String name) {
+		for( ImageData data : imageData) {
+			if( data.id == identifier) {
+				Layer rig = new SimpleLayer( data, name);
+				groups.addContextual(context, rig);
+				
+				width = Math.max(width, data.getData().getWidth());
+				height = Math.max(height, data.getData().getHeight());
+				
+				layers.add(rig);
+				setActiveLayer(rig);
+				
+				alertStructureChanged();
+				return rig;
+			}
+		}
+		
+		System.out.println("Bad");
+		
+		return null;
+	}
+	
 	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
 		GroupTree.GroupNode newNode = groups.addContextual(context, name);
 		alertStructureChanged();
@@ -103,6 +133,18 @@ public class ImageWorkspace {
 	}
 	
 
+	
+	/***
+	 * Used Primarily for Loading, this will merely add the imageData to the 
+	 * Workspace's data set, but it will not be linked logically in any way
+	 * (for that you'll need to add a Node to the GroupTree
+	 */
+	public void addImageDataDirect( ImageData newData) {
+		imageData.add( newData);
+	}
+	
+	
+	// :::: Move Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
 		groups.moveAbove(nodeToMove, nodeAbove);
 		alertStructureChanged();

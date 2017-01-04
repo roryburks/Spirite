@@ -51,7 +51,7 @@ public class DrawEngine {
 		if( state != STATE.DRAWING)
 			return;
 		
-		working_image = master.getCurrentWorkspace().getActivePart().getData();
+		working_image = master.getCurrentWorkspace().getActiveData().getData();
 		
 		if( working_image == null ) {
 			endStroke();
@@ -121,7 +121,7 @@ public class DrawEngine {
 	
 	// Simple Queue flood fill
 	public void fill( int x, int y, Color color) {
-		BufferedImage image = master.getCurrentWorkspace().getActivePart().getData();
+		BufferedImage image = master.getCurrentWorkspace().getActiveData().getData();
 		if( image == null) return;
 		
 		if( !MUtil.coordInImage(x, y, image)) {
