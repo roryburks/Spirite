@@ -33,6 +33,7 @@ public class LayersPanel extends JPanel {
 	public LayersPanel(MasterControl master) {
 		this.master = master;
 		
+		
 		btnNewLayer = new JButton();
 		btnNewLayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

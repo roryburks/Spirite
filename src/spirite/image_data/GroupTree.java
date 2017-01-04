@@ -21,18 +21,20 @@ public class GroupTree {
 	}
 	
 	// :::: Get
-	public Node getRoot() {
+	public GroupNode getRoot() {
 		return root;
 	}
 	
 	// :::: Add
-	public void addContextual( Node selected, String group_name) {
+	public GroupNode addContextual( Node selected, String group_name) {
 		GroupNode to_add = new GroupNode(group_name);
 		_addContextual( selected, to_add);
+		return to_add;
 	}
-	public void addContextual( Node selected, Layer rig) {
-		RigNode to_add = new RigNode(rig);
+	public LayerNode addContextual( Node selected, Layer rig) {
+		LayerNode to_add = new LayerNode(rig);
 		_addContextual( selected, to_add);
+		return to_add;
 	}
 	
 	private void _addContextual( Node selected, Node to_add) {
@@ -40,11 +42,11 @@ public class GroupTree {
 			to_add.parent = root;
 			root.children.add( to_add);
 		}
-		if( selected instanceof GroupNode) {
+		else if( selected instanceof GroupNode) {
 			to_add.parent = selected;
 			selected.children.add(to_add);
 		}
-		if( selected instanceof RigNode) {
+		else if( selected instanceof LayerNode) {
 			GroupNode parent = (GroupNode)selected.parent;
 			to_add.parent = parent;
 			selected.parent.children.add( parent.children.indexOf(selected), to_add);
@@ -170,14 +172,14 @@ public class GroupTree {
 		}
 	}
 	
-	public class RigNode extends Node {
+	public class LayerNode extends Node {
 		private Layer data;
 		
-		RigNode( Layer data) {
+		LayerNode( Layer data) {
 			this.data = data;
 		}
 		
-		public Layer getRig() {
+		public Layer getLayer() {
 			return data;
 		}
 	}

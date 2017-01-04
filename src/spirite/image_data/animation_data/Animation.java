@@ -22,7 +22,9 @@ public class Animation {
 	}
 	
 	public BufferedImage renderFrame( float t) {
-//		float rt = MUtil.cycle(start, end, t);
+		float rt = MUtil.cycle(startFrame, endFrame, t);
+		
+		
 		return null;
 	}
 	

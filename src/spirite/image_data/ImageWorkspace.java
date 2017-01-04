@@ -18,7 +18,7 @@ import spirite.image_data.GroupTree.Node;
  */
 public class ImageWorkspace {
 	private List<Part> parts;
-	private List<Layer> rigs;
+	private List<Layer> layers;
 	private List<Scene> scenes;
 	private GroupTree groups;
 	
@@ -30,7 +30,7 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace() {
 		parts = new ArrayList<Part>();
-		rigs = new ArrayList<Layer>();
+		layers = new ArrayList<Layer>();
 		scenes = new ArrayList<Scene>();
 		
 		groups = new GroupTree(this);
@@ -44,8 +44,18 @@ public class ImageWorkspace {
 		return height;
 	}
 	
-	public GroupTree.Node getRootNode() {
+	public GroupTree.GroupNode getRootNode() {
 		return groups.getRoot();
+	}
+	
+	public List<Part> getImageData() {
+		List<Part> list = new ArrayList<>(parts.size());
+		
+		for( Part part : parts) {
+			list.add( part);
+		}
+		
+		return list;
 	}
 
 	// :::: The activePart is the part (i.e. raw image data) which will be drawn on
@@ -55,14 +65,14 @@ public class ImageWorkspace {
 	public Part getActivePart() {
 		if( selected_rig < 0) return null;
 		
-		Layer rig = rigs.get( selected_rig);
+		Layer rig = layers.get( selected_rig);
 		if( rig == null) return null;
 		
 		return rig.getActivePart();
 	}
 	
 	public void setActivePart( Layer rig) {
-		selected_rig = rigs.indexOf(rig);
+		selected_rig = layers.indexOf(rig);
 	}
 	
 	// Creates a New Rig
@@ -74,7 +84,8 @@ public class ImageWorkspace {
 
 		Layer rig = new SimpleLayer(w, h, name, c);		
 		groups.addContextual(context, rig);
-		rigs.add(rig);
+		layers.add(rig);
+		parts.add(rig.getActivePart());
 		
 		width = Math.max(width, w);
 		height = Math.max(height, h);
@@ -85,9 +96,10 @@ public class ImageWorkspace {
 		alertStructureChanged();
 		return rig;
 	}
-	public void addTreeNode( GroupTree.Node context, String name) {
-		groups.addContextual(context, name);
+	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
+		GroupTree.GroupNode newNode = groups.addContextual(context, name);
 		alertStructureChanged();
+		return newNode;
 	}
 	
 
@@ -116,9 +128,9 @@ public class ImageWorkspace {
 	private void _gdq_rec( GroupTree.Node node, List<Layer>queue) {
 		for( GroupTree.Node child : node.getChildren()) {
 			if( child.isVisible()) {
-				if( child instanceof GroupTree.RigNode) {
+				if( child instanceof GroupTree.LayerNode) {
 					// !!!! Very Debug [TODO]
-					queue.add(0,((GroupTree.RigNode)child).getRig());
+					queue.add(0,((GroupTree.LayerNode)child).getLayer());
 				}
 				else {
 					_gdq_rec( child, queue);

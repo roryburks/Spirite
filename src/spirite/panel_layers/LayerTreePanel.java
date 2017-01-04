@@ -45,13 +45,14 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
-	implements MImageStructureObserver,
+	implements MImageStructureObserver, MWorkspaceObserver,
 	 TreeCellRenderer, TreeSelectionListener, TreeExpansionListener
 {
 	MasterControl master;
@@ -67,6 +68,7 @@ public class LayerTreePanel extends ContentTree
 		this.master = master;
 		workspace = master.getCurrentWorkspace();
 		workspace.addImageStructureObserver(this);
+		master.addWorkspaceObserver(this);
 		
 		constructFromWorkspace();
 		
@@ -219,10 +221,10 @@ public class LayerTreePanel extends ContentTree
 		
 		Object obj = node.getUserObject();
 		
-		if( obj instanceof GroupTree.RigNode) {
-			GroupTree.RigNode rn = (GroupTree.RigNode)obj;
+		if( obj instanceof GroupTree.LayerNode) {
+			GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
 			
-			workspace.setActivePart(rn.getRig());
+			workspace.setActivePart(rn.getLayer());
 		}
 		else
 			workspace.setActivePart(null);
@@ -247,14 +249,23 @@ public class LayerTreePanel extends ContentTree
 			renderPanel.label.setText(gn.getName());
 			return renderPanel;
 		}
-		if( obj instanceof GroupTree.RigNode) {
-			GroupTree.RigNode rn = (GroupTree.RigNode)obj;
+		if( obj instanceof GroupTree.LayerNode) {
+			GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
 			
 
-			renderPanel.label.setText(rn.getRig().getName());
+			renderPanel.label.setText(rn.getLayer().getName());
 		}
 		return renderPanel;
 	}
+
+	// :::: WorkspaceObserver
+	@Override
+	public void currentWorkspaceChanged() {
+		workspace = master.getCurrentWorkspace();
+		this.constructFromWorkspace();
+	}
+
+	@Override	public void newWorkspace() {}
 
 }
 

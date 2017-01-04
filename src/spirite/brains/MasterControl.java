@@ -69,6 +69,18 @@ public class MasterControl {
     	return render_engine;
     }
     
+
+    // !!!! TODO DEBUG
+    public void setCurrentWorkpace( ImageWorkspace workspace) {
+
+		System.out.println("maybe null");
+    	if( workspace != null) {
+    		System.out.println("not null");
+    		System.out.println(workspace.getRootNode().getChildren().size());
+    		this.image_manager = workspace;
+    		this.currentWorkspaceChanged();
+    	}
+    }
     
 
     // ==== Image Managements
@@ -110,4 +122,28 @@ public class MasterControl {
         public void imageChanged();
         public void newImage();
     }
+    
+    
+
+    List<MWorkspaceObserver> workspaceObservers = new ArrayList<>();
+
+    public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.add(obs);}
+    public void removeWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.remove(obs); }
+    
+    private void currentWorkspaceChanged() {
+    	for( MWorkspaceObserver obs : workspaceObservers) {
+    		obs.currentWorkspaceChanged();
+    	}
+    }
+    private void newWorkspace() {
+    	for( MWorkspaceObserver obs : workspaceObservers) {
+    		obs.newWorkspace();
+    	}
+    }
+    
+    public static interface MWorkspaceObserver {
+        public void currentWorkspaceChanged();
+        public void newWorkspace();
+    }
+    
 }

@@ -36,6 +36,12 @@ public class Globals {
 	private static Object[][] menu_scheme = {
 			{"File", KeyEvent.VK_F, null},
 			{".New Image", KeyEvent.VK_N, "global.new_image"},
+			{".-"},
+			{".Open", KeyEvent.VK_O, "global.open_image"},
+			{".-"},
+			{".Save", KeyEvent.VK_S, "global.save_image"},
+			{".Save As", KeyEvent.VK_A, "global.save_image_as"},
+			{".-"},
 			{".Debug Color", KeyEvent.VK_C, "global.debug_color"},
 			
 			{"Edit", KeyEvent.VK_E, null},
@@ -44,7 +50,7 @@ public class Globals {
 			{".Dialogs", KeyEvent.VK_D, null},
 			{"..Layers", KeyEvent.VK_L, "frame.showLayerFrame"},
 			{"..Tools", KeyEvent.VK_T, "frame.showToolsFrame"},
-			{"..-",null,null},
+			{"..-"},
 			{"..Animation Scheme", KeyEvent.VK_S, "frame.showAnimSchemeFrame"},
 	};
 

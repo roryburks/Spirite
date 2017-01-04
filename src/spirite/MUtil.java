@@ -38,6 +38,9 @@ public class MUtil {
 		return ((t - start) % diff + diff) % diff + start;
 	}
 	
+	// :::: String
+	
+	// :::: Other
 	public static boolean coordInImage( int x, int y, BufferedImage image) {
 		if( image == null) return false;
 		

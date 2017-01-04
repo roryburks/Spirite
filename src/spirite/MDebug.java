@@ -9,6 +9,13 @@ import javax.swing.JOptionPane;
  */
 public class MDebug {
 	
+	public static enum ErrorType {
+		FILE,
+		// Something being made that is either too big or too small
+		//	or somehow gets data out of bounds
+		OUT_OF_BOUNDS,
+	}
+	
 	public static enum WarningType {
 		// A structural warning is an issue that should never happen according to 
 		//	program design.  It indicates some potentially major oversight, but
@@ -24,11 +31,19 @@ public class MDebug {
 		//	thinks that are referenced by strings along the lines of "global.new_image"
 		//	Reference warnings are failures to find the corresponding data
 		REFERENCE,
+		// Called when the user or program tries to do something that it expects to
+		//	be supported but isn't (probably because of version problems)
+		UNSUPPORTED,
 		UNSPECIFIED
 	}
 	
 	public static void handleWarning( WarningType priority, Object source, String message) {
 		System.out.println( "Warning: " + message);
+	}
+	
+	public static void handleError( ErrorType type, Object source, String message) {
+
+		System.out.println( "Error: " + message);
 	}
 	
     public static void handleError( int priority, String message) {

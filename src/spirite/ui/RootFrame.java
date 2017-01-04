@@ -16,6 +16,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,9 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.dialogs.NewImagePanel;
+import spirite.file.LoadEngine;
+import spirite.file.LoadEngine.BadSIFFFileException;
+import spirite.file.SaveEngine;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
@@ -264,6 +268,18 @@ public class RootFrame extends javax.swing.JFrame
         	promptNewImage();
         else if( command.equals("debug_color"))
         	promptDebugColor();
+        // !!! TODO START DEBUG
+        else if( command.equals("open_image"))
+			try {
+				master.setCurrentWorkpace( 
+						LoadEngine.loadWorkspace( new File("E:/test.sif")));
+			} catch (BadSIFFFileException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e.getMessage());
+			}
+		else if( command.equals("save_image_as"))
+        	SaveEngine.saveWorkspace( master.getCurrentWorkspace(), new File("E:/test.sif"));
+        // !!! TODO ENDDEBUG
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
         }
