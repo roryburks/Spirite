@@ -56,6 +56,7 @@ public class ContentTree extends JPanel
 	protected DefaultTreeModel model;
 	protected CCTDragManager dragManager;
 	protected JScrollPane scrollPane;
+	protected CCPanel container;
 	
 	protected CCTree tree;
 	protected Color bgColor;
@@ -76,14 +77,16 @@ public class ContentTree extends JPanel
 	public ContentTree() {
 		// Simple grid layout, fills the whole area
 		this.setLayout( new GridLayout());
+		container = new CCPanel();
+		this.add(container);
 		
 		buttonPanel = new CCBPanel();
 		tree = new CCTree();
-		scrollPane = new JScrollPane(tree);
+		scrollPane = new JScrollPane(container);
 		this.add(scrollPane);
 		
-		
 		// Link Listener
+		container.addMouseListener(this);
 		tree.addMouseListener(this);
 		buttonPanel.addMouseListener(this);
 		tree.addTreeSelectionListener(this);	// TODO: this isn't working for some reason
@@ -99,7 +102,7 @@ public class ContentTree extends JPanel
 		
 		// Make the background invisible as we will draw the background manually
 		bgColor = tree.getBackground();
-		setOpaque( false);
+		container.setOpaque( false);
 		tree.setOpaque(false);
 		buttonPanel.setOpaque(false);
 
@@ -129,66 +132,70 @@ public class ContentTree extends JPanel
 		Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
 		int bpwidth = size.width + 2*margin.width;
 
-		GroupLayout layout = new GroupLayout( this);
+		GroupLayout layout = new GroupLayout( container);
 		
 		
 		layout.setHorizontalGroup(
 			layout.createSequentialGroup()
 				.addComponent(buttonPanel, bpwidth, bpwidth, bpwidth)
-				.addComponent(tree, 0, 100, Integer.MAX_VALUE)
+				.addComponent(tree)
 		);
 		layout.setVerticalGroup(
 			layout.createParallelGroup(Alignment.LEADING)
 				.addComponent(buttonPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE)
 				.addComponent(tree, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE)
 		);
-		setLayout(layout);
+		container.setLayout(layout);
 	}
 	
 	/***
 	 * 
 	 */
-	@Override
-	public void paint( Graphics g) {
-		g.setColor( bgColor);
-		g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
-		
-
-		// Draw a Background around the Selected Path
-		int r = tree.getRowForPath( tree.getSelectionPath());
-		Rectangle rect = tree.getRowBounds(r);
-		
-		if( rect != null) {
-			if( dragManager.dragIntoNode != null)
-				g.setColor( Globals.getColor("contentTree.selectedBGDragging"));
-			else
-				g.setColor( Globals.getColor("contentTree.selectedBackground"));
-			g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
-		}
-		
-		// Draw a Line/Border indicating where you're dragging and dropping
-		if( dragManager.dragIntoNode != null) {
-			g.setColor( Color.BLACK);
+	protected class CCPanel extends JPanel {
+		@Override
+		public void paint( Graphics g) {
+			g.setColor( bgColor);
+			g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
 			
-			rect = tree.getPathBounds(dragManager.dragIntoNode);
+	
+			// Draw a Background around the Selected Path
+			int r = tree.getRowForPath( tree.getSelectionPath());
+			Rectangle rect = tree.getRowBounds(r);
 			
-			
-			switch( dragManager.dragMode) {
-			case PLACE_OVER:
-				g.drawLine( 0, rect.y, getWidth(), rect.y);
-				break;
-			case PLACE_UNDER:
-				g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
-				break;
-			case PLACE_INTO:
-				g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
-				break;
-			default:
-				break;
+			if( rect != null) {
+				if( dragManager.dragIntoNode != null)
+					g.setColor( Globals.getColor("contentTree.selectedBGDragging"));
+				else
+					g.setColor( Globals.getColor("contentTree.selectedBackground"));
+				g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
 			}
+			
+			// Draw a Line/Border indicating where you're dragging and dropping
+			if( dragManager.dragIntoNode != null) {
+				g.setColor( Color.BLACK);
+				
+				rect = tree.getPathBounds(dragManager.dragIntoNode);
+				
+				
+				switch( dragManager.dragMode) {
+				case PLACE_OVER:
+					g.drawLine( 0, rect.y, getWidth(), rect.y);
+					break;
+				case PLACE_UNDER:
+					g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
+					break;
+				case PLACE_INTO:
+					g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
+					break;
+				default:
+					break;
+				}
+			}
+			
+//			System.out.println(tree.get());
+			
+			super.paint(g);
 		}
-		
-		super.paint(g);
 	}
 	
 	

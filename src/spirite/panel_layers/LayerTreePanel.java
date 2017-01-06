@@ -113,6 +113,7 @@ public class LayerTreePanel extends ContentTree
 		model.nodeStructureChanged(root);
 
 		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
+		
 		repaint();
 		
 		dragManager.stopDragging();
