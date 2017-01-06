@@ -58,6 +58,7 @@ public class HotkeyManager {
                 
                 {"global.newLayerQuick", (new Hotkey( KeyEvent.VK_INSERT, 0))},
                 
+                {"global.undo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK))},
             }
         );
         

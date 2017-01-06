@@ -297,6 +297,9 @@ public class RootFrame extends javax.swing.JFrame
 			if( f != null)
 				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
 		}
+		else if( command.equals("undo")) {
+			master.getUndoEngine().undo();
+		}
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
         }

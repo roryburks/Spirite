@@ -5,14 +5,19 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import spirite.MDebug.WarningType;
+import spirite.MDebug;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
+import spirite.image_data.ImageData;
 
 /***
  * Pretty much anything which alters the image data goes through the DrawEngine
@@ -21,102 +26,146 @@ import spirite.brains.MasterControl;
  *
  */
 public class DrawEngine {
-	int old_x, old_y;
-	int new_x, new_y;
 	MasterControl master;
-	StrokeParams stroke;
 	
 	BufferedImage working_image;
 	Timer update_timer;
+	StrokeEngine timedStroke = null;
 	
 	private enum STATE { READY, DRAWING };
-	STATE state = STATE.READY;
 	
 	public DrawEngine( MasterControl master) {
 		this.master = master;
-		stroke = null;
+	}
+
+	public StrokeEngine createStrokeEngine( ImageData data) {
+		return new StrokeEngine(data);
+	}
+	
+	/***
+	 * The StrokeEngine operates asynchronously to the input data.  In general
+	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
+	 * pen input is performed.
+	 */
+	public class StrokeEngine {
+		int old_x, old_y;
+		int new_x, new_y;
+		STATE state = STATE.READY;
+
+		StrokeParams stroke;
+		ImageData data;
 		
-		update_timer = new Timer();
-		update_timer.scheduleAtFixedRate( new TimerTask() {
-			@Override
-			public void run() {
-				 stepStroke();
+		List<Point> prec = new LinkedList<>();
+		
+		protected StrokeEngine(ImageData data) {
+			this.data = data;
+			stroke = null;
+		}
+		
+		// :::: Get's
+		public StrokeParams getParams() {
+			return stroke;
+		}
+		public ImageData getImageData() {
+			return data;
+		}
+		
+		/***
+		 * 
+		 * @param s
+		 * @param x
+		 * @param y
+		 * @return true if the data has been changed, false otherwise
+		 */
+		public boolean startStroke( StrokeParams s, int x, int y) {
+			if( data == null || data.getData() == null) 
+				return false;
+			stroke = s;
+			BufferedImage img = data.getData();
+			int crgb = stroke.getColor().getRGB();
+			
+			old_x = x;
+			old_y = y;
+			new_x = x;
+			new_y = y;
+			prec.add( new Point(x,y));
+			
+			state = STATE.DRAWING;
+			
+			if( MUtil.coordInImage( x, y, img) && img.getRGB(x, y) != crgb) {
+				img.setRGB(x, y, crgb);
+				return true;
+			}
+			return false;
+		}
+		
+		/***
+		 * 
+		 * @return true if the step wan't a null-step (non-moving)
+		 */
+		public synchronized boolean stepStroke() {
+			if( state != STATE.DRAWING || data == null || data.getData() == null) {
+				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
+				endStroke();
+				return false;
 			}
 			
-		}, 100, 16);
-	}
-	
-	// :::: Stroke engine
-	private synchronized void stepStroke() {
-		if( state != STATE.DRAWING)
-			return;
-		
-		if(  master.getCurrentWorkspace().getActiveData() == null ) {
-			endStroke();
-			return;
-		}
-		
-		working_image = master.getCurrentWorkspace().getActiveData().getData();
-		
-		
-//		System.out.println( old_x + "," + old_y + " : " + new_x + "," + new_y + "::: " + state);
-		
+			BufferedImage img = data.getData();
+			boolean changed = false;
+				
+			// Draw Stroke (only if the mouse has moved)
+			if( new_x != old_x || new_y != old_y) {
+				prec.add( new Point(new_x,new_y));
+				Graphics g = img.getGraphics();
+				
+				switch( stroke.method) {
+				case BASIC:
+					g.setColor( stroke.getColor());
+					g.drawLine(old_x, old_y, new_x, new_y);
+					break;
+				case ERASE:
+					Graphics2D g2 = (Graphics2D)g;
+					Composite c = g2.getComposite()
+							;
+					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
+					g2.setColor( new Color(0,0,0,0));
+					g2.drawLine( old_x, old_y, new_x, new_y);
+					g2.setComposite( c);
+				}
+				g.dispose();
+				changed = true;
+			}
 			
-		// Draw Stroke
-		Graphics g = working_image.getGraphics();
-		
-		switch( stroke.method) {
-		case BASIC:
-			g.setColor( stroke.getColor());
-			g.drawLine(old_x, old_y, new_x, new_y);
-			break;
-		case ERASE:
-			Graphics2D g2 = (Graphics2D)g;
-			Composite c = g2.getComposite()
-					;
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-			g2.setColor( new Color(0,0,0,0));
-			g2.drawLine( old_x, old_y, new_x, new_y);
-			g2.setComposite( c);
-		}
-		g.dispose();
-		
-		// Refresh
-		master.refreshImage();
-		
-		old_x = new_x;
-		old_y = new_y;
-	}
-	
-	// :::: Stroke API
-	public void startStroke( StrokeParams s, int x, int y) {
-		old_x = x;
-		old_y = y;
-		new_x = x;
-		new_y = y;
-		
-		stroke = s;
-		
-		if( MUtil.coordInImage( x, y, working_image)) {
-			working_image.setRGB(x, y, stroke.getColor().getRGB());
-			master.refreshImage();
+			
+			old_x = new_x;
+			old_y = new_y;
+			return changed;
 		}
 		
-		state = STATE.DRAWING;
+		/***
+		 * Updates the coordinates for the stroke
+		 */
+		public synchronized void updateStroke( int x, int y) {
+			new_x = x;
+			new_y = y;
+		}
+		
+		public void endStroke() {
+			old_x = -1;
+			old_y = -1;
+			state = STATE.READY;
+			working_image = null;
+		}
+		
+		public Point[] getHistory() {
+			Point[] array = new Point[prec.size()];
+			return prec.toArray(array);
+		}
 	}
 	
-	public synchronized void updateStroke( int x, int y) {
-		new_x = x;
-		new_y = y;
-	}
+
 	
-	public void endStroke() {
-		old_x = -1;
-		old_y = -1;
-		state = STATE.READY;
-		working_image = null;
-//		System.out.println("ASFASDF");
-	}
+
 	
 	// :::: Other
 	
@@ -191,7 +240,6 @@ public class DrawEngine {
 			if( !locked)
 				this.method = method;
 		}
-		
 		
 	}
 }

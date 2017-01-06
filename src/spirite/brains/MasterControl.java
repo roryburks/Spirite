@@ -7,6 +7,7 @@ import java.util.List;
 import spirite.dialogs.Dialogs;
 import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine;
+import spirite.draw_engine.UndoEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.FrameManager;
 
@@ -23,9 +24,10 @@ public class MasterControl {
     PaletteManager palette;
     ToolsetManager toolset;
     ImageWorkspace imageManager;
+    SettingsManager settingsManager;
     DrawEngine drawEngine;
     RenderEngine renderEngine;
-    SettingsManager settingsManager;
+    UndoEngine undoEngine;
     
     FrameManager frame_manager;
     
@@ -41,10 +43,11 @@ public class MasterControl {
         palette = new PaletteManager();
         toolset = new ToolsetManager();
         imageManager = new ImageWorkspace();
+        settingsManager = new SettingsManager();
         frame_manager = new FrameManager( this);
         drawEngine = new DrawEngine( this);
         renderEngine = new RenderEngine( this);
-        settingsManager = new SettingsManager();
+        undoEngine = new UndoEngine( this);
         Dialogs.setMaster(this); //// TODO BAD
     }
 
@@ -72,6 +75,9 @@ public class MasterControl {
     }
     public SettingsManager getSettingsManager() {
     	return settingsManager;
+    }
+    public UndoEngine getUndoEngine() {
+    	return undoEngine;
     }
     
 

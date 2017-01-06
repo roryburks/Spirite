@@ -1,6 +1,9 @@
 package spirite.panel_work;
 
 import java.awt.Color;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jpen.PButton;
 import jpen.PButtonEvent;
 import jpen.PKindEvent;
@@ -10,8 +13,13 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
+import spirite.draw_engine.DrawEngine.StrokeEngine;
 import spirite.draw_engine.DrawEngine.StrokeParams;
 import spirite.draw_engine.DrawEngine.StrokeParams.Method;
+import spirite.draw_engine.UndoEngine;
+import spirite.draw_engine.UndoEngine.StrokeAction;
+import spirite.image_data.ImageData;
+import spirite.image_data.ImageWorkspace;
 
 public class Penner 
 	implements PenListener
@@ -19,6 +27,8 @@ public class Penner
 	WorkPanel context;
 	DrawPanel draw_panel;
 	MasterControl master;
+	Timer update_timer;
+	StrokeEngine strokeEngine = null;
 	
 	int x, y;
 	
@@ -29,7 +39,18 @@ public class Penner
 		this.draw_panel = draw_panel;
 		this.context = draw_panel.context;
 		this.master = context.master;
-		
+
+		update_timer = new Timer();
+		update_timer.scheduleAtFixedRate( new TimerTask() {
+			@Override
+			public void run() {
+				if( strokeEngine != null && state == STATE.DRAWING) {
+					if( strokeEngine.stepStroke())
+						master.refreshImage();
+				}
+			}
+			
+		}, 100, 16);
 	}
 
 	@Override
@@ -51,15 +72,15 @@ public class Penner
 						: context.master.getPaletteManager().getActiveColor(1);
 				stroke.setColor( c);
 				
-				master.getDrawEngine().startStroke(stroke, context.stiXm(x), context.stiYm(y));
-				state = STATE.DRAWING;
+				// Start the Stroke
+				startStroke( stroke);
 			}
 			if( tool == "eraser") {
 				StrokeParams stroke = new StrokeParams();
 				stroke.setMethod( Method.ERASE);
 
-				master.getDrawEngine().startStroke(stroke, context.stiXm(x), context.stiYm(y));
-				state = STATE.DRAWING;
+				// Start the Stroke
+				startStroke( stroke);
 			}
 			if( tool == "fill") {
 				Color c = (button == PButton.Type.LEFT) ? 
@@ -70,10 +91,31 @@ public class Penner
 			
 		}
 		else if( state == STATE.DRAWING) {
-			master.getDrawEngine().endStroke();
+			// End the Stroke
+			if( strokeEngine != null) {
+				strokeEngine.endStroke();
+				
+				UndoEngine engine = master.getUndoEngine();
+				StrokeAction stroke = engine.new StrokeAction( 
+						strokeEngine.getParams(), 
+						strokeEngine.getHistory());
+				engine.storeAction( stroke, strokeEngine.getImageData());
+				strokeEngine = null;
+			}
 			state = STATE.READY;
 		}
 		
+	}
+	
+	private void startStroke( StrokeParams stroke) {
+		ImageWorkspace workspace = master.getCurrentWorkspace();
+		if( workspace != null && workspace.getActiveData() != null) {
+			ImageData data = workspace.getActiveData();
+			master.getUndoEngine().prepareContext(data);
+			strokeEngine = master.getDrawEngine().createStrokeEngine( data);
+			strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y));
+			state = STATE.DRAWING;
+		}
 	}
 
 	@Override
@@ -113,7 +155,9 @@ public class Penner
 		}
 		
 		if( state == STATE.DRAWING) {
-			master.getDrawEngine().updateStroke( context.stiXm(x), context.stiYm(y));
+			if( strokeEngine != null) {
+				strokeEngine.updateStroke(context.stiXm(x), context.stiYm(y));
+			}
 		}
 	}
 
