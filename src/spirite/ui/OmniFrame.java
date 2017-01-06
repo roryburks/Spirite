@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -18,23 +17,13 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -45,12 +34,12 @@ import javax.swing.TransferHandler;
 
 import spirite.brains.MasterControl;
 import spirite.draw_engine.RenderEngine.RenderSettings;
-import spirite.panel_layers.LayersPanel;
-import spirite.panel_toolset.ToolsPanel;
 import spirite.ui.FrameManager.FrameType;
 
 public class OmniFrame extends JDialog
 {	
+	private static final long serialVersionUID = 1L;
+
 	private MasterControl master;
 	
 	// Components
@@ -91,6 +80,8 @@ public class OmniFrame extends JDialog
 	 * is not nearly as effective as overriding a Component's
 	 */
 	public class OmniTabbedFrame extends JTabbedPane {
+		private static final long serialVersionUID = 1L;
+
 		OmniTabbedFrame() {
 			super();
 		}
@@ -165,6 +156,10 @@ public class OmniFrame extends JDialog
 	
 	
 	public class OmniBar extends JPanel implements MouseListener {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		public OmniBar( String title) {
 			add( new JLabel(title));
 			this.setOpaque(false);
@@ -248,6 +243,10 @@ public class OmniFrame extends JDialog
 	protected class OFTransferHandler extends TransferHandler 
 		implements DragGestureListener
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		protected DragSource dragSource;
 		protected List<DragGestureRecognizer> dgrs = new ArrayList<>();
 		protected DropTarget dropTarget;

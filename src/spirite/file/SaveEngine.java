@@ -1,17 +1,10 @@
 package spirite.file;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;

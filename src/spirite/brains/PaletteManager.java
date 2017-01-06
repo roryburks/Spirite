@@ -25,8 +25,8 @@ public class PaletteManager {
     };
 
     PaletteManager() {
-    	palette_colors = new ArrayList();
-        active_colors = new ArrayList();
+    	palette_colors = new ArrayList<Color>();
+        active_colors = new ArrayList<Color>();
 
         active_colors.add(0, Color.black);
         active_colors.add(1, Color.white);

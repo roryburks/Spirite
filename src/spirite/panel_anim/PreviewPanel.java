@@ -4,13 +4,13 @@ package spirite.panel_anim;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
-import spirite.brains.MasterControl.MImageObserver;
 import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.brains.MasterControl;
 
 public class PreviewPanel extends JPanel
 {
-    MasterControl master;
+	private static final long serialVersionUID = 1L;
+	MasterControl master;
 
     public PreviewPanel() {}
     public PreviewPanel(MasterControl master) {

@@ -7,9 +7,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
@@ -21,7 +19,8 @@ import spirite.dialogs.Dialogs;
 public class PalettePanel extends JPanel 
         implements MouseListener, MPaletteObserver
 {
-    final static int BIG_SIZE = 20;
+	private static final long serialVersionUID = 1L;
+	final static int BIG_SIZE = 20;
     final static int SMALL_SIZE = 12;
 
     MasterControl master;
@@ -153,7 +152,8 @@ public class PalettePanel extends JPanel
 
 
     class ColorPicker extends JPanel {
-        int index;
+		private static final long serialVersionUID = 1L;
+		int index;
 
         ColorPicker( int index) {
             this.index = index;
@@ -165,8 +165,9 @@ public class PalettePanel extends JPanel
     }
 
     class Palette extends JPanel {
+		private static final long serialVersionUID = 1L;
 
-        public Palette() {
+		public Palette() {
             this.setOpaque(false);
         }
 

@@ -29,8 +29,8 @@ import spirite.brains.MasterControl;
 public class NewImagePanel extends javax.swing.JPanel 
     implements ActionListener
 {
-
-    MasterControl master;
+	private static final long serialVersionUID = 1L;
+	MasterControl master;
     MouseListener textfieldMouseListener;
     ColorComboModel comboModel;
     Color selected_color;
@@ -257,7 +257,8 @@ public class NewImagePanel extends javax.swing.JPanel
 class ColorComboModel extends AbstractListModel
         implements ComboBoxModel
 {
-    Color[] Colors = {
+	private static final long serialVersionUID = 1L;
+	Color[] Colors = {
         new Color( 0, 0, 0, 0),
         new Color( 0, 0, 0, 255),
         new Color( 255, 255, 255, 255),
@@ -278,7 +279,8 @@ class ColorComboModel extends AbstractListModel
     class CCM_Renderer extends JPanel
       implements ListCellRenderer
     {
-        JLabel jlabel;
+		private static final long serialVersionUID = 1L;
+		JLabel jlabel;
         JPanel color_panel, null_panel;
 
         CCM_Renderer( ) {

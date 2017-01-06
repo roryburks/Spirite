@@ -3,30 +3,20 @@
 package spirite.panel_work;
 
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.List;
-
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.event.MouseInputListener;
-//import jpen.event.PenListener;
-
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MImageObserver;
-import spirite.brains.ToolsetManager.MToolsetObserver;
-import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageData;
@@ -38,6 +28,7 @@ import spirite.image_data.ImageData;
 public class DrawPanel extends JPanel
      implements MImageObserver, ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	WorkPanel context;
 	MasterControl master;
 	Penner penner;

@@ -28,12 +28,12 @@ import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
-import spirite.ui.FrameManager.FrameType;
 
 public class ToolsPanel extends JPanel
         implements ComponentListener, MToolsetObserver
 {
-    private static final int BUTTON_WIDTH = 24;
+	private static final long serialVersionUID = 1L;
+	private static final int BUTTON_WIDTH = 24;
     private static final int BUTTON_HEIGHT = 24;
 
     int tool_len;
@@ -179,7 +179,8 @@ public class ToolsPanel extends JPanel
     class ToolButton extends JToggleButton
             implements ActionListener, MouseListener
     {
-        int ix, iy;
+		private static final long serialVersionUID = 1L;
+		int ix, iy;
         String tool;
 
         boolean hover = false;

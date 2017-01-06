@@ -34,6 +34,7 @@ public class LayerTreePanel extends ContentTree
 	implements MImageStructureObserver, MWorkspaceObserver,
 	 TreeSelectionListener, TreeExpansionListener, KeyListener
 {
+	private static final long serialVersionUID = 1L;
 	MasterControl master;
 	ImageWorkspace workspace;
 	LTPCellEditor editor;
@@ -266,6 +267,7 @@ public class LayerTreePanel extends ContentTree
 	 *
 	 */
 	private class LTPCellRenderer extends DefaultTreeCellRenderer {
+		private static final long serialVersionUID = 1L;
 		LayerTreeNodePanel renderPanel;
 		
 		LTPCellRenderer() {
@@ -303,7 +305,6 @@ public class LayerTreePanel extends ContentTree
 		implements KeyListener 
 	{
 		LayerTreeNodePanel renderPanel;
-		String text;
 		GroupTree.Node editingNode = null;
 		
 		public LTPCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {

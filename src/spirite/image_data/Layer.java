@@ -1,11 +1,5 @@
 package spirite.image_data;
 
-import java.awt.Color;
-import java.util.List;
-
-import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent;
-
 
 // !!!! For now I'm going with a 1 Rig : 1 Part for simplicity
 public class Layer {

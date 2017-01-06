@@ -1,10 +1,9 @@
 package spirite.panel_anim;
 
-import javax.swing.JPanel;
-
 import spirite.ui.ContentTree;
 
 public class AnimationSchemeTreePanel extends ContentTree {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Create the panel.

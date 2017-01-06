@@ -5,17 +5,11 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.Position;
-import javax.swing.text.Segment;
 
 public class MUtil {
 
@@ -56,6 +50,7 @@ public class MUtil {
 	 *
 	 */
 	public static class MTextFieldNumber extends JTextField implements DocumentListener {
+		private static final long serialVersionUID = 1L;
 		private int max = Integer.MAX_VALUE;
 		private int min = Integer.MIN_VALUE;
 		
@@ -78,6 +73,7 @@ public class MUtil {
 		 * you to enter non-number characters.
 		 */
 		public static class MTFNDocument extends PlainDocument {
+			private static final long serialVersionUID = 1L;
 			private boolean allows_negative = true;
 			private boolean allows_floats = false;
 			@Override

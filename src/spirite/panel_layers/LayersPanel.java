@@ -8,18 +8,15 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.brains.MasterControl;
-import spirite.dialogs.NewImagePanel;
 import spirite.dialogs.NewLayerDPanel;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
-import spirite.ui.FrameManager;
-import spirite.ui.FrameManager.FrameType;
-
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 public class LayersPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 
 	MasterControl master;
 	
@@ -93,7 +90,7 @@ public class LayersPanel extends JPanel {
 			int w = panel.getValueWidth();
 			int h = panel.getValueHeight();
 			String name = panel.getValueName();
-			String type = panel.getValueType();
+			//String type = panel.getValueType();
 			Color c = panel.getValueColor();
 			
 

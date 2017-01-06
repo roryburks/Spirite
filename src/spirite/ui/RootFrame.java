@@ -2,33 +2,19 @@
 package spirite.ui;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JColorChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -52,7 +38,8 @@ import spirite.panel_work.WorkPanel;
 public class RootFrame extends javax.swing.JFrame
         implements KeyEventDispatcher, WindowFocusListener, ActionListener
 {
-    private AnimPanel animPanel;
+	private static final long serialVersionUID = 1L;
+	private AnimPanel animPanel;
     private PalettePanel palettePanel;
     private ToolsPanel toolsPanel;
     private WorkPanel workPanel;
@@ -138,7 +125,7 @@ public class RootFrame extends javax.swing.JFrame
     	
     	// Atempt to construct menu from parsed data in menu_scheme
 		// !!!! TODO: note, there are very few sanity checks in here for now
-    	int active_level = 0;
+//    	int active_level = 0;
     	for( int i = 0; i < menu_scheme.length; ++i) {
     		String title = (String)menu_scheme[i][0];
     		
@@ -325,9 +312,11 @@ public class RootFrame extends javax.swing.JFrame
             int key = e.getKeyCode();
             int modifier = e.getModifiersEx();
 
-            String command = master.getHotekyManager().getCommand( key, modifier);
+            if( modifier == mod) {
+            	String command = master.getHotekyManager().getCommand( key, modifier);
 
-            performCommand(command);
+            	performCommand(command);
+            }
 
         }
         

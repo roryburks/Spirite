@@ -1,14 +1,11 @@
 package spirite.panel_work;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.image.BufferedImage;
-import spirite.MDebug;
 import spirite.brains.MasterControl.MImageObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.brains.MasterControl;
@@ -27,7 +24,8 @@ import spirite.brains.MasterControl;
 public class WorkPanel extends javax.swing.JPanel 
         implements MImageObserver, AdjustmentListener, ComponentListener
 {
-    private static final int SCROLL_RATIO = 10;
+	private static final long serialVersionUID = 1L;
+	private static final int SCROLL_RATIO = 10;
     private static final int SCROLL_BUFFER = 100;
 
     int zoom_level = 0; // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...

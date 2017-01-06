@@ -43,6 +43,7 @@ public class LoadEngine {
 			ra.read(b);
 			
 			if( !Arrays.equals( header, b)) {
+				ra.close();
 				throw new BadSIFFFileException("Bad Fileheader (not an SIFF File).");
 			}
 			
@@ -188,6 +189,8 @@ public class LoadEngine {
 	}
 	
 	public static class BadSIFFFileException extends Exception {
+		private static final long serialVersionUID = 1L;
+
 		public BadSIFFFileException( String message) {
 			super(message);
 		}

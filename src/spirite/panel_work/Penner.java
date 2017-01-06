@@ -1,12 +1,8 @@
 package spirite.panel_work;
 
 import java.awt.Color;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import jpen.PButton;
 import jpen.PButtonEvent;
-import jpen.PKind;
 import jpen.PKindEvent;
 import jpen.PLevel;
 import jpen.PLevelEvent;
@@ -38,7 +34,7 @@ public class Penner
 
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
-		PKind.Type type = pbe.pen.getKind().getType();
+//		PKind.Type type = pbe.pen.getKind().getType();
 		
 		if( pbe.button.value == true) {
 			PButton.Type button = pbe.button.getType();
@@ -92,6 +88,8 @@ public class Penner
 		case ERASER:
 			master.getToolsetManager().setCursor(ToolsetManager.Cursor.ERASER);
 			break;
+		default:
+			break;
 		}
 		
 	}
@@ -109,6 +107,8 @@ public class Penner
 				y = Math.round( level.value);
 				break;
 			case PRESSURE:
+			default:
+				break;
 			}
 		}
 		

@@ -19,11 +19,11 @@ import spirite.brains.PaletteManager;
 import spirite.image_data.ImageWorkspace;
 
 import javax.swing.SwingConstants;
-import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class NewLayerDPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	private MTextFieldNumber tfWidth;
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;

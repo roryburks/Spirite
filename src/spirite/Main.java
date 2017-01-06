@@ -5,7 +5,6 @@ package spirite;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import spirite.brains.MasterControl;
-import spirite.panel_layers.LayersPanel;
 import spirite.ui.FrameManager;
 
 /**

@@ -8,7 +8,8 @@ import spirite.brains.MasterControl;
 public class AnimPanel extends javax.swing.JPanel 
         implements MImageObserver
 {
-    MasterControl master;
+	private static final long serialVersionUID = 1L;
+	MasterControl master;
 
     /**
      * Creates new form PreviewPanel

@@ -1,12 +1,5 @@
 package spirite.panel_work;
 
-import java.awt.Color;
-
-import javax.swing.JPanel;
-
-import spirite.brains.MasterControl.MImageObserver;
-import spirite.brains.MasterControl;
-
 /**
  *WorkSplicePanel is a simple container for the DrawPanel (which displays the 
  *	working images and controls input) and the ReferencePanel (which displays 
@@ -16,7 +9,8 @@ import spirite.brains.MasterControl;
  */
 public class WorkSplicePanel extends javax.swing.JPanel 
 {
-    WorkPanel context;
+	private static final long serialVersionUID = 1L;
+	WorkPanel context;
 //    MasterControl master;
     int offsetx, offsety;
 

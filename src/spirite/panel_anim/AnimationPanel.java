@@ -3,12 +3,12 @@ package spirite.panel_anim;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class AnimationPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Create the panel.

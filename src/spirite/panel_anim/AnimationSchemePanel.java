@@ -3,12 +3,11 @@ package spirite.panel_anim;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
-import spirite.ui.FrameManager.FrameType;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 
 public class AnimationSchemePanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	private MasterControl master;
 
 	public AnimationSchemePanel( MasterControl master) {

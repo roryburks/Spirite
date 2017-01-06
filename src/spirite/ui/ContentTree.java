@@ -52,6 +52,7 @@ public class ContentTree extends JPanel
 	implements MouseListener, TreeSelectionListener, TreeModelListener, TreeExpansionListener
 	
 {
+	private static final long serialVersionUID = 1L;
 	protected DefaultMutableTreeNode root;
 	protected DefaultTreeModel model;
 	protected CCTDragManager dragManager;
@@ -152,6 +153,7 @@ public class ContentTree extends JPanel
 	 * 
 	 */
 	protected class CCPanel extends JPanel {
+		private static final long serialVersionUID = 1L;
 		@Override
 		public void paint( Graphics g) {
 			g.setColor( bgColor);
@@ -200,6 +202,7 @@ public class ContentTree extends JPanel
 	
 	
 	public class CCBPanel extends JPanel {
+		private static final long serialVersionUID = 1L;
 		CCButton[] buttons = new CCButton[0];
 		
 		CCBPanel() {}
@@ -271,6 +274,7 @@ public class ContentTree extends JPanel
 	}
 	
 	public class CCButton extends JToggleButton {
+		private static final long serialVersionUID = 1L;
 		int rowNum;
 		private TreePath path;
 		public CCButton( TreePath path) {
@@ -287,6 +291,7 @@ public class ContentTree extends JPanel
 	 * components to the DDTree
 	 */
 	public class CCTree extends JTree {
+		private static final long serialVersionUID = 1L;
 		public CCTree() {}
 		
 		@Override

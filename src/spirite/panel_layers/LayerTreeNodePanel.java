@@ -11,6 +11,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import spirite.Globals;
 
 public class LayerTreeNodePanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	JTextField label;
 	JPanel ppanel;
 
