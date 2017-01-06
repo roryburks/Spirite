@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
+
 /***
  * @author Rory Burks
  *
@@ -101,9 +104,10 @@ public class GroupTree {
 	public class Node  {
 		// !!!! TODO : Various attributes (such as oppacity) that apply to the group
 		//	or the Rig (without altering them) should go here
-		private float alpha;
-		private boolean visible = true;
-		private boolean expanded = true;
+		protected float alpha;
+		protected boolean visible = true;
+		protected boolean expanded = true;
+		protected String name = "";
 
 		
 		// !!!! Note: even though RigNodes will never use it, it's still useful to have for 
@@ -130,6 +134,19 @@ public class GroupTree {
 		}
 		public void setExpanded( boolean expanded) {
 			this.expanded = expanded;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			if( !this.name.equals(name)) {
+				this.name = name;
+
+				// Contruct and trigger the StructureChangeEvent
+				StructureChangeEvent evt = new StructureChangeEvent(context, ChangeType.RENAME);
+				evt.affectedNodes.add(this);
+				context.triggerStructureChanged( evt);
+			}
 		}
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
@@ -158,18 +175,10 @@ public class GroupTree {
 	}
 	
 	public class GroupNode extends Node {
-		private String name;
-		
 		GroupNode( String name) {
 			this.name = name;
 		}
 		
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
 	}
 	
 	public class LayerNode extends Node {
@@ -177,10 +186,17 @@ public class GroupTree {
 		
 		LayerNode( Layer data) {
 			this.data = data;
+			this.name = data.getName();
 		}
 		
 		public Layer getLayer() {
 			return data;
+		}
+		
+		@Override
+		public void setName(String name) {
+			super.setName(name);
+			data.setName(name);
 		}
 	}
 }

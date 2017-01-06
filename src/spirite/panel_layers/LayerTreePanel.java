@@ -30,6 +30,8 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
@@ -94,8 +96,9 @@ public class LayerTreePanel extends ContentTree
     
     // :::: MImageStructureObserver interface
 	@Override
-	public void structureChanged() {
+	public void structureChanged( StructureChangeEvent evt) {
 		constructFromWorkspace();
+		
 	}
 	
 
@@ -136,12 +139,18 @@ public class LayerTreePanel extends ContentTree
 		}
 		
 		try {
-    		if( ((GroupTree.Node)tree_node.getUserObject()).isExpanded() ) {
+			GroupTree.Node node = (GroupTree.Node)tree_node.getUserObject();
+    		if( node.isExpanded() ) {
     			TreePath path =  new TreePath(tree_node.getPath());
     			tree.expandPath(path);
     		}
-    		else {
+    		else {}
+    		
+    		if( node == workspace.getSelectedNode()) {
+    			TreePath path =  new TreePath(tree_node.getPath());
+    			tree.addSelectionPath(path);
     		}
+    			
 		} catch( ClassCastException e) {}
 	}
     
@@ -222,13 +231,7 @@ public class LayerTreePanel extends ContentTree
 	public void valueChanged(TreeSelectionEvent evt) {			
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
-		if( node instanceof GroupTree.LayerNode) {
-			GroupTree.LayerNode rn = (GroupTree.LayerNode)node;
-			
-			workspace.setActiveLayer(rn.getLayer());
-		}
-		else
-			workspace.setActiveLayer(null);
+		workspace.setSelectedNode(node);
 		
 		// !!! TODO Debug: this shouldn't need to be here (it should just be in ContentTree)
 		repaint();
@@ -350,14 +353,8 @@ public class LayerTreePanel extends ContentTree
 		private void saveText() {
 			if( editingNode != null) {
 				String text = renderPanel.label.getText();
-
-				if( editingNode instanceof GroupTree.GroupNode) {
-					(( GroupTree.GroupNode)editingNode).setName(text);
-					
-				}
-				else if(editingNode instanceof GroupTree.LayerNode) {
-					(( GroupTree.LayerNode)editingNode).getLayer().setName(text);
-				}
+				
+				editingNode.setName(text);
 				
 			}
 			

@@ -58,8 +58,10 @@ public class HotkeyManager {
                 {"toolset.box_selection", (new Hotkey( KeyEvent.VK_R, 0))},
                 {"toolset.move", (new Hotkey( KeyEvent.VK_M, 0))},
                 {"toolset.color_picker", (new Hotkey( KeyEvent.VK_O, 0))},
-                
+
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
+                
+                {"global.newLayerQuick", (new Hotkey( KeyEvent.VK_INSERT, 0))},
                 
             }
         );

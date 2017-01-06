@@ -12,12 +12,14 @@ public class SimpleLayer extends Layer
 {
 	ImageData part;
 
-	public SimpleLayer( ImageData data, String name) {
+	public SimpleLayer( ImageData data, String name, ImageWorkspace context) {
+		super(context);
 		part = data;
 		this.name = name;
 	}
 	
-	public SimpleLayer(int x, int y, String name, Color c) {
+	public SimpleLayer(int x, int y, String name, Color c, ImageWorkspace context) {
+		super(context);
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		

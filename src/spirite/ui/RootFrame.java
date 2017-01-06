@@ -1,6 +1,7 @@
 
 package spirite.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.KeyEventDispatcher;
@@ -36,6 +37,7 @@ import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
+import spirite.image_data.ImageWorkspace;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
@@ -268,6 +270,18 @@ public class RootFrame extends javax.swing.JFrame
         else if( command.equals("debug_color"))
         	promptDebugColor();
         // !!! TODO START DEBUG
+        else if( command.equals("newLayerQuick")) {
+        	ImageWorkspace workspace = master.getCurrentWorkspace();
+        	if( workspace != null) {
+        		System.out.println(workspace.getSelectedNode());
+        		workspace.addNewRig( 
+        				workspace.getSelectedNode(), 
+        				workspace.getWidth(), 
+        				workspace.getHeight(), 
+        				"newLayer", 
+        				new Color(0,0,0,0));
+        	}
+        }
         else if( command.equals("open_image"))
 			try {
 				master.setCurrentWorkpace( 

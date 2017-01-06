@@ -66,7 +66,10 @@ public class Penner
 				state = STATE.DRAWING;
 			}
 			if( tool == "fill") {
-				master.getDrawEngine().fill(context.stiXm(x), context.stiYm(y), master.getPaletteManager().getActiveColor(0));
+				Color c = (button == PButton.Type.LEFT) ? 
+						context.master.getPaletteManager().getActiveColor(0)
+						: context.master.getPaletteManager().getActiveColor(1);
+				master.getDrawEngine().fill(context.stiXm(x), context.stiYm(y), c);
 			}
 			
 		}

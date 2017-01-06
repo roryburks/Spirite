@@ -1,16 +1,11 @@
 package spirite.panel_layers;
 
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.Globals;
@@ -31,10 +26,7 @@ public class LayerTreeNodePanel extends JPanel {
 		label.setOpaque(false);
 		label.setBorder(null);
 		
-//		Dimension maxWidth = Globals.getMetric("layerpanel.treenodes.max");
-		
-		
-		this.setBackground( new Color(0,0,0,0));
+		this.setOpaque( false);
 		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(

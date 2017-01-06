@@ -14,6 +14,10 @@ public class MDebug {
 		// Something being made that is either too big or too small
 		//	or somehow gets data out of bounds
 		OUT_OF_BOUNDS,
+		// A minor structural error is more serious than a structural warning and
+		//	indicates a potential substantial flaw in program design, but shouldn't
+		//	cause a catastrophic failure of the program.
+		STRUCTURAL_MINOR,
 	}
 	
 	public static enum WarningType {
@@ -43,7 +47,7 @@ public class MDebug {
 	
 	public static void handleError( ErrorType type, Object source, String message) {
 
-		System.out.println( "Error: " + message);
+        JOptionPane.showMessageDialog(null, "Error: " + message);
 	}
 	
     public static void handleError( int priority, String message) {

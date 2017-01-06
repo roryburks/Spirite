@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 
 
 /***
@@ -61,21 +65,28 @@ public class ImageWorkspace {
 		return list;
 	}
 
-	// :::: The activePart is the part (i.e. raw image data) which will be drawn on
-	//	when the user gives input.
-	private int selectedLayer = -1;
 	
 	public ImageData getActiveData() {
-		if( selectedLayer < 0) return null;
+		if( selected == null) return null;
 		
-		Layer rig = layers.get( selectedLayer);
-		if( rig == null) return null;
-		
-		return rig.getActiveData();
+		if( selected instanceof GroupTree.LayerNode) {
+			// !!!! SHOULD be no reason to add sanity checks here.
+			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
+		}
+		return null;
 	}
 	
-	public void setActiveLayer( Layer rig) {
-		selectedLayer = layers.indexOf(rig);
+//	public void setActiveLayer( Layer rig) {
+	//	selectedLayer = layers.indexOf(rig);
+	//}
+	
+	public GroupTree.Node getSelectedNode() {
+		return selected;
+	}
+	public void setSelectedNode( GroupTree.Node node) {
+		// TODO : Add Sanity check to make sure the node is in the workspace
+		
+		selected = node;
 	}
 	
 	// Creates a New Rig
@@ -85,8 +96,8 @@ public class ImageWorkspace {
 	
 	public Layer addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
 
-		Layer rig = new SimpleLayer(w, h, name, c);		
-		groups.addContextual(context, rig);
+		Layer rig = new SimpleLayer(w, h, name, c, this);		
+		GroupTree.Node newNode = groups.addContextual(context, rig);
 		layers.add(rig);
 		
 		//!!!! TODO : Reimagine a better way to link Image Data to Workspace
@@ -96,36 +107,51 @@ public class ImageWorkspace {
 		width = Math.max(width, w);
 		height = Math.max(height, h);
 		
-		setActiveLayer(rig);
+		setSelectedNode( newNode);
 		
+
+		// Contruct and trigger the StructureChangeEvent
+		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
+		evt.affectedNodes.add(newNode);
+		triggerStructureChanged( evt);
 		
-		alertStructureChanged();
 		return rig;
 	}
 	
 	public Layer addNewRig( GroupTree.Node context, int identifier, String name) {
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
-				Layer rig = new SimpleLayer( data, name);
-				groups.addContextual(context, rig);
+				Layer rig = new SimpleLayer( data, name, this);
+				GroupTree.Node newNode = groups.addContextual(context, rig);
 				
 				width = Math.max(width, data.getData().getWidth());
 				height = Math.max(height, data.getData().getHeight());
 				
 				layers.add(rig);
-				setActiveLayer(rig);
+				setSelectedNode( newNode);
 				
-				alertStructureChanged();
+				// Contruct and trigger the StructureChangeEvent
+				StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
+				evt.affectedNodes.add(newNode);
+				triggerStructureChanged( evt);
+				
 				return rig;
 			}
 		}
+		
+		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to add a new Simple Layer using an identifier that does not exist in the current workspace.");
 		
 		return null;
 	}
 	
 	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
 		GroupTree.GroupNode newNode = groups.addContextual(context, name);
-		alertStructureChanged();
+
+		// Contruct and trigger the StructureChangeEvent
+		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
+		evt.affectedNodes.add(newNode);
+		triggerStructureChanged( evt);
+		
 		return newNode;
 	}
 	
@@ -144,15 +170,27 @@ public class ImageWorkspace {
 	// :::: Move Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
 		groups.moveAbove(nodeToMove, nodeAbove);
-		alertStructureChanged();
+		
+		// Contruct and trigger the StructureChangeEvent
+		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
+		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt);
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
 		groups.moveBelow(nodeToMove, nodeUnder);
-		alertStructureChanged();
+		
+		// Contruct and trigger the StructureChangeEvent
+		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
+		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt);
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
 		groups.moveInto(nodeToMove, nodeInto, top);
-		alertStructureChanged();
+		
+		// Contruct and trigger the StructureChangeEvent
+		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
+		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt);
 	}
 	
 	
@@ -179,19 +217,40 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Observers
+	public static class StructureChangeEvent {
+		public final ImageWorkspace workspace;
+		public final ChangeType changeType;
+		LinkedList<GroupTree.Node> affectedNodes = new LinkedList<>();
+		
+		public enum ChangeType {
+			ADDITION,
+			DELETION,
+			RENAME,
+			MOVE
+		}
+		
+		StructureChangeEvent( ImageWorkspace workspace, ChangeType changeType) {
+			this.workspace = workspace;
+			this.changeType = changeType;
+		}
+		
+		public List<GroupTree.Node> getAffectedNode() {
+			return (List<Node>) affectedNodes.clone();
+		}
+	}
+	
     private List<MImageStructureObserver> imageStructureObservers = new ArrayList<>();
 
     public void addImageStructureObserver( MImageStructureObserver obs) { imageStructureObservers.add(obs);}
     public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
     
-    void alertStructureChanged() {
-    	
+    void triggerStructureChanged( StructureChangeEvent evt) {
         for( MImageStructureObserver obs : imageStructureObservers) {
-            obs.structureChanged();
+            obs.structureChanged( evt);
         }
     }
     
     public static interface MImageStructureObserver {
-        public void structureChanged();
+        public void structureChanged(StructureChangeEvent evt);
     }
 }
