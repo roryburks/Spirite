@@ -278,24 +278,12 @@ public class OmniFrame extends JDialog
 			}
 		}
 		
-		// :::: Export
-		@Override
-		public int getSourceActions( JComponent c) {
-			System.out.println("get: " + c);
-			return MOVE;
-		}
-		
-		@Override
-		public Transferable createTransferable( JComponent c) {
-			System.out.println("create: " + c);
-			return null;
-		}
-		
-		@Override 
-		public void exportDone( JComponent c, Transferable t, int action) {
-
-			System.out.println("get: " + c);
-		}
+		// :::: Export 
+		// Unused because JPanel has no built-in DnD functionality and so the start of 
+		//	Dragging has to be added manually with a DragSource object
+		@Override		public int getSourceActions( JComponent c) {return MOVE;}
+		@Override		public Transferable createTransferable( JComponent c) {	return null;}
+		@Override 		public void exportDone( JComponent c, Transferable t, int action) {}
 		
 		// :::: Import
 		@Override

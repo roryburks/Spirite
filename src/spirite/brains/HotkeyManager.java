@@ -144,9 +144,6 @@ public class HotkeyManager {
 
             key = buff.getInt();
             modifier = buff.getInt();
-            System.out.println(modifier);
-            
-
         }
 
         @Override

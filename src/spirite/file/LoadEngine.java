@@ -51,11 +51,9 @@ public class LoadEngine {
 			// Load Chunks until you've reached the end
 			List<ChunkInfo> chunks = parseChunks( ra);
 
-			System.out.println("test");
 			// First Load the Image Data
 			for( ChunkInfo ci : chunks) {
 				if( ci.header.equals("IMGD")) {
-					System.out.println("Start:" + ci.startPointer + ":" + ci.size);
 					ra.seek( ci.startPointer);
 					parseImageDataSection(workspace, ra, ci.size);
 				}
@@ -86,6 +84,11 @@ public class LoadEngine {
 		int size;
 	}
 	
+	/***
+	 * Reads all the header data from the chunks
+	 * 
+	 * Note: assumes that the file is already aligned to the first chunk.
+	 */
 	private static List<ChunkInfo> parseChunks(RandomAccessFile ra) 
 			throws IOException 
 	{
@@ -101,8 +104,6 @@ public class LoadEngine {
 			ci.startPointer = ra.getFilePointer();
 			ra.skipBytes(ci.size);
 			
-
-			System.out.println("Header:" + ci.header + "," + ci.size);
 			list.add(ci);
 		}
 		
@@ -121,18 +122,15 @@ public class LoadEngine {
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
-		System.out.println("Parsing Image Start:"+  startPointer);
 		
 		while( ra.getFilePointer() < endPointer) {
 			identifier = ra.readInt();
 			imgSize = ra.readInt();
 
-			System.out.println("Img id:" + identifier);
 			byte[] buffer = new byte[imgSize];
 			ra.read(buffer);
 			
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
-			System.out.println("Img:" + img.getWidth()  + "," + img.getHeight());
 			
 			ImageData idata = new ImageData( img, identifier);
 			workspace.addImageDataDirect(idata);
@@ -154,8 +152,6 @@ public class LoadEngine {
 		int identifier = -1;
 		String name;
 		
-		System.out.println( "GTS: " + startPointer + " - " + endPointer);
-		
 		// Create a array that keeps track of the active layers of group
 		//	nodes (all the nested nodes leading up to the current node)
 		GroupTree.GroupNode[] nodeLayer = new GroupTree.GroupNode[256];
@@ -174,14 +170,10 @@ public class LoadEngine {
 				identifier = ra.readInt();
 			
 			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
-
-			System.out.println(name);
 			
 			// !!!! Kind of hack-y that it's even saved, but only the root node should be
 			//	layer 0 and there should only be one (and it's already created)
-			if( layer == 0) {
-				System.out.println("bad:" + name);
-			}
+			if( layer == 0) {}
 			else {
 				if( type == SaveLoadUtil.NODE_GROUP) {
 					nodeLayer[layer] = workspace.addTreeNode( nodeLayer[layer-1], name);

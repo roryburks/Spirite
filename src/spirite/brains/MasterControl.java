@@ -73,10 +73,7 @@ public class MasterControl {
     // !!!! TODO DEBUG
     public void setCurrentWorkpace( ImageWorkspace workspace) {
 
-		System.out.println("maybe null");
     	if( workspace != null) {
-    		System.out.println("not null");
-    		System.out.println(workspace.getRootNode().getChildren().size());
     		this.image_manager = workspace;
     		this.currentWorkspaceChanged();
     	}

@@ -24,18 +24,39 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.List;
+
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.image_data.GroupTree;
 
 public class ContentTree extends JPanel
-//	implements TreeSelectionListener, TreeExpansionListener
+	implements MouseListener, TreeSelectionListener, TreeModelListener, TreeExpansionListener
+	
 {
 	protected DefaultMutableTreeNode root;
 	protected DefaultTreeModel model;
@@ -45,22 +66,37 @@ public class ContentTree extends JPanel
 	protected CCTree tree;
 	protected Color bgColor;
 	
-	
+	protected CCBPanel buttonPanel;
+
+	// :::: Methods triggered by internal events that should can and should be 
+	//	overwriten
+	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {}
+	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {}
+	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {}	
+	protected void clickPath( TreePath path, int clickCount) {
+		tree.setSelectionPath(path);
+	}
+	protected void buttonPressed( CCButton button) {}
+	protected void buttonCreated( CCButton button) {}
 
 	public ContentTree() {
 		// Simple grid layout, fills the whole area
 		this.setLayout( new GridLayout());
 		
-		
+		buttonPanel = new CCBPanel();
 		tree = new CCTree();
 		scrollPane = new JScrollPane(tree);
 		this.add(scrollPane);
 		
+		
+		// Link Listener
+		tree.addMouseListener(this);
+		buttonPanel.addMouseListener(this);
+		tree.addTreeSelectionListener(this);	// TODO: this isn't working for some reason
+		
 		// Single root is invisible, but path is visible
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
-		
-//		tree.constructFromWorkspace();
 		
 		// Create Model
 		root = new DefaultMutableTreeNode("root");
@@ -69,8 +105,9 @@ public class ContentTree extends JPanel
 		
 		// Make the background invisible as we will draw the background manually
 		bgColor = tree.getBackground();
-		setBackground( new Color(0,0,0,0));
-		tree.setBackground( new Color(0,0,0,0));
+		setOpaque( false);
+		tree.setOpaque(false);
+		buttonPanel.setOpaque(false);
 
 		// Initialize Drag-Drop Manager
 		dragManager = new CCTDragManager();
@@ -83,6 +120,35 @@ public class ContentTree extends JPanel
 						dragManager);
 		
 		dragManager.dropTarget = new DropTarget(tree,dragManager);
+		
+		
+		initLayout();
+		buttonPanel.reformPanel();
+		tree.getModel().addTreeModelListener(this);
+	}
+	
+	/***
+	 * Initializes the Layout and the buttons
+	 */
+	private void initLayout() {
+		Dimension size = Globals.getMetric("contentTree.buttonSize", new Dimension(30,30));
+		Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
+		int bpwidth = size.width + 2*margin.width;
+
+		GroupLayout layout = new GroupLayout( this);
+		
+		
+		layout.setHorizontalGroup(
+			layout.createSequentialGroup()
+				.addComponent(buttonPanel, bpwidth, bpwidth, bpwidth)
+				.addComponent(tree, 0, 100, Integer.MAX_VALUE)
+		);
+		layout.setVerticalGroup(
+			layout.createParallelGroup(Alignment.LEADING)
+				.addComponent(buttonPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE)
+				.addComponent(tree, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE)
+		);
+		setLayout(layout);
 	}
 	
 	/***
@@ -90,71 +156,140 @@ public class ContentTree extends JPanel
 	 */
 	@Override
 	public void paint( Graphics g) {
+		g.setColor( bgColor);
+		g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
+		
+
+		// Draw a Background around the Selected Path
+		int r = tree.getRowForPath( tree.getSelectionPath());
+		Rectangle rect = tree.getRowBounds(r);
+		
+		if( rect != null) {
+			if( dragManager.dragIntoNode != null)
+				g.setColor( Globals.getColor("contentTree.selectedBGDragging"));
+			else
+				g.setColor( Globals.getColor("contentTree.selectedBackground"));
+			g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
+		}
+		
+		// Draw a Line/Border indicating where you're dragging and dropping
+		if( dragManager.dragIntoNode != null) {
+			g.setColor( Color.BLACK);
+			
+			rect = tree.getPathBounds(dragManager.dragIntoNode);
+			
+			
+			switch( dragManager.dragMode) {
+			case PLACE_OVER:
+				g.drawLine( 0, rect.y, getWidth(), rect.y);
+				break;
+			case PLACE_UNDER:
+				g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
+				break;
+			case PLACE_INTO:
+				g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
+				break;
+			default:
+				break;
+			}
+		}
 		
 		super.paint(g);
 	}
 	
-	// :::: Methods you should overload
+	
+	public class CCBPanel extends JPanel {
+		CCButton[] buttons = new CCButton[0];
+		
+		CCBPanel() {}
+		
+		public void reformPanel() {
+			// Note: margin height is ignored as the gap is calculated from the Size
+			Dimension size = Globals.getMetric("contentTree.buttonSize", new Dimension(30,30));
+			Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
+			
+			// Delete the Old Buttons
+			for( CCButton button : buttons) {
+				remove(button);
+			}
+			
+			// Initialize space for New buttons
+			int c = tree.getRowCount();
+			buttons = new CCButton[c];
+			
+			// Construct the skeleton of the layout
+			GroupLayout layout = new GroupLayout(this);
+					
+			GroupLayout.Group hGroup = layout.createParallelGroup();
+			GroupLayout.Group vGroup = layout.createSequentialGroup();
 
-	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {
+			layout.setHorizontalGroup(
+					layout.createSequentialGroup()
+					.addGap(margin.width)
+					.addGroup( hGroup)
+				);
+			layout.setVerticalGroup(vGroup);
+			
+			// Add each button and set the layout for them as needed
+			int old_y = 0;
+			for( int i = 0; i < c; ++i) {
+				TreePath path = tree.getPathForRow(i);
+				
+				Rectangle r = tree.getPathBounds(path);
+				int vmargin = Math.max(0,(r.height - size.height) / 2);
+				
+				buttons[i] = new CCButton(path);
+				buttons[i].addActionListener( new ActionListener() {					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						buttonPressed((CCButton)e.getSource());
+					}
+				});
+				buttonCreated(buttons[i]);
+				add( buttons[i]);
+				
+				hGroup.addComponent( buttons[i], size.width, size.width, size.width);
+				
+				vGroup.addGap(r.y - old_y + vmargin)
+					.addComponent( buttons[i], size.height, size.height, size.height);
+				
+				old_y = r.y + vmargin + size.height;
+			}
+			
+
+			
+			this.setLayout(layout);
+		}
+		
+		@Override
+		public void paint( Graphics g) {
+			// Draw the Background manually so we can draw behind the Tree
+			super.paint(g);
+		}
 		
 	}
-	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {
+	
+	public class CCButton extends JToggleButton {
+		int rowNum;
+		private TreePath path;
+		public CCButton( TreePath path) {
+			this.path = path;
+		}
+		
+		public TreePath getAssosciatedTreePath() {
+			return path;
+		}
 	}
-
-	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {
-	}	
 
 	/***
 	 * The Tree part of the Tree Panel is separated so that we can add other
 	 * components to the DDTree
 	 */
 	public class CCTree extends JTree {
-		public CCTree() {
-			
-		}
+		public CCTree() {}
 		
 		@Override
 		public void paint( Graphics g) {
-
-			
-			// Draw the Background manually so we can draw behind the Tree
-			g.setColor( bgColor);
-			g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
-
-			// Draw a Background around the Selected Path
-			int r = tree.getRowForPath( tree.getSelectionPath());
-			Rectangle rect = tree.getRowBounds(r);
-			
-			if( rect != null) {
-				if( dragManager.dragIntoNode != null)
-						g.setColor( Globals.getColor("layerpanel.tree.selectedBGDragging"));
-				else
-					g.setColor( Globals.getColor("layerpanel.tree.selectedBackground"));
-				g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
-			}
-			
-			// Draw a Line/Border indicating where you're dragging and dropping
-			if( dragManager.dragIntoNode != null) {
-				g.setColor( Color.BLACK);
-				
-				rect = tree.getPathBounds(dragManager.dragIntoNode);
-				
-				switch( dragManager.dragMode) {
-				case PLACE_OVER:
-					g.drawLine( 0, rect.y, getWidth(), rect.y);
-					break;
-				case PLACE_UNDER:
-					g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
-					break;
-				case PLACE_INTO:
-					g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
-					break;
-				default:
-					break;
-				}
-			}
-			
 			super.paint(g);
 		}
 	}
@@ -171,6 +306,10 @@ public class ContentTree extends JPanel
 		HOVER_SELF
 	};
 	
+	/***
+	 * The DragManager manages the drag and drop functionality of the tree.
+	 *
+	 */
 	protected class CCTDragManager 
 		implements DragGestureListener, DropTargetListener, DragSourceListener
 	{
@@ -273,14 +412,14 @@ public class ContentTree extends JPanel
 		 */
 		private boolean testDrag( Point p ) {
 			// Doing it like this makes it so only the vertical position is relvant
-			TreePath path = tree.getPathForRow(tree.getRowForLocation(p.x, p.y));
+			TreePath path = getPathFromY(p.y);
 			
 			if( path != null) {
 				try {
 					DefaultMutableTreeNode testNode = (DefaultMutableTreeNode)path.getLastPathComponent();
 							
 				
-					Dimension d = Globals.getMetric("layerpanel.treenodes.dragdropleniency");
+					Dimension d = Globals.getMetric("contentTree.dragdropLeniency");
 					Rectangle r = tree.getPathBounds(path);
 					int offset = p.y - r.y;
 					
@@ -355,5 +494,98 @@ public class ContentTree extends JPanel
 		@Override		public void dragExit(DragSourceEvent arg0) {}
 		@Override		public void dragOver(DragSourceDragEvent evt) {}
 		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
+	}
+	
+	public TreePath getPathFromY( int y) {
+		int c = tree.getRowCount();
+		
+		for( int i = 0; i < c; ++i) {
+			Rectangle r = tree.getRowBounds(i);
+			
+			if( r.y <= y && r.y + r.height >= y) {
+				return tree.getPathForRow(i);
+			}
+		}
+		return null;
+	}
+
+	
+	// :::: MouseListener
+	@Override
+	public void mouseClicked(MouseEvent evt) {
+		TreePath path = getPathFromY(evt.getY());
+		
+		if( path != null) {
+			clickPath(path, evt.getClickCount());
+		}
+	}
+
+	@Override	public void mouseEntered(MouseEvent arg0) {}
+	@Override	public void mouseExited(MouseEvent arg0) {}
+	@Override	public void mousePressed(MouseEvent arg0) {	}
+	@Override	public void mouseReleased(MouseEvent arg0) {}
+
+	// :::: TreeSelectionListener
+	@Override
+	public void valueChanged(TreeSelectionEvent arg0) {
+		// This is needed because the selection UI of the linked ButtonPanel 
+		//	has graphics related to the tree's slection that needs to be redrawn
+		repaint();
+	}
+
+	// :::: TreeModelListener
+	@Override	public void treeNodesChanged(TreeModelEvent e) {}
+
+	@Override
+	public void treeNodesInserted(TreeModelEvent e) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
+		
+	}
+
+	@Override
+	public void treeNodesRemoved(TreeModelEvent e) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
+		
+	}
+
+	@Override
+	public void treeStructureChanged(TreeModelEvent e) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
+	}
+
+	// :::: TreeExpansionListener
+	@Override
+	public void treeCollapsed(TreeExpansionEvent event) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
+	}
+
+	@Override
+	public void treeExpanded(TreeExpansionEvent event) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
 	}
 }

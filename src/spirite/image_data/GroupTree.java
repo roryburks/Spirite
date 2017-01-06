@@ -122,7 +122,7 @@ public class GroupTree {
 		public boolean isVisible() {
 			return visible;
 		}
-		public void setVisible( boolean visisble) {
+		public void setVisible( boolean visible) {
 			this.visible = visible;
 		}
 		public boolean isExpanded() {

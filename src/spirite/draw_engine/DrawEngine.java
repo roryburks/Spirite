@@ -51,12 +51,13 @@ public class DrawEngine {
 		if( state != STATE.DRAWING)
 			return;
 		
-		working_image = master.getCurrentWorkspace().getActiveData().getData();
-		
-		if( working_image == null ) {
+		if(  master.getCurrentWorkspace().getActiveData() == null ) {
 			endStroke();
 			return;
 		}
+		
+		working_image = master.getCurrentWorkspace().getActiveData().getData();
+		
 		
 //		System.out.println( old_x + "," + old_y + " : " + new_x + "," + new_y + "::: " + state);
 		

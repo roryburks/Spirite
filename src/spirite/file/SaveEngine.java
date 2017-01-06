@@ -151,7 +151,6 @@ public class SaveEngine {
 			// [4] : Image ID
 			ra.writeInt( part.getID());
 			// [4] : Size of Image Data
-			System.out.println(bos.size());
 			ra.writeInt( bos.size());
 			// [x] : Image Data
 			ra.write(bos.toByteArray());

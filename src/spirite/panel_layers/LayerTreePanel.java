@@ -28,6 +28,7 @@ import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
@@ -47,6 +48,8 @@ import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.ui.ContentTree;
@@ -85,17 +88,19 @@ public class LayerTreePanel extends ContentTree
     }
     
     // :::: API
-    GroupTree.Node getSelectedNode() {
-    	TreePath path = tree.getSelectionPath();
-    	
+    public GroupTree.Node getSelectedNode() {
+    	return getNodeFromPath( tree.getSelectionPath());
+    }
+    
+    private GroupTree.Node getNodeFromPath( TreePath path) {
     	if( path != null) {
-	    	
-	    	try {
+    		try {
 	    		return (GroupTree.Node)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
 	    	}catch (ClassCastException c) {
-	    		MDebug.handleWarning( WarningType.STRUCTURAL, this, "Selected Tree Node isn't a GroupTree Node");
+	    		MDebug.handleWarning( WarningType.STRUCTURAL, this, "Tree Node isn't a GroupTree Node");
 	    	}
     	}
+
 		return null;
     }
     
@@ -157,9 +162,9 @@ public class LayerTreePanel extends ContentTree
 	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {
 		try {
 			workspace.moveAbove(
-					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
-					(GroupTree.Node)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject());
-		}catch (NullPointerException|ClassCastException e) {
+					getNodeFromPath( nodeMove),
+					getNodeFromPath( nodeInto));
+		}catch (NullPointerException e) {
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
 		}
 	}
@@ -167,9 +172,9 @@ public class LayerTreePanel extends ContentTree
 	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {
 		try {
 			workspace.moveBelow(
-					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
-					(GroupTree.Node)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject());
-		}catch (NullPointerException|ClassCastException e) {
+					getNodeFromPath( nodeMove),
+					getNodeFromPath( nodeInto));
+		}catch (NullPointerException e) {
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
 		}
 	}
@@ -178,39 +183,45 @@ public class LayerTreePanel extends ContentTree
 	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {
 		try {
 			workspace.moveInto(
-					(GroupTree.Node)((DefaultMutableTreeNode)nodeMove.getLastPathComponent()).getUserObject(),
-					(GroupTree.GroupNode)((DefaultMutableTreeNode)nodeInto.getLastPathComponent()).getUserObject(),
+					getNodeFromPath( nodeMove),
+					(GroupNode) getNodeFromPath( nodeInto),
 					top);
 		}catch (NullPointerException|ClassCastException e) {
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
 		}
 	}	
+	
+	@Override
+	protected void buttonPressed(CCButton button) {
+		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
+
+		node.setVisible( button.isSelected());
+		master.refreshImage();
+	}
+	
+	@Override
+	protected void buttonCreated(CCButton button) {
+		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
+
+		button.setSelected( node.isVisible());
+		
+	}
 
 	// :::: TreeExpansionListener
 	@Override
 	public void treeCollapsed(TreeExpansionEvent evt) {
-		// Store the Collapsed state in the GroupTree so that the data remembers the UI state
-		try {
-			GroupTree.Node node = 
-					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
-			
+		// Store the Expanded state in the GroupTree so that the data remembers the UI state
+		GroupTree.Node node = getNodeFromPath( evt.getPath());
+		if( node != null)
 			node.setExpanded(false);
-		} catch ( ClassCastException e) {
-			MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
-		}
 	}
 
 	@Override
 	public void treeExpanded(TreeExpansionEvent evt) {
 		// Store the Expanded state in the GroupTree so that the data remembers the UI state
-		try {
-			GroupTree.Node node = 
-					(GroupTree.Node)((DefaultMutableTreeNode)evt.getPath().getLastPathComponent()).getUserObject();
-			
+		GroupTree.Node node = getNodeFromPath( evt.getPath());
+		if( node != null)
 			node.setExpanded(true);
-		} catch ( ClassCastException e) {
-			MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Bad Tree Class Type");
-		}
 		
 	}
 
@@ -220,18 +231,19 @@ public class LayerTreePanel extends ContentTree
 	 * active part (the part that gets drawn on) is changed
 	 */
 	@Override
-	public void valueChanged(TreeSelectionEvent tse) {			
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+	public void valueChanged(TreeSelectionEvent evt) {			
+		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
-		Object obj = node.getUserObject();
-		
-		if( obj instanceof GroupTree.LayerNode) {
-			GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
+		if( node instanceof GroupTree.LayerNode) {
+			GroupTree.LayerNode rn = (GroupTree.LayerNode)node;
 			
 			workspace.setActiveLayer(rn.getLayer());
 		}
 		else
 			workspace.setActiveLayer(null);
+		
+		// !!! TODO Debug: this shouldn't need to be here (it should just be in ContentTree)
+		repaint();
 		
 	}
 

@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
@@ -124,8 +125,6 @@ public class RootFrame extends javax.swing.JFrame
     	return Math.min(r, MAX_LEVEL);
     }
     private void initMenu() {
-
-    	
     	Object[][] menu_scheme = Globals.getMenuSchem();
     	
 
@@ -274,8 +273,7 @@ public class RootFrame extends javax.swing.JFrame
 				master.setCurrentWorkpace( 
 						LoadEngine.loadWorkspace( new File("E:/test.sif")));
 			} catch (BadSIFFFileException e) {
-				// TODO Auto-generated catch block
-				System.out.println(e.getMessage());
+				MDebug.handleError( ErrorType.FILE, e, "Malformed SIF file.");
 			}
 		else if( command.equals("save_image_as"))
         	SaveEngine.saveWorkspace( master.getCurrentWorkspace(), new File("E:/test.sif"));

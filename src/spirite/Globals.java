@@ -19,13 +19,15 @@ public class Globals {
         {"drawpanel.layer.border", new Color(16,16,16)},
         {"toolbutton.selected.background", new Color( 128,128,128)},
 
-        {"layerpanel.tree.selectedBGDragging", new Color( 192,192,212)},
-        {"layerpanel.tree.selectedBackground",new Color( 160,160,196)},
+        {"contentTree.selectedBGDragging", new Color( 192,192,212)},
+        {"contentTree.selectedBackground",new Color( 160,160,196)},
     };
     
     private static Object metrics[][] = {
     		{"layerpanel.treenodes.max", new Dimension( 40, 40)},
-    		{"layerpanel.treenodes.dragdropleniency", new Dimension( 0, 10)},
+    		{"contentTree.dragdropLeniency", new Dimension( 0, 10)},
+    		{"contentTree.buttonSize", new Dimension( 30, 30)},
+    		{"contentTree.buttonMargin", new Dimension( 5, 5)},
     };
     
 	// Each dot before the name indicates the level it should be in.  For example one dot
@@ -62,15 +64,18 @@ public class Globals {
 
         return Color.black;
     }
-    
+
     public static Dimension getMetric( String id) {
+    	return getMetric( id, new Dimension(64,64));
+    }
+    public static Dimension getMetric( String id, Dimension defaultSize) {
 
         for( int i = 0; i < metrics.length; ++i) {
             if( metrics[i][0].equals(id))
                 return (Dimension)metrics[i][1];
         }
 
-        return new Dimension( 64,64);
+        return defaultSize;
     }
     
     public static Object[][] getMenuSchem() {

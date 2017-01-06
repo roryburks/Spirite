@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 public class LayersPanel extends JPanel {
-	
+
 	MasterControl master;
 	
 	LayerTreePanel layerTreePanel;
@@ -102,7 +102,7 @@ public class LayersPanel extends JPanel {
 			
 			ImageWorkspace workspace = master.getCurrentWorkspace();
 			
-			master.getCurrentWorkspace().addNewRig(selected_node, w, h, name, c);
+			workspace.addNewRig(selected_node, w, h, name, c);
 			
 			master.refreshImage();
 		}

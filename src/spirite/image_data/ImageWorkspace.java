@@ -76,7 +76,6 @@ public class ImageWorkspace {
 	
 	public void setActiveLayer( Layer rig) {
 		selectedLayer = layers.indexOf(rig);
-		System.out.println(selectedLayer);
 	}
 	
 	// Creates a New Rig
@@ -120,8 +119,6 @@ public class ImageWorkspace {
 				return rig;
 			}
 		}
-		
-		System.out.println("Bad");
 		
 		return null;
 	}
@@ -188,6 +185,7 @@ public class ImageWorkspace {
     public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
     
     void alertStructureChanged() {
+    	
         for( MImageStructureObserver obs : imageStructureObservers) {
             obs.structureChanged();
         }
