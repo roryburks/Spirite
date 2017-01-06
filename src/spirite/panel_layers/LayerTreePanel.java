@@ -1,43 +1,22 @@
 package spirite.panel_layers;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragGestureRecognizer;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
-import java.io.IOException;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Enumeration;
+import java.util.EventObject;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -49,24 +28,24 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
-import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
 	implements MImageStructureObserver, MWorkspaceObserver,
-	 TreeCellRenderer, TreeSelectionListener, TreeExpansionListener
+	 TreeSelectionListener, TreeExpansionListener, KeyListener
 {
 	MasterControl master;
 	ImageWorkspace workspace;
-	LayerTreeNodePanel renderPanel;
+	LTPCellEditor editor;
+	LTPCellRenderer renderer;
+	
 
 	// :::: Initialize
 	public LayerTreePanel( MasterControl master) {
 		super();
 		
-		renderPanel = new LayerTreeNodePanel();
 		
 		this.master = master;
 		workspace = master.getCurrentWorkspace();
@@ -75,10 +54,19 @@ public class LayerTreePanel extends ContentTree
 		
 		constructFromWorkspace();
 		
-		tree.setCellRenderer(this);
+		renderer = new LTPCellRenderer();
+		editor = new LTPCellEditor(tree, renderer);
+		
+		tree.setCellRenderer(renderer);
+		tree.setCellEditor(editor);
 		tree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addTreeSelectionListener(this);
 		tree.addTreeExpansionListener(this);
+		this.addKeyListener(this);
+		
+		tree.setEditable(true);
+//		tree.click
+		
 	}
 
     // :::: Paint
@@ -247,32 +235,8 @@ public class LayerTreePanel extends ContentTree
 		
 	}
 
-	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf,
-			int row, boolean hasFocus) 
-	{
-			
-		renderPanel.setPreferredSize( new Dimension( 128, Globals.getMetric("layerpanel.treenodes.max").width + 4));
-		
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-		Object obj = node.getUserObject();
+	// :::: TreeCellRenderer
 
-		// Determine what kind of data the node on the tree contains and then 
-		//	alter the node visuals accordingly
-		if( obj instanceof GroupTree.GroupNode) {
-			GroupTree.GroupNode gn = (GroupTree.GroupNode)obj;
-			
-			renderPanel.label.setText(gn.getName());
-			return renderPanel;
-		}
-		if( obj instanceof GroupTree.LayerNode) {
-			GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
-			
-
-			renderPanel.label.setText(rn.getLayer().getName());
-		}
-		return renderPanel;
-	}
 
 	// :::: WorkspaceObserver
 	@Override
@@ -285,6 +249,139 @@ public class LayerTreePanel extends ContentTree
 	}
 
 	@Override	public void newWorkspace() {}
+
+	// KeyListener
+	@Override
+	public void keyPressed(KeyEvent evt) {
+		if( evt.getKeyCode() == KeyEvent.VK_F2 && getSelectedNode() != null) {
+			tree.startEditingAtPath(tree.getSelectionPath());
+		}
+	}
+
+	@Override	public void keyReleased(KeyEvent arg0) {}
+	@Override	public void keyTyped(KeyEvent arg0) {}
+	
+	/***
+	 * TreeCellRender
+	 *
+	 */
+	private class LTPCellRenderer extends DefaultTreeCellRenderer {
+		LayerTreeNodePanel renderPanel;
+		
+		LTPCellRenderer() {
+			renderPanel = new LayerTreeNodePanel();
+		}
+		
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, 
+				boolean expanded, boolean leaf, int row, boolean hasFocus) 
+		{
+			
+			
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+			Object obj = node.getUserObject();
+
+			// Determine what kind of data the node on the tree contains and then 
+			//	alter the node visuals accordingly
+			if( obj instanceof GroupTree.GroupNode) {
+				GroupTree.GroupNode gn = (GroupTree.GroupNode)obj;
+				
+				renderPanel.label.setText(gn.getName());
+				return renderPanel;
+			}
+			if( obj instanceof GroupTree.LayerNode) {
+				GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
+				
+
+				renderPanel.label.setText(rn.getLayer().getName());
+			}
+			return renderPanel;
+		}
+	}
+
+	private class LTPCellEditor extends DefaultTreeCellEditor
+		implements KeyListener 
+	{
+		LayerTreeNodePanel renderPanel;
+		String text;
+		GroupTree.Node editingNode = null;
+		
+		public LTPCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+			super(tree, renderer);
+			renderPanel = new LayerTreeNodePanel();
+			renderPanel.label.addKeyListener(this);
+		}
+		
+		
+		@Override
+		public Component getTreeCellEditorComponent(
+				JTree tree, Object value, boolean isSelected, boolean expanded,
+				boolean leaf, int row) 
+		{
+			Object obj = ((DefaultMutableTreeNode)value).getUserObject();
+
+			if( obj instanceof GroupTree.GroupNode) {
+				GroupTree.GroupNode node = (GroupTree.GroupNode)obj;
+				editingNode = node;
+				renderPanel.label.setText( node.getName());
+			}
+			else if( obj instanceof GroupTree.LayerNode) {
+				GroupTree.LayerNode node = (GroupTree.LayerNode)obj;
+				editingNode = node;
+				renderPanel.label.setText( node.getLayer().getName());
+				
+			}
+		
+			return renderPanel;
+		}
+		
+		@Override
+		public void cancelCellEditing() {
+			saveText();
+			super.cancelCellEditing();
+		}
+		
+		@Override
+		public boolean stopCellEditing() {
+			saveText();
+			return super.stopCellEditing();
+		}
+		
+		private void saveText() {
+			if( editingNode != null) {
+				String text = renderPanel.label.getText();
+
+				if( editingNode instanceof GroupTree.GroupNode) {
+					(( GroupTree.GroupNode)editingNode).setName(text);
+					
+				}
+				else if(editingNode instanceof GroupTree.LayerNode) {
+					(( GroupTree.LayerNode)editingNode).getLayer().setName(text);
+				}
+				
+			}
+			
+			editingNode = null;
+		}
+		
+		@Override
+		public boolean isCellEditable(EventObject evt) {
+			if( evt == null)
+				return true;
+			return false;
+		}
+
+
+		// :::: KeyListener
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if( e.getKeyCode() == KeyEvent.VK_ENTER) {
+				this.stopCellEditing();
+			}
+		}
+		@Override		public void keyReleased(KeyEvent e) {}
+		@Override		public void keyTyped(KeyEvent e) {}
+	}
 
 }
 
