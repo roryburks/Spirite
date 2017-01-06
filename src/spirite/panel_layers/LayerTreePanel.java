@@ -1,7 +1,6 @@
 package spirite.panel_layers;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,12 +15,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
@@ -31,7 +28,6 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 

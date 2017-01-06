@@ -1,8 +1,6 @@
 package spirite.image_data;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.image_data.GroupTree.GroupNode;
-import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 

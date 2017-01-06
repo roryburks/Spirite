@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.dialogs.Dialogs;
 import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine;
 import spirite.image_data.ImageWorkspace;
@@ -23,9 +24,10 @@ public class MasterControl {
     HotkeyManager hotkeys;
     PaletteManager palette;
     ToolsetManager toolset;
-    ImageWorkspace image_manager;
-    DrawEngine draw_engine;
-    RenderEngine render_engine;
+    ImageWorkspace imageManager;
+    DrawEngine drawEngine;
+    RenderEngine renderEngine;
+    SettingsManager settingsManager;
     
     FrameManager frame_manager;
     
@@ -40,10 +42,12 @@ public class MasterControl {
         hotkeys = new HotkeyManager();
         palette = new PaletteManager();
         toolset = new ToolsetManager();
-        image_manager = new ImageWorkspace();
+        imageManager = new ImageWorkspace();
         frame_manager = new FrameManager( this);
-        draw_engine = new DrawEngine( this);
-        render_engine = new RenderEngine( this);
+        drawEngine = new DrawEngine( this);
+        renderEngine = new RenderEngine( this);
+        settingsManager = new SettingsManager();
+        Dialogs.setMaster(this); //// TODO BAD
     }
 
 
@@ -57,16 +61,19 @@ public class MasterControl {
     	return palette;
     }
     public ImageWorkspace getCurrentWorkspace() {
-    	return image_manager;
+    	return imageManager;
     }
     public FrameManager getFrameManager() {
     	return frame_manager;
     }
     public DrawEngine getDrawEngine() {
-    	return draw_engine;
+    	return drawEngine;
     }
     public RenderEngine getRenderEngine(){
-    	return render_engine;
+    	return renderEngine;
+    }
+    public SettingsManager getSettingsManager() {
+    	return settingsManager;
     }
     
 
@@ -74,7 +81,7 @@ public class MasterControl {
     public void setCurrentWorkpace( ImageWorkspace workspace) {
 
     	if( workspace != null) {
-    		this.image_manager = workspace;
+    		this.imageManager = workspace;
     		this.currentWorkspaceChanged();
     	}
     }
@@ -84,7 +91,7 @@ public class MasterControl {
     public void newImage( int width, int height) {newImage(width,height,new Color(0,0,0,0));}
     public void newImage( int width, int height, Color color) {
 //    	image_manager.newImage(width, height, color);
-    	image_manager.newRig(width, height, "shamma", color);
+    	imageManager.newRig(width, height, "shamma", color);
 
         for( MImageObserver obs : imageObservers) {
             obs.newImage();

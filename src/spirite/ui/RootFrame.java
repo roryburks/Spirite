@@ -33,6 +33,7 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
+import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
@@ -269,7 +270,6 @@ public class RootFrame extends javax.swing.JFrame
         	promptNewImage();
         else if( command.equals("debug_color"))
         	promptDebugColor();
-        // !!! TODO START DEBUG
         else if( command.equals("newLayerQuick")) {
         	ImageWorkspace workspace = master.getCurrentWorkspace();
         	if( workspace != null) {
@@ -282,16 +282,34 @@ public class RootFrame extends javax.swing.JFrame
         				new Color(0,0,0,0));
         	}
         }
+        // !!! TODO START DEBUG
         else if( command.equals("open_image"))
 			try {
-				master.setCurrentWorkpace( 
-						LoadEngine.loadWorkspace( new File("E:/test.sif")));
+				File f =Dialogs.pickFileOpen();
+				
+				if( f != null) {
+					master.setCurrentWorkpace( 
+						LoadEngine.loadWorkspace( f));
+					master.getSettingsManager().setOpennedFile(f);
+				}
 			} catch (BadSIFFFileException e) {
 				MDebug.handleError( ErrorType.FILE, e, "Malformed SIF file.");
 			}
-		else if( command.equals("save_image_as"))
-        	SaveEngine.saveWorkspace( master.getCurrentWorkspace(), new File("E:/test.sif"));
-        // !!! TODO ENDDEBUG
+        else if( command.equals("save_image")) {
+        	File f= master.getSettingsManager().getOpennedFile();
+        	
+        	if( f == null)
+        		f = Dialogs.pickFileSave();
+        	
+        	if( f != null)
+				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
+        }
+		else if( command.equals("save_image_as")) {
+			File f = Dialogs.pickFileSave();
+			
+			if( f != null)
+				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
+		}
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
         }
