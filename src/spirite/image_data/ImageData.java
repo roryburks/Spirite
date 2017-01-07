@@ -5,16 +5,18 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public class ImageData {
-
+	ImageWorkspace context;	
 	private BufferedImage data;
 	int id;
 	
-	public ImageData( BufferedImage img, int id) {
+	public ImageData( BufferedImage img, int id, ImageWorkspace context) {
+		this.context = context;
 		data = img;
 		this.id = id;
 	}
 	
-	public ImageData( int width, int height, Color bg) {
+	public ImageData( int width, int height, Color bg, ImageWorkspace context) {
+		this.context = context;
 		data = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
 		
         Graphics2D g2d = data.createGraphics();
@@ -29,5 +31,9 @@ public class ImageData {
 	
 	public int getID() {
 		return id;
+	}
+	
+	public void refresh() {
+		context.refreshImage();
 	}
 }

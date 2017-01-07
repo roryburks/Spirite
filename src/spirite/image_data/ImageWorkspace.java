@@ -7,6 +7,8 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.brains.MasterControl;
+import spirite.draw_engine.UndoEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
@@ -31,6 +33,10 @@ public class ImageWorkspace {
 	private int width = 0;
 	private int height = 0;
 	
+	private UndoEngine undoEngine;
+	private MasterControl master;
+	
+	
 	
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
@@ -39,6 +45,7 @@ public class ImageWorkspace {
 		
 		groups = new GroupTree(this);
 		
+		undoEngine = new UndoEngine(this);
 	}
 	
 	public int getWidth() {
@@ -46,6 +53,10 @@ public class ImageWorkspace {
 	}
 	public int getHeight() {
 		return height;
+	}
+	
+	public UndoEngine getUndoEngine() {
+		return undoEngine;
 	}
 	
 	public GroupTree.GroupNode getRootNode() {
@@ -249,5 +260,23 @@ public class ImageWorkspace {
     
     public static interface MImageStructureObserver {
         public void structureChanged(StructureChangeEvent evt);
+    }
+    
+
+    List<MImageObserver> imageObservers = new ArrayList<>();
+    
+
+    public void refreshImage() {
+        for( MImageObserver obs : imageObservers) {
+            obs.imageChanged();
+        }
+    }
+
+    public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
+    public void removeImageObserver( MImageObserver obs) { imageObservers.remove(obs); }
+    
+    public static interface MImageObserver {
+        public void imageChanged();
+        public void newImage();
     }
 }

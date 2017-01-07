@@ -133,7 +133,7 @@ public class LoadEngine {
 			
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
 			
-			ImageData idata = new ImageData( img, identifier);
+			ImageData idata = new ImageData( img, identifier, workspace);
 			workspace.addImageDataDirect(idata);
 		}
 	}

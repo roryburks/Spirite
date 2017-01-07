@@ -1,12 +1,12 @@
 package spirite.panel_anim;
 
-import spirite.brains.MasterControl.MImageObserver;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MCurrentImageObserver;
 
 
 
 public class AnimPanel extends javax.swing.JPanel 
-        implements MImageObserver
+        implements MCurrentImageObserver
 {
 	private static final long serialVersionUID = 1L;
 	MasterControl master;
@@ -17,19 +17,18 @@ public class AnimPanel extends javax.swing.JPanel
     public AnimPanel() { initComponents(); }
     public AnimPanel( MasterControl master) {
         this.master = master;
-        this.master.addImageObserver(this);
-        initComponents();
+        
+        master.addCurrentImageObserver(this);
     }
 
     @Override
-    public void imageChanged() {
-        this.repaint();
+    public void imageRefresh() {
+    	this.repaint();
     }
-
-    @Override
-    public void newImage() {
-        this.repaint();
-    }
+	@Override
+	public void imageStructureRefresh() {
+		this.repaint();
+	}
 
                           
     private void initComponents() {
@@ -66,5 +65,6 @@ public class AnimPanel extends javax.swing.JPanel
     }               
 
              
-    private PreviewPanel previewPanel;            
+    private PreviewPanel previewPanel;
+
 }

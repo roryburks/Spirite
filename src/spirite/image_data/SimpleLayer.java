@@ -23,7 +23,7 @@ public class SimpleLayer extends Layer
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		
-		part = new ImageData(x, y, c);
+		part = new ImageData(x, y, c, context);
 	}
 
 	@Override

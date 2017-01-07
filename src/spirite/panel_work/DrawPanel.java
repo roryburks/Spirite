@@ -16,7 +16,7 @@ import javax.swing.Timer;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MImageObserver;
+import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageData;
@@ -26,7 +26,7 @@ import spirite.image_data.ImageData;
  *
  */
 public class DrawPanel extends JPanel
-     implements MImageObserver, ActionListener
+     implements MCurrentImageObserver, ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	WorkPanel context;
@@ -45,7 +45,7 @@ public class DrawPanel extends JPanel
 
 		penner = new Penner( this);
 		
-		master.addImageObserver(this);
+		master.addCurrentImageObserver(this);
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();
@@ -126,16 +126,16 @@ public class DrawPanel extends JPanel
 
 
 	@Override
-	public void imageChanged() {
-	}
-	@Override
-	public void newImage() {
-		
-	}
-	@Override
 	public void actionPerformed(ActionEvent arg0) {
     	metronome = (metronome + 1) % 16;
     	context.repaint();
+	}
+	@Override
+	public void imageRefresh() {
+		
+	}
+	@Override
+	public void imageStructureRefresh() {		
 	}
  
 }

@@ -191,7 +191,6 @@ public class LayerTreePanel extends ContentTree
 		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 
 		node.setVisible( button.isSelected());
-		master.refreshImage();
 	}
 	
 	@Override

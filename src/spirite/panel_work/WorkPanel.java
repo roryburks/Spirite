@@ -6,7 +6,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import spirite.brains.MasterControl.MImageObserver;
+import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.brains.MasterControl;
 
@@ -22,7 +22,7 @@ import spirite.brains.MasterControl;
  * @author Rory Burks
  */
 public class WorkPanel extends javax.swing.JPanel 
-        implements MImageObserver, AdjustmentListener, ComponentListener
+        implements MCurrentImageObserver, AdjustmentListener, ComponentListener
 {
 	private static final long serialVersionUID = 1L;
 	private static final int SCROLL_RATIO = 10;
@@ -42,7 +42,7 @@ public class WorkPanel extends javax.swing.JPanel
         this.master = master;
         initComponents();
 
-        master.addImageObserver(this);
+        master.addCurrentImageObserver(this);
 
         jscrollHorizontal.addAdjustmentListener(this);
         jscrollVertical.addAdjustmentListener(this);
@@ -203,12 +203,12 @@ public class WorkPanel extends javax.swing.JPanel
 
     // :::: MImageObserver
     @Override
-    public void imageChanged() {
+    public void imageRefresh() {
         this.repaint();
     }
 
     @Override
-    public void newImage() {
+    public void imageStructureRefresh() {
         calibrateScrolls();
 
     	ImageWorkspace image = master.getCurrentWorkspace();

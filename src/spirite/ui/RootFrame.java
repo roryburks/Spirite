@@ -298,7 +298,12 @@ public class RootFrame extends javax.swing.JFrame
 				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
 		}
 		else if( command.equals("undo")) {
-			master.getUndoEngine().undo();
+			if( master.getCurrentWorkspace() != null)
+				master.getCurrentWorkspace().getUndoEngine().undo();
+		}
+		else if( command.equals("redo")) {
+			if( master.getCurrentWorkspace() != null)
+				master.getCurrentWorkspace().getUndoEngine().redo();
 		}
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);

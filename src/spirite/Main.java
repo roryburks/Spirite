@@ -20,32 +20,6 @@ public class Main{
 
     public static void main(String[] args) {
         try {
-        	LinkedList<Integer> pll = new LinkedList<>();
-        	pll.add( new Integer(1));
-        	pll.add( new Integer(2));
-        	pll.add( new Integer(3));
-        	pll.add( new Integer(4));
-        	pll.add( new Integer(5));
-        	pll.add( new Integer(6));
-        	pll.add( new Integer(7));
-        	pll.add( new Integer(8));
-        	pll.add( new Integer(9));
-        	
-        	Iterator<Integer> it = pll.descendingIterator();
-        	int i = it.next();
-        	
-        	Iterator<Integer> it2 = pll.descendingIterator();
-        	while( it2.hasNext()) {
-        		int i2 = it2.next();
-        		if( i == i2) 
-        			break;
-        		it2.remove();
-        	}
-        
-        	for( Integer i3 : pll) {
-        		System.out.print(i3);
-        	}
-        	
             master = new MasterControl();
 
             setLookAndFeel();

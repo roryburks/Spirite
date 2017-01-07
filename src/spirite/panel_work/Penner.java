@@ -1,6 +1,7 @@
 package spirite.panel_work;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,8 +46,9 @@ public class Penner
 			@Override
 			public void run() {
 				if( strokeEngine != null && state == STATE.DRAWING) {
-					if( strokeEngine.stepStroke())
-						master.refreshImage();
+					if( strokeEngine.stepStroke()) {
+						strokeEngine.getImageData().refresh();
+					}
 				}
 			}
 			
@@ -84,9 +86,19 @@ public class Penner
 			}
 			if( tool == "fill") {
 				Color c = (button == PButton.Type.LEFT) ? 
-						context.master.getPaletteManager().getActiveColor(0)
-						: context.master.getPaletteManager().getActiveColor(1);
-				master.getDrawEngine().fill(context.stiXm(x), context.stiYm(y), c);
+						master.getPaletteManager().getActiveColor(0)
+						: master.getPaletteManager().getActiveColor(1);
+
+				ImageWorkspace workspace = master.getCurrentWorkspace();
+				ImageData data = workspace.getActiveData();
+				if( data != null) {
+					Point p = new Point(context.stiXm(x), context.stiYm(y));
+					UndoEngine engine = workspace.getUndoEngine();
+					engine.prepareContext(data);
+					master.getDrawEngine().fill( p.x, p.y, c, data);
+					engine.storeAction( engine.new FillAction(p, c) , data);
+					data.refresh();
+				} 
 			}
 			
 		}
@@ -95,7 +107,8 @@ public class Penner
 			if( strokeEngine != null) {
 				strokeEngine.endStroke();
 				
-				UndoEngine engine = master.getUndoEngine();
+				// TODO : This should probably not be polling master, but instead StrokeEngine somehow
+				UndoEngine engine = master.getCurrentWorkspace().getUndoEngine();
 				StrokeAction stroke = engine.new StrokeAction( 
 						strokeEngine.getParams(), 
 						strokeEngine.getHistory());
@@ -111,7 +124,7 @@ public class Penner
 		ImageWorkspace workspace = master.getCurrentWorkspace();
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageData data = workspace.getActiveData();
-			master.getUndoEngine().prepareContext(data);
+			workspace.getUndoEngine().prepareContext(data);
 			strokeEngine = master.getDrawEngine().createStrokeEngine( data);
 			strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y));
 			state = STATE.DRAWING;

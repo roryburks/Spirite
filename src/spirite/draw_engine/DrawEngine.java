@@ -26,16 +26,13 @@ import spirite.image_data.ImageData;
  *
  */
 public class DrawEngine {
-	MasterControl master;
-	
 	BufferedImage working_image;
 	Timer update_timer;
 	StrokeEngine timedStroke = null;
 	
 	private enum STATE { READY, DRAWING };
 	
-	public DrawEngine( MasterControl master) {
-		this.master = master;
+	public DrawEngine( ) {
 	}
 
 	public StrokeEngine createStrokeEngine( ImageData data) {
@@ -170,8 +167,9 @@ public class DrawEngine {
 	// :::: Other
 	
 	// Simple Queue flood fill
-	public void fill( int x, int y, Color color) {
-		BufferedImage image = master.getCurrentWorkspace().getActiveData().getData();
+	public void fill( int x, int y, Color color, ImageData data) {
+		if( data == null) return;
+		BufferedImage image = data.getData();
 		if( image == null) return;
 		
 		if( !MUtil.coordInImage(x, y, image)) {
@@ -212,8 +210,6 @@ public class DrawEngine {
 				queue.add( MUtil.packInt(ix, iy-1));
 			}
 		}
-		
-		master.refreshImage();
 	}
 	
 	// :::: Internal

@@ -18,6 +18,7 @@ public class MDebug {
 		//	indicates a potential substantial flaw in program design, but shouldn't
 		//	cause a catastrophic failure of the program.
 		STRUCTURAL_MINOR,
+		STRUCTURAL,
 	}
 	
 	public static enum WarningType {

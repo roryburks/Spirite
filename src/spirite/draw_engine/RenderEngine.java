@@ -4,24 +4,32 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MImageObserver;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.Layer;
 
 public class RenderEngine 
-	implements MImageObserver
+	implements MImageObserver, MWorkspaceObserver
 {
 	List<Cache> image_cache;
 	MasterControl master;
+	List<ImageWorkspace> workspaces = new LinkedList<>();
 	
 	public RenderEngine( MasterControl master) {
 		this.master = master;
 		image_cache = new ArrayList<>();
 		
-		master.addImageObserver(this);
+		if( master.getCurrentWorkspace() != null) {
+			ImageWorkspace ws = master.getCurrentWorkspace();
+			workspaces.add( ws);
+			ws.addImageObserver( this);
+		}
+		master.addWorkspaceObserver(this);
 	}
 	
 	public BufferedImage renderImage(RenderSettings settings) {
@@ -123,5 +131,24 @@ public class RenderEngine
 	@Override
 	public void newImage() {
 		imageChanged();
+	}
+
+	// :::: MWorkspaceObserver
+	@Override
+	public void currentWorkspaceChanged() {
+		ImageWorkspace ws = master.getCurrentWorkspace();
+		if( !workspaces.contains(ws)) {
+			workspaces.add(ws);
+			ws.addImageObserver(this);
+		}
+	}
+
+	@Override
+	public void newWorkspace() {
+		ImageWorkspace ws = master.getCurrentWorkspace();
+		if( !workspaces.contains(ws)) {
+			workspaces.add(ws);
+			ws.addImageObserver(this);
+		}
 	}
 }

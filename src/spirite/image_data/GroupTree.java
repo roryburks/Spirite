@@ -127,7 +127,12 @@ public class GroupTree {
 			return visible;
 		}
 		public void setVisible( boolean visible) {
-			this.visible = visible;
+			if( this.visible != visible) {
+				this.visible = visible;
+				
+				context.refreshImage();
+			}
+			
 		}
 		public boolean isExpanded() {
 			return expanded;

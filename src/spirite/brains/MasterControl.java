@@ -9,6 +9,9 @@ import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine;
 import spirite.draw_engine.UndoEngine;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.MImageStructureObserver;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.ui.FrameManager;
 
 /***
@@ -18,7 +21,9 @@ import spirite.ui.FrameManager;
  * @author Rory Burks
  *
  */
-public class MasterControl {
+public class MasterControl
+	implements MImageObserver, MImageStructureObserver 
+{
 	// Components
     HotkeyManager hotkeys;
     PaletteManager palette;
@@ -27,7 +32,6 @@ public class MasterControl {
     SettingsManager settingsManager;
     DrawEngine drawEngine;
     RenderEngine renderEngine;
-    UndoEngine undoEngine;
     
     FrameManager frame_manager;
     
@@ -35,7 +39,6 @@ public class MasterControl {
     
     int width = 0;
     int height = 0;
-    int image_update = 0;
     
 
     public MasterControl() {
@@ -45,10 +48,12 @@ public class MasterControl {
         imageManager = new ImageWorkspace();
         settingsManager = new SettingsManager();
         frame_manager = new FrameManager( this);
-        drawEngine = new DrawEngine( this);
+        drawEngine = new DrawEngine();
         renderEngine = new RenderEngine( this);
-        undoEngine = new UndoEngine( this);
         Dialogs.setMaster(this); //// TODO BAD
+        
+        imageManager.addImageObserver(this);
+        imageManager.addImageStructureObserver(this);
     }
 
 
@@ -76,10 +81,6 @@ public class MasterControl {
     public SettingsManager getSettingsManager() {
     	return settingsManager;
     }
-    public UndoEngine getUndoEngine() {
-    	return undoEngine;
-    }
-    
 
     // !!!! TODO DEBUG
     public void setCurrentWorkpace( ImageWorkspace workspace) {
@@ -96,21 +97,6 @@ public class MasterControl {
     public void newImage( int width, int height, Color color) {
 //    	image_manager.newImage(width, height, color);
     	imageManager.newRig(width, height, "shamma", color);
-
-        for( MImageObserver obs : imageObservers) {
-            obs.newImage();
-        }
-    }
-
-    public void refreshImage() {
-        image_update++;
-        for( MImageObserver obs : imageObservers) {
-            obs.imageChanged();
-        }
-    }
-
-    public int getImageUpdate() {
-        return image_update;
     }
 
     public int getWidth() { return width;}
@@ -121,18 +107,6 @@ public class MasterControl {
     
 
     // ==== Observer Interfaces ====
-    List<MImageObserver> imageObservers = new ArrayList<>();
-
-    public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
-    public void removeImageObserver( MImageObserver obs) { imageObservers.remove(obs); }
-    
-    public static interface MImageObserver {
-        public void imageChanged();
-        public void newImage();
-    }
-    
-    
-
     List<MWorkspaceObserver> workspaceObservers = new ArrayList<>();
 
     public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.add(obs);}
@@ -154,4 +128,49 @@ public class MasterControl {
         public void newWorkspace();
     }
     
+    // :::: MCurrentImageObserver
+    List<MCurrentImageObserver> cimageObservers = new ArrayList<>();
+
+    public void addCurrentImageObserver( MCurrentImageObserver obs) { cimageObservers.add(obs);}
+    public void removeCurrentImageObserver( MCurrentImageObserver obs) { cimageObservers.remove(obs); }
+
+    private void  triggerImageRefresh() {
+    	for( MCurrentImageObserver obs : cimageObservers) {
+    		obs.imageRefresh();
+    	}
+    }
+    private void  triggerImageStructureRefresh() {
+    	for( MCurrentImageObserver obs : cimageObservers) {
+    		obs.imageStructureRefresh();
+    	}
+    }
+    
+    /***
+     * A lot of components only ever draw the currently active image workspace
+     * and redraws on any kind of status change.  For these, MCurrentImageObserver
+     * is easier to use than a putting a MImageObserver on the current workspace
+     *and changing it every time the workspace changes
+     */
+    public static interface MCurrentImageObserver {
+    	public void imageRefresh();
+    	public void imageStructureRefresh();
+    }
+
+	@Override
+	public void structureChanged(StructureChangeEvent evt) {
+		triggerImageStructureRefresh();
+	}
+
+
+	@Override
+	public void imageChanged() {
+		triggerImageRefresh();
+		
+	}
+
+
+	@Override
+	public void newImage() {
+		triggerImageStructureRefresh();
+	}
 }
