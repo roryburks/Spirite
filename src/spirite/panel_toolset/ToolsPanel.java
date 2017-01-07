@@ -24,6 +24,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
@@ -71,7 +72,7 @@ public class ToolsPanel extends JPanel
             is_width = icon_sheet.getWidth() / 25;
             is_height = icon_sheet.getHeight() / 25;
         } catch (IOException e) {
-            MDebug.handleError(  3, "ToolsetPanel.prepareIconSheet:" + e.getMessage());
+        	MDebug.handleError( ErrorType.RESOURCE, this, "Failed to prepare Toolset Icon Sheet");
         }
 
         // Turns all pixels the same color as the top-left pixel into transparent

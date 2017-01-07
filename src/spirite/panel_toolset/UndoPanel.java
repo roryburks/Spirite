@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -29,6 +28,12 @@ import spirite.draw_engine.UndoEngine.StrokeAction;
 import spirite.draw_engine.UndoEngine.UndoIndex;
 import spirite.draw_engine.UndoEngine.VisibilityAction;
 
+/***
+ * The UndoPanel shows the History of all Undoable actions and lets you navigate them
+ * through click.
+ * 
+ * @author Rory Burks
+ */
 public class UndoPanel extends JPanel
 	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener
 {
@@ -43,6 +48,7 @@ public class UndoPanel extends JPanel
 		this.master = master;
 		this.setLayout( new GridLayout());
 		
+		// Set the list up and link it with everything
 		model = new DefaultListModel<>();
 		list = new JList<UndoIndex>();
 		list.setModel(model);
@@ -52,18 +58,23 @@ public class UndoPanel extends JPanel
 		list.setCellRenderer(this);
 		list.getSelectionModel().addListSelectionListener(this);
 		
+		// Put the List in a ScrollPane
 		container = new JScrollPane(list);
 		container.setPreferredSize( new Dimension(240,300));
 		this.add(container);
 		
+		// Link the UndoEngine
 		engine = master.getCurrentWorkspace().getUndoEngine();
 		engine.addUndoEngineObserver(this);
 		
-		model.addElement(null);
-		container.setAutoscrolls(true);
+		constructFromHistory( engine.constructUndoHistory());
 	}
 
 	
+	/***
+	 * Using the UndoHistory from UndoEngine.constructUndoHistory, removes
+	 * the old model data and constructs it anew.
+	 */
 	private void constructFromHistory(List<UndoIndex> undoHistory ){
 		model.clear();
 		
@@ -186,6 +197,7 @@ public class UndoPanel extends JPanel
 	// :::: ListSelectionListener
 	@Override
 	public void valueChanged(ListSelectionEvent evt) {
+		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {

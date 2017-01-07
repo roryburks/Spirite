@@ -8,7 +8,7 @@ import java.awt.Color;
  * @author Rory Burks
  *
  */
-public class SimpleLayer extends Layer
+/*public class SimpleLayer extends Layer
 {
 	ImageData part;
 
@@ -30,4 +30,4 @@ public class SimpleLayer extends Layer
 	public ImageData getActiveData() {
 		return part;
 	}
-}
+}*/

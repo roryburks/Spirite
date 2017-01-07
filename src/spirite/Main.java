@@ -2,12 +2,10 @@
 
 package spirite;
 
-import java.awt.Point;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.ui.FrameManager;
 
@@ -28,7 +26,7 @@ public class Main{
                 public void run() { createUI();}
             });
         } catch( Exception e) {
-            MDebug.handleError(0, e);
+        	MDebug.handleError( ErrorType.FATAL, e, "Core:" + e.getMessage());
         }
     }
 
@@ -37,7 +35,7 @@ public class Main{
             UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName());
         }
         catch (Exception e) {
-            MDebug.handleError( 5, "Unable to set Look and Feel", e);
+        	MDebug.handleError( ErrorType.RESOURCE, e, "Invalid Look and Feel.");
         }
     }
 

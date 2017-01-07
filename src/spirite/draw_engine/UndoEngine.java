@@ -20,6 +20,7 @@ import spirite.draw_engine.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
  * The Basic idea behind the UndoEngine is that only every Nth action 
@@ -35,6 +36,12 @@ import spirite.image_data.ImageWorkspace;
  * many tasks, for ones that require continuous input (in particular, Strokes)
  * they can't be generalized in that way.
  * 
+ * Events which update the undo engine with undo-able commands should come from
+ *  a limited number of places to promote code maintainability.  Those places 
+ *  include:
+ * -ImageWorkspace
+ * -DrawEngine
+ * 
  * @author Rory Burks
  *
  */
@@ -42,16 +49,22 @@ public class UndoEngine {
 	static final int TICKS_PER_KEY = 10;
 	int maxCacheSize = 2000000;
 	int cacheSize = 0;
-	List<UndoContext> contexts = new ArrayList<UndoContext>();
-	LinkedList<UndoContext> queue = new LinkedList<>();
+	final List<UndoContext> contexts = new ArrayList<UndoContext>();
+	final LinkedList<UndoContext> queue = new LinkedList<>();
 	ListIterator<UndoContext> queuePosition = null;
-	ImageWorkspace workspace;
+	final ImageWorkspace workspace;
 	
 	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
 		contexts.add( new NullContext());
 	}
 	
+	public void reset() {
+		contexts.clear();
+		queue.clear();
+		queuePosition = null;
+		contexts.add( new NullContext());
+	}
 	
 	public int getQueuePosition() {
 		if( queuePosition == null) 
@@ -391,9 +404,12 @@ public class UndoEngine {
 	 *  UndoActions
 	 *
 	 */
-	public class UndoAction {
-		public void performAction( ImageData data) {}
+	public abstract class UndoAction {
+		public abstract void performAction( ImageData data);
 	}
+	
+	// :::: Image UIndoActions
+	//	Actions working directly on the image data
 	
 	public class StrokeAction extends UndoAction {
 		Point[] points;
@@ -440,6 +456,10 @@ public class UndoEngine {
 		}
 	}
 	
+	// :::: Null UndoActions
+	//	Actions working on the logical image structure rather than the 
+	//	stored ImageData.
+	
 	public abstract class NullAction extends UndoAction {
 		public abstract void undoAction();
 	}
@@ -459,8 +479,28 @@ public class UndoEngine {
 			node.setVisible(!this.setTo, false);
 		}
 	}
+	public class StructureAction extends NullAction {
+		final StructureChange change;
+		
+		public StructureAction(StructureChange change) {
+			this.change = change;
+		}
+		
+		@Override
+		public void performAction(ImageData data) {
+			change.execute();
+			change.alert(false);
+		}
+		@Override
+		public void undoAction() {
+			change.unexecute();
+			change.alert(true);
+		}
+
+		
+	}
 	
-	// Undo Engine
+	// :::: MUndoEngineObserver
     List<MUndoEngineObserver> undoObservers = new ArrayList<>();
 
     public void addUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.add(obs);}
@@ -473,7 +513,7 @@ public class UndoEngine {
     		obs.historyChanged(list);
     	}
     } 
-    
+
     private void  triggerUndo() {
     	for( MUndoEngineObserver obs : undoObservers) {
     		obs.undo();

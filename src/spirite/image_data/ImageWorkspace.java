@@ -7,10 +7,11 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.draw_engine.UndoEngine;
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 
 
 /***
@@ -21,7 +22,6 @@ import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
  */
 public class ImageWorkspace {
 	private List<ImageData> imageData;
-	private List<Layer> layers;
 	private List<Scene> scenes;
 	private GroupTree groups;
 	
@@ -38,7 +38,6 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
-		layers = new ArrayList<Layer>();
 		scenes = new ArrayList<Scene>();
 		
 		groups = new GroupTree(this);
@@ -55,6 +54,10 @@ public class ImageWorkspace {
 	
 	public UndoEngine getUndoEngine() {
 		return undoEngine;
+	}
+	
+	public void resetUndoEngine() {
+		undoEngine.reset();
 	}
 	
 	public GroupTree.GroupNode getRootNode() {
@@ -77,71 +80,56 @@ public class ImageWorkspace {
 		
 		if( selected instanceof GroupTree.LayerNode) {
 			// !!!! SHOULD be no reason to add sanity checks here.
-			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
+			return  ((GroupTree.LayerNode)selected).getImageData();
 		}
 		return null;
 	}
-	
-//	public void setActiveLayer( Layer rig) {
-	//	selectedLayer = layers.indexOf(rig);
-	//}
 	
 	public GroupTree.Node getSelectedNode() {
 		return selected;
 	}
 	public void setSelectedNode( GroupTree.Node node) {
-		// TODO : Add Sanity check to make sure the node is in the workspace
+		if( !nodeInWorkspace(node))
+			return;
 		
 		selected = node;
 	}
 	
 	// Creates a New Rig
-	public Layer newRig( int w, int h, String name, Color c) {
+	public LayerNode newRig( int w, int h, String name, Color c) {
 		return 	addNewRig( null, w, h, name, c);
 	}
 	
-	public Layer addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
-
-		Layer rig = new SimpleLayer(w, h, name, c, this);		
-		GroupTree.Node newNode = groups.addContextual(context, rig);
-		layers.add(rig);
+	public LayerNode addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
+		// Create new Image Data and link it to the workspace
+		ImageData data = new ImageData(w, h, c, this);
+		data.id = workingID++;	// PostIncrement
+		imageData.add(data);
 		
-		//!!!! TODO : Reimagine a better way to link Image Data to Workspace
-		imageData.add(rig.getActiveData());
-		rig.getActiveData().id = workingID++;	// PostIncrement
 		
 		width = Math.max(width, w);
 		height = Math.max(height, h);
 		
-		setSelectedNode( newNode);
+		// Create node then execute StructureChange event
+		LayerNode node = groups.new LayerNode( data, name);
 		
-
-		// Contruct and trigger the StructureChangeEvent
-		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
-		evt.affectedNodes.add(newNode);
-		triggerStructureChanged( evt);
+		executeChange(createAdditionEvent(node, context));
 		
-		return rig;
+		return node;
 	}
 	
-	public Layer addNewRig( GroupTree.Node context, int identifier, String name) {
+	public LayerNode addNewRig( GroupTree.Node context, int identifier, String name) {
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
-				Layer rig = new SimpleLayer( data, name, this);
-				GroupTree.Node newNode = groups.addContextual(context, rig);
-				
-				width = Math.max(width, data.getData().getWidth());
+				// Create node then execute StructureChange event
+				LayerNode node = groups.new LayerNode( data, name);
+
+				width = Math.max(width,  data.getData().getWidth());
 				height = Math.max(height, data.getData().getHeight());
 				
-				layers.add(rig);
-				setSelectedNode( newNode);
+				executeChange(createAdditionEvent(node, context));
 				
-				// Contruct and trigger the StructureChangeEvent
-				StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
-				evt.affectedNodes.add(newNode);
-				triggerStructureChanged( evt);
-				
-				return rig;
+				return node;
 			}
 		}
 		
@@ -151,12 +139,9 @@ public class ImageWorkspace {
 	}
 	
 	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
-		GroupTree.GroupNode newNode = groups.addContextual(context, name);
-
-		// Contruct and trigger the StructureChangeEvent
-		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.ADDITION);
-		evt.affectedNodes.add(newNode);
-		triggerStructureChanged( evt);
+		GroupTree.GroupNode newNode = groups.new GroupNode(name);
+		
+		executeChange(createAdditionEvent(newNode,context));
 		
 		return newNode;
 	}
@@ -178,42 +163,45 @@ public class ImageWorkspace {
 		groups.moveAbove(nodeToMove, nodeAbove);
 		
 		// Contruct and trigger the StructureChangeEvent
-		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
-		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt);
+		StructureChange evt = null;
+//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
+//		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt, false);
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
 		groups.moveBelow(nodeToMove, nodeUnder);
 		
 		// Contruct and trigger the StructureChangeEvent
-		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
-		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt);
+		StructureChange evt = null;
+//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
+//		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt,false);
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
 		groups.moveInto(nodeToMove, nodeInto, top);
 		
 		// Contruct and trigger the StructureChangeEvent
-		StructureChangeEvent evt = new StructureChangeEvent(this, ChangeType.MOVE);
-		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt);
+		StructureChange evt = null;
+//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
+//		evt.affectedNodes.add(nodeToMove);
+		triggerStructureChanged( evt, false);
 	}
 	
 	
 	// Creates a queue of images for drawing purposes
-	public List<Layer> getDrawingQueue() {
-		List<Layer> queue = new LinkedList<Layer>();
+	public List<LayerNode> getDrawingQueue() {
+		List<LayerNode> queue = new LinkedList<LayerNode>();
 		
 		_gdq_rec( groups.getRoot(), queue);
 		
 		return queue;
 	}
-	private void _gdq_rec( GroupTree.Node node, List<Layer>queue) {
+	private void _gdq_rec( GroupTree.Node node, List<LayerNode>queue) {
 		for( GroupTree.Node child : node.getChildren()) {
 			if( child.isVisible()) {
 				if( child instanceof GroupTree.LayerNode) {
 					// !!!! Very Debug [TODO]
-					queue.add(0,((GroupTree.LayerNode)child).getLayer());
+					queue.add(0,((GroupTree.LayerNode)child));
 				}
 				else {
 					_gdq_rec( child, queue);
@@ -222,42 +210,167 @@ public class ImageWorkspace {
 		}
 	}
 	
-	// :::: Observers
-	public static class StructureChangeEvent {
-		public final ImageWorkspace workspace;
-		public final ChangeType changeType;
-		LinkedList<GroupTree.Node> affectedNodes = new LinkedList<>();
-		
-		public enum ChangeType {
-			ADDITION,
-			DELETION,
-			RENAME,
-			MOVE
-		}
-		
-		StructureChangeEvent( ImageWorkspace workspace, ChangeType changeType) {
-			this.workspace = workspace;
-			this.changeType = changeType;
-		}
-		
-		public List<GroupTree.Node> getAffectedNode() {
-			return (List<Node>) affectedNodes.clone();
+
+	
+	/***
+	 * A StructureChange class defines all sorts of GroupTree structure changes
+	 *
+	 */
+	public abstract class StructureChange {
+		public abstract void execute();
+		public abstract void unexecute();
+		public abstract void cauterize();
+		public void alert( boolean undo) {
+			triggerStructureChanged(this, undo);
 		}
 	}
 	
+	public class AdditionChange extends StructureChange {
+		public final GroupTree.Node node;
+		public final GroupTree.Node parent;
+		public final GroupTree.Node nodeBefore;
+		
+		AdditionChange(
+				GroupTree.Node node,
+				GroupTree.Node parent,
+				GroupTree.Node before) 
+		{
+			this.node = node;
+			this.parent = parent;
+			this.nodeBefore = before;
+		}
+		
+		@Override
+		public void execute() {
+			parent._add( node, nodeBefore);
+			selected = node;
+		}
+		@Override
+		public void unexecute() {
+			node._del();
+			if( selected == node)
+				selected = null;
+		}
+
+		@Override
+		public void cauterize() {}
+	}
+	
+
+	public class DeletionChange extends StructureChange {
+		public final GroupTree.Node node;
+		public final GroupTree.Node parent;
+		public final GroupTree.Node nodeBefore;
+		
+		DeletionChange(
+				GroupTree.Node node,
+				GroupTree.Node parent,
+				GroupTree.Node before) 
+		{
+			this.node = node;
+			this.parent = parent;
+			this.nodeBefore = before;
+		}
+
+		@Override
+		public void execute() {
+			node._del();
+		}
+
+		@Override
+		public void unexecute() {
+			parent._add(node, nodeBefore);
+		}
+
+		@Override
+		public void cauterize() {}
+		
+	}
+	
+	public void executeChange( StructureChange change) {
+		change.execute();
+		
+		undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
+		change.alert(false);
+	}
+	
+	// :::: StructureChangeEvent Factories
+	public StructureChange createDeletionEvent( GroupTree.Node node) {
+		if( node.getParent() == this.getRootNode()) 
+			return null;
+		else if( !nodeInWorkspace(node)) 
+			return null;
+		
+		return new DeletionChange( 
+				node,
+				node.getParent(),
+				node.getNodeBefore());
+	}
+	
+	public StructureChange createAdditionEvent( Node newNode, Node context ) {
+		Node parent;
+		Node nodeBefore;
+		if( context == null) {
+			parent = groups.getRoot();
+			nodeBefore = null;
+		}
+		else if( context instanceof GroupNode) {
+			parent = context;
+			nodeBefore = null;
+		}
+		else {
+			if( context.getParent() == null)
+				return null;
+			parent = context.getParent();
+			nodeBefore = context;
+		}
+
+		return new AdditionChange( 
+				newNode,
+				parent,
+				nodeBefore);
+	}
+
+	public StructureChange createMoveEventAbove(Node nodeToMove, Node nodeAbove ) {
+		return null;
+	}
+	public StructureChange createMoveEventBellow(Node nodeToMove, Node nodeAbove ) {
+		return null;
+	}
+	public StructureChange createMoveEventInto(Node nodeToMove, Node nodeAbove, boolean top) {
+		return null;
+	}
+	
+	/***
+	 * Verifies that the given node exists within the current workspace
+	 */
+	public boolean nodeInWorkspace( GroupTree.Node node) {
+		return _niw_rec( groups.getRoot(), node);
+	}
+	private boolean _niw_rec( GroupTree.Node working, GroupTree.Node toCheck) {
+		if( working == toCheck) 
+			return true;
+		
+		for( GroupTree.Node child : working.getChildren()) {
+			return _niw_rec( child, toCheck);
+		}
+		return false;
+	}
+	
+	// :::: Observers
     private List<MImageStructureObserver> imageStructureObservers = new ArrayList<>();
 
     public void addImageStructureObserver( MImageStructureObserver obs) { imageStructureObservers.add(obs);}
     public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
     
-    void triggerStructureChanged( StructureChangeEvent evt) {
+    void triggerStructureChanged( StructureChange evt, boolean undo) {
         for( MImageStructureObserver obs : imageStructureObservers) {
             obs.structureChanged( evt);
         }
     }
     
     public static interface MImageStructureObserver {
-        public void structureChanged(StructureChangeEvent evt);
+        public void structureChanged(StructureChange evt);
     }
     
 

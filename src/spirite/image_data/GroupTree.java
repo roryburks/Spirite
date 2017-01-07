@@ -7,9 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.draw_engine.UndoEngine;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
+import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
  * @author Rory Burks
@@ -17,7 +18,7 @@ import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
  */
 public class GroupTree {
 	private GroupNode root;
-	private ImageWorkspace context;
+	ImageWorkspace context;
 	
 	public GroupTree( ImageWorkspace context) {
 		this.context = context;
@@ -29,34 +30,6 @@ public class GroupTree {
 		return root;
 	}
 	
-	// :::: Add
-	public GroupNode addContextual( Node selected, String group_name) {
-		GroupNode to_add = new GroupNode(group_name);
-		_addContextual( selected, to_add);
-		return to_add;
-	}
-	public LayerNode addContextual( Node selected, Layer rig) {
-		LayerNode to_add = new LayerNode(rig);
-		_addContextual( selected, to_add);
-		return to_add;
-	}
-	
-	private void _addContextual( Node selected, Node to_add) {
-		if( selected == null || selected == root) {
-			to_add.parent = root;
-			root.children.add( to_add);
-		}
-		else if( selected instanceof GroupNode) {
-			to_add.parent = selected;
-			selected.children.add(to_add);
-		}
-		else if( selected instanceof LayerNode) {
-			GroupNode parent = (GroupNode)selected.parent;
-			to_add.parent = parent;
-			selected.parent.children.add( parent.children.indexOf(selected), to_add);
-		}
-	}
-	
 	// :::: Moving Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
 		if( nodeToMove == null || nodeAbove == null || nodeAbove.parent == null 
@@ -64,7 +37,7 @@ public class GroupTree {
 			return;
 
 		nodeToMove._del();
-		nodeAbove.parent._add(nodeToMove, nodeAbove, true);
+//		nodeAbove.parent._add(nodeToMove, nodeAbove, true);
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
 		if( nodeToMove == null || nodeUnder == null || nodeUnder.parent == null 
@@ -72,7 +45,7 @@ public class GroupTree {
 			return;
 
 		nodeToMove._del();
-		nodeUnder.parent._add(nodeToMove, nodeUnder, false);
+//		nodeUnder.parent._add(nodeToMove, nodeUnder, false);
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
 		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null 
@@ -123,6 +96,23 @@ public class GroupTree {
 			return (ArrayList<Node>)children.clone();
 		}
 		
+		public Node getNodeBefore() {
+			if( parent == null) 
+				return null;
+			
+			Node before;
+			List<Node> children = getParent().getChildren();
+			int i = children.indexOf( this);
+			if( i == -1) {
+				MDebug.handleError( ErrorType.STRUCTURAL, this, "Group Tree malformation (Not child of own parent).");
+				return null;
+			}
+			if( i == 0)
+				return null;
+			
+			return children.get(i-1);
+		}
+		
 		// :::: Get/Set
 		public boolean isVisible() {
 			return visible;
@@ -153,22 +143,21 @@ public class GroupTree {
 				this.name = name;
 
 				// Contruct and trigger the StructureChangeEvent
-				StructureChangeEvent evt = new StructureChangeEvent(context, ChangeType.RENAME);
-				evt.affectedNodes.add(this);
-				context.triggerStructureChanged( evt);
+				StructureChange evt = null;
+//				StructureChange evt = new StructureChange(context, StructureChangeType.RENAME);
+//				context.triggerStructureChanged( evt);
 			}
 		}
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
 		//	has direct access to add/remove commands.
-		protected void _add( Node toAdd, Node child, boolean above) {
-			if( children == null) return;
-			
+		protected void _add( Node toAdd, Node child) {
 			int i = children.indexOf(child);
 			
-			if( i == -1) return;
-			
-			children.add( i + (above?0:1), toAdd);
+			if( i == -1) 
+				children.add(toAdd);
+			else
+				children.add( i, toAdd);
 			toAdd.parent = this;
 		}
 		protected void _rem( Node toRem) {
@@ -192,21 +181,15 @@ public class GroupTree {
 	}
 	
 	public class LayerNode extends Node {
-		private Layer data;
+		ImageData data;
 		
-		LayerNode( Layer data) {
+		LayerNode( ImageData data, String name) {
 			this.data = data;
-			this.name = data.getName();
+			this.name = name;
 		}
 		
-		public Layer getLayer() {
+		public ImageData getImageData() {
 			return data;
-		}
-		
-		@Override
-		public void setName(String name) {
-			super.setName(name);
-			data.setName(name);
 		}
 	}
 }

@@ -114,12 +114,12 @@ public class SaveEngine {
 			// [1] : Node Type ID
 			ra.write( SaveLoadUtil.NODE_LAYER);
 			
-			ImageData data = rnode.getLayer().getActiveData();
+			ImageData data = rnode.getImageData();
 			// [4] : ID of ImageData linked to this LayerNode
 			ra.writeInt( data.getID());
 			
 			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8( rnode.getLayer().getName()));
+			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8( rnode.getName()));
 		}
 		else {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Unknown GroupTree Node type on saving.");

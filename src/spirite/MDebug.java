@@ -19,6 +19,12 @@ public class MDebug {
 		//	cause a catastrophic failure of the program.
 		STRUCTURAL_MINOR,
 		STRUCTURAL,
+		// Indicates that a core resource (such as an icon sheet) is not loading
+		//	properly.  While the program can probably function without it, it will
+		//	not be very user-friendly.
+		RESOURCE,
+		// A Fatal Error can and should immediately terminate the program
+		FATAL,
 	}
 	
 	public static enum WarningType {
@@ -51,7 +57,7 @@ public class MDebug {
         JOptionPane.showMessageDialog(null, "Error: " + message);
 	}
 	
-    public static void handleError( int priority, String message) {
+/*    public static void handleError( int priority, String message) {
         JOptionPane.showMessageDialog(null, "MDB: " + message);
     }
 
@@ -61,7 +67,7 @@ public class MDebug {
 
     public static void handleError( int priority, Exception e) {
         JOptionPane.showMessageDialog(null, "MDB: " + e.getCause() + "/n" + e.getMessage() + "/n" + e.toString());
-    }
+    }*/
 
     public static void note( String message) {
         JOptionPane.showMessageDialog(null, message);

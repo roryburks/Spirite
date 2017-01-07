@@ -56,6 +56,7 @@ public class RootFrame extends javax.swing.JFrame
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
         master.newImage(128,128,new java.awt.Color(0,0,0,0));
+        master.getCurrentWorkspace().resetUndoEngine();
     }
 
     private void initComponents() {

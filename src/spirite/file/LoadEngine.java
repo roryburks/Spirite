@@ -68,6 +68,7 @@ public class LoadEngine {
 				}
 			}
 			
+			workspace.resetUndoEngine();
 			return workspace;
 			
 		} catch (UnsupportedEncodingException e) {

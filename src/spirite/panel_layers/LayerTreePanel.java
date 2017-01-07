@@ -27,7 +27,7 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
@@ -93,7 +93,7 @@ public class LayerTreePanel extends ContentTree
     
     // :::: MImageStructureObserver interface
 	@Override
-	public void structureChanged( StructureChangeEvent evt) {
+	public void structureChanged( StructureChange evt) {
 		constructFromWorkspace();
 		
 	}
@@ -122,7 +122,7 @@ public class LayerTreePanel extends ContentTree
 	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
 		for( GroupTree.Node child : group_node.getChildren()) {
 			DefaultMutableTreeNode node_to_add = new DefaultMutableTreeNode(child);
-			
+
 			tree_node.add( node_to_add);
 			
 			_cfw_construcRecursively( child, node_to_add);
@@ -284,18 +284,10 @@ public class LayerTreePanel extends ContentTree
 
 			// Determine what kind of data the node on the tree contains and then 
 			//	alter the node visuals accordingly
-			if( obj instanceof GroupTree.GroupNode) {
-				GroupTree.GroupNode gn = (GroupTree.GroupNode)obj;
-				
-				renderPanel.label.setText(gn.getName());
-				return renderPanel;
+			if( obj instanceof GroupTree.Node) {
+				renderPanel.label.setText( ((GroupTree.Node)obj).getName() );
 			}
-			if( obj instanceof GroupTree.LayerNode) {
-				GroupTree.LayerNode rn = (GroupTree.LayerNode)obj;
-				
-
-				renderPanel.label.setText(rn.getLayer().getName());
-			}
+		
 			return renderPanel;
 		}
 	}
@@ -320,17 +312,10 @@ public class LayerTreePanel extends ContentTree
 		{
 			Object obj = ((DefaultMutableTreeNode)value).getUserObject();
 
-			if( obj instanceof GroupTree.GroupNode) {
-				GroupTree.GroupNode node = (GroupTree.GroupNode)obj;
-				editingNode = node;
-				renderPanel.label.setText( node.getName());
-			}
-			else if( obj instanceof GroupTree.LayerNode) {
-				GroupTree.LayerNode node = (GroupTree.LayerNode)obj;
-				editingNode = node;
-				renderPanel.label.setText( node.getLayer().getName());
-				
-			}
+			// Determine what kind of data the node on the tree contains and then 
+			//	alter the node visuals accordingly
+			if( obj instanceof GroupTree.Node)
+				renderPanel.label.setText( ((GroupTree.Node)obj).getName());
 		
 			return renderPanel;
 		}

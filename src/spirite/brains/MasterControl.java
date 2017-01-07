@@ -7,11 +7,10 @@ import java.util.List;
 import spirite.dialogs.Dialogs;
 import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.RenderEngine;
-import spirite.draw_engine.UndoEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
-import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.ui.FrameManager;
 
 /***
@@ -156,16 +155,17 @@ public class MasterControl
     	public void imageStructureRefresh();
     }
 
+    // :::: MImageStructureObserver
 	@Override
-	public void structureChanged(StructureChangeEvent evt) {
+	public void structureChanged(StructureChange evt) {
 		triggerImageStructureRefresh();
 	}
 
 
+	// :::: MImageObserver
 	@Override
 	public void imageChanged() {
 		triggerImageRefresh();
-		
 	}
 
 

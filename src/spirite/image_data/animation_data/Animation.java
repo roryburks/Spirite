@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.MUtil;
-import spirite.image_data.Layer;
+import spirite.image_data.GroupTree.LayerNode;
 
 public class Animation {
 	private ArrayList<Scene> scenes = new ArrayList<>();
@@ -50,7 +50,7 @@ public class Animation {
 	
 	//!!!! TODO: Simplicity for now
 	public static class Scene {
-		private List<Layer> layers = new ArrayList();
+		private List<LayerNode> layers = new ArrayList();
 		
 		
 	}
