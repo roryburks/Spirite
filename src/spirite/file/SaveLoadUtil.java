@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 
+/***
+ * A container for various Utility functions for files IO
+ * 
+ * @author Rory Burks
+ *
+ */
 public class SaveLoadUtil {
 	// :::: Node Type Identifiers for the SIFF GroupTree Section
 	public static final byte NODE_GROUP = 0x00;

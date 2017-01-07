@@ -1,4 +1,4 @@
-package spirite.draw_engine;
+package spirite.image_data;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -10,9 +10,14 @@ import java.util.List;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 
+/***
+ * The RenderEngine may or may not be a big and necessary component
+ * in the future.  For now all it does is take the drawQueue and
+ * draw it, but in the future it might buffer recently-rendered
+ * iterations of images, control various rendering paramaters, etc.
+ */
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver
 {

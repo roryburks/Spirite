@@ -16,6 +16,10 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageData;
 
+/***
+ * SaveEngine is a static container for methods which saves images to
+ * various file formats (but particularly the native SIF format)
+ */
 public class SaveEngine {
 	public static byte[] getHeader() 
 		throws UnsupportedEncodingException

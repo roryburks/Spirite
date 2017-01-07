@@ -194,8 +194,6 @@ public class ContentTree extends JPanel
 				}
 			}
 			
-//			System.out.println(tree.get());
-			
 			super.paint(g);
 		}
 	}

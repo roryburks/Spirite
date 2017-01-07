@@ -7,14 +7,17 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 
 
 /***
- * An ImageWorkspace is 
+ * An ImageWorkspace is essentially the root class for all aspects of the graphical
+ * data, both storage and interface.
+ * 
+ * Multiple ImageWorkspaces can exist, though their interactions with each other are
+ * minimal.
  * 
  * @author Rory Burks
  *

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.dialogs.Dialogs;
-import spirite.draw_engine.DrawEngine;
-import spirite.draw_engine.RenderEngine;
+import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.RenderEngine;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
@@ -15,7 +15,10 @@ import spirite.ui.FrameManager;
 
 /***
  * Master Control is little more than a container for all the various components 
- * which handle the grand internals of the program.
+ * which handle the grand internals of the program.  
+ * 
+ * Note: Though most UI components will need full access to MasterControl, giving
+ * it to too many internal components is probably indicative of backwards design.
  * 
  * @author Rory Burks
  *
@@ -122,6 +125,11 @@ public class MasterControl
     	}
     }
     
+    /***
+     * A WorkspaceObserver watches for changes in which workspace is being 
+     * actively selected, it doesn't watch for changes inside any Workspace
+     * for that you need one of the various Observers in ImageWorkspace
+     */
     public static interface MWorkspaceObserver {
         public void currentWorkspaceChanged();
         public void newWorkspace();

@@ -20,7 +20,7 @@ import javax.swing.event.ListSelectionListener;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
-import spirite.draw_engine.DrawEngine;
+import spirite.image_data.DrawEngine;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.FillAction;
 import spirite.image_data.UndoEngine.MUndoEngineObserver;

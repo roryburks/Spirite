@@ -14,14 +14,23 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
-import spirite.draw_engine.DrawEngine.StrokeEngine;
-import spirite.draw_engine.DrawEngine.StrokeParams;
-import spirite.draw_engine.DrawEngine.Method;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
+import spirite.image_data.DrawEngine.Method;
+import spirite.image_data.DrawEngine.StrokeEngine;
+import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.UndoEngine.StrokeAction;
 
+/***
+ * The Penner translates Pen and Mouse input, particularly from the draw
+ * panel and then translates them into actions to be performed by the 
+ * DrawEngine.
+ * 
+ * Uses the JPen2 library which requires the JPen DLLs to be accessible.
+ *
+ * @author Rory Burks
+ */
 public class Penner 
 	implements PenListener
 {
@@ -85,25 +94,32 @@ public class Penner
 				startStroke( stroke);
 			}
 			if( tool == "fill") {
+				// Determine Color
 				Color c = (button == PButton.Type.LEFT) ? 
 						master.getPaletteManager().getActiveColor(0)
 						: master.getPaletteManager().getActiveColor(1);
 
+				// Grab the Active Data
 				ImageWorkspace workspace = master.getCurrentWorkspace();
 				ImageData data = workspace.getActiveData();
+				
 				if( data != null) {
+					// Perform the fill Action, only store the UndoAction if 
+					//	an actual change is made.
 					Point p = new Point(context.stiXm(x), context.stiYm(y));
 					UndoEngine engine = workspace.getUndoEngine();
 					engine.prepareContext(data);
-					master.getDrawEngine().fill( p.x, p.y, c, data);
-					engine.storeAction( engine.new FillAction(p, c) , data);
-					data.refresh();
+					if( master.getDrawEngine().fill( p.x, p.y, c, data)) {
+						engine.storeAction( engine.new FillAction(p, c) , data);
+						data.refresh();
+					}
 				} 
 			}
 			
 		}
 		else if( state == STATE.DRAWING) {
-			// End the Stroke
+			// Pen-up
+			
 			if( strokeEngine != null) {
 				strokeEngine.endStroke();
 				
@@ -151,8 +167,8 @@ public class Penner
 
 	@Override
 	public void penLevelEvent(PLevelEvent ple) {
-		
-		// TODO Auto-generated method stub
+		// Note: JPen updates PenLevels (which inform of things like position and pressure)
+		//	asynchronously with press buttons and other such things, so you have to be careful.
 		for( PLevel level: ple.levels) {
 			switch( level.getType()) {
 			case X:
@@ -174,14 +190,7 @@ public class Penner
 		}
 	}
 
-	@Override
-	public void penScrollEvent(PScrollEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void penTock(long arg0) {
-		
-	}
+	@Override	public void penScrollEvent(PScrollEvent arg0) {}
+	@Override	public void penTock(long arg0) {}
 
 }

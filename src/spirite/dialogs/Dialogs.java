@@ -11,6 +11,10 @@ import javax.swing.JOptionPane;
 
 import spirite.brains.MasterControl;
 
+/***
+ * A static centalized namespace for calling the various Dialogs.
+ *
+ */
 public class Dialogs {
 	// !!!! TODO VERY DEBUG
 	static MasterControl master;

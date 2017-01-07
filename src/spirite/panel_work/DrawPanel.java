@@ -17,8 +17,8 @@ import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
-import spirite.draw_engine.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.ImageData;
 
 /**

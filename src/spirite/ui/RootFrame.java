@@ -261,7 +261,6 @@ public class RootFrame extends javax.swing.JFrame
         else if( command.equals("newLayerQuick")) {
         	ImageWorkspace workspace = master.getCurrentWorkspace();
         	if( workspace != null) {
-        		System.out.println(workspace.getSelectedNode());
         		workspace.addNewRig( 
         				workspace.getSelectedNode(), 
         				workspace.getWidth(), 

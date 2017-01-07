@@ -4,8 +4,9 @@ package spirite.panel_anim;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
-import spirite.draw_engine.RenderEngine.RenderSettings;
+
 import spirite.brains.MasterControl;
+import spirite.image_data.RenderEngine.RenderSettings;
 
 public class PreviewPanel extends JPanel
 {

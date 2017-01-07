@@ -1,4 +1,4 @@
-package spirite.draw_engine;
+package spirite.image_data;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -11,16 +11,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
-import java.util.TimerTask;
-
 import spirite.MDebug.WarningType;
 import spirite.MDebug;
 import spirite.MUtil;
-import spirite.brains.MasterControl;
-import spirite.image_data.ImageData;
 
 /***
- * Pretty much anything which alters the image data goes through the DrawEngine
+ * Pretty much anything which alters the image data directly goes 
+ * through the DrawEngine
  * 
  * @author Rory Burks
  *
@@ -192,15 +189,19 @@ public class DrawEngine {
 
 	
 	// :::: Other
-	
-	// Simple Queue flood fill
-	public void fill( int x, int y, Color color, ImageData data) {
-		if( data == null) return;
+
+
+	/***
+	 * Simple queue-based flood fill.
+	 * @return true if any changes were made
+	 */
+	public boolean fill( int x, int y, Color color, ImageData data) {
+		if( data == null) return false;
 		BufferedImage image = data.getData();
-		if( image == null) return;
+		if( image == null) return false;
 		
 		if( !MUtil.coordInImage(x, y, image)) {
-			return;
+			return false;
 		}
 		
 		Queue<Integer> queue = new LinkedList<Integer>();
@@ -212,7 +213,7 @@ public class DrawEngine {
 		int bg = image.getRGB(x, y);
 		int c = color.getRGB();
 		
-		if( bg == c) return;
+		if( bg == c) return false;
 		
 		while( !queue.isEmpty()) {
 			int p = queue.poll();
@@ -237,6 +238,8 @@ public class DrawEngine {
 				queue.add( MUtil.packInt(ix, iy-1));
 			}
 		}
+		
+		return true;
 	}
 	
 	// :::: Internal

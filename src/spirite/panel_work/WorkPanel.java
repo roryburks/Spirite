@@ -37,7 +37,6 @@ public class WorkPanel extends javax.swing.JPanel
     MasterControl master;
 
 
-    public WorkPanel() {initComponents();}  // !!! Only exists so that the IDE doesn't freak out
     public WorkPanel( MasterControl master) {
         this.master = master;
         initComponents();
@@ -56,7 +55,8 @@ public class WorkPanel extends javax.swing.JPanel
 
     @Override
     public void paint( Graphics g) {
-        super.paint(g); // Makes sure all the child components get painted
+    	// Let swing do the heavy lifting.
+        super.paint(g); 
 
         // :: Draws the zoom level in the bottom right corner
         if(zoom_level >= 0) {
@@ -93,14 +93,16 @@ public class WorkPanel extends javax.swing.JPanel
         return zoom_level;
     }
 
-    // :::: WorkPanel Group related
+    // :::: Coordinate Conversion methods
+    // its : converts image coordinates to screen coordinates (accounting for zoom)
+    // sti : converts screen coordinates to image coordinates
     int itsX( int x) { return Math.round(x * zoom) + offsetx;}
     int itsY( int y) { return Math.round(y * zoom) + offsety;}
     int stiX( int x) { return Math.round((x - offsetx) / zoom);}
     int stiY( int y) { return Math.round((y - offsety) / zoom);}
     
-    // *m functions are tweaked such that mouse input effects the pixel it
-    //  looks like it should effect
+    // *m functions are as above, but tweaked for mouse coordinates, such that 
+    // 	mouse input is rounded as visually expected.
     int itsXm( int x) { return Math.round(x * zoom + zoom/2 - 1) + offsetx;}
     int itsYm( int y) { return Math.round(y * zoom + zoom/2 - 1) + offsety;}
     int stiXm( int x) { return Math.round((x - offsetx-zoom/2-1) / zoom);}

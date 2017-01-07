@@ -1,9 +1,7 @@
 package spirite.file;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -16,11 +14,14 @@ import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 
+/***
+ * LoadEngine is a static container for methods which load images from
+ * various file formats (but particularly the native SIF format)
+ */
 public class LoadEngine {
 
 	
@@ -120,7 +121,6 @@ public class LoadEngine {
 			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
 			throws IOException 
 	{
-		long startPointer = ra.getFilePointer();
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
@@ -147,7 +147,6 @@ public class LoadEngine {
 			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
 			throws IOException 
 	{
-		long startPointer = ra.getFilePointer();
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int layer = 0;
 		int type;

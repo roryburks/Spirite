@@ -33,7 +33,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import spirite.brains.MasterControl;
-import spirite.draw_engine.RenderEngine.RenderSettings;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager.FrameType;
 
 public class OmniFrame extends JDialog

@@ -15,12 +15,15 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.draw_engine.DrawEngine;
-import spirite.draw_engine.DrawEngine.StrokeEngine;
-import spirite.draw_engine.DrawEngine.StrokeParams;
+import spirite.image_data.DrawEngine.StrokeEngine;
+import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
+ * The UndoEngine stores all undoable actions and the data needed to recover
+ * the image data to its previous states.  It also determines how and when the
+ * data should be clipped.
+ * 
  * The Basic idea behind the UndoEngine is that only every Nth action 
  * (by default 10) actually stores the entire ImageData with it.  Instead
  * most undo actions are stored as their logical components, be they a 
@@ -35,8 +38,7 @@ import spirite.image_data.ImageWorkspace.StructureChange;
  * they can't be generalized in that way.
  * 
  * Events which update the undo engine with undo-able commands should come from
- *  a limited number of places to promote code maintainability.  Those places 
- *  include:
+ *  a limited number of places to promote code maintainability.  As of now, only:
  * -ImageWorkspace
  * -DrawEngine
  * 
@@ -57,6 +59,11 @@ public class UndoEngine {
 		contexts.add( new NullContext());
 	}
 	
+	/***
+	 * Usually called after loading an image or creating a new one, this
+	 * method solidifies the current image state, removing any hanging
+	 * undoable actions.
+	 */
 	public void reset() {
 		contexts.clear();
 		queue.clear();
@@ -64,6 +71,10 @@ public class UndoEngine {
 		contexts.add( new NullContext());
 	}
 	
+	/***
+	 * Gets the current position of the Endo Queue
+	 * @return 0: Base Image, 1: One Action off the base Image, ....
+	 */
 	public int getQueuePosition() {
 		if( queuePosition == null) 
 			return queue.size();
@@ -71,6 +82,10 @@ public class UndoEngine {
 			return queuePosition.nextIndex();
 	}
 	
+	/***
+	 * Moves the undo Queue to the requested position, performing all
+	 * undo's and redo's along the way.
+	 */
 	public void setQueuePosition( int pos) {
 		if( pos > queue.size() || pos < 0) 
 			return;
@@ -85,8 +100,8 @@ public class UndoEngine {
 	
 	/***
 	 * Constructs a list of all the logical actions that are performed in the
-	 * Undo History that makes very little sense to the Undo Engine but is
-	 * more easily interpreted into user-readable data
+	 * Undo History in a straight list that makes very little sense to the Undo 
+	 * Engine but is more easily interpreted into user-readable data.
 	 */
 	public List<UndoIndex> constructUndoHistory() {
 		// !!!! NOTE: this leaks data access
@@ -147,8 +162,6 @@ public class UndoEngine {
 		// Delete all actions stored after the current iterator point
 		if( queuePosition != null) {
 			queue.subList(queuePosition.nextIndex(), queue.size()).clear();
-
-			System.out.println(queue.size());
 			
 
 			for( UndoContext context : contexts) {
@@ -187,7 +200,7 @@ public class UndoEngine {
 	 * Attempts to undo an action.
 	 * @return true if it was successful, false otherwise (if it has no earlier data)
 	 */
-	public boolean undo() {
+	public synchronized boolean undo() {
 		if( queuePosition == null) 
 			queuePosition = queue.listIterator(queue.size());
 		
@@ -205,7 +218,7 @@ public class UndoEngine {
 	 * Attempts to redo an action
 	 * @return true if it was successful, false otherwise (if it has no further data)
 	 */
-	public boolean redo() {
+	public synchronized boolean redo() {
 		if( queuePosition == null || !queuePosition.hasNext()) {
 			return false;
 		}
@@ -216,6 +229,12 @@ public class UndoEngine {
 		}
 	}
 	
+
+	/***
+	 * An Undo Context is tied to a ImageData object.  It stores the ImageData's previous
+	 * 	BufferedImage states.  Instead of saving one BufferedImage per undo action, it 
+	 *  stores only one every N undo actions, while storing the action 
+	 */
 	private abstract class UndoContext {
 		ImageData image;
 
@@ -233,9 +252,7 @@ public class UndoEngine {
 	}
 	
 	/***
-	 * An Undo Context is tied to a ImageData object.  It stores the ImageData's previous
-	 * 	BufferedImage states.  Instead of saving one BufferedImage per undo action, it 
-	 *  stores only one every N undo actions, while storing the action 
+	 * ImageContext is the default UndoContext
 	 */
 	private class ImageContext extends UndoContext {
 		List<BufferedImage> keyframes = new ArrayList<>();
@@ -274,7 +291,7 @@ public class UndoEngine {
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-			g2.setColor( new Color(0,0,0,0));
+			//g2.setColor( new Color(0,0,0,0));
 			g.drawImage( keyframes.get(0), 0, 0,  null);
 
 			g2.setComposite( c);
@@ -326,7 +343,7 @@ public class UndoEngine {
 	 * NullContext is a special context that is not associated with any ImageData
 	 * As such the concept of keyframes to work from doesn't make sense.  Instead
 	 * Each task is stored.  But since you are not strictly working forwards, the
-	 * UndoActions assosciated with NullContext must have two-way methods for
+	 * UndoActions associated with NullContext must have two-way methods for
 	 * performing AND undoing
 	 */
 	private class NullContext extends UndoContext {
@@ -398,7 +415,9 @@ public class UndoEngine {
 	
 	/***
 	 *  UndoActions
-	 *
+	 *  
+	 *  Not only store the data needed to recreate the actions on the image data,
+	 *  but also implements the methods to recreate them.
 	 */
 	public abstract class UndoAction {
 		public abstract void performAction( ImageData data);
@@ -451,10 +470,14 @@ public class UndoEngine {
 		}
 	}
 	
-	// :::: Null UndoActions
-	//	Actions working on the logical image structure rather than the 
-	//	stored ImageData.
 	
+	/***
+	 * NullAction
+	 * 
+	 * Associated with the NullContext, a NullAction must not only have
+	 * a performAction method, but also an undoAction() since it's a
+	 * two-way Action isntead of building from stored states.
+	 */
 	public abstract class NullAction extends UndoAction {
 		public abstract void undoAction();
 	}

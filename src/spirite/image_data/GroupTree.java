@@ -1,19 +1,17 @@
 package spirite.image_data;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
+ * Though almost all ImageData goes through the group tree before being
+ * displayed and/or manipulated, GroupTree should function primarily as
+ * a container, not as an interface.
+ * 
  * @author Rory Burks
- *
  */
 public class GroupTree {
 	private GroupNode root;
@@ -27,38 +25,6 @@ public class GroupTree {
 	// :::: Get
 	public GroupNode getRoot() {
 		return root;
-	}
-	
-	// :::: Moving Nodes
-	public void moveAbove( Node nodeToMove, Node nodeAbove) {
-		if( nodeToMove == null || nodeAbove == null || nodeAbove.parent == null 
-				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeAbove.parent))
-			return;
-
-		nodeToMove._del();
-//		nodeAbove.parent._add(nodeToMove, nodeAbove, true);
-	}
-	public void moveBelow( Node nodeToMove, Node nodeUnder) {
-		if( nodeToMove == null || nodeUnder == null || nodeUnder.parent == null 
-				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeUnder.parent))
-			return;
-
-		nodeToMove._del();
-//		nodeUnder.parent._add(nodeToMove, nodeUnder, false);
-	}
-	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
-		if( nodeToMove == null || nodeInto == null || nodeToMove.parent == null 
-				|| nodeToMove.parent == null || _isChild( nodeToMove, nodeInto))
-			return;
-
-		
-		nodeToMove._del();
-		if( top)
-			nodeInto.children.add(0, nodeToMove);
-		else
-			nodeInto.children.add(nodeToMove);
-			
-		nodeToMove.parent = nodeInto;
 	}
 	
 	// To make sure you don't try to move a node into one of it's children we perform this test.
@@ -75,22 +41,24 @@ public class GroupTree {
 	
 	// ::: Nodes
 	public class Node  {
-		// !!!! TODO : Various attributes (such as oppacity) that apply to the group
-		//	or the Rig (without altering them) should go here
+		// !!!! TODO : Various attributes (such as opacity) that apply to the group
+		//	or the Node (without altering them) should go here
 		protected float alpha;
 		protected boolean visible = true;
 		protected boolean expanded = true;
 		protected String name = "";
 
 		
-		// !!!! Note: even though RigNodes will never use it, it's still useful to have for 
-		//	generic purposes
+		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
+		//	to have for generic purposes
 		ArrayList<Node> children = new ArrayList<>();
 		private Node parent = null;
 		
 		public Node getParent() {
 			return parent;
 		}
+		
+		@SuppressWarnings("unchecked")
 		public List<Node> getChildren() {
 			return (ArrayList<Node>)children.clone();
 		}
@@ -103,7 +71,6 @@ public class GroupTree {
 			if( parent == null) 
 				return null;
 			
-			Node before;
 			List<Node> children = getParent().getChildren();
 			int i = children.indexOf( this);
 			if( i == -1) {
