@@ -9,7 +9,6 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.draw_engine.UndoEngine;
 import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
@@ -63,7 +62,7 @@ public class GroupTree {
 	}
 	
 	// To make sure you don't try to move a node into one of it's children we perform this test.
-	private boolean _isChild( Node node, Node nodeInto) {
+	boolean _isChild( Node node, Node nodeInto) {
 		Node n = nodeInto;
 		
 		while( n != root && n != null) {
@@ -96,7 +95,11 @@ public class GroupTree {
 			return (ArrayList<Node>)children.clone();
 		}
 		
-		public Node getNodeBefore() {
+		/***
+		 * Gets the node that comes after you in the tree.  Or null if you're the last
+		 * node.
+		 */
+		public Node getNextNode() {
 			if( parent == null) 
 				return null;
 			
@@ -107,25 +110,19 @@ public class GroupTree {
 				MDebug.handleError( ErrorType.STRUCTURAL, this, "Group Tree malformation (Not child of own parent).");
 				return null;
 			}
-			if( i == 0)
+			if( i == children.size()-1)
 				return null;
 			
-			return children.get(i-1);
+			return children.get(i+1);
 		}
 		
 		// :::: Get/Set
 		public boolean isVisible() {
 			return visible;
 		}
-		public void setVisible( boolean visible, boolean undoable) {
+		void setVisible( boolean visible) {
 			if( this.visible != visible) {
 				this.visible = visible;
-				
-				if( undoable) {
-					UndoEngine engine = context.getUndoEngine();
-					engine.storeAction( engine.new VisibilityAction(this, visible), null);
-				}
-				context.refreshImage();
 			}
 			
 		}
@@ -138,14 +135,9 @@ public class GroupTree {
 		public String getName() {
 			return name;
 		}
-		public void setName(String name) {
+		void setName(String name) {
 			if( !this.name.equals(name)) {
 				this.name = name;
-
-				// Contruct and trigger the StructureChangeEvent
-				StructureChange evt = null;
-//				StructureChange evt = new StructureChange(context, StructureChangeType.RENAME);
-//				context.triggerStructureChanged( evt);
 			}
 		}
 		

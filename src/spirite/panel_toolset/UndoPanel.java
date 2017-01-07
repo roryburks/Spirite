@@ -21,12 +21,12 @@ import javax.swing.event.ListSelectionListener;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.draw_engine.DrawEngine;
-import spirite.draw_engine.UndoEngine;
-import spirite.draw_engine.UndoEngine.FillAction;
-import spirite.draw_engine.UndoEngine.MUndoEngineObserver;
-import spirite.draw_engine.UndoEngine.StrokeAction;
-import spirite.draw_engine.UndoEngine.UndoIndex;
-import spirite.draw_engine.UndoEngine.VisibilityAction;
+import spirite.image_data.UndoEngine;
+import spirite.image_data.UndoEngine.FillAction;
+import spirite.image_data.UndoEngine.MUndoEngineObserver;
+import spirite.image_data.UndoEngine.StrokeAction;
+import spirite.image_data.UndoEngine.StructureAction;
+import spirite.image_data.UndoEngine.UndoIndex;
 
 /***
  * The UndoPanel shows the History of all Undoable actions and lets you navigate them
@@ -158,8 +158,9 @@ public class UndoPanel extends JPanel
 		}
 		else if( value.action instanceof FillAction)
 			actionString = "Fill";
-		else if( value.action instanceof VisibilityAction)
-			actionString = "Visibility change";
+		else if( value.action instanceof StructureAction) {
+			actionString = ((StructureAction)value.action).change.description;
+		}
 		
 		renderPanel.label.setText(actionString);
 		

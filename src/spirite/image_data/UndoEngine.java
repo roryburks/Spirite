@@ -1,4 +1,4 @@
-package spirite.draw_engine;
+package spirite.image_data;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,11 +15,9 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.draw_engine.DrawEngine;
 import spirite.draw_engine.DrawEngine.StrokeEngine;
 import spirite.draw_engine.DrawEngine.StrokeParams;
-import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
-import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
@@ -96,7 +94,7 @@ public class UndoEngine {
 		
 		// Prepare all the UndoContexts to create a queue from their first data
 		for( UndoContext context : contexts ) {
-			context.startSeek();
+			context.startIterate();
 		}
 		
 		// Get Each UndoAction from 
@@ -104,7 +102,7 @@ public class UndoEngine {
 		while( it.hasNext()) {
 			UndoContext context= it.next();
 			
-			list.add( new UndoIndex( context.image, context.seekGet()));
+			list.add( new UndoIndex( context.image, context.iterateNext()));
 		}
 		
 		return list;
@@ -230,8 +228,8 @@ public class UndoEngine {
 		abstract void redo();
 		abstract void cauterize();
 
-		abstract void startSeek();
-		abstract UndoAction seekGet();
+		abstract void startIterate();
+		abstract UndoAction iterateNext();
 	}
 	
 	/***
@@ -311,19 +309,17 @@ public class UndoEngine {
 		}
 
 		
-		// :::: Seeking
-		int seekMet;
+		// :::: Iterating
+		int iterMet;
 		@Override
-		void startSeek() {
-			seekMet = 0;
+		void startIterate() {
+			iterMet = 0;
 		}
 
 		@Override
-		UndoAction seekGet() {
-			return actions.get(seekMet++);
+		UndoAction iterateNext() {
+			return actions.get(iterMet++);
 		}
-
-
 	}
 	
 	/***
@@ -382,20 +378,20 @@ public class UndoEngine {
 		}
 
 
-		Iterator<NullAction> seekPointer = null;
+		Iterator<NullAction> iter = null;
 		@Override
-		void startSeek() {
-			seekPointer = actions.iterator();
+		void startIterate() {
+			iter = actions.iterator();
 		}
 		
 		@Override
-		UndoAction seekGet() {
-			if( !seekPointer.hasNext()) {
+		UndoAction iterateNext() {
+			if( !iter.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
 			}
 			else
-				return seekPointer.next();
+				return iter.next();
 				
 		}
 	}
@@ -451,7 +447,6 @@ public class UndoEngine {
 		@Override
 		public void performAction( ImageData data) {
 			DrawEngine de = new DrawEngine();
-			StrokeEngine engine = de.createStrokeEngine(data);
 			de.fill(p.x, p.y, c, data);
 		}
 	}
@@ -463,24 +458,8 @@ public class UndoEngine {
 	public abstract class NullAction extends UndoAction {
 		public abstract void undoAction();
 	}
-	public class VisibilityAction extends NullAction {
-		GroupTree.Node node;
-		boolean setTo;
-		public VisibilityAction( GroupTree.Node node, boolean setTo) {
-			this.node = node;
-			this.setTo = setTo;
-		}
-		@Override
-		public void performAction( ImageData data) {
-			node.setVisible(this.setTo, false);
-		}
-		@Override
-		public void undoAction() {
-			node.setVisible(!this.setTo, false);
-		}
-	}
 	public class StructureAction extends NullAction {
-		final StructureChange change;
+		public final StructureChange change;
 		
 		public StructureAction(StructureChange change) {
 			this.change = change;
@@ -496,8 +475,6 @@ public class UndoEngine {
 			change.unexecute();
 			change.alert(true);
 		}
-
-		
 	}
 	
 	// :::: MUndoEngineObserver

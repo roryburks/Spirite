@@ -17,10 +17,10 @@ import spirite.brains.ToolsetManager;
 import spirite.draw_engine.DrawEngine.StrokeEngine;
 import spirite.draw_engine.DrawEngine.StrokeParams;
 import spirite.draw_engine.DrawEngine.Method;
-import spirite.draw_engine.UndoEngine;
-import spirite.draw_engine.UndoEngine.StrokeAction;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.UndoEngine;
+import spirite.image_data.UndoEngine.StrokeAction;
 
 public class Penner 
 	implements PenListener

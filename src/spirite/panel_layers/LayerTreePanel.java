@@ -190,7 +190,7 @@ public class LayerTreePanel extends ContentTree
 	protected void buttonPressed(CCButton button) {
 		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 
-		node.setVisible( button.isSelected(), true);
+		workspace.setNodeVisibility(node,  button.isSelected());
 	}
 	
 	@Override
@@ -314,29 +314,31 @@ public class LayerTreePanel extends ContentTree
 
 			// Determine what kind of data the node on the tree contains and then 
 			//	alter the node visuals accordingly
-			if( obj instanceof GroupTree.Node)
-				renderPanel.label.setText( ((GroupTree.Node)obj).getName());
+			if( obj instanceof GroupTree.Node) {
+				editingNode = (GroupTree.Node)obj;
+				renderPanel.label.setText( editingNode.getName());
+			}
+			
 		
 			return renderPanel;
 		}
 		
 		@Override
 		public void cancelCellEditing() {
-			saveText();
 			super.cancelCellEditing();
+			saveText();
 		}
 		
 		@Override
 		public boolean stopCellEditing() {
-			saveText();
 			return super.stopCellEditing();
 		}
 		
 		private void saveText() {
 			if( editingNode != null) {
 				String text = renderPanel.label.getText();
-				
-				editingNode.setName(text);
+
+				workspace.renameNode(editingNode, text);
 				
 			}
 			
@@ -355,7 +357,7 @@ public class LayerTreePanel extends ContentTree
 		@Override
 		public void keyPressed(KeyEvent e) {
 			if( e.getKeyCode() == KeyEvent.VK_ENTER) {
-				this.stopCellEditing();
+				this.cancelCellEditing();
 			}
 		}
 		@Override		public void keyReleased(KeyEvent e) {}

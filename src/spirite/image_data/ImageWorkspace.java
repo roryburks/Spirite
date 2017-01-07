@@ -8,7 +8,6 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
-import spirite.draw_engine.UndoEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -160,31 +159,56 @@ public class ImageWorkspace {
 	
 	// :::: Move Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
-		groups.moveAbove(nodeToMove, nodeAbove);
+		if( nodeToMove == null || nodeAbove == null || nodeAbove.getParent() == null 
+				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeAbove.getParent()))
+			return;
 		
-		// Contruct and trigger the StructureChangeEvent
-		StructureChange evt = null;
-//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
-//		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt, false);
+		
+		executeChange( new MoveChange(
+				nodeToMove,
+				nodeToMove.getParent(),
+				nodeToMove.getNextNode(),
+				nodeAbove.getParent(),
+				nodeAbove));
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
-		groups.moveBelow(nodeToMove, nodeUnder);
+		if( nodeToMove == null || nodeUnder == null || nodeUnder.getParent() == null 
+				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeUnder.getParent()))
+			return;
 		
-		// Contruct and trigger the StructureChangeEvent
-		StructureChange evt = null;
-//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
-//		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt,false);
+		
+		List<Node> children = nodeUnder.getParent().getChildren();
+		int i = children.indexOf(nodeUnder);
+		Node nodeBefore;
+		
+		if( i+1 == children.size())
+			nodeBefore = null;
+		else
+			nodeBefore = children.get(i+1);
+		
+		executeChange( new MoveChange(
+				nodeToMove,
+				nodeToMove.getParent(),
+				nodeToMove.getNextNode(),
+				nodeUnder.getParent(),
+				nodeBefore));
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
-		groups.moveInto(nodeToMove, nodeInto, top);
+		if( nodeToMove == null || nodeInto == null || nodeInto.getParent()== null 
+				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeInto))
+			return;
 		
-		// Contruct and trigger the StructureChangeEvent
-		StructureChange evt = null;
-//		StructureChange evt = new StructureChange(this, StructureChangeType.MOVE);
-//		evt.affectedNodes.add(nodeToMove);
-		triggerStructureChanged( evt, false);
+		Node nodeBefore = null;
+		if( top && !nodeInto.getChildren().isEmpty()) {
+			nodeBefore = nodeInto.getChildren().get(0);
+		}
+
+		executeChange( new MoveChange(
+				nodeToMove,
+				nodeToMove.getParent(),
+				nodeToMove.getNextNode(),
+				nodeInto,
+				nodeBefore));
 	}
 	
 	
@@ -210,6 +234,17 @@ public class ImageWorkspace {
 		}
 	}
 	
+	
+	public void renameNode( Node node, String newName) {
+		if( newName != node.name)
+			executeChange( new RenameChange(newName, node));
+	}
+	
+	public void setNodeVisibility( Node node, boolean visible) {
+		if( node.isVisible() != visible) {
+			executeChange( new VisbilityChange(node, visible));
+		}
+	}
 
 	
 	/***
@@ -217,11 +252,15 @@ public class ImageWorkspace {
 	 *
 	 */
 	public abstract class StructureChange {
+		public String description = "Unknown Structure Change";
+		boolean imageChange = true;
 		public abstract void execute();
 		public abstract void unexecute();
 		public abstract void cauterize();
 		public void alert( boolean undo) {
 			triggerStructureChanged(this, undo);
+			if( imageChange)
+				refreshImage();
 		}
 	}
 	
@@ -235,6 +274,7 @@ public class ImageWorkspace {
 				GroupTree.Node parent,
 				GroupTree.Node before) 
 		{
+			description = "Added Node";
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
@@ -267,6 +307,7 @@ public class ImageWorkspace {
 				GroupTree.Node parent,
 				GroupTree.Node before) 
 		{
+			description = "Deleted Node";
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
@@ -284,6 +325,98 @@ public class ImageWorkspace {
 
 		@Override
 		public void cauterize() {}
+	}
+	
+	public class RenameChange extends StructureChange {
+		public final String newName;
+		public final String oldName;
+		public final Node node;
+		
+		public RenameChange(
+				String newName,
+				Node node) 
+		{
+			description = "Renamed Node";
+			imageChange = false;
+			this.newName = newName;
+			this.oldName = node.name;
+			this.node = node;
+		}
+
+		@Override
+		public void execute() {
+			node.setName(newName);
+		}
+		@Override
+		public void unexecute() {
+			node.setName(oldName);
+		}
+		@Override		public void cauterize() {}
+		
+	}
+	
+	public class MoveChange extends StructureChange {
+		public final Node moveNode;
+		public final Node oldParent;
+		public final Node newParent;
+		public final Node oldNext;
+		public final Node newNext;
+		
+		
+		public MoveChange(
+				Node moveNode,
+				Node oldParent,
+				Node oldNext,
+				Node newParent,
+				Node newNext) 
+		{
+			description = "Moved Node";
+			this.moveNode = moveNode;
+			this.oldParent = oldParent;
+			this.oldNext = oldNext;
+			this.newParent = newParent;
+			this.newNext = newNext;
+		}
+
+		@Override
+		public void execute() {
+			moveNode._del();
+			newParent._add(moveNode, newNext);
+		}
+
+		@Override
+		public void unexecute() {
+			moveNode._del();
+			oldParent._add(moveNode, oldNext);
+		}
+
+		@Override		public void cauterize() {}
+		
+	}
+	public class VisbilityChange extends StructureChange {
+		public final boolean visibleAfter;
+		public final Node node;
+		
+		VisbilityChange( Node node, boolean visible) {
+			this.node = node;
+			this.visibleAfter = visible;
+			this.description = "Visibility Change";
+		}
+
+		@Override
+		public void execute() {
+			node.setVisible(visibleAfter);
+		}
+
+		@Override
+		public void unexecute() {
+			node.setVisible(!visibleAfter);
+		}
+
+		@Override
+		public void cauterize() {
+			
+		}
 		
 	}
 	
@@ -304,7 +437,7 @@ public class ImageWorkspace {
 		return new DeletionChange( 
 				node,
 				node.getParent(),
-				node.getNodeBefore());
+				node.getNextNode());
 	}
 	
 	public StructureChange createAdditionEvent( Node newNode, Node context ) {
@@ -331,15 +464,7 @@ public class ImageWorkspace {
 				nodeBefore);
 	}
 
-	public StructureChange createMoveEventAbove(Node nodeToMove, Node nodeAbove ) {
-		return null;
-	}
-	public StructureChange createMoveEventBellow(Node nodeToMove, Node nodeAbove ) {
-		return null;
-	}
-	public StructureChange createMoveEventInto(Node nodeToMove, Node nodeAbove, boolean top) {
-		return null;
-	}
+	
 	
 	/***
 	 * Verifies that the given node exists within the current workspace
