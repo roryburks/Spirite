@@ -15,7 +15,6 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.brains.MasterControl;
 import spirite.draw_engine.DrawEngine.StrokeEngine;
 import spirite.draw_engine.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
@@ -51,6 +50,59 @@ public class UndoEngine {
 	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
 		contexts.add( new NullContext());
+	}
+	
+	
+	public int getQueuePosition() {
+		if( queuePosition == null) 
+			return queue.size();
+		else
+			return queuePosition.nextIndex();
+	}
+	
+	public void setQueuePosition( int pos) {
+		if( pos > queue.size() || pos < 0) 
+			return;
+		
+		while( pos < getQueuePosition()) {
+			undo();
+		}
+		while( pos > getQueuePosition()) {
+			redo();
+		}
+	}
+	
+	/***
+	 * Constructs a list of all the logical actions that are performed in the
+	 * Undo History that makes very little sense to the Undo Engine but is
+	 * more easily interpreted into user-readable data
+	 */
+	public List<UndoIndex> constructUndoHistory() {
+		// !!!! NOTE: this leaks data access
+		List<UndoIndex> list = new ArrayList<>(queue.size());
+		
+		// Prepare all the UndoContexts to create a queue from their first data
+		for( UndoContext context : contexts ) {
+			context.startSeek();
+		}
+		
+		// Get Each UndoAction from 
+		Iterator<UndoContext> it = queue.iterator();
+		while( it.hasNext()) {
+			UndoContext context= it.next();
+			
+			list.add( new UndoIndex( context.image, context.seekGet()));
+		}
+		
+		return list;
+	}
+	public static class UndoIndex {
+		public ImageData data;
+		public UndoAction action;
+		public UndoIndex( ImageData data, UndoAction action) {
+			this.data = data;
+			this.action = action;
+		}
 	}
 	
 	/***
@@ -106,6 +158,7 @@ public class UndoEngine {
 				
 				queue.add(storedContext);
 				queuePosition = null;
+				triggerHistoryChanged();
 				return;
 			}
 		}
@@ -115,6 +168,7 @@ public class UndoEngine {
 					new ImageContext( data);
 			contexts.add(storedContext);
 		}
+		
 		
 	}
 	
@@ -131,6 +185,7 @@ public class UndoEngine {
 		else {
 			UndoContext toUndo = queuePosition.previous();
 			toUndo.undo();
+			triggerUndo();
 			return true;
 		}
 	}
@@ -145,6 +200,7 @@ public class UndoEngine {
 		}
 		else {
 			queuePosition.next().redo();
+			triggerRedo();
 			return true;
 		}
 	}
@@ -156,10 +212,13 @@ public class UndoEngine {
 			this.image = data;
 		}
 
-		public abstract void addAction( UndoAction action);
-		public abstract void undo();
-		public abstract void redo();		protected abstract void cauterize();
+		abstract void addAction( UndoAction action);
+		abstract void undo();
+		abstract void redo();
+		abstract void cauterize();
 
+		abstract void startSeek();
+		abstract UndoAction seekGet();
 	}
 	
 	/***
@@ -196,7 +255,8 @@ public class UndoEngine {
 			met++;
 		}
 		
-		public void undo() {
+		@Override
+		void undo() {
 			Graphics g = image.getData().getGraphics();
 			
 			// Refresh the Image to the current base keyframe
@@ -215,8 +275,9 @@ public class UndoEngine {
 			
 			workspace.refreshImage();
 		}
-		
-		public void redo() {
+
+		@Override
+		void redo() {
 			met++;
 			if( met > actions.size()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue.");
@@ -231,9 +292,25 @@ public class UndoEngine {
 		/***
 		 * Makes it so that all information after the current marker is deleted
 		 */
-		protected void cauterize() {
+		@Override
+		void cauterize() {
 			actions.subList(met, actions.size()).clear();
 		}
+
+		
+		// :::: Seeking
+		int seekMet;
+		@Override
+		void startSeek() {
+			seekMet = 0;
+		}
+
+		@Override
+		UndoAction seekGet() {
+			return actions.get(seekMet++);
+		}
+
+
 	}
 	
 	/***
@@ -260,12 +337,12 @@ public class UndoEngine {
 				MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempting to give a null context a non-null Action.");
 		}
 		@Override
-		public void undo() {
+		void undo() {
 			if( pointer == null)
 				pointer = actions.listIterator(actions.size());
 			
-			if( !pointer.hasPrevious()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue.");
+			if( !pointer.hasPrevious() || pointer == null) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Undo).");
 				return;
 			}
 			
@@ -273,9 +350,9 @@ public class UndoEngine {
 		}
 		
 		@Override
-		public void redo() {
+		void redo() {
 			if( pointer == null || !pointer.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue.");
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return;
 			}
 			
@@ -284,14 +361,36 @@ public class UndoEngine {
 
 
 		@Override
-		protected void cauterize() {
+		void cauterize() {
 			if( pointer != null) {
 				actions.subList(pointer.nextIndex(), actions.size()).clear();
+				pointer = null;
 			}
+		}
+
+
+		Iterator<NullAction> seekPointer = null;
+		@Override
+		void startSeek() {
+			seekPointer = actions.iterator();
+		}
+		
+		@Override
+		UndoAction seekGet() {
+			if( !seekPointer.hasNext()) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				return null;
+			}
+			else
+				return seekPointer.next();
+				
 		}
 	}
 	
-	
+	/***
+	 *  UndoActions
+	 *
+	 */
 	public class UndoAction {
 		public void performAction( ImageData data) {}
 	}
@@ -303,6 +402,11 @@ public class UndoEngine {
 		public StrokeAction( StrokeParams params, Point[] points){			
 			this.params = params;
 			this.points = points;
+		}
+		
+		public StrokeParams getParams() {
+			// TODO LEAK
+			return params;
 		}
 		
 		@Override
@@ -348,11 +452,42 @@ public class UndoEngine {
 		}
 		@Override
 		public void performAction( ImageData data) {
-			node.setVisible(this.setTo);
+			node.setVisible(this.setTo, false);
 		}
 		@Override
 		public void undoAction() {
-			node.setVisible(!this.setTo);
+			node.setVisible(!this.setTo, false);
 		}
 	}
+	
+	// Undo Engine
+    List<MUndoEngineObserver> undoObservers = new ArrayList<>();
+
+    public void addUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.add(obs);}
+    public void removeUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.remove(obs); }
+
+    private void  triggerHistoryChanged() {
+    	List<UndoIndex> list = constructUndoHistory();
+    	
+    	for( MUndoEngineObserver obs : undoObservers) {
+    		obs.historyChanged(list);
+    	}
+    } 
+    
+    private void  triggerUndo() {
+    	for( MUndoEngineObserver obs : undoObservers) {
+    		obs.undo();
+    	}
+    }
+    private void  triggerRedo() {
+    	for( MUndoEngineObserver obs : undoObservers) {
+    		obs.redo();
+    	}
+    }
+    
+    public static interface MUndoEngineObserver {
+    	public void historyChanged(List<UndoIndex> undoHistory);
+    	public void undo();
+    	public void redo();
+    }
 }

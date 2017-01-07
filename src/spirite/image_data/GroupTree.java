@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.draw_engine.UndoEngine;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent.ChangeType;
 
@@ -126,10 +127,14 @@ public class GroupTree {
 		public boolean isVisible() {
 			return visible;
 		}
-		public void setVisible( boolean visible) {
+		public void setVisible( boolean visible, boolean undoable) {
 			if( this.visible != visible) {
 				this.visible = visible;
 				
+				if( undoable) {
+					UndoEngine engine = context.getUndoEngine();
+					engine.storeAction( engine.new VisibilityAction(this, visible), null);
+				}
 				context.refreshImage();
 			}
 			

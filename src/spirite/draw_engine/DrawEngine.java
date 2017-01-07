@@ -159,7 +159,34 @@ public class DrawEngine {
 			return prec.toArray(array);
 		}
 	}
-	
+
+	// :::: Stroke Params
+	public enum Method {BASIC, ERASE};
+	public static class StrokeParams {
+		
+		Color c = Color.BLACK;
+		Method method = Method.BASIC;
+		boolean locked = false;
+		
+		public StrokeParams() {}
+		
+		public void setColor( Color c) {
+			if( !locked)
+				this.c = c;
+		}
+		public Color getColor() {
+			return c;
+		}
+		
+		public void setMethod( Method method) {
+			if( !locked)
+				this.method = method;
+		}
+		public Method getMethod() {
+			return method;
+		}
+		
+	}
 
 	
 
@@ -214,28 +241,4 @@ public class DrawEngine {
 	
 	// :::: Internal
 	
-	// :::: Stroke Params
-	public static class StrokeParams {
-		public enum Method {BASIC, ERASE};
-		
-		Color c = Color.BLACK;
-		Method method = Method.BASIC;
-		boolean locked = false;
-		
-		public StrokeParams() {}
-		
-		public void setColor( Color c) {
-			if( !locked)
-				this.c = c;
-		}
-		public Color getColor() {
-			return c;
-		}
-		
-		public void setMethod( Method method) {
-			if( !locked)
-				this.method = method;
-		}
-		
-	}
 }

@@ -190,7 +190,7 @@ public class LayerTreePanel extends ContentTree
 	protected void buttonPressed(CCButton button) {
 		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 
-		node.setVisible( button.isSelected());
+		node.setVisible( button.isSelected(), true);
 	}
 	
 	@Override

@@ -7,7 +7,6 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.brains.MasterControl;
 import spirite.draw_engine.UndoEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.Node;
@@ -34,7 +33,6 @@ public class ImageWorkspace {
 	private int height = 0;
 	
 	private UndoEngine undoEngine;
-	private MasterControl master;
 	
 	
 	

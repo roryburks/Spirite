@@ -12,6 +12,10 @@ import java.awt.event.KeyEvent;
  * which they can change, though Hotkeys go through the HotkeyManager).
  *
  * How this is implemented may change in the future, so it's best to abstract it
+ * 
+ * TODO: It is probably best to have either some kind of sorted list for binary
+ * 	searches or a contextual tree so that the search time does not get out
+ * 	of hand later
  */
 public class Globals {
     private static Object colors[][] = {
@@ -21,6 +25,9 @@ public class Globals {
 
         {"contentTree.selectedBGDragging", new Color( 192,192,212)},
         {"contentTree.selectedBackground",new Color( 160,160,196)},
+
+        {"undoPanel.selectedBackground",new Color( 160,160,196)},
+        {"undoPanel.background",new Color( 238,238,238)},
     };
     
     private static Object metrics[][] = {
@@ -54,6 +61,7 @@ public class Globals {
 			{"..Tools", KeyEvent.VK_T, "frame.showToolsFrame"},
 			{"..-"},
 			{"..Animation Scheme", KeyEvent.VK_S, "frame.showAnimSchemeFrame"},
+			{"..Undo History", KeyEvent.VK_H, "frame.showUndoFrame"},
 	};
 
     public static Color getColor( String id) {

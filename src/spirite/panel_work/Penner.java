@@ -16,7 +16,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.draw_engine.DrawEngine.StrokeEngine;
 import spirite.draw_engine.DrawEngine.StrokeParams;
-import spirite.draw_engine.DrawEngine.StrokeParams.Method;
+import spirite.draw_engine.DrawEngine.Method;
 import spirite.draw_engine.UndoEngine;
 import spirite.draw_engine.UndoEngine.StrokeAction;
 import spirite.image_data.ImageData;

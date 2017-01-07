@@ -12,6 +12,7 @@ import spirite.brains.MasterControl;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
+import spirite.panel_toolset.UndoPanel;
 
 public class FrameManager implements WindowListener {
 	private MasterControl master;
@@ -27,6 +28,7 @@ public class FrameManager implements WindowListener {
 		LAYER ("Layers"),
 		TOOLS ("Toolset"),
 		ANIMATION_SCHEME ("Animation Scheme"),
+		UNDO("Undo History"),
 		;
 		
 		private String name;
@@ -50,6 +52,8 @@ public class FrameManager implements WindowListener {
 			return new ToolsPanel(master);
 		case ANIMATION_SCHEME:
 			return new AnimationSchemePanel(master);
+		case UNDO:
+			return new UndoPanel(master);
 		default:
 			return null;
 		}
@@ -67,6 +71,8 @@ public class FrameManager implements WindowListener {
 			addFrame( FrameType.TOOLS);
 		else if( command.equals("showAnimSchemeFrame"))
 			addFrame( FrameType.ANIMATION_SCHEME);
+		else if( command.equals("showUndoFrame"))
+			addFrame( FrameType.UNDO);
 	}
 	
 	// :::: UI-related
