@@ -11,7 +11,6 @@ public class WorkSplicePanel extends javax.swing.JPanel
 {
 	private static final long serialVersionUID = 1L;
 	WorkPanel context;
-//    MasterControl master;
     int offsetx, offsety;
 
     /**

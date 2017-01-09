@@ -26,12 +26,12 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.ImageWorkspace.MImageStructureObserver;
+import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
-	implements MImageStructureObserver, MWorkspaceObserver,
+	implements MImageObserver, MWorkspaceObserver,
 	 TreeSelectionListener, TreeExpansionListener, KeyListener
 {
 	private static final long serialVersionUID = 1L;
@@ -48,7 +48,7 @@ public class LayerTreePanel extends ContentTree
 		
 		this.master = master;
 		workspace = master.getCurrentWorkspace();
-		workspace.addImageStructureObserver(this);
+		workspace.addImageObserver(this);
 		master.addWorkspaceObserver(this);
 		
 		constructFromWorkspace();
@@ -91,11 +91,11 @@ public class LayerTreePanel extends ContentTree
 		return null;
     }
     
-    // :::: MImageStructureObserver interface
+    // :::: MImageObserver interface
+    @Override    public void imageChanged() {}
 	@Override
 	public void structureChanged( StructureChange evt) {
 		constructFromWorkspace();
-		
 	}
 	
 
@@ -240,15 +240,16 @@ public class LayerTreePanel extends ContentTree
 
 	// :::: WorkspaceObserver
 	@Override
-	public void currentWorkspaceChanged() {
+	public void currentWorkspaceChanged( ImageWorkspace arg0, ImageWorkspace arg1) {
 		// Remove assosciations with the old Workspace and add ones to the new
-		workspace.removeImageStructureeObserver(this);
+		workspace.removeImageObserver(this);
 		workspace = master.getCurrentWorkspace();
-		workspace.addImageStructureObserver( this);
+		workspace.addImageObserver( this);
 		this.constructFromWorkspace();
 	}
 
-	@Override	public void newWorkspace() {}
+	@Override	public void newWorkspace( ImageWorkspace arg0) {}
+	@Override	public void removeWorkspace( ImageWorkspace arg0) {}
 
 	// KeyListener
 	@Override

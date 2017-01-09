@@ -486,25 +486,13 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Observers
-    private List<MImageStructureObserver> imageStructureObservers = new ArrayList<>();
-
-    public void addImageStructureObserver( MImageStructureObserver obs) { imageStructureObservers.add(obs);}
-    public void removeImageStructureeObserver( MImageStructureObserver obs) { imageStructureObservers.remove(obs); }
+    List<MImageObserver> imageObservers = new ArrayList<>();
     
     void triggerStructureChanged( StructureChange evt, boolean undo) {
-        for( MImageStructureObserver obs : imageStructureObservers) {
+        for( MImageObserver obs : imageObservers) {
             obs.structureChanged( evt);
         }
     }
-    
-    public static interface MImageStructureObserver {
-        public void structureChanged(StructureChange evt);
-    }
-    
-
-    List<MImageObserver> imageObservers = new ArrayList<>();
-    
-
     public void refreshImage() {
         for( MImageObserver obs : imageObservers) {
             obs.imageChanged();
@@ -516,6 +504,6 @@ public class ImageWorkspace {
     
     public static interface MImageObserver {
         public void imageChanged();
-        public void newImage();
+        public void structureChanged(StructureChange evt);
     }
 }

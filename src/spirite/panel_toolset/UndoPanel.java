@@ -20,7 +20,9 @@ import javax.swing.event.ListSelectionListener;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.DrawEngine;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.FillAction;
 import spirite.image_data.UndoEngine.MUndoEngineObserver;
@@ -35,7 +37,8 @@ import spirite.image_data.UndoEngine.UndoIndex;
  * @author Rory Burks
  */
 public class UndoPanel extends JPanel
-	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener
+	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener,
+	MWorkspaceObserver
 {
 	private static final long serialVersionUID = 1L;
 	JScrollPane container;
@@ -63,9 +66,10 @@ public class UndoPanel extends JPanel
 		container.setPreferredSize( new Dimension(240,300));
 		this.add(container);
 		
-		// Link the UndoEngine
+		// Link the various components
 		engine = master.getCurrentWorkspace().getUndoEngine();
 		engine.addUndoEngineObserver(this);
+		master.addWorkspaceObserver(this);
 		
 		constructFromHistory( engine.constructUndoHistory());
 	}
@@ -212,4 +216,18 @@ public class UndoPanel extends JPanel
 			}
 		});
 	}
+
+
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		// Unlink the old Workspace's UndoEngine and link the new
+		engine.removeUndoEngineObserver(this);
+		engine = selected.getUndoEngine();
+		engine.addUndoEngineObserver(this);
+		constructFromHistory(engine.constructUndoHistory());
+	}
+
+
+	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {	}
+	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {	}
 }

@@ -34,9 +34,11 @@ import spirite.image_data.UndoEngine.StrokeAction;
 public class Penner 
 	implements PenListener
 {
-	WorkPanel context;
-	DrawPanel draw_panel;
+	// Why it needs Master: it needs access to know which Toolset and Palette Colors
+	//	are being used.  !! DO NOT USE master.getCurrentWorkspace !!
 	MasterControl master;
+	WorkPanel context;
+	DrawPanel drawPanel;
 	Timer update_timer;
 	StrokeEngine strokeEngine = null;
 	
@@ -46,7 +48,7 @@ public class Penner
 	STATE state = STATE.READY;
 	
 	public Penner( DrawPanel draw_panel) {
-		this.draw_panel = draw_panel;
+		this.drawPanel = draw_panel;
 		this.context = draw_panel.context;
 		this.master = context.master;
 
@@ -100,7 +102,7 @@ public class Penner
 						: master.getPaletteManager().getActiveColor(1);
 
 				// Grab the Active Data
-				ImageWorkspace workspace = master.getCurrentWorkspace();
+				ImageWorkspace workspace = drawPanel.workspace;
 				ImageData data = workspace.getActiveData();
 				
 				if( data != null) {
@@ -124,7 +126,7 @@ public class Penner
 				strokeEngine.endStroke();
 				
 				// TODO : This should probably not be polling master, but instead StrokeEngine somehow
-				UndoEngine engine = master.getCurrentWorkspace().getUndoEngine();
+				UndoEngine engine = drawPanel.workspace.getUndoEngine();
 				StrokeAction stroke = engine.new StrokeAction( 
 						strokeEngine.getParams(), 
 						strokeEngine.getHistory());
@@ -137,12 +139,15 @@ public class Penner
 	}
 	
 	private void startStroke( StrokeParams stroke) {
-		ImageWorkspace workspace = master.getCurrentWorkspace();
+		ImageWorkspace workspace = drawPanel.workspace;
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageData data = workspace.getActiveData();
 			workspace.getUndoEngine().prepareContext(data);
 			strokeEngine = master.getDrawEngine().createStrokeEngine( data);
-			strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y));
+			
+			if( strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y))) {
+				workspace.refreshImage();
+			}
 			state = STATE.DRAWING;
 		}
 	}

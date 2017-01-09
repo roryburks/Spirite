@@ -2,12 +2,18 @@ package spirite.panel_work;
 
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+
+import javax.swing.SwingUtilities;
+
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.brains.MasterControl;
 
 /**
@@ -19,44 +25,67 @@ import spirite.brains.MasterControl;
  *Internal Panels should use WorkPanel to convert screen coordinates to image
  *	coordinates.
  *
+ * A note about understanding the various coordinate systems:
+ * -The Scrollbar Values correspond directly to the offset of the image in windospace
+ *   So if you wanted to draw image point 0,0 in the top-left corner, the scrollbar
+ * 	 should be set to the values 0,0.  With the scroll at 1,1, then the point in the top
+ * 	 left corner would be <10,10> (with SCROLL_RATIO of 10), meaning the image is drawn
+ * 	 with offset <-10,-10>
+ *
  * @author Rory Burks
  */
 public class WorkPanel extends javax.swing.JPanel 
-        implements MCurrentImageObserver, AdjustmentListener, ComponentListener
+        implements MImageObserver,  
+        	AdjustmentListener, ComponentListener
 {
+	Point center = new Point(0,0);
 	private static final long serialVersionUID = 1L;
+	
+	// 1 "tick" of the scrollbar to corresponds to SCROLL_RATIO pixels at zoom 1
 	private static final int SCROLL_RATIO = 10;
+	
+	// at least SCROLL_BUFFER pixels must be visible in the scroll region for any axis
+	// 	negative SCROLL_BUFFER would allow you to scroll the image off-screen entirely
     private static final int SCROLL_BUFFER = 100;
 
-    int zoom_level = 0; // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
-                        //           -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
+    // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
+    //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
+    int zoom_level = 0; 
     float zoom = 1.0f;
 
     int offsetx, offsety;
 
     MasterControl master;
+    ImageWorkspace workspace;
 
 
-    public WorkPanel( MasterControl master) {
+    public WorkPanel( MasterControl master, ImageWorkspace workspace) {
         this.master = master;
+        this.workspace = workspace;
         initComponents();
 
-        master.addCurrentImageObserver(this);
+        workspace.addImageObserver(this);
 
         jscrollHorizontal.addAdjustmentListener(this);
         jscrollVertical.addAdjustmentListener(this);
         this.addComponentListener(this);
 
-        calibrateScrolls();
 
-        offsetx = 0;
-        offsety = 0;
+
+        System.out.println("1");
+		calibrateScrolls();
+        System.out.println("2");
+
+		center.x = workspace.getWidth() / 2;
+		center.y = workspace.getHeight() / 2;
+
     }
 
     @Override
     public void paint( Graphics g) {
     	// Let swing do the heavy lifting.
         super.paint(g); 
+        
 
         // :: Draws the zoom level in the bottom right corner
         if(zoom_level >= 0) {
@@ -103,11 +132,10 @@ public class WorkPanel extends javax.swing.JPanel
     
     // *m functions are as above, but tweaked for mouse coordinates, such that 
     // 	mouse input is rounded as visually expected.
-    int itsXm( int x) { return Math.round(x * zoom + zoom/2 - 1) + offsetx;}
-    int itsYm( int y) { return Math.round(y * zoom + zoom/2 - 1) + offsety;}
-    int stiXm( int x) { return Math.round((x - offsetx-zoom/2-1) / zoom);}
-    int stiYm( int y) { return Math.round((y - offsety-zoom/2-1) / zoom);}
-
+    int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
+    int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
+    int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
+    int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
     // ::: Internal
 
     /***
@@ -115,10 +143,10 @@ public class WorkPanel extends javax.swing.JPanel
      * such that you can scroll around the entire image +/- the width of the
      * window (with a little buffer determined by SCREEN_BUFFER)
      */
+    private boolean calibrating = false;
     private void calibrateScrolls() {
-    	ImageWorkspace image = master.getCurrentWorkspace();
-    	
-        if( image == null) {
+    	calibrating = true;
+        if( workspace == null) {
             jscrollHorizontal.setEnabled(false);
             jscrollVertical.setEnabled(false);
             return;
@@ -134,33 +162,48 @@ public class WorkPanel extends javax.swing.JPanel
 
         float hor_min = -width + SCROLL_BUFFER;
         float vert_min = -height + SCROLL_BUFFER;
-        float hor_max = image.getWidth() * zoom - SCROLL_BUFFER;
-        float vert_max = image.getHeight() * zoom - SCROLL_BUFFER;
+        float hor_max = workspace.getWidth() * zoom - SCROLL_BUFFER;
+        float vert_max = workspace.getHeight() * zoom - SCROLL_BUFFER;
 
         jscrollHorizontal.setMinimum( (int)Math.round(hor_min/ratio));
         jscrollVertical.setMinimum( (int)Math.round(vert_min/ratio));
 
+        jscrollHorizontal.setVisibleAmount(50);
+        jscrollVertical.setVisibleAmount(50);
+
         jscrollHorizontal.setMaximum( (int)Math.round(hor_max/ratio) + jscrollHorizontal.getVisibleAmount());
-        jscrollVertical.setMaximum( (int)Math.round(vert_max/ratio) + jscrollVertical.getVisibleAmount());
+        jscrollVertical.setMaximum( (int)Math.round(vert_max/ratio) + jscrollVertical.getVisibleAmount());        
+        calibrating = false;
     }
 
     /**
      * Arranges the scroll bars such that the view is centered around the
      * given coordinates on the image.
-     * (Note, coordinates are in image-space, do not account for zoom)
+     * (Note, coordinates are in image-space; do not account for zoom as 
+     * the method will do that for you)
      */
     private void centerAtPos( int x, int y) {
-    	ImageWorkspace image = master.getCurrentWorkspace();
-
-        if(image == null) return;
-
         final int ratio = SCROLL_RATIO;
 
-        int px = (int)(x*zoom - workSplicePanel.getWidth()/2);
-        int py = (int)(y*zoom - workSplicePanel.getHeight()/2);
+        int px = Math.round(x*zoom - workSplicePanel.getWidth()/2.0f);
+        int py = Math.round(y*zoom - workSplicePanel.getHeight()/2.0f);
 
+        System.out.println("Aleph");
         jscrollHorizontal.setValue( Math.round(px / (float)ratio));
         jscrollVertical.setValue(( Math.round(py / (float)ratio)));
+        System.out.println("Bet");
+        
+        center.x = x;
+        center.y = y;
+    }
+    
+    public Point getCenter() {
+    	Point c = new Point();
+
+    	c.x = stiXm(workSplicePanel.getWidth()/2);
+    	c.y = stiYm(workSplicePanel.getHeight()/2);
+    	
+    	return c;
     }
 
 
@@ -194,6 +237,7 @@ public class WorkPanel extends javax.swing.JPanel
                 .addComponent(jscrollHorizontal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }                      
+    
 
                
     private javax.swing.JScrollBar jscrollHorizontal;
@@ -204,42 +248,45 @@ public class WorkPanel extends javax.swing.JPanel
     // ==== Event Listeners and Observers ====
 
     // :::: MImageObserver
-    @Override
-    public void imageRefresh() {
-        this.repaint();
-    }
+	@Override
+	public void imageChanged() {
+		this.repaint();
+	}
 
-    @Override
-    public void imageStructureRefresh() {
+	@Override
+	public void structureChanged(StructureChange evt) {
+		
         calibrateScrolls();
 
-    	ImageWorkspace image = master.getCurrentWorkspace();
-        centerAtPos( image.getWidth()/2, image.getHeight()/2);
+        centerAtPos( workspace.getWidth()/2, workspace.getHeight()/2);
         this.repaint();
-    }
+	}
+
 
     // :::: Adjustment Listener
     @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
         if( e.getSource() == jscrollHorizontal) {
             offsetx = -e.getValue()*SCROLL_RATIO;
+            if( !calibrating)
+            	center.x = stiXm(workSplicePanel.getWidth()/2);
             this.repaint();
         }
         if( e.getSource() == jscrollVertical) {
             offsety = -e.getValue()*SCROLL_RATIO;
+            if( !calibrating)
+            	center.x = stiXm(workSplicePanel.getWidth()/2);
             this.repaint();
         }
+        
     }
 
     // :::: Component Listener
     @Override
     public void componentResized(ComponentEvent e) {
-        int center_x = stiXm(workSplicePanel.getWidth()/2);
-        int center_y = stiYm(workSplicePanel.getHeight()/2);
-
         this.calibrateScrolls();
 
-        this.centerAtPos(center_x, center_y);
+        this.centerAtPos(center.x, center.y);
     }
     @Override
     public void componentMoved(ComponentEvent e) {}
@@ -247,4 +294,6 @@ public class WorkPanel extends javax.swing.JPanel
     public void componentShown(ComponentEvent e) {}
     @Override
     public void componentHidden(ComponentEvent e) {}
+
+
 }

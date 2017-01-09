@@ -86,6 +86,7 @@ public class DrawEngine {
 			
 			state = STATE.DRAWING;
 			
+			
 			if( MUtil.coordInImage( x, y, img) && img.getRGB(x, y) != crgb) {
 				img.setRGB(x, y, crgb);
 				return true;

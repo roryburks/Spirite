@@ -16,8 +16,9 @@ import javax.swing.Timer;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.ImageData;
 
@@ -26,11 +27,16 @@ import spirite.image_data.ImageData;
  *
  */
 public class DrawPanel extends JPanel
-     implements MCurrentImageObserver, ActionListener
+     implements MImageObserver, ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	WorkPanel context;
+
+	// Why it needs Master: Penner needs Master, and it also needs access
+	//	to the RenderEngine which caches drawn images
 	MasterControl master;
+	
+	WorkPanel context;
+	ImageWorkspace workspace;
 	Penner penner;
 
 	Timer paint_timer;
@@ -41,11 +47,12 @@ public class DrawPanel extends JPanel
 	public DrawPanel(WorkPanel context) {
 		this.context = context;
 		this.master = context.master;
+		this.workspace = context.workspace;
 		this.setBackground(new Color(0, 0, 0, 0));
 
 		penner = new Penner( this);
 		
-		master.addCurrentImageObserver(this);
+		workspace.addImageObserver(this);
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();
@@ -68,11 +75,11 @@ public class DrawPanel extends JPanel
         Graphics2D g2 = (Graphics2D) g;
 
         // Draw Image
-        ImageWorkspace workspace = master.getCurrentWorkspace();
+        ImageWorkspace workspace = context.workspace;
         if( workspace != null) {
         	
         	RenderSettings settings = new RenderSettings();
-        	settings.workspace = master.getCurrentWorkspace();
+        	settings.workspace = workspace;
         	
         	BufferedImage image = master.getRenderEngine().renderImage(settings);
 
@@ -130,12 +137,8 @@ public class DrawPanel extends JPanel
     	metronome = (metronome + 1) % 16;
     	context.repaint();
 	}
-	@Override
-	public void imageRefresh() {
-		
-	}
-	@Override
-	public void imageStructureRefresh() {		
-	}
+	
+	@Override	public void imageChanged() {}
+	@Override	public void structureChanged(StructureChange evt) {	}
  
 }

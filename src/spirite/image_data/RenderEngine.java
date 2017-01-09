@@ -11,6 +11,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
  * The RenderEngine may or may not be a big and necessary component
@@ -120,6 +121,7 @@ public class RenderEngine
 		public ImageWorkspace workspace;
 	}
 
+	// :::: MImageObserver
 	@Override
 	public void imageChanged() {
 		
@@ -133,14 +135,11 @@ public class RenderEngine
 		}
 	}
 
-	@Override
-	public void newImage() {
-		imageChanged();
-	}
+	@Override	public void structureChanged(StructureChange evt) {	}
 
 	// :::: MWorkspaceObserver
 	@Override
-	public void currentWorkspaceChanged() {
+	public void currentWorkspaceChanged( ImageWorkspace arg0, ImageWorkspace arg1) {
 		ImageWorkspace ws = master.getCurrentWorkspace();
 		if( !workspaces.contains(ws)) {
 			workspaces.add(ws);
@@ -149,11 +148,18 @@ public class RenderEngine
 	}
 
 	@Override
-	public void newWorkspace() {
-		ImageWorkspace ws = master.getCurrentWorkspace();
+	public void newWorkspace( ImageWorkspace ws) {
 		if( !workspaces.contains(ws)) {
 			workspaces.add(ws);
 			ws.addImageObserver(this);
 		}
 	}
+	
+
+	@Override
+	public void removeWorkspace( ImageWorkspace ws) {
+		// TODO: Figure out why I have the workspaces list in here
+		workspaces.remove(ws);
+	}
+
 }

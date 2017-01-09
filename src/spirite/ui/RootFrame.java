@@ -29,6 +29,7 @@ import spirite.panel_anim.AnimPanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
+import spirite.panel_work.WorkTabPane;
 
 /**
  * While the MasterControl is "home base" for all the internals of the program, the root
@@ -42,32 +43,35 @@ public class RootFrame extends javax.swing.JFrame
 	private AnimPanel animPanel;
     private PalettePanel palettePanel;
     private ToolsPanel toolsPanel;
-    private WorkPanel workPanel;
+    private WorkTabPane workPane;
     
     private MasterControl master;
 
 
     public RootFrame( MasterControl master) {
         this.master =  master;
+        
         initComponents();
         
 
         this.addWindowFocusListener( this);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+        
 
-        master.newImage(128,128,new java.awt.Color(0,0,0,0));
+        master.newWorkspace(128,128,new java.awt.Color(0,0,0,0), true);
         master.getCurrentWorkspace().resetUndoEngine();
+
     }
 
     private void initComponents() {
-    	workPanel = new WorkPanel( master);
+    	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
     	animPanel = new AnimPanel( master);
     	palettePanel = new PalettePanel( master);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        workPanel.setMinimumSize(new java.awt.Dimension(300, 300));
+        workPane.setMinimumSize(new java.awt.Dimension(300, 300));
 
         toolsPanel.setPreferredSize(new java.awt.Dimension(140, 140));
 
@@ -80,8 +84,8 @@ public class RootFrame extends javax.swing.JFrame
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(workPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
-                    .addComponent(animPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 501, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(workPane, 0, 535, Short.MAX_VALUE)
+                    .addComponent(animPanel, 0, 501, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -99,7 +103,7 @@ public class RootFrame extends javax.swing.JFrame
                         .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(workPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                        .addComponent(workPane, 0, 340, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(animPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
@@ -186,7 +190,7 @@ public class RootFrame extends javax.swing.JFrame
                 JOptionPane.PLAIN_MESSAGE);
 
         if( response == JOptionPane.OK_OPTION) {
-            master.newImage(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor());
+            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
         }
     }                                            
 
@@ -231,6 +235,7 @@ public class RootFrame extends javax.swing.JFrame
      */
     private void globalHotkeyCommand( String command) {
         if( command.equals("zoom_in")) {
+        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             int zl = workPanel.getZoomLevel();
             if( zl >= 11)
                 workPanel.zoom(((zl+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
@@ -240,6 +245,7 @@ public class RootFrame extends javax.swing.JFrame
                 workPanel.zoom(zl+1);
         }
         else if( command.equals("zoom_out")) {
+        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             int zl = workPanel.getZoomLevel();
             if( zl > 11)
                 workPanel.zoom((zl/4)*4-1);
@@ -248,12 +254,18 @@ public class RootFrame extends javax.swing.JFrame
             else
                 workPanel.zoom(zl-1);
         }
-        else if( command.equals("zoom_in_slow"))
+        else if( command.equals("zoom_in_slow")) {
+        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(workPanel.getZoomLevel()+1);
-        else if( command.equals("zoom_out_slow"))
+        }
+        else if( command.equals("zoom_out_slow")) {
+        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(workPanel.getZoomLevel()-1);
-        else if( command.equals("zoom_0"))
+        }
+        else if( command.equals("zoom_0")) {
+        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(0);
+        }
         else if( command.equals("new_image"))
         	promptNewImage();
         else if( command.equals("debug_color"))
@@ -275,8 +287,8 @@ public class RootFrame extends javax.swing.JFrame
 				File f =Dialogs.pickFileOpen();
 				
 				if( f != null) {
-					master.setCurrentWorkpace( 
-						LoadEngine.loadWorkspace( f));
+					master.addWorkpace( 
+						LoadEngine.loadWorkspace( f), true);
 					master.getSettingsManager().setOpennedFile(f);
 				}
 			} catch (BadSIFFFileException e) {

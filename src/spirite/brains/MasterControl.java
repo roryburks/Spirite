@@ -4,12 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.MImageStructureObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.ui.FrameManager;
 
@@ -24,18 +25,21 @@ import spirite.ui.FrameManager;
  *
  */
 public class MasterControl
-	implements MImageObserver, MImageStructureObserver 
+	implements MImageObserver 
 {
 	// Components
     HotkeyManager hotkeys;
     PaletteManager palette;
     ToolsetManager toolset;
-    ImageWorkspace imageManager;
     SettingsManager settingsManager;
     DrawEngine drawEngine;
     RenderEngine renderEngine;
     
     FrameManager frame_manager;
+    
+
+    List<ImageWorkspace> workspaces = new ArrayList<>();
+    ImageWorkspace currentWorkspace = null;
     
     Color current_color = new Color(120,160,160);
     
@@ -47,15 +51,15 @@ public class MasterControl
         hotkeys = new HotkeyManager();
         palette = new PaletteManager();
         toolset = new ToolsetManager();
-        imageManager = new ImageWorkspace();
         settingsManager = new SettingsManager();
         frame_manager = new FrameManager( this);
         drawEngine = new DrawEngine();
         renderEngine = new RenderEngine( this);
         Dialogs.setMaster(this); //// TODO BAD
         
-        imageManager.addImageObserver(this);
-        imageManager.addImageStructureObserver(this);
+//        new
+  //      workspaces.addImageObserver(this);
+    //    workspaces.addImageStructureObserver(this);
     }
 
 
@@ -69,7 +73,7 @@ public class MasterControl
     	return palette;
     }
     public ImageWorkspace getCurrentWorkspace() {
-    	return imageManager;
+   		return currentWorkspace;
     }
     public FrameManager getFrameManager() {
     	return frame_manager;
@@ -84,21 +88,52 @@ public class MasterControl
     	return settingsManager;
     }
 
-    // !!!! TODO DEBUG
     public void setCurrentWorkpace( ImageWorkspace workspace) {
-
-    	if( workspace != null) {
-    		this.imageManager = workspace;
-    		this.currentWorkspaceChanged();
+    	if( currentWorkspace == workspace)
+    		return;
+    	
+    	if( !workspaces.contains(workspace)) {
+    		MDebug.handleError( ErrorType.STRUCTURAL, this, "Tried to assign current workspace to a workspace that MasterControl isn't tracking.");
+    		
+    		addWorkpace(workspace, false);
     	}
+    	
+    	ImageWorkspace previous = currentWorkspace;
+    	currentWorkspace = workspace;
+    	triggerWorkspaceChanged( workspace, previous);
     }
     
 
+    /***
+     * Called when you want to add a Workspace that has been algorithmically constructed
+     * 	such as with the LoadEngine, rather than making a new one with a default layer.
+     */
+	public void addWorkpace(ImageWorkspace workspace, boolean select) {
+		workspaces.add(workspace);
+		triggerNewWorkspace(workspace);
+		
+		workspace.addImageObserver(this);
+		
+		if( select || currentWorkspace == null) {
+			setCurrentWorkpace(workspace);
+		}
+	}
+    
+
     // ==== Image Managements
-    public void newImage( int width, int height) {newImage(width,height,new Color(0,0,0,0));}
-    public void newImage( int width, int height, Color color) {
+    public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
+    public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
 //    	image_manager.newImage(width, height, color);
-    	imageManager.newRig(width, height, "shamma", color);
+    	ImageWorkspace ws = new ImageWorkspace();
+    	ws.newRig(width, height, "Background", color);
+    	
+    	workspaces.add( ws);
+    	ws.addImageObserver( this);
+    	
+    	triggerNewWorkspace(ws);
+    	if( selectOnCreate || currentWorkspace == null) {
+    		setCurrentWorkpace( ws);
+    	}
     }
 
     public int getWidth() { return width;}
@@ -114,14 +149,19 @@ public class MasterControl
     public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.add(obs);}
     public void removeWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.remove(obs); }
     
-    private void currentWorkspaceChanged() {
+    private void triggerWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
     	for( MWorkspaceObserver obs : workspaceObservers) {
-    		obs.currentWorkspaceChanged();
+    		obs.currentWorkspaceChanged(selected, previous);
     	}
     }
-    private void newWorkspace() {
+    private void triggerNewWorkspace(ImageWorkspace added) {
     	for( MWorkspaceObserver obs : workspaceObservers) {
-    		obs.newWorkspace();
+    		obs.newWorkspace(added);
+    	}
+    }
+    private void triggerRemoveWorkspace(ImageWorkspace removed) {
+    	for( MWorkspaceObserver obs : workspaceObservers) {
+    		obs.removeWorkspace(removed);
     	}
     }
     
@@ -131,8 +171,9 @@ public class MasterControl
      * for that you need one of the various Observers in ImageWorkspace
      */
     public static interface MWorkspaceObserver {
-        public void currentWorkspaceChanged();
-        public void newWorkspace();
+        public void currentWorkspaceChanged(  ImageWorkspace selected,  ImageWorkspace previous);
+        public void newWorkspace( ImageWorkspace newWorkspace);
+        public void removeWorkspace( ImageWorkspace newWorkspace);
     }
     
     // :::: MCurrentImageObserver
@@ -163,22 +204,17 @@ public class MasterControl
     	public void imageStructureRefresh();
     }
 
-    // :::: MImageStructureObserver
+	// :::: MImageObserver
 	@Override
 	public void structureChanged(StructureChange evt) {
 		triggerImageStructureRefresh();
 	}
 
 
-	// :::: MImageObserver
 	@Override
 	public void imageChanged() {
 		triggerImageRefresh();
 	}
 
 
-	@Override
-	public void newImage() {
-		triggerImageStructureRefresh();
-	}
 }
