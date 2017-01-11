@@ -1,5 +1,6 @@
 package spirite.panel_layers;
 
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.GroupLayout;
@@ -29,16 +30,16 @@ public class LayerTreeNodePanel extends JPanel {
 		
 		this.setOpaque( false);
 		
+		Dimension size = Globals.getMetric("layerpanel.treenodes.max");
+		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(2)
-					.addComponent(ppanel, GroupLayout.PREFERRED_SIZE, Globals.getMetric("layerpanel.treenodes.max").width, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(label, 10 ,  128, Integer.MAX_VALUE)
-					.addGap(2)
-				)
+			groupLayout.createSequentialGroup()
+				.addGap(2)
+				.addComponent(ppanel, size.width, size.width, size.width)
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(label, 10 ,  128, Integer.MAX_VALUE)
+				.addGap(2)
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -46,7 +47,7 @@ public class LayerTreeNodePanel extends JPanel {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(2)
-							.addComponent(ppanel, GroupLayout.PREFERRED_SIZE,  Globals.getMetric("layerpanel.treenodes.max").height, GroupLayout.PREFERRED_SIZE))
+							.addComponent(ppanel, size.height,  size.height, size.height))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(label)))

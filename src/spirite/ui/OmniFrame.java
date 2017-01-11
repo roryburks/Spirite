@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -67,7 +68,7 @@ public class OmniFrame extends JDialog
 		DRAG_INTO_CONTENT
 	}
 	private DragMode dragMode = DragMode.NOT_DRAGGING;
-	private int dragTab = 0;
+	private int dragIndex = 0;
 	
 	public OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
@@ -121,7 +122,7 @@ public class OmniFrame extends JDialog
 
 			switch( dragMode) {
 			case DRAG_INTO_TAB:
-				Rectangle r = root.getBoundsAt(dragTab);
+				Rectangle r = root.getBoundsAt(dragIndex);
 				
                 Graphics2D g2 = (Graphics2D) g;
                 Stroke oldStroke = g2.getStroke();
@@ -226,6 +227,7 @@ public class OmniFrame extends JDialog
 		JLabel label;
 		public OmniBar( String title) {
 			label = new JLabel(title);
+			label.setFont( new Font("Tahoma", Font.PLAIN, 10));
 			add( label);
 			this.setOpaque(false);
 			addMouseListener(this);
@@ -374,7 +376,7 @@ public class OmniFrame extends JDialog
 					else {
 						dragMode = DragMode.DRAG_INTO_TAB;
 					}
-					dragTab = tabIndex;
+					dragIndex = tabIndex;
 					
 					root.repaint();
 					return true;
@@ -393,7 +395,7 @@ public class OmniFrame extends JDialog
 						(OFTransferable)support.getTransferable().getTransferData(FLAVOR);
 
 				trans.parent.removeContainer( trans.panel);
-				addContainer(trans.panel, dragTab);
+				addContainer(trans.panel, dragIndex);
 				
 				dragMode = DragMode.NOT_DRAGGING;
 				root.repaint();
@@ -440,14 +442,24 @@ public class OmniFrame extends JDialog
 
 		// DragSourceListener
 		@Override		public void dragDropEnd(DragSourceDropEvent evt) {
-			// Drag out of current frame
+			
 			if( evt.getDropAction() == TransferHandler.NONE && containers.contains(dragging)) {
-				if( containers.size() > 1) {
+				// When you drag into a component that has its own DnD handling, you can
+				//	get a false negative in which importData is never called, so it's 
+				//	handled here
+				if( root.contains( evt.getLocation())) {
+					removeContainer( dragging);
+					addContainer( dragging, dragIndex);
+				}
+				
+				// Drag a tab out of its frame
+				else if( containers.size() > 1) {
 					FrameManager fm = master.getFrameManager();
 					removeContainer(dragging);
 					fm.containerToFrame(dragging, evt.getLocation());
 				}
 			}
+			dragMode = DragMode.NOT_DRAGGING;
 			dragging = null;
 		}
 		@Override		public void dragEnter(DragSourceDragEvent arg0) {}

@@ -31,10 +31,10 @@ public class Globals {
     };
     
     private static Object metrics[][] = {
-    		{"layerpanel.treenodes.max", new Dimension( 40, 40)},
+    		{"layerpanel.treenodes.max", new Dimension( 32, 32)},
     		{"contentTree.dragdropLeniency", new Dimension( 0, 10)},
-    		{"contentTree.buttonSize", new Dimension( 30, 30)},
-    		{"contentTree.buttonMargin", new Dimension( 5, 5)},
+    		{"contentTree.buttonSize", new Dimension( 24, 24)},
+    		{"contentTree.buttonMargin", new Dimension( 2, 2)},
     };
     
 	// Each dot before the name indicates the level it should be in.  For example one dot

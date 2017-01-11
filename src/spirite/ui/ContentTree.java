@@ -26,15 +26,23 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+
+import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -49,20 +57,24 @@ import spirite.Globals;
 import spirite.MDebug;
 
 public class ContentTree extends JPanel
-	implements MouseListener, TreeSelectionListener, TreeModelListener, TreeExpansionListener
+	implements MouseListener, TreeModelListener
 	
 {
+		
 	private static final long serialVersionUID = 1L;
 	protected DefaultMutableTreeNode root;
 	protected DefaultTreeModel model;
 	protected CCTDragManager dragManager;
 	protected JScrollPane scrollPane;
 	protected CCPanel container;
+	protected CCTreeListener listener = new CCTreeListener();
 	
 	protected CCTree tree;
 	protected Color bgColor;
 	
 	protected CCBPanel buttonPanel;
+	
+	private int buttonsPerRow = 0;
 
 	// :::: Methods triggered by internal events that should can and should be 
 	//	overwriten
@@ -86,11 +98,6 @@ public class ContentTree extends JPanel
 		scrollPane = new JScrollPane(container);
 		this.add(scrollPane);
 		
-		// Link Listener
-		container.addMouseListener(this);
-		tree.addMouseListener(this);
-		buttonPanel.addMouseListener(this);
-		tree.addTreeSelectionListener(this);	// TODO: this isn't working for some reason
 		
 		// Single root is invisible, but path is visible
 		tree.setRootVisible(false);
@@ -123,15 +130,47 @@ public class ContentTree extends JPanel
 		initLayout();
 		buttonPanel.reformPanel();
 		tree.getModel().addTreeModelListener(this);
+		
+
+		// Pretty Ugly, but I don't want the tree to change its horizontal scroll
+		//	when it starts editing (because it will usually auto-align to hide 
+		//	the buttons), so I replace the default F2 action with one that
+		//	remembers the Horizontal scrollbar's position and resets it after
+		//	editing begins.
+		InputMap m = tree.getInputMap( JComponent.WHEN_FOCUSED);
+		m.put( KeyStroke.getKeyStroke( KeyEvent.VK_F2, 0), "myAction");
+		tree.getActionMap().put("myAction", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JScrollBar hsb = scrollPane.getHorizontalScrollBar();
+				int value = (hsb == null) ? 0 : hsb.getValue();
+				
+				tree.startEditingAtPath(tree.getSelectionPath());
+				
+				hsb = scrollPane.getHorizontalScrollBar();
+				if( hsb != null)
+					hsb.setValue(value);
+			}
+		});
+		
+		// Link Listener
+		container.addMouseListener(this);
+		tree.addMouseListener(this);
+		buttonPanel.addMouseListener(this);
+		tree.addTreeSelectionListener(listener);
+		tree.addTreeExpansionListener(listener);
 	}
 	
 	/***
-	 * Initializes the Layout and the buttons
+	 * Initializes the Outer Layout
 	 */
 	private void initLayout() {
+		//!!!! It's possible that this and CCButtonPanel's reformPanel should be part 
+		// of the same method instead of separated.  There's little reason for the layouts
+		// to be logically separated.
 		Dimension size = Globals.getMetric("contentTree.buttonSize", new Dimension(30,30));
 		Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
-		int bpwidth = size.width + 2*margin.width;
+		int bpwidth = buttonsPerRow*size.width + (buttonsPerRow+1)*margin.width;
 
 		GroupLayout layout = new GroupLayout( container);
 		
@@ -147,6 +186,14 @@ public class ContentTree extends JPanel
 				.addComponent(tree, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE, Integer.MAX_VALUE)
 		);
 		container.setLayout(layout);
+	}
+	
+	public void setButtonsPerRow( int num) {
+		if( num < 0 ) return;
+		
+		buttonsPerRow = num;
+		initLayout();
+		buttonPanel.reformPanel();
 	}
 	
 	/***
@@ -201,7 +248,7 @@ public class ContentTree extends JPanel
 	
 	public class CCBPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
-		CCButton[] buttons = new CCButton[0];
+		CCButton[][] buttons = new CCButton[0][];
 		
 		CCBPanel() {}
 		
@@ -211,51 +258,63 @@ public class ContentTree extends JPanel
 			Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
 			
 			// Delete the Old Buttons
-			for( CCButton button : buttons) {
-				remove(button);
+			for( CCButton[] row : buttons) {
+				for( CCButton button : row)
+					remove(button);
 			}
 			
-			// Initialize space for New buttons
-			int c = tree.getRowCount();
-			buttons = new CCButton[c];
 			
 			// Construct the skeleton of the layout
 			GroupLayout layout = new GroupLayout(this);
 					
 			GroupLayout.Group hGroup = layout.createParallelGroup();
 			GroupLayout.Group vGroup = layout.createSequentialGroup();
-
-			layout.setHorizontalGroup(
-					layout.createSequentialGroup()
-					.addGap(margin.width)
-					.addGroup( hGroup)
-				);
+			
+			layout.setHorizontalGroup(hGroup);
 			layout.setVerticalGroup(vGroup);
 			
-			// Add each button and set the layout for them as needed
-			int old_y = 0;
-			for( int i = 0; i < c; ++i) {
-				TreePath path = tree.getPathForRow(i);
+			if( buttonsPerRow != 0) {
+				// Initialize space for New buttons
+				int c = tree.getRowCount();
+				buttons = new CCButton[ c][];
 				
-				Rectangle r = tree.getPathBounds(path);
-				int vmargin = Math.max(0,(r.height - size.height) / 2);
 				
-				buttons[i] = new CCButton(path);
-				buttons[i].addActionListener( new ActionListener() {					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						buttonPressed((CCButton)e.getSource());
+				// Add each button and set the layout for them as needed
+				int old_y = 0;
+				for( int i = 0; i < c; ++i) {
+					buttons[i] = new CCButton[buttonsPerRow];
+					TreePath path = tree.getPathForRow(i);
+					
+					Rectangle r = tree.getPathBounds(path);
+					int vmargin = Math.max(0,(r.height - size.height) / 2);
+					
+					GroupLayout.Group innerHGroup = layout.createSequentialGroup();
+					GroupLayout.Group innerVGroup = layout.createParallelGroup();
+					
+					for( int j = 0; j < buttonsPerRow; ++j) {
+						buttons[i][j] = new CCButton(path, j);
+						buttons[i][j].addActionListener( new ActionListener() {					
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								buttonPressed((CCButton)e.getSource());
+							}
+						});
+						buttonCreated(buttons[i][j]);
+//						add( buttons[i][j]);
+						
+						innerHGroup.addGap(margin.width)
+								.addComponent( buttons[i][j], size.width, size.width, size.width);
+						innerVGroup.addComponent(buttons[i][j], size.height, size.height, size.height);
 					}
-				});
-				buttonCreated(buttons[i]);
-				add( buttons[i]);
-				
-				hGroup.addComponent( buttons[i], size.width, size.width, size.width);
-				
-				vGroup.addGap(r.y - old_y + vmargin)
-					.addComponent( buttons[i], size.height, size.height, size.height);
-				
-				old_y = r.y + vmargin + size.height;
+					
+					innerHGroup.addGap(margin.width);
+					
+					hGroup.addGroup(innerHGroup);
+					vGroup.addGap(r.y - old_y + vmargin)
+						.addGroup(innerVGroup);
+					
+					old_y = r.y + vmargin + size.height;
+				}
 			}
 			
 
@@ -273,10 +332,11 @@ public class ContentTree extends JPanel
 	
 	public class CCButton extends JToggleButton {
 		private static final long serialVersionUID = 1L;
-		int rowNum;
+		public final int buttonNum;
 		private TreePath path;
-		public CCButton( TreePath path) {
+		public CCButton( TreePath path, int num) {
 			this.path = path;
+			this.buttonNum = num;
 		}
 		
 		public TreePath getAssosciatedTreePath() {
@@ -529,13 +589,6 @@ public class ContentTree extends JPanel
 	@Override	public void mousePressed(MouseEvent arg0) {	}
 	@Override	public void mouseReleased(MouseEvent arg0) {}
 
-	// :::: TreeSelectionListener
-	@Override
-	public void valueChanged(TreeSelectionEvent arg0) {
-		// This is needed because the selection UI of the linked ButtonPanel 
-		//	has graphics related to the tree's slection that needs to be redrawn
-		repaint();
-	}
 
 	// :::: TreeModelListener
 	@Override	public void treeNodesChanged(TreeModelEvent e) {}
@@ -571,25 +624,39 @@ public class ContentTree extends JPanel
 			}
 		});
 	}
+	
+	// !!! I have no idea why these listeners will only work when put in a separate
+	//	class when all other listeners seem to work just fine when implemented in
+	//	other container classes.
+	public class CCTreeListener implements TreeExpansionListener, TreeSelectionListener {
+		@Override
+		public void valueChanged(TreeSelectionEvent arg0) {
+			// This is needed because the selection UI of the linked ButtonPanel 
+			//	has graphics related to the tree's slection that needs to be redrawn
+			repaint();
+		}
+		
+		@Override
+		public void treeCollapsed(TreeExpansionEvent event) {
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					buttonPanel.reformPanel();
+				}
+			});
+		}
 
-	// :::: TreeExpansionListener
-	@Override
-	public void treeCollapsed(TreeExpansionEvent event) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				buttonPanel.reformPanel();
-			}
-		});
+		@Override
+		public void treeExpanded(TreeExpansionEvent event) {
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					buttonPanel.reformPanel();
+				}
+			});
+		}
+		
 	}
 
-	@Override
-	public void treeExpanded(TreeExpansionEvent event) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				buttonPanel.reformPanel();
-			}
-		});
-	}
+	
 }

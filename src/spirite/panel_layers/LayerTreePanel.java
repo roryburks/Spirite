@@ -2,12 +2,19 @@ package spirite.panel_layers;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.EventObject;
 
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -61,9 +68,11 @@ public class LayerTreePanel extends ContentTree
 		tree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addTreeSelectionListener(this);
 		tree.addTreeExpansionListener(this);
-		this.addKeyListener(this);
-		
 		tree.setEditable(true);
+		
+		this.setButtonsPerRow(2);
+		
+		scrollPane.setAutoscrolls(false);
 		
 	}
 
@@ -151,7 +160,7 @@ public class LayerTreePanel extends ContentTree
 		} catch( ClassCastException e) {}
 	}
     
-	// :::: DDTree
+	// :::: ContentTree
 	@Override
 	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {
 		try {
@@ -187,17 +196,20 @@ public class LayerTreePanel extends ContentTree
 	
 	@Override
 	protected void buttonPressed(CCButton button) {
-		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
-
-		workspace.setNodeVisibility(node,  button.isSelected());
+		if( button.buttonNum == 0) {
+			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
+			
+			workspace.setNodeVisibility(node,  button.isSelected());
+		}
 	}
 	
 	@Override
 	protected void buttonCreated(CCButton button) {
-		GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
-
-		button.setSelected( node.isVisible());
-		
+		if( button.buttonNum == 0) {
+			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
+			
+			button.setSelected( node.isVisible());
+		}
 	}
 
 	// :::: TreeExpansionListener
@@ -253,9 +265,24 @@ public class LayerTreePanel extends ContentTree
 	// KeyListener
 	@Override
 	public void keyPressed(KeyEvent evt) {
-		if( evt.getKeyCode() == KeyEvent.VK_F2 && getSelectedNode() != null) {
+/*		if( evt.getKeyCode() == KeyEvent.VK_F2 && getSelectedNode() != null) {
+			JScrollBar hsb =  scrollPane.getHorizontalScrollBar();
+			
+			final int v = (hsb == null) ? 0: hsb.getValue();
+			SwingUtilities.invokeLater( new Runnable() {					
+				@Override
+				public void run() {
+					JScrollBar hsb =  scrollPane.getHorizontalScrollBar();
+					if( hsb != null) {
+						hsb.setValue(v);
+
+					}
+				}
+			});*/
+
+			System.out.println("TEST");
 			tree.startEditingAtPath(tree.getSelectionPath());
-		}
+//		}
 	}
 
 	@Override	public void keyReleased(KeyEvent arg0) {}
@@ -292,6 +319,9 @@ public class LayerTreePanel extends ContentTree
 		}
 	}
 
+	/***
+	 * Tree Cell Editor
+	 */
 	private class LTPCellEditor extends DefaultTreeCellEditor
 		implements KeyListener 
 	{
