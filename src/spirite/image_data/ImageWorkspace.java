@@ -24,7 +24,6 @@ import spirite.image_data.GroupTree.Node;
  */
 public class ImageWorkspace {
 	private List<ImageData> imageData;
-	private List<Scene> scenes;
 	private GroupTree groups;
 	
 	private GroupTree.Node selected = null;
@@ -42,7 +41,6 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
-		scenes = new ArrayList<Scene>();
 		
 		groups = new GroupTree(this);
 		

@@ -25,7 +25,6 @@ import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
 import spirite.image_data.ImageWorkspace;
-import spirite.panel_anim.AnimPanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
@@ -40,7 +39,6 @@ public class RootFrame extends javax.swing.JFrame
         implements KeyEventDispatcher, WindowFocusListener, ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	private AnimPanel animPanel;
     private PalettePanel palettePanel;
     private ToolsPanel toolsPanel;
     private WorkTabPane workPane;
@@ -66,7 +64,6 @@ public class RootFrame extends javax.swing.JFrame
     private void initComponents() {
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
-    	animPanel = new AnimPanel( master);
     	palettePanel = new PalettePanel( master);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -84,8 +81,7 @@ public class RootFrame extends javax.swing.JFrame
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(workPane, 0, 535, Short.MAX_VALUE)
-                    .addComponent(animPanel, 0, 501, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(workPane, 0, 535, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -104,8 +100,7 @@ public class RootFrame extends javax.swing.JFrame
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(workPane, 0, 340, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(animPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))))
         );
 
         pack();

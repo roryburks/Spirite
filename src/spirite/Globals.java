@@ -62,6 +62,8 @@ public class Globals {
 			{"..-"},
 			{"..Animation Scheme", KeyEvent.VK_S, "frame.showAnimSchemeFrame"},
 			{"..Undo History", KeyEvent.VK_H, "frame.showUndoFrame"},
+			
+			{".Animation View", KeyEvent.VK_A, "frame.showAnimationView"},
 	};
 
     public static Color getColor( String id) {

@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
@@ -135,7 +136,8 @@ public class DrawPanel extends JPanel
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
     	metronome = (metronome + 1) % 16;
-    	context.repaint();
+
+    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
 	}
 	
 	@Override	public void imageChanged() {}

@@ -6,9 +6,11 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
+import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
@@ -74,6 +76,12 @@ public class FrameManager implements WindowListener {
 			addFrame( FrameType.ANIMATION_SCHEME);
 		else if( command.equals("showUndoFrame"))
 			addFrame( FrameType.UNDO);
+		else if(command.equals("showAnimationView")) {
+			JDialog d = new JDialog();
+			d.add(new AnimPanel(master));
+			d.pack();
+			d.setVisible(true);
+		}
 	}
 	
 	// :::: UI-related

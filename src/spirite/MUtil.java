@@ -6,6 +6,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -29,11 +31,30 @@ public class MUtil {
 	public static int high16( int i) {
 		return i >>> 16;
 	}
-	
+
 	public static float cycle( float start, float end, float t) {
 		float diff = end - start;
+		if( diff == 0.0f)
+			return 0.0f;
 		
 		return ((t - start) % diff + diff) % diff + start;
+	}
+	public static int cycle( int start, int end, int t) {
+		int diff = end - start;
+		if( diff == 0)
+			return 0;
+		
+		return ((((t - start) % diff) + diff) % diff) + start;
+	}
+	
+	// ::::
+	public static List<Integer> arrayToList( int arr[]) {
+		List<Integer> list = new ArrayList<>(arr.length);
+		
+		for( int i = 0; i < arr.length; ++i) {
+			list.add(arr[i]);
+		}
+		return list;
 	}
 	
 	// :::: String
