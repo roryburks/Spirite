@@ -2,6 +2,7 @@
 package spirite.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -107,64 +109,36 @@ public class RootFrame extends javax.swing.JFrame
     }                   
 
     
-    public static final int MAX_LEVEL = 10;
-    private int _imCountLevel( String s){
-    	int r = 0;
-    	while( s.charAt(r) == '.')
-    		r++;
-    	return Math.min(r, MAX_LEVEL);
-    }
+
     private void initMenu() {
-    	Object[][] menu_scheme = Globals.getMenuSchem();
+    	final String[][] menuScheme = {
+    			//Name, actionString, icon
+    			{"&File", null, null},
+    			{".&New Image", "global.new_image", null},
+    			{".-"},
+    			{".&Open", "global.open_image", null},
+    			{".-"},
+    			{".&Save", "global.save_image", null},
+    			{".Save &As", "global.save_image_as", null},
+    			{".-"},
+    			{".Debug &Color", "global.debug_color", null},
+    			
+    			{"&Edit", null, null},
+    			
+    			{"&Window", null, null},
+    			{".&Dialogs", null, null},
+    			{"..&Layers", "frame.showLayerFrame", null},
+    			{"..&Tools", "frame.showToolsFrame", null},
+    			{"..-"},
+    			{"..Animation &Scheme", "frame.showAnimSchemeFrame"},
+    			{"..Undo &History", "frame.showUndoFrame"},
+    			
+    			{".&Animation View", "frame.showAnimationView", null},
+    	};
     	
-
     	JMenuBar jMenuBar = new JMenuBar();
-		JMenuItem new_node;
+    	UIUtil.constructMenu(jMenuBar, menuScheme, this);
     	
-    	JMenuItem[] active_root_tree = new JMenuItem[MAX_LEVEL];
-    	
-    	// Atempt to construct menu from parsed data in menu_scheme
-		// !!!! TODO: note, there are very few sanity checks in here for now
-//    	int active_level = 0;
-    	for( int i = 0; i < menu_scheme.length; ++i) {
-    		String title = (String)menu_scheme[i][0];
-    		
-    		
-    		// Determine the depth of the node and crop off the extra .'s
-    		int level =_imCountLevel(title);
-    		title = title.substring(level);
-    		
-    		// If it's - that means it's a separator
-    		if( title.equals("-")) {
-    			((JMenu)active_root_tree[level-1]).addSeparator();
-    			continue;
-    		}
-    		
-    		
-    		// Determine if it needs to be a Menu (which contains other options nested in it)
-    		//	or a plain MenuItem (which doesn't)
-    		if( level != 0 && (i+1 == menu_scheme.length || _imCountLevel((String)menu_scheme[i+1][0]) <= level)) {
-    			new_node = new JMenuItem( title);
-    		}
-    		else {
-    			new_node = new JMenu( title);
-    		}
-    		new_node.setMnemonic((int)menu_scheme[i][1]);
-
-    		if( menu_scheme[i][2] != null) {
-    			new_node.setActionCommand((String)menu_scheme[i][2]);
-    			new_node.addActionListener(  this);
-    		}
-    		
-    		// Add the MenuItem into the appropriate context
-    		if( level == 0) {
-    			jMenuBar.add( new_node);
-    		}
-    		else {
-    			active_root_tree[level-1].add(new_node);
-    		}
-    		active_root_tree[ level] = new_node;
-    	}
     	
 
         setJMenuBar(jMenuBar);

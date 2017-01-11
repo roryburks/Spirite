@@ -4,7 +4,8 @@ package spirite;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
+
+import javax.swing.Icon;
 
 /**
  * The Globals object will centralize all globals that might have reason to
@@ -36,35 +37,7 @@ public class Globals {
     		{"contentTree.buttonSize", new Dimension( 24, 24)},
     		{"contentTree.buttonMargin", new Dimension( 2, 2)},
     };
-    
-	// Each dot before the name indicates the level it should be in.  For example one dot
-	//	means it goes inside the last zero-dot item, two dots means it should go in the last
-	//	one-dot item, etc.
-	// Note, there should never be any reason to skip dots and doing so will probably 
-	//	break it.
-	private static Object[][] menu_scheme = {
-			{"File", KeyEvent.VK_F, null},
-			{".New Image", KeyEvent.VK_N, "global.new_image"},
-			{".-"},
-			{".Open", KeyEvent.VK_O, "global.open_image"},
-			{".-"},
-			{".Save", KeyEvent.VK_S, "global.save_image"},
-			{".Save As", KeyEvent.VK_A, "global.save_image_as"},
-			{".-"},
-			{".Debug Color", KeyEvent.VK_C, "global.debug_color"},
-			
-			{"Edit", KeyEvent.VK_E, null},
-			
-			{"Window", KeyEvent.VK_W, null},
-			{".Dialogs", KeyEvent.VK_D, null},
-			{"..Layers", KeyEvent.VK_L, "frame.showLayerFrame"},
-			{"..Tools", KeyEvent.VK_T, "frame.showToolsFrame"},
-			{"..-"},
-			{"..Animation Scheme", KeyEvent.VK_S, "frame.showAnimSchemeFrame"},
-			{"..Undo History", KeyEvent.VK_H, "frame.showUndoFrame"},
-			
-			{".Animation View", KeyEvent.VK_A, "frame.showAnimationView"},
-	};
+
 
     public static Color getColor( String id) {
         for( int i = 0; i < colors.length; ++i) {
@@ -88,8 +61,8 @@ public class Globals {
         return defaultSize;
     }
     
-    public static Object[][] getMenuSchem() {
-    	return menu_scheme;
-    }
     
+    public static Icon getIcon( String id) {
+    	return null;
+    }
 }
