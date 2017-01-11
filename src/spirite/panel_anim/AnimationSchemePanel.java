@@ -33,7 +33,7 @@ public class AnimationSchemePanel extends JPanel {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(animationSchemeTreePanel, GroupLayout.PREFERRED_SIZE, 448, GroupLayout.PREFERRED_SIZE)
+					.addComponent(animationSchemeTreePanel, 0, 448, Integer.MAX_VALUE)
 					.addContainerGap(77, Short.MAX_VALUE))
 		);
 		setLayout(groupLayout);

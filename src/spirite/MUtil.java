@@ -1,10 +1,14 @@
 package spirite;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
@@ -42,6 +46,38 @@ public class MUtil {
 			return false;
 		
 		return true;
+	}
+	
+	/***
+	 * Called when an overlaying component (such as a GlassPane) eats a mouse event, but
+	 * still wants the components bellow to receive it.
+	 */
+	public static void redispatchMouseEvent( Component reciever, Component container, MouseEvent evt) {
+		Point p = SwingUtilities.convertPoint(reciever, evt.getPoint(), container);
+		
+		if( p.y < 0) { 
+			// Not in component
+		} else {
+			Component toSend = 
+					SwingUtilities.getDeepestComponentAt(container, p.x, p.y);
+			if( toSend != null) {
+				Point convertedPoint = SwingUtilities.convertPoint(container, p, toSend);
+				toSend.dispatchEvent( new MouseEvent(
+						toSend,
+						evt.getID(),
+						evt.getWhen(),
+						evt.getModifiers(),
+						convertedPoint.x,
+						convertedPoint.y,
+						evt.getClickCount(),
+						evt.isPopupTrigger()
+						));
+			}
+			else {
+			}
+		}
+		
+		
 	}
 	
 	/***

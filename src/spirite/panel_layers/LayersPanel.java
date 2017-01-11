@@ -16,10 +16,13 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 public class LayersPanel extends JPanel {
-	private static final long serialVersionUID = 1L;
-
+	// LayersPanel needs Master because various dialogs it creates needs
+	//	access to it.  Consider centralizing that in the Dialogs class
+	//	for better modularity.
 	MasterControl master;
 	
+	private static final long serialVersionUID = 1L;
+
 	LayerTreePanel layerTreePanel;
 	JButton btnNewLayer;
 	JButton btnNewGroup;
@@ -97,7 +100,7 @@ public class LayersPanel extends JPanel {
 			// Add the new layer contextually according to the selected Node
 			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();			
 			
-			ImageWorkspace workspace = master.getCurrentWorkspace();
+			ImageWorkspace workspace = layerTreePanel.workspace;
 			
 			workspace.addNewRig(selected_node, w, h, name, c);
 		}
@@ -106,6 +109,6 @@ public class LayersPanel extends JPanel {
 	private void btnNewGroupPress() {
 		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
 		
-		master.getCurrentWorkspace().addTreeNode(selected_node, "Test");
+		layerTreePanel.workspace.addTreeNode(selected_node, "Test");
 	}
 }

@@ -34,9 +34,11 @@ public class LayerTreePanel extends ContentTree
 	implements MImageObserver, MWorkspaceObserver,
 	 TreeSelectionListener, TreeExpansionListener, KeyListener
 {
-	private static final long serialVersionUID = 1L;
-	MasterControl master;
+	// LayerTreePanel only needs master to add a WorkspaceObserver
+//	MasterControl master;
 	ImageWorkspace workspace;
+	
+	private static final long serialVersionUID = 1L;
 	LTPCellEditor editor;
 	LTPCellRenderer renderer;
 	
@@ -45,8 +47,6 @@ public class LayerTreePanel extends ContentTree
 	public LayerTreePanel( MasterControl master) {
 		super();
 		
-		
-		this.master = master;
 		workspace = master.getCurrentWorkspace();
 		workspace.addImageObserver(this);
 		master.addWorkspaceObserver(this);
@@ -64,7 +64,6 @@ public class LayerTreePanel extends ContentTree
 		this.addKeyListener(this);
 		
 		tree.setEditable(true);
-//		tree.click
 		
 	}
 
@@ -240,10 +239,10 @@ public class LayerTreePanel extends ContentTree
 
 	// :::: WorkspaceObserver
 	@Override
-	public void currentWorkspaceChanged( ImageWorkspace arg0, ImageWorkspace arg1) {
+	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
 		// Remove assosciations with the old Workspace and add ones to the new
 		workspace.removeImageObserver(this);
-		workspace = master.getCurrentWorkspace();
+		workspace = current;
 		workspace.addImageObserver( this);
 		this.constructFromWorkspace();
 	}

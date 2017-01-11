@@ -2,6 +2,11 @@
 
 package spirite;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -17,6 +22,23 @@ public class Main{
     public static MasterControl master;
 
     public static void main(String[] args) {
+    	LinkedList<Integer> sorted = new LinkedList<>();
+    	
+    	ListIterator<Integer> it = sorted.listIterator();
+    	int intArr[] = new int[10];
+    	int i = 0;
+    	
+    	while( it.hasNext()) {
+    		if( intArr[i] > it.next()) {
+    			it.previous();
+    			it.add(i);
+    			it.next();
+    		}
+    	}
+
+        HashMap<Integer,Boolean> map = new HashMap<>();
+        
+        
         try {
             master = new MasterControl();
 

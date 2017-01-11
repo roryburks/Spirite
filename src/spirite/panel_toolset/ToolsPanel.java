@@ -33,13 +33,15 @@ import spirite.brains.ToolsetManager.MToolsetObserver;
 public class ToolsPanel extends JPanel
         implements ComponentListener, MToolsetObserver
 {
+	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
+    MasterControl master;
+    
 	private static final long serialVersionUID = 1L;
 	private static final int BUTTON_WIDTH = 24;
     private static final int BUTTON_HEIGHT = 24;
 
     int tool_len;
 
-    MasterControl master;
 
     BufferedImage icon_sheet = null;
     int is_width, is_height;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.MDebug;
-import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
@@ -56,10 +56,6 @@ public class MasterControl
         drawEngine = new DrawEngine();
         renderEngine = new RenderEngine( this);
         Dialogs.setMaster(this); //// TODO BAD
-        
-//        new
-  //      workspaces.addImageObserver(this);
-    //    workspaces.addImageStructureObserver(this);
     }
 
 
@@ -88,12 +84,18 @@ public class MasterControl
     	return settingsManager;
     }
 
+    /***
+     * Makes the given workspace the currently selected workspace.
+     * 
+     * Note: if the workspace is not already managed by MasterControl it will add it to
+     * 	management, but you should really be using addWorkspace then.
+     */
     public void setCurrentWorkpace( ImageWorkspace workspace) {
     	if( currentWorkspace == workspace)
     		return;
     	
     	if( !workspaces.contains(workspace)) {
-    		MDebug.handleError( ErrorType.STRUCTURAL, this, "Tried to assign current workspace to a workspace that MasterControl isn't tracking.");
+    		MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to assign current workspace to a workspace that MasterControl isn't tracking.");
     		
     		addWorkpace(workspace, false);
     	}
@@ -123,7 +125,6 @@ public class MasterControl
     // ==== Image Managements
     public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
     public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
-//    	image_manager.newImage(width, height, color);
     	ImageWorkspace ws = new ImageWorkspace();
     	ws.newRig(width, height, "Background", color);
     	
@@ -153,6 +154,8 @@ public class MasterControl
     	for( MWorkspaceObserver obs : workspaceObservers) {
     		obs.currentWorkspaceChanged(selected, previous);
     	}
+    	triggerImageStructureRefresh();
+    	triggerImageRefresh();
     }
     private void triggerNewWorkspace(ImageWorkspace added) {
     	for( MWorkspaceObserver obs : workspaceObservers) {
@@ -209,7 +212,6 @@ public class MasterControl
 	public void structureChanged(StructureChange evt) {
 		triggerImageStructureRefresh();
 	}
-
 
 	@Override
 	public void imageChanged() {

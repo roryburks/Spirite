@@ -38,7 +38,6 @@ public class NewLayerDPanel extends JPanel {
 	private JLabel lblColorT;
 	private JLabel lblColorSelect;
 	
-	private MasterControl master;
 	private Border b_selected;
 	private Border b_unselected;
 	private Font f_selected;
@@ -51,7 +50,6 @@ public class NewLayerDPanel extends JPanel {
 
 
 	public NewLayerDPanel( MasterControl master) {
-		this.master = master;
 		ImageWorkspace image = master.getCurrentWorkspace();
 
 		b_selected = new BevelBorder(BevelBorder.RAISED, Color.BLACK, Color.WHITE, Color.WHITE, Color.BLACK);

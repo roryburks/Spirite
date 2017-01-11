@@ -19,12 +19,13 @@ import spirite.dialogs.Dialogs;
 public class PalettePanel extends JPanel 
         implements MouseListener, MPaletteObserver
 {
+	// PalettePanel only needs access to PaletteManager
+    MasterControl master;
+    PaletteManager paletteManager;
+    
 	private static final long serialVersionUID = 1L;
 	final static int BIG_SIZE = 20;
     final static int SMALL_SIZE = 12;
-
-    MasterControl master;
-    PaletteManager palette_manager;
 
     ColorPicker main, sub;
     JScrollPane container;
@@ -33,11 +34,11 @@ public class PalettePanel extends JPanel
     public PalettePanel(){}
     public PalettePanel( MasterControl master) {
         this.master = master;
-        palette_manager = master.getPaletteManager();
+        paletteManager = master.getPaletteManager();
 
         initComponents();
 
-        master.getPaletteManager().addPaletteObserver(this);
+        paletteManager.addPaletteObserver(this);
 
   //      this.add( new JButton());
     }
@@ -59,9 +60,6 @@ public class PalettePanel extends JPanel
         container = new JScrollPane(palette, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         container.getHorizontalScrollBar().setPreferredSize(new Dimension(5, 0));
         
-
-//        palette.setPreferredSize( new Dimension( 50,999));
-//        palette.setBackground(Color.red);
 
         layout.setHorizontalGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
@@ -93,22 +91,9 @@ public class PalettePanel extends JPanel
     // :: MPaletteObserver
     @Override
     public void colorChanged() {
-        main.setBackground( palette_manager.getActiveColor(0));
-        sub.setBackground( palette_manager.getActiveColor(1));
+        main.setBackground( paletteManager.getActiveColor(0));
+        sub.setBackground( paletteManager.getActiveColor(1));
         repaint();
-/*        if( index == 0) {
-            main.setBackground( master.getColor(index));
-            main.repaint();
-        }
-        if( index == 1) {
-            sub.setBackground( master.getColor(index));
-            sub.repaint();
-            // Needed so that the foreground color appears in front of the background
-            main.repaint();
-        }
-        else {
-            palette.repaintIndex(index);
-        }*/
     }
 
     // :: MouseEventListener
@@ -125,22 +110,22 @@ public class PalettePanel extends JPanel
             Color c = Dialogs.pickColor();
 
             if( c != null)
-                palette_manager.setPaletteColor(((ColorPicker)source).index, c);
+                paletteManager.setPaletteColor(((ColorPicker)source).index, c);
         }
         if( source == palette) {
-            int count = master.getPaletteManager().getPaletteColorCount();
+            int count = paletteManager.getPaletteColorCount();
             int index = palette.getIndexAt(e.getX(), e.getY());
 
             if( index >= 0 && index < count) {
                 if( e.getClickCount() == 1) {
-                	palette_manager.setActiveColor(dest_color, palette_manager.getPaletteColor(index));
+                	paletteManager.setActiveColor(dest_color, paletteManager.getPaletteColor(index));
                 }
                 else if( e.getClickCount() == 2){
                     Color c = Dialogs.pickColor();
 
                     if( c != null) {
-                    	palette_manager.setPaletteColor(index,  c);
-                    	palette_manager.setActiveColor(0, c);
+                    	paletteManager.setPaletteColor(index,  c);
+                    	paletteManager.setActiveColor(0, c);
                     }
                 }
             }
@@ -159,7 +144,7 @@ public class PalettePanel extends JPanel
             this.index = index;
             this.setBorder( new EtchedBorder(EtchedBorder.LOWERED));
             this.setPreferredSize( new Dimension( 24,24));
-            this.setBackground( palette_manager.getActiveColor(index));
+            this.setBackground( paletteManager.getActiveColor(index));
 
         }
     }
@@ -186,16 +171,16 @@ public class PalettePanel extends JPanel
 
         @Override
         public void paint( Graphics g) {
-            Color selected1 = palette_manager.getActiveColor(0);
-            Color selected2 = palette_manager.getActiveColor(1);
+            Color selected1 = paletteManager.getActiveColor(0);
+            Color selected2 = paletteManager.getActiveColor(1);
 
-            int count = palette_manager.getPaletteColorCount();
+            int count = paletteManager.getPaletteColorCount();
             int w = Math.max(1, this.getWidth() / SMALL_SIZE);
             int ix = 0;
             int iy = 0;
 
             for( int i = 0; i < count; ++i) {
-                Color c = palette_manager.getPaletteColor(i);
+                Color c = paletteManager.getPaletteColor(i);
                 g.setColor(c);
                 g.fillRect(ix*SMALL_SIZE + 1, iy*SMALL_SIZE + 1, SMALL_SIZE-1, SMALL_SIZE-1);
 

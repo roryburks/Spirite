@@ -31,6 +31,11 @@ import spirite.brains.MasterControl;
  * 	 should be set to the values 0,0.  With the scroll at 1,1, then the point in the top
  * 	 left corner would be <10,10> (with SCROLL_RATIO of 10), meaning the image is drawn
  * 	 with offset <-10,-10>
+ * 
+ * TODO: The various conversions to and from screen coordinates and image coordinate
+ *   cause a little drift in things like auto-centering the image.  The things that
+ *   absolutely must be pixel perfect (in particular drawing) have been ironed down, 
+ *   but a lot of the little UI pieces have off-by-two-or-three errors here and there.
  *
  * @author Rory Burks
  */
@@ -55,6 +60,7 @@ public class WorkPanel extends javax.swing.JPanel
 
     int offsetx, offsety;
 
+    // WorkPanel needs Master because some of its components need it
     MasterControl master;
     ImageWorkspace workspace;
 
@@ -72,9 +78,7 @@ public class WorkPanel extends javax.swing.JPanel
 
 
 
-        System.out.println("1");
 		calibrateScrolls();
-        System.out.println("2");
 
 		center.x = workspace.getWidth() / 2;
 		center.y = workspace.getHeight() / 2;
@@ -136,8 +140,8 @@ public class WorkPanel extends javax.swing.JPanel
     int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
     int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
     int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
-    // ::: Internal
 
+    // ::: Internal
     /***
      * Calibrates the Scrollbars to the correct minimum and maximum value
      * such that you can scroll around the entire image +/- the width of the
@@ -188,10 +192,8 @@ public class WorkPanel extends javax.swing.JPanel
         int px = Math.round(x*zoom - workSplicePanel.getWidth()/2.0f);
         int py = Math.round(y*zoom - workSplicePanel.getHeight()/2.0f);
 
-        System.out.println("Aleph");
         jscrollHorizontal.setValue( Math.round(px / (float)ratio));
         jscrollVertical.setValue(( Math.round(py / (float)ratio)));
-        System.out.println("Bet");
         
         center.x = x;
         center.y = y;
@@ -263,7 +265,7 @@ public class WorkPanel extends javax.swing.JPanel
 	}
 
 
-    // :::: Adjustment Listener
+    // :::: AdjustmentListener
     @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
         if( e.getSource() == jscrollHorizontal) {
@@ -281,7 +283,7 @@ public class WorkPanel extends javax.swing.JPanel
         
     }
 
-    // :::: Component Listener
+    // :::: ComponentListener
     @Override
     public void componentResized(ComponentEvent e) {
         this.calibrateScrolls();

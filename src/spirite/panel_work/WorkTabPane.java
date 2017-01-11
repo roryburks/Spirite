@@ -25,6 +25,7 @@ public class WorkTabPane extends JTabbedPane
 		master.addWorkspaceObserver(this);
 		
 		this.addChangeListener(this);
+		
 	}
 	
 	

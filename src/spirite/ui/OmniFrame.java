@@ -17,9 +17,18 @@ import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +41,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import spirite.MDebug.WarningType;
+import spirite.MDebug;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager.FrameType;
+import spirite.ui.OmniFrame.OmniContainer;
 
 public class OmniFrame extends JDialog
 {	
@@ -58,9 +71,29 @@ public class OmniFrame extends JDialog
 	
 	public OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
+		initComponents();
+		
+		// Create the panel of the given type
+		addPanel( type);	
+		
+	}
+	
+	public OmniFrame(MasterControl master, OmniContainer container) {
+		this.master = master;
+		initComponents();
+		
+		addContainer(container, -1);
+	}
 
+	private void initComponents() {
 		root = new OmniTabbedFrame();
 		root.setTabPlacement(JTabbedPane.TOP);
+		root.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		//root.addMouseListener(this);
+		
+		//getGlassPane().setVisible(true);
+		//getGlassPane().addMouseListener(this);
+		//getGlassPane().addMouseMotionListener(this);;
 		
 		//
 		transferHandler = new OFTransferHandler(this);
@@ -68,10 +101,6 @@ public class OmniFrame extends JDialog
 		
 		// Create TabbedPane
 		this.add( root);
-
-		
-		// Create the panel of the given type
-		addPanel( type);	
 		
 	}
 	
@@ -92,20 +121,20 @@ public class OmniFrame extends JDialog
 
 			switch( dragMode) {
 			case DRAG_INTO_TAB:
-				if( dragTab == -1) {
-					g.drawRect(0, 0, getWidth()-1, getHeight()-1);
-				}
-				else {
-					
-					Rectangle r = root.getTabComponentAt(dragTab).getBounds();
-					
-	                Graphics2D g2 = (Graphics2D) g;
-	                Stroke oldStroke = g2.getStroke();
-					g2.setColor( Color.BLACK);
-					g2.setStroke( new BasicStroke(3));
-					g2.drawRect( r.x, r.y, r.width, r.height);
-					g2.setStroke( oldStroke);
-				}
+				Rectangle r = root.getBoundsAt(dragTab);
+				
+                Graphics2D g2 = (Graphics2D) g;
+                Stroke oldStroke = g2.getStroke();
+				g2.setColor( Color.BLACK);
+				g2.setStroke( new BasicStroke(3));
+				g2.drawRect( r.x, r.y, r.width, r.height);
+				g2.setStroke( oldStroke);
+				break;
+			case DRAG_INTO_CONTENT:
+				g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+				break;
+			default:
+				break;
 			}
 			
 		}
@@ -120,7 +149,7 @@ public class OmniFrame extends JDialog
 		
 		if( panel == null) return;
 		
-		root.addTab("Test", panel);
+		root.addTab("tab", panel);
 		
 		OmniBar bar = new OmniBar( type.getName());
 		root.setTabComponentAt(root.getTabCount()-1, bar);
@@ -154,21 +183,55 @@ public class OmniFrame extends JDialog
 		return false;
 	}
 	
+	// :::: OmniFrame-to-Omniframe Panel Docking methods
+	private void removeContainer( OmniContainer toRemove) {
+		int index = containers.indexOf( toRemove);
+		if( index == -1) {
+			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Tried to remove a OmniTab that doesn't exist.");
+			return;
+		}
+		
+		root.remove(index);
+		containers.remove(index);
+		transferHandler.refreshGestureRecognizers();
+		
+		// If this OmniFrame holds no other tabs, remove it
+		if( containers.size() == 0) {
+			this.dispose();
+		}
+	}
+	private void addContainer( OmniContainer toAdd, int index) {
+		if( index == -1) {
+			root.add(toAdd.panel);
+			containers.add(toAdd);
+			index = containers.size()-1;
+		}
+		else {
+			root.add(toAdd.panel, index);
+			containers.add(index,toAdd);
+		}
+		toAdd.bar = new OmniBar( toAdd.type.getName());
+		root.setTabComponentAt(index, toAdd.bar);
+		root.setSelectedIndex(index);
+		transferHandler.refreshGestureRecognizers();
+	}
 	
+	
+	/***
+	 * Custom Tab
+	 */
 	public class OmniBar extends JPanel implements MouseListener {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
+		
+		JLabel label;
 		public OmniBar( String title) {
-			add( new JLabel(title));
+			label = new JLabel(title);
+			add( label);
 			this.setOpaque(false);
 			addMouseListener(this);
 		}
 
-		/***
-		 * Required so that the custom tab component behaves like a tab.
-		 */
+		// Required so that the custom tab component behaves like a tab.
 		@Override
 		public void mouseClicked(MouseEvent evt) {
 			if( evt.getButton() == MouseEvent.BUTTON1) {
@@ -183,15 +246,18 @@ public class OmniFrame extends JDialog
 				
 			}
 		}
-
 		@Override		public void mouseEntered(MouseEvent e) {}
 		@Override		public void mouseExited(MouseEvent e) {}
 		@Override		public void mousePressed(MouseEvent e) {}
 		@Override		public void mouseReleased(MouseEvent e) {}
 	}
-	private class OmniContainer {
+	
+	static class OmniContainer {
 		JPanel panel;
-		OmniBar bar;
+		OmniBar bar;	// It's possible that this shouldn't be here.  It helps
+						//  simplify some internal code, but it is tied closely to
+						//  the particular OmniFrame that it is currently housed
+						//  in whereas the OmniContainer class is more abstract
 		FrameType type;
 		
 		OmniContainer( JPanel panel, OmniBar bar, FrameType type) {
@@ -211,7 +277,7 @@ public class OmniFrame extends JDialog
 		
 		OFTransferable( OmniFrame parent, OmniContainer container) {
 			this.parent = parent;
-			this.panel = panel;
+			this.panel = container;
 		}
 		
 		@Override
@@ -241,21 +307,20 @@ public class OmniFrame extends JDialog
 	 *  OmniPanels
 	 */
 	protected class OFTransferHandler extends TransferHandler 
-		implements DragGestureListener
+		implements DragGestureListener, DragSourceListener
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		protected DragSource dragSource;
 		protected List<DragGestureRecognizer> dgrs = new ArrayList<>();
 		protected DropTarget dropTarget;
 		private OmniFrame context;
+		private OmniContainer dragging = null;	// Used only for dragging a container out of a frame
 		
 		public OFTransferHandler(OmniFrame context) {
 			this.context = context;
 			dragSource = DragSource.getDefaultDragSource();
 		}
+		
 		
 		/**
 		 * Called when the tab structure changed, removes all existing
@@ -284,46 +349,35 @@ public class OmniFrame extends JDialog
 		@Override		public Transferable createTransferable( JComponent c) {	return null;}
 		@Override 		public void exportDone( JComponent c, Transferable t, int action) {}
 		
+		
 		// :::: Import
 		@Override
 		public boolean canImport( TransferSupport support) {
 			for( DataFlavor df : support.getDataFlavors()) {
 				if( df == FLAVOR) {
+					Point p = support.getDropLocation().getDropPoint();
 					
-					Component c = root.getComponentAt( support.getDropLocation().getDropPoint());
+					int tabIndex = -1;
 					
-					
-					// !!!! Note: This is very ugly and I'm not sure that this is guarenteed
-					//	to work in all Java implementations past and pressent, but 
-					//	since JTabbedPane lacks any "getTabContainer" option or similar
-					//	this is what I have to do
-					if( c == containers.get(0).bar.getParent()) {
-						// Determine which (if any) tab you're hovered over
-						Point p = SwingUtilities.convertPoint(
-								root, 
-								support.getDropLocation().getDropPoint(), 
-								c);
-						
-						Component tab = c.getComponentAt(p);
-						
-						
-
-						dragMode = DragMode.DRAG_INTO_TAB;
-						
-						// Determine which tab is being dragged over
-						int i = 0;
-						int cnt = root.getTabCount();
-						dragTab = -1;
-						for( i = 0; i < cnt; ++i) {
-							if( tab == root.getTabComponentAt(i)) {
-								dragTab = i;
-							}
+					// Step 1: Determine which, if any tab you're hovering over
+					for( int i = 0; i < root.getTabCount(); ++i) {
+						Rectangle rect = root.getBoundsAt(i);
+						if( rect.contains(p)) {
+							tabIndex = i;
+							break;
 						}
-						
-						root.repaint();
-						return true;
 					}
-
+					
+					if( tabIndex == -1) {
+						dragMode = DragMode.DRAG_INTO_CONTENT;
+					}
+					else {
+						dragMode = DragMode.DRAG_INTO_TAB;
+					}
+					dragTab = tabIndex;
+					
+					root.repaint();
+					return true;
 				}
 			}
 			
@@ -333,15 +387,27 @@ public class OmniFrame extends JDialog
 		
 		@Override
 		public boolean importData( TransferSupport support) {
-			dragMode = DragMode.NOT_DRAGGING;
-			root.repaint();
-			return true;
+			
+			try {
+				OFTransferable trans = 
+						(OFTransferable)support.getTransferable().getTransferData(FLAVOR);
+
+				trans.parent.removeContainer( trans.panel);
+				addContainer(trans.panel, dragTab);
+				
+				dragMode = DragMode.NOT_DRAGGING;
+				root.repaint();
+				return true;
+			} catch (UnsupportedFlavorException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
 		}
 
 		// :::: DragGestureListener
 		@Override
 		public void dragGestureRecognized(DragGestureEvent evt) {
-			
 			// Determine which component is being Dragged (all registerred components
 			//	should be OmniBars and if they're not this object wouldn't know what
 			//	to do with them anyway)
@@ -349,7 +415,7 @@ public class OmniFrame extends JDialog
 				if( evt.getComponent() == container.bar) {					
 					OFTransferable oftrans = new OFTransferable( context, container);
 					Transferable trans = (Transferable)oftrans;
-					
+					dragging = container;
 
 					// Set the cursor and start the drag action
 					Cursor cursor = DragSource.DefaultMoveDrop;
@@ -366,10 +432,35 @@ public class OmniFrame extends JDialog
 							master.getRenderEngine().renderImage( set),
 							new Point(10,10), 
 							trans, 
-							null);
+							this);
 				}
 			}
 			
 		}
+
+		// DragSourceListener
+		@Override		public void dragDropEnd(DragSourceDropEvent evt) {
+			// Drag out of current frame
+			if( evt.getDropAction() == TransferHandler.NONE && containers.contains(dragging)) {
+				if( containers.size() > 1) {
+					FrameManager fm = master.getFrameManager();
+					removeContainer(dragging);
+					fm.containerToFrame(dragging, evt.getLocation());
+				}
+			}
+			dragging = null;
+		}
+		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
+		@Override		public void dragOver(DragSourceDragEvent arg0) {}
+		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
+		@Override
+		public void dragExit(DragSourceEvent arg0) {
+			if( dragMode != DragMode.NOT_DRAGGING) {
+				dragMode = DragMode.NOT_DRAGGING;
+				root.repaint();
+			}
+		}
+
+
 	}
 }

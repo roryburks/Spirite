@@ -93,13 +93,13 @@ public class SaveEngine {
 		if( node instanceof GroupTree.GroupNode) {
 			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
 			
-			// [1] : Depath of Node in GroupTree
+			// [1] : Depth of Node in GroupTree
 			ra.write( depth);
 			// [1] : Node Type ID
 			ra.write( SaveLoadUtil.NODE_GROUP);
 
 			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8(gnode.getName()));
+			ra.write( SaveLoadUtil.strToByteArrayUTF8(gnode.getName()));
 			
 			// Go through each of the Group Node's children recursively and save them
 			for( GroupTree.Node child : node.getChildren()) {
@@ -123,7 +123,7 @@ public class SaveEngine {
 			ra.writeInt( data.getID());
 			
 			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToNullTerminatedByteUTF8( rnode.getName()));
+			ra.write( SaveLoadUtil.strToByteArrayUTF8( rnode.getName()));
 		}
 		else {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Unknown GroupTree Node type on saving.");

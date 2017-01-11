@@ -40,9 +40,12 @@ public class UndoPanel extends JPanel
 	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener,
 	MWorkspaceObserver
 {
+	// UndoPanel needs Master because it needs to add a WorkspaceObserver.
+	//	It's possible that it shouldn't be storing Master
+	MasterControl master;
+	
 	private static final long serialVersionUID = 1L;
 	JScrollPane container;
-	MasterControl master;
 	JList<UndoIndex> list;
 	DefaultListModel<UndoIndex> model;
 	UndoEngine engine;

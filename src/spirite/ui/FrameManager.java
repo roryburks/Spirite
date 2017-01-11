@@ -13,6 +13,7 @@ import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_toolset.UndoPanel;
+import spirite.ui.OmniFrame.OmniContainer;
 
 public class FrameManager implements WindowListener {
 	private MasterControl master;
@@ -27,7 +28,7 @@ public class FrameManager implements WindowListener {
 		BAD (""),
 		LAYER ("Layers"),
 		TOOLS ("Toolset"),
-		ANIMATION_SCHEME ("Animation Scheme"),
+		ANIMATION_SCHEME ("Anim"),
 		UNDO("Undo History"),
 		;
 		
@@ -99,18 +100,18 @@ public class FrameManager implements WindowListener {
 		}
 		
 		// Next create the container frame and show it
-		OmniFrame container = new OmniFrame( master, frameType);
+		OmniFrame omniFrame = new OmniFrame( master, frameType);
 		
-		container.pack();
+		omniFrame.pack();
 		
 		if( root != null) {
 			Point p = root.getLocationOnScreen();
-			container.setLocation( p.x + root.getWidth(), p.y);
+			omniFrame.setLocation( p.x + root.getWidth(), p.y);
 		}
 		
-		container.setVisible(true);
-		container.addWindowListener(this);
-		frames.add(container);
+		omniFrame.setVisible(true);
+		omniFrame.addWindowListener(this);
+		frames.add(omniFrame);
 	}
 	
 	/***
@@ -121,6 +122,28 @@ public class FrameManager implements WindowListener {
 			frame.toFront();
 		}
 	}
+	
+	/***
+	 * Constructs a new frame from an already-constructed OmniContainer Panel
+	 * 
+	 * This has package scope because OmniFrame should be the only one that ever 
+	 * needs to call it.
+	 */
+	void containerToFrame( OmniContainer container, Point locationOnScreen) {
+		OmniFrame frame = new OmniFrame( master, container);
+		frame.pack();
+		
+		// Offset the frame from the mouse coordinates to approximate the tab 
+		//	(rather than window top-left) being where you drop it
+		//	!!!! could be better if you really want to go through the pain of calculating system metrics
+		locationOnScreen.x -= 10;
+		locationOnScreen.y -= 40;
+		frame.setLocation(locationOnScreen );
+		frame.setVisible(true);
+		frame.addWindowListener( this);
+		frames.add(frame);
+	}
+	
 	
 	// :::: WindowListener
 	@Override	public void windowClosing(WindowEvent evt) {

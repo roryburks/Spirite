@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 /***
  * A container for various Utility functions for files IO
  * 
+ * 
+ * 
  * @author Rory Burks
  *
  */
@@ -21,7 +23,7 @@ public class SaveLoadUtil {
 	 * Converts a string to a Null-Terminated byte array using
 	 * UTF-8 charset
 	 */
-	public static byte[] strToNullTerminatedByteUTF8( String str) 
+	public static byte[] strToByteArrayUTF8( String str) 
 			throws UnsupportedEncodingException
 	{
 		byte b[] = (str + "\0").getBytes("UTF-8");
