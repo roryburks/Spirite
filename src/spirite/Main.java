@@ -22,24 +22,7 @@ public class Main{
     public static MasterControl master;
 
     public static void main(String[] args) {
-    	LinkedList<Integer> sorted = new LinkedList<>();
-    	
-    	ListIterator<Integer> it = sorted.listIterator();
-    	int intArr[] = new int[10];
-    	int i = 0;
-    	
-    	while( it.hasNext()) {
-    		if( intArr[i] > it.next()) {
-    			it.previous();
-    			it.add(i);
-    			it.next();
-    		}
-    	}
-
-        HashMap<Integer,Boolean> map = new HashMap<>();
-        
-        
-        try {
+    	try {
             master = new MasterControl();
 
             setLookAndFeel();
