@@ -1,6 +1,9 @@
 package spirite.image_data;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,11 +56,21 @@ public class RenderEngine
 			
 			image = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics g = image.getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
 	
 			for( LayerNode layer : drawing_queue) {
 				// !!!! TODO Very Debug
-				if( layer.getImageData() != null)
-					g.drawImage(layer.getImageData().getData(), 0, 0, null);
+				if( layer.getImageData() != null) {
+					if( layer.alpha != 1.0f) {
+						Composite cc = g2.getComposite();
+						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.alpha));
+						g2.drawImage(layer.getImageData().getData(), 0, 0, null);
+						g2.setComposite(cc);
+						
+					}
+					else
+						g.drawImage(layer.getImageData().getData(), 0, 0, null);
+				}
 			}
 			
 			Cache c = new Cache();

@@ -1,6 +1,9 @@
 package spirite.ui;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -22,6 +25,13 @@ import javax.swing.tree.TreePath;
 
 public class UIUtil {
 
+	public static void drawStringCenter( Graphics g, String text, Rectangle rect) {
+		FontMetrics fm = g.getFontMetrics();
+		int dx = (rect.width - fm.stringWidth(text))/2;
+		int dy = (rect.height - fm.getHeight())/2 + fm.getAscent();
+		g.drawString(text, dx, dy);
+	}
+	
 	/***
 	 * Expands all nodes in the tree, assumes they are using 
 	 * DefaultMutableTreeNode form.  If it doesn't, it won't work

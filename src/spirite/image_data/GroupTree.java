@@ -81,7 +81,7 @@ public class GroupTree {
 	public abstract class Node  {
 		// !!!! TODO : Various attributes (such as opacity) that apply to the group
 		//	or the Node (without altering them) should go here
-		protected float alpha;
+		protected float alpha = 1.0f;
 		protected boolean visible = true;
 		protected boolean expanded = true;
 		protected String name = "";
@@ -130,6 +130,9 @@ public class GroupTree {
 				this.visible = visible;
 			}
 			
+		}
+		public float getAlpha() {
+			return alpha;
 		}
 		public boolean isExpanded() {
 			return expanded;

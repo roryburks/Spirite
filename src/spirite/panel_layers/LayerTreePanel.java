@@ -51,6 +51,7 @@ public class LayerTreePanel extends ContentTree
 	// LayerTreePanel only needs master to add a WorkspaceObserver
 //	MasterControl master;
 	ImageWorkspace workspace;
+	LayersPanel context;
 	
 	private static final long serialVersionUID = 1L;
 	LTPCellEditor editor;
@@ -58,8 +59,9 @@ public class LayerTreePanel extends ContentTree
 	
 
 	// :::: Initialize
-	public LayerTreePanel( MasterControl master) {
+	public LayerTreePanel( MasterControl master, LayersPanel context) {
 		super();
+		this.context = context;
 		
 		// Add Observers
 		workspace = master.getCurrentWorkspace();
@@ -157,7 +159,7 @@ public class LayerTreePanel extends ContentTree
 
 		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
 		
-		repaint();
+//		repaint();	// Not really necessary since nodeStructureChanged should handle it
 		
 		dragManager.stopDragging();
 	}
@@ -330,6 +332,8 @@ public class LayerTreePanel extends ContentTree
 		workspace.setSelectedNode(node);
 		
 		// !!! TODO Debug: this shouldn't need to be here (it should just be in ContentTree)
+		
+		context.opacitySlider.repaint();
 		repaint();
 		
 	}

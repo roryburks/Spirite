@@ -54,6 +54,12 @@ public class UndoEngine {
 	ListIterator<UndoContext> queuePosition = null;
 	final ImageWorkspace workspace;
 	
+	UndoAction getMostRecentAction() {
+		if( queue.size() == 0)
+			return null;
+		return queue.getLast().getLast();
+	}
+	
 	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
 		contexts.add( new NullContext());
@@ -264,6 +270,7 @@ public class UndoEngine {
 
 		abstract void startIterate();
 		abstract UndoAction iterateNext();
+		abstract UndoAction getLast();
 		
 		abstract boolean isEmpty();
 	}
@@ -365,6 +372,15 @@ public class UndoEngine {
 		boolean isEmpty() {
 			return actions.isEmpty();
 		}
+
+
+		@Override
+		UndoAction getLast() {
+			if( actions.isEmpty())
+				return null;
+			else
+				return actions.get(actions.size()-1);
+		}
 	}
 	
 	/***
@@ -448,6 +464,14 @@ public class UndoEngine {
 		@Override
 		boolean isEmpty() {
 			return actions.isEmpty();
+		}
+
+		@Override
+		UndoAction getLast() {
+			if( actions.isEmpty())
+				return null;
+			else
+				return actions.getLast();
 		}
 	}
 	

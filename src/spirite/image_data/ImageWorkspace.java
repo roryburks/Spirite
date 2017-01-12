@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.Color;
+import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -13,6 +14,8 @@ import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.UndoEngine.StructureAction;
+import spirite.image_data.UndoEngine.UndoAction;
 
 
 /***
@@ -323,8 +326,34 @@ public class ImageWorkspace {
 	}
 	
 	public void setNodeVisibility( Node node, boolean visible) {
-		if( node.isVisible() != visible) {
-			executeChange( new VisbilityChange(node, visible));
+		if( nodeInWorkspace(node) && node.isVisible() != visible) {
+			executeChange( new VisibilityChange(node, visible));
+		}
+	}
+	public void setNodeAlpha( Node node, float alpha) {
+		if( nodeInWorkspace(node) && node.alpha != alpha) {
+			
+			// Since UI components might update alpha faster than is practical
+			//	to store, if the last undoAction is a AlphaChange action,
+			//	make it eat this action
+			if( undoEngine.getQueuePosition() == undoEngine.queue.size()) {
+				UndoAction action = undoEngine.getMostRecentAction();
+				
+				if( action instanceof StructureAction) {
+					StructureAction saction = (StructureAction)action;
+					
+					if( saction.change instanceof OpacityChange) {
+						OpacityChange change = (OpacityChange)saction.change;
+						
+						change.opacityAfter = alpha;
+						node.alpha = alpha;
+						triggerImageRefresh();
+						return;
+					}
+				}
+			}
+			
+			executeChange( new OpacityChange(node, alpha));
 		}
 	}
 
@@ -468,24 +497,48 @@ public class ImageWorkspace {
 		}
 		
 	}
-	public class VisbilityChange extends StructureChange {
+	public class VisibilityChange extends StructureChange {
 		public final boolean visibleAfter;
 		public final Node node;
 		
-		VisbilityChange( Node node, boolean visible) {
+		VisibilityChange( Node node, boolean visible) {
 			this.node = node;
 			this.visibleAfter = visible;
-			this.description = "Visibility Change";
+			
+			this.description = "Visibility Changed";
 		}
 
 		@Override
 		public void execute() {
-			node.setVisible(visibleAfter);
+			node.visible = visibleAfter;
 		}
 
 		@Override
 		public void unexecute() {
-			node.setVisible(!visibleAfter);
+			node.visible = !visibleAfter;
+		}
+	}
+	public class OpacityChange extends StructureChange {
+		float opacityBefore;
+		float opacityAfter;
+		public final Node node;
+		
+		OpacityChange( Node node, float opacity) {
+			this.node = node;
+			this.opacityBefore = node.alpha;
+			this.opacityAfter = opacity;
+			
+			this.description = "Opacity Changed";
+		}
+
+		@Override
+		public void execute() {
+			node.alpha = opacityAfter;
+		}
+
+		@Override
+		public void unexecute() {
+			node.alpha = opacityBefore;
 		}
 	}
 	
