@@ -321,7 +321,7 @@ public class UndoEngine {
 				actions.get(i).performAction(image);
 			}
 			
-			workspace.refreshImage();
+			workspace.triggerImageRefresh();
 		}
 
 		@Override
@@ -334,7 +334,7 @@ public class UndoEngine {
 			for( int i = 0; i < met; ++i) {
 				actions.get(i).performAction(image);
 			}
-			workspace.refreshImage();
+			workspace.triggerImageRefresh();
 		}
 		
 		/***

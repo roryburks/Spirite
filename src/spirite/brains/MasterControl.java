@@ -126,7 +126,7 @@ public class MasterControl
     public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
     public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
     	ImageWorkspace ws = new ImageWorkspace();
-    	ws.newRig(width, height, "Background", color);
+    	ws.newLayer(width, height, "Background", color);
     	
     	workspaces.add( ws);
     	ws.addImageObserver( this);

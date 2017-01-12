@@ -146,7 +146,7 @@ public class Penner
 			strokeEngine = master.getDrawEngine().createStrokeEngine( data);
 			
 			if( strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y))) {
-				workspace.refreshImage();
+				workspace.triggerImageRefresh();
 			}
 			state = STATE.DRAWING;
 		}

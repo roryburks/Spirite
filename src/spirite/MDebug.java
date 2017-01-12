@@ -9,6 +9,8 @@ import javax.swing.JOptionPane;
  */
 public class MDebug {
 	
+	public static final boolean DEBUG = true;
+	
 	public static enum ErrorType {
 		FILE,
 		// Something being made that is either too big or too small

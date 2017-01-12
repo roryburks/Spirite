@@ -177,12 +177,12 @@ public class LoadEngine {
 			if( layer == 0) {}
 			else {
 				if( type == SaveLoadUtil.NODE_GROUP) {
-					nodeLayer[layer] = workspace.addTreeNode( nodeLayer[layer-1], name);
+					nodeLayer[layer] = workspace.addGroupNode( nodeLayer[layer-1], name);
 					nodeLayer[layer].setExpanded(true);
 				}
 				if( type == SaveLoadUtil.NODE_LAYER) {
 					// !!!! TODO DEBUG
-					workspace.addNewRig( nodeLayer[layer-1], identifier, name);
+					workspace.addNewLayer( nodeLayer[layer-1], identifier, name);
 				}
 			}
 		}

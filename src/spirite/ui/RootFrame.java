@@ -243,7 +243,7 @@ public class RootFrame extends javax.swing.JFrame
         	ImageWorkspace workspace = master.getCurrentWorkspace();
         	if( workspace != null) {
         		workspace.setSelectedNode(
-        			workspace.addNewRig( 
+        			workspace.addNewLayer( 
         				workspace.getSelectedNode(), 
         				workspace.getWidth(), 
         				workspace.getHeight(), 

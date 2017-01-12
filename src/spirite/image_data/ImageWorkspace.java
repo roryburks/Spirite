@@ -13,6 +13,7 @@ import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.animation_data.AbstractAnimation;
 
 
 /***
@@ -30,7 +31,7 @@ public class ImageWorkspace {
 	//	Image Data (used by something in the GroupTree) or it used by a component
 	//	stored in the UndoEngine.
 	List<ImageData> imageData;
-	private int workingID = 0;	// an incrementing unique ID per imageData
+	int workingID = 0;	// an incrementing unique ID per imageData
 	
 	// The GroupTree is the primary container for all tracked ImageData.  Though
 	//	there can be other logical collections that also have ImageData parts to
@@ -39,6 +40,8 @@ public class ImageWorkspace {
 	private GroupTree groupTree;
 	private GroupTree.Node selected = null;
 	private UndoEngine undoEngine;
+	
+	private AnimationManager animationManager;
 	
 	private int width = 0;
 	private int height = 0;
@@ -49,6 +52,7 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
+		animationManager = new AnimationManager(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 	}
@@ -112,6 +116,10 @@ public class ImageWorkspace {
 		return undoEngine;
 	}
 	
+	public AnimationManager getAnimationManager() {
+		return animationManager;
+	}
+	
 	public GroupTree.GroupNode getRootNode() {
 		return groupTree.getRoot();
 	}
@@ -150,16 +158,16 @@ public class ImageWorkspace {
 		}
 	}
 	
-	// :::: New Rig Creation
-	public LayerNode newRig( int w, int h, String name, Color c) {
-		return 	addNewRig( null, w, h, name, c);
+	// :::: Group Node Modification
+	public LayerNode newLayer( int w, int h, String name, Color c) {
+		return 	addNewLayer( null, w, h, name, c);
 	}
 	
-	public LayerNode addNewRig(  GroupTree.Node context, int w, int h, String name, Color c) {
+	public LayerNode addNewLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
 		ImageData data = new ImageData(w, h, c, this);
-		data.id = workingID++;	// PostIncrement
 		imageData.add(data);
+		data.id = workingID++;
 		
 		
 		width = Math.max(width, w);
@@ -173,7 +181,7 @@ public class ImageWorkspace {
 		return node;
 	}
 	
-	public LayerNode addNewRig( GroupTree.Node context, int identifier, String name) {
+	public LayerNode addNewLayer( GroupTree.Node context, int identifier, String name) {
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event
@@ -193,7 +201,7 @@ public class ImageWorkspace {
 		return null;
 	}
 	
-	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
+	public GroupTree.GroupNode addGroupNode( GroupTree.Node context, String name) {
 		GroupTree.GroupNode newNode = groupTree.new GroupNode(name);
 		
 		executeChange(createAdditionEvent(newNode,context));
@@ -201,15 +209,18 @@ public class ImageWorkspace {
 		return newNode;
 	}
 	
-
-	
 	/***
 	 * Used Primarily for Loading, this will merely add the imageData to the 
 	 * Workspace's data set, but it will not be linked logically in any way
-	 * (for that you'll need to add a Node to the GroupTree
+	 * (for that you'll need to add a Node to the GroupTree otherwise it
+	 * will get erased next time cleanDataCache is called)
 	 */
 	public void addImageDataDirect( ImageData newData) {
 		imageData.add( newData);
+		if( newData.id < workingID)
+			newData.id = workingID++;
+		else
+			workingID = newData.id+1;
 	}
 	
 	
@@ -267,7 +278,6 @@ public class ImageWorkspace {
 				nodeBefore));
 	}
 	
-	
 	// Creates a queue of images for drawing purposes
 	public List<LayerNode> getDrawingQueue() {
 		List<LayerNode> queue = new LinkedList<LayerNode>();
@@ -319,7 +329,7 @@ public class ImageWorkspace {
 		public void alert( boolean undo) {
 			triggerStructureChanged(this, undo);
 			if( imageChange)
-				refreshImage();
+				triggerImageRefresh();
 		}
 	}
 	
@@ -508,7 +518,7 @@ public class ImageWorkspace {
 	}
 
 	
-	
+	// :::: Utility Methods
 	/***
 	 * Verifies that the given node exists within the current workspace
 	 */
@@ -521,15 +531,13 @@ public class ImageWorkspace {
 	// :::: Observers
     List<MImageObserver> imageObservers = new ArrayList<>();
     
-    void triggerStructureChanged( StructureChange evt, boolean undo) {
-        for( MImageObserver obs : imageObservers) {
+    private void triggerStructureChanged( StructureChange evt, boolean undo) {
+        for( MImageObserver obs : imageObservers)
             obs.structureChanged( evt);
-        }
     }
-    public void refreshImage() {
-        for( MImageObserver obs : imageObservers) {
+    public void triggerImageRefresh() {
+        for( MImageObserver obs : imageObservers)
             obs.imageChanged();
-        }
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
@@ -543,10 +551,9 @@ public class ImageWorkspace {
 
     List<MSelectionObserver> selectionObservers = new ArrayList<>();
     
-    public void triggerSelectedChanged() {
-        for( MSelectionObserver obs : selectionObservers) {
+    private void triggerSelectedChanged() {
+        for( MSelectionObserver obs : selectionObservers)
             obs.selectionChanged( selected);
-        }
     }
 
     public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}

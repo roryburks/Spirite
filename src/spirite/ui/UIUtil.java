@@ -3,20 +3,42 @@ package spirite.ui;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 public class UIUtil {
 
+	/***
+	 * Expands all nodes in the tree, assumes they are using 
+	 * DefaultMutableTreeNode form.  If it doesn't, it won't work
+	 */
+	public static void expandAllNodes( JTree tree) {
+		try {
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+			Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+			while( e.hasMoreElements()) {
+				DefaultMutableTreeNode node = e.nextElement();
+				
+				tree.expandPath( new TreePath(node.getPath() ));
+			}
+		} catch ( ClassCastException e) {
+			
+		}
+	}
+	
 	public static final int MAX_LEVEL = 10;
     private static int _imCountLevel( String s){
     	int r = 0;

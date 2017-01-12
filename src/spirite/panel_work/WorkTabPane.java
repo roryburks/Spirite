@@ -72,7 +72,6 @@ public class WorkTabPane extends JTabbedPane
 	// :::: ChangeListener
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
-		int i = getSelectedIndex();
 		ImageWorkspace selected = panels.get( getSelectedIndex()).workspace;
 		
 		if( selected != master.getCurrentWorkspace()) {

@@ -20,7 +20,7 @@ public class AnimationSchemePanel extends JPanel {
 	 */
 	public void initComponents() {
 		
-		AnimationSchemeTreePanel animationSchemeTreePanel = new AnimationSchemeTreePanel();
+		animationSchemeTreePanel = new AnimationSchemeTreePanel(master);
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -39,4 +39,5 @@ public class AnimationSchemePanel extends JPanel {
 		setLayout(groupLayout);
 		
 	}
+	AnimationSchemeTreePanel animationSchemeTreePanel;
 }

@@ -2,11 +2,15 @@ package spirite.panel_layers;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.EventObject;
 
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -31,11 +35,13 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.animation_data.SimpleAnimation;
 import spirite.ui.ContentTree;
+import spirite.ui.UIUtil;
 
 public class LayerTreePanel extends ContentTree 
 	implements MImageObserver, MWorkspaceObserver,
-	 TreeSelectionListener, TreeExpansionListener, MSelectionObserver
+	 TreeSelectionListener, TreeExpansionListener, MSelectionObserver, ActionListener
 {
 	// LayerTreePanel only needs master to add a WorkspaceObserver
 //	MasterControl master;
@@ -50,27 +56,26 @@ public class LayerTreePanel extends ContentTree
 	public LayerTreePanel( MasterControl master) {
 		super();
 		
+		// Add Observers
 		workspace = master.getCurrentWorkspace();
 		workspace.addImageObserver(this);
 		workspace.addSelectionObserver(this);
 		master.addWorkspaceObserver(this);
 		
-		constructFromWorkspace();
-		
+		// Set Tree Properties
 		renderer = new LTPCellRenderer();
 		editor = new LTPCellEditor(tree, renderer);
-		
 		tree.setCellRenderer(renderer);
 		tree.setCellEditor(editor);
 		tree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.addTreeSelectionListener(this);
 		tree.addTreeExpansionListener(this);
 		tree.setEditable(true);
-		
-		this.setButtonsPerRow(2);
-		
+		setButtonsPerRow(2);
+
 		scrollPane.setAutoscrolls(false);
 		
+		constructFromWorkspace();
 	}
 
     // :::: Paint
@@ -206,7 +211,6 @@ public class LayerTreePanel extends ContentTree
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
 		}
 	}
-
 	@Override
 	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {
 		try {
@@ -217,8 +221,7 @@ public class LayerTreePanel extends ContentTree
 		}catch (NullPointerException|ClassCastException e) {
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Error Moving Node in Tree.");
 		}
-	}	
-	
+	}
 	@Override
 	protected void buttonPressed(CCButton button) {
 		if( button.buttonNum == 0) {
@@ -227,7 +230,6 @@ public class LayerTreePanel extends ContentTree
 			workspace.setNodeVisibility(node,  button.isSelected());
 		}
 	}
-	
 	@Override
 	protected void buttonCreated(CCButton button) {
 		if( button.buttonNum == 0) {
@@ -236,18 +238,55 @@ public class LayerTreePanel extends ContentTree
 			button.setSelected( node.isVisible());
 		}
 	}
+	@Override
+	protected void clickPath(TreePath path, MouseEvent evt) {
+		super.clickPath(path, evt);
+
+		if( path == null) return;
+		if( evt.getButton() == MouseEvent.BUTTON3) {
+			
+			DefaultMutableTreeNode node = 
+					(DefaultMutableTreeNode)path.getLastPathComponent();
+			
+			Object usrObj = node.getUserObject();
+			
+			if( usrObj instanceof GroupNode) {
+				
+				String[][] menuScheme = {
+					{"&Construct Simple Animation From Group", "animfromgroup", null}
+				};
+				
+				contextMenu.removeAll();
+				UIUtil.constructMenu(contextMenu, menuScheme, this);
+				contextMenu.context = (Node)usrObj;
+				
+				contextMenu.show(this, evt.getX(), evt.getY());
+			}
+			
+		}
+	}
+	
+	LTPContextMenu contextMenu = new LTPContextMenu();
+	class LTPContextMenu extends JPopupMenu {
+		Node context = null;
+		
+		public LTPContextMenu() {}
+	}
 
 	// :::: TreeExpansionListener
 	@Override
 	public void treeCollapsed(TreeExpansionEvent evt) {
+		super.treeCollapsed(evt);
+		
 		// Store the Expanded state in the GroupTree so that the data remembers the UI state
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		if( node != null)
 			node.setExpanded(false);
 	}
-
 	@Override
 	public void treeExpanded(TreeExpansionEvent evt) {
+		super.treeExpanded(evt);
+		
 		// Store the Expanded state in the GroupTree so that the data remembers the UI state
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		if( node != null)
@@ -256,12 +295,13 @@ public class LayerTreePanel extends ContentTree
 	}
 
 	// :::: TreeSelectionListener
-	/***
-	 * Called whenever the user has selected a new tree node, updates the Workspace so that the 
-	 * active part (the part that gets drawn on) is changed
-	 */
 	@Override
 	public void valueChanged(TreeSelectionEvent evt) {
+		super.valueChanged(evt);
+		
+		// Called whenever the user has selected a new tree node, updates the 
+		//	 Workspace so that the  active part (the part that gets drawn on) 
+		//	 is changed.
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
 		workspace.setSelectedNode(node);
@@ -270,9 +310,7 @@ public class LayerTreePanel extends ContentTree
 		repaint();
 		
 	}
-
-	// :::: TreeCellRenderer
-
+	
 
 	// :::: WorkspaceObserver
 	@Override
@@ -285,9 +323,18 @@ public class LayerTreePanel extends ContentTree
 		workspace.addSelectionObserver(this);
 		this.constructFromWorkspace();
 	}
-
 	@Override	public void newWorkspace( ImageWorkspace arg0) {}
 	@Override	public void removeWorkspace( ImageWorkspace arg0) {}
+	
+
+	// :::: ActionListener
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		if( evt.getActionCommand().equals("animfromgroup")) {
+			GroupNode group = (GroupNode)contextMenu.context;
+			workspace.getAnimationManager().addAnimation(new SimpleAnimation(group));
+		}
+	}
 	
 	/***
 	 * TreeCellRender
@@ -313,7 +360,10 @@ public class LayerTreePanel extends ContentTree
 			// Determine what kind of data the node on the tree contains and then 
 			//	alter the node visuals accordingly
 			if( obj instanceof GroupTree.Node) {
-				renderPanel.label.setText( ((GroupTree.Node)obj).getName() );
+				String str = ((GroupTree.Node)obj).getName();
+				if( MDebug.DEBUG && obj instanceof GroupTree.LayerNode)
+					str += " " + ((GroupTree.LayerNode)obj).getImageData().getID();
+				renderPanel.label.setText( str);
 			}
 		
 			return renderPanel;
@@ -394,6 +444,7 @@ public class LayerTreePanel extends ContentTree
 		@Override		public void keyReleased(KeyEvent e) {}
 		@Override		public void keyTyped(KeyEvent e) {}
 	}
+
 
 	
 

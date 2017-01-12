@@ -14,7 +14,7 @@ import spirite.image_data.GroupTree.LayerNode;
 
 public class SimpleAnimation extends AbstractAnimation
 {
-	private List<AnimationLayer> layers = new ArrayList<>();
+	private ArrayList<AnimationLayer> layers = new ArrayList<>();
 	private int startFrame;
 	private int endFrame;
 
@@ -24,6 +24,7 @@ public class SimpleAnimation extends AbstractAnimation
 	public SimpleAnimation(GroupNode group) {
 		AnimationLayer layer = new AnimationLayer();
 		layer.group = group;
+		name = group.getName();
 		
 		for( GroupTree.Node node : group.getChildren()) {
 			if( node instanceof LayerNode) {
@@ -50,10 +51,9 @@ public class SimpleAnimation extends AbstractAnimation
 		return endFrame;
 	}
 	
-	public BufferedImage renderFrame( float t) {
-		
-		
-		return null;
+	@SuppressWarnings("unchecked")
+	public List<AnimationLayer> getLayers() {
+		return (List<AnimationLayer>) layers.clone();
 	}
 
 	@Override
@@ -63,6 +63,8 @@ public class SimpleAnimation extends AbstractAnimation
 		
 		
 		for( AnimationLayer layer : layers) {
+			if( layer.getFrames().size() == 0) continue;
+			
 			int start = layer.keyTimes.get(0);
 			int end = layer.keyTimes.get(layer.keyTimes.size()-1);
 			int frame = 0;
@@ -107,8 +109,8 @@ public class SimpleAnimation extends AbstractAnimation
 	
 	public static class AnimationLayer {
 		protected GroupNode group;
-		protected List<LayerNode> frames = new ArrayList<>();
-		protected List<Integer> keyTimes = new ArrayList<>();
+		protected ArrayList<LayerNode> frames = new ArrayList<>();
+		protected ArrayList<Integer> keyTimes = new ArrayList<>();
 		protected boolean asynchronous = false;
 		protected boolean loops = true;
 		
@@ -130,6 +132,14 @@ public class SimpleAnimation extends AbstractAnimation
 			this.loops = loops;
 		}
 		
+		@SuppressWarnings("unchecked")
+		public List<LayerNode> getFrames() {
+			return (ArrayList<LayerNode>) frames.clone();
+		}
+		@SuppressWarnings("unchecked")
+		public List<Integer> getKeyTimes() {
+			return (ArrayList<Integer>) keyTimes.clone();
+		}
 		
 	}
 }

@@ -102,13 +102,13 @@ public class LayersPanel extends JPanel {
 			
 			ImageWorkspace workspace = layerTreePanel.workspace;
 			
-			workspace.addNewRig(selected_node, w, h, name, c);
+			workspace.addNewLayer(selected_node, w, h, name, c);
 		}
 	}
 	
 	private void btnNewGroupPress() {
 		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
 		
-		layerTreePanel.workspace.addTreeNode(selected_node, "Test");
+		layerTreePanel.workspace.addGroupNode(selected_node, "Test");
 	}
 }

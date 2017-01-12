@@ -45,7 +45,7 @@ public class GroupTree {
 	}
 	
 
-	// Creates a sequential list of all the LayerNodes in the tree
+	// Creates a depth-first sequential list of all the LayerNodes in the tree
 	public List<LayerNode> getAllLayerNodes() {
 		List<LayerNode> list = new ArrayList<>();
 		_galn_rec( root, list);
@@ -62,7 +62,7 @@ public class GroupTree {
 		}
 	}
 
-	// Creates a sequential list of all the Nodes in the tree
+	// Creates a depth-first sequential list of all the Nodes in the tree
 	public List<Node> getAllNodes() {
 		List<Node> list = new ArrayList<>();
 		_gan_rec( root, list);

@@ -17,6 +17,7 @@ public class ImageData {
 	
 	public ImageData( int width, int height, Color bg, ImageWorkspace context) {
 		this.context = context;
+		
 		data = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
 		
         Graphics2D g2d = data.createGraphics();
@@ -34,6 +35,6 @@ public class ImageData {
 	}
 	
 	public void refresh() {
-		context.refreshImage();
+		context.triggerImageRefresh();
 	}
 }

@@ -57,8 +57,7 @@ import spirite.Globals;
 import spirite.MDebug;
 
 public class ContentTree extends JPanel
-	implements MouseListener, TreeModelListener
-	
+	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 
 {
 		
 	private static final long serialVersionUID = 1L;
@@ -67,7 +66,6 @@ public class ContentTree extends JPanel
 	protected CCTDragManager dragManager;
 	protected JScrollPane scrollPane;
 	protected CCPanel container;
-	protected CCTreeListener listener = new CCTreeListener();
 	
 	protected CCTree tree;
 	protected Color bgColor;
@@ -81,7 +79,7 @@ public class ContentTree extends JPanel
 	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {}
 	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {}
 	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {}	
-	protected void clickPath( TreePath path, int clickCount) {
+	protected void clickPath( TreePath path, MouseEvent clickEvent) {
 		tree.setSelectionPath(path);
 	}
 	protected void buttonPressed( CCButton button) {}
@@ -157,8 +155,8 @@ public class ContentTree extends JPanel
 		container.addMouseListener(this);
 		tree.addMouseListener(this);
 		buttonPanel.addMouseListener(this);
-		tree.addTreeSelectionListener(listener);
-		tree.addTreeExpansionListener(listener);
+		tree.addTreeSelectionListener(this);
+		tree.addTreeExpansionListener(this);
 	}
 	
 	/***
@@ -580,7 +578,7 @@ public class ContentTree extends JPanel
 		TreePath path = getPathFromY(evt.getY());
 		
 		if( path != null) {
-			clickPath(path, evt.getClickCount());
+			clickPath(path, evt);
 		}
 	}
 
@@ -625,38 +623,31 @@ public class ContentTree extends JPanel
 		});
 	}
 	
-	// !!! I have no idea why these listeners will only work when put in a separate
-	//	class when all other listeners seem to work just fine when implemented in
-	//	other container classes.
-	public class CCTreeListener implements TreeExpansionListener, TreeSelectionListener {
-		@Override
-		public void valueChanged(TreeSelectionEvent arg0) {
-			// This is needed because the selection UI of the linked ButtonPanel 
-			//	has graphics related to the tree's slection that needs to be redrawn
-			repaint();
-		}
-		
-		@Override
-		public void treeCollapsed(TreeExpansionEvent event) {
-			SwingUtilities.invokeLater( new Runnable() {
-				@Override
-				public void run() {
-					buttonPanel.reformPanel();
-				}
-			});
-		}
 
-		@Override
-		public void treeExpanded(TreeExpansionEvent event) {
-			SwingUtilities.invokeLater( new Runnable() {
-				@Override
-				public void run() {
-					buttonPanel.reformPanel();
-				}
-			});
-		}
-		
+	@Override
+	public void valueChanged(TreeSelectionEvent arg0) {
+		// This is needed because the selection UI of the linked ButtonPanel 
+		//	has graphics related to the tree's slection that needs to be redrawn
+		repaint();
+	}
+	
+	@Override
+	public void treeCollapsed(TreeExpansionEvent event) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
 	}
 
-	
+	@Override
+	public void treeExpanded(TreeExpansionEvent event) {
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				buttonPanel.reformPanel();
+			}
+		});
+	}
 }

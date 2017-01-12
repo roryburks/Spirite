@@ -10,6 +10,7 @@ import spirite.ui.UIUtil.MTextFieldNumber;
 
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import java.awt.Dimension;
@@ -19,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
@@ -86,7 +88,11 @@ public class AnimPanel extends javax.swing.JPanel
 			}
 		});
         
-        constructFromAnimation( new SimpleAnimation( master.getCurrentWorkspace().getRootNode()));
+        
+        List<AbstractAnimation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
+        if( !list.isEmpty()) {
+        	constructFromAnimation( list.get(0));
+        }
     }
     
     private void updateSlider() {
@@ -233,6 +239,7 @@ public class AnimPanel extends javax.swing.JPanel
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
+		}else if( source == buttonForward) {			
 		}
 	}
 
