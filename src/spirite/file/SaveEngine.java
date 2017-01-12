@@ -13,8 +13,8 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageData;
+import spirite.image_data.ImageWorkspace;
 
 /***
  * SaveEngine is a static container for methods which saves images to

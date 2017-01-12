@@ -8,13 +8,10 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import javax.swing.SwingUtilities;
-
-import spirite.brains.MasterControl.MCurrentImageObserver;
+import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.brains.MasterControl;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external

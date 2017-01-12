@@ -3,7 +3,6 @@ package spirite.image_data;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.animation_data.AbstractAnimation;
 
 /***

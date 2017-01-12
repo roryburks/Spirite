@@ -35,8 +35,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
-import spirite.MDebug.WarningType;
 import spirite.MDebug;
+import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager.FrameType;

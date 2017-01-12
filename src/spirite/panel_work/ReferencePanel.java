@@ -4,6 +4,7 @@ package spirite.panel_work;
 
 import java.awt.Color;
 import java.awt.Graphics;
+
 import javax.swing.JPanel;
 
 public class ReferencePanel extends JPanel

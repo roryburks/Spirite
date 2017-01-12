@@ -17,11 +17,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -58,6 +60,8 @@ public class ToolsPanel extends JPanel
 
         prepareIconSheet();
         initComponents();
+        
+        this.setOpaque(false);
         
         // Make sure it's created with the proper selected tool
         toolsetChanged(master.getToolsetManager().getSelectedTool());

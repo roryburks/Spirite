@@ -1,18 +1,5 @@
 package spirite.panel_anim;
 
-import spirite.MUtil;
-import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MCurrentImageObserver;
-import spirite.image_data.animation_data.AbstractAnimation;
-import spirite.image_data.animation_data.SimpleAnimation;
-import spirite.ui.UIUtil;
-import spirite.ui.UIUtil.MTextFieldNumber;
-
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -23,16 +10,24 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JLabel;
+
+import spirite.MUtil;
+import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MCurrentImageObserver;
+import spirite.image_data.animation_data.AbstractAnimation;
+import spirite.ui.UIUtil;
+import spirite.ui.UIUtil.MTextFieldNumber;
 
 
 

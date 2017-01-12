@@ -7,10 +7,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
+
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.brains.PaletteManager.MPaletteObserver;

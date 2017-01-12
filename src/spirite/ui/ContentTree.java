@@ -26,7 +26,6 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -34,9 +33,9 @@ import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -53,6 +52,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
 import spirite.Globals;
 import spirite.MDebug;
 
@@ -71,6 +71,12 @@ public class ContentTree extends JPanel
 	protected Color bgColor;
 	
 	protected CCBPanel buttonPanel;
+
+	// Determines the background color to draw the selected node
+	// can be re-written by children
+	protected Color selectedBG;
+	protected Color selectedBGDragging;
+	
 	
 	private int buttonsPerRow = 0;
 
@@ -96,6 +102,8 @@ public class ContentTree extends JPanel
 		scrollPane = new JScrollPane(container);
 		this.add(scrollPane);
 		
+		selectedBG = Globals.getColor("contentTree.selectedBackground");
+		selectedBGDragging = Globals.getColor("contentTree.selectedBGDragging");
 		
 		// Single root is invisible, but path is visible
 		tree.setRootVisible(false);
@@ -197,48 +205,54 @@ public class ContentTree extends JPanel
 	/***
 	 * 
 	 */
+	protected void paintCCPanel( Graphics g, int width, int height, boolean drawBG) {
+		if( drawBG) {
+			g.setColor( bgColor);
+			g.fillRect( 0, 0, width-1, height-1);
+		}
+		
+
+		// Draw a Background around the Selected Path
+		int r = tree.getRowForPath( tree.getSelectionPath());
+		Rectangle rect = tree.getRowBounds(r);
+		
+		if( rect != null) {
+			if( dragManager.dragIntoNode != null)
+				g.setColor( selectedBGDragging);
+			else
+				g.setColor( selectedBG);
+			g.fillRect( 0, rect.y, width-1, rect.height-1);
+		}
+		
+		// Draw a Line/Border indicating where you're dragging and dropping
+		if( dragManager.dragIntoNode != null) {
+			g.setColor( Color.BLACK);
+			
+			rect = tree.getPathBounds(dragManager.dragIntoNode);
+			
+			
+			switch( dragManager.dragMode) {
+			case PLACE_OVER:
+				g.drawLine( 0, rect.y, width, rect.y);
+				break;
+			case PLACE_UNDER:
+				g.drawLine( 0, rect.y+rect.height-1, width, rect.y+rect.height-1);
+				break;
+			case PLACE_INTO:
+				g.drawRect( 0, rect.y, width-1, rect.height-1);
+				break;
+			default:
+				break;
+			}
+		}
+		
+	}
 	protected class CCPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public void paint( Graphics g) {
-			g.setColor( bgColor);
-			g.fillRect( 0, 0, this.getWidth()-1, this.getHeight()-1);
-			
-	
-			// Draw a Background around the Selected Path
-			int r = tree.getRowForPath( tree.getSelectionPath());
-			Rectangle rect = tree.getRowBounds(r);
-			
-			if( rect != null) {
-				if( dragManager.dragIntoNode != null)
-					g.setColor( Globals.getColor("contentTree.selectedBGDragging"));
-				else
-					g.setColor( Globals.getColor("contentTree.selectedBackground"));
-				g.fillRect( 0, rect.y, this.getWidth()-1, rect.height-1);
-			}
-			
-			// Draw a Line/Border indicating where you're dragging and dropping
-			if( dragManager.dragIntoNode != null) {
-				g.setColor( Color.BLACK);
-				
-				rect = tree.getPathBounds(dragManager.dragIntoNode);
-				
-				
-				switch( dragManager.dragMode) {
-				case PLACE_OVER:
-					g.drawLine( 0, rect.y, getWidth(), rect.y);
-					break;
-				case PLACE_UNDER:
-					g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
-					break;
-				case PLACE_INTO:
-					g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
-					break;
-				default:
-					break;
-				}
-			}
-			
+			paintCCPanel( g, getWidth(), getHeight(), true);
+
 			super.paint(g);
 		}
 	}
@@ -624,6 +638,7 @@ public class ContentTree extends JPanel
 	}
 	
 
+	// :::: TreeSelectionListener
 	@Override
 	public void valueChanged(TreeSelectionEvent arg0) {
 		// This is needed because the selection UI of the linked ButtonPanel 

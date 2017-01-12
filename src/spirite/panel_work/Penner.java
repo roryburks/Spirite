@@ -14,12 +14,12 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
-import spirite.image_data.ImageData;
-import spirite.image_data.ImageWorkspace;
-import spirite.image_data.UndoEngine;
 import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.ImageData;
+import spirite.image_data.ImageWorkspace;
+import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.StrokeAction;
 
 /***

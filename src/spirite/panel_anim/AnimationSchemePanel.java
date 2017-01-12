@@ -1,10 +1,10 @@
 package spirite.panel_anim;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 
 public class AnimationSchemePanel extends JPanel {
 	private static final long serialVersionUID = 1L;

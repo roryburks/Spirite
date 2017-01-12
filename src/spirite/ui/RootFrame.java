@@ -2,7 +2,6 @@
 package spirite.ui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -11,13 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
+
 import javax.swing.JColorChooser;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import spirite.Globals;
+
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;

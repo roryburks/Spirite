@@ -11,8 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
-import spirite.MDebug.WarningType;
+
 import spirite.MDebug;
+import spirite.MDebug.WarningType;
 import spirite.MUtil;
 
 /***

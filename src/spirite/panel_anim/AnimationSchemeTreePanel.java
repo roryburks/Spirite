@@ -2,6 +2,8 @@ package spirite.panel_anim;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -10,60 +12,67 @@ import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.AnimationManager;
+import spirite.image_data.AnimationManager.AnimationStructureEvent;
+import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.animation_data.AbstractAnimation;
 import spirite.image_data.animation_data.SimpleAnimation;
 import spirite.image_data.animation_data.SimpleAnimation.AnimationLayer;
-import spirite.image_data.AnimationManager.AnimationStructureEvent;
-import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends ContentTree 
-	implements TreeCellRenderer, MAnimationStructureObserver
+	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver
 {
 	private static final long serialVersionUID = 1L;
 
 	ImageWorkspace workspace;
 	AnimationManager manager;
 	
+	
 	/**
 	 * Create the panel.
 	 */
 	public AnimationSchemeTreePanel( MasterControl master) {
+		
 		tree.setCellRenderer(this);
 		workspace = master.getCurrentWorkspace();
 		manager = workspace.getAnimationManager();
 		
 		manager.addStructureObserver(this);
+		workspace.addSelectionObserver(this);
 		
 		reconstruct();
 	}
-	
+
+	/***
+	 * Constructs the AnimationTree from all the animations stored in the 
+	 * AnimationManager
+	 */
 	private void reconstruct() {
 		root.removeAllChildren();
 		
 		for( AbstractAnimation animation : manager.getAnimations()) {
 			DefaultMutableTreeNode anim = new DefaultMutableTreeNode(animation);
 			
-			if( animation instanceof SimpleAnimation) {
+			if( animation instanceof SimpleAnimation) 
 				constructSimpleAnimationTree(anim, (SimpleAnimation)animation);
-			}
 			
 			root.add(anim);
 		}
 		
 
 		model.nodeStructureChanged(root);
-		
 		UIUtil.expandAllNodes(tree);
 	}
 	
@@ -183,12 +192,68 @@ public class AnimationSchemeTreePanel extends ContentTree
 			return label;
 		}
 	}
+	
+	// :::: ContentTree
+	Color pseudoselectColor = new Color( 190,160,140,120);
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void paintCCPanel(Graphics g, int width, int height, boolean drawBG) {
+		if( drawBG) {
+			g.setColor( bgColor);
+			g.fillRect( 0, 0, width-1, height-1);
+		}
+		
+		
+		Enumeration <DefaultMutableTreeNode> e =
+				((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
+		
+		Node selected = workspace.getSelectedNode();
+		if( selected != null)  {		
+			while( e.hasMoreElements()) {
+				DefaultMutableTreeNode node = e.nextElement();
+				
+				if( node.getUserObject() instanceof SALFrame) {
+					SALFrame frame = (SALFrame)node.getUserObject();
+					
+					if( frame.layer == selected) {
+						Rectangle rect = tree.getPathBounds( new TreePath(node.getPath()));
+						g.setColor(pseudoselectColor);
+						g.fillRect(0, rect.y, width-1, rect.height-1);
+					}
+				}
+			}
+		}
+		
+		super.paintCCPanel(g, width, height, false);
+	}
 
 	// :::: AnimationStructureObserver
 	@Override
 	public void animationStructureChanged(AnimationStructureEvent evt) {
 		reconstruct();
 		
+	}
+	
+	// :::: TreeSelectionListener (inherited from ContentTree)
+	@Override
+	public void valueChanged(TreeSelectionEvent evt) {
+		super.valueChanged(evt);
+		
+		DefaultMutableTreeNode node = 
+				(DefaultMutableTreeNode)evt.getPath().getLastPathComponent();
+		
+		Object obj = node.getUserObject();
+		if( obj instanceof SALFrame) {
+			SALFrame frame = (SALFrame)obj;
+			
+			workspace.setSelectedNode(frame.layer);
+		}
+	}
+
+	// :::: MSelectionObserver
+	@Override
+	public void selectionChanged(Node newSelection) {
+		repaint();
 	}
 
 }

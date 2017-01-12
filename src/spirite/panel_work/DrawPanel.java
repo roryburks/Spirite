@@ -11,17 +11,19 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
+import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine.RenderSettings;
-import spirite.image_data.ImageData;
 
 /**
  * DrawPanel is the 
@@ -137,10 +139,12 @@ public class DrawPanel extends JPanel
 	public void actionPerformed(ActionEvent arg0) {
     	metronome = (metronome + 1) % 16;
 
-    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
+    //	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
 	}
 	
-	@Override	public void imageChanged() {}
+	@Override	public void imageChanged() {
+    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
+    }
 	@Override	public void structureChanged(StructureChange evt) {	}
  
 }

@@ -1,20 +1,17 @@
 package spirite.panel_layers;
 
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
-import spirite.dialogs.NewLayerDPanel;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageWorkspace;
-import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
 
 public class LayersPanel extends JPanel {
 	// LayersPanel needs Master because various dialogs it creates needs

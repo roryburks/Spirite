@@ -9,9 +9,9 @@ import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.RenderEngine;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.RenderEngine;
 import spirite.ui.FrameManager;
 
 /***

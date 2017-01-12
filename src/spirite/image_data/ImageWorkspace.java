@@ -13,7 +13,6 @@ import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.animation_data.AbstractAnimation;
 
 
 /***

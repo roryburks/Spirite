@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
+
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
@@ -20,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
+
 import spirite.brains.MasterControl;
 
 /**
