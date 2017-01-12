@@ -17,17 +17,37 @@ public class SimpleAnimation extends AbstractAnimation
 	private List<AnimationLayer> layers = new ArrayList<>();
 	private int startFrame;
 	private int endFrame;
-	
+
 	public SimpleAnimation() {
+	}
+
+	public SimpleAnimation(GroupNode group) {
+		AnimationLayer layer = new AnimationLayer();
+		layer.group = group;
+		
+		for( GroupTree.Node node : group.getChildren()) {
+			if( node instanceof LayerNode) {
+				layer.frames.add((LayerNode) node);
+			}
+		}
+		
+		for( int i = 0; i <= layer.frames.size(); ++i) {
+			layer.keyTimes.add(i);
+		}
+		
+		startFrame = 0;
+		endFrame = layer.frames.size();
+		
+		layers.add(layer);
 	}
 	
 	@Override
 	public float getStartFrame() {
-		return 0;
+		return startFrame;
 	}
 	@Override
 	public float getEndFrame() {
-		return 0;
+		return endFrame;
 	}
 	
 	public BufferedImage renderFrame( float t) {
@@ -47,6 +67,8 @@ public class SimpleAnimation extends AbstractAnimation
 			int end = layer.keyTimes.get(layer.keyTimes.size()-1);
 			int frame = 0;
 			int localMet = met;
+
+
 			
 			// Based on the layer timing type, determine the local frame
 			//	index to use (if any)

@@ -2,19 +2,12 @@ package spirite.panel_layers;
 
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.EventObject;
 
-import javax.swing.AbstractAction;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
 import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -22,6 +15,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -32,14 +26,16 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.ui.ContentTree;
 
 public class LayerTreePanel extends ContentTree 
 	implements MImageObserver, MWorkspaceObserver,
-	 TreeSelectionListener, TreeExpansionListener, KeyListener
+	 TreeSelectionListener, TreeExpansionListener, MSelectionObserver
 {
 	// LayerTreePanel only needs master to add a WorkspaceObserver
 //	MasterControl master;
@@ -56,6 +52,7 @@ public class LayerTreePanel extends ContentTree
 		
 		workspace = master.getCurrentWorkspace();
 		workspace.addImageObserver(this);
+		workspace.addSelectionObserver(this);
 		master.addWorkspaceObserver(this);
 		
 		constructFromWorkspace();
@@ -106,6 +103,33 @@ public class LayerTreePanel extends ContentTree
 		constructFromWorkspace();
 	}
 	
+	// :::: MSelectionObserver
+	@Override
+	public void selectionChanged(Node newSelection) {
+		TreePath path = getPathOfNode( newSelection);
+		
+		if(path != null)
+			tree.setSelectionPath(path);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private TreePath getPathOfNode( Node nodeToFind){
+		TreeModel m = tree.getModel();
+		
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)m.getRoot();
+		Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+		
+		while( e.hasMoreElements()) {
+			DefaultMutableTreeNode node = e.nextElement();
+			
+			if( node.getUserObject() == nodeToFind) {
+				return new TreePath(node.getPath());
+			}
+		}
+		
+		return null;
+	}
+	
 
 	/***
 	 * Called any time the structure of the image has changed, completely removes
@@ -138,6 +162,7 @@ public class LayerTreePanel extends ContentTree
 		
 		tree_node.setAllowsChildren( group_node instanceof GroupTree.GroupNode);
 	}
+	@SuppressWarnings("unchecked")
 	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
 		for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
@@ -236,7 +261,7 @@ public class LayerTreePanel extends ContentTree
 	 * active part (the part that gets drawn on) is changed
 	 */
 	@Override
-	public void valueChanged(TreeSelectionEvent evt) {			
+	public void valueChanged(TreeSelectionEvent evt) {
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
 		workspace.setSelectedNode(node);
@@ -254,39 +279,15 @@ public class LayerTreePanel extends ContentTree
 	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
 		// Remove assosciations with the old Workspace and add ones to the new
 		workspace.removeImageObserver(this);
+		workspace.removeSelectionObserver(this);
 		workspace = current;
 		workspace.addImageObserver( this);
+		workspace.addSelectionObserver(this);
 		this.constructFromWorkspace();
 	}
 
 	@Override	public void newWorkspace( ImageWorkspace arg0) {}
 	@Override	public void removeWorkspace( ImageWorkspace arg0) {}
-
-	// KeyListener
-	@Override
-	public void keyPressed(KeyEvent evt) {
-/*		if( evt.getKeyCode() == KeyEvent.VK_F2 && getSelectedNode() != null) {
-			JScrollBar hsb =  scrollPane.getHorizontalScrollBar();
-			
-			final int v = (hsb == null) ? 0: hsb.getValue();
-			SwingUtilities.invokeLater( new Runnable() {					
-				@Override
-				public void run() {
-					JScrollBar hsb =  scrollPane.getHorizontalScrollBar();
-					if( hsb != null) {
-						hsb.setValue(v);
-
-					}
-				}
-			});*/
-
-			System.out.println("TEST");
-			tree.startEditingAtPath(tree.getSelectionPath());
-//		}
-	}
-
-	@Override	public void keyReleased(KeyEvent arg0) {}
-	@Override	public void keyTyped(KeyEvent arg0) {}
 	
 	/***
 	 * TreeCellRender
@@ -393,6 +394,8 @@ public class LayerTreePanel extends ContentTree
 		@Override		public void keyReleased(KeyEvent e) {}
 		@Override		public void keyTyped(KeyEvent e) {}
 	}
+
+	
 
 }
 

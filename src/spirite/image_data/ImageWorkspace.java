@@ -141,10 +141,13 @@ public class ImageWorkspace {
 		return selected;
 	}
 	public void setSelectedNode( GroupTree.Node node) {
-		if( !nodeInWorkspace(node))
+		if( !nodeInWorkspace(node)) 
 			return;
 		
-		selected = node;
+		if( selected != node) {
+			selected = node;
+			triggerSelectedChanged();
+		}
 	}
 	
 	// :::: New Rig Creation
@@ -495,7 +498,7 @@ public class ImageWorkspace {
 			if( context.getParent() == null)
 				return null;
 			parent = context.getParent();
-			nodeBefore = context;
+			nodeBefore = context.getNextNode();
 		}
 
 		return new AdditionChange( 
@@ -510,16 +513,9 @@ public class ImageWorkspace {
 	 * Verifies that the given node exists within the current workspace
 	 */
 	public boolean nodeInWorkspace( GroupTree.Node node) {
-		return _niw_rec( groupTree.getRoot(), node);
-	}
-	private boolean _niw_rec( GroupTree.Node working, GroupTree.Node toCheck) {
-		if( working == toCheck) 
-			return true;
+		List<Node> nodes = groupTree.getAllNodes();
 		
-		for( GroupTree.Node child : working.getChildren()) {
-			return _niw_rec( child, toCheck);
-		}
-		return false;
+		return nodes.contains(node);
 	}
 	
 	// :::: Observers
@@ -542,5 +538,21 @@ public class ImageWorkspace {
     public static interface MImageObserver {
         public void imageChanged();
         public void structureChanged(StructureChange evt);
+    }
+    
+
+    List<MSelectionObserver> selectionObservers = new ArrayList<>();
+    
+    public void triggerSelectedChanged() {
+        for( MSelectionObserver obs : selectionObservers) {
+            obs.selectionChanged( selected);
+        }
+    }
+
+    public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
+    public void removeSelectionObserver( MSelectionObserver obs) { selectionObservers.remove(obs); }
+    
+    public static interface MSelectionObserver{
+    	public void selectionChanged( Node newSelection);
     }
 }

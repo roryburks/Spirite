@@ -4,6 +4,7 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.animation_data.AbstractAnimation;
+import spirite.image_data.animation_data.SimpleAnimation;
 import spirite.ui.UIUtil;
 import spirite.ui.UIUtil.MTextFieldNumber;
 
@@ -12,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -43,6 +45,8 @@ public class AnimPanel extends javax.swing.JPanel
 	
     Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
 	
+    AbstractAnimation animation = null;
+    
 	// Metronome settings
 	float start = 0.0f;
 	float end = 2.0f;
@@ -77,10 +81,12 @@ public class AnimPanel extends javax.swing.JPanel
         final AnimPanel _this = this;
         SwingUtilities.invokeLater( new Runnable() {
 			@Override
-			public void run() {        
+			public void run() {
 				((java.awt.Window)SwingUtilities.getRoot(_this)).addWindowListener(_this);
 			}
 		});
+        
+        constructFromAnimation( new SimpleAnimation( master.getCurrentWorkspace().getRootNode()));
     }
     
     private void updateSlider() {
@@ -99,23 +105,37 @@ public class AnimPanel extends javax.swing.JPanel
 	}
 	
 	private void constructFromAnimation( AbstractAnimation anim) {
+		animation = anim;
 		start = anim.getStartFrame();
-		end = anim.getStartFrame();
+		end = anim.getEndFrame();
 		slider.setValue(0);
+		
+		updateSlider();
 	}
 	
 
-    private PreviewPanel previewPanel;
+    private DisplayPanel previewPanel;
     private MTextFieldNumber tfFPS;
     private JButton buttonBack;
     private JToggleButton buttonPlay;
     private JButton buttonForward;
     private JSlider slider;
+    
+    private class DisplayPanel extends JPanel {
+    	@Override
+    	public void paint(Graphics g) {
+    		super.paint(g);
+    		
+    		if( animation != null) {
+    			animation.drawFrame(g, met);
+    		}
+    	}
+    }
                           
     private void initComponents() {
         Dimension size = new Dimension(24,24);
 
-        previewPanel = new PreviewPanel( master);
+        previewPanel = new DisplayPanel();
         
         buttonBack = new JButton();
         buttonPlay = new JToggleButton();
@@ -207,7 +227,9 @@ public class AnimPanel extends javax.swing.JPanel
 				met += 16.0f * tps / 1000.0f;
 				met = MUtil.cycle(start, end, met);
 				slider.setValue( Math.round(1000* (met - start) / (end - start)));
-				slider.repaint();
+//				slider.repaint();
+				
+				repaint();
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();

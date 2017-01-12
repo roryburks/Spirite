@@ -44,7 +44,7 @@ public class GroupTree {
 		return false;
 	}
 	
-	
+
 	// Creates a sequential list of all the LayerNodes in the tree
 	public List<LayerNode> getAllLayerNodes() {
 		List<LayerNode> list = new ArrayList<>();
@@ -58,6 +58,21 @@ public class GroupTree {
 			}
 			else if( child instanceof GroupNode){
 				_galn_rec( (GroupNode) child, list);
+			}
+		}
+	}
+
+	// Creates a sequential list of all the Nodes in the tree
+	public List<Node> getAllNodes() {
+		List<Node> list = new ArrayList<>();
+		_gan_rec( root, list);
+		return list;
+	}
+	private void _gan_rec( GroupNode parent, List<Node>list) {
+		for( Node child : parent.getChildren()) {
+			list.add( child);
+			if( child instanceof GroupNode){
+				_gan_rec( (GroupNode) child, list);
 			}
 		}
 	}
