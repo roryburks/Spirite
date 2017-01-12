@@ -140,7 +140,6 @@ public class RootFrame extends javax.swing.JFrame
     	UIUtil.constructMenu(jMenuBar, menuScheme, this);
     	
     	
-
         setJMenuBar(jMenuBar);
     }
     
@@ -160,6 +159,7 @@ public class RootFrame extends javax.swing.JFrame
 
         if( response == JOptionPane.OK_OPTION) {
             master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
+            master.getCurrentWorkspace().resetUndoEngine();
         }
     }                                            
 

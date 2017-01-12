@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
@@ -80,6 +81,7 @@ public class FrameManager implements WindowListener {
 			JDialog d = new JDialog();
 			d.add(new AnimPanel(master));
 			d.pack();
+			d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			d.setVisible(true);
 		}
 	}

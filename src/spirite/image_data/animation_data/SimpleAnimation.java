@@ -21,9 +21,11 @@ public class SimpleAnimation extends AbstractAnimation
 	public SimpleAnimation() {
 	}
 	
+	@Override
 	public float getStartFrame() {
 		return 0;
 	}
+	@Override
 	public float getEndFrame() {
 		return 0;
 	}

@@ -1,15 +1,23 @@
 package spirite.ui;
 
-import java.awt.Component;
+import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 public class UIUtil {
-    public static final int MAX_LEVEL = 10;
+
+	public static final int MAX_LEVEL = 10;
     private static int _imCountLevel( String s){
     	int r = 0;
     	while( s.charAt(r) == '.')
@@ -18,25 +26,25 @@ public class UIUtil {
     }
     
     /***
-     * Constructs a menu from an array of objects corresponding to the menu scheme as such:
-     * 
-     * The menuScheme is an n-by-3 array 
-     * -The first string represents the menu title as well as its structure (see below)
-     * -The second string represents the actionCommand
-     * -The third string represents the icon associated with it (using Globals.getIcon)
-     * 
+	 * Constructs a menu from an array of objects corresponding to the menu scheme as such:
+	 * 
+	 * The menuScheme is an n-by-3 array 
+	 * -The first string represents the menu title as well as its structure (see below)
+	 * -The second string represents the actionCommand
+	 * -The third string represents the icon associated with it (using Globals.getIcon)
+	 * 
 	 * Each dot before the name indicates the level it should be in.  For example one dot
-	 *	 means it goes inside the last zero-dot item, two dots means it should go in the last
-	 *	 one-dot item, etc.  !!Note, there should never be any reason to skip dots and doing 
+	 *   means it goes inside the last zero-dot item, two dots means it should go in the last
+	 *   one-dot item, etc.  !!Note, there should never be any reason to skip dots and doing 
 	 *   so will probably break it.
 	 * The & character before a letter represents the Mnemonic key that should be associated
 	 *   with it.
 	 * If the title is simply - (perhaps after some .'s representing its depth), then it is
 	 *   will simply construct a separator and will ignore the last two elements in the
 	 *   array (in fact they don't need to exist).
-     * @param root the Component (be it JPopupMenu or JMenuBar or other) to construct the menu into
-     * @param menuScheme See Above
-     * @param listener the listener which will be sent the Action when an item is selected
+	 * @param root the Component (be it JPopupMenu or JMenuBar or other) to construct the menu into
+	 * @param menuScheme See Above
+	 * @param listener the listener which will be sent the Action when an item is selected
      */
 	public static void constructMenu( JComponent root, String menuScheme[][], ActionListener listener) {
 		JMenuItem new_node;
@@ -99,5 +107,130 @@ public class UIUtil {
     		}
     		active_root_tree[ level] = new_node;
     	}
+	}
+	
+	
+
+    /***
+	 * I found the behavior of JFormattedTextField to be inadequate so I'm implementing
+	 * my own and centralizing it here.
+	 *
+	 */
+	public static class MTextFieldNumber extends JTextField implements DocumentListener {
+		private static final long serialVersionUID = 1L;
+		private int max = Integer.MAX_VALUE;
+		private int min = Integer.MIN_VALUE;
+		
+		private Color default_color = null;
+		private Color bad_color = Color.RED;
+		
+		private MTFNDocument mdocument;
+		
+		private boolean valid = true;
+		
+
+		private boolean allows_negative = true;
+		private boolean allows_floats = false;
+		
+		public MTextFieldNumber() {
+			init();
+		}
+
+		public MTextFieldNumber(boolean allowsNegatives, boolean allowsFloats) {
+			this.allows_floats = allowsFloats;
+			this.allows_negative = allowsNegatives;
+			init();
+		}
+		private void init() {
+			mdocument = new MTFNDocument();
+			this.setDocument(mdocument);
+			this.getDocument().addDocumentListener(this);
+			
+		}
+
+		
+		/***
+		 * Document that behaves identically to PlainDocument, but doesn't allow
+		 * you to enter non-number characters.
+		 */
+		public class MTFNDocument extends PlainDocument {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void insertString( int offset, String str, AttributeSet a) throws BadLocationException {
+				
+				// Only allow the user to enter part of a string if it's digits.  Possibly with 
+				//	- and .  But only one - at the beginning (and only if negatives are allowed)
+				//	and only one . (if floats are allowed)
+				if( !str.matches("^-?[0-9]*\\.?[0-9]*$") 
+						|| (str.startsWith("-") && (offset !=0 || !allows_negative))
+						|| (str.contains(".") && (this.getText(0, this.getLength()).contains(".") || !allows_floats)))
+					Toolkit.getDefaultToolkit().beep();
+				else
+					super.insertString(offset, str, a);
+			}
+		}
+		
+		
+		// :::: API
+		public void setMinMax( int min, int max) {
+			this.min = min;
+			this.max = max;
+		}
+		public int getNumber() {
+			try {
+				int i = Integer.parseInt( this.getText());
+				return i;
+			}
+			catch( NumberFormatException e) {
+				return 0;
+			}
+		}
+		public boolean getValid() {
+			return valid;
+		}
+		
+		// :::: Out of bounds check
+		
+		// Turn the text field red if the data is out of bounds
+		private void checkIfOOB() {
+			String text = this.getText();
+			
+			try {
+				int i = Integer.parseInt(text);
+				if( text == "") i = 0;
+				
+				if( i < min || i > max)
+					this.outOfBounds();
+				else
+					this.inBounds();
+			}catch( Exception e) {}
+		}
+		private void outOfBounds() {
+			default_color = this.getBackground();
+			this.setBackground(bad_color);
+			valid = false;
+			
+		}
+		private void inBounds() {
+			if( !valid) {
+				this.setBackground(default_color);
+				valid = true;
+			}
+		}
+		
+	
+	
+		// :::: DocumentListener
+		@Override public void changedUpdate(DocumentEvent e) {}
+		
+		@Override public void removeUpdate(DocumentEvent de) {
+			checkIfOOB();
+		}
+		
+		@Override
+		public synchronized void insertUpdate(DocumentEvent de) {
+			checkIfOOB();
+		}
+	
 	}
 }

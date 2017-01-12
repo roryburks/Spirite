@@ -4,4 +4,6 @@ import java.awt.Graphics;
 
 public abstract class AbstractAnimation {
 	public abstract void drawFrame( Graphics g, float t);
+	public abstract float getStartFrame();
+	public abstract float getEndFrame();
 }

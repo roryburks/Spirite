@@ -2,11 +2,14 @@ package spirite.image_data;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -23,47 +26,94 @@ import spirite.image_data.GroupTree.Node;
  *
  */
 public class ImageWorkspace {
-	private List<ImageData> imageData;
-	private GroupTree groups;
+	// ImageData is tracked in ImageWorkspace if it is either part of the active
+	//	Image Data (used by something in the GroupTree) or it used by a component
+	//	stored in the UndoEngine.
+	List<ImageData> imageData;
+	private int workingID = 0;	// an incrementing unique ID per imageData
 	
+	// The GroupTree is the primary container for all tracked ImageData.  Though
+	//	there can be other logical collections that also have ImageData parts to
+	//	it, all data used in the workspace should have an entry in GroupTree even
+	//	if it has entries elsewhere
+	private GroupTree groupTree;
 	private GroupTree.Node selected = null;
-	
-	private int workingID = 0;
+	private UndoEngine undoEngine;
 	
 	private int width = 0;
 	private int height = 0;
 	
 	private String name;
-	
-	private UndoEngine undoEngine;
-	
+	private boolean changed;
 	
 	
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
-		
-		groups = new GroupTree(this);
-		
+		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 	}
 	
+	// :::: Maintenance Methods
+	public void cleanDataCache() {
+		boolean used[] = new boolean[imageData.size()];
+		Arrays.fill(used, false);
+		
+		// Go through each Layer in the groupTree and flag the imageData
+		//	it uses as being used.
+		List< LayerNode> layers = groupTree.getAllLayerNodes();
+		for( LayerNode node : layers) {
+			ImageData data = node.getImageData();
+			int i = imageData.indexOf(data);
+			
+			if( i == -1) {
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData during Cache cleanup.");
+				imageData.add(data);
+			}
+			else 
+				used[i] = true;
+		}
+		
+		for( int i=used.length-1; i>=0; --i) {
+			if( !used[i]) {
+				System.out.println("Clearing: " + i);
+				imageData.remove(i);
+			}
+		}
+	}
+
+	
+	public void resetUndoEngine() {
+		undoEngine.reset();
+	}
+	
+	// :::: Getters and Setters
 	public int getWidth() {
 		return width;
 	}
+	public void setWidth( int width) {
+		if( width >= 0 && this.width != width
+				&& width < Globals.getMetric("workspace.max_size").width) 
+		{
+			this.width = width;
+		}
+	}
 	public int getHeight() {
 		return height;
+	}
+	public void setHeight( int height) {
+		if( height >= 0 && this.height != height
+				&& height < Globals.getMetric("workspace.max_size").height)
+		{
+			this.height = height;
+		}
 	}
 	
 	public UndoEngine getUndoEngine() {
 		return undoEngine;
 	}
 	
-	public void resetUndoEngine() {
-		undoEngine.reset();
-	}
-	
 	public GroupTree.GroupNode getRootNode() {
-		return groups.getRoot();
+		return groupTree.getRoot();
 	}
 	
 	public List<ImageData> getImageData() {
@@ -97,7 +147,7 @@ public class ImageWorkspace {
 		selected = node;
 	}
 	
-	// Creates a New Rig
+	// :::: New Rig Creation
 	public LayerNode newRig( int w, int h, String name, Color c) {
 		return 	addNewRig( null, w, h, name, c);
 	}
@@ -113,7 +163,7 @@ public class ImageWorkspace {
 		height = Math.max(height, h);
 		
 		// Create node then execute StructureChange event
-		LayerNode node = groups.new LayerNode( data, name);
+		LayerNode node = groupTree.new LayerNode( data, name);
 		
 		executeChange(createAdditionEvent(node, context));
 		
@@ -124,7 +174,7 @@ public class ImageWorkspace {
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event
-				LayerNode node = groups.new LayerNode( data, name);
+				LayerNode node = groupTree.new LayerNode( data, name);
 
 				width = Math.max(width,  data.getData().getWidth());
 				height = Math.max(height, data.getData().getHeight());
@@ -141,7 +191,7 @@ public class ImageWorkspace {
 	}
 	
 	public GroupTree.GroupNode addTreeNode( GroupTree.Node context, String name) {
-		GroupTree.GroupNode newNode = groups.new GroupNode(name);
+		GroupTree.GroupNode newNode = groupTree.new GroupNode(name);
 		
 		executeChange(createAdditionEvent(newNode,context));
 		
@@ -163,7 +213,7 @@ public class ImageWorkspace {
 	// :::: Move Nodes
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
 		if( nodeToMove == null || nodeAbove == null || nodeAbove.getParent() == null 
-				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeAbove.getParent()))
+				|| nodeToMove.getParent() == null || groupTree._isChild( nodeToMove, nodeAbove.getParent()))
 			return;
 		
 		
@@ -176,7 +226,7 @@ public class ImageWorkspace {
 	}
 	public void moveBelow( Node nodeToMove, Node nodeUnder) {
 		if( nodeToMove == null || nodeUnder == null || nodeUnder.getParent() == null 
-				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeUnder.getParent()))
+				|| nodeToMove.getParent() == null || groupTree._isChild( nodeToMove, nodeUnder.getParent()))
 			return;
 		
 		
@@ -198,7 +248,7 @@ public class ImageWorkspace {
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
 		if( nodeToMove == null || nodeInto == null || nodeInto.getParent()== null 
-				|| nodeToMove.getParent() == null || groups._isChild( nodeToMove, nodeInto))
+				|| nodeToMove.getParent() == null || groupTree._isChild( nodeToMove, nodeInto))
 			return;
 		
 		Node nodeBefore = null;
@@ -219,7 +269,7 @@ public class ImageWorkspace {
 	public List<LayerNode> getDrawingQueue() {
 		List<LayerNode> queue = new LinkedList<LayerNode>();
 		
-		_gdq_rec( groups.getRoot(), queue);
+		_gdq_rec( groupTree.getRoot(), queue);
 		
 		return queue;
 	}
@@ -259,7 +309,10 @@ public class ImageWorkspace {
 		boolean imageChange = true;
 		public abstract void execute();
 		public abstract void unexecute();
-		public abstract void cauterize();
+		
+		// Called when history has been re-written and so the action never
+		//	was performed, and thus 
+		public void cauterize() {}
 		public void alert( boolean undo) {
 			triggerStructureChanged(this, undo);
 			if( imageChange)
@@ -294,9 +347,6 @@ public class ImageWorkspace {
 			if( selected == node)
 				selected = null;
 		}
-
-		@Override
-		public void cauterize() {}
 	}
 	
 
@@ -325,15 +375,12 @@ public class ImageWorkspace {
 		public void unexecute() {
 			parent._add(node, nodeBefore);
 		}
-
-		@Override
-		public void cauterize() {}
 	}
 	
 	public class RenameChange extends StructureChange {
 		public final String newName;
 		public final String oldName;
-		public final Node node;
+		public final Node node;	// if null, then it's renaming the workspace
 		
 		public RenameChange(
 				String newName,
@@ -354,8 +401,6 @@ public class ImageWorkspace {
 		public void unexecute() {
 			node.setName(oldName);
 		}
-		@Override		public void cauterize() {}
-		
 	}
 	
 	public class MoveChange extends StructureChange {
@@ -392,8 +437,6 @@ public class ImageWorkspace {
 			moveNode._del();
 			oldParent._add(moveNode, oldNext);
 		}
-
-		@Override		public void cauterize() {}
 		
 	}
 	public class VisbilityChange extends StructureChange {
@@ -415,12 +458,6 @@ public class ImageWorkspace {
 		public void unexecute() {
 			node.setVisible(!visibleAfter);
 		}
-
-		@Override
-		public void cauterize() {
-			
-		}
-		
 	}
 	
 	public void executeChange( StructureChange change) {
@@ -447,7 +484,7 @@ public class ImageWorkspace {
 		Node parent;
 		Node nodeBefore;
 		if( context == null) {
-			parent = groups.getRoot();
+			parent = groupTree.getRoot();
 			nodeBefore = null;
 		}
 		else if( context instanceof GroupNode) {
@@ -473,7 +510,7 @@ public class ImageWorkspace {
 	 * Verifies that the given node exists within the current workspace
 	 */
 	public boolean nodeInWorkspace( GroupTree.Node node) {
-		return _niw_rec( groups.getRoot(), node);
+		return _niw_rec( groupTree.getRoot(), node);
 	}
 	private boolean _niw_rec( GroupTree.Node working, GroupTree.Node toCheck) {
 		if( working == toCheck) 

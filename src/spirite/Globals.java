@@ -36,6 +36,7 @@ public class Globals {
     		{"contentTree.dragdropLeniency", new Dimension( 0, 10)},
     		{"contentTree.buttonSize", new Dimension( 24, 24)},
     		{"contentTree.buttonMargin", new Dimension( 2, 2)},
+    		{"workspace.max_size", new Dimension( 20000,20000)},
     };
 
 

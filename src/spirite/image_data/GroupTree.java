@@ -11,6 +11,11 @@ import spirite.MDebug.ErrorType;
  * displayed and/or manipulated, GroupTree should function primarily as
  * a container, not as an interface.
  * 
+ * Note: "floating" Nodes which are nested inside a GroupTree, but are not
+ *	linked to it through its root-branch system can exist for numerous 
+ * 	reasons, such as for storing undo actions or because a UI component
+ * 	hasn't re-constructed its data based on the GroupTree changes.
+ * 
  * @author Rory Burks
  */
 public class GroupTree {
@@ -39,8 +44,26 @@ public class GroupTree {
 		return false;
 	}
 	
+	
+	// Creates a sequential list of all the LayerNodes in the tree
+	public List<LayerNode> getAllLayerNodes() {
+		List<LayerNode> list = new ArrayList<>();
+		_galn_rec( root, list);
+		return list;
+	}
+	private void _galn_rec( GroupNode parent, List<LayerNode>list) {
+		for( Node child : parent.getChildren()) {
+			if( child instanceof LayerNode) {
+				list.add((LayerNode) child);
+			}
+			else if( child instanceof GroupNode){
+				_galn_rec( (GroupNode) child, list);
+			}
+		}
+	}
+	
 	// ::: Nodes
-	public class Node  {
+	public abstract class Node  {
 		// !!!! TODO : Various attributes (such as opacity) that apply to the group
 		//	or the Node (without altering them) should go here
 		protected float alpha;

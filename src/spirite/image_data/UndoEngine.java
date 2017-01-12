@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +16,10 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
@@ -163,15 +166,16 @@ public class UndoEngine {
 		if( queuePosition != null) {
 			queue.subList(queuePosition.nextIndex(), queue.size()).clear();
 			
-
 			for( UndoContext context : contexts) {
 				context.cauterize();
 			}
+			
+			// Since erasing the timeline might create ghosts 
+			workspace.cleanDataCache();
 		}
 		
 		// Determine if the Context for the given ImageData exists
 		UndoContext storedContext = null;
-
 		
 		for( UndoContext context : contexts) {
 			if( context.image == data) {
@@ -194,6 +198,20 @@ public class UndoEngine {
 		}
 		
 		
+
+		cleanUnusedContexts();
+	}
+	
+	private void cleanUnusedContexts() {
+		Iterator<UndoContext> it = contexts.iterator();
+		
+		while( it.hasNext()) {
+			UndoContext uc = it.next();
+			if( !(uc instanceof NullContext) && uc.isEmpty()) {
+				System.out.println("Removing unused context");
+				it.remove();
+			}
+		}
 	}
 	
 	/***
@@ -249,6 +267,8 @@ public class UndoEngine {
 
 		abstract void startIterate();
 		abstract UndoAction iterateNext();
+		
+		abstract boolean isEmpty();
 	}
 	
 	/***
@@ -322,7 +342,12 @@ public class UndoEngine {
 		 */
 		@Override
 		void cauterize() {
-			actions.subList(met, actions.size()).clear();
+			List<UndoAction> subList = actions.subList(met, actions.size());
+			
+			for( UndoAction action : subList) {
+				action.onCauterize();
+			}
+			subList.clear();
 		}
 
 		
@@ -336,6 +361,12 @@ public class UndoEngine {
 		@Override
 		UndoAction iterateNext() {
 			return actions.get(iterMet++);
+		}
+
+
+		@Override
+		boolean isEmpty() {
+			return actions.isEmpty();
 		}
 	}
 	
@@ -389,7 +420,12 @@ public class UndoEngine {
 		@Override
 		void cauterize() {
 			if( pointer != null) {
-				actions.subList(pointer.nextIndex(), actions.size()).clear();
+				List<NullAction> subList = actions.subList(pointer.nextIndex(), actions.size());
+				
+				for( NullAction action : subList) {
+					action.onCauterize();
+				}
+				subList.clear();
 				pointer = null;
 			}
 		}
@@ -411,6 +447,11 @@ public class UndoEngine {
 				return iter.next();
 				
 		}
+
+		@Override
+		boolean isEmpty() {
+			return actions.isEmpty();
+		}
 	}
 	
 	/***
@@ -421,6 +462,7 @@ public class UndoEngine {
 	 */
 	public abstract class UndoAction {
 		public abstract void performAction( ImageData data);
+		public void onCauterize() {}
 	}
 	
 	// :::: Image UIndoActions
@@ -497,6 +539,11 @@ public class UndoEngine {
 		public void undoAction() {
 			change.unexecute();
 			change.alert(true);
+		}
+		
+		@Override
+		public void onCauterize() {
+			change.cauterize();
 		}
 	}
 	
