@@ -8,6 +8,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.brains.MasterControl;
+import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewLayerDPanel;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
@@ -62,7 +63,7 @@ public class LayersPanel extends JPanel {
 							.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
 							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
-						.addComponent(layerTreePanel, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
+						.addComponent(layerTreePanel, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -81,29 +82,7 @@ public class LayersPanel extends JPanel {
 	}
 	
 	private void btnNewLayerPress() {
-		NewLayerDPanel panel = new NewLayerDPanel(master);
-		
-		int response = JOptionPane.showConfirmDialog(this,
-			panel,
-			"New Image",
-			JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.PLAIN_MESSAGE);
-		
-		if( response == JOptionPane.OK_OPTION) {
-			int w = panel.getValueWidth();
-			int h = panel.getValueHeight();
-			String name = panel.getValueName();
-			//String type = panel.getValueType();
-			Color c = panel.getValueColor();
-			
-
-			// Add the new layer contextually according to the selected Node
-			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();			
-			
-			ImageWorkspace workspace = layerTreePanel.workspace;
-			
-			workspace.addNewLayer(selected_node, w, h, name, c);
-		}
+		Dialogs.performNewLayerDialog(layerTreePanel.workspace);
 	}
 	
 	private void btnNewGroupPress() {

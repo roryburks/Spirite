@@ -10,6 +10,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import spirite.brains.MasterControl;
+import spirite.image_data.GroupTree;
+import spirite.image_data.ImageWorkspace;
 
 /***
  * A static centalized namespace for calling the various Dialogs.
@@ -74,5 +76,32 @@ public class Dialogs {
     		return fc.getSelectedFile();
     	return null;
     	
+    }
+    
+    public static boolean performNewLayerDialog( ImageWorkspace workspace) {
+
+		NewLayerDPanel panel = new NewLayerDPanel(master);
+		
+		int response = JOptionPane.showConfirmDialog(null,
+			panel,
+			"New Image",
+			JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.PLAIN_MESSAGE);
+		
+		if( response == JOptionPane.OK_OPTION) {
+			int w = panel.getValueWidth();
+			int h = panel.getValueHeight();
+			String name = panel.getValueName();
+			//String type = panel.getValueType();
+			Color c = panel.getValueColor();
+			
+
+			// Add the new layer contextually according to the selected Node
+			GroupTree.Node context = workspace.getSelectedNode();
+			
+			workspace.addNewLayer(context, w, h, name, c);
+			return true;
+		}
+		return false;
     }
 }

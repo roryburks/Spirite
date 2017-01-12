@@ -7,8 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.List;
 
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -28,8 +31,10 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -248,21 +253,39 @@ public class LayerTreePanel extends ContentTree
 			DefaultMutableTreeNode node = 
 					(DefaultMutableTreeNode)path.getLastPathComponent();
 			
-			Object usrObj = node.getUserObject();
+			// Construct the base Context Menu
+			String descriptor = "...";
 			
+			Object usrObj = node.getUserObject();
 			if( usrObj instanceof GroupNode) {
-				
-				String[][] menuScheme = {
-					{"&Construct Simple Animation From Group", "animfromgroup", null}
-				};
-				
-				contextMenu.removeAll();
-				UIUtil.constructMenu(contextMenu, menuScheme, this);
-				contextMenu.context = (Node)usrObj;
-				
-				contextMenu.show(this, evt.getX(), evt.getY());
+				descriptor = "Layer Group";
+			}
+			if( usrObj instanceof LayerNode) {
+				descriptor = "Layer";
 			}
 			
+			String[][] baseMenuScheme = {
+					{"&New Layer", "newLayer", null},
+					{"New Layer &Group", "newGroup", null},
+					{"-"},
+					{"Duplicate "+descriptor, "duplicate", null}, 
+					{"Delete  "+descriptor, "delete", null}, 
+			};
+			List<String[]> menuScheme = new ArrayList<>(Arrays.asList(baseMenuScheme));
+			
+			// Add parts to the menu scheme depending on node type
+			if( usrObj instanceof GroupNode) {
+				menuScheme.add( new String[]{"-"});
+				menuScheme.add( new String[]{"&Construct Simple Animation From Group", "animfromgroup", null});
+			}
+			else if( usrObj instanceof LayerNode) {
+			}
+
+			// Show the ContextMenu
+			contextMenu.removeAll();
+			UIUtil.constructMenu(contextMenu, menuScheme.toArray( new String[0][]), this);
+			contextMenu.context = (Node)usrObj;
+			contextMenu.show(this, evt.getX(), evt.getY());
 		}
 	}
 	
@@ -330,9 +353,25 @@ public class LayerTreePanel extends ContentTree
 	// :::: ActionListener
 	@Override
 	public void actionPerformed(ActionEvent evt) {
+		// ActionCommands from JPopupMenu
 		if( evt.getActionCommand().equals("animfromgroup")) {
 			GroupNode group = (GroupNode)contextMenu.context;
 			workspace.getAnimationManager().addAnimation(new SimpleAnimation(group));
+		}
+		else if (evt.getActionCommand().equals("newGroup")){
+			workspace.addGroupNode(contextMenu.context, "New Group");
+		}
+		else if (evt.getActionCommand().equals("newLayer")) {
+			Dialogs.performNewLayerDialog(workspace);
+		}
+		else if (evt.getActionCommand().equals("duplicate")) {
+			
+		}
+		else if (evt.getActionCommand().equals("delete")) {
+			workspace.removeNode(contextMenu.context);
+		}
+		else {
+			System.out.println(evt.getActionCommand());
 		}
 	}
 	
@@ -365,6 +404,12 @@ public class LayerTreePanel extends ContentTree
 					str += " " + ((GroupTree.LayerNode)obj).getImageData().getID();
 				renderPanel.label.setText( str);
 			}
+			
+			if( obj instanceof GroupTree.LayerNode) {
+				renderPanel.ppanel.image = ((GroupTree.LayerNode)obj).getImageData();
+			}
+			else
+				renderPanel.ppanel.image = null;
 		
 			return renderPanel;
 		}
@@ -399,7 +444,12 @@ public class LayerTreePanel extends ContentTree
 				editingNode = (GroupTree.Node)obj;
 				renderPanel.label.setText( editingNode.getName());
 			}
-			
+
+			if( obj instanceof GroupTree.LayerNode) {
+				renderPanel.ppanel.image = ((GroupTree.LayerNode)obj).getImageData();
+			}
+			else
+				renderPanel.ppanel.image = null;
 		
 			return renderPanel;
 		}

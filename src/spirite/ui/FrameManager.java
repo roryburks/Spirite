@@ -157,6 +157,7 @@ public class FrameManager implements WindowListener {
 	
 	// :::: WindowListener
 	@Override	public void windowClosing(WindowEvent evt) {
+		evt.getWindow().removeAll();
 		frames.remove(evt.getWindow());
 	}
 	@Override	public void windowActivated(WindowEvent evt) {}

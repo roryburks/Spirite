@@ -2,7 +2,6 @@ package spirite.ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -23,13 +22,8 @@ import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,17 +33,27 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import spirite.MDebug.WarningType;
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager.FrameType;
-import spirite.ui.OmniFrame.OmniContainer;
 
+/***
+ * 
+ * TODO: So apparently as late as Java 1.8, JDialogs are still memory
+ * 	leaks in that they are JNI roots that are never cleared up by the GC.
+ * (Although some research suggests this only exists in the JDK, not the JRE)
+ * 	So at some point (in addition to figuring out a unintrusive way
+ * 	to make components de-link Observers) I have set up the frame
+ * 	manager to re-use OmniFrames or at least void them out to 
+ * 	prevent the memory leak from mattering at all.
+ * 
+ * @author RoryBurks
+ *
+ */
 public class OmniFrame extends JDialog
 {	
 	private static final long serialVersionUID = 1L;

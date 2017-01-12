@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.event.DocumentEvent;
@@ -74,7 +75,8 @@ public class UIUtil {
     	
     	// If root is a JMenuBar, make sure that all top-level nodes are JMenu's
     	//	instead of JMenuItems (otherwise they glitch out the bar)
-    	boolean baseMenu = (root instanceof JMenuBar);
+    	boolean isMenuBar = (root instanceof JMenuBar);
+    	boolean isPopupMenu = (root instanceof JPopupMenu);
     	
     	// Atempt to construct menu from parsed data in menu_scheme
 		// !!!! TODO: note, there are very few sanity checks in here for now
@@ -89,7 +91,12 @@ public class UIUtil {
     		
     		// If it's - that means it's a separator
     		if( title.equals("-")) {
-    			((JMenu)active_root_tree[level-1]).addSeparator();
+    			if( level == 0 ) {
+    				if( isPopupMenu)
+    					((JPopupMenu)root).addSeparator();
+    			}
+    			else
+    				((JMenu)active_root_tree[level-1]).addSeparator();
     			continue;
     		}
     		
@@ -103,7 +110,7 @@ public class UIUtil {
     		
     		// Determine if it needs to be a Menu (which contains other options nested in it)
     		//	or a plain MenuItem (which doesn't)
-    		if( (level != 0 || !baseMenu) && (i+1 == menuScheme.length || _imCountLevel((String)menuScheme[i+1][0]) <= level)) {
+    		if( (level != 0 || !isMenuBar) && (i+1 == menuScheme.length || _imCountLevel((String)menuScheme[i+1][0]) <= level)) {
     			new_node = new JMenuItem( title);
     		}
     		else {

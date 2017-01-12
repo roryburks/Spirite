@@ -146,10 +146,13 @@ public class ImageWorkspace {
 	}
 	
 	public GroupTree.Node getSelectedNode() {
+		if( !nodeInWorkspace(selected)) {
+			setSelectedNode(null);
+		}
 		return selected;
 	}
 	public void setSelectedNode( GroupTree.Node node) {
-		if( !nodeInWorkspace(node)) 
+		if( node != null && !nodeInWorkspace(node)) 
 			return;
 		
 		if( selected != node) {
@@ -221,6 +224,20 @@ public class ImageWorkspace {
 			newData.id = workingID++;
 		else
 			workingID = newData.id+1;
+	}
+	
+	// :::: Remove Nodes
+	public void removeNode( Node node) {
+		if(!nodeInWorkspace(node) ) {
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempted to remove a node from the wrong Workspace.");
+			return;
+		}
+		if( node == groupTree.getRoot()){
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempted to remove a Root Node.");
+			return;
+		}
+		
+		executeChange( createDeletionEvent(node));
 	}
 	
 	
@@ -482,7 +499,7 @@ public class ImageWorkspace {
 	
 	// :::: StructureChangeEvent Factories
 	public StructureChange createDeletionEvent( GroupTree.Node node) {
-		if( node.getParent() == this.getRootNode()) 
+		if( node == this.getRootNode()) 
 			return null;
 		else if( !nodeInWorkspace(node)) 
 			return null;
@@ -538,6 +555,8 @@ public class ImageWorkspace {
     public void triggerImageRefresh() {
         for( MImageObserver obs : imageObservers)
             obs.imageChanged();
+        
+        
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}

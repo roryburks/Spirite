@@ -29,6 +29,7 @@ public class WorkTabPane extends JTabbedPane
 	List<WorkPanel> panels = new ArrayList<>();
 	
 	
+	
 	public WorkTabPane( MasterControl master) {
 		this.master = master;
 		
