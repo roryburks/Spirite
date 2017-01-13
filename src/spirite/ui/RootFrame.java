@@ -255,7 +255,6 @@ public class RootFrame extends javax.swing.JFrame
         		
         	}
         }
-        // !!! TODO START DEBUG
         else if( command.equals("open_image"))
 			try {
 				File f =Dialogs.pickFileOpen();

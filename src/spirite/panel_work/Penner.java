@@ -254,7 +254,6 @@ public class Penner
 	public boolean dispatchKeyEvent(KeyEvent evt) {
 		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
 		if( shift && !holdingShift) {
-			System.out.println("Test");
 			shiftStartX = x;
 			shiftStartY = y;
 			shiftMode = 0;

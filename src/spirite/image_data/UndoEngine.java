@@ -7,11 +7,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -285,43 +288,65 @@ public class UndoEngine {
 		
 		ImageContext( ImageData data) {
 			super(data);
-			BufferedImage toCopy = data.getData();
 			
+			keyframes.add(deepCopy(data.getData()));
+		}
+
+		class KeyframeAction extends UndoAction {
+			int index;
+			KeyframeAction( int i) {
+				this.index = i;
+			}
+			@Override		
+			public void performAction(ImageData data) {	
+				resetToKeyframe(index);
+			}
+		}
+		
+		private BufferedImage deepCopy( BufferedImage toCopy) {
 			cacheSize += toCopy.getWidth() * toCopy.getHeight() + 4;
 			
-			// DeepCopy the BufferedImage
-			BufferedImage copy = new BufferedImage( 
+			System.out.println(cacheSize);
+			
+			return new BufferedImage( 
 					toCopy.getColorModel(),
 					toCopy.copyData(null),
 					toCopy.isAlphaPremultiplied(),
 					null);
-			keyframes.add( copy);
+		}
+		private void resetToKeyframe( int i) {
+			Graphics g = image.getData().getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
+			Composite c = g2.getComposite();
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
+			g2.drawImage( keyframes.get(i), 0, 0,  null);
+			g2.setComposite( c);
 		}
 		
 		
 		public void addAction( UndoAction action) {
-			if( met == TICKS_PER_KEY) {
-				// TODO
+			// tricky pre-increment
+			if( (++met % TICKS_PER_KEY) == 0) {
+				keyframes.add(deepCopy(image.getData()));
+				actions.add(new KeyframeAction(keyframes.size()-1));
 			}
-			actions.add(action);
-			met++;
+			else {
+				actions.add(action);
+			}
+			
 		}
 		
 		@Override
 		void undo() {
-			Graphics g = image.getData().getGraphics();
-			
-			// Refresh the Image to the current base keyframe
-			Graphics2D g2 = (Graphics2D)g;
-			Composite c = g2.getComposite();
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-			//g2.setColor( new Color(0,0,0,0));
-			g.drawImage( keyframes.get(0), 0, 0,  null);
-
-			g2.setComposite( c);
-			
 			met--;
-			for( int i = 0; i < met; ++i) {
+			if( met < 0) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Internal Undo attempted before start of context.");
+			}
+			
+			// Refresh the Image to the current most recent keyframe
+			resetToKeyframe(met/TICKS_PER_KEY);
+
+			for( int i = met - (met % TICKS_PER_KEY); i < met; ++i) {
 				actions.get(i).performAction(image);
 			}
 			
@@ -331,13 +356,19 @@ public class UndoEngine {
 		@Override
 		void redo() {
 			met++;
-			if( met > actions.size()) {
+			if( met > actions.size() || met == 0) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue.");
 				return;
 			}
-			for( int i = 0; i < met; ++i) {
-				actions.get(i).performAction(image);
+			if( (met % TICKS_PER_KEY) == 0) {
+				resetToKeyframe( met/TICKS_PER_KEY);
 			}
+			else {
+				for( int i = met - (met % TICKS_PER_KEY); i < met; ++i) {
+					actions.get(i).performAction(image);
+				}
+			}
+
 			workspace.triggerImageRefresh();
 		}
 		
@@ -485,6 +516,7 @@ public class UndoEngine {
 		public abstract void performAction( ImageData data);
 		public void onCauterize() {}
 	}
+	
 	
 	// :::: Image UIndoActions
 	//	Actions working directly on the image data
