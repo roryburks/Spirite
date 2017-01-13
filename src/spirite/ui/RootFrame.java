@@ -264,13 +264,17 @@ public class RootFrame extends javax.swing.JFrame
 				MDebug.handleError( ErrorType.FILE, e, "Malformed SIF file.");
 			}
         else if( command.equals("save_image")) {
-        	File f= master.getSettingsManager().getOpennedFile();
-        	
-        	if( f == null)
-        		f = Dialogs.pickFileSave();
-        	
-        	if( f != null)
-				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
+        	ImageWorkspace workspace = master.getCurrentWorkspace();
+
+        	File f=workspace.getFile();
+
+        	if( !workspace.hasChanged() || f == null) {
+	        	if( f == null)
+	        		f = Dialogs.pickFileSave();
+	        	
+	        	if( f != null)
+					SaveEngine.saveWorkspace( workspace, f);
+        	}
         }
 		else if( command.equals("save_image_as")) {
 			File f = Dialogs.pickFileSave();

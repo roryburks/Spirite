@@ -1,15 +1,18 @@
 package spirite.dialogs;
 
-import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JSeparator;
-
-import java.awt.Color;
-import java.awt.Font;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
@@ -17,11 +20,6 @@ import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.UIUtil;
-import spirite.ui.UIUtil.MTextFieldNumber;
-
-import javax.swing.SwingConstants;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class NewLayerDPanel extends JPanel {
 	private static final long serialVersionUID = 1L;

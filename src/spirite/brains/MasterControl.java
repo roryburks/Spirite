@@ -1,12 +1,17 @@
 package spirite.brains;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
+import spirite.file.SaveEngine;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -20,6 +25,9 @@ import spirite.ui.FrameManager;
  * 
  * Note: Though most UI components will need full access to MasterControl, giving
  * it to too many internal components is probably indicative of backwards design.
+ * 
+ * !!!! NOTE: I have made the decision to allow null workspace selection (particularly
+ * 	when none are open). This opens up a lot of scrutiny to be placed on UI components.
  * 
  * @author Rory Burks
  *
@@ -83,6 +91,57 @@ public class MasterControl
     public SettingsManager getSettingsManager() {
     	return settingsManager;
     }
+    
+    // :::: API
+    
+    public void closeWorkspace( ImageWorkspace workspace) {
+    	int i = workspaces.indexOf(workspace);
+    	
+    	if( i == -1) {
+    		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to remove a workspace that is not being tracked.");
+    		return;
+    	}
+    	
+    	if( workspace.hasChanged()) {
+    		// Prompt the User to Save the file before closing if it's 
+    		//	changed and respond accordingly.
+	    	int ret = JOptionPane.showConfirmDialog(
+	    			null,
+	    			"Save file before closing?",
+	    			"Closing " + workspace.getFileName(),
+	    			JOptionPane.YES_NO_CANCEL_OPTION,
+	    			JOptionPane.QUESTION_MESSAGE
+	    			);
+	    	
+	    	if( ret == JOptionPane.CANCEL_OPTION)
+	    		return;
+	    	
+	    	if( ret == JOptionPane.YES_OPTION) {
+	    		File f = workspace.getFile();
+	    		
+	    		if( f == null)
+	    			f = Dialogs.pickFileSave();
+	    		
+	    		if( f != null)
+	    			SaveEngine.saveWorkspace(workspace, workspace.getFile());
+	    		else
+	    			return;
+	    	}
+    	}
+    	
+    	// Remove the workspace and select a new one (if one's available)
+    	workspaces.remove(i);
+    	triggerRemoveWorkspace(workspace);
+    	
+    	if(  workspaces.size() > i) {
+    		setCurrentWorkpace( workspaces.get(i));
+    	}else if( i > 0){
+    		setCurrentWorkpace( workspaces.get(i-1));
+    	} else {
+    		setCurrentWorkpace(null);
+    	}
+    	
+    }
 
     /***
      * Makes the given workspace the currently selected workspace.
@@ -94,7 +153,7 @@ public class MasterControl
     	if( currentWorkspace == workspace)
     		return;
     	
-    	if( !workspaces.contains(workspace)) {
+    	if( workspace != null && !workspaces.contains(workspace)) {
     		MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to assign current workspace to a workspace that MasterControl isn't tracking.");
     		
     		addWorkpace(workspace, false);
@@ -145,6 +204,16 @@ public class MasterControl
     
 
     // ==== Observer Interfaces ====
+    /***
+     * A WorkspaceObserver watches for changes in which workspace is being 
+     * actively selected, it doesn't watch for changes inside any Workspace
+     * for that you need one of the various Observers in ImageWorkspace
+     */
+    public static interface MWorkspaceObserver {
+        public void currentWorkspaceChanged(  ImageWorkspace selected,  ImageWorkspace previous);
+        public void newWorkspace( ImageWorkspace newWorkspace);
+        public void removeWorkspace( ImageWorkspace newWorkspace);
+    }
     List<MWorkspaceObserver> workspaceObservers = new ArrayList<>();
 
     public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.add(obs);}
@@ -168,16 +237,6 @@ public class MasterControl
     	}
     }
     
-    /***
-     * A WorkspaceObserver watches for changes in which workspace is being 
-     * actively selected, it doesn't watch for changes inside any Workspace
-     * for that you need one of the various Observers in ImageWorkspace
-     */
-    public static interface MWorkspaceObserver {
-        public void currentWorkspaceChanged(  ImageWorkspace selected,  ImageWorkspace previous);
-        public void newWorkspace( ImageWorkspace newWorkspace);
-        public void removeWorkspace( ImageWorkspace newWorkspace);
-    }
     
     // :::: MCurrentImageObserver
     List<MCurrentImageObserver> cimageObservers = new ArrayList<>();

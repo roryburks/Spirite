@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,13 @@ import javax.swing.event.ChangeListener;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.FileChangeEvent;
+import spirite.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.ui.UIUtil;
 
 public class WorkTabPane extends JTabbedPane 
 	implements MWorkspaceObserver, ChangeListener,
-		MouseListener, ActionListener
+		MouseListener, ActionListener, MWorkspaceFileObserver
 {
 	MasterControl master;
 	List<WorkPanel> panels = new ArrayList<>();
@@ -45,7 +48,6 @@ public class WorkTabPane extends JTabbedPane
 	// :::: MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-
 		for( int i = 0; i < panels.size(); ++i) {
 			if( panels.get(i).workspace == selected) {
 				setSelectedIndex(i);
@@ -57,19 +59,38 @@ public class WorkTabPane extends JTabbedPane
 	@Override
 	public void newWorkspace( ImageWorkspace newWorkspace) {
 		WorkPanel panel =  new WorkPanel(master, newWorkspace);
+		newWorkspace.addWorkspaceFileObserve(this);
 		panels.add(panel);
-		this.addTab("Untilted Image", panel);
+		
+		String title;
+		
+		if( newWorkspace.getFile() == null) {
+			title = "Untitled Image";
+		}
+		else {
+			title = newWorkspace.getFile().getName();
+		}
+		
+		this.addTab(title, panel);
 	}
 	
 	@Override
-	public void removeWorkspace( ImageWorkspace arg0) {
-		// TODO Auto-generated method stub
-		
+	public void removeWorkspace( ImageWorkspace workspace) {
+		for( int i = 0; i < panels.size(); ++i) {
+			if( panels.get(i).workspace == workspace) {
+				this.removeTabAt(i);
+				panels.remove(i);
+				break;
+			}
+		}
 	}
 
 	// :::: ChangeListener
 	@Override
-	public void stateChanged(ChangeEvent arg0) {
+	public void stateChanged(ChangeEvent evt) {
+		if( getSelectedIndex() == -1)
+			return;
+		
 		ImageWorkspace selected = panels.get( getSelectedIndex()).workspace;
 		
 		if( selected != master.getCurrentWorkspace()) {
@@ -78,11 +99,11 @@ public class WorkTabPane extends JTabbedPane
 	}
 
 
-	// MouseListener
-	@Override	public void mouseClicked(MouseEvent arg0) {}
-	@Override	public void mouseEntered(MouseEvent arg0) {}
-	@Override	public void mouseExited(MouseEvent arg0) {}
-	@Override	public void mouseReleased(MouseEvent arg0) {}
+	// :::: MouseListener, ActionListener for ContextMenu behavior
+	WTPContextMenu contextMenu = new WTPContextMenu();
+	class WTPContextMenu extends JPopupMenu {
+		int tabID;
+	}
 	@Override
 	public void mousePressed(MouseEvent evt) {
 		if( evt.getButton() == MouseEvent.BUTTON3) {
@@ -90,24 +111,41 @@ public class WorkTabPane extends JTabbedPane
 				Rectangle rect = getBoundsAt(i);
 				if( rect.contains(evt.getPoint())) {
 					
+					contextMenu.tabID = i;
+					
 					String [][] menuScheme =  {
 						{"&Close File", "close", null},
 					};
 					
-					JPopupMenu jpm = new JPopupMenu();
-					UIUtil.constructMenu(jpm, menuScheme, this);
-					jpm.show(evt.getComponent(), evt.getX(), evt.getY());
+					contextMenu.removeAll();
+					UIUtil.constructMenu(contextMenu, menuScheme, this);
+					contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 				}
 			}
 		}
 	}
+	@Override	public void mouseClicked(MouseEvent arg0) {}
+	@Override	public void mouseEntered(MouseEvent arg0) {}
+	@Override	public void mouseExited(MouseEvent arg0) {}
+	@Override	public void mouseReleased(MouseEvent arg0) {}
 
-
-	// ActionListener
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		System.out.println(arg0.getActionCommand());
-		
+	public void actionPerformed(ActionEvent evt) {
+		if( evt.getActionCommand().equals("close")) {
+			ImageWorkspace workspace = panels.get(contextMenu.tabID).workspace;
+			master.closeWorkspace(workspace);
+		}		
+	}
+
+
+	// :::: MWorkspaceFileObserver
+	@Override
+	public void fileChanged( FileChangeEvent evt) {
+		for( int i = 0; i < panels.size(); ++i) {
+			if( panels.get(i).workspace == evt.getWorkspace()) {
+				setTitleAt(i,  evt.getWorkspace().getFileName() + (evt.hasChanged() ? "*" : ""));
+			}
+		}
 	}
 	
 	

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -48,7 +49,7 @@ public class UndoPanel extends JPanel
 	JScrollPane container;
 	JList<UndoIndex> list;
 	DefaultListModel<UndoIndex> model;
-	UndoEngine engine;
+	UndoEngine engine = null;
 	
 	public UndoPanel( MasterControl master) {
 		this.master = master;
@@ -70,11 +71,14 @@ public class UndoPanel extends JPanel
 		this.add(container);
 		
 		// Link the various components
-		engine = master.getCurrentWorkspace().getUndoEngine();
-		engine.addUndoEngineObserver(this);
+		ImageWorkspace ws = master.getCurrentWorkspace();
+		if( ws != null) {
+			engine = ws.getUndoEngine();
+			engine.addUndoEngineObserver(this);
+			constructFromHistory( engine.constructUndoHistory());
+		}
 		master.addWorkspaceObserver(this);
 		
-		constructFromHistory( engine.constructUndoHistory());
 	}
 
 	
@@ -91,7 +95,7 @@ public class UndoPanel extends JPanel
 			model.addElement( index);
 		}
 		
-
+		
 		list.setSelectedIndex( model.size() - 1);
 	}
 
@@ -194,24 +198,33 @@ public class UndoPanel extends JPanel
 
 	@Override
 	public void undo() {
-		list.setSelectedIndex(engine.getQueuePosition());
+		if( engine != null)
+			list.setSelectedIndex(engine.getQueuePosition());
 	}
 
 	@Override
 	public void redo() {
-		list.setSelectedIndex(engine.getQueuePosition());
+		if( engine != null)
+			list.setSelectedIndex(engine.getQueuePosition());
 	}
 	
 	// :::: ListSelectionListener
 	@Override
 	public void valueChanged(ListSelectionEvent evt) {
+		
 		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
+				if( engine == null)
+					return;
+				
+				
 				ListSelectionModel model = (ListSelectionModel) evt.getSource();
 				int i = model.getMinSelectionIndex();
-				list.scrollRectToVisible( list.getCellBounds(i,i));
+				Rectangle rect = list.getCellBounds(i,i);
+				if( rect != null)
+					list.scrollRectToVisible( rect);
 				
 				if( i != engine.getQueuePosition()) {
 					engine.setQueuePosition(i);
@@ -224,10 +237,16 @@ public class UndoPanel extends JPanel
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		// Unlink the old Workspace's UndoEngine and link the new
-		engine.removeUndoEngineObserver(this);
-		engine = selected.getUndoEngine();
-		engine.addUndoEngineObserver(this);
-		constructFromHistory(engine.constructUndoHistory());
+		if( engine != null)
+			engine.removeUndoEngineObserver(this);
+		
+		if( selected != null) {
+			engine = selected.getUndoEngine();
+			engine.addUndoEngineObserver(this);
+			constructFromHistory(engine.constructUndoHistory());
+		} else {
+			model.clear();
+		}
 	}
 
 

@@ -83,10 +83,12 @@ public class AnimPanel extends javax.swing.JPanel
 			}
 		});
         
-        
-        List<AbstractAnimation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
-        if( !list.isEmpty()) {
-        	constructFromAnimation( list.get(0));
+
+        if( master.getCurrentWorkspace() != null) {
+	        List<AbstractAnimation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
+	        if( !list.isEmpty()) {
+	        	constructFromAnimation( list.get(0));
+	        }
         }
     }
     
@@ -161,7 +163,10 @@ public class AnimPanel extends javax.swing.JPanel
         
         GroupLayout layout = new GroupLayout(this);
         
-        Dimension previewSize = new Dimension( master.getCurrentWorkspace().getWidth(), master.getCurrentWorkspace().getHeight());
+        
+        Dimension previewSize = (master.getCurrentWorkspace() == null)
+        		? new Dimension( 128,128)
+        		:new Dimension( master.getCurrentWorkspace().getWidth(), master.getCurrentWorkspace().getHeight());
         
         layout.setHorizontalGroup( layout.createSequentialGroup()
     		.addGap(5)

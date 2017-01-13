@@ -18,6 +18,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
@@ -32,12 +33,12 @@ import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends ContentTree 
-	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver
+	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver, MWorkspaceObserver
 {
 	private static final long serialVersionUID = 1L;
 
-	ImageWorkspace workspace;
-	AnimationManager manager;
+	ImageWorkspace workspace = null;
+	AnimationManager manager = null;
 	
 	
 	/**
@@ -46,11 +47,16 @@ public class AnimationSchemeTreePanel extends ContentTree
 	public AnimationSchemeTreePanel( MasterControl master) {
 		
 		tree.setCellRenderer(this);
-		workspace = master.getCurrentWorkspace();
-		manager = workspace.getAnimationManager();
 		
-		manager.addStructureObserver(this);
-		workspace.addSelectionObserver(this);
+		
+		workspace = master.getCurrentWorkspace();
+		if( workspace != null) {
+			manager = workspace.getAnimationManager();
+			manager.addStructureObserver(this);
+			workspace.addSelectionObserver(this);
+		}
+		
+		master.addWorkspaceObserver(this);
 		
 		reconstruct();
 	}
@@ -61,6 +67,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	 */
 	private void reconstruct() {
 		root.removeAllChildren();
+		if( manager == null) return;
 		
 		for( AbstractAnimation animation : manager.getAnimations()) {
 			DefaultMutableTreeNode anim = new DefaultMutableTreeNode(animation);
@@ -207,7 +214,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		Enumeration <DefaultMutableTreeNode> e =
 				((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
 		
-		Node selected = workspace.getSelectedNode();
+		Node selected = (workspace == null) ? null : workspace.getSelectedNode();
 		if( selected != null)  {		
 			while( e.hasMoreElements()) {
 				DefaultMutableTreeNode node = e.nextElement();
@@ -255,5 +262,23 @@ public class AnimationSchemeTreePanel extends ContentTree
 	public void selectionChanged(Node newSelection) {
 		repaint();
 	}
+
+	// :::: MWorkspaceObserver
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		if( workspace != null) {
+			workspace.removeSelectionObserver(this);
+			manager.removeStructureObserver(this);
+		}
+		workspace = selected;
+		if( workspace != null) {
+			manager = workspace.getAnimationManager();
+			manager.addStructureObserver(this);
+			workspace.addSelectionObserver(this);
+		}
+		reconstruct();
+	}
+	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 
 }

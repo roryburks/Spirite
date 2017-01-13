@@ -65,8 +65,10 @@ public class LayerTreePanel extends ContentTree
 		
 		// Add Observers
 		workspace = master.getCurrentWorkspace();
-		workspace.addImageObserver(this);
-		workspace.addSelectionObserver(this);
+		if( workspace != null) {
+			workspace.addImageObserver(this);
+			workspace.addSelectionObserver(this);
+		}
 		master.addWorkspaceObserver(this);
 		
 		// Set Tree Properties
@@ -150,10 +152,10 @@ public class LayerTreePanel extends ContentTree
 	private void constructFromWorkspace() {
 		root.removeAllChildren();
 		
-		GroupTree.Node node = workspace.getRootNode();
-
-		// Start the recursive tree traversal
-		_cfw_construcRecursively( node, root);
+		if( workspace != null) {
+			// Start the recursive tree traversal
+			_cfw_construcRecursively( workspace.getRootNode(), root);
+		}
 		
 		model.nodeStructureChanged(root);
 
@@ -329,7 +331,8 @@ public class LayerTreePanel extends ContentTree
 		//	 is changed.
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
-		workspace.setSelectedNode(node);
+		if( workspace != null)
+			workspace.setSelectedNode(node);
 		
 		// !!! TODO Debug: this shouldn't need to be here (it should just be in ContentTree)
 		
@@ -343,12 +346,17 @@ public class LayerTreePanel extends ContentTree
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
 		// Remove assosciations with the old Workspace and add ones to the new
-		workspace.removeImageObserver(this);
-		workspace.removeSelectionObserver(this);
+		if( workspace != null) {
+			workspace.removeImageObserver(this);
+			workspace.removeSelectionObserver(this);
+		}
 		workspace = current;
-		workspace.addImageObserver( this);
-		workspace.addSelectionObserver(this);
-		this.constructFromWorkspace();
+		
+		if( current != null) {
+			workspace.addImageObserver( this);
+			workspace.addSelectionObserver(this);
+		}
+		constructFromWorkspace();
 	}
 	@Override	public void newWorkspace( ImageWorkspace arg0) {}
 	@Override	public void removeWorkspace( ImageWorkspace arg0) {}

@@ -21,6 +21,8 @@ import spirite.image_data.ImageWorkspace.StructureChange;
  * in the future.  For now all it does is take the drawQueue and
  * draw it, but in the future it might buffer recently-rendered
  * iterations of images, control various rendering paramaters, etc.
+ * 
+ * TODO: Figure out why I have a worskpaces list here.
  */
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver
@@ -35,8 +37,11 @@ public class RenderEngine
 		
 		if( master.getCurrentWorkspace() != null) {
 			ImageWorkspace ws = master.getCurrentWorkspace();
-			workspaces.add( ws);
-			ws.addImageObserver( this);
+			
+			if( ws != null) {
+				workspaces.add( ws);
+				ws.addImageObserver( this);
+			}
 		}
 		master.addWorkspaceObserver(this);
 	}
@@ -152,9 +157,8 @@ public class RenderEngine
 
 	// :::: MWorkspaceObserver
 	@Override
-	public void currentWorkspaceChanged( ImageWorkspace arg0, ImageWorkspace arg1) {
-		ImageWorkspace ws = master.getCurrentWorkspace();
-		if( !workspaces.contains(ws)) {
+	public void currentWorkspaceChanged( ImageWorkspace ws, ImageWorkspace old) {
+		if( ws!= null && !workspaces.contains(ws)) {
 			workspaces.add(ws);
 			ws.addImageObserver(this);
 		}
@@ -171,7 +175,6 @@ public class RenderEngine
 
 	@Override
 	public void removeWorkspace( ImageWorkspace ws) {
-		// TODO: Figure out why I have the workspaces list in here
 		workspaces.remove(ws);
 	}
 

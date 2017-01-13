@@ -21,19 +21,7 @@ import spirite.image_data.ImageWorkspace;
  * various file formats (but particularly the native SIF format)
  */
 public class SaveEngine {
-	public static byte[] getHeader() 
-		throws UnsupportedEncodingException
-	{
-		byte b[] = new byte[8];
-		System.arraycopy( "SIFF".getBytes("UTF-8"), 0, b, 0, 4);
-		
-		// Versioning
-		b[4] = 0;
-		b[5] = 0;
-		b[6] = 0;
-		b[7] = 0;
-		return b;
-	}
+
 	
 	public static void saveWorkspace( ImageWorkspace workspace, File file) {
 		RandomAccessFile ra;
@@ -49,7 +37,7 @@ public class SaveEngine {
 			
 			
 			// Write Header
-			ra.write( getHeader());
+			ra.write( SaveLoadUtil.getHeader());
 			
 			// Save Group
 			saveGroupTree( workspace.getRootNode(), ra);
@@ -57,8 +45,9 @@ public class SaveEngine {
 			// Save Image Data
 			saveImageData( workspace.getImageData(), ra);
 			
-
 			ra.close();
+			
+			workspace.fileSaved(file);
 		}catch (UnsupportedEncodingException e) {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
 		}catch( IOException e) {

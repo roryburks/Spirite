@@ -1,7 +1,7 @@
 package spirite.image_data;
 
 import java.awt.Color;
-import java.sql.Struct;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -48,8 +48,8 @@ public class ImageWorkspace {
 	private int width = 0;
 	private int height = 0;
 	
-	private String name;
-	private boolean changed;
+	private File file = null;
+	private boolean changed = false;
 	
 	
 	public ImageWorkspace() {
@@ -57,6 +57,14 @@ public class ImageWorkspace {
 		animationManager = new AnimationManager(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
+	}
+	
+	// :::: API
+	public void fileSaved( File newFile) {
+		file = newFile;
+		changed = false;
+		
+		triggerFileChange();
 	}
 	
 	// :::: Maintenance Methods
@@ -90,6 +98,7 @@ public class ImageWorkspace {
 	
 	public void resetUndoEngine() {
 		undoEngine.reset();
+		changed = false;
 	}
 	
 	// :::: Getters and Setters
@@ -112,6 +121,21 @@ public class ImageWorkspace {
 		{
 			this.height = height;
 		}
+	}
+	
+	public File getFile() {
+		return file;
+	} 
+	
+	public String getFileName() {
+		if( file == null) 
+			return "Untitled Image";
+		else
+			return file.getName();
+	}
+	
+	public boolean hasChanged() {
+		return changed;
 	}
 	
 	public UndoEngine getUndoEngine() {
@@ -438,7 +462,7 @@ public class ImageWorkspace {
 	public class RenameChange extends StructureChange {
 		public final String newName;
 		public final String oldName;
-		public final Node node;	// if null, then it's renaming the workspace
+		public final Node node;
 		
 		public RenameChange(
 				String newName,
@@ -598,6 +622,15 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Observers
+	/**
+	 * ImageObserver - triggers when an image's data has been changed
+	 *  (<code>imageChanged</code>) or when the image's logical structure
+	 *  has changed (<code>structureChanged</code>)
+	 */
+    public static interface MImageObserver {
+        public void imageChanged();
+        public void structureChanged(StructureChange evt);
+    }
     List<MImageObserver> imageObservers = new ArrayList<>();
     
     private void triggerStructureChanged( StructureChange evt, boolean undo) {
@@ -608,18 +641,29 @@ public class ImageWorkspace {
         for( MImageObserver obs : imageObservers)
             obs.imageChanged();
         
-        
+        // !!!! TODO: Hook into the undo engine to determine this
+        //	such that if an action is undone or redone to the same state
+        //	as the saved state, the image is re-flagged as unchanged.
+        //	To do this I will finally have to implement image checking
+        //	out and checking in so that all UndoEngine code is called
+        //	from ImageWorkspace, and not from DrawEngine
+		if( !changed) {
+			changed = true;
+			triggerFileChange();
+		}
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
     public void removeImageObserver( MImageObserver obs) { imageObservers.remove(obs); }
     
-    public static interface MImageObserver {
-        public void imageChanged();
-        public void structureChanged(StructureChange evt);
-    }
-    
 
+
+    /**
+     * SelectionObserver - triggers when a different Layer has been selected
+     */
+    public static interface MSelectionObserver{
+    	public void selectionChanged( Node newSelection);
+    }
     List<MSelectionObserver> selectionObservers = new ArrayList<>();
     
     private void triggerSelectedChanged() {
@@ -630,7 +674,44 @@ public class ImageWorkspace {
     public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
     public void removeSelectionObserver( MSelectionObserver obs) { selectionObservers.remove(obs); }
     
-    public static interface MSelectionObserver{
-    	public void selectionChanged( Node newSelection);
+    
+    
+    /**
+     * WorkspaceFileObserver - triggers when the File accompanying the
+     * 	workspace has changed or if the status of whether or not the
+     *  file is different from its saved form has changed
+     */
+    public static interface MWorkspaceFileObserver{
+    	public void fileChanged( FileChangeEvent evt);
     }
+    public static class FileChangeEvent {
+    	final ImageWorkspace workspace;
+    	final File file;
+    	final boolean changed;
+    	
+    	FileChangeEvent(ImageWorkspace workspace, File newFile, boolean changed) {
+    		this.workspace = workspace;
+    		this.file = newFile;
+    		this.changed = changed;
+    	}
+    	public ImageWorkspace getWorkspace() {
+    		return workspace;
+    	}
+    	public File getFile() {
+    		return file;
+    	}
+    	public boolean hasChanged() {
+    		return changed;
+    	}
+    }
+    List<MWorkspaceFileObserver> fileObservers = new ArrayList<>();
+    
+    private void triggerFileChange() {
+        for( MWorkspaceFileObserver obs : fileObservers)
+            obs.fileChanged( new FileChangeEvent( this, file, changed));
+    }
+
+    public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(obs);}
+    public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.remove(obs); }
+    
 }

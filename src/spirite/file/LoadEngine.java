@@ -39,7 +39,7 @@ public class LoadEngine {
 			
 			// Verify Header
 			ra.seek(0);
-			byte[] header = SaveEngine.getHeader();
+			byte[] header = SaveLoadUtil.getHeader();
 			byte[] b = new byte[8];
 			ra.read(b);
 			
@@ -70,6 +70,7 @@ public class LoadEngine {
 			}
 			
 			workspace.resetUndoEngine();
+			workspace.fileSaved(file);
 			return workspace;
 			
 		} catch (UnsupportedEncodingException e) {

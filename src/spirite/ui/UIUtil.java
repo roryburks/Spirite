@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.JComponent;
@@ -25,6 +26,10 @@ import javax.swing.tree.TreePath;
 
 public class UIUtil {
 
+	/***
+	 * Draws the string centered in the given Rectangle (using the font already
+	 *	set up in the Graphics)
+	 */
 	public static void drawStringCenter( Graphics g, String text, Rectangle rect) {
 		FontMetrics fm = g.getFontMetrics();
 		int dx = (rect.width - fm.stringWidth(text))/2;
