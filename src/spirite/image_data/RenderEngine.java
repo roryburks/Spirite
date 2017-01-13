@@ -99,6 +99,7 @@ public class RenderEngine
 	}
 	
 	private class Cache {
+		ImageWorkspace workspace;
 		BufferedImage data;
 		RenderSettings settings;
 		long last_used;
@@ -176,6 +177,16 @@ public class RenderEngine
 	@Override
 	public void removeWorkspace( ImageWorkspace ws) {
 		workspaces.remove(ws);
+		
+		Iterator<Cache> it = image_cache.iterator();
+		
+		while( it.hasNext()) {
+			Cache c = it.next();
+
+			if( c.settings.workspace == ws) {
+				it.remove();
+			}
+		}
 	}
 
 }

@@ -67,15 +67,16 @@ public class AnimationSchemeTreePanel extends ContentTree
 	 */
 	private void reconstruct() {
 		root.removeAllChildren();
-		if( manager == null) return;
-		
-		for( AbstractAnimation animation : manager.getAnimations()) {
-			DefaultMutableTreeNode anim = new DefaultMutableTreeNode(animation);
+		if( manager != null) {
 			
-			if( animation instanceof SimpleAnimation) 
-				constructSimpleAnimationTree(anim, (SimpleAnimation)animation);
-			
-			root.add(anim);
+			for( AbstractAnimation animation : manager.getAnimations()) {
+				DefaultMutableTreeNode anim = new DefaultMutableTreeNode(animation);
+				
+				if( animation instanceof SimpleAnimation) 
+					constructSimpleAnimationTree(anim, (SimpleAnimation)animation);
+				
+				root.add(anim);
+			}
 		}
 		
 
@@ -275,6 +276,8 @@ public class AnimationSchemeTreePanel extends ContentTree
 			manager = workspace.getAnimationManager();
 			manager.addStructureObserver(this);
 			workspace.addSelectionObserver(this);
+		} else {
+			manager = null;
 		}
 		reconstruct();
 	}

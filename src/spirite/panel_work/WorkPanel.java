@@ -241,7 +241,7 @@ public class WorkPanel extends javax.swing.JPanel
                
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
-    private WorkSplicePanel workSplicePanel;
+    WorkSplicePanel workSplicePanel;
     // !! End Generated Code
 
     // ==== Event Listeners and Observers ====

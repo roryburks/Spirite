@@ -83,7 +83,7 @@ public class WorkSplicePanel extends javax.swing.JPanel
     }                      
 
               
-    private DrawPanel drawPanel;
-    private ReferencePanel previewPanel;        
+    DrawPanel drawPanel;
+    ReferencePanel previewPanel;        
 
 }

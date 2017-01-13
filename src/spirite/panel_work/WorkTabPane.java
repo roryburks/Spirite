@@ -77,9 +77,11 @@ public class WorkTabPane extends JTabbedPane
 	@Override
 	public void removeWorkspace( ImageWorkspace workspace) {
 		for( int i = 0; i < panels.size(); ++i) {
-			if( panels.get(i).workspace == workspace) {
+			WorkPanel panel = panels.get(i);
+			if( panel.workspace == workspace) {
 				this.removeTabAt(i);
 				panels.remove(i);
+				panel.workSplicePanel.drawPanel.triggerClose();
 				break;
 			}
 		}

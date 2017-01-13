@@ -345,6 +345,8 @@ public class LayerTreePanel extends ContentTree
 	// :::: WorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
+		contextMenu.context = null;
+		
 		// Remove assosciations with the old Workspace and add ones to the new
 		if( workspace != null) {
 			workspace.removeImageObserver(this);

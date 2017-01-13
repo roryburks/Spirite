@@ -565,6 +565,7 @@ public class ContentTree extends JPanel
 			}
 			
 			changeDrag( null, DragMode.NOT_DRAGGING);
+			draggingNode = null;
 		}
 		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
 		@Override		public void dragExit(DragSourceEvent arg0) {}

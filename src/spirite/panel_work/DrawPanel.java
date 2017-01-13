@@ -147,4 +147,10 @@ public class DrawPanel extends JPanel
     }
 	@Override	public void structureChanged(StructureChange evt) {	}
  
+	
+	void triggerClose() {
+		AwtPenToolkit.removePenListener(this, penner);
+		penner.update_timer.cancel();
+		paint_timer.stop();
+	}
 }
