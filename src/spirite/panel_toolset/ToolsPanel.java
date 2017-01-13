@@ -198,6 +198,7 @@ public class ToolsPanel extends JPanel
             this.iy = master.getToolsetManager().getTooliy(tool);
             this.addActionListener(this);
             this.addMouseListener(this);
+            this.setBorder(null);
 
             Hotkey key = master.getHotekyManager().getHotkey("toolset." + tool);
             this.setToolTipText("<html>" + tool + " <b>" + key.toString() + "</b></html>" );
@@ -208,12 +209,12 @@ public class ToolsPanel extends JPanel
         }
 
         @Override
-        public void paint( Graphics g) {
+        public void paintComponent( Graphics g) {
             int w = this.getWidth();
             int h = this.getHeight();
             int ew = w - BUTTON_WIDTH;
 
-//            super.paint(g);
+//            super.paintComponent(g);
 
             if( isSelected()) {
                 g.setColor( Globals.getColor("toolbutton.selected.background"));

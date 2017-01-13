@@ -15,7 +15,7 @@ public class ReferencePanel extends JPanel
         
     }
     @Override
-    public void paint( Graphics g) {
-        super.paint(g);
+    public void paintComponent( Graphics g) {
+        super.paintComponent(g);
     }
 }

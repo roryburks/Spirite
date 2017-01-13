@@ -398,8 +398,12 @@ public class OmniFrame extends JDialog
 				OFTransferable trans = 
 						(OFTransferable)support.getTransferable().getTransferData(FLAVOR);
 
-				trans.parent.removeContainer( trans.panel);
-				addContainer(trans.panel, dragIndex);
+				// Move the container from its old spot to its new (unless
+				//	you're trying to move a single-frame OmniPanel into itself)
+				if( trans.parent != context || containers.size() > 1) {
+					trans.parent.removeContainer( trans.panel);
+					addContainer(trans.panel, dragIndex);
+				}
 				
 				dragMode = DragMode.NOT_DRAGGING;
 				root.repaint();
@@ -452,8 +456,10 @@ public class OmniFrame extends JDialog
 				//	get a false negative in which importData is never called, so it's 
 				//	handled here
 				if( root.contains( evt.getLocation())) {
-					removeContainer( dragging);
-					addContainer( dragging, dragIndex);
+					if( containers.size() > 1) {
+						removeContainer( dragging);
+						addContainer( dragging, dragIndex);
+					}
 				}
 				
 				// Drag a tab out of its frame

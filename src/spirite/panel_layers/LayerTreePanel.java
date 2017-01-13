@@ -87,8 +87,8 @@ public class LayerTreePanel extends ContentTree
 
     // :::: Paint
     @Override
-    public void paint( Graphics g) {
-    	super.paint(g);
+    public void paintComponent( Graphics g) {
+    	super.paintComponent(g);
     }
     
     // :::: API

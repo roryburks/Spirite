@@ -69,8 +69,8 @@ public class DrawPanel extends JPanel
 
     // :::: Paint
     @Override
-    public void paint( Graphics g) {
-        super.paint(g);
+    public void paintComponent( Graphics g) {
+        super.paintComponent(g);
 
         if( master == null) return; // Needed so the IDE doesn't freak out
 

@@ -124,8 +124,8 @@ public class AnimPanel extends javax.swing.JPanel
     
     private class DisplayPanel extends JPanel {
     	@Override
-    	public void paint(Graphics g) {
-    		super.paint(g);
+    	public void paintComponent(Graphics g) {
+    		super.paintComponent(g);
     		
     		if( animation != null) {
     			animation.drawFrame(g, met);

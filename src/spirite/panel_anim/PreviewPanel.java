@@ -21,7 +21,8 @@ public class PreviewPanel extends JPanel
 
 
     @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
+    	
         if( master == null) {
             g.drawArc(0, 0, 64, 64, 15, 300);
             return;

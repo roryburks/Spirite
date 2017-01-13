@@ -28,7 +28,7 @@ public class LayerTreeNodePanel extends JPanel {
 		public ImageData image = null;
 		
 		@Override
-		public void paint(Graphics g) {
+		public void paintComponent(Graphics g) {
 			int width = this.getWidth();
 			int height = this.getHeight();
 

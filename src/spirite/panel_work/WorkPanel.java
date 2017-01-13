@@ -83,9 +83,9 @@ public class WorkPanel extends javax.swing.JPanel
     }
 
     @Override
-    public void paint( Graphics g) {
+    public void paintComponent( Graphics g) {
     	// Let swing do the heavy lifting.
-        super.paint(g); 
+        super.paintComponent(g); 
         
 
         // :: Draws the zoom level in the bottom right corner

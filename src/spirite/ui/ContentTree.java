@@ -250,10 +250,10 @@ public class ContentTree extends JPanel
 	protected class CCPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
-		public void paint( Graphics g) {
+		public void paintComponent( Graphics g) {
 			paintCCPanel( g, getWidth(), getHeight(), true);
 
-			super.paint(g);
+			super.paintComponent(g);
 		}
 	}
 	
@@ -335,9 +335,9 @@ public class ContentTree extends JPanel
 		}
 		
 		@Override
-		public void paint( Graphics g) {
+		public void paintComponent( Graphics g) {
 			// Draw the Background manually so we can draw behind the Tree
-			super.paint(g);
+			super.paintComponent(g);
 		}
 		
 	}
@@ -365,8 +365,8 @@ public class ContentTree extends JPanel
 		public CCTree() {}
 		
 		@Override
-		public void paint( Graphics g) {
-			super.paint(g);
+		public void paintComponent( Graphics g) {
+			super.paintComponent(g);
 		}
 	}
 
