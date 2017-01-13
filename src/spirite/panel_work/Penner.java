@@ -1,7 +1,10 @@
 package spirite.panel_work;
 
 import java.awt.Color;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,6 +15,7 @@ import jpen.PLevel;
 import jpen.PLevelEvent;
 import jpen.PScrollEvent;
 import jpen.event.PenListener;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.image_data.DrawEngine.Method;
@@ -32,7 +36,7 @@ import spirite.image_data.UndoEngine.StrokeAction;
  * @author Rory Burks
  */
 public class Penner 
-	implements PenListener
+	implements PenListener, KeyEventDispatcher
 {
 	// Why it needs Master: it needs access to know which Toolset and Palette Colors
 	//	are being used.  !! DO NOT USE master.getCurrentWorkspace !!
@@ -52,6 +56,10 @@ public class Penner
 		this.context = draw_panel.context;
 		this.master = context.master;
 
+		// Add Timer and KeyDispatcher
+		//	Note: since these are utilities with a global focus that you're
+		//	giving references of Penner to, you will need to clean them up
+		//	so that Penner (and everything it touches) gets GC'd
 		update_timer = new Timer();
 		update_timer.scheduleAtFixedRate( new TimerTask() {
 			@Override
@@ -64,6 +72,9 @@ public class Penner
 			}
 			
 		}, 100, 16);
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+			.addKeyEventDispatcher(this);
 	}
 
 	@Override
@@ -71,6 +82,12 @@ public class Penner
 //		PKind.Type type = pbe.pen.getKind().getType();
 		
 		if( pbe.button.value == true) {
+			x = wX;
+			y = wY;
+			shiftStartX = wX;
+			shiftStartY = wY;
+			shiftMode = 0;
+			
 			PButton.Type button = pbe.button.getType();
 			
 			if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
@@ -170,6 +187,12 @@ public class Penner
 		
 	}
 
+	boolean holdingShift = false;
+	int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
+	int shiftStartX;
+	int shiftStartY;
+	int wX;
+	int wY;
 	@Override
 	public void penLevelEvent(PLevelEvent ple) {
 		// Note: JPen updates PenLevels (which inform of things like position and pressure)
@@ -177,16 +200,42 @@ public class Penner
 		for( PLevel level: ple.levels) {
 			switch( level.getType()) {
 			case X:
-				x = Math.round( level.value);
+				wX = Math.round( level.value);
+				if( holdingShift) {
+					if( shiftMode == 2)
+						break;
+					if( shiftMode == 0) {
+						if( Math.abs(shiftStartX - wX) > 10) {
+							shiftMode = 1;
+						}
+						else break;
+					}
+				}
+				
+				x = wX;
 				break;
 			case Y:
-				y = Math.round( level.value);
+				wY = Math.round( level.value);
+				if( holdingShift) {
+					if( shiftMode == 1)
+						break;
+					if( shiftMode == 0) {
+						if( Math.abs(shiftStartY - wY) > 10) {
+							shiftMode = 2;
+						}
+						else break;
+					}
+				}
+				y = wY;
 				break;
 			case PRESSURE:
 			default:
 				break;
 			}
 		}
+		
+		
+		context.workSplicePanel.context.refreshCoordinates(context.stiXm(x), context.stiYm(y));
 		
 		if( state == STATE.DRAWING) {
 			if( strokeEngine != null) {
@@ -198,4 +247,28 @@ public class Penner
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}
 	@Override	public void penTock(long arg0) {}
 
+	
+
+	// :::: KeyEventDispatcher
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent evt) {
+		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
+		if( shift && !holdingShift) {
+			System.out.println("Test");
+			shiftStartX = x;
+			shiftStartY = y;
+			shiftMode = 0;
+		}
+			
+		holdingShift = shift;
+		return false;
+	}
+	
+
+	public void cleanUp() {
+		update_timer.cancel();
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+			.removeKeyEventDispatcher(this);
+		
+	}
 }

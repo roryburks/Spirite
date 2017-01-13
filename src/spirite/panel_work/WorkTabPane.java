@@ -81,7 +81,7 @@ public class WorkTabPane extends JTabbedPane
 			if( panel.workspace == workspace) {
 				this.removeTabAt(i);
 				panels.remove(i);
-				panel.workSplicePanel.drawPanel.triggerClose();
+				panel.workSplicePanel.drawPanel.cleanUp();
 				break;
 			}
 		}

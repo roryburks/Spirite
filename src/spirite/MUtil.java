@@ -23,6 +23,10 @@ public class MUtil {
 	public static int high16( int i) {
 		return i >>> 16;
 	}
+	
+	public static double distance( double x1, double y1, double x2, double y2) {
+		return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+	}
 
 	public static float cycle( float start, float end, float t) {
 		float diff = end - start;

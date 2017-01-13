@@ -10,7 +10,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -24,6 +26,7 @@ import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
@@ -117,6 +120,8 @@ public class RootFrame extends javax.swing.JFrame
     			{".-"},
     			{".&Save", "global.save_image", null},
     			{".Save &As", "global.save_image_as", null},
+    			{".-"},
+    			{".Export", "global.export", null},
     			{".-"},
     			{".Debug &Color", "global.debug_color", null},
     			
@@ -289,6 +294,22 @@ public class RootFrame extends javax.swing.JFrame
 		else if( command.equals("redo")) {
 			if( master.getCurrentWorkspace() != null)
 				master.getCurrentWorkspace().getUndoEngine().redo();
+		}
+		else if( command.equals("export")) {
+			File f = Dialogs.pickFileSave();
+			
+			if( f != null) {
+				RenderSettings settings = new RenderSettings();
+				settings.workspace = master.getCurrentWorkspace();
+				try {
+					ImageIO.write(
+							master.getRenderEngine().renderImage(settings),
+							"png",
+							f);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);

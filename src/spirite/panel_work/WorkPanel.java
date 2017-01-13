@@ -1,12 +1,19 @@
 package spirite.panel_work;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+
+import javax.swing.GroupLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
@@ -81,6 +88,22 @@ public class WorkPanel extends javax.swing.JPanel
 		center.y = workspace.getHeight() / 2;
 
     }
+    
+    int mx = 0;
+    int my = 0;
+    void refreshCoordinates( int x, int y) {
+    	if( mx != x || my != y) {
+    		mx = x;
+    		my = y;
+    		
+    		Rectangle rect = new Rectangle(0,0,workspace.getWidth(), workspace.getHeight());
+    		if( rect.contains(x, y)) {
+    			coordinateLabel.setText( mx + "," + my);
+    		}
+    		else
+    			coordinateLabel.setText("");
+    	}
+    }
 
     @Override
     public void paintComponent( Graphics g) {
@@ -88,17 +111,7 @@ public class WorkPanel extends javax.swing.JPanel
         super.paintComponent(g); 
         
 
-        // :: Draws the zoom level in the bottom right corner
-        if(zoom_level >= 0) {
-            g.setFont( new Font("Tahoma", Font.PLAIN, 12));
-            g.drawString(Integer.toString(zoom_level+1), this.getWidth() - ((zoom_level > 8) ? 16 : 12), this.getHeight()-5);
-        }
-        else {
-            g.setFont( new Font("Tahoma", Font.PLAIN, 8));
-            g.drawString("1/", this.getWidth() - 15, this.getHeight() - 10);
-            g.setFont( new Font("Tahoma", Font.PLAIN, 10));
-            g.drawString(Integer.toString(-zoom_level+1), this.getWidth() - ((zoom_level < -8) ? 10 : 8), this.getHeight()-4);
-        }
+
     }
     
     // :::: API
@@ -204,45 +217,66 @@ public class WorkPanel extends javax.swing.JPanel
     	
     	return c;
     }
+    
 
-
-    // !! Start Generated Code        
     private void initComponents() {
 
-        jscrollVertical = new javax.swing.JScrollBar();
-        jscrollHorizontal = new javax.swing.JScrollBar();
+        jscrollVertical = new JScrollBar();
+        jscrollHorizontal = new JScrollBar();
         workSplicePanel = new WorkSplicePanel( this);
+        coordinateLabel = new JLabel();
+        zoomPanel = new JPanel() {
+        	@Override
+        	protected void paintComponent(Graphics g) {
+        	// :: Draws the zoom level in the bottom right corner
+                if(zoom_level >= 0) {
+                    g.setFont( new Font("Tahoma", Font.PLAIN, 12));
+                    g.drawString(Integer.toString(zoom_level+1), this.getWidth() - ((zoom_level > 8) ? 16 : 12), this.getHeight()-5);
+                }
+                else {
+                    g.setFont( new Font("Tahoma", Font.PLAIN, 8));
+                    g.drawString("1/", this.getWidth() - 15, this.getHeight() - 10);
+                    g.setFont( new Font("Tahoma", Font.PLAIN, 10));
+                    g.drawString(Integer.toString(-zoom_level+1), this.getWidth() - ((zoom_level < -8) ? 10 : 8), this.getHeight()-4);
+                }
+        	}
+        };
+        zoomPanel.setBackground( Color.RED);
 
         jscrollHorizontal.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(workSplicePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jscrollHorizontal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, 0)
-                .addComponent(jscrollVertical, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(workSplicePanel)
+                    .addComponent(jscrollHorizontal, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup( layout.createParallelGroup()
+                    .addComponent(jscrollVertical)	
+                    .addComponent(zoomPanel, 0, 0, jscrollVertical.preferredSize().width)
+                )
+            )
+            .addComponent(coordinateLabel)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jscrollVertical, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(workSplicePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addComponent(jscrollHorizontal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        layout.setVerticalGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(jscrollVertical, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(workSplicePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup( layout.createParallelGroup()
+                .addComponent(jscrollHorizontal)
+                .addComponent(zoomPanel)
+            )
+            .addComponent(coordinateLabel, 24,24,24)
         );
-    }                      
+    }
     
-
-               
+    JLabel coordinateLabel;
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
     WorkSplicePanel workSplicePanel;
-    // !! End Generated Code
+    JPanel zoomPanel;
 
     // ==== Event Listeners and Observers ====
 
