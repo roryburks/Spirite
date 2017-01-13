@@ -1,5 +1,8 @@
 package spirite.image_data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /***
  *  The SelectionEngine controls the selected image data, moving it from
  *  layer to layer, workspace to workspace, and program-to-clipboard
@@ -7,5 +10,30 @@ package spirite.image_data;
  *
  */
 public class SelectionEngine {
+	
+	
 
+	// :::: Observers
+	public static interface MSelectionObserver {
+		public void selectionChanged(SelectionEvent evt);
+		public void buildingSelection( SelectionEvent evt);
+	}
+	public static class SelectionEvent {
+	}
+    List<MSelectionObserver> selectionObservers = new ArrayList<>();
+
+    void triggerSelectionChanged(SelectionEvent evt) {
+    	for( MSelectionObserver obs : selectionObservers) {
+    		obs.selectionChanged(evt);
+    	}
+    }
+    void triggerBuildingSelection(SelectionEvent evt) {
+    	for( MSelectionObserver obs : selectionObservers) {
+    		obs.buildingSelection(evt);
+    	}
+    }
+
+    public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
+	public void removeSelectionObserver( MSelectionObserver obs) { selectionObservers.remove(obs); }
+	    
 }

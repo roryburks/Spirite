@@ -129,7 +129,7 @@ public class MasterControl
 	    	}
     	}
     	
-    	// Remove the workspace and select a new one (if one's available)
+    	// Remove the workspace
     	workspaces.remove(i);
     	triggerRemoveWorkspace(workspace);
     	
@@ -239,6 +239,16 @@ public class MasterControl
     
     
     // :::: MCurrentImageObserver
+    /***
+     * A lot of components only ever draw the currently active image workspace
+     * and redraws on any kind of status change.  For these, MCurrentImageObserver
+     * is easier to use than a putting a MImageObserver on the current workspace
+     *and changing it every time the workspace changes
+     */
+    public static interface MCurrentImageObserver {
+    	public void imageRefresh();
+    	public void imageStructureRefresh();
+    }
     List<MCurrentImageObserver> cimageObservers = new ArrayList<>();
 
     public void addCurrentImageObserver( MCurrentImageObserver obs) { cimageObservers.add(obs);}
@@ -255,16 +265,6 @@ public class MasterControl
     	}
     }
     
-    /***
-     * A lot of components only ever draw the currently active image workspace
-     * and redraws on any kind of status change.  For these, MCurrentImageObserver
-     * is easier to use than a putting a MImageObserver on the current workspace
-     *and changing it every time the workspace changes
-     */
-    public static interface MCurrentImageObserver {
-    	public void imageRefresh();
-    	public void imageStructureRefresh();
-    }
 
 	// :::: MImageObserver
 	@Override

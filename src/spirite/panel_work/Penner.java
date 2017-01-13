@@ -46,6 +46,8 @@ public class Penner
 	Timer update_timer;
 	StrokeEngine strokeEngine = null;
 	
+	String activeTool = null;
+	
 	int x, y;
 	
 	private enum STATE { READY, DRAWING};
@@ -79,7 +81,6 @@ public class Penner
 
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
-//		PKind.Type type = pbe.pen.getKind().getType();
 		
 		if( pbe.button.value == true) {
 			x = wX;
@@ -134,6 +135,11 @@ public class Penner
 					}
 				} 
 			}
+			if( tool == "box_selection"){
+				
+			}
+			
+			activeTool = tool;
 			
 		}
 		else if( state == STATE.DRAWING) {
