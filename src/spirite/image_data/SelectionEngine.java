@@ -6,6 +6,11 @@ import java.util.List;
 /***
  *  The SelectionEngine controls the selected image data, moving it from
  *  layer to layer, workspace to workspace, and program-to-clipboard
+ *  
+ *  A "Selection" is essentially an alpha mask and a corresponding 
+ *  BufferedImage which is floating outside of the ImageWorkspace until
+ *  it is either merged into existing data or elevated to its own layer.
+ *  
  * @author Rory Burks
  *
  */

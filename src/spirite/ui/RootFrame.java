@@ -17,6 +17,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
@@ -60,7 +61,6 @@ public class RootFrame extends javax.swing.JFrame
 
         master.newWorkspace(128,128,new java.awt.Color(0,0,0,0), true);
         master.getCurrentWorkspace().resetUndoEngine();
-
     }
 
     private void initComponents() {
@@ -132,8 +132,8 @@ public class RootFrame extends javax.swing.JFrame
     			{"..&Layers", "frame.showLayerFrame", null},
     			{"..&Tools", "frame.showToolsFrame", null},
     			{"..-"},
-    			{"..Animation &Scheme", "frame.showAnimSchemeFrame"},
-    			{"..Undo &History", "frame.showUndoFrame"},
+    			{"..Animation &Scheme", "frame.showAnimSchemeFrame", null},
+    			{"..Undo &History", "frame.showUndoFrame", null},
     			
     			{".&Animation View", "frame.showAnimationView", null},
     	};

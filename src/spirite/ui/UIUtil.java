@@ -24,6 +24,8 @@ import javax.swing.text.PlainDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import spirite.Globals;
+
 public class UIUtil {
 
 	/***
@@ -141,6 +143,9 @@ public class UIUtil {
     			if( listener != null)
     				new_node.addActionListener(  listener);
     		}
+    		
+    		if( menuScheme[i].length > 2 && menuScheme[i][2] != null)
+    			new_node.setIcon(Globals.getIcon(menuScheme[i][2]));
     		
     		// Add the MenuItem into the appropriate context
     		if( level == 0) {

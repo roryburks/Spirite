@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
@@ -52,6 +53,8 @@ public class LayersPanel extends JPanel {
 			}
 		});
 		btnNewLayer.setToolTipText("New Layer");
+		btnNewLayer.setIcon(Globals.getIcon("new_layer"));
+		
 		btnNewGroup = new JButton();
 		btnNewGroup.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -59,6 +62,7 @@ public class LayersPanel extends JPanel {
 			}
 		});
 		btnNewGroup.setToolTipText("New Group");
+		btnNewGroup.setIcon( Globals.getIcon("new_group"));
 		
 		
 		

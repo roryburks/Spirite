@@ -27,6 +27,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
@@ -245,6 +246,8 @@ public class LayerTreePanel extends ContentTree
 			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
 			button.setSelected( node.isVisible());
+			button.setIcon( Globals.getIcon("visible_off"));
+			button.setSelectedIcon(Globals.getIcon("visible_on"));
 		}
 	}
 	@Override
@@ -269,8 +272,8 @@ public class LayerTreePanel extends ContentTree
 			}
 			
 			String[][] baseMenuScheme = {
-					{"&New Layer", "newLayer", null},
-					{"New Layer &Group", "newGroup", null},
+					{"&New Layer", "newLayer", "new_layer"},
+					{"New Layer &Group", "newGroup", "new_group"},
 					{"-"},
 					{"Duplicate "+descriptor, "duplicate", null}, 
 					{"Delete  "+descriptor, "delete", null}, 
