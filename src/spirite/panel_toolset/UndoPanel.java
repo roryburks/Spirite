@@ -151,27 +151,12 @@ public class UndoPanel extends JPanel
 			boolean isSelected, 
 			boolean cellHasFocus) 
 	{
-		String actionString = "";
+		String actionString;
 		
 		if( value == null)
 			actionString = "[Base Image]";
-		else if( value.action instanceof StrokeAction) {
-			DrawEngine.Method m = ((StrokeAction)value.action).getParams().getMethod();
-			actionString = "Stroke: ";
-			switch( m) {
-			case BASIC:
-				actionString += "Pixel";
-				break;
-			case ERASE:
-				actionString += "Erase";
-				break;
-			}
-		}
-		else if( value.action instanceof FillAction)
-			actionString = "Fill";
-		else if( value.action instanceof StructureAction) {
-			actionString = ((StructureAction)value.action).change.description;
-		}
+		else
+			actionString = value.action.description;
 		
 		renderPanel.label.setText(actionString);
 		

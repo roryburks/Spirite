@@ -15,6 +15,7 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.StackableStructureChange;
@@ -361,7 +362,7 @@ public class UndoEngine {
 	 */
 	private class ImageContext extends UndoContext {
 //		List<BufferedImage> keyframes = new ArrayList<>();
-		List<UndoAction> actions = new ArrayList<>();
+		List<ImageAction> actions = new ArrayList<>();
 		int pointer = 0;	// The position on the actionsList
 		int met = 0;	// Amount of actions it's been since a Keyframe
 		int vstart = 0;	// The first "valid" action.  As the tail is clipped,
@@ -376,19 +377,35 @@ public class UndoEngine {
 			pointer = 0;
 		}
 
-		class KeyframeAction extends UndoAction {
+		/** A KeyframeAction is a special kind of ImageAction which instead of
+		 * storing the way the image was changed, but instead stores the
+		 * entire image as it should appear after the action.  It stores the
+		 * action that it's "supposed" to be in hiddenAction and performs
+		 * its logical components (if it has any).*/
+		class KeyframeAction extends ImageAction {
 			BufferedImage frame;
-			UndoAction hiddenAction;
-			KeyframeAction( BufferedImage frame, UndoAction action) {
+			ImageAction hiddenAction;
+			KeyframeAction( BufferedImage frame, ImageAction action) {
 				this.frame = frame;
 				this.hiddenAction = action;
 			}
-			@Override		
-			public void performAction(ImageData data) {	
+			@Override 
+			public void performAction() {
+				if( hiddenAction != null)
+				hiddenAction.performAction();
+			}
+			@Override
+			public void undoAction() {
+				if( hiddenAction != null)
+				hiddenAction.undoAction();
+			}
+			@Override
+			public void performImageAction(ImageData image) {
 				resetToKeyframe(frame);
 			}
 		}
 		
+		/** Duplicates the image in its entirety. */
 		private BufferedImage deepCopy( BufferedImage toCopy) {
 			// Note: Though this requires BufferedImage, it's not actually
 			//	modifying the image, so no checkout is needed.
@@ -416,6 +433,9 @@ public class UndoEngine {
 		
 		
 		public void addAction( UndoAction action) {
+			if( !(action instanceof ImageAction)) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to add a non ImageAction to an ImageContext");
+			}
 			
 			met++;
 			pointer++;
@@ -423,11 +443,11 @@ public class UndoEngine {
 			// The second half of this conditional is mostly debug to
 			//	test if the dynamic keyframe distance is working, but 
 			if( met == MAX_TICKS_PER_KEY || action instanceof FillAction) {
-				actions.add(new KeyframeAction(deepCopy(image.data), action));
+				actions.add(new KeyframeAction(deepCopy(image.data), (ImageAction)action));
 				met = 0;
 			}
 			else {
-				actions.add(action);
+				actions.add((ImageAction)action);
 			}
 		}
 		
@@ -438,6 +458,9 @@ public class UndoEngine {
 			if( pointer < 0) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Internal Undo attempted before start of context.");
 			}
+
+			// Undo the logical action
+			actions.get(pointer).undoAction();
 			
 			// Find the previous KeyframeAction
 			if( met < 0) {
@@ -448,13 +471,12 @@ public class UndoEngine {
 				}
 				met = i;
 			}
-			
-			
+						
 			// Refresh the Image to the current most recent keyframe
-			actions.get(pointer-met).performAction(image);
+			actions.get(pointer-met).performImageAction(image);
 
 			for( int i = pointer - met; i <= pointer; ++i) {
-				actions.get(i).performAction(image);
+				actions.get(i).performImageAction(image);
 			}
 			
 			workspace.triggerImageRefresh();
@@ -472,7 +494,8 @@ public class UndoEngine {
 				met = 0;
 			}
 			for( int i = pointer - met; i <= pointer; ++i) {
-				actions.get(i).performAction(image);
+				actions.get(i).performAction();
+				actions.get(i).performImageAction(image);
 			}
 			workspace.triggerImageRefresh();
 		}
@@ -482,11 +505,11 @@ public class UndoEngine {
 		 */
 		@Override
 		void cauterize() {
-			List<UndoAction> subList = actions.subList(pointer+1, actions.size());
+			List<ImageAction> subList = actions.subList(pointer+1, actions.size());
 			
 			// Iterate backwards so you can delete keyframes by the end
 			//	so that you don't mess up indices
-			ListIterator<UndoAction> it = subList.listIterator(subList.size());
+			ListIterator<ImageAction> it = subList.listIterator(subList.size());
 			
 			while( it.hasPrevious()){
 				UndoAction action = it.previous();
@@ -562,7 +585,7 @@ public class UndoEngine {
 					MDebug.handleError( ErrorType.STRUCTURAL, this, "UndoEngine Corruption: First Action in ImageContext wasn't a KeyframeAction");
 				}
 				
-				List<UndoAction> subList = actions.subList(0, vstart);
+				List<ImageAction> subList = actions.subList(0, vstart);
 				pointer -= subList.size();
 				subList.clear();
 				vstart = 0;
@@ -616,7 +639,7 @@ public class UndoEngine {
 				return;
 			}
 			
-			pointer.next().performAction(null);
+			pointer.next().performAction();
 		}
 
 
@@ -676,26 +699,57 @@ public class UndoEngine {
 	 *  but also implements the methods to recreate them.
 	 */
 	public abstract class UndoAction {
-		public abstract void performAction( ImageData data);
+		public String description = "";
+		public abstract void performAction();
+		public abstract void undoAction();
 		public void onCauterize() {}
 	}
 	
+	/** ImageActions ara assosciated with ImageContexts, they have two components
+	 * to them: a logical component, which calls performAction and undoAction
+	 * sequentially as normal, but also has a performImageAction which writes
+	 * to the imageData (additively from the last keyframe). */
+	public abstract class ImageAction extends UndoAction {
+		@Override public void performAction() {}
+		@Override public void undoAction() {}
+		public abstract void performImageAction( ImageData image);
+	}
+
+	/** Associated with the NullContext, a NullAction strictly requires you to
+	 * have an UndoAction since there is always a logical component assosciated
+	 * with it (otherwise it would have no Actions to it)
+	 */
+	public abstract class NullAction extends UndoAction {}
 	
+	/** A StackableAction is an action that if performed multiple times in
+	 * a row will automatically group into a single action by calling 
+	 * <code>stackNewAction</code> on the old action if <code>canStack</code>
+	 * returns true.  */
 	public interface StackableAction {
 		public void stackNewAction( UndoAction newAction);
 		public boolean canStack( UndoAction newAction);
 	}
 	
-	// :::: Image UIndoActions
-	//	Actions working directly on the image data
 	
-	public class StrokeAction extends UndoAction {
+	
+	// ==== Image Undo Actions ====
+	
+	public class StrokeAction extends ImageAction {
 		Point[] points;
 		StrokeParams params;
 		
 		public StrokeAction( StrokeParams params, Point[] points){			
 			this.params = params;
 			this.points = points;
+			
+			switch( params.getMethod()) {
+			case BASIC:
+				description = "Basic Stroke Action";
+				break;
+			case ERASE:
+				description = "Erase Stroke Action";
+				break;
+			}
 		}
 		
 		public StrokeParams getParams() {
@@ -704,7 +758,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		public void performAction( ImageData data) {
+		public void performImageAction( ImageData data) {
 			StrokeEngine engine = workspace.getDrawEngine().createStrokeEngine(data);
 			
 			engine.startStroke(params, points[0].x, points[0].y);
@@ -717,74 +771,30 @@ public class UndoEngine {
 			engine.endStroke();
 		}
 	}
-	public class FillAction extends UndoAction {
+	public class FillAction extends ImageAction {
 		Point p;
 		Color c;
 		
 		public FillAction( Point p, Color c) {
 			this.p = p;
 			this.c = c;
+			description = "Fill";
 		}
 
 		@Override
-		public void performAction( ImageData data) {
+		public void performImageAction( ImageData data) {
 			DrawEngine de = workspace.getDrawEngine();
 			de.fill(p.x, p.y, c, data);
 		}
 	}
 	
-	public class StartSelectionAction extends UndoAction
-	{
-		int startX, startY;
-		Selection selection;
-		public StartSelectionAction( Selection selection, int startX, int startY) {
-			
-		}
-		@Override
-		public void performAction(ImageData data) {
-			workspace.getSelectionEngine().setSelection(selection);
-		}
-		
-	}
-	public class MoveSelectionAction extends UndoAction 
-		implements StackableAction
-	{
-		int deltaX;
-		int deltaY;
-		
-		public MoveSelectionAction( int deltaX, int deltaY) {
-			this.deltaX = deltaX;
-			this.deltaY = deltaY;
-		}
-
-		@Override
-		public void performAction(ImageData data) {
-			
-		}
-
-		@Override
-		public void stackNewAction(UndoAction newAction) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public boolean canStack(UndoAction newAction) {
-			return true;
-		}
-		
-	}
 	
-	/***
-	 * NullAction
-	 * 
-	 * Associated with the NullContext, a NullAction must not only have
-	 * a performAction method, but also an undoAction() since it's a
-	 * two-way Action isntead of building from stored states.
-	 */
-	public abstract class NullAction extends UndoAction {
-		public abstract void undoAction();
-	}
+	
+	// ==== Null Undo Actions ====
+	
+	/** NullActions which are handled by the ImageWorkspace are 
+	 * StructureActions, whose behavior is defined by StructureChanges
+	 * which are used both for the initial execution and the UndoEngine */
 	public class StructureAction extends NullAction {
 		public final StructureChange change;
 		
@@ -793,7 +803,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		public void performAction(ImageData data) {
+		public void performAction() {
 			change.execute();
 			change.alert(false);
 		}
@@ -808,25 +818,59 @@ public class UndoEngine {
 			change.cauterize();
 		}
 	}
+	
+	/*** A StackableStructureAction is a StructureAction with a 
+	 * StackableChange.  The StackableChange implements the stack check
+	 * and merge, this class just mediates.	 */
 	public class StackableStructureAction extends StructureAction
 		implements StackableAction 
 	{
 		public StackableStructureAction(StructureChange change) {
 			super(change);
 		}
-
 		@Override
 		public void stackNewAction(UndoAction newAction) {
 			((StackableStructureChange)change).stackNewChange(
 					((StackableStructureAction)newAction).change);
 		}
-		
 		@Override
 		public boolean canStack(UndoAction newAction) {
 			return ((StackableStructureChange)change).canStack(
 					((StackableStructureAction)newAction).change);
 		}
 	}
+	
+	public class SetSelectionAction extends NullAction {
+		int offsetX, offsetY;
+		Selection selection;
+		int poX, poY;
+		Selection pSelection;
+		
+		SetSelectionAction( Selection selection, int offsetX, int offsetY,
+				Selection previousSelection, int previousOX, int previousOY) 
+		{
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+			this.selection = selection;
+			this.pSelection = previousSelection;
+			this.poX = previousOX;
+			this.poY= previousOY;
+			description = "Selection Change.";
+		}
+		
+		@Override
+		public void performAction() {
+			workspace.getSelectionEngine().setSelection( selection, offsetX, offsetY);
+		}
+
+		@Override
+		public void undoAction() {
+			workspace.getSelectionEngine().setSelection( pSelection, poX, poY);
+		}
+		
+	}
+	
+	
 	
 	// :::: MUndoEngineObserver
     List<MUndoEngineObserver> undoObservers = new ArrayList<>();
@@ -841,7 +885,6 @@ public class UndoEngine {
     		obs.historyChanged(list);
     	}
     } 
-
     private void  triggerUndo() {
     	for( MUndoEngineObserver obs : undoObservers) {
     		obs.undo();

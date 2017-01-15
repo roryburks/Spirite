@@ -203,12 +203,12 @@ public class ImageWorkspace {
 		if( !verifyImage(image))
 			return null;
 		
-		if( image.locked ) {
+/*		if( image.locked ) {
 			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-out locked ImageData");
 			return null;
 		}
 		
-		image.locked = true;
+		image.locked = true;*/
 		return image.data;
 	}
 	
@@ -216,13 +216,13 @@ public class ImageWorkspace {
 		if( !verifyImage(image))
 			return;
 
-		if( !image.locked ) {
+/*		if( !image.locked ) {
 			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-in unlocked ImageData");
 			return;
 		}
 		
 		
-		image.locked = false;
+		image.locked = false;*/
 		triggerImageRefresh();
 	}
 	

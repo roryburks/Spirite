@@ -34,11 +34,17 @@ public class SelectionEngine {
 	// Variables related to Selection state
 	private Selection selection = null;
 	private boolean lifted = false;
+	protected BufferedImage liftedData = null;
 	private int startX;	// pulls double-duty as the starting point for the selection building
 	private int startY;	// and the starting point for a MoveSelectionAction
 
 	protected int offsetX;
 	protected int offsetY;
+	
+	// Stored for the UndoEngine
+	private int oldOX, oldOY;
+	private Selection oldSelection;
+	
 
 	private Boolean building = false;
 	private SelectionType selectionType;	// Only used when building a selection
@@ -69,11 +75,27 @@ public class SelectionEngine {
 
 
 	
+	// :::: Selection Building
+	private void rememberOldSelection() {
+		if( selection == null)
+			oldSelection = null;
+		else
+			oldSelection = (Selection)(selection.clone());
+		oldOX = offsetX;
+		oldOY = offsetY;
+	}
+	
 	public void startBuildingSelection( SelectionType type, int x, int y) {
+		rememberOldSelection();
+		
+		
+		// Anchor any in-the-air selection data
 		if( lifted) {
 			anchorLifted();
 		}
 		voidSelection();
+		
+		// Start building
 		building = true;
 		selectionType = type;
 		startX = x;
@@ -86,12 +108,9 @@ public class SelectionEngine {
 		
 		switch( selectionType) {
 		case RECTANGLE:
-			selection = new RectSelection(
-					new Rectangle( 
-						Math.min(startX, x), 
-						Math.min(startY, y),
-						Math.abs(startX-x),
-						Math.abs(startY-y)));
+			offsetX = Math.min(startX, x);
+			offsetY = Math.min(startY, y);
+			selection = new RectSelection( Math.abs(startX-x), Math.abs(startY-y));
 			evt.selection = selection;
 			break;
 		}
@@ -99,14 +118,7 @@ public class SelectionEngine {
 		triggerBuildingSelection( evt);
 		
 	}
-	
-	/** !! Should only be used by the UndoEngine !! */
-	void setSelection( Selection selection) {
-		voidSelection();
-		
-		this.selection = selection;
-	}
-	
+
 	public void finishBuildingSelection() {
 		building = false;
 		if(selection == null) {
@@ -119,23 +131,56 @@ public class SelectionEngine {
 		if( !selection.clipToRect(rect))
 			voidSelection();
 		
+		UndoEngine undo = workspace.getUndoEngine();
+		undo.storeAction( 
+				undo.new SetSelectionAction(
+						selection, offsetX, offsetY, 
+						oldSelection, oldOX, oldOY), null);
+		
 		triggerBuildingSelection(null);
 		triggerSelectionChanged(null);
 	}
 	
-	public void anchorLifted() {
+	/** !! Should only be used by the UndoEngine !! */
+	void setSelection( Selection selection, int offsetX, int offsetY) {
+		voidSelection();
+		
+		this.selection = selection;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		
+		triggerBuildingSelection(null);
+		triggerSelectionChanged(null);
+	}
+	
+	
+	
+	// ::::
+	
+	private void anchorLifted() {
 		if( !lifted)
 			return;
 
 		BufferedImage layerImg = workspace.checkoutImage(selection.dataContext);
 		
 		Graphics g = layerImg.getGraphics();
-		g.drawImage(selection.liftedData, offsetX, offsetY, null);
+		g.drawImage(liftedData, offsetX, offsetY, null);
 		
 		UndoEngine undoEngine = workspace.getUndoEngine();
-		undoEngine.storeAction(undoEngine.new MoveSelectionAction( startX, startY), selection.dataContext);
+//		undoEngine.storeAction(undoEngine.new MoveSelectionAction( startX, startY), selection.dataContext);
 		workspace.checkinImage(selection.dataContext);
 		voidSelection();
+	}
+	
+	public void unselect() {
+		UndoEngine undo = workspace.getUndoEngine();
+		undo.storeAction( undo.new SetSelectionAction(null, 0, 0, selection, offsetX, offsetY), null);
+		
+		if( lifted)
+			anchorLifted();
+		
+		
+		selection = null;
 	}
 	
 	/***
@@ -143,7 +188,7 @@ public class SelectionEngine {
 	 * any lifted data will automatically be merged with its dataContext when you
 	 * start building a new selection.
 	 */
-	public void voidSelection() {
+	private void voidSelection() {
 		building = false;
 		selection = null;
 		lifted = false;
@@ -173,16 +218,16 @@ public class SelectionEngine {
 		selection.dataContext = node.getImageData();
 		
 		// Creates a Selection Mask
-		selection.liftedData = new BufferedImage( 
+		liftedData = new BufferedImage( 
 				rect.width, 
 				rect.height, 
 				BufferedImage.TYPE_INT_ARGB);
-		MUtil.clearImage(selection.liftedData);
+		MUtil.clearImage(liftedData);
 		
 		BufferedImage layerImg = workspace.checkoutImage(selection.dataContext);
 		
 		// Copy the data inside the Selection's alphaMask to liftedData
-		Graphics g = selection.liftedData.getGraphics();
+		Graphics g = liftedData.getGraphics();
 		selection.drawSelectionMask(g);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
@@ -206,8 +251,8 @@ public class SelectionEngine {
 	}
 	
 	// :::: Various Selection Formats
-	public abstract class Selection {
-		protected BufferedImage liftedData = null;
+	public abstract class Selection 
+	{
 		protected ImageData dataContext;
 		
 		// Note: SelectionBounds is drawn in image-space (i.e. accounting
@@ -227,6 +272,7 @@ public class SelectionEngine {
 			return liftedData;
 		}
 		
+		public abstract Selection clone();
 	}
 	
 	public class NullSelection extends Selection {
@@ -235,6 +281,7 @@ public class SelectionEngine {
 		@Override		public boolean contains(int x, int y) {return false;}
 		@Override		Rectangle getBounds() {return new Rectangle(0,0,0,0);}
 		@Override		boolean clipToRect(Rectangle rect) {return false;}
+		@Override		public Selection clone() { return new NullSelection();}
 	}
 	
 	/***
@@ -243,11 +290,9 @@ public class SelectionEngine {
 	public class RectSelection extends Selection {
 		int width;
 		int height;
-		RectSelection( Rectangle rect) {
-			offsetX = rect.x;
-			offsetY = rect.y;
-			width = rect.width;
-			height = rect.height;
+		RectSelection( int width, int height) {
+			this.width = width;
+			this.height = height;
 		}
 		@Override
 		public void drawSelectionBounds( Graphics g) {
@@ -281,6 +326,12 @@ public class SelectionEngine {
 			height = intersection.height;
 			
 			return true;
+		}
+		
+
+		@Override
+		public RectSelection clone()  {
+			return new RectSelection( width, height);
 		}
 	}
 

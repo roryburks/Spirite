@@ -147,6 +147,8 @@ public class Penner
 				Selection selection = selectionEngine.getSelection();
 				
 				if( selection != null && selection.contains(x,y)) {
+					if( !selectionEngine.isLifted())
+						selectionEngine.liftSelection();
 					state = STATE.MOVING;
 				}
 				else {
@@ -167,6 +169,13 @@ public class Penner
 			}
 			
 			activeTool = tool;
+			
+			if( selectionEngine.getSelection() != null
+					&& state != STATE.FORMING_SELECTION
+					&& state != STATE.MOVING) 
+			{
+				selectionEngine.unselect();
+			}
 			
 		}
 		else {
