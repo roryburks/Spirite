@@ -15,8 +15,6 @@ import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.UndoEngine.StructureAction;
-import spirite.image_data.UndoEngine.UndoAction;
 
 
 /***
@@ -405,27 +403,6 @@ public class ImageWorkspace {
 	}
 	public void setNodeAlpha( Node node, float alpha) {
 		if( nodeInWorkspace(node) && node.alpha != alpha) {
-			
-			// Since UI components might update alpha faster than is practical
-			//	to store, if the last undoAction is a AlphaChange action,
-			//	make it eat this action
-			if( undoEngine.getQueuePosition() == undoEngine.queue.size()) {
-				UndoAction action = undoEngine.getMostRecentAction();
-				
-				if( action instanceof StructureAction) {
-					StructureAction saction = (StructureAction)action;
-					
-					if( saction.change instanceof OpacityChange) {
-						OpacityChange change = (OpacityChange)saction.change;
-						
-						change.opacityAfter = alpha;
-						node.alpha = alpha;
-						triggerImageRefresh();
-						return;
-					}
-				}
-			}
-			
 			executeChange( new OpacityChange(node, alpha));
 		}
 	}
@@ -449,6 +426,11 @@ public class ImageWorkspace {
 			if( imageChange)
 				triggerImageRefresh();
 		}
+	}
+	
+	public abstract class StackableStructureChange extends StructureChange {
+		public abstract void stackNewChange( StructureChange newChange);
+		public abstract boolean canStack( StructureChange newChange);
 	}
 	
 	public class AdditionChange extends StructureChange {
@@ -591,7 +573,8 @@ public class ImageWorkspace {
 			node.visible = !visibleAfter;
 		}
 	}
-	public class OpacityChange extends StructureChange {
+	public class OpacityChange extends StackableStructureChange
+	{
 		float opacityBefore;
 		float opacityAfter;
 		public final Node node;
@@ -613,12 +596,29 @@ public class ImageWorkspace {
 		public void unexecute() {
 			node.alpha = opacityBefore;
 		}
+
+		@Override
+		public void stackNewChange(StructureChange newChange) {
+			OpacityChange change = (OpacityChange)newChange;
+			
+			this.opacityAfter = change.opacityAfter;
+		}
+		
+		@Override
+		public boolean canStack(StructureChange newChange) {
+			OpacityChange change = (OpacityChange)newChange;
+			
+			return (node == change.node);
+		}
 	}
 	
 	public void executeChange( StructureChange change) {
 		change.execute();
 		
-		undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
+		if( change instanceof StackableStructureChange) 
+			undoEngine.storeAction(undoEngine.new StackableStructureAction(change) , null);
+		else 
+			undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
 		change.alert(false);
 	}
 	

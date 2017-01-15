@@ -17,7 +17,9 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.ImageWorkspace.StackableStructureChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -33,14 +35,29 @@ import spirite.image_data.ImageWorkspace.StructureChange;
  * differential encoding.
  * 
  * While coding drawing actions for UndoActions separately from the actual
- * draw commands in the Penner program might seem like redundant code for
- * many tasks, for ones that require continuous input (in particular, Strokes)
- * they can't be generalized in that way.
+ *   draw commands might seem like redundant code for many tasks, there are enough
+ *   tasks that require continuous visual feedback to separate performAction code
+ *   from realtime execution code (though calling similar methods).
+ * All NullActions are performed in a centralized place (ImageWorkspace.executeAction)
  * 
  * Events which update the undo engine with undo-able commands should come from
  *  a limited number of places to promote code maintainability.  As of now, only:
  * -ImageWorkspace
  * -DrawEngine
+ * -SelectionEngine
+ * 
+ * !!!! MASSIVE TODO: Figure out the best way to make selection actions undoable.
+ * I want to have each of the following actions undoable:
+ * -Form the Selection
+ * -Move the selection
+ * -Anchor the selection.
+ * 
+ * The problem is that "Move the Selection" is an action that will change the image
+ * data, but is also an action that has logical repercussions (it changes the form
+ * and placement of the selection), so it can't be handled by the NullContext
+ * without screwing up the ImageContext pipeline and if handled by the 
+ * ImageContext, not only would it require a lot of redundant code, but it'd
+ * probably screw up the pipeline anyway.
  * 
  * @author Rory Burks
  *
@@ -184,6 +201,20 @@ public class UndoEngine {
 	 * undoable.
 	 */
 	public void storeAction( UndoAction action, ImageData data) {
+		// If the UndoAction is a StackableAction
+		if( queue.size() != 0 && getQueuePosition() == queue.size() && action instanceof StackableAction) {
+			UndoAction lastAction = getMostRecentAction();
+			
+			
+			if( lastAction.getClass().equals(action.getClass())) {
+				StackableAction stackAction = ((StackableAction)lastAction);
+				if(stackAction.canStack(action)) {
+					stackAction.stackNewAction(action);
+					return;
+				}
+			}
+		}
+		
 		// Delete all actions stored after the current iterator point
 		if( queuePosition != null) {
 			queue.subList(queuePosition.nextIndex(), queue.size()).clear();
@@ -650,6 +681,11 @@ public class UndoEngine {
 	}
 	
 	
+	public interface StackableAction {
+		public void stackNewAction( UndoAction newAction);
+		public boolean canStack( UndoAction newAction);
+	}
+	
 	// :::: Image UIndoActions
 	//	Actions working directly on the image data
 	
@@ -697,6 +733,47 @@ public class UndoEngine {
 		}
 	}
 	
+	public class StartSelectionAction extends UndoAction
+	{
+		int startX, startY;
+		Selection selection;
+		public StartSelectionAction( Selection selection, int startX, int startY) {
+			
+		}
+		@Override
+		public void performAction(ImageData data) {
+			workspace.getSelectionEngine().setSelection(selection);
+		}
+		
+	}
+	public class MoveSelectionAction extends UndoAction 
+		implements StackableAction
+	{
+		int deltaX;
+		int deltaY;
+		
+		public MoveSelectionAction( int deltaX, int deltaY) {
+			this.deltaX = deltaX;
+			this.deltaY = deltaY;
+		}
+
+		@Override
+		public void performAction(ImageData data) {
+			
+		}
+
+		@Override
+		public void stackNewAction(UndoAction newAction) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean canStack(UndoAction newAction) {
+			return true;
+		}
+		
+	}
 	
 	/***
 	 * NullAction
@@ -729,6 +806,25 @@ public class UndoEngine {
 		@Override
 		public void onCauterize() {
 			change.cauterize();
+		}
+	}
+	public class StackableStructureAction extends StructureAction
+		implements StackableAction 
+	{
+		public StackableStructureAction(StructureChange change) {
+			super(change);
+		}
+
+		@Override
+		public void stackNewAction(UndoAction newAction) {
+			((StackableStructureChange)change).stackNewChange(
+					((StackableStructureAction)newAction).change);
+		}
+		
+		@Override
+		public boolean canStack(UndoAction newAction) {
+			return ((StackableStructureChange)change).canStack(
+					((StackableStructureAction)newAction).change);
 		}
 	}
 	

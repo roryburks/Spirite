@@ -22,6 +22,8 @@ import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.StrokeAction;
@@ -46,17 +48,24 @@ public class Penner
 	Timer update_timer;
 	StrokeEngine strokeEngine = null;
 	
+	ImageWorkspace workspace;
+	SelectionEngine selectionEngine;
+	UndoEngine undoEngine;
+	
 	String activeTool = null;
 	
 	int x, y;
 	
-	private enum STATE { READY, DRAWING, FORMING_SELECTION};
+	private enum STATE { READY, DRAWING, FORMING_SELECTION, MOVING};
 	STATE state = STATE.READY;
 	
 	public Penner( DrawPanel draw_panel) {
 		this.drawPanel = draw_panel;
 		this.context = draw_panel.context;
 		this.master = context.master;
+		this.workspace = draw_panel.workspace;
+		this.selectionEngine = workspace.getSelectionEngine();
+		this.undoEngine = workspace.getUndoEngine();
 
 		// Add Timer and KeyDispatcher
 		//	Note: since these are utilities with a global focus that you're
@@ -96,7 +105,7 @@ public class Penner
 			
 			String tool = master.getToolsetManager().getSelectedTool();
 			
-			if( tool == "pen") {
+			if( tool.equals("pen")) {
 				StrokeParams stroke = new StrokeParams();
 				Color c = (button == PButton.Type.LEFT) ? 
 						context.master.getPaletteManager().getActiveColor(0)
@@ -106,14 +115,14 @@ public class Penner
 				// Start the Stroke
 				startStroke( stroke);
 			}
-			if( tool == "eraser") {
+			if( tool.equals("eraser")) {
 				StrokeParams stroke = new StrokeParams();
 				stroke.setMethod( Method.ERASE);
 
 				// Start the Stroke
 				startStroke( stroke);
 			}
-			if( tool == "fill") {
+			if( tool.equals("fill")) {
 				// Determine Color
 				Color c = (button == PButton.Type.LEFT) ? 
 						master.getPaletteManager().getActiveColor(0)
@@ -134,10 +143,27 @@ public class Penner
 					}
 				} 
 			}
-			if( tool == "box_selection"){
-				ImageWorkspace workspace = drawPanel.workspace;
-				workspace.getSelectionEngine().startBuildingSelection(SelectionType.RECTANGLE, x, y);
-				state = STATE.FORMING_SELECTION;
+			if( tool.equals("box_selection")){
+				Selection selection = selectionEngine.getSelection();
+				
+				if( selection != null && selection.contains(x,y)) {
+					state = STATE.MOVING;
+				}
+				else {
+					selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
+					state = STATE.FORMING_SELECTION;
+				}
+			}
+			if( tool.equals("move")) {
+				Selection selection = selectionEngine.getSelection();
+				
+				
+				if(selection != null) {
+					if( !selectionEngine.isLifted())
+						selectionEngine.liftSelection();
+					
+					state = STATE.MOVING;
+				}
 			}
 			
 			activeTool = tool;
@@ -161,7 +187,7 @@ public class Penner
 				break;
 			case FORMING_SELECTION:
 				drawPanel.workspace.getSelectionEngine().finishBuildingSelection();
-				drawPanel.workspace.getSelectionEngine().liftSelection();
+//				drawPanel.workspace.getSelectionEngine().liftSelection();
 			}
 			state = STATE.READY;
 		}
@@ -207,6 +233,8 @@ public class Penner
 	int shiftStartY;
 	int wX;
 	int wY;
+	int oldX;
+	int oldY;
 	@Override
 	public void penLevelEvent(PLevelEvent ple) {
 		// Note: JPen updates PenLevels (which inform of things like position and pressure)
@@ -249,8 +277,10 @@ public class Penner
 		}
 		
 		
+		
 		context.workSplicePanel.context.refreshCoordinates(x, y);
 		
+		// Perform state-based "on-pen/mouse move" code
 		switch( state) {
 		case DRAWING:
 			if( strokeEngine != null) {
@@ -260,9 +290,19 @@ public class Penner
 		case FORMING_SELECTION:
 			drawPanel.workspace.getSelectionEngine().updateBuildingSelection(x, y);
 			break;
+		case MOVING:
+			if( oldX != x || oldY != y) {
+				selectionEngine.setOffset(
+						selectionEngine.getOffsetX() + (x - oldX),
+						selectionEngine.getOffsetY() + (y - oldY));
+			}
+			break;
 		default:
 			break;
 		}
+		
+		oldX = x;
+		oldY = y;
 	}
 
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}

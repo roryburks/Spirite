@@ -15,6 +15,7 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * The RenderEngine may or may not be a big and necessary component
@@ -53,9 +54,21 @@ public class RenderEngine
 		if( image == null) {
 			// Otherwise get the drawing queue and draw it
 			ImageWorkspace workspace = settings.workspace;
+			SelectionEngine selectionEngine = workspace.getSelectionEngine();
 			
-			if( workspace == null || workspace.getWidth() == 0 || workspace.getHeight() == 0) 
+			// Abort if it does not make sense to draw the workspace
+			if( workspace == null || workspace.getWidth() <= 0 || workspace.getHeight() <= 0) 
 				return null;
+
+			// Remember the selection state if you're drawing the selection
+			Selection selection = null;
+			ImageData lifteContext = null;
+			
+			if( settings.drawSelection && selectionEngine.isLifted()) {
+				selection = selectionEngine.getSelection();
+				lifteContext = selection.getLiftedContext();
+			}
+			
 			
 			List<LayerNode> drawing_queue = workspace.getDrawingQueue();
 			
@@ -63,18 +76,27 @@ public class RenderEngine
 			Graphics g = image.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 	
+			// Go through each layer and draw it according to the settings
 			for( LayerNode layer : drawing_queue) {
-				// !!!! TODO Very Debug
-				if( layer.getImageData() != null) {
-					if( layer.alpha != 1.0f) {
-						Composite cc = g2.getComposite();
+				ImageData layerData = layer.getImageData();
+				
+				if( layerData != null) {
+					Composite cc = g2.getComposite();
+					
+					if( layer.alpha != 1.0f) 
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.alpha));
-						g2.drawImage(layer.getImageData().readImage().image, 0, 0, null);
-						g2.setComposite(cc);
-						
+
+					g.drawImage(layer.getImageData().readImage().image, 0, 0, null);
+					
+					if( lifteContext == layerData) {
+						g.drawImage( 
+								selection.getLiftedData(), 
+								selectionEngine.getOffsetX(), 
+								selectionEngine.getOffsetY(), 
+								null);
 					}
-					else
-						g.drawImage(layer.getImageData().readImage().image, 0, 0, null);
+					
+					g2.setComposite(cc);
 				}
 			}
 			
@@ -112,10 +134,15 @@ public class RenderEngine
 	}
 	
 	public static class RenderSettings {
+		public ImageWorkspace workspace;
+		public boolean drawSelection = true;
+		
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
+			result = prime * result + (drawSelection ? 1231 : 1237);
 			result = prime * result + ((workspace == null) ? 0 : workspace.hashCode());
 			return result;
 		}
@@ -129,6 +156,8 @@ public class RenderEngine
 			if (getClass() != obj.getClass())
 				return false;
 			RenderSettings other = (RenderSettings) obj;
+			if (drawSelection != other.drawSelection)
+				return false;
 			if (workspace == null) {
 				if (other.workspace != null)
 					return false;
@@ -137,7 +166,6 @@ public class RenderEngine
 			return true;
 		}
 
-		public ImageWorkspace workspace;
 	}
 
 	// :::: MImageObserver
