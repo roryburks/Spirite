@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+
 public class ImageData {
 	ImageWorkspace context;	
-	private BufferedImage data;
+	BufferedImage data;
 	int id;
+	boolean locked = false;
 	
 	public ImageData( BufferedImage img, int id, ImageWorkspace context) {
 		this.context = context;
@@ -26,8 +28,8 @@ public class ImageData {
         g2d.dispose();
 	}
 	
-	public BufferedImage getData() {
-		return data;
+	public ReadOnlyImage readImage() {
+		return new ReadOnlyImage(data);
 	}
 	
 	public int getID() {

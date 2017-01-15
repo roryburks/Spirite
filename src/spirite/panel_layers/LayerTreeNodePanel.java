@@ -42,6 +42,7 @@ public class LayerTreeNodePanel extends JPanel {
 			}
 			
 			if( image != null) {
+				// TODO: This should be in RenderEngine
 				Graphics2D g2 = (Graphics2D)g;
 				RenderingHints oldHints = g2.getRenderingHints();
 				RenderingHints newHints = new RenderingHints(
@@ -53,7 +54,7 @@ public class LayerTreeNodePanel extends JPanel {
 						RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2.setRenderingHints(newHints);
 				g2.drawImage(
-						image.getData(), 
+						image.readImage().image, 
 						0, 0, 
 						this.getWidth(),
 						this.getHeight(),

@@ -7,7 +7,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +24,7 @@ import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ReadOnlyImage;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
@@ -111,15 +111,17 @@ public class DrawPanel extends JPanel
             ImageData active = workspace.getActiveData();
             
             if( active != null) {
-	            BufferedImage data = active.getData();
-	            if( data.getWidth() != workspace.getWidth() || data.getHeight() != workspace.getHeight()) {
+            	ReadOnlyImage img = active.readImage();
+	            int width = img.getWidth();
+	            int height = img.getHeight();
+	            if( width != workspace.getWidth() || height != workspace.getHeight()) {
 	                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
 	                g2.setStroke(new_stroke);
 	                g2.setColor(Globals.getColor("drawpanel.layer.border"));
 	                g2.drawRect( context.itsX(0)-1,
 	    		            context.itsY(0)-1,
-	    		            (int)Math.round(data.getWidth()*context.zoom)+1,
-	    		            (int)Math.round(data.getHeight()*context.zoom)+1);
+	    		            (int)Math.round(width*context.zoom)+1,
+	    		            (int)Math.round(width*context.zoom)+1);
 	            }
             }
 
@@ -152,6 +154,7 @@ public class DrawPanel extends JPanel
             g2.setStroke(old_stroke);
             g2.setTransform(trans);
         }
+        
     }
 
 

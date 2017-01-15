@@ -337,10 +337,10 @@ public class UndoEngine {
 						// this increments until it hits a Keyframe, then it removes
 						// the old base keyframe and adjusts
 		
-		ImageContext( ImageData data) {
-			super(data);
+		ImageContext( ImageData image) {
+			super(image);
 			
-			actions.add(new KeyframeAction(deepCopy(data.getData()), null));
+			actions.add(new KeyframeAction(deepCopy(image.data), null));
 			met = 0;
 			pointer = 0;
 		}
@@ -359,6 +359,8 @@ public class UndoEngine {
 		}
 		
 		private BufferedImage deepCopy( BufferedImage toCopy) {
+			// Note: Though this requires BufferedImage, it's not actually
+			//	modifying the image, so no checkout is needed.
 			cacheSize += toCopy.getWidth() * toCopy.getHeight() * 4;
 			System.out.println(cacheSize);
 			
@@ -371,7 +373,8 @@ public class UndoEngine {
 			
 		}
 		private void resetToKeyframe( BufferedImage frame) {
-			Graphics g = image.getData().getGraphics();
+			// TODO
+			Graphics g = image.data.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -389,7 +392,7 @@ public class UndoEngine {
 			// The second half of this conditional is mostly debug to
 			//	test if the dynamic keyframe distance is working, but 
 			if( met == MAX_TICKS_PER_KEY || action instanceof FillAction) {
-				actions.add(new KeyframeAction(deepCopy(image.getData()), action));
+				actions.add(new KeyframeAction(deepCopy(image.data), action));
 				met = 0;
 			}
 			else {
@@ -666,7 +669,7 @@ public class UndoEngine {
 		
 		@Override
 		public void performAction( ImageData data) {
-			StrokeEngine engine = (new DrawEngine()).createStrokeEngine(data);
+			StrokeEngine engine = workspace.getDrawEngine().createStrokeEngine(data);
 			
 			engine.startStroke(params, points[0].x, points[0].y);
 			
@@ -689,7 +692,7 @@ public class UndoEngine {
 
 		@Override
 		public void performAction( ImageData data) {
-			DrawEngine de = new DrawEngine();
+			DrawEngine de = workspace.getDrawEngine();
 			de.fill(p.x, p.y, c, data);
 		}
 	}

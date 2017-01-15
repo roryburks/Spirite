@@ -24,13 +24,14 @@ import spirite.MUtil;
  *
  */
 public class DrawEngine {
-	BufferedImage working_image;
 	Timer update_timer;
 	StrokeEngine timedStroke = null;
+	ImageWorkspace workspace;
 	
 	private enum STATE { READY, DRAWING };
 	
-	public DrawEngine( ) {
+	public DrawEngine( ImageWorkspace workspace) {
+		this.workspace = workspace;
 	}
 
 	public StrokeEngine createStrokeEngine( ImageData data) {
@@ -49,6 +50,7 @@ public class DrawEngine {
 
 		StrokeParams stroke;
 		ImageData data;
+		BufferedImage img;
 		
 		List<Point> prec = new LinkedList<>();
 		
@@ -73,10 +75,10 @@ public class DrawEngine {
 		 * @return true if the data has been changed, false otherwise
 		 */
 		public boolean startStroke( StrokeParams s, int x, int y) {
-			if( data == null || data.getData() == null) 
+			if( data == null) 
 				return false;
 			stroke = s;
-			BufferedImage img = data.getData();
+			img = workspace.checkoutImage(data);
 			int crgb = stroke.getColor().getRGB();
 			
 			old_x = x;
@@ -100,13 +102,12 @@ public class DrawEngine {
 		 * @return true if the step wan't a null-step (non-moving)
 		 */
 		public synchronized boolean stepStroke() {
-			if( state != STATE.DRAWING || data == null || data.getData() == null) {
+			if( state != STATE.DRAWING || data == null) {
 				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
 				endStroke();
 				return false;
 			}
 			
-			BufferedImage img = data.getData();
 			boolean changed = false;
 				
 			// Draw Stroke (only if the mouse has moved)
@@ -146,11 +147,13 @@ public class DrawEngine {
 			new_y = y;
 		}
 		
-		public void endStroke() {
+		public synchronized void endStroke() {
+			state = STATE.READY;
 			old_x = -1;
 			old_y = -1;
-			state = STATE.READY;
-			working_image = null;
+			if( data != null) {
+				workspace.checkinImage(data);
+			}
 		}
 		
 		public Point[] getHistory() {
@@ -199,10 +202,9 @@ public class DrawEngine {
 	 */
 	public boolean fill( int x, int y, Color color, ImageData data) {
 		if( data == null) return false;
-		BufferedImage image = data.getData();
-		if( image == null) return false;
-		
-		if( !MUtil.coordInImage(x, y, image)) {
+		BufferedImage image = workspace.checkoutImage(data);
+		if( image == null || !MUtil.coordInImage(x, y, image))  {
+			workspace.checkinImage(data);
 			return false;
 		}
 		
@@ -215,7 +217,10 @@ public class DrawEngine {
 		int bg = image.getRGB(x, y);
 		int c = color.getRGB();
 		
-		if( bg == c) return false;
+		if( bg == c) {
+			workspace.checkinImage(data);
+			return false;
+		}
 		
 		while( !queue.isEmpty()) {
 			int p = queue.poll();
@@ -241,6 +246,7 @@ public class DrawEngine {
 			}
 		}
 		
+		workspace.checkinImage(data);
 		return true;
 	}
 	

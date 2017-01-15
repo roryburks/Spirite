@@ -132,7 +132,7 @@ public class SaveEngine {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		for( ImageData part : imageData) {
 			// (Foreach ImageData)
-			ImageIO.write( part.getData(), "png", bos);
+			ImageIO.write( part.readImage().image, "png", bos);
 
 			// [4] : Image ID
 			ra.writeInt( part.getID());

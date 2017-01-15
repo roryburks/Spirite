@@ -69,12 +69,12 @@ public class RenderEngine
 					if( layer.alpha != 1.0f) {
 						Composite cc = g2.getComposite();
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.alpha));
-						g2.drawImage(layer.getImageData().getData(), 0, 0, null);
+						g2.drawImage(layer.getImageData().readImage().image, 0, 0, null);
 						g2.setComposite(cc);
 						
 					}
 					else
-						g.drawImage(layer.getImageData().getData(), 0, 0, null);
+						g.drawImage(layer.getImageData().readImage().image, 0, 0, null);
 				}
 			}
 			

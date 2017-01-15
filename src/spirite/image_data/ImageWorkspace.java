@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class ImageWorkspace {
 	
 	private AnimationManager animationManager;
 	private SelectionEngine selectionEngine;
+	private DrawEngine drawEngine;
 	
 	private int width = 0;
 	private int height = 0;
@@ -57,6 +59,7 @@ public class ImageWorkspace {
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);
+		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 	}
@@ -152,6 +155,10 @@ public class ImageWorkspace {
 		return selectionEngine;
 	}
 	
+	public DrawEngine getDrawEngine() {
+		return drawEngine;
+	}
+	
 	public GroupTree.GroupNode getRootNode() {
 		return groupTree.getRoot();
 	}
@@ -193,6 +200,42 @@ public class ImageWorkspace {
 		}
 	}
 	
+	// :::: Image Checkout
+	public BufferedImage checkoutImage( ImageData image) {
+		if( !verifyImage(image))
+			return null;
+		
+		if( image.locked ) {
+			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-out locked ImageData");
+			return null;
+		}
+		
+		image.locked = true;
+		return image.data;
+	}
+	
+	public void checkinImage( ImageData image) {
+		if( !verifyImage(image))
+			return;
+
+		if( !image.locked ) {
+			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-in unlocked ImageData");
+			return;
+		}
+		
+		
+		image.locked = false;
+		triggerImageRefresh();
+	}
+	
+	private boolean verifyImage( ImageData image) {
+		if( !imageData.contains(image)) {
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout image from wrong workspce.");
+			return false;
+		}
+		return true;
+	}
+	
 	// :::: Group Node Modification
 	public LayerNode newLayer( int w, int h, String name, Color c) {
 		return 	addNewLayer( null, w, h, name, c);
@@ -222,8 +265,8 @@ public class ImageWorkspace {
 				// Create node then execute StructureChange event
 				LayerNode node = groupTree.new LayerNode( data, name);
 
-				width = Math.max(width,  data.getData().getWidth());
-				height = Math.max(height, data.getData().getHeight());
+				width = Math.max(width,  data.readImage().getWidth());
+				height = Math.max(height, data.readImage().getHeight());
 				
 				executeChange(createAdditionEvent(node, context));
 				
@@ -643,7 +686,7 @@ public class ImageWorkspace {
         for( MImageObserver obs : imageObservers)
             obs.structureChanged( evt);
     }
-    public void triggerImageRefresh() {
+    void triggerImageRefresh() {
         for( MImageObserver obs : imageObservers)
             obs.imageChanged();
         

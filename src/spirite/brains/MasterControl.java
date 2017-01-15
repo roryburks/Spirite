@@ -12,7 +12,6 @@ import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
 import spirite.file.SaveEngine;
-import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
@@ -40,7 +39,6 @@ public class MasterControl
     PaletteManager palette;
     ToolsetManager toolset;
     SettingsManager settingsManager;
-    DrawEngine drawEngine;
     RenderEngine renderEngine;
     
     FrameManager frame_manager;
@@ -61,7 +59,6 @@ public class MasterControl
         toolset = new ToolsetManager();
         settingsManager = new SettingsManager();
         frame_manager = new FrameManager( this);
-        drawEngine = new DrawEngine();
         renderEngine = new RenderEngine( this);
         Dialogs.setMaster(this); //// TODO BAD
     }
@@ -81,9 +78,6 @@ public class MasterControl
     }
     public FrameManager getFrameManager() {
     	return frame_manager;
-    }
-    public DrawEngine getDrawEngine() {
-    	return drawEngine;
     }
     public RenderEngine getRenderEngine(){
     	return renderEngine;

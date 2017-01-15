@@ -47,6 +47,8 @@ public class MDebug {
 		// Called when the user or program tries to do something that it expects to
 		//	be supported but isn't (probably because of version problems)
 		UNSUPPORTED,
+		// Called when the program tries to access data that has been locked
+		LOCK_CONFLICT,
 		UNSPECIFIED
 	}
 	

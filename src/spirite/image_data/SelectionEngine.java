@@ -5,15 +5,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import spirite.MUtil;
 import spirite.image_data.GroupTree.LayerNode;
@@ -36,19 +30,36 @@ public class SelectionEngine {
 		
 	}
 	
-	
-	
-	BufferedImage liftedData = null;
 	ImageWorkspace workspace;
-	SelectionEngine( ImageWorkspace workspace) {
-		this.workspace = workspace;
-	}
-	
+	// Variables related to Selection state
+	private Selection selection = null;
+	private BufferedImage liftedData = null;
+	private int offsetX, offsetY;
+	private ImageData dataContext;
+	private boolean lifted = false;
+
+	// Variables related to Selection Building
 	private Boolean building = false;
 	private SelectionType selectionType;
 	private int startX;
 	private int startY;
-	private Selection selection = null;
+	
+	SelectionEngine( ImageWorkspace workspace) {
+		this.workspace = workspace;
+	}
+
+	public boolean isLifted() {
+		return lifted;
+	}
+	
+	public ImageData getLiftedData() {
+		return dataContext;
+	}
+	
+	public Selection getSelection() {
+		return selection;
+	}
+	
 	public void startBuildingSelection( SelectionType type, int x, int y) {
 		building = true;
 		selectionType = type;
@@ -82,9 +93,6 @@ public class SelectionEngine {
 		}*/
 	}
 	
-	public Selection getSelection() {
-		return selection;
-	}
 	
 	public void liftSelection() {
 		if( selection == null)
@@ -103,6 +111,9 @@ public class SelectionEngine {
 		
 		if( rect.isEmpty())
 			return;
+		
+		offsetX = rect.x;
+		offsetY = rect.y;
 
 		
 		if( liftedData != null)
@@ -112,21 +123,27 @@ public class SelectionEngine {
 		liftedData = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
 		MUtil.clearImage(liftedData);
 		
+		BufferedImage layerImg = workspace.checkoutImage(node.getImageData());
 		
+		// Copy the data inside the Selection's alphaMask to liftedData
 		Graphics g = liftedData.getGraphics();
 		selection.drawSelectionMask(g);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-		g2.drawImage( node.getImageData().getData(), -rect.x, -rect.y, null);
+		g2.drawImage( layerImg, -rect.x, -rect.y, null);
+		g.dispose();
 		
-
-		// !!!! DEBUG
-		try {
-			ImageIO.write(liftedData, "png", new File("E:/Test.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// Delete the data inside the selection's alphaMask from the lifted data
+		g =layerImg.getGraphics();
+		g2 = (Graphics2D)g;
+		g2.translate(offsetX, offsetY);
+		g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
+		selection.drawSelectionMask(g2);
+		g.dispose();
+		
+		lifted = true;
+		
+		workspace.checkinImage(node.getImageData());
 	}
 	public void anchorSelection( ImageData image) {
 		// TODO
@@ -142,7 +159,7 @@ public class SelectionEngine {
 	public static class RectSelection extends Selection {
 		Rectangle rect;
 		RectSelection( Rectangle rect) {
-			this.rect = rect;
+			this.rect = (Rectangle)rect.clone();
 		}
 		@Override
 		public void drawSelectionBounds( Graphics g) {
