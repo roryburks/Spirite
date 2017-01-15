@@ -15,7 +15,6 @@ import jpen.PLevel;
 import jpen.PLevelEvent;
 import jpen.PScrollEvent;
 import jpen.event.PenListener;
-import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.image_data.DrawEngine.Method;
@@ -23,6 +22,7 @@ import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.StrokeAction;
 
@@ -50,7 +50,7 @@ public class Penner
 	
 	int x, y;
 	
-	private enum STATE { READY, DRAWING};
+	private enum STATE { READY, DRAWING, FORMING_SELECTION};
 	STATE state = STATE.READY;
 	
 	public Penner( DrawPanel draw_panel) {
@@ -126,7 +126,7 @@ public class Penner
 				if( data != null) {
 					// Perform the fill Action, only store the UndoAction if 
 					//	an actual change is made.
-					Point p = new Point(context.stiXm(x), context.stiYm(y));
+					Point p = new Point(x, y);
 					UndoEngine engine = workspace.getUndoEngine();
 					engine.prepareContext(data);
 					if( master.getDrawEngine().fill( p.x, p.y, c, data)) {
@@ -136,25 +136,33 @@ public class Penner
 				} 
 			}
 			if( tool == "box_selection"){
-				
+				ImageWorkspace workspace = drawPanel.workspace;
+				workspace.getSelectionEngine().startBuildingSelection(SelectionType.RECTANGLE, x, y);
+				state = STATE.FORMING_SELECTION;
 			}
 			
 			activeTool = tool;
 			
 		}
-		else if( state == STATE.DRAWING) {
+		else {
 			// Pen-up
-			
-			if( strokeEngine != null) {
-				strokeEngine.endStroke();
-				
-				// TODO : This should probably not be polling master, but instead StrokeEngine somehow
-				UndoEngine engine = drawPanel.workspace.getUndoEngine();
-				StrokeAction stroke = engine.new StrokeAction( 
-						strokeEngine.getParams(), 
-						strokeEngine.getHistory());
-				engine.storeAction( stroke, strokeEngine.getImageData());
-				strokeEngine = null;
+			switch( state) {
+			case DRAWING:
+				if( strokeEngine != null) {
+					strokeEngine.endStroke();
+					
+					// TODO : This should probably not be polling master, but instead StrokeEngine somehow
+					UndoEngine engine = drawPanel.workspace.getUndoEngine();
+					StrokeAction stroke = engine.new StrokeAction( 
+							strokeEngine.getParams(), 
+							strokeEngine.getHistory());
+					engine.storeAction( stroke, strokeEngine.getImageData());
+					strokeEngine = null;
+				}
+				break;
+			case FORMING_SELECTION:
+				drawPanel.workspace.getSelectionEngine().finishBuildingSelection();
+				drawPanel.workspace.getSelectionEngine().liftSelection();
 			}
 			state = STATE.READY;
 		}
@@ -168,7 +176,7 @@ public class Penner
 			workspace.getUndoEngine().prepareContext(data);
 			strokeEngine = master.getDrawEngine().createStrokeEngine( data);
 			
-			if( strokeEngine.startStroke( stroke, context.stiXm(x), context.stiYm(y))) {
+			if( strokeEngine.startStroke( stroke, x, y)) {
 				workspace.triggerImageRefresh();
 			}
 			state = STATE.DRAWING;
@@ -206,8 +214,8 @@ public class Penner
 		for( PLevel level: ple.levels) {
 			switch( level.getType()) {
 			case X:
-				wX = Math.round( level.value);
-				if( holdingShift) {
+				wX = context.stiXm(Math.round( level.value));
+				if( holdingShift && state == STATE.DRAWING) {
 					if( shiftMode == 2)
 						break;
 					if( shiftMode == 0) {
@@ -221,8 +229,8 @@ public class Penner
 				x = wX;
 				break;
 			case Y:
-				wY = Math.round( level.value);
-				if( holdingShift) {
+				wY = context.stiYm(Math.round( level.value));
+				if( holdingShift && state == STATE.DRAWING) {
 					if( shiftMode == 1)
 						break;
 					if( shiftMode == 0) {
@@ -241,12 +249,19 @@ public class Penner
 		}
 		
 		
-		context.workSplicePanel.context.refreshCoordinates(context.stiXm(x), context.stiYm(y));
+		context.workSplicePanel.context.refreshCoordinates(x, y);
 		
-		if( state == STATE.DRAWING) {
+		switch( state) {
+		case DRAWING:
 			if( strokeEngine != null) {
-				strokeEngine.updateStroke(context.stiXm(x), context.stiYm(y));
+				strokeEngine.updateStroke(x, y);
 			}
+			break;
+		case FORMING_SELECTION:
+			drawPanel.workspace.getSelectionEngine().updateBuildingSelection(x, y);
+			break;
+		default:
+			break;
 		}
 	}
 

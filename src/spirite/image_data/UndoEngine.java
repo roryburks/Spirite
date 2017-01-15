@@ -7,14 +7,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -380,7 +377,7 @@ public class UndoEngine {
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2.drawImage( frame, 0, 0,  null);
 			g2.setComposite( c);
-			
+			g2.dispose();
 		}
 		
 		

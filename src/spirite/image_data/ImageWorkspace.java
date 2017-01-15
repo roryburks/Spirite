@@ -44,6 +44,7 @@ public class ImageWorkspace {
 	private UndoEngine undoEngine;
 	
 	private AnimationManager animationManager;
+	private SelectionEngine selectionEngine;
 	
 	private int width = 0;
 	private int height = 0;
@@ -55,6 +56,7 @@ public class ImageWorkspace {
 	public ImageWorkspace() {
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
+		selectionEngine = new SelectionEngine(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 	}
@@ -144,6 +146,10 @@ public class ImageWorkspace {
 	
 	public AnimationManager getAnimationManager() {
 		return animationManager;
+	}
+	
+	public SelectionEngine getSelectionEngine() {
+		return selectionEngine;
 	}
 	
 	public GroupTree.GroupNode getRootNode() {

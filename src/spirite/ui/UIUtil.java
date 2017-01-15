@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.JComponent;

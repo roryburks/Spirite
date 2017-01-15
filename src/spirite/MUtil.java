@@ -1,6 +1,10 @@
 package spirite;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -56,6 +60,13 @@ public class MUtil {
 	// :::: String
 	
 	// :::: Other
+	public static void clearImage( BufferedImage image) {
+		Graphics2D g2 = (Graphics2D)image.getGraphics();
+		g2.setColor( new Color(0,0,0,0));
+		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
+		g2.fillRect(0, 0, image.getWidth(), image.getHeight());
+	}
+	
 	public static boolean coordInImage( int x, int y, BufferedImage image) {
 		if( image == null) return false;
 		

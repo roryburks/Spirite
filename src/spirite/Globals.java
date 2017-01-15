@@ -5,14 +5,12 @@ package spirite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 /**
@@ -73,7 +71,7 @@ public class Globals {
     private static class IconSet {
     	String resourceFile;
     	BufferedImage img = null;
-    	Icon iconsheet[][] = null;
+    	ImageIcon iconsheet[][] = null;
     	int widthPerIcon;
     	int heightPerIcon;
     }
@@ -104,10 +102,10 @@ public class Globals {
     			set.heightPerIcon = (Integer) row[2];
     			int w = (Integer)row[3];
     			int h = (Integer)row[4];
-    			set.iconsheet = new Icon[w][];
+    			set.iconsheet = new ImageIcon[w][];
     			
     			for( int i = 0; i<w; ++i) {
-    				set.iconsheet[i] = new Icon[h];
+    				set.iconsheet[i] = new ImageIcon[h];
     				for( int j=0; j<h; ++j)
     					set.iconsheet[i][j] = null;
     			}
@@ -142,7 +140,7 @@ public class Globals {
     }
     
     
-    public static Icon getIcon( String id) {
+    public static ImageIcon getIcon( String id) {
     	if( iconSets == null)
     		initIconSets();
     	
@@ -155,7 +153,7 @@ public class Globals {
     			if( set.img == null) {
     				// Load the image if it isn't loaded already
     				try {
-						set.img = loadIconSheet(set.getClass().getClassLoader().getResource("icons2.png").openStream());
+						set.img = loadIconSheet(Globals.class.getClassLoader().getResource("icons2.png").openStream());
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

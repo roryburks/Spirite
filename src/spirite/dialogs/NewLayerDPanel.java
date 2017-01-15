@@ -72,6 +72,7 @@ public class NewLayerDPanel extends JPanel {
 		tfWidth.setText( Integer.toString(image.getWidth()));
 		tfHeight.setText( Integer.toString(image.getHeight()));
 		
+		
 		this.setSelected(2);
 	}
 	

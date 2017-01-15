@@ -9,6 +9,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
@@ -86,7 +87,8 @@ public class Dialogs {
 			panel,
 			"New Image",
 			JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.PLAIN_MESSAGE,
+			Globals.getIcon("new_layer"));
 		
 		if( response == JOptionPane.OK_OPTION) {
 			int w = panel.getValueWidth();

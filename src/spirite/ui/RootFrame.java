@@ -17,7 +17,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
-import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
