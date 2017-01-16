@@ -8,10 +8,13 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
 
 public class ImageData {
-	ImageWorkspace context;	
-	BufferedImage data;
+	// Should really be a nested class, but ImageWorkspace is a bit too busy
+	private final ImageWorkspace context;
+	
+	
+	private BufferedImage data;
 	int id;
-	boolean locked = false;
+	boolean locked = false;	// Mostly unused for now
 	
 	public ImageData( BufferedImage img, int id, ImageWorkspace context) {
 		this.context = context;

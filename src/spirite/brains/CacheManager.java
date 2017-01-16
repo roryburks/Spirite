@@ -27,7 +27,7 @@ public class CacheManager {
 	}
 	
 	
-	// :::: Not sure if this code should be here or in RenderEngine since
+	//  Not sure if this code should be here or in RenderEngine since
 	//	even though many places should use CacheManager to track resource
 	//	count, tracking last_used is probably only useful to RenderEngine
 	public class CachedImage {

@@ -33,16 +33,12 @@ import spirite.image_data.SelectionEngine.Selection;
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver
 {
-//	List<Cache> image_cache;
-	Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
-
-	final CacheManager cacheManager;
-	final MasterControl master;
+	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
+	private final CacheManager cacheManager;
 	
+	// Needs Master just to add it as a Workspace Observer
 	public RenderEngine( MasterControl master) {
-		this.master = master;
 		this.cacheManager = master.getCacheManager();
-//		image_cache = new ArrayList<>();
 		
 		if( master.getCurrentWorkspace() != null) {
 			ImageWorkspace ws = master.getCurrentWorkspace();
@@ -54,6 +50,9 @@ public class RenderEngine
 		master.addWorkspaceObserver(this);
 	}
 	
+	/** Renders the image using the given RenderSettings, accessing it from the
+	 * cache if the image has been already rendered under those settings and no
+	 * relevant ImageData has changed since then. */
 	public BufferedImage renderImage(RenderSettings settings) {
 		settings.normalize();
 		
@@ -71,7 +70,7 @@ public class RenderEngine
 
 			if( settings.image != null) {
 				// I think I need to re-think names
-				BufferedImage imageImage = settings.image.data;
+				BufferedImage imageImage = settings.image.readImage().image;
 
 				
 				cachedImage = cacheManager.createImage(settings.width, settings.height);
@@ -94,6 +93,9 @@ public class RenderEngine
 		return cachedImage.access();
 	}
 	
+	// TODO: this is not only very debug, but the whole concept of a drawing
+	//	queue is faulty since it does not allow Group settings such as Opacity
+	//	to be properly implemented.
 	private CachedImage drawQueue( RenderSettings settings) {
 		ImageWorkspace workspace = settings.workspace;
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
@@ -146,7 +148,7 @@ public class RenderEngine
 		return cachedImage;
 	}
 	
-	// Looks to see if the current rendering requested is already cached; if so, just give the cache
+	/** Checks if the given settings have a cached version. */
 	private CachedImage getCachedImage( RenderSettings settings) {
 		CachedImage c = imageCache.get(settings);
 		
@@ -157,7 +159,7 @@ public class RenderEngine
 	}
 	
 
-	
+	/** RenderSettings define exactly what you want to be drawn and how. */
 	public static class RenderSettings {
 		
 		public ImageWorkspace workspace;
@@ -196,8 +198,8 @@ public class RenderEngine
 				node = null;
 				drawSelection = false;
 				
-				if( width == -1) width = image.data.getWidth();
-				if( height == -1) height = image.data.getHeight();
+				if( width == -1) width = image.readImage().image.getWidth();
+				if( height == -1) height = image.readImage().image.getHeight();
 			}
 			else {
 				if( width == -1) width = workspace.getWidth();
@@ -205,7 +207,7 @@ public class RenderEngine
 			}
 		}
 		
-		List<ImageData> getImagesReliedOn() {
+		public List<ImageData> getImagesReliedOn() {
 			if( image != null) {
 				List<ImageData> list = new LinkedList<>();
 				list.add(image);
@@ -217,7 +219,7 @@ public class RenderEngine
 			}
 		}
 		
-		// Eclipse Auto-generated.  Should work as expected
+		// !!!! Eclipse Auto-generated.  Should work as expected
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -276,7 +278,7 @@ public class RenderEngine
 	@Override	public void structureChanged(StructureChange evt) {	}
 	@Override
 	public void imageChanged( ImageChangeEvent evt) {
-		// Remove all caches whose data 
+		// Remove all caches whose renderings would have been effected by this change
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
 		
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
@@ -286,12 +288,18 @@ public class RenderEngine
 			
 			RenderSettings setting = entry.getKey();
 			if( setting.workspace == evt.workspace) {
+				// Since structureChanges do not effect ImageData and image draws
+				//	ignore settings, pass over image renderings on structureChange
+				if( setting.image != null && evt.isStructureChange())
+					continue;
+				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
 				List<ImageData> intersection = new LinkedList<ImageData>(evt.dataChanged);
 				intersection.retainAll(setting.getImagesReliedOn());
 				
-				if( !intersection.isEmpty()) {				
+				if( !intersection.isEmpty()) {
+					
 					// Flush the visual data from memory, then remove the entry
 					entry.getValue().flush();
 					it.remove();

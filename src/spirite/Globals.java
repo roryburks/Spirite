@@ -13,6 +13,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import spirite.MDebug.ErrorType;
+
 /**
  * The Globals object will centralize all globals that might have reason to
  * change (in particular text that might need localizations and user preferences
@@ -25,7 +27,10 @@ import javax.swing.ImageIcon;
  * 	of hand later
  */
 public class Globals {
-    private static Object colors[][] = {
+	
+	// TODO: In the future these databases will probably be stored as text 
+	//	files
+    private static final Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
         {"drawpanel.layer.border", new Color(16,16,16)},
         {"toolbutton.selected.background", new Color( 128,128,128)},
@@ -37,13 +42,21 @@ public class Globals {
         {"undoPanel.background",new Color( 238,238,238)},
     };
     
-    private static Object metrics[][] = {
+    private static final Object metrics[][] = {
     		{"layerpanel.treenodes.max", new Dimension( 32, 32)},
     		{"contentTree.dragdropLeniency", new Dimension( 0, 10)},
     		{"contentTree.buttonSize", new Dimension( 24, 24)},
     		{"contentTree.buttonMargin", new Dimension( 2, 2)},
     		{"workspace.max_size", new Dimension( 20000,20000)},
     };
+    
+    private static final Object icons[][] = {
+			{"icons2.png", 25, 25, 4,1},
+    		{"visible_on", 0, 0},
+    		{"visible_off", 1, 0},
+    		{"new_layer", 2, 0},
+    		{"new_group", 3, 0},
+	};
 
 
     public static Color getColor( String id) {
@@ -82,17 +95,10 @@ public class Globals {
     private static void initIconSets() {
     	iconSets = new ArrayList<>();
     	// Construct the iconTable from 
-    	Object[][] sheet = {
-    			{"icons2.png", 25, 25, 4,1},
-        		{"visible_on", 0, 0},
-        		{"visible_off", 1, 0},
-        		{"new_layer", 2, 0},
-        		{"new_group", 3, 0},
-    	};
     	
     	// Step 1: 
     	int setCount = 0;
-    	for( Object[] row : sheet) {
+    	for( Object[] row : icons) {
     		if( row.length == 5) {
     			
     			IconSet set = new IconSet();
@@ -116,11 +122,11 @@ public class Globals {
     	}
     	
     	// Step 2: add the individual table entires
-    	iconTable = new Object[sheet.length - setCount][];
+    	iconTable = new Object[icons.length - setCount][];
 
     	IconSet set = null;
     	int index = 0;
-    	for( Object[] row : sheet) {
+    	for( Object[] row : icons) {
     		if( row.length == 5) {
     			for( IconSet iset : iconSets) {
     				if( iset.resourceFile == (String)row[0]) {
@@ -154,9 +160,8 @@ public class Globals {
     				// Load the image if it isn't loaded already
     				try {
 						set.img = loadIconSheet(Globals.class.getClassLoader().getResource("icons2.png").openStream());
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					} catch (IOException e) {
+						MDebug.handleError( ErrorType.RESOURCE, null, e.getMessage());
 					}
     			}
     			

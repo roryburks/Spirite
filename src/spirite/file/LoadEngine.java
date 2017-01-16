@@ -24,9 +24,10 @@ import spirite.image_data.ImageWorkspace;
  * various file formats (but particularly the native SIF format)
  */
 public class LoadEngine {
-	public static MasterControl master;
+	private static MasterControl master;
 	public static void setMaster( MasterControl m) { master = m;}
 	
+	/** Attempts to load the given file into a new Workspace. */
 	public static ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
 	{
@@ -79,7 +80,6 @@ public class LoadEngine {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
 			throw new BadSIFFFileException("UTF-8 Format Unsupported (somehow).");
 		}catch( IOException e) {
-//			e.printStackTrace();
 			throw new BadSIFFFileException("Error Reading File: " + e.getStackTrace());
 		}
 	}
@@ -184,7 +184,6 @@ public class LoadEngine {
 					nodeLayer[layer].setExpanded(true);
 				}
 				if( type == SaveLoadUtil.NODE_LAYER) {
-					// !!!! TODO DEBUG
 					workspace.addNewLayer( nodeLayer[layer-1], identifier, name);
 				}
 			}

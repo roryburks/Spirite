@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
 import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -393,7 +394,6 @@ public class OmniFrame extends JDialog
 		
 		@Override
 		public boolean importData( TransferSupport support) {
-			
 			try {
 				OFTransferable trans = 
 						(OFTransferable)support.getTransferable().getTransferData(FLAVOR);
@@ -409,8 +409,7 @@ public class OmniFrame extends JDialog
 				root.repaint();
 				return true;
 			} catch (UnsupportedFlavorException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to import unsupported Data in OmniFrame (shouldn't have been flagged as importable).");
 				return false;
 			}
 		}

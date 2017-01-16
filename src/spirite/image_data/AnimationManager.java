@@ -13,7 +13,7 @@ import spirite.image_data.animation_data.AbstractAnimation;
  *
  */
 public class AnimationManager {
-	final ImageWorkspace context;
+	private final ImageWorkspace context;
 	
 	private ArrayList<AbstractAnimation> animations = new ArrayList<>();
 	
@@ -33,22 +33,21 @@ public class AnimationManager {
 		return (List<AbstractAnimation>)animations.clone();
 	}
 	
-	// Observers
-	List<MAnimationStructureObserver> structureObservers = new ArrayList<>();
-	
-	private void triggerStructureChange( AnimationStructureEvent evt) {
-		for( MAnimationStructureObserver obs : structureObservers)
-			obs.animationStructureChanged(evt);
-	}
-	
-
-    public void addStructureObserver( MAnimationStructureObserver obs) { structureObservers.add(obs);}
-    public void removeStructureObserver( MAnimationStructureObserver obs) { structureObservers.remove(obs); }
-	
+	// :::: Observers
 	public static interface MAnimationStructureObserver {
 		public void animationStructureChanged(AnimationStructureEvent evt);
 	}
 	
 	public static class AnimationStructureEvent {
+	}
+	
+
+	List<MAnimationStructureObserver> structureObservers = new ArrayList<>();
+    public void addStructureObserver( MAnimationStructureObserver obs) { structureObservers.add(obs);}
+    public void removeStructureObserver( MAnimationStructureObserver obs) { structureObservers.remove(obs); }
+
+	private void triggerStructureChange( AnimationStructureEvent evt) {
+		for( MAnimationStructureObserver obs : structureObservers)
+			obs.animationStructureChanged(evt);
 	}
 }

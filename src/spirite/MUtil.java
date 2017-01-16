@@ -31,6 +31,11 @@ public class MUtil {
 		return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 	}
 
+	/** 
+	 * Places t in between start and end such that it is offset by an integer
+	 * number of rotations of start to end. <br>
+	 * (ex: if start = 10, end = 20, t = 65, returns 15)
+	 */
 	public static float cycle( float start, float end, float t) {
 		float diff = end - start;
 		if( diff == 0.0f)
@@ -38,6 +43,12 @@ public class MUtil {
 		
 		return ((t - start) % diff + diff) % diff + start;
 	}
+
+	/** 
+	 * Places t in between start and end such that it is offset by an integer
+	 * number of rotations of start to end. <br>
+	 * (ex: if start = 10, end = 20, t = 65, returns 15)
+	 */
 	public static int cycle( int start, int end, int t) {
 		int diff = end - start;
 		if( diff == 0)
@@ -59,6 +70,7 @@ public class MUtil {
 	// :::: String
 	
 	// :::: Other
+	/** Fills the image entirely with transparent data */
 	public static void clearImage( BufferedImage image) {
 		Graphics2D g2 = (Graphics2D)image.getGraphics();
 		g2.setColor( new Color(0,0,0,0));
@@ -103,7 +115,5 @@ public class MUtil {
 			else {
 			}
 		}
-		
-		
 	}
 }

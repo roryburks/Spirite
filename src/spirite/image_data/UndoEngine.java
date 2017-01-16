@@ -66,19 +66,21 @@ import spirite.image_data.SelectionEngine.Selection;
  *
  */
 public class UndoEngine {
-	static final int MAX_TICKS_PER_KEY = 10;
-	int absoluteMaxCache = 200000000;	// 200 mb
-	int maxCacheSize = 50000000;	// 50 mb
-	int maxQueueSize = 100;
-	final List<UndoContext> contexts = new ArrayList<UndoContext>();
-	final LinkedList<UndoContext> queue = new LinkedList<>();
-	ListIterator<UndoContext> queuePosition = null;
+	private static final int MAX_TICKS_PER_KEY = 10;
+	private int absoluteMaxCache = 200000000;	// 200 m
+	private int maxCacheSize = 50000000;	// 50 m
+	private int maxQueueSize = 100;
+	private final List<UndoContext> contexts = new ArrayList<UndoContext>();
+	private final LinkedList<UndoContext> queue = new LinkedList<>();
+	private ListIterator<UndoContext> queuePosition = null;
 	
 	private final ImageWorkspace workspace;
 	private final CacheManager cacheManager;
+
+	/** Marks the point on the undoQueue where the image is considered "unchanged" */
+	private int saveSpot = -1;	
 	
-	// TODO Implement 
-	enum CullBehavior {
+	private enum CullBehavior {
 		// If cacheSize > maxCacheSize, start clipping the queue's tail
 		//	until that is no longer true
 		ONLY_CACHE,		
@@ -89,13 +91,8 @@ public class UndoEngine {
 		//	or if cacheSize > absoluteMaxCache
 		CACHE_AND_COUNT,
 	}
-	CullBehavior cullBehavior = CullBehavior.CACHE_AND_COUNT;
+	private CullBehavior cullBehavior = CullBehavior.CACHE_AND_COUNT;
 	
-	UndoAction getMostRecentAction() {
-		if( queue.size() == 0)
-			return null;
-		return queue.getLast().getLast();
-	}
 	
 	public UndoEngine(ImageWorkspace workspace, CacheManager cacheManager) {
 		this.workspace = workspace;
@@ -116,6 +113,7 @@ public class UndoEngine {
 		queue.clear();
 		queuePosition = null;
 		contexts.add( new NullContext());
+		saveSpot = 0;
 	}
 	
 	/***
@@ -145,6 +143,14 @@ public class UndoEngine {
 		}
 	}
 	
+	// Called by ImageWorkapce
+	boolean atSaveSpot() {
+		return saveSpot == getQueuePosition();
+	}
+	void setSaveSpot() {
+		saveSpot = getQueuePosition();
+	}
+	
 	/***
 	 * Constructs a list of all the logical actions that are performed in the
 	 * Undo History in a straight list that makes very little sense to the Undo 
@@ -169,6 +175,11 @@ public class UndoEngine {
 		
 		return list;
 	}
+	public UndoAction getMostRecentAction() {
+		if( queue.size() == 0)
+			return null;
+		return queue.getLast().getLast();
+	}
 	public static class UndoIndex {
 		public ImageData data;
 		public UndoAction action;
@@ -183,10 +194,9 @@ public class UndoEngine {
 	 * You need to call this before you edit the data or else the first action
 	 * you perform will not be undoable.
 	 * 
-	 * TODO : Consider whether it's worth centralizing these kind of things 
-	 * in the ImageWorskpace with a series of Checkouts/Checkins
+	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
-	public void prepareContext( ImageData data) {
+	void prepareContext( ImageData data) {
 		for( UndoContext context : contexts) {
 			if( context.image == data)
 				return;
@@ -202,23 +212,10 @@ public class UndoEngine {
 	 * ImageData.
 	 * 
  	 * Note: the Context should have already been created using prepareContext
-	 * if it is not, then the first undoable action on the ImageData will not be
-	 * undoable.
+	 * when the image was checked out.  If not, the first action will not be
+	 * undoable because the previous keyframe will not have been stored.
 	 */
 	public void storeAction( UndoAction action, ImageData data) {
-		// If the UndoAction is a StackableAction
-		if( queue.size() != 0 && getQueuePosition() == queue.size() && action instanceof StackableAction) {
-			UndoAction lastAction = getMostRecentAction();
-			
-			
-			if( lastAction.getClass().equals(action.getClass())) {
-				StackableAction stackAction = ((StackableAction)lastAction);
-				if(stackAction.canStack(action)) {
-					stackAction.stackNewAction(action);
-					return;
-				}
-			}
-		}
 		
 		// Delete all actions stored after the current iterator point
 		if( queuePosition != null) {
@@ -230,6 +227,26 @@ public class UndoEngine {
 			
 			// Since erasing the timeline might create ghosts 
 			workspace.cleanDataCache();
+			
+			if( queue.size() < saveSpot) {
+				saveSpot = -1;
+			}
+		}
+		
+
+		// If the UndoAction is a StackableAction and a compatible entry
+		//   is on the top of the stack, modify that entry instead of creating
+		//   a new one.
+		if( queue.size() != 0 && getQueuePosition() == queue.size() && action instanceof StackableAction) {
+			UndoAction lastAction = getMostRecentAction();
+			
+			if( lastAction.getClass().equals(action.getClass())) {
+				StackableAction stackAction = ((StackableAction)lastAction);
+				if(stackAction.canStack(action)) {
+					stackAction.stackNewAction(action);
+					return;
+				}
+			}
 		}
 		
 		// Determine if the Context for the given ImageData exists
@@ -258,8 +275,11 @@ public class UndoEngine {
 		cull();
 	}
 	
+	/** Checks to see if there are too many UndoActions (using the behavior determined
+	 * by the cullBehavior) and gets rid of the oldest undo actions until there
+	 * aren't. */
 	private void cull() {
-		while( cacheManager.getCacheSize() > absoluteMaxCache)
+		while( queue.size() > 0 && cacheManager.getCacheSize() > absoluteMaxCache) 
 			clipTail();
 		
 		switch( cullBehavior) {
@@ -269,7 +289,8 @@ public class UndoEngine {
 				clipTail();
 			break;
 		case ONLY_CACHE:
-			while( cacheManager.getCacheSize() > maxCacheSize)
+			while( cacheManager.getCacheSize() > maxCacheSize
+					&& queue.size() > 0)
 				clipTail();
 			break;
 		case ONLY_UNDO_COUNT:
@@ -336,9 +357,16 @@ public class UndoEngine {
 	
 
 	/***
-	 * An Undo Context is tied to a ImageData object.  It stores the ImageData's previous
-	 * 	BufferedImage states.  Instead of saving one BufferedImage per undo action, it 
-	 *  stores only one every N undo actions, while storing the action 
+	 * An UndoContext represents a "space" in which actions are sequentially relevant
+	 * to each other.  e.g. If you change an ImageData's image data, it will have no
+	 * effect on any other ImageData's data and such is stored in a separate context.
+	 * But if you move a Node from one tree to another tree and then delete its old
+	 * parent the order in which that happens is very important, and thus they must
+	 * exist in the same context.
+	 * 
+	 * As of now there are two types of contexts: 
+	 * -ImageContext which exist one per image.
+	 * -NullContext of which only one exists, for changes outside any image data.
 	 */
 	private abstract class UndoContext {
 		ImageData image;
@@ -347,37 +375,46 @@ public class UndoEngine {
 			this.image = data;
 		}
 
-		abstract void addAction( UndoAction action);
-		abstract void undo();
-		abstract void redo();
-		abstract void cauterize();
-		abstract void clipTail();
+		protected abstract void addAction( UndoAction action);
+		protected abstract void undo();
+		protected abstract void redo();
+		protected abstract void cauterize();
+		protected abstract void clipTail();
 
-		abstract void startIterate();
-		abstract UndoAction iterateNext();
-		abstract UndoAction getLast();
+		protected abstract void startIterate();
+		protected abstract UndoAction iterateNext();
+		protected abstract UndoAction getLast();
 		
-		abstract boolean isEmpty();
+		protected abstract boolean isEmpty();
 		
-		void flush() {}
+		protected void flush() {}
 	}
 	
 	/***
-	 * ImageContext is the default UndoContext
+	 * ImageContext are tied to a particular ImageData.  Instead of storing
+	 * each state as a separate BufferedImage, it only stores every N Keyframes
+	 * (although the distance between Keyframes can be dynamic).  It stores 
+	 * the changes in between Keyframes as their logical components and when
+	 * undoing it reverts to the most recent earlier Keyframe and then re-constructs
+	 * each action to get to the expected state.
+	 * 
+	 * This is an attempt to balance between memory-use and processor-use in a 
+	 * setting where "reversible actions" are virtually impossible since you're 
+	 * writing over old data.
 	 */
 	private class ImageContext extends UndoContext {
 //		List<BufferedImage> keyframes = new ArrayList<>();
-		List<ImageAction> actions = new ArrayList<>();
-		int pointer = 0;	// The position on the actionsList
-		int met = 0;	// Amount of actions it's been since a Keyframe
-		int vstart = 0;	// The first "valid" action.  As the tail is clipped,
-						// this increments until it hits a Keyframe, then it removes
-						// the old base keyframe and adjusts
+		private final List<ImageAction> actions = new ArrayList<>();
+		private int pointer = 0;	// The position on the actionsList
+		private int met = 0;	// Amount of actions it's been since a Keyframe
+		private int vstart = 0;	// The first "valid" action.  As the tail is clipped,
+								// this increments until it hits a Keyframe, then it removes
+								// the old base keyframe and adjusts
 		
-		ImageContext( ImageData image) {
+		protected ImageContext( ImageData image) {
 			super(image);
 			
-			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.data), null));
+			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), null));
 			met = 0;
 			pointer = 0;
 		}
@@ -387,7 +424,7 @@ public class UndoEngine {
 		 * entire image as it should appear after the action.  It stores the
 		 * action that it's "supposed" to be in hiddenAction and performs
 		 * its logical components (if it has any).*/
-		class KeyframeAction extends ImageAction {
+		private class KeyframeAction extends ImageAction {
 			CachedImage frameCache;
 			ImageAction hiddenAction;
 			KeyframeAction( CachedImage frame, ImageAction action) {
@@ -411,18 +448,19 @@ public class UndoEngine {
 		}
 		
 		private void resetToKeyframe( BufferedImage frame) {
-			// TODO
-			Graphics g = image.data.getGraphics();
+			BufferedImage bi = workspace.checkoutImage(image);
+			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2.drawImage( frame, 0, 0,  null);
 			g2.setComposite( c);
 			g2.dispose();
+			workspace.checkinImage(image);
 		}
 		
-		
-		public void addAction( UndoAction action) {
+		@Override
+		protected void addAction( UndoAction action) {
 			if( !(action instanceof ImageAction)) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to add a non ImageAction to an ImageContext");
 			}
@@ -433,7 +471,7 @@ public class UndoEngine {
 			// The second half of this conditional is mostly debug to
 			//	test if the dynamic keyframe distance is working, but 
 			if( met == MAX_TICKS_PER_KEY || action instanceof FillAction) {
-				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.data), (ImageAction)action));
+				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), (ImageAction)action));
 				met = 0;
 			}
 			else {
@@ -442,7 +480,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		void undo() {
+		protected void undo() {
 			pointer--;
 			met--;
 			if( pointer < 0) {
@@ -472,11 +510,12 @@ public class UndoEngine {
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.dataChanged.add(this.image);
+			evt.isUndoEngineEvent = true;
 			workspace.triggerImageRefresh(evt);
 		}
 
 		@Override
-		void redo() {
+		protected void redo() {
 			pointer++;
 			met++;
 			if( pointer >= actions.size() || pointer == 0) {
@@ -494,6 +533,7 @@ public class UndoEngine {
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.dataChanged.add(this.image);
+			evt.isUndoEngineEvent = true;
 			workspace.triggerImageRefresh(evt);
 		}
 		
@@ -501,7 +541,7 @@ public class UndoEngine {
 		 * Makes it so that all information after the current marker is deleted
 		 */
 		@Override
-		void cauterize() {
+		protected void cauterize() {
 			List<ImageAction> subList = actions.subList(pointer+1, actions.size());
 			
 			// Iterate backwards so you can delete keyframes by the end
@@ -522,14 +562,14 @@ public class UndoEngine {
 
 		
 		// :::: Iterating
-		int iterMet;
+		private int iterMet;
 		@Override
-		void startIterate() {
+		protected void startIterate() {
 			iterMet = 1;
 		}
 
 		@Override
-		UndoAction iterateNext() {
+		protected UndoAction iterateNext() {
 			UndoAction action = actions.get(iterMet++);
 			
 			if( action instanceof KeyframeAction) {
@@ -540,13 +580,13 @@ public class UndoEngine {
 
 
 		@Override
-		boolean isEmpty() {
+		protected boolean isEmpty() {
 			return actions.size() <= vstart+1;
 		}
 
 
 		@Override
-		UndoAction getLast() {
+		protected UndoAction getLast() {
 			if( actions.isEmpty())
 				return null;
 			else
@@ -554,7 +594,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		void flush() {
+		protected void flush() {
 			for( UndoAction action: actions) {
 				if( action instanceof KeyframeAction) {
 					((KeyframeAction)action).frameCache.flush();
@@ -562,7 +602,7 @@ public class UndoEngine {
 			}
 		}
 		@Override
-		void clipTail() {
+		protected void clipTail() {
 			if( vstart == pointer) {
 				MDebug.handleError( ErrorType.STRUCTURAL_MINOR, this, "Tried to clip more than exists in ImageContext");
 			}
@@ -595,15 +635,15 @@ public class UndoEngine {
 	 * compared to ImageContext.
 	 */
 	private class NullContext extends UndoContext {
-		LinkedList<NullAction> actions = new LinkedList<>();
-		ListIterator<NullAction> pointer = null;
+		private final LinkedList<NullAction> actions = new LinkedList<>();
+		private ListIterator<NullAction> pointer = null;
 		
 		NullContext() {
 			super(null);
 		}
 
 		@Override
-		public void addAction(UndoAction action) {
+		protected void addAction(UndoAction action) {
 			if( action instanceof NullAction) {
 				actions.add( (NullAction) action);
 			}
@@ -611,7 +651,7 @@ public class UndoEngine {
 				MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempting to give a null context a non-null Action.");
 		}
 		@Override
-		void undo() {
+		protected void undo() {
 			if( pointer == null)
 				pointer = actions.listIterator(actions.size());
 			
@@ -624,7 +664,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		void redo() {
+		protected void redo() {
 			if( pointer == null || !pointer.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return;
@@ -635,7 +675,7 @@ public class UndoEngine {
 
 
 		@Override
-		void cauterize() {
+		protected void cauterize() {
 			if( pointer != null) {
 				List<NullAction> subList = actions.subList(pointer.nextIndex(), actions.size());
 				
@@ -650,12 +690,12 @@ public class UndoEngine {
 
 		Iterator<NullAction> iter = null;
 		@Override
-		void startIterate() {
+		protected void startIterate() {
 			iter = actions.iterator();
 		}
 		
 		@Override
-		UndoAction iterateNext() {
+		protected UndoAction iterateNext() {
 			if( !iter.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
@@ -665,12 +705,12 @@ public class UndoEngine {
 		}
 
 		@Override
-		boolean isEmpty() {
+		protected boolean isEmpty() {
 			return actions.isEmpty();
 		}
 
 		@Override
-		UndoAction getLast() {
+		protected UndoAction getLast() {
 			if( actions.isEmpty())
 				return null;
 			else
@@ -678,7 +718,7 @@ public class UndoEngine {
 		}
 
 		@Override
-		void clipTail() {
+		protected void clipTail() {
 			actions.removeFirst();
 		}
 	}
@@ -691,9 +731,9 @@ public class UndoEngine {
 	 */
 	public abstract class UndoAction {
 		public String description = "";
-		public abstract void performAction();
-		public abstract void undoAction();
-		public void onCauterize() {}
+		protected abstract void performAction();
+		protected abstract void undoAction();
+		protected void onCauterize() {}
 	}
 	
 	/** ImageActions ara assosciated with ImageContexts, they have two components
@@ -701,9 +741,9 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public abstract class ImageAction extends UndoAction {
-		@Override public void performAction() {}
-		@Override public void undoAction() {}
-		public abstract void performImageAction( ImageData image);
+		@Override protected void performAction() {}
+		@Override protected void undoAction() {}
+		protected abstract void performImageAction( ImageData image);
 	}
 
 	/** Associated with the NullContext, a NullAction strictly requires you to
@@ -744,12 +784,11 @@ public class UndoEngine {
 		}
 		
 		public StrokeParams getParams() {
-			// TODO LEAK
 			return params;
 		}
 		
 		@Override
-		public void performImageAction( ImageData data) {
+		protected void performImageAction( ImageData data) {
 			StrokeEngine engine = workspace.getDrawEngine().createStrokeEngine(data);
 			
 			engine.startStroke(params, points[0].x, points[0].y);
@@ -763,8 +802,8 @@ public class UndoEngine {
 		}
 	}
 	public class FillAction extends ImageAction {
-		Point p;
-		Color c;
+		private final Point p;
+		private final Color c;
 		
 		public FillAction( Point p, Color c) {
 			this.p = p;
@@ -773,10 +812,12 @@ public class UndoEngine {
 		}
 
 		@Override
-		public void performImageAction( ImageData data) {
+		protected void performImageAction( ImageData data) {
 			DrawEngine de = workspace.getDrawEngine();
 			de.fill(p.x, p.y, c, data);
 		}
+		public Point getPoint() { return new Point(p);}
+		public Color getColor() { return new Color(c.getRGB());}
 	}
 	
 	
@@ -787,25 +828,25 @@ public class UndoEngine {
 	 * StructureActions, whose behavior is defined by StructureChanges
 	 * which are used both for the initial execution and the UndoEngine */
 	public class StructureAction extends NullAction {
-		public final StructureChange change;
+		public final StructureChange change;	// !!! Might be bad visibility
 		
 		public StructureAction(StructureChange change) {
 			this.change = change;
 		}
 		
 		@Override
-		public void performAction() {
+		protected void performAction() {
 			change.execute();
 			change.alert(false);
 		}
 		@Override
-		public void undoAction() {
+		protected void undoAction() {
 			change.unexecute();
 			change.alert(true);
 		}
 		
 		@Override
-		public void onCauterize() {
+		protected void onCauterize() {
 			change.cauterize();
 		}
 	}
@@ -832,10 +873,10 @@ public class UndoEngine {
 	}
 	
 	public class SetSelectionAction extends NullAction {
-		int offsetX, offsetY;
-		Selection selection;
-		int poX, poY;
-		Selection pSelection;
+		private int offsetX, offsetY;
+		private Selection selection;
+		private int poX, poY;
+		private Selection pSelection;
 		
 		SetSelectionAction( Selection selection, int offsetX, int offsetY,
 				Selection previousSelection, int previousOX, int previousOY) 
@@ -850,12 +891,12 @@ public class UndoEngine {
 		}
 		
 		@Override
-		public void performAction() {
+		protected void performAction() {
 			workspace.getSelectionEngine().setSelection( selection, offsetX, offsetY);
 		}
 
 		@Override
-		public void undoAction() {
+		protected void undoAction() {
 			workspace.getSelectionEngine().setSelection( pSelection, poX, poY);
 		}
 		
@@ -864,12 +905,16 @@ public class UndoEngine {
 	
 	
 	// :::: MUndoEngineObserver
+    public static interface MUndoEngineObserver {
+    	public void historyChanged(List<UndoIndex> undoHistory);
+    	public void undo();
+    	public void redo();
+    }
     List<MUndoEngineObserver> undoObservers = new ArrayList<>();
-
     public void addUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.add(obs);}
     public void removeUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.remove(obs); }
 
-    private void  triggerHistoryChanged() {
+    private void triggerHistoryChanged() {
     	List<UndoIndex> list = constructUndoHistory();
     	
     	for( MUndoEngineObserver obs : undoObservers) {
@@ -885,11 +930,5 @@ public class UndoEngine {
     	for( MUndoEngineObserver obs : undoObservers) {
     		obs.redo();
     	}
-    }
-    
-    public static interface MUndoEngineObserver {
-    	public void historyChanged(List<UndoIndex> undoHistory);
-    	public void undo();
-    	public void redo();
     }
 }

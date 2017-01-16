@@ -189,23 +189,26 @@ public class RootFrame extends javax.swing.JFrame
             if( command.startsWith("global."))
                 globalHotkeyCommand(command.substring("global.".length()));
             else if( command.startsWith("toolset."))
-                master.getToolsetManager().setTool(command.substring("toolset.".length()));
+                master.getToolsetManager().setSelectedTool(command.substring("toolset.".length()));
             else if( command.startsWith("palette."))
             	master.getPaletteManager().performCommand(command.substring("palette.".length()));
             else if( command.startsWith("frame."))
             	master.getFrameManager().performCommand(command.substring("frame.".length()));
+            else if( command.startsWith("context."))
+                contextualCommand(command.substring("context.".length()));
             else {
             	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
             }
         }
     }
     
-    /***
-     * Performs the given hotkey command string (should be of "global." focus)
-     */
-    private void globalHotkeyCommand( String command) {
+    private void contextualCommand( String command) {
+    	// !!! TODO: As I add new components that can have contextual commands
+    	//	figure out how I want to generalize this
+    	WorkPanel workPanel = workPane.getCurrentWorkPane();
+    	if( workPanel == null) return;
+    	
         if( command.equals("zoom_in")) {
-        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             int zl = workPanel.getZoomLevel();
             if( zl >= 11)
                 workPanel.zoom(((zl+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
@@ -215,7 +218,6 @@ public class RootFrame extends javax.swing.JFrame
                 workPanel.zoom(zl+1);
         }
         else if( command.equals("zoom_out")) {
-        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             int zl = workPanel.getZoomLevel();
             if( zl > 11)
                 workPanel.zoom((zl/4)*4-1);
@@ -225,18 +227,24 @@ public class RootFrame extends javax.swing.JFrame
                 workPanel.zoom(zl-1);
         }
         else if( command.equals("zoom_in_slow")) {
-        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(workPanel.getZoomLevel()+1);
         }
         else if( command.equals("zoom_out_slow")) {
-        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(workPanel.getZoomLevel()-1);
         }
         else if( command.equals("zoom_0")) {
-        	WorkPanel workPanel = workPane.getCurrentWorkPane();
             workPanel.zoom(0);
         }
-        else if( command.equals("new_image"))
+        else {
+        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown contextual command: context." + command);
+        }
+    }
+    
+    /***
+     * Performs the given hotkey command string (should be of "global." focus)
+     */
+    private void globalHotkeyCommand( String command) {
+        if( command.equals("new_image"))
         	promptNewImage();
         else if( command.equals("debug_color"))
         	promptDebugColor();

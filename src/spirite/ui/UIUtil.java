@@ -24,6 +24,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import spirite.Globals;
+import spirite.MDebug;
+import spirite.MDebug.WarningType;
 
 public class UIUtil {
 
@@ -99,8 +101,9 @@ public class UIUtil {
 	 * 
 	 * Each dot before the name indicates the level it should be in.  For example one dot
 	 *   means it goes inside the last zero-dot item, two dots means it should go in the last
-	 *   one-dot item, etc.  !!Note, there should never be any reason to skip dots and doing 
-	 *   so will probably break it.
+	 *   one-dot item, etc.  Note: if you skip a certain level of dot's (eg: going from
+	 *   two dots to four dots), then the extra dots will be ignored, possibly resulting
+	 *   in unexpected menu form.
 	 * The & character before a letter represents the Mnemonic key that should be associated
 	 *   with it.
 	 * If the title is simply - (perhaps after some .'s representing its depth), then it is
@@ -120,15 +123,23 @@ public class UIUtil {
     	boolean isPopupMenu = (root instanceof JPopupMenu);
     	
     	// Atempt to construct menu from parsed data in menu_scheme
-		// !!!! TODO: note, there are very few sanity checks in here for now
-//    	int active_level = 0;
+    	int active_level = 0;
     	for( int i = 0; i < menuScheme.length; ++i) {
+    		if( menuScheme[i].length == 0 || !(menuScheme[i][0] instanceof String))
+    			continue;
+    		
     		String title = (String)menuScheme[i][0];
     		char mnemonic = '\0';
     		
     		// Determine the depth of the node and crop off the extra .'s
     		int level =_imCountLevel(title);
     		title = title.substring(level);
+    		
+    		if( level > active_level ) {
+    			MDebug.handleWarning(WarningType.INITIALIZATION, null, "Bad Menu Scheme.");
+    			level = active_level;
+    		}
+    		active_level = level+1;
     		
     		// If it's - that means it's a separator
     		if( title.equals("-")) {
@@ -138,6 +149,8 @@ public class UIUtil {
     			}
     			else
     				((JMenu)active_root_tree[level-1]).addSeparator();
+    			
+    			active_level--;
     			continue;
     		}
     		
@@ -161,14 +174,14 @@ public class UIUtil {
     			new_node.setMnemonic(0);
     		
 
-    		if( menuScheme[i][1] != null) {
+    		if( menuScheme[i].length > 1 && menuScheme[i][1] instanceof String) {
     			new_node.setActionCommand((String)menuScheme[i][1]);
     			
     			if( listener != null)
     				new_node.addActionListener(  listener);
     		}
     		
-    		if( menuScheme[i].length > 2 && menuScheme[i][2] != null)
+    		if( menuScheme[i].length > 2 && menuScheme[i][2] instanceof String)
     			new_node.setIcon(Globals.getIcon(menuScheme[i][2]));
     		
     		// Add the MenuItem into the appropriate context

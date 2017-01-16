@@ -29,24 +29,20 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
  *
  */
 public class HotkeyManager {
-    Preferences prefs;
-    
-    //Map<Hotkey,String> hotkey_map;
-    BidiMap<Hotkey,String> hotkey_map;
-    
-//    Map<>
+    private final Preferences prefs;    
+    private final BidiMap<Hotkey,String> hotkey_map;
 
-    public HotkeyManager() {
+    HotkeyManager() {
         prefs = Preferences.userNodeForPackage(spirite.Main.class);
         hotkey_map = new DualHashBidiMap<>();
 
         loadHotkeys(
             new Object[][] {
-                {"global.zoom_in", (new Hotkey( KeyEvent.VK_ADD, 0))},
-                {"global.zoom_out", (new Hotkey( KeyEvent.VK_SUBTRACT, 0))},
-                {"global.zoom_in_slow", (new Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK))},
-                {"global.zoom_out_slow", (new Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK))},
-                {"global.zoom_0", (new Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK))},
+                {"context.zoom_in", (new Hotkey( KeyEvent.VK_ADD, 0))},
+                {"context.zoom_out", (new Hotkey( KeyEvent.VK_SUBTRACT, 0))},
+                {"context.zoom_in_slow", (new Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK))},
+                {"context.zoom_out_slow", (new Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK))},
+                {"context.zoom_0", (new Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK))},
 
                 {"toolset.pen", (new Hotkey( KeyEvent.VK_P, 0))},
                 {"toolset.eraser", (new Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK))},

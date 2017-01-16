@@ -114,7 +114,7 @@ public class ToolsPanel extends JPanel
 
         buttons = new ToolButton[tool_len];
         for( int i = 0; i < tool_len; ++i) {
-            buttons[i] = new ToolButton( toolset.getTool(i));
+            buttons[i] = new ToolButton( toolset.getNthTool(i));
             container.add( buttons[i]);
             x += 1;
             if( x >= is_width) {
@@ -242,7 +242,7 @@ public class ToolsPanel extends JPanel
         // :: On Button Click
         @Override
         public void actionPerformed(ActionEvent e) {
-            master.getToolsetManager().setTool(((ToolButton)e.getSource()).tool);
+            master.getToolsetManager().setSelectedTool(((ToolButton)e.getSource()).tool);
         }
 
         @Override public void mouseClicked(MouseEvent e) {}

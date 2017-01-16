@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
  *
  */
 public class ReadOnlyImage {
-	public BufferedImage image;
+	public final BufferedImage image;
 
 	public ReadOnlyImage(BufferedImage base) {
 		this.image = base;

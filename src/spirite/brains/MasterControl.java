@@ -37,18 +37,16 @@ public class MasterControl
 	implements MImageObserver 
 {
 	// Components
-    final HotkeyManager hotkeys;
-    final PaletteManager palette;
-    final ToolsetManager toolset;
-    final SettingsManager settingsManager;
-    final RenderEngine renderEngine;
-    final CacheManager cacheManager;
-    
+    private final HotkeyManager hotkeys;
+    private final PaletteManager palette;
+    private final ToolsetManager toolset;
+    private final SettingsManager settingsManager;
+    private final RenderEngine renderEngine;
+    private final CacheManager cacheManager;
+    private final FrameManager frameManager;
 
-    final FrameManager frame_manager;
-
-    final List<ImageWorkspace> workspaces = new ArrayList<>();
-    ImageWorkspace currentWorkspace = null;
+    private final List<ImageWorkspace> workspaces = new ArrayList<>();
+    private ImageWorkspace currentWorkspace = null;
     
 
     public MasterControl() {
@@ -57,7 +55,7 @@ public class MasterControl
         toolset = new ToolsetManager();
         settingsManager = new SettingsManager();
         cacheManager = new CacheManager();
-        frame_manager = new FrameManager( this);
+        frameManager = new FrameManager( this);
         renderEngine = new RenderEngine( this);
 
         Dialogs.setMaster(this); //// TODO BAD
@@ -65,6 +63,7 @@ public class MasterControl
     }
 
 
+    // :::: Getters/Setters
     public HotkeyManager getHotekyManager() {
         return hotkeys;
     }
@@ -78,7 +77,7 @@ public class MasterControl
    		return currentWorkspace;
     }
     public FrameManager getFrameManager() {
-    	return frame_manager;
+    	return frameManager;
     }
     public RenderEngine getRenderEngine(){
     	return renderEngine;
@@ -90,8 +89,8 @@ public class MasterControl
     	return cacheManager;
     }
     
-    // :::: API
     
+    // :::: Workspace API
     public void closeWorkspace( ImageWorkspace workspace) {
     	int i = workspaces.indexOf(workspace);
     	
@@ -179,7 +178,6 @@ public class MasterControl
 	}
     
 
-    // ==== Image Managements
     public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
     public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
     	ImageWorkspace ws = new ImageWorkspace( cacheManager);
@@ -194,6 +192,7 @@ public class MasterControl
     	}
     }
 
+    // TODO: Debug, should probably be handled in SettingsManager
     public int getDefaultWidth() { return 128;}
     public int getDefaultHeight() { return 128;}
 

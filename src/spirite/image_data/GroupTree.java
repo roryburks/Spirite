@@ -19,10 +19,10 @@ import spirite.MDebug.ErrorType;
  * @author Rory Burks
  */
 public class GroupTree {
-	private GroupNode root;
-	ImageWorkspace context;
+	private final GroupNode root;
+	private final ImageWorkspace context;	// Might not be needed or belong
 	
-	public GroupTree( ImageWorkspace context) {
+	GroupTree( ImageWorkspace context) {
 		this.context = context;
 		root = new GroupNode(null);
 	}
@@ -32,12 +32,12 @@ public class GroupTree {
 		return root;
 	}
 	
-	// To make sure you don't try to move a node into one of it's children we perform this test.
-	boolean _isChild( Node node, Node nodeInto) {
-		Node n = nodeInto;
+	/** Tests to see if nodeP is a parent of nodeC. */
+	boolean _isChild( Node nodeP, Node nodeC) {
+		Node n = nodeC;
 		
 		while( n != root && n != null) {
-			if( n == node) return true;
+			if( n == nodeP) return true;
 			n = n.parent;
 		}
 		
@@ -45,7 +45,7 @@ public class GroupTree {
 	}
 	
 
-	// Creates a depth-first sequential list of all the LayerNodes in the tree
+	/** Creates a depth-first sequential list of all the LayerNodes in the tree. */
 	public List<LayerNode> getAllLayerNodes() {
 		List<LayerNode> list = new ArrayList<>();
 		_galn_rec( root, list);
@@ -62,7 +62,7 @@ public class GroupTree {
 		}
 	}
 
-	// Creates a depth-first sequential list of all the Nodes in the tree
+	/** Creates a depth-first sequential list of all the Nodes in the tree. */
 	public List<Node> getAllNodes() {
 		List<Node> list = new ArrayList<>();
 		_gan_rec( root, list);
@@ -79,8 +79,6 @@ public class GroupTree {
 	
 	// ::: Nodes
 	public abstract class Node  {
-		// !!!! TODO : Various attributes (such as opacity) that apply to the group
-		//	or the Node (without altering them) should go here
 		protected float alpha = 1.0f;
 		protected boolean visible = true;
 		protected boolean expanded = true;
@@ -89,7 +87,7 @@ public class GroupTree {
 		
 		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
 		//	to have for generic purposes
-		ArrayList<Node> children = new ArrayList<>();
+		private final ArrayList<Node> children = new ArrayList<>();
 		private Node parent = null;
 		
 		public Node getParent() {
@@ -151,8 +149,8 @@ public class GroupTree {
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
 		//	has direct access to add/remove commands.
-		protected void _add( Node toAdd, Node child) {
-			int i = children.indexOf(child);
+		protected void _add( Node toAdd, Node before) {
+			int i = children.indexOf(before);
 			
 			if( i == -1) 
 				children.add(toAdd);

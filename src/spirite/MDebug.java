@@ -59,21 +59,9 @@ public class MDebug {
 	}
 	
 	public static void handleError( ErrorType type, Object source, String message) {
-
+		Thread.dumpStack();
         JOptionPane.showMessageDialog(null, "Error: " + message);
 	}
-	
-/*    public static void handleError( int priority, String message) {
-        JOptionPane.showMessageDialog(null, "MDB: " + message);
-    }
-
-    public static void handleError( int priority, String message, Exception e) {
-        JOptionPane.showMessageDialog(null, "MDB: " + message);
-    }
-
-    public static void handleError( int priority, Exception e) {
-        JOptionPane.showMessageDialog(null, "MDB: " + e.getCause() + "/n" + e.getMessage() + "/n" + e.toString());
-    }*/
 
     public static void note( String message) {
         JOptionPane.showMessageDialog(null, message);

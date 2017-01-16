@@ -38,7 +38,7 @@ public class SelectionEngine {
 	protected BufferedImage liftedData = null;
 	private int startX;	// pulls double-duty as the starting point for the selection building
 	private int startY;	// and the starting point for a MoveSelectionAction
-
+	
 	protected int offsetX;
 	protected int offsetY;
 	
@@ -47,7 +47,7 @@ public class SelectionEngine {
 	private Selection oldSelection;
 	
 
-	private Boolean building = false;
+	private boolean building = false;
 	private SelectionType selectionType;	// Only used when building a selection
 	
 	SelectionEngine( ImageWorkspace workspace) {
@@ -81,15 +81,6 @@ public class SelectionEngine {
 
 	
 	// :::: Selection Building
-	private void rememberOldSelection() {
-		if( selection == null)
-			oldSelection = null;
-		else
-			oldSelection = (Selection)(selection.clone());
-		oldOX = offsetX;
-		oldOY = offsetY;
-	}
-	
 	public void startBuildingSelection( SelectionType type, int x, int y) {
 		rememberOldSelection();
 		
@@ -109,6 +100,8 @@ public class SelectionEngine {
 	}
 	
 	public void updateBuildingSelection( int x, int y) {
+		if(!building) return;
+		
 		SelectionEvent evt = new SelectionEvent();
 		
 		switch( selectionType) {
@@ -144,6 +137,14 @@ public class SelectionEngine {
 		
 		triggerBuildingSelection(null);
 		triggerSelectionChanged(null);
+	}
+	private void rememberOldSelection() {
+		if( selection == null)
+			oldSelection = null;
+		else
+			oldSelection = (Selection)(selection.clone());
+		oldOX = offsetX;
+		oldOY = offsetY;
 	}
 	
 	/** !! Should only be used by the UndoEngine !! */
@@ -349,7 +350,9 @@ public class SelectionEngine {
 		Selection selection;
 	}
     List<MSelectionEngineObserver> selectionObservers = new ArrayList<>();
-
+    public void addSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.add(obs);}
+	public void removeSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.remove(obs); }
+	
     void triggerSelectionChanged(SelectionEvent evt) {
     	for( MSelectionEngineObserver obs : selectionObservers) {
     		obs.selectionBuilt(evt);
@@ -361,7 +364,5 @@ public class SelectionEngine {
     	}
     }
 
-    public void addSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.add(obs);}
-	public void removeSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.remove(obs); }
-	    
+    
 }

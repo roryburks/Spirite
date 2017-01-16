@@ -24,9 +24,8 @@ public class WorkTabPane extends JTabbedPane
 	implements MWorkspaceObserver, ChangeListener,
 		MouseListener, ActionListener, MWorkspaceFileObserver
 {
-	MasterControl master;
-	List<WorkPanel> panels = new ArrayList<>();
-	
+	final MasterControl master;
+	final List<WorkPanel> panels = new ArrayList<>();	// Panels should maintain a 1:1 assosciation with tabs
 	
 	
 	public WorkTabPane( MasterControl master) {
@@ -40,8 +39,11 @@ public class WorkTabPane extends JTabbedPane
 	
 	
 	public WorkPanel getCurrentWorkPane() {
-		// TODO BAD
-		return (WorkPanel)this.getSelectedComponent();
+		int index = this.getSelectedIndex();
+		if( index != -1)
+			return panels.get(index);
+		
+		return null;
 	}
 	
 	// :::: MWorkspaceObserver

@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -33,7 +35,6 @@ public class ImageWorkspace {
 	//	Image Data (used by something in the GroupTree) or it used by a component
 	//	stored in the UndoEngine.
 	List<ImageData> imageData;
-	int workingID = 0;	// an incrementing unique ID per imageData
 	
 	// Internal Components
 	private final GroupTree groupTree;
@@ -43,10 +44,10 @@ public class ImageWorkspace {
 	private final DrawEngine drawEngine;
 	
 	// External Components
-	private final CacheManager cacheManager;
+//	private final CacheManager cacheManager;
 	
 	private GroupTree.Node selected = null;
-	
+	private int workingID = 0;	// an incrementing unique ID per imageData
 	
 	private int width = 0;
 	private int height = 0;
@@ -56,7 +57,7 @@ public class ImageWorkspace {
 	
 	
 	public ImageWorkspace( CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
+//		this.cacheManager = cacheManager;
 		
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
@@ -66,13 +67,6 @@ public class ImageWorkspace {
 		undoEngine = new UndoEngine(this, cacheManager);
 	}
 	
-	// :::: API
-	public void fileSaved( File newFile) {
-		file = newFile;
-		changed = false;
-		
-		triggerFileChange();
-	}
 	
 	// :::: Maintenance Methods
 	public void cleanDataCache() {
@@ -102,10 +96,22 @@ public class ImageWorkspace {
 		}
 	}
 
-	
+	/** Called when an image is first made or is first loaded, resets the UndoEngine
+	 * so that various internal actions regarding constructing the workspace are not
+	 * undoable.*/
 	public void resetUndoEngine() {
 		undoEngine.reset();
 		changed = false;
+	}
+	
+	/** Called when an image is saved, remembers the undo position to correctly track
+	 * if an image is at its saved state or not. */
+	public void fileSaved( File newFile) {
+		file = newFile;
+		changed = false;
+		undoEngine.setSaveSpot();
+		
+		triggerFileChange();
 	}
 	
 	// :::: Getters and Setters
@@ -207,26 +213,23 @@ public class ImageWorkspace {
 		if( !verifyImage(image))
 			return null;
 		
-/*		if( image.locked ) {
-			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-out locked ImageData");
-			return null;
-		}
+		undoEngine.prepareContext(image);
 		
-		image.locked = true;*/
-		return image.data;
+		// !!! TODO: Strict image locking and unlocking seems like too much trouble.
+		//	BufferedImages are buffered so you don't have to worry too much about
+		//	that, but all the same I should have some way to keep track of what
+		//	objects have images checked out so that they are checked in eventually
+		//	and that they terminate correctly if the image were to be unloaded.
+		
+		// Violates the spirit of readImage, but changing image.data's visibility
+		//	to Package just for this would defeat the entire purpose.
+		return image.readImage().image;	
 	}
 	
 	public void checkinImage( ImageData image) {
 		if( !verifyImage(image))
 			return;
 
-/*		if( !image.locked ) {
-			MDebug.handleWarning(WarningType.LOCK_CONFLICT, this, "Tried to check-in unlocked ImageData");
-			return;
-		}
-		
-		
-		image.locked = false;*/
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.dataChanged.add(image);
 		evt.workspace = this;
@@ -236,7 +239,7 @@ public class ImageWorkspace {
 	
 	private boolean verifyImage( ImageData image) {
 		if( !imageData.contains(image)) {
-			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout image from wrong workspce.");
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout/in image from wrong workspce.");
 			return false;
 		}
 		return true;
@@ -376,29 +379,8 @@ public class ImageWorkspace {
 				nodeBefore));
 	}
 	
-	// Creates a queue of images for drawing purposes
-	public List<LayerNode> getDrawingQueue() {
-		List<LayerNode> queue = new LinkedList<LayerNode>();
-		
-		_gdq_rec( groupTree.getRoot(), queue);
-		
-		return queue;
-	}
-	private void _gdq_rec( GroupTree.Node node, List<LayerNode>queue) {
-		for( GroupTree.Node child : node.getChildren()) {
-			if( child.isVisible()) {
-				if( child instanceof GroupTree.LayerNode) {
-					// !!!! Very Debug [TODO]
-					queue.add(0,((GroupTree.LayerNode)child));
-				}
-				else {
-					_gdq_rec( child, queue);
-				}
-			}
-		}
-	}
 	
-	
+	// :::: Node Attribute Changes
 	public void renameNode( Node node, String newName) {
 		if( newName != node.name)
 			executeChange( new RenameChange(newName, node));
@@ -416,9 +398,11 @@ public class ImageWorkspace {
 	}
 
 	
-	/***
-	 * A StructureChange class defines all sorts of GroupTree structure changes
-	 *
+	/**
+	 * A StructureChange class logically represent a change to the image's Group
+	 * Structure.  The classes implement both performing that change and undoing
+	 * that change (as such it must remember the information required for doing that).
+	 * these methods are called both for the initial execution and from the UndoEngine
 	 */
 	public abstract class StructureChange {
 		public String description = "Unknown Structure Change";
@@ -439,11 +423,15 @@ public class ImageWorkspace {
 		}
 	}
 	
+	/** A StackableStructureChange corresponds to a StackableAction (see 
+	 * UndoEngine.StackableAction), meaning that performing the action over
+	 * and over on the same node should consolidate into a single action. */
 	public abstract class StackableStructureChange extends StructureChange {
 		public abstract void stackNewChange( StructureChange newChange);
 		public abstract boolean canStack( StructureChange newChange);
 	}
 	
+	/** Adding a node to the tree. */
 	public class AdditionChange extends StructureChange {
 		public final GroupTree.Node node;
 		public final GroupTree.Node parent;
@@ -473,7 +461,7 @@ public class ImageWorkspace {
 		}
 	}
 	
-
+	/** Removing a Node from the tree */
 	public class DeletionChange extends StructureChange {
 		public final GroupTree.Node node;
 		public final GroupTree.Node parent;
@@ -501,32 +489,7 @@ public class ImageWorkspace {
 		}
 	}
 	
-	public class RenameChange extends StructureChange {
-		public final String newName;
-		public final String oldName;
-		public final Node node;
-		
-		public RenameChange(
-				String newName,
-				Node node) 
-		{
-			description = "Renamed Node";
-			imageChange = false;
-			this.newName = newName;
-			this.oldName = node.name;
-			this.node = node;
-		}
-
-		@Override
-		public void execute() {
-			node.setName(newName);
-		}
-		@Override
-		public void unexecute() {
-			node.setName(oldName);
-		}
-	}
-	
+	/** Moving the node from one place to another. */
 	public class MoveChange extends StructureChange {
 		public final Node moveNode;
 		public final Node oldParent;
@@ -563,6 +526,35 @@ public class ImageWorkspace {
 		}
 		
 	}
+	
+	/** Renaming the node */
+	public class RenameChange extends StructureChange {
+		public final String newName;
+		public final String oldName;
+		public final Node node;
+		
+		public RenameChange(
+				String newName,
+				Node node) 
+		{
+			description = "Renamed Node";
+			imageChange = false;
+			this.newName = newName;
+			this.oldName = node.name;
+			this.node = node;
+		}
+
+		@Override
+		public void execute() {
+			node.setName(newName);
+		}
+		@Override
+		public void unexecute() {
+			node.setName(oldName);
+		}
+	}
+	
+	/** Changing the node's visibility */
 	public class VisibilityChange extends StructureChange {
 		public final boolean visibleAfter;
 		public final Node node;
@@ -584,6 +576,8 @@ public class ImageWorkspace {
 			node.visible = !visibleAfter;
 		}
 	}
+	
+	/** Changing the node's Opacity */
 	public class OpacityChange extends StackableStructureChange
 	{
 		float opacityBefore;
@@ -623,6 +617,7 @@ public class ImageWorkspace {
 		}
 	}
 	
+	/** Executes the given change and stores it in the UndoEngine */
 	public void executeChange( StructureChange change) {
 		change.execute();
 		
@@ -633,7 +628,7 @@ public class ImageWorkspace {
 		change.alert(false);
 	}
 	
-	// :::: StructureChangeEvent Factories
+	// :::: StructureChangeEvent Creation Methods for simplifying the process
 	public StructureChange createDeletionEvent( GroupTree.Node node) {
 		if( node == this.getRootNode()) 
 			return null;
@@ -681,6 +676,29 @@ public class ImageWorkspace {
 		return nodes.contains(node);
 	}
 	
+
+	/** Creates a queue of images for drawing purposes. */
+	public List<LayerNode> getDrawingQueue() {
+		List<LayerNode> queue = new LinkedList<LayerNode>();
+		
+		_gdq_rec( groupTree.getRoot(), queue);
+		
+		return queue;
+	}
+	private void _gdq_rec( GroupTree.Node node, List<LayerNode>queue) {
+		for( GroupTree.Node child : node.getChildren()) {
+			if( child.isVisible()) {
+				if( child instanceof GroupTree.LayerNode) {
+					// !!!! Very Debug [TODO]
+					queue.add(0,((GroupTree.LayerNode)child));
+				}
+				else {
+					_gdq_rec( child, queue);
+				}
+			}
+		}
+	}
+	
 	// :::: Observers
 	/**
 	 * ImageObserver - triggers when an image's data has been changed
@@ -696,11 +714,14 @@ public class ImageWorkspace {
     	LinkedList<ImageData> dataChanged = new LinkedList<>();
     	LinkedList<Node> nodesChanged = new LinkedList<>();
     	boolean selectionLayerChange = false;
+    	boolean isUndoEngineEvent = false;	// Probably a more generic way to do this
+    	boolean isStructureChange = false;
     	
     	public ImageWorkspace getWorkspace() { return workspace;}
     	public List<ImageData> getChangedImages() { return (List<ImageData>) dataChanged.clone();}
     	public List<Node> getChangedNodes() { return (List<Node>) nodesChanged.clone();}
     	public boolean getSelectionLayerChange() { return selectionLayerChange;}
+    	public boolean isStructureChange() {return isStructureChange;}
     }
     List<MImageObserver> imageObservers = new ArrayList<>();
     
@@ -712,13 +733,11 @@ public class ImageWorkspace {
         for( MImageObserver obs : imageObservers)
             obs.imageChanged(evt);
         
-        // !!!! TODO: Hook into the undo engine to determine this
-        //	such that if an action is undone or redone to the same state
-        //	as the saved state, the image is re-flagged as unchanged.
-        //	To do this I will finally have to implement image checking
-        //	out and checking in so that all UndoEngine code is called
-        //	from ImageWorkspace, and not from DrawEngine
-		if( !changed) {
+        if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
+			changed = false;
+			triggerFileChange();
+        }
+		else if( !changed) {
 			changed = true;
 			triggerFileChange();
 		}

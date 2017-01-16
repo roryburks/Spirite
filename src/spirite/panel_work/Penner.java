@@ -137,7 +137,6 @@ public class Penner
 					//	an actual change is made.
 					Point p = new Point(x, y);
 					UndoEngine engine = workspace.getUndoEngine();
-					engine.prepareContext(data);
 					if( drawPanel.workspace.getDrawEngine().fill( p.x, p.y, c, data)) {
 						engine.storeAction( engine.new FillAction(p, c) , data);
 					}
@@ -185,7 +184,6 @@ public class Penner
 				if( strokeEngine != null) {
 					strokeEngine.endStroke();
 					
-					// TODO : This should probably not be polling master, but instead StrokeEngine somehow
 					UndoEngine engine = drawPanel.workspace.getUndoEngine();
 					StrokeAction stroke = engine.new StrokeAction( 
 							strokeEngine.getParams(), 
@@ -207,7 +205,6 @@ public class Penner
 		ImageWorkspace workspace = drawPanel.workspace;
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageData data = workspace.getActiveData();
-			workspace.getUndoEngine().prepareContext(data);
 
 			strokeEngine = drawPanel.workspace.getDrawEngine().createStrokeEngine( data);
 			

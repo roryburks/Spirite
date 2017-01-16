@@ -24,11 +24,7 @@ import spirite.MUtil;
  *
  */
 public class DrawEngine {
-	Timer update_timer;
-	StrokeEngine timedStroke = null;
-	ImageWorkspace workspace;
-	
-	private enum STATE { READY, DRAWING };
+	private final ImageWorkspace workspace;
 	
 	public DrawEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
@@ -37,7 +33,8 @@ public class DrawEngine {
 	public StrokeEngine createStrokeEngine( ImageData data) {
 		return new StrokeEngine(data);
 	}
-	
+
+	private enum STATE { READY, DRAWING };
 	/***
 	 * The StrokeEngine operates asynchronously to the input data.  In general
 	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
@@ -177,7 +174,7 @@ public class DrawEngine {
 				this.c = c;
 		}
 		public Color getColor() {
-			return c;
+			return new Color( c.getRGB());
 		}
 		
 		public void setMethod( Method method) {
@@ -249,7 +246,5 @@ public class DrawEngine {
 		workspace.checkinImage(data);
 		return true;
 	}
-	
-	// :::: Internal
 	
 }

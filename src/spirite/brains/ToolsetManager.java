@@ -12,14 +12,14 @@ import java.util.Map;
  * ToolsetManager manages the currently selected toolset
  */
 public class ToolsetManager {
-    String[] toolset = {
+    private static final String[] toolset = {
         "pen","eraser","fill","box_selection", "move", "color_picker"
     };
     
     public enum Cursor {MOUSE, STYLUS, ERASER};
     private Cursor cursor = Cursor.MOUSE;
     
-    Map<Cursor, Integer> selected = new EnumMap<>(Cursor.class);
+    private final Map<Cursor, Integer> selected = new EnumMap<>(Cursor.class);
     
     public ToolsetManager() {
         selected.put(Cursor.MOUSE, 0);
@@ -27,22 +27,22 @@ public class ToolsetManager {
         selected.put(Cursor.ERASER, 1);
     }
     
-    // Get/Set currently used Cursor
+    // :::: Get/Set
     public Cursor getCursor() {
     	return cursor;
     }
     public void setCursor( Cursor cursor) {
     	this.cursor = cursor;
     	
-    	toolsetChanged(selected.get(cursor));
+    	triggerToolsetChanged(selected.get(cursor));
     }
 
-    public void setTool( String tool) {
+    public void setSelectedTool( String tool) {
         int ind = Arrays.asList(toolset).indexOf(tool);
 
         if( ind != -1) {
             selected.replace(cursor, ind);
-            toolsetChanged(ind);
+            triggerToolsetChanged(ind);
         }
     }
     
@@ -53,8 +53,8 @@ public class ToolsetManager {
     public int getToolCount() {
         return toolset.length;
     }
-    public String getTool( int index) {
-        return toolset[index];
+    public String getNthTool( int n) {
+        return toolset[n];
     }
 
     // Gets the position the toolset is in the icons.png image
@@ -78,17 +78,18 @@ public class ToolsetManager {
     }
 
     // ==== Toolset Observer
+    public interface MToolsetObserver {
+        public void toolsetChanged( String new_tool);
+    }
+    
     List<MToolsetObserver> toolsetObserver = new ArrayList<>();
-
     public void addToolsetObserver( MToolsetObserver obs) { toolsetObserver.add(obs); }
     public void removeToolsetObserver( MToolsetObserver obs) { toolsetObserver.remove(obs);}
-    private void toolsetChanged( int index) {
+    
+    private void triggerToolsetChanged( int index) {
         for( MToolsetObserver obs : toolsetObserver) {
             obs.toolsetChanged(toolset[index]);
         }
     }
 
-    public interface MToolsetObserver {
-        public void toolsetChanged( String new_tool);
-    }
 }

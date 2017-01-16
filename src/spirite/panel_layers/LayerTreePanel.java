@@ -373,11 +373,7 @@ public class LayerTreePanel extends ContentTree
 		if( workspace != null)
 			workspace.setSelectedNode(node);
 		
-		// !!! TODO Debug: this shouldn't need to be here (it should just be in ContentTree)
-		
 		context.opacitySlider.repaint();
-		repaint();
-		
 	}
 	
 

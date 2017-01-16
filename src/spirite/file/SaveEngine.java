@@ -22,7 +22,7 @@ import spirite.image_data.ImageWorkspace;
  */
 public class SaveEngine {
 
-	
+	/** Attempts to save the workspace to a SIF (native image format) file. */
 	public static void saveWorkspace( ImageWorkspace workspace, File file) {
 		RandomAccessFile ra;
 		
@@ -55,9 +55,7 @@ public class SaveEngine {
 		}
 	}
 	
-	/***
-	 * 
-	 */
+	/** Saves the GRPT chunk containing the Group Tree data */
 	private static void saveGroupTree( GroupTree.Node root, RandomAccessFile ra) 
 		throws UnsupportedEncodingException, IOException
 	{
@@ -119,6 +117,7 @@ public class SaveEngine {
 		}
 	}
 	
+	/** Saves the IMGD chunk containing the Image data, each in PNG format. */
 	private static void saveImageData( List<ImageData> imageData, RandomAccessFile ra) 
 			throws UnsupportedEncodingException, IOException 
 	{
