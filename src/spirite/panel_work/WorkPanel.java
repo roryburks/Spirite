@@ -17,6 +17,7 @@ import javax.swing.JScrollBar;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 
@@ -282,7 +283,7 @@ public class WorkPanel extends javax.swing.JPanel
 
     // :::: MImageObserver
 	@Override
-	public void imageChanged() {
+	public void imageChanged(ImageChangeEvent evt) {
 		this.repaint();
 	}
 

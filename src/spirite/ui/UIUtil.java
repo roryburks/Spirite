@@ -27,6 +27,31 @@ import spirite.Globals;
 
 public class UIUtil {
 
+	static final Color c1 = new Color( 168,168,168);
+	static final Color c2 = new Color( 192,192,192);
+	public static void drawTransparencyBG( Graphics g, Rectangle rect) {
+		Rectangle bounds;
+		if( rect == null)
+			bounds = g.getClipBounds();
+		else
+			bounds = rect;
+		
+		if( bounds.isEmpty())
+			return;
+		
+		int size = 4;
+		
+		for( int i = 0; i*size < bounds.width; ++i) {
+			for( int j=0; j*size < bounds.height; ++j) {
+				g.setColor(
+						(((i+j)%2) == 1)? c1:c2);
+				
+				g.fillRect(bounds.x + i*size, bounds.y + j*size, size, size);
+				
+			}
+		}
+	}
+
 	/***
 	 * Draws the string centered in the given Rectangle (using the font already
 	 *	set up in the Graphics)

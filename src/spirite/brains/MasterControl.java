@@ -11,8 +11,10 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
+import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
@@ -35,22 +37,18 @@ public class MasterControl
 	implements MImageObserver 
 {
 	// Components
-    HotkeyManager hotkeys;
-    PaletteManager palette;
-    ToolsetManager toolset;
-    SettingsManager settingsManager;
-    RenderEngine renderEngine;
-    
-    FrameManager frame_manager;
+    final HotkeyManager hotkeys;
+    final PaletteManager palette;
+    final ToolsetManager toolset;
+    final SettingsManager settingsManager;
+    final RenderEngine renderEngine;
+    final CacheManager cacheManager;
     
 
-    List<ImageWorkspace> workspaces = new ArrayList<>();
+    final FrameManager frame_manager;
+
+    final List<ImageWorkspace> workspaces = new ArrayList<>();
     ImageWorkspace currentWorkspace = null;
-    
-    Color current_color = new Color(120,160,160);
-    
-    int width = 0;
-    int height = 0;
     
 
     public MasterControl() {
@@ -58,9 +56,12 @@ public class MasterControl
         palette = new PaletteManager();
         toolset = new ToolsetManager();
         settingsManager = new SettingsManager();
+        cacheManager = new CacheManager();
         frame_manager = new FrameManager( this);
         renderEngine = new RenderEngine( this);
+
         Dialogs.setMaster(this); //// TODO BAD
+        LoadEngine.setMaster(this); //// TODO BAD
     }
 
 
@@ -84,6 +85,9 @@ public class MasterControl
     }
     public SettingsManager getSettingsManager() {
     	return settingsManager;
+    }
+    public CacheManager getCacheManager() {
+    	return cacheManager;
     }
     
     // :::: API
@@ -178,7 +182,7 @@ public class MasterControl
     // ==== Image Managements
     public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
     public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
-    	ImageWorkspace ws = new ImageWorkspace();
+    	ImageWorkspace ws = new ImageWorkspace( cacheManager);
     	ws.newLayer(width, height, "Background", color);
     	
     	workspaces.add( ws);
@@ -190,8 +194,6 @@ public class MasterControl
     	}
     }
 
-    public int getWidth() { return width;}
-    public int getHeight() { return height;}
     public int getDefaultWidth() { return 128;}
     public int getDefaultHeight() { return 128;}
 
@@ -267,7 +269,7 @@ public class MasterControl
 	}
 
 	@Override
-	public void imageChanged() {
+	public void imageChanged( ImageChangeEvent evt) {
 		triggerImageRefresh();
 	}
 

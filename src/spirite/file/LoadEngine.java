@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
@@ -23,7 +24,8 @@ import spirite.image_data.ImageWorkspace;
  * various file formats (but particularly the native SIF format)
  */
 public class LoadEngine {
-
+	public static MasterControl master;
+	public static void setMaster( MasterControl m) { master = m;}
 	
 	public static ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
@@ -48,7 +50,7 @@ public class LoadEngine {
 				throw new BadSIFFFileException("Bad Fileheader (not an SIFF File).");
 			}
 			
-			ImageWorkspace workspace = new ImageWorkspace();
+			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
 			
 			// Load Chunks until you've reached the end
 			List<ChunkInfo> chunks = parseChunks( ra);

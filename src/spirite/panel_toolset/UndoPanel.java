@@ -22,13 +22,9 @@ import javax.swing.event.ListSelectionListener;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
-import spirite.image_data.UndoEngine.FillAction;
 import spirite.image_data.UndoEngine.MUndoEngineObserver;
-import spirite.image_data.UndoEngine.StrokeAction;
-import spirite.image_data.UndoEngine.StructureAction;
 import spirite.image_data.UndoEngine.UndoIndex;
 
 /***

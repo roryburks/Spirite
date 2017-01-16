@@ -22,6 +22,7 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ReadOnlyImage;
@@ -165,7 +166,7 @@ public class DrawPanel extends JPanel
     //	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
 	}
 	
-	@Override	public void imageChanged() {
+	@Override	public void imageChanged(ImageChangeEvent evt) {
     	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
     }
 	@Override	public void structureChanged(StructureChange evt) {	}

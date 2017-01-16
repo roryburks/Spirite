@@ -12,6 +12,7 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.brains.CacheManager;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -34,17 +35,18 @@ public class ImageWorkspace {
 	List<ImageData> imageData;
 	int workingID = 0;	// an incrementing unique ID per imageData
 	
-	// The GroupTree is the primary container for all tracked ImageData.  Though
-	//	there can be other logical collections that also have ImageData parts to
-	//	it, all data used in the workspace should have an entry in GroupTree even
-	//	if it has entries elsewhere
-	private GroupTree groupTree;
-	private GroupTree.Node selected = null;
-	private UndoEngine undoEngine;
+	// Internal Components
+	private final GroupTree groupTree;
+	private final UndoEngine undoEngine;
+	private final AnimationManager animationManager;
+	private final SelectionEngine selectionEngine;
+	private final DrawEngine drawEngine;
 	
-	private AnimationManager animationManager;
-	private SelectionEngine selectionEngine;
-	private DrawEngine drawEngine;
+	// External Components
+	private final CacheManager cacheManager;
+	
+	private GroupTree.Node selected = null;
+	
 	
 	private int width = 0;
 	private int height = 0;
@@ -53,13 +55,15 @@ public class ImageWorkspace {
 	private boolean changed = false;
 	
 	
-	public ImageWorkspace() {
+	public ImageWorkspace( CacheManager cacheManager) {
+		this.cacheManager = cacheManager;
+		
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);
 		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
-		undoEngine = new UndoEngine(this);
+		undoEngine = new UndoEngine(this, cacheManager);
 	}
 	
 	// :::: API
@@ -223,7 +227,11 @@ public class ImageWorkspace {
 		
 		
 		image.locked = false;*/
-		triggerImageRefresh();
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.dataChanged.add(image);
+		evt.workspace = this;
+		
+		triggerImageRefresh( evt);
 	}
 	
 	private boolean verifyImage( ImageData image) {
@@ -423,8 +431,11 @@ public class ImageWorkspace {
 		public void cauterize() {}
 		public void alert( boolean undo) {
 			triggerStructureChanged(this, undo);
-			if( imageChange)
-				triggerImageRefresh();
+			if( imageChange) {
+				ImageChangeEvent evt = new ImageChangeEvent();
+				evt.workspace = ImageWorkspace.this;
+				triggerImageRefresh( evt);
+			}
 		}
 	}
 	
@@ -677,8 +688,19 @@ public class ImageWorkspace {
 	 *  has changed (<code>structureChanged</code>)
 	 */
     public static interface MImageObserver {
-        public void imageChanged();
+        public void imageChanged(ImageChangeEvent evt);
         public void structureChanged(StructureChange evt);
+    }
+    public static class ImageChangeEvent {
+    	ImageWorkspace workspace = null;
+    	LinkedList<ImageData> dataChanged = new LinkedList<>();
+    	LinkedList<Node> nodesChanged = new LinkedList<>();
+    	boolean selectionLayerChange = false;
+    	
+    	public ImageWorkspace getWorkspace() { return workspace;}
+    	public List<ImageData> getChangedImages() { return (List<ImageData>) dataChanged.clone();}
+    	public List<Node> getChangedNodes() { return (List<Node>) nodesChanged.clone();}
+    	public boolean getSelectionLayerChange() { return selectionLayerChange;}
     }
     List<MImageObserver> imageObservers = new ArrayList<>();
     
@@ -686,9 +708,9 @@ public class ImageWorkspace {
         for( MImageObserver obs : imageObservers)
             obs.structureChanged( evt);
     }
-    void triggerImageRefresh() {
+    void triggerImageRefresh(ImageChangeEvent evt) {
         for( MImageObserver obs : imageObservers)
-            obs.imageChanged();
+            obs.imageChanged(evt);
         
         // !!!! TODO: Hook into the undo engine to determine this
         //	such that if an action is undone or redone to the same state

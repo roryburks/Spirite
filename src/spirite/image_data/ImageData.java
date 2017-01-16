@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+
 
 public class ImageData {
 	ImageWorkspace context;	
@@ -37,6 +39,9 @@ public class ImageData {
 	}
 	
 	public void refresh() {
-		context.triggerImageRefresh();
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.workspace = context;
+		evt.dataChanged.add(this);
+		context.triggerImageRefresh(evt);
 	}
 }

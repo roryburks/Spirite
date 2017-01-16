@@ -1,7 +1,10 @@
 package spirite.panel_layers;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,8 +16,13 @@ import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.List;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -37,10 +45,14 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.RenderEngine;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.animation_data.SimpleAnimation;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
@@ -49,20 +61,22 @@ public class LayerTreePanel extends ContentTree
 	implements MImageObserver, MWorkspaceObserver,
 	 TreeSelectionListener, TreeExpansionListener, MSelectionObserver, ActionListener
 {
-	// LayerTreePanel only needs master to add a WorkspaceObserver
-//	MasterControl master;
+	// LayerTreePanel only needs master to add a WorkspaceObserver and to hook
+	//	into the RenderEngine (for drawing the thumbnails)
 	ImageWorkspace workspace;
-	LayersPanel context;
+	final LayersPanel context;
+	final RenderEngine renderEngine;
 	
 	private static final long serialVersionUID = 1L;
-	LTPCellEditor editor;
-	LTPCellRenderer renderer;
+	final LTPCellEditor editor;
+	final LTPCellRenderer renderer;
 	
 
 	// :::: Initialize
 	public LayerTreePanel( MasterControl master, LayersPanel context) {
 		super();
 		this.context = context;
+		this.renderEngine = master.getRenderEngine();
 		
 		// Add Observers
 		workspace = master.getCurrentWorkspace();
@@ -112,7 +126,29 @@ public class LayerTreePanel extends ContentTree
     }
     
     // :::: MImageObserver interface
-    @Override    public void imageChanged() {}
+    @SuppressWarnings("unchecked")
+	@Override    public void imageChanged(ImageChangeEvent evt) {
+    	Enumeration<DefaultMutableTreeNode> e =
+    			((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
+
+		List<ImageData> changedImages = evt.getChangedImages();
+    	
+    	while( e.hasMoreElements()) {
+    		DefaultMutableTreeNode node = e.nextElement();
+    		
+    		Object obj = node.getUserObject();
+    		if( obj instanceof LayerNode) {
+    			LayerNode layer = (LayerNode)obj;
+    			if( changedImages.contains(layer.getImageData())) {
+    				// !!!! TODO: This draws only the PART that is necessary, but
+    				// 	probably causes a lot of unnecessary code to execute internally
+    				//	there might be a far better Swing-intended way to repaint a
+    				//	particular node within the tree
+    				tree.repaint(tree.getPathBounds(new TreePath(node.getPath())));
+    			}
+    		}
+    	}
+    }
 	@Override
 	public void structureChanged( StructureChange evt) {
 		constructFromWorkspace();
@@ -392,10 +428,7 @@ public class LayerTreePanel extends ContentTree
 		}
 	}
 	
-	/***
-	 * TreeCellRender
-	 *
-	 */
+	/** TreeCellRender */
 	private class LTPCellRenderer extends DefaultTreeCellRenderer {
 		private static final long serialVersionUID = 1L;
 		LayerTreeNodePanel renderPanel;
@@ -432,9 +465,7 @@ public class LayerTreePanel extends ContentTree
 		}
 	}
 
-	/***
-	 * Tree Cell Editor
-	 */
+	/** Tree Cell Editor */
 	private class LTPCellEditor extends DefaultTreeCellEditor
 		implements KeyListener 
 	{
@@ -512,9 +543,87 @@ public class LayerTreePanel extends ContentTree
 		@Override		public void keyTyped(KeyEvent e) {}
 	}
 
-
 	
+	/** Tree Node Panels */
+	class LayerTreeNodePanel extends JPanel {
+		private static final long serialVersionUID = 1L;
+		JTextField label;
+		LTNPPanel ppanel;
+
+		static final int N = 8;
+		class LTNPPanel extends JPanel {
+			public ImageData image = null;
+			
+			@Override
+			public void paintComponent(Graphics g) {
+				UIUtil.drawTransparencyBG(g, null);
+				
+				if( image != null) {
+					RenderSettings settings = new RenderSettings();
+					settings.workspace = workspace;
+					settings.width = getWidth();
+					settings.height = getHeight();
+					settings.image = image;
+
+					RenderingHints newHints = new RenderingHints(
+				             RenderingHints.KEY_TEXT_ANTIALIASING,
+				             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+					newHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, 
+							RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+					newHints.put( RenderingHints.KEY_INTERPOLATION, 
+							RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+					
+					settings.hints = newHints;
+					
+					g.drawImage(renderEngine.renderImage(settings), 0, 0, null);
+				}
+			}
+			
+		}
+		
+		/**
+		 * Create the panel.
+		 */
+		public LayerTreeNodePanel() {
+			label = new JTextField("Name");
+			ppanel = new LTNPPanel();
+			
+			label.setFont( new Font("Tahoma", Font.BOLD, 12));
+			label.setEditable( true);
+			label.setOpaque(false);
+			label.setBorder(null);
+			
+			
+			this.setOpaque( false);
+			
+			Dimension size = Globals.getMetric("layerpanel.treenodes.max");
+			
+			GroupLayout groupLayout = new GroupLayout(this);
+			groupLayout.setHorizontalGroup(
+				groupLayout.createSequentialGroup()
+					.addGap(2)
+					.addComponent(ppanel, size.width, size.width, size.width)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label, 10 ,  128, Integer.MAX_VALUE)
+					.addGap(2)
+			);
+			groupLayout.setVerticalGroup(
+				groupLayout.createParallelGroup(Alignment.LEADING)
+					.addGroup(groupLayout.createSequentialGroup()
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+							.addGroup(groupLayout.createSequentialGroup()
+								.addGap(2)
+								.addComponent(ppanel, size.height,  size.height, size.height))
+							.addGroup(groupLayout.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(label)))
+						.addGap(2)
+					)
+			);
+			setLayout(groupLayout);
+
+		}
+	}
 
 }
-
 

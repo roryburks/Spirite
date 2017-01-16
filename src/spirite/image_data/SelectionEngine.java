@@ -12,6 +12,7 @@ import java.util.List;
 import spirite.MUtil;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -70,7 +71,11 @@ public class SelectionEngine {
 	public void setOffset( int x, int y) {
 		offsetX = x;
 		offsetY = y;
-		workspace.triggerImageRefresh();
+		
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.workspace = workspace;
+		evt.selectionLayerChange = true;
+		workspace.triggerImageRefresh(evt);
 	}
 
 

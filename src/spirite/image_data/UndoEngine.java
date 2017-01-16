@@ -15,9 +15,11 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.image_data.DrawEngine.Method;
+import spirite.brains.CacheManager;
+import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.StackableStructureChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.SelectionEngine.Selection;
@@ -68,11 +70,12 @@ public class UndoEngine {
 	int absoluteMaxCache = 200000000;	// 200 mb
 	int maxCacheSize = 50000000;	// 50 mb
 	int maxQueueSize = 100;
-	int cacheSize = 0;
 	final List<UndoContext> contexts = new ArrayList<UndoContext>();
 	final LinkedList<UndoContext> queue = new LinkedList<>();
 	ListIterator<UndoContext> queuePosition = null;
-	final ImageWorkspace workspace;
+	
+	private final ImageWorkspace workspace;
+	private final CacheManager cacheManager;
 	
 	// TODO Implement 
 	enum CullBehavior {
@@ -94,8 +97,9 @@ public class UndoEngine {
 		return queue.getLast().getLast();
 	}
 	
-	public UndoEngine(ImageWorkspace workspace) {
+	public UndoEngine(ImageWorkspace workspace, CacheManager cacheManager) {
 		this.workspace = workspace;
+		this.cacheManager = cacheManager;
 		contexts.add( new NullContext());
 	}
 	
@@ -255,16 +259,17 @@ public class UndoEngine {
 	}
 	
 	private void cull() {
-		while( cacheSize > absoluteMaxCache)
+		while( cacheManager.getCacheSize() > absoluteMaxCache)
 			clipTail();
 		
 		switch( cullBehavior) {
 		case CACHE_AND_COUNT:
-			while( cacheSize > maxCacheSize && queue.size() > cacheSize)
+			while( cacheManager.getCacheSize() > maxCacheSize 
+					&& queue.size() > cacheManager.getCacheSize())
 				clipTail();
 			break;
 		case ONLY_CACHE:
-			while( cacheSize > maxCacheSize)
+			while( cacheManager.getCacheSize() > maxCacheSize)
 				clipTail();
 			break;
 		case ONLY_UNDO_COUNT:
@@ -372,7 +377,7 @@ public class UndoEngine {
 		ImageContext( ImageData image) {
 			super(image);
 			
-			actions.add(new KeyframeAction(deepCopy(image.data), null));
+			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.data), null));
 			met = 0;
 			pointer = 0;
 		}
@@ -383,10 +388,10 @@ public class UndoEngine {
 		 * action that it's "supposed" to be in hiddenAction and performs
 		 * its logical components (if it has any).*/
 		class KeyframeAction extends ImageAction {
-			BufferedImage frame;
+			CachedImage frameCache;
 			ImageAction hiddenAction;
-			KeyframeAction( BufferedImage frame, ImageAction action) {
-				this.frame = frame;
+			KeyframeAction( CachedImage frame, ImageAction action) {
+				this.frameCache = frame;
 				this.hiddenAction = action;
 			}
 			@Override 
@@ -401,25 +406,10 @@ public class UndoEngine {
 			}
 			@Override
 			public void performImageAction(ImageData image) {
-				resetToKeyframe(frame);
+				resetToKeyframe(frameCache.access());
 			}
 		}
 		
-		/** Duplicates the image in its entirety. */
-		private BufferedImage deepCopy( BufferedImage toCopy) {
-			// Note: Though this requires BufferedImage, it's not actually
-			//	modifying the image, so no checkout is needed.
-			cacheSize += toCopy.getWidth() * toCopy.getHeight() * 4;
-			System.out.println(cacheSize);
-			
-			return new BufferedImage( 
-					toCopy.getColorModel(),
-					toCopy.copyData(null),
-					toCopy.isAlphaPremultiplied(),
-					null);
-			
-			
-		}
 		private void resetToKeyframe( BufferedImage frame) {
 			// TODO
 			Graphics g = image.data.getGraphics();
@@ -443,7 +433,7 @@ public class UndoEngine {
 			// The second half of this conditional is mostly debug to
 			//	test if the dynamic keyframe distance is working, but 
 			if( met == MAX_TICKS_PER_KEY || action instanceof FillAction) {
-				actions.add(new KeyframeAction(deepCopy(image.data), (ImageAction)action));
+				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.data), (ImageAction)action));
 				met = 0;
 			}
 			else {
@@ -479,7 +469,10 @@ public class UndoEngine {
 				actions.get(i).performImageAction(image);
 			}
 			
-			workspace.triggerImageRefresh();
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.dataChanged.add(this.image);
+			workspace.triggerImageRefresh(evt);
 		}
 
 		@Override
@@ -497,7 +490,11 @@ public class UndoEngine {
 				actions.get(i).performAction();
 				actions.get(i).performImageAction(image);
 			}
-			workspace.triggerImageRefresh();
+			
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.dataChanged.add(this.image);
+			workspace.triggerImageRefresh(evt);
 		}
 		
 		/***
@@ -517,9 +514,7 @@ public class UndoEngine {
 				if( action instanceof KeyframeAction) {
 					// Remove the keyframe and flush its data to make absolutely
 					//	sure there are no leaks.
-					BufferedImage image = ((KeyframeAction)action).frame;
-					cacheSize -= image.getWidth() * image.getHeight() * 4;
-					image.flush();
+					((KeyframeAction)action).frameCache.flush();
 				}
 			}
 			subList.clear();
@@ -562,9 +557,7 @@ public class UndoEngine {
 		void flush() {
 			for( UndoAction action: actions) {
 				if( action instanceof KeyframeAction) {
-					BufferedImage img = ((KeyframeAction)action).frame;
-					cacheSize -= 4*img.getWidth()*img.getHeight();
-					img.flush();
+					((KeyframeAction)action).frameCache.flush();
 				}
 			}
 		}
@@ -578,9 +571,7 @@ public class UndoEngine {
 			if( actions.get(vstart) instanceof KeyframeAction) {
 				// Remove the base Keyframe and all actions up until the new keyframe
 				try {
-					BufferedImage img = ((KeyframeAction)actions.get(0)).frame;
-					cacheSize -= 4*img.getWidth()*img.getHeight();
-					img.flush();
+					((KeyframeAction)actions.get(0)).frameCache.flush();
 				} catch ( ClassCastException e) {
 					MDebug.handleError( ErrorType.STRUCTURAL, this, "UndoEngine Corruption: First Action in ImageContext wasn't a KeyframeAction");
 				}
