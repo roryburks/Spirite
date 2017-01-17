@@ -134,6 +134,7 @@ public class RootFrame extends javax.swing.JFrame
     			{"..Undo &History", "frame.showUndoFrame", null},
     			
     			{".&Animation View", "frame.showAnimationView", null},
+    			{".Debug View", "frame.showDebugDialog", null}
     	};
     	
     	JMenuBar jMenuBar = new JMenuBar();

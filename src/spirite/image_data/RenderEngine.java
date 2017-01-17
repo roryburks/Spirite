@@ -120,8 +120,10 @@ public class RenderEngine
 		}
 		
 		
+		// Step 2: Recursively draw the image
 		_propperRec( root,0, settings, images);
 		
+		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
 			images[i].flush();
 		
@@ -179,12 +181,12 @@ public class RenderEngine
 				if( child instanceof LayerNode) {
 					LayerNode layer = (LayerNode)child;
 					
-					_setGraphicsSettings(g, node, settings);
+					_setGraphicsSettings(g, child, settings);
 					g2.drawImage( layer.data.readImage().image,
 							0, 0, 
 							settings.width, settings.height, 
 							null);
-					_resetRenderSettings(g, node, settings);
+					_resetRenderSettings(g, child, settings);
 				}
 				else if( child instanceof GroupNode && !child.getChildren().isEmpty()) {
 					if( n == buffer.length+1) {
@@ -195,12 +197,12 @@ public class RenderEngine
 
 					_propperRec((GroupNode)child, n+1, settings, buffer);
 
-					_setGraphicsSettings(g, node,settings);
+					_setGraphicsSettings(g, child,settings);
 					g2.drawImage( buffer[n+1],
 							0, 0, 
 							settings.width, settings.height, 
 							null);
-					_resetRenderSettings(g, node, settings);
+					_resetRenderSettings(g, child, settings);
 				}
 			}
 		}

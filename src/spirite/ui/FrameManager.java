@@ -80,6 +80,13 @@ public class FrameManager implements WindowListener {
 			d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			d.setVisible(true);
 		}
+		else if( command.equals("showDebugDialog")) {
+			DebugDialog d = new DebugDialog(master);
+			d.pack();
+			d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			d.setVisible(true);
+			
+		}
 	}
 	
 	// :::: UI-related
