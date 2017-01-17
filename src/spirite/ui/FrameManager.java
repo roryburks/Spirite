@@ -19,14 +19,16 @@ import spirite.panel_toolset.UndoPanel;
 import spirite.ui.OmniFrame.OmniContainer;
 
 public class FrameManager implements WindowListener {
-	private MasterControl master;
+	private final MasterControl master;
 	private RootFrame root = null;
 	
-	private List<OmniFrame> frames = new ArrayList<>();
+	private final List<OmniFrame> frames = new ArrayList<>();
+
+	public FrameManager( MasterControl master) {
+		this.master = master;
+	}
 	
-	/***
-	 * A Collection of identifiers for all the dockable Frames.
-	 */
+	/** A Collection of identifiers for all the dockable Frames. */
 	public static enum FrameType {
 		BAD (""),
 		LAYER ("Layers"),
@@ -44,10 +46,7 @@ public class FrameManager implements WindowListener {
 		}
 	}
 	
-	/***
-	 * The facroty which creates Docked panels based on their type
-	 * identifier
-	 */
+	/** The facroty which creates Docked panels based on their type identifier.	 */
 	public JPanel createOmniPanel( FrameType type) {
 		switch( type) {
 		case LAYER:
@@ -63,9 +62,6 @@ public class FrameManager implements WindowListener {
 		}
 	}
 	
-	public FrameManager( MasterControl master) {
-		this.master = master;
-	}
 	
 	// :::: API
 	public void performCommand( String command) {
@@ -94,10 +90,7 @@ public class FrameManager implements WindowListener {
         root.setVisible(true);
 	}
 	
-	/***
-	 * 
-	 * @param bit_mask Bitwise combination of 
-	 */
+	/** */
 	public void addFrame( FrameType frameType) {
 		// First Check to make sure the frame type isn't already open
 		//	(assuming it's not duplicateable)
@@ -124,9 +117,7 @@ public class FrameManager implements WindowListener {
 		frames.add(omniFrame);
 	}
 	
-	/***
-	 * 
-	 */
+	/** */
 	public void showAllFrames() {
 		for( OmniFrame frame : frames) {
 			frame.toFront();
@@ -136,8 +127,7 @@ public class FrameManager implements WindowListener {
 	/***
 	 * Constructs a new frame from an already-constructed OmniContainer Panel
 	 * 
-	 * This has package scope because OmniFrame should be the only one that ever 
-	 * needs to call it.
+	 * OmniFrame should be the only one calling this
 	 */
 	void containerToFrame( OmniContainer container, Point locationOnScreen) {
 		OmniFrame frame = new OmniFrame( master, container);

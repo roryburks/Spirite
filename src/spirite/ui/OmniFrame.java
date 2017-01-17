@@ -58,13 +58,12 @@ import spirite.ui.FrameManager.FrameType;
 public class OmniFrame extends JDialog
 {	
 	private static final long serialVersionUID = 1L;
-
-	private MasterControl master;
+	private final MasterControl master;
 	
 	// Components
-	private OFTransferHandler transferHandler;
-	private JTabbedPane root;
-	private List<OmniContainer> containers = new ArrayList<>();
+	private final OFTransferHandler transferHandler = new OFTransferHandler(this);
+	private final List<OmniContainer> containers = new ArrayList<>();
+	private JTabbedPane root = new OmniTabbedFrame();
 	
 	// Drag UI States
 	private enum DragMode {
@@ -75,7 +74,7 @@ public class OmniFrame extends JDialog
 	private DragMode dragMode = DragMode.NOT_DRAGGING;
 	private int dragIndex = 0;
 	
-	public OmniFrame( MasterControl master, FrameType type) {
+	OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
 		initComponents();
 		
@@ -84,7 +83,7 @@ public class OmniFrame extends JDialog
 		
 	}
 	
-	public OmniFrame(MasterControl master, OmniContainer container) {
+	OmniFrame(MasterControl master, OmniContainer container) {
 		this.master = master;
 		initComponents();
 		
@@ -92,17 +91,13 @@ public class OmniFrame extends JDialog
 	}
 
 	private void initComponents() {
-		root = new OmniTabbedFrame();
 		root.setTabPlacement(JTabbedPane.TOP);
 		root.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		//root.addMouseListener(this);
 		
 		//getGlassPane().setVisible(true);
 		//getGlassPane().addMouseListener(this);
 		//getGlassPane().addMouseMotionListener(this);;
 		
-		//
-		transferHandler = new OFTransferHandler(this);
 		root.setTransferHandler(transferHandler);
 		
 		// Create TabbedPane
@@ -110,10 +105,7 @@ public class OmniFrame extends JDialog
 		
 	}
 	
-	/***
-	 * This classes is needed because overriding a JDialog's paint method
-	 * is not nearly as effective as overriding a Component's
-	 */
+	/** The TabbedPane Container for all component panels */
 	public class OmniTabbedFrame extends JTabbedPane {
 		private static final long serialVersionUID = 1L;
 
@@ -125,6 +117,7 @@ public class OmniFrame extends JDialog
 		public void paintComponent( Graphics g) {
 			super.paintComponent(g);
 
+			// Draw Graphics related to Docking
 			switch( dragMode) {
 			case DRAG_INTO_TAB:
 				Rectangle r = root.getBoundsAt(dragIndex);
@@ -142,14 +135,11 @@ public class OmniFrame extends JDialog
 			default:
 				break;
 			}
-			
 		}
 	}
 	
 	
-	/*** 
-	 * Adds Panel of the given FrameType
-	 */
+	/** Adds Panel of the given FrameType. */
 	public void addPanel( FrameType type) {
 		JPanel panel = master.getFrameManager().createOmniPanel(type);
 		
@@ -164,9 +154,7 @@ public class OmniFrame extends JDialog
 		transferHandler.refreshGestureRecognizers();
 	}
 	
-	/***
-	 * @return All the FrameTypes contained in the OmniFrame
-	 */
+	/** Get all the FrameTypes contained in the OmniFrame. */
 	public List<FrameType> getContainedFrameTypes() {
 		List<FrameType> list = new ArrayList<FrameType>();
 
@@ -177,9 +165,7 @@ public class OmniFrame extends JDialog
 		return list;
 	}
 	
-	/***
-	 * @return True if the OmniPanel contains any frame of the given Type
-	 */
+	/*** @return True if the OmniPanel contains any frame of the given Type */
 	public boolean containsFrameType( FrameType type) {
 		for( OmniContainer container : containers) {
 			if( container.type == type)
@@ -223,13 +209,11 @@ public class OmniFrame extends JDialog
 	}
 	
 	
-	/***
-	 * Custom Tab
-	 */
+	/** Custom Tab Component */
 	public class OmniBar extends JPanel implements MouseListener {
 		private static final long serialVersionUID = 1L;
 		
-		JLabel label;
+		private final JLabel label;
 		public OmniBar( String title) {
 			label = new JLabel(title);
 			label.setFont( new Font("Tahoma", Font.PLAIN, 10));
@@ -259,6 +243,7 @@ public class OmniFrame extends JDialog
 		@Override		public void mouseReleased(MouseEvent e) {}
 	}
 	
+	/** */
 	static class OmniContainer {
 		JPanel panel;
 		OmniBar bar;	// It's possible that this shouldn't be here.  It helps
@@ -275,12 +260,11 @@ public class OmniFrame extends JDialog
 	}
 	
 	
-	/***
-	 * 
-	 */
+	/** Transferable Object storing the data which Component is moving 
+	 * and what its parent it.  */
 	private static class OFTransferable implements Transferable {
-		OmniFrame parent;
-		OmniContainer panel;
+		private final OmniFrame parent;
+		private final OmniContainer panel;
 		
 		OFTransferable( OmniFrame parent, OmniContainer container) {
 			this.parent = parent;
@@ -289,20 +273,11 @@ public class OmniFrame extends JDialog
 		
 		@Override
 		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-			if( flavor.equals(FLAVOR))
-				return this;
+			if( flavor.equals(FLAVOR)) return this;
 			else throw new UnsupportedFlavorException(flavor);
 		}
-
-		@Override
-		public DataFlavor[] getTransferDataFlavors() {
-			return flavors;
-		}
-
-		@Override
-		public boolean isDataFlavorSupported(DataFlavor flavor) {
-			return flavor.equals(FLAVOR);
-		}
+		@Override public DataFlavor[] getTransferDataFlavors() {return flavors;}
+		@Override public boolean isDataFlavorSupported(DataFlavor flavor) {return flavor.equals(FLAVOR);}
 	}
 	public final static DataFlavor FLAVOR = 
 			new DataFlavor( OFTransferable.class, "OmniPanel");
@@ -317,14 +292,14 @@ public class OmniFrame extends JDialog
 		implements DragGestureListener, DragSourceListener
 	{
 		private static final long serialVersionUID = 1L;
-		protected DragSource dragSource;
-		protected List<DragGestureRecognizer> dgrs = new ArrayList<>();
-		protected DropTarget dropTarget;
-		private OmniFrame context;
-		private OmniContainer dragging = null;	// Used only for dragging a container out of a frame
+		protected final DragSource dragSource;
+		protected final List<DragGestureRecognizer> dgrs = new ArrayList<>();
+		
+		// Used only for dragging a container out to a new Frame, otherwise
+		//	the Transferable object is used
+		private OmniContainer dragging = null;	
 		
 		public OFTransferHandler(OmniFrame context) {
-			this.context = context;
 			dragSource = DragSource.getDefaultDragSource();
 		}
 		
@@ -387,8 +362,6 @@ public class OmniFrame extends JDialog
 					return true;
 				}
 			}
-			
-			
 			return false;
 		}
 		
@@ -400,7 +373,7 @@ public class OmniFrame extends JDialog
 
 				// Move the container from its old spot to its new (unless
 				//	you're trying to move a single-frame OmniPanel into itself)
-				if( trans.parent != context || containers.size() > 1) {
+				if( trans.parent != OmniFrame.this || containers.size() > 1) {
 					trans.parent.removeContainer( trans.panel);
 					addContainer(trans.panel, dragIndex);
 				}
@@ -422,7 +395,7 @@ public class OmniFrame extends JDialog
 			//	to do with them anyway)
 			for( OmniContainer container : containers) {
 				if( evt.getComponent() == container.bar) {					
-					OFTransferable oftrans = new OFTransferable( context, container);
+					OFTransferable oftrans = new OFTransferable( OmniFrame.this, container);
 					Transferable trans = (Transferable)oftrans;
 					dragging = container;
 
@@ -448,6 +421,9 @@ public class OmniFrame extends JDialog
 		}
 
 		// DragSourceListener
+		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
+		@Override		public void dragOver(DragSourceDragEvent arg0) {}
+		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
 		@Override		public void dragDropEnd(DragSourceDropEvent evt) {
 			
 			if( evt.getDropAction() == TransferHandler.NONE && containers.contains(dragging)) {
@@ -471,9 +447,6 @@ public class OmniFrame extends JDialog
 			dragMode = DragMode.NOT_DRAGGING;
 			dragging = null;
 		}
-		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
-		@Override		public void dragOver(DragSourceDragEvent arg0) {}
-		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
 		@Override
 		public void dragExit(DragSourceEvent arg0) {
 			if( dragMode != DragMode.NOT_DRAGGING) {
@@ -481,7 +454,5 @@ public class OmniFrame extends JDialog
 				root.repaint();
 			}
 		}
-
-
 	}
 }

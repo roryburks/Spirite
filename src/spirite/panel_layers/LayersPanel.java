@@ -30,10 +30,10 @@ public class LayersPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
-	LayerTreePanel layerTreePanel;
-	JButton btnNewLayer;
-	JButton btnNewGroup;
-	OpacitySlider opacitySlider;
+	private final LayerTreePanel layerTreePanel;
+	private final JButton btnNewLayer;
+	private final JButton btnNewGroup;
+	private final OpacitySlider opacitySlider;
 		
 	/**
 	 * Create the panel.
@@ -99,9 +99,7 @@ public class LayersPanel extends JPanel {
 
 	}
 	
-	/***
-	 * The OpacitySlider Swing Component
-	 */
+	/** The OpacitySlider Swing Component */
 	class OpacitySlider extends JPanel  {
 		OSMA adapter = new OSMA();
 		OpacitySlider() {
@@ -163,6 +161,10 @@ public class LayersPanel extends JPanel {
 				}
 			}
 		}
+	}
+	
+	public void updateSelected() {
+		opacitySlider.repaint();
 	}
 
 	

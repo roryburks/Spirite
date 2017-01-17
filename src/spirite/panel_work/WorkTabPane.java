@@ -24,8 +24,11 @@ public class WorkTabPane extends JTabbedPane
 	implements MWorkspaceObserver, ChangeListener,
 		MouseListener, ActionListener, MWorkspaceFileObserver
 {
-	final MasterControl master;
-	final List<WorkPanel> panels = new ArrayList<>();	// Panels should maintain a 1:1 assosciation with tabs
+	// Needs to rememver master so it can pass it on to WorkPanel's
+	private final MasterControl master;
+	
+	// Panels should maintain a 1:1 assosciation with tabs
+	private final List<WorkPanel> panels = new ArrayList<>();
 	
 	
 	public WorkTabPane( MasterControl master) {
@@ -103,8 +106,8 @@ public class WorkTabPane extends JTabbedPane
 
 
 	// :::: MouseListener, ActionListener for ContextMenu behavior
-	WTPContextMenu contextMenu = new WTPContextMenu();
-	class WTPContextMenu extends JPopupMenu {
+	private final WTPContextMenu contextMenu = new WTPContextMenu();
+	private class WTPContextMenu extends JPopupMenu {
 		int tabID;
 	}
 	@Override

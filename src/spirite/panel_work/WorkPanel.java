@@ -48,26 +48,30 @@ public class WorkPanel extends javax.swing.JPanel
         implements MImageObserver,  
         	AdjustmentListener, ComponentListener
 {
-	Point center = new Point(0,0);
 	private static final long serialVersionUID = 1L;
+	
+	
+	// Stores the point where the image is centered at so that the UI components
+	//	don't have to do a lot of guess-work when resizing components etc.
+	private Point center = new Point(0,0);
 	
 	// 1 "tick" of the scrollbar to corresponds to SCROLL_RATIO pixels at zoom 1
 	private static final int SCROLL_RATIO = 10;
 	
-	// at least SCROLL_BUFFER pixels must be visible in the scroll region for any axis
-	// 	negative SCROLL_BUFFER would allow you to scroll the image off-screen entirely
+	// At least SCROLL_BUFFER pixels must be visible in the scroll region for any axis
+	// 	negative SCROLL_BUFFER would allow you to scroll the image off-screen entirely.
     private static final int SCROLL_BUFFER = 100;
 
     // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
     //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
-    int zoom_level = 0; 
-    float zoom = 1.0f;
+    private int zoom_level = 0; 
+    private float zoom = 1.0f;
 
-    int offsetx, offsety;
+    private int offsetx, offsety;
 
     // WorkPanel needs Master because some of its components need it
-    MasterControl master;
-    ImageWorkspace workspace;
+    final MasterControl master;
+    final ImageWorkspace workspace;
 
 
     public WorkPanel( MasterControl master, ImageWorkspace workspace) {
@@ -90,8 +94,9 @@ public class WorkPanel extends javax.swing.JPanel
 
     }
     
-    int mx = 0;
-    int my = 0;
+    // Image Coordinates that you're mouse-over'd displayed in the bottom bar
+    private int mx = 0;
+    private int my = 0;
     void refreshCoordinates( int x, int y) {
     	if( mx != x || my != y) {
     		mx = x;
@@ -104,15 +109,6 @@ public class WorkPanel extends javax.swing.JPanel
     		else
     			coordinateLabel.setText("");
     	}
-    }
-
-    @Override
-    public void paintComponent( Graphics g) {
-    	// Let swing do the heavy lifting.
-        super.paintComponent(g); 
-        
-
-
     }
     
     // :::: API
@@ -135,6 +131,10 @@ public class WorkPanel extends javax.swing.JPanel
 
     public int getZoomLevel( ) {
         return zoom_level;
+    }
+    
+    public float getZoom() {
+    	return zoom;
     }
 
     // :::: Coordinate Conversion methods
@@ -256,7 +256,9 @@ public class WorkPanel extends javax.swing.JPanel
                     .addComponent(jscrollHorizontal, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup( layout.createParallelGroup()
                     .addComponent(jscrollVertical)	
+                 // !!!! TODO: figure out why this is necessary to keep the layout working as expected and find a better way
                     .addComponent(zoomPanel, 0, 0, jscrollVertical.preferredSize().width)
+                 // !!!!
                 )
             )
             .addComponent(coordinateLabel)
@@ -273,11 +275,11 @@ public class WorkPanel extends javax.swing.JPanel
         );
     }
     
-    JLabel coordinateLabel;
+    private JLabel coordinateLabel;
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
-    WorkSplicePanel workSplicePanel;
-    JPanel zoomPanel;
+    WorkSplicePanel workSplicePanel;	// !!!! Maybe should be private with getter
+    private JPanel zoomPanel;
 
     // ==== Event Listeners and Observers ====
 

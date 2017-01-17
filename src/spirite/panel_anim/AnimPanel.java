@@ -35,20 +35,20 @@ public class AnimPanel extends javax.swing.JPanel
         implements MCurrentImageObserver, ActionListener, WindowListener, DocumentListener
 {
 	private static final long serialVersionUID = 1L;
-	MasterControl master;
-	Timer timer;
-	boolean isPlaying = false;
+	private final MasterControl master;
+	private final Timer timer;
+	private boolean isPlaying = false;
 	
 	
-    Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
+    private final Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
 	
-    AbstractAnimation animation = null;
+    private AbstractAnimation animation = null;
     
 	// Metronome settings
-	float start = 0.0f;
-	float end = 2.0f;
-	float tps = 0.2f;
-	float met = 0.0f;
+	private float start = 0.0f;
+	private float end = 2.0f;
+	private float tps = 0.2f;
+	private float met = 0.0f;
 
     /**
      * Creates new form PreviewPanel
@@ -117,6 +117,7 @@ public class AnimPanel extends javax.swing.JPanel
 	}
 	
 
+	// Start Design
     private DisplayPanel previewPanel;
     private MTextFieldNumber tfFPS;
     private JButton buttonBack;
@@ -134,7 +135,7 @@ public class AnimPanel extends javax.swing.JPanel
     		}
     	}
     }
-                          
+    
     private void initComponents() {
         Dimension size = new Dimension(24,24);
 
@@ -175,11 +176,11 @@ public class AnimPanel extends javax.swing.JPanel
             	.addGroup( layout.createParallelGroup(Alignment.LEADING)
                 	.addGroup(layout.createSequentialGroup()
                 		.addGap(5)
-                		.addComponent(buttonBack, 24, 24, 24)
+                		.addComponent(buttonBack, size.width, size.width, size.width)
                 		.addGap(5)
-                		.addComponent(buttonPlay, 24, 24, 24)
+                		.addComponent(buttonPlay, size.width, size.width, size.width)
             			.addGap(5)
-            			.addComponent(buttonForward, 24, 24, 24)
+            			.addComponent(buttonForward, size.width, size.width, size.width)
             			.addPreferredGap(ComponentPlacement.UNRELATED)
             			.addComponent(tfFPS, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
             			.addPreferredGap(ComponentPlacement.RELATED)
@@ -208,11 +209,11 @@ public class AnimPanel extends javax.swing.JPanel
             			.addGap(5)
             			.addGroup(layout.createParallelGroup(Alignment.LEADING)
             				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
-            					.addComponent(tfFPS, 24, 24, 24)
+            					.addComponent(tfFPS, size.height, size.height, size.height)
             					.addComponent(lblFps))
-            				.addComponent(buttonBack, 24, 24, 24)
-            				.addComponent(buttonPlay, 24, 24, 24)
-            				.addComponent(buttonForward, 24, 24, 24))
+            				.addComponent(buttonBack, size.height, size.height, size.height)
+            				.addComponent(buttonPlay, size.height, size.height, size.height)
+            				.addComponent(buttonForward, size.height, size.height, size.height))
             		)
         		)
     			.addGap(5)
@@ -222,6 +223,7 @@ public class AnimPanel extends javax.swing.JPanel
 
         this.setLayout(layout);
     }
+    // End Design
 
     
     // :::: ActionListener
@@ -233,7 +235,6 @@ public class AnimPanel extends javax.swing.JPanel
 				met += 16.0f * tps / 1000.0f;
 				met = MUtil.cycle(start, end, met);
 				slider.setValue( Math.round(1000* (met - start) / (end - start)));
-//				slider.repaint();
 				
 				repaint();
 			}

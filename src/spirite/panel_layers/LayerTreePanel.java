@@ -64,12 +64,12 @@ public class LayerTreePanel extends ContentTree
 	// LayerTreePanel only needs master to add a WorkspaceObserver and to hook
 	//	into the RenderEngine (for drawing the thumbnails)
 	ImageWorkspace workspace;
-	final LayersPanel context;
-	final RenderEngine renderEngine;
+	private final LayersPanel context;
+	private final RenderEngine renderEngine;
 	
 	private static final long serialVersionUID = 1L;
-	final LTPCellEditor editor;
-	final LTPCellRenderer renderer;
+	private final LTPCellEditor editor;
+	private final LTPCellRenderer renderer;
 	
 
 	// :::: Initialize
@@ -101,17 +101,12 @@ public class LayerTreePanel extends ContentTree
 		
 		constructFromWorkspace();
 	}
-
-    // :::: Paint
-    @Override
-    public void paintComponent( Graphics g) {
-    	super.paintComponent(g);
-    }
     
-    // :::: API
+    // :::: Get/Set
     public GroupTree.Node getSelectedNode() {
     	return getNodeFromPath( tree.getSelectionPath());
     }
+    
     
     private GroupTree.Node getNodeFromPath( TreePath path) {
     	if( path != null) {
@@ -127,7 +122,8 @@ public class LayerTreePanel extends ContentTree
     
     // :::: MImageObserver interface
     @SuppressWarnings("unchecked")
-	@Override    public void imageChanged(ImageChangeEvent evt) {
+	@Override
+	public void imageChanged(ImageChangeEvent evt) {
     	Enumeration<DefaultMutableTreeNode> e =
     			((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
 
@@ -332,7 +328,7 @@ public class LayerTreePanel extends ContentTree
 		}
 	}
 	
-	LTPContextMenu contextMenu = new LTPContextMenu();
+	private final LTPContextMenu contextMenu = new LTPContextMenu();
 	class LTPContextMenu extends JPopupMenu {
 		Node context = null;
 		
@@ -373,7 +369,7 @@ public class LayerTreePanel extends ContentTree
 		if( workspace != null)
 			workspace.setSelectedNode(node);
 		
-		context.opacitySlider.repaint();
+		context.updateSelected();
 	}
 	
 
@@ -427,15 +423,21 @@ public class LayerTreePanel extends ContentTree
 	/** TreeCellRender */
 	private class LTPCellRenderer extends DefaultTreeCellRenderer {
 		private static final long serialVersionUID = 1L;
-		LayerTreeNodePanel renderPanel;
+		private final LayerTreeNodePanel renderPanel;
 		
 		LTPCellRenderer() {
 			renderPanel = new LayerTreeNodePanel();
 		}
 		
 		@Override
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, 
-				boolean expanded, boolean leaf, int row, boolean hasFocus) 
+		public Component getTreeCellRendererComponent(
+				JTree tree, 
+				Object value, 
+				boolean selected, 
+				boolean expanded, 
+				boolean leaf, 
+				int row, 
+				boolean hasFocus) 
 		{
 			
 			
@@ -465,8 +467,8 @@ public class LayerTreePanel extends ContentTree
 	private class LTPCellEditor extends DefaultTreeCellEditor
 		implements KeyListener 
 	{
-		LayerTreeNodePanel renderPanel;
-		GroupTree.Node editingNode = null;
+		private final LayerTreeNodePanel renderPanel;
+		private GroupTree.Node editingNode = null;
 		
 		public LTPCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
 			super(tree, renderer);
@@ -477,8 +479,12 @@ public class LayerTreePanel extends ContentTree
 		
 		@Override
 		public Component getTreeCellEditorComponent(
-				JTree tree, Object value, boolean isSelected, boolean expanded,
-				boolean leaf, int row) 
+				JTree tree, 
+				Object value, 
+				boolean isSelected, 
+				boolean expanded,
+				boolean leaf, 
+				int row) 
 		{
 			Object obj = ((DefaultMutableTreeNode)value).getUserObject();
 
@@ -514,7 +520,6 @@ public class LayerTreePanel extends ContentTree
 				String text = renderPanel.label.getText();
 
 				workspace.renameNode(editingNode, text);
-				
 			}
 			
 			editingNode = null;
@@ -543,10 +548,11 @@ public class LayerTreePanel extends ContentTree
 	/** Tree Node Panels */
 	class LayerTreeNodePanel extends JPanel {
 		private static final long serialVersionUID = 1L;
-		JTextField label;
-		LTNPPanel ppanel;
+		private final JTextField label;
+		private final LTNPPanel ppanel;
 
 		static final int N = 8;
+		/** The Panel that has the Image Thumbnail in it. */
 		class LTNPPanel extends JPanel {
 			public ImageData image = null;
 			
@@ -577,9 +583,6 @@ public class LayerTreePanel extends ContentTree
 			
 		}
 		
-		/**
-		 * Create the panel.
-		 */
 		public LayerTreeNodePanel() {
 			label = new JTextField("Name");
 			ppanel = new LTNPPanel();
@@ -617,7 +620,6 @@ public class LayerTreePanel extends ContentTree
 					)
 			);
 			setLayout(groupLayout);
-
 		}
 	}
 

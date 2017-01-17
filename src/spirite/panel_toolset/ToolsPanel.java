@@ -27,23 +27,35 @@ import javax.swing.SwingUtilities;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.brains.HotkeyManager;
 import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
 
+/**
+ * 
+ * 
+ * Note: there is some redundant code between the way this loads its
+ * "IconSheet" for buttons and the Global.getIcon method, but this
+ * Component efficiently uses a single BufferedImage without splitting
+ * it up so for now I'm keeping it.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class ToolsPanel extends JPanel
         implements ComponentListener, MToolsetObserver
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
-    MasterControl master;
+    private final ToolsetManager toolsetManager;
+    private final HotkeyManager hotkeyManager;
     
 	private static final long serialVersionUID = 1L;
 	private static final int BUTTON_WIDTH = 24;
     private static final int BUTTON_HEIGHT = 24;
 
-    int tool_len;
-
+    private int tool_len;
 
     BufferedImage icon_sheet = null;
     int is_width, is_height;
@@ -54,9 +66,10 @@ public class ToolsPanel extends JPanel
 
 
     public ToolsPanel( MasterControl master) {
-        this.master = master;
+    	this.toolsetManager = master.getToolsetManager();
+    	this.hotkeyManager = master.getHotekyManager();
 
-        master.getToolsetManager().addToolsetObserver(this);
+    	toolsetManager.addToolsetObserver(this);
 
         prepareIconSheet();
         initComponents();
@@ -64,7 +77,7 @@ public class ToolsPanel extends JPanel
         this.setOpaque(false);
         
         // Make sure it's created with the proper selected tool
-        toolsetChanged(master.getToolsetManager().getSelectedTool());
+        toolsetChanged(toolsetManager.getSelectedTool());
     }
 
     // Loads the icon sheet from icons.resources
@@ -109,12 +122,11 @@ public class ToolsPanel extends JPanel
         int x = 0;
         int y = 0;
 
-        ToolsetManager toolset = master.getToolsetManager();
-        tool_len = toolset.getToolCount();
+        tool_len = toolsetManager.getToolCount();
 
         buttons = new ToolButton[tool_len];
         for( int i = 0; i < tool_len; ++i) {
-            buttons[i] = new ToolButton( toolset.getNthTool(i));
+            buttons[i] = new ToolButton( toolsetManager.getNthTool(i));
             container.add( buttons[i]);
             x += 1;
             if( x >= is_width) {
@@ -187,20 +199,20 @@ public class ToolsPanel extends JPanel
             implements ActionListener, MouseListener
     {
 		private static final long serialVersionUID = 1L;
-		int ix, iy;
-        String tool;
+		private int ix, iy;
+        private String tool;
 
         boolean hover = false;
 
         ToolButton( String tool) {
             this.tool = tool;
-            this.ix = master.getToolsetManager().getToolix(tool);
-            this.iy = master.getToolsetManager().getTooliy(tool);
+            this.ix = toolsetManager.getToolix(tool);
+            this.iy = toolsetManager.getTooliy(tool);
             this.addActionListener(this);
             this.addMouseListener(this);
             this.setBorder(null);
 
-            Hotkey key = master.getHotekyManager().getHotkey("toolset." + tool);
+            Hotkey key = hotkeyManager.getHotkey("toolset." + tool);
             this.setToolTipText("<html>" + tool + " <b>" + key.toString() + "</b></html>" );
 
             // Because the component can be semi-transparent at times, this is
@@ -242,7 +254,7 @@ public class ToolsPanel extends JPanel
         // :: On Button Click
         @Override
         public void actionPerformed(ActionEvent e) {
-            master.getToolsetManager().setSelectedTool(((ToolButton)e.getSource()).tool);
+        	toolsetManager.setSelectedTool(((ToolButton)e.getSource()).tool);
         }
 
         @Override public void mouseClicked(MouseEvent e) {}

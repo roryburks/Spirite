@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Timer;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;

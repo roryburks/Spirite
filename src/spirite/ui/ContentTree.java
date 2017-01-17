@@ -61,27 +61,26 @@ public class ContentTree extends JPanel
 {
 		
 	private static final long serialVersionUID = 1L;
-	protected DefaultMutableTreeNode root;
-	protected DefaultTreeModel model;
-	protected CCTDragManager dragManager;
-	protected JScrollPane scrollPane;
-	protected CCPanel container;
+	protected final DefaultMutableTreeNode root;
+	protected final DefaultTreeModel model;
+	protected final CCTDragManager dragManager;
+	protected final JScrollPane scrollPane;
+	protected final CCPanel container;
 	
-	protected CCTree tree;
-	protected Color bgColor;
+	protected final JTree tree;
+	protected final Color bgColor;
 	
-	protected CCBPanel buttonPanel;
+	protected final CCBPanel buttonPanel;
 
 	// Determines the background color to draw the selected node
 	// can be re-written by children
 	protected Color selectedBG;
 	protected Color selectedBGDragging;
 	
-	
 	private int buttonsPerRow = 0;
 
-	// :::: Methods triggered by internal events that should can and should be 
-	//	overwriten
+	// :::: Methods triggered by internal events that can and should be 
+	//	overwritten
 	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {}
 	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {}
 	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {}	
@@ -98,7 +97,7 @@ public class ContentTree extends JPanel
 		this.add(container);
 		
 		buttonPanel = new CCBPanel();
-		tree = new CCTree();
+		tree = new JTree();
 		scrollPane = new JScrollPane(container);
 		this.add(scrollPane);
 		
@@ -122,15 +121,7 @@ public class ContentTree extends JPanel
 
 		// Initialize Drag-Drop Manager
 		dragManager = new CCTDragManager();
-
-		dragManager.dragSource = DragSource.getDefaultDragSource();
-		dragManager.dgr = 
-				dragManager.dragSource.createDefaultDragGestureRecognizer( 
-						tree, 
-						DnDConstants.ACTION_COPY_OR_MOVE, 
-						dragManager);
-		
-		dragManager.dropTarget = new DropTarget(tree,dragManager);
+		new DropTarget(tree,dragManager);	// TODO: Figure out how this works
 		
 		
 		initLayout();
@@ -167,9 +158,7 @@ public class ContentTree extends JPanel
 		tree.addTreeExpansionListener(this);
 	}
 	
-	/***
-	 * Initializes the Outer Layout
-	 */
+	/** Initializes the Outer Layout */
 	private void initLayout() {
 		//!!!! It's possible that this and CCButtonPanel's reformPanel should be part 
 		// of the same method instead of separated.  There's little reason for the layouts
@@ -194,6 +183,20 @@ public class ContentTree extends JPanel
 		container.setLayout(layout);
 	}
 	
+	// ::::  API
+	public TreePath getPathFromY( int y) {
+		int c = tree.getRowCount();
+		
+		for( int i = 0; i < c; ++i) {
+			Rectangle r = tree.getRowBounds(i);
+			
+			if( r.y <= y && r.y + r.height >= y) {
+				return tree.getPathForRow(i);
+			}
+		}
+		return null;
+	}
+	
 	public void setButtonsPerRow( int num) {
 		if( num < 0 ) return;
 		
@@ -202,8 +205,12 @@ public class ContentTree extends JPanel
 		buttonPanel.reformPanel();
 	}
 	
-	/***
+	/** 
+	 * Internal painComponent method which adds more parameters for child
+	 * 	classes to mess with
 	 * 
+	 *   @param drawBG whether or not to draw the base Background Color (so
+	 *   child components can draw behind it)
 	 */
 	protected void paintCCPanel( Graphics g, int width, int height, boolean drawBG) {
 		if( drawBG) {
@@ -257,10 +264,12 @@ public class ContentTree extends JPanel
 		}
 	}
 	
-	
+	/** The panel to the left of the tree that constructs the buttons parallel
+	 * to the tree nodes. 
+	 */
 	public class CCBPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
-		CCButton[][] buttons = new CCButton[0][];
+		private CCButton[][] buttons = new CCButton[0][];
 		
 		CCBPanel() {}
 		
@@ -291,7 +300,7 @@ public class ContentTree extends JPanel
 				buttons = new CCButton[ c][];
 				
 				
-				// Add each button and set the layout for them as needed
+				// Add each button and set the dynamic layout for them as needed
 				int old_y = 0;
 				for( int i = 0; i < c; ++i) {
 					buttons[i] = new CCButton[buttonsPerRow];
@@ -312,7 +321,6 @@ public class ContentTree extends JPanel
 							}
 						});
 						buttonCreated(buttons[i][j]);
-//						add( buttons[i][j]);
 						
 						innerHGroup.addGap(margin.width)
 								.addComponent( buttons[i][j], size.width, size.width, size.width);
@@ -329,7 +337,6 @@ public class ContentTree extends JPanel
 				}
 			}
 			
-
 			
 			this.setLayout(layout);
 		}
@@ -342,36 +349,22 @@ public class ContentTree extends JPanel
 		
 	}
 	
+	/** A Button that is linked to a TreePath*/
 	public class CCButton extends JToggleButton {
 		private static final long serialVersionUID = 1L;
 		public final int buttonNum;
-		private TreePath path;
+		private final TreePath path;
 		public CCButton( TreePath path, int num) {
 			this.path = path;
 			this.buttonNum = num;
 		}
 		
 		public TreePath getAssosciatedTreePath() {
-			return path;
-		}
-	}
-
-	/***
-	 * The Tree part of the Tree Panel is separated so that we can add other
-	 * components to the DDTree
-	 */
-	public class CCTree extends JTree {
-		private static final long serialVersionUID = 1L;
-		public CCTree() {}
-		
-		@Override
-		public void paintComponent( Graphics g) {
-			super.paintComponent(g);
+			return new TreePath(path.getPath());
 		}
 	}
 
 	
-
 
 	
 	public static enum DragMode {
@@ -382,49 +375,36 @@ public class ContentTree extends JPanel
 		HOVER_SELF
 	};
 	
-	/***
-	 * The DragManager manages the drag and drop functionality of the tree.
-	 *
-	 */
+	/** The DragManager manages the drag and drop functionality of the tree.*/
 	protected class CCTDragManager 
 		implements DragGestureListener, DropTargetListener, DragSourceListener
 	{
-		DragSource dragSource;
-		DragGestureRecognizer dgr;
-		DropTarget dropTarget;
+		private final DragSource dragSource;
 		
 		protected DragMode dragMode = DragMode.NOT_DRAGGING;	
 		protected TreePath dragIntoNode = null;
 		protected TreePath draggingNode = null;
 		
 		public CCTDragManager() {
+			dragSource = DragSource.getDefaultDragSource();
+			dragSource.createDefaultDragGestureRecognizer( 
+							tree, 
+							DnDConstants.ACTION_COPY_OR_MOVE, 
+							this);
 		}
 		
 	
-		/***
-		 * Simple Transferable object that only acts as an identifier
-		 */
+		/** Simple Transferable object that only acts as an identifier. */
 		private class ContainerNode implements Transferable {
 			@Override
 			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-				if( flavor.equals(FLAVOR))
-					return this;
+				if( flavor.equals(FLAVOR))	return this;
 				else throw new UnsupportedFlavorException(flavor);
-			}
-	
-			@Override
-			public DataFlavor[] getTransferDataFlavors() {
-				return flavors;
-			}
-	
-			@Override
-			public boolean isDataFlavorSupported(DataFlavor flavor) {
-				return flavor.equals(FLAVOR);
-			}
-			
+			}	
+			@Override public DataFlavor[] getTransferDataFlavors() {return flavors;}
+			@Override public boolean isDataFlavorSupported(DataFlavor flavor) {return flavor.equals(FLAVOR);}
 		}
-		final public DataFlavor FLAVOR = 
-				new DataFlavor( ContainerNode.class, "Container Node");
+		final public DataFlavor FLAVOR = new DataFlavor( ContainerNode.class, "Container Node");
 		private DataFlavor flavors[] = {FLAVOR};
 		
 		// :::: DragGesterRecignizer
@@ -452,7 +432,6 @@ public class ContentTree extends JPanel
 		@Override		public void dragExit(DropTargetEvent arg0) {}
 		@Override		public void dropActionChanged(DropTargetDragEvent arg0) {}
 		@Override		public void drop(DropTargetDropEvent arg0) {}
-	
 		@Override
 		public void dragOver(DropTargetDragEvent evt) {
 			// Make sure it's the correct Flavor Type
@@ -572,22 +551,13 @@ public class ContentTree extends JPanel
 		@Override		public void dragOver(DragSourceDragEvent evt) {}
 		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
 	}
-	
-	public TreePath getPathFromY( int y) {
-		int c = tree.getRowCount();
-		
-		for( int i = 0; i < c; ++i) {
-			Rectangle r = tree.getRowBounds(i);
-			
-			if( r.y <= y && r.y + r.height >= y) {
-				return tree.getPathForRow(i);
-			}
-		}
-		return null;
-	}
 
 	
 	// :::: MouseListener
+	@Override	public void mouseEntered(MouseEvent arg0) {}
+	@Override	public void mouseExited(MouseEvent arg0) {}
+	@Override	public void mousePressed(MouseEvent arg0) {	}
+	@Override	public void mouseReleased(MouseEvent arg0) {}
 	@Override
 	public void mouseClicked(MouseEvent evt) {
 		TreePath path = getPathFromY(evt.getY());
@@ -597,15 +567,9 @@ public class ContentTree extends JPanel
 		}
 	}
 
-	@Override	public void mouseEntered(MouseEvent arg0) {}
-	@Override	public void mouseExited(MouseEvent arg0) {}
-	@Override	public void mousePressed(MouseEvent arg0) {	}
-	@Override	public void mouseReleased(MouseEvent arg0) {}
-
 
 	// :::: TreeModelListener
 	@Override	public void treeNodesChanged(TreeModelEvent e) {}
-
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
 		SwingUtilities.invokeLater( new Runnable() {

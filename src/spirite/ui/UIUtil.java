@@ -28,9 +28,9 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 
 public class UIUtil {
-
-	static final Color c1 = new Color( 168,168,168);
-	static final Color c2 = new Color( 192,192,192);
+	private static final Color c1 = new Color( 168,168,168);
+	private static final Color c2 = new Color( 192,192,192);
+	/** Draws the grid background that goes behind an image to show transparency. */
 	public static void drawTransparencyBG( Graphics g, Rectangle rect) {
 		Rectangle bounds;
 		if( rect == null)
@@ -303,8 +303,6 @@ public class UIUtil {
 				valid = true;
 			}
 		}
-		
-	
 	
 		// :::: DocumentListener
 		@Override public void changedUpdate(DocumentEvent e) {}

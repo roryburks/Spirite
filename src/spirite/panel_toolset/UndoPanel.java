@@ -37,18 +37,13 @@ public class UndoPanel extends JPanel
 	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener,
 	MWorkspaceObserver
 {
-	// UndoPanel needs Master because it needs to add a WorkspaceObserver.
-	//	It's possible that it shouldn't be storing Master
-	MasterControl master;
-	
 	private static final long serialVersionUID = 1L;
-	JScrollPane container;
-	JList<UndoIndex> list;
-	DefaultListModel<UndoIndex> model;
-	UndoEngine engine = null;
+	private final JScrollPane container;
+	private final JList<UndoIndex> list;
+	private final DefaultListModel<UndoIndex> model;
+	private UndoEngine engine = null;
 	
 	public UndoPanel( MasterControl master) {
-		this.master = master;
 		this.setLayout( new GridLayout());
 		
 		// Set the list up and link it with everything
@@ -98,7 +93,7 @@ public class UndoPanel extends JPanel
 	
 	
 	// :::: Cell Rendering
-	UPRPanel renderPanel = new UPRPanel();
+	private final UPRPanel renderPanel = new UPRPanel();
 	
 	class UPRPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
@@ -215,6 +210,7 @@ public class UndoPanel extends JPanel
 	}
 
 
+	// MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		// Unlink the old Workspace's UndoEngine and link the new
@@ -229,8 +225,6 @@ public class UndoPanel extends JPanel
 			model.clear();
 		}
 	}
-
-
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {	}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {	}
 }

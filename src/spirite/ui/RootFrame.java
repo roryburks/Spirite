@@ -45,8 +45,7 @@ public class RootFrame extends javax.swing.JFrame
     private ToolsPanel toolsPanel;
     private WorkTabPane workPane;
     
-    private MasterControl master;
-
+    private final MasterControl master;
 
     public RootFrame( MasterControl master) {
         this.master =  master;
@@ -146,9 +145,7 @@ public class RootFrame extends javax.swing.JFrame
     
     // :::: Menu Actions
     
-    /***
-     * Prompts for a new image dialog and then perofms it
-     */
+    /** Prompts for a new image dialog and then performs it. */
     private void promptNewImage() {     
         NewImagePanel panel = new NewImagePanel(master);
 
@@ -164,9 +161,7 @@ public class RootFrame extends javax.swing.JFrame
         }
     }                                            
 
-    /***
-     * 
-     */
+    /**     */
     private void promptDebugColor() {  
         // TODO DEBUG
         JColorChooser jcp = new JColorChooser();
@@ -180,8 +175,8 @@ public class RootFrame extends javax.swing.JFrame
 
 
 
-    /***
-     * Performs the given hotkey command string or deligates the command to the
+    /**
+     * Performs the given hotkey command string or delegates the command to the
      * appropriate component
      */
     public void performCommand( String command) {
@@ -240,9 +235,7 @@ public class RootFrame extends javax.swing.JFrame
         }
     }
     
-    /***
-     * Performs the given hotkey command string (should be of "global." focus)
-     */
+    /** Performs the given hotkey command string (should be of "global." focus). */
     private void globalHotkeyCommand( String command) {
         if( command.equals("new_image"))
         	promptNewImage();
@@ -344,6 +337,7 @@ public class RootFrame extends javax.swing.JFrame
     }
 
     // :::: WindowFocusListener
+	@Override	public void windowLostFocus(WindowEvent arg0) {	}
 	@Override
 	public void windowGainedFocus(WindowEvent evt) {
 		// !!!! TODO : This causes issues when you move a window to a different Desktop/Workspace
@@ -355,7 +349,6 @@ public class RootFrame extends javax.swing.JFrame
 		}
 	}
 
-	@Override	public void windowLostFocus(WindowEvent arg0) {	}
 
 	// :::: ActionListener
 	@Override

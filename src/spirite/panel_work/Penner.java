@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import javax.swing.Timer;
 
 import jpen.PButton;
 import jpen.PButtonEvent;
@@ -38,26 +40,26 @@ import spirite.image_data.UndoEngine.StrokeAction;
  * @author Rory Burks
  */
 public class Penner 
-	implements PenListener, KeyEventDispatcher
+	implements PenListener, KeyEventDispatcher, ActionListener
 {
 	// Why it needs Master: it needs access to know which Toolset and Palette Colors
 	//	are being used.  !! DO NOT USE master.getCurrentWorkspace !!
-	MasterControl master;
-	WorkPanel context;
-	DrawPanel drawPanel;
-	Timer update_timer;
-	StrokeEngine strokeEngine = null;
+	private final MasterControl master;
+	private final WorkPanel context;
+	private final DrawPanel drawPanel;
+	private final Timer update_timer;
+	private StrokeEngine strokeEngine = null;
 	
-	ImageWorkspace workspace;
-	SelectionEngine selectionEngine;
-	UndoEngine undoEngine;
+	private final ImageWorkspace workspace;
+	private final SelectionEngine selectionEngine;
+	private final UndoEngine undoEngine;
 	
-	String activeTool = null;
+	private String activeTool = null;
 	
-	int x, y;
+	private int x, y;
 	
 	private enum STATE { READY, DRAWING, FORMING_SELECTION, MOVING};
-	STATE state = STATE.READY;
+	private STATE state = STATE.READY;
 	
 	public Penner( DrawPanel draw_panel) {
 		this.drawPanel = draw_panel;
@@ -71,18 +73,9 @@ public class Penner
 		//	Note: since these are utilities with a global focus that you're
 		//	giving references of Penner to, you will need to clean them up
 		//	so that Penner (and everything it touches) gets GC'd
-		update_timer = new Timer();
-		update_timer.scheduleAtFixedRate( new TimerTask() {
-			@Override
-			public void run() {
-				if( strokeEngine != null && state == STATE.DRAWING) {
-					if( strokeEngine.stepStroke()) {
-						strokeEngine.getImageData().refresh();
-					}
-				}
-			}
-			
-		}, 100, 16);
+		update_timer = new Timer(16, this);
+		update_timer.setRepeats(true);
+		update_timer.start();
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.addKeyEventDispatcher(this);
@@ -194,7 +187,9 @@ public class Penner
 				break;
 			case FORMING_SELECTION:
 				drawPanel.workspace.getSelectionEngine().finishBuildingSelection();
-//				drawPanel.workspace.getSelectionEngine().liftSelection();
+				break;
+			default:
+				break;
 			}
 			state = STATE.READY;
 		}
@@ -233,14 +228,14 @@ public class Penner
 		
 	}
 
-	boolean holdingShift = false;
-	int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
-	int shiftStartX;
-	int shiftStartY;
-	int wX;
-	int wY;
-	int oldX;
-	int oldY;
+	private boolean holdingShift = false;
+	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
+	private int shiftStartX;
+	private int shiftStartY;
+	private int wX;
+	private int wY;
+	private int oldX;
+	private int oldY;
 	@Override
 	public void penLevelEvent(PLevelEvent ple) {
 		// Note: JPen updates PenLevels (which inform of things like position and pressure)
@@ -284,7 +279,7 @@ public class Penner
 		
 		
 		
-		context.workSplicePanel.context.refreshCoordinates(x, y);
+		context.refreshCoordinates(x, y);
 		
 		// Perform state-based "on-pen/mouse move" code
 		switch( state) {
@@ -310,7 +305,6 @@ public class Penner
 		oldX = x;
 		oldY = y;
 	}
-
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}
 	@Override	public void penTock(long arg0) {}
 
@@ -330,11 +324,24 @@ public class Penner
 		return false;
 	}
 	
+	// :::: ActionListener
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		if( strokeEngine != null && state == STATE.DRAWING) {
+			if( strokeEngine.stepStroke()) {
+				strokeEngine.getImageData().refresh();
+			}
+		}
+	}
+	
 
+	/** Cleans up resources that have a global-level context in Swing to avoid
+	 * Memory Leaks. */
 	public void cleanUp() {
-		update_timer.cancel();
+		update_timer.stop();
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.removeKeyEventDispatcher(this);
 		
 	}
+
 }

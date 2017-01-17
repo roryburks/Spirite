@@ -101,7 +101,6 @@ public class NewImagePanel extends javax.swing.JPanel
         return ml;
     }
 
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
@@ -234,7 +233,7 @@ public class NewImagePanel extends javax.swing.JPanel
 
 
     // Variables declaration - do not modify                     
-    private javax.swing.JComboBox<String> colorCombo;
+    private javax.swing.JComboBox<Color> colorCombo;
     private javax.swing.JPanel colorPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -256,8 +255,8 @@ public class NewImagePanel extends javax.swing.JPanel
 }
 
 
-class ColorComboModel extends AbstractListModel
-        implements ComboBoxModel
+class ColorComboModel extends AbstractListModel<Color>
+        implements ComboBoxModel<Color>
 {
 	private static final long serialVersionUID = 1L;
 	Color[] Colors = {
@@ -279,7 +278,7 @@ class ColorComboModel extends AbstractListModel
     int selected = 0;
 
     class CCM_Renderer extends JPanel
-      implements ListCellRenderer
+      implements ListCellRenderer<Color>
     {
 		private static final long serialVersionUID = 1L;
 		JLabel jlabel;
@@ -306,7 +305,13 @@ class ColorComboModel extends AbstractListModel
         }
 
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+        		JList<? extends Color> list, 
+        		Color value, 
+        		int index, 
+        		boolean isSelected, 
+        		boolean cellHasFocus) 
+        {
             Color c = (Color)value;
 
             int ind = 0;
@@ -355,7 +360,7 @@ class ColorComboModel extends AbstractListModel
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public Color getElementAt(int index) {
         return Colors[index];
     }
 

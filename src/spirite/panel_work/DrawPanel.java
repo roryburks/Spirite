@@ -26,36 +26,35 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ReadOnlyImage;
+import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 
 /**
- * DrawPanel is the 
- *
+ * DrawPanel is the main UI component for drawing.  It captures the User's input 
+ * using the JPen library (for both Mouse and Drawing Tablet) and draws the image
+ * in the WorkArea
+ * 
+ * @author Rory Burks
  */
 public class DrawPanel extends JPanel
      implements MImageObserver, ActionListener, MSelectionEngineObserver
 {
 	private static final long serialVersionUID = 1L;
 
-	// Why it needs Master: Penner needs Master, and it also needs access
-	//	to the RenderEngine which caches drawn images
-	MasterControl master;
+	private final RenderEngine renderEngine;	
+	private final Penner penner;
+	final WorkPanel context;
+	final ImageWorkspace workspace;
+	private final Timer paint_timer;
 	
-	WorkPanel context;
-	ImageWorkspace workspace;
-	Penner penner;
+	private int metronome = 0;
 
-	Timer paint_timer;
-	
-	int metronome = 0;
-
-	public DrawPanel() {}
 	public DrawPanel(WorkPanel context) {
+		this.renderEngine = context.master.getRenderEngine();
 		this.context = context;
-		this.master = context.master;
 		this.workspace = context.workspace;
 		this.setBackground(new Color(0, 0, 0, 0));
 
@@ -66,9 +65,6 @@ public class DrawPanel extends JPanel
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();
-
-	//	this.addMouseListener(mouser);
-//		this.addMouseMotionListener(mouser);
 		
 		AwtPenToolkit.addPenListener(this, penner);
 	}
@@ -79,17 +75,15 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-
-        if( master == null) return; // Needed so the IDE doesn't freak out
+        float zoom = context.getZoom();
 
         // Draw Image
-        ImageWorkspace workspace = context.workspace;
         if( workspace != null) {
         	
         	RenderSettings settings = new RenderSettings();
         	settings.workspace = workspace;
         	
-        	BufferedImage image = master.getRenderEngine().renderImage(settings);
+        	BufferedImage image = renderEngine.renderImage(settings);
 
         	if( image != null) {
             g.drawImage( image, context.itsX(0), context.itsY(0),
@@ -98,15 +92,15 @@ public class DrawPanel extends JPanel
         	}
 
 
-            // Draw Border around the complete image
+            // Draw Border around the Workspace
             Stroke old_stroke = g2.getStroke();
             Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
             g2.setStroke(new_stroke);
             g2.setColor(Globals.getColor("drawpanel.image.border"));
             g2.drawRect( context.itsX(0)-1,
 		            context.itsY(0)-1,
-		            (int)Math.round(workspace.getWidth()*context.zoom)+1,
-		            (int)Math.round(workspace.getHeight()*context.zoom)+1);
+		            (int)Math.round(workspace.getWidth()*zoom)+1,
+		            (int)Math.round(workspace.getHeight()*zoom)+1);
             
             // Draw Border around the active Layer
             ImageData active = workspace.getActiveData();
@@ -121,8 +115,8 @@ public class DrawPanel extends JPanel
 	                g2.setColor(Globals.getColor("drawpanel.layer.border"));
 	                g2.drawRect( context.itsX(0)-1,
 	    		            context.itsY(0)-1,
-	    		            (int)Math.round(width*context.zoom)+1,
-	    		            (int)Math.round(width*context.zoom)+1);
+	    		            (int)Math.round(width*zoom)+1,
+	    		            (int)Math.round(width*zoom)+1);
 	            }
             }
 
@@ -131,7 +125,7 @@ public class DrawPanel extends JPanel
             
             
             // Draw Grid
-            if( context.zoom >= 4) {
+            if( zoom >= 4) {
                 for( int i = 0; i < workspace.getWidth(); ++i) {
                     g2.drawLine(context.itsX(i), 0, context.itsX(i), this.getHeight());
                 }
@@ -141,14 +135,14 @@ public class DrawPanel extends JPanel
             }
         }
 
-        // Draw Border around selection
+        // Draw Border around Selection
         Selection selection = workspace.getSelectionEngine().getSelection();
 
         if( selection != null) {
         	AffineTransform trans = g2.getTransform();
             Stroke old_stroke = g2.getStroke();
             Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
-            g2.scale(context.zoom, context.zoom);
+            g2.scale(zoom, zoom);
             g2.translate(context.itsX(0), context.itsY(0));
             g2.setStroke(new_stroke);
             selection.drawSelectionBounds(g);
@@ -159,6 +153,7 @@ public class DrawPanel extends JPanel
     }
 
 
+    // :::: ActionListener (for timer)
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
     	metronome = (metronome + 1) % 16;
@@ -166,24 +161,26 @@ public class DrawPanel extends JPanel
     //	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
 	}
 	
+	// :::: MImageObserver
 	@Override	public void imageChanged(ImageChangeEvent evt) {
     	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
     }
 	@Override	public void structureChanged(StructureChange evt) {	}
  
 	
+	
+	// :::: MSelectionEngineObserver
+	@Override	public void selectionBuilt(SelectionEvent evt) {}
+	@Override
+	public void buildingSelection(SelectionEvent evt) {
+    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
+	}
+	
+
+	/** Removes Global references (Swing-Global and JNI-Global) to avoid leaks */
 	void cleanUp() {
 		AwtPenToolkit.removePenListener(this, penner);
 		paint_timer.stop();
 		penner.cleanUp();
-	}
-	@Override
-	public void selectionBuilt(SelectionEvent evt) {
-		
-	}
-	@Override
-	public void buildingSelection(SelectionEvent evt) {
-    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
-		
 	}
 }

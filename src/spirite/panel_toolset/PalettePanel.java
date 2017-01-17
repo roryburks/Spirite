@@ -5,6 +5,7 @@ package spirite.panel_toolset;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -22,27 +23,22 @@ public class PalettePanel extends JPanel
         implements MouseListener, MPaletteObserver
 {
 	// PalettePanel only needs access to PaletteManager
-    MasterControl master;
-    PaletteManager paletteManager;
+    private final PaletteManager paletteManager;
     
 	private static final long serialVersionUID = 1L;
-	final static int BIG_SIZE = 20;
-    final static int SMALL_SIZE = 12;
+	private final static int BIG_SIZE = 20;
+    private final static int SMALL_SIZE = 12;
 
-    ColorPicker main, sub;
-    JScrollPane container;
-    Palette palette;
+    private ColorPicker main, sub;
+    private JScrollPane container;
+    private PaletteSubpanel palette;
 
-    public PalettePanel(){}
     public PalettePanel( MasterControl master) {
-        this.master = master;
         paletteManager = master.getPaletteManager();
 
         initComponents();
 
         paletteManager.addPaletteObserver(this);
-
-  //      this.add( new JButton());
     }
 
     // Set up the GUI
@@ -56,7 +52,7 @@ public class PalettePanel extends JPanel
         sub = new ColorPicker( 1);
         sub.addMouseListener(this);
 
-        palette = new Palette();
+        palette = new PaletteSubpanel();
         palette.addMouseListener(this);
 
         container = new JScrollPane(palette, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -137,31 +133,29 @@ public class PalettePanel extends JPanel
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
 
-
+    /** Panels for the Foreground and Background colors */
     class ColorPicker extends JPanel {
 		private static final long serialVersionUID = 1L;
-		int index;
+		private final int index;
 
         ColorPicker( int index) {
             this.index = index;
             this.setBorder( new EtchedBorder(EtchedBorder.LOWERED));
             this.setPreferredSize( new Dimension( 24,24));
             this.setBackground( paletteManager.getActiveColor(index));
-
         }
     }
 
-    class Palette extends JPanel {
+    /** Panel that draws and handles all other Palette colors. */
+    class PaletteSubpanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 
-		public Palette() {
+		public PaletteSubpanel() {
             this.setOpaque(false);
         }
 
         public void repaintIndex( int index) {
-            // Could be replaced with a smaller repaint area corresponding
-            //  only to the index redrawn
-            this.repaint();
+            this.repaint( getBoundsOfIndex(index));
         }
 
         public int getIndexAt( int x, int y) {
@@ -169,6 +163,17 @@ public class PalettePanel extends JPanel
 
             if( x > SMALL_SIZE * w) return -1;
             return x/SMALL_SIZE + (y/SMALL_SIZE)*w;
+        }
+        
+        public Rectangle getBoundsOfIndex( int i) {
+        	if( i < 0 || i > paletteManager.getPaletteColorCount())
+        		return null;
+        	
+        	int w = Math.max(1, this.getWidth() / SMALL_SIZE);
+        	int x = SMALL_SIZE * (i % w);
+        	int y = SMALL_SIZE * (i / w);
+        	
+        	return new Rectangle( x, y, SMALL_SIZE, SMALL_SIZE);
         }
 
         @Override

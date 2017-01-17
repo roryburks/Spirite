@@ -37,17 +37,15 @@ public class AnimationSchemeTreePanel extends ContentTree
 {
 	private static final long serialVersionUID = 1L;
 
-	ImageWorkspace workspace = null;
-	AnimationManager manager = null;
+	private ImageWorkspace workspace = null;
+	private AnimationManager manager = null;
 	
 	
 	/**
 	 * Create the panel.
 	 */
 	public AnimationSchemeTreePanel( MasterControl master) {
-		
 		tree.setCellRenderer(this);
-		
 		
 		workspace = master.getCurrentWorkspace();
 		if( workspace != null) {
@@ -116,7 +114,6 @@ public class AnimationSchemeTreePanel extends ContentTree
 		LayerNode layer;
 	}
 
-	JLabel label = new JLabel();
 	
 	class ASTNPanel extends JPanel {
 		JPanel imgPanel;
@@ -165,7 +162,9 @@ public class AnimationSchemeTreePanel extends ContentTree
 		}
 	}
 	
-	ASTNPanel renderPanel = new ASTNPanel();
+	// Back-up component for nodes that don't have anything more specific
+	private final JLabel label = new JLabel();	
+	private final ASTNPanel renderPanel = new ASTNPanel();
 	@Override
 	public Component getTreeCellRendererComponent(
 			JTree tree, 
@@ -202,7 +201,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	
 	// :::: ContentTree
-	Color pseudoselectColor = new Color( 190,160,140,120);
+	private final Color pseudoselectColor = new Color( 190,160,140,120);
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void paintCCPanel(Graphics g, int width, int height, boolean drawBG) {
