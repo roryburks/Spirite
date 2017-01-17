@@ -506,7 +506,8 @@ public class UndoEngine {
 			for( int i = pointer - met; i <= pointer; ++i) {
 				actions.get(i).performImageAction(image);
 			}
-			
+
+			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.dataChanged.add(this.image);
@@ -529,7 +530,8 @@ public class UndoEngine {
 				actions.get(i).performAction();
 				actions.get(i).performImageAction(image);
 			}
-			
+
+			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.dataChanged.add(this.image);

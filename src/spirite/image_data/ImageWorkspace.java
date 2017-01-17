@@ -239,10 +239,10 @@ public class ImageWorkspace {
 		if( !verifyImage(image))
 			return;
 
+		// Construct ImageChangeEvent and send it
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.dataChanged.add(image);
 		evt.workspace = this;
-		
 		triggerImageRefresh( evt);
 	}
 	
@@ -418,6 +418,7 @@ public class ImageWorkspace {
 		boolean imageChange = true;
 		public abstract void execute();
 		public abstract void unexecute();
+		public List<Node> getChangedNodes() { return new LinkedList<>();}
 		
 		// Called when history has been re-written and so the action never
 		//	was performed, and thus 
@@ -427,6 +428,8 @@ public class ImageWorkspace {
 			if( imageChange) {
 				ImageChangeEvent evt = new ImageChangeEvent();
 				evt.workspace = ImageWorkspace.this;
+				evt.nodesChanged.addAll(getChangedNodes());
+				evt.isStructureChange = true;
 				triggerImageRefresh( evt);
 			}
 		}
@@ -435,7 +438,7 @@ public class ImageWorkspace {
 	/** A StackableStructureChange corresponds to a StackableAction (see 
 	 * UndoEngine.StackableAction), meaning that performing the action over
 	 * and over on the same node should consolidate into a single action. */
-	public abstract class StackableStructureChange extends StructureChange {
+	public interface StackableStructureChange {
 		public abstract void stackNewChange( StructureChange newChange);
 		public abstract boolean canStack( StructureChange newChange);
 	}
@@ -468,6 +471,12 @@ public class ImageWorkspace {
 			if( selected == node)
 				selected = null;
 		}
+		@Override
+		public List<Node> getChangedNodes() {
+			List<Node> list = new LinkedList<Node>();
+			list.add(parent);
+			return list;
+		}
 	}
 	
 	/** Removing a Node from the tree */
@@ -495,6 +504,12 @@ public class ImageWorkspace {
 		@Override
 		public void unexecute() {
 			parent._add(node, nodeBefore);
+		}
+		@Override
+		public List<Node> getChangedNodes() {
+			List<Node> list = new LinkedList<Node>();
+			list.add(parent);
+			return list;
 		}
 	}
 	
@@ -533,7 +548,14 @@ public class ImageWorkspace {
 			moveNode._del();
 			oldParent._add(moveNode, oldNext);
 		}
-		
+
+		@Override
+		public List<Node> getChangedNodes() {
+			List<Node> list = new LinkedList<Node>();
+			list.add(oldParent);
+			list.add(newParent);
+			return list;
+		}
 	}
 	
 	/** Renaming the node */
@@ -563,13 +585,23 @@ public class ImageWorkspace {
 		}
 	}
 	
-	/** Changing the node's visibility */
-	public class VisibilityChange extends StructureChange {
-		public final boolean visibleAfter;
+	public abstract class NodeAtributeChange extends StructureChange {
 		public final Node node;
+		NodeAtributeChange( Node node) {this.node = node;}
+		@Override
+		public List<Node> getChangedNodes() {
+			List<Node> list = new LinkedList<Node>();
+			list.add(node);
+			return list;
+		}
+	}
+	
+	/** Changing the node's visibility */
+	public class VisibilityChange extends NodeAtributeChange {
+		public final boolean visibleAfter;
 		
 		VisibilityChange( Node node, boolean visible) {
-			this.node = node;
+			super(node);
 			this.visibleAfter = visible;
 			
 			this.description = "Visibility Changed";
@@ -587,14 +619,14 @@ public class ImageWorkspace {
 	}
 	
 	/** Changing the node's Opacity */
-	public class OpacityChange extends StackableStructureChange
+	public class OpacityChange extends NodeAtributeChange
+		implements StackableStructureChange
 	{
 		float opacityBefore;
 		float opacityAfter;
-		public final Node node;
 		
 		OpacityChange( Node node, float opacity) {
-			this.node = node;
+			super(node);
 			this.opacityBefore = node.alpha;
 			this.opacityAfter = opacity;
 			
@@ -686,8 +718,7 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Observers
-	/**
-	 * ImageObserver - triggers when an image's data has been changed
+	/** ImageObserver - triggers when an image's data has been changed
 	 *  (<code>imageChanged</code>) or when the image's logical structure
 	 *  has changed (<code>structureChanged</code>)
 	 */

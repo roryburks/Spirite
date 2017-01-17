@@ -42,6 +42,7 @@ public class ImageData {
 	}
 	
 	public void refresh() {
+		// Construct ImageChangeEvent and send it
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.workspace = context;
 		evt.dataChanged.add(this);

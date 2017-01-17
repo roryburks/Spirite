@@ -71,7 +71,8 @@ public class SelectionEngine {
 	public void setOffset( int x, int y) {
 		offsetX = x;
 		offsetY = y;
-		
+
+		// Construct ImageChangeEvent and send it
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.workspace = workspace;
 		evt.selectionLayerChange = true;

@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import spirite.MDebug;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -35,6 +37,8 @@ import spirite.image_data.SelectionEngine.Selection;
  * in the future.  For now all it does is take the drawQueue and
  * draw it, but in the future it might buffer recently-rendered
  * iterations of images, control various rendering paramaters, etc.
+ * 
+ * TODO: Re-add Selection Layer drawing
  */
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver
@@ -106,9 +110,6 @@ public class RenderEngine
 	 * properly.
 	 */
 	private BufferedImage propperRender(RenderSettings settings) {
-		GroupNode root = (settings.node == null)?settings.workspace.getRootNode():settings.node;
-		
-		
 		// Step 1: Determine amount of data needed
 		int n = _getNeededImagers( settings);
 		
@@ -121,7 +122,7 @@ public class RenderEngine
 		
 		
 		// Step 2: Recursively draw the image
-		_propperRec( root,0, settings, images);
+		_propperRec( settings.node, 0, settings, images);
 		
 		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
@@ -135,8 +136,7 @@ public class RenderEngine
 	 * the given RenderSettings.  This number is equal to largest Group
 	 * depth of any node. */
 	private int _getNeededImagers(RenderSettings settings) {
-		Node root = (settings.node == null)?settings.workspace.getRootNode():settings.node;
-		int n = root.getDepth();
+		int n = settings.node.getDepth();
 		NodeValidator validator = new NodeValidator() {			
 			@Override
 			public boolean isValid(Node node) {
@@ -150,7 +150,7 @@ public class RenderEngine
 			}
 		};
 		
-		List<Node> list = root.getAllNodesST(validator);
+		List<Node> list = settings.node.getAllNodesST(validator);
 
 		int max = 0;
 		for( Node node : list) {
@@ -276,9 +276,11 @@ public class RenderEngine
 				if( height == -1) height = image.readImage().image.getHeight();
 			}
 			else {
+				if( node == null) node = workspace.getRootNode();
 				if( width == -1) width = workspace.getWidth();
 				if( height == -1) height = workspace.getHeight();
 			}
+			
 		}
 		
 		public List<ImageData> getImagesReliedOn() {
@@ -288,9 +290,39 @@ public class RenderEngine
 				return list;
 			}
 			else {
-				// TODO: Add other cases
-				return workspace.imageData;
+				// Get a list of all layer nodes then get a list of all ImageData
+				//	contained within those nodes
+				List<Node> layerNodes = node.getAllNodesST( new NodeValidator() {
+					@Override
+					public boolean isValid(Node node) {
+						return (node instanceof LayerNode);
+					}
+					@Override public boolean checkChildren(Node node) {return true;}
+				});
+				
+				List<ImageData> list = new LinkedList<>();
+				
+				Iterator<Node> it = layerNodes.iterator();
+				while( it.hasNext()){
+					LayerNode layer = (LayerNode)it.next();
+					
+					// Avoiding duplicates should make the intersection method quicker
+					if( list.indexOf(layer.data) == -1)
+						list.add(layer.data);
+				}
+				
+				return list;
 			}
+		}
+		
+
+		public List<Node> getNodesReliedOn() {
+			List<Node> list =  new LinkedList<>();
+			if( image == null) {
+				if( node == null) {return list;}
+				list.addAll( node.getAllNodes());
+			}
+			return list;
 		}
 		
 		// !!!! Eclipse Auto-generated.  Should work as expected
@@ -346,6 +378,7 @@ public class RenderEngine
 			return true;
 		}
 
+
 	}
 
 	// :::: MImageObserver
@@ -367,12 +400,16 @@ public class RenderEngine
 				if( setting.image != null && evt.isStructureChange())
 					continue;
 				
+				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
-				List<ImageData> intersection = new LinkedList<ImageData>(evt.dataChanged);
-				intersection.retainAll(setting.getImagesReliedOn());
+				List<ImageData> dataInCommon = new LinkedList<ImageData>(evt.dataChanged);
+				dataInCommon.retainAll(setting.getImagesReliedOn());
 				
-				if( !intersection.isEmpty()) {
+				List<Node> nodesInCommon = new LinkedList<Node>(evt.nodesChanged);
+				nodesInCommon.retainAll(setting.getNodesReliedOn());
+				
+				if( !dataInCommon.isEmpty() || !nodesInCommon.isEmpty()) {
 					
 					// Flush the visual data from memory, then remove the entry
 					entry.getValue().flush();
