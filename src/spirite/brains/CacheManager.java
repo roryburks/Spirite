@@ -3,6 +3,7 @@ package spirite.brains;
 import java.awt.image.BufferedImage;
 
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 
 /***
@@ -63,6 +64,19 @@ public class CacheManager {
 		}
 		cacheSize += 4 * width * height;
 		
+		
+		return c;
+	}
+	
+	/** Put an existing image into the Cache. */
+	public CachedImage cacheImage( BufferedImage image) {
+		if( image == null) {
+			image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+			MUtil.clearImage(image);
+		}
+		CachedImage c = new CachedImage();
+		c.data = image;
+		cacheSize += (image.getWidth() * image.getHeight() * image.getColorModel().getPixelSize()) / 8;
 		
 		return c;
 	}

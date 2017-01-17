@@ -10,15 +10,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import spirite.MDebug.ErrorType;
+import spirite.MDebug;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
+import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
@@ -83,8 +89,9 @@ public class RenderEngine
 				g2.drawImage(imageImage, 0, 0, settings.width, settings.height, null);
 				g.dispose();
 			}
-			else
-				cachedImage = drawQueue(settings);
+			else {
+				cachedImage = cacheManager.cacheImage(propperRender(settings));
+			}
 
 			
 			imageCache.put(settings, cachedImage);
@@ -93,59 +100,124 @@ public class RenderEngine
 		return cachedImage.access();
 	}
 	
-	// TODO: this is not only very debug, but the whole concept of a drawing
-	//	queue is faulty since it does not allow Group settings such as Opacity
-	//	to be properly implemented.
-	private CachedImage drawQueue( RenderSettings settings) {
-		ImageWorkspace workspace = settings.workspace;
-		SelectionEngine selectionEngine = workspace.getSelectionEngine();
-		Selection selection = null;
-		ImageData lifteContext = null;
+	/** 
+	 * This method will draw the group as it's "intended" to be seen,
+	 * requiring extra intermediate image data to combine the layers
+	 * properly.
+	 */
+	private BufferedImage propperRender(RenderSettings settings) {
+		GroupNode root = (settings.node == null)?settings.workspace.getRootNode():settings.node;
 		
-		if( settings.drawSelection && selectionEngine.isLifted()) {
-			selection = selectionEngine.getSelection();
-			lifteContext = selection.getLiftedContext();
+		
+		// Step 1: Determine amount of data needed
+		int n = _getNeededImagers( settings);
+		
+		if( n <= 0) return null;
+		
+		BufferedImage images[] = new BufferedImage[n];
+		for( int i=0; i<n; ++i) {
+			images[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
 		}
 		
-		int width = settings.width;
-		int height= settings.height;
 		
-		CachedImage cachedImage = cacheManager.createImage(width, height);
+		_propperRec( root,0, settings, images);
 		
-		BufferedImage image = cachedImage.access();
-		Graphics g = image.getGraphics();
+		for( int i=1; i<n;++i)
+			images[i].flush();
+		
+		
+		return images[0];
+	}
+	
+	/** Determines the number of images needed to properly render 
+	 * the given RenderSettings.  This number is equal to largest Group
+	 * depth of any node. */
+	private int _getNeededImagers(RenderSettings settings) {
+		Node root = (settings.node == null)?settings.workspace.getRootNode():settings.node;
+		int n = root.getDepth();
+		NodeValidator validator = new NodeValidator() {			
+			@Override
+			public boolean isValid(Node node) {
+				return (node.isVisible() && !(node instanceof GroupNode)
+						&& node.getChildren().size() == 0);
+			}
+
+			@Override
+			public boolean checkChildren(Node node) {
+				return (node.isVisible() && node.getAlpha() > 0);
+			}
+		};
+		
+		List<Node> list = root.getAllNodesST(validator);
+
+		int max = 0;
+		for( Node node : list) {
+			int i = node.getDepth()-n;
+			if( i > max) max = i;
+		}
+		
+		return max;
+	}
+	
+	private void _propperRec(GroupNode node, int n, RenderSettings settings, BufferedImage[] buffer) {
+		if( n < 0 || n >= buffer.length) {
+			MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
+			return;
+		}
+		
+		Graphics g = buffer[n].getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
-
-
-		List<LayerNode> drawing_queue = workspace.getDrawingQueue();
+		if( settings.hints != null)
+			g2.setRenderingHints(settings.hints);
 		
-		// Go through each layer and draw it according to the settings
-		for( LayerNode layer : drawing_queue) {
-			ImageData layerData = layer.getImageData();
-			
-			if( layerData != null) {
-				Composite cc = g2.getComposite();
-				
-				if( layer.alpha != 1.0f) 
-					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, layer.alpha));
-
-				g.drawImage(layer.getImageData().readImage().image, 0, 0, null);
-				
-				if( lifteContext == layerData) {
-					g.drawImage( 
-							selection.getLiftedData(), 
-							selectionEngine.getOffsetX(), 
-							selectionEngine.getOffsetY(),
-							width,
-							height,
+		// Go through the node's children (in reverse), drawing any visible group
+		//	found recursively and drawing any Layer found plainly.
+		ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
+		while( it.hasPrevious()) {
+			Node child = it.previous();
+			if( child.isVisible()) {
+				if( child instanceof LayerNode) {
+					LayerNode layer = (LayerNode)child;
+					
+					_setGraphicsSettings(g, node, settings);
+					g2.drawImage( layer.data.readImage().image,
+							0, 0, 
+							settings.width, settings.height, 
 							null);
+					_resetRenderSettings(g, node, settings);
 				}
-				
-				g2.setComposite(cc);
+				else if( child instanceof GroupNode && !child.getChildren().isEmpty()) {
+					if( n == buffer.length+1) {
+						MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
+						continue;
+					}
+					
+
+					_propperRec((GroupNode)child, n+1, settings, buffer);
+
+					_setGraphicsSettings(g, node,settings);
+					g2.drawImage( buffer[n+1],
+							0, 0, 
+							settings.width, settings.height, 
+							null);
+					_resetRenderSettings(g, node, settings);
+				}
 			}
 		}
+		g.dispose();
+	}
+	
+	
+	private Composite cc;
+	private void _setGraphicsSettings( Graphics g, Node node, RenderSettings settings) {
+		final Graphics2D g2 = (Graphics2D)g;
+		 cc = g2.getComposite();
 		
-		return cachedImage;
+		if( node.alpha != 1.0f) 
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.alpha));
+	}
+	private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
+		((Graphics2D)g).setComposite(cc);
 	}
 	
 	/** Checks if the given settings have a cached version. */
@@ -177,7 +249,7 @@ public class RenderEngine
 		public int width = -1;
 		public int height = -1;
 
-		public GroupTree.Node node = null;	// If null uses the root node
+		public GroupNode node = null;	// If null uses the root node
 		
 		/** Converts all ambiguous settings into an explicit form
 		 * so that automatic hashCode and equals methods will work

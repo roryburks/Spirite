@@ -32,6 +32,7 @@ public class GroupTree {
 		return root;
 	}
 	
+	
 	/** Tests to see if nodeP is a parent of nodeC. */
 	boolean _isChild( Node nodeP, Node nodeC) {
 		Node n = nodeC;
@@ -44,38 +45,14 @@ public class GroupTree {
 		return false;
 	}
 	
+	
 
-	/** Creates a depth-first sequential list of all the LayerNodes in the tree. */
-	public List<LayerNode> getAllLayerNodes() {
-		List<LayerNode> list = new ArrayList<>();
-		_galn_rec( root, list);
-		return list;
-	}
-	private void _galn_rec( GroupNode parent, List<LayerNode>list) {
-		for( Node child : parent.getChildren()) {
-			if( child instanceof LayerNode) {
-				list.add((LayerNode) child);
-			}
-			else if( child instanceof GroupNode){
-				_galn_rec( (GroupNode) child, list);
-			}
-		}
+	public interface NodeValidator {
+		boolean isValid(Node node);
+		boolean checkChildren(Node node);	// Note, root is always checkable
 	}
 
-	/** Creates a depth-first sequential list of all the Nodes in the tree. */
-	public List<Node> getAllNodes() {
-		List<Node> list = new ArrayList<>();
-		_gan_rec( root, list);
-		return list;
-	}
-	private void _gan_rec( GroupNode parent, List<Node>list) {
-		for( Node child : parent.getChildren()) {
-			list.add( child);
-			if( child instanceof GroupNode){
-				_gan_rec( (GroupNode) child, list);
-			}
-		}
-	}
+	
 	
 	// ::: Nodes
 	public abstract class Node  {
@@ -83,6 +60,31 @@ public class GroupTree {
 		protected boolean visible = true;
 		protected boolean expanded = true;
 		protected String name = "";
+
+		// :::: Get/Set
+		public boolean isVisible() {
+			return (visible && alpha > 0);
+		}
+		void setVisible( boolean visible) {
+			if( this.visible != visible) 
+				this.visible = visible;
+		}
+		public float getAlpha() {
+			return alpha;
+		}
+		public boolean isExpanded() {
+			return expanded;
+		}
+		public void setExpanded( boolean expanded) {
+			this.expanded = expanded;
+		}
+		public String getName() {
+			return name;
+		}
+		void setName(String name) {
+			if( !this.name.equals(name)) 
+				this.name = name;
+		}
 
 		
 		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
@@ -97,6 +99,56 @@ public class GroupTree {
 		@SuppressWarnings("unchecked")
 		public List<Node> getChildren() {
 			return (ArrayList<Node>)children.clone();
+		}
+
+		/** Gets the depth of the node.  Child of root = 1.
+		 * if the node is disjointed (isn't an ancestor of the root), returns -1.
+		 */
+		public int getDepth() {
+			Node n = this;
+			int i = 0;
+			while( n != root) {
+				++i;
+				if( n == null) return -1;
+				n = n.parent;
+			}
+			return i;
+		}
+		
+		/** Gets all children such that they pass the validator test, including
+		 * subchildren if their parent pass the checkChildren test.
+		 * 
+		 * List is composed depth-first.
+		 */
+		public List<Node> getAllNodesST(NodeValidator validator) {
+			List<Node> list = new ArrayList<>();
+			_ganst( this, validator, list);
+			return list;
+		}
+		private void _ganst( Node parent, NodeValidator validator, List<Node> list) {
+			for( Node child :parent.getChildren()) {
+				if( validator.isValid(child))
+					list.add(child);
+				
+				if( validator.checkChildren(child)) 
+					_ganst( child, validator, list);
+			}
+		}
+		
+		/** Creates a depth-first sequential list of all the Nodes in the tree. */
+		public List<Node> getAllNodes() {
+			// Could be implemented using getAllNodesST, but this is probably faster
+			List<Node> list = new ArrayList<>();
+			_gan_rec( root, list);
+			return list;
+		}
+		private void _gan_rec( GroupNode parent, List<Node>list) {
+			for( Node child : parent.getChildren()) {
+				list.add( child);
+				if( child instanceof GroupNode){
+					_gan_rec( (GroupNode) child, list);
+				}
+			}
 		}
 		
 		/***
@@ -119,33 +171,6 @@ public class GroupTree {
 			return children.get(i+1);
 		}
 		
-		// :::: Get/Set
-		public boolean isVisible() {
-			return visible;
-		}
-		void setVisible( boolean visible) {
-			if( this.visible != visible) {
-				this.visible = visible;
-			}
-			
-		}
-		public float getAlpha() {
-			return alpha;
-		}
-		public boolean isExpanded() {
-			return expanded;
-		}
-		public void setExpanded( boolean expanded) {
-			this.expanded = expanded;
-		}
-		public String getName() {
-			return name;
-		}
-		void setName(String name) {
-			if( !this.name.equals(name)) {
-				this.name = name;
-			}
-		}
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
 		//	has direct access to add/remove commands.

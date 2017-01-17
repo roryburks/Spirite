@@ -452,12 +452,9 @@ public class LayerTreePanel extends ContentTree
 					str += " " + ((GroupTree.LayerNode)obj).getImageData().getID();
 				renderPanel.label.setText( str);
 			}
-			
-			if( obj instanceof GroupTree.LayerNode) {
-				renderPanel.ppanel.image = ((GroupTree.LayerNode)obj).getImageData();
-			}
-			else
-				renderPanel.ppanel.image = null;
+
+			if( obj instanceof GroupTree.Node) 
+				renderPanel.ppanel.node = (GroupTree.Node)obj;
 		
 			return renderPanel;
 		}
@@ -495,11 +492,8 @@ public class LayerTreePanel extends ContentTree
 				renderPanel.label.setText( editingNode.getName());
 			}
 
-			if( obj instanceof GroupTree.LayerNode) {
-				renderPanel.ppanel.image = ((GroupTree.LayerNode)obj).getImageData();
-			}
-			else
-				renderPanel.ppanel.image = null;
+			if( obj instanceof GroupTree.Node) 
+				renderPanel.ppanel.node = (GroupTree.Node)obj;
 		
 			return renderPanel;
 		}
@@ -554,18 +548,23 @@ public class LayerTreePanel extends ContentTree
 		static final int N = 8;
 		/** The Panel that has the Image Thumbnail in it. */
 		class LTNPPanel extends JPanel {
-			public ImageData image = null;
+//			public ImageData image = null;
+			GroupTree.Node node = null;
 			
 			@Override
 			public void paintComponent(Graphics g) {
 				UIUtil.drawTransparencyBG(g, null);
 				
-				if( image != null) {
+				if( node != null) {
 					RenderSettings settings = new RenderSettings();
 					settings.workspace = workspace;
 					settings.width = getWidth();
 					settings.height = getHeight();
-					settings.image = image;
+					
+					if( node instanceof LayerNode)
+						settings.image = ((LayerNode)node).getImageData();
+					else if( node instanceof GroupNode)
+						settings.node = (GroupNode)node;
 
 					RenderingHints newHints = new RenderingHints(
 				             RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -577,6 +576,7 @@ public class LayerTreePanel extends ContentTree
 					
 					settings.hints = newHints;
 					
+
 					g.drawImage(renderEngine.renderImage(settings), 0, 0, null);
 				}
 			}

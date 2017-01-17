@@ -16,6 +16,7 @@ import spirite.brains.CacheManager;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.GroupTree.NodeValidator;
 
 
 /***
@@ -73,9 +74,16 @@ public class ImageWorkspace {
 		
 		// Go through each Layer in the groupTree and flag the imageData
 		//	it uses as being used.
-		List< LayerNode> layers = groupTree.getAllLayerNodes();
-		for( LayerNode node : layers) {
-			ImageData data = node.getImageData();
+		List<Node> layers = groupTree.getRoot().getAllNodesST( new NodeValidator() {
+			@Override
+			public boolean isValid(Node node) {
+				return (node instanceof LayerNode);
+			}
+			@Override
+			public boolean checkChildren(Node node) {return true;}
+		});
+		for( Node node : layers) {
+			ImageData data = ((LayerNode)node).getImageData();
 			int i = imageData.indexOf(data);
 			
 			if( i == -1) {
@@ -167,6 +175,9 @@ public class ImageWorkspace {
 	
 	public GroupTree.GroupNode getRootNode() {
 		return groupTree.getRoot();
+	}
+	public GroupTree getGroupTree() {
+		return groupTree;
 	}
 	
 	public List<ImageData> getImageData() {
@@ -669,32 +680,9 @@ public class ImageWorkspace {
 	 * Verifies that the given node exists within the current workspace
 	 */
 	public boolean nodeInWorkspace( GroupTree.Node node) {
-		List<Node> nodes = groupTree.getAllNodes();
+		List<Node> nodes = groupTree.getRoot().getAllNodes();
 		
 		return nodes.contains(node);
-	}
-	
-
-	/** Creates a queue of images for drawing purposes. */
-	public List<LayerNode> getDrawingQueue() {
-		List<LayerNode> queue = new LinkedList<LayerNode>();
-		
-		_gdq_rec( groupTree.getRoot(), queue);
-		
-		return queue;
-	}
-	private void _gdq_rec( GroupTree.Node node, List<LayerNode>queue) {
-		for( GroupTree.Node child : node.getChildren()) {
-			if( child.isVisible()) {
-				if( child instanceof GroupTree.LayerNode) {
-					// !!!! Very Debug [TODO]
-					queue.add(0,((GroupTree.LayerNode)child));
-				}
-				else {
-					_gdq_rec( child, queue);
-				}
-			}
-		}
 	}
 	
 	// :::: Observers

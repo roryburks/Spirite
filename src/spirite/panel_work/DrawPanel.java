@@ -19,7 +19,6 @@ import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
-import spirite.brains.MasterControl;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
