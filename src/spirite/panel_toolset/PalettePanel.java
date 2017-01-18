@@ -178,6 +178,7 @@ public class PalettePanel extends JPanel
 
         @Override
         public void paintComponent( Graphics g) {
+        	super.paintComponent(g);
             Color selected1 = paletteManager.getActiveColor(0);
             Color selected2 = paletteManager.getActiveColor(1);
 

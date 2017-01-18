@@ -180,11 +180,12 @@ public class RenderEngine
 			if( child.isVisible()) {
 				if( child instanceof LayerNode) {
 					LayerNode layer = (LayerNode)child;
+					BufferedImage img = layer.data.readImage().image;
 					
 					_setGraphicsSettings(g, child, settings);
-					g2.drawImage( layer.data.readImage().image,
+					g2.drawImage( img,
 							child.x, child.y, 
-							settings.width, settings.height, 
+							img.getWidth(), img.getHeight(), 
 							null);
 					_resetRenderSettings(g, child, settings);
 				}
@@ -199,7 +200,7 @@ public class RenderEngine
 
 					_setGraphicsSettings(g, child,settings);
 					g2.drawImage( buffer[n+1],
-							child.x, child.y, 
+							0, 0, 
 							settings.width, settings.height, 
 							null);
 					_resetRenderSettings(g, child, settings);

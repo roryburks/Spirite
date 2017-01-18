@@ -229,7 +229,8 @@ public class WorkPanel extends javax.swing.JPanel
         zoomPanel = new JPanel() {
         	@Override
         	protected void paintComponent(Graphics g) {
-        	// :: Draws the zoom level in the bottom right corner
+        		super.paintComponent(g);
+        		// :: Draws the zoom level in the bottom right corner
                 if(zoom_level >= 0) {
                     g.setFont( new Font("Tahoma", Font.PLAIN, 12));
                     g.drawString(Integer.toString(zoom_level+1), this.getWidth() - ((zoom_level > 8) ? 16 : 12), this.getHeight()-5);
@@ -242,7 +243,6 @@ public class WorkPanel extends javax.swing.JPanel
                 }
         	}
         };
-        zoomPanel.setBackground( Color.RED);
 
         jscrollHorizontal.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
 

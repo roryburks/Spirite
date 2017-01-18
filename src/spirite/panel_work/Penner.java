@@ -133,11 +133,12 @@ public class Penner
 
 				// Grab the Active Data
 				ImageData data = workspace.getActiveData();
+				GroupTree.Node node = workspace.getSelectedNode();
 				
-				if( data != null) {
+				if( data != null && node != null) {
 					// Perform the fill Action, only store the UndoAction if 
 					//	an actual change is made.
-					Point p = new Point(x, y);
+					Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
 					if( drawEngine.fill( p.x, p.y, c, data)) {
 						undoEngine.storeAction( undoEngine.new FillAction(p, c) , data);
 					}
@@ -209,10 +210,11 @@ public class Penner
 	private void startStroke( StrokeParams stroke) {
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageData data = workspace.getActiveData();
+			GroupTree.Node node = workspace.getSelectedNode();
 
 			strokeEngine = drawEngine.createStrokeEngine( data);
 			
-			if( strokeEngine.startStroke( stroke, x, y)) {
+			if( strokeEngine.startStroke( stroke, x - node.getOffsetX() , y - node.getOffsetY())) {
 				data.refresh();
 			}
 			state = STATE.DRAWING;
@@ -289,12 +291,13 @@ public class Penner
 		
 		
 		context.refreshCoordinates(x, y);
+		GroupTree.Node node= workspace.getSelectedNode();// !!!! Maybe better to store which node you're moving locally
 		
 		// Perform state-based "on-pen/mouse move" code
 		switch( state) {
 		case DRAWING:
-			if( strokeEngine != null) {
-				strokeEngine.updateStroke(x, y);
+			if( strokeEngine != null && node != null) {
+				strokeEngine.updateStroke(x - node.getOffsetX(), y - node.getOffsetY());
 			}
 			break;
 		case FORMING_SELECTION:
@@ -307,7 +310,6 @@ public class Penner
 						selectionEngine.getOffsetY() + (y - oldY));
 			break;
 		case MOVING_NODE:
-			GroupTree.Node node = workspace.getSelectedNode();	// !!!! Maybe better to store which node you're moving locally
 			if( node != null && (oldX != x || oldY != y))
 				node.setOffsetX( node.getOffsetX() + (x - oldX), 
 								 node.getOffsetY() + (y - oldY));

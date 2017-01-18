@@ -572,6 +572,7 @@ public class LayerTreePanel extends ContentTree
 			
 			@Override
 			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
 				UIUtil.drawTransparencyBG(g, null);
 				
 				if( node != null) {

@@ -8,6 +8,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +24,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+
+import org.w3c.dom.css.Rect;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -222,11 +225,17 @@ public class ToolsPanel extends JPanel
 
         @Override
         public void paintComponent( Graphics g) {
+        	// I'm not sure if this is the best way to go about calling super.paintComponent
+        	//	without it actually drawing anything.
+        	Rectangle r = g.getClipBounds();
+        	g.setClip(0, 0, 0, 0);
+        	super.paintComponent(g);
+        	g.setClip(r.x, r.y, r.width, r.height);
+        	
             int w = this.getWidth();
             int h = this.getHeight();
             int ew = w - BUTTON_WIDTH;
 
-//            super.paintComponent(g);
 
             if( isSelected()) {
                 g.setColor( Globals.getColor("toolbutton.selected.background"));
