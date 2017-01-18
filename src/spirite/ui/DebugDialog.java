@@ -5,13 +5,19 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import spirite.brains.CacheManager.CacheContext;
+import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
+import spirite.image_data.RenderEngine;
+import spirite.image_data.UndoEngine;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -74,8 +80,19 @@ public class DebugDialog extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-
 		DecimalFormat df = new DecimalFormat("#.##");
-		textPane.setText("Cache Size:"+ df.format(master.getCacheManager().getCacheSize()/(1024.0*1024.0))+"MB");
+
+		String str = "Cache Size:"+ df.format(master.getCacheManager().getCacheSize()/(1024.0*1024.0))+"MB\n";
+		
+		Map< Object, CacheContext> map = master.getCacheManager()._debugGetMap();
+		
+		for( Map.Entry< Object, CacheContext> set : map.entrySet()) {
+			
+			str += set.getKey().toString() + " :: ";
+			
+			str += df.format(set.getValue().getSize() /(1024.0*1024.0)) + "MB\n";
+		}
+		
+		textPane.setText(str);
 	}
 }

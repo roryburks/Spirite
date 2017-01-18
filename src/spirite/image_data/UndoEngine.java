@@ -95,10 +95,15 @@ public class UndoEngine {
 	private CullBehavior cullBehavior = CullBehavior.CACHE_AND_COUNT;
 	
 	
-	public UndoEngine(ImageWorkspace workspace, CacheManager cacheManager) {
+	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
-		this.cacheManager = cacheManager;
+		this.cacheManager = workspace.getCacheManager();
 		contexts.add( new NullContext());
+	}
+	
+	@Override
+	public String toString() {
+		return "UndoEngine for: " + workspace.getFileName();
 	}
 	
 	
@@ -144,10 +149,24 @@ public class UndoEngine {
 		}
 	}
 	
-	// Called by ImageWorkapce
+	// :::: Called by ImageWorkapce
+	/** Gets a list of all Data used in the UndoEngine. */
+	List<ImageData> getDataUsed() {
+		List<ImageData> list = new ArrayList<>();
+		
+		for( UndoContext context : contexts) {
+			if( context.image != null)
+				list.add(context.image);
+		}
+		
+		return list;
+	}
+	
+	/** @return true if the undoQueue is currently at the "Saved" position. */
 	boolean atSaveSpot() {
 		return saveSpot == getQueuePosition();
 	}
+	/** Sets the current undoQueue position as the "Saved" position. */
 	void setSaveSpot() {
 		saveSpot = getQueuePosition();
 	}
@@ -226,12 +245,10 @@ public class UndoEngine {
 				context.cauterize();
 			}
 			
-			// Since erasing the timeline might create ghosts 
-			workspace.cleanDataCache();
-			
 			if( queue.size() < saveSpot) {
 				saveSpot = -1;
 			}
+			queuePosition = null;
 		}
 		
 
@@ -304,6 +321,7 @@ public class UndoEngine {
 		//	the current pointer on the UndoQueue, but it might happen.
 		
 		cleanUnusedContexts();
+		workspace.cleanDataCache();
 	}
 	
 	private void clipTail() {
@@ -415,7 +433,7 @@ public class UndoEngine {
 		protected ImageContext( ImageData image) {
 			super(image);
 			
-			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), null));
+			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image, UndoEngine.this), null));
 			met = 0;
 			pointer = 0;
 		}
@@ -474,7 +492,7 @@ public class UndoEngine {
 			// Record a keyframe if it's been a while or the action is a "HeavyAction"
 			//	i.e. an action requiring a lot of computation to perform
 			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
-				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), iaction));
+				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image,  UndoEngine.this), iaction));
 				met = 0;
 			}
 			else {
@@ -735,10 +753,11 @@ public class UndoEngine {
 	 *  but also implements the methods to recreate them.
 	 */
 	public abstract class UndoAction {
-		public String description = "";
+		protected String description = "";
 		protected abstract void performAction();
 		protected abstract void undoAction();
 		protected void onCauterize() {}
+		public String getDescription() {return description;}
 	}
 	
 	/** ImageActions are associated with ImageContexts, they have two components
@@ -866,6 +885,10 @@ public class UndoEngine {
 		@Override
 		protected void onCauterize() {
 			change.cauterize();
+		}
+		@Override
+		public String getDescription() {
+			return change.description;
 		}
 	}
 	

@@ -90,7 +90,18 @@ public class Penner
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.addKeyEventDispatcher(this);
 	}
+	
+	// Since Penner mostly deals in Image Coordinates, not Screen Coordinates,
+	//	when the Image Space changes (such as on zoom-in), the coordinates need
+	//	to be updated.
+	public void refreshCoordinates() {
+		rawUpdateX(rawX);
+		rawUpdateY(rawY);
+	}
 
+	// :::: PenListener
+	@Override	public void penScrollEvent(PScrollEvent arg0) {}
+	@Override	public void penTock(long arg0) {}
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
 		
@@ -243,10 +254,44 @@ public class Penner
 	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
 	private int shiftStartX;
 	private int shiftStartY;
-	private int wX;
-	private int wY;
-	private int oldX;
-	private int oldY;
+	private int wX;		// wX and wY are the semi-raw coordinates which are just
+	private int wY;		// 	the raw positions converted to ImageSpace whereas x and y
+						// 	sometimes do not get updated (e.g. when shift-locked)
+	private int oldX;	// OldX and OldY are the last-checked X and Y primarily used
+	private int oldY;	// 	for things that only happen if they change
+	private int rawX;	// raw position are the last-recorded coordinates in pure form
+	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
+	
+	private void rawUpdateX( int raw) {
+		rawX = raw;
+		wX = context.stiXm(rawX);
+		if( holdingShift && state == STATE.DRAWING) {
+			if( shiftMode == 2)
+				return;
+			if( shiftMode == 0) {
+				if( Math.abs(shiftStartX - wX) > 10) {
+					shiftMode = 1;
+				}
+				else return;
+			}
+		}
+		x = wX;
+	}
+	private void rawUpdateY( int raw) {
+		rawY = raw;
+		wY = context.stiYm( rawY);
+		if( holdingShift && state == STATE.DRAWING) {
+			if( shiftMode == 1)
+				return;
+			if( shiftMode == 0) {
+				if( Math.abs(shiftStartY - wY) > 10) {
+					shiftMode = 2;
+				}
+				else return;
+			}
+		}
+		y = wY;
+	}
 	@Override
 	public void penLevelEvent(PLevelEvent ple) {
 		// Note: JPen updates PenLevels (which inform of things like position and pressure)
@@ -254,41 +299,16 @@ public class Penner
 		for( PLevel level: ple.levels) {
 			switch( level.getType()) {
 			case X:
-				wX = context.stiXm(Math.round( level.value));
-				if( holdingShift && state == STATE.DRAWING) {
-					if( shiftMode == 2)
-						break;
-					if( shiftMode == 0) {
-						if( Math.abs(shiftStartX - wX) > 10) {
-							shiftMode = 1;
-						}
-						else break;
-					}
-				}
-				
-				x = wX;
+				rawUpdateX(Math.round(level.value));
 				break;
 			case Y:
-				wY = context.stiYm(Math.round( level.value));
-				if( holdingShift && state == STATE.DRAWING) {
-					if( shiftMode == 1)
-						break;
-					if( shiftMode == 0) {
-						if( Math.abs(shiftStartY - wY) > 10) {
-							shiftMode = 2;
-						}
-						else break;
-					}
-				}
-				y = wY;
+				rawUpdateY(Math.round(level.value));
 				break;
 			case PRESSURE:
 			default:
 				break;
 			}
 		}
-		
-		
 		
 		context.refreshCoordinates(x, y);
 		GroupTree.Node node= workspace.getSelectedNode();// !!!! Maybe better to store which node you're moving locally
@@ -321,8 +341,6 @@ public class Penner
 		oldX = x;
 		oldY = y;
 	}
-	@Override	public void penScrollEvent(PScrollEvent arg0) {}
-	@Override	public void penTock(long arg0) {}
 
 	
 

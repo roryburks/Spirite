@@ -59,6 +59,10 @@ public class RenderEngine
 		}
 		master.addWorkspaceObserver(this);
 	}
+	@Override
+	public String toString() {
+		return "Rendering Engine";
+	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
 	 * cache if the image has been already rendered under those settings and no
@@ -83,7 +87,7 @@ public class RenderEngine
 				BufferedImage imageImage = settings.image.readImage().image;
 
 				
-				cachedImage = cacheManager.createImage(settings.width, settings.height);
+				cachedImage = cacheManager.createImage(settings.width, settings.height, this);
 				
 				BufferedImage image = cachedImage.access();
 				
@@ -94,7 +98,7 @@ public class RenderEngine
 				g.dispose();
 			}
 			else {
-				cachedImage = cacheManager.cacheImage(propperRender(settings));
+				cachedImage = cacheManager.cacheImage(propperRender(settings), this);
 			}
 
 			

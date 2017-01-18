@@ -147,7 +147,7 @@ public class UndoPanel extends JPanel
 		if( value == null)
 			actionString = "[Base Image]";
 		else
-			actionString = value.action.description;
+			actionString = value.action.getDescription();
 		
 		renderPanel.label.setText(actionString);
 		

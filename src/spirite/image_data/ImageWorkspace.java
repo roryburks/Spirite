@@ -42,6 +42,7 @@ public class ImageWorkspace {
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
 	private final DrawEngine drawEngine;
+	private final CacheManager cacheManager;
 	
 	// External Components
 //	private final CacheManager cacheManager;
@@ -57,16 +58,19 @@ public class ImageWorkspace {
 	
 	
 	public ImageWorkspace( CacheManager cacheManager) {
-//		this.cacheManager = cacheManager;
-		
+		this.cacheManager = cacheManager;
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);
 		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
-		undoEngine = new UndoEngine(this, cacheManager);
+		undoEngine = new UndoEngine(this);
 	}
 	
+	@Override
+	public String toString() {
+		return "ImageWorkspace: " + getFileName();
+	}
 	
 	// :::: Maintenance Methods
 	public void cleanDataCache() {
@@ -95,10 +99,23 @@ public class ImageWorkspace {
 				used[i] = true;
 		}
 		
-		for( int i=used.length-1; i>=0; --i) {
-			if( !used[i]) {
-				System.out.println("Clearing: " + i);
-				imageData.remove(i);
+		// Go through the UndoEngine and flag them as being used
+		for( ImageData image : undoEngine.getDataUsed()) {
+			int index = imageData.indexOf(image);
+			
+			if( index == -1) {
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData from UndoEngine during Cache cleanup.");
+				imageData.add(image);
+			}
+			else if( index < used.length) {	// shouldn't be needed, but can be
+				used[index] = true;
+			}
+		}
+		
+		for( int index=used.length-1; index>=0; --index) {
+			if( !used[index]) {
+				imageData.get(index).flush();
+				imageData.remove(index);
 			}
 		}
 	}
@@ -172,6 +189,10 @@ public class ImageWorkspace {
 	
 	public DrawEngine getDrawEngine() {
 		return drawEngine;
+	}
+	
+	public CacheManager getCacheManager() {
+		return cacheManager;
 	}
 	
 	public GroupTree.GroupNode getRootNode() {
@@ -294,7 +315,6 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewLayer( GroupTree.Node context, int identifier, String name) {
-		System.out.println(imageData.size());
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event

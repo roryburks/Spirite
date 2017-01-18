@@ -14,6 +14,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.SwingUtilities;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
@@ -123,9 +124,11 @@ public class WorkPanel extends javax.swing.JPanel
         // Recalculate zoom factor
         zoom = (zoom_level >= 0) ? zoom_level + 1 : 1/(float)(-zoom_level+1);
 
+        // Readjust the Scrollbar
         calibrateScrolls();
-
         centerAtPos(center_x, center_y);
+        
+        workSplicePanel.drawPanel.refreshPennerCoords();
         repaint();
     }
 

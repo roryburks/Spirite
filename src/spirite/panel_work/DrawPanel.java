@@ -70,6 +70,9 @@ public class DrawPanel extends JPanel
 		AwtPenToolkit.addPenListener(this, penner);
 	}
  
+	public void refreshPennerCoords() {
+		penner.refreshCoordinates();
+	}
 
     // :::: Paint
     @Override

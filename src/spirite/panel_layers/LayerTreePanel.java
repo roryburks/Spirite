@@ -159,7 +159,6 @@ public class LayerTreePanel extends ContentTree
 				CCButton button = buttonPanel.getButtonAt( i, 0);
 				Node node = (Node)((DefaultMutableTreeNode)button.getAssosciatedTreePath().getLastPathComponent()).getUserObject();
 				if( node == changedNode) {
-					System.out.println("TEST");
 					button.setSelected(node.isVisible());
 					break;
 				}
