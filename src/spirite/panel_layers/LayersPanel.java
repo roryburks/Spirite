@@ -155,7 +155,7 @@ public class LayersPanel extends JPanel {
 				if( selected != null) {
 					float alpha = (float)e.getX() / (float)getWidth();
 					alpha = Math.min( 1.0f, Math.max(0.0f, alpha));
-					layerTreePanel.workspace.setNodeAlpha(selected, alpha);
+					selected.setAlpha(alpha);
 					
 					repaint();
 				}

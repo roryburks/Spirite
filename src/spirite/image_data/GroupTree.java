@@ -5,6 +5,7 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.image_data.ImageWorkspace.VisibilityChange;
 
 /***
  * Though almost all ImageData goes through the group tree before being
@@ -58,6 +59,8 @@ public class GroupTree {
 	public abstract class Node  {
 		protected float alpha = 1.0f;
 		protected boolean visible = true;
+		protected int x = 0;
+		protected int y = 0;
 		protected boolean expanded = true;
 		protected String name = "";
 
@@ -65,12 +68,32 @@ public class GroupTree {
 		public boolean isVisible() {
 			return (visible && alpha > 0);
 		}
-		void setVisible( boolean visible) {
-			if( this.visible != visible) 
-				this.visible = visible;
+		public void setVisible( boolean visible) {
+			if( context.nodeInWorkspace(this) && this.visible != visible) {
+				context.executeChange( context.new VisibilityChange(this, visible));
+			}
+			else { this.visible = visible;}
 		}
 		public float getAlpha() {
 			return alpha;
+		}
+		public void setAlpha( float alpha) {
+			if( context.nodeInWorkspace(this) && this.alpha != alpha) {
+				context.executeChange( context.new OpacityChange( this, alpha));
+			}
+			else { this.alpha = alpha;}
+		}
+		public int getOffsetX() {
+			return x;
+		}
+		public int getOffsetY() {
+			return y;
+		}
+		public void setOffsetX( int x, int y) {
+			if( context.nodeInWorkspace(this) && (this.x != x || this.y != y)) {
+				context.executeChange( context.new OffsetChange( this, x, y));
+			}
+			else {this.x = x; this.y = y;}
 		}
 		public boolean isExpanded() {
 			return expanded;

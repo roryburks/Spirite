@@ -19,6 +19,8 @@ import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
+import spirite.brains.MasterControl;
+import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
@@ -51,13 +53,13 @@ public class DrawPanel extends JPanel
 	
 	private int metronome = 0;
 
-	public DrawPanel(WorkPanel context) {
-		this.renderEngine = context.master.getRenderEngine();
+	public DrawPanel(WorkPanel context, MasterControl master) {
+		this.renderEngine = master.getRenderEngine();
 		this.context = context;
 		this.workspace = context.workspace;
 		this.setBackground(new Color(0, 0, 0, 0));
 
-		penner = new Penner( this);
+		penner = new Penner( this, master);
 		
 		workspace.addImageObserver(this);
 		workspace.getSelectionEngine().addSelectionObserver(this);
@@ -102,21 +104,22 @@ public class DrawPanel extends JPanel
 		            (int)Math.round(workspace.getHeight()*zoom)+1);
             
             // Draw Border around the active Layer
-            ImageData active = workspace.getActiveData();
+            GroupTree.Node selected = workspace.getSelectedNode();
             
-            if( active != null) {
-            	ReadOnlyImage img = active.readImage();
-	            int width = img.getWidth();
-	            int height = img.getHeight();
-	            if( width != workspace.getWidth() || height != workspace.getHeight()) {
-	                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
-	                g2.setStroke(new_stroke);
-	                g2.setColor(Globals.getColor("drawpanel.layer.border"));
-	                g2.drawRect( context.itsX(0)-1,
-	    		            context.itsY(0)-1,
-	    		            (int)Math.round(width*zoom)+1,
-	    		            (int)Math.round(width*zoom)+1);
-	            }
+            if( selected!= null) {
+                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
+                g2.setStroke(new_stroke);
+                g2.setColor(Globals.getColor("drawpanel.layer.border"));
+                
+            	if( selected instanceof GroupTree.LayerNode) {
+            		BufferedImage bi = ((GroupTree.LayerNode) selected).getImageData().readImage().image;
+            		
+            		g2.drawRect( 
+            				context.itsX(selected.getOffsetX()), 
+            				context.itsY(selected.getOffsetY()), 
+            				(int)(bi.getWidth()* context.getZoom()), 
+            				(int)(bi.getHeight() * context.getZoom()));
+            	}
             }
 
 

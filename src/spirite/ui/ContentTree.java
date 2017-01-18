@@ -346,6 +346,18 @@ public class ContentTree extends JPanel
 			super.paintComponent(g);
 		}
 		
+		public int getButtonRowCount() {
+			return buttons.length;
+		}
+		public CCButton getButtonAt( int i, int j) {
+			if( i < 0 || j < 0) return null;
+			if( i >= buttons.length)
+				return null;
+			if( j >= buttons[i].length)
+				return null;
+			return buttons[i][j];
+		}
+		
 	}
 	
 	/** A Button that is linked to a TreePath*/

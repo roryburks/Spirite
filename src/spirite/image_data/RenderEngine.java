@@ -183,7 +183,7 @@ public class RenderEngine
 					
 					_setGraphicsSettings(g, child, settings);
 					g2.drawImage( layer.data.readImage().image,
-							0, 0, 
+							child.x, child.y, 
 							settings.width, settings.height, 
 							null);
 					_resetRenderSettings(g, child, settings);
@@ -199,7 +199,7 @@ public class RenderEngine
 
 					_setGraphicsSettings(g, child,settings);
 					g2.drawImage( buffer[n+1],
-							0, 0, 
+							child.x, child.y, 
 							settings.width, settings.height, 
 							null);
 					_resetRenderSettings(g, child, settings);

@@ -411,17 +411,6 @@ public class ImageWorkspace {
 		if( newName != node.name)
 			executeChange( new RenameChange(newName, node));
 	}
-	
-	public void setNodeVisibility( Node node, boolean visible) {
-		if( nodeInWorkspace(node) && node.isVisible() != visible) {
-			executeChange( new VisibilityChange(node, visible));
-		}
-	}
-	public void setNodeAlpha( Node node, float alpha) {
-		if( nodeInWorkspace(node) && node.alpha != alpha) {
-			executeChange( new OpacityChange(node, alpha));
-		}
-	}
 
 	
 	/**
@@ -433,15 +422,17 @@ public class ImageWorkspace {
 	public abstract class StructureChange {
 		public String description = "Unknown Structure Change";
 		boolean imageChange = true;
+		boolean groupTreeChange = false;
 		public abstract void execute();
 		public abstract void unexecute();
 		public List<Node> getChangedNodes() { return new LinkedList<>();}
+		public final boolean isGroupTreeChange() {return groupTreeChange;}
 		
 		// Called when history has been re-written and so the action never
 		//	was performed, and thus 
 		public void cauterize() {}
 		public void alert( boolean undo) {
-			triggerStructureChanged(this, undo);
+			triggerGroupStructureChanged(this, undo);
 			if( imageChange) {
 				ImageChangeEvent evt = new ImageChangeEvent();
 				evt.workspace = ImageWorkspace.this;
@@ -475,6 +466,7 @@ public class ImageWorkspace {
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
+			this.groupTreeChange = true;
 		}
 		
 		@Override
@@ -511,6 +503,7 @@ public class ImageWorkspace {
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
+			this.groupTreeChange = true;
 		}
 
 		@Override
@@ -552,6 +545,7 @@ public class ImageWorkspace {
 			this.oldNext = oldNext;
 			this.newParent = newParent;
 			this.newNext = newNext;
+			this.groupTreeChange = true;
 		}
 
 		@Override
@@ -559,13 +553,11 @@ public class ImageWorkspace {
 			moveNode._del();
 			newParent._add(moveNode, newNext);
 		}
-
 		@Override
 		public void unexecute() {
 			moveNode._del();
 			oldParent._add(moveNode, oldNext);
 		}
-
 		@Override
 		public List<Node> getChangedNodes() {
 			List<Node> list = new LinkedList<Node>();
@@ -650,27 +642,41 @@ public class ImageWorkspace {
 			this.description = "Opacity Changed";
 		}
 
-		@Override
-		public void execute() {
-			node.alpha = opacityAfter;
-		}
-
-		@Override
-		public void unexecute() {
-			node.alpha = opacityBefore;
-		}
-
-		@Override
-		public void stackNewChange(StructureChange newChange) {
+		@Override public void execute() { node.alpha = opacityAfter;}
+		@Override public void unexecute() { node.alpha = opacityBefore;}
+		@Override public void stackNewChange(StructureChange newChange) {
 			OpacityChange change = (OpacityChange)newChange;
-			
 			this.opacityAfter = change.opacityAfter;
 		}
-		
-		@Override
-		public boolean canStack(StructureChange newChange) {
+		@Override public boolean canStack(StructureChange newChange) {
 			OpacityChange change = (OpacityChange)newChange;
+			return (node == change.node);
+		}
+	}
+	
+	
+	public class OffsetChange extends NodeAtributeChange
+		implements StackableStructureChange
+	{
+		int dx, dy;
+		
+		OffsetChange( Node node, int newX, int newY) {
+			super(node);
+			this.dx = newX - node.x;
+			this.dy = newY - node.y;
 			
+			this.description = "Opacity Changed";
+		}
+
+		@Override public void execute() { node.x += dx; node.y += dy;}
+		@Override public void unexecute() { node.x -= dx; node.y -= dy;}
+		@Override public void stackNewChange(StructureChange newChange) {
+			OffsetChange change = (OffsetChange)newChange;
+			this.dx += change.dx;
+			this.dy += change.dy;
+		}
+		@Override public boolean canStack(StructureChange newChange) {
+			OffsetChange change = (OffsetChange)newChange;
 			return (node == change.node);
 		}
 	}
@@ -759,7 +765,7 @@ public class ImageWorkspace {
     }
     List<MImageObserver> imageObservers = new ArrayList<>();
     
-    private void triggerStructureChanged( StructureChange evt, boolean undo) {
+    private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
         for( MImageObserver obs : imageObservers)
             obs.structureChanged( evt);
     }

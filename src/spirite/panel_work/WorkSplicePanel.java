@@ -1,5 +1,7 @@
 package spirite.panel_work;
 
+import spirite.brains.MasterControl;
+
 /**
  *WorkSplicePanel is a simple container for the DrawPanel (which displays the 
  *	working images and controls input) and the ReferencePanel (which displays 
@@ -17,8 +19,9 @@ public class WorkSplicePanel extends javax.swing.JPanel
      * Creates new form WorkSplicePanel
      */
     public WorkSplicePanel() { initComponents();}
-    public WorkSplicePanel( WorkPanel context) {
+    public WorkSplicePanel( WorkPanel context, MasterControl master) {
         this.context = context;
+        drawPanel = new DrawPanel( context, master);
         initComponents();
 
         offsetx = 0;
@@ -27,7 +30,6 @@ public class WorkSplicePanel extends javax.swing.JPanel
  
     private void initComponents() {
 
-        drawPanel = new DrawPanel( context);
         previewPanel = new ReferencePanel();
 
         setPreferredSize(new java.awt.Dimension(420, 322));

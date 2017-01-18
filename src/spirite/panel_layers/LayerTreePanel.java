@@ -50,7 +50,9 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.image_data.ImageWorkspace.OpacityChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.VisibilityChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.animation_data.SimpleAnimation;
@@ -147,7 +149,24 @@ public class LayerTreePanel extends ContentTree
     }
 	@Override
 	public void structureChanged( StructureChange evt) {
-		constructFromWorkspace();
+		if( evt.isGroupTreeChange()) {
+			constructFromWorkspace();
+		}
+		else if( evt instanceof VisibilityChange) {
+			Node changedNode = evt.getChangedNodes().get(0);	// should be no need to sanity check
+			
+			for( int i = 0; i<buttonPanel.getButtonRowCount(); ++i) {
+				CCButton button = buttonPanel.getButtonAt( i, 0);
+				Node node = (Node)((DefaultMutableTreeNode)button.getAssosciatedTreePath().getLastPathComponent()).getUserObject();
+				if( node == changedNode) {
+					System.out.println("TEST");
+					button.setSelected(node.isVisible());
+					break;
+				}
+			}
+		}else if( evt instanceof OpacityChange) {
+//			if( evt.get)
+		}
 	}
 	
 	// :::: MSelectionObserver
@@ -269,7 +288,7 @@ public class LayerTreePanel extends ContentTree
 		if( button.buttonNum == 0) {
 			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
-			workspace.setNodeVisibility(node,  button.isSelected());
+			node.setVisible(button.isSelected());
 		}
 	}
 	@Override

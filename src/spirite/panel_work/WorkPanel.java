@@ -70,7 +70,7 @@ public class WorkPanel extends javax.swing.JPanel
     private int offsetx, offsety;
 
     // WorkPanel needs Master because some of its components need it
-    final MasterControl master;
+    private final MasterControl master;
     final ImageWorkspace workspace;
 
 
@@ -224,7 +224,7 @@ public class WorkPanel extends javax.swing.JPanel
 
         jscrollVertical = new JScrollBar();
         jscrollHorizontal = new JScrollBar();
-        workSplicePanel = new WorkSplicePanel( this);
+        workSplicePanel = new WorkSplicePanel( this, master);
         coordinateLabel = new JLabel();
         zoomPanel = new JPanel() {
         	@Override
