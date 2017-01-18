@@ -18,6 +18,7 @@ import jpen.PLevel;
 import jpen.PLevelEvent;
 import jpen.PScrollEvent;
 import jpen.event.PenListener;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.brains.ToolsetManager;
@@ -72,8 +73,10 @@ public class Penner
 	
 	private int x, y;
 	
-	private enum STATE { READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE};
+	private enum STATE { READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
+		PICKING};
 	private STATE state = STATE.READY;
+	private int stateVar = 0;
 	
 	public Penner( DrawPanel draw_panel, MasterControl master) {
 		this.context = draw_panel.context;
@@ -127,8 +130,11 @@ public class Penner
 			
 			switch( tool) {
 			case PEN:
-				if( holdingCtrl) 
+				if( holdingCtrl)  {
 					pickColor(button == PButton.Type.LEFT);
+					state = STATE.PICKING;
+					stateVar = (button == PButton.Type.LEFT)?1:0;
+				}
 				else
 					startPen( button == PButton.Type.LEFT);
 				break;
@@ -146,6 +152,8 @@ public class Penner
 				break;
 			case COLOR_PICKER:
 				pickColor( button == PButton.Type.LEFT);
+				state = STATE.PICKING;
+				stateVar = (button == PButton.Type.LEFT)?1:0;
 				break;
 			}
 			
@@ -242,10 +250,13 @@ public class Penner
 		}
 	}
 	private void pickColor( boolean leftClick) {
-
+		// Get the composed image
 		RenderSettings settings = new RenderSettings();
 		settings.workspace = workspace;
 		BufferedImage img = renderEngine.renderImage(settings);
+		
+		if( !MUtil.coordInImage(x, y, img))
+			return;
 		paletteManager.setActiveColor(
 				(leftClick)?0:1, new Color(img.getRGB(x, y)));
 	}
@@ -373,7 +384,10 @@ public class Penner
 			if( node != null && (oldX != x || oldY != y))
 				node.setOffsetX( node.getOffsetX() + (x - oldX), 
 								 node.getOffsetY() + (y - oldY));
-				
+			break;
+		case PICKING:
+			pickColor( stateVar == 1);
+			break;
 		default:
 			break;
 		}

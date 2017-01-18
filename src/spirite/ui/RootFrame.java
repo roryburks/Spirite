@@ -58,7 +58,7 @@ public class RootFrame extends javax.swing.JFrame
         
 
         master.newWorkspace(128,128,new java.awt.Color(0,0,0,0), true);
-        master.getCurrentWorkspace().resetUndoEngine();
+        master.getCurrentWorkspace().finishBuilding();
     }
 
     private void initComponents() {
@@ -160,7 +160,7 @@ public class RootFrame extends javax.swing.JFrame
 
         if( response == JOptionPane.OK_OPTION) {
             master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
-            master.getCurrentWorkspace().resetUndoEngine();
+            master.getCurrentWorkspace().finishBuilding();
         }
     }                                            
 

@@ -217,9 +217,9 @@ public class ToolsPanel extends JPanel
             this.setBorder(null);
 
 
-            Hotkey key = hotkeyManager.getHotkey("toolset." + tool.name);
+            Hotkey key = hotkeyManager.getHotkey("toolset." + tool.name());
             
-            this.setToolTipText("<html>" + tool.name + " <b>" + ((key==null)?"":key.toString()) + "</b></html>" );
+            this.setToolTipText("<html>" + tool.description + " <b>" + ((key==null)?"":key.toString()) + "</b></html>" );
 
             // Because the component can be semi-transparent at times, this is
             //  needed to redraw the background when the component is redrawn

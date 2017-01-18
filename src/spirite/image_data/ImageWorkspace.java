@@ -55,6 +55,8 @@ public class ImageWorkspace {
 	
 	private File file = null;
 	private boolean changed = false;
+	private boolean building = true;	// While building, no UndoActionsare stored
+										// and no cache is cleared
 	
 	
 	public ImageWorkspace( CacheManager cacheManager) {
@@ -74,6 +76,7 @@ public class ImageWorkspace {
 	
 	// :::: Maintenance Methods
 	public void cleanDataCache() {
+		if( building) return;
 		boolean used[] = new boolean[imageData.size()];
 		Arrays.fill(used, false);
 		
@@ -123,8 +126,9 @@ public class ImageWorkspace {
 	/** Called when an image is first made or is first loaded, resets the UndoEngine
 	 * so that various internal actions regarding constructing the workspace are not
 	 * undoable.*/
-	public void resetUndoEngine() {
+	public void finishBuilding() {
 		undoEngine.reset();
+		building = false;
 		changed = false;
 	}
 	
@@ -329,7 +333,7 @@ public class ImageWorkspace {
 			}
 		}
 		
-		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to add a new Simple Layer using an identifier that does not exist in the current workspace.");
+		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to add a new Simple Layer using an identifier that does not exist in the current workspace. :" + identifier);
 		
 		return null;
 	}
@@ -354,6 +358,7 @@ public class ImageWorkspace {
 			newData.id = workingID++;
 		else
 			workingID = newData.id+1;
+		
 	}
 	
 	// :::: Remove Nodes
@@ -704,11 +709,12 @@ public class ImageWorkspace {
 	/** Executes the given change and stores it in the UndoEngine */
 	public void executeChange( StructureChange change) {
 		change.execute();
-		
-		if( change instanceof StackableStructureChange) 
-			undoEngine.storeAction(undoEngine.new StackableStructureAction(change) , null);
-		else 
-			undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
+		if( !building) {
+			if( change instanceof StackableStructureChange) 
+				undoEngine.storeAction(undoEngine.new StackableStructureAction(change) , null);
+			else 
+				undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
+		}
 		change.alert(false);
 	}
 	

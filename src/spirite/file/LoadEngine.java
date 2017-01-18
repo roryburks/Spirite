@@ -52,7 +52,7 @@ public class LoadEngine {
 			}
 			
 			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
-			
+
 			// Load Chunks until you've reached the end
 			List<ChunkInfo> chunks = parseChunks( ra);
 
@@ -72,7 +72,7 @@ public class LoadEngine {
 				}
 			}
 			
-			workspace.resetUndoEngine();
+			workspace.finishBuilding();
 			workspace.fileSaved(file);
 			return workspace;
 			
@@ -136,7 +136,7 @@ public class LoadEngine {
 			ra.read(buffer);
 			
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
-			
+
 			ImageData idata = new ImageData( img, identifier, workspace);
 			workspace.addImageDataDirect(idata);
 		}
@@ -172,6 +172,7 @@ public class LoadEngine {
 			
 			if( type == SaveLoadUtil.NODE_LAYER) 
 				identifier = ra.readInt();
+			
 			
 			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
 			

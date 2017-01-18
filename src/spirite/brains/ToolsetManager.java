@@ -14,15 +14,15 @@ import java.util.Map;
 public class ToolsetManager {
 	
 	public static enum Tool {
-		PEN("pen"), 
-		ERASER("eraser"), 
-		FILL("fill"), 
-		BOX_SELECTION("box_selection"), 
-		MOVE("move"),
-		COLOR_PICKER("color_picker");
+		PEN("Pen"), 
+		ERASER("Eraser"), 
+		FILL("Fill"), 
+		BOX_SELECTION("Box Selection"), 
+		MOVE("Move"),
+		COLOR_PICKER("Color Picker");
 		
-		public final String name;
-		Tool( String name){ this.name = name;}
+		public final String description;
+		Tool( String name){ this.description = name;}
 	}
     
     public enum Cursor {MOUSE, STYLUS, ERASER};
@@ -52,7 +52,7 @@ public class ToolsetManager {
     }
     public void setSelectedTool( String tool) {
     	for( Tool check : Tool.values()) {
-    		if( check.name.equals(tool)) {
+    		if( check.name().equals(tool)) {
     			setSelectedTool(check);
     		}
     	}

@@ -44,12 +44,12 @@ public class HotkeyManager {
                 {"context.zoom_out_slow", (new Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK))},
                 {"context.zoom_0", (new Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK))},
 
-                {"toolset.pen", (new Hotkey( KeyEvent.VK_P, 0))},
-                {"toolset.eraser", (new Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK))},
-                {"toolset.fill", (new Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK))},
-                {"toolset.box_selection", (new Hotkey( KeyEvent.VK_R, 0))},
-                {"toolset.move", (new Hotkey( KeyEvent.VK_M, 0))},
-                {"toolset.color_picker", (new Hotkey( KeyEvent.VK_O, 0))},
+                {"toolset.PEN", (new Hotkey( KeyEvent.VK_P, 0))},
+                {"toolset.ERASER", (new Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK))},
+                {"toolset.FILL", (new Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK))},
+                {"toolset.BOX_SELECTION", (new Hotkey( KeyEvent.VK_R, 0))},
+                {"toolset.MOVE", (new Hotkey( KeyEvent.VK_M, 0))},
+                {"toolset.COLOR_PICKER", (new Hotkey( KeyEvent.VK_O, 0))},
 
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
                 
@@ -63,9 +63,9 @@ public class HotkeyManager {
         
         loadBinds(
     		new Object[][] {
-    			{"stylus", "toolset.pen"},
-    			{"eraser", "toolset.eraser"},
-    			{"mouse" , "toolset.pen"}
+    			{"stylus", "toolset.PEN"},
+    			{"eraser", "toolset.ERASER"},
+    			{"mouse" , "toolset.PEN"}
     		}
         );
     }
