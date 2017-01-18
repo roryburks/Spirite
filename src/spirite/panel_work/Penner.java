@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Timer;
 
@@ -20,6 +21,7 @@ import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.brains.ToolsetManager;
+import spirite.brains.ToolsetManager.Tool;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.StrokeEngine;
@@ -27,6 +29,8 @@ import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.RenderEngine;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
@@ -53,17 +57,18 @@ public class Penner
 	private StrokeEngine strokeEngine = null;
 	
 	// It might be easier to just link Master instead of linking every
-	//	single Manager in the kitchen, but I don't like the idea of 
-	//	leaking capabilities (such as frame management) to components that 
-	//	don't need it.
+	//	single Manager in the kitchen, but I like the idea of encouraging
+	//	thinking about why you need a component before actually linking it.
 	private final ImageWorkspace workspace;
 	private final SelectionEngine selectionEngine;
 	private final UndoEngine undoEngine;
 	private final DrawEngine drawEngine;
 	private final ToolsetManager toolsetManager;
 	private final PaletteManager paletteManager;
+	private final RenderEngine renderEngine;	// used for color picking.
+												// might not belong here, maybe in DrawEngine
 	
-	private String activeTool = null;
+	private Tool activeTool = null;
 	
 	private int x, y;
 	
@@ -78,6 +83,7 @@ public class Penner
 		this.drawEngine = workspace.getDrawEngine();
 		this.toolsetManager = master.getToolsetManager();
 		this.paletteManager = master.getPaletteManager();
+		this.renderEngine = master.getRenderEngine();
 
 		// Add Timer and KeyDispatcher
 		//	Note: since these are utilities with a global focus that you're
@@ -117,70 +123,30 @@ public class Penner
 			if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
 				return;
 			
-			String tool = toolsetManager.getSelectedTool();
+			Tool tool = toolsetManager.getSelectedTool();
 			
-			if( tool.equals("pen")) {
-				StrokeParams stroke = new StrokeParams();
-				Color c = (button == PButton.Type.LEFT) ? 
-						paletteManager.getActiveColor(0)
-						: paletteManager.getActiveColor(1);
-				stroke.setColor( c);
-				
-				// Start the Stroke
-				startStroke( stroke);
-			}
-			if( tool.equals("eraser")) {
-				StrokeParams stroke = new StrokeParams();
-				stroke.setMethod( Method.ERASE);
-
-				// Start the Stroke
-				startStroke( stroke);
-			}
-			if( tool.equals("fill")) {
-				// Determine Color
-				Color c = (button == PButton.Type.LEFT) ? 
-						paletteManager.getActiveColor(0)
-						: paletteManager.getActiveColor(1);
-
-				// Grab the Active Data
-				ImageData data = workspace.getActiveData();
-				GroupTree.Node node = workspace.getSelectedNode();
-				
-				if( data != null && node != null) {
-					// Perform the fill Action, only store the UndoAction if 
-					//	an actual change is made.
-					Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
-					if( drawEngine.fill( p.x, p.y, c, data)) {
-						undoEngine.storeAction( undoEngine.new FillAction(p, c) , data);
-					}
-				} 
-			}
-			if( tool.equals("box_selection")){
-				Selection selection = selectionEngine.getSelection();
-				
-				if( selection != null && selection.contains(x,y)) {
-					if( !selectionEngine.isLifted())
-						selectionEngine.liftSelection();
-					state = STATE.MOVING_SELECTION;
-				}
-				else {
-					selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
-					state = STATE.FORMING_SELECTION;
-				}
-			}
-			if( tool.equals("move")) {
-				Selection selection = selectionEngine.getSelection();
-				
-				
-				if(selection != null) {
-					if( !selectionEngine.isLifted())
-						selectionEngine.liftSelection();
-					
-					state = STATE.MOVING_SELECTION;
-				}
-				else {
-					state = STATE.MOVING_NODE;
-				}
+			switch( tool) {
+			case PEN:
+				if( holdingCtrl) 
+					pickColor(button == PButton.Type.LEFT);
+				else
+					startPen( button == PButton.Type.LEFT);
+				break;
+			case ERASER:
+				startErase();
+				break;
+			case FILL:
+				fill( button == PButton.Type.LEFT);
+				break;
+			case BOX_SELECTION:
+				startSelection();
+				break;
+			case MOVE:
+				startMove();
+				break;
+			case COLOR_PICKER:
+				pickColor( button == PButton.Type.LEFT);
+				break;
 			}
 			
 			activeTool = tool;
@@ -218,6 +184,24 @@ public class Penner
 		
 	}
 	
+	// :::: Start Methods
+	private void startPen( boolean leftClick) {
+		 StrokeParams stroke = new StrokeParams();
+		 Color c = (leftClick) ? 
+				paletteManager.getActiveColor(0)
+				: paletteManager.getActiveColor(1);
+		stroke.setColor( c);
+		
+		// Start the Stroke
+		startStroke( stroke);
+	}
+	private void startErase() {
+		StrokeParams stroke = new StrokeParams();
+		stroke.setMethod( Method.ERASE);
+
+		// Start the Stroke
+		startStroke( stroke);
+	}	
 	private void startStroke( StrokeParams stroke) {
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageData data = workspace.getActiveData();
@@ -231,6 +215,61 @@ public class Penner
 			state = STATE.DRAWING;
 		}
 	}
+	private void startSelection() {
+		Selection selection = selectionEngine.getSelection();
+		
+		if( selection != null && selection.contains(x,y)) {
+			if( !selectionEngine.isLifted())
+				selectionEngine.liftSelection();
+			state = STATE.MOVING_SELECTION;
+		}
+		else {
+			selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
+			state = STATE.FORMING_SELECTION;
+		}
+	}
+	private void startMove() {
+		Selection selection = selectionEngine.getSelection();
+		
+		if(selection != null) {
+			if( !selectionEngine.isLifted())
+				selectionEngine.liftSelection();
+			
+			state = STATE.MOVING_SELECTION;
+		}
+		else {
+			state = STATE.MOVING_NODE;
+		}
+	}
+	private void pickColor( boolean leftClick) {
+
+		RenderSettings settings = new RenderSettings();
+		settings.workspace = workspace;
+		BufferedImage img = renderEngine.renderImage(settings);
+		paletteManager.setActiveColor(
+				(leftClick)?0:1, new Color(img.getRGB(x, y)));
+	}
+	private void fill( boolean leftClick) {
+		// Determine Color
+		Color c = (leftClick) ? 
+				paletteManager.getActiveColor(0)
+				: paletteManager.getActiveColor(1);
+
+		// Grab the Active Data
+		ImageData data = workspace.getActiveData();
+		GroupTree.Node node = workspace.getSelectedNode();
+		
+		if( data != null && node != null) {
+			// Perform the fill Action, only store the UndoAction if 
+			//	an actual change is made.
+			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
+			if( drawEngine.fill( p.x, p.y, c, data)) {
+				undoEngine.storeAction( undoEngine.new FillAction(p, c) , data);
+			}
+		} 
+	}
+	
+	
 
 	@Override
 	public void penKindEvent(PKindEvent pke) {
@@ -251,6 +290,7 @@ public class Penner
 	}
 
 	private boolean holdingShift = false;
+	private boolean holdingCtrl = false;
 	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
 	private int shiftStartX;
 	private int shiftStartY;
@@ -348,6 +388,7 @@ public class Penner
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent evt) {
 		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
+		boolean ctrl = (( evt.getModifiers() & KeyEvent.CTRL_MASK) != 0);
 		if( shift && !holdingShift) {
 			shiftStartX = x;
 			shiftStartY = y;
@@ -355,6 +396,7 @@ public class Penner
 		}
 			
 		holdingShift = shift;
+		holdingCtrl = ctrl;
 		return false;
 	}
 	

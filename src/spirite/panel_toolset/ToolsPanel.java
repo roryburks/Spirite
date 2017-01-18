@@ -35,6 +35,7 @@ import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
+import spirite.brains.ToolsetManager.Tool;
 
 /**
  * 
@@ -179,9 +180,9 @@ public class ToolsPanel extends JPanel
     public void componentHidden(ComponentEvent e) {}
 
     @Override
-    public void toolsetChanged(String new_tool) {
+    public void toolsetChanged( Tool newTool) {
         for( ToolButton button : buttons) {
-            if( button.tool.equals(new_tool)) {
+            if( button.tool.equals(newTool)) {
                 if( !button.isSelected()) {
                     button.setSelected(true);
                     button.repaint();
@@ -203,11 +204,11 @@ public class ToolsPanel extends JPanel
     {
 		private static final long serialVersionUID = 1L;
 		private int ix, iy;
-        private String tool;
+        private Tool tool;
 
         boolean hover = false;
 
-        ToolButton( String tool) {
+        ToolButton( Tool tool) {
             this.tool = tool;
             this.ix = toolsetManager.getToolix(tool);
             this.iy = toolsetManager.getTooliy(tool);
@@ -215,8 +216,10 @@ public class ToolsPanel extends JPanel
             this.addMouseListener(this);
             this.setBorder(null);
 
-            Hotkey key = hotkeyManager.getHotkey("toolset." + tool);
-            this.setToolTipText("<html>" + tool + " <b>" + key.toString() + "</b></html>" );
+
+            Hotkey key = hotkeyManager.getHotkey("toolset." + tool.name);
+            
+            this.setToolTipText("<html>" + tool.name + " <b>" + ((key==null)?"":key.toString()) + "</b></html>" );
 
             // Because the component can be semi-transparent at times, this is
             //  needed to redraw the background when the component is redrawn

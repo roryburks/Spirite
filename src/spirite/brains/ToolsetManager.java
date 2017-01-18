@@ -12,19 +12,28 @@ import java.util.Map;
  * ToolsetManager manages the currently selected toolset
  */
 public class ToolsetManager {
-    private static final String[] toolset = {
-        "pen","eraser","fill","box_selection", "move", "color_picker"
-    };
+	
+	public static enum Tool {
+		PEN("pen"), 
+		ERASER("eraser"), 
+		FILL("fill"), 
+		BOX_SELECTION("box_selection"), 
+		MOVE("move"),
+		COLOR_PICKER("color_picker");
+		
+		public final String name;
+		Tool( String name){ this.name = name;}
+	}
     
     public enum Cursor {MOUSE, STYLUS, ERASER};
     private Cursor cursor = Cursor.MOUSE;
     
-    private final Map<Cursor, Integer> selected = new EnumMap<>(Cursor.class);
+    private final Map<Cursor, Tool> selected = new EnumMap<>(Cursor.class);
     
     public ToolsetManager() {
-        selected.put(Cursor.MOUSE, 0);
-        selected.put(Cursor.STYLUS, 0);
-        selected.put(Cursor.ERASER, 1);
+        selected.put(Cursor.MOUSE, Tool.PEN);
+        selected.put(Cursor.STYLUS, Tool.PEN);
+        selected.put(Cursor.ERASER, Tool.ERASER);
     }
     
     // :::: Get/Set
@@ -37,39 +46,42 @@ public class ToolsetManager {
     	triggerToolsetChanged(selected.get(cursor));
     }
 
+    public void setSelectedTool( Tool tool) {
+        selected.replace(cursor, tool);
+        triggerToolsetChanged(tool);
+    }
     public void setSelectedTool( String tool) {
-        int ind = Arrays.asList(toolset).indexOf(tool);
-
-        if( ind != -1) {
-            selected.replace(cursor, ind);
-            triggerToolsetChanged(ind);
-        }
+    	for( Tool check : Tool.values()) {
+    		if( check.name.equals(tool)) {
+    			setSelectedTool(check);
+    		}
+    	}
     }
     
-    public String getSelectedTool() {
-        return toolset[selected.get(cursor)];
+    public Tool getSelectedTool() {
+        return selected.get(cursor);
     }
 
     public int getToolCount() {
-        return toolset.length;
+        return Tool.values().length;
     }
-    public String getNthTool( int n) {
-        return toolset[n];
+    public Tool getNthTool( int n) {
+        return Tool.values()[n];
     }
 
     // Gets the position the toolset is in the icons.png image
     // !!!! TODO: There is probably a beter place to put this and make it less
     //  hard-coded, but for now I'll centralize it here
-    public int getToolix( String tool) {
-        int ind = Arrays.asList(toolset).indexOf(tool);
+    public int getToolix( Tool tool) {
+        int ind = tool.ordinal();
 
         if( ind != -1) {
             return ind % 4;
         }
         return 4;
     }
-    public int getTooliy( String tool) {
-        int ind = Arrays.asList(toolset).indexOf(tool);
+    public int getTooliy( Tool tool) {
+        int ind = tool.ordinal();
 
         if( ind != -1) {
             return ind / 4;
@@ -79,16 +91,16 @@ public class ToolsetManager {
 
     // ==== Toolset Observer
     public interface MToolsetObserver {
-        public void toolsetChanged( String new_tool);
+        public void toolsetChanged( Tool newTool);
     }
     
     List<MToolsetObserver> toolsetObserver = new ArrayList<>();
     public void addToolsetObserver( MToolsetObserver obs) { toolsetObserver.add(obs); }
     public void removeToolsetObserver( MToolsetObserver obs) { toolsetObserver.remove(obs);}
     
-    private void triggerToolsetChanged( int index) {
+    private void triggerToolsetChanged( Tool newTool) {
         for( MToolsetObserver obs : toolsetObserver) {
-            obs.toolsetChanged(toolset[index]);
+            obs.toolsetChanged(newTool);
         }
     }
 
