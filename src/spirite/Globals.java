@@ -27,9 +27,46 @@ import spirite.MDebug.ErrorType;
  * 	of hand later
  */
 public class Globals {
-	
+
 	// TODO: In the future these databases will probably be stored as text 
 	//	files
+	private static final String commands[][] = {
+			{"global.new_image"},
+			{"global.debug_color"},
+			{"global.newLayerQuick"},
+			{"global.open_image"},
+			{"global.save_image"},
+			{"global.save_image_as"},
+			{"global.undo"},
+			{"global.redo"},
+			{"global.export"},
+			{"global."},
+
+			{"context.zoom_in"},
+			{"context.zoom_out"},
+			{"context.zoom_in_slow"},
+			{"context.zoom_out_slow"},
+			{"context.zoom_0"},
+			{"context."},
+
+			{"toolset.pen"},
+			{"toolset.eraser"},
+			{"toolset.fill"},
+			{"toolset.box_selection"},
+			{"toolset.move"},
+			{"toolset.color_picker"},
+			{"toolset."},
+
+			{"palette.swap"},
+			{"palette."},
+			
+			{"frame."},
+			
+			{"draw.clearLayer"},
+			{"draw."},
+			
+	};
+	
     private static final Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
         {"drawpanel.layer.border", new Color(16,16,16)},

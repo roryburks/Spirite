@@ -384,7 +384,7 @@ public class RenderEngine
 	// :::: MImageObserver
 	@Override	public void structureChanged(StructureChange evt) {	}
 	@Override
-	public void imageChanged( ImageChangeEvent evt) {
+	public synchronized void imageChanged( ImageChangeEvent evt) {
 		// Remove all caches whose renderings would have been effected by this change
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
 		

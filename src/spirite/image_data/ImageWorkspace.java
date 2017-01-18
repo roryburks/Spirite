@@ -17,6 +17,7 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.UndoEngine.ClearAction;
 
 
 /***
@@ -254,6 +255,21 @@ public class ImageWorkspace {
 		return true;
 	}
 	
+	/** Performs a command of context "draw." */
+	public void executeDrawCommand( String command) {
+		if( command.equals("clearLayer")) {
+			ImageData image = getActiveData();
+			if( image != null) {
+				ClearAction action = undoEngine.new ClearAction();
+				action.performImageAction(image);
+				undoEngine.storeAction(action, image);
+			}
+		}
+        else {
+        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Draw command: draw." + command);
+        }
+	}
+	
 	// :::: Group Node Modification
 	public LayerNode newLayer( int w, int h, String name, Color c) {
 		return 	addNewLayer( null, w, h, name, c);
@@ -278,6 +294,7 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewLayer( GroupTree.Node context, int identifier, String name) {
+		System.out.println(imageData.size());
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event

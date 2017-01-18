@@ -269,7 +269,7 @@ public class WorkPanel extends javax.swing.JPanel
                 .addComponent(workSplicePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup( layout.createParallelGroup()
                 .addComponent(jscrollHorizontal)
-                .addComponent(zoomPanel)
+                .addComponent(zoomPanel, 0, 0, jscrollHorizontal.preferredSize().height)
             )
             .addComponent(coordinateLabel, 24,24,24)
         );

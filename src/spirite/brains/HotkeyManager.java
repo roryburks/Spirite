@@ -54,9 +54,10 @@ public class HotkeyManager {
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
                 
                 {"global.newLayerQuick", (new Hotkey( KeyEvent.VK_INSERT, 0))},
-
                 {"global.undo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK))},
                 {"global.redo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
+                
+                {"draw.clearLayer", (new Hotkey( KeyEvent.VK_DELETE, 0))},
             }
         );
         

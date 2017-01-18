@@ -124,6 +124,8 @@ public class RootFrame extends javax.swing.JFrame
     			{".Debug &Color", "global.debug_color", null},
     			
     			{"&Edit", null, null},
+    			{".&Undo", "global.undo", null},
+    			{".&Redo", "global.redo", null},
     			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},
@@ -192,6 +194,12 @@ public class RootFrame extends javax.swing.JFrame
             	master.getFrameManager().performCommand(command.substring("frame.".length()));
             else if( command.startsWith("context."))
                 contextualCommand(command.substring("context.".length()));
+            else if( command.startsWith("draw.")){
+            	final ImageWorkspace workspace = master.getCurrentWorkspace();
+            	if( workspace != null) {
+            		workspace.executeDrawCommand( command.substring("draw.".length()));
+            	}
+            }
             else {
             	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
             }

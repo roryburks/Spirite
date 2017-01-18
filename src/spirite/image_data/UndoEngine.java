@@ -15,6 +15,7 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.DrawEngine.StrokeEngine;
@@ -463,19 +464,21 @@ public class UndoEngine {
 		protected void addAction( UndoAction action) {
 			if( !(action instanceof ImageAction)) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to add a non ImageAction to an ImageContext");
+				return;
 			}
+			final ImageAction iaction = (ImageAction)action;
 			
 			met++;
 			pointer++;
 			
-			// The second half of this conditional is mostly debug to
-			//	test if the dynamic keyframe distance is working, but 
-			if( met == MAX_TICKS_PER_KEY || action instanceof FillAction) {
-				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), (ImageAction)action));
+			// Record a keyframe if it's been a while or the action is a "HeavyAction"
+			//	i.e. an action requiring a lot of computation to perform
+			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
+				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image), iaction));
 				met = 0;
 			}
 			else {
-				actions.add((ImageAction)action);
+				actions.add(iaction);
 			}
 		}
 		
@@ -738,7 +741,7 @@ public class UndoEngine {
 		protected void onCauterize() {}
 	}
 	
-	/** ImageActions ara assosciated with ImageContexts, they have two components
+	/** ImageActions are associated with ImageContexts, they have two components
 	 * to them: a logical component, which calls performAction and undoAction
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
@@ -746,7 +749,10 @@ public class UndoEngine {
 		@Override protected void performAction() {}
 		@Override protected void undoAction() {}
 		protected abstract void performImageAction( ImageData image);
+		protected boolean isHeavyAction() {return false;}
 	}
+	
+	
 
 	/** Associated with the NullContext, a NullAction strictly requires you to
 	 * have an UndoAction since there is always a logical component assosciated
@@ -763,7 +769,7 @@ public class UndoEngine {
 		public boolean canStack( UndoAction newAction);
 	}
 	
-	
+
 	
 	// ==== Image Undo Actions ====
 	
@@ -820,6 +826,16 @@ public class UndoEngine {
 		}
 		public Point getPoint() { return new Point(p);}
 		public Color getColor() { return new Color(c.getRGB());}
+	}
+	public class ClearAction extends ImageAction {
+		public ClearAction() {description = "Clear Image";}
+		@Override
+		protected void performImageAction(ImageData image) {
+			BufferedImage bi = workspace.checkoutImage(image);
+			MUtil.clearImage(bi);
+			workspace.checkinImage(image);
+		}
+		
 	}
 	
 	
