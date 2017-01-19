@@ -15,6 +15,8 @@ import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.SimpleLayer;
 
 /***
  * SaveEngine is a static container for methods which saves images to
@@ -98,19 +100,22 @@ public class SaveEngine {
 			}
 		}
 		else if( node instanceof GroupTree.LayerNode) {
-			GroupTree.LayerNode rnode = (GroupTree.LayerNode) node;
+			Layer layer = ((GroupTree.LayerNode) node).getLayer();
 			
 			// [1] : Depth of Node in GroupTree
 			ra.write( depth);
-			// [1] : Node Type ID
-			ra.write( SaveLoadUtil.NODE_LAYER);
 			
-			ImageData data = rnode.getImageData();
-			// [4] : ID of ImageData linked to this LayerNode
-			ra.writeInt( data.getID());
+			if( layer instanceof SimpleLayer) {
+				// [1] : Node Type ID
+				ra.write( SaveLoadUtil.NODE_SIMPLE_LAYER);
+				
+				ImageData data = ((SimpleLayer) layer).getData();
+				// [4] : ID of ImageData linked to this LayerNode
+				ra.writeInt( data.getID());
+			}
 			
 			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToByteArrayUTF8( rnode.getName()));
+			ra.write( SaveLoadUtil.strToByteArrayUTF8( node.getName()));
 		}
 		else {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Unknown GroupTree Node type on saving.");

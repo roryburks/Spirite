@@ -5,8 +5,11 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,6 +17,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.swing.SwingUtilities;
+
 import java.util.Set;
 
 import spirite.MDebug.ErrorType;
@@ -31,6 +37,7 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.SelectionEngine.Selection;
+import spirite.image_data.layers.Layer;
 
 /***
  * The RenderEngine may or may not be a big and necessary component
@@ -86,15 +93,27 @@ public class RenderEngine
 				// I think I need to re-think names
 				BufferedImage imageImage = settings.image.readImage().image;
 
-				
 				cachedImage = cacheManager.createImage(settings.width, settings.height, this);
 				
 				BufferedImage image = cachedImage.access();
-				
 				Graphics g = image.getGraphics();
 				Graphics2D g2 = (Graphics2D)g;
+				
 				g2.setRenderingHints(settings.hints);
 				g2.drawImage(imageImage, 0, 0, settings.width, settings.height, null);
+				g.dispose();
+			}
+			else if( settings.layer != null) {
+				cachedImage = cacheManager.createImage(settings.width, settings.height, this);
+				
+
+				BufferedImage image = cachedImage.access();
+				Graphics g = image.getGraphics();
+				Graphics2D g2 = (Graphics2D)g;
+				
+				g2.scale( settings.width / (float)settings.layer.getWidth(),
+						settings.height / (float)settings.layer.getHeight());
+				settings.layer.draw(g);
 				g.dispose();
 			}
 			else {
@@ -187,17 +206,21 @@ public class RenderEngine
 			Node child = it.previous();
 			if( child.isVisible()) {
 				if( child instanceof LayerNode) {
-					LayerNode layer = (LayerNode)child;
-					BufferedImage img = layer.data.readImage().image;
+					// Layer Node
+					Layer layer = ((LayerNode)child).getLayer();
 					
 					_setGraphicsSettings(g, child, settings);
-					g2.drawImage( img,
-							Math.round(child.x*ratioW), Math.round(child.y*ratioH), 
-							settings.width, settings.height,
-							null);
+					AffineTransform transform = g2.getTransform();
+					g2.translate(child.x, child.y);
+					g2.scale( ratioW, ratioH);
+					
+					layer.draw(g);
+					
+					g2.setTransform(transform);
 					_resetRenderSettings(g, child, settings);
 				}
 				else if( child instanceof GroupNode && !child.getChildren().isEmpty()) {
+					// Group Node
 					if( n == buffer.length+1) {
 						MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
 						continue;
@@ -205,11 +228,10 @@ public class RenderEngine
 					
 
 					_propperRec((GroupNode)child, n+1, settings, buffer);
-
+					
 					_setGraphicsSettings(g, child,settings);
 					g2.drawImage( buffer[n+1],
 							0, 0, 
-							settings.width, settings.height, 
 							null);
 					_resetRenderSettings(g, child, settings);
 				}
@@ -248,9 +270,6 @@ public class RenderEngine
 		public ImageWorkspace workspace;
 		public boolean drawSelection = true;
 
-		/** If image is non-null, then the only thing you draw is that
-		 * image.  drawSelection and node are both ignored. */
-		public ImageData image = null;
 		
 		/** If null uses default hints. */
 		public RenderingHints hints = null;
@@ -260,7 +279,11 @@ public class RenderEngine
 		public int width = -1;
 		public int height = -1;
 
-		public GroupNode node = null;	// If null uses the root node
+		// Only one of the following three can be non-null.
+		//	If all three are null, it draws the root node
+		public GroupNode node = null;
+		public ImageData image = null;
+		public Layer layer = null;
 		
 		/** Converts all ambiguous settings into an explicit form
 		 * so that automatic hashCode and equals methods will work
@@ -279,10 +302,18 @@ public class RenderEngine
 			// Change all the many things ignored if image is null to null
 			if(image != null) {
 				node = null;
+				layer = null;
 				drawSelection = false;
 				
 				if( width == -1) width = image.readImage().image.getWidth();
 				if( height == -1) height = image.readImage().image.getHeight();
+			}
+			else if( layer != null) {
+				node = null;
+				image = null;
+				drawSelection = false;
+				if( width == -1) width = layer.getWidth();
+				if( height == -1) height = layer.getHeight();
 			}
 			else {
 				if( node == null) node = workspace.getRootNode();
@@ -294,9 +325,10 @@ public class RenderEngine
 		
 		public List<ImageData> getImagesReliedOn() {
 			if( image != null) {
-				List<ImageData> list = new LinkedList<>();
-				list.add(image);
-				return list;
+				return Arrays.asList(image);
+			}
+			else if( layer != null) {
+				return layer.getUsedImageData();
 			}
 			else {
 				// Get a list of all layer nodes then get a list of all ImageData
@@ -313,11 +345,11 @@ public class RenderEngine
 				
 				Iterator<Node> it = layerNodes.iterator();
 				while( it.hasNext()){
-					LayerNode layer = (LayerNode)it.next();
-					
-					// Avoiding duplicates should make the intersection method quicker
-					if( list.indexOf(layer.data) == -1)
-						list.add(layer.data);
+					for( ImageData data : ((LayerNode)it.next()).getLayer().getUsedImageData()) {
+						// Avoiding duplicates should make the intersection method quicker
+						if( list.indexOf(data) == -1)
+							list.add(data);
+					}
 				}
 				
 				return list;
@@ -334,7 +366,6 @@ public class RenderEngine
 			return list;
 		}
 		
-		// !!!! Eclipse Auto-generated.  Should work as expected
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -343,6 +374,7 @@ public class RenderEngine
 			result = prime * result + height;
 			result = prime * result + ((hints == null) ? 0 : hints.hashCode());
 			result = prime * result + ((image == null) ? 0 : image.hashCode());
+			result = prime * result + ((layer == null) ? 0 : layer.hashCode());
 			result = prime * result + ((node == null) ? 0 : node.hashCode());
 			result = prime * result + width;
 			result = prime * result + ((workspace == null) ? 0 : workspace.hashCode());
@@ -372,6 +404,11 @@ public class RenderEngine
 					return false;
 			} else if (!image.equals(other.image))
 				return false;
+			if (layer == null) {
+				if (other.layer != null)
+					return false;
+			} else if (!layer.equals(other.layer))
+				return false;
 			if (node == null) {
 				if (other.node != null)
 					return false;
@@ -396,7 +433,8 @@ public class RenderEngine
 	public synchronized void imageChanged( ImageChangeEvent evt) {
 		// Remove all caches whose renderings would have been effected by this change
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
-		
+	
+		try {
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 	
 		while( it.hasNext()) {
@@ -425,6 +463,16 @@ public class RenderEngine
 					it.remove();
 				}
 			}
+		}
+		} catch( ConcurrentModificationException e){
+			// TODO: Very Bad.  Have to figure out where the collision is comind from.
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					System.out.println("ConcurrentModification when checking imageChange.");
+					imageCache.clear();
+				}
+			});
 		}
 	}
 	

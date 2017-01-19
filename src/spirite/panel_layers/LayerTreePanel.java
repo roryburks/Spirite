@@ -12,8 +12,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -45,6 +47,7 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
@@ -132,18 +135,43 @@ public class LayerTreePanel extends ContentTree
 		List<ImageData> changedImages = evt.getChangedImages();
     	
     	while( e.hasMoreElements()) {
-    		DefaultMutableTreeNode node = e.nextElement();
+    		DefaultMutableTreeNode treeNode = e.nextElement();
+    		Object obj = treeNode.getUserObject();
     		
-    		Object obj = node.getUserObject();
+    		Collection<ImageData> dataUsed;
+    		
     		if( obj instanceof LayerNode) {
-    			LayerNode layer = (LayerNode)obj;
-    			if( changedImages.contains(layer.getImageData())) {
-    				// !!!! TODO: This draws only the PART that is necessary, but
-    				// 	probably causes a lot of unnecessary code to execute internally
-    				//	there might be a far better Swing-intended way to repaint a
-    				//	particular node within the tree
-    				tree.repaint(tree.getPathBounds(new TreePath(node.getPath())));
+    			dataUsed = ((LayerNode)obj).getLayer().getUsedImageData();
+    		}
+    		else if( obj instanceof GroupNode) {
+    			dataUsed = new LinkedHashSet<>();	// LinkedHashSet efficiently avoids duplicates
+				
+    			List<Node> layerNodes = ((GroupNode)obj).getAllNodesST( new NodeValidator() {
+					@Override public boolean isValid(Node node) {
+						return (node.isVisible() && node instanceof LayerNode);
+					}
+					@Override public boolean checkChildren(Node node) {
+						return node.isVisible();
+					}
+				});
+    			
+    			for( Node lnode : layerNodes) {
+    				dataUsed.addAll( ((LayerNode)lnode).getLayer().getUsedImageData());
     			}
+			}
+    		else
+    			continue;
+    		
+    		// Test the intersection of changedImages and dataUsed to see if the node needs to be re-drawn
+    		List<ImageData> intersection = new ArrayList<>(dataUsed);
+    		intersection.retainAll(changedImages);
+    		
+    		if( !dataUsed.isEmpty()) {
+				// !!!! TODO: This draws only the PART that is necessary, but
+				// 	probably causes a lot of unnecessary code to execute internally
+				//	there might be a far better Swing-intended way to repaint a
+				//	particular node within the tree
+				tree.repaint(tree.getPathBounds(new TreePath(treeNode.getPath())));
     		}
     	}
     }
@@ -467,7 +495,7 @@ public class LayerTreePanel extends ContentTree
 			if( obj instanceof GroupTree.Node) {
 				String str = ((GroupTree.Node)obj).getName();
 				if( MDebug.DEBUG && obj instanceof GroupTree.LayerNode)
-					str += " " + ((GroupTree.LayerNode)obj).getImageData().getID();
+					str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().getID();
 				renderPanel.label.setText( str);
 			}
 
@@ -581,7 +609,7 @@ public class LayerTreePanel extends ContentTree
 					settings.height = getHeight();
 					
 					if( node instanceof LayerNode)
-						settings.image = ((LayerNode)node).getImageData();
+						settings.layer = ((LayerNode)node).getLayer();
 					else if( node instanceof GroupNode)
 						settings.node = (GroupNode)node;
 

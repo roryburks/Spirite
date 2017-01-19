@@ -89,6 +89,10 @@ public class PalettePanel extends JPanel
         btnSavePalette.setIcon(Globals.getIcon("palSavePalette"));
         btnLoadPalette.setIcon(Globals.getIcon("palLoadPalette"));
         btnAddColor.setIcon(Globals.getIcon("palNewColor"));
+
+        btnSavePalette.setBackground( new Color( 170,170,220));
+        btnLoadPalette.setBackground( new Color( 170,170,220));
+        btnAddColor.setBackground( new Color( 170,170,220));
         
         Dimension bsize = new Dimension(24, 12);
         

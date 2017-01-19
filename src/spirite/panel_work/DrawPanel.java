@@ -32,6 +32,7 @@ import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
+import spirite.image_data.layers.Layer;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 
@@ -115,13 +116,13 @@ public class DrawPanel extends JPanel
                 g2.setColor(Globals.getColor("drawpanel.layer.border"));
                 
             	if( selected instanceof GroupTree.LayerNode) {
-            		BufferedImage bi = ((GroupTree.LayerNode) selected).getImageData().readImage().image;
+            		Layer layer = ((GroupTree.LayerNode) selected).getLayer();
             		
             		g2.drawRect( 
             				context.itsX(selected.getOffsetX()), 
             				context.itsY(selected.getOffsetY()), 
-            				(int)(bi.getWidth()* context.getZoom()), 
-            				(int)(bi.getHeight() * context.getZoom()));
+            				(int)(layer.getWidth()* context.getZoom()), 
+            				(int)(layer.getHeight() * context.getZoom()));
             	}
             }
 

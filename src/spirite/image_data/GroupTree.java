@@ -6,6 +6,7 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.image_data.ImageWorkspace.VisibilityChange;
+import spirite.image_data.layers.Layer;
 
 /***
  * Though almost all ImageData goes through the group tree before being
@@ -227,15 +228,16 @@ public class GroupTree {
 	}
 	
 	public class LayerNode extends Node {
-		ImageData data;
+		Layer layer;
+//		ImageData data;
 		
-		LayerNode( ImageData data, String name) {
-			this.data = data;
+		LayerNode( Layer layer, String name) {
+			this.layer = layer;
 			this.name = name;
 		}
 		
-		public ImageData getImageData() {
-			return data;
+		public Layer getLayer() {
+			return layer;
 		}
 	}
 }

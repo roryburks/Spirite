@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
+
 /***
  * SettingsManager will handle all the various properties and settings
  * that need to be remembered for ease of use reasons and aren't remembered
@@ -39,6 +43,11 @@ public class SettingsManager {
 		if( paletteList == null)
 			loadPaletteList();
 		
+		if( raw.length > Preferences.MAX_VALUE_LENGTH * 3 / 4) {
+			MDebug.handleError(ErrorType.ALLOCATION_FAILED, null, "Preference size too large.");
+			return;
+		}
+		
 		if( !paletteList.contains(name)) {
 			paletteList.add(name);
 			prefs.put("PaletteList", String.join("\0", paletteList));
@@ -48,7 +57,6 @@ public class SettingsManager {
 	}
 	private void loadPaletteList() {
 		String raw = prefs.get("PaletteList","");
-		
 		
 		String entries[] = raw == "" ? new String[0] : raw.split("\0");
 		paletteList = new ArrayList<String>(Arrays.asList(entries));

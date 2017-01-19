@@ -908,6 +908,12 @@ public class UndoEngine {
 		}
 		@Override
 		public boolean canStack(UndoAction newAction) {
+			if( !newAction.getClass().equals(this.getClass()))
+				return false;
+			if( !change.getClass().equals(
+					((StackableStructureAction)newAction).change.getClass()))
+				return false;
+
 			return ((StackableStructureChange)change).canStack(
 					((StackableStructureAction)newAction).change);
 		}

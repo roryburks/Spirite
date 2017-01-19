@@ -2,13 +2,19 @@
 package spirite.ui;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -25,6 +31,7 @@ import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_toolset.PalettePanel;
@@ -329,12 +336,18 @@ public class RootFrame extends javax.swing.JFrame
     public boolean dispatchKeyEvent(KeyEvent e) {
         int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
 
+    	
+
         // Hotkeys
         if( e.getID() == KeyEvent.KEY_PRESSED) {
             int key = e.getKeyCode();
             int modifier = e.getModifiersEx();
-
-            if( modifier == mod) {
+            
+        	// ::: Copy/Cut/Paste have hard-coded hotkeys
+            if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_V) {
+            	paste();
+            }
+            else if( modifier == mod) {
             	String command = master.getHotekyManager().getCommand( key, modifier);
 
             	performCommand(command);
@@ -343,6 +356,31 @@ public class RootFrame extends javax.swing.JFrame
         }
         
         return false;
+    }
+    
+    private void paste() {
+    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	
+    	try {
+    		//!!!! DEBUG
+/*    		Image img = (Image) c.getData(DataFlavor.imageFlavor);
+    		int width = img.getWidth(null);
+    		int height = img.getHeight(null);
+
+    		ImageWorkspace workspace = master.getCurrentWorkspace();
+    		if( workspace == null) {
+    			workspace = new ImageWorkspace(master.getCacheManager());
+    			workspace.finishBuilding();
+    		}
+    		
+    		LayerNode node = workspace.addNewLayer( workspace.getSelectedNode(), width, height, "Pasted Layer", new Color(0,0,0,0));
+    		BufferedImage bi =workspace.checkoutImage(node.getImageData());Graphics g = bi.getGraphics();
+    		g.drawImage(img, 0, 0, null);
+    		g.dispose();
+    		img.flush();
+    		workspace.checkinImage(node.getImageData());*/
+    		//!!!! DEBUG
+    	} catch( Exception e) {}
     }
 
     // :::: WindowFocusListener

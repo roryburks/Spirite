@@ -170,7 +170,7 @@ public class LoadEngine {
 			layer = ra.readUnsignedByte();			
 			type = ra.readUnsignedByte();
 			
-			if( type == SaveLoadUtil.NODE_LAYER) 
+			if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) 
 				identifier = ra.readInt();
 			
 			
@@ -184,7 +184,7 @@ public class LoadEngine {
 					nodeLayer[layer] = workspace.addGroupNode( nodeLayer[layer-1], name);
 					nodeLayer[layer].setExpanded(true);
 				}
-				if( type == SaveLoadUtil.NODE_LAYER) {
+				if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) {
 					workspace.addNewLayer( nodeLayer[layer-1], identifier, name);
 				}
 			}

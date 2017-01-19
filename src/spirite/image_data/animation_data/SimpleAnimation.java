@@ -100,7 +100,8 @@ public class SimpleAnimation extends AbstractAnimation
 			frame--;
 			
 			if( frame != -1) {
-				g.drawImage( layer.frames.get(frame).getImageData().readImage().image, 0, 0, null);
+				layer.frames.get(frame).getLayer().draw(g);
+//				g.drawImage( layer.frames.get(frame).getImageData().readImage().image, 0, 0, null);
 			}
 		}
 	}

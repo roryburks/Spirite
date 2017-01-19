@@ -20,6 +20,7 @@ import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 
@@ -99,11 +100,16 @@ public class Test1 {
 			assert( g1.getClass().equals(g2.getClass()));
 			
 			if( g1 instanceof LayerNode) {
-				BufferedImage img1 = ((LayerNode)g1).getImageData().readImage().image;
-				BufferedImage img2 = ((LayerNode)g2).getImageData().readImage().image;
-				
-				assert( compareImages(img1,img2));
+				assert( ((LayerNode)g1).getLayer().getUsedImageData().equals(
+						((LayerNode)g2).getLayer().getUsedImageData()));
 			}
+		}
+		
+		for( ImageData data : workspace.getImageData()) {
+			BufferedImage b1 = data.readImage().image;
+			BufferedImage b2 = data.readImage().image;
+			
+			assert( compareImages(b1,b2));
 		}
 	}
 	

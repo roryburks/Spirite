@@ -222,7 +222,7 @@ public class SelectionEngine {
 		Rectangle rect = selection.getBounds();
 		
 		// At this point we're going through with the lift
-		selection.dataContext = node.getImageData();
+		selection.dataContext = node.getLayer().getActiveData();
 		
 		// Creates a Selection Mask
 		liftedData = new BufferedImage( 
@@ -254,7 +254,7 @@ public class SelectionEngine {
 		startX = offsetX;
 		startY = offsetY;
 		
-		workspace.checkinImage(node.getImageData());
+		workspace.checkinImage(selection.dataContext);
 	}
 	
 	// :::: Various Selection Formats

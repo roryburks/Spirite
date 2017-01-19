@@ -18,6 +18,7 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.UndoEngine.ClearAction;
+import spirite.image_data.layers.SimpleLayer;
 
 
 /***
@@ -91,15 +92,18 @@ public class ImageWorkspace {
 			public boolean checkChildren(Node node) {return true;}
 		});
 		for( Node node : layers) {
-			ImageData data = ((LayerNode)node).getImageData();
-			int i = imageData.indexOf(data);
+			List<ImageData> layerDataUsed = ((LayerNode)node).getLayer().getUsedImageData();
 			
-			if( i == -1) {
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData during Cache cleanup.");
-				imageData.add(data);
+			for( ImageData data : layerDataUsed) {
+				int i = imageData.indexOf(data);
+				
+				if( i == -1) {
+					MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData during Cache cleanup.");
+					imageData.add(data);
+				}
+				else 
+					used[i] = true;
 			}
-			else 
-				used[i] = true;
 		}
 		
 		// Go through the UndoEngine and flag them as being used
@@ -222,7 +226,7 @@ public class ImageWorkspace {
 		
 		if( selected instanceof GroupTree.LayerNode) {
 			// !!!! SHOULD be no reason to add sanity checks here.
-			return  ((GroupTree.LayerNode)selected).getImageData();
+			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
 		}
 		return null;
 	}
@@ -311,7 +315,7 @@ public class ImageWorkspace {
 		height = Math.max(height, h);
 		
 		// Create node then execute StructureChange event
-		LayerNode node = groupTree.new LayerNode( data, name);
+		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
 		
 		executeChange(createAdditionEvent(node, context));
 		
@@ -322,7 +326,7 @@ public class ImageWorkspace {
 		for( ImageData data : imageData) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event
-				LayerNode node = groupTree.new LayerNode( data, name);
+				LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
 
 				width = Math.max(width,  data.readImage().getWidth());
 				height = Math.max(height, data.readImage().getHeight());
@@ -690,7 +694,7 @@ public class ImageWorkspace {
 			this.dx = newX - node.x;
 			this.dy = newY - node.y;
 			
-			this.description = "Opacity Changed";
+			this.description = "Changed Node Offset";
 		}
 
 		@Override public void execute() { node.x += dx; node.y += dy;}
