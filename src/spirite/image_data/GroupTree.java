@@ -5,7 +5,6 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.image_data.ImageWorkspace.VisibilityChange;
 import spirite.image_data.layers.Layer;
 
 /***

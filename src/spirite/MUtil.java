@@ -4,9 +4,14 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,5 +130,26 @@ public class MUtil {
 			else {
 			}
 		}
+	}
+	
+	// Really seems like this should be a native function
+	public static class TransferableImage implements Transferable {
+		private Image image;
+		public TransferableImage( Image image) {this.image = image;}
+		@Override
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			if( isDataFlavorSupported( flavor))
+				return image;
+			else
+				throw new UnsupportedFlavorException(flavor);
+		}
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { DataFlavor.imageFlavor };
+		}
+		@Override
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			return flavor == DataFlavor.imageFlavor;
+		}		
 	}
 }

@@ -3,7 +3,7 @@
  */
 package sjunit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

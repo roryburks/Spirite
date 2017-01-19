@@ -25,7 +25,6 @@ public class SimpleLayer extends Layer {
 	@Override
 	public void draw(Graphics g) {
 		g.drawImage(data.readImage().image, 0, 0, null);
-		
 	}
 
 	@Override

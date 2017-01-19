@@ -7,7 +7,6 @@ import javax.swing.UIManager;
 
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
-import spirite.image_data.layers.Layer;
 import spirite.ui.FrameManager;
 
 /**

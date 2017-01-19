@@ -1,6 +1,5 @@
 package spirite.panel_work;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -14,7 +13,6 @@ import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;

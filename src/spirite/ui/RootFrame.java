@@ -25,15 +25,18 @@ import javax.swing.JOptionPane;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
-import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree;
+import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.layers.SimpleLayer;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
@@ -336,7 +339,6 @@ public class RootFrame extends javax.swing.JFrame
     public boolean dispatchKeyEvent(KeyEvent e) {
         int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
 
-    	
 
         // Hotkeys
         if( e.getID() == KeyEvent.KEY_PRESSED) {
@@ -344,9 +346,10 @@ public class RootFrame extends javax.swing.JFrame
             int modifier = e.getModifiersEx();
             
         	// ::: Copy/Cut/Paste have hard-coded hotkeys
-            if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_V) {
+            if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_V) 
             	paste();
-            }
+            else if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_C)
+            	copy();
             else if( modifier == mod) {
             	String command = master.getHotekyManager().getCommand( key, modifier);
 
@@ -362,25 +365,50 @@ public class RootFrame extends javax.swing.JFrame
     	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
     	
     	try {
-    		//!!!! DEBUG
-/*    		Image img = (Image) c.getData(DataFlavor.imageFlavor);
+    		// Paste Clipboard to new SimpleLayer
+    		Image img = (Image) c.getData(DataFlavor.imageFlavor);
     		int width = img.getWidth(null);
     		int height = img.getHeight(null);
+    		boolean newWorkspace = false;
 
     		ImageWorkspace workspace = master.getCurrentWorkspace();
     		if( workspace == null) {
     			workspace = new ImageWorkspace(master.getCacheManager());
-    			workspace.finishBuilding();
+    			newWorkspace = true;
     		}
     		
-    		LayerNode node = workspace.addNewLayer( workspace.getSelectedNode(), width, height, "Pasted Layer", new Color(0,0,0,0));
-    		BufferedImage bi =workspace.checkoutImage(node.getImageData());Graphics g = bi.getGraphics();
+    		BufferedImage bi = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
+    		Graphics g = bi.getGraphics();
     		g.drawImage(img, 0, 0, null);
-    		g.dispose();
-    		img.flush();
-    		workspace.checkinImage(node.getImageData());*/
-    		//!!!! DEBUG
+    		workspace.addNewSimpleLayer( workspace.getSelectedNode(), bi, "Pasted Layer");
+
+    		if( newWorkspace)
+    			workspace.finishBuilding();
     	} catch( Exception e) {}
+    }
+    
+
+    private void copy() {
+    	ImageWorkspace workspace = master.getCurrentWorkspace();
+    	
+    	if( workspace == null) return;
+    	
+    	RenderSettings settings = new RenderSettings();
+    	settings.workspace = workspace;
+    	
+    	GroupTree.Node node = workspace.getSelectedNode();
+    	
+    	if( node instanceof GroupTree.LayerNode) 
+    		settings.layer = ((GroupTree.LayerNode)node).getLayer();
+    	else if( node instanceof GroupTree.GroupNode) 
+    		settings.node = (GroupTree.GroupNode)node;
+
+    	BufferedImage img = master.getRenderEngine().renderImage(settings);
+    	TransferableImage transfer = new TransferableImage(img);
+    	
+
+    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	c.setContents(transfer, null);
     }
 
     // :::: WindowFocusListener

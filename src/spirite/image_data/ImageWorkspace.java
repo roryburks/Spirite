@@ -304,6 +304,18 @@ public class ImageWorkspace {
 		return 	addNewLayer( null, w, h, name, c);
 	}
 	
+	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
+		ImageData data = new ImageData( img, workingID++, this);
+		imageData.add(data);
+
+		width = Math.max(width, img.getWidth());
+		height = Math.max(height, img.getHeight());
+		
+		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
+		executeChange( createAdditionEvent(node,context));
+		return node;
+	}
+	
 	public LayerNode addNewLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
 		ImageData data = new ImageData(w, h, c, this);

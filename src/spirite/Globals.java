@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.UIManager;
 
 import spirite.MDebug.ErrorType;
 
@@ -50,12 +49,12 @@ public class Globals {
 			{"context.zoom_0"},
 			{"context."},
 
-			{"toolset.pen"},
-			{"toolset.eraser"},
-			{"toolset.fill"},
-			{"toolset.box_selection"},
-			{"toolset.move"},
-			{"toolset.color_picker"},
+			{"toolset.PEN"},
+			{"toolset.ERASER"},
+			{"toolset.FILL"},
+			{"toolset.BOX_SELECTION"},
+			{"toolset.MOVE"},
+			{"toolset.COLOR_PICKER"},
 			{"toolset."},
 
 			{"palette.swap"},

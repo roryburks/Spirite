@@ -25,8 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
-import org.w3c.dom.css.Rect;
-
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;

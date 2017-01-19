@@ -5,24 +5,19 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Map;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import spirite.brains.CacheManager.CacheContext;
-import spirite.brains.CacheManager.CachedImage;
-import spirite.brains.MasterControl;
-import spirite.image_data.RenderEngine;
-import spirite.image_data.UndoEngine;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+
+import spirite.brains.CacheManager.CacheContext;
+import spirite.brains.MasterControl;
 
 public class DebugDialog extends JDialog implements ActionListener {
 

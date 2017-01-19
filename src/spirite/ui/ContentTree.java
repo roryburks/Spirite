@@ -25,7 +25,9 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -35,6 +37,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -112,6 +115,7 @@ public class ContentTree extends JPanel
 		model = new DefaultTreeModel(root);
 		tree.setModel(model);
 		
+		
 		// Make the background invisible as we will draw the background manually
 		bgColor = tree.getBackground();
 		container.setOpaque( false);
@@ -121,7 +125,7 @@ public class ContentTree extends JPanel
 		// Initialize Drag-Drop Manager
 		dragManager = new CCTDragManager();
 		new DropTarget(tree,dragManager);	// TODO: Figure out how this works
-		
+		tree.setTransferHandler(null);	// Prevent default tree copy,paste,and drag/drop
 		
 		initLayout();
 		buttonPanel.reformPanel();
@@ -134,6 +138,7 @@ public class ContentTree extends JPanel
 		//	remembers the Horizontal scrollbar's position and resets it after
 		//	editing begins.
 		InputMap m = tree.getInputMap( JComponent.WHEN_FOCUSED);
+		m.clear();
 		m.put( KeyStroke.getKeyStroke( KeyEvent.VK_F2, 0), "myAction");
 		tree.getActionMap().put("myAction", new AbstractAction() {
 			@Override

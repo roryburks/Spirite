@@ -21,12 +21,10 @@ import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.ReadOnlyImage;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
@@ -131,11 +129,17 @@ public class DrawPanel extends JPanel
             
             
             // Draw Grid
+            int w = getWidth();
+            int h = getHeight();
             if( zoom >= 4) {
                 for( int i = 0; i < workspace.getWidth(); ++i) {
+                	if( context.itsX(i) < 0) continue;
+                	if( context.itsX(i) > w) break;
                     g2.drawLine(context.itsX(i), 0, context.itsX(i), this.getHeight());
                 }
                 for( int i = 0; i < workspace.getHeight(); ++i) {
+                	if( context.itsY(i) < 0) continue;
+                	if( context.itsY(i) > h) break;
                     g2.drawLine(0, context.itsY(i), this.getWidth(), context.itsY(i));
                 }
             }

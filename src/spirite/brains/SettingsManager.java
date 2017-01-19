@@ -8,7 +8,6 @@ import java.util.prefs.Preferences;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MDebug.WarningType;
 
 /***
  * SettingsManager will handle all the various properties and settings

@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil;
 
 /***
  * The CacheManager keeps track of all the various dynamic memory 
