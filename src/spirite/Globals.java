@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.UIManager;
 
 import spirite.MDebug.ErrorType;
 
@@ -93,6 +94,10 @@ public class Globals {
     		{"visible_off", 1, 0},
     		{"new_layer", 2, 0},
     		{"new_group", 3, 0},
+    		{"icons_12x12.png",13,13,3,1},
+    		{"palNewColor", 0,0},
+    		{"palSavePalette", 1, 0},
+    		{"palLoadPalette", 2, 0},
 	};
 
 
@@ -165,6 +170,7 @@ public class Globals {
     	int index = 0;
     	for( Object[] row : icons) {
     		if( row.length == 5) {
+    			System.out.println((String)row[0]);
     			for( IconSet iset : iconSets) {
     				if( iset.resourceFile == (String)row[0]) {
     					set = iset;
@@ -196,9 +202,10 @@ public class Globals {
     			if( set.img == null) {
     				// Load the image if it isn't loaded already
     				try {
-						set.img = loadIconSheet(Globals.class.getClassLoader().getResource("icons2.png").openStream());
-					} catch (IOException e) {
+						set.img = loadIconSheet(Globals.class.getClassLoader().getResource(set.resourceFile).openStream());
+					} catch (Exception e) {
 						MDebug.handleError( ErrorType.RESOURCE, null, e.getMessage());
+				    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
 					}
     			}
     			
@@ -213,8 +220,8 @@ public class Globals {
     			return set.iconsheet[x][y];
     		}
     	}
-    	
-    	return null;
+
+    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
     }
     
     private static BufferedImage loadIconSheet( InputStream is) throws IOException 

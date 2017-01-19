@@ -1,6 +1,10 @@
 package spirite.brains;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 /***
  * SettingsManager will handle all the various properties and settings
@@ -11,7 +15,50 @@ import java.io.File;
  *
  */
 public class SettingsManager {
+    private final Preferences prefs;
 	private File opennedFile = null;
+	private List<String> paletteList = null;
+	
+	public SettingsManager() {
+        prefs = Preferences.userNodeForPackage(spirite.Main.class);
+        
+	}
+	
+	// Palette Saving/Loading: 
+	//
+	/** used by PaletteManager to get the raw data corresponding to a palette. */
+	byte[] getRawPalette( String name) {
+		List<String> names = getStoredPalettes();
+		
+		if( !names.contains(name))
+			return null;
+		
+		return prefs.getByteArray("palette."+name, null);
+	}
+	void saveRawPalette( String name, byte[] raw) {
+		if( paletteList == null)
+			loadPaletteList();
+		
+		if( !paletteList.contains(name)) {
+			paletteList.add(name);
+			prefs.put("PaletteList", String.join("\0", paletteList));
+		}
+		
+		prefs.putByteArray("palette."+name, raw);
+	}
+	private void loadPaletteList() {
+		String raw = prefs.get("PaletteList","");
+		
+		
+		String entries[] = raw == "" ? new String[0] : raw.split("\0");
+		paletteList = new ArrayList<String>(Arrays.asList(entries));
+	}
+	public List<String> getStoredPalettes() {
+		if( paletteList == null)
+			loadPaletteList();
+		
+		return paletteList;
+	}
 	
 	public File getOpennedFile() {
 		return opennedFile;

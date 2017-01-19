@@ -126,6 +126,8 @@ public class RenderEngine
 		
 		
 		// Step 2: Recursively draw the image
+		ratioW = settings.width / (float)settings.workspace.getWidth();
+		ratioH = settings.height / (float)settings.workspace.getHeight();
 		_propperRec( settings.node, 0, settings, images);
 		
 		// Flush the data we only needed to build the image
@@ -135,6 +137,7 @@ public class RenderEngine
 		
 		return images[0];
 	}
+	private float ratioW, ratioH;
 	
 	/** Determines the number of images needed to properly render 
 	 * the given RenderSettings.  This number is equal to largest Group
@@ -170,6 +173,7 @@ public class RenderEngine
 			MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
 			return;
 		}
+
 		
 		Graphics g = buffer[n].getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
@@ -188,8 +192,8 @@ public class RenderEngine
 					
 					_setGraphicsSettings(g, child, settings);
 					g2.drawImage( img,
-							child.x, child.y, 
-							img.getWidth(), img.getHeight(), 
+							Math.round(child.x*ratioW), Math.round(child.y*ratioH), 
+							settings.width, settings.height,
 							null);
 					_resetRenderSettings(g, child, settings);
 				}

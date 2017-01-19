@@ -86,7 +86,7 @@ public class UIUtil {
 	public static final int MAX_LEVEL = 10;
     private static int _imCountLevel( String s){
     	int r = 0;
-    	while( s.charAt(r) == '.')
+    	while( r < s.length() && s.charAt(r) == '.')
     		r++;
     	return Math.min(r, MAX_LEVEL);
     }

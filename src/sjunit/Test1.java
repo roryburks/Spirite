@@ -31,9 +31,12 @@ public class Test1 {
 	MasterControl master = new MasterControl();
 	
 	public Test1() {
-		LoadEngine.setMaster(master);
+		LoadEngine.setMaster(master);	// still bad
 	}
 	
+	/** Creates an image, saves it to a temp file, then loads it, comparing
+	 * image structures to verify that either Saving and Loading are working 
+	 * as intended or they're both screwed up symmetrically. */
 	@Test
 	public void testSaveLoadIntegrity() {
 		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());

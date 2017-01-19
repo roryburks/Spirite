@@ -38,12 +38,12 @@ public class MasterControl
 {
 	// Components
     private final HotkeyManager hotkeys;
-    private final PaletteManager palette;
     private final ToolsetManager toolset;
     private final SettingsManager settingsManager;
-    private final RenderEngine renderEngine;
     private final CacheManager cacheManager;
     private final FrameManager frameManager;
+    private final PaletteManager palette;	// Requires SettingsManager
+    private final RenderEngine renderEngine;// Require CacheManager
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -51,12 +51,12 @@ public class MasterControl
 
     public MasterControl() {
         hotkeys = new HotkeyManager();
-        palette = new PaletteManager();
         toolset = new ToolsetManager();
         settingsManager = new SettingsManager();
         cacheManager = new CacheManager();
         frameManager = new FrameManager( this);
-        renderEngine = new RenderEngine( this);
+        renderEngine = new RenderEngine( this);	
+        palette = new PaletteManager( this);
 
         Dialogs.setMaster(this); //// TODO BAD
         LoadEngine.setMaster(this); //// TODO BAD
