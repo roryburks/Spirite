@@ -6,6 +6,7 @@ package sjunit;
 import static org.junit.Assert.fail;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +18,16 @@ import spirite.brains.MasterControl;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
+import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.UndoEngine;
+import spirite.image_data.UndoEngine.StrokeAction;
+import spirite.image_data.layers.Layer;
 
 /**
  * @author Guy
@@ -37,7 +42,8 @@ public class Test1 {
 	
 	/** Creates an image, saves it to a temp file, then loads it, comparing
 	 * image structures to verify that either Saving and Loading are working 
-	 * as intended or they're both screwed up symmetrically. */
+	 * as intended or they're both screwed up symmetrically. 
+	 * */
 	@Test
 	public void testSaveLoadIntegrity() {
 		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
@@ -129,6 +135,47 @@ public class Test1 {
 		}
 
 		return true;
+	}
+	public static BufferedImage deepCopy( BufferedImage toCopy) {
+		return new BufferedImage( 
+				toCopy.getColorModel(),
+				toCopy.copyData(null),
+				toCopy.isAlphaPremultiplied(),
+				null);
+	}
+	
+	/**
+	 * This test performs a series of undo actions verifying at certain steps that everything
+	 * is working as expected.
+	 * 
+	 * Should probably be more thorough
+	 */
+	@Test
+	public void testUndoEngineIntegrity() {
+		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+		master.addWorkpace(workspace, false);
+		Layer layer1 = ((LayerNode)workspace.addNewLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
+		workspace.finishBuilding();
+		
+		UndoEngine engine = workspace.getUndoEngine();
+		
+		assert engine.getQueuePosition() == 0;
+		
+		Layer layer2 = ((LayerNode)workspace.addNewLayer(null, 160, 160, "two", new Color(0,0,0,0))).getLayer();
+		
+		
+		
+		RenderSettings settings = new RenderSettings();
+		settings.workspace = workspace;
+		BufferedImage img = master.getRenderEngine().renderImage(settings);
+		BufferedImage img2 = deepCopy(img);
+		
+
+		Layer layer3 = ((LayerNode)workspace.addNewLayer(null, 900, 900, "three", new Color(0,0,0,0))).getLayer();
+		
+		engine.undo();
+		
+		assert compareImages( img2, master.getRenderEngine().renderImage(settings));
 	}
 
 }

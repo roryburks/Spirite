@@ -185,14 +185,22 @@ public class PaletteManager {
     	
     	while( bis.available() > 0) {
 	    	if( count == 0) {
-	    		caret += bis.read();
+	    		int i = bis.read();
+	    		caret += i;
 	    	}
 	    	else {
+	    		System.out.println(count);
 	    		for( int i = 0; i < count; ++i) {
-	    			Color c = new Color( bis.read(), bis.read(), bis.read(), bis.read());
+	    			int r = bis.read();
+	    			int g = bis.read();
+	    			int b = bis.read();
+	    			int a = bis.read();
+	    			Color c = new Color( r,g,b,a);
 	    			palette_colors.put(i+caret, c);
 	    		}
+	    		caret += count;
 	    	}
+	    	count = bis.read();
     	}
     	
     	triggerColorChanged();

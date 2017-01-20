@@ -882,7 +882,6 @@ public class UndoEngine {
 		
 		@Override
 		protected UndoAction iterateNext() {
-			System.out.println(actions.size());
 			if( !iter.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;

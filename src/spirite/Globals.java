@@ -169,7 +169,6 @@ public class Globals {
     	int index = 0;
     	for( Object[] row : icons) {
     		if( row.length == 5) {
-    			System.out.println((String)row[0]);
     			for( IconSet iset : iconSets) {
     				if( iset.resourceFile == (String)row[0]) {
     					set = iset;

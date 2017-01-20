@@ -281,7 +281,6 @@ public class ImageWorkspace {
 	}
 	
 	private boolean verifyImage( ImageData image) {
-		System.out.println(image);
 		if( !imageData.contains(image)) {
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout/in image from wrong workspce.");
 			return false;
@@ -314,30 +313,12 @@ public class ImageWorkspace {
 		imageData.add(newImage);
 
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(newImage), name);
-		if( width < img.getWidth() || height < img.getHeight()) {
-			List<ImageData> data = new ArrayList<>(2);
-			List<UndoAction> actions = new ArrayList<>(2);
-
-			actions.add(undoEngine.new StructureAction( createAdditionEvent(node,context)));
-			data.add(null);
-			actions.add(undoEngine.new StructureAction( new DimensionChange( Math.max(width, img.getWidth()),Math.max(height, img.getHeight()))));
-			data.add(null);
-			
-			try {
-				CompositeAction action = undoEngine.new CompositeAction( actions, data);
-				executeComposite(action);
-				
-				// It's important that you add the action to the UndoEngine AFTER
-				//	you add the node to the GroupTree by calling executingComposite
-				//	otherwise the UndoEngine will cull the imageData before it's linked
-				undoEngine.storeAction(action, null);
-			} catch (BadCompositeConstructionExcpetion e) {
-				e.printStackTrace();
-				return null;
-			}
+		try {
+			_addLayer(node, context);
+		} catch (BadCompositeConstructionExcpetion e) {
+			e.printStackTrace();
 		}
-		else
-			executeChange( createAdditionEvent(node,context));
+		
 		return node;
 	}
 	
@@ -347,14 +328,13 @@ public class ImageWorkspace {
 		imageData.add(data);
 		data.id = workingID++;
 		
-		
-		width = Math.max(width, w);
-		height = Math.max(height, h);
-		
 		// Create node then execute StructureChange event
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
-		
-		executeChange(createAdditionEvent(node, context));
+		try {
+			_addLayer(node, context);
+		} catch (BadCompositeConstructionExcpetion e) {
+			e.printStackTrace();
+		}
 		
 		return node;
 	}
@@ -377,6 +357,37 @@ public class ImageWorkspace {
 		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to add a new Simple Layer using an identifier that does not exist in the current workspace. :" + identifier);
 		
 		return null;
+	}
+	
+	/** Internal attLayer method adds the Layer, tagging a Workspace Resize action
+	 * along with it if one is warranted.
+	 */
+	private void _addLayer(LayerNode node, Node context) 
+			throws BadCompositeConstructionExcpetion 
+	{
+		if( width < node.getLayer().getWidth() || height < node.getLayer().getHeight()) {
+			List<ImageData> data = new ArrayList<>(2);
+			List<UndoAction> actions = new ArrayList<>(2);
+
+			actions.add(undoEngine.new StructureAction( createAdditionEvent(node,context)));
+			data.add(null);
+			actions.add(undoEngine.new StructureAction( 
+					new DimensionChange( 
+							Math.max(width, node.getLayer().getWidth()),
+							Math.max(height, node.getLayer().getHeight()))
+					));
+			data.add(null);
+			
+			CompositeAction action = undoEngine.new CompositeAction( actions, data);
+			executeComposite(action);
+			
+			// It's important that you add the action to the UndoEngine AFTER
+			//	you add the node to the GroupTree by calling executingComposite
+			//	otherwise the UndoEngine will cull the imageData before it's linked
+			undoEngine.storeAction(action, null);
+		}
+		else
+			executeChange( createAdditionEvent(node,context));
 	}
 	
 	public GroupTree.GroupNode addGroupNode( GroupTree.Node context, String name) {
