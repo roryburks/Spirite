@@ -206,15 +206,15 @@ public class UndoEngine {
 		
 		return list;
 	}
-	public UndoAction getMostRecentAction() {
+	public UndoableAction getMostRecentAction() {
 		if( queue.size() == 0)
 			return null;
 		return queue.getLast().getLast();
 	}
 	public static class UndoIndex {
 		public ImageData data;
-		public UndoAction action;
-		public UndoIndex( ImageData data, UndoAction action) {
+		public UndoableAction action;
+		public UndoIndex( ImageData data, UndoableAction action) {
 			this.data = data;
 			this.action = action;
 		}
@@ -257,7 +257,7 @@ public class UndoEngine {
 	 * when the image was checked out.  If not, the first action will not be
 	 * undoable because the previous keyframe will not have been stored.
 	 */
-	public void storeAction( UndoAction action, ImageData data) {
+	public void storeAction( UndoableAction action) {
 		
 		// Delete all actions stored after the current iterator point
 		if( queuePosition != null) {
@@ -278,7 +278,7 @@ public class UndoEngine {
 		//   is on the top of the stack, modify that entry instead of creating
 		//   a new one.
 		if( queue.size() != 0 && getQueuePosition() == queue.size() && action instanceof StackableAction) {
-			UndoAction lastAction = getMostRecentAction();
+			UndoableAction lastAction = getMostRecentAction();
 			
 			if( lastAction.getClass().equals(action.getClass())) {
 				StackableAction stackAction = ((StackableAction)lastAction);
@@ -299,9 +299,10 @@ public class UndoEngine {
 			context = contexts.get(1);
 		}
 		else {
-			assert( data != null);
+			ImageAction iaction = (ImageAction)action;
+			
 			for( UndoContext test : contexts) {
-				if( test.image == data) {
+				if( test.image == iaction.data) {
 					context = test;
 					break;
 				}
@@ -318,8 +319,8 @@ public class UndoEngine {
 			triggerHistoryChanged();
 		}
 		else {
-			assert( data != null);
-			contexts.add(new ImageContext( data));
+			assert( action instanceof ImageAction);
+			contexts.add(new ImageContext( ((ImageAction)action).data));
 		}
 		
 		// Cull 
@@ -429,15 +430,15 @@ public class UndoEngine {
 			this.image = data;
 		}
 
-		protected abstract void addAction( UndoAction action);
+		protected abstract void addAction( UndoableAction action);
 		protected abstract void undo();
 		protected abstract void redo();
 		protected abstract void cauterize();
 		protected abstract void clipTail();
 
 		protected abstract void startIterate();
-		protected abstract UndoAction iterateNext();
-		protected abstract UndoAction getLast();
+		protected abstract UndoableAction iterateNext();
+		protected abstract UndoableAction getLast();
 		
 		protected abstract boolean isEmpty();
 		
@@ -482,6 +483,7 @@ public class UndoEngine {
 			CachedImage frameCache;
 			ImageAction hiddenAction;
 			KeyframeAction( CachedImage frame, ImageAction action) {
+				super(image);
 				this.frameCache = frame;
 				this.hiddenAction = action;
 			}
@@ -514,7 +516,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		protected void addAction( UndoAction action) {
+		protected void addAction( UndoableAction action) {
 			if( !(action instanceof ImageAction)) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to add a non ImageAction to an ImageContext");
 				return;
@@ -607,7 +609,7 @@ public class UndoEngine {
 			ListIterator<ImageAction> it = subList.listIterator(subList.size());
 			
 			while( it.hasPrevious()){
-				UndoAction action = it.previous();
+				UndoableAction action = it.previous();
 				
 				if( action instanceof KeyframeAction) {
 					// Remove the keyframe and flush its data to make absolutely
@@ -627,8 +629,8 @@ public class UndoEngine {
 		}
 
 		@Override
-		protected UndoAction iterateNext() {
-			UndoAction action = actions.get(iterMet++);
+		protected UndoableAction iterateNext() {
+			UndoableAction action = actions.get(iterMet++);
 			
 			if( action instanceof KeyframeAction) {
 				return ((KeyframeAction)action).hiddenAction;
@@ -644,7 +646,7 @@ public class UndoEngine {
 
 
 		@Override
-		protected UndoAction getLast() {
+		protected UndoableAction getLast() {
 			if( actions.isEmpty())
 				return null;
 			else
@@ -653,7 +655,7 @@ public class UndoEngine {
 		
 		@Override
 		protected void flush() {
-			for( UndoAction action: actions) {
+			for( UndoableAction action: actions) {
 				if( action instanceof KeyframeAction) {
 					((KeyframeAction)action).frameCache.flush();
 				}
@@ -701,7 +703,7 @@ public class UndoEngine {
 		}
 
 		@Override
-		protected void addAction(UndoAction action) {
+		protected void addAction(UndoableAction action) {
 			if( action instanceof NullAction) {
 				actions.add( (NullAction) action);
 			}
@@ -753,7 +755,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		protected UndoAction iterateNext() {
+		protected UndoableAction iterateNext() {
 			if( !iter.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
@@ -768,7 +770,7 @@ public class UndoEngine {
 		}
 
 		@Override
-		protected UndoAction getLast() {
+		protected UndoableAction getLast() {
 			if( actions.isEmpty())
 				return null;
 			else
@@ -790,8 +792,21 @@ public class UndoEngine {
 	 *
 	 */
 	private class CompositeContext extends UndoContext {
-		LinkedList<CompositeAction> actions = new LinkedList();
+		LinkedList<CompositeAction> actions = new LinkedList<>();
 		private ListIterator<CompositeAction> pointer = null;
+		private LinkedList<CachedImage> cache = new LinkedList<>();
+		private ListIterator<CachedImage> cpointer = null;
+		
+
+		// Special Null Actions for marking when Selection Data needs to be stored
+		class StoreSelection extends NullAction {
+			@Override protected void performAction() {}
+			@Override protected void undoAction() {}
+		}
+		class DiscardSelection extends NullAction {
+			@Override protected void performAction() {}
+			@Override protected void undoAction() {}
+		}
 		
 		CompositeContext() {
 			super(null);
@@ -810,7 +825,7 @@ public class UndoEngine {
 		}
 
 		@Override
-		protected void addAction(UndoAction action) {
+		protected void addAction(UndoableAction action) {
 			CompositeAction composite = (CompositeAction)action;
 			
 			for( int i=0; i<composite.contexts.length; ++i) {
@@ -881,7 +896,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		protected UndoAction iterateNext() {
+		protected UndoableAction iterateNext() {
 			if( !iter.hasNext()) {
 				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
@@ -901,7 +916,7 @@ public class UndoEngine {
 		}
 
 		@Override
-		protected UndoAction getLast() {
+		protected UndoableAction getLast() {
 			if( actions.isEmpty())
 				return null;
 			else
@@ -918,7 +933,7 @@ public class UndoEngine {
 	 *  Not only store the data needed to recreate the actions on the image data,
 	 *  but also implements the methods to recreate them.
 	 */
-	public abstract class UndoAction {
+	public static abstract class UndoableAction {
 		protected String description = "";
 		protected abstract void performAction();
 		protected abstract void undoAction();
@@ -930,7 +945,11 @@ public class UndoEngine {
 	 * to them: a logical component, which calls performAction and undoAction
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
-	public abstract class ImageAction extends UndoAction {
+	public static abstract class ImageAction extends UndoableAction {
+		protected final ImageData data;
+		protected ImageAction( ImageData data) {
+			this.data = data;
+		}
 		@Override protected void performAction() {}
 		@Override protected void undoAction() {}
 		protected abstract void performImageAction( ImageData image);
@@ -943,63 +962,60 @@ public class UndoEngine {
 	 * have an UndoAction since there is always a logical component assosciated
 	 * with it (otherwise it would have no Actions to it)
 	 */
-	public abstract class NullAction extends UndoAction {}
+	public static abstract class NullAction extends UndoableAction {}
 	
 	/** A StackableAction is an action that if performed multiple times in
 	 * a row will automatically group into a single action by calling 
 	 * <code>stackNewAction</code> on the old action if <code>canStack</code>
 	 * returns true.  */
 	public interface StackableAction {
-		public void stackNewAction( UndoAction newAction);
-		public boolean canStack( UndoAction newAction);
+		public void stackNewAction( UndoableAction newAction);
+		public boolean canStack( UndoableAction newAction);
 	}
 	
 	/** A CompositeAction is composed of two or more (or less, but what's the point)
 	 * actions which are performed in a single "undo/redo" event in sequential order.
 	 * The actions it composites can be any combination of actions with any Contexts.
 	 */
-	public class CompositeAction extends UndoAction {
+	public class CompositeAction extends UndoableAction {
 		private final UndoContext contexts[];
-		private final UndoAction actions[];
+		private final UndoableAction actions[];
 		
-		public CompositeAction( List<UndoAction> actions, List<ImageData>data) 
-				throws BadCompositeConstructionExcpetion
+		public CompositeAction( List<UndoableAction> actions, String description) 
 		{
-			if( actions.size() != data.size())
-				throw new BadCompositeConstructionExcpetion("List Size Mismatch");
+			// Constructs a CompositeAction from the given lists of actions
+			this.description = description;
 			
 			int len = actions.size();
 			this.contexts = new UndoContext[len];
-			this.actions = new UndoAction[len];
+			this.actions = new UndoableAction[len];
 			
 			for( int i=0; i < len; ++i) {
-				UndoAction action = actions.get(i);
+				UndoableAction action = actions.get(i);
 				
 				this.actions[i] = action;
 				
 				if( action instanceof NullAction)
 					this.contexts[i] = UndoEngine.this.contexts.get(0);
 				else if( action instanceof ImageAction) {
-					if( data.get(i) == null)
-						throw new BadCompositeConstructionExcpetion("ImageAction with null Image.");
-					this.contexts[i] = contextOf( data.get(i));
+					this.contexts[i] = contextOf( ((ImageAction)action).data);
 				}
-				else
-					throw new BadCompositeConstructionExcpetion("Bad ActionType in Composite (Tried to Composite a Composite?)");
 			}
 		}
-		public List<UndoAction> getActions() {
+		public List<UndoableAction> getActions() {
 			return Arrays.asList(actions);
 		}
-		@Override		protected void performAction() { throw new UnsupportedOperationException();}
+		@Override		protected void performAction() { 
+			for( int i = 0; i<contexts.length; ++i) {
+				actions[i].performAction();
+				if( actions[i] instanceof ImageAction){
+					((ImageAction)actions[i]).performImageAction(
+							((ImageContext)contexts[i]).image);
+				}
+			}
+		}
 		@Override		protected void undoAction() {throw new UnsupportedOperationException();}
 		
-	}
-
-	public class BadCompositeConstructionExcpetion extends Exception {
-		BadCompositeConstructionExcpetion( String message) {
-			super("BadComposite: " + message);
-		}
 	}
 
 	
@@ -1009,7 +1025,8 @@ public class UndoEngine {
 		Point[] points;
 		StrokeParams params;
 		
-		public StrokeAction( StrokeParams params, Point[] points){			
+		public StrokeAction( StrokeParams params, Point[] points, ImageData data){	
+			super(data);
 			this.params = params;
 			this.points = points;
 			
@@ -1045,7 +1062,8 @@ public class UndoEngine {
 		private final Point p;
 		private final Color c;
 		
-		public FillAction( Point p, Color c) {
+		public FillAction( Point p, Color c, ImageData data) {
+			super(data);
 			this.p = p;
 			this.c = c;
 			description = "Fill";
@@ -1060,16 +1078,14 @@ public class UndoEngine {
 		public Color getColor() { return new Color(c.getRGB());}
 	}
 	public class ClearAction extends ImageAction {
-		public ClearAction() {description = "Clear Image";}
+		public ClearAction(ImageData data) {super(data); description = "Clear Image";}
 		@Override
 		protected void performImageAction(ImageData image) {
 			BufferedImage bi = workspace.checkoutImage(image);
 			MUtil.clearImage(bi);
 			workspace.checkinImage(image);
 		}
-		
 	}
-	
 	
 	
 	// ==== Null Undo Actions ====
@@ -1115,12 +1131,12 @@ public class UndoEngine {
 			super(change);
 		}
 		@Override
-		public void stackNewAction(UndoAction newAction) {
+		public void stackNewAction(UndoableAction newAction) {
 			((StackableStructureChange)change).stackNewChange(
 					((StackableStructureAction)newAction).change);
 		}
 		@Override
-		public boolean canStack(UndoAction newAction) {
+		public boolean canStack(UndoableAction newAction) {
 			if( !newAction.getClass().equals(this.getClass()))
 				return false;
 			if( !change.getClass().equals(
@@ -1147,7 +1163,7 @@ public class UndoEngine {
 			this.pSelection = previousSelection;
 			this.poX = previousOX;
 			this.poY= previousOY;
-			description = "Selection Change.";
+			description = "Selection Change";
 		}
 		
 		@Override
@@ -1159,9 +1175,21 @@ public class UndoEngine {
 		protected void undoAction() {
 			workspace.getSelectionEngine().setSelection( pSelection, poX, poY);
 		}
-		
 	}
+
 	
+	public UndoableAction createSelectMoveEvent( int x, int y) {
+		return null;
+	}
+	public UndoableAction createCutEvent() {
+		return null;
+	}
+	public void tackAnchorEventToLastAction() {
+		assert getQueuePosition() == queue.size();
+	}
+	public void tackDiscardEventToLastAction() {
+		assert getQueuePosition() == queue.size();
+	}
 	
 	
 	// :::: MUndoEngineObserver

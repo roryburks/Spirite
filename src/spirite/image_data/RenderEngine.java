@@ -33,6 +33,7 @@ import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -143,6 +144,16 @@ public class RenderEngine
 		// Step 2: Recursively draw the image
 		ratioW = settings.width / (float)settings.workspace.getWidth();
 		ratioH = settings.height / (float)settings.workspace.getHeight();
+		
+		selectedData = null;
+		if( settings.drawSelection ){
+			ImageData dataContext= settings.workspace.getSelectionEngine().getDataContext();
+			if( dataContext != null) {
+				selectedData = dataContext;
+				seloffX = settings.workspace.getSelectionEngine().getOffsetX();
+				seloffY = settings.workspace.getSelectionEngine().getOffsetY();
+			}
+		}
 		_propperRec( settings.node, 0, settings, images);
 		
 		// Flush the data we only needed to build the image
@@ -153,6 +164,8 @@ public class RenderEngine
 		return images[0];
 	}
 	private float ratioW, ratioH;
+	private ImageData selectedData;
+	private int seloffX, seloffY;
 	
 	/** Determines the number of images needed to properly render 
 	 * the given RenderSettings.  This number is equal to largest Group
@@ -209,6 +222,10 @@ public class RenderEngine
 					AffineTransform transform = g2.getTransform();
 					g2.translate(child.x, child.y);
 					g2.scale( ratioW, ratioH);
+					
+					if( selectedData != null && layer.getUsedImageData().contains(selectedData)) {
+						g.drawImage( settings.workspace.getSelectionEngine().liftedData, seloffX, seloffY, null);
+					}
 					
 					layer.draw(g);
 					
@@ -432,11 +449,20 @@ public class RenderEngine
 	
 		try {
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
-	
+
+
+		LinkedList<ImageData> relevantData = new LinkedList<ImageData>(evt.dataChanged);
+		LinkedList<ImageData> relevantDataSel = new LinkedList<ImageData>(evt.dataChanged);
+		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()) {
+			relevantDataSel.add( evt.getWorkspace().getSelectionEngine().getDataContext());
+		}
+		
 		while( it.hasNext()) {
 			Entry<RenderSettings,CachedImage> entry = it.next();
 			
 			RenderSettings setting = entry.getKey();
+			
+			
 			if( setting.workspace == evt.workspace) {
 				// Since structureChanges do not effect ImageData and image draws
 				//	ignore settings, pass over image renderings on structureChange
@@ -446,8 +472,8 @@ public class RenderEngine
 				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
-				List<ImageData> dataInCommon = new LinkedList<ImageData>(evt.dataChanged);
-				dataInCommon.retainAll(setting.getImagesReliedOn());
+				List<ImageData> dataInCommon = new LinkedList<>(setting.getImagesReliedOn());
+				dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
 				
 				List<Node> nodesInCommon = new LinkedList<Node>(evt.nodesChanged);
 				nodesInCommon.retainAll(setting.getNodesReliedOn());

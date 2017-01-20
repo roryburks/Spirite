@@ -13,6 +13,10 @@ import spirite.MUtil;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.image_data.UndoEngine.ImageAction;
+import spirite.image_data.UndoEngine.NullAction;
+import spirite.image_data.UndoEngine.StackableAction;
+import spirite.image_data.UndoEngine.UndoableAction;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -31,11 +35,14 @@ public class SelectionEngine {
 		
 	}
 	
-	ImageWorkspace workspace;
+	private final ImageWorkspace workspace;
+	private final UndoEngine undoEngine;
+	
 	// Variables related to Selection state
 	private Selection selection = null;
 	private boolean lifted = false;
 	protected BufferedImage liftedData = null;
+	protected ImageData dataContext = null;
 	private int startX;	// pulls double-duty as the starting point for the selection building
 	private int startY;	// and the starting point for a MoveSelectionAction
 	
@@ -52,6 +59,7 @@ public class SelectionEngine {
 	
 	SelectionEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
+		this.undoEngine = workspace.getUndoEngine();
 	}
 
 	public boolean isLifted() {
@@ -62,6 +70,9 @@ public class SelectionEngine {
 	public Selection getSelection() {
 		return selection;
 	}
+	public ImageData getDataContext() {
+		return dataContext;
+	}
 	public int getOffsetX() {
 		return offsetX;
 	}
@@ -69,17 +80,110 @@ public class SelectionEngine {
 		return offsetY;
 	}
 	public void setOffset( int x, int y) {
-		offsetX = x;
-		offsetY = y;
+		int dx = x - offsetX;
+		int dy = y - offsetY;
 
-		// Construct ImageChangeEvent and send it
-		ImageChangeEvent evt = new ImageChangeEvent();
-		evt.workspace = workspace;
-		evt.selectionLayerChange = true;
-		workspace.triggerImageRefresh(evt);
+		if( !lifted) {
+			if( !validateSelection())
+				return;
+			
+			Node snode = workspace.getSelectedNode();
+			if( !(snode instanceof LayerNode))
+				return;
+			LayerNode node = (LayerNode)snode;
+
+			BufferedImage lifted = liftSelection(node);
+			
+			// Construct an execute the composite action
+			List<UndoableAction> actions = new ArrayList<>(2);
+			
+			actions.add(new MoveSelectionAction(dx, dy));
+			actions.add(new ClearSelectionAction(selection, offsetX, offsetY,
+					node.getLayer().getActiveData()));
+			
+			UndoableAction action = undoEngine.new CompositeAction(actions, "Moved Selection");
+			action.performAction();
+		}
+		else {		
+			UndoableAction action = new MoveSelectionAction(dx, dy);
+			action.performAction();
+			undoEngine.storeAction(action);
+		}
 	}
+	
+	UndoableAction createMoveAction( int x, int y) {
+		if( !lifted) {
+			
+		}
+		return null;
+	}
+	
+	public class MoveSelectionAction extends NullAction 
+		implements StackableAction
+	{
+		private int dx, dy;
+		
+		protected MoveSelectionAction( int dx, int dy) {
+			this.dx = dx;
+			this.dy = dy;
+			description = "Selection Move";
+		}
+	
+		void translate( int deltax, int deltay) {
+			offsetX += deltax;
+			offsetY += deltay;
 
-
+			// Construct ImageChangeEvent and send it
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.selectionLayerChange = true;
+			workspace.triggerImageRefresh(evt);
+			
+		}
+		@Override
+		protected void performAction() {
+			translate(dx, dy);
+		}
+		@Override
+		protected void undoAction() {
+			translate(-dx, -dy);
+		}
+		
+		@Override public void stackNewAction(UndoableAction newAction) {
+			MoveSelectionAction action = (MoveSelectionAction)newAction;
+			this.dx += action.dx;
+			this.dy += action.dy;
+		}
+		@Override public boolean canStack(UndoableAction newAction) {
+			return newAction instanceof MoveSelectionAction;
+		}
+	}
+	
+	public class ClearSelectionAction extends ImageAction {
+		private final Selection selection;
+		private final int ox, oy;
+		
+		public ClearSelectionAction( Selection selection, int ox, int oy, ImageData data) {
+			super(data);
+			this.selection = selection;
+			this.ox = ox;
+			this.oy = oy;
+		}
+		
+		@Override
+		protected void performImageAction(ImageData image) {
+			// TODO Auto-generated method stub
+			BufferedImage img = workspace.checkoutImage(image);
+			Graphics g = img.getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
+			g2.translate(offsetX, offsetY);
+			g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
+			selection.drawSelectionMask(g2);
+			g.dispose();
+			workspace.checkinImage(image);
+		}
+	}
+	
 	
 	// :::: Selection Building
 	public void startBuildingSelection( SelectionType type, int x, int y) {
@@ -130,11 +234,10 @@ public class SelectionEngine {
 		if( !selection.clipToRect(rect))
 			voidSelection();
 		
-		UndoEngine undo = workspace.getUndoEngine();
-		undo.storeAction( 
-				undo.new SetSelectionAction(
+		undoEngine.storeAction( 
+				undoEngine.new SetSelectionAction(
 						selection, offsetX, offsetY, 
-						oldSelection, oldOX, oldOY), null);
+						oldSelection, oldOX, oldOY));
 		
 		triggerBuildingSelection(null);
 		triggerSelectionChanged(null);
@@ -168,20 +271,19 @@ public class SelectionEngine {
 		if( !lifted)
 			return;
 
-		BufferedImage layerImg = workspace.checkoutImage(selection.dataContext);
+		BufferedImage layerImg = workspace.checkoutImage(dataContext);
 		
 		Graphics g = layerImg.getGraphics();
 		g.drawImage(liftedData, offsetX, offsetY, null);
 		
 		UndoEngine undoEngine = workspace.getUndoEngine();
 //		undoEngine.storeAction(undoEngine.new MoveSelectionAction( startX, startY), selection.dataContext);
-		workspace.checkinImage(selection.dataContext);
+		workspace.checkinImage(dataContext);
 		voidSelection();
 	}
 	
 	public void unselect() {
-		UndoEngine undo = workspace.getUndoEngine();
-		undo.storeAction( undo.new SetSelectionAction(null, 0, 0, selection, offsetX, offsetY), null);
+		undoEngine.storeAction( undoEngine.new SetSelectionAction(null, 0, 0, selection, offsetX, offsetY));
 		
 		if( lifted)
 			anchorLifted();
@@ -202,27 +304,27 @@ public class SelectionEngine {
 	}
 	
 	
-	public void liftSelection() {
+	private boolean validateSelection() {
 		if( selection == null)
-			return;
-		
-		Node snode = workspace.getSelectedNode();
-		if( !(snode instanceof LayerNode))
-			return;
-		LayerNode node = (LayerNode)snode;
-		
+			return false;
+
 		// Determine if the proposed selection is within the bounds of the 
 		// Workspace, if not, cancel lift.
 		// TODO: Make this more precise intersection geometry.
 		if( !selection.clipToRect(new Rectangle( 0, 0, workspace.getWidth(), workspace.getHeight()))) {
 			voidSelection();
-			return;
+			return false;
 		}
 		
+		return true;
+	}
+	
+	
+	private BufferedImage liftSelection(LayerNode node) {
 		Rectangle rect = selection.getBounds();
 		
 		// At this point we're going through with the lift
-		selection.dataContext = node.getLayer().getActiveData();
+		dataContext = node.getLayer().getActiveData();
 		
 		// Creates a Selection Mask
 		liftedData = new BufferedImage( 
@@ -231,7 +333,7 @@ public class SelectionEngine {
 				BufferedImage.TYPE_INT_ARGB);
 		MUtil.clearImage(liftedData);
 		
-		BufferedImage layerImg = workspace.checkoutImage(selection.dataContext);
+		BufferedImage layerImg = dataContext.readImage().image;
 		
 		// Copy the data inside the Selection's alphaMask to liftedData
 		Graphics g = liftedData.getGraphics();
@@ -241,26 +343,17 @@ public class SelectionEngine {
 		g2.drawImage( layerImg, -offsetX, -offsetY, null);
 		g.dispose();
 		
-		// Delete the data inside the selection's alphaMask from the lifted data
-		g =layerImg.getGraphics();
-		g2 = (Graphics2D)g;
-		g2.translate(offsetX, offsetY);
-		g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
-		selection.drawSelectionMask(g2);
-		g.dispose();
-		
 		lifted = true;
-		
 		startX = offsetX;
 		startY = offsetY;
 		
-		workspace.checkinImage(selection.dataContext);
+		return liftedData;
 	}
 	
 	// :::: Various Selection Formats
-	public abstract class Selection 
+	public abstract static class Selection 
 	{
-		protected ImageData dataContext;
+//		protected ImageData dataContext;
 		
 		// Note: SelectionBounds is drawn in image-space (i.e. accounting
 		//	for offsets), whereas SelectionMask is drawn in selection space
@@ -271,13 +364,13 @@ public class SelectionEngine {
 		abstract Rectangle getBounds();
 		abstract boolean clipToRect( Rectangle rect);	// returns false if the clipped Selection is empty
 		
-		public ImageData getLiftedContext() {
+/*		public ImageData getLiftedContext() {
 			return dataContext;
 		}
 		
 		public BufferedImage getLiftedData() {
 			return liftedData;
-		}
+		}*/
 		
 		public abstract Selection clone();
 	}

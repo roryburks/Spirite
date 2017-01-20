@@ -17,11 +17,10 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
-import spirite.image_data.UndoEngine.BadCompositeConstructionExcpetion;
 import spirite.image_data.UndoEngine.ClearAction;
 import spirite.image_data.UndoEngine.CompositeAction;
 import spirite.image_data.UndoEngine.StructureAction;
-import spirite.image_data.UndoEngine.UndoAction;
+import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -68,10 +67,10 @@ public class ImageWorkspace {
 		this.cacheManager = cacheManager;
 		imageData = new ArrayList<ImageData>();
 		animationManager = new AnimationManager(this);
-		selectionEngine = new SelectionEngine(this);
 		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
+		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
 	}
 	
 	@Override
@@ -293,9 +292,9 @@ public class ImageWorkspace {
 		if( command.equals("clearLayer")) {
 			ImageData image = getActiveData();
 			if( image != null) {
-				ClearAction action = undoEngine.new ClearAction();
+				ClearAction action = undoEngine.new ClearAction(image);
 				action.performImageAction(image);
-				undoEngine.storeAction(action, image);
+				undoEngine.storeAction(action);
 			}
 		}
         else {
@@ -313,11 +312,7 @@ public class ImageWorkspace {
 		imageData.add(newImage);
 
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(newImage), name);
-		try {
-			_addLayer(node, context);
-		} catch (BadCompositeConstructionExcpetion e) {
-			e.printStackTrace();
-		}
+		_addLayer(node, context);
 		
 		return node;
 	}
@@ -330,11 +325,7 @@ public class ImageWorkspace {
 		
 		// Create node then execute StructureChange event
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
-		try {
-			_addLayer(node, context);
-		} catch (BadCompositeConstructionExcpetion e) {
-			e.printStackTrace();
-		}
+		_addLayer(node, context);
 		
 		return node;
 	}
@@ -363,28 +354,24 @@ public class ImageWorkspace {
 	 * along with it if one is warranted.
 	 */
 	private void _addLayer(LayerNode node, Node context) 
-			throws BadCompositeConstructionExcpetion 
 	{
 		if( width < node.getLayer().getWidth() || height < node.getLayer().getHeight()) {
-			List<ImageData> data = new ArrayList<>(2);
-			List<UndoAction> actions = new ArrayList<>(2);
+			List<UndoableAction> actions = new ArrayList<>(2);
 
 			actions.add(undoEngine.new StructureAction( createAdditionEvent(node,context)));
-			data.add(null);
 			actions.add(undoEngine.new StructureAction( 
 					new DimensionChange( 
 							Math.max(width, node.getLayer().getWidth()),
 							Math.max(height, node.getLayer().getHeight()))
 					));
-			data.add(null);
 			
-			CompositeAction action = undoEngine.new CompositeAction( actions, data);
+			CompositeAction action = undoEngine.new CompositeAction( actions, actions.get(0).description);
 			executeComposite(action);
 			
 			// It's important that you add the action to the UndoEngine AFTER
 			//	you add the node to the GroupTree by calling executingComposite
 			//	otherwise the UndoEngine will cull the imageData before it's linked
-			undoEngine.storeAction(action, null);
+			undoEngine.storeAction(action);
 		}
 		else
 			executeChange( createAdditionEvent(node,context));
@@ -761,7 +748,7 @@ public class ImageWorkspace {
 	public class OffsetChange extends NodeAtributeChange
 		implements StackableStructureChange
 	{
-		int dx, dy;
+		private int dx, dy;
 		
 		OffsetChange( Node node, int newX, int newY) {
 			super(node);
@@ -789,16 +776,16 @@ public class ImageWorkspace {
 		change.execute();
 		if( !building) {
 			if( change instanceof StackableStructureChange) 
-				undoEngine.storeAction(undoEngine.new StackableStructureAction(change) , null);
+				undoEngine.storeAction(undoEngine.new StackableStructureAction(change));
 			else 
-				undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
+				undoEngine.storeAction(undoEngine.new StructureAction(change));
 		}
 		change.alert(false);
 	}
 	
 	/** Executes all StructureChanges (if any) in the given CompositeAction */
 	public void executeComposite( CompositeAction composite) {
-		for( UndoAction action : composite.getActions()) {
+		for( UndoableAction action : composite.getActions()) {
 			if( action instanceof StructureAction) {
 				StructureChange change = ((StructureAction)action).change;
 				change.execute();

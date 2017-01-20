@@ -160,12 +160,12 @@ public class Penner
 			
 			activeTool = tool;
 			
-			if( selectionEngine.getSelection() != null
+/*			if( selectionEngine.getSelection() != null
 					&& state != STATE.FORMING_SELECTION
 					&& state != STATE.MOVING_SELECTION) 
 			{
 				selectionEngine.unselect();
-			}
+			}*/
 			
 		}
 		else {
@@ -177,8 +177,9 @@ public class Penner
 					
 					StrokeAction stroke = undoEngine.new StrokeAction( 
 							strokeEngine.getParams(), 
-							strokeEngine.getHistory());
-					undoEngine.storeAction( stroke, strokeEngine.getImageData());
+							strokeEngine.getHistory(),
+							strokeEngine.getImageData());
+					undoEngine.storeAction( stroke);
 					strokeEngine = null;
 				}
 				break;
@@ -233,8 +234,6 @@ public class Penner
 		Selection selection = selectionEngine.getSelection();
 		
 		if( selection != null && selection.contains(x,y)) {
-			if( !selectionEngine.isLifted())
-				selectionEngine.liftSelection();
 			state = STATE.MOVING_SELECTION;
 		}
 		else {
@@ -246,9 +245,6 @@ public class Penner
 		Selection selection = selectionEngine.getSelection();
 		
 		if(selection != null) {
-			if( !selectionEngine.isLifted())
-				selectionEngine.liftSelection();
-			
 			state = STATE.MOVING_SELECTION;
 		}
 		else {
@@ -281,7 +277,7 @@ public class Penner
 			//	an actual change is made.
 			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
 			if( drawEngine.fill( p.x, p.y, c, data)) {
-				undoEngine.storeAction( undoEngine.new FillAction(p, c) , data);
+				undoEngine.storeAction( undoEngine.new FillAction(p, c, data));
 			}
 		} 
 	}

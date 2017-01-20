@@ -29,6 +29,8 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
+import spirite.brains.ToolsetManager.ToolSettings;
+import spirite.brains.ToolsetManager.ToolsetSettingsPanel;
 import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;
@@ -38,6 +40,7 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_toolset.PalettePanel;
+import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkTabPane;
@@ -53,6 +56,7 @@ public class RootFrame extends javax.swing.JFrame
 	private static final long serialVersionUID = 1L;
     private PalettePanel palettePanel;
     private ToolsPanel toolsPanel;
+    private ToolSettingsPanel settingPanel;
     private WorkTabPane workPane;
     
     private final MasterControl master;
@@ -76,12 +80,12 @@ public class RootFrame extends javax.swing.JFrame
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
+    	settingPanel = new ToolSettingsPanel( master.getToolsetManager());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         workPane.setMinimumSize(new java.awt.Dimension(300, 300));
-
-        toolsPanel.setPreferredSize(new java.awt.Dimension(140, 140));
+        toolsPanel.setPreferredSize(new java.awt.Dimension(140, 80));
 
         initMenu();
         
@@ -95,7 +99,8 @@ public class RootFrame extends javax.swing.JFrame
                     .addComponent(workPane, 0, 535, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(settingPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(0, 0, 0))
         );
@@ -106,6 +111,8 @@ public class RootFrame extends javax.swing.JFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(settingPanel, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
