@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
@@ -112,7 +113,7 @@ public class DrawEngine {
 				Graphics g = img.getGraphics();
 
 				Graphics2D g2 = (Graphics2D)g;
-//				g2.setStroke( new BasicStroke(9f, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
+				g2.setStroke( new BasicStroke( stroke.width, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
 				switch( stroke.method) {
 				case BASIC:
 					g.setColor( stroke.getColor());
@@ -164,6 +165,7 @@ public class DrawEngine {
 		
 		Color c = Color.BLACK;
 		Method method = Method.BASIC;
+		float width = 1.0f;
 		boolean locked = false;
 		
 		public StrokeParams() {}
@@ -172,17 +174,19 @@ public class DrawEngine {
 			if( !locked)
 				this.c = c;
 		}
-		public Color getColor() {
-			return new Color( c.getRGB());
-		}
+		public Color getColor() {return new Color( c.getRGB());}
 		
 		public void setMethod( Method method) {
 			if( !locked)
 				this.method = method;
 		}
-		public Method getMethod() {
-			return method;
+		public Method getMethod() {return method;}
+		
+		public void setWidth( float width) {
+			if( !locked)
+				this.width = width;
 		}
+		public float getWidth() { return width;}
 		
 	}
 

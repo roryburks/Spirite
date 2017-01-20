@@ -11,11 +11,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
+import spirite.brains.ToolsetManager.PixelSettings;
+import spirite.brains.ToolsetManager.Tool;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_toolset.UndoPanel;
+import spirite.panel_toolset.settings_panels.PixelSettingsPanel;
 import spirite.ui.OmniFrame.OmniContainer;
 
 public class FrameManager implements WindowListener {
@@ -52,7 +55,8 @@ public class FrameManager implements WindowListener {
 		case LAYER:
 			return new LayersPanel( master);
 		case TOOLS:
-			return new ToolsPanel(master);
+			return new PixelSettingsPanel((PixelSettings) master.getToolsetManager().getToolsetSettings(Tool.PEN));
+//			return new ToolsPanel(master);
 		case ANIMATION_SCHEME:
 			return new AnimationSchemePanel(master);
 		case UNDO:

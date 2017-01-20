@@ -21,6 +21,7 @@ import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
 import spirite.ui.UIUtil;
+import spirite.ui.UIUtil.SliderPanel;
 
 public class LayersPanel extends JPanel {
 	// LayersPanel needs Master because various dialogs it creates needs
@@ -97,10 +98,35 @@ public class LayersPanel extends JPanel {
 		);
 		setLayout(groupLayout);
 
+		opacitySlider.refresh();
 	}
 	
 	/** The OpacitySlider Swing Component */
-	class OpacitySlider extends JPanel  {
+	class OpacitySlider extends SliderPanel {
+		OpacitySlider() {
+			setMin(0.0f);
+			setMax(1.0f);
+			setLabel("Opacity: ");
+		}
+		
+		public void refresh() {
+			if( layerTreePanel == null) return;
+			GroupTree.Node selected = layerTreePanel.getSelectedNode();
+			if( selected != null) {
+				setValue( selected.getAlpha());
+			}
+		}
+		
+		@Override
+		public void onValueChanged(float newValue) {
+			GroupTree.Node selected = layerTreePanel.getSelectedNode();
+			if( selected != null) {
+				selected.setAlpha(getValue());
+			}
+			super.onValueChanged(newValue);
+		}
+	}
+/*	class OpacitySlider extends JPanel  {
 		OSMA adapter = new OSMA();
 		OpacitySlider() {
 			addMouseMotionListener(adapter);
@@ -162,10 +188,10 @@ public class LayersPanel extends JPanel {
 				}
 			}
 		}
-	}
+	}*/
 	
 	public void updateSelected() {
-		opacitySlider.repaint();
+		opacitySlider.refresh();
 	}
 
 	

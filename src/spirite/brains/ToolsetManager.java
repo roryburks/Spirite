@@ -4,8 +4,11 @@ package spirite.brains;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JPanel;
 
 /**
  * ToolsetManager manages the currently selected toolset
@@ -28,11 +31,15 @@ public class ToolsetManager {
     private Cursor cursor = Cursor.MOUSE;
     
     private final Map<Cursor, Tool> selected = new EnumMap<>(Cursor.class);
+    private final Map<Tool,ToolsetSettings> toolSettings = new HashMap<>();
     
     public ToolsetManager() {
         selected.put(Cursor.MOUSE, Tool.PEN);
         selected.put(Cursor.STYLUS, Tool.PEN);
         selected.put(Cursor.ERASER, Tool.ERASER);
+
+        toolSettings.put( Tool.PEN, new PixelSettings());
+        toolSettings.put( Tool.ERASER, new PixelSettings());
     }
     
     // :::: Get/Set
@@ -67,6 +74,10 @@ public class ToolsetManager {
     public Tool getNthTool( int n) {
         return Tool.values()[n];
     }
+    
+    public ToolsetSettings getToolsetSettings(Tool tool) {
+    	return toolSettings.get(tool);
+    }
 
     // Gets the position the toolset is in the icons.png image
     // !!!! TODO: There is probably a beter place to put this and make it less
@@ -88,6 +99,29 @@ public class ToolsetManager {
         return 4;
     }
 
+
+    // :::: Toolset Settings
+    public static abstract class ToolsetSettings {
+    	
+    }
+    public static class PixelSettings extends ToolsetSettings {
+    	private float width = 5;
+    	
+    	public float getWidth() {return width;}
+    	public void setWidth( float width) {this.width = width;}
+    }
+    public static class EraserSettings extends ToolsetSettings {
+    	private float width = 5;
+    	
+    	public float getWidth() {return width;}
+    	public void setWidth( float width) {this.width = width;}
+    }
+    
+    
+    public static abstract class ToolsetSettingsPanel extends JPanel {
+    	public abstract void updateSettings( ToolsetSettings settings);
+    }
+    
     // ==== Toolset Observer
     public interface MToolsetObserver {
         public void toolsetChanged( Tool newTool);

@@ -22,6 +22,7 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.brains.ToolsetManager;
+import spirite.brains.ToolsetManager.PixelSettings;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
@@ -194,11 +195,13 @@ public class Penner
 	
 	// :::: Start Methods
 	private void startPen( boolean leftClick) {
-		 StrokeParams stroke = new StrokeParams();
-		 Color c = (leftClick) ? 
+		PixelSettings settings = (PixelSettings) toolsetManager.getToolsetSettings(Tool.PEN);
+		StrokeParams stroke = new StrokeParams();
+		Color c = (leftClick) ? 
 				paletteManager.getActiveColor(0)
 				: paletteManager.getActiveColor(1);
 		stroke.setColor( c);
+		stroke.setWidth(settings.getWidth());
 		
 		// Start the Stroke
 		startStroke( stroke);
