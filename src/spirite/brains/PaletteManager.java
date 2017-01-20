@@ -189,7 +189,6 @@ public class PaletteManager {
 	    		caret += i;
 	    	}
 	    	else {
-	    		System.out.println(count);
 	    		for( int i = 0; i < count; ++i) {
 	    			int r = bis.read();
 	    			int g = bis.read();

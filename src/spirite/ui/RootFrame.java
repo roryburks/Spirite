@@ -14,9 +14,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JColorChooser;
@@ -33,10 +35,8 @@ import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
-import spirite.image_data.layers.SimpleLayer;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
@@ -48,7 +48,7 @@ import spirite.panel_work.WorkTabPane;
  * panels are attached to it, it also is the delegator for all of the Hotkeys.
  */
 public class RootFrame extends javax.swing.JFrame
-        implements KeyEventDispatcher, WindowFocusListener, ActionListener
+        implements KeyEventDispatcher, WindowFocusListener, ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
     private PalettePanel palettePanel;
@@ -62,7 +62,8 @@ public class RootFrame extends javax.swing.JFrame
         
         initComponents();
         
-
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(this);
         this.addWindowFocusListener( this);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
         
@@ -430,4 +431,58 @@ public class RootFrame extends javax.swing.JFrame
 	public void actionPerformed(ActionEvent evt) {
 		performCommand(evt.getActionCommand());
 	}
+
+	// :::: WindowListener
+	@Override	public void windowActivated(WindowEvent arg0) {	}
+	@Override	public void windowClosed(WindowEvent arg0) {}
+	@Override	public void windowDeactivated(WindowEvent arg0) {}
+	@Override	public void windowDeiconified(WindowEvent arg0) {}
+	@Override	public void windowIconified(WindowEvent arg0) {}
+	@Override	public void windowOpened(WindowEvent arg0) {}
+	@Override
+	public void windowClosing(WindowEvent evt) {
+		int unsaved = 0;
+		List<ImageWorkspace> workspaces = master.getWorkspaces();
+		
+		for( ImageWorkspace workspace : workspaces) {
+			if( workspace.hasChanged())
+				unsaved++;
+		}
+		
+		if( unsaved > 1) {
+			int response = JOptionPane.showConfirmDialog(this, 
+					"Multiple Workspaces are unsaved, save them before closing?", 
+					"Closing Program",
+					JOptionPane.YES_NO_CANCEL_OPTION);
+			
+			 if( response == JOptionPane.CANCEL_OPTION)
+				return;
+			 else if( response == JOptionPane.YES_OPTION) {
+				 for( ImageWorkspace workspace : workspaces) {
+					 if( workspace.hasChanged()) {
+						 // Prompt User to save the workspace, 
+						 if( master.promptSave(workspace) == JOptionPane.CANCEL_OPTION)
+							 return;
+					 }
+				 }
+			 }
+		}
+		else if (unsaved == 1) {
+			 for( ImageWorkspace workspace : workspaces) {
+				 if( workspace.hasChanged()) {
+					 // Prompt User to save the workspace, 
+					 if( master.promptSave(workspace) == JOptionPane.CANCEL_OPTION)
+						 return;
+				 }
+			 }
+			 this.dispose();
+			
+		}
+		
+		this.dispose();
+        System.exit(0);
+	}
+
+	
+	
 }

@@ -6,7 +6,6 @@ package sjunit;
 import static org.junit.Assert.fail;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +17,6 @@ import spirite.brains.MasterControl;
 import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.file.SaveEngine;
-import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -26,7 +24,6 @@ import spirite.image_data.ImageData;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.UndoEngine;
-import spirite.image_data.UndoEngine.StrokeAction;
 import spirite.image_data.layers.Layer;
 
 /**

@@ -76,6 +76,9 @@ public class MasterControl
     public ImageWorkspace getCurrentWorkspace() {
    		return currentWorkspace;
     }
+    public List<ImageWorkspace> getWorkspaces() {
+    	return new ArrayList<>(workspaces);
+    }
     public FrameManager getFrameManager() {
     	return frameManager;
     }
@@ -100,30 +103,8 @@ public class MasterControl
     	}
     	
     	if( workspace.hasChanged()) {
-    		// Prompt the User to Save the file before closing if it's 
-    		//	changed and respond accordingly.
-	    	int ret = JOptionPane.showConfirmDialog(
-	    			null,
-	    			"Save file before closing?",
-	    			"Closing " + workspace.getFileName(),
-	    			JOptionPane.YES_NO_CANCEL_OPTION,
-	    			JOptionPane.QUESTION_MESSAGE
-	    			);
-	    	
-	    	if( ret == JOptionPane.CANCEL_OPTION)
-	    		return;
-	    	
-	    	if( ret == JOptionPane.YES_OPTION) {
-	    		File f = workspace.getFile();
-	    		
-	    		if( f == null)
-	    			f = Dialogs.pickFileSave();
-	    		
-	    		if( f != null)
-	    			SaveEngine.saveWorkspace(workspace, workspace.getFile());
-	    		else
-	    			return;
-	    	}
+    		if( promptSave(workspace) == JOptionPane.CANCEL_OPTION)
+    			return;
     	}
     	
     	// Remove the workspace
@@ -138,6 +119,45 @@ public class MasterControl
     		setCurrentWorkpace(null);
     	}
     	
+    }
+    
+    /** Prompt the User if he wants to save a file, then if he . 
+     * 
+     * @return 
+     * YES_OPTION if saved
+     * <br>NO_OPTION if User doesn't want to save
+     * <br>CANCEL_OPTION if User cancels
+     * */
+    public int promptSave( ImageWorkspace workspace ) {
+		// Prompt the User to Save the file before closing if it's 
+		//	changed and respond accordingly.
+    	int ret = JOptionPane.showConfirmDialog(
+    			null,
+    			"Save " + workspace.getFileName() + " before closing?",
+    			"Closing " + workspace.getFileName(),
+    			JOptionPane.YES_NO_CANCEL_OPTION,
+    			JOptionPane.QUESTION_MESSAGE
+    			);
+    	
+    	if( ret == JOptionPane.CANCEL_OPTION)
+    		return ret;
+    	
+    	if( ret == JOptionPane.YES_OPTION) {
+    		File f = workspace.getFile();
+    		
+    		if( f == null)
+    			f = Dialogs.pickFileSave();
+    		
+    		if( f != null) {
+    			SaveEngine.saveWorkspace(workspace, workspace.getFile());
+    			return ret;
+    		}
+    		else
+    			return JOptionPane.CANCEL_OPTION;
+    	}
+    	
+    	// NO_OPTION
+    	return ret;
     }
 
     /***
