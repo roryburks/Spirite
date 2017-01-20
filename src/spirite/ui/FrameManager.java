@@ -11,14 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
-import spirite.brains.ToolsetManager.PixelSettings;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
+import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_toolset.UndoPanel;
-import spirite.panel_toolset.settings_panels.PixelSettingsPanel;
 import spirite.ui.OmniFrame.OmniContainer;
 
 public class FrameManager implements WindowListener {
@@ -35,7 +34,7 @@ public class FrameManager implements WindowListener {
 	public static enum FrameType {
 		BAD (""),
 		LAYER ("Layers"),
-		TOOLS ("Toolset"),
+		TOOL_SETTINGS ("Tool Settings"),
 		ANIMATION_SCHEME ("Anim"),
 		UNDO("Undo History"),
 		;
@@ -54,8 +53,8 @@ public class FrameManager implements WindowListener {
 		switch( type) {
 		case LAYER:
 			return new LayersPanel( master);
-		case TOOLS:
-			return new PixelSettingsPanel((PixelSettings) master.getToolsetManager().getToolsetSettings(Tool.PEN));
+		case TOOL_SETTINGS:
+			return new ToolSettingsPanel( master.getToolsetManager());
 //			return new ToolsPanel(master);
 		case ANIMATION_SCHEME:
 			return new AnimationSchemePanel(master);
@@ -72,7 +71,7 @@ public class FrameManager implements WindowListener {
 		if( command.equals("showLayerFrame"))
 			addFrame( FrameType.LAYER);
 		else if( command.equals("showToolsFrame"))
-			addFrame( FrameType.TOOLS);
+			addFrame( FrameType.TOOL_SETTINGS);
 		else if( command.equals("showAnimSchemeFrame"))
 			addFrame( FrameType.ANIMATION_SCHEME);
 		else if( command.equals("showUndoFrame"))

@@ -2,13 +2,18 @@
 
 package spirite.brains;
 
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JPanel;
+
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 
 /**
  * ToolsetManager manages the currently selected toolset
@@ -31,15 +36,15 @@ public class ToolsetManager {
     private Cursor cursor = Cursor.MOUSE;
     
     private final Map<Cursor, Tool> selected = new EnumMap<>(Cursor.class);
-    private final Map<Tool,ToolsetSettings> toolSettings = new HashMap<>();
+    private final Map<Tool,ToolSettings> toolSettings = new HashMap<>();
     
     public ToolsetManager() {
         selected.put(Cursor.MOUSE, Tool.PEN);
         selected.put(Cursor.STYLUS, Tool.PEN);
         selected.put(Cursor.ERASER, Tool.ERASER);
 
-        toolSettings.put( Tool.PEN, new PixelSettings());
-        toolSettings.put( Tool.ERASER, new PixelSettings());
+        toolSettings.put( Tool.PEN, constructPixelSettings());
+        toolSettings.put( Tool.ERASER, constructEraseSettings());
     }
     
     // :::: Get/Set
@@ -75,7 +80,7 @@ public class ToolsetManager {
         return Tool.values()[n];
     }
     
-    public ToolsetSettings getToolsetSettings(Tool tool) {
+    public ToolSettings getToolSettings(Tool tool) {
     	return toolSettings.get(tool);
     }
 
@@ -101,25 +106,130 @@ public class ToolsetManager {
 
 
     // :::: Toolset Settings
-    public static abstract class ToolsetSettings {
+    public class ToolSettings {
+    	Property properties[];
     	
+    	public PropertySchemeNode[] getPropertyScheme() {
+    		PropertySchemeNode ret[] = new PropertySchemeNode[properties.length];
+    		
+    		for( int i=0; i<properties.length; ++i) {
+    			ret[i] = new PropertySchemeNode( properties[i]);
+    		}
+    		return ret;
+    	}
+    	
+    	public Object getValue( String id) {
+    		for( int i=0; i<properties.length; ++i) {
+    			if( properties[i].id.equals(id)) {
+    				return properties[i].value;
+    			}
+    		}
+    		
+    		return null;
+    	}
+
+    	public void setValue( String id, Object value) {
+    		for( int i=0; i<properties.length; ++i) {
+    			if( properties[i].id.equals(id)) {
+    				if(!getValueClassFromType(properties[i].type).isInstance(value))
+    					throw new ClassCastException("Value type does not match Property scheme.");
+    				properties[i].value = value;
+    			}
+    		}
+    	}
     }
-    public static class PixelSettings extends ToolsetSettings {
-    	private float width = 5;
-    	
-    	public float getWidth() {return width;}
-    	public void setWidth( float width) {this.width = width;}
+    static class Property 
+    {
+    	String id;
+    	PropertyType type;
+    	String hiName;
+    	Object value;
     }
-    public static class EraserSettings extends ToolsetSettings {
-    	private float width = 5;
-    	
-    	public float getWidth() {return width;}
-    	public void setWidth( float width) {this.width = width;}
+    public static class PropertySchemeNode 
+    {
+    	public final String id;
+    	public final PropertyType type;
+    	public final String hiName;
+    	public final Object value;
+    	PropertySchemeNode( Property other) {
+    		id = other.id;
+    		hiName = other.hiName;
+    		type = other.type;
+    		value = other.value;
+    	}
     }
     
+    public enum PropertyType {
+    	SIZE,
+    }
+    
+    ToolSettings constructPixelSettings() {
+    	final Object[][] scheme = {
+    			{"width", PropertyType.SIZE, "Width", 5.0f},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    ToolSettings constructEraseSettings() {
+    	final Object[][] scheme = {
+    			{"width",  PropertyType.SIZE, "Width", 5.0f},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    
+    /**<pre>
+     * Constructs ToolSettings from a Nx4 Scheme, returning null if the 
+     * scheme is malformed.
+     *
+     * Setting Scheme Format: a Nx4 array with each 4-length entry 
+     *	corresponding to:
+     * 0: the id which is used to access/refer to it
+     * 1: an identifier of the type of preference, which determines both
+     *	the GUI element that appears for it and the data-type of the value
+     * 2: A human-readable label that appears on GUI and tooltips
+     * 3: the default value
+     </pre>*/
+    ToolSettings constructFromScheme( Object[][] scheme) {
+    	ToolSettings settings = new ToolSettings();
+    	settings.properties = new Property[scheme.length];
+
+    	for(int i=0; i<scheme.length; ++i) {
+    		try {
+    			if( scheme[i].length != 4) 
+    				throw new Exception("Bad Row Type");
+
+    			settings.properties[i] = new Property();
+    			settings.properties[i].id = (String)scheme[i][0];
+    			settings.properties[i].type = (PropertyType)scheme[i][1];
+    			settings.properties[i].hiName = (String)scheme[i][2];
+    			
+    			if(  !getValueClassFromType(settings.properties[i].type).isInstance(scheme[i][3])) {
+        			throw new Exception("Value Class does not match type.");
+    			}
+    			settings.properties[i].value = scheme[i][3];
+    		
+    		} catch( Exception e) {
+    			MDebug.handleError(ErrorType.STRUCTURAL, this, "Improper Toolset Settings Scheme: " + e.getMessage());
+    			return null;
+    		}
+    	}
+    	
+    	return settings;
+    }
+    
+    //
+    Class<?> getValueClassFromType( PropertyType type) {
+    	switch( type) {
+    	case SIZE:
+    		return Float.class;
+    	}
+    	
+    	return null;	// Should be no way to reach this
+    }
     
     public static abstract class ToolsetSettingsPanel extends JPanel {
-    	public abstract void updateSettings( ToolsetSettings settings);
+    	public abstract void updateSettings( ToolSettings settings);
     }
     
     // ==== Toolset Observer
