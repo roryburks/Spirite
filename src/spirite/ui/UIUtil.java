@@ -277,7 +277,7 @@ public class UIUtil {
 		}
 		
 		// :::: Determine how it's drawn
-		private String valueAsString() {
+		protected String valueAsString(float value) {
 			DecimalFormat df = new DecimalFormat();
 			df.setMaximumFractionDigits(2);
 			df.setMinimumFractionDigits(2);
@@ -307,7 +307,7 @@ public class UIUtil {
 			
 			g2.setColor( new Color( 222,222,222));
 			
-			UIUtil.drawStringCenter(g2, label + valueAsString(), getBounds());
+			UIUtil.drawStringCenter(g2, label + valueAsString(value), getBounds());
 
 			g2.setPaint(oldP);
 			g2.setColor( Color.BLACK);

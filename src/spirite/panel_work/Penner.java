@@ -202,6 +202,7 @@ public class Penner
 				: paletteManager.getActiveColor(1);
 		stroke.setColor( c);
 		stroke.setWidth((float)settings.getValue("width"));
+		stroke.setAlpha((float)settings.getValue("alpha"));
 		
 		// Start the Stroke
 		startStroke( stroke);

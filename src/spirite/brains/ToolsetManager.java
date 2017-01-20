@@ -160,11 +160,13 @@ public class ToolsetManager {
     }
     
     public enum PropertyType {
-    	SIZE,
+    	SIZE, OPACITY,
     }
     
+    // :::: Setting Schemes
     ToolSettings constructPixelSettings() {
     	final Object[][] scheme = {
+    			{"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
     			{"width", PropertyType.SIZE, "Width", 5.0f},
     	};
     	
@@ -172,6 +174,7 @@ public class ToolsetManager {
     }
     ToolSettings constructEraseSettings() {
     	final Object[][] scheme = {
+    			{"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
     			{"width",  PropertyType.SIZE, "Width", 5.0f},
     	};
     	
@@ -222,6 +225,7 @@ public class ToolsetManager {
     Class<?> getValueClassFromType( PropertyType type) {
     	switch( type) {
     	case SIZE:
+    	case OPACITY:
     		return Float.class;
     	}
     	

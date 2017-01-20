@@ -116,12 +116,14 @@ public class DrawEngine {
 				g2.setStroke( new BasicStroke( stroke.width, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
 				switch( stroke.method) {
 				case BASIC:
+					if( stroke.alpha != 1) 
+						g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, stroke.alpha));
 					g.setColor( stroke.getColor());
 					g.drawLine(old_x, old_y, new_x, new_y);
 					break;
 				case ERASE:
 					Composite c = g2.getComposite();
-					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
+					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN,stroke.alpha));
 					g2.setColor( new Color(0,0,0,0));
 					g2.drawLine( old_x, old_y, new_x, new_y);
 					g2.setComposite( c);
@@ -166,6 +168,7 @@ public class DrawEngine {
 		Color c = Color.BLACK;
 		Method method = Method.BASIC;
 		float width = 1.0f;
+		float alpha = 1.0f;
 		boolean locked = false;
 		
 		public StrokeParams() {}
@@ -188,6 +191,11 @@ public class DrawEngine {
 		}
 		public float getWidth() { return width;}
 		
+		public void setAlpha( float alpha) {
+			if( !locked)
+				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
+		}
+		public float getAlpha() {return alpha;}
 	}
 
 	

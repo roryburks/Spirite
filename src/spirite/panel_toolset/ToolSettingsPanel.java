@@ -1,6 +1,7 @@
 package spirite.panel_toolset;
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -99,7 +100,7 @@ public class ToolSettingsPanel extends JPanel
 	void createNode( PropertySchemeNode node, Group horizontal, Group vertical) {
 		
 		switch( node.type) {
-		case SIZE:
+		case SIZE:{
 			SizeSlider slider = new SizeSlider() {
 				@Override
 				public void onValueChanged(float newValue) {
@@ -109,9 +110,26 @@ public class ToolSettingsPanel extends JPanel
 			};
 			slider.setValue( (float)node.value);
 			slider.setLabel( node.hiName + " : ");
+			horizontal.addComponent(slider).addGap(30);
+			vertical.addComponent(slider, 24,24,24);
+			break;}
+		case OPACITY: {
+			SliderPanel slider = new SliderPanel() {
+				@Override
+				public void onValueChanged(float newValue) {
+					settings.setValue(node.id, newValue);
+					super.onValueChanged(newValue);
+				}
+				@Override
+				protected String valueAsString(float value) {
+					return super.valueAsString(value*100);
+				}
+			};
+			slider.setValue((float)node.value);
+			slider.setLabel(node.hiName + " : ");
 			horizontal.addComponent(slider);
 			vertical.addComponent(slider, 24,24,24);
-			break;
+			break;}
 		}
 	}
 
