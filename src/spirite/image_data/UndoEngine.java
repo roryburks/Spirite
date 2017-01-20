@@ -8,7 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -71,7 +74,7 @@ public class UndoEngine {
 	private int absoluteMaxCache = 200000000;	// 200 m
 	private int maxCacheSize = 50000000;	// 50 m
 	private int maxQueueSize = 100;
-	private final List<UndoContext> contexts = new ArrayList<UndoContext>();
+	private final List<UndoContext> contexts;
 	private final LinkedList<UndoContext> queue = new LinkedList<>();
 	private ListIterator<UndoContext> queuePosition = null;
 	
@@ -98,7 +101,12 @@ public class UndoEngine {
 	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
 		this.cacheManager = workspace.getCacheManager();
+		
+		contexts = new ArrayList<UndoContext>();
 		contexts.add( new NullContext());
+		contexts.add( new CompositeContext());
+		assert( contexts.get(0) instanceof NullContext);
+		assert( contexts.get(1) instanceof CompositeContext);
 	}
 	
 	@Override
@@ -115,10 +123,13 @@ public class UndoEngine {
 	public void reset() {
 		for( UndoContext context : contexts)
 			context.flush();
-		contexts.clear();
 		queue.clear();
 		queuePosition = null;
+		contexts.clear();
 		contexts.add( new NullContext());
+		contexts.add( new CompositeContext());
+		assert( contexts.get(0) instanceof NullContext);
+		assert( contexts.get(1) instanceof CompositeContext);
 		saveSpot = 0;
 	}
 	
@@ -222,9 +233,20 @@ public class UndoEngine {
 				return;
 		}
 		
-		contexts.add((data == null) ?
-				new NullContext() :
-				new ImageContext( data));
+		assert( data != null);
+		contexts.add( new ImageContext( data));
+	}
+	private UndoContext contextOf( ImageData data) {
+		assert( data != null);
+
+		for( UndoContext context : contexts) {
+			if( context.image == data)
+				return context;
+		}
+		
+		UndoContext context = new ImageContext(data);
+		contexts.add(context);
+		return context;
 	}
 	
 	/***
@@ -268,25 +290,36 @@ public class UndoEngine {
 		}
 		
 		// Determine if the Context for the given ImageData exists
-		UndoContext storedContext = null;
+		UndoContext context = null;
 		
-		for( UndoContext context : contexts) {
-			if( context.image == data) {
-				// Add the action to the queue
-				context.addAction(action);
-				storedContext = context;
-				
-				
-				queue.add(storedContext);
-				queuePosition = null;
-				triggerHistoryChanged();
+		if( action instanceof NullAction) {
+			context = contexts.get(0);
+		}
+		else if( action instanceof CompositeAction) {
+			context = contexts.get(1);
+		}
+		else {
+			assert( data != null);
+			for( UndoContext test : contexts) {
+				if( test.image == data) {
+					context = test;
+					break;
+				}
 			}
 		}
-		if( storedContext == null) {
-			storedContext = (data == null) ?
-					new NullContext() :
-					new ImageContext( data);
-			contexts.add(storedContext);
+
+		
+		if( context != null) {
+			// Add the action to the queue
+			context.addAction(action);
+				
+			queue.add(context);
+			queuePosition = null;
+			triggerHistoryChanged();
+		}
+		else {
+			assert( data != null);
+			contexts.add(new ImageContext( data));
 		}
 		
 		// Cull 
@@ -331,10 +364,12 @@ public class UndoEngine {
 	
 	private void cleanUnusedContexts() {
 		Iterator<UndoContext> it = contexts.iterator();
-
+		
+		it.next();	// Skip past the two Special Contexts (Null/Composite)
+		it.next();
 		while( it.hasNext()) {
 			UndoContext uc = it.next();
-			if( !(uc instanceof NullContext) && uc.isEmpty()) {
+			if( uc.isEmpty()) {
 				uc.flush();
 				it.remove();
 			}
@@ -746,6 +781,138 @@ public class UndoEngine {
 		}
 	}
 	
+	
+
+	
+	/**
+	 * The CompositeContext is a special Context which 
+	 * @author Guy
+	 *
+	 */
+	private class CompositeContext extends UndoContext {
+		LinkedList<CompositeAction> actions = new LinkedList();
+		private ListIterator<CompositeAction> pointer = null;
+		
+		CompositeContext() {
+			super(null);
+		}
+		
+		protected Collection<UndoContext> getUsedContexts() {
+			Collection<UndoContext> ret = new LinkedHashSet<>();
+			
+			for( CompositeAction action : actions) {
+				for( UndoContext context : action.contexts) {
+					ret.add(context);
+				}
+			}
+			
+			return ret;
+		}
+
+		@Override
+		protected void addAction(UndoAction action) {
+			CompositeAction composite = (CompositeAction)action;
+			
+			for( int i=0; i<composite.contexts.length; ++i) {
+				composite.contexts[i].addAction(composite.actions[i]);
+			}
+			actions.add(composite);
+		}
+
+		@Override
+		protected void undo() {
+			if( pointer == null)
+				pointer = actions.listIterator(actions.size());
+			
+			if( !pointer.hasPrevious() || pointer == null) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Undo).");
+				return;
+			}
+			
+			CompositeAction composite = pointer.previous();
+
+			for( UndoContext context : composite.contexts) {
+				context.undo();
+			}
+		}
+
+		@Override
+		protected void redo() {
+			if( pointer == null || !pointer.hasNext()) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				return;
+			}
+
+			CompositeAction composite = pointer.next();
+			for( UndoContext context : composite.contexts) {
+				context.redo();
+			}
+		}
+
+		@Override
+		protected void cauterize() {
+			if( pointer != null) {
+				// All the real heavy-work will be handled by the other contexts
+				List<CompositeAction> subList = actions.subList(pointer.nextIndex(), actions.size());
+				subList.clear();
+				pointer = null;
+			}
+		}
+
+		@Override
+		protected void clipTail() {
+			CompositeAction composite = actions.getFirst();
+			
+			for( UndoContext context : composite.contexts) {
+				context.clipTail();
+			}
+			actions.removeFirst();
+			
+		}
+
+		Iterator<CompositeAction> iter = null;
+		@Override
+		protected void startIterate() {
+			// Note even though the iterator position in other contexts can depend
+			//	on the CompositeContext, since they're all started at the same time
+			//	and in the same place we don't need to check for them here, but
+			//	that might not be true in the future.
+			iter = actions.iterator();
+		}
+		
+		@Override
+		protected UndoAction iterateNext() {
+			System.out.println(actions.size());
+			if( !iter.hasNext()) {
+				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				return null;
+			}
+			else {
+				CompositeAction composite = iter.next();
+				
+				for( UndoContext context : composite.contexts)
+					context.iterateNext();
+				return composite;
+			}
+		}
+
+		@Override
+		protected boolean isEmpty() {
+			return actions.isEmpty();
+		}
+
+		@Override
+		protected UndoAction getLast() {
+			if( actions.isEmpty())
+				return null;
+			else
+				return actions.getLast();
+		}
+		
+	}
+	
+	
+	
 	/***
 	 *  UndoActions
 	 *  
@@ -788,6 +955,53 @@ public class UndoEngine {
 		public boolean canStack( UndoAction newAction);
 	}
 	
+	/** A CompositeAction is composed of two or more (or less, but what's the point)
+	 * actions which are performed in a single "undo/redo" event in sequential order.
+	 * The actions it composites can be any combination of actions with any Contexts.
+	 */
+	public class CompositeAction extends UndoAction {
+		private final UndoContext contexts[];
+		private final UndoAction actions[];
+		
+		public CompositeAction( List<UndoAction> actions, List<ImageData>data) 
+				throws BadCompositeConstructionExcpetion
+		{
+			if( actions.size() != data.size())
+				throw new BadCompositeConstructionExcpetion("List Size Mismatch");
+			
+			int len = actions.size();
+			this.contexts = new UndoContext[len];
+			this.actions = new UndoAction[len];
+			
+			for( int i=0; i < len; ++i) {
+				UndoAction action = actions.get(i);
+				
+				this.actions[i] = action;
+				
+				if( action instanceof NullAction)
+					this.contexts[i] = UndoEngine.this.contexts.get(0);
+				else if( action instanceof ImageAction) {
+					if( data.get(i) == null)
+						throw new BadCompositeConstructionExcpetion("ImageAction with null Image.");
+					this.contexts[i] = contextOf( data.get(i));
+				}
+				else
+					throw new BadCompositeConstructionExcpetion("Bad ActionType in Composite (Tried to Composite a Composite?)");
+			}
+		}
+		public List<UndoAction> getActions() {
+			return Arrays.asList(actions);
+		}
+		@Override		protected void performAction() { throw new UnsupportedOperationException();}
+		@Override		protected void undoAction() {throw new UnsupportedOperationException();}
+		
+	}
+
+	public class BadCompositeConstructionExcpetion extends Exception {
+		BadCompositeConstructionExcpetion( String message) {
+			super("BadComposite: " + message);
+		}
+	}
 
 	
 	// ==== Image Undo Actions ====

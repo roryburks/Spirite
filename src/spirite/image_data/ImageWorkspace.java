@@ -17,7 +17,11 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.UndoEngine.BadCompositeConstructionExcpetion;
 import spirite.image_data.UndoEngine.ClearAction;
+import spirite.image_data.UndoEngine.CompositeAction;
+import spirite.image_data.UndoEngine.StructureAction;
+import spirite.image_data.UndoEngine.UndoAction;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -277,6 +281,7 @@ public class ImageWorkspace {
 	}
 	
 	private boolean verifyImage( ImageData image) {
+		System.out.println(image);
 		if( !imageData.contains(image)) {
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout/in image from wrong workspce.");
 			return false;
@@ -305,14 +310,34 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
-		ImageData data = new ImageData( img, workingID++, this);
-		imageData.add(data);
+		ImageData newImage = new ImageData( img, workingID++, this);
+		imageData.add(newImage);
 
-		width = Math.max(width, img.getWidth());
-		height = Math.max(height, img.getHeight());
-		
-		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
-		executeChange( createAdditionEvent(node,context));
+		LayerNode node = groupTree.new LayerNode( new SimpleLayer(newImage), name);
+		if( width < img.getWidth() || height < img.getHeight()) {
+			List<ImageData> data = new ArrayList<>(2);
+			List<UndoAction> actions = new ArrayList<>(2);
+
+			actions.add(undoEngine.new StructureAction( createAdditionEvent(node,context)));
+			data.add(null);
+			actions.add(undoEngine.new StructureAction( new DimensionChange( Math.max(width, img.getWidth()),Math.max(height, img.getHeight()))));
+			data.add(null);
+			
+			try {
+				CompositeAction action = undoEngine.new CompositeAction( actions, data);
+				executeComposite(action);
+				
+				// It's important that you add the action to the UndoEngine AFTER
+				//	you add the node to the GroupTree by calling executingComposite
+				//	otherwise the UndoEngine will cull the imageData before it's linked
+				undoEngine.storeAction(action, null);
+			} catch (BadCompositeConstructionExcpetion e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else
+			executeChange( createAdditionEvent(node,context));
 		return node;
 	}
 	
@@ -695,6 +720,32 @@ public class ImageWorkspace {
 		}
 	}
 	
+	/** Change the Workspace's Dimensions */
+	public class DimensionChange extends StructureChange
+	{
+		int oldWidth, oldHeight;
+		int newWidth, newHeight;
+
+		DimensionChange( int width, int height) {
+			this.newWidth = width;
+			this.newHeight = height;
+			this.oldWidth = ImageWorkspace.this.width;
+			this.oldHeight = ImageWorkspace.this.height;
+		}
+		
+		@Override
+		public void execute() {
+			width = newWidth;
+			height = newHeight;
+		}
+
+		@Override
+		public void unexecute() {
+			width = oldWidth;
+			height = oldHeight;
+		}
+		
+	}
 	
 	public class OffsetChange extends NodeAtributeChange
 		implements StackableStructureChange
@@ -732,6 +783,17 @@ public class ImageWorkspace {
 				undoEngine.storeAction(undoEngine.new StructureAction(change) , null);
 		}
 		change.alert(false);
+	}
+	
+	/** Executes all StructureChanges (if any) in the given CompositeAction */
+	public void executeComposite( CompositeAction composite) {
+		for( UndoAction action : composite.getActions()) {
+			if( action instanceof StructureAction) {
+				StructureChange change = ((StructureAction)action).change;
+				change.execute();
+				change.alert(false);
+			}
+		}
 	}
 	
 	// :::: StructureChangeEvent Creation Methods for simplifying the process

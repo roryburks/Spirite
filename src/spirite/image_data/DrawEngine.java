@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
@@ -110,16 +111,16 @@ public class DrawEngine {
 			if( new_x != old_x || new_y != old_y) {
 				prec.add( new Point(new_x,new_y));
 				Graphics g = img.getGraphics();
-				
+
+				Graphics2D g2 = (Graphics2D)g;
+//				g2.setStroke( new BasicStroke(9f, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
 				switch( stroke.method) {
 				case BASIC:
 					g.setColor( stroke.getColor());
 					g.drawLine(old_x, old_y, new_x, new_y);
 					break;
 				case ERASE:
-					Graphics2D g2 = (Graphics2D)g;
-					Composite c = g2.getComposite()
-							;
+					Composite c = g2.getComposite();
 					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 					g2.setColor( new Color(0,0,0,0));
 					g2.drawLine( old_x, old_y, new_x, new_y);
