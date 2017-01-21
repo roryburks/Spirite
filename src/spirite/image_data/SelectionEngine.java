@@ -6,11 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import spirite.MUtil;
 import spirite.brains.CacheManager;
@@ -18,7 +15,6 @@ import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.UndoEngine.ImageAction;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
@@ -183,7 +179,6 @@ public class SelectionEngine {
 		oldSelection = scope.selection;
 		oldOX = scope.offsetX;
 		oldOY = scope.offsetY;
-//		scope.selection = null;
 		
 		// Start building
 		building = true;
@@ -238,12 +233,7 @@ public class SelectionEngine {
 		building = false;
 	}
 	
-	
-	
-	// ::::
-	
 	public void unselect() {
-		
 		UndoableAction action = createNewSelect(null, 0, 0);
 		action.performAction();
 		undoEngine.storeAction(action);

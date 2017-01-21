@@ -2,14 +2,12 @@
 
 package spirite.brains;
 
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JPanel;
 
 import spirite.MDebug;

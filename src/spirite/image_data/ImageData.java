@@ -9,11 +9,12 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
 
 public class ImageData {
+
 	// Should really be a nested class, but ImageWorkspace is a bit too busy
 	private final ImageWorkspace context;
 	
 	private CachedImage data;
-	int id;
+	int id = -1;
 	boolean locked = false;	// Mostly unused for now
 	
 	public ImageData( BufferedImage img, int id, ImageWorkspace context) {
@@ -34,6 +35,11 @@ public class ImageData {
         g2d.dispose();
 	}
 	
+	public ImageWorkspace getContext() {
+		// This method existing gives me a bad taste.  Perhaps I should rethink
+		//	ImageData
+		return context;
+	}
 	public ReadOnlyImage readImage() {
 		return new ReadOnlyImage(data.access());
 	}
@@ -53,4 +59,5 @@ public class ImageData {
 	void flush() {
 		data.flush();
 	}
+	
 }

@@ -1,14 +1,7 @@
 package spirite.panel_layers;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -20,7 +13,6 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
-import spirite.ui.UIUtil;
 import spirite.ui.UIUtil.SliderPanel;
 
 public class LayersPanel extends JPanel {

@@ -369,14 +369,14 @@ public class LayerTreePanel extends ContentTree
 			// Show the ContextMenu
 			contextMenu.removeAll();
 			UIUtil.constructMenu(contextMenu, menuScheme.toArray( new String[0][]), this);
-			contextMenu.context = (Node)usrObj;
+			contextMenu.node = (Node)usrObj;
 			contextMenu.show(this, evt.getX(), evt.getY());
 		}
 	}
 	
 	private final LTPContextMenu contextMenu = new LTPContextMenu();
 	class LTPContextMenu extends JPopupMenu {
-		Node context = null;
+		Node node = null;
 		
 		public LTPContextMenu() {}
 	}
@@ -422,7 +422,7 @@ public class LayerTreePanel extends ContentTree
 	// :::: WorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
-		contextMenu.context = null;
+		contextMenu.node = null;
 		
 		// Remove assosciations with the old Workspace and add ones to the new
 		if( workspace != null) {
@@ -446,20 +446,20 @@ public class LayerTreePanel extends ContentTree
 	public void actionPerformed(ActionEvent evt) {
 		// ActionCommands from JPopupMenu
 		if( evt.getActionCommand().equals("animfromgroup")) {
-			GroupNode group = (GroupNode)contextMenu.context;
+			GroupNode group = (GroupNode)contextMenu.node;
 			workspace.getAnimationManager().addAnimation(new SimpleAnimation(group));
 		}
 		else if (evt.getActionCommand().equals("newGroup")){
-			workspace.addGroupNode(contextMenu.context, "New Group");
+			workspace.addGroupNode(contextMenu.node, "New Group");
 		}
 		else if (evt.getActionCommand().equals("newLayer")) {
 			Dialogs.performNewLayerDialog(workspace);
 		}
 		else if (evt.getActionCommand().equals("duplicate")) {
-			
+			workspace.duplicateNode(contextMenu.node);
 		}
 		else if (evt.getActionCommand().equals("delete")) {
-			workspace.removeNode(contextMenu.context);
+			workspace.removeNode(contextMenu.node);
 		}
 		else {
 			System.out.println(evt.getActionCommand());

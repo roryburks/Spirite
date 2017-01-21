@@ -258,7 +258,7 @@ public class WorkPanel extends javax.swing.JPanel
                 .addGroup( layout.createParallelGroup()
                     .addComponent(jscrollVertical)	
                  // !!!! TODO: figure out why this is necessary to keep the layout working as expected and find a better way
-                    .addComponent(zoomPanel, 0, 0, jscrollVertical.preferredSize().width)
+                    .addComponent(zoomPanel, 0, 0, jscrollVertical.getPreferredSize().width)
                  // !!!!
                 )
             )
@@ -270,7 +270,7 @@ public class WorkPanel extends javax.swing.JPanel
                 .addComponent(workSplicePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup( layout.createParallelGroup()
                 .addComponent(jscrollHorizontal)
-                .addComponent(zoomPanel, 0, 0, jscrollHorizontal.preferredSize().height)
+                .addComponent(zoomPanel, 0, 0, jscrollHorizontal.getPreferredSize().height)
             )
             .addComponent(coordinateLabel, 24,24,24)
         );

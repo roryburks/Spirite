@@ -1,9 +1,11 @@
 package spirite.image_data.layers;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 
+import spirite.MUtil;
 import spirite.image_data.ImageData;
 
 public class SimpleLayer extends Layer {
@@ -40,6 +42,14 @@ public class SimpleLayer extends Layer {
 	@Override
 	public int getHeight() {
 		return data.readImage().getHeight();
+	}
+
+	@Override
+	public Layer duplicate() {
+		BufferedImage bi = MUtil.deepCopy(data.readImage().image);
+		ImageData dupe = new ImageData(bi, -1, data.getContext());
+		
+		return new SimpleLayer(dupe);
 	}
 
 }

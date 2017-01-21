@@ -1,7 +1,6 @@
 package spirite.panel_toolset;
 
 import java.awt.Color;
-import java.text.DecimalFormat;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -14,8 +13,8 @@ import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.brains.ToolsetManager.PropertySchemeNode;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
-import spirite.ui.UIUtil.SliderPanel;
 import spirite.panel_toolset.PropertyPanels.SizeSlider;
+import spirite.ui.UIUtil.SliderPanel;
 
 public class ToolSettingsPanel extends JPanel 
 	implements MToolsetObserver
@@ -26,7 +25,6 @@ public class ToolSettingsPanel extends JPanel
 	
 	private final JLabel label;
 	private final JScrollPane container;
-	private JPanel contentPanel;
 	public ToolSettingsPanel( ToolsetManager manager) {
 		this.manager = manager;
 		

@@ -26,7 +26,6 @@ import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.StackableStructureChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -799,20 +798,7 @@ public class UndoEngine {
 	private class CompositeContext extends UndoContext {
 		LinkedList<CompositeAction> actions = new LinkedList<>();
 		private ListIterator<CompositeAction> pointer = null;
-		private LinkedList<CachedImage> cache = new LinkedList<>();
-		private ListIterator<CachedImage> cpointer = null;
-		
 
-		// Special Null Actions for marking when Selection Data needs to be stored
-		class StoreSelection extends NullAction {
-			@Override protected void performAction() {}
-			@Override protected void undoAction() {}
-		}
-		class DiscardSelection extends NullAction {
-			@Override protected void performAction() {}
-			@Override protected void undoAction() {}
-		}
-		
 		CompositeContext() {
 			super(null);
 		}

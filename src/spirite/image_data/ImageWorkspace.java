@@ -5,8 +5,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -21,6 +26,7 @@ import spirite.image_data.UndoEngine.ClearAction;
 import spirite.image_data.UndoEngine.CompositeAction;
 import spirite.image_data.UndoEngine.StructureAction;
 import spirite.image_data.UndoEngine.UndoableAction;
+import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -38,7 +44,13 @@ public class ImageWorkspace {
 	// ImageData is tracked in ImageWorkspace if it is either part of the active
 	//	Image Data (used by something in the GroupTree) or it used by a component
 	//	stored in the UndoEngine.
-	List<ImageData> imageData;
+	//
+	// It's possible to implement this using LinkedHashSet and a custom HashCode
+	//	which would reinforce the intended purpose of the id's and prevent any
+	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
+	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
+	//	by ImageWorkspace.
+	Map<Integer,ImageData> imageData;	
 	
 	// Internal Components
 	private final GroupTree groupTree;
@@ -65,7 +77,7 @@ public class ImageWorkspace {
 	
 	public ImageWorkspace( CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
-		imageData = new ArrayList<ImageData>();
+		imageData = new HashMap<>();
 		animationManager = new AnimationManager(this);
 		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
@@ -81,11 +93,13 @@ public class ImageWorkspace {
 	// :::: Maintenance Methods
 	public void cleanDataCache() {
 		if( building) return;
-		boolean used[] = new boolean[imageData.size()];
-		Arrays.fill(used, false);
 		
-		// Go through each Layer in the groupTree and flag the imageData
-		//	it uses as being used.
+		Iterator<Entry<Integer, ImageData>> it = imageData.entrySet().iterator();
+		LinkedHashSet<ImageData> dataToAdd = new LinkedHashSet<>();
+		List<Integer> dataToRemove = new LinkedList<>();
+		List<ImageData> undoImageSet = undoEngine.getDataUsed();
+		
+		// Create a list of all LayerNodes in the GroupTree
 		List<Node> layers = groupTree.getRoot().getAllNodesST( new NodeValidator() {
 			@Override
 			public boolean isValid(Node node) {
@@ -94,39 +108,56 @@ public class ImageWorkspace {
 			@Override
 			public boolean checkChildren(Node node) {return true;}
 		});
-		for( Node node : layers) {
-			List<ImageData> layerDataUsed = ((LayerNode)node).getLayer().getUsedImageData();
+
+		// Pre-compute a list of all used data lists in case any Layer implements
+		//	getUsedImageData in an inefficient way
+		List<List<ImageData>> layerDataUsed = new ArrayList<>(layers.size());
+		for( int i=0; i<layers.size(); ++i) {
+			layerDataUsed.add(i, ((LayerNode)layers.get(i)).getLayer().getUsedImageData());
+		}
+		
+		// Step 1: Go through each tracked ImageData and find unused entries
+		while( it.hasNext()) {
+			Entry<Integer, ImageData> entry = it.next();
 			
-			for( ImageData data : layerDataUsed) {
-				int i = imageData.indexOf(data);
-				
-				if( i == -1) {
-					MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData during Cache cleanup.");
-					imageData.add(data);
+			if( undoImageSet.contains(entry.getValue()))
+				continue;
+			
+			boolean used = false;
+			for( List<ImageData> layerData : layerDataUsed) {
+				if( layerData.contains(entry.getValue()))  {
+					used = true;
+					break;
 				}
-				else 
-					used[i] = true;
 			}
-		}
-		
-		// Go through the UndoEngine and flag them as being used
-		for( ImageData image : undoEngine.getDataUsed()) {
-			int index = imageData.indexOf(image);
 			
-			if( index == -1) {
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Found untracked ImageData from UndoEngine during Cache cleanup.");
-				imageData.add(image);
-			}
-			else if( index < used.length) {	// shouldn't be needed, but can be
-				used[index] = true;
+			if( !used)
+				dataToRemove.add(entry.getKey());
+		}
+
+		// Step 2: Go through all used entries and make sure they're tracked
+		for( List<ImageData> layerData : layerDataUsed) {
+			for( ImageData data : layerData) {
+				if( !imageData.containsValue(data))
+					dataToAdd.add(data);
 			}
 		}
-		
-		for( int index=used.length-1; index>=0; --index) {
-			if( !used[index]) {
-				imageData.get(index).flush();
-				imageData.remove(index);
-			}
+		for( ImageData data : undoImageSet) {
+			if( !imageData.containsValue(data))
+				dataToAdd.add(data);
+		}
+
+		// Add and Remove
+		for( Integer i : dataToRemove) {
+			imageData.remove(i);
+		}
+		for( ImageData data : dataToAdd) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Untracked Image Data found when cleaning ImageWorkspace.");
+			if( data.id == -1 || imageData.containsKey(data.id)) {
+				data.id = workingID++;
+			} 
+			
+			imageData.put(data.id, data);
 		}
 	}
 
@@ -216,7 +247,7 @@ public class ImageWorkspace {
 	public List<ImageData> getImageData() {
 		List<ImageData> list = new ArrayList<>(imageData.size());
 		
-		for( ImageData data : imageData) {
+		for( ImageData data : imageData.values()) {
 			list.add( data);
 		}
 		
@@ -280,7 +311,7 @@ public class ImageWorkspace {
 	}
 	
 	private boolean verifyImage( ImageData image) {
-		if( !imageData.contains(image)) {
+		if( !imageData.containsValue(image)) {
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to checkout/in image from wrong workspce.");
 			return false;
 		}
@@ -309,9 +340,48 @@ public class ImageWorkspace {
 		return 	addNewLayer( null, w, h, name, c);
 	}
 	
+	/** Imports the layer into the given context, assigning any ImageData contained
+	 * unique identifiers.
+	 * 	 */
+	public LayerNode importLayer( Node context, Layer layer, String name) {
+		List<ImageData> usedData = layer.getUsedImageData();
+		Map<Integer,Integer> idMap = new HashMap<>();
+		
+		for( ImageData data : usedData) {
+			if( data.id == -1) {
+				data.id = workingID++;
+			} else {
+				// Link same-ID ImageData together
+				Integer link= idMap.get(data.id);
+				
+				if(link == null) {
+					idMap.put(data.id, workingID);
+					data.id = workingID++;
+				}
+				else
+					data.id = link;
+			}
+		}
+		
+		LayerNode node = groupTree.new LayerNode(layer, name);
+		executeChange(createAdditionChange(node, context));
+		return node;
+	}
+	
+	
+	/** Imports the given Group Node and all included ImageData into it.  If the
+	 * ImageData has unassigned (-1) identifiers, it will automatically assign them
+	 * unique ones.  If any ImageData have assigned identifiers, it will give them
+	 * new ones such that any previously matching identifiers still match.
+	 */
+	public GroupNode importGroup( Node context, GroupNode node ) {
+		return null;
+	}
+	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
-		ImageData newImage = new ImageData( img, workingID++, this);
-		imageData.add(newImage);
+		ImageData newImage = new ImageData( img, workingID, this);
+		imageData.put(workingID, newImage);
+		workingID++;
 
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(newImage), name);
 		_addLayer(node, context);
@@ -322,8 +392,9 @@ public class ImageWorkspace {
 	public LayerNode addNewLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
 		ImageData data = new ImageData(w, h, c, this);
-		imageData.add(data);
-		data.id = workingID++;
+		data.id = workingID;
+		imageData.put(workingID, data);
+		workingID++;
 		
 		// Create node then execute StructureChange event
 		LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
@@ -333,7 +404,7 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewLayer( GroupTree.Node context, int identifier, String name) {
-		for( ImageData data : imageData) {
+		for( ImageData data : imageData.values()) {
 			if( data.id == identifier) {
 				// Create node then execute StructureChange event
 				LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
@@ -341,7 +412,7 @@ public class ImageWorkspace {
 				width = Math.max(width,  data.readImage().getWidth());
 				height = Math.max(height, data.readImage().getHeight());
 				
-				executeChange(createAdditionEvent(node, context));
+				executeChange(createAdditionChange(node, context));
 				
 				return node;
 			}
@@ -360,7 +431,7 @@ public class ImageWorkspace {
 		if( width < node.getLayer().getWidth() || height < node.getLayer().getHeight()) {
 			List<UndoableAction> actions = new ArrayList<>(2);
 
-			actions.add(undoEngine.new StructureAction( createAdditionEvent(node,context)));
+			actions.add(undoEngine.new StructureAction( createAdditionChange(node,context)));
 			actions.add(undoEngine.new StructureAction( 
 					new DimensionChange( 
 							Math.max(width, node.getLayer().getWidth()),
@@ -376,15 +447,27 @@ public class ImageWorkspace {
 			undoEngine.storeAction(action);
 		}
 		else
-			executeChange( createAdditionEvent(node,context));
+			executeChange( createAdditionChange(node,context));
 	}
 	
 	public GroupTree.GroupNode addGroupNode( GroupTree.Node context, String name) {
 		GroupTree.GroupNode newNode = groupTree.new GroupNode(name);
 		
-		executeChange(createAdditionEvent(newNode,context));
+		executeChange(createAdditionChange(newNode,context));
 		
 		return newNode;
+	}
+	
+	public Node duplicateNode( Node nodeToDuplicate) {
+		if( nodeToDuplicate instanceof LayerNode) {
+			Layer dupe = ((LayerNode)nodeToDuplicate).getLayer().duplicate();
+			return importLayer(nodeToDuplicate.getNextNode(), dupe, nodeToDuplicate.getName() + " copy");
+		}
+		else if( nodeToDuplicate instanceof GroupNode) {
+			
+		}
+		
+		return null;
 	}
 	
 	/***
@@ -394,11 +477,11 @@ public class ImageWorkspace {
 	 * will get erased next time cleanDataCache is called)
 	 */
 	public void addImageDataDirect( ImageData newData) {
-		imageData.add( newData);
 		if( newData.id < workingID)
 			newData.id = workingID++;
 		else
 			workingID = newData.id+1;
+		imageData.put( newData.id, newData);
 		
 	}
 	
@@ -809,7 +892,7 @@ public class ImageWorkspace {
 				node.getNextNode());
 	}
 	
-	public StructureChange createAdditionEvent( Node newNode, Node context ) {
+	public StructureChange createAdditionChange( Node newNode, Node context ) {
 		Node parent;
 		Node nodeBefore;
 		if( context == null) {
@@ -862,8 +945,8 @@ public class ImageWorkspace {
     	boolean isStructureChange = false;
     	
     	public ImageWorkspace getWorkspace() { return workspace;}
-    	public List<ImageData> getChangedImages() { return (List<ImageData>) dataChanged.clone();}
-    	public List<Node> getChangedNodes() { return (List<Node>) nodesChanged.clone();}
+    	public List<ImageData> getChangedImages() { return new ArrayList<>(dataChanged);}
+    	public List<Node> getChangedNodes() { return new ArrayList<>(nodesChanged);}
     	public boolean getSelectionLayerChange() { return selectionLayerChange;}
     	public boolean isStructureChange() {return isStructureChange;}
     }

@@ -29,8 +29,6 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
-import spirite.brains.ToolsetManager.ToolSettings;
-import spirite.brains.ToolsetManager.ToolsetSettingsPanel;
 import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewImagePanel;
 import spirite.file.LoadEngine;

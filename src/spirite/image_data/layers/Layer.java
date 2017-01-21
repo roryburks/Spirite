@@ -11,4 +11,6 @@ public abstract class Layer {
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();
 	public abstract int getHeight();
+	
+	public abstract Layer duplicate();
 }

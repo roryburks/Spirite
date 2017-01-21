@@ -102,6 +102,14 @@ public class MUtil {
 		return true;
 	}
 	
+	public static BufferedImage deepCopy( BufferedImage toCopy) {
+		return new BufferedImage( 
+				toCopy.getColorModel(),
+				toCopy.copyData(null),
+				toCopy.isAlphaPremultiplied(),
+				null);
+	}
+	
 	/***
 	 * Called when an overlaying component (such as a GlassPane) eats a mouse event, but
 	 * still wants the components bellow to receive it.

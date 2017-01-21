@@ -33,7 +33,6 @@ import javax.swing.tree.TreePath;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
-import spirite.image_data.GroupTree;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);

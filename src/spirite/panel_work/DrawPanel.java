@@ -135,6 +135,7 @@ public class DrawPanel extends JPanel
             int w = getWidth();
             int h = getHeight();
             if( zoom >= 4) {
+            	g2.setColor( new Color(90,90,90));
                 for( int i = 0; i < workspace.getWidth(); ++i) {
                 	if( context.itsX(i) < 0) continue;
                 	if( context.itsX(i) > w) break;
@@ -158,10 +159,11 @@ public class DrawPanel extends JPanel
         if( selection != null) {
         	AffineTransform trans = g2.getTransform();
             Stroke old_stroke = g2.getStroke();
-            Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
-            g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-            g2.scale(zoom, zoom);
+            Stroke new_stroke = new BasicStroke(1/(( zoom >= 4)?(zoom/2):zoom), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4/zoom,2/zoom}, 0);
             g2.translate(context.itsX(0), context.itsY(0));
+            g2.scale(zoom, zoom);
+            g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
+            g2.setColor(Color.black);
             g2.setStroke(new_stroke);
             selection.drawSelectionBounds(g);
             g2.setStroke(old_stroke);

@@ -11,12 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import spirite.brains.MasterControl;
-import spirite.brains.ToolsetManager.Tool;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolSettingsPanel;
-import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_toolset.UndoPanel;
 import spirite.ui.OmniFrame.OmniContainer;
 
