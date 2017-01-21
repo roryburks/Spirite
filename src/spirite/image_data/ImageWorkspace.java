@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -373,9 +374,27 @@ public class ImageWorkspace {
 	 * ImageData has unassigned (-1) identifiers, it will automatically assign them
 	 * unique ones.  If any ImageData have assigned identifiers, it will give them
 	 * new ones such that any previously matching identifiers still match.
+	 * 
+	 * Actually I have to completely re-think the whole duplicate ID thing.  It'd
+	 * have to belong in Duplicate
 	 */
 	public GroupNode importGroup( Node context, GroupNode node ) {
-		return null;
+		List<Node> layers = node.getAllNodesST( new GroupTree.NodeValidatorLayer());
+//		Map<Integer,ImageData> linked = new HashMap<>();
+		List<ImageData> unlinked = new ArrayList<>();
+		
+		for( Node lnode : layers) {
+			for( ImageData data: ((LayerNode)lnode).getLayer().getUsedImageData()) {
+				unlinked.add(data);
+			}
+		}
+		for( ImageData data : unlinked) {
+			data.id = workingID++;
+			imageData.put(data.id, data);
+		}
+		
+		executeChange(createAdditionChange(node, context));
+		return node;
 	}
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
@@ -464,10 +483,43 @@ public class ImageWorkspace {
 			return importLayer(nodeToDuplicate.getNextNode(), dupe, nodeToDuplicate.getName() + " copy");
 		}
 		else if( nodeToDuplicate instanceof GroupNode) {
+			GroupNode dupeRoot= groupTree.new GroupNode(nodeToDuplicate.name + " copy");
+
+			// Breadth-first duping
+			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
+
+			for( Node child: nodeToDuplicate.getChildren()) {
+				dupeQueue.add( new NodeContext(child, dupeRoot));
+			}
+			while( !dupeQueue.isEmpty()) {
+				NodeContext next = dupeQueue.poll();
+				Node dupe;
+				
+				if( next.toDupe instanceof GroupNode) {
+					dupe = groupTree.new GroupNode( next.toDupe.getName()+" copy");
+					
+					for( Node child : next.toDupe.getChildren()) {
+						dupeQueue.add( new NodeContext( child, dupe));
+					}
+				}
+				else {
+					dupe = groupTree.new LayerNode( ((LayerNode)next.toDupe).getLayer().duplicate(), next.toDupe.getName() + " copy");
+				}
+				
+				next.parent._add(dupe, null);
+			}
 			
+			return importGroup(nodeToDuplicate.getNextNode(), dupeRoot);
 		}
 		
 		return null;
+	}
+	class NodeContext {
+		Node toDupe, parent;
+		NodeContext( Node toDupe, Node parentInDupe) {
+			this.toDupe = toDupe;
+			this.parent = parentInDupe;
+		}
 	}
 	
 	/***

@@ -5,6 +5,8 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -51,6 +53,12 @@ public class GroupTree {
 	public interface NodeValidator {
 		boolean isValid(Node node);
 		boolean checkChildren(Node node);	// Note, root is always checkable
+	}
+	public static class NodeValidatorLayer implements NodeValidator {
+		@Override public boolean isValid(Node node) {
+			return node instanceof LayerNode;
+		}
+		@Override public boolean checkChildren(Node node) {return true;}
 	}
 
 	
