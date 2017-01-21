@@ -290,11 +290,13 @@ public class ImageWorkspace {
 	/** Performs a command of context "draw." */
 	public void executeDrawCommand( String command) {
 		if( command.equals("clearLayer")) {
-			ImageData image = getActiveData();
-			if( image != null) {
-				ClearAction action = undoEngine.new ClearAction(image);
-				action.performImageAction(image);
-				undoEngine.storeAction(action);
+			if(!selectionEngine.attemptClearSelection()) {
+				ImageData image = getActiveData();
+				if( image != null) {
+					ClearAction action = undoEngine.new ClearAction(image);
+					action.performImageAction(image);
+					undoEngine.storeAction(action);
+				}
 			}
 		}
         else {

@@ -6,13 +6,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import spirite.MUtil;
+import spirite.brains.CacheManager;
+import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.UndoEngine.ImageAction;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
@@ -37,53 +43,79 @@ public class SelectionEngine {
 	
 	private final ImageWorkspace workspace;
 	private final UndoEngine undoEngine;
+	private final CacheManager cacheManager;
 	
 	// Variables related to Selection state
-	private Selection selection = null;
-	private boolean lifted = false;
-	protected BufferedImage liftedData = null;
-	protected ImageData dataContext = null;
-	private int startX;	// pulls double-duty as the starting point for the selection building
-	private int startY;	// and the starting point for a MoveSelectionAction
-	
-	protected int offsetX;
-	protected int offsetY;
+	private final SelectionScope scope = new SelectionScope();
+	class SelectionScope {
+		private Selection selection = null;
+		private boolean lifted = false;
+		protected CachedImage liftedImage = null;
+		protected ImageData dataContext = null;
+		protected int offsetX;
+		protected int offsetY;
+		
+		private Selection getSelection() {return selection;}
+		private boolean isLifted() {return lifted;}
+		private CachedImage getLiftedImage() {return liftedImage;}
+		private ImageData getDataContext() {return dataContext;}
+		private int getOffsetX() {return offsetX;}
+		private int getOffsetY() {return offsetY;}
+	}
+	private StartSelectionAction startAction = null;
 	
 	// Stored for the UndoEngine
-	private int oldOX, oldOY;
-	private Selection oldSelection;
+	private int oldOX = 0;
+	private int oldOY = 0;
+	private Selection oldSelection = null;
 	
-
+	// Variables relating to Building
 	private boolean building = false;
 	private SelectionType selectionType;	// Only used when building a selection
+	private Selection buildingSelection = null;
+	private int startX;
+	private int startY;
+	private int currentX;
+	private int currentY;
 	
 	SelectionEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
+		this.cacheManager = workspace.getCacheManager();
 	}
 
+	// :::: Get/Set
 	public boolean isLifted() {
-		return lifted;
+		return scope.isLifted();
 	}
 	
+	public boolean isBuilding() {
+		return building;
+	}
+	public Selection getBuildingSelection() {
+		return buildingSelection;
+	}
 	
 	public Selection getSelection() {
-		return selection;
+		return scope.getSelection();
 	}
 	public ImageData getDataContext() {
-		return dataContext;
+		return scope.getDataContext();
+	}
+	public CachedImage getLiftedImage() {
+		return scope.getLiftedImage();
 	}
 	public int getOffsetX() {
-		return offsetX;
+		return (building)?currentX:scope.getOffsetX();
 	}
 	public int getOffsetY() {
-		return offsetY;
+		return (building)?currentY:scope.getOffsetY();
 	}
 	public void setOffset( int x, int y) {
-		int dx = x - offsetX;
-		int dy = y - offsetY;
+		int dx = x - scope.getOffsetX();
+		int dy = y - scope.getOffsetY();
 
-		if( !lifted) {
+		if( !scope.isLifted()) {
 			if( !validateSelection())
 				return;
 			
@@ -92,31 +124,190 @@ public class SelectionEngine {
 				return;
 			LayerNode node = (LayerNode)snode;
 
-			BufferedImage lifted = liftSelection(node);
+			StartSelectionAction startAction = createLiftAction(node);
 			
 			// Construct an execute the composite action
-			List<UndoableAction> actions = new ArrayList<>(2);
-			
-			actions.add(new MoveSelectionAction(dx, dy));
-			actions.add(new ClearSelectionAction(selection, offsetX, offsetY,
+			List<UndoableAction> actions = new ArrayList<>(3);
+			actions.add( startAction);
+			actions.add(new ClearSelectionAction(scope.getSelection(), scope.getOffsetX(), scope.getOffsetY(),
 					node.getLayer().getActiveData()));
+			actions.add( new MoveSelectionAction(dx,dy));
 			
-			UndoableAction action = undoEngine.new CompositeAction(actions, "Moved Selection");
+			UndoableAction action = undoEngine.new StackableCompositeAction(actions, actions.get(2).description);
 			action.performAction();
+			undoEngine.storeAction(action);
 		}
-		else {		
+		else {
 			UndoableAction action = new MoveSelectionAction(dx, dy);
 			action.performAction();
 			undoEngine.storeAction(action);
 		}
 	}
 	
-	UndoableAction createMoveAction( int x, int y) {
-		if( !lifted) {
-			
+	
+	public boolean attemptClearSelection() {
+		if( scope.isLifted()) {
+			// If you have lifted data, it clears the lifted data without changing the
+			//	 fact that it is lifted
+			UndoableAction action = new EndSelectionAction(startAction);
+			action.performAction();
+			undoEngine.storeAction( action);
+			return true;
 		}
-		return null;
+		
+		if(!validateSelection())
+			return false;
+		
+
+		Node snode = workspace.getSelectedNode();
+		if( !(snode instanceof LayerNode))
+			return false;
+		LayerNode node = (LayerNode)snode;
+
+		ImageAction action = new ClearSelectionAction(
+				scope.getSelection(), 
+				scope.getOffsetX(), 
+				scope.getOffsetY(), 
+				node.getLayer().getActiveData());
+		action.performImageAction(node.getLayer().getActiveData());
+		undoEngine.storeAction(action);
+		return true;
 	}
+	
+	
+	// :::: Selection Building
+	public void startBuildingSelection( SelectionType type, int x, int y) {
+		// !!!! For the engine to work as expected, it is important that the user
+		//	only updates the selection through these building mechanisms.
+		
+		oldSelection = scope.selection;
+		oldOX = scope.offsetX;
+		oldOY = scope.offsetY;
+//		scope.selection = null;
+		
+		// Start building
+		building = true;
+		selectionType = type;
+		startX = x;
+		startY = y;
+		buildingSelection = new NullSelection();
+	}
+	
+	public void updateBuildingSelection( int x, int y) {
+		if(!building) return;
+		
+		SelectionEvent evt = new SelectionEvent();
+		
+		switch( selectionType) {
+		case RECTANGLE:
+			buildingSelection = new RectSelection( Math.abs(startX-x), Math.abs(startY-y));
+			currentX = Math.min(startX, x);
+			currentY = Math.min(startY, y);
+			evt.selection = buildingSelection;
+			break;
+		}
+		
+		triggerBuildingSelection( evt);
+		
+	}
+
+	public void finishBuildingSelection() {
+		// First Verify that the selection is non-empty
+		building = false;
+		
+		Rectangle rect = buildingSelection.clipToRect(new Rectangle( -currentX, -currentY, workspace.getWidth(), workspace.getHeight()));
+		
+		if( rect == null) {
+			unselect();
+			return;
+		}
+		
+		currentX += rect.x;
+		currentY += rect.y;
+		
+		// Then Store the action and perform it
+		UndoableAction action = createNewSelect(buildingSelection, currentX, currentY);
+		action.performAction();
+		undoEngine.storeAction(  action);
+		
+		triggerBuildingSelection(null);
+		triggerSelectionChanged(null);
+	}
+	
+	public void voidBuilding() {
+		building = false;
+	}
+	
+	
+	
+	// ::::
+	
+	public void unselect() {
+		
+		UndoableAction action = createNewSelect(null, 0, 0);
+		action.performAction();
+		undoEngine.storeAction(action);
+	}
+	
+	/***
+	 * Deletes the lifted data from memory.  Note: If you don't call this function
+	 * any lifted data will automatically be merged with its dataContext when you
+	 * start building a new selection.
+	 */
+	
+	public boolean validateSelection() {
+		if( building) finishBuildingSelection();
+		
+		if( scope.getSelection() == null)
+			return false;
+		
+		return true;
+	}
+	
+	
+	private StartSelectionAction createLiftAction(LayerNode node) {
+		ImageData imageData = node.getLayer().getActiveData();
+		
+		// Creates a Selection Mask
+		Rectangle rect = scope.getSelection().getBounds();
+		BufferedImage bufferedImage = new BufferedImage( 
+				rect.width, 
+				rect.height, 
+				BufferedImage.TYPE_INT_ARGB);
+		MUtil.clearImage(bufferedImage);
+		Graphics g = bufferedImage.getGraphics();
+		scope.getSelection().drawSelectionMask(g);
+		
+		BufferedImage layerImg = imageData.readImage().image;
+		
+		// Copy the data inside the Selection's alphaMask to liftedData
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
+		g2.drawImage( layerImg, -scope.getOffsetX(), -scope.getOffsetY(), null);
+		g.dispose();
+		
+		startAction = new StartSelectionAction(bufferedImage, imageData);
+		return startAction;
+	}
+	
+	private UndoableAction createNewSelect( Selection selection, int ox, int oy) {
+		UndoableAction baseAction = new SetSelectionAction( selection, ox, oy, 
+				oldSelection, oldOX, oldOY);
+
+		if( scope.isLifted()) {
+			List<UndoableAction> actions = new ArrayList<>(3);
+			
+			actions.add(new PasteSelectionAction(startAction, scope.offsetX, scope.offsetY));
+			actions.add(new EndSelectionAction(startAction));
+			actions.add(baseAction);
+			return undoEngine.new CompositeAction(actions, baseAction.description);
+		}
+		else return baseAction;
+	}
+	
+
+	
+	// ============= Selection-Related Undoable Actions
 	
 	public class MoveSelectionAction extends NullAction 
 		implements StackableAction
@@ -130,15 +321,14 @@ public class SelectionEngine {
 		}
 	
 		void translate( int deltax, int deltay) {
-			offsetX += deltax;
-			offsetY += deltay;
+			scope.offsetX += deltax;
+			scope.offsetY += deltay;
 
 			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.selectionLayerChange = true;
 			workspace.triggerImageRefresh(evt);
-			
 		}
 		@Override
 		protected void performAction() {
@@ -159,6 +349,7 @@ public class SelectionEngine {
 		}
 	}
 	
+	/** Clears the data under the given selection. */
 	public class ClearSelectionAction extends ImageAction {
 		private final Selection selection;
 		private final int ox, oy;
@@ -168,15 +359,15 @@ public class SelectionEngine {
 			this.selection = selection;
 			this.ox = ox;
 			this.oy = oy;
+			this.description = "Deleted Selected Data";
 		}
 		
 		@Override
 		protected void performImageAction(ImageData image) {
-			// TODO Auto-generated method stub
 			BufferedImage img = workspace.checkoutImage(image);
 			Graphics g = img.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
-			g2.translate(offsetX, offsetY);
+			g2.translate(ox, oy);
 			g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
 			selection.drawSelectionMask(g2);
 			g.dispose();
@@ -184,177 +375,135 @@ public class SelectionEngine {
 		}
 	}
 	
-	
-	// :::: Selection Building
-	public void startBuildingSelection( SelectionType type, int x, int y) {
-		rememberOldSelection();
-		
-		
-		// Anchor any in-the-air selection data
-		if( lifted) {
-			anchorLifted();
+	public class StartSelectionAction extends NullAction {
+		final CachedImage cachedData;
+		final ImageData dataContext;
+		StartSelectionAction( BufferedImage liftedData, ImageData context) {
+			this.dataContext = context;
+			this.cachedData = cacheManager.cacheImage(liftedData, undoEngine);
 		}
-		voidSelection();
+		@Override protected void performAction() {
+			scope.liftedImage = cachedData;
+			scope.dataContext = dataContext;
+			scope.lifted = true;
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.selectionLayerChange = true;
+			workspace.triggerImageRefresh(evt);
+		}
+		@Override protected void undoAction() {
+			scope.liftedImage = null;
+			scope.lifted = false;
+		}
+		@Override
+		protected void onAdd() {
+			// Separate onAdd event rather than constructor because liftSelection
+			//	creates a StartSelectionAction that doesn't necessarily get 
+			//	added to the UndoEngine
+			this.cachedData.startTracking(this);
+		}
+		@Override
+		protected void onDispatch() {
+			cachedData.relinquish(this);
+		}
+	}
+	public class EndSelectionAction extends NullAction {
+		final CachedImage cachedData;
+		final ImageData dataContext;
+		EndSelectionAction( StartSelectionAction start) {
+			this.cachedData = start.cachedData;
+			this.dataContext = start.dataContext;
+			this.cachedData.startTracking(this);
+		}
+		@Override protected void performAction() {
+			scope.liftedImage = null;
+			scope.lifted = false;
+		}
+		@Override protected void undoAction() {
+			scope.lifted = true;
+			scope.liftedImage = cachedData;
+			scope.dataContext = dataContext;
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.selectionLayerChange = true;
+			workspace.triggerImageRefresh(evt);
+		}
+		@Override
+		protected void onAdd() {
+			this.cachedData.startTracking(this);
+		}
+		@Override
+		protected void onDispatch() {
+			cachedData.relinquish(this);
+		}
+	}
+	public class PasteSelectionAction extends ImageAction {
+		final CachedImage cachedData;
+		final int ox, oy;
+		protected PasteSelectionAction(StartSelectionAction start, int ox, int oy) {
+			super(start.dataContext);
+			cachedData = start.cachedData;
+			this.ox = ox;
+			this.oy = oy;
+		}
+		@Override
+		protected void performImageAction(ImageData image) {
+			BufferedImage bi = workspace.checkoutImage(image);
+			Graphics g = bi.getGraphics();
+			g.drawImage(cachedData.access(), ox, oy, null);
+			g.dispose();
+			workspace.checkinImage(image);
+		}
 		
-		// Start building
-		building = true;
-		selectionType = type;
-		startX = x;
-		startY = y;
-		selection = new NullSelection();
 	}
 	
-	public void updateBuildingSelection( int x, int y) {
-		if(!building) return;
+	public class SetSelectionAction extends NullAction {
+		private int offsetX, offsetY;
+		private Selection selection;
+		private int poX, poY;
+		private Selection pSelection;
 		
-		SelectionEvent evt = new SelectionEvent();
-		
-		switch( selectionType) {
-		case RECTANGLE:
-			offsetX = Math.min(startX, x);
-			offsetY = Math.min(startY, y);
-			selection = new RectSelection( Math.abs(startX-x), Math.abs(startY-y));
-			evt.selection = selection;
-			break;
+		SetSelectionAction( Selection selection, int offsetX, int offsetY,
+				Selection previousSelection, int previousOX, int previousOY) 
+		{
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+			this.selection = selection;
+			this.pSelection = previousSelection;
+			this.poX = previousOX;
+			this.poY= previousOY;
+			description = "Selection Change";
 		}
 		
-		triggerBuildingSelection( evt);
-		
-	}
+		@Override
+		protected void performAction() {
+			voidBuilding();
+			
+			scope.selection = selection;
+			scope.offsetX = offsetX;
+			scope.offsetY = offsetY;
+			
+			triggerBuildingSelection(null);
+			triggerSelectionChanged(null);
+		}
 
-	public void finishBuildingSelection() {
-		building = false;
-		if(selection == null) {
-			voidSelection();
-			return;
+		@Override
+		protected void undoAction() {
+			voidBuilding();
+			
+			scope.selection = pSelection;
+			scope.offsetX = poX;
+			scope.offsetY = poY;
+			
+			triggerBuildingSelection(null);
+			triggerSelectionChanged(null);
 		}
-		
-		Rectangle rect = new Rectangle( 0, 0, workspace.getWidth(), workspace.getHeight());
-		
-		if( !selection.clipToRect(rect))
-			voidSelection();
-		
-		undoEngine.storeAction( 
-				undoEngine.new SetSelectionAction(
-						selection, offsetX, offsetY, 
-						oldSelection, oldOX, oldOY));
-		
-		triggerBuildingSelection(null);
-		triggerSelectionChanged(null);
-	}
-	private void rememberOldSelection() {
-		if( selection == null)
-			oldSelection = null;
-		else
-			oldSelection = (Selection)(selection.clone());
-		oldOX = offsetX;
-		oldOY = offsetY;
-	}
-	
-	/** !! Should only be used by the UndoEngine !! */
-	void setSelection( Selection selection, int offsetX, int offsetY) {
-		voidSelection();
-		
-		this.selection = selection;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-		
-		triggerBuildingSelection(null);
-		triggerSelectionChanged(null);
 	}
 	
 	
-	
-	// ::::
-	
-	private void anchorLifted() {
-		if( !lifted)
-			return;
-
-		BufferedImage layerImg = workspace.checkoutImage(dataContext);
-		
-		Graphics g = layerImg.getGraphics();
-		g.drawImage(liftedData, offsetX, offsetY, null);
-		
-		UndoEngine undoEngine = workspace.getUndoEngine();
-//		undoEngine.storeAction(undoEngine.new MoveSelectionAction( startX, startY), selection.dataContext);
-		workspace.checkinImage(dataContext);
-		voidSelection();
-	}
-	
-	public void unselect() {
-		undoEngine.storeAction( undoEngine.new SetSelectionAction(null, 0, 0, selection, offsetX, offsetY));
-		
-		if( lifted)
-			anchorLifted();
-		
-		
-		selection = null;
-	}
-	
-	/***
-	 * Deletes the lifted data from memory.  Note: If you don't call this function
-	 * any lifted data will automatically be merged with its dataContext when you
-	 * start building a new selection.
-	 */
-	private void voidSelection() {
-		building = false;
-		selection = null;
-		lifted = false;
-	}
-	
-	
-	private boolean validateSelection() {
-		if( selection == null)
-			return false;
-
-		// Determine if the proposed selection is within the bounds of the 
-		// Workspace, if not, cancel lift.
-		// TODO: Make this more precise intersection geometry.
-		if( !selection.clipToRect(new Rectangle( 0, 0, workspace.getWidth(), workspace.getHeight()))) {
-			voidSelection();
-			return false;
-		}
-		
-		return true;
-	}
-	
-	
-	private BufferedImage liftSelection(LayerNode node) {
-		Rectangle rect = selection.getBounds();
-		
-		// At this point we're going through with the lift
-		dataContext = node.getLayer().getActiveData();
-		
-		// Creates a Selection Mask
-		liftedData = new BufferedImage( 
-				rect.width, 
-				rect.height, 
-				BufferedImage.TYPE_INT_ARGB);
-		MUtil.clearImage(liftedData);
-		
-		BufferedImage layerImg = dataContext.readImage().image;
-		
-		// Copy the data inside the Selection's alphaMask to liftedData
-		Graphics g = liftedData.getGraphics();
-		selection.drawSelectionMask(g);
-		Graphics2D g2 = (Graphics2D)g;
-		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-		g2.drawImage( layerImg, -offsetX, -offsetY, null);
-		g.dispose();
-		
-		lifted = true;
-		startX = offsetX;
-		startY = offsetY;
-		
-		return liftedData;
-	}
-	
-	// :::: Various Selection Formats
+	// ========== Selection Database
 	public abstract static class Selection 
 	{
-//		protected ImageData dataContext;
-		
 		// Note: SelectionBounds is drawn in image-space (i.e. accounting
 		//	for offsets), whereas SelectionMask is drawn in selection space
 		//	(not accounting for offsets).
@@ -362,15 +511,7 @@ public class SelectionEngine {
 		abstract void drawSelectionMask( Graphics g);
 		public abstract boolean contains( int x, int y);
 		abstract Rectangle getBounds();
-		abstract boolean clipToRect( Rectangle rect);	// returns false if the clipped Selection is empty
-		
-/*		public ImageData getLiftedContext() {
-			return dataContext;
-		}
-		
-		public BufferedImage getLiftedData() {
-			return liftedData;
-		}*/
+		abstract Rectangle clipToRect( Rectangle rect);	// returns null if the clipped Selection is empty
 		
 		public abstract Selection clone();
 	}
@@ -380,7 +521,7 @@ public class SelectionEngine {
 		@Override		void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
 		@Override		Rectangle getBounds() {return new Rectangle(0,0,0,0);}
-		@Override		boolean clipToRect(Rectangle rect) {return false;}
+		@Override		Rectangle clipToRect(Rectangle rect) {return null;}
 		@Override		public Selection clone() { return new NullSelection();}
 	}
 	
@@ -396,7 +537,7 @@ public class SelectionEngine {
 		}
 		@Override
 		public void drawSelectionBounds( Graphics g) {
-			g.drawRect( offsetX, offsetY, width, height);
+			g.drawRect( 0, 0, width, height);
 		}
 		@Override
 		void drawSelectionMask( Graphics g) {
@@ -409,23 +550,22 @@ public class SelectionEngine {
 		}
 		@Override
 		public boolean contains( int x, int y) {
-			return (new Rectangle( offsetX, offsetY, width, height)).contains(x,y);
+			return (new Rectangle( 0, 0, width, height)).contains(x,y);
 		}
 		
 		@Override
-		boolean clipToRect(Rectangle rect) {
-			Rectangle selectionRect = new Rectangle( offsetX, offsetY, width, height);
+		Rectangle clipToRect(Rectangle rect) {
+			Rectangle selectionRect = new Rectangle( 0, 0, width, height);
 			Rectangle intersection = rect.intersection(selectionRect);
 			
 			if( intersection.isEmpty())
-				return false;
-			
-			offsetX = intersection.x;
-			offsetY = intersection.y;
+				return null;
+
 			width = intersection.width;
 			height = intersection.height;
 			
-			return true;
+			
+			return new Rectangle(intersection);
 		}
 		
 

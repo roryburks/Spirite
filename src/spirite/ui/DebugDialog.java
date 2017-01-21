@@ -16,7 +16,7 @@ import javax.swing.JTextPane;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import spirite.brains.CacheManager.CacheContext;
+import spirite.brains.CacheManager.CacheDomain;
 import spirite.brains.MasterControl;
 
 public class DebugDialog extends JDialog implements ActionListener {
@@ -79,9 +79,9 @@ public class DebugDialog extends JDialog implements ActionListener {
 
 		String str = "Cache Size:"+ df.format(master.getCacheManager().getCacheSize()/(1024.0*1024.0))+"MB\n";
 		
-		Map< Object, CacheContext> map = master.getCacheManager()._debugGetMap();
+		Map< Object, CacheDomain> map = master.getCacheManager()._debugGetMap();
 		
-		for( Map.Entry< Object, CacheContext> set : map.entrySet()) {
+		for( Map.Entry< Object, CacheDomain> set : map.entrySet()) {
 			
 			str += set.getKey().toString() + " :: ";
 			

@@ -233,7 +233,7 @@ public class Penner
 	private void startSelection() {
 		Selection selection = selectionEngine.getSelection();
 		
-		if( selection != null && selection.contains(x,y)) {
+		if( selection != null && selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) {
 			state = STATE.MOVING_SELECTION;
 		}
 		else {

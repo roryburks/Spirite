@@ -146,7 +146,7 @@ public class RenderEngine
 		ratioH = settings.height / (float)settings.workspace.getHeight();
 		
 		selectedData = null;
-		if( settings.drawSelection ){
+		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
 			ImageData dataContext= settings.workspace.getSelectionEngine().getDataContext();
 			if( dataContext != null) {
 				selectedData = dataContext;
@@ -224,7 +224,7 @@ public class RenderEngine
 					g2.scale( ratioW, ratioH);
 					
 					if( selectedData != null && layer.getUsedImageData().contains(selectedData)) {
-						g.drawImage( settings.workspace.getSelectionEngine().liftedData, seloffX, seloffY, null);
+						g.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), seloffX, seloffY, null);
 					}
 					
 					layer.draw(g);

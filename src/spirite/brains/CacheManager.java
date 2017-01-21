@@ -1,7 +1,9 @@
 package spirite.brains;
 
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,18 +23,27 @@ import spirite.MUtil;
  * cached images.  This does NOT include visual memory of things like
  * Icons.
  * 
+ * domain - The "area" of the program in which the CachedImage exists, in general.
+ * 		This is used primarily for debug/user-visibility reasons.
+ * user - An object which is using the data.  By default these aren't tracked
+ * 		but if a CachedImage has multiple users, they can use the user tracking
+ * 		features to automatically flush the data if all users relinquish it
+ * 		(alternately anything that has access to the CachedImage can flush it manually
+ * 		even if other users are using it).
+ * 		
+ * 
  * @author Rory Burks
  *
  */
 public class CacheManager {
 	protected long cacheSize = 0;
-	private final Map<Object,CacheContext> cache = new HashMap<>();
+	private final Map<Object,CacheDomain> cache = new HashMap<>();
 	
 	public long getCacheSize() {
 		return cacheSize;
 	}
 	
-	public final Map<Object,CacheContext> _debugGetMap() {
+	public final Map<Object,CacheDomain> _debugGetMap() {
 		if( !MDebug.DEBUG) {
 			return null;
 		}
@@ -40,7 +51,7 @@ public class CacheManager {
 		return cache;
 	}
 	
-	public class CacheContext {
+	public class CacheDomain {
 		List<CachedImage> list = new LinkedList<>();
 		public int getSize() {
 			int size = 0;
@@ -58,16 +69,17 @@ public class CacheManager {
 	public class CachedImage {
 		protected BufferedImage data = null;
 		protected long last_used;
-		Object user;
+		protected Collection<Object> users = new LinkedHashSet<>();
+		Object domain;
 		
-		CachedImage(Object user) {
+		CachedImage(Object domain) {
 			last_used = System.currentTimeMillis();
 			
-			CacheContext context = cache.get(user);
+			CacheDomain context = cache.get(domain);
 			
 			if( context == null) {
-				context = new CacheContext();
-				cache.put(user, context);
+				context = new CacheDomain();
+				cache.put(domain, context);
 			}
 			context.list.add(this);
 		}
@@ -81,7 +93,7 @@ public class CacheManager {
 			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 			data.flush();
 			
-			for( CacheContext context : cache.values()) {
+			for( CacheDomain context : cache.values()) {
 				int i = context.list.indexOf(this);
 				if( i != -1) context.list.remove(i);
 			}
@@ -91,14 +103,24 @@ public class CacheManager {
 			data = image;
 			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;;
 		}
+		
+		public void startTracking( Object obj) {
+			users.add(obj);
+		}
+		public void relinquish( Object obj) {
+			users.remove(obj);
+			if( users.isEmpty()) {
+				flush();
+			}
+		}
 	}
 	
 	/** Creates a new empty Cached Image*/
-	public CachedImage createImage( int width, int height, Object user) {
+	public CachedImage createImage( int width, int height, Object domain) {
 		if( width <= 0 || height <= 0)
 			return null;
 		
-		CachedImage c = new CachedImage(user);
+		CachedImage c = new CachedImage(domain);
 		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB));
 		
 		if( c.data == null) {
@@ -111,21 +133,21 @@ public class CacheManager {
 	}
 	
 	/** Put an existing image into the Cache. */
-	public CachedImage cacheImage( BufferedImage image, Object user) {
+	public CachedImage cacheImage( BufferedImage image, Object domain) {
 		if( image == null) {
 			image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 			MUtil.clearImage(image);
 		}
-		CachedImage c = new CachedImage(user);
+		CachedImage c = new CachedImage(domain);
 		c.setData(image);
 		
 		return c;
 	}
 	
 	/** Creates a new CachedImage by creating a verbatim copy of a given BufferedImage*/
-	public CachedImage createDeepCopy( BufferedImage toCopy, Object user) {
+	public CachedImage createDeepCopy( BufferedImage toCopy, Object domain) {
 		
-		CachedImage c = new CachedImage(user);
+		CachedImage c = new CachedImage(domain);
 		c.setData(new BufferedImage( 
 				toCopy.getColorModel(),
 				toCopy.copyData(null),

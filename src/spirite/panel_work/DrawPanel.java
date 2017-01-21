@@ -27,6 +27,7 @@ import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
@@ -48,6 +49,7 @@ public class DrawPanel extends JPanel
 	private final Penner penner;
 	final WorkPanel context;
 	final ImageWorkspace workspace;
+	private final SelectionEngine selectionEngine;
 	private final Timer paint_timer;
 	
 	private int metronome = 0;
@@ -56,6 +58,7 @@ public class DrawPanel extends JPanel
 		this.renderEngine = master.getRenderEngine();
 		this.context = context;
 		this.workspace = context.workspace;
+		this.selectionEngine = workspace.getSelectionEngine();
 		this.setBackground(new Color(0, 0, 0, 0));
 
 		penner = new Penner( this, master);
@@ -146,12 +149,17 @@ public class DrawPanel extends JPanel
         }
 
         // Draw Border around Selection
-        Selection selection = workspace.getSelectionEngine().getSelection();
+        Selection selection = null;
+        if( selectionEngine.isBuilding())
+        	selection = selectionEngine.getBuildingSelection();
+        else 
+        	selection = workspace.getSelectionEngine().getSelection();
 
         if( selection != null) {
         	AffineTransform trans = g2.getTransform();
             Stroke old_stroke = g2.getStroke();
             Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
+            g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
             g2.scale(zoom, zoom);
             g2.translate(context.itsX(0), context.itsY(0));
             g2.setStroke(new_stroke);

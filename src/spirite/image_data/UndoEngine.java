@@ -280,7 +280,7 @@ public class UndoEngine {
 		if( queue.size() != 0 && getQueuePosition() == queue.size() && action instanceof StackableAction) {
 			UndoableAction lastAction = getMostRecentAction();
 			
-			if( lastAction.getClass().equals(action.getClass())) {
+			if( lastAction instanceof StackableAction) {
 				StackableAction stackAction = ((StackableAction)lastAction);
 				if(stackAction.canStack(action)) {
 					stackAction.stackNewAction(action);
@@ -313,6 +313,7 @@ public class UndoEngine {
 		if( context != null) {
 			// Add the action to the queue
 			context.addAction(action);
+			action.onAdd();
 				
 			queue.add(context);
 			queuePosition = null;
@@ -678,6 +679,9 @@ public class UndoEngine {
 				
 				List<ImageAction> subList = actions.subList(0, vstart);
 				pointer -= subList.size();
+				
+				for( ImageAction action : subList)
+					action.onDispatch();
 				subList.clear();
 				vstart = 0;
 			}
@@ -740,7 +744,7 @@ public class UndoEngine {
 				List<NullAction> subList = actions.subList(pointer.nextIndex(), actions.size());
 				
 				for( NullAction action : subList) {
-					action.onCauterize();
+					action.onDispatch();
 				}
 				subList.clear();
 				pointer = null;
@@ -779,6 +783,7 @@ public class UndoEngine {
 
 		@Override
 		protected void clipTail() {
+			actions.getFirst().onDispatch();
 			actions.removeFirst();
 		}
 	}
@@ -937,7 +942,8 @@ public class UndoEngine {
 		protected String description = "";
 		protected abstract void performAction();
 		protected abstract void undoAction();
-		protected void onCauterize() {}
+		protected void onDispatch() {}
+		protected void onAdd() {}
 		public String getDescription() {return description;}
 	}
 	
@@ -978,8 +984,8 @@ public class UndoEngine {
 	 * The actions it composites can be any combination of actions with any Contexts.
 	 */
 	public class CompositeAction extends UndoableAction {
-		private final UndoContext contexts[];
-		private final UndoableAction actions[];
+		protected final UndoContext contexts[];
+		protected final UndoableAction actions[];
 		
 		public CompositeAction( List<UndoableAction> actions, String description) 
 		{
@@ -1018,6 +1024,39 @@ public class UndoEngine {
 		
 	}
 
+	/** A stackableCompositeAction is identical to a normal CompositeAction
+	 * except it stack any non-composite StackableAction into any of the 
+	 * sub-actions that can stack.
+	 */
+	public class StackableCompositeAction extends CompositeAction 
+		implements StackableAction
+	{
+		public StackableCompositeAction(List<UndoableAction> actions, String description) {
+			super(actions, description);
+		}
+
+		@Override
+		public void stackNewAction(UndoableAction newAction) {
+			for( int i=0; i<actions.length; ++i) {
+				if( actions[i] instanceof StackableAction
+					&& ((StackableAction)actions[i]).canStack(newAction)) {
+					((StackableAction)actions[i]).stackNewAction(newAction);
+				}
+			}
+		}
+
+		@Override
+		public boolean canStack(UndoableAction newAction) {
+			for( int i=0; i<actions.length; ++i) {
+				if( actions[i] instanceof StackableAction
+					&& ((StackableAction)actions[i]).canStack(newAction)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+	}
 	
 	// ==== Image Undo Actions ====
 	
@@ -1112,7 +1151,7 @@ public class UndoEngine {
 		}
 		
 		@Override
-		protected void onCauterize() {
+		protected void onDispatch() {
 			change.cauterize();
 		}
 		@Override
@@ -1148,34 +1187,7 @@ public class UndoEngine {
 		}
 	}
 	
-	public class SetSelectionAction extends NullAction {
-		private int offsetX, offsetY;
-		private Selection selection;
-		private int poX, poY;
-		private Selection pSelection;
-		
-		SetSelectionAction( Selection selection, int offsetX, int offsetY,
-				Selection previousSelection, int previousOX, int previousOY) 
-		{
-			this.offsetX = offsetX;
-			this.offsetY = offsetY;
-			this.selection = selection;
-			this.pSelection = previousSelection;
-			this.poX = previousOX;
-			this.poY= previousOY;
-			description = "Selection Change";
-		}
-		
-		@Override
-		protected void performAction() {
-			workspace.getSelectionEngine().setSelection( selection, offsetX, offsetY);
-		}
 
-		@Override
-		protected void undoAction() {
-			workspace.getSelectionEngine().setSelection( pSelection, poX, poY);
-		}
-	}
 
 	
 	public UndoableAction createSelectMoveEvent( int x, int y) {
