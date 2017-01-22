@@ -295,9 +295,7 @@ public class ImageWorkspace {
 		//	objects have images checked out so that they are checked in eventually
 		//	and that they terminate correctly if the image were to be unloaded.
 		
-		// Violates the spirit of readImage, but changing image.data's visibility
-		//	to Package just for this would defeat the entire purpose.
-		return image.readImage().image;	
+		return image.deepAccess();
 	}
 	
 	public void checkinImage( ImageData image) {
@@ -428,8 +426,8 @@ public class ImageWorkspace {
 				// Create node then execute StructureChange event
 				LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
 
-				width = Math.max(width,  data.readImage().getWidth());
-				height = Math.max(height, data.readImage().getHeight());
+				width = Math.max(width,  data.getWidth());
+				height = Math.max(height, data.getHeight());
 				
 				executeChange(createAdditionChange(node, context));
 				

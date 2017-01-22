@@ -25,17 +25,43 @@ import spirite.MUtil;
  */
 public class DrawEngine {
 	private final ImageWorkspace workspace;
+	private final StrokeEngine engine = new StrokeEngine();
 	
 	public DrawEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
 	}
 
-	public StrokeEngine createStrokeEngine( ImageData data) {
-		return new StrokeEngine(data);
+	public StrokeEngine startStrokeEngine( ImageData data) {
+		engine.data = data;
+		engine.stroke=  null;
+		return engine;
+	}
+	
+	public boolean strokeIsDrawing() {
+		return (engine.state == STATE.DRAWING);
+	}
+	public BufferedImage getStrokeLayer() {
+		return engine.strokeLayer;
+	}
+	public StrokeEngine getStrokeEngine() {
+		return engine;
+	}
+	public ImageData getStrokeContext() {
+		if( engine.state == STATE.DRAWING) {
+			return engine.data;
+		}
+		else
+			return null;
 	}
 
 	private enum STATE { READY, DRAWING };
+	
 	/***
+	 * The StrokeEngine is abstracted from the DrawEngine primarily for style
+	 * purposes, but you could presumably create multiple stroke engines to
+	 * draw on data asynchronously, though the stroke wouldn't appear until it
+	 * was completed.
+	 * 
 	 * The StrokeEngine operates asynchronously to the input data.  In general
 	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
 	 * pen input is performed.
@@ -47,12 +73,12 @@ public class DrawEngine {
 
 		StrokeParams stroke;
 		ImageData data;
-		BufferedImage img;
+		BufferedImage strokeLayer;
+		BufferedImage compositionLayer;
 		
 		List<Point> prec = new LinkedList<>();
 		
-		protected StrokeEngine(ImageData data) {
-			this.data = data;
+		protected StrokeEngine() {
 			stroke = null;
 		}
 		
@@ -71,13 +97,16 @@ public class DrawEngine {
 		 * @param y
 		 * @return true if the data has been changed, false otherwise
 		 */
-		public boolean startStroke( StrokeParams s, int x, int y) {
+		public synchronized boolean startStroke( StrokeParams s, int x, int y) {
 			if( data == null) 
 				return false;
 			stroke = s;
-			img = workspace.checkoutImage(data);
+			
+			strokeLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			compositionLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			int crgb = stroke.getColor().getRGB();
 			
+			prec = new LinkedList<>();
 			old_x = x;
 			old_y = y;
 			new_x = x;
@@ -87,8 +116,8 @@ public class DrawEngine {
 			state = STATE.DRAWING;
 			
 			
-			if( MUtil.coordInImage( x, y, img) && img.getRGB(x, y) != crgb) {
-				img.setRGB(x, y, crgb);
+			if( MUtil.coordInImage( x, y, strokeLayer) && strokeLayer.getRGB(x, y) != crgb) {
+				strokeLayer.setRGB(x, y, crgb);
 				return true;
 			}
 			return false;
@@ -110,24 +139,12 @@ public class DrawEngine {
 			// Draw Stroke (only if the mouse has moved)
 			if( new_x != old_x || new_y != old_y) {
 				prec.add( new Point(new_x,new_y));
-				Graphics g = img.getGraphics();
+				Graphics g = strokeLayer.getGraphics();
 
 				Graphics2D g2 = (Graphics2D)g;
+				g.setColor( stroke.getColor());
 				g2.setStroke( new BasicStroke( stroke.width, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
-				switch( stroke.method) {
-				case BASIC:
-					if( stroke.alpha != 1) 
-						g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, stroke.alpha));
-					g.setColor( stroke.getColor());
-					g.drawLine(old_x, old_y, new_x, new_y);
-					break;
-				case ERASE:
-					Composite c = g2.getComposite();
-					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN,stroke.alpha));
-					g2.setColor( new Color(0,0,0,0));
-					g2.drawLine( old_x, old_y, new_x, new_y);
-					g2.setComposite( c);
-				}
+				g2.drawLine( old_x, old_y, new_x, new_y);
 				g.dispose();
 				changed = true;
 			}
@@ -151,13 +168,38 @@ public class DrawEngine {
 			old_x = -1;
 			old_y = -1;
 			if( data != null) {
+				BufferedImage img = workspace.checkoutImage(data);
+				drawStrokeLayer(img.getGraphics());
 				workspace.checkinImage(data);
 			}
+			
+			strokeLayer.flush();
+			compositionLayer.flush();
 		}
 		
 		public Point[] getHistory() {
 			Point[] array = new Point[prec.size()];
 			return prec.toArray(array);
+		}
+
+		public void drawStrokeLayer( Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
+			Composite c = g2.getComposite();
+			switch( stroke.method) {
+			case BASIC:
+				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.alpha));
+				break;
+			case ERASE:
+				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.alpha));
+				break;
+			}
+			g.drawImage(getStrokeLayer(), 0, 0, null);
+			g2.setComposite( c);
+		}
+		
+		public BufferedImage getCompositionLayer() {
+			MUtil.clearImage(compositionLayer);
+			return compositionLayer;
 		}
 	}
 

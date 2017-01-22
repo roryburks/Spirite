@@ -26,6 +26,7 @@ import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -80,6 +81,9 @@ public class RenderEngine
 			// Otherwise get the drawing queue and draw it
 			ImageWorkspace workspace = settings.workspace;
 			
+			WorkingRenderData workingData = new WorkingRenderData();
+			
+			
 			// Abort if it does not make sense to draw the workspace
 			if( workspace == null || workspace.getWidth() <= 0 || workspace.getHeight() <= 0
 					|| settings.width == 0 || settings.height == 0) 
@@ -87,8 +91,6 @@ public class RenderEngine
 
 			if( settings.image != null) {
 				// I think I need to re-think names
-				BufferedImage imageImage = settings.image.readImage().image;
-
 				cachedImage = cacheManager.createImage(settings.width, settings.height, this);
 				
 				BufferedImage image = cachedImage.access();
@@ -96,7 +98,9 @@ public class RenderEngine
 				Graphics2D g2 = (Graphics2D)g;
 				
 				g2.setRenderingHints(settings.hints);
-				g2.drawImage(imageImage, 0, 0, settings.width, settings.height, null);
+				g2.scale( settings.width / (float)settings.image.getWidth(), 
+						  settings.height / (float)settings.image.getHeight());
+				settings.image.drawLayer(g);
 				g.dispose();
 			}
 			else if( settings.layer != null) {
@@ -113,7 +117,7 @@ public class RenderEngine
 				g.dispose();
 			}
 			else {
-				cachedImage = cacheManager.cacheImage(propperRender(settings), this);
+				cachedImage = cacheManager.cacheImage(propperRender(settings, workingData), this);
 			}
 
 			
@@ -128,7 +132,8 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	private BufferedImage propperRender(RenderSettings settings) {
+	private BufferedImage propperRender(RenderSettings settings, WorkingRenderData wrk) 
+	{
 		// Step 1: Determine amount of data needed
 		int n = _getNeededImagers( settings);
 		
@@ -139,21 +144,20 @@ public class RenderEngine
 			images[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
 		}
 		
-		
 		// Step 2: Recursively draw the image
-		ratioW = settings.width / (float)settings.workspace.getWidth();
-		ratioH = settings.height / (float)settings.workspace.getHeight();
+		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
+		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
 		
-		selectedData = null;
+		wrk.selectedData = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
 			ImageData dataContext= settings.workspace.getSelectionEngine().getDataContext();
 			if( dataContext != null) {
-				selectedData = dataContext;
-				seloffX = settings.workspace.getSelectionEngine().getOffsetX();
-				seloffY = settings.workspace.getSelectionEngine().getOffsetY();
+				wrk.selectedData = dataContext;
+				wrk.seloffX = settings.workspace.getSelectionEngine().getOffsetX();
+				wrk.seloffY = settings.workspace.getSelectionEngine().getOffsetY();
 			}
 		}
-		_propperRec( settings.node, 0, settings, images);
+		_propperRec( settings.node, 0, settings, images, wrk);
 		
 		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
@@ -162,9 +166,12 @@ public class RenderEngine
 		
 		return images[0];
 	}
-	private float ratioW, ratioH;
-	private ImageData selectedData;
-	private int seloffX, seloffY;
+	
+	private class WorkingRenderData {
+		float ratioW, ratioH;
+		ImageData selectedData;
+		int seloffX, seloffY;
+	}
 	
 	/** Determines the number of images needed to properly render 
 	 * the given RenderSettings.  This number is equal to largest Group
@@ -195,7 +202,13 @@ public class RenderEngine
 		return max;
 	}
 	
-	private void _propperRec(GroupNode node, int n, RenderSettings settings, BufferedImage[] buffer) {
+	private void _propperRec(
+			GroupNode node, 
+			int n, 
+			RenderSettings settings, 
+			BufferedImage[] buffer,
+			WorkingRenderData wrk) 
+	{
 		if( n < 0 || n >= buffer.length) {
 			MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
 			return;
@@ -220,12 +233,16 @@ public class RenderEngine
 					_setGraphicsSettings(g, child, settings);
 					AffineTransform transform = g2.getTransform();
 					g2.translate(child.x, child.y);
-					g2.scale( ratioW, ratioH);
+					g2.scale( wrk.ratioW, wrk.ratioH);
 					
-					if( selectedData != null && layer.getUsedImageData().contains(selectedData)) {
-						g.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), seloffX, seloffY, null);
+					if( wrk.selectedData != null 
+							&& layer.getUsedImageData().contains(wrk.selectedData)) 
+					{
+						g.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), 
+								wrk.seloffX, wrk.seloffY, null);
 					}
-					
+
+
 					layer.draw(g);
 					
 					g2.setTransform(transform);
@@ -239,7 +256,7 @@ public class RenderEngine
 					}
 					
 
-					_propperRec((GroupNode)child, n+1, settings, buffer);
+					_propperRec((GroupNode)child, n+1, settings, buffer,wrk);
 					
 					_setGraphicsSettings(g, child,settings);
 					g2.drawImage( buffer[n+1],
@@ -317,8 +334,8 @@ public class RenderEngine
 				layer = null;
 				drawSelection = false;
 				
-				if( width == -1) width = image.readImage().image.getWidth();
-				if( height == -1) height = image.readImage().image.getHeight();
+				if( width == -1) width = image.getWidth();
+				if( height == -1) height = image.getHeight();
 			}
 			else if( layer != null) {
 				node = null;

@@ -469,7 +469,7 @@ public class UndoEngine {
 		protected ImageContext( ImageData image) {
 			super(image);
 			
-			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image, UndoEngine.this), null));
+			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(), UndoEngine.this), null));
 			met = 0;
 			pointer = 0;
 		}
@@ -529,7 +529,7 @@ public class UndoEngine {
 			// Record a keyframe if it's been a while or the action is a "HeavyAction"
 			//	i.e. an action requiring a lot of computation to perform
 			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
-				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.readImage().image,  UndoEngine.this), iaction));
+				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(),  UndoEngine.this), iaction));
 				met = 0;
 			}
 			else {
@@ -1071,7 +1071,7 @@ public class UndoEngine {
 		
 		@Override
 		protected void performImageAction( ImageData data) {
-			StrokeEngine engine = workspace.getDrawEngine().createStrokeEngine(data);
+			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
 			engine.startStroke(params, points[0].x, points[0].y);
 			

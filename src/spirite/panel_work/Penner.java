@@ -222,7 +222,7 @@ public class Penner
 			ImageData data = workspace.getActiveData();
 			GroupTree.Node node = workspace.getSelectedNode();
 
-			strokeEngine = drawEngine.createStrokeEngine( data);
+			strokeEngine = drawEngine.startStrokeEngine( data);
 			
 			if( strokeEngine.startStroke( stroke, x - node.getOffsetX() , y - node.getOffsetY())) {
 				data.refresh();

@@ -109,8 +109,8 @@ public class Test1 {
 		}
 		
 		for( ImageData data : workspace.getImageData()) {
-			BufferedImage b1 = data.readImage().image;
-			BufferedImage b2 = data.readImage().image;
+			BufferedImage b1 = data.deepAccess();
+			BufferedImage b2 = data.deepAccess();
 			
 			assert( compareImages(b1,b2));
 		}

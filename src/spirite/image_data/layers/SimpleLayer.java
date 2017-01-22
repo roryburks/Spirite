@@ -26,7 +26,7 @@ public class SimpleLayer extends Layer {
 
 	@Override
 	public void draw(Graphics g) {
-		g.drawImage(data.readImage().image, 0, 0, null);
+		data.drawLayer(g);
 	}
 
 	@Override
@@ -36,17 +36,17 @@ public class SimpleLayer extends Layer {
 
 	@Override
 	public int getWidth() {
-		return data.readImage().getWidth();
+		return data.getWidth();
 	}
 
 	@Override
 	public int getHeight() {
-		return data.readImage().getHeight();
+		return data.getHeight();
 	}
 
 	@Override
 	public Layer duplicate() {
-		BufferedImage bi = MUtil.deepCopy(data.readImage().image);
+		BufferedImage bi = MUtil.deepCopy(data.deepAccess());
 		ImageData dupe = new ImageData(bi, -1, data.getContext());
 		
 		return new SimpleLayer(dupe);

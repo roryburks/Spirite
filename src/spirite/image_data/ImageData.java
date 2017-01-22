@@ -1,10 +1,14 @@
 package spirite.image_data;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import spirite.brains.CacheManager.CachedImage;
+import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
 
@@ -40,12 +44,36 @@ public class ImageData {
 		//	ImageData
 		return context;
 	}
-	public ReadOnlyImage readImage() {
-		return new ReadOnlyImage(data.access());
+	
+	/** Should only be used for reading/copying.  If used for writing will not
+	 * be tracked by Observers/UndoEngine. */
+	public BufferedImage deepAccess() {
+		return data.access();
+	}
+	
+	public void drawLayer(Graphics g) {
+		if( context != null && context.getDrawEngine().getStrokeContext() == this) {
+			BufferedImage bi = context.getDrawEngine().getStrokeEngine().getCompositionLayer();
+			Graphics big = bi.getGraphics();
+			big.drawImage( data.access(), 0, 0, null);
+			context.getDrawEngine().getStrokeEngine().drawStrokeLayer(big);
+			g.drawImage( bi, 0, 0, null);
+			big.dispose();
+		}
+		else {
+			g.drawImage( data.access(), 0, 0, null);
+		}
 	}
 	
 	public int getID() {
 		return id;
+	}
+
+	public int getWidth() {
+		return data.access().getWidth();
+	}
+	public int getHeight() {
+		return data.access().getHeight();
 	}
 	
 	public void refresh() {

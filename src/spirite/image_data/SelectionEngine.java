@@ -268,12 +268,11 @@ public class SelectionEngine {
 		Graphics g = bufferedImage.getGraphics();
 		scope.getSelection().drawSelectionMask(g);
 		
-		BufferedImage layerImg = imageData.readImage().image;
-		
 		// Copy the data inside the Selection's alphaMask to liftedData
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-		g2.drawImage( layerImg, -scope.getOffsetX(), -scope.getOffsetY(), null);
+		g2.translate(-scope.getOffsetX(), -scope.getOffsetY());
+		imageData.drawLayer(g);
 		g.dispose();
 		
 		startAction = new StartSelectionAction(bufferedImage, imageData);
