@@ -279,13 +279,7 @@ public class Penner
 			// Perform the fill Action, only store the UndoAction if 
 			//	an actual change is made.
 			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
-			if( drawEngine.fill( p.x, p.y, c, data)) {
-				undoEngine.storeAction( 
-						drawEngine.new FillAction(
-								p, c, 
-								selectionEngine.getBuiltSelection(), 
-								data));
-			}
+			drawEngine.fill( p.x, p.y, c, data);
 		} 
 	}
 	

@@ -70,7 +70,7 @@ public class RootFrame extends javax.swing.JFrame
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
         
 
-        master.newWorkspace(128,128,new java.awt.Color(0,0,0,0), true);
+        master.newWorkspace(640,480,new java.awt.Color(0,0,0,0), true);
         master.getCurrentWorkspace().finishBuilding();
     }
 
@@ -94,7 +94,7 @@ public class RootFrame extends javax.swing.JFrame
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(workPane, 0, 535, Short.MAX_VALUE))
+                    .addComponent(workPane, 0, 800, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -115,7 +115,7 @@ public class RootFrame extends javax.swing.JFrame
                         .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(workPane, 0, 340, Short.MAX_VALUE)
+                        .addComponent(workPane, 0, 600, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))))
         );
 
