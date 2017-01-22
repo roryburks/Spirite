@@ -27,6 +27,7 @@ import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.PenState;
+import spirite.image_data.DrawEngine.StrokeAction;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
@@ -38,7 +39,6 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
-import spirite.image_data.UndoEngine.StrokeAction;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -176,7 +176,7 @@ public class Penner
 				if( strokeEngine != null) {
 					strokeEngine.endStroke();
 					
-					StrokeAction stroke = undoEngine.new StrokeAction( 
+					StrokeAction stroke = drawEngine.new StrokeAction( 
 							strokeEngine.getParams(), 
 							strokeEngine.getHistory(),
 							strokeEngine.getLastSelection(),
@@ -281,7 +281,7 @@ public class Penner
 			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
 			if( drawEngine.fill( p.x, p.y, c, data)) {
 				undoEngine.storeAction( 
-						undoEngine.new FillAction(
+						drawEngine.new FillAction(
 								p, c, 
 								selectionEngine.getBuiltSelection(), 
 								data));

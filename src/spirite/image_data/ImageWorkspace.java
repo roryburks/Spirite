@@ -22,7 +22,6 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
-import spirite.image_data.UndoEngine.ClearAction;
 import spirite.image_data.UndoEngine.CompositeAction;
 import spirite.image_data.UndoEngine.StructureAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -79,10 +78,10 @@ public class ImageWorkspace {
 		this.cacheManager = cacheManager;
 		imageData = new HashMap<>();
 		animationManager = new AnimationManager(this);
-		drawEngine = new DrawEngine(this);
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
+		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
 	}
 	
 	@Override
@@ -322,10 +321,7 @@ public class ImageWorkspace {
 			if(!selectionEngine.attemptClearSelection()) {
 				ImageData image = getActiveData();
 				if( image != null) {
-					ClearAction action = undoEngine.new ClearAction(image);
-					action.performImageAction(image);
-					undoEngine.storeAction(action);
-				}
+					drawEngine.clear(image);				}
 			}
 		}
         else {

@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,11 +16,13 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.image_data.SelectionEngine.BuiltSelection;
-import spirite.image_data.SelectionEngine.Selection;
+import spirite.image_data.UndoEngine.ImageAction;
 
 /***
  * Pretty much anything which alters the image data directly goes 
- * through the DrawEngine
+ * through the DrawEngine.
+ * 
+ * 
  * 
  * @author Rory Burks
  *
@@ -27,9 +30,13 @@ import spirite.image_data.SelectionEngine.Selection;
 public class DrawEngine {
 	private final ImageWorkspace workspace;
 	private final StrokeEngine engine = new StrokeEngine();
+	private final UndoEngine undoEngine;
+	private final SelectionEngine selectionEngine;
 	
 	public DrawEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
+		this.undoEngine = workspace.getUndoEngine();
+		this.selectionEngine = workspace.getSelectionEngine();
 	}
 
 	public StrokeEngine startStrokeEngine( ImageData data) {
@@ -54,7 +61,31 @@ public class DrawEngine {
 		else
 			return null;
 	}
+	
+	
+	
+	/** Because many drawing actions can filter based on Selection
+	 * Mask, when re-doing them the mask which was active at the time
+	 * has to be remembered.  This function will apply the selection mask
+	 * to the next draw action performed.  If there is no seletion mask
+	 * queued, it will use the active selection.
+	 */
+	void queueSelectionMask( BuiltSelection mask) {
+		queuedSelection = mask;
+	}
+	private BuiltSelection pollSelectionMask() {
+		if( queuedSelection == null)
+			return workspace.getSelectionEngine().getBuiltSelection();
 
+		BuiltSelection ret = queuedSelection;
+		queuedSelection = null;
+		return ret;
+	}
+	BuiltSelection queuedSelection = null;
+	
+	
+	
+	// Stroke Code
 	private enum STATE { READY, DRAWING };
 	
 	public static class PenState {
@@ -149,12 +180,13 @@ public class DrawEngine {
 			return data;
 		}
 		
-		/** Starts a stroke with the provided selection mask. */
-		public synchronized boolean startStrokeMasked( 
-				StrokeParams s, 
-				PenState ps, 
-				BuiltSelection mask)
-		{
+		/**
+		 * Starts a new stroke using the workspace's current selection as the 
+		 * selection mask 
+		 * 
+		 * @return true if the data has been changed, false otherwise*/
+		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
+
 			if( data == null) 
 				return false;
 			stroke = s;
@@ -163,7 +195,8 @@ public class DrawEngine {
 			compositionLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			int crgb = stroke.getColor().getRGB();
 			
-			sel = mask;
+			sel = pollSelectionMask();
+			
 			if( sel.selection != null) {
 				selectionMask = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(selectionMask);
@@ -192,17 +225,6 @@ public class DrawEngine {
 				return true;
 			}
 			return false;
-		}
-		
-		
-		/**
-		 * Starts a new stroke using the workspace's current selection as the 
-		 * selection mask 
-		 * 
-		 * @return true if the data has been changed, false otherwise*/
-		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
-			return startStrokeMasked( s, ps, workspace.getSelectionEngine().getBuiltSelection());
-
 		}
 		
 		/***
@@ -234,7 +256,7 @@ public class DrawEngine {
 						BasicStroke.CAP_SQUARE));
 				g2.drawLine( oldState.x, oldState.y, newState.x, newState.y);
 				
-				if( sel != null) {
+				if( sel.selection != null) {
 					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 					g2.drawImage(selectionMask, 0, 0, null);
 				}
@@ -354,79 +376,173 @@ public class DrawEngine {
 	}
 
 	
+	private void execute( MaskedImageAction action) {
+		action.performImageAction(action.data);
+		undoEngine.storeAction(action);
+	}
 
 	
 	// :::: Other
-
+	/***
+	 * 
+	 */
+	public void clear( ImageData data) {
+		execute( new ClearAction(data, pollSelectionMask()));
+	}
 
 	/***
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, Color color, ImageData data) {
-		return fillMasked( x, y, color, data, workspace.getSelectionEngine().getBuiltSelection());
-	}
-	public boolean fillMasked( 
-			int x, 
-			int y, 
-			Color color, 
-			ImageData data, 
-			BuiltSelection mask) 
+	public boolean fill( int x, int y, Color color, ImageData data)
 	{
 		if( data == null) return false;
-		BufferedImage image = workspace.checkoutImage(data);
-		if( image == null || !MUtil.coordInImage(x, y, image))  {
-			workspace.checkinImage(data);
+		BufferedImage bi = data.deepAccess();
+		if( !MUtil.coordInImage(x, y, bi))
 			return false;
-		}
-		
-		Queue<Integer> queue = new LinkedList<Integer>();
-		queue.add( MUtil.packInt(x, y));
-		
-		
-		int w = image.getWidth();
-		int h = image.getHeight();
-		int bg = image.getRGB(x, y);
-		int c = color.getRGB();
-		
-		if( bg == c) {
-			workspace.checkinImage(data);
+		if( bi.getRGB(x,y) == color.getRGB())
 			return false;
-		}
 		
-		while( !queue.isEmpty()) {
-			int p = queue.poll();
-			int ix = MUtil.low16(p);
-			int iy = MUtil.high16(p);
-			
-			// TODO: Very bad idea to have the second half of this here, but fine for 
-			//    simple shape like Rectangle
-			//
-			// Better way: lift the selected data out of the mask with a different
-			//	color underneath (just have to make sure other color is different from
-			//	bg), then perform fill on that layer, then paste the layer back.
-			if( image.getRGB(ix, iy) != bg ||
-				(mask.selection != null && !mask.selection.contains(ix-mask.offsetX, iy-mask.offsetY)))
-				continue;
-				
-			image.setRGB(ix, iy, c);
-
-			if( ix + 1 < w) {
-				queue.add( MUtil.packInt(ix+1, iy));
-			}
-			if( ix - 1 >= 0) {
-				queue.add( MUtil.packInt(ix-1, iy));
-			}
-			if( iy + 1 < h) {
-				queue.add( MUtil.packInt(ix, iy+1));
-			}
-			if( iy - 1 >= 0) {
-				queue.add( MUtil.packInt(ix, iy-1));
-			}
-		}
-		
-		workspace.checkinImage(data);
+		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
 		return true;
 	}
+	
+	
+	
+	
+	
+	// :::: UndoableActions
+	//	All actions 
+	
+	public abstract class MaskedImageAction extends ImageAction {
+		protected final BuiltSelection mask;
+
+		MaskedImageAction(ImageData data, BuiltSelection mask) {
+			super(data);
+			this.mask = mask;
+		}
+	}
+	
+	public class StrokeAction extends MaskedImageAction {
+		PenState[] points;
+		StrokeParams params;
+		
+		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageData data){	
+			super(data, mask);
+			this.params = params;
+			this.points = points;
+			
+			switch( params.getMethod()) {
+			case BASIC:
+				description = "Basic Stroke Action";
+				break;
+			case ERASE:
+				description = "Erase Stroke Action";
+				break;
+			}
+		}
+		
+		public StrokeParams getParams() {
+			return params;
+		}
+		
+		@Override
+		protected void performImageAction( ImageData data) {
+			queueSelectionMask(mask);
+			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
+			
+			engine.startStroke(params, points[0]);
+			
+			for( int i = 1; i < points.length; ++i) {
+				engine.updateStroke( points[i]);
+				engine.stepStroke();
+			}
+			
+			engine.endStroke();
+		}
+	}
+	public class FillAction extends MaskedImageAction {
+		private final Point p;
+		private final Color color;
+		
+		public FillAction( Point p, Color c, BuiltSelection mask, ImageData data) {
+			super(data, mask);
+			this.p = p;
+			this.color = c;
+			description = "Fill";
+		}
+
+		@Override
+		protected void performImageAction( ImageData data) {
+			BufferedImage bi = workspace.checkoutImage(data);
+			
+			Queue<Integer> queue = new LinkedList<Integer>();
+			queue.add( MUtil.packInt(p.x, p.y));
+			
+			
+			int w = bi.getWidth();
+			int h = bi.getHeight();
+			int bg = bi.getRGB(p.x, p.y);
+			int c = color.getRGB();
+			
+			while( !queue.isEmpty()) {
+				int p = queue.poll();
+				int ix = MUtil.low16(p);
+				int iy = MUtil.high16(p);
+				
+				// TODO: Very bad idea to have the second half of this here, but fine for 
+				//    simple shape like Rectangle
+				//
+				// Better way: lift the selected data out of the mask with a different
+				//	color underneath (just have to make sure other color is different from
+				//	bg), then perform fill on that layer, then paste the layer back.
+				if( bi.getRGB(ix, iy) != bg ||
+					(mask.selection != null && !mask.selection.contains(ix-mask.offsetX, iy-mask.offsetY)))
+					continue;
+					
+				bi.setRGB(ix, iy, c);
+
+				if( ix + 1 < w) {
+					queue.add( MUtil.packInt(ix+1, iy));
+				}
+				if( ix - 1 >= 0) {
+					queue.add( MUtil.packInt(ix-1, iy));
+				}
+				if( iy + 1 < h) {
+					queue.add( MUtil.packInt(ix, iy+1));
+				}
+				if( iy - 1 >= 0) {
+					queue.add( MUtil.packInt(ix, iy-1));
+				}
+			}
+			
+			workspace.checkinImage(data);
+		}
+		public Point getPoint() { return new Point(p);}
+		public Color getColor() { return new Color(color.getRGB());}
+	}
+
+	public class ClearAction extends MaskedImageAction {
+		private ClearAction(ImageData data, BuiltSelection mask) {
+			super(data, mask); 
+			description = "Clear Image";
+		}
+		@Override
+		protected void performImageAction(ImageData image) {
+			BufferedImage bi = workspace.checkoutImage(image);
+			
+			if( mask.selection == null)
+				MUtil.clearImage(bi);
+			else {
+				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				g2.translate(mask.offsetX, mask.offsetY);
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+				mask.selection.drawSelectionMask(g2);
+			}
+
+			workspace.checkinImage(image);
+		}
+	}
+	
 	
 }

@@ -1,11 +1,9 @@
 package spirite.image_data;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +16,11 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
-import spirite.image_data.DrawEngine.PenState;
-import spirite.image_data.DrawEngine.StrokeEngine;
-import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.StackableStructureChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.SelectionEngine.BuiltSelection;
-import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -54,19 +46,7 @@ import spirite.image_data.SelectionEngine.Selection;
  * -ImageWorkspace
  * -DrawEngine
  * -SelectionEngine
- * 
- * !!!! MASSIVE TODO: Figure out the best way to make selection actions undoable.
- * I want to have each of the following actions undoable:
- * -Form the Selection
- * -Move the selection
- * -Anchor the selection.
- * 
- * The problem is that "Move the Selection" is an action that will change the image
- * data, but is also an action that has logical repercussions (it changes the form
- * and placement of the selection), so it can't be handled by the NullContext
- * without screwing up the ImageContext pipeline and if handled by the 
- * ImageContext, not only would it require a lot of redundant code, but it'd
- * probably screw up the pipeline anyway.
+ * ~~Penner has access to it for ending the Stroke, should probably fix that.
  * 
  * @author Rory Burks
  *
@@ -794,9 +774,9 @@ public class UndoEngine {
 
 	
 	/**
-	 * The CompositeContext is a special Context which 
-	 * @author Guy
-	 *
+	 * The CompositeContext is a special Context which can store multiple actions
+	 * (both Image and Null) in a single action.  A CompositeAction is performed 
+	 * in order that they are added to the list and undone in reverse order.
 	 */
 	private class CompositeContext extends UndoContext {
 		LinkedList<CompositeAction> actions = new LinkedList<>();
@@ -840,8 +820,8 @@ public class UndoEngine {
 			
 			CompositeAction composite = pointer.previous();
 
-			for( UndoContext context : composite.contexts) {
-				context.undo();
+			for( int i = composite.contexts.length-1; i>=0; --i) {
+				composite.contexts[i].undo();
 			}
 		}
 
@@ -1001,6 +981,10 @@ public class UndoEngine {
 			return Arrays.asList(actions);
 		}
 		@Override		protected void performAction() { 
+			// Even though the CompositeContext executes "redo" by calling the
+			//	relevant context for redo, many components perform commands the
+			//	initial time by constructing an UndoableAction and then calling
+			//	performAction, so we implement it here.
 			for( int i = 0; i<contexts.length; ++i) {
 				actions[i].performAction();
 				if( actions[i] instanceof ImageAction){
@@ -1048,81 +1032,9 @@ public class UndoEngine {
 	}
 	
 	// ==== Image Undo Actions ====
-	
-	public abstract class MaskedImageAction extends ImageAction {
-		protected final BuiltSelection mask;
 
-		protected MaskedImageAction(ImageData data, BuiltSelection mask) {
-			super(data);
-			this.mask = mask;
-		}
-	}
 	
-	public class StrokeAction extends MaskedImageAction {
-		PenState[] points;
-		StrokeParams params;
-		
-		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageData data){	
-			super(data, mask);
-			this.params = params;
-			this.points = points;
-			
-			switch( params.getMethod()) {
-			case BASIC:
-				description = "Basic Stroke Action";
-				break;
-			case ERASE:
-				description = "Erase Stroke Action";
-				break;
-			}
-		}
-		
-		public StrokeParams getParams() {
-			return params;
-		}
-		
-		@Override
-		protected void performImageAction( ImageData data) {
-			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
-			
-			engine.startStrokeMasked(params, points[0], mask);
-			
-			for( int i = 1; i < points.length; ++i) {
-				engine.updateStroke( points[i]);
-				engine.stepStroke();
-			}
-			
-			engine.endStroke();
-		}
-	}
-	public class FillAction extends MaskedImageAction {
-		private final Point p;
-		private final Color c;
-		
-		public FillAction( Point p, Color c, BuiltSelection mask, ImageData data) {
-			super(data, mask);
-			this.p = p;
-			this.c = c;
-			description = "Fill";
-		}
 
-		@Override
-		protected void performImageAction( ImageData data) {
-			DrawEngine de = workspace.getDrawEngine();
-			de.fillMasked(p.x, p.y, c, data, mask);
-		}
-		public Point getPoint() { return new Point(p);}
-		public Color getColor() { return new Color(c.getRGB());}
-	}
-	public class ClearAction extends ImageAction {
-		public ClearAction(ImageData data) {super(data); description = "Clear Image";}
-		@Override
-		protected void performImageAction(ImageData image) {
-			BufferedImage bi = workspace.checkoutImage(image);
-			MUtil.clearImage(bi);
-			workspace.checkinImage(image);
-		}
-	}
 	
 	
 	// ==== Null Undo Actions ====
@@ -1183,22 +1095,6 @@ public class UndoEngine {
 			return ((StackableStructureChange)change).canStack(
 					((StackableStructureAction)newAction).change);
 		}
-	}
-	
-
-
-	
-	public UndoableAction createSelectMoveEvent( int x, int y) {
-		return null;
-	}
-	public UndoableAction createCutEvent() {
-		return null;
-	}
-	public void tackAnchorEventToLastAction() {
-		assert getQueuePosition() == queue.size();
-	}
-	public void tackDiscardEventToLastAction() {
-		assert getQueuePosition() == queue.size();
 	}
 	
 	
