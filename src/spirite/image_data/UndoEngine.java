@@ -27,6 +27,8 @@ import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.StackableStructureChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -1047,12 +1049,21 @@ public class UndoEngine {
 	
 	// ==== Image Undo Actions ====
 	
-	public class StrokeAction extends ImageAction {
+	public abstract class MaskedImageAction extends ImageAction {
+		protected final BuiltSelection mask;
+
+		protected MaskedImageAction(ImageData data, BuiltSelection mask) {
+			super(data);
+			this.mask = mask;
+		}
+	}
+	
+	public class StrokeAction extends MaskedImageAction {
 		PenState[] points;
 		StrokeParams params;
 		
-		public StrokeAction( StrokeParams params, PenState[] points, ImageData data){	
-			super(data);
+		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageData data){	
+			super(data, mask);
 			this.params = params;
 			this.points = points;
 			
@@ -1074,7 +1085,7 @@ public class UndoEngine {
 		protected void performImageAction( ImageData data) {
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
-			engine.startStroke(params, points[0]);
+			engine.startStrokeMasked(params, points[0], mask);
 			
 			for( int i = 1; i < points.length; ++i) {
 				engine.updateStroke( points[i]);
@@ -1084,12 +1095,12 @@ public class UndoEngine {
 			engine.endStroke();
 		}
 	}
-	public class FillAction extends ImageAction {
+	public class FillAction extends MaskedImageAction {
 		private final Point p;
 		private final Color c;
 		
-		public FillAction( Point p, Color c, ImageData data) {
-			super(data);
+		public FillAction( Point p, Color c, BuiltSelection mask, ImageData data) {
+			super(data, mask);
 			this.p = p;
 			this.c = c;
 			description = "Fill";
@@ -1098,7 +1109,7 @@ public class UndoEngine {
 		@Override
 		protected void performImageAction( ImageData data) {
 			DrawEngine de = workspace.getDrawEngine();
-			de.fill(p.x, p.y, c, data);
+			de.fillMasked(p.x, p.y, c, data, mask);
 		}
 		public Point getPoint() { return new Point(p);}
 		public Color getColor() { return new Color(c.getRGB());}

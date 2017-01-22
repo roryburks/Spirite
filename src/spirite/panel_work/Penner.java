@@ -179,6 +179,7 @@ public class Penner
 					StrokeAction stroke = undoEngine.new StrokeAction( 
 							strokeEngine.getParams(), 
 							strokeEngine.getHistory(),
+							strokeEngine.getLastSelection(),
 							strokeEngine.getImageData());
 					undoEngine.storeAction( stroke);
 					strokeEngine = null;
@@ -279,7 +280,11 @@ public class Penner
 			//	an actual change is made.
 			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
 			if( drawEngine.fill( p.x, p.y, c, data)) {
-				undoEngine.storeAction( undoEngine.new FillAction(p, c, data));
+				undoEngine.storeAction( 
+						undoEngine.new FillAction(
+								p, c, 
+								selectionEngine.getBuiltSelection(), 
+								data));
 			}
 		} 
 	}

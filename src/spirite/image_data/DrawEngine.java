@@ -14,6 +14,8 @@ import java.util.Queue;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
+import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.image_data.SelectionEngine.Selection;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -106,18 +108,34 @@ public class DrawEngine {
 	 * The StrokeEngine operates asynchronously to the input data.  In general
 	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
 	 * pen input is performed.
+	 * 
+	 * The StrokeEngine creates three BufferedImages the size of the ImageData
+	 * in question:
+	 * -The strokeLayer stores the actual stroke visually.  Strokes are drawn on 
+	 *   this layer before being anchored to the ImageData layer at the end of the
+	 *   stroke so that transparency and other blend methods can be performed without
+	 *   worrying about the stroke drawing over itself.
+	 * -The compositionLayer is stored for the benefit of ImageData which needs
+	 *   another layer in order for certain blend modes/Stroke styles to properly
+	 *   render
+	 * -The selectionMask is cached because the memory waste is minimal compared
+	 *   to the amount of extra cycles it'd be to constantly draw an inverse mask
+	 *   of the selection.
 	 */
 	public class StrokeEngine {
-		PenState oldState = new PenState();
-		PenState newState = new PenState();
-		STATE state = STATE.READY;
+		private PenState oldState = new PenState();
+		private PenState newState = new PenState();
+		private STATE state = STATE.READY;
 
-		StrokeParams stroke;
-		ImageData data;
-		BufferedImage strokeLayer;
-		BufferedImage compositionLayer;
-		
-		List<PenState> prec = new LinkedList<>();
+		private StrokeParams stroke;
+		private ImageData data;
+		private BufferedImage strokeLayer;
+		private BufferedImage compositionLayer;
+		private BufferedImage selectionMask;
+
+		private BuiltSelection sel;
+
+		private List<PenState> prec = new LinkedList<>();
 		
 		protected StrokeEngine() {
 			stroke = null;
@@ -131,14 +149,12 @@ public class DrawEngine {
 			return data;
 		}
 		
-		/***
-		 * 
-		 * @param s
-		 * @param x
-		 * @param y
-		 * @return true if the data has been changed, false otherwise
-		 */
-		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
+		/** Starts a stroke with the provided selection mask. */
+		public synchronized boolean startStrokeMasked( 
+				StrokeParams s, 
+				PenState ps, 
+				BuiltSelection mask)
+		{
 			if( data == null) 
 				return false;
 			stroke = s;
@@ -147,7 +163,19 @@ public class DrawEngine {
 			compositionLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			int crgb = stroke.getColor().getRGB();
 			
-			prec = new LinkedList<>();
+			sel = mask;
+			if( sel.selection != null) {
+				selectionMask = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				MUtil.clearImage(selectionMask);
+				
+				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
+				g2.translate(sel.offsetX, sel.offsetY);
+				sel.selection.drawSelectionMask(g2);
+				g2.dispose();
+			}
+			
+			// Starts recording the Pen States
+			prec = new LinkedList<PenState>();
 			oldState.x = ps.x;
 			oldState.y = ps.y;
 			oldState.pressure = ps.pressure;
@@ -166,7 +194,20 @@ public class DrawEngine {
 			return false;
 		}
 		
+		
+		/**
+		 * Starts a new stroke using the workspace's current selection as the 
+		 * selection mask 
+		 * 
+		 * @return true if the data has been changed, false otherwise*/
+		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
+			return startStrokeMasked( s, ps, workspace.getSelectionEngine().getBuiltSelection());
+
+		}
+		
 		/***
+		 * Draws the next step in the stroke, assuming that updateStroke was
+		 * already called to update the PenState
 		 * 
 		 * @return true if the step wan't a null-step (non-moving)
 		 */
@@ -192,6 +233,13 @@ public class DrawEngine {
 						BasicStroke.CAP_ROUND, 
 						BasicStroke.CAP_SQUARE));
 				g2.drawLine( oldState.x, oldState.y, newState.x, newState.y);
+				
+				if( sel != null) {
+					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
+					g2.drawImage(selectionMask, 0, 0, null);
+				}
+					
+				
 				g.dispose();
 				changed = true;
 			}
@@ -203,15 +251,17 @@ public class DrawEngine {
 			return changed;
 		}
 		
-		/***
-		 * Updates the coordinates for the stroke
-		 */
+		/** Updates the coordinates for the stroke.
+		 * 
+		 * DOES NOT ATUALLY DRAW THE STROKE (call stepStroke for that). */
 		public synchronized void updateStroke( PenState state) {
 			newState.x = state.x;
 			newState.y = state.y;
 			newState.pressure = state.pressure;
 		}
 		
+		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
+		 * to the data, and flushing the used resources. */
 		public synchronized void endStroke() {
 			state = STATE.READY;
 			
@@ -223,13 +273,22 @@ public class DrawEngine {
 			
 			strokeLayer.flush();
 			compositionLayer.flush();
+			if( selectionMask != null)
+				selectionMask.flush();
 		}
 		
+		// Methods used to record the Stroke so that it can be repeated
+		//	Could possibly combine them into a single class
 		public PenState[] getHistory() {
 			PenState[] array = new PenState[prec.size()];
 			return prec.toArray(array);
 		}
+		public BuiltSelection getLastSelection() {
+			return sel;
+		}
+		
 
+		// Draws the Stroke Layer onto the graphics
 		public void drawStrokeLayer( Graphics g) {
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
@@ -251,8 +310,13 @@ public class DrawEngine {
 		}
 	}
 
-	// :::: Stroke Params
 	public enum Method {BASIC, ERASE};
+	/** 
+	 * StrokeParams define the style/tool/options of the Stroke.
+	 * 
+	 * lock is not actually used yet, but changing data mid-stroke is a 
+	 * bar idea.
+	 */
 	public static class StrokeParams {
 		
 		Color c = Color.BLACK;
@@ -300,6 +364,15 @@ public class DrawEngine {
 	 * @return true if any changes were made
 	 */
 	public boolean fill( int x, int y, Color color, ImageData data) {
+		return fillMasked( x, y, color, data, workspace.getSelectionEngine().getBuiltSelection());
+	}
+	public boolean fillMasked( 
+			int x, 
+			int y, 
+			Color color, 
+			ImageData data, 
+			BuiltSelection mask) 
+	{
 		if( data == null) return false;
 		BufferedImage image = workspace.checkoutImage(data);
 		if( image == null || !MUtil.coordInImage(x, y, image))  {
@@ -326,7 +399,14 @@ public class DrawEngine {
 			int ix = MUtil.low16(p);
 			int iy = MUtil.high16(p);
 			
-			if( image.getRGB(ix, iy) != bg)
+			// TODO: Very bad idea to have the second half of this here, but fine for 
+			//    simple shape like Rectangle
+			//
+			// Better way: lift the selected data out of the mask with a different
+			//	color underneath (just have to make sure other color is different from
+			//	bg), then perform fill on that layer, then paste the layer back.
+			if( image.getRGB(ix, iy) != bg ||
+				(mask.selection != null && !mask.selection.contains(ix-mask.offsetX, iy-mask.offsetY)))
 				continue;
 				
 			image.setRGB(ix, iy, c);

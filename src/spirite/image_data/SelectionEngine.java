@@ -28,6 +28,10 @@ import spirite.image_data.UndoEngine.UndoableAction;
  *  BufferedImage which is floating outside of the ImageWorkspace until
  *  it is either merged into existing data or elevated to its own layer.
  *  
+ *  I debated on whether or not to integrate offsets into the Selection
+ *  rather than have it tracked separately, but offsets would still need
+ *  to be tracked for liftedData so there would be no point.
+ *  
  * @author Rory Burks
  *
  */
@@ -92,6 +96,9 @@ public class SelectionEngine {
 		return buildingSelection;
 	}
 	
+	public BuiltSelection getBuiltSelection() {
+		return new BuiltSelection( scope.getSelection(), scope.getOffsetX(), scope.getOffsetY());
+	}
 	public Selection getSelection() {
 		return scope.getSelection();
 	}
@@ -561,6 +568,16 @@ public class SelectionEngine {
 		@Override
 		public RectSelection clone()  {
 			return new RectSelection( width, height);
+		}
+	}
+	public class BuiltSelection {
+		public final Selection selection;
+		public final int offsetX;
+		public final int offsetY;
+		public BuiltSelection(Selection selection, int offsetX, int offsetY){
+			this.selection = selection;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
 		}
 	}
 
