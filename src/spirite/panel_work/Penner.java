@@ -26,6 +26,7 @@ import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
+import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
@@ -224,7 +225,8 @@ public class Penner
 
 			strokeEngine = drawEngine.startStrokeEngine( data);
 			
-			if( strokeEngine.startStroke( stroke, x - node.getOffsetX() , y - node.getOffsetY())) {
+			if( strokeEngine.startStroke(stroke,  new PenState(
+							x - node.getOffsetX(), y - node.getOffsetY(), pressure))) {
 				data.refresh();
 			}
 			state = STATE.DRAWING;
@@ -315,6 +317,8 @@ public class Penner
 	private int rawX;	// raw position are the last-recorded coordinates in pure form
 	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
 	
+	private float pressure = 1.0f;
+	
 	private void rawUpdateX( int raw) {
 		rawX = raw;
 		wX = context.stiXm(rawX);
@@ -358,6 +362,9 @@ public class Penner
 				rawUpdateY(Math.round(level.value));
 				break;
 			case PRESSURE:
+				pressure = level.value;
+				System.out.println(pressure);
+				break;
 			default:
 				break;
 			}
@@ -370,7 +377,8 @@ public class Penner
 		switch( state) {
 		case DRAWING:
 			if( strokeEngine != null && node != null) {
-				strokeEngine.updateStroke(x - node.getOffsetX(), y - node.getOffsetY());
+				strokeEngine.updateStroke( new PenState(						
+						x - node.getOffsetX(), y - node.getOffsetY(), pressure));
 			}
 			break;
 		case FORMING_SELECTION:

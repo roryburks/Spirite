@@ -21,6 +21,7 @@ import spirite.MDebug.ErrorType;
 import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
+import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
@@ -1047,10 +1048,10 @@ public class UndoEngine {
 	// ==== Image Undo Actions ====
 	
 	public class StrokeAction extends ImageAction {
-		Point[] points;
+		PenState[] points;
 		StrokeParams params;
 		
-		public StrokeAction( StrokeParams params, Point[] points, ImageData data){	
+		public StrokeAction( StrokeParams params, PenState[] points, ImageData data){	
 			super(data);
 			this.params = params;
 			this.points = points;
@@ -1073,10 +1074,10 @@ public class UndoEngine {
 		protected void performImageAction( ImageData data) {
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
-			engine.startStroke(params, points[0].x, points[0].y);
+			engine.startStroke(params, points[0]);
 			
 			for( int i = 1; i < points.length; ++i) {
-				engine.updateStroke( points[i].x, points[i].y);
+				engine.updateStroke( points[i]);
 				engine.stepStroke();
 			}
 			

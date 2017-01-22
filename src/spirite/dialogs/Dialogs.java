@@ -48,7 +48,7 @@ public class Dialogs {
     	File f = master.getSettingsManager().getOpennedFile();
     	
     	if( f == null)
-    		f = new File("E:/");
+    		f = new File("E:/Documents/Workspace/Spirite/SIF/");
     	
     	fc.setCurrentDirectory( f);
     	int val = fc.showOpenDialog(null);
@@ -66,7 +66,7 @@ public class Dialogs {
     	File f = master.getSettingsManager().getOpennedFile();
     	
     	if( f == null)
-        	fc.setCurrentDirectory( new File("E:/"));
+        	fc.setCurrentDirectory( new File("E:/Documents/Workspace/Spirite/SIF/"));
     	else {
     		fc.setCurrentDirectory( f);
     		fc.setSelectedFile(f);

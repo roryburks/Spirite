@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +55,48 @@ public class DrawEngine {
 
 	private enum STATE { READY, DRAWING };
 	
+	public static class PenState {
+		PenState(){}
+		public PenState( int x, int y, float pressure) {
+			this.x = x;
+			this.y = y;
+			this.pressure = pressure;
+		}
+		public PenState( PenState other) {
+			this.x = other.x;
+			this.y = other.y;
+			this.pressure = other.pressure;
+		}
+		int x;
+		int y;
+		float pressure = 1.0f;
+	}
+	
+	public static interface PenDynamics {
+		public float getSize( PenState ps);
+	}
+	
+
+	public static PenDynamics getBasicDynamics() {
+		return basicDynamics;
+	}
+	private static final PenDynamics basicDynamics = new PenDynamics() {
+		@Override
+		public float getSize(PenState ps) {
+			return 1.0f;
+		}
+	};
+	
+	public static PenDynamics getDefaultDynamics() {
+		return defaultDynamics;
+	}
+	private static final PenDynamics defaultDynamics = new PenDynamics() {
+		@Override
+		public float getSize(PenState ps) {
+			return ps.pressure;
+		}
+	};
+	
 	/***
 	 * The StrokeEngine is abstracted from the DrawEngine primarily for style
 	 * purposes, but you could presumably create multiple stroke engines to
@@ -67,8 +108,8 @@ public class DrawEngine {
 	 * pen input is performed.
 	 */
 	public class StrokeEngine {
-		int old_x, old_y;
-		int new_x, new_y;
+		PenState oldState = new PenState();
+		PenState newState = new PenState();
 		STATE state = STATE.READY;
 
 		StrokeParams stroke;
@@ -76,7 +117,7 @@ public class DrawEngine {
 		BufferedImage strokeLayer;
 		BufferedImage compositionLayer;
 		
-		List<Point> prec = new LinkedList<>();
+		List<PenState> prec = new LinkedList<>();
 		
 		protected StrokeEngine() {
 			stroke = null;
@@ -97,7 +138,7 @@ public class DrawEngine {
 		 * @param y
 		 * @return true if the data has been changed, false otherwise
 		 */
-		public synchronized boolean startStroke( StrokeParams s, int x, int y) {
+		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
 			if( data == null) 
 				return false;
 			stroke = s;
@@ -107,17 +148,19 @@ public class DrawEngine {
 			int crgb = stroke.getColor().getRGB();
 			
 			prec = new LinkedList<>();
-			old_x = x;
-			old_y = y;
-			new_x = x;
-			new_y = y;
-			prec.add( new Point(x,y));
+			oldState.x = ps.x;
+			oldState.y = ps.y;
+			oldState.pressure = ps.pressure;
+			newState.x = ps.x;
+			newState.y = ps.y;
+			newState.pressure = ps.pressure;
+			prec.add( ps);
 			
 			state = STATE.DRAWING;
 			
 			
-			if( MUtil.coordInImage( x, y, strokeLayer) && strokeLayer.getRGB(x, y) != crgb) {
-				strokeLayer.setRGB(x, y, crgb);
+			if( MUtil.coordInImage( ps.x, ps.y, strokeLayer) && strokeLayer.getRGB( ps.x, ps.y) != crgb) {
+				strokeLayer.setRGB( ps.x, ps.y, crgb);
 				return true;
 			}
 			return false;
@@ -137,36 +180,41 @@ public class DrawEngine {
 			boolean changed = false;
 				
 			// Draw Stroke (only if the mouse has moved)
-			if( new_x != old_x || new_y != old_y) {
-				prec.add( new Point(new_x,new_y));
+			if( newState.x != oldState.x || newState.y != oldState.y)
+			{
+				prec.add( new PenState(newState));
 				Graphics g = strokeLayer.getGraphics();
 
 				Graphics2D g2 = (Graphics2D)g;
 				g.setColor( stroke.getColor());
-				g2.setStroke( new BasicStroke( stroke.width, BasicStroke.CAP_ROUND, BasicStroke.CAP_SQUARE));
-				g2.drawLine( old_x, old_y, new_x, new_y);
+				g2.setStroke( new BasicStroke( 
+						stroke.dynamics.getSize(newState)*stroke.width, 
+						BasicStroke.CAP_ROUND, 
+						BasicStroke.CAP_SQUARE));
+				g2.drawLine( oldState.x, oldState.y, newState.x, newState.y);
 				g.dispose();
 				changed = true;
 			}
 			
 			
-			old_x = new_x;
-			old_y = new_y;
+			oldState.x = newState.x;
+			oldState.y = newState.y;
+			oldState.pressure = newState.pressure;
 			return changed;
 		}
 		
 		/***
 		 * Updates the coordinates for the stroke
 		 */
-		public synchronized void updateStroke( int x, int y) {
-			new_x = x;
-			new_y = y;
+		public synchronized void updateStroke( PenState state) {
+			newState.x = state.x;
+			newState.y = state.y;
+			newState.pressure = state.pressure;
 		}
 		
 		public synchronized void endStroke() {
 			state = STATE.READY;
-			old_x = -1;
-			old_y = -1;
+			
 			if( data != null) {
 				BufferedImage img = workspace.checkoutImage(data);
 				drawStrokeLayer(img.getGraphics());
@@ -177,8 +225,8 @@ public class DrawEngine {
 			compositionLayer.flush();
 		}
 		
-		public Point[] getHistory() {
-			Point[] array = new Point[prec.size()];
+		public PenState[] getHistory() {
+			PenState[] array = new PenState[prec.size()];
 			return prec.toArray(array);
 		}
 
@@ -212,6 +260,7 @@ public class DrawEngine {
 		float width = 1.0f;
 		float alpha = 1.0f;
 		boolean locked = false;
+		PenDynamics dynamics = DrawEngine.getDefaultDynamics();
 		
 		public StrokeParams() {}
 		

@@ -5,8 +5,6 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.GroupTree.Node;
 import spirite.image_data.layers.Layer;
 
 /***
