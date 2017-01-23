@@ -8,6 +8,8 @@ import java.io.File;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
@@ -47,8 +49,15 @@ public class Dialogs {
     	
     	File f = master.getSettingsManager().getOpennedFile();
     	
-    	if( f == null)
-    		f = new File("E:/Documents/Workspace/Spirite/SIF/");
+    	for( FileFilter filter : fc.getChoosableFileFilters()) {
+    		fc.removeChoosableFileFilter(filter);
+    	}
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Spirite Workspace File", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg", "jpeg"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG File", "png"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Bitmap File", "bmp"));
+    	fc.addChoosableFileFilter( fc.getAcceptAllFileFilter());
     	
     	fc.setCurrentDirectory( f);
     	int val = fc.showOpenDialog(null);
@@ -61,17 +70,19 @@ public class Dialogs {
 
     public static File pickFileSave() {
     	JFileChooser fc = new JFileChooser();
-
     	
     	File f = master.getSettingsManager().getOpennedFile();
-    	
-    	if( f == null)
-        	fc.setCurrentDirectory( new File("E:/Documents/Workspace/Spirite/SIF/"));
-    	else {
-    		fc.setCurrentDirectory( f);
-    		fc.setSelectedFile(f);
+
+    	for( FileFilter filter : fc.getChoosableFileFilters()) {
+    		fc.removeChoosableFileFilter(filter);
     	}
-    		
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Spirite Workspace File", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("WARNING: To save as Image File use Export Option", "\0"));
+    	fc.addChoosableFileFilter( fc.getAcceptAllFileFilter());
+    	
+
+		fc.setCurrentDirectory( f);
+		fc.setSelectedFile(f);
     		
     	int val = fc.showSaveDialog(null);
     	
@@ -79,6 +90,33 @@ public class Dialogs {
     		return fc.getSelectedFile();
     	return null;
     	
+    }
+    
+
+    public static File pickFileExport() {
+    	JFileChooser fc = new JFileChooser();
+    	
+    	File f = master.getSettingsManager().getOpennedFile();
+
+    	for( FileFilter filter : fc.getChoosableFileFilters()) {
+    		fc.removeChoosableFileFilter(filter);
+    	}
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Spirite Workspace File", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg", "jpeg"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG File", "png"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Bitmap File", "bmp"));
+    	fc.addChoosableFileFilter( fc.getAcceptAllFileFilter());
+    	
+		fc.setCurrentDirectory( f);
+		fc.setSelectedFile(f);
+		
+    		
+    	int val = fc.showSaveDialog(null);
+    	
+    	if( val == JFileChooser.APPROVE_OPTION)
+    		return fc.getSelectedFile();
+    	return null;
     }
     
     public static boolean performNewLayerDialog( ImageWorkspace workspace) {

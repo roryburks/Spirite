@@ -1,6 +1,7 @@
 package spirite.brains;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,6 +196,16 @@ public class MasterControl
 		if( select || currentWorkspace == null) {
 			setCurrentWorkpace(workspace);
 		}
+	}
+	
+	public ImageWorkspace createWorkspaceFromImage( BufferedImage image, boolean select) {
+		ImageWorkspace workspace = new ImageWorkspace(cacheManager);
+		if( image != null)
+			workspace.addNewSimpleLayer(null, image, "Base Image");
+		workspace.finishBuilding();
+		
+		this.addWorkpace(workspace, select);
+		return workspace;
 	}
     
 

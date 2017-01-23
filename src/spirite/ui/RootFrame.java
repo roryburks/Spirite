@@ -205,10 +205,11 @@ public class RootFrame extends javax.swing.JFrame
     			{".-"},
     			{".&Open", "global.open_image", null},
     			{".-"},
-    			{".&Save", "global.save_image", null},
-    			{".Save &As", "global.save_image_as", null},
+    			{".&Save Workspace", "global.save_image", null},
+    			{".Save Workspace &As...", "global.save_image_as", null},
     			{".-"},
-    			{".Export", "global.export", null},
+    			{".Export Image", "global.export", null},
+    			{".Export Image As...", "global.export_as", null},
     			{".-"},
     			{".Debug &Color", "global.debug_color", null},
     			
@@ -337,8 +338,12 @@ public class RootFrame extends javax.swing.JFrame
     private void globalHotkeyCommand( String command) {
         if( command.equals("new_image"))
         	promptNewImage();
-        else if( command.equals("debug_color"))
-        	promptDebugColor();
+        else if( command.equals("debug_color")) {
+        	for( String s : ImageIO.getReaderFormatNames()) {
+        		System.out.println(s);
+        	}
+        //	promptDebugColor();
+        }
         else if( command.equals("newLayerQuick")) {
         	ImageWorkspace workspace = master.getCurrentWorkspace();
         	if( workspace != null) {
@@ -353,18 +358,13 @@ public class RootFrame extends javax.swing.JFrame
         		
         	}
         }
-        else if( command.equals("open_image"))
-			try {
-				File f =Dialogs.pickFileOpen();
-				
-				if( f != null) {
-					master.addWorkpace( 
-						LoadEngine.loadWorkspace( f), true);
-					master.getSettingsManager().setOpennedFile(f);
-				}
-			} catch (BadSIFFFileException e) {
-				MDebug.handleError( ErrorType.FILE, e, "Malformed SIF file.");
+        else if( command.equals("open_image")){
+			File f =Dialogs.pickFileOpen();
+			
+			if( f != null) {
+	        	openFile( f);
 			}
+        }
         else if( command.equals("save_image")) {
         	ImageWorkspace workspace = master.getCurrentWorkspace();
 
@@ -374,8 +374,10 @@ public class RootFrame extends javax.swing.JFrame
 	        	if( f == null)
 	        		f = Dialogs.pickFileSave();
 	        	
-	        	if( f != null)
+	        	if( f != null) {
 					SaveEngine.saveWorkspace( workspace, f);
+					workspace.fileSaved(f);
+	        	}
         	}
         }
 		else if( command.equals("save_image_as")) {
@@ -392,25 +394,75 @@ public class RootFrame extends javax.swing.JFrame
 			if( master.getCurrentWorkspace() != null)
 				master.getCurrentWorkspace().getUndoEngine().redo();
 		}
-		else if( command.equals("export")) {
-			File f = Dialogs.pickFileSave();
+		else if( command.equals("export") || command.equals("export_as")) {
+			File f = Dialogs.pickFileExport();
 			
 			if( f != null) {
-				RenderSettings settings = new RenderSettings();
-				settings.workspace = master.getCurrentWorkspace();
-				try {
-					ImageIO.write(
-							master.getRenderEngine().renderImage(settings),
-							"png",
-							f);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				exportWorkspaceToFile( master.getCurrentWorkspace(), f);
 			}
 		}
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
         }
+    }
+    
+    private void openFile( File f) {
+    	String ext = f.getName().substring( f.getName().lastIndexOf("."+1));
+    	
+    	boolean attempted = false;
+    	if( ext.equals("png") || ext.equals("bmp") || ext.equals("jpg") || ext.equals("jpeg")) 
+    	{
+    		// First try to load the file as normal if it's a normal image format
+    		try {
+				BufferedImage bi = ImageIO.read(f);
+				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+				master.getSettingsManager().setOpennedFile(f);
+				return;
+			} catch (IOException e) {
+				attempted = true;
+			}
+    	}
+		try {
+			// If it's not recognized (or failed to load) as a normal file, try to
+			//	load it as an SIF
+			master.addWorkpace( 
+				LoadEngine.loadWorkspace( f), true);
+			master.getSettingsManager().setOpennedFile(f);
+			return;
+		} catch (BadSIFFFileException e) {}
+		if( !attempted) {
+			// If we didn't try to load the image as a normal format already (if 
+			//	its extension was not recognized) and loading it as an SIF failed,
+			//	try to load it as a normal Image
+    		try {
+				BufferedImage bi = ImageIO.read(f);
+				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+				master.getSettingsManager().setOpennedFile(f);
+				return;
+			} catch (IOException e) {}
+		}
+    }
+    
+    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
+    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
+    	
+    	RenderSettings settings = new RenderSettings();
+    	settings.workspace = workspace;
+    	BufferedImage bi = master.getRenderEngine().renderImage(settings);
+    	
+    	if( ext.equals("jpg") || ext.equals("jpeg")) {
+    		// Remove Alpha Layer of JPG so that encoding works correctly
+    		BufferedImage bi2 = bi;
+    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
+    		bi.getGraphics().drawImage(bi2, 0, 0, null);
+    	}
+    	
+    	try {
+			ImageIO.write( bi, ext, f);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
+			e.printStackTrace();
+		}
     }
     
     // :::: KeyEventDispatcher
