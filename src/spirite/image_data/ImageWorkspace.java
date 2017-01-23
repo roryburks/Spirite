@@ -1,6 +1,7 @@
 package spirite.image_data;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -262,6 +263,13 @@ public class ImageWorkspace {
 			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
 		}
 		return null;
+	}
+	public Point getActiveDataOffset() {
+		if( selected instanceof GroupTree.LayerNode) {
+			return new Point( selected.x, selected.y);
+		}
+		else
+			return new Point(0,0);
 	}
 	
 	public GroupTree.Node getSelectedNode() {

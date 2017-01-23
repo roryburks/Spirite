@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -51,14 +52,12 @@ public class SelectionEngine {
 		private Selection selection = null;
 		private boolean lifted = false;
 		protected CachedImage liftedImage = null;
-		protected ImageData dataContext = null;
 		protected int offsetX;
 		protected int offsetY;
 		
 		private Selection getSelection() {return selection;}
 		private boolean isLifted() {return lifted;}
 		private CachedImage getLiftedImage() {return liftedImage;}
-		private ImageData getDataContext() {return dataContext;}
 		private int getOffsetX() {return offsetX;}
 		private int getOffsetY() {return offsetY;}
 	}
@@ -97,13 +96,18 @@ public class SelectionEngine {
 	}
 	
 	public BuiltSelection getBuiltSelection() {
-		return new BuiltSelection( scope.getSelection(), scope.getOffsetX(), scope.getOffsetY());
+		int dx = 0;
+		int dy = 0;
+		
+//		if( scope.get)
+		
+		return new BuiltSelection( 
+				scope.getSelection(), 
+				scope.getOffsetX(), 
+				scope.getOffsetY());
 	}
 	public Selection getSelection() {
 		return scope.getSelection();
-	}
-	public ImageData getDataContext() {
-		return scope.getDataContext();
 	}
 	public CachedImage getLiftedImage() {
 		return scope.getLiftedImage();
@@ -132,7 +136,10 @@ public class SelectionEngine {
 			// Construct an execute the composite action
 			List<UndoableAction> actions = new ArrayList<>(3);
 			actions.add( startAction);
-			actions.add(new ClearSelectionAction(scope.getSelection(), scope.getOffsetX(), scope.getOffsetY(),
+			actions.add(new ClearSelectionAction(
+					scope.getSelection(), 
+					scope.getOffsetX() - node.getOffsetX(), 
+					scope.getOffsetY() - node.getOffsetY(),
 					node.getLayer().getActiveData()));
 			actions.add( new MoveSelectionAction(dx,dy));
 			
@@ -167,10 +174,12 @@ public class SelectionEngine {
 			return false;
 		LayerNode node = (LayerNode)snode;
 
+		System.out.println(node.getOffsetX());
+		
 		ImageAction action = new ClearSelectionAction(
 				scope.getSelection(), 
-				scope.getOffsetX(), 
-				scope.getOffsetY(), 
+				scope.getOffsetX() - node.getOffsetX(), 
+				scope.getOffsetY() - node.getOffsetY(), 
 				node.getLayer().getActiveData());
 		action.performImageAction(node.getLayer().getActiveData());
 		undoEngine.storeAction(action);
@@ -272,15 +281,30 @@ public class SelectionEngine {
 				rect.height, 
 				BufferedImage.TYPE_INT_ARGB);
 		MUtil.clearImage(bufferedImage);
-		Graphics g = bufferedImage.getGraphics();
-		scope.getSelection().drawSelectionMask(g);
+		Graphics2D g2 = (Graphics2D)bufferedImage.getGraphics();
+		
+		// Draw the mask, clipping the bounds of drawing to only the part 
+		// that the selection	intersects with the Image so that you do not 
+		//  leave un-applied mask left in the image.
+		rect.x = scope.getOffsetX();
+		rect.y = scope.getOffsetY();
+		Rectangle nodeRect = new Rectangle( 
+				node.getOffsetX(), node.getOffsetY(),
+				node.getLayer().getWidth(), node.getLayer().getHeight());
+		Rectangle intersection = nodeRect.intersection(rect);
+		
+		g2.setClip(intersection.x-rect.x , intersection.y-rect.y, 
+				intersection.width, intersection.height);
+		
+		scope.getSelection().drawSelectionMask(g2);
 		
 		// Copy the data inside the Selection's alphaMask to liftedData
-		Graphics2D g2 = (Graphics2D)g;
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
+		g2.translate(node.getOffsetX(), node.getOffsetY());
 		g2.translate(-scope.getOffsetX(), -scope.getOffsetY());
-		imageData.drawLayer(g);
-		g.dispose();
+
+		imageData.drawLayer(g2);
+		g2.dispose();
 		
 		startAction = new StartSelectionAction(bufferedImage, imageData);
 		return startAction;
@@ -293,7 +317,12 @@ public class SelectionEngine {
 		if( scope.isLifted()) {
 			List<UndoableAction> actions = new ArrayList<>(3);
 			
-			actions.add(new PasteSelectionAction(startAction, scope.offsetX, scope.offsetY));
+			Point offset = workspace.getActiveDataOffset();
+			actions.add(new PasteSelectionAction(
+					startAction, 
+					scope.offsetX - offset.x, 
+					scope.offsetY - offset.y,
+					workspace.getActiveData()));
 			actions.add(new EndSelectionAction(startAction));
 			actions.add(baseAction);
 			return undoEngine.new CompositeAction(actions, baseAction.description);
@@ -373,14 +402,11 @@ public class SelectionEngine {
 	
 	public class StartSelectionAction extends NullAction {
 		final CachedImage cachedData;
-		final ImageData dataContext;
 		StartSelectionAction( BufferedImage liftedData, ImageData context) {
-			this.dataContext = context;
 			this.cachedData = cacheManager.cacheImage(liftedData, undoEngine);
 		}
 		@Override protected void performAction() {
 			scope.liftedImage = cachedData;
-			scope.dataContext = dataContext;
 			scope.lifted = true;
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
@@ -405,10 +431,8 @@ public class SelectionEngine {
 	}
 	public class EndSelectionAction extends NullAction {
 		final CachedImage cachedData;
-		final ImageData dataContext;
 		EndSelectionAction( StartSelectionAction start) {
 			this.cachedData = start.cachedData;
-			this.dataContext = start.dataContext;
 			this.cachedData.startTracking(this);
 		}
 		@Override protected void performAction() {
@@ -418,7 +442,6 @@ public class SelectionEngine {
 		@Override protected void undoAction() {
 			scope.lifted = true;
 			scope.liftedImage = cachedData;
-			scope.dataContext = dataContext;
 			ImageChangeEvent evt = new ImageChangeEvent();
 			evt.workspace = workspace;
 			evt.selectionLayerChange = true;
@@ -436,8 +459,9 @@ public class SelectionEngine {
 	public class PasteSelectionAction extends ImageAction {
 		final CachedImage cachedData;
 		final int ox, oy;
-		protected PasteSelectionAction(StartSelectionAction start, int ox, int oy) {
-			super(start.dataContext);
+		protected PasteSelectionAction(StartSelectionAction start, int ox, int oy, ImageData image) 
+		{
+			super(image);
 			cachedData = start.cachedData;
 			this.ox = ox;
 			this.oy = oy;

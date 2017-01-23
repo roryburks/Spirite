@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -149,11 +150,12 @@ public class RenderEngine
 		
 		wrk.selectedData = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
-			ImageData dataContext= settings.workspace.getSelectionEngine().getDataContext();
+			ImageData dataContext= settings.workspace.getActiveData();
 			if( dataContext != null) {
+				Point p = settings.workspace.getActiveDataOffset();
 				wrk.selectedData = dataContext;
-				wrk.seloffX = settings.workspace.getSelectionEngine().getOffsetX();
-				wrk.seloffY = settings.workspace.getSelectionEngine().getOffsetY();
+				wrk.seloffX = settings.workspace.getSelectionEngine().getOffsetX() - p.x;
+				wrk.seloffY = settings.workspace.getSelectionEngine().getOffsetY() - p.y;
 			}
 		}
 		_propperRec( settings.node, 0, settings, images, wrk);
@@ -469,8 +471,10 @@ public class RenderEngine
 
 		LinkedList<ImageData> relevantData = new LinkedList<ImageData>(evt.dataChanged);
 		LinkedList<ImageData> relevantDataSel = new LinkedList<ImageData>(evt.dataChanged);
-		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()) {
-			relevantDataSel.add( evt.getWorkspace().getSelectionEngine().getDataContext());
+		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()
+				&& evt.getWorkspace().getActiveData() != null) 
+		{
+			relevantDataSel.add(  evt.getWorkspace().getActiveData());
 		}
 		
 		while( it.hasNext()) {
