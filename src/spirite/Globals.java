@@ -4,6 +4,7 @@ package spirite;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -210,7 +211,9 @@ public class Globals {
     			if( set.iconsheet[x][y] == null) {
     				BufferedImage img = new BufferedImage(set.widthPerIcon-1,set.heightPerIcon-1, set.img.getType());
     				
-    				img.getGraphics().drawImage(set.img, -(set.widthPerIcon)*x, -(set.heightPerIcon)*y, null);
+    				Graphics g = img.getGraphics();
+    				g.drawImage(set.img, -(set.widthPerIcon)*x, -(set.heightPerIcon)*y, null);
+    				g.dispose();
     				
     				set.iconsheet[x][y] = new ImageIcon(img);
     			}

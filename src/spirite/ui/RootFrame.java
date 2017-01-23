@@ -2,22 +2,17 @@
 package spirite.ui;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
@@ -33,10 +28,8 @@ import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import spirite.MDebug;
-import spirite.MDebug.ErrorType;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
@@ -303,31 +296,19 @@ public class RootFrame extends javax.swing.JFrame
     	if( workPanel == null) return;
     	
         if( command.equals("zoom_in")) {
-            int zl = workPanel.getZoomLevel();
-            if( zl >= 11)
-                workPanel.zoom(((zl+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
-            else if( zl >= 3)
-                workPanel.zoom(((zl+1)/2)*2 + 1);
-            else
-                workPanel.zoom(zl+1);
+        	workPanel.zoomIn();
         }
         else if( command.equals("zoom_out")) {
-            int zl = workPanel.getZoomLevel();
-            if( zl > 11)
-                workPanel.zoom((zl/4)*4-1);
-            else if( zl > 3)
-                workPanel.zoom((zl/2)*2-1);
-            else
-                workPanel.zoom(zl-1);
+        	workPanel.zoomOut();
         }
         else if( command.equals("zoom_in_slow")) {
-            workPanel.zoom(workPanel.getZoomLevel()+1);
+            workPanel.setZoomLevel(workPanel.getZoomLevel()+1);
         }
         else if( command.equals("zoom_out_slow")) {
-            workPanel.zoom(workPanel.getZoomLevel()-1);
+            workPanel.setZoomLevel(workPanel.getZoomLevel()-1);
         }
         else if( command.equals("zoom_0")) {
-            workPanel.zoom(0);
+            workPanel.setZoomLevel(0);
         }
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown contextual command: context." + command);
@@ -407,7 +388,7 @@ public class RootFrame extends javax.swing.JFrame
     }
     
     private void openFile( File f) {
-    	String ext = f.getName().substring( f.getName().lastIndexOf("."+1));
+    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
     	
     	boolean attempted = false;
     	if( ext.equals("png") || ext.equals("bmp") || ext.equals("jpg") || ext.equals("jpeg")) 
@@ -454,7 +435,9 @@ public class RootFrame extends javax.swing.JFrame
     		// Remove Alpha Layer of JPG so that encoding works correctly
     		BufferedImage bi2 = bi;
     		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
-    		bi.getGraphics().drawImage(bi2, 0, 0, null);
+    		Graphics g = bi.getGraphics();
+    		g.drawImage(bi2, 0, 0, null);
+    		g.dispose();
     	}
     	
     	try {

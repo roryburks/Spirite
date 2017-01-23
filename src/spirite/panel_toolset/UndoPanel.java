@@ -77,7 +77,9 @@ public class UndoPanel extends JPanel
 	 * Using the UndoHistory from UndoEngine.constructUndoHistory, removes
 	 * the old model data and constructs it anew.
 	 */
+	private boolean constructing = false;
 	private void constructFromHistory(List<UndoIndex> undoHistory ){
+		constructing = true;
 		model.clear();
 		
 		model.addElement(null);
@@ -87,7 +89,8 @@ public class UndoPanel extends JPanel
 		}
 		
 		
-		list.setSelectedIndex( model.size() - 1);
+		list.setSelectedIndex( engine.getQueuePosition());
+		constructing = false;
 	}
 
 	
@@ -187,6 +190,7 @@ public class UndoPanel extends JPanel
 	// :::: ListSelectionListener
 	@Override
 	public void valueChanged(ListSelectionEvent evt) {
+		if( constructing) return;
 		
 		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
 		SwingUtilities.invokeLater( new Runnable() {

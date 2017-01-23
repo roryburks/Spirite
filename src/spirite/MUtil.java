@@ -91,6 +91,7 @@ public class MUtil {
 		g2.setColor( new Color(0,0,0,0));
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
 		g2.fillRect(0, 0, image.getWidth(), image.getHeight());
+		g2.dispose();
 	}
 	
 	public static boolean coordInImage( int x, int y, BufferedImage image) {

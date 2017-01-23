@@ -88,7 +88,10 @@ public class ToolsPanel extends JPanel
         try {
             BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("icons.png").openStream());
             icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            icon_sheet.getGraphics().drawImage(buff, 0, 0, null);
+            
+            Graphics g = icon_sheet.getGraphics();
+            g.drawImage(buff, 0, 0, null);
+            g.dispose();
 
             is_width = icon_sheet.getWidth() / 25;
             is_height = icon_sheet.getHeight() / 25;

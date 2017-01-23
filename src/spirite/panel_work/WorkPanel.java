@@ -1,18 +1,24 @@
 package spirite.panel_work;
 
+import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseWheelEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.SwingUtilities;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
@@ -45,7 +51,7 @@ import spirite.image_data.ImageWorkspace.StructureChange;
  */
 public class WorkPanel extends javax.swing.JPanel 
         implements MImageObserver,  
-        	AdjustmentListener, ComponentListener
+        	AdjustmentListener, ComponentListener, AWTEventListener
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -78,19 +84,33 @@ public class WorkPanel extends javax.swing.JPanel
         this.workspace = workspace;
         initComponents();
 
+        // Add Listeners/Observers
         workspace.addImageObserver(this);
 
         jscrollHorizontal.addAdjustmentListener(this);
         jscrollVertical.addAdjustmentListener(this);
         this.addComponentListener(this);
 
-
+        // Add Swing-Level listener for MouseWheelEvents so that the lower
+        //	panels do not eat the event.
+        //
+        // !!!! NOTE: This adds a semi-global reference of WorkPanel to the
+        //	Default Toolkit meaning it will not be garbage collected.  For
+        //	now this is fine because WorkPanel's life is the same as the program's
+        //	but that might change in the future, so you'd have to clean up.
+        long eventMask = AWTEvent.MOUSE_WHEEL_EVENT_MASK;
+        Toolkit.getDefaultToolkit().addAWTEventListener( this, eventMask);
 
 		calibrateScrolls();
 
 		center.x = workspace.getWidth() / 2;
 		center.y = workspace.getHeight() / 2;
 
+    }
+    
+    private void setCenter( int x, int y) {
+    	center.x = Math.max(0, Math.min(workspace.getWidth(), x));
+    	center.y = Math.max(0, Math.min(workspace.getHeight(), y));
     }
     
     // Image Coordinates that you're mouse-over'd displayed in the bottom bar
@@ -111,10 +131,8 @@ public class WorkPanel extends javax.swing.JPanel
     }
     
     // :::: API
-    public void zoom( int amount) {
+    public void setZoomLevel( int amount) {
         // Remember the center so you can re-center the scroll at that position
-        int center_x = stiXm(workSplicePanel.getWidth()/2);
-        int center_y = stiYm(workSplicePanel.getHeight()/2);
 
         // Change zoom_level
         zoom_level = amount;
@@ -124,10 +142,27 @@ public class WorkPanel extends javax.swing.JPanel
 
         // Readjust the Scrollbar
         calibrateScrolls();
-        centerAtPos(center_x, center_y);
+        centerAtPos(center.x, center.y);
         
         workSplicePanel.drawPanel.refreshPennerCoords();
         repaint();
+    }
+    
+    public void zoomIn() {
+        if( zoom_level >= 11)
+        	setZoomLevel(((zoom_level+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
+        else if( zoom_level >= 3)
+        	setZoomLevel(((zoom_level+1)/2)*2 + 1);
+        else
+        	setZoomLevel( zoom_level+1);
+    }
+    public void zoomOut() {
+        if( zoom_level > 11)
+        	setZoomLevel((zoom_level/4)*4-1);
+        else if( zoom_level > 3)
+        	setZoomLevel((zoom_level/2)*2-1);
+        else
+        	setZoomLevel(zoom_level - 1);
     }
 
     public int getZoomLevel( ) {
@@ -207,8 +242,7 @@ public class WorkPanel extends javax.swing.JPanel
         jscrollHorizontal.setValue( Math.round(px / (float)ratio));
         jscrollVertical.setValue(( Math.round(py / (float)ratio)));
         
-        center.x = x;
-        center.y = y;
+        setCenter( x, y);
     }
     
     public Point getCenter() {
@@ -295,7 +329,7 @@ public class WorkPanel extends javax.swing.JPanel
 		
         calibrateScrolls();
 
-        centerAtPos( workspace.getWidth()/2, workspace.getHeight()/2);
+        centerAtPos( this.center.x, this.center.y);
         this.repaint();
 	}
 
@@ -305,32 +339,65 @@ public class WorkPanel extends javax.swing.JPanel
     public void adjustmentValueChanged(AdjustmentEvent e) {
         if( e.getSource() == jscrollHorizontal) {
             offsetx = -e.getValue()*SCROLL_RATIO;
-            if( !calibrating)
-            	center.x = stiXm(workSplicePanel.getWidth()/2);
+            if( !calibrating)  {
+            	setCenter( stiXm(workSplicePanel.getHeight()/2), center.y);
+            }
             this.repaint();
         }
         if( e.getSource() == jscrollVertical) {
             offsety = -e.getValue()*SCROLL_RATIO;
-            if( !calibrating)
-            	center.x = stiXm(workSplicePanel.getWidth()/2);
+            if( !calibrating) {
+            	setCenter( center.x, stiYm(workSplicePanel.getHeight()/2));
+            }
             this.repaint();
         }
         
     }
 
     // :::: ComponentListener
+    @Override public void componentMoved(ComponentEvent e) {}
+    @Override public void componentShown(ComponentEvent e) {}
+    @Override public void componentHidden(ComponentEvent e) {}
     @Override
     public void componentResized(ComponentEvent e) {
         this.calibrateScrolls();
 
         this.centerAtPos(center.x, center.y);
     }
-    @Override
-    public void componentMoved(ComponentEvent e) {}
-    @Override
-    public void componentShown(ComponentEvent e) {}
-    @Override
-    public void componentHidden(ComponentEvent e) {}
 
+    // :::: AWTEvent Listener, MOUSE_WHEEL_EVENT_MASK
+    // I'm not sure if this is necessary, but some weird behavior compells 
+    //	me to do it.
+    boolean eventlock = false;	
+	@Override
+	public void eventDispatched(AWTEvent raw) {
+		if( eventlock) return;
+		eventlock = true;
+		if( raw instanceof MouseWheelEvent) {
+			mouseWheelEvent((MouseWheelEvent)raw);
+		}
+		eventlock = false;
+	}
+
+	private void mouseWheelEvent( MouseWheelEvent evt) {
+		if(evt.isControlDown()) {			
+			// Verify that the Mouse Event happens within the space of
+			//	the WorkPanel and convert its point to local coordinates.
+			Component source = (Component)evt.getSource();
+			if( SwingUtilities.isDescendingFrom(this, source)) {
+				Point p = SwingUtilities.convertPoint(source, evt.getPoint(), this);
+
+				if( this.contains(p)) {
+				if( evt.getWheelRotation() < 0) {
+					center.x = (center.x + stiX(p.x))/2;
+					center.y = (center.y + stiY(p.y))/2;
+					zoomIn();
+				}
+				else if( evt.getWheelRotation() > 0)
+					zoomOut();
+				}
+			}
+		}
+	}
 
 }

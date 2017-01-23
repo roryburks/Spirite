@@ -288,8 +288,9 @@ public class DrawEngine {
 			state = STATE.READY;
 			
 			if( data != null) {
-				BufferedImage img = workspace.checkoutImage(data);
-				drawStrokeLayer(img.getGraphics());
+				Graphics g = workspace.checkoutImage(data).getGraphics();
+				drawStrokeLayer(g);
+				g.dispose();
 				workspace.checkinImage(data);
 			}
 			
@@ -538,6 +539,7 @@ public class DrawEngine {
 				g2.translate(mask.offsetX, mask.offsetY);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 				mask.selection.drawSelectionMask(g2);
+				g2.dispose();
 			}
 
 			workspace.checkinImage(image);

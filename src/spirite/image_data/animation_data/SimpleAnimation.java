@@ -3,14 +3,10 @@ package spirite.image_data.animation_data;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-
-import javax.imageio.ImageIO;
 
 import spirite.MUtil;
 import spirite.image_data.GroupTree;
@@ -57,14 +53,15 @@ public class SimpleAnimation extends AbstractAnimation
 		int c = layers.get(0).getFrames().size();
 		int w = l.getWidth();
 		BufferedImage bi = new BufferedImage(w*c, l.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		MUtil.clearImage(bi);
-
 		g.translate(-w, 0);
 		for( int i=0; i<c; ++i) {
 			g.translate(w, 0);
 			layers.get(0).getFrames().get(i).getLayer().draw(g);
 		}
+		g.dispose();
 		
 /*		try {
 			ImageIO.write(bi, "png", new File("E:/test.png"));

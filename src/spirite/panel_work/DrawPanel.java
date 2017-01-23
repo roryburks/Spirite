@@ -22,9 +22,11 @@ import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -43,7 +45,8 @@ import spirite.ui.UIUtil;
  * @author Rory Burks
  */
 public class DrawPanel extends JPanel
-     implements MImageObserver, ActionListener, MSelectionEngineObserver
+     implements MImageObserver, ActionListener, MSelectionEngineObserver, 
+     	MSelectionObserver
 {
 	private static final long serialVersionUID = 1L;
 
@@ -67,6 +70,7 @@ public class DrawPanel extends JPanel
 		
 		workspace.addImageObserver(this);
 		workspace.getSelectionEngine().addSelectionObserver(this);
+		workspace.addSelectionObserver(this);
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();
@@ -217,5 +221,10 @@ public class DrawPanel extends JPanel
 		AwtPenToolkit.removePenListener(this, penner);
 		paint_timer.stop();
 		penner.cleanUp();
+	}
+
+	@Override
+	public void selectionChanged(Node newSelection) {
+    	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
 	}
 }
