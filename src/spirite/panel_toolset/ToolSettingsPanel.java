@@ -14,7 +14,7 @@ import spirite.brains.ToolsetManager.PropertySchemeNode;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.panel_toolset.PropertyPanels.SizeSlider;
-import spirite.ui.UIUtil.SliderPanel;
+import spirite.ui.components.SliderPanel;
 
 public class ToolSettingsPanel extends JPanel 
 	implements MToolsetObserver

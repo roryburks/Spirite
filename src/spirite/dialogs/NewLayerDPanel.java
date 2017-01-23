@@ -19,12 +19,12 @@ import javax.swing.border.Border;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.image_data.ImageWorkspace;
-import spirite.ui.UIUtil;
+import spirite.ui.components.MTextFieldNumber;
 
 public class NewLayerDPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private UIUtil.MTextFieldNumber tfWidth;
-	private UIUtil.MTextFieldNumber tfHeight;
+	private MTextFieldNumber tfWidth;
+	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
 	private JLabel lblPartType;
@@ -148,10 +148,10 @@ public class NewLayerDPanel extends JPanel {
 		
 		JLabel lblWidth = new JLabel("Width:");
 		
-		tfWidth = new UIUtil.MTextFieldNumber();
+		tfWidth = new MTextFieldNumber();
 		tfWidth.setColumns(10);
 		
-		tfHeight = new UIUtil.MTextFieldNumber();
+		tfHeight = new MTextFieldNumber();
 		tfHeight.setColumns(10);
 		
 		JLabel lblHeight = new JLabel("Height:");

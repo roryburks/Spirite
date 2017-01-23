@@ -1,6 +1,6 @@
 package spirite.panel_toolset;
 
-import spirite.ui.UIUtil.SliderPanel;
+import spirite.ui.components.SliderPanel;
 
 public class PropertyPanels {
 

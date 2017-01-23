@@ -7,6 +7,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
+import spirite.ui.UIUtil;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 
@@ -86,16 +88,10 @@ public class DrawPanel extends JPanel
         // Draw Image
         if( workspace != null) {
         	
+        	
         	RenderSettings settings = new RenderSettings();
         	settings.workspace = workspace;
         	
-        	BufferedImage image = renderEngine.renderImage(settings);
-
-        	if( image != null) {
-            g.drawImage( image, context.itsX(0), context.itsY(0),
-            		context.itsX(image.getWidth()), context.itsY(image.getHeight()),
-            		0, 0, image.getWidth(), image.getHeight(), null);
-        	}
 
 
             // Draw Border around the Workspace
@@ -107,6 +103,25 @@ public class DrawPanel extends JPanel
 		            context.itsY(0)-1,
 		            (int)Math.round(workspace.getWidth()*zoom)+1,
 		            (int)Math.round(workspace.getHeight()*zoom)+1);
+
+            // Draw Transparency BG
+            int dx = (context.itsX(0) >= 0)?0:-context.itsX(0);
+            int dy = (context.itsY(0) >= 0)?0:-context.itsY(0);
+            UIUtil.drawTransparencyBG(g, new Rectangle( 
+            		Math.max(0, context.itsX(0)),
+            		Math.max(0, context.itsY(0)),
+            		Math.min(context.getWidth(), (int)Math.round(workspace.getWidth()*zoom)-2-dx),
+            		Math.min(context.getHeight(), (int)Math.round(workspace.getHeight()*zoom)-2-dy)),
+            		8);
+            
+            // Render the image
+        	BufferedImage image = renderEngine.renderImage(settings);
+
+        	if( image != null) {
+            g.drawImage( image, context.itsX(0), context.itsY(0),
+            		context.itsX(image.getWidth()), context.itsY(image.getHeight()),
+            		0, 0, image.getWidth(), image.getHeight(), null);
+        	}
             
             // Draw Border around the active Layer
             GroupTree.Node selected = workspace.getSelectedNode();
@@ -136,12 +151,12 @@ public class DrawPanel extends JPanel
             int h = getHeight();
             if( zoom >= 4) {
             	g2.setColor( new Color(90,90,90));
-                for( int i = 0; i < workspace.getWidth(); ++i) {
+                for( int i = 0; i < workspace.getWidth(); i+=2) {
                 	if( context.itsX(i) < 0) continue;
                 	if( context.itsX(i) > w) break;
                     g2.drawLine(context.itsX(i), 0, context.itsX(i), this.getHeight());
                 }
-                for( int i = 0; i < workspace.getHeight(); ++i) {
+                for( int i = 0; i < workspace.getHeight(); i+=2) {
                 	if( context.itsY(i) < 0) continue;
                 	if( context.itsY(i) > h) break;
                     g2.drawLine(0, context.itsY(i), this.getWidth(), context.itsY(i));

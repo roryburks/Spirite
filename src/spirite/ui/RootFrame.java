@@ -10,6 +10,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
@@ -52,6 +53,9 @@ import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkTabPane;
+import spirite.ui.components.ResizePanel;
+import spirite.ui.components.ResizePanel.Orientation;
+import spirite.ui.components.ResizePanel.ResizeAlerter;
 
 /**
  * While the MasterControl is "home base" for all the internals of the program, the root
@@ -91,6 +95,8 @@ public class RootFrame extends javax.swing.JFrame
 
     private ResizePanel leftResizer;
     private ResizePanel rightResizer;
+    private ResizePanel resizeN;
+    private ResizePanel resizeS;
 
     private void resetLayout() {
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -116,6 +122,27 @@ public class RootFrame extends javax.swing.JFrame
         getContentPane().setLayout(layout);
     	
     }
+    
+    private void resetRightLayout() {
+        GroupLayout layout = new GroupLayout(rightContainer);
+        
+        layout.setHorizontalGroup( layout.createParallelGroup(Alignment.LEADING)
+        	.addComponent(toolsPanel)
+        	.addComponent(resizeN)
+        	.addComponent(settingPanel)
+        	.addComponent(resizeS)
+        	.addComponent(palettePanel)
+        );
+        layout.setVerticalGroup( layout.createSequentialGroup()
+            	.addComponent(toolsPanel, resizeN.getResizeSize(), resizeN.getResizeSize(), resizeN.getResizeSize())
+            	.addComponent(resizeN,6,6,6)
+            	.addComponent(settingPanel, resizeS.getResizeSize(), resizeS.getResizeSize(), resizeS.getResizeSize())
+            	.addComponent(resizeS,6,6,6)
+            	.addComponent(palettePanel, 0,300,300)
+            	.addContainerGap()
+        );
+        rightContainer.setLayout(layout);
+    }
 
     private void initComponents() {
     	workPane = new WorkTabPane( master);
@@ -126,9 +153,24 @@ public class RootFrame extends javax.swing.JFrame
     	leftContainer = new JPanel();
     	rightContainer = new JPanel();
     	
-    	leftResizer = new ResizePanel( Orientation.WEST, 160);    	
-    	rightResizer = new ResizePanel( Orientation.EAST, 160);
+    	ResizeAlerter alerter = new ResizeAlerter() {
+			@Override
+			public void alert() {
+				resetLayout();
+			}
+		};
+		leftResizer = new ResizePanel(Orientation.WEST, 160, getContentPane(), alerter);
+    	rightResizer = new ResizePanel( Orientation.EAST, 160, getContentPane(), alerter);
     	
+    	alerter = new ResizeAlerter() {
+			@Override
+			public void alert() {
+				resetRightLayout();
+			}
+		};
+    	resizeN = new ResizePanel( Orientation.NORTH, 80, getContentPane(), alerter);
+    	resizeS = new ResizePanel( Orientation.NORTH, 160, getContentPane(), alerter);
+        
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,145 +187,13 @@ public class RootFrame extends javax.swing.JFrame
         leftContainer.add(new LayersPanel(master));
         
         // Right Panel Layout
-        GroupLayout layout = new GroupLayout(rightContainer);
-        
-        layout.setHorizontalGroup( layout.createParallelGroup(Alignment.LEADING)
-        	.addComponent(toolsPanel)
-        	.addComponent(settingPanel)
-        	.addComponent(palettePanel)
-        );
-        layout.setVerticalGroup( layout.createSequentialGroup()
-            	.addComponent(toolsPanel)
-            	.addComponent(settingPanel)
-            	.addComponent(palettePanel, 300,300,300)
-        );
-        rightContainer.setLayout(layout);
+        resetRightLayout();
         
         pack();
     }                   
     
 
-    public enum Orientation {
-    	EAST, WEST, NORTH, SOUTH
-    };
-    /**
-     * A ResizePanel keeps track of the size of a component within a container.
-     * It does not actually do any resziing, but rather it tracks mouse movement
-     * and converts it to the intended size which a Layout can deal with.  
-     * 
-     * For now it is binded to RootFrame, but it could easily
-     * be generalized using a passed interface instead resetLayout()
-     */
-    private class ResizePanel extends JPanel {
-    	private final Orientation orientation;
-    	private final ResizeBarAdapter adapter;
-    	private int size;
-    	private int buffer = 50;
-    	
-    	ResizePanel(Orientation orientation, int default_size) {
-    		this.orientation = orientation;
-    		this.adapter = new ResizeBarAdapter();
-    		this.size = default_size;
 
-    		this.addMouseListener(adapter);
-    		this.addMouseMotionListener(adapter);
-    		
-    		switch( orientation) {
-    		case EAST:
-    		case WEST:
-    			this.setCursor(new Cursor( Cursor.E_RESIZE_CURSOR));
-    			break;
-    		case NORTH:
-    		case SOUTH:
-    			this.setCursor(new Cursor( Cursor.N_RESIZE_CURSOR));
-    			break;
-    		}
-    		
-    	}
-    	
-    	int getResizeSize() {
-    		return size;
-    	}
-    	
-    	@Override
-    	protected void paintComponent(Graphics g) {
-    		super.paintComponents(g);
-
-    		int depth;
-    		int breadth;
-			g.setColor(new Color(190,190,190));
-    		switch( orientation) {
-    		case EAST:
-    		case WEST:
-    			depth = getWidth();
-    			breadth = getHeight();
-				g.drawLine( 0, 10, 0, breadth-10);
-				g.drawLine( depth/2, 5, depth/2, breadth-5);
-				g.drawLine( depth-1, 10, depth-1, breadth-10);
-				break;
-    		case NORTH:
-    		case SOUTH:
-    			depth = getHeight();
-    			breadth = getWidth();
-				g.drawLine( 10, 0, breadth-10, 0);
-				g.drawLine( 5, depth/2, breadth-5, depth/2);
-				g.drawLine( 10, depth-1,  breadth-10, depth-1);
-    			break;
-    		}
-    		
-    	}
-    	
-        private class ResizeBarAdapter extends MouseAdapter {
-        	int start_pos;
-        	int start_size;
-        	
-        	public ResizeBarAdapter( ) {}
-        	
-        	@Override
-        	public void mousePressed(MouseEvent e) {
-        		Point p = SwingUtilities.convertPoint( e.getComponent(), e.getPoint(), getContentPane());
-        		
-        		switch( orientation) {
-        		case EAST:
-        		case WEST:
-        			start_pos = p.x;
-        			break;
-        		case NORTH:
-        		case SOUTH:
-        			start_pos = p.y;
-        			break;
-        		}
-        		start_size = size;
-        	}
-        	
-        	@Override
-        	public void mouseDragged(MouseEvent e) {
-        		Point p = SwingUtilities.convertPoint( e.getComponent(), e.getPoint(), getContentPane());
-
-        		switch( orientation) {
-        		case EAST:
-            		size = start_size + (start_pos - p.x);
-            		size = Math.max( buffer, Math.min( getParent().getWidth()-buffer, size));
-            		break;
-        		case WEST:
-            		size = start_size - (start_pos - p.x);
-            		size = Math.max( buffer, Math.min( getParent().getWidth()-buffer, size));
-            		break;
-        		case NORTH:
-            		size = start_size + (start_pos - p.y);
-            		size = Math.max( buffer, Math.min( getParent().getHeight()-buffer, size));
-            		break;
-        		case SOUTH:
-            		size = start_size - (start_pos - p.y);
-            		size = Math.max( buffer, Math.min( getParent().getHeight()-buffer, size));
-            		break;
-        		}
-        		resetLayout();
-        		
-        		super.mouseDragged(e);
-        	}
-        }
-    }
 
     
 

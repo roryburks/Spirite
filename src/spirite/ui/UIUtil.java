@@ -2,31 +2,17 @@ package spirite.ui;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.text.DecimalFormat;
 import java.util.Enumeration;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -37,8 +23,12 @@ import spirite.MDebug.WarningType;
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);
 	private static final Color c2 = new Color( 192,192,192);
+	
 	/** Draws the grid background that goes behind an image to show transparency. */
 	public static void drawTransparencyBG( Graphics g, Rectangle rect) {
+		drawTransparencyBG( g, rect, 4);
+	}
+	public static void drawTransparencyBG( Graphics g, Rectangle rect, int size) {
 		Rectangle bounds;
 		if( rect == null)
 			bounds = g.getClipBounds();
@@ -47,8 +37,6 @@ public class UIUtil {
 		
 		if( bounds.isEmpty())
 			return;
-		
-		int size = 4;
 		
 		for( int i = 0; i*size < bounds.width; ++i) {
 			for( int j=0; j*size < bounds.height; ++j) {
@@ -200,239 +188,5 @@ public class UIUtil {
     		}
     		active_root_tree[ level] = new_node;
     	}
-	}
-	
-
-	public static class SliderPanel extends JPanel {
-		private float value = 0.0f;
-		private float min = 0.0f;
-		private float max = 1.0f;
-		private String label = "";
-		protected boolean hardCapped = true;
-		
-		public SliderPanel() {
-			MouseAdapter adapter = new MouseAdapter() {
-				@Override
-				public void mousePressed(MouseEvent e) {
-					setValue( widthToValue( e.getX() / (float)getWidth()));
-					super.mousePressed(e);
-				}
-				@Override
-				public void mouseDragged(MouseEvent e) {
-					setValue( widthToValue( e.getX() / (float)getWidth()));
-					super.mouseDragged(e);
-				}
-			};
-
-			addMouseListener( adapter);
-			addMouseMotionListener( adapter);
-		}
-		
-		public void onValueChanged( float newValue) {
-			repaint();
-		}
-		
-		// :::: Getters/Setters
-		public float getValue() {
-			return value;
-		}
-
-		public void setValue(float value) {
-			if( hardCapped)
-				value = Math.min( max, Math.max(min, value));
-			if( this.value != value) {
-				this.value = value;
-				onValueChanged( value);
-			}
-		}
-
-		public float getMin() {
-			return min;
-		}
-
-		public void setMin(float min) {
-			this.min = min;
-			if( hardCapped)
-				value = Math.max(min, value);
-		}
-
-		public float getMax() {
-			return max;
-		}
-
-		public void setMax(float max) {
-			this.max = max;
-			if( hardCapped)
-				value = Math.max(min, value);
-		}
-
-		public String getLabel() {
-			return label;
-		}
-
-		public void setLabel(String label) {
-			if( label == null) label = "";
-			this.label = label;
-		}
-		
-		// :::: Determine how it's drawn
-		protected String valueAsString(float value) {
-			DecimalFormat df = new DecimalFormat();
-			df.setMaximumFractionDigits(2);
-			df.setMinimumFractionDigits(2);
-			return df.format(value);
-		}
-		
-		protected float valueToWidth(float value) {
-			return Math.max(0.0f, Math.min(1.0f, (value - min) / (max - min)));
-		}
-		protected float widthToValue( float portion) {
-			return portion * (max-min)  + min;
-		}
-		
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			Graphics2D g2 = (Graphics2D)g;
-
-			Paint oldP = g2.getPaint();
-			Paint newP = new GradientPaint( 0,0, new Color(64,64,64), getWidth(), 0, new Color( 128,128,128));
-			g2.setPaint(newP);
-			g2.fillRect(0, 0, getWidth(), getHeight());
-
-			newP = new GradientPaint( 0,0, new Color(120,120,190), 0, getHeight(), new Color( 90,90,160));
-			g2.setPaint(newP);
-			g2.fillRect( 0, 0, Math.round(getWidth()*valueToWidth(value)), getHeight());
-			
-			g2.setColor( new Color( 222,222,222));
-			
-			UIUtil.drawStringCenter(g2, label + valueAsString(value), getBounds());
-
-			g2.setPaint(oldP);
-			g2.setColor( Color.BLACK);
-			g2.drawRect(0, 0, getWidth()-1, getHeight()-1);
-		}
-		
-	}
-
-    /***
-	 * I found the behavior of JFormattedTextField to be inadequate so I'm implementing
-	 * my own and centralizing it here.
-	 *
-	 */
-	public static class MTextFieldNumber extends JTextField implements DocumentListener {
-		private static final long serialVersionUID = 1L;
-		private int max = Integer.MAX_VALUE;
-		private int min = Integer.MIN_VALUE;
-		
-		private Color default_color = null;
-		private Color bad_color = Color.RED;
-		
-		private MTFNDocument mdocument;
-		
-		private boolean valid = true;
-		
-
-		private boolean allows_negative = true;
-		private boolean allows_floats = false;
-		
-		public MTextFieldNumber() {
-			init();
-		}
-
-		public MTextFieldNumber(boolean allowsNegatives, boolean allowsFloats) {
-			this.allows_floats = allowsFloats;
-			this.allows_negative = allowsNegatives;
-			init();
-		}
-		private void init() {
-			mdocument = new MTFNDocument();
-			this.setDocument(mdocument);
-			this.getDocument().addDocumentListener(this);
-			
-		}
-
-		
-		/***
-		 * Document that behaves identically to PlainDocument, but doesn't allow
-		 * you to enter non-number characters.
-		 */
-		public class MTFNDocument extends PlainDocument {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void insertString( int offset, String str, AttributeSet a) throws BadLocationException {
-				
-				// Only allow the user to enter part of a string if it's digits.  Possibly with 
-				//	- and .  But only one - at the beginning (and only if negatives are allowed)
-				//	and only one . (if floats are allowed)
-				if( !str.matches("^-?[0-9]*\\.?[0-9]*$") 
-						|| (str.startsWith("-") && (offset !=0 || !allows_negative))
-						|| (str.contains(".") && (this.getText(0, this.getLength()).contains(".") || !allows_floats)))
-					Toolkit.getDefaultToolkit().beep();
-				else
-					super.insertString(offset, str, a);
-			}
-		}
-		
-		
-		// :::: API
-		public void setMinMax( int min, int max) {
-			this.min = min;
-			this.max = max;
-		}
-		public int getNumber() {
-			try {
-				int i = Integer.parseInt( this.getText());
-				return i;
-			}
-			catch( NumberFormatException e) {
-				return 0;
-			}
-		}
-		public boolean getValid() {
-			return valid;
-		}
-		
-		// :::: Out of bounds check
-		
-		// Turn the text field red if the data is out of bounds
-		private void checkIfOOB() {
-			String text = this.getText();
-			
-			try {
-				int i = Integer.parseInt(text);
-				if( text == "") i = 0;
-				
-				if( i < min || i > max)
-					this.outOfBounds();
-				else
-					this.inBounds();
-			}catch( Exception e) {}
-		}
-		private void outOfBounds() {
-			default_color = this.getBackground();
-			this.setBackground(bad_color);
-			valid = false;
-			
-		}
-		private void inBounds() {
-			if( !valid) {
-				this.setBackground(default_color);
-				valid = true;
-			}
-		}
-	
-		// :::: DocumentListener
-		@Override public void changedUpdate(DocumentEvent e) {}
-		
-		@Override public void removeUpdate(DocumentEvent de) {
-			checkIfOOB();
-		}
-		
-		@Override
-		public synchronized void insertUpdate(DocumentEvent de) {
-			checkIfOOB();
-		}
-	
 	}
 }

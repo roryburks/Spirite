@@ -27,8 +27,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.animation_data.AbstractAnimation;
 import spirite.image_data.animation_data.SimpleAnimation;
-import spirite.ui.UIUtil;
-import spirite.ui.UIUtil.MTextFieldNumber;
+import spirite.ui.components.MTextFieldNumber;
 
 
 
@@ -158,7 +157,7 @@ public class AnimPanel extends javax.swing.JPanel
         slider.setPaintLabels(true);
 		
         
-        tfFPS = new UIUtil.MTextFieldNumber( true, true);
+        tfFPS = new MTextFieldNumber( true, true);
         tfFPS.setColumns(8);
         
         JLabel lblFps = new JLabel("FPS");

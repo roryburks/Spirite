@@ -13,7 +13,7 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
-import spirite.ui.UIUtil.SliderPanel;
+import spirite.ui.components.SliderPanel;
 
 public class LayersPanel extends JPanel {
 	// LayersPanel needs Master because various dialogs it creates needs
