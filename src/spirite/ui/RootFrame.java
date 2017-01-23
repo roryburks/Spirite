@@ -2,16 +2,21 @@
 package spirite.ui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
@@ -21,9 +26,13 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -37,6 +46,7 @@ import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
@@ -52,10 +62,6 @@ public class RootFrame extends javax.swing.JFrame
         implements KeyEventDispatcher, WindowFocusListener, ActionListener, WindowListener
 {
 	private static final long serialVersionUID = 1L;
-    private PalettePanel palettePanel;
-    private ToolsPanel toolsPanel;
-    private ToolSettingsPanel settingPanel;
-    private WorkTabPane workPane;
     
     private final MasterControl master;
 
@@ -73,12 +79,56 @@ public class RootFrame extends javax.swing.JFrame
         master.newWorkspace(640,480,new java.awt.Color(0,0,0,0), true);
         master.getCurrentWorkspace().finishBuilding();
     }
+    
+
+    private PalettePanel palettePanel;
+    private ToolsPanel toolsPanel;
+    private ToolSettingsPanel settingPanel;
+    private WorkTabPane workPane;
+    
+    private JPanel leftContainer;
+    private JPanel rightContainer;
+
+    private ResizePanel leftResizer;
+    private ResizePanel rightResizer;
+
+    private void resetLayout() {
+        GroupLayout layout = new GroupLayout(getContentPane());
+
+        GroupLayout.Group hGroup = layout.createSequentialGroup();
+        GroupLayout.Group vGroup = layout.createParallelGroup(Alignment.LEADING);
+        
+        hGroup.addComponent(leftContainer, leftResizer.getResizeSize(), leftResizer.getResizeSize(), leftResizer.getResizeSize())
+    	.addComponent(leftResizer, 6,6,6)
+        	.addComponent(workPane,160,800,Short.MAX_VALUE)
+        	.addComponent(rightResizer, 6,6,6)
+        	.addComponent(rightContainer, rightResizer.getResizeSize(), rightResizer.getResizeSize(), rightResizer.getResizeSize());
+        
+        
+        vGroup.addComponent(leftContainer)
+        	.addComponent(leftResizer)
+        	.addComponent(workPane, 160, 600, Short.MAX_VALUE)
+        	.addComponent(rightResizer)
+        	.addComponent(rightContainer);
+        
+        layout.setHorizontalGroup(hGroup);
+        layout.setVerticalGroup(vGroup);
+        getContentPane().setLayout(layout);
+    	
+    }
 
     private void initComponents() {
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
     	settingPanel = new ToolSettingsPanel( master.getToolsetManager());
+    	
+    	leftContainer = new JPanel();
+    	rightContainer = new JPanel();
+    	
+    	leftResizer = new ResizePanel( Orientation.WEST, 160);    	
+    	rightResizer = new ResizePanel( Orientation.EAST, 160);
+    	
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,40 +137,153 @@ public class RootFrame extends javax.swing.JFrame
 
         initMenu();
         
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(workPane, 0, 800, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(settingPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(0, 0, 0))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(toolsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(settingPanel, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(palettePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(workPane, 0, 600, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))))
-        );
+        // Main Layout
+        resetLayout();
 
+        // LeftPanel Layout
+        leftContainer.setLayout(new GridLayout());
+        leftContainer.add(new LayersPanel(master));
+        
+        // Right Panel Layout
+        GroupLayout layout = new GroupLayout(rightContainer);
+        
+        layout.setHorizontalGroup( layout.createParallelGroup(Alignment.LEADING)
+        	.addComponent(toolsPanel)
+        	.addComponent(settingPanel)
+        	.addComponent(palettePanel)
+        );
+        layout.setVerticalGroup( layout.createSequentialGroup()
+            	.addComponent(toolsPanel)
+            	.addComponent(settingPanel)
+            	.addComponent(palettePanel, 300,300,300)
+        );
+        rightContainer.setLayout(layout);
+        
         pack();
     }                   
+    
+
+    public enum Orientation {
+    	EAST, WEST, NORTH, SOUTH
+    };
+    /**
+     * A ResizePanel keeps track of the size of a component within a container.
+     * It does not actually do any resziing, but rather it tracks mouse movement
+     * and converts it to the intended size which a Layout can deal with.  
+     * 
+     * For now it is binded to RootFrame, but it could easily
+     * be generalized using a passed interface instead resetLayout()
+     */
+    private class ResizePanel extends JPanel {
+    	private final Orientation orientation;
+    	private final ResizeBarAdapter adapter;
+    	private int size;
+    	private int buffer = 50;
+    	
+    	ResizePanel(Orientation orientation, int default_size) {
+    		this.orientation = orientation;
+    		this.adapter = new ResizeBarAdapter();
+    		this.size = default_size;
+
+    		this.addMouseListener(adapter);
+    		this.addMouseMotionListener(adapter);
+    		
+    		switch( orientation) {
+    		case EAST:
+    		case WEST:
+    			this.setCursor(new Cursor( Cursor.E_RESIZE_CURSOR));
+    			break;
+    		case NORTH:
+    		case SOUTH:
+    			this.setCursor(new Cursor( Cursor.N_RESIZE_CURSOR));
+    			break;
+    		}
+    		
+    	}
+    	
+    	int getResizeSize() {
+    		return size;
+    	}
+    	
+    	@Override
+    	protected void paintComponent(Graphics g) {
+    		super.paintComponents(g);
+
+    		int depth;
+    		int breadth;
+			g.setColor(new Color(190,190,190));
+    		switch( orientation) {
+    		case EAST:
+    		case WEST:
+    			depth = getWidth();
+    			breadth = getHeight();
+				g.drawLine( 0, 10, 0, breadth-10);
+				g.drawLine( depth/2, 5, depth/2, breadth-5);
+				g.drawLine( depth-1, 10, depth-1, breadth-10);
+				break;
+    		case NORTH:
+    		case SOUTH:
+    			depth = getHeight();
+    			breadth = getWidth();
+				g.drawLine( 10, 0, breadth-10, 0);
+				g.drawLine( 5, depth/2, breadth-5, depth/2);
+				g.drawLine( 10, depth-1,  breadth-10, depth-1);
+    			break;
+    		}
+    		
+    	}
+    	
+        private class ResizeBarAdapter extends MouseAdapter {
+        	int start_pos;
+        	int start_size;
+        	
+        	public ResizeBarAdapter( ) {}
+        	
+        	@Override
+        	public void mousePressed(MouseEvent e) {
+        		Point p = SwingUtilities.convertPoint( e.getComponent(), e.getPoint(), getContentPane());
+        		
+        		switch( orientation) {
+        		case EAST:
+        		case WEST:
+        			start_pos = p.x;
+        			break;
+        		case NORTH:
+        		case SOUTH:
+        			start_pos = p.y;
+        			break;
+        		}
+        		start_size = size;
+        	}
+        	
+        	@Override
+        	public void mouseDragged(MouseEvent e) {
+        		Point p = SwingUtilities.convertPoint( e.getComponent(), e.getPoint(), getContentPane());
+
+        		switch( orientation) {
+        		case EAST:
+            		size = start_size + (start_pos - p.x);
+            		size = Math.max( buffer, Math.min( getParent().getWidth()-buffer, size));
+            		break;
+        		case WEST:
+            		size = start_size - (start_pos - p.x);
+            		size = Math.max( buffer, Math.min( getParent().getWidth()-buffer, size));
+            		break;
+        		case NORTH:
+            		size = start_size + (start_pos - p.y);
+            		size = Math.max( buffer, Math.min( getParent().getHeight()-buffer, size));
+            		break;
+        		case SOUTH:
+            		size = start_size - (start_pos - p.y);
+            		size = Math.max( buffer, Math.min( getParent().getHeight()-buffer, size));
+            		break;
+        		}
+        		resetLayout();
+        		
+        		super.mouseDragged(e);
+        	}
+        }
+    }
 
     
 
@@ -181,7 +344,7 @@ public class RootFrame extends javax.swing.JFrame
     }                                            
 
     /**     */
-    private void promptDebugColor() {  
+    private void promptDebugColor() {
         // TODO DEBUG
         JColorChooser jcp = new JColorChooser();
         int response = JOptionPane.showConfirmDialog(this, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

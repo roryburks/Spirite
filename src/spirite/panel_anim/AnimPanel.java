@@ -26,6 +26,7 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.image_data.animation_data.AbstractAnimation;
+import spirite.image_data.animation_data.SimpleAnimation;
 import spirite.ui.UIUtil;
 import spirite.ui.UIUtil.MTextFieldNumber;
 
@@ -240,7 +241,8 @@ public class AnimPanel extends javax.swing.JPanel
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
-		}else if( source == buttonForward) {			
+		}else if( source == buttonForward) {		
+			((SimpleAnimation)this.animation).save();
 		}
 	}
 

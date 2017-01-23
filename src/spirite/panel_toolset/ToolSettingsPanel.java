@@ -134,6 +134,7 @@ public class ToolSettingsPanel extends JPanel
 	@Override
 	public void toolsetChanged(Tool newTool) {
 		updatePanel();
+		repaint();
 	}
 	
 

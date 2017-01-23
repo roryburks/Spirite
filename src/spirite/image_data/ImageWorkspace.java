@@ -522,12 +522,10 @@ public class ImageWorkspace {
 	 * will get erased next time cleanDataCache is called)
 	 */
 	public void addImageDataDirect( ImageData newData) {
-		if( newData.id < workingID)
-			newData.id = workingID++;
-		else
-			workingID = newData.id+1;
 		imageData.put( newData.id, newData);
 		
+		if( newData.id >= workingID)
+			workingID = newData.id+1;
 	}
 	
 	// :::: Remove Nodes

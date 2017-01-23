@@ -174,7 +174,7 @@ public class RenderEngine
 	
 	/** Determines the number of images needed to properly render 
 	 * the given RenderSettings.  This number is equal to largest Group
-	 * depth of any node. */
+	 * depth of any visible node. */
 	private int _getNeededImagers(RenderSettings settings) {
 		int n = settings.node.getDepth();
 		NodeValidator validator = new NodeValidator() {			
@@ -249,8 +249,9 @@ public class RenderEngine
 				}
 				else if( child instanceof GroupNode && !child.getChildren().isEmpty()) {
 					// Group Node
-					if( n == buffer.length+1) {
-						MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
+					if( n == buffer.length-1) {
+						// Note: the code can reach here if all the children are invisible.
+						// There might be other, unintended ways for the code to reach here.
 						continue;
 					}
 					
