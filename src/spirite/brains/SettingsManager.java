@@ -19,7 +19,7 @@ import spirite.MDebug.ErrorType;
  */
 public class SettingsManager {
     private final Preferences prefs;
-	private File opennedFile = null;
+	private File opennedFile = new File("E:/Documents/Workspace/Spirite/SIF");
 	private List<String> paletteList = null;
 	
 	public SettingsManager() {

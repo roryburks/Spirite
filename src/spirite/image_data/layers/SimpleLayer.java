@@ -1,26 +1,24 @@
 package spirite.image_data.layers;
 
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 
-import spirite.MUtil;
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 
 public class SimpleLayer extends Layer {
-	private final ImageData data;
+	private final ImageHandle data;
 	
-	public SimpleLayer( ImageData data) {
+	public SimpleLayer( ImageHandle data) {
 		this.data = data;
 	}
 	
-	public ImageData getData() {
+	public ImageHandle getData() {
 		return data;
 	}
 
 	@Override
-	public List<ImageData> getUsedImageData() {
+	public List<ImageHandle> getUsedImageData() {
 		return Arrays.asList(data);
 	}
 
@@ -30,7 +28,7 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public ImageData getActiveData() {
+	public ImageHandle getActiveData() {
 		return data;
 	}
 
@@ -45,11 +43,8 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public Layer duplicate() {
-		BufferedImage bi = MUtil.deepCopy(data.deepAccess());
-		ImageData dupe = new ImageData(bi, -1, data.getContext());
-		
-		return new SimpleLayer(dupe);
+	public Layer logicalDuplicate() {
+		return new SimpleLayer(data.dupe());
 	}
 
 }

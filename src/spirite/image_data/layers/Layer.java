@@ -3,14 +3,18 @@ package spirite.image_data.layers;
 import java.awt.Graphics;
 import java.util.List;
 
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 
 public abstract class Layer {
-	public abstract ImageData getActiveData();
-	public abstract List<ImageData> getUsedImageData();
+	public abstract ImageHandle getActiveData();
+	public abstract List<ImageHandle> getUsedImageData();
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();
 	public abstract int getHeight();
 	
-	public abstract Layer duplicate();
+	/**
+	 * Creates a logical duplicate of the Layer, creating Null-Context
+	 * ImageHandles.
+	 */
+	public abstract Layer logicalDuplicate();
 }

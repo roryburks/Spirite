@@ -173,8 +173,6 @@ public class SelectionEngine {
 		if( !(snode instanceof LayerNode))
 			return false;
 		LayerNode node = (LayerNode)snode;
-
-		System.out.println(node.getOffsetX());
 		
 		ImageAction action = new ClearSelectionAction(
 				scope.getSelection(), 
@@ -272,7 +270,7 @@ public class SelectionEngine {
 	
 	
 	private StartSelectionAction createLiftAction(LayerNode node) {
-		ImageData imageData = node.getLayer().getActiveData();
+		ImageHandle imageData = node.getLayer().getActiveData();
 		
 		// Creates a Selection Mask
 		Rectangle rect = scope.getSelection().getBounds();
@@ -379,7 +377,7 @@ public class SelectionEngine {
 		private final Selection selection;
 		private final int ox, oy;
 		
-		public ClearSelectionAction( Selection selection, int ox, int oy, ImageData data) {
+		public ClearSelectionAction( Selection selection, int ox, int oy, ImageHandle data) {
 			super(data);
 			this.selection = selection;
 			this.ox = ox;
@@ -388,7 +386,7 @@ public class SelectionEngine {
 		}
 		
 		@Override
-		protected void performImageAction(ImageData image) {
+		protected void performImageAction(ImageHandle image) {
 			BufferedImage img = workspace.checkoutImage(image);
 			Graphics g = img.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -402,7 +400,7 @@ public class SelectionEngine {
 	
 	public class StartSelectionAction extends NullAction {
 		final CachedImage cachedData;
-		StartSelectionAction( BufferedImage liftedData, ImageData context) {
+		StartSelectionAction( BufferedImage liftedData, ImageHandle context) {
 			this.cachedData = cacheManager.cacheImage(liftedData, undoEngine);
 		}
 		@Override protected void performAction() {
@@ -459,7 +457,7 @@ public class SelectionEngine {
 	public class PasteSelectionAction extends ImageAction {
 		final CachedImage cachedData;
 		final int ox, oy;
-		protected PasteSelectionAction(StartSelectionAction start, int ox, int oy, ImageData image) 
+		protected PasteSelectionAction(StartSelectionAction start, int ox, int oy, ImageHandle image) 
 		{
 			super(image);
 			cachedData = start.cachedData;
@@ -467,7 +465,7 @@ public class SelectionEngine {
 			this.oy = oy;
 		}
 		@Override
-		protected void performImageAction(ImageData image) {
+		protected void performImageAction(ImageHandle image) {
 			BufferedImage bi = workspace.checkoutImage(image);
 			Graphics g = bi.getGraphics();
 			g.drawImage(cachedData.access(), ox, oy, null);

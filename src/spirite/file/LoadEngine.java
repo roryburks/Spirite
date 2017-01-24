@@ -8,7 +8,9 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -16,8 +18,10 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.SimpleLayer;
 
 /***
  * LoadEngine is a static container for methods which load images from
@@ -52,6 +56,7 @@ public class LoadEngine {
 			}
 			
 			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+			Map<Integer,BufferedImage> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
 			List<ChunkInfo> chunks = parseChunks( ra);
@@ -60,7 +65,7 @@ public class LoadEngine {
 			for( ChunkInfo ci : chunks) {
 				if( ci.header.equals("IMGD")) {
 					ra.seek( ci.startPointer);
-					parseImageDataSection(workspace, ra, ci.size);
+					imageMap = parseImageDataSection(ra, ci.size);
 				}
 			}
 			
@@ -71,6 +76,19 @@ public class LoadEngine {
 					parseGroupTreeSection(workspace, ra, ci.size);
 				}
 			}
+			
+			// TODO DEBUG
+			for( BufferedImage img : imageMap.values()) {
+				if( img.getWidth() > workspace.getWidth()) {
+					workspace.setWidth(img.getWidth());
+				}
+				if( img.getHeight() > workspace.getHeight()) {
+					workspace.setHeight(img.getHeight());
+				}
+			}
+			// TODO
+			
+			workspace.importData( workspace.getRootNode(), imageMap);
 			
 			workspace.finishBuilding();
 			workspace.fileSaved(file);
@@ -120,10 +138,11 @@ public class LoadEngine {
 	 * Read ImageData Section Data
 	 * [IMGD]
 	 */
-	private static void parseImageDataSection(
-			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
+	private static Map<Integer,BufferedImage> parseImageDataSection(
+			RandomAccessFile ra, int chunkSize) 
 			throws IOException 
 	{
+		Map<Integer,BufferedImage> dataMap = new HashMap<>();
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
@@ -136,10 +155,11 @@ public class LoadEngine {
 			ra.read(buffer);
 			
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
-
-			ImageData idata = new ImageData( img, identifier, workspace);
-			workspace.addImageDataDirect(idata);
+			dataMap.put(identifier, img);
+			
 		}
+		
+		return dataMap;
 	}
 	
 	/***
@@ -151,7 +171,7 @@ public class LoadEngine {
 			throws IOException 
 	{
 		long endPointer = ra.getFilePointer() + chunkSize;
-		int layer = 0;
+		int depth = 0;
 		int type;
 		int identifier = -1;
 		String name;
@@ -167,7 +187,7 @@ public class LoadEngine {
 		
 		while( ra.getFilePointer() < endPointer) {
 			// Read data
-			layer = ra.readUnsignedByte();			
+			depth = ra.readUnsignedByte();			
 			type = ra.readUnsignedByte();
 			
 			if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) 
@@ -177,15 +197,16 @@ public class LoadEngine {
 			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
 			
 			// !!!! Kind of hack-y that it's even saved, but only the root node should be
-			//	layer 0 and there should only be one (and it's already created)
-			if( layer == 0) {}
+			//	depth 0 and there should only be one (and it's already created)
+			if( depth == 0) {}
 			else {
 				if( type == SaveLoadUtil.NODE_GROUP) {
-					nodeLayer[layer] = workspace.addGroupNode( nodeLayer[layer-1], name);
-					nodeLayer[layer].setExpanded(true);
+					nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
+					nodeLayer[depth].setExpanded(true);
 				}
 				if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) {
-					workspace.addNewLayer( nodeLayer[layer-1], identifier, name);
+					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
+					workspace.addShellLayer( nodeLayer[depth-1], layer, name);
 				}
 			}
 		}

@@ -1,30 +1,50 @@
 package spirite.image_data;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
-
-public class ImageData {
+/**
+ * Under normal circumstances an ImageHandle is a logical connection to a
+ * CachedImage in an ImageWorkspace, but it can also serve as a placeholder
+ * for resources which are in the middle of construction.
+ * 
+ * For example, one can create an ImageHandle with built-in BufferedImages
+ * and then they can pass the ImageHandles to the ImageWorkspace and it'll
+ * convert those BufferedImages into CachedImages, attempting to preserve
+ * the id if possible.
+ *
+ */
+public class ImageHandle {
 
 	// Should really be a nested class, but ImageWorkspace is a bit too busy
-	private final ImageWorkspace context;
+	ImageWorkspace context;
 	
-	private CachedImage data;
 	int id = -1;
 	boolean locked = false;	// Mostly unused for now
 	
-	public ImageData( BufferedImage img, int id, ImageWorkspace context) {
+	// workspace.getData should have constant-time access (being implemented
+	//	with a HashTable, so there's probably no point to remember the
+	//	CachedImage and doing so might lead to unnecessary bugs.
+	
+	public ImageHandle( ImageWorkspace context, int id) {
+		this.context = context;
+		this.id = id;
+	}
+	
+	/** Returns a null-context duplicate (just preserves the ID) */
+	public ImageHandle dupe() {
+		return new ImageHandle( null, this.id);
+	}
+	
+/*	public ImageHandle( BufferedImage img, int id, ImageWorkspace context) {
 		this.context = context;
 		data = context.getCacheManager().cacheImage(img, context);
 		this.id = id;
 	}
 	
-	public ImageData( int width, int height, Color bg, ImageWorkspace context) {
+	public ImageHandle( int width, int height, Color bg, ImageWorkspace context) {
 		this.context = context;
 		
 		data = context.getCacheManager().cacheImage(
@@ -34,6 +54,16 @@ public class ImageData {
         g2d.setColor( bg);
         g2d.fillRect( 0, 0, width, height);
         g2d.dispose();
+	}*/
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if( !( obj instanceof ImageHandle))
+			return false;
+		ImageHandle other = (ImageHandle)obj;
+		
+		return (this.context == other.context) && (this.id == other.id);
 	}
 	
 	public ImageWorkspace getContext() {
@@ -45,20 +75,20 @@ public class ImageData {
 	/** Should only be used for reading/copying.  If used for writing will not
 	 * be tracked by Observers/UndoEngine. */
 	public BufferedImage deepAccess() {
-		return data.access();
+		return context.getData(id).access();
 	}
 	
 	public void drawLayer(Graphics g) {
 		if( context != null && context.getDrawEngine().getStrokeContext() == this) {
 			BufferedImage bi = context.getDrawEngine().getStrokeEngine().getCompositionLayer();
 			Graphics big = bi.getGraphics();
-			big.drawImage( data.access(), 0, 0, null);
+			big.drawImage( context.getData(id).access(), 0, 0, null);
 			context.getDrawEngine().getStrokeEngine().drawStrokeLayer(big);
 			g.drawImage( bi, 0, 0, null);
 			big.dispose();
 		}
 		else {
-			g.drawImage( data.access(), 0, 0, null);
+			g.drawImage( context.getData(id).access(), 0, 0, null);
 		}
 	}
 	
@@ -67,10 +97,10 @@ public class ImageData {
 	}
 
 	public int getWidth() {
-		return data.access().getWidth();
+		return context.getData(id).access().getWidth();
 	}
 	public int getHeight() {
-		return data.access().getHeight();
+		return context.getData(id).access().getHeight();
 	}
 	
 	public void refresh() {
@@ -82,7 +112,7 @@ public class ImageData {
 	}
 	
 	void flush() {
-		data.flush();
+		context.getData(id).flush();
 	}
 	
 }

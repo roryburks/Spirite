@@ -319,12 +319,8 @@ public class RootFrame extends javax.swing.JFrame
     private void globalHotkeyCommand( String command) {
         if( command.equals("new_image"))
         	promptNewImage();
-        else if( command.equals("debug_color")) {
-        	for( String s : ImageIO.getReaderFormatNames()) {
-        		System.out.println(s);
-        	}
-        //	promptDebugColor();
-        }
+        else if( command.equals("debug_color"))
+        	promptDebugColor();
         else if( command.equals("newLayerQuick")) {
         	ImageWorkspace workspace = master.getCurrentWorkspace();
         	if( workspace != null) {

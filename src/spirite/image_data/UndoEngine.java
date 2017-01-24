@@ -144,8 +144,8 @@ public class UndoEngine {
 	
 	// :::: Called by ImageWorkapce
 	/** Gets a list of all Data used in the UndoEngine. */
-	List<ImageData> getDataUsed() {
-		List<ImageData> list = new ArrayList<>();
+	List<ImageHandle> getDataUsed() {
+		List<ImageHandle> list = new ArrayList<>();
 		
 		for( UndoContext context : contexts) {
 			if( context.image != null)
@@ -194,9 +194,9 @@ public class UndoEngine {
 		return queue.getLast().getLast();
 	}
 	public static class UndoIndex {
-		public ImageData data;
+		public ImageHandle data;
 		public UndoableAction action;
-		public UndoIndex( ImageData data, UndoableAction action) {
+		public UndoIndex( ImageHandle data, UndoableAction action) {
 			this.data = data;
 			this.action = action;
 		}
@@ -209,7 +209,7 @@ public class UndoEngine {
 	 * 
 	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
-	void prepareContext( ImageData data) {
+	void prepareContext( ImageHandle data) {
 		for( UndoContext context : contexts) {
 			if( context.image == data)
 				return;
@@ -218,7 +218,7 @@ public class UndoEngine {
 		assert( data != null);
 		contexts.add( new ImageContext( data));
 	}
-	private UndoContext contextOf( ImageData data) {
+	private UndoContext contextOf( ImageHandle data) {
 		assert( data != null);
 
 		for( UndoContext context : contexts) {
@@ -407,9 +407,9 @@ public class UndoEngine {
 	 * -NullContext of which only one exists, for changes outside any image data.
 	 */
 	private abstract class UndoContext {
-		ImageData image;
+		ImageHandle image;
 
-		UndoContext( ImageData data) {
+		UndoContext( ImageHandle data) {
 			this.image = data;
 		}
 
@@ -449,7 +449,7 @@ public class UndoEngine {
 								// this increments until it hits a Keyframe, then it removes
 								// the old base keyframe and adjusts
 		
-		protected ImageContext( ImageData image) {
+		protected ImageContext( ImageHandle image) {
 			super(image);
 			
 			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(), UndoEngine.this), null));
@@ -481,7 +481,7 @@ public class UndoEngine {
 				hiddenAction.undoAction();
 			}
 			@Override
-			public void performImageAction(ImageData image) {
+			public void performImageAction(ImageHandle image) {
 				resetToKeyframe(frameCache.access());
 			}
 		}
@@ -921,13 +921,13 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final ImageData data;
-		protected ImageAction( ImageData data) {
+		protected final ImageHandle data;
+		protected ImageAction( ImageHandle data) {
 			this.data = data;
 		}
 		@Override protected void performAction() {}
 		@Override protected void undoAction() {}
-		protected abstract void performImageAction( ImageData image);
+		protected abstract void performImageAction( ImageHandle image);
 		protected boolean isHeavyAction() {return false;}
 	}
 	

@@ -13,7 +13,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SimpleLayer;
@@ -109,7 +109,7 @@ public class SaveEngine {
 				// [1] : Node Type ID
 				ra.write( SaveLoadUtil.NODE_SIMPLE_LAYER);
 				
-				ImageData data = ((SimpleLayer) layer).getData();
+				ImageHandle data = ((SimpleLayer) layer).getData();
 				// [4] : ID of ImageData linked to this LayerNode
 				ra.writeInt( data.getID());
 			}
@@ -123,7 +123,7 @@ public class SaveEngine {
 	}
 	
 	/** Saves the IMGD chunk containing the Image data, each in PNG format. */
-	private static void saveImageData( List<ImageData> imageData, RandomAccessFile ra) 
+	private static void saveImageData( List<ImageHandle> imageData, RandomAccessFile ra) 
 			throws UnsupportedEncodingException, IOException 
 	{
 		// [4] : "IMGD" tag
@@ -134,7 +134,7 @@ public class SaveEngine {
 		ra.writeInt(0);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		for( ImageData part : imageData) {
+		for( ImageHandle part : imageData) {
 			// (Foreach ImageData)
 			ImageIO.write( part.deepAccess(), "png", bos);
 

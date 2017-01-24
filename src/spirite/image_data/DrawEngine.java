@@ -39,7 +39,7 @@ public class DrawEngine {
 		this.selectionEngine = workspace.getSelectionEngine();
 	}
 
-	public StrokeEngine startStrokeEngine( ImageData data) {
+	public StrokeEngine startStrokeEngine( ImageHandle data) {
 		engine.data = data;
 		engine.stroke=  null;
 		return engine;
@@ -54,7 +54,7 @@ public class DrawEngine {
 	public StrokeEngine getStrokeEngine() {
 		return engine;
 	}
-	public ImageData getStrokeContext() {
+	public ImageHandle getStrokeContext() {
 		if( engine.state == STATE.DRAWING) {
 			return engine.data;
 		}
@@ -159,7 +159,7 @@ public class DrawEngine {
 		private STATE state = STATE.READY;
 
 		private StrokeParams stroke;
-		private ImageData data;
+		private ImageHandle data;
 		private BufferedImage strokeLayer;
 		private BufferedImage compositionLayer;
 		private BufferedImage selectionMask;
@@ -176,7 +176,7 @@ public class DrawEngine {
 		public StrokeParams getParams() {
 			return stroke;
 		}
-		public ImageData getImageData() {
+		public ImageHandle getImageData() {
 			return data;
 		}
 		
@@ -387,7 +387,7 @@ public class DrawEngine {
 	/***
 	 * 
 	 */
-	public void clear( ImageData data) {
+	public void clear( ImageHandle data) {
 		execute( new ClearAction(data, pollSelectionMask()));
 	}
 
@@ -395,7 +395,7 @@ public class DrawEngine {
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, Color color, ImageData data)
+	public boolean fill( int x, int y, Color color, ImageHandle data)
 	{
 		if( data == null) return false;
 		BufferedImage bi = data.deepAccess();
@@ -418,7 +418,7 @@ public class DrawEngine {
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
 
-		MaskedImageAction(ImageData data, BuiltSelection mask) {
+		MaskedImageAction(ImageHandle data, BuiltSelection mask) {
 			super(data);
 			this.mask = mask;
 		}
@@ -428,7 +428,7 @@ public class DrawEngine {
 		PenState[] points;
 		StrokeParams params;
 		
-		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageData data){	
+		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageHandle data){	
 			super(data, mask);
 			this.params = params;
 			this.points = points;
@@ -448,7 +448,7 @@ public class DrawEngine {
 		}
 		
 		@Override
-		protected void performImageAction( ImageData data) {
+		protected void performImageAction( ImageHandle data) {
 			queueSelectionMask(mask);
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
@@ -466,7 +466,7 @@ public class DrawEngine {
 		private final Point p;
 		private final Color color;
 		
-		public FillAction( Point p, Color c, BuiltSelection mask, ImageData data) {
+		public FillAction( Point p, Color c, BuiltSelection mask, ImageHandle data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -474,7 +474,7 @@ public class DrawEngine {
 		}
 
 		@Override
-		protected void performImageAction( ImageData data) {
+		protected void performImageAction( ImageHandle data) {
 			BufferedImage bi = workspace.checkoutImage(data);
 			
 			Queue<Integer> queue = new LinkedList<Integer>();
@@ -524,12 +524,12 @@ public class DrawEngine {
 	}
 
 	public class ClearAction extends MaskedImageAction {
-		private ClearAction(ImageData data, BuiltSelection mask) {
+		private ClearAction(ImageHandle data, BuiltSelection mask) {
 			super(data, mask); 
 			description = "Clear Image";
 		}
 		@Override
-		protected void performImageAction(ImageData image) {
+		protected void performImageAction(ImageHandle image) {
 			BufferedImage bi = workspace.checkoutImage(image);
 			
 			if( mask.selection == null)

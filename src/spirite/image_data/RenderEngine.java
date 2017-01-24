@@ -150,7 +150,7 @@ public class RenderEngine
 		
 		wrk.selectedData = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
-			ImageData dataContext= settings.workspace.getActiveData();
+			ImageHandle dataContext= settings.workspace.getActiveData();
 			if( dataContext != null) {
 				Point p = settings.workspace.getActiveDataOffset();
 				wrk.selectedData = dataContext;
@@ -170,7 +170,7 @@ public class RenderEngine
 	
 	private class WorkingRenderData {
 		float ratioW, ratioH;
-		ImageData selectedData;
+		ImageHandle selectedData;
 		int seloffX, seloffY;
 	}
 	
@@ -313,7 +313,7 @@ public class RenderEngine
 		// Only one of the following three can be non-null.
 		//	If all three are null, it draws the root node
 		public GroupNode node = null;
-		public ImageData image = null;
+		public ImageHandle image = null;
 		public Layer layer = null;
 		
 		/** Converts all ambiguous settings into an explicit form
@@ -354,7 +354,7 @@ public class RenderEngine
 			
 		}
 		
-		public List<ImageData> getImagesReliedOn() {
+		public List<ImageHandle> getImagesReliedOn() {
 			if( image != null) {
 				return Arrays.asList(image);
 			}
@@ -372,11 +372,11 @@ public class RenderEngine
 					@Override public boolean checkChildren(Node node) {return true;}
 				});
 				
-				List<ImageData> list = new LinkedList<>();
+				List<ImageHandle> list = new LinkedList<>();
 				
 				Iterator<Node> it = layerNodes.iterator();
 				while( it.hasNext()){
-					for( ImageData data : ((LayerNode)it.next()).getLayer().getUsedImageData()) {
+					for( ImageHandle data : ((LayerNode)it.next()).getLayer().getUsedImageData()) {
 						// Avoiding duplicates should make the intersection method quicker
 						if( list.indexOf(data) == -1)
 							list.add(data);
@@ -469,8 +469,8 @@ public class RenderEngine
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 
 
-		LinkedList<ImageData> relevantData = new LinkedList<ImageData>(evt.dataChanged);
-		LinkedList<ImageData> relevantDataSel = new LinkedList<ImageData>(evt.dataChanged);
+		LinkedList<ImageHandle> relevantData = new LinkedList<ImageHandle>(evt.dataChanged);
+		LinkedList<ImageHandle> relevantDataSel = new LinkedList<ImageHandle>(evt.dataChanged);
 		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()
 				&& evt.getWorkspace().getActiveData() != null) 
 		{
@@ -492,7 +492,7 @@ public class RenderEngine
 				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
-				List<ImageData> dataInCommon = new LinkedList<>(setting.getImagesReliedOn());
+				List<ImageHandle> dataInCommon = new LinkedList<>(setting.getImagesReliedOn());
 				dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
 				
 				List<Node> nodesInCommon = new LinkedList<Node>(evt.nodesChanged);

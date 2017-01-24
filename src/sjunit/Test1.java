@@ -20,7 +20,7 @@ import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.UndoEngine;
@@ -108,7 +108,7 @@ public class Test1 {
 			}
 		}
 		
-		for( ImageData data : workspace.getImageData()) {
+		for( ImageHandle data : workspace.getImageData()) {
 			BufferedImage b1 = data.deepAccess();
 			BufferedImage b2 = data.deepAccess();
 			

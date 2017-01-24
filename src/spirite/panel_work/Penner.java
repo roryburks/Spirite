@@ -31,7 +31,7 @@ import spirite.image_data.DrawEngine.StrokeAction;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageData;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -221,7 +221,7 @@ public class Penner
 	}	
 	private void startStroke( StrokeParams stroke) {
 		if( workspace != null && workspace.getActiveData() != null) {
-			ImageData data = workspace.getActiveData();
+			ImageHandle data = workspace.getActiveData();
 			GroupTree.Node node = workspace.getSelectedNode();
 
 			strokeEngine = drawEngine.startStrokeEngine( data);
@@ -272,7 +272,7 @@ public class Penner
 				: paletteManager.getActiveColor(1);
 
 		// Grab the Active Data
-		ImageData data = workspace.getActiveData();
+		ImageHandle data = workspace.getActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
 		if( data != null && node != null) {
@@ -362,7 +362,6 @@ public class Penner
 				break;
 			case PRESSURE:
 				pressure = level.value;
-				System.out.println(pressure);
 				break;
 			default:
 				break;
