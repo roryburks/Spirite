@@ -3,6 +3,7 @@ package spirite.panel_toolset;
 import java.awt.Color;
 
 import javax.swing.GroupLayout;
+import javax.swing.Icon;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,9 +15,10 @@ import spirite.brains.ToolsetManager.PropertySchemeNode;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.panel_toolset.PropertyPanels.SizeSlider;
+import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.SliderPanel;
 
-public class ToolSettingsPanel extends JPanel 
+public class ToolSettingsPanel extends OmniComponent
 	implements MToolsetObserver
 {
 	private final ToolsetManager manager;
@@ -137,5 +139,10 @@ public class ToolSettingsPanel extends JPanel
 		repaint();
 	}
 	
-
+	
+	// :::: OmniComponent
+	@Override
+	public void onCleanup() {
+		manager.removeToolsetObserver(this);
+	}
 }

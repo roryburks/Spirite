@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
+import javax.swing.Icon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -14,8 +15,9 @@ import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
 import spirite.ui.components.SliderPanel;
+import spirite.ui.OmniFrame.OmniComponent;
 
-public class LayersPanel extends JPanel {
+public class LayersPanel extends OmniComponent {
 	// LayersPanel needs Master because various dialogs it creates needs
 	//	access to it.  Consider centralizing that in the Dialogs class
 	//	for better modularity.
@@ -34,12 +36,15 @@ public class LayersPanel extends JPanel {
 	public LayersPanel(MasterControl master) {
 		this.master = master;
 		
-		
 		opacitySlider = new OpacitySlider();
 		layerTreePanel = new LayerTreePanel(master, this);
-		
-		
 		btnNewLayer = new JButton();
+		btnNewGroup = new JButton();
+		
+		initComponents();
+	}
+	
+	private void initComponents() {
 		btnNewLayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnNewLayerPress();
@@ -48,7 +53,6 @@ public class LayersPanel extends JPanel {
 		btnNewLayer.setToolTipText("New Layer");
 		btnNewLayer.setIcon(Globals.getIcon("new_layer"));
 		
-		btnNewGroup = new JButton();
 		btnNewGroup.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnNewGroupPress();
@@ -91,6 +95,7 @@ public class LayersPanel extends JPanel {
 		setLayout(groupLayout);
 
 		opacitySlider.refresh();
+		
 	}
 	
 	/** The OpacitySlider Swing Component */
@@ -118,69 +123,6 @@ public class LayersPanel extends JPanel {
 			super.onValueChanged(newValue);
 		}
 	}
-/*	class OpacitySlider extends JPanel  {
-		OSMA adapter = new OSMA();
-		OpacitySlider() {
-			addMouseMotionListener(adapter);
-			addMouseListener(adapter);
-		}
-		
-		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			
-			Graphics2D g2 = (Graphics2D)g;
-			
-			Paint oldP = g2.getPaint();
-			Paint newP = new GradientPaint( 0,0, new Color(64,64,64), getWidth(), 0, new Color( 128,128,128));
-			g2.setPaint(newP);
-			g2.fillRect(0, 0, getWidth(), getHeight());
-			
-
-			GroupTree.Node selected = layerTreePanel.getSelectedNode();
-			
-			if( selected!= null) {
-				newP = new GradientPaint( 0,0, new Color(120,120,190), 0, getHeight(), new Color( 90,90,160));
-				g2.setPaint(newP);
-				g2.fillRect( 0, 0, Math.round(getWidth()*selected.getAlpha()), getHeight());
-				
-				g2.setColor( new Color( 222,222,222));
-				
-				UIUtil.drawStringCenter(g2, "Opacity: " + Math.round(selected.getAlpha() * 100), getBounds());
-			}
-			
-
-			g2.setPaint(oldP);
-		}
-
-		private class OSMA extends MouseAdapter {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				updateAlpha(e);
-			}
-			
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				updateAlpha(e);
-			}
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-			
-			void updateAlpha( MouseEvent e) {
-				GroupTree.Node selected = layerTreePanel.getSelectedNode();
-				
-				if( selected != null) {
-					float alpha = (float)e.getX() / (float)getWidth();
-					alpha = Math.min( 1.0f, Math.max(0.0f, alpha));
-					selected.setAlpha(alpha);
-					
-					repaint();
-				}
-			}
-		}
-	}*/
 	
 	public void updateSelected() {
 		opacitySlider.refresh();
@@ -195,5 +137,11 @@ public class LayersPanel extends JPanel {
 		GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
 		
 		layerTreePanel.workspace.addGroupNode(selected_node, "Test");
+	}
+	
+	// :::: OmniContainer
+	@Override
+	public void onCleanup() {
+		layerTreePanel.cleanup();
 	}
 }

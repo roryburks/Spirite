@@ -63,14 +63,15 @@ import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
 public class LayerTreePanel extends ContentTree 
-	implements MImageObserver, MWorkspaceObserver,
-	 TreeSelectionListener, TreeExpansionListener, MSelectionObserver, ActionListener
+	implements MImageObserver, MWorkspaceObserver, MSelectionObserver,
+	 TreeSelectionListener, TreeExpansionListener, ActionListener
 {
-	// LayerTreePanel only needs master to add a WorkspaceObserver and to hook
-	//	into the RenderEngine (for drawing the thumbnails)
-	ImageWorkspace workspace;
+	// LayerTreePanel only needs master to add and remove a WorkspaceObserver
+	//	and to hook into the RenderEngine (for drawing the thumbnails)
+	private final MasterControl master;
 	private final LayersPanel context;
 	private final RenderEngine renderEngine;
+	ImageWorkspace workspace;	// Non-private because LayersPanel needs access to this
 	
 	private static final long serialVersionUID = 1L;
 	private final LTPCellEditor editor;
@@ -80,6 +81,7 @@ public class LayerTreePanel extends ContentTree
 	// :::: Initialize
 	public LayerTreePanel( MasterControl master, LayersPanel context) {
 		super();
+		this.master = master;
 		this.context = context;
 		this.renderEngine = master.getRenderEngine();
 		
@@ -276,6 +278,15 @@ public class LayerTreePanel extends ContentTree
     		}
     			
 		} catch( ClassCastException e) {}
+	}
+	
+	// :::: Calld by Parent's OmniContainer.onCleanup
+	void cleanup() {
+		master.removeWorkspaceObserver(this);
+		if( workspace != null) {
+			workspace.removeImageObserver( this);
+			workspace.removeSelectionObserver(this);
+		}
 	}
     
 	// :::: ContentTree

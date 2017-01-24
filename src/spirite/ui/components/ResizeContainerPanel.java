@@ -35,6 +35,7 @@ public class ResizeContainerPanel extends JPanel{
 	private final List<ResizeBar> trailingBars;
 	private ContainerOrientation cOrientation;
 	private JComponent stretchComponent;
+	private int barSize = 5;
 
 	public static final int LEADING = Integer.MAX_VALUE;
 	public static final int TRAILING = Integer.MIN_VALUE;
@@ -62,6 +63,15 @@ public class ResizeContainerPanel extends JPanel{
 	public void setStretchArea(int min) {
 		min_stretch = min;
 	}
+
+	public int getBarSize() {return barSize;}
+	public void setBarSize( int size) {
+		size = Math.max(0,  size);
+		if( barSize != size) {
+			barSize = size;
+			resetLayout();
+		}
+	}
 	
 	
 	public void setPanelComponent( ResizeBar panel, JComponent component) {
@@ -76,13 +86,13 @@ public class ResizeContainerPanel extends JPanel{
         
         for( ResizeBar bar : leadingBars) {
         	stretch.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize())
-        		.addComponent(bar, 6, 6, 6);
+        		.addComponent(bar, barSize, barSize, barSize);
         }
         if( stretchComponent != null) {
         	stretch.addComponent(stretchComponent);
         }
         for( ResizeBar bar : trailingBars) {
-        	stretch.addComponent(bar, 6, 6, 6)
+        	stretch.addComponent(bar, barSize, barSize, barSize)
         		.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize());
         }
 
@@ -120,7 +130,6 @@ public class ResizeContainerPanel extends JPanel{
 		if( position == 0) position = Integer.MAX_VALUE;
 		int ret = position;
 		
-		System.out.println(ret);
 		if( position < 0) {
 			if( -position >= trailingBars.size()) {
 				trailingBars.add(new ResizeBar(default_size,min_size, component, true));
@@ -140,7 +149,6 @@ public class ResizeContainerPanel extends JPanel{
 			}
 		}
 
-		System.out.println(ret);
 
 		resetLayout();
 		return ret;

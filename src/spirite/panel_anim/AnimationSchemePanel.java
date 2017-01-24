@@ -1,12 +1,15 @@
 package spirite.panel_anim;
 
 import javax.swing.GroupLayout;
+import javax.swing.Icon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
+import spirite.ui.OmniFrame.OmniComponent;
 
-public class AnimationSchemePanel extends JPanel {
+public class AnimationSchemePanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;
 	private MasterControl master;
 
@@ -40,4 +43,11 @@ public class AnimationSchemePanel extends JPanel {
 		
 	}
 	AnimationSchemeTreePanel animationSchemeTreePanel;
+	
+	// :::: OmniComponent
+	@Override
+	public void onCleanup() {
+		// TODO Auto-generated method stub
+		super.onCleanup();
+	}
 }

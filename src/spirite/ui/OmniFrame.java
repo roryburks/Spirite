@@ -23,10 +23,15 @@ import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -34,9 +39,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager.FrameType;
@@ -54,10 +61,11 @@ import spirite.ui.FrameManager.FrameType;
  * @author RoryBurks
  *
  */
-public class OmniFrame extends JDialog
+public class OmniFrame extends JPanel
 {	
 	private static final long serialVersionUID = 1L;
 	private final MasterControl master;
+	private final FrameManager frameManager;
 	
 	// Components
 	private final OFTransferHandler transferHandler = new OFTransferHandler(this);
@@ -75,6 +83,7 @@ public class OmniFrame extends JDialog
 	
 	OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
+		this.frameManager = master.getFrameManager();
 		initComponents();
 		
 		// Create the panel of the given type
@@ -84,6 +93,7 @@ public class OmniFrame extends JDialog
 	
 	OmniFrame(MasterControl master, OmniContainer container) {
 		this.master = master;
+		this.frameManager = master.getFrameManager();
 		initComponents();
 		
 		addContainer(container, -1);
@@ -140,13 +150,13 @@ public class OmniFrame extends JDialog
 	
 	/** Adds Panel of the given FrameType. */
 	public void addPanel( FrameType type) {
-		JPanel panel = master.getFrameManager().createOmniPanel(type);
+		OmniComponent panel = master.getFrameManager().createOmniComponent(type);
 		
 		if( panel == null) return;
 		
 		root.addTab("tab", panel);
 		
-		OmniBar bar = new OmniBar( type.getName());
+		OmniBar bar = new OmniBar( type.getName(), type);
 		root.setTabComponentAt(root.getTabCount()-1, bar);
 		
 		containers.add(new OmniContainer(panel, bar, type));
@@ -188,23 +198,30 @@ public class OmniFrame extends JDialog
 		
 		// If this OmniFrame holds no other tabs, remove it
 		if( containers.size() == 0) {
-			this.dispose();
+			frameManager.triggereClose(this);
 		}
 	}
 	private void addContainer( OmniContainer toAdd, int index) {
 		if( index == -1) {
-			root.add(toAdd.panel);
+			root.add(toAdd.component);
 			containers.add(toAdd);
 			index = containers.size()-1;
 		}
 		else {
-			root.add(toAdd.panel, index);
+			root.add(toAdd.component, index);
 			containers.add(index,toAdd);
 		}
-		toAdd.bar = new OmniBar( toAdd.type.getName());
+		toAdd.bar = new OmniBar( toAdd.type.getName(), toAdd.type);
 		root.setTabComponentAt(index, toAdd.bar);
 		root.setSelectedIndex(index);
 		transferHandler.refreshGestureRecognizers();
+	}
+	
+	// Called by FrameManager
+	void triggerCleanup() {
+		for( OmniContainer container : containers) {
+			container.component.onCleanup();
+		}
 	}
 	
 	
@@ -213,8 +230,39 @@ public class OmniFrame extends JDialog
 		private static final long serialVersionUID = 1L;
 		
 		private final JLabel label;
-		public OmniBar( String title) {
+		private final JPanel iconPanel;
+		final ImageIcon icon;
+		
+		
+		public OmniBar( String title, FrameType type) {
+			icon = FrameManager.getIconForType(type);
+			
 			label = new JLabel(title);
+			iconPanel = new JPanel() {
+				@Override
+				protected void paintComponent(Graphics g) {
+					super.paintComponent(g);
+					g.drawImage(icon.getImage(),0,0,null);
+					
+				}
+			};
+			iconPanel.setOpaque(false);
+			
+			GroupLayout layout = new GroupLayout(this);
+			
+			layout.setHorizontalGroup( layout.createParallelGroup()
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(iconPanel,24,24,24)
+					.addComponent(label, 0, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+				)
+			);
+			
+			layout.setVerticalGroup(layout.createParallelGroup( Alignment.CENTER)
+				.addComponent(iconPanel,24,24,24)
+				.addComponent(label));
+			
+			this.setLayout(layout);
+			
 			label.setFont( new Font("Tahoma", Font.PLAIN, 10));
 			add( label);
 			this.setOpaque(false);
@@ -244,18 +292,27 @@ public class OmniFrame extends JDialog
 	
 	/** */
 	static class OmniContainer {
-		JPanel panel;
+		OmniComponent component;
 		OmniBar bar;	// It's possible that this shouldn't be here.  It helps
 						//  simplify some internal code, but it is tied closely to
 						//  the particular OmniFrame that it is currently housed
 						//  in whereas the OmniContainer class is more abstract
 		FrameType type;
 		
-		OmniContainer( JPanel panel, OmniBar bar, FrameType type) {
-			this.panel = panel;
+		OmniContainer( OmniComponent component, OmniBar bar, FrameType type) {
+			this.component = component;
 			this.bar = bar;
 			this.type = type;
 		}
+	}
+	
+	/** 
+	 * Because Components often bind into semi-global contexts with observers and
+	 *	listeners, they will need to remove those links when the component is closed
+	 *	so that they can properly be caught by the GC.
+	 */
+	public static abstract class OmniComponent extends JPanel{
+		public void onCleanup() {}
 	}
 	
 	
@@ -296,7 +353,7 @@ public class OmniFrame extends JDialog
 		
 		// Used only for dragging a container out to a new Frame, otherwise
 		//	the Transferable object is used
-		private OmniContainer dragging = null;	
+		private OmniContainer dragging = null;
 		
 		public OFTransferHandler(OmniFrame context) {
 			dragSource = DragSource.getDefaultDragSource();
@@ -373,10 +430,11 @@ public class OmniFrame extends JDialog
 				// Move the container from its old spot to its new (unless
 				//	you're trying to move a single-frame OmniPanel into itself)
 				if( trans.parent != OmniFrame.this || containers.size() > 1) {
+					OmniContainer temp = trans.panel;
 					trans.parent.removeContainer( trans.panel);
-					addContainer(trans.panel, dragIndex);
+					addContainer(temp, dragIndex);
 				}
-				
+
 				dragMode = DragMode.NOT_DRAGGING;
 				root.repaint();
 				return true;
@@ -404,13 +462,22 @@ public class OmniFrame extends JDialog
 					if( action == DnDConstants.ACTION_MOVE)
 						cursor = DragSource.DefaultMoveDrop;
 					
-					RenderSettings set = new RenderSettings();
-					set.workspace = master.getCurrentWorkspace();
+					
+					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_INT_ARGB);
+					Graphics g = image.getGraphics();
+					
+					g.setColor( new Color(128,128,128,128));
+					g.fillRect(0, 0, image.getWidth(), image.getHeight());
+					if( container.bar.icon != null)
+						g.drawImage( container.bar.icon.getImage(), 0, 0, null);
+					g.setColor( Color.BLACK);
+					g.drawString(container.type.getName(), 24, 16);
+					g.dispose();
 					
 					dragSource.startDrag(
 							evt, 
 							cursor, 
-							master.getRenderEngine().renderImage( set),
+							image,
 							new Point(10,10), 
 							trans, 
 							this);
@@ -424,7 +491,7 @@ public class OmniFrame extends JDialog
 		@Override		public void dragOver(DragSourceDragEvent arg0) {}
 		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}
 		@Override		public void dragDropEnd(DragSourceDropEvent evt) {
-			
+
 			if( evt.getDropAction() == TransferHandler.NONE && containers.contains(dragging)) {
 				// When you drag into a component that has its own DnD handling, you can
 				//	get a false negative in which importData is never called, so it's 

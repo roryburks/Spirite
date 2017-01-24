@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.MUndoEngineObserver;
 import spirite.image_data.UndoEngine.UndoIndex;
+import spirite.ui.OmniFrame.OmniComponent;
 
 /***
  * The UndoPanel shows the History of all Undoable actions and lets you navigate them
@@ -33,17 +35,21 @@ import spirite.image_data.UndoEngine.UndoIndex;
  * 
  * @author Rory Burks
  */
-public class UndoPanel extends JPanel
+public class UndoPanel extends OmniComponent
 	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener,
 	MWorkspaceObserver
 {
 	private static final long serialVersionUID = 1L;
+
+	// Needed to bind/unbind Observer
+	private final MasterControl master;
 	private final JScrollPane container;
 	private final JList<UndoIndex> list;
 	private final DefaultListModel<UndoIndex> model;
 	private UndoEngine engine = null;
 	
 	public UndoPanel( MasterControl master) {
+		this.master = master;
 		this.setLayout( new GridLayout());
 		
 		// Set the list up and link it with everything
@@ -163,6 +169,14 @@ public class UndoPanel extends JPanel
 	}
 
 
+	// :::: OmniComponent
+	@Override
+	public void onCleanup() {
+		master.removeWorkspaceObserver(this);
+		if( engine != null)
+			engine.removeUndoEngineObserver(this);
+	}
+	
 	// :::: MUndoEngineObserver
 	@Override
 	public void historyChanged(List<UndoIndex> undoHistory) {
@@ -226,6 +240,7 @@ public class UndoPanel extends JPanel
 			engine.addUndoEngineObserver(this);
 			constructFromHistory(engine.constructUndoHistory());
 		} else {
+			engine = null;
 			model.clear();
 		}
 	}

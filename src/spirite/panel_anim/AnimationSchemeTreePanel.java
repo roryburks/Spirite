@@ -37,6 +37,8 @@ public class AnimationSchemeTreePanel extends ContentTree
 {
 	private static final long serialVersionUID = 1L;
 
+	// MasterControl needed to add/remove WorkspaceObserver
+	private final MasterControl master;
 	private ImageWorkspace workspace = null;
 	private AnimationManager manager = null;
 	
@@ -45,6 +47,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	 * Create the panel.
 	 */
 	public AnimationSchemeTreePanel( MasterControl master) {
+		this.master = master;
 		tree.setCellRenderer(this);
 		
 		workspace = master.getCurrentWorkspace();
@@ -197,6 +200,15 @@ public class AnimationSchemeTreePanel extends ContentTree
 			label.setText("Animation Layer");
 		
 			return label;
+		}
+	}
+	
+	// Called from AnimSchemePanel's OmniContainer.onCleanup
+	void cleanup() {
+		master.removeWorkspaceObserver(this);
+		if( workspace != null) {
+			workspace.removeSelectionObserver(this);
+			manager.removeStructureObserver(this);
 		}
 	}
 	

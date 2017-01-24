@@ -158,11 +158,11 @@ public class RootFrame extends javax.swing.JFrame
     			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},
-    			{"..&Layers", "frame.showLayerFrame", null},
-    			{"..&Tools", "frame.showToolsFrame", null},
+    			{"..&Layers", "frame.showLayerFrame", "icon.frame.layers"},
+    			{"..&Tools", "frame.showToolsFrame", "icon.frame.toolSettings"},
     			{"..-"},
-    			{"..Animation &Scheme", "frame.showAnimSchemeFrame", null},
-    			{"..Undo &History", "frame.showUndoFrame", null},
+    			{"..Animation &Scheme", "frame.showAnimSchemeFrame", "icon.frame.animationScheme"},
+    			{"..Undo &History", "frame.showUndoFrame", "icon.frame.undoHistory"},
     			
     			{".&Animation View", "frame.showAnimationView", null},
     			{".Debug View", "frame.showDebugDialog", null}

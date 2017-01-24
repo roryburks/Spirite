@@ -6,23 +6,31 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import spirite.Globals;
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
+import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 
 public class FrameManager implements WindowListener {
 	private final MasterControl master;
-	private RootFrame root = null;
 	
-	private final List<OmniFrame> frames = new ArrayList<>();
+	private final List<OmniDialog> dialogs = new ArrayList<>();
+	private RootFrame root = null;
+	private class OmniDialog extends JDialog {
+		OmniFrame frame;
+	}
 
 	public FrameManager( MasterControl master) {
 		this.master = master;
@@ -47,7 +55,7 @@ public class FrameManager implements WindowListener {
 	}
 	
 	/** The facroty which creates Docked panels based on their type identifier.	 */
-	public JPanel createOmniPanel( FrameType type) {
+	public OmniComponent createOmniComponent( FrameType type) {
 		switch( type) {
 		case LAYER:
 			return new LayersPanel( master);
@@ -60,6 +68,21 @@ public class FrameManager implements WindowListener {
 			return new UndoPanel(master);
 		default:
 			return null;
+		}
+	}
+
+	public static ImageIcon getIconForType( FrameType type) {
+		switch( type) {
+		case LAYER:
+			return Globals.getIcon("icon.frame.layers");
+		case TOOL_SETTINGS:
+			return Globals.getIcon("icon.frame.toolSettings");
+		case ANIMATION_SCHEME:
+			return Globals.getIcon("icon.frame.animationScheme");
+		case UNDO:
+			return Globals.getIcon("icon.frame.undoHistory");
+		default:
+			return Globals.getIcon("new_layer");
 		}
 	}
 	
@@ -98,37 +121,49 @@ public class FrameManager implements WindowListener {
         root.setVisible(true);
 	}
 	
+	private List<OmniFrame> frameList() {
+		List<OmniFrame> ret = new ArrayList<>(dialogs.size()+1);
+		for( OmniDialog d : dialogs) {
+			ret.add(d.frame);
+		}
+//		ret.add(root.getOmniFrame);
+		return ret;
+	}
+	
 	/** */
 	public void addFrame( FrameType frameType) {
 		// First Check to make sure the frame type isn't already open
 		//	(assuming it's not duplicateable)
-		for( OmniFrame frame : frames) {
-			if( frame.containsFrameType( frameType)) {
-				frame.toFront();
+		
+		for( OmniDialog d : dialogs) {
+			if( d.frame.containsFrameType( frameType)) {
+				d.toFront();
 				
 				return;
 			}
 		}
 		
 		// Next create the container frame and show it
+		OmniDialog d = new OmniDialog();
 		OmniFrame omniFrame = new OmniFrame( master, frameType);
-		
-		omniFrame.pack();
+		d.frame = omniFrame;
+		d.add(omniFrame);
+		d.pack();
 		
 		if( root != null) {
 			Point p = root.getLocationOnScreen();
-			omniFrame.setLocation( p.x + root.getWidth(), p.y);
+			d.setLocation( p.x + root.getWidth(), p.y);
 		}
-		
-		omniFrame.setVisible(true);
-		omniFrame.addWindowListener(this);
-		frames.add(omniFrame);
+
+		d.setVisible(true);
+		d.addWindowListener(this);
+		dialogs.add(d);
 	}
 	
 	/** */
 	public void showAllFrames() {
-		for( OmniFrame frame : frames) {
-			frame.toFront();
+		for( OmniDialog d: dialogs) {
+			d.toFront();
 		}
 	}
 	
@@ -138,25 +173,55 @@ public class FrameManager implements WindowListener {
 	 * OmniFrame should be the only one calling this
 	 */
 	void containerToFrame( OmniContainer container, Point locationOnScreen) {
+		OmniDialog d = new OmniDialog();
 		OmniFrame frame = new OmniFrame( master, container);
-		frame.pack();
+		d.frame = frame;
+		d.add(frame);
+		d.pack();
 		
 		// Offset the frame from the mouse coordinates to approximate the tab 
 		//	(rather than window top-left) being where you drop it
 		//	!!!! could be better if you really want to go through the pain of calculating system metrics
 		locationOnScreen.x -= 10;
 		locationOnScreen.y -= 40;
-		frame.setLocation(locationOnScreen );
-		frame.setVisible(true);
-		frame.addWindowListener( this);
-		frames.add(frame);
+		d.setLocation(locationOnScreen );
+		
+		d.setVisible(true);
+		d.addWindowListener( this);
+		dialogs.add(d);
 	}
 	
+	/** When an OmniFrame is made empty from internal mechanisms, it will call this. */
+	void triggereClose(OmniFrame frame) {
+		
+		// Really should be an easier way to add events to the queue without
+		//	processing them immediately, but I'd rather invoke SwingUtilities
+		//	than get the Default Toolkit
+		for( OmniDialog d : dialogs) {
+			if( d.frame == frame) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						d.dispatchEvent( new WindowEvent(d,WindowEvent.WINDOW_CLOSING));
+					}
+				});
+			}
+		}
+	}
 	
 	// :::: WindowListener
 	@Override	public void windowClosing(WindowEvent evt) {
-		evt.getWindow().removeAll();
-		frames.remove(evt.getWindow());
+		if( !dialogs.contains(evt.getWindow())) {
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Unknown Dialog Closing in Frame Manager");
+		}
+		else {
+			OmniDialog d = (OmniDialog)evt.getWindow();
+			evt.getWindow().removeAll();	// Done to try to stop leak described in OmniFrame.java
+			
+			d.frame.triggerCleanup();
+			d.dispose();
+			dialogs.remove(d);
+		}
 	}
 	@Override	public void windowActivated(WindowEvent evt) {}
 	@Override	public void windowClosed(WindowEvent evt) {}

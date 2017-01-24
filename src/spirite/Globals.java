@@ -89,15 +89,21 @@ public class Globals {
     };
     
     private static final Object icons[][] = {
-			{"icons2.png", 25, 25, 4,1},
+			{"icons2.png", 25, 25, 4,3},
     		{"visible_on", 0, 0},
     		{"visible_off", 1, 0},
     		{"new_layer", 2, 0},
     		{"new_group", 3, 0},
+    		{"icon.frame.layers",0,2},
+    		{"icon.frame.undoHistory",1,2},
+    		{"icon.frame.animationScheme",2,2},
+    		{"icon.frame.toolSettings",3,2},
+    		
     		{"icons_12x12.png",13,13,3,1},
     		{"palNewColor", 0,0},
     		{"palSavePalette", 1, 0},
     		{"palLoadPalette", 2, 0},
+    		
 	};
 
 
@@ -191,9 +197,10 @@ public class Globals {
     public static ImageIcon getIcon( String id) {
     	if( iconSets == null)
     		initIconSets();
-    	
+
     	for( int i = 0; i < iconTable.length; ++i) {
     		if( iconTable[i][0].equals(id)) {
+
     			IconSet set = (IconSet)iconTable[i][1];
     			int x = (Integer)iconTable[i][2];
     			int y = (Integer)iconTable[i][3];
@@ -211,6 +218,7 @@ public class Globals {
     			if( set.iconsheet[x][y] == null) {
     				BufferedImage img = new BufferedImage(set.widthPerIcon-1,set.heightPerIcon-1, set.img.getType());
     				
+    				System.out.println((set.heightPerIcon));
     				Graphics g = img.getGraphics();
     				g.drawImage(set.img, -(set.widthPerIcon)*x, -(set.heightPerIcon)*y, null);
     				g.dispose();
