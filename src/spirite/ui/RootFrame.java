@@ -2,6 +2,7 @@
 package spirite.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -19,6 +20,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -41,14 +43,14 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_layers.LayersPanel;
+import spirite.panel_layers.ReferenceSchemePanel;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkTabPane;
-import spirite.ui.components.ResizePanel;
-import spirite.ui.components.ResizePanel.Orientation;
-import spirite.ui.components.ResizePanel.ResizeAlerter;
+import spirite.ui.components.ResizeContainerPanel;
+import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
 
 /**
  * While the MasterControl is "home base" for all the internals of the program, the root
@@ -84,86 +86,37 @@ public class RootFrame extends javax.swing.JFrame
     private WorkTabPane workPane;
     
     private JPanel leftContainer;
-    private JPanel rightContainer;
-
-    private ResizePanel leftResizer;
-    private ResizePanel rightResizer;
-    private ResizePanel resizeN;
-    private ResizePanel resizeS;
-
-    private void resetLayout() {
-        GroupLayout layout = new GroupLayout(getContentPane());
-
-        GroupLayout.Group hGroup = layout.createSequentialGroup();
-        GroupLayout.Group vGroup = layout.createParallelGroup(Alignment.LEADING);
-        
-        hGroup.addComponent(leftContainer, leftResizer.getResizeSize(), leftResizer.getResizeSize(), leftResizer.getResizeSize())
-    	.addComponent(leftResizer, 6,6,6)
-        	.addComponent(workPane,160,800,Short.MAX_VALUE)
-        	.addComponent(rightResizer, 6,6,6)
-        	.addComponent(rightContainer, rightResizer.getResizeSize(), rightResizer.getResizeSize(), rightResizer.getResizeSize());
-        
-        
-        vGroup.addComponent(leftContainer)
-        	.addComponent(leftResizer)
-        	.addComponent(workPane, 160, 600, Short.MAX_VALUE)
-        	.addComponent(rightResizer)
-        	.addComponent(rightContainer);
-        
-        layout.setHorizontalGroup(hGroup);
-        layout.setVerticalGroup(vGroup);
-        getContentPane().setLayout(layout);
-    	
-    }
+    private ResizeContainerPanel rightContainer;
+    private JPanel rrContainer;
     
-    private void resetRightLayout() {
-        GroupLayout layout = new GroupLayout(rightContainer);
-        
-        layout.setHorizontalGroup( layout.createParallelGroup(Alignment.LEADING)
-        	.addComponent(toolsPanel)
-        	.addComponent(resizeN)
-        	.addComponent(settingPanel)
-        	.addComponent(resizeS)
-        	.addComponent(palettePanel)
-        );
-        layout.setVerticalGroup( layout.createSequentialGroup()
-            	.addComponent(toolsPanel, resizeN.getResizeSize(), resizeN.getResizeSize(), resizeN.getResizeSize())
-            	.addComponent(resizeN,6,6,6)
-            	.addComponent(settingPanel, resizeS.getResizeSize(), resizeS.getResizeSize(), resizeS.getResizeSize())
-            	.addComponent(resizeS,6,6,6)
-            	.addComponent(palettePanel, 0,300,300)
-            	.addContainerGap()
-        );
-        rightContainer.setLayout(layout);
-    }
+    private ResizeContainerPanel container;
+
+    
 
     private void initComponents() {
+    	this.setLayout(new GridLayout());
+    	
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
     	settingPanel = new ToolSettingsPanel( master.getToolsetManager());
     	
     	leftContainer = new JPanel();
-    	rightContainer = new JPanel();
+    	rightContainer = new ResizeContainerPanel(palettePanel, ContainerOrientation.VERTICAL);
+    	rrContainer = new JPanel();
     	
-    	ResizeAlerter alerter = new ResizeAlerter() {
-			@Override
-			public void alert() {
-				resetLayout();
-			}
-		};
-		leftResizer = new ResizePanel(Orientation.WEST, 160, getContentPane(), alerter);
-    	rightResizer = new ResizePanel( Orientation.EAST, 160, getContentPane(), alerter);
-    	
-    	alerter = new ResizeAlerter() {
-			@Override
-			public void alert() {
-				resetRightLayout();
-			}
-		};
-    	resizeN = new ResizePanel( Orientation.NORTH, 80, getContentPane(), alerter);
-    	resizeS = new ResizePanel( Orientation.NORTH, 160, getContentPane(), alerter);
-        
+    	workPane.setPreferredSize(new Dimension(800,600));
+    	container = new ResizeContainerPanel(workPane,ContainerOrientation.HORIZONTAL);
+    	this.add(container);
+
+    	container.addPanel(50, 160, 1, leftContainer);
+    	container.addPanel(50, 160, -1, rightContainer);
+    	container.addPanel(50, 160, -2, rrContainer);
+    	container.setStretchArea(200);
+
+    	rightContainer.addPanel(50, 80, 0, toolsPanel);
+    	rightContainer.addPanel(50, 160, 0, settingPanel);
+    	rightContainer.setStretchArea(80);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -171,16 +124,12 @@ public class RootFrame extends javax.swing.JFrame
         toolsPanel.setPreferredSize(new java.awt.Dimension(140, 80));
 
         initMenu();
-        
-        // Main Layout
-        resetLayout();
 
         // LeftPanel Layout
         leftContainer.setLayout(new GridLayout());
         leftContainer.add(new LayersPanel(master));
-        
-        // Right Panel Layout
-        resetRightLayout();
+        rrContainer.setLayout(new GridLayout());
+        rrContainer.add( new ReferenceSchemePanel(master));
         
         pack();
     }                   

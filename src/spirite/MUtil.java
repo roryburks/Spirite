@@ -36,6 +36,17 @@ public class MUtil {
 		return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 	}
 
+	public static int clip( int min, int value, int max) {
+		if( value < min) return min;
+		if( value > max) return max;
+		return value;
+	}
+	public static float clip( float min, float value, float max) {
+		if( value < min) return min;
+		if( value > max) return max;
+		return value;
+	}
+
 	/** 
 	 * Places t in between start and end such that it is offset by an integer
 	 * number of rotations of start to end. <br>
