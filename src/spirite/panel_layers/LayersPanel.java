@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
-import javax.swing.Icon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.Globals;
@@ -18,11 +16,6 @@ import spirite.ui.components.SliderPanel;
 import spirite.ui.OmniFrame.OmniComponent;
 
 public class LayersPanel extends OmniComponent {
-	// LayersPanel needs Master because various dialogs it creates needs
-	//	access to it.  Consider centralizing that in the Dialogs class
-	//	for better modularity.
-	MasterControl master;
-	
 	private static final long serialVersionUID = 1L;
 
 	private final LayerTreePanel layerTreePanel;
@@ -34,7 +27,6 @@ public class LayersPanel extends OmniComponent {
 	 * Create the panel.
 	 */
 	public LayersPanel(MasterControl master) {
-		this.master = master;
 		
 		opacitySlider = new OpacitySlider();
 		layerTreePanel = new LayerTreePanel(master, this);

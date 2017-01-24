@@ -599,7 +599,7 @@ public class ImageWorkspace {
 				nodeBefore));
 	}
 	public void moveInto( Node nodeToMove, GroupNode nodeInto, boolean top) {
-		if( nodeToMove == null || nodeInto == null || nodeInto.getParent()== null 
+		if( nodeToMove == null || nodeInto == null 
 				|| nodeToMove.getParent() == null || groupTree._isChild( nodeToMove, nodeInto))
 			return;
 		

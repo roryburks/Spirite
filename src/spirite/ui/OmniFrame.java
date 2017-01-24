@@ -84,7 +84,7 @@ public class OmniFrame extends JPanel
 	OmniFrame( MasterControl master, FrameType type) {
 		this.master = master;
 		this.frameManager = master.getFrameManager();
-		initComponents();
+		construct();
 		
 		// Create the panel of the given type
 		addPanel( type);	
@@ -94,12 +94,12 @@ public class OmniFrame extends JPanel
 	OmniFrame(MasterControl master, OmniContainer container) {
 		this.master = master;
 		this.frameManager = master.getFrameManager();
-		initComponents();
+		construct();
 		
 		addContainer(container, -1);
 	}
 
-	private void initComponents() {
+	private void construct() {
 		root.setTabPlacement(JTabbedPane.TOP);
 		root.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		

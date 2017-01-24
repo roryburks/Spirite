@@ -42,6 +42,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -50,10 +51,12 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.ui.ContentTree.DragMode;
 
 public class ContentTree extends JPanel
 	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 
@@ -80,14 +83,15 @@ public class ContentTree extends JPanel
 
 	// :::: Methods triggered by internal events that can and should be 
 	//	overwritten
-	protected void moveAbove( TreePath nodeMove, TreePath nodeInto) {}
-	protected void moveBelow( TreePath nodeMove, TreePath nodeInto) {}
-	protected void moveInto( TreePath nodeMove, TreePath nodeInto, boolean top) {}	
 	protected void clickPath( TreePath path, MouseEvent clickEvent) {
 		tree.setSelectionPath(path);
 	}
 	protected void buttonPressed( CCButton button) {}
 	protected void buttonCreated( CCButton button) {}
+	protected boolean allowsHoverOut() { return false;}
+	protected Transferable buildTransferable(DefaultMutableTreeNode node) {return null;}
+	protected boolean validTransferable(DataFlavor dfs[]) {return false;}
+	protected boolean importInto( Transferable trans, TreePath draggingInto, DragMode dragMode) { return false;}
 
 	public ContentTree() {
 		// Simple grid layout, fills the whole area
@@ -121,8 +125,8 @@ public class ContentTree extends JPanel
 
 		// Initialize Drag-Drop Manager
 		dragManager = new CCTDragManager();
-		new DropTarget(tree,dragManager);	// TODO: Figure out how this works
-		tree.setTransferHandler(null);	// Prevent default tree copy,paste,and drag/drop
+		tree.setTransferHandler(dragManager);	// Prevent default tree copy,paste,and drag/drop
+		tree.setSelectionModel( new LockingSelectionModel());
 		
 		initLayout();
 		buttonPanel.reformPanel();
@@ -252,6 +256,12 @@ public class ContentTree extends JPanel
 			default:
 				break;
 			}
+		}
+		else if( dragManager.dragMode == DragMode.HOVER_OUT) {
+			Rectangle rect2 = tree.getRowBounds(tree.getRowCount()-1);
+			
+			
+			g.drawLine( 0, rect2.y+rect2.height+2, width,  rect2.y+rect2.height+2);
 		}
 		
 	}
@@ -385,12 +395,39 @@ public class ContentTree extends JPanel
 		PLACE_OVER,
 		PLACE_UNDER,
 		PLACE_INTO,
-		HOVER_SELF
+		HOVER_SELF,
+		HOVER_OUT
 	};
 	
+
+	// Kind of ugly, but this is the easiest way I can determine to prevent the 
+	//	Tree from changing its selection while dragging nodes.
+	private static boolean locked = false;
+	private class LockingSelectionModel extends DefaultTreeSelectionModel {
+		@Override public void addSelectionPath(TreePath path) {
+			if( !locked)
+				super.addSelectionPath(path);
+		}
+		@Override public void removeSelectionPath(TreePath path) {
+			if( !locked)
+				super.removeSelectionPath(path);
+		}
+		@Override
+		public void setSelectionPath(TreePath path) {
+			if( !locked)
+				super.setSelectionPath(path);
+		}
+		@Override
+		public void clearSelection() {
+			if( !locked)
+				super.clearSelection();
+		}
+	}
+
+	
 	/** The DragManager manages the drag and drop functionality of the tree.*/
-	protected class CCTDragManager 
-		implements DragGestureListener, DropTargetListener, DragSourceListener
+	protected class CCTDragManager extends TransferHandler
+		implements DragGestureListener, DragSourceListener
 	{
 		private final DragSource dragSource;
 		
@@ -407,18 +444,42 @@ public class ContentTree extends JPanel
 		}
 		
 	
-		/** Simple Transferable object that only acts as an identifier. */
-		private class ContainerNode implements Transferable {
-			@Override
-			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-				if( flavor.equals(FLAVOR))	return this;
-				else throw new UnsupportedFlavorException(flavor);
-			}	
-			@Override public DataFlavor[] getTransferDataFlavors() {return flavors;}
-			@Override public boolean isDataFlavorSupported(DataFlavor flavor) {return flavor.equals(FLAVOR);}
+		// :::: Import
+		@Override
+		public boolean canImport(TransferSupport support) {
+			// Make sure it's the correct Flavor Type
+			DataFlavor dfs[] = support.getDataFlavors();
+			
+			// !!! TODO Figure out how to make the ContentTree DnD not interfere
+			//	with the OmniFrame DnD while overlapping areas
+			if( !validTransferable(dfs)) {
+				if( dfs.length >= 1 && dfs[0] != OmniFrame.FLAVOR){
+					
+				}
+				return false;
+			}
+			
+			
+			// Then Test based on Position (while updating the data
+			//	keeping track of where the tree node will be placed).
+			if(!testDrag( support.getDropLocation().getDropPoint())) {
+				return false;
+			}
+			else {
+				return true;
+			}
 		}
-		final public DataFlavor FLAVOR = new DataFlavor( ContainerNode.class, "Container Node");
-		private DataFlavor flavors[] = {FLAVOR};
+		
+		@Override
+		public boolean importData(TransferSupport support) {
+			locked = false;
+			
+			if( validTransferable(support.getDataFlavors())) {
+				return importInto(support.getTransferable(), dragIntoNode, dragMode);
+			}
+			
+			return false;
+		}
 		
 		// :::: DragGesterRecignizer
 		@Override
@@ -426,9 +487,13 @@ public class ContentTree extends JPanel
 			TreePath dragNode = tree.getSelectionPath();
 			
 			if( dragNode != null) {
-				ContainerNode containerNode = new ContainerNode();
 				draggingNode = dragNode;
-				Transferable trans = (Transferable) containerNode;
+				
+
+				Transferable trans = buildTransferable((DefaultMutableTreeNode)(dragNode.getLastPathComponent()));
+				
+				if( trans == null)
+					trans = new NilTransferable();
 				
 				// Set the cursor and start the drag action
 				Cursor cursor = DragSource.DefaultMoveDrop;
@@ -436,40 +501,22 @@ public class ContentTree extends JPanel
 				if( action == DnDConstants.ACTION_MOVE)
 					cursor = DragSource.DefaultMoveDrop;
 				
+				locked = true;
 				dragSource.startDrag( evt, cursor, trans, this);
 			}
 		}
-		
-		// :::: DragTargetListener
-		@Override		public void dragEnter(DropTargetDragEvent arg0) {}
-		@Override		public void dragExit(DropTargetEvent arg0) {}
-		@Override		public void dropActionChanged(DropTargetDragEvent arg0) {}
-		@Override		public void drop(DropTargetDropEvent arg0) {}
-		@Override
-		public void dragOver(DropTargetDragEvent evt) {
-			// Make sure it's the correct Flavor Type
-			DataFlavor dfs[] = evt.getCurrentDataFlavors();
-			
-			// !!! TODO Figure out how to make the ContentTree DnD not interfere
-			//	with the OmniFrame DnD while overlapping areas
-			if( dfs.length != 1 || dfs[0] != FLAVOR) {
-				if( dfs[0] != OmniFrame.FLAVOR)
-//					evt.acceptDrag(DnDConstants.M);
-					evt.rejectDrag();
-				return;
+		private class NilTransferable implements Transferable {
+			NilTransferable( ) {}
+			@Override
+			public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+				if( flavor.equals(FLAVOR))	return this;
+				else throw new UnsupportedFlavorException(flavor);
 			}
-			
-			
-			// Then Test based on Position (while updating the data
-			//	keeping track of where the tree node will be placed).
-			if(!testDrag( evt.getLocation())) {
-				evt.rejectDrag();
-			}
-			else {
-				evt.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
-			}
-			
+			@Override public DataFlavor[] getTransferDataFlavors() {return flavors;}
+			@Override public boolean isDataFlavorSupported(DataFlavor flavor) {return flavor.equals(FLAVOR);}
 		}
+		final public DataFlavor FLAVOR = new DataFlavor( NilTransferable.class, "Nil Transferable (Unimplemented)");
+		private final DataFlavor flavors[] = {FLAVOR};
 		
 		/***
 		 * Tests whether the point is a valid and stores what kind of drop it would be
@@ -481,6 +528,8 @@ public class ContentTree extends JPanel
 		private boolean testDrag( Point p ) {
 			// Doing it like this makes it so only the vertical position is relvant
 			TreePath path = getPathFromY(p.y);
+
+			System.out.println(p);
 			
 			if( path != null) {
 				try {
@@ -492,7 +541,7 @@ public class ContentTree extends JPanel
 					int offset = p.y - r.y;
 					
 					
-					if( testNode == draggingNode.getLastPathComponent())
+					if( draggingNode != null &&testNode == draggingNode.getLastPathComponent())
 						changeDrag( path, DragMode.HOVER_SELF);
 					else if( testNode.getAllowsChildren() &&
 							offset > d.height && offset < r.height - d.height) 
@@ -503,7 +552,7 @@ public class ContentTree extends JPanel
 						changeDrag( path, DragMode.PLACE_OVER);
 					else
 						changeDrag( path, DragMode.PLACE_UNDER);
-					
+
 					return true;
 					
 				}catch( ClassCastException e) {
@@ -512,8 +561,13 @@ public class ContentTree extends JPanel
 					MDebug.handleWarning( MDebug.WarningType.UNSPECIFIED, this, "NullPointer in testDrag (probably sync issue)");
 				}
 			}
+			else if( allowsHoverOut()) {
+				changeDrag(path, DragMode.HOVER_OUT);
+				return true;
+			}
 			
-			changeDrag( dragIntoNode, dragMode);
+			
+			
 			return false;
 		}
 		
@@ -534,28 +588,7 @@ public class ContentTree extends JPanel
 		// :::: DragSourceListener
 		@Override 		
 		public void dragDropEnd(DragSourceDropEvent arg0) {
-			// This kind of stuff is SUPPOSED to go in the DragTargetListener drop event
-			//	but just to make absolutely sure that there are no async issues with changing
-			//	the drag settings to null and since I don't actually use the Transferable
-			//	data, I put it here.
-			if( dragIntoNode != null) {
-				
-				if( dragMode == DragMode.PLACE_OVER)
-					moveAbove(draggingNode, dragIntoNode);
-				else if( ((DefaultMutableTreeNode)dragIntoNode.getLastPathComponent()).getAllowsChildren()) {
-					if( dragMode == DragMode.PLACE_UNDER) {
-						if( tree.isExpanded(dragIntoNode))
-							moveInto( draggingNode, dragIntoNode, true);
-						else
-							moveBelow( draggingNode, dragIntoNode);
-					}
-					else if( dragMode == DragMode.PLACE_INTO)
-						moveInto( draggingNode, dragIntoNode, false);
-				}
-				else if( dragMode == DragMode.PLACE_UNDER || dragMode == DragMode.PLACE_INTO) 
-					moveBelow(draggingNode, dragIntoNode);
-			}
-			
+			locked = false;
 			changeDrag( null, DragMode.NOT_DRAGGING);
 			draggingNode = null;
 		}
