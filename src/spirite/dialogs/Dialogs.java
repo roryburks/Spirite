@@ -47,7 +47,7 @@ public class Dialogs {
     public static File pickFileOpen() {
     	JFileChooser fc = new JFileChooser();
     	
-    	File f = master.getSettingsManager().getOpennedFile();
+    	File f = master.getSettingsManager().getOpenFilePath();
     	
     	for( FileFilter filter : fc.getChoosableFileFilters()) {
     		fc.removeChoosableFileFilter(filter);
@@ -71,7 +71,7 @@ public class Dialogs {
     public static File pickFileSave() {
     	JFileChooser fc = new JFileChooser();
     	
-    	File f = master.getSettingsManager().getOpennedFile();
+    	File f = master.getSettingsManager().getWorkspaceFilePath();
 
     	for( FileFilter filter : fc.getChoosableFileFilters()) {
     		fc.removeChoosableFileFilter(filter);
@@ -96,7 +96,7 @@ public class Dialogs {
     public static File pickFileExport() {
     	JFileChooser fc = new JFileChooser();
     	
-    	File f = master.getSettingsManager().getOpennedFile();
+    	File f = master.getSettingsManager().getImageFilePath();
 
     	for( FileFilter filter : fc.getChoosableFileFilters()) {
     		fc.removeChoosableFileFilter(filter);
@@ -110,7 +110,6 @@ public class Dialogs {
     	
 		fc.setCurrentDirectory( f);
 		fc.setSelectedFile(f);
-		
     		
     	int val = fc.showSaveDialog(null);
     	

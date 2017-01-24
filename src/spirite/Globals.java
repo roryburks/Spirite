@@ -25,7 +25,7 @@ import spirite.MDebug.ErrorType;
  * 
  * TODO: It is probably best to have either some kind of sorted list for binary
  * 	searches or a contextual tree so that the search time does not get out
- * 	of hand later
+ * 	of hand later.  Or just a HashMap
  */
 public class Globals {
 

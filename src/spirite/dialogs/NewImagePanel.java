@@ -63,8 +63,8 @@ public class NewImagePanel extends javax.swing.JPanel
         selected_color = (Color)colorCombo.getSelectedItem();
         colorPanel.setBackground(selected_color);
 
-        jtfWidth.setText( Integer.toString(master.getDefaultWidth()));
-        jtfHeight.setText( Integer.toString(master.getDefaultHeight()));
+        jtfWidth.setText( Integer.toString(master.getSettingsManager().getDefaultWidth()));
+        jtfHeight.setText( Integer.toString(master.getSettingsManager().getDefaultHeight()));
     }
 
 

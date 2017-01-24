@@ -19,11 +19,16 @@ import spirite.MDebug.ErrorType;
  */
 public class SettingsManager {
     private final Preferences prefs;
-	private File opennedFile = new File("E:/Documents/Workspace/Spirite/SIF");
+	private File workspaceFilePath;
+	private File imageFilePath;
 	private List<String> paletteList = null;
+	private boolean lastUsedWorkspace = true;
 	
 	public SettingsManager() {
         prefs = Preferences.userNodeForPackage(spirite.Main.class);
+        
+        workspaceFilePath = new File( prefs.get("wsPath", "E:/Documents/Workspace/Spirite/SIF"));
+        imageFilePath = new File(prefs.get("imgPath", System.getProperty("user.dir")));
         
 	}
 	
@@ -66,11 +71,27 @@ public class SettingsManager {
 		
 		return paletteList;
 	}
+
+	public File getWorkspaceFilePath() {
+		return workspaceFilePath;
+	}
+	public void setWorkspaceFilePath( File file) {
+		workspaceFilePath = file;
+		prefs.put("wsPath", file.getPath());
+		lastUsedWorkspace = true;
+	}
+	public File getImageFilePath() {
+		return imageFilePath;
+	}
+	public void setImageFilePath( File file) {
+		imageFilePath = file;
+		prefs.put("imgPath", file.getPath());
+		lastUsedWorkspace = false;
+	}
+	public File getOpenFilePath() {
+		return lastUsedWorkspace ? workspaceFilePath :imageFilePath;
+	}
 	
-	public File getOpennedFile() {
-		return opennedFile;
-	}
-	public void setOpennedFile( File file) {
-		opennedFile = file;
-	}
+	public int getDefaultWidth() {return 640;}
+    public int getDefaultHeight() { return 480;}
 }

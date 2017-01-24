@@ -71,7 +71,6 @@ public class Test1 {
 		try {
 			temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail( "Couldn't create TempFile.");
 		}
@@ -80,7 +79,6 @@ public class Test1 {
 		try {
 			ImageWorkspace ws2 = LoadEngine.loadWorkspace(temp);
 		} catch (BadSIFFFileException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail( "Couldn't loadback file.");
 		}

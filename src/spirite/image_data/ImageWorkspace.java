@@ -461,21 +461,22 @@ public class ImageWorkspace {
 			// Mostly duplicate code from the Layer part of bellow.
 			//	Could possibly generalize
 			Layer layer = ((LayerNode)nodeToDuplicate).getLayer();
-			// TODO
 			Layer dupe = layer.logicalDuplicate();
+			
+			// Duplicate all used Data into a map
 			Map< Integer, BufferedImage> dupeData = new HashMap<>();
-
 			for( ImageHandle handle : layer.getUsedImageData()) {
 				if( !dupeData.containsKey(handle.id)) {
 					dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
 				}
 			}
-
+			
+			// Import that Node
 			LayerNode newNode = 
 					groupTree.new LayerNode(dupe, nodeToDuplicate.name + " copy");
 			importData( newNode, dupeData);
 			
-
+			
 			executeChange( new AdditionChange( 
 					newNode, 
 					nodeToDuplicate.getParent(), 
@@ -487,7 +488,7 @@ public class ImageWorkspace {
 			GroupNode dupeRoot= groupTree.new GroupNode(nodeToDuplicate.name + " copy");
 			Map< Integer, BufferedImage> dupeData = new HashMap<>();
 
-			// Breadth-first duping
+			// Breadth-first queue for Duping
 			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
 
 			for( Node child: nodeToDuplicate.getChildren()) {
@@ -508,7 +509,7 @@ public class ImageWorkspace {
 				else {
 					Layer layer = ((LayerNode)next.toDupe).getLayer();
 					
-					// Clone any not-yet-duplicated Image data into the
+					// Deep Copy any not-yet-duplicated Image data into the
 					//	dupeData map
 					for( ImageHandle handle : layer.getUsedImageData()) {
 						if( !dupeData.containsKey(handle.id)) {

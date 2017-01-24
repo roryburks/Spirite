@@ -20,12 +20,9 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -303,6 +300,7 @@ public class RootFrame extends javax.swing.JFrame
 	        	if( f != null) {
 					SaveEngine.saveWorkspace( workspace, f);
 					workspace.fileSaved(f);
+					master.getSettingsManager().setWorkspaceFilePath(f);
 	        	}
         	}
         }
@@ -342,7 +340,7 @@ public class RootFrame extends javax.swing.JFrame
     		try {
 				BufferedImage bi = ImageIO.read(f);
 				master.createWorkspaceFromImage(bi, true).fileSaved(f);
-				master.getSettingsManager().setOpennedFile(f);
+				master.getSettingsManager().setImageFilePath(f);
 				return;
 			} catch (IOException e) {
 				attempted = true;
@@ -353,7 +351,7 @@ public class RootFrame extends javax.swing.JFrame
 			//	load it as an SIF
 			master.addWorkpace( 
 				LoadEngine.loadWorkspace( f), true);
-			master.getSettingsManager().setOpennedFile(f);
+			master.getSettingsManager().setWorkspaceFilePath(f);
 			return;
 		} catch (BadSIFFFileException e) {}
 		if( !attempted) {
@@ -363,7 +361,7 @@ public class RootFrame extends javax.swing.JFrame
     		try {
 				BufferedImage bi = ImageIO.read(f);
 				master.createWorkspaceFromImage(bi, true).fileSaved(f);
-				master.getSettingsManager().setOpennedFile(f);
+				master.getSettingsManager().setImageFilePath(f);
 				return;
 			} catch (IOException e) {}
 		}
@@ -387,6 +385,7 @@ public class RootFrame extends javax.swing.JFrame
     	
     	try {
 			ImageIO.write( bi, ext, f);
+			master.getSettingsManager().setImageFilePath(f);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
 			e.printStackTrace();

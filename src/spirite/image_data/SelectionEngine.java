@@ -95,16 +95,26 @@ public class SelectionEngine {
 		return buildingSelection;
 	}
 	
+	/** Returns a BuiltSelection which incorporates all relevant offset data
+	 * such that Workspace space is converted into Selection space on the
+	 * node it's selecting.
+	 * 
+	 * (Consider incorperating SelectedNode into this?)
+	 */
 	public BuiltSelection getBuiltSelection() {
 		int dx = 0;
 		int dy = 0;
+		Node node = workspace.getSelectedNode();
 		
-//		if( scope.get)
+		if( node != null) {
+			dx += node.getOffsetX();
+			dy += node.getOffsetY();
+		}
 		
 		return new BuiltSelection( 
 				scope.getSelection(), 
-				scope.getOffsetX(), 
-				scope.getOffsetY());
+				scope.getOffsetX() - dx, 
+				scope.getOffsetY() - dy);
 	}
 	public Selection getSelection() {
 		return scope.getSelection();

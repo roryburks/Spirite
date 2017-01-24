@@ -151,6 +151,7 @@ public class MasterControl
     		
     		if( f != null) {
     			SaveEngine.saveWorkspace(workspace, workspace.getFile());
+    			settingsManager.setWorkspaceFilePath(f);
     			return ret;
     		}
     		else
@@ -222,10 +223,6 @@ public class MasterControl
     		setCurrentWorkpace( ws);
     	}
     }
-
-    // TODO: Debug, should probably be handled in SettingsManager
-    public int getDefaultWidth() { return 128;}
-    public int getDefaultHeight() { return 128;}
 
     
 

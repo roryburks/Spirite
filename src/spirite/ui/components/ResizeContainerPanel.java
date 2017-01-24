@@ -1,21 +1,19 @@
 package spirite.ui.components;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.GroupLayout.Alignment;
 
 import spirite.MUtil;
 

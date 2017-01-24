@@ -16,8 +16,6 @@ import java.util.Set;
  * The PaletteManager stores both the active colors and the palette
  * of colors stored for easy access. 
  * 
- * TODO: make the palettes able to be saved and loaded.
- * 
  * @author Rory Burks
  *
  */

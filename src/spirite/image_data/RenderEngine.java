@@ -41,8 +41,6 @@ import spirite.image_data.layers.Layer;
  * in the future.  For now all it does is take the drawQueue and
  * draw it, but in the future it might buffer recently-rendered
  * iterations of images, control various rendering paramaters, etc.
- * 
- * TODO: Re-add Selection Layer drawing
  */
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver
@@ -507,7 +505,7 @@ public class RenderEngine
 			}
 		}
 		} catch( ConcurrentModificationException e){
-			// TODO: Very Bad.  Have to figure out where the collision is comind from.
+			// TODO: Very Bad.  Have to figure out where the collision is coming from.
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
