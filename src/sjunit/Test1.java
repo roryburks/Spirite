@@ -57,14 +57,14 @@ public class Test1 {
 		}
 		
 		// Verify Image dimension adjustment
-		workspace.addNewLayer(null, 100, 100, "Name", new Color(50,50,50));
-		workspace.addNewLayer(null, 50, 900, "Namex", new Color(50,50,50));
+		workspace.addNewSimpleLayer(null, 100, 100, "Name", new Color(50,50,50));
+		workspace.addNewSimpleLayer(null, 50, 900, "Namex", new Color(50,50,50));
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	
 		GroupNode beta = workspace.addGroupNode(null, "Beta");
-		workspace.addNewLayer(beta, 50,  50, "Beta_1", new Color( 0,100,0));
-		workspace.addNewLayer(beta, 50,  50, "Beta_2", new Color( 0,0,100));
-		workspace.addNewLayer(beta, 50,  50, "Beta_3", new Color( 100,0,0));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_1", new Color( 0,100,0));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_2", new Color( 0,0,100));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_3", new Color( 100,0,0));
 		
 		// Save file then load it to verify it's working
 		File temp = null;
@@ -151,14 +151,14 @@ public class Test1 {
 	public void testUndoEngineIntegrity() {
 		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
 		master.addWorkpace(workspace, false);
-		Layer layer1 = ((LayerNode)workspace.addNewLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
+		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
 		workspace.finishBuilding();
 		
 		UndoEngine engine = workspace.getUndoEngine();
 		
 		assert engine.getQueuePosition() == 0;
 		
-		Layer layer2 = ((LayerNode)workspace.addNewLayer(null, 160, 160, "two", new Color(0,0,0,0))).getLayer();
+		Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", new Color(0,0,0,0))).getLayer();
 		
 		
 		
@@ -168,7 +168,7 @@ public class Test1 {
 		BufferedImage img2 = deepCopy(img);
 		
 
-		Layer layer3 = ((LayerNode)workspace.addNewLayer(null, 900, 900, "three", new Color(0,0,0,0))).getLayer();
+		Layer layer3 = ((LayerNode)workspace.addNewSimpleLayer(null, 900, 900, "three", new Color(0,0,0,0))).getLayer();
 		
 		engine.undo();
 		

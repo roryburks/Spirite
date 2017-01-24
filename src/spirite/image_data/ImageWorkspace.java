@@ -61,10 +61,9 @@ public class ImageWorkspace {
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
 	private final DrawEngine drawEngine;
-	private final CacheManager cacheManager;
 	
 	// External Components
-//	private final CacheManager cacheManager;
+	private final CacheManager cacheManager;
 	
 	private GroupTree.Node selected = null;
 	private int workingID = 0;	// an incrementing unique ID per imageData
@@ -327,44 +326,31 @@ public class ImageWorkspace {
         }
 	}
 	
-	// :::: Group Node Modification
-	public LayerNode newLayer( int w, int h, String name, Color c) {
-		return 	addNewLayer( null, w, h, name, c);
-	}
 	
-	/** Imports the layer into the given context, assigning any ImageData contained
-	 * unique identifiers.
-	 * 	 */
-	public LayerNode importLayer( 
-			Node context, 
-			Layer layer, 
-			String name,
-			Map<Integer,BufferedImage> newData) 
-	{
-		return (LayerNode) importNode( context, groupTree.new LayerNode(layer,name), newData);
-	}
-	
-	
+	// :::: Content Addition
 	/** Imports the given Group Node and all included ImageData into it.
 	 * 
+	 * Importing Data works like this: it goes through the node and converts
+	 * all null-context'd ImageHandles and converts them to valid handles
+	 * such that they link to the the CachedImage creatted by the Data Map.
 	 * 
+	 * e.g. a LayerNode had a null-handle with ID 3 and in the Data Map,
+	 * 	3 is mapped to a Smiley Face, importData will import the Smiley
+	 * 	Face and assign it ID 7 (because ID 3 was already taken) and it will
+	 * 	change the Null-Handle to a context-handle with ID 7.  All null-context
+	 * 	handles with ID 3 will have the same ID (7) after Importing.
 	 */
-	public Node importNode( 
-			Node context, 
-			Node node, 
-			Map<Integer,BufferedImage> newData) 
-	{
-		importData(node, newData);
-		executeChange(createAdditionChange(node, context));
-		return node;
-	}
 	public void importData( 
 			Node node, 
 			Map<Integer,BufferedImage> newData)
 	{
+		// Construct a list of all LayerNodes within the context.
+		if( node == null) 
+			node = groupTree.getRoot();
 		List<Node> layers = node.getAllNodesST( new GroupTree.NodeValidatorLayer());
 		if( node instanceof LayerNode)
 			layers.add(node);
+		
 		Map<Integer,Integer> rebindMap = new HashMap<>();
 		List<ImageHandle> unlinked = new ArrayList<>();
 		
@@ -388,10 +374,13 @@ public class ImageWorkspace {
 		
 		// Step 3: Convert Null-Context ImageHandles to valid ImageHandles
 		for( ImageHandle data : unlinked) {
-			data.id = rebindMap.get(data.id);
-			data.context = this;
+			if( data.context != this) {
+				data.id = rebindMap.get(data.id);
+				data.context = this;
+			}
 		}
 	}
+	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
 		imageData.put( workingID, cacheManager.cacheImage(img, this));
@@ -404,7 +393,7 @@ public class ImageWorkspace {
 		return node;
 	}
 	
-	public LayerNode addNewLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
+	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
 		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.createGraphics();
@@ -418,6 +407,10 @@ public class ImageWorkspace {
 				name);
 	}
 	
+	/** A Shell Layer is a layer whose ImageHandles are not yet linked to
+	 * the Workspace.  When creating a complex custom Layer or constructing
+	 * multiple layers at once (e.g. when loading), it is useful to do this
+	 * and then call ImportData with the Data Map to add a Layer.*/
 	public LayerNode addShellLayer(GroupTree.Node context, Layer layer, String name ){
 		LayerNode node = groupTree.new LayerNode( layer, name);
 		
@@ -425,27 +418,8 @@ public class ImageWorkspace {
 		
 		return node;
 	}
-/*	public LayerNode addNewLayer( GroupTree.Node context, int identifier, String name) {
-		for( ImageHandle data : imageData.values()) {
-			if( data.id == identifier) {
-				// Create node then execute StructureChange event
-				LayerNode node = groupTree.new LayerNode( new SimpleLayer(data), name);
-
-				width = Math.max(width,  data.getWidth());
-				height = Math.max(height, data.getHeight());
-				
-				executeChange(createAdditionChange(node, context));
-				
-				return node;
-			}
-		}
-		
-		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to add a new Simple Layer using an identifier that does not exist in the current workspace. :" + identifier);
-		
-		return null;
-	}*/
 	
-	/** Internal attLayer method adds the Layer, tagging a Workspace Resize action
+	/** Internal addLayer method adds the Layer, tagging a Workspace Resize action
 	 * along with it if one is warranted.
 	 */
 	private void _addLayer(LayerNode node, Node context) 
@@ -472,6 +446,7 @@ public class ImageWorkspace {
 			executeChange( createAdditionChange(node,context));
 	}
 	
+	/** Adds a GroupNode at the given context. */
 	public GroupTree.GroupNode addGroupNode( GroupTree.Node context, String name) {
 		GroupTree.GroupNode newNode = groupTree.new GroupNode(name);
 		
@@ -480,6 +455,7 @@ public class ImageWorkspace {
 		return newNode;
 	}
 	
+	/** Duplicates the given node, placing its duplicate under the original. */
 	public Node duplicateNode( Node nodeToDuplicate) {
 		if( nodeToDuplicate instanceof LayerNode) {
 			// Mostly duplicate code from the Layer part of bellow.
@@ -495,10 +471,17 @@ public class ImageWorkspace {
 				}
 			}
 
-			return importNode(
-					nodeToDuplicate.getNextNode(),
-					groupTree.new LayerNode(dupe, nodeToDuplicate.name + " copy"), 
-					dupeData);
+			LayerNode newNode = 
+					groupTree.new LayerNode(dupe, nodeToDuplicate.name + " copy");
+			importData( newNode, dupeData);
+			
+
+			executeChange( new AdditionChange( 
+					newNode, 
+					nodeToDuplicate.getParent(), 
+					nodeToDuplicate.getNextNode()));
+			
+			return newNode;
 		}
 		else if( nodeToDuplicate instanceof GroupNode) {
 			GroupNode dupeRoot= groupTree.new GroupNode(nodeToDuplicate.name + " copy");
@@ -541,7 +524,15 @@ public class ImageWorkspace {
 				next.parent._add(dupe, null);
 			}
 			
-			return importNode(nodeToDuplicate.getNextNode(), dupeRoot, dupeData);
+			
+			importData(dupeRoot, dupeData);
+			
+			executeChange( new AdditionChange( 
+					dupeRoot, 
+					nodeToDuplicate.getParent(), 
+					nodeToDuplicate.getNextNode()));
+			
+			return dupeRoot;
 		}
 		
 		return null;

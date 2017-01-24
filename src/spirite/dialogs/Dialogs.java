@@ -141,7 +141,7 @@ public class Dialogs {
 			// Add the new layer contextually according to the selected Node
 			GroupTree.Node context = workspace.getSelectedNode();
 			
-			workspace.addNewLayer(context, w, h, name, c);
+			workspace.addNewSimpleLayer(context, w, h, name, c);
 			return true;
 		}
 		return false;
