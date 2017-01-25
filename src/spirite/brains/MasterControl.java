@@ -45,6 +45,8 @@ public class MasterControl
     private final FrameManager frameManager;
     private final PaletteManager palette;	// Requires SettingsManager
     private final RenderEngine renderEngine;// Require CacheManager
+    private final SaveEngine saveEngine;
+    private final LoadEngine loadEngine;
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -58,9 +60,10 @@ public class MasterControl
         frameManager = new FrameManager( this);
         renderEngine = new RenderEngine( this);	
         palette = new PaletteManager( this);
+        loadEngine = new LoadEngine(this);
+        saveEngine = new SaveEngine(this);
 
         Dialogs.setMaster(this); //// TODO BAD
-        LoadEngine.setMaster(this); //// TODO BAD
     }
 
 
@@ -92,7 +95,21 @@ public class MasterControl
     public CacheManager getCacheManager() {
     	return cacheManager;
     }
+    public SaveEngine getSaveEngine() {
+    	return saveEngine;
+    }
+    public LoadEngine getLoadEngine() {
+    	return loadEngine;
+    }
     
+    
+    public void saveWorkspace( ImageWorkspace workspace, File f) {
+    	if( workspace == null || f == null) return;
+    	saveEngine.saveWorkspace( workspace, f );
+		workspace.fileSaved(f);
+		saveEngine.removeAutosaved(workspace);
+		saveEngine.triggerAutosave(workspace, 5*60, 10);	// Autosave every 5 minutes
+    }
     
     // :::: Workspace API
     public void closeWorkspace( ImageWorkspace workspace) {
@@ -154,7 +171,8 @@ public class MasterControl
     			f = Dialogs.pickFileSave();
     		
     		if( f != null) {
-    			SaveEngine.saveWorkspace(workspace, workspace.getFile());
+    			saveEngine.saveWorkspace(workspace, workspace.getFile());
+    			saveEngine.removeAutosaved(workspace);
     			settingsManager.setWorkspaceFilePath(f);
     			return ret;
     		}
@@ -230,6 +248,10 @@ public class MasterControl
     		setCurrentWorkpace( ws);
     	}
     }
+    
+    // Properly implementing this will require a better understanding of Swing
+    //	and AWT threads, but the idea is to lock the Program from terminating
+    //	
 
     
 

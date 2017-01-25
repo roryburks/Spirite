@@ -41,9 +41,6 @@ import spirite.image_data.layers.Layer;
 public class Test1 {
 	MasterControl master = new MasterControl();
 	
-	public Test1() {
-		LoadEngine.setMaster(master);	// still bad
-	}
 	
 	/** Creates an image, saves it to a temp file, then loads it, comparing
 	 * image structures to verify that either Saving and Loading are working 
@@ -82,11 +79,11 @@ public class Test1 {
 			e.printStackTrace();
 			fail( "Couldn't create TempFile.");
 		}
-		SaveEngine.saveWorkspace(workspace, temp);
+		master.getSaveEngine().saveWorkspace(workspace, temp);
 		
 		ImageWorkspace ws2 = null;
 		try {
-			ws2 = LoadEngine.loadWorkspace(temp);
+			ws2 = master.getLoadEngine().loadWorkspace(temp);
 		} catch (BadSIFFFileException e) {
 			e.printStackTrace();
 			fail( "Couldn't loadback file.");
@@ -125,7 +122,7 @@ public class Test1 {
 			}
 		}
 		
-		for( ImageHandle data : workspace.getImageData()) {
+		for( ImageHandle data : workspace.getAllImages()) {
 			BufferedImage b1 = data.deepAccess();
 			BufferedImage b2 = data.deepAccess();
 			
@@ -269,6 +266,9 @@ public class Test1 {
 			for( int i=0; i<50; ++i) {
 				performRandomUndoableAction( workspace);
 			}
+			
+			workspace.relinquishCache(workspace.reserveCache());
+			
 			RenderSettings settings = new RenderSettings();
 			settings.workspace = workspace;
 			master.getRenderEngine().renderImage(settings);

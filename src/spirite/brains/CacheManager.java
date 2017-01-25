@@ -118,10 +118,14 @@ public class CacheManager {
 			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;;
 		}
 		
-		public void startTracking( Object obj) {
+		public void reserve( Object obj) {
 			users.add(obj);
 		}
 		public void relinquish( Object obj) {
+			if( !users.contains(obj)) {
+				MDebug.handleError( ErrorType.STRUCTURAL, this, "Tried to relinquish from a non-reserved object (this probably means the intended relinquish will never happen).");
+			}
+			
 			users.remove(obj);
 			if( users.isEmpty()) {
 				flush();

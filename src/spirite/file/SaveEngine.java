@@ -1,19 +1,27 @@
 package spirite.file;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.Timer;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
+import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.layers.Layer;
@@ -23,13 +31,111 @@ import spirite.image_data.layers.SimpleLayer;
  * SaveEngine is a static container for methods which saves images to
  * various file formats (but particularly the native SIF format)
  */
-public class SaveEngine {
+public class SaveEngine implements ActionListener, MWorkspaceObserver {
+
+	private final Timer autosaveTimer = new Timer(10000, this);
+	
+	public SaveEngine( MasterControl master) {
+		autosaveTimer.start();
+		
+		master.addWorkspaceObserver(this);
+	}
+	
+	
+	// Autosave functionality 
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		long time = System.currentTimeMillis();
+		for( AutoSaveWatcher watcher : watchers) {
+			if( watcher.workspace.getFile() != null &&
+				watcher.interval < (time - watcher.lastTime)/1000 &&
+				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome()) 
+			{
+				(new Thread(new Runnable() {
+					@Override
+					public void run() {
+						System.out.println("Saving Backup");
+						saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"));
+						System.out.println("Finished");
+					}
+				})).start();
+			}
+		}
+	}
+	
+	// Behavior might warrant a Map<Workspace,ASW>, but the syntax would
+	//	be dirtier and there is no real performanc threat here.
+	private final List<AutoSaveWatcher> watchers = new ArrayList<>();
+	
+	private class AutoSaveWatcher {
+		final ImageWorkspace workspace;
+		int interval;
+		int undoCount;
+		long lastTime;
+		int lastUndoSpot;
+		
+		AutoSaveWatcher( ImageWorkspace workspace, int interval, int undoCount) {
+			this.workspace = workspace;
+			this.interval = interval;
+			this.undoCount = undoCount;
+
+			this.lastTime = System.currentTimeMillis();
+			this.lastUndoSpot = workspace.getUndoEngine().getMetronome();
+		}
+	}
+	
+	/**
+	 * If interval is positive then it will auto-save the workspace every 
+	 * <code>interval</code> seconds if any changes have been made.  If
+	 * <code>undoCount</cod> is positive, it will auto-save every that many
+	 * undo's.  If both are set it'll reset only when both conditions are
+	 * true.
+	 */
+	public void triggerAutosave( ImageWorkspace workspace, int interval, int undoCount ) {
+		if( interval <= 0 && undoCount <= 0) return;
+		
+		for( AutoSaveWatcher watcher : watchers) {
+			if( watcher.workspace == workspace) {
+				watcher.interval = interval;
+				watcher.undoCount = undoCount;
+				return;
+			}
+		}
+		
+		watchers.add(new AutoSaveWatcher(workspace, interval, undoCount));
+	}
+	public void untriggerAutosave( ImageWorkspace workspace) {
+		Iterator<AutoSaveWatcher> it = watchers.iterator();
+		while( it.hasNext()) {
+			if( it.next().workspace == workspace) {
+				it.remove();
+			}
+		}
+	}
+	
+	public void removeAutosaved( ImageWorkspace workspace) {
+		File f = workspace.getFile();
+		if( f != null) {
+			 f= new File(workspace.getFile().getAbsolutePath() + "~");
+			 if( f.exists()) {
+				 f.delete();
+			 }
+		}
+	}
+	
 
 	/** Attempts to save the workspace to a SIF (native image format) file. */
-	public static void saveWorkspace( ImageWorkspace workspace, File file) {
+	public void saveWorkspace( ImageWorkspace workspace, File file) {
 		RandomAccessFile ra;
+		List<ImageHandle> handles = null;
 		
 		try {
+			// Copies both parts of 
+			GroupNode dupeRoot = (GroupNode) workspace.shallowDuplicateNode( workspace.getRootNode());
+			handles = workspace.reserveCache();
+			
+			
+			
 			if( file.exists()) {
 				file.delete();
 			}
@@ -48,10 +154,10 @@ public class SaveEngine {
 			ra.writeInt(MUtil.packInt(workspace.getWidth(), workspace.getHeight()));
 
 			// Save Group
-			saveGroupTree( workspace.getRootNode(), ra);
+			saveGroupTree( dupeRoot, ra);
 			
 			// Save Image Data
-			saveImageData( workspace.getImageData(), ra);
+			saveImageData( handles, ra);
 			
 			ra.close();
 			
@@ -59,12 +165,12 @@ public class SaveEngine {
 		}catch (UnsupportedEncodingException e) {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
 		}catch( IOException e) {
-			
 		}
+		workspace.relinquishCache(handles);
 	}
 	
 	/** Saves the GRPT chunk containing the Group Tree data */
-	private static void saveGroupTree( GroupTree.Node root, RandomAccessFile ra) 
+	private void saveGroupTree( GroupTree.Node root, RandomAccessFile ra) 
 		throws UnsupportedEncodingException, IOException
 	{
 		byte depth = 0;
@@ -82,7 +188,7 @@ public class SaveEngine {
 		
 		ra.seek(endPointer);
 	}
-	private static void _sgt_rec( GroupTree.Node node, RandomAccessFile ra, byte depth) 
+	private void _sgt_rec( GroupTree.Node node, RandomAccessFile ra, byte depth) 
 			throws UnsupportedEncodingException, IOException 
 	{
 		// [1] : Depth of Node in GroupTree
@@ -139,7 +245,7 @@ public class SaveEngine {
 	}
 	
 	/** Saves the IMGD chunk containing the Image data, each in PNG format. */
-	private static void saveImageData( List<ImageHandle> imageData, RandomAccessFile ra) 
+	private void saveImageData( List<ImageHandle> imageData, RandomAccessFile ra) 
 			throws UnsupportedEncodingException, IOException 
 	{
 		// [4] : "IMGD" tag
@@ -172,4 +278,14 @@ public class SaveEngine {
 		
 		ra.seek(filePointer2);
 	}
+
+
+	// :::: MWorkspaceObserver
+	@Override public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {}
+	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override public void removeWorkspace(ImageWorkspace workspace) {
+		untriggerAutosave( workspace);
+	}
+
+
 }

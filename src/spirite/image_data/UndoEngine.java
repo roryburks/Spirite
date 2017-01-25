@@ -62,6 +62,9 @@ public class UndoEngine {
 	
 	private final ImageWorkspace workspace;
 	private final CacheManager cacheManager;
+	
+	private int met = 0;	// Keeps track of how many changes there have been
+							// since the last reset.
 
 	/** Marks the point on the undoQueue where the image is considered "unchanged" */
 	private int saveSpot = -1;	
@@ -113,6 +116,7 @@ public class UndoEngine {
 		assert( contexts.get(0) instanceof NullContext);
 		assert( contexts.get(1) instanceof CompositeContext);
 		saveSpot = 0;
+		met = 0;
 	}
 	
 	/***
@@ -140,6 +144,13 @@ public class UndoEngine {
 		while( pos > getQueuePosition()) {
 			redo();
 		}
+	}
+	
+	/** Returns the number of UndoActions it's been since the last time
+	 * reset was called (or since creation if it's never been called).
+	 */
+	public int getMetronome() {
+		return met;
 	}
 	
 	// :::: Called by ImageWorkapce
@@ -306,6 +317,8 @@ public class UndoEngine {
 			contexts.add(new ImageContext( ((ImageAction)action).data));
 		}
 		
+		met++;
+		
 		// Cull 
 		cull();
 	}
@@ -381,6 +394,7 @@ public class UndoEngine {
 		if( !queuePosition.hasPrevious())
 			return false;
 		else {
+			--met;
 			UndoContext toUndo = queuePosition.previous();
 			toUndo.undo();
 			triggerUndo();
@@ -397,6 +411,7 @@ public class UndoEngine {
 			return false;
 		}
 		else {
+			++met;
 			queuePosition.next().redo();
 			triggerRedo();
 			return true;

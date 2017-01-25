@@ -152,6 +152,7 @@ public class ImageWorkspace {
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
 			System.out.println("Clearing Unused Workspace Data");
+			imageData.get(i).relinquish(this);
 			imageData.remove(i);
 		}
 	}
@@ -246,7 +247,7 @@ public class ImageWorkspace {
 		return groupTree;
 	}
 	
-	public List<ImageHandle> getImageData() {
+	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
 		
 		for( Entry<Integer,CachedImage> entry : imageData.entrySet()) {
@@ -426,7 +427,9 @@ public class ImageWorkspace {
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,BufferedImage> entry : newData.entrySet()) {
-			imageData.put( workingID, cacheManager.cacheImage(entry.getValue(), this));
+			CachedImage ci = cacheManager.cacheImage(entry.getValue(), this);
+			ci.reserve(this);
+			imageData.put( workingID, ci);
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -442,7 +445,9 @@ public class ImageWorkspace {
 	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
-		imageData.put( workingID, cacheManager.cacheImage(img, this));
+		CachedImage ci = cacheManager.cacheImage(img, this);
+		ci.reserve(this);
+		imageData.put( workingID, ci);
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 
@@ -1256,9 +1261,46 @@ public class ImageWorkspace {
     public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}
     public void removeReferenceObserve( MReferenceObserver obs) { referenceObservers.remove(obs); }
 
+    
+    // :::: Resource Management
+    private final Map<List<ImageHandle>,List<CachedImage>> reserveMap = new HashMap<>();
+    
+    
+    /**
+     * By reserving the cache, you are preserving its state in memory until you
+     * are done with it.  Be sure to call "relinquishCache" with the exact same
+     * list or else the memory will never be freed.  This makes sure asynchronous
+     * uses of the data (for example File Saving) does not get corrupted while 
+     * not leaking access to CachedImages
+     */
+    public List<ImageHandle> reserveCache() {
+    	List<ImageHandle> handles = new ArrayList<>(imageData.size());
+    	List<CachedImage> caches = new ArrayList<>(imageData.size());
+        	
+    	for( Entry<Integer,CachedImage> entry : imageData.entrySet()) {
+    		handles.add( new ImageHandle(this, entry.getKey()));
+    		caches.add( entry.getValue());
+    	}
+    	for( CachedImage ci :  caches) {
+    		ci.reserve(handles);
+    	}
+    	
+    	reserveMap.put(handles, caches);
+
+    	return handles;
+    }
+    
+    /** Relinquish a state of  CachedImages as given by reserveCache */
+    public void relinquishCache( List<ImageHandle> handles) {
+    	for( CachedImage ci :  reserveMap.get(handles)) {
+    		ci.relinquish(handles);
+    	}
+    	reserveMap.remove(handles);
+    }
+    
 	public void cleanup() {
 		for( CachedImage img : imageData.values()) {
-			img.flush();
+			img.relinquish(this);
 		}
 		
 		undoEngine.cleanup();

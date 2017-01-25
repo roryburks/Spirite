@@ -30,15 +30,18 @@ import spirite.image_data.layers.SimpleLayer;
  * various file formats (but particularly the native SIF format)
  */
 public class LoadEngine {
-	private static MasterControl master;
-	public static void setMaster( MasterControl m) { master = m;}
+	private final MasterControl master;
+	
+	public LoadEngine(MasterControl master) {
+		this.master = master;
+	}
 	
 	private static class LoadSettings {
 		int version;
 	}
 	
 	/** Attempts to load the given file into a new Workspace. */
-	public static ImageWorkspace loadWorkspace( File file) 
+	public ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
 	{
 		RandomAccessFile ra;
@@ -135,7 +138,7 @@ public class LoadEngine {
 	 * 
 	 * Note: assumes that the file is already aligned to the first chunk.
 	 */
-	private static List<ChunkInfo> parseChunks(RandomAccessFile ra) 
+	private List<ChunkInfo> parseChunks(RandomAccessFile ra) 
 			throws IOException 
 	{
 		List<ChunkInfo> list = new ArrayList<ChunkInfo>();
@@ -160,7 +163,7 @@ public class LoadEngine {
 	 * Read ImageData Section Data
 	 * [IMGD]
 	 */
-	private static Map<Integer,BufferedImage> parseImageDataSection(
+	private Map<Integer,BufferedImage> parseImageDataSection(
 			RandomAccessFile ra, int chunkSize) 
 			throws IOException 
 	{
@@ -188,7 +191,7 @@ public class LoadEngine {
 	 * Read GroupTree Section Data
 	 * [GRPT]
 	 */
-	private static void parseGroupTreeSection( 
+	private void parseGroupTreeSection( 
 			ImageWorkspace workspace, 
 			RandomAccessFile ra, 
 			int chunkSize,

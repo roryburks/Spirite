@@ -52,7 +52,7 @@ public class Dialogs {
     	for( FileFilter filter : fc.getChoosableFileFilters()) {
     		fc.removeChoosableFileFilter(filter);
     	}
-    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif", "sif~"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("Spirite Workspace File", "sif"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg", "jpeg"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG File", "png"));
@@ -101,7 +101,7 @@ public class Dialogs {
     	for( FileFilter filter : fc.getChoosableFileFilters()) {
     		fc.removeChoosableFileFilter(filter);
     	}
-    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("Supported Image Files", "jpg", "jpeg", "png", "bmp", "sif", "sif~"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("Spirite Workspace File", "sif"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg", "jpeg"));
     	fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG File", "png"));

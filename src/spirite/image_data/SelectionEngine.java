@@ -430,7 +430,7 @@ public class SelectionEngine {
 			// Separate onAdd event rather than constructor because liftSelection
 			//	creates a StartSelectionAction that doesn't necessarily get 
 			//	added to the UndoEngine
-			this.cachedData.startTracking(this);
+			this.cachedData.reserve(this);
 		}
 		@Override
 		protected void onDispatch() {
@@ -441,7 +441,7 @@ public class SelectionEngine {
 		final CachedImage cachedData;
 		EndSelectionAction( StartSelectionAction start) {
 			this.cachedData = start.cachedData;
-			this.cachedData.startTracking(this);
+			this.cachedData.reserve(this);
 		}
 		@Override protected void performAction() {
 			scope.liftedImage = null;
@@ -457,7 +457,7 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void onAdd() {
-			this.cachedData.startTracking(this);
+			this.cachedData.reserve(this);
 		}
 		@Override
 		protected void onDispatch() {

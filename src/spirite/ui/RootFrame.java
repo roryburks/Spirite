@@ -33,9 +33,7 @@ import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.dialogs.NewImagePanel;
-import spirite.file.LoadEngine;
 import spirite.file.LoadEngine.BadSIFFFileException;
-import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -309,17 +307,17 @@ public class RootFrame extends javax.swing.JFrame
 	        		f = Dialogs.pickFileSave();
 	        	
 	        	if( f != null) {
-					SaveEngine.saveWorkspace( workspace, f);
-					workspace.fileSaved(f);
-					master.getSettingsManager().setWorkspaceFilePath(f);
+	        		master.saveWorkspace(workspace, f);
+	        		master.getSettingsManager().setWorkspaceFilePath(f);
 	        	}
         	}
         }
 		else if( command.equals("save_image_as")) {
 			File f = Dialogs.pickFileSave();
 			
-			if( f != null)
-				SaveEngine.saveWorkspace( master.getCurrentWorkspace(), f);
+			if( f != null) {
+				master.saveWorkspace(master.getCurrentWorkspace(), f);
+			}
 		}
 		else if( command.equals("undo")) {
 			if( master.getCurrentWorkspace() != null)
@@ -360,9 +358,10 @@ public class RootFrame extends javax.swing.JFrame
 		try {
 			// If it's not recognized (or failed to load) as a normal file, try to
 			//	load it as an SIF
-			ImageWorkspace ws = master.addWorkpace( 
-				LoadEngine.loadWorkspace( f), true);
+			ImageWorkspace ws = master.getLoadEngine().loadWorkspace( f);
 			ws.fileSaved(f);
+			master.addWorkpace( ws, true);
+			master.getSaveEngine().triggerAutosave(ws, 10, 10);	// Autosave every 5 minutes
 			master.getSettingsManager().setWorkspaceFilePath(f);
 			return;
 		} catch (BadSIFFFileException e) {}
@@ -548,6 +547,9 @@ public class RootFrame extends javax.swing.JFrame
 			
 		}
 		
+//		if( master.isLocked()) {
+			
+	//	}
 		this.dispose();
         System.exit(0);
 	}
