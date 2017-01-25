@@ -96,6 +96,9 @@ public class MasterControl
     
     // :::: Workspace API
     public void closeWorkspace( ImageWorkspace workspace) {
+    	closeWorkspace(workspace, true);
+    }
+    public void closeWorkspace( ImageWorkspace workspace, boolean promptSave) {
     	int i = workspaces.indexOf(workspace);
     	
     	if( i == -1) {
@@ -103,12 +106,13 @@ public class MasterControl
     		return;
     	}
     	
-    	if( workspace.hasChanged()) {
+    	if( promptSave && workspace.hasChanged() ) {
     		if( promptSave(workspace) == JOptionPane.CANCEL_OPTION)
     			return;
     	}
     	
     	// Remove the workspace
+    	workspace.cleanup();
     	workspaces.remove(i);
     	triggerRemoveWorkspace(workspace);
     	

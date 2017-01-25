@@ -314,23 +314,33 @@ public class UndoEngine {
 	 * by the cullBehavior) and gets rid of the oldest undo actions until there
 	 * aren't. */
 	private void cull() {
-		while( queue.size() > 0 && cacheManager.getCacheSize() > absoluteMaxCache) 
+		while( queue.size() > 0 && cacheManager.getCacheSize() > absoluteMaxCache) {
+
+			System.out.println("Cull (Max)");
 			clipTail();
+		}
 		
 		switch( cullBehavior) {
 		case CACHE_AND_COUNT:
 			while( cacheManager.getCacheSize() > maxCacheSize 
-					&& queue.size() > cacheManager.getCacheSize())
+					&& queue.size() > cacheManager.getCacheSize()) {
+
+				System.out.println("Cull (CaC)");
 				clipTail();
+			}
 			break;
 		case ONLY_CACHE:
 			while( cacheManager.getCacheSize() > maxCacheSize
-					&& queue.size() > 0)
+					&& queue.size() > 0) {
+				System.out.println("Cull (Cache)");
 				clipTail();
+			}
 			break;
 		case ONLY_UNDO_COUNT:
-			while( queue.size() > maxQueueSize)
+			while( queue.size() > maxQueueSize){
+				System.out.println("Cull Queue");
 				clipTail();
+			}
 			break;
 			
 		}
@@ -1125,4 +1135,9 @@ public class UndoEngine {
     		obs.redo();
     	}
     }
+
+	public void cleanup() {
+		for( UndoContext context : contexts)
+			context.flush();
+	}
 }

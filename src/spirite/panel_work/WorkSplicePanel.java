@@ -33,8 +33,8 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
     public WorkSplicePanel( WorkPanel context, MasterControl master) {
     	this.context = context;
         this.zoomer = context.zoomer;
-        drawPanel = new DrawPanel( context, master);
         previewPanel = new ReferencePanel(context, master);
+        drawPanel = new DrawPanel( context, master);
         initComponents();
         
         context.workspace.addReferenceObserve(this);
@@ -52,11 +52,11 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
         GroupLayout layout = new javax.swing.GroupLayout(this);
 
         layout.setHorizontalGroup( layout.createParallelGroup()
-        		.addComponent(drawPanel)
-        		.addComponent(previewPanel));
+        		.addComponent(previewPanel)
+        		.addComponent(drawPanel));
         layout.setVerticalGroup( layout.createParallelGroup()
-        		.addComponent(drawPanel)
-        		.addComponent(previewPanel));
+        		.addComponent(previewPanel)
+        		.addComponent(drawPanel));
         this.setLayout(layout);
     }                      
     
@@ -79,7 +79,7 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
     DrawPanel drawPanel;
     ReferencePanel previewPanel;
 
-	@Override	public void referenceStructureChanged() {}
+	@Override	public void referenceStructureChanged(boolean hard) {}
 	@Override
 	public void toggleReference(boolean referenceMode) {
 		setBackground( referenceMode ? referenceBG : normalBG);

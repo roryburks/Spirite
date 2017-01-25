@@ -2,8 +2,10 @@
 
 package spirite.panel_work;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -58,6 +60,8 @@ public class ReferencePanel extends JPanel
             settings.node = workspace.getReferenceRoot();
             
             BufferedImage image = renderer.renderImage(settings);
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getRefAlpha()));
             g.drawImage( image, 
             		zoomer.itsX(0), zoomer.itsY(0),
             		zoomer.itsX(image.getWidth()), zoomer.itsY(image.getHeight()),
@@ -75,7 +79,7 @@ public class ReferencePanel extends JPanel
 	
 	// :::: ReferenceObserver
 	@Override
-	public void referenceStructureChanged() {
+	public void referenceStructureChanged(boolean hard) {
 		repaint();
 		
 	}

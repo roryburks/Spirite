@@ -292,6 +292,7 @@ public class ImageWorkspace {
 	
 	// :::: Reference Management
 	private boolean editingReference = false;
+	private float refAlpha = 1.0f;
 	public boolean isEditingReference() {
 		return editingReference;
 	}
@@ -302,12 +303,20 @@ public class ImageWorkspace {
 		}
 	}
 	
+	public float getRefAlpha() {return refAlpha;}
+	public void setRefAlpha( float alpha) { 
+		this.refAlpha = alpha;
+		triggerReferenceStructureChanged(false);
+	}
+	
+	
+	
 	public void addReferenceNode( Node toAdd, Node parent, Node before) {
 		if( !verifyReference(parent) || (before != null && !verifyReference(before)))
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to insert into reference");
 		else {
 			parent._add(toAdd, before);
-			triggerReferenceStructureChanged();
+			triggerReferenceStructureChanged(true);
 		}
 	}
 	public void clearReferenceNode( Node toRem) {
@@ -724,7 +733,7 @@ public class ImageWorkspace {
 		else {
 			change.execute();
 			if( verifyReference(change.moveNode)) 
-				triggerReferenceStructureChanged();
+				triggerReferenceStructureChanged(true);
 		}
 	}
 	
@@ -1229,15 +1238,15 @@ public class ImageWorkspace {
      * is toggled between reference of non-reference.
      */
     public static interface MReferenceObserver {
-    	public void referenceStructureChanged();
+    	public void referenceStructureChanged( boolean hard);
 //    	public void referenceImageChanged();
     	public void toggleReference( boolean referenceMode);
     }
     private final List<MReferenceObserver> referenceObservers = new ArrayList<>();
 
-    private void triggerReferenceStructureChanged() {
+    public void triggerReferenceStructureChanged(boolean hard) {
         for( MReferenceObserver obs : referenceObservers)
-        	obs.referenceStructureChanged();
+        	obs.referenceStructureChanged( hard);
     }
     private void triggerReferenceToggle(boolean edit) {
         for( MReferenceObserver obs : referenceObservers)
@@ -1246,6 +1255,14 @@ public class ImageWorkspace {
 
     public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}
     public void removeReferenceObserve( MReferenceObserver obs) { referenceObservers.remove(obs); }
+
+	public void cleanup() {
+		for( CachedImage img : imageData.values()) {
+			img.flush();
+		}
+		
+		undoEngine.cleanup();
+	}
     
     
 }

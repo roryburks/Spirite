@@ -77,8 +77,14 @@ public class Penner
 	
 	private int x, y;
 	
-	private enum STATE { READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
-		PICKING};
+	private enum STATE { 
+		READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
+		PICKING,
+		
+		// Reference-Related
+		REF_GLOBAL_MOVE, REF_FINE_ZOOM,
+		REF_NODE_MOVE
+	};
 	private STATE state = STATE.READY;
 	private int stateVar = 0;
 	
@@ -119,6 +125,8 @@ public class Penner
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
 		
+		if( pbe.button.typeNumber > 3) return;	// Shit/Ctrl/Etc events
+		
 		if( pbe.button.value == true) {
 			x = wX;
 			y = wY;
@@ -126,43 +134,54 @@ public class Penner
 			shiftStartY = wY;
 			shiftMode = 0;
 			
-			PButton.Type button = pbe.button.getType();
 			
-			if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
-				return;
-			
-			Tool tool = toolsetManager.getSelectedTool();
-			
-			switch( tool) {
-			case PEN:
-				if( holdingCtrl)  {
-					pickColor(button == PButton.Type.LEFT);
+			if( workspace.isEditingReference()) {
+				if( holdingCtrl)
+					state = STATE.REF_FINE_ZOOM;
+				else
+					state = STATE.REF_GLOBAL_MOVE;
+				
+			}
+			else {
+				PButton.Type button = pbe.button.getType();
+				
+				if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
+					return;
+				
+				Tool tool = toolsetManager.getSelectedTool();
+				
+				switch( tool) {
+				case PEN:
+					if( holdingCtrl)  {
+						pickColor(button == PButton.Type.LEFT);
+						state = STATE.PICKING;
+						stateVar = (button == PButton.Type.LEFT)?1:0;
+					}
+					else
+						startPen( button == PButton.Type.LEFT);
+					break;
+				case ERASER:
+					startErase();
+					break;
+				case FILL:
+					fill( button == PButton.Type.LEFT);
+					break;
+				case BOX_SELECTION:
+					startSelection();
+					break;
+				case MOVE:
+					startMove();
+					break;
+				case COLOR_PICKER:
+					pickColor( button == PButton.Type.LEFT);
 					state = STATE.PICKING;
 					stateVar = (button == PButton.Type.LEFT)?1:0;
+					break;
 				}
-				else
-					startPen( button == PButton.Type.LEFT);
-				break;
-			case ERASER:
-				startErase();
-				break;
-			case FILL:
-				fill( button == PButton.Type.LEFT);
-				break;
-			case BOX_SELECTION:
-				startSelection();
-				break;
-			case MOVE:
-				startMove();
-				break;
-			case COLOR_PICKER:
-				pickColor( button == PButton.Type.LEFT);
-				state = STATE.PICKING;
-				stateVar = (button == PButton.Type.LEFT)?1:0;
-				break;
+
+				activeTool = tool;
 			}
 			
-			activeTool = tool;
 			
 /*			if( selectionEngine.getSelection() != null
 					&& state != STATE.FORMING_SELECTION
@@ -399,8 +418,18 @@ public class Penner
 		case PICKING:
 			pickColor( stateVar == 1);
 			break;
-		default:
+			
+		case REF_GLOBAL_MOVE:
+			context.refzoomer.setCX( context.refzoomer.getCX()+ (x - oldX));
+			context.refzoomer.setCY( context.refzoomer.getCY()+ (y - oldY));
 			break;
+		case REF_FINE_ZOOM:
+			System.out.println(y - oldY + "," + Math.pow(1.0005, 1+(y-oldY)));
+			context.refzoomer.setFineZoom((float) (context.refzoomer.getZoom() * Math.pow(1.0005, 1+(y-oldY))));
+			break;
+		case REF_NODE_MOVE:
+			
+		case READY:
 		}
 		
 		oldX = x;

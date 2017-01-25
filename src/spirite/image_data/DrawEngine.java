@@ -100,9 +100,9 @@ public class DrawEngine {
 			this.y = other.y;
 			this.pressure = other.pressure;
 		}
-		int x;
-		int y;
-		float pressure = 1.0f;
+		public int x;
+		public int y;
+		public float pressure = 1.0f;
 	}
 	
 	public static interface PenDynamics {
@@ -448,7 +448,7 @@ public class DrawEngine {
 		}
 		
 		@Override
-		protected void performImageAction( ImageHandle data) {
+		public void performImageAction( ImageHandle data) {
 			queueSelectionMask(mask);
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			

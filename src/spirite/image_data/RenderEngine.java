@@ -33,6 +33,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.layers.Layer;
 
@@ -43,7 +44,7 @@ import spirite.image_data.layers.Layer;
  * iterations of images, control various rendering paramaters, etc.
  */
 public class RenderEngine 
-	implements MImageObserver, MWorkspaceObserver
+	implements MImageObserver, MWorkspaceObserver, MReferenceObserver
 {
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final CacheManager cacheManager;
@@ -57,6 +58,7 @@ public class RenderEngine
 			
 			if( ws != null) {
 				ws.addImageObserver( this);
+				ws.addReferenceObserve(this);
 			}
 		}
 		master.addWorkspaceObserver(this);
@@ -521,6 +523,7 @@ public class RenderEngine
 	@Override	public void currentWorkspaceChanged( ImageWorkspace ws, ImageWorkspace old) {}
 	@Override	public void newWorkspace( ImageWorkspace ws) {
 		ws.addImageObserver( this);
+		ws.addReferenceObserve(this);
 	}
 	@Override
 	public void removeWorkspace( ImageWorkspace ws) {
@@ -539,6 +542,19 @@ public class RenderEngine
 				it.remove();
 			}
 		}
+	}
+	@Override
+	public void referenceStructureChanged(boolean hard) {
+		// TODO: VERY DEBUG
+		for(CachedImage c: imageCache.values())
+			c.flush();
+		imageCache.clear();
+		
+	}
+	@Override
+	public void toggleReference(boolean referenceMode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

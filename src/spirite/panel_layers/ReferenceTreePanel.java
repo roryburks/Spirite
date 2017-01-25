@@ -15,9 +15,11 @@ import spirite.image_data.ImageWorkspace.MReferenceObserver;
 public class ReferenceTreePanel extends NodeTree 
 	implements MReferenceObserver 
 {
+	private final ReferenceSchemePanel context;
 
-	public ReferenceTreePanel(MasterControl master) {
+	public ReferenceTreePanel(MasterControl master, ReferenceSchemePanel context) {
 		super(master);
+		this.context= context;
 		
 		super.constructFromNode(null);
 		nodeRoot = null;
@@ -150,8 +152,9 @@ public class ReferenceTreePanel extends NodeTree
 
 	// :::: MReferenceObserver
 	@Override
-	public void referenceStructureChanged() {
-		constructFromRoot();
+	public void referenceStructureChanged(boolean hard) {
+		if( hard)
+			constructFromRoot();
 		
 	}
 

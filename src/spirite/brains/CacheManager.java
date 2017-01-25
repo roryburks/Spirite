@@ -1,6 +1,7 @@
 package spirite.brains;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -52,6 +53,10 @@ public class CacheManager {
 	}
 	
 	public class CacheDomain {
+		private final Object context;
+		private CacheDomain( Object context) {
+			this.context = context;
+		}
 		List<CachedImage> list = new LinkedList<>();
 		public int getSize() {
 			int size = 0;
@@ -78,7 +83,7 @@ public class CacheManager {
 			CacheDomain context = cache.get(domain);
 			
 			if( context == null) {
-				context = new CacheDomain();
+				context = new CacheDomain(domain);
 				cache.put(domain, context);
 			}
 			context.list.add(this);
@@ -93,10 +98,19 @@ public class CacheManager {
 			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 			data.flush();
 			
+			List<CacheDomain> toRem = new ArrayList<CacheDomain>();
 			for( CacheDomain context : cache.values()) {
 				int i = context.list.indexOf(this);
 				if( i != -1) context.list.remove(i);
+				
+				if( context.list.isEmpty()) {
+					toRem.add(context);
+				}
 			}
+			for( CacheDomain rem : toRem) {
+				cache.remove(rem.context);
+			}
+			
 		}
 		
 		void setData( BufferedImage image) {

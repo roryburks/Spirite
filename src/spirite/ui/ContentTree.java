@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -20,6 +21,7 @@ import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -124,6 +126,7 @@ public class ContentTree extends JPanel
 
 		// Initialize Drag-Drop Manager
 		transferHandler = new CCTTransferHandler();
+		tree.setTransferHandler(null);
 		this.setTransferHandler(transferHandler);	// Prevent default tree copy,paste,and drag/drop
 		tree.setSelectionModel( new LockingSelectionModel());
 		
@@ -452,6 +455,14 @@ public class ContentTree extends JPanel
 							DnDConstants.ACTION_COPY_OR_MOVE, 
 							this);
 		}
+
+		// :::: Export 
+		// Unused to make sure no default mechanisms get in our way
+		@Override public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException {}
+		@Override public void exportAsDrag(JComponent comp, InputEvent e, int action) {}
+		@Override		public int getSourceActions( JComponent c) {return -1;}
+		@Override		public Transferable createTransferable( JComponent c) {	return null;}
+		@Override 		public void exportDone( JComponent c, Transferable t, int action) {}
 		
 	
 		// :::: Import

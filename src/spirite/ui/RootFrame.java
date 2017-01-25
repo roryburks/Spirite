@@ -473,8 +473,8 @@ public class RootFrame extends javax.swing.JFrame
     		settings.node = (GroupTree.GroupNode)node;
 
     	BufferedImage img = master.getRenderEngine().renderImage(settings);
-    	TransferableImage transfer = new TransferableImage(img);
     	
+    	TransferableImage transfer = new TransferableImage(img);
 
     	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
     	c.setContents(transfer, null);

@@ -6,10 +6,12 @@ package sjunit;
 import static org.junit.Assert.fail;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -20,6 +22,11 @@ import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.DrawEngine.Method;
+import spirite.image_data.DrawEngine.PenState;
+import spirite.image_data.DrawEngine.StrokeAction;
+import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -173,4 +180,91 @@ public class Test1 {
 		assert compareImages( img2, master.getRenderEngine().renderImage(settings));
 	}
 
+	Random rn = new Random(System.nanoTime());
+	public void performRandomUndoableAction(ImageWorkspace workspace) {
+		int random = rn.nextInt(4);
+		switch(rn.nextInt(4)) {
+		case 0:
+			// Add layer
+			workspace.addNewSimpleLayer(
+					getRandomNode(workspace), 
+					100 + rn.nextInt(100), 100 + rn.nextInt(100)
+					, Float.toHexString(rn.nextFloat()), randomColor());
+			break;
+		case 1:
+			// Add Group
+//			workspace.addGroupNode(getRandomNode(workspace), Float.toHexString(rn.nextFloat()));
+			break;
+		case 2:
+		case 3:
+			// Add Random Stroke
+			workspace.setSelectedNode(randomLayerNode(workspace));
+			
+			PenState p[] = new PenState[50];
+			for( int i=0; i<50; ++i) {
+				p[i] = new PenState(rn.nextInt(200),
+						 rn.nextInt(200),
+						 rn.nextFloat());
+			}
+			
+			StrokeParams params = new StrokeParams();
+			
+			params.setAlpha( rn.nextFloat());
+			params.setMethod((random == 3)?Method.BASIC:Method.ERASE);
+			params.setColor( randomColor() );
+			params.setWidth( rn.nextInt(5));
+			
+			StrokeAction action =
+			workspace.getDrawEngine().new StrokeAction(params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.getActiveData());
+			
+			action.performImageAction(workspace.getActiveData());
+			workspace.getUndoEngine().storeAction(action);
+		}
+	}
+	
+	public Color randomColor() {
+		return new Color(rn.nextInt(255),rn.nextInt(255),rn.nextInt(255));
+	}
+	
+	public Node getRandomNode( ImageWorkspace workspace) {
+		List<Node> l = workspace.getRootNode().getAllNodes();
+		if( l.size() <= 0) return null;
+		return l.get( rn.nextInt(l.size()));
+	}
+	public LayerNode randomLayerNode( ImageWorkspace workspace) {
+		List<Node> l = workspace.getRootNode().getAllNodesST( new GroupTree.NodeValidatorLayer());
+		
+		if( l.size() == 0) return null;
+		
+		return (LayerNode) l.get( rn.nextInt(l.size()));
+	}
+	
+	/*** Performs a series of randomly-constructed semi-memory-intensive actions
+	 * , closing the workspace regularly and creating new ones to make sure cache
+	 * data is getting cleared.
+	 * 
+	 * Use in conjunction with VisualVM or such if you suspect untracked leaks.
+	 */
+	@Test
+	public void testCacheClearing() {
+		for( int round=0; round < 1000; ++round) {
+			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+			workspace.finishBuilding();
+			master.addWorkpace(workspace, false);
+			
+			workspace.addNewSimpleLayer(null, 50, 50, "BASE", new Color(0,0,0,0));
+			for( int i=0; i<50; ++i) {
+				performRandomUndoableAction( workspace);
+			}
+			RenderSettings settings = new RenderSettings();
+			settings.workspace = workspace;
+			master.getRenderEngine().renderImage(settings);
+			
+			master.closeWorkspace(workspace, false);
+
+			if( master.getCacheManager().getCacheSize() > 30000) {
+				fail( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
+			}
+		}
+	}
 }

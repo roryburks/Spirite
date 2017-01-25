@@ -145,7 +145,7 @@ public class NodeTree extends ContentTree
     // :::: MImageObserver interface
     @SuppressWarnings("unchecked")
 	@Override
-	public void imageChanged(ImageChangeEvent evt) {
+	public synchronized void imageChanged(ImageChangeEvent evt) {
     	Enumeration<DefaultMutableTreeNode> e =
     			((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
 
@@ -188,7 +188,7 @@ public class NodeTree extends ContentTree
 				// 	probably causes a lot of unnecessary code to execute internally
 				//	there might be a far better Swing-intended way to repaint a
 				//	particular node within the tree
-				tree.repaint(tree.getPathBounds(new TreePath(treeNode.getPath())));
+				tree.repaint();
     		}
     	}
     }
