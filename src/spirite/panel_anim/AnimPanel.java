@@ -25,17 +25,22 @@ import javax.swing.event.DocumentListener;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
+import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.image_data.AnimationManager.AnimationStructureEvent;
+import spirite.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.animation_data.AbstractAnimation;
 import spirite.image_data.animation_data.SimpleAnimation;
+import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
 
 
 
-public class AnimPanel extends javax.swing.JPanel 
-        implements MCurrentImageObserver, ActionListener, WindowListener, DocumentListener
+public class AnimPanel extends OmniComponent
+        implements MCurrentImageObserver, ActionListener, WindowListener, 
+        	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver
 {
 	private static final long serialVersionUID = 1L;
-	private final MasterControl master;
 	private final Timer timer;
 	private boolean isPlaying = false;
 	
@@ -49,13 +54,24 @@ public class AnimPanel extends javax.swing.JPanel
 	private float end = 2.0f;
 	private float tps = 0.2f;
 	private float met = 0.0f;
+	
 
+	private final MasterControl master;
+	private ImageWorkspace workspace;
+	
     /**
      * Creates new form PreviewPanel
      */
-//    public AnimPanel() { initComponents(); }
     public AnimPanel( MasterControl master) {
         this.master = master;
+        
+        
+    	master.addWorkspaceObserver(this);
+    	workspace = master.getCurrentWorkspace();
+    	if( workspace != null) {
+    		workspace.getAnimationManager().addStructureObserver(this);
+    	}
+    	
         
         initComponents();
         
@@ -280,6 +296,25 @@ public class AnimPanel extends javax.swing.JPanel
 		}catch( NumberFormatException e) {
 			
 		}
+	}
+
+	// :::: MWorkspaceObserver
+	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	// :::: MAnimationStructureObserver
+	@Override
+	public void animationStructureChanged(AnimationStructureEvent evt) {
+		try{
+		constructFromAnimation( workspace.getAnimationManager().getAnimations().get(0));
+		} catch( NullPointerException e) {}
+		
 	}
 	
 	

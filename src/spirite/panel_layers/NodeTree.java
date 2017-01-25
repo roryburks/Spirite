@@ -46,6 +46,7 @@ import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.dialogs.Dialogs;
+import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -472,7 +473,10 @@ public class NodeTree extends ContentTree
 		// ActionCommands from JPopupMenu
 		if( evt.getActionCommand().equals("animfromgroup")) {
 			GroupNode group = (GroupNode)contextMenu.node;
-			workspace.getAnimationManager().addAnimation(new SimpleAnimation(group));
+			AnimationManager manager = workspace.getAnimationManager();
+			manager.linkAnimation(
+					manager.addAnimation(new SimpleAnimation(group)),
+					group);
 		}
 		else if (evt.getActionCommand().equals("newGroup")){
 			workspace.addGroupNode(contextMenu.node, "New Group");

@@ -30,6 +30,9 @@ import spirite.image_data.layers.SimpleLayer;
 /***
  * SaveEngine is a static container for methods which saves images to
  * various file formats (but particularly the native SIF format)
+ * 
+ * TODO: Implement a thread-locking mechanism preventing RootPanel from
+ * 	closing with System.close if there is a Save action going on.
  */
 public class SaveEngine implements ActionListener, MWorkspaceObserver {
 

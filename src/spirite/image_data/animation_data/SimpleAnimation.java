@@ -24,6 +24,10 @@ public class SimpleAnimation extends AbstractAnimation
 	}
 
 	public SimpleAnimation(GroupNode group) {
+		layers.add( constructFromGroup(group));
+	}
+	private AnimationLayer constructFromGroup( GroupNode group) {
+
 		AnimationLayer layer = new AnimationLayer();
 		layer.group = group;
 		name = group.getName();
@@ -45,7 +49,7 @@ public class SimpleAnimation extends AbstractAnimation
 		startFrame = 0;
 		endFrame = layer.frames.size();
 		
-		layers.add(layer);
+		return layer;
 	}
 	
 	public void save() {
@@ -170,6 +174,21 @@ public class SimpleAnimation extends AbstractAnimation
 		public List<Integer> getKeyTimes() {
 			return (ArrayList<Integer>) keyTimes.clone();
 		}
+		
+	}
+
+	@Override
+	public void interpretLink(GroupNode node) {
+		
+		for( int i=0; i<layers.size(); ++i) {
+			if( layers.get(i).group == node) {
+				layers.remove(i);
+				layers.add( constructFromGroup(node));
+				return;
+			}
+		}
+
+		layers.add( constructFromGroup(node));
 		
 	}
 }
