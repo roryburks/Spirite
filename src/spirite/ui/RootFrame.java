@@ -45,6 +45,7 @@ import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
+import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.panel_work.WorkTabPane;
 import spirite.ui.components.ResizeContainerPanel;
 import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
@@ -242,20 +243,23 @@ public class RootFrame extends javax.swing.JFrame
     	WorkPanel workPanel = workPane.getCurrentWorkPane();
     	if( workPanel == null) return;
     	
+    	Zoomer zoomer = (workPanel.workspace.isEditingReference())?
+    			workPanel.refzoomer : workPanel.zoomer;
+    	
         if( command.equals("zoom_in")) {
-        	workPanel.zoomIn();
+        	zoomer.zoomIn();
         }
         else if( command.equals("zoom_out")) {
-        	workPanel.zoomOut();
+        	zoomer.zoomOut();
         }
         else if( command.equals("zoom_in_slow")) {
-            workPanel.setZoomLevel(workPanel.getZoomLevel()+1);
+        	zoomer.setZoomLevel(zoomer.getZoomLevel()+1);
         }
         else if( command.equals("zoom_out_slow")) {
-            workPanel.setZoomLevel(workPanel.getZoomLevel()-1);
+        	zoomer.setZoomLevel(zoomer.getZoomLevel()-1);
         }
         else if( command.equals("zoom_0")) {
-            workPanel.setZoomLevel(0);
+        	zoomer.setZoomLevel(0);
         }
         else {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown contextual command: context." + command);
@@ -266,6 +270,12 @@ public class RootFrame extends javax.swing.JFrame
     private void globalHotkeyCommand( String command) {
         if( command.equals("new_image"))
         	promptNewImage();
+        else if( command.equals("toggle_reference")) {
+        	ImageWorkspace workspace = master.getCurrentWorkspace();
+        	if( workspace != null) {
+        		workspace.setEditingReference(!workspace.isEditingReference());
+        	}
+        }
         else if( command.equals("debug_color"))
         	promptDebugColor();
         else if( command.equals("newLayerQuick")) {

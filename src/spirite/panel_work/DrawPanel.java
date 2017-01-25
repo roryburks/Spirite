@@ -35,6 +35,7 @@ import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
+import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.UIUtil;
 
 /**
@@ -53,6 +54,7 @@ public class DrawPanel extends JPanel
 	private final RenderEngine renderEngine;	
 	private final Penner penner;
 	final WorkPanel context;
+	final Zoomer zoomer;
 	final ImageWorkspace workspace;
 	private final SelectionEngine selectionEngine;
 	private final Timer paint_timer;
@@ -62,9 +64,11 @@ public class DrawPanel extends JPanel
 	public DrawPanel(WorkPanel context, MasterControl master) {
 		this.renderEngine = master.getRenderEngine();
 		this.context = context;
+		this.zoomer = context.zoomer;
 		this.workspace = context.workspace;
 		this.selectionEngine = workspace.getSelectionEngine();
 		this.setBackground(new Color(0, 0, 0, 0));
+		this.setOpaque( false);
 
 		penner = new Penner( this, master);
 		
@@ -87,7 +91,7 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        float zoom = context.getZoom();
+        float zoom = zoomer.getZoom();
 
         // Draw Image
         if( workspace != null) {
@@ -103,27 +107,17 @@ public class DrawPanel extends JPanel
             Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
             g2.setStroke(new_stroke);
             g2.setColor(Globals.getColor("drawpanel.image.border"));
-            g2.drawRect( context.itsX(0)-1,
-		            context.itsY(0)-1,
+            g2.drawRect( zoomer.itsX(0)-1,
+            		zoomer.itsY(0)-1,
 		            (int)Math.round(workspace.getWidth()*zoom)+1,
 		            (int)Math.round(workspace.getHeight()*zoom)+1);
-
-            // Draw Transparency BG
-            int dx = (context.itsX(0) >= 0)?0:-context.itsX(0);
-            int dy = (context.itsY(0) >= 0)?0:-context.itsY(0);
-            UIUtil.drawTransparencyBG(g, new Rectangle( 
-            		Math.max(0, context.itsX(0)),
-            		Math.max(0, context.itsY(0)),
-            		Math.min(context.getWidth(), (int)Math.round(workspace.getWidth()*zoom)-2-dx),
-            		Math.min(context.getHeight(), (int)Math.round(workspace.getHeight()*zoom)-2-dy)),
-            		8);
             
             // Render the image
         	BufferedImage image = renderEngine.renderImage(settings);
 
         	if( image != null) {
-            g.drawImage( image, context.itsX(0), context.itsY(0),
-            		context.itsX(image.getWidth()), context.itsY(image.getHeight()),
+            g.drawImage( image, zoomer.itsX(0), zoomer.itsY(0),
+            		zoomer.itsX(image.getWidth()), zoomer.itsY(image.getHeight()),
             		0, 0, image.getWidth(), image.getHeight(), null);
         	}
             
@@ -139,10 +133,10 @@ public class DrawPanel extends JPanel
             		Layer layer = ((GroupTree.LayerNode) selected).getLayer();
             		
             		g2.drawRect( 
-            				context.itsX(selected.getOffsetX()), 
-            				context.itsY(selected.getOffsetY()), 
-            				(int)(layer.getWidth()* context.getZoom()), 
-            				(int)(layer.getHeight() * context.getZoom()));
+            				zoomer.itsX(selected.getOffsetX()), 
+            				zoomer.itsY(selected.getOffsetY()), 
+            				(int)(layer.getWidth()* zoomer.getZoom()), 
+            				(int)(layer.getHeight() * zoomer.getZoom()));
             	}
             }
 
@@ -156,14 +150,14 @@ public class DrawPanel extends JPanel
             if( zoom >= 4) {
             	g2.setColor( new Color(90,90,90));
                 for( int i = 0; i < workspace.getWidth(); i+=2) {
-                	if( context.itsX(i) < 0) continue;
-                	if( context.itsX(i) > w) break;
-                    g2.drawLine(context.itsX(i), 0, context.itsX(i), this.getHeight());
+                	if( zoomer.itsX(i) < 0) continue;
+                	if( zoomer.itsX(i) > w) break;
+                    g2.drawLine(zoomer.itsX(i), 0, zoomer.itsX(i), this.getHeight());
                 }
                 for( int i = 0; i < workspace.getHeight(); i+=2) {
-                	if( context.itsY(i) < 0) continue;
-                	if( context.itsY(i) > h) break;
-                    g2.drawLine(0, context.itsY(i), this.getWidth(), context.itsY(i));
+                	if( zoomer.itsY(i) < 0) continue;
+                	if( zoomer.itsY(i) > h) break;
+                    g2.drawLine(0, zoomer.itsY(i), this.getWidth(), zoomer.itsY(i));
                 }
             }
         }
@@ -179,7 +173,7 @@ public class DrawPanel extends JPanel
         	AffineTransform trans = g2.getTransform();
             Stroke old_stroke = g2.getStroke();
             Stroke new_stroke = new BasicStroke(1/(( zoom >= 4)?(zoom/2):zoom), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4/zoom,2/zoom}, 0);
-            g2.translate(context.itsX(0), context.itsY(0));
+            g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoom, zoom);
             g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
             g2.setColor(Color.black);

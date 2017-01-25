@@ -25,6 +25,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.ui.UIUtil;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external
@@ -54,7 +55,11 @@ public class WorkPanel extends javax.swing.JPanel
         	AdjustmentListener, ComponentListener, AWTEventListener
 {
 	private static final long serialVersionUID = 1L;
-	
+
+	int w = 0;	// Image Width
+	int h = 0;	// Image Height
+	int h_w = 0;	// Half Image Width
+	int h_h = 0;	// Half Image Height
 	
 	// Stores the point where the image is centered at so that the UI components
 	//	don't have to do a lot of guess-work when resizing components etc.
@@ -67,17 +72,11 @@ public class WorkPanel extends javax.swing.JPanel
 	// 	negative SCROLL_BUFFER would allow you to scroll the image off-screen entirely.
     private static final int SCROLL_BUFFER = 100;
 
-    // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
-    //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
-    private int zoom_level = 0; 
-    private float zoom = 1.0f;
-
-    private int offsetx, offsety;
-
     // WorkPanel needs Master because some of its components need it
     private final MasterControl master;
-    final ImageWorkspace workspace;
+    public final ImageWorkspace workspace;
 
+    private int offsetx, offsety;
 
     public WorkPanel( MasterControl master, ImageWorkspace workspace) {
         this.master = master;
@@ -108,6 +107,106 @@ public class WorkPanel extends javax.swing.JPanel
 
     }
     
+    public final Zoomer zoomer = new Zoomer();
+    public final Zoomer refzoomer= new RefZoomer();
+    
+    public class RefZoomer extends Zoomer {
+    	private int cx = 0;
+    	private int cy = 0;
+    	
+    	
+    	@Override
+    	public void setZoomLevel(int amount) {
+            
+    		super.setZoomLevel(amount);
+    	}
+    	
+    	public float getZoom() {
+    		System.out.println(super.getZoom() * zoomer.getZoom());
+    		return super.getZoom() * zoomer.getZoom();
+    	}
+    	
+        // :::: Coordinate Conversion methods
+
+        int itsX( int x) { return Math.round( x * zoom  * zoomer.zoom) + offsetx;}
+        int itsY( int y) { return Math.round(y * zoom * zoomer.zoom) + offsety ;}
+        int stiX( int x) { return Math.round((x - offsetx) / zoom * zoomer.zoom);}
+        int stiY( int y) { return Math.round((y - offsety) / zoom * zoomer.zoom);}
+        
+        int itsXm( int x) { return (int) (Math.floor(x * zoom * zoomer.zoom) + offsetx);}
+        int itsYm( int y) { return (int) (Math.floor(y * zoom * zoomer.zoom) + offsety);}
+        int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom * zoomer.zoom);}
+        int stiYm( int y) { return (int) Math.floor((y - offsety ) / zoom * zoomer.zoom);}
+    }
+    
+    public class Zoomer {
+
+
+        // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
+        //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
+        int zoom_level = 0; 
+        float zoom = 1.0f;
+        
+        
+        // :::: API
+        public void setZoomLevel( int amount) {
+            // Remember the center so you can re-center the scroll at that position
+
+            // Change zoom_level
+            zoom_level = amount;
+
+            // Recalculate zoom factor
+            zoom = (zoom_level >= 0) ? zoom_level + 1 : 1/(float)(-zoom_level+1);
+
+            // Readjust the Scrollbar
+            calibrateScrolls();
+            centerAtPos(center.x, center.y);
+            
+            workSplicePanel.drawPanel.refreshPennerCoords();
+            repaint();
+        }
+        
+        public void zoomIn() {
+            if( zoom_level >= 11)
+            	setZoomLevel(((zoom_level+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
+            else if( zoom_level >= 3)
+            	setZoomLevel(((zoom_level+1)/2)*2 + 1);
+            else
+            	setZoomLevel( zoom_level+1);
+        }
+        public void zoomOut() {
+            if( zoom_level > 11)
+            	setZoomLevel((zoom_level/4)*4-1);
+            else if( zoom_level > 3)
+            	setZoomLevel((zoom_level/2)*2-1);
+            else
+            	setZoomLevel(zoom_level - 1);
+        }
+
+        public int getZoomLevel( ) {
+            return zoom_level;
+        }
+        
+        public float getZoom() {
+        	return zoom;
+        }
+
+        // :::: Coordinate Conversion methods
+        // its : converts image coordinates to screen coordinates (accounting for zoom)
+        // sti : converts screen coordinates to image coordinates
+        int itsX( int x) { return Math.round(x * zoom) + offsetx;}
+        int itsY( int y) { return Math.round(y * zoom) + offsety;}
+        int stiX( int x) { return Math.round((x - offsetx) / zoom);}
+        int stiY( int y) { return Math.round((y - offsety) / zoom);}
+        
+        // *m functions are as above, but tweaked for mouse coordinates, such that 
+        // 	mouse input is rounded as visually expected.
+        int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
+        int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
+        int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
+        int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
+    }
+    
     private void setCenter( int x, int y) {
     	center.x = Math.max(0, Math.min(workspace.getWidth(), x));
     	center.y = Math.max(0, Math.min(workspace.getHeight(), y));
@@ -130,63 +229,8 @@ public class WorkPanel extends javax.swing.JPanel
     	}
     }
     
-    // :::: API
-    public void setZoomLevel( int amount) {
-        // Remember the center so you can re-center the scroll at that position
-
-        // Change zoom_level
-        zoom_level = amount;
-
-        // Recalculate zoom factor
-        zoom = (zoom_level >= 0) ? zoom_level + 1 : 1/(float)(-zoom_level+1);
-
-        // Readjust the Scrollbar
-        calibrateScrolls();
-        centerAtPos(center.x, center.y);
-        
-        workSplicePanel.drawPanel.refreshPennerCoords();
-        repaint();
-    }
     
-    public void zoomIn() {
-        if( zoom_level >= 11)
-        	setZoomLevel(((zoom_level+1)/4)*4 + 3);   // Arithmetic's a little unintuitive because of zoom_level's off by 1
-        else if( zoom_level >= 3)
-        	setZoomLevel(((zoom_level+1)/2)*2 + 1);
-        else
-        	setZoomLevel( zoom_level+1);
-    }
-    public void zoomOut() {
-        if( zoom_level > 11)
-        	setZoomLevel((zoom_level/4)*4-1);
-        else if( zoom_level > 3)
-        	setZoomLevel((zoom_level/2)*2-1);
-        else
-        	setZoomLevel(zoom_level - 1);
-    }
 
-    public int getZoomLevel( ) {
-        return zoom_level;
-    }
-    
-    public float getZoom() {
-    	return zoom;
-    }
-
-    // :::: Coordinate Conversion methods
-    // its : converts image coordinates to screen coordinates (accounting for zoom)
-    // sti : converts screen coordinates to image coordinates
-    int itsX( int x) { return Math.round(x * zoom) + offsetx;}
-    int itsY( int y) { return Math.round(y * zoom) + offsety;}
-    int stiX( int x) { return Math.round((x - offsetx) / zoom);}
-    int stiY( int y) { return Math.round((y - offsety) / zoom);}
-    
-    // *m functions are as above, but tweaked for mouse coordinates, such that 
-    // 	mouse input is rounded as visually expected.
-    int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
-    int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
-    int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
-    int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
 
     // ::: Internal
     /***
@@ -213,8 +257,8 @@ public class WorkPanel extends javax.swing.JPanel
 
         float hor_min = -width + SCROLL_BUFFER;
         float vert_min = -height + SCROLL_BUFFER;
-        float hor_max = workspace.getWidth() * zoom - SCROLL_BUFFER;
-        float vert_max = workspace.getHeight() * zoom - SCROLL_BUFFER;
+        float hor_max = workspace.getWidth() * zoomer.zoom - SCROLL_BUFFER;
+        float vert_max = workspace.getHeight() * zoomer.zoom - SCROLL_BUFFER;
 
         jscrollHorizontal.setMinimum( (int)Math.round(hor_min/ratio));
         jscrollVertical.setMinimum( (int)Math.round(vert_min/ratio));
@@ -236,8 +280,8 @@ public class WorkPanel extends javax.swing.JPanel
     private void centerAtPos( int x, int y) {
         final int ratio = SCROLL_RATIO;
 
-        int px = Math.round(x*zoom - workSplicePanel.getWidth()/2.0f);
-        int py = Math.round(y*zoom - workSplicePanel.getHeight()/2.0f);
+        int px = Math.round(x*zoomer.zoom - workSplicePanel.getWidth()/2.0f);
+        int py = Math.round(y*zoomer.zoom - workSplicePanel.getHeight()/2.0f);
 
         jscrollHorizontal.setValue( Math.round(px / (float)ratio));
         jscrollVertical.setValue(( Math.round(py / (float)ratio)));
@@ -248,8 +292,8 @@ public class WorkPanel extends javax.swing.JPanel
     public Point getCenter() {
     	Point c = new Point();
 
-    	c.x = stiXm(workSplicePanel.getWidth()/2);
-    	c.y = stiYm(workSplicePanel.getHeight()/2);
+    	c.x = zoomer.stiXm(workSplicePanel.getWidth()/2);
+    	c.y = zoomer.stiYm(workSplicePanel.getHeight()/2);
     	
     	return c;
     }
@@ -266,15 +310,15 @@ public class WorkPanel extends javax.swing.JPanel
         	protected void paintComponent(Graphics g) {
         		super.paintComponent(g);
         		// :: Draws the zoom level in the bottom right corner
-                if(zoom_level >= 0) {
+                if(zoomer.zoom_level >= 0) {
                     g.setFont( new Font("Tahoma", Font.PLAIN, 12));
-                    g.drawString(Integer.toString(zoom_level+1), this.getWidth() - ((zoom_level > 8) ? 16 : 12), this.getHeight()-5);
+                    g.drawString(Integer.toString(zoomer.zoom_level+1), this.getWidth() - ((zoomer.zoom_level > 8) ? 16 : 12), this.getHeight()-5);
                 }
                 else {
                     g.setFont( new Font("Tahoma", Font.PLAIN, 8));
                     g.drawString("1/", this.getWidth() - 15, this.getHeight() - 10);
                     g.setFont( new Font("Tahoma", Font.PLAIN, 10));
-                    g.drawString(Integer.toString(-zoom_level+1), this.getWidth() - ((zoom_level < -8) ? 10 : 8), this.getHeight()-4);
+                    g.drawString(Integer.toString(-zoomer.zoom_level+1), this.getWidth() - ((zoomer.zoom_level < -8) ? 10 : 8), this.getHeight()-4);
                 }
         	}
         };
@@ -326,11 +370,17 @@ public class WorkPanel extends javax.swing.JPanel
 
 	@Override
 	public void structureChanged(StructureChange evt) {
-		
-        calibrateScrolls();
-
-        centerAtPos( this.center.x, this.center.y);
-        this.repaint();
+		if( workspace.getWidth() != w || workspace.getHeight() != h) {
+			w = workspace.getWidth();
+			h = workspace.getHeight();
+			h_w = w/2;
+			h_h = h/2;
+			
+	        calibrateScrolls();
+	
+	        centerAtPos( this.center.x, this.center.y);
+	        this.repaint();
+		}
 	}
 
 
@@ -339,15 +389,17 @@ public class WorkPanel extends javax.swing.JPanel
     public void adjustmentValueChanged(AdjustmentEvent e) {
         if( e.getSource() == jscrollHorizontal) {
             offsetx = -e.getValue()*SCROLL_RATIO;
+            System.out.println(offsetx);
             if( !calibrating)  {
-            	setCenter( stiXm(workSplicePanel.getHeight()/2), center.y);
+            	setCenter( zoomer.stiXm(workSplicePanel.getHeight()/2), center.y);
             }
             this.repaint();
         }
         if( e.getSource() == jscrollVertical) {
-            offsety = -e.getValue()*SCROLL_RATIO;
+        	offsety = -e.getValue()*SCROLL_RATIO;
+            System.out.println(offsety);
             if( !calibrating) {
-            	setCenter( center.x, stiYm(workSplicePanel.getHeight()/2));
+            	setCenter( center.x, zoomer.stiYm(workSplicePanel.getHeight()/2));
             }
             this.repaint();
         }
@@ -389,12 +441,12 @@ public class WorkPanel extends javax.swing.JPanel
 
 				if( this.contains(p)) {
 				if( evt.getWheelRotation() < 0) {
-					center.x = (center.x + stiX(p.x))/2;
-					center.y = (center.y + stiY(p.y))/2;
-					zoomIn();
+					center.x = (center.x + zoomer.stiX(p.x))/2;
+					center.y = (center.y + zoomer.stiY(p.y))/2;
+					zoomer.zoomIn();
 				}
 				else if( evt.getWheelRotation() > 0)
-					zoomOut();
+					zoomer.zoomOut();
 				}
 			}
 		}

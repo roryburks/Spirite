@@ -291,11 +291,24 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Reference Management
+	private boolean editingReference = false;
+	public boolean isEditingReference() {
+		return editingReference;
+	}
+	public void setEditingReference( boolean edit) {
+		if( editingReference != edit) {
+			editingReference = edit;
+			triggerReferenceToggle( edit);
+		}
+	}
+	
 	public void addReferenceNode( Node toAdd, Node parent, Node before) {
 		if( !verifyReference(parent) || (before != null && !verifyReference(before)))
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to insert into reference");
-		else
+		else {
 			parent._add(toAdd, before);
+			triggerReferenceStructureChanged();
+		}
 	}
 	public void clearReferenceNode( Node toRem) {
 		if( !verifyReference(toRem) && toRem != null)
@@ -320,6 +333,7 @@ public class ImageWorkspace {
 		
 		return true;
 	}
+	
 	
 	// :::: Image Checkout
 	public BufferedImage checkoutImage( ImageHandle image) {
@@ -656,7 +670,7 @@ public class ImageWorkspace {
 			return;
 		
 		
-		executeChange( new MoveChange(
+		move( new MoveChange(
 				nodeToMove,
 				nodeToMove.getParent(),
 				nodeToMove.getNextNode(),
@@ -678,7 +692,7 @@ public class ImageWorkspace {
 		else
 			nodeBefore = children.get(i+1);
 		
-		executeChange( new MoveChange(
+		move( new MoveChange(
 				nodeToMove,
 				nodeToMove.getParent(),
 				nodeToMove.getNextNode(),
@@ -695,12 +709,23 @@ public class ImageWorkspace {
 			nodeBefore = nodeInto.getChildren().get(0);
 		}
 
-		executeChange( new MoveChange(
+		move( new MoveChange(
 				nodeToMove,
 				nodeToMove.getParent(),
 				nodeToMove.getNextNode(),
 				nodeInto,
 				nodeBefore));
+		
+	}
+	private void move( MoveChange change) {
+		if( nodeInWorkspace(change.moveNode)) {
+			executeChange(change);
+		}
+		else {
+			change.execute();
+			if( verifyReference(change.moveNode)) 
+				triggerReferenceStructureChanged();
+		}
 	}
 	
 	
@@ -1007,8 +1032,11 @@ public class ImageWorkspace {
 	
 	/** Executes the given change and stores it in the UndoEngine */
 	public void executeChange( StructureChange change) {
+		executeChange(change, true);
+	}
+	public void executeChange( StructureChange change, boolean addUndo) {
 		change.execute();
-		if( !building) {
+		if( !building && addUndo) {
 			if( change instanceof StackableStructureChange) 
 				undoEngine.storeAction(undoEngine.new StackableStructureAction(change));
 			else 
@@ -1071,9 +1099,23 @@ public class ImageWorkspace {
 	 * Verifies that the given node exists within the current workspace
 	 */
 	public boolean nodeInWorkspace( GroupTree.Node node) {
-		List<Node> nodes = groupTree.getRoot().getAllNodes();
+		GroupNode root = groupTree.getRoot();
+		if( node == root) return true;
+		int i = 0;
 		
-		return nodes.contains(node);
+		while( i < 1000 && node != root) {
+			if( node == null)
+				return false;
+			
+			node = node.getParent();
+			++i;
+		}
+		if( i == 1000) {
+			MDebug.handleError(ErrorType.STRUCTURAL, null, "Cyclical Node (verifyReference)");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	// :::: Observers
@@ -1179,5 +1221,31 @@ public class ImageWorkspace {
 
     public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(obs);}
     public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.remove(obs); }
+    
+    
+    /**
+     * MReferenceObservers - Triggers when the reference structure has changed,
+     * when the way References are drawn is changed, or when the input method
+     * is toggled between reference of non-reference.
+     */
+    public static interface MReferenceObserver {
+    	public void referenceStructureChanged();
+//    	public void referenceImageChanged();
+    	public void toggleReference( boolean referenceMode);
+    }
+    private final List<MReferenceObserver> referenceObservers = new ArrayList<>();
+
+    private void triggerReferenceStructureChanged() {
+        for( MReferenceObserver obs : referenceObservers)
+        	obs.referenceStructureChanged();
+    }
+    private void triggerReferenceToggle(boolean edit) {
+        for( MReferenceObserver obs : referenceObservers)
+        	obs.toggleReference(edit);
+    }
+
+    public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}
+    public void removeReferenceObserve( MReferenceObserver obs) { referenceObservers.remove(obs); }
+    
     
 }

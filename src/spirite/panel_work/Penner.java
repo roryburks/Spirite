@@ -39,6 +39,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
+import spirite.panel_work.WorkPanel.Zoomer;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -55,7 +56,8 @@ public class Penner
 	// Contains "Image to Screen" and "Screen to Image" methods.
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
 	//	with UI controls
-	private final WorkPanel context;	
+	private final WorkPanel context;
+	private final Zoomer zoomer;	
 	private final Timer update_timer;
 	private StrokeEngine strokeEngine = null;
 	
@@ -81,6 +83,7 @@ public class Penner
 	private int stateVar = 0;
 	
 	public Penner( DrawPanel draw_panel, MasterControl master) {
+		this.zoomer = draw_panel.zoomer;
 		this.context = draw_panel.context;
 		this.workspace = draw_panel.workspace;
 		this.selectionEngine = workspace.getSelectionEngine();
@@ -320,7 +323,7 @@ public class Penner
 	
 	private void rawUpdateX( int raw) {
 		rawX = raw;
-		wX = context.stiXm(rawX);
+		wX = zoomer.stiXm(rawX);
 		if( holdingShift && state == STATE.DRAWING) {
 			if( shiftMode == 2)
 				return;
@@ -335,7 +338,7 @@ public class Penner
 	}
 	private void rawUpdateY( int raw) {
 		rawY = raw;
-		wY = context.stiYm( rawY);
+		wY = zoomer.stiYm( rawY);
 		if( holdingShift && state == STATE.DRAWING) {
 			if( shiftMode == 1)
 				return;

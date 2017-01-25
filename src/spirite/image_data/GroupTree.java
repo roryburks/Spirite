@@ -144,6 +144,17 @@ public class GroupTree {
 			return i;
 		}
 		
+		public int getDepthFrom( Node ancestor) {
+			Node n = this;
+			int i = 0;
+			while( n != ancestor) {
+				++i;
+				if( n == null) return -1;
+				n = n.parent;
+			}
+			return i;
+		}
+		
 		/** Gets all children such that they pass the validator test, including
 		 * subchildren if their parent pass the checkChildren test.
 		 * 

@@ -41,6 +41,7 @@ public class Globals {
 			{"global.undo"},
 			{"global.redo"},
 			{"global.export"},
+			{"global.toggle_reference"},
 			{"global."},
 
 			{"context.zoom_in"},
@@ -219,7 +220,6 @@ public class Globals {
     			if( set.iconsheet[x][y] == null) {
     				BufferedImage img = new BufferedImage(set.widthPerIcon-1,set.heightPerIcon-1, set.img.getType());
     				
-    				System.out.println((set.heightPerIcon));
     				Graphics g = img.getGraphics();
     				g.drawImage(set.img, -(set.widthPerIcon)*x, -(set.heightPerIcon)*y, null);
     				g.dispose();

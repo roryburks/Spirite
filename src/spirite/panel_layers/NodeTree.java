@@ -304,8 +304,6 @@ public class NodeTree extends ContentTree
 	protected Node nodeFromTransfer( Transferable trans ) throws UnsupportedFlavorException, IOException 
 	{
 		Node node = ((NodeTransferable)trans.getTransferData(FLAVOR)).node;
-		if( !workspace.nodeInWorkspace(node))
-			return null;
 		return node;
 	}
 	

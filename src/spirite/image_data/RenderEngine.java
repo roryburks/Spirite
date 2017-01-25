@@ -134,18 +134,18 @@ public class RenderEngine
 	{
 		// Step 1: Determine amount of data needed
 		int n = _getNeededImagers( settings);
-		
+
 		if( n <= 0) return null;
 		
 		BufferedImage images[] = new BufferedImage[n];
 		for( int i=0; i<n; ++i) {
 			images[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
 		}
-		
+
 		// Step 2: Recursively draw the image
 		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
 		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
-		
+
 		wrk.selectedData = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
 			ImageHandle dataContext= settings.workspace.getActiveData();
@@ -176,7 +176,6 @@ public class RenderEngine
 	 * the given RenderSettings.  This number is equal to largest Group
 	 * depth of any visible node. */
 	private int _getNeededImagers(RenderSettings settings) {
-		int n = settings.node.getDepth();
 		NodeValidator validator = new NodeValidator() {			
 			@Override
 			public boolean isValid(Node node) {
@@ -194,7 +193,7 @@ public class RenderEngine
 
 		int max = 0;
 		for( Node node : list) {
-			int i = node.getDepth()-n;
+			int i = node.getDepthFrom(settings.node);
 			if( i > max) max = i;
 		}
 		
@@ -213,6 +212,7 @@ public class RenderEngine
 			return;
 		}
 
+		
 		
 		Graphics g = buffer[n].getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
@@ -482,6 +482,7 @@ public class RenderEngine
 			
 			
 			if( setting.workspace == evt.workspace) {
+				
 				// Since structureChanges do not effect ImageData and image draws
 				//	ignore settings, pass over image renderings on structureChange
 				if( setting.image != null && evt.isStructureChange())
@@ -497,7 +498,6 @@ public class RenderEngine
 				nodesInCommon.retainAll(setting.getNodesReliedOn());
 				
 				if( !dataInCommon.isEmpty() || !nodesInCommon.isEmpty()) {
-					
 					// Flush the visual data from memory, then remove the entry
 					entry.getValue().flush();
 					it.remove();

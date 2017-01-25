@@ -209,6 +209,15 @@ public class ContentTree extends JPanel
 		buttonPanel.reformPanel();
 	}
 	
+	protected Color getColor( int row) {
+		if( tree.isRowSelected(row)) {
+			if( transferHandler.dragMode != DragMode.NOT_DRAGGING)
+				return selectedBGDragging;
+			return selectedBG;
+		}
+		return null;
+	}
+	
 	/** 
 	 * Internal painComponent method which adds more parameters for child
 	 * 	classes to mess with
@@ -217,60 +226,59 @@ public class ContentTree extends JPanel
 	 *   child components can draw behind it)
 	 */
 	protected void paintCCPanel( Graphics g, int width, int height, boolean drawBG) {
-		if( drawBG) {
-			g.setColor( bgColor);
-			g.fillRect( 0, 0, width-1, height-1);
-		}
-		
-
-		// Draw a Background around the Selected Path
-		int r = tree.getRowForPath( tree.getSelectionPath());
-		Rectangle rect = tree.getRowBounds(r);
-		
-		if( rect != null) {
-			if( transferHandler.dragIntoNode != null)
-				g.setColor( selectedBGDragging);
-			else
-				g.setColor( selectedBG);
-			g.fillRect( 0, rect.y, width-1, rect.height-1);
-		}
-		
-		// Draw a Line/Border indicating where you're dragging and dropping
-		if( transferHandler.dragIntoNode != null) {
-			g.setColor( Color.BLACK);
-			
-			rect = tree.getPathBounds(transferHandler.dragIntoNode);
-			
-			
-			switch( transferHandler.dragMode) {
-			case PLACE_OVER:
-				g.drawLine( 0, rect.y, width, rect.y);
-				break;
-			case PLACE_UNDER:
-				g.drawLine( 0, rect.y+rect.height-1, width, rect.y+rect.height-1);
-				break;
-			case PLACE_INTO:
-				g.drawRect( 0, rect.y, width-1, rect.height-1);
-				break;
-			default:
-				break;
-			}
-		}
-		else if( transferHandler.dragMode == DragMode.HOVER_OUT) {
-			Rectangle rect2 = tree.getRowBounds(tree.getRowCount()-1);
-			int dy = (rect2==null)?3:rect2.y+rect2.height+2;
-			
-			g.drawLine( 0, dy, width,  dy);
-		}
 		
 	}
 	protected class CCPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public void paintComponent( Graphics g) {
-			paintCCPanel( g, getWidth(), getHeight(), true);
-
 			super.paintComponent(g);
+
+			if( bgColor != null) {
+				g.setColor( bgColor);
+				g.fillRect( 0, 0, getWidth()-1, getHeight() -1);
+			}
+			
+
+			for( int i=0; i<tree.getRowCount(); ++i) {
+				Color c = getColor( i);
+				
+				if( c != null ) {
+					Rectangle rect = tree.getRowBounds(i);
+					
+					if( rect != null) {
+						g.setColor(c);
+						g.fillRect( 0, rect.y, getWidth()-1, rect.height-1);
+					}
+				}
+			}
+			// Draw a Line/Border indicating where you're dragging and dropping
+			if( transferHandler.dragIntoNode != null) {
+				g.setColor( Color.BLACK);
+				
+				Rectangle rect = tree.getPathBounds(transferHandler.dragIntoNode);
+				
+				
+				switch( transferHandler.dragMode) {
+				case PLACE_OVER:
+					g.drawLine( 0, rect.y, getWidth(), rect.y);
+					break;
+				case PLACE_UNDER:
+					g.drawLine( 0, rect.y+rect.height-1, getWidth(), rect.y+rect.height-1);
+					break;
+				case PLACE_INTO:
+					g.drawRect( 0, rect.y, getWidth()-1, rect.height-1);
+					break;
+				default:
+					break;
+				}
+			}
+			else if( transferHandler.dragMode == DragMode.HOVER_OUT) {
+				Rectangle rect2 = tree.getRowBounds(tree.getRowCount()-1);
+				int dy = (rect2==null)?3:rect2.y+rect2.height+2;
+				
+				g.drawLine( 0, dy, getWidth(),  dy);
+			}
 		}
 	}
 	

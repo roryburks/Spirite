@@ -22,6 +22,7 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
@@ -214,36 +215,24 @@ public class AnimationSchemeTreePanel extends ContentTree
 	
 	// :::: ContentTree
 	private final Color pseudoselectColor = new Color( 190,160,140,120);
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	protected void paintCCPanel(Graphics g, int width, int height, boolean drawBG) {
-		if( drawBG) {
-			g.setColor( bgColor);
-			g.fillRect( 0, 0, width-1, height-1);
-		}
-		
-		
-		Enumeration <DefaultMutableTreeNode> e =
-				((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
-		
+	protected Color getColor(int row) {
+		Object usrObj = 
+				((DefaultMutableTreeNode)tree.getPathForRow(row).getLastPathComponent()).getUserObject();
+
 		Node selected = (workspace == null) ? null : workspace.getSelectedNode();
-		if( selected != null)  {		
-			while( e.hasMoreElements()) {
-				DefaultMutableTreeNode node = e.nextElement();
-				
-				if( node.getUserObject() instanceof SALFrame) {
-					SALFrame frame = (SALFrame)node.getUserObject();
-					
-					if( frame.layer == selected) {
-						Rectangle rect = tree.getPathBounds( new TreePath(node.getPath()));
-						g.setColor(pseudoselectColor);
-						g.fillRect(0, rect.y, width-1, rect.height-1);
-					}
-				}
+		if( selected == null) return null;
+		if( selected instanceof GroupNode) return null;
+		
+		if( usrObj instanceof SALFrame) {
+			SALFrame frame = (SALFrame) usrObj;
+			
+			if( frame.layer.getLayer() == ((LayerNode)selected).getLayer()) {
+				return pseudoselectColor;
 			}
 		}
-		
-		super.paintCCPanel(g, width, height, false);
+		return super.getColor(row);
 	}
 
 	// :::: AnimationStructureObserver

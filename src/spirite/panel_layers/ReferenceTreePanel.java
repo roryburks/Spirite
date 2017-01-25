@@ -10,8 +10,11 @@ import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.MReferenceObserver;
 
-public class ReferenceTreePanel extends NodeTree {
+public class ReferenceTreePanel extends NodeTree 
+	implements MReferenceObserver 
+{
 
 	public ReferenceTreePanel(MasterControl master) {
 		super(master);
@@ -22,8 +25,10 @@ public class ReferenceTreePanel extends NodeTree {
 
 		if( workspace == null)
 			nodeRoot = null;
-		else
+		else {
 			nodeRoot = workspace.getReferenceRoot();
+			workspace.addReferenceObserve(this);
+		}
 
 		constructFromRoot();
 		
@@ -34,12 +39,18 @@ public class ReferenceTreePanel extends NodeTree {
 	// :::: WorkspaceObserver inherited from NodeTree
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace current, ImageWorkspace previous) {
+		if( workspace != null) {
+			workspace.removeReferenceObserve(this);
+		}
+		
 		super.currentWorkspaceChanged(current, previous);
 
 		if( workspace == null)
 			nodeRoot = null;
-		else
+		else {
 			nodeRoot = workspace.getReferenceRoot();
+			workspace.addReferenceObserve(this);
+		}
 		constructFromRoot();
 	}
 
@@ -48,62 +59,76 @@ public class ReferenceTreePanel extends NodeTree {
 	@Override
 	protected boolean importAbove( Transferable trans, TreePath path) {
 		try {
-			System.out.println("b");
-			Node toAdd = workspace.shallowDuplicateNode(nodeFromTransfer(trans));
+			Node tnode = nodeFromTransfer(trans);
 			Node context = nodeFromPath(path);
-			workspace.addReferenceNode(toAdd, context.getParent(), context);
-			constructFromRoot();
-			System.out.println("b");
+			
+			if( workspace.verifyReference(tnode)) {
+				workspace.moveAbove(tnode, context);
+			}
+			else {
+				Node toAdd = workspace.shallowDuplicateNode(tnode);
+				workspace.addReferenceNode(toAdd, context.getParent(), context);
+			}
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree):" + e.getMessage());
 			return false;
 		}
 	}
 	@Override
 	protected boolean importBelow( Transferable trans, TreePath path) {
 		try {
-			System.out.println("ABOVE");
-			Node toAdd = workspace.shallowDuplicateNode(nodeFromTransfer(trans));
+			Node tnode = nodeFromTransfer(trans);
 			Node context = nodeFromPath(path);
-			workspace.addReferenceNode(toAdd, context.getParent(), context.getNextNode());
-			constructFromRoot();
-			System.out.println("ABOVE");
+			
+			if( workspace.verifyReference(tnode)) {
+				workspace.moveBelow(tnode, context);
+			}
+			else  {
+				Node toAdd = workspace.shallowDuplicateNode(tnode);
+				workspace.addReferenceNode(toAdd, context.getParent(), context.getNextNode());
+			}
+			
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree):" + e.getMessage());
 			return false;
 		}
 	}
 	@Override
 	protected boolean importInto( Transferable trans, TreePath path, boolean top) {
 		try {
-			System.out.println("Into");
-			Node toAdd = workspace.shallowDuplicateNode(nodeFromTransfer(trans));
+			Node tnode =nodeFromTransfer(trans);
 			Node context = nodeFromPath(path);
 			Node before = null;
-			
-			if(top && !context.getChildren().isEmpty())
-				before = context.getChildren().get(0);
 
-			workspace.addReferenceNode(toAdd, context, before);
-			constructFromRoot();
+			if( workspace.verifyReference(tnode))
+				workspace.moveInto(tnode, (GroupNode) context, top);
+			else {	
+				Node toAdd =  workspace.shallowDuplicateNode(tnode);
+				if(top && !context.getChildren().isEmpty())
+					before = context.getChildren().get(0);
+	
+				workspace.addReferenceNode(toAdd, context, before);
+			}
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree):" + e.getMessage());
 			return false;
 		}
 	}
 	@Override
 	protected boolean importOut( Transferable trans) {
 			try {
-				Node toAdd = workspace.shallowDuplicateNode(nodeFromTransfer(trans));
+				Node tnode = nodeFromTransfer(trans);
 				
-				workspace.addReferenceNode(toAdd, workspace.getReferenceRoot(), null);
-				constructFromRoot();
+				if( !workspace.verifyReference(tnode)) {
+					Node toAdd = workspace.shallowDuplicateNode(tnode);
+					workspace.addReferenceNode(toAdd, workspace.getReferenceRoot(), null);
+				}
 				return true;
 			} catch (Exception e) {
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree):" + e.getMessage());
 				return false;
 			}
 	}
@@ -114,5 +139,31 @@ public class ReferenceTreePanel extends NodeTree {
 		workspace.clearReferenceNode(node);
 		constructFromRoot();
 		return super.importClear(path);
+	}
+	
+	// Prevents a self-over from being interpreted as an importClear
+	@Override
+	protected boolean importSelf(Transferable trans, TreePath path) {
+		return true;
+	}
+
+
+	// :::: MReferenceObserver
+	@Override
+	public void referenceStructureChanged() {
+		constructFromRoot();
+		
+	}
+
+
+	@Override
+	public void toggleReference(boolean referenceMode) {}
+	
+	// :::: NodeTree
+	@Override
+	void cleanup() {
+		if( workspace != null)
+			workspace.removeReferenceObserve(this);
+		super.cleanup();
 	}
 }

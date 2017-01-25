@@ -1,6 +1,15 @@
 package spirite.panel_work;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+
+import javax.swing.GroupLayout;
+
 import spirite.brains.MasterControl;
+import spirite.image_data.ImageWorkspace.MReferenceObserver;
+import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.ui.UIUtil;
 
 /**
  *WorkSplicePanel is a simple container for the DrawPanel (which displays the 
@@ -9,20 +18,27 @@ import spirite.brains.MasterControl;
  *
  * @author Rory Burks
  */
-public class WorkSplicePanel extends javax.swing.JPanel 
+public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObserver 
 {
 	private static final long serialVersionUID = 1L;
-	WorkPanel context;
+	final WorkPanel context;
+	final Zoomer zoomer;
     int offsetx, offsety;
 
+    Color normalBG = new Color(238,238,238);
+    Color referenceBG = new Color( 210,210,242);
     /**
      * Creates new form WorkSplicePanel
      */
-    public WorkSplicePanel() { initComponents();}
     public WorkSplicePanel( WorkPanel context, MasterControl master) {
-        this.context = context;
+    	this.context = context;
+        this.zoomer = context.zoomer;
         drawPanel = new DrawPanel( context, master);
+        previewPanel = new ReferencePanel(context, master);
         initComponents();
+        
+        context.workspace.addReferenceObserve(this);
+        
 
         offsetx = 0;
         offsety = 0;
@@ -30,62 +46,44 @@ public class WorkSplicePanel extends javax.swing.JPanel
  
     private void initComponents() {
 
-        previewPanel = new ReferencePanel();
 
         setPreferredSize(new java.awt.Dimension(420, 322));
 
-        javax.swing.GroupLayout drawPanelLayout = new javax.swing.GroupLayout(drawPanel);
-        drawPanel.setLayout(drawPanelLayout);
-        drawPanelLayout.setHorizontalGroup(
-            drawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 420, Short.MAX_VALUE)
-        );
-        drawPanelLayout.setVerticalGroup(
-            drawPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 321, Short.MAX_VALUE)
-        );
+        GroupLayout layout = new javax.swing.GroupLayout(this);
 
-        javax.swing.GroupLayout previewPanelLayout = new javax.swing.GroupLayout(previewPanel);
-        previewPanel.setLayout(previewPanelLayout);
-        previewPanelLayout.setHorizontalGroup(
-            previewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        previewPanelLayout.setVerticalGroup(
-            previewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 310, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        layout.setHorizontalGroup( layout.createParallelGroup()
+        		.addComponent(drawPanel)
+        		.addComponent(previewPanel));
+        layout.setVerticalGroup( layout.createParallelGroup()
+        		.addComponent(drawPanel)
+        		.addComponent(previewPanel));
         this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(drawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(previewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(1, 1, 1)
-                .addComponent(drawPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(previewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGap(1, 1, 1)))
-        );
     }                      
+    
+
+    @Override
+    protected void paintComponent(Graphics g) {
+    	super.paintComponent(g);
+        // Draw Transparency BG
+        int dx = (zoomer.itsX(0) >= 0)?0:-zoomer.itsX(0);
+        int dy = (zoomer.itsY(0) >= 0)?0:-zoomer.itsY(0);
+        UIUtil.drawTransparencyBG(g, new Rectangle( 
+        		Math.max(0, zoomer.itsX(0)),
+        		Math.max(0, zoomer.itsY(0)),
+        		Math.min(getWidth(), (int)Math.round(context.workspace.getWidth()*zoomer.getZoom())-2-dx),
+        		Math.min(getHeight(), (int)Math.round(context.workspace.getHeight()*zoomer.getZoom())-2-dy)),
+        		8);
+    }
 
               
     DrawPanel drawPanel;
-    ReferencePanel previewPanel;        
+    ReferencePanel previewPanel;
+
+	@Override	public void referenceStructureChanged() {}
+	@Override
+	public void toggleReference(boolean referenceMode) {
+		setBackground( referenceMode ? referenceBG : normalBG);
+		
+	}        
 
 }
