@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;

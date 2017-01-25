@@ -89,7 +89,7 @@ public class Globals {
     };
     
     private static final Object icons[][] = {
-			{"icons2.png", 25, 25, 4,3},
+			{"icons2.png", 25, 25, 5,3},
     		{"visible_on", 0, 0},
     		{"visible_off", 1, 0},
     		{"new_layer", 2, 0},
@@ -98,6 +98,7 @@ public class Globals {
     		{"icon.frame.undoHistory",1,2},
     		{"icon.frame.animationScheme",2,2},
     		{"icon.frame.toolSettings",3,2},
+    		{"icon.frame.referenceScheme",4,2},
     		
     		{"icons_12x12.png",13,13,3,1},
     		{"palNewColor", 0,0},

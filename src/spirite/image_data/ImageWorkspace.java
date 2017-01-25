@@ -57,6 +57,7 @@ public class ImageWorkspace {
 	
 	// Internal Components
 	private final GroupTree groupTree;
+	private final GroupNode referenceRoot;
 	private final UndoEngine undoEngine;
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
@@ -85,6 +86,7 @@ public class ImageWorkspace {
 		undoEngine = new UndoEngine(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
 		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
+		referenceRoot = groupTree.new GroupNode("___ref");
 	}
 	
 	@Override
@@ -237,6 +239,9 @@ public class ImageWorkspace {
 	public GroupTree.GroupNode getRootNode() {
 		return groupTree.getRoot();
 	}
+	public GroupNode getReferenceRoot() {
+		return referenceRoot;
+	}
 	public GroupTree getGroupTree() {
 		return groupTree;
 	}
@@ -283,6 +288,37 @@ public class ImageWorkspace {
 			selected = node;
 			triggerSelectedChanged();
 		}
+	}
+	
+	// :::: Reference Management
+	public void addReferenceNode( Node toAdd, Node parent, Node before) {
+		if( !verifyReference(parent) || (before != null && !verifyReference(before)))
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to insert into reference");
+		else
+			parent._add(toAdd, before);
+	}
+	public void clearReferenceNode( Node toRem) {
+		if( !verifyReference(toRem) && toRem != null)
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to be cleared.");
+		else
+			toRem._del();
+	}
+	public boolean verifyReference( Node node) {
+		int i = 0;
+		
+		while( i < 1000 && node != referenceRoot) {
+			if( node == null || node == groupTree.getRoot())
+				return false;
+			
+			node = node.getParent();
+			++i;
+		}
+		if( i == 1000) {
+			MDebug.handleError(ErrorType.STRUCTURAL, null, "Cyclical Node (verifyReference)");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	// :::: Image Checkout
@@ -455,12 +491,14 @@ public class ImageWorkspace {
 		return newNode;
 	}
 	
+	
+	
 	/** Duplicates the given node, placing its duplicate under the original. */
-	public Node duplicateNode( Node nodeToDuplicate) {
-		if( nodeToDuplicate instanceof LayerNode) {
+	public Node duplicateNode( Node toDupe) {
+		if( toDupe instanceof LayerNode) {
 			// Mostly duplicate code from the Layer part of bellow.
 			//	Could possibly generalize
-			Layer layer = ((LayerNode)nodeToDuplicate).getLayer();
+			Layer layer = ((LayerNode)toDupe).getLayer();
 			Layer dupe = layer.logicalDuplicate();
 			
 			// Duplicate all used Data into a map
@@ -473,25 +511,25 @@ public class ImageWorkspace {
 			
 			// Import that Node
 			LayerNode newNode = 
-					groupTree.new LayerNode(dupe, nodeToDuplicate.name + " copy");
+					groupTree.new LayerNode(dupe, toDupe.name + " copy");
 			importData( newNode, dupeData);
 			
 			
 			executeChange( new AdditionChange( 
 					newNode, 
-					nodeToDuplicate.getParent(), 
-					nodeToDuplicate.getNextNode()));
+					toDupe.getParent(), 
+					toDupe.getNextNode()));
 			
 			return newNode;
 		}
-		else if( nodeToDuplicate instanceof GroupNode) {
-			GroupNode dupeRoot= groupTree.new GroupNode(nodeToDuplicate.name + " copy");
+		else if( toDupe instanceof GroupNode) {
+			GroupNode dupeRoot= groupTree.new GroupNode(toDupe.name + " copy");
 			Map< Integer, BufferedImage> dupeData = new HashMap<>();
 
 			// Breadth-first queue for Duping
 			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
 
-			for( Node child: nodeToDuplicate.getChildren()) {
+			for( Node child: toDupe.getChildren()) {
 				dupeQueue.add( new NodeContext(child, dupeRoot));
 			}
 			while( !dupeQueue.isEmpty()) {
@@ -530,8 +568,8 @@ public class ImageWorkspace {
 			
 			executeChange( new AdditionChange( 
 					dupeRoot, 
-					nodeToDuplicate.getParent(), 
-					nodeToDuplicate.getNextNode()));
+					toDupe.getParent(), 
+					toDupe.getNextNode()));
 			
 			return dupeRoot;
 		}
@@ -544,6 +582,55 @@ public class ImageWorkspace {
 			this.toDupe = toDupe;
 			this.parent = parentInDupe;
 		}
+	}
+	
+
+	/**
+	 * A shallow duplication will duplicate all nodes, but all LayerNodes will
+	 * be references to the original, not deep copies.  This Method does not
+	 * automatically add the node to the GroupTree (as it's probably being used
+	 * for something else).
+	 */
+	public Node shallowDuplicateNode( Node toDupe) {
+		// Lots of redundant code from duplicateNode, but probably unavoidable
+		
+		
+		if( toDupe instanceof LayerNode) 
+			return groupTree.new LayerNode(((LayerNode) toDupe).getLayer(), toDupe.name);
+		else if( toDupe instanceof GroupNode) {
+			GroupNode dupeRoot= groupTree.new GroupNode(toDupe.name);
+
+			// Breadth-first queue for Duping
+			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
+			
+			for( Node child: toDupe.getChildren()) {
+				dupeQueue.add( new NodeContext(child, dupeRoot));
+			}
+			while( !dupeQueue.isEmpty()) {
+				NodeContext next = dupeQueue.poll();
+				Node dupe;
+				
+				if( next.toDupe instanceof GroupNode) {
+					// Clone Group node, and add all its children to the queue
+					dupe = groupTree.new GroupNode( next.toDupe.getName());
+					
+					for( Node child : next.toDupe.getChildren()) {
+						dupeQueue.add( new NodeContext( child, dupe));
+					}
+				}
+				else {
+					// Shallow-clone Layer node
+					Layer layer = ((LayerNode)next.toDupe).getLayer();
+					dupe = groupTree.new LayerNode( layer, next.toDupe.getName());
+				}
+				
+				next.parent._add(dupe, null);
+			}
+			
+			return dupeRoot;
+		}
+		
+		return null;
 	}
 	
 	

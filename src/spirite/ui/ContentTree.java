@@ -18,11 +18,6 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,7 +51,6 @@ import javax.swing.tree.TreePath;
 
 import spirite.Globals;
 import spirite.MDebug;
-import spirite.ui.ContentTree.DragMode;
 
 public class ContentTree extends JPanel
 	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 
@@ -65,7 +59,7 @@ public class ContentTree extends JPanel
 	private static final long serialVersionUID = 1L;
 	protected final DefaultMutableTreeNode root;
 	protected final DefaultTreeModel model;
-	protected final CCTDragManager dragManager;
+	protected final CCTTransferHandler transferHandler;
 	protected final JScrollPane scrollPane;
 	protected final CCPanel container;
 	
@@ -91,8 +85,13 @@ public class ContentTree extends JPanel
 	protected boolean allowsHoverOut() { return false;}
 	protected Transferable buildTransferable(DefaultMutableTreeNode node) {return null;}
 	protected boolean validTransferable(DataFlavor dfs[]) {return false;}
-	protected boolean importInto( Transferable trans, TreePath draggingInto, DragMode dragMode) { return false;}
-
+	protected boolean importOut(Transferable trans) {return false;}
+	protected boolean importAbove(Transferable trans, TreePath path) {return false;}
+	protected boolean importBelow(Transferable trans, TreePath path) {return false;}
+	protected boolean importSelf(Transferable trans, TreePath path) {return false;}
+	protected boolean importInto(Transferable trans, TreePath path, boolean top) {return false;}
+	protected boolean importClear( TreePath path) {return false;}
+	
 	public ContentTree() {
 		// Simple grid layout, fills the whole area
 		this.setLayout( new GridLayout());
@@ -124,8 +123,8 @@ public class ContentTree extends JPanel
 		buttonPanel.setOpaque(false);
 
 		// Initialize Drag-Drop Manager
-		dragManager = new CCTDragManager();
-		tree.setTransferHandler(dragManager);	// Prevent default tree copy,paste,and drag/drop
+		transferHandler = new CCTTransferHandler();
+		this.setTransferHandler(transferHandler);	// Prevent default tree copy,paste,and drag/drop
 		tree.setSelectionModel( new LockingSelectionModel());
 		
 		initLayout();
@@ -229,7 +228,7 @@ public class ContentTree extends JPanel
 		Rectangle rect = tree.getRowBounds(r);
 		
 		if( rect != null) {
-			if( dragManager.dragIntoNode != null)
+			if( transferHandler.dragIntoNode != null)
 				g.setColor( selectedBGDragging);
 			else
 				g.setColor( selectedBG);
@@ -237,13 +236,13 @@ public class ContentTree extends JPanel
 		}
 		
 		// Draw a Line/Border indicating where you're dragging and dropping
-		if( dragManager.dragIntoNode != null) {
+		if( transferHandler.dragIntoNode != null) {
 			g.setColor( Color.BLACK);
 			
-			rect = tree.getPathBounds(dragManager.dragIntoNode);
+			rect = tree.getPathBounds(transferHandler.dragIntoNode);
 			
 			
-			switch( dragManager.dragMode) {
+			switch( transferHandler.dragMode) {
 			case PLACE_OVER:
 				g.drawLine( 0, rect.y, width, rect.y);
 				break;
@@ -257,11 +256,11 @@ public class ContentTree extends JPanel
 				break;
 			}
 		}
-		else if( dragManager.dragMode == DragMode.HOVER_OUT) {
+		else if( transferHandler.dragMode == DragMode.HOVER_OUT) {
 			Rectangle rect2 = tree.getRowBounds(tree.getRowCount()-1);
+			int dy = (rect2==null)?3:rect2.y+rect2.height+2;
 			
-			
-			g.drawLine( 0, rect2.y+rect2.height+2, width,  rect2.y+rect2.height+2);
+			g.drawLine( 0, dy, width,  dy);
 		}
 		
 	}
@@ -423,10 +422,13 @@ public class ContentTree extends JPanel
 				super.clearSelection();
 		}
 	}
+	
+	// Even uglier, but hey.
+	private static boolean imported = false;
 
 	
 	/** The DragManager manages the drag and drop functionality of the tree.*/
-	protected class CCTDragManager extends TransferHandler
+	protected class CCTTransferHandler extends TransferHandler
 		implements DragGestureListener, DragSourceListener
 	{
 		private final DragSource dragSource;
@@ -435,7 +437,7 @@ public class ContentTree extends JPanel
 		protected TreePath dragIntoNode = null;
 		protected TreePath draggingNode = null;
 		
-		public CCTDragManager() {
+		public CCTTransferHandler() {
 			dragSource = DragSource.getDefaultDragSource();
 			dragSource.createDefaultDragGestureRecognizer( 
 							tree, 
@@ -473,11 +475,37 @@ public class ContentTree extends JPanel
 		@Override
 		public boolean importData(TransferSupport support) {
 			locked = false;
+			imported = importInner(support);
 			
+			
+			return imported;
+		}
+		private boolean importInner( TransferSupport support) {
 			if( validTransferable(support.getDataFlavors())) {
-				return importInto(support.getTransferable(), dragIntoNode, dragMode);
+				Transferable trans = support.getTransferable();
+
+				if( dragMode == DragMode.HOVER_OUT) {
+					return importOut(trans);
+				}
+				else if( dragMode == DragMode.HOVER_SELF)
+					return importSelf(trans, dragIntoNode);
+				else if( dragIntoNode != null) {					
+					if( dragMode == DragMode.PLACE_OVER)
+						return importAbove( trans, dragIntoNode);
+					else if( ((DefaultMutableTreeNode)dragIntoNode.getLastPathComponent()).getAllowsChildren()){
+						if( dragMode == DragMode.PLACE_UNDER) {
+							if( tree.isExpanded(dragIntoNode) )
+								return importInto( trans, dragIntoNode, true);
+							else
+								return importBelow( trans, dragIntoNode);
+						}
+						if( dragMode == DragMode.PLACE_INTO)
+							return importInto( trans, dragIntoNode, false);
+					}
+					else if( dragMode == DragMode.PLACE_UNDER || dragMode == DragMode.PLACE_INTO) 
+						return importBelow( trans, dragIntoNode);
+				}
 			}
-			
 			return false;
 		}
 		
@@ -502,6 +530,7 @@ public class ContentTree extends JPanel
 					cursor = DragSource.DefaultMoveDrop;
 				
 				locked = true;
+				imported = false;
 				dragSource.startDrag( evt, cursor, trans, this);
 			}
 		}
@@ -529,7 +558,6 @@ public class ContentTree extends JPanel
 			// Doing it like this makes it so only the vertical position is relvant
 			TreePath path = getPathFromY(p.y);
 
-			System.out.println(p);
 			
 			if( path != null) {
 				try {
@@ -589,8 +617,12 @@ public class ContentTree extends JPanel
 		@Override 		
 		public void dragDropEnd(DragSourceDropEvent arg0) {
 			locked = false;
+			if( !imported)
+				importClear( draggingNode);
+			
 			changeDrag( null, DragMode.NOT_DRAGGING);
 			draggingNode = null;
+			
 		}
 		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
 		@Override		public void dragExit(DragSourceEvent arg0) {}
@@ -654,7 +686,16 @@ public class ContentTree extends JPanel
 	public void valueChanged(TreeSelectionEvent arg0) {
 		// This is needed because the selection UI of the linked ButtonPanel 
 		//	has graphics related to the tree's slection that needs to be redrawn
-		repaint();
+		
+		SwingUtilities.invokeLater( new Runnable() {
+			
+			@Override
+			public void run() {
+				transferHandler.stopDragging();
+				
+				repaint();
+			}
+		});
 	}
 	
 	@Override

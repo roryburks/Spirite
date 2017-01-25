@@ -1,11 +1,8 @@
 package spirite.panel_anim;
 
 import javax.swing.GroupLayout;
-import javax.swing.Icon;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
 
-import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.ui.OmniFrame.OmniComponent;
 

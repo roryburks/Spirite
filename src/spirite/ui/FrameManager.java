@@ -18,6 +18,7 @@ import spirite.brains.MasterControl;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
+import spirite.panel_layers.ReferenceSchemePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
 import spirite.ui.OmniFrame.OmniComponent;
@@ -43,6 +44,7 @@ public class FrameManager implements WindowListener {
 		TOOL_SETTINGS ("Tool Settings"),
 		ANIMATION_SCHEME ("Anim"),
 		UNDO("Undo History"),
+		REFERENCE("Reference Scheme"),
 		;
 		
 		private String name;
@@ -66,9 +68,13 @@ public class FrameManager implements WindowListener {
 			return new AnimationSchemePanel(master);
 		case UNDO:
 			return new UndoPanel(master);
-		default:
-			return null;
+		case REFERENCE:
+			return new ReferenceSchemePanel(master);
+		case BAD:
+			break;
 		}
+		
+		return null;
 	}
 
 	public static ImageIcon getIconForType( FrameType type) {
@@ -81,9 +87,12 @@ public class FrameManager implements WindowListener {
 			return Globals.getIcon("icon.frame.animationScheme");
 		case UNDO:
 			return Globals.getIcon("icon.frame.undoHistory");
-		default:
-			return Globals.getIcon("new_layer");
+		case REFERENCE:
+			return Globals.getIcon("icon.frame.referenceScheme");
+		case BAD:
+			return null;
 		}
+		return null;
 	}
 	
 	
@@ -97,6 +106,8 @@ public class FrameManager implements WindowListener {
 			addFrame( FrameType.ANIMATION_SCHEME);
 		else if( command.equals("showUndoFrame"))
 			addFrame( FrameType.UNDO);
+		else if( command.equals("showReferenceFrame"))
+			addFrame( FrameType.REFERENCE);
 		else if(command.equals("showAnimationView")) {
 			JDialog d = new JDialog();
 			d.add(new AnimPanel(master));

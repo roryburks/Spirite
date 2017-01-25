@@ -3,7 +3,6 @@ package spirite.panel_toolset;
 import java.awt.Color;
 
 import javax.swing.GroupLayout;
-import javax.swing.Icon;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

@@ -163,6 +163,7 @@ public class RootFrame extends javax.swing.JFrame
     			{"..-"},
     			{"..Animation &Scheme", "frame.showAnimSchemeFrame", "icon.frame.animationScheme"},
     			{"..Undo &History", "frame.showUndoFrame", "icon.frame.undoHistory"},
+    			{"..&Reference Scheme", "frame.showReferenceFrame", "icon.frame.referenceScheme"},
     			
     			{".&Animation View", "frame.showAnimationView", null},
     			{".Debug View", "frame.showDebugDialog", null}

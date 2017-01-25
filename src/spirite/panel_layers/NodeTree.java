@@ -23,20 +23,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -49,26 +47,35 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageHandle;
-import spirite.image_data.ImageWorkspace;
-import spirite.image_data.RenderEngine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.ImageHandle;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.OpacityChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ImageWorkspace.VisibilityChange;
+import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.animation_data.SimpleAnimation;
-import spirite.ui.UIUtil;
 import spirite.ui.ContentTree;
-import spirite.ui.ContentTree.CCButton;
-import spirite.ui.ContentTree.DragMode;
+import spirite.ui.UIUtil;
 
+/**
+ * NodeTree exists as a mutual parent of LayerTreePanel and ReferenceTree
+ * Panel since they would otherwise share 99% of their code.  But even 
+ * though you could use a NodeTree independently it is not quite complete
+ * enough to make sense as an independent class but also wouldn't make sense
+ * an abstract.  The awkward middle ground is probably indicative of poor
+ * design.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class NodeTree extends ContentTree
 	implements MImageObserver, MWorkspaceObserver, MSelectionObserver,
 		TreeSelectionListener, TreeExpansionListener, ActionListener
@@ -230,7 +237,10 @@ public class NodeTree extends ContentTree
 		return null;
 	}
 	
-	
+
+	public void constructFromRoot() {
+		constructFromNode( nodeRoot);
+	}
 	public void constructFromNode( GroupNode node) {
 
 		root.removeAllChildren();
@@ -240,7 +250,7 @@ public class NodeTree extends ContentTree
 		
 
 		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
-		dragManager.stopDragging();
+		transferHandler.stopDragging();
 	}
 	
 	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
@@ -287,54 +297,18 @@ public class NodeTree extends ContentTree
 	}
     
 	// :::: ContentTree
-	@Override
-	protected boolean importInto(Transferable trans, TreePath dragIntoNode, DragMode dragMode) {
-		System.out.println(dragMode);
-		
-		Node nodeToMove = null;
-		try {
-			nodeToMove = ((NodeTransferable)trans.getTransferData(FLAVOR)).node;
-		} catch (UnsupportedFlavorException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println(dragMode);
-		if( dragIntoNode != null) {
-			System.out.println("DFASDF");
-
-			Node nodeInto = (Node)((DefaultMutableTreeNode)dragIntoNode.getLastPathComponent()).getUserObject();
-			
-			if( dragMode == DragMode.PLACE_OVER) {
-				workspace.moveAbove(nodeToMove, nodeInto);
-				return true;
-			}
-			else if( nodeInto instanceof GroupNode) {
-				if( dragMode == DragMode.PLACE_UNDER) {
-					if( tree.isExpanded(dragIntoNode) )
-						workspace.moveInto(nodeToMove, (GroupNode) nodeInto, true);
-					else
-						workspace.moveBelow(nodeToMove, nodeInto);
-				}
-				else if( dragMode == DragMode.PLACE_INTO)
-					workspace.moveInto(nodeToMove, (GroupNode)nodeInto, true);
-				return true;
-			}
-			else if( dragMode == DragMode.PLACE_UNDER || dragMode == DragMode.PLACE_INTO)  {
-				workspace.moveBelow(nodeToMove, nodeInto);
-				return true;
-			}
-		}
-		else if( dragMode == DragMode.HOVER_OUT) {
-			if( nodeRoot != null) {
-				workspace.moveInto(nodeToMove, nodeRoot, false);
-				return false;
-			}
-		}
-		
-		// TODO Auto-generated method stub
-		return false;
+	public Node nodeFromPath( TreePath path) {
+		return (Node)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
 	}
+	
+	protected Node nodeFromTransfer( Transferable trans ) throws UnsupportedFlavorException, IOException 
+	{
+		Node node = ((NodeTransferable)trans.getTransferData(FLAVOR)).node;
+		if( !workspace.nodeInWorkspace(node))
+			return null;
+		return node;
+	}
+	
 
 	@Override
 	protected void buttonPressed(CCButton button) {

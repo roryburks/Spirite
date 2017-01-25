@@ -12,8 +12,8 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
 import spirite.image_data.GroupTree;
-import spirite.ui.components.SliderPanel;
 import spirite.ui.OmniFrame.OmniComponent;
+import spirite.ui.components.SliderPanel;
 
 public class LayersPanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;
