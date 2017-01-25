@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -83,8 +84,9 @@ public class Test1 {
 		}
 		SaveEngine.saveWorkspace(workspace, temp);
 		
+		ImageWorkspace ws2 = null;
 		try {
-			ImageWorkspace ws2 = LoadEngine.loadWorkspace(temp);
+			ws2 = LoadEngine.loadWorkspace(temp);
 		} catch (BadSIFFFileException e) {
 			e.printStackTrace();
 			fail( "Couldn't loadback file.");
@@ -92,13 +94,13 @@ public class Test1 {
 		
 		// Compare the two workspaces
 		Node g1 = workspace.getRootNode();
-		Node g2 = workspace.getRootNode();
+		Node g2 = ws2.getRootNode();
 		
 		List<Node> l1 = g1.getAllNodes();
 		List<Node> l2 = g2.getAllNodes();
 		
 		if( l1.size() != l2.size()) 
-			fail("Node desync.");
+			fail("Node desync." + l1.size() + "v s " + l2.size());
 		
 		for( int i = 0; i < l1.size(); ++i) {
 			g1 = l1.get(i);
@@ -108,8 +110,18 @@ public class Test1 {
 			assert( g1.getClass().equals(g2.getClass()));
 			
 			if( g1 instanceof LayerNode) {
-				assert( ((LayerNode)g1).getLayer().getUsedImageData().equals(
-						((LayerNode)g2).getLayer().getUsedImageData()));
+				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getUsedImageData().iterator();
+				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getUsedImageData().iterator();
+
+				while( it1.hasNext()) {
+					assert(
+						compareImages(
+								it1.next().deepAccess(),
+								it2.next().deepAccess()
+								
+						));
+				}
+				assert( !it2.hasNext());
 			}
 		}
 		
@@ -245,9 +257,10 @@ public class Test1 {
 	 * 
 	 * Use in conjunction with VisualVM or such if you suspect untracked leaks.
 	 */
+	public static final int CACHE_ROUNDS = 100;
 	@Test
 	public void testCacheClearing() {
-		for( int round=0; round < 1000; ++round) {
+		for( int round=0; round < CACHE_ROUNDS; ++round) {
 			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
 			workspace.finishBuilding();
 			master.addWorkpace(workspace, false);

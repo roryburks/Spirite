@@ -191,8 +191,9 @@ public class MasterControl
     /***
      * Called when you want to add a Workspace that has been algorithmically constructed
      * 	such as with the LoadEngine, rather than making a new one with a default layer.
+     * @return 
      */
-	public void addWorkpace(ImageWorkspace workspace, boolean select) {
+	public ImageWorkspace addWorkpace(ImageWorkspace workspace, boolean select) {
 		workspaces.add(workspace);
 		triggerNewWorkspace(workspace);
 		
@@ -201,6 +202,8 @@ public class MasterControl
 		if( select || currentWorkspace == null) {
 			setCurrentWorkpace(workspace);
 		}
+		
+		return workspace;
 	}
 	
 	public ImageWorkspace createWorkspaceFromImage( BufferedImage image, boolean select) {

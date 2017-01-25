@@ -16,8 +16,10 @@ import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.layers.Layer;
@@ -31,13 +33,21 @@ public class LoadEngine {
 	private static MasterControl master;
 	public static void setMaster( MasterControl m) { master = m;}
 	
+	private static class LoadSettings {
+		int version;
+	}
+	
 	/** Attempts to load the given file into a new Workspace. */
 	public static ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
 	{
 		RandomAccessFile ra;
+		LoadSettings settings = new LoadSettings();
 		
 		try {
+			int width = -1;
+			int height = -1;
+			
 			if( !file.exists()) {
 				throw new BadSIFFFileException("File Does Not Exist.");
 			}
@@ -47,12 +57,21 @@ public class LoadEngine {
 			// Verify Header
 			ra.seek(0);
 			byte[] header = SaveLoadUtil.getHeader();
-			byte[] b = new byte[8];
+			byte[] b = new byte[4];
 			ra.read(b);
+			
 			
 			if( !Arrays.equals( header, b)) {
 				ra.close();
 				throw new BadSIFFFileException("Bad Fileheader (not an SIFF File).");
+			}
+			
+			settings.version = ra.readInt();
+			
+			if( settings.version >= 1) {
+				int packed = ra.readInt();
+				width = MUtil.high16(packed);
+				height= MUtil.low16(packed);
 			}
 			
 			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
@@ -73,7 +92,7 @@ public class LoadEngine {
 			for( ChunkInfo ci : chunks) {
 				if( ci.header.equals("GRPT")) {
 					ra.seek( ci.startPointer);
-					parseGroupTreeSection(workspace, ra, ci.size);
+					parseGroupTreeSection(workspace, ra, ci.size,settings);
 				}
 			}
 			
@@ -89,6 +108,9 @@ public class LoadEngine {
 			// TODO
 			
 			workspace.importData( workspace.getRootNode(), imageMap);
+
+			workspace.setWidth(width);
+			workspace.setHeight(height);
 			
 			workspace.finishBuilding();
 			workspace.fileSaved(file);
@@ -167,7 +189,10 @@ public class LoadEngine {
 	 * [GRPT]
 	 */
 	private static void parseGroupTreeSection( 
-			ImageWorkspace workspace, RandomAccessFile ra, int chunkSize) 
+			ImageWorkspace workspace, 
+			RandomAccessFile ra, 
+			int chunkSize,
+			LoadSettings settings) 
 			throws IOException 
 	{
 		long endPointer = ra.getFilePointer() + chunkSize;
@@ -186,8 +211,23 @@ public class LoadEngine {
 		}
 		
 		while( ra.getFilePointer() < endPointer) {
+			// Default values
+			float alpha = 1.0f;
+			int ox = 0;
+			int oy = 0;
+			int bitmask = 0x01 | 0x02;
+			
 			// Read data
-			depth = ra.readUnsignedByte();			
+			depth = ra.readUnsignedByte();
+			
+			if( settings.version >= 1) {
+				alpha = ra.readFloat();
+				int packed = ra.readInt();
+				ox = MUtil.high16(packed);
+				oy = MUtil.low16(packed);
+				bitmask = ra.readByte();
+			}
+			
 			type = ra.readUnsignedByte();
 			
 			if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) 
@@ -196,18 +236,26 @@ public class LoadEngine {
 			
 			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
 			
+			Node node = null;
+			
 			// !!!! Kind of hack-y that it's even saved, but only the root node should be
 			//	depth 0 and there should only be one (and it's already created)
-			if( depth == 0) {}
+			if( depth == 0) { continue;}
 			else {
 				if( type == SaveLoadUtil.NODE_GROUP) {
-					nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
+					node = nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
 					nodeLayer[depth].setExpanded(true);
 				}
 				if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) {
 					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
-					workspace.addShellLayer( nodeLayer[depth-1], layer, name);
+					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
 				}
+			}
+			if( node != null) {
+				node.setAlpha(alpha);
+				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
+				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
+				node.setOffset(ox, oy);
 			}
 		}
 	}

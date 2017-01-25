@@ -99,7 +99,7 @@ public class GroupTree {
 		public int getOffsetY() {
 			return y;
 		}
-		public void setOffsetX( int x, int y) {
+		public void setOffset( int x, int y) {
 			if( context.nodeInWorkspace(this) && (this.x != x || this.y != y)) {
 				context.executeChange( context.new OffsetChange( this, x, y));
 			}

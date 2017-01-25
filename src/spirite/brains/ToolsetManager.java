@@ -24,7 +24,8 @@ public class ToolsetManager {
 		FILL("Fill"), 
 		BOX_SELECTION("Box Selection"), 
 		MOVE("Move"),
-		COLOR_PICKER("Color Picker");
+		COLOR_PICKER("Color Picker"),
+		PIXEL("Pixel");
 		
 		public final String description;
 		Tool( String name){ this.description = name;}

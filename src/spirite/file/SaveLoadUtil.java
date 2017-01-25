@@ -19,22 +19,21 @@ public class SaveLoadUtil {
 	public static final byte NODE_SIMPLE_LAYER = 0x01;
 	public static final byte NODE_UNKNOWN = (byte)0xFF;
 	
+	public static final int VERSION = 0x0000_0001;
+
+	public static final int VISIBLE_MASK = 0x01;
+	public static final int EXPANDED_MASK = 0x02;
+	
 	/***
 	 * Gets the current SIFF header
 	 */
 	public static byte[] getHeader() 
 			throws UnsupportedEncodingException
-		{
-			byte b[] = new byte[8];
-			System.arraycopy( "SIFF".getBytes("UTF-8"), 0, b, 0, 4);
-			
-			// Versioning
-			b[4] = 0;
-			b[5] = 0;
-			b[6] = 0;
-			b[7] = 0;
-			return b;
-		}
+	{
+		byte b[] = new byte[4];
+		System.arraycopy( "SIFF".getBytes("UTF-8"), 0, b, 0, 4);
+		return b;
+	}
 	
 	/***
 	 * Converts a string to a Null-Terminated byte array using

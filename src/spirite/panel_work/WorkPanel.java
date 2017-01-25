@@ -102,6 +102,11 @@ public class WorkPanel extends javax.swing.JPanel
 
 		calibrateScrolls();
 
+		h = workspace.getHeight();
+		w = workspace.getWidth();
+		h_h = h/2;
+		h_w = w/2;
+		
 		center.x = workspace.getWidth() / 2;
 		center.y = workspace.getHeight() / 2;
 
@@ -127,26 +132,28 @@ public class WorkPanel extends javax.swing.JPanel
     		workspace.triggerReferenceStructureChanged(false);
     	}
     	
+    	public float getRawZoom() {return zoom;}
     	public void setFineZoom( float zoom) {
     		this.zoom = zoom;
     		workspace.triggerReferenceStructureChanged(false);
     	}
     	
     	public float getZoom() {
+    		System.out.println(h_h);
     		return super.getZoom() * zoomer.getZoom();
     	}
     	
         // :::: Coordinate Conversion methods
 
-        int itsX( int x) { return Math.round( (x + cx) * zoom  * zoomer.zoom) + offsetx;}
-        int itsY( int y) { return Math.round( (y + cy) * zoom * zoomer.zoom) + offsety ;}
-        int stiX( int x) { return Math.round((x - offsetx) / zoom * zoomer.zoom - cx);}
-        int stiY( int y) { return Math.round((y - offsety) / zoom * zoomer.zoom - cy);}
+        int itsX( int x) { return Math.round( (x - h_w) * zoom  * zoomer.zoom) + offsetx + h_w + cx;}
+        int itsY( int y) { return Math.round( (y - h_h) * zoom * zoomer.zoom) + offsety + h_h +cy;}
+        int stiX( int x) { return Math.round((x - offsetx - h_w - cx) / zoom * zoomer.zoom + h_w);}
+        int stiY( int y) { return Math.round((y - offsety - h_h - cy) / zoom * zoomer.zoom + h_h);}
         
-        int itsXm( int x) { return (int) (Math.floor((x +cx) * zoom * zoomer.zoom) + offsetx);}
-        int itsYm( int y) { return (int) (Math.floor((y +cy)* zoom * zoomer.zoom) + offsety);}
-        int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom * zoomer.zoom-cx);}
-        int stiYm( int y) { return (int) Math.floor((y - offsety ) / zoom * zoomer.zoom-cy);}
+        int itsXm( int x) { return (int) (Math.floor((x - h_w) * zoom * zoomer.zoom) + offsetx + h_w + cx);}
+        int itsYm( int y) { return (int) (Math.floor((y - h_h)* zoom * zoomer.zoom) + offsety + h_h + cy);}
+        int stiXm( int x) { return (int) Math.floor((x - offsetx - h_w - cx) / zoom * zoomer.zoom + h_w);}
+        int stiYm( int y) { return (int) Math.floor((y - offsety - h_h - cy) / zoom * zoomer.zoom + h_h);}
     }
     
     public class Zoomer {

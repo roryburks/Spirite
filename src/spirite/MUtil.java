@@ -20,8 +20,8 @@ import javax.swing.SwingUtilities;
 public class MUtil {
 
 	// :::: Math Functions
-	public static int packInt( int low, int high) {
-		return (low&0xffff) | ((high&0xffff) << 16);
+	public static int packInt( int high, int low) {
+		return ((high&0xffff) << 16) | (low&0xffff);
 	}
 	
 	public static int low16( int i) {

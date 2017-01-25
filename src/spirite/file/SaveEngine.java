@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
@@ -38,9 +39,14 @@ public class SaveEngine {
 	
 			
 			
-			// Write Header
+			// [4] Header
 			ra.write( SaveLoadUtil.getHeader());
+			// [4]Version
+			ra.writeInt(1);
 			
+			// [2] Width, [2] Height
+			ra.writeInt(MUtil.packInt(workspace.getWidth(), workspace.getHeight()));
+
 			// Save Group
 			saveGroupTree( workspace.getRootNode(), ra);
 			
@@ -79,14 +85,26 @@ public class SaveEngine {
 	private static void _sgt_rec( GroupTree.Node node, RandomAccessFile ra, byte depth) 
 			throws UnsupportedEncodingException, IOException 
 	{
+		// [1] : Depth of Node in GroupTree
+		ra.writeByte( depth);
+		
+		// [4] : alpha
+		ra.writeFloat(node.getAlpha());
+		
+		// [2] : x offset [2] : y offset
+		ra.writeInt( MUtil.packInt(node.getOffsetX(), node.getOffsetY()));
+
+		// [1] : bitmask
+		int mask = 
+				(node.isVisible() ? SaveLoadUtil.VISIBLE_MASK : 0) + 
+				(node.isExpanded() ? SaveLoadUtil.EXPANDED_MASK : 0); 
+		ra.writeByte( mask);
+		
 		if( node instanceof GroupTree.GroupNode) {
 			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
-			
-			// [1] : Depth of Node in GroupTree
-			ra.write( depth);
 			// [1] : Node Type ID
 			ra.write( SaveLoadUtil.NODE_GROUP);
-
+			
 			// [n] : Null-terminated UTF-8 String for Layer name
 			ra.write( SaveLoadUtil.strToByteArrayUTF8(gnode.getName()));
 			
@@ -102,8 +120,6 @@ public class SaveEngine {
 		else if( node instanceof GroupTree.LayerNode) {
 			Layer layer = ((GroupTree.LayerNode) node).getLayer();
 			
-			// [1] : Depth of Node in GroupTree
-			ra.write( depth);
 			
 			if( layer instanceof SimpleLayer) {
 				// [1] : Node Type ID

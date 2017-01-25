@@ -177,6 +177,8 @@ public class Penner
 					state = STATE.PICKING;
 					stateVar = (button == PButton.Type.LEFT)?1:0;
 					break;
+				case PIXEL:
+					startPixel( button == PButton.Type.LEFT);
 				}
 
 				activeTool = tool;
@@ -241,6 +243,16 @@ public class Penner
 		// Start the Stroke
 		startStroke( stroke);
 	}	
+	private void startPixel( boolean leftClick) {
+		StrokeParams stroke = new StrokeParams();
+		stroke.setMethod( Method.PIXEL);
+		Color c = (leftClick) ? 
+				paletteManager.getActiveColor(0)
+				: paletteManager.getActiveColor(1);
+		stroke.setColor( c);
+		startStroke( stroke);
+		
+	}
 	private void startStroke( StrokeParams stroke) {
 		if( workspace != null && workspace.getActiveData() != null) {
 			ImageHandle data = workspace.getActiveData();
@@ -337,6 +349,8 @@ public class Penner
 	private int oldY;	// 	for things that only happen if they change
 	private int rawX;	// raw position are the last-recorded coordinates in pure form
 	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
+	private int oldRawX;
+	private int oldRawY;
 	
 	private float pressure = 1.0f;
 	
@@ -412,7 +426,7 @@ public class Penner
 			break;
 		case MOVING_NODE:
 			if( node != null && (oldX != x || oldY != y))
-				node.setOffsetX( node.getOffsetX() + (x - oldX), 
+				node.setOffset( node.getOffsetX() + (x - oldX), 
 								 node.getOffsetY() + (y - oldY));
 			break;
 		case PICKING:
@@ -420,12 +434,11 @@ public class Penner
 			break;
 			
 		case REF_GLOBAL_MOVE:
-			context.refzoomer.setCX( context.refzoomer.getCX()+ (x - oldX));
-			context.refzoomer.setCY( context.refzoomer.getCY()+ (y - oldY));
+			context.refzoomer.setCX( Math.round(context.refzoomer.getCX()+ (x - oldX)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
+			context.refzoomer.setCY( Math.round(context.refzoomer.getCY()+ (y - oldY)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
 			break;
 		case REF_FINE_ZOOM:
-			System.out.println(y - oldY + "," + Math.pow(1.0005, 1+(y-oldY)));
-			context.refzoomer.setFineZoom((float) (context.refzoomer.getZoom() * Math.pow(1.0005, 1+(y-oldY))));
+			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0005, 1+(rawY - oldRawY))));
 			break;
 		case REF_NODE_MOVE:
 			
@@ -434,6 +447,8 @@ public class Penner
 		
 		oldX = x;
 		oldY = y;
+		oldRawX = rawX;
+		oldRawY = rawY;
 	}
 
 	

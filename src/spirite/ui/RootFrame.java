@@ -304,7 +304,7 @@ public class RootFrame extends javax.swing.JFrame
 
         	File f=workspace.getFile();
 
-        	if( !workspace.hasChanged() || f == null) {
+        	if( workspace.hasChanged() || f == null) {
 	        	if( f == null)
 	        		f = Dialogs.pickFileSave();
 	        	
@@ -360,8 +360,9 @@ public class RootFrame extends javax.swing.JFrame
 		try {
 			// If it's not recognized (or failed to load) as a normal file, try to
 			//	load it as an SIF
-			master.addWorkpace( 
+			ImageWorkspace ws = master.addWorkpace( 
 				LoadEngine.loadWorkspace( f), true);
+			ws.fileSaved(f);
 			master.getSettingsManager().setWorkspaceFilePath(f);
 			return;
 		} catch (BadSIFFFileException e) {}

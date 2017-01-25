@@ -247,20 +247,22 @@ public class DrawEngine {
 			{
 				prec.add( new PenState(newState));
 				Graphics g = strokeLayer.getGraphics();
-
 				Graphics2D g2 = (Graphics2D)g;
 				g.setColor( stroke.getColor());
-				g2.setStroke( new BasicStroke( 
-						stroke.dynamics.getSize(newState)*stroke.width, 
-						BasicStroke.CAP_ROUND, 
-						BasicStroke.CAP_SQUARE));
+
+				if( stroke.getMethod() != Method.PIXEL){
+					g2.setStroke( new BasicStroke( 
+							stroke.dynamics.getSize(newState)*stroke.width, 
+							BasicStroke.CAP_ROUND, 
+							BasicStroke.CAP_SQUARE));
+				}
 				g2.drawLine( oldState.x, oldState.y, newState.x, newState.y);
 				
+
 				if( sel.selection != null) {
 					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 					g2.drawImage(selectionMask, 0, 0, null);
 				}
-					
 				
 				g.dispose();
 				changed = true;
@@ -317,6 +319,7 @@ public class DrawEngine {
 			Composite c = g2.getComposite();
 			switch( stroke.method) {
 			case BASIC:
+			case PIXEL:
 				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.alpha));
 				break;
 			case ERASE:
@@ -333,7 +336,7 @@ public class DrawEngine {
 		}
 	}
 
-	public enum Method {BASIC, ERASE};
+	public enum Method {BASIC, ERASE, PIXEL};
 	/** 
 	 * StrokeParams define the style/tool/options of the Stroke.
 	 * 
@@ -439,6 +442,9 @@ public class DrawEngine {
 				break;
 			case ERASE:
 				description = "Erase Stroke Action";
+				break;
+			case PIXEL:
+				description = "Pixel Stroke Action";
 				break;
 			}
 		}
