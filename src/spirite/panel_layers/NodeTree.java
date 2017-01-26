@@ -469,9 +469,10 @@ public class NodeTree extends ContentTree
 	// :::: ActionListener
 	@Override
 	public void actionPerformed(ActionEvent evt) {
+		
 		// ActionCommands from JPopupMenu
 		switch( evt.getActionCommand()) {
-		case "animformgroup":
+		case "animfromgroup":
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
 			manager.linkAnimation(

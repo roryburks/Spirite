@@ -124,11 +124,12 @@ public class AnimPanel extends OmniComponent
 	}
 	
 	private void constructFromAnimation( AbstractAnimation anim) {
+		
 		animation = anim;
 		start = anim.getStartFrame();
 		end = anim.getEndFrame();
 		slider.setValue(0);
-		
+
 		updateSlider();
 	}
 	
@@ -313,7 +314,10 @@ public class AnimPanel extends OmniComponent
 	public void animationStructureChanged(AnimationStructureEvent evt) {
 		try{
 		constructFromAnimation( workspace.getAnimationManager().getAnimations().get(0));
-		} catch( NullPointerException e) {}
+		} catch( NullPointerException e) {
+			System.out.println("None");
+			
+		}
 		
 	}
 	

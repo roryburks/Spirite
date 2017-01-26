@@ -54,14 +54,16 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				watcher.interval < (time - watcher.lastTime)/1000 &&
 				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome()) 
 			{
+				watcher.lastTime = time;
 				(new Thread(new Runnable() {
 					@Override
 					public void run() {
 						System.out.println("Saving Backup");
-						saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"));
+						saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
 						System.out.println("Finished");
 					}
 				})).start();
+				watcher.lastTime = time;
 			}
 		}
 	}
@@ -129,6 +131,9 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
 	/** Attempts to save the workspace to a SIF (native image format) file. */
 	public void saveWorkspace( ImageWorkspace workspace, File file) {
+		saveWorkspace( workspace, file, true);
+	}
+	public void saveWorkspace( ImageWorkspace workspace, File file, boolean track) {
 		RandomAccessFile ra;
 		List<ImageHandle> handles = null;
 		
@@ -164,7 +169,8 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 			
 			ra.close();
 			
-			workspace.fileSaved(file);
+			if( track)
+				workspace.fileSaved(file);
 		}catch (UnsupportedEncodingException e) {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
 		}catch( IOException e) {

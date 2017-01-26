@@ -474,6 +474,8 @@ public class ImageWorkspace {
 	
 	public void cropNode( Node nodeToCrop, Rectangle bounds) {
 		
+		System.out.println(bounds);
+		
 		bounds = bounds.intersection(new Rectangle(0,0,width,height));
 		if( bounds.isEmpty())return;
 		
@@ -490,13 +492,19 @@ public class ImageWorkspace {
 		List<UndoableAction> actions = new ArrayList<UndoableAction>();
 		
 		for( LayerNode node : toCrop ) {
+			Rectangle toCompare = new Rectangle( bounds);
+			toCompare.x -= node.x;
+			toCompare.y -= node.y;
 			
 			List<ImageHandle> handles = node.layer.getUsedImageData();
-			List<Rectangle> rects = node.layer.interpretCrop(bounds);
+			List<Rectangle> rects = node.layer.interpretCrop(toCompare);
 			
 			for( int i=0; i < handles.size() && i<rects.size(); ++i) {
 				Rectangle rect = new Rectangle(rects.get(i));
 				ImageHandle handle = handles.get(i);
+				
+				
+				System.out.println(toCompare +":::" + rect);
 				
 				
 				if( rect.x < 0) {
@@ -520,6 +528,8 @@ public class ImageWorkspace {
 				if( rect.height > handle.getHeight())
 					rect.height = handle.getHeight();
 				
+
+				System.out.println(rect);
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(image);
@@ -530,10 +540,10 @@ public class ImageWorkspace {
 				
 				
 				actions.add( undoEngine.createReplaceAction(handle, image));
+				actions.add(new StructureAction(
+						new OffsetChange(node, node.x+rect.x,node.y+rect.y)));
 			}
 	
-			actions.add(new StructureAction(
-					new OffsetChange(node, bounds.x, bounds.y)));
 		}
 		
 		if(!actions.isEmpty()) {
