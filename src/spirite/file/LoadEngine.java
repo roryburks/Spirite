@@ -36,7 +36,49 @@ public class LoadEngine {
 		this.master = master;
 	}
 	
-	private static class LoadSettings {
+	
+    public void openFile( File f) {
+    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
+    	
+    	boolean attempted = false;
+    	if( ext.equals("png") || ext.equals("bmp") || ext.equals("jpg") || ext.equals("jpeg")) 
+    	{
+    		// First try to load the file as normal if it's a normal image format
+    		try {
+				BufferedImage bi = ImageIO.read(f);
+				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+				master.getSettingsManager().setImageFilePath(f);
+				return;
+			} catch (IOException e) {
+				attempted = true;
+			}
+    	}
+		try {
+			// If it's not recognized (or failed to load) as a normal file, try to
+			//	load it as an SIF
+			ImageWorkspace ws = master.getLoadEngine().loadWorkspace( f);
+			ws.fileSaved(f);
+			master.addWorkpace( ws, true);
+			master.getSaveEngine().triggerAutosave(ws, 10, 10);	// Autosave every 5 minutes
+			master.getSettingsManager().setWorkspaceFilePath(f);
+			return;
+		} catch (BadSIFFFileException e) {}
+		if( !attempted) {
+			// If we didn't try to load the image as a normal format already (if 
+			//	its extension was not recognized) and loading it as an SIF failed,
+			//	try to load it as a normal Image
+    		try {
+				BufferedImage bi = ImageIO.read(f);
+				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+				master.getSettingsManager().setImageFilePath(f);
+				return;
+			} catch (IOException e) {}
+		}
+    }
+	
+    
+    
+	private static class LoadHelper {
 		int version;
 	}
 	
@@ -45,7 +87,7 @@ public class LoadEngine {
 		throws BadSIFFFileException
 	{
 		RandomAccessFile ra;
-		LoadSettings settings = new LoadSettings();
+		LoadHelper settings = new LoadHelper();
 		
 		try {
 			int width = -1;
@@ -77,7 +119,7 @@ public class LoadEngine {
 				height= MUtil.low16(packed);
 			}
 			
-			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+			ImageWorkspace workspace = new ImageWorkspace(master);
 			Map<Integer,BufferedImage> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
@@ -195,7 +237,7 @@ public class LoadEngine {
 			ImageWorkspace workspace, 
 			RandomAccessFile ra, 
 			int chunkSize,
-			LoadSettings settings) 
+			LoadHelper settings) 
 			throws IOException 
 	{
 		long endPointer = ra.getFilePointer() + chunkSize;

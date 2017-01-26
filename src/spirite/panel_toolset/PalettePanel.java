@@ -34,8 +34,9 @@ import spirite.ui.UIUtil;
 public class PalettePanel extends JPanel 
         implements MouseListener, MPaletteObserver, ActionListener
 {
-	// PalettePanel only needs access to PaletteManager
+	// PalettePanel only needs access to PaletteManager and Dialogs
     private final PaletteManager paletteManager;
+    private final Dialogs dialogs;
     
 	private static final long serialVersionUID = 1L;
 	private final static int BIG_SIZE = 20;
@@ -49,6 +50,7 @@ public class PalettePanel extends JPanel
     private JButton btnAddColor;
 
     public PalettePanel( MasterControl master) {
+    	this.dialogs = master.getDialogs();
         paletteManager = master.getPaletteManager();
 
         initComponents();
@@ -166,7 +168,7 @@ public class PalettePanel extends JPanel
     	Component draggedFrom = e.getComponent();
     	if( draggedFrom.contains(e.getPoint())) {
     		if( draggedFrom instanceof ColorPicker) {
-    			Color c = Dialogs.pickColor();
+    			Color c = dialogs.pickColor();
     			
     			if( c != null) {
     				paletteManager.setActiveColor(((ColorPicker)draggedFrom).index, c);
@@ -186,7 +188,7 @@ public class PalettePanel extends JPanel
     			else if( startIndex == endIndex) {
     				if( e.getClickCount() == 2 || startC == null) {
     					// Color Pick new Palette Color
-    					Color c = Dialogs.pickColor( startC);
+    					Color c = dialogs.pickColor( startC);
     					if( c != null)  {
     						paletteManager.setPaletteColor(startIndex, c);
         					paletteManager.setActiveColor(e.getButton()/2, c);

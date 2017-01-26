@@ -1,11 +1,14 @@
 package spirite.brains;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.MDebug;
@@ -19,6 +22,7 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
+import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.ui.FrameManager;
 
 /***
@@ -47,6 +51,7 @@ public class MasterControl
     private final RenderEngine renderEngine;// Require CacheManager
     private final SaveEngine saveEngine;
     private final LoadEngine loadEngine;
+    private final Dialogs dialog;
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -62,8 +67,7 @@ public class MasterControl
         palette = new PaletteManager( this);
         loadEngine = new LoadEngine(this);
         saveEngine = new SaveEngine(this);
-
-        Dialogs.setMaster(this); //// TODO BAD
+        dialog = new Dialogs(this);
     }
 
 
@@ -100,6 +104,9 @@ public class MasterControl
     }
     public LoadEngine getLoadEngine() {
     	return loadEngine;
+    }
+    public Dialogs getDialogs() {
+    	return dialog;
     }
     
     
@@ -168,7 +175,7 @@ public class MasterControl
     		File f = workspace.getFile();
     		
     		if( f == null)
-    			f = Dialogs.pickFileSave();
+    			f = dialog.pickFileSave();
     		
     		if( f != null) {
     			saveEngine.saveWorkspace(workspace, workspace.getFile());
@@ -225,7 +232,7 @@ public class MasterControl
 	}
 	
 	public ImageWorkspace createWorkspaceFromImage( BufferedImage image, boolean select) {
-		ImageWorkspace workspace = new ImageWorkspace(cacheManager);
+		ImageWorkspace workspace = new ImageWorkspace(this);
 		if( image != null)
 			workspace.addNewSimpleLayer(null, image, "Base Image");
 		workspace.finishBuilding();
@@ -237,7 +244,7 @@ public class MasterControl
 
     public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
     public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
-    	ImageWorkspace ws = new ImageWorkspace( cacheManager);
+    	ImageWorkspace ws = new ImageWorkspace( this);
     	ws.addNewSimpleLayer(null, width, height, "Background", color);
     	
     	workspaces.add( ws);
@@ -248,6 +255,118 @@ public class MasterControl
     		setCurrentWorkpace( ws);
     	}
     }
+    
+    public void executeCommandString( String command) {
+    	String space = command.substring(0, command.indexOf(".")+1);
+    	if( space == null) {
+    		System.out.println(command);
+    		return;
+    	}
+    	switch( space) {
+    	case "global.":
+            globalHotkeyCommand(command.substring("global.".length()));
+            break;
+    	case "toolset.":
+    		toolset.setSelectedTool(command.substring("toolset.".length()));    		
+            break;
+    	case "palette.":
+        	palette.performCommand(command.substring("palette.".length()));
+    		break;
+    	case "frame.":
+        	frameManager.performCommand(command.substring("frame.".length()));
+        	break;
+    	case "context.":
+            frameManager.getRootFrame().contextualCommand(command.substring("context.".length()));
+            break;
+    	case "draw.":
+        	if( currentWorkspace != null) {
+        		currentWorkspace.executeDrawCommand( command.substring("draw.".length()));
+        	}
+        	break;
+       	default:
+            	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
+    	}
+    }
+    
+    /** Performs the given hotkey command string (should be of "global." focus). */
+    private void globalHotkeyCommand( String command) {
+    	
+    	switch( command) {
+    	case "save":{
+    		if( currentWorkspace == null)
+    			break;
+    		
+        	File f=currentWorkspace.getFile();
+
+        	if( currentWorkspace.hasChanged() || f == null) {
+	        	if( f == null)
+	        		f = dialog.pickFileSave();
+	        	
+	        	if( f != null) {
+	        		saveWorkspace(currentWorkspace, f);
+	        		settingsManager.setWorkspaceFilePath(f);
+	        	}
+        	}
+        	break;}
+    	case "save_image_as": {
+			File f = dialog.pickFileSave();
+			
+			if( f != null) {
+				saveWorkspace(currentWorkspace, f);
+			}
+    		break;}
+    	case "new_image":
+    		dialog.promptNewImage();
+        	break;
+    	case "debug_color":
+    		dialog.promptDebugColor();
+    		break;
+    	case "open_image": {
+			File f =dialog.pickFileOpen();
+			
+			if( f != null) {
+	        	loadEngine.openFile( f);
+			}
+			break;}
+    	case "export":
+    	case "export_as":{
+			File f = dialog.pickFileExport();
+			
+			if( f != null) {
+				exportWorkspaceToFile( currentWorkspace, f);
+			}
+			break;}
+    		
+       	default:
+        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
+    	}
+    }
+    
+    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
+    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
+    	
+    	RenderSettings settings = new RenderSettings();
+    	settings.workspace = workspace;
+    	BufferedImage bi = renderEngine.renderImage(settings);
+    	
+    	if( ext.equals("jpg") || ext.equals("jpeg")) {
+    		// Remove Alpha Layer of JPG so that encoding works correctly
+    		BufferedImage bi2 = bi;
+    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
+    		Graphics g = bi.getGraphics();
+    		g.drawImage(bi2, 0, 0, null);
+    		g.dispose();
+    	}
+    	
+    	try {
+			ImageIO.write( bi, ext, f);
+			settingsManager.setImageFilePath(f);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
+			e.printStackTrace();
+		}
+    }
+    
     
     // Properly implementing this will require a better understanding of Swing
     //	and AWT threads, but the idea is to lock the Program from terminating

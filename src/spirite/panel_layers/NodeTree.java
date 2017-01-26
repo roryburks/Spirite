@@ -45,7 +45,6 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.dialogs.Dialogs;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
@@ -471,26 +470,27 @@ public class NodeTree extends ContentTree
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		// ActionCommands from JPopupMenu
-		if( evt.getActionCommand().equals("animfromgroup")) {
+		switch( evt.getActionCommand()) {
+		case "animformgroup":
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
 			manager.linkAnimation(
 					manager.addAnimation(new SimpleAnimation(group)),
 					group);
-		}
-		else if (evt.getActionCommand().equals("newGroup")){
+			break;
+		case "newGroup":
 			workspace.addGroupNode(contextMenu.node, "New Group");
-		}
-		else if (evt.getActionCommand().equals("newLayer")) {
-			Dialogs.performNewLayerDialog(workspace);
-		}
-		else if (evt.getActionCommand().equals("duplicate")) {
+			break;
+		case "newLayer":
+			master.getDialogs().performNewLayerDialog(workspace);
+			break;
+		case "duplicate":
 			workspace.duplicateNode(contextMenu.node);
-		}
-		else if (evt.getActionCommand().equals("delete")) {
+			break;
+		case "delete":
 			workspace.removeNode(contextMenu.node);
-		}
-		else {
+			break;
+		default:
 			System.out.println(evt.getActionCommand());
 		}
 	}

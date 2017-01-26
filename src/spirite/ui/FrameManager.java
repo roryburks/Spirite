@@ -62,7 +62,7 @@ public class FrameManager implements WindowListener {
 		case LAYER:
 			return new LayersPanel( master);
 		case TOOL_SETTINGS:
-			return new ToolSettingsPanel( master.getToolsetManager());
+			return new ToolSettingsPanel( master);
 //			return new ToolsPanel(master);
 		case ANIMATION_SCHEME:
 			return new AnimationSchemePanel(master);
@@ -130,6 +130,10 @@ public class FrameManager implements WindowListener {
         root.pack();
         root.setLocationByPlatform(true);
         root.setVisible(true);
+	}
+	
+	public RootFrame getRootFrame() {
+		return root;
 	}
 	
 	private List<OmniFrame> frameList() {

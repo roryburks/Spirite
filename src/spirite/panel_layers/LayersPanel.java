@@ -18,6 +18,7 @@ import spirite.ui.components.SliderPanel;
 public class LayersPanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;
 
+	final Dialogs dialogs;
 	private final LayerTreePanel layerTreePanel;
 	private final JButton btnNewLayer;
 	private final JButton btnNewGroup;
@@ -27,6 +28,7 @@ public class LayersPanel extends OmniComponent {
 	 * Create the panel.
 	 */
 	public LayersPanel(MasterControl master) {
+		this.dialogs = master.getDialogs();
 		
 		opacitySlider = new OpacitySlider();
 		layerTreePanel = new LayerTreePanel(master, this);
@@ -122,7 +124,7 @@ public class LayersPanel extends OmniComponent {
 
 	
 	private void btnNewLayerPress() {
-		Dialogs.performNewLayerDialog(layerTreePanel.workspace);
+		dialogs.performNewLayerDialog(layerTreePanel.workspace);
 	}
 	
 	private void btnNewGroupPress() {

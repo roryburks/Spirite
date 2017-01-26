@@ -538,7 +538,7 @@ public class SelectionEngine {
 		public abstract void drawSelectionBounds( Graphics g);
 		abstract void drawSelectionMask( Graphics g);
 		public abstract boolean contains( int x, int y);
-		abstract Rectangle getBounds();
+		public abstract Rectangle getBounds();
 		abstract Rectangle clipToRect( Rectangle rect);	// returns null if the clipped Selection is empty
 		
 		public abstract Selection clone();
@@ -548,7 +548,7 @@ public class SelectionEngine {
 		@Override		public void drawSelectionBounds(Graphics g) {}
 		@Override		void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
-		@Override		Rectangle getBounds() {return new Rectangle(0,0,0,0);}
+		@Override		public Rectangle getBounds() {return new Rectangle(0,0,0,0);}
 		@Override		Rectangle clipToRect(Rectangle rect) {return null;}
 		@Override		public Selection clone() { return new NullSelection();}
 	}
@@ -573,7 +573,7 @@ public class SelectionEngine {
 			g.fillRect(0, 0, width, height);
 		}
 		@Override
-		Rectangle getBounds() {
+		public Rectangle getBounds() {
 			return new Rectangle( 0, 0, width, height);
 		}
 		@Override

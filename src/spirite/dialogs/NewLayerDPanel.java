@@ -48,7 +48,9 @@ public class NewLayerDPanel extends JPanel {
 	private Color custom_color = null;
 
 
+	private final MasterControl master;
 	public NewLayerDPanel( MasterControl master) {
+		this.master = master;
 		ImageWorkspace image = master.getCurrentWorkspace();
 
 		b_selected = new BevelBorder(BevelBorder.RAISED, Color.BLACK, Color.WHITE, Color.WHITE, Color.BLACK);
@@ -200,7 +202,7 @@ public class NewLayerDPanel extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if( selected == 3 || custom_color == null) {
-					Color c = Dialogs.pickColor();
+					Color c = master.getDialogs().pickColor();
 					
 					if( c != null) {
 						colorPanelSelect.setBackground(c);

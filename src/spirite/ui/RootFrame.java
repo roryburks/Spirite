@@ -1,7 +1,6 @@
 
 package spirite.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -18,12 +17,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-import javax.swing.JColorChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,9 +26,6 @@ import javax.swing.JPanel;
 import spirite.MDebug;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
-import spirite.dialogs.Dialogs;
-import spirite.dialogs.NewImagePanel;
-import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -95,7 +87,7 @@ public class RootFrame extends javax.swing.JFrame
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
-    	settingPanel = new ToolSettingsPanel( master.getToolsetManager());
+    	settingPanel = new ToolSettingsPanel( master);
     	
     	leftContainer = new JPanel();
     	rightContainer = new ResizeContainerPanel(palettePanel, ContainerOrientation.VERTICAL);
@@ -152,8 +144,8 @@ public class RootFrame extends javax.swing.JFrame
     			{".Debug &Color", "global.debug_color", null},
     			
     			{"&Edit", null, null},
-    			{".&Undo", "global.undo", null},
-    			{".&Redo", "global.redo", null},
+    			{".&Undo", "draw.undo", null},
+    			{".&Redo", "draw.redo", null},
     			
     			{"&Layer", null, null},
     			{".Auto&crop Layer", "draw.autocroplayer", null},
@@ -180,74 +172,8 @@ public class RootFrame extends javax.swing.JFrame
     
     // :::: Menu Actions
     
-    /** Prompts for a new image dialog and then performs it. */
-    private void promptNewImage() {     
-        NewImagePanel panel = new NewImagePanel(master);
-
-        int response = JOptionPane.showConfirmDialog(this,
-                panel,
-                "New Image",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE);
-
-        if( response == JOptionPane.OK_OPTION) {
-            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
-            master.getCurrentWorkspace().finishBuilding();
-        }
-    }                                            
-
-    /**     */
-    private void promptDebugColor() {
-        // TODO DEBUG
-        JColorChooser jcp = new JColorChooser();
-        int response = JOptionPane.showConfirmDialog(this, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if( response == JOptionPane.OK_OPTION) {
-            master.getPaletteManager().setActiveColor(0, jcp.getColor());
-        }
-
-    }                                             
-
-
-
-    /**
-     * Performs the given hotkey command string or delegates the command to the
-     * appropriate component
-     */
-    public void performCommand( String command) {
-    	String space = command.substring(0, command.indexOf(".")+1);
-    	if( space == null) {
-    		System.out.println(command);
-    		return;
-    	}
-    	switch( space) {
-    	case "global.":
-            globalHotkeyCommand(command.substring("global.".length()));
-            break;
-    	case "toolset.":
-            master.getToolsetManager().setSelectedTool(command.substring("toolset.".length()));    		
-            break;
-    	case "palette.":
-        	master.getPaletteManager().performCommand(command.substring("palette.".length()));
-    		break;
-    	case "frame.":
-        	master.getFrameManager().performCommand(command.substring("frame.".length()));
-        	break;
-    	case "context.":
-            contextualCommand(command.substring("context.".length()));
-            break;
-    	case "draw.":
-        	final ImageWorkspace workspace = master.getCurrentWorkspace();
-        	if( workspace != null) {
-        		workspace.executeDrawCommand( command.substring("draw.".length()));
-        	}
-        	break;
-       	default:
-            	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
-    	}
-    }
     
-    private void contextualCommand( String command) {
+    public void contextualCommand( String command) {
     	// !!! TODO: As I add new components that can have contextual commands
     	//	figure out how I want to generalize this
     	WorkPanel workPanel = workPane.getCurrentWorkPane();
@@ -276,144 +202,11 @@ public class RootFrame extends javax.swing.JFrame
         }
     }
     
-    /** Performs the given hotkey command string (should be of "global." focus). */
-    private void globalHotkeyCommand( String command) {
-        if( command.equals("new_image"))
-        	promptNewImage();
-        else if( command.equals("toggle_reference")) {
-        	ImageWorkspace workspace = master.getCurrentWorkspace();
-        	if( workspace != null) {
-        		workspace.setEditingReference(!workspace.isEditingReference());
-        	}
-        }
-        else if( command.equals("debug_color"))
-        	promptDebugColor();
-        else if( command.equals("newLayerQuick")) {
-        	ImageWorkspace workspace = master.getCurrentWorkspace();
-        	if( workspace != null) {
-        		workspace.setSelectedNode(
-        			workspace.addNewSimpleLayer( 
-        				workspace.getSelectedNode(), 
-        				workspace.getWidth(), 
-        				workspace.getHeight(), 
-        				"newLayer", 
-        				new Color(0,0,0,0)));
-        		
-        		
-        	}
-        }
-        else if( command.equals("open_image")){
-			File f =Dialogs.pickFileOpen();
-			
-			if( f != null) {
-	        	openFile( f);
-			}
-        }
-        else if( command.equals("save_image")) {
-        	ImageWorkspace workspace = master.getCurrentWorkspace();
 
-        	File f=workspace.getFile();
+    
 
-        	if( workspace.hasChanged() || f == null) {
-	        	if( f == null)
-	        		f = Dialogs.pickFileSave();
-	        	
-	        	if( f != null) {
-	        		master.saveWorkspace(workspace, f);
-	        		master.getSettingsManager().setWorkspaceFilePath(f);
-	        	}
-        	}
-        }
-		else if( command.equals("save_image_as")) {
-			File f = Dialogs.pickFileSave();
-			
-			if( f != null) {
-				master.saveWorkspace(master.getCurrentWorkspace(), f);
-			}
-		}
-		else if( command.equals("undo")) {
-			if( master.getCurrentWorkspace() != null)
-				master.getCurrentWorkspace().getUndoEngine().undo();
-		}
-		else if( command.equals("redo")) {
-			if( master.getCurrentWorkspace() != null)
-				master.getCurrentWorkspace().getUndoEngine().redo();
-		}
-		else if( command.equals("export") || command.equals("export_as")) {
-			File f = Dialogs.pickFileExport();
-			
-			if( f != null) {
-				exportWorkspaceToFile( master.getCurrentWorkspace(), f);
-			}
-		}
-        else {
-        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
-        }
-    }
     
-    private void openFile( File f) {
-    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
-    	
-    	boolean attempted = false;
-    	if( ext.equals("png") || ext.equals("bmp") || ext.equals("jpg") || ext.equals("jpeg")) 
-    	{
-    		// First try to load the file as normal if it's a normal image format
-    		try {
-				BufferedImage bi = ImageIO.read(f);
-				master.createWorkspaceFromImage(bi, true).fileSaved(f);
-				master.getSettingsManager().setImageFilePath(f);
-				return;
-			} catch (IOException e) {
-				attempted = true;
-			}
-    	}
-		try {
-			// If it's not recognized (or failed to load) as a normal file, try to
-			//	load it as an SIF
-			ImageWorkspace ws = master.getLoadEngine().loadWorkspace( f);
-			ws.fileSaved(f);
-			master.addWorkpace( ws, true);
-			master.getSaveEngine().triggerAutosave(ws, 10, 10);	// Autosave every 5 minutes
-			master.getSettingsManager().setWorkspaceFilePath(f);
-			return;
-		} catch (BadSIFFFileException e) {}
-		if( !attempted) {
-			// If we didn't try to load the image as a normal format already (if 
-			//	its extension was not recognized) and loading it as an SIF failed,
-			//	try to load it as a normal Image
-    		try {
-				BufferedImage bi = ImageIO.read(f);
-				master.createWorkspaceFromImage(bi, true).fileSaved(f);
-				master.getSettingsManager().setImageFilePath(f);
-				return;
-			} catch (IOException e) {}
-		}
-    }
-    
-    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
-    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
-    	
-    	RenderSettings settings = new RenderSettings();
-    	settings.workspace = workspace;
-    	BufferedImage bi = master.getRenderEngine().renderImage(settings);
-    	
-    	if( ext.equals("jpg") || ext.equals("jpeg")) {
-    		// Remove Alpha Layer of JPG so that encoding works correctly
-    		BufferedImage bi2 = bi;
-    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
-    		Graphics g = bi.getGraphics();
-    		g.drawImage(bi2, 0, 0, null);
-    		g.dispose();
-    	}
-    	
-    	try {
-			ImageIO.write( bi, ext, f);
-			master.getSettingsManager().setImageFilePath(f);
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
-			e.printStackTrace();
-		}
-    }
+
     
     // :::: KeyEventDispatcher
     @Override
@@ -435,7 +228,7 @@ public class RootFrame extends javax.swing.JFrame
             	String command = master.getHotekyManager().getCommand( key, modifier);
 
             	if( command != null)
-            		performCommand(command);
+            		master.executeCommandString(command);
             }
 
         }
@@ -455,7 +248,7 @@ public class RootFrame extends javax.swing.JFrame
 
     		ImageWorkspace workspace = master.getCurrentWorkspace();
     		if( workspace == null) {
-    			workspace = new ImageWorkspace(master.getCacheManager());
+    			workspace = new ImageWorkspace(master);
     			newWorkspace = true;
     		}
     		
@@ -510,7 +303,7 @@ public class RootFrame extends javax.swing.JFrame
 	// :::: ActionListener
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		performCommand(evt.getActionCommand());
+		master.executeCommandString(evt.getActionCommand());
 	}
 
 	// :::: WindowListener

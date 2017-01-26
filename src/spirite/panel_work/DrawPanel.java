@@ -102,7 +102,12 @@ public class DrawPanel extends JPanel
 
             // Draw Border around the Workspace
             Stroke old_stroke = g2.getStroke();
-            Stroke new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, 0);
+            Stroke new_stroke = new BasicStroke(
+            		1, 
+            		BasicStroke.CAP_BUTT, 
+            		BasicStroke.JOIN_BEVEL, 
+            		0, 
+            		new float[]{4,2}, 0);
             g2.setStroke(new_stroke);
             g2.setColor(Globals.getColor("drawpanel.image.border"));
             g2.drawRect( zoomer.itsX(0)-1,
@@ -170,7 +175,13 @@ public class DrawPanel extends JPanel
         if( selection != null) {
         	AffineTransform trans = g2.getTransform();
             Stroke old_stroke = g2.getStroke();
-            Stroke new_stroke = new BasicStroke(1/(( zoom >= 4)?(zoom/2):zoom), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4/zoom,2/zoom}, 0);
+            Stroke new_stroke = new BasicStroke(
+            		1/(( zoom >= 4)?(zoom/2):zoom), 
+            		BasicStroke.CAP_BUTT, 
+            		BasicStroke.JOIN_BEVEL, 
+            		0, 
+            		new float[]{4/zoom,2/zoom}, 
+            		0);
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoom, zoom);
             g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
@@ -181,6 +192,9 @@ public class DrawPanel extends JPanel
             g2.setTransform(trans);
         }
         
+        // 
+        if( penner.drawsOverlay())
+        	penner.paintOverlay(g);
     }
 
 

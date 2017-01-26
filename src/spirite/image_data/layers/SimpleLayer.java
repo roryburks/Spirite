@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import spirite.image_data.ImageHandle;
-import spirite.image_data.UndoEngine.UndoableAction;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;
@@ -52,8 +51,10 @@ public class SimpleLayer extends Layer {
 
 	@Override
 	public List<Rectangle> interpretCrop(Rectangle rect) {
+		Rectangle bounds = new Rectangle(data.getWidth(), data.getHeight());
+		
 		List<Rectangle> list = new ArrayList<>(1);
-		list.add( new Rectangle(rect));
+		list.add( bounds.intersection(rect));
 		
 		return list;
 	}

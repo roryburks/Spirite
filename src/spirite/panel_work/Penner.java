@@ -1,9 +1,16 @@
 package spirite.panel_work;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -73,6 +80,34 @@ public class Penner
 	private final RenderEngine renderEngine;	// used for color picking.
 												// might not belong here, maybe in DrawEngine
 	
+
+	private boolean holdingShift = false;
+	private boolean holdingCtrl = false;
+	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
+	
+	// Naturally, being a mouse (or drawing tablet)-based input handler with
+	//	a variety of states, a large number of coordinate sets need to be 
+	//	remembered.  While it's possible that some of these could be condensed
+	//	into fewer variables, it wouldn't be worth it just to save a few bytes
+	//	of RAM
+	private int startX;	// Set at the start 
+	private int startY;
+	private int shiftX;	//shiftX/Y are used to try and determine if, when holding
+	private int shiftY;	//	shift, you are drawing vertically or horizontally
+						// 	there are a few pixels of leniency before it determines
+	private int wX;		// wX and wY are the semi-raw coordinates which are just
+	private int wY;		// 	the raw positions converted to ImageSpace whereas x and y
+						// 	sometimes do not get updated (e.g. when shift-locked)
+	private int oldX;	// OldX and OldY are the last-checked X and Y primarily used
+	private int oldY;	// 	for things that only happen if they change
+	private int rawX;	// raw position are the last-recorded coordinates in pure form
+	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
+	private int oldRawX;	// Similar to oldX and oldY but for 
+	private int oldRawY;
+	
+	
+	private float pressure = 1.0f;
+	
 	private Tool activeTool = null;
 	
 	private int x, y;
@@ -81,12 +116,29 @@ public class Penner
 		READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
 		PICKING,
 		
+		// stateVar for CROPPING:
+		//	0 Means you're building a new Crop
+		//	1 Means you're not hovering over anything in particular (but a 
+		//		Cropping Rectangle is built
+		//	3rd Bit (0x04) represents the user Hovering over a certain section
+		//		if no other bits are set it's the middle section.
+		//	4th Bit (0x08) is set if you're resizing (as determined by 3rd Hex)
+		//	
+		//	The 3rd Hex word determines which dimensions he's resizing
+		//	0x100 : Top
+		//	0x200 : Bottom
+		//	0x400 : Left
+		//	0x800 : Right
+		// stateObj stores the built CroppingRectangle if stateVar != 0
+		CROPPING, 
+		
 		// Reference-Related
 		REF_GLOBAL_MOVE, REF_FINE_ZOOM,
 		REF_NODE_MOVE
 	};
 	private STATE state = STATE.READY;
 	private int stateVar = 0;
+	private Object stateObj = null;
 	
 	public Penner( DrawPanel draw_panel, MasterControl master) {
 		this.zoomer = draw_panel.zoomer;
@@ -125,21 +177,30 @@ public class Penner
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
 		
+		if( pbe.button.getType() == PButton.Type.SHIFT &&
+				pbe.button.value) 
+		{
+			shiftX = wX;
+			shiftY = wY;
+			shiftMode = 0;
+		}
 		if( pbe.button.typeNumber > 3) return;	// Shit/Ctrl/Etc events
 		
 		if( pbe.button.value == true) {
 			x = wX;
 			y = wY;
-			shiftStartX = wX;
-			shiftStartY = wY;
+			startX = x;
+			startY = y;
+			shiftX = wX;
+			shiftY = wY;
 			shiftMode = 0;
 			
 			
 			if( workspace.isEditingReference()) {
 				if( holdingCtrl)
-					state = STATE.REF_FINE_ZOOM;
+					setState( STATE.REF_FINE_ZOOM);
 				else
-					state = STATE.REF_GLOBAL_MOVE;
+					setState(  STATE.REF_GLOBAL_MOVE);
 				
 			}
 			else {
@@ -150,12 +211,12 @@ public class Penner
 				
 				Tool tool = toolsetManager.getSelectedTool();
 				
+				
 				switch( tool) {
 				case PEN:
 					if( holdingCtrl)  {
 						pickColor(button == PButton.Type.LEFT);
-						state = STATE.PICKING;
-						stateVar = (button == PButton.Type.LEFT)?1:0;
+						setState(  STATE.PICKING, (button == PButton.Type.LEFT)?1:0);
 					}
 					else
 						startPen( button == PButton.Type.LEFT);
@@ -174,11 +235,38 @@ public class Penner
 					break;
 				case COLOR_PICKER:
 					pickColor( button == PButton.Type.LEFT);
-					state = STATE.PICKING;
+					setState( state = STATE.PICKING);
 					stateVar = (button == PButton.Type.LEFT)?1:0;
 					break;
 				case PIXEL:
-					startPixel( button == PButton.Type.LEFT);
+					if( holdingCtrl)  {
+						pickColor(button == PButton.Type.LEFT);
+						setState( state = STATE.PICKING);
+						stateVar = (button == PButton.Type.LEFT)?1:0;
+					}
+					else
+						startPixel( button == PButton.Type.LEFT);
+					break;
+				case CROP:
+					if( state == STATE.CROPPING)
+					{
+						if( (Rectangle)stateObj == null ||
+							!((Rectangle)stateObj).contains(x, y)) {
+							setState(STATE.CROPPING);
+							break;
+						}
+						
+						if( stateVar == 0x04) {
+							workspace.cropNode(workspace.getSelectedNode(), (Rectangle)stateObj);
+							setState( STATE.READY);
+						}
+						else  {
+							stateVar |= 0x08;
+						}
+					}
+					else
+						setState( STATE.CROPPING);
+					break;
 				}
 
 				activeTool = tool;
@@ -194,7 +282,7 @@ public class Penner
 			
 		}
 		else {
-			// Pen-up
+			// Pen up
 			switch( state) {
 			case DRAWING:
 				if( strokeEngine != null) {
@@ -208,18 +296,39 @@ public class Penner
 					undoEngine.storeAction( stroke);
 					strokeEngine = null;
 				}
+				setState( STATE.READY);
 				break;
 			case FORMING_SELECTION:
 				selectionEngine.finishBuildingSelection();
+				setState( STATE.READY);
 				break;
+			case CROPPING: {
+				ToolSettings settings = toolsetManager.getToolSettings(Tool.CROP);
+
+				if( (stateVar & 0x8) != 0)
+					stateVar ^= 0x8;
+				
+				if( stateVar == 0) {
+					Rectangle rect = MUtil.rectFromEndpoints(
+							startX, startY, x, y);
+					stateObj = rect;
+					if( (Boolean)settings.getValue("quickCrop")) {
+						workspace.cropNode(
+								workspace.getSelectedNode(), 
+								new Rectangle( rect.x, rect.y, rect.width, rect.height));
+						setState( STATE.READY);
+					}
+					stateVar = 1;
+				}
+				break;}
 			default:
+				setState( STATE.READY);
 				break;
 			}
-			state = STATE.READY;
 		}
 		
 	}
-	
+
 	// :::: Start Methods
 	private void startPen( boolean leftClick) {
 		ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
@@ -264,28 +373,28 @@ public class Penner
 							x - node.getOffsetX(), y - node.getOffsetY(), pressure))) {
 				data.refresh();
 			}
-			state = STATE.DRAWING;
+			setState( STATE.DRAWING);
 		}
 	}
 	private void startSelection() {
 		Selection selection = selectionEngine.getSelection();
 		
 		if( selection != null && selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) {
-			state = STATE.MOVING_SELECTION;
+			setState(  STATE.MOVING_SELECTION);
 		}
 		else {
 			selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
-			state = STATE.FORMING_SELECTION;
+			setState( STATE.FORMING_SELECTION);
 		}
 	}
 	private void startMove() {
 		Selection selection = selectionEngine.getSelection();
 		
 		if(selection != null) {
-			state = STATE.MOVING_SELECTION;
+			setState(  STATE.MOVING_SELECTION);
 		}
 		else {
-			state = STATE.MOVING_NODE;
+			setState( state = STATE.MOVING_NODE);
 		}
 	}
 	private void pickColor( boolean leftClick) {
@@ -337,22 +446,6 @@ public class Penner
 		
 	}
 
-	private boolean holdingShift = false;
-	private boolean holdingCtrl = false;
-	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
-	private int shiftStartX;
-	private int shiftStartY;
-	private int wX;		// wX and wY are the semi-raw coordinates which are just
-	private int wY;		// 	the raw positions converted to ImageSpace whereas x and y
-						// 	sometimes do not get updated (e.g. when shift-locked)
-	private int oldX;	// OldX and OldY are the last-checked X and Y primarily used
-	private int oldY;	// 	for things that only happen if they change
-	private int rawX;	// raw position are the last-recorded coordinates in pure form
-	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
-	private int oldRawX;
-	private int oldRawY;
-	
-	private float pressure = 1.0f;
 	
 	private void rawUpdateX( int raw) {
 		rawX = raw;
@@ -361,7 +454,7 @@ public class Penner
 			if( shiftMode == 2)
 				return;
 			if( shiftMode == 0) {
-				if( Math.abs(shiftStartX - wX) > 10) {
+				if( Math.abs(shiftX - rawX) > 10) {
 					shiftMode = 1;
 				}
 				else return;
@@ -376,7 +469,7 @@ public class Penner
 			if( shiftMode == 1)
 				return;
 			if( shiftMode == 0) {
-				if( Math.abs(shiftStartY - wY) > 10) {
+				if( Math.abs(shiftY - rawY) > 10) {
 					shiftMode = 2;
 				}
 				else return;
@@ -440,9 +533,36 @@ public class Penner
 		case REF_FINE_ZOOM:
 			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0005, 1+(rawY - oldRawY))));
 			break;
+		case CROPPING:
+			Rectangle rect = (Rectangle)stateObj;
+
+			if( (stateVar & 0x08) != 0) {
+				if( (stateVar & 0x100) != 0) {
+					// Top
+					rect.y += (y - oldY);
+					rect.height -= (y - oldY);
+				}
+				if( (stateVar & 0x200) != 0) {
+					// Bottom
+					rect.height += (y - oldY);
+				}
+				if( (stateVar & 0x400) != 0) {
+					// Left
+					rect.x += (x - oldX);
+					rect.width -= (x - oldX);
+				}
+				if( (stateVar & 0x800) != 0) {
+					// Right
+					rect.width+= (x - oldX);
+				}
+			}
+			break;
 		case REF_NODE_MOVE:
-			
 		case READY:
+		}
+		
+		if( oldX != x || oldY != y && drawsOverlay()) {
+			context.repaint();
 		}
 		
 		oldX = x;
@@ -451,6 +571,151 @@ public class Penner
 		oldRawY = rawY;
 	}
 
+	public void paintOverlay( Graphics g) {
+		Graphics2D g2 = (Graphics2D)g;
+		
+		switch(state) {
+		case CROPPING:
+			int x1, y1, x2, y2;
+			
+			Rectangle rect = (stateVar == 0)
+					? rect = MUtil.rectFromEndpoints(startX, startY, x, y)
+					: (Rectangle)stateObj;
+			Rectangle screenRect = new Rectangle(
+					context.zoomer.itsXm(rect.x), context.zoomer.itsYm(rect.y), 
+					Math.round(context.zoomer.getZoom()*rect.width), Math.round(context.zoomer.getZoom()*rect.height));
+			
+			
+			Stroke s = g2.getStroke();
+            Stroke new_stroke = new BasicStroke(
+            		1, 
+            		BasicStroke.CAP_BUTT, 
+            		BasicStroke.JOIN_BEVEL, 
+            		0, 
+            		new float[]{8,4}, 0);
+            g2.setStroke(new_stroke);
+			g.drawRect( screenRect.x, screenRect.y, screenRect.width,screenRect.height);
+
+			Composite c = g2.getComposite();
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+
+			x1 = context.zoomer.itsXm(0);
+			y1 = context.zoomer.itsYm(0);
+			x2 = context.zoomer.itsXm(workspace.getWidth());
+			y2 = context.zoomer.itsYm(workspace.getHeight());
+
+			// Draw Grey area outside of crop
+			g2.fillRect( x1, y1, screenRect.x - x1 - 1, y2-y1);
+			g2.fillRect( screenRect.x-1, y1, screenRect.width+2, screenRect.y - y1 - 1);
+			g2.fillRect( screenRect.x-1, screenRect.y + screenRect.height+1, screenRect.width+2, y2 - (screenRect.height+ screenRect.y) + 1);
+			g2.fillRect( screenRect.x + screenRect.width+1,  y1, x2 - (screenRect.width+screenRect.x)+1, y2-y1);
+			
+			// Draw Special junks
+			if( stateVar != 0 ) {
+				// A bit too much logic in draw events for my taste, but it's
+				//	better than adding Zoom observers.
+
+				g2.setStroke(new BasicStroke(2.0f));
+				if( (stateVar & 0x8)== 0) {
+					// Inner Rect that represents finilizing the crop
+					Rectangle inner = MUtil.scaleRect(screenRect, 0.6f);
+					
+					if( inner.contains(rawX, rawY)) {
+						g2.setColor(Color.YELLOW);
+						g2.drawRect(inner.x, inner.y, inner.width, inner.height);
+						
+						stateVar = 0x04;
+					}
+				}
+
+				Rectangle topLeft = MUtil.scaleRect(screenRect, 0.2f);
+				topLeft.x = screenRect.x;
+				topLeft.y = screenRect.y; 
+				
+				Rectangle topRight =new Rectangle(topLeft);
+				topRight.x = screenRect.x + screenRect.width - topRight.width;
+				topRight.y = screenRect.y;
+				
+				Rectangle bottomLeft =new Rectangle(topLeft);
+				bottomLeft.x = screenRect.x;
+				bottomLeft.y = screenRect.y + screenRect.height - bottomLeft.height;
+				
+				Rectangle bottomRight  =new Rectangle(topLeft);
+				bottomRight.x = screenRect.x + screenRect.width - bottomRight.width;
+				bottomRight.y = screenRect.y + screenRect.height - bottomRight.height;
+				
+				if( topLeft.contains(rawX, rawY)) {
+					g2.setColor(Color.YELLOW);
+					
+					if( (stateVar & 0x8) == 0)
+						stateVar = 0x04 | 0x100 | 0x400;
+				}
+				else 
+					g2.setColor(Color.WHITE);
+				g2.drawRect(topLeft.x, topLeft.y, topLeft.width, topLeft.height);
+				
+				if( topRight.contains(rawX, rawY)) {
+					g2.setColor(Color.YELLOW);
+					if( (stateVar & 0x8) == 0)
+						stateVar = 0x04 | 0x100 | 0x800;
+				}
+				else 
+					g2.setColor(Color.WHITE);
+				g2.drawRect(topRight.x, topRight.y, topRight.width, topRight.height);
+				
+				if( bottomLeft.contains(rawX, rawY)) {
+					g2.setColor(Color.YELLOW);
+					if( (stateVar & 0x8) == 0)
+						stateVar = 0x04 | 0x200 | 0x400;
+				}
+				else 
+					g2.setColor(Color.WHITE);
+				g2.drawRect(bottomLeft.x, bottomLeft.y, bottomLeft.width, bottomLeft.height);
+				
+				if( bottomRight.contains(rawX, rawY)) {
+					g2.setColor(Color.YELLOW);
+					if( (stateVar & 0x8) == 0)
+						stateVar = 0x04 | 0x200 | 0x800;
+				}
+				else 
+					g2.setColor(Color.WHITE);
+				g2.drawRect(bottomRight.x, bottomRight.y, bottomRight.width, bottomRight.height);
+			}
+			
+			g2.setComposite(c);
+			g2.setStroke(s);
+		default:
+			break;
+		}
+	}
+
+	public boolean drawsOverlay() {
+		switch( state) {
+		case CROPPING:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	
+	private void setState( STATE newState) {
+		setState( newState, 0);
+	}
+	
+	private void setState(STATE newState, int var) {
+		boolean paint = false;
+		
+		if( drawsOverlay()) paint = true;
+		
+		state = newState;
+		stateVar = var;
+		stateObj = null;
+		
+		if( paint || drawsOverlay())
+			context.repaint();
+		
+	}
 	
 
 	// :::: KeyEventDispatcher
@@ -458,11 +723,6 @@ public class Penner
 	public boolean dispatchKeyEvent(KeyEvent evt) {
 		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
 		boolean ctrl = (( evt.getModifiers() & KeyEvent.CTRL_MASK) != 0);
-		if( shift && !holdingShift) {
-			shiftStartX = x;
-			shiftStartY = y;
-			shiftMode = 0;
-		}
 			
 		holdingShift = shift;
 		holdingCtrl = ctrl;

@@ -68,6 +68,26 @@ public class MUtil {
 		return ((t - start) % diff + diff) % diff + start;
 	}
 
+	
+	/**
+	 * Constructs a non-negative dimension Rectangle from two coordinates
+	 */
+	public static Rectangle rectFromEndpoints( int x1, int y1, int x2, int y2) {
+		return new Rectangle( Math.min(x1, x2), Math.min(y1, y2),
+				Math.abs(x1-x2), Math.abs(y1-y2));
+	}
+	
+	/** Stretches the Rectangle from the center by a given scaler */
+	public static Rectangle scaleRect( Rectangle rect, float scalar) {
+		return new Rectangle(
+				rect.x - Math.round(rect.width * (scalar-1)/2.0f),
+				rect.y - Math.round(rect.height * (scalar-1)/2.0f),
+				Math.round(rect.width * scalar),
+				Math.round(rect.height * scalar)
+			);
+		
+	}
+	
 	/** 
 	 * Places t in between start and end such that it is offset by an integer
 	 * number of rotations of start to end. <br>

@@ -21,18 +21,18 @@ import spirite.image_data.ImageWorkspace;
  *
  */
 public class Dialogs {
-	// !!!! TODO VERY DEBUG
-	static MasterControl master;
-	public static void setMaster( MasterControl masterc) {
-		master = masterc;
+	private final MasterControl master;
+	
+	public Dialogs( MasterControl masterc) {
+		this.master = masterc;
 	}
 
     /**
      * Pops up the color picker dialog and queries it for a color
      * @return The color picked or null if they canceled
      */
-	public static Color pickColor() { return pickColor(null);}
-    public static Color pickColor(Color defaultColor) {
+	public Color pickColor() { return pickColor(null);}
+    public Color pickColor(Color defaultColor) {
         JColorChooser jcp = new JColorChooser();
         jcp.setColor(defaultColor);
         int response = JOptionPane.showConfirmDialog(null, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -44,7 +44,7 @@ public class Dialogs {
         return null;
     }
     
-    public static File pickFileOpen() {
+    public File pickFileOpen() {
     	JFileChooser fc = new JFileChooser();
     	
     	File f = master.getSettingsManager().getOpenFilePath();
@@ -68,7 +68,7 @@ public class Dialogs {
     }
     
 
-    public static File pickFileSave() {
+    public File pickFileSave() {
     	JFileChooser fc = new JFileChooser();
     	
     	File f = master.getSettingsManager().getWorkspaceFilePath();
@@ -93,7 +93,7 @@ public class Dialogs {
     }
     
 
-    public static File pickFileExport() {
+    public File pickFileExport() {
     	JFileChooser fc = new JFileChooser();
     	
     	File f = master.getSettingsManager().getImageFilePath();
@@ -118,7 +118,7 @@ public class Dialogs {
     	return null;
     }
     
-    public static boolean performNewLayerDialog( ImageWorkspace workspace) {
+    public boolean performNewLayerDialog( ImageWorkspace workspace) {
 
 		NewLayerDPanel panel = new NewLayerDPanel(master);
 		
@@ -144,5 +144,33 @@ public class Dialogs {
 			return true;
 		}
 		return false;
+    }
+    
+
+    /** Prompts for a new image dialog and then performs it. */
+    public void promptNewImage() {     
+        NewImagePanel panel = new NewImagePanel(master);
+
+        int response = JOptionPane.showConfirmDialog(null,
+                panel,
+                "New Image",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if( response == JOptionPane.OK_OPTION) {
+            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
+            master.getCurrentWorkspace().finishBuilding();
+        }
+    }                                            
+
+    /**     */
+    public void promptDebugColor() {
+        // TODO DEBUG
+        JColorChooser jcp = new JColorChooser();
+        int response = JOptionPane.showConfirmDialog(null, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if( response == JOptionPane.OK_OPTION) {
+            master.getPaletteManager().setActiveColor(0, jcp.getColor());
+        }
     }
 }

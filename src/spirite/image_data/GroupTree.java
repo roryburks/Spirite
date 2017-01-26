@@ -159,6 +159,28 @@ public class GroupTree {
 			return i;
 		}
 		
+		/** Sure we have Validators to do this, but this is common enough to
+		 * implement.  Plus it grabs itself it's a layer node. */
+		public List<LayerNode> getAllLayerNodes() {
+			List<LayerNode> list = new ArrayList<>();
+			
+			if( this instanceof LayerNode) 
+				list.add((LayerNode)this);
+			else
+				_galn( this, list);
+			
+			return list;
+		}
+		private void _galn( Node parent, List<LayerNode> list) {
+			for( Node child :parent.getChildren()) {
+				if( child instanceof LayerNode)
+					list.add( (LayerNode) child);
+				else
+					_galn(child, list);
+
+			}
+		}
+		
 		/** Gets all children such that they pass the validator test, including
 		 * subchildren if their parent pass the checkChildren test.
 		 * 

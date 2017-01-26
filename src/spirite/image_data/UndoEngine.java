@@ -430,12 +430,15 @@ public class UndoEngine {
 		prepareContext(handle);
 		for( UndoContext context : contexts) {
 			if( context instanceof ImageContext ) {
-				ImageContext icontext = (ImageContext)context;
-				
-				CachedImage ci = cacheManager.cacheImage(newImage, workspace);
-				
-				ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, ci);
-				return action;
+					ImageContext icontext = (ImageContext)context;
+					
+					if( icontext.image == handle) {
+					
+					CachedImage ci = cacheManager.cacheImage(newImage, workspace);
+					
+					ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, ci);
+					return action;
+				}
 			}
 		}
 		
@@ -558,7 +561,7 @@ public class UndoEngine {
 			final CachedImage previousCache;
 			
 			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
-				super(cached, null);
+				super(cached, new NilImageAction(data));
 				
 				int p;
 				KeyframeAction previous = null;
@@ -1036,6 +1039,15 @@ public class UndoEngine {
 		@Override protected void undoAction() {}
 		protected abstract void performImageAction( ImageHandle image);
 		protected boolean isHeavyAction() {return false;}
+	}
+	
+	// For internal use only.  Why would you wannt make an empty Image Action?
+	static class NilImageAction extends ImageAction {
+		protected NilImageAction(ImageHandle data) {
+			super(data);
+		}
+		@Override		protected void performImageAction(ImageHandle image) {}
+		
 	}
 	
 	

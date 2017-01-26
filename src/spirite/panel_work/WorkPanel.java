@@ -138,7 +138,6 @@ public class WorkPanel extends javax.swing.JPanel
     	}
     	
     	public float getZoom() {
-    		System.out.println(h_h);
     		return super.getZoom() * zoomer.getZoom();
     	}
     	

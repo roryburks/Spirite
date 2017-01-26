@@ -46,7 +46,7 @@ public class Test1 {
 	 * */
 	@Test
 	public void testSaveLoadIntegrity() {
-		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+		ImageWorkspace workspace = new ImageWorkspace(master);
 
 		// Verify that nothing funny happens when you try to render a null workspace
 		try {
@@ -161,7 +161,7 @@ public class Test1 {
 	 */
 	@Test
 	public void testUndoEngineIntegrity() {
-		ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+		ImageWorkspace workspace = new ImageWorkspace(master);
 		master.addWorkpace(workspace, false);
 		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
 		workspace.finishBuilding();
@@ -231,7 +231,7 @@ public class Test1 {
 			LayerNode node = randomLayerNode(workspace);
 			if( node == null) break;
 			
-			workspace.cropLayer(node, new Rectangle( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)));
+			workspace.cropNode(node, new Rectangle( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)));
 			break;
 		}
 	}
@@ -259,11 +259,11 @@ public class Test1 {
 	 * 
 	 * Use in conjunction with VisualVM or such if you suspect untracked leaks.
 	 */
-	public static final int CACHE_ROUNDS = 1000;
+	public static final int CACHE_ROUNDS = 100;
 	@Test
 	public void testCacheClearing() {
 		for( int round=0; round < CACHE_ROUNDS; ++round) {
-			ImageWorkspace workspace = new ImageWorkspace(master.getCacheManager());
+			ImageWorkspace workspace = new ImageWorkspace(master);
 			workspace.finishBuilding();
 			master.addWorkpace(workspace, false);
 			

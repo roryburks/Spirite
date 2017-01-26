@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
+import javax.swing.JOptionPane;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -23,10 +24,13 @@ import spirite.MDebug.ErrorType;
 import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
+import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.UndoEngine.CompositeAction;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
@@ -70,6 +74,7 @@ public class ImageWorkspace {
 	
 	// External Components
 	private final CacheManager cacheManager;
+	private final SettingsManager settingsManager;
 	
 	private GroupTree.Node selected = null;
 	private int workingID = 0;	// an incrementing unique ID per imageData
@@ -83,8 +88,9 @@ public class ImageWorkspace {
 										// and no cache is cleared
 	
 	
-	public ImageWorkspace( CacheManager cacheManager) {
-		this.cacheManager = cacheManager;
+	public ImageWorkspace( MasterControl master) {
+		this.cacheManager = master.getCacheManager();
+		this.settingsManager = master.getSettingsManager();
 		imageData = new HashMap<>();
 		animationManager = new AnimationManager(this);
 		groupTree = new GroupTree(this);
@@ -385,6 +391,13 @@ public class ImageWorkspace {
 		imageData.get(old.id).relinquish(this);
 		imageData.put(old.id, newImg);
 		newImg.reserve(this);
+		
+		
+		
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.dataChanged = new  LinkedList<ImageHandle>();
+		evt.dataChanged.add(old);		
+		triggerImageRefresh(evt);
 	}
 	
 	/** Performs a command of context "draw." */
@@ -392,14 +405,49 @@ public class ImageWorkspace {
 	public void executeDrawCommand( String command) {
 		
 		switch( command) {
+		case "undo":
+			undoEngine.undo();
+			break;
+		case "redo":
+			undoEngine.redo();
+			break;
+    	case "newLayerQuick":
+    		setSelectedNode(
+    				addNewSimpleLayer(
+    						getSelectedNode(), 
+    						width, height,
+    						"New Layer", 
+    						new Color(0,0,0,0))
+    			);
+    		break;
+    	case "toggle_reference":
+    		editingReference = !editingReference;
 		case "clearLayer":
 			if(!selectionEngine.attemptClearSelection()) {
 				ImageHandle image = getActiveData();
-				if( image != null) {
-					drawEngine.clear(image);				}
+				if( image != null) 
+					drawEngine.clear(image);
 			}
 			break;
-		case "autocroplayer":
+		case "cropSelection": {
+			Node node = getSelectedNode();
+			
+			Selection selection = (selectionEngine.getSelection());
+			if( selection == null) {
+				java.awt.Toolkit.getDefaultToolkit().beep();
+				return;
+			}
+			
+			
+			Rectangle rect = selection.getBounds();
+			rect.x += selectionEngine.getOffsetX();
+			rect.y += selectionEngine.getOffsetY();
+			
+
+			
+			cropNode( node , rect);
+			break;}
+		case "autocroplayer": {
 			Node node = getSelectedNode();
 			
 			if( node instanceof LayerNode) {
@@ -411,69 +459,88 @@ public class ImageWorkspace {
 							layer.getActiveData().deepAccess(),
 							1, 
 							false);
-					cropLayer((LayerNode) node, rect);
+					cropNode((LayerNode) node, rect);
 				} catch (UnsupportedDataTypeException e) {
 					e.printStackTrace();
 				}
 				
 			}
-			break;
+			break;}
 		default:
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Draw command: draw." + command);
 		}
 	}
 	
 	
-	public void cropLayer( LayerNode node, Rectangle bounds) {
+	public void cropNode( Node nodeToCrop, Rectangle bounds) {
 		
-		List<ImageHandle> handles = node.layer.getUsedImageData();
-		List<Rectangle> rects = node.layer.interpretCrop(bounds);
+		bounds = bounds.intersection(new Rectangle(0,0,width,height));
+		if( bounds.isEmpty())return;
 		
 
-		List<UndoableAction> actions = new ArrayList<UndoableAction>();
-		
-		for( int i=0; i < handles.size() && i<rects.size(); ++i) {
-			Rectangle rect = new Rectangle(rects.get(i));
-			ImageHandle handle = handles.get(i);
+		if( nodeToCrop instanceof GroupNode 
+			&& settingsManager.getBoolSetting("promptOnGroupCrop")) {
+			int r = JOptionPane.showConfirmDialog(null, "Crop all Layers within the group?", "Cropping Group", JOptionPane.YES_NO_OPTION);
 			
-			if( rect.x < 0) {
-				rect.width -= rect.x;
-				rect.x = 0;
-			}
-			if( rect.y < 0) {
-				rect.height -= rect.y;
-				rect.y = 0;
-			}
-			
-			if( rect.width <= 0 || rect.height <= 0)
-				continue;
-
-			if( rect.width > handle.getWidth() &&
-				rect.height > handle.getHeight())
-				continue;
-
-			if( rect.width > handle.getWidth())
-				rect.width = handle.getWidth();
-			if( rect.height > handle.getHeight())
-				rect.height = handle.getHeight();
-			
-			// Construct a crop action
-			BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
-			MUtil.clearImage(image);
-			Graphics2D g2 = (Graphics2D) image.getGraphics();
-			g2.translate(-bounds.x, -bounds.y);
-			handle.drawLayer(g2);
-			g2.dispose();
-			
-			actions.add( undoEngine.createReplaceAction(handle, image));
+			if( r != JOptionPane.YES_OPTION)
+				return;
 		}
 
-		actions.add(new StructureAction(
-				new OffsetChange(node, bounds.x, bounds.y)));
-		CompositeAction action = undoEngine.new CompositeAction(actions, "Cropped Layer");
+		List<LayerNode> toCrop = nodeToCrop.getAllLayerNodes();
+		List<UndoableAction> actions = new ArrayList<UndoableAction>();
 		
-		action.performAction();
-		undoEngine.storeAction(action);
+		for( LayerNode node : toCrop ) {
+			
+			List<ImageHandle> handles = node.layer.getUsedImageData();
+			List<Rectangle> rects = node.layer.interpretCrop(bounds);
+			
+			for( int i=0; i < handles.size() && i<rects.size(); ++i) {
+				Rectangle rect = new Rectangle(rects.get(i));
+				ImageHandle handle = handles.get(i);
+				
+				
+				if( rect.x < 0) {
+					rect.width -= rect.x;
+					rect.x = 0;
+				}
+				if( rect.y < 0) {
+					rect.height -= rect.y;
+					rect.y = 0;
+				}
+				
+				if( rect.width <= 0 || rect.height <= 0)
+					continue;
+	
+				if( rect.width > handle.getWidth() &&
+					rect.height > handle.getHeight())
+					continue;
+	
+				if( rect.width > handle.getWidth())
+					rect.width = handle.getWidth();
+				if( rect.height > handle.getHeight())
+					rect.height = handle.getHeight();
+				
+				// Construct a crop action
+				BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+				MUtil.clearImage(image);
+				Graphics2D g2 = (Graphics2D) image.getGraphics();
+				g2.translate(-bounds.x, -bounds.y);
+				handle.drawLayer(g2);
+				g2.dispose();
+				
+				
+				actions.add( undoEngine.createReplaceAction(handle, image));
+			}
+	
+			actions.add(new StructureAction(
+					new OffsetChange(node, bounds.x, bounds.y)));
+		}
+		
+		if(!actions.isEmpty()) {
+			CompositeAction action = undoEngine.new CompositeAction(actions, (nodeToCrop instanceof LayerNode) ? "Cropped Layer" : "Cropped Group");
+					action.performAction();
+			undoEngine.storeAction(action);
+		}
 	}
 	
 	
