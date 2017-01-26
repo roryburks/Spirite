@@ -6,7 +6,6 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.brains.MasterControl;
-import spirite.image_data.GroupTree;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.SliderPanel;
 

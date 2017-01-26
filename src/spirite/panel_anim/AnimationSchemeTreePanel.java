@@ -2,9 +2,6 @@ package spirite.panel_anim;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -15,7 +12,6 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreePath;
 
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;

@@ -19,8 +19,6 @@ import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.image_data.ImageWorkspace.StackableStructureChange;
-import spirite.image_data.ImageWorkspace.StructureChange;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -418,6 +416,33 @@ public class UndoEngine {
 		}
 	}
 	
+	// :::: Special Creation methods
+	
+	/**
+	 * Creates a special action that replaces the image at the given handle with the
+	 *	new BufferedImage.  
+	 *
+	 * After creating the image, you should performAction on it as well as store
+	 * it into the UndoEngine or else Undoing might get a little weird.
+	 */
+	public UndoableAction createReplaceAction( ImageHandle handle, BufferedImage newImage) {
+
+		prepareContext(handle);
+		for( UndoContext context : contexts) {
+			if( context instanceof ImageContext ) {
+				ImageContext icontext = (ImageContext)context;
+				
+				CachedImage ci = cacheManager.cacheImage(newImage, workspace);
+				
+				ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, ci);
+				return action;
+			}
+		}
+		
+		MDebug.handleError(ErrorType.STRUCTURAL, this, "Failed to create ReplaceAction (problem with prepareContext?)");
+		return null;
+	}
+	
 
 	/***
 	 * An UndoContext represents a "space" in which actions are sequentially relevant
@@ -478,6 +503,7 @@ public class UndoEngine {
 			super(image);
 			
 			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(), UndoEngine.this), null));
+			
 			met = 0;
 			pointer = 0;
 		}
@@ -494,20 +520,71 @@ public class UndoEngine {
 				super(image);
 				this.frameCache = frame;
 				this.hiddenAction = action;
+				frameCache.reserve(this);	// Should be in onAdd
 			}
 			@Override 
 			public void performAction() {
 				if( hiddenAction != null)
-				hiddenAction.performAction();
+					hiddenAction.performAction();
 			}
 			@Override
 			public void undoAction() {
 				if( hiddenAction != null)
-				hiddenAction.undoAction();
+					hiddenAction.undoAction();
 			}
 			@Override
 			public void performImageAction(ImageHandle image) {
 				resetToKeyframe(frameCache.access());
+			}
+			
+			@Override
+			protected void onDispatch() {
+				
+				// Most of the times, this should be the only thing that has
+				//	a handle on the CachedImage, but in special cases, the 
+				//	cached image might have been passed to it, so a multi-user
+				//	scheme is relevant.
+				frameCache.relinquish(this);
+				if( hiddenAction != null)
+					hiddenAction.onDispatch();
+			}
+		}
+		
+		/**
+		 * ReplaceImageAction is a special kind of KeyframeAction in which the
+		 * entire image has been replaced with another one.
+		 */
+		class ReplaceImageAction extends KeyframeAction {
+			final CachedImage previousCache;
+			
+			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
+				super(cached, null);
+				
+				int p;
+				KeyframeAction previous = null;
+				for(  p = pointer; p>=0; p--) {
+					if( actions.get(p) instanceof KeyframeAction) {
+						previous = (KeyframeAction)actions.get(p);
+						break;
+					}
+				}
+				if( previous == null) {
+					MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, null, "Could not find a Keyframe in context.");
+					previousCache = null;
+				}
+				else {
+					previousCache = previous.frameCache;
+				}
+			}
+			
+			@Override
+			public void performAction() {
+				workspace._replaceIamge(data, frameCache);
+			}
+			
+			@Override
+			public void undoAction() {
+				workspace._replaceIamge(data, previousCache);
 			}
 		}
 		
@@ -554,7 +631,7 @@ public class UndoEngine {
 			}
 
 			// Undo the logical action
-			actions.get(pointer).undoAction();
+			actions.get(pointer+1).undoAction();
 			
 			// Find the previous KeyframeAction
 			if( met < 0) {
@@ -618,12 +695,7 @@ public class UndoEngine {
 			
 			while( it.hasPrevious()){
 				UndoableAction action = it.previous();
-				
-				if( action instanceof KeyframeAction) {
-					// Remove the keyframe and flush its data to make absolutely
-					//	sure there are no leaks.
-					((KeyframeAction)action).frameCache.flush();
-				}
+				action.onDispatch();
 			}
 			subList.clear();
 		}
@@ -664,9 +736,7 @@ public class UndoEngine {
 		@Override
 		protected void flush() {
 			for( UndoableAction action: actions) {
-				if( action instanceof KeyframeAction) {
-					((KeyframeAction)action).frameCache.flush();
-				}
+				action.onDispatch();
 			}
 		}
 		@Override
@@ -792,6 +862,12 @@ public class UndoEngine {
 		protected void clipTail() {
 			actions.getFirst().onDispatch();
 			actions.removeFirst();
+		}
+		
+		@Override
+		protected void flush() {
+			for( NullAction action : actions)
+				action.onDispatch();
 		}
 	}
 	
@@ -922,6 +998,12 @@ public class UndoEngine {
 				return actions.getLast();
 		}
 		
+		
+		@Override
+		protected void flush() {
+			// Shouldn't need to flush since the other contexts will be flushed
+			//	as well.
+		}
 	}
 	
 	
@@ -1020,6 +1102,12 @@ public class UndoEngine {
 		}
 		@Override		protected void undoAction() {throw new UnsupportedOperationException();}
 		
+		@Override
+		protected void onAdd() {
+			for( UndoableAction action :actions) {
+				action.onAdd();
+			}
+		}
 	}
 
 	/** A stackableCompositeAction is identical to a normal CompositeAction
@@ -1054,72 +1142,6 @@ public class UndoEngine {
 			return false;
 		}
 		
-	}
-	
-	// ==== Image Undo Actions ====
-
-	
-
-	
-	
-	// ==== Null Undo Actions ====
-	
-	/** NullActions which are handled by the ImageWorkspace are 
-	 * StructureActions, whose behavior is defined by StructureChanges
-	 * which are used both for the initial execution and the UndoEngine */
-	public class StructureAction extends NullAction {
-		public final StructureChange change;	// !!! Might be bad visibility
-		
-		public StructureAction(StructureChange change) {
-			this.change = change;
-		}
-		
-		@Override
-		protected void performAction() {
-			change.execute();
-			change.alert(false);
-		}
-		@Override
-		protected void undoAction() {
-			change.unexecute();
-			change.alert(true);
-		}
-		
-		@Override
-		protected void onDispatch() {
-			change.cauterize();
-		}
-		@Override
-		public String getDescription() {
-			return change.description;
-		}
-	}
-	
-	/*** A StackableStructureAction is a StructureAction with a 
-	 * StackableChange.  The StackableChange implements the stack check
-	 * and merge, this class just mediates.	 */
-	public class StackableStructureAction extends StructureAction
-		implements StackableAction 
-	{
-		public StackableStructureAction(StructureChange change) {
-			super(change);
-		}
-		@Override
-		public void stackNewAction(UndoableAction newAction) {
-			((StackableStructureChange)change).stackNewChange(
-					((StackableStructureAction)newAction).change);
-		}
-		@Override
-		public boolean canStack(UndoableAction newAction) {
-			if( !newAction.getClass().equals(this.getClass()))
-				return false;
-			if( !change.getClass().equals(
-					((StackableStructureAction)newAction).change.getClass()))
-				return false;
-
-			return ((StackableStructureChange)change).canStack(
-					((StackableStructureAction)newAction).change);
-		}
 	}
 	
 	

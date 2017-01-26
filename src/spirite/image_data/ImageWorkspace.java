@@ -2,7 +2,9 @@ package spirite.image_data;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+
+import javax.activation.UnsupportedDataTypeException;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -24,7 +28,8 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.UndoEngine.CompositeAction;
-import spirite.image_data.UndoEngine.StructureAction;
+import spirite.image_data.UndoEngine.NullAction;
+import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SimpleLayer;
@@ -372,19 +377,105 @@ public class ImageWorkspace {
 		triggerImageRefresh( evt);
 	}
 	
+	/** Internal method should not be called by external methods (if so
+	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
+	 * and 
+	 */
+	void _replaceIamge( ImageHandle old, CachedImage newImg) {
+		imageData.get(old.id).relinquish(this);
+		imageData.put(old.id, newImg);
+		newImg.reserve(this);
+	}
+	
 	/** Performs a command of context "draw." */
+	
 	public void executeDrawCommand( String command) {
-		if( command.equals("clearLayer")) {
+		
+		switch( command) {
+		case "clearLayer":
 			if(!selectionEngine.attemptClearSelection()) {
 				ImageHandle image = getActiveData();
 				if( image != null) {
 					drawEngine.clear(image);				}
 			}
-		}
-        else {
+			break;
+		case "autocroplayer":
+			Node node = getSelectedNode();
+			
+			if( node instanceof LayerNode) {
+				Layer layer = ((LayerNode) node).getLayer();
+				
+				try {
+					Rectangle rect;
+					rect = MUtil.findContentBounds(
+							layer.getActiveData().deepAccess(),
+							1, 
+							false);
+					cropLayer((LayerNode) node, rect);
+				} catch (UnsupportedDataTypeException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			break;
+		default:
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Draw command: draw." + command);
-        }
+		}
 	}
+	
+	
+	public void cropLayer( LayerNode node, Rectangle bounds) {
+		
+		List<ImageHandle> handles = node.layer.getUsedImageData();
+		List<Rectangle> rects = node.layer.interpretCrop(bounds);
+		
+
+		List<UndoableAction> actions = new ArrayList<UndoableAction>();
+		
+		for( int i=0; i < handles.size() && i<rects.size(); ++i) {
+			Rectangle rect = new Rectangle(rects.get(i));
+			ImageHandle handle = handles.get(i);
+			
+			if( rect.x < 0) {
+				rect.width -= rect.x;
+				rect.x = 0;
+			}
+			if( rect.y < 0) {
+				rect.height -= rect.y;
+				rect.y = 0;
+			}
+			
+			if( rect.width <= 0 || rect.height <= 0)
+				continue;
+
+			if( rect.width > handle.getWidth() &&
+				rect.height > handle.getHeight())
+				continue;
+
+			if( rect.width > handle.getWidth())
+				rect.width = handle.getWidth();
+			if( rect.height > handle.getHeight())
+				rect.height = handle.getHeight();
+			
+			// Construct a crop action
+			BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+			MUtil.clearImage(image);
+			Graphics2D g2 = (Graphics2D) image.getGraphics();
+			g2.translate(-bounds.x, -bounds.y);
+			handle.drawLayer(g2);
+			g2.dispose();
+			
+			actions.add( undoEngine.createReplaceAction(handle, image));
+		}
+
+		actions.add(new StructureAction(
+				new OffsetChange(node, bounds.x, bounds.y)));
+		CompositeAction action = undoEngine.new CompositeAction(actions, "Cropped Layer");
+		
+		action.performAction();
+		undoEngine.storeAction(action);
+	}
+	
 	
 	
 	// :::: Content Addition
@@ -491,8 +582,8 @@ public class ImageWorkspace {
 		if( width < node.getLayer().getWidth() || height < node.getLayer().getHeight()) {
 			List<UndoableAction> actions = new ArrayList<>(2);
 
-			actions.add(undoEngine.new StructureAction( createAdditionChange(node,context)));
-			actions.add(undoEngine.new StructureAction( 
+			actions.add(new StructureAction( createAdditionChange(node,context)));
+			actions.add(new StructureAction( 
 					new DimensionChange( 
 							Math.max(width, node.getLayer().getWidth()),
 							Math.max(height, node.getLayer().getHeight()))
@@ -749,6 +840,66 @@ public class ImageWorkspace {
 			executeChange( new RenameChange(newName, node));
 	}
 
+	
+	/** NullActions which are handled by the ImageWorkspace are 
+	 * StructureActions, whose behavior is defined by StructureChanges
+	 * which are used both for the initial execution and the UndoEngine */
+	public class StructureAction extends NullAction {
+		public final StructureChange change;	// !!! Might be bad visibility
+		
+		public StructureAction(StructureChange change) {
+			this.change = change;
+		}
+		
+		@Override
+		protected void performAction() {
+			change.execute();
+			change.alert(false);
+		}
+		@Override
+		protected void undoAction() {
+			change.unexecute();
+			change.alert(true);
+		}
+		
+		@Override
+		protected void onDispatch() {
+			change.cauterize();
+		}
+		@Override
+		public String getDescription() {
+			return change.description;
+		}
+	}
+	
+
+	
+	/*** A StackableStructureAction is a StructureAction with a 
+	 * StackableChange.  The StackableChange implements the stack check
+	 * and merge, this class just mediates.	 */
+	public class StackableStructureAction extends StructureAction
+		implements StackableAction 
+	{
+		public StackableStructureAction(StructureChange change) {
+			super(change);
+		}
+		@Override
+		public void stackNewAction(UndoableAction newAction) {
+			((StackableStructureChange)change).stackNewChange(
+					((StackableStructureAction)newAction).change);
+		}
+		@Override
+		public boolean canStack(UndoableAction newAction) {
+			if( !newAction.getClass().equals(this.getClass()))
+				return false;
+			if( !change.getClass().equals(
+					((StackableStructureAction)newAction).change.getClass()))
+				return false;
+
+			return ((StackableStructureChange)change).canStack(
+					((StackableStructureAction)newAction).change);
+		}
+	}
 	
 	/**
 	 * A StructureChange class logically represent a change to the image's Group
@@ -1052,9 +1203,9 @@ public class ImageWorkspace {
 		change.execute();
 		if( !building && addUndo) {
 			if( change instanceof StackableStructureChange) 
-				undoEngine.storeAction(undoEngine.new StackableStructureAction(change));
+				undoEngine.storeAction(new StackableStructureAction(change));
 			else 
-				undoEngine.storeAction(undoEngine.new StructureAction(change));
+				undoEngine.storeAction(new StructureAction(change));
 		}
 		change.alert(false);
 	}

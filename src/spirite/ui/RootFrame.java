@@ -155,6 +155,9 @@ public class RootFrame extends javax.swing.JFrame
     			{".&Undo", "global.undo", null},
     			{".&Redo", "global.redo", null},
     			
+    			{"&Layer", null, null},
+    			{".Auto&crop Layer", "draw.autocroplayer", null},
+    			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},
     			{"..&Layers", "frame.showLayerFrame", "icon.frame.layers"},
@@ -212,27 +215,36 @@ public class RootFrame extends javax.swing.JFrame
      * appropriate component
      */
     public void performCommand( String command) {
-        if( command != null) {
-            if( command.startsWith("global."))
-                globalHotkeyCommand(command.substring("global.".length()));
-            else if( command.startsWith("toolset."))
-                master.getToolsetManager().setSelectedTool(command.substring("toolset.".length()));
-            else if( command.startsWith("palette."))
-            	master.getPaletteManager().performCommand(command.substring("palette.".length()));
-            else if( command.startsWith("frame."))
-            	master.getFrameManager().performCommand(command.substring("frame.".length()));
-            else if( command.startsWith("context."))
-                contextualCommand(command.substring("context.".length()));
-            else if( command.startsWith("draw.")){
-            	final ImageWorkspace workspace = master.getCurrentWorkspace();
-            	if( workspace != null) {
-            		workspace.executeDrawCommand( command.substring("draw.".length()));
-            	}
-            }
-            else {
+    	String space = command.substring(0, command.indexOf(".")+1);
+    	if( space == null) {
+    		System.out.println(command);
+    		return;
+    	}
+    	switch( space) {
+    	case "global.":
+            globalHotkeyCommand(command.substring("global.".length()));
+            break;
+    	case "toolset.":
+            master.getToolsetManager().setSelectedTool(command.substring("toolset.".length()));    		
+            break;
+    	case "palette.":
+        	master.getPaletteManager().performCommand(command.substring("palette.".length()));
+    		break;
+    	case "frame.":
+        	master.getFrameManager().performCommand(command.substring("frame.".length()));
+        	break;
+    	case "context.":
+            contextualCommand(command.substring("context.".length()));
+            break;
+    	case "draw.":
+        	final ImageWorkspace workspace = master.getCurrentWorkspace();
+        	if( workspace != null) {
+        		workspace.executeDrawCommand( command.substring("draw.".length()));
+        	}
+        	break;
+       	default:
             	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
-            }
-        }
+    	}
     }
     
     private void contextualCommand( String command) {
@@ -422,7 +434,8 @@ public class RootFrame extends javax.swing.JFrame
             else if( modifier == mod) {
             	String command = master.getHotekyManager().getCommand( key, modifier);
 
-            	performCommand(command);
+            	if( command != null)
+            		performCommand(command);
             }
 
         }
@@ -547,9 +560,7 @@ public class RootFrame extends javax.swing.JFrame
 			
 		}
 		
-//		if( master.isLocked()) {
-			
-	//	}
+		
 		this.dispose();
         System.exit(0);
 	}

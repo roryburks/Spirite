@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -115,7 +116,7 @@ public class CacheManager {
 		
 		void setData( BufferedImage image) {
 			data = image;
-			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;;
+			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 		}
 		
 		public void reserve( Object obj) {

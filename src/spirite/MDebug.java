@@ -21,6 +21,11 @@ public class MDebug {
 		//	cause a catastrophic failure of the program.
 		STRUCTURAL_MINOR,
 		STRUCTURAL,
+		// A major structural error will probably cripple an entire aspect of
+		//	the program.  They are huge problems that shouldn't happen and probably 
+		// 	cannot be fixed without restarting the program but they aren't 
+		//	immediately fatal.
+		STRUCTURAL_MAJOR,
 		// Most likely due to out-of-memory error or some system lock.
 		ALLOCATION_FAILED,
 		// Indicates that a core resource (such as an icon sheet) is not loading

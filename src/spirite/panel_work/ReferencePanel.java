@@ -3,7 +3,6 @@
 package spirite.panel_work;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -13,15 +12,14 @@ import javax.swing.JPanel;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_work.WorkPanel.Zoomer;
-import spirite.image_data.RenderEngine;
 
 public class ReferencePanel extends JPanel 
 	implements MImageObserver, MReferenceObserver

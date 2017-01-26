@@ -47,8 +47,12 @@ public class ImageHandle {
 		return context;
 	}
 	
-	/** Should only be used for reading/copying.  If used for writing will not
-	 * be tracked by Observers/UndoEngine. */
+	/** Should only be used for reading/copying in things that need direct
+	 * access to the BufferedImage.
+	 * 
+	 * RETURN VALUE SHOULD NEVER BE STORED, if used for writing, will not 
+	 * trigger proper Observers.
+	 *  */
 	public BufferedImage deepAccess() {
 		if( context == null) return null;
 		return context.getData(id).access();

@@ -1,10 +1,13 @@
 package spirite.image_data.layers;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import spirite.image_data.ImageHandle;
+import spirite.image_data.UndoEngine.UndoableAction;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;
@@ -45,6 +48,14 @@ public class SimpleLayer extends Layer {
 	@Override
 	public Layer logicalDuplicate() {
 		return new SimpleLayer(data.dupe());
+	}
+
+	@Override
+	public List<Rectangle> interpretCrop(Rectangle rect) {
+		List<Rectangle> list = new ArrayList<>(1);
+		list.add( new Rectangle(rect));
+		
+		return list;
 	}
 
 }

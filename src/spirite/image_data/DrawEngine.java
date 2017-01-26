@@ -494,8 +494,8 @@ public class DrawEngine {
 			
 			while( !queue.isEmpty()) {
 				int p = queue.poll();
-				int ix = MUtil.low16(p);
-				int iy = MUtil.high16(p);
+				int ix = MUtil.high16(p);
+				int iy = MUtil.low16(p);
 				
 				// TODO: Very bad idea to have the second half of this here, but fine for 
 				//    simple shape like Rectangle

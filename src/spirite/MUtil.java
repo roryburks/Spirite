@@ -6,16 +6,24 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
+
+import mutil.ArrayInterpretation.IntCounter;
+import mutil.ArrayInterpretation.InterpretedIntArray;
 
 public class MUtil {
 
@@ -120,6 +128,200 @@ public class MUtil {
 				toCopy.copyData(null),
 				toCopy.isAlphaPremultiplied(),
 				null);
+	}
+	
+	/**
+	 * 	Returns a rectangle that represents the sub-section of the original image 
+	 * such that as large full rectangular regions on the outside of a single
+	 * color are removed without touching non-background data.
+	 * 
+	 * @param image
+	 * 		The image to crop.
+	 * @param buffer 
+	 * 		The amount of pixels outside of the region with non-background
+	 * 		content to preserve on each side of the image.
+	 * @param transparentOnly
+	 * 		If true, it only crops if the background is transparent, if 
+	 * 		false it will crop any background color.
+	 * @return
+	 * 		The Rectangle of the image as it should be cropped.
+	 * @throws 
+	 * 		UnsupportedDataTypeException if the ColorModel does not conform
+	 * 		to the a supported format
+	 */
+	public static Rectangle findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) throws UnsupportedDataTypeException {
+		_ImageCropHelper data = new _ImageCropHelper(image);
+		int x1 =0, y1=0, x2=0, y2=0;
+				
+		// Don't feel like going through and special-casing 1-size things.
+		if( data.w <2 || data.h < 2) return new Rectangle(0,0,data.w,data.h);
+		
+		int lpp = image.getColorModel().getPixelSize();
+		if( lpp != 4*8) throw new UnsupportedDataTypeException("Only programmed to deal with 4-byte color data.");
+
+		data.bgcolor = data.pixels[0];
+
+		// Usually the background color will be the top-left pixel, but
+		//	sometimes it'll be the bottom-right pixel.
+		// (Note all pixels in the edges share either a row or a column 
+		//	with one of these two pixels, so it'll be one of the two).
+		// Note: this also pulls double-duty of checking the special case
+		//	of the 0th row and column, which simplifies the Binary Search
+		if( !data.rowIsEmpty(0) || ! data.colIsEmpty(0)) {
+			int i = data.h*data.w - 1;
+			data.bgcolor = data.pixels[i];
+		}
+		
+		if(transparentOnly && ((data.bgcolor >>> 24) & 0xFF) != 0) 
+			return new Rectangle(0,0,data.w,data.h);
+		
+		// Find Left-most 
+		IntCounter c = new IntCounter( 0, data.w-1);
+
+		int ret;
+		
+		// Left
+		ret = data.findFirstEmptyLine( new IntCounter(0,data.w-1), false);
+		x1 = (ret == -1) ? 0 : ret;
+		
+		// Right
+		ret = data.findFirstEmptyLine( new IntCounter(data.w-1, 0), false);
+		x2 = (ret == -1) ? data.w-1 : data.w-1-ret;
+
+		// Top
+		ret = data.findFirstEmptyLine( new IntCounter(0,data.h-1), true);
+		y1 = (ret == -1) ? 0 : ret;
+
+		// Bottom
+		ret = data.findFirstEmptyLine( new IntCounter(data.h-1, 0), true);
+		y2 = (ret == -1) ? data.h-1 : data.h-1-ret;
+
+		x1 = Math.max(0, x1 - buffer);
+		y1 = Math.max(0, y1 - buffer);
+		x2 = Math.min(data.w-1, x2 + buffer);
+		y2 = Math.min(data.h-1, y2 + buffer);
+		
+		
+		return new Rectangle( x1, y1, x2-x1+1, y2-y1+1 );
+	}
+	private static class _ImageCropHelper {
+		final int w;
+		final int h;
+		final boolean hcheck[];
+		final boolean vcheck[];
+		final int pixels[];
+		int bgcolor;
+		
+		private boolean transpose = false;
+		
+		_ImageCropHelper( BufferedImage image ) {
+			this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+			this.w = image.getWidth();
+			this.h = image.getHeight();
+			this.hcheck = new boolean[w];
+			this.vcheck = new boolean[h];
+		}
+		
+		// Sanity checks would be inefficient, let's just assume everything
+		//	works correctly because it's already been tested.
+		boolean compare( int x1, int y1, int x2, int y2) {
+			int i1 = x1 + y1*w;
+			int i2 = x2 + y2*w;
+			return (pixels[i1] == pixels[i2]);
+		}
+		boolean verify( int x, int y) {
+			int i = (transpose)?(y+x*w):(x + y*w);
+			return (pixels[i] == bgcolor);
+		}
+		
+		// Kind of Ugly code in here, but it's a bit much to copy all that
+		// code just to swap X and Y and w for h
+		
+		/**
+		 * @return true if the line contains only BG data
+		 */
+		private boolean lineIsEmpty( int num, boolean row) {
+			Queue<Integer> queue = new LinkedList<Integer>();
+
+			try {
+				if( row) {
+					queue.add(MUtil.packInt(w,0));
+					transpose = false;
+				}
+				else {
+					queue.add(MUtil.packInt(h,0));
+					transpose = true;
+				}
+				if(!verify( 0, num))
+					return false;
+				while( !queue.isEmpty()) {
+					int p = queue.poll();
+					int hi = high16(p);
+					int lo = low16(p);
+					
+					int n = (hi + lo) / 2;
+					
+					
+					if( !verify( n, num))
+						return false;
+
+					if( hi-n > 1) queue.add(packInt(hi,n));
+					if( n-lo > 1) queue.add(packInt(n,lo));
+				}
+				
+				return true;
+			}finally {
+				transpose = false;
+			}
+		}
+		boolean rowIsEmpty( int rownum) {
+			return lineIsEmpty(rownum, true);
+		}
+		boolean colIsEmpty( int colnum) {
+			return lineIsEmpty(colnum, false);
+		}
+		
+		private int findFirstEmptyLine( InterpretedIntArray data, boolean row) {
+			int size = data.length();
+			if( size == 0) return -1;
+			
+			int rightmostFree = -1;
+			int leftmostBlocked = Integer.MAX_VALUE;
+			
+			Queue<Integer> queue = new LinkedList<>();
+			queue.add( MUtil.packInt(size,0));
+			
+			boolean zeroth = lineIsEmpty(data.get(0), row);
+			
+			if( !zeroth) return -1;
+			
+			while( !queue.isEmpty()) {
+				int p = queue.poll();
+				int hi = MUtil.high16(p);
+				int lo = MUtil.low16(p);
+				 
+				int n = (hi + lo) / 2;
+				
+				if( lineIsEmpty(data.get(n), row)) {
+					if( n < leftmostBlocked && n > rightmostFree)
+						rightmostFree = n;
+					
+					if( hi-n > 1) queue.add(MUtil.packInt(hi,n));
+				}
+				else if( n < leftmostBlocked) {
+					leftmostBlocked = n;
+					if( rightmostFree > leftmostBlocked)
+						rightmostFree = -1;
+				}
+				if( n-lo > 1) queue.add( MUtil.packInt(n,lo));
+			}
+			
+			
+			//The only way you could be at this point is if the zeroth
+			//	row is free (otherwise it'd return -1), so the rightmostFree
+			//	must at least be 0.
+			return (rightmostFree == -1) ? 0 : rightmostFree;
+		}
 	}
 	
 	/***

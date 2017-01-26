@@ -7,7 +7,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +35,6 @@ import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
 import spirite.panel_work.WorkPanel.Zoomer;
-import spirite.ui.UIUtil;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 
