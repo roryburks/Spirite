@@ -155,6 +155,7 @@ public class PalettePanel extends JPanel
 
     // :: MouseEventListener
     int startX, startY;
+    long startTime;
     int currentlyOver = -1;
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
@@ -162,9 +163,12 @@ public class PalettePanel extends JPanel
     @Override public void mousePressed(MouseEvent e) {
         startX = e.getX();
         startY = e.getY();
+        startTime = System.currentTimeMillis();
     }
     @Override 
     public void mouseReleased(MouseEvent e) {
+    	boolean shortEvt = ( System.currentTimeMillis() - startTime < 200);
+    	
     	Component draggedFrom = e.getComponent();
     	if( draggedFrom.contains(e.getPoint())) {
     		if( draggedFrom instanceof ColorPicker) {
@@ -185,7 +189,7 @@ public class PalettePanel extends JPanel
     			Color startC = paletteManager.getPaletteColor(startIndex);
     			
     			if( startIndex == -1 || endIndex == -1){}
-    			else if( startIndex == endIndex) {
+    			else if( startIndex == endIndex || shortEvt) {
     				if( e.getClickCount() == 2 || startC == null) {
     					// Color Pick new Palette Color
     					Color c = dialogs.pickColor( startC);

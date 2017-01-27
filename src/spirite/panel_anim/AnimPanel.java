@@ -2,6 +2,7 @@ package spirite.panel_anim;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -148,6 +149,8 @@ public class AnimPanel extends OmniComponent
     		super.paintComponent(g);
     		
     		if( animation != null) {
+    			Graphics2D g2 = (Graphics2D)g;
+    			g2.scale(2.0, 2.0);
     			animation.drawFrame(g, met);
     		}
     	}
@@ -184,7 +187,9 @@ public class AnimPanel extends OmniComponent
         
         Dimension previewSize = (master.getCurrentWorkspace() == null)
         		? new Dimension( 128,128)
-        		:new Dimension( master.getCurrentWorkspace().getWidth(), master.getCurrentWorkspace().getHeight());
+        		:new Dimension( master.getCurrentWorkspace().getWidth()*2, master.getCurrentWorkspace().getHeight()*2);
+        		
+        		previewSize = new Dimension(400,400);
         
         layout.setHorizontalGroup( layout.createSequentialGroup()
     		.addGap(5)

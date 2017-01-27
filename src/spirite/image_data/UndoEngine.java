@@ -5,6 +5,8 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +15,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -154,14 +158,17 @@ public class UndoEngine {
 	// :::: Called by ImageWorkapce
 	/** Gets a list of all Data used in the UndoEngine. */
 	List<ImageHandle> getDataUsed() {
-		List<ImageHandle> list = new ArrayList<>();
+		LinkedHashSet<ImageHandle> set = new LinkedHashSet<>();
 		
 		for( UndoContext context : contexts) {
-			if( context.image != null)
-				list.add(context.image);
+			if( context instanceof NullContext) {
+				set.addAll(((NullContext) context).getImageDependency());
+			}
+			else if( context.image != null)
+				set.add(context.image);
 		}
 		
-		return list;
+		return new ArrayList<>(set);
 	}
 	
 	/** @return true if the undoQueue is currently at the "Saved" position. */
@@ -536,13 +543,17 @@ public class UndoEngine {
 					hiddenAction.undoAction();
 			}
 			@Override
+			protected void onAdd() {
+				if( hiddenAction != null)
+					hiddenAction.onAdd();
+			}
+			@Override
 			public void performImageAction(ImageHandle image) {
 				resetToKeyframe(frameCache.access());
 			}
 			
 			@Override
 			protected void onDispatch() {
-				
 				// Most of the times, this should be the only thing that has
 				//	a handle on the CachedImage, but in special cases, the 
 				//	cached image might have been passed to it, so a multi-user
@@ -563,23 +574,18 @@ public class UndoEngine {
 			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
 				super(cached, new NilImageAction(data));
 				
-				int p;
-				KeyframeAction previous = null;
-				for(  p = pointer; p>=0; p--) {
-					if( actions.get(p) instanceof KeyframeAction) {
-						previous = (KeyframeAction)actions.get(p);
-						break;
-					}
-				}
-				if( previous == null) {
-					MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, null, "Could not find a Keyframe in context.");
-					previousCache = null;
-				}
-				else {
-					previousCache = previous.frameCache;
-				}
+				previousCache = workspace._accessCache(data);
 			}
-			
+			@Override
+			protected void onAdd() {
+				previousCache.reserve(this);
+				super.onAdd();
+			}
+			@Override
+			protected void onDispatch() {
+				previousCache.relinquish(this);
+				super.onDispatch();
+			}
 			@Override
 			public void performAction() {
 				workspace._replaceIamge(data, frameCache);
@@ -621,6 +627,8 @@ public class UndoEngine {
 				met = 0;
 			}
 			else {
+				if( iaction instanceof KeyframeAction)
+					met = 0;
 				actions.add(iaction);
 			}
 		}
@@ -784,6 +792,19 @@ public class UndoEngine {
 		
 		NullContext() {
 			super(null);
+		}
+		
+		protected Collection<ImageHandle> getImageDependency() {
+			LinkedHashSet<ImageHandle> set = new LinkedHashSet<>();
+			
+			
+			for( NullAction action : actions){
+				if( action.reliesOnData()) {
+					set.addAll( action.getDependencies());
+				}
+			}
+			
+			return set;
 		}
 
 		@Override
@@ -1056,7 +1077,10 @@ public class UndoEngine {
 	 * have an UndoAction since there is always a logical component assosciated
 	 * with it (otherwise it would have no Actions to it)
 	 */
-	public static abstract class NullAction extends UndoableAction {}
+	public static abstract class NullAction extends UndoableAction {
+		public boolean reliesOnData() {return false;}
+		public Collection<ImageHandle> getDependencies() { return null;}
+	}
 	
 	/** A StackableAction is an action that if performed multiple times in
 	 * a row will automatically group into a single action by calling 
@@ -1099,11 +1123,17 @@ public class UndoEngine {
 		public List<UndoableAction> getActions() {
 			return Arrays.asList(actions);
 		}
+		/**
+		 * Even though the CompositeContext executes "redo" by calling the
+		 * relevant context for redo, many components perform commands the
+		 * initial time by constructing an UndoableAction and then calling
+		 * performAction, so we implement it here.
+		 * 
+		 * It even performs the ImageActions which aren't normally performed
+		 * using the performAction 
+		 */
 		@Override		protected void performAction() { 
-			// Even though the CompositeContext executes "redo" by calling the
-			//	relevant context for redo, many components perform commands the
-			//	initial time by constructing an UndoableAction and then calling
-			//	performAction, so we implement it here.
+			// 
 			for( int i = 0; i<contexts.length; ++i) {
 				actions[i].performAction();
 				if( actions[i] instanceof ImageAction){
@@ -1154,6 +1184,35 @@ public class UndoEngine {
 			return false;
 		}
 		
+	}
+	
+	// Typically non-special UndoActions shouldn't go here but I don't see w
+	public static class DrawImageAction extends ImageAction {
+		private final CachedImage stored;
+		private final int dx;
+		private final int dy;
+		
+		public DrawImageAction(ImageHandle data, CachedImage other, int x, int y) {
+			super(data);
+			this.stored = other;
+			this.dx = x;
+			this.dy = y;
+		}
+		@Override protected void onAdd() {
+			stored.reserve(this);
+		}
+		@Override protected void onDispatch() {
+			stored.relinquish(this);
+		}
+		@Override
+		protected void performImageAction(ImageHandle image) {
+			System.out.println("::" + dx +" ,"+ dy);
+			BufferedImage bi = image.context.checkoutImage(image);
+			Graphics g = bi.getGraphics();
+			g.drawImage(stored.access(), dx, dy, null);
+			g.dispose();
+			image.context.checkinImage(image);
+		}
 	}
 	
 	

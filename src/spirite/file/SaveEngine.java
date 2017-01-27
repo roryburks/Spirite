@@ -64,6 +64,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 					}
 				})).start();
 				watcher.lastTime = time;
+				watcher.undoCount = watcher.workspace.getUndoEngine().getMetronome();
 			}
 		}
 	}
@@ -211,8 +212,9 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
 		// [1] : bitmask
 		int mask = 
-				(node.isVisible() ? SaveLoadUtil.VISIBLE_MASK : 0) + 
-				(node.isExpanded() ? SaveLoadUtil.EXPANDED_MASK : 0); 
+				(node.isVisible() ? SaveLoadUtil.VISIBLE_MASK : 0) | 
+				(node.isExpanded() ? SaveLoadUtil.EXPANDED_MASK : 0);
+
 		ra.writeByte( mask);
 		
 		if( node instanceof GroupTree.GroupNode) {

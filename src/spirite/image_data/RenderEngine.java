@@ -158,7 +158,7 @@ public class RenderEngine
 				wrk.seloffY = settings.workspace.getSelectionEngine().getOffsetY() - p.y;
 			}
 		}
-		_propperRec( settings.node, 0, settings, images, wrk);
+		_propperRec( (GroupNode)settings.node, 0, settings, images, wrk);
 		
 		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
@@ -312,7 +312,7 @@ public class RenderEngine
 
 		// Only one of the following three can be non-null.
 		//	If all three are null, it draws the root node
-		public GroupNode node = null;
+		public Node node = null;
 		public ImageHandle image = null;
 		public Layer layer = null;
 		
@@ -330,6 +330,11 @@ public class RenderEngine
 			if( workspace == null) 
 				throw new UnsupportedOperationException("Cannot render a null Workspace");
 			
+			if( node instanceof LayerNode) {
+				layer = ((LayerNode) node).getLayer();
+				node = null;
+			}
+			
 			// Change all the many things ignored if image is null to null
 			if(image != null) {
 				node = null;
@@ -341,7 +346,6 @@ public class RenderEngine
 			}
 			else if( layer != null) {
 				node = null;
-				image = null;
 				drawSelection = false;
 				if( width == -1) width = layer.getWidth();
 				if( height == -1) height = layer.getHeight();

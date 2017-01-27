@@ -362,6 +362,9 @@ public class NodeTree extends ContentTree
 				menuScheme.add( new String[]{"&Construct Simple Animation From Group", "animfromgroup", null});
 			}
 			else if( usrObj instanceof LayerNode) {
+				if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
+					menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
+				}
 			}
 
 			// Show the ContextMenu
@@ -490,6 +493,10 @@ public class NodeTree extends ContentTree
 			break;
 		case "delete":
 			workspace.removeNode(contextMenu.node);
+			break;
+		case "mergeDown":
+			if( contextMenu.node instanceof LayerNode)	// should be unnecessary
+				workspace.mergeNodes( contextMenu.node.getNextNode(), (LayerNode) contextMenu.node);
 			break;
 		default:
 			System.out.println(evt.getActionCommand());

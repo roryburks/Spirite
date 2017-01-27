@@ -14,6 +14,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
@@ -116,6 +117,21 @@ public class LayerTreePanel extends NodeTree
 				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
 				return false;
 			}
+	}
+	
+	@Override
+	protected void buttonPressed(CCButton button) {
+		super.buttonPressed(button);
+		
+		if( button.buttonNum == 1) {
+
+			Node node = getNodeFromPath( button.getAssosciatedTreePath());
+			
+			if( button.isSelected())
+				workspace.addToggle(node);
+			else
+				workspace.remToggle(node);
+		}
 	}
 }
 

@@ -8,7 +8,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.Layer.MergeHelper;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -75,6 +78,7 @@ public class ImageWorkspace {
 	// External Components
 	private final CacheManager cacheManager;
 	private final SettingsManager settingsManager;
+	private final RenderEngine renderEngine;
 	
 	private GroupTree.Node selected = null;
 	private int workingID = 0;	// an incrementing unique ID per imageData
@@ -91,6 +95,7 @@ public class ImageWorkspace {
 	public ImageWorkspace( MasterControl master) {
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
+		this.renderEngine = master.getRenderEngine();
 		imageData = new HashMap<>();
 		animationManager = new AnimationManager(this);
 		groupTree = new GroupTree(this);
@@ -240,12 +245,18 @@ public class ImageWorkspace {
 		return selectionEngine;
 	}
 	
+	
 	public DrawEngine getDrawEngine() {
 		return drawEngine;
 	}
 	
+	// Doesn't feel great leaking external components, but they're very
+	//	relevant to images and it's better than given them MasterControl
 	public CacheManager getCacheManager() {
 		return cacheManager;
+	}
+	public RenderEngine getRenderEngine() {
+		return renderEngine;
 	}
 	
 	public GroupTree.GroupNode getRootNode() {
@@ -400,6 +411,13 @@ public class ImageWorkspace {
 		triggerImageRefresh(evt);
 	}
 	
+	/** I don't like that this function exists, but it was naive to think I
+	 * could avoid it. 
+	 * ONLY USE IF YOU REALLY NEED THE CACHEDIMAGE, NOT JUST THE BUFFEREDIMAGE*/
+	CachedImage _accessCache( ImageHandle handle) {
+		return imageData.get(handle.id);
+	}
+	
 	/** Performs a command of context "draw." */
 	
 	public void executeDrawCommand( String command) {
@@ -410,6 +428,9 @@ public class ImageWorkspace {
 			break;
 		case "redo":
 			undoEngine.redo();
+			break;
+		case "toggle":
+			toggleQuick();
 			break;
     	case "newLayerQuick":
     		setSelectedNode(
@@ -471,10 +492,8 @@ public class ImageWorkspace {
 		}
 	}
 	
-	
+	// :::: Various Actions
 	public void cropNode( Node nodeToCrop, Rectangle bounds) {
-		
-		System.out.println(bounds);
 		
 		bounds = bounds.intersection(new Rectangle(0,0,width,height));
 		if( bounds.isEmpty())return;
@@ -504,9 +523,6 @@ public class ImageWorkspace {
 				ImageHandle handle = handles.get(i);
 				
 				
-				System.out.println(toCompare +":::" + rect);
-				
-				
 				if( rect.x < 0) {
 					rect.width -= rect.x;
 					rect.x = 0;
@@ -529,12 +545,11 @@ public class ImageWorkspace {
 					rect.height = handle.getHeight();
 				
 
-				System.out.println(rect);
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
-				g2.translate(-bounds.x, -bounds.y);
+				g2.translate(-rect.x, -rect.y);
 				handle.drawLayer(g2);
 				g2.dispose();
 				
@@ -548,9 +563,37 @@ public class ImageWorkspace {
 		
 		if(!actions.isEmpty()) {
 			CompositeAction action = undoEngine.new CompositeAction(actions, (nodeToCrop instanceof LayerNode) ? "Cropped Layer" : "Cropped Group");
-					action.performAction();
+			action.performAction();
 			undoEngine.storeAction(action);
 		}
+	}
+	
+	public void mergeNodes( Node source, LayerNode destination) {
+		if( source == null || destination == null) return;
+		
+		
+		if( !destination.getLayer().canMerge(source))
+			return;
+		
+		List<UndoableAction> actions = new ArrayList<>();
+		
+		MergeHelper helper = destination.getLayer().merge(source, -destination.x+source.x, -destination.y+source.y);
+		actions.addAll( helper.actions);
+		if( helper.offsetChange.x != 0 || helper.offsetChange.y != 0){
+			System.out.println("OFFSET" + helper.offsetChange);
+			actions.add( new StructureAction(
+					new OffsetChange(
+							destination, 
+							destination.x + helper.offsetChange.x, 
+							destination.y + helper.offsetChange.y)
+					));
+		}
+			
+		actions.add(new StructureAction( 
+				new DeletionChange(source, source.getParent(), source.getNextNode())));
+		CompositeAction composite = undoEngine.new CompositeAction(actions, "Merge Action");
+		composite.performAction();
+		undoEngine.storeAction(composite);
 	}
 	
 	
@@ -819,6 +862,13 @@ public class ImageWorkspace {
 					Layer layer = ((LayerNode)next.toDupe).getLayer();
 					dupe = groupTree.new LayerNode( layer, next.toDupe.getName());
 				}
+
+				dupe.alpha = next.toDupe.alpha;
+				dupe.x = next.toDupe.x;
+				dupe.y = next.toDupe.y;
+				dupe.visible = next.toDupe.visible;
+				dupe.expanded = next.toDupe.expanded;
+				
 				
 				next.parent._add(dupe, null);
 			}
@@ -947,6 +997,14 @@ public class ImageWorkspace {
 		public String getDescription() {
 			return change.description;
 		}
+		@Override
+		public boolean reliesOnData() {
+			return change.reliesOnData();
+		}
+		@Override
+		public Collection<ImageHandle> getDependencies() {
+			return change.getDependencies();
+		}
 	}
 	
 
@@ -991,6 +1049,8 @@ public class ImageWorkspace {
 		public abstract void execute();
 		public abstract void unexecute();
 		public List<Node> getChangedNodes() { return new LinkedList<>();}
+		public boolean reliesOnData() {return false;}
+		public Collection<ImageHandle> getDependencies() { return null;}
 		public final boolean isGroupTreeChange() {return groupTreeChange;}
 		
 		// Called when history has been re-written and so the action never
@@ -1085,6 +1145,19 @@ public class ImageWorkspace {
 			List<Node> list = new LinkedList<Node>();
 			list.add(parent);
 			return list;
+		}
+		@Override public boolean reliesOnData() {
+			return true;
+		}
+		@Override public Collection<ImageHandle> getDependencies() {
+			LinkedHashSet<ImageHandle> dependencies = new LinkedHashSet<>();
+			List<LayerNode> layerNodes = node.getAllLayerNodes();
+			
+			for( LayerNode layerNode : layerNodes) {
+				dependencies.addAll( layerNode.getLayer().getUsedImageData());
+			}
+			
+			return dependencies;
 		}
 	}
 	
@@ -1534,5 +1607,35 @@ public class ImageWorkspace {
 		undoEngine.cleanup();
 	}
     
+	
+	// DEBUG
+	List<Node> toggleList = new ArrayList<>();
+	int toggleid = 0;
+	
+	void toggleQuick() {
+		for( Node n : toggleList) {
+			n.alpha = 0.3f;
+		}
+		
+		toggleid++;
+		if( toggleid >= toggleList.size())
+			toggleid = 0;
+		
+		if( toggleid < toggleList.size())
+			toggleList.get(toggleid).alpha = 1.0f;
+		
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.workspace = this;
+		evt.nodesChanged = new LinkedList<>(toggleList);
+		triggerImageRefresh(evt);
+	}
+	
+	public void addToggle( Node node) {
+		toggleList.add(node);
+	}
+	
+	public void remToggle( Node node) {
+		toggleList.remove(node);
+	}
     
 }

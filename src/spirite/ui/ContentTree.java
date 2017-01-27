@@ -479,11 +479,14 @@ public class ContentTree extends JPanel
 				}
 				return false;
 			}
-			
-			
+
+			Point p = SwingUtilities.convertPoint( support.getComponent(), 
+					support.getDropLocation().getDropPoint(), 
+					tree);
+
 			// Then Test based on Position (while updating the data
 			//	keeping track of where the tree node will be placed).
-			if(!testDrag( support.getDropLocation().getDropPoint())) {
+			if(!testDrag( p)) {
 				return false;
 			}
 			else {
@@ -531,6 +534,10 @@ public class ContentTree extends JPanel
 		// :::: DragGesterRecignizer
 		@Override
 		public void dragGestureRecognized(DragGestureEvent evt) {
+			if( evt.getTriggerEvent() instanceof MouseEvent &&
+				((MouseEvent)evt.getTriggerEvent()).getButton() != 1)
+				return;
+			
 			TreePath dragNode = tree.getSelectionPath();
 			
 			if( dragNode != null) {

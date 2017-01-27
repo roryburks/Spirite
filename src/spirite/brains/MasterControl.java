@@ -257,11 +257,7 @@ public class MasterControl
     }
     
     public void executeCommandString( String command) {
-    	String space = command.substring(0, command.indexOf(".")+1);
-    	if( space == null) {
-    		System.out.println(command);
-    		return;
-    	}
+    	String space = (command == null)?"":command.substring(0, command.indexOf(".")+1);
     	switch( space) {
     	case "global.":
             globalHotkeyCommand(command.substring("global.".length()));
@@ -292,7 +288,7 @@ public class MasterControl
     private void globalHotkeyCommand( String command) {
     	
     	switch( command) {
-    	case "save":{
+    	case "save_image":{
     		if( currentWorkspace == null)
     			break;
     		

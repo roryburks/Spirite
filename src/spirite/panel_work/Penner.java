@@ -413,6 +413,8 @@ public class Penner
 		Color c = (leftClick) ? 
 				paletteManager.getActiveColor(0)
 				: paletteManager.getActiveColor(1);
+				
+		if( holdingCtrl) c = new Color(0,0,0,0);
 
 		// Grab the Active Data
 		ImageHandle data = workspace.getActiveData();

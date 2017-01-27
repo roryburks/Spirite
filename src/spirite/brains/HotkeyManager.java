@@ -50,7 +50,7 @@ public class HotkeyManager {
                 {"toolset.BOX_SELECTION", (new Hotkey( KeyEvent.VK_R, 0))},
                 {"toolset.MOVE", (new Hotkey( KeyEvent.VK_M, 0))},
                 {"toolset.COLOR_PICKER", (new Hotkey( KeyEvent.VK_O, 0))},
-                {"toolset.PIXEL", (new Hotkey( KeyEvent.VK_S, 0))},
+                {"toolset.PIXEL", (new Hotkey( KeyEvent.VK_A, 0))},
 
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
                 
@@ -59,6 +59,7 @@ public class HotkeyManager {
                 {"draw.redo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
                 {"draw.toggle_reference", (new Hotkey( KeyEvent.VK_BACK_QUOTE, 0))},	
                 {"draw.clearLayer", (new Hotkey( KeyEvent.VK_DELETE, 0))},
+                {"draw.toggle", (new Hotkey( KeyEvent.VK_TAB, 0))},
                 
                 {"global.save_image", (new Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK))},
                 

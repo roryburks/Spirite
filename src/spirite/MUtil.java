@@ -88,6 +88,17 @@ public class MUtil {
 		
 	}
 	
+	/** Returns the smallest rectangle such that rect1 and rect2 are contained
+	 * within it.	 */
+	public static Rectangle circumscribe( Rectangle rect1, Rectangle rect2) {
+		return rectFromEndpoints(
+				Math.min( rect1.x, rect2.x),
+				Math.min( rect1.y, rect2.y),
+				Math.max( rect1.x + rect1.width, rect2.x + rect2.width),
+				Math.max( rect1.y + rect1.height, rect2.y + rect2.height)
+				);
+	}
+	
 	/** 
 	 * Places t in between start and end such that it is offset by an integer
 	 * number of rotations of start to end. <br>

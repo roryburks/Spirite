@@ -492,6 +492,8 @@ public class DrawEngine {
 			int bg = bi.getRGB(p.x, p.y);
 			int c = color.getRGB();
 			
+			if( bg == c) return;
+			
 			while( !queue.isEmpty()) {
 				int p = queue.poll();
 				int ix = MUtil.high16(p);
