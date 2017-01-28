@@ -367,7 +367,7 @@ public class MUtil {
 		} else {
 			Component toSend = 
 					SwingUtilities.getDeepestComponentAt(container, p.x, p.y);
-			if( toSend != null) {
+			if( toSend != null && toSend != reciever) {
 				Point convertedPoint = SwingUtilities.convertPoint(container, p, toSend);
 				toSend.dispatchEvent( new MouseEvent(
 						toSend,

@@ -29,6 +29,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionListener;
@@ -374,7 +375,8 @@ public class NodeTree extends ContentTree
 			contextMenu.removeAll();
 			UIUtil.constructMenu(contextMenu, menuScheme.toArray( new String[0][]), this);
 			contextMenu.node = (Node)usrObj;
-			contextMenu.show(this, evt.getX(), evt.getY());
+			
+			contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
 	}
 	
@@ -494,7 +496,13 @@ public class NodeTree extends ContentTree
 			anim.importGroup(group);
 			manager.linkAnimation(anim, group);
 			
-			break;}					
+			break;}
+		case "animBreakBind":
+			AnimationManager manager = workspace.getAnimationManager();
+//			manager.
+
+			// TODO
+			break;
 		case "newGroup":
 			workspace.addGroupNode(contextMenu.node, "New Group");
 			break;

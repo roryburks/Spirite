@@ -1,14 +1,14 @@
 package spirite.panel_anim;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,23 +18,20 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
-import spirite.MDebug.ErrorType;
-import spirite.MDebug.WarningType;
-import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.image_data.GroupTree.GroupNode;
-import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.GroupTree.Node;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
-import spirite.image_data.ImageWorkspace;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
@@ -181,55 +178,88 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	
 	// Back-up component for nodes that don't have anything more specific
-	private final JLabel label = new JLabel();	
-//	private final Component renderPanel = new TTree();
 	
 	class FixedFramePanel extends JPanel 
-		implements AnimNodeBuilder
+		implements AnimNodeBuilder, MouseListener
 	{
 		static final int LABEL_HEIGHT = 20;
-		
+		static final int NODE_HEIGHT = 24;
+		static final int OUTLINE_WIDTH = 10;
 		FixedFrameAnimation anim;
+		ArrayList<ArrayList<FrameLink>> frameLinks = new ArrayList<>();
+		
 		FixedFramePanel(FixedFrameAnimation anim) {
 			this.anim = anim;
 			this.setOpaque(false);
 			constructLayout();
+			tree.addMouseListener(this);
+			container.addMouseListener(this);
 		}
 		
-		class FFPOutline extends JPanel
-		{
-			int dy[];
-			FFPOutline( int count) {
-				this.setOpaque(false);
-				dy = new int[count];
-			}
-			@Override
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				
-				g.setColor( new Color( 160,160,220));
-				g.drawLine(3, LABEL_HEIGHT, 3, dy[dy.length-1]);
-				
-				for( int i=0; i<dy.length; ++i) {
-					g.drawLine(3, dy[i], 8, dy[i]);
+		@Override
+		protected void paintComponent(Graphics g) {
+			Node selected = workspace.getSelectedNode();
+			if( !(selected instanceof LayerNode))
+				selected = null;
+			
+			for( List<FrameLink> list : frameLinks) {
+				for( FrameLink fl : list) {
+					if( fl.frame.node == selected) {
+						g.setColor(pseudoselectColor);
+						g.fillRect( fl.component.getX()-OUTLINE_WIDTH, fl.component.getY(),
+								fl.component.getWidth()+OUTLINE_WIDTH, fl.component.getHeight());
+					}
 				}
 			}
+			
+			super.paintComponent(g);
 		}
 		
+
+		// :::: Coordinate Helping Methods
+		public Rectangle boundsFromLink(FrameLink fl) {
+			return new Rectangle(fl.component.getX()-OUTLINE_WIDTH, fl.component.getY(),
+								fl.component.getWidth()+OUTLINE_WIDTH, fl.component.getHeight());
+		}
+		
+		public FrameLink linkAt( Point p) {
+
+			for( List<FrameLink> list : frameLinks) {
+				for( FrameLink fl : list) {
+					if( boundsFromLink(fl).contains(p))
+						return fl;
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * The layout of the FixedFramePanel mimics a collection of 
+		 * parallel trees using a dynamically-constructed GroupLayout, 
+		 * with each tree corresponding to an Animation layer whose nodes
+		 * correspond to animation elements, aligned such that all nodes 
+		 * on the same horizontal line appear on the same frame.
+		 * 
+		 * The exception being Asynchronous Layers, which have their own
+		 * heights.
+		 */
 		private void constructLayout() {
+			
 			List<AnimationLayer> layers = anim.getLayers();
 			
+			frameLinks.clear();
 			
 			GroupLayout layout = new GroupLayout(this);
 			
 			Group horizontal = layout.createSequentialGroup();
 			Group vertical = layout.createParallelGroup();
 			
-			for( AnimationLayer layer : layers) {
-				List<Frame> frames = layer.getFrames();
-				FFPOutline outline = new FFPOutline(frames.size());
+			for( int index=0; index<layers.size(); ++index) {
+				List<Frame> frames = layers.get(index).getFrames();
+				ArrayList<FrameLink> links = new ArrayList<>(frames.size());
+				FFPOutline outline = new FFPOutline(index);
 				
-				horizontal.addComponent(outline, 10,10,10);
+				horizontal.addComponent(outline, OUTLINE_WIDTH,OUTLINE_WIDTH,OUTLINE_WIDTH);
 				vertical.addComponent(outline);
 				
 				Group subHor = layout.createParallelGroup();
@@ -240,19 +270,21 @@ public class AnimationSchemeTreePanel extends ContentTree
 				subHor.addComponent(label);
 				subVert.addComponent(label, LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT);
 				
-				int i=0;
 				int dy = 10 + LABEL_HEIGHT;
 				for( Frame frame : frames) {
-					outline.dy[i++] = dy;
-					dy += 24;
 					TitlePanel tp = new TitlePanel();
-					tp.startLabel.setText(""+frame.start);
-					tp.endLabel.setText(""+frame.end);
+					tp.startLabel.setText(""+frame.getStart());
+					tp.endLabel.setText(""+frame.getEnd());
 					subHor.addComponent(tp);
-					subVert.addComponent(tp,24,24,24);
+					subVert.addComponent(tp,NODE_HEIGHT,NODE_HEIGHT,NODE_HEIGHT);
+
+					links.add(new FrameLink(dy,frame,tp));
+					dy += NODE_HEIGHT;
 				}
 				horizontal.addGroup(subHor);
 				vertical.addGroup(subVert);
+				
+				frameLinks.add(links);
 			}
 			
 			layout.setVerticalGroup(vertical);
@@ -260,6 +292,44 @@ public class AnimationSchemeTreePanel extends ContentTree
 			this.setLayout(layout);
 		}
 		
+
+		/** FrameLink is a helper-class that memorizes the link between
+		 * a frame and their visual presence in the UI.
+		 */
+		private class FrameLink {
+			final int ypos;
+			final Frame frame;
+			final Component component;
+			FrameLink( int y, Frame frame, Component component) 
+			{this.ypos = y; this.frame = frame; this.component = component;}
+		}
+		class FFPOutline extends JPanel
+		{
+			final int col;
+			FFPOutline( int col) {
+				this.setOpaque(false);
+				this.col = col;
+			}
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				
+				List<FrameLink> links = frameLinks.get(col);
+				
+				if(! links.isEmpty()) {
+					g.setColor( new Color( 160,160,220));
+					g.drawLine(3, LABEL_HEIGHT, 3, 
+							frameLinks.get(col).get(frameLinks.get(col).size()-1).ypos);
+					
+					for( FrameLink fl : frameLinks.get(col)){
+						g.drawLine(3, fl.ypos, 8, fl.ypos);
+					}
+				}
+			}
+		}
+
+
+		// :::: AnimNodeBuilder
 		@Override
 		public void updateComponent() {
 			constructLayout();
@@ -269,6 +339,34 @@ public class AnimationSchemeTreePanel extends ContentTree
 		public Component getComponent() {
 			return this;
 		}
+
+		// :::: MouseListener
+		@Override public void mouseEntered(MouseEvent evt) {}
+		@Override public void mouseExited(MouseEvent evt) {}
+		@Override public void mouseReleased(MouseEvent evt) {}
+		@Override public void mouseClicked(MouseEvent evt) {}
+		@Override public void mousePressed(MouseEvent evt) {
+			// I despise JTree's Coordinate Space Methods.  Why am I even using
+			//	this frustrating object when dealing with GroupLayouts is a 
+			//	thousand times easier?
+			Point p = SwingUtilities.convertPoint(
+					evt.getComponent(), evt.getPoint(), tree);
+			
+			Rectangle r =
+					tree.getPathBounds(tree.getClosestPathForLocation(p.x, p.y));
+			
+			if( !r.contains(p))
+				return;
+			p.x -= r.x;
+			p.y -= r.y;
+
+			FrameLink fl = linkAt(p);
+			
+			if( fl != null) {
+				workspace.setSelectedNode(fl.frame.node);
+			}
+		}
+
 	}
 	
 	
@@ -279,6 +377,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		public void updateComponent();
 		public Component getComponent();
 	}
+	private final JLabel label = new JLabel();	
 	private final TitlePanel labelPanel = new TitlePanel();
 	private final HashMap<Animation,AnimNodeBuilder> builderMap = new HashMap<>();
 	
@@ -340,12 +439,9 @@ public class AnimationSchemeTreePanel extends ContentTree
 	
 	@Override
 	protected Color getColor(int row) {
-		
-		if( tree.isRowSelected(row))
-			return super.getColor(row);
-		
 		return null;
-/*		Object usrObj = 
+/*
+		Object usrObj = 
 				((DefaultMutableTreeNode)tree.getPathForRow(row).getLastPathComponent()).getUserObject();
 
 		Node selected = (workspace == null) ? null : workspace.getSelectedNode();
@@ -422,4 +518,5 @@ public class AnimationSchemeTreePanel extends ContentTree
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 
+	
 }

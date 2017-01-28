@@ -9,14 +9,12 @@ import java.util.List;
 
 import spirite.MUtil;
 import spirite.brains.CacheManager.CachedImage;
-import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
-import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.UndoEngine.DrawImageAction;
-import spirite.image_data.layers.Layer.MergeHelper;
+import spirite.image_data.UndoEngine.UndoableAction;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;

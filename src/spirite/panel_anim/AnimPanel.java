@@ -28,9 +28,9 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.Animation;
-import spirite.image_data.ImageWorkspace;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
@@ -320,7 +320,6 @@ public class AnimPanel extends OmniComponent
 		try{
 		constructFromAnimation( workspace.getAnimationManager().getAnimations().get(0));
 		} catch( NullPointerException e) {
-			System.out.println("None");
 			
 		}
 		

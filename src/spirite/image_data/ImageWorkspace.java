@@ -593,7 +593,6 @@ public class ImageWorkspace {
 		MergeHelper helper = destination.getLayer().merge(source, -destination.x+source.x, -destination.y+source.y);
 		actions.addAll( helper.actions);
 		if( helper.offsetChange.x != 0 || helper.offsetChange.y != 0){
-			System.out.println("OFFSET" + helper.offsetChange);
 			actions.add( new StructureAction(
 					new OffsetChange(
 							destination, 

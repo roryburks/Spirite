@@ -283,6 +283,12 @@ public class MasterControl
             	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
     	}
     }
+
+/*    public interface CommandExecuter {
+    	public abstract static Collection<String> getValidCommands();
+    	public String getCommandDomain();
+    	public void executeCommand( String commmand);
+    }*/
     
     /** Performs the given hotkey command string (should be of "global." focus). */
     private void globalHotkeyCommand( String command) {

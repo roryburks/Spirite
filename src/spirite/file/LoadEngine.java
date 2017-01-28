@@ -299,7 +299,6 @@ public class LoadEngine {
 			if( node != null) {
 				node.setAlpha(alpha);
 				
-				System.out.println(bitmask);
 				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
 				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
 				node.setOffset(ox, oy);

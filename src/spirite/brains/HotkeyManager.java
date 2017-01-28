@@ -109,6 +109,7 @@ public class HotkeyManager {
     public Hotkey getHotkey( String command) {
         return hotkey_map.getKey(command);
     }
+    
 
     /**
      * A Hotkey

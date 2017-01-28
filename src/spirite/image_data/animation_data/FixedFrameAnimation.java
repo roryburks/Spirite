@@ -44,17 +44,17 @@ public class FixedFrameAnimation extends Animation
 		
 		ListIterator<GroupTree.Node> it = group.getChildren().listIterator(group.getChildren().size());
 		
+		int met = 0;
 		while( it.hasPrevious()) {
 			GroupTree.Node node = it.previous();
 			
 			if( node instanceof LayerNode) {
-				layer.frames.add((LayerNode) node);
+				layer.frames.add( new Frame((LayerNode) node, 1, met, Marker.FRAME));
+				met += 1;
 			}
 		}
 		
-		for( int i = 0; i <= layer.frames.size(); ++i) {
-			layer.keyTimes.add(i);
-		}
+		layer.frames.add(new Frame(null, 0, met, Marker.END_AND_LOOP));
 
 		startFrame = 0;
 		endFrame = layer.frames.size();
@@ -110,50 +110,24 @@ public class FixedFrameAnimation extends Animation
 		int _t = (int)Math.floor(t);
 		int met = MUtil.cycle(startFrame, endFrame, _t);
 		
-		System.out.println(_t);
-		
 		for( AnimationLayer layer : layers) {
 			if( layer.getFrames().size() == 0) continue;
 			
-			int start = layer.keyTimes.get(0);
-			int end = layer.keyTimes.get(layer.keyTimes.size()-1);
+			int start = layer.getStart();
+			int end = layer.getEnd();
 			int frame = 0;
 			int localMet = met;
 
 
-			
 			// Based on the layer timing type, determine the local frame
 			//	index to use (if any)
 			if( layer.asynchronous) {
 				localMet = MUtil.cycle(start, end, _t);
-				
-			}
-			else if( met < start) {
-				continue;
-			}
-			else if( met >= end) {
-				if( !layer.loops)
-					continue;
-				
-				localMet = MUtil.cycle( start, end-start, met-start);
 			}
 			
-			// Iterate through the keyTimes list until you have found the one
-			//	after yours, then step back
-			Iterator<Integer> it = layer.keyTimes.iterator();
+			LayerNode node = layer.getFrame(localMet);
 			
-			while( it.hasNext()) {
-				int i = it.next();
-				if( i > localMet)
-					break;
-				
-				frame++;
-			}
-			frame--;
-			
-			if( frame != -1) {
-				layer.frames.get(frame).getLayer().draw(g);
-			}
+			if( node != null)node.getLayer().draw(g);
 		}
 	}
 
@@ -181,36 +155,105 @@ public class FixedFrameAnimation extends Animation
 		triggerChange();
 	}
 	
+	
+	
+	public enum Marker {
+		FRAME,
+		START_LOCAL_LOOP,
+		END_LOCAL_LOOP,
+		END_AND_LOOP,
+		NIL_OUT,
+	}
+
 	public static class Frame {
-		public final int start;
-		public final int end;
-		public final LayerNode node;
-		Frame( LayerNode node, int start, int end) {
+		public int start;	// Not used internally, should be calculatable from other parts of the animation
+		public int length;
+		public LayerNode node;
+		public Marker marker;
+		Frame( LayerNode node, int length, int start, Marker marker) {
 			this.node = node;
+			this.length = length;
 			this.start = start;
-			this.end = end;
+			this.marker = marker;
+		}
+		public int getStart() {
+			return start;
+		}
+		public int getEnd() {
+			return start+length;
 		}
 	}
-	
 	public static class AnimationLayer {
 		protected GroupNode group;
-		protected ArrayList<LayerNode> frames = new ArrayList<>();
-		protected ArrayList<Integer> keyTimes = new ArrayList<>();
+		protected final ArrayList<Frame> frames = new ArrayList<>();
 		protected boolean asynchronous = false;
-		protected boolean loops = true;
 		
 		public AnimationLayer() {
 		}
 		
 		
 		public int getStart() {
-			if( keyTimes.isEmpty()) return 0;
-			return keyTimes.get(0);
+			int i = 0;
+			for( Frame frame : frames) {
+				if( frame.marker == Marker.FRAME) {
+					return i;
+				}
+				i += frame.length;
+			}
+			return -1;
 		}
 		public int getEnd() {
-			if( keyTimes.isEmpty()) return 0;
-			return keyTimes.get(keyTimes.size()-1);
+			int i = 0;
+			for( Frame frame : frames) {
+				i += frame.length;
+			}
+			return i;
+		}
+		
+		public LayerNode getFrame( int met) {
+			int tick = 0;
+			boolean looping = false;
+			int startLoop = 0;
+			int loopSize;
+			LayerNode layer = null;
+			List<LayerNode> loopLayer = new ArrayList<>(0);
+			List<Integer> loopmarkers = new ArrayList<>(0);
 			
+			
+			for( int index=0; index < frames.size(); ++index) {
+				Frame frame = frames.get(index);
+
+				tick += frame.length;
+				switch( frame.marker) {
+				case FRAME:
+					layer = frame.node;
+					break;
+				case START_LOCAL_LOOP:
+					looping = true;
+					startLoop = tick;
+					break;
+				case END_AND_LOOP:
+					if( tick == 0)
+						return null;
+					index = -1;
+					break;
+				case END_LOCAL_LOOP:
+					looping = false;
+					loopSize = tick - startLoop;
+					break;
+				case NIL_OUT:
+					layer = null;
+					break;
+				}
+				if( tick > met) {
+					if( looping) {
+						// TODO
+					}
+					else return layer;
+				}
+			}
+			
+			return layer;
 		}
 		
 		
@@ -220,31 +263,23 @@ public class FixedFrameAnimation extends Animation
 		public void setAsynchronous(boolean asynchronous) {
 			this.asynchronous = asynchronous;
 		}
-		public boolean isLoops() {
-			return loops;
-		}
-		public void setLoops(boolean loops) {
-			this.loops = loops;
-		}
 		
 		public List<Frame> getFrames() {
-			ArrayList<Frame> list = new ArrayList<>(frames.size());
-			for( int i=0; i <frames.size(); ++i) {
-				list.add( new Frame( frames.get(i), keyTimes.get(i), keyTimes.get(i+1)));
-			}
-			
-			return list;
+			return new ArrayList<>(frames);
 		}
 
-		@SuppressWarnings("unchecked")
 		private List<LayerNode> getLayers() {
-			return (List<LayerNode>) frames.clone();
+			ArrayList<LayerNode> list = new ArrayList<>();
+			for( Frame frame : frames) {
+				if( frame.marker == Marker.FRAME)
+					list.add(frame.node);
+			}
+			return list;
 		}
 		
-		@SuppressWarnings("unchecked")
-		public List<Integer> getKeyTimes() {
-			return (ArrayList<Integer>) keyTimes.clone();
-		}
+/*		public List<Integer> getKeyTimes() {
+			return new ArrayList<>(keyTimes);
+		}*/
 	}
 
 }

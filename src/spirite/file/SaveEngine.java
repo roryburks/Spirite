@@ -52,7 +52,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		for( AutoSaveWatcher watcher : watchers) {
 			if( watcher.workspace.getFile() != null &&
 				watcher.interval < (time - watcher.lastTime)/1000 &&
-				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome()) 
+				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome() - watcher.lastUndoSpot) 
 			{
 				watcher.lastTime = time;
 				(new Thread(new Runnable() {
@@ -64,7 +64,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 					}
 				})).start();
 				watcher.lastTime = time;
-				watcher.undoCount = watcher.workspace.getUndoEngine().getMetronome();
+				watcher.lastUndoSpot= watcher.workspace.getUndoEngine().getMetronome();
 			}
 		}
 	}

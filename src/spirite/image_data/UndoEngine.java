@@ -5,8 +5,6 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,8 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -910,7 +906,8 @@ public class UndoEngine {
 		CompositeContext() {
 			super(null);
 		}
-		
+
+		// Might be unnecessary
 		protected Collection<UndoContext> getUsedContexts() {
 			Collection<UndoContext> ret = new LinkedHashSet<>();
 			
@@ -1228,7 +1225,6 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction(ImageHandle image) {
-			System.out.println("::" + dx +" ,"+ dy);
 			BufferedImage bi = image.context.checkoutImage(image);
 			Graphics g = bi.getGraphics();
 			g.drawImage(stored.access(), dx, dy, null);

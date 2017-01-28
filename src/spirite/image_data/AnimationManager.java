@@ -8,7 +8,6 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.animation_data.FixedFrameAnimation;
 
 /***
  * AnimatonManager manages the animation functionality of an ImageWorkspace.

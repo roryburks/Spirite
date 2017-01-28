@@ -67,9 +67,9 @@ public class UIUtil {
 	public static void expandAllNodes( JTree tree) {
 		try {
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-			Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+			Enumeration<?> e =  root.depthFirstEnumeration();
 			while( e.hasMoreElements()) {
-				DefaultMutableTreeNode node = e.nextElement();
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.nextElement();
 				
 				tree.expandPath( new TreePath(node.getPath() ));
 			}
