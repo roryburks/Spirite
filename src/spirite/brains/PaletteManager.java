@@ -37,6 +37,8 @@ public class PaletteManager {
 
         active_colors.add(0, Color.black);
         active_colors.add(1, Color.white);
+        active_colors.add(2, Color.RED);
+        active_colors.add(3, Color.BLACK);
         
         loadDefaultPalette();
     }
@@ -62,7 +64,17 @@ public class PaletteManager {
     public void toggleActiveColors() {
     	Color t = active_colors.get(0);
     	active_colors.set(0, active_colors.get(1));
-    	active_colors.set(1, t);
+    	active_colors.set(1, active_colors.get(2));
+    	active_colors.set(2, active_colors.get(3));
+    	active_colors.set(3, t);
+        triggerColorChanged();
+    }
+    public void toggleActiveColors2() {
+    	Color t = active_colors.get(2);
+    	active_colors.set(2, active_colors.get(1));
+    	active_colors.set(1, active_colors.get(0));
+    	active_colors.set(0, active_colors.get(3));
+    	active_colors.set(3, t);
         triggerColorChanged();
     }
 
@@ -207,8 +219,14 @@ public class PaletteManager {
     
     // :::: Hotkeys
     public void performCommand( String command) {
-    	if( command.equals("swap"))
+    	switch (command) {
+    	case "swap":
     		toggleActiveColors();
+    		break;
+    	case "swapBack":
+    		toggleActiveColors2();
+    		break;
+    	}
     }
     
     // :::: Palette Change Observer

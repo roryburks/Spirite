@@ -53,6 +53,7 @@ public class HotkeyManager {
                 {"toolset.PIXEL", (new Hotkey( KeyEvent.VK_A, 0))},
 
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
+                {"palette.swapBack", (new Hotkey( KeyEvent.VK_Z, 0))},
                 
                 {"draw.newLayerQuick", (new Hotkey( KeyEvent.VK_INSERT, 0))},
                 {"draw.undo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK))},
@@ -60,6 +61,11 @@ public class HotkeyManager {
                 {"draw.toggle_reference", (new Hotkey( KeyEvent.VK_BACK_QUOTE, 0))},	
                 {"draw.clearLayer", (new Hotkey( KeyEvent.VK_DELETE, 0))},
                 {"draw.toggle", (new Hotkey( KeyEvent.VK_TAB, 0))},
+
+                {"draw.shiftLeft", (new Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
+                {"draw.shiftRight", (new Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
+                {"draw.shiftDown", (new Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
+                {"draw.shiftUp", (new Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 
                 {"global.save_image", (new Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK))},
                 

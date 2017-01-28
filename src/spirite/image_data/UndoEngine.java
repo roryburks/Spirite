@@ -1165,20 +1165,42 @@ public class UndoEngine {
 
 		@Override
 		public void stackNewAction(UndoableAction newAction) {
-			for( int i=0; i<actions.length; ++i) {
-				if( actions[i] instanceof StackableAction
-					&& ((StackableAction)actions[i]).canStack(newAction)) {
-					((StackableAction)actions[i]).stackNewAction(newAction);
+			List<UndoableAction> toCheck;
+			if( newAction instanceof CompositeAction) {
+				toCheck = Arrays.asList(((CompositeAction)newAction).actions);
+			}
+			else {
+				toCheck = new ArrayList<>(1);
+				toCheck.add(newAction);
+			}
+			
+			for( UndoableAction action : toCheck) {
+				for( int i=0; i<actions.length; ++i) {
+					if( actions[i] instanceof StackableAction
+						&& ((StackableAction)actions[i]).canStack(action)) {
+						((StackableAction)actions[i]).stackNewAction(action);
+					}
 				}
 			}
 		}
 
 		@Override
 		public boolean canStack(UndoableAction newAction) {
-			for( int i=0; i<actions.length; ++i) {
-				if( actions[i] instanceof StackableAction
-					&& ((StackableAction)actions[i]).canStack(newAction)) {
-					return true;
+			List<UndoableAction> toCheck;
+			if( newAction instanceof CompositeAction) {
+				toCheck = Arrays.asList(((CompositeAction)newAction).actions);
+			}
+			else {
+				toCheck = new ArrayList<>(1);
+				toCheck.add(newAction);
+			}
+			
+			for( UndoableAction action : toCheck) {
+				for( int i=0; i<actions.length; ++i) {
+					if( actions[i] instanceof StackableAction
+						&& ((StackableAction)actions[i]).canStack(action)) {
+						return true;
+					}
 				}
 			}
 			return false;

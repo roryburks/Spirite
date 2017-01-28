@@ -27,11 +27,11 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.image_data.Animation;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
-import spirite.image_data.ImageWorkspace;
-import spirite.image_data.animation_data.AbstractAnimation;
-import spirite.image_data.animation_data.SimpleAnimation;
+import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
 
@@ -48,7 +48,7 @@ public class AnimPanel extends OmniComponent
 	
     private final Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
 	
-    private AbstractAnimation animation = null;
+    private Animation animation = null;
     
 	// Metronome settings
 	private float start = 0.0f;
@@ -102,7 +102,7 @@ public class AnimPanel extends OmniComponent
         
 
         if( master.getCurrentWorkspace() != null) {
-	        List<AbstractAnimation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
+	        List<Animation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
 	        if( !list.isEmpty()) {
 	        	constructFromAnimation( list.get(0));
 	        }
@@ -124,7 +124,7 @@ public class AnimPanel extends OmniComponent
 		this.repaint();
 	}
 	
-	private void constructFromAnimation( AbstractAnimation anim) {
+	private void constructFromAnimation( Animation anim) {
 		
 		animation = anim;
 		start = anim.getStartFrame();
@@ -263,7 +263,7 @@ public class AnimPanel extends OmniComponent
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
 		}else if( source == buttonForward) {		
-			((SimpleAnimation)this.animation).save();
+			((FixedFrameAnimation)this.animation).save();
 		}
 	}
 

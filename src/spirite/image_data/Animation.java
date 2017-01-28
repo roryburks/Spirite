@@ -1,16 +1,19 @@
-package spirite.image_data.animation_data;
+package spirite.image_data;
 
 import java.awt.Graphics;
 
 import spirite.image_data.GroupTree.GroupNode;
 
-public abstract class AbstractAnimation {
-	String name;
+public abstract class Animation {
+	protected String name;
+	AnimationManager context;
 	
+	protected void triggerChange() {if( context != null) context.triggerStructureChange(null);}
 	public abstract void drawFrame( Graphics g, float t);
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();
 	public abstract void interpretLink( GroupNode node);
+	public abstract void importGroup( GroupNode node);
 	
 	public String getName() {
 		return name;

@@ -251,7 +251,7 @@ public class ContentTree extends JPanel
 					
 					if( rect != null) {
 						g.setColor(c);
-						g.fillRect( 0, rect.y, getWidth()-1, rect.height-1);
+						g.fillRect( 0, rect.y, getWidth(), rect.height);
 					}
 				}
 			}

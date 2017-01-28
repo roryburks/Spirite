@@ -45,6 +45,7 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
@@ -61,7 +62,7 @@ import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ImageWorkspace.VisibilityChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
-import spirite.image_data.animation_data.SimpleAnimation;
+import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
@@ -351,8 +352,8 @@ public class NodeTree extends ContentTree
 					{"&New Layer", "newLayer", "new_layer"},
 					{"New Layer &Group", "newGroup", "new_group"},
 					{"-"},
-					{"Duplicate "+descriptor, "duplicate", null}, 
-					{"Delete  "+descriptor, "delete", null}, 
+					{"D&uplicate "+descriptor, "duplicate", null}, 
+					{"&Delete  "+descriptor, "delete", null}, 
 			};
 			List<String[]> menuScheme = new ArrayList<>(Arrays.asList(baseMenuScheme));
 			
@@ -360,6 +361,8 @@ public class NodeTree extends ContentTree
 			if( usrObj instanceof GroupNode) {
 				menuScheme.add( new String[]{"-"});
 				menuScheme.add( new String[]{"&Construct Simple Animation From Group", "animfromgroup", null});
+				if( workspace.getAnimationManager().getSelectedAnimation() != null)
+					menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
 			}
 			else if( usrObj instanceof LayerNode) {
 				if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
@@ -475,13 +478,23 @@ public class NodeTree extends ContentTree
 		
 		// ActionCommands from JPopupMenu
 		switch( evt.getActionCommand()) {
-		case "animfromgroup":
+		case "animfromgroup":{
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
 			manager.linkAnimation(
-					manager.addAnimation(new SimpleAnimation(group)),
+					manager.addAnimation(new FixedFrameAnimation(group)),
 					group);
-			break;
+			break;}
+		case "animinsert":{
+			GroupNode group = (GroupNode)contextMenu.node;
+			AnimationManager manager = workspace.getAnimationManager();
+			Animation anim  = manager.getSelectedAnimation();
+			if( anim == null) break;
+			
+			anim.importGroup(group);
+			manager.linkAnimation(anim, group);
+			
+			break;}					
 		case "newGroup":
 			workspace.addGroupNode(contextMenu.node, "New Group");
 			break;

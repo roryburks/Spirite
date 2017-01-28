@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
@@ -105,6 +106,7 @@ public class OmniFrame extends JPanel
 		root.setTransferHandler(transferHandler);
 		
 		// Create TabbedPane
+		this.setLayout(new GridLayout());
 		this.add( root);
 		
 	}

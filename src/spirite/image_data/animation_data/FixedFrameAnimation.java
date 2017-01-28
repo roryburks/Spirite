@@ -13,21 +13,27 @@ import java.util.ListIterator;
 import javax.imageio.ImageIO;
 
 import spirite.MUtil;
+import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.layers.Layer;
 
-public class SimpleAnimation extends AbstractAnimation
+/**
+ * A FixedFrameAnimation 
+ * @author Rory Burks
+ *
+ */
+public class FixedFrameAnimation extends Animation
 {
 	private ArrayList<AnimationLayer> layers = new ArrayList<>();
 	private int startFrame;
 	private int endFrame;
 
-	public SimpleAnimation() {
+	public FixedFrameAnimation() {
 	}
 
-	public SimpleAnimation(GroupNode group) {
+	public FixedFrameAnimation(GroupNode group) {
 		layers.add( constructFromGroup(group));
 	}
 	private AnimationLayer constructFromGroup( GroupNode group) {
@@ -49,15 +55,21 @@ public class SimpleAnimation extends AbstractAnimation
 		for( int i = 0; i <= layer.frames.size(); ++i) {
 			layer.keyTimes.add(i);
 		}
-		
+
 		startFrame = 0;
 		endFrame = layer.frames.size();
+		for( AnimationLayer other : layers) {
+			if( other.getStart() < startFrame)
+				startFrame = other.getStart();
+			if( other.getEnd() > endFrame)
+				endFrame = other.getEnd();
+		}
 		
 		return layer;
 	}
 	
 	public void save() {
-		Layer l = layers.get(0).getFrames().get(0).getLayer();
+		Layer l = layers.get(0).getLayers().get(0).getLayer();
 		int c = layers.get(0).getFrames().size();
 		int w = l.getWidth();
 		BufferedImage bi = new BufferedImage(w*c, l.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -67,7 +79,7 @@ public class SimpleAnimation extends AbstractAnimation
 		g.translate(-w, 0);
 		for( int i=0; i<c; ++i) {
 			g.translate(w, 0);
-			layers.get(0).getFrames().get(i).getLayer().draw(g);
+			layers.get(0).getLayers().get(i).getLayer().draw(g);
 		}
 		g.dispose();
 		
@@ -98,6 +110,7 @@ public class SimpleAnimation extends AbstractAnimation
 		int _t = (int)Math.floor(t);
 		int met = MUtil.cycle(startFrame, endFrame, _t);
 		
+		System.out.println(_t);
 		
 		for( AnimationLayer layer : layers) {
 			if( layer.getFrames().size() == 0) continue;
@@ -140,8 +153,42 @@ public class SimpleAnimation extends AbstractAnimation
 			
 			if( frame != -1) {
 				layer.frames.get(frame).getLayer().draw(g);
-//				g.drawImage( layer.frames.get(frame).getImageData().readImage().image, 0, 0, null);
 			}
+		}
+	}
+
+	@Override
+	public void interpretLink(GroupNode node) {
+		boolean done = false;
+		// Descending Iteration to avoid content desync on multiple hits
+		for( int i=layers.size()-1; i>=0; --i) {
+			if( layers.get(i).group == node) {
+				layers.remove(i);
+				layers.add( constructFromGroup(node));
+				done = true;
+			}
+		}
+
+		if( !done)
+			layers.add( constructFromGroup(node));
+	
+		triggerChange();
+	}
+	
+	@Override
+	public void importGroup(GroupNode node) {
+		layers.add( constructFromGroup(node));
+		triggerChange();
+	}
+	
+	public static class Frame {
+		public final int start;
+		public final int end;
+		public final LayerNode node;
+		Frame( LayerNode node, int start, int end) {
+			this.node = node;
+			this.start = start;
+			this.end = end;
 		}
 	}
 	
@@ -155,6 +202,16 @@ public class SimpleAnimation extends AbstractAnimation
 		public AnimationLayer() {
 		}
 		
+		
+		public int getStart() {
+			if( keyTimes.isEmpty()) return 0;
+			return keyTimes.get(0);
+		}
+		public int getEnd() {
+			if( keyTimes.isEmpty()) return 0;
+			return keyTimes.get(keyTimes.size()-1);
+			
+		}
 		
 		
 		public boolean isAsynchronous() {
@@ -170,29 +227,24 @@ public class SimpleAnimation extends AbstractAnimation
 			this.loops = loops;
 		}
 		
-		@SuppressWarnings("unchecked")
-		public List<LayerNode> getFrames() {
-			return (ArrayList<LayerNode>) frames.clone();
+		public List<Frame> getFrames() {
+			ArrayList<Frame> list = new ArrayList<>(frames.size());
+			for( int i=0; i <frames.size(); ++i) {
+				list.add( new Frame( frames.get(i), keyTimes.get(i), keyTimes.get(i+1)));
+			}
+			
+			return list;
 		}
+
+		@SuppressWarnings("unchecked")
+		private List<LayerNode> getLayers() {
+			return (List<LayerNode>) frames.clone();
+		}
+		
 		@SuppressWarnings("unchecked")
 		public List<Integer> getKeyTimes() {
 			return (ArrayList<Integer>) keyTimes.clone();
 		}
-		
 	}
 
-	@Override
-	public void interpretLink(GroupNode node) {
-		
-		for( int i=0; i<layers.size(); ++i) {
-			if( layers.get(i).group == node) {
-				layers.remove(i);
-				layers.add( constructFromGroup(node));
-				return;
-			}
-		}
-
-		layers.add( constructFromGroup(node));
-		
-	}
 }

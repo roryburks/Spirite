@@ -34,6 +34,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.UndoEngine.CompositeAction;
+import spirite.image_data.UndoEngine.ImageAction;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -432,6 +433,18 @@ public class ImageWorkspace {
 		case "toggle":
 			toggleQuick();
 			break;
+		case "shiftRight":
+			shiftData(getSelectedNode(), 1, 0);
+			break;
+		case "shiftLeft":
+			shiftData(getSelectedNode(), -1, 0);
+			break;
+		case "shiftUp":
+			shiftData(getSelectedNode(), 0, -1);
+			break;
+		case "shiftDown":
+			shiftData(getSelectedNode(), 0, 1);
+			break;
     	case "newLayerQuick":
     		setSelectedNode(
     				addNewSimpleLayer(
@@ -596,6 +609,74 @@ public class ImageWorkspace {
 		undoEngine.storeAction(composite);
 	}
 	
+	
+	/** 
+	 * Shifts all image data of the node.
+	 */
+	public void shiftData( Node target, int shiftX, int shiftY) {
+		List<LayerNode> layerNodes = target.getAllLayerNodes();
+		LinkedHashSet<ImageHandle> data = new LinkedHashSet<>();
+		
+		for( LayerNode node : layerNodes) {
+			data.addAll( node.getLayer().getUsedImageData());
+		}
+
+		if( data.isEmpty())
+			return;
+		List<UndoableAction> actions = new LinkedList<>();
+		for( ImageHandle handle : data) 
+			actions.add(new ShiftDataAction(handle, shiftX, shiftY));
+		
+		CompositeAction composte = undoEngine.new StackableCompositeAction(actions, "Shift Image Data");
+		composte.performAction();
+		
+		undoEngine.storeAction(composte);
+	}
+	
+	private class ShiftDataAction extends ImageAction
+		implements StackableAction
+	{
+		private int x, y;
+		protected ShiftDataAction(ImageHandle data, int x, int y) {
+			super(data);
+			this.x = x;
+			this.y = y;
+		}
+		@Override
+		protected void performImageAction(ImageHandle image) {
+			BufferedImage img = checkoutImage(image);
+			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			MUtil.clearImage(buffer);
+			Graphics g = buffer.getGraphics();
+			g.drawImage(img, x, y, null);
+			g.dispose();
+			MUtil.clearImage(img);
+			g = img.getGraphics();
+			g.drawImage(buffer, 0, 0, null);
+			g.dispose();
+			checkinImage(image);
+		}
+		@Override
+		public void stackNewAction(UndoableAction newAction) {
+			ShiftDataAction other = (ShiftDataAction) newAction;
+			x += other.x;
+			y += other.y;
+		}
+		@Override
+		public boolean canStack(UndoableAction action) {
+			if(! (action instanceof ShiftDataAction)) return false;
+			ShiftDataAction other = (ShiftDataAction) action;
+
+			if( other.data != this.data) return false;
+			if( other.x <0 && x > 0) return false;
+			if( other.x >0 && x < 0) return false;
+			if( other.y >0 && y < 0) return false;
+			if( other.y <0 && y > 0) return false;
+			
+			return true;
+		}
+		
+	}
 	
 	
 	// :::: Content Addition

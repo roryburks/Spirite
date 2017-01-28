@@ -8,7 +8,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.animation_data.AbstractAnimation;
+import spirite.image_data.animation_data.FixedFrameAnimation;
 
 /***
  * AnimatonManager manages the animation functionality of an ImageWorkspace.
@@ -20,7 +20,8 @@ import spirite.image_data.animation_data.AbstractAnimation;
 public class AnimationManager implements MImageObserver {
 	private final ImageWorkspace context;
 	
-	private ArrayList<AbstractAnimation> animations = new ArrayList<>();
+	private ArrayList<Animation> animations = new ArrayList<>();
+	Animation selectedAnimation = null;
 	
 
 	AnimationManager( ImageWorkspace context) {
@@ -28,31 +29,52 @@ public class AnimationManager implements MImageObserver {
 		context.addImageObserver(this);
 	}
 	
-	public AbstractAnimation addAnimation( AbstractAnimation animation) {
+	// Get/Set
+	public Animation getSelectedAnimation() {
+		return selectedAnimation;
+	}
+	public void setSelectedAnimation( Animation anim) {
+		selectedAnimation = anim;
+	}
+	public List<Animation> getAnimations() {
+		return new ArrayList<> (animations);
+	}
+	
+	
+	
+	public Animation addAnimation( Animation animation) {
 		animations.add(animation);
-		
+		animation.context = this;
+		setSelectedAnimation(animation);
 		triggerStructureChange( new AnimationStructureEvent());
 		return animation;
 	}
 	
+	
+	// :::: Animation Links
+	private class Link {
+		 Animation animation;
+		 GroupNode group;
+	}
 	private final List<Link> links = new ArrayList<>();
 	
-	public void linkAnimation( AbstractAnimation animation, GroupNode group ) {
+	public void linkAnimation( Animation animation, GroupNode group ) {
 		Link link = new Link();
 		link.animation = animation;
 		link.group = group;
 		
 		links.add(link);
 	}
-	private class Link {
-		 AbstractAnimation animation;
-		 GroupNode group;
+	public void unlinkAnimation(Animation animation, GroupNode group) {
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<AbstractAnimation> getAnimations() {
-		return (List<AbstractAnimation>)animations.clone();
+	public boolean isLinked(Animation animation, GroupNode group) {
+		return false;
 	}
+	
+	public void destroyLinked( Animation animation, GroupNode group) {
+	}
+	
 	
 	// :::: Observers
 	public static interface MAnimationStructureObserver {
@@ -60,6 +82,7 @@ public class AnimationManager implements MImageObserver {
 	}
 	
 	public static class AnimationStructureEvent {
+		public List<Animation> getAnimationsAffected() { return new ArrayList<>(0);}
 	}
 	
 
@@ -67,7 +90,7 @@ public class AnimationManager implements MImageObserver {
     public void addStructureObserver( MAnimationStructureObserver obs) { structureObservers.add(obs);}
     public void removeStructureObserver( MAnimationStructureObserver obs) { structureObservers.remove(obs); }
 
-	private void triggerStructureChange( AnimationStructureEvent evt) {
+	void triggerStructureChange( AnimationStructureEvent evt) {
 		for( MAnimationStructureObserver obs : structureObservers)
 			obs.animationStructureChanged(evt);
 	}

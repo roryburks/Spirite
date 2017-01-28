@@ -555,10 +555,6 @@ public class RenderEngine
 		imageCache.clear();
 		
 	}
-	@Override
-	public void toggleReference(boolean referenceMode) {
-		// TODO Auto-generated method stub
-		
-	}
+	@Override	public void toggleReference(boolean referenceMode) {}
 
 }

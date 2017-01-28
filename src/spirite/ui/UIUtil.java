@@ -108,7 +108,7 @@ public class UIUtil {
 	 * @param menuScheme See Above
 	 * @param listener the listener which will be sent the Action when an item is selected
      */
-	public static void constructMenu( JComponent root, String menuScheme[][], ActionListener listener) {
+	public static void constructMenu( JComponent root, Object menuScheme[][], ActionListener listener) {
 		JMenuItem new_node;
     	JMenuItem[] active_root_tree = new JMenuItem[MAX_LEVEL];
     	
@@ -166,7 +166,7 @@ public class UIUtil {
     			new_node = new JMenu( title);
     		}
     		if( mnemonic != '\0')
-    			new_node.setMnemonic(0);
+    			new_node.setMnemonic(mnemonic);
     		
 
     		if( menuScheme[i].length > 1 && menuScheme[i][1] instanceof String) {
@@ -177,7 +177,7 @@ public class UIUtil {
     		}
     		
     		if( menuScheme[i].length > 2 && menuScheme[i][2] instanceof String)
-    			new_node.setIcon(Globals.getIcon(menuScheme[i][2]));
+    			new_node.setIcon(Globals.getIcon((String)menuScheme[i][2]));
     		
     		// Add the MenuItem into the appropriate context
     		if( level == 0) {
