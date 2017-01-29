@@ -4,7 +4,9 @@ import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -15,6 +17,7 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.CommandExecuter;
 import spirite.panel_anim.AnimPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
@@ -24,17 +27,21 @@ import spirite.panel_toolset.UndoPanel;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 
-public class FrameManager implements WindowListener {
+public class FrameManager 
+	implements WindowListener, CommandExecuter
+{
 	private final MasterControl master;
 	
 	private final List<OmniDialog> dialogs = new ArrayList<>();
-	private RootFrame root = null;
+	private final RootFrame root;
 	private class OmniDialog extends JDialog {
 		OmniFrame frame;
 	}
 
 	public FrameManager( MasterControl master) {
 		this.master = master;
+
+        root = new RootFrame( master);
 	}
 	
 	/** A Collection of identifiers for all the dockable Frames. */
@@ -96,37 +103,9 @@ public class FrameManager implements WindowListener {
 	}
 	
 	
-	// :::: API
-	public void performCommand( String command) {
-		if( command.equals("showLayerFrame"))
-			addFrame( FrameType.LAYER);
-		else if( command.equals("showToolsFrame"))
-			addFrame( FrameType.TOOL_SETTINGS);
-		else if( command.equals("showAnimSchemeFrame"))
-			addFrame( FrameType.ANIMATION_SCHEME);
-		else if( command.equals("showUndoFrame"))
-			addFrame( FrameType.UNDO);
-		else if( command.equals("showReferenceFrame"))
-			addFrame( FrameType.REFERENCE);
-		else if(command.equals("showAnimationView")) {
-			JDialog d = new JDialog();
-			d.add(new AnimPanel(master));
-			d.pack();
-			d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			d.setVisible(true);
-		}
-		else if( command.equals("showDebugDialog")) {
-			DebugDialog d = new DebugDialog(master);
-			d.pack();
-			d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			d.setVisible(true);
-			
-		}
-	}
 	
 	// :::: UI-related
 	public void packMainFrame() {
-        root = new RootFrame( master);
         root.pack();
         root.setLocationByPlatform(true);
         root.setVisible(true);
@@ -244,4 +223,67 @@ public class FrameManager implements WindowListener {
 	@Override	public void windowDeiconified(WindowEvent evt) {}
 	@Override	public void windowIconified(WindowEvent evt) {}
 	@Override	public void windowOpened(WindowEvent evt) {}
+
+	// :::: CommandExecuter
+	private final Map<String,Runnable> commandMap = new HashMap<>();
+	
+	private void initCommandMap() {
+		commandMap.put("showLayerFrame", new Runnable() {
+			@Override public void run() {
+				addFrame( FrameType.LAYER);
+			}
+		});commandMap.put("showToolsFrame", new Runnable() {
+			@Override public void run() {
+				addFrame( FrameType.TOOL_SETTINGS);
+			}
+		});commandMap.put("showAnimSchemeFrame", new Runnable() {
+			@Override public void run() {
+				addFrame( FrameType.ANIMATION_SCHEME);
+			}
+		});commandMap.put("showUndoFrame", new Runnable() {
+			@Override public void run() {
+				addFrame( FrameType.UNDO);
+			}
+		});commandMap.put("showReferenceFrame", new Runnable() {
+			@Override public void run() {
+				addFrame( FrameType.REFERENCE);
+			}
+		});commandMap.put("showAnimationView", new Runnable() {
+			@Override public void run() {
+				JDialog d = new JDialog();
+				d.add(new AnimPanel(master));
+				d.pack();
+				d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				d.setVisible(true);
+			}
+		});commandMap.put("showDebugDialog", new Runnable() {
+			@Override public void run() {
+				DebugDialog d = new DebugDialog(master);
+				d.pack();
+				d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				d.setVisible(true);
+			}
+		});
+	}
+	
+	@Override
+	public List<String> getValidCommands() {
+		return new ArrayList<>(commandMap.keySet());
+	}
+
+	@Override
+	public String getCommandDomain() {
+		return "frame";
+	}
+
+	@Override
+	public boolean executeCommand(String command) {
+		Runnable runnable = commandMap.get(command);
+		
+		if( runnable != null) {
+			runnable.run();
+			return true;
+		}
+		return false;
+	}
 }

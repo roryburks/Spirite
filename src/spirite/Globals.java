@@ -28,46 +28,6 @@ import spirite.MDebug.ErrorType;
  * 	of hand later.  Or just a HashMap
  */
 public class Globals {
-
-	// TODO: In the future these databases will probably be stored as text 
-	//	files
-	private static final String commands[][] = {
-			{"global.new_image"},
-			{"global.debug_color"},
-			{"global.newLayerQuick"},
-			{"global.open_image"},
-			{"global.save_image"},
-			{"global.save_image_as"},
-			{"global.undo"},
-			{"global.redo"},
-			{"global.export"},
-			{"global.toggle_reference"},
-			{"global."},
-
-			{"context.zoom_in"},
-			{"context.zoom_out"},
-			{"context.zoom_in_slow"},
-			{"context.zoom_out_slow"},
-			{"context.zoom_0"},
-			{"context."},
-
-			{"toolset.PEN"},
-			{"toolset.ERASER"},
-			{"toolset.FILL"},
-			{"toolset.BOX_SELECTION"},
-			{"toolset.MOVE"},
-			{"toolset.COLOR_PICKER"},
-			{"toolset."},
-
-			{"palette.swap"},
-			{"palette."},
-			
-			{"frame."},
-			
-			{"draw.clearLayer"},
-			{"draw."},
-			
-	};
 	
     private static final Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},

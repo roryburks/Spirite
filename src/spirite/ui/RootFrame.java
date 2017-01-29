@@ -17,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JMenuBar;
@@ -26,6 +27,7 @@ import javax.swing.JPanel;
 import spirite.MDebug;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.CommandExecuter;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
@@ -46,7 +48,8 @@ import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
  * panels are attached to it, it also is the delegator for all of the Hotkeys.
  */
 public class RootFrame extends javax.swing.JFrame
-        implements KeyEventDispatcher, WindowFocusListener, ActionListener, WindowListener
+        implements KeyEventDispatcher, WindowFocusListener, ActionListener, 
+        	WindowListener, CommandExecuter
 {
 	private static final long serialVersionUID = 1L;
     
@@ -147,6 +150,7 @@ public class RootFrame extends javax.swing.JFrame
     			{".&Undo", "draw.undo", null},
     			{".&Redo", "draw.redo", null},
     			
+    			
     			{"&Layer", null, null},
     			{".Auto&crop Layer", "draw.autocroplayer", null},
     			
@@ -160,7 +164,10 @@ public class RootFrame extends javax.swing.JFrame
     			{"..&Reference Scheme", "frame.showReferenceFrame", "icon.frame.referenceScheme"},
     			
     			{".&Animation View", "frame.showAnimationView", null},
-    			{".Debug View", "frame.showDebugDialog", null}
+    			{".Debug View", "frame.showDebugDialog", null},
+    			
+    			{"&Settings", null, null},
+    			{".Manage &Hotkeys", "dialog.HOTKEY", null},
     	};
     	
     	JMenuBar jMenuBar = new JMenuBar();
@@ -173,34 +180,6 @@ public class RootFrame extends javax.swing.JFrame
     // :::: Menu Actions
     
     
-    public void contextualCommand( String command) {
-    	// !!! TODO: As I add new components that can have contextual commands
-    	//	figure out how I want to generalize this
-    	WorkPanel workPanel = workPane.getCurrentWorkPane();
-    	if( workPanel == null) return;
-    	
-    	Zoomer zoomer = (workPanel.workspace.isEditingReference())?
-    			workPanel.refzoomer : workPanel.zoomer;
-    	
-        if( command.equals("zoom_in")) {
-        	zoomer.zoomIn();
-        }
-        else if( command.equals("zoom_out")) {
-        	zoomer.zoomOut();
-        }
-        else if( command.equals("zoom_in_slow")) {
-        	zoomer.setZoomLevel(zoomer.getZoomLevel()+1);
-        }
-        else if( command.equals("zoom_out_slow")) {
-        	zoomer.setZoomLevel(zoomer.getZoomLevel()-1);
-        }
-        else if( command.equals("zoom_0")) {
-        	zoomer.setZoomLevel(0);
-        }
-        else {
-        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown contextual command: context." + command);
-        }
-    }
     
 
     
@@ -358,6 +337,57 @@ public class RootFrame extends javax.swing.JFrame
         System.exit(0);
 	}
 
+
+
+	// CommandExecuter
+	@Override
+	public List<String> getValidCommands() {
+		// TODO: Less hard-coded.
+		return Arrays.asList(new String[]{
+			"zoom_in",
+			"zoom_out",
+			"zoom_in_slow",
+			"zoom_out_slow",
+			"zoom_0"
+		});
+	}
+
+	@Override
+	public String getCommandDomain() {
+		return "context";
+	}
 	
-	
+	@Override
+	public boolean executeCommand(String command) {
+    	// !!! TODO: As I add new components that can have contextual commands
+    	//	figure out how I want to generalize this
+    	WorkPanel workPanel = workPane.getCurrentWorkPane();
+    	if( workPanel == null) return true;
+    	
+    	Zoomer zoomer = (workPanel.workspace.isEditingReference())?
+    			workPanel.refzoomer : workPanel.zoomer;
+    	
+        if( command.equals("zoom_in")) {
+        	zoomer.zoomIn();
+        	return true;
+        }
+        else if( command.equals("zoom_out")) {
+        	zoomer.zoomOut();
+        	return true;
+        }
+        else if( command.equals("zoom_in_slow")) {
+        	zoomer.setZoomLevel(zoomer.getZoomLevel()+1);
+        	return true;
+        }
+        else if( command.equals("zoom_out_slow")) {
+        	zoomer.setZoomLevel(zoomer.getZoomLevel()-1);
+        	return true;
+        }
+        else if( command.equals("zoom_0")) {
+        	zoomer.setZoomLevel(0);
+        	return true;
+        }
+	    
+		return false;
+	}
 }

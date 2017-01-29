@@ -19,7 +19,7 @@ public class Main{
     public static void main(String[] args) {
     	
     	
-       	try {
+//       	try {
             master = new MasterControl();
 
             setLookAndFeel();
@@ -27,9 +27,9 @@ public class Main{
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() { createUI();}
             });
-        } catch( Exception e) {
-        	MDebug.handleError( ErrorType.FATAL, e, "Core:" + e.getMessage());
-        }
+      //  } catch( Exception e) {
+    //    	MDebug.handleError( ErrorType.FATAL, e, "Core:" + e.getMessage());
+  //      }
     }
 
     public static void setLookAndFeel() {
@@ -43,7 +43,6 @@ public class Main{
 
     public static void createUI() {
     	FrameManager frame_manager = master.getFrameManager();
-    	
     	frame_manager.packMainFrame();
     	
     	frame_manager.addFrame( FrameManager.FrameType.LAYER);

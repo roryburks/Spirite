@@ -2,27 +2,38 @@ package spirite.brains;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.Selection;
+import spirite.image_data.layers.Layer;
 import spirite.ui.FrameManager;
 
 /***
@@ -55,6 +66,7 @@ public class MasterControl
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
+    private final CommandExecuter executers[];
     
 
     public MasterControl() {
@@ -62,12 +74,26 @@ public class MasterControl
         toolset = new ToolsetManager();
         settingsManager = new SettingsManager();
         cacheManager = new CacheManager();
-        frameManager = new FrameManager( this);
         renderEngine = new RenderEngine( this);	
         palette = new PaletteManager( this);
         loadEngine = new LoadEngine(this);
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
+        frameManager = new FrameManager( this);
+        
+
+        // As of now I see no reason to dynamically construct this with a series 
+        //	of addCommandExecuter and removeCommandExecuter methods.  I could make
+        //	command execution modular that way, but it'd invite forgotten GC links.
+        executers = new CommandExecuter[] {
+        	new GlobalCommandExecuter(),
+        	new RelativeWorkspaceCommandExecuter(),
+        	toolset,
+        	palette,
+        	frameManager,
+        	frameManager.getRootFrame(),
+        	dialog
+        };
     }
 
 
@@ -256,93 +282,266 @@ public class MasterControl
     	}
     }
     
-    public void executeCommandString( String command) {
-    	String space = (command == null)?"":command.substring(0, command.indexOf(".")+1);
-    	switch( space) {
-    	case "global.":
-            globalHotkeyCommand(command.substring("global.".length()));
-            break;
-    	case "toolset.":
-    		toolset.setSelectedTool(command.substring("toolset.".length()));    		
-            break;
-    	case "palette.":
-        	palette.performCommand(command.substring("palette.".length()));
-    		break;
-    	case "frame.":
-        	frameManager.performCommand(command.substring("frame.".length()));
-        	break;
-    	case "context.":
-            frameManager.getRootFrame().contextualCommand(command.substring("context.".length()));
-            break;
-    	case "draw.":
-        	if( currentWorkspace != null) {
-        		currentWorkspace.executeDrawCommand( command.substring("draw.".length()));
-        	}
-        	break;
-       	default:
-            	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Command String prefix: " + command);
-    	}
-    }
-
-/*    public interface CommandExecuter {
-    	public abstract static Collection<String> getValidCommands();
-    	public String getCommandDomain();
-    	public void executeCommand( String commmand);
-    }*/
     
-    /** Performs the given hotkey command string (should be of "global." focus). */
-    private void globalHotkeyCommand( String command) {
+    
+    public void executeCommandString( String command) {
+    	String space = (command == null)?"":command.substring(0, command.indexOf("."));
+    	String subCommand = command.substring(space.length()+1);
     	
-    	switch( command) {
-    	case "save_image":{
-    		if( currentWorkspace == null)
-    			break;
-    		
-        	File f=currentWorkspace.getFile();
-
-        	if( currentWorkspace.hasChanged() || f == null) {
-	        	if( f == null)
-	        		f = dialog.pickFileSave();
-	        	
-	        	if( f != null) {
-	        		saveWorkspace(currentWorkspace, f);
-	        		settingsManager.setWorkspaceFilePath(f);
-	        	}
-        	}
-        	break;}
-    	case "save_image_as": {
-			File f = dialog.pickFileSave();
-			
-			if( f != null) {
-				saveWorkspace(currentWorkspace, f);
-			}
-    		break;}
-    	case "new_image":
-    		dialog.promptNewImage();
-        	break;
-    	case "debug_color":
-    		dialog.promptDebugColor();
-    		break;
-    	case "open_image": {
-			File f =dialog.pickFileOpen();
-			
-			if( f != null) {
-	        	loadEngine.openFile( f);
-			}
-			break;}
-    	case "export":
-    	case "export_as":{
-			File f = dialog.pickFileExport();
-			
-			if( f != null) {
-				exportWorkspaceToFile( currentWorkspace, f);
-			}
-			break;}
-    		
-       	default:
-        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown global command: global." + command);
+    	boolean executed = false;
+    	boolean attempted = false;
+    	
+    	for( CommandExecuter executer : executers) {
+    		if( executer.getCommandDomain().equals(space)) {
+    			attempted = true;
+    			if(executer.executeCommand(subCommand))
+    				executed = true;
+    		}
     	}
+    	if( !executed) {
+    		if( attempted)
+    			MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unrecognized command:" + command);
+    		else
+    			MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unrecognized command domain:" + space);
+    	}
+
+    	
     }
+    public List<String> getAllValidCommands() {
+    	List<String> list = new ArrayList<>();
+    	for( CommandExecuter executer : executers) {
+    		String domain = executer.getCommandDomain();
+    		List<String> commands = executer.getValidCommands();
+    		
+    		for( String command : commands) {
+    			list.add( domain + "." + command);
+    		}
+    	}
+    	
+    	return list;
+    }
+
+    public interface CommandExecuter {
+    	public abstract List<String> getValidCommands();
+    	public String getCommandDomain();
+    	public boolean executeCommand( String command);
+    }
+    
+    class GlobalCommandExecuter implements CommandExecuter {
+    	final Map<String, Runnable> commandMap = new HashMap<>();
+    	GlobalCommandExecuter() {
+    		commandMap.put("save_image", new Runnable() {
+				@Override public void run() {
+		    		if( currentWorkspace == null)
+		    			return;
+		    		
+		        	File f=currentWorkspace.getFile();
+
+		        	if( currentWorkspace.hasChanged() || f == null) {
+			        	if( f == null)
+			        		f = dialog.pickFileSave();
+			        	
+			        	if( f != null) {
+			        		saveWorkspace(currentWorkspace, f);
+			        		settingsManager.setWorkspaceFilePath(f);
+			        	}
+		        	}
+				}
+			});
+    		commandMap.put("save_image_as", new Runnable() {
+				@Override public void run() {
+					File f = dialog.pickFileSave();
+					
+					if( f != null) {
+						saveWorkspace(currentWorkspace, f);
+					}
+				}
+			});
+    		commandMap.put("new_image", new Runnable() {
+				@Override public void run() {
+		    		dialog.promptNewImage();
+				}
+			});
+    		commandMap.put("debug_color", new Runnable() {
+				@Override public void run() {
+		    		dialog.promptDebugColor();
+				}
+			});
+    		commandMap.put("open_image", new Runnable() {
+    			@Override public void run() {
+	    			File f =dialog.pickFileOpen();
+	    			
+	    			if( f != null) {
+	    	        	loadEngine.openFile( f);
+	    			}
+    			}
+    		});
+    		commandMap.put("export", new Runnable() {
+				@Override public void run() {
+					File f = dialog.pickFileExport();
+					
+					if( f != null) {
+						exportWorkspaceToFile( currentWorkspace, f);
+					}
+				}
+			});
+    		commandMap.put("export_as", commandMap.get("export"));
+    		
+    	}
+
+		@Override public List<String> getValidCommands() {
+			return new ArrayList<>(commandMap.keySet());
+		}
+
+		@Override
+		public String getCommandDomain() {
+			return "global";
+		}
+
+		@Override
+		public boolean executeCommand(String command) {
+			Runnable runnable = commandMap.get(command);
+			
+			if( runnable != null) {
+				runnable.run();
+				return true;
+			}
+			else
+				return false;
+		}
+    	
+    }
+
+    class RelativeWorkspaceCommandExecuter implements CommandExecuter {
+    	private final Map<String, Runnable> commandMap = new HashMap<>();
+    	
+    	// For simplicity's sake, workspaces are stored in the Class
+    	//	scope and checked for non-null there before being passed to the
+    	//	anonymous Runnable's
+    	private ImageWorkspace workspace;
+    	RelativeWorkspaceCommandExecuter() {
+    		commandMap.put("undo", new Runnable() {
+				@Override public void run() {
+					workspace.getUndoEngine().undo();
+				}
+			});
+    		commandMap.put("redo", new Runnable() {
+				@Override public void run() {
+					workspace.getUndoEngine().redo();
+				}
+			});
+    		commandMap.put("toggle", new Runnable() {
+				@Override public void run() {
+					workspace.toggleQuick();
+				}
+			});
+    		commandMap.put("shiftRight", new Runnable() {
+				@Override public void run() {
+					workspace.shiftData(workspace.getSelectedNode(), 1, 0);
+				}
+			});
+    		commandMap.put("shiftLeft", new Runnable() {
+				@Override public void run() {
+					workspace.shiftData(workspace.getSelectedNode(), -1, 0);
+				}
+			});
+    		commandMap.put("shiftDown", new Runnable() {
+				@Override public void run() {
+					workspace.shiftData(workspace.getSelectedNode(), 0, 1);
+				}
+			});
+    		commandMap.put("shiftUp", new Runnable() {
+				@Override public void run() {
+					workspace.shiftData(workspace.getSelectedNode(), 0, -1);
+				}
+			});
+    		commandMap.put("newLayerQuick", new Runnable() {
+    			@Override public void run() {
+    				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
+    						workspace.getWidth(), workspace.getHeight(), 
+    						"New Layer", new Color(0,0,0,0));
+    			}
+    		});
+    		commandMap.put("toggle_reference", new Runnable() {
+				@Override public void run() {
+					workspace.setEditingReference(!workspace.isEditingReference());
+				}
+			});
+    		commandMap.put("clearLayer", new Runnable() {
+				@Override public void run() {
+					if(!workspace.getSelectionEngine().attemptClearSelection()) {
+						ImageHandle image = workspace.getActiveData();
+						if( image != null) 
+							workspace.getDrawEngine().clear(image);
+					}
+				}
+			});
+    		commandMap.put("cropSelection", new Runnable() {
+				@Override public void run() {
+					Node node = workspace.getSelectedNode();
+					SelectionEngine selectionEngine = workspace.getSelectionEngine();
+					
+					Selection selection = selectionEngine.getSelection();
+					if( selection == null) {
+						java.awt.Toolkit.getDefaultToolkit().beep();
+						return;
+					}
+
+					Rectangle rect = selection.getBounds();
+					rect.x += selectionEngine.getOffsetX();
+					rect.y += selectionEngine.getOffsetY();
+					
+					workspace.cropNode(node, rect);
+				}
+			});
+    		commandMap.put("autocroplayer", new Runnable() {
+				@Override public void run() {
+					Node node = workspace.getSelectedNode();
+					
+					if( node instanceof LayerNode) {
+						Layer layer = ((LayerNode)node).getLayer();
+
+						try {
+							Rectangle rect;
+							rect = MUtil.findContentBounds(
+									layer.getActiveData().deepAccess(),
+									1, 
+									false);
+							workspace.cropNode((LayerNode) node, rect);
+						} catch (UnsupportedDataTypeException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+    		
+    	}
+
+		@Override public List<String> getValidCommands() {
+			return new ArrayList<>(commandMap.keySet());
+		}
+
+		@Override
+		public String getCommandDomain() {
+			return "draw";
+		}
+
+		@Override
+		public boolean executeCommand(String command) {
+			Runnable runnable = commandMap.get(command);
+			
+			if( runnable != null) {
+				if( currentWorkspace != null) {
+					workspace = currentWorkspace;
+					runnable.run();
+				}
+				return true;
+			}
+			else
+				return false;
+		}
+    }
+    
     
     private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
     	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);

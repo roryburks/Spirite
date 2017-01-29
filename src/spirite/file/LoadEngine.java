@@ -1,5 +1,6 @@
 package spirite.file;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -46,7 +47,12 @@ public class LoadEngine {
     		// First try to load the file as normal if it's a normal image format
     		try {
 				BufferedImage bi = ImageIO.read(f);
-				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				MUtil.clearImage(bi2);
+				Graphics g = bi2.getGraphics();
+				g.drawImage(bi, 0, 0, null);
+				g.dispose();
+				master.createWorkspaceFromImage(bi2, true).fileSaved(f);
 				master.getSettingsManager().setImageFilePath(f);
 				return;
 			} catch (IOException e) {
@@ -221,8 +227,13 @@ public class LoadEngine {
 			byte[] buffer = new byte[imgSize];
 			ra.read(buffer);
 			
-			BufferedImage img = ImageIO.read(new ByteArrayInputStream(buffer));
-			dataMap.put(identifier, img);
+			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
+			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			MUtil.clearImage(bi2);
+			Graphics g = bi2.getGraphics();
+			g.drawImage(bi, 0, 0, null);
+			g.dispose();
+			dataMap.put(identifier, bi2);
 			
 		}
 		

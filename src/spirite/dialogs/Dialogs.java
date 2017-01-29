@@ -4,6 +4,8 @@ package spirite.dialogs;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
@@ -13,6 +15,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.CommandExecuter;
+import spirite.brains.ToolsetManager.Tool;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 
@@ -20,11 +24,37 @@ import spirite.image_data.ImageWorkspace;
  * A static centalized namespace for calling the various Dialogs.
  *
  */
-public class Dialogs {
+public class Dialogs 
+	implements CommandExecuter
+{
 	private final MasterControl master;
+	
+	public enum DialogType {
+		HOTKEY,
+		PICK_COLOR,
+	}
 	
 	public Dialogs( MasterControl masterc) {
 		this.master = masterc;
+	}
+	
+	public boolean openDialog( String string) {
+		for( DialogType type : DialogType.values()) {
+			if( type.name().equals(string)) {
+				openDialog( type);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void openDialog( DialogType type) {
+		switch( type) {
+		case HOTKEY:
+			HotkeyDialog dialog = new HotkeyDialog(master);
+			dialog.show();
+			break;
+		}
 	}
 
     /**
@@ -173,4 +203,24 @@ public class Dialogs {
             master.getPaletteManager().setActiveColor(0, jcp.getColor());
         }
     }
+
+    // :::: CommandExecuter
+	@Override
+	public List<String> getValidCommands() {
+		DialogType[] dialogTypes= DialogType.values();
+		List<String> list = new ArrayList<>(dialogTypes.length);
+		
+		for( DialogType type : dialogTypes) {
+			list.add( type.name());
+		}
+		return list;
+	}
+	@Override public String getCommandDomain() {
+		return "dialog";
+	}
+
+	@Override
+	public boolean executeCommand(String commmand) {
+		return openDialog(commmand);
+	}
 }

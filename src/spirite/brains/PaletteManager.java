@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import spirite.brains.MasterControl.CommandExecuter;
+
 /***
  * The PaletteManager stores both the active colors and the palette
  * of colors stored for easy access. 
@@ -19,7 +22,9 @@ import java.util.Set;
  * @author Rory Burks
  *
  */
-public class PaletteManager {
+public class PaletteManager 
+	implements CommandExecuter
+{
 	private final SettingsManager settingsManager;
     private final List<Color> active_colors;
     private Map<Integer,Color> palette_colors;
@@ -217,18 +222,6 @@ public class PaletteManager {
     	return true;
     }
     
-    // :::: Hotkeys
-    public void performCommand( String command) {
-    	switch (command) {
-    	case "swap":
-    		toggleActiveColors();
-    		break;
-    	case "swapBack":
-    		toggleActiveColors2();
-    		break;
-    	}
-    }
-    
     // :::: Palette Change Observer
     public static interface MPaletteObserver {
         public void colorChanged();
@@ -242,4 +235,29 @@ public class PaletteManager {
         for( MPaletteObserver obs : paletteObservers)
             obs.colorChanged();
     }
+
+    // :::: CommandExecuter
+    //	TODO: less hard-coded if this ever gets more commands
+	@Override
+	public List<String> getValidCommands() {
+		return Arrays.asList( new String[]{"swap","swarpBack"});
+	}
+
+	@Override
+	public String getCommandDomain() {
+		return "palette";
+	}
+
+	@Override
+	public boolean executeCommand(String command) {
+    	switch (command) {
+    	case "swap":
+    		toggleActiveColors();
+    		return true;
+    	case "swapBack":
+    		toggleActiveColors2();
+    		return false;
+    	}
+		return false;
+	}
 }

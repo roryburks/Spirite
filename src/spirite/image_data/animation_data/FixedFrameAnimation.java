@@ -69,17 +69,31 @@ public class FixedFrameAnimation extends Animation
 	}
 	
 	public void save() {
-		Layer l = layers.get(0).getLayers().get(0).getLayer();
-		int c = layers.get(0).getFrames().size();
-		int w = l.getWidth();
-		BufferedImage bi = new BufferedImage(w*c, l.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		int width = 0;
+		int height = 0;
+
+
+		for( AnimationLayer layer : layers) {
+			for( Frame frame : layer.getFrames()) {
+				if( frame.marker == Marker.FRAME) {
+					width = Math.max( width, frame.node.getLayer().getWidth());
+					height = Math.max( width, frame.node.getLayer().getWidth());
+				}
+			}
+		}
+		
+		int c = (int)Math.floor(getEndFrame());
+		
+		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_INT_ARGB);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		MUtil.clearImage(bi);
-		g.translate(-w, 0);
+		g.translate(-width, 0);
 		for( int i=0; i<c; ++i) {
-			g.translate(w, 0);
-			layers.get(0).getLayers().get(i).getLayer().draw(g);
+			g.translate(width, 0);
+			drawFrame(g, i);
+//			if( layers.get(0))
+//			layers.get(0).getLayers().get(i).getLayer().draw(g);
 		}
 		g.dispose();
 		
@@ -97,7 +111,7 @@ public class FixedFrameAnimation extends Animation
 	}
 	@Override
 	public float getEndFrame() {
-		return endFrame;
+		return endFrame-1;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -159,7 +173,7 @@ public class FixedFrameAnimation extends Animation
 	
 	public enum Marker {
 		FRAME,
-		START_LOCAL_LOOP,
+		START_LOCAL_LOOP,	
 		END_LOCAL_LOOP,
 		END_AND_LOOP,
 		NIL_OUT,

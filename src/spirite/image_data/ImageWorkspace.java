@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -417,92 +418,6 @@ public class ImageWorkspace {
 	 * ONLY USE IF YOU REALLY NEED THE CACHEDIMAGE, NOT JUST THE BUFFEREDIMAGE*/
 	CachedImage _accessCache( ImageHandle handle) {
 		return imageData.get(handle.id);
-	}
-	
-	/** Performs a command of context "draw." */
-	
-	public void executeDrawCommand( String command) {
-		
-		switch( command) {
-		case "undo":
-			undoEngine.undo();
-			break;
-		case "redo":
-			undoEngine.redo();
-			break;
-		case "toggle":
-			toggleQuick();
-			break;
-		case "shiftRight":
-			shiftData(getSelectedNode(), 1, 0);
-			break;
-		case "shiftLeft":
-			shiftData(getSelectedNode(), -1, 0);
-			break;
-		case "shiftUp":
-			shiftData(getSelectedNode(), 0, -1);
-			break;
-		case "shiftDown":
-			shiftData(getSelectedNode(), 0, 1);
-			break;
-    	case "newLayerQuick":
-    		setSelectedNode(
-    				addNewSimpleLayer(
-    						getSelectedNode(), 
-    						width, height,
-    						"New Layer", 
-    						new Color(0,0,0,0))
-    			);
-    		break;
-    	case "toggle_reference":
-    		editingReference = !editingReference;
-		case "clearLayer":
-			if(!selectionEngine.attemptClearSelection()) {
-				ImageHandle image = getActiveData();
-				if( image != null) 
-					drawEngine.clear(image);
-			}
-			break;
-		case "cropSelection": {
-			Node node = getSelectedNode();
-			
-			Selection selection = (selectionEngine.getSelection());
-			if( selection == null) {
-				java.awt.Toolkit.getDefaultToolkit().beep();
-				return;
-			}
-			
-			
-			Rectangle rect = selection.getBounds();
-			rect.x += selectionEngine.getOffsetX();
-			rect.y += selectionEngine.getOffsetY();
-			
-
-			
-			cropNode( node , rect);
-			break;}
-		case "autocroplayer": {
-			Node node = getSelectedNode();
-			
-			if( node instanceof LayerNode) {
-				Layer layer = ((LayerNode) node).getLayer();
-				
-				try {
-					Rectangle rect;
-					rect = MUtil.findContentBounds(
-							layer.getActiveData().deepAccess(),
-							1, 
-							false);
-					cropNode((LayerNode) node, rect);
-				} catch (UnsupportedDataTypeException e) {
-					e.printStackTrace();
-				}
-				
-			}
-			break;}
-		default:
-        	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Draw command: draw." + command);
-		}
 	}
 	
 	// :::: Various Actions
@@ -1692,7 +1607,7 @@ public class ImageWorkspace {
 	List<Node> toggleList = new ArrayList<>();
 	int toggleid = 0;
 	
-	void toggleQuick() {
+	public void toggleQuick() {
 		for( Node n : toggleList) {
 			n.alpha = 0.3f;
 		}

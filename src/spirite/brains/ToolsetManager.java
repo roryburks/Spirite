@@ -12,11 +12,15 @@ import javax.swing.JPanel;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
+import spirite.brains.MasterControl.CommandExecuter;
 
 /**
  * ToolsetManager manages the currently selected toolset
  */
-public class ToolsetManager {
+public class ToolsetManager 
+	implements CommandExecuter
+{
 	
 	public static enum Tool {
 		PEN("Pen"), 
@@ -62,12 +66,14 @@ public class ToolsetManager {
         selected.replace(cursor, tool);
         triggerToolsetChanged(tool);
     }
-    public void setSelectedTool( String tool) {
+    public boolean setSelectedTool( String tool) {
     	for( Tool check : Tool.values()) {
     		if( check.name().equals(tool)) {
     			setSelectedTool(check);
+    			return true;
     		}
     	}
+    	return false;
     }
     
     public Tool getSelectedTool() {
@@ -272,5 +278,25 @@ public class ToolsetManager {
             obs.toolsetChanged(newTool);
         }
     }
+
+    // :::: CommandExecuter
+	@Override
+	public List<String> getValidCommands() {
+		Tool[] tools= Tool.values();
+		List<String> list = new ArrayList<>(tools.length);
+		
+		for( Tool tool : tools) {
+			list.add( tool.name());
+		}
+		return list;
+	}
+	@Override public String getCommandDomain() {
+		return "tool";
+	}
+
+	@Override
+	public boolean executeCommand(String commmand) {
+		return setSelectedTool(commmand);
+	}
 
 }
