@@ -42,6 +42,7 @@ public class FrameManager
 		this.master = master;
 
         root = new RootFrame( master);
+        initCommandMap();
 	}
 	
 	/** A Collection of identifiers for all the dockable Frames. */

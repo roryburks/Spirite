@@ -173,7 +173,9 @@ public class Penner
 
 	// :::: PenListener
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}
-	@Override	public void penTock(long arg0) {}
+	@Override	public void penTock(long arg0) {
+		
+	}
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
 		

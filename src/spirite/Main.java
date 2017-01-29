@@ -11,6 +11,10 @@ import spirite.ui.FrameManager;
 
 /**
  * Entry Point
+ * 
+ * TODO: Decide best way to have all Observers working on the AWT-EventQueue thread
+ * no matter what thread triggers it.  (Copy-paste "Swing.InvokeLater 100 times or
+ * implement some sort of class hierarchy).
  */
 public class Main{
     

@@ -20,6 +20,7 @@ import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -1454,21 +1455,31 @@ public class ImageWorkspace {
     List<MImageObserver> imageObservers = new ArrayList<>();
     
     private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
-        for( MImageObserver obs : imageObservers)
-            obs.structureChanged( evt);
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MImageObserver obs : imageObservers)
+		            obs.structureChanged( evt);
+			}
+    	});
     }
     void triggerImageRefresh(ImageChangeEvent evt) {
-        for( MImageObserver obs : imageObservers)
-            obs.imageChanged(evt);
-        
-        if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
-			changed = false;
-			triggerFileChange();
-        }
-		else if( !changed) {
-			changed = true;
-			triggerFileChange();
-		}
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MImageObserver obs : imageObservers)
+		            obs.imageChanged(evt);
+		        
+		        if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
+					changed = false;
+					triggerFileChange();
+		        }
+				else if( !changed) {
+					changed = true;
+					triggerFileChange();
+				}
+			}
+    	});
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
@@ -1485,8 +1496,13 @@ public class ImageWorkspace {
     List<MSelectionObserver> selectionObservers = new ArrayList<>();
     
     private void triggerSelectedChanged() {
-        for( MSelectionObserver obs : selectionObservers)
-            obs.selectionChanged( selected);
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MSelectionObserver obs : selectionObservers)
+		            obs.selectionChanged( selected);
+			}
+    	});
     }
 
     public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
@@ -1525,8 +1541,13 @@ public class ImageWorkspace {
     List<MWorkspaceFileObserver> fileObservers = new ArrayList<>();
     
     private void triggerFileChange() {
-        for( MWorkspaceFileObserver obs : fileObservers)
-            obs.fileChanged( new FileChangeEvent( this, file, changed));
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MWorkspaceFileObserver obs : fileObservers)
+		            obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
+			}
+    	});
     }
 
     public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(obs);}
@@ -1546,12 +1567,22 @@ public class ImageWorkspace {
     private final List<MReferenceObserver> referenceObservers = new ArrayList<>();
 
     public void triggerReferenceStructureChanged(boolean hard) {
-        for( MReferenceObserver obs : referenceObservers)
-        	obs.referenceStructureChanged( hard);
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MReferenceObserver obs : referenceObservers)
+		        	obs.referenceStructureChanged( hard);
+			}
+    	});
     }
     private void triggerReferenceToggle(boolean edit) {
-        for( MReferenceObserver obs : referenceObservers)
-        	obs.toggleReference(edit);
+    	SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+		        for( MReferenceObserver obs : referenceObservers)
+		        	obs.toggleReference(edit);
+			}
+		});
     }
 
     public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}

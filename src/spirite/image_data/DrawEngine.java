@@ -23,7 +23,6 @@ import spirite.image_data.UndoEngine.ImageAction;
  * through the DrawEngine.
  * 
  * 
- * 
  * @author Rory Burks
  *
  */

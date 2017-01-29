@@ -77,7 +77,7 @@ public class FixedFrameAnimation extends Animation
 			for( Frame frame : layer.getFrames()) {
 				if( frame.marker == Marker.FRAME) {
 					width = Math.max( width, frame.node.getLayer().getWidth());
-					height = Math.max( width, frame.node.getLayer().getWidth());
+					height = Math.max( height, frame.node.getLayer().getHeight());
 				}
 			}
 		}

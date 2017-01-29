@@ -291,7 +291,7 @@ public class ToolsetManager
 		return list;
 	}
 	@Override public String getCommandDomain() {
-		return "tool";
+		return "toolset";
 	}
 
 	@Override
