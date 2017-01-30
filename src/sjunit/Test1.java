@@ -10,9 +10,12 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
@@ -43,9 +46,20 @@ public class Test1 {
 	/** Creates an image, saves it to a temp file, then loads it, comparing
 	 * image structures to verify that either Saving and Loading are working 
 	 * as intended or they're both screwed up symmetrically. 
+	 * @throws InterruptedException 
+	 * @throws InvocationTargetException 
 	 * */
 	@Test
-	public void testSaveLoadIntegrity() {
+	public void testSaveLoadIntegrity() throws InvocationTargetException, InterruptedException {
+		SwingUtilities.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				tsli();
+			}
+		});
+	}
+		
+	public void tsli() {
 		ImageWorkspace workspace = new ImageWorkspace(master);
 
 		// Verify that nothing funny happens when you try to render a null workspace
@@ -158,9 +172,19 @@ public class Test1 {
 	 * is working as expected.
 	 * 
 	 * Should probably be more thorough
+	 * @throws InterruptedException 
+	 * @throws InvocationTargetException 
 	 */
 	@Test
-	public void testUndoEngineIntegrity() {
+	public void testUndoEngineIntegrity() throws InvocationTargetException, InterruptedException {
+		SwingUtilities.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				tuei();
+			}
+		});
+	}
+	public void tuei() {
 		ImageWorkspace workspace = new ImageWorkspace(master);
 		master.addWorkpace(workspace, false);
 		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
@@ -261,7 +285,15 @@ public class Test1 {
 	 */
 	public static final int CACHE_ROUNDS = 100;
 	@Test
-	public void testCacheClearing() {
+	public void testCacheClearing() throws InvocationTargetException, InterruptedException {
+		SwingUtilities.invokeAndWait( new Runnable() {
+			@Override
+			public void run() {
+				tcc();
+			}
+		});
+	}
+	public void tcc() {
 		for( int round=0; round < CACHE_ROUNDS; ++round) {
 			ImageWorkspace workspace = new ImageWorkspace(master);
 			workspace.finishBuilding();

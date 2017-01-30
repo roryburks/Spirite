@@ -16,9 +16,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;

@@ -24,7 +24,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import spirite.MDebug;
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;

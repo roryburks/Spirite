@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -17,7 +16,6 @@ import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.layers.Layer;
 
 /**
  * A FixedFrameAnimation 

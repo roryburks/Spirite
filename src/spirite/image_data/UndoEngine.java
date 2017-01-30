@@ -346,7 +346,7 @@ public class UndoEngine {
 	private void cull() {
 		while( queue.size() > 0 && cacheManager.getCacheSize() > absoluteMaxCache) {
 
-			System.out.println("Cull (Max)");
+			MDebug.log("Cull (Max)");
 			clipTail();
 		}
 		
@@ -355,20 +355,20 @@ public class UndoEngine {
 			while( cacheManager.getCacheSize() > maxCacheSize 
 					&& queue.size() > cacheManager.getCacheSize()) {
 
-				System.out.println("Cull (CaC)");
+				MDebug.log("Cull (CaC)");
 				clipTail();
 			}
 			break;
 		case ONLY_CACHE:
 			while( cacheManager.getCacheSize() > maxCacheSize
 					&& queue.size() > 0) {
-				System.out.println("Cull (Cache)");
+				MDebug.log("Cull (Cache)");
 				clipTail();
 			}
 			break;
 		case ONLY_UNDO_COUNT:
 			while( queue.size() > maxQueueSize){
-				System.out.println("Cull Queue");
+				MDebug.log("Cull Queue");
 				clipTail();
 			}
 			break;

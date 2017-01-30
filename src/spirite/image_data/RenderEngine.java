@@ -465,7 +465,7 @@ public class RenderEngine
 	// :::: MImageObserver
 	@Override	public void structureChanged(StructureChange evt) {	}
 	@Override
-	public synchronized void imageChanged( ImageChangeEvent evt) {
+	public void imageChanged( ImageChangeEvent evt) {
 		// Remove all caches whose renderings would have been effected by this change
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
 	
@@ -515,7 +515,7 @@ public class RenderEngine
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					System.out.println("ConcurrentModification when checking imageChange.");
+					MDebug.log("ConcurrentModification when checking imageChange.");
 					imageCache.clear();
 				}
 			});

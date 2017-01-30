@@ -16,7 +16,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
-import spirite.brains.ToolsetManager.Tool;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 

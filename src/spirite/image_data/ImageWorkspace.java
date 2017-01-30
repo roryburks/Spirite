@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -18,9 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -34,15 +31,14 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
-import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.UndoEngine.CompositeAction;
 import spirite.image_data.UndoEngine.ImageAction;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.RigLayer;
 import spirite.image_data.layers.Layer.MergeHelper;
+import spirite.image_data.layers.RigLayer;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -109,6 +105,7 @@ public class ImageWorkspace {
 		referenceRoot = groupTree.new GroupNode("___ref");
 	}
 	
+	
 	@Override
 	public String toString() {
 		return "ImageWorkspace: " + getFileName();
@@ -171,7 +168,6 @@ public class ImageWorkspace {
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
-			System.out.println("Clearing Unused Workspace Data");
 			imageData.get(i).relinquish(this);
 			imageData.remove(i);
 		}
@@ -284,11 +280,27 @@ public class ImageWorkspace {
 	}
 
 	
+	/**
+	 * A BuildActiveData is a helper class which is intended to be used
+	 * by Image-modification functions which operate in Image Space.  It
+	 * combines all applied transform properties such that when a function 
+	 * draws on the BuiltActiveData at X, Y, it'll be modifying the ImageData
+	 * which APPEARS at X,Y.
+	 */
+	public class BuiltActiveData {
+		public final ImageHandle handle;
+		public final int ox;
+		public final int oy;
+		public BuiltActiveData( ImageHandle handle, int ox, int oy) {
+			this.handle = handle;
+			this.ox = ox;
+			this.oy = oy;
+		}
+	}
 	public ImageHandle getActiveData() {
 		if( selected == null) return null;
 		
 		if( selected instanceof GroupTree.LayerNode) {
-			System.out.println("TEST");
 			// !!!! SHOULD be no reason to add sanity checks here.
 			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
 		}
@@ -411,7 +423,7 @@ public class ImageWorkspace {
 		
 		
 		ImageChangeEvent evt = new ImageChangeEvent();
-		evt.dataChanged = new  LinkedList<ImageHandle>();
+		evt.dataChanged = new  ArrayList<ImageHandle>(1);
 		evt.dataChanged.add(old);		
 		triggerImageRefresh(evt);
 	}
@@ -660,7 +672,9 @@ public class ImageWorkspace {
 	 * then the image will get flushed next time the image data is checked
 	 */
 	public ImageHandle importData( BufferedImage newImage) {
-		imageData.put( workingID, cacheManager.cacheImage(newImage, this));
+		CachedImage ci = cacheManager.cacheImage(newImage, this);
+		imageData.put( workingID, ci);
+		ci.reserve(this);
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
@@ -701,6 +715,7 @@ public class ImageWorkspace {
         g.fillRect( 0, 0, width, height);
         g.dispose();
         imageData.put(workingID, ci);
+        ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
 		
 		LayerNode node = groupTree.new LayerNode( new RigLayer(handle), name);
@@ -1126,13 +1141,15 @@ public class ImageWorkspace {
 		@Override
 		public void execute() {
 			parent._add( node, nodeBefore);
-			selected = node;
+			setSelectedNode(node);
+			
 		}
 		@Override
 		public void unexecute() {
 			node._del();
-			if( selected == node)
-				selected = null;
+			if( selected == node) {
+				setSelectedNode(null);
+			}
 		}
 		@Override
 		public List<Node> getChangedNodes() {
@@ -1473,11 +1490,13 @@ public class ImageWorkspace {
     }
     public static class ImageChangeEvent {
     	ImageWorkspace workspace = null;
-    	LinkedList<ImageHandle> dataChanged = new LinkedList<>();
-    	LinkedList<Node> nodesChanged = new LinkedList<>();
+    	ArrayList<ImageHandle> dataChanged = new ArrayList<>();
+    	ArrayList<Node> nodesChanged = new ArrayList<>();
     	boolean selectionLayerChange = false;
     	boolean isUndoEngineEvent = false;	// Probably a more generic way to do this
     	boolean isStructureChange = false;
+    	
+    	ImageChangeEvent(){}
     	
     	public ImageWorkspace getWorkspace() { return workspace;}
     	public List<ImageHandle> getChangedImages() { return new ArrayList<>(dataChanged);}
@@ -1488,31 +1507,34 @@ public class ImageWorkspace {
     List<MImageObserver> imageObservers = new ArrayList<>();
     
     private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MImageObserver obs : imageObservers)
-		            obs.structureChanged( evt);
-			}
-    	});
+        for( MImageObserver obs : imageObservers)
+            obs.structureChanged( evt);
     }
-    void triggerImageRefresh(ImageChangeEvent evt) {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MImageObserver obs : imageObservers)
-		            obs.imageChanged(evt);
-		        
-		        if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
-					changed = false;
-					triggerFileChange();
-		        }
-				else if( !changed) {
-					changed = true;
-					triggerFileChange();
-				}
-			}
-    	});
+    public void triggerInternalLayerChange( Layer layer) {
+    	ImageChangeEvent evt = new ImageChangeEvent();
+    	evt.workspace = this;
+    	evt.nodesChanged = new ArrayList<Node>(1);
+    	evt.isStructureChange = true;
+    	
+    	for( LayerNode node : groupTree.getRoot().getAllLayerNodes()) {
+    		if( node.getLayer() == layer)
+    			evt.nodesChanged.add(node);
+    	}
+    	
+    	triggerImageRefresh(evt);
+    }
+    synchronized void triggerImageRefresh(ImageChangeEvent evt) {
+        for( MImageObserver obs : imageObservers)
+            obs.imageChanged(evt);
+        
+        if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
+			changed = false;
+			triggerFileChange();
+        }
+		else if( !changed) {
+			changed = true;
+			triggerFileChange();
+		}
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
@@ -1528,15 +1550,10 @@ public class ImageWorkspace {
     }
     List<MSelectionObserver> selectionObservers = new ArrayList<>();
     
-    private void triggerSelectedChanged() {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MSelectionObserver obs : selectionObservers)
-		            obs.selectionChanged( selected);
-			}
-    	});
-    }
+    private synchronized void triggerSelectedChanged() {
+        for( MSelectionObserver obs : selectionObservers)
+            obs.selectionChanged( selected);
+	}
 
     public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
     public void removeSelectionObserver( MSelectionObserver obs) { selectionObservers.remove(obs); }
@@ -1573,14 +1590,10 @@ public class ImageWorkspace {
     }
     List<MWorkspaceFileObserver> fileObservers = new ArrayList<>();
     
-    private void triggerFileChange() {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MWorkspaceFileObserver obs : fileObservers)
-		            obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
-			}
-    	});
+    private synchronized void triggerFileChange() {
+        for( MWorkspaceFileObserver obs : fileObservers)
+            obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
+
     }
 
     public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(obs);}
@@ -1600,22 +1613,16 @@ public class ImageWorkspace {
     private final List<MReferenceObserver> referenceObservers = new ArrayList<>();
 
     public void triggerReferenceStructureChanged(boolean hard) {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MReferenceObserver obs : referenceObservers)
-		        	obs.referenceStructureChanged( hard);
-			}
-    	});
+
+        for( MReferenceObserver obs : referenceObservers)
+        	obs.referenceStructureChanged( hard);
+
     }
     private void triggerReferenceToggle(boolean edit) {
-    	SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-		        for( MReferenceObserver obs : referenceObservers)
-		        	obs.toggleReference(edit);
-			}
-		});
+
+        for( MReferenceObserver obs : referenceObservers)
+        	obs.toggleReference(edit);
+
     }
 
     public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}
@@ -1685,7 +1692,7 @@ public class ImageWorkspace {
 		
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.workspace = this;
-		evt.nodesChanged = new LinkedList<>(toggleList);
+		evt.nodesChanged = new ArrayList<>(toggleList);
 		triggerImageRefresh(evt);
 	}
 	

@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl.CommandExecuter;
 
 /**

@@ -310,7 +310,6 @@ public class ContentTree extends JPanel
 		
 		public void reformPanel() {
 			if( building) return;
-			System.out.println("1");
 			
 			// Note: margin height is ignored as the gap is calculated from the Size
 			Dimension size = Globals.getMetric("contentTree.buttonSize", new Dimension(30,30));
@@ -691,22 +690,16 @@ public class ContentTree extends JPanel
 	@Override	public void treeNodesChanged(TreeModelEvent e) {}
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		System.out.println("2");
 				buttonPanel.reformPanel();
 	}
 
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
-		System.out.println("3");
-
 			buttonPanel.reformPanel();
-
-		
 	}
 
 	@Override
 	public void treeStructureChanged(TreeModelEvent e) {
-		System.out.println("4");
 			buttonPanel.reformPanel();
 	}
 	
@@ -714,20 +707,16 @@ public class ContentTree extends JPanel
 	// :::: TreeSelectionListener
 	@Override
 	public void valueChanged(TreeSelectionEvent arg0) {
-
-				transferHandler.stopDragging();
-				
+			transferHandler.stopDragging();
 	}
 	
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
-		System.out.println("5");
-				buttonPanel.reformPanel();
+			buttonPanel.reformPanel();
 	}
 
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
-		System.out.println("6");
-				buttonPanel.reformPanel();
+			buttonPanel.reformPanel();
 	}
 }

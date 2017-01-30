@@ -71,4 +71,8 @@ public class MDebug {
     public static void note( String message) {
         JOptionPane.showMessageDialog(null, message);
     }
+
+    public static void log( String message) {
+		System.out.println( "Log: " + message);
+    }
 }

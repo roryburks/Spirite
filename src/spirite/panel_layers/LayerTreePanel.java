@@ -36,6 +36,7 @@ public class LayerTreePanel extends NodeTree
 			nodeRoot = workspace.getRootNode();
 
 		constructFromRoot();
+		
 	}
 
 	// :::: TreeSelectionListener inherited from ContentTree

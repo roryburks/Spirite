@@ -24,6 +24,8 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.RigLayer;
+import spirite.image_data.layers.RigLayer.Part;
 import spirite.image_data.layers.SimpleLayer;
 
 /***
@@ -120,9 +122,8 @@ public class LoadEngine {
 			settings.version = ra.readInt();
 			
 			if( settings.version >= 1) {
-				int packed = ra.readInt();
-				width = MUtil.high16(packed);
-				height= MUtil.low16(packed);
+				width = ra.readShort();
+				height= ra.readShort();
 			}
 			
 			ImageWorkspace workspace = new ImageWorkspace(master);
@@ -251,6 +252,12 @@ public class LoadEngine {
 			LoadHelper settings) 
 			throws IOException 
 	{
+
+		if( settings.version <= 1) {
+			_legacyHandleGroupTree0001(workspace, ra, chunkSize, settings);
+			return;
+		}
+		
 		long endPointer = ra.getFilePointer() + chunkSize;
 		int depth = 0;
 		int type;
@@ -267,6 +274,7 @@ public class LoadEngine {
 		}
 		
 		while( ra.getFilePointer() < endPointer) {
+			
 			// Default values
 			float alpha = 1.0f;
 			int ox = 0;
@@ -278,9 +286,104 @@ public class LoadEngine {
 			
 			if( settings.version >= 1) {
 				alpha = ra.readFloat();
-				int packed = ra.readInt();
-				ox = MUtil.high16(packed);
-				oy = MUtil.low16(packed);
+				ox = ra.readShort();
+				oy = ra.readShort();
+				bitmask = ra.readByte();
+			}
+
+			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
+			type = ra.readUnsignedByte();
+			
+			
+			
+			Node node = null;
+			
+			// !!!! Kind of hack-y that it's even saved, but only the root node should be
+			//	depth 0 and there should only be one (and it's already created)
+			if( depth == 0) { continue;}
+			else {
+				switch( type) {
+				case SaveLoadUtil.NODE_GROUP:
+					node = nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
+					nodeLayer[depth].setExpanded(true);
+					break;
+				case SaveLoadUtil.NODE_SIMPLE_LAYER:
+					identifier = ra.readInt();
+					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
+					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
+					break;
+				case SaveLoadUtil.NODE_RIG_LAYER: {
+					int partCount = ra.readByte();
+					List<Part> parts = new ArrayList<Part>( partCount);
+					
+					
+					for( int i=0; i<partCount; ++i) {
+						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
+						int pox = ra.readShort();
+						int poy = ra.readShort();
+						int pdepth = ra.readInt();
+						int pid = ra.readInt();
+						
+						parts.add( new Part( 
+								new ImageHandle( null, pid),
+								partName,
+								pox, poy, pdepth));
+					}
+					
+					
+					RigLayer rig = new RigLayer( parts);
+					node = workspace.addShellLayer(nodeLayer[depth-1], rig, name);
+					break;}
+				}
+			}
+			if( node != null) {
+				node.setAlpha(alpha);
+				
+				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
+				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
+				node.setOffset(ox, oy);
+			}
+		}
+	}
+	
+	// Legacy Methods: Handles conversion of depreciated formats into new standards
+	//	without cluttering code too much
+	private static void _legacyHandleGroupTree0001(
+			ImageWorkspace workspace, 
+			RandomAccessFile ra,
+			int chunkSize,
+			LoadHelper settings) throws IOException 
+	{
+		long endPointer = ra.getFilePointer() + chunkSize;
+		int depth = 0;
+		int type;
+		int identifier = -1;
+		String name;
+		
+		// Create a array that keeps track of the active layers of group
+		//	nodes (all the nested nodes leading up to the current node)
+		GroupTree.GroupNode[] nodeLayer = new GroupTree.GroupNode[256];
+		
+		nodeLayer[0] = workspace.getRootNode();
+		for( int i = 1; i < 256; ++i) {
+			nodeLayer[i] = null;
+		}
+		
+		while( ra.getFilePointer() < endPointer) {
+			
+			// Default values
+			float alpha = 1.0f;
+			int ox = 0;
+			int oy = 0;
+			int bitmask = 0x01 | 0x02;
+			
+			// Read data
+			depth = ra.readUnsignedByte();
+			
+			if( settings.version >= 1) {
+				alpha = ra.readFloat();
+				ox = ra.readShort();
+				oy = ra.readShort();
 				bitmask = ra.readByte();
 			}
 			
@@ -298,13 +401,36 @@ public class LoadEngine {
 			//	depth 0 and there should only be one (and it's already created)
 			if( depth == 0) { continue;}
 			else {
-				if( type == SaveLoadUtil.NODE_GROUP) {
+				switch( type) {
+				case SaveLoadUtil.NODE_GROUP:
 					node = nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
 					nodeLayer[depth].setExpanded(true);
-				}
-				if( type == SaveLoadUtil.NODE_SIMPLE_LAYER) {
+					break;
+				case SaveLoadUtil.NODE_SIMPLE_LAYER:
 					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
 					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
+					break;
+				case SaveLoadUtil.NODE_RIG_LAYER: {
+					int partCount = ra.readByte();
+					List<Part> parts = new ArrayList<Part>( partCount);
+					
+					
+					for( int i=0; i<partCount; ++i) {
+						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
+						int pox = ra.readShort();
+						int poy = ra.readShort();
+						int pdepth = ra.readInt();
+						int pid = ra.readInt();
+						parts.add( new Part( 
+								new ImageHandle( null, pid),
+								partName,
+								pox, poy, pdepth));
+					}
+					
+					
+					RigLayer rig = new RigLayer( parts);
+					node = workspace.addShellLayer(nodeLayer[depth-1], rig, name);
+					break;}
 				}
 			}
 			if( node != null) {

@@ -17,7 +17,6 @@ import javax.swing.Timer;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
-import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree;
@@ -25,6 +24,8 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.RigLayer;
+import spirite.image_data.layers.RigLayer.Part;
 import spirite.image_data.layers.SimpleLayer;
 
 /***
@@ -58,9 +59,9 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				(new Thread(new Runnable() {
 					@Override
 					public void run() {
-						System.out.println("Saving Backup");
+						MDebug.log("Saving Backup");
 						saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
-						System.out.println("Finished");
+						MDebug.log("Finished");
 					}
 				})).start();
 				watcher.lastTime = time;
@@ -144,7 +145,6 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 			handles = workspace.reserveCache();
 			
 			
-			
 			if( file.exists()) {
 				file.delete();
 			}
@@ -157,10 +157,11 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 			// [4] Header
 			ra.write( SaveLoadUtil.getHeader());
 			// [4]Version
-			ra.writeInt(1);
+			ra.writeInt(SaveLoadUtil.VERSION);
 			
 			// [2] Width, [2] Height
-			ra.writeInt(MUtil.packInt(workspace.getWidth(), workspace.getHeight()));
+			ra.writeShort(workspace.getWidth());
+			ra.writeShort(workspace.getHeight());
 
 			// Save Group
 			saveGroupTree( dupeRoot, ra);
@@ -208,7 +209,8 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		ra.writeFloat(node.getAlpha());
 		
 		// [2] : x offset [2] : y offset
-		ra.writeInt( MUtil.packInt(node.getOffsetX(), node.getOffsetY()));
+		ra.writeShort( node.getOffsetX());
+		ra.writeShort(node.getOffsetY());
 
 		// [1] : bitmask
 		int mask = 
@@ -217,13 +219,13 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
 		ra.writeByte( mask);
 		
+		// [n] : Null-terminated UTF-8 String for Layer name
+		ra.write( SaveLoadUtil.strToByteArrayUTF8( node.getName()));
+		
 		if( node instanceof GroupTree.GroupNode) {
 			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
 			// [1] : Node Type ID
 			ra.write( SaveLoadUtil.NODE_GROUP);
-			
-			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToByteArrayUTF8(gnode.getName()));
 			
 			// Go through each of the Group Node's children recursively and save them
 			for( GroupTree.Node child : node.getChildren()) {
@@ -246,9 +248,33 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				// [4] : ID of ImageData linked to this LayerNode
 				ra.writeInt( data.getID());
 			}
-			
-			// [n] : Null-terminated UTF-8 String for Layer name
-			ra.write( SaveLoadUtil.strToByteArrayUTF8( node.getName()));
+			if( layer instanceof RigLayer) {
+				RigLayer rig = (RigLayer)layer;
+				List<Part> parts = rig.getParts();
+				
+				
+				// [1] : Node Type ID
+				ra.writeByte(SaveLoadUtil.NODE_RIG_LAYER);
+				
+				// [1] : Number or Parts
+				ra.writeByte( parts.size());
+				
+				// per Part:
+				for(Part part : parts) {
+					// [n]: null-terminated UTF-8 String
+					ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
+					
+					// [2] : OffsetX, [2] :OffsetY
+					ra.writeShort(part.getOffsetX());
+					ra.writeShort(part.getOffsetY());
+					
+					// [4] : Depth
+					ra.writeInt( part.getDepth());
+					
+					// [4] ImageHandle ID
+					ra.writeInt(part.getImageHandle().getID());
+				}
+			}
 		}
 		else {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Unknown GroupTree Node type on saving.");

@@ -30,7 +30,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionListener;
@@ -538,7 +537,7 @@ public class NodeTree extends ContentTree
 					workspace.getWidth(), workspace.getHeight(), "Rig", new Color(0,0,0,0));
 			break;
 		default:
-			System.out.println(evt.getActionCommand());
+			MDebug.log(evt.getActionCommand());
 		}
 	}
 	

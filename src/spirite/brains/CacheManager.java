@@ -95,6 +95,9 @@ public class CacheManager {
 		}
 		
 		public void flush() {
+			// TODO: Figure out why this is necessary (it probably shouldn't be)
+			if( data == null) return;
+			
 			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 			data.flush();
 			data = null;
@@ -115,6 +118,7 @@ public class CacheManager {
 		}
 		
 		void setData( BufferedImage image) {
+			assert( image != null);
 			data = image;
 			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 		}

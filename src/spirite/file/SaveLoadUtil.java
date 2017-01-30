@@ -17,9 +17,10 @@ public class SaveLoadUtil {
 	// :::: Node Type Identifiers for the SIFF GroupTree Section
 	public static final byte NODE_GROUP = 0x00;
 	public static final byte NODE_SIMPLE_LAYER = 0x01;
+	public static final byte NODE_RIG_LAYER = 0x02;
 	public static final byte NODE_UNKNOWN = (byte)0xFF;
 	
-	public static final int VERSION = 0x0000_0001;
+	public static final int VERSION = 0x0000_0002;
 
 	public static final int VISIBLE_MASK = 0x01;
 	public static final int EXPANDED_MASK = 0x02;
