@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
@@ -31,10 +32,12 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -81,7 +84,7 @@ public class RenderEngine
 			// Otherwise get the drawing queue and draw it
 			ImageWorkspace workspace = settings.workspace;
 			
-			WorkingRenderData workingData = new WorkingRenderData();
+			RenderHelper workingData = new RenderHelper();
 			
 			
 			// Abort if it does not make sense to draw the workspace
@@ -132,7 +135,7 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	private BufferedImage propperRender(RenderSettings settings, WorkingRenderData wrk) 
+	private BufferedImage propperRender(RenderSettings settings, RenderHelper wrk) 
 	{
 		// Step 1: Determine amount of data needed
 		int n = _getNeededImagers( settings);
@@ -148,14 +151,23 @@ public class RenderEngine
 		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
 		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
 
-		wrk.selectedData = null;
+		wrk.buildSelectedImage = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
-			ImageHandle dataContext= settings.workspace.getActiveData();
+			// Create a buffered Image that represents the ImageData of the
+			//	current 
+			BuiltImageData dataContext= settings.workspace.builtActiveData();
 			if( dataContext != null) {
-				Point p = settings.workspace.getActiveDataOffset();
-				wrk.selectedData = dataContext;
-				wrk.seloffX = settings.workspace.getSelectionEngine().getOffsetX() - p.x;
-				wrk.seloffY = settings.workspace.getSelectionEngine().getOffsetY() - p.y;
+				wrk.selLayerBI = new BufferedImage( 
+						dataContext.handle.getWidth(), dataContext.handle.getHeight(),
+						BufferedImage.TYPE_INT_ARGB);
+				MUtil.clearImage(wrk.selLayerBI);
+				
+				Graphics2D g2 = (Graphics2D) wrk.selLayerBI.getGraphics();
+				g2.setTransform( dataContext.getTransform());
+				g2.transform(settings.workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
+				
+				g2.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), 0, 0, null);
+//				wrk.builtSelection = 
 			}
 		}
 		_propperRec( (GroupNode)settings.node, 0, settings, images, wrk);
@@ -163,15 +175,17 @@ public class RenderEngine
 		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
 			images[i].flush();
-		
+		if( wrk.selLayerBI != null)
+			wrk.selLayerBI.flush();
 		
 		return images[0];
 	}
 	
-	private class WorkingRenderData {
+	private class RenderHelper {
+		public BufferedImage selLayerBI= null;
+		public BuiltImageData buildSelectedImage;
+		public BuiltSelection builtSelection;
 		float ratioW, ratioH;
-		ImageHandle selectedData;
-		int seloffX, seloffY;
 	}
 	
 	/** Determines the number of images needed to properly render 
@@ -207,7 +221,7 @@ public class RenderEngine
 			int n, 
 			RenderSettings settings, 
 			BufferedImage[] buffer,
-			WorkingRenderData wrk) 
+			RenderHelper wrk) 
 	{
 		if( n < 0 || n >= buffer.length) {
 			MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
@@ -236,11 +250,9 @@ public class RenderEngine
 					g2.translate(child.x, child.y);
 					g2.scale( wrk.ratioW, wrk.ratioH);
 					
-					if( wrk.selectedData != null 
-							&& layer.getUsedImages().contains(wrk.selectedData)) 
+					if( wrk.selLayerBI != null ) 
 					{
-						g.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), 
-								wrk.seloffX, wrk.seloffY, null);
+						g2.drawImage(wrk.selLayerBI, 0, 0, null);
 					}
 
 
@@ -476,9 +488,9 @@ public class RenderEngine
 		LinkedList<ImageHandle> relevantData = new LinkedList<ImageHandle>(evt.dataChanged);
 		LinkedList<ImageHandle> relevantDataSel = new LinkedList<ImageHandle>(evt.dataChanged);
 		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()
-				&& evt.getWorkspace().getActiveData() != null) 
+				&& evt.getWorkspace().builtActiveData() != null) 
 		{
-			relevantDataSel.add(  evt.getWorkspace().getActiveData());
+			relevantDataSel.add(  evt.getWorkspace().builtActiveData().handle);
 		}
 		
 		while( it.hasNext()) {

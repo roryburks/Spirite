@@ -8,10 +8,12 @@ import java.util.List;
 
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
+import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.UndoEngine.UndoableAction;
 
 public abstract class Layer {
-	public abstract ImageHandle getActiveData();
+	public abstract BuildingImageData getActiveData();
 	public abstract List<ImageHandle> getUsedImages();
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();

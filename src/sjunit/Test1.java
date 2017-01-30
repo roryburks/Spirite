@@ -246,9 +246,9 @@ public class Test1 {
 			params.setWidth( rn.nextInt(5));
 			
 			StrokeAction action =
-			workspace.getDrawEngine().new StrokeAction(params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.getActiveData());
+			workspace.getDrawEngine().new StrokeAction(params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.builtActiveData());
 			
-			action.performImageAction(workspace.getActiveData());
+			action.performImageAction(workspace.builtActiveData().handle);
 			workspace.getUndoEngine().storeAction(action);
 			break;
 		case 4:

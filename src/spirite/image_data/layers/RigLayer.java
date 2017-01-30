@@ -17,6 +17,8 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -207,11 +209,11 @@ public class RigLayer extends Layer
 	
 	// :::: Layer
 	@Override
-	public ImageHandle getActiveData() {
+	public BuildingImageData getActiveData() {
 		if( active == null)
 			return null;
 		
-		return active.handle;
+		return new BuildingImageData(active.handle, active.ox, active.oy);
 	}
 
 	@Override

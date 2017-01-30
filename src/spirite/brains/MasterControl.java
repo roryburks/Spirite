@@ -26,6 +26,7 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
@@ -470,7 +471,9 @@ public class MasterControl
     		commandMap.put("clearLayer", new Runnable() {
 				@Override public void run() {
 					if(!workspace.getSelectionEngine().attemptClearSelection()) {
-						ImageHandle image = workspace.getActiveData();
+						// Note: transforms are irrelevant for this action, so 
+						//	accessing handle directly is appropriate.
+						BuiltImageData image = workspace.builtActiveData();
 						if( image != null) 
 							workspace.getDrawEngine().clear(image);
 					}
@@ -496,6 +499,8 @@ public class MasterControl
 			});
     		commandMap.put("autocroplayer", new Runnable() {
 				@Override public void run() {
+					// TODO: Will probably need fixing with new BuiltActiveDAta
+					//	format
 					Node node = workspace.getSelectedNode();
 					
 					if( node instanceof LayerNode) {
@@ -504,7 +509,7 @@ public class MasterControl
 						try {
 							Rectangle rect;
 							rect = MUtil.findContentBounds(
-									layer.getActiveData().deepAccess(),
+									layer.getActiveData().handle.deepAccess(),
 									1, 
 									false);
 							workspace.cropNode((LayerNode) node, rect);

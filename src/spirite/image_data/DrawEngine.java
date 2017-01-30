@@ -15,6 +15,7 @@ import java.util.Queue;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
 
@@ -38,7 +39,7 @@ public class DrawEngine {
 		this.selectionEngine = workspace.getSelectionEngine();
 	}
 
-	public StrokeEngine startStrokeEngine( ImageHandle data) {
+	public StrokeEngine startStrokeEngine( BuiltImageData data) {
 		engine.data = data;
 		engine.stroke=  null;
 		return engine;
@@ -55,7 +56,7 @@ public class DrawEngine {
 	}
 	public ImageHandle getStrokeContext() {
 		if( engine.state == STATE.DRAWING) {
-			return engine.data;
+			return engine.data.handle;
 		}
 		else
 			return null;
@@ -155,16 +156,18 @@ public class DrawEngine {
 	public class StrokeEngine {
 		private PenState oldState = new PenState();
 		private PenState newState = new PenState();
+		private PenState rawState = new PenState();	// Needed to prevent UndoAction from double-tranforming
 		private STATE state = STATE.READY;
 
 		private StrokeParams stroke;
-		private ImageHandle data;
+		private BuiltImageData data;
 		private BufferedImage strokeLayer;
 		private BufferedImage compositionLayer;
 		private BufferedImage selectionMask;
 
 		private BuiltSelection sel;
 
+		// Records the rawState
 		private List<PenState> prec = new LinkedList<>();
 		
 		protected StrokeEngine() {
@@ -175,7 +178,7 @@ public class DrawEngine {
 		public StrokeParams getParams() {
 			return stroke;
 		}
-		public ImageHandle getImageData() {
+		public BuiltImageData getImageData() {
 			return data;
 		}
 		
@@ -190,14 +193,17 @@ public class DrawEngine {
 				return false;
 			stroke = s;
 			
-			strokeLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			compositionLayer = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			strokeLayer = new BufferedImage( 
+					data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			compositionLayer = new BufferedImage( 
+					data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			int crgb = stroke.getColor().getRGB();
 			
 			sel = pollSelectionMask();
 			
 			if( sel.selection != null) {
-				selectionMask = new BufferedImage( data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				selectionMask = new BufferedImage( 
+						data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(selectionMask);
 				
 				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
@@ -208,19 +214,26 @@ public class DrawEngine {
 			
 			// Starts recording the Pen States
 			prec = new LinkedList<PenState>();
-			oldState.x = ps.x;
-			oldState.y = ps.y;
+			Point layerSpace = (data.convert(new Point(ps.x,ps.y)));
+			
+			oldState.x = layerSpace.x;
+			oldState.y = layerSpace.y;
 			oldState.pressure = ps.pressure;
-			newState.x = ps.x;
-			newState.y = ps.y;
+			newState.x = layerSpace.x;
+			newState.y = layerSpace.y;
 			newState.pressure = ps.pressure;
+			rawState.x = ps.x;
+			rawState.y = ps.y;
+			rawState.pressure = ps.pressure;
 			prec.add( ps);
 			
 			state = STATE.DRAWING;
 			
 			
-			if( MUtil.coordInImage( ps.x, ps.y, strokeLayer) && strokeLayer.getRGB( ps.x, ps.y) != crgb) {
-				strokeLayer.setRGB( ps.x, ps.y, crgb);
+			if( MUtil.coordInImage( layerSpace.x, layerSpace.y, strokeLayer) 
+					&& strokeLayer.getRGB( layerSpace.x, layerSpace.y) != crgb) 
+			{
+				strokeLayer.setRGB( layerSpace.x, layerSpace.y, crgb);
 				return true;
 			}
 			return false;
@@ -244,7 +257,7 @@ public class DrawEngine {
 			// Draw Stroke (only if the mouse has moved)
 			if( newState.x != oldState.x || newState.y != oldState.y)
 			{
-				prec.add( new PenState(newState));
+				prec.add( new PenState(rawState));
 				Graphics g = strokeLayer.getGraphics();
 				Graphics2D g2 = (Graphics2D)g;
 				g.setColor( stroke.getColor());
@@ -278,9 +291,13 @@ public class DrawEngine {
 		 * 
 		 * DOES NOT ATUALLY DRAW THE STROKE (call stepStroke for that). */
 		public synchronized void updateStroke( PenState state) {
-			newState.x = state.x;
-			newState.y = state.y;
+			Point layerSpace = data.convert( new Point( state.x, state.y));
+			newState.x = layerSpace.x;
+			newState.y = layerSpace.y;
 			newState.pressure = state.pressure;
+			rawState.x = state.x;
+			rawState.y = state.y;
+			rawState.pressure = state.pressure;
 		}
 		
 		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
@@ -289,10 +306,11 @@ public class DrawEngine {
 			state = STATE.READY;
 			
 			if( data != null) {
-				Graphics g = workspace.checkoutImage(data).getGraphics();
+				BufferedImage bi = workspace.checkoutImage(data.handle);
+				Graphics g = bi.getGraphics();
 				drawStrokeLayer(g);
 				g.dispose();
-				workspace.checkinImage(data);
+				workspace.checkinImage(data.handle);
 			}
 			
 			strokeLayer.flush();
@@ -380,7 +398,7 @@ public class DrawEngine {
 
 	
 	private void execute( MaskedImageAction action) {
-		action.performImageAction(action.data);
+		action.performImageAction(action.data.handle);
 		undoEngine.storeAction(action);
 	}
 
@@ -389,7 +407,7 @@ public class DrawEngine {
 	/***
 	 * 
 	 */
-	public void clear( ImageHandle data) {
+	public void clear( BuiltImageData data) {
 		execute( new ClearAction(data, pollSelectionMask()));
 	}
 
@@ -397,14 +415,21 @@ public class DrawEngine {
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, Color color, ImageHandle data)
+	public boolean fill( int x, int y, Color color, BuiltImageData data)
 	{
 		if( data == null) return false;
-		BufferedImage bi = data.deepAccess();
-		if( !MUtil.coordInImage(x, y, bi))
+		
+		Point p = data.convert( new Point(x,y));
+		
+		BufferedImage bi = data.handle.deepAccess();
+		if( !MUtil.coordInImage( p.x, p.y, bi)) {
+			System.out.println("OUT:" + p);
 			return false;
-		if( bi.getRGB(x,y) == color.getRGB())
+		}
+		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
+			System.out.println("DUPE");
 			return false;
+		}
 		
 		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
 		return true;
@@ -419,18 +444,20 @@ public class DrawEngine {
 	
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
+		protected final BuiltImageData data;
 
-		MaskedImageAction(ImageHandle data, BuiltSelection mask) {
-			super(data);
+		MaskedImageAction(BuiltImageData data, BuiltSelection mask) {
+			super(data.handle);
 			this.mask = mask;
+			this.data = data;
 		}
 	}
 	
 	public class StrokeAction extends MaskedImageAction {
-		PenState[] points;
-		StrokeParams params;
+		private final PenState[] points;
+		private final StrokeParams params;
 		
-		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, ImageHandle data){	
+		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, BuiltImageData data){	
 			super(data, mask);
 			this.params = params;
 			this.points = points;
@@ -453,7 +480,7 @@ public class DrawEngine {
 		}
 		
 		@Override
-		public void performImageAction( ImageHandle data) {
+		public void performImageAction( ImageHandle UNUSED) {
 			queueSelectionMask(mask);
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
@@ -471,7 +498,7 @@ public class DrawEngine {
 		private final Point p;
 		private final Color color;
 		
-		public FillAction( Point p, Color c, BuiltSelection mask, ImageHandle data) {
+		public FillAction( Point p, Color c, BuiltSelection mask, BuiltImageData data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -479,17 +506,22 @@ public class DrawEngine {
 		}
 
 		@Override
-		protected void performImageAction( ImageHandle data) {
-			BufferedImage bi = workspace.checkoutImage(data);
+		protected void performImageAction( ImageHandle UNUSED) {
+			
+			BufferedImage bi = workspace.checkoutImage(data.handle);
 			
 			Queue<Integer> queue = new LinkedList<Integer>();
-			queue.add( MUtil.packInt(p.x, p.y));
+			
+			Point layerSpace = data.convert( new Point(p.x, p.y));
+			queue.add( MUtil.packInt(layerSpace.x, layerSpace.y));
 			
 			
 			int w = bi.getWidth();
 			int h = bi.getHeight();
-			int bg = bi.getRGB(p.x, p.y);
+			int bg = bi.getRGB(layerSpace.x, layerSpace.y);
 			int c = color.getRGB();
+			
+			
 			
 			if( bg == c) return;
 			
@@ -498,15 +530,14 @@ public class DrawEngine {
 				int ix = MUtil.high16(p);
 				int iy = MUtil.low16(p);
 				
-				// TODO: Very bad idea to have the second half of this here, but fine for 
-				//    simple shape like Rectangle
+				// TODO: Was bad so I removed Selection Masking for now
 				//
 				// Better way: lift the selected data out of the mask with a different
 				//	color underneath (just have to make sure other color is different from
 				//	bg), then perform fill on that layer, then paste the layer back.
-				if( bi.getRGB(ix, iy) != bg ||
-					(mask.selection != null && !mask.selection.contains(ix-mask.offsetX, iy-mask.offsetY)))
+				if( bi.getRGB(ix, iy) != bg)
 					continue;
+					
 					
 				bi.setRGB(ix, iy, c);
 
@@ -524,32 +555,33 @@ public class DrawEngine {
 				}
 			}
 			
-			workspace.checkinImage(data);
+			workspace.checkinImage(data.handle);
 		}
 		public Point getPoint() { return new Point(p);}
 		public Color getColor() { return new Color(color.getRGB());}
 	}
 
 	public class ClearAction extends MaskedImageAction {
-		private ClearAction(ImageHandle data, BuiltSelection mask) {
+		private ClearAction(BuiltImageData data, BuiltSelection mask) {
 			super(data, mask); 
 			description = "Clear Image";
 		}
 		@Override
 		protected void performImageAction(ImageHandle image) {
-			BufferedImage bi = workspace.checkoutImage(image);
 			
-			if( mask.selection == null)
-				MUtil.clearImage(bi);
+			if( mask.selection == null) {
+				data.checkout();
+				MUtil.clearImage(data.handle.deepAccess());
+				data.checkin();
+			}
 			else {
-				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				Graphics2D g2 = (Graphics2D) data.checkout();
 				g2.translate(mask.offsetX, mask.offsetY);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 				mask.selection.drawSelectionMask(g2);
-				g2.dispose();
+				data.checkin();
 			}
 
-			workspace.checkinImage(image);
 		}
 	}
 	

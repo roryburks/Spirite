@@ -37,6 +37,7 @@ import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeAction;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
@@ -365,15 +366,15 @@ public class Penner
 		
 	}
 	private void startStroke( StrokeParams stroke) {
-		if( workspace != null && workspace.getActiveData() != null) {
-			ImageHandle data = workspace.getActiveData();
+		if( workspace != null && workspace.builtActiveData() != null) {
+			BuiltImageData data = workspace.builtActiveData();
 			GroupTree.Node node = workspace.getSelectedNode();
 
 			strokeEngine = drawEngine.startStrokeEngine( data);
 			
 			if( strokeEngine.startStroke(stroke,  new PenState(
-							x - node.getOffsetX(), y - node.getOffsetY(), pressure))) {
-				data.refresh();
+							x, y, pressure))) {
+				data.handle.refresh();
 			}
 			setState( STATE.DRAWING);
 		}
@@ -419,14 +420,13 @@ public class Penner
 		if( holdingCtrl) c = new Color(0,0,0,0);
 
 		// Grab the Active Data
-		ImageHandle data = workspace.getActiveData();
+		BuiltImageData data = workspace.builtActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
 		if( data != null && node != null) {
 			// Perform the fill Action, only store the UndoAction if 
 			//	an actual change is made.
-			Point p = new Point(x - node.getOffsetX(), y - node.getOffsetY());
-			drawEngine.fill( p.x, p.y, c, data);
+			drawEngine.fill( x, y, c, data);
 		} 
 	}
 	
@@ -509,7 +509,7 @@ public class Penner
 		case DRAWING:
 			if( strokeEngine != null && node != null) {
 				strokeEngine.updateStroke( new PenState(						
-						x - node.getOffsetX(), y - node.getOffsetY(), pressure));
+						x , y , pressure));
 			}
 			break;
 		case FORMING_SELECTION:
@@ -738,7 +738,7 @@ public class Penner
 	public void actionPerformed(ActionEvent evt) {
 		if( strokeEngine != null && state == STATE.DRAWING) {
 			if( strokeEngine.stepStroke()) {
-				strokeEngine.getImageData().refresh();
+				strokeEngine.getImageData().handle.refresh();
 			}
 		}
 	}

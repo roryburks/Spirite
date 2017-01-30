@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -286,33 +287,121 @@ public class ImageWorkspace {
 	 * combines all applied transform properties such that when a function 
 	 * draws on the BuiltActiveData at X, Y, it'll be modifying the ImageData
 	 * which APPEARS at X,Y.
+	 * 
+	 * Right now only incorporates Offset, but can be modified to incorperate
+	 * any kind of draw action in the future.
 	 */
-	public class BuiltActiveData {
+	public class BuiltImageData {
 		public final ImageHandle handle;
-		public final int ox;
-		public final int oy;
-		public BuiltActiveData( ImageHandle handle, int ox, int oy) {
+		private final int ox;
+		private final int oy;
+		private Graphics g = null;
+		public BuiltImageData( ImageHandle handle) {
+			this.handle = handle;
+			this.ox = 0;
+			this.oy = 0;
+		}
+		public BuiltImageData( ImageHandle handle, int ox, int oy) {
+			this.handle = handle;
+			this.ox = ox;
+			this.oy = oy;
+		}
+		public void draw(Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
+			
+			AffineTransform transform = g2.getTransform();
+			g2.translate(ox, oy);
+			
+			handle.drawLayer(g2);
+			
+			g2.setTransform( transform);
+		}
+		
+		/**
+		 * Creates a graphical object with transforms applied such that
+		 * drawing on the returned Graphics will draw on the correct Image
+		 * Data spot.
+		 */
+		public Graphics checkout() {
+			BufferedImage bi = checkoutImage(handle);
+			g = bi.getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
+			g2.translate(-ox, -oy);
+			return g;
+		}
+		
+		/**
+		 * Once finished drawn you must checkin your data.  Not only does this
+		 * dispose the Graphics (which is debatably necessary), but it triggers
+		 * the appropriate ImageChange actions
+		 */
+		public void checkin() {
+			checkinImage(handle);
+			g.dispose();
+			g = null;
+		}
+		
+		/** Converts the given point in ImageSpace to BuiltActiveData space*/
+		public Point convert( Point p) {
+			//	Some image modification methods do not use draw actions, but
+			//	 rather alter the image directly.  For example a flood fill action.
+			//	
+			return new Point(p.x-ox, p.y-oy);
+		}
+		
+		/** Returns the Tranform needed to convert WorkspaceSpace into DataSpace*/
+		public AffineTransform getTransform() {
+			AffineTransform transform = new AffineTransform();
+			transform.translate( -ox, -oy);
+			return transform;
+		}
+	}
+
+	/**
+	 * BuiltActiveData's should be immutable, but after the Layers give their
+	 * BuiltData to the ImageWorkspace and before the ImageWorkspace gives it
+	 * to the Class that requested it, ImageWorkspace has to add in the Node
+	 * transform data.  BuildingActiveData is an intermediate class that 
+	 * Layers send that have their local transforms.
+	 */
+	public static class BuildingImageData {
+		public final ImageHandle handle;
+		private final int ox;
+		private final int oy;
+		public BuildingImageData( ImageHandle handle, int ox, int oy) {
 			this.handle = handle;
 			this.ox = ox;
 			this.oy = oy;
 		}
 	}
-	public ImageHandle getActiveData() {
+	
+	public BuiltImageData builtActiveData() {
 		if( selected == null) return null;
 		
 		if( selected instanceof GroupTree.LayerNode) {
-			// !!!! SHOULD be no reason to add sanity checks here.
-			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
+			BuildingImageData data = ((GroupTree.LayerNode)selected).getLayer().getActiveData();
+			
+			return  new BuiltImageData( data.handle,
+					data.ox + selected.x, data.oy + selected.y);
 		}
 		return null;
 	}
-	public Point getActiveDataOffset() {
+	
+	public BuiltImageData buildData( LayerNode node) {
+		BuildingImageData data = node.getLayer().getActiveData();
+		
+		return  new BuiltImageData( data.handle,
+				data.ox + selected.x, data.oy + selected.y);
+	}
+	
+	
+/*	public Point getActiveDataOffset() {
 		if( selected instanceof GroupTree.LayerNode) {
 			return new Point( selected.x, selected.y);
 		}
 		else
 			return new Point(0,0);
-	}
+	}*/
 	
 	public GroupTree.Node getSelectedNode() {
 		if( !nodeInWorkspace(selected)) {

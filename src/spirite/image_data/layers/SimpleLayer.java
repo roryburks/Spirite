@@ -12,6 +12,8 @@ import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.UndoEngine.DrawImageAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -38,8 +40,8 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public ImageHandle getActiveData() {
-		return data;
+	public BuildingImageData getActiveData() {
+		return new BuildingImageData(data, 0, 0);
 	}
 
 	@Override

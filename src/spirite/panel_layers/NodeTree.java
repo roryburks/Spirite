@@ -571,7 +571,7 @@ public class NodeTree extends ContentTree
 				String str = ((GroupTree.Node)obj).getName();
 				if( MDebug.DEBUG && obj instanceof GroupTree.LayerNode) {
 					try {
-						str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().getID();
+						str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().handle.getID();
 					}catch(Exception e) {}
 				}
 				renderPanel.label.setText( str);
