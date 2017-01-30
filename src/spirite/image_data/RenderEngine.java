@@ -237,7 +237,7 @@ public class RenderEngine
 					g2.scale( wrk.ratioW, wrk.ratioH);
 					
 					if( wrk.selectedData != null 
-							&& layer.getUsedImageData().contains(wrk.selectedData)) 
+							&& layer.getUsedImages().contains(wrk.selectedData)) 
 					{
 						g.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), 
 								wrk.seloffX, wrk.seloffY, null);
@@ -363,7 +363,7 @@ public class RenderEngine
 				return Arrays.asList(image);
 			}
 			else if( layer != null) {
-				return layer.getUsedImageData();
+				return layer.getUsedImages();
 			}
 			else {
 				// Get a list of all layer nodes then get a list of all ImageData
@@ -380,7 +380,7 @@ public class RenderEngine
 				
 				Iterator<Node> it = layerNodes.iterator();
 				while( it.hasNext()){
-					for( ImageHandle data : ((LayerNode)it.next()).getLayer().getUsedImageData()) {
+					for( ImageHandle data : ((LayerNode)it.next()).getLayer().getUsedImages()) {
 						// Avoiding duplicates should make the intersection method quicker
 						if( list.indexOf(data) == -1)
 							list.add(data);

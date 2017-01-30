@@ -158,7 +158,7 @@ public class LoadEngine {
 			}
 			// TODO
 			
-			workspace.importData( workspace.getRootNode(), imageMap);
+			workspace.importNodeWithData( workspace.getRootNode(), imageMap);
 
 			workspace.setWidth(width);
 			workspace.setHeight(height);

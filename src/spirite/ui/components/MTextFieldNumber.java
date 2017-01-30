@@ -45,7 +45,6 @@ public class MTextFieldNumber extends JTextField implements DocumentListener {
 		mdocument = new MTFNDocument();
 		this.setDocument(mdocument);
 		this.getDocument().addDocumentListener(this);
-		
 	}
 
 	

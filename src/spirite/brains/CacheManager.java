@@ -97,6 +97,7 @@ public class CacheManager {
 		public void flush() {
 			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
 			data.flush();
+			data = null;
 			
 			List<CacheDomain> toRem = new ArrayList<CacheDomain>();
 			for( CacheDomain context : cache.values()) {

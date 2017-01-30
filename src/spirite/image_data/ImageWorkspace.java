@@ -41,6 +41,7 @@ import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.RigLayer;
 import spirite.image_data.layers.Layer.MergeHelper;
 import spirite.image_data.layers.SimpleLayer;
 
@@ -134,7 +135,7 @@ public class ImageWorkspace {
 		//	getUsedImageData in an inefficient way
 		List<List<ImageHandle>> layerDataUsed = new ArrayList<>(layers.size());
 		for( int i=0; i<layers.size(); ++i) {
-			layerDataUsed.add(i, ((LayerNode)layers.get(i)).getLayer().getUsedImageData());
+			layerDataUsed.add(i, ((LayerNode)layers.get(i)).getLayer().getUsedImages());
 		}
 		
 		// Step 1: Go through each tracked ImageData and find unused entries
@@ -287,6 +288,7 @@ public class ImageWorkspace {
 		if( selected == null) return null;
 		
 		if( selected instanceof GroupTree.LayerNode) {
+			System.out.println("TEST");
 			// !!!! SHOULD be no reason to add sanity checks here.
 			return  ((GroupTree.LayerNode)selected).getLayer().getActiveData();
 		}
@@ -444,7 +446,7 @@ public class ImageWorkspace {
 			toCompare.x -= node.x;
 			toCompare.y -= node.y;
 			
-			List<ImageHandle> handles = node.layer.getUsedImageData();
+			List<ImageHandle> handles = node.layer.getUsedImages();
 			List<Rectangle> rects = node.layer.interpretCrop(toCompare);
 			
 			for( int i=0; i < handles.size() && i<rects.size(); ++i) {
@@ -533,7 +535,7 @@ public class ImageWorkspace {
 		LinkedHashSet<ImageHandle> data = new LinkedHashSet<>();
 		
 		for( LayerNode node : layerNodes) {
-			data.addAll( node.getLayer().getUsedImageData());
+			data.addAll( node.getLayer().getUsedImages());
 		}
 
 		if( data.isEmpty())
@@ -607,7 +609,7 @@ public class ImageWorkspace {
 	 * 	change the Null-Handle to a context-handle with ID 7.  All null-context
 	 * 	handles with ID 3 will have the same ID (7) after Importing.
 	 */
-	public void importData( 
+	public void importNodeWithData( 
 			Node node, 
 			Map<Integer,BufferedImage> newData)
 	{
@@ -624,7 +626,7 @@ public class ImageWorkspace {
 		// Step 1: Go through all the ImageData and find all ImageHandles
 		//	that aren't active ImageHandles in the Workspace
 		for( Node lnode : layers) {
-			for( ImageHandle data: ((LayerNode)lnode).getLayer().getUsedImageData()) 
+			for( ImageHandle data: ((LayerNode)lnode).getLayer().getUsedImages()) 
 			{
 				if( !isValidHandle(data))
 					unlinked.add(data);
@@ -648,6 +650,19 @@ public class ImageWorkspace {
 				data.context = this;
 			}
 		}
+	}
+	
+	/**
+	 * Puts the newImage into the Workspace space (caching it and assigning
+	 * it a handle) and returns that handle.
+	 * 
+	 * NOTE: If the ImageHandle is not linked to a Layer in the Workspace
+	 * then the image will get flushed next time the image data is checked
+	 */
+	public ImageHandle importData( BufferedImage newImage) {
+		imageData.put( workingID, cacheManager.cacheImage(newImage, this));
+		
+		return new ImageHandle(this, workingID++);	// Postincriment
 	}
 	
 	
@@ -676,6 +691,24 @@ public class ImageWorkspace {
 				context, 
 				img, 
 				name);
+	}
+	
+	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
+		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+		CachedImage ci = cacheManager.cacheImage( bi, this);
+        Graphics g = bi.createGraphics();
+        g.setColor( c);
+        g.fillRect( 0, 0, width, height);
+        g.dispose();
+        imageData.put(workingID, ci);
+        ImageHandle handle= new ImageHandle(this, workingID++);
+		
+		LayerNode node = groupTree.new LayerNode( new RigLayer(handle), name);
+		_addLayer(node,context);
+		
+		return node;
+		
+		
 	}
 	
 	/** A Shell Layer is a layer whose ImageHandles are not yet linked to
@@ -738,7 +771,7 @@ public class ImageWorkspace {
 			
 			// Duplicate all used Data into a map
 			Map< Integer, BufferedImage> dupeData = new HashMap<>();
-			for( ImageHandle handle : layer.getUsedImageData()) {
+			for( ImageHandle handle : layer.getUsedImages()) {
 				if( !dupeData.containsKey(handle.id)) {
 					dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
 				}
@@ -747,7 +780,7 @@ public class ImageWorkspace {
 			// Import that Node
 			LayerNode newNode = 
 					groupTree.new LayerNode(dupe, toDupe.name + " copy");
-			importData( newNode, dupeData);
+			importNodeWithData( newNode, dupeData);
 			
 			
 			executeChange( new AdditionChange( 
@@ -784,7 +817,7 @@ public class ImageWorkspace {
 					
 					// Deep Copy any not-yet-duplicated Image data into the
 					//	dupeData map
-					for( ImageHandle handle : layer.getUsedImageData()) {
+					for( ImageHandle handle : layer.getUsedImages()) {
 						if( !dupeData.containsKey(handle.id)) {
 							dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
 						}
@@ -799,7 +832,7 @@ public class ImageWorkspace {
 			}
 			
 			
-			importData(dupeRoot, dupeData);
+			importNodeWithData(dupeRoot, dupeData);
 			
 			executeChange( new AdditionChange( 
 					dupeRoot, 
@@ -1150,7 +1183,7 @@ public class ImageWorkspace {
 			List<LayerNode> layerNodes = node.getAllLayerNodes();
 			
 			for( LayerNode layerNode : layerNodes) {
-				dependencies.addAll( layerNode.getLayer().getUsedImageData());
+				dependencies.addAll( layerNode.getLayer().getUsedImages());
 			}
 			
 			return dependencies;

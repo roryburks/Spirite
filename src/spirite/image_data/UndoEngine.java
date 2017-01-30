@@ -16,6 +16,7 @@ import java.util.ListIterator;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
@@ -241,6 +242,21 @@ public class UndoEngine {
 		UndoContext context = new ImageContext(data);
 		contexts.add(context);
 		return context;
+	}
+	
+	
+	/** 
+	 * For integrity's sake I should probably be performing this not just for
+	 * components that don't have visibility on performAction, but in general
+	 * for everything except continuous events (StrokeActions mostly).
+	 */
+	public void performAndStore( UndoableAction action) {
+		if( action != null) {
+			action.performAction();
+			storeAction(action);
+		}
+		else
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Attempted to store null as an action.");
 	}
 	
 	/***

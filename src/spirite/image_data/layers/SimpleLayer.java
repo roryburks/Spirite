@@ -28,7 +28,7 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public List<ImageHandle> getUsedImageData() {
+	public List<ImageHandle> getUsedImages() {
 		return Arrays.asList(data);
 	}
 

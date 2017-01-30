@@ -33,6 +33,8 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_layers.ReferenceSchemePanel;
+import spirite.panel_layers.RigPanel;
+import spirite.panel_toolset.ColorPicker;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
@@ -75,10 +77,11 @@ public class RootFrame extends javax.swing.JFrame
     private ToolsPanel toolsPanel;
     private ToolSettingsPanel settingPanel;
     private WorkTabPane workPane;
+    private RigPanel rigPanel;
     
     private JPanel leftContainer;
     private ResizeContainerPanel rightContainer;
-    private JPanel rrContainer;
+    private ResizeContainerPanel rrContainer;
     
     private ResizeContainerPanel container;
 
@@ -91,10 +94,12 @@ public class RootFrame extends javax.swing.JFrame
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
     	settingPanel = new ToolSettingsPanel( master);
+    	rigPanel = new RigPanel(master);
+    	ReferenceSchemePanel rsp =  new ReferenceSchemePanel(master);
     	
     	leftContainer = new JPanel();
     	rightContainer = new ResizeContainerPanel(palettePanel, ContainerOrientation.VERTICAL);
-    	rrContainer = new JPanel();
+    	rrContainer = new ResizeContainerPanel(rsp, ContainerOrientation.VERTICAL);
     	
     	workPane.setPreferredSize(new Dimension(800,600));
     	container = new ResizeContainerPanel(workPane,ContainerOrientation.HORIZONTAL);
@@ -107,7 +112,11 @@ public class RootFrame extends javax.swing.JFrame
 
     	rightContainer.addPanel(50, 80, 0, toolsPanel);
     	rightContainer.addPanel(50, 160, 0, settingPanel);
+    	rightContainer.addPanel(50, 160, 0, new ColorPicker());
     	rightContainer.setStretchArea(80);
+    	
+    	rrContainer.addPanel( 100, 300, -1, rigPanel);
+    	rrContainer.setStretchArea(100);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -119,8 +128,6 @@ public class RootFrame extends javax.swing.JFrame
         // LeftPanel Layout
         leftContainer.setLayout(new GridLayout());
         leftContainer.add(new LayersPanel(master));
-        rrContainer.setLayout(new GridLayout());
-        rrContainer.add( new ReferenceSchemePanel(master));
         
         pack();
     }                   

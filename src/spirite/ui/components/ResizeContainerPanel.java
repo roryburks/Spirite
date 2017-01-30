@@ -332,7 +332,6 @@ public class ResizeContainerPanel extends JPanel{
 	    				size = start_size + (start_pos - p.y);
 	    			else
 	    				size = start_size - (start_pos - p.y);
-	        		size = start_size - (start_pos - p.y);
 	        		size = MUtil.clip( 
 	        				min_size , 
 	        				size,

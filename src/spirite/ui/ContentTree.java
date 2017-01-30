@@ -221,6 +221,20 @@ public class ContentTree extends JPanel
 		return null;
 	}
 	
+	
+	/**
+	 * Called to prevent excessive, potentially cyclical rebuilds
+	 */
+	private boolean building = false;
+	protected void startBuilding() {
+		building = true;
+	}
+	protected void finishBuilding() {
+		building = false;
+		
+		buttonPanel.reformPanel();
+	}
+	
 	/** 
 	 * Internal painComponent method which adds more parameters for child
 	 * 	classes to mess with
@@ -295,6 +309,9 @@ public class ContentTree extends JPanel
 		CCBPanel() {}
 		
 		public void reformPanel() {
+			if( building) return;
+			System.out.println("1");
+			
 			// Note: margin height is ignored as the gap is calculated from the Size
 			Dimension size = Globals.getMetric("contentTree.buttonSize", new Dimension(30,30));
 			Dimension margin = Globals.getMetric("contentTree.buttonMargin", new Dimension(5,5));
@@ -665,10 +682,8 @@ public class ContentTree extends JPanel
 	@Override
 	public void mouseClicked(MouseEvent evt) {
 		TreePath path = getPathFromY(evt.getY());
-		
-		if( path != null) {
-			clickPath(path, evt);
-		}
+
+		clickPath(path, evt);
 	}
 
 
@@ -676,71 +691,43 @@ public class ContentTree extends JPanel
 	@Override	public void treeNodesChanged(TreeModelEvent e) {}
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
+		System.out.println("2");
 				buttonPanel.reformPanel();
-			}
-		});
-		
 	}
 
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				buttonPanel.reformPanel();
-			}
-		});
+		System.out.println("3");
+
+			buttonPanel.reformPanel();
+
 		
 	}
 
 	@Override
 	public void treeStructureChanged(TreeModelEvent e) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				buttonPanel.reformPanel();
-			}
-		});
+		System.out.println("4");
+			buttonPanel.reformPanel();
 	}
 	
 
 	// :::: TreeSelectionListener
 	@Override
 	public void valueChanged(TreeSelectionEvent arg0) {
-		// This is needed because the selection UI of the linked ButtonPanel 
-		//	has graphics related to the tree's slection that needs to be redrawn
-		
-		SwingUtilities.invokeLater( new Runnable() {
-			
-			@Override
-			public void run() {
+
 				transferHandler.stopDragging();
 				
-				repaint();
-			}
-		});
 	}
 	
 	@Override
 	public void treeCollapsed(TreeExpansionEvent event) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
+		System.out.println("5");
 				buttonPanel.reformPanel();
-			}
-		});
 	}
 
 	@Override
 	public void treeExpanded(TreeExpansionEvent event) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
+		System.out.println("6");
 				buttonPanel.reformPanel();
-			}
-		});
 	}
 }

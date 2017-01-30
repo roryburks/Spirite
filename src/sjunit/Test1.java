@@ -105,8 +105,8 @@ public class Test1 {
 			assert( g1.getClass().equals(g2.getClass()));
 			
 			if( g1 instanceof LayerNode) {
-				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getUsedImageData().iterator();
-				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getUsedImageData().iterator();
+				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getUsedImages().iterator();
+				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getUsedImages().iterator();
 
 				while( it1.hasNext()) {
 					assert(

@@ -1,5 +1,6 @@
 package spirite.panel_layers;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -160,7 +161,7 @@ public class NodeTree extends ContentTree
     		Collection<ImageHandle> dataUsed;
     		
     		if( obj instanceof LayerNode) {
-    			dataUsed = ((LayerNode)obj).getLayer().getUsedImageData();
+    			dataUsed = ((LayerNode)obj).getLayer().getUsedImages();
     		}
     		else if( obj instanceof GroupNode) {
     			dataUsed = new LinkedHashSet<>();	// LinkedHashSet efficiently avoids duplicates
@@ -175,7 +176,7 @@ public class NodeTree extends ContentTree
 				});
     			
     			for( Node lnode : layerNodes) {
-    				dataUsed.addAll( ((LayerNode)lnode).getLayer().getUsedImageData());
+    				dataUsed.addAll( ((LayerNode)lnode).getLayer().getUsedImages());
     			}
 			}
     		else
@@ -244,15 +245,17 @@ public class NodeTree extends ContentTree
 		constructFromNode( nodeRoot);
 	}
 	public void constructFromNode( GroupNode node) {
-
+		startBuilding();
 		root.removeAllChildren();
 		if( node != null)
 			_cfw_construcRecursively( node, root);
 		model.nodeStructureChanged(root);
 		
 
-		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
+		// TODO: Fix the problem this is causing and re-implement
+//		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
 		transferHandler.stopDragging();
+		finishBuilding();
 	}
 	
 	private void _cfw_construcRecursively( GroupTree.Node group_node, DefaultMutableTreeNode tree_node) {
@@ -331,50 +334,61 @@ public class NodeTree extends ContentTree
 	@Override
 	protected void clickPath(TreePath path, MouseEvent evt) {
 		super.clickPath(path, evt);
-
-		if( path == null) return;
 		if( evt.getButton() == MouseEvent.BUTTON3) {
 			
-			DefaultMutableTreeNode node = 
-					(DefaultMutableTreeNode)path.getLastPathComponent();
+			// All-context menu items
+			List<String[]> menuScheme = new ArrayList<>(
+				Arrays.asList(new String[][] {
+					{"&New..."},
+					{".New Simple &Layer", "newLayer", "new_layer"},
+					{".New Layer &Group", "newGroup", "new_group"},
+					{".New &Rig Layer", "newRig", null}
+				})
+			);
+			contextMenu.node = null;
 			
 			// Construct the base Context Menu
-			String descriptor = "...";
 			
-			Object usrObj = node.getUserObject();
-			if( usrObj instanceof GroupNode) {
-				descriptor = "Layer Group";
-			}
-			if( usrObj instanceof LayerNode) {
-				descriptor = "Layer";
-			}
-			
-			String[][] baseMenuScheme = {
-					{"&New Layer", "newLayer", "new_layer"},
-					{"New Layer &Group", "newGroup", "new_group"},
-					{"-"},
-					{"D&uplicate "+descriptor, "duplicate", null}, 
-					{"&Delete  "+descriptor, "delete", null}, 
-			};
-			List<String[]> menuScheme = new ArrayList<>(Arrays.asList(baseMenuScheme));
-			
-			// Add parts to the menu scheme depending on node type
-			if( usrObj instanceof GroupNode) {
-				menuScheme.add( new String[]{"-"});
-				menuScheme.add( new String[]{"&Construct Simple Animation From Group", "animfromgroup", null});
-				if( workspace.getAnimationManager().getSelectedAnimation() != null)
-					menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
-			}
-			else if( usrObj instanceof LayerNode) {
-				if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
-					menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
+			if( path != null) {
+				DefaultMutableTreeNode node = 
+						(DefaultMutableTreeNode)path.getLastPathComponent();
+				Object usrObj = node.getUserObject();
+				contextMenu.node = (Node)usrObj;
+				
+				String descriptor = "...";
+				if( usrObj instanceof GroupNode) {
+					descriptor = "Layer Group";
+				}
+				if( usrObj instanceof LayerNode) {
+					descriptor = "Layer";
+				}
+	
+				// All-node related menu items
+				menuScheme.addAll(Arrays.asList(new String[][] {
+						{"-"},
+						{"D&uplicate "+descriptor, "duplicate", null}, 
+						{"&Delete  "+descriptor, "delete", null}, 
+				}));
+				
+				// Add parts to the menu scheme depending on node type
+				if( usrObj instanceof GroupNode) {
+					menuScheme.addAll(Arrays.asList(new String[][] {
+								{"-"},
+								{"&Construct Simple Animation From Group", "animfromgroup", null},
+								{"&Delete  "+descriptor, "delete", null}, 
+								{"&Add Group To Animation As New Layer", "animinsert", null}
+					}));
+				}
+				else if( usrObj instanceof LayerNode) {
+					if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
+						menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
+					}
 				}
 			}
 
 			// Show the ContextMenu
 			contextMenu.removeAll();
 			UIUtil.constructMenu(contextMenu, menuScheme.toArray( new String[0][]), this);
-			contextMenu.node = (Node)usrObj;
 			
 			contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
@@ -519,6 +533,10 @@ public class NodeTree extends ContentTree
 			if( contextMenu.node instanceof LayerNode)	// should be unnecessary
 				workspace.mergeNodes( contextMenu.node.getNextNode(), (LayerNode) contextMenu.node);
 			break;
+		case "newRig":
+			workspace.addNewRigLayer(workspace.getSelectedNode(), 
+					workspace.getWidth(), workspace.getHeight(), "Rig", new Color(0,0,0,0));
+			break;
 		default:
 			System.out.println(evt.getActionCommand());
 		}
@@ -552,8 +570,11 @@ public class NodeTree extends ContentTree
 			//	alter the node visuals accordingly
 			if( obj instanceof GroupTree.Node) {
 				String str = ((GroupTree.Node)obj).getName();
-				if( MDebug.DEBUG && obj instanceof GroupTree.LayerNode)
-					str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().getID();
+				if( MDebug.DEBUG && obj instanceof GroupTree.LayerNode) {
+					try {
+						str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().getID();
+					}catch(Exception e) {}
+				}
 				renderPanel.label.setText( str);
 			}
 

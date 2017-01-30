@@ -12,7 +12,7 @@ import spirite.image_data.UndoEngine.UndoableAction;
 
 public abstract class Layer {
 	public abstract ImageHandle getActiveData();
-	public abstract List<ImageHandle> getUsedImageData();
+	public abstract List<ImageHandle> getUsedImages();
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();
 	public abstract int getHeight();
