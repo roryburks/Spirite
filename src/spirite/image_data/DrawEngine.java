@@ -398,7 +398,7 @@ public class DrawEngine {
 
 	
 	private void execute( MaskedImageAction action) {
-		action.performImageAction(action.data.handle);
+		action.performImageAction();
 		undoEngine.storeAction(action);
 	}
 
@@ -480,7 +480,7 @@ public class DrawEngine {
 		}
 		
 		@Override
-		public void performImageAction( ImageHandle UNUSED) {
+		public void performImageAction( ) {
 			queueSelectionMask(mask);
 			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
 			
@@ -506,7 +506,7 @@ public class DrawEngine {
 		}
 
 		@Override
-		protected void performImageAction( ImageHandle UNUSED) {
+		protected void performImageAction( ) {
 			
 			BufferedImage bi = workspace.checkoutImage(data.handle);
 			
@@ -567,7 +567,7 @@ public class DrawEngine {
 			description = "Clear Image";
 		}
 		@Override
-		protected void performImageAction(ImageHandle image) {
+		protected void performImageAction() {
 			
 			if( mask.selection == null) {
 				data.checkout();

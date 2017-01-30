@@ -661,8 +661,8 @@ public class ImageWorkspace {
 			this.y = y;
 		}
 		@Override
-		protected void performImageAction(ImageHandle image) {
-			BufferedImage img = checkoutImage(image);
+		protected void performImageAction() {
+			BufferedImage img = checkoutImage(data);
 			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			MUtil.clearImage(buffer);
 			Graphics g = buffer.getGraphics();
@@ -672,7 +672,7 @@ public class ImageWorkspace {
 			g = img.getGraphics();
 			g.drawImage(buffer, 0, 0, null);
 			g.dispose();
-			checkinImage(image);
+			checkinImage(data);
 		}
 		@Override
 		public void stackNewAction(UndoableAction newAction) {

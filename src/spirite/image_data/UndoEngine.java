@@ -560,7 +560,7 @@ public class UndoEngine {
 					hiddenAction.onAdd();
 			}
 			@Override
-			public void performImageAction(ImageHandle image) {
+			public void performImageAction() {
 				resetToKeyframe(frameCache.access());
 			}
 			
@@ -667,10 +667,10 @@ public class UndoEngine {
 			}
 						
 			// Refresh the Image to the current most recent keyframe
-			actions.get(pointer-met).performImageAction(image);
+			actions.get(pointer-met).performImageAction();
 
 			for( int i = pointer - met; i <= pointer; ++i) {
-				actions.get(i).performImageAction(image);
+				actions.get(i).performImageAction();
 			}
 
 			// Construct ImageChangeEvent and send it
@@ -694,7 +694,7 @@ public class UndoEngine {
 			}
 			for( int i = pointer - met; i <= pointer; ++i) {
 				actions.get(i).performAction();
-				actions.get(i).performImageAction(image);
+				actions.get(i).performImageAction();
 			}
 
 			// Construct ImageChangeEvent and send it
@@ -1071,7 +1071,7 @@ public class UndoEngine {
 		}
 		@Override protected void performAction() {}
 		@Override protected void undoAction() {}
-		protected abstract void performImageAction( ImageHandle image);
+		protected abstract void performImageAction( );
 		protected boolean isHeavyAction() {return false;}
 	}
 	
@@ -1080,7 +1080,7 @@ public class UndoEngine {
 		protected NilImageAction(ImageHandle data) {
 			super(data);
 		}
-		@Override		protected void performImageAction(ImageHandle image) {}
+		@Override		protected void performImageAction() {}
 		
 	}
 	
@@ -1150,8 +1150,7 @@ public class UndoEngine {
 			for( int i = 0; i<contexts.length; ++i) {
 				actions[i].performAction();
 				if( actions[i] instanceof ImageAction){
-					((ImageAction)actions[i]).performImageAction(
-							((ImageContext)contexts[i]).image);
+					((ImageAction)actions[i]).performImageAction();
 				}
 			}
 		}
@@ -1240,12 +1239,12 @@ public class UndoEngine {
 			stored.relinquish(this);
 		}
 		@Override
-		protected void performImageAction(ImageHandle image) {
-			BufferedImage bi = image.context.checkoutImage(image);
+		protected void performImageAction() {
+			BufferedImage bi = data.context.checkoutImage(data);
 			Graphics g = bi.getGraphics();
 			g.drawImage(stored.access(), dx, dy, null);
 			g.dispose();
-			image.context.checkinImage(image);
+			data.context.checkinImage(data);
 		}
 	}
 	

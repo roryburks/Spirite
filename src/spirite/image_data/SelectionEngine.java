@@ -188,7 +188,7 @@ public class SelectionEngine {
 		ImageAction action = new ClearSelectionAction(
 				getBuiltSelection(),
 				workspace.buildData(node));
-		action.performImageAction(node.getLayer().getActiveData().handle);
+		action.performImageAction();
 		undoEngine.storeAction(action);
 		return true;
 	}
@@ -404,7 +404,7 @@ public class SelectionEngine {
 		}
 
 		@Override
-		protected void performImageAction(ImageHandle image) {
+		protected void performImageAction() {
 			Graphics g = builtData.checkout();
 			
 			Graphics2D g2 = (Graphics2D)g;
@@ -488,7 +488,7 @@ public class SelectionEngine {
 			this.builtSelection = builtSelection;
 		}
 		@Override
-		protected void performImageAction(ImageHandle image) {
+		protected void performImageAction() {
 			Graphics2D g2 = (Graphics2D)builtImage.checkout();
 			g2.transform( builtSelection.getDrawFromTransform());
 			g2.drawImage(cachedData.access(), 0, 0, null);
