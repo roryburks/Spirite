@@ -87,11 +87,11 @@ public class ImageWorkspace {
 	
 	// Internal Components
 	private final GroupTree groupTree;
-	private final GroupNode referenceRoot;
 	private final UndoEngine undoEngine;
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
 	private final DrawEngine drawEngine;
+	private final ReferenceManager referenceManager;
 	
 	// External Components
 	private final CacheManager cacheManager;
@@ -120,7 +120,7 @@ public class ImageWorkspace {
 		undoEngine = new UndoEngine(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
 		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
-		referenceRoot = groupTree.new GroupNode("___ref");
+		referenceManager = new ReferenceManager(this);
 	}
 	
 	
@@ -275,6 +275,10 @@ public class ImageWorkspace {
 		return drawEngine;
 	}
 	
+	public ReferenceManager getReferenceManager() {
+		return referenceManager;
+	}
+	
 	// Doesn't feel great leaking external components, but they're very
 	//	relevant to images and it's better than given them MasterControl
 	public CacheManager getCacheManager() {
@@ -286,9 +290,6 @@ public class ImageWorkspace {
 	
 	public GroupTree.GroupNode getRootNode() {
 		return groupTree.getRoot();
-	}
-	public GroupNode getReferenceRoot() {
-		return referenceRoot;
 	}
 	public GroupTree getGroupTree() {
 		return groupTree;
@@ -531,60 +532,6 @@ public class ImageWorkspace {
 		}
 	}
 	
-	// :::: Reference Management
-	private boolean editingReference = false;
-	private float refAlpha = 1.0f;
-	public boolean isEditingReference() {
-		return editingReference;
-	}
-	public void setEditingReference( boolean edit) {
-		if( editingReference != edit) {
-			editingReference = edit;
-			triggerReferenceToggle( edit);
-		}
-	}
-	
-	public float getRefAlpha() {return refAlpha;}
-	public void setRefAlpha( float alpha) { 
-		this.refAlpha = alpha;
-		triggerReferenceStructureChanged(false);
-	}
-	
-	
-	
-	public void addReferenceNode( Node toAdd, Node parent, Node before) {
-		if( !verifyReference(parent) || (before != null && !verifyReference(before)))
-			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to insert into reference");
-		else {
-			parent._add(toAdd, before);
-			triggerReferenceStructureChanged(true);
-		}
-	}
-	public void clearReferenceNode( Node toRem) {
-		if( !verifyReference(toRem) && toRem != null)
-			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Non-reference attempted to be cleared.");
-		else
-			toRem._del();
-	}
-	public boolean verifyReference( Node node) {
-		int i = 0;
-		
-		while( i < 1000 && node != referenceRoot) {
-			if( node == null || node == groupTree.getRoot())
-				return false;
-			
-			node = node.getParent();
-			++i;
-		}
-		if( i == 1000) {
-			MDebug.handleError(ErrorType.STRUCTURAL, null, "Cyclical Node (verifyReference)");
-			return false;
-		}
-		
-		return true;
-	}
-	
-	
 	// :::: Image Checkout
 	private BufferedImage checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
@@ -637,6 +584,12 @@ public class ImageWorkspace {
 	 * ONLY USE IF YOU REALLY NEED THE CACHEDIMAGE, NOT JUST THE BUFFEREDIMAGE*/
 	CachedImage _accessCache( ImageHandle handle) {
 		return imageData.get(handle.id).cachedImage;
+	}
+	
+	/** Creates a Group Node that's detached from the ImageWorkspace, but still
+	 * has access to it.  (Mostly used for custom drawing). */
+	GroupNode _createDetatchedGroup(String name) {
+		return groupTree.new GroupNode(name);
 	}
 	
 	// :::: Various Actions
@@ -1205,11 +1158,7 @@ public class ImageWorkspace {
 		if( nodeInWorkspace(change.moveNode)) {
 			executeChange(change);
 		}
-		else {
-			change.execute();
-			if( verifyReference(change.moveNode)) 
-				triggerReferenceStructureChanged(true);
-		}
+		change.execute();
 	}
 	
 	
@@ -1850,46 +1799,6 @@ public class ImageWorkspace {
     }
     
     
-    /**
-     * MReferenceObservers - Triggers when the reference structure has changed,
-     * when the way References are drawn is changed, or when the input method
-     * is toggled between reference of non-reference.
-     */
-    public static interface MReferenceObserver {
-    	public void referenceStructureChanged( boolean hard);
-//    	public void referenceImageChanged();
-    	public void toggleReference( boolean referenceMode);
-    }
-    private final List<WeakReference<MReferenceObserver>> referenceObservers = new ArrayList<>();
-
-    public void triggerReferenceStructureChanged(boolean hard) {
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-            	obs.referenceStructureChanged( hard);
-    	}
-    }
-    private void triggerReferenceToggle(boolean edit) {
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-            	obs.referenceStructureChanged( edit);
-    	}
-    }
-
-    public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(new WeakReference(obs));}
-    public void removeReferenceObserve( MReferenceObserver obs) { 
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver other = it.next().get();
-    		if( other == obs || other == null)
-    			it.remove();
-    	}
-    }
 
     
     // :::: Resource Management

@@ -170,7 +170,7 @@ public class Penner
 			// Pen-down:
 			if( behavior != null)
 				behavior.onPenDown();
-			else if( workspace.isEditingReference()) {
+			else if( workspace.getReferenceManager().isEditingReference()) {
 				// Special Reference behavior
 				if( holdingCtrl) {
 					behavior = new ZoomingReference();

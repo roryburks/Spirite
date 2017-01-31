@@ -15,6 +15,8 @@ import spirite.ui.FrameManager;
  * TODO: Decide best way to have all Observers working on the AWT-EventQueue thread
  * no matter what thread triggers it.  (Copy-paste "Swing.InvokeLater 100 times or
  * implement some sort of class hierarchy).
+ * 
+ * TODO: Make all Observers weak-referenced.
  */
 public class Main{
     

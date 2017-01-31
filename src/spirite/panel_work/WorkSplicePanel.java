@@ -7,7 +7,7 @@ import java.awt.Rectangle;
 import javax.swing.GroupLayout;
 
 import spirite.brains.MasterControl;
-import spirite.image_data.ImageWorkspace.MReferenceObserver;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.UIUtil;
 
@@ -25,6 +25,10 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
 	final Zoomer zoomer;
     int offsetx, offsety;
 
+    final DrawPanel drawPanel;
+    private final ReferencePanel previewPanel;
+    private final ReferencePanel previewPanelBack;
+    
     Color normalBG = new Color(238,238,238);
     Color referenceBG = new Color( 210,210,242);
     /**
@@ -33,11 +37,12 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
     public WorkSplicePanel( WorkPanel context, MasterControl master) {
     	this.context = context;
         this.zoomer = context.zoomer;
-        previewPanel = new ReferencePanel(context, master);
+        previewPanel = new ReferencePanel(context, master, true);
         drawPanel = new DrawPanel( context, master);
+        previewPanelBack = new ReferencePanel(context, master, false);
         initComponents();
         
-        context.workspace.addReferenceObserve(this);
+        context.workspace.getReferenceManager().addReferenceObserve(this);
         
 
         offsetx = 0;
@@ -53,10 +58,12 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
 
         layout.setHorizontalGroup( layout.createParallelGroup()
         		.addComponent(previewPanel)
-        		.addComponent(drawPanel));
+        		.addComponent(drawPanel)
+        		.addComponent(previewPanelBack));
         layout.setVerticalGroup( layout.createParallelGroup()
         		.addComponent(previewPanel)
-        		.addComponent(drawPanel));
+        		.addComponent(drawPanel)
+        		.addComponent(previewPanelBack));
         this.setLayout(layout);
     }                      
     
@@ -76,8 +83,6 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
     }
 
               
-    DrawPanel drawPanel;
-    ReferencePanel previewPanel;
 
 	@Override	public void referenceStructureChanged(boolean hard) {}
 	@Override

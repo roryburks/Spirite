@@ -6,19 +6,25 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.MReferenceObserver;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.layers.Layer;
 import spirite.panel_work.WorkPanel.Zoomer;
 
 public class ReferencePanel extends JPanel 
@@ -28,21 +34,23 @@ public class ReferencePanel extends JPanel
 	private final MasterControl master;
 	private final Zoomer zoomer;
 	private final RenderEngine renderer;
+	private final boolean front;
 	
 	private ImageWorkspace workspace;
 	
 	private static final long serialVersionUID = 1L;
-	public ReferencePanel(WorkPanel context, MasterControl master) {
+	public ReferencePanel(WorkPanel context, MasterControl master, boolean front) {
 		this.zoomer = context.refzoomer;
 		this.master = master;
 		this.renderer = master.getRenderEngine();
+		this.front = front;
 		
 		workspace = context.workspace;
 		if( workspace == null) {
 			MDebug.handleError( ErrorType.FATAL, this, "Reference Panel with no WS");
 		}
 		workspace.addImageObserver(this);
-		workspace.addReferenceObserve(this);
+		workspace.getReferenceManager().addReferenceObserve(this);
 				
 		
 		this.setOpaque(false);
@@ -53,20 +61,39 @@ public class ReferencePanel extends JPanel
         super.paintComponent(g);
         
         if( workspace != null) {
-            RenderSettings settings = new RenderSettings();
-            settings.workspace = workspace;
-            settings.node = workspace.getReferenceRoot();
+            if( buffer != null) {
             
-            BufferedImage image = renderer.renderImage(settings);
             Graphics2D g2 = (Graphics2D)g;
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getRefAlpha()));
-            g.drawImage( image, 
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
+            g.drawImage( buffer, 
             		zoomer.itsX(0), zoomer.itsY(0),
-            		zoomer.itsX(image.getWidth()), zoomer.itsY(image.getHeight()),
-            		0, 0, image.getWidth(), image.getHeight(), null);
+            		zoomer.itsX(buffer.getWidth()), zoomer.itsY(buffer.getHeight()),
+            		0, 0, buffer.getWidth(), buffer.getHeight(), null);
+            }
         }
         
     }
+    
+    // ReferencePanel bypasses the normal RenderEngine mechamisms because the
+    //	refresh mechanisms of references are fairly simple and entirely tied
+    //	to the RefrerencePanel
+    private BufferedImage buffer = null;
+    
+    private void refresh() {
+    	buffer = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    	MUtil.clearImage(buffer);
+    	Graphics g = buffer.getGraphics();
+    	if( workspace != null) {
+    		List<Layer> list = (front)?
+    				workspace.getReferenceManager().getFrontList():
+   					workspace.getReferenceManager().getBackList();
+    				
+    		for( Layer layer : list) {
+    			layer.draw(g);
+    		}
+    	}
+    }
+    
 	
 	// :::: MImageObserver
 	@Override public void structureChanged(StructureChange evt) {}
@@ -78,6 +105,8 @@ public class ReferencePanel extends JPanel
 	// :::: ReferenceObserver
 	@Override
 	public void referenceStructureChanged(boolean hard) {
+		if( hard)
+			refresh();
 		repaint();
 		
 	}

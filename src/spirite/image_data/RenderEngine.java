@@ -36,7 +36,7 @@ import spirite.image_data.GroupTree.NodeValidator;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.MReferenceObserver;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.layers.Layer;
@@ -62,7 +62,7 @@ public class RenderEngine
 			
 			if( ws != null) {
 				ws.addImageObserver( this);
-				ws.addReferenceObserve(this);
+				ws.getReferenceManager().addReferenceObserve(this);
 			}
 		}
 		master.addWorkspaceObserver(this);
@@ -397,8 +397,8 @@ public class RenderEngine
 		public int width = -1;
 		public int height = -1;
 
-		// Only one of the following three can be non-null.
-		//	If all three are null, it draws the root node
+		// Only one of the following can be non-null.
+		//	If all are null, it draws the root node
 		public Node node = null;
 		public ImageHandle image = null;
 		public Layer layer = null;
@@ -614,7 +614,7 @@ public class RenderEngine
 	@Override	public void currentWorkspaceChanged( ImageWorkspace ws, ImageWorkspace old) {}
 	@Override	public void newWorkspace( ImageWorkspace ws) {
 		ws.addImageObserver( this);
-		ws.addReferenceObserve(this);
+		ws.getReferenceManager().addReferenceObserve(this);
 	}
 	@Override
 	public void removeWorkspace( ImageWorkspace ws) {
@@ -635,13 +635,7 @@ public class RenderEngine
 		}
 	}
 	@Override
-	public void referenceStructureChanged(boolean hard) {
-		// TODO: VERY DEBUG
-		for(CachedImage c: imageCache.values())
-			c.flush();
-		imageCache.clear();
-		
-	}
+	public void referenceStructureChanged(boolean hard) {}
 	@Override	public void toggleReference(boolean referenceMode) {}
 
 }

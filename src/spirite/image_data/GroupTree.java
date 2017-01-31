@@ -78,9 +78,9 @@ public class GroupTree {
 			if( context.nodeInWorkspace(this) && this.visible != visible) {
 				context.executeChange( context.new VisibilityChange(this, visible));
 			}
-			else if( context.verifyReference(this)) {
+			else if( context.getReferenceManager().isReferenceNode(this)) {
 				this.visible = visible;
-				context.triggerReferenceStructureChanged(false);
+				context.getReferenceManager().triggerReferenceStructureChanged(false);
 			}
 			else { this.visible = visible;}
 		}

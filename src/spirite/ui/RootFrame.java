@@ -370,7 +370,7 @@ public class RootFrame extends javax.swing.JFrame
     	WorkPanel workPanel = workPane.getCurrentWorkPane();
     	if( workPanel == null) return true;
     	
-    	Zoomer zoomer = (workPanel.workspace.isEditingReference())?
+    	Zoomer zoomer = (workPanel.workspace.getReferenceManager().isEditingReference())?
     			workPanel.refzoomer : workPanel.zoomer;
     	
         if( command.equals("zoom_in")) {

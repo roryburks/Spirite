@@ -120,21 +120,21 @@ public class WorkPanel extends javax.swing.JPanel
 
     	public int getCX() {return cx;}
     	public int getCY() {return cy;}
-    	public void setCX(int x) {cx = x; workspace.triggerReferenceStructureChanged(false);}
-    	public void setCY(int y) {cy = y; workspace.triggerReferenceStructureChanged(false);}
+    	public void setCX(int x) {cx = x; workspace.getReferenceManager().triggerReferenceStructureChanged(false);}
+    	public void setCY(int y) {cy = y; workspace.getReferenceManager().triggerReferenceStructureChanged(false);}
     	
     	
     	@Override
     	public void setZoomLevel(int amount) {
             
     		super.setZoomLevel(amount);
-    		workspace.triggerReferenceStructureChanged(false);
+    		workspace.getReferenceManager().triggerReferenceStructureChanged(false);
     	}
     	
     	public float getRawZoom() {return zoom;}
     	public void setFineZoom( float zoom) {
     		this.zoom = zoom;
-    		workspace.triggerReferenceStructureChanged(false);
+    		workspace.getReferenceManager().triggerReferenceStructureChanged(false);
     	}
     	
     	public float getZoom() {

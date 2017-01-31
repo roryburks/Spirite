@@ -29,6 +29,7 @@ import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ReferenceManager;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine;
@@ -464,8 +465,8 @@ public class MasterControl
     		});
     		commandMap.put("toggle_reference", new Runnable() {
 				@Override public void run() {
-					System.out.println("TEST");
-					workspace.setEditingReference(!workspace.isEditingReference());
+					ReferenceManager rm = workspace.getReferenceManager();
+					rm.setEditingReference(!rm.isEditingReference());
 				}
 			});
     		commandMap.put("clearLayer", new Runnable() {

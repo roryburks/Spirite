@@ -25,14 +25,14 @@ import spirite.ui.components.SliderPanel;
  *
  */
 public class ReferenceSchemePanel extends OmniComponent{
-	private final ReferenceTreePanel referenceTreePanel;
+	private final ReferenceListPanel referenceTreePanel;
 	private final JButton btn1 = new JButton();
 	private final JButton btn2 = new JButton();
 	private final OpacitySlider opacitySlider = new OpacitySlider();
 	
 	
 	public ReferenceSchemePanel(MasterControl master) {
-		referenceTreePanel = new ReferenceTreePanel(master, this);
+		referenceTreePanel = new ReferenceListPanel(master, this);
 		initComponents();
 	}
 	
@@ -81,18 +81,18 @@ public class ReferenceSchemePanel extends OmniComponent{
 		
 		public void refresh() {
 
-			referenceTreePanel.workspace.getRefAlpha();
+//			referenceTreePanel.workspace.getRefAlpha();
 		}
 		
 		@Override
 		public void onValueChanged(float newValue) {
-			referenceTreePanel.workspace.setRefAlpha(getValue());
+//			referenceTreePanel.workspace.setRefAlpha(getValue());
 			super.onValueChanged(newValue);
 		}
 	}
 	
 	@Override
 	public void onCleanup() {
-		referenceTreePanel.cleanup();
+//		referenceTreePanel.cleanup();
 	}
 }
