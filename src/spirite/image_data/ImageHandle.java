@@ -50,8 +50,9 @@ public class ImageHandle {
 	/** Should only be used for reading/copying in things that need direct
 	 * access to the BufferedImage.
 	 * 
-	 * RETURN VALUE SHOULD NEVER BE STORED, if used for writing, will not 
-	 * trigger proper Observers.
+	 * RETURN VALUE SHOULD NEVER BE STORED LONG-TERM, if used for writing, 
+	 * will not trigger proper Observers.  And probably other bad stuff 
+	 * will happen if it sticks around in GC
 	 *  */
 	public BufferedImage deepAccess() {
 		if( context == null) return null;
@@ -81,10 +82,10 @@ public class ImageHandle {
 	}
 
 	public int getWidth() {
-		return context.getData(id).access().getWidth();
+		return context.getWidthOf(id);
 	}
 	public int getHeight() {
-		return context.getData(id).access().getHeight();
+		return context.getHeightOf(id);
 	}
 	
 	public void refresh() {
@@ -98,5 +99,4 @@ public class ImageHandle {
 	void flush() {
 		context.getData(id).flush();
 	}
-	
 }

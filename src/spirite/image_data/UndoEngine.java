@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager;
@@ -224,8 +225,10 @@ public class UndoEngine {
 	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
 	void prepareContext( ImageHandle data) {
+//		System.out.println("Preparing:" + data.id);
 		for( UndoContext context : contexts) {
-			if( context.image == data)
+			if( context.image == null) continue;
+			if( context.image.equals(data))
 				return;
 		}
 		
@@ -236,7 +239,8 @@ public class UndoEngine {
 		assert( data != null);
 
 		for( UndoContext context : contexts) {
-			if( context.image == data)
+			if( context.image == null) continue;
+			if( context.image.equals(data))
 				return context;
 		}
 		
@@ -313,12 +317,14 @@ public class UndoEngine {
 			ImageAction iaction = (ImageAction)action;
 			
 			for( UndoContext test : contexts) {
-				if( test.image == iaction.builtImage.handle) {
+				if( test.image == null) continue;
+				if( test.image.equals(iaction.builtImage.handle)) {
 					context = test;
 					break;
 				}
 			}
 		}
+		
 
 		
 		if( context != null) {
@@ -332,6 +338,7 @@ public class UndoEngine {
 		}
 		else {
 			assert( action instanceof ImageAction);
+			System.out.println(((ImageAction)action).builtImage.handle);
 			contexts.add(new ImageContext( ((ImageAction)action).builtImage.handle));
 		}
 		
@@ -452,7 +459,7 @@ public class UndoEngine {
 			if( context instanceof ImageContext ) {
 					ImageContext icontext = (ImageContext)context;
 					
-					if( icontext.image == handle) {
+					if( icontext.image.equals(handle)) {
 					
 					CachedImage ci = cacheManager.cacheImage(newImage, workspace);
 					
@@ -562,7 +569,7 @@ public class UndoEngine {
 			}
 			@Override
 			public void performImageAction() {
-				resetToKeyframe(frameCache.access());
+				resetToKeyframe(frameCache);
 			}
 			
 			@Override
@@ -610,14 +617,15 @@ public class UndoEngine {
 			}
 		}
 		
-		private void resetToKeyframe( BufferedImage frame) {
+		private void resetToKeyframe( CachedImage frame) {
+//			workspace._replaceIamge(image, frame);
 			BuiltImageData built = workspace.new BuiltImageData(image);
 			BufferedImage bi = built.checkoutRaw();
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-			g2.drawImage( frame, 0, 0,  null);
+			g2.drawImage( frame.access(), 0, 0,  null);
 			g2.setComposite( c);
 			g2.dispose();
 			built.checkin();

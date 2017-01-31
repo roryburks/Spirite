@@ -247,8 +247,8 @@ public class DrawEngine {
 		 */
 		public synchronized boolean stepStroke() {
 			if( state != STATE.DRAWING || data == null) {
-				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
-				endStroke();
+//				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
+//				endStroke();
 				return false;
 			}
 			
@@ -303,6 +303,8 @@ public class DrawEngine {
 		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
 		 * to the data, and flushing the used resources. */
 		public synchronized void endStroke() {
+			System.out.println("TEST");
+			
 			state = STATE.READY;
 			
 			if( data != null) {
@@ -420,7 +422,7 @@ public class DrawEngine {
 		
 		Point p = data.convert( new Point(x,y));
 		
-		BufferedImage bi = data.handle.deepAccess();
+		BufferedImage bi = data.checkoutRaw();
 		if( !MUtil.coordInImage( p.x, p.y, bi)) {
 			System.out.println("OUT:" + p);
 			return false;
@@ -429,6 +431,7 @@ public class DrawEngine {
 			System.out.println("DUPE");
 			return false;
 		}
+		data.checkin();
 		
 		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
 		return true;

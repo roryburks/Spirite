@@ -291,6 +291,7 @@ public class Penner
 				if( strokeEngine != null) {
 					strokeEngine.endStroke();
 					
+					System.out.println("END");
 					StrokeAction stroke = drawEngine.new StrokeAction( 
 							strokeEngine.getParams(), 
 							strokeEngine.getHistory(),

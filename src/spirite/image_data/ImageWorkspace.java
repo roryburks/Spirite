@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+import javax.activation.UnsupportedDataTypeException;
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.Globals;
@@ -65,7 +68,21 @@ public class ImageWorkspace {
 	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
 	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
 	//	by ImageWorkspace.
-	private final Map<Integer,CachedImage> imageData;
+	private final Map<Integer,InternalImage> imageData;
+	
+	private class InternalImage {
+		CachedImage cachedImage;
+		final boolean isDynamic = false;
+		InternalImage( CachedImage ci) { this.cachedImage = ci;}
+		
+		int getWidth() {
+			return (isDynamic) ? width : cachedImage.access().getWidth();
+		}
+		int getHeight() {
+			return (isDynamic) ? height : cachedImage.access().getHeight();
+		}
+	}
+	
 	private boolean isValidHandle(ImageHandle handle) {
 		return ( handle.context == this && imageData.containsKey(handle.id));
 	}
@@ -171,13 +188,20 @@ public class ImageWorkspace {
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
-			imageData.get(i).relinquish(this);
+			imageData.get(i).cachedImage.relinquish(this);
 			imageData.remove(i);
 		}
 	}
 	
 	CachedImage getData(int i) {
-		return imageData.get(i);
+		return imageData.get(i).cachedImage;
+	}
+
+	int getWidthOf( int i) {
+		return imageData.get(i).getWidth();
+	}
+	int getHeightOf( int i) {
+		return imageData.get(i).getHeight();
 	}
 
 	/** Called when an image is first made or is first loaded, resets the UndoEngine
@@ -275,7 +299,7 @@ public class ImageWorkspace {
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
 		
-		for( Entry<Integer,CachedImage> entry : imageData.entrySet()) {
+		for( Entry<Integer,InternalImage> entry : imageData.entrySet()) {
 			list.add( new ImageHandle( this, entry.getKey()));
 		}
 		
@@ -297,7 +321,10 @@ public class ImageWorkspace {
 		public final ImageHandle handle;
 		private final int ox;
 		private final int oy;
+
+		private BufferedImage working = null;
 		private Graphics g = null;
+		
 		public BuiltImageData( ImageHandle handle) {
 			this.handle = handle;
 			this.ox = 0;
@@ -323,29 +350,112 @@ public class ImageWorkspace {
 		 * Creates a graphical object with transforms applied such that
 		 * drawing on the returned Graphics will draw on the correct Image
 		 * Data spot.
+		 * 
+		 * !!! When done modifying the image always call checkout. !!!
 		 */
 		public Graphics checkout() {
-			BufferedImage bi = checkoutImage(handle);
-			g = bi.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
-			g2.translate(-ox, -oy);
-			return g;
+			if( handle.context != ImageWorkspace.this)
+				MDebug.handleError(ErrorType.STRUCTURAL, null, "Checking out image in wrong workspace");
+			
+			InternalImage internal = imageData.get(handle.id);
+			
+			if( internal.isDynamic) {
+				undoEngine.prepareContext(handle);
+				System.out.println("Checkout:" + handle.id);
+				if( working != null)
+					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
+				
+				working = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+				Graphics g = working.getGraphics();
+				draw(g);
+				return g;
+			}
+			else {
+				BufferedImage bi = checkoutImage(handle);
+				g = bi.getGraphics();
+				Graphics2D g2 = (Graphics2D)g;
+				g2.translate(-ox, -oy);
+				return g;
+			}
 		}
 		
-		/** Retrieves the underlying BufferedImage of the BuiltImage */
+		/** Retrieves the underlying BufferedImage of the BuiltImage
+		 * 
+		 * !!! When done modifying the image always call checkout. !!!
+		 */
 		public BufferedImage checkoutRaw() {
-			return checkoutImage(handle);
+			InternalImage internal = imageData.get(handle.id);
+			
+			if( internal.isDynamic) {
+				undoEngine.prepareContext(handle);
+				System.out.println("Checkout:" + handle.id);
+				if( working != null)
+					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
+
+				working = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+				Graphics g = working.getGraphics();
+				draw(g);
+				g.dispose();
+				return working;
+			}
+			else
+				return checkoutImage(handle);
 		}
 		
 		/**
 		 * Once finished drawn you must checkin your data.  Not only does this
 		 * dispose the Graphics (which is debatably necessary), but it triggers
-		 * the appropriate ImageChange actions
+		 * the appropriate ImageChange actions.  And if the ImageHandle is 
+		 * Dynamic, it's VERY important to call this so that it gets anchored
+		 * correctly
 		 */
 		public void checkin() {
-			checkinImage(handle);
-			if( g != null)
+			InternalImage internal = imageData.get(handle.id);
+			
+			if( internal.isDynamic) {
+				System.out.println("Checkin:" + handle.id);
+				// Reset all draw properties.  There might be a better way.
+			//	if( g != null)
+		//			g.dispose();
+	//			g = working.getGraphics();
+				
+				// Draws the old data, as built ontop of the new
+//				draw(g);
+//				g.dispose();
+				
+				
+				
+				try {
+					Rectangle rect = MUtil.findContentBounds(working, 0, true);
+					
+					if( !rect.isEmpty()) {
+						System.out.println(rect);
+						BufferedImage bi = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+						Graphics g = bi.getGraphics();	// Over-writing scope not strictly necessary
+						g.drawImage(working, -rect.x, -rect.y, null);
+						g.dispose();
+						_replaceIamge(handle, cacheManager.cacheImage(bi, ImageWorkspace.this));
+					}
+				} catch (UnsupportedDataTypeException e) {
+					e.printStackTrace();
+					MDebug.handleError(ErrorType.STRUCTURAL, e, "Bad ImageDataType on Dynamic Image Re-bound");
+				}
+				working.flush();
+				working = null;
+				
+
+				ImageChangeEvent evt = new ImageChangeEvent();
+				evt.dataChanged.add(handle);
+				evt.workspace = ImageWorkspace.this;
+				triggerImageRefresh( evt);
+			}
+			else if( g == null)	{// Should only happen if it was a raw checkout.
+				checkinImage(handle);
+			}
+			else {
+				checkinImage(handle);
 				g.dispose();
+			}
 			g = null;
 		}
 		
@@ -494,7 +604,8 @@ public class ImageWorkspace {
 		//	objects have images checked out so that they are checked in eventually
 		//	and that they terminate correctly if the image were to be unloaded.
 		
-		return image.deepAccess();
+		InternalImage internalImage = imageData.get(image.id);
+		return internalImage.cachedImage.access();
 	}
 	
 	private void checkinImage( ImageHandle handle) {
@@ -513,8 +624,10 @@ public class ImageWorkspace {
 	 * and 
 	 */
 	void _replaceIamge( ImageHandle old, CachedImage newImg) {
-		imageData.get(old.id).relinquish(this);
-		imageData.put(old.id, newImg);
+		InternalImage internal = imageData.get(old.id);
+		
+		internal.cachedImage.relinquish(this);
+		internal.cachedImage = newImg;
 		newImg.reserve(this);
 		
 		
@@ -529,7 +642,7 @@ public class ImageWorkspace {
 	 * could avoid it. 
 	 * ONLY USE IF YOU REALLY NEED THE CACHEDIMAGE, NOT JUST THE BUFFEREDIMAGE*/
 	CachedImage _accessCache( ImageHandle handle) {
-		return imageData.get(handle.id);
+		return imageData.get(handle.id).cachedImage;
 	}
 	
 	// :::: Various Actions
@@ -747,7 +860,8 @@ public class ImageWorkspace {
 		for( Entry<Integer,BufferedImage> entry : newData.entrySet()) {
 			CachedImage ci = cacheManager.cacheImage(entry.getValue(), this);
 			ci.reserve(this);
-			imageData.put( workingID, ci);
+			
+			imageData.put( workingID, new InternalImage(ci));
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -770,7 +884,7 @@ public class ImageWorkspace {
 	 */
 	public ImageHandle importData( BufferedImage newImage) {
 		CachedImage ci = cacheManager.cacheImage(newImage, this);
-		imageData.put( workingID, ci);
+		imageData.put( workingID, new InternalImage(ci));
 		ci.reserve(this);
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
@@ -780,7 +894,7 @@ public class ImageWorkspace {
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
 		CachedImage ci = cacheManager.cacheImage(img, this);
 		ci.reserve(this);
-		imageData.put( workingID, ci);
+		imageData.put( workingID, new InternalImage(ci));
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 
@@ -809,18 +923,21 @@ public class ImageWorkspace {
 		CachedImage ci = cacheManager.cacheImage( bi, this);
         Graphics g = bi.createGraphics();
         g.setColor( c);
-        g.fillRect( 0, 0, width, height);
+        g.fillRect( 0, 0, w, h);
         g.dispose();
-        imageData.put(workingID, ci);
+        
+        InternalImage internal = new InternalImage(ci);
+//        internal.isDynamic = true;
+        imageData.put(workingID, internal);
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
 		
+        System.out.println("Dynamic: " + (workingID-1));
+        
 		LayerNode node = groupTree.new LayerNode( new RigLayer(handle), name);
 		_addLayer(node,context);
 		
 		return node;
-		
-		
 	}
 	
 	/** A Shell Layer is a layer whose ImageHandles are not yet linked to
@@ -1796,9 +1913,9 @@ public class ImageWorkspace {
     	List<ImageHandle> handles = new ArrayList<>(imageData.size());
     	List<CachedImage> caches = new ArrayList<>(imageData.size());
         	
-    	for( Entry<Integer,CachedImage> entry : imageData.entrySet()) {
+    	for( Entry<Integer,InternalImage> entry : imageData.entrySet()) {
     		handles.add( new ImageHandle(this, entry.getKey()));
-    		caches.add( entry.getValue());
+    		caches.add( entry.getValue().cachedImage);
     	}
     	for( CachedImage ci :  caches) {
     		ci.reserve(handles);
@@ -1818,8 +1935,8 @@ public class ImageWorkspace {
     }
     
 	public void cleanup() {
-		for( CachedImage img : imageData.values()) {
-			img.relinquish(this);
+		for( InternalImage img : imageData.values()) {
+			img.cachedImage.relinquish(this);
 		}
 		
 		undoEngine.cleanup();
