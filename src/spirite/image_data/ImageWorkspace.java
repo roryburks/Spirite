@@ -8,9 +8,11 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1593,12 +1595,8 @@ public class ImageWorkspace {
     	public boolean getSelectionLayerChange() { return selectionLayerChange;}
     	public boolean isStructureChange() {return isStructureChange;}
     }
-    List<MImageObserver> imageObservers = new ArrayList<>();
-    
-    private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
-        for( MImageObserver obs : imageObservers)
-            obs.structureChanged( evt);
-    }
+    List<WeakReference<MImageObserver>> imageObservers = new ArrayList<>();
+
     public void triggerInternalLayerChange( Layer layer) {
     	ImageChangeEvent evt = new ImageChangeEvent();
     	evt.workspace = this;
@@ -1612,9 +1610,25 @@ public class ImageWorkspace {
     	
     	triggerImageRefresh(evt);
     }
+    private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
+    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
+    	
+    	while( it.hasNext()) {
+    		MImageObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else
+    			obs.structureChanged( evt);
+    	}
+    }
     synchronized void triggerImageRefresh(ImageChangeEvent evt) {
-        for( MImageObserver obs : imageObservers)
-            obs.imageChanged(evt);
+    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
+    	
+    	while( it.hasNext()) {
+    		MImageObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else
+    			obs.imageChanged(evt);
+    	}
         
         if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
 			changed = false;
@@ -1626,8 +1640,15 @@ public class ImageWorkspace {
 		}
     }
 
-    public void addImageObserver( MImageObserver obs) { imageObservers.add(obs);}
-    public void removeImageObserver( MImageObserver obs) { imageObservers.remove(obs); }
+    public void addImageObserver( MImageObserver obs) { imageObservers.add(new WeakReference<>(obs));}
+    public void removeImageObserver( MImageObserver obs) { 
+    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
+    	while( it.hasNext()) {
+    		MImageObserver other= it.next().get();
+    		if( other == obs || other == null)
+    			it.remove(); 
+    	}
+    }
     
 
 
@@ -1637,15 +1658,27 @@ public class ImageWorkspace {
     public static interface MSelectionObserver{
     	public void selectionChanged( Node newSelection);
     }
-    List<MSelectionObserver> selectionObservers = new ArrayList<>();
+    List<WeakReference<MSelectionObserver>> selectionObservers = new ArrayList<>();
     
     private synchronized void triggerSelectedChanged() {
-        for( MSelectionObserver obs : selectionObservers)
-            obs.selectionChanged( selected);
+    	Iterator<WeakReference<MSelectionObserver>> it = selectionObservers.iterator();
+    	while( it.hasNext()) {
+    		MSelectionObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else  
+    			obs.selectionChanged( selected);
+    	}
 	}
 
-    public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(obs);}
-    public void removeSelectionObserver( MSelectionObserver obs) { selectionObservers.remove(obs); }
+    public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(new WeakReference<>(obs));}
+    public void removeSelectionObserver( MSelectionObserver obs) { 
+    	Iterator<WeakReference<MSelectionObserver>> it = selectionObservers.iterator();
+    	while( it.hasNext()) {
+    		MSelectionObserver other = it.next().get();
+    		if( other == obs || other == null)
+    			it.remove();
+    	}
+    }
     
     
     
@@ -1677,16 +1710,27 @@ public class ImageWorkspace {
     		return changed;
     	}
     }
-    List<MWorkspaceFileObserver> fileObservers = new ArrayList<>();
+    List<WeakReference<MWorkspaceFileObserver>> fileObservers = new ArrayList<>();
     
     private synchronized void triggerFileChange() {
-        for( MWorkspaceFileObserver obs : fileObservers)
-            obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
-
+    	Iterator<WeakReference<MWorkspaceFileObserver>> it = fileObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceFileObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else 
+    			obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
+    	}
     }
 
-    public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(obs);}
-    public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.remove(obs); }
+    public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(new WeakReference<>(obs));}
+    public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) {
+    	Iterator<WeakReference<MWorkspaceFileObserver>> it = fileObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceFileObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			fileObservers.remove(obs); 
+    	}
+    }
     
     
     /**
@@ -1699,23 +1743,36 @@ public class ImageWorkspace {
 //    	public void referenceImageChanged();
     	public void toggleReference( boolean referenceMode);
     }
-    private final List<MReferenceObserver> referenceObservers = new ArrayList<>();
+    private final List<WeakReference<MReferenceObserver>> referenceObservers = new ArrayList<>();
 
     public void triggerReferenceStructureChanged(boolean hard) {
-
-        for( MReferenceObserver obs : referenceObservers)
-        	obs.referenceStructureChanged( hard);
-
+    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
+    	while( it.hasNext()) {
+    		MReferenceObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else
+            	obs.referenceStructureChanged( hard);
+    	}
     }
     private void triggerReferenceToggle(boolean edit) {
-
-        for( MReferenceObserver obs : referenceObservers)
-        	obs.toggleReference(edit);
-
+    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
+    	while( it.hasNext()) {
+    		MReferenceObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else
+            	obs.referenceStructureChanged( edit);
+    	}
     }
 
-    public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(obs);}
-    public void removeReferenceObserve( MReferenceObserver obs) { referenceObservers.remove(obs); }
+    public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(new WeakReference(obs));}
+    public void removeReferenceObserve( MReferenceObserver obs) { 
+    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
+    	while( it.hasNext()) {
+    		MReferenceObserver other = it.next().get();
+    		if( other == obs || other == null)
+    			it.remove();
+    	}
+    }
 
     
     // :::: Resource Management

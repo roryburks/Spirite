@@ -1,6 +1,7 @@
 package spirite.brains;
 
 import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -38,7 +40,7 @@ import spirite.MUtil;
  */
 public class CacheManager {
 	protected long cacheSize = 0;
-	private final Map<Object,CacheDomain> cache = new HashMap<>();
+	private final Map<Object,CacheDomain> cache = new WeakHashMap<>();
 	
 	public long getCacheSize() {
 		return cacheSize;
@@ -48,16 +50,40 @@ public class CacheManager {
 		if( !MDebug.DEBUG) {
 			return null;
 		}
-		
 		return cache;
 	}
 	
-	public class CacheDomain {
-		private final Object context;
-		private CacheDomain( Object context) {
-			this.context = context;
+	/**
+	 * Removes Caches which are empty (have no CacheImages
+	 */
+	public void clearUnusedDomains() {
+		// !!!! For domains that get removed through WeakReference erasure,
+		//	it MIGHT be necessary to manually flush and de-link CachedImages
+		//	but that might screw up multi-object CachedImages and GC SHOULD
+		//	take care of them anyway.
+		List<CacheDomain> toRem = new ArrayList<CacheDomain>();
+		for( CacheDomain context : toRem) {
+			if( context.list.isEmpty() ||
+				context.context.get()==null) {
+				toRem.add(context);
+			}
 		}
-		List<CachedImage> list = new LinkedList<>();
+		for( CacheDomain rem : toRem) {
+			cacheSize -= rem.getSize();
+			rem.flush();
+			cache.remove(rem.context);
+		}
+	}
+	
+	/**
+	 * A CacheDomain 
+	 */
+	public class CacheDomain {
+		private final WeakReference<Object> context;
+		private final List<CachedImage> list = new LinkedList<>();
+		private CacheDomain( Object context) {
+			this.context = new WeakReference<>(context);
+		}
 		public int getSize() {
 			int size = 0;
 			
@@ -66,15 +92,17 @@ public class CacheManager {
 			}
 			return size;
 		}
+		private void flush() {
+			for( CachedImage ci : list) {
+				ci.relinquishSoft(context.get());
+			}
+		}
 	}
 	
-	//  Not sure if this code should be here or in RenderEngine since
-	//	even though many places should use CacheManager to track resource
-	//	count, tracking last_used is probably only useful to RenderEngine
 	public class CachedImage {
 		protected BufferedImage data = null;
 		protected long last_used;
-		protected Collection<Object> users = new LinkedHashSet<>();
+		protected Collection<WeakReference<Object>> users = new LinkedHashSet<>();
 		Object domain;
 		
 		CachedImage(Object domain) {
@@ -102,19 +130,11 @@ public class CacheManager {
 			data.flush();
 			data = null;
 			
-			List<CacheDomain> toRem = new ArrayList<CacheDomain>();
 			for( CacheDomain context : cache.values()) {
 				int i = context.list.indexOf(this);
 				if( i != -1) context.list.remove(i);
-				
-				if( context.list.isEmpty()) {
-					toRem.add(context);
-				}
 			}
-			for( CacheDomain rem : toRem) {
-				cache.remove(rem.context);
-			}
-			
+			clearUnusedDomains();
 		}
 		
 		void setData( BufferedImage image) {
@@ -124,13 +144,33 @@ public class CacheManager {
 		}
 		
 		public void reserve( Object obj) {
-			users.add(obj);
+			users.add(new WeakReference<>(obj));
 		}
 		public void relinquish( Object obj) {
-			if( !users.contains(obj)) {
+			WeakReference<Object> toRem = null;
+			
+			for( WeakReference<Object> wr : users) {
+				if( wr.get() == obj) {
+					toRem = wr;
+					break;
+				}
+			}
+			if( toRem == null) {
 				MDebug.handleError( ErrorType.STRUCTURAL, this, "Tried to relinquish from a non-reserved object (this probably means the intended relinquish will never happen).");
 			}
 			
+			users.remove(toRem);
+			if( users.isEmpty()) {
+				flush();
+			}
+		}
+		
+		/** Relinquishes without giving an error if it wasn't registered;
+		 * used when a Weak Reference domain has been cleared.
+		 */
+		private void relinquishSoft( Object obj) {
+			// Note: Assumes that if one WeakReference of a certain Object has been
+			//	cleared by GC then all others will as well.
 			users.remove(obj);
 			if( users.isEmpty()) {
 				flush();
