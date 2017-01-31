@@ -16,6 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
+import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 
@@ -147,7 +148,7 @@ public class Dialogs
     	return null;
     }
     
-    public boolean performNewLayerDialog( ImageWorkspace workspace) {
+    public NewLayerHelper callNewLayerDialog( ImageWorkspace workspace) {
 
 		NewLayerDPanel panel = new NewLayerDPanel(master);
 		
@@ -159,20 +160,14 @@ public class Dialogs
 			Globals.getIcon("new_layer"));
 		
 		if( response == JOptionPane.OK_OPTION) {
-			int w = panel.getValueWidth();
-			int h = panel.getValueHeight();
-			String name = panel.getValueName();
-			//String type = panel.getValueType();
-			Color c = panel.getValueColor();
-			
 
 			// Add the new layer contextually according to the selected Node
-			GroupTree.Node context = workspace.getSelectedNode();
-			
-			workspace.addNewSimpleLayer(context, w, h, name, c);
-			return true;
+//			GroupTree.Node context = workspace.getSelectedNode();
+//			
+//			workspace.addNewSimpleLayer(context, w, h, name, c);
+			return panel.getHelper();
 		}
-		return false;
+		return null;
     }
     
 

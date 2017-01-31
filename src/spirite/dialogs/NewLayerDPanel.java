@@ -22,6 +22,24 @@ import spirite.image_data.ImageWorkspace;
 import spirite.ui.components.MTextFieldNumber;
 
 public class NewLayerDPanel extends JPanel {
+	public class NewLayerHelper {
+		public final int width, height;
+		public final Color color;
+		public final String name;
+		public final String type;
+		private NewLayerHelper() {
+			width = tfWidth.getNumber();
+			height = tfHeight.getNumber();
+			color = getValueColor();
+			name = tfPartName.getText();
+			type = tfPartType.getText();
+		}
+	}
+	
+	public NewLayerHelper getHelper() {
+		return new NewLayerHelper();
+	}
+	
 	private static final long serialVersionUID = 1L;
 	private MTextFieldNumber tfWidth;
 	private MTextFieldNumber tfHeight;
@@ -143,7 +161,7 @@ public class NewLayerDPanel extends JPanel {
 	 */
 	private void initComponents() {
 		
-		JLabel lblPartName = new JLabel("Part Name:");
+		JLabel lblPartName = new JLabel("Layer Name:");
 		
 		tfPartName = new JTextField();
 		tfPartName.setColumns(10);
@@ -161,7 +179,7 @@ public class NewLayerDPanel extends JPanel {
 		tfPartType = new JTextField();
 		tfPartType.setColumns(10);
 		
-		lblPartType = new JLabel("Part Type:");
+		lblPartType = new JLabel("Base Part:");
 		
 		JSeparator separator = new JSeparator();
 		

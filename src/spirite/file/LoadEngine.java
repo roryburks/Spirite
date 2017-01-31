@@ -327,7 +327,8 @@ public class LoadEngine {
 						parts.add( new Part( 
 								new ImageHandle( null, pid),
 								partName,
-								pox, poy, pdepth));
+								pox, poy, pdepth,
+								true, 1.0f));
 					}
 					
 					
@@ -410,27 +411,6 @@ public class LoadEngine {
 					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
 					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
 					break;
-				case SaveLoadUtil.NODE_RIG_LAYER: {
-					int partCount = ra.readByte();
-					List<Part> parts = new ArrayList<Part>( partCount);
-					
-					
-					for( int i=0; i<partCount; ++i) {
-						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
-						int pox = ra.readShort();
-						int poy = ra.readShort();
-						int pdepth = ra.readInt();
-						int pid = ra.readInt();
-						parts.add( new Part( 
-								new ImageHandle( null, pid),
-								partName,
-								pox, poy, pdepth));
-					}
-					
-					
-					RigLayer rig = new RigLayer( parts);
-					node = workspace.addShellLayer(nodeLayer[depth-1], rig, name);
-					break;}
 				}
 			}
 			if( node != null) {

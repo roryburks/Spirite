@@ -20,16 +20,19 @@ public class SliderPanel extends JPanel {
 	private String label = "";
 	protected boolean hardCapped = true;
 	
+	
 	public SliderPanel() {
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				setValue( widthToValue( e.getX() / (float)getWidth()));
+				if( isEnabled())
+					setValue( widthToValue( e.getX() / (float)getWidth()));
 				super.mousePressed(e);
 			}
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				setValue( widthToValue( e.getX() / (float)getWidth()));
+				if( isEnabled())
+					setValue( widthToValue( e.getX() / (float)getWidth()));
 				super.mouseDragged(e);
 			}
 		};
@@ -99,18 +102,29 @@ public class SliderPanel extends JPanel {
 	protected float widthToValue( float portion) {
 		return portion * (max-min)  + min;
 	}
-	
+
+	Color bgGradLeft = new Color(64,64,64);
+	Color bgGradRight = new Color( 128,128,128);
+	Color fgGradLeft =  new Color(120,120,190);
+	Color fgGradRight =  new Color( 90,90,160);
+	Color disabledGradLeft = new Color(120,120,120);
+	Color disabledGradRight = new Color(160,160,160);
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 
+		
 		Paint oldP = g2.getPaint();
-		Paint newP = new GradientPaint( 0,0, new Color(64,64,64), getWidth(), 0, new Color( 128,128,128));
+		Paint newP = new GradientPaint( 0,0,bgGradLeft, getWidth(), 0, bgGradRight);
 		g2.setPaint(newP);
 		g2.fillRect(0, 0, getWidth(), getHeight());
 
-		newP = new GradientPaint( 0,0, new Color(120,120,190), 0, getHeight(), new Color( 90,90,160));
+		if( isEnabled())
+			newP = new GradientPaint( 0,0, fgGradLeft, 0, getHeight(), fgGradRight);
+		else
+			newP = new GradientPaint( 0,0, disabledGradLeft, 0, getHeight(), disabledGradRight);
+			
 		g2.setPaint(newP);
 		g2.fillRect( 0, 0, Math.round(getWidth()*valueToWidth(value)), getHeight());
 		

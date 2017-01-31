@@ -11,7 +11,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.dialogs.Dialogs;
+import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.image_data.GroupTree;
+import spirite.image_data.ImageWorkspace;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.SliderPanel;
 
@@ -124,7 +126,10 @@ public class LayersPanel extends OmniComponent {
 
 	
 	private void btnNewLayerPress() {
-		dialogs.performNewLayerDialog(layerTreePanel.workspace);
+		ImageWorkspace workspace = layerTreePanel.workspace;
+		NewLayerHelper helper = dialogs.callNewLayerDialog(workspace);
+		workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
+				helper.width, helper.height, helper.name, helper.color);
 	}
 	
 	private void btnNewGroupPress() {

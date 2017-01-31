@@ -361,7 +361,6 @@ public class ImageWorkspace {
 			
 			if( internal.isDynamic) {
 				undoEngine.prepareContext(handle);
-				System.out.println("Checkout:" + handle.id);
 				if( working != null)
 					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
 				
@@ -388,7 +387,6 @@ public class ImageWorkspace {
 			
 			if( internal.isDynamic) {
 				undoEngine.prepareContext(handle);
-				System.out.println("Checkout:" + handle.id);
 				if( working != null)
 					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
 
@@ -413,7 +411,6 @@ public class ImageWorkspace {
 			InternalImage internal = imageData.get(handle.id);
 			
 			if( internal.isDynamic) {
-				System.out.println("Checkin:" + handle.id);
 				// Reset all draw properties.  There might be a better way.
 			//	if( g != null)
 		//			g.dispose();
@@ -429,7 +426,6 @@ public class ImageWorkspace {
 					Rectangle rect = MUtil.findContentBounds(working, 0, true);
 					
 					if( !rect.isEmpty()) {
-						System.out.println(rect);
 						BufferedImage bi = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
 						Graphics g = bi.getGraphics();	// Over-writing scope not strictly necessary
 						g.drawImage(working, -rect.x, -rect.y, null);
@@ -931,8 +927,6 @@ public class ImageWorkspace {
         imageData.put(workingID, internal);
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
-		
-        System.out.println("Dynamic: " + (workingID-1));
         
 		LayerNode node = groupTree.new LayerNode( new RigLayer(handle), name);
 		_addLayer(node,context);

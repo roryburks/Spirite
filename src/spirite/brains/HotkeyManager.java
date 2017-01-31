@@ -51,6 +51,7 @@ public class HotkeyManager {
                 {"toolset.MOVE", (new Hotkey( KeyEvent.VK_M, 0))},
                 {"toolset.COLOR_PICKER", (new Hotkey( KeyEvent.VK_O, 0))},
                 {"toolset.PIXEL", (new Hotkey( KeyEvent.VK_A, 0))},
+                {"toolset.COMPOSER", (new Hotkey( KeyEvent.VK_CAPS_LOCK, 0))},
 
                 {"palette.swap", (new Hotkey( KeyEvent.VK_X, 0))},
                 {"palette.swapBack", (new Hotkey( KeyEvent.VK_Z, 0))},

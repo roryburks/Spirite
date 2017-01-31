@@ -225,7 +225,6 @@ public class UndoEngine {
 	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
 	void prepareContext( ImageHandle data) {
-//		System.out.println("Preparing:" + data.id);
 		for( UndoContext context : contexts) {
 			if( context.image == null) continue;
 			if( context.image.equals(data))
@@ -338,7 +337,6 @@ public class UndoEngine {
 		}
 		else {
 			assert( action instanceof ImageAction);
-			System.out.println(((ImageAction)action).builtImage.handle);
 			contexts.add(new ImageContext( ((ImageAction)action).builtImage.handle));
 		}
 		

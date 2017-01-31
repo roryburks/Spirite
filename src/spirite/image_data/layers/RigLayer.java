@@ -1,5 +1,7 @@
 package spirite.image_data.layers;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -34,7 +36,7 @@ import spirite.image_data.UndoEngine.UndoableAction;
  */
 public class RigLayer extends Layer
 {
-	private final List<Part> parts = new ArrayList<>();
+	private final ArrayList<Part> parts = new ArrayList<>();
 	private Part active = null;
 	private ImageWorkspace context;
 	
@@ -62,13 +64,19 @@ public class RigLayer extends Layer
 		//	(but probably limited to the same group?)
 		private int depth;	
 		private String partName;
+		private boolean visible = true;
+		private float alpha = 1.0f;
 		
-		public Part( ImageHandle handle, String pName, int ox, int oy, int depth) {
+		public Part( ImageHandle handle, String pName, int ox, int oy, int depth, 
+				boolean visible, float alpha) 
+		{
 			this.handle = handle;
 			this.partName = pName;
 			this.ox = ox;
 			this.oy = oy;
 			this.depth = depth;
+			this.visible = visible;
+			this.alpha = alpha;
 		}
 		
 		private Part(ImageHandle handle, String partName) {
@@ -91,6 +99,12 @@ public class RigLayer extends Layer
 		public ImageHandle getImageHandle() {
 			return handle;
 		}
+		public boolean isVisible() {
+			return visible;
+		}
+		public float getAlpha() {
+			return alpha;
+		}
 	}
 	
 
@@ -102,6 +116,27 @@ public class RigLayer extends Layer
 	public void setActivePart(Part part) {
 		if( parts.contains(part))
 			active = part;
+	}
+	
+	/** Returns the first highest-depth part that is visible and has 
+	 * non-transparent data at x, y (in Layer-space)*/
+	public Part grabPart(int x, int y, boolean select) {
+		for( int i=parts.size()-1; i >= 0; --i) {
+			Part part = parts.get(i);
+			if( part.isVisible()) {
+				int rgb =part.handle.deepAccess().getRGB(x - part.ox, y-part.oy);
+				
+				if( ((rgb >>> 24) & 0xFF) == 0) continue; 
+				
+				if( select) {
+					setActivePart(part);
+					_trigger();
+				}
+				
+				return part;
+			}
+		}
+		return null;
 	}
 	
 	/** Outside classes should use createModifyPartAction */
@@ -187,13 +222,13 @@ public class RigLayer extends Layer
 	 * method.
 	 * 
 	 * Can return null if the part is not in the RigLayer*/
-	public UndoableAction createModifyPartAction( 
-			Part part, int ox, int oy, int depth, String partName) 
+	public UndoableAction createModifyPartAction( Part part, int ox, int oy, 
+			int depth, String partName, boolean visible, float alpha) 
 	{
 
 		if( !parts.contains(part))
 			return null;
-		return new ChangePartAttributesAction(part, ox, oy, depth, partName);
+		return new ChangePartAttributesAction(part, ox, oy, depth, partName, visible, alpha);
 	}
 	
 	
@@ -232,11 +267,29 @@ public class RigLayer extends Layer
 		Graphics2D g2 = (Graphics2D)g;
 		
 		AffineTransform trans = g2.getTransform();
+		Composite comp = g2.getComposite();
 		
 		for( Part part : parts) {
-			g2.translate(part.ox, part.oy);
-			part.handle.drawLayer(g);
-			g2.setTransform(trans);
+			if( part.visible) {
+				g2.translate(part.ox, part.oy);
+				if( part.alpha != 1.0f) {
+					// TODO: Fairly debug, eventually, I'll need a way of stacking
+					//	composites on top of each other
+					if( comp instanceof AlphaComposite) {
+						
+						g2.setComposite( AlphaComposite.getInstance(
+								AlphaComposite.SRC_OVER, 
+								((AlphaComposite)comp).getAlpha()*part.alpha));
+					}
+					else {
+						g2.setComposite( AlphaComposite.getInstance(
+							AlphaComposite.SRC_OVER, part.alpha));
+					}
+				}
+				part.handle.drawLayer(g);
+				g2.setComposite(comp);
+				g2.setTransform(trans);
+			}
 		}
 	}
 
@@ -252,7 +305,7 @@ public class RigLayer extends Layer
 			if( px2 > x2) x2 = px2;
 		}
 		
-		return x2 - x1;
+		return x2 - 0;
 	}
 
 	@Override
@@ -266,7 +319,7 @@ public class RigLayer extends Layer
 			int py2 = part.oy + part.handle.getHeight();
 			if( py2 > y2) y2 = py2;
 		}
-		return y2 - y1;
+		return y2 - 0;
 	}
 
 	@Override
@@ -296,8 +349,19 @@ public class RigLayer extends Layer
 
 	@Override
 	public Layer logicalDuplicate() {
-		// TODO
-		return new RigLayer( parts.get(0).handle);
+		List<Part> dupeParts = new ArrayList<Part>(parts.size());
+		for( Part part : parts) {
+			dupeParts.add(new Part(
+				part.handle.dupe(),
+				part.partName,
+				part.ox,
+				part.oy,
+				part.depth,
+				part.visible,
+				part.alpha
+			));
+		}
+		return new RigLayer( dupeParts);
 	}
 	
 	
@@ -378,26 +442,36 @@ public class RigLayer extends Layer
 		private int old_ox, old_oy, new_ox, new_oy;
 		private int old_depth, new_depth;
 		private String oldName, newName;
+		private boolean oldVisible, newVisible;
+		private float oldAlpha, newAlpha;
 		
-		ChangePartAttributesAction( Part part, int ox, int oy, int depth, String name ) 
+		ChangePartAttributesAction( Part part, int ox, int oy, int depth, String name,
+				boolean visible, float alpha) 
 		{
 			this.part = part;
 			this.old_ox = part.ox;
 			this.old_oy = part.oy;
 			this.old_depth = part.depth;
 			this.oldName = part.partName;
+			this.oldAlpha = part.alpha;
+			this.oldVisible = part.visible;
 			this.new_ox = ox;
 			this.new_oy = oy;
 			this.new_depth = depth;
 			this.newName = name;
+			this.newAlpha = alpha;
+			this.newVisible = visible;
 		}
 		
 		@Override
 		protected void performAction() {
+			
 			part.ox = new_ox;
 			part.oy = new_oy;
 			_setPartDepth(part, new_depth);
 			part.partName = newName;
+			part.visible = newVisible;
+			part.alpha = newAlpha;
 			_trigger();
 		}
 
@@ -407,6 +481,8 @@ public class RigLayer extends Layer
 			part.oy = old_oy;
 			_setPartDepth(part, old_depth);
 			part.partName = oldName;
+			part.visible = oldVisible;
+			part.alpha = oldAlpha;
 			_trigger();
 		}
 

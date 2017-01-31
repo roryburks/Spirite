@@ -32,7 +32,7 @@ public class Main{
                 public void run() { createUI();}
             });
         } catch( Exception e) {
-        	MDebug.handleError( ErrorType.FATAL, e, "Core:" + e.getMessage());
+//        	MDebug.handleError( ErrorType.FATAL, e, "Core:" + e.getMessage());
         }
     }
 

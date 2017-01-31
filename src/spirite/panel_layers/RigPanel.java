@@ -1,6 +1,7 @@
 package spirite.panel_layers;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -12,8 +13,11 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -21,11 +25,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -34,6 +40,7 @@ import spirite.image_data.layers.RigLayer.Part;
 import spirite.image_data.layers.RigLayer.RigStructureObserver;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
+import spirite.ui.components.SliderPanel;
 
 public class RigPanel extends OmniComponent 
 	implements MWorkspaceObserver, MSelectionObserver, ActionListener,
@@ -46,7 +53,9 @@ public class RigPanel extends OmniComponent
 	private final JTextField tfName= new JTextField();
 	private final JButton bNewPart = new JButton();
 	private final JButton bRemovePart = new JButton();
+	private final JToggleButton bNodeVisiblity = new JToggleButton();
 	private final DefaultListModel<Part> model = new DefaultListModel<>();
+	private final OpacitySlider opacitySlider = new OpacitySlider();
 	
 	private final MasterControl master;
 	private ImageWorkspace workspace;
@@ -64,9 +73,48 @@ public class RigPanel extends OmniComponent
 			workspace.addSelectionObserver(this);
 		
 		listPanel.addListSelectionListener(this);
+		listPanel.setCellRenderer(renderer);
 		
 		refresh();
 	}
+	
+	
+	private final ListCellRenderer<Part> renderer = new RigCellRender();
+			
+	class RigCellRender implements ListCellRenderer<RigLayer.Part> {
+		private JPanel renderPanel = new JPanel();
+		private JLabel label = new JLabel();
+		private Color bgColor = new Color( 255,255,255);
+		private Color selColor = new Color( 90,90,160);
+		
+		
+		RigCellRender() {
+			GroupLayout layout = new GroupLayout(renderPanel);
+			
+			layout.setVerticalGroup( layout.createSequentialGroup()
+				.addComponent(label,16,16,16)
+			);
+			layout.setHorizontalGroup( layout.createSequentialGroup()
+				.addComponent(label)
+			);
+			
+			renderPanel.setLayout(layout);
+			
+		}
+		
+		@Override
+		public Component getListCellRendererComponent(
+				JList<? extends Part> list, 
+				Part value, 
+				int index, 
+				boolean isSelected,
+				boolean cellHasFocus)
+		{
+			label.setText(value.getTypeName());
+			renderPanel.setBackground(isSelected?selColor:bgColor);
+			return renderPanel;
+		}
+	};
 	
 	private void initComponents() {
 		GroupLayout layout = new GroupLayout(this);
@@ -79,10 +127,18 @@ public class RigPanel extends OmniComponent
 
 		bNewPart.setToolTipText("Create New Part");
 		bRemovePart.setToolTipText("Remove Selected Part");
+		bNodeVisiblity.setToolTipText("Toggle Node Visibility");
 		bNewPart.setActionCommand("newPart");
 		bRemovePart.setActionCommand("remPart");
+		bNodeVisiblity.setActionCommand("toggleVis");
 		bNewPart.addActionListener(this);
 		bRemovePart.addActionListener(this);
+		bNodeVisiblity.addActionListener(this);
+
+		bNewPart.setIcon(Globals.getIcon("icon.rig.new"));
+		bRemovePart.setIcon(Globals.getIcon("icon.rig.rem"));
+		bNodeVisiblity.setSelectedIcon(Globals.getIcon("icon.rig.visOn"));
+		bNodeVisiblity.setIcon(Globals.getIcon("icon.rig.visOff"));
 
 		tfOffsetX.getDocument().addDocumentListener(this);
 		tfOffsetY.getDocument().addDocumentListener(this);
@@ -96,8 +152,10 @@ public class RigPanel extends OmniComponent
 			.addComponent(jscroll, 0, 200, Short.MAX_VALUE)
 			.addGap(3)
 			.addGroup( layout.createParallelGroup()
+				.addComponent(bNodeVisiblity, bSize.height, bSize.height, bSize.height)
 				.addComponent(bNewPart, bSize.height, bSize.height, bSize.height)
 				.addComponent(bRemovePart, bSize.height, bSize.height, bSize.height)
+				.addComponent(opacitySlider, bSize.height, bSize.height, bSize.height)
 			)
 			.addGap(3)
 			.addGroup( layout.createParallelGroup()
@@ -143,7 +201,11 @@ public class RigPanel extends OmniComponent
 					.addComponent(tfName, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
 				)
 				.addGroup(layout.createSequentialGroup()
-					.addGap(0,0,Short.MAX_VALUE)
+					.addGap(3)
+					.addComponent(opacitySlider)
+					.addGap(3)
+					.addComponent(bNodeVisiblity, bSize.width, bSize.width, bSize.width)
+					.addGap(3)
 					.addComponent(bNewPart, bSize.width, bSize.width, bSize.width)
 					.addGap(3)
 					.addComponent(bRemovePart, bSize.width, bSize.width, bSize.width)
@@ -154,6 +216,20 @@ public class RigPanel extends OmniComponent
 		);
 		this.setLayout(layout);
 		
+	}
+	
+	class OpacitySlider extends SliderPanel {
+		OpacitySlider() {
+			setMin(0.0f);
+			setMax(1.0f);
+			setLabel("Opacity: ");
+		}
+		
+		@Override
+		public void onValueChanged(float newValue) {
+			changePartAttributes();
+			super.onValueChanged(newValue);
+		}
 	}
 	
 	
@@ -207,16 +283,20 @@ public class RigPanel extends OmniComponent
 				tfName.setText(part.getTypeName());
 				tfOffsetX.setText(""+part.getOffsetX());
 				tfOffsetY.setText(""+part.getOffsetY());
+				bNodeVisiblity.setSelected(part.isVisible());
+				opacitySlider.setValue(part.getAlpha());
 			}
 		}
 
 		bNewPart.setEnabled(!(rig==null));
 		bRemovePart.setEnabled(!(rig==null));
+		bNodeVisiblity.setEnabled(!(rig==null));
 		tfDepth.setEnabled(!(rig==null));
 		tfName.setEnabled(!(rig==null));
 		tfOffsetX.setEnabled(!(rig==null));
 		tfOffsetY.setEnabled(!(rig==null));
 		listPanel.setEnabled(!(rig==null));
+		opacitySlider.setEnabled(!(rig==null));
 		
 		Color c = (rig == null) ? cDisabled : cEnabled;
 
@@ -277,7 +357,7 @@ public class RigPanel extends OmniComponent
 		switch( evt.getActionCommand()) {
 		case "newPart":
 			if( rig != null) {
-				BufferedImage bi = new BufferedImage( 100,100, BufferedImage.TYPE_INT_ARGB);
+				BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_INT_ARGB);
 				
 				workspace.getUndoEngine().performAndStore(
 						rig.createAddPartAction(bi, 0, 0, 0,""));
@@ -288,6 +368,9 @@ public class RigPanel extends OmniComponent
 				workspace.getUndoEngine().performAndStore(
 						rig.createRemovePartAction(rig.getActivePart()));
 			}
+			break;
+		case "toggleVis":
+			changePartAttributes();
 			break;
 		default:
 			MDebug.log(evt.getActionCommand());
@@ -362,12 +445,15 @@ public class RigPanel extends OmniComponent
 			if( part.getOffsetX() != tfOffsetX.getNumber() ||
 				part.getOffsetY() != tfOffsetY.getNumber() ||
 				part.getDepth() != tfDepth.getNumber() ||
-				!part.getTypeName().equals(tfName.getText())) 
+				!part.getTypeName().equals(tfName.getText()) ||
+				part.isVisible() != bNodeVisiblity.isSelected() ||
+				part.getAlpha() != opacitySlider.getValue()) 
 			{
 				
 				UndoableAction action = rig.createModifyPartAction(
 						part, tfOffsetX.getNumber(), tfOffsetY.getNumber(), 
-						tfDepth.getNumber(), tfName.getText());
+						tfDepth.getNumber(), tfName.getText(), 
+						bNodeVisiblity.isSelected(), opacitySlider.getValue());
 				
 				if( action != null)
 					workspace.getUndoEngine().performAndStore(action);

@@ -46,6 +46,7 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
@@ -519,9 +520,11 @@ public class NodeTree extends ContentTree
 		case "newGroup":
 			workspace.addGroupNode(contextMenu.node, "New Group");
 			break;
-		case "newLayer":
-			master.getDialogs().performNewLayerDialog(workspace);
-			break;
+		case "newLayer": {
+			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
+			workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
+					helper.width, helper.height, helper.name, helper.color);
+			break;}
 		case "duplicate":
 			workspace.duplicateNode(contextMenu.node);
 			break;
@@ -532,10 +535,13 @@ public class NodeTree extends ContentTree
 			if( contextMenu.node instanceof LayerNode)	// should be unnecessary
 				workspace.mergeNodes( contextMenu.node.getNextNode(), (LayerNode) contextMenu.node);
 			break;
-		case "newRig":
+		case "newRig":{
+
+			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
+			
 			workspace.addNewRigLayer(workspace.getSelectedNode(), 
-					workspace.getWidth(), workspace.getHeight(), "Rig", new Color(0,0,0,0));
-			break;
+					helper.width, helper.height, helper.name, helper.color);
+			break;}
 		default:
 			MDebug.log(evt.getActionCommand());
 		}

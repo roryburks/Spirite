@@ -325,13 +325,8 @@ public class SelectionEngine {
 	}
 	
 	private UndoableAction createNewSelect( Selection selection, int ox, int oy) {
-
-		//System.out.println(selection.getBounds());
 		UndoableAction baseAction = new SetSelectionAction( 
 				new BuiltSelection(selection, ox, oy), oldSelection);
-	//	System.out.println(selection.getBounds());
-
-//		System.out.println((new BuiltSelection(selection, ox, oy)).selection.getBounds());
 
 		if( scope.isLifted()) {
 			List<UndoableAction> actions = new ArrayList<>(3);

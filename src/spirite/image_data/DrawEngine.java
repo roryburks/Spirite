@@ -303,8 +303,6 @@ public class DrawEngine {
 		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
 		 * to the data, and flushing the used resources. */
 		public synchronized void endStroke() {
-			System.out.println("TEST");
-			
 			state = STATE.READY;
 			
 			if( data != null) {
@@ -424,11 +422,9 @@ public class DrawEngine {
 		
 		BufferedImage bi = data.checkoutRaw();
 		if( !MUtil.coordInImage( p.x, p.y, bi)) {
-			System.out.println("OUT:" + p);
 			return false;
 		}
 		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
-			System.out.println("DUPE");
 			return false;
 		}
 		data.checkin();

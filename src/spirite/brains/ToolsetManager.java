@@ -29,7 +29,8 @@ public class ToolsetManager
 		MOVE("Move"),
 		COLOR_PICKER("Color Picker"),
 		PIXEL("Pixel"),
-		CROP("Cropper");
+		CROP("Cropper"),
+		COMPOSER("Rig Composer");
 		
 		public final String description;
 		Tool( String name){ this.description = name;}

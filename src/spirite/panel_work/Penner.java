@@ -39,6 +39,8 @@ import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.RenderEngine;
@@ -47,6 +49,8 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
+import spirite.image_data.layers.RigLayer;
+import spirite.image_data.layers.RigLayer.Part;
 import spirite.panel_work.WorkPanel.Zoomer;
 
 /***
@@ -84,6 +88,7 @@ public class Penner
 
 	private boolean holdingShift = false;
 	private boolean holdingCtrl = false;
+	private boolean holdingAlt = false;
 	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
 	
 	// Naturally, being a mouse (or drawing tablet)-based input handler with
@@ -112,6 +117,7 @@ public class Penner
 	private Tool activeTool = null;
 	
 	private int x, y;
+
 	
 	private enum STATE { 
 		READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
@@ -135,11 +141,16 @@ public class Penner
 		
 		// Reference-Related
 		REF_GLOBAL_MOVE, REF_FINE_ZOOM,
-		REF_NODE_MOVE
+		REF_NODE_MOVE, MOVING_RIG_PART
 	};
 	private STATE state = STATE.READY;
 	private int stateVar = 0;
 	private Object stateObj = null;
+
+	class ComposerStateObject {
+		RigLayer rig = null;
+		Part part;
+	}
 	
 	public Penner( DrawPanel draw_panel, MasterControl master) {
 		this.zoomer = draw_panel.zoomer;
@@ -270,6 +281,27 @@ public class Penner
 					else
 						setState( STATE.CROPPING);
 					break;
+				case COMPOSER:
+					Node node = workspace.getSelectedNode();
+					if( !(node instanceof LayerNode)
+						|| (!(((LayerNode)node).getLayer() instanceof RigLayer))) 
+						break;
+					
+					RigLayer rig = (RigLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
+					RigLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
+					
+					if( part == null) part = rig.getActivePart();
+					
+					if( holdingShift) {
+						setState( STATE.MOVING_RIG_PART);
+						
+						ComposerStateObject cso = new ComposerStateObject();
+						cso.rig = rig;
+						cso.part = part;
+						this.stateObj = cso;
+					}
+					
+					break;
 				}
 
 				activeTool = tool;
@@ -291,7 +323,6 @@ public class Penner
 				if( strokeEngine != null) {
 					strokeEngine.endStroke();
 					
-					System.out.println("END");
 					StrokeAction stroke = drawEngine.new StrokeAction( 
 							strokeEngine.getParams(), 
 							strokeEngine.getHistory(),
@@ -562,8 +593,24 @@ public class Penner
 				}
 			}
 			break;
+		case MOVING_RIG_PART:
+			ComposerStateObject cso = (ComposerStateObject)stateObj;
+			
+			undoEngine.performAndStore(
+				cso.rig.createModifyPartAction( cso.part, 
+						cso.part.getOffsetX() + (x - oldX),
+						cso.part.getOffsetY() + (y - oldY), 
+						cso.part.getDepth(), 
+						cso.part.getTypeName(), 
+						cso.part.isVisible(), 
+						cso.part.getAlpha())
+			);
+			
+			break;
 		case REF_NODE_MOVE:
 		case READY:
+		default:
+			break;
 		}
 		
 		if( oldX != x || oldY != y && drawsOverlay()) {
@@ -728,9 +775,11 @@ public class Penner
 	public boolean dispatchKeyEvent(KeyEvent evt) {
 		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
 		boolean ctrl = (( evt.getModifiers() & KeyEvent.CTRL_MASK) != 0);
+		boolean alt = (( evt.getModifiers() & KeyEvent.ALT_MASK) != 0);
 			
 		holdingShift = shift;
 		holdingCtrl = ctrl;
+		holdingAlt = alt;
 		return false;
 	}
 	
