@@ -8,7 +8,9 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,6 +71,12 @@ public class RenderEngine
 	@Override
 	public String toString() {
 		return "Rendering Engine";
+	}
+	
+	public static abstract class Renderable {
+		private int subDepth;
+		public int depth;
+		public abstract void draw( Graphics g);
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -237,50 +245,118 @@ public class RenderEngine
 		
 		// Go through the node's children (in reverse), drawing any visible group
 		//	found recursively and drawing any Layer found plainly.
+		
+		// Step 1: Construct a list of all components that need to be rendered
+		int count = 0;	// This subDepth counter is used to make sure Renderables of
+						// the same depth are rendered in the correct order.
+		
+		
 		ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
+		List< Renderable> renderList = new ArrayList<>();
 		while( it.hasPrevious()) {
 			Node child = it.previous();
 			if( child.isVisible()) {
-				if( child instanceof LayerNode) {
-					// Layer Node
-					Layer layer = ((LayerNode)child).getLayer();
-					
-					_setGraphicsSettings(g, child, settings);
-					AffineTransform transform = g2.getTransform();
-					g2.translate(child.x, child.y);
-					g2.scale( wrk.ratioW, wrk.ratioH);
-					
-					if( wrk.selLayerBI != null ) 
-					{
-						g2.drawImage(wrk.selLayerBI, 0, 0, null);
-					}
-
-
-					layer.draw(g);
-					
-					g2.setTransform(transform);
-					_resetRenderSettings(g, child, settings);
-				}
-				else if( child instanceof GroupNode && !child.getChildren().isEmpty()) {
-					// Group Node
+				if( child instanceof GroupNode) {
 					if( n == buffer.length-1) {
 						// Note: the code can reach here if all the children are invisible.
 						// There might be other, unintended ways for the code to reach here.
 						continue;
 					}
 					
-
-					_propperRec((GroupNode)child, n+1, settings, buffer,wrk);
+					Renderable renderable;
+					renderable =  new GroupRenderable(
+							(GroupNode) child, n, settings, buffer, wrk);
+					renderable.subDepth = count++;
+					renderList.add(renderable);
+				}
+				else {
+					List<Renderable> sub = ((LayerNode)child).getLayer().getDrawList();
 					
-					_setGraphicsSettings(g, child,settings);
-					g2.drawImage( buffer[n+1],
-							0, 0, 
-							null);
-					_resetRenderSettings(g, child, settings);
+					for( Renderable subRend : sub) {
+						Renderable renderable = new TransformedRenderable(
+								(LayerNode) child, subRend, settings, wrk);
+						renderable.subDepth = count++;
+						renderList.add(renderable );
+					}
 				}
 			}
 		}
+		
+		// Step 2: Sort the list by depth then subdepth, increasing.
+		renderList.sort( new Comparator<Renderable>() {
+			@Override
+			public int compare(Renderable o1, Renderable o2) {
+				if( o1.depth == o2.depth)
+					return o1.subDepth - o2.subDepth;
+				return o1.depth - o2.depth;
+			}
+		});
+		
+		// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
+		for( Renderable renderable : renderList) {
+			renderable.draw(g2);
+		}
+		
+
 		g.dispose();
+	}
+
+	private class GroupRenderable extends Renderable {
+		private final GroupNode node;
+		private final int n;
+		private final RenderSettings settings;
+		private final BufferedImage[] buffer;
+		private final RenderHelper wrk;
+		GroupRenderable( GroupNode node, 
+				int n, 
+					RenderSettings settings,
+				BufferedImage[] buffer,
+				RenderHelper wrk ) 
+		{
+			this.node = node;
+			this.n = n;
+			this.settings = settings;
+			this.buffer = buffer;
+			this.wrk = wrk;
+		}
+		@Override
+		public void draw(Graphics g) {
+			_propperRec(node, n+1, settings, buffer,wrk);
+			_setGraphicsSettings(g, node,settings);
+			g.drawImage( buffer[n+1],
+					0, 0, 
+					null);
+			_resetRenderSettings(g, node,settings);
+		}
+		
+	}
+	
+	/** Converts a Layer-space Renderable into an Image-space Renderable. */
+	private class TransformedRenderable extends Renderable {
+		private final Renderable renderable;
+		private final RenderHelper wrk;
+		private final RenderSettings settings;
+		private final LayerNode node;
+		TransformedRenderable( LayerNode node, Renderable renderable, RenderSettings settings, RenderHelper wrk) {
+			this.node = node;
+			this.renderable = renderable;
+			this.depth = renderable.depth;
+			this.wrk = wrk;
+			this.settings = settings;
+		}
+		@Override
+		public void draw(Graphics g) {
+			_setGraphicsSettings(g, node,settings);
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform transform = g2.getTransform();
+			g2.translate(node.x, node.y);
+			g2.scale( wrk.ratioW, wrk.ratioH);
+			renderable.draw(g2);
+			
+			g2.setTransform(transform);
+			_resetRenderSettings(g, node,settings);
+		}
+		
 	}
 	
 	

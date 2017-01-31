@@ -388,11 +388,13 @@ public class Penner
 		startStroke( stroke);
 	}	
 	private void startPixel( boolean leftClick) {
+		ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
 		StrokeParams stroke = new StrokeParams();
 		stroke.setMethod( Method.PIXEL);
 		Color c = (leftClick) ? 
 				paletteManager.getActiveColor(0)
 				: paletteManager.getActiveColor(1);
+		stroke.setAlpha((float)settings.getValue("alpha"));
 		stroke.setColor( c);
 		startStroke( stroke);
 		

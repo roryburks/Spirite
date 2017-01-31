@@ -465,6 +465,7 @@ public class MasterControl
     		});
     		commandMap.put("toggle_reference", new Runnable() {
 				@Override public void run() {
+					System.out.println("TEST");
 					workspace.setEditingReference(!workspace.isEditingReference());
 				}
 			});

@@ -336,12 +336,11 @@ public class RigPanel extends OmniComponent
 		}
 	}	
 
-	// :::: MWorkspaceObserver
+	// :::: MSelectionListener
 	@Override
 	public void selectionChanged(Node newSelection) {
 		if( newSelection instanceof LayerNode) {
 			LayerNode ln = (LayerNode)newSelection;
-
 			if( ln.getLayer() instanceof RigLayer) {
 				setRig( (RigLayer)ln.getLayer());
 				return;

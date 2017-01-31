@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -16,6 +17,7 @@ import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.RenderEngine.Renderable;
 
 /**
  * A FixedFrameAnimation 
@@ -122,6 +124,8 @@ public class FixedFrameAnimation extends Animation
 		int _t = (int)Math.floor(t);
 		int met = MUtil.cycle(startFrame, endFrame, _t);
 		
+		List<Renderable> drawList = new ArrayList<>();
+		
 		for( AnimationLayer layer : layers) {
 			if( layer.getFrames().size() == 0) continue;
 			
@@ -139,7 +143,20 @@ public class FixedFrameAnimation extends Animation
 			
 			LayerNode node = layer.getFrame(localMet);
 			
-			if( node != null)node.getLayer().draw(g);
+			if( node != null) {
+				drawList.addAll( node.getLayer().getDrawList());
+			}
+		}
+		
+		drawList.sort( new  Comparator<Renderable>() {
+			@Override
+			public int compare(Renderable o1, Renderable o2) {
+				return o1.depth - o2.depth;
+			}
+		});
+		
+		for( Renderable renderable : drawList) {
+			renderable.draw(g);
 		}
 	}
 

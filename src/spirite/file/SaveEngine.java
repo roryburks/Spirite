@@ -121,13 +121,13 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 	}
 	
 	public void removeAutosaved( ImageWorkspace workspace) {
-		File f = workspace.getFile();
+/*		File f = workspace.getFile();
 		if( f != null) {
 			 f= new File(workspace.getFile().getAbsolutePath() + "~");
 			 if( f.exists()) {
 				 f.delete();
 			 }
-		}
+		}*/
 	}
 	
 

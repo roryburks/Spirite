@@ -10,6 +10,7 @@ import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
+import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.UndoableAction;
 
 public abstract class Layer {
@@ -20,6 +21,11 @@ public abstract class Layer {
 	public abstract int getHeight();
 	
 	public abstract boolean canMerge( GroupTree.Node node);
+	
+	/** Constructs a list of drawable objects assosciated with their
+	 * drawDepth.
+	 */
+	public abstract List<Renderable> getDrawList();
 	
 	/**
 	 * @param x	the offset of the node relative to this one

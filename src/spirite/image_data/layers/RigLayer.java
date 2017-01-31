@@ -21,6 +21,7 @@ import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
+import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -292,6 +293,34 @@ public class RigLayer extends Layer
 			}
 		}
 	}
+	
+	public void drawPart( Graphics g, Part part) {
+		Graphics2D g2 = (Graphics2D)g;
+
+		AffineTransform trans = g2.getTransform();
+		Composite comp = g2.getComposite();
+		
+
+		if( part.alpha != 1.0f) {
+			// TODO: Fairly debug, eventually, I'll need a way of stacking
+			//	composites on top of each other
+			if( comp instanceof AlphaComposite) {
+				
+				g2.setComposite( AlphaComposite.getInstance(
+						AlphaComposite.SRC_OVER, 
+						((AlphaComposite)comp).getAlpha()*part.alpha));
+			}
+			else {
+				g2.setComposite( AlphaComposite.getInstance(
+					AlphaComposite.SRC_OVER, part.alpha));
+			}
+		}
+		part.handle.drawLayer(g);
+		
+		g2.setComposite(comp);
+		g2.setTransform(trans);
+	}
+	
 
 	@Override
 	public int getWidth() {
@@ -364,6 +393,26 @@ public class RigLayer extends Layer
 		return new RigLayer( dupeParts);
 	}
 	
+
+	@Override
+	public List<Renderable> getDrawList() {
+		List<Renderable> list = new ArrayList<> ( parts.size());
+		
+		for( Part part : parts) {
+			if( part.isVisible()) {
+				Renderable renderable = new Renderable() {
+					@Override
+					public void draw(Graphics g) {
+						drawPart(g,part);
+					}
+				};
+				renderable.depth = part.depth;
+				list.add(renderable);
+			}
+		}
+		
+		return list;
+	}
 	
 	
 	// :::: Rig Modification related 
@@ -524,5 +573,6 @@ public class RigLayer extends Layer
 			obs.rigStructureChanged();
 		}
 	}
+
 
 }

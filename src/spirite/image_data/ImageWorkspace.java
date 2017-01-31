@@ -666,6 +666,8 @@ public class ImageWorkspace {
 			
 			List<ImageHandle> handles = node.layer.getUsedImages();
 			List<Rectangle> rects = node.layer.interpretCrop(toCompare);
+
+			if( rects == null || handles  == null) continue;
 			
 			for( int i=0; i < handles.size() && i<rects.size(); ++i) {
 				Rectangle rect = new Rectangle(rects.get(i));
@@ -1964,7 +1966,7 @@ public class ImageWorkspace {
 	}
 	
 	public void remToggle( Node node) {
-		toggleList.remove(node);
+		toggleList.clear();;
 	}
     
 }

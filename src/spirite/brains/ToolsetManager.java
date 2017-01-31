@@ -47,7 +47,8 @@ public class ToolsetManager
         selected.put(Cursor.STYLUS, Tool.PEN);
         selected.put(Cursor.ERASER, Tool.ERASER);
 
-        toolSettings.put( Tool.PEN, constructPixelSettings());
+        toolSettings.put( Tool.PEN, constructPenSettings());
+        toolSettings.put( Tool.PIXEL, constructPixelSettings());
         toolSettings.put( Tool.ERASER, constructEraseSettings());
         toolSettings.put( Tool.CROP, constructCropperSettings());
     }
@@ -174,9 +175,9 @@ public class ToolsetManager
     }
     
     // :::: Setting Schemes
-    private ToolSettings constructPixelSettings() {
+    private ToolSettings constructPenSettings() {
     	final Object[][] scheme = {
-    			{"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
+    			{"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
     			{"width", PropertyType.SIZE, "Width", 5.0f},
     	};
     	
@@ -186,6 +187,13 @@ public class ToolsetManager
     	final Object[][] scheme = {
     			{"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
     			{"width",  PropertyType.SIZE, "Width", 5.0f},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    private ToolSettings constructPixelSettings() {
+    	final Object[][] scheme = {
+    			{"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
     	};
     	
     	return constructFromScheme(scheme);

@@ -15,6 +15,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.RenderEngine.RenderSettings;
+import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.DrawImageAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 
@@ -112,5 +113,20 @@ public class SimpleLayer extends Layer {
 		
 		return helper;
 	}
+
+	@Override
+	public List<Renderable> getDrawList() {
+		Renderable renderable = new Renderable() {
+			@Override
+			public void draw(Graphics g) {
+				SimpleLayer.this.draw(g);
+			}
+		};
+		renderable.depth = 0;
+		
+		return Arrays.asList( new Renderable[]{renderable});
+	}
+	
+	
 
 }

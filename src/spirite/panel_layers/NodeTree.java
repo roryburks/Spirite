@@ -253,7 +253,7 @@ public class NodeTree extends ContentTree
 		
 
 		// TODO: Fix the problem this is causing and re-implement
-//		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
+		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
 		transferHandler.stopDragging();
 		finishBuilding();
 	}
