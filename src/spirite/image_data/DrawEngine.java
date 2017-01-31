@@ -306,11 +306,10 @@ public class DrawEngine {
 			state = STATE.READY;
 			
 			if( data != null) {
-				BufferedImage bi = workspace.checkoutImage(data.handle);
-				Graphics g = bi.getGraphics();
+				Graphics g = data.checkoutRaw().getGraphics();
 				drawStrokeLayer(g);
 				g.dispose();
-				workspace.checkinImage(data.handle);
+				data.checkin();
 			}
 			
 			strokeLayer.flush();
@@ -444,12 +443,10 @@ public class DrawEngine {
 	
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
-		protected final BuiltImageData data;
 
 		MaskedImageAction(BuiltImageData data, BuiltSelection mask) {
-			super(data.handle);
+			super(data);
 			this.mask = mask;
-			this.data = data;
 		}
 	}
 	
@@ -482,7 +479,7 @@ public class DrawEngine {
 		@Override
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
-			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(data);
+			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(builtImage);
 			
 			engine.startStroke(params, points[0]);
 			
@@ -508,11 +505,11 @@ public class DrawEngine {
 		@Override
 		protected void performImageAction( ) {
 			
-			BufferedImage bi = workspace.checkoutImage(data.handle);
+			BufferedImage bi= builtImage.checkoutRaw();
 			
 			Queue<Integer> queue = new LinkedList<Integer>();
 			
-			Point layerSpace = data.convert( new Point(p.x, p.y));
+			Point layerSpace = builtImage.convert( new Point(p.x, p.y));
 			queue.add( MUtil.packInt(layerSpace.x, layerSpace.y));
 			
 			
@@ -555,7 +552,7 @@ public class DrawEngine {
 				}
 			}
 			
-			workspace.checkinImage(data.handle);
+			builtImage.checkin();
 		}
 		public Point getPoint() { return new Point(p);}
 		public Color getColor() { return new Color(color.getRGB());}
@@ -570,16 +567,16 @@ public class DrawEngine {
 		protected void performImageAction() {
 			
 			if( mask.selection == null) {
-				data.checkout();
-				MUtil.clearImage(data.handle.deepAccess());
-				data.checkin();
+				builtImage.checkout();
+				MUtil.clearImage(builtImage.handle.deepAccess());
+				builtImage.checkin();
 			}
 			else {
-				Graphics2D g2 = (Graphics2D) data.checkout();
+				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.translate(mask.offsetX, mask.offsetY);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 				mask.selection.drawSelectionMask(g2);
-				data.checkin();
+				builtImage.checkin();
 			}
 
 		}

@@ -19,6 +19,7 @@ import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
 /***
@@ -312,7 +313,7 @@ public class UndoEngine {
 			ImageAction iaction = (ImageAction)action;
 			
 			for( UndoContext test : contexts) {
-				if( test.image == iaction.data) {
+				if( test.image == iaction.builtImage.handle) {
 					context = test;
 					break;
 				}
@@ -331,7 +332,7 @@ public class UndoEngine {
 		}
 		else {
 			assert( action instanceof ImageAction);
-			contexts.add(new ImageContext( ((ImageAction)action).data));
+			contexts.add(new ImageContext( ((ImageAction)action).builtImage.handle));
 		}
 		
 		met++;
@@ -539,7 +540,7 @@ public class UndoEngine {
 			CachedImage frameCache;
 			ImageAction hiddenAction;
 			KeyframeAction( CachedImage frame, ImageAction action) {
-				super(image);
+				super(workspace.new BuiltImageData(image));
 				this.frameCache = frame;
 				this.hiddenAction = action;
 				frameCache.reserve(this);	// Should be in onAdd
@@ -600,17 +601,18 @@ public class UndoEngine {
 			}
 			@Override
 			public void performAction() {
-				workspace._replaceIamge(data, frameCache);
+				workspace._replaceIamge(builtImage.handle, frameCache);
 			}
 			
 			@Override
 			public void undoAction() {
-				workspace._replaceIamge(data, previousCache);
+				workspace._replaceIamge(builtImage.handle, previousCache);
 			}
 		}
 		
 		private void resetToKeyframe( BufferedImage frame) {
-			BufferedImage bi = workspace.checkoutImage(image);
+			BuiltImageData built = workspace.new BuiltImageData(image);
+			BufferedImage bi = built.checkoutRaw();
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 			Composite c = g2.getComposite();
@@ -618,7 +620,7 @@ public class UndoEngine {
 			g2.drawImage( frame, 0, 0,  null);
 			g2.setComposite( c);
 			g2.dispose();
-			workspace.checkinImage(image);
+			built.checkin();
 		}
 		
 		@Override
@@ -1065,9 +1067,9 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final ImageHandle data;
-		protected ImageAction( ImageHandle data) {
-			this.data = data;
+		protected final BuiltImageData builtImage;
+		protected ImageAction( BuiltImageData data) {
+			this.builtImage = data;
 		}
 		@Override protected void performAction() {}
 		@Override protected void undoAction() {}
@@ -1075,10 +1077,10 @@ public class UndoEngine {
 		protected boolean isHeavyAction() {return false;}
 	}
 	
-	// For internal use only.  Why would you wannt make an empty Image Action?
-	static class NilImageAction extends ImageAction {
+	// For internal use only.  Why would you want make an empty Image Action?
+	class NilImageAction extends ImageAction {
 		protected NilImageAction(ImageHandle data) {
-			super(data);
+			super(workspace.new BuiltImageData(data));
 		}
 		@Override		protected void performImageAction() {}
 		
@@ -1129,7 +1131,7 @@ public class UndoEngine {
 				if( action instanceof NullAction)
 					this.contexts[i] = UndoEngine.this.contexts.get(0);
 				else if( action instanceof ImageAction) {
-					this.contexts[i] = contextOf( ((ImageAction)action).data);
+					this.contexts[i] = contextOf( ((ImageAction)action).builtImage.handle);
 				}
 			}
 		}
@@ -1223,14 +1225,12 @@ public class UndoEngine {
 	// Typically non-special UndoActions shouldn't go here but I don't see w
 	public static class DrawImageAction extends ImageAction {
 		private final CachedImage stored;
-		private final int dx;
-		private final int dy;
+//		private final int dx;
+	//	private final int dy;
 		
-		public DrawImageAction(ImageHandle data, CachedImage other, int x, int y) {
+		public DrawImageAction(BuiltImageData data, CachedImage other) {
 			super(data);
 			this.stored = other;
-			this.dx = x;
-			this.dy = y;
 		}
 		@Override protected void onAdd() {
 			stored.reserve(this);
@@ -1240,11 +1240,9 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			BufferedImage bi = data.context.checkoutImage(data);
-			Graphics g = bi.getGraphics();
-			g.drawImage(stored.access(), dx, dy, null);
-			g.dispose();
-			data.context.checkinImage(data);
+			Graphics g = builtImage.checkout();
+			g.drawImage(stored.access(), 0, 0, null);
+			builtImage.checkin();
 		}
 	}
 	

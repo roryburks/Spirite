@@ -105,7 +105,7 @@ public class SimpleLayer extends Layer {
 		}
 		else {
 			CachedImage ci = workspace.getCacheManager().cacheImage(image, workspace.getUndoEngine());
-			UndoableAction action = new DrawImageAction(data, ci, x, y);
+			UndoableAction action = new DrawImageAction(workspace.new BuiltImageData(data, x, y), ci);
 			helper.actions.add(action);
 		}
 		

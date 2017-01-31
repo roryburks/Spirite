@@ -53,9 +53,8 @@ public class CacheManager {
 		return cache;
 	}
 	
-	/**
-	 * Removes Caches which are empty (have no CacheImages
-	 */
+	/**Removes Caches which are empty (have no CacheImages or are the 
+	 * domain of an empty Reference).	 */
 	public void clearUnusedDomains() {
 		// !!!! For domains that get removed through WeakReference erasure,
 		//	it MIGHT be necessary to manually flush and de-link CachedImages
@@ -75,8 +74,8 @@ public class CacheManager {
 		}
 	}
 	
-	/**
-	 * A CacheDomain 
+	/** CacheDomains exist primarily for visibility purposes, so the user or the
+	 * debugger can see which object is using which CachedImage.
 	 */
 	public class CacheDomain {
 		private final WeakReference<Object> context;
@@ -98,6 +97,7 @@ public class CacheManager {
 			}
 		}
 	}
+	
 	
 	public class CachedImage {
 		protected BufferedImage data = null;

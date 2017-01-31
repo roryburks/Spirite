@@ -394,25 +394,22 @@ public class SelectionEngine {
 	/** Clears the data under the given selection. */
 	public class ClearSelectionAction extends ImageAction {
 		private final BuiltSelection selection;
-		private final BuiltImageData builtData;
 		
 		public ClearSelectionAction(BuiltSelection builtSelection, BuiltImageData builtData) {
-			super(builtData.handle);
+			super(builtData);
 			this.selection = builtSelection;
-			this.builtData = builtData;
 			this.description = "Deleted Selected Data";
 		}
 
 		@Override
 		protected void performImageAction() {
-			Graphics g = builtData.checkout();
+			Graphics g = builtImage.checkout();
 			
 			Graphics2D g2 = (Graphics2D)g;
-//			g2.translate(-ox, -oy);
 			g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
 			selection.drawSelectionMask(g2);
 
-			builtData.checkin();
+			builtImage.checkin();
 		}
 	}
 	
@@ -474,7 +471,6 @@ public class SelectionEngine {
 	}
 	public class PasteSelectionAction extends ImageAction {
 		final CachedImage cachedData;
-		private final BuiltImageData builtImage;
 		private final BuiltSelection builtSelection;
 		
 		protected PasteSelectionAction(
@@ -482,9 +478,8 @@ public class SelectionEngine {
 				BuiltImageData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
-			super(builtActiveData.handle);
+			super(builtActiveData);
 			this.cachedData = start.cachedData;
-			this.builtImage = builtActiveData;
 			this.builtSelection = builtSelection;
 		}
 		@Override

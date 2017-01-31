@@ -332,6 +332,11 @@ public class ImageWorkspace {
 			return g;
 		}
 		
+		/** Retrieves the underlying BufferedImage of the BuiltImage */
+		public BufferedImage checkoutRaw() {
+			return checkoutImage(handle);
+		}
+		
 		/**
 		 * Once finished drawn you must checkin your data.  Not only does this
 		 * dispose the Graphics (which is debatably necessary), but it triggers
@@ -339,7 +344,8 @@ public class ImageWorkspace {
 		 */
 		public void checkin() {
 			checkinImage(handle);
-			g.dispose();
+			if( g != null)
+				g.dispose();
 			g = null;
 		}
 		
@@ -476,7 +482,7 @@ public class ImageWorkspace {
 	
 	
 	// :::: Image Checkout
-	public BufferedImage checkoutImage( ImageHandle image) {
+	private BufferedImage checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
 			return null;
 		
@@ -491,7 +497,7 @@ public class ImageWorkspace {
 		return image.deepAccess();
 	}
 	
-	public void checkinImage( ImageHandle handle) {
+	private void checkinImage( ImageHandle handle) {
 		if( !isValidHandle(handle))
 			return;
 
@@ -658,13 +664,13 @@ public class ImageWorkspace {
 	{
 		private int x, y;
 		protected ShiftDataAction(ImageHandle data, int x, int y) {
-			super(data);
+			super( new BuiltImageData(data));
 			this.x = x;
 			this.y = y;
 		}
 		@Override
 		protected void performImageAction() {
-			BufferedImage img = checkoutImage(data);
+			BufferedImage img = builtImage.checkoutRaw();
 			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			MUtil.clearImage(buffer);
 			Graphics g = buffer.getGraphics();
@@ -674,7 +680,7 @@ public class ImageWorkspace {
 			g = img.getGraphics();
 			g.drawImage(buffer, 0, 0, null);
 			g.dispose();
-			checkinImage(data);
+			builtImage.checkin();
 		}
 		@Override
 		public void stackNewAction(UndoableAction newAction) {
@@ -687,7 +693,7 @@ public class ImageWorkspace {
 			if(! (action instanceof ShiftDataAction)) return false;
 			ShiftDataAction other = (ShiftDataAction) action;
 
-			if( other.data != this.data) return false;
+			if( other.builtImage.handle != this.builtImage.handle) return false;
 			if( other.x <0 && x > 0) return false;
 			if( other.x >0 && x < 0) return false;
 			if( other.y >0 && y < 0) return false;
