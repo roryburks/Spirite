@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import spirite.MDebug;
-import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;

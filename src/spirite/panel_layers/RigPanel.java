@@ -31,7 +31,6 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.UndoEngine.UndoableAction;

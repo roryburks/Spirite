@@ -17,7 +17,6 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
-import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 
 /***

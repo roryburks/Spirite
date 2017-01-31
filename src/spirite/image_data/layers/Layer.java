@@ -9,7 +9,6 @@ import java.util.List;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.UndoableAction;
 

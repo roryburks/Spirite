@@ -8,15 +8,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-
-import javax.swing.Timer;
 
 import jpen.PButton;
 import jpen.PButtonEvent;
@@ -37,12 +34,11 @@ import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeAction;
 import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
-import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.RenderEngine;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine;
@@ -70,8 +66,6 @@ public class Penner
 	//	with UI controls
 	private final WorkPanel context;
 	private final Zoomer zoomer;	
-	private final Timer update_timer;
-	private StrokeEngine strokeEngine = null;
 	
 	// It might be easier to just link Master instead of linking every
 	//	single Manager in the kitchen, but I like the idea of encouraging
@@ -114,43 +108,10 @@ public class Penner
 	
 	private float pressure = 1.0f;
 	
-	private Tool activeTool = null;
-	
 	private int x, y;
 
 	
-	private enum STATE { 
-		READY, DRAWING, FORMING_SELECTION, MOVING_SELECTION, MOVING_NODE,
-		PICKING,
-		
-		// stateVar for CROPPING:
-		//	0 Means you're building a new Crop
-		//	1 Means you're not hovering over anything in particular (but a 
-		//		Cropping Rectangle is built
-		//	3rd Bit (0x04) represents the user Hovering over a certain section
-		//		if no other bits are set it's the middle section.
-		//	4th Bit (0x08) is set if you're resizing (as determined by 3rd Hex)
-		//	
-		//	The 3rd Hex word determines which dimensions he's resizing
-		//	0x100 : Top
-		//	0x200 : Bottom
-		//	0x400 : Left
-		//	0x800 : Right
-		// stateObj stores the built CroppingRectangle if stateVar != 0
-		CROPPING, 
-		
-		// Reference-Related
-		REF_GLOBAL_MOVE, REF_FINE_ZOOM,
-		REF_NODE_MOVE, MOVING_RIG_PART
-	};
-	private STATE state = STATE.READY;
-	private int stateVar = 0;
-	private Object stateObj = null;
-
-	class ComposerStateObject {
-		RigLayer rig = null;
-		Part part;
-	}
+	private StateBehavior behavior;
 	
 	public Penner( DrawPanel draw_panel, MasterControl master) {
 		this.zoomer = draw_panel.zoomer;
@@ -162,14 +123,6 @@ public class Penner
 		this.toolsetManager = master.getToolsetManager();
 		this.paletteManager = master.getPaletteManager();
 		this.renderEngine = master.getRenderEngine();
-
-		// Add Timer and KeyDispatcher
-		//	Note: since these are utilities with a global focus that you're
-		//	giving references of Penner to, you will need to clean them up
-		//	so that Penner (and everything it touches) gets GC'd
-		update_timer = new Timer(16, this);
-		update_timer.setRepeats(true);
-		update_timer.start();
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.addKeyEventDispatcher(this);
@@ -186,7 +139,8 @@ public class Penner
 	// :::: PenListener
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}
 	@Override	public void penTock(long arg0) {
-		
+		if( behavior != null)
+			behavior.onTock();
 	}
 	@Override
 	public void penButtonEvent(PButtonEvent pbe) {
@@ -208,78 +162,78 @@ public class Penner
 			shiftX = wX;
 			shiftY = wY;
 			shiftMode = 0;
+
+			PButton.Type button = pbe.button.getType();
+			if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
+				return;
 			
-			
-			if( workspace.isEditingReference()) {
-				if( holdingCtrl)
-					setState( STATE.REF_FINE_ZOOM);
-				else
-					setState(  STATE.REF_GLOBAL_MOVE);
-				
+			// Pen-down:
+			if( behavior != null)
+				behavior.onPenDown();
+			else if( workspace.isEditingReference()) {
+				// Special Reference behavior
+				if( holdingCtrl) {
+					behavior = new ZoomingReference();
+					behavior.start();
+				}
+				else {
+					behavior = new GlobalRefMove();
+					behavior.start();
+				}
 			}
 			else {
-				PButton.Type button = pbe.button.getType();
-				
-				if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
-					return;
+				// Tool-based State-starting
 				
 				Tool tool = toolsetManager.getSelectedTool();
 				
-				
 				switch( tool) {
 				case PEN:
-					if( holdingCtrl)  {
-						pickColor(button == PButton.Type.LEFT);
-						setState(  STATE.PICKING, (button == PButton.Type.LEFT)?1:0);
-					}
-					else
-						startPen( button == PButton.Type.LEFT);
+					if( holdingCtrl) 
+						behavior = new PickBehavior(button == PButton.Type.LEFT);
+					else 
+						behavior = new PenBehavior((button == PButton.Type.LEFT) ? 
+										paletteManager.getActiveColor(0)
+										: paletteManager.getActiveColor(1));
 					break;
 				case ERASER:
-					startErase();
+					behavior = new EraseBehavior();
 					break;
 				case FILL:
 					fill( button == PButton.Type.LEFT);
 					break;
-				case BOX_SELECTION:
-					startSelection();
-					break;
-				case MOVE:
-					startMove();
-					break;
+				case BOX_SELECTION: {
+					Selection selection = selectionEngine.getSelection();
+					
+					if( selection != null && 
+							selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
+						behavior = new MovingSelectionBehavior();
+					else 
+						behavior = new FormingSelectionBehavior();
+					break;}
+				case MOVE:{
+					Selection selection = selectionEngine.getSelection();
+					
+					if(selection != null)
+						behavior = new MovingSelectionBehavior();
+					else if(workspace.getSelectedNode() != null) 
+						behavior = new MovingNodeBehavior(workspace.getSelectedNode());
+
+					break;}
 				case COLOR_PICKER:
-					pickColor( button == PButton.Type.LEFT);
-					setState( state = STATE.PICKING);
-					stateVar = (button == PButton.Type.LEFT)?1:0;
+					behavior = new PickBehavior(button == PButton.Type.LEFT);
 					break;
 				case PIXEL:
 					if( holdingCtrl)  {
-						pickColor(button == PButton.Type.LEFT);
-						setState( state = STATE.PICKING);
-						stateVar = (button == PButton.Type.LEFT)?1:0;
+						behavior = new PickBehavior(button == PButton.Type.LEFT);
 					}
-					else
-						startPixel( button == PButton.Type.LEFT);
+					else {
+						behavior = new PixelBehavior((button == PButton.Type.LEFT) ? 
+								paletteManager.getActiveColor(0)
+								: paletteManager.getActiveColor(1));
+					}
 					break;
 				case CROP:
-					if( state == STATE.CROPPING)
-					{
-						if( (Rectangle)stateObj == null ||
-							!((Rectangle)stateObj).contains(x, y)) {
-							setState(STATE.CROPPING);
-							break;
-						}
-						
-						if( stateVar == 0x04) {
-							workspace.cropNode(workspace.getSelectedNode(), (Rectangle)stateObj);
-							setState( STATE.READY);
-						}
-						else  {
-							stateVar |= 0x08;
-						}
-					}
-					else
-						setState( STATE.CROPPING);
+					behavior = new CroppingBehavior();
 					break;
 				case COMPOSER:
 					Node node = workspace.getSelectedNode();
@@ -292,159 +246,26 @@ public class Penner
 					
 					if( part == null) part = rig.getActivePart();
 					
-					if( holdingShift) {
-						setState( STATE.MOVING_RIG_PART);
-						
-						ComposerStateObject cso = new ComposerStateObject();
-						cso.rig = rig;
-						cso.part = part;
-						this.stateObj = cso;
-					}
+					if( holdingShift)
+						behavior = new MovingRigPart(rig, part);
 					
 					break;
 				}
-
-				activeTool = tool;
+				
+				if( behavior != null)
+					behavior.start();
 			}
-			
-			
-/*			if( selectionEngine.getSelection() != null
-					&& state != STATE.FORMING_SELECTION
-					&& state != STATE.MOVING_SELECTION) 
-			{
-				selectionEngine.unselect();
-			}*/
-			
 		}
 		else {
-			// Pen up
-			switch( state) {
-			case DRAWING:
-				if( strokeEngine != null) {
-					strokeEngine.endStroke();
-					
-					StrokeAction stroke = drawEngine.new StrokeAction( 
-							strokeEngine.getParams(), 
-							strokeEngine.getHistory(),
-							strokeEngine.getLastSelection(),
-							strokeEngine.getImageData());
-					undoEngine.storeAction( stroke);
-					strokeEngine = null;
-				}
-				setState( STATE.READY);
-				break;
-			case FORMING_SELECTION:
-				selectionEngine.finishBuildingSelection();
-				setState( STATE.READY);
-				break;
-			case CROPPING: {
-				ToolSettings settings = toolsetManager.getToolSettings(Tool.CROP);
-
-				if( (stateVar & 0x8) != 0)
-					stateVar ^= 0x8;
-				
-				if( stateVar == 0) {
-					Rectangle rect = MUtil.rectFromEndpoints(
-							startX, startY, x, y);
-					stateObj = rect;
-					if( (Boolean)settings.getValue("quickCrop")) {
-						workspace.cropNode(
-								workspace.getSelectedNode(), 
-								new Rectangle( rect.x, rect.y, rect.width, rect.height));
-						setState( STATE.READY);
-					}
-					stateVar = 1;
-				}
-				break;}
-			default:
-				setState( STATE.READY);
-				break;
+			// PenUp
+			if( behavior != null) {
+				behavior.onPenUp();
 			}
 		}
 		
 	}
 
 	// :::: Start Methods
-	private void startPen( boolean leftClick) {
-		ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
-		StrokeParams stroke = new StrokeParams();
-		Color c = (leftClick) ? 
-				paletteManager.getActiveColor(0)
-				: paletteManager.getActiveColor(1);
-		stroke.setColor( c);
-		stroke.setWidth((float)settings.getValue("width"));
-		stroke.setAlpha((float)settings.getValue("alpha"));
-		
-		// Start the Stroke
-		startStroke( stroke);
-	}
-	private void startErase() {
-		ToolSettings settings = toolsetManager.getToolSettings(Tool.ERASER);
-		StrokeParams stroke = new StrokeParams();
-		stroke.setMethod( Method.ERASE);
-		stroke.setWidth((float)settings.getValue("width"));
-
-		// Start the Stroke
-		startStroke( stroke);
-	}	
-	private void startPixel( boolean leftClick) {
-		ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
-		StrokeParams stroke = new StrokeParams();
-		stroke.setMethod( Method.PIXEL);
-		Color c = (leftClick) ? 
-				paletteManager.getActiveColor(0)
-				: paletteManager.getActiveColor(1);
-		stroke.setAlpha((float)settings.getValue("alpha"));
-		stroke.setColor( c);
-		startStroke( stroke);
-		
-	}
-	private void startStroke( StrokeParams stroke) {
-		if( workspace != null && workspace.builtActiveData() != null) {
-			BuiltImageData data = workspace.builtActiveData();
-			GroupTree.Node node = workspace.getSelectedNode();
-
-			strokeEngine = drawEngine.startStrokeEngine( data);
-			
-			if( strokeEngine.startStroke(stroke,  new PenState(
-							x, y, pressure))) {
-				data.handle.refresh();
-			}
-			setState( STATE.DRAWING);
-		}
-	}
-	private void startSelection() {
-		Selection selection = selectionEngine.getSelection();
-		
-		if( selection != null && selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) {
-			setState(  STATE.MOVING_SELECTION);
-		}
-		else {
-			selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
-			setState( STATE.FORMING_SELECTION);
-		}
-	}
-	private void startMove() {
-		Selection selection = selectionEngine.getSelection();
-		
-		if(selection != null) {
-			setState(  STATE.MOVING_SELECTION);
-		}
-		else {
-			setState( state = STATE.MOVING_NODE);
-		}
-	}
-	private void pickColor( boolean leftClick) {
-		// Get the composed image
-		RenderSettings settings = new RenderSettings();
-		settings.workspace = workspace;
-		BufferedImage img = renderEngine.renderImage(settings);
-		
-		if( !MUtil.coordInImage(x, y, img))
-			return;
-		paletteManager.setActiveColor(
-				(leftClick)?0:1, new Color(img.getRGB(x, y)));
-	}
 	private void fill( boolean leftClick) {
 		// Determine Color
 		Color c = (leftClick) ? 
@@ -488,7 +309,7 @@ public class Penner
 	private void rawUpdateX( int raw) {
 		rawX = raw;
 		wX = zoomer.stiXm(rawX);
-		if( holdingShift && state == STATE.DRAWING) {
+		if( holdingShift && behavior instanceof StateBehavior) {
 			if( shiftMode == 2)
 				return;
 			if( shiftMode == 0) {
@@ -503,7 +324,7 @@ public class Penner
 	private void rawUpdateY( int raw) {
 		rawY = raw;
 		wY = zoomer.stiYm( rawY);
-		if( holdingShift && state == STATE.DRAWING) {
+		if( holdingShift && behavior instanceof StateBehavior) {
 			if( shiftMode == 1)
 				return;
 			if( shiftMode == 0) {
@@ -536,86 +357,12 @@ public class Penner
 		}
 		
 		context.refreshCoordinates(x, y);
-		GroupTree.Node node= workspace.getSelectedNode();// !!!! Maybe better to store which node you're moving locally
 		
 		// Perform state-based "on-pen/mouse move" code
-		switch( state) {
-		case DRAWING:
-			if( strokeEngine != null && node != null) {
-				strokeEngine.updateStroke( new PenState(						
-						x , y , pressure));
-			}
-			break;
-		case FORMING_SELECTION:
-			selectionEngine.updateBuildingSelection(x, y);
-			break;
-		case MOVING_SELECTION:
-			if( oldX != x || oldY != y) 
-				selectionEngine.setOffset(
-						selectionEngine.getOffsetX() + (x - oldX),
-						selectionEngine.getOffsetY() + (y - oldY));
-			break;
-		case MOVING_NODE:
-			if( node != null && (oldX != x || oldY != y))
-				node.setOffset( node.getOffsetX() + (x - oldX), 
-								 node.getOffsetY() + (y - oldY));
-			break;
-		case PICKING:
-			pickColor( stateVar == 1);
-			break;
-			
-		case REF_GLOBAL_MOVE:
-			context.refzoomer.setCX( Math.round(context.refzoomer.getCX()+ (x - oldX)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
-			context.refzoomer.setCY( Math.round(context.refzoomer.getCY()+ (y - oldY)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
-			break;
-		case REF_FINE_ZOOM:
-			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0005, 1+(rawY - oldRawY))));
-			break;
-		case CROPPING:
-			Rectangle rect = (Rectangle)stateObj;
+		if( behavior != null)
+			behavior.onMove();
 
-			if( (stateVar & 0x08) != 0) {
-				if( (stateVar & 0x100) != 0) {
-					// Top
-					rect.y += (y - oldY);
-					rect.height -= (y - oldY);
-				}
-				if( (stateVar & 0x200) != 0) {
-					// Bottom
-					rect.height += (y - oldY);
-				}
-				if( (stateVar & 0x400) != 0) {
-					// Left
-					rect.x += (x - oldX);
-					rect.width -= (x - oldX);
-				}
-				if( (stateVar & 0x800) != 0) {
-					// Right
-					rect.width+= (x - oldX);
-				}
-			}
-			break;
-		case MOVING_RIG_PART:
-			ComposerStateObject cso = (ComposerStateObject)stateObj;
-			
-			undoEngine.performAndStore(
-				cso.rig.createModifyPartAction( cso.part, 
-						cso.part.getOffsetX() + (x - oldX),
-						cso.part.getOffsetY() + (y - oldY), 
-						cso.part.getDepth(), 
-						cso.part.getTypeName(), 
-						cso.part.isVisible(), 
-						cso.part.getAlpha())
-			);
-			
-			break;
-		case REF_NODE_MOVE:
-		case READY:
-		default:
-			break;
-		}
-		
-		if( oldX != x || oldY != y && drawsOverlay()) {
+		if( oldX != x || oldY != y && behavior instanceof DrawnStateBehavior) {
 			context.repaint();
 		}
 		
@@ -624,23 +371,387 @@ public class Penner
 		oldRawX = rawX;
 		oldRawY = rawY;
 	}
-
-	public void paintOverlay( Graphics g) {
-		Graphics2D g2 = (Graphics2D)g;
+	
+	// By design, StateBehavior has and should make use of all local variables
+	//	relevant to it, variables passed to it (if any) are for convenience only
+	//	as the StateBehavior could have either accessed them or caculated them
+	//	itself.
+	abstract class StateBehavior {
+		public abstract void start();
+		public abstract void onTock();
+		public abstract void onMove();
 		
-		switch(state) {
-		case CROPPING:
-			int x1, y1, x2, y2;
+		// For most StateBehavior, onPenDown will be irrelevant/not make sense
+		//	because their penUp action is to cancel the state.
+		public void onPenDown() {}
+		public void onPenUp() {
+			end();
+		}
+		
+		public void end() {
+			// This effectively ends the state behavior
+			behavior = null;
+		}
+	}
+	
+	abstract class DrawnStateBehavior extends StateBehavior {
+		public abstract void paintOverlay( Graphics g);
+	}
+	
+	abstract class StrokeBehavior extends StateBehavior {
+		StrokeEngine strokeEngine;
+		
+		public void startStroke (StrokeParams stroke) {
+			if( workspace != null && workspace.builtActiveData() != null) {
+				BuiltImageData data = workspace.builtActiveData();
+				GroupTree.Node node = workspace.getSelectedNode();
+
+				strokeEngine = drawEngine.startStrokeEngine( data);
+				
+				if( strokeEngine.startStroke(stroke,  new PenState(
+								x, y, pressure))) {
+					data.handle.refresh();
+				}
+			}
+		}
+		
+		@Override
+		public void onTock() {
+			if( strokeEngine != null) {
+				if( strokeEngine.stepStroke()) {
+					strokeEngine.getImageData().handle.refresh();
+				}
+			}
+		}
+
+		@Override
+		public void onPenUp() {
+			if( strokeEngine != null) {
+				strokeEngine.endStroke();
+				
+				StrokeAction stroke = drawEngine.new StrokeAction( 
+						strokeEngine.getParams(), 
+						strokeEngine.getHistory(),
+						strokeEngine.getLastSelection(),
+						strokeEngine.getImageData());
+				undoEngine.storeAction( stroke);
+				strokeEngine = null;
+			}
+			super.onPenUp();
+		}
+		
+		@Override
+		public void onMove() {
+
+			// !!!! Maybe better to store which node you're moving locally
+			GroupTree.Node node= workspace.getSelectedNode();
+			if( strokeEngine != null && node != null) {
+				strokeEngine.updateStroke( new PenState(						
+						x , y , pressure));
+			}
+		}
+	}
+	
+	class EraseBehavior extends StrokeBehavior {
+		@Override
+		public void start() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.ERASER);
+			StrokeParams stroke = new StrokeParams();
+			stroke.setMethod( Method.ERASE);
+			stroke.setWidth((float)settings.getValue("width"));
+
+			// Start the Stroke
+			startStroke( stroke);
+		}
+	}
+	
+
+	class PenBehavior extends StrokeBehavior {
+		final Color color;
+		PenBehavior( Color color) {
+			this.color = color;
+		}
+		@Override
+		public void start() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
+			StrokeParams stroke = new StrokeParams();
+			stroke.setColor( color);
+			stroke.setWidth((float)settings.getValue("width"));
+			stroke.setAlpha((float)settings.getValue("alpha"));
 			
-			Rectangle rect = (stateVar == 0)
-					? rect = MUtil.rectFromEndpoints(startX, startY, x, y)
-					: (Rectangle)stateObj;
-			Rectangle screenRect = new Rectangle(
-					context.zoomer.itsXm(rect.x), context.zoomer.itsYm(rect.y), 
-					Math.round(context.zoomer.getZoom()*rect.width), Math.round(context.zoomer.getZoom()*rect.height));
+			// Start the Stroke
+			startStroke( stroke);
+		}
+	}
+	class PixelBehavior extends StrokeBehavior {
+		final Color color;
+		PixelBehavior( Color color) {
+			this.color = color;
+		}
+		@Override
+		public void start() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
+			StrokeParams stroke = new StrokeParams();
+			stroke.setMethod( Method.PIXEL);
+			stroke.setAlpha((float)settings.getValue("alpha"));
+			stroke.setColor( color);
+			startStroke( stroke);
+		}
+	}
+	
+	class PickBehavior extends StateBehavior {
+		final boolean leftClick;
+		
+		PickBehavior( boolean leftClick) {
+			this.leftClick = leftClick;
+		}
+		
+		private void pickColor() {
+			// Get the composed image
+			RenderSettings settings = new RenderSettings();
+			settings.workspace = workspace;
+			BufferedImage img = renderEngine.renderImage(settings);
 			
+			if( !MUtil.coordInImage(x, y, img))
+				return;
+			paletteManager.setActiveColor(
+					(leftClick)?0:1, new Color(img.getRGB(x, y)));
+		}
+
+		@Override
+		public void start() {
+			pickColor();
+		}
+		@Override
+		public void onMove() {
+			pickColor();
+		}
+		@Override public void onTock() {}
+	}
+	
+	class MovingNodeBehavior extends StateBehavior {
+		final Node node;
+		
+		MovingNodeBehavior( Node node) {
+			this.node = node;
+		}
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			if( node != null && (oldX != x || oldY != y))
+				node.setOffset( node.getOffsetX() + (x - oldX), 
+								 node.getOffsetY() + (y - oldY));
+		}
+	}
+	class MovingSelectionBehavior extends StateBehavior {
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			if( oldX != x || oldY != y) 
+				selectionEngine.setOffset(
+						selectionEngine.getOffsetX() + (x - oldX),
+						selectionEngine.getOffsetY() + (y - oldY));
+		}
+	}
+	class MovingRigPart extends StateBehavior {
+		private final RigLayer rig;
+		private final Part part;
+		MovingRigPart( RigLayer rig, Part part) {
+			this.rig = rig;
+			this.part = part;
+		}
+
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			undoEngine.performAndStore(
+					rig.createModifyPartAction( part, 
+							part.getOffsetX() + (x - oldX),
+							part.getOffsetY() + (y - oldY), 
+							part.getDepth(), 
+							part.getTypeName(), 
+							part.isVisible(), 
+							part.getAlpha())
+				);
+		}
+	}
+	class ZoomingReference extends StateBehavior {
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0005, 1+(rawY - oldRawY))));
+		}
+	}
+	class GlobalRefMove extends StateBehavior {
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			context.refzoomer.setCX( Math.round(context.refzoomer.getCX()+ (x - oldX)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
+			context.refzoomer.setCY( Math.round(context.refzoomer.getCY()+ (y - oldY)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
+		}
+		
+	}
+	
+	class FormingSelectionBehavior extends StateBehavior {
+		@Override
+		public void start() {
+			selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
+		}
+		@Override
+		public void onMove() {
+			selectionEngine.updateBuildingSelection(x, y);
+		}
+		@Override
+		public void onPenUp() {
+			selectionEngine.finishBuildingSelection();
+			super.onPenUp();
+		}
+		@Override
+		public void onTock() {
+			selectionEngine.updateBuildingSelection(x, y);
+		}
+	}
+	class CroppingBehavior extends DrawnStateBehavior {
+		boolean building = false;
+		boolean modifying = false;
+		Rectangle cropSection = null;
+		Rectangle middle;
+		Rectangle topRight;
+		Rectangle topLeft;
+		Rectangle bottomRight;
+		Rectangle bottomLeft;
+		int startx, starty;
+		//	0x1 : Top
+		//	0x2 : Bottom
+		//	0x4 : Left
+		//	0x8 : Right
+		byte cardinalMap = 0x00;
+
+		static final byte TOPMASK = 0x01;
+		static final byte BOTTOMMASK = 0x02;
+		static final byte LEFTMASK = 0x04;
+		static final byte RIGHTMASK = 0x08;
+//		Rectangle 
+		
+		private void buildCrop( ) {
+			middle = MUtil.scaleRect( cropSection, 0.6f);
+			topLeft = MUtil.scaleRect( cropSection, 0.2f);
+			topLeft.x = cropSection.x;
+			topLeft.y = cropSection.y;
+			topRight = new Rectangle(topLeft);
+			topRight.x = cropSection.x + cropSection.width - topRight.width;
+			topRight.y = cropSection.y;
+			bottomLeft = new Rectangle(topLeft);
+			bottomLeft.x = cropSection.x;
+			bottomLeft.y = cropSection.y + cropSection.height - bottomLeft.height;
+			bottomRight = new Rectangle(topLeft);
+			bottomRight.x = cropSection.x + cropSection.width - bottomRight.width;
+			bottomRight.y = cropSection.y + cropSection.height - bottomRight.height;
+		}
+
+		@Override
+		public void start() {
+			building = true;
+			startx = x;
+			starty = y;
+			cropSection = new Rectangle( x, y, 0, 0);
+		}
+
+		@Override
+		public void onPenUp() {
+	
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.CROP);
+	
+			cardinalMap = 0;
+
+
+			if( building) {
+				cropSection = MUtil.rectFromEndpoints(
+						startX, startY, x, y);
+				if( (Boolean)settings.getValue("quickCrop")) {
+					workspace.cropNode(
+						workspace.getSelectedNode(), 
+						cropSection);
+					end();
+				}
+				else
+					buildCrop();
+				
+				building = false;
+			}
+		}
+		
+		@Override public void onTock() {}
+
+		@Override
+		public void onMove() {
+
+			if( building) {
+				cropSection = MUtil.rectFromEndpoints(
+						startX, startY, x, y);
+			}
+			else if( modifying) {
+				if( (cardinalMap & TOPMASK) != 0 ) {
+					cropSection.y += y - oldY;
+					cropSection.height -= (y - oldY);
+				}
+				if( (cardinalMap & BOTTOMMASK) != 0) {
+					cropSection.height += (y - oldY);
+				}
+				if( (cardinalMap & LEFTMASK) != 0) {
+					cropSection.x += (x - oldX);
+					cropSection.width -= (x - oldX);
+				}
+				if( (cardinalMap & RIGHTMASK)!= 0) {
+					cropSection.width+= (x - oldX);
+				}
+				buildCrop();
+			}
+		}
+		
+		@Override
+		public void onPenDown() {
+			if( cropSection == null || !cropSection.contains(x, y)) {
+				building = true;
+				startx = x;
+				starty = y;
+			}
+			else {
+				cardinalMap = 0;
+				
+				if( middle.contains( x, y)) {
+					workspace.cropNode(
+							workspace.getSelectedNode(), 
+							cropSection);
+					
+					end();
+				}
+				else if( topRight.contains(x, y)) 
+					cardinalMap = TOPMASK | RIGHTMASK;
+				else if( topLeft.contains(x,y))
+					cardinalMap = TOPMASK | LEFTMASK;
+				else if( bottomLeft.contains(x,y))
+					cardinalMap = BOTTOMMASK| LEFTMASK;
+				else if( bottomRight.contains(x,y))
+					cardinalMap = BOTTOMMASK | RIGHTMASK;
+				
+				if( cardinalMap != 0)
+					modifying = true;
+			}
+		}
+
+		@Override
+		public void paintOverlay(Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
 			
 			Stroke s = g2.getStroke();
+			
+			// Outline
             Stroke new_stroke = new BasicStroke(
             		1, 
             		BasicStroke.CAP_BUTT, 
@@ -648,127 +759,66 @@ public class Penner
             		0, 
             		new float[]{8,4}, 0);
             g2.setStroke(new_stroke);
-			g.drawRect( screenRect.x, screenRect.y, screenRect.width,screenRect.height);
+            
+            
+            Rectangle r = context.zoomer.itsRm(cropSection);
+            g.drawRect(r.x, r.y, r.width, r.height);
+			
 
+            // Grey area outside
 			Composite c = g2.getComposite();
+			int x1 = context.zoomer.itsXm(0);
+			int y1 = context.zoomer.itsYm(0);
+			int x2 = context.zoomer.itsXm(workspace.getWidth());
+			int y2 = context.zoomer.itsYm(workspace.getHeight());
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
-
-			x1 = context.zoomer.itsXm(0);
-			y1 = context.zoomer.itsYm(0);
-			x2 = context.zoomer.itsXm(workspace.getWidth());
-			y2 = context.zoomer.itsYm(workspace.getHeight());
-
-			// Draw Grey area outside of crop
-			g2.fillRect( x1, y1, screenRect.x - x1 - 1, y2-y1);
-			g2.fillRect( screenRect.x-1, y1, screenRect.width+2, screenRect.y - y1 - 1);
-			g2.fillRect( screenRect.x-1, screenRect.y + screenRect.height+1, screenRect.width+2, y2 - (screenRect.height+ screenRect.y) + 1);
-			g2.fillRect( screenRect.x + screenRect.width+1,  y1, x2 - (screenRect.width+screenRect.x)+1, y2-y1);
+			g2.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
+			g2.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
+			g2.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
+			g2.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
 			
-			// Draw Special junks
-			if( stateVar != 0 ) {
-				// A bit too much logic in draw events for my taste, but it's
-				//	better than adding Zoom observers.
-
+			if( !building) {
 				g2.setStroke(new BasicStroke(2.0f));
-				if( (stateVar & 0x8)== 0) {
-					// Inner Rect that represents finilizing the crop
-					Rectangle inner = MUtil.scaleRect(screenRect, 0.6f);
-					
-					if( inner.contains(rawX, rawY)) {
-						g2.setColor(Color.YELLOW);
-						g2.drawRect(inner.x, inner.y, inner.width, inner.height);
-						
-						stateVar = 0x04;
-					}
+				
+				if( middle.contains(x,y)) {
+					r = context.zoomer.itsRm( middle);
+					g2.setColor(Color.YELLOW);
+		            g.drawRect(r.x, r.y, r.width, r.height);
 				}
 
-				Rectangle topLeft = MUtil.scaleRect(screenRect, 0.2f);
-				topLeft.x = screenRect.x;
-				topLeft.y = screenRect.y; 
-				
-				Rectangle topRight =new Rectangle(topLeft);
-				topRight.x = screenRect.x + screenRect.width - topRight.width;
-				topRight.y = screenRect.y;
-				
-				Rectangle bottomLeft =new Rectangle(topLeft);
-				bottomLeft.x = screenRect.x;
-				bottomLeft.y = screenRect.y + screenRect.height - bottomLeft.height;
-				
-				Rectangle bottomRight  =new Rectangle(topLeft);
-				bottomRight.x = screenRect.x + screenRect.width - bottomRight.width;
-				bottomRight.y = screenRect.y + screenRect.height - bottomRight.height;
-				
-				if( topLeft.contains(rawX, rawY)) {
+				if( topRight.contains(x,y))
 					g2.setColor(Color.YELLOW);
-					
-					if( (stateVar & 0x8) == 0)
-						stateVar = 0x04 | 0x100 | 0x400;
-				}
-				else 
+				else
 					g2.setColor(Color.WHITE);
-				g2.drawRect(topLeft.x, topLeft.y, topLeft.width, topLeft.height);
-				
-				if( topRight.contains(rawX, rawY)) {
+				r = context.zoomer.itsRm(topRight);
+	            g.drawRect(r.x, r.y, r.width, r.height);
+
+				if( topLeft.contains(x,y))
 					g2.setColor(Color.YELLOW);
-					if( (stateVar & 0x8) == 0)
-						stateVar = 0x04 | 0x100 | 0x800;
-				}
-				else 
+				else
 					g2.setColor(Color.WHITE);
-				g2.drawRect(topRight.x, topRight.y, topRight.width, topRight.height);
-				
-				if( bottomLeft.contains(rawX, rawY)) {
+				r = context.zoomer.itsRm(topLeft);
+	            g.drawRect(r.x, r.y, r.width, r.height);
+
+				if( bottomLeft.contains(x,y))
 					g2.setColor(Color.YELLOW);
-					if( (stateVar & 0x8) == 0)
-						stateVar = 0x04 | 0x200 | 0x400;
-				}
-				else 
+				else
 					g2.setColor(Color.WHITE);
-				g2.drawRect(bottomLeft.x, bottomLeft.y, bottomLeft.width, bottomLeft.height);
-				
-				if( bottomRight.contains(rawX, rawY)) {
+				r = context.zoomer.itsRm(bottomLeft);
+	            g.drawRect(r.x, r.y, r.width, r.height);
+
+				if( bottomRight.contains(x,y))
 					g2.setColor(Color.YELLOW);
-					if( (stateVar & 0x8) == 0)
-						stateVar = 0x04 | 0x200 | 0x800;
-				}
-				else 
+				else
 					g2.setColor(Color.WHITE);
-				g2.drawRect(bottomRight.x, bottomRight.y, bottomRight.width, bottomRight.height);
+				r = context.zoomer.itsRm(bottomRight);
+	            g.drawRect(r.x, r.y, r.width, r.height);
 			}
-			
-			g2.setComposite(c);
-			g2.setStroke(s);
-		default:
-			break;
-		}
-	}
 
-	public boolean drawsOverlay() {
-		switch( state) {
-		case CROPPING:
-			return true;
-		default:
-			return false;
+    		g2.setComposite(c);
+    		g2.setStroke(s);
 		}
-	}
-	
-	
-	private void setState( STATE newState) {
-		setState( newState, 0);
-	}
-	
-	private void setState(STATE newState, int var) {
-		boolean paint = false;
-		
-		if( drawsOverlay()) paint = true;
-		
-		state = newState;
-		stateVar = var;
-		stateObj = null;
-		
-		if( paint || drawsOverlay())
-			context.repaint();
-		
+
 	}
 	
 
@@ -788,21 +838,25 @@ public class Penner
 	// :::: ActionListener
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		if( strokeEngine != null && state == STATE.DRAWING) {
-			if( strokeEngine.stepStroke()) {
-				strokeEngine.getImageData().handle.refresh();
-			}
-		}
 	}
 	
 
 	/** Cleans up resources that have a global-level context in Swing to avoid
 	 * Memory Leaks. */
 	public void cleanUp() {
-		update_timer.stop();
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.removeKeyEventDispatcher(this);
 		
+	}
+
+	public boolean drawsOverlay() {
+		return behavior instanceof DrawnStateBehavior;
+	}
+
+	public void paintOverlay(Graphics g) {
+		if( behavior instanceof DrawnStateBehavior) {
+			((DrawnStateBehavior)behavior).paintOverlay(g);
+		}
 	}
 
 }

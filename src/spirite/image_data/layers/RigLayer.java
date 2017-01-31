@@ -20,7 +20,6 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;

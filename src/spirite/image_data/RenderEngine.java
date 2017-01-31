@@ -4,7 +4,6 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -24,8 +23,8 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.ErrorType;
+import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;

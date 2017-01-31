@@ -220,6 +220,15 @@ public class WorkPanel extends javax.swing.JPanel
         int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
         int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
         int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
+        
+        Rectangle itsRm( Rectangle rect) {
+        	return new Rectangle(
+        		itsXm( rect.x),
+        		itsYm( rect.y),
+        		Math.round(rect.width * zoom),
+        		Math.round(rect.height*zoom)
+        	);
+        }
     }
     
     private void setCenter( int x, int y) {

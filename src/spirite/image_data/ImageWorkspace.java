@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.Globals;
