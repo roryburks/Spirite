@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -25,6 +24,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,21 +32,19 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.TransferHandler;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.TransferHandler.TransferSupport;
+import javax.swing.ListCellRenderer;
+import javax.swing.border.EtchedBorder;
 
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.image_data.ImageWorkspace;
-import spirite.image_data.ReferenceManager;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ReferenceManager;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
-import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.layers.Layer;
-import spirite.panel_layers.LayerTreePanel.NodeTransferable;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.SliderPanel;
 
@@ -273,14 +271,22 @@ public class ReferenceSchemePanel extends OmniComponent
 						}
 					}
 				};
+				thumbnail.setBorder( BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+				this.setBorder( BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 				
 	
 				layout.setVerticalGroup( layout.createParallelGroup()
-					.addComponent(thumbnail, d.height, d.height, d.height)
+					.addGroup( layout.createSequentialGroup()
+						.addGap(2)
+						.addComponent(thumbnail, d.height, d.height, d.height)
+						.addGap(2)
+					)
 					.addComponent(label)
 				);
 				layout.setHorizontalGroup( layout.createSequentialGroup()
+					.addGap(3)
 					.addComponent(thumbnail, d.width, d.width, d.width)
+					.addGap(3)
 					.addComponent(label)
 					.addGap(0, 0, Short.MAX_VALUE)
 				);

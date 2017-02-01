@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import spirite.brains.MasterControl;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.PenState;
@@ -31,7 +32,6 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.Layer;
 

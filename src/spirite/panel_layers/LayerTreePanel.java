@@ -23,11 +23,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -46,28 +46,27 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
-import spirite.image_data.ImageHandle;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.RenderEngine;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.OpacityChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ImageWorkspace.VisibilityChange;
-import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.animation_data.FixedFrameAnimation;
-import spirite.ui.UIUtil;
 import spirite.ui.ContentTree;
-import spirite.ui.ContentTree.CCButton;
+import spirite.ui.UIUtil;
 
 public class LayerTreePanel extends ContentTree 
 	implements MImageObserver, MWorkspaceObserver, MSelectionObserver,

@@ -1,4 +1,4 @@
-package spirite.image_data;
+package spirite.brains;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,20 +26,19 @@ import javax.swing.SwingUtilities;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
-import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
-import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.GroupTree.NodeValidator;
+import spirite.image_data.ImageHandle;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -185,7 +183,6 @@ public class RenderEngine
 		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
 		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
 
-		wrk.buildSelectedImage = null;
 		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
 			// Create a buffered Image that represents the ImageData of the
 			//	current 
@@ -217,8 +214,8 @@ public class RenderEngine
 	
 	private class RenderHelper {
 		public BufferedImage selLayerBI= null;
-		public BuiltImageData buildSelectedImage;
-		public BuiltSelection builtSelection;
+		//public BuiltImageData buildSelectedImage;
+		//public BuiltSelection builtSelection;
 		float ratioW, ratioH;
 	}
 	
@@ -375,7 +372,7 @@ public class RenderEngine
 			_setGraphicsSettings(g, node,settings);
 			Graphics2D g2 = (Graphics2D)g;
 			AffineTransform transform = g2.getTransform();
-			g2.translate(node.x, node.y);
+			g2.translate(node.getOffsetX(), node.getOffsetY());
 			g2.scale( wrk.ratioW, wrk.ratioH);
 			renderable.draw(g2);
 			
@@ -391,8 +388,8 @@ public class RenderEngine
 		final Graphics2D g2 = (Graphics2D)g;
 		 cc = g2.getComposite();
 		
-		if( node.alpha != 1.0f) 
-			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.alpha));
+		if( node.getAlpha() != 1.0f) 
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.getAlpha()));
 	}
 	private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
 		((Graphics2D)g).setComposite(cc);
@@ -616,9 +613,9 @@ public class RenderEngine
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 
 
-		LinkedList<ImageHandle> relevantData = new LinkedList<ImageHandle>(evt.dataChanged);
-		LinkedList<ImageHandle> relevantDataSel = new LinkedList<ImageHandle>(evt.dataChanged);
-		if( evt.selectionLayerChange && evt.getWorkspace().getSelectionEngine().isLifted()
+		List<ImageHandle> relevantData = evt.getChangedImages();
+		List<ImageHandle> relevantDataSel = evt.getChangedImages();
+		if( evt.isSelectionLayerChange() && evt.getWorkspace().getSelectionEngine().isLifted()
 				&& evt.getWorkspace().builtActiveData() != null) 
 		{
 			relevantDataSel.add(  evt.getWorkspace().builtActiveData().handle);
@@ -630,7 +627,7 @@ public class RenderEngine
 			RenderSettings setting = entry.getKey();
 			
 			
-			if( setting.workspace == evt.workspace) {
+			if( setting.workspace == evt.getWorkspace()) {
 				
 				// Since structureChanges do not effect ImageData and image draws
 				//	ignore settings, pass over image renderings on structureChange
@@ -643,7 +640,7 @@ public class RenderEngine
 				List<ImageHandle> dataInCommon = new LinkedList<>(setting.getImagesReliedOn());
 				dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
 				
-				List<Node> nodesInCommon = new LinkedList<Node>(evt.nodesChanged);
+				List<Node> nodesInCommon = evt.getChangedNodes();
 				nodesInCommon.retainAll(setting.getNodesReliedOn());
 				
 				if( !dataInCommon.isEmpty() || !nodesInCommon.isEmpty()) {
@@ -694,12 +691,19 @@ public class RenderEngine
 	public void referenceStructureChanged(boolean hard) {
 		// TODO: Make this far more discriminating with a proper Event object
 		//	passing workspace and whether the front/back are changed
-		Iterator<RenderSettings> it = imageCache.keySet().iterator();
+		
 
+		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
+		
+		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
+	
 		while( it.hasNext()) {
-			RenderSettings settings = it.next();
+			Entry<RenderSettings,CachedImage> entry = it.next();
 			
-			if( settings.refRender != ReferenceRender.NULL) {
+			RenderSettings setting = entry.getKey();
+			if( setting.refRender != ReferenceRender.NULL) {
+				// Flush the visual data from memory, then remove the entry
+				entry.getValue().flush();
 				it.remove();
 			}
 		}

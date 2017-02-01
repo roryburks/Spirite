@@ -25,6 +25,8 @@ import jpen.event.PenListener;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
+import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
@@ -39,8 +41,6 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
-import spirite.image_data.RenderEngine;
-import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
@@ -583,7 +583,7 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0005, 1+(rawY - oldRawY))));
+			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0015, 1+(rawY - oldRawY))));
 		}
 	}
 	class GlobalRefMove extends StateBehavior {

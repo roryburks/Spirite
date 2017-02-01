@@ -109,4 +109,8 @@ public class SettingsManager {
     public Dimension getThumbnailSize() {
     	return new Dimension( 32, 32);
     }
+    
+    public boolean getAllowsEdittingInvisible() {
+    	return false;
+    }
 }

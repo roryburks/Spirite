@@ -30,6 +30,7 @@ import spirite.MUtil;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
+import spirite.brains.RenderEngine;
 import spirite.brains.SettingsManager;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -1658,7 +1659,7 @@ public class ImageWorkspace {
     	public ImageWorkspace getWorkspace() { return workspace;}
     	public List<ImageHandle> getChangedImages() { return new ArrayList<>(dataChanged);}
     	public List<Node> getChangedNodes() { return new ArrayList<>(nodesChanged);}
-    	public boolean getSelectionLayerChange() { return selectionLayerChange;}
+    	public boolean isSelectionLayerChange() { return selectionLayerChange;}
     	public boolean isStructureChange() {return isStructureChange;}
     }
     List<WeakReference<MImageObserver>> imageObservers = new ArrayList<>();

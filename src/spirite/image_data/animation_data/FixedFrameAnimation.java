@@ -13,11 +13,11 @@ import java.util.ListIterator;
 import javax.imageio.ImageIO;
 
 import spirite.MUtil;
+import spirite.brains.RenderEngine.Renderable;
 import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.RenderEngine.Renderable;
 
 /**
  * A FixedFrameAnimation 

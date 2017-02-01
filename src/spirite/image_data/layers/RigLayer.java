@@ -15,12 +15,12 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
+import spirite.brains.RenderEngine.Renderable;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
-import spirite.image_data.RenderEngine.Renderable;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;

@@ -6,26 +6,20 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MUtil;
 import spirite.brains.MasterControl;
+import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.ReferenceRender;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
-import spirite.image_data.RenderEngine;
-import spirite.image_data.RenderEngine.ReferenceRender;
-import spirite.image_data.RenderEngine.RenderSettings;
-import spirite.image_data.layers.Layer;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.panel_work.WorkPanel.Zoomer;
 
 public class ReferencePanel extends JPanel 
