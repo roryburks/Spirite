@@ -23,6 +23,7 @@ import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.RenderEngine;
+import spirite.image_data.RenderEngine.ReferenceRender;
 import spirite.image_data.RenderEngine.RenderSettings;
 import spirite.image_data.layers.Layer;
 import spirite.panel_work.WorkPanel.Zoomer;
@@ -61,7 +62,11 @@ public class ReferencePanel extends JPanel
         super.paintComponent(g);
         
         if( workspace != null) {
-            if( buffer != null) {
+        	RenderSettings settings = new RenderSettings();
+        	settings.refRender = (front)?ReferenceRender.FRONT : ReferenceRender.BACK;
+        	settings.workspace = workspace;
+        	
+        	BufferedImage buffer = master.getRenderEngine().renderImage(settings);
             
             Graphics2D g2 = (Graphics2D)g;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
@@ -69,30 +74,10 @@ public class ReferencePanel extends JPanel
             		zoomer.itsX(0), zoomer.itsY(0),
             		zoomer.itsX(buffer.getWidth()), zoomer.itsY(buffer.getHeight()),
             		0, 0, buffer.getWidth(), buffer.getHeight(), null);
-            }
         }
         
     }
     
-    // ReferencePanel bypasses the normal RenderEngine mechamisms because the
-    //	refresh mechanisms of references are fairly simple and entirely tied
-    //	to the RefrerencePanel
-    private BufferedImage buffer = null;
-    
-    private void refresh() {
-    	buffer = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB);
-    	MUtil.clearImage(buffer);
-    	Graphics g = buffer.getGraphics();
-    	if( workspace != null) {
-    		List<Layer> list = (front)?
-    				workspace.getReferenceManager().getFrontList():
-   					workspace.getReferenceManager().getBackList();
-    				
-    		for( Layer layer : list) {
-    			layer.draw(g);
-    		}
-    	}
-    }
     
 	
 	// :::: MImageObserver
@@ -105,8 +90,6 @@ public class ReferencePanel extends JPanel
 	// :::: ReferenceObserver
 	@Override
 	public void referenceStructureChanged(boolean hard) {
-		if( hard)
-			refresh();
 		repaint();
 		
 	}

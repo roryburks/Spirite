@@ -187,7 +187,7 @@ public class ReferenceSchemePanel extends OmniComponent
 		private void initComponents() {
 			GroupLayout layout = new GroupLayout(this);
 			
-			helperLabel.setText("<html><h2>Drag nodes here to add them to the reference section, drag out to remove.");
+			helperLabel.setText("<html><h2>Drag Layers here to add them to the reference section, drag out to remove.");
 			helperLabel.setForeground(helperColor);
 	
 			layout.setVerticalGroup( layout.createParallelGroup()

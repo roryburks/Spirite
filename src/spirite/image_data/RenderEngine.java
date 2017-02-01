@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -76,6 +78,12 @@ public class RenderEngine
 		private int subDepth;
 		public int depth;
 		public abstract void draw( Graphics g);
+		
+		// TODO: Implement these so the RenderEngine code
+		//	is not so ugly.
+		// 	public abstract int getDefaultWidth();
+		//	public abstract int getDefaultHeight();
+		//	public List<ImageHandle> getImageDependencies();
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -125,6 +133,25 @@ public class RenderEngine
 						settings.height / (float)settings.layer.getHeight());
 				settings.layer.draw(g);
 				g.dispose();
+			}
+			else if( settings.refRender != ReferenceRender.NULL) {
+				cachedImage = cacheManager.createImage(settings.width, settings.height, this);
+				
+				BufferedImage image = cachedImage.access();
+				Graphics2D g2 = (Graphics2D)image.getGraphics();
+				
+				List<Layer> layerList = (settings.refRender == ReferenceRender.FRONT)?
+						settings.workspace.getReferenceManager().getFrontList():
+						settings.workspace.getReferenceManager().getBackList();
+				float rw = settings.width / (float)settings.workspace.getWidth();
+				float rh = settings.height / (float)settings.workspace.getHeight();
+				g2.scale( rw, rh);
+						
+				for( Layer layer : layerList ) {
+					layer.draw(g2);
+				}
+				
+				g2.dispose();
 			}
 			else {
 				cachedImage = cacheManager.cacheImage(propperRender(settings, workingData), this);
@@ -380,7 +407,10 @@ public class RenderEngine
 		
 		return c;
 	}
-	
+
+	public enum ReferenceRender {
+		NULL, FRONT, BACK
+	}
 
 	/** RenderSettings define exactly what you want to be drawn and how. */
 	public static class RenderSettings {
@@ -399,9 +429,13 @@ public class RenderEngine
 
 		// Only one of the following can be non-null.
 		//	If all are null, it draws the root node
+		// I don't think either wrapping them in an Interface or using a generic 
+		//	Object would do here, so for now I'll just hard-code and hope this list
+		//	doesn't get too long
 		public Node node = null;
 		public ImageHandle image = null;
 		public Layer layer = null;
+		public ReferenceRender refRender = ReferenceRender.NULL;
 		
 		/** Converts all ambiguous settings into an explicit form
 		 * so that automatic hashCode and equals methods will work
@@ -424,18 +458,22 @@ public class RenderEngine
 			
 			// Change all the many things ignored if image is null to null
 			if(image != null) {
-				node = null;
-				layer = null;
+				node = null; layer = null;refRender = ReferenceRender.NULL;
 				drawSelection = false;
 				
 				if( width == -1) width = image.getWidth();
 				if( height == -1) height = image.getHeight();
 			}
 			else if( layer != null) {
-				node = null;
+				node = null; refRender = ReferenceRender.NULL;
 				drawSelection = false;
 				if( width == -1) width = layer.getWidth();
 				if( height == -1) height = layer.getHeight();
+			}
+			else if(refRender != ReferenceRender.NULL) {
+				node = null;
+				if( width == -1) width = workspace.getWidth();
+				if( height == -1) height = workspace.getHeight();
 			}
 			else {
 				if( node == null) node = workspace.getRootNode();
@@ -451,6 +489,21 @@ public class RenderEngine
 			}
 			else if( layer != null) {
 				return layer.getUsedImages();
+			}
+			else if( refRender != ReferenceRender.NULL) {
+				LinkedHashSet<ImageHandle> set = new LinkedHashSet<ImageHandle>();
+				
+				if( refRender == ReferenceRender.BACK) {
+					for( Layer layer : workspace.getReferenceManager().getBackList()) {
+						set.addAll( layer.getUsedImages());
+					}
+				}
+				else if( refRender == ReferenceRender.FRONT) {
+					for( Layer layer : workspace.getReferenceManager().getFrontList()) {
+						set.addAll( layer.getUsedImages());
+					}
+				}
+				return new ArrayList<>(set);
 			}
 			else {
 				// Get a list of all layer nodes then get a list of all ImageData
@@ -498,6 +551,7 @@ public class RenderEngine
 			result = prime * result + ((image == null) ? 0 : image.hashCode());
 			result = prime * result + ((layer == null) ? 0 : layer.hashCode());
 			result = prime * result + ((node == null) ? 0 : node.hashCode());
+			result = prime * result + ((refRender == null) ? 0 : refRender.hashCode());
 			result = prime * result + width;
 			result = prime * result + ((workspace == null) ? 0 : workspace.hashCode());
 			return result;
@@ -535,6 +589,8 @@ public class RenderEngine
 				if (other.node != null)
 					return false;
 			} else if (!node.equals(other.node))
+				return false;
+			if (refRender != other.refRender)
 				return false;
 			if (width != other.width)
 				return false;
@@ -635,7 +691,19 @@ public class RenderEngine
 		}
 	}
 	@Override
-	public void referenceStructureChanged(boolean hard) {}
+	public void referenceStructureChanged(boolean hard) {
+		// TODO: Make this far more discriminating with a proper Event object
+		//	passing workspace and whether the front/back are changed
+		Iterator<RenderSettings> it = imageCache.keySet().iterator();
+
+		while( it.hasNext()) {
+			RenderSettings settings = it.next();
+			
+			if( settings.refRender != ReferenceRender.NULL) {
+				it.remove();
+			}
+		}
+	}
 	@Override	public void toggleReference(boolean referenceMode) {}
 
 }
