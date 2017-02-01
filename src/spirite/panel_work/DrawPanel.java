@@ -50,7 +50,7 @@ public class DrawPanel extends JPanel
 	private static final long serialVersionUID = 1L;
 
 	private final RenderEngine renderEngine;	
-	private final Penner penner;
+	private final JPenPenner penner;
 	final WorkPanel context;
 	final Zoomer zoomer;
 	final ImageWorkspace workspace;
@@ -68,7 +68,7 @@ public class DrawPanel extends JPanel
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setOpaque( false);
 
-		penner = new Penner( this, master);
+		penner = new JPenPenner( this, master);
 		
 		workspace.addImageObserver(this);
 		workspace.getSelectionEngine().addSelectionObserver(this);

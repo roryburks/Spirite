@@ -15,13 +15,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import jpen.PButton;
-import jpen.PButtonEvent;
-import jpen.PKindEvent;
-import jpen.PLevel;
-import jpen.PLevelEvent;
-import jpen.PScrollEvent;
-import jpen.event.PenListener;
+import jpen.PButton;		// BAD
+import jpen.PButtonEvent;	// BAD
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
@@ -33,8 +28,6 @@ import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.PenState;
-import spirite.image_data.DrawEngine.StrokeAction;
-import spirite.image_data.DrawEngine.StrokeEngine;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
@@ -59,7 +52,7 @@ import spirite.panel_work.WorkPanel.Zoomer;
  * @author Rory Burks
  */
 public class Penner 
-	implements PenListener, KeyEventDispatcher, ActionListener
+	implements KeyEventDispatcher, ActionListener
 {
 	// Contains "Image to Screen" and "Screen to Image" methods.
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
@@ -135,137 +128,155 @@ public class Penner
 		rawUpdateX(rawX);
 		rawUpdateY(rawY);
 	}
+	
+	/** Pen/Mouse input should not necessarily change the image every time
+	 * a raw input is detected, because the input might stair-step, updating
+	 * X and Y at different times, instead step should be called at regular
+	 * short intervals (no slower than 50 times per second, preferably) to
+	 * update all move behavior.*/
+	public void step() {
+		// Perform state-based "on-pen/mouse move" code
+		if( behavior != null)
 
-	// :::: PenListener
-	@Override	public void penScrollEvent(PScrollEvent arg0) {}
-	@Override	public void penTock(long arg0) {
+		if( (oldX != x || oldY != y) && behavior != null) {
+			behavior.onMove();
+			if( behavior instanceof DrawnStateBehavior)
+				context.repaint();
+			
+			context.refreshCoordinates(x, y);
+		}
+		
 		if( behavior != null)
 			behavior.onTock();
-	}
-	@Override
-	public void penButtonEvent(PButtonEvent pbe) {
 		
-		if( pbe.button.getType() == PButton.Type.SHIFT &&
-				pbe.button.value) 
-		{
+		oldX = x;
+		oldY = y;
+		oldRawX = rawX;
+		oldRawY = rawY;
+		
+
+	}
+	
+	/**
+	 */
+	public void penDownEvent(PButtonEvent pbe) {
+		// TODO: This Should not be using JPen objects
+		if( pbe.button.getType() == PButton.Type.SHIFT) {
 			shiftX = wX;
 			shiftY = wY;
 			shiftMode = 0;
 		}
 		if( pbe.button.typeNumber > 3) return;	// Shit/Ctrl/Etc events
 		
-		if( pbe.button.value == true) {
-			x = wX;
-			y = wY;
-			startX = x;
-			startY = y;
-			shiftX = wX;
-			shiftY = wY;
-			shiftMode = 0;
+		x = wX;
+		y = wY;
+		startX = x;
+		startY = y;
+		shiftX = wX;
+		shiftY = wY;
+		shiftMode = 0;
 
-			PButton.Type button = pbe.button.getType();
-			if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
-				return;
-			
-			// Pen-down:
-			if( behavior != null)
-				behavior.onPenDown();
-			else if( workspace.getReferenceManager().isEditingReference()) {
-				// Special Reference behavior
-				if( holdingCtrl) {
-					behavior = new ZoomingReference();
-					behavior.start();
-				}
-				else {
-					behavior = new GlobalRefMove();
-					behavior.start();
-				}
+		PButton.Type button = pbe.button.getType();
+		if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
+			return;
+		
+		if( behavior != null)
+			behavior.onPenDown();
+		else if( workspace.getReferenceManager().isEditingReference()) {
+			// Special Reference behavior
+			if( holdingCtrl) {
+				behavior = new ZoomingReference();
+				behavior.start();
 			}
 			else {
-				// Tool-based State-starting
-				
-				Tool tool = toolsetManager.getSelectedTool();
-				
-				switch( tool) {
-				case PEN:
-					if( holdingCtrl) 
-						behavior = new PickBehavior(button == PButton.Type.LEFT);
-					else 
-						behavior = new PenBehavior((button == PButton.Type.LEFT) ? 
-										paletteManager.getActiveColor(0)
-										: paletteManager.getActiveColor(1));
-					break;
-				case ERASER:
-					behavior = new EraseBehavior();
-					break;
-				case FILL:
-					fill( button == PButton.Type.LEFT);
-					break;
-				case BOX_SELECTION: {
-					Selection selection = selectionEngine.getSelection();
-					
-					if( selection != null && 
-							selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
-						behavior = new MovingSelectionBehavior();
-					else 
-						behavior = new FormingSelectionBehavior();
-					break;}
-				case MOVE:{
-					Selection selection = selectionEngine.getSelection();
-					
-					if(selection != null)
-						behavior = new MovingSelectionBehavior();
-					else if(workspace.getSelectedNode() != null) 
-						behavior = new MovingNodeBehavior(workspace.getSelectedNode());
-
-					break;}
-				case COLOR_PICKER:
-					behavior = new PickBehavior(button == PButton.Type.LEFT);
-					break;
-				case PIXEL:
-					if( holdingCtrl)  {
-						behavior = new PickBehavior(button == PButton.Type.LEFT);
-					}
-					else {
-						behavior = new PixelBehavior((button == PButton.Type.LEFT) ? 
-								paletteManager.getActiveColor(0)
-								: paletteManager.getActiveColor(1));
-					}
-					break;
-				case CROP:
-					behavior = new CroppingBehavior();
-					break;
-				case COMPOSER:
-					Node node = workspace.getSelectedNode();
-					if( !(node instanceof LayerNode)
-						|| (!(((LayerNode)node).getLayer() instanceof RigLayer))) 
-						break;
-					
-					RigLayer rig = (RigLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
-					RigLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
-					
-					if( part == null) part = rig.getActivePart();
-					
-					if( holdingShift)
-						behavior = new MovingRigPart(rig, part);
-					
-					break;
-				}
-				
-				if( behavior != null)
-					behavior.start();
+				behavior = new GlobalRefMove();
+				behavior.start();
 			}
 		}
 		else {
-			// PenUp
-			if( behavior != null) {
-				behavior.onPenUp();
+			// Tool-based State-starting
+			Tool tool = toolsetManager.getSelectedTool();
+			
+			switch( tool) {
+			case PEN:
+				if( holdingCtrl) 
+					behavior = new PickBehavior(button == PButton.Type.LEFT);
+				else 
+					behavior = new PenBehavior((button == PButton.Type.LEFT) ? 
+									paletteManager.getActiveColor(0)
+									: paletteManager.getActiveColor(1));
+				break;
+			case ERASER:
+				behavior = new EraseBehavior();
+				break;
+			case FILL:
+				fill( button == PButton.Type.LEFT);
+				break;
+			case BOX_SELECTION: {
+				Selection selection = selectionEngine.getSelection();
+				
+				if( selection != null && 
+						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
+					behavior = new MovingSelectionBehavior();
+				else 
+					behavior = new FormingSelectionBehavior();
+				break;}
+			case MOVE:{
+				Selection selection = selectionEngine.getSelection();
+				
+				if(selection != null)
+					behavior = new MovingSelectionBehavior();
+				else if(workspace.getSelectedNode() != null) 
+					behavior = new MovingNodeBehavior(workspace.getSelectedNode());
+
+				break;}
+			case COLOR_PICKER:
+				behavior = new PickBehavior(button == PButton.Type.LEFT);
+				break;
+			case PIXEL:
+				if( holdingCtrl)  {
+					behavior = new PickBehavior(button == PButton.Type.LEFT);
+				}
+				else {
+					behavior = new PixelBehavior((button == PButton.Type.LEFT) ? 
+							paletteManager.getActiveColor(0)
+							: paletteManager.getActiveColor(1));
+				}
+				break;
+			case CROP:
+				behavior = new CroppingBehavior();
+				break;
+			case COMPOSER:
+				Node node = workspace.getSelectedNode();
+				if( !(node instanceof LayerNode)
+					|| (!(((LayerNode)node).getLayer() instanceof RigLayer))) 
+					break;
+				
+				RigLayer rig = (RigLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
+				RigLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
+				
+				if( part == null) part = rig.getActivePart();
+				
+				if( holdingShift)
+					behavior = new MovingRigPart(rig, part);
+				
+				break;
 			}
+			
+			if( behavior != null)
+				behavior.start();
 		}
-		
+	}
+	
+	public void penUpEvent( PButtonEvent pbe)
+	{
+		// PenUp
+		if( behavior != null) {
+			behavior.onPenUp();
+		}
 	}
 
-	// :::: Start Methods
+	// :::: Single-click actions that don't require StateBehavior
 	private void fill( boolean leftClick) {
 		// Determine Color
 		Color c = (leftClick) ? 
@@ -284,29 +295,12 @@ public class Penner
 			drawEngine.fill( x, y, c, data);
 		} 
 	}
-	
-	
-
-	@Override
-	public void penKindEvent(PKindEvent pke) {
-		switch( pke.kind.getType()) {
-		case CURSOR:
-			toolsetManager.setCursor(ToolsetManager.Cursor.MOUSE);
-			break;
-		case STYLUS:
-			toolsetManager.setCursor(ToolsetManager.Cursor.STYLUS);
-			break;
-		case ERASER:
-			toolsetManager.setCursor(ToolsetManager.Cursor.ERASER);
-			break;
-		default:
-			break;
-		}
-		
-	}
 
 	
-	private void rawUpdateX( int raw) {
+	// :::: Methods to feed raw data into the Penner for it to interpret.
+	// !!!! Note: these methods should behave as if there's no potential behavior
+	//	problem if they aren't running on the AWTEvent thread.
+	public void rawUpdateX( int raw) {
 		rawX = raw;
 		wX = zoomer.stiXm(rawX);
 		if( holdingShift && behavior instanceof StateBehavior) {
@@ -321,7 +315,7 @@ public class Penner
 		}
 		x = wX;
 	}
-	private void rawUpdateY( int raw) {
+	public void rawUpdateY( int raw) {
 		rawY = raw;
 		wY = zoomer.stiYm( rawY);
 		if( holdingShift && behavior instanceof StateBehavior) {
@@ -336,40 +330,8 @@ public class Penner
 		}
 		y = wY;
 	}
-	@Override
-	public void penLevelEvent(PLevelEvent ple) {
-		// Note: JPen updates PenLevels (which inform of things like position and pressure)
-		//	asynchronously with press buttons and other such things, so you have to be careful.
-		for( PLevel level: ple.levels) {
-			switch( level.getType()) {
-			case X:
-				rawUpdateX(Math.round(level.value));
-				break;
-			case Y:
-				rawUpdateY(Math.round(level.value));
-				break;
-			case PRESSURE:
-				pressure = level.value;
-				break;
-			default:
-				break;
-			}
-		}
-		
-		context.refreshCoordinates(x, y);
-		
-		// Perform state-based "on-pen/mouse move" code
-		if( behavior != null)
-			behavior.onMove();
-
-		if( oldX != x || oldY != y && behavior instanceof DrawnStateBehavior) {
-			context.repaint();
-		}
-		
-		oldX = x;
-		oldY = y;
-		oldRawX = rawX;
-		oldRawY = rawY;
+	public void rawUpdatePressure( float pressure) {
+		this.pressure = pressure;
 	}
 	
 	// By design, StateBehavior has and should make use of all local variables
@@ -399,57 +361,30 @@ public class Penner
 	}
 	
 	abstract class StrokeBehavior extends StateBehavior {
-		StrokeEngine strokeEngine;
 		
 		public void startStroke (StrokeParams stroke) {
 			if( workspace != null && workspace.builtActiveData() != null) {
 				BuiltImageData data = workspace.builtActiveData();
 				GroupTree.Node node = workspace.getSelectedNode();
-
-				strokeEngine = drawEngine.startStrokeEngine( data);
 				
-				if( strokeEngine.startStroke(stroke,  new PenState(
-								x, y, pressure))) {
-					data.handle.refresh();
-				}
+				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
+					end();
 			}
 		}
 		
 		@Override
 		public void onTock() {
-			if( strokeEngine != null) {
-				if( strokeEngine.stepStroke()) {
-					strokeEngine.getImageData().handle.refresh();
-				}
-			}
+			drawEngine.stepStroke( new PenState( x, y, pressure));
+
 		}
 
 		@Override
 		public void onPenUp() {
-			if( strokeEngine != null) {
-				strokeEngine.endStroke();
-				
-				StrokeAction stroke = drawEngine.new StrokeAction( 
-						strokeEngine.getParams(), 
-						strokeEngine.getHistory(),
-						strokeEngine.getLastSelection(),
-						strokeEngine.getImageData());
-				undoEngine.storeAction( stroke);
-				strokeEngine = null;
-			}
+			drawEngine.endStroke();
 			super.onPenUp();
 		}
 		
-		@Override
-		public void onMove() {
-
-			// !!!! Maybe better to store which node you're moving locally
-			GroupTree.Node node= workspace.getSelectedNode();
-			if( strokeEngine != null && node != null) {
-				strokeEngine.updateStroke( new PenState(						
-						x , y , pressure));
-			}
-		}
+		@Override public void onMove() {}
 	}
 	
 	class EraseBehavior extends StrokeBehavior {

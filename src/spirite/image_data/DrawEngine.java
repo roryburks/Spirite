@@ -12,7 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import spirite.MDebug;
 import spirite.MUtil;
+import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
@@ -20,7 +23,7 @@ import spirite.image_data.UndoEngine.ImageAction;
 /***
  * Pretty much anything which alters the image data directly goes 
  * through the DrawEngine.
- * 
+
  * 
  * @author Rory Burks
  *
@@ -35,12 +38,6 @@ public class DrawEngine {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
 		this.selectionEngine = workspace.getSelectionEngine();
-	}
-
-	public StrokeEngine startStrokeEngine( BuiltImageData data) {
-		engine.data = data;
-		engine.stroke=  null;
-		return engine;
 	}
 	
 	public boolean strokeIsDrawing() {
@@ -60,26 +57,85 @@ public class DrawEngine {
 			return null;
 	}
 	
-	
-	
-	/** Because many drawing actions can filter based on Selection
-	 * Mask, when re-doing them the mask which was active at the time
-	 * has to be remembered.  This function will apply the selection mask
-	 * to the next draw action performed.  If there is no seletion mask
-	 * queued, it will use the active selection.
-	 */
-	void queueSelectionMask( BuiltSelection mask) {
-		queuedSelection = mask;
+	/** @return true if the stroke started, false otherwise	 */
+	public boolean startStroke(StrokeParams stroke, PenState ps, BuiltImageData data) {
+		if( engine.state == STATE.DRAWING) {
+			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
+			return false;
+		}
+		else if( data == null) {
+			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to start stroke on null data.");
+			return false;
+		}
+		else {
+			if( engine.startStroke(stroke, ps, data))
+				data.handle.refresh();
+			return true;
+		}
 	}
-	private BuiltSelection pollSelectionMask() {
-		if( queuedSelection == null)
-			return workspace.getSelectionEngine().getBuiltSelection();
+	public void stepStroke( PenState ps) {
+		if( engine.state != STATE.DRAWING) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to step stroke that isn't active.");
+			return ;
+		}
+		else {
+			if(engine.stepStroke(ps))
+				engine.data.handle.refresh();
+		}
+	}
+	public void endStroke( ) {
+		if( engine.state != STATE.DRAWING) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to end stroke that isn't active.");
+			return ;
+		}
+		else {
+				engine.endStroke();
+				
+				undoEngine.storeAction(
+					new StrokeAction(
+						engine.getParams(),
+						engine.getHistory(),
+						engine.getLastSelection(),
+						engine.getImageData()));
+		}
+		
+	}
+	
 
-		BuiltSelection ret = queuedSelection;
-		queuedSelection = null;
-		return ret;
+	/***
+	 * 
+	 */
+	public void clear( BuiltImageData data) {
+		execute( new ClearAction(data, pollSelectionMask()));
 	}
-	BuiltSelection queuedSelection = null;
+
+	/***
+	 * Simple queue-based flood fill.
+	 * @return true if any changes were made
+	 */
+	public boolean fill( int x, int y, Color color, BuiltImageData data)
+	{
+		if( data == null) return false;
+		
+		Point p = data.convert( new Point(x,y));
+		
+		BufferedImage bi = data.checkoutRaw();
+		if( !MUtil.coordInImage( p.x, p.y, bi)) {
+			return false;
+		}
+		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
+			return false;
+		}
+		data.checkin();
+		
+
+		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
+
+		return true;
+	}
+	
+	
+	
 	
 	
 	
@@ -184,11 +240,14 @@ public class DrawEngine {
 		 * Starts a new stroke using the workspace's current selection as the 
 		 * selection mask 
 		 * 
-		 * @return true if the data has been changed, false otherwise*/
-		public synchronized boolean startStroke( StrokeParams s, PenState ps) {
-
+		 * @return true if the data has been changed, false otherwise.*/
+		public synchronized boolean startStroke( 
+				StrokeParams s, PenState ps, BuiltImageData data) 
+		{
 			if( data == null) 
 				return false;
+			
+			this.data = data;
 			stroke = s;
 			
 			strokeLayer = new BufferedImage( 
@@ -243,9 +302,17 @@ public class DrawEngine {
 		 * 
 		 * @return true if the step wan't a null-step (non-moving)
 		 */
-		public synchronized boolean stepStroke() {
+		public synchronized boolean stepStroke( PenState ps) {
+			Point layerSpace = data.convert( new Point( ps.x, ps.y));
+			newState.x = layerSpace.x;
+			newState.y = layerSpace.y;
+			newState.pressure = ps.pressure;
+			rawState.x = ps.x;
+			rawState.y = ps.y;
+			rawState.pressure = ps.pressure;
+			
 			if( state != STATE.DRAWING || data == null) {
-//				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
+				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
 //				endStroke();
 				return false;
 			}
@@ -283,19 +350,6 @@ public class DrawEngine {
 			oldState.y = newState.y;
 			oldState.pressure = newState.pressure;
 			return changed;
-		}
-		
-		/** Updates the coordinates for the stroke.
-		 * 
-		 * DOES NOT ATUALLY DRAW THE STROKE (call stepStroke for that). */
-		public synchronized void updateStroke( PenState state) {
-			Point layerSpace = data.convert( new Point( state.x, state.y));
-			newState.x = layerSpace.x;
-			newState.y = layerSpace.y;
-			newState.pressure = state.pressure;
-			rawState.x = state.x;
-			rawState.y = state.y;
-			rawState.pressure = state.pressure;
 		}
 		
 		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
@@ -401,39 +455,29 @@ public class DrawEngine {
 
 	
 	// :::: Other
-	/***
-	 * 
-	 */
-	public void clear( BuiltImageData data) {
-		execute( new ClearAction(data, pollSelectionMask()));
-	}
+	
+	
+	
+	
 
-	/***
-	 * Simple queue-based flood fill.
-	 * @return true if any changes were made
+	/** Because many drawing actions can filter based on Selection
+	 * Mask, when re-doing them the mask which was active at the time
+	 * has to be remembered.  This function will apply the selection mask
+	 * to the next draw action performed.  If there is no seletion mask
+	 * queued, it will use the active selection.
 	 */
-	public boolean fill( int x, int y, Color color, BuiltImageData data)
-	{
-		if( data == null) return false;
-		
-		Point p = data.convert( new Point(x,y));
-		
-		BufferedImage bi = data.checkoutRaw();
-		if( !MUtil.coordInImage( p.x, p.y, bi)) {
-			return false;
-		}
-		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
-			return false;
-		}
-		data.checkin();
-		
-		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
-		return true;
+	void queueSelectionMask( BuiltSelection mask) {
+		queuedSelection = mask;
 	}
-	
-	
-	
-	
+	private BuiltSelection pollSelectionMask() {
+		if( queuedSelection == null)
+			return workspace.getSelectionEngine().getBuiltSelection();
+
+		BuiltSelection ret = queuedSelection;
+		queuedSelection = null;
+		return ret;
+	}
+	BuiltSelection queuedSelection = null;
 	
 	// :::: UndoableActions
 	//	All actions 
@@ -476,13 +520,11 @@ public class DrawEngine {
 		@Override
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
-			StrokeEngine engine = workspace.getDrawEngine().startStrokeEngine(builtImage);
 			
-			engine.startStroke(params, points[0]);
+			startStroke(params, points[0], builtImage);
 			
 			for( int i = 1; i < points.length; ++i) {
-				engine.updateStroke( points[i]);
-				engine.stepStroke();
+				engine.stepStroke( points[i]);
 			}
 			
 			engine.endStroke();
