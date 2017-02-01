@@ -71,9 +71,9 @@ public class MasterControl
     
 
     public MasterControl() {
+        settingsManager = new SettingsManager();
         hotkeys = new HotkeyManager();
         toolset = new ToolsetManager();
-        settingsManager = new SettingsManager();
         cacheManager = new CacheManager();
         renderEngine = new RenderEngine( this);	
         palette = new PaletteManager( this);

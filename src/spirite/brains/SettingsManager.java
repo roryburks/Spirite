@@ -1,5 +1,6 @@
 package spirite.brains;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,5 +104,9 @@ public class SettingsManager {
         	MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Setting String Requested: " + setting);
         	return false;
     	}
+    }
+    
+    public Dimension getThumbnailSize() {
+    	return new Dimension( 32, 32);
     }
 }

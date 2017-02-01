@@ -62,9 +62,13 @@ public class MDebug {
 	public static void handleWarning( WarningType priority, Object source, String message) {
 		System.out.println( "Warning: " + message);
 	}
-	
+
 	public static void handleError( ErrorType type, Object source, String message) {
 		Thread.dumpStack();
+        JOptionPane.showMessageDialog(null, "Error: " + message);
+	}
+	public static void handleError( ErrorType type, Exception source, String message) {
+		source.printStackTrace();
         JOptionPane.showMessageDialog(null, "Error: " + message);
 	}
 

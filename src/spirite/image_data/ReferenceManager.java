@@ -41,16 +41,34 @@ public class ReferenceManager {
 	
 	
 	
-	public void addReference( Layer toAdd,int i) {
-		System.out.println(i);
+	public void addReference( Layer toAdd,int index) {
 		if( toAdd != null) {
-			references.add(i, toAdd);
+			references.add(index, toAdd);
 			triggerReferenceStructureChanged(true);
 		}
 	}
+	public void removeReferenceAt( int index) {
+		if( references.get(index) != null && index < references.size()) {
+			references.remove(index);
+			triggerReferenceStructureChanged(true);
+		}
+	}
+	public void moveReference( int oldIndex, int newIndex) {
+		Layer toMove = references.get(oldIndex);
+		if( oldIndex > newIndex) {
+			references.remove(oldIndex);
+			references.add(newIndex,toMove);
+		}
+		else {
+			references.add(newIndex,toMove);
+			references.remove(oldIndex);
+		}
+		triggerReferenceStructureChanged(true);
+	}
 	public void clearReference( Layer toRem) {
 		if( toRem != null) {
-			references.remove(toRem);
+			while( references.contains(toRem))
+				references.remove(toRem);
 			triggerReferenceStructureChanged(true);
 		}
 	}
