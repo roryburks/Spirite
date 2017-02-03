@@ -55,6 +55,11 @@ public class Globals {
     		{"visible_off", 1, 0},
     		{"new_layer", 2, 0},
     		{"new_group", 3, 0},
+
+    		{"icon.anim.stepF", 0,1},
+    		{"icon.anim.play", 1,1},
+    		{"icon.anim.stepB", 2,1},
+    		
     		{"icon.frame.layers",0,2},
     		{"icon.frame.undoHistory",1,2},
     		{"icon.frame.animationScheme",2,2},

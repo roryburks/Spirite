@@ -418,7 +418,7 @@ public class DrawEngine {
 		float width = 1.0f;
 		float alpha = 1.0f;
 		boolean locked = false;
-		PenDynamics dynamics = DrawEngine.getBasicDynamics();
+		PenDynamics dynamics = DrawEngine.getDefaultDynamics();
 		
 		public StrokeParams() {}
 		

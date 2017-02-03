@@ -205,11 +205,11 @@ public class ReferenceSchemePanel extends OmniComponent
 		}
 
 		@Override
-		public void paint(Graphics g) {
+		public void paintComponent(Graphics g) {
 			// It's generally not a good idea to Override paint instead of
 			//	paintComponent, but this is the laziest way to get the lines 
 			//	to appear over other components
-			super.paint(g);
+			super.paintComponent(g);
 			
 			
 			switch( dndMan.dragState) {

@@ -159,6 +159,8 @@ public class RenderEngine
 			imageCache.put(settings, cachedImage);
 		}
 		
+		if( compositionImage != null) compositionImage.flush();
+		compositionImage = null;
 		return cachedImage.access();
 	}
 	
@@ -178,42 +180,61 @@ public class RenderEngine
 		for( int i=0; i<n; ++i) {
 			images[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
 		}
+		
+		// Step 2: Compose the Stroke and Lifted Selection data onto the 
+		//	active Image so that they appear when drawn.
+		BuiltImageData dataContext= settings.workspace.buildActiveData();
+		if( dataContext != null) {
+			if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
 
-		// Step 2: Recursively draw the image
-		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
-		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
-
-		if( settings.drawSelection && settings.workspace.getSelectionEngine().getLiftedImage() != null ){
-			// Create a buffered Image that represents the ImageData of the
-			//	current 
-			BuiltImageData dataContext= settings.workspace.builtActiveData();
-			if( dataContext != null) {
-				wrk.selLayerBI = new BufferedImage( 
+				compositionImage= new BufferedImage( 
 						dataContext.handle.getWidth(), dataContext.handle.getHeight(),
 						BufferedImage.TYPE_INT_ARGB);
-				MUtil.clearImage(wrk.selLayerBI);
+				MUtil.clearImage(compositionImage);
+				compositionContext = dataContext.handle;
 				
-				Graphics2D g2 = (Graphics2D) wrk.selLayerBI.getGraphics();
+				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();
+				g2.drawImage(dataContext.handle.deepAccess(), 0, 0, null);
 				g2.setTransform( dataContext.getTransform());
 				g2.transform(settings.workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
 				
 				g2.drawImage( settings.workspace.getSelectionEngine().getLiftedImage().access(), 0, 0, null);
-//				wrk.builtSelection = 
+				g2.dispose();
+			}
+			if( settings.workspace.getDrawEngine().strokeIsDrawing()) {
+				if( compositionImage == null) {
+					compositionImage= new BufferedImage( 
+							dataContext.handle.getWidth(), dataContext.handle.getHeight(),
+							BufferedImage.TYPE_INT_ARGB);
+					MUtil.clearImage(compositionImage);
+					compositionContext = dataContext.handle;
+				}
+				else {
+					MDebug.log("Probably shouldn't have lifted data and stroke engine at the same time");
+				}
+				
+				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();
+				g2.drawImage(dataContext.handle.deepAccess(), 0, 0, null);
+				settings.workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(g2);
+				g2.dispose();
 			}
 		}
+
+		// Step 3: Recursively draw the image
+		wrk.ratioW = settings.width / (float)settings.workspace.getWidth();
+		wrk.ratioH = settings.height / (float)settings.workspace.getHeight();
+
 		_propperRec( (GroupNode)settings.node, 0, settings, images, wrk);
 		
 		// Flush the data we only needed to build the image
 		for( int i=1; i<n;++i)
 			images[i].flush();
-		if( wrk.selLayerBI != null)
-			wrk.selLayerBI.flush();
 		
 		return images[0];
 	}
 	
 	private class RenderHelper {
-		public BufferedImage selLayerBI= null;
+		//public BufferedImage selLayerBI= null;
 		//public BuiltImageData buildSelectedImage;
 		//public BuiltSelection builtSelection;
 		float ratioW, ratioH;
@@ -323,6 +344,22 @@ public class RenderEngine
 
 		g.dispose();
 	}
+	
+	// Perhaps a bit hacky, but when ImageData is in a certain composite state,
+	//	particularly when a stroke is being drawn or if lifted Image data is
+	//	being moved, the RenderImage will compose all the drawn layers onto a single
+	//	image which the ImageHandle's drawLayer will call.  This de-centralizes the
+	//	rendering code somewhat, but saves double-creating layers or missing changes
+	//	to the image data.
+	private BufferedImage compositionImage;
+	private ImageHandle compositionContext = null;
+	public BufferedImage getCompositeLayer( ImageHandle handle) {
+		if( handle.equals(compositionContext)){
+			return compositionImage;
+		}
+		return null;
+	}
+	
 
 	private class GroupRenderable extends Renderable {
 		private final GroupNode node;
@@ -616,9 +653,9 @@ public class RenderEngine
 		List<ImageHandle> relevantData = evt.getChangedImages();
 		List<ImageHandle> relevantDataSel = evt.getChangedImages();
 		if( evt.isSelectionLayerChange() && evt.getWorkspace().getSelectionEngine().isLifted()
-				&& evt.getWorkspace().builtActiveData() != null) 
+				&& evt.getWorkspace().buildActiveData() != null) 
 		{
-			relevantDataSel.add(  evt.getWorkspace().builtActiveData().handle);
+			relevantDataSel.add(  evt.getWorkspace().buildActiveData().handle);
 		}
 		
 		while( it.hasNext()) {

@@ -28,11 +28,11 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
  * @author Rory Burks
  *
  */
-public class HotkeyManager {
+public class ActionManager {
     private final Preferences prefs;    
     private final BidiMap<Hotkey,String> hotkey_map;
 
-    HotkeyManager() {
+    ActionManager() {
         prefs = Preferences.userNodeForPackage(spirite.Main.class);
         hotkey_map = new DualHashBidiMap<>();
 

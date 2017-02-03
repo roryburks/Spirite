@@ -18,7 +18,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
-import spirite.panel_anim.AnimPanel;
+import spirite.panel_anim.AnimationPreviewPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_layers.ReferenceSchemePanel;
@@ -252,7 +252,7 @@ public class FrameManager
 		});commandMap.put("showAnimationView", new Runnable() {
 			@Override public void run() {
 				JDialog d = new JDialog();
-				d.add(new AnimPanel(master));
+				d.add(new AnimationPreviewPanel(master));
 				d.pack();
 				d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				d.setVisible(true);

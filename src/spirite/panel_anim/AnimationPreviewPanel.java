@@ -20,9 +20,14 @@ import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicSliderUI;
+import javax.swing.plaf.metal.MetalSliderUI;
 
+import spirite.Globals;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
@@ -37,9 +42,9 @@ import spirite.ui.components.MTextFieldNumber;
 
 
 
-public class AnimPanel extends OmniComponent
-        implements MCurrentImageObserver, ActionListener, WindowListener, 
-        	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver
+public class AnimationPreviewPanel extends OmniComponent
+        implements MCurrentImageObserver, ActionListener, 
+        	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver, ChangeListener
 {
 	private static final long serialVersionUID = 1L;
 	private final Timer timer;
@@ -47,6 +52,8 @@ public class AnimPanel extends OmniComponent
 	
 	
     private final Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
+    JLabel lbLeft = new JLabel();
+    JLabel lbRight = new JLabel();
 	
     private Animation animation = null;
     
@@ -60,10 +67,21 @@ public class AnimPanel extends OmniComponent
 	private final MasterControl master;
 	private ImageWorkspace workspace;
 	
+
+	// Start Design
+    private DisplayPanel previewPanel;
+    private MTextFieldNumber tfFPS;
+    private JButton buttonBack;
+    private JToggleButton buttonPlay;
+    private JButton buttonForward;
+    private final JSlider slider = new JSlider();
+    private final SliderLimiter sliderLimiter = new SliderLimiter();
+    
+	
     /**
      * Creates new form PreviewPanel
      */
-    public AnimPanel( MasterControl master) {
+    public AnimationPreviewPanel( MasterControl master) {
         this.master = master;
         
         
@@ -80,7 +98,10 @@ public class AnimPanel extends OmniComponent
         timer.setRepeats(true);
         timer.start();
         
+        
         updateSlider();
+
+        slider.addChangeListener(this);
         
         // Add Listeners
         tfFPS.getDocument().addDocumentListener( this);
@@ -89,16 +110,9 @@ public class AnimPanel extends OmniComponent
         buttonPlay.addActionListener(this);
         buttonForward.addActionListener(this);
         
-        // I hate doing things like this, but since the Timer keeps <this> alive and 
-        //	the Swing system keeps the timer alive, <this> will never get GC'd and
-        //	the timer will never stop unless you stop it manually.
-        final AnimPanel _this = this;
-        SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				((java.awt.Window)SwingUtilities.getRoot(_this)).addWindowListener(_this);
-			}
-		});
+        buttonBack.setIcon(Globals.getIcon("icon.anim.stepB"));
+        buttonPlay.setIcon(Globals.getIcon("icon.anim.play"));
+        buttonForward.setIcon(Globals.getIcon("icon.anim.stepF"));
         
 
         if( master.getCurrentWorkspace() != null) {
@@ -108,54 +122,6 @@ public class AnimPanel extends OmniComponent
 	        }
         }
     }
-    
-    private void updateSlider() {
-        tfFPS.setText(Float.toString(tps));
-    	sliderDoc.get(0).setText(Float.toString(start));
-    	sliderDoc.get(1000).setText(Float.toString(end));
-    }
-
-    @Override
-    public void imageRefresh() {
-    	this.repaint();
-    }
-	@Override
-	public void imageStructureRefresh() {
-		this.repaint();
-	}
-	
-	private void constructFromAnimation( Animation anim) {
-		
-		animation = anim;
-		start = anim.getStartFrame();
-		end = anim.getEndFrame();
-		slider.setValue(0);
-
-		updateSlider();
-	}
-	
-
-	// Start Design
-    private DisplayPanel previewPanel;
-    private MTextFieldNumber tfFPS;
-    private JButton buttonBack;
-    private JToggleButton buttonPlay;
-    private JButton buttonForward;
-    private JSlider slider;
-    
-    private class DisplayPanel extends JPanel {
-    	@Override
-    	public void paintComponent(Graphics g) {
-    		super.paintComponent(g);
-    		
-    		if( animation != null) {
-    			Graphics2D g2 = (Graphics2D)g;
-    			g2.scale(2.0, 2.0);
-    			animation.drawFrame(g, met);
-    		}
-    	}
-    }
-    
     private void initComponents() {
         Dimension size = new Dimension(24,24);
 
@@ -166,15 +132,7 @@ public class AnimPanel extends OmniComponent
         buttonForward = new JButton();
         
         // Init Slider Properties
-        slider = new JSlider();
-        slider.setEnabled(false);
-		slider.setMinimum(0);
-		slider.setMaximum(1000);
-		slider.setValue(0);
-		sliderDoc.put(0, new JLabel("0.0"));
-		sliderDoc.put(1000, new JLabel("1.0"));
-        slider.setLabelTable( sliderDoc);
-        slider.setPaintLabels(true);
+        slider.setEnabled(true);
 		
         
         tfFPS = new MTextFieldNumber( true, true);
@@ -213,7 +171,10 @@ public class AnimPanel extends OmniComponent
                 .addGroup( layout.createParallelGroup(Alignment.LEADING)
                 	.addGroup( layout.createSequentialGroup()
                 		.addGap(5)
-                		.addComponent(slider, 0, 186, 186)
+                		.addGroup( layout.createParallelGroup()
+                			.addComponent(slider, 0, 186, 186)
+                			.addComponent(sliderLimiter)
+                		)
             			.addContainerGap(0, Short.MAX_VALUE)
                 	)
                 )
@@ -240,6 +201,7 @@ public class AnimPanel extends OmniComponent
         		)
     			.addGap(5)
     			.addComponent(slider)
+    			.addComponent(sliderLimiter, 16, 16, 16)
     			.addGap(5)
         );
 
@@ -247,6 +209,70 @@ public class AnimPanel extends OmniComponent
     }
     // End Design
 
+    class SliderLimiter extends JPanel {
+    	
+    	@Override
+    	public void paintComponent(Graphics g) {
+    		
+    	}
+    }
+    
+
+    
+    private void updateSlider() {
+        tfFPS.setText(Float.toString(tps));
+
+    	slider.setMinimum((int) start);
+    	slider.setMaximum((int) end-1);
+		slider.setValue((int)start);
+        
+    	sliderDoc.clear();
+    	lbLeft.setText(Float.toString(start));
+    	lbRight.setText(Float.toString(end-1));
+    	sliderDoc.put((int)start, lbLeft);
+    	sliderDoc.put((int)(end-1), lbRight);
+        slider.setLabelTable( sliderDoc);
+
+        slider.setPaintLabels(true);
+    	slider.setPaintTicks(true);
+    	slider.setSnapToTicks(true);
+    	slider.setMajorTickSpacing(1);
+    }
+
+    @Override
+    public void imageRefresh() {
+    	this.repaint();
+    }
+	@Override
+	public void imageStructureRefresh() {
+		this.repaint();
+	}
+	
+	private void constructFromAnimation( Animation anim) {
+		
+		animation = anim;
+		start = anim.getStartFrame();
+		end = anim.getEndFrame();
+		slider.setValue(0);
+
+		updateSlider();
+	}
+	
+
+    
+    private class DisplayPanel extends JPanel {
+    	@Override
+    	public void paintComponent(Graphics g) {
+    		super.paintComponent(g);
+    		
+    		if( animation != null) {
+    			Graphics2D g2 = (Graphics2D)g;
+    			g2.scale(2.0, 2.0);
+    			animation.drawFrame(g, met);
+    		}
+    	}
+    }
+    
     
     // :::: ActionListener
 	@Override
@@ -256,9 +282,8 @@ public class AnimPanel extends OmniComponent
 			if( isPlaying) {
 				met += 16.0f * tps / 1000.0f;
 				met = MUtil.cycle(start, end, met);
-				slider.setValue( Math.round(1000* (met - start) / (end - start)));
+				slider.setValue((int) met);
 				
-				repaint();
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
@@ -266,19 +291,6 @@ public class AnimPanel extends OmniComponent
 			((FixedFrameAnimation)this.animation).save();
 		}
 	}
-
-
-	// :::: WindowListener
-	@Override
-	public void windowClosed(WindowEvent e) {
-		timer.stop();
-	}
-	@Override	public void windowClosing(WindowEvent e) {}
-	@Override	public void windowDeactivated(WindowEvent e) {}
-	@Override	public void windowDeiconified(WindowEvent e) {}
-	@Override	public void windowIconified(WindowEvent e) {}
-	@Override	public void windowOpened(WindowEvent e) {}
-	@Override	public void windowActivated(WindowEvent e) {}
 
 	// :::: DocumentListener
 	@Override
@@ -312,6 +324,11 @@ public class AnimPanel extends OmniComponent
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+
+		repaint();
+	}
 
 
 	// :::: MAnimationStructureObserver
@@ -325,5 +342,10 @@ public class AnimPanel extends OmniComponent
 		
 	}
 	
+	// :::: Inherited from OmniContainer
+	@Override
+	public void onCleanup() {
+		timer.stop();
+	}
 	
 }

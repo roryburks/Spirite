@@ -3,10 +3,13 @@ package spirite;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -134,7 +137,7 @@ public class MUtil {
 	    return new String(hexChars);
 	}
 	
-	// :::: Other
+	// :::: Image-related
 	/** Fills the image entirely with transparent data */
 	public static void clearImage( BufferedImage image) {
 		Graphics2D g2 = (Graphics2D)image.getGraphics();
@@ -159,6 +162,30 @@ public class MUtil {
 				toCopy.copyData(null),
 				toCopy.isAlphaPremultiplied(),
 				null);
+	}
+	
+
+	/** Attempts to get an image from the clipboard, returning null if 
+	 * there is no image or for some reason you can't get it. 
+	 * @return
+	 */
+	public static BufferedImage imageFromClipboard() {
+		try {
+	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    	
+			// Convert Clipboard image into BufferedImage
+			Image img = (Image)c.getData(DataFlavor.imageFlavor);
+			
+    		BufferedImage bi = new BufferedImage(  
+    				img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    		Graphics g = bi.getGraphics();
+    		g.drawImage(img, 0, 0, null);
+    		g.dispose();
+
+    		return bi;
+		} catch( IOException | UnsupportedFlavorException e) {}
+		
+		return null;
 	}
 	
 	/**

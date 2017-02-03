@@ -3,6 +3,8 @@ package spirite.image_data;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import spirite.MDebug;
+import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 
@@ -60,20 +62,19 @@ public class ImageHandle {
 	}
 	
 	public void drawLayer(Graphics g) {
+		if( context == null) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
+			return;
+		}
 		CachedImage ci = context.getData(id);
 		
 		if( ci == null) return;
 		
-		if( context != null && context.getDrawEngine().getStrokeContext() == this) {
-			BufferedImage bi = context.getDrawEngine().getStrokeEngine().getCompositionLayer();
-			Graphics big = bi.getGraphics();
-			big.drawImage( ci.access(), 0, 0, null);
-			context.getDrawEngine().getStrokeEngine().drawStrokeLayer(big);
-			g.drawImage( bi, 0, 0, null);
-			big.dispose();
+		if( context.getRenderEngine().getCompositeLayer(this) == null) {
+			g.drawImage( ci.access(), 0, 0, null);
 		}
 		else {
-			g.drawImage( ci.access(), 0, 0, null);
+			g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
 		}
 	}
 	

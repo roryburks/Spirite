@@ -255,8 +255,6 @@ public class LayerTreePanel extends ContentTree
 			_cfw_construcRecursively( node, root);
 		model.nodeStructureChanged(root);
 		
-
-		// TODO: Fix the problem this is causing and re-implement
 		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
 		transferHandler.stopDragging();
 		finishBuilding();

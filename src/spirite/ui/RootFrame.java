@@ -104,7 +104,7 @@ public class RootFrame extends javax.swing.JFrame
     	container = new ResizeContainerPanel(workPane,ContainerOrientation.HORIZONTAL);
     	this.add(container);
 
-    	container.addPanel(50, 160, 1, leftContainer);
+    	container.addPanel(50, 240, 1, leftContainer);
     	container.addPanel(50, 160, -1, rightContainer);
     	container.addPanel(50, 160, -2, rrContainer);
     	container.setStretchArea(200);
@@ -182,16 +182,6 @@ public class RootFrame extends javax.swing.JFrame
     	
         setJMenuBar(jMenuBar);
     }
-    
-    // :::: Menu Actions
-    
-    
-    
-
-    
-
-    
-
     
     // :::: KeyEventDispatcher
     @Override

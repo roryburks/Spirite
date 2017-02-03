@@ -489,11 +489,21 @@ public class ImageWorkspace {
 		}
 	}
 	
-	public BuiltImageData builtActiveData() {
+	public boolean isActiveHandle( ImageHandle handle) {
+		if( selected == null) return false;
+		
+		if( selected instanceof LayerNode) {
+			return ((LayerNode)selected).getLayer().getActiveData().handle.equals( handle);
+		}
+		return false;
+	}
+	
+	public BuiltImageData buildActiveData() {
+		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;
 		
-		if( selected instanceof GroupTree.LayerNode) {
-			BuildingImageData data = ((GroupTree.LayerNode)selected).getLayer().getActiveData();
+		if( selected instanceof LayerNode) {
+			BuildingImageData data = ((LayerNode)selected).getLayer().getActiveData();
 			
 			return  new BuiltImageData( data.handle,
 					data.ox + selected.x, data.oy + selected.y);
@@ -502,6 +512,7 @@ public class ImageWorkspace {
 	}
 	
 	public BuiltImageData buildData( LayerNode node) {
+		getSelectedNode();	// Makes sure the selected node is refreshed
 		BuildingImageData data = node.getLayer().getActiveData();
 		
 		return  new BuiltImageData( data.handle,
@@ -520,6 +531,7 @@ public class ImageWorkspace {
 	public GroupTree.Node getSelectedNode() {
 		if( !nodeInWorkspace(selected)) {
 			setSelectedNode(null);
+			triggerSelectedChanged();
 		}
 		return selected;
 	}

@@ -2,7 +2,11 @@ package spirite.brains;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +57,7 @@ public class MasterControl
 	implements MImageObserver 
 {
 	// Components
-    private final HotkeyManager hotkeys;
+    private final ActionManager hotkeys;
     private final ToolsetManager toolset;
     private final SettingsManager settingsManager;
     private final CacheManager cacheManager;
@@ -71,7 +75,7 @@ public class MasterControl
 
     public MasterControl() {
         settingsManager = new SettingsManager();
-        hotkeys = new HotkeyManager();
+        hotkeys = new ActionManager();
         toolset = new ToolsetManager();
         cacheManager = new CacheManager();
         renderEngine = new RenderEngine( this);	
@@ -98,7 +102,7 @@ public class MasterControl
 
 
     // :::: Getters/Setters
-    public HotkeyManager getHotekyManager() {
+    public ActionManager getHotekyManager() {
         return hotkeys;
     }
     public ToolsetManager getToolsetManager() {
@@ -376,18 +380,34 @@ public class MasterControl
 	    			}
     			}
     		});
-    		commandMap.put("export", new Runnable() {
-				@Override public void run() {
-					File f = dialog.pickFileExport();
-					
-					if( f != null) {
-						exportWorkspaceToFile( currentWorkspace, f);
-					}
+    		commandMap.put("export", new Runnable() {@Override public void run() {
+				File f = dialog.pickFileExport();
+				
+				if( f != null) {
+					exportWorkspaceToFile( currentWorkspace, f);
 				}
-			});
+			}});
     		commandMap.put("export_as", commandMap.get("export"));
-    		
+    		commandMap.put("copy", new Runnable() {@Override public void run() {
+    		}});
+    		commandMap.put("copyVisible", new Runnable() {@Override public void run() {
+    		}});
+    		commandMap.put("paste", new Runnable() {@Override public void run() {
+    			BufferedImage bi = MUtil.imageFromClipboard();
+    			if( bi == null) return;
+    			
+	    		// Create new Workspace from
+	    		if( currentWorkspace == null) {
+	    			createWorkspaceFromImage(bi, true);
+	    		}
+	    		else {
+	    			
+	    		}
+    		}});
+    		commandMap.put("pasteAsLayer", new Runnable() {@Override public void run() {
+    		}});
     	}
+    	
 
 		@Override public List<String> getValidCommands() {
 			return new ArrayList<>(commandMap.keySet());
@@ -473,7 +493,7 @@ public class MasterControl
 					if(!workspace.getSelectionEngine().attemptClearSelection()) {
 						// Note: transforms are irrelevant for this action, so 
 						//	accessing handle directly is appropriate.
-						BuiltImageData image = workspace.builtActiveData();
+						BuiltImageData image = workspace.buildActiveData();
 						if( image != null) 
 							workspace.getDrawEngine().clear(image);
 					}

@@ -322,7 +322,7 @@ public class SelectionEngine {
 			
 			actions.add(new PasteSelectionAction(
 					startAction, 
-					workspace.builtActiveData(),
+					workspace.buildActiveData(),
 					getBuiltSelection()));
 			actions.add(new EndSelectionAction(startAction));
 			actions.add(baseAction);

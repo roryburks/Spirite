@@ -28,8 +28,8 @@ import javax.swing.SwingUtilities;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.brains.HotkeyManager;
-import spirite.brains.HotkeyManager.Hotkey;
+import spirite.brains.ActionManager;
+import spirite.brains.ActionManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
@@ -51,7 +51,7 @@ public class ToolsPanel extends JPanel
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
     private final ToolsetManager toolsetManager;
-    private final HotkeyManager hotkeyManager;
+    private final ActionManager hotkeyManager;
     
 	private static final long serialVersionUID = 1L;
 	private static final int BUTTON_WIDTH = 24;

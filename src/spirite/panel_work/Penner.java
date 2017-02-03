@@ -286,7 +286,7 @@ public class Penner
 		if( holdingCtrl) c = new Color(0,0,0,0);
 
 		// Grab the Active Data
-		BuiltImageData data = workspace.builtActiveData();
+		BuiltImageData data = workspace.buildActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
 		if( data != null && node != null) {
@@ -363,8 +363,8 @@ public class Penner
 	abstract class StrokeBehavior extends StateBehavior {
 		
 		public void startStroke (StrokeParams stroke) {
-			if( workspace != null && workspace.builtActiveData() != null) {
-				BuiltImageData data = workspace.builtActiveData();
+			if( workspace != null && workspace.buildActiveData() != null) {
+				BuiltImageData data = workspace.buildActiveData();
 				GroupTree.Node node = workspace.getSelectedNode();
 				
 				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
