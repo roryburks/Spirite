@@ -547,7 +547,7 @@ public class UndoEngine {
 				super(workspace.new BuiltImageData(image));
 				this.frameCache = frame;
 				this.hiddenAction = action;
-				frameCache.reserve(this);	// Should be in onAdd
+				frameCache.reserve(this);
 			}
 			@Override 
 			public void performAction() {
@@ -579,6 +579,13 @@ public class UndoEngine {
 				if( hiddenAction != null)
 					hiddenAction.onDispatch();
 			}
+			
+			@Override
+			protected void finalize() throws Throwable {
+				// Shouldn't be necessary
+				frameCache.relinquish(this);
+				super.finalize();
+			}
 		}
 		
 		/**
@@ -592,10 +599,10 @@ public class UndoEngine {
 				super(cached, new NilImageAction(data));
 				
 				previousCache = workspace._accessCache(data);
+				previousCache.reserve(this);
 			}
 			@Override
 			protected void onAdd() {
-				previousCache.reserve(this);
 				super.onAdd();
 			}
 			@Override
@@ -612,10 +619,18 @@ public class UndoEngine {
 			public void undoAction() {
 				workspace._replaceIamge(builtImage.handle, previousCache);
 			}
+			
+			@Override
+			protected void finalize() throws Throwable {
+				// Is necessary if createReplaceAction is called, but never entered
+				//	into the UndoEngine (but the CachedImage can't be reserved from
+				//	onAdd as it might already be flushed by then).
+				previousCache.relinquish(this);
+				super.finalize();
+			}
 		}
 		
 		private void resetToKeyframe( CachedImage frame) {
-//			workspace._replaceIamge(image, frame);
 			BuiltImageData built = workspace.new BuiltImageData(image);
 			BufferedImage bi = built.checkoutRaw();
 			Graphics g = bi.getGraphics();
@@ -779,7 +794,7 @@ public class UndoEngine {
 			if( actions.get(vstart) instanceof KeyframeAction) {
 				// Remove the base Keyframe and all actions up until the new keyframe
 				try {
-					((KeyframeAction)actions.get(0)).frameCache.flush();
+//					((KeyframeAction)actions.get(0)).frameCache.flush();	// Should be handled by onDispatch
 				} catch ( ClassCastException e) {
 					MDebug.handleError( ErrorType.STRUCTURAL, this, "UndoEngine Corruption: First Action in ImageContext wasn't a KeyframeAction");
 				}

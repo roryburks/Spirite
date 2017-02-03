@@ -554,7 +554,7 @@ public class ContentTree extends JPanel
 				((MouseEvent)evt.getTriggerEvent()).getButton() != 1)
 				return;
 			
-			TreePath dragNode = tree.getSelectionPath();
+			TreePath dragNode = getPathFromY( evt.getDragOrigin().y);
 			
 			if( dragNode != null) {
 				draggingNode = dragNode;

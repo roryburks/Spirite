@@ -782,7 +782,7 @@ public class LayerTreePanel extends ContentTree
 		//	 is changed.
 		GroupTree.Node node = getNodeFromPath( evt.getPath());
 		
-		if( workspace != null)
+		if( workspace != null && workspace.nodeInWorkspace(node))
 			workspace.setSelectedNode(node);
 		if( context != null)
 			context.updateSelected();

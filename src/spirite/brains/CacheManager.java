@@ -122,6 +122,7 @@ public class CacheManager {
 		}
 		
 		public void flush() {
+			
 			// TODO: Figure out why this is necessary (it probably shouldn't be)
 			if( data == null) return;
 			
@@ -146,6 +147,7 @@ public class CacheManager {
 			users.add(new WeakReference<>(obj));
 		}
 		public void relinquish( Object obj) {
+			
 			WeakReference<Object> toRem = null;
 			
 			for( WeakReference<Object> wr : users) {
@@ -168,6 +170,7 @@ public class CacheManager {
 		 * used when a Weak Reference domain has been cleared.
 		 */
 		private void relinquishSoft( Object obj) {
+			
 			// Note: Assumes that if one WeakReference of a certain Object has been
 			//	cleared by GC then all others will as well.
 			users.remove(obj);
