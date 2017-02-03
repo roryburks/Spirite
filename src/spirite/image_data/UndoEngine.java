@@ -1121,15 +1121,33 @@ public class UndoEngine {
 		
 		public CompositeAction( List<UndoableAction> actions, String description) 
 		{
+			List<UndoableAction> sanatized = new ArrayList<>();
+			
+			// Clear all CompositeActions from the list and replace them with
+			//	their list of action.
+			Iterator<UndoableAction> it = actions.iterator();
+			while( it.hasNext()) {
+				UndoableAction action = it.next();
+				if( action instanceof CompositeAction) {
+					CompositeAction composite = (CompositeAction)action;
+					it.remove();
+					for( UndoableAction inAction : composite.actions) {
+						sanatized.add(inAction);
+					}
+				}
+				else
+					sanatized.add(action);
+			}
+			
 			// Constructs a CompositeAction from the given lists of actions
 			this.description = description;
 			
-			int len = actions.size();
+			int len = sanatized.size();
 			this.contexts = new UndoContext[len];
 			this.actions = new UndoableAction[len];
 			
 			for( int i=0; i < len; ++i) {
-				UndoableAction action = actions.get(i);
+				UndoableAction action = sanatized.get(i);
 				
 				this.actions[i] = action;
 				

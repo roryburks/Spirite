@@ -68,10 +68,12 @@ public class SelectionEngine {
 			offsetY = sel.offsetY;
 		}
 	}
-	private StartSelectionAction startAction = null;
+	
+	// To make sure lift events are synced up, every lift
+	private StartLiftAction startLiftAction = null;
 	
 	// Stored for the UndoEngine
-	private BuiltSelection oldSelection = null;
+	private BuiltSelection oldSelection = new BuiltSelection(null, 0, 0);
 	
 	// Variables relating to Building
 	private boolean building = false;
@@ -137,7 +139,7 @@ public class SelectionEngine {
 				return;
 			LayerNode node = (LayerNode)snode;
 
-			StartSelectionAction startAction = createLiftAction(node);
+			StartLiftAction startAction = createLiftAction(node);
 			
 			// Construct an execute the composite action
 			List<UndoableAction> actions = new ArrayList<>(3);
@@ -161,10 +163,11 @@ public class SelectionEngine {
 	
 	
 	public boolean attemptClearSelection() {
+		
 		if( scope.isLifted()) {
 			// If you have lifted data, it clears the lifted data without changing the
 			//	 fact that it is lifted
-			UndoableAction action = new EndSelectionAction(startAction);
+			UndoableAction action = new EndLiftAction(startLiftAction);
 			action.performAction();
 			undoEngine.storeAction( action);
 			return true;
@@ -271,7 +274,14 @@ public class SelectionEngine {
 	}
 	
 	
-	private StartSelectionAction createLiftAction(LayerNode node) {
+	private StartLiftAction createLiftAction(LayerNode node) {
+		startLiftAction = new StartLiftAction(copyData(node));
+		return startLiftAction;
+	}
+	
+
+	/** Lifts the current */
+	public BufferedImage copyData(LayerNode node) {
 		BuiltImageData builtImage = workspace.buildData(node);
 		
 		// Creates a Selection Mask
@@ -301,7 +311,6 @@ public class SelectionEngine {
 		// Copy the data inside the Selection's alphaMask to liftedData
 		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
 		
-//		g2.translate(node.getOffsetX(), node.getOffsetY());
 		g2.translate(-scope.getOffsetX(), -scope.getOffsetY());
 
 		builtImage.draw(g2);
@@ -309,8 +318,7 @@ public class SelectionEngine {
 		
 		g2.dispose();
 		
-		startAction = new StartSelectionAction(bufferedImage, builtImage.handle);
-		return startAction;
+		return bufferedImage;
 	}
 	
 	private UndoableAction createNewSelect( Selection selection, int ox, int oy) {
@@ -321,26 +329,67 @@ public class SelectionEngine {
 			List<UndoableAction> actions = new ArrayList<>(3);
 			
 			actions.add(new PasteSelectionAction(
-					startAction, 
+					startLiftAction, 
 					workspace.buildActiveData(),
 					getBuiltSelection()));
-			actions.add(new EndSelectionAction(startAction));
+			actions.add(new EndLiftAction(startLiftAction));
 			actions.add(baseAction);
 			return undoEngine.new CompositeAction(actions, baseAction.description);
 		}
 		else return baseAction;
 	}
 	
+	public void anchorSelection() {
+		if( !scope.isLifted()) return;
+		
+		
+
+		List<UndoableAction> actions = new ArrayList<>(2);
+		
+		actions.add(new PasteSelectionAction(
+				startLiftAction, 
+				workspace.buildActiveData(),
+				getBuiltSelection()));
+		actions.add(new EndLiftAction(startLiftAction));
+		
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
+	}
+	public void imageToSelection( BufferedImage bi, int ox, int oy) {
+		if( bi == null) return;
+		
+		List<UndoableAction> actions = new ArrayList<>(2);
+		actions.add(createNewSelect(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy));
+		startLiftAction = new StartLiftAction(bi);
+		actions.add( startLiftAction);
+		
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Pasted Image to Layer"));
+	}
+	
+	
 
 	
 	// ============= Selection-Related Undoable Actions
+	/** Since actions on selection care very much about what node is being selected
+	 * make sure all logical selection actions remember and reset that node.*/
+	public abstract class SelectionAction extends NullAction 
+	{
+		private final Node selectedNode;
+		SelectionAction( Node selected) {selectedNode = selected;}
+		@Override protected void performAction() {
+			workspace.setSelectedNode(selectedNode);
+		}
+		@Override protected void undoAction() {
+			workspace.setSelectedNode(selectedNode);
+		}
+	}
 	
-	public class MoveSelectionAction extends NullAction 
+	public class MoveSelectionAction extends SelectionAction 
 		implements StackableAction
 	{
 		private int dx, dy;
 		
 		protected MoveSelectionAction( int dx, int dy) {
+			super( workspace.getSelectedNode());
 			this.dx = dx;
 			this.dy = dy;
 			description = "Selection Move";
@@ -358,10 +407,12 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void performAction() {
+			super.performAction();
 			translate(dx, dy);
 		}
 		@Override
 		protected void undoAction() {
+			super.undoAction();
 			translate(-dx, -dy);
 		}
 		
@@ -397,12 +448,14 @@ public class SelectionEngine {
 		}
 	}
 	
-	public class StartSelectionAction extends NullAction {
+	public class StartLiftAction extends SelectionAction {
 		final CachedImage cachedData;
-		StartSelectionAction( BufferedImage liftedData, ImageHandle context) {
+		StartLiftAction( BufferedImage liftedData) {
+			super( workspace.getSelectedNode());
 			this.cachedData = cacheManager.cacheImage(liftedData, undoEngine);
 		}
 		@Override protected void performAction() {
+			super.performAction();
 			scope.liftedImage = cachedData;
 			scope.lifted = true;
 			ImageChangeEvent evt = new ImageChangeEvent();
@@ -411,8 +464,13 @@ public class SelectionEngine {
 			workspace.triggerImageRefresh(evt);
 		}
 		@Override protected void undoAction() {
+			super.undoAction();
 			scope.liftedImage = null;
 			scope.lifted = false;
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.selectionLayerChange = true;
+			workspace.triggerImageRefresh(evt);
 		}
 		@Override
 		protected void onAdd() {
@@ -426,17 +484,29 @@ public class SelectionEngine {
 			cachedData.relinquish(this);
 		}
 	}
-	public class EndSelectionAction extends NullAction {
+	
+	/** Ends the Lifted Data action, clearing any data that was lifted,
+	 * but doesn't change the actual selection.*/
+	public class EndLiftAction extends SelectionAction {
 		final CachedImage cachedData;
-		EndSelectionAction( StartSelectionAction start) {
+		private static final String DESC = "Cleared Lifted Image";
+		EndLiftAction( StartLiftAction start) {
+			super( workspace.getSelectedNode());
 			this.cachedData = start.cachedData;
 			this.cachedData.reserve(this);
+			description = DESC;
 		}
 		@Override protected void performAction() {
+			super.performAction();
 			scope.liftedImage = null;
 			scope.lifted = false;
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.workspace = workspace;
+			evt.selectionLayerChange = true;
+			workspace.triggerImageRefresh(evt);
 		}
 		@Override protected void undoAction() {
+			super.undoAction();
 			scope.lifted = true;
 			scope.liftedImage = cachedData;
 			ImageChangeEvent evt = new ImageChangeEvent();
@@ -458,7 +528,7 @@ public class SelectionEngine {
 		private final BuiltSelection builtSelection;
 		
 		protected PasteSelectionAction(
-				StartSelectionAction start, 
+				StartLiftAction start, 
 				BuiltImageData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
@@ -476,13 +546,14 @@ public class SelectionEngine {
 		
 	}
 	
-	public class SetSelectionAction extends NullAction {
+	public class SetSelectionAction extends SelectionAction {
 		
 		private final BuiltSelection oldSelection;
 		final BuiltSelection newSelection;
 		
 		SetSelectionAction( BuiltSelection newSelection, BuiltSelection oldSelection) 
 		{
+			super( workspace.getSelectedNode());
 			this.oldSelection = oldSelection;
 			this.newSelection = newSelection;
 			description = "Selection Change";
@@ -490,6 +561,7 @@ public class SelectionEngine {
 		
 		@Override
 		protected void performAction() {
+			super.performAction();
 			voidBuilding();
 			
 			scope.setFromBuiltSelection(newSelection);
@@ -500,6 +572,7 @@ public class SelectionEngine {
 
 		@Override
 		protected void undoAction() {
+			super.undoAction();
 			voidBuilding();
 
 			scope.setFromBuiltSelection(oldSelection);
@@ -507,8 +580,7 @@ public class SelectionEngine {
 			triggerBuildingSelection(null);
 			triggerSelectionChanged(null);
 		}
-	}
-	
+	}	
 	
 	// ========== Selection Database
 	public abstract static class Selection 

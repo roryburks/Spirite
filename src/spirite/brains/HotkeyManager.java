@@ -28,11 +28,11 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
  * @author Rory Burks
  *
  */
-public class ActionManager {
+public class HotkeyManager {
     private final Preferences prefs;    
     private final BidiMap<Hotkey,String> hotkey_map;
 
-    ActionManager() {
+    HotkeyManager() {
         prefs = Preferences.userNodeForPackage(spirite.Main.class);
         hotkey_map = new DualHashBidiMap<>();
 
@@ -69,6 +69,11 @@ public class ActionManager {
                 {"draw.shiftUp", (new Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 
                 {"global.save_image", (new Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK))},
+                {"global.copy", (new Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK))},
+                {"global.copyVisible", (new Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
+                {"global.paste", (new Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK))},
+                {"global.pasteAsLayer", (new Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
+                {"global.cut", (new Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK))},
                 
             }
         );

@@ -531,15 +531,20 @@ public class ImageWorkspace {
 	public GroupTree.Node getSelectedNode() {
 		if( !nodeInWorkspace(selected)) {
 			setSelectedNode(null);
-			triggerSelectedChanged();
 		}
 		return selected;
 	}
 	public void setSelectedNode( GroupTree.Node node) {
-		if( node != null && !nodeInWorkspace(node)) 
+		if( node != null && !nodeInWorkspace(node))  {
+			MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to select a node into the wrong workspace.");
 			return;
+		}
 		
 		if( selected != node) {
+			if( selectionEngine.isLifted()) {
+//				selectionEngine.
+			}
+			
 			selected = node;
 			triggerSelectedChanged();
 		}
@@ -1701,6 +1706,14 @@ public class ImageWorkspace {
     }
     synchronized void triggerImageRefresh(ImageChangeEvent evt) {
     	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
+    	
+    	if( evt.selectionLayerChange ) {
+    		BuiltImageData bid = buildActiveData();
+    		if( bid != null) {
+    			evt.dataChanged.add( bid.handle);
+    		}
+    		
+    	}
     	
     	while( it.hasNext()) {
     		MImageObserver obs = it.next().get();

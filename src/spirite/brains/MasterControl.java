@@ -2,11 +2,9 @@ package spirite.brains;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +21,14 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
+import spirite.MUtil.TransferableImage;
 import spirite.brains.RenderEngine.RenderSettings;
+import spirite.brains.ToolsetManager.Tool;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
+import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
@@ -57,7 +59,7 @@ public class MasterControl
 	implements MImageObserver 
 {
 	// Components
-    private final ActionManager hotkeys;
+    private final HotkeyManager hotkeys;
     private final ToolsetManager toolset;
     private final SettingsManager settingsManager;
     private final CacheManager cacheManager;
@@ -75,7 +77,7 @@ public class MasterControl
 
     public MasterControl() {
         settingsManager = new SettingsManager();
-        hotkeys = new ActionManager();
+        hotkeys = new HotkeyManager();
         toolset = new ToolsetManager();
         cacheManager = new CacheManager();
         renderEngine = new RenderEngine( this);	
@@ -102,7 +104,7 @@ public class MasterControl
 
 
     // :::: Getters/Setters
-    public ActionManager getHotekyManager() {
+    public HotkeyManager getHotekyManager() {
         return hotkeys;
     }
     public ToolsetManager getToolsetManager() {
@@ -389,22 +391,103 @@ public class MasterControl
 			}});
     		commandMap.put("export_as", commandMap.get("export"));
     		commandMap.put("copy", new Runnable() {@Override public void run() {
+    			if( currentWorkspace == null ||
+    				currentWorkspace.getSelectedNode() == null) return; 
+    			
+    			if(currentWorkspace.getSelectedNode() instanceof LayerNode &&
+    				currentWorkspace.getSelectionEngine().getSelection() != null) {
+        			// Copies the current selection to the Clipboard
+    				
+    				// TODO: Implement for GroupNode
+
+	    	    	BufferedImage img;
+    				if( currentWorkspace.getSelectionEngine().isLifted())
+    					img = currentWorkspace.getSelectionEngine().getLiftedImage().access();
+    				else
+    					img = currentWorkspace.getSelectionEngine().copyData((LayerNode)currentWorkspace.getSelectedNode());
+    				
+	    	    	TransferableImage transfer = new TransferableImage(img);
+	    	    	
+	    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    	    	c.setContents(transfer, null);
+    			}
+    			else {
+	    			// Copies the current selected node to the Clipboard
+	    	    	GroupTree.Node node = currentWorkspace.getSelectedNode();
+	
+	    	    	RenderSettings settings = new RenderSettings();
+	    	    	settings.workspace = currentWorkspace;
+	    	    	if( node == null) return;
+	    	    	else if( node instanceof LayerNode) 
+	    	    		settings.layer = ((LayerNode) node).getLayer();
+	    	    	else if( node instanceof GroupNode)
+	    	    		settings.node = node;
+	
+	    	    	BufferedImage img = renderEngine.renderImage(settings);
+	    	    	TransferableImage transfer = new TransferableImage(img);
+	    	    	
+	    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    	    	c.setContents(transfer, null);
+    			}
     		}});
     		commandMap.put("copyVisible", new Runnable() {@Override public void run() {
+    			if( currentWorkspace == null) return;
+    			
+    			// Copies the current default render to the Clipboard
+    			RenderSettings settings = new RenderSettings();
+    			settings.workspace = currentWorkspace;
+    			
+    			// Should be fine to send Clipboard an internal reference since once
+    			//	rendered, the RenderEngine's cache should be immutable
+    	    	BufferedImage img = renderEngine.renderImage(settings);
+    	    	TransferableImage transfer = new TransferableImage(img);
+    	    	
+    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	    	c.setContents(transfer, null);
+    		}});
+    		commandMap.put("cut", new Runnable() {@Override public void run() {
+    			commandMap.get("copy").run();
+    			
+    			MasterControl.this.executeCommandString("draw.clearLayer");
     		}});
     		commandMap.put("paste", new Runnable() {@Override public void run() {
     			BufferedImage bi = MUtil.imageFromClipboard();
     			if( bi == null) return;
     			
-	    		// Create new Workspace from
 	    		if( currentWorkspace == null) {
+		    		// Create new Workspace from Pasted Data
 	    			createWorkspaceFromImage(bi, true);
 	    		}
+	    		else if( currentWorkspace.buildActiveData() == null){
+	    			//	Paste Data as new layer
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    		}
 	    		else {
+	    			// Paste Data onto Selection Engine (current selected Data)
+	    			int ox = 0, oy=0;
 	    			
+	    			Node node = currentWorkspace.getSelectedNode();
+	    			if( node != null) {
+	    				ox = node.getOffsetX();
+	    				oy = node.getOffsetY();
+	    			}
+	    			
+	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, 0, 0);
+	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
     		}});
     		commandMap.put("pasteAsLayer", new Runnable() {@Override public void run() {
+    			BufferedImage bi = MUtil.imageFromClipboard();
+    			if( bi == null) return;
+    			
+	    		if( currentWorkspace == null) {
+		    		// Create new Workspace from Pasted Data
+	    			createWorkspaceFromImage(bi, true);
+	    		}
+	    		else {
+	    			//	Paste Data as new layer
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    		}
     		}});
     	}
     	

@@ -210,7 +210,7 @@ public class RenderEngine
 					compositionContext = dataContext.handle;
 				}
 				else {
-					MDebug.log("Probably shouldn't have lifted data and stroke engine at the same time");
+//					MDebug.log("Probably shouldn't have lifted data and stroke engine at the same time");
 				}
 				
 				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();

@@ -2,14 +2,11 @@
 package spirite.ui;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -186,7 +183,6 @@ public class RootFrame extends javax.swing.JFrame
     // :::: KeyEventDispatcher
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
-        int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
 
 
         // Hotkeys
@@ -195,46 +191,17 @@ public class RootFrame extends javax.swing.JFrame
             int modifier = e.getModifiersEx();
             
         	// ::: Copy/Cut/Paste have hard-coded hotkeys
-            if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_V) 
-            	paste();
-            else if( mod == KeyEvent.CTRL_DOWN_MASK && e.getKeyCode() == KeyEvent.VK_C)
-            	copy();
-            else if( modifier == mod) {
-            	String command = master.getHotekyManager().getCommand( key, modifier);
+//			int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
+//			if( modifier == mod) {	// I'm not sure why I was compelled to limit it to no extended modifiers, but I don't think there's a good reason
 
-            	if( command != null)
-            		master.executeCommandString(command);
-            }
+            String command = master.getHotekyManager().getCommand( key, modifier);
+
+        	if( command != null)
+        		master.executeCommandString(command);
 
         }
         
         return false;
-    }
-    
-    private void paste() {
-    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-    	
-    	try {
-    		// Paste Clipboard to new SimpleLayer
-    		Image img = (Image) c.getData(DataFlavor.imageFlavor);
-    		int width = img.getWidth(null);
-    		int height = img.getHeight(null);
-    		boolean newWorkspace = false;
-
-    		ImageWorkspace workspace = master.getCurrentWorkspace();
-    		if( workspace == null) {
-    			workspace = new ImageWorkspace(master);
-    			newWorkspace = true;
-    		}
-    		
-    		BufferedImage bi = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
-    		Graphics g = bi.getGraphics();
-    		g.drawImage(img, 0, 0, null);
-    		workspace.addNewSimpleLayer( workspace.getSelectedNode(), bi, "Pasted Layer");
-
-    		if( newWorkspace)
-    			workspace.finishBuilding();
-    	} catch( Exception e) {}
     }
     
 

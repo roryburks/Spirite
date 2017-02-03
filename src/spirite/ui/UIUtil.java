@@ -165,8 +165,9 @@ public class UIUtil {
     		else {
     			new_node = new JMenu( title);
     		}
-    		if( mnemonic != '\0')
+    		if( mnemonic != '\0') {
     			new_node.setMnemonic(mnemonic);
+    		}
     		
 
     		if( menuScheme[i].length > 1 && menuScheme[i][1] instanceof String) {
