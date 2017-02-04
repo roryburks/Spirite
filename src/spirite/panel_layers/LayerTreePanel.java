@@ -160,7 +160,7 @@ public class LayerTreePanel extends ContentTree
     		Collection<ImageHandle> dataUsed;
     		
     		if( obj instanceof LayerNode) {
-    			dataUsed = ((LayerNode)obj).getLayer().getUsedImages();
+    			dataUsed = ((LayerNode)obj).getLayer().getImageDependencies();
     		}
     		else if( obj instanceof GroupNode) {
     			dataUsed = new LinkedHashSet<>();	// LinkedHashSet efficiently avoids duplicates
@@ -175,7 +175,7 @@ public class LayerTreePanel extends ContentTree
 				});
     			
     			for( Node lnode : layerNodes) {
-    				dataUsed.addAll( ((LayerNode)lnode).getLayer().getUsedImages());
+    				dataUsed.addAll( ((LayerNode)lnode).getLayer().getImageDependencies());
     			}
 			}
     		else

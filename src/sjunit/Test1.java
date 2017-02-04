@@ -119,8 +119,8 @@ public class Test1 {
 			assert( g1.getClass().equals(g2.getClass()));
 			
 			if( g1 instanceof LayerNode) {
-				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getUsedImages().iterator();
-				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getUsedImages().iterator();
+				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getImageDependencies().iterator();
+				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getImageDependencies().iterator();
 
 				while( it1.hasNext()) {
 					assert(
@@ -255,7 +255,7 @@ public class Test1 {
 			LayerNode node = randomLayerNode(workspace);
 			if( node == null) break;
 			
-			workspace.cropNode(node, new Rectangle( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)));
+			workspace.cropNode(node, new Rectangle( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)), false);
 			break;
 		}
 	}

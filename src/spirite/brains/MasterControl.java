@@ -38,6 +38,7 @@ import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ReferenceManager;
 import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.RectSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
 import spirite.ui.FrameManager;
@@ -94,6 +95,7 @@ public class MasterControl
         executers = new CommandExecuter[] {
         	new GlobalCommandExecuter(),
         	new RelativeWorkspaceCommandExecuter(),
+        	new SelectionCommandExecuter(),
         	toolset,
         	palette,
         	frameManager,
@@ -472,7 +474,7 @@ public class MasterControl
 	    				oy = node.getOffsetY();
 	    			}
 	    			
-	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, 0, 0);
+	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
 	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
     		}});
@@ -523,106 +525,87 @@ public class MasterControl
     	//	anonymous Runnable's
     	private ImageWorkspace workspace;
     	RelativeWorkspaceCommandExecuter() {
-    		commandMap.put("undo", new Runnable() {
-				@Override public void run() {
-					workspace.getUndoEngine().undo();
-				}
-			});
-    		commandMap.put("redo", new Runnable() {
-				@Override public void run() {
-					workspace.getUndoEngine().redo();
-				}
-			});
-    		commandMap.put("toggle", new Runnable() {
-				@Override public void run() {
-					workspace.toggleQuick();
-				}
-			});
-    		commandMap.put("shiftRight", new Runnable() {
-				@Override public void run() {
-					workspace.shiftData(workspace.getSelectedNode(), 1, 0);
-				}
-			});
-    		commandMap.put("shiftLeft", new Runnable() {
-				@Override public void run() {
-					workspace.shiftData(workspace.getSelectedNode(), -1, 0);
-				}
-			});
-    		commandMap.put("shiftDown", new Runnable() {
-				@Override public void run() {
-					workspace.shiftData(workspace.getSelectedNode(), 0, 1);
-				}
-			});
-    		commandMap.put("shiftUp", new Runnable() {
-				@Override public void run() {
-					workspace.shiftData(workspace.getSelectedNode(), 0, -1);
-				}
-			});
-    		commandMap.put("newLayerQuick", new Runnable() {
-    			@Override public void run() {
-    				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
-    						workspace.getWidth(), workspace.getHeight(), 
-    						"New Layer", new Color(0,0,0,0));
-    			}
-    		});
-    		commandMap.put("toggle_reference", new Runnable() {
-				@Override public void run() {
+    		commandMap.put("undo", new Runnable() {@Override public void run() {
+    			workspace.getUndoEngine().undo();
+    		}});
+    		commandMap.put("redo", new Runnable() {@Override public void run() {
+				workspace.getUndoEngine().redo();
+			}});
+    		commandMap.put("toggle", new Runnable() {@Override public void run() {
+				workspace.toggleQuick();
+			}});
+    		commandMap.put("shiftRight", new Runnable() {@Override public void run() {
+				workspace.shiftData(workspace.getSelectedNode(), 1, 0);
+			}});
+    		commandMap.put("shiftLeft", new Runnable() {@Override public void run() {
+				workspace.shiftData(workspace.getSelectedNode(), -1, 0);
+			}});
+    		commandMap.put("shiftDown", new Runnable() {@Override public void run() {
+				workspace.shiftData(workspace.getSelectedNode(), 0, 1);
+    		}});
+    		commandMap.put("shiftUp", new Runnable() {@Override public void run() {
+				workspace.shiftData(workspace.getSelectedNode(), 0, -1);
+			}});
+    		commandMap.put("newLayerQuick", new Runnable() {@Override public void run() {
+				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
+						workspace.getWidth(), workspace.getHeight(), 
+						"New Layer", new Color(0,0,0,0));
+    		}});
+    		commandMap.put("toggle_reference", new Runnable() {@Override public void run() {
 					ReferenceManager rm = workspace.getReferenceManager();
 					rm.setEditingReference(!rm.isEditingReference());
+			}});
+    		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
+				if(!workspace.getSelectionEngine().attemptClearSelection()) {
+					// Note: transforms are irrelevant for this action, so 
+					//	accessing handle directly is appropriate.
+					BuiltImageData image = workspace.buildActiveData();
+					if( image != null) 
+						workspace.getDrawEngine().clear(image);
 				}
-			});
-    		commandMap.put("clearLayer", new Runnable() {
-				@Override public void run() {
-					if(!workspace.getSelectionEngine().attemptClearSelection()) {
-						// Note: transforms are irrelevant for this action, so 
-						//	accessing handle directly is appropriate.
-						BuiltImageData image = workspace.buildActiveData();
-						if( image != null) 
-							workspace.getDrawEngine().clear(image);
-					}
+			}});
+    		commandMap.put("cropSelection", new Runnable() {@Override public void run() {
+				Node node = workspace.getSelectedNode();
+				SelectionEngine selectionEngine = workspace.getSelectionEngine();
+				
+				Selection selection = selectionEngine.getSelection();
+				if( selection == null) {
+					java.awt.Toolkit.getDefaultToolkit().beep();
+					return;
 				}
-			});
-    		commandMap.put("cropSelection", new Runnable() {
-				@Override public void run() {
-					Node node = workspace.getSelectedNode();
-					SelectionEngine selectionEngine = workspace.getSelectionEngine();
-					
-					Selection selection = selectionEngine.getSelection();
-					if( selection == null) {
-						java.awt.Toolkit.getDefaultToolkit().beep();
-						return;
-					}
 
-					Rectangle rect = selection.getBounds();
-					rect.x += selectionEngine.getOffsetX();
-					rect.y += selectionEngine.getOffsetY();
-					
-					workspace.cropNode(node, rect);
-				}
-			});
-    		commandMap.put("autocroplayer", new Runnable() {
-				@Override public void run() {
-					// TODO: Will probably need fixing with new BuiltActiveDAta
-					//	format
-					Node node = workspace.getSelectedNode();
-					
-					if( node instanceof LayerNode) {
-						Layer layer = ((LayerNode)node).getLayer();
+				Rectangle rect = selection.getBounds();
+				rect.x += selectionEngine.getOffsetX();
+				rect.y += selectionEngine.getOffsetY();
+				
+				workspace.cropNode(node, rect, false);
+			}});
+    		commandMap.put("autocroplayer", new Runnable() {@Override public void run() {
+				// TODO: Will probably need fixing with new BuiltActiveDAta
+				//	format
+				Node node = workspace.getSelectedNode();
+				
+				if( node instanceof LayerNode) {
+					Layer layer = ((LayerNode)node).getLayer();
 
-						try {
-							Rectangle rect;
-							rect = MUtil.findContentBounds(
-									layer.getActiveData().handle.deepAccess(),
-									1, 
-									false);
-							workspace.cropNode((LayerNode) node, rect);
-						} catch (UnsupportedDataTypeException e) {
-							e.printStackTrace();
-						}
+					try {
+						Rectangle rect;
+						rect = MUtil.findContentBounds(
+								layer.getActiveData().handle.deepAccess(),
+								1, 
+								false);
+						workspace.cropNode((LayerNode) node, rect, true);
+					} catch (UnsupportedDataTypeException e) {
+						e.printStackTrace();
 					}
 				}
-			});
-    		
+    		}});
+    		commandMap.put("layerToImageSize", new Runnable() {@Override public void run() {
+				Node node = workspace.getSelectedNode();
+				
+				if( node != null)
+					workspace.cropNode(node, new Rectangle(0,0,workspace.getWidth(), workspace.getHeight()), false);
+    		}});
     	}
 
 		@Override public List<String> getValidCommands() {
@@ -650,6 +633,50 @@ public class MasterControl
 		}
     }
     
+    private class SelectionCommandExecuter implements CommandExecuter {
+    	private final Map<String, Runnable> commandMap = new HashMap<>();
+    	
+    	// For simplicity's sake, stored before executing the command
+    	private ImageWorkspace workspace;
+    	private SelectionEngine selectionEngine;
+    	
+    	public SelectionCommandExecuter() {
+    		commandMap.put("all", new Runnable() {@Override public void run() {
+    			selectionEngine.setSelection(
+    					new RectSelection(workspace.getWidth(),workspace.getHeight()), 0, 0);
+    		}});
+    		commandMap.put("none", new Runnable() {@Override public void run() {
+    			selectionEngine.unselect();
+    		}});
+		}
+    	
+		@Override
+		public List<String> getValidCommands() {
+			return new ArrayList<>(commandMap.keySet());
+		}
+
+		@Override
+		public String getCommandDomain() {
+			return "select";
+		}
+
+		@Override
+		public boolean executeCommand(String command) {
+			Runnable runnable = commandMap.get(command);
+			
+			if( runnable != null) {
+				if( currentWorkspace != null) {
+					workspace = currentWorkspace;
+					selectionEngine = currentWorkspace.getSelectionEngine();
+					runnable.run();
+				}
+				return true;
+			}
+			else
+				return false;
+		}
+    	
+    }
     
     private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
     	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);

@@ -202,6 +202,7 @@ public class ToolsetManager
     	final Object[][] scheme = {
     			{"cropSelection", PropertyType.BUTTON, "Crop Selection", "draw.cropSelection",  DISABLE_ON_NO_SELECTION},
     			{"quickCrop", PropertyType.CHECK_BOX, "Crop on Finish", false},
+    			{"shrinkOnly", PropertyType.CHECK_BOX, "Shrink-only Crop", false},
     	};
     	
     	return constructFromScheme(scheme);

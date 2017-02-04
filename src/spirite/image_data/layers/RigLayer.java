@@ -21,6 +21,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -252,7 +253,7 @@ public class RigLayer extends Layer
 	}
 
 	@Override
-	public List<ImageHandle> getUsedImages() {
+	public List<ImageHandle> getImageDependencies() {
 		List<ImageHandle> handles = new ArrayList<>( parts.size());
 		for( Part part : parts) {
 			handles.add(part.handle);
@@ -271,7 +272,6 @@ public class RigLayer extends Layer
 		
 		for( Part part : parts) {
 			if( part.visible) {
-				g2.translate(part.ox, part.oy);
 				if( part.alpha != 1.0f) {
 					// TODO: Fairly debug, eventually, I'll need a way of stacking
 					//	composites on top of each other
@@ -284,9 +284,9 @@ public class RigLayer extends Layer
 					else {
 						g2.setComposite( AlphaComposite.getInstance(
 							AlphaComposite.SRC_OVER, part.alpha));
-					}
+					}	
 				}
-				part.handle.drawLayer(g);
+				g2.translate(part.ox,part.oy);
 				g2.setComposite(comp);
 				g2.setTransform(trans);
 			}
@@ -314,6 +314,7 @@ public class RigLayer extends Layer
 					AlphaComposite.SRC_OVER, part.alpha));
 			}
 		}
+		g2.translate(part.ox,part.oy);
 		part.handle.drawLayer(g);
 		
 		g2.setComposite(comp);
@@ -356,7 +357,7 @@ public class RigLayer extends Layer
 	}
 
 	@Override
-	public MergeHelper merge(Node node, int x, int y) {
+	public LayerActionHelper merge(Node node, int x, int y) {
 		Layer layer = ((LayerNode)node).getLayer();
 		if( layer instanceof RigLayer) {
 			RigLayer other = (RigLayer)layer;
@@ -370,9 +371,15 @@ public class RigLayer extends Layer
 	}
 
 	@Override
-	public List<Rectangle> interpretCrop(Rectangle rect) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Rectangle> getBoundList() {
+		List<Rectangle> list = new ArrayList<>(parts.size());
+		
+		for( Part part : parts) {
+			list.add( new Rectangle(part.ox, part.oy, part.handle.getWidth(), part.handle.getHeight()));
+		}
+		
+		
+		return list;
 	}
 
 	@Override
@@ -513,7 +520,6 @@ public class RigLayer extends Layer
 		
 		@Override
 		protected void performAction() {
-			
 			part.ox = new_ox;
 			part.oy = new_oy;
 			_setPartDepth(part, new_depth);
@@ -571,6 +577,26 @@ public class RigLayer extends Layer
 		for( RigStructureObserver obs : rigObservers) {
 			obs.rigStructureChanged();
 		}
+	}
+
+	@Override
+	public LayerActionHelper interpretCrop( List<ImageCropHelper> crops) {
+		LayerActionHelper helper = null;
+		
+		for( ImageCropHelper crop : crops) {
+			for( Part part : parts) {
+				if( crop.handle.equals(part.handle)) {
+					if( helper == null)
+						helper = new LayerActionHelper();
+					
+					helper.actions.add( new ChangePartAttributesAction(
+							part, part.ox + crop.dx, part.oy + crop.dy, 
+							part.depth, part.partName, part.visible, part.alpha));
+				}
+			}
+		}
+		
+		return helper;
 	}
 
 

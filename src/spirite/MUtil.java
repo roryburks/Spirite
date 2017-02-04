@@ -29,6 +29,8 @@ import mutil.ArrayInterpretation.IntCounter;
 import mutil.ArrayInterpretation.InterpretedIntArray;
 
 public class MUtil {
+	
+	public final static Point ORIGIN = new Point(0,0);
 
 	// :::: Math Functions
 	public static int packInt( int high, int low) {

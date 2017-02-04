@@ -231,7 +231,7 @@ public class SelectionEngine {
 		
 		Rectangle rect = buildingSelection.clipToRect(new Rectangle( -currentX, -currentY, workspace.getWidth(), workspace.getHeight()));
 		
-		if( rect == null) {
+		if( rect == null || rect.isEmpty()) {
 			unselect();
 			return;
 		}
@@ -248,9 +248,37 @@ public class SelectionEngine {
 		triggerSelectionChanged(null);
 	}
 	
-	public void voidBuilding() {
-		building = false;
+	public void setSelection( Selection selection, int ox, int oy) {
+		undoEngine.performAndStore( createNewSelect(selection, ox, oy));
 	}
+	
+
+	public void anchorSelection() {
+		if( !scope.isLifted()) return;
+		
+		
+
+		List<UndoableAction> actions = new ArrayList<>(2);
+		
+		actions.add(new PasteSelectionAction(
+				startLiftAction, 
+				workspace.buildActiveData(),
+				getBuiltSelection()));
+		actions.add(new EndLiftAction(startLiftAction));
+		
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
+	}
+	public void imageToSelection( BufferedImage bi, int ox, int oy) {
+		if( bi == null) return;
+		
+		List<UndoableAction> actions = new ArrayList<>(2);
+		actions.add(createNewSelect(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy));
+		startLiftAction = new StartLiftAction(bi);
+		actions.add( startLiftAction);
+		
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Pasted Image to Layer"));
+	}
+	
 	
 	public void unselect() {
 		UndoableAction action = createNewSelect(null, 0, 0);
@@ -339,32 +367,9 @@ public class SelectionEngine {
 		else return baseAction;
 	}
 	
-	public void anchorSelection() {
-		if( !scope.isLifted()) return;
-		
-		
-
-		List<UndoableAction> actions = new ArrayList<>(2);
-		
-		actions.add(new PasteSelectionAction(
-				startLiftAction, 
-				workspace.buildActiveData(),
-				getBuiltSelection()));
-		actions.add(new EndLiftAction(startLiftAction));
-		
-		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
+	void voidBuilding() {
+		building = false;
 	}
-	public void imageToSelection( BufferedImage bi, int ox, int oy) {
-		if( bi == null) return;
-		
-		List<UndoableAction> actions = new ArrayList<>(2);
-		actions.add(createNewSelect(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy));
-		startLiftAction = new StartLiftAction(bi);
-		actions.add( startLiftAction);
-		
-		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Pasted Image to Layer"));
-	}
-	
 	
 
 	
@@ -597,7 +602,7 @@ public class SelectionEngine {
 		public abstract Selection clone();
 	}
 	
-	public class NullSelection extends Selection {
+	public static class NullSelection extends Selection {
 		@Override		public void drawSelectionBounds(Graphics g) {}
 		@Override		void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
@@ -609,10 +614,10 @@ public class SelectionEngine {
 	/***
 	 * Simple Rectangular Selection
 	 */
-	public class RectSelection extends Selection {
+	public static class RectSelection extends Selection {
 		int width;
 		int height;
-		RectSelection( int width, int height) {
+		public RectSelection( int width, int height) {
 			this.width = width;
 			this.height = height;
 		}

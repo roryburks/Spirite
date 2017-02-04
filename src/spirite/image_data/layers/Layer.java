@@ -10,11 +10,12 @@ import spirite.brains.RenderEngine.Renderable;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.image_data.UndoEngine.UndoableAction;
 
 public abstract class Layer {
 	public abstract BuildingImageData getActiveData();
-	public abstract List<ImageHandle> getUsedImages();
+	public abstract List<ImageHandle> getImageDependencies();
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();
 	public abstract int getHeight();
@@ -32,13 +33,21 @@ public abstract class Layer {
 	 * @return an object that contains all the data needed to create
 	 * 	a composite Merge Action.
 	 */
-	public abstract MergeHelper merge(GroupTree.Node node, int x, int y);
+	public abstract LayerActionHelper merge(GroupTree.Node node, int x, int y);
 	
 	/**
-	 * Given a proposed Cropping region, returns a list corresponding
-	 * to which areas of the ImageData it uses should be cropped.
+	 * Returns a list of the relative bounds within the Layer where each ImageData
+	 * is drawn.
 	 */
-	public abstract List<Rectangle> interpretCrop(Rectangle rect);
+	public abstract List<Rectangle> getBoundList();
+	
+	
+	
+	/**
+	 * Returns a list of UndoableActions corresponding to a Crop action for 
+	 * the Layer.
+	 */
+	public abstract LayerActionHelper interpretCrop( List<ImageCropHelper> helpers);
 	
 	/**
 	 * Creates a logical duplicate of the Layer, creating Null-Context
@@ -49,10 +58,10 @@ public abstract class Layer {
 	
 	/** 
 	 * Contains all the logical information for the workspace to create
-	 * a MergeAction based on the desired merge behavior of the layer.
+	 * actions in addition to any external changes needed.
 	 */
-	public static class MergeHelper {
-		public List<UndoableAction> actions = new ArrayList<>();
+	public static class LayerActionHelper {
+		public List<UndoableAction> actions = new ArrayList<>(0);
 		public Point offsetChange = new Point(0,0);
 	}
 }

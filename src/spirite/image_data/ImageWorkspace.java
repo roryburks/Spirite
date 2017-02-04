@@ -42,7 +42,7 @@ import spirite.image_data.UndoEngine.NullAction;
 import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.Layer.MergeHelper;
+import spirite.image_data.layers.Layer.LayerActionHelper;
 import spirite.image_data.layers.RigLayer;
 import spirite.image_data.layers.SimpleLayer;
 
@@ -151,7 +151,7 @@ public class ImageWorkspace {
 		//	getUsedImageData in an inefficient way
 		List<List<ImageHandle>> layerDataUsed = new ArrayList<>(layers.size());
 		for( int i=0; i<layers.size(); ++i) {
-			layerDataUsed.add(i, ((LayerNode)layers.get(i)).getLayer().getUsedImages());
+			layerDataUsed.add(i, ((LayerNode)layers.get(i)).getLayer().getImageDependencies());
 		}
 		
 		// Step 1: Go through each tracked ImageData and find unused entries
@@ -342,6 +342,18 @@ public class ImageWorkspace {
 			g2.translate(ox, oy);
 			
 			handle.drawLayer(g2);
+			
+			g2.setTransform( transform);
+		}
+		
+		public void drawBorder( Graphics g) {
+			if( handle == null) return;
+			
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform transform = g2.getTransform();
+			g2.translate(ox, oy);
+			
+			g2.drawRect(0, 0, handle.getWidth(), handle.getHeight());
 			
 			g2.setTransform( transform);
 		}
@@ -550,6 +562,7 @@ public class ImageWorkspace {
 		}
 	}
 	
+	
 	// :::: Image Checkout
 	private BufferedImage checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
@@ -611,10 +624,17 @@ public class ImageWorkspace {
 	}
 	
 	// :::: Various Actions
-	public void cropNode( Node nodeToCrop, Rectangle bounds) {
+	
+	/**
+	 *  Resizes the given node 
+	 * @param nodeToCrop
+	 * @param inputRect
+	 * @param shrinkOnly
+	 */
+	public void cropNode( Node nodeToCrop, Rectangle inputRect, boolean shrinkOnly) {
 		
-		bounds = bounds.intersection(new Rectangle(0,0,width,height));
-		if( bounds.isEmpty())return;
+		inputRect = inputRect.intersection(new Rectangle(0,0,width,height));
+		if( inputRect.isEmpty())return;
 		
 
 		if( nodeToCrop instanceof GroupNode 
@@ -624,67 +644,79 @@ public class ImageWorkspace {
 			if( r != JOptionPane.YES_OPTION)
 				return;
 		}
-
+		
+		// Step 1: Crop all the Image Data in all affected ImageLayers
 		List<LayerNode> toCrop = nodeToCrop.getAllLayerNodes();
-		List<UndoableAction> actions = new ArrayList<UndoableAction>();
+		List<UndoableAction> actions = new ArrayList<>();
+		List<ImageCropHelper> handlesCropped = new ArrayList<>();
 		
 		for( LayerNode node : toCrop ) {
-			Rectangle toCompare = new Rectangle( bounds);
-			toCompare.x -= node.x;
-			toCompare.y -= node.y;
-			
-			List<ImageHandle> handles = node.layer.getUsedImages();
-			List<Rectangle> rects = node.layer.interpretCrop(toCompare);
+			List<ImageHandle> handles = node.layer.getImageDependencies();
+			List<Rectangle> imageBounds = node.layer.getBoundList();
 
-			if( rects == null || handles  == null) continue;
+			if( inputRect == null || handles  == null ) continue;
 			
-			for( int i=0; i < handles.size() && i<rects.size(); ++i) {
-				Rectangle rect = new Rectangle(rects.get(i));
+			for( int i=0; i < handles.size() && i<imageBounds.size(); ++i) {
 				ImageHandle handle = handles.get(i);
+				Rectangle imageBound = imageBounds.get(i);
+				imageBound.x += node.x;
+				imageBound.y += node.y;
 				
+				Rectangle newBounds;
 				
-				if( rect.x < 0) {
-					rect.width -= rect.x;
-					rect.x = 0;
+				if( shrinkOnly) {
+					newBounds = inputRect.intersection(imageBound);
 				}
-				if( rect.y < 0) {
-					rect.height -= rect.y;
-					rect.y = 0;
+				else {
+					newBounds = inputRect;
 				}
 				
-				if( rect.width <= 0 || rect.height <= 0)
+				if( newBounds.equals(imageBound))
 					continue;
-	
-				if( rect.width > handle.getWidth() &&
-					rect.height > handle.getHeight())
-					continue;
-	
-				if( rect.width > handle.getWidth())
-					rect.width = handle.getWidth();
-				if( rect.height > handle.getHeight())
-					rect.height = handle.getHeight();
-				
 
 				// Construct a crop action
-				BufferedImage image = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
+				BufferedImage image = new BufferedImage( 
+						newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
-				g2.translate(-rect.x, -rect.y);
+				g2.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
 				handle.drawLayer(g2);
 				g2.dispose();
 				
-				
 				actions.add( undoEngine.createReplaceAction(handle, image));
-				actions.add(new StructureAction(
-						new OffsetChange(node, node.x+rect.x,node.y+rect.y)));
+				handlesCropped.add( new ImageCropHelper( handle, newBounds.x-imageBound.x,  newBounds.y-imageBound.y));
 			}
 	
 		}
 		
+		// Step 2: For every Layer that uses the cropped image data, create
+		//	a list of undoable actions corresponding to the structure change
+		for( LayerNode node : groupTree.getRoot().getAllLayerNodes()) {
+			LayerActionHelper layerAction = node.getLayer().interpretCrop(handlesCropped);
+			
+			if( layerAction != null ) {
+				actions.addAll( layerAction.actions);
+				if( !layerAction.offsetChange.equals(MUtil.ORIGIN)) {
+					actions.add( new StructureAction(new OffsetChange(node, 
+							node.getOffsetX() + layerAction.offsetChange.x, 
+							node.getOffsetY() + layerAction.offsetChange.y)));
+				}
+			}
+		}
+		
 		if(!actions.isEmpty()) {
 			CompositeAction action = undoEngine.new CompositeAction(actions, (nodeToCrop instanceof LayerNode) ? "Cropped Layer" : "Cropped Group");
-			action.performAction();
-			undoEngine.storeAction(action);
+			undoEngine.performAndStore(action);
+		}
+	}
+	public static class ImageCropHelper {
+		public final ImageHandle handle;
+		public final int dx;
+		public final int dy;
+		ImageCropHelper( ImageHandle handle, int dx, int dy) {
+			this.handle = handle;
+			this.dx = dx;
+			this.dy = dy;
 		}
 	}
 	
@@ -697,7 +729,7 @@ public class ImageWorkspace {
 		
 		List<UndoableAction> actions = new ArrayList<>();
 		
-		MergeHelper helper = destination.getLayer().merge(source, -destination.x+source.x, -destination.y+source.y);
+		LayerActionHelper helper = destination.getLayer().merge(source, -destination.x+source.x, -destination.y+source.y);
 		actions.addAll( helper.actions);
 		if( helper.offsetChange.x != 0 || helper.offsetChange.y != 0){
 			actions.add( new StructureAction(
@@ -724,7 +756,7 @@ public class ImageWorkspace {
 		LinkedHashSet<ImageHandle> data = new LinkedHashSet<>();
 		
 		for( LayerNode node : layerNodes) {
-			data.addAll( node.getLayer().getUsedImages());
+			data.addAll( node.getLayer().getImageDependencies());
 		}
 
 		if( data.isEmpty())
@@ -815,7 +847,7 @@ public class ImageWorkspace {
 		// Step 1: Go through all the ImageData and find all ImageHandles
 		//	that aren't active ImageHandles in the Workspace
 		for( Node lnode : layers) {
-			for( ImageHandle data: ((LayerNode)lnode).getLayer().getUsedImages()) 
+			for( ImageHandle data: ((LayerNode)lnode).getLayer().getImageDependencies()) 
 			{
 				if( !isValidHandle(data))
 					unlinked.add(data);
@@ -965,7 +997,7 @@ public class ImageWorkspace {
 			
 			// Duplicate all used Data into a map
 			Map< Integer, BufferedImage> dupeData = new HashMap<>();
-			for( ImageHandle handle : layer.getUsedImages()) {
+			for( ImageHandle handle : layer.getImageDependencies()) {
 				if( !dupeData.containsKey(handle.id)) {
 					dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
 				}
@@ -1011,7 +1043,7 @@ public class ImageWorkspace {
 					
 					// Deep Copy any not-yet-duplicated Image data into the
 					//	dupeData map
-					for( ImageHandle handle : layer.getUsedImages()) {
+					for( ImageHandle handle : layer.getImageDependencies()) {
 						if( !dupeData.containsKey(handle.id)) {
 							dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
 						}
@@ -1375,7 +1407,7 @@ public class ImageWorkspace {
 			List<LayerNode> layerNodes = node.getAllLayerNodes();
 			
 			for( LayerNode layerNode : layerNodes) {
-				dependencies.addAll( layerNode.getLayer().getUsedImages());
+				dependencies.addAll( layerNode.getLayer().getImageDependencies());
 			}
 			
 			return dependencies;
@@ -1620,7 +1652,7 @@ public class ImageWorkspace {
 			if( context.getParent() == null)
 				return null;
 			parent = context.getParent();
-			nodeBefore = context.getNextNode();
+			nodeBefore = context;
 		}
 
 		return new AdditionChange( 

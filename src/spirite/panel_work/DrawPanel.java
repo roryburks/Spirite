@@ -19,12 +19,15 @@ import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
+import spirite.MDebug;
+import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
@@ -89,112 +92,117 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        float zoom = zoomer.getZoom();
+        final float zoom = zoomer.getZoom();
+        
+        if( workspace == null) {
+        	MDebug.handleError(ErrorType.STRUCTURAL, null, "Null Workspaced Draw Panel");
+        	return;
+        }
+        
+        final BasicStroke dashedStroke = new BasicStroke(
+        		1/(( zoom >= 4)?(zoom/2):zoom), 
+        		BasicStroke.CAP_BUTT, 
+        		BasicStroke.JOIN_BEVEL, 
+        		0, 
+        		new float[]{4/zoom,2/zoom}, 
+        		0);
+        final Stroke baseStroke = g2.getStroke();
 
         // Draw Image
-        if( workspace != null) {
-        	
-        	
-        	RenderSettings settings = new RenderSettings();
-        	settings.workspace = workspace;
-        	
+    	RenderSettings settings = new RenderSettings();
+    	settings.workspace = workspace;    	
 
 
-            // Draw Border around the Workspace
-            Stroke old_stroke = g2.getStroke();
-            Stroke new_stroke = new BasicStroke(
-            		1, 
-            		BasicStroke.CAP_BUTT, 
-            		BasicStroke.JOIN_BEVEL, 
-            		0, 
-            		new float[]{4,2}, 0);
-            g2.setStroke(new_stroke);
-            g2.setColor(Globals.getColor("drawpanel.image.border"));
-            g2.drawRect( zoomer.itsX(0)-1,
-            		zoomer.itsY(0)-1,
-		            (int)Math.round(workspace.getWidth()*zoom)+1,
-		            (int)Math.round(workspace.getHeight()*zoom)+1);
+        // Draw Border around the Workspace
+        g2.setStroke(dashedStroke);
+        g2.setColor(Globals.getColor("drawpanel.image.border"));
+        g2.drawRect( zoomer.itsX(0)-1,
+        		zoomer.itsY(0)-1,
+	            (int)Math.round(workspace.getWidth()*zoom)+1,
+	            (int)Math.round(workspace.getHeight()*zoom)+1);
+        
+        // Render the image
+    	BufferedImage image = renderEngine.renderImage(settings);
+
+    	if( image != null) {
+        g.drawImage( image, zoomer.itsX(0), zoomer.itsY(0),
+        		zoomer.itsX(image.getWidth()), zoomer.itsY(image.getHeight()),
+        		0, 0, image.getWidth(), image.getHeight(), null);
+    	}
+        
+        // Draw Border around the active Layer
+        GroupTree.Node selected = workspace.getSelectedNode();
+        
+        if( selected!= null) {
+            g2.setStroke(dashedStroke);
+            g2.setColor(Globals.getColor("drawpanel.layer.border"));
             
-            // Render the image
-        	BufferedImage image = renderEngine.renderImage(settings);
-
-        	if( image != null) {
-            g.drawImage( image, zoomer.itsX(0), zoomer.itsY(0),
-            		zoomer.itsX(image.getWidth()), zoomer.itsY(image.getHeight()),
-            		0, 0, image.getWidth(), image.getHeight(), null);
+        	if( selected instanceof GroupTree.LayerNode) {
+        		Layer layer = ((GroupTree.LayerNode) selected).getLayer();
+        		
+        		g2.drawRect( 
+        				zoomer.itsX(selected.getOffsetX()), 
+        				zoomer.itsY(selected.getOffsetY()), 
+        				(int)(layer.getWidth()* zoomer.getZoom()), 
+        				(int)(layer.getHeight() * zoomer.getZoom()));
         	}
-            
-            // Draw Border around the active Layer
-            GroupTree.Node selected = workspace.getSelectedNode();
-            
-            if( selected!= null) {
-                new_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4,2}, metronome/4.0f);
-                g2.setStroke(new_stroke);
-                g2.setColor(Globals.getColor("drawpanel.layer.border"));
-                
-            	if( selected instanceof GroupTree.LayerNode) {
-            		Layer layer = ((GroupTree.LayerNode) selected).getLayer();
-            		
-            		g2.drawRect( 
-            				zoomer.itsX(selected.getOffsetX()), 
-            				zoomer.itsY(selected.getOffsetY()), 
-            				(int)(layer.getWidth()* zoomer.getZoom()), 
-            				(int)(layer.getHeight() * zoomer.getZoom()));
-            	}
-            }
-
-
-            g2.setStroke(old_stroke);
-            
-            
-            // Draw Grid
-            int w = getWidth();
-            int h = getHeight();
-            if( zoom >= 4) {
-            	g2.setColor( new Color(90,90,90));
-                for( int i = 0; i < workspace.getWidth(); i+=2) {
-                	if( zoomer.itsX(i) < 0) continue;
-                	if( zoomer.itsX(i) > w) break;
-                    g2.drawLine(zoomer.itsX(i), 0, zoomer.itsX(i), this.getHeight());
-                }
-                for( int i = 0; i < workspace.getHeight(); i+=2) {
-                	if( zoomer.itsY(i) < 0) continue;
-                	if( zoomer.itsY(i) > h) break;
-                    g2.drawLine(0, zoomer.itsY(i), this.getWidth(), zoomer.itsY(i));
-                }
-            }
+        }
+        
+        // Draw Border on active Data
+        BuiltImageData bid = workspace.buildActiveData();
+        
+        if( bid != null) {
+			AffineTransform transform = g2.getTransform();
+            g2.setStroke(dashedStroke);
+            g2.setColor(Globals.getColor("drawpanel.bid.border"));
+            g2.translate(zoomer.itsX(0), zoomer.itsY(0));
+            g2.scale(zoomer.getZoom(), zoomer.getZoom());
+            bid.drawBorder(g2);
+			g2.setTransform( transform);
         }
 
+
+        g2.setStroke(baseStroke);
+        
+        
+        // Draw Grid
+        int w = getWidth();
+        int h = getHeight();
+        if( zoom >= 4) {
+        	g2.setColor( new Color(90,90,90));
+            for( int i = 0; i < workspace.getWidth(); i+=2) {
+            	if( zoomer.itsX(i) < 0) continue;
+            	if( zoomer.itsX(i) > w) break;
+                g2.drawLine(zoomer.itsX(i), 0, zoomer.itsX(i), this.getHeight());
+            }
+            for( int i = 0; i < workspace.getHeight(); i+=2) {
+            	if( zoomer.itsY(i) < 0) continue;
+            	if( zoomer.itsY(i) > h) break;
+                g2.drawLine(0, zoomer.itsY(i), this.getWidth(), zoomer.itsY(i));
+            }
+        }
+        
+
         // Draw Border around Selection
-        Selection selection = null;
-        if( selectionEngine.isBuilding())
-        	selection = selectionEngine.getBuildingSelection();
-        else 
-        	selection = workspace.getSelectionEngine().getSelection();
+        Selection selection = ( selectionEngine.isBuilding()) ?
+        	selectionEngine.getBuildingSelection() :
+        	workspace.getSelectionEngine().getSelection();
 
         if( selection != null) {
         	AffineTransform trans = g2.getTransform();
-            Stroke old_stroke = g2.getStroke();
-            Stroke new_stroke = new BasicStroke(
-            		1/(( zoom >= 4)?(zoom/2):zoom), 
-            		BasicStroke.CAP_BUTT, 
-            		BasicStroke.JOIN_BEVEL, 
-            		0, 
-            		new float[]{4/zoom,2/zoom}, 
-            		0);
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoom, zoom);
             g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
             g2.setColor(Color.black);
-            g2.setStroke(new_stroke);
+            g2.setStroke(dashedStroke);
             selection.drawSelectionBounds(g);
-            g2.setStroke(old_stroke);
+            g2.setStroke(baseStroke);
             g2.setTransform(trans);
         }
         
-        // 
         if( penner.drawsOverlay())
         	penner.paintOverlay(g);
+
     }
 
 

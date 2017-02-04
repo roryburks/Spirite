@@ -456,8 +456,7 @@ public class UndoEngine {
 			if( context instanceof ImageContext ) {
 					ImageContext icontext = (ImageContext)context;
 					
-					if( icontext.image.equals(handle)) {
-					
+				if( icontext.image.equals(handle)) {
 					CachedImage ci = cacheManager.cacheImage(newImage, workspace);
 					
 					ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, ci);
@@ -543,6 +542,7 @@ public class UndoEngine {
 		private class KeyframeAction extends ImageAction {
 			CachedImage frameCache;
 			ImageAction hiddenAction;
+			boolean freed = false;
 			KeyframeAction( CachedImage frame, ImageAction action) {
 				super(workspace.new BuiltImageData(image));
 				this.frameCache = frame;
@@ -578,12 +578,14 @@ public class UndoEngine {
 				frameCache.relinquish(this);
 				if( hiddenAction != null)
 					hiddenAction.onDispatch();
+				freed = true;
 			}
 			
 			@Override
 			protected void finalize() throws Throwable {
 				// Shouldn't be necessary
-				frameCache.relinquish(this);
+				if( !freed)
+					frameCache.relinquish(this);
 				super.finalize();
 			}
 		}
@@ -593,12 +595,16 @@ public class UndoEngine {
 		 * entire image has been replaced with another one.
 		 */
 		class ReplaceImageAction extends KeyframeAction {
-			final CachedImage previousCache;
+			private final CachedImage previousCache;
+			private final CachedImage newCache;
+			boolean freed = false;
 			
 			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
-				super(cached, new NilImageAction(data));
+				super( cacheManager.createDeepCopy(cached.access(), UndoEngine.this), new NilImageAction(data));
 				
+				newCache = cached;
 				previousCache = workspace._accessCache(data);
+				newCache.reserve(this);
 				previousCache.reserve(this);
 			}
 			@Override
@@ -608,11 +614,13 @@ public class UndoEngine {
 			@Override
 			protected void onDispatch() {
 				previousCache.relinquish(this);
+				newCache.relinquish(this);
+				freed = true;
 				super.onDispatch();
 			}
 			@Override
 			public void performAction() {
-				workspace._replaceIamge(builtImage.handle, frameCache);
+				workspace._replaceIamge(builtImage.handle, newCache);
 			}
 			
 			@Override
@@ -625,7 +633,10 @@ public class UndoEngine {
 				// Is necessary if createReplaceAction is called, but never entered
 				//	into the UndoEngine (but the CachedImage can't be reserved from
 				//	onAdd as it might already be flushed by then).
-				previousCache.relinquish(this);
+				if( !freed) {
+					previousCache.relinquish(this);
+					newCache.relinquish(this);
+				}
 				super.finalize();
 			}
 		}
@@ -691,7 +702,7 @@ public class UndoEngine {
 			// Refresh the Image to the current most recent keyframe
 			actions.get(pointer-met).performImageAction();
 
-			for( int i = pointer - met; i <= pointer; ++i) {
+			for( int i = pointer - met+1; i <= pointer; ++i) {
 				actions.get(i).performImageAction();
 			}
 

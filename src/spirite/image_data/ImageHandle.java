@@ -14,6 +14,9 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
  * of building complex data structures relying on Images that should be 
  * Cached by allowing you to create ImageHandles without a null context
  * and then linking them to the ImageWorkspace using importData
+ * 
+ * !!!! NOTE: Use .equals().  There should be little to no reason to ever
+ * use <code>==</code> as it defeats the entire point of handles.
  */
 public class ImageHandle {
 	ImageWorkspace context;

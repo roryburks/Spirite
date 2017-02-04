@@ -156,6 +156,13 @@ public class RootFrame extends javax.swing.JFrame
     			
     			{"&Layer", null, null},
     			{".Auto&crop Layer", "draw.autocroplayer", null},
+    			{".Layer to &Image Size", "draw.layerToImageSize", null},
+    			
+    			{"&Select", null, null},
+    			{".&All", "select.all", null},
+    			{".&None", "select.none", null},
+    			{".&Invert Selection (unimplemented)", "select.invert", null},
+    			//{".&Invert Selection (unimplemented)", "select.invert", null},
     			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},

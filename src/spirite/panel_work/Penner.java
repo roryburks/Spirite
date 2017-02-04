@@ -611,7 +611,8 @@ public class Penner
 				if( (Boolean)settings.getValue("quickCrop")) {
 					workspace.cropNode(
 						workspace.getSelectedNode(), 
-						cropSection);
+						cropSection,
+						(Boolean)settings.getValue("shrinkOnly"));
 					end();
 				}
 				else
@@ -651,6 +652,8 @@ public class Penner
 		
 		@Override
 		public void onPenDown() {
+			if( toolsetManager.getSelectedTool() != Tool.CROP) { end(); return;}
+			
 			if( cropSection == null || !cropSection.contains(x, y)) {
 				building = true;
 				startx = x;
@@ -662,7 +665,8 @@ public class Penner
 				if( middle.contains( x, y)) {
 					workspace.cropNode(
 							workspace.getSelectedNode(), 
-							cropSection);
+							cropSection,
+							(Boolean)toolsetManager.getToolSettings(Tool.CROP).getValue("shrinkOnly"));
 					
 					end();
 				}
@@ -706,12 +710,17 @@ public class Penner
 			int y1 = context.zoomer.itsYm(0);
 			int x2 = context.zoomer.itsXm(workspace.getWidth());
 			int y2 = context.zoomer.itsYm(workspace.getHeight());
+
+			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
+			if( r.x + r.width > x2) { r.width = x2 - r.x;}
+			
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
 			g2.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
 			g2.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
 			g2.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
 			g2.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
 			
+			// The various inner rectangles represenging the modification points
 			if( !building) {
 				g2.setStroke(new BasicStroke(2.0f));
 				

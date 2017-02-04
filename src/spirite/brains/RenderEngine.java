@@ -522,19 +522,19 @@ public class RenderEngine
 				return Arrays.asList(image);
 			}
 			else if( layer != null) {
-				return layer.getUsedImages();
+				return layer.getImageDependencies();
 			}
 			else if( refRender != ReferenceRender.NULL) {
 				LinkedHashSet<ImageHandle> set = new LinkedHashSet<ImageHandle>();
 				
 				if( refRender == ReferenceRender.BACK) {
 					for( Layer layer : workspace.getReferenceManager().getBackList()) {
-						set.addAll( layer.getUsedImages());
+						set.addAll( layer.getImageDependencies());
 					}
 				}
 				else if( refRender == ReferenceRender.FRONT) {
 					for( Layer layer : workspace.getReferenceManager().getFrontList()) {
-						set.addAll( layer.getUsedImages());
+						set.addAll( layer.getImageDependencies());
 					}
 				}
 				return new ArrayList<>(set);
@@ -554,7 +554,7 @@ public class RenderEngine
 				
 				Iterator<Node> it = layerNodes.iterator();
 				while( it.hasNext()){
-					for( ImageHandle data : ((LayerNode)it.next()).getLayer().getUsedImages()) {
+					for( ImageHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
 						// Avoiding duplicates should make the intersection method quicker
 						if( list.indexOf(data) == -1)
 							list.add(data);

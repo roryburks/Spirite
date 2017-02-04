@@ -31,7 +31,8 @@ public class Globals {
 	
     private static final Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
-        {"drawpanel.layer.border", new Color(16,16,16)},
+        {"drawpanel.bid.border", new Color(16,16,16)},
+        {"drawpanel.layer.border", new Color(190,190,120)},
         {"toolbutton.selected.background", new Color( 128,128,128)},
 
         {"contentTree.selectedBGDragging", new Color( 192,192,212)},

@@ -240,7 +240,7 @@ public class PaletteManager
     //	TODO: less hard-coded if this ever gets more commands
 	@Override
 	public List<String> getValidCommands() {
-		return Arrays.asList( new String[]{"swap","swarpBack"});
+		return Arrays.asList( new String[]{"swap","swapBack"});
 	}
 
 	@Override
@@ -256,7 +256,7 @@ public class PaletteManager
     		return true;
     	case "swapBack":
     		toggleActiveColors2();
-    		return false;
+    		return true;
     	}
 		return false;
 	}

@@ -67,6 +67,9 @@ public class HotkeyManager {
                 {"draw.shiftRight", (new Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 {"draw.shiftDown", (new Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 {"draw.shiftUp", (new Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
+
+                {"select.all", (new Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK))},
+                {"select.none", (new Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
                 
                 {"global.save_image", (new Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK))},
                 {"global.copy", (new Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK))},

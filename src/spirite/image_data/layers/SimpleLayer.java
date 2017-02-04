@@ -15,6 +15,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
+import spirite.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.image_data.UndoEngine.DrawImageAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 
@@ -30,7 +31,7 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public List<ImageHandle> getUsedImages() {
+	public List<ImageHandle> getImageDependencies() {
 		return Arrays.asList(data);
 	}
 
@@ -60,11 +61,11 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public List<Rectangle> interpretCrop(Rectangle rect) {
-		Rectangle bounds = new Rectangle(data.getWidth(), data.getHeight());
+	public List<Rectangle> getBoundList() {
 		
 		List<Rectangle> list = new ArrayList<>(1);
-		list.add( bounds.intersection(rect));
+		list.add(new Rectangle( 0, 0, data.getWidth(), data.getHeight()));
+//		list.add( bounds.intersection(rect));
 		
 		return list;
 	}
@@ -75,8 +76,8 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public MergeHelper merge(Node node, int x, int y) {
-		MergeHelper helper = new MergeHelper();
+	public LayerActionHelper merge(Node node, int x, int y) {
+		LayerActionHelper helper = new LayerActionHelper();
 		if( !canMerge(node)) return helper;
 
 		ImageWorkspace workspace = data.getContext();	// Non-null as per canMerge
@@ -124,6 +125,20 @@ public class SimpleLayer extends Layer {
 		renderable.depth = 0;
 		
 		return Arrays.asList( new Renderable[]{renderable});
+	}
+
+	@Override
+	public LayerActionHelper interpretCrop( List<ImageCropHelper> crops) {
+		
+		for( ImageCropHelper crop : crops) {
+			if( crop.handle.equals(data)){
+				LayerActionHelper helper = new  LayerActionHelper();
+				helper.offsetChange.x = crop.dx;
+				helper.offsetChange.y = crop.dy;
+				return helper;
+			}
+		}
+		return null;
 	}
 	
 	
