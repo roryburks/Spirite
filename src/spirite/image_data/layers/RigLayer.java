@@ -15,6 +15,7 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 import spirite.brains.RenderEngine.Renderable;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -125,6 +126,8 @@ public class RigLayer extends Layer
 		for( int i=parts.size()-1; i >= 0; --i) {
 			Part part = parts.get(i);
 			if( part.isVisible()) {
+				if( !MUtil.coordInImage(x - part.ox, y-part.oy, part.handle.deepAccess()))
+					continue;
 				int rgb =part.handle.deepAccess().getRGB(x - part.ox, y-part.oy);
 				
 				if( ((rgb >>> 24) & 0xFF) == 0) continue; 
@@ -447,9 +450,9 @@ public class RigLayer extends Layer
 		}
 		@Override
 		protected void undoAction() {
-			parts.remove(added);
 			if (active == added)
 				active = null;
+			parts.remove(added);
 			_trigger();
 		}
 		@Override public boolean reliesOnData() {return true;}
@@ -467,9 +470,9 @@ public class RigLayer extends Layer
 		}
 		@Override
 		protected void performAction() {
-			parts.remove(removed);
 			if (active == removed)
 				active = null;
+			parts.remove(removed);
 			_trigger();
 		}
 		@Override

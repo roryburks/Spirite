@@ -517,6 +517,7 @@ public class ImageWorkspace {
 		if( selected instanceof LayerNode) {
 			BuildingImageData data = ((LayerNode)selected).getLayer().getActiveData();
 			
+			if( data == null) return null;
 			return  new BuiltImageData( data.handle,
 					data.ox + selected.x, data.oy + selected.y);
 		}

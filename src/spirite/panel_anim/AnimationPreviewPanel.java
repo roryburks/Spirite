@@ -83,7 +83,7 @@ public class AnimationPreviewPanel extends OmniComponent
     	master.addWorkspaceObserver(this);
     	workspace = master.getCurrentWorkspace();
     	if( workspace != null) {
-    		workspace.getAnimationManager().addStructureObserver(this);
+    		workspace.getAnimationManager().addAnimationStructureObserver(this);
     	}
     	
         
@@ -327,14 +327,20 @@ public class AnimationPreviewPanel extends OmniComponent
 
 
 	// :::: MAnimationStructureObserver
-	@Override
-	public void animationStructureChanged(AnimationStructureEvent evt) {
+	@Override public void animationAdded(AnimationStructureEvent evt) {
+		refresh();
+	}
+	@Override public void animationRemoved(AnimationStructureEvent evt) {
+		refresh();
+	}
+	@Override public void animationChanged(AnimationStructureEvent evt) {
+		refresh();
+	}
+	private void refresh() {	
+		// Lazy, but effective
 		try{
 		constructFromAnimation( workspace.getAnimationManager().getAnimations().get(0));
-		} catch( NullPointerException e) {
-			
-		}
-		
+		} catch( NullPointerException e) {}
 	}
 	
 	// :::: Inherited from OmniContainer

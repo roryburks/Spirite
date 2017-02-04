@@ -8,7 +8,7 @@ public abstract class Animation {
 	protected String name;
 	AnimationManager context;
 	
-	protected void triggerChange() {if( context != null) context.triggerStructureChange(null);}
+	protected void triggerChange() {if( context != null) context.triggerChangeAnimation(this);}
 	public abstract void drawFrame( Graphics g, float t);
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();

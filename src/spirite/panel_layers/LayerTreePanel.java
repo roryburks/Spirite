@@ -556,8 +556,9 @@ public class LayerTreePanel extends ContentTree
 
 			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
 			
-			workspace.addNewRigLayer(workspace.getSelectedNode(), 
-					helper.width, helper.height, helper.name, helper.color);
+			if( helper != null) 
+				workspace.addNewRigLayer(workspace.getSelectedNode(), 
+						helper.width, helper.height, helper.name, helper.color);
 			break;}
 		default:
 			MDebug.log(evt.getActionCommand());

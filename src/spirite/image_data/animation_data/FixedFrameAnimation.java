@@ -195,22 +195,20 @@ public class FixedFrameAnimation extends Animation
 	}
 
 	public static class Frame {
-		public int start;	// Not used internally, should be calculatable from other parts of the animation
-		public int length;
-		public LayerNode node;
-		public Marker marker;
+		private int start;	// Not used internally, should be calculatable from other parts of the animation
+		private int length;
+		private LayerNode node;
+		private Marker marker;
 		Frame( LayerNode node, int length, int start, Marker marker) {
 			this.node = node;
 			this.length = length;
 			this.start = start;
 			this.marker = marker;
 		}
-		public int getStart() {
-			return start;
-		}
-		public int getEnd() {
-			return start+length;
-		}
+		public int getStart() { return start; }
+		public int getEnd() { return start+length; }
+		public LayerNode getLayerNode() { return node; }
+		public Marker getMarker() { return marker;}
 	}
 	public static class AnimationLayer {
 		protected GroupNode group;

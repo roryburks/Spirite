@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -36,6 +37,7 @@ import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.image_data.animation_data.FixedFrameAnimation.Frame;
+import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
@@ -60,7 +62,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		workspace = master.getCurrentWorkspace();
 		if( workspace != null) {
 			manager = workspace.getAnimationManager();
-			manager.addStructureObserver(this);
+			manager.addAnimationStructureObserver(this);
 			workspace.addSelectionObserver(this);
 		}
 		
@@ -120,12 +122,6 @@ public class AnimationSchemeTreePanel extends ContentTree
 		}
 	}
 	
-	private class SALFrame {
-		int start;
-		int end;
-		LayerNode layer;
-	}
-
 	
 	class TitlePanel extends JPanel {
 		JPanel imgPanel;
@@ -188,6 +184,12 @@ public class AnimationSchemeTreePanel extends ContentTree
 		FixedFrameAnimation anim;
 		ArrayList<ArrayList<FrameLink>> frameLinks = new ArrayList<>();
 		
+		// For quicker construction certain Nodes are cached and re-used.
+		//	Note: as of now shortenned caches are never freed, but they should
+		//	be removed when the component is removed anyway
+		ArrayList<FramePanel> fpCache = new ArrayList<>();	
+		int fpcMet;
+		
 		FixedFramePanel(FixedFrameAnimation anim) {
 			this.anim = anim;
 			this.setOpaque(false);
@@ -195,6 +197,9 @@ public class AnimationSchemeTreePanel extends ContentTree
 			tree.addMouseListener(this);
 			container.addMouseListener(this);
 		}
+		
+
+		private class FramePanel extends TitlePanel {}
 		
 		@Override
 		protected void paintComponent(Graphics g) {
@@ -204,11 +209,9 @@ public class AnimationSchemeTreePanel extends ContentTree
 			
 			for( List<FrameLink> list : frameLinks) {
 				for( FrameLink fl : list) {
-					if( fl.frame.node == selected) {
-						g.setColor(pseudoselectColor);
-						g.fillRect( fl.component.getX()-OUTLINE_WIDTH, fl.component.getY(),
-								fl.component.getWidth()+OUTLINE_WIDTH, fl.component.getHeight());
-					}
+					fl.behavior.drawBackground(g, new Rectangle(
+							fl.component.getX()-OUTLINE_WIDTH, fl.component.getY(),
+							fl.component.getWidth()+OUTLINE_WIDTH, fl.component.getHeight()));
 				}
 			}
 			
@@ -244,10 +247,12 @@ public class AnimationSchemeTreePanel extends ContentTree
 		 * heights.
 		 */
 		private void constructLayout() {
+			fpcMet = 0;
 			
 			List<AnimationLayer> layers = anim.getLayers();
 			
 			frameLinks.clear();
+			this.removeAll();
 			
 			GroupLayout layout = new GroupLayout(this);
 			
@@ -269,18 +274,34 @@ public class AnimationSchemeTreePanel extends ContentTree
 				
 				subHor.addComponent(label);
 				subVert.addComponent(label, LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT);
-				
+
 				int dy = 10 + LABEL_HEIGHT;
 				for( Frame frame : frames) {
-					TitlePanel tp = new TitlePanel();
-					tp.startLabel.setText(""+frame.getStart());
-					tp.endLabel.setText(""+frame.getEnd());
-					subHor.addComponent(tp);
-					subVert.addComponent(tp,NODE_HEIGHT,NODE_HEIGHT,NODE_HEIGHT);
 
-					links.add(new FrameLink(dy,frame,tp));
-					dy += NODE_HEIGHT;
+					FrameTypeBehavior behavior = null;
+					
+					switch( frame.getMarker()) {
+					case END_AND_LOOP:
+						behavior = new EndMarkerBehavior();
+						break;
+					case END_LOCAL_LOOP:
+					case START_LOCAL_LOOP:
+					case NIL_OUT:
+						break;
+					case FRAME:
+						behavior = new FrameFrameBehavior(frame);
+						break;
+					}
+					if( behavior != null) {
+						int h = behavior.getHeight();
+						Component component = behavior.buildNode();
+						
+						subHor.addComponent(component);
+						subVert.addComponent(component,h,h,h);
+						links.add( new FrameLink(dy, behavior, component));
+					}
 				}
+				
 				horizontal.addGroup(subHor);
 				vertical.addGroup(subVert);
 				
@@ -292,16 +313,95 @@ public class AnimationSchemeTreePanel extends ContentTree
 			this.setLayout(layout);
 		}
 		
+		/**
+		 * Defines both how to construct a layer as well as the behavior
+		 * it should perform on certain contextual events.
+		 */
+		private abstract class FrameTypeBehavior {
+			public abstract Component buildNode();
+			public abstract int getHeight();
+			public abstract void onPress( MouseEvent evt);
+			public void drawBackground( Graphics g, Rectangle bounds) {}
+		}
+		
+		/** Behavior for normal frames. */
+		private class FrameFrameBehavior extends FrameTypeBehavior {
+			public final Frame frame;
+			
+			FrameFrameBehavior( Frame frame) {
+				assert( frame.getMarker() == Marker.FRAME);
+				this.frame = frame;
+			}
 
+			@Override
+			public void drawBackground(Graphics g, Rectangle bounds) {
+				if( workspace.getSelectedNode() == frame.getLayerNode()) {
+					g.setColor(pseudoselectColor);
+					g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+				}
+			}
+			@Override
+			public Component buildNode() {
+				FramePanel panel;
+				
+				if(fpcMet >= fpCache.size()) {
+					panel = new FramePanel();
+					fpCache.add(panel);
+				}
+				else 
+					panel = fpCache.get(fpcMet);
+				++fpcMet;
+
+				panel.startLabel.setText(""+frame.getStart());
+				panel.endLabel.setText(""+frame.getEnd());
+				
+				return panel;
+			}
+			
+			@Override
+			public int getHeight() {
+				return NODE_HEIGHT;
+			}
+			@Override
+			public void onPress( MouseEvent evt) {
+				workspace.setSelectedNode(frame.getLayerNode());
+			}
+		}
+		
+		
+		/** Behavior for the end marker. */
+		private class EndMarkerBehavior extends FrameTypeBehavior {
+			@Override
+			public Component buildNode() {
+				JPanel endP = new JPanel();
+				endP.setBackground(Color.RED);
+				return endP;
+			}
+
+			@Override
+			public int getHeight() {
+				return 10;
+			}
+
+			@Override
+			public void onPress(MouseEvent evt) {
+				// TODO Auto-generated method stub
+				
+			}
+		}
+
+		
+		
 		/** FrameLink is a helper-class that memorizes the link between
 		 * a frame and their visual presence in the UI.
 		 */
 		private class FrameLink {
 			final int ypos;
-			final Frame frame;
+			FrameTypeBehavior behavior;
+//			final Frame frame;
 			final Component component;
-			FrameLink( int y, Frame frame, Component component) 
-			{this.ypos = y; this.frame = frame; this.component = component;}
+			FrameLink( int y, FrameTypeBehavior behavior, Component component) 
+			{this.ypos = y; this.behavior = behavior; this.component = component;}
 		}
 		class FFPOutline extends JPanel
 		{
@@ -363,7 +463,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 			FrameLink fl = linkAt(p);
 			
 			if( fl != null) {
-				workspace.setSelectedNode(fl.frame.node);
+				fl.behavior.onPress( SwingUtilities.convertMouseEvent(evt.getComponent(), evt, fl.component));
 			}
 		}
 
@@ -430,7 +530,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		master.removeWorkspaceObserver(this);
 		if( workspace != null) {
 			workspace.removeSelectionObserver(this);
-			manager.removeStructureObserver(this);
+			manager.removeAnimationStructureObserver(this);
 		}
 	}
 	
@@ -460,20 +560,37 @@ public class AnimationSchemeTreePanel extends ContentTree
 
 	// :::: AnimationStructureObserver
 	@Override
-	public void animationStructureChanged(AnimationStructureEvent evt) {
-		if( evt == null) {
-			for( AnimNodeBuilder builder : builderMap.values())
-				builder.updateComponent();
-		}
-		else {
-			for( Object anim : evt.getAnimationsAffected()) {
-				AnimNodeBuilder builder = builderMap.get(anim);
-				if( builder != null)
-					builder.updateComponent();
+	public void animationAdded(AnimationStructureEvent evt) {
+		triggerReconstruct(evt);
+	}
+
+	@Override
+	public void animationRemoved(AnimationStructureEvent evt) {
+		triggerReconstruct(evt);
+	}
+
+	@Override
+	public void animationChanged(AnimationStructureEvent evt) {
+		triggerReconstruct(evt);
+	}
+	
+	boolean reconstructed;
+	public void triggerReconstruct( AnimationStructureEvent evt) {
+		for( Entry<Animation,AnimNodeBuilder> entry: builderMap.entrySet()){
+			if( entry.getKey() == evt.getAnimation()) {
+				entry.getValue().updateComponent();
 			}
 		}
 		
-		reconstruct();
+		// Attempt to minimize reconstructs in the case multiple triggers happen
+		//	in quick succession (before the Panel needs to be redrawn)
+		reconstructed = false;
+		SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
+			if( !reconstructed) {
+				reconstructed = true;
+				reconstruct();
+			}
+		}});	
 	}
 	
 	// :::: TreeSelectionListener (inherited from ContentTree)
@@ -485,11 +602,6 @@ public class AnimationSchemeTreePanel extends ContentTree
 				(DefaultMutableTreeNode)evt.getPath().getLastPathComponent();
 		
 		Object obj = node.getUserObject();
-		if( obj instanceof SALFrame) {
-			SALFrame frame = (SALFrame)obj;
-			
-			workspace.setSelectedNode(frame.layer);
-		}
 	}
 
 	// :::: MSelectionObserver
@@ -503,12 +615,12 @@ public class AnimationSchemeTreePanel extends ContentTree
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		if( workspace != null) {
 			workspace.removeSelectionObserver(this);
-			manager.removeStructureObserver(this);
+			manager.removeAnimationStructureObserver(this);
 		}
 		workspace = selected;
 		if( workspace != null) {
 			manager = workspace.getAnimationManager();
-			manager.addStructureObserver(this);
+			manager.addAnimationStructureObserver(this);
 			workspace.addSelectionObserver(this);
 		} else {
 			manager = null;
@@ -517,6 +629,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
+
 
 	
 }
