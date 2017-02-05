@@ -5,8 +5,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -17,8 +21,11 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
@@ -45,8 +52,8 @@ import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
-public class AnimationSchemeTreePanel extends ContentTree 
-	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver, 
+public class AnimationSchemeTreePanel extends JPanel 
+	implements  MAnimationStructureObserver, MSelectionObserver, 
 		MWorkspaceObserver, MAnimationStateObserver
 {
 	private static final long serialVersionUID = 1L;
@@ -56,13 +63,19 @@ public class AnimationSchemeTreePanel extends ContentTree
 	private ImageWorkspace workspace = null;
 	private AnimationManager manager = null;
 	
+	private final JPanel container = new JPanel();
+	private final JScrollPane scrollPane = new JScrollPane(container);
 	
 	/**
 	 * Create the panel.
 	 */
 	public AnimationSchemeTreePanel( MasterControl master) {
 		this.master = master;
-		tree.setCellRenderer(this);
+		this.setLayout(new GridLayout());
+		
+
+		container.setBackground(Color.white);
+		this.add(scrollPane);
 		
 		workspace = master.getCurrentWorkspace();
 		if( workspace != null) {
@@ -82,60 +95,110 @@ public class AnimationSchemeTreePanel extends ContentTree
 	 * AnimationManager
 	 */
 	private void reconstruct() {
-		root.removeAllChildren();
+		container.removeAll();
+		
+		
+		GroupLayout layout = new GroupLayout(container);
+		
+		Group horLeft = layout.createParallelGroup();
+		Group horRight = layout.createParallelGroup();
+		SequentialGroup vertical = layout.createSequentialGroup();
+		
 		if( manager != null) {
 			
 			for( Animation animation : manager.getAnimations()) {
-				DefaultMutableTreeNode anim = new DefaultMutableTreeNode(new AnimationTitle(animation));
+
+				// Construct the components
+				TitlePanel labelPanel = new TitlePanel(animation);
+				Component content = constructComponentFromAnimation(animation);
+				ExpandButton expandButton = new ExpandButton(content);
+				expandButton.setSelected(true);
 				
-				if( animation instanceof FixedFrameAnimation) 
-					constructSimpleAnimationTree(anim, (FixedFrameAnimation)animation);
 				
-				root.add(anim);
+				
+				labelPanel.titleLabel.setText(animation.getName());
+				labelPanel.startLabel.setText(""+animation.getStartFrame());
+				labelPanel.endLabel.setText(""+animation.getEndFrame());
+				
+				vertical.addGroup(layout.createParallelGroup()
+					.addComponent(labelPanel,TITLE_HEIGHT,TITLE_HEIGHT,TITLE_HEIGHT)
+					.addComponent(expandButton,TITLE_HEIGHT,TITLE_HEIGHT,TITLE_HEIGHT))
+				.addGroup(layout.createParallelGroup()
+					.addComponent(content,GroupLayout.PREFERRED_SIZE,GroupLayout.PREFERRED_SIZE,GroupLayout.PREFERRED_SIZE));
+				horLeft.addComponent(expandButton,LEFT_SECTION_WIDTH,LEFT_SECTION_WIDTH,LEFT_SECTION_WIDTH);
+				horRight.addComponent(labelPanel);
+				horRight.addComponent(content,0,0,Short.MAX_VALUE);
 			}
 		}
 		
 
-		model.nodeStructureChanged(root);
+//		model.nodeStructureChanged(root);
+		vertical.addGap(0,0,Short.MAX_VALUE);
+		layout.setVerticalGroup(vertical);
+		layout.setHorizontalGroup( layout.createSequentialGroup()
+			.addGroup(horLeft)
+			.addGroup(horRight));
 		
-/*		Enumeration e = ((DefaultMutableTreeNode)model.getRoot()).depthFirstEnumeration();
-		
-		while( e.hasMoreElements()) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-			model.nodeChanged(node);
-		}*/
-		
-		UIUtil.expandAllNodes(tree);
+		container.setLayout(layout);
 	}
+	private static final int LEFT_SECTION_WIDTH = 16;
+	private static final int TITLE_HEIGHT = 24;
 	
-	private void constructSimpleAnimationTree( 
-			DefaultMutableTreeNode into, 
-			FixedFrameAnimation animation ) 
-	{
-		List<AnimationLayer> list = animation.getLayers();
-		
+	
+	class ExpandButton extends JToggleButton implements ActionListener {
+		private final Component content;
+		ExpandButton(Component content) {
+			this.content = content;
+			this.setOpaque(false);
+			this.setBackground(new Color(0,0,0,0));
+			this.setBorder(null);
 
-		DefaultMutableTreeNode animationNode = 
-				new DefaultMutableTreeNode( animation);
-		
-		into.add(animationNode);
-	}
-	
-	private class AnimationTitle {
-		final Animation animation;
-		AnimationTitle( Animation anim) {
-			this.animation = anim;
+			this.setIcon(Globals.getIcon("icon.expanded"));
+			this.setRolloverIcon(Globals.getIcon("icon.expandedHL"));
+			this.setSelectedIcon(Globals.getIcon("icon.unexpanded"));
+			this.setRolloverSelectedIcon(Globals.getIcon("icon.unexpandedHL"));
+			
+			this.addActionListener(this);
+		}
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			content.setVisible(this.isSelected());
 		}
 	}
 	
+
+	// 
+	private Component constructComponentFromAnimation(Animation animation) {
+		AnimNodeBuilder builder =builderMap.get(animation);
+		
+		if( builder == null) {
+			builder = createComponent(animation);
+			builderMap.put(animation, builder);
+		}
+		
+		return builder.getComponent();
+	}
+
+	public interface AnimNodeBuilder  {
+		public void updateComponent();
+		public Component getComponent();
+	}
+	private final HashMap<Animation,AnimNodeBuilder> builderMap = new HashMap<>();
 	
-	class TitlePanel extends JPanel {
+	private AnimNodeBuilder createComponent( Animation anim) {
+		if( anim instanceof FixedFrameAnimation) {
+			return new FixedFramePanel((FixedFrameAnimation)anim);
+		}
+		return null;
+	}
+	
+	class BaseTPanel extends JPanel {
 		JPanel imgPanel;
 		JLabel titleLabel;
 		JLabel startLabel;
 		JLabel endLabel;
 		
-		TitlePanel() {
+		BaseTPanel() {
 			setOpaque(false);
 			
 			imgPanel = new JPanel();
@@ -178,6 +241,36 @@ public class AnimationSchemeTreePanel extends ContentTree
 			this.setLayout(layout);
 		}
 	}
+	class TitlePanel extends BaseTPanel implements MouseListener {
+		final Animation animation;
+		
+		TitlePanel( Animation animation) {
+			this.animation = animation;
+			this.addMouseListener(this);
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			if( manager != null && manager.getSelectedAnimation() == animation) {
+				System.out.println("SS");
+				g.setColor(selectedAnimColor);
+				g.fillRect(0, 0, getWidth(), getHeight());
+			}
+			super.paintComponent(g);
+		}
+
+		// MouseListener
+		@Override public void mouseEntered(MouseEvent arg0) {}
+		@Override public void mouseExited(MouseEvent arg0) {}
+		@Override public void mousePressed(MouseEvent arg0) {}
+		@Override public void mouseReleased(MouseEvent arg0) {}
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			if( manager != null) {
+				manager.setSelectedAnimation(animation);
+			}
+		}
+	}
 
 	private final Color pseudoselectColor = Globals.getColor("animSchemePanel.activeNodeBG");
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
@@ -201,12 +294,11 @@ public class AnimationSchemeTreePanel extends ContentTree
 			this.anim = anim;
 			this.setOpaque(false);
 			constructLayout();
-			tree.addMouseListener(this);
-			container.addMouseListener(this);
+			this.addMouseListener(this);
 		}
 		
 
-		private class FramePanel extends TitlePanel {}
+		private class FramePanel extends BaseTPanel {}
 		private class MarkerPanel extends JPanel {
 			final JLabel label = new JLabel();
 			
@@ -369,6 +461,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 					case NIL_OUT:
 						break;
 					case FRAME:
+						System.out.println(frame);
 						behavior = new FrameFrameBehavior(frame);
 						break;
 					}
@@ -476,7 +569,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 			@Override
 			public Component buildNode() {
 				FramePanel panel = getFromFPCache();
-
+				
 				panel.startLabel.setText(""+frame.getStart());
 				panel.endLabel.setText(""+frame.getEnd());
 				
@@ -493,6 +586,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 			}
 			@Override
 			public void onPress( MouseEvent evt) {
+				System.out.println(workspace +"," + frame);
 				workspace.setSelectedNode(frame.getLayerNode());
 			}
 		}
@@ -584,18 +678,12 @@ public class AnimationSchemeTreePanel extends ContentTree
 			//	this frustrating object when dealing with GroupLayouts is a 
 			//	thousand times easier?
 			Point p = SwingUtilities.convertPoint(
-					evt.getComponent(), evt.getPoint(), tree);
-			
-			Rectangle r =
-					tree.getPathBounds(tree.getClosestPathForLocation(p.x, p.y));
-			
-			if( !r.contains(p))
-				return;
-			p.x -= r.x;
-			p.y -= r.y;
+					evt.getComponent(), evt.getPoint(), this);
 			
 			for( Component c : getComponents()) {
 				if( (c instanceof TickPanel) && c.getBounds().contains(p)) {
+					if( manager.getSelectedAnimation() != anim)
+						manager.setSelectedAnimation(anim);
 					manager.setFrame( ((TickPanel)c).tick);
 				}
 			}
@@ -610,61 +698,6 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	
 	
-	
-	
-	// :::: TreeCellRenderer
-	public interface AnimNodeBuilder  {
-		public void updateComponent();
-		public Component getComponent();
-	}
-	private final JLabel label = new JLabel();	
-	private final TitlePanel labelPanel = new TitlePanel();
-	private final HashMap<Animation,AnimNodeBuilder> builderMap = new HashMap<>();
-	
-	@Override
-	public Component getTreeCellRendererComponent(
-			JTree tree, 
-			Object obj, 
-			boolean selected, 
-			boolean expanded, 
-			boolean leaf, 
-			int row, 
-			boolean hasFocus) 
-	{
-		
-		Object usrObj = ((DefaultMutableTreeNode)obj).getUserObject();
-		
-		if( usrObj instanceof AnimationTitle) {
-			Animation sa = ((AnimationTitle)usrObj).animation;
-			labelPanel.titleLabel.setText(sa.getName()+ " [Simple Animation]");
-			labelPanel.startLabel.setText( Float.toString(sa.getStartFrame()));
-			labelPanel.endLabel.setText(Float.toString(sa.getEndFrame()));
-			return labelPanel;
-		}else if( usrObj instanceof Animation) {
-			Animation anim = (Animation)usrObj;
-			AnimNodeBuilder builder = builderMap.get(anim);
-			
-			if( builder == null) {
-				builder = createComponent(anim);
-				builderMap.put(anim, builder);
-			}
-			
-			
-			return builder.getComponent();
-		}else {
-			label.setText("Animation Layer");
-		
-			return label;
-		}
-	}
-	
-	private AnimNodeBuilder createComponent( Animation anim) {
-		if( anim instanceof FixedFrameAnimation) {
-			return new FixedFramePanel((FixedFrameAnimation)anim);
-		}
-		return null;
-	}
-	
 	// Called from AnimSchemePanel's OmniContainer.onCleanup
 	void cleanup() {
 		master.removeWorkspaceObserver(this);
@@ -672,26 +705,6 @@ public class AnimationSchemeTreePanel extends ContentTree
 			workspace.removeSelectionObserver(this);
 			manager.removeAnimationStructureObserver(this);
 		}
-	}
-	
-	// :::: ContentTree
-	
-	@Override
-	protected Color getColor(int row) {
-
-		Object usrObj = 
-				((DefaultMutableTreeNode)tree.getPathForRow(row).getLastPathComponent()).getUserObject();
-
-		
-		if( usrObj instanceof AnimationTitle) {
-			Animation selected = (manager == null) ? null : manager.getSelectedAnimation();
-			
-			if( selected != null && selected == ((AnimationTitle)usrObj).animation) {
-				return selectedAnimColor;
-			}
-		}
-
-		return null;
 	}
 
 	// :::: AnimationStructureObserver
@@ -730,7 +743,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	
 	// :::: TreeSelectionListener (inherited from ContentTree)
-	@Override
+/*	@Override
 	public void valueChanged(TreeSelectionEvent evt) {
 		super.valueChanged(evt);
 		
@@ -742,7 +755,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		if( obj instanceof AnimationTitle) {
 			manager.setSelectedAnimation( ((AnimationTitle) obj).animation);
 		}
-	}
+	}*/
 
 	// :::: MSelectionObserver
 	@Override
@@ -753,6 +766,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 	// :::: MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		System.out.println("CHANGED");
 		if( workspace != null) {
 			workspace.removeSelectionObserver(this);
 			manager.removeAnimationStructureObserver(this);

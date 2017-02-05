@@ -30,11 +30,12 @@ public class FixedFrameAnimation extends Animation
 	private int startFrame;
 	private int endFrame;
 
-	public FixedFrameAnimation() {
-	}
+//	public FixedFrameAnimation() {
+//	}
 
 	public FixedFrameAnimation(GroupNode group) {
 		layers.add( constructFromGroup(group));
+		name = group.getName();
 	}
 	private AnimationLayer constructFromGroup( GroupNode group) {
 

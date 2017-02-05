@@ -34,6 +34,7 @@ import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.RigLayer;
 
 /**
  * @author Guy
@@ -76,6 +77,16 @@ public class Test1 {
 		// Verify Image dimension adjustment
 		workspace.addNewSimpleLayer(null, 100, 100, "Name", new Color(50,50,50));
 		workspace.addNewSimpleLayer(null, 50, 900, "Namex", new Color(50,50,50));
+		{
+			LayerNode lnode = workspace.addNewRigLayer(null, 50, 50, "Rig", new Color(0,0,0,0));
+			RigLayer rig = (RigLayer)lnode.getLayer();
+			
+
+			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			
+			workspace.getUndoEngine().performAndStore(
+					rig.createAddPartAction(bi, 0, 0, 0,""));
+		}
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	
 		GroupNode beta = workspace.addGroupNode(null, "Beta");
