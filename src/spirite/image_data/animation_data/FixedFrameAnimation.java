@@ -18,6 +18,7 @@ import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 
 /**
  * A FixedFrameAnimation 
@@ -36,6 +37,7 @@ public class FixedFrameAnimation extends Animation
 	public FixedFrameAnimation(GroupNode group) {
 		layers.add( constructFromGroup(group));
 		name = group.getName();
+		recalculateMetrics();
 	}
 	private AnimationLayer constructFromGroup( GroupNode group) {
 
@@ -50,23 +52,27 @@ public class FixedFrameAnimation extends Animation
 			GroupTree.Node node = it.previous();
 			
 			if( node instanceof LayerNode) {
-				layer.frames.add( new Frame((LayerNode) node, 1, met, Marker.FRAME));
+				layer.frames.add( layer.new Frame((LayerNode) node, 1, Marker.FRAME));
 				met += 1;
 			}
 		}
 		
-		layer.frames.add(new Frame(null, 0, met, Marker.END_AND_LOOP));
-
-		startFrame = 0;
-		endFrame = layer.frames.size();
-		for( AnimationLayer other : layers) {
-			if( other.getStart() < startFrame)
-				startFrame = other.getStart();
-			if( other.getEnd() > endFrame)
-				endFrame = other.getEnd();
-		}
+		layer.frames.add(layer.new Frame(null, 0, Marker.END_AND_LOOP));
 		
 		return layer;
+	}
+	
+	private void _triggerChange() {
+		recalculateMetrics();
+		triggerChange();
+	}
+	private void recalculateMetrics() {
+		startFrame = 0;
+		endFrame = 0;
+		for( AnimationLayer layer : layers) {
+			if( layer.getStart() < startFrame) startFrame = layer.getStart();
+			if( layer.getEnd() >= endFrame)endFrame = layer.getEnd()+1;
+		}
 	}
 	
 	public void save() {
@@ -181,14 +187,16 @@ public class FixedFrameAnimation extends Animation
 
 		if( !done)
 			layers.add( constructFromGroup(node));
-	
-		triggerChange();
+
+
+		_triggerChange();
 	}
+	
 	
 	@Override
 	public void importGroup(GroupNode node) {
 		layers.add( constructFromGroup(node));
-		triggerChange();
+		_triggerChange();
 	}
 	
 	
@@ -201,24 +209,39 @@ public class FixedFrameAnimation extends Animation
 		NIL_OUT,
 	}
 
-	public static class Frame {
-		private int start;	// Not used internally, should be calculatable from other parts of the animation
-		private int length;
-		private LayerNode node;
-		private Marker marker;
-		Frame( LayerNode node, int length, int start, Marker marker) {
-			this.node = node;
-			this.length = length;
-			this.start = start;
-			this.marker = marker;
-		}
-		public int getStart() { return start; }
-		public int getEnd() { return start+length; }
-		public int getLength() {return length;}
-		public LayerNode getLayerNode() { return node; }
-		public Marker getMarker() { return marker;}
-	}
-	public static class AnimationLayer {
+	public class AnimationLayer {
+		public class Frame {
+				private int length;
+				private LayerNode node;
+				private Marker marker;
+				private Frame( LayerNode node, int length, Marker marker) {
+					this.node = node;
+					this.length = length;
+					this.marker = marker;
+				}
+				public int getStart() { 
+					int i = 0;
+					for( Frame frame : frames) {
+						if( frame == this)
+							return i;
+						i += frame.length;
+					}
+					return Integer.MIN_VALUE; 
+				}
+				public int getEnd() { return getStart()+length; }
+				public int getLength() {return length;}
+				public LayerNode getLayerNode() { return node; }
+				public Marker getMarker() { return marker;}
+				
+				public void setLength( int newLength) {
+					if( newLength < 0) 
+						throw new IndexOutOfBoundsException();
+					length = newLength;
+					
+					_triggerChange();
+				}
+			}
+
 		protected GroupNode group;
 		protected final ArrayList<Frame> frames = new ArrayList<>();
 		protected boolean asynchronous = false;
@@ -241,6 +264,7 @@ public class FixedFrameAnimation extends Animation
 			int i = 0;
 			for( Frame frame : frames) {
 				i += frame.length;
+				
 			}
 			return i;
 		}

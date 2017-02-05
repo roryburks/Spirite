@@ -2,8 +2,10 @@ package spirite.image_data;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -45,11 +47,32 @@ public class AnimationManager implements MImageObserver {
 	public List<Animation> getAnimations() {
 		return new ArrayList<> (animations);
 	}
-	public float getFrame() {return met;}
-	public void setFrame( float frame) {
-		if( met != frame) {
-			met = frame;
-			triggerFrameChanged();
+	
+	public AnimationState getAnimationState( Animation animation) {
+		return stateMap.get(animation);
+	}
+	
+	private final Map<Animation,AnimationState> stateMap = new HashMap<>();
+	
+	public class AnimationState {
+		private float met;
+		private boolean expanded = true;
+		
+		private AnimationState(){}
+		
+		public boolean getExpanded() {return expanded;}
+		public void setExpanded( boolean expanded) {
+			if(this.expanded != expanded) {
+				this.expanded = expanded;
+				triggerStateChanged();
+			}
+		}
+		public float getMetronom() {return met;}
+		public void setMetronome(float metronome) {
+			if( this.met != metronome) {
+				this.met = metronome;
+				triggerStateChanged();
+			}
 		}
 	}
 	
@@ -77,7 +100,7 @@ public class AnimationManager implements MImageObserver {
 			triggerAnimationSelectionChange(animation);
 		}
 		animations.remove(index);
-//		trigg
+		triggerRemoveAnimation(animation);
 	}
 	
 	
@@ -125,6 +148,9 @@ public class AnimationManager implements MImageObserver {
     	evt.animation = anim;
     	evt.type = StructureChangeType.ADD;
     	
+    	// This might not belong here
+    	stateMap.put(anim, new AnimationState());
+    	
     	Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
     	while( it.hasNext()) {
     		MAnimationStructureObserver obs = it.next().get();
@@ -137,6 +163,9 @@ public class AnimationManager implements MImageObserver {
     	AnimationStructureEvent evt = new AnimationStructureEvent();
     	evt.animation = anim;
     	evt.type = StructureChangeType.REMOVE;
+    	
+    	// This might not belong here
+    	stateMap.remove(anim);
     	
     	Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
     	while( it.hasNext()) {
@@ -186,16 +215,16 @@ public class AnimationManager implements MImageObserver {
 	public class MAnimationStateEvent {
 		private Animation selected;
 		private Animation previous = null;
-		private float frame;
+		private AnimationState state;
 		
 		private MAnimationStateEvent() {
 			selected = AnimationManager.this.getSelectedAnimation();
-			frame = AnimationManager.this.getFrame();
+			state = stateMap.get(selected);
 		}
 		
 		public Animation getSelected() {return selected;}
 		public Animation getPreviousSelection() {return previous;}
-		public float getFrame() { return frame;}
+		public AnimationState getState() { return state;}
 	}
 	
 	private void triggerAnimationSelectionChange( Animation previous) {
@@ -211,7 +240,7 @@ public class AnimationManager implements MImageObserver {
     			obs.selectedAnimationChanged( evt);
     	}
 	}
-	private void triggerFrameChanged( ) {
+	private void triggerStateChanged( ) {
     	Iterator<WeakReference<MAnimationStateObserver>> it = animationStateObservers.iterator();
     	
     	MAnimationStateEvent evt = new MAnimationStateEvent();

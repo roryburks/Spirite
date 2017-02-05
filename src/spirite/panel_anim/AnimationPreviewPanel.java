@@ -281,7 +281,7 @@ public class AnimationPreviewPanel extends OmniComponent
     		if( animation != null) {
     			Graphics2D g2 = (Graphics2D)g;
     			g2.scale(2.0, 2.0);
-    			animation.drawFrame(g, animationManager.getFrame());
+    			animation.drawFrame(g, animationManager.getAnimationState(animation).getMetronom());
     		}
     	}
     }
@@ -298,9 +298,9 @@ public class AnimationPreviewPanel extends OmniComponent
 		if( source == timer) {
 			if( isPlaying) {
 				
-				float met = animationManager.getFrame() +  16.0f * tps / 1000.0f;
+				float met = animationManager.getAnimationState(animation).getMetronom() +  16.0f * tps / 1000.0f;
 				met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
-				animationManager.setFrame(met);
+				animationManager.getAnimationState(animation).setMetronome(met);
 				slider.setValue((int) Math.floor(met));
 				
 			}

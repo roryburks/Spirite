@@ -1,16 +1,20 @@
 package spirite.panel_anim;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridBagLayout;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -26,11 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
@@ -47,10 +47,8 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
-import spirite.image_data.animation_data.FixedFrameAnimation.Frame;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
-import spirite.ui.ContentTree;
-import spirite.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends JPanel 
 	implements  MAnimationStructureObserver, MSelectionObserver, 
@@ -111,9 +109,11 @@ public class AnimationSchemeTreePanel extends JPanel
 				// Construct the components
 				TitlePanel labelPanel = new TitlePanel(animation);
 				Component content = constructComponentFromAnimation(animation);
-				ExpandButton expandButton = new ExpandButton(content);
-				expandButton.setSelected(true);
+				ExpandButton expandButton = new ExpandButton(content, animation);
 				
+				
+				expandButton.setSelected(manager.getAnimationState(animation).getExpanded());
+				content.setVisible(expandButton.isSelected());
 				
 				
 				labelPanel.titleLabel.setText(animation.getName());
@@ -147,8 +147,10 @@ public class AnimationSchemeTreePanel extends JPanel
 	
 	class ExpandButton extends JToggleButton implements ActionListener {
 		private final Component content;
-		ExpandButton(Component content) {
+		private final Animation animation;
+		ExpandButton(Component content, Animation animation) {
 			this.content = content;
+			this.animation = animation;
 			this.setOpaque(false);
 			this.setBackground(new Color(0,0,0,0));
 			this.setBorder(null);
@@ -162,7 +164,9 @@ public class AnimationSchemeTreePanel extends JPanel
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			content.setVisible(this.isSelected());
+			content.setVisible(isSelected());
+			
+			manager.getAnimationState(animation).setExpanded(isSelected());
 		}
 	}
 	
@@ -252,7 +256,6 @@ public class AnimationSchemeTreePanel extends JPanel
 		@Override
 		protected void paintComponent(Graphics g) {
 			if( manager != null && manager.getSelectedAnimation() == animation) {
-				System.out.println("SS");
 				g.setColor(selectedAnimColor);
 				g.fillRect(0, 0, getWidth(), getHeight());
 			}
@@ -278,7 +281,7 @@ public class AnimationSchemeTreePanel extends JPanel
 	// Back-up component for nodes that don't have anything more specific
 	
 	class FixedFramePanel extends JPanel 
-		implements AnimNodeBuilder, MouseListener
+		implements AnimNodeBuilder
 	{
 		static final int TICK_HEIGHT = 24;
 		static final int TICK_WIDTH = 20;
@@ -294,7 +297,8 @@ public class AnimationSchemeTreePanel extends JPanel
 			this.anim = anim;
 			this.setOpaque(false);
 			constructLayout();
-			this.addMouseListener(this);
+			this.addMouseListener(mouseAdapter);
+			this.addMouseMotionListener(mouseAdapter);
 		}
 		
 
@@ -304,8 +308,6 @@ public class AnimationSchemeTreePanel extends JPanel
 			
 			MarkerPanel() {
 				GroupLayout layout = new GroupLayout(this);
-				
-				System.out.println(label.getFont().getFontName());
 				
 				label.setFont(new Font("Dialog.bold",Font.BOLD, 10));
 				
@@ -355,7 +357,7 @@ public class AnimationSchemeTreePanel extends JPanel
 			
 			// Paint Background behind current frame
 			if( manager.getSelectedAnimation() == anim) {
-				int tick = (int) Math.floor( manager.getFrame());
+				int tick = (int) Math.floor( manager.getAnimationState(anim).getMetronom());
 				
 				if( tick >= anim.getStart() && tick <= anim.getEnd()) {
 					g.setColor(tickColor);
@@ -374,6 +376,9 @@ public class AnimationSchemeTreePanel extends JPanel
 			}
 			
 			super.paintComponent(g);
+			
+			if( state != null)
+				state.onDraw(g);
 		}
 		
 
@@ -461,7 +466,6 @@ public class AnimationSchemeTreePanel extends JPanel
 					case NIL_OUT:
 						break;
 					case FRAME:
-						System.out.println(frame);
 						behavior = new FrameFrameBehavior(frame);
 						break;
 					}
@@ -470,11 +474,15 @@ public class AnimationSchemeTreePanel extends JPanel
 						if( h == 0) continue;
 						
 						Component component = behavior.buildNode();
+						component.setPreferredSize(new Dimension(0,h));
 						
 						subHor.addComponent(component);
-						subVert.addComponent(component,h,h,h);
-						links.add( new FrameLink(
-								dy + behavior.getTreeOffset(), behavior, component));
+						subVert.addComponent(component,GroupLayout.PREFERRED_SIZE,GroupLayout.PREFERRED_SIZE,GroupLayout.PREFERRED_SIZE);
+						
+						FrameLink link = new FrameLink(
+								dy + behavior.getTreeOffset(), behavior, component);
+						behavior.setLink(link);
+						links.add( link);
 						dy += h;
 					}
 				}
@@ -543,10 +551,20 @@ public class AnimationSchemeTreePanel extends JPanel
 		 * it should perform on certain contextual events.
 		 */
 		private abstract class FrameTypeBehavior {
-			public abstract Component buildNode();
+			protected Component component;
+			protected FrameLink link;
+			final public Component buildNode() {
+				component = _buildNode();
+				return component;
+			}
+			final public void setLink(FrameLink link) {
+				this.link = link;
+			}
+			protected abstract Component _buildNode();
 			public abstract int getHeight();
 			public abstract int getTreeOffset();
 			public abstract void onPress( MouseEvent evt);
+			public void onMouseover(MouseEvent evt) {}
 			public void drawBackground( Graphics g, Rectangle bounds) {}
 		}
 		
@@ -567,7 +585,7 @@ public class AnimationSchemeTreePanel extends JPanel
 				}
 			}
 			@Override
-			public Component buildNode() {
+			protected Component _buildNode() {
 				FramePanel panel = getFromFPCache();
 				
 				panel.startLabel.setText(""+frame.getStart());
@@ -586,8 +604,21 @@ public class AnimationSchemeTreePanel extends JPanel
 			}
 			@Override
 			public void onPress( MouseEvent evt) {
-				System.out.println(workspace +"," + frame);
-				workspace.setSelectedNode(frame.getLayerNode());
+				if( Math.abs(evt.getY() - component.getHeight()) < 5) {
+					startState( new ResizingFrameState(link, frame) );
+				}
+				else
+					workspace.setSelectedNode(frame.getLayerNode());
+			}
+			@Override
+			public void onMouseover(MouseEvent evt) {
+				
+				if( Math.abs(evt.getY() - component.getHeight()) < 5) {
+					setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+				}
+				else {
+					setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				}
 			}
 		}
 		
@@ -595,7 +626,7 @@ public class AnimationSchemeTreePanel extends JPanel
 		/** Behavior for the end marker. */
 		private class EndMarkerBehavior extends FrameTypeBehavior {
 			@Override
-			public Component buildNode() {
+			protected Component _buildNode() {
 				MarkerPanel panel = getFromMPCache();
 				panel.label.setVerticalAlignment(JLabel.CENTER);
 				panel.label.setText("End and Loop");
@@ -631,6 +662,82 @@ public class AnimationSchemeTreePanel extends JPanel
 			FrameLink( int y, FrameTypeBehavior behavior, Component component) 
 			{this.ypos = y; this.behavior = behavior; this.component = component;}
 		}
+		
+		private State state = null;
+		void startState( State state) {
+			if( this.state != null) {
+				// Add onEnd here if it ever becomes needed
+			}
+			this.state = state;
+			state.onStart();
+		}
+		
+		private abstract class State {
+			abstract void onStart();
+			void onDrag(MouseEvent evt) {}
+			void onRelease(MouseEvent evt) { end();}
+			void onDraw( Graphics g) {}
+			final void end() {state = null; repaint();}
+		}
+		private class ResizingFrameState extends State {
+			private final FrameLink link;
+			private final Frame frame;
+			private final int start;
+			private int end ;
+			
+			ResizingFrameState( FrameLink link, Frame frame) {
+				this.link = link;
+				this.frame = frame;
+				this.start = frame.getStart();
+				end = start+1;
+			}
+			@Override void onStart() {}
+			@Override
+			void onRelease(MouseEvent evt) {
+				frame.setLength(end - start);
+				super.onRelease(evt);
+			}
+			@Override
+			void onDrag( MouseEvent evt) {
+				int i = frameFromY(evt.getY());
+				
+				
+				if( i >= start) end = i+1;
+				else end = start;
+
+				link.component.setPreferredSize(new Dimension(0,TICK_HEIGHT*(end-start)));
+				doLayout();
+				revalidate();
+			}
+
+			@Override
+			void onDraw(Graphics g) {
+				Graphics2D g2 = (Graphics2D)g;
+				Stroke old = g2.getStroke();
+				g2.setStroke(new BasicStroke(2));
+				g.setColor(Color.BLACK);
+				g.drawRect(0, getFrameY(start), getWidth(),TICK_HEIGHT*(end-start));
+				g2.setStroke(old);
+			}
+		}
+		
+		private int frameFromY( int y) {
+			if( y < LABEL_HEIGHT) return -1;
+			
+			int index = (y - LABEL_HEIGHT) / TICK_HEIGHT;
+			
+			return index;
+		}
+		
+		private int getFrameY( int index) {
+			if( index == -1) return 0;
+			return LABEL_HEIGHT + TICK_HEIGHT*index;
+		}
+		private Rectangle getFrameBounds( int index) {
+			
+			return new Rectangle(0, LABEL_HEIGHT + TICK_HEIGHT*index, getHeight(), LABEL_HEIGHT + TICK_HEIGHT*(index+1));
+		}
+		
 		class FFPOutline extends JPanel
 		{
 			final int col;
@@ -669,31 +776,48 @@ public class AnimationSchemeTreePanel extends JPanel
 		}
 
 		// :::: MouseListener
-		@Override public void mouseEntered(MouseEvent evt) {}
-		@Override public void mouseExited(MouseEvent evt) {}
-		@Override public void mouseReleased(MouseEvent evt) {}
-		@Override public void mouseClicked(MouseEvent evt) {}
-		@Override public void mousePressed(MouseEvent evt) {
-			// I despise JTree's Coordinate Space Methods.  Why am I even using
-			//	this frustrating object when dealing with GroupLayouts is a 
-			//	thousand times easier?
-			Point p = SwingUtilities.convertPoint(
-					evt.getComponent(), evt.getPoint(), this);
-			
-			for( Component c : getComponents()) {
-				if( (c instanceof TickPanel) && c.getBounds().contains(p)) {
-					if( manager.getSelectedAnimation() != anim)
-						manager.setSelectedAnimation(anim);
-					manager.setFrame( ((TickPanel)c).tick);
+		private final MouseAdapter mouseAdapter = new MouseAdapter() {
+			@Override public void mousePressed(MouseEvent evt) {
+				// Probably unnecessary
+				Point p = SwingUtilities.convertPoint(
+						evt.getComponent(), evt.getPoint(), FixedFramePanel.this);
+				
+				for( Component c : getComponents()) {
+					if( (c instanceof TickPanel) && c.getBounds().contains(p)) {
+						if( manager.getSelectedAnimation() != anim)
+							manager.setSelectedAnimation(anim);
+						
+						manager.getAnimationState(anim).setMetronome(((TickPanel)c).tick);
+					}
+				}
+				
+				FrameLink fl = linkAt(p);
+				
+				if( fl != null) {
+					fl.behavior.onPress( SwingUtilities.convertMouseEvent(evt.getComponent(), evt, fl.component));
 				}
 			}
 			
-			FrameLink fl = linkAt(p);
+			public void mouseMoved(MouseEvent evt) {
+				// Probably unnecessary
+				Point p = SwingUtilities.convertPoint(
+						evt.getComponent(), evt.getPoint(), FixedFramePanel.this);
+
+				FrameLink fl = linkAt(p);
+				if( fl != null) {
+					fl.behavior.onMouseover( SwingUtilities.convertMouseEvent(evt.getComponent(), evt, fl.component));
+				}
+				
+			};
+			public void mouseDragged(MouseEvent evt) {
+				if( state != null)
+					state.onDrag(evt);
+			};
 			
-			if( fl != null) {
-				fl.behavior.onPress( SwingUtilities.convertMouseEvent(evt.getComponent(), evt, fl.component));
-			}
-		}
+			public void mouseReleased(MouseEvent evt) {
+				if( state != null) state.onRelease(evt);
+			};
+		};
 
 	}
 	
@@ -751,7 +875,6 @@ public class AnimationSchemeTreePanel extends JPanel
 	// :::: MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		System.out.println("CHANGED");
 		if( workspace != null) {
 			workspace.removeSelectionObserver(this);
 			manager.removeAnimationStructureObserver(this);
