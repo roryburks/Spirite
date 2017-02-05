@@ -40,6 +40,9 @@ public class Globals {
 
         {"undoPanel.selectedBackground",new Color( 160,160,196)},
         {"undoPanel.background",new Color( 238,238,238)},
+        
+        {"animSchemePanel.activeNodeBG", new Color( 190,160,140,120)},
+        {"animSchemePanel.tickBG", new Color( 250,250,190)},
     };
     
     private static final Object metrics[][] = {

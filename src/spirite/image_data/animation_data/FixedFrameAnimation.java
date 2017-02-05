@@ -109,8 +109,14 @@ public class FixedFrameAnimation extends Animation
 	public float getStartFrame() {
 		return startFrame;
 	}
+	public int getStart() {
+		return startFrame;
+	}
 	@Override
 	public float getEndFrame() {
+		return endFrame-1;
+	}
+	public int getEnd() {
 		return endFrame-1;
 	}
 	
@@ -207,6 +213,7 @@ public class FixedFrameAnimation extends Animation
 		}
 		public int getStart() { return start; }
 		public int getEnd() { return start+length; }
+		public int getLength() {return length;}
 		public LayerNode getLayerNode() { return node; }
 		public Marker getMarker() { return marker;}
 	}

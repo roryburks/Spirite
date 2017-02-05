@@ -28,7 +28,10 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.Animation;
+import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
+import spirite.image_data.AnimationManager.MAnimationStateEvent;
+import spirite.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.animation_data.FixedFrameAnimation;
@@ -39,7 +42,8 @@ import spirite.ui.components.MTextFieldNumber;
 
 public class AnimationPreviewPanel extends OmniComponent
         implements MCurrentImageObserver, ActionListener, 
-        	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver, ChangeListener
+        	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver, 
+        	ChangeListener, MAnimationStateObserver
 {
 	private static final long serialVersionUID = 1L;
 	private final Timer timer;
@@ -50,17 +54,18 @@ public class AnimationPreviewPanel extends OmniComponent
     JLabel lbLeft = new JLabel();
     JLabel lbRight = new JLabel();
 	
-    private Animation animation = null;
+//    private Animation animation = null;
     
 	// Metronome settings
 	private float start = 0.0f;
 	private float end = 2.0f;
 	private float tps = 0.2f;
-	private float met = 0.0f;
+//	private float met = 0.0f;
 	
 
 	private final MasterControl master;
 	private ImageWorkspace workspace;
+	private AnimationManager animationManager;
 	
 
 	// Start Design
@@ -79,12 +84,16 @@ public class AnimationPreviewPanel extends OmniComponent
     public AnimationPreviewPanel( MasterControl master) {
         this.master = master;
         
-        
-    	master.addWorkspaceObserver(this);
+        // Link Observers
+        master.addWorkspaceObserver(this);
     	workspace = master.getCurrentWorkspace();
     	if( workspace != null) {
-    		workspace.getAnimationManager().addAnimationStructureObserver(this);
+    		animationManager = workspace.getAnimationManager();
+    		animationManager.addAnimationStructureObserver(this);
+    		animationManager.addAnimationStateObserver(this);
     	}
+    	else
+    		animationManager = null;
     	
         
         initComponents();
@@ -110,11 +119,8 @@ public class AnimationPreviewPanel extends OmniComponent
         buttonForward.setIcon(Globals.getIcon("icon.anim.stepF"));
         
 
-        if( master.getCurrentWorkspace() != null) {
-	        List<Animation> list = master.getCurrentWorkspace().getAnimationManager().getAnimations();
-	        if( !list.isEmpty()) {
-	        	constructFromAnimation( list.get(0));
-	        }
+        if( animationManager != null) {
+        	reconstructFromSelectedAnimation();
         }
     }
     private void initComponents() {
@@ -243,14 +249,25 @@ public class AnimationPreviewPanel extends OmniComponent
 		this.repaint();
 	}
 	
-	private void constructFromAnimation( Animation anim) {
+	private void reconstructFromSelectedAnimation() {
+		if( animationManager == null) {
+			start = 0;
+			end = 1;
+			slider.setValue(0);
+			updateSlider();
+		}
+		else {
+			Animation animation = animationManager.getSelectedAnimation();
+			
+			if( animation != null) {
+			
+				start = animation.getStartFrame();
+				end = animation.getEndFrame();
+				slider.setValue(0);
 		
-		animation = anim;
-		start = anim.getStartFrame();
-		end = anim.getEndFrame();
-		slider.setValue(0);
-
-		updateSlider();
+				updateSlider();
+			}
+		}
 	}
 	
 
@@ -259,31 +276,39 @@ public class AnimationPreviewPanel extends OmniComponent
     	@Override
     	public void paintComponent(Graphics g) {
     		super.paintComponent(g);
+    		if( animationManager == null) return;
+    		Animation animation = animationManager.getSelectedAnimation();
     		
     		if( animation != null) {
     			Graphics2D g2 = (Graphics2D)g;
     			g2.scale(2.0, 2.0);
-    			animation.drawFrame(g, met);
+    			animation.drawFrame(g, animationManager.getFrame());
     		}
     	}
     }
     
     
-    // :::: ActionListener
+    // :::: ActionListener for Timper
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		Object source = evt.getSource();
+		if( animationManager == null) return;
+		Animation animation = animationManager.getSelectedAnimation();
+		if( animation == null) return;
+		
 		if( source == timer) {
 			if( isPlaying) {
-				met += 16.0f * tps / 1000.0f;
-				met = MUtil.cycle(start, end, met);
-				slider.setValue((int) met);
+				
+				float met = animationManager.getFrame() +  16.0f * tps / 1000.0f;
+				met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
+				animationManager.setFrame(met);
+				slider.setValue((int) Math.floor(met));
 				
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
 		}else if( source == buttonForward) {		
-			((FixedFrameAnimation)this.animation).save();
+			((FixedFrameAnimation)animation).save();
 		}
 	}
 
@@ -306,9 +331,7 @@ public class AnimationPreviewPanel extends OmniComponent
 		
 		try {
 			tps = Float.parseFloat(str);
-		}catch( NumberFormatException e) {
-			
-		}
+		}catch( NumberFormatException e) {}
 	}
 
 	// :::: MWorkspaceObserver
@@ -316,8 +339,19 @@ public class AnimationPreviewPanel extends OmniComponent
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		// TODO Auto-generated method stub
-		
+		if( workspace != null) {
+			animationManager.removeAnimationStateObserver(this);
+			animationManager.removeAnimationStructureObserver(this);
+		}
+    	workspace = master.getCurrentWorkspace();
+    	if( workspace != null) {
+    		animationManager = workspace.getAnimationManager();
+    		animationManager.addAnimationStructureObserver(this);
+    		animationManager.addAnimationStateObserver(this);
+    	}
+    	else
+    		animationManager = null;
+    	reconstructFromSelectedAnimation();
 	}
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
@@ -339,14 +373,26 @@ public class AnimationPreviewPanel extends OmniComponent
 	private void refresh() {	
 		// Lazy, but effective
 		try{
-		constructFromAnimation( workspace.getAnimationManager().getAnimations().get(0));
+		reconstructFromSelectedAnimation();
 		} catch( NullPointerException e) {}
 	}
+	
+	// MAnimationStateObserver
+		@Override
+		public void selectedAnimationChanged(MAnimationStateEvent evt) {
+			refresh();
+		}
+		@Override
+		public void animationFrameChanged(MAnimationStateEvent evt) {
+			repaint();
+		}
 	
 	// :::: Inherited from OmniContainer
 	@Override
 	public void onCleanup() {
 		timer.stop();
 	}
+	
+	
 	
 }

@@ -3,6 +3,7 @@ package spirite.panel_anim;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -24,11 +25,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
+import spirite.image_data.AnimationManager.MAnimationStateEvent;
+import spirite.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -42,7 +46,8 @@ import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends ContentTree 
-	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver, MWorkspaceObserver
+	implements TreeCellRenderer, MAnimationStructureObserver, MSelectionObserver, 
+		MWorkspaceObserver, MAnimationStateObserver
 {
 	private static final long serialVersionUID = 1L;
 
@@ -63,6 +68,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		if( workspace != null) {
 			manager = workspace.getAnimationManager();
 			manager.addAnimationStructureObserver(this);
+			manager.addAnimationStateObserver(this);
 			workspace.addSelectionObserver(this);
 		}
 		
@@ -172,23 +178,24 @@ public class AnimationSchemeTreePanel extends ContentTree
 			this.setLayout(layout);
 		}
 	}
-	
+
+	private final Color pseudoselectColor = Globals.getColor("animSchemePanel.activeNodeBG");
+	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
+	private final Color selectedAnimColor = Globals.getColor("contentTree.selectedBackground");
 	// Back-up component for nodes that don't have anything more specific
 	
 	class FixedFramePanel extends JPanel 
 		implements AnimNodeBuilder, MouseListener
 	{
+		static final int TICK_HEIGHT = 24;
+		static final int TICK_WIDTH = 20;
 		static final int LABEL_HEIGHT = 20;
 		static final int NODE_HEIGHT = 24;
+		static final int MARKER_HEIGHT = 10;
 		static final int OUTLINE_WIDTH = 10;
 		FixedFrameAnimation anim;
 		ArrayList<ArrayList<FrameLink>> frameLinks = new ArrayList<>();
 		
-		// For quicker construction certain Nodes are cached and re-used.
-		//	Note: as of now shortenned caches are never freed, but they should
-		//	be removed when the component is removed anyway
-		ArrayList<FramePanel> fpCache = new ArrayList<>();	
-		int fpcMet;
 		
 		FixedFramePanel(FixedFrameAnimation anim) {
 			this.anim = anim;
@@ -200,6 +207,53 @@ public class AnimationSchemeTreePanel extends ContentTree
 		
 
 		private class FramePanel extends TitlePanel {}
+		private class MarkerPanel extends JPanel {
+			final JLabel label = new JLabel();
+			
+			MarkerPanel() {
+				GroupLayout layout = new GroupLayout(this);
+				
+				System.out.println(label.getFont().getFontName());
+				
+				label.setFont(new Font("Dialog.bold",Font.BOLD, 10));
+				
+				layout.setHorizontalGroup(layout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(label)
+					.addContainerGap());
+				layout.setVerticalGroup(layout.createParallelGroup()
+					.addComponent(label, MARKER_HEIGHT, MARKER_HEIGHT, MARKER_HEIGHT));
+				
+				this.setLayout(layout);
+			}
+		}
+		private class TickPanel extends JPanel {
+			private final JLabel label = new JLabel();
+			private int tick;
+			TickPanel() {
+				this.setOpaque(false);
+				GroupLayout layout = new GroupLayout(this);
+				
+				label.setFont(new Font("Dialog.bold",Font.BOLD, 10));
+				label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+				label.setHorizontalAlignment(JLabel.CENTER);
+				
+				layout.setHorizontalGroup(layout.createSequentialGroup()
+					.addGap(2)
+					.addComponent(label, 0, 0, Short.MAX_VALUE)
+					.addGap(2));
+				layout.setVerticalGroup(layout.createSequentialGroup()
+					.addGap(2)
+					.addComponent(label, 0, 0, Short.MAX_VALUE)
+					.addGap(2));
+				
+				this.setLayout(layout);
+			}
+			void setTick( int tick) {
+				this.tick = tick;
+				label.setText(""+tick);
+			}
+		}
 		
 		@Override
 		protected void paintComponent(Graphics g) {
@@ -207,6 +261,18 @@ public class AnimationSchemeTreePanel extends ContentTree
 			if( !(selected instanceof LayerNode))
 				selected = null;
 			
+			// Paint Background behind current frame
+			if( manager.getSelectedAnimation() == anim) {
+				int tick = (int) Math.floor( manager.getFrame());
+				
+				if( tick >= anim.getStart() && tick <= anim.getEnd()) {
+					g.setColor(tickColor);
+					int dy = LABEL_HEIGHT + TICK_HEIGHT*(tick - anim.getStart());
+					g.fillRect(0, dy, getWidth(), TICK_HEIGHT);
+				}
+			}
+			
+			// Paint Background behind Nodes
 			for( List<FrameLink> list : frameLinks) {
 				for( FrameLink fl : list) {
 					fl.behavior.drawBackground(g, new Rectangle(
@@ -247,17 +313,31 @@ public class AnimationSchemeTreePanel extends ContentTree
 		 * heights.
 		 */
 		private void constructLayout() {
-			fpcMet = 0;
+			softResetCache();
 			
 			List<AnimationLayer> layers = anim.getLayers();
 			
 			frameLinks.clear();
 			this.removeAll();
 			
+			// Should possibly be GridBagLayout, but I feel more comfortable with
+			//	 GroupLayout.
 			GroupLayout layout = new GroupLayout(this);
 			
 			Group horizontal = layout.createSequentialGroup();
 			Group vertical = layout.createParallelGroup();
+
+			Group subHor = layout.createParallelGroup();
+			Group subVert = layout.createSequentialGroup();
+			subVert.addGap(LABEL_HEIGHT);
+			for( int met= anim.getStart(); met < anim.getEnd(); ++met) {
+				TickPanel panel = getFromTPCache();
+				panel.setTick(met);
+				subVert.addComponent(panel, TICK_HEIGHT, TICK_HEIGHT, TICK_HEIGHT);
+				subHor.addComponent(panel, TICK_WIDTH, TICK_WIDTH, TICK_WIDTH);
+			}
+			horizontal.addGroup(subHor);
+			vertical.addGroup(subVert);
 			
 			for( int index=0; index<layers.size(); ++index) {
 				List<Frame> frames = layers.get(index).getFrames();
@@ -267,15 +347,15 @@ public class AnimationSchemeTreePanel extends ContentTree
 				horizontal.addComponent(outline, OUTLINE_WIDTH,OUTLINE_WIDTH,OUTLINE_WIDTH);
 				vertical.addComponent(outline);
 				
-				Group subHor = layout.createParallelGroup();
-				Group subVert = layout.createSequentialGroup();
+				subHor = layout.createParallelGroup();
+				subVert = layout.createSequentialGroup();
 				
 				JLabel label = new JLabel("Animation Layer");
 				
 				subHor.addComponent(label);
 				subVert.addComponent(label, LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT);
 
-				int dy = 10 + LABEL_HEIGHT;
+				int dy = LABEL_HEIGHT;
 				for( Frame frame : frames) {
 
 					FrameTypeBehavior behavior = null;
@@ -294,11 +374,15 @@ public class AnimationSchemeTreePanel extends ContentTree
 					}
 					if( behavior != null) {
 						int h = behavior.getHeight();
+						if( h == 0) continue;
+						
 						Component component = behavior.buildNode();
 						
 						subHor.addComponent(component);
 						subVert.addComponent(component,h,h,h);
-						links.add( new FrameLink(dy, behavior, component));
+						links.add( new FrameLink(
+								dy + behavior.getTreeOffset(), behavior, component));
+						dy += h;
 					}
 				}
 				
@@ -312,6 +396,54 @@ public class AnimationSchemeTreePanel extends ContentTree
 			layout.setHorizontalGroup(horizontal);
 			this.setLayout(layout);
 		}
+
+		// For quicker construction certain Nodes are cached and re-used.
+		//	Note: as of now shortenned caches are never freed, but they should
+		//	be removed when the component is removed anyway
+		ArrayList<FramePanel> fpCache = new ArrayList<>();
+		ArrayList<MarkerPanel> mpCache = new ArrayList<>();
+		ArrayList<TickPanel> tpCache = new ArrayList<>();
+		int fpcMet;
+		int mpcMet;
+		int tpcMet;
+		private void softResetCache() {
+			fpcMet = 0;
+			mpcMet = 0;
+			tpcMet = 0;
+		}
+		private FramePanel getFromFPCache() {
+			FramePanel panel;
+			if(fpcMet >= fpCache.size()) {
+				panel = new FramePanel();
+				fpCache.add(panel);
+			}
+			else 
+				panel = fpCache.get(fpcMet);
+			++fpcMet;
+			return panel;
+		}
+		private MarkerPanel getFromMPCache() {
+			MarkerPanel panel;
+			if(mpcMet >= mpCache.size()) {
+				panel = new MarkerPanel();
+				mpCache.add(panel);
+			}
+			else 
+				panel = mpCache.get(mpcMet);
+			++mpcMet;
+			return panel;
+		}
+		private TickPanel getFromTPCache() {
+			TickPanel panel;
+			if(tpcMet >= tpCache.size()) {
+				panel = new TickPanel();
+				tpCache.add(panel);
+			}
+			else 
+				panel = tpCache.get(tpcMet);
+			++tpcMet;
+			return panel;
+		}
 		
 		/**
 		 * Defines both how to construct a layer as well as the behavior
@@ -320,6 +452,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 		private abstract class FrameTypeBehavior {
 			public abstract Component buildNode();
 			public abstract int getHeight();
+			public abstract int getTreeOffset();
 			public abstract void onPress( MouseEvent evt);
 			public void drawBackground( Graphics g, Rectangle bounds) {}
 		}
@@ -342,15 +475,7 @@ public class AnimationSchemeTreePanel extends ContentTree
 			}
 			@Override
 			public Component buildNode() {
-				FramePanel panel;
-				
-				if(fpcMet >= fpCache.size()) {
-					panel = new FramePanel();
-					fpCache.add(panel);
-				}
-				else 
-					panel = fpCache.get(fpcMet);
-				++fpcMet;
+				FramePanel panel = getFromFPCache();
 
 				panel.startLabel.setText(""+frame.getStart());
 				panel.endLabel.setText(""+frame.getEnd());
@@ -360,7 +485,11 @@ public class AnimationSchemeTreePanel extends ContentTree
 			
 			@Override
 			public int getHeight() {
-				return NODE_HEIGHT;
+				return NODE_HEIGHT*frame.getLength();
+			}
+			@Override
+			public int getTreeOffset() {
+				return NODE_HEIGHT/2;
 			}
 			@Override
 			public void onPress( MouseEvent evt) {
@@ -373,14 +502,19 @@ public class AnimationSchemeTreePanel extends ContentTree
 		private class EndMarkerBehavior extends FrameTypeBehavior {
 			@Override
 			public Component buildNode() {
-				JPanel endP = new JPanel();
-				endP.setBackground(Color.RED);
-				return endP;
+				MarkerPanel panel = getFromMPCache();
+				panel.label.setVerticalAlignment(JLabel.CENTER);
+				panel.label.setText("End and Loop");
+				return panel;
 			}
 
 			@Override
 			public int getHeight() {
-				return 10;
+				return MARKER_HEIGHT;
+			}
+			@Override
+			public int getTreeOffset() {
+				return MARKER_HEIGHT/2;
 			}
 
 			@Override
@@ -459,7 +593,13 @@ public class AnimationSchemeTreePanel extends ContentTree
 				return;
 			p.x -= r.x;
 			p.y -= r.y;
-
+			
+			for( Component c : getComponents()) {
+				if( (c instanceof TickPanel) && c.getBounds().contains(p)) {
+					manager.setFrame( ((TickPanel)c).tick);
+				}
+			}
+			
 			FrameLink fl = linkAt(p);
 			
 			if( fl != null) {
@@ -535,27 +675,23 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	
 	// :::: ContentTree
-	private final Color pseudoselectColor = new Color( 190,160,140,120);
 	
 	@Override
 	protected Color getColor(int row) {
-		return null;
-/*
+
 		Object usrObj = 
 				((DefaultMutableTreeNode)tree.getPathForRow(row).getLastPathComponent()).getUserObject();
 
-		Node selected = (workspace == null) ? null : workspace.getSelectedNode();
-		if( selected == null) return null;
-		if( selected instanceof GroupNode) return null;
 		
-		if( usrObj instanceof SALFrame) {
-			SALFrame frame = (SALFrame) usrObj;
+		if( usrObj instanceof AnimationTitle) {
+			Animation selected = (manager == null) ? null : manager.getSelectedAnimation();
 			
-			if( frame.layer.getLayer() == ((LayerNode)selected).getLayer()) {
-				return pseudoselectColor;
+			if( selected != null && selected == ((AnimationTitle)usrObj).animation) {
+				return selectedAnimColor;
 			}
 		}
-		return super.getColor(row);*/
+
+		return null;
 	}
 
 	// :::: AnimationStructureObserver
@@ -602,6 +738,10 @@ public class AnimationSchemeTreePanel extends ContentTree
 				(DefaultMutableTreeNode)evt.getPath().getLastPathComponent();
 		
 		Object obj = node.getUserObject();
+		
+		if( obj instanceof AnimationTitle) {
+			manager.setSelectedAnimation( ((AnimationTitle) obj).animation);
+		}
 	}
 
 	// :::: MSelectionObserver
@@ -616,11 +756,13 @@ public class AnimationSchemeTreePanel extends ContentTree
 		if( workspace != null) {
 			workspace.removeSelectionObserver(this);
 			manager.removeAnimationStructureObserver(this);
+			manager.removeAnimationStateObserver(this);
 		}
 		workspace = selected;
 		if( workspace != null) {
 			manager = workspace.getAnimationManager();
 			manager.addAnimationStructureObserver(this);
+			manager.addAnimationStateObserver(this);
 			workspace.addSelectionObserver(this);
 		} else {
 			manager = null;
@@ -629,6 +771,17 @@ public class AnimationSchemeTreePanel extends ContentTree
 	}
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
+
+	// :::: MAnimationStateObserver
+	@Override
+	public void selectedAnimationChanged(MAnimationStateEvent evt) {
+		repaint();
+	}
+
+	@Override
+	public void animationFrameChanged(MAnimationStateEvent evt) {
+		repaint();
+	}
 
 
 	
