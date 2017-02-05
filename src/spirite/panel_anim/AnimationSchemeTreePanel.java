@@ -741,21 +741,6 @@ public class AnimationSchemeTreePanel extends JPanel
 			}
 		}});	
 	}
-	
-	// :::: TreeSelectionListener (inherited from ContentTree)
-/*	@Override
-	public void valueChanged(TreeSelectionEvent evt) {
-		super.valueChanged(evt);
-		
-		DefaultMutableTreeNode node = 
-				(DefaultMutableTreeNode)evt.getPath().getLastPathComponent();
-		
-		Object obj = node.getUserObject();
-		
-		if( obj instanceof AnimationTitle) {
-			manager.setSelectedAnimation( ((AnimationTitle) obj).animation);
-		}
-	}*/
 
 	// :::: MSelectionObserver
 	@Override
