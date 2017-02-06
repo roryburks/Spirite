@@ -1,0 +1,72 @@
+Version 0003
+
+Compatibility Issues: None, just added functionality.
+
+** UTF8  means null-terminated UTF8 encoded string ***
+
+Header
+ [4] "SIFF"
+ [4] Version number
+ [2] Image Width
+ [2] Image Height
+ 
+ Per Group:
+ [4] 4-character chunk identifier
+ [4] n: size of chunk
+ [n] chunk data
+ 
+ ---- GRPT - Group Tree Chunk ----
+ Per Group:
+ [1]: Depth of the GroupTree
+ [1] : various single-bit settings
+    1st bit: Visibility
+ [4] : alpha
+ [2] : X offset
+ [2] : Y offset
+ [n] : UTF8 : Node name
+ [1] : Node Type ID:
+    0x00 : Group Node
+    0x01 : Simple Layer
+        [4] : ID of linked ImageData
+    0x02 : Rig Layer
+        [1] : Number of Parts
+        Per Part:
+            [n] : UTF8 : Part Type name
+            [2] : X offset
+            [2] : Y offset
+            [4] : draw depth
+            [4] : ImageID
+
+ ---- IMGD - Image Data Chunk ----
+ Per Iamge:
+ [4] : Image ID
+ [4] : Size of Image Data
+ [n] : PNG-saved Image File
+
+---- ANIM - Animation Data Chunk
+Per Animation:
+[n] : UTF8 : Animation Name
+[1] : Animation Type ID:
+    0x01 : FixedFrameAnimation
+        [2] : Number of Layers
+        Per Layer:
+            [4] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
+            [2] : Number of Frames
+            Per Frame:
+                [1] : MarkerID
+                [2] : Length
+                If MarkerID == FRAME
+                    [4] : NodeID of LayerNode Bound to (see Bellow)
+
+NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
+
+
+
+===== Impossed sanity things that could be warned in-program: ====
+::::Nodes
+[ubyte] limit for GroupDepth (i.e. group of group of group....)
+[ushort] limit of all dimensions
+
+:::: Animations:
+[short] limit for Frame Length
+[short] limit for Layer Count

@@ -29,6 +29,7 @@ import spirite.image_data.ImageWorkspace.MoveChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 
 /**
  * A FixedFrameAnimation 
@@ -49,6 +50,54 @@ public class FixedFrameAnimation extends Animation
 	
 	public FixedFrameAnimation( String name) {
 		this.name = name;
+	}
+	
+	public void addBuiltLayer(AnimationLayerBuilder builder) {
+		
+		AnimationLayer layer = new AnimationLayer();
+		layer.group = builder.group;
+		for( BuildFrame frame : builder.frames) {
+			layer.frames.add( layer.new Frame(frame.node, frame.length, frame.marker));
+		}
+		
+		layers.add(layer);
+		_triggerChange();
+	}
+	
+	public static class AnimationLayerBuilder {
+		private final List<BuildFrame> frames = new ArrayList<>();
+		private GroupNode group;
+		
+		/**
+		 *  Adds the described frame to the list of Frames.  
+		 * 
+		 * @return true if added, false if the frame is malformed or you can't
+		 * add any more frames
+		 */
+		public boolean addFrame( Marker marker, int length, LayerNode node) {
+			BuildFrame frame = new BuildFrame();
+
+			frame.marker = marker;
+			frame.length = length;
+			if( marker == Marker.FRAME) {
+				frame.node = node;
+			}
+			frames.add(frame);
+			
+			return true;
+			
+//			return false;
+		}
+		
+		public void setGroupLink( GroupNode group) {
+			this.group = group;
+		}
+		
+		class BuildFrame {
+			Marker marker;
+			int length;
+			LayerNode node;
+		}
 	}
 	
 	

@@ -33,7 +33,7 @@ public class MDebug {
 		//	not be very user-friendly.
 		RESOURCE,
 		// A Fatal Error can and should immediately terminate the program
-		FATAL,
+		FATAL, 
 	}
 	
 	public static enum WarningType {

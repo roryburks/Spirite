@@ -381,6 +381,27 @@ public class AnimationSchemeTreePanel extends JPanel
 			}
 		}
 		
+		private class LinkButton extends JToggleButton implements ActionListener {
+			private final AnimationLayer layer;
+			LinkButton(AnimationLayer layer) {
+				this.layer = layer;
+				this.setOpaque(false);
+				this.setBackground(new Color(0,0,0,0));
+				this.setBorder(null);
+
+				this.setIcon(Globals.getIcon("icon.link"));
+				this.setSelectedIcon(Globals.getIcon("icon.unlink"));
+				
+				this.addActionListener(this);
+			}
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+//				manager.getAnimationState(animation).setExpanded(isSelected());
+			}
+		}
+
+		
 		@Override
 		protected void paintComponent(Graphics g) {
 			Node selected = workspace.getSelectedNode();
@@ -456,8 +477,10 @@ public class AnimationSchemeTreePanel extends JPanel
 			Group horizontal = layout.createSequentialGroup();
 			Group vertical = layout.createParallelGroup();
 
+			// Add the list of Frame Ticks
 			Group subHor = layout.createParallelGroup();
 			Group subVert = layout.createSequentialGroup();
+			
 			subVert.addGap(LABEL_HEIGHT);
 			for( int met= anim.getStart(); met < anim.getEnd(); ++met) {
 				TickPanel panel = getFromTPCache();
@@ -471,18 +494,26 @@ public class AnimationSchemeTreePanel extends JPanel
 			for( int index=0; index<layers.size(); ++index) {
 				List<Frame> frames = layers.get(index).getFrames();
 				ArrayList<FrameLink> links = new ArrayList<>(frames.size());
-				FFPOutline outline = new FFPOutline(index);
 				
+				// Add the Outline (part to the left of a Layer which shows the "tree" path
+				FFPOutline outline = new FFPOutline(index);
 				horizontal.addComponent(outline, OUTLINE_WIDTH,OUTLINE_WIDTH,OUTLINE_WIDTH);
 				vertical.addComponent(outline);
 				
 				subHor = layout.createParallelGroup();
 				subVert = layout.createSequentialGroup();
-				
+
+				// Add the Label for the Animation Layer
 				JLabel label = new JLabel("Animation Layer");
+				LinkButton linkButton = new LinkButton(layers.get(index));
 				
-				subHor.addComponent(label);
-				subVert.addComponent(label, LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT);
+				subHor.addGroup(layout.createSequentialGroup()
+					.addComponent(linkButton, OUTLINE_WIDTH, OUTLINE_WIDTH, OUTLINE_WIDTH)
+					.addGap(2)
+					.addComponent(label));
+				subVert.addGroup(layout.createParallelGroup()
+						.addComponent(linkButton,LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT) 
+						.addComponent(label, LABEL_HEIGHT,LABEL_HEIGHT,LABEL_HEIGHT));
 
 				int dy = LABEL_HEIGHT;
 				for( Frame frame : frames) {

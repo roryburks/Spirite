@@ -70,10 +70,12 @@ public class Globals {
     		{"icon.frame.toolSettings",3,2},
     		{"icon.frame.referenceScheme",4,2},
     		
-    		{"icons_12x12.png",13,13,4,3},
+    		{"icons_12x12.png",13,13,5,3},
     		{"palNewColor", 0,0},
     		{"palSavePalette", 1, 0},
     		{"palLoadPalette", 2, 0},
+    		{"icon.link", 3, 0},
+    		{"icon.unlink", 4, 0},
     		
     		{"icon.rig.new", 0, 1},
     		{"icon.rig.rem", 1, 1},

@@ -17,13 +17,18 @@ import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.animation_data.FixedFrameAnimation;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
+import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.RigLayer;
 import spirite.image_data.layers.RigLayer.Part;
@@ -94,7 +99,7 @@ public class LoadEngine {
 		ImageWorkspace workspace;
 		
 		int layerMet = 0;
-		final List<LayerNode> layers = new ArrayList<>();
+		final List<Node> nodes = new ArrayList<>();
 	}
 	
 	/** Attempts to load the given file into a new Workspace. */
@@ -315,7 +320,10 @@ public class LoadEngine {
 			
 			// !!!! Kind of hack-y that it's even saved, but only the root node should be
 			//	depth 0 and there should only be one (and it's already created)
-			if( depth == 0) { continue;}
+			if( depth == 0) {
+				helper.nodes.add(helper.workspace.getRootNode());
+				continue;
+			}
 			else {
 				switch( type) {
 				case SaveLoadUtil.NODE_GROUP:
@@ -326,7 +334,6 @@ public class LoadEngine {
 					identifier = helper.ra.readInt();
 					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
 					node = helper.workspace.addShellLayer( nodeLayer[depth-1], layer, name);
-					helper.layers.add((LayerNode) node);
 					break;
 				case SaveLoadUtil.NODE_RIG_LAYER: {
 					int partCount = helper.ra.readByte();
@@ -350,11 +357,11 @@ public class LoadEngine {
 					
 					RigLayer rig = new RigLayer( parts);
 					node = helper.workspace.addShellLayer(nodeLayer[depth-1], rig, name);
-					helper.layers.add((LayerNode) node);
 					break;}
 				}
 			}
 			if( node != null) {
+				helper.nodes.add(node);
 				node.setAlpha(alpha);
 				
 				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
@@ -374,7 +381,47 @@ public class LoadEngine {
 		while( helper.ra.getFilePointer() < endPointer) {
 			String name = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
 			
+			int type = helper.ra.readByte();
+			
+			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) {
+				loadFixedFrameAnimation( helper, name);
+			}
+			else {
+				MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unrecognized Animation Type: " + type);
+				return;
+			}
 		}
+	}
+	
+	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
+			throws IOException 
+	{
+		FixedFrameAnimation animation = new FixedFrameAnimation(name);
+		
+		int layerCount = helper.ra.readShort();
+		
+		for( int i=0; i<layerCount; ++i) {
+			AnimationLayerBuilder builder = new AnimationLayerBuilder();
+			
+			int groupNodeID = helper.ra.readInt();
+			int frameCount = helper.ra.readShort();
+			
+			if( groupNodeID > 0)
+				builder.setGroupLink((GroupNode) helper.nodes.get(groupNodeID));
+			
+			for( int j=0; j<frameCount; ++j) {
+				Marker marker = Marker.values()[helper.ra.readByte()];
+				int length = helper.ra.readShort();
+				LayerNode node = (marker == Marker.FRAME) 
+						? (LayerNode)helper.nodes.get(helper.ra.readInt())
+						: null;
+				
+				builder.addFrame(marker, length, node);
+			}
+			
+			animation.addBuiltLayer(builder);
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards

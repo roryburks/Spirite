@@ -169,7 +169,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 			// Save Various Chunks
 			saveGroupTree( helper);
 			saveImageData( helper);
-//			saveAnimationData( helper);
+			saveAnimationData( helper);
 			
 			helper.ra.close();
 			
@@ -231,7 +231,6 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		helper.ra.write( SaveLoadUtil.strToByteArrayUTF8( node.getName()));
 
 		helper.nodeMap.put( node, helper.nmMet++);
-		System.out.println(node);
 		if( node instanceof GroupTree.GroupNode) {
 			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
 			// [1] : Node Type ID
@@ -350,7 +349,6 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				
 				for( AnimationLayer layer : layers) {
 					// [4] : Group Node Bound to
-					System.out.println(layer.getGroupLink());
 					helper.ra.writeInt(helper.nodeMap.get(layer.getGroupLink()));
 					
 					// [2] : Number of Frames
