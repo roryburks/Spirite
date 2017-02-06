@@ -18,7 +18,7 @@ import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.panel_work.WorkPanel.Zoomer;
 
@@ -75,7 +75,7 @@ public class ReferencePanel extends JPanel
     
 	
 	// :::: MImageObserver
-	@Override public void structureChanged(StructureChange evt) {}
+	@Override public void structureChanged(StructureChangeEvent evt) {}
 	@Override
 	public void imageChanged(ImageChangeEvent evt) {
 		this.repaint();

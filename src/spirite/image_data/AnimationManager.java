@@ -13,7 +13,7 @@ import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 
 /***
  * AnimatonManager manages the animation functionality of an ImageWorkspace.
@@ -105,7 +105,7 @@ public class AnimationManager implements MImageObserver {
 	
 	
 	// :::: Animation Links
-	private class Link {
+/*	private class Link {
 		 Animation animation;
 		 GroupNode group;
 	}
@@ -126,7 +126,7 @@ public class AnimationManager implements MImageObserver {
 	}
 	
 	public void destroyLinked( Animation animation, GroupNode group) {
-	}
+	}*/
 	
 	
 	// :::: Observers
@@ -271,14 +271,13 @@ public class AnimationManager implements MImageObserver {
 	@Override	public void imageChanged(ImageChangeEvent evt) {}
 
 	@Override
-	public void structureChanged(StructureChange evt) {
-		List<Node> changed = evt.getChangedNodes();
+	public void structureChanged(StructureChangeEvent evt) {
+		List<Node> changed = evt.change.getChangedNodes();
 		
-		for( Link link : links) {
-			if( changed.contains(link.group)) {
-				link.animation.interpretLink(link.group);
-				
-				triggerChangeAnimation(link.animation);
+		for( Animation animation : animations) {
+			for( GroupNode node : animation.getGroupLinks()) {
+				if( changed.contains(node))
+					animation.interpretChange(node, evt);
 			}
 		}
 	}

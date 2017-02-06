@@ -14,13 +14,18 @@ import java.io.UnsupportedEncodingException;
  *
  */
 public class SaveLoadUtil {
+	// :::: Generic Identifier
+	public static final byte UNKNOWN = (byte)0xFF;
 	// :::: Node Type Identifiers for the SIFF GroupTree Section
 	public static final byte NODE_GROUP = 0x00;
 	public static final byte NODE_SIMPLE_LAYER = 0x01;
-	public static final byte NODE_RIG_LAYER = 0x02;
-	public static final byte NODE_UNKNOWN = (byte)0xFF;
+	public static final byte NODE_RIG_LAYER = 0x02;	
+	// :::: Animation Type Identifiers
+	public static final byte ANIM_FIXED_FRAME = 0x01;
 	
-	public static final int VERSION = 0x0000_0002;
+	
+	
+	public static final int VERSION = 0x0000_0003;
 
 	public static final int VISIBLE_MASK = 0x01;
 	public static final int EXPANDED_MASK = 0x02;

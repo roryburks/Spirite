@@ -1694,7 +1694,7 @@ public class ImageWorkspace {
 	 */
     public static interface MImageObserver {
         public void imageChanged(ImageChangeEvent evt);
-        public void structureChanged(StructureChange evt);
+        public void structureChanged(StructureChangeEvent evt);
     }
     public static class ImageChangeEvent {
     	ImageWorkspace workspace = null;
@@ -1711,6 +1711,14 @@ public class ImageWorkspace {
     	public List<Node> getChangedNodes() { return new ArrayList<>(nodesChanged);}
     	public boolean isSelectionLayerChange() { return selectionLayerChange;}
     	public boolean isStructureChange() {return isStructureChange;}
+    }
+    public static class StructureChangeEvent {
+    	public final StructureChange change;
+    	public final boolean reversed;
+    	StructureChangeEvent( StructureChange change, boolean reversed) {
+    		this.change = change;
+    		this.reversed = reversed;
+    	}
     }
     List<WeakReference<MImageObserver>> imageObservers = new ArrayList<>();
 
@@ -1734,7 +1742,7 @@ public class ImageWorkspace {
     		MImageObserver obs = it.next().get();
     		if( obs == null) it.remove();
     		else
-    			obs.structureChanged( evt);
+    			obs.structureChanged( new StructureChangeEvent(evt,undo));
     	}
     }
     synchronized void triggerImageRefresh(ImageChangeEvent evt) {

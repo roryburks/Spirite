@@ -20,6 +20,7 @@ import spirite.MDebug.ErrorType;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree;
+import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
@@ -88,14 +89,19 @@ public class LoadEngine {
     
 	private static class LoadHelper {
 		int version;
+		List<ChunkInfo> chunkList;
+		RandomAccessFile ra;
+		ImageWorkspace workspace;
+		
+		int layerMet = 0;
+		final List<LayerNode> layers = new ArrayList<>();
 	}
 	
 	/** Attempts to load the given file into a new Workspace. */
 	public ImageWorkspace loadWorkspace( File file) 
 		throws BadSIFFFileException
 	{
-		RandomAccessFile ra;
-		LoadHelper settings = new LoadHelper();
+		LoadHelper helper = new LoadHelper();
 		
 		try {
 			int width = -1;
@@ -105,68 +111,79 @@ public class LoadEngine {
 				throw new BadSIFFFileException("File Does Not Exist.");
 			}
 			
-			ra = new RandomAccessFile( file, "r");
+			helper.ra = new RandomAccessFile( file, "r");
 			
 			// Verify Header
-			ra.seek(0);
+			helper.ra.seek(0);
 			byte[] header = SaveLoadUtil.getHeader();
 			byte[] b = new byte[4];
-			ra.read(b);
+			helper.ra.read(b);
 			
 			
 			if( !Arrays.equals( header, b)) {
-				ra.close();
+				helper.ra.close();
 				throw new BadSIFFFileException("Bad Fileheader (not an SIFF File).");
 			}
 			
-			settings.version = ra.readInt();
+			helper.version = helper.ra.readInt();
 			
-			if( settings.version >= 1) {
-				width = ra.readShort();
-				height= ra.readShort();
+			if( helper.version >= 1) {
+				width = helper.ra.readShort();
+				height= helper.ra.readShort();
 			}
 			
-			ImageWorkspace workspace = new ImageWorkspace(master);
+			helper.workspace = new ImageWorkspace(master);
 			Map<Integer,BufferedImage> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
-			List<ChunkInfo> chunks = parseChunks( ra);
+			parseChunks( helper);
 
 			// First Load the Image Data
-			for( ChunkInfo ci : chunks) {
+			for( ChunkInfo ci : helper.chunkList) {
 				if( ci.header.equals("IMGD")) {
-					ra.seek( ci.startPointer);
-					imageMap = parseImageDataSection(ra, ci.size);
+					helper.ra.seek( ci.startPointer);
+					imageMap = parseImageDataSection(helper, ci.size);
 				}
 			}
 			
 			// Next Load the Group Tree
-			for( ChunkInfo ci : chunks) {
+			for( ChunkInfo ci : helper.chunkList ) {
 				if( ci.header.equals("GRPT")) {
-					ra.seek( ci.startPointer);
-					parseGroupTreeSection(workspace, ra, ci.size,settings);
+					helper.ra.seek( ci.startPointer);
+					parseGroupTreeSection(helper, ci.size);
 				}
 			}
+
+			// Next Load the Animation Data
+			if( helper.version >= 3) {
+				for( ChunkInfo ci : helper.chunkList ) {
+					if( ci.header.equals("ANIM")) {
+						helper.ra.seek( ci.startPointer);
+						parseAnimationSection(helper, ci.size);
+					}
+				}
+			}
+			helper.ra.close();
 			
 			// TODO DEBUG
 			for( BufferedImage img : imageMap.values()) {
-				if( img.getWidth() > workspace.getWidth()) {
-					workspace.setWidth(img.getWidth());
+				if( img.getWidth() > helper.workspace.getWidth()) {
+					helper.workspace.setWidth(img.getWidth());
 				}
-				if( img.getHeight() > workspace.getHeight()) {
-					workspace.setHeight(img.getHeight());
+				if( img.getHeight() > helper.workspace.getHeight()) {
+					helper.workspace.setHeight(img.getHeight());
 				}
 			}
 			// TODO
 			
-			workspace.importNodeWithData( workspace.getRootNode(), imageMap);
+			helper.workspace.importNodeWithData( helper.workspace.getRootNode(), imageMap);
 
-			workspace.setWidth(width);
-			workspace.setHeight(height);
+			helper.workspace.setWidth(width);
+			helper.workspace.setHeight(height);
 			
-			workspace.finishBuilding();
-			workspace.fileSaved(file);
-			return workspace;
+			helper.workspace.finishBuilding();
+			helper.workspace.fileSaved(file);
+			return helper.workspace;
 			
 		} catch (UnsupportedEncodingException e) {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
@@ -175,7 +192,9 @@ public class LoadEngine {
 			throw new BadSIFFFileException("Error Reading File: " + e.getStackTrace());
 		}
 	}
-	
+
+
+
 	private static class ChunkInfo {
 		String header;
 		long startPointer;
@@ -187,25 +206,23 @@ public class LoadEngine {
 	 * 
 	 * Note: assumes that the file is already aligned to the first chunk.
 	 */
-	private List<ChunkInfo> parseChunks(RandomAccessFile ra) 
+	private void parseChunks(LoadHelper helper) 
 			throws IOException 
 	{
-		List<ChunkInfo> list = new ArrayList<ChunkInfo>();
+		helper.chunkList = new ArrayList<ChunkInfo>();
 
 		byte[] b = new byte[4];
 		
-		while( ra.read(b) == 4) {
+		while( helper.ra.read(b) == 4) {
 			ChunkInfo ci = new ChunkInfo();
 			
-			ci.size = ra.readInt();
+			ci.size = helper.ra.readInt();
 			ci.header = new String( b, "UTF-8");
-			ci.startPointer = ra.getFilePointer();
-			ra.skipBytes(ci.size);
+			ci.startPointer = helper.ra.getFilePointer();
+			helper.ra.skipBytes(ci.size);
 			
-			list.add(ci);
+			helper.chunkList.add(ci);
 		}
-		
-		return list;
 	}
 
 	/***
@@ -213,20 +230,20 @@ public class LoadEngine {
 	 * [IMGD]
 	 */
 	private Map<Integer,BufferedImage> parseImageDataSection(
-			RandomAccessFile ra, int chunkSize) 
+			LoadHelper helper, int chunkSize) 
 			throws IOException 
 	{
 		Map<Integer,BufferedImage> dataMap = new HashMap<>();
-		long endPointer = ra.getFilePointer() + chunkSize;
+		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
 		
-		while( ra.getFilePointer() < endPointer) {
-			identifier = ra.readInt();
-			imgSize = ra.readInt();
+		while( helper.ra.getFilePointer() < endPointer) {
+			identifier = helper.ra.readInt();
+			imgSize = helper.ra.readInt();
 
 			byte[] buffer = new byte[imgSize];
-			ra.read(buffer);
+			helper.ra.read(buffer);
 			
 			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
 			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -246,19 +263,17 @@ public class LoadEngine {
 	 * [GRPT]
 	 */
 	private void parseGroupTreeSection( 
-			ImageWorkspace workspace, 
-			RandomAccessFile ra, 
-			int chunkSize,
-			LoadHelper settings) 
+			LoadHelper helper,
+			int chunkSize) 
 			throws IOException 
 	{
 
-		if( settings.version <= 1) {
-			_legacyHandleGroupTree0001(workspace, ra, chunkSize, settings);
+		if( helper.version <= 1) {
+			_legacyHandleGroupTree0001(helper.workspace, helper.ra, chunkSize, helper);
 			return;
 		}
 		
-		long endPointer = ra.getFilePointer() + chunkSize;
+		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int depth = 0;
 		int type;
 		int identifier = -1;
@@ -268,12 +283,12 @@ public class LoadEngine {
 		//	nodes (all the nested nodes leading up to the current node)
 		GroupTree.GroupNode[] nodeLayer = new GroupTree.GroupNode[256];
 		
-		nodeLayer[0] = workspace.getRootNode();
+		nodeLayer[0] = helper.workspace.getRootNode();
 		for( int i = 1; i < 256; ++i) {
 			nodeLayer[i] = null;
 		}
 		
-		while( ra.getFilePointer() < endPointer) {
+		while( helper.ra.getFilePointer() < endPointer) {
 			
 			// Default values
 			float alpha = 1.0f;
@@ -282,17 +297,17 @@ public class LoadEngine {
 			int bitmask = 0x01 | 0x02;
 			
 			// Read data
-			depth = ra.readUnsignedByte();
+			depth = helper.ra.readUnsignedByte();
 			
-			if( settings.version >= 1) {
-				alpha = ra.readFloat();
-				ox = ra.readShort();
-				oy = ra.readShort();
-				bitmask = ra.readByte();
+			if( helper.version >= 1) {
+				alpha = helper.ra.readFloat();
+				ox = helper.ra.readShort();
+				oy = helper.ra.readShort();
+				bitmask = helper.ra.readByte();
 			}
 
-			name = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
-			type = ra.readUnsignedByte();
+			name = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+			type = helper.ra.readUnsignedByte();
 			
 			
 			
@@ -304,25 +319,26 @@ public class LoadEngine {
 			else {
 				switch( type) {
 				case SaveLoadUtil.NODE_GROUP:
-					node = nodeLayer[depth] = workspace.addGroupNode( nodeLayer[depth-1], name);
+					node = nodeLayer[depth] = helper.workspace.addGroupNode( nodeLayer[depth-1], name);
 					nodeLayer[depth].setExpanded(true);
 					break;
 				case SaveLoadUtil.NODE_SIMPLE_LAYER:
-					identifier = ra.readInt();
+					identifier = helper.ra.readInt();
 					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
-					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
+					node = helper.workspace.addShellLayer( nodeLayer[depth-1], layer, name);
+					helper.layers.add((LayerNode) node);
 					break;
 				case SaveLoadUtil.NODE_RIG_LAYER: {
-					int partCount = ra.readByte();
+					int partCount = helper.ra.readByte();
 					List<Part> parts = new ArrayList<Part>( partCount);
 					
 					
 					for( int i=0; i<partCount; ++i) {
-						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra);
-						int pox = ra.readShort();
-						int poy = ra.readShort();
-						int pdepth = ra.readInt();
-						int pid = ra.readInt();
+						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+						int pox = helper.ra.readShort();
+						int poy = helper.ra.readShort();
+						int pdepth = helper.ra.readInt();
+						int pid = helper.ra.readInt();
 						
 						parts.add( new Part( 
 								new ImageHandle( null, pid),
@@ -333,7 +349,8 @@ public class LoadEngine {
 					
 					
 					RigLayer rig = new RigLayer( parts);
-					node = workspace.addShellLayer(nodeLayer[depth-1], rig, name);
+					node = helper.workspace.addShellLayer(nodeLayer[depth-1], rig, name);
+					helper.layers.add((LayerNode) node);
 					break;}
 				}
 			}
@@ -344,6 +361,19 @@ public class LoadEngine {
 				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
 				node.setOffset(ox, oy);
 			}
+		}
+	}
+	
+
+	
+	private void parseAnimationSection(LoadHelper helper, int chunkSize) 
+			throws IOException 
+	{
+		long endPointer = helper.ra.getFilePointer() + chunkSize;
+		
+		while( helper.ra.getFilePointer() < endPointer) {
+			String name = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+			
 		}
 	}
 	

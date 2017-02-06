@@ -62,7 +62,7 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.ImageWorkspace.OpacityChange;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ImageWorkspace.VisibilityChange;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.ContentTree;
@@ -195,9 +195,9 @@ public class LayerTreePanel extends ContentTree
     	}
     }
 	@Override
-	public void structureChanged( StructureChange evt) {
-		if( evt instanceof VisibilityChange) {
-			Node changedNode = evt.getChangedNodes().get(0);	// should be no need to sanity check
+	public void structureChanged( StructureChangeEvent evt) {
+		if( evt.change instanceof VisibilityChange) {
+			Node changedNode = evt.change.getChangedNodes().get(0);	// should be no need to sanity check
 			
 			for( int i = 0; i<buttonPanel.getButtonRowCount(); ++i) {
 				CCButton button = buttonPanel.getButtonAt( i, 0);
@@ -207,12 +207,12 @@ public class LayerTreePanel extends ContentTree
 					break;
 				}
 			}
-		}else if( evt instanceof OpacityChange) {
+		}else if( evt.change instanceof OpacityChange) {
 //			if( evt.get)
 		}
 		
 
-		if( evt.isGroupTreeChange()) {
+		if( evt.change.isGroupTreeChange()) {
 			constructFromRoot();
 		}
 	}
@@ -383,12 +383,10 @@ public class LayerTreePanel extends ContentTree
 				
 				// Add parts to the menu scheme depending on node type
 				if( usrObj instanceof GroupNode) {
-					menuScheme.addAll(Arrays.asList(new String[][] {
-								{"-"},
-								{"&Construct Simple Animation From Group", "animfromgroup", null},
-								{"&Delete  "+descriptor, "delete", null}, 
-								{"&Add Group To Animation As New Layer", "animinsert", null}
-					}));
+					menuScheme.add( new String[] {"-"});
+					menuScheme.add( new String[] {"&Construct Simple Animation From Group", "animfromgroup", null});
+					if( workspace.getAnimationManager().getSelectedAnimation() != null)
+						menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
 				}
 				else if( usrObj instanceof LayerNode) {
 					if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
@@ -514,9 +512,7 @@ public class LayerTreePanel extends ContentTree
 		case "animfromgroup":{
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
-			manager.linkAnimation(
-					manager.addAnimation(new FixedFrameAnimation(group)),
-					group);
+			manager.addAnimation(new FixedFrameAnimation(group));
 			break;}
 		case "animinsert":{
 			GroupNode group = (GroupNode)contextMenu.node;
@@ -525,7 +521,6 @@ public class LayerTreePanel extends ContentTree
 			if( anim == null) break;
 			
 			anim.importGroup(group);
-			manager.linkAnimation(anim, group);
 			
 			break;}
 		case "animBreakBind":

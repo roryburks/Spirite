@@ -1,8 +1,10 @@
 package spirite.image_data;
 
 import java.awt.Graphics;
+import java.util.List;
 
 import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 
 public abstract class Animation {
 	protected String name;
@@ -12,8 +14,10 @@ public abstract class Animation {
 	public abstract void drawFrame( Graphics g, float t);
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();
-	public abstract void interpretLink( GroupNode node);
 	public abstract void importGroup( GroupNode node);
+
+	public abstract List<GroupNode> getGroupLinks();
+	public abstract void interpretChange( GroupNode node, StructureChangeEvent evt);
 	
 	public String getName() {
 		return name;

@@ -28,6 +28,7 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -49,6 +50,7 @@ import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends JPanel 
 	implements  MAnimationStructureObserver, MSelectionObserver, 
@@ -268,9 +270,39 @@ public class AnimationSchemeTreePanel extends JPanel
 		@Override public void mousePressed(MouseEvent arg0) {}
 		@Override public void mouseReleased(MouseEvent arg0) {}
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
+		public void mouseClicked(MouseEvent evt) {
 			if( manager != null) {
-				manager.setSelectedAnimation(animation);
+				switch( evt.getButton()) {
+				case MouseEvent.BUTTON1:
+					manager.setSelectedAnimation(animation);
+					break;
+				case MouseEvent.BUTTON3:
+					contextMenu.animation = animation;
+					Object[][] menuScheme = new Object[][]{
+						{"Delete Animation", "remAnim", null}
+					};
+					contextMenu.removeAll();
+					UIUtil.constructMenu(contextMenu, menuScheme, contextMenu);
+					contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+					break;
+				}
+			}
+		}
+	}
+	private final ContextMenu contextMenu = new ContextMenu();
+	private class ContextMenu extends JPopupMenu
+		implements ActionListener
+	{
+		Animation animation;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			switch( e.getActionCommand()) {
+			case "remAnim":
+				if( manager != null) {
+					manager.removeAnimation(animation);
+				}
+				break;
 			}
 		}
 	}
@@ -737,6 +769,7 @@ public class AnimationSchemeTreePanel extends JPanel
 			
 			return new Rectangle(0, LABEL_HEIGHT + TICK_HEIGHT*index, getHeight(), LABEL_HEIGHT + TICK_HEIGHT*(index+1));
 		}
+		
 		
 		class FFPOutline extends JPanel
 		{

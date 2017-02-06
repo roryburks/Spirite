@@ -31,7 +31,7 @@ import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
@@ -218,7 +218,7 @@ public class DrawPanel extends JPanel
 	@Override	public void imageChanged(ImageChangeEvent evt) {
     	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
     }
-	@Override	public void structureChanged(StructureChange evt) {	}
+	@Override	public void structureChanged(StructureChangeEvent evt) {	}
  
 	
 	

@@ -237,6 +237,24 @@ public class GroupTree {
 			return children.get(i+1);
 		}
 		
+		/** Gets the node that comes before this one (or null if it's the first) */
+		public Node getPreviousNode() {
+			if( parent == null) 
+				return null;
+			
+			List<Node> children = getParent().getChildren();
+			int index = children.indexOf(this);
+
+			if( index == -1) {
+				MDebug.handleError( ErrorType.STRUCTURAL, this, "Group Tree malformation (Not child of own parent).");
+				return null;
+			}
+			if( index == 0)
+				return null;
+			return children.get(index-1);
+			
+		}
+		
 		
 		// For simplicity's sake (particularly regarding Observers), only the GroupTree
 		//	has direct access to add/remove commands.

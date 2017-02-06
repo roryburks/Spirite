@@ -24,7 +24,7 @@ import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external
@@ -393,7 +393,7 @@ public class WorkPanel extends javax.swing.JPanel
 	}
 
 	@Override
-	public void structureChanged(StructureChange evt) {
+	public void structureChanged(StructureChangeEvent evt) {
 		if( workspace.getWidth() != w || workspace.getHeight() != h) {
 			w = workspace.getWidth();
 			h = workspace.getHeight();

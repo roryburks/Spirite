@@ -7,8 +7,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.imageio.ImageIO;
 
@@ -18,6 +22,12 @@ import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace.AdditionChange;
+import spirite.image_data.ImageWorkspace.DeletionChange;
+import spirite.image_data.ImageWorkspace.MoveChange;
+import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 
 /**
@@ -31,14 +41,17 @@ public class FixedFrameAnimation extends Animation
 	private int startFrame;
 	private int endFrame;
 
-//	public FixedFrameAnimation() {
-//	}
-
 	public FixedFrameAnimation(GroupNode group) {
 		layers.add( constructFromGroup(group));
 		name = group.getName();
 		recalculateMetrics();
 	}
+	
+	public FixedFrameAnimation( String name) {
+		this.name = name;
+	}
+	
+	
 	private AnimationLayer constructFromGroup( GroupNode group) {
 
 		AnimationLayer layer = new AnimationLayer();
@@ -174,22 +187,73 @@ public class FixedFrameAnimation extends Animation
 	}
 
 	@Override
-	public void interpretLink(GroupNode node) {
-		boolean done = false;
-		// Descending Iteration to avoid content desync on multiple hits
-		for( int i=layers.size()-1; i>=0; --i) {
-			if( layers.get(i).group == node) {
-				layers.remove(i);
-				layers.add( constructFromGroup(node));
-				done = true;
+	public void interpretChange(GroupNode node, StructureChangeEvent evt) {
+		
+		for( int i=0; i<layers.size(); ++i) {
+			AnimationLayer layer = layers.get(i);
+			
+			if( layer.group == node) {
+				StructureChange change = evt.change;
+				
+				if( change instanceof AdditionChange) {
+					AdditionChange addition = (AdditionChange)change;
+					if( addition.parent == layer.group && addition.node instanceof LayerNode) {
+						if( evt.reversed)
+							layer.removeNode( (LayerNode) addition.node);
+						else
+							layer.addNode( (LayerNode) addition.node);
+					}
+				}
+				else if( change instanceof DeletionChange) {
+					DeletionChange deletion = (DeletionChange)change;
+					
+					if( deletion.parent == layer.group
+							&& layer.getLayers().contains(deletion.node)) 
+					{
+						if( evt.reversed)
+							layer.addNode( (LayerNode) deletion.node);
+						else
+							layer.removeNode( (LayerNode)deletion.node);
+					}
+				}
+				else if( change instanceof MoveChange) {
+					MoveChange movement = (MoveChange)change;
+					
+					if( movement.oldParent == layer.group &&
+						movement.oldParent == movement.newParent) {
+						layer.moveNode( (LayerNode) movement.moveNode);
+					}
+					else if( movement.oldParent == layer.group) {
+						if( evt.reversed)
+							layer.addNode( (LayerNode) movement.moveNode);
+						else
+							layer.removeNode((LayerNode) movement.moveNode);
+					}
+					else if( movement.newParent == layer.group) {
+						if( evt.reversed)
+							layer.removeNode( (LayerNode) movement.moveNode);
+						else
+							layer.addNode((LayerNode) movement.moveNode);
+					}
+				}
 			}
 		}
 
-		if( !done)
-			layers.add( constructFromGroup(node));
-
 
 		_triggerChange();
+	}
+	
+	@Override
+	public List<GroupNode> getGroupLinks() {
+		List<GroupNode> list = new ArrayList<>(layers.size());
+		
+		for( AnimationLayer layer : layers) {
+			if( layer.group != null) {
+				list.add(layer.group);
+			}
+		}
+		
+		return list;
 	}
 	
 	
@@ -211,45 +275,88 @@ public class FixedFrameAnimation extends Animation
 
 	public class AnimationLayer {
 		public class Frame {
-				private int length;
-				private LayerNode node;
-				private Marker marker;
-				private Frame( LayerNode node, int length, Marker marker) {
-					this.node = node;
-					this.length = length;
-					this.marker = marker;
-				}
-				public int getStart() { 
-					int i = 0;
-					for( Frame frame : frames) {
-						if( frame == this)
-							return i;
-						i += frame.length;
-					}
-					return Integer.MIN_VALUE; 
-				}
-				public int getEnd() { return getStart()+length; }
-				public int getLength() {return length;}
-				public LayerNode getLayerNode() { return node; }
-				public Marker getMarker() { return marker;}
-				
-				public void setLength( int newLength) {
-					if( newLength < 0) 
-						throw new IndexOutOfBoundsException();
-					length = newLength;
-					
-					_triggerChange();
-				}
+			private int length;
+			private LayerNode node;
+			private Marker marker;
+			private Frame( LayerNode node, int length, Marker marker) {
+				this.node = node;
+				this.length = length;
+				this.marker = marker;
 			}
+			public int getStart() { 
+				int i = 0;
+				for( Frame frame : frames) {
+					if( frame == this)
+						return i;
+					i += frame.length;
+				}
+				return Integer.MIN_VALUE; 
+			}
+			public int getEnd() { return getStart()+length; }
+			public int getLength() {return length;}
+			public LayerNode getLayerNode() { return node; }
+			public Marker getMarker() { return marker;}
+			
+			public void setLength( int newLength) {
+				if( newLength < 0) 
+					throw new IndexOutOfBoundsException();
+				length = newLength;
+				
+				_triggerChange();
+			}
+		}
 
 		protected GroupNode group;
 		protected final ArrayList<Frame> frames = new ArrayList<>();
 		protected boolean asynchronous = false;
 		
-		public AnimationLayer() {
+		private AnimationLayer() {}
+		
+		
+		public void moveNode(LayerNode moveNode) {
+			Iterator<Frame> it = frames.iterator();
+			while( it.hasNext()) {
+				Frame frame = it.next();
+				
+				if( frame.getLayerNode() == moveNode) {
+					it.remove();
+					addFrame(moveNode,frame);
+					return;
+				}
+			}
 		}
-		
-		
+
+
+		public void removeNode(LayerNode node) {
+			frames.removeIf( new Predicate<Frame>() {
+				@Override public boolean test(Frame t) {
+					return ( t.node == node);
+				}
+			});
+		}
+
+
+		public void addNode(LayerNode node) { 
+			addFrame( node, new Frame(node, 1, Marker.FRAME));
+		}
+		private void addFrame(LayerNode node, Frame frame) { 
+			Node nodeBefore = node.getPreviousNode();
+			
+			while( nodeBefore != null && !(nodeBefore instanceof LayerNode))
+				nodeBefore = nodeBefore.getPreviousNode();
+			
+
+			for( int i=0; i<frames.size(); ++i) {
+				if( frames.get(i).node == nodeBefore) {
+					frames.add(i, frame);
+					return;
+				}
+			}
+				
+			frames.add( frames.size()-1, frame);
+		}
+
+
 		public int getStart() {
 			int i = 0;
 			for( Frame frame : frames) {
@@ -315,6 +422,10 @@ public class FixedFrameAnimation extends Animation
 			return layer;
 		}
 		
+		public GroupNode getGroupLink() {
+			return group;
+		}
+		
 		
 		public boolean isAsynchronous() {
 			return asynchronous;
@@ -326,6 +437,8 @@ public class FixedFrameAnimation extends Animation
 		public List<Frame> getFrames() {
 			return new ArrayList<>(frames);
 		}
+		
+		
 
 		private List<LayerNode> getLayers() {
 			ArrayList<LayerNode> list = new ArrayList<>();
@@ -334,6 +447,19 @@ public class FixedFrameAnimation extends Animation
 					list.add(frame.node);
 			}
 			return list;
+		}
+		
+		/** A map of where each Layer exists within the Frame list*/
+		private Map<LayerNode,Integer> getLayerMap() {
+			Map<LayerNode,Integer> map = new HashMap<>();
+			for( int i=0; i<frames.size(); ++i) {
+				Frame frame = frames.get(i);
+				
+				if( frame.getMarker() == Marker.FRAME) {
+					map.put(frame.getLayerNode(), i);
+				}
+			}
+			return map;
 		}
 		
 /*		public List<Integer> getKeyTimes() {

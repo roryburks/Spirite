@@ -37,7 +37,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.layers.Layer;
 
@@ -640,7 +640,7 @@ public class RenderEngine
 	}
 
 	// :::: MImageObserver
-	@Override	public void structureChanged(StructureChange evt) {	}
+	@Override	public void structureChanged(StructureChangeEvent evt) {	}
 	@Override
 	public void imageChanged( ImageChangeEvent evt) {
 		// Remove all caches whose renderings would have been effected by this change

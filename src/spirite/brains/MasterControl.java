@@ -35,7 +35,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
-import spirite.image_data.ImageWorkspace.StructureChange;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.RectSelection;
@@ -775,7 +775,7 @@ public class MasterControl
 
 	// :::: MImageObserver
 	@Override
-	public void structureChanged(StructureChange evt) {
+	public void structureChanged(StructureChangeEvent evt) {
 		triggerImageStructureRefresh();
 	}
 
