@@ -475,6 +475,11 @@ public class ImageWorkspace {
 			return new Point(p.x-ox, p.y-oy);
 		}
 		
+		// TODO: This might be bad if I ever add rotations etc
+		public Rectangle getBounds() {
+			return new Rectangle( ox, oy, handle.getWidth(), handle.getHeight());
+		}
+		
 		/** Returns the Tranform needed to convert WorkspaceSpace into DataSpace*/
 		public AffineTransform getTransform() {
 			AffineTransform transform = new AffineTransform();

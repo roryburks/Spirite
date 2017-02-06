@@ -405,8 +405,10 @@ public class MasterControl
 	    	    	BufferedImage img;
     				if( currentWorkspace.getSelectionEngine().isLifted())
     					img = currentWorkspace.getSelectionEngine().getLiftedImage().access();
-    				else
-    					img = currentWorkspace.getSelectionEngine().copyData((LayerNode)currentWorkspace.getSelectedNode());
+    				else {
+    					img = currentWorkspace.getSelectionEngine().getBuiltSelection()
+    						.liftSelectionFromData(currentWorkspace.buildActiveData());
+    				}
     				
 	    	    	TransferableImage transfer = new TransferableImage(img);
 	    	    	

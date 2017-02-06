@@ -303,50 +303,11 @@ public class SelectionEngine {
 	
 	
 	private StartLiftAction createLiftAction(LayerNode node) {
-		startLiftAction = new StartLiftAction(copyData(node));
-		return startLiftAction;
-	}
-	
-
-	/** Lifts the current */
-	public BufferedImage copyData(LayerNode node) {
+		BuiltSelection mask = getBuiltSelection();
 		BuiltImageData builtImage = workspace.buildData(node);
 		
-		// Creates a Selection Mask
-		Rectangle rect = scope.getSelection().getBounds();
-		BufferedImage bufferedImage = new BufferedImage( 
-				rect.width, 
-				rect.height, 
-				BufferedImage.TYPE_INT_ARGB);
-		MUtil.clearImage(bufferedImage);
-		Graphics2D g2 = (Graphics2D)bufferedImage.getGraphics();
-		
-		// Draw the mask, clipping the bounds of drawing to only the part 
-		// that the selection	intersects with the Image so that you do not 
-		//  leave un-applied mask left in the image.
-		rect.x = scope.getOffsetX();
-		rect.y = scope.getOffsetY();
-		Rectangle nodeRect = new Rectangle( 
-				node.getOffsetX(), node.getOffsetY(),
-				node.getLayer().getWidth(), node.getLayer().getHeight());
-		Rectangle intersection = nodeRect.intersection(rect);
-		
-		g2.setClip(intersection.x-rect.x , intersection.y-rect.y, 
-				intersection.width, intersection.height);
-		
-		scope.getSelection().drawSelectionMask(g2);
-		
-		// Copy the data inside the Selection's alphaMask to liftedData
-		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-		
-		g2.translate(-scope.getOffsetX(), -scope.getOffsetY());
-
-		builtImage.draw(g2);
-		
-		
-		g2.dispose();
-		
-		return bufferedImage;
+		startLiftAction = new StartLiftAction(mask.liftSelectionFromData(builtImage));
+		return startLiftAction;
 	}
 	
 	private UndoableAction createNewSelect( Selection selection, int ox, int oy) {
@@ -678,6 +639,37 @@ public class SelectionEngine {
 			g2.setTransform(trans);
 		}
 		
+		public BufferedImage liftSelectionFromData( BuiltImageData data) {
+			Rectangle selectionRect = selection.getBounds();
+			selectionRect.x = offsetX;
+			selectionRect.y = offsetY;
+			
+			BufferedImage bi = new BufferedImage( 
+					selectionRect.width, selectionRect.height, BufferedImage.TYPE_INT_ARGB);
+			MUtil.clearImage(bi);
+			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+
+			// Draw the mask, clipping the bounds of drawing to only the part 
+			// that the selection	intersects with the Image so that you do not 
+			//  leave un-applied mask left in the image.
+			Rectangle dataRect = data.getBounds();
+			Rectangle intersection = dataRect.intersection(selectionRect);
+			
+			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
+					intersection.width, intersection.height);
+			selection.drawSelectionMask(g2);	// Note: Untransformed
+			
+
+			// Copy the data inside the Selection's alphaMask to liftedData
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
+			
+			g2.translate(-offsetX, -offsetY);
+
+			data.draw(g2);
+			g2.dispose();
+			
+			return bi;
+		}
 
 		public AffineTransform getDrawFromTransform() {
 			AffineTransform trans = new AffineTransform();

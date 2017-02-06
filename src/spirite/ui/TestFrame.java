@@ -7,6 +7,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
@@ -68,7 +69,17 @@ public class TestFrame extends JFrame {
 				)
 				
 		);
+		
+		JRadioButton radioButton = new JRadioButton("1");
+		panelA.add(radioButton);
+		
+		JRadioButton radioButton_1 = new JRadioButton("2");
+		panelA.add(radioButton_1);
+		
+		JRadioButton radioButton_2 = new JRadioButton("3");
+		panelA.add(radioButton_2);
 		panel_1.setLayout(gl_panel_1);
+		
 	}
 
 }

@@ -1,6 +1,7 @@
 package spirite.panel_toolset;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -186,6 +187,10 @@ public class ToolSettingsPanel extends OmniComponent
 			vertical.addComponent(checkbox);
 			break;}
 		}
+	}
+	
+	private class ToolPropertyComponent extends Component {
+		
 	}
 	
 	private void checkStatus( ) {

@@ -33,7 +33,6 @@ import spirite.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
 
@@ -58,7 +57,7 @@ public class AnimationPreviewPanel extends OmniComponent
 	// Metronome settings
 	private float start = 0.0f;
 	private float end = 2.0f;
-	private float tps = 0.2f;
+	private float tps = 8.0f;
 //	private float met = 0.0f;
 	
 
@@ -306,8 +305,23 @@ public class AnimationPreviewPanel extends OmniComponent
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();
-		}else if( source == buttonForward) {		
-			((FixedFrameAnimation)animation).save();
+		}else if( source == buttonForward) {
+			buttonPlay.setSelected(false);
+			isPlaying = false;
+
+			float met = animationManager.getAnimationState(animation).getMetronom() +  1.0f;
+			met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
+			animationManager.getAnimationState(animation).setMetronome(met);
+			slider.setValue((int) Math.floor(met));
+//			((FixedFrameAnimation)animation).save();
+		}else if( source == buttonBack) {
+			buttonPlay.setSelected(false);
+			isPlaying = false;
+
+			float met = animationManager.getAnimationState(animation).getMetronom() -  1.0f;
+			met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
+			animationManager.getAnimationState(animation).setMetronome(met);
+			slider.setValue((int) Math.floor(met));
 		}
 	}
 

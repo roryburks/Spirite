@@ -3,6 +3,8 @@ package spirite.panel_work;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.GroupLayout;
 
@@ -18,7 +20,8 @@ import spirite.ui.UIUtil;
  *
  * @author Rory Burks
  */
-public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObserver 
+public class WorkSplicePanel extends javax.swing.JPanel 
+	implements MReferenceObserver, MouseWheelListener 
 {
 	private static final long serialVersionUID = 1L;
 	final WorkPanel context;
@@ -43,6 +46,9 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
         initComponents();
         
         context.workspace.getReferenceManager().addReferenceObserve(this);
+        
+        previewPanelBack.addMouseWheelListener(this);
+        drawPanel.addMouseWheelListener(this);
         
 
         offsetx = 0;
@@ -83,12 +89,21 @@ public class WorkSplicePanel extends javax.swing.JPanel implements MReferenceObs
     }
 
               
-
+    // :::: MReferenceObserver
 	@Override	public void referenceStructureChanged(boolean hard) {}
 	@Override
 	public void toggleReference(boolean referenceMode) {
 		setBackground( referenceMode ? referenceBG : normalBG);
 		
+	}
+
+	// :::: MouseWheelListener
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent evt) {
+		if( evt.getWheelRotation() < 0)
+			zoomer.zoomIn();
+		else if( evt.getWheelRotation() > 0)
+			zoomer.zoomOut();
 	}        
 
 }

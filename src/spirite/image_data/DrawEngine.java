@@ -134,6 +134,9 @@ public class DrawEngine {
 		return true;
 	}
 	
+	public void flip( BuiltImageData data, boolean horizontal) {
+		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
+	}
 	
 	
 	
@@ -621,5 +624,70 @@ public class DrawEngine {
 		}
 	}
 	
+	public class FlipAction extends MaskedImageAction 
+	{
+		private final boolean horizontal;
+		FlipAction(BuiltImageData data, BuiltSelection mask, boolean horizontal) {
+			super(data, mask);
+			this.horizontal = horizontal;
+			description = "Flip Action";
+		}
+
+		@Override
+		protected void performImageAction() {
+			BufferedImage bi = builtImage.checkoutRaw();
+			
+			if( mask != null && mask.selection != null) {
+				
+				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
+
+
+				BufferedImage buffer = flipImage(lifted);
+
+				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+				mask.drawSelectionMask(g2);
+				
+
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+				g2.drawImage(buffer, mask.offsetX, mask.offsetY, null);
+				g2.dispose();
+				buffer.flush();
+			}
+			else {
+				BufferedImage buffer = flipImage( bi);
+				
+				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+				g2.drawImage(buffer, 0, 0, null);
+				g2.dispose();
+				buffer.flush();
+			}
+			
+			builtImage.checkin();
+		}
+
+		private BufferedImage flipImage( BufferedImage bi) {
+			// Might be able to do this single-Image but things get weird if you 
+			//	draw a Buffer onto itself
+			BufferedImage buffer = new BufferedImage( 
+					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2 = (Graphics2D)buffer.getGraphics();
+			
+			if( horizontal) {
+				g2.translate(bi.getWidth(), 0);
+				g2.scale(-1.0, 1.0);
+			}
+			else {
+				g2.translate(0, bi.getHeight());
+				g2.scale(1.0, -1.0);
+				
+			}
+			g2.drawImage(bi, 0, 0, null);
+			g2.dispose();
+			
+			return buffer;
+		}
+	}
 	
 }

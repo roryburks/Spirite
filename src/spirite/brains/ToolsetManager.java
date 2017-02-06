@@ -30,7 +30,9 @@ public class ToolsetManager
 		COLOR_PICKER("Color Picker"),
 		PIXEL("Pixel"),
 		CROP("Cropper"),
-		COMPOSER("Rig Composer");
+		COMPOSER("Rig Composer"),
+		FLIPPER("Horizontal/Vertical Flipping"),
+		RESHAPER("Reshaping Tool");
 		
 		public final String description;
 		Tool( String name){ this.description = name;}
@@ -171,7 +173,9 @@ public class ToolsetManager
     }
     
     public enum PropertyType {
-    	SIZE, OPACITY, CHECK_BOX,BUTTON
+    	SIZE, OPACITY, CHECK_BOX,BUTTON, 
+    	// RADIO_BUTTON is a special Property Type in that 
+    	RADIO_BUTTON
     }
     
     // :::: Setting Schemes
@@ -203,6 +207,15 @@ public class ToolsetManager
     			{"cropSelection", PropertyType.BUTTON, "Crop Selection", "draw.cropSelection",  DISABLE_ON_NO_SELECTION},
     			{"quickCrop", PropertyType.CHECK_BOX, "Crop on Finish", false},
     			{"shrinkOnly", PropertyType.CHECK_BOX, "Shrink-only Crop", false},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    private ToolSettings constructFlipperSettings() {
+    	final Object[][] scheme = {
+    			{"flipMode.hor", PropertyType.RADIO_BUTTON, "Horizontal Flipping ", true},
+    			{"flipMode.vert", PropertyType.RADIO_BUTTON, "Vertical Flipping ", false},
+    			{"flipMode.either", PropertyType.RADIO_BUTTON, "Determine from Movement", false},
     	};
     	
     	return constructFromScheme(scheme);
@@ -276,6 +289,7 @@ public class ToolsetManager
     // ==== Toolset Observer
     public interface MToolsetObserver {
         public void toolsetChanged( Tool newTool);
+//        public void toolsetPropertyChanged( Tool tool);
     }
     
     List<MToolsetObserver> toolsetObserver = new ArrayList<>();

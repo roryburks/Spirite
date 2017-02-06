@@ -76,21 +76,14 @@ public class Penner
 	private boolean holdingShift = false;
 	private boolean holdingCtrl = false;
 	private boolean holdingAlt = false;
-	private int shiftMode = 0;	// 0 : accept any, 1 : horizontal, 2: vertical
 	
 	// Naturally, being a mouse (or drawing tablet)-based input handler with
 	//	a variety of states, a large number of coordinate sets need to be 
 	//	remembered.  While it's possible that some of these could be condensed
 	//	into fewer variables, it wouldn't be worth it just to save a few bytes
 	//	of RAM
-	private int startX;	// Set at the start 
-	private int startY;
-	private int shiftX;	//shiftX/Y are used to try and determine if, when holding
-	private int shiftY;	//	shift, you are drawing vertically or horizontally
-						// 	there are a few pixels of leniency before it determines
-	private int wX;		// wX and wY are the semi-raw coordinates which are just
-	private int wY;		// 	the raw positions converted to ImageSpace whereas x and y
-						// 	sometimes do not get updated (e.g. when shift-locked)
+	//private int startX;	// Set at the start 
+//	private int startY;
 	private int oldX;	// OldX and OldY are the last-checked X and Y primarily used
 	private int oldY;	// 	for things that only happen if they change
 	private int rawX;	// raw position are the last-recorded coordinates in pure form
@@ -161,20 +154,7 @@ public class Penner
 	 */
 	public void penDownEvent(PButtonEvent pbe) {
 		// TODO: This Should not be using JPen objects
-		if( pbe.button.getType() == PButton.Type.SHIFT) {
-			shiftX = wX;
-			shiftY = wY;
-			shiftMode = 0;
-		}
 		if( pbe.button.typeNumber > 3) return;	// Shit/Ctrl/Etc events
-		
-		x = wX;
-		y = wY;
-		startX = x;
-		startY = y;
-		shiftX = wX;
-		shiftY = wY;
-		shiftMode = 0;
 
 		PButton.Type button = pbe.button.getType();
 		if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
@@ -261,6 +241,8 @@ public class Penner
 					behavior = new MovingRigPart(rig, part);
 				
 				break;
+			case FLIPPER:
+				behavior = new FlippingBehavior();
 			}
 			
 			if( behavior != null)
@@ -302,33 +284,11 @@ public class Penner
 	//	problem if they aren't running on the AWTEvent thread.
 	public void rawUpdateX( int raw) {
 		rawX = raw;
-		wX = zoomer.stiXm(rawX);
-		if( holdingShift && behavior instanceof StateBehavior) {
-			if( shiftMode == 2)
-				return;
-			if( shiftMode == 0) {
-				if( Math.abs(shiftX - rawX) > 10) {
-					shiftMode = 1;
-				}
-				else return;
-			}
-		}
-		x = wX;
+		x = zoomer.stiXm(rawX);
 	}
 	public void rawUpdateY( int raw) {
 		rawY = raw;
-		wY = zoomer.stiYm( rawY);
-		if( holdingShift && behavior instanceof StateBehavior) {
-			if( shiftMode == 1)
-				return;
-			if( shiftMode == 0) {
-				if( Math.abs(shiftY - rawY) > 10) {
-					shiftMode = 2;
-				}
-				else return;
-			}
-		}
-		y = wY;
+		y = zoomer.stiYm( rawY);
 	}
 	public void rawUpdatePressure( float pressure) {
 		this.pressure = pressure;
@@ -361,9 +321,16 @@ public class Penner
 	}
 	
 	abstract class StrokeBehavior extends StateBehavior {
+		int shiftX = x;
+		int shiftY = y;
+		int dx = x;
+		int dy = y;
+		private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
 		
 		public void startStroke (StrokeParams stroke) {
 			if( workspace != null && workspace.buildActiveData() != null) {
+				shiftX = x;
+				shiftY = y;
 				BuiltImageData data = workspace.buildActiveData();
 				GroupTree.Node node = workspace.getSelectedNode();
 				
@@ -374,7 +341,32 @@ public class Penner
 		
 		@Override
 		public void onTock() {
-			drawEngine.stepStroke( new PenState( x, y, pressure));
+			if( holdingShift) {
+				if( shiftMode == -1) {
+					shiftMode = 0;
+					shiftX = x;
+					shiftY = y;
+				}
+				if( shiftMode == 0) {
+					if( Math.abs(shiftX - x) > 10)
+						shiftMode = 1;
+					else if( Math.abs(shiftY - y) > 10)
+						shiftMode = 2;
+				}
+				
+				System.out.println(shiftMode);
+				
+				if( shiftMode == 1)
+					dx = x;
+				if( shiftMode == 2)
+					dy = y;
+			}
+			else {
+				shiftMode = -1;
+				dx = x;
+				dy = y;
+			}
+			drawEngine.stepStroke( new PenState( dx, dy, pressure));
 
 		}
 
@@ -607,7 +599,7 @@ public class Penner
 
 			if( building) {
 				cropSection = MUtil.rectFromEndpoints(
-						startX, startY, x, y);
+						startx, starty, x, y);
 				if( (Boolean)settings.getValue("quickCrop")) {
 					workspace.cropNode(
 						workspace.getSelectedNode(), 
@@ -629,7 +621,7 @@ public class Penner
 
 			if( building) {
 				cropSection = MUtil.rectFromEndpoints(
-						startX, startY, x, y);
+						startx, starty, x, y);
 			}
 			else if( modifying) {
 				if( (cardinalMap & TOPMASK) != 0 ) {
@@ -766,6 +758,34 @@ public class Penner
 	}
 	
 
+	class FlippingBehavior extends StateBehavior {
+		int startX, startY;
+		
+		@Override
+		public void start() {
+			startX = x;
+			startY = y;
+		}
+		@Override
+		public void onMove() {
+			
+		}
+		@Override
+		public void onPenUp() {
+			BuiltImageData data =  workspace.buildActiveData();
+			if( data != null) {
+				if( MUtil.distance(x , y, startX, startY) < 5 ||
+					Math.abs(x - startX) > Math.abs(y - startY))
+					drawEngine.flip( data, true);
+				else
+					drawEngine.flip( data, false);
+			}
+			
+			super.onPenUp();
+		}
+		@Override public void onTock() {}
+	}
+	
 	// :::: KeyEventDispatcher
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent evt) {
