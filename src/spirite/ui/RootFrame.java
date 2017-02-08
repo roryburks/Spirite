@@ -216,16 +216,11 @@ public class RootFrame extends javax.swing.JFrame
     	ImageWorkspace workspace = master.getCurrentWorkspace();
     	
     	if( workspace == null) return;
-    	
-    	RenderSettings settings = new RenderSettings();
-    	settings.workspace = workspace;
-    	
+
     	GroupTree.Node node = workspace.getSelectedNode();
-    	
-    	if( node instanceof GroupTree.LayerNode) 
-    		settings.layer = ((GroupTree.LayerNode)node).getLayer();
-    	else if( node instanceof GroupTree.GroupNode) 
-    		settings.node = (GroupTree.GroupNode)node;
+    	RenderSettings settings = new RenderSettings(
+    			master.getRenderEngine().getNodeRenderTarget(node));
+
 
     	BufferedImage img = master.getRenderEngine().renderImage(settings);
     	

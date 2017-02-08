@@ -38,6 +38,7 @@ import javax.swing.border.EtchedBorder;
 
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.brains.RenderEngine.LayerRenderTarget;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -259,9 +260,8 @@ public class ReferenceSchemePanel extends OmniComponent
 						super.paintComponent(g);
 						
 						if( workspace != null && layer != null) {
-							RenderSettings settings = new RenderSettings();
-							settings.workspace = workspace;
-							settings.layer = layer;
+							RenderSettings settings = new RenderSettings(
+									new LayerRenderTarget(workspace,layer));
 							settings.width = d.width;
 							settings.height = d.height;
 						

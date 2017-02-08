@@ -333,6 +333,9 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		
 		// [4] : "ANIM" tag
 		helper.ra.write( "ANIM".getBytes("UTF-8"));
+		
+		// [4] : ChunkLength (placeholder for now)
+		helper.ra.writeInt(0);
 		long start = helper.ra.getFilePointer();
 		
 		for( Animation animation : animations) {

@@ -109,8 +109,8 @@ public class DrawPanel extends JPanel
         final Stroke baseStroke = g2.getStroke();
 
         // Draw Image
-    	RenderSettings settings = new RenderSettings();
-    	settings.workspace = workspace;    	
+    	RenderSettings settings = new RenderSettings(
+    			renderEngine.getDefaultRenderTarget(workspace));
 
 
         // Draw Border around the Workspace

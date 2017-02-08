@@ -435,8 +435,8 @@ public class Penner
 		
 		private void pickColor() {
 			// Get the composed image
-			RenderSettings settings = new RenderSettings();
-			settings.workspace = workspace;
+			RenderSettings settings = new RenderSettings(
+					renderEngine.getDefaultRenderTarget(workspace));
 			BufferedImage img = renderEngine.renderImage(settings);
 			
 			if( !MUtil.coordInImage(x, y, img))

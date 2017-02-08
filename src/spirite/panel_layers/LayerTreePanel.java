@@ -68,6 +68,7 @@ import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.ContentTree;
 import spirite.ui.UIUtil;
 
+
 public class LayerTreePanel extends ContentTree 
 	implements MImageObserver, MWorkspaceObserver, MSelectionObserver,
 	 TreeSelectionListener, TreeExpansionListener, ActionListener
@@ -701,15 +702,15 @@ public class LayerTreePanel extends ContentTree
 				UIUtil.drawTransparencyBG(g, null);
 				
 				if( node != null) {
-					RenderSettings settings = new RenderSettings();
-					settings.workspace = workspace;
+					RenderSettings settings = new RenderSettings(
+							renderEngine.getNodeRenderTarget(node));
 					settings.width = getWidth();
 					settings.height = getHeight();
 					
-					if( node instanceof LayerNode)
+/*					if( node instanceof LayerNode)
 						settings.layer = ((LayerNode)node).getLayer();
 					else if( node instanceof GroupNode)
-						settings.node = (GroupNode)node;
+						settings.node = (GroupNode)node;*/
 
 					RenderingHints newHints = new RenderingHints(
 				             RenderingHints.KEY_TEXT_ANTIALIASING,

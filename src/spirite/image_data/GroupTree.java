@@ -129,9 +129,11 @@ public class GroupTree {
 			return parent;
 		}
 		
-		@SuppressWarnings("unchecked")
 		public List<Node> getChildren() {
-			return (ArrayList<Node>)children.clone();
+			return new ArrayList<>(children);
+		}
+		public ImageWorkspace getContext() {
+			return context;
 		}
 
 		/** Gets the depth of the node.  Child of root = 1.

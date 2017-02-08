@@ -65,8 +65,8 @@ public class Test1 {
 
 		// Verify that nothing funny happens when you try to render a null workspace
 		try {
-			RenderSettings settings = new RenderSettings();
-			settings.workspace = workspace;
+			RenderSettings settings = new RenderSettings(
+					master.getRenderEngine().getDefaultRenderTarget(workspace));
 			BufferedImage img = master.getRenderEngine().renderImage(settings);
 			assert( img == null);
 		}catch( Exception e) {
@@ -208,9 +208,9 @@ public class Test1 {
 		Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", new Color(0,0,0,0))).getLayer();
 		
 		
-		
-		RenderSettings settings = new RenderSettings();
-		settings.workspace = workspace;
+
+		RenderSettings settings = new RenderSettings(
+				master.getRenderEngine().getDefaultRenderTarget(workspace));
 		BufferedImage img = master.getRenderEngine().renderImage(settings);
 		BufferedImage img2 = deepCopy(img);
 		
@@ -316,9 +316,9 @@ public class Test1 {
 			}
 			
 			workspace.relinquishCache(workspace.reserveCache());
-			
-			RenderSettings settings = new RenderSettings();
-			settings.workspace = workspace;
+
+			RenderSettings settings = new RenderSettings(
+					master.getRenderEngine().getDefaultRenderTarget(workspace));
 			master.getRenderEngine().renderImage(settings);
 			
 			master.closeWorkspace(workspace, false);

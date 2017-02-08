@@ -81,9 +81,8 @@ public class SimpleLayer extends Layer {
 		if( !canMerge(node)) return helper;
 
 		ImageWorkspace workspace = data.getContext();	// Non-null as per canMerge
-		RenderSettings settings = new RenderSettings();
-		settings.workspace = data.getContext();
-		settings.node = node;
+		RenderSettings settings = new RenderSettings(
+				workspace.getRenderEngine().getNodeRenderTarget(node));
 		BufferedImage image = workspace.getRenderEngine().renderImage(settings);
 		
 		Rectangle myBounds = new Rectangle( 0, 0, data.getWidth(), data.getHeight());

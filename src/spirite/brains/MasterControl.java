@@ -28,7 +28,6 @@ import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
 import spirite.image_data.GroupTree;
-import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
@@ -419,13 +418,8 @@ public class MasterControl
 	    			// Copies the current selected node to the Clipboard
 	    	    	GroupTree.Node node = currentWorkspace.getSelectedNode();
 	
-	    	    	RenderSettings settings = new RenderSettings();
-	    	    	settings.workspace = currentWorkspace;
-	    	    	if( node == null) return;
-	    	    	else if( node instanceof LayerNode) 
-	    	    		settings.layer = ((LayerNode) node).getLayer();
-	    	    	else if( node instanceof GroupNode)
-	    	    		settings.node = node;
+	    	    	RenderSettings settings = new RenderSettings(
+	    	    			renderEngine.getNodeRenderTarget(node));
 	
 	    	    	BufferedImage img = renderEngine.renderImage(settings);
 	    	    	TransferableImage transfer = new TransferableImage(img);
@@ -438,8 +432,9 @@ public class MasterControl
     			if( currentWorkspace == null) return;
     			
     			// Copies the current default render to the Clipboard
-    			RenderSettings settings = new RenderSettings();
-    			settings.workspace = currentWorkspace;
+    			RenderSettings settings = new RenderSettings(
+    					renderEngine.getDefaultRenderTarget(currentWorkspace));
+//    			settings.workspace = currentWorkspace;
     			
     			// Should be fine to send Clipboard an internal reference since once
     			//	rendered, the RenderEngine's cache should be immutable
@@ -683,8 +678,8 @@ public class MasterControl
     private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
     	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
     	
-    	RenderSettings settings = new RenderSettings();
-    	settings.workspace = workspace;
+    	RenderSettings settings = new RenderSettings(
+    			renderEngine.getDefaultRenderTarget(workspace));
     	BufferedImage bi = renderEngine.renderImage(settings);
     	
     	if( ext.equals("jpg") || ext.equals("jpeg")) {
