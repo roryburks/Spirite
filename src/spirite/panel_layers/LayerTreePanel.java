@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -695,36 +697,27 @@ public class LayerTreePanel extends ContentTree
 		class LTNPPanel extends JPanel {
 //			public ImageData image = null;
 			GroupTree.Node node = null;
+
+			LTNPPanel() {
+				this.setOpaque(false);
+			}
 			
 			@Override
 			public void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				UIUtil.drawTransparencyBG(g, null);
+				
 				
 				if( node != null) {
-					RenderSettings settings = new RenderSettings(
-							renderEngine.getNodeRenderTarget(node));
-					settings.width = getWidth();
-					settings.height = getHeight();
-					
-/*					if( node instanceof LayerNode)
-						settings.layer = ((LayerNode)node).getLayer();
-					else if( node instanceof GroupNode)
-						settings.node = (GroupNode)node;*/
-
-					RenderingHints newHints = new RenderingHints(
-				             RenderingHints.KEY_TEXT_ANTIALIASING,
-				             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-					newHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, 
-							RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-					newHints.put( RenderingHints.KEY_INTERPOLATION, 
-							RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-					
-					settings.hints = newHints;
-					
-
-					g.drawImage(renderEngine.renderImage(settings), 0, 0, null);
+					BufferedImage bi = renderEngine.accessThumbnail(node);
+					if( bi != null) {
+						UIUtil.drawTransparencyBG(g, new Rectangle( bi.getWidth(), bi.getHeight()));
+						g.drawImage(bi, 0, 0, null);
+					}
+					else 
+						UIUtil.drawTransparencyBG(g, null);
 				}
+				else 
+					UIUtil.drawTransparencyBG(g, null);
 			}
 			
 		}

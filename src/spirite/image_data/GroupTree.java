@@ -204,7 +204,7 @@ public class GroupTree {
 		}
 		
 		/** Creates a depth-first sequential list of all the Nodes in the tree. */
-		public List<Node> getAllNodes() {
+		public List<Node> getAllAncestors() {
 			// Could be implemented using getAllNodesST, but this is probably faster
 			List<Node> list = new ArrayList<>();
 			_gan_rec( root, list);

@@ -116,8 +116,8 @@ public class Test1 {
 		Node g1 = workspace.getRootNode();
 		Node g2 = ws2.getRootNode();
 		
-		List<Node> l1 = g1.getAllNodes();
-		List<Node> l2 = g2.getAllNodes();
+		List<Node> l1 = g1.getAllAncestors();
+		List<Node> l2 = g2.getAllAncestors();
 		
 		if( l1.size() != l2.size()) 
 			fail("Node desync." + l1.size() + "v s " + l2.size());
@@ -276,7 +276,7 @@ public class Test1 {
 	}
 	
 	public Node getRandomNode( ImageWorkspace workspace) {
-		List<Node> l = workspace.getRootNode().getAllNodes();
+		List<Node> l = workspace.getRootNode().getAllAncestors();
 		if( l.size() <= 0) return null;
 		return l.get( rn.nextInt(l.size()));
 	}

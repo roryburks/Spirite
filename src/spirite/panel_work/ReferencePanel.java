@@ -13,7 +13,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.ReferenceRenderTarget;
+import spirite.brains.RenderEngine.ReferenceRenderSource;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
@@ -57,7 +57,7 @@ public class ReferencePanel extends JPanel
         
         if( workspace != null) {
         	RenderSettings settings = new RenderSettings(
-        			new ReferenceRenderTarget(workspace,front));
+        			new ReferenceRenderSource(workspace,front));
         	
         	BufferedImage buffer = master.getRenderEngine().renderImage(settings);
             

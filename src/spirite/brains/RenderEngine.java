@@ -5,12 +5,14 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -51,24 +53,54 @@ public class RenderEngine
 {
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final CacheManager cacheManager;
+	private final Timer sweepTimer;
+	
+	//  ThumbnailManager needs access to MasterControl to keep track of all
+	//	workspaces that exist (easier and more reliable than hooking into Observers)
+	private final MasterControl master;
+	
+	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
 	
 	// Needs Master just to add it as a Workspace Observer
 	public RenderEngine( MasterControl master) {
+		this.master = master;
 		this.cacheManager = master.getCacheManager();
 		
-		if( master.getCurrentWorkspace() != null) {
-			ImageWorkspace ws = master.getCurrentWorkspace();
-			
-			if( ws != null) {
-				ws.addImageObserver( this);
-				ws.getReferenceManager().addReferenceObserve(this);
-			}
-		}
 		master.addWorkspaceObserver(this);
+		for( ImageWorkspace workspace : master.getWorkspaces()) {
+			workspace.addImageObserver( this);
+			workspace.getReferenceManager().addReferenceObserve(this);
+			
+		}
+		
+		sweepTimer = new Timer(3 * 1000 /*3 seconds*/,new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ageOutCache();
+				thumbnailManager.refreshThumbnailCache();
+			}
+		});
+		sweepTimer.start();
 	}
 	@Override
 	public String toString() {
 		return "Rendering Engine";
+	}
+	
+	/** Clears the cache of entries which haven't been used in a long time. */
+	public void ageOutCache() {
+
+		long currentTime = System.currentTimeMillis();
+		Iterator<Entry<RenderSettings,CachedImage>> it = imageCache.entrySet().iterator();
+		while( it.hasNext()) {
+			Entry<RenderSettings,CachedImage> entry = it.next();
+			
+			if( currentTime - entry.getValue().last_used > MAX_CACHE_RESERVE) {
+				MDebug.log("Aged Out Cache.");
+				entry.getValue().flush();
+				it.remove();
+			}
+		}
 	}
 	
 	public static abstract class Renderable {
@@ -171,8 +203,125 @@ public class RenderEngine
 		return c;
 	}
 
-	public enum ReferenceRender {
-		NULL, FRONT, BACK
+	public BufferedImage accessThumbnail( Node node) {
+		return thumbnailManager.accessThumbnail(node);
+	}
+	private final ThumbnailManager thumbnailManager = new ThumbnailManager();
+	public ThumbnailManager getThumbnailManager() {return thumbnailManager;}
+	/** 
+	 * The ThumbnailManager keeps track of rendering thumbnails, cacheing them and 
+	 * making sure they are not redrawn too often.	Outer classes can get the 
+	 * thumbnails using the RenderEngine.accessThumbnail method, but if they want
+	 * to change soemthing about the way Thumbnails are rendered, they will have
+	 * to access the Manager through the getThumbnailManager method.
+	 */
+	public class ThumbnailManager {
+		int thumbWidth = 32;
+		int thumbHeight = 32;
+		private ThumbnailManager(){}
+
+		private final Map<Node,Thumbnail> thumbnailMap = new HashMap<>();
+		
+		public BufferedImage accessThumbnail( Node node) {
+			Thumbnail thumb = thumbnailManager.thumbnailMap.get(node);
+			
+			if( thumb == null) {
+				return null;
+			}
+			return thumb.bi;
+		}
+
+		
+		/** Goes through each Node and check if there is an up-to-date thumbnail
+		 * of them, rendering a new one if there isn't. */
+		void refreshThumbnailCache() {
+			List<Node> allNodes = new ArrayList<>();
+			
+			for( ImageWorkspace workspace : master.getWorkspaces()) {
+				allNodes.addAll(workspace.getRootNode().getAllAncestors());
+			}
+			
+			// Remove all entries of nodes that no longer exist.
+			thumbnailMap.keySet().retainAll(allNodes);
+			
+			// Then go through and update all thumbnails
+			for(Node node : allNodes) {
+				Thumbnail thumb = thumbnailMap.get(node);
+				
+				if( thumb == null) {
+					thumb = new Thumbnail();
+					thumb.bi = renderThumbnail(node);
+					thumb.changed = false;
+					thumbnailMap.put(node, thumb);
+				}
+				else if( thumb.changed) {
+					thumb.bi.flush();
+					thumb.bi = renderThumbnail(node);
+					thumb.changed = false;
+				}
+			}
+		}
+		
+		private BufferedImage renderThumbnail( Node node) {
+
+			RenderingHints newHints = new RenderingHints(
+		             RenderingHints.KEY_TEXT_ANTIALIASING,
+		             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			newHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, 
+					RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+			newHints.put( RenderingHints.KEY_INTERPOLATION, 
+					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+			RenderSource rs = getNodeRenderTarget(node);
+			RenderSettings settings = new RenderSettings(rs);
+			settings.height = thumbHeight;
+			settings.width = thumbWidth;
+			settings.normalize();
+			return rs.render(settings);
+		}
+		
+		private class Thumbnail {
+			boolean changed = false;
+			BufferedImage bi;
+		}
+
+		public void imageChanged(ImageChangeEvent evt) {
+			List<ImageHandle> relevantData = evt.getChangedImages();
+			List<Node> changedNodes = evt.getChangedNodes();
+			
+			Iterator<Entry<Node,Thumbnail>> it = thumbnailMap.entrySet().iterator();
+			while( it.hasNext()) {
+				Entry<Node,Thumbnail> entry = it.next();
+				if( entry.getValue().changed) continue;
+				if( entry.getKey().getContext() != evt.getWorkspace()) continue;
+				
+				// Check to see if the thumbnail contains data that was changed
+				List<LayerNode> layerNodes = entry.getKey().getAllLayerNodes();
+				
+				for( LayerNode layerNode : layerNodes) {
+					if( !Collections.disjoint(relevantData, layerNode.getLayer().getImageDependencies())) {
+						entry.getValue().changed = true;
+						continue;
+					}
+				}
+				
+				// Or if the thumbnail contains nodes whose structural data has been changed
+				List<Node> nodeDependency = entry.getKey().getAllNodesST(new NodeValidator() {
+					@Override
+					public boolean isValid(Node node) {
+						return node.isVisible();
+					}
+					@Override
+					public boolean checkChildren(Node node) {
+						return node.isVisible();
+					}
+				});
+				if( !Collections.disjoint(changedNodes, nodeDependency)){
+					entry.getValue().changed = true;
+					continue;
+				}
+			}
+		}
 	}
 
 	/** RenderSettings define exactly what you want to be drawn and how. */
@@ -218,8 +367,8 @@ public class RenderEngine
 			return true;
 		}
 
-		final RenderTarget target ;
-		public RenderSettings( RenderTarget target) {
+		final RenderSource target ;
+		public RenderSettings( RenderSource target) {
 			if( target == null) 
 				throw new UnsupportedOperationException("Cannot render a null Target");
 			this.target = target;
@@ -253,19 +402,19 @@ public class RenderEngine
 		}
 	}
 	
-	public RenderTarget getDefaultRenderTarget( ImageWorkspace workspace) {
-		return new NodeRenderTarget(workspace.getRootNode());
+	public RenderSource getDefaultRenderTarget( ImageWorkspace workspace) {
+		return new NodeRenderSource(workspace.getRootNode());
 	}
-	public RenderTarget getNodeRenderTarget( Node node) {
+	public RenderSource getNodeRenderTarget( Node node) {
 		if( node instanceof LayerNode) {
-			return new LayerRenderTarget(node.getContext(),((LayerNode) node).getLayer());
+			return new LayerRenderSource(node.getContext(),((LayerNode) node).getLayer());
 		}
 		else
-			return new NodeRenderTarget((GroupNode) node);
+			return new NodeRenderSource((GroupNode) node);
 	}
-	public static abstract class RenderTarget {
+	public static abstract class RenderSource {
 		final ImageWorkspace workspace;
-		RenderTarget( ImageWorkspace workspace) {this.workspace = workspace;}
+		RenderSource( ImageWorkspace workspace) {this.workspace = workspace;}
 		public abstract int getDefaultWidth();
 		public abstract int getDefaultHeight();
 		public abstract List<ImageHandle> getImagesReliedOn();
@@ -286,7 +435,7 @@ public class RenderEngine
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			RenderTarget other = (RenderTarget) obj;
+			RenderSource other = (RenderSource) obj;
 			if (workspace == null) {
 				if (other.workspace != null)
 					return false;
@@ -302,16 +451,16 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	public class NodeRenderTarget extends RenderTarget {
+	public class NodeRenderSource extends RenderSource {
 		private final GroupNode root;
-		public NodeRenderTarget( GroupNode node) {
+		public NodeRenderSource( GroupNode node) {
 			super(node.getContext());
 			this.root = node;
 		}
 
 		public List<Node> getNodesReliedOn() {
 			List<Node> list =  new LinkedList<>();
-			list.addAll( root.getAllNodes());
+			list.addAll( root.getAllAncestors());
 			return list;
 		}
 
@@ -365,7 +514,7 @@ public class RenderEngine
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			NodeRenderTarget other = (NodeRenderTarget) obj;
+			NodeRenderSource other = (NodeRenderSource) obj;
 			if (root == null) {
 				if (other.root != null)
 					return false;
@@ -568,9 +717,9 @@ public class RenderEngine
 		}
 	}
 	
-	public static class ImageRenderTarget extends RenderTarget {
+	public static class ImageRenderSource extends RenderSource {
 		private final ImageHandle handle;
-		public ImageRenderTarget( ImageHandle handle) {
+		public ImageRenderSource( ImageHandle handle) {
 			super(handle.getContext());
 			this.handle = handle;
 		}
@@ -605,7 +754,7 @@ public class RenderEngine
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			ImageRenderTarget other = (ImageRenderTarget) obj;
+			ImageRenderSource other = (ImageRenderSource) obj;
 			if (handle == null) {
 				if (other.handle != null)
 					return false;
@@ -632,9 +781,9 @@ public class RenderEngine
 	}
 
 	
-	public static class LayerRenderTarget extends RenderTarget {
+	public static class LayerRenderSource extends RenderSource {
 		private final Layer layer;
-		public LayerRenderTarget( ImageWorkspace workspace, Layer layer) {
+		public LayerRenderSource( ImageWorkspace workspace, Layer layer) {
 			super(workspace);
 			this.layer = layer;
 		}
@@ -670,7 +819,7 @@ public class RenderEngine
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			LayerRenderTarget other = (LayerRenderTarget) obj;
+			LayerRenderSource other = (LayerRenderSource) obj;
 			if (layer == null) {
 				if (other.layer != null)
 					return false;
@@ -695,10 +844,10 @@ public class RenderEngine
 		}
 	}
 
-	public static class ReferenceRenderTarget extends RenderTarget {
+	public static class ReferenceRenderSource extends RenderSource {
 
 		private final boolean front;
-		public ReferenceRenderTarget( ImageWorkspace workspace, boolean front) {
+		public ReferenceRenderSource( ImageWorkspace workspace, boolean front) {
 			super(workspace);
 			this.front = front;
 		}
@@ -764,7 +913,7 @@ public class RenderEngine
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			ReferenceRenderTarget other = (ReferenceRenderTarget) obj;
+			ReferenceRenderSource other = (ReferenceRenderSource) obj;
 			if (front != other.front)
 				return false;
 			return true;
@@ -777,8 +926,6 @@ public class RenderEngine
 	public void imageChanged( ImageChangeEvent evt) {
 		// Remove all caches whose renderings would have been effected by this change
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
-	
-		try {
 		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 
 
@@ -789,7 +936,6 @@ public class RenderEngine
 		{
 			relevantDataSel.add(  evt.getWorkspace().buildActiveData().handle);
 		}
-		
 		while( it.hasNext()) {
 			Entry<RenderSettings,CachedImage> entry = it.next();
 			
@@ -805,7 +951,7 @@ public class RenderEngine
 				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
-				List<ImageHandle> dataInCommon = new LinkedList<>(setting.target.getImagesReliedOn());
+				List<ImageHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
 				dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
 				
 				List<Node> nodesInCommon = evt.getChangedNodes();
@@ -818,16 +964,7 @@ public class RenderEngine
 				}
 			}
 		}
-		} catch( ConcurrentModificationException e){
-			// TODO: Very Bad.  Have to figure out where the collision is coming from.
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					MDebug.log("ConcurrentModification when checking imageChange.");
-					imageCache.clear();
-				}
-			});
-		}
+		thumbnailManager.imageChanged(evt);
 	}
 	
 
@@ -869,7 +1006,7 @@ public class RenderEngine
 			Entry<RenderSettings,CachedImage> entry = it.next();
 			
 			RenderSettings setting = entry.getKey();
-			if( setting.target instanceof ReferenceRenderTarget) {
+			if( setting.target instanceof ReferenceRenderSource) {
 				// Flush the visual data from memory, then remove the entry
 				entry.getValue().flush();
 				it.remove();
