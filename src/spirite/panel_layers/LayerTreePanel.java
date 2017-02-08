@@ -258,7 +258,7 @@ public class LayerTreePanel extends ContentTree
 			_cfw_construcRecursively( node, root);
 		model.nodeStructureChanged(root);
 		
-		_cfw_setExpandedStateRecursively( (DefaultMutableTreeNode)model.getRoot());
+		_cfw_setExpandedState();
 		transferHandler.stopDragging();
 		finishBuilding();
 	}
@@ -275,26 +275,33 @@ public class LayerTreePanel extends ContentTree
 		tree_node.setAllowsChildren( group_node instanceof GroupTree.GroupNode);
 	}
 	@SuppressWarnings("unchecked")
-	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
-		for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
+	private void _cfw_setExpandedState() {
+		// A bit ugly, but the Tree Root is not an instance of GroupNode
+		//	(as resetting it every time the workspace is changed would far more cumbersome)
+		//	so the first step is done semi-manually
+		for( Enumeration<TreeNode> e = ((DefaultMutableTreeNode)model.getRoot()).children(); e.hasMoreElements();) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
 			_cfw_setExpandedStateRecursively( child);
 		}
+	}
+	@SuppressWarnings("unchecked")
+	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
+		GroupTree.Node node = (GroupTree.Node)tree_node.getUserObject();
+		if( node.isExpanded() ) {
+			System.out.println(node);
+			for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
+				_cfw_setExpandedStateRecursively( child);
+			}
+			TreePath path =  new TreePath(tree_node.getPath());
+			tree.expandPath(path);
+		}
+		else {}
 		
-		try {
-			GroupTree.Node node = (GroupTree.Node)tree_node.getUserObject();
-    		if( node.isExpanded() ) {
-    			TreePath path =  new TreePath(tree_node.getPath());
-    			tree.expandPath(path);
-    		}
-    		else {}
-    		
-    		if( node == workspace.getSelectedNode()) {
-    			TreePath path =  new TreePath(tree_node.getPath());
-    			tree.addSelectionPath(path);
-    		}
-    			
-		} catch( ClassCastException e) {}
+		if( node == workspace.getSelectedNode()) {
+			TreePath path =  new TreePath(tree_node.getPath());
+			tree.addSelectionPath(path);
+		}
 	}
 	
 	// :::: Calld by Parent's OmniContainer.onCleanup

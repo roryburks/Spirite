@@ -255,7 +255,8 @@ public class RenderEngine
 					thumbnailMap.put(node, thumb);
 				}
 				else if( thumb.changed) {
-					thumb.bi.flush();
+					if( thumb.bi != null)
+						thumb.bi.flush();
 					thumb.bi = renderThumbnail(node);
 					thumb.changed = false;
 				}
@@ -412,6 +413,19 @@ public class RenderEngine
 		else
 			return new NodeRenderSource((GroupNode) node);
 	}
+	
+	/**
+	 * A RenderSource corresponds to an object which can be rendered and it implements
+	 * everything needed to perform a Render using certain RenderSettings.
+	 *
+	 * Note: It is important that subclasses overload the equals and hashCode methods
+	 * of each RenderSource since the RenderEngine uses them to determine if you
+	 * are rendering the same thing as something that has already been rendered.
+	 * If you just go on the built-in uniqueness test and pass them through renderImage
+	 * then unless you are storing the RenderSource locally yourself (which is possible
+	 * and not harmful but defeats the purpose of RenderEngine), then RenderEngine 
+	 * will get clogged remembering different renders of the same image.
+	 */
 	public static abstract class RenderSource {
 		final ImageWorkspace workspace;
 		RenderSource( ImageWorkspace workspace) {this.workspace = workspace;}
@@ -447,7 +461,7 @@ public class RenderEngine
 	
 
 	/** 
-	 * This Class will draw the group as it's "intended" to be seen,
+	 * This Class will draw a group as it's "intended" to be seen,
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
@@ -717,6 +731,7 @@ public class RenderEngine
 		}
 	}
 	
+	/** This renders an Image rather plainly. */
 	public static class ImageRenderSource extends RenderSource {
 		private final ImageHandle handle;
 		public ImageRenderSource( ImageHandle handle) {
@@ -844,6 +859,8 @@ public class RenderEngine
 		}
 	}
 
+	/** This renders the Reference section, either the front section (the part placed
+	 * over the image) or the back section (the part placed behind). */
 	public static class ReferenceRenderSource extends RenderSource {
 
 		private final boolean front;
