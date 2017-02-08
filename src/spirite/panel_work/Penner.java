@@ -354,8 +354,6 @@ public class Penner
 						shiftMode = 2;
 				}
 				
-				System.out.println(shiftMode);
-				
 				if( shiftMode == 1)
 					dx = x;
 				if( shiftMode == 2)
