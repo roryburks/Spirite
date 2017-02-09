@@ -34,9 +34,9 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.image_data.UndoEngine.UndoableAction;
-import spirite.image_data.layers.RigLayer;
-import spirite.image_data.layers.RigLayer.Part;
-import spirite.image_data.layers.RigLayer.RigStructureObserver;
+import spirite.image_data.layers.SpriteLayer;
+import spirite.image_data.layers.SpriteLayer.Part;
+import spirite.image_data.layers.SpriteLayer.RigStructureObserver;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
 import spirite.ui.components.SliderPanel;
@@ -58,7 +58,7 @@ public class RigPanel extends OmniComponent
 	
 	private final MasterControl master;
 	private ImageWorkspace workspace;
-	private RigLayer rig;
+	private SpriteLayer rig;
 	
 	public RigPanel( MasterControl master) {
 		this.master = master;
@@ -80,7 +80,7 @@ public class RigPanel extends OmniComponent
 	
 	private final ListCellRenderer<Part> renderer = new RigCellRender();
 			
-	class RigCellRender implements ListCellRenderer<RigLayer.Part> {
+	class RigCellRender implements ListCellRenderer<SpriteLayer.Part> {
 		private JPanel renderPanel = new JPanel();
 		private JLabel label = new JLabel();
 		private Color bgColor = new Color( 255,255,255);
@@ -232,7 +232,7 @@ public class RigPanel extends OmniComponent
 	}
 	
 	
-	private void setRig( RigLayer setTo) {
+	private void setRig( SpriteLayer setTo) {
 		if( rig != null) 
 			rig.removeRigObserver(this);
 		
@@ -341,8 +341,8 @@ public class RigPanel extends OmniComponent
 //		System.out.println("SELECT");
 		if( newSelection instanceof LayerNode) {
 			LayerNode ln = (LayerNode)newSelection;
-			if( ln.getLayer() instanceof RigLayer) {
-				setRig( (RigLayer)ln.getLayer());
+			if( ln.getLayer() instanceof SpriteLayer) {
+				setRig( (SpriteLayer)ln.getLayer());
 				return;
 			}
 		}

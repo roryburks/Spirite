@@ -32,7 +32,8 @@ public class ToolsetManager
 		CROP("Cropper"),
 		COMPOSER("Rig Composer"),
 		FLIPPER("Horizontal/Vertical Flipping"),
-		RESHAPER("Reshaping Tool");
+		RESHAPER("Reshaping Tool"),
+		ORIGIN("Origin Tool");
 		
 		public final String description;
 		Tool( String name){ this.description = name;}

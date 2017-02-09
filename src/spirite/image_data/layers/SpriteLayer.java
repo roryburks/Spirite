@@ -29,26 +29,24 @@ import spirite.image_data.UndoEngine.UndoableAction;
 
 
 /**
- * A Rig is composed of multiple Images arranged in parts, each part having an 
- * offset and possibly more.
  * 
  * 
  * @author Rory Burks
  *
  */
-public class RigLayer extends Layer
+public class SpriteLayer extends Layer
 {
 	private final ArrayList<Part> parts = new ArrayList<>();
 	private Part active = null;
 	private ImageWorkspace context;
 	
-	public RigLayer( ImageHandle handle) {
+	public SpriteLayer( ImageHandle handle) {
 		context = handle.getContext();
 		active = new Part(handle, "Base");
 		parts.add( active);
 	}
 	
-	public RigLayer( List<Part> parts) {
+	public SpriteLayer( List<Part> parts) {
 		this.parts.addAll(parts);
 		
 		if( !this.parts.isEmpty())
@@ -362,8 +360,8 @@ public class RigLayer extends Layer
 	@Override
 	public LayerActionHelper merge(Node node, int x, int y) {
 		Layer layer = ((LayerNode)node).getLayer();
-		if( layer instanceof RigLayer) {
-			RigLayer other = (RigLayer)layer;
+		if( layer instanceof SpriteLayer) {
+			SpriteLayer other = (SpriteLayer)layer;
 	
 			// TODO:
 //			Merge
@@ -399,7 +397,7 @@ public class RigLayer extends Layer
 				part.alpha
 			));
 		}
-		return new RigLayer( dupeParts);
+		return new SpriteLayer( dupeParts);
 	}
 	
 

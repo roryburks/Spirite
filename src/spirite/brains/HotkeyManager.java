@@ -33,7 +33,7 @@ public class HotkeyManager {
     private final BidiMap<Hotkey,String> hotkey_map;
 
     HotkeyManager() {
-        prefs = Preferences.userNodeForPackage(spirite.Main.class);
+        prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
         hotkey_map = new DualHashBidiMap<>();
 
         loadHotkeys(

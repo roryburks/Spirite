@@ -30,8 +30,8 @@ import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.RigLayer;
-import spirite.image_data.layers.RigLayer.Part;
+import spirite.image_data.layers.SpriteLayer;
+import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.image_data.layers.SimpleLayer;
 
 /***
@@ -355,7 +355,7 @@ public class LoadEngine {
 					}
 					
 					
-					RigLayer rig = new RigLayer( parts);
+					SpriteLayer rig = new SpriteLayer( parts);
 					node = helper.workspace.addShellLayer(nodeLayer[depth-1], rig, name);
 					break;}
 				}

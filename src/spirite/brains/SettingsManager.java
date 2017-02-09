@@ -26,11 +26,12 @@ public class SettingsManager {
 	private boolean lastUsedWorkspace = true;
 	
 	public SettingsManager() {
-        prefs = Preferences.userNodeForPackage(spirite.Main.class);
+        prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
         
         workspaceFilePath = new File( prefs.get("wsPath", "E:/Documents/Workspace/Spirite/SIF"));
         imageFilePath = new File(prefs.get("imgPath", System.getProperty("user.dir")));
         
+//        drawOrigin = prefs.getBoolean("drawOrigin", arg1)
 	}
 	
 	// Palette Saving/Loading: 
@@ -112,5 +113,13 @@ public class SettingsManager {
     
     public boolean getAllowsEdittingInvisible() {
     	return false;
+    }
+    
+    private boolean drawOrigin;
+    public boolean drawsOrigin() {
+    	return drawOrigin;
+    }
+    public void setDrawsOrigin( boolean drawOrigin) {
+    	this.drawOrigin = drawOrigin;
     }
 }

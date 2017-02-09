@@ -34,7 +34,7 @@ import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.RigLayer;
+import spirite.image_data.layers.SpriteLayer;
 
 /**
  * @author Guy
@@ -79,7 +79,7 @@ public class Test1 {
 		workspace.addNewSimpleLayer(null, 50, 900, "Namex", new Color(50,50,50));
 		{
 			LayerNode lnode = workspace.addNewRigLayer(null, 50, 50, "Rig", new Color(0,0,0,0));
-			RigLayer rig = (RigLayer)lnode.getLayer();
+			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
 			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_INT_ARGB);

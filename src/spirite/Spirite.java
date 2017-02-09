@@ -18,7 +18,7 @@ import spirite.ui.FrameManager;
  * 
  * TODO: Make all Observers weak-referenced.
  */
-public class Main{
+public class Spirite{
     
     public static MasterControl master;
 

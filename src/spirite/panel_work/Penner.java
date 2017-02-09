@@ -38,8 +38,8 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
-import spirite.image_data.layers.RigLayer;
-import spirite.image_data.layers.RigLayer.Part;
+import spirite.image_data.layers.SpriteLayer;
+import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.panel_work.WorkPanel.Zoomer;
 
 /***
@@ -229,11 +229,11 @@ public class Penner
 			case COMPOSER:
 				Node node = workspace.getSelectedNode();
 				if( !(node instanceof LayerNode)
-					|| (!(((LayerNode)node).getLayer() instanceof RigLayer))) 
+					|| (!(((LayerNode)node).getLayer() instanceof SpriteLayer))) 
 					break;
 				
-				RigLayer rig = (RigLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
-				RigLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
+				SpriteLayer rig = (SpriteLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
+				SpriteLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
 				
 				if( part == null) part = rig.getActivePart();
 				
@@ -321,16 +321,16 @@ public class Penner
 	}
 	
 	abstract class StrokeBehavior extends StateBehavior {
-		int shiftX = x;
-		int shiftY = y;
+		int shiftX = rawX;
+		int shiftY = rawY;
 		int dx = x;
 		int dy = y;
 		private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
 		
 		public void startStroke (StrokeParams stroke) {
 			if( workspace != null && workspace.buildActiveData() != null) {
-				shiftX = x;
-				shiftY = y;
+				shiftX = rawX;
+				shiftY = rawY;
 				BuiltImageData data = workspace.buildActiveData();
 				GroupTree.Node node = workspace.getSelectedNode();
 				
@@ -344,13 +344,13 @@ public class Penner
 			if( holdingShift) {
 				if( shiftMode == -1) {
 					shiftMode = 0;
-					shiftX = x;
-					shiftY = y;
+					shiftX = rawX;
+					shiftY = rawY;
 				}
 				if( shiftMode == 0) {
-					if( Math.abs(shiftX - x) > 10)
+					if( Math.abs(shiftX - rawX) > 10)
 						shiftMode = 1;
-					else if( Math.abs(shiftY - y) > 10)
+					else if( Math.abs(shiftY - rawY) > 10)
 						shiftMode = 2;
 				}
 				
@@ -481,9 +481,9 @@ public class Penner
 		}
 	}
 	class MovingRigPart extends StateBehavior {
-		private final RigLayer rig;
+		private final SpriteLayer rig;
 		private final Part part;
-		MovingRigPart( RigLayer rig, Part part) {
+		MovingRigPart( SpriteLayer rig, Part part) {
 			this.rig = rig;
 			this.part = part;
 		}

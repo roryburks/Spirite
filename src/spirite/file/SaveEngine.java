@@ -32,8 +32,8 @@ import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.RigLayer;
-import spirite.image_data.layers.RigLayer.Part;
+import spirite.image_data.layers.SpriteLayer;
+import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.image_data.layers.SimpleLayer;
 
 /***
@@ -257,8 +257,8 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				// [4] : ID of ImageData linked to this LayerNode
 				helper.ra.writeInt( data.getID());
 			}
-			if( layer instanceof RigLayer) {
-				RigLayer rig = (RigLayer)layer;
+			if( layer instanceof SpriteLayer) {
+				SpriteLayer rig = (SpriteLayer)layer;
 				List<Part> parts = rig.getParts();
 				
 				

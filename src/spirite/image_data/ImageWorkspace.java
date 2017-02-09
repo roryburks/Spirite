@@ -43,7 +43,7 @@ import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.Layer.LayerActionHelper;
-import spirite.image_data.layers.RigLayer;
+import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SimpleLayer;
 
 
@@ -937,7 +937,7 @@ public class ImageWorkspace {
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
         
-		LayerNode node = groupTree.new LayerNode( new RigLayer(handle), name);
+		LayerNode node = groupTree.new LayerNode( new SpriteLayer(handle), name);
 		_addLayer(node,context);
 		
 		return node;
