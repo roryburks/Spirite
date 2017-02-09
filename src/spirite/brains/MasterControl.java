@@ -591,6 +591,8 @@ public class MasterControl
 								layer.getActiveData().handle.deepAccess(),
 								1, 
 								false);
+						rect.x += node.getOffsetX();
+						rect.y += node.getOffsetY();
 						workspace.cropNode((LayerNode) node, rect, true);
 					} catch (UnsupportedDataTypeException e) {
 						e.printStackTrace();

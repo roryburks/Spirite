@@ -209,7 +209,9 @@ public class MUtil {
 	 * 		UnsupportedDataTypeException if the ColorModel does not conform
 	 * 		to the a supported format
 	 */
-	public static Rectangle findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) throws UnsupportedDataTypeException {
+	public static Rectangle findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) 
+			throws UnsupportedDataTypeException 
+	{
 		_ImageCropHelper data = new _ImageCropHelper(image);
 		int x1 =0, y1=0, x2=0, y2=0;
 				
@@ -234,9 +236,6 @@ public class MUtil {
 		
 		if(transparentOnly && ((data.bgcolor >>> 24) & 0xFF) != 0) 
 			return new Rectangle(0,0,data.w,data.h);
-		
-		// Find Left-most 
-		IntCounter c = new IntCounter( 0, data.w-1);
 
 		int ret;
 		
@@ -267,31 +266,19 @@ public class MUtil {
 	private static class _ImageCropHelper {
 		final int w;
 		final int h;
-		final boolean hcheck[];
-		final boolean vcheck[];
 		final int pixels[];
 		int bgcolor;
-		
-		private boolean transpose = false;
 		
 		_ImageCropHelper( BufferedImage image ) {
 			this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 			this.w = image.getWidth();
 			this.h = image.getHeight();
-			this.hcheck = new boolean[w];
-			this.vcheck = new boolean[h];
 		}
 		
 		// Sanity checks would be inefficient, let's just assume everything
 		//	works correctly because it's already been tested.
-		boolean compare( int x1, int y1, int x2, int y2) {
-			int i1 = x1 + y1*w;
-			int i2 = x2 + y2*w;
-			return (pixels[i1] == pixels[i2]);
-		}
 		boolean verify( int x, int y) {
-			int i = (transpose)?(y+x*w):(x + y*w);
-			return (pixels[i] == bgcolor);
+			return (pixels[x + y*w] == bgcolor);
 		}
 		
 		// Kind of Ugly code in here, but it's a bit much to copy all that
@@ -301,38 +288,17 @@ public class MUtil {
 		 * @return true if the line contains only BG data
 		 */
 		private boolean lineIsEmpty( int num, boolean row) {
-			Queue<Integer> queue = new LinkedList<Integer>();
-
-			try {
-				if( row) {
-					queue.add(MUtil.packInt(w,0));
-					transpose = false;
+			if( row) {
+				for(int x=0; x < w; ++x) {
+					if( !verify(x,num))return false;
 				}
-				else {
-					queue.add(MUtil.packInt(h,0));
-					transpose = true;
-				}
-				if(!verify( 0, num))
-					return false;
-				while( !queue.isEmpty()) {
-					int p = queue.poll();
-					int hi = high16(p);
-					int lo = low16(p);
-					
-					int n = (hi + lo) / 2;
-					
-					
-					if( !verify( n, num))
-						return false;
-
-					if( hi-n > 1) queue.add(packInt(hi,n));
-					if( n-lo > 1) queue.add(packInt(n,lo));
-				}
-				
-				return true;
-			}finally {
-				transpose = false;
 			}
+			else {
+				for(int y=0; y < h; ++y) {
+					if( !verify(num, y))return false;
+				}
+			}
+			return true;
 		}
 		boolean rowIsEmpty( int rownum) {
 			return lineIsEmpty(rownum, true);
@@ -345,42 +311,11 @@ public class MUtil {
 			int size = data.length();
 			if( size == 0) return -1;
 			
-			int rightmostFree = -1;
-			int leftmostBlocked = Integer.MAX_VALUE;
-			
-			Queue<Integer> queue = new LinkedList<>();
-			queue.add( MUtil.packInt(size,0));
-			
-			boolean zeroth = lineIsEmpty(data.get(0), row);
-			
-			if( !zeroth) return -1;
-			
-			while( !queue.isEmpty()) {
-				int p = queue.poll();
-				int hi = MUtil.high16(p);
-				int lo = MUtil.low16(p);
-				 
-				int n = (hi + lo) / 2;
-				
-				if( lineIsEmpty(data.get(n), row)) {
-					if( n < leftmostBlocked && n > rightmostFree)
-						rightmostFree = n;
-					
-					if( hi-n > 1) queue.add(MUtil.packInt(hi,n));
-				}
-				else if( n < leftmostBlocked) {
-					leftmostBlocked = n;
-					if( rightmostFree > leftmostBlocked)
-						rightmostFree = -1;
-				}
-				if( n-lo > 1) queue.add( MUtil.packInt(n,lo));
+			for( int i=0; i < size; ++i) {
+				if( !lineIsEmpty(data.get(i), row))
+					return i;
 			}
-			
-			
-			//The only way you could be at this point is if the zeroth
-			//	row is free (otherwise it'd return -1), so the rightmostFree
-			//	must at least be 0.
-			return (rightmostFree == -1) ? 0 : rightmostFree;
+			return -1;
 		}
 	}
 	
