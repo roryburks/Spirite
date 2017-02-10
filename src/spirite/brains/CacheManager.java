@@ -121,6 +121,13 @@ public class CacheManager {
 			return data;
 		}
 		
+		public void replace( BufferedImage bi) {
+			data.flush();
+			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+			data = bi;
+			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+		}
+		
 		public void flush() {
 			
 			// TODO: Figure out why this is necessary (it probably shouldn't be)

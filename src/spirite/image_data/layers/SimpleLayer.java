@@ -10,7 +10,7 @@ import java.util.List;
 import spirite.MUtil;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.RenderEngine.RenderSettings;
-import spirite.brains.RenderEngine.Renderable;
+import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
@@ -114,16 +114,12 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public List<Renderable> getDrawList() {
-		Renderable renderable = new Renderable() {
-			@Override
-			public void draw(Graphics g) {
-				SimpleLayer.this.draw(g);
-			}
-		};
+	public List<TransformedHandle> getDrawList() {
+		TransformedHandle renderable = new TransformedHandle();
+		renderable.handle = data;
 		renderable.depth = 0;
 		
-		return Arrays.asList( new Renderable[]{renderable});
+		return Arrays.asList( new TransformedHandle[]{renderable});
 	}
 
 	@Override

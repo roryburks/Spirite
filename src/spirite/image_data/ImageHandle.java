@@ -1,5 +1,7 @@
 package spirite.image_data;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -7,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
-import spirite.brains.CacheManager.CachedImage;
+import spirite.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.InternalImage;
 
@@ -25,7 +27,6 @@ public class ImageHandle {
 	ImageWorkspace context;
 	
 	int id = -1;
-	boolean locked = false;	// Mostly unused for now
 	
 	// ImageWorkspace.getData should have constant-time access (being implemented
 	//	with a HashTable, so there's probably no point to remember the
@@ -66,7 +67,26 @@ public class ImageHandle {
 		if( context == null) return null;
 		return context.getData(id).cachedImage.access();
 	}
+
+	public void drawLayer(Graphics g, AffineTransform transform, Composite composite) {
+		Graphics2D g2 = (Graphics2D)g;
+		Composite c = g2.getComposite();
+		
+		if( composite != null) {
+			if( composite instanceof AlphaComposite && c instanceof AlphaComposite) {
 	
+				g2.setComposite( AlphaComposite.getInstance(
+						AlphaComposite.SRC_OVER, 
+						((AlphaComposite)composite).getAlpha()*
+						((AlphaComposite)c).getAlpha()));
+			}
+			else
+				g2.setComposite(composite);
+		}
+		drawLayer(g,transform);
+		
+		g2.setComposite(c);
+	}
 	public void drawLayer(Graphics g, AffineTransform transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
@@ -80,6 +100,10 @@ public class ImageHandle {
 		AffineTransform prev= g2.getTransform();
 		if (transform == null)
 			transform = new AffineTransform();
+		if( ii instanceof DynamicInternalImage) {
+			transform.translate(
+					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
+		}
 		
 		if( context.getRenderEngine().getCompositeLayer(this) == null) {
 			g2.transform(transform);
@@ -87,7 +111,8 @@ public class ImageHandle {
 			g2.setTransform(prev);
 		}
 		else {
-			if( ii.isDynamic) {
+			if( ii instanceof DynamicInternalImage) {
+				g2.setTransform(new AffineTransform());
 				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
 			}
 			else {

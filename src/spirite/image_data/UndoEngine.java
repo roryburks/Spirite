@@ -20,7 +20,9 @@ import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
+import spirite.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.image_data.ImageWorkspace.InternalImage;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -542,12 +544,20 @@ public class UndoEngine {
 		private class KeyframeAction extends ImageAction {
 			CachedImage frameCache;
 			ImageAction hiddenAction;
+			private final int ii_ox, ii_oy;
 			boolean freed = false;
 			KeyframeAction( CachedImage frame, ImageAction action) {
 				super(workspace.new BuiltImageData(image));
 				this.frameCache = frame;
 				this.hiddenAction = action;
 				frameCache.reserve(this);
+				
+
+				InternalImage ii = workspace.getData(image.id);
+				if( ii instanceof DynamicInternalImage) {
+					ii_ox = ((DynamicInternalImage) ii).ox;
+					ii_oy = ((DynamicInternalImage) ii).oy;
+				} else {ii_ox=0;ii_oy=0;}
 			}
 			@Override 
 			public void performAction() {
@@ -566,8 +576,27 @@ public class UndoEngine {
 			}
 			@Override
 			public void performImageAction() {
-				resetToKeyframe(frameCache);
+
+				InternalImage ii = workspace.getData(image.id);
+				if( ii instanceof DynamicInternalImage) {
+					((DynamicInternalImage) ii).ox  = ii_ox;
+					((DynamicInternalImage) ii).oy  = ii_oy;
+					workspace._replaceIamge(image, cacheManager.cacheImage(frameCache.access(), workspace));
+				} 
+				else {
+					BuiltImageData built = workspace.new BuiltImageData(image);
+					BufferedImage bi = built.checkoutRaw();
+					Graphics g = bi.getGraphics();
+					Graphics2D g2 = (Graphics2D)g;
+					Composite c = g2.getComposite();
+					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
+					g2.drawImage( frameCache.access(), 0, 0,  null);
+					g2.setComposite( c);
+					g2.dispose();
+					built.checkin();
+				}
 			}
+
 			
 			@Override
 			protected void onDispatch() {
@@ -641,18 +670,6 @@ public class UndoEngine {
 			}
 		}
 		
-		private void resetToKeyframe( CachedImage frame) {
-			BuiltImageData built = workspace.new BuiltImageData(image);
-			BufferedImage bi = built.checkoutRaw();
-			Graphics g = bi.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
-			Composite c = g2.getComposite();
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-			g2.drawImage( frame.access(), 0, 0,  null);
-			g2.setComposite( c);
-			g2.dispose();
-			built.checkin();
-		}
 		
 		@Override
 		protected void addAction( UndoableAction action) {

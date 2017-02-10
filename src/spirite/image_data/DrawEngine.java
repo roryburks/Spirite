@@ -307,7 +307,6 @@ public class DrawEngine {
 		 */
 		public synchronized boolean stepStroke( PenState ps) {
 			Point layerSpace = data.convert( new Point( ps.x, ps.y));
-			System.out.println(layerSpace.x + "," + layerSpace.y);
 			newState.x = layerSpace.x;
 			newState.y = layerSpace.y;
 			newState.pressure = ps.pressure;

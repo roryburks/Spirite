@@ -1,5 +1,6 @@
 package spirite.image_data;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -8,9 +9,11 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -21,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.Globals;
@@ -71,15 +75,21 @@ public class ImageWorkspace {
 	
 	class InternalImage {
 		CachedImage cachedImage;
-		boolean isDynamic = false;
 		InternalImage( CachedImage ci) { this.cachedImage = ci;}
 		
 		int getWidth() {
-			return (isDynamic) ? width : cachedImage.access().getWidth();
+			return cachedImage.access().getWidth();
 		}
 		int getHeight() {
-			return (isDynamic) ? height : cachedImage.access().getHeight();
+			return cachedImage.access().getHeight();
 		}
+	}
+	class DynamicInternalImage extends InternalImage {
+		int ox, oy;
+		DynamicInternalImage(CachedImage ci) {
+			super(ci);
+		}
+		
 	}
 	
 	private boolean isValidHandle(ImageHandle handle) {
@@ -319,8 +329,8 @@ public class ImageWorkspace {
 	 */
 	public class BuiltImageData {
 		public final ImageHandle handle;
-		private final int ox;
-		private final int oy;
+		final int ox;
+		final int oy;
 
 		private BufferedImage working = null;
 		private Graphics g = null;
@@ -386,8 +396,6 @@ public class ImageWorkspace {
 		 * !!! When done modifying the image always call checkout. !!!
 		 */
 		public BufferedImage checkoutRaw() {
-			InternalImage internal = imageData.get(handle.id);
-			
 			return _checkoutImage(handle);
 		}
 		
@@ -399,7 +407,6 @@ public class ImageWorkspace {
 		 * correctly
 		 */
 		public void checkin() {
-			InternalImage internal = imageData.get(handle.id);
 			if( g == null)	{// Should only happen if it was a raw checkout.
 				_checkinImage(handle);
 			}
@@ -440,8 +447,12 @@ public class ImageWorkspace {
 	}
 	
 	public class DynamicImageData extends BuiltImageData{
-		public DynamicImageData(ImageHandle handle, int ox, int oy) {
+		private final DynamicInternalImage dii;
+		public DynamicImageData(ImageHandle handle, int ox, int oy,
+				DynamicInternalImage dii) 
+		{
 			super(handle, ox, oy);
+			this.dii = dii;
 		}
 		
 		@Override public int getWidth() {
@@ -452,6 +463,7 @@ public class ImageWorkspace {
 		}
 		@Override public Point convert(Point p) {
 			return p;
+//			return new Point(p.x + dii.ox, p.y + dii.oy);
 		}
 		@Override
 		public void drawBorder(Graphics g) {
@@ -460,11 +472,79 @@ public class ImageWorkspace {
 		}
 		@Override
 		public AffineTransform getTransform() {
-			return new AffineTransform();
+			AffineTransform tf = new AffineTransform();
+//			tf.translate( dii.ox,dii.oy);
+			return tf;
 		}
 		@Override
 		public AffineTransform getDrawTransform() {
 			return new AffineTransform();
+		}
+		@Override
+		public void draw(Graphics g) {
+
+			Graphics2D g2 = (Graphics2D)g;
+			
+			AffineTransform transform = new AffineTransform();			
+			transform.translate(ox,oy);
+			handle.drawLayer(g2, transform);
+		}
+		
+		Rectangle activeRect = null;
+		BufferedImage buffer = null;
+		Graphics g = null;
+		@Override
+		public Graphics checkout() {
+			g = checkoutRaw().getGraphics();
+			return g;
+		}
+		@Override
+		public BufferedImage checkoutRaw() {
+			undoEngine.prepareContext(handle);
+			buffer = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
+			Graphics gr = buffer.getGraphics();
+			gr.drawImage(this.handle.deepAccess(),
+					ox+dii.ox, 
+					oy+dii.oy, null);
+			gr.dispose();
+			return buffer;
+		}
+		@Override
+		public void checkin() {
+			activeRect = (new Rectangle(0,0,width,height)).union(
+					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
+
+			BufferedImage bi = new BufferedImage( 
+					activeRect.width, activeRect.height,BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+
+			// Draw the part of the old image over the new one
+			g2.drawImage(this.handle.deepAccess(),
+					ox+dii.ox - activeRect.x, 
+					oy+dii.oy- activeRect.y, null);
+
+			// Clear the section of the old image that will be replaced by the new one
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
+			g2.drawImage(buffer, -activeRect.x, -activeRect.y, null);
+
+			imageData.get(handle.id).cachedImage.replace(bi);
+			
+			buffer = null;
+			if( g != null)g.dispose();
+			g = null;
+			
+			System.out.println(activeRect + ":" + ox + "," + oy);
+
+			dii.ox = activeRect.x - ox;
+			dii.oy = activeRect.y - oy;
+			activeRect = null;
+			
+
+			// Construct ImageChangeEvent and send it
+			ImageChangeEvent evt = new ImageChangeEvent();
+			evt.dataChanged.add(handle);
+			evt.workspace = ImageWorkspace.this;
+			triggerImageRefresh( evt);
 		}
 	}
 
@@ -508,12 +588,16 @@ public class ImageWorkspace {
 	public BuiltImageData buildData( LayerNode node) {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		BuildingImageData data = node.getLayer().getActiveData();
-
-		if( imageData.get(data.handle.id) == null || !(imageData.get(data.handle.id).isDynamic)) {
-			return new BuiltImageData( data.handle,
-				data.ox + node.x, data.oy + node.y);
-		}
-		return new DynamicImageData(data.handle,
+		
+		if( data == null) return null;
+		
+		InternalImage ii = imageData.get(data.handle.id);
+		if( ii == null) return null;
+		
+		if( ii instanceof DynamicInternalImage)		
+			return new DynamicImageData(data.handle,
+				data.ox + node.x, data.oy + node.y, (DynamicInternalImage) ii);
+		else return new BuiltImageData( data.handle,
 				data.ox + node.x, data.oy + node.y);
 	}
 	
@@ -550,27 +634,20 @@ public class ImageWorkspace {
 	
 	
 	// :::: Image Checkout
+	boolean locked = false;
 	private BufferedImage _checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
 			return null;
 		
+		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
+		locked = true;
 		undoEngine.prepareContext(image);
 		
-		// !!! TODO: Strict image locking and unlocking seems like too much trouble.
-		//	BufferedImages are buffered so you don't have to worry too much about
-		//	that, but all the same I should have some way to keep track of what
-		//	objects have images checked out so that they are checked in eventually
-		//	and that they terminate correctly if the image were to be unloaded.
-		
-		InternalImage internalImage = imageData.get(image.id);
-		if( internalImage.isDynamic) {
-			
-		}
-		
-		return internalImage.cachedImage.access();
+		return imageData.get(image.id).cachedImage.access();
 	}
 	
 	private void _checkinImage( ImageHandle handle) {
+		locked = false;
 		if( !isValidHandle(handle))
 			return;
 
@@ -916,8 +993,7 @@ public class ImageWorkspace {
         g.fillRect( 0, 0, w, h);
         g.dispose();
         
-        InternalImage internal = new InternalImage(ci);
-        internal.isDynamic = true;
+        InternalImage internal = new DynamicInternalImage(ci);
         imageData.put(workingID, internal);
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);

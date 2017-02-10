@@ -103,10 +103,12 @@ public class RenderEngine
 		}
 	}
 	
-	public static abstract class Renderable {
-		private int subDepth;
+	public static class TransformedHandle {
 		public int depth;
-		public abstract void draw( Graphics g);
+		public Composite comp = null;
+		public AffineTransform trans = new AffineTransform();
+		public ImageHandle handle;
+//		public abstract void draw( Graphics g);
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -156,38 +158,32 @@ public class RenderEngine
 	private void buildCompositeLayer(ImageWorkspace workspace) {
 		BuiltImageData dataContext= workspace.buildActiveData();
 		if( dataContext != null) {
-			if( workspace.getSelectionEngine().getLiftedImage() != null ){
+			BufferedImage bi = null;
+			Graphics2D g2;
+			if( workspace.getSelectionEngine().getLiftedImage() != null 
+				||  workspace.getDrawEngine().strokeIsDrawing()) {
 
-				compositionImage= new BufferedImage( 
+				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
 						BufferedImage.TYPE_INT_ARGB);
-				MUtil.clearImage(compositionImage);
+				
+				g2 = (Graphics2D)bi.getGraphics();
+				dataContext.draw(g2);
+			
+				
+				if( workspace.getSelectionEngine().getLiftedImage() != null ){
+					g2.setTransform( dataContext.getTransform());
+					g2.transform(workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
+					
+					g2.drawImage( workspace.getSelectionEngine().getLiftedImage().access(), 0, 0, null);
+					g2.dispose();
+				}
+				if( workspace.getDrawEngine().strokeIsDrawing()) {
+					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(g2);
+					g2.dispose();
+				}
 				compositionContext = dataContext.handle;
-				
-				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();
-				g2.drawImage(dataContext.handle.deepAccess(), 0, 0, null);
-				g2.setTransform( dataContext.getTransform());
-				g2.transform(workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
-				
-				g2.drawImage( workspace.getSelectionEngine().getLiftedImage().access(), 0, 0, null);
-				g2.dispose();
-			}
-			if( workspace.getDrawEngine().strokeIsDrawing()) {
-				if( compositionImage == null) {
-					compositionImage= new BufferedImage( 
-							dataContext.getWidth(), dataContext.getHeight(),
-							BufferedImage.TYPE_INT_ARGB);
-					MUtil.clearImage(compositionImage);
-					compositionContext = dataContext.handle;
-				}
-				else {
-//					MDebug.log("Probably shouldn't have lifted data and stroke engine at the same time");
-				}
-				
-				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();
-				g2.drawImage(dataContext.handle.deepAccess(), 0, 0, null);
-				workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(g2);
-				g2.dispose();
+				compositionImage = bi;
 			}
 		}
 	}
@@ -625,7 +621,7 @@ public class RenderEngine
 			
 			
 			ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
-			List< Renderable> renderList = new ArrayList<>();
+			List< Drawable> renderList = new ArrayList<>();
 			while( it.hasPrevious()) {
 				Node child = it.previous();
 				if( child.isVisible()) {
@@ -636,17 +632,17 @@ public class RenderEngine
 							continue;
 						}
 						
-						Renderable renderable;
+						Drawable renderable;
 						renderable =  new GroupRenderable(
 								(GroupNode) child, n, settings);
 						renderable.subDepth = count++;
 						renderList.add(renderable);
 					}
 					else {
-						List<Renderable> sub = ((LayerNode)child).getLayer().getDrawList();
+						List<TransformedHandle> sub = ((LayerNode)child).getLayer().getDrawList();
 						
-						for( Renderable subRend : sub) {
-							Renderable renderable = new TransformedRenderable(
+						for( TransformedHandle subRend : sub) {
+							Drawable renderable = new TransformedRenderable(
 									(LayerNode) child, subRend, settings);
 							renderable.subDepth = count++;
 							renderList.add(renderable );
@@ -656,9 +652,9 @@ public class RenderEngine
 			}
 			
 			// Step 2: Sort the list by depth then subdepth, increasing.
-			renderList.sort( new Comparator<Renderable>() {
+			renderList.sort( new Comparator<Drawable>() {
 				@Override
-				public int compare(Renderable o1, Renderable o2) {
+				public int compare(Drawable o1, Drawable o2) {
 					if( o1.depth == o2.depth)
 						return o1.subDepth - o2.subDepth;
 					return o1.depth - o2.depth;
@@ -666,12 +662,18 @@ public class RenderEngine
 			});
 			
 			// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
-			for( Renderable renderable : renderList) {
+			for( Drawable renderable : renderList) {
 				renderable.draw(g2);
 			}
 			
 
 			g.dispose();
+		}
+		
+		private abstract class Drawable {
+			private int subDepth;
+			protected int depth;
+			public abstract void draw(Graphics g);
 		}
 
 		private Composite cc;
@@ -685,7 +687,7 @@ public class RenderEngine
 		private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
 			((Graphics2D)g).setComposite(cc);
 		}
-		private class GroupRenderable extends Renderable {
+		private class GroupRenderable extends Drawable {
 			private final GroupNode node;
 			private final int n;
 			private final RenderSettings settings;
@@ -705,26 +707,26 @@ public class RenderEngine
 				_resetRenderSettings(g, node,settings);
 			}
 		}
-		private class TransformedRenderable extends Renderable {
-			private final Renderable renderable;
+		private class TransformedRenderable extends Drawable {
+			private final TransformedHandle renderable;
 			private final RenderSettings settings;
 			private final LayerNode node;
-			private final BuiltImageData built;
-			TransformedRenderable( LayerNode node, Renderable renderable, RenderSettings settings) {
+			private AffineTransform transform;
+			TransformedRenderable( LayerNode node, TransformedHandle renderable, RenderSettings settings) {
 				this.node = node;
-				this.built = workspace.buildData(node);
 				this.renderable = renderable;
 				this.depth = renderable.depth;
 				this.settings = settings;
+				this.transform = renderable.trans;
+				this.transform.translate(node.getOffsetX(), node.getOffsetY());
 			}
 			@Override
 			public void draw(Graphics g) {
 				_setGraphicsSettings(g, node,settings);
 				Graphics2D g2 = (Graphics2D)g;
 				AffineTransform transform = g2.getTransform();
-				g2.transform(built.getDrawTransform());
 				g2.scale( ratioW, ratioH);
-				renderable.draw(g2);
+				renderable.handle.drawLayer(g2, this.transform, renderable.comp);
 				
 				g2.setTransform(transform);
 				_resetRenderSettings(g, node,settings);

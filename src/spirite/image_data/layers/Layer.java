@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.brains.RenderEngine.Renderable;
+import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
@@ -25,7 +25,7 @@ public abstract class Layer {
 	/** Constructs a list of drawable objects assosciated with their
 	 * drawDepth.
 	 */
-	public abstract List<Renderable> getDrawList();
+	public abstract List<TransformedHandle> getDrawList();
 	
 	/**
 	 * @param x	the offset of the node relative to this one

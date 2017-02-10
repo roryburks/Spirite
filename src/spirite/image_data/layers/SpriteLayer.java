@@ -16,7 +16,7 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
-import spirite.brains.RenderEngine.Renderable;
+import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
@@ -267,29 +267,10 @@ public class SpriteLayer extends Layer
 		//	depth is changed.
 		Graphics2D g2 = (Graphics2D)g;
 		
-		AffineTransform trans = g2.getTransform();
-		Composite comp = g2.getComposite();
+		List<TransformedHandle> drawList = getDrawList();
 		
-		for( Part part : parts) {
-			if( part.visible) {
-				if( part.alpha != 1.0f) {
-					// TODO: Fairly debug, eventually, I'll need a way of stacking
-					//	composites on top of each other
-					if( comp instanceof AlphaComposite) {
-						
-						g2.setComposite( AlphaComposite.getInstance(
-								AlphaComposite.SRC_OVER, 
-								((AlphaComposite)comp).getAlpha()*part.alpha));
-					}
-					else {
-						g2.setComposite( AlphaComposite.getInstance(
-							AlphaComposite.SRC_OVER, part.alpha));
-					}	
-				}
-				g2.translate(part.ox,part.oy);
-				g2.setComposite(comp);
-				g2.setTransform(trans);
-			}
+		for( TransformedHandle th : drawList) {
+			th.handle.drawLayer(g2, th.trans, th.comp);
 		}
 	}
 	
@@ -400,17 +381,18 @@ public class SpriteLayer extends Layer
 	
 
 	@Override
-	public List<Renderable> getDrawList() {
-		List<Renderable> list = new ArrayList<> ( parts.size());
+	public List<TransformedHandle> getDrawList() {
+		List<TransformedHandle> list = new ArrayList<> ( parts.size());
 		
 		for( Part part : parts) {
 			if( part.isVisible()) {
-				Renderable renderable = new Renderable() {
-					@Override
-					public void draw(Graphics g) {
-						drawPart(g,part);
-					}
-				};
+				
+				TransformedHandle renderable = new TransformedHandle();
+
+				renderable.comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, part.alpha);
+				
+				renderable.handle = part.handle;
+				renderable.trans.translate( part.ox, part.oy);
 				renderable.depth = part.depth;
 				list.add(renderable);
 			}
