@@ -26,13 +26,15 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.ImportImage;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.SimpleLayer;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
-import spirite.image_data.layers.SimpleLayer;
+import spirite.image_data.ImageWorkspace.DynamicImportImage;
 
 /***
  * LoadEngine is a static container for methods which load images from
@@ -138,7 +140,7 @@ public class LoadEngine {
 			}
 			
 			helper.workspace = new ImageWorkspace(master);
-			Map<Integer,BufferedImage> imageMap = new HashMap<>();
+			Map<Integer,ImportImage> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
 			parseChunks( helper);
@@ -170,16 +172,17 @@ public class LoadEngine {
 			}
 			helper.ra.close();
 			
-			// TODO DEBUG
-			for( BufferedImage img : imageMap.values()) {
-				if( img.getWidth() > helper.workspace.getWidth()) {
-					helper.workspace.setWidth(img.getWidth());
-				}
-				if( img.getHeight() > helper.workspace.getHeight()) {
-					helper.workspace.setHeight(img.getHeight());
+			if( helper.version < 2) {
+				for( ImportImage impi : imageMap.values()) {
+					BufferedImage img = impi.image;
+					if( img.getWidth() > helper.workspace.getWidth()) {
+						helper.workspace.setWidth(img.getWidth());
+					}
+					if( img.getHeight() > helper.workspace.getHeight()) {
+						helper.workspace.setHeight(img.getHeight());
+					}
 				}
 			}
-			// TODO
 			
 			helper.workspace.importNodeWithData( helper.workspace.getRootNode(), imageMap);
 
@@ -234,19 +237,29 @@ public class LoadEngine {
 	 * Read ImageData Section Data
 	 * [IMGD]
 	 */
-	private Map<Integer,BufferedImage> parseImageDataSection(
+	private Map<Integer, ImportImage> parseImageDataSection(
 			LoadHelper helper, int chunkSize) 
 			throws IOException 
 	{
-		Map<Integer,BufferedImage> dataMap = new HashMap<>();
+		Map<Integer,ImportImage> dataMap = new HashMap<>();
 		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
+		int mask = 0;
+		int ox = 0;
+		int oy = 0;
 		
 		while( helper.ra.getFilePointer() < endPointer) {
 			identifier = helper.ra.readInt();
-			imgSize = helper.ra.readInt();
+			if( helper.version >= 4) {
+				mask = helper.ra.readByte();
+				if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
+					ox = helper.ra.readShort();
+					oy = helper.ra.readShort();
+				}
+			}
 
+			imgSize = helper.ra.readInt();
 			byte[] buffer = new byte[imgSize];
 			helper.ra.read(buffer);
 			
@@ -256,7 +269,14 @@ public class LoadEngine {
 			Graphics g = bi2.getGraphics();
 			g.drawImage(bi, 0, 0, null);
 			g.dispose();
-			dataMap.put(identifier, bi2);
+			
+			ImportImage impi;
+			if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
+				 impi = new DynamicImportImage( bi2, ox, oy);
+			}
+			else
+				impi = new ImportImage( bi2);
+			dataMap.put(identifier, impi);
 			
 		}
 		

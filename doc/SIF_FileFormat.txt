@@ -1,6 +1,6 @@
-Version 0003
+Version 0004
 
-Compatibility Issues: None, just added functionality.
+Compatibility Issues: extra byte per Image in ImageData section.
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -20,6 +20,7 @@ Header
  [1]: Depth of the GroupTree
  [1] : various single-bit settings
     1st bit: Visibility
+    2nd bit: Expanded
  [4] : alpha
  [2] : X offset
  [2] : Y offset
@@ -40,6 +41,11 @@ Header
  ---- IMGD - Image Data Chunk ----
  Per Iamge:
  [4] : Image ID
+ [1] : Mask
+    1st bit: Dynamic
+      if Dynamic:
+        [2] : Dynamic offsetX 
+        [2] : Dynamic offsetY
  [4] : Size of Image Data
  [n] : PNG-saved Image File
 

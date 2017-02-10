@@ -32,9 +32,9 @@ import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.SimpleLayer;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
-import spirite.image_data.layers.SimpleLayer;
 
 /***
  * SaveEngine is a static container for methods which saves images to
@@ -308,6 +308,16 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
 			// [4] : Image ID
 			helper.ra.writeInt( part.getID());
+			// [1] : Bitwise map (for now only one entry, 0th bit for whether or not it's dynamic)
+			int mask = part.isDynamic() ? SaveLoadUtil.DYNMIC_MASK : 0;
+			helper.ra.writeByte(mask);
+			if( part.isDynamic()) {
+				// If Dynamic
+				// [2] : Dynamic offsetX
+				helper.ra.writeShort(part.getDynamicX());
+				// [2] : Dynamic offsetY
+				helper.ra.writeShort(part.getDynamicY());
+			}
 			// [4] : Size of Image Data
 			helper.ra.writeInt( bos.size());
 			// [x] : Image Data

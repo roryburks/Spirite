@@ -9,7 +9,6 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import spirite.Globals;
@@ -47,8 +44,8 @@ import spirite.image_data.UndoEngine.StackableAction;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.Layer.LayerActionHelper;
-import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SimpleLayer;
+import spirite.image_data.layers.SpriteLayer;
 
 
 /***
@@ -86,8 +83,10 @@ public class ImageWorkspace {
 	}
 	class DynamicInternalImage extends InternalImage {
 		int ox, oy;
-		DynamicInternalImage(CachedImage ci) {
+		DynamicInternalImage(CachedImage ci, int ox, int oy) {
 			super(ci);
+			this.ox = ox;
+			this.oy = oy;
 		}
 		
 	}
@@ -331,9 +330,7 @@ public class ImageWorkspace {
 		public final ImageHandle handle;
 		final int ox;
 		final int oy;
-
-		private BufferedImage working = null;
-		private Graphics g = null;
+		protected Graphics g = null;
 		
 		public BuiltImageData( ImageHandle handle) {
 			this.handle = handle;
@@ -468,7 +465,10 @@ public class ImageWorkspace {
 		@Override
 		public void drawBorder(Graphics g) {
 			if( handle == null) return;
-			g.drawRect(0, 0, width, height);
+			
+			
+			g.drawRect(ox + dii.ox, oy + dii.oy, 
+					handle.getWidth(), handle.getHeight());
 		}
 		@Override
 		public AffineTransform getTransform() {
@@ -490,9 +490,7 @@ public class ImageWorkspace {
 			handle.drawLayer(g2, transform);
 		}
 		
-		Rectangle activeRect = null;
 		BufferedImage buffer = null;
-		Graphics g = null;
 		@Override
 		public Graphics checkout() {
 			g = checkoutRaw().getGraphics();
@@ -511,7 +509,7 @@ public class ImageWorkspace {
 		}
 		@Override
 		public void checkin() {
-			activeRect = (new Rectangle(0,0,width,height)).union(
+			Rectangle activeRect = (new Rectangle(0,0,width,height)).union(
 					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
 			BufferedImage bi = new BufferedImage( 
@@ -886,6 +884,21 @@ public class ImageWorkspace {
 	
 	
 	// :::: Content Addition
+	public static class ImportImage {
+		public final BufferedImage image;
+		public ImportImage( BufferedImage image) {
+			this.image = image;
+		}
+	}
+	public static class DynamicImportImage extends ImportImage {
+		final int ox, oy;
+		public DynamicImportImage(BufferedImage image, int ox, int oy) {
+			super(image);
+			this.ox = ox;
+			this.oy = oy;
+		}
+	}
+	
 	/** Imports the given Group Node and all included ImageData into it.
 	 * 
 	 * Importing Data works like this: it goes through the node and converts
@@ -900,7 +913,7 @@ public class ImageWorkspace {
 	 */
 	public void importNodeWithData( 
 			Node node, 
-			Map<Integer,BufferedImage> newData)
+			Map<Integer,ImportImage> newData)
 	{
 		// Construct a list of all LayerNodes within the context.
 		if( node == null) 
@@ -924,11 +937,16 @@ public class ImageWorkspace {
 		
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
-		for( Entry<Integer,BufferedImage> entry : newData.entrySet()) {
-			CachedImage ci = cacheManager.cacheImage(entry.getValue(), this);
+		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
+			CachedImage ci = cacheManager.cacheImage(entry.getValue().image, this);
 			ci.reserve(this);
 			
-			imageData.put( workingID, new InternalImage(ci));
+			if( entry.getValue() instanceof DynamicImportImage) {
+				DynamicImportImage dimpi = (DynamicImportImage)entry.getValue();
+				imageData.put( workingID, new DynamicInternalImage(ci, dimpi.ox, dimpi.oy));
+			}
+			else
+				imageData.put( workingID, new InternalImage(ci));
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -952,6 +970,19 @@ public class ImageWorkspace {
 	public ImageHandle importData( BufferedImage newImage) {
 		CachedImage ci = cacheManager.cacheImage(newImage, this);
 		imageData.put( workingID, new InternalImage(ci));
+		ci.reserve(this);
+		
+		return new ImageHandle(this, workingID++);	// Postincriment
+	}
+	
+	/**
+	 * DynamicData resizes its area such that you never reach the "end" of 
+	 * the data (but can only draw on the currently visible part) and it
+	 * will automatically crop the data periodically to only the used area.
+	 */
+	public ImageHandle importDynamicData(BufferedImage newImage) {
+		CachedImage ci = cacheManager.cacheImage(newImage, this);
+		imageData.put( workingID, new DynamicInternalImage(ci, 0, 0));
 		ci.reserve(this);
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
@@ -993,7 +1024,7 @@ public class ImageWorkspace {
         g.fillRect( 0, 0, w, h);
         g.dispose();
         
-        InternalImage internal = new DynamicInternalImage(ci);
+        InternalImage internal = new DynamicInternalImage(ci, 0, 0);
         imageData.put(workingID, internal);
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
@@ -1063,10 +1094,19 @@ public class ImageWorkspace {
 			Layer dupe = layer.logicalDuplicate();
 			
 			// Duplicate all used Data into a map
-			Map< Integer, BufferedImage> dupeData = new HashMap<>();
+			Map< Integer, ImportImage> dupeData = new HashMap<>();
 			for( ImageHandle handle : layer.getImageDependencies()) {
 				if( !dupeData.containsKey(handle.id)) {
-					dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
+					ImportImage impi;
+					if( handle.isDynamic()) {
+						DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
+						impi = new DynamicImportImage(MUtil.deepCopy( handle.deepAccess()), 
+								dii.ox, dii.oy);
+					}
+					else {
+						 impi = new ImportImage(MUtil.deepCopy( handle.deepAccess()));
+					}
+					dupeData.put( handle.id, impi);
 				}
 			}
 			
@@ -1085,7 +1125,7 @@ public class ImageWorkspace {
 		}
 		else if( toDupe instanceof GroupNode) {
 			GroupNode dupeRoot= groupTree.new GroupNode(toDupe.name + " copy");
-			Map< Integer, BufferedImage> dupeData = new HashMap<>();
+			Map< Integer, ImportImage> dupeData = new HashMap<>();
 
 			// Breadth-first queue for Duping
 			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
@@ -1112,7 +1152,16 @@ public class ImageWorkspace {
 					//	dupeData map
 					for( ImageHandle handle : layer.getImageDependencies()) {
 						if( !dupeData.containsKey(handle.id)) {
-							dupeData.put( handle.id, MUtil.deepCopy( handle.deepAccess()));
+							ImportImage impi;
+							if( handle.isDynamic()) {
+								DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
+								impi = new DynamicImportImage(MUtil.deepCopy( handle.deepAccess()), 
+										dii.ox, dii.oy);
+							}
+							else {
+								 impi = new ImportImage(MUtil.deepCopy( handle.deepAccess()));
+							}
+							dupeData.put(handle.id, impi);
 						}
 					}
 					
@@ -2008,5 +2057,4 @@ public class ImageWorkspace {
 	public void remToggle( Node node) {
 		toggleList.clear();;
 	}
-    
 }

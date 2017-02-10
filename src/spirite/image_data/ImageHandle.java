@@ -87,6 +87,29 @@ public class ImageHandle {
 		
 		g2.setComposite(c);
 	}
+	
+	public boolean isDynamic() {
+		if( context != null && context.getData(id) instanceof DynamicInternalImage)
+			return true;
+		return false;
+	}
+	public int getDynamicX() {
+		if( context == null) return 0;
+		InternalImage ii = context.getData(id);
+		if( ii instanceof DynamicInternalImage) {
+			return ((DynamicInternalImage) ii).ox;
+		}
+		return 0;
+	}
+	public int getDynamicY() {
+		if( context == null) return 0;
+		InternalImage ii = context.getData(id);
+		if( ii instanceof DynamicInternalImage) {
+			return ((DynamicInternalImage) ii).oy;
+		}
+		return 0;
+	}
+	
 	public void drawLayer(Graphics g, AffineTransform transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");

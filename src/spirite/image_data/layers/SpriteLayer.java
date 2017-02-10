@@ -192,7 +192,7 @@ public class SpriteLayer extends Layer
 		}
 		
 		
-		Part part = new Part(context.importData(image), testing);
+		Part part = new Part(context.importDynamicData(image), testing);
 		part.ox = ox;
 		part.oy = oy;
 		part.depth = depth;
@@ -444,7 +444,7 @@ public class SpriteLayer extends Layer
 		
 		RemovePartAction( Part part) {
 			removed = part;
-			this.description = "Added Part to Rig";
+			this.description = "Removed Part from Rig";
 		}
 		@Override
 		protected void performAction() {

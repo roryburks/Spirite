@@ -26,7 +26,6 @@ import javax.swing.Timer;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.MUtil;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.GroupTree.GroupNode;

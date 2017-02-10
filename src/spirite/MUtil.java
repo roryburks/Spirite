@@ -18,9 +18,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
