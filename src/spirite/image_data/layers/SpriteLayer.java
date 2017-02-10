@@ -39,6 +39,7 @@ public class SpriteLayer extends Layer
 	private final ArrayList<Part> parts = new ArrayList<>();
 	private Part active = null;
 	private ImageWorkspace context;
+	int originX, originY;
 	
 	public SpriteLayer( ImageHandle handle) {
 		context = handle.getContext();
@@ -59,9 +60,6 @@ public class SpriteLayer extends Layer
 	public static class Part {
 		private final ImageHandle handle;
 		private int ox, oy;
-		// TODO: Make this global, not just local, i.e. having a depth of -1 will draw
-		//	before everything with a greater depth, even outside of this rig 
-		//	(but probably limited to the same group?)
 		private int depth;	
 		private String partName;
 		private boolean visible = true;
@@ -250,6 +248,7 @@ public class SpriteLayer extends Layer
 		if( active == null)
 			return null;
 		
+		
 		return new BuildingImageData(active.handle, active.ox, active.oy);
 	}
 
@@ -297,7 +296,6 @@ public class SpriteLayer extends Layer
 	public void drawPart( Graphics g, Part part) {
 		Graphics2D g2 = (Graphics2D)g;
 
-		AffineTransform trans = g2.getTransform();
 		Composite comp = g2.getComposite();
 		
 
@@ -315,11 +313,12 @@ public class SpriteLayer extends Layer
 					AlphaComposite.SRC_OVER, part.alpha));
 			}
 		}
-		g2.translate(part.ox,part.oy);
-		part.handle.drawLayer(g);
+
+		AffineTransform trans = new AffineTransform();
+		trans.translate(part.ox,part.oy);
+		part.handle.drawLayer(g, trans);
 		
 		g2.setComposite(comp);
-		g2.setTransform(trans);
 	}
 	
 
@@ -378,7 +377,6 @@ public class SpriteLayer extends Layer
 		for( Part part : parts) {
 			list.add( new Rectangle(part.ox, part.oy, part.handle.getWidth(), part.handle.getHeight()));
 		}
-		
 		
 		return list;
 	}
@@ -599,6 +597,4 @@ public class SpriteLayer extends Layer
 		
 		return helper;
 	}
-
-
 }

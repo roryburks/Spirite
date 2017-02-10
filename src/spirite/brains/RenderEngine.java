@@ -159,7 +159,7 @@ public class RenderEngine
 			if( workspace.getSelectionEngine().getLiftedImage() != null ){
 
 				compositionImage= new BufferedImage( 
-						dataContext.handle.getWidth(), dataContext.handle.getHeight(),
+						dataContext.getWidth(), dataContext.getHeight(),
 						BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(compositionImage);
 				compositionContext = dataContext.handle;
@@ -175,7 +175,7 @@ public class RenderEngine
 			if( workspace.getDrawEngine().strokeIsDrawing()) {
 				if( compositionImage == null) {
 					compositionImage= new BufferedImage( 
-							dataContext.handle.getWidth(), dataContext.handle.getHeight(),
+							dataContext.getWidth(), dataContext.getHeight(),
 							BufferedImage.TYPE_INT_ARGB);
 					MUtil.clearImage(compositionImage);
 					compositionContext = dataContext.handle;
@@ -709,8 +709,10 @@ public class RenderEngine
 			private final Renderable renderable;
 			private final RenderSettings settings;
 			private final LayerNode node;
+			private final BuiltImageData built;
 			TransformedRenderable( LayerNode node, Renderable renderable, RenderSettings settings) {
 				this.node = node;
+				this.built = workspace.buildData(node);
 				this.renderable = renderable;
 				this.depth = renderable.depth;
 				this.settings = settings;
@@ -720,7 +722,7 @@ public class RenderEngine
 				_setGraphicsSettings(g, node,settings);
 				Graphics2D g2 = (Graphics2D)g;
 				AffineTransform transform = g2.getTransform();
-				g2.translate(node.getOffsetX(), node.getOffsetY());
+				g2.transform(built.getDrawTransform());
 				g2.scale( ratioW, ratioH);
 				renderable.draw(g2);
 				
@@ -789,7 +791,7 @@ public class RenderEngine
 			g2.setRenderingHints(settings.hints);
 			g2.scale( settings.width / (float)handle.getWidth(), 
 					  settings.height / (float)handle.getHeight());
-			handle.drawLayer(g);
+			handle.drawLayer(g,null);
 			g.dispose();
 			return null;
 		}

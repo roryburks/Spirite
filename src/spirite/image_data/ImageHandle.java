@@ -1,12 +1,15 @@
 package spirite.image_data;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.image_data.ImageWorkspace.InternalImage;
 
 /**
  * Under normal circumstances an ImageHandle is a logical connection to a
@@ -61,23 +64,37 @@ public class ImageHandle {
 	 *  */
 	public BufferedImage deepAccess() {
 		if( context == null) return null;
-		return context.getData(id).access();
+		return context.getData(id).cachedImage.access();
 	}
 	
-	public void drawLayer(Graphics g) {
+	public void drawLayer(Graphics g, AffineTransform transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
 		}
-		CachedImage ci = context.getData(id);
+		InternalImage ii = context.getData(id);
 		
-		if( ci == null) return;
+		if( ii == null) return;
+
+		Graphics2D g2  =(Graphics2D)g;
+		AffineTransform prev= g2.getTransform();
+		if (transform == null)
+			transform = new AffineTransform();
 		
 		if( context.getRenderEngine().getCompositeLayer(this) == null) {
-			g.drawImage( ci.access(), 0, 0, null);
+			g2.transform(transform);
+			g.drawImage( ii.cachedImage.access(), 0, 0, null);
+			g2.setTransform(prev);
 		}
 		else {
-			g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
+			if( ii.isDynamic) {
+				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
+			}
+			else {
+				g2.transform(transform);
+				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
+				g2.setTransform(prev);
+			}
 		}
 	}
 	
@@ -101,6 +118,6 @@ public class ImageHandle {
 	}
 	
 	void flush() {
-		context.getData(id).flush();
+		context.getData(id).cachedImage.flush();
 	}
 }

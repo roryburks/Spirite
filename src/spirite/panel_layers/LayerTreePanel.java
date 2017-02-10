@@ -288,7 +288,6 @@ public class LayerTreePanel extends ContentTree
 	private void _cfw_setExpandedStateRecursively( DefaultMutableTreeNode tree_node) {
 		GroupTree.Node node = (GroupTree.Node)tree_node.getUserObject();
 		if( node.isExpanded() ) {
-			System.out.println(node);
 			for( Enumeration<TreeNode> e = tree_node.children(); e.hasMoreElements();) {
 				DefaultMutableTreeNode child = (DefaultMutableTreeNode)e.nextElement();
 				_cfw_setExpandedStateRecursively( child);

@@ -37,7 +37,7 @@ public class SimpleLayer extends Layer {
 
 	@Override
 	public void draw(Graphics g) {
-		data.drawLayer(g);
+		data.drawLayer(g,null);
 	}
 
 	@Override

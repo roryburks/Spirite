@@ -69,9 +69,9 @@ public class ImageWorkspace {
 	//	by ImageWorkspace.
 	private final Map<Integer,InternalImage> imageData;
 	
-	private class InternalImage {
+	class InternalImage {
 		CachedImage cachedImage;
-		final boolean isDynamic = false;
+		boolean isDynamic = false;
 		InternalImage( CachedImage ci) { this.cachedImage = ci;}
 		
 		int getWidth() {
@@ -192,8 +192,8 @@ public class ImageWorkspace {
 		}
 	}
 	
-	CachedImage getData(int i) {
-		return imageData.get(i).cachedImage;
+	InternalImage getData(int i) {
+		return imageData.get(i);
 	}
 
 	int getWidthOf( int i) {
@@ -335,15 +335,19 @@ public class ImageWorkspace {
 			this.ox = ox;
 			this.oy = oy;
 		}
+		
+		public int getWidth() {
+			return handle.getWidth();
+		}
+		public int getHeight() {
+			return handle.getHeight();
+		}
+		
 		public void draw(Graphics g) {
 			Graphics2D g2 = (Graphics2D)g;
 			
-			AffineTransform transform = g2.getTransform();
-			g2.translate(ox, oy);
-			
-			handle.drawLayer(g2);
-			
-			g2.setTransform( transform);
+			AffineTransform transform = new AffineTransform();			
+			handle.drawLayer(g2, transform);
 		}
 		
 		public void drawBorder( Graphics g) {
@@ -369,25 +373,12 @@ public class ImageWorkspace {
 			if( handle.context != ImageWorkspace.this)
 				MDebug.handleError(ErrorType.STRUCTURAL, null, "Checking out image in wrong workspace");
 			
-			InternalImage internal = imageData.get(handle.id);
 			
-			if( internal.isDynamic) {
-				undoEngine.prepareContext(handle);
-				if( working != null)
-					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
-				
-				working = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-				Graphics g = working.getGraphics();
-				draw(g);
-				return g;
-			}
-			else {
-				BufferedImage bi = checkoutImage(handle);
-				g = bi.getGraphics();
-				Graphics2D g2 = (Graphics2D)g;
-				g2.translate(-ox, -oy);
-				return g;
-			}
+			BufferedImage bi = _checkoutImage(handle);
+			g = bi.getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
+			g2.translate(-ox, -oy);
+			return g;
 		}
 		
 		/** Retrieves the underlying BufferedImage of the BuiltImage
@@ -397,19 +388,7 @@ public class ImageWorkspace {
 		public BufferedImage checkoutRaw() {
 			InternalImage internal = imageData.get(handle.id);
 			
-			if( internal.isDynamic) {
-				undoEngine.prepareContext(handle);
-				if( working != null)
-					MDebug.handleError(ErrorType.STRUCTURAL, null, "Tried to double-checkout a dynamic image.");
-
-				working = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-				Graphics g = working.getGraphics();
-				draw(g);
-				g.dispose();
-				return working;
-			}
-			else
-				return checkoutImage(handle);
+			return _checkoutImage(handle);
 		}
 		
 		/**
@@ -421,47 +400,11 @@ public class ImageWorkspace {
 		 */
 		public void checkin() {
 			InternalImage internal = imageData.get(handle.id);
-			
-			if( internal.isDynamic) {
-				// Reset all draw properties.  There might be a better way.
-			//	if( g != null)
-		//			g.dispose();
-	//			g = working.getGraphics();
-				
-				// Draws the old data, as built ontop of the new
-//				draw(g);
-//				g.dispose();
-				
-				
-				
-				try {
-					Rectangle rect = MUtil.findContentBounds(working, 0, true);
-					
-					if( !rect.isEmpty()) {
-						BufferedImage bi = new BufferedImage( rect.width, rect.height, BufferedImage.TYPE_INT_ARGB);
-						Graphics g = bi.getGraphics();	// Over-writing scope not strictly necessary
-						g.drawImage(working, -rect.x, -rect.y, null);
-						g.dispose();
-						_replaceIamge(handle, cacheManager.cacheImage(bi, ImageWorkspace.this));
-					}
-				} catch (UnsupportedDataTypeException e) {
-					e.printStackTrace();
-					MDebug.handleError(ErrorType.STRUCTURAL, e, "Bad ImageDataType on Dynamic Image Re-bound");
-				}
-				working.flush();
-				working = null;
-				
-
-				ImageChangeEvent evt = new ImageChangeEvent();
-				evt.dataChanged.add(handle);
-				evt.workspace = ImageWorkspace.this;
-				triggerImageRefresh( evt);
-			}
-			else if( g == null)	{// Should only happen if it was a raw checkout.
-				checkinImage(handle);
+			if( g == null)	{// Should only happen if it was a raw checkout.
+				_checkinImage(handle);
 			}
 			else {
-				checkinImage(handle);
+				_checkinImage(handle);
 				g.dispose();
 			}
 			g = null;
@@ -485,6 +428,43 @@ public class ImageWorkspace {
 			AffineTransform transform = new AffineTransform();
 			transform.translate( -ox, -oy);
 			return transform;
+		}
+
+		/** Returns the Tranform needed to convert DataSpace into Workspace space*/
+		public AffineTransform getDrawTransform() {
+			AffineTransform transform = new AffineTransform();
+			transform.translate( ox, oy);
+			return transform;
+			
+		}
+	}
+	
+	public class DynamicImageData extends BuiltImageData{
+		public DynamicImageData(ImageHandle handle, int ox, int oy) {
+			super(handle, ox, oy);
+		}
+		
+		@Override public int getWidth() {
+			return width;
+		} 
+		@Override public int getHeight() {
+			return height;
+		}
+		@Override public Point convert(Point p) {
+			return p;
+		}
+		@Override
+		public void drawBorder(Graphics g) {
+			if( handle == null) return;
+			g.drawRect(0, 0, width, height);
+		}
+		@Override
+		public AffineTransform getTransform() {
+			return new AffineTransform();
+		}
+		@Override
+		public AffineTransform getDrawTransform() {
+			return new AffineTransform();
 		}
 	}
 
@@ -520,11 +500,7 @@ public class ImageWorkspace {
 		if( selected == null) return null;
 		
 		if( selected instanceof LayerNode) {
-			BuildingImageData data = ((LayerNode)selected).getLayer().getActiveData();
-			
-			if( data == null) return null;
-			return  new BuiltImageData( data.handle,
-					data.ox + selected.x, data.oy + selected.y);
+			return buildData( (LayerNode) selected);
 		}
 		return null;
 	}
@@ -532,9 +508,13 @@ public class ImageWorkspace {
 	public BuiltImageData buildData( LayerNode node) {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		BuildingImageData data = node.getLayer().getActiveData();
-		
-		return  new BuiltImageData( data.handle,
-				data.ox + selected.x, data.oy + selected.y);
+
+		if( imageData.get(data.handle.id) == null || !(imageData.get(data.handle.id).isDynamic)) {
+			return new BuiltImageData( data.handle,
+				data.ox + node.x, data.oy + node.y);
+		}
+		return new DynamicImageData(data.handle,
+				data.ox + node.x, data.oy + node.y);
 	}
 	
 	
@@ -570,7 +550,7 @@ public class ImageWorkspace {
 	
 	
 	// :::: Image Checkout
-	private BufferedImage checkoutImage( ImageHandle image) {
+	private BufferedImage _checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
 			return null;
 		
@@ -583,10 +563,14 @@ public class ImageWorkspace {
 		//	and that they terminate correctly if the image were to be unloaded.
 		
 		InternalImage internalImage = imageData.get(image.id);
+		if( internalImage.isDynamic) {
+			
+		}
+		
 		return internalImage.cachedImage.access();
 	}
 	
-	private void checkinImage( ImageHandle handle) {
+	private void _checkinImage( ImageHandle handle) {
 		if( !isValidHandle(handle))
 			return;
 
@@ -685,8 +669,9 @@ public class ImageWorkspace {
 						newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
-				g2.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
-				handle.drawLayer(g2);
+				AffineTransform transform = new AffineTransform();		
+				transform.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
+				handle.drawLayer(g2, transform);
 				g2.dispose();
 				
 				actions.add( undoEngine.createReplaceAction(handle, image));
@@ -932,7 +917,7 @@ public class ImageWorkspace {
         g.dispose();
         
         InternalImage internal = new InternalImage(ci);
-//        internal.isDynamic = true;
+        internal.isDynamic = true;
         imageData.put(workingID, internal);
         ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);

@@ -254,16 +254,16 @@ public class DrawEngine {
 			stroke = s;
 			
 			strokeLayer = new BufferedImage( 
-					data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			compositionLayer = new BufferedImage( 
-					data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			int crgb = stroke.getColor().getRGB();
 			
 			sel = pollSelectionMask();
 			
 			if( sel.selection != null) {
 				selectionMask = new BufferedImage( 
-						data.handle.getWidth(), data.handle.getHeight(), BufferedImage.TYPE_INT_ARGB);
+						data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
 				MUtil.clearImage(selectionMask);
 				
 				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
@@ -307,6 +307,7 @@ public class DrawEngine {
 		 */
 		public synchronized boolean stepStroke( PenState ps) {
 			Point layerSpace = data.convert( new Point( ps.x, ps.y));
+			System.out.println(layerSpace.x + "," + layerSpace.y);
 			newState.x = layerSpace.x;
 			newState.y = layerSpace.y;
 			newState.pressure = ps.pressure;
