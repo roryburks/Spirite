@@ -63,6 +63,7 @@ public class Globals {
     		{"icon.anim.stepF", 0,1},
     		{"icon.anim.play", 1,1},
     		{"icon.anim.stepB", 2,1},
+    		{"icon.anim.export", 3,1},
     		
     		{"icon.frame.layers",0,2},
     		{"icon.frame.undoHistory",1,2},

@@ -14,6 +14,10 @@ import java.io.UnsupportedEncodingException;
  *
  */
 public class SaveLoadUtil {
+	public static class AAF {
+		public static final int version = 1;
+	}
+	
 	// :::: Generic Identifier
 	public static final byte UNKNOWN = (byte)0xFF;
 	// :::: Node Type Identifiers for the SIFF GroupTree Section

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.imageio.ImageIO;
+import javax.swing.TransferHandler;
 
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
@@ -197,7 +198,15 @@ public class FixedFrameAnimation extends Animation
 	@Override
 	public void drawFrame(Graphics g, float t) {
 		int _t = (int)Math.floor(t);
-		int met = MUtil.cycle(startFrame, endFrame, _t);
+		List<TransformedHandle> drawList = getDrawListForFrame(_t);
+		
+		for( TransformedHandle renderable : drawList) {
+			renderable.handle.drawLayer(g, renderable.trans);
+		}
+	}
+	
+	public List<TransformedHandle> getDrawListForFrame( int t) {
+		int met = MUtil.cycle(startFrame, endFrame, t);
 		
 		List<TransformedHandle> drawList = new ArrayList<>();
 		
@@ -206,14 +215,13 @@ public class FixedFrameAnimation extends Animation
 			
 			int start = layer.getStart();
 			int end = layer.getEnd();
-			int frame = 0;
 			int localMet = met;
 
 
 			// Based on the layer timing type, determine the local frame
 			//	index to use (if any)
 			if( layer.asynchronous) {
-				localMet = MUtil.cycle(start, end, _t);
+				localMet = MUtil.cycle(start, end, t);
 			}
 			
 			LayerNode node = layer.getFrame(localMet);
@@ -230,9 +238,7 @@ public class FixedFrameAnimation extends Animation
 			}
 		});
 		
-		for( TransformedHandle renderable : drawList) {
-			renderable.handle.drawLayer(g, renderable.trans);
-		}
+		return drawList;
 	}
 
 	@Override

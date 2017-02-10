@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.swing.GroupLayout;
@@ -26,6 +27,7 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.file.AnimIO;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
@@ -33,6 +35,7 @@ import spirite.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.MTextFieldNumber;
 
@@ -67,11 +70,12 @@ public class AnimationPreviewPanel extends OmniComponent
 	
 
 	// Start Design
-    private DisplayPanel previewPanel;
+    private final DisplayPanel previewPanel = new DisplayPanel();
     private MTextFieldNumber tfFPS;
-    private JButton buttonBack;
-    private JToggleButton buttonPlay;
-    private JButton buttonForward;
+    private final JButton buttonBack = new JButton();
+    private final JToggleButton buttonPlay = new JToggleButton();
+    private final JButton buttonForward = new JButton();
+    private final JButton buttonExport = new JButton();
     private final JSlider slider = new JSlider();
     private final SliderLimiter sliderLimiter = new SliderLimiter();
     
@@ -111,10 +115,13 @@ public class AnimationPreviewPanel extends OmniComponent
         buttonBack.addActionListener(this);
         buttonPlay.addActionListener(this);
         buttonForward.addActionListener(this);
+        buttonExport.addActionListener(this);
         
         buttonBack.setIcon(Globals.getIcon("icon.anim.stepB"));
         buttonPlay.setIcon(Globals.getIcon("icon.anim.play"));
         buttonForward.setIcon(Globals.getIcon("icon.anim.stepF"));
+        buttonExport.setIcon(Globals.getIcon("icon.anim.export"));
+        buttonExport.setToolTipText("Export Animation");
         
 
         if( animationManager != null) {
@@ -123,12 +130,6 @@ public class AnimationPreviewPanel extends OmniComponent
     }
     private void initComponents() {
         Dimension size = new Dimension(24,24);
-
-        previewPanel = new DisplayPanel();
-        
-        buttonBack = new JButton();
-        buttonPlay = new JToggleButton();
-        buttonForward = new JButton();
         
         // Init Slider Properties
         slider.setEnabled(true);
@@ -165,6 +166,8 @@ public class AnimationPreviewPanel extends OmniComponent
             			.addPreferredGap(ComponentPlacement.RELATED)
             			.addComponent(lblFps)
             			.addContainerGap(0, Short.MAX_VALUE)
+            			.addComponent(buttonExport, size.width, size.width, size.width)
+            			.addGap(10)
                 	)
                 )
                 .addGroup( layout.createParallelGroup(Alignment.LEADING)
@@ -195,7 +198,8 @@ public class AnimationPreviewPanel extends OmniComponent
             					.addComponent(lblFps))
             				.addComponent(buttonBack, size.height, size.height, size.height)
             				.addComponent(buttonPlay, size.height, size.height, size.height)
-            				.addComponent(buttonForward, size.height, size.height, size.height))
+            				.addComponent(buttonForward, size.height, size.height, size.height)
+            				.addComponent(buttonExport, size.height, size.height, size.height))
             		)
         		)
     			.addGap(5)
@@ -322,6 +326,14 @@ public class AnimationPreviewPanel extends OmniComponent
 			met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
 			animationManager.getAnimationState(animation).setMetronome(met);
 			slider.setValue((int) Math.floor(met));
+		}else if( source == buttonExport) {
+			if( animation instanceof FixedFrameAnimation) {
+				try {
+					AnimIO.exportFFAnim((FixedFrameAnimation) animation, new java.io.File("E:/test.png"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

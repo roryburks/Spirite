@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JOptionPane;
 
 import spirite.Globals;
@@ -524,18 +525,40 @@ public class ImageWorkspace {
 			// Clear the section of the old image that will be replaced by the new one
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2.drawImage(buffer, -activeRect.x, -activeRect.y, null);
+			g2.dispose();
 
-			imageData.get(handle.id).cachedImage.replace(bi);
+			dii.ox = activeRect.x - ox;
+			dii.oy = activeRect.y - oy;
+			activeRect = null;
+			
+			Rectangle cropped = null;
+			try {
+				cropped = MUtil.findContentBounds(bi, 0, true);
+			} catch (UnsupportedDataTypeException e) {
+				e.printStackTrace();
+			}
+			BufferedImage nbi;
+			if( cropped == null || cropped.isEmpty()) {
+				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_INT_ARGB);
+			}
+			else {
+				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_INT_ARGB);
+			}
+			g2 = (Graphics2D)nbi.getGraphics();
+			g2.drawImage(bi, -cropped.x, -cropped.y, null);
+			g2.dispose();
+			
+			dii.ox += cropped.x;
+			dii.oy += cropped.y;
+			
+			imageData.get(handle.id).cachedImage.replace(nbi);
 			
 			buffer = null;
 			if( g != null)g.dispose();
 			g = null;
 			
-			System.out.println(activeRect + ":" + ox + "," + oy);
-
-			dii.ox = activeRect.x - ox;
-			dii.oy = activeRect.y - oy;
-			activeRect = null;
+			
+			
 			
 
 			// Construct ImageChangeEvent and send it
@@ -573,6 +596,7 @@ public class ImageWorkspace {
 		return false;
 	}
 	
+	private ImageHandle activeHandle;
 	public BuiltImageData buildActiveData() {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;
@@ -637,7 +661,7 @@ public class ImageWorkspace {
 		if( !isValidHandle(image))
 			return null;
 		
-		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
+//		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
 		locked = true;
 		undoEngine.prepareContext(image);
 		

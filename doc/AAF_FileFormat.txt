@@ -1,0 +1,21 @@
+AAF file:
+Version 0001
+
+An AAF file is linked to a PNG file.  The PNG file stores a bunch of animation frames packed into a single sheet and the AAF file describes how to unpack them and how to interpret them as an animation.
+
+Note, unlike SIF files, AAF files are versioned for backwards compatibility.  A simpler file format intended to be used as an end-product if conversions are needed scripts can be made manually.
+
+[4] : version number
+[2] : Number of Animations
+  Per Animation:
+    [n] : UTF8, name of the animation
+    [2] : Number of Rigs
+      : Per Rig:
+       [1] : Number of frames
+        : Per frame
+          [2] FrameID
+          [2] OffsetX
+          [2] OffsetY
+[2] : Number of Frames
+  Per Frame:
+    [8] : (x,y,w,h), each short : Rectangle describing where the frame's located
