@@ -20,16 +20,11 @@ import spirite.MDebug.ErrorType;
  */
 public class SettingsManager {
     private final Preferences prefs;
-	private File workspaceFilePath;
-	private File imageFilePath;
 	private List<String> paletteList = null;
-	private boolean lastUsedWorkspace = true;
 	
 	public SettingsManager() {
         prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
         
-        workspaceFilePath = new File( prefs.get("wsPath", "E:/Documents/Workspace/Spirite/SIF"));
-        imageFilePath = new File(prefs.get("imgPath", System.getProperty("user.dir")));
         
 //        drawOrigin = prefs.getBoolean("drawOrigin", arg1)
 	}
@@ -74,7 +69,13 @@ public class SettingsManager {
 		return paletteList;
 	}
 
+	private boolean lastUsedWorkspace = true;
+	private File workspaceFilePath;
+	private File imageFilePath;
+	private File aafFilePath;
 	public File getWorkspaceFilePath() {
+		if( workspaceFilePath == null)
+	        workspaceFilePath = new File( prefs.get("wsPath", System.getProperty("user.dir")));
 		return workspaceFilePath;
 	}
 	public void setWorkspaceFilePath( File file) {
@@ -83,6 +84,8 @@ public class SettingsManager {
 		lastUsedWorkspace = true;
 	}
 	public File getImageFilePath() {
+		if( imageFilePath == null)
+	        imageFilePath = new File(prefs.get("imgPath", System.getProperty("user.dir")));
 		return imageFilePath;
 	}
 	public void setImageFilePath( File file) {
@@ -90,8 +93,17 @@ public class SettingsManager {
 		prefs.put("imgPath", file.getPath());
 		lastUsedWorkspace = false;
 	}
+	public File getAAFFilePath() {
+		if( aafFilePath == null)
+			aafFilePath = new File( prefs.get("aafPath", System.getProperty("user.dir")));
+		return aafFilePath;
+	}
+	public void setAAFFilePath( File file) {
+		aafFilePath = file;
+		prefs.put("aafPath", file.getPath());
+	}
 	public File getOpenFilePath() {
-		return lastUsedWorkspace ? workspaceFilePath :imageFilePath;
+		return lastUsedWorkspace ? getWorkspaceFilePath():getImageFilePath();
 	}
 	
 	public int getDefaultWidth() {return 640;}

@@ -392,21 +392,34 @@ public class MasterControl
 			}});
     		commandMap.put("export_as", commandMap.get("export"));
     		commandMap.put("copy", new Runnable() {@Override public void run() {
-    			if( currentWorkspace == null ||
-    				currentWorkspace.getSelectedNode() == null) return; 
+    			if( currentWorkspace == null) return;
+    			Node selected = currentWorkspace.getSelectedNode();
     			
-    			if(currentWorkspace.getSelectedNode() instanceof LayerNode &&
+    			if( selected == null) commandMap.get("copyVisible").run();; 
+    			
+    			if(currentWorkspace.getSelectedNode() != null &&
     				currentWorkspace.getSelectionEngine().getSelection() != null) {
         			// Copies the current selection to the Clipboard
-    				
-    				// TODO: Implement for GroupNode
 
 	    	    	BufferedImage img;
-    				if( currentWorkspace.getSelectionEngine().isLifted())
+    				if( currentWorkspace.getSelectionEngine().isLifted()) {
+    					// Copies straight from the lifted data
     					img = currentWorkspace.getSelectionEngine().getLiftedImage().access();
+    				}
     				else {
-    					img = currentWorkspace.getSelectionEngine().getBuiltSelection()
-    						.liftSelectionFromData(currentWorkspace.buildActiveData());
+    					BuiltImageData bid = currentWorkspace.buildActiveData();
+    					
+    					if( bid == null) {
+    		    	    	RenderSettings settings = new RenderSettings(
+    		    	    			renderEngine.getNodeRenderTarget(selected));
+    		
+    		    	    	BufferedImage nodeImg = renderEngine.renderImage(settings);
+    						img = currentWorkspace.getSelectionEngine().getBuiltSelection()
+    								.liftSelectionFromImage(nodeImg,0,0);
+    					}
+    					else
+	    					img = currentWorkspace.getSelectionEngine().getBuiltSelection()
+	    						.liftSelectionFromData(currentWorkspace.buildActiveData());
     				}
     				
 	    	    	TransferableImage transfer = new TransferableImage(img);

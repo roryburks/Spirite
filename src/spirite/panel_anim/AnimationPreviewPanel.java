@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -329,7 +330,10 @@ public class AnimationPreviewPanel extends OmniComponent
 		}else if( source == buttonExport) {
 			if( animation instanceof FixedFrameAnimation) {
 				try {
-					AnimIO.exportFFAnim((FixedFrameAnimation) animation, new java.io.File("E:/test.png"));
+					File f = master.getDialogs().pickAAFExport();
+					if( f != null) {
+						AnimIO.exportFFAnim((FixedFrameAnimation) animation, f);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

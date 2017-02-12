@@ -237,7 +237,6 @@ public class PaletteManager
     }
 
     // :::: CommandExecuter
-    //	TODO: less hard-coded if this ever gets more commands
 	@Override
 	public List<String> getValidCommands() {
 		return Arrays.asList( new String[]{"swap","swapBack"});

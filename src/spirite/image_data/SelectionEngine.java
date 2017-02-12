@@ -621,6 +621,12 @@ public class SelectionEngine {
 			return new RectSelection( width, height);
 		}
 	}
+
+	/** Helper Class to reduce duplicate code. */
+	private interface LiftScheme {
+		void draw(Graphics g);
+		Rectangle getBounds();
+	}
 	public class BuiltSelection {
 		public final Selection selection;
 		public final int offsetX;
@@ -639,10 +645,10 @@ public class SelectionEngine {
 			g2.setTransform(trans);
 		}
 		
-		public BufferedImage liftSelectionFromData( BuiltImageData data) {
+		private BufferedImage LiftSelection( LiftScheme liftScheme) {
 			Rectangle selectionRect = selection.getBounds();
-			selectionRect.x = offsetX;
-			selectionRect.y = offsetY;
+			selectionRect.x = this.offsetX;
+			selectionRect.y = this.offsetY;
 			
 			BufferedImage bi = new BufferedImage( 
 					selectionRect.width, selectionRect.height, BufferedImage.TYPE_INT_ARGB);
@@ -652,7 +658,7 @@ public class SelectionEngine {
 			// Draw the mask, clipping the bounds of drawing to only the part 
 			// that the selection	intersects with the Image so that you do not 
 			//  leave un-applied mask left in the image.
-			Rectangle dataRect = data.getBounds();
+			Rectangle dataRect = liftScheme.getBounds();
 			Rectangle intersection = dataRect.intersection(selectionRect);
 			
 			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
@@ -663,12 +669,40 @@ public class SelectionEngine {
 			// Copy the data inside the Selection's alphaMask to liftedData
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
 			
-			g2.translate(-offsetX, -offsetY);
-
-			data.draw(g2);
+			g2.translate(-this.offsetX, -this.offsetY);
+			
+			liftScheme.draw(g2);
 			g2.dispose();
 			
 			return bi;
+		}
+		public BufferedImage liftSelectionFromImage( 
+				BufferedImage img, int offsetX, int offsetY)
+		{
+			return LiftSelection( new LiftScheme() {
+				@Override
+				public Rectangle getBounds() {
+					return new Rectangle( offsetX, offsetY, img.getWidth(), img.getHeight());
+				}
+				
+				@Override
+				public void draw(Graphics g) {
+					g.drawImage(img, 0, 0, null);
+				}
+			});
+		}
+		public BufferedImage liftSelectionFromData( BuiltImageData data) {
+			return LiftSelection(new LiftScheme() {
+				@Override
+				public Rectangle getBounds() {
+					return data.getBounds();
+				}
+				
+				@Override
+				public void draw(Graphics g) {
+					data.draw(g);
+				}
+			});
 		}
 
 		public AffineTransform getDrawFromTransform() {

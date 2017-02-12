@@ -91,8 +91,15 @@ public class Dialogs
     	fc.setCurrentDirectory( f);
     	int val = fc.showOpenDialog(null);
     	
-    	if( val == JFileChooser.APPROVE_OPTION)
-    		return fc.getSelectedFile();
+    	if( val == JFileChooser.APPROVE_OPTION) {
+    		File ret = fc.getSelectedFile();
+    		
+    		if( ret.getName().endsWith(".sif") || ret.getName().endsWith(".sif~"))
+    			master.getSettingsManager().setWorkspaceFilePath(ret);
+    		else
+    			master.getSettingsManager().setImageFilePath(ret);
+    		return ret;
+    	}
     	return null;
     }
     
@@ -114,9 +121,16 @@ public class Dialogs
 		fc.setSelectedFile(f);
     		
     	int val = fc.showSaveDialog(null);
-    	
-    	if( val == JFileChooser.APPROVE_OPTION)
-    		return fc.getSelectedFile();
+
+    	if( val == JFileChooser.APPROVE_OPTION) {
+    		File ret = fc.getSelectedFile();
+    		
+    		if( ret.getName().endsWith(".sif") || ret.getName().endsWith(".sif~"))
+    			master.getSettingsManager().setWorkspaceFilePath(ret);
+    		else
+    			master.getSettingsManager().setImageFilePath(ret);
+    		return ret;
+    	}
     	return null;
     	
     }
@@ -141,9 +155,40 @@ public class Dialogs
 		fc.setSelectedFile(f);
     		
     	int val = fc.showSaveDialog(null);
+
+    	if( val == JFileChooser.APPROVE_OPTION) {
+    		File ret = fc.getSelectedFile();
+    		
+    		if( ret.getName().endsWith(".sif") || ret.getName().endsWith(".sif~"))
+    			master.getSettingsManager().setWorkspaceFilePath(ret);
+    		else
+    			master.getSettingsManager().setImageFilePath(ret);
+    		return ret;
+    	}
+    	return null;
+    }
+    
+    public File pickAAFExport() {
+    	JFileChooser fc = new JFileChooser();
     	
-    	if( val == JFileChooser.APPROVE_OPTION)
+    	File f = master.getSettingsManager().getAAFFilePath();
+
+    	for( FileFilter filter : fc.getChoosableFileFilters()) {
+    		fc.removeChoosableFileFilter(filter);
+    	}
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("AAF File", "aaf"));
+    	fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG File", "png"));
+    	fc.addChoosableFileFilter( fc.getAcceptAllFileFilter());
+    	
+		fc.setCurrentDirectory( f);
+		fc.setSelectedFile(f);
+    		
+    	int val = fc.showSaveDialog(null);
+    	
+    	if( val == JFileChooser.APPROVE_OPTION) {
+    		master.getSettingsManager().setAAFFilePath(fc.getSelectedFile());
     		return fc.getSelectedFile();
+    	}
     	return null;
     }
     

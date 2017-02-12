@@ -27,7 +27,8 @@ public class AnimIO {
 		// Step 0: Convert the given filename to a uniform format
 		String name = file.getName();
 		if( name.endsWith(".png")) name = name.substring(0, name.length()-".png".length());
-		name = file.getParent() + name;
+		else if( name.endsWith(".aaf")) name = name.substring(0, name.length()-".aaf".length());
+		name = file.getParent() +"/"+ name;
 		
 		// Step 1: Interpret animation data as AAF Data
 		for( int i=0; i < animation.getEnd() ; ++i) {
@@ -65,6 +66,13 @@ public class AnimIO {
 				toPack.add(null);
 			}
 			else {
+				int ox = 0;
+				int oy = 0;
+				if( handle.isDynamic()) {
+					ox = handle.getDynamicX();
+					oy = handle.getDynamicY();
+				}
+				
 				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
 				Graphics g = bi.getGraphics();
 				g.drawImage(handle.deepAccess(), -bounds.x, -bounds.y, null);
@@ -72,8 +80,8 @@ public class AnimIO {
 				
 				CroppedImage ci = new CroppedImage();
 				ci.bi = bi;
-				ci.ox = bounds.x;
-				ci.oy = bounds.y;
+				ci.ox = bounds.x + ox;
+				ci.oy = bounds.y + oy;
 				
 				images.add(ci);
 				toPack.add(new Dimension(bounds.width,bounds.height));

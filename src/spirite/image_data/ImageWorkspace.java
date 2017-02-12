@@ -487,7 +487,7 @@ public class ImageWorkspace {
 			Graphics2D g2 = (Graphics2D)g;
 			
 			AffineTransform transform = new AffineTransform();			
-			transform.translate(ox,oy);
+//			transform.translate(ox,oy);
 			handle.drawLayer(g2, transform);
 		}
 		
@@ -496,6 +496,12 @@ public class ImageWorkspace {
 		public Graphics checkout() {
 			g = checkoutRaw().getGraphics();
 			return g;
+		}
+		
+		@Override
+		public Rectangle getBounds() {
+			return new Rectangle( ox + dii.ox, oy + dii.oy, 
+					handle.getWidth(), handle.getHeight());
 		}
 		@Override
 		public BufferedImage checkoutRaw() {
