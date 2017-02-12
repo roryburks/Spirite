@@ -2,12 +2,16 @@
 
 package spirite.brains;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import spirite.MDebug;
@@ -22,21 +26,28 @@ public class ToolsetManager
 {
 	
 	public static enum Tool {
-		PEN("Pen"), 
-		ERASER("Eraser"), 
-		FILL("Fill"), 
-		BOX_SELECTION("Box Selection"), 
-		MOVE("Move"),
-		COLOR_PICKER("Color Picker"),
-		PIXEL("Pixel"),
-		CROP("Cropper"),
-		COMPOSER("Rig Composer"),
-		FLIPPER("Horizontal/Vertical Flipping"),
-		RESHAPER("Reshaping Tool"),
-		ORIGIN("Origin Tool");
+		PEN("Pen", 0), 
+		ERASER("Eraser",1), 
+		FILL("Fill",2), 
+		BOX_SELECTION("Box Selection",3), 
+		MOVE("Move",4),
+		COLOR_PICKER("Color Picker",5),
+		PIXEL("Pixel",6),
+		CROP("Cropper",7),
+		COMPOSER("Rig Composer",8),
+		FLIPPER("Horizontal/Vertical Flipping",9),
+		RESHAPER("Reshaping Tool",10),
+		ORIGIN("Origin Tool",11);
 		
 		public final String description;
-		Tool( String name){ this.description = name;}
+		public final int iconLocation;
+		Tool( String name, int offset){ 
+			this.description = name; 
+			
+			// Could possibly just be replaced with .ordinal, but that's probably
+			//	bad practice.
+			this.iconLocation = offset;	
+		}
 	}
     
     public enum Cursor {MOUSE, STYLUS, ERASER};
@@ -94,25 +105,45 @@ public class ToolsetManager
     public ToolSettings getToolSettings(Tool tool) {
     	return toolSettings.get(tool);
     }
+    
+
+    BufferedImage icon_sheet = null;
+    int is_width, is_height;
+    private static final int TOOL_ICON_WIDTH = 24;
+    private static final int TOOL_ICON_HEIGHT = 24;
+    // Loads the icon sheet from icons.resources
+    private void prepareIconSheet() {
+        icon_sheet = null;
+        try {
+            BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("icons.png").openStream());
+            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            
+            Graphics g = icon_sheet.getGraphics();
+            g.drawImage(buff, 0, 0, null);
+            g.dispose();
+
+            is_width = icon_sheet.getWidth() / (TOOL_ICON_WIDTH+1);
+            is_height = icon_sheet.getHeight() / (TOOL_ICON_HEIGHT+1);
+        } catch (IOException e) {
+        	MDebug.handleError( ErrorType.RESOURCE, this, "Failed to prepare Toolset Icon Sheet");
+        }
+    }
+    
+    public void drawIcon( Graphics g, Tool tool) {
+    	if( icon_sheet == null) prepareIconSheet();
+    	int ix = getToolix(tool);
+    	int iy = getTooliy(tool);
+        g.drawImage( icon_sheet, 0, 0, TOOL_ICON_WIDTH, TOOL_ICON_HEIGHT,
+                ix*(TOOL_ICON_WIDTH+1), iy*(TOOL_ICON_HEIGHT+1), 
+                ix*(TOOL_ICON_WIDTH+1)+TOOL_ICON_WIDTH, iy*(TOOL_ICON_HEIGHT+1)+TOOL_ICON_HEIGHT, null);
+    }
 
     // Gets the position the toolset is in the icons.png image
-    // !!!! TODO: There is probably a beter place to put this and make it less
-    //  hard-coded, but for now I'll centralize it here
-    public int getToolix( Tool tool) {
-        int ind = tool.ordinal();
-
-        if( ind != -1) {
-            return ind % 4;
-        }
-        return 4;
+    private int getToolix( Tool tool) {
+    	return tool.iconLocation % is_width;
     }
-    public int getTooliy( Tool tool) {
-        int ind = tool.ordinal();
-
-        if( ind != -1) {
-            return ind / 4;
-        }
-        return 4;
+    private int getTooliy( Tool tool) {
+        return tool.iconLocation / is_width;
     }
 
 

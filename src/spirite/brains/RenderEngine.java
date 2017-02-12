@@ -962,13 +962,6 @@ public class RenderEngine
 			RenderSettings setting = entry.getKey();
 			
 			if( setting.target.workspace == evt.getWorkspace()) {
-
-				// TODO: Figure out if I need to translate this in the new system
-				// Since structureChanges do not effect ImageData and image draws
-				//	ignore settings, pass over image renderings on structureChange
-				//if( setting.image != null && evt.isStructureChange())
-				//	continue;
-				
 				// Make sure that the particular ImageData changed is
 				//	used by the Cache (if not, don't remove it)
 				List<ImageHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
@@ -1016,6 +1009,10 @@ public class RenderEngine
 	public void referenceStructureChanged(boolean hard) {
 		// TODO: Make this far more discriminating with a proper Event object
 		//	passing workspace and whether the front/back are changed
+		//
+		//	Low Priority: References are changed rarely, it's tedious to determine
+		//	if front/back are effected often, and if a Workspace isn't being effected
+		//	by a reference change chances are it isn't drawing the reference anyway
 		
 
 		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();

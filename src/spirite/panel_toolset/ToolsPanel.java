@@ -59,8 +59,6 @@ public class ToolsPanel extends JPanel
 
     private int tool_len;
 
-    BufferedImage icon_sheet = null;
-    int is_width, is_height;
 
     JPanel container;
 
@@ -73,7 +71,6 @@ public class ToolsPanel extends JPanel
 
     	toolsetManager.addToolsetObserver(this);
 
-        prepareIconSheet();
         initComponents();
         
         this.setOpaque(false);
@@ -82,35 +79,6 @@ public class ToolsPanel extends JPanel
         toolsetChanged(toolsetManager.getSelectedTool());
     }
 
-    // Loads the icon sheet from icons.resources
-    private void prepareIconSheet() {
-        icon_sheet = null;
-        try {
-            BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("icons.png").openStream());
-            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            
-            Graphics g = icon_sheet.getGraphics();
-            g.drawImage(buff, 0, 0, null);
-            g.dispose();
-
-            is_width = icon_sheet.getWidth() / 25;
-            is_height = icon_sheet.getHeight() / 25;
-        } catch (IOException e) {
-        	MDebug.handleError( ErrorType.RESOURCE, this, "Failed to prepare Toolset Icon Sheet");
-        }
-
-        // Turns all pixels the same color as the top-left pixel into transparent
-        //  pixels
-        if( icon_sheet != null) {
-            int base = icon_sheet.getRGB(0, 0);
-
-            for(int x = 0; x < icon_sheet.getWidth(); ++x) {
-                for( int y = 0; y < icon_sheet.getHeight(); ++y)
-                    if( base == icon_sheet.getRGB(x, y))
-                        icon_sheet.setRGB(x, y, 0);
-            }
-        }
-    }
 
     private void initComponents() {
         // The toolset panel is simply a JPanel with a Grid Layout inside
@@ -124,20 +92,12 @@ public class ToolsPanel extends JPanel
         add(container);
 
         // :: Add Toolset Buttons
-        int x = 0;
-        int y = 0;
-
         tool_len = toolsetManager.getToolCount();
 
         buttons = new ToolButton[tool_len];
         for( int i = 0; i < tool_len; ++i) {
             buttons[i] = new ToolButton( toolsetManager.getNthTool(i));
             container.add( buttons[i]);
-            x += 1;
-            if( x >= is_width) {
-                x = 0;
-                y = (y + 1) % is_height;
-            }
         }
 
         // Calibrate the grid
@@ -204,15 +164,12 @@ public class ToolsPanel extends JPanel
             implements ActionListener, MouseListener
     {
 		private static final long serialVersionUID = 1L;
-		private int ix, iy;
         private Tool tool;
 
         boolean hover = false;
 
         ToolButton( Tool tool) {
             this.tool = tool;
-            this.ix = toolsetManager.getToolix(tool);
-            this.iy = toolsetManager.getTooliy(tool);
             this.addActionListener(this);
             this.addMouseListener(this);
             this.setBorder(null);
@@ -246,12 +203,13 @@ public class ToolsPanel extends JPanel
                 g.fillRect(0, 0, w, h);
             }
 
+            Graphics2D g2 = (Graphics2D)g;
+            g2.translate(ew/2, 0);
+            toolsetManager.drawIcon(g2, tool);
+            g2.translate(-ew/2, 0);
             
-            g.drawImage( icon_sheet, ew / 2, 0, ew/2 + 24, 24,
-                    ix*25, iy*25, ix*25+24, iy*25+24, null);
 
             if( hover) {
-                Graphics2D g2 = (Graphics2D)g;
                 Shape shape = new java.awt.geom.RoundRectangle2D.Float(0, 0, this.getWidth()-1, this.getHeight()-1, 5, 5);
 
                 GradientPaint grad = new GradientPaint(w, 0, new Color(0,0,0,0), w, h, new Color(255,255,255,128));

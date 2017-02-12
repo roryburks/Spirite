@@ -591,8 +591,6 @@ public class MasterControl
 				workspace.cropNode(node, rect, false);
 			}});
     		commandMap.put("autocroplayer", new Runnable() {@Override public void run() {
-				// TODO: Will probably need fixing with new BuiltActiveDAta
-				//	format
 				Node node = workspace.getSelectedNode();
 				
 				if( node instanceof LayerNode) {
