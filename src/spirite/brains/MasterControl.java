@@ -369,11 +369,6 @@ public class MasterControl
 		    		dialog.promptNewImage();
 				}
 			});
-    		commandMap.put("debug_color", new Runnable() {
-				@Override public void run() {
-		    		dialog.promptDebugColor();
-				}
-			});
     		commandMap.put("open_image", new Runnable() {
     			@Override public void run() {
 	    			File f =dialog.pickFileOpen();

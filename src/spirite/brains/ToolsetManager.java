@@ -115,7 +115,7 @@ public class ToolsetManager
     private void prepareIconSheet() {
         icon_sheet = null;
         try {
-            BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("icons.png").openStream());
+            BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("tool_icons.png").openStream());
             icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
             
             Graphics g = icon_sheet.getGraphics();

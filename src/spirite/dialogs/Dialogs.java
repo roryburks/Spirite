@@ -229,17 +229,6 @@ public class Dialogs
             master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
             master.getCurrentWorkspace().finishBuilding();
         }
-    }                                            
-
-    /**     */
-    public void promptDebugColor() {
-        // TODO DEBUG
-        JColorChooser jcp = new JColorChooser();
-        int response = JOptionPane.showConfirmDialog(null, jcp, "Choose Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if( response == JOptionPane.OK_OPTION) {
-            master.getPaletteManager().setActiveColor(0, jcp.getColor());
-        }
     }
 
     // :::: CommandExecuter

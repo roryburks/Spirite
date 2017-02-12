@@ -1,6 +1,8 @@
 
 package spirite.ui;
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
@@ -20,6 +22,8 @@ import java.util.List;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
 
 import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
@@ -146,8 +150,6 @@ public class RootFrame extends javax.swing.JFrame
     			{".-"},
     			{".Export Image", "global.export", null},
     			{".Export Image As...", "global.export_as", null},
-    			{".-"},
-    			{".Debug &Color", "global.debug_color", null},
     			
     			{"&Edit", null, null},
     			{".&Undo", "draw.undo", null},
@@ -293,13 +295,61 @@ public class RootFrame extends javax.swing.JFrame
 						 return;
 				 }
 			 }
-			 this.dispose();
 			
 		}
 		
+
+
+		// If the SaveEngine is locked (still saving a file), wait 10 seconds,
+		//	if it's still saving, prompt the user to override, wait 30 more seconds,
+		//	then repeat (30 seconds -> prompt ->).
+		//
+		// Thread-inside-thread format so that the user can still experience UI 
+		//	Feedback while thread is waiting for SaveEngine to unlock
+		final int cursorType = Cursor.WAIT_CURSOR;
+		final Component glassPane = getGlassPane();
+		glassPane.setCursor(Cursor.getPredefinedCursor(cursorType));
+		glassPane.setVisible(true);
 		
-		this.dispose();
-        System.exit(0);
+		Thread outer = new Thread( new Runnable() {@Override public void run() {
+			Thread thread = new Thread(new Runnable() {@Override public void run() {
+				while( master.getSaveEngine().isLocked() ) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}});
+			try {
+				int option = JOptionPane.NO_OPTION;
+				thread.start();
+				thread.join(10*1000);
+				while( master.getSaveEngine().isLocked() && 
+						thread.isAlive() &&  option == JOptionPane.NO_OPTION)
+				{
+					thread.join(30*1000);
+					option = JOptionPane.showConfirmDialog(null, "File is still saving, close anyway?", "Closing Spirite", JOptionPane.YES_NO_CANCEL_OPTION);
+				}
+				
+				if( option == JOptionPane.CANCEL_OPTION) {
+					SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+						glassPane.setVisible(false);
+					}});
+					return;
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+				dispose();
+		        System.exit(0);	
+			}});
+		}});
+
+
+		outer.start();
 	}
 
 

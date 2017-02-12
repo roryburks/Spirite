@@ -40,8 +40,8 @@ import spirite.image_data.layers.SpriteLayer.Part;
  * SaveEngine is a static container for methods which saves images to
  * various file formats (but particularly the native SIF format)
  * 
- * TODO: Implement a thread-locking mechanism preventing RootPanel from
- * 	closing with System.close if there is a Save action going on.
+ * TODO: Figure out a stable way to multi-thread backups (one thing is for sure
+ * the conversion from BufferedImage to PNG through ImageIO should be multi-threaded)
  */
 public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
@@ -64,14 +64,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome() - watcher.lastUndoSpot) 
 			{
 				watcher.lastTime = time;
-				(new Thread(new Runnable() {
-					@Override
-					public void run() {
-						MDebug.log("Saving Backup");
-						saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
-						MDebug.log("Finished");
-					}
-				})).start();
+				saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
 				watcher.lastTime = time;
 				watcher.lastUndoSpot= watcher.workspace.getUndoEngine().getMetronome();
 			}
@@ -97,6 +90,11 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 			this.lastTime = System.currentTimeMillis();
 			this.lastUndoSpot = workspace.getUndoEngine().getMetronome();
 		}
+	}
+	
+	private int lockCount = 0;
+	public boolean isLocked() {
+		return lockCount != 0;
 	}
 	
 	/**
@@ -129,7 +127,8 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 	}
 	
 	public void removeAutosaved( ImageWorkspace workspace) {
-/*		File f = workspace.getFile();
+/*		TODO: Reimplement when things are more stable
+ * 		File f = workspace.getFile();
 		if( f != null) {
 			 f= new File(workspace.getFile().getAbsolutePath() + "~");
 			 if( f.exists()) {
@@ -144,7 +143,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		saveWorkspace( workspace, file, true);
 	}
 	public void saveWorkspace( ImageWorkspace workspace, File file, boolean track) {
-
+		lockCount++;
 		SaveHelper helper = new SaveHelper(workspace);
 
 		try {
@@ -183,6 +182,7 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 				if( helper.ra != null)
 					helper.ra.close();
 			} catch (IOException e) {}
+			lockCount--;
 		}
 		workspace.relinquishCache(helper.reservedCache);
 	}
@@ -232,7 +232,6 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 
 		helper.nodeMap.put( node, helper.nmMet++);
 		if( node instanceof GroupTree.GroupNode) {
-			GroupTree.GroupNode gnode = (GroupTree.GroupNode) node;
 			// [1] : Node Type ID
 			helper.ra.write( SaveLoadUtil.NODE_GROUP);
 			
