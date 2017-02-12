@@ -2,6 +2,7 @@ package spirite.file;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,8 +17,43 @@ import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.animation_data.FixedFrameAnimation;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
+import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 
 public class AnimIO {
+	public static void exportAnimationSheet( FixedFrameAnimation animation, File file) 
+			throws IOException 
+	{
+		int width = 0;
+		int height = 0;
+
+
+		for( AnimationLayer layer : animation.getLayers()) {
+			for( Frame frame : layer.getFrames()) {
+				if( frame.getMarker() == Marker.FRAME) {
+					width = Math.max( width, frame.getLayerNode().getLayer().getWidth());
+					height = Math.max( height, frame.getLayerNode().getLayer().getHeight());
+				}
+			}
+		}
+		
+		int c = (int)Math.floor(animation.getEndFrame());
+		
+		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_INT_ARGB);
+		
+		Graphics2D g = (Graphics2D) bi.getGraphics();
+		MUtil.clearImage(bi);
+		g.translate(-width, 0);
+		for( int i=0; i<c; ++i) {
+			g.translate(width, 0);
+			animation.drawFrame(g, i);
+		}
+		g.dispose();
+		
+		ImageIO.write(bi, "png", file);
+	}
+	
 	public static void exportFFAnim( FixedFrameAnimation animation, File file) 
 			throws IOException 
 	{

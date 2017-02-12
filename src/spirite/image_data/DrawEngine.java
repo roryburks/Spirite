@@ -4,13 +4,18 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -123,13 +128,18 @@ public class DrawEngine {
 		if( !MUtil.coordInImage( p.x, p.y, bi)) {
 			return false;
 		}
+		
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		if( mask.selection != null && !mask.selection.contains(x - mask.offsetX, y-mask.offsetY)) {
+			return false;
+		}
 		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
 			return false;
 		}
 		data.checkin();
 		
 
-		execute( new FillAction(new Point(x,y), color, selectionEngine.getBuiltSelection(), data));
+		execute( new FillAction(new Point(x,y), color, mask, data));
 
 		return true;
 	}
@@ -546,20 +556,44 @@ public class DrawEngine {
 
 		@Override
 		protected void performImageAction( ) {
-			
-			BufferedImage bi= builtImage.checkoutRaw();
+			BufferedImage bi;
+			Point layerSpace;
+			BufferedImage intermediate = null;
+			if( mask.selection == null) {
+				bi= builtImage.checkoutRaw();
+				layerSpace = builtImage.convert( new Point(p.x, p.y));
+			}
+			else {
+				bi = mask.liftSelectionFromData(builtImage);
+				layerSpace = new Point(p.x - mask.offsetX, p.y - mask.offsetY);
+			}
 			
 			Queue<Integer> queue = new LinkedList<Integer>();
 			
-			Point layerSpace = builtImage.convert( new Point(p.x, p.y));
 			queue.add( MUtil.packInt(layerSpace.x, layerSpace.y));
-			
 			
 			int w = bi.getWidth();
 			int h = bi.getHeight();
 			int bg = bi.getRGB(layerSpace.x, layerSpace.y);
 			int c = color.getRGB();
 			
+			if( mask.selection != null && bg == 0){
+				// A lot of work for a singular yet common case: 
+				// When coloring into transparent data, create an image which has
+				//	a color other than 0 (pure transparent) outside of its selection
+				//	mask (this has to be done in a couple of renderings).
+				intermediate = bi;
+				bi = new BufferedImage(
+						bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				g2.setColor(Color.GREEN);
+				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+				mask.selection.drawSelectionMask(g2);
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+				g2.drawImage(intermediate, 0, 0, null);
+				g2.dispose();
+			}
 			
 			
 			if( bg == c) return;
@@ -569,11 +603,6 @@ public class DrawEngine {
 				int ix = MUtil.high16(p);
 				int iy = MUtil.low16(p);
 				
-				// TODO: Was bad so I removed Selection Masking for now
-				//
-				// Better way: lift the selected data out of the mask with a different
-				//	color underneath (just have to make sure other color is different from
-				//	bg), then perform fill on that layer, then paste the layer back.
 				if( bi.getRGB(ix, iy) != bg)
 					continue;
 					
@@ -594,6 +623,35 @@ public class DrawEngine {
 				}
 			}
 			
+			if( mask.selection != null) {
+				if( bg == 0) { 
+					// Continuing from above, after the fill is done, crop out the
+					//	green outer mask out of the result image.  (This requires
+					//	re-using the second BufferedImage since selection masks will
+					//	most often be using a geometric rendering that never actually
+					//	touches the pixels outside of it with its rasterizer)
+					MUtil.clearImage(intermediate);
+					Graphics2D g2 = (Graphics2D)intermediate.getGraphics();
+					mask.selection.drawSelectionMask(g2);
+					g2.dispose();
+					
+					g2 = (Graphics2D) bi.getGraphics();
+					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
+					g2.drawImage(intermediate, 0, 0, null);
+					g2.dispose();
+				}
+
+				// Anchor the lifted image to the real image
+				Graphics g = builtImage.checkout();
+				Point p = builtImage.convert(new Point(mask.offsetX,mask.offsetY));
+				g.drawImage( bi, p.x, p.y, null);
+			}
+			try {
+				ImageIO.write(bi, "png", new java.io.File("E:/test.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			builtImage.checkin();
 		}
 		public Point getPoint() { return new Point(p);}

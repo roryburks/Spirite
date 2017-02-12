@@ -2,6 +2,7 @@ package spirite.image_data;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -557,7 +558,7 @@ public class SelectionEngine {
 		public abstract void drawSelectionBounds( Graphics g);
 		abstract void drawSelectionMask( Graphics g);
 		public abstract boolean contains( int x, int y);
-		public abstract Rectangle getBounds();
+		public abstract Dimension getDimension();
 		abstract Rectangle clipToRect( Rectangle rect);	// returns null if the clipped Selection is empty
 		
 		public abstract Selection clone();
@@ -567,7 +568,7 @@ public class SelectionEngine {
 		@Override		public void drawSelectionBounds(Graphics g) {}
 		@Override		void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
-		@Override		public Rectangle getBounds() {return new Rectangle(0,0,0,0);}
+		@Override		public Dimension getDimension() {return new Dimension(0,0);}
 		@Override		Rectangle clipToRect(Rectangle rect) {return null;}
 		@Override		public Selection clone() { return new NullSelection();}
 	}
@@ -592,8 +593,8 @@ public class SelectionEngine {
 			g.fillRect(0, 0, width, height);
 		}
 		@Override
-		public Rectangle getBounds() {
-			return new Rectangle( 0, 0, width, height);
+		public Dimension getDimension() {
+			return new Dimension( width, height);
 		}
 		@Override
 		public boolean contains( int x, int y) {
@@ -646,7 +647,7 @@ public class SelectionEngine {
 		}
 		
 		private BufferedImage LiftSelection( LiftScheme liftScheme) {
-			Rectangle selectionRect = selection.getBounds();
+			Rectangle selectionRect = new Rectangle(selection.getDimension());
 			selectionRect.x = this.offsetX;
 			selectionRect.y = this.offsetY;
 			

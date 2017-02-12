@@ -579,9 +579,9 @@ public class MasterControl
 					return;
 				}
 
-				Rectangle rect = selection.getBounds();
-				rect.x += selectionEngine.getOffsetX();
-				rect.y += selectionEngine.getOffsetY();
+				Rectangle rect = new Rectangle(selection.getDimension());
+				rect.x = selectionEngine.getOffsetX();
+				rect.y = selectionEngine.getOffsetY();
 				
 				workspace.cropNode(node, rect, false);
 			}});

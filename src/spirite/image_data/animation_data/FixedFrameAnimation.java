@@ -138,43 +138,6 @@ public class FixedFrameAnimation extends Animation
 		}
 	}
 	
-	public void save() {
-		int width = 0;
-		int height = 0;
-
-
-		for( AnimationLayer layer : layers) {
-			for( Frame frame : layer.getFrames()) {
-				if( frame.marker == Marker.FRAME) {
-					width = Math.max( width, frame.node.getLayer().getWidth());
-					height = Math.max( height, frame.node.getLayer().getHeight());
-				}
-			}
-		}
-		
-		int c = (int)Math.floor(getEndFrame());
-		
-		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_INT_ARGB);
-		
-		Graphics2D g = (Graphics2D) bi.getGraphics();
-		MUtil.clearImage(bi);
-		g.translate(-width, 0);
-		for( int i=0; i<c; ++i) {
-			g.translate(width, 0);
-			drawFrame(g, i);
-//			if( layers.get(0))
-//			layers.get(0).getLayers().get(i).getLayer().draw(g);
-		}
-		g.dispose();
-		
-		try {
-			ImageIO.write(bi, "png", new File("E:/test.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	@Override
 	public float getStartFrame() {
 		return startFrame;
