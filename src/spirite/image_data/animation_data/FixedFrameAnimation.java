@@ -1,10 +1,6 @@
 package spirite.image_data.animation_data;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,9 +9,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import javax.imageio.ImageIO;
-import javax.swing.TransferHandler;
 
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
@@ -29,7 +22,6 @@ import spirite.image_data.ImageWorkspace.DeletionChange;
 import spirite.image_data.ImageWorkspace.MoveChange;
 import spirite.image_data.ImageWorkspace.StructureChange;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 
 /**
@@ -190,7 +182,10 @@ public class FixedFrameAnimation extends Animation
 			LayerNode node = layer.getFrame(localMet);
 			
 			if( node != null) {
-				drawList.addAll( node.getLayer().getDrawList());
+				for( TransformedHandle tr  : node.getLayer().getDrawList()) {
+					tr.trans.translate(node.getOffsetX(), node.getOffsetY());
+					drawList.add( tr);
+				}
 			}
 		}
 		

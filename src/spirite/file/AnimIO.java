@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.imageio.ImageIO;
+
 import mutil.RectanglePacker;
 import mutil.RectanglePacker.PackedRectangle;
 import spirite.MUtil;
@@ -18,10 +20,19 @@ import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
-import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
 
+/**
+ * AnimIO is a container for static methods that export Animations of various
+ * formats into various file formats.
+ * 
+ * @author RoryBurks
+ */
 public class AnimIO {
+	/**
+	 * Exports the animation into a PNG wile with each frame tiled one after the other.
+	 */
 	public static void exportAnimationSheet( FixedFrameAnimation animation, File file) 
 			throws IOException 
 	{
@@ -54,6 +65,10 @@ public class AnimIO {
 		ImageIO.write(bi, "png", file);
 	}
 	
+	/**
+	 * Exports the given FixedFrameAnimation into an .aaf file with a corresponding 
+	 * PNG.
+	 */
 	public static void exportFFAnim( FixedFrameAnimation animation, File file) 
 			throws IOException 
 	{

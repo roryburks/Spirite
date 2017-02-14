@@ -4,11 +4,9 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -137,7 +135,6 @@ public class DrawEngine {
 			return false;
 		}
 		data.checkin();
-		
 
 		execute( new FillAction(new Point(x,y), color, mask, data));
 

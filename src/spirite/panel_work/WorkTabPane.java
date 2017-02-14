@@ -18,6 +18,7 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.image_data.ImageWorkspace.MWorkspaceFileObserver;
+import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.UIUtil;
 
 public class WorkTabPane extends JTabbedPane 
@@ -46,6 +47,15 @@ public class WorkTabPane extends JTabbedPane
 		if( index != -1)
 			return panels.get(index);
 		
+		return null;
+	}
+	
+	public Zoomer getZoomerForWorkspace( ImageWorkspace ws) {
+		for( WorkPanel panel : panels) {
+			if( panel.workspace == ws) {
+				return panel.zoomer;
+			}
+		}
 		return null;
 	}
 	

@@ -72,6 +72,19 @@ public class MUtil {
 	}
 
 	
+	/** 
+	 * Places t in between start and end such that it is offset by an integer
+	 * number of rotations of start to end. <br>
+	 * (ex: if start = 10, end = 20, t = 65, returns 15)
+	 */
+	public static int cycle( int start, int end, int t) {
+		int diff = end - start;
+		if( diff == 0)
+			return 0;
+		
+		return ((((t - start) % diff) + diff) % diff) + start;
+	}
+	
 	/**
 	 * Constructs a non-negative dimension Rectangle from two coordinates
 	 */
@@ -100,19 +113,6 @@ public class MUtil {
 				Math.max( rect1.x + rect1.width, rect2.x + rect2.width),
 				Math.max( rect1.y + rect1.height, rect2.y + rect2.height)
 				);
-	}
-	
-	/** 
-	 * Places t in between start and end such that it is offset by an integer
-	 * number of rotations of start to end. <br>
-	 * (ex: if start = 10, end = 20, t = 65, returns 15)
-	 */
-	public static int cycle( int start, int end, int t) {
-		int diff = end - start;
-		if( diff == 0)
-			return 0;
-		
-		return ((((t - start) % diff) + diff) % diff) + start;
 	}
 	
 	// ::::
@@ -239,7 +239,8 @@ public class MUtil {
 		
 		// Left
 		ret = data.findFirstEmptyLine( new IntCounter(0,data.w-1), false);
-		x1 = (ret == -1) ? 0 : ret;
+		if( ret == -1) return new Rectangle(0,0,0,0);
+		x1 = ret;
 		
 		// Right
 		ret = data.findFirstEmptyLine( new IntCounter(data.w-1, 0), false);
@@ -247,7 +248,8 @@ public class MUtil {
 
 		// Top
 		ret = data.findFirstEmptyLine( new IntCounter(0,data.h-1), true);
-		y1 = (ret == -1) ? 0 : ret;
+		if( ret == -1) return new Rectangle(0,0,0,0);
+		y1 =  ret;
 
 		// Bottom
 		ret = data.findFirstEmptyLine( new IntCounter(data.h-1, 0), true);

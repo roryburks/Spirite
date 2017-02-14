@@ -18,12 +18,15 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
+import spirite.image_data.ImageWorkspace;
 import spirite.panel_anim.AnimationPreviewPanel;
 import spirite.panel_anim.AnimationSchemePanel;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_layers.ReferenceSchemePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
+import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkTabPane;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 
@@ -202,6 +205,13 @@ public class FrameManager
 				});
 			}
 		}
+	}
+	
+	public Zoomer getZoomerForWorkspace( ImageWorkspace ws) {
+		if( root == null) return null;
+		
+		WorkTabPane wsPane = root.getWTPane();
+		return wsPane.getZoomerForWorkspace(ws);
 	}
 	
 	// :::: WindowListener

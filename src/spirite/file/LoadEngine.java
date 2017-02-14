@@ -26,6 +26,7 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.DynamicImportImage;
 import spirite.image_data.ImageWorkspace.ImportImage;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
@@ -34,7 +35,6 @@ import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SimpleLayer;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
-import spirite.image_data.ImageWorkspace.DynamicImportImage;
 
 /***
  * LoadEngine is a static container for methods which load images from

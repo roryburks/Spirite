@@ -145,7 +145,7 @@ public class SelectionEngine {
 			// Construct an execute the composite action
 			List<UndoableAction> actions = new ArrayList<>(3);
 			actions.add( startAction);
-			// TODO: Verify that it works
+			
 			actions.add(new ClearSelectionAction(
 					getBuiltSelection(),
 					workspace.buildData(node)));

@@ -240,7 +240,7 @@ public class RigPanel extends OmniComponent
 		
 		if( rig != null)
 			rig.addRigObserver(this);
-		
+
 		refresh();
 	}
 
@@ -338,7 +338,6 @@ public class RigPanel extends OmniComponent
 	// :::: MSelectionListener
 	@Override
 	public void selectionChanged(Node newSelection) {
-//		System.out.println("SELECT");
 		if( newSelection instanceof LayerNode) {
 			LayerNode ln = (LayerNode)newSelection;
 			if( ln.getLayer() instanceof SpriteLayer) {
@@ -387,8 +386,8 @@ public class RigPanel extends OmniComponent
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
-				building = true;
 				if( rig == null) return;
+				building = true;
 				ListSelectionModel model =  listPanel.getSelectionModel();
 				int i = model.getMinSelectionIndex();
 				Rectangle rect = listPanel.getCellBounds(i,i);

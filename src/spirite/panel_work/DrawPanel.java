@@ -87,6 +87,7 @@ public class DrawPanel extends JPanel
 		penner.refreshCoordinates();
 	}
 
+	
     // :::: Paint
     @Override
     public void paintComponent( Graphics g) {
@@ -120,7 +121,8 @@ public class DrawPanel extends JPanel
         		zoomer.itsY(0)-1,
 	            (int)Math.round(workspace.getWidth()*zoom)+1,
 	            (int)Math.round(workspace.getHeight()*zoom)+1);
-        
+
+        long start = System.currentTimeMillis();
         // Render the image
     	BufferedImage image = renderEngine.renderImage(settings);
 
@@ -133,7 +135,7 @@ public class DrawPanel extends JPanel
         // Draw Border around the active Layer
         GroupTree.Node selected = workspace.getSelectedNode();
         
-        if( selected!= null) {
+/*        if( selected!= null) {
             g2.setStroke(dashedStroke);
             g2.setColor(Globals.getColor("drawpanel.layer.border"));
             
@@ -146,10 +148,10 @@ public class DrawPanel extends JPanel
         				(int)(layer.getWidth()* zoomer.getZoom()), 
         				(int)(layer.getHeight() * zoomer.getZoom()));
         	}
-        }
+        }*/
         
         // Draw Border on active Data
-        BuiltImageData bid = workspace.buildActiveData();
+/*        BuiltImageData bid = workspace.buildActiveData();
         
         if( bid != null) {
 			AffineTransform transform = g2.getTransform();
@@ -159,7 +161,7 @@ public class DrawPanel extends JPanel
             g2.scale(zoomer.getZoom(), zoomer.getZoom());
             bid.drawBorder(g2);
 			g2.setTransform( transform);
-        }
+        }*/
 
 
         g2.setStroke(baseStroke);

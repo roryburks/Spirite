@@ -40,6 +40,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.RectSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
+import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.FrameManager;
 
 /***
@@ -473,10 +474,16 @@ public class MasterControl
 	    			// Paste Data onto Selection Engine (current selected Data)
 	    			int ox = 0, oy=0;
 	    			
+	    			Zoomer zoom = frameManager.getZoomerForWorkspace(currentWorkspace);
+
+	    			int min_x = zoom.stiX(0);
+	    			int min_y = zoom.stiY(0);
+	    			
 	    			Node node = currentWorkspace.getSelectedNode();
 	    			if( node != null) {
-	    				ox = node.getOffsetX();
-	    				oy = node.getOffsetY();
+	    				
+	    				ox = Math.max(min_x,node.getOffsetX());
+	    				oy = Math.max(min_y,node.getOffsetY());
 	    			}
 	    			
 	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);

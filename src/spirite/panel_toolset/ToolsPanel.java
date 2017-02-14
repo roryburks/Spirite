@@ -16,18 +16,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import spirite.Globals;
-import spirite.MDebug;
-import spirite.MDebug.ErrorType;
 import spirite.brains.HotkeyManager;
 import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;

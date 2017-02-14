@@ -22,7 +22,6 @@ import java.util.List;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
 import spirite.MUtil.TransferableImage;
@@ -213,23 +212,8 @@ public class RootFrame extends javax.swing.JFrame
         return false;
     }
     
-
-    private void copy() {
-    	ImageWorkspace workspace = master.getCurrentWorkspace();
-    	
-    	if( workspace == null) return;
-
-    	GroupTree.Node node = workspace.getSelectedNode();
-    	RenderSettings settings = new RenderSettings(
-    			master.getRenderEngine().getNodeRenderTarget(node));
-
-
-    	BufferedImage img = master.getRenderEngine().renderImage(settings);
-    	
-    	TransferableImage transfer = new TransferableImage(img);
-
-    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-    	c.setContents(transfer, null);
+    WorkTabPane getWTPane() {
+    	return this.workPane;
     }
 
     // :::: WindowFocusListener

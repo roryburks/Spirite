@@ -143,15 +143,15 @@ public class WorkPanel extends javax.swing.JPanel
     	
         // :::: Coordinate Conversion methods
 
-        int itsX( int x) { return Math.round( (x + cx) * zoom  * zoomer.zoom) + offsetx  ;}
-        int itsY( int y) { return Math.round( (y +cy) * zoom * zoomer.zoom) + offsety  ;}
-        int stiX( int x) { return Math.round((x - offsetx) / zoom * zoomer.zoom  - cx);}
-        int stiY( int y) { return Math.round((y - offsety ) / zoom * zoomer.zoom  - cy);}
+        public int itsX( int x) { return Math.round( (x + cx) * zoom  * zoomer.zoom) + offsetx  ;}
+        public int itsY( int y) { return Math.round( (y +cy) * zoom * zoomer.zoom) + offsety  ;}
+        public int stiX( int x) { return Math.round((x - offsetx) / zoom * zoomer.zoom  - cx);}
+        public int stiY( int y) { return Math.round((y - offsety ) / zoom * zoomer.zoom  - cy);}
         
-        int itsXm( int x) { return (int) (Math.floor((x + cx) * zoom * zoomer.zoom) + offsetx  );}
-        int itsYm( int y) { return (int) (Math.floor((y  + cy)* zoom * zoomer.zoom) + offsety );}
-        int stiXm( int x) { return (int) Math.floor((x - offsetx  ) / zoom * zoomer.zoom - cx);}
-        int stiYm( int y) { return (int) Math.floor((y - offsety ) / zoom * zoomer.zoom  - cy);}
+        public int itsXm( int x) { return (int) (Math.floor((x + cx) * zoom * zoomer.zoom) + offsetx  );}
+        public int itsYm( int y) { return (int) (Math.floor((y  + cy)* zoom * zoomer.zoom) + offsety );}
+        public int stiXm( int x) { return (int) Math.floor((x - offsetx  ) / zoom * zoomer.zoom - cx);}
+        public int stiYm( int y) { return (int) Math.floor((y - offsety ) / zoom * zoomer.zoom  - cy);}
     }
     
     public class Zoomer {
@@ -209,19 +209,19 @@ public class WorkPanel extends javax.swing.JPanel
         // :::: Coordinate Conversion methods
         // its : converts image coordinates to screen coordinates (accounting for zoom)
         // sti : converts screen coordinates to image coordinates
-        int itsX( int x) { return Math.round(x * zoom) + offsetx;}
-        int itsY( int y) { return Math.round(y * zoom) + offsety;}
-        int stiX( int x) { return Math.round((x - offsetx) / zoom);}
-        int stiY( int y) { return Math.round((y - offsety) / zoom);}
+        public int itsX( int x) { return Math.round(x * zoom) + offsetx;}
+        public int itsY( int y) { return Math.round(y * zoom) + offsety;}
+        public int stiX( int x) { return Math.round((x - offsetx) / zoom);}
+        public int stiY( int y) { return Math.round((y - offsety) / zoom);}
         
         // *m functions are as above, but tweaked for mouse coordinates, such that 
         // 	mouse input is rounded as visually expected.
-        int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
-        int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
+        public int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
+        public int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
         int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
-        int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
+        public int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
         
-        Rectangle itsRm( Rectangle rect) {
+        public Rectangle itsRm( Rectangle rect) {
         	return new Rectangle(
         		itsXm( rect.x),
         		itsYm( rect.y),
