@@ -646,14 +646,13 @@ public class SelectionEngine {
 			g2.setTransform(trans);
 		}
 		
-		private BufferedImage LiftSelection( LiftScheme liftScheme) {
+		private BufferedImage liftSelection( LiftScheme liftScheme) {
 			Rectangle selectionRect = new Rectangle(selection.getDimension());
 			selectionRect.x = this.offsetX;
 			selectionRect.y = this.offsetY;
 			
 			BufferedImage bi = new BufferedImage( 
 					selectionRect.width, selectionRect.height, BufferedImage.TYPE_INT_ARGB);
-			MUtil.clearImage(bi);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the mask, clipping the bounds of drawing to only the part 
@@ -669,7 +668,7 @@ public class SelectionEngine {
 
 			// Copy the data inside the Selection's alphaMask to liftedData
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-			
+
 			g2.translate(-this.offsetX, -this.offsetY);
 			
 			liftScheme.draw(g2);
@@ -680,7 +679,7 @@ public class SelectionEngine {
 		public BufferedImage liftSelectionFromImage( 
 				BufferedImage img, int offsetX, int offsetY)
 		{
-			return LiftSelection( new LiftScheme() {
+			return liftSelection( new LiftScheme() {
 				@Override
 				public Rectangle getBounds() {
 					return new Rectangle( offsetX, offsetY, img.getWidth(), img.getHeight());
@@ -693,7 +692,7 @@ public class SelectionEngine {
 			});
 		}
 		public BufferedImage liftSelectionFromData( BuiltImageData data) {
-			return LiftSelection(new LiftScheme() {
+			return liftSelection(new LiftScheme() {
 				@Override
 				public Rectangle getBounds() {
 					return data.getBounds();

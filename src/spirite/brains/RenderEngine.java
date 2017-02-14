@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -162,12 +163,18 @@ public class RenderEngine
 			if( workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing()) {
 
+				Rectangle r = dataContext.getBounds();
 				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
 						BufferedImage.TYPE_INT_ARGB);
 				
 				g2 = (Graphics2D)bi.getGraphics();
+				
+//				g2.translate(-r.x, -r.y);
+				g2.setTransform(dataContext.getTransform());
 				dataContext.draw(g2);
+				g2.setTransform(new AffineTransform());
+//				g2.translate(r.x, r.y);
 			
 				
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){

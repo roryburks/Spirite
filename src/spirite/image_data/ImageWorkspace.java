@@ -353,7 +353,8 @@ public class ImageWorkspace {
 		public void draw(Graphics g) {
 			Graphics2D g2 = (Graphics2D)g;
 			
-			AffineTransform transform = new AffineTransform();			
+			AffineTransform transform = new AffineTransform();
+			transform.translate(ox, oy);
 			handle.drawLayer(g2, transform);
 		}
 		
@@ -473,21 +474,12 @@ public class ImageWorkspace {
 		@Override
 		public AffineTransform getTransform() {
 			AffineTransform tf = new AffineTransform();
-//			tf.translate( dii.ox,dii.oy);
+			tf.translate( -ox, -oy);
 			return tf;
 		}
 		@Override
 		public AffineTransform getDrawTransform() {
 			return new AffineTransform();
-		}
-		@Override
-		public void draw(Graphics g) {
-
-			Graphics2D g2 = (Graphics2D)g;
-			
-			AffineTransform transform = new AffineTransform();			
-//			transform.translate(ox,oy);
-			handle.drawLayer(g2, transform);
 		}
 		
 		BufferedImage buffer = null;

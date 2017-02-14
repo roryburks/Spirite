@@ -135,7 +135,7 @@ public class DrawPanel extends JPanel
         // Draw Border around the active Layer
         GroupTree.Node selected = workspace.getSelectedNode();
         
-/*        if( selected!= null) {
+        if( selected!= null) {
             g2.setStroke(dashedStroke);
             g2.setColor(Globals.getColor("drawpanel.layer.border"));
             
@@ -148,7 +148,7 @@ public class DrawPanel extends JPanel
         				(int)(layer.getWidth()* zoomer.getZoom()), 
         				(int)(layer.getHeight() * zoomer.getZoom()));
         	}
-        }*/
+        }
         
         // Draw Border on active Data
 /*        BuiltImageData bid = workspace.buildActiveData();
