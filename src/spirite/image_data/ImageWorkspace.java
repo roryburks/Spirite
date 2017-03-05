@@ -474,7 +474,6 @@ public class ImageWorkspace {
 		@Override
 		public AffineTransform getTransform() {
 			AffineTransform tf = new AffineTransform();
-			tf.translate( -ox, -oy);
 			return tf;
 		}
 		@Override
@@ -1133,9 +1132,8 @@ public class ImageWorkspace {
 			
 			// Import that Node
 			LayerNode newNode = 
-					groupTree.new LayerNode(dupe, toDupe.name + " copy");
+					groupTree.new LayerNode((LayerNode) toDupe, dupe, toDupe.name + " copy");
 			importNodeWithData( newNode, dupeData);
-			
 			
 			executeChange( new AdditionChange( 
 					newNode, 
@@ -1145,7 +1143,7 @@ public class ImageWorkspace {
 			return newNode;
 		}
 		else if( toDupe instanceof GroupNode) {
-			GroupNode dupeRoot= groupTree.new GroupNode(toDupe.name + " copy");
+			GroupNode dupeRoot= groupTree.new GroupNode((GroupNode) toDupe, toDupe.name + " copy");
 			Map< Integer, ImportImage> dupeData = new HashMap<>();
 
 			// Breadth-first queue for Duping
@@ -1160,7 +1158,7 @@ public class ImageWorkspace {
 				
 				if( next.toDupe instanceof GroupNode) {
 					// Clone Group node, and add all its children to the queue
-					dupe = groupTree.new GroupNode( next.toDupe.getName()+" copy");
+					dupe = groupTree.new GroupNode( (GroupNode) next.toDupe, next.toDupe.getName()+" copy");
 					
 					for( Node child : next.toDupe.getChildren()) {
 						dupeQueue.add( new NodeContext( child, dupe));
@@ -1187,6 +1185,7 @@ public class ImageWorkspace {
 					}
 					
 					dupe = groupTree.new LayerNode( 
+							(LayerNode) next.toDupe,
 							layer.logicalDuplicate(), 
 							next.toDupe.getName() + " copy");
 				}

@@ -115,12 +115,12 @@ public class DrawPanel extends JPanel
 
 
         // Draw Border around the Workspace
-        g2.setStroke(dashedStroke);
+/*        g2.setStroke(dashedStroke);
         g2.setColor(Globals.getColor("drawpanel.image.border"));
         g2.drawRect( zoomer.itsX(0)-1,
         		zoomer.itsY(0)-1,
 	            (int)Math.round(workspace.getWidth()*zoom)+1,
-	            (int)Math.round(workspace.getHeight()*zoom)+1);
+	            (int)Math.round(workspace.getHeight()*zoom)+1);*/
 
         long start = System.currentTimeMillis();
         // Render the image

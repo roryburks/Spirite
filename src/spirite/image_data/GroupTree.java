@@ -69,6 +69,19 @@ public class GroupTree {
 		protected int y = 0;
 		protected boolean expanded = true;
 		protected String name = "";
+		
+		Node() {
+			
+		}
+		
+		private Node( Node other, String name) {
+			this.name = name;
+			this.expanded = other.expanded;
+			this.x = other.x;
+			this.y = other.y;
+			this.visible = other.visible;
+			this.alpha = other.alpha;
+		}
 
 		// :::: Get/Set
 		public boolean isVisible() {
@@ -286,12 +299,19 @@ public class GroupTree {
 		GroupNode( String name) {
 			this.name = name;
 		}
+		GroupNode( GroupNode other, String name) {
+			super( other, name);
+		}
 		
 	}
 	
 	public class LayerNode extends Node {
 		Layer layer;
 //		ImageData data;
+		LayerNode( LayerNode other, Layer layer, String name) {
+			super( other, name);
+			this.layer = layer;
+		}
 		
 		LayerNode( Layer layer, String name) {
 			this.layer = layer;

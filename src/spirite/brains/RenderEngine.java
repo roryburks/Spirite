@@ -170,11 +170,9 @@ public class RenderEngine
 				
 				g2 = (Graphics2D)bi.getGraphics();
 				
-//				g2.translate(-r.x, -r.y);
 				g2.setTransform(dataContext.getTransform());
 				dataContext.draw(g2);
 				g2.setTransform(new AffineTransform());
-//				g2.translate(r.x, r.y);
 			
 				
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
