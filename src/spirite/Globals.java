@@ -71,7 +71,7 @@ public class Globals {
     		{"icon.frame.toolSettings",3,2},
     		{"icon.frame.referenceScheme",4,2},
     		
-    		{"icons_12x12.png",13,13,5,3},
+    		{"icons_12x12.png",13,13,5,4},
     		{"palNewColor", 0,0},
     		{"palSavePalette", 1, 0},
     		{"palLoadPalette", 2, 0},
@@ -82,11 +82,16 @@ public class Globals {
     		{"icon.rig.rem", 1, 1},
     		{"icon.rig.visOn", 2, 1},
     		{"icon.rig.visOff", 3, 1},
-    		
+
     		{"icon.expanded", 0, 2},
     		{"icon.expandedHL", 1, 2},
     		{"icon.unexpanded", 2, 2},
     		{"icon.unexpandedHL", 3, 2},
+
+    		{"icon.arrowS", 0, 3},
+    		{"icon.arrowW", 1, 3},
+    		{"icon.arrowN", 2, 3},
+    		{"icon.arrowE", 3, 3},
     		
 	};
 

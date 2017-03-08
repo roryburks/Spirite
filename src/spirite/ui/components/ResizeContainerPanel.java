@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -11,10 +13,13 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import spirite.Globals;
 import spirite.MUtil;
 
 /**
@@ -35,7 +40,7 @@ public class ResizeContainerPanel extends JPanel{
 	private final List<ResizeBar> trailingBars;
 	private ContainerOrientation cOrientation;
 	private JComponent stretchComponent;
-	private int barSize = 5;
+	private int barSize = 8;
 
 	public static final int LEADING = Integer.MAX_VALUE;
 	public static final int TRAILING = Integer.MIN_VALUE;
@@ -79,27 +84,36 @@ public class ResizeContainerPanel extends JPanel{
 	}
 	
 	private void resetLayout() {
+		this.removeAll();
         GroupLayout layout = new GroupLayout(this);
 
         GroupLayout.Group stretch = layout.createSequentialGroup();
         GroupLayout.Group noStretch = layout.createParallelGroup(Alignment.LEADING);
         
         for( ResizeBar bar : leadingBars) {
-        	stretch.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize())
-        		.addComponent(bar, barSize, barSize, barSize);
+        	if( bar.componentVisible)
+        		stretch.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize());
+        	stretch.addComponent(bar, barSize, barSize, barSize);
         }
         if( stretchComponent != null) {
         	stretch.addComponent(stretchComponent);
         }
         for( ResizeBar bar : trailingBars) {
-        	stretch.addComponent(bar, barSize, barSize, barSize)
-        		.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize());
+        	stretch.addComponent(bar, barSize, barSize, barSize);
+        	if( bar.componentVisible)
+        		stretch.addComponent(bar.component, bar.getResizeSize(),bar.getResizeSize(),bar.getResizeSize());
         }
 
-        for( ResizeBar bar : leadingBars)
-        	noStretch.addComponent(bar.component).addComponent(bar);
-        for( ResizeBar bar : trailingBars)
-        	noStretch.addComponent(bar.component).addComponent(bar);
+        for( ResizeBar bar : leadingBars) {
+        	if( bar.componentVisible)
+        		noStretch.addComponent(bar.component);
+        	noStretch.addComponent(bar);
+        }
+        for( ResizeBar bar : trailingBars) {
+        	if( bar.componentVisible)
+        		noStretch.addComponent(bar.component);
+        	noStretch.addComponent(bar);
+        }
         if( stretchComponent != null)
         	noStretch.addComponent(stretchComponent);
         
@@ -114,7 +128,8 @@ public class ResizeContainerPanel extends JPanel{
             break;
         }
         this.setLayout(layout);
-        
+
+		validate();
 	}
 	
 	/** If the position is less than the smallest or more than the largest,
@@ -132,8 +147,8 @@ public class ResizeContainerPanel extends JPanel{
 		
 		if( position < 0) {
 			if( -position >= trailingBars.size()) {
+				ret = -trailingBars.size()-1;
 				trailingBars.add(new ResizeBar(default_size,min_size, component, true));
-				ret = -trailingBars.size();
 			}
 			else {
 				trailingBars.add(-position-1,new ResizeBar(default_size,min_size,component,true));
@@ -141,8 +156,8 @@ public class ResizeContainerPanel extends JPanel{
 		}
 		else {
 			if( position >= leadingBars.size()) {
+				ret = leadingBars.size()+1;
 				leadingBars.add(new ResizeBar(default_size,min_size, component,false));
-				ret = leadingBars.size();
 			}
 			else {
 				leadingBars.add(position-1,new ResizeBar(default_size,min_size,component,false));
@@ -153,11 +168,24 @@ public class ResizeContainerPanel extends JPanel{
 		resetLayout();
 		return ret;
 	}
-	public void removePanel( int index) {
+	
+	public void setPanelVisible( int index, boolean visible) {
+		if( index == 0) return;
 		
+		if( index < 0) {
+			if( -index >= leadingBars.size()) return;
+			leadingBars.get(-index).componentVisible = visible;
+		}
+		else {
+			if( index >= trailingBars.size()) return;
+			trailingBars.get(index).componentVisible = visible;
+		}
+		resetLayout();
+	}
+	
+	public void removePanel( int index) {
 	}
 	public void removeAllPanels() {
-		
 	}
 	
 	/** List places the West/North components then the East/South ones. */
@@ -171,7 +199,43 @@ public class ResizeContainerPanel extends JPanel{
 		private int size;
 		private int min_size = 50;
 		private JComponent component;
-		private final boolean trailing;
+		private boolean trailing;	
+		boolean componentVisible = true;
+
+		private final Icon iconExpanded;
+		private final Icon iconUnexpanded;
+		private final Color BAR_LINE_COLOR = new Color(190,190,190);
+		private final JButton btnExpand = new JButton();
+		private final JPanel pullBar = new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+
+				int depth = 0;
+				int breadth = 0;
+				g.setColor(BAR_LINE_COLOR);
+				switch( cOrientation) {
+				case HORIZONTAL:
+					depth = getWidth();
+					breadth = getHeight();
+					g.drawLine( depth/2-2, 10, depth/2-2, breadth-10);
+					g.drawLine( depth/2, 5, depth/2, breadth-5);
+					g.drawLine( depth/2+2, 10, depth/2+2, breadth-10);
+					break;
+				case VERTICAL:
+					depth = getHeight();
+					breadth = getWidth();
+					g.drawLine( 10, depth/2-2, breadth-10, depth/2-2);
+					g.drawLine( 5, depth/2, breadth-5, depth/2);
+					g.drawLine( 10, depth/2+2,  breadth-10, depth/2+2);
+					break;
+				}
+				
+				System.out.println(depth +","+breadth);
+			}
+		};
+	
+		
 		
 		/**
 		 * 
@@ -196,20 +260,73 @@ public class ResizeContainerPanel extends JPanel{
 			this.component = component;
 			this.trailing = trailing;
 
+			// :::: Determine which direction the arrow should be pointing
+			//	based on both the local and global orientations as well
+			//	as the expanded state
+			if(cOrientation == ContainerOrientation.VERTICAL) {
+				this.iconExpanded = Globals.getIcon("icon.arrowE");
+				this.iconUnexpanded = (trailing)
+						?Globals.getIcon("icon.arrowS")
+						:Globals.getIcon("icon.arrowN");
+			}
+			else {
+				this.iconExpanded = Globals.getIcon("icon.arrowS");
+				this.iconUnexpanded = (trailing)
+						?Globals.getIcon("icon.arrowE")
+						:Globals.getIcon("icon.arrowW");
+			}
+
 			this.adapter = new ResizeBarAdapter();
 			this.addMouseListener(adapter);
 			this.addMouseMotionListener(adapter);
+
+			btnExpand.setIcon(iconExpanded);
+			btnExpand.setBorderPainted(false); 
+			btnExpand.setContentAreaFilled(false); 
+	        btnExpand.setFocusPainted(false); 
+	        btnExpand.setOpaque(false);
+			
+			GroupLayout layout = new GroupLayout( this);
 			
 			switch( cOrientation) {
-			case HORIZONTAL:
-				this.setCursor(new Cursor( Cursor.E_RESIZE_CURSOR));
+			case HORIZONTAL: 
+				layout.setHorizontalGroup(layout.createParallelGroup()
+					.addComponent(btnExpand, barSize, barSize, barSize)
+					.addComponent(pullBar, barSize, barSize, barSize)
+				);
+				layout.setVerticalGroup(layout.createSequentialGroup()
+					.addComponent(btnExpand, 12, 12, 12)
+					.addComponent(pullBar)
+				);
+				pullBar.setCursor(new Cursor( Cursor.E_RESIZE_CURSOR));
 				break;
 			case VERTICAL:
-				this.setCursor(new Cursor( Cursor.N_RESIZE_CURSOR));
+				layout.setVerticalGroup(layout.createParallelGroup()
+					.addComponent(btnExpand, barSize, barSize, barSize)
+					.addComponent(pullBar, barSize, barSize, barSize)
+				);
+				layout.setHorizontalGroup(layout.createSequentialGroup()
+					.addComponent(btnExpand, 12, 12, 12)
+					.addComponent(pullBar)
+				);
+				pullBar.setCursor(new Cursor( Cursor.N_RESIZE_CURSOR));
 				break;
 			}
+			this.setLayout(layout);
 			
+			initBindings();
 		}
+		
+		public void initBindings() {
+			btnExpand.addActionListener( new ActionListener() {
+				@Override public void actionPerformed(ActionEvent e) {
+					componentVisible = !componentVisible;
+					btnExpand.setIcon((componentVisible)?iconExpanded:iconUnexpanded);
+					resetLayout();
+				}
+			});
+		}
+		
 		
 		public int getResizeSize() {
 			return size;
@@ -225,31 +342,6 @@ public class ResizeContainerPanel extends JPanel{
 			min_size = min;
 		}
 		
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponents(g);
-
-			int depth;
-			int breadth;
-			g.setColor(new Color(190,190,190));
-			switch( cOrientation) {
-			case HORIZONTAL:
-				depth = getWidth();
-				breadth = getHeight();
-				g.drawLine( 0, 10, 0, breadth-10);
-				g.drawLine( depth/2, 5, depth/2, breadth-5);
-				g.drawLine( depth-1, 10, depth-1, breadth-10);
-				break;
-			case VERTICAL:
-				depth = getHeight();
-				breadth = getWidth();
-				g.drawLine( 10, 0, breadth-10, 0);
-				g.drawLine( 5, depth/2, breadth-5, depth/2);
-				g.drawLine( 10, depth-1,  breadth-10, depth-1);
-				break;
-			}
-			
-		}
 		
 	    private class ResizeBarAdapter extends MouseAdapter {
 	    	int start_pos;
@@ -328,7 +420,7 @@ public class ResizeContainerPanel extends JPanel{
 	        				ResizeContainerPanel.this.getWidth()-min_stretch - reserved);
 	        		break;
 	    		case VERTICAL:
-	    			if( trailing)
+	    			if(trailing)
 	    				size = start_size + (start_pos - p.y);
 	    			else
 	    				size = start_size - (start_pos - p.y);
