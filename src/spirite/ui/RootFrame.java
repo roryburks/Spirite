@@ -111,7 +111,7 @@ public class RootFrame extends javax.swing.JFrame
 
     	rightContainer.addPanel(50, 80, 0, toolsPanel);
     	rightContainer.addPanel(50, 160, 0, settingPanel);
-    	rightContainer.addPanel(50, 160, 0, new ColorPicker(master));
+    	rightContainer.addPanel(160, 160, 0, new ColorPicker(master));
     	rightContainer.setStretchArea(80);
     	
     	rrContainer.addPanel( 100, 300, -1, rigPanel);

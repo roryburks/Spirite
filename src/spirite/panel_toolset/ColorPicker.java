@@ -2,14 +2,17 @@ package spirite.panel_toolset;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,7 +33,8 @@ public class ColorPicker extends OmniComponent
 	private final ComponentsRGBA comp2 = new ComponentsRGBA();
 	private final ComponentsHSVA comp1hsv = new ComponentsHSVA();
 	private final ComponentsHSVA comp2hsv = new ComponentsHSVA();
-	
+
+	private JTabbedPane container = new JTabbedPane();
 
 	
 	private final PaletteManager paletteManager;
@@ -60,16 +64,27 @@ public class ColorPicker extends OmniComponent
 	
 	
 	private void initComponents() {
-		GroupLayout layout = new GroupLayout( this);
+		this.setLayout(new GridLayout());
+		this.add( container);
 
-/*		layout.setHorizontalGroup( layout.createParallelGroup()
+		JPanel rgb = new JPanel();
+		JPanel hsv = new JPanel();
+		container.addTab("RGB", rgb);
+		container.addTab("HSV", hsv);
+		
+		
+		GroupLayout layout = new GroupLayout( rgb);
+		layout.setHorizontalGroup( layout.createParallelGroup()
 			.addGroup( rgbaHorCompGroup( layout, comp1))
 			.addGroup( rgbaHorCompGroup( layout, comp2))
 		);
 		layout.setVerticalGroup( layout.createSequentialGroup()
 			.addGroup( rgbaVertCompGroup(layout, comp1))
 			.addGroup( rgbaVertCompGroup(layout, comp2))
-		);*/
+		);
+		rgb.setLayout( layout);
+
+		layout = new GroupLayout( hsv);
 		layout.setHorizontalGroup( layout.createParallelGroup()
 			.addGroup( hsvaHorCompGroup( layout, comp1hsv))
 			.addGroup( hsvaHorCompGroup( layout, comp2hsv))
@@ -78,8 +93,8 @@ public class ColorPicker extends OmniComponent
 			.addGroup( hsvaVertCompGroup(layout, comp1hsv))
 			.addGroup( hsvaVertCompGroup(layout, comp2hsv))
 		);
+		hsv.setLayout(layout);
 		
-		setLayout( layout);
 		refreshColors();
 	}
 
