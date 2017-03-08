@@ -232,21 +232,23 @@ public class FixedFrameAnimation extends Animation
 				else if( change instanceof MoveChange) {
 					MoveChange movement = (MoveChange)change;
 					
-					if( movement.oldParent == layer.group &&
-						movement.oldParent == movement.newParent) {
-						layer.moveNode( (LayerNode) movement.moveNode);
-					}
-					else if( movement.oldParent == layer.group) {
-						if( evt.reversed)
-							layer.addNode( (LayerNode) movement.moveNode);
-						else
-							layer.removeNode((LayerNode) movement.moveNode);
-					}
-					else if( movement.newParent == layer.group) {
-						if( evt.reversed)
-							layer.removeNode( (LayerNode) movement.moveNode);
-						else
-							layer.addNode((LayerNode) movement.moveNode);
+					if( movement.moveNode instanceof LayerNode) {
+						if( movement.oldParent == layer.group &&
+							movement.oldParent == movement.newParent) {
+							layer.moveNode( (LayerNode) movement.moveNode);
+						}
+						else if( movement.oldParent == layer.group) {
+							if( evt.reversed)
+								layer.addNode( (LayerNode) movement.moveNode);
+							else
+								layer.removeNode((LayerNode) movement.moveNode);
+						}
+						else if( movement.newParent == layer.group) {
+							if( evt.reversed)
+								layer.removeNode( (LayerNode) movement.moveNode);
+							else
+								layer.addNode((LayerNode) movement.moveNode);
+						}
 					}
 				}
 			}

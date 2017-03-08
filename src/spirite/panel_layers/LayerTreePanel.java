@@ -789,7 +789,8 @@ public class LayerTreePanel extends ContentTree
 			workspace.moveAbove( nodeFromTransfer(trans), nodeFromPath(path));
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			e.printStackTrace();
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) ia");
 			return false;
 		}
 	}
@@ -799,7 +800,8 @@ public class LayerTreePanel extends ContentTree
 			workspace.moveBelow(nodeFromTransfer(trans), nodeFromPath(path));
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			e.printStackTrace();
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) ib");
 			return false;
 		}
 	}
@@ -809,7 +811,8 @@ public class LayerTreePanel extends ContentTree
 			workspace.moveInto(nodeFromTransfer(trans), (GroupNode)nodeFromPath(path), top);
 			return true;
 		} catch (Exception e) {
-			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+			e.printStackTrace();
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) ii");
 			return false;
 		}
 	}
@@ -819,7 +822,8 @@ public class LayerTreePanel extends ContentTree
 				workspace.moveInto(nodeFromTransfer(trans), nodeRoot, false);
 				return true;
 			} catch (Exception e) {
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree)");
+				e.printStackTrace();
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) io");
 				return false;
 			}
 	}

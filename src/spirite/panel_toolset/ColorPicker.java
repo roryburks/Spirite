@@ -341,9 +341,9 @@ public class ColorPicker extends OmniComponent
 			aSlider.setMinimum(0);
 			aSlider.setMaximum(255);
 			hText.setMinMax(0,360);
-			sText.setMinMax(0,360);
-			vText.setMinMax(0,360);
-			aText.setMinMax(0,360);
+			sText.setMinMax(0,100);
+			vText.setMinMax(0,100);
+			aText.setMinMax(0,255);
 			ChangeListener sliderChangeListener = new ChangeListener() {
 				@Override public void stateChanged(ChangeEvent e) {
 					if(!lock && alerter != null) {
