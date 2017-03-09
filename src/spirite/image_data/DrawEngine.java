@@ -7,14 +7,19 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
+import mutil.Interpolation;
+import mutil.Interpolation.LagrangeInterpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
@@ -41,6 +46,8 @@ public class DrawEngine {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
 		this.selectionEngine = workspace.getSelectionEngine();
+		
+		
 	}
 	
 	public boolean strokeIsDrawing() {
@@ -172,8 +179,20 @@ public class DrawEngine {
 	public static interface PenDynamics {
 		public float getSize( PenState ps);
 	}
-	
+	public static class LegrangeDynamics implements PenDynamics{
+		private final LagrangeInterpolator li;
+		LegrangeDynamics( List<Point2D> list) {
+			this.li = new LagrangeInterpolator(list);
+		}
 
+		@Override
+		public float getSize(PenState ps) {
+			return Math.min(1, Math.max(0, (float) li.f(ps.pressure)));
+		}
+	}
+
+
+	
 	public static PenDynamics getBasicDynamics() {
 		return basicDynamics;
 	}
@@ -184,8 +203,17 @@ public class DrawEngine {
 		}
 	};
 	
+	private static final PenDynamics personalDynamics = new LegrangeDynamics(
+		Arrays.asList( new Point2D[] {
+				new Point2D.Double(0,0),
+				new Point2D.Double(0.25,0),
+				new Point2D.Double(1,1)
+			}
+		)
+	);
+	
 	public static PenDynamics getDefaultDynamics() {
-		return defaultDynamics;
+		return personalDynamics;
 	}
 	private static final PenDynamics defaultDynamics = new PenDynamics() {
 		@Override
