@@ -772,5 +772,36 @@ public class DrawEngine {
 			return buffer;
 		}
 	}
+
+	public class ScaleAction extends MaskedImageAction 
+	{
+
+		ScaleAction(BuiltImageData data, BuiltSelection mask) {
+			super(data, mask);
+		}
+		
+
+		@Override
+		protected void performImageAction() {
+		}
+		
+	}
+	
+
+	public BufferedImage scale(BufferedImage bi) {
+
+		// Might be able to do this single-Image but things get weird if you 
+		//	draw a Buffer onto itself
+		BufferedImage buffer = new BufferedImage( 
+				bi.getWidth()*2, bi.getHeight()*2, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
+		
+		g2.scale(2, 2);
+		
+		g2.drawImage(bi, 0, 0, null);
+		g2.dispose();
+		
+		return buffer;
+	}
 	
 }

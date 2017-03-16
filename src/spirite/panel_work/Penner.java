@@ -38,6 +38,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
+import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.panel_work.WorkPanel.Zoomer;
@@ -243,6 +244,12 @@ public class Penner
 				break;
 			case FLIPPER:
 				behavior = new FlippingBehavior();
+				break;
+			case RESHAPER:
+				UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
+						workspace.buildActiveData().handle, 
+						drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
+				workspace.getUndoEngine().performAndStore(ra);
 			}
 			
 			if( behavior != null)

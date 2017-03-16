@@ -27,7 +27,6 @@ public class AnimationManager implements MImageObserver {
 	
 	private ArrayList<Animation> animations = new ArrayList<>();
 	private Animation selectedAnimation = null;
-	private float met = 0.0f;
 	
 
 	AnimationManager( ImageWorkspace context) {

@@ -6,22 +6,31 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 
+import mutil.GifSequenceWriter;
 import mutil.RectanglePacker;
 import mutil.RectanglePacker.PackedRectangle;
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.image_data.GroupTree.GroupNode;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.image_data.layers.Layer;
+import spirite.image_data.layers.SimpleLayer;
 
 /**
  * AnimIO is a container for static methods that export Animations of various
@@ -63,6 +72,36 @@ public class AnimIO {
 		g.dispose();
 		
 		ImageIO.write(bi, "png", file);
+	}
+	
+	public static void exportGroupGif( GroupNode group, File file, float fps) 
+			throws FileNotFoundException, IOException 
+	{
+		List<BufferedImage> biList = new ArrayList<>();
+		for( Node node : group.getChildren()) {
+			if( node instanceof LayerNode ) {
+				Layer l = ((LayerNode) node).getLayer();
+				if( l instanceof SimpleLayer) {
+					biList.add(l.getActiveData().handle.deepAccess());
+				}
+			}
+		}
+		
+		ImageOutputStream ios = new FileImageOutputStream(file);
+		
+		System.out.println((int)(1000 / fps));
+		GifSequenceWriter gsw = new GifSequenceWriter(
+				ios, 
+				biList.get(0).getType(), 
+				(int)(1000 / fps), 
+				true);
+		
+		for( BufferedImage bi : biList) {
+			gsw.writeToSequence(bi);
+		}
+		
+		gsw.close();
+		ios.close();
 	}
 	
 	/**

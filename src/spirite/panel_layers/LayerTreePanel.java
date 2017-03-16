@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.brains.RenderEngine;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.file.AnimIO;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.GroupTree;
@@ -394,6 +396,7 @@ public class LayerTreePanel extends ContentTree
 					menuScheme.add( new String[] {"&Construct Simple Animation From Group", "animfromgroup", null});
 					if( workspace.getAnimationManager().getSelectedAnimation() != null)
 						menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
+					menuScheme.add( new String[] {"&Write Group To GIF Animation", "giffromgroup", null});
 				}
 				else if( usrObj instanceof LayerNode) {
 					if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
@@ -520,6 +523,15 @@ public class LayerTreePanel extends ContentTree
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
 			manager.addAnimation(new FixedFrameAnimation(group));
+			break;}
+		case "giffromgroup":{
+			GroupNode group = (GroupNode)contextMenu.node;
+			try {
+				AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;}
 		case "animinsert":{
 			GroupNode group = (GroupNode)contextMenu.node;

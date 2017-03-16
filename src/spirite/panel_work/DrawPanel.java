@@ -168,7 +168,7 @@ public class DrawPanel extends JPanel
         
         
         // Draw Grid
-        int w = getWidth();
+/*        int w = getWidth();
         int h = getHeight();
         if( zoom >= 4) {
         	g2.setColor( new Color(90,90,90));
@@ -182,7 +182,7 @@ public class DrawPanel extends JPanel
             	if( zoomer.itsY(i) > h) break;
                 g2.drawLine(0, zoomer.itsY(i), this.getWidth(), zoomer.itsY(i));
             }
-        }
+        }*/
         
 
         // Draw Border around Selection
