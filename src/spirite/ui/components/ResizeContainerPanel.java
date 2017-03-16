@@ -230,8 +230,6 @@ public class ResizeContainerPanel extends JPanel{
 					g.drawLine( 10, depth/2+2,  breadth-10, depth/2+2);
 					break;
 				}
-				
-				System.out.println(depth +","+breadth);
 			}
 		};
 	

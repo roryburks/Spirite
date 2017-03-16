@@ -27,6 +27,7 @@ import spirite.MUtil;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
+import spirite.image_data.draw.JOGLDrawer;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -41,6 +42,7 @@ public class DrawEngine {
 	private final StrokeEngine engine = new StrokeEngine();
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
+	private final JOGLDrawer jogl = new JOGLDrawer();
 	
 	public DrawEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
@@ -152,7 +154,9 @@ public class DrawEngine {
 		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 	}
 	
-	
+	public void changeColor( BuiltImageData data) {
+		execute( new ColorChangeAction(data, selectionEngine.getBuiltSelection()));
+	}
 	
 	
 	
@@ -784,7 +788,21 @@ public class DrawEngine {
 		@Override
 		protected void performImageAction() {
 		}
+	}
+	public class ColorChangeAction extends MaskedImageAction 
+	{
+
+		ColorChangeAction(BuiltImageData data, BuiltSelection mask) {
+			super(data, mask);
+		}
 		
+
+		@Override
+		protected void performImageAction() {
+			Graphics g = builtImage.checkout();
+			g.drawImage( jogl.renderTriangle(), 0, 0, null);
+			builtImage.checkin();
+		}
 	}
 	
 

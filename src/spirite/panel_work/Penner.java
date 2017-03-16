@@ -246,10 +246,16 @@ public class Penner
 				behavior = new FlippingBehavior();
 				break;
 			case RESHAPER:
-				UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
-						workspace.buildActiveData().handle, 
-						drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
-				workspace.getUndoEngine().performAndStore(ra);
+				if( button == PButton.Type.LEFT) {
+					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
+							workspace.buildActiveData().handle, 
+							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
+					workspace.getUndoEngine().performAndStore(ra);
+				}
+				else {
+					drawEngine.changeColor(workspace.buildActiveData());
+				}
+				break;
 			}
 			
 			if( behavior != null)

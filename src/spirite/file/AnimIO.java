@@ -89,7 +89,6 @@ public class AnimIO {
 		
 		ImageOutputStream ios = new FileImageOutputStream(file);
 		
-		System.out.println((int)(1000 / fps));
 		GifSequenceWriter gsw = new GifSequenceWriter(
 				ios, 
 				biList.get(0).getType(), 
