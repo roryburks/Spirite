@@ -37,12 +37,11 @@ public class GLUIDraw {
 
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
         	new float[] {
-        			// x      y     z     t    rsx     rsy
-                    -1.0f, -1.0f, 0.0f, 1.0f,  0.0f, 1.0f,
-                    +1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-                    -1.0f, +1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                    +1.0f, +1.0f, 0.0f, 1.0f,  1.0f, 0.0f
-                    
+    			// x      y     z     w    rsx     rsy
+                -1.0f, -1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+                +1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+                -1.0f, +1.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+                +1.0f, +1.0f, 0.0f, 1.0f,  1.0f, 1.0f
         	}
         );
 		

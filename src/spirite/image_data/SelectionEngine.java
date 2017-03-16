@@ -556,7 +556,7 @@ public class SelectionEngine {
 		//	for offsets), whereas SelectionMask is drawn in selection space
 		//	(not accounting for offsets).
 		public abstract void drawSelectionBounds( Graphics g);
-		abstract void drawSelectionMask( Graphics g);
+		public abstract void drawSelectionMask( Graphics g);
 		public abstract boolean contains( int x, int y);
 		public abstract Dimension getDimension();
 		abstract Rectangle clipToRect( Rectangle rect);	// returns null if the clipped Selection is empty
@@ -566,7 +566,7 @@ public class SelectionEngine {
 	
 	public static class NullSelection extends Selection {
 		@Override		public void drawSelectionBounds(Graphics g) {}
-		@Override		void drawSelectionMask(Graphics g) {}
+		@Override		public void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
 		@Override		public Dimension getDimension() {return new Dimension(0,0);}
 		@Override		Rectangle clipToRect(Rectangle rect) {return null;}
@@ -588,7 +588,7 @@ public class SelectionEngine {
 			g.drawRect( 0, 0, width, height);
 		}
 		@Override
-		void drawSelectionMask( Graphics g) {
+		public void drawSelectionMask( Graphics g) {
 			g.setColor( Color.black);
 			g.fillRect(0, 0, width, height);
 		}

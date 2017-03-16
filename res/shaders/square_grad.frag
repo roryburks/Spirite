@@ -15,7 +15,7 @@ vec4 HSVtoRGB( vec4 hsv) {
 	float hh, p, q, t, ff;
 	int i;
 	vec4 ret;
-	ret.a = 1.0;
+	ret.a = hsv[3];
 	
 	if( hsv[1] <= 0.0) {
 		ret.r = hsv[2];

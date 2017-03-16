@@ -23,7 +23,6 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.file.LoadEngine.BadSIFFFileException;
 import spirite.image_data.DrawEngine.Method;
-import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeAction;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
@@ -35,6 +34,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SpriteLayer;
+import spirite.pen.PenTraits.PenState;
 
 /**
  * @author Guy
@@ -241,7 +241,7 @@ public class Test1 {
 		case 3:
 			// Add Random Stroke
 			workspace.setSelectedNode(randomLayerNode(workspace));
-			
+
 			PenState p[] = new PenState[50];
 			for( int i=0; i<50; ++i) {
 				p[i] = new PenState(rn.nextInt(200),

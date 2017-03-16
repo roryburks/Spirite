@@ -28,6 +28,11 @@ import spirite.MUtil;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
+import spirite.pen.PenTraits;
+import spirite.pen.PenTraits.PenDynamics;
+import spirite.pen.PenTraits.PenState;
+import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.STATE;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -39,7 +44,7 @@ import spirite.image_data.UndoEngine.ImageAction;
  */
 public class DrawEngine {
 	private final ImageWorkspace workspace;
-	private final StrokeEngine engine = new StrokeEngine();
+	private final DefaultStrokeEngine engine = new DefaultStrokeEngine();
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
 	private final JOGLDrawer jogl = new JOGLDrawer();
@@ -53,17 +58,17 @@ public class DrawEngine {
 	}
 	
 	public boolean strokeIsDrawing() {
-		return (engine.state == STATE.DRAWING);
+		return (engine.getState() == STATE.DRAWING);
 	}
 	public BufferedImage getStrokeLayer() {
-		return engine.strokeLayer;
+		return engine.getStrokeLayer();
 	}
 	public StrokeEngine getStrokeEngine() {
 		return engine;
 	}
 	public ImageHandle getStrokeContext() {
-		if( engine.state == STATE.DRAWING) {
-			return engine.data.handle;
+		if( engine.getState() == STATE.DRAWING) {
+			return engine.getImageData().handle;
 		}
 		else
 			return null;
@@ -71,7 +76,7 @@ public class DrawEngine {
 	
 	/** @return true if the stroke started, false otherwise	 */
 	public boolean startStroke(StrokeParams stroke, PenState ps, BuiltImageData data) {
-		if( engine.state == STATE.DRAWING) {
+		if( engine.getState() == STATE.DRAWING) {
 			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
 		}
@@ -80,23 +85,23 @@ public class DrawEngine {
 			return false;
 		}
 		else {
-			if( engine.startStroke(stroke, ps, data))
+			if( engine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
 			return true;
 		}
 	}
 	public void stepStroke( PenState ps) {
-		if( engine.state != STATE.DRAWING) {
+		if( engine.getState() != STATE.DRAWING) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to step stroke that isn't active.");
 			return ;
 		}
 		else {
 			if(engine.stepStroke(ps))
-				engine.data.handle.refresh();
+				engine.getImageData().handle.refresh();
 		}
 	}
 	public void endStroke( ) {
-		if( engine.state != STATE.DRAWING) {
+		if( engine.getState() != STATE.DRAWING) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to end stroke that isn't active.");
 			return ;
 		}
@@ -161,39 +166,8 @@ public class DrawEngine {
 	
 	
 	// Stroke Code
-	private enum STATE { READY, DRAWING };
 	
-	public static class PenState {
-		PenState(){}
-		public PenState( int x, int y, float pressure) {
-			this.x = x;
-			this.y = y;
-			this.pressure = pressure;
-		}
-		public PenState( PenState other) {
-			this.x = other.x;
-			this.y = other.y;
-			this.pressure = other.pressure;
-		}
-		public int x;
-		public int y;
-		public float pressure = 1.0f;
-	}
 	
-	public static interface PenDynamics {
-		public float getSize( PenState ps);
-	}
-	public static class LegrangeDynamics implements PenDynamics{
-		private final LagrangeInterpolator li;
-		LegrangeDynamics( List<Point2D> list) {
-			this.li = new LagrangeInterpolator(list);
-		}
-
-		@Override
-		public float getSize(PenState ps) {
-			return Math.min(1, Math.max(0, (float) li.f(ps.pressure)));
-		}
-	}
 
 
 	
@@ -206,8 +180,8 @@ public class DrawEngine {
 			return 1.0f;
 		}
 	};
-	
-	private static final PenDynamics personalDynamics = new LegrangeDynamics(
+
+	private static final PenDynamics personalDynamics = new PenTraits.LegrangeDynamics(
 		Arrays.asList( new Point2D[] {
 				new Point2D.Double(0,0),
 				new Point2D.Double(0.25,0),
@@ -227,11 +201,6 @@ public class DrawEngine {
 	};
 	
 	/***
-	 * The StrokeEngine is abstracted from the DrawEngine primarily for style
-	 * purposes, but you could presumably create multiple stroke engines to
-	 * draw on data asynchronously, though the stroke wouldn't appear until it
-	 * was completed.
-	 * 
 	 * The StrokeEngine operates asynchronously to the input data.  In general
 	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
 	 * pen input is performed.
@@ -249,90 +218,16 @@ public class DrawEngine {
 	 *   to the amount of extra cycles it'd be to constantly draw an inverse mask
 	 *   of the selection.
 	 */
-	public class StrokeEngine {
-		private PenState oldState = new PenState();
-		private PenState newState = new PenState();
-		private PenState rawState = new PenState();	// Needed to prevent UndoAction from double-tranforming
-		private STATE state = STATE.READY;
-
-		private StrokeParams stroke;
-		private BuiltImageData data;
-		private BufferedImage strokeLayer;
-		private BufferedImage compositionLayer;
-		private BufferedImage selectionMask;
-
-		private BuiltSelection sel;
-
-		// Records the rawState
-		private List<PenState> prec = new LinkedList<>();
-		
-		protected StrokeEngine() {
-			stroke = null;
+	public class DefaultStrokeEngine extends StrokeEngine
+	{
+		protected DefaultStrokeEngine() {
 		}
 		
-		// :::: Get's
-		public StrokeParams getParams() {
-			return stroke;
-		}
-		public BuiltImageData getImageData() {
-			return data;
-		}
-		
-		/**
-		 * Starts a new stroke using the workspace's current selection as the 
-		 * selection mask 
-		 * 
-		 * @return true if the data has been changed, false otherwise.*/
-		public synchronized boolean startStroke( 
-				StrokeParams s, PenState ps, BuiltImageData data) 
-		{
-			if( data == null) 
-				return false;
-			
-			this.data = data;
-			stroke = s;
-			
-			strokeLayer = new BufferedImage( 
-					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
-			compositionLayer = new BufferedImage( 
-					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		@Override
+		public boolean startDrawStroke( PenState ps) {
 			int crgb = stroke.getColor().getRGB();
-			
-			sel = pollSelectionMask();
-			
-			if( sel.selection != null) {
-				selectionMask = new BufferedImage( 
-						data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				MUtil.clearImage(selectionMask);
-				
-				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
-				g2.translate(sel.offsetX, sel.offsetY);
-				sel.selection.drawSelectionMask(g2);
-				g2.dispose();
-			}
-			
-			// Starts recording the Pen States
-			prec = new LinkedList<PenState>();
-			Point layerSpace = (data.convert(new Point(ps.x,ps.y)));
-			
-			oldState.x = layerSpace.x;
-			oldState.y = layerSpace.y;
-			oldState.pressure = ps.pressure;
-			newState.x = layerSpace.x;
-			newState.y = layerSpace.y;
-			newState.pressure = ps.pressure;
-			rawState.x = ps.x;
-			rawState.y = ps.y;
-			rawState.pressure = ps.pressure;
-			prec.add( ps);
-			
-			state = STATE.DRAWING;
-			
-			
-			if( MUtil.coordInImage( layerSpace.x, layerSpace.y, strokeLayer) 
-					&& strokeLayer.getRGB( layerSpace.x, layerSpace.y) != crgb) 
-			{
-				strokeLayer.setRGB( layerSpace.x, layerSpace.y, crgb);
+			if( strokeLayer.getRGB( ps.x, ps.y) != crgb ) {
+				strokeLayer.setRGB( ps.x, ps.y, crgb);
 				return true;
 			}
 			return false;
@@ -344,38 +239,22 @@ public class DrawEngine {
 		 * 
 		 * @return true if the step wan't a null-step (non-moving)
 		 */
-		public synchronized boolean stepStroke( PenState ps) {
-			Point layerSpace = data.convert( new Point( ps.x, ps.y));
-			newState.x = layerSpace.x;
-			newState.y = layerSpace.y;
-			newState.pressure = ps.pressure;
-			rawState.x = ps.x;
-			rawState.y = ps.y;
-			rawState.pressure = ps.pressure;
-			
-			if( state != STATE.DRAWING || data == null) {
-				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
-//				endStroke();
-				return false;
-			}
-			
-			boolean changed = false;
-				
+		@Override
+		public boolean stepDrawStroke( PenState fromState, PenState toState) {
 			// Draw Stroke (only if the mouse has moved)
-			if( newState.x != oldState.x || newState.y != oldState.y)
+			if( toState.x != fromState.x || toState.y != fromState.y)
 			{
-				prec.add( new PenState(rawState));
 				Graphics g = strokeLayer.getGraphics();
 				Graphics2D g2 = (Graphics2D)g;
 				g.setColor( stroke.getColor());
 
 				if( stroke.getMethod() != Method.PIXEL){
 					g2.setStroke( new BasicStroke( 
-							stroke.dynamics.getSize(newState)*stroke.width, 
+							stroke.dynamics.getSize(toState)*stroke.width, 
 							BasicStroke.CAP_ROUND, 
 							BasicStroke.CAP_SQUARE));
 				}
-				g2.drawLine( oldState.x, oldState.y, newState.x, newState.y);
+				g2.drawLine( fromState.x, fromState.y, toState.x, toState.y);
 				
 
 				if( sel.selection != null) {
@@ -384,66 +263,14 @@ public class DrawEngine {
 				}
 				
 				g.dispose();
-				changed = true;
+				return true;
 			}
 			
 			
-			oldState.x = newState.x;
-			oldState.y = newState.y;
-			oldState.pressure = newState.pressure;
-			return changed;
+			return false;
 		}
 		
-		/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
-		 * to the data, and flushing the used resources. */
-		public synchronized void endStroke() {
-			state = STATE.READY;
-			
-			if( data != null) {
-				Graphics g = data.checkoutRaw().getGraphics();
-				drawStrokeLayer(g);
-				g.dispose();
-				data.checkin();
-			}
-			
-			strokeLayer.flush();
-			compositionLayer.flush();
-			if( selectionMask != null)
-				selectionMask.flush();
-		}
 		
-		// Methods used to record the Stroke so that it can be repeated
-		//	Could possibly combine them into a single class
-		public PenState[] getHistory() {
-			PenState[] array = new PenState[prec.size()];
-			return prec.toArray(array);
-		}
-		public BuiltSelection getLastSelection() {
-			return sel;
-		}
-		
-
-		// Draws the Stroke Layer onto the graphics
-		public void drawStrokeLayer( Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			Composite c = g2.getComposite();
-			switch( stroke.method) {
-			case BASIC:
-			case PIXEL:
-				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.alpha));
-				break;
-			case ERASE:
-				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.alpha));
-				break;
-			}
-			g.drawImage(getStrokeLayer(), 0, 0, null);
-			g2.setComposite( c);
-		}
-		
-		public BufferedImage getCompositionLayer() {
-			MUtil.clearImage(compositionLayer);
-			return compositionLayer;
-		}
 	}
 
 	public enum Method {BASIC, ERASE, PIXEL};
@@ -487,6 +314,10 @@ public class DrawEngine {
 				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
 		}
 		public float getAlpha() {return alpha;}
+		
+		public PenDynamics getDynamics() {
+			return dynamics;
+		}
 	}
 
 	

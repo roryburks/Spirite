@@ -27,7 +27,6 @@ import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.DrawEngine.Method;
-import spirite.image_data.DrawEngine.PenState;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
@@ -42,6 +41,7 @@ import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.pen.PenTraits.PenState;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
