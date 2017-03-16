@@ -5,13 +5,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.SwingUtilities;
 
+import com.hackoeur.jglm.Vec4;
 import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -20,39 +23,81 @@ import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
+import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import spirite.gl.GLEngine;
+import spirite.gl.GLEngine.ProgramType;
 
 public class JOGLDrawer {
 	private final GLEngine engine = GLEngine.getInstance();
 	
-//	GLAutoDrawable drawable;
 	public JOGLDrawer() {
-/*		GLProfile profile = GLProfile.getDefault();
-		GLCapabilities caps = new GLCapabilities(profile);
-        caps.setHardwareAccelerated(true); 
-        caps.setDoubleBuffered(false); 
-        caps.setAlphaBits(8); 
-        caps.setRedBits(8); 
-        caps.setBlueBits(8); 
-        caps.setGreenBits(8); 
-        caps.setOnscreen(false); 
-		GLDrawableFactory df = GLDrawableFactory.getFactory(profile);
-		drawable = df.createOffscreenAutoDrawable(
-				df.getDefaultDevice(), 
-				caps,
-				new DefaultGLCapabilitiesChooser(), 
-				width, height);*/
-		
 	}
 
-    static int width = 300; 
+    static int width = 640; 
     static int height = 480; 
     static int numPoints = 1000; 
     static Random r = new Random(); 
 
+    
+    
 	public BufferedImage renderTriangle() {
+		engine.setSurfaceSize(width, height);
+		
+		GL4 gl = engine.getGL4();
+
+        FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
+        	new float[] {
+                +0.75f, +0.75f, 0.0f, 1.0f,
+                +0.75f, -0.75f, 0.0f, 1.0f,
+                -0.75f, -0.75f, 0.0f, 1.0f
+        	}
+        );
+
+	    IntBuffer positionBufferObject = GLBuffers.newDirectIntBuffer(1);
+	    IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
+	    
+	    gl.glGenBuffers(1, positionBufferObject);
+	    gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+	    gl.glBufferData(
+	    		GL4.GL_ARRAY_BUFFER, 
+	    		vertexBuffer.capacity()*Float.BYTES, 
+	    		vertexBuffer, 
+	    		GL4.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, 0);
+	    
+		gl.glGenVertexArrays(1, vao);
+		gl.glBindVertexArray(vao.get(0));
+
+
+	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+        gl.glClearBufferfv(GL4.GL_COLOR, 0, clearColor);
+
+        gl.glUseProgram( engine.getProgram(ProgramType.DEFAULT));
+
+        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+        gl.glEnableVertexAttribArray(GLEngine.Attr.POSITION);
+        gl.glVertexAttribPointer(GLEngine.Attr.POSITION, Vec4.NUM, GL4.GL_FLOAT, false, Vec4.STRIDE, 0);
+
+        gl.glDrawArrays(GL4.GL_TRIANGLES, 0, 3);
+
+        gl.glDisableVertexAttribArray(GLEngine.Attr.POSITION);
+        gl.glUseProgram(0);
+        
+		
+		gl.glDeleteVertexArrays(1, vao);
+		gl.glDeleteBuffers(1, positionBufferObject);
+
+		GLAutoDrawable drawable = engine.getDrawable();
+        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+        		.readPixelsToBufferedImage(
+        				gl, 0, 0, width, height, true); 
+        
+        return im;
+	}
+	
+	public BufferedImage _old() {
 		engine.setSurfaceSize(width, height);
 		
 		GLAutoDrawable drawable = engine.getDrawable();

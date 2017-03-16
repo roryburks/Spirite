@@ -32,6 +32,19 @@ public class GLEngine implements GLEventListener {
 	private final GLOffscreenAutoDrawable drawable;
 	private int width = 1;
 	private int height = 1;
+	
+	private int defaultProgram;
+	
+	/** Namespace for Attribute Bindings */
+    public static class Attr {
+        public static final int POSITION = 0;
+        public static final int NORMAL = 2;
+        public static final int COLOR = 1;
+        public static final int TEXCOORD = 4;
+        public static final int DRAW_ID = 5;
+        public static final int CAMERA_SPHERE_POS = 6;
+        public static final int SPHERE_RADIUS = 7;
+    }
 
 	private static final GLEngine singly = new GLEngine();
 	public static GLEngine getInstance() {
@@ -54,7 +67,7 @@ public class GLEngine implements GLEventListener {
 
 		drawable = fact.createOffscreenAutoDrawable(
 				fact.getDefaultDevice(), 
-				fact.getAvailableCapabilities(fact.getDefaultDevice()).get(0),
+				caps,
 				new DefaultGLCapabilitiesChooser(), 
 				1, 1);
 		 
@@ -97,6 +110,13 @@ public class GLEngine implements GLEventListener {
 		return drawable;
 	}
 	
+	public enum ProgramType {
+		DEFAULT
+	}
+	public int getProgram( ProgramType type){
+		return this.defaultProgram;
+	}
+	
 	
 	// Initialization
 	
@@ -114,7 +134,7 @@ public class GLEngine implements GLEventListener {
 				GL4.GL_FRAGMENT_SHADER,
 				"shaders/basic.frag"));
         
-        createProgram( gl, shaderList);
+        defaultProgram = createProgram( gl, shaderList);
         
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
