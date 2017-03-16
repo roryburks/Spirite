@@ -1,4 +1,4 @@
-package spirite.image_data.draw;
+package spirite.gl;
 
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
@@ -26,8 +26,8 @@ import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
-import spirite.gl.GLEngine;
 import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLUIDraw.GradientType;
 
 public class JOGLDrawer {
 	private final GLEngine engine = GLEngine.getInstance();
@@ -41,17 +41,26 @@ public class JOGLDrawer {
     static Random r = new Random(); 
 
     
-    
+
 	public BufferedImage renderTriangle() {
+		return GLUIDraw.drawColorGradient( 0.5f, GradientType.SATURATION, width, height);
+	}
+	public BufferedImage _old2() {
 		engine.setSurfaceSize(width, height);
 		
 		GL4 gl = engine.getGL4();
 
-        FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
+		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
         	new float[] {
-                +0.75f, +0.75f, 0.0f, 1.0f,
-                +0.75f, -0.75f, 0.0f, 1.0f,
-                -0.75f, -0.75f, 0.0f, 1.0f
+                    -1.0f, -1.0f, 0.0f, 1.0f,
+                    +1.0f, -1.0f, 0.0f, 1.0f,
+                    -1.0f, +1.0f, 0.0f, 1.0f,
+                    +1.0f, +1.0f, 0.0f, 1.0f,
+                    
+                    +1.0f, +0.000f, 0.0f, 1.0f,
+                    +0.0f, +1.000f, 0.0f, 1.0f,
+                    +0.0f, +0.000f, 1.0f, 1.0f,
+                    +1.0f, +1.000f, 1.0f, 1.0f
         	}
         );
 
@@ -78,11 +87,14 @@ public class JOGLDrawer {
 
         gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, positionBufferObject.get(0));
         gl.glEnableVertexAttribArray(GLEngine.Attr.POSITION);
+        gl.glEnableVertexAttribArray(GLEngine.Attr.COLOR);
         gl.glVertexAttribPointer(GLEngine.Attr.POSITION, Vec4.NUM, GL4.GL_FLOAT, false, Vec4.STRIDE, 0);
+        gl.glVertexAttribPointer(GLEngine.Attr.COLOR, Vec4.NUM, GL4.GL_FLOAT, false, Vec4.STRIDE, Vec4.STRIDE*4);
 
-        gl.glDrawArrays(GL4.GL_TRIANGLES, 0, 3);
+        gl.glDrawArrays(GL4.GL_TRIANGLE_STRIP, 0, 4);
 
         gl.glDisableVertexAttribArray(GLEngine.Attr.POSITION);
+        gl.glDisableVertexAttribArray(GLEngine.Attr.COLOR);
         gl.glUseProgram(0);
         
 		

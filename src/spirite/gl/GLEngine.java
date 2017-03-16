@@ -32,8 +32,9 @@ public class GLEngine implements GLEventListener {
 	private final GLOffscreenAutoDrawable drawable;
 	private int width = 1;
 	private int height = 1;
-	
+
 	private int defaultProgram;
+	private int sgProgram;
 	
 	/** Namespace for Attribute Bindings */
     public static class Attr {
@@ -111,10 +112,17 @@ public class GLEngine implements GLEventListener {
 	}
 	
 	public enum ProgramType {
-		DEFAULT
+		DEFAULT,
+		SQARE_GRADIENT
 	}
 	public int getProgram( ProgramType type){
-		return this.defaultProgram;
+		switch( type) {
+		case DEFAULT:
+			return this.defaultProgram;
+		case SQARE_GRADIENT:
+			return this.sgProgram;
+		}
+		return 0;
 	}
 	
 	
@@ -135,6 +143,24 @@ public class GLEngine implements GLEventListener {
 				"shaders/basic.frag"));
         
         defaultProgram = createProgram( gl, shaderList);
+        
+        for( Integer shader : shaderList) {
+        	gl.glDeleteShader(shader);
+        }
+        
+
+        shaderList = new ArrayList<>();
+        
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_VERTEX_SHADER,
+				"shaders/square_grad.vert"));
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_FRAGMENT_SHADER,
+				"shaders/square_grad.frag"));
+        
+        sgProgram = createProgram( gl, shaderList);
         
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);

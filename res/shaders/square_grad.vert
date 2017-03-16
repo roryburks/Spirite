@@ -1,12 +1,12 @@
 #version 330
 
 layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
+layout (location = 1) in vec2 space;
 
-flat out vec4 theColor;
+smooth out vec2 relSpace;
 
 void main()
 {
     gl_Position = position;
-    theColor = color;
+    relSpace = space;
 }

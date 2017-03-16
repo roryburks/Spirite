@@ -23,11 +23,11 @@ import mutil.Interpolation.LagrangeInterpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.gl.JOGLDrawer;
 import spirite.MUtil;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
-import spirite.image_data.draw.JOGLDrawer;
 
 /***
  * Pretty much anything which alters the image data directly goes 
