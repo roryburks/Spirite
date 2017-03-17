@@ -170,6 +170,19 @@ public abstract class StrokeEngine {
 	public abstract boolean stepDrawStroke( PenState fromState, PenState toState);
 //	public abstract void endStroke();
 
+	
+	/**
+	 * In order to speed up undo/redo, certain Stroke Engines will batch all
+	 * draw commands into a single command instead of updating the stroke layer
+	 * repeatedly.
+	 */
+	public boolean batchDraw( 
+			StrokeParams stroke, 
+			PenState[] states, 
+			BuiltImageData data,
+			BuiltSelection mask) {
+		return false;
+	}
 
 
 	// Draws the Stroke Layer onto the graphics

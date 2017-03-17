@@ -23,6 +23,7 @@ import mutil.Interpolation.LagrangeInterpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
+import spirite.gl.GLStrokeEngine;
 import spirite.gl.JOGLDrawer;
 import spirite.MUtil;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -45,6 +46,7 @@ import spirite.pen.StrokeEngine.STATE;
 public class DrawEngine {
 	private final ImageWorkspace workspace;
 	private final DefaultStrokeEngine engine = new DefaultStrokeEngine();
+//	private final StrokeEngine engine = new GLStrokeEngine();
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
 	private final JOGLDrawer jogl = new JOGLDrawer();
@@ -394,10 +396,11 @@ public class DrawEngine {
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
 			
-			startStroke(params, points[0], builtImage);
-			
-			for( int i = 1; i < points.length; ++i) {
-				engine.stepStroke( points[i]);
+			if( !engine.batchDraw(params, points, builtImage, mask)){
+				engine.startStroke(params, points[0], builtImage, mask);
+				for( int i = 1; i < points.length; ++i) {
+					engine.stepStroke( points[i]);
+				}
 			}
 			
 			engine.endStroke();

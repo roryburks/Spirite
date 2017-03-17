@@ -68,6 +68,7 @@ public class JPenPenner implements PenListener
 				penner.rawUpdateY(Math.round(level.value));
 				break;
 			case PRESSURE:
+				System.out.println(level.value);
 				penner.rawUpdatePressure(level.value);
 				break;
 			default:

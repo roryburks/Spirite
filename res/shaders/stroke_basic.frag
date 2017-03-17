@@ -6,5 +6,8 @@ out vec4 outputColor;
 
 void main()
 {
-    outputColor = theColor;
+    outputColor.r = 1;
+    outputColor.g = 1;
+    outputColor.b = 1;
+    outputColor.a = 1;
 }

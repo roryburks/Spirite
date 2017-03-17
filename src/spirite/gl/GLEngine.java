@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -33,8 +34,6 @@ public class GLEngine implements GLEventListener {
 	private int width = 1;
 	private int height = 1;
 
-	private int defaultProgram;
-	private int sgProgram;
 	
 	/** Namespace for Attribute Bindings */
     public static class Attr {
@@ -113,16 +112,70 @@ public class GLEngine implements GLEventListener {
 	
 	public enum ProgramType {
 		DEFAULT,
-		SQARE_GRADIENT
+		SQARE_GRADIENT,
+		BASIC_STROKE
 	}
+	private int defaultProgram;
+	private int sgProgram;
+	private int bsProgram;
 	public int getProgram( ProgramType type){
 		switch( type) {
 		case DEFAULT:
 			return this.defaultProgram;
 		case SQARE_GRADIENT:
 			return this.sgProgram;
+		case BASIC_STROKE:
+			return this.bsProgram;
 		}
 		return 0;
+	}
+	
+	// :::: Data Buffer Preperation
+	public class PreparedData{		
+		@Override
+		protected void finalize() throws Throwable {
+			free();
+			super.finalize();
+		}
+		
+		public int getBuffer() {
+			return positionBufferObject.get(0);
+		}
+		
+		public void free() {
+			if( !_free) {
+				_free = true;
+				GL4 gl = drawable.getGL().getGL4();
+
+				gl.glDeleteVertexArrays(1, vao);
+				gl.glDeleteBuffers(1, positionBufferObject);
+			}
+		}
+		
+		private boolean _free = false;
+		private IntBuffer positionBufferObject = GLBuffers.newDirectIntBuffer(1);
+		private IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
+	}
+	public PreparedData prepareRawData( float raw[]) {
+		GL4 gl = drawable.getGL().getGL4();
+		
+		PreparedData pd = new PreparedData();
+		
+		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(raw);
+
+	    gl.glGenBuffers(1, pd.positionBufferObject);
+	    gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
+	    gl.glBufferData(
+	    		GL4.GL_ARRAY_BUFFER, 
+	    		vertexBuffer.capacity()*Float.BYTES, 
+	    		vertexBuffer, 
+	    		GL4.GL_STREAM_DRAW);
+        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, 0);
+
+		gl.glGenVertexArrays(1, pd.vao);
+		gl.glBindVertexArray(pd.vao.get(0));
+		
+		return pd;
 	}
 	
 	
@@ -133,6 +186,7 @@ public class GLEngine implements GLEventListener {
 
         ArrayList<Integer> shaderList = new ArrayList<>();
         
+        // Default Shader
         shaderList.add( compileShaderFromResource(
 				gl,
 				GL4.GL_VERTEX_SHADER,
@@ -149,7 +203,8 @@ public class GLEngine implements GLEventListener {
         }
         
 
-        shaderList = new ArrayList<>();
+        // Square Gradient Shader
+        shaderList.clear();
         
         shaderList.add( compileShaderFromResource(
 				gl,
@@ -165,12 +220,35 @@ public class GLEngine implements GLEventListener {
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
         }
+        
+        // Basic Stroke Shader
+        shaderList.clear();
+
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_VERTEX_SHADER,
+				"shaders/stroke_basic.vert"));
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_GEOMETRY_SHADER,
+				"shaders/stroke_basic.geom"));
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_FRAGMENT_SHADER,
+				"shaders/stroke_basic.frag"));
+        
+        bsProgram = createProgram( gl, shaderList);
+        
+        for( Integer shader : shaderList) {
+        	gl.glDeleteShader(shader);
+        }
+        
 	}
 	
 	private int createProgram( GL4 gl, ArrayList<Integer> shaderList) {
 		// Create and Link Program
 		int program = gl.glCreateProgram();
-		
+
 		for( Integer shader : shaderList){
 			gl.glAttachShader(program, shader);	
 		}
