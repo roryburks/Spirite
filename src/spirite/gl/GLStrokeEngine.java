@@ -8,8 +8,11 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.List;
 
 import com.hackoeur.jglm.Vec4;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
@@ -18,6 +21,7 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 
 import mutil.MatrixBuilder;
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.ProgramType;
 import spirite.image_data.DrawEngine.StrokeParams;
@@ -50,16 +54,88 @@ public class GLStrokeEngine extends StrokeEngine {
 		if( fromState.x == toState.x && fromState.y == toState.y)
 			return false;
 		
-		_stroke( new PenState[] {fromState,toState});
+		_stroke(composeVBufferFromNew(toState));
 		return true;
 	}
 	
 	@Override
 	public boolean batchDraw(StrokeParams stroke, PenState[] states, BuiltImageData data, BuiltSelection mask) {
 		super.startStroke(stroke, states[0], data, mask);
-		_stroke( states);
-		super.endStroke();
+		_stroke( composeVBufferFromArray(states));
 		return true;
+	}
+	
+	
+	
+	private class GLVBuffer {
+		float[] vBuffer;
+		int len;
+	}
+
+	private GLVBuffer composeVBufferFromNew( PenState toStates) {
+		GLVBuffer vb = new GLVBuffer();
+		
+		// Prepare Data as a buffer
+		float raw[] = new float[6*(prec.size()+3)];
+		
+		raw[4] = -1;
+		for( int i=0; i<prec.size(); ++i) {
+			PenState recState = prec.get(i);
+			int off = (i+1)*6;
+			// x y z w
+			raw[off+0] = recState.x;
+			raw[off+1] = recState.y;
+			raw[off+2] = 0.0f;
+			raw[off+3] = 1.0f;
+			
+			// size pressure
+			raw[off+4] = stroke.getDynamics().getSize(recState) * stroke.getWidth();
+			raw[off+5] = recState.pressure;
+		}
+
+		int off = (prec.size()+1)*6;
+		// x y z w
+		raw[off+0] = toStates.x;
+		raw[off+1] = toStates.y;
+		raw[off+2] = 0.0f;
+		raw[off+3] = 1.0f;
+		
+		// size pressure
+		raw[off+4] = stroke.getDynamics().getSize(toStates) * stroke.getWidth();
+		raw[off+5] = toStates.pressure;
+		
+		raw[ (prec.size()+2)*6+4] = -1;
+		
+		vb.vBuffer = raw;
+		vb.len = prec.size()+3;
+		
+		return vb;
+	}
+	private GLVBuffer composeVBufferFromArray( PenState[] states) {
+		GLVBuffer vb = new GLVBuffer();
+		
+		// Prepare Data as a buffer
+		float raw[] = new float[6*(states.length+2)];
+		
+		raw[4] = -1;
+		for( int i=0; i< states.length; ++i) {
+			int off = (i+1)*6;
+			// x y z w
+			raw[off+0] = states[i].x;
+			raw[off+1] = states[i].y;
+			raw[off+2] = 0.0f;
+			raw[off+3] = 1.0f;
+			
+			// size pressure
+			raw[off+4] = stroke.getDynamics().getSize(states[i]) * stroke.getWidth();
+			raw[off+5] = states[i].pressure;
+		}
+		raw[ (states.length+1)*6+4] = -1;
+		
+		vb.vBuffer = raw;
+		vb.len = states.length+2;
+		
+		return vb;
 	}
 
 	private final static int ATTR_POS = 0;
@@ -72,7 +148,8 @@ public class GLStrokeEngine extends StrokeEngine {
 	 * passes it to a geometry shader that will expand it into a proper shape
 	 * to be filled by the fragment shader.
 	 */
-	private void _stroke( PenState[] states) {
+	private void _stroke( GLVBuffer glvb) {
+		System.out.println("test");
 
 		int w = data.getWidth();
 		int h = data.getHeight();
@@ -80,26 +157,8 @@ public class GLStrokeEngine extends StrokeEngine {
 		engine.setSurfaceSize( w, h);
 		GL4 gl = engine.getGL4();
 		
-		// Prepare Data as a buffer
-		float raw[] = new float[6*states.length];
 		
-		for( int i=0; i< states.length; ++i) {
-			int off = i*6;
-			// x y z w
-			raw[off+0] = states[i].x;
-			raw[off+1] = states[i].y;
-//			raw[off+0] = 2.0f * states[i].x / (float)w - 1.0f;
-//			raw[off+1] = -(2.0f * states[i].y / (float)h - 1.0f);
-			raw[off+2] = 0.0f;
-			raw[off+3] = 1.0f;
-			
-			// size pressure
-			raw[off+4] = stroke.getDynamics().getSize(states[i]) * stroke.getWidth();
-			MDebug.log(""+raw[off+4]);
-			raw[off+5] = states[i].pressure;
-		}
-		
-		PreparedData pd = engine.prepareRawData(raw);
+		PreparedData pd = engine.prepareRawData(glvb.vBuffer);
 
 		// Clear Surface
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -120,13 +179,24 @@ public class GLStrokeEngine extends StrokeEngine {
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -100, 10)
+        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
         );
         gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
+        int uColor = gl.glGetUniformLocation( prog, "uColor");
+        gl.glUniform3f(uColor, 
+        		stroke.getColor().getRed()/255.0f,
+        		stroke.getColor().getGreen()/255.0f,
+        		stroke.getColor().getBlue()/255.0f);
         
 
-        gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, states.length);
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendEquation(gl.GL_MAX);
+
+    	gl.glDrawArrays(GL4.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
         
+
+
+        gl.glDisable( GL.GL_BLEND);
 
         gl.glDisableVertexAttribArray( ATTR_POS);
         gl.glDisableVertexAttribArray( ATTR_SIZE);
@@ -138,7 +208,8 @@ public class GLStrokeEngine extends StrokeEngine {
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				gl, 0, 0, data.getWidth(), data.getHeight(), true); 
+        				gl, 0, 0, w, h, true); 
+		MUtil.clearImage(strokeLayer);
 		Graphics g = strokeLayer.getGraphics();
 		g.drawImage(im, 0, 0, null);
 		

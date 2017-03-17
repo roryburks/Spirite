@@ -33,7 +33,7 @@ public abstract class StrokeEngine {
 	protected BufferedImage selectionMask;
 	
 	// Recording of raw states
-	private List<PenState> prec = new LinkedList<>();
+	protected List<PenState> prec = new LinkedList<>();
 
 	protected BuiltSelection sel;
 	

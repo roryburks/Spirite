@@ -1,13 +1,15 @@
-#version 330
+#version 450
 
 smooth in vec4 theColor;
+
+in float fWeight;
+
+uniform vec3 uColor;
 
 out vec4 outputColor;
 
 void main()
 {
-    outputColor.r = 1;
-    outputColor.g = 1;
-    outputColor.b = 1;
-    outputColor.a = 1;
+	// Porter-Duff Source Over Destination
+    outputColor = vec4(uColor,sqrt(sqrt(fWeight)));
 }

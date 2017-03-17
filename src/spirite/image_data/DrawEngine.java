@@ -45,11 +45,13 @@ import spirite.pen.StrokeEngine.STATE;
  */
 public class DrawEngine {
 	private final ImageWorkspace workspace;
-	private final DefaultStrokeEngine engine = new DefaultStrokeEngine();
-//	private final StrokeEngine engine = new GLStrokeEngine();
+	private final DefaultStrokeEngine defEngine = new DefaultStrokeEngine();
+	private final GLStrokeEngine glEngine = new GLStrokeEngine();
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
 	private final JOGLDrawer jogl = new JOGLDrawer();
+	
+	private StrokeEngine activeEngine = null;
 	
 	public DrawEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
@@ -60,25 +62,24 @@ public class DrawEngine {
 	}
 	
 	public boolean strokeIsDrawing() {
-		return (engine.getState() == STATE.DRAWING);
+		return activeEngine != null;
 	}
 	public BufferedImage getStrokeLayer() {
-		return engine.getStrokeLayer();
+		return (activeEngine == null) ? null : activeEngine.getStrokeLayer();
 	}
 	public StrokeEngine getStrokeEngine() {
-		return engine;
+		return activeEngine;
+	}
+	public StrokeEngine ___J_defEngine() {
+		return defEngine;
 	}
 	public ImageHandle getStrokeContext() {
-		if( engine.getState() == STATE.DRAWING) {
-			return engine.getImageData().handle;
-		}
-		else
-			return null;
+		return (activeEngine == null) ? null : activeEngine.getImageData().handle;
 	}
 	
 	/** @return true if the stroke started, false otherwise	 */
 	public boolean startStroke(StrokeParams stroke, PenState ps, BuiltImageData data) {
-		if( engine.getState() == STATE.DRAWING) {
+		if( activeEngine != null) {
 			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
 		}
@@ -87,35 +88,48 @@ public class DrawEngine {
 			return false;
 		}
 		else {
-			if( engine.startStroke(stroke, ps, data, pollSelectionMask()))
+			switch( stroke.getMethod()) {
+			case PIXEL:
+				activeEngine = defEngine;
+				break;
+			case BASIC:
+			case ERASE:
+				activeEngine = glEngine;
+				break;
+			}
+			
+			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
 			return true;
 		}
 	}
 	public void stepStroke( PenState ps) {
-		if( engine.getState() != STATE.DRAWING) {
+		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to step stroke that isn't active.");
 			return ;
 		}
 		else {
-			if(engine.stepStroke(ps))
-				engine.getImageData().handle.refresh();
+			if(activeEngine.stepStroke(ps))
+				activeEngine.getImageData().handle.refresh();
 		}
 	}
 	public void endStroke( ) {
-		if( engine.getState() != STATE.DRAWING) {
+		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
+			activeEngine = null;
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to end stroke that isn't active.");
 			return ;
 		}
 		else {
-				engine.endStroke();
+			activeEngine.endStroke();
 				
-				undoEngine.storeAction(
-					new StrokeAction(
-						engine.getParams(),
-						engine.getHistory(),
-						engine.getLastSelection(),
-						engine.getImageData()));
+			undoEngine.storeAction(
+				new StrokeAction(
+					activeEngine,
+					activeEngine.getParams(),
+					activeEngine.getHistory(),
+					activeEngine.getLastSelection(),
+					activeEngine.getImageData()));
+			activeEngine = null;
 		}
 		
 	}
@@ -369,9 +383,17 @@ public class DrawEngine {
 	public class StrokeAction extends MaskedImageAction {
 		private final PenState[] points;
 		private final StrokeParams params;
+		private final StrokeEngine engine;
 		
-		public StrokeAction( StrokeParams params, PenState[] points, BuiltSelection mask, BuiltImageData data){	
+		public StrokeAction( 
+				StrokeEngine engine,
+				StrokeParams params, 
+				PenState[] points, 
+				BuiltSelection mask, 
+				BuiltImageData data)
+		{
 			super(data, mask);
+			this.engine = engine;
 			this.params = params;
 			this.points = points;
 			
@@ -395,7 +417,7 @@ public class DrawEngine {
 		@Override
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
-			
+
 			if( !engine.batchDraw(params, points, builtImage, mask)){
 				engine.startStroke(params, points[0], builtImage, mask);
 				for( int i = 1; i < points.length; ++i) {

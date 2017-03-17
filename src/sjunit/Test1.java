@@ -257,7 +257,7 @@ public class Test1 {
 			params.setWidth( rn.nextInt(5));
 			
 			StrokeAction action =
-			workspace.getDrawEngine().new StrokeAction(params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
+			workspace.getDrawEngine().new StrokeAction(workspace.getDrawEngine().___J_defEngine(),params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
 			
 			action.performImageAction();
 			workspace.getUndoEngine().storeAction(action);
