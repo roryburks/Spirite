@@ -27,7 +27,6 @@ import spirite.brains.ToolsetManager.Tool;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
-import spirite.gl.GLEngine;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;

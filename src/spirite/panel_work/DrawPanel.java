@@ -27,7 +27,6 @@ import spirite.brains.RenderEngine.RenderSettings;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.MSelectionObserver;
@@ -105,7 +104,7 @@ public class DrawPanel extends JPanel
         		BasicStroke.CAP_BUTT, 
         		BasicStroke.JOIN_BEVEL, 
         		0, 
-        		new float[]{4/zoom,2/zoom}, 
+        		new float[]{4,2}, 
         		0);
         final Stroke baseStroke = g2.getStroke();
 

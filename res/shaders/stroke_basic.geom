@@ -5,12 +5,15 @@
 #define PI2 6.2831852
 
 layout(lines_adjacency) in;
-layout(triangle_strip, max_vertices = 9) out;
+layout(triangle_strip, max_vertices = 13) out;
+
 uniform mat4 perspectiveMatrix;
+uniform float uH;	// Passing this is probably horribly misguided
 
 in float vSize[];
 
-out float fWeight;
+smooth out float fWeight;
+flat out float fX, fY, fM;
 
 // Could probably be optimized to only use 1 mod with knowledge
 //	of the range atan can be in
@@ -40,6 +43,26 @@ void main()
 		// Starting Endpoint
 		bl += vec2(-sang2, cang2) * vSize[1];
 		br += vec2(sang2, -cang2) * vSize[1];
+		
+		
+		// Start Dot
+	    fWeight = -1;
+	    fX = bc.x+0.5;
+	    fY = uH-(bc.y+0.5);
+	    fM = vSize[1];
+	    
+	    gl_Position = perspectiveMatrix*vec4(bl-vec2(cang2,sang2)*vSize[1],0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(bl,0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(br-vec2(cang2,sang2)*vSize[1],0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(br,0,1);
+	    EmitVertex();
+	    EndPrimitive();
+	    
+	    fX = 0;
+	    fY = 0;
 	}
 	else {
 		float a1 = atan( 
@@ -61,6 +84,25 @@ void main()
 	if( vSize[3] < 0) {
 		tl += vec2(-sang2, cang2) * vSize[2];
 		tr += vec2(sang2, -cang2) * vSize[2];
+		
+		// End Dot
+	    fWeight = -1;
+	    fX = tc.x+0.5;
+	    fY = uH-(tc.y+0.5);
+	    fM = vSize[1];
+	    
+	    gl_Position = perspectiveMatrix*vec4(tl+vec2(cang2,sang2)*vSize[1],0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(tl,0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(tr+vec2(cang2,sang2)*vSize[1],0,1);
+	    EmitVertex();
+	    gl_Position = perspectiveMatrix*vec4(tr,0,1);
+	    EmitVertex();
+	    EndPrimitive();
+	    
+	    fX = 0;
+	    fY = 0;
 	}
 	else {
 		vec2 te = tc;
@@ -78,7 +120,6 @@ void main()
 			
 		    gl_Position = perspectiveMatrix*vec4(tl,0,1);
 		    fWeight = 0;
-		    gl_FrontColor = gl_FrontColorIn[1];
 		    EmitVertex();
 		}
 		else {
@@ -88,7 +129,6 @@ void main()
 			
 		    gl_Position = perspectiveMatrix*vec4(tr,0,1);
 		    fWeight = 0;
-		    gl_FrontColor = gl_FrontColorIn[1];
 		    EmitVertex();
 		}
 			
@@ -100,7 +140,6 @@ void main()
 	    
 	    gl_Position = perspectiveMatrix*vec4(te,0,1);
 	    fWeight = 0;
-	    gl_FrontColor = gl_FrontColorIn[1];
 	    EmitVertex();
 	    EndPrimitive();
 	}
@@ -120,37 +159,31 @@ void main()
 	// 1 : Bottomleft
     gl_Position = perspectiveMatrix*vec4(bl,0,1);
     fWeight = 0;
-    gl_FrontColor = gl_FrontColorIn[1];
     EmitVertex();
 
 	// 2 : Topleft
     gl_Position = perspectiveMatrix*vec4(tl,0,1);
     fWeight = 0;
-    gl_FrontColor = gl_FrontColorIn[2];
     EmitVertex();
     
     // 3 :bottomcenter
     gl_Position = perspectiveMatrix*vec4(bc,0,1);
     fWeight = 1;
-    gl_FrontColor = gl_FrontColorIn[1];
     EmitVertex();
     
     // 4 :topcenter
     gl_Position = perspectiveMatrix*vec4(tc,0,1);
     fWeight = 1;
-    gl_FrontColor = gl_FrontColorIn[2];
     EmitVertex();
     
     // 5: bottomright
     gl_Position = perspectiveMatrix*vec4(br,0,1);
     fWeight = 0;
-    gl_FrontColor = gl_FrontColorIn[1];
     EmitVertex();
     
     // 6: topright
     gl_Position = perspectiveMatrix*vec4(tr,0,1);
     fWeight = 0;
-    gl_FrontColor = gl_FrontColorIn[2];
     EmitVertex();
     
     EndPrimitive();

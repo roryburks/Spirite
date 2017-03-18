@@ -2,7 +2,6 @@ package spirite.gl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -16,7 +15,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
@@ -26,8 +24,6 @@ import com.jogamp.opengl.util.GLBuffers;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import sun.misc.IOUtils;
-import sun.security.util.Length;
 
 public class GLEngine implements GLEventListener {
 	private final GLOffscreenAutoDrawable drawable;

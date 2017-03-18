@@ -1,32 +1,23 @@
 package spirite.gl;
 
-import spirite.pen.PenTraits.PenState;
-
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.Arrays;
-import java.util.List;
 
-import com.hackoeur.jglm.Vec4;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
-import com.jogamp.opengl.util.glsl.ShaderCode;
 
 import mutil.MatrixBuilder;
-import spirite.MDebug;
 import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.ProgramType;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
 public class GLStrokeEngine extends StrokeEngine {
@@ -179,7 +170,7 @@ public class GLStrokeEngine extends StrokeEngine {
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
+        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
         );
         gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
         int uColor = gl.glGetUniformLocation( prog, "uColor");
@@ -187,6 +178,7 @@ public class GLStrokeEngine extends StrokeEngine {
         		stroke.getColor().getRed()/255.0f,
         		stroke.getColor().getGreen()/255.0f,
         		stroke.getColor().getBlue()/255.0f);
+        gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
         
 
         gl.glEnable(GL.GL_BLEND);

@@ -10,13 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine.STATE;
 
 public abstract class StrokeEngine {
 	public enum STATE { READY, DRAWING };

@@ -7,15 +7,12 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,11 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import spirite.MUtil.TransferableImage;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
-import spirite.brains.RenderEngine.RenderSettings;
-import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.panel_layers.LayersPanel;
 import spirite.panel_layers.ReferenceSchemePanel;
