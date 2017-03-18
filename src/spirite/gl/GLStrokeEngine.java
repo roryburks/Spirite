@@ -1,6 +1,7 @@
 package spirite.gl;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
@@ -44,7 +45,7 @@ public class GLStrokeEngine extends StrokeEngine {
 	public boolean stepDrawStroke(PenState fromState, PenState toState) {
 		if( fromState.x == toState.x && fromState.y == toState.y)
 			return false;
-		
+
 		_stroke(composeVBufferFromNew(toState));
 		return true;
 	}

@@ -259,17 +259,10 @@ public class ToolsetManager
     	return constructFromScheme(scheme);
     }
    
-    public enum Scope {
-    	LOCAL("Local"),
-    	NODE("Entire Layer/Group")
-    	;
-    	
-    	String description;
-    	Scope( String d) {description = d;}
-    }
     private ToolSettings constructColorChangeSettings() {
     	final Object[][] scheme = {
         		{"scope", PropertyType.DROP_DOWN,"Scope",  0, 0, new String[]{"Local","Entire Layer/Group","Entire Project"}},
+    			{"ignoreAlpha", PropertyType.CHECK_BOX, "Ignore Alpha", true},
     	};
     	
     	return constructFromScheme(scheme);

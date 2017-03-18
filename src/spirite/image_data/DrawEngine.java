@@ -25,6 +25,7 @@ import spirite.gl.GLStrokeEngine;
 import spirite.gl.JOGLDrawer;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
+import spirite.image_data.ImageWorkspace.BuildingImageData;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
@@ -176,7 +177,7 @@ public class DrawEngine {
 		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 	}
 	
-	public void changeColor( Color from, Color to, int scope) {
+	public void changeColor( Color from, Color to, int scope, boolean ignoreAlpha) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		
 		Node selected = null;
@@ -187,7 +188,7 @@ public class DrawEngine {
 		case 0:	// Local
 			BuiltImageData bid = workspace.buildActiveData();
 			if( bid != null) {
-				execute( new ColorChangeAction(bid, mask, from, to));
+				execute( new ColorChangeAction(bid, mask, from, to,ignoreAlpha));
 			}
 			break;
 		case 1: // Group/Layer
@@ -203,10 +204,12 @@ public class DrawEngine {
 			for( LayerNode lnode : selected.getAllLayerNodes()) {
 				Layer layer = lnode.getLayer();
 				
-				for( ImageHandle handle : layer.getImageDependencies()) {
+				for( BuildingImageData data : layer.getDataToBuild()) {
+					data.ox += lnode.x;
+					data.oy += lnode.y;
 					actions.add( new ColorChangeAction(
-							workspace.buildData(handle),
-							mask, from, to));
+							workspace.buildData(data),
+							mask, from, to, ignoreAlpha));
 				}
 			}
 			
@@ -616,7 +619,6 @@ public class DrawEngine {
 
 		@Override
 		protected void performImageAction() {
-			BufferedImage bi = builtImage.checkoutRaw();
 			
 			if( mask != null && mask.selection != null) {
 				
@@ -625,7 +627,7 @@ public class DrawEngine {
 
 				BufferedImage buffer = flipImage(lifted);
 
-				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
 				mask.drawSelectionMask(g2);
 				
@@ -636,6 +638,7 @@ public class DrawEngine {
 				buffer.flush();
 			}
 			else {
+				BufferedImage bi = builtImage.checkoutRaw();
 				BufferedImage buffer = flipImage( bi);
 				
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
@@ -644,8 +647,8 @@ public class DrawEngine {
 				g2.dispose();
 				buffer.flush();
 			}
-			
 			builtImage.checkin();
+			
 		}
 
 		private BufferedImage flipImage( BufferedImage bi) {
@@ -686,17 +689,41 @@ public class DrawEngine {
 	public class ColorChangeAction extends MaskedImageAction 
 	{
 		private final Color from, to;
-		ColorChangeAction(BuiltImageData data, BuiltSelection mask, Color from, Color to) {
+		private final boolean ignoreAlpha;
+		ColorChangeAction(
+				BuiltImageData data, 
+				BuiltSelection mask, 
+				Color from, Color to, 
+				boolean ignoreAlpha) 
+		{
 			super(data, mask);
 			this.from = from;
 			this.to = to;
+			this.ignoreAlpha = ignoreAlpha;
 			description = "Color Change Action";
 		}
 		
 		@Override
 		protected void performImageAction() {
-			BufferedImage bi = builtImage.checkoutRaw();
-			jogl.changeColor(bi, from, to);
+			int options = (ignoreAlpha)? 0:1; 
+
+			if( mask != null && mask.selection != null) {
+				
+				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
+				jogl.changeColor(lifted, from, to, options);
+
+				Graphics2D g2 = (Graphics2D) builtImage.checkout();
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+				mask.drawSelectionMask(g2);
+
+
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
+			}
+			else {
+				BufferedImage bi = builtImage.checkoutRaw();
+				jogl.changeColor(bi, from, to, options);
+			}
 			builtImage.checkin();
 		}
 	}

@@ -256,21 +256,26 @@ public class Penner
 				}
 				break;
 			case COLOR_CHANGE:
+				if( holdingCtrl)  {
+					behavior = new PickBehavior(button == PButton.Type.LEFT);
+					break;
+				}
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
 				
 				int scope = (Integer)settings.getValue("scope");
+				boolean ignoreAlpha = (Boolean)settings.getValue("ignoreAlpha");
 				
 				if( button == PButton.Type.LEFT) {
 					drawEngine.changeColor(
 							paletteManager.getActiveColor(0),
 							paletteManager.getActiveColor(1),
-							scope);
+							scope, ignoreAlpha);
 				}
 				else {
 					drawEngine.changeColor(
 							paletteManager.getActiveColor(1),
 							paletteManager.getActiveColor(0),
-							scope);
+							scope, ignoreAlpha);
 				}
 				break;
 			}

@@ -44,22 +44,22 @@ public class SimpleLayer extends Layer {
 	public BuildingImageData getActiveData() {
 		return new BuildingImageData(data, 0, 0);
 	}
-
+	@Override
+	public List<BuildingImageData> getDataToBuild(){
+		return Arrays.asList( new BuildingImageData[] {new BuildingImageData(data, 0, 0)});
+	}
 	@Override
 	public int getWidth() {
 		return data.getWidth();
 	}
-
 	@Override
 	public int getHeight() {
 		return data.getHeight();
 	}
-
 	@Override
 	public Layer logicalDuplicate() {
 		return new SimpleLayer(data.dupe());
 	}
-
 	@Override
 	public List<Rectangle> getBoundList() {
 		
@@ -69,12 +69,10 @@ public class SimpleLayer extends Layer {
 		
 		return list;
 	}
-
 	@Override
 	public boolean canMerge(Node node) {
 		return (data.getContext() != null);
 	}
-
 	@Override
 	public LayerActionHelper merge(Node node, int x, int y) {
 		LayerActionHelper helper = new LayerActionHelper();

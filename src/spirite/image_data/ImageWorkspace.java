@@ -571,11 +571,14 @@ public class ImageWorkspace {
 	 * to the Class that requested it, ImageWorkspace has to add in the Node
 	 * transform data.  BuildingActiveData is an intermediate class that 
 	 * Layers send that have their local transforms.
+	 * 
+	 * Since this is an intermediate plain-data type intended only for 
+	 * transmitting information, there's no reason to have the data protected.
 	 */
 	public static class BuildingImageData {
 		public final ImageHandle handle;
-		private final int ox;
-		private final int oy;
+		public int ox;
+		public int oy;
 		public BuildingImageData( ImageHandle handle, int ox, int oy) {
 			this.handle = handle;
 			this.ox = ox;
@@ -604,7 +607,6 @@ public class ImageWorkspace {
 	}
 	
 	public BuiltImageData buildData( LayerNode node) {
-		getSelectedNode();	// Makes sure the selected node is refreshed
 		BuildingImageData data = node.getLayer().getActiveData();
 		
 		if( data == null) return null;
@@ -618,17 +620,17 @@ public class ImageWorkspace {
 		else return new BuiltImageData( data.handle,
 				data.ox + node.x, data.oy + node.y);
 	}
-	public BuiltImageData buildData( ImageHandle handle) {
-		getSelectedNode();	// Makes sure the selected node is refreshed
+	public BuiltImageData buildData( BuildingImageData data) {
+		if( data == null) return null;
 		
-		if( handle == null) return null;
-		
-		InternalImage ii = imageData.get(handle.id);
+		InternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
 		if( ii instanceof DynamicInternalImage)		
-			return new DynamicImageData( handle,0, 0, (DynamicInternalImage) ii);
-		else return new BuiltImageData( handle, 0, 0);
+			return new DynamicImageData(data.handle,
+				data.ox, data.oy, (DynamicInternalImage) ii);
+		else return new BuiltImageData( data.handle,
+				data.ox, data.oy);
 	}
 	
 	

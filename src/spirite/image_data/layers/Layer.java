@@ -16,6 +16,7 @@ import spirite.image_data.UndoEngine.UndoableAction;
 public abstract class Layer {
 	public abstract BuildingImageData getActiveData();
 	public abstract List<ImageHandle> getImageDependencies();
+	public abstract List<BuildingImageData> getDataToBuild();
 	public abstract void draw( Graphics g);
 	public abstract int getWidth();
 	public abstract int getHeight();

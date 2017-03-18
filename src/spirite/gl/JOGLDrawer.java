@@ -47,8 +47,10 @@ public class JOGLDrawer {
     static int numPoints = 1000; 
     static Random r = new Random(); 
 
-    
-    public void changeColor( BufferedImage bi, Color from, Color to) {
+    /**
+     * @param options 0th bit: 0 = ignore alpha, 1 = test alpha
+     */
+    public void changeColor( BufferedImage bi, Color from, Color to, int options) {
 		GL4 gl = engine.getGL4();
 		
 		int w = bi.getWidth();
@@ -110,8 +112,10 @@ public class JOGLDrawer {
 		// Bind Uniforms
 		int cFrom = gl.glGetUniformLocation(prog, "cFrom");
 		int cTo = gl.glGetUniformLocation(prog, "cTo");
+		int optionMask = gl.glGetUniformLocation(prog, "optionMask");
 		gl.glUniform4f( cFrom, from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f);
 		gl.glUniform4f( cTo, to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f);
+		gl.glUniform1i(optionMask, options);
 		
 		// Start Draw
         gl.glEnable(GL.GL_BLEND);
@@ -123,7 +127,6 @@ public class JOGLDrawer {
 		// Finished Drawing
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
-//		gl.glDeleteTextures(1, tex);
 		texture.disable(gl);
 		texture.destroy(gl);
 		pd.free();

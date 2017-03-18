@@ -253,6 +253,15 @@ public class SpriteLayer extends Layer
 	}
 
 	@Override
+	public List<BuildingImageData> getDataToBuild(){
+		List<BuildingImageData> list = new ArrayList<>(parts.size());
+		for( Part p : parts) {
+			list.add( new BuildingImageData( p.handle, p.ox, p.oy));
+		}
+		return list;
+	}
+
+	@Override
 	public List<ImageHandle> getImageDependencies() {
 		List<ImageHandle> handles = new ArrayList<>( parts.size());
 		for( Part part : parts) {
