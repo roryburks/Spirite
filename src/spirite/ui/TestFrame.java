@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JComboBox;
 
 public class TestFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -75,6 +76,9 @@ public class TestFrame extends JFrame {
 		
 		JRadioButton radioButton_1 = new JRadioButton("2");
 		panelA.add(radioButton_1);
+		
+		JComboBox comboBox = new JComboBox();
+		panelA.add(comboBox);
 		
 		JRadioButton radioButton_2 = new JRadioButton("3");
 		panelA.add(radioButton_2);

@@ -209,7 +209,7 @@ public class MUtil {
 			Image img = (Image)c.getData(DataFlavor.imageFlavor);
 			
     		BufferedImage bi = new BufferedImage(  
-    				img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    				img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB_PRE);
     		Graphics g = bi.getGraphics();
     		g.drawImage(img, 0, 0, null);
     		g.dispose();

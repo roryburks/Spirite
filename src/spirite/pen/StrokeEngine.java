@@ -78,15 +78,15 @@ public abstract class StrokeEngine {
 		stroke = s;
 		
 		strokeLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 		compositionLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 		
 		sel = selection;
 		
 		if( sel.selection != null) {
 			selectionMask = new BufferedImage( 
-					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 			MUtil.clearImage(selectionMask);
 			
 			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();

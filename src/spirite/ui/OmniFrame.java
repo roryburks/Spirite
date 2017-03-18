@@ -436,7 +436,7 @@ public class OmniFrame extends JPanel
 				root.repaint();
 				return true;
 			} catch (UnsupportedFlavorException | IOException e) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to import unsupported Data in OmniFrame (shouldn't have been flagged as importable).");
+				MDebug.handleError(ErrorType.STRUCTURAL, e, "Tried to import unsupported Data in OmniFrame (shouldn't have been flagged as importable).");
 				return false;
 			}
 		}
@@ -460,7 +460,7 @@ public class OmniFrame extends JPanel
 						cursor = DragSource.DefaultMoveDrop;
 					
 					
-					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_INT_ARGB);
+					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_INT_ARGB_PRE);
 					Graphics g = image.getGraphics();
 					
 					g.setColor( new Color(128,128,128,128));

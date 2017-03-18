@@ -160,7 +160,7 @@ public class MasterControl
     	int i = workspaces.indexOf(workspace);
     	
     	if( i == -1) {
-    		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Tried to remove a workspace that is not being tracked.");
+    		MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Tried to remove a workspace that is not being tracked.");
     		return;
     	}
     	

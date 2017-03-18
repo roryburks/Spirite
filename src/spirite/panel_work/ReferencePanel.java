@@ -42,7 +42,7 @@ public class ReferencePanel extends JPanel
 		
 		workspace = context.workspace;
 		if( workspace == null) {
-			MDebug.handleError( ErrorType.FATAL, this, "Reference Panel with no WS");
+			MDebug.handleError( ErrorType.FATAL, "Reference Panel with no WS");
 		}
 		workspace.addImageObserver(this);
 		workspace.getReferenceManager().addReferenceObserve(this);

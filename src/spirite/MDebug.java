@@ -63,7 +63,7 @@ public class MDebug {
 		System.out.println( "Warning: " + message);
 	}
 
-	public static void handleError( ErrorType type, Object source, String message) {
+	public static void handleError( ErrorType type, String message) {
 		Thread.dumpStack();
         JOptionPane.showMessageDialog(null, "Error: " + message);
 	}

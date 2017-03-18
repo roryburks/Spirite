@@ -65,6 +65,8 @@ public class ToolsetManager
         toolSettings.put( Tool.PIXEL, constructPixelSettings());
         toolSettings.put( Tool.ERASER, constructEraseSettings());
         toolSettings.put( Tool.CROP, constructCropperSettings());
+//        toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
+        toolSettings.put( Tool.COLOR_CHANGE, constructColorChangeSettings());
     }
     
     // :::: Get/Set
@@ -116,7 +118,7 @@ public class ToolsetManager
         icon_sheet = null;
         try {
             BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("tool_icons.png").openStream());
-            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
             
             Graphics g = icon_sheet.getGraphics();
             g.drawImage(buff, 0, 0, null);
@@ -125,7 +127,7 @@ public class ToolsetManager
             is_width = icon_sheet.getWidth() / (TOOL_ICON_WIDTH+1);
             is_height = icon_sheet.getHeight() / (TOOL_ICON_HEIGHT+1);
         } catch (IOException e) {
-        	MDebug.handleError( ErrorType.RESOURCE, this, "Failed to prepare Toolset Icon Sheet");
+        	MDebug.handleError( ErrorType.RESOURCE, e, "Failed to prepare Toolset Icon Sheet");
         }
     }
     
@@ -151,11 +153,11 @@ public class ToolsetManager
     public class ToolSettings {
     	Property properties[];
     	
-    	public PropertySchemeNode[] getPropertyScheme() {
-    		PropertySchemeNode ret[] = new PropertySchemeNode[properties.length];
+    	public Property[] getPropertyScheme() {
+    		Property ret[] = new Property[properties.length];
     		
     		for( int i=0; i<properties.length; ++i) {
-    			ret[i] = new PropertySchemeNode( properties[i]);
+    			ret[i] = properties[i];
     		}
     		return ret;
     	}
@@ -179,35 +181,39 @@ public class ToolsetManager
     			}
     		}
     	}
+    	
+    	public Object getExtra(String id) {
+    		for( int i=0; i<properties.length; ++i) {
+    			if( properties[i].id.equals(id)) {
+    				return properties[i].extra;
+    			}
+    		}
+    		return null;
+    	}
     }
-    static class Property 
+    public static class Property 
     {
     	String id;
     	PropertyType type;
     	String hiName;
     	Object value;
+    	Object extra;
     	int mask;
-    }
-    public static class PropertySchemeNode 
-    {
-    	public final String id;
-    	public final PropertyType type;
-    	public final String hiName;
-    	public final Object value;
-    	public final int attributeMask;
-    	PropertySchemeNode( Property other) {
-    		id = other.id;
-    		hiName = other.hiName;
-    		type = other.type;
-    		value = other.value;
-    		attributeMask = other.mask;
-    	}
+
+    	public String getId() {return id;}
+    	public PropertyType getType() {return type;}
+    	public String getName() {return hiName;}
+    	public Object getValue() {return value;}
+    	public Object getExtra() {return extra;}
+    	public int getMask() {return mask;}
     }
     
     public enum PropertyType {
     	SIZE, OPACITY, CHECK_BOX,BUTTON, 
     	// RADIO_BUTTON is a special Property Type in that 
-    	RADIO_BUTTON
+    	RADIO_BUTTON,
+    	// DropDown
+    	DROP_DOWN
     }
     
     // :::: Setting Schemes
@@ -252,7 +258,23 @@ public class ToolsetManager
     	
     	return constructFromScheme(scheme);
     }
+   
+    public enum Scope {
+    	LOCAL("Local"),
+    	NODE("Entire Layer/Group")
+    	;
     	
+    	String description;
+    	Scope( String d) {description = d;}
+    }
+    private ToolSettings constructColorChangeSettings() {
+    	final Object[][] scheme = {
+        		{"scope", PropertyType.DROP_DOWN,"Scope",  0, 0, new String[]{"Local","Entire Layer/Group","Entire Project"}},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    
     public static final int DISABLE_ON_NO_SELECTION = 0x01;
     
     /**<pre>
@@ -268,6 +290,7 @@ public class ToolsetManager
      * 3: the default value
      * 4: (optional) an integer mask that corresponds to various behavior
      * 	such as when the GUI element should be disabled
+     * 5: (optional) any additional type-specific data needed
      </pre>*/
     ToolSettings constructFromScheme( Object[][] scheme) {
     	ToolSettings settings = new ToolSettings();
@@ -275,7 +298,7 @@ public class ToolsetManager
 
     	for(int i=0; i<scheme.length; ++i) {
     		try {
-    			if( scheme[i].length > 5) 
+    			if( scheme[i].length < 4) 
     				throw new Exception("Bad Row Type");
 
     			settings.properties[i] = new Property();
@@ -284,6 +307,8 @@ public class ToolsetManager
     			settings.properties[i].hiName = (String)scheme[i][2];
     			if( scheme[i].length > 4) 
         			settings.properties[i].mask = (int)scheme[i][4];
+    			if( scheme[i].length > 5)
+    				settings.properties[i].extra = scheme[i][5];
     			
     			if(  !getValueClassFromType(settings.properties[i].type).isInstance(scheme[i][3])) {
         			throw new Exception("Value Class does not match type. Expected: " + getValueClassFromType(settings.properties[i].type).getClass() + " got: " + scheme[i][3].getClass() );
@@ -291,13 +316,15 @@ public class ToolsetManager
     			settings.properties[i].value = scheme[i][3];
     		
     		} catch( Exception e) {
-    			MDebug.handleError(ErrorType.STRUCTURAL, this, "Improper Toolset Settings Scheme: " + e.getMessage());
+    			MDebug.handleError(ErrorType.STRUCTURAL, e, "Improper Toolset Settings Scheme: " + e.getMessage());
     			return null;
     		}
     	}
     	
     	return settings;
     }
+    
+    private 
     
     //
     Class<?> getValueClassFromType( PropertyType type) {
@@ -309,6 +336,8 @@ public class ToolsetManager
 			return String.class;
 		case CHECK_BOX:
 			return Boolean.class;
+		case DROP_DOWN:
+			return Integer.class;
     	}
     	
     	return null;	// Should be no way to reach this

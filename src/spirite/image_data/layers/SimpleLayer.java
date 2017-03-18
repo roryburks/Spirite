@@ -94,7 +94,7 @@ public class SimpleLayer extends Layer {
 			helper.offsetChange.y = newBounds.y;
 			
 			// Draw both images in their respective spots
-			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			MUtil.clearImage(combination);
 			Graphics g = combination.getGraphics();
 			g.drawImage( data.deepAccess(), 0-newBounds.x, 0-newBounds.y, null);

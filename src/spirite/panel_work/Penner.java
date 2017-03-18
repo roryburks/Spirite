@@ -256,11 +256,22 @@ public class Penner
 				}
 				break;
 			case COLOR_CHANGE:
-
-				drawEngine.changeColor(
-						workspace.buildActiveData(),
-						paletteManager.getActiveColor(0),
-						paletteManager.getActiveColor(1));
+				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
+				
+				int scope = (Integer)settings.getValue("scope");
+				
+				if( button == PButton.Type.LEFT) {
+					drawEngine.changeColor(
+							paletteManager.getActiveColor(0),
+							paletteManager.getActiveColor(1),
+							scope);
+				}
+				else {
+					drawEngine.changeColor(
+							paletteManager.getActiveColor(1),
+							paletteManager.getActiveColor(0),
+							scope);
+				}
 				break;
 			}
 			

@@ -186,12 +186,12 @@ public class ImageWorkspace {
 		for( List<ImageHandle> layerData : layerDataUsed) {
 			for( ImageHandle data : layerData) {
 				if( data.context != this || !imageData.containsKey(data.id))
-					MDebug.handleError(ErrorType.STRUCTURAL, this, "Untracked Image Data found when cleaning ImageWorkspace.");
+					MDebug.handleError(ErrorType.STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace.");
 			}
 		}
 		for( ImageHandle data : undoImageSet) {
 			if( data.context != this || !imageData.containsKey(data.id))
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Untracked Image Data found from UndoEngine.");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Untracked Image Data found from UndoEngine.");
 		}
 
 		// Remove Unused Entries
@@ -496,7 +496,7 @@ public class ImageWorkspace {
 		@Override
 		public BufferedImage checkoutRaw() {
 			undoEngine.prepareContext(handle);
-			buffer = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB);
+			buffer = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB_PRE);
 			Graphics gr = buffer.getGraphics();
 			gr.drawImage(this.handle.deepAccess(),
 					ox+dii.ox, 
@@ -510,7 +510,7 @@ public class ImageWorkspace {
 					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
 			BufferedImage bi = new BufferedImage( 
-					activeRect.width, activeRect.height,BufferedImage.TYPE_INT_ARGB);
+					activeRect.width, activeRect.height,BufferedImage.TYPE_INT_ARGB_PRE);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the part of the old image over the new one
@@ -535,10 +535,10 @@ public class ImageWorkspace {
 			}
 			BufferedImage nbi;
 			if( cropped == null || cropped.isEmpty()) {
-				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_INT_ARGB);
+				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_INT_ARGB_PRE);
 			}
 			else {
-				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_INT_ARGB);
+				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			}
 			g2 = (Graphics2D)nbi.getGraphics();
 			g2.drawImage(bi, -cropped.x, -cropped.y, null);
@@ -617,6 +617,18 @@ public class ImageWorkspace {
 				data.ox + node.x, data.oy + node.y, (DynamicInternalImage) ii);
 		else return new BuiltImageData( data.handle,
 				data.ox + node.x, data.oy + node.y);
+	}
+	public BuiltImageData buildData( ImageHandle handle) {
+		getSelectedNode();	// Makes sure the selected node is refreshed
+		
+		if( handle == null) return null;
+		
+		InternalImage ii = imageData.get(handle.id);
+		if( ii == null) return null;
+		
+		if( ii instanceof DynamicInternalImage)		
+			return new DynamicImageData( handle,0, 0, (DynamicInternalImage) ii);
+		else return new BuiltImageData( handle, 0, 0);
 	}
 	
 	
@@ -761,7 +773,7 @@ public class ImageWorkspace {
 
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( 
-						newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB);
+						newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
 				AffineTransform transform = new AffineTransform();		
@@ -869,7 +881,7 @@ public class ImageWorkspace {
 		@Override
 		protected void performImageAction() {
 			BufferedImage img = builtImage.checkoutRaw();
-			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 			MUtil.clearImage(buffer);
 			Graphics g = buffer.getGraphics();
 			g.drawImage(img, x, y, null);
@@ -1024,7 +1036,7 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
-		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = img.createGraphics();
         g.setColor( c);
         g.fillRect( 0, 0, width, height);
@@ -1037,7 +1049,7 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
-		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB_PRE);
 		CachedImage ci = cacheManager.cacheImage( bi, this);
         Graphics g = bi.createGraphics();
         g.setColor( c);
@@ -1274,11 +1286,11 @@ public class ImageWorkspace {
 	// :::: Remove Nodes
 	public void removeNode( Node node) {
 		if(!nodeInWorkspace(node) ) {
-			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempted to remove a node from the wrong Workspace.");
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Attempted to remove a node from the wrong Workspace.");
 			return;
 		}
 		if( node == groupTree.getRoot()){
-			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempted to remove a Root Node.");
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Attempted to remove a Root Node.");
 			return;
 		}
 		

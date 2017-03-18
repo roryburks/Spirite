@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,8 +14,12 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
+
+import javafx.scene.control.ComboBox;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,7 +29,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
-import spirite.brains.ToolsetManager.PropertySchemeNode;
+import spirite.brains.ToolsetManager.Property;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.ImageWorkspace;
@@ -39,7 +45,7 @@ public class ToolSettingsPanel extends OmniComponent
 	private final MasterControl master;
 	private final ToolsetManager manager;
 	private ToolSettings settings;
-	private final Map<JComponent,PropertySchemeNode> activeMap = new HashMap<>();
+	private final Map<JComponent,Property> activeMap = new HashMap<>();
 	private ImageWorkspace workspace = null;
 
 	
@@ -102,7 +108,7 @@ public class ToolSettingsPanel extends OmniComponent
 		}
 	}
 	
-	JPanel constructFromScheme( PropertySchemeNode[] scheme) {
+	JPanel constructFromScheme( Property[] scheme) {
 		activeMap.clear();
 		if( scheme == null) return null;
 		JPanel panel = new JPanel();
@@ -126,19 +132,19 @@ public class ToolSettingsPanel extends OmniComponent
 		return panel;
 	}
 	
-	void createNode( PropertySchemeNode node, Group horizontal, Group vertical, GroupLayout layout) {
-		switch( node.type) {
+	void createNode( Property node, Group horizontal, Group vertical, GroupLayout layout) {
+		switch( node.getType()) {
 		case SIZE:{
 			SizeSlider slider = new SizeSlider() {
 				@Override
 				public void onValueChanged(float newValue) {
-					settings.setValue( node.id, newValue);
+					settings.setValue( node.getId(), newValue);
 					super.onValueChanged(newValue);
 				}
 			};
 			activeMap.put(slider, node);
-			slider.setValue( (float)node.value);
-			slider.setLabel( node.hiName + " : ");
+			slider.setValue( (float)node.getValue());
+			slider.setLabel( node.getName() + " : ");
 			horizontal.addComponent(slider).addGap(30);
 			vertical.addComponent(slider, 24,24,24);
 			break;}
@@ -146,7 +152,7 @@ public class ToolSettingsPanel extends OmniComponent
 			SliderPanel slider = new SliderPanel() {
 				@Override
 				public void onValueChanged(float newValue) {
-					settings.setValue(node.id, newValue);
+					settings.setValue(node.getId(), newValue);
 					super.onValueChanged(newValue);
 				}
 				@Override
@@ -155,17 +161,17 @@ public class ToolSettingsPanel extends OmniComponent
 				}
 			};
 			activeMap.put(slider, node);
-			slider.setValue((float)node.value);
-			slider.setLabel(node.hiName + " : ");
+			slider.setValue((float)node.getValue());
+			slider.setLabel(node.getName() + " : ");
 			horizontal.addComponent(slider);
 			vertical.addComponent(slider, 24,24,24);
 			break;}
 		case BUTTON: {
-			JButton button = new JButton(node.hiName);
+			JButton button = new JButton(node.getName());
 			JPanel panel = new JPanel();
 			activeMap.put(button, node);
 			
-			button.setActionCommand( (String)node.value);
+			button.setActionCommand( (String)node.getValue());
 			button.addActionListener(this);
 
 			horizontal.addGroup(layout.createParallelGroup(Alignment.CENTER)
@@ -173,18 +179,45 @@ public class ToolSettingsPanel extends OmniComponent
 			vertical.addComponent(button, 20,20,20).addComponent(panel,0,0,0);
 			break;}
 		case CHECK_BOX: {
-			JCheckBox checkbox = new JCheckBox(node.hiName);
+			JCheckBox checkbox = new JCheckBox(node.getName());
 			activeMap.put(checkbox, node);
 			checkbox.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					settings.setValue(node.id, checkbox.isSelected());
+					settings.setValue(node.getId(), checkbox.isSelected());
 				}
 			});
 			checkbox.setFont(new Font("Tahoma",Font.PLAIN, 10));
+			checkbox.setSelected((Boolean)node.getValue());
 			
 			horizontal.addGap(5).addComponent(checkbox);
 			vertical.addComponent(checkbox);
+			break;}
+		case DROP_DOWN: {
+			JComboBox<String> comboBox = new JComboBox<>();
+			JLabel label = new JLabel(node.getName() + ":");
+			
+			String options[] = (String[])node.getExtra();
+			
+			for( int i=0; i<options.length; ++i) {
+				comboBox.addItem(options[i]);
+			}
+			comboBox.setSelectedIndex((Integer)node.getValue());
+			comboBox.addItemListener( new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if( e.getStateChange() == ItemEvent.SELECTED)
+						settings.setValue(node.getId(), comboBox.getSelectedIndex());					
+				}
+			});
+			
+			
+			horizontal.addGroup(layout.createParallelGroup()
+					.addComponent(label)
+					.addComponent(comboBox, 0, 0, Short.MAX_VALUE));
+			vertical.addComponent(label)
+					.addComponent(comboBox, 20, 20, 20);
+			
 			break;}
 		}
 	}
@@ -194,8 +227,8 @@ public class ToolSettingsPanel extends OmniComponent
 	}
 	
 	private void checkStatus( ) {
-		for( Entry<JComponent,PropertySchemeNode> entry : activeMap.entrySet()) {
-			int mask = entry.getValue().attributeMask;
+		for( Entry<JComponent,Property> entry : activeMap.entrySet()) {
+			int mask = entry.getValue().getMask();
 			
 			if( (mask & ToolsetManager.DISABLE_ON_NO_SELECTION) != 0) {
 				if( workspace == null || workspace.getSelectionEngine().getSelection() == null)  {

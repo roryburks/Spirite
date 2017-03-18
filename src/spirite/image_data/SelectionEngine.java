@@ -651,7 +651,7 @@ public class SelectionEngine {
 			selectionRect.y = this.offsetY;
 			
 			BufferedImage bi = new BufferedImage( 
-					selectionRect.width, selectionRect.height, BufferedImage.TYPE_INT_ARGB);
+					selectionRect.width, selectionRect.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the mask, clipping the bounds of drawing to only the part 

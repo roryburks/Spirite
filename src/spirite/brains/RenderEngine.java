@@ -166,7 +166,7 @@ public class RenderEngine
 				Rectangle r = dataContext.getBounds();
 				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
-						BufferedImage.TYPE_INT_ARGB);
+						BufferedImage.TYPE_INT_ARGB_PRE);
 				
 				g2 = (Graphics2D)bi.getGraphics();
 				
@@ -549,7 +549,7 @@ public class RenderEngine
 				
 				buffer = new BufferedImage[n];
 				for( int i=0; i<n; ++i) {
-					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
+					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
 				}
 				
 				// Step 2: Compose the Stroke and Lifted Selection data onto the 
@@ -605,7 +605,7 @@ public class RenderEngine
 				RenderSettings settings) 
 		{
 			if( n < 0 || n >= buffer.length) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Error: propperRender exceeds expected image need.");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
 				return;
 			}
 
@@ -789,7 +789,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
+					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -854,7 +854,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
+					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -904,7 +904,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB);
+					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 			
 			List<Layer> layerList = (front)?

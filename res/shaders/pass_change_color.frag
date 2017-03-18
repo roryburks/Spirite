@@ -1,5 +1,7 @@
 #version 330
 
+#define thresh 0.005
+
 in vec2 vUV;
 
 out vec4 outputColor; 
@@ -11,10 +13,18 @@ uniform vec4 cTo;
 void main()
 {
 	vec4 texCol = texture(myTexture, vUV).rgba;
+	if( texCol.a != 0) {
+		// AWTTextureIO.newTexture comes premultiplied, but 
+		//	AWTGLReadBufferUtil.readPixelsToBufferedImage
+		//	inteprets it as non-premultiplied.  Go figure.
+		texCol.r /= texCol.a;
+		texCol.g /= texCol.a;
+		texCol.b /= texCol.a;
+	}
 	
-	if( distance(cFrom.r , texCol.r) < 0.00390625 &&
-		distance(cFrom.g , texCol.g) < 0.00390625 &&
-		distance(cFrom.b , texCol.b) < 0.00390625 ) {
+	if( distance(cFrom.r , texCol.r) < thresh &&
+		distance(cFrom.g , texCol.g) < thresh &&
+		distance(cFrom.b , texCol.b) < thresh ) {
 		outputColor.rgb = cTo.rgb;
 		outputColor.a = texCol.a;
 	}

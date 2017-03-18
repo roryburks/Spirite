@@ -1,5 +1,6 @@
 package spirite.gl;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -20,6 +21,8 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -118,6 +121,61 @@ public class GLEngine implements GLEventListener {
 	
 	public int getProgram( ProgramType type){
 		return programs[type.ordinal()];
+	}
+	
+	// :::: Texture Preperation
+	public class PreparedTexture{
+		Texture texture;
+		
+		@Override
+		protected void finalize() throws Throwable {
+			free();
+			super.finalize();
+		}
+		
+		boolean _free = false;
+		
+		public void free() {
+			if( !_free) {
+				GL4 gl = drawable.getGL().getGL4();
+				_free = true;
+				texture.disable(gl);
+				texture.destroy(gl);
+			}
+		}
+	}
+	public PreparedTexture prepareTexture( BufferedImage bi) {
+		GL4 gl = drawable.getGL().getGL4();
+		PreparedTexture pt = new PreparedTexture();
+		pt.texture = AWTTextureIO.newTexture(gl.getGLProfile(), bi, false);
+
+		pt.texture.setTexParameteri(gl, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR);
+		pt.texture.setTexParameteri(gl, GL4.GL_TEXTURE_MAG_FILTER, GL4.GL_LINEAR);
+		pt.texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_S, GL4.GL_CLAMP_TO_EDGE);
+		pt.texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_T, GL4.GL_CLAMP_TO_EDGE);
+
+		pt.texture.enable(gl);
+		pt.texture.bind(gl);
+
+/*		IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
+        gl.glGenTextures(1, tex);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, tex.get(0));
+		gl.glTexParameteri( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR);
+		gl.glTexParameteri( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MAG_FILTER, GL4.GL_LINEAR);
+		gl.glTexParameteri( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_WRAP_S, GL4.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_WRAP_T, GL4.GL_CLAMP_TO_EDGE);
+		gl.glTexImage2D(
+				GL4.GL_TEXTURE_2D,
+				0,
+				GL4.GL_RGBA,
+				w, h,
+				0,
+				GL4.GL_RGBA,
+				GL4.GL_UNSIGNED_BYTE,
+				MUtil.bufferFromImage(bi)
+				);*/
+		
+		return pt;
 	}
 	
 	// :::: Data Buffer Preperation
@@ -276,7 +334,7 @@ public class GLEngine implements GLEventListener {
             bufferInfoLog.get(bytes);
             String strInfoLog = new String(bytes);
 
-			MDebug.handleError(ErrorType.RESOURCE, (Object)null, "Link Program." + strInfoLog);
+			MDebug.handleError(ErrorType.RESOURCE, "Link Program." + strInfoLog);
 
 			infoLogLength.clear();
 			bufferInfoLog.clear();
@@ -343,7 +401,7 @@ public class GLEngine implements GLEventListener {
 				type = "unknown type: " + shaderType;
 				break;
 			}
-			MDebug.handleError(ErrorType.RESOURCE, (Object)null, "Failed to compile GLSL shader (" + type + "): " + strInfoLog);
+			MDebug.handleError(ErrorType.RESOURCE, "Failed to compile GLSL shader (" + type + "): " + strInfoLog);
 			
 			infoLogLength.clear();
 			bufferInfoLog.clear();

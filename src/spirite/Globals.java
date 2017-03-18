@@ -200,7 +200,7 @@ public class Globals {
 						set.img = loadIconSheet(Globals.class.getClassLoader().getResource(set.resourceFile).openStream());
 					} catch (Exception e) {
 						MDebug.handleError( ErrorType.RESOURCE, null, e.getMessage());
-				    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
+				    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB_PRE));
 					}
     			}
     			
@@ -218,13 +218,13 @@ public class Globals {
     		}
     	}
 
-    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
+    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB_PRE));
     }
     
     private static BufferedImage loadIconSheet( InputStream is) throws IOException 
     {
     	BufferedImage buff = ImageIO.read(is);
-    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
     	img.getGraphics().drawImage(buff, 0, 0, null);
         
         // Turns all pixels the same color as the top-left pixel into transparent

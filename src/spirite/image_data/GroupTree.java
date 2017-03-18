@@ -243,7 +243,7 @@ public class GroupTree {
 			List<Node> children = getParent().getChildren();
 			int i = children.indexOf( this);
 			if( i == -1) {
-				MDebug.handleError( ErrorType.STRUCTURAL, this, "Group Tree malformation (Not child of own parent).");
+				MDebug.handleError( ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).");
 				return null;
 			}
 			if( i == children.size()-1)
@@ -261,7 +261,7 @@ public class GroupTree {
 			int index = children.indexOf(this);
 
 			if( index == -1) {
-				MDebug.handleError( ErrorType.STRUCTURAL, this, "Group Tree malformation (Not child of own parent).");
+				MDebug.handleError( ErrorType.STRUCTURAL, "Group Tree malformation (Not child of own parent).");
 				return null;
 			}
 			if( index == 0)

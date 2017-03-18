@@ -467,7 +467,7 @@ public class UndoEngine {
 			}
 		}
 		
-		MDebug.handleError(ErrorType.STRUCTURAL, this, "Failed to create ReplaceAction (problem with prepareContext?)");
+		MDebug.handleError(ErrorType.STRUCTURAL, "Failed to create ReplaceAction (problem with prepareContext?)");
 		return null;
 	}
 	
@@ -674,7 +674,7 @@ public class UndoEngine {
 		@Override
 		protected void addAction( UndoableAction action) {
 			if( !(action instanceof ImageAction)) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to add a non ImageAction to an ImageContext");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Tried to add a non ImageAction to an ImageContext");
 				return;
 			}
 			final ImageAction iaction = (ImageAction)action;
@@ -700,7 +700,7 @@ public class UndoEngine {
 			pointer--;
 			met--;
 			if( pointer < 0) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Internal Undo attempted before start of context.");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Internal Undo attempted before start of context.");
 			}
 
 			// Undo the logical action
@@ -736,7 +736,7 @@ public class UndoEngine {
 			pointer++;
 			met++;
 			if( pointer >= actions.size() || pointer == 0) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue.");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue.");
 				return;
 			}
 			if( actions.get(pointer) instanceof KeyframeAction) {
@@ -815,7 +815,7 @@ public class UndoEngine {
 		@Override
 		protected void clipTail() {
 			if( vstart == pointer) {
-				MDebug.handleError( ErrorType.STRUCTURAL_MINOR, this, "Tried to clip more than exists in ImageContext");
+				MDebug.handleError( ErrorType.STRUCTURAL_MINOR, "Tried to clip more than exists in ImageContext");
 			}
 			
 			vstart++;
@@ -824,7 +824,7 @@ public class UndoEngine {
 				try {
 //					((KeyframeAction)actions.get(0)).frameCache.flush();	// Should be handled by onDispatch
 				} catch ( ClassCastException e) {
-					MDebug.handleError( ErrorType.STRUCTURAL, this, "UndoEngine Corruption: First Action in ImageContext wasn't a KeyframeAction");
+					MDebug.handleError( ErrorType.STRUCTURAL, e, "UndoEngine Corruption: First Action in ImageContext wasn't a KeyframeAction");
 				}
 				
 				List<ImageAction> subList = actions.subList(0, vstart);
@@ -875,7 +875,7 @@ public class UndoEngine {
 				actions.add( (NullAction) action);
 			}
 			else 
-				MDebug.handleError(ErrorType.STRUCTURAL_MINOR, this, "Attempting to give a null context a non-null Action.");
+				MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Attempting to give a null context a non-null Action.");
 		}
 		@Override
 		protected void undo() {
@@ -883,7 +883,7 @@ public class UndoEngine {
 				pointer = actions.listIterator(actions.size());
 			
 			if( !pointer.hasPrevious() || pointer == null) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Undo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Undo).");
 				return;
 			}
 			
@@ -893,7 +893,7 @@ public class UndoEngine {
 		@Override
 		protected void redo() {
 			if( pointer == null || !pointer.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return;
 			}
 			
@@ -924,7 +924,7 @@ public class UndoEngine {
 		@Override
 		protected UndoableAction iterateNext() {
 			if( !iter.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
 			}
 			else
@@ -1002,7 +1002,7 @@ public class UndoEngine {
 				pointer = actions.listIterator(actions.size());
 			
 			if( !pointer.hasPrevious() || pointer == null) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Undo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Undo).");
 				return;
 			}
 			
@@ -1016,7 +1016,7 @@ public class UndoEngine {
 		@Override
 		protected void redo() {
 			if( pointer == null || !pointer.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return;
 			}
 
@@ -1060,7 +1060,7 @@ public class UndoEngine {
 		@Override
 		protected UndoableAction iterateNext() {
 			if( !iter.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, this, "Undo Outer queue desynced with inner queue (Null Redo).");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
 				return null;
 			}
 			else {

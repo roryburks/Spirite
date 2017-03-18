@@ -163,7 +163,7 @@ public class CacheManager {
 				}
 			}
 			if( toRem == null) {
-				MDebug.handleError( ErrorType.STRUCTURAL, this, "Tried to relinquish from a non-reserved object (this probably means the intended relinquish will never happen).");
+				MDebug.handleError( ErrorType.STRUCTURAL, "Tried to relinquish from a non-reserved object (this probably means the intended relinquish will never happen).");
 			}
 			
 			users.remove(toRem);
@@ -192,10 +192,10 @@ public class CacheManager {
 			return null;
 		
 		CachedImage c = new CachedImage(domain);
-		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB));
+		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB_PRE));
 		
 		if( c.data == null) {
-			MDebug.handleError(ErrorType.ALLOCATION_FAILED, this, "Failed to create Image Data.");
+			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
 			return null;
 		}
 		
@@ -206,7 +206,7 @@ public class CacheManager {
 	/** Put an existing image into the Cache. */
 	public CachedImage cacheImage( BufferedImage image, Object domain) {
 		if( image == null) {
-			image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+			image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB_PRE);
 			MUtil.clearImage(image);
 		}
 		CachedImage c = new CachedImage(domain);

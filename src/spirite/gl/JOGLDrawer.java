@@ -53,13 +53,7 @@ public class JOGLDrawer {
 		
 		int w = bi.getWidth();
 		int h = bi.getHeight();
-
-        try {
-			ImageIO.write(bi, "png", new File("E:/Test1.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		engine.setSurfaceSize(w, h);
 
 		PreparedData pd = engine.prepareRawData(new float[]{
 			// x    y      u     v
@@ -84,10 +78,14 @@ public class JOGLDrawer {
         gl.glVertexAttribPointer(1, 2, GL4.GL_FLOAT, false, 4*4, 4*2);
 
         // Bind Texture
-//		Texture texture = AWTTextureIO.newTexture(gl.getGLProfile(), bi, false);
-//		Texture texture = TextureIO.newTexture(AWTTextureIO.newTextureData(gl.getGLProfile(), bi, false));
+		Texture texture = AWTTextureIO.newTexture(gl.getGLProfile(), bi, false);
 
-		IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
+		texture.setTexParameteri(gl, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR);
+		texture.setTexParameteri(gl, GL4.GL_TEXTURE_MAG_FILTER, GL4.GL_LINEAR);
+		texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_S, GL4.GL_CLAMP_TO_EDGE);
+		texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_T, GL4.GL_CLAMP_TO_EDGE);
+
+/*		IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
         gl.glGenTextures(1, tex);
         gl.glBindTexture(GL.GL_TEXTURE_2D, tex.get(0));
 		gl.glTexParameteri( GL4.GL_TEXTURE_2D, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR);
@@ -103,7 +101,9 @@ public class JOGLDrawer {
 				GL4.GL_RGBA,
 				GL4.GL_UNSIGNED_BYTE,
 				MUtil.bufferFromImage(bi)
-				);
+				);*/
+		texture.enable(gl);
+		texture.bind(gl);
 		
 		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
 		
@@ -112,11 +112,6 @@ public class JOGLDrawer {
 		int cTo = gl.glGetUniformLocation(prog, "cTo");
 		gl.glUniform4f( cFrom, from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f);
 		gl.glUniform4f( cTo, to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f);
-
-		System.out.println(from.getRed()/255f);
-		System.out.println(from.getGreen()/255f);
-		System.out.println(from.getBlue()/255f);
-		System.out.println(from.getAlpha()/255f);
 		
 		// Start Draw
         gl.glEnable(GL.GL_BLEND);
@@ -128,21 +123,16 @@ public class JOGLDrawer {
 		// Finished Drawing
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
-		gl.glDeleteTextures(1, tex);
-//		texture.disable(gl);
-//		texture.destroy(gl);
+//		gl.glDeleteTextures(1, tex);
+		texture.disable(gl);
+		texture.destroy(gl);
 		pd.free();
 		
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
         				gl, 0, 0, w, h, true); 
-        try {
-			ImageIO.write(im, "png", new File("E:/Test.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        
 //		MUtil.clearImage(bi);
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

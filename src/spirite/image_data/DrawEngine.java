@@ -9,8 +9,10 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import javax.imageio.ImageIO;
@@ -21,9 +23,13 @@ import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.gl.GLStrokeEngine;
 import spirite.gl.JOGLDrawer;
+import spirite.image_data.GroupTree.LayerNode;
+import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.UndoEngine.ImageAction;
+import spirite.image_data.UndoEngine.UndoableAction;
+import spirite.image_data.layers.Layer;
 import spirite.pen.PenTraits;
 import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
@@ -75,11 +81,11 @@ public class DrawEngine {
 	/** @return true if the stroke started, false otherwise	 */
 	public boolean startStroke(StrokeParams stroke, PenState ps, BuiltImageData data) {
 		if( activeEngine != null) {
-			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
 		}
 		else if( data == null) {
-			MDebug.handleError(ErrorType.STRUCTURAL, this, "Tried to start stroke on null data.");
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to start stroke on null data.");
 			return false;
 		}
 		else {
@@ -170,8 +176,45 @@ public class DrawEngine {
 		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 	}
 	
-	public void changeColor( BuiltImageData data, Color from, Color to) {
-		execute( new ColorChangeAction(data, selectionEngine.getBuiltSelection(), from, to));
+	public void changeColor( Color from, Color to, int scope) {
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		
+		Node selected = null;
+		
+		
+		
+		switch( scope) {
+		case 0:	// Local
+			BuiltImageData bid = workspace.buildActiveData();
+			if( bid != null) {
+				execute( new ColorChangeAction(bid, mask, from, to));
+			}
+			break;
+		case 1: // Group/Layer
+			// Switch statement is kind of awkward.  Just roll with it.
+			selected = workspace.getSelectedNode();
+			if( selected == null) return;
+		case 2: // Global
+			if( selected == null) 
+				selected = workspace.getRootNode();
+
+			List<UndoableAction> actions = new ArrayList<>();
+			
+			for( LayerNode lnode : selected.getAllLayerNodes()) {
+				Layer layer = lnode.getLayer();
+				
+				for( ImageHandle handle : layer.getImageDependencies()) {
+					actions.add( new ColorChangeAction(
+							workspace.buildData(handle),
+							mask, from, to));
+				}
+			}
+			
+			UndoableAction action = undoEngine.new CompositeAction(actions, "Color Change Action");
+			undoEngine.performAndStore(action);
+			break;
+		}
+		
 	}
 	
 	
@@ -464,7 +507,7 @@ public class DrawEngine {
 				//	mask (this has to be done in a couple of renderings).
 				intermediate = bi;
 				bi = new BufferedImage(
-						bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+						bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
 				g2.setColor(Color.GREEN);
 				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
@@ -609,7 +652,7 @@ public class DrawEngine {
 			// Might be able to do this single-Image but things get weird if you 
 			//	draw a Buffer onto itself
 			BufferedImage buffer = new BufferedImage( 
-					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 			Graphics2D g2 = (Graphics2D)buffer.getGraphics();
 			
 			if( horizontal) {
@@ -647,12 +690,11 @@ public class DrawEngine {
 			super(data, mask);
 			this.from = from;
 			this.to = to;
+			description = "Color Change Action";
 		}
 		
-
 		@Override
 		protected void performImageAction() {
-			System.out.println("TEST");
 			BufferedImage bi = builtImage.checkoutRaw();
 			jogl.changeColor(bi, from, to);
 			builtImage.checkin();
@@ -665,7 +707,7 @@ public class DrawEngine {
 		// Might be able to do this single-Image but things get weird if you 
 		//	draw a Buffer onto itself
 		BufferedImage buffer = new BufferedImage( 
-				bi.getWidth()*2, bi.getHeight()*2, BufferedImage.TYPE_INT_ARGB);
+				bi.getWidth()*2, bi.getHeight()*2, BufferedImage.TYPE_INT_ARGB_PRE);
 		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
 		
 		g2.scale(2, 2);

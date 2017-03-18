@@ -57,7 +57,7 @@ public class LoadEngine {
     		// First try to load the file as normal if it's a normal image format
     		try {
 				BufferedImage bi = ImageIO.read(f);
-				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 				MUtil.clearImage(bi2);
 				Graphics g = bi2.getGraphics();
 				g.drawImage(bi, 0, 0, null);
@@ -264,7 +264,7 @@ public class LoadEngine {
 			helper.ra.read(buffer);
 			
 			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
-			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
 			MUtil.clearImage(bi2);
 			Graphics g = bi2.getGraphics();
 			g.drawImage(bi, 0, 0, null);
