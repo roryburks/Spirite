@@ -37,7 +37,7 @@ public class ToolsetManager
 		COMPOSER("Rig Composer",8),
 		FLIPPER("Horizontal/Vertical Flipping",9),
 		RESHAPER("Reshaping Tool",10),
-		ORIGIN("Origin Tool",11);
+		COLOR_CHANGE("Color Change Tool",11);
 		
 		public final String description;
 		public final int iconLocation;

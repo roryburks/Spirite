@@ -109,21 +109,15 @@ public class GLEngine implements GLEventListener {
 	public enum ProgramType {
 		DEFAULT,
 		SQARE_GRADIENT,
-		BASIC_STROKE
+		BASIC_STROKE,
+		CHANGE_COLOR,
+		;
 	}
-	private int defaultProgram;
-	private int sgProgram;
-	private int bsProgram;
+	
+	private int programs[] = new int[ProgramType.values().length];
+	
 	public int getProgram( ProgramType type){
-		switch( type) {
-		case DEFAULT:
-			return this.defaultProgram;
-		case SQARE_GRADIENT:
-			return this.sgProgram;
-		case BASIC_STROKE:
-			return this.bsProgram;
-		}
-		return 0;
+		return programs[type.ordinal()];
 	}
 	
 	// :::: Data Buffer Preperation
@@ -192,7 +186,7 @@ public class GLEngine implements GLEventListener {
 				GL4.GL_FRAGMENT_SHADER,
 				"shaders/basic.frag"));
         
-        defaultProgram = createProgram( gl, shaderList);
+        programs[ProgramType.DEFAULT.ordinal()] = createProgram( gl, shaderList);
         
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
@@ -211,7 +205,7 @@ public class GLEngine implements GLEventListener {
 				GL4.GL_FRAGMENT_SHADER,
 				"shaders/square_grad.frag"));
         
-        sgProgram = createProgram( gl, shaderList);
+        programs[ProgramType.SQARE_GRADIENT.ordinal()] = createProgram( gl, shaderList);
         
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
@@ -233,12 +227,30 @@ public class GLEngine implements GLEventListener {
 				GL4.GL_FRAGMENT_SHADER,
 				"shaders/stroke_basic.frag"));
         
-        bsProgram = createProgram( gl, shaderList);
+        programs[ProgramType.BASIC_STROKE.ordinal()] = createProgram( gl, shaderList);
         
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
         }
         
+
+        // Change Color
+        shaderList.clear();
+
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_VERTEX_SHADER,
+				"shaders/pass.vert"));
+        shaderList.add( compileShaderFromResource(
+				gl,
+				GL4.GL_FRAGMENT_SHADER,
+				"shaders/pass_change_color.frag"));
+        
+        programs[ProgramType.CHANGE_COLOR.ordinal()] = createProgram( gl, shaderList);
+        
+        for( Integer shader : shaderList) {
+        	gl.glDeleteShader(shader);
+        }
 	}
 	
 	private int createProgram( GL4 gl, ArrayList<Integer> shaderList) {

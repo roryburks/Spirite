@@ -28,6 +28,9 @@ void main()
 	
 	vec2 bl, bc, br, tl, tc, tr;
 	
+	float w1 = vSize[1]/2;
+	float w2 = vSize[2]/2;
+	
 	bl = br = bc = vec2( gl_in[1].gl_Position.x, gl_in[1].gl_Position.y);
 	tl = tr = tc = vec2( gl_in[2].gl_Position.x, gl_in[2].gl_Position.y);
 	
@@ -41,21 +44,21 @@ void main()
 	
 	if( vSize[0] < 0) {
 		// Starting Endpoint
-		bl += vec2(-sang2, cang2) * vSize[1];
-		br += vec2(sang2, -cang2) * vSize[1];
+		bl += vec2(-sang2, cang2) * w1;
+		br += vec2(sang2, -cang2) * w1;
 		
 		
 		// Start Dot
 	    fWeight = -1;
 	    fX = bc.x+0.5;
 	    fY = uH-(bc.y+0.5);
-	    fM = vSize[1];
+	    fM = w1;
 	    
-	    gl_Position = perspectiveMatrix*vec4(bl-vec2(cang2,sang2)*vSize[1],0,1);
+	    gl_Position = perspectiveMatrix*vec4(bl-vec2(cang2,sang2)*w1,0,1);
 	    EmitVertex();
 	    gl_Position = perspectiveMatrix*vec4(bl,0,1);
 	    EmitVertex();
-	    gl_Position = perspectiveMatrix*vec4(br-vec2(cang2,sang2)*vSize[1],0,1);
+	    gl_Position = perspectiveMatrix*vec4(br-vec2(cang2,sang2)*w1,0,1);
 	    EmitVertex();
 	    gl_Position = perspectiveMatrix*vec4(br,0,1);
 	    EmitVertex();
@@ -72,30 +75,30 @@ void main()
 		float sang1 = sin(a1);
 			
 		if( angle_difference( a1, a2) > 0){
-			bl += vec2(-sang2, cang2) * vSize[1];
-			br += vec2(sang1 + sang2, -cang1 - cang2) * vSize[1]/2;
+			bl += vec2(-sang2, cang2) * w1;
+			br += vec2(sang1 + sang2, -cang1 - cang2) * w1/2;
 		}
 		else {
-			bl += vec2(-sang1 - sang2, cang1 + cang2) * vSize[1]/2;
-			br += vec2(sang2, -cang2) * vSize[1];
+			bl += vec2(-sang1 - sang2, cang1 + cang2) * w1/2;
+			br += vec2(sang2, -cang2) * w1;
 		}
 	}
 	
 	if( vSize[3] < 0) {
-		tl += vec2(-sang2, cang2) * vSize[2];
-		tr += vec2(sang2, -cang2) * vSize[2];
+		tl += vec2(-sang2, cang2) * w2;
+		tr += vec2(sang2, -cang2) * w2;
 		
 		// End Dot
 	    fWeight = -1;
 	    fX = tc.x+0.5;
 	    fY = uH-(tc.y+0.5);
-	    fM = vSize[1];
+	    fM = w2;
 	    
-	    gl_Position = perspectiveMatrix*vec4(tl+vec2(cang2,sang2)*vSize[1],0,1);
+	    gl_Position = perspectiveMatrix*vec4(tl+vec2(cang2,sang2)*w2,0,1);
 	    EmitVertex();
 	    gl_Position = perspectiveMatrix*vec4(tl,0,1);
 	    EmitVertex();
-	    gl_Position = perspectiveMatrix*vec4(tr+vec2(cang2,sang2)*vSize[1],0,1);
+	    gl_Position = perspectiveMatrix*vec4(tr+vec2(cang2,sang2)*w2,0,1);
 	    EmitVertex();
 	    gl_Position = perspectiveMatrix*vec4(tr,0,1);
 	    EmitVertex();
@@ -113,9 +116,9 @@ void main()
 		float sang3 = sin(a3);
 		
 		if( angle_difference( a2, a3) > 0){
-			tl += vec2(-sang2, cang2) * vSize[2];
-			tr += vec2(sang3 + sang2, -cang3 - cang2) * vSize[2]/2;
-			te += vec2( -sang3, cang3) * vSize[2];
+			tl += vec2(-sang2, cang2) * w2;
+			tr += vec2(sang3 + sang2, -cang3 - cang2) * w2/2;
+			te += vec2( -sang3, cang3) * w2;
 			
 			
 		    gl_Position = perspectiveMatrix*vec4(tl,0,1);
@@ -123,9 +126,9 @@ void main()
 		    EmitVertex();
 		}
 		else {
-			tl += vec2(-sang3 - sang2, cang3 + cang2) * vSize[2]/2;
-			tr += vec2(sang2, -cang2) * vSize[2];
-			te += vec2( sang3, -cang3) * vSize[2];
+			tl += vec2(-sang3 - sang2, cang3 + cang2) * w2/2;
+			tr += vec2(sang2, -cang2) * w2;
+			te += vec2( sang3, -cang3) * w2;
 			
 		    gl_Position = perspectiveMatrix*vec4(tr,0,1);
 		    fWeight = 0;

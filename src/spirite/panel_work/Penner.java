@@ -253,8 +253,14 @@ public class Penner
 					workspace.getUndoEngine().performAndStore(ra);
 				}
 				else {
-					drawEngine.changeColor(workspace.buildActiveData());
 				}
+				break;
+			case COLOR_CHANGE:
+
+				drawEngine.changeColor(
+						workspace.buildActiveData(),
+						paletteManager.getActiveColor(0),
+						paletteManager.getActiveColor(1));
 				break;
 			}
 			

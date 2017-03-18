@@ -140,8 +140,6 @@ public class GLStrokeEngine extends StrokeEngine {
 	 * to be filled by the fragment shader.
 	 */
 	private void _stroke( GLVBuffer glvb) {
-		System.out.println("test");
-
 		int w = data.getWidth();
 		int h = data.getHeight();
 		
@@ -182,7 +180,8 @@ public class GLStrokeEngine extends StrokeEngine {
         
 
         gl.glEnable(GL.GL_BLEND);
-        gl.glBlendEquation(gl.GL_MAX);
+        gl.glBlendFunc(GL4.GL_SRC_ALPHA, GL4.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL4.GL_MAX);
 
     	gl.glDrawArrays(GL4.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
         

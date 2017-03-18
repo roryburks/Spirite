@@ -170,8 +170,8 @@ public class DrawEngine {
 		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 	}
 	
-	public void changeColor( BuiltImageData data) {
-		execute( new ColorChangeAction(data, selectionEngine.getBuiltSelection()));
+	public void changeColor( BuiltImageData data, Color from, Color to) {
+		execute( new ColorChangeAction(data, selectionEngine.getBuiltSelection(), from, to));
 	}
 	
 	
@@ -642,16 +642,19 @@ public class DrawEngine {
 	}
 	public class ColorChangeAction extends MaskedImageAction 
 	{
-
-		ColorChangeAction(BuiltImageData data, BuiltSelection mask) {
+		private final Color from, to;
+		ColorChangeAction(BuiltImageData data, BuiltSelection mask, Color from, Color to) {
 			super(data, mask);
+			this.from = from;
+			this.to = to;
 		}
 		
 
 		@Override
 		protected void performImageAction() {
-			Graphics g = builtImage.checkout();
-			g.drawImage( jogl.renderTriangle(), 0, 0, null);
+			System.out.println("TEST");
+			BufferedImage bi = builtImage.checkoutRaw();
+			jogl.changeColor(bi, from, to);
 			builtImage.checkin();
 		}
 	}

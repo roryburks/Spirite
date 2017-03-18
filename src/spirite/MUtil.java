@@ -15,8 +15,15 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,7 +170,32 @@ public class MUtil {
 				toCopy.isAlphaPremultiplied(),
 				null);
 	}
-	
+	public static ByteBuffer bufferFromImage( BufferedImage image) {
+		// TODO: Figure out if there's ANY way to make this more efficient
+		ByteBuffer byteBuffer;
+		DataBuffer dataBuffer = image.getRaster().getDataBuffer();
+
+		if (dataBuffer instanceof DataBufferInt) {
+		    int[] pixelData = ((DataBufferInt) dataBuffer).getData();
+		    
+		    byteBuffer = ByteBuffer.allocate(pixelData.length * 4);
+		    
+		    for( int i=0; i < pixelData.length; i += 1) {
+		    	// Change ARGB to RGBA
+		    	int argb = pixelData[i];
+		    	byteBuffer.put( (byte) ((argb >>> 16) & 0xFF));
+		    	byteBuffer.put( (byte) ((argb >>> 8) & 0xFF));
+		    	byteBuffer.put( (byte) ((argb >>> 0) & 0xFF));
+		    	byteBuffer.put( (byte) ((argb >>> 24) & 0xFF));
+		    }
+		}
+		else {
+		    throw new IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.getClass());
+		}
+		
+		byteBuffer.rewind();
+		return byteBuffer;
+	}
 
 	/** Attempts to get an image from the clipboard, returning null if 
 	 * there is no image or for some reason you can't get it. 
