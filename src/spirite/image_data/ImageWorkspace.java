@@ -595,7 +595,6 @@ public class ImageWorkspace {
 		return false;
 	}
 	
-	private ImageHandle activeHandle;
 	public BuiltImageData buildActiveData() {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;

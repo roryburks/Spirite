@@ -12,6 +12,8 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
+import spirite.pen.PenTraits.ButtonType;
+import spirite.pen.PenTraits.MButtonEvent;
 
 public class JPenPenner implements PenListener
 {
@@ -23,17 +25,37 @@ public class JPenPenner implements PenListener
 		toolsetManager = master.getToolsetManager();
 	}
 
+	private final MButtonEvent MButtonFromPButton( PButtonEvent pbe) {
+		MButtonEvent mbe = new MButtonEvent();
+		
+		switch (pbe.button.getType()) {
+		case LEFT:
+			mbe.buttonType = ButtonType.LEFT;
+			break;
+		case RIGHT:
+			mbe.buttonType = ButtonType.RIGHT;
+			break;
+		case CENTER:
+			mbe.buttonType = ButtonType.CENTER;
+			break;
+		default:
+			return null;
+		}
+		
+		return mbe;
+	}
+
 	@Override	public void penScrollEvent(PScrollEvent arg0) {}
 	@Override
 	public void penButtonEvent(PButtonEvent evt) {
 		if( evt.button.value) {
 			SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
-				penner.penDownEvent(evt);
+				penner.penDownEvent(MButtonFromPButton(evt));
 			}});
 		}
 		else {
 			SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
-				penner.penUpEvent(evt);
+				penner.penUpEvent(MButtonFromPButton(evt));
 			}});
 		}
 	}

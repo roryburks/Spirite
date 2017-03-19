@@ -30,7 +30,7 @@ public class Dialogs
 	
 	public enum DialogType {
 		HOTKEY,
-		PICK_COLOR,
+//		PICK_COLOR,
 	}
 	
 	public Dialogs( MasterControl masterc) {
@@ -51,7 +51,7 @@ public class Dialogs
 		switch( type) {
 		case HOTKEY:
 			HotkeyDialog dialog = new HotkeyDialog(master);
-			dialog.show();
+			dialog.setVisible(true);
 			break;
 		}
 	}

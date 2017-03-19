@@ -11,7 +11,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
@@ -162,7 +161,7 @@ public class ReferenceSchemePanel extends OmniComponent
 		private final Color bgColor = new Color(64,64,64);
 		private final Color bgColorActive = new Color(120,120,160);
 		private final Color helperColor = new Color( 90,90,64);
-		private final Color addOutlineColor = new Color( 160,160,111);
+		private final Color addOutlineColor = Color.black;//new Color( 160,160,111);
 		
 		private final JLabel helperLabel = new JLabel();
 		private final JList<Layer> referenceList = new JList<>();
@@ -222,7 +221,7 @@ public class ReferenceSchemePanel extends OmniComponent
 				Rectangle rect = referenceList.getCellBounds(dndMan.dragToIndex, dndMan.dragToIndex);
 				if( rect != null) {
 					int dy = rect.y;
-					g.setColor(Color.black);
+					g.setColor(addOutlineColor);
 					g.drawLine(0, dy+1, getWidth(), dy+1);
 					g.drawLine(0, dy, getWidth(), dy);
 				}
@@ -231,7 +230,7 @@ public class ReferenceSchemePanel extends OmniComponent
 				Rectangle rect = referenceList.getCellBounds(dndMan.dragToIndex, dndMan.dragToIndex);
 				if( rect != null) {
 					int dy = rect.y + rect.height - 1;
-					g.setColor(Color.black);
+					g.setColor(addOutlineColor);
 					g.drawLine(0, dy-1, getWidth(), dy-1);
 					g.drawLine(0, dy, getWidth(), dy);
 				}
@@ -315,14 +314,15 @@ public class ReferenceSchemePanel extends OmniComponent
 			implements DragGestureListener, DragSourceListener 
 		{
 			private final DragSource dragSource = DragSource.getDefaultDragSource();
-			private final DragGestureRecognizer dragGestureRecognizer;
+//			private final DragGestureRecognizer dragGestureRecognizer;
 			private int draggingIndex = -1;
 			int dragToIndex;
 			DragState dragState = DragState.NOT_DRAGGING;
 			
 			
 			RLPDnDManager() {
-				dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
+				//dragGestureRecognizer = 
+				dragSource.createDefaultDragGestureRecognizer(
 						referenceList, DnDConstants.ACTION_COPY_OR_MOVE, this);
 			}
 			
@@ -389,6 +389,7 @@ public class ReferenceSchemePanel extends OmniComponent
 							case UNDER:
 								refMan.addReference(layer, dragToIndex+1);
 								break;
+							default:
 							}
 						}
 						
@@ -443,18 +444,8 @@ public class ReferenceSchemePanel extends OmniComponent
 
 			@Override public void dragEnter(DragSourceDragEvent arg0) {}
 			@Override public void dragExit(DragSourceEvent arg0) {}
-
-			@Override
-			public void dragOver(DragSourceDragEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void dropActionChanged(DragSourceDragEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			@Override public void dragOver(DragSourceDragEvent arg0) {}
+			@Override public void dropActionChanged(DragSourceDragEvent arg0) {}
 		}
 
 		/** Empty Transferable that just makes sure RLPDnDManager only accepts drags

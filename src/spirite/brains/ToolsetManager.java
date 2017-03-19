@@ -65,7 +65,7 @@ public class ToolsetManager
         toolSettings.put( Tool.PIXEL, constructPixelSettings());
         toolSettings.put( Tool.ERASER, constructEraseSettings());
         toolSettings.put( Tool.CROP, constructCropperSettings());
-//        toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
+        toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
         toolSettings.put( Tool.COLOR_CHANGE, constructColorChangeSettings());
     }
     
@@ -221,6 +221,7 @@ public class ToolsetManager
     	final Object[][] scheme = {
     			{"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
     			{"width", PropertyType.SIZE, "Width", 5.0f},
+    			{"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
     	};
     	
     	return constructFromScheme(scheme);
@@ -229,6 +230,7 @@ public class ToolsetManager
     	final Object[][] scheme = {
     			{"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
     			{"width",  PropertyType.SIZE, "Width", 5.0f},
+    			{"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
     	};
     	
     	return constructFromScheme(scheme);
@@ -251,9 +253,9 @@ public class ToolsetManager
     }
     private ToolSettings constructFlipperSettings() {
     	final Object[][] scheme = {
-    			{"flipMode.hor", PropertyType.RADIO_BUTTON, "Horizontal Flipping ", true},
-    			{"flipMode.vert", PropertyType.RADIO_BUTTON, "Vertical Flipping ", false},
-    			{"flipMode.either", PropertyType.RADIO_BUTTON, "Determine from Movement", false},
+    			{"flipMode", PropertyType.RADIO_BUTTON, "Flip Mode", 2, 0,
+    				new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}
+    			},
     	};
     	
     	return constructFromScheme(scheme);
@@ -330,6 +332,8 @@ public class ToolsetManager
 		case CHECK_BOX:
 			return Boolean.class;
 		case DROP_DOWN:
+			return Integer.class;
+		case RADIO_BUTTON:
 			return Integer.class;
     	}
     	

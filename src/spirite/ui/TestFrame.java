@@ -5,12 +5,12 @@ import java.awt.EventQueue;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
 
 public class TestFrame extends JFrame {
 	private static final long serialVersionUID = 1L;

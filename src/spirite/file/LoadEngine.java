@@ -100,7 +100,7 @@ public class LoadEngine {
 		RandomAccessFile ra;
 		ImageWorkspace workspace;
 		
-		int layerMet = 0;
+//		int layerMet = 0;
 		final List<Node> nodes = new ArrayList<>();
 	}
 	

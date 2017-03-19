@@ -7,6 +7,14 @@ import mutil.Interpolation.LagrangeInterpolator;
 
 public class PenTraits {
 
+	public enum ButtonType {
+		LEFT, RIGHT, CENTER
+	}
+	public static class MButtonEvent {
+		public ButtonType buttonType;
+		
+	}
+	
 	public static class PenState {
 		public PenState(){}
 		public PenState( int x, int y, float pressure) {

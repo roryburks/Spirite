@@ -90,15 +90,7 @@ public class DrawEngine {
 			return false;
 		}
 		else {
-			switch( stroke.getMethod()) {
-			case PIXEL:
-				activeEngine = defEngine;
-				break;
-			case BASIC:
-			case ERASE:
-				activeEngine = glEngine;
-				break;
-			}
+			activeEngine = (stroke.getHard())? defEngine : glEngine;
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
@@ -343,8 +335,10 @@ public class DrawEngine {
 		Method method = Method.BASIC;
 		float width = 1.0f;
 		float alpha = 1.0f;
-		boolean locked = false;
+		boolean hard = false;
 		PenDynamics dynamics = DrawEngine.getDefaultDynamics();
+
+		boolean locked = false;
 		
 		public StrokeParams() {}
 		
@@ -372,6 +366,16 @@ public class DrawEngine {
 		}
 		public float getAlpha() {return alpha;}
 		
+		public void setHard( boolean hard) {
+			if( !locked)
+				this.hard = hard;
+		}
+		public boolean getHard() {return hard;}
+		
+		public void setDynamics( PenDynamics dynamics) {
+			if( !locked && dynamics != null)
+				this.dynamics = dynamics;
+		}
 		public PenDynamics getDynamics() {
 			return dynamics;
 		}
@@ -571,12 +575,6 @@ public class DrawEngine {
 				Graphics g = builtImage.checkout();
 				Point p = builtImage.convert(new Point(mask.offsetX,mask.offsetY));
 				g.drawImage( bi, p.x, p.y, null);
-			}
-			try {
-				ImageIO.write(bi, "png", new java.io.File("E:/test.png"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			builtImage.checkin();
 		}

@@ -1,7 +1,6 @@
 package spirite.panel_toolset;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +13,13 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
-
-import javafx.scene.control.ComboBox;
-
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import spirite.brains.MasterControl;
@@ -42,11 +39,22 @@ import spirite.ui.components.SliderPanel;
 public class ToolSettingsPanel extends OmniComponent
 	implements MToolsetObserver, MWorkspaceObserver, MSelectionEngineObserver, ActionListener
 {
+	// External Components
 	private final MasterControl master;
 	private final ToolsetManager manager;
 	private ToolSettings settings;
-	private final Map<JComponent,Property> activeMap = new HashMap<>();
 	private ImageWorkspace workspace = null;
+	
+	/**
+	 * The ActiveMap links components to a property such that they can be 
+	 * enabled/disabled/changed based on watched changes depending on their behavior
+	 * options.
+	 * 
+	 * (For most Properties this is unnecessary, but it's good to add them to the
+	 * map for future compatibility sake in case they are given behavior that allows
+	 * them to be disabled/changed externally.)
+	 */
+	private final Map<JComponent,Property> activeMap = new HashMap<>();
 
 	
 	private final JLabel label;
@@ -195,13 +203,16 @@ public class ToolSettingsPanel extends OmniComponent
 			break;}
 		case DROP_DOWN: {
 			JComboBox<String> comboBox = new JComboBox<>();
+			activeMap.put( comboBox, node);
 			JLabel label = new JLabel(node.getName() + ":");
 			
 			String options[] = (String[])node.getExtra();
 			
+			// Init Components
 			for( int i=0; i<options.length; ++i) {
 				comboBox.addItem(options[i]);
 			}
+			comboBox.setFont(new Font("Tahoma",Font.PLAIN, 10));
 			comboBox.setSelectedIndex((Integer)node.getValue());
 			comboBox.addItemListener( new ItemListener() {
 				@Override
@@ -211,7 +222,7 @@ public class ToolSettingsPanel extends OmniComponent
 				}
 			});
 			
-			
+			// Add Components to Layout
 			horizontal.addGroup(layout.createParallelGroup()
 					.addComponent(label)
 					.addComponent(comboBox, 0, 0, Short.MAX_VALUE));
@@ -219,11 +230,39 @@ public class ToolSettingsPanel extends OmniComponent
 					.addComponent(comboBox, 20, 20, 20);
 			
 			break;}
+		case RADIO_BUTTON:{
+			String options[] = (String[])node.getExtra();
+			
+			// Create Components and their settings
+			JRadioButton[] radioButtons = new JRadioButton[ options.length];
+			for( int i=0; i<options.length; ++i) {
+				radioButtons[i] = new JRadioButton(options[i]);
+				activeMap.put( radioButtons[i], node);
+				radioButtons[i].setFont(new Font("Tahoma",Font.PLAIN, 10));
+			}
+			
+			radioButtons[(Integer)node.getValue()].setSelected(true);
+			
+			// Link actions of the Components, and add them to the layout
+			Group horSub = layout.createParallelGroup();
+			for( int i=0; i<options.length; ++i) {
+				final int index = i;
+				radioButtons[i].addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						for( int i=0; i<options.length; ++i) {
+							radioButtons[i].setSelected(i == index);
+						}
+						settings.setValue(node.getId(), index);
+					}
+				});
+				
+				horSub.addComponent(radioButtons[i]);
+				vertical.addComponent(radioButtons[i]);
+			}
+			horizontal.addGroup(horSub);
+			break;}
 		}
-	}
-	
-	private class ToolPropertyComponent extends Component {
-		
 	}
 	
 	private void checkStatus( ) {
@@ -240,6 +279,7 @@ public class ToolSettingsPanel extends OmniComponent
 		}
 	}
 
+	// :::: MToolsetObserver
 	@Override
 	public void toolsetChanged(Tool newTool) {
 		updatePanel();

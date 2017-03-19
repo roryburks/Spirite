@@ -17,7 +17,6 @@ import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
@@ -28,7 +27,7 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 
-public class GLEngine implements GLEventListener {
+public class GLEngine  {
 	private final GLOffscreenAutoDrawable drawable;
 	private int width = 1;
 	private int height = 1;
@@ -410,29 +409,5 @@ public class GLEngine implements GLEventListener {
 		status.clear();
 		
 		return shader;
-	}
-
-	@Override
-	public void display(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispose(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void init(GLAutoDrawable arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -1,7 +1,6 @@
 package spirite.gl;
 
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 

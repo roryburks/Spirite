@@ -15,8 +15,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import jpen.PButton;		// BAD
-import jpen.PButtonEvent;	// BAD
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
@@ -41,6 +39,8 @@ import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.pen.PenTraits.ButtonType;
+import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
 
 /***
@@ -151,15 +151,11 @@ public class Penner
 
 	}
 	
+	
 	/**
 	 */
-	public void penDownEvent(PButtonEvent pbe) {
-		// TODO: This Should not be using JPen objects
-		if( pbe.button.typeNumber > 3) return;	// Shit/Ctrl/Etc events
-
-		PButton.Type button = pbe.button.getType();
-		if( button != PButton.Type.LEFT && button != PButton.Type.RIGHT && button != PButton.Type.CENTER)
-			return;
+	public void penDownEvent(MButtonEvent mbe) {
+		if( mbe == null) return;
 		
 		if( behavior != null)
 			behavior.onPenDown();
@@ -181,9 +177,9 @@ public class Penner
 			switch( tool) {
 			case PEN:
 				if( holdingCtrl) 
-					behavior = new PickBehavior(button == PButton.Type.LEFT);
+					behavior = new PickBehavior( mbe.buttonType == ButtonType.LEFT);
 				else 
-					behavior = new PenBehavior((button == PButton.Type.LEFT) ? 
+					behavior = new PenBehavior((mbe.buttonType == ButtonType.LEFT) ? 
 									paletteManager.getActiveColor(0)
 									: paletteManager.getActiveColor(1));
 				break;
@@ -191,7 +187,7 @@ public class Penner
 				behavior = new EraseBehavior();
 				break;
 			case FILL:
-				fill( button == PButton.Type.LEFT);
+				fill( mbe.buttonType == ButtonType.LEFT);
 				break;
 			case BOX_SELECTION: {
 				Selection selection = selectionEngine.getSelection();
@@ -212,14 +208,14 @@ public class Penner
 
 				break;}
 			case COLOR_PICKER:
-				behavior = new PickBehavior(button == PButton.Type.LEFT);
+				behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
 				break;
 			case PIXEL:
 				if( holdingCtrl)  {
-					behavior = new PickBehavior(button == PButton.Type.LEFT);
+					behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
 				}
 				else {
-					behavior = new PixelBehavior((button == PButton.Type.LEFT) ? 
+					behavior = new PixelBehavior((mbe.buttonType == ButtonType.LEFT) ? 
 							paletteManager.getActiveColor(0)
 							: paletteManager.getActiveColor(1));
 				}
@@ -242,11 +238,24 @@ public class Penner
 					behavior = new MovingRigPart(rig, part);
 				
 				break;
-			case FLIPPER:
-				behavior = new FlippingBehavior();
-				break;
-			case RESHAPER:
-				if( button == PButton.Type.LEFT) {
+			case FLIPPER:{
+				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
+				Integer flipMode = (Integer)settings.getValue("flipMode");
+				
+				switch( flipMode) {
+				case 0:	// Horizontal
+					drawEngine.flip( workspace.buildActiveData(), true);
+					break;
+				case 1:	// Vertical
+					drawEngine.flip( workspace.buildActiveData(), false);
+					break;
+				case 2:
+					behavior = new FlippingBehavior();
+					break;
+				}
+				break;}
+			case RESHAPER:{
+				if( mbe.buttonType == ButtonType.LEFT) {
 					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
 							workspace.buildActiveData().handle, 
 							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
@@ -254,10 +263,10 @@ public class Penner
 				}
 				else {
 				}
-				break;
-			case COLOR_CHANGE:
+				break;}
+			case COLOR_CHANGE: {
 				if( holdingCtrl)  {
-					behavior = new PickBehavior(button == PButton.Type.LEFT);
+					behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
 					break;
 				}
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
@@ -265,7 +274,7 @@ public class Penner
 				int scope = (Integer)settings.getValue("scope");
 				boolean ignoreAlpha = (Boolean)settings.getValue("ignoreAlpha");
 				
-				if( button == PButton.Type.LEFT) {
+				if( mbe.buttonType == ButtonType.LEFT) {
 					drawEngine.changeColor(
 							paletteManager.getActiveColor(0),
 							paletteManager.getActiveColor(1),
@@ -277,7 +286,7 @@ public class Penner
 							paletteManager.getActiveColor(0),
 							scope, ignoreAlpha);
 				}
-				break;
+				break;}
 			}
 			
 			if( behavior != null)
@@ -285,7 +294,7 @@ public class Penner
 		}
 	}
 	
-	public void penUpEvent( PButtonEvent pbe)
+	public void penUpEvent( MButtonEvent mButtonEvent)
 	{
 		// PenUp
 		if( behavior != null) {
@@ -367,7 +376,7 @@ public class Penner
 				shiftX = rawX;
 				shiftY = rawY;
 				BuiltImageData data = workspace.buildActiveData();
-				GroupTree.Node node = workspace.getSelectedNode();
+//				GroupTree.Node node = workspace.getSelectedNode();
 				
 				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
 					end();
@@ -419,6 +428,7 @@ public class Penner
 			StrokeParams stroke = new StrokeParams();
 			stroke.setMethod( Method.ERASE);
 			stroke.setWidth((float)settings.getValue("width"));
+			stroke.setHard((Boolean)settings.getValue("hard"));
 
 			// Start the Stroke
 			startStroke( stroke);
@@ -438,6 +448,7 @@ public class Penner
 			stroke.setColor( color);
 			stroke.setWidth((float)settings.getValue("width"));
 			stroke.setAlpha((float)settings.getValue("alpha"));
+			stroke.setHard((Boolean)settings.getValue("hard"));
 			
 			// Start the Stroke
 			startStroke( stroke);
@@ -454,6 +465,7 @@ public class Penner
 			StrokeParams stroke = new StrokeParams();
 			stroke.setMethod( Method.PIXEL);
 			stroke.setAlpha((float)settings.getValue("alpha"));
+			stroke.setHard(true);
 			stroke.setColor( color);
 			startStroke( stroke);
 		}

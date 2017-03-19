@@ -26,7 +26,7 @@ public class ReferencePanel extends JPanel
 	implements MImageObserver, MReferenceObserver
 
 {
-	private final MasterControl master;
+//	private final MasterControl master;
 	private final Zoomer zoomer;
 	private final RenderEngine renderer;
 	private final boolean front;
@@ -36,7 +36,7 @@ public class ReferencePanel extends JPanel
 	private static final long serialVersionUID = 1L;
 	public ReferencePanel(WorkPanel context, MasterControl master, boolean front) {
 		this.zoomer = context.refzoomer;
-		this.master = master;
+//		this.master = master;
 		this.renderer = master.getRenderEngine();
 		this.front = front;
 		
@@ -59,7 +59,7 @@ public class ReferencePanel extends JPanel
         	RenderSettings settings = new RenderSettings(
         			new ReferenceRenderSource(workspace,front));
         	
-        	BufferedImage buffer = master.getRenderEngine().renderImage(settings);
+        	BufferedImage buffer = renderer.renderImage(settings);
             
             Graphics2D g2 = (Graphics2D)g;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
