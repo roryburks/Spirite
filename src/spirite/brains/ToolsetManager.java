@@ -30,14 +30,15 @@ public class ToolsetManager
 		ERASER("Eraser",1), 
 		FILL("Fill",2), 
 		BOX_SELECTION("Box Selection",3), 
-		MOVE("Move",4),
-		COLOR_PICKER("Color Picker",5),
+		FREEFORM_SELECTION("Free Selection",4), 
+		MOVE("Move",5),
 		PIXEL("Pixel",6),
 		CROP("Cropper",7),
 		COMPOSER("Rig Composer",8),
 		FLIPPER("Horizontal/Vertical Flipping",9),
 		RESHAPER("Reshaping Tool",10),
-		COLOR_CHANGE("Color Change Tool",11);
+		COLOR_CHANGE("Color Change Tool",11),
+		COLOR_PICKER("Color Picker",12),;
 		
 		public final String description;
 		public final int iconLocation;

@@ -8,11 +8,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.MUtil;
@@ -21,6 +23,7 @@ import spirite.brains.PaletteManager;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.ToolsetManager;
+import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
@@ -30,6 +33,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionBuilder;
 import spirite.image_data.SelectionEngine.SelectionType;
@@ -55,7 +59,7 @@ import spirite.pen.StrokeEngine.StrokeParams;
  * @author Rory Burks
  */
 public class Penner 
-	implements KeyEventDispatcher, ActionListener
+	implements KeyEventDispatcher, ActionListener, MToolsetObserver
 {
 	// Contains "Image to Screen" and "Screen to Image" methods.
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
@@ -112,6 +116,8 @@ public class Penner
 		this.toolsetManager = master.getToolsetManager();
 		this.paletteManager = master.getPaletteManager();
 		this.renderEngine = master.getRenderEngine();
+		
+		toolsetManager.addToolsetObserver(this);
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.addKeyEventDispatcher(this);
@@ -202,6 +208,9 @@ public class Penner
 					
 					behavior = new FormingSelectionBehavior((Integer)settings.getValue("shape"));
 				}
+				break;}
+			case FREEFORM_SELECTION: {
+				behavior = new FreeFormingSelectionBehavior();
 				break;}
 			case MOVE:{
 				Selection selection = selectionEngine.getSelection();
@@ -605,7 +614,62 @@ public class Penner
 		}
 		@Override
 		public void onTock() {
-			selectionEngine.updateBuildingSelection(x, y);
+//			selectionEngine.updateBuildingSelection(x, y);
+		}
+	}
+
+	class FreeFormingSelectionBehavior extends DrawnStateBehavior {
+		private boolean drawing = true;
+		private FreeformSelectionBuilder builder;
+		@Override
+		public void start() {
+			builder = selectionEngine.new FreeformSelectionBuilder();
+			selectionEngine.startBuildingSelection( builder, x, y);
+		}
+
+		@Override
+		public void onMove() {
+			if( drawing && (x != oldX || y != oldY))
+				selectionEngine.updateBuildingSelection(x, y);
+		}
+		@Override public void onTock() {}
+		public boolean testFinish() {
+			Point p_s = builder.getStart();
+			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
+				selectionEngine.finishBuildingSelection();
+				this.end();
+				return true;
+			}
+			return false;
+		}
+		@Override public void onPenUp() {
+			drawing = false;
+			testFinish();
+		}
+		@Override
+		public void onPenDown() {
+			drawing = true;
+			if( !testFinish())
+				selectionEngine.updateBuildingSelection(x, y);
+		}
+		@Override
+		public void paintOverlay(Graphics g) {
+			if( !drawing) {
+				Point p_e = builder.getEnd();
+				
+				g.setColor( Color.BLACK);
+				g.drawLine(zoomer.itsXm(p_e.x), zoomer.itsYm(p_e.y), 
+						zoomer.itsXm(x), zoomer.itsYm(y));
+
+			}
+
+			Point p_s = builder.getStart();
+			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
+				g.setColor( Color.YELLOW);
+				g.fillOval(zoomer.itsXm(p_s.x)-5, zoomer.itsYm(p_s.y) - 5, 10, 10);
+			}
+			else
+				g.drawOval(zoomer.itsXm(p_s.x)-5, zoomer.itsYm(p_s.y) - 5, 10, 10);
 		}
 	}
 	class CroppingBehavior extends DrawnStateBehavior {
@@ -885,6 +949,15 @@ public class Penner
 	public void paintOverlay(Graphics g) {
 		if( behavior instanceof DrawnStateBehavior) {
 			((DrawnStateBehavior)behavior).paintOverlay(g);
+		}
+	}
+
+	// :::: MToolsetObserver
+	@Override
+	public void toolsetChanged(Tool newTool) {
+		this.behavior = null;
+		if( selectionEngine.isBuilding()) {
+			selectionEngine.cancelBuildingSelection();
 		}
 	}
 

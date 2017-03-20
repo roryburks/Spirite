@@ -1,16 +1,25 @@
 package spirite.image_data;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.activation.UnsupportedDataTypeException;
+
+import mutil.DataCompaction.IntCompactor;
+import spirite.MDebug;
+import spirite.MUtil;
+import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.image_data.GroupTree.LayerNode;
@@ -213,46 +222,29 @@ public class SelectionEngine {
 		
 		SelectionEvent evt = new SelectionEvent();
 		
-		
-/*		switch( selectionType) {
-		case RECTANGLE:
-			buildingSelection = new RectSelection( Math.abs(startX-x), Math.abs(startY-y));
-			currentX = Math.min(startX, x);
-			currentY = Math.min(startY, y);
-			evt.selection = buildingSelection;
-			break;
-		}*/
-		
 		triggerBuildingSelection( evt);
 		
 	}
 
 	public void finishBuildingSelection() {
-		if( selectionBuilder.release()) {
-			building = false;
-			
-			// Then Store the action and perform it
-			UndoableAction action = createNewSelect( selectionBuilder.build());
-			action.performAction();
-			undoEngine.storeAction(  action);
-			
-			triggerBuildingSelection(null);
-			triggerSelectionChanged(null);
-		}
-
-		// First Verify that the selection is non-empty
-/*		Rectangle rect = buildingSelection.clipToRect(new Rectangle( -currentX, -currentY, workspace.getWidth(), workspace.getHeight()));
+		building = false;
 		
-		if( rect == null || rect.isEmpty()) {
-			unselect();
-			return;
-		}
+		// Then Store the action and perform it
+		UndoableAction action = createNewSelect( selectionBuilder.build());
+		action.performAction();
+		undoEngine.storeAction(  action);
 		
-		currentX += rect.x;
-		currentY += rect.y;*/
-		
+		triggerBuildingSelection(null);
+		triggerSelectionChanged(null);
 	}
 	
+	public void cancelBuildingSelection() {
+		selectionBuilder = null;
+		building = false;
+		triggerBuildingSelection(null);
+	}
+	
+	// :::: Selection Setting
 	public void setSelection( Selection selection, int ox, int oy) {
 		undoEngine.performAndStore( createNewSelect(new BuiltSelection(selection, ox, oy)));
 	}
@@ -557,7 +549,6 @@ public class SelectionEngine {
 	{
 		protected abstract void start( int x, int y);
 		protected abstract void update( int x, int y);
-		protected abstract boolean release();	// Returns true if it counts as finishing the selection
 		protected abstract BuiltSelection build();
 		protected abstract void draw( Graphics g);
 	}
@@ -592,18 +583,14 @@ public class SelectionEngine {
 		
 		@Override
 		protected void start(int x, int y) {
-			startX = x;
-			startY = y;
+			startX = currentX = x;
+			startY = currentY = y;
 		}
 
 		@Override
 		protected void update(int x, int y) {
 			currentX = x;
 			currentY = y;
-		}
-		@Override
-		protected boolean release() {
-			return true;
 		}
 		@Override
 		protected BuiltSelection build() {
@@ -670,8 +657,8 @@ public class SelectionEngine {
 		
 		@Override
 		protected void start(int x, int y) {
-			startX = x;
-			startY = y;
+			startX = currentX = x;
+			startY = currentY = y;
 		}
 	
 		@Override
@@ -680,15 +667,12 @@ public class SelectionEngine {
 			currentY = y;
 		}
 		@Override
-		protected boolean release() {
-			return true;
-		}
-		@Override
 		protected BuiltSelection build() {
 			Rectangle buildingRect = new Rectangle( 
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
 			
+			// TODO
 //			Rectangle intersection = buildingRect.intersection(
 //					new Rectangle(0,0, workspace.getWidth(), workspace.getHeight()));
 			
@@ -734,7 +718,109 @@ public class SelectionEngine {
 			return new OvalSelection( width, height);
 		}
 	}
+	public class FreeformSelectionBuilder extends SelectionBuilder {
+		IntCompactor compactor = new IntCompactor();
+		@Override
+		protected void start(int x, int y) {
+			compactor.add(x);
+			compactor.add(y);
+		}
 
+		@Override
+		protected void update(int x, int y) {
+			compactor.add(x);
+			compactor.add(y);
+		}
+		@Override
+		protected BuiltSelection build() {
+			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+			
+			Polygon pg = new Polygon();
+			for( int i=0; i<compactor.size(); i += 2) {
+				pg.addPoint(compactor.get(i), compactor.get(i+1));
+			}
+			Graphics g = bi.getGraphics();
+			g.setColor(Color.BLACK);
+			g.fillPolygon(pg);
+			g.dispose();
+			
+			try {
+				Rectangle bounds = MUtil.findContentBounds(bi, 0, true);
+				if( bounds == null || bounds.isEmpty())
+					return new BuiltSelection( null, 0, 0);
+				
+				BufferedImage bi2 = bi;
+				bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
+				g = bi.getGraphics();
+				g.drawImage(bi2, -bounds.x, -bounds.y, null);
+				g.dispose();
+				return new BuiltSelection(new ImageSelection(bi), bounds.x, bounds.y);
+			} catch (UnsupportedDataTypeException e) {
+				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
+			}
+			
+			
+			return new BuiltSelection(new ImageSelection(bi), 0, 0);
+		}
+
+		@Override
+		protected void draw(Graphics g) {
+			System.out.println(compactor.size());
+			Graphics2D g2 = (Graphics2D)g;
+
+			int ox = compactor.get(0);
+			int oy = compactor.get(1);
+			int nx, ny;
+			for( int i=2; i<compactor.size(); i+=2) {
+				nx = compactor.get(i);
+				ny = compactor.get(i+1);
+				g.drawLine(ox, oy, nx, ny);
+				ox = nx;
+				oy = ny;
+			}
+		}
+		public Point getStart() {
+			return new Point( compactor.get(0), compactor.get(1));
+		}
+		public Point getEnd() {
+			int s = compactor.size();
+			return new Point( compactor.get(s-2), compactor.get(s-1));
+		}
+		
+	}
+	
+	public class ImageSelection extends Selection {
+		private final BufferedImage bi;
+		
+		public ImageSelection(BufferedImage bi) {
+			this.bi = bi;
+		}
+		@Override
+		public void drawSelectionBounds(Graphics g) {
+			// TODO
+		}
+		@Override
+		public void drawSelectionMask(Graphics g) {
+			g.drawImage(bi, 0, 0, null);
+		}
+		@Override
+		public boolean contains(int x, int y) {
+			if( x < 0 || x > bi.getWidth() || y < 0 || y > bi.getHeight())
+				return false;
+			
+			return ((bi.getRGB(x, y) >>> 24)!= 0);
+		}
+		@Override
+		public Dimension getDimension() {
+			return new Dimension( bi.getWidth(), bi.getHeight());
+		}
+		@Override
+		public Selection clone() {
+			return new ImageSelection(MUtil.deepCopy(bi));
+		}
+		
+	}
+	
 	/** Helper Class to reduce duplicate code. */
 	private interface LiftScheme {
 		void draw(Graphics g);
