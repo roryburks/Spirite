@@ -77,12 +77,7 @@ public class SelectionEngine {
 	
 	// Variables relating to Building
 	private boolean building = false;
-	private SelectionType selectionType;	// Only used when building a selection
-	private Selection buildingSelection = null;
-	private int startX;
-	private int startY;
-	private int currentX;
-	private int currentY;
+	private SelectionBuilder selectionBuilder;	// Only used when building a selection
 	
 	SelectionEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
@@ -98,8 +93,12 @@ public class SelectionEngine {
 	public boolean isBuilding() {
 		return building;
 	}
-	public Selection getBuildingSelection() {
+/*	public Selection getBuildingSelection() {
 		return buildingSelection;
+	}*/
+	public void drawBuildingSelection( Graphics g) {
+		if( selectionBuilder != null)
+			selectionBuilder.draw(g);
 	}
 	
 	/** Returns a BuiltSelection which incorporates all relevant offset data
@@ -121,10 +120,10 @@ public class SelectionEngine {
 		return scope.getLiftedImage();
 	}
 	public int getOffsetX() {
-		return (building)?currentX:scope.getOffsetX();
+		return scope.getOffsetX();
 	}
 	public int getOffsetY() {
-		return (building)?currentY:scope.getOffsetY();
+		return scope.getOffsetY();
 	}
 	public void setOffset( int x, int y) {
 		int dx = x - scope.getOffsetX();
@@ -193,7 +192,9 @@ public class SelectionEngine {
 	
 	
 	// :::: Selection Building
-	public void startBuildingSelection( SelectionType type, int x, int y) {
+	public void startBuildingSelection( SelectionBuilder builder, int x, int y) {
+		if( builder == null) return;
+		
 		// !!!! For the engine to work as expected, it is important that the user
 		//	only updates the selection through these building mechanisms.
 		
@@ -201,35 +202,46 @@ public class SelectionEngine {
 		
 		// Start building
 		building = true;
-		selectionType = type;
-		startX = x;
-		startY = y;
-		buildingSelection = new NullSelection();
+		selectionBuilder = builder;
+		selectionBuilder.start(x, y);
 	}
 	
 	public void updateBuildingSelection( int x, int y) {
 		if(!building) return;
 		
+		selectionBuilder.update(x, y);
+		
 		SelectionEvent evt = new SelectionEvent();
 		
-		switch( selectionType) {
+		
+/*		switch( selectionType) {
 		case RECTANGLE:
 			buildingSelection = new RectSelection( Math.abs(startX-x), Math.abs(startY-y));
 			currentX = Math.min(startX, x);
 			currentY = Math.min(startY, y);
 			evt.selection = buildingSelection;
 			break;
-		}
+		}*/
 		
 		triggerBuildingSelection( evt);
 		
 	}
 
 	public void finishBuildingSelection() {
+		if( selectionBuilder.release()) {
+			building = false;
+			
+			// Then Store the action and perform it
+			UndoableAction action = createNewSelect( selectionBuilder.build());
+			action.performAction();
+			undoEngine.storeAction(  action);
+			
+			triggerBuildingSelection(null);
+			triggerSelectionChanged(null);
+		}
+
 		// First Verify that the selection is non-empty
-		building = false;
-		
-		Rectangle rect = buildingSelection.clipToRect(new Rectangle( -currentX, -currentY, workspace.getWidth(), workspace.getHeight()));
+/*		Rectangle rect = buildingSelection.clipToRect(new Rectangle( -currentX, -currentY, workspace.getWidth(), workspace.getHeight()));
 		
 		if( rect == null || rect.isEmpty()) {
 			unselect();
@@ -237,19 +249,12 @@ public class SelectionEngine {
 		}
 		
 		currentX += rect.x;
-		currentY += rect.y;
+		currentY += rect.y;*/
 		
-		// Then Store the action and perform it
-		UndoableAction action = createNewSelect(buildingSelection, currentX, currentY);
-		action.performAction();
-		undoEngine.storeAction(  action);
-		
-		triggerBuildingSelection(null);
-		triggerSelectionChanged(null);
 	}
 	
 	public void setSelection( Selection selection, int ox, int oy) {
-		undoEngine.performAndStore( createNewSelect(selection, ox, oy));
+		undoEngine.performAndStore( createNewSelect(new BuiltSelection(selection, ox, oy)));
 	}
 	
 
@@ -272,7 +277,7 @@ public class SelectionEngine {
 		if( bi == null) return;
 		
 		List<UndoableAction> actions = new ArrayList<>(2);
-		actions.add(createNewSelect(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy));
+		actions.add(createNewSelect(new BuiltSelection(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy)));
 		startLiftAction = new StartLiftAction(bi);
 		actions.add( startLiftAction);
 		
@@ -281,7 +286,7 @@ public class SelectionEngine {
 	
 	
 	public void unselect() {
-		UndoableAction action = createNewSelect(null, 0, 0);
+		UndoableAction action = createNewSelect( new BuiltSelection(null, 0, 0));
 		action.performAction();
 		undoEngine.storeAction(action);
 	}
@@ -310,9 +315,8 @@ public class SelectionEngine {
 		return startLiftAction;
 	}
 	
-	private UndoableAction createNewSelect( Selection selection, int ox, int oy) {
-		UndoableAction baseAction = new SetSelectionAction( 
-				new BuiltSelection(selection, ox, oy), oldSelection);
+	private UndoableAction createNewSelect( BuiltSelection selection) {
+		UndoableAction baseAction = new SetSelectionAction( selection, oldSelection);
 
 		if( scope.isLifted()) {
 			List<UndoableAction> actions = new ArrayList<>(3);
@@ -549,6 +553,16 @@ public class SelectionEngine {
 	}	
 	
 	// ========== Selection Database
+	public abstract static class SelectionBuilder
+	{
+		protected abstract void start( int x, int y);
+		protected abstract void update( int x, int y);
+		protected abstract boolean release();	// Returns true if it counts as finishing the selection
+		protected abstract BuiltSelection build();
+		protected abstract void draw( Graphics g);
+	}
+	
+	//
 	public abstract static class Selection 
 	{
 		// Note: SelectionBounds is drawn in image-space (i.e. accounting
@@ -558,7 +572,6 @@ public class SelectionEngine {
 		public abstract void drawSelectionMask( Graphics g);
 		public abstract boolean contains( int x, int y);
 		public abstract Dimension getDimension();
-		abstract Rectangle clipToRect( Rectangle rect);	// returns null if the clipped Selection is empty
 		
 		public abstract Selection clone();
 	}
@@ -568,8 +581,51 @@ public class SelectionEngine {
 		@Override		public void drawSelectionMask(Graphics g) {}
 		@Override		public boolean contains(int x, int y) {return false;}
 		@Override		public Dimension getDimension() {return new Dimension(0,0);}
-		@Override		Rectangle clipToRect(Rectangle rect) {return null;}
 		@Override		public Selection clone() { return new NullSelection();}
+	}
+	
+	public class RectSelectionBuilder extends SelectionBuilder {
+		private int startX;
+		private int startY;
+		private int currentX;
+		private int currentY;
+		
+		@Override
+		protected void start(int x, int y) {
+			startX = x;
+			startY = y;
+		}
+
+		@Override
+		protected void update(int x, int y) {
+			currentX = x;
+			currentY = y;
+		}
+		@Override
+		protected boolean release() {
+			return true;
+		}
+		@Override
+		protected BuiltSelection build() {
+			Rectangle buildingRect = new Rectangle( 
+					Math.min(startX, currentX), Math.min(startY, currentY),
+					Math.abs(startX-currentX), Math.abs(startY-currentY));
+			
+			Rectangle intersection = buildingRect.intersection(
+					new Rectangle(0,0, workspace.getWidth(), workspace.getHeight()));
+			
+			if( intersection == null || intersection.isEmpty())
+				return new BuiltSelection( null, 0, 0);
+			
+			return new BuiltSelection( new RectSelection(
+					intersection.width, intersection.height), intersection.x, intersection.y);
+		}
+		@Override
+		protected void draw(Graphics g) {
+			g.drawRect(
+					Math.min(startX, currentX), Math.min(startY, currentY),
+					Math.abs(startX-currentX), Math.abs(startY-currentY));
+		}
 	}
 	
 	/***
@@ -599,26 +655,83 @@ public class SelectionEngine {
 		public boolean contains( int x, int y) {
 			return (new Rectangle( 0, 0, width, height)).contains(x,y);
 		}
-		
-		@Override
-		Rectangle clipToRect(Rectangle rect) {
-			Rectangle selectionRect = new Rectangle( 0, 0, width, height);
-			Rectangle intersection = rect.intersection(selectionRect);
-			
-			if( intersection.isEmpty())
-				return null;
-
-			width = intersection.width;
-			height = intersection.height;
-			
-			
-			return new Rectangle(intersection);
-		}
-		
 
 		@Override
 		public RectSelection clone()  {
 			return new RectSelection( width, height);
+		}
+	}
+	
+	public class OvalSelectionBuilder extends SelectionBuilder {
+		private int startX;
+		private int startY;
+		private int currentX;
+		private int currentY;
+		
+		@Override
+		protected void start(int x, int y) {
+			startX = x;
+			startY = y;
+		}
+	
+		@Override
+		protected void update(int x, int y) {
+			currentX = x;
+			currentY = y;
+		}
+		@Override
+		protected boolean release() {
+			return true;
+		}
+		@Override
+		protected BuiltSelection build() {
+			Rectangle buildingRect = new Rectangle( 
+					Math.min(startX, currentX), Math.min(startY, currentY),
+					Math.abs(startX-currentX), Math.abs(startY-currentY));
+			
+//			Rectangle intersection = buildingRect.intersection(
+//					new Rectangle(0,0, workspace.getWidth(), workspace.getHeight()));
+			
+			if( buildingRect == null || buildingRect.isEmpty())
+				return new BuiltSelection( null, 0, 0);
+			
+			return new BuiltSelection( new OvalSelection(
+					buildingRect.width, buildingRect.height), buildingRect.x, buildingRect.y);
+		}
+		@Override
+		protected void draw(Graphics g) {
+			g.drawOval(
+					Math.min(startX, currentX), Math.min(startY, currentY),
+					Math.abs(startX-currentX), Math.abs(startY-currentY));
+		}
+	}
+	public static class OvalSelection extends Selection {
+		private int width;
+		private int height;
+		public OvalSelection( int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+		@Override
+		public void drawSelectionBounds( Graphics g) {
+			g.drawOval( 0, 0, width, height);
+		}
+		@Override
+		public void drawSelectionMask( Graphics g) {
+			g.setColor( Color.black);
+			g.fillOval(0, 0, width, height);
+		}
+		@Override
+		public Dimension getDimension() {
+			return new Dimension( width, height);
+		}
+		@Override
+		public boolean contains( int x, int y) {
+			return (new Rectangle( 0, 0, width, height)).contains(x,y);
+		}
+		@Override
+		public OvalSelection clone()  {
+			return new OvalSelection( width, height);
 		}
 	}
 

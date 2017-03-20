@@ -80,7 +80,7 @@ public class DrawEngine {
 	}
 	
 	/** @return true if the stroke started, false otherwise	 */
-	public boolean startStroke(StrokeParams stroke, PenState ps, BuiltImageData data) {
+	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, BuiltImageData data) {
 		if( activeEngine != null) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
@@ -297,9 +297,9 @@ public class DrawEngine {
 				Graphics2D g2 = (Graphics2D)g;
 				g.setColor( stroke.getColor());
 
-				if( stroke.getMethod() != Method.PIXEL){
+				if( stroke.getMethod() != StrokeEngine.Method.PIXEL){
 					g2.setStroke( new BasicStroke( 
-							stroke.dynamics.getSize(toState)*stroke.width, 
+							stroke.getDynamics().getSize(toState)*stroke.getWidth(), 
 							BasicStroke.CAP_ROUND, 
 							BasicStroke.CAP_SQUARE));
 				}
@@ -322,66 +322,6 @@ public class DrawEngine {
 		
 	}
 
-	public enum Method {BASIC, ERASE, PIXEL};
-	/** 
-	 * StrokeParams define the style/tool/options of the Stroke.
-	 * 
-	 * lock is not actually used yet, but changing data mid-stroke is a 
-	 * bar idea.
-	 */
-	public static class StrokeParams {
-		
-		Color c = Color.BLACK;
-		Method method = Method.BASIC;
-		float width = 1.0f;
-		float alpha = 1.0f;
-		boolean hard = false;
-		PenDynamics dynamics = DrawEngine.getDefaultDynamics();
-
-		boolean locked = false;
-		
-		public StrokeParams() {}
-		
-		public void setColor( Color c) {
-			if( !locked)
-				this.c = c;
-		}
-		public Color getColor() {return new Color( c.getRGB());}
-		
-		public void setMethod( Method method) {
-			if( !locked)
-				this.method = method;
-		}
-		public Method getMethod() {return method;}
-		
-		public void setWidth( float width) {
-			if( !locked)
-				this.width = width;
-		}
-		public float getWidth() { return width;}
-		
-		public void setAlpha( float alpha) {
-			if( !locked)
-				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
-		}
-		public float getAlpha() {return alpha;}
-		
-		public void setHard( boolean hard) {
-			if( !locked)
-				this.hard = hard;
-		}
-		public boolean getHard() {return hard;}
-		
-		public void setDynamics( PenDynamics dynamics) {
-			if( !locked && dynamics != null)
-				this.dynamics = dynamics;
-		}
-		public PenDynamics getDynamics() {
-			return dynamics;
-		}
-	}
-
-	
 	private void execute( MaskedImageAction action) {
 		action.performImageAction();
 		undoEngine.storeAction(action);
@@ -427,12 +367,12 @@ public class DrawEngine {
 	
 	public class StrokeAction extends MaskedImageAction {
 		private final PenState[] points;
-		private final StrokeParams params;
+		private final StrokeEngine.StrokeParams params;
 		private final StrokeEngine engine;
 		
 		public StrokeAction( 
 				StrokeEngine engine,
-				StrokeParams params, 
+				StrokeEngine.StrokeParams params, 
 				PenState[] points, 
 				BuiltSelection mask, 
 				BuiltImageData data)
@@ -455,7 +395,7 @@ public class DrawEngine {
 			}
 		}
 		
-		public StrokeParams getParams() {
+		public StrokeEngine.StrokeParams getParams() {
 			return params;
 		}
 		

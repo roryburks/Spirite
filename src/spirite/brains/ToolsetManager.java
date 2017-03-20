@@ -64,6 +64,7 @@ public class ToolsetManager
         toolSettings.put( Tool.PEN, constructPenSettings());
         toolSettings.put( Tool.PIXEL, constructPixelSettings());
         toolSettings.put( Tool.ERASER, constructEraseSettings());
+        toolSettings.put( Tool.BOX_SELECTION, constructBoxSelectionSettings());
         toolSettings.put( Tool.CROP, constructCropperSettings());
         toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
         toolSettings.put( Tool.COLOR_CHANGE, constructColorChangeSettings());
@@ -238,6 +239,14 @@ public class ToolsetManager
     private ToolSettings constructPixelSettings() {
     	final Object[][] scheme = {
     			{"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
+    	};
+    	
+    	return constructFromScheme(scheme);
+    }
+    private ToolSettings constructBoxSelectionSettings() {
+    	final Object[][] scheme = {
+    			{"shape", PropertyType.DROP_DOWN, "Shape", 0, 0, 
+    				new String[]{"Rectangle","Oval"}},
     	};
     	
     	return constructFromScheme(scheme);

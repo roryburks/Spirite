@@ -14,11 +14,11 @@ import mutil.MatrixBuilder;
 import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.ProgramType;
-import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.StrokeParams;
 
 public class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
@@ -28,11 +28,6 @@ public class GLStrokeEngine extends StrokeEngine {
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
-	}
-	
-	@Override
-	public boolean startStroke(StrokeParams s, PenState ps, BuiltImageData data, BuiltSelection selection) {
-		return super.startStroke(s, ps, data, selection);
 	}
 	
 	@Override
@@ -50,7 +45,7 @@ public class GLStrokeEngine extends StrokeEngine {
 	}
 	
 	@Override
-	public boolean batchDraw(StrokeParams stroke, PenState[] states, BuiltImageData data, BuiltSelection mask) {
+	public boolean batchDraw(StrokeEngine.StrokeParams stroke, PenState[] states, BuiltImageData data, BuiltSelection mask) {
 		super.startStroke(stroke, states[0], data, mask);
 		_stroke( composeVBufferFromArray(states));
 		return true;

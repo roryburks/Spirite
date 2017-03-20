@@ -1,6 +1,7 @@
 package spirite.pen;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,20 +13,89 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
-import spirite.image_data.DrawEngine.StrokeParams;
+import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
+import spirite.pen.StrokeEngine.Method;
+import spirite.pen.StrokeEngine.StrokeParams;
 
 public abstract class StrokeEngine {
 	public enum STATE { READY, DRAWING };
 	
+	/** 
+	 * StrokeParams define the style/tool/options of the Stroke.
+	 * 
+	 * lock is not actually used yet, but changing data mid-stroke is a 
+	 * bar idea.
+	 */
+	public static class StrokeParams {
+		
+		Color c = Color.BLACK;
+		StrokeEngine.Method method = StrokeEngine.Method.BASIC;
+		private float width = 1.0f;
+		private float alpha = 1.0f;
+		private boolean hard = false;
+		private PenDynamics dynamics = DrawEngine.getDefaultDynamics();
+		private int maxWidth = 25;
+	
+		private boolean locked = false;
+		
+		public StrokeParams() {}
+		
+		public void setColor( Color c) {
+			if( !locked)
+				this.c = c;
+		}
+		public Color getColor() {return new Color( c.getRGB());}
+		
+		public void setMethod( StrokeEngine.Method method) {
+			if( !locked)
+				this.method = method;
+		}
+		public StrokeEngine.Method getMethod() {return method;}
+		
+		public void setWidth( float width) {
+			if( !locked)
+				this.width = width;
+		}
+		public float getWidth() { return width;}
+		
+		public void setAlpha( float alpha) {
+			if( !locked)
+				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
+		}
+		public float getAlpha() {return alpha;}
+		
+		public void setHard( boolean hard) {
+			if( !locked)
+				this.hard = hard;
+		}
+		public boolean getHard() {return hard;}
+		
+		public void setDynamics( PenDynamics dynamics) {
+			if( !locked && dynamics != null)
+				this.dynamics = dynamics;
+		}
+		public PenDynamics getDynamics() {
+			return dynamics;
+		}
+		
+		public void setMaxWidth( int width) {
+			if( !locked) this.maxWidth = width;
+		}
+		public int getMaxWidth() { return this.maxWidth;}
+	}
+
+	public enum Method {BASIC, ERASE, PIXEL}
+
 	protected PenState oldState = new PenState();
 	protected PenState newState = new PenState();
 	protected PenState rawState = new PenState();	// Needed to prevent UndoAction from double-tranforming
-	protected STATE state = STATE.READY;
+	protected StrokeEngine.STATE state = StrokeEngine.STATE.READY;
 
-	protected StrokeParams stroke = null;
+	protected StrokeEngine.StrokeParams stroke = null;
 	protected BuiltImageData data;
 	protected BufferedImage strokeLayer;
 	protected BufferedImage compositionLayer;
@@ -37,13 +107,13 @@ public abstract class StrokeEngine {
 	protected BuiltSelection sel;
 	
 	// :::: Get's
-	public StrokeParams getParams() {
+	public StrokeEngine.StrokeParams getParams() {
 		return stroke;
 	}
 	public BuiltImageData getImageData() {
 		return data;
 	}
-	public STATE getState() {
+	public StrokeEngine.STATE getState() {
 		return state;
 	}
 	public BufferedImage getStrokeLayer() {
@@ -64,8 +134,8 @@ public abstract class StrokeEngine {
 	 * selection mask 
 	 * 
 	 * @return true if the data has been changed, false otherwise.*/
-	public boolean startStroke( 
-			StrokeParams s, 
+	public final boolean startStroke( 
+			StrokeEngine.StrokeParams s, 
 			PenState ps, 
 			BuiltImageData data,
 			BuiltSelection selection) 
@@ -110,7 +180,7 @@ public abstract class StrokeEngine {
 		rawState.pressure = ps.pressure;
 		prec.add( ps);
 		
-		state = STATE.DRAWING;
+		state = StrokeEngine.STATE.DRAWING;
 		
 		
 		if( MUtil.coordInImage( layerSpace.x, layerSpace.y, strokeLayer)) 
@@ -120,7 +190,13 @@ public abstract class StrokeEngine {
 		return false;
 	}
 
-	public boolean stepStroke( PenState ps) {
+	public final boolean stepStroke( PenState ps) {
+		int start_x = oldState.x;
+		int start_y = oldState.y;
+		double distance = MUtil.distance( start_x, start_y, ps.x, ps.y);
+//		int 
+		
+		
 		Point layerSpace = data.convert( new Point( ps.x, ps.y));
 		newState.x = layerSpace.x;
 		newState.y = layerSpace.y;
@@ -129,7 +205,7 @@ public abstract class StrokeEngine {
 		rawState.y = ps.y;
 		rawState.pressure = ps.pressure;
 		
-		if( state != STATE.DRAWING || data == null) {
+		if( state != StrokeEngine.STATE.DRAWING || data == null) {
 			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
 			return false;
 		}
@@ -147,9 +223,9 @@ public abstract class StrokeEngine {
 
 	/** Finalizes the stroke, resetting the state, anchoring the strokeLayer
 	 * to the data, and flushing the used resources. */
-	public void endStroke() {
+	public final void endStroke() {
 
-		state = STATE.READY;
+		state = StrokeEngine.STATE.READY;
 		
 		if( data != null) {
 			Graphics g = data.checkoutRaw().getGraphics();
@@ -176,7 +252,7 @@ public abstract class StrokeEngine {
 	 * repeatedly.
 	 */
 	public boolean batchDraw( 
-			StrokeParams stroke, 
+			StrokeEngine.StrokeParams stroke, 
 			PenState[] states, 
 			BuiltImageData data,
 			BuiltSelection mask) {

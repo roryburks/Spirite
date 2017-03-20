@@ -22,9 +22,7 @@ import org.junit.Test;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.file.LoadEngine.BadSIFFFileException;
-import spirite.image_data.DrawEngine.Method;
 import spirite.image_data.DrawEngine.StrokeAction;
-import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -35,6 +33,9 @@ import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.pen.PenTraits.PenState;
+import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.Method;
+import spirite.pen.StrokeEngine.StrokeParams;
 
 /**
  * @author Guy
@@ -249,10 +250,10 @@ public class Test1 {
 						 rn.nextFloat());
 			}
 			
-			StrokeParams params = new StrokeParams();
+			StrokeEngine.StrokeParams params = new StrokeEngine.StrokeParams();
 			
 			params.setAlpha( rn.nextFloat());
-			params.setMethod((random == 3)?Method.BASIC:Method.ERASE);
+			params.setMethod((random == 3)?StrokeEngine.Method.BASIC:StrokeEngine.Method.ERASE);
 			params.setColor( randomColor() );
 			params.setWidth( rn.nextInt(5));
 			

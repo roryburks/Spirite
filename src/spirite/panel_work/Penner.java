@@ -24,8 +24,6 @@ import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
 import spirite.image_data.DrawEngine;
-import spirite.image_data.DrawEngine.Method;
-import spirite.image_data.DrawEngine.StrokeParams;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -33,6 +31,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.Selection;
+import spirite.image_data.SelectionEngine.SelectionBuilder;
 import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.UndoableAction;
@@ -42,6 +41,9 @@ import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
+import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.Method;
+import spirite.pen.StrokeEngine.StrokeParams;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -195,8 +197,11 @@ public class Penner
 				if( selection != null && 
 						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
 					behavior = new MovingSelectionBehavior();
-				else 
-					behavior = new FormingSelectionBehavior();
+				else  {
+					ToolSettings settings = toolsetManager.getToolSettings(Tool.BOX_SELECTION);
+					
+					behavior = new FormingSelectionBehavior((Integer)settings.getValue("shape"));
+				}
 				break;}
 			case MOVE:{
 				Selection selection = selectionEngine.getSelection();
@@ -371,7 +376,7 @@ public class Penner
 		int dy = y;
 		private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
 		
-		public void startStroke (StrokeParams stroke) {
+		public void startStroke (StrokeEngine.StrokeParams stroke) {
 			if( workspace != null && workspace.buildActiveData() != null) {
 				shiftX = rawX;
 				shiftY = rawY;
@@ -425,8 +430,8 @@ public class Penner
 		@Override
 		public void start() {
 			ToolSettings settings = toolsetManager.getToolSettings(Tool.ERASER);
-			StrokeParams stroke = new StrokeParams();
-			stroke.setMethod( Method.ERASE);
+			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
+			stroke.setMethod( StrokeEngine.Method.ERASE);
 			stroke.setWidth((float)settings.getValue("width"));
 			stroke.setHard((Boolean)settings.getValue("hard"));
 
@@ -444,7 +449,7 @@ public class Penner
 		@Override
 		public void start() {
 			ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
-			StrokeParams stroke = new StrokeParams();
+			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
 			stroke.setColor( color);
 			stroke.setWidth((float)settings.getValue("width"));
 			stroke.setAlpha((float)settings.getValue("alpha"));
@@ -462,8 +467,8 @@ public class Penner
 		@Override
 		public void start() {
 			ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
-			StrokeParams stroke = new StrokeParams();
-			stroke.setMethod( Method.PIXEL);
+			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
+			stroke.setMethod( StrokeEngine.Method.PIXEL);
 			stroke.setAlpha((float)settings.getValue("alpha"));
 			stroke.setHard(true);
 			stroke.setColor( color);
@@ -570,9 +575,24 @@ public class Penner
 	}
 	
 	class FormingSelectionBehavior extends StateBehavior {
+		private final int shape;
+		FormingSelectionBehavior( int shape) {
+			this.shape = shape;
+		}
 		@Override
 		public void start() {
-			selectionEngine.startBuildingSelection(SelectionType.RECTANGLE, x, y);
+			SelectionBuilder builder = null;
+			
+			switch( shape) {
+			case 0:
+				builder = selectionEngine.new RectSelectionBuilder();
+				break;
+			case 1:
+				builder = selectionEngine.new OvalSelectionBuilder();
+				break;
+			}
+			
+			selectionEngine.startBuildingSelection( builder, x, y);
 		}
 		@Override
 		public void onMove() {
