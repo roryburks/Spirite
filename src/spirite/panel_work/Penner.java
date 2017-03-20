@@ -202,7 +202,9 @@ public class Penner
 				
 				if( selection != null && 
 						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
+				{
 					behavior = new MovingSelectionBehavior();
+				}
 				else  {
 					ToolSettings settings = toolsetManager.getToolSettings(Tool.BOX_SELECTION);
 					
@@ -210,7 +212,16 @@ public class Penner
 				}
 				break;}
 			case FREEFORM_SELECTION: {
-				behavior = new FreeFormingSelectionBehavior();
+				Selection selection = selectionEngine.getSelection();
+				
+				if( selection != null && 
+						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
+				{
+					behavior = new MovingSelectionBehavior();
+				}
+				else  {
+					behavior = new FreeFormingSelectionBehavior();
+				}
 				break;}
 			case MOVE:{
 				Selection selection = selectionEngine.getSelection();

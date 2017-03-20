@@ -113,6 +113,7 @@ public class GLEngine  {
 		SQARE_GRADIENT,
 		BASIC_STROKE,
 		CHANGE_COLOR,
+		PASS_BORDER,
 		;
 	}
 	
@@ -229,85 +230,59 @@ public class GLEngine  {
 	// Initialization
 	
 	private void initShaders() {
+        programs[ProgramType.DEFAULT.ordinal()] = loadProgramFromResources(
+				"shaders/basic.vert", 
+				null, 
+				"shaders/square_grad.frag");
+        programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources(
+				"shaders/basic.vert", 
+				null, 
+				"shaders/square_grad.frag");
+        programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources(
+				"shaders/square_grad.vert", 
+				null, 
+				"shaders/square_grad.frag");
+        programs[ProgramType.BASIC_STROKE.ordinal()] = loadProgramFromResources(
+				"shaders/stroke_basic.vert", 
+				"shaders/stroke_basic.geom", 
+				"shaders/stroke_basic.frag");
+        programs[ProgramType.CHANGE_COLOR.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_change_color.frag");
+        programs[ProgramType.PASS_BORDER.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_border.frag");
+        		
+	}
+	
+	private int loadProgramFromResources( String vert, String geom, String frag){
 		GL4 gl = drawable.getGL().getGL4();
 
         ArrayList<Integer> shaderList = new ArrayList<>();
         
-        // Default Shader
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_VERTEX_SHADER,
-				"shaders/basic.vert"));
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_FRAGMENT_SHADER,
-				"shaders/basic.frag"));
+        if( vert != null) {
+            shaderList.add( compileShaderFromResource(
+    				gl, GL4.GL_VERTEX_SHADER, vert));
+        }
+        if( geom != null) {
+            shaderList.add( compileShaderFromResource(
+    				gl, GL4.GL_GEOMETRY_SHADER, geom));
+        }
+        if( frag != null ){
+            shaderList.add( compileShaderFromResource(
+    				gl, GL4.GL_FRAGMENT_SHADER, frag));
+        }
         
-        programs[ProgramType.DEFAULT.ordinal()] = createProgram( gl, shaderList);
-        
+		int ret = createProgram( gl, shaderList);
+		
+
         for( Integer shader : shaderList) {
         	gl.glDeleteShader(shader);
         }
         
-
-        // Square Gradient Shader
-        shaderList.clear();
-        
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_VERTEX_SHADER,
-				"shaders/square_grad.vert"));
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_FRAGMENT_SHADER,
-				"shaders/square_grad.frag"));
-        
-        programs[ProgramType.SQARE_GRADIENT.ordinal()] = createProgram( gl, shaderList);
-        
-        for( Integer shader : shaderList) {
-        	gl.glDeleteShader(shader);
-        }
-        
-        // Basic Stroke Shader
-        shaderList.clear();
-
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_VERTEX_SHADER,
-				"shaders/stroke_basic.vert"));
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_GEOMETRY_SHADER,
-				"shaders/stroke_basic.geom"));
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_FRAGMENT_SHADER,
-				"shaders/stroke_basic.frag"));
-        
-        programs[ProgramType.BASIC_STROKE.ordinal()] = createProgram( gl, shaderList);
-        
-        for( Integer shader : shaderList) {
-        	gl.glDeleteShader(shader);
-        }
-        
-
-        // Change Color
-        shaderList.clear();
-
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_VERTEX_SHADER,
-				"shaders/pass.vert"));
-        shaderList.add( compileShaderFromResource(
-				gl,
-				GL4.GL_FRAGMENT_SHADER,
-				"shaders/pass_change_color.frag"));
-        
-        programs[ProgramType.CHANGE_COLOR.ordinal()] = createProgram( gl, shaderList);
-        
-        for( Integer shader : shaderList) {
-        	gl.glDeleteShader(shader);
-        }
+        return ret;
 	}
 	
 	private int createProgram( GL4 gl, ArrayList<Integer> shaderList) {

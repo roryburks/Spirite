@@ -22,6 +22,7 @@ import spirite.MUtil;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
+import spirite.gl.GLUIDraw;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -745,7 +746,7 @@ public class SelectionEngine {
 			g.dispose();
 			
 			try {
-				Rectangle bounds = MUtil.findContentBounds(bi, 0, true);
+				Rectangle bounds = MUtil.findContentBounds(bi, 2, true);
 				if( bounds == null || bounds.isEmpty())
 					return new BuiltSelection( null, 0, 0);
 				
@@ -792,12 +793,15 @@ public class SelectionEngine {
 	public class ImageSelection extends Selection {
 		private final BufferedImage bi;
 		
+		/** NOTE: To properly draw the border, the supplied buffered image should
+		 * be cropped with a 1-pixel border (if it's cropped at all).
+		 */
 		public ImageSelection(BufferedImage bi) {
 			this.bi = bi;
 		}
 		@Override
 		public void drawSelectionBounds(Graphics g) {
-			// TODO
+			g.drawImage(GLUIDraw.drawBounds(bi), 0, 0, null);
 		}
 		@Override
 		public void drawSelectionMask(Graphics g) {
