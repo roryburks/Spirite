@@ -8,14 +8,11 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import javax.imageio.ImageIO;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -454,7 +451,7 @@ public class DrawEngine {
 				//	mask (this has to be done in a couple of renderings).
 				intermediate = bi;
 				bi = new BufferedImage(
-						bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+						bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
 				g2.setColor(Color.GREEN);
 				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
@@ -593,7 +590,7 @@ public class DrawEngine {
 			// Might be able to do this single-Image but things get weird if you 
 			//	draw a Buffer onto itself
 			BufferedImage buffer = new BufferedImage( 
-					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g2 = (Graphics2D)buffer.getGraphics();
 			
 			if( horizontal) {
@@ -672,7 +669,7 @@ public class DrawEngine {
 		// Might be able to do this single-Image but things get weird if you 
 		//	draw a Buffer onto itself
 		BufferedImage buffer = new BufferedImage( 
-				bi.getWidth()*2, bi.getHeight()*2, BufferedImage.TYPE_INT_ARGB_PRE);
+				bi.getWidth()*2, bi.getHeight()*2, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
 		
 		g2.scale(2, 2);

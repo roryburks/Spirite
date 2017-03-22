@@ -460,7 +460,7 @@ public class OmniFrame extends JPanel
 						cursor = DragSource.DefaultMoveDrop;
 					
 					
-					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_INT_ARGB_PRE);
+					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_4BYTE_ABGR);
 					Graphics g = image.getGraphics();
 					
 					g.setColor( new Color(128,128,128,128));

@@ -60,7 +60,7 @@ public class AnimIO {
 		
 		int c = (int)Math.floor(animation.getEndFrame());
 		
-		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_INT_ARGB_PRE);
+		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		MUtil.clearImage(bi);
@@ -162,7 +162,7 @@ public class AnimIO {
 					oy = handle.getDynamicY();
 				}
 				
-				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
+				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics g = bi.getGraphics();
 				g.drawImage(handle.deepAccess(), -bounds.x, -bounds.y, null);
 				g.dispose();
@@ -191,7 +191,7 @@ public class AnimIO {
 		}
 		
 		BufferedImage output_bi = new BufferedImage(
-				pr.width, pr.height, BufferedImage.TYPE_INT_ARGB_PRE);
+				pr.width, pr.height, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics g = output_bi.getGraphics();
 		for( CroppedImage ci : images) {
 			if( ci != null && ci.rectInImage != null) {

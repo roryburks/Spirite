@@ -166,7 +166,7 @@ public class RenderEngine
 				Rectangle r = dataContext.getBounds();
 				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
-						BufferedImage.TYPE_INT_ARGB_PRE);
+						BufferedImage.TYPE_4BYTE_ABGR);
 				
 				g2 = (Graphics2D)bi.getGraphics();
 				
@@ -549,7 +549,7 @@ public class RenderEngine
 				
 				buffer = new BufferedImage[n];
 				for( int i=0; i<n; ++i) {
-					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
+					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
 				}
 				
 				// Step 2: Compose the Stroke and Lifted Selection data onto the 
@@ -789,7 +789,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
+					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -854,7 +854,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
+					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -904,7 +904,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_INT_ARGB_PRE);
+					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 			
 			List<Layer> layerList = (front)?

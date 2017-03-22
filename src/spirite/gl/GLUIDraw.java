@@ -1,13 +1,11 @@
 package spirite.gl;
 
-import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -15,9 +13,10 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import mutil.MatrixBuilder;
-import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
+import spirite.gl.GLEngine.PreparedTexture;
 import spirite.gl.GLEngine.ProgramType;
+import sun.awt.image.IntegerInterleavedRaster;
 
 /** 
  * GLUIDraw is a mostly-static (needs to be linked to a non-static GLEngine
@@ -53,7 +52,7 @@ public class GLUIDraw {
 		int h = image.getHeight();
 		
 		engine.setSurfaceSize( w, h);
-		GL4 gl = engine.getGL4();
+		GL3 gl = engine.getGL3();
 
 		PreparedData pd = engine.prepareRawData(new float[]{
 			// x  y   u   v
@@ -65,59 +64,54 @@ public class GLUIDraw {
 		
 		// Clear Surface
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL4.GL_COLOR, 0, clearColor);
+        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
 
         int prog = engine.getProgram(ProgramType.PASS_BORDER);
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
-        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
         gl.glEnableVertexAttribArray( 0);
         gl.glEnableVertexAttribArray( 1);
-        gl.glVertexAttribPointer( 0, 2, GL4.GL_FLOAT, false, 4*4, 0);
-        gl.glVertexAttribPointer( 1, 2, GL4.GL_FLOAT, false, 4*4, 4*2);
+        gl.glVertexAttribPointer( 0, 2, GL3.GL_FLOAT, false, 4*4, 0);
+        gl.glVertexAttribPointer( 1, 2, GL3.GL_FLOAT, false, 4*4, 4*2);
         
         //Bind Texture
-		Texture texture = AWTTextureIO.newTexture(gl.getGLProfile(), image, false);
-		texture.setTexParameteri(gl, GL4.GL_TEXTURE_MIN_FILTER, GL4.GL_LINEAR);
-		texture.setTexParameteri(gl, GL4.GL_TEXTURE_MAG_FILTER, GL4.GL_LINEAR);
-		texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_S, GL4.GL_CLAMP_TO_EDGE);
-		texture.setTexParameteri(gl, GL4.GL_TEXTURE_WRAP_T, GL4.GL_CLAMP_TO_EDGE);
-		texture.enable(gl);
-		texture.bind(gl);
-
-        
+		PreparedTexture pt = engine.prepareTexture(image);
+		gl.glEnable(GL3.GL_TEXTURE_2D);
+		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
+		
         // Bind Uniforms
         int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
+        	MatrixBuilder.orthagonalProjectionMatrix( 0, w, 0, h, -1, 1)
         );
         gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
 
         // Start Draw
-		gl.glDrawArrays(GL4.GL_TRIANGLE_STRIP, 0, 4);
+		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
         
 
 		// Free
+		gl.glDisable(GL3.GL_TEXTURE_2D);
         gl.glDisableVertexAttribArray( 0);
         gl.glDisableVertexAttribArray( 1);
         gl.glUseProgram(0);
-        texture.disable(gl);
-        texture.destroy(gl);
+        pt.free();
         pd.free();
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
         				gl, 0, 0, w, h, true); 
-		
+       
 		return im;
 	}
 	
 	public static BufferedImage drawColorGradient( float fixed, GradientType type, int w, int h) {
 		engine.setSurfaceSize(w,h);
 		
-		GL4 gl = engine.getGL4();
+		GL3 gl = engine.getGL3();
 		
 
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
@@ -134,20 +128,20 @@ public class GLUIDraw {
 	    IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
 	    
 	    gl.glGenBuffers(1, positionBufferObject);
-	    gl.glBindBuffer( GL4.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+	    gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, positionBufferObject.get(0));
 	    gl.glBufferData(
-	    		GL4.GL_ARRAY_BUFFER, 
+	    		GL3.GL_ARRAY_BUFFER, 
 	    		vertexBuffer.capacity()*Float.BYTES, 
 	    		vertexBuffer, 
-	    		GL4.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, 0);
+	    		GL3.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
 
 		gl.glGenVertexArrays(1, vao);
 		gl.glBindVertexArray(vao.get(0));
 		
 
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL4.GL_COLOR, 0, clearColor);
+        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
 		
 		
 		// Start Draw
@@ -156,16 +150,16 @@ public class GLUIDraw {
         int varCol = gl.glGetUniformLocation( prog, "varCol");
         int fixedCol = gl.glGetUniformLocation( prog, "fixedCol");
         
-		gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, positionBufferObject.get(0));
         gl.glEnableVertexAttribArray(GLEngine.Attr.POSITION);
         gl.glEnableVertexAttribArray(GLEngine.Attr.COLOR);
-        gl.glVertexAttribPointer(GLEngine.Attr.POSITION, 4, GL4.GL_FLOAT, false, 4*6, 0);
-        gl.glVertexAttribPointer(GLEngine.Attr.COLOR, 2, GL4.GL_FLOAT, false, 4*6, 4*4);
+        gl.glVertexAttribPointer(GLEngine.Attr.POSITION, 4, GL3.GL_FLOAT, false, 4*6, 0);
+        gl.glVertexAttribPointer(GLEngine.Attr.COLOR, 2, GL3.GL_FLOAT, false, 4*6, 4*4);
 
         gl.glUniform1i( varCol, type.ordinal());
         gl.glUniform1f( fixedCol, fixed);
         
-        gl.glDrawArrays(GL4.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
 
 		// End Draw
         

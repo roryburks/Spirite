@@ -18,8 +18,6 @@ import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine.Method;
-import spirite.pen.StrokeEngine.StrokeParams;
 
 public abstract class StrokeEngine {
 	public enum STATE { READY, DRAWING };
@@ -148,15 +146,15 @@ public abstract class StrokeEngine {
 		stroke = s;
 		
 		strokeLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+				data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		compositionLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+				data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		
 		sel = selection;
 		
 		if( sel.selection != null) {
 			selectionMask = new BufferedImage( 
-					data.getWidth(), data.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+					data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			MUtil.clearImage(selectionMask);
 			
 			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();

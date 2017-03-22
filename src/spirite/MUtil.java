@@ -16,6 +16,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -204,7 +205,7 @@ public class MUtil {
 			Image img = (Image)c.getData(DataFlavor.imageFlavor);
 			
     		BufferedImage bi = new BufferedImage(  
-    				img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB_PRE);
+    				img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR);
     		Graphics g = bi.getGraphics();
     		g.drawImage(img, 0, 0, null);
     		g.dispose();
@@ -246,7 +247,10 @@ public class MUtil {
 		int lpp = image.getColorModel().getPixelSize();
 		if( lpp != 4*8) throw new UnsupportedDataTypeException("Only programmed to deal with 4-byte color data.");
 
-		data.bgcolor = data.pixels[0];
+		data.bgcolor[0] = data.pixels[0];
+		data.bgcolor[1] = data.pixels[1];
+		data.bgcolor[2] = data.pixels[2];
+		data.bgcolor[3] = data.pixels[3];
 
 		// Usually the background color will be the top-left pixel, but
 		//	sometimes it'll be the bottom-right pixel.
@@ -255,11 +259,14 @@ public class MUtil {
 		// Note: this also pulls double-duty of checking the special case
 		//	of the 0th row and column, which simplifies the Binary Search
 		if( !data.rowIsEmpty(0) || ! data.colIsEmpty(0)) {
-			int i = data.h*data.w - 1;
-			data.bgcolor = data.pixels[i];
+			int i = (data.h*data.w - 1)*4;
+			data.bgcolor[0] = data.pixels[i];
+			data.bgcolor[1] = data.pixels[i+1];
+			data.bgcolor[2] = data.pixels[i+2];
+			data.bgcolor[3] = data.pixels[i+3];
 		}
 		
-		if(transparentOnly && ((data.bgcolor >>> 24) & 0xFF) != 0) 
+		if(transparentOnly && (data.bgcolor[0] != 0))
 			return new Rectangle(0,0,data.w,data.h);
 
 		int ret;
@@ -293,11 +300,11 @@ public class MUtil {
 	private static class _ImageCropHelper {
 		final int w;
 		final int h;
-		final int pixels[];
-		int bgcolor;
+		final byte pixels[];
+		final byte bgcolor[] = new byte[4];
 		
 		_ImageCropHelper( BufferedImage image ) {
-			this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+			this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			this.w = image.getWidth();
 			this.h = image.getHeight();
 		}
@@ -305,7 +312,11 @@ public class MUtil {
 		// Sanity checks would be inefficient, let's just assume everything
 		//	works correctly because it's already been tested.
 		boolean verify( int x, int y) {
-			return (pixels[x + y*w] == bgcolor);
+			int i = (x + y*w)*4;
+			return pixels[i] == bgcolor[0] && 
+					pixels[i+1] == bgcolor[1] && 
+					pixels[i+2] == bgcolor[2] && 
+					pixels[i+3] == bgcolor[3];
 		}
 		
 		// Kind of Ugly code in here, but it's a bit much to copy all that

@@ -422,6 +422,8 @@ public class ImageWorkspace {
 			//	
 			return new Point(p.x-ox, p.y-oy);
 		}
+		public int convertX( int x) { return x - ox;}
+		public int convertY( int y) { return y - oy;}
 		
 		// TODO: This might be bad if I ever add rotations etc
 		public Rectangle getBounds() {
@@ -496,7 +498,7 @@ public class ImageWorkspace {
 		@Override
 		public BufferedImage checkoutRaw() {
 			undoEngine.prepareContext(handle);
-			buffer = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB_PRE);
+			buffer = new BufferedImage( width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics gr = buffer.getGraphics();
 			gr.drawImage(this.handle.deepAccess(),
 					ox+dii.ox, 
@@ -510,7 +512,7 @@ public class ImageWorkspace {
 					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
 			BufferedImage bi = new BufferedImage( 
-					activeRect.width, activeRect.height,BufferedImage.TYPE_INT_ARGB_PRE);
+					activeRect.width, activeRect.height,BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the part of the old image over the new one
@@ -535,10 +537,10 @@ public class ImageWorkspace {
 			}
 			BufferedImage nbi;
 			if( cropped == null || cropped.isEmpty()) {
-				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_INT_ARGB_PRE);
+				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_4BYTE_ABGR);
 			}
 			else {
-				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_INT_ARGB_PRE);
+				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_4BYTE_ABGR);
 			}
 			g2 = (Graphics2D)nbi.getGraphics();
 			g2.drawImage(bi, -cropped.x, -cropped.y, null);
@@ -774,7 +776,7 @@ public class ImageWorkspace {
 
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( 
-						newBounds.width, newBounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
+						newBounds.width, newBounds.height, BufferedImage.TYPE_4BYTE_ABGR);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
 				AffineTransform transform = new AffineTransform();		
@@ -882,7 +884,7 @@ public class ImageWorkspace {
 		@Override
 		protected void performImageAction() {
 			BufferedImage img = builtImage.checkoutRaw();
-			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			MUtil.clearImage(buffer);
 			Graphics g = buffer.getGraphics();
 			g.drawImage(img, x, y, null);
@@ -1037,7 +1039,7 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
-		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB_PRE);
+		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics g = img.createGraphics();
         g.setColor( c);
         g.fillRect( 0, 0, width, height);
@@ -1050,7 +1052,7 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
-		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB_PRE);
+		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_4BYTE_ABGR);
 		CachedImage ci = cacheManager.cacheImage( bi, this);
         Graphics g = bi.createGraphics();
         g.setColor( c);

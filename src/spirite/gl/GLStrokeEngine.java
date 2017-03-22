@@ -1,13 +1,12 @@
 package spirite.gl;
 
 import java.awt.AlphaComposite;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL4;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -20,7 +19,6 @@ import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
-import spirite.pen.StrokeEngine.StrokeParams;
 
 public class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
@@ -71,8 +69,8 @@ public class GLStrokeEngine extends StrokeEngine {
 			PenState recState = prec.get(i);
 			int off = (i+1)*6;
 			// x y z w
-			raw[off+0] = recState.x;
-			raw[off+1] = recState.y;
+			raw[off+0] = data.convertX(recState.x);
+			raw[off+1] = data.convertY(recState.y);
 			raw[off+2] = 0.0f;
 			raw[off+3] = 1.0f;
 			
@@ -109,8 +107,8 @@ public class GLStrokeEngine extends StrokeEngine {
 		for( int i=0; i< states.length; ++i) {
 			int off = (i+1)*6;
 			// x y z w
-			raw[off+0] = states[i].x;
-			raw[off+1] = states[i].y;
+			raw[off+0] = data.convertX(states[i].x);
+			raw[off+1] = data.convertY(states[i].y);
 			raw[off+2] = 0.0f;
 			raw[off+3] = 1.0f;
 			
@@ -141,26 +139,26 @@ public class GLStrokeEngine extends StrokeEngine {
 		int h = data.getHeight();
 		
 		engine.setSurfaceSize( w, h);
-		GL4 gl = engine.getGL4();
+		GL3 gl = engine.getGL3();
 		
 		
 		PreparedData pd = engine.prepareRawData(glvb.vBuffer);
 
 		// Clear Surface
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL4.GL_COLOR, 0, clearColor);
+        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
 
         int prog = engine.getProgram(ProgramType.BASIC_STROKE);
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
-        gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
         gl.glEnableVertexAttribArray( ATTR_POS);
         gl.glEnableVertexAttribArray( ATTR_SIZE);
         gl.glEnableVertexAttribArray( ATTR_PRESSURE);
-        gl.glVertexAttribPointer( ATTR_POS, 4, GL4.GL_FLOAT, false, STRIDE, 0);
-        gl.glVertexAttribPointer( ATTR_SIZE, 1, GL4.GL_FLOAT, false, STRIDE, 4*4);
-        gl.glVertexAttribPointer( ATTR_PRESSURE, 1, GL4.GL_FLOAT, false, STRIDE, 4*5);
+        gl.glVertexAttribPointer( ATTR_POS, 4, GL3.GL_FLOAT, false, STRIDE, 0);
+        gl.glVertexAttribPointer( ATTR_SIZE, 1, GL3.GL_FLOAT, false, STRIDE, 4*4);
+        gl.glVertexAttribPointer( ATTR_PRESSURE, 1, GL3.GL_FLOAT, false, STRIDE, 4*5);
         
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
@@ -177,10 +175,10 @@ public class GLStrokeEngine extends StrokeEngine {
         
 
         gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL4.GL_SRC_ALPHA, GL4.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL4.GL_MAX);
+        gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL3.GL_MAX);
 
-    	gl.glDrawArrays(GL4.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
+    	gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
         
 
 

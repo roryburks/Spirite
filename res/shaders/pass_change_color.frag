@@ -13,15 +13,8 @@ uniform int optionMask;
 
 void main()
 {
-	vec4 texCol = texture(myTexture, vUV).rgba;
-	if( texCol.a != 0) {
-		// AWTTextureIO.newTexture comes premultiplied, but 
-		//	AWTGLReadBufferUtil.readPixelsToBufferedImage
-		//	inteprets it as non-premultiplied.  Go figure.
-		texCol.r /= texCol.a;
-		texCol.g /= texCol.a;
-		texCol.b /= texCol.a;
-	}
+	vec4 intex = texture(myTexture, vUV);
+	vec4 texCol = vec4(intex[1],intex[2],intex[3],intex[0]);
 	
 	if( distance(cFrom.r , texCol.r) < thresh &&
 		distance(cFrom.g , texCol.g) < thresh &&

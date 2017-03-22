@@ -34,8 +34,6 @@ import spirite.image_data.layers.Layer;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
-import spirite.pen.StrokeEngine.Method;
-import spirite.pen.StrokeEngine.StrokeParams;
 
 /**
  * @author Guy
@@ -83,7 +81,7 @@ public class Test1 {
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			
 			workspace.getUndoEngine().performAndStore(
 					rig.createAddPartAction(bi, 0, 0, 0,""));

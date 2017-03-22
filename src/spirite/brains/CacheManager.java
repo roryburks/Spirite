@@ -192,7 +192,7 @@ public class CacheManager {
 			return null;
 		
 		CachedImage c = new CachedImage(domain);
-		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB_PRE));
+		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_4BYTE_ABGR));
 		
 		if( c.data == null) {
 			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
@@ -206,7 +206,7 @@ public class CacheManager {
 	/** Put an existing image into the Cache. */
 	public CachedImage cacheImage( BufferedImage image, Object domain) {
 		if( image == null) {
-			image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB_PRE);
+			image = new BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR);
 			MUtil.clearImage(image);
 		}
 		CachedImage c = new CachedImage(domain);

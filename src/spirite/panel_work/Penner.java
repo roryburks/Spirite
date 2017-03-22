@@ -14,7 +14,6 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.MUtil;
@@ -37,7 +36,6 @@ import spirite.image_data.SelectionEngine.BuildMode;
 import spirite.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionBuilder;
-import spirite.image_data.SelectionEngine.SelectionType;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.UndoEngine.UndoableAction;
 import spirite.image_data.layers.SpriteLayer;
@@ -47,8 +45,6 @@ import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
-import spirite.pen.StrokeEngine.Method;
-import spirite.pen.StrokeEngine.StrokeParams;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -201,7 +197,7 @@ public class Penner
 			case BOX_SELECTION: {
 				Selection selection = selectionEngine.getSelection();
 				
-				if( selection != null && 
+				if( selection != null &&  !holdingShift && !holdingCtrl &&
 						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
 				{
 					behavior = new MovingSelectionBehavior();
@@ -223,7 +219,7 @@ public class Penner
 			case FREEFORM_SELECTION: {
 				Selection selection = selectionEngine.getSelection();
 				
-				if( selection != null && 
+				if( selection != null && !holdingShift && !holdingCtrl &&
 						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
 				{
 					behavior = new MovingSelectionBehavior();
