@@ -28,6 +28,12 @@ import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.ProgramType;
 import spirite.gl.GLUIDraw.GradientType;
 
+
+/**
+ * 
+ * @author Guy
+ *
+ */
 public class JOGLDrawer {
 	private final GLEngine engine = GLEngine.getInstance();
 	

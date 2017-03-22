@@ -33,6 +33,7 @@ import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.BuildMode;
 import spirite.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionBuilder;
@@ -207,8 +208,16 @@ public class Penner
 				}
 				else  {
 					ToolSettings settings = toolsetManager.getToolSettings(Tool.BOX_SELECTION);
-					
-					behavior = new FormingSelectionBehavior((Integer)settings.getValue("shape"));
+
+					BuildMode mode;
+					if( holdingShift && holdingCtrl)
+						mode = BuildMode.INTERSECTION;
+					else if( holdingShift)
+						mode = BuildMode.ADD;
+					else if( holdingCtrl)
+						mode = BuildMode.SUBTRACT;
+					else mode = BuildMode.DEFAULT;
+					behavior = new FormingSelectionBehavior((Integer)settings.getValue("shape"), mode);
 				}
 				break;}
 			case FREEFORM_SELECTION: {
@@ -220,7 +229,15 @@ public class Penner
 					behavior = new MovingSelectionBehavior();
 				}
 				else  {
-					behavior = new FreeFormingSelectionBehavior();
+					BuildMode mode;
+					if( holdingShift && holdingCtrl)
+						mode = BuildMode.INTERSECTION;
+					else if( holdingShift)
+						mode = BuildMode.ADD;
+					else if( holdingCtrl)
+						mode = BuildMode.SUBTRACT;
+					else mode = BuildMode.DEFAULT;
+					behavior = new FreeFormingSelectionBehavior(mode);
 				}
 				break;}
 			case MOVE:{
@@ -596,8 +613,10 @@ public class Penner
 	
 	class FormingSelectionBehavior extends StateBehavior {
 		private final int shape;
-		FormingSelectionBehavior( int shape) {
+		private final BuildMode mode;
+		FormingSelectionBehavior( int shape, BuildMode mode) {
 			this.shape = shape;
+			this.mode = mode;
 		}
 		@Override
 		public void start() {
@@ -612,7 +631,7 @@ public class Penner
 				break;
 			}
 			
-			selectionEngine.startBuildingSelection( builder, x, y);
+			selectionEngine.startBuildingSelection( builder, x, y, mode);
 		}
 		@Override
 		public void onMove() {
@@ -631,11 +650,15 @@ public class Penner
 
 	class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 		private boolean drawing = true;
+		private final BuildMode mode;
 		private FreeformSelectionBuilder builder;
+		FreeFormingSelectionBehavior( BuildMode mode) {
+			this.mode = mode;
+		}
 		@Override
 		public void start() {
 			builder = selectionEngine.new FreeformSelectionBuilder();
-			selectionEngine.startBuildingSelection( builder, x, y);
+			selectionEngine.startBuildingSelection( builder, x, y, mode);
 		}
 
 		@Override

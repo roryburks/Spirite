@@ -37,6 +37,7 @@ import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager;
 import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.SelectionEngine.RectSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
@@ -654,8 +655,8 @@ public class MasterControl
     	
     	public SelectionCommandExecuter() {
     		commandMap.put("all", new Runnable() {@Override public void run() {
-    			selectionEngine.setSelection(
-    					new RectSelection(workspace.getWidth(),workspace.getHeight()), 0, 0);
+    			selectionEngine.setSelection( new BuiltSelection(
+    					new RectSelection(workspace.getWidth(),workspace.getHeight()), 0, 0));
     		}});
     		commandMap.put("none", new Runnable() {@Override public void run() {
     			selectionEngine.unselect();

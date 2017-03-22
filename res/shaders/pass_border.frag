@@ -29,7 +29,6 @@ void main()
 			else
 				outputColor = vec4(1,1,1,1);
 		}
-		   
 	}
 	else
 		outputColor = vec4(0,0,0,0);

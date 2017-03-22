@@ -1,6 +1,8 @@
 package spirite.gl;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
@@ -196,9 +198,14 @@ public class GLStrokeEngine extends StrokeEngine {
         		.readPixelsToBufferedImage(
         				gl, 0, 0, w, h, true); 
 		MUtil.clearImage(strokeLayer);
-		Graphics g = strokeLayer.getGraphics();
-		g.drawImage(im, 0, 0, null);
-		
+		Graphics2D g2 = (Graphics2D)strokeLayer.getGraphics();
+		g2.drawImage(im, 0, 0, null);
+
+		if( sel.selection != null) {
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
+			g2.drawImage(selectionMask, 0, 0, null);
+		}
+		g2.dispose();
 	}
 	
 }

@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,10 +85,14 @@ public class SelectionEngine {
 	
 	// Stored for the UndoEngine
 	private BuiltSelection oldSelection = new BuiltSelection(null, 0, 0);
-	
+
 	// Variables relating to Building
 	private boolean building = false;
 	private SelectionBuilder selectionBuilder;	// Only used when building a selection
+	public enum BuildMode {
+		DEFAULT, ADD, SUBTRACT, INTERSECTION
+	};
+	private BuildMode buildMode;
 	
 	SelectionEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
@@ -201,8 +206,11 @@ public class SelectionEngine {
 	}
 	
 	
-	// :::: Selection Building
-	public void startBuildingSelection( SelectionBuilder builder, int x, int y) {
+	// ===================
+	// ==== Selection Building
+	// ===================
+	
+	public void startBuildingSelection( SelectionBuilder builder, int x, int y, BuildMode mode) {
 		if( builder == null) return;
 		
 		// !!!! For the engine to work as expected, it is important that the user
@@ -213,6 +221,7 @@ public class SelectionEngine {
 		// Start building
 		building = true;
 		selectionBuilder = builder;
+		buildMode = mode;
 		selectionBuilder.start(x, y);
 	}
 	
@@ -230,13 +239,22 @@ public class SelectionEngine {
 	public void finishBuildingSelection() {
 		building = false;
 		
-		// Then Store the action and perform it
-		UndoableAction action = createNewSelect( selectionBuilder.build());
-		action.performAction();
-		undoEngine.storeAction(  action);
+		switch( buildMode) {
+		case DEFAULT:
+			setSelection(selectionBuilder.build());
+			break;
+		case ADD:
+			setSelection(combineSelection(getBuiltSelection(),selectionBuilder.build()));
+			break;
+		case SUBTRACT:
+			setSelection(subtractSelection(getBuiltSelection(),selectionBuilder.build()));
+			break;
+		case INTERSECTION:
+			setSelection(intersectSelection(getBuiltSelection(),selectionBuilder.build()));
+			break;
+		}
 		
-		triggerBuildingSelection(null);
-		triggerSelectionChanged(null);
+		
 	}
 	
 	public void cancelBuildingSelection() {
@@ -246,16 +264,67 @@ public class SelectionEngine {
 	}
 	
 	// :::: Selection Setting
-	public void setSelection( Selection selection, int ox, int oy) {
-		undoEngine.performAndStore( createNewSelect(new BuiltSelection(selection, ox, oy)));
+	public void setSelection( BuiltSelection selection) {
+		undoEngine.performAndStore( createNewSelect(selection));
+		triggerBuildingSelection(null);
+		triggerSelectionChanged(null);
+	}
+	
+	public BuiltSelection combineSelection( BuiltSelection sel1, BuiltSelection sel2) {
+		BufferedImage bi = new BufferedImage(
+				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+		
+		Graphics g = bi.getGraphics();
+		if( sel1 != null)
+			sel1.drawSelectionMask(g);
+		if( sel2 != null)
+			sel2.drawSelectionMask(g);
+		g.dispose();
+		
+		return new BuiltSelection( bi);
+	}
+	public BuiltSelection subtractSelection( BuiltSelection sel1, BuiltSelection sel2){
+
+		BufferedImage bi = new BufferedImage(
+				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+		
+		Graphics2D g2 = (Graphics2D)bi.getGraphics();
+		if( sel1 != null)
+			sel1.drawSelectionMask(g2);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+		if( sel2 != null)
+			sel2.drawSelectionMask(g2);
+		g2.dispose();
+
+		return new BuiltSelection( bi);
+	}
+	public BuiltSelection intersectSelection( BuiltSelection sel1, BuiltSelection sel2){
+		BufferedImage bi = new BufferedImage(
+				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+		BufferedImage bi2 = new BufferedImage(
+				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+		
+		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
+		
+		Graphics2D g2 = (Graphics2D)bi.getGraphics();
+		sel1.drawSelectionMask(g2);
+		g2.dispose();
+		
+
+		g2 = (Graphics2D)bi2.getGraphics();
+		sel2.drawSelectionMask(g2);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
+		g2.drawImage( bi, 0, 0, null);
+		g2.dispose();
+
+		return new BuiltSelection( bi2);
 	}
 	
 
+	/** Anchors the current floating selection into the active layer*/
 	public void anchorSelection() {
 		if( !scope.isLifted()) return;
 		
-		
-
 		List<UndoableAction> actions = new ArrayList<>(2);
 		
 		actions.add(new PasteSelectionAction(
@@ -266,6 +335,8 @@ public class SelectionEngine {
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
 	}
+	
+	
 	public void imageToSelection( BufferedImage bi, int ox, int oy) {
 		if( bi == null) return;
 		
@@ -745,30 +816,11 @@ public class SelectionEngine {
 			g.fillPolygon(pg);
 			g.dispose();
 			
-			try {
-				Rectangle bounds = MUtil.findContentBounds(bi, 2, true);
-				if( bounds == null || bounds.isEmpty())
-					return new BuiltSelection( null, 0, 0);
-				
-				BufferedImage bi2 = bi;
-				bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
-				g = bi.getGraphics();
-				g.drawImage(bi2, -bounds.x, -bounds.y, null);
-				g.dispose();
-				return new BuiltSelection(new ImageSelection(bi), bounds.x, bounds.y);
-			} catch (UnsupportedDataTypeException e) {
-				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
-			}
-			
-			
-			return new BuiltSelection(new ImageSelection(bi), 0, 0);
+			return new BuiltSelection(bi);
 		}
 
 		@Override
 		protected void draw(Graphics g) {
-			System.out.println(compactor.size());
-			Graphics2D g2 = (Graphics2D)g;
-
 			int ox = compactor.get(0);
 			int oy = compactor.get(1);
 			int nx, ny;
@@ -790,7 +842,7 @@ public class SelectionEngine {
 		
 	}
 	
-	public class ImageSelection extends Selection {
+	public static class ImageSelection extends Selection {
 		private final BufferedImage bi;
 		
 		/** NOTE: To properly draw the border, the supplied buffered image should
@@ -801,7 +853,7 @@ public class SelectionEngine {
 		}
 		@Override
 		public void drawSelectionBounds(Graphics g) {
-			g.drawImage(GLUIDraw.drawBounds(bi), 0, 0, null);
+			g.drawImage(GLUIDraw.drawBounds(bi,null), 0, 0, null);
 		}
 		@Override
 		public void drawSelectionMask(Graphics g) {
@@ -830,19 +882,48 @@ public class SelectionEngine {
 		void draw(Graphics g);
 		Rectangle getBounds();
 	}
-	public class BuiltSelection {
+	public static class BuiltSelection {
 		public final Selection selection;
 		public final int offsetX;
 		public final int offsetY;
+		
+		public BuiltSelection( BufferedImage bi) {
+			Rectangle bounds = null;
+			try {
+				bounds = MUtil.findContentBounds(bi, 2, true);
+			} catch (UnsupportedDataTypeException e) {
+				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
+			}
+			if( bounds == null || bounds.isEmpty()) {
+				selection = null;
+				offsetX = 0;
+				offsetY = 0;
+			}
+			else {
+				BufferedImage bi2 = bi;
+				bi = new BufferedImage( 
+						bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB_PRE);
+				Graphics g = bi.getGraphics();
+				g.drawImage(bi2, -bounds.x, -bounds.y, null);
+				g.dispose();
+				
+				selection = new ImageSelection(bi);
+				offsetX = bounds.x;
+				offsetY = bounds.y;
+			}
+		}
+		
 		public BuiltSelection(Selection selection, int offsetX, int offsetY){
 			this.selection = selection;
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
 		}
-		public void drawSelectionMask(Graphics2D g2) {
+		public void drawSelectionMask(Graphics g) {
+			if( selection == null) return;
+			Graphics2D g2 = (Graphics2D)g;
 			AffineTransform trans = g2.getTransform();
 			
-			g2.translate(offsetX, offsetY);
+			g.translate(offsetX, offsetY);
 			selection.drawSelectionMask(g2);
 			
 			g2.setTransform(trans);
