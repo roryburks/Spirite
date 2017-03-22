@@ -12,13 +12,13 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import mutil.MatrixBuilder;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.PreparedTexture;
 import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLParameters.GLParam1i;
+import spirite.gl.GLParameters.GLParam4f;
 
 
 /**
@@ -36,11 +36,8 @@ public class JOGLDrawer {
     static int height = 480; 
     static int numPoints = 1000; 
     static Random r = new Random(); 
-
-    /**
-     * @param options 0th bit: 0 = ignore alpha, 1 = test alpha
-     */
-    public void changeColor( BufferedImage bi, Color from, Color to, int options) {
+    
+    private void applyProgram( BufferedImage bi, int prog, GLParameters params){
 		GL3 gl = engine.getGL3();
 		
 		int w = bi.getWidth();
@@ -59,8 +56,6 @@ public class JOGLDrawer {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
         gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
         
-        int prog = engine.getProgram(ProgramType.CHANGE_COLOR);
-        System.out.println(prog);
         gl.glUseProgram(prog);
         
         // Bind Attribute Streams
@@ -74,21 +69,17 @@ public class JOGLDrawer {
 		PreparedTexture pt = engine.prepareTexture(bi);
 		gl.glEnable(GL3.GL_TEXTURE_2D);
 		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
-		
-		// Bind Uniforms
-		int cFrom = gl.glGetUniformLocation(prog, "cFrom");
-		int cTo = gl.glGetUniformLocation(prog, "cTo");
-		int optionMask = gl.glGetUniformLocation(prog, "optionMask");
-        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
-		gl.glUniform4f( cFrom, from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f);
-		gl.glUniform4f( cTo, to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f);
-		gl.glUniform1i(optionMask, options);
 
+		// Bind Uniforms
+        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
         	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
         );
         gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
-		
+        
+        if( params != null)
+        	params.apply(gl, prog);
+
 		// Start Draw
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
@@ -99,10 +90,8 @@ public class JOGLDrawer {
 		// Finished Drawing
 		gl.glDisable(GL3.GL_TEXTURE_2D);
 		gl.glDisableVertexAttribArray(0);
-		gl.glDisableVertexAttribArray(1);        gl.glUseProgram(0);
-
-//		texture.disable(gl);
-//		texture.destroy(gl);
+		gl.glDisableVertexAttribArray(1);
+        gl.glUseProgram(0);
         pt.free();
 		pd.free();
 		
@@ -114,5 +103,24 @@ public class JOGLDrawer {
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);
 		g.drawImage(im, 0, 0, null);
+    }
+
+    /**
+     * @param options 0th bit: 0 = ignore alpha, 1 = test alpha
+     */
+    public void changeColor( BufferedImage bi, Color from, Color to, int options) {
+    	GLParameters params = new GLParameters();
+
+    	params.addParam( new GLParam1i("optionMask", options));
+    	params.addParam( new GLParam4f("cFrom", 
+    			from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f));
+    	params.addParam( new GLParam4f("cTo", 
+    			to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f));
+    	
+    	applyProgram(bi, engine.getProgram(ProgramType.CHANGE_COLOR), params);
+    }
+    
+    public void invert( BufferedImage bi) {
+    	applyProgram( bi, engine.getProgram(ProgramType.PASS_INVERT), null);
     }
 }

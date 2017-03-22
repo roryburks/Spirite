@@ -174,6 +174,7 @@ public class GLStrokeEngine extends StrokeEngine {
         gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
         
 
+        gl.glEnable(GL3.GL_MULTISAMPLE);
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL3.GL_MAX);
@@ -183,6 +184,7 @@ public class GLStrokeEngine extends StrokeEngine {
 
 
         gl.glDisable( GL.GL_BLEND);
+        gl.glDisable(GL3.GL_MULTISAMPLE);
 
         gl.glDisableVertexAttribArray( ATTR_POS);
         gl.glDisableVertexAttribArray( ATTR_SIZE);

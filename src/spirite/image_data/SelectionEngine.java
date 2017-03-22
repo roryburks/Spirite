@@ -316,6 +316,20 @@ public class SelectionEngine {
 
 		return new BuiltSelection( bi2);
 	}
+	public BuiltSelection invertSelection( BuiltSelection sel) {
+		BufferedImage bi = new BufferedImage(
+				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		
+		Graphics2D g2 = (Graphics2D)bi.getGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+		if( sel != null)
+			sel.drawSelectionMask(g2);
+		g2.dispose();
+
+		return new BuiltSelection( bi);
+	}
 	
 
 	/** Anchors the current floating selection into the active layer*/
@@ -337,12 +351,22 @@ public class SelectionEngine {
 	public void imageToSelection( BufferedImage bi, int ox, int oy) {
 		if( bi == null) return;
 		
+		
+		
 		List<UndoableAction> actions = new ArrayList<>(2);
-		actions.add(createNewSelect(new BuiltSelection(new RectSelection(bi.getWidth(), bi.getHeight()), ox, oy)));
+		actions.add(createNewSelect(buildRectSelection(
+				new Rectangle( ox, oy, bi.getWidth(), bi.getHeight()))));
 		startLiftAction = new StartLiftAction(bi);
 		actions.add( startLiftAction);
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Pasted Image to Layer"));
+	}
+	
+	public BuiltSelection buildRectSelection( Rectangle rect) {
+		RectSelectionBuilder rsb = new RectSelectionBuilder();
+		rsb.start(rect.x, rect.y);
+		rsb.update(rect.x+rect.width, rect.y+rect.height);
+		return rsb.build();
 	}
 	
 	
@@ -663,58 +687,21 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			Rectangle buildingRect = new Rectangle( 
+			BufferedImage bi = new BufferedImage( 
+					workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			Graphics g = bi.getGraphics();
+			g.fillRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
+			g.dispose();
 			
-			Rectangle intersection = buildingRect.intersection(
-					new Rectangle(0,0, workspace.getWidth(), workspace.getHeight()));
-			
-			if( intersection == null || intersection.isEmpty())
-				return new BuiltSelection( null, 0, 0);
-			
-			return new BuiltSelection( new RectSelection(
-					intersection.width, intersection.height), intersection.x, intersection.y);
+			return new BuiltSelection( bi);
 		}
 		@Override
 		protected void draw(Graphics g) {
 			g.drawRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
-		}
-	}
-	
-	/***
-	 * Simple Rectangular Selection
-	 */
-	public static class RectSelection extends Selection {
-		int width;
-		int height;
-		public RectSelection( int width, int height) {
-			this.width = width;
-			this.height = height;
-		}
-		@Override
-		public void drawSelectionBounds( Graphics g) {
-			g.drawRect( 0, 0, width, height);
-		}
-		@Override
-		public void drawSelectionMask( Graphics g) {
-			g.setColor( Color.black);
-			g.fillRect(0, 0, width, height);
-		}
-		@Override
-		public Dimension getDimension() {
-			return new Dimension( width, height);
-		}
-		@Override
-		public boolean contains( int x, int y) {
-			return (new Rectangle( 0, 0, width, height)).contains(x,y);
-		}
-
-		@Override
-		public RectSelection clone()  {
-			return new RectSelection( width, height);
 		}
 	}
 	
@@ -752,35 +739,6 @@ public class SelectionEngine {
 			g.drawOval(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
-		}
-	}
-	public static class OvalSelection extends Selection {
-		private int width;
-		private int height;
-		public OvalSelection( int width, int height) {
-			this.width = width;
-			this.height = height;
-		}
-		@Override
-		public void drawSelectionBounds( Graphics g) {
-			g.drawOval( 0, 0, width, height);
-		}
-		@Override
-		public void drawSelectionMask( Graphics g) {
-			g.setColor( Color.black);
-			g.fillOval(0, 0, width, height);
-		}
-		@Override
-		public Dimension getDimension() {
-			return new Dimension( width, height);
-		}
-		@Override
-		public boolean contains( int x, int y) {
-			return (new Rectangle( 0, 0, width, height)).contains(x,y);
-		}
-		@Override
-		public OvalSelection clone()  {
-			return new OvalSelection( width, height);
 		}
 	}
 	public class FreeformSelectionBuilder extends SelectionBuilder {
@@ -844,9 +802,10 @@ public class SelectionEngine {
 		public ImageSelection(BufferedImage bi) {
 			this.bi = bi;
 		}
+		static int c = 0;
 		@Override
 		public void drawSelectionBounds(Graphics g) {
-			g.drawImage(GLUIDraw.drawBounds(bi,null), 0, 0, null);
+			g.drawImage(GLUIDraw.drawBounds(bi,null, c--), 0, 0, null);
 		}
 		@Override
 		public void drawSelectionMask(Graphics g) {
@@ -854,7 +813,7 @@ public class SelectionEngine {
 		}
 		@Override
 		public boolean contains(int x, int y) {
-			if( x < 0 || x > bi.getWidth() || y < 0 || y > bi.getHeight())
+			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
 				return false;
 			
 			return ((bi.getRGB(x, y) >>> 24)!= 0);

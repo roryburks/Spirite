@@ -171,8 +171,6 @@ public class DrawEngine {
 		
 		Node selected = null;
 		
-		
-		
 		switch( scope) {
 		case 0:	// Local
 			BuiltImageData bid = workspace.buildActiveData();
@@ -206,17 +204,16 @@ public class DrawEngine {
 			undoEngine.performAndStore(action);
 			break;
 		}
-		
+	}
+	public void invert(BuiltImageData data) {
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		execute( new InvertAction(data, mask));
 	}
 	
-	
-	
-	// Stroke Code
-	
-	
 
 
-	
+	// Defauilt Dynamics
+	// TODO: This should probably be in some settings area
 	public static PenDynamics getBasicDynamics() {
 		return basicDynamics;
 	}
@@ -559,11 +556,10 @@ public class DrawEngine {
 				
 				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
 
-
 				BufferedImage buffer = flipImage(lifted);
 
 				Graphics2D g2 = (Graphics2D) builtImage.checkout();
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 				mask.drawSelectionMask(g2);
 				
 
@@ -611,17 +607,48 @@ public class DrawEngine {
 
 	public class ScaleAction extends MaskedImageAction 
 	{
-
 		ScaleAction(BuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		
-
 		@Override
 		protected void performImageAction() {
 		}
 	}
-	public class ColorChangeAction extends MaskedImageAction 
+	
+	public abstract class PerformFilterAction extends MaskedImageAction
+	{
+
+		PerformFilterAction(BuiltImageData data, BuiltSelection mask) {
+			super(data, mask);
+		}
+
+		@Override
+		protected void performImageAction() {
+			if( mask != null && mask.selection != null) {
+				// Lift the Selection
+				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
+				applyFilter(lifted);
+
+				Graphics2D g2 = (Graphics2D) builtImage.checkout();
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+				mask.drawSelectionMask(g2);
+
+
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
+			}
+			else {
+				BufferedImage bi = builtImage.checkoutRaw();
+				applyFilter(bi);
+			}
+			builtImage.checkin();
+		}
+		
+		abstract void applyFilter( BufferedImage image);
+		
+	}
+	public class ColorChangeAction extends PerformFilterAction 
 	{
 		private final Color from, to;
 		private final boolean ignoreAlpha;
@@ -637,29 +664,19 @@ public class DrawEngine {
 			this.ignoreAlpha = ignoreAlpha;
 			description = "Color Change Action";
 		}
-		
 		@Override
-		protected void performImageAction() {
-			int options = (ignoreAlpha)? 0:1; 
-
-			if( mask != null && mask.selection != null) {
-				
-				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
-				jogl.changeColor(lifted, from, to, options);
-
-				Graphics2D g2 = (Graphics2D) builtImage.checkout();
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-				mask.drawSelectionMask(g2);
-
-
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
-			}
-			else {
-				BufferedImage bi = builtImage.checkoutRaw();
-				jogl.changeColor(bi, from, to, options);
-			}
-			builtImage.checkin();
+		void applyFilter(BufferedImage image) {
+			int options = (ignoreAlpha)?0:1;
+			jogl.changeColor(image, from, to, options);
+		}
+	}
+	public class InvertAction extends PerformFilterAction {
+		InvertAction(BuiltImageData data, BuiltSelection mask) {
+			super(data, mask);
+		}
+		@Override
+		void applyFilter(BufferedImage image) {
+			jogl.invert(image);
 		}
 	}
 	

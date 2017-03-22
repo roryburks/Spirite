@@ -9,14 +9,11 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import mutil.MatrixBuilder;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.PreparedTexture;
 import spirite.gl.GLEngine.ProgramType;
-import sun.awt.image.IntegerInterleavedRaster;
 
 /** 
  * GLUIDraw is a mostly-static (needs to be linked to a non-static GLEngine
@@ -46,7 +43,7 @@ public class GLUIDraw {
 	 * @return
 	 */
 	public static BufferedImage drawBounds( 
-			BufferedImage image, Rectangle UNUSED) 
+			BufferedImage image, Rectangle UNUSED, int cycle) 
 	{
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -83,10 +80,12 @@ public class GLUIDraw {
 		
         // Bind Uniforms
         int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+        int uCycle = gl.glGetUniformLocation( prog, "uCycle");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
         	MatrixBuilder.orthagonalProjectionMatrix( 0, w, 0, h, -1, 1)
         );
         gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
+        gl.glUniform1i(uCycle, cycle);
 
         // Start Draw
 		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);

@@ -62,6 +62,7 @@ public class HotkeyManager {
                 {"draw.toggle_reference", (new Hotkey( KeyEvent.VK_BACK_QUOTE, 0))},	
                 {"draw.clearLayer", (new Hotkey( KeyEvent.VK_DELETE, 0))},
                 {"draw.toggle", (new Hotkey( KeyEvent.VK_TAB, 0))},
+                {"draw.invert", (new Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK ))},
 
                 {"draw.shiftLeft", (new Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 {"draw.shiftRight", (new Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
@@ -70,6 +71,7 @@ public class HotkeyManager {
 
                 {"select.all", (new Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK))},
                 {"select.none", (new Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
+                {"select.invert", (new Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
                 
                 {"global.save_image", (new Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK))},
                 {"global.copy", (new Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK))},

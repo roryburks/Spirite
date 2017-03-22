@@ -38,7 +38,6 @@ import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.BuiltSelection;
-import spirite.image_data.SelectionEngine.RectSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
 import spirite.panel_work.WorkPanel.Zoomer;
@@ -619,6 +618,13 @@ public class MasterControl
 				if( node != null)
 					workspace.cropNode(node, new Rectangle(0,0,workspace.getWidth(), workspace.getHeight()), false);
     		}});
+    		commandMap.put("invert", new Runnable() {@Override public void run() {
+    			BuiltImageData data= workspace.buildActiveData();
+    			
+    			if( data != null) {
+    				workspace.getDrawEngine().invert(data);
+    			}
+    		}});
     	}
 
 		@Override public List<String> getValidCommands() {
@@ -655,11 +661,16 @@ public class MasterControl
     	
     	public SelectionCommandExecuter() {
     		commandMap.put("all", new Runnable() {@Override public void run() {
-    			selectionEngine.setSelection( new BuiltSelection(
-    					new RectSelection(workspace.getWidth(),workspace.getHeight()), 0, 0));
+    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
+    					new Rectangle(0,0,workspace.getWidth(), workspace.getHeight())));
+
     		}});
     		commandMap.put("none", new Runnable() {@Override public void run() {
     			selectionEngine.unselect();
+    		}});
+    		commandMap.put("invert", new Runnable() {@Override public void run() {
+    			BuiltSelection sel = selectionEngine.getBuiltSelection();
+    			selectionEngine.setSelection( selectionEngine.invertSelection(sel));
     		}});
 		}
     	

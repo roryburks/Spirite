@@ -14,7 +14,8 @@ uniform int optionMask;
 void main()
 {
 	vec4 intex = texture(myTexture, vUV);
-	vec4 texCol = vec4(intex[1],intex[2],intex[3],intex[0]);
+	vec4 texCol = vec4(intex[3],intex[2],intex[1],intex[0]);
+	
 	
 	if( distance(cFrom.r , texCol.r) < thresh &&
 		distance(cFrom.g , texCol.g) < thresh &&

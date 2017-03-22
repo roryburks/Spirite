@@ -9,12 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import javax.swing.AbstractSpinnerModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
@@ -53,16 +55,12 @@ public class AnimationPreviewPanel extends OmniComponent
 	
 	
     private final Hashtable<Integer, JLabel> sliderDoc = new Hashtable<>();
-    JLabel lbLeft = new JLabel();
-    JLabel lbRight = new JLabel();
 	
-//    private Animation animation = null;
-    
-	// Metronome settings
+	// Display Settings
 	private float start = 0.0f;
 	private float end = 2.0f;
 	private float tps = 8.0f;
-//	private float met = 0.0f;
+	private int zoom_level = 1;
 	
 
 	private final MasterControl master;
@@ -71,6 +69,8 @@ public class AnimationPreviewPanel extends OmniComponent
 	
 
 	// Start Design
+    private final JLabel lbLeft = new JLabel();
+    private final JLabel lbRight = new JLabel();
     private final DisplayPanel previewPanel = new DisplayPanel();
     private MTextFieldNumber tfFPS;
     private final JButton buttonBack = new JButton();
@@ -79,6 +79,7 @@ public class AnimationPreviewPanel extends OmniComponent
     private final JButton buttonExport = new JButton();
     private final JSlider slider = new JSlider();
     private final SliderLimiter sliderLimiter = new SliderLimiter();
+    private final JSpinner spinner = new JSpinner();
     
 	
     /**
@@ -97,32 +98,25 @@ public class AnimationPreviewPanel extends OmniComponent
     	}
     	else
     		animationManager = null;
+        master.addCurrentImageObserver(this);
     	
-        
+        // Initialize UI
         initComponents();
+        initBindings();
         
         timer = new Timer(16, this);
         timer.setRepeats(true);
         timer.start();
         
-        
         updateSlider();
 
-        slider.addChangeListener(this);
-        
         // Add Listeners
+        slider.addChangeListener(this);
         tfFPS.getDocument().addDocumentListener( this);
-        master.addCurrentImageObserver(this);
         buttonBack.addActionListener(this);
         buttonPlay.addActionListener(this);
         buttonForward.addActionListener(this);
         buttonExport.addActionListener(this);
-        
-        buttonBack.setIcon(Globals.getIcon("icon.anim.stepB"));
-        buttonPlay.setIcon(Globals.getIcon("icon.anim.play"));
-        buttonForward.setIcon(Globals.getIcon("icon.anim.stepF"));
-        buttonExport.setIcon(Globals.getIcon("icon.anim.export"));
-        buttonExport.setToolTipText("Export Animation");
         
 
         if( animationManager != null) {
@@ -132,17 +126,23 @@ public class AnimationPreviewPanel extends OmniComponent
     private void initComponents() {
         Dimension size = new Dimension(24,24);
         
-        // Init Slider Properties
+        // Init ComponentProperties
         slider.setEnabled(true);
-		
         
         tfFPS = new MTextFieldNumber( true, true);
         tfFPS.setColumns(8);
         
+        buttonBack.setIcon(Globals.getIcon("icon.anim.stepB"));
+        buttonPlay.setIcon(Globals.getIcon("icon.anim.play"));
+        buttonForward.setIcon(Globals.getIcon("icon.anim.stepF"));
+        buttonExport.setIcon(Globals.getIcon("icon.anim.export"));
+        buttonExport.setToolTipText("Export Animation");
+        
         JLabel lblFps = new JLabel("FPS");
+        JLabel lbZoom = new JLabel("Zoom:");
         
+        // Init Layout
         GroupLayout layout = new GroupLayout(this);
-        
         
         Dimension previewSize = (master.getCurrentWorkspace() == null)
         		? new Dimension( 128,128)
@@ -167,6 +167,9 @@ public class AnimationPreviewPanel extends OmniComponent
             			.addPreferredGap(ComponentPlacement.RELATED)
             			.addComponent(lblFps)
             			.addContainerGap(0, Short.MAX_VALUE)
+            			.addComponent(lbZoom)
+            			.addComponent(spinner, 40,40,40)
+            			.addGap(5)
             			.addComponent(buttonExport, size.width, size.width, size.width)
             			.addGap(10)
                 	)
@@ -200,6 +203,8 @@ public class AnimationPreviewPanel extends OmniComponent
             				.addComponent(buttonBack, size.height, size.height, size.height)
             				.addComponent(buttonPlay, size.height, size.height, size.height)
             				.addComponent(buttonForward, size.height, size.height, size.height)
+                			.addComponent(spinner, size.height, size.height, size.height)
+                			.addComponent(lbZoom, size.height, size.height, size.height)
             				.addComponent(buttonExport, size.height, size.height, size.height))
             		)
         		)
@@ -211,7 +216,43 @@ public class AnimationPreviewPanel extends OmniComponent
 
         this.setLayout(layout);
     }
+    
+    private void initBindings() {
+        spinner.setModel( new AbstractSpinnerModel() {
+			@Override
+			public void setValue(Object value) {
+				if( value instanceof Integer) {
+					zoom_level = (Integer)value;
+					this.fireStateChanged();
+				}
+			}
+			@Override
+			public Object getValue() {
+				if( zoom_level >= 0) {
+					return Integer.toString(zoom_level+1);
+				}
+				else
+					return "1/"+Integer.toString((-zoom_level)+1);
+			}
+			@Override
+			public Object getPreviousValue() {
+				return zoom_level-1;
+			}
+			@Override
+			public Object getNextValue() {
+				return zoom_level+1;
+			}
+		});
+        spinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				previewPanel.repaint();
+			}
+		});
+    }
     // End Design
+    
+    
 
     class SliderLimiter extends JPanel {
     	
@@ -221,7 +262,11 @@ public class AnimationPreviewPanel extends OmniComponent
     	}
     }
     
-
+    private float getZoom() {
+    	return (zoom_level >= 0)
+    			?( zoom_level+1)
+    			: (1.0f / (float)(-zoom_level+1));
+    }
     
     private void updateSlider() {
         tfFPS.setText(Float.toString(tps));
@@ -284,7 +329,7 @@ public class AnimationPreviewPanel extends OmniComponent
     		
     		if( animation != null) {
     			Graphics2D g2 = (Graphics2D)g;
-    			g2.scale(2.0, 2.0);
+    			g2.scale(getZoom(), getZoom());
     			animation.drawFrame(g, animationManager.getAnimationState(animation).getMetronom());
     		}
     	}

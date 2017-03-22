@@ -19,14 +19,11 @@ import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
 
 public class GLEngine  {
 	private final GLOffscreenAutoDrawable drawable;
@@ -111,6 +108,7 @@ public class GLEngine  {
 		BASIC_STROKE,
 		CHANGE_COLOR,
 		PASS_BORDER,
+		PASS_INVERT,
 		;
 	}
 	
@@ -254,6 +252,10 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_border.frag");
+        programs[ProgramType.PASS_INVERT.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_invert.frag");
         		
 	}
 	

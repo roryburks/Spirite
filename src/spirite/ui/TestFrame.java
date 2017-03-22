@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
@@ -76,6 +77,9 @@ public class TestFrame extends JFrame {
 		
 		JRadioButton radioButton_1 = new JRadioButton("2");
 		panelA.add(radioButton_1);
+		
+		JSpinner spinner = new JSpinner();
+		panelA.add(spinner);
 		
 		JComboBox comboBox = new JComboBox();
 		panelA.add(comboBox);

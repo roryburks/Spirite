@@ -157,7 +157,10 @@ public class RootFrame extends javax.swing.JFrame
     			{".&All", "select.all", null},
     			{".&None", "select.none", null},
     			{".&Invert Selection (unimplemented)", "select.invert", null},
-    			//{".&Invert Selection (unimplemented)", "select.invert", null},
+    			
+    			{"&Image", null, null},
+    			{".&Invert", "draw.invert", null},
+    			{".&To Color", "draw.toColor", null},
     			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},
