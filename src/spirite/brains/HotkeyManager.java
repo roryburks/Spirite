@@ -31,6 +31,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 public class HotkeyManager {
     private final Preferences prefs;    
     private final BidiMap<Hotkey,String> hotkey_map;
+    
 
     HotkeyManager() {
         prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
@@ -91,6 +92,17 @@ public class HotkeyManager {
     		}
         );
     }
+    
+    public static boolean isModifier( int keycode) {
+    	switch( keycode) {
+    	case KeyEvent.VK_CONTROL:
+    	case KeyEvent.VK_SHIFT:
+    	case KeyEvent.VK_ALT:
+    		return true;
+		default:
+			return false;
+    	}
+    }
 
     /**
      * Loads the hotkey data from preference space using a hard-coded set of key
@@ -119,6 +131,11 @@ public class HotkeyManager {
 
     public Hotkey getHotkey( String command) {
         return hotkey_map.getKey(command);
+    }
+    
+    public void setCommand( int key, int modifier, String command) {
+    	hotkey_map.put( new Hotkey( key, modifier), command);
+//    	hotkey_map.put(arg0, arg1)
     }
     
 

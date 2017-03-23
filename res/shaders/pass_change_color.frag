@@ -17,10 +17,11 @@ void main()
 	vec4 texCol = vec4(intex[3],intex[2],intex[1],intex[0]);
 	
 	
-	if( distance(cFrom.r , texCol.r) < thresh &&
+	if( optionMask == 2 || 
+		(distance(cFrom.r , texCol.r) < thresh &&
 		distance(cFrom.g , texCol.g) < thresh &&
 		distance(cFrom.b , texCol.b) < thresh &&
-		(optionMask == 0 || distance(cFrom.a , texCol.a) < thresh) ) {
+		(optionMask == 1 || distance(cFrom.a , texCol.a) < thresh) )) {
 		outputColor.rgb = cTo.rgb;
 		outputColor.a = texCol.a;
 	}

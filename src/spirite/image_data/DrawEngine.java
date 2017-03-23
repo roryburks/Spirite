@@ -166,7 +166,21 @@ public class DrawEngine {
 		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 	}
 	
-	public void changeColor( Color from, Color to, int scope, boolean ignoreAlpha) {
+	/**
+	 * Changes all pixels of one color into another color.
+	 * 
+	 * @param from Color which will be changed
+	 * @param to Color that it'll be changed to
+	 * @param scope
+	 * <li>0 : Local (applies to only the active data)
+	 * <li>1 : Node (applies to all ImageData in the selected Group/Layer)
+	 * <li>2 : Global (applies to ALL ImageData in the workspace)
+	 * @param mode 
+	 * <li>0 : Converts only exact RGBA matches.
+	 * <li>1 : Converts RGB matches, ignoring alpha
+	 * <li>2 : Converts all RGB colors to the <code>to</code> color, preserving alpha
+	 */
+	public void changeColor( Color from, Color to, int scope, int mode) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		
 		Node selected = null;
@@ -175,7 +189,7 @@ public class DrawEngine {
 		case 0:	// Local
 			BuiltImageData bid = workspace.buildActiveData();
 			if( bid != null) {
-				execute( new ColorChangeAction(bid, mask, from, to,ignoreAlpha));
+				execute( new ColorChangeAction(bid, mask, from, to, mode));
 			}
 			break;
 		case 1: // Group/Layer
@@ -196,7 +210,7 @@ public class DrawEngine {
 					data.oy += lnode.y;
 					actions.add( new ColorChangeAction(
 							workspace.buildData(data),
-							mask, from, to, ignoreAlpha));
+							mask, from, to, mode));
 				}
 			}
 			
@@ -634,7 +648,6 @@ public class DrawEngine {
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 				mask.drawSelectionMask(g2);
 
-
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
 			}
@@ -651,23 +664,22 @@ public class DrawEngine {
 	public class ColorChangeAction extends PerformFilterAction 
 	{
 		private final Color from, to;
-		private final boolean ignoreAlpha;
+		private final int mode;
 		ColorChangeAction(
 				BuiltImageData data, 
 				BuiltSelection mask, 
 				Color from, Color to, 
-				boolean ignoreAlpha) 
+				int mode) 
 		{
 			super(data, mask);
 			this.from = from;
 			this.to = to;
-			this.ignoreAlpha = ignoreAlpha;
+			this.mode = mode;
 			description = "Color Change Action";
 		}
 		@Override
 		void applyFilter(BufferedImage image) {
-			int options = (ignoreAlpha)?0:1;
-			jogl.changeColor(image, from, to, options);
+			jogl.changeColor(image, from, to, mode);
 		}
 	}
 	public class InvertAction extends PerformFilterAction {

@@ -315,6 +315,7 @@ public class MasterControl
 
     	
     }
+    /** Returns a list of all valid Command Strings.  */
     public List<String> getAllValidCommands() {
     	List<String> list = new ArrayList<>();
     	for( CommandExecuter executer : executers) {
@@ -328,6 +329,15 @@ public class MasterControl
     	
     	return list;
     }
+    
+    /** Returns a list of all Command String domains. */
+    public List<String> getCommandDomains() {
+    	List<String> list = new ArrayList<>(executers.length);
+    	for( CommandExecuter executer : executers) 
+    		list.add(executer.getCommandDomain());
+    	return list;
+    }
+    
 
     public interface CommandExecuter {
     	public abstract List<String> getValidCommands();

@@ -310,19 +310,19 @@ public class Penner
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
 				
 				int scope = (Integer)settings.getValue("scope");
-				boolean ignoreAlpha = (Boolean)settings.getValue("ignoreAlpha");
+				int mode = (Integer)settings.getValue("mode");
 				
 				if( mbe.buttonType == ButtonType.LEFT) {
 					drawEngine.changeColor(
 							paletteManager.getActiveColor(0),
 							paletteManager.getActiveColor(1),
-							scope, ignoreAlpha);
+							scope, mode);
 				}
 				else {
 					drawEngine.changeColor(
 							paletteManager.getActiveColor(1),
 							paletteManager.getActiveColor(0),
-							scope, ignoreAlpha);
+							scope, mode);
 				}
 				break;}
 			}

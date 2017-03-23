@@ -274,7 +274,9 @@ public class ToolsetManager
     private ToolSettings constructColorChangeSettings() {
     	final Object[][] scheme = {
         		{"scope", PropertyType.DROP_DOWN,"Scope",  0, 0, new String[]{"Local","Entire Layer/Group","Entire Project"}},
-    			{"ignoreAlpha", PropertyType.CHECK_BOX, "Ignore Alpha", true},
+    			{"mode", PropertyType.RADIO_BUTTON, "Apply Mode", 0, 0,
+    				new String[] {"Check Alpha", "Ignore Alpha", "Change All"}
+    			},
     	};
     	
     	return constructFromScheme(scheme);

@@ -128,7 +128,4 @@ public class JPenPenner implements PenListener
 	public void cleanUp() {
 		penner.cleanUp();
 	}
-
-	
-	
 }
