@@ -262,11 +262,11 @@ public class SelectionEngine {
 	// ==== Selection Setting
 	// ==============
 	public void setSelection( BuiltSelection selection) {
-		undoEngine.performAndStore( createNewSelect(selection));
+		undoEngine.performAndStore( createNewSelectAction(selection));
 		triggerBuildingSelection(null);
 		triggerSelectionChanged(null);
 	}
-	
+		
 	public BuiltSelection combineSelection( BuiltSelection sel1, BuiltSelection sel2) {
 		BufferedImage bi = new BufferedImage(
 				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -354,7 +354,7 @@ public class SelectionEngine {
 		
 		
 		List<UndoableAction> actions = new ArrayList<>(2);
-		actions.add(createNewSelect(buildRectSelection(
+		actions.add(createNewSelectAction(buildRectSelection(
 				new Rectangle( ox, oy, bi.getWidth(), bi.getHeight()))));
 		startLiftAction = new StartLiftAction(bi);
 		actions.add( startLiftAction);
@@ -371,7 +371,7 @@ public class SelectionEngine {
 	
 	
 	public void unselect() {
-		UndoableAction action = createNewSelect( new BuiltSelection(null, 0, 0));
+		UndoableAction action = createNewSelectAction( new BuiltSelection(null, 0, 0));
 		action.performAction();
 		undoEngine.storeAction(action);
 	}
@@ -400,7 +400,7 @@ public class SelectionEngine {
 		return startLiftAction;
 	}
 	
-	private UndoableAction createNewSelect( BuiltSelection selection) {
+	public UndoableAction createNewSelectAction( BuiltSelection selection) {
 		UndoableAction baseAction = new SetSelectionAction( selection, oldSelection);
 
 		if( scope.isLifted()) {
@@ -838,7 +838,7 @@ public class SelectionEngine {
 		public final Selection selection;
 		public final int offsetX;
 		public final int offsetY;
-		
+
 		public BuiltSelection( BufferedImage bi) {
 			Rectangle bounds = null;
 			try {

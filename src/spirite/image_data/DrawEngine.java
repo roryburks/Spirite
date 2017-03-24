@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import jogamp.graph.geom.plane.AffineTransform;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
@@ -163,7 +164,31 @@ public class DrawEngine {
 	}
 	
 	public void flip( BuiltImageData data, boolean horizontal) {
-		execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
+		BuiltSelection sel = selectionEngine.getBuiltSelection();
+		
+		if( sel == null)
+			execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
+		else {
+			UndoableAction actions[] = new UndoableAction[2];
+			actions[0] = new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal);
+			
+			// This is kind of bad
+			BufferedImage bi = new 
+					BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			Graphics2D g2 = (Graphics2D) bi.getGraphics();
+			g2.setColor(Color.WHITE);
+			g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
+			g2.dispose();
+			
+			bi = sel.liftSelectionFromImage(bi, 0, 0);
+			bi = flipImage(bi, horizontal);
+			
+			BuiltSelection sel2 =  new BuiltSelection(bi);
+			sel2 = new BuiltSelection( sel2.selection, sel2.offsetX+sel.offsetX, sel2.offsetX+sel.offsetY);
+			actions[1] = selectionEngine.createNewSelectAction(sel2);
+			
+			undoEngine.performAndStore( undoEngine.new CompositeAction(Arrays.asList(actions), actions[0].description));
+		}
 	}
 	
 	/**
@@ -570,7 +595,7 @@ public class DrawEngine {
 				
 				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
 
-				BufferedImage buffer = flipImage(lifted);
+				BufferedImage buffer = flipImage(lifted, horizontal);
 
 				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
@@ -584,7 +609,7 @@ public class DrawEngine {
 			}
 			else {
 				BufferedImage bi = builtImage.checkoutRaw();
-				BufferedImage buffer = flipImage( bi);
+				BufferedImage buffer = flipImage( bi, horizontal);
 				
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -595,28 +620,26 @@ public class DrawEngine {
 			builtImage.checkin();
 			
 		}
-
-		private BufferedImage flipImage( BufferedImage bi) {
-			// Might be able to do this single-Image but things get weird if you 
-			//	draw a Buffer onto itself
-			BufferedImage buffer = new BufferedImage( 
-					bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-			Graphics2D g2 = (Graphics2D)buffer.getGraphics();
-			
-			if( horizontal) {
-				g2.translate(bi.getWidth(), 0);
-				g2.scale(-1.0, 1.0);
-			}
-			else {
-				g2.translate(0, bi.getHeight());
-				g2.scale(1.0, -1.0);
-				
-			}
-			g2.drawImage(bi, 0, 0, null);
-			g2.dispose();
-			
-			return buffer;
+	}
+	private static BufferedImage flipImage( BufferedImage bi, boolean horizontal) {
+		// Might be able to do this single-Image but things get weird if you 
+		//	draw a Buffer onto itself
+		BufferedImage buffer = new BufferedImage( 
+				bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
+		
+		if( horizontal) {
+			g2.translate(bi.getWidth(), 0);
+			g2.scale(-1.0, 1.0);
 		}
+		else {
+			g2.translate(0, bi.getHeight());
+			g2.scale(1.0, -1.0);
+		}
+		g2.drawImage(bi, 0, 0, null);
+		g2.dispose();
+		
+		return buffer;
 	}
 
 	public class ScaleAction extends MaskedImageAction 
