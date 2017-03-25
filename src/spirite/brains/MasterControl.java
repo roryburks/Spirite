@@ -410,7 +410,7 @@ public class MasterControl
 	    	    	BufferedImage img;
     				if( currentWorkspace.getSelectionEngine().isLifted()) {
     					// Copies straight from the lifted data
-    					img = currentWorkspace.getSelectionEngine().getLiftedImage().access();
+    					img = currentWorkspace.getSelectionEngine().getLiftedImage();
     				}
     				else {
     					BuiltImageData bid = currentWorkspace.buildActiveData();

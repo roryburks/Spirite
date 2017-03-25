@@ -179,7 +179,7 @@ public class RenderEngine
 					g2.setTransform( dataContext.getTransform());
 					g2.transform(workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
 					
-					g2.drawImage( workspace.getSelectionEngine().getLiftedImage().access(), 0, 0, null);
+					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
 					g2.dispose();
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {

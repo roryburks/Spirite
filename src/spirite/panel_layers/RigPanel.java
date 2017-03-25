@@ -394,7 +394,7 @@ public class RigPanel extends OmniComponent
 				if( rect != null)
 					listPanel.scrollRectToVisible( rect);
 				
-				Part part = RigPanel.this.model.getElementAt(i);
+					Part part = RigPanel.this.model.getElementAt(i);
 				if( rig.getActivePart() != part) {
 					rig.setActivePart(part);
 				}

@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import jogamp.graph.geom.plane.AffineTransform;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
@@ -166,7 +166,15 @@ public class DrawEngine {
 	public void flip( BuiltImageData data, boolean horizontal) {
 		BuiltSelection sel = selectionEngine.getBuiltSelection();
 		
-		if( sel == null)
+		if( selectionEngine.isLifted()) {
+			AffineTransform trans = new AffineTransform();
+			if( horizontal)
+				trans.scale(-1, 1);
+			else
+				trans.scale(1, -1);
+			selectionEngine.transformSelection(trans);
+		}
+		else if( sel == null)
 			execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 		else {
 			UndoableAction actions[] = new UndoableAction[2];
