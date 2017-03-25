@@ -69,6 +69,7 @@ public class ToolsetManager
         toolSettings.put( Tool.CROP, constructCropperSettings());
         toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
         toolSettings.put( Tool.COLOR_CHANGE, constructColorChangeSettings());
+        toolSettings.put( Tool.RESHAPER, constructReshapeSettings());
     }
     
     // :::: Get/Set
@@ -279,6 +280,12 @@ public class ToolsetManager
     			},
     	};
     	
+    	return constructFromScheme(scheme);
+    }
+    private ToolSettings constructReshapeSettings() {
+    	final Object[][] scheme = {
+    			{"cropSelection", PropertyType.BUTTON, "Apply Transformation", "draw.applyTransform",  DISABLE_ON_NO_SELECTION},
+    	};
     	return constructFromScheme(scheme);
     }
     

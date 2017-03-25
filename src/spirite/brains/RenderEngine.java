@@ -177,7 +177,7 @@ public class RenderEngine
 				
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
 					g2.setTransform( dataContext.getTransform());
-					g2.transform(workspace.getSelectionEngine().getBuiltSelection().getDrawFromTransform());
+					g2.transform(workspace.getSelectionEngine().getDrawFromTransform());
 					
 					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
 					g2.dispose();

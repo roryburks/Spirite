@@ -57,17 +57,21 @@ public class SelectionEngine {
 	
 	private final ImageWorkspace workspace;
 	private final UndoEngine undoEngine;
-	private final CacheManager cacheManager;
 	
 	private final ImageChangeEvent selChangeEvt = new ImageChangeEvent();
 	
 	// Variables related to Selection state
-	private BuiltSelection selection = new BuiltSelection(null,0,0);
+	private BuiltSelection built = new BuiltSelection(null,0,0);
 	private boolean lifted = false;
 	protected BufferedImage liftedImage = null;
-//	protected int offsetX;
-//	protected int offsetY;
-
+	
+	private void setBuiltSelection( BuiltSelection sel) {
+		
+		built = (sel == null) ? new BuiltSelection(null, 0, 0) : sel;
+		
+		proposingTransform = false;
+	}
+	
 	// Variables relating to Building
 	private boolean building = false;
 	private SelectionBuilder selectionBuilder;	// Only used when building a selection
@@ -76,10 +80,14 @@ public class SelectionEngine {
 	};
 	private BuildMode buildMode;
 	
+	// Variables relating to Transforming
+	private boolean proposingTransform = false;
+	AffineTransform proposedTransform = null;
+
+	
 	SelectionEngine( ImageWorkspace workspace) {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
-		this.cacheManager = workspace.getCacheManager();
 
 		selChangeEvt.workspace = workspace;
 		selChangeEvt.selectionLayerChange = true;
@@ -94,9 +102,6 @@ public class SelectionEngine {
 	public boolean isBuilding() {
 		return building;
 	}
-/*	public Selection getBuildingSelection() {
-		return buildingSelection;
-	}*/
 	public void drawBuildingSelection( Graphics g) {
 		if( selectionBuilder != null)
 			selectionBuilder.draw(g);
@@ -109,23 +114,36 @@ public class SelectionEngine {
 	 * (Consider incorperating SelectedNode into this?)
 	 */
 	public BuiltSelection getBuiltSelection() {
-		return selection;
+		return built;
 	}
 	public Selection getSelection() {
-		return selection.selection;
+		return built.selection;
 	}
 	public BufferedImage getLiftedImage() {
 		return liftedImage;
 	}
+
+	public AffineTransform getDrawFromTransform() {
+		AffineTransform trans = new AffineTransform();
+		if( proposingTransform) {
+			Dimension d = built.selection.getDimension();
+			trans.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
+			trans.concatenate(proposedTransform);
+			trans.translate(-d.width/2, -d.height/2);
+		}
+		else
+			trans.translate(built.offsetX, built.offsetY);
+		return trans;
+	}
 	public int getOffsetX() {
-		return selection.offsetX;
+		return built.offsetX;
 	}
 	public int getOffsetY() {
-		return selection.offsetY;
+		return built.offsetY;
 	}
 	public void setOffset( int x, int y) {
-		int dx = x - selection.offsetX;
-		int dy = y - selection.offsetY;
+		int dx = x - built.offsetX;
+		int dy = y - built.offsetY;
 
 		if( !lifted) {
 			if( !validateSelection())
@@ -157,9 +175,33 @@ public class SelectionEngine {
 		}
 	}
 	
+	public void liftData() {
+//		if( !lifted) {
+			if( !validateSelection())
+				return;
+			
+			Node snode = workspace.getSelectedNode();
+			if( !(snode instanceof LayerNode))
+				return;
+			LayerNode node = (LayerNode)snode;
+			
+			// Construct an execute the composite action
+			List<UndoableAction> actions = new ArrayList<>(3);
+			actions.add( createLiftAction(node));
+			actions.add(new ClearSelectionAction(
+					getBuiltSelection(),
+					workspace.buildData(node)));
+					
+			
+			UndoableAction action = undoEngine.new StackableCompositeAction(actions, "Lift Data");
+			action.performAction();
+			undoEngine.storeAction(action);
+//		}
+	}
 	
+	
+	/** Clears the lifted data if it exists */
 	public boolean attemptClearSelection() {
-		
 		if( lifted) {
 			// If you have lifted data, it clears the lifted data without changing the
 			//	 fact that it is lifted
@@ -187,17 +229,23 @@ public class SelectionEngine {
 		return true;
 	}
 	
+	public void proposeTransform( AffineTransform trans) {
+		this.proposingTransform = true;
+		this.proposedTransform = trans;
+		workspace.triggerImageRefresh(selChangeEvt);
+	}
+	public void applyProposedTransform() {
+		if( proposingTransform) {
+			transformSelection(proposedTransform);
+			proposingTransform = false;
+		}
+	}
 	
 	// ===================
 	// ==== Selection Building
 	// ===================
 	public void startBuildingSelection( SelectionBuilder builder, int x, int y, BuildMode mode) {
 		if( builder == null) return;
-		
-		// !!!! For the engine to work as expected, it is important that the user
-		//	only updates the selection through these building mechanisms.
-		
-//		oldSelection = getBuiltSelection();
 		
 		// Start building
 		building = true;
@@ -243,22 +291,12 @@ public class SelectionEngine {
 	}
 	
 	// ==============
-	// ==== Selection Setting
+	// ==== Selection modification
 	// ==============
 	/** Sets the selection to a new selection, triggering all observer actions,
 	 * lifting/anchoring data as needed, and inserting it into the undo engine. */
 	public void setSelection( BuiltSelection selection) {
 		undoEngine.performAndStore( createNewSelectAction(selection));
-		triggerBuildingSelection(null);
-		triggerSelectionChanged(null);
-	}
-	
-	/** Sets the selection to a new selection, triggering observers, but not lifting
-	 * or anchoring the lifted image and not creating an undo action. 
-	 * 
-	 * !!!! Visibility possibly should be private. */
-	public void setSelectionQuiet( BuiltSelection selection) {
-		this.selection = selection;
 		triggerBuildingSelection(null);
 		triggerSelectionChanged(null);
 	}
@@ -331,11 +369,11 @@ public class SelectionEngine {
 				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		
-		Dimension d = selection.selection.getDimension();
-		g2.translate(selection.offsetX+d.width/2, selection.offsetY+d.height/2);
+		Dimension d = built.selection.getDimension();
+		g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
 		g2.transform(trans);
 		g2.translate(-d.width/2, -d.height/2);
-		selection.selection.drawSelectionMask(g2);
+		built.selection.drawSelectionMask(g2);
 		g2.dispose();
 		BuiltSelection sel = new BuiltSelection(bi);
 		
@@ -346,7 +384,7 @@ public class SelectionEngine {
 			bi = new BufferedImage(
 					workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			g2 = (Graphics2D)bi.getGraphics();
-			g2.translate(selection.offsetX+d.width/2, selection.offsetY+d.height/2);
+			g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
 			g2.transform(trans);
 			g2.translate(-d.width/2, -d.height/2);
 			g2.drawImage(liftedImage, 0, 0, null);
@@ -365,10 +403,6 @@ public class SelectionEngine {
 		}
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Transform Lifted Selection"));
-
-		
-		workspace.buildActiveData().handle.refresh();
-		this.setSelectionQuiet(sel);
 	}
 	
 
@@ -424,7 +458,7 @@ public class SelectionEngine {
 	public boolean validateSelection() {
 		if( building) finishBuildingSelection();
 		
-		if( selection == null)
+		if( built == null)
 			return false;
 		
 		return true;
@@ -517,11 +551,9 @@ public class SelectionEngine {
 		@Override
 		protected void performImageAction() {
 			Graphics2D g2 = (Graphics2D)builtImage.checkout();
-			g2.transform( builtSelection.getDrawFromTransform());
-			g2.drawImage(liftedImage, 0, 0, null);
+			g2.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY, null);
 			builtImage.checkin();
 		}
-		
 	}
 
 	public class MoveSelectionAction extends SelectionAction 
@@ -537,8 +569,8 @@ public class SelectionEngine {
 		}
 	
 		void translate( int deltax, int deltay) {
-			selection = new BuiltSelection( selection.selection, 
-					selection.offsetX+deltax,selection.offsetY+deltay);
+			setBuiltSelection(new BuiltSelection( built.selection, 
+					built.offsetX+deltax,built.offsetY+deltay));
 
 			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
@@ -584,7 +616,7 @@ public class SelectionEngine {
 			super.performAction();
 			voidBuilding();
 
-			selection = newSelection;
+			setBuiltSelection(newSelection);
 			
 			triggerBuildingSelection(null);
 			triggerSelectionChanged(null);
@@ -595,7 +627,7 @@ public class SelectionEngine {
 			super.undoAction();
 			voidBuilding();
 
-			selection = oldSelection;
+			setBuiltSelection(oldSelection);
 			
 			triggerBuildingSelection(null);
 			triggerSelectionChanged(null);
@@ -927,12 +959,6 @@ public class SelectionEngine {
 					data.draw(g);
 				}
 			});
-		}
-
-		public AffineTransform getDrawFromTransform() {
-			AffineTransform trans = new AffineTransform();
-			trans.translate(offsetX, offsetY);
-			return trans;
 		}
 	}
 

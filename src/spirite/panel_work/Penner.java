@@ -4,17 +4,25 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import spirite.MUtil;
 import spirite.brains.MasterControl;
@@ -33,6 +41,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.BuildMode;
+import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionBuilder;
@@ -293,11 +302,20 @@ public class Penner
 				}
 				break;}
 			case RESHAPER:{
+				BuiltSelection sel =selectionEngine.getBuiltSelection();
+				
+				if( sel == null || sel.selection == null) {
+					selectionEngine.setSelection( selectionEngine.buildRectSelection(
+							new Rectangle(0,0,workspace.getWidth(),workspace.getHeight())));
+				}
+				if( !selectionEngine.isLifted())
+					selectionEngine.liftData();
 				if( mbe.buttonType == ButtonType.LEFT) {
-					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
+					behavior = new ReshapingBehavior();
+/*					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
 							workspace.buildActiveData().handle, 
 							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
-					workspace.getUndoEngine().performAndStore(ra);
+					workspace.getUndoEngine().performAndStore(ra);*/
 				}
 				else {
 				}
@@ -916,6 +934,194 @@ public class Penner
 
 	}
 	
+
+	enum ReshapeStates {
+		READY, ROTATE, RESIZE, MOVING
+	}
+	class ReshapingBehavior extends DrawnStateBehavior {
+		AffineTransform wTrans = new AffineTransform();
+		AffineTransform lockTrans = new AffineTransform();
+		AffineTransform calcTrans = new AffineTransform();
+		ReshapeStates state = ReshapeStates.READY;
+		int startX,startY;
+		int overlap = -1;
+		// 0123 : NESW
+		// 4567 : NW NE SE SW
+		// 89AB : NW NE SE SW (rotation)
+		// C : Moving
+		
+		@Override
+		public void paintOverlay(Graphics g) {
+			float zoom = zoomer.getZoom();
+			
+			BuiltSelection sel =selectionEngine.getBuiltSelection();
+			
+			if( sel == null || sel.selection == null){
+				this.end();
+				return;
+			}
+			Dimension d = sel.selection.getDimension();
+			
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform origTrans = g2.getTransform();
+
+			AffineTransform relTrans = new AffineTransform();
+			relTrans.translate(zoomer.itsX(0), zoomer.itsY(0));
+			relTrans.scale(zoom, zoom);
+			relTrans.translate(d.width/2+sel.offsetX, d.height/2+sel.offsetY);
+			relTrans.concatenate(wTrans);
+			relTrans.translate(-d.width/2, -d.height/2);
+			
+			g2.setTransform(relTrans);
+
+			g2.drawRect( 0, 0, d.width, d.height);
+			
+			Stroke defStroke = new BasicStroke( 2/zoom);
+			g2.setColor(Color.GRAY);
+			g2.setStroke(defStroke);
+			
+			Point2D p = new Point2D.Float();
+			try {
+				p = relTrans.inverseTransform(new Point(rawX,rawY), p);
+			} catch (NoninvertibleTransformException e) {
+				e.printStackTrace();
+			}
+			
+			int sw = (int)Math.round(d.width*0.3);	// Width of corner rect
+			int sh = (int)Math.round(d.height*0.3);	// Height
+			int x2 = (int)Math.round(d.width*0.7);	// Offset of right rect
+			int y2 = (int)Math.round(d.height*0.7);	// " bottom
+			int di = (int)Math.round(d.height*0.2);	// Diameter of rotate thing
+			int of = (int)Math.round(d.height*0.25*0.2);
+
+			int b = 4;
+			
+			List<Shape> s = new ArrayList<>(12);
+			s.add(new Rectangle(sw+b, b, x2-sw-b*2, sh-b*2));	// N
+			s.add(new Rectangle(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
+			s.add(new Rectangle(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
+			s.add(new Rectangle(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
+			
+			s.add(new Rectangle(b, b, sw-b*2, sh-b*2));			// NW
+			s.add(new Rectangle(x2+b, b, sw-b*2, sh-b*2));		// NE
+			s.add(new Rectangle(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
+			s.add(new Rectangle(b, y2+b, sw-b*2, sh-b*2));		// SW
+
+			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
+			s.add(new Ellipse2D.Float( d.width-of, -di+of, di, di));	// NE
+			s.add(new Ellipse2D.Float( d.width-of, d.height-of, di, di));	// SE
+			s.add(new Ellipse2D.Float( -di+of, d.height-of, di, di));	// SW
+
+			s.add(new Rectangle(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
+			
+			if( this.state == ReshapeStates.READY)
+				overlap = -1;
+			for( int i=0; i<s.size(); ++i) {
+				Shape shape = s.get(i);
+				if( overlap == i || (overlap == -1 && shape.contains(p))) {
+					g2.setColor(Color.YELLOW);
+					g2.setStroke(new BasicStroke( 4/zoom));
+					g2.draw(shape);
+					g2.setColor(Color.GRAY);
+					g2.setStroke(defStroke);
+					overlap = i;
+				}
+				else g2.draw(shape);
+			}
+
+			
+			g2.setTransform(origTrans);
+			
+		}
+
+		@Override public void onPenUp() {
+			this.state = ReshapeStates.READY;
+		}
+		@Override
+		public void onPenDown() {
+			BuiltSelection sel =selectionEngine.getBuiltSelection();
+			
+			if( sel == null || sel.selection == null){
+				this.end();
+				return;
+			}
+			
+			if( overlap >= 0 && overlap <= 7) {
+				startX = x;
+				startY = y;
+				this.state = ReshapeStates.RESIZE;
+			}
+			else if( overlap >= 8 && overlap <= 0xB) {
+				Dimension d = sel.selection.getDimension();
+				startX = x;
+				startY = y;
+				lockTrans = new AffineTransform(wTrans);
+				calcTrans = new AffineTransform();
+				calcTrans.translate(-sel.offsetX-d.width/2.0f, -sel.offsetY-d.height/2.0f);
+				calcTrans.preConcatenate(lockTrans);
+				this.state = ReshapeStates.ROTATE;
+			}
+			else if( overlap == 0xC)
+				this.state = ReshapeStates.MOVING;
+		}
+		@Override
+		public void onMove() {
+			BuiltSelection sel =selectionEngine.getBuiltSelection();
+			
+			if( sel == null || sel.selection == null){
+				this.end();
+				return;
+			}
+			
+			switch( this.state) {
+			case MOVING:
+				if( oldX != x || oldY != y) 
+					selectionEngine.setOffset(
+							selectionEngine.getOffsetX() + (x - oldX),
+							selectionEngine.getOffsetY() + (y - oldY));
+				break;
+			case READY:
+				break;
+			case RESIZE:{
+				Dimension d = sel.selection.getDimension();
+				Point2D pn = new Point2D.Float();
+				Point2D ps = new Point2D.Float();
+
+				calcTrans.transform(new Point(x,y), pn);
+				calcTrans.transform(new Point(startX,startY), ps);
+
+				wTrans = (new AffineTransform(lockTrans));
+
+				float h = d.height/2.0f;
+				float w = d.width/2.0f;
+				wTrans.scale((pn.getX() - w)/(ps.getX()-w), (pn.getY() - h)/(ps.getY()-h));
+				break;}
+			case ROTATE:{
+				Point2D pn = new Point2D.Float();
+				Point2D ps = new Point2D.Float();
+
+				calcTrans.transform(new Point(x,y), pn);
+				calcTrans.transform(new Point(startX,startY), ps);
+				
+				wTrans = (new AffineTransform(lockTrans));
+				
+				double start = Math.atan2(ps.getY(), ps.getX());
+				double end =  Math.atan2(pn.getY(), pn.getX());
+				wTrans.rotate(end-start);
+				break;}
+			
+			}
+			
+			selectionEngine.proposeTransform(wTrans);
+		}
+		@Override
+		public void start() {
+		}
+
+		@Override
+		public void onTock() {}
+
+	}
 
 	class FlippingBehavior extends StateBehavior {
 		int startX, startY;

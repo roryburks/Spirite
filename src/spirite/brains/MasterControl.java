@@ -635,6 +635,9 @@ public class MasterControl
     				workspace.getDrawEngine().invert(data);
     			}
     		}});
+    		commandMap.put("applyTransform", new Runnable() {@Override public void run() {
+    			workspace.getSelectionEngine().applyProposedTransform();
+    		}});
     	}
 
 		@Override public List<String> getValidCommands() {
