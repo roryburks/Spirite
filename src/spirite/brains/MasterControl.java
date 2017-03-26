@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -646,6 +647,19 @@ public class MasterControl
     		commandMap.put("reset_reference", new Runnable() {@Override public void run() {
 					ReferenceManager rm = workspace.getReferenceManager();
 					rm.resetTransform();
+			}});
+    		commandMap.put("lift_to_reference", new Runnable() {@Override public void run() {
+    			SelectionEngine se = workspace.getSelectionEngine();
+    			ReferenceManager rm = workspace.getReferenceManager();
+    			
+    			BuiltSelection sel = se.getBuiltSelection();
+    			BufferedImage bi = se.getLiftedImage();
+    			
+    			AffineTransform trans = new AffineTransform();
+    			trans.translate(sel.offsetX, sel.offsetY);
+    			rm.addReference(bi, rm.getCenter(), trans);
+    			
+    			se.attemptClearSelection();
 			}});
     	}
 

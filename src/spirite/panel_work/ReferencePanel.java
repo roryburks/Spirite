@@ -66,7 +66,7 @@ public class ReferencePanel extends JPanel
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoomer.getZoom(), zoomer.getZoom());
-            g2.transform( workspace.getReferenceManager().getTransform());
+//            g2.transform( workspace.getReferenceManager().getTransform());
             g.drawImage( buffer, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
         }
         

@@ -73,7 +73,7 @@ public class ReferenceSchemePanel extends OmniComponent
 {
 	private final ReferenceListPanel referenceListPanel;
 	private final JButton btnReset = new JButton();
-	private final JButton btn2 = new JButton();
+	private final JButton btnLift = new JButton();
 	final OpacitySlider opacitySlider = new OpacitySlider();
 	
 	private final MasterControl master;
@@ -84,9 +84,10 @@ public class ReferenceSchemePanel extends OmniComponent
 	public ReferenceSchemePanel(MasterControl master) {
 		this.master = master;
 		referenceListPanel = new ReferenceListPanel();
+		
 		initComponents();
+		initLayout();
 		initBindings();
-		opacitySlider.setValue(1.0f);
 
 		
 		
@@ -100,6 +101,25 @@ public class ReferenceSchemePanel extends OmniComponent
 	}
 	
 	private void initComponents() {
+		opacitySlider.setValue(1.0f);
+		btnReset.setToolTipText("Reset the reference transform.");
+		btnLift.setToolTipText("Lift the current selection as a Reference.");
+		
+	}
+	private void initBindings() {
+		btnReset.addActionListener( new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				master.executeCommandString("draw.reset_reference");
+			}
+		});
+		btnLift.addActionListener( new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				master.executeCommandString("draw.lift_to_reference");
+			}
+		});
+	}
+	
+	private void initLayout() {
 		GroupLayout groupLayout = new GroupLayout(this);
 		
 		groupLayout.setHorizontalGroup(
@@ -113,7 +133,7 @@ public class ReferenceSchemePanel extends OmniComponent
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
-							.addComponent(btn2, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnLift, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(referenceListPanel, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
 					.addGap(3))
 		);
@@ -127,19 +147,12 @@ public class ReferenceSchemePanel extends OmniComponent
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btn2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnLift, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);
 		setLayout(groupLayout);
 	}
 	
-	private void initBindings() {
-		btnReset.addActionListener( new ActionListener() {
-			@Override public void actionPerformed(ActionEvent e) {
-				master.executeCommandString("draw.reset_reference");
-			}
-		});
-	}
 	
 	
 	
@@ -325,8 +338,11 @@ public class ReferenceSchemePanel extends OmniComponent
 			if( value == null) {
 				renderComponent.label.setText("Base Image");
 			}
-			else  {
+			else if( value instanceof LayerReference) {
 				renderComponent.label.setText("Layer: " + index);
+			}
+			else if( value instanceof ImageReference){
+				renderComponent.label.setText("Floating Selection: " + index);
 			}
 			return renderComponent;
 		}

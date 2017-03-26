@@ -33,6 +33,8 @@ public class ReferenceManager {
 		references.add(null);
 	}
 	
+	// ==================
+	// ==== Reference Types
 	public abstract class Reference {
 		AffineTransform localTransform = new AffineTransform();
 		public abstract void draw( Graphics g);
@@ -50,6 +52,7 @@ public class ReferenceManager {
 			Graphics2D g2 = (Graphics2D)g;
 			AffineTransform t = g2.getTransform();
 			g2.transform(localTransform);
+			g2.transform(globalTransform);
 			
 			layer.draw(g2);
 			
@@ -152,14 +155,25 @@ public class ReferenceManager {
 	public int getCount() {
 		return references.size();
 	}
+	public int getCenter() {
+		return references.indexOf(null);
+	}
 	
 	
 	// ============
 	// ==== Add/Remove References
-	
+
 	public void addReference( Layer toAdd,int index) {
 		if( toAdd != null) {
 			references.add(index, new LayerReference(toAdd));
+			triggerReferenceStructureChanged(true);
+		}
+	}
+	public void addReference( BufferedImage toAdd, int index, AffineTransform local) {
+		if( toAdd != null) {
+			Reference ref = new ImageReference(toAdd);
+			ref.localTransform = local;
+			references.add(index, ref);
 			triggerReferenceStructureChanged(true);
 		}
 	}

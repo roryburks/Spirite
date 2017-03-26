@@ -60,10 +60,11 @@ public class HotkeyManager {
                 {"draw.newLayerQuick", (new Hotkey( KeyEvent.VK_INSERT, 0))},
                 {"draw.undo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK))},
                 {"draw.redo", (new Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
-                {"draw.toggle_reference", (new Hotkey( KeyEvent.VK_BACK_QUOTE, 0))},	
                 {"draw.clearLayer", (new Hotkey( KeyEvent.VK_DELETE, 0))},
                 {"draw.toggle", (new Hotkey( KeyEvent.VK_TAB, 0))},
                 {"draw.invert", (new Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK ))},
+                {"draw.toggle_reference", (new Hotkey( KeyEvent.VK_BACK_QUOTE, 0))},	
+                {"draw.lift_to_reference", (new Hotkey( KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},	
 
                 {"draw.shiftLeft", (new Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
                 {"draw.shiftRight", (new Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK))},
