@@ -1,5 +1,9 @@
 package spirite.image_data;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,22 +17,100 @@ import spirite.image_data.layers.Layer;
  *
  *	References Come in two types: 
  *	-Layers dragged from the Workspace, they are affected by the Reference transform.
- *	-
+ *	-Floating Images pasted into the floating reference section.
  */
 public class ReferenceManager {
 	private boolean editingReference = false;
 	private float refAlpha = 1.0f;
-	
-	
-	
-	
+
+	AffineTransform globalTransform = new AffineTransform();
+	AffineTransform calcTransform = new AffineTransform();	// just for caching purposes
+
 	// null signifies the Workspace layer
-	private final List<Layer> references = new ArrayList<>();
+	private final List<Reference> references = new ArrayList<>();
 	
 	ReferenceManager(ImageWorkspace imageWorkspace) {
 		references.add(null);
 	}
 	
+	public abstract class Reference {
+		AffineTransform localTransform = new AffineTransform();
+		public abstract void draw( Graphics g);
+	}
+	
+	public class LayerReference extends Reference{
+		public final Layer layer;
+		
+		private LayerReference( Layer layer) {
+			this.layer = layer;
+		}
+
+		@Override
+		public void draw(Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform t = g2.getTransform();
+			g2.transform(localTransform);
+			
+			layer.draw(g2);
+			
+			g2.setTransform(t);
+		}
+	}
+	public class ImageReference extends Reference {
+		public final BufferedImage image;
+		ImageReference( BufferedImage image) {
+			this.image = image;
+		}
+		@Override
+		public void draw(Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform t = g2.getTransform();
+			g2.transform(localTransform);
+			
+			g2.drawImage( image, 0, 0, null);
+			
+			g2.setTransform(t);	
+		}
+	}
+	
+	// ===========
+	// ==== Transform Manipulation
+	public void shiftTransform( float dx, float dy) {
+		calcTransform.setToIdentity();
+		calcTransform.translate(dx, dy);
+		globalTransform.preConcatenate(calcTransform);
+		triggerReferenceStructureChanged(false);
+	}
+	
+	public void rotateTransform( float theta, float x, float y) {
+		calcTransform.setToIdentity();
+		calcTransform.translate(x, y);
+		calcTransform.rotate( theta);
+		calcTransform.translate(-x, -y);
+		globalTransform.preConcatenate(calcTransform);
+		triggerReferenceStructureChanged(false);
+	}
+	public void resetTransform() {
+		globalTransform.setToIdentity();
+		triggerReferenceStructureChanged(false);
+	}
+	public void zoomTransform( float zoom, float x, float y) {
+		calcTransform.setToIdentity();
+		calcTransform.translate(x, y);
+		calcTransform.scale(zoom, zoom);
+		calcTransform.translate(-x, -y);
+		globalTransform.preConcatenate(calcTransform);
+		triggerReferenceStructureChanged(false);
+	}
+	public AffineTransform getTransform() {
+		return new AffineTransform(globalTransform);
+	}
+	
+	
+	
+	
+	// ===============
+	// ==== Simple API
 	public boolean isEditingReference() {
 		return editingReference;
 	}
@@ -44,12 +126,40 @@ public class ReferenceManager {
 		this.refAlpha = alpha;
 		triggerReferenceStructureChanged(false);
 	}
+	public boolean isReferenceNode( Node node) {
+		return ( node != null && references.contains(node));
+	}
+	
+	public List<Reference> getList( boolean front) {
+		if( front)
+			return new ArrayList<Reference>(references.subList(0, references.indexOf(null)));
+		else
+			return new ArrayList<Reference>(references.subList(references.indexOf(null)+1, references.size()));
+	}
+
+	public List<ImageHandle> getDependencies( boolean front) {
+		List<Reference> refs = getList(front);
+		List<ImageHandle> dependencies = new ArrayList<>();
+		
+		for( Reference ref : refs) {
+			if( ref instanceof LayerReference) {
+				dependencies.addAll( ((LayerReference) ref).layer.getImageDependencies());
+			}
+		}
+		return dependencies;
+	}
+	
+	public int getCount() {
+		return references.size();
+	}
 	
 	
+	// ============
+	// ==== Add/Remove References
 	
 	public void addReference( Layer toAdd,int index) {
 		if( toAdd != null) {
-			references.add(index, toAdd);
+			references.add(index, new LayerReference(toAdd));
 			triggerReferenceStructureChanged(true);
 		}
 	}
@@ -60,7 +170,7 @@ public class ReferenceManager {
 		}
 	}
 	public void moveReference( int oldIndex, int newIndex) {
-		Layer toMove = references.get(oldIndex);
+		Reference toMove = references.get(oldIndex);
 		if( oldIndex > newIndex) {
 			references.remove(oldIndex);
 			references.add(newIndex,toMove);
@@ -79,20 +189,6 @@ public class ReferenceManager {
 		}
 	}
 	
-	public boolean isReferenceNode( Node node) {
-		return ( node != null && references.contains(node));
-	}
-
-	public List<Layer> getFrontList() {
-		return new ArrayList<Layer>(references.subList(0, references.indexOf(null)));
-	}
-	public List<Layer> getBackList() {
-		return new ArrayList<Layer>(references.subList(references.indexOf(null)+1, references.size()));
-	}
-	
-	public int getCount() {
-		return references.size();
-	}
 	
 
     /**

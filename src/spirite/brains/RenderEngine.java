@@ -40,6 +40,7 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
+import spirite.image_data.ReferenceManager.Reference;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -891,14 +892,7 @@ public class RenderEngine
 		public List<ImageHandle> getImagesReliedOn() {
 			List<ImageHandle> list = new ArrayList<>();
 			
-			for( Layer layer : (front) 
-					?workspace.getReferenceManager().getFrontList()
-					:workspace.getReferenceManager().getBackList())
-			{
-				list.addAll(layer.getImageDependencies());
-			}
-			
-			return list;
+			return workspace.getReferenceManager().getDependencies(front);
 		}
 
 		@Override
@@ -907,15 +901,13 @@ public class RenderEngine
 					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 			
-			List<Layer> layerList = (front)?
-					workspace.getReferenceManager().getFrontList():
-					workspace.getReferenceManager().getBackList();
+			List<Reference> refList = workspace.getReferenceManager().getList(front);
 			float rw = settings.width / (float)workspace.getWidth();
 			float rh = settings.height / (float)workspace.getHeight();
 			g2.scale( rw, rh);
 					
-			for( Layer layer : layerList ) {
-				layer.draw(g2);
+			for( Reference ref : refList ) {
+				ref.draw(g2);
 			}
 			
 			g2.dispose();

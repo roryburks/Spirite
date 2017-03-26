@@ -20,6 +20,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -43,7 +45,10 @@ import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ReferenceManager;
+import spirite.image_data.ReferenceManager.ImageReference;
+import spirite.image_data.ReferenceManager.LayerReference;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
+import spirite.image_data.ReferenceManager.Reference;
 import spirite.image_data.layers.Layer;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.components.SliderPanel;
@@ -67,7 +72,7 @@ public class ReferenceSchemePanel extends OmniComponent
 	implements MWorkspaceObserver
 {
 	private final ReferenceListPanel referenceListPanel;
-	private final JButton btn1 = new JButton();
+	private final JButton btnReset = new JButton();
 	private final JButton btn2 = new JButton();
 	final OpacitySlider opacitySlider = new OpacitySlider();
 	
@@ -80,6 +85,7 @@ public class ReferenceSchemePanel extends OmniComponent
 		this.master = master;
 		referenceListPanel = new ReferenceListPanel();
 		initComponents();
+		initBindings();
 		opacitySlider.setValue(1.0f);
 
 		
@@ -105,7 +111,7 @@ public class ReferenceSchemePanel extends OmniComponent
 							.addComponent(opacitySlider)
 						)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btn1, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
 							.addComponent(btn2, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(referenceListPanel, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
@@ -120,11 +126,19 @@ public class ReferenceSchemePanel extends OmniComponent
 					.addComponent(referenceListPanel, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btn1, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btn2, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);
 		setLayout(groupLayout);
+	}
+	
+	private void initBindings() {
+		btnReset.addActionListener( new ActionListener() {
+			@Override public void actionPerformed(ActionEvent e) {
+				master.executeCommandString("draw.reset_reference");
+			}
+		});
 	}
 	
 	
@@ -155,7 +169,7 @@ public class ReferenceSchemePanel extends OmniComponent
 	}
 	
 	public class ReferenceListPanel extends JPanel 
-		implements  ListCellRenderer<Layer>, MReferenceObserver
+		implements  ListCellRenderer<Reference>, MReferenceObserver
 	{
 	
 		private final Color bgColor = new Color(64,64,64);
@@ -164,8 +178,8 @@ public class ReferenceSchemePanel extends OmniComponent
 		private final Color addOutlineColor = Color.black;//new Color( 160,160,111);
 		
 		private final JLabel helperLabel = new JLabel();
-		private final JList<Layer> referenceList = new JList<>();
-		private final DefaultListModel<Layer> model = new DefaultListModel<>();
+		private final JList<Reference> referenceList = new JList<>();
+		private final DefaultListModel<Reference> model = new DefaultListModel<>();
 		private final RLPDnDManager dndMan = new RLPDnDManager();
 	
 		public ReferenceListPanel() {
@@ -245,7 +259,7 @@ public class ReferenceSchemePanel extends OmniComponent
 		class RLPCellPanel extends JPanel {
 			final JLabel label;
 			final JPanel thumbnail;
-			Layer layer;
+			Reference reference;
 			
 			RLPCellPanel() {
 				GroupLayout layout = new GroupLayout(this);
@@ -258,15 +272,23 @@ public class ReferenceSchemePanel extends OmniComponent
 					protected void paintComponent(Graphics g) {
 						super.paintComponent(g);
 						
-						if( workspace != null && layer != null) {
-							RenderSettings settings = new RenderSettings(
-									new LayerRenderSource(workspace,layer));
-							settings.width = d.width;
-							settings.height = d.height;
-						
-							BufferedImage bi = master.getRenderEngine().renderImage(settings);
+						if( workspace != null && reference != null ) {
+							if( reference instanceof LayerReference) {
+								RenderSettings settings = new RenderSettings(
+										new LayerRenderSource(workspace,((LayerReference)reference).layer));
+								settings.width = d.width;
+								settings.height = d.height;
 							
-							g.drawImage(bi, 0, 0, d.width, d.height, null);
+								BufferedImage bi = master.getRenderEngine().renderImage(settings);
+								
+								g.drawImage(bi, 0, 0, d.width, d.height, null);
+							}
+							else if( reference instanceof ImageReference){
+								BufferedImage bi = ((ImageReference) reference).image;
+								g.drawImage(bi, 
+										0, 0, bi.getWidth(), bi.getHeight(),
+										0, 0, d.width, d.height, null);
+							}
 						}
 					}
 				};
@@ -296,10 +318,10 @@ public class ReferenceSchemePanel extends OmniComponent
 		
 		@Override
 		public Component getListCellRendererComponent(
-				JList<? extends Layer> list, Layer value, int index,
+				JList<? extends Reference> list, Reference value, int index,
 				boolean isSelected, boolean cellHasFocus) 
 		{
-			renderComponent.layer = value;
+			renderComponent.reference = value;
 			if( value == null) {
 				renderComponent.label.setText("Base Image");
 			}
@@ -469,12 +491,12 @@ public class ReferenceSchemePanel extends OmniComponent
 		void refreshList() {
 			model.clear();
 			if( refMan != null) {
-				for( Layer layer : refMan.getFrontList()) {
-					model.addElement(layer);
+				for( Reference ref : refMan.getList(true)) {
+					model.addElement(ref);
 				}
 				model.addElement(null);
-				for( Layer layer : refMan.getBackList()) {
-					model.addElement(layer);
+				for( Reference ref : refMan.getList(false)) {
+					model.addElement(ref);
 				}
 			}
 		}

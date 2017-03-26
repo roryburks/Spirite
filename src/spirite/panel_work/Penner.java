@@ -186,6 +186,10 @@ public class Penner
 				behavior = new ZoomingReference();
 				behavior.start();
 			}
+			else if( holdingShift) {
+				behavior = new RotatingReference();
+				behavior.start();
+			}
 			else {
 				behavior = new GlobalRefMove();
 				behavior.start();
@@ -619,11 +623,27 @@ public class Penner
 		}
 	}
 	class ZoomingReference extends StateBehavior {
+		int startx = x;
+		int starty = y;
 		@Override public void start() {}
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			context.refzoomer.setFineZoom((float) (context.refzoomer.getRawZoom() * Math.pow(1.0015, 1+(rawY - oldRawY))));
+			workspace.getReferenceManager().zoomTransform(
+					(float)Math.pow(1.0015, 1+(rawY - oldRawY)), startx, starty);
+		}
+	}
+	class RotatingReference extends StateBehavior {
+		int startx = x;
+		int starty = y;
+		int ox = rawX;
+		@Override public void start() {}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			float theta = (rawX-ox)*0.05f;
+			ox = rawX;
+			workspace.getReferenceManager().rotateTransform(theta, startx, starty);
 		}
 	}
 	class GlobalRefMove extends StateBehavior {
@@ -631,8 +651,8 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			context.refzoomer.setCX( Math.round(context.refzoomer.getCX()+ (x - oldX)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
-			context.refzoomer.setCY( Math.round(context.refzoomer.getCY()+ (y - oldY)*context.refzoomer.getZoom()/context.refzoomer.getRawZoom()));
+			float zoom = zoomer.getZoom();
+			workspace.getReferenceManager().shiftTransform((x-oldX)*zoom, (y-oldY)*zoom);
 		}
 		
 	}
@@ -1116,12 +1136,10 @@ public class Penner
 				calcTrans.transform(new Point(x,y), pn);
 				calcTrans.transform(new Point(startX,startY), ps);
 
-				wTrans = new AffineTransform();
-
-				float h = d.height/2.0f;
-				float w = d.width/2.0f;
-				wTrans.scale((pn.getX() - w)/(ps.getX()-w), (pn.getY() - h)/(ps.getY()-h));
-				wTrans.preConcatenate(lockTrans);
+				wTrans = (new AffineTransform(lockTrans));
+				
+				wTrans.scale(pn.getX()/ps.getX(),pn.getY()/ps.getY());
+				//wTrans.concatenate(lockTrans);
 				break;}
 			case ROTATE:{
 				Point2D pn = new Point2D.Float();

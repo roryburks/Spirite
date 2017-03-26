@@ -112,48 +112,7 @@ public class WorkPanel extends javax.swing.JPanel
     }
     
     public final Zoomer zoomer = new Zoomer();
-    public final RefZoomer refzoomer= new RefZoomer();
-    
-    public class RefZoomer extends Zoomer {
-    	private int cx = 0;
-    	private int cy = 0;
 
-    	public int getCX() {return cx;}
-    	public int getCY() {return cy;}
-    	public void setCX(int x) {cx = x; workspace.getReferenceManager().triggerReferenceStructureChanged(false);}
-    	public void setCY(int y) {cy = y; workspace.getReferenceManager().triggerReferenceStructureChanged(false);}
-    	
-    	
-    	@Override
-    	public void setZoomLevel(int amount) {
-            
-    		super.setZoomLevel(amount);
-    		workspace.getReferenceManager().triggerReferenceStructureChanged(false);
-    	}
-    	
-    	public float getRawZoom() {return zoom;}
-    	public void setFineZoom( float zoom) {
-    		this.zoom = zoom;
-    		workspace.getReferenceManager().triggerReferenceStructureChanged(false);
-    	}
-    	
-    	public float getZoom() {
-    		return super.getZoom() * zoomer.getZoom();
-    	}
-    	
-        // :::: Coordinate Conversion methods
-
-        public int itsX( int x) { return Math.round( (x + cx) * zoom  * zoomer.zoom) + offsetx  ;}
-        public int itsY( int y) { return Math.round( (y +cy) * zoom * zoomer.zoom) + offsety  ;}
-        public int stiX( int x) { return Math.round((x - offsetx) / zoom * zoomer.zoom  - cx);}
-        public int stiY( int y) { return Math.round((y - offsety ) / zoom * zoomer.zoom  - cy);}
-        
-        public int itsXm( int x) { return (int) (Math.floor((x + cx) * zoom * zoomer.zoom) + offsetx  );}
-        public int itsYm( int y) { return (int) (Math.floor((y  + cy)* zoom * zoomer.zoom) + offsety );}
-        public int stiXm( int x) { return (int) Math.floor((x - offsetx  ) / zoom * zoomer.zoom - cx);}
-        public int stiYm( int y) { return (int) Math.floor((y - offsety ) / zoom * zoomer.zoom  - cy);}
-    }
-    
     public class Zoomer {
 
 

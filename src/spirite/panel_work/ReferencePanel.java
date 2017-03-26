@@ -27,15 +27,16 @@ public class ReferencePanel extends JPanel
 
 {
 //	private final MasterControl master;
-	private final Zoomer zoomer;
 	private final RenderEngine renderer;
 	private final boolean front;
 	
+	private final Zoomer zoomer;
+	
 	private ImageWorkspace workspace;
+	
 	
 	private static final long serialVersionUID = 1L;
 	public ReferencePanel(WorkPanel context, MasterControl master, boolean front) {
-		this.zoomer = context.refzoomer;
 		this.renderer = master.getRenderEngine();
 		this.front = front;
 		
@@ -46,6 +47,7 @@ public class ReferencePanel extends JPanel
 		workspace.addImageObserver(this);
 		workspace.getReferenceManager().addReferenceObserve(this);
 				
+		this.zoomer = context.zoomer;
 		
 		this.setOpaque(false);
         
@@ -62,10 +64,10 @@ public class ReferencePanel extends JPanel
             
             Graphics2D g2 = (Graphics2D)g;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
-            g.drawImage( buffer, 
-            		zoomer.itsX(0), zoomer.itsY(0),
-            		zoomer.itsX(buffer.getWidth()), zoomer.itsY(buffer.getHeight()),
-            		0, 0, buffer.getWidth(), buffer.getHeight(), null);
+            g2.translate(zoomer.itsX(0), zoomer.itsY(0));
+            g2.scale(zoomer.getZoom(), zoomer.getZoom());
+            g2.transform( workspace.getReferenceManager().getTransform());
+            g.drawImage( buffer, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
         }
         
     }

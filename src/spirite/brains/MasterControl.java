@@ -574,10 +574,6 @@ public class MasterControl
 						workspace.getWidth(), workspace.getHeight(), 
 						"New Layer", new Color(0,0,0,0));
     		}});
-    		commandMap.put("toggle_reference", new Runnable() {@Override public void run() {
-					ReferenceManager rm = workspace.getReferenceManager();
-					rm.setEditingReference(!rm.isEditingReference());
-			}});
     		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
@@ -642,6 +638,15 @@ public class MasterControl
     			if( p != null)
     				p.cleanseState();
     		}});
+
+    		commandMap.put("toggle_reference", new Runnable() {@Override public void run() {
+					ReferenceManager rm = workspace.getReferenceManager();
+					rm.setEditingReference(!rm.isEditingReference());
+			}});
+    		commandMap.put("reset_reference", new Runnable() {@Override public void run() {
+					ReferenceManager rm = workspace.getReferenceManager();
+					rm.resetTransform();
+			}});
     	}
 
 		@Override public List<String> getValidCommands() {
