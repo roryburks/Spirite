@@ -14,11 +14,16 @@ import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
-
+/**
+ * 
+ * Uses the JPen2 library,
+ * @author Guy
+ *
+ */
 public class JPenPenner implements PenListener
 {
 	private final ToolsetManager toolsetManager;
-	private final Penner penner;
+	final Penner penner;
 	
 	public JPenPenner( DrawPanel context, MasterControl master) {
 		penner = new Penner(context, master);

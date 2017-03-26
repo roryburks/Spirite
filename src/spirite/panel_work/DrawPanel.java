@@ -85,6 +85,10 @@ public class DrawPanel extends JPanel
 	public void refreshPennerCoords() {
 		penner.refreshCoordinates();
 	}
+	
+	public Penner getPenner() {
+		return penner.penner;
+	}
 
 	
     // :::: Paint

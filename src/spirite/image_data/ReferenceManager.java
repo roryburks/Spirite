@@ -11,10 +11,16 @@ import spirite.image_data.layers.Layer;
 /**
  * ReferenceManager manages the Reference system.
  *
+ *	References Come in two types: 
+ *	-Layers dragged from the Workspace, they are affected by the Reference transform.
+ *	-
  */
 public class ReferenceManager {
 	private boolean editingReference = false;
 	private float refAlpha = 1.0f;
+	
+	
+	
 	
 	// null signifies the Workspace layer
 	private final List<Layer> references = new ArrayList<>();

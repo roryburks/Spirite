@@ -40,6 +40,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
+import spirite.panel_work.Penner;
 import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.FrameManager;
 
@@ -637,6 +638,9 @@ public class MasterControl
     		}});
     		commandMap.put("applyTransform", new Runnable() {@Override public void run() {
     			workspace.getSelectionEngine().applyProposedTransform();
+    			Penner p = frameManager.getPennerForWorkspace(workspace);
+    			if( p != null)
+    				p.cleanseState();
     		}});
     	}
 

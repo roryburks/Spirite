@@ -20,6 +20,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,6 @@ import spirite.pen.StrokeEngine;
  * panel and then translates them into actions to be performed by the 
  * DrawEngine.
  * 
- * Uses the JPen2 library which requires the JPen DLLs to be accessible.
  *
  * @author Rory Burks
  */
@@ -135,6 +135,13 @@ public class Penner
 	public void refreshCoordinates() {
 		rawUpdateX(rawX);
 		rawUpdateY(rawY);
+	}
+	
+	public void cleanseState() {
+		if( behavior != null)
+			behavior.end();
+		behavior = null;
+		context.repaint();
 	}
 	
 	/** Pen/Mouse input should not necessarily change the image every time
@@ -417,6 +424,11 @@ public class Penner
 	}
 	
 	abstract class DrawnStateBehavior extends StateBehavior {
+		@Override
+		public void end() {
+			super.end();
+			context.repaint();
+		}
 		public abstract void paintOverlay( Graphics g);
 	}
 	
@@ -939,8 +951,17 @@ public class Penner
 		READY, ROTATE, RESIZE, MOVING
 	}
 	class ReshapingBehavior extends DrawnStateBehavior {
+		// The Working Transform is the transform which is used for drawing
 		AffineTransform wTrans = new AffineTransform();
+		
+		// The Lock Transform is the transform stored at the start of the current
+		//	action, which is used in combination of the transformation of the current
+		//	action to create the Working Transform
 		AffineTransform lockTrans = new AffineTransform();
+		
+		// The Calculation Transform is a version of the Locked Transform which has
+		//	all the relevent offsets built-in so that calculation changes in mouse
+		//	movement with respect to the selection's center can be easily performed.
 		AffineTransform calcTrans = new AffineTransform();
 		ReshapeStates state = ReshapeStates.READY;
 		int startX,startY;
@@ -987,32 +1008,32 @@ public class Penner
 				e.printStackTrace();
 			}
 			
-			int sw = (int)Math.round(d.width*0.3);	// Width of corner rect
-			int sh = (int)Math.round(d.height*0.3);	// Height
-			int x2 = (int)Math.round(d.width*0.7);	// Offset of right rect
-			int y2 = (int)Math.round(d.height*0.7);	// " bottom
-			int di = (int)Math.round(d.height*0.2);	// Diameter of rotate thing
-			int of = (int)Math.round(d.height*0.25*0.2);
+			float sw = d.width*0.3f;	// Width of corner rect
+			float sh = d.height*0.3f;	// Height
+			float x2 = d.width*0.7f;	// Offset of right rect
+			float y2 = d.height*0.7f;	// " bottom
+			float di = d.height*0.2f;	// Diameter of rotate thing
+			float of = d.height*0.25f*0.2f;
 
-			int b = 4;
+			float b = 4/zoom;
 			
 			List<Shape> s = new ArrayList<>(12);
-			s.add(new Rectangle(sw+b, b, x2-sw-b*2, sh-b*2));	// N
-			s.add(new Rectangle(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
-			s.add(new Rectangle(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
-			s.add(new Rectangle(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
+			s.add(new Rectangle2D.Float(sw+b, b, x2-sw-b*2, sh-b*2));	// N
+			s.add(new Rectangle2D.Float(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
+			s.add(new Rectangle2D.Float(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
+			s.add(new Rectangle2D.Float(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
 			
-			s.add(new Rectangle(b, b, sw-b*2, sh-b*2));			// NW
-			s.add(new Rectangle(x2+b, b, sw-b*2, sh-b*2));		// NE
-			s.add(new Rectangle(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
-			s.add(new Rectangle(b, y2+b, sw-b*2, sh-b*2));		// SW
+			s.add(new Rectangle2D.Float(b, b, sw-b*2, sh-b*2));			// NW
+			s.add(new Rectangle2D.Float(x2+b, b, sw-b*2, sh-b*2));		// NE
+			s.add(new Rectangle2D.Float(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
+			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
 
 			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
 			s.add(new Ellipse2D.Float( d.width-of, -di+of, di, di));	// NE
 			s.add(new Ellipse2D.Float( d.width-of, d.height-of, di, di));	// SE
 			s.add(new Ellipse2D.Float( -di+of, d.height-of, di, di));	// SW
 
-			s.add(new Rectangle(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
+			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
 			
 			if( this.state == ReshapeStates.READY)
 				overlap = -1;
@@ -1047,8 +1068,13 @@ public class Penner
 			}
 			
 			if( overlap >= 0 && overlap <= 7) {
+				Dimension d = sel.selection.getDimension();
 				startX = x;
 				startY = y;
+				lockTrans = new AffineTransform(wTrans);
+				calcTrans = new AffineTransform();
+				calcTrans.translate(-sel.offsetX-d.width/2.0f, -sel.offsetY-d.height/2.0f);
+				calcTrans.preConcatenate(lockTrans);
 				this.state = ReshapeStates.RESIZE;
 			}
 			else if( overlap >= 8 && overlap <= 0xB) {
@@ -1090,11 +1116,12 @@ public class Penner
 				calcTrans.transform(new Point(x,y), pn);
 				calcTrans.transform(new Point(startX,startY), ps);
 
-				wTrans = (new AffineTransform(lockTrans));
+				wTrans = new AffineTransform();
 
 				float h = d.height/2.0f;
 				float w = d.width/2.0f;
 				wTrans.scale((pn.getX() - w)/(ps.getX()-w), (pn.getY() - h)/(ps.getY()-h));
+				wTrans.preConcatenate(lockTrans);
 				break;}
 			case ROTATE:{
 				Point2D pn = new Point2D.Float();
@@ -1118,6 +1145,11 @@ public class Penner
 		public void start() {
 		}
 
+		@Override
+		public void end() {
+			super.end();
+			selectionEngine.stopProposintTransform();
+		}
 		@Override
 		public void onTock() {}
 
@@ -1191,7 +1223,9 @@ public class Penner
 	// :::: MToolsetObserver
 	@Override
 	public void toolsetChanged(Tool newTool) {
-		this.behavior = null;
+		if(behavior != null)
+			behavior.end();
+		behavior = null;
 		if( selectionEngine.isBuilding()) {
 			selectionEngine.cancelBuildingSelection();
 		}

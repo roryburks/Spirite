@@ -234,6 +234,13 @@ public class SelectionEngine {
 		this.proposedTransform = trans;
 		workspace.triggerImageRefresh(selChangeEvt);
 	}
+	public void stopProposintTransform() {
+		if( proposingTransform) {
+			proposingTransform = false;
+			workspace.triggerImageRefresh(selChangeEvt);
+		}
+		
+	}
 	public void applyProposedTransform() {
 		if( proposingTransform) {
 			transformSelection(proposedTransform);

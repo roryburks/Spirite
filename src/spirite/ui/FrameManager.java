@@ -25,6 +25,7 @@ import spirite.panel_layers.LayersPanel;
 import spirite.panel_layers.ReferenceSchemePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
+import spirite.panel_work.Penner;
 import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.panel_work.WorkTabPane;
 import spirite.ui.OmniFrame.OmniComponent;
@@ -212,6 +213,13 @@ public class FrameManager
 		
 		WorkTabPane wsPane = root.getWTPane();
 		return wsPane.getZoomerForWorkspace(ws);
+	}
+	public Penner getPennerForWorkspace( ImageWorkspace ws) {
+
+		if( root == null) return null;
+		
+		WorkTabPane wsPane = root.getWTPane();
+		return wsPane.getPennerForWorkspace(ws);
 	}
 	
 	// :::: WindowListener

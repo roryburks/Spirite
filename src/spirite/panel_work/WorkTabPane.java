@@ -58,6 +58,14 @@ public class WorkTabPane extends JTabbedPane
 		}
 		return null;
 	}
+	public Penner getPennerForWorkspace( ImageWorkspace ws) {
+		for( WorkPanel panel : panels) {
+			if( panel.workspace == ws) {
+				return panel.workSplicePanel.drawPanel.getPenner();
+			}
+		}
+		return null;
+	}
 	
 	// :::: MWorkspaceObserver
 	@Override

@@ -36,7 +36,6 @@ public class ReferencePanel extends JPanel
 	private static final long serialVersionUID = 1L;
 	public ReferencePanel(WorkPanel context, MasterControl master, boolean front) {
 		this.zoomer = context.refzoomer;
-//		this.master = master;
 		this.renderer = master.getRenderEngine();
 		this.front = front;
 		
