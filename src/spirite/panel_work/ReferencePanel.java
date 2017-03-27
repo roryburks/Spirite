@@ -20,6 +20,7 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
+import spirite.image_data.ReferenceManager.Reference;
 import spirite.panel_work.WorkPanel.Zoomer;
 
 public class ReferencePanel extends JPanel 
@@ -66,7 +67,12 @@ public class ReferencePanel extends JPanel
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoomer.getZoom(), zoomer.getZoom());
-//            g2.transform( workspace.getReferenceManager().getTransform());
+            
+            for(Reference ref : workspace.getReferenceManager().getList(this.front)) {
+            	if( !ref.isGlobal())
+            		ref.draw(g2);
+            }
+            g2.transform( workspace.getReferenceManager().getTransform());
             g.drawImage( buffer, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
         }
         

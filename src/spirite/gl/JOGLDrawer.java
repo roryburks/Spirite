@@ -106,7 +106,7 @@ public class JOGLDrawer {
     }
 
     /**
-     * @param options 0th bit: 0 = ignore alpha, 1 = test alpha
+     * @param options 0th bit: 0 = ignore alpha, 1 = test alpha, 2 = change all
      */
     public void changeColor( BufferedImage bi, Color from, Color to, int options) {
     	GLParameters params = new GLParameters();

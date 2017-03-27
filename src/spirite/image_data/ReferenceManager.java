@@ -36,8 +36,10 @@ public class ReferenceManager {
 	// ==================
 	// ==== Reference Types
 	public abstract class Reference {
+		protected boolean global;
 		AffineTransform localTransform = new AffineTransform();
 		public abstract void draw( Graphics g);
+		public final boolean isGlobal() {return global;}
 	}
 	
 	public class LayerReference extends Reference{
@@ -45,6 +47,7 @@ public class ReferenceManager {
 		
 		private LayerReference( Layer layer) {
 			this.layer = layer;
+			this.global = true;
 		}
 
 		@Override
@@ -52,7 +55,6 @@ public class ReferenceManager {
 			Graphics2D g2 = (Graphics2D)g;
 			AffineTransform t = g2.getTransform();
 			g2.transform(localTransform);
-			g2.transform(globalTransform);
 			
 			layer.draw(g2);
 			
@@ -63,6 +65,7 @@ public class ReferenceManager {
 		public final BufferedImage image;
 		ImageReference( BufferedImage image) {
 			this.image = image;
+			this.global = false;
 		}
 		@Override
 		public void draw(Graphics g) {

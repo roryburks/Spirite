@@ -29,6 +29,8 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.gl.GLEngine;
+import spirite.gl.GLMultiRenderer;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -544,6 +546,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
 			try {
+				
 				int n = _getNeededImagers( settings);
 	
 				if( n <= 0) return null;
@@ -907,7 +910,8 @@ public class RenderEngine
 			g2.scale( rw, rh);
 					
 			for( Reference ref : refList ) {
-				ref.draw(g2);
+				if( ref.isGlobal())
+					ref.draw(g2);
 			}
 			
 			g2.dispose();

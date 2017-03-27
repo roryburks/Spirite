@@ -1,10 +1,13 @@
 package spirite.gl;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
@@ -14,6 +17,9 @@ import mutil.MatrixBuilder;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.PreparedTexture;
 import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLMultiRenderer.GLRenderer;
+import spirite.gl.GLParameters.GLParam1i;
+import spirite.gl.GLParameters.GLParam4f;
 
 /** 
  * GLUIDraw is a mostly-static (needs to be linked to a non-static GLEngine
@@ -35,6 +41,153 @@ public class GLUIDraw {
 		HUE,
 		SATURATION,
 		VALUE
+	}
+	
+	/** A debug method which demonstrates the GLMultiRender capabilities:
+	 * draws a border around the image, then changes that border color to red.
+	 */
+	public static BufferedImage _ddbounds( 
+			BufferedImage bi, int cycle )
+	{
+		int w = bi.getWidth();
+		int h = bi.getHeight();
+		GL3 gl = engine.getGL3();
+		engine.setSurfaceSize(w, h);
+
+		GLMultiRenderer glmu = new GLMultiRenderer(
+				w, h, gl.getGL2());
+		glmu.init();
+		
+		glmu.render( new GLRenderer() {
+			@Override
+			public void render(GL _gl) {
+				GL3 gl = _gl.getGL3();
+				
+				PreparedData pd = engine.prepareRawData(new float[]{
+					// x  y   u   v
+					0, 0, 0.0f, 0.0f,
+					w, 0, 1.0f, 0.0f,
+					0, h, 0.0f, 1.0f,
+					w, h, 1.0f, 1.0f,
+				});
+				
+				// Clear Surface
+			    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+		        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+
+		        int prog = engine.getProgram(ProgramType.PASS_BORDER);
+		        gl.glUseProgram( prog);
+
+		        // Bind Attribute Streams
+		        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
+		        gl.glEnableVertexAttribArray( 0);
+		        gl.glEnableVertexAttribArray( 1);
+		        gl.glVertexAttribPointer( 0, 2, GL3.GL_FLOAT, false, 4*4, 0);
+		        gl.glVertexAttribPointer( 1, 2, GL3.GL_FLOAT, false, 4*4, 4*2);
+		        
+		        //Bind Texture
+				PreparedTexture pt = engine.prepareTexture(bi);
+				gl.glEnable(GL3.GL_TEXTURE_2D);
+				gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
+				
+		        // Bind Uniforms
+		        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+		        int uCycle = gl.glGetUniformLocation( prog, "uCycle");
+		        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
+		        	MatrixBuilder.orthagonalProjectionMatrix( 0, w, 0, h, -1, 1)
+		        );
+		        gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
+		        gl.glUniform1i(uCycle, cycle);
+
+		        // Start Draw
+				gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+		        
+
+				// Free
+				gl.glDisable(GL3.GL_TEXTURE_2D);
+		        gl.glDisableVertexAttribArray( 0);
+		        gl.glDisableVertexAttribArray( 1);
+		        gl.glUseProgram(0);
+		        pt.free();
+		        pd.free();
+			}
+		});
+
+
+		PreparedData pd = engine.prepareRawData(new float[]{
+			// x  y   u   v
+			0, 0, 0.0f, 0.0f,
+			w, 0, 1.0f, 0.0f,
+			0, h, 0.0f, 1.0f,
+			w, h, 1.0f, 1.0f,
+		});
+
+		// Clear Surface
+	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+
+    	GLParameters params = new GLParameters();
+
+    	params.addParam( new GLParam1i("optionMask", 2));
+    	params.addParam( new GLParam4f("cFrom", 0, 0, 0, 1));
+    	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
+    	
+    	int prog = engine.getProgram(ProgramType.CHANGE_COLOR);
+        gl.glUseProgram(prog);
+        
+        // Bind Attribute Streams
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glEnableVertexAttribArray(0);
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(0, 2, GL3.GL_FLOAT, false, 4*4, 0);
+        gl.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, 4*4, 4*2);
+
+        // Bind Texture
+//        gl.glPushAttrib(GL.GL_TEXTURE_BI);
+//        gl.glActiveTexture(inTextureUnitID);
+        gl.glBindTexture(GL3.GL_TEXTURE_2D, glmu.getTexture());
+        //set the texture up to be used for painting a surface ...
+        int textureTarget = GL3.GL_TEXTURE_2D;
+        gl.glEnable(textureTarget);
+//        gl.glTexEnvi(GL.GL_TEXTURE_ENV,GL3.GL_TEXTURE_ENV_MODE,GL3.GL_MODULATE);
+        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MIN_FILTER,GL3.GL_LINEAR);
+        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MAG_FILTER,GL3.GL_LINEAR);
+        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_S,GL3.GL_REPEAT);
+        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_T,GL3.GL_REPEAT);
+        
+
+		// Bind Uniforms
+        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
+        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
+        );
+        gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
+        
+        if( params != null)
+        	params.apply(gl, prog);
+
+		// Start Draw
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
+        gl.glBlendEquation(GL3.GL_MAX);
+		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glDisable( GL.GL_BLEND);
+		
+		// Finished Drawing
+		gl.glDisable(GL3.GL_TEXTURE_2D);
+		gl.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(1);
+        gl.glUseProgram(0);
+		pd.free();
+        
+		glmu.cleanup();
+
+		GLAutoDrawable drawable = engine.getDrawable();
+        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+        		.readPixelsToBufferedImage(
+        				gl, 0, 0, w, h, true); 
+       
+		return im;
 	}
 	
 	/**
