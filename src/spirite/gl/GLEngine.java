@@ -12,6 +12,7 @@ import java.util.Scanner;
 import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -20,6 +21,7 @@ import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 
+import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -102,6 +104,8 @@ public class GLEngine  {
 		return drawable;
 	}
 	
+	// =================
+	// ==== Program Management
 	public enum ProgramType {
 		DEFAULT,
 		SQARE_GRADIENT,
@@ -116,6 +120,73 @@ public class GLEngine  {
 	
 	public int getProgram( ProgramType type){
 		return programs[type.ordinal()];
+	}
+	
+	
+	/** Applies the specified Shader Program with the provided parameters, using 
+	 * the basic xyuv texture construction.*/
+	public void applyProgram( ProgramType type, GLParameters params) {
+		int w = params.width;
+		int h = params.height;
+		setSurfaceSize(w, h);
+		GL3 gl = getGL3();
+		int prog = getProgram(type);
+
+		PreparedData pd = prepareRawData(new float[]{
+			// x  y   u   v
+			0, 0, 0.0f, 0.0f,
+			w, 0, 1.0f, 0.0f,
+			0, h, 0.0f, 1.0f,
+			w, h, 1.0f, 1.0f,
+		});
+
+		// Clear Surface
+	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+        
+        gl.glUseProgram(prog);
+        
+        // Bind Attribute Streams
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glEnableVertexAttribArray(0);
+        gl.glEnableVertexAttribArray(1);
+        gl.glVertexAttribPointer(0, 2, GL3.GL_FLOAT, false, 4*4, 0);
+        gl.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, 4*4, 4*2);
+
+        // Bind Texture
+        if( params.texture != null) {
+        	params.texture.load();
+//    		PreparedTexture pt = engine.prepareTexture(bi);
+    		gl.glEnable(GL3.GL_TEXTURE_2D);
+    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
+        }
+
+		// Bind Uniforms
+        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
+        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
+        );
+        gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
+        
+        if( params != null)
+        	params.apply(gl, prog);
+
+		// Start Draw
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
+        gl.glBlendEquation(GL3.GL_MAX);
+		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glDisable( GL.GL_BLEND);
+		
+		// Finished Drawing
+		gl.glDisable(GL3.GL_TEXTURE_2D);
+		gl.glDisableVertexAttribArray(0);
+		gl.glDisableVertexAttribArray(1);
+        gl.glUseProgram(0);
+		pd.free();
+        if( params.texture != null) {
+        	params.texture.unload();
+        }
 	}
 	
 	// :::: Texture Preperation
@@ -137,6 +208,7 @@ public class GLEngine  {
 			super.finalize();
 		}
 		
+		public int getTexID() {return tex.get(0);}
 		private boolean _free = false;
 		
 		public void free() {
@@ -225,7 +297,8 @@ public class GLEngine  {
 	}
 	
 	
-	// Initialization
+	// ==============
+	// ==== Initialization
 	
 	private void initShaders() {
         programs[ProgramType.DEFAULT.ordinal()] = loadProgramFromResources(

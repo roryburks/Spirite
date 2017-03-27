@@ -10,20 +10,15 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
 
 import mutil.DataCompaction.IntCompactor;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
-import spirite.brains.CacheManager;
-import spirite.brains.CacheManager.CachedImage;
 import spirite.gl.GLUIDraw;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;

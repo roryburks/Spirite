@@ -1,10 +1,13 @@
 package spirite.gl;
 
+import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.jogamp.opengl.GL3;
+
+import spirite.gl.GLEngine.PreparedTexture;
 
 /**
  * GLParameters encapsulates the GL Uniform Parameters so that they
@@ -14,6 +17,79 @@ import com.jogamp.opengl.GL3;
  *
  */
 public class GLParameters {
+	public final List<GLParam> params = new ArrayList<>();
+	public GLTexture texture;
+	public int width, height;
+	
+	public GLParameters( int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+	
+	public void addParam( GLParam param) {
+		params.add(param);
+	}
+
+	public void apply( GL3 gl, int prog) {
+		for( GLParam param : params) {
+			param.apply(gl, prog);
+		}
+	}
+	
+	// ==============
+	// ==== Textures
+	
+	/** A class storing things that can be transferred into  */
+	public abstract static class GLTexture {
+		public abstract int load();
+		public abstract void unload();
+	}
+	
+	public static class GLImageTexture extends GLTexture {
+		private PreparedTexture texture;
+		private final BufferedImage image;
+		
+		public GLImageTexture( BufferedImage image) {
+			this.image = image;
+		}
+
+		@Override
+		public int load(){
+			texture = GLEngine.getInstance().prepareTexture(image);
+			
+			return texture.getTexID();
+		}
+		@Override
+		public void unload(){
+			texture.free();
+		}
+	}
+	public static class GLFBOTexture extends GLTexture {
+		private final GLMultiRenderer glmu;
+		public GLFBOTexture( GLMultiRenderer glmu) {
+			this.glmu = glmu;
+		}
+		@Override
+		public int load() {
+	        //set the texture up to be used for painting a surface ...
+			GL3 gl = GLEngine.getInstance().getGL3();
+	        gl.glBindTexture(GL3.GL_TEXTURE_2D, glmu.getTexture());
+	        int textureTarget = GL3.GL_TEXTURE_2D;
+	        gl.glEnable(textureTarget);
+	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MIN_FILTER,GL3.GL_LINEAR);
+	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MAG_FILTER,GL3.GL_LINEAR);
+	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_S,GL3.GL_REPEAT);
+	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_T,GL3.GL_REPEAT);
+	        
+	        return glmu.getTexture();
+		}
+
+		@Override public void unload() {}	
+	}
+	
+	// ==============
+	// ==== Specific Parameters
+
 	public abstract static class GLParam {
 		protected final String name;
 		GLParam( String name) { this.name = name;}
@@ -63,15 +139,4 @@ public class GLParameters {
 		}
 	}
 	
-	private final List<GLParam> params = new ArrayList<>();
-	
-	public void addParam( GLParam param) {
-		params.add(param);
-	}
-
-	public void apply( GL3 gl, int prog) {
-		for( GLParam param : params) {
-			param.apply(gl, prog);
-		}
-	}
 }

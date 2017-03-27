@@ -29,8 +29,6 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.gl.GLEngine;
-import spirite.gl.GLMultiRenderer;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
