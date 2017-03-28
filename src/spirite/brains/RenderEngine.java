@@ -777,6 +777,23 @@ public class RenderEngine
 	 * This updated version uses JOGL rendering algorithms instead of 
 	 * AWT rendering, so that custom fragment shaders can be injected 
 	 * without performace-loss.
+	 * 
+	 * I will attempt to explain how the shaders work in relation to each
+	 * other and why they are built that way:
+	 * 
+	 * To begin, we are using Porter/Duff composition rules (in particular
+	 * Source Over Destination), which requires using pre-multiplied pixel
+	 * format.  Now it is possible 
+	 * 
+	 * Any time that a BufferedImage is being drawn to a GL surface, we use
+	 * PASS_BASIC, which colors it to the texture as premultipled and using
+	 * Porter/Duff SRC_OVER rule, multiplying in the shader.  Any time that 
+	 * a GL Surface is drawn to another GL Surface, we use PASS_NULL, which
+	 * preserves the color data, not multiplying them by the alpha because
+	 * they are already premultiplied.  And finally when we draw the 
+	 * GLSurface to the primary GL Drawing Surface, then we use PASS_ESCALATE
+	 * which convert it to non-premultiplied by divinding the colors by the 
+	 * alpha.
 	 */
 	public class NodeRenderSource extends RenderSource {
 		private final GroupNode root;
@@ -1031,7 +1048,7 @@ public class RenderEngine
 						params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()));
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
 						GLEngine.getInstance().applyPassProgram(
-								ProgramType.PASS_BASIC, params, null);
+								ProgramType.PASS_NULL, params, null);
 					}
 				});
 			}

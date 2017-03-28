@@ -104,22 +104,23 @@ public class GLUIDraw {
 	 * @return
 	 */
 	public static BufferedImage drawBounds( 
-			BufferedImage image, AffineTransform trans, int cycle) 
+			BufferedImage image, int cycle, AffineTransform trans) 
 	{
-		int w = image.getWidth();
-		int h = image.getHeight();
-		GLParameters params = new GLParameters(w, h);
+		int width = image.getWidth();
+		int height = image.getHeight();
+		GLParameters params = new GLParameters(width, height);
 		
 		params.addParam( new GLParam1i("uCycle", cycle));
 		params.texture = new GLImageTexture(image);
 
     	engine.clearSurface();
-		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
+		engine.applyPassProgram(ProgramType.PASS_BORDER, params, trans,
+				0, 0, image.getWidth(), image.getHeight());
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, w, h, false); 
+        				engine.getGL3(), 0, 0, width, height, false); 
        
 		return im;
 	}

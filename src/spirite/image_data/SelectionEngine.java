@@ -9,11 +9,13 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
+import javax.imageio.ImageIO;
 
 import mutil.DataCompaction.IntCompactor;
 import spirite.Globals;
@@ -787,7 +789,7 @@ public class SelectionEngine {
 				pg.addPoint(compactor.get(i), compactor.get(i+1));
 			}
 			Graphics g = bi.getGraphics();
-			g.setColor(Color.BLACK);
+			g.setColor(Color.WHITE);
 			g.fillPolygon(pg);
 			g.dispose();
 			
@@ -830,11 +832,16 @@ public class SelectionEngine {
 		@Override
 		public void drawSelectionBounds(Graphics g) {
 			// TODO: Make this work as expected (modification of GLRendering needed)
-//			Graphics2D g2 = (Graphics2D)g;
+			Graphics2D g2 = (Graphics2D)g;
+			g2.drawImage(GLUIDraw.drawBounds(bi, c--, null), 0, 0, null);
 //			AffineTransform trans = g2.getTransform();
 //			g2.setTransform( new AffineTransform());
 			
-			g.drawImage(GLUIDraw.drawBounds(bi, null, c--), 0, 0, null);
+//			AffineTransform t2 = g2.getTransform();
+//			t2.scale(1,1);
+
+//			Rectangle r = g.getClipBounds();
+//				g2.drawImage(GLUIDraw.drawBounds(bi, c--, t2, r.width, r.height), 0, 0, null);
 //			g2.setTransform(trans);
 		}
 		@Override
