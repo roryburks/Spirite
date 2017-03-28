@@ -20,6 +20,13 @@ import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
+/**
+ * The GLStrokeEngine is a StrokeEngine that uses OpenGL to create a particular
+ * kind of Stroke.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
 	
@@ -50,7 +57,6 @@ public class GLStrokeEngine extends StrokeEngine {
 		_stroke( composeVBufferFromArray(states));
 		return true;
 	}
-	
 	
 	
 	private class GLVBuffer {

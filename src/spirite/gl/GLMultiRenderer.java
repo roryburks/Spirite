@@ -8,6 +8,15 @@ import com.jogamp.opengl.GL3;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 
+
+/**
+ * GLMultiRenderer encapsulates the behavior of a FrameBuffer Object, used for
+ * multi-pass rendering (rendering an image to a surface in a certain way then
+ * rendering THAT surface to the image in a certain way).
+ * 
+ * @author Rory Burks
+ *
+ */
 public class GLMultiRenderer {
 	private final GL2 gl;
 	private final int width, height;
@@ -22,8 +31,10 @@ public class GLMultiRenderer {
 		this.gl = gl;
 	}
 	
+	/** Checks is the FrameBuffer was successfully created, displaying a proper
+	 * Error message if it wasn't.
+	 */
 	private void checkFramebuffer() {
-
         switch( gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)) {
         case GL.GL_FRAMEBUFFER_COMPLETE:
     		break;
@@ -66,8 +77,12 @@ public class GLMultiRenderer {
         }
 	}
 	
+	/** Loads the frame buffer object and prepares it for use.  
+	 * 
+	 * NOTE: cleanup() must be called at some point after calling this
+	 * so that the native OpenGL resources get freed.
+	 */
 	public void init() {
-		
 		// Allocate FBO
 		int[] result = new int[1];
 		gl.glGenFramebuffers(1, result, 0);
@@ -94,11 +109,14 @@ public class GLMultiRenderer {
         gl.glBindFramebuffer( GL.GL_FRAMEBUFFER, 0);
 	}
 		
-	
+	/** A GLRenderer is passed to the GLMU's render method.  Any GL code inside
+	 * the render method of the GLRenderer will be applied to the FrameBuffer
+	 * assosciated with the GLMU*/
 	public static interface GLRenderer {
 		public void render(GL gl);
 	}
 	
+	/** Renders the given GL code within the context of the encapsulated FrameBuffer */
 	public void render( GLRenderer renderer ) {
 //		gl.glPushAttrib(GL2.GL_TRANSFORM_BIT | GL2.GL_ENABLE_BIT | GL2.GL_COLOR_BUFFER_BIT);
 //		gl.glDisable(GL.GL_DEPTH_TEST);
@@ -117,6 +135,7 @@ public class GLMultiRenderer {
 
 	}
 	
+	/** Gets the ID of the Color Texture that GLMU uses.*/
 	public int getTexture() {
 		return this.tex;
 	}

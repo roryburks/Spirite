@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import spirite.Globals;
 import spirite.MUtil;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.RenderEngine.RenderSettings;
@@ -92,7 +93,7 @@ public class SimpleLayer extends Layer {
 			helper.offsetChange.y = newBounds.y;
 			
 			// Draw both images in their respective spots
-			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, Globals.BI_FORMAT);
 			MUtil.clearImage(combination);
 			Graphics g = combination.getGraphics();
 			g.drawImage( data.deepAccess(), 0-newBounds.x, 0-newBounds.y, null);

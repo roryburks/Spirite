@@ -2,9 +2,12 @@ package mutil;
 
 import java.util.ArrayList;
 
-/**
- * @author Guy
- *
+/***
+ * A naive compact Data storage type designed for data which grows steadily
+ * and then stops at a size that cannot be easily predicted.  Allocates in
+ * CHUNKS rather than exponentially.
+ * 
+ * @author Rory Burks
  */
 public class DataCompaction {
 	public static class IntCompactor {

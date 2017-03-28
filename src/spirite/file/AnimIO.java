@@ -19,6 +19,7 @@ import javax.imageio.stream.ImageOutputStream;
 import mutil.GifSequenceWriter;
 import mutil.RectanglePacker;
 import mutil.RectanglePacker.PackedRectangle;
+import spirite.Globals;
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.image_data.GroupTree.GroupNode;
@@ -60,7 +61,7 @@ public class AnimIO {
 		
 		int c = (int)Math.floor(animation.getEndFrame());
 		
-		BufferedImage bi = new BufferedImage(width*c, height, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage bi = new BufferedImage(width*c, height, Globals.BI_FORMAT);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		MUtil.clearImage(bi);
@@ -74,6 +75,13 @@ public class AnimIO {
 		ImageIO.write(bi, "png", file);
 	}
 	
+	/**
+	 * Exports a given GroupNode into an animated GIF with the to the given file
+	 * animated with the given FPS.
+	 * 
+	 * NOTE: This method is extremely experimental and only works for SimpleLayers
+	 * as of now.
+	 */
 	public static void exportGroupGif( GroupNode group, File file, float fps) 
 			throws FileNotFoundException, IOException 
 	{
@@ -162,7 +170,7 @@ public class AnimIO {
 					oy = handle.getDynamicY();
 				}
 				
-				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, Globals.BI_FORMAT);
 				Graphics g = bi.getGraphics();
 				g.drawImage(handle.deepAccess(), -bounds.x, -bounds.y, null);
 				g.dispose();
@@ -191,7 +199,7 @@ public class AnimIO {
 		}
 		
 		BufferedImage output_bi = new BufferedImage(
-				pr.width, pr.height, BufferedImage.TYPE_4BYTE_ABGR);
+				pr.width, pr.height, Globals.BI_FORMAT);
 		Graphics g = output_bi.getGraphics();
 		for( CroppedImage ci : images) {
 			if( ci != null && ci.rectInImage != null) {

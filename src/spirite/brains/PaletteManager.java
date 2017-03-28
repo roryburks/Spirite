@@ -3,6 +3,7 @@ package spirite.brains;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +20,10 @@ import spirite.brains.MasterControl.CommandExecuter;
  * The PaletteManager stores both the active colors and the palette
  * of colors stored for easy access. 
  * 
+ * Palettes are saved using the SettingsManager, which stores them using the 
+ * Preference system.  A list of all saved palettes arestored in "PaletteList" 
+ * and each palette is stored in "palette.[name]"
+ * 
  * @author Rory Burks
  *
  */
@@ -27,7 +32,7 @@ public class PaletteManager
 {
 	private final SettingsManager settingsManager;
     private final List<Color> active_colors;
-    private Map<Integer,Color> palette_colors;
+    private final Map<Integer,Color> palette_colors;
 
     private final static Color default_palette[] = {
         Color.BLACK, Color.DARK_GRAY, Color.GRAY, Color.LIGHT_GRAY, Color.WHITE,
@@ -58,7 +63,8 @@ public class PaletteManager
         triggerColorChanged();
     }
     
-    // :::: Active Color Methods
+    // ==================
+    // ==== Active Color Methods
     public Color getActiveColor( int i) {
     	return active_colors.get(i);
     }
@@ -74,7 +80,7 @@ public class PaletteManager
     	active_colors.set(3, t);
         triggerColorChanged();
     }
-    public void toggleActiveColors2() {
+    public void toggleActiveColorsBackwards() {
     	Color t = active_colors.get(2);
     	active_colors.set(2, active_colors.get(1));
     	active_colors.set(1, active_colors.get(0));
@@ -84,7 +90,8 @@ public class PaletteManager
     }
 
 
-    // :::: Palette Color Methods
+    // ===================
+    // ==== Palette Color Methods
     public Color getPaletteColor( int i) {
     	return palette_colors.get(i);
     }
@@ -121,13 +128,18 @@ public class PaletteManager
     	return settingsManager.getStoredPalettes();
     }
     
+    // ==================
+    // ==== Palette Saving/Loading
     
+    /** Saves the palette as the given name. */
     public boolean savePalette( String name) {
-    	// The format of a Saved Palette is slightly more complicated than is needed
-    	//	but to preserve space and dimensionality, it's sufficient.
+    	// For the most part Palettes are stored as an array of 4 bytes per
+    	//	color in RGBA format/order.  But to preserve dimensionality of 
+    	//	the palette while avoiding excessive "whitespace" bytes, the following
+    	// 	format is used:
     	
     	// [1] First byte corresponds to number of consecutive color datas
-    	// [4*n] n*4 bytes representing the color data
+    	// [4*n] n*4 bytes representing the color data, in RGBA form
     	//		(if first byte was 0x00), 
     	//		[1] next byte represents consecutive empty datas
     	ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -187,13 +199,14 @@ public class PaletteManager
     	
     	return true;	// Not sure why/if it should ever return false
     }
+    
+    /** Loads the palette of the given name. */
     public boolean loadPalette( String name) {
     	byte raw[] = settingsManager.getRawPalette(name);
     	if( raw == null) return false;
     	
     	palette_colors.clear();
     	ByteArrayInputStream bis = new ByteArrayInputStream(raw);
-  
     	
     	int caret = 0;
     	int count = bis.read();
@@ -222,19 +235,40 @@ public class PaletteManager
     	return true;
     }
     
+    
+    
     // :::: Palette Change Observer
     public static interface MPaletteObserver {
         public void colorChanged();
     }
     
-    List<MPaletteObserver> paletteObservers = new ArrayList<>();
-    public void addPaletteObserver( MPaletteObserver obs) { paletteObservers.add(obs); }
-    public void removePaletteObserver( MPaletteObserver obs) {paletteObservers.remove(obs);}
+    List<WeakReference<MPaletteObserver>> paletteObservers = new ArrayList<>();
+    public void addPaletteObserver( MPaletteObserver obs) { 
+    	paletteObservers.add(new WeakReference<PaletteManager.MPaletteObserver>(obs)); 
+    }
+    public void removePaletteObserver( MPaletteObserver obs) {
+    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
+    	while( it.hasNext()) {
+    		MPaletteObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			it.remove();
+    	}
+    }
     
     private void triggerColorChanged() {
-        for( MPaletteObserver obs : paletteObservers)
-            obs.colorChanged();
+    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
+    	while( it.hasNext()) {
+    		MPaletteObserver other = it.next().get();
+    		if( other == null )
+    			it.remove();
+    		else
+                other.colorChanged();
+    	}
     }
+    
+
+    // ================
+    // ==== Implemented Interfaces
 
     // :::: CommandExecuter
 	@Override
@@ -254,7 +288,7 @@ public class PaletteManager
     		toggleActiveColors();
     		return true;
     	case "swapBack":
-    		toggleActiveColors2();
+    		toggleActiveColorsBackwards();
     		return true;
     	}
 		return false;

@@ -85,7 +85,7 @@ public class ImageHandle {
 		}
 		drawLayer(g,transform);
 		
-//		BufferedImage.TYPE_4BYTE_ABGR;
+//		Globals.BI_FORMAT;
 		g2.setComposite(c);
 	}
 	

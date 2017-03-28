@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
@@ -33,6 +34,12 @@ import spirite.MUtil;
  * 		(alternately anything that has access to the CachedImage can flush it manually
  * 		even if other users are using it).
  * 		
+ * 
+ * TODO: Figure out if the CacheManager is really necessary.  The RenderEngine is the 
+ * only thing that really uses it as intended, all other use cases should be handled
+ * by regular Garbage Collection.  It DOES keep track of memory usage so that UndoEngine
+ * can remove undos once memory usage gets too big, but that can be done with substantially
+ * less code and less scopes.
  * 
  * @author Rory Burks
  *
@@ -192,7 +199,7 @@ public class CacheManager {
 			return null;
 		
 		CachedImage c = new CachedImage(domain);
-		c.setData(new BufferedImage( width, height, BufferedImage.TYPE_4BYTE_ABGR));
+		c.setData(new BufferedImage( width, height, Globals.BI_FORMAT));
 		
 		if( c.data == null) {
 			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
@@ -206,7 +213,7 @@ public class CacheManager {
 	/** Put an existing image into the Cache. */
 	public CachedImage cacheImage( BufferedImage image, Object domain) {
 		if( image == null) {
-			image = new BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR);
+			image = new BufferedImage(1,1,Globals.BI_FORMAT);
 			MUtil.clearImage(image);
 		}
 		CachedImage c = new CachedImage(domain);

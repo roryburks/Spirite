@@ -1,6 +1,5 @@
 package spirite.gl;
 
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -31,13 +30,23 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import sun.awt.image.ByteInterleavedRaster;
 
+/**
+ * GLEngine is the root point for dealing with OpenGL through JOGL.  It handles
+ * the initialization of surfaces and components and manages the resources, 
+ * making sure that they are properly de-allocated inside OpenGL
+ * 
+ * Uses a Singleton paradigm that can be accessed through GLEngine.getInstance()
+ * 
+ * @author Rory Burks
+ */
 public class GLEngine  {
 	private final GLOffscreenAutoDrawable drawable;
 	private int width = 1;
 	private int height = 1;
 
 	
-	/** Namespace for Attribute Bindings */
+	/** Namespace for Attribute Bindings 
+	 * CURRENTLY USED VERY RARELY * */
     public static class Attr {
         public static final int POSITION = 0;
         public static final int NORMAL = 2;
@@ -54,7 +63,6 @@ public class GLEngine  {
 	}
 	
 	private GLEngine() {
-		
 		// Create Offscreen OpenGl Surface
 		GLProfile profile = GLProfile.getDefault();
         GLDrawableFactory fact = GLDrawableFactory.getFactory(profile);
@@ -76,6 +84,8 @@ public class GLEngine  {
 
 		// The GL object has to be running on the AWTEvent thread for UI objects
 		//	to access it without causing thread-locking.
+		//
+		// TODO: Figure out whether this needs to be SwingUtilities.invokeAndWait
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
@@ -87,7 +97,8 @@ public class GLEngine  {
 		});
 	}
 	
-	// API
+	// ============
+	// ==== Simple API
 	public void setSurfaceSize( int width, int height) {
 		if( this.width != width || this.height != height) {
 			this.width = width;
@@ -100,8 +111,7 @@ public class GLEngine  {
 	public GL3 getGL3() {
 		drawable.display();
 		drawable.getContext().makeCurrent();
-//		this.drawable.getContext().makeCurrent();
-		return this.drawable.getGL().getGL3();
+		return drawable.getGL().getGL3();
 	}
 	
 	public GLAutoDrawable getDrawable() {
@@ -123,6 +133,7 @@ public class GLEngine  {
 		PASS_BORDER,
 		PASS_INVERT,
 		PASS_BASIC,
+		PASS_ESCALATE,
 		;
 	}
 	
@@ -132,9 +143,21 @@ public class GLEngine  {
 		return programs[type.ordinal()];
 	}
 
+	/** Applies the given program using the given parameters, in simple Pass 
+	 * format (i.e. drawing the image onto the screen in a 1:1 way, while 
+	 * applying a certain fragment shader.	 */
 	public void applyPassProgram(ProgramType type, GLParameters params, AffineTransform trans){
 		applyPassProgram( type, params, trans, 0, 0, params.width, params.height);
 	}
+
+	/** Applies the given program using the given parameters, in simple Pass 
+	 * format (i.e. drawing the image onto the screen in a 1:1 way, while 
+	 * applying a certain fragment shader.	 
+	 * 
+	 * x1, y1, x2, y2 describes the area of the screen which the Image should 
+	 * be drawn.  For example, when drawing a 128x128 image in a 1000x1000 screen,
+	 * you would use 0, 0, 128, 128.
+	 */
 	public void applyPassProgram(
 			ProgramType type, GLParameters params, AffineTransform trans,
 			float x1, float y1, float x2, float y2)
@@ -186,7 +209,6 @@ public class GLEngine  {
         // Bind Texture
         if( params.texture != null) {
         	params.texture.load();
-//    		PreparedTexture pt = engine.prepareTexture(bi);
     		gl.glEnable(GL3.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
@@ -200,20 +222,18 @@ public class GLEngine  {
         switch( type) {
 		case BASIC_STROKE:
 		case DEFAULT:
-			System.out.println("BAD");
 		case PASS_BASIC:
-			// TODO: This doesn't LOOK right, but it's working as 
-			//	intended for now.
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFuncSeparate(
-	        		GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA, 
-	        		GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA);
+	        		GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA,
+	        		GL3.GL_ONE, GL3.GL_ONE);
 	        gl.glBlendEquation(GL3.GL_FUNC_ADD);
 	        break;
 		case PASS_BORDER:
 		case CHANGE_COLOR:
 		case PASS_INVERT:
 		case SQARE_GRADIENT:
+		case PASS_ESCALATE:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
 	        gl.glBlendEquation(GL3.GL_MAX);
@@ -234,22 +254,15 @@ public class GLEngine  {
         }
 	}
 	
+	/** Writes the active GL Surface to a BufferedImage */
 	public BufferedImage glSurfaceToImage() {
         return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage( getGL3(), 0, 0, width, height, false); 
 		
 	}
 	
-	// :::: Texture Preperation
-	/**
-	 * Note about the way textures are Prepared:
-	 * 
-	 * AWT uses ARGB aligned data, whereas OpenGL wants to read it as RGBA.
-	 * Though it might be possible to tell glTexImage2D to align the data
-	 * in a certain way, it comes with a loss in portability.  It's better
-	 * to just use the indexes inside the shader manually:
-	 * [0] for a, [1] for r. [2] for g, [3] for b
-	 */
+	// ==================
+	// ==== Texture Preperation
 	public class PreparedTexture{
 		private IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
 		
@@ -295,11 +308,11 @@ public class GLEngine  {
 				ByteBuffer.wrap(((ByteInterleavedRaster)bi.getRaster()).getDataStorage())
 				);
 		
-		
 		return pt;
 	}
 	
-	// :::: Data Buffer Preperation
+	// =================
+	// ==== Data Buffer Preperation
 	public class PreparedData{		
 		@Override
 		protected void finalize() throws Throwable {
@@ -384,6 +397,10 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_basic.frag");
+        programs[ProgramType.PASS_ESCALATE.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_escalate.frag");
         		
 	}
 	

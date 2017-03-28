@@ -1,25 +1,28 @@
-// Rory Burks
-
 package spirite.brains;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl.CommandExecuter;
 
 /**
- * ToolsetManager manages the currently selected toolset
+ * The ToolsetManager manages the set of Tools available, which tool is 
+ * selected, and what the settings for each tool is.
+ * 
+ * @author Rory Burks
  */
 public class ToolsetManager 
 	implements CommandExecuter
@@ -45,8 +48,9 @@ public class ToolsetManager
 		Tool( String name, int offset){ 
 			this.description = name; 
 			
-			// Could possibly just be replaced with .ordinal, but that's probably
-			//	bad practice.
+			// Could be replaced with .ordinal for now, but since these
+			// numbers are also tied to the position they appear on 
+			//	tool_icons.png, it's a good idea to allow for more flexibility
 			this.iconLocation = offset;	
 		}
 	}
@@ -54,6 +58,7 @@ public class ToolsetManager
     public enum Cursor {MOUSE, STYLUS, ERASER};
     private Cursor cursor = Cursor.MOUSE;
     
+    // Each cursor uses a different tool.
     private final Map<Cursor, Tool> selected = new EnumMap<>(Cursor.class);
     private final Map<Tool,ToolSettings> toolSettings = new HashMap<>();
     
@@ -72,7 +77,8 @@ public class ToolsetManager
         toolSettings.put( Tool.RESHAPER, constructReshapeSettings());
     }
     
-    // :::: Get/Set
+    // ===============
+    // ==== Get/Set
     public Cursor getCursor() {
     	return cursor;
     }
@@ -82,6 +88,9 @@ public class ToolsetManager
     	triggerToolsetChanged(selected.get(cursor));
     }
 
+    public Tool getSelectedTool() {
+        return selected.get(cursor);
+    }
     public void setSelectedTool( Tool tool) {
         selected.replace(cursor, tool);
         triggerToolsetChanged(tool);
@@ -94,10 +103,6 @@ public class ToolsetManager
     		}
     	}
     	return false;
-    }
-    
-    public Tool getSelectedTool() {
-        return selected.get(cursor);
     }
 
     public int getToolCount() {
@@ -112,16 +117,19 @@ public class ToolsetManager
     }
     
 
+    // ===================
+    // ==== Tool Icon Sheet Management
     BufferedImage icon_sheet = null;
     int is_width, is_height;
     private static final int TOOL_ICON_WIDTH = 24;
     private static final int TOOL_ICON_HEIGHT = 24;
-    // Loads the icon sheet from icons.resources
+    
+    /** Loads the icon sheet from tool_icons.png */
     private void prepareIconSheet() {
         icon_sheet = null;
         try {
             BufferedImage buff = ImageIO.read ( getClass().getClassLoader().getResource("tool_icons.png").openStream());
-            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), Globals.BI_FORMAT);
             
             Graphics g = icon_sheet.getGraphics();
             g.drawImage(buff, 0, 0, null);
@@ -134,6 +142,7 @@ public class ToolsetManager
         }
     }
     
+    /** Draws the icon for the given tool.*/
     public void drawIcon( Graphics g, Tool tool) {
     	if( icon_sheet == null) prepareIconSheet();
     	int ix = getToolix(tool);
@@ -152,7 +161,14 @@ public class ToolsetManager
     }
 
 
-    // :::: Toolset Settings
+    
+    /**
+     * ToolSettins is an abstract to describe all the settings a particular tool
+     * has.  For quick development and modularity purposes, these settings are 
+     * not inherently hard-coded, but are constructed from an object array scheme
+     * (see constructFromScheme for the format) in which strings are used to 
+     * get a particular property.
+     */
     public class ToolSettings {
     	Property properties[];
     	
@@ -185,6 +201,9 @@ public class ToolsetManager
     		}
     	}
     	
+    	/** Extra Data is data stored with certain PropertyType's, usually 
+    	 * StringArrays of Human-Readable formats of the options the property has,
+    	 * stored for constructing the UI Component.*/
     	public Object getExtra(String id) {
     		for( int i=0; i<properties.length; ++i) {
     			if( properties[i].id.equals(id)) {
@@ -213,13 +232,16 @@ public class ToolsetManager
     
     public enum PropertyType {
     	SIZE, OPACITY, CHECK_BOX,BUTTON, 
-    	// RADIO_BUTTON is a special Property Type in that 
+    	// RADIO_BUTTON is a special Property Type in that contains an finite
+    	//	amount of on-off options, only one of which can be active at a given
+    	//	time.
     	RADIO_BUTTON,
     	// DropDown
     	DROP_DOWN
     }
     
-    // :::: Setting Schemes
+    // =======================
+    // ==== Setting Schemes
     private ToolSettings constructPenSettings() {
     	final Object[][] scheme = {
     			{"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
@@ -338,10 +360,10 @@ public class ToolsetManager
     	return settings;
     }
     
-    private 
-    
-    //
-    Class<?> getValueClassFromType( PropertyType type) {
+    /** This method exists mostly for development purposes, it verifies that
+     * the value you are trying to set a property to is the type that it 
+     * should be, so that the proper error can be Managed inside this class. */
+    private Class<?> getValueClassFromType( PropertyType type) {
     	switch( type) {
     	case SIZE:
     	case OPACITY:
@@ -351,7 +373,6 @@ public class ToolsetManager
 		case CHECK_BOX:
 			return Boolean.class;
 		case DROP_DOWN:
-			return Integer.class;
 		case RADIO_BUTTON:
 			return Integer.class;
     	}
@@ -359,24 +380,35 @@ public class ToolsetManager
     	return null;	// Should be no way to reach this
     }
     
-    public static abstract class ToolsetSettingsPanel extends JPanel {
-    	public abstract void updateSettings( ToolSettings settings);
-    }
-    
+    // ===============
     // ==== Toolset Observer
     public interface MToolsetObserver {
         public void toolsetChanged( Tool newTool);
 //        public void toolsetPropertyChanged( Tool tool);
     }
     
-    List<MToolsetObserver> toolsetObserver = new ArrayList<>();
-    public void addToolsetObserver( MToolsetObserver obs) { toolsetObserver.add(obs); }
-    public void removeToolsetObserver( MToolsetObserver obs) { toolsetObserver.remove(obs);}
+    List<WeakReference<MToolsetObserver>> toolsetObserver = new ArrayList<>();
+    public void addToolsetObserver( MToolsetObserver obs) { 
+    	toolsetObserver.add( new WeakReference<ToolsetManager.MToolsetObserver>(obs)); 
+    }
+    public void removeToolsetObserver( MToolsetObserver obs) { 
+    	Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
+    	while( it.hasNext()) {
+    		MToolsetObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			it.remove();
+    	}
+    }
     
     private void triggerToolsetChanged( Tool newTool) {
-        for( MToolsetObserver obs : toolsetObserver) {
-            obs.toolsetChanged(newTool);
-        }
+    	Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
+    	while( it.hasNext()) {
+    		MToolsetObserver obs = it.next().get();
+    		if( obs == null )
+    			it.remove();
+    		else
+                obs.toolsetChanged(newTool);
+    	}
     }
 
     // :::: CommandExecuter

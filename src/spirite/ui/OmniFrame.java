@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
@@ -460,7 +461,7 @@ public class OmniFrame extends JPanel
 						cursor = DragSource.DefaultMoveDrop;
 					
 					
-					BufferedImage image = new BufferedImage(128,24,BufferedImage.TYPE_4BYTE_ABGR);
+					BufferedImage image = new BufferedImage(128,24,Globals.BI_FORMAT);
 					Graphics g = image.getGraphics();
 					
 					g.setColor( new Color(128,128,128,128));

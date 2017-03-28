@@ -498,7 +498,7 @@ public class ImageWorkspace {
 		@Override
 		public BufferedImage checkoutRaw() {
 			undoEngine.prepareContext(handle);
-			buffer = new BufferedImage( width, height, BufferedImage.TYPE_4BYTE_ABGR);
+			buffer = new BufferedImage( width, height, Globals.BI_FORMAT);
 			Graphics gr = buffer.getGraphics();
 			gr.drawImage(this.handle.deepAccess(),
 					ox+dii.ox, 
@@ -512,7 +512,7 @@ public class ImageWorkspace {
 					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
 			BufferedImage bi = new BufferedImage( 
-					activeRect.width, activeRect.height,BufferedImage.TYPE_4BYTE_ABGR);
+					activeRect.width, activeRect.height,Globals.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the part of the old image over the new one
@@ -537,10 +537,10 @@ public class ImageWorkspace {
 			}
 			BufferedImage nbi;
 			if( cropped == null || cropped.isEmpty()) {
-				nbi = new BufferedImage( 1,1, BufferedImage.TYPE_4BYTE_ABGR);
+				nbi = new BufferedImage( 1,1, Globals.BI_FORMAT);
 			}
 			else {
-				nbi = new BufferedImage( cropped.width,cropped.height, BufferedImage.TYPE_4BYTE_ABGR);
+				nbi = new BufferedImage( cropped.width,cropped.height, Globals.BI_FORMAT);
 			}
 			g2 = (Graphics2D)nbi.getGraphics();
 			g2.drawImage(bi, -cropped.x, -cropped.y, null);
@@ -776,7 +776,7 @@ public class ImageWorkspace {
 
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( 
-						newBounds.width, newBounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+						newBounds.width, newBounds.height, Globals.BI_FORMAT);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
 				AffineTransform transform = new AffineTransform();		
@@ -884,7 +884,7 @@ public class ImageWorkspace {
 		@Override
 		protected void performImageAction() {
 			BufferedImage img = builtImage.checkoutRaw();
-			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), Globals.BI_FORMAT);
 			MUtil.clearImage(buffer);
 			Graphics g = buffer.getGraphics();
 			g.drawImage(img, x, y, null);
@@ -1039,7 +1039,7 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
 		// Create new Image Data and link it to the workspace
-		BufferedImage img = new BufferedImage( w, h, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage img = new BufferedImage( w, h, Globals.BI_FORMAT);
         Graphics g = img.createGraphics();
         g.setColor( c);
         g.fillRect( 0, 0, width, height);
@@ -1052,7 +1052,7 @@ public class ImageWorkspace {
 	}
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
-		BufferedImage bi = new BufferedImage(w,h,BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage bi = new BufferedImage(w,h,Globals.BI_FORMAT);
 		CachedImage ci = cacheManager.cacheImage( bi, this);
         Graphics g = bi.createGraphics();
         g.setColor( c);
@@ -2011,7 +2011,7 @@ public class ImageWorkspace {
     	while( it.hasNext()) {
     		MWorkspaceFileObserver other = it.next().get();
     		if( other == null || other == obs)
-    			fileObservers.remove(obs); 
+    			it.remove();
     	}
     }
     

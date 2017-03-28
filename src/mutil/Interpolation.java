@@ -3,8 +3,23 @@ package mutil;
 import java.awt.geom.Point2D;
 import java.util.List;
 
+/**
+ * A Package which contains a set of classes for interpolating data.
+ * 
+ * TODO: Implement Bezier and CubicSpline interpolation
+ * 
+ * @author Rory Burks
+ */
 public class Interpolation {
-	public static class LagrangeInterpolator {
+	public static interface Interpolator{
+		public double f(double t);
+	}
+	
+	/** Constructs a Polygon of degree N-1 which goes through the given N
+	 * points and uses that Polygon to interpolate the data. */
+	public static class LagrangeInterpolator 
+		implements Interpolator
+	{
 		double[] coef;
 		public LagrangeInterpolator( List<Point2D> points) {
 			final int N = points.size();

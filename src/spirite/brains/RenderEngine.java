@@ -27,17 +27,15 @@ import javax.swing.Timer;
 
 import com.jogamp.opengl.GL;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.gl.GLEngine;
-import spirite.gl.GLMultiRenderer;
 import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLMultiRenderer;
 import spirite.gl.GLMultiRenderer.GLRenderer;
-import spirite.gl.GLParameters.GLFBOTexture;
-import spirite.gl.GLParameters.GLParam1i;
-import spirite.gl.GLParameters.GLParam4f;
 import spirite.gl.GLParameters;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -59,6 +57,20 @@ import spirite.image_data.layers.Layer;
  * draw it, but in the future it might buffer recently-rendered
  * iterations of images, control various rendering paramaters, etc.
  */
+
+/**
+ * The RenderEngine executes the rendering of images to a format users will 
+ * see.  In particular, the NodeRenderSource combines all of the layers of a 
+ * given group (including all subgroups) using all the Node properties (alpha,
+ * offset, etc) to draw the image as it's intended to be seen.
+ * 
+ * The RenderEngine also caches thumbnails of layers and recently-rendered 
+ * images and keeps track of whether or not the images have changed since last
+ * rendering to avoid re-rendering images unnecessarily.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class RenderEngine 
 	implements MImageObserver, MWorkspaceObserver, MReferenceObserver
 {
@@ -72,7 +84,6 @@ public class RenderEngine
 	
 	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
 	
-	// Needs Master just to add it as a Workspace Observer
 	public RenderEngine( MasterControl master) {
 		this.master = master;
 		this.cacheManager = master.getCacheManager();
@@ -119,7 +130,6 @@ public class RenderEngine
 		public Composite comp = null;
 		public AffineTransform trans = new AffineTransform();
 		public ImageHandle handle;
-//		public abstract void draw( Graphics g);
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -152,6 +162,8 @@ public class RenderEngine
 		return cachedImage.access();
 	}
 	
+	// ====================
+	// ==== Composite Image Management
 	// Perhaps a bit hacky, but when ImageData is in a certain composite state,
 	//	particularly when a stroke is being drawn or if lifted Image data is
 	//	being moved, the RenderImage will compose all the drawn layers onto a single
@@ -177,7 +189,7 @@ public class RenderEngine
 				Rectangle r = dataContext.getBounds();
 				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
-						BufferedImage.TYPE_4BYTE_ABGR);
+						Globals.BI_FORMAT);
 				
 				g2 = (Graphics2D)bi.getGraphics();
 				
@@ -214,6 +226,11 @@ public class RenderEngine
 		return c;
 	}
 
+	
+	// ===================
+	// ==== Thumbnail Management
+	
+	
 	public BufferedImage accessThumbnail( Node node) {
 		return thumbnailManager.accessThumbnail(node);
 	}
@@ -425,6 +442,9 @@ public class RenderEngine
 			return new NodeRenderSource((GroupNode) node);
 	}
 	
+	
+	// ================
+	// ==== Render Sources
 	/**
 	 * A RenderSource corresponds to an object which can be rendered and it implements
 	 * everything needed to perform a Render using certain RenderSettings.
@@ -560,7 +580,7 @@ public class RenderEngine
 				
 				buffer = new BufferedImage[n];
 				for( int i=0; i<n; ++i) {
-					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+					buffer[i] = new BufferedImage( settings.width, settings.height, Globals.BI_FORMAT);
 				}
 				
 				// Step 2: Compose the Stroke and Lifted Selection data onto the 
@@ -753,6 +773,10 @@ public class RenderEngine
 	 * This Class will draw a group as it's "intended" to be seen,
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
+	 * 
+	 * This updated version uses JOGL rendering algorithms instead of 
+	 * AWT rendering, so that custom fragment shaders can be injected 
+	 * without performace-loss.
 	 */
 	public class NodeRenderSource extends RenderSource {
 		private final GroupNode root;
@@ -826,9 +850,8 @@ public class RenderEngine
 			return true;
 		}
 
-		float ratioW;
-//		BufferedImage buffer[];
 		GLMultiRenderer glmu[];
+		float ratioW;
 		float ratioH;
 		@Override
 		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
@@ -840,32 +863,7 @@ public class RenderEngine
 				if( n <= 0) return null;
 				engine.setSurfaceSize(settings.width, settings.height);
 				
-/*				glmu = new GLMultiRenderer[1];
-				glmu[0] = new GLMultiRenderer(settings.width, settings.height, GLEngine.getInstance().getGL3().getGL2());
-				glmu[0].init();
-
-				glmu[0].render(new GLRenderer() {
-					@Override
-					public void render(GL gl) {
-						engine.clearSurface();
-					}
-				});
-				
-				for( LayerNode node : this.root.getAllLayerNodes()) {
-					
-					glmu[0].render(new GLRenderer() {
-						@Override
-						public void render(GL gl) {
-							BufferedImage bi = node.getLayer().getActiveData().handle.deepAccess();
-							GLParameters params = new GLParameters(settings.width, settings.height);
-							params.texture = new GLParameters.GLImageTexture(bi);
-							engine.applyPassProgram(ProgramType.PASS_BASIC, params, null,
-									0, 0, bi.getWidth(), bi.getHeight());
-						}
-					});
-				}*/
-				
-				// Prepare the FBO for rendering
+				// Prepare the FrameBuffers needed for rendering
 				glmu = new GLMultiRenderer[n];
 				for( int i=0; i<n; ++i) {
 					glmu[i] = new GLMultiRenderer(
@@ -888,12 +886,15 @@ public class RenderEngine
 	
 				_render_rec( root, 0, settings);
 
-				// Render the top-most FBO to the GLSurface and 
+				// Step 4: Render the top-most FBO to the GLSurface and then that
+				// surface onto a BufferedImage so that Swing can draw it.
+				// TODO: This last step could be avoided if I used a GLPanel instead
+				//	of a basic Swing Panel
 				engine.setSurfaceSize(settings.width, settings.height);
 				GLParameters params = new GLParameters(settings.width, settings.height);
 				params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 		    	engine.clearSurface();
-				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null);
+				engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null);
 				
 				BufferedImage bi = engine.glSurfaceToImage();
 
@@ -1001,9 +1002,6 @@ public class RenderEngine
 			for( Drawable renderable : renderList) {
 				renderable.draw(n);
 			}
-			
-
-//			g.dispose();
 		}
 		
 		private abstract class Drawable {
@@ -1012,17 +1010,6 @@ public class RenderEngine
 			public abstract void draw(int ind);
 		}
 
-		private Composite cc;
-		private void _setGraphicsSettings( Graphics g, Node node, RenderSettings settings) {
-//			final Graphics2D g2 = (Graphics2D)g;
-//			 cc = g2.getComposite();
-//			
-//			if( node.getAlpha() != 1.0f) 
-//				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.getAlpha()));
-		}
-		private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
-			((Graphics2D)g).setComposite(cc);
-		}
 		private class GroupRenderable extends Drawable {
 			private final GroupNode node;
 			private final int n;
@@ -1047,12 +1034,6 @@ public class RenderEngine
 								ProgramType.PASS_BASIC, params, null);
 					}
 				});
-				
-//				_setGraphicsSettings(g, node,settings);
-//				g.drawImage( buffer[n+1],
-//						0, 0, 
-//						null);
-//				_resetRenderSettings(g, node,settings);
 			}
 		}
 		private class TransformedRenderable extends Drawable {
@@ -1155,7 +1136,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+					settings.width, settings.height, Globals.BI_FORMAT);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -1220,7 +1201,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+					settings.width, settings.height, Globals.BI_FORMAT);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -1263,7 +1244,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+					settings.width, settings.height, Globals.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 			
 			List<Reference> refList = workspace.getReferenceManager().getList(front);
@@ -1302,6 +1283,10 @@ public class RenderEngine
 			return true;
 		}
 	}
+	
+	
+	// ===================
+	// ==== Implemented Interfaces
 
 	// :::: MImageObserver
 	@Override	public void structureChanged(StructureChangeEvent evt) {	}

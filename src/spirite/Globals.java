@@ -29,6 +29,8 @@ import spirite.MDebug.ErrorType;
  */
 public class Globals {
 	
+	public static int BI_FORMAT = BufferedImage.TYPE_4BYTE_ABGR;
+	
     private static final Object colors[][] = {
         {"drawpanel.image.border", new Color(190,190,190)},
         {"drawpanel.bid.border", new Color(16,16,16)},
@@ -200,7 +202,7 @@ public class Globals {
 						set.img = loadIconSheet(Globals.class.getClassLoader().getResource(set.resourceFile).openStream());
 					} catch (Exception e) {
 						MDebug.handleError( ErrorType.RESOURCE, null, e.getMessage());
-				    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR));
+				    	return new ImageIcon( new BufferedImage(1,1,Globals.BI_FORMAT));
 					}
     			}
     			
@@ -218,13 +220,13 @@ public class Globals {
     		}
     	}
 
-    	return new ImageIcon( new BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR));
+    	return new ImageIcon( new BufferedImage(1,1,Globals.BI_FORMAT));
     }
     
     private static BufferedImage loadIconSheet( InputStream is) throws IOException 
     {
     	BufferedImage buff = ImageIO.read(is);
-    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), Globals.BI_FORMAT);
     	img.getGraphics().drawImage(buff, 0, 0, null);
         
         // Turns all pixels the same color as the top-left pixel into transparent

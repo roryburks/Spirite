@@ -15,6 +15,8 @@ import spirite.MDebug.ErrorType;
  * that need to be remembered for ease of use reasons and aren't remembered
  * by Swing's default components.
  * 
+ * It saves and load data persistantly using Java's Preferences package.
+ * 
  * @author Rory Burks
  *
  */
@@ -24,13 +26,10 @@ public class SettingsManager {
 	
 	public SettingsManager() {
         prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
-        
-        
-//        drawOrigin = prefs.getBoolean("drawOrigin", arg1)
 	}
 	
-	// Palette Saving/Loading: 
-	//
+	// ==============
+	// ==== Palette Saving/Loading: 
 	/** used by PaletteManager to get the raw data corresponding to a palette. */
 	byte[] getRawPalette( String name) {
 		List<String> names = getStoredPalettes();
@@ -69,6 +68,8 @@ public class SettingsManager {
 		return paletteList;
 	}
 
+	// ====================
+	// ==== Recent-Used FilePath Settings
 	private boolean lastUsedWorkspace = true;
 	private File workspaceFilePath;
 	private File imageFilePath;
@@ -106,6 +107,8 @@ public class SettingsManager {
 		return lastUsedWorkspace ? getWorkspaceFilePath():getImageFilePath();
 	}
 	
+	// ===============
+	// ==== Simple Settings
 	public int getDefaultWidth() {return 640;}
     public int getDefaultHeight() { return 480;}
     
@@ -123,15 +126,11 @@ public class SettingsManager {
     	return new Dimension( 32, 32);
     }
     
+    /** Returns whether or not the editor will allow editing of image data which
+     * is currently not visible.
+     * 
+     *  !!! TODO: UNIMPLEMENTED !!*/
     public boolean getAllowsEdittingInvisible() {
     	return false;
-    }
-    
-    private boolean drawOrigin;
-    public boolean drawsOrigin() {
-    	return drawOrigin;
-    }
-    public void setDrawsOrigin( boolean drawOrigin) {
-    	this.drawOrigin = drawOrigin;
     }
 }

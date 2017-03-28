@@ -1,8 +1,7 @@
 package spirite.dialogs;
 
 /**
- *
- * @author Guy
+ * CURRENTLY UNUSED (uses the default Swing color picker for now)
  */
 public class ColorPickerPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1L;

@@ -1,6 +1,5 @@
 package spirite.gl;
 
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -20,11 +19,8 @@ import spirite.gl.GLParameters.GLParam1i;
 import spirite.gl.GLParameters.GLParam4f;
 
 /** 
- * GLUIDraw is a mostly-static (needs to be linked to a non-static GLEngine
- * object) class encapsulates some general-purpose UI Drawing methods which
- * need graphical acceleration to be drawn quickly.
- * 
- * 
+ * GLUIDraw is a mostly-static class encapsulates some general-purpose 
+ * UI Drawing methods which need graphical acceleration to be drawn quickly.
  * 
  * @author Rory Burks
  *
@@ -103,7 +99,7 @@ public class GLUIDraw {
 	}
 	
 	/**
-	 * Draws a dashed border around the image
+	 * Draws a dashed border around the pixels of the image
 	 * @param image
 	 * @return
 	 */

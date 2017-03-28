@@ -25,6 +25,12 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
  * component (that's handled in the Main Frame), it simply stores all the hotkeys
  * and what they are linked to.
  * 
+ * TODO: This entire class really needs to be re-written such that the following
+ * functions are allowed and work as intended:
+ * -Allowing multiple hotkeys for a single command (but not vice versa)
+ * -Allow for saving and loading of Hotkey maps (both to preference string and
+ * to file) without using that ugly ISO encoding.
+ * 
  * @author Rory Burks
  *
  */
@@ -94,6 +100,10 @@ public class HotkeyManager {
         );
     }
     
+    /***
+     * Returns whether the given keycode is considered a "Modifier" (in other
+     * words that key alone should not serve as a hotkey).
+     */
     public static boolean isModifier( int keycode) {
     	switch( keycode) {
     	case KeyEvent.VK_CONTROL:
@@ -163,6 +173,7 @@ public class HotkeyManager {
 
             // !!! Bad
             try {
+            	String str = new String(buff.array(), "ISO-8859-1");
                 return new String(buff.array(), "ISO-8859-1");//buff.array().toString();
             } catch (UnsupportedEncodingException ex) {
                 return "";

@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.file.LoadEngine.BadSIFFFileException;
@@ -81,7 +82,7 @@ public class Test1 {
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), Globals.BI_FORMAT);
 			
 			workspace.getUndoEngine().performAndStore(
 					rig.createAddPartAction(bi, 0, 0, 0,""));

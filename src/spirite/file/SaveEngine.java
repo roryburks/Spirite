@@ -41,7 +41,8 @@ import spirite.image_data.layers.SpriteLayer.Part;
  * various file formats (but particularly the native SIF format)
  * 
  * TODO: Figure out a stable way to multi-thread backups (one thing is for sure
- * the conversion from BufferedImage to PNG through ImageIO should be multi-threaded)
+ * the conversion from BufferedImage to PNG through ImageIO should not
+ * be on the UI thread)
  */
 public class SaveEngine implements ActionListener, MWorkspaceObserver {
 

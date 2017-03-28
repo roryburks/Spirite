@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
@@ -146,15 +147,15 @@ public abstract class StrokeEngine {
 		stroke = s;
 		
 		strokeLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
 		compositionLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
 		
 		sel = selection;
 		
 		if( sel.selection != null) {
 			selectionMask = new BufferedImage( 
-					data.getWidth(), data.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
 			MUtil.clearImage(selectionMask);
 			
 			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();

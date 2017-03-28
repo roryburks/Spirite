@@ -6,9 +6,7 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 
 /***
- * A container for various Utility functions for files IO
- * 
- * 
+ * A container for various Utility functions and constants for files IO
  * 
  * @author Rory Burks
  *

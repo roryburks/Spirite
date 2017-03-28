@@ -29,6 +29,12 @@ import spirite.brains.HotkeyManager.Hotkey;
 import spirite.brains.MasterControl;
 import spirite.ui.components.SimpleTree;
 
+/**
+ * HotkeyDialog provides a user-interface for adding/changing hotkeys for any 
+ * of the available CommandStrings.
+ * 
+ * @author Rory Burks
+ */
 public class HotkeyDialog extends JDialog {
 	private final String HOTKEY_CHANGE = "Double-Click on Hotkey to Change.";
 	private final String HOTKEY_CHANGING = ": Press Key Combo to change hotkey.";

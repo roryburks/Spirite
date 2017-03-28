@@ -16,6 +16,7 @@ import java.util.function.Predicate;
  * such that none of them intersect and using various heuristics to minimize the
  * area which bounds all the Rectangles.
  *
+ * @author Rory Burks
  */
 public class RectanglePacker {
 	

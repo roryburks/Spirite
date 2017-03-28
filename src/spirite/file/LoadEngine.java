@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
@@ -57,7 +58,7 @@ public class LoadEngine {
     		// First try to load the file as normal if it's a normal image format
     		try {
 				BufferedImage bi = ImageIO.read(f);
-				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
 				MUtil.clearImage(bi2);
 				Graphics g = bi2.getGraphics();
 				g.drawImage(bi, 0, 0, null);
@@ -264,7 +265,7 @@ public class LoadEngine {
 			helper.ra.read(buffer);
 			
 			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
-			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
 			MUtil.clearImage(bi2);
 			Graphics g = bi2.getGraphics();
 			g.drawImage(bi, 0, 0, null);

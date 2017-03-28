@@ -25,6 +25,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
+/** @author Elliot Kroo (elliot[at]kroo[dot]net) */
 public class GifSequenceWriter {
   protected ImageWriter gifWriter;
   protected ImageWriteParam imageWriteParam;

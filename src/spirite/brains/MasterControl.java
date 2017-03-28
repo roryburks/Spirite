@@ -9,8 +9,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,11 +48,22 @@ import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.FrameManager;
 
 /***
- * Master Control is little more than a container for all the various components 
- * which handle the grand internals of the program.  
+ * MasterControl is the top level Model object for all non-UI-related data.
+ * For the most part it is little more than a container for all the sub-components
+ * which handle the internals of the program, but it also servers two primary 
+ * functions itself:
+ *	-Interpreting command strings and managing all components which accept command
+ *	strings.  
+ *		-This includes storing a few CommandExecuters which perform certain
+ *		command strings, in particular those in the spaces:
+ *			-global.*
+ *			-select.*
+ *			-draw.*
+ *	-Managing the creation and destruction of ImageWorkspaces
  * 
- * Note: Though most UI components will need full access to MasterControl, giving
- * it to too many internal components is probably indicative of backwards design.
+ * Note: Though most UI components will need relatively unobstructed access 
+ * 	to MasterControl, giving full access to too many internal components is probably 
+ *  indicative of problematic, backwards design.
  * 
  * !!!! NOTE: I have made the decision to allow null workspace selection (particularly
  * 	when none are open). This opens up a lot of scrutiny to be placed on UI components.
@@ -145,6 +158,8 @@ public class MasterControl
     	return dialog;
     }
     
+    // =============
+    // ==== Workspace File Open/Save/Load
     
     public void saveWorkspace( ImageWorkspace workspace, File f) {
     	if( workspace == null || f == null) return;
@@ -153,8 +168,39 @@ public class MasterControl
 		saveEngine.removeAutosaved(workspace);
 		saveEngine.triggerAutosave(workspace, 5*60, 10);	// Autosave every 5 minutes
     }
+
+    /** 
+     * Saves the given workspace to the given standard image file format as a 
+     * flat image (made from currently-visible layers).
+     * 
+     * Supported Image Formats are those supported by the native implementation
+     * of ImageIO (PNG, JPG, GIF should be guaranteed to work)
+     */
+    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
+    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
+    	
+    	RenderSettings settings = new RenderSettings(
+    			renderEngine.getDefaultRenderTarget(workspace));
+    	BufferedImage bi = renderEngine.renderImage(settings);
+    	
+    	if( ext.equals("jpg") || ext.equals("jpeg")) {
+    		// Remove Alpha Layer of JPG so that encoding works correctly
+    		BufferedImage bi2 = bi;
+    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
+    		Graphics g = bi.getGraphics();
+    		g.drawImage(bi2, 0, 0, null);
+    		g.dispose();
+    	}
+    	
+    	try {
+			ImageIO.write( bi, ext, f);
+			settingsManager.setImageFilePath(f);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
+			e.printStackTrace();
+		}
+    }
     
-    // :::: Workspace API
     public void closeWorkspace( ImageWorkspace workspace) {
     	closeWorkspace(workspace, true);
     }
@@ -227,6 +273,10 @@ public class MasterControl
     	return ret;
     }
 
+    
+    // ==========
+    // ==== Workspace Manipulation
+    
     /***
      * Makes the given workspace the currently selected workspace.
      * 
@@ -293,7 +343,9 @@ public class MasterControl
     }
     
     
-    
+
+    // ==========
+    // ==== Command Execution
     public void executeCommandString( String command) {
     	String space = (command == null)?"":command.substring(0, command.indexOf("."));
     	String subCommand = command.substring(space.length()+1);
@@ -347,6 +399,8 @@ public class MasterControl
     	public boolean executeCommand( String command);
     }
     
+    /** Command Executer for "global.*" commands.  These are abstract or top-level
+     * commands such as "Save", "Undo", "Copy", and "Paste"     */
     class GlobalCommandExecuter implements CommandExecuter {
     	final Map<String, Runnable> commandMap = new HashMap<>();
     	GlobalCommandExecuter() {
@@ -538,9 +592,10 @@ public class MasterControl
 			else
 				return false;
 		}
-    	
     }
 
+    /** Command Executre for "draw.*" commands.  These are commands that make
+     * direct and immediate changes to the image.     */
     class RelativeWorkspaceCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
     	
@@ -688,6 +743,8 @@ public class MasterControl
 		}
     }
     
+    /** CommandExecuter for "select.*" commands.  Commands which affect the 
+     * selection form.     */
     private class SelectionCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
     	
@@ -738,38 +795,9 @@ public class MasterControl
     	
     }
     
-    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
-    	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
-    	
-    	RenderSettings settings = new RenderSettings(
-    			renderEngine.getDefaultRenderTarget(workspace));
-    	BufferedImage bi = renderEngine.renderImage(settings);
-    	
-    	if( ext.equals("jpg") || ext.equals("jpeg")) {
-    		// Remove Alpha Layer of JPG so that encoding works correctly
-    		BufferedImage bi2 = bi;
-    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
-    		Graphics g = bi.getGraphics();
-    		g.drawImage(bi2, 0, 0, null);
-    		g.dispose();
-    	}
-    	
-    	try {
-			ImageIO.write( bi, ext, f);
-			settingsManager.setImageFilePath(f);
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
-			e.printStackTrace();
-		}
-    }
-    
-    
-    // Properly implementing this will require a better understanding of Swing
-    //	and AWT threads, but the idea is to lock the Program from terminating
-    //	
-
     
 
+    // ===============
     // ==== Observer Interfaces ====
     /***
      * A WorkspaceObserver watches for changes in which workspace is being 
@@ -781,26 +809,50 @@ public class MasterControl
         public void newWorkspace( ImageWorkspace newWorkspace);
         public void removeWorkspace( ImageWorkspace newWorkspace);
     }
-    List<MWorkspaceObserver> workspaceObservers = new ArrayList<>();
+    List<WeakReference<MWorkspaceObserver>> workspaceObservers = new ArrayList<>();
 
-    public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.add(obs);}
-    public void removeWorkspaceObserver( MWorkspaceObserver obs) { workspaceObservers.remove(obs); }
+    public void addWorkspaceObserver( MWorkspaceObserver obs) {
+    	workspaceObservers.add(new WeakReference<MasterControl.MWorkspaceObserver>(obs));
+    }
+    public void removeWorkspaceObserver( MWorkspaceObserver obs) {
+    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			it.remove();
+    	}
+    }
     
     private void triggerWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-    	for( MWorkspaceObserver obs : workspaceObservers) {
-    		obs.currentWorkspaceChanged(selected, previous);
+    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else 
+        		other.currentWorkspaceChanged(selected, previous);
     	}
     	triggerImageStructureRefresh();
     	triggerImageRefresh();
     }
     private void triggerNewWorkspace(ImageWorkspace added) {
-    	for( MWorkspaceObserver obs : workspaceObservers) {
-    		obs.newWorkspace(added);
+    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else 
+        		other.newWorkspace(added);
     	}
     }
     private void triggerRemoveWorkspace(ImageWorkspace removed) {
-    	for( MWorkspaceObserver obs : workspaceObservers) {
-    		obs.removeWorkspace(removed);
+    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
+    	while( it.hasNext()) {
+    		MWorkspaceObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else 
+        		other.removeWorkspace(removed);
     	}
     }
     
@@ -816,19 +868,38 @@ public class MasterControl
     	public void imageRefresh();
     	public void imageStructureRefresh();
     }
-    List<MCurrentImageObserver> cimageObservers = new ArrayList<>();
+    List<WeakReference<MCurrentImageObserver>> cimageObservers = new ArrayList<>();
 
-    public void addCurrentImageObserver( MCurrentImageObserver obs) { cimageObservers.add(obs);}
-    public void removeCurrentImageObserver( MCurrentImageObserver obs) { cimageObservers.remove(obs); }
+    public void addCurrentImageObserver( MCurrentImageObserver obs) { 
+    	cimageObservers.add(new WeakReference<MCurrentImageObserver>(obs));
+    }
+    public void removeCurrentImageObserver( MCurrentImageObserver obs) { 
+    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
+    	while( it.hasNext()) {
+    		MCurrentImageObserver other = it.next().get();
+    		if( obs == other || other == null)
+    			it.remove();
+    	}
+    }
 
     private void  triggerImageRefresh() {
-    	for( MCurrentImageObserver obs : cimageObservers) {
-    		obs.imageRefresh();
+    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
+    	while( it.hasNext()) {
+    		MCurrentImageObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else
+    			other.imageRefresh();
     	}
     }
     private void  triggerImageStructureRefresh() {
-    	for( MCurrentImageObserver obs : cimageObservers) {
-    		obs.imageStructureRefresh();
+    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
+    	while( it.hasNext()) {
+    		MCurrentImageObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else
+    			other.imageStructureRefresh();
     	}
     }
     

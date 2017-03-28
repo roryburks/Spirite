@@ -16,6 +16,7 @@ import java.util.List;
 import javax.activation.UnsupportedDataTypeException;
 
 import mutil.DataCompaction.IntCompactor;
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
@@ -305,7 +306,7 @@ public class SelectionEngine {
 		
 	public BuiltSelection combineSelection( BuiltSelection sel1, BuiltSelection sel2) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		Graphics g = bi.getGraphics();
 		if( sel1 != null)
@@ -319,7 +320,7 @@ public class SelectionEngine {
 	public BuiltSelection subtractSelection( BuiltSelection sel1, BuiltSelection sel2){
 
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		if( sel1 != null)
@@ -333,9 +334,9 @@ public class SelectionEngine {
 	}
 	public BuiltSelection intersectSelection( BuiltSelection sel1, BuiltSelection sel2){
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		BufferedImage bi2 = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
 		
@@ -354,7 +355,7 @@ public class SelectionEngine {
 	}
 	public BuiltSelection invertSelection( BuiltSelection sel) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		g2.setColor(Color.WHITE);
@@ -368,7 +369,7 @@ public class SelectionEngine {
 	}
 	public void transformSelection( AffineTransform trans) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		
 		Dimension d = built.selection.getDimension();
@@ -384,7 +385,7 @@ public class SelectionEngine {
 		
 		if( lifted) {
 			bi = new BufferedImage(
-					workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 			g2 = (Graphics2D)bi.getGraphics();
 			g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
 			g2.transform(trans);
@@ -396,7 +397,7 @@ public class SelectionEngine {
 			
 			
 			BufferedImage afterLift = new BufferedImage(
-					afterDim.width, afterDim.height,  BufferedImage.TYPE_4BYTE_ABGR);
+					afterDim.width, afterDim.height,  Globals.BI_FORMAT);
 			g2 = (Graphics2D)afterLift.getGraphics();
 			g2.drawImage(bi, -sel.offsetX, -sel.offsetY, null);
 			g2.dispose();
@@ -711,7 +712,7 @@ public class SelectionEngine {
 		@Override
 		protected BuiltSelection build() {
 			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 			Graphics g = bi.getGraphics();
 			g.fillRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
@@ -748,7 +749,7 @@ public class SelectionEngine {
 		@Override
 		protected BuiltSelection build() {
 			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 			Graphics g = bi.getGraphics();
 			g.fillOval(
 					Math.min(startX, currentX), Math.min(startY, currentY),
@@ -779,7 +780,7 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 			
 			Polygon pg = new Polygon();
 			for( int i=0; i<compactor.size(); i += 2) {
@@ -883,7 +884,7 @@ public class SelectionEngine {
 			else {
 				BufferedImage bi2 = bi;
 				bi = new BufferedImage( 
-						bounds.width, bounds.height, BufferedImage.TYPE_4BYTE_ABGR);
+						bounds.width, bounds.height, Globals.BI_FORMAT);
 				Graphics g = bi.getGraphics();
 				g.drawImage(bi2, -bounds.x, -bounds.y, null);
 				g.dispose();
@@ -916,7 +917,7 @@ public class SelectionEngine {
 			selectionRect.y = this.offsetY;
 			
 			BufferedImage bi = new BufferedImage( 
-					selectionRect.width, selectionRect.height, BufferedImage.TYPE_4BYTE_ABGR);
+					selectionRect.width, selectionRect.height, Globals.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the mask, clipping the bounds of drawing to only the part 
