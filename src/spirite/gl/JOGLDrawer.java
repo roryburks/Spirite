@@ -44,7 +44,8 @@ public class JOGLDrawer {
     			to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f));
 
     	params.texture = new GLImageTexture(bi);
-    	
+
+    	engine.clearSurface();
     	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
     	
     	glSurfaceToImage(bi);
@@ -53,7 +54,8 @@ public class JOGLDrawer {
     public void invert( BufferedImage bi) {
     	GLParameters params = new GLParameters(bi.getWidth(), bi.getHeight());
     	params.texture = new GLImageTexture(bi);
-    	
+
+    	engine.clearSurface();
     	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null);
     	glSurfaceToImage(bi);
     }

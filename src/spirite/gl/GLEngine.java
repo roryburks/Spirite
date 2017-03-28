@@ -1,5 +1,6 @@
 package spirite.gl;
 
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -107,6 +108,11 @@ public class GLEngine  {
 		return drawable;
 	}
 	
+	public void clearSurface() {
+	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+        getGL3().glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+	}
+	
 	// =================
 	// ==== Program Management
 	public enum ProgramType {
@@ -116,6 +122,7 @@ public class GLEngine  {
 		CHANGE_COLOR,
 		PASS_BORDER,
 		PASS_INVERT,
+		PASS_BASIC,
 		;
 	}
 	
@@ -124,8 +131,14 @@ public class GLEngine  {
 	public int getProgram( ProgramType type){
 		return programs[type.ordinal()];
 	}
-	
+
 	public void applyPassProgram(ProgramType type, GLParameters params, AffineTransform trans){
+		applyPassProgram( type, params, trans, 0, 0, params.width, params.height);
+	}
+	public void applyPassProgram(
+			ProgramType type, GLParameters params, AffineTransform trans,
+			float x1, float y1, float x2, float y2)
+	{
 		GLParameters modifiedParams = new GLParameters(params);
 
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
@@ -138,12 +151,14 @@ public class GLEngine  {
         modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
         		"perspectiveMatrix", 1, true, matrix.getBuffer()));
         
-        applyProgram( type, modifiedParams);
+        applyProgram( type, modifiedParams, x1, y1, x2, y2);
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
-	public void applyProgram( ProgramType type, GLParameters params) {
+	public void applyProgram( ProgramType type, GLParameters params,
+			float x1, float y1, float x2, float y2) 
+	{
 		int w = params.width;
 		int h = params.height;
 		setSurfaceSize(w, h);
@@ -152,15 +167,12 @@ public class GLEngine  {
 
 		PreparedData pd = prepareRawData(new float[]{
 			// x  y   u   v
-			0, 0, 0.0f, 1.0f,
-			w, 0, 1.0f, 1.0f,
-			0, h, 0.0f, 0.0f,
-			w, h, 1.0f, 0.0f,
+			x1, h-y1, 0.0f, 0.0f,
+			x2, h-y1, 1.0f, 0.0f,
+			x1, h-y2, 0.0f, 1.0f,
+			x2, h-y2, 1.0f, 1.0f,
 		});
 
-		// Clear Surface
-	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
         
         gl.glUseProgram(prog);
         
@@ -185,9 +197,29 @@ public class GLEngine  {
         	params.apply(gl, prog);
 
 		// Start Draw
-        gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
-        gl.glBlendEquation(GL3.GL_MAX);
+        switch( type) {
+		case BASIC_STROKE:
+		case DEFAULT:
+			System.out.println("BAD");
+		case PASS_BASIC:
+			// TODO: This doesn't LOOK right, but it's working as 
+			//	intended for now.
+	        gl.glEnable(GL.GL_BLEND);
+	        gl.glBlendFuncSeparate(
+	        		GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA, 
+	        		GL3.GL_ONE, GL3.GL_ONE_MINUS_SRC_ALPHA);
+	        gl.glBlendEquation(GL3.GL_FUNC_ADD);
+	        break;
+		case PASS_BORDER:
+		case CHANGE_COLOR:
+		case PASS_INVERT:
+		case SQARE_GRADIENT:
+	        gl.glEnable(GL.GL_BLEND);
+	        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
+	        gl.glBlendEquation(GL3.GL_MAX);
+	        break;
+        
+        }
 		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
         gl.glDisable( GL.GL_BLEND);
 		
@@ -348,6 +380,10 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_invert.frag");
+        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_basic.frag");
         		
 	}
 	

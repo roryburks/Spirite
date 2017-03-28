@@ -19,7 +19,7 @@ public class MatrixBuilder {
 	public static float[] wrapAffineTransformAs4x4( AffineTransform trans) {
 		return new float[] {
 			(float) trans.getScaleX(), (float) trans.getShearX(),0, (float) trans.getTranslateX(),
-			(float) trans.getShearY(), (float) trans.getScaleY(), 0, (float) trans.getTranslateY(),
+			(float) trans.getShearY(), (float) trans.getScaleY(), 0, (float) -trans.getTranslateY(),
 			0, 0, 1, 0,
 			0, 0, 0, 1
 		};

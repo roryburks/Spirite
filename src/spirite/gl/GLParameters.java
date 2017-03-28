@@ -104,7 +104,7 @@ public class GLParameters {
 			return gl.glGetUniformLocation( prog, name);
 		}
 	}
-	
+
 	public static class GLParam1i extends GLParam {
 		private int i1;
 		public GLParam1i( String name, int i1) {
@@ -114,6 +114,17 @@ public class GLParameters {
 		@Override
 		public void apply(GL3 gl, int prog) {
 			gl.glUniform1i( getUniformLocation(gl, prog), i1);
+		}
+	}
+	public static class GLParam1f extends GLParam {
+		private float f1;
+		public GLParam1f( String name, float f1) {
+			super(name);
+			this.f1 = f1;
+		}
+		@Override
+		public void apply(GL3 gl, int prog) {
+			gl.glUniform1f( getUniformLocation(gl, prog), f1);
 		}
 	}
 	public static class GLParam4f extends GLParam {

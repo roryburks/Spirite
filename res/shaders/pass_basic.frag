@@ -1,16 +1,16 @@
 #version 330
 
-#define thresh 0.005
 
 in vec2 vUV;
 
-out vec4 outputColor; 
+out vec4 outputColor;
 
 uniform sampler2D myTexture;
+uniform float uAlpha;
 
 void main()
 {
-	vec4 intex = texture(myTexture, vUV);
+	vec4 texCol = texture(myTexture, vUV);
 	
-	outputColor = vec4( texCol.r, texCol.g, texCol.b, texCol.a);
+	outputColor = vec4( texCol.r, texCol.g, texCol.b, texCol.a*uAlpha);
 }

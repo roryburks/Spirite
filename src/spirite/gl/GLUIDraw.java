@@ -88,6 +88,7 @@ public class GLUIDraw {
     	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
     	params.texture = new GLFBOTexture(glmu);
     	
+    	engine.clearSurface();
     	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
         
 		glmu.cleanup();
@@ -115,7 +116,8 @@ public class GLUIDraw {
 		
 		params.addParam( new GLParam1i("uCycle", cycle));
 		params.texture = new GLImageTexture(image);
-		
+
+    	engine.clearSurface();
 		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
 
 		GLAutoDrawable drawable = engine.getDrawable();

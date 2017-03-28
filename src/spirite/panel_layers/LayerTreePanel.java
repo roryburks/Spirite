@@ -553,8 +553,10 @@ public class LayerTreePanel extends ContentTree
 			break;
 		case "newLayer": {
 			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
-			workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-					helper.width, helper.height, helper.name, helper.color);
+			if( helper != null) {
+				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
+						helper.width, helper.height, helper.name, helper.color);
+			}
 			break;}
 		case "duplicate":
 			workspace.duplicateNode(contextMenu.node);

@@ -475,9 +475,9 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	public class NodeRenderSource extends RenderSource {
+	public class _NodeRenderSource extends RenderSource {
 		private final GroupNode root;
-		public NodeRenderSource( GroupNode node) {
+		public _NodeRenderSource( GroupNode node) {
 			super(node.getContext());
 			this.root = node;
 		}
@@ -754,9 +754,9 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	public class _NodeRenderSource extends RenderSource {
+	public class NodeRenderSource extends RenderSource {
 		private final GroupNode root;
-		public _NodeRenderSource( GroupNode node) {
+		public NodeRenderSource( GroupNode node) {
 			super(node.getContext());
 			this.root = node;
 		}
@@ -840,31 +840,42 @@ public class RenderEngine
 				if( n <= 0) return null;
 				engine.setSurfaceSize(settings.width, settings.height);
 				
-				glmu = new GLMultiRenderer[1];
+/*				glmu = new GLMultiRenderer[1];
 				glmu[0] = new GLMultiRenderer(settings.width, settings.height, GLEngine.getInstance().getGL3().getGL2());
 				glmu[0].init();
+
+				glmu[0].render(new GLRenderer() {
+					@Override
+					public void render(GL gl) {
+						engine.clearSurface();
+					}
+				});
 				
 				for( LayerNode node : this.root.getAllLayerNodes()) {
 					
 					glmu[0].render(new GLRenderer() {
 						@Override
 						public void render(GL gl) {
+							BufferedImage bi = node.getLayer().getActiveData().handle.deepAccess();
 							GLParameters params = new GLParameters(settings.width, settings.height);
-					    	params.addParam( new GLParam1i("optionMask", 0));
-					    	params.addParam( new GLParam4f("cFrom", 0,0,0,1));
-					    	params.addParam( new GLParam4f("cTo", 0,0,0,1));
-							params.texture = new GLParameters.GLImageTexture(
-									node.getLayer().getActiveData().handle.deepAccess());
-							engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
+							params.texture = new GLParameters.GLImageTexture(bi);
+							engine.applyPassProgram(ProgramType.PASS_BASIC, params, null,
+									0, 0, bi.getWidth(), bi.getHeight());
 						}
 					});
-				}
-//				buffer = new BufferedImage[n];
-/*				for( int i=0; i<n; ++i) {
+				}*/
+				
+				// Prepare the FBO for rendering
+				glmu = new GLMultiRenderer[n];
+				for( int i=0; i<n; ++i) {
 					glmu[i] = new GLMultiRenderer(
 							settings.width, settings.height, engine.getGL3().getGL2());
 					glmu[i].init();
-//					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+					glmu[i].render(new GLRenderer() {
+						@Override public void render(GL gl) {
+							engine.clearSurface();
+						}
+					});
 				}
 				
 				// Step 2: Compose the Stroke and Lifted Selection data onto the 
@@ -877,32 +888,20 @@ public class RenderEngine
 	
 				_render_rec( root, 0, settings);
 
-				GLParameters params = new GLParameters(settings.width, settings.height);
-
-		    	params.addParam( new GLParam1i("optionMask", 2));
-		    	params.addParam( new GLParam4f("cFrom", 0, 0, 0, 1));
-		    	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
-		    	params.texture = new GLFBOTexture(glmu[0]);
-		    	
-		    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
-//				engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
-				BufferedImage bi = engine.glSurfaceToImage();
-				
-				// Flush the data we only needed to build the image
-				for( int i=0; i<n;++i) {
-					glmu[i].cleanup();
-//					buffer[i].flush();
-				}
-				
-				*/
-
+				// Render the top-most FBO to the GLSurface and 
 				engine.setSurfaceSize(settings.width, settings.height);
 				GLParameters params = new GLParameters(settings.width, settings.height);
 				params.texture = new GLParameters.GLFBOTexture(glmu[0]);
-				engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
+		    	engine.clearSurface();
+				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null);
 				
 				BufferedImage bi = engine.glSurfaceToImage();
-				glmu[0].cleanup();
+
+				// Flush the data we only needed to build the image
+				for( int i=0; i<n;++i) {
+					glmu[i].cleanup();
+				}
+				
 				return bi;
 			}
 			finally {
@@ -948,13 +947,6 @@ public class RenderEngine
 				MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
 				return;
 			}
-
-			
-			
-//			Graphics g = buffer[n].getGraphics();
-//			Graphics2D g2 = (Graphics2D)g;
-//			if( settings.hints != null)
-//				g2.setRenderingHints(settings.hints);
 			
 			// Go through the node's children (in reverse), drawing any visible group
 			//	found recursively and drawing any Layer found plainly.
@@ -1044,20 +1036,15 @@ public class RenderEngine
 			@Override
 			public void draw(int ind) {
 				_render_rec(node, n+1, settings);
-				
+
 				glmu[n].render( new GLRenderer() {
 					@Override
 					public void render(GL _gl) {
 						GLParameters params = new GLParameters(settings.width, settings.height);
-
-				    	params.addParam( new GLParam1i("optionMask", 2));
-				    	params.addParam( new GLParam4f("cFrom", 0, 0, 0, 1));
-				    	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
+						params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()));
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
-						
-						System.out.println("TES");
 						GLEngine.getInstance().applyPassProgram(
-								ProgramType.CHANGE_COLOR, params, null);
+								ProgramType.PASS_BASIC, params, null);
 					}
 				});
 				
@@ -1083,27 +1070,36 @@ public class RenderEngine
 			}
 			@Override
 			public void draw(int ind) {
-				
+
 				glmu[ind].render( new GLRenderer() {
 					@Override
 					public void render(GL _gl) {
+						
 						GLParameters params = new GLParameters(settings.width, settings.height);
-						params.texture = new GLParameters.GLImageTexture(
-								renderable.handle.deepAccess());
+						
+						float alpha = node.getAlpha();
+						if( renderable.comp instanceof AlphaComposite) {
+							alpha *= ((AlphaComposite)renderable.comp).getAlpha();
+						}
+						params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
 
-//						System.out.println("TES" + ind);
+						
+						AffineTransform trans = new AffineTransform();
+						trans.concatenate(transform);
+
+						BufferedImage bi =  getCompositeLayer(renderable.handle);
+						if( bi == null) {
+							bi = renderable.handle.deepAccess();
+							trans.translate(renderable.handle.getDynamicX(), 
+									renderable.handle.getDynamicY());
+						}
+						
+						params.texture = new GLParameters.GLImageTexture(bi);
 						GLEngine.getInstance().applyPassProgram(
-								ProgramType.CHANGE_COLOR, params, null);
+								ProgramType.PASS_BASIC, params, trans,
+								0, 0, bi.getWidth(), bi.getHeight());
 					}
 				});
-//				_setGraphicsSettings(g, node,settings);
-//				Graphics2D g2 = (Graphics2D)g;
-//				AffineTransform transform = g2.getTransform();
-//				g2.scale( ratioW, ratioH);
-//				renderable.handle.drawLayer(g2, this.transform, renderable.comp);
-//				
-//				g2.setTransform(transform);
-//				_resetRenderSettings(g, node,settings);
 			}
 			
 		}

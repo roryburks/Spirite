@@ -100,9 +100,9 @@ public class GLMultiRenderer {
 	}
 	
 	public void render( GLRenderer renderer ) {
-		gl.glPushAttrib(GL2.GL_TRANSFORM_BIT | GL2.GL_ENABLE_BIT | GL2.GL_COLOR_BUFFER_BIT);
-		gl.glDisable(GL.GL_DEPTH_TEST);
-		gl.glDepthMask(false);
+//		gl.glPushAttrib(GL2.GL_TRANSFORM_BIT | GL2.GL_ENABLE_BIT | GL2.GL_COLOR_BUFFER_BIT);
+//		gl.glDisable(GL.GL_DEPTH_TEST);
+//		gl.glDepthMask(false);
 		
 		// Bind Framebuffer
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
@@ -111,9 +111,9 @@ public class GLMultiRenderer {
 
 		
 		renderer.render(gl);
-		gl.glPopAttrib();
+//		gl.glPopAttrib();
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
-		gl.glPopAttrib();
+//		gl.glPopAttrib();
 
 	}
 	
