@@ -45,7 +45,7 @@ public class JOGLDrawer {
 
     	params.texture = new GLImageTexture(bi);
     	
-    	engine.applyProgram(ProgramType.CHANGE_COLOR, params);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
     	
     	glSurfaceToImage(bi);
     }
@@ -54,7 +54,7 @@ public class JOGLDrawer {
     	GLParameters params = new GLParameters(bi.getWidth(), bi.getHeight());
     	params.texture = new GLImageTexture(bi);
     	
-    	engine.applyProgram( ProgramType.PASS_INVERT, params);
+    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null);
     	glSurfaceToImage(bi);
     }
     
@@ -63,7 +63,7 @@ public class JOGLDrawer {
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, bi.getWidth(), bi.getHeight(), true); 
+        				engine.getGL3(), 0, 0, bi.getWidth(), bi.getHeight(), false); 
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

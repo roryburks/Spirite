@@ -1,5 +1,6 @@
 package spirite.gl;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
 
+import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
@@ -20,6 +22,7 @@ import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
+import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import mutil.MatrixBuilder;
 import spirite.Globals;
@@ -122,6 +125,21 @@ public class GLEngine  {
 		return programs[type.ordinal()];
 	}
 	
+	public void applyPassProgram(ProgramType type, GLParameters params, AffineTransform trans){
+		GLParameters modifiedParams = new GLParameters(params);
+
+        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
+        		0, params.width, 0, params.height, -1, 1));
+        if( trans != null) {
+	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
+	        matrix = matrix2.multiply(matrix);
+        }
+        
+        modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
+        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
+        
+        applyProgram( type, modifiedParams);
+	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
@@ -134,10 +152,10 @@ public class GLEngine  {
 
 		PreparedData pd = prepareRawData(new float[]{
 			// x  y   u   v
-			0, 0, 0.0f, 0.0f,
-			w, 0, 1.0f, 0.0f,
-			0, h, 0.0f, 1.0f,
-			w, h, 1.0f, 1.0f,
+			0, 0, 0.0f, 1.0f,
+			w, 0, 1.0f, 1.0f,
+			0, h, 0.0f, 0.0f,
+			w, h, 1.0f, 0.0f,
 		});
 
 		// Clear Surface
@@ -161,12 +179,7 @@ public class GLEngine  {
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
 
-		// Bind Uniforms
-        int perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
-        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(0, w, 0, h, -1, 1)
-        );
-        gl.glUniformMatrix4fv(perspectiveMatrix, 1, true, orthagonalMatrix);
+		// Bind Uniform
         
         if( params != null)
         	params.apply(gl, prog);
@@ -187,6 +200,12 @@ public class GLEngine  {
         if( params.texture != null) {
         	params.texture.unload();
         }
+	}
+	
+	public BufferedImage glSurfaceToImage() {
+        return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+        		.readPixelsToBufferedImage( getGL3(), 0, 0, width, height, false); 
+		
 	}
 	
 	// :::: Texture Preperation
@@ -240,7 +259,7 @@ public class GLEngine  {
 				w, h,
 				0,
 				GL3.GL_RGBA,
-				GL3.GL_UNSIGNED_BYTE,
+				GL3.GL_UNSIGNED_INT_8_8_8_8,
 				ByteBuffer.wrap(((ByteInterleavedRaster)bi.getRaster()).getDataStorage())
 				);
 		

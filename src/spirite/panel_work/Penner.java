@@ -22,8 +22,12 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import spirite.MUtil;
 import spirite.brains.MasterControl;
@@ -34,6 +38,7 @@ import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
+import spirite.gl.GLUIDraw;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
@@ -331,7 +336,7 @@ public class Penner
 				}
 				break;}
 			case COLOR_CHANGE: {
-				/* !!! DEBUG!!!
+/*				// !!! DEBUG!!!
 				try {
 					ImageIO.write(
 					GLUIDraw._ddbounds(selectionEngine.getLiftedImage(), 0),

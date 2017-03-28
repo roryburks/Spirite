@@ -106,8 +106,8 @@ public class GLMultiRenderer {
 		
 		// Bind Framebuffer
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
-		gl.glPushAttrib( GL2.GL_VIEWPORT_BIT);
-		gl.glViewport(0, 0, width, height);
+//		gl.glPushAttrib( GL2.GL_VIEWPORT_BIT);
+//		gl.glViewport(0, 0, width, height);
 
 		
 		renderer.render(gl);

@@ -25,6 +25,12 @@ public class GLParameters {
 		this.width = width;
 		this.height = height;
 	}
+	public GLParameters( GLParameters other) {
+		this.width = other.width;
+		this.height = other.height;
+		this.params.addAll(other.params);
+		this.texture = other.texture;
+	}
 	
 	public void addParam( GLParam param) {
 		params.add(param);

@@ -25,10 +25,20 @@ import java.util.Set;
 
 import javax.swing.Timer;
 
+import com.jogamp.opengl.GL;
+
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.gl.GLEngine;
+import spirite.gl.GLMultiRenderer;
+import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLMultiRenderer.GLRenderer;
+import spirite.gl.GLParameters.GLFBOTexture;
+import spirite.gl.GLParameters.GLParam1i;
+import spirite.gl.GLParameters.GLParam4f;
+import spirite.gl.GLParameters;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -460,7 +470,6 @@ public class RenderEngine
 		}
 	}
 	
-
 	/** 
 	 * This Class will draw a group as it's "intended" to be seen,
 	 * requiring extra intermediate image data to combine the layers
@@ -736,6 +745,365 @@ public class RenderEngine
 				
 				g2.setTransform(transform);
 				_resetRenderSettings(g, node,settings);
+			}
+			
+		}
+	}
+	/** 
+	 * This Class will draw a group as it's "intended" to be seen,
+	 * requiring extra intermediate image data to combine the layers
+	 * properly.
+	 */
+	public class _NodeRenderSource extends RenderSource {
+		private final GroupNode root;
+		public _NodeRenderSource( GroupNode node) {
+			super(node.getContext());
+			this.root = node;
+		}
+
+		public List<Node> getNodesReliedOn() {
+			List<Node> list =  new LinkedList<>();
+			list.addAll( root.getAllAncestors());
+			return list;
+		}
+
+		@Override
+		public int getDefaultWidth() {
+			return workspace.getWidth();
+		}
+		@Override
+		public int getDefaultHeight() {
+			return workspace.getHeight();
+		}
+
+		@Override
+		public List<ImageHandle> getImagesReliedOn() {
+			// Get a list of all layer nodes then get a list of all ImageData
+			//	contained within those nodes
+			List<Node> layerNodes = root.getAllNodesST( new NodeValidator() {
+				@Override
+				public boolean isValid(Node node) {
+					return (node instanceof LayerNode);
+				}
+				@Override public boolean checkChildren(Node node) {return true;}
+			});
+			
+			List<ImageHandle> list = new LinkedList<>();
+			
+			Iterator<Node> it = layerNodes.iterator();
+			while( it.hasNext()){
+				for( ImageHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
+					// Avoiding duplicates should make the intersection method quicker
+					if( list.indexOf(data) == -1)
+						list.add(data);
+				}
+			}
+			return list;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + ((root == null) ? 0 : root.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			NodeRenderSource other = (NodeRenderSource) obj;
+			if (root == null) {
+				if (other.root != null)
+					return false;
+			} else if (!root.equals(other.root))
+				return false;
+			return true;
+		}
+
+		float ratioW;
+//		BufferedImage buffer[];
+		GLMultiRenderer glmu[];
+		float ratioH;
+		@Override
+		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
+			try {
+				GLEngine engine = GLEngine.getInstance();
+				
+				int n = _getNeededImagers( settings);
+	
+				if( n <= 0) return null;
+				engine.setSurfaceSize(settings.width, settings.height);
+				
+				glmu = new GLMultiRenderer[1];
+				glmu[0] = new GLMultiRenderer(settings.width, settings.height, GLEngine.getInstance().getGL3().getGL2());
+				glmu[0].init();
+				
+				for( LayerNode node : this.root.getAllLayerNodes()) {
+					
+					glmu[0].render(new GLRenderer() {
+						@Override
+						public void render(GL gl) {
+							GLParameters params = new GLParameters(settings.width, settings.height);
+					    	params.addParam( new GLParam1i("optionMask", 0));
+					    	params.addParam( new GLParam4f("cFrom", 0,0,0,1));
+					    	params.addParam( new GLParam4f("cTo", 0,0,0,1));
+							params.texture = new GLParameters.GLImageTexture(
+									node.getLayer().getActiveData().handle.deepAccess());
+							engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
+						}
+					});
+				}
+//				buffer = new BufferedImage[n];
+/*				for( int i=0; i<n; ++i) {
+					glmu[i] = new GLMultiRenderer(
+							settings.width, settings.height, engine.getGL3().getGL2());
+					glmu[i].init();
+//					buffer[i] = new BufferedImage( settings.width, settings.height, BufferedImage.TYPE_4BYTE_ABGR);
+				}
+				
+				// Step 2: Compose the Stroke and Lifted Selection data onto the 
+				//	active Image so that they appear when drawn.
+				buildCompositeLayer(workspace);
+	
+				// Step 3: Recursively draw the image
+				ratioW = settings.width / (float)workspace.getWidth();
+				ratioH = settings.height / (float)workspace.getHeight();
+	
+				_render_rec( root, 0, settings);
+
+				GLParameters params = new GLParameters(settings.width, settings.height);
+
+		    	params.addParam( new GLParam1i("optionMask", 2));
+		    	params.addParam( new GLParam4f("cFrom", 0, 0, 0, 1));
+		    	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
+		    	params.texture = new GLFBOTexture(glmu[0]);
+		    	
+		    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
+//				engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
+				BufferedImage bi = engine.glSurfaceToImage();
+				
+				// Flush the data we only needed to build the image
+				for( int i=0; i<n;++i) {
+					glmu[i].cleanup();
+//					buffer[i].flush();
+				}
+				
+				*/
+
+				engine.setSurfaceSize(settings.width, settings.height);
+				GLParameters params = new GLParameters(settings.width, settings.height);
+				params.texture = new GLParameters.GLFBOTexture(glmu[0]);
+				engine.applyPassProgram(ProgramType.PASS_INVERT, params, null);
+				
+				BufferedImage bi = engine.glSurfaceToImage();
+				glmu[0].cleanup();
+				return bi;
+			}
+			finally {
+				glmu = null;
+				//buffer = null;
+			}
+		}
+		
+		/** Determines the number of images needed to properly render 
+		 * the given RenderSettings.  This number is equal to largest Group
+		 * depth of any visible node. */
+		private int _getNeededImagers(RenderSettings settings) {
+			NodeValidator validator = new NodeValidator() {			
+				@Override
+				public boolean isValid(Node node) {
+					return (node.isVisible() && !(node instanceof GroupNode)
+							&& node.getChildren().size() == 0);
+				}
+
+				@Override
+				public boolean checkChildren(Node node) {
+					return (node.isVisible() && node.getAlpha() > 0);
+				}
+			};
+			
+			List<Node> list = root.getAllNodesST(validator);
+
+			int max = 0;
+			for( Node ancestor : list) {
+				int i = ancestor.getDepthFrom(root);
+				if( i > max) max = i;
+			}
+			
+			return max;
+		}
+		
+		private void _render_rec(
+				GroupNode node, 
+				int n, 
+				RenderSettings settings) 
+		{
+			if( n < 0 || n >= glmu.length) {
+				MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
+				return;
+			}
+
+			
+			
+//			Graphics g = buffer[n].getGraphics();
+//			Graphics2D g2 = (Graphics2D)g;
+//			if( settings.hints != null)
+//				g2.setRenderingHints(settings.hints);
+			
+			// Go through the node's children (in reverse), drawing any visible group
+			//	found recursively and drawing any Layer found plainly.
+			
+			// Step 1: Construct a list of all components that need to be rendered
+			int count = 0;	// This subDepth counter is used to make sure Renderables of
+							// the same depth are rendered in the correct order.
+			
+			
+			ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
+			List< Drawable> renderList = new ArrayList<>();
+			while( it.hasPrevious()) {
+				Node child = it.previous();
+				if( child.isVisible()) {
+					if( child instanceof GroupNode) {
+						if( n == glmu.length-1) {
+							// Note: the code can reach here if all the children are invisible.
+							// There might be other, unintended ways for the code to reach here.
+							continue;
+						}
+						
+						Drawable renderable;
+						renderable =  new GroupRenderable(
+								(GroupNode) child, n, settings);
+						renderable.subDepth = count++;
+						renderList.add(renderable);
+					}
+					else {
+						List<TransformedHandle> sub = ((LayerNode)child).getLayer().getDrawList();
+						
+						for( TransformedHandle subRend : sub) {
+							Drawable renderable = new TransformedRenderable(
+									(LayerNode) child, subRend, settings);
+							renderable.subDepth = count++;
+							renderList.add(renderable );
+						}
+					}
+				}
+			}
+			
+			// Step 2: Sort the list by depth then subdepth, increasing.
+			renderList.sort( new Comparator<Drawable>() {
+				@Override
+				public int compare(Drawable o1, Drawable o2) {
+					if( o1.depth == o2.depth)
+						return o1.subDepth - o2.subDepth;
+					return o1.depth - o2.depth;
+				}
+			});
+			
+			// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
+			for( Drawable renderable : renderList) {
+				renderable.draw(n);
+			}
+			
+
+//			g.dispose();
+		}
+		
+		private abstract class Drawable {
+			private int subDepth;
+			protected int depth;
+			public abstract void draw(int ind);
+		}
+
+		private Composite cc;
+		private void _setGraphicsSettings( Graphics g, Node node, RenderSettings settings) {
+//			final Graphics2D g2 = (Graphics2D)g;
+//			 cc = g2.getComposite();
+//			
+//			if( node.getAlpha() != 1.0f) 
+//				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.getAlpha()));
+		}
+		private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
+			((Graphics2D)g).setComposite(cc);
+		}
+		private class GroupRenderable extends Drawable {
+			private final GroupNode node;
+			private final int n;
+			private final RenderSettings settings;
+			GroupRenderable( GroupNode node, int n, RenderSettings settings) 
+			{
+				this.node = node;
+				this.n = n;
+				this.settings = settings;
+			}
+			@Override
+			public void draw(int ind) {
+				_render_rec(node, n+1, settings);
+				
+				glmu[n].render( new GLRenderer() {
+					@Override
+					public void render(GL _gl) {
+						GLParameters params = new GLParameters(settings.width, settings.height);
+
+				    	params.addParam( new GLParam1i("optionMask", 2));
+				    	params.addParam( new GLParam4f("cFrom", 0, 0, 0, 1));
+				    	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
+						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
+						
+						System.out.println("TES");
+						GLEngine.getInstance().applyPassProgram(
+								ProgramType.CHANGE_COLOR, params, null);
+					}
+				});
+				
+//				_setGraphicsSettings(g, node,settings);
+//				g.drawImage( buffer[n+1],
+//						0, 0, 
+//						null);
+//				_resetRenderSettings(g, node,settings);
+			}
+		}
+		private class TransformedRenderable extends Drawable {
+			private final TransformedHandle renderable;
+			private final RenderSettings settings;
+			private final LayerNode node;
+			private AffineTransform transform;
+			TransformedRenderable( LayerNode node, TransformedHandle renderable, RenderSettings settings) {
+				this.node = node;
+				this.renderable = renderable;
+				this.depth = renderable.depth;
+				this.settings = settings;
+				this.transform = renderable.trans;
+				this.transform.translate(node.getOffsetX(), node.getOffsetY());
+			}
+			@Override
+			public void draw(int ind) {
+				
+				glmu[ind].render( new GLRenderer() {
+					@Override
+					public void render(GL _gl) {
+						GLParameters params = new GLParameters(settings.width, settings.height);
+						params.texture = new GLParameters.GLImageTexture(
+								renderable.handle.deepAccess());
+
+//						System.out.println("TES" + ind);
+						GLEngine.getInstance().applyPassProgram(
+								ProgramType.CHANGE_COLOR, params, null);
+					}
+				});
+//				_setGraphicsSettings(g, node,settings);
+//				Graphics2D g2 = (Graphics2D)g;
+//				AffineTransform transform = g2.getTransform();
+//				g2.scale( ratioW, ratioH);
+//				renderable.handle.drawLayer(g2, this.transform, renderable.comp);
+//				
+//				g2.setTransform(transform);
+//				_resetRenderSettings(g, node,settings);
 			}
 			
 		}

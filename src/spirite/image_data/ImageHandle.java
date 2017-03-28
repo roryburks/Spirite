@@ -85,6 +85,7 @@ public class ImageHandle {
 		}
 		drawLayer(g,transform);
 		
+//		BufferedImage.TYPE_4BYTE_ABGR;
 		g2.setComposite(c);
 	}
 	

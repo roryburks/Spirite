@@ -1,6 +1,7 @@
 package spirite.gl;
 
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -62,7 +63,21 @@ public class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLImageTexture(bi);
-				engine.applyProgram(ProgramType.PASS_BORDER, params);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
+			}
+		});
+		
+
+		GLMultiRenderer glmub = new GLMultiRenderer(
+				w, h, gl.getGL2());
+		glmub.init();
+		glmub.render( new GLRenderer() {
+			@Override
+			public void render(GL _gl) {
+				GLParameters params = new GLParameters(w, h);
+				params.addParam( new GLParam1i("uCycle", cycle));
+				params.texture = new GLFBOTexture(glmu);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
 			}
 		});
 
@@ -73,14 +88,15 @@ public class GLUIDraw {
     	params.addParam( new GLParam4f("cTo", 1, 0, 0, 1));
     	params.texture = new GLFBOTexture(glmu);
     	
-    	engine.applyProgram(ProgramType.CHANGE_COLOR, params);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
         
 		glmu.cleanup();
+		glmub.cleanup();
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				gl, 0, 0, w, h, true); 
+        				gl, 0, 0, w, h, false); 
        
 		return im;
 	}
@@ -91,7 +107,7 @@ public class GLUIDraw {
 	 * @return
 	 */
 	public static BufferedImage drawBounds( 
-			BufferedImage image, Rectangle UNUSED, int cycle) 
+			BufferedImage image, AffineTransform trans, int cycle) 
 	{
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -100,12 +116,12 @@ public class GLUIDraw {
 		params.addParam( new GLParam1i("uCycle", cycle));
 		params.texture = new GLImageTexture(image);
 		
-		engine.applyProgram(ProgramType.PASS_BORDER, params);
+		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, w, h, true); 
+        				engine.getGL3(), 0, 0, w, h, false); 
        
 		return im;
 	}
@@ -174,8 +190,7 @@ public class GLUIDraw {
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage(
-        				gl, 0, 0, w, h, true); 
+        		.readPixelsToBufferedImage( gl, 0, 0, w, h, true); 
         
         return im;
 	}
