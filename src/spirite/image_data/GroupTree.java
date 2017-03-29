@@ -5,6 +5,7 @@ import java.util.List;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.brains.RenderEngine.RenderMethod;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -69,6 +70,8 @@ public class GroupTree {
 		protected int y = 0;
 		protected boolean expanded = true;
 		protected String name = "";
+		protected RenderMethod renderMethod = RenderMethod.DEFAULT;
+		protected int renderValue = 0;
 		
 		Node() {
 			
@@ -84,9 +87,7 @@ public class GroupTree {
 		}
 
 		// :::: Get/Set
-		public boolean isVisible() {
-			return (visible && alpha > 0);
-		}
+		public boolean isVisible() {return (visible && alpha > 0);}
 		public void setVisible( boolean visible) {
 			if( context.nodeInWorkspace(this) && this.visible != visible) {
 				context.executeChange( context.new VisibilityChange(this, visible));
@@ -97,39 +98,42 @@ public class GroupTree {
 			}
 			else { this.visible = visible;}
 		}
-		public float getAlpha() {
-			return alpha;
-		}
+		
+		public float getAlpha() {return alpha;}
 		public void setAlpha( float alpha) {
 			if( context.nodeInWorkspace(this) && this.alpha != alpha) {
 				context.executeChange( context.new OpacityChange( this, alpha));
 			}
 			else { this.alpha = alpha;}
 		}
-		public int getOffsetX() {
-			return x;
-		}
-		public int getOffsetY() {
-			return y;
-		}
+		
+		public int getOffsetX() {return x;}
+		public int getOffsetY() {return y;}
 		public void setOffset( int x, int y) {
 			if( context.nodeInWorkspace(this) && (this.x != x || this.y != y)) {
 				context.executeChange( context.new OffsetChange( this, x, y));
 			}
 			else {this.x = x; this.y = y;}
 		}
-		public boolean isExpanded() {
-			return expanded;
-		}
+		
+		public boolean isExpanded() {return expanded;}
 		public void setExpanded( boolean expanded) {
 			this.expanded = expanded;
 		}
-		public String getName() {
-			return name;
-		}
+		
+		public String getName() {return name;}
 		void setName(String name) {
 			if( !this.name.equals(name)) 
 				this.name = name;
+		}
+		
+		public RenderMethod getRenderMethod() {return renderMethod;}
+		public int getRenderValue() {return renderValue;}
+		public void setRenderMethod( RenderMethod method, int renderValue) {
+			if( context.nodeInWorkspace(this) && (renderMethod != method || this.renderValue != renderValue)) {
+				context.executeChange( context.new MethodChange( this, method, renderValue));
+			}
+			else {this.renderMethod = method; this.renderValue = renderValue;}
 		}
 
 		

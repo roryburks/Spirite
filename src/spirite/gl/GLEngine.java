@@ -28,6 +28,7 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.gl.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 
 /**
@@ -97,6 +98,12 @@ public class GLEngine  {
 		});
 	}
 	
+	public final GLRenderer clearRenderer = new GLRenderer() {
+		@Override public void render(GL gl) {
+			clearSurface();
+		}
+	};
+	
 	// ============
 	// ==== Simple API
 	public void setSurfaceSize( int width, int height) {
@@ -134,7 +141,6 @@ public class GLEngine  {
 		PASS_INVERT,
 		PASS_BASIC,
 		PASS_ESCALATE,
-		PASS_NULL,
 		;
 	}
 	
@@ -224,7 +230,6 @@ public class GLEngine  {
 		case BASIC_STROKE:
 		case DEFAULT:
 		case PASS_BASIC:
-		case PASS_NULL:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL3.GL_FUNC_ADD);
@@ -401,10 +406,6 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_escalate.frag");
-        programs[ProgramType.PASS_NULL.ordinal()] = loadProgramFromResources( 
-				"shaders/pass.vert", 
-				null, 
-				"shaders/pass_null.frag");
         		
 	}
 	

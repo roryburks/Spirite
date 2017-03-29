@@ -49,6 +49,7 @@ import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.RenderMethod;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.file.AnimIO;
 import spirite.image_data.Animation;
@@ -327,18 +328,25 @@ public class LayerTreePanel extends ContentTree
 	@Override
 	protected void buttonPressed(CCButton button) {
 		if( button.buttonNum == 0) {
+			// Visibility Button
 			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
 			node.setVisible(button.isSelected());
 		}
 		if( button.buttonNum == 1) {
-
+			// Link Button
 			Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
-			if( button.isSelected())
+			if( button.isSelected()) {
+				node.setRenderMethod(RenderMethod.COLOR_CHANGE, 0);
+			}
+			else {
+				node.setRenderMethod(RenderMethod.DEFAULT, 0);
+			}
+/*			if( button.isSelected())
 				workspace.addToggle(node);
 			else
-				workspace.remToggle(node);
+				workspace.remToggle(node);*/
 		}
 	}
 	@Override

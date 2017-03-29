@@ -32,6 +32,7 @@ import spirite.brains.CacheManager;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -1722,7 +1723,7 @@ public class ImageWorkspace {
 		}
 		
 	}
-	
+
 	public class OffsetChange extends NodeAtributeChange
 		implements StackableStructureChange
 	{
@@ -1745,6 +1746,40 @@ public class ImageWorkspace {
 		}
 		@Override public boolean canStack(StructureChange newChange) {
 			OffsetChange change = (OffsetChange)newChange;
+			return (node == change.node);
+		}
+	}
+	public class MethodChange extends NodeAtributeChange
+		implements StackableStructureChange
+	{
+		private RenderMethod newMethod, oldMethod;
+		private int newValue, oldValue;
+		
+		MethodChange( Node node, RenderMethod method, int value) {
+			super(node);
+			this.newMethod = method;
+			this.newValue = value;
+			this.oldMethod = node.renderMethod;
+			this.oldValue = node.renderValue;
+			
+			this.description = "Changed Node Render Method";
+		}
+	
+		@Override public void execute() { 
+			node.renderMethod = newMethod; 
+			node.renderValue = newValue;
+		}
+		@Override public void unexecute()  { 
+			node.renderMethod = oldMethod; 
+			node.renderValue = oldValue;
+		}
+		@Override public void stackNewChange(StructureChange newChange) {
+			MethodChange change = (MethodChange)newChange;
+			this.newMethod = change.newMethod;
+			this.newValue = change.newValue;
+		}
+		@Override public boolean canStack(StructureChange newChange) {
+			MethodChange change = (MethodChange)newChange;
 			return (node == change.node);
 		}
 	}

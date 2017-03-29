@@ -77,6 +77,7 @@ public class RenderEngine
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final CacheManager cacheManager;
 	private final Timer sweepTimer;
+	private GLEngine engine = GLEngine.getInstance();
 	
 	//  ThumbnailManager needs access to MasterControl to keep track of all
 	//	workspaces that exist (easier and more reliable than hooking into Observers)
@@ -125,11 +126,19 @@ public class RenderEngine
 		}
 	}
 	
+	// ===================
+	// ===== Render Attributes
 	public static class TransformedHandle {
 		public int depth;
 		public Composite comp = null;
 		public AffineTransform trans = new AffineTransform();
 		public ImageHandle handle;
+	}
+	
+	public enum RenderMethod {
+		DEFAULT, 
+		COLOR_CHANGE,
+		
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -186,7 +195,6 @@ public class RenderEngine
 			if( workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing()) {
 
-				Rectangle r = dataContext.getBounds();
 				bi= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
 						Globals.BI_FORMAT);
@@ -873,8 +881,6 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
 			try {
-				GLEngine engine = GLEngine.getInstance();
-				
 				int n = _getNeededImagers( settings);
 	
 				if( n <= 0) return null;
@@ -956,10 +962,8 @@ public class RenderEngine
 			return max;
 		}
 		
-		private void _render_rec(
-				GroupNode node, 
-				int n, 
-				RenderSettings settings) 
+		
+		private void _render_rec(GroupNode node, int n, RenderSettings settings) 
 		{
 			if( n < 0 || n >= glmu.length) {
 				MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
@@ -1021,6 +1025,25 @@ public class RenderEngine
 			}
 		}
 		
+		// ==================
+		// ==== Node-specific Drawing
+		private void setParamsFromNode(
+				Node node, GLParameters params, boolean fullPremult, float moreAlpha) 
+		{
+			
+			int mask = 0;
+			switch( node.getRenderMethod()) {
+			case COLOR_CHANGE:
+				mask = 0b10;
+				break;
+			case DEFAULT:
+				break;
+			
+			}
+			params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));
+			params.addParam( new GLParameters.GLParam1i("uComp", mask | ((fullPremult)?1:0)));
+		}
+		
 		private abstract class Drawable {
 			private int subDepth;
 			protected int depth;
@@ -1039,16 +1062,17 @@ public class RenderEngine
 			}
 			@Override
 			public void draw(int ind) {
+				glmu[n+1].render( engine.clearRenderer);
 				_render_rec(node, n+1, settings);
 
 				glmu[n].render( new GLRenderer() {
 					@Override
 					public void render(GL _gl) {
 						GLParameters params = new GLParameters(settings.width, settings.height);
-						params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()));
+						setParamsFromNode( node, params, false, 1);
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
-						GLEngine.getInstance().applyPassProgram(
-								ProgramType.PASS_NULL, params, null);
+						engine.applyPassProgram(
+								ProgramType.PASS_BASIC, params, null);
 					}
 				});
 			}
@@ -1075,11 +1099,10 @@ public class RenderEngine
 						
 						GLParameters params = new GLParameters(settings.width, settings.height);
 						
-						float alpha = node.getAlpha();
-						if( renderable.comp instanceof AlphaComposite) {
+						float alpha = 1;
+						if( renderable.comp instanceof AlphaComposite)
 							alpha *= ((AlphaComposite)renderable.comp).getAlpha();
-						}
-						params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+						setParamsFromNode( node, params, true, alpha);
 
 						
 						AffineTransform trans = new AffineTransform();
@@ -1093,7 +1116,7 @@ public class RenderEngine
 						}
 						
 						params.texture = new GLParameters.GLImageTexture(bi);
-						GLEngine.getInstance().applyPassProgram(
+						engine.applyPassProgram(
 								ProgramType.PASS_BASIC, params, trans,
 								0, 0, bi.getWidth(), bi.getHeight());
 					}
