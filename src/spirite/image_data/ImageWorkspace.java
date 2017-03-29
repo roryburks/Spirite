@@ -12,6 +12,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -89,7 +90,6 @@ public class ImageWorkspace {
 			this.ox = ox;
 			this.oy = oy;
 		}
-		
 	}
 	
 	private boolean isValidHandle(ImageHandle handle) {
@@ -133,14 +133,16 @@ public class ImageWorkspace {
 		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
 		referenceManager = new ReferenceManager(this);
 	}
-	
-	
 	@Override
 	public String toString() {
 		return "ImageWorkspace: " + getFileName();
 	}
 	
-	// :::: Maintenance Methods
+	// =============
+	// ==== Maintenance Methods
+	
+	/** Goes through the imageData cache, removing anything that is not needed
+	 * by any current Layers or anything stored in the UndoEngine */
 	public void cleanDataCache() {
 		if( building) return;
 		
@@ -232,10 +234,9 @@ public class ImageWorkspace {
 		triggerFileChange();
 	}
 	
-	// :::: Getters and Setters
-	public int getWidth() {
-		return width;
-	}
+	// ===========
+	// ==== Getters and Setters
+	public int getWidth() {return width;}
 	public void setWidth( int width) {
 		if( width >= 0 && this.width != width
 				&& width < Globals.getMetric("workspace.max_size").width) 
@@ -243,9 +244,8 @@ public class ImageWorkspace {
 			this.width = width;
 		}
 	}
-	public int getHeight() {
-		return height;
-	}
+	
+	public int getHeight() {return height;}
 	public void setHeight( int height) {
 		if( height >= 0 && this.height != height
 				&& height < Globals.getMetric("workspace.max_size").height)
@@ -254,9 +254,7 @@ public class ImageWorkspace {
 		}
 	}
 	
-	public File getFile() {
-		return file;
-	} 
+	public File getFile() {return file;} 
 	
 	public String getFileName() {
 		if( file == null) 
@@ -265,46 +263,25 @@ public class ImageWorkspace {
 			return file.getName();
 	}
 	
-	public boolean hasChanged() {
-		return changed;
-	}
+	public boolean hasChanged() { return changed; }
 	
-	public UndoEngine getUndoEngine() {
-		return undoEngine;
-	}
+	// Sub-Components
+	public UndoEngine getUndoEngine() { return undoEngine; }
+	public AnimationManager getAnimationManager() { return animationManager; }
+	public SelectionEngine getSelectionEngine() { return selectionEngine; }
+	public DrawEngine getDrawEngine() { return drawEngine; }
+	public ReferenceManager getReferenceManager() { return referenceManager; }
 	
-	public AnimationManager getAnimationManager() {
-		return animationManager;
-	}
-	
-	public SelectionEngine getSelectionEngine() {
-		return selectionEngine;
-	}
-	
-	
-	public DrawEngine getDrawEngine() {
-		return drawEngine;
-	}
-	
-	public ReferenceManager getReferenceManager() {
-		return referenceManager;
-	}
+	// Super-Components (components rooted in MasterControl, simply being passed on)
+	public RenderEngine getRenderEngine() { return renderEngine; }
 	
 	// Doesn't feel great leaking external components, but they're very
 	//	relevant to images and it's better than given them MasterControl
-	public CacheManager getCacheManager() {
-		return cacheManager;
-	}
-	public RenderEngine getRenderEngine() {
-		return renderEngine;
-	}
+	public CacheManager getCacheManager() { return cacheManager; }
 	
-	public GroupTree.GroupNode getRootNode() {
-		return groupTree.getRoot();
-	}
-	public GroupTree getGroupTree() {
-		return groupTree;
-	}
+	
+	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }
+	public GroupTree getGroupTree() { return groupTree; }
 	
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
@@ -316,7 +293,10 @@ public class ImageWorkspace {
 		return list;
 	}
 
+	// ===============
+	// ==== Data Building
 	
+	// TODO: Figure out how much of this is really needed
 	/**
 	 * A BuildActiveData is a helper class which is intended to be used
 	 * by Image-modification functions which operate in Image Space.  It
@@ -589,15 +569,7 @@ public class ImageWorkspace {
 		}
 	}
 	
-	public boolean isActiveHandle( ImageHandle handle) {
-		if( selected == null) return false;
-		
-		if( selected instanceof LayerNode) {
-			return ((LayerNode)selected).getLayer().getActiveData().handle.equals( handle);
-		}
-		return false;
-	}
-	
+	/** Returns the Active Data in its Built form, with all the offsets applied. */
 	public BuiltImageData buildActiveData() {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;
@@ -608,6 +580,7 @@ public class ImageWorkspace {
 		return null;
 	}
 	
+	/** Builds all applied offsets into a LayerNode. */
 	public BuiltImageData buildData( LayerNode node) {
 		BuildingImageData data = node.getLayer().getActiveData();
 		
@@ -622,6 +595,9 @@ public class ImageWorkspace {
 		else return new BuiltImageData( data.handle,
 				data.ox + node.x, data.oy + node.y);
 	}
+	
+	/** Converts BuildingImageData (which is provided by Layers to describe all
+	 * sub-parts in a partially-built form) into fully-built Image Data	 */
 	public BuiltImageData buildData( BuildingImageData data) {
 		if( data == null) return null;
 		
@@ -635,19 +611,12 @@ public class ImageWorkspace {
 				data.ox, data.oy);
 	}
 	
-	
-/*	public Point getActiveDataOffset() {
-		if( selected instanceof GroupTree.LayerNode) {
-			return new Point( selected.x, selected.y);
-		}
-		else
-			return new Point(0,0);
-	}*/
+	// ==============
+	// ==== Node Selection 
 	
 	public GroupTree.Node getSelectedNode() {
-		if( !nodeInWorkspace(selected)) {
+		if( !nodeInWorkspace(selected))
 			setSelectedNode(null);
-		}
 		return selected;
 	}
 	public void setSelectedNode( GroupTree.Node node) {
@@ -657,23 +626,20 @@ public class ImageWorkspace {
 		}
 		
 		if( selected != node) {
-			if( selectionEngine.isLifted()) {
-//				selectionEngine.
-			}
-			
 			selected = node;
 			triggerSelectedChanged();
 		}
 	}
 	
 	
-	// :::: Image Checkout
+	// ===============
+	// ==== Image Checkout (called by BuiltImageData)
 	boolean locked = false;
 	private BufferedImage _checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
 			return null;
 		
-//		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
+		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
 		locked = true;
 		undoEngine.prepareContext(image);
 		
@@ -1364,12 +1330,6 @@ public class ImageWorkspace {
 	}
 	
 	
-	// :::: Node Attribute Changes
-	public void renameNode( Node node, String newName) {
-		if( newName != node.name)
-			executeChange( new RenameChange(newName, node));
-	}
-
 	
 	/** NullActions which are handled by the ImageWorkspace are 
 	 * StructureActions, whose behavior is defined by StructureChanges
@@ -1629,11 +1589,11 @@ public class ImageWorkspace {
 
 		@Override
 		public void execute() {
-			node.setName(newName);
+			node.name = newName;
 		}
 		@Override
 		public void unexecute() {
-			node.setName(oldName);
+			node.name = oldName;
 		}
 	}
 	
@@ -1848,7 +1808,8 @@ public class ImageWorkspace {
 	}
 
 	
-	// :::: Utility Methods
+	// ===================
+	// ==== Utility Methods
 	/***
 	 * Verifies that the given node exists within the current workspace
 	 */
@@ -1872,7 +1833,11 @@ public class ImageWorkspace {
 		return true;
 	}
 	
-	// :::: Observers
+	
+	// ========================
+	// ==== Observers
+	
+	
 	/** ImageObserver - triggers when an image's data has been changed
 	 *  (<code>imageChanged</code>) or when the image's logical structure
 	 *  has changed (<code>structureChanged</code>)
@@ -2052,8 +2017,8 @@ public class ImageWorkspace {
     
     
 
-    
-    // :::: Resource Management
+    // =============
+    // ==== Resource Management
     private final Map<List<ImageHandle>,List<CachedImage>> reserveMap = new HashMap<>();
     
     

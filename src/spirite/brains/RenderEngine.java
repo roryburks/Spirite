@@ -503,19 +503,13 @@ public class RenderEngine
 	 * requiring extra intermediate image data to combine the layers
 	 * properly.
 	 */
-	public class _NodeRenderSource extends RenderSource {
+	public class NodeRenderSource extends RenderSource {
 		private final GroupNode root;
-		public _NodeRenderSource( GroupNode node) {
+		public NodeRenderSource( GroupNode node) {
 			super(node.getContext());
 			this.root = node;
 		}
-
-		public List<Node> getNodesReliedOn() {
-			List<Node> list =  new LinkedList<>();
-			list.addAll( root.getAllAncestors());
-			return list;
-		}
-
+		
 		@Override
 		public int getDefaultWidth() {
 			return workspace.getWidth();
@@ -524,7 +518,12 @@ public class RenderEngine
 		public int getDefaultHeight() {
 			return workspace.getHeight();
 		}
-
+		@Override
+		public List<Node> getNodesReliedOn() {
+			List<Node> list =  new LinkedList<>();
+			list.addAll( root.getAllAncestors());
+			return list;
+		}
 		@Override
 		public List<ImageHandle> getImagesReliedOn() {
 			// Get a list of all layer nodes then get a list of all ImageData
@@ -549,11 +548,13 @@ public class RenderEngine
 			}
 			return list;
 		}
+		
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
+			result = prime * result + getOuterType().hashCode();
 			result = prime * result + ((root == null) ? 0 : root.hashCode());
 			return result;
 		}
@@ -567,6 +568,8 @@ public class RenderEngine
 			if (getClass() != obj.getClass())
 				return false;
 			NodeRenderSource other = (NodeRenderSource) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
 			if (root == null) {
 				if (other.root != null)
 					return false;
@@ -574,16 +577,70 @@ public class RenderEngine
 				return false;
 			return true;
 		}
+		private RenderEngine getOuterType() {
+			return RenderEngine.this;
+		}
 
+		@Override
+		public BufferedImage render(RenderSettings settings) {
+			// TODO: Add way to detect if OpenGL is not proprly loaded, and use
+			//	default AWT renderer if not
+			
+			NodeRenderer renderer = new GLNodeRenderer(root);
+			return renderer.render(settings, workspace);
+		}
+
+	}
+	
+	/** */
+	private abstract class NodeRenderer {
+		final GroupNode root;
+		NodeRenderer( GroupNode root) { this.root = root;}
+		public abstract BufferedImage render(RenderSettings settings, ImageWorkspace workspace);
+		
+		/** Determines the number of images needed to properly render 
+		 * the given RenderSettings.  This number is equal to largest Group
+		 * depth of any visible node. */
+		int _getNeededImagers(RenderSettings settings) {
+			NodeValidator validator = new NodeValidator() {			
+				@Override
+				public boolean isValid(Node node) {
+					return (node.isVisible() && !(node instanceof GroupNode)
+							&& node.getChildren().size() == 0);
+				}
+
+				@Override
+				public boolean checkChildren(Node node) {
+					return (node.isVisible() && node.getAlpha() > 0);
+				}
+			};
+			
+			List<Node> list = root.getAllNodesST(validator);
+
+			int max = 0;
+			for( Node ancestor : list) {
+				int i = ancestor.getDepthFrom(root);
+				if( i > max) max = i;
+			}
+			
+			return max;
+		}
+	}
+
+	public class AWTNodeRenderer extends NodeRenderer {
 		float ratioW;
 		BufferedImage buffer[];
 		float ratioH;
+		
+		AWTNodeRenderer( GroupNode node) {
+			super(node);
+		}
+		
 		@Override
-		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
+		public BufferedImage render(RenderSettings settings, ImageWorkspace workspace) {		
 			try {
-				
+				// Step 1: Determine amount of data needed
 				int n = _getNeededImagers( settings);
-	
 				if( n <= 0) return null;
 				
 				buffer = new BufferedImage[n];
@@ -610,34 +667,6 @@ public class RenderEngine
 			finally {buffer = null;}
 		}
 		
-		/** Determines the number of images needed to properly render 
-		 * the given RenderSettings.  This number is equal to largest Group
-		 * depth of any visible node. */
-		private int _getNeededImagers(RenderSettings settings) {
-			NodeValidator validator = new NodeValidator() {			
-				@Override
-				public boolean isValid(Node node) {
-					return (node.isVisible() && !(node instanceof GroupNode)
-							&& node.getChildren().size() == 0);
-				}
-
-				@Override
-				public boolean checkChildren(Node node) {
-					return (node.isVisible() && node.getAlpha() > 0);
-				}
-			};
-			
-			List<Node> list = root.getAllNodesST(validator);
-
-			int max = 0;
-			for( Node ancestor : list) {
-				int i = ancestor.getDepthFrom(root);
-				if( i > max) max = i;
-			}
-			
-			return max;
-		}
-		
 		private void _render_rec(
 				GroupNode node, 
 				int n, 
@@ -647,8 +676,6 @@ public class RenderEngine
 				MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
 				return;
 			}
-
-			
 			
 			Graphics g = buffer[n].getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -708,7 +735,6 @@ public class RenderEngine
 			for( Drawable renderable : renderList) {
 				renderable.draw(g2);
 			}
-			
 
 			g.dispose();
 		}
@@ -777,11 +803,8 @@ public class RenderEngine
 			
 		}
 	}
+	
 	/** 
-	 * This Class will draw a group as it's "intended" to be seen,
-	 * requiring extra intermediate image data to combine the layers
-	 * properly.
-	 * 
 	 * This updated version uses JOGL rendering algorithms instead of 
 	 * AWT rendering, so that custom fragment shaders can be injected 
 	 * without performace-loss.
@@ -793,94 +816,28 @@ public class RenderEngine
 	 * Source Over Destination), which requires using pre-multiplied pixel
 	 * format.  Now it is possible 
 	 * 
-	 * Any time that a BufferedImage is being drawn to a GL surface, we use
-	 * PASS_BASIC, which colors it to the texture as premultipled and using
-	 * Porter/Duff SRC_OVER rule, multiplying in the shader.  Any time that 
-	 * a GL Surface is drawn to another GL Surface, we use PASS_NULL, which
-	 * preserves the color data, not multiplying them by the alpha because
-	 * they are already premultiplied.  And finally when we draw the 
-	 * GLSurface to the primary GL Drawing Surface, then we use PASS_ESCALATE
-	 * which convert it to non-premultiplied by divinding the colors by the 
-	 * alpha.
+	 * Any time that new colors are being drawn to a GLSurface, they must
+	 * be multiplied with their alpha to convert it to premultiplied form.
+	 * When GLSurfaces are drawn to GLSurfaces, the data is already premultiplied
+	 * so it can be drawn normally.  Finally, data must be converted to 
+	 * non-premultiplied form since that is the internal format that is used.
+	 * This is done using the PASS_ESCALATE shader.  All other actions are
+	 * accomplished using PASS_RENDER and appropriate uComp values.
+	 * (see "pass_render.frag" for appropriate values).
 	 */
-	public class NodeRenderSource extends RenderSource {
-		private final GroupNode root;
-		public NodeRenderSource( GroupNode node) {
-			super(node.getContext());
-			this.root = node;
-		}
-
-		public List<Node> getNodesReliedOn() {
-			List<Node> list =  new LinkedList<>();
-			list.addAll( root.getAllAncestors());
-			return list;
-		}
-
-		@Override
-		public int getDefaultWidth() {
-			return workspace.getWidth();
-		}
-		@Override
-		public int getDefaultHeight() {
-			return workspace.getHeight();
-		}
-
-		@Override
-		public List<ImageHandle> getImagesReliedOn() {
-			// Get a list of all layer nodes then get a list of all ImageData
-			//	contained within those nodes
-			List<Node> layerNodes = root.getAllNodesST( new NodeValidator() {
-				@Override
-				public boolean isValid(Node node) {
-					return (node instanceof LayerNode);
-				}
-				@Override public boolean checkChildren(Node node) {return true;}
-			});
-			
-			List<ImageHandle> list = new LinkedList<>();
-			
-			Iterator<Node> it = layerNodes.iterator();
-			while( it.hasNext()){
-				for( ImageHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
-					// Avoiding duplicates should make the intersection method quicker
-					if( list.indexOf(data) == -1)
-						list.add(data);
-				}
-			}
-			return list;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + ((root == null) ? 0 : root.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			NodeRenderSource other = (NodeRenderSource) obj;
-			if (root == null) {
-				if (other.root != null)
-					return false;
-			} else if (!root.equals(other.root))
-				return false;
-			return true;
-		}
-
+	public class GLNodeRenderer extends NodeRenderer {
 		GLMultiRenderer glmu[];
 		float ratioW;
 		float ratioH;
+		
+		public GLNodeRenderer( GroupNode node) {
+			super(node);
+		}
+
 		@Override
-		public BufferedImage render(RenderSettings settings) {		// Step 1: Determine amount of data needed
+		public BufferedImage render(RenderSettings settings, ImageWorkspace workspace) {
 			try {
+				// Step 1: Determine amount of data needed
 				int n = _getNeededImagers( settings);
 	
 				if( n <= 0) return null;
@@ -933,35 +890,6 @@ public class RenderEngine
 				//buffer = null;
 			}
 		}
-		
-		/** Determines the number of images needed to properly render 
-		 * the given RenderSettings.  This number is equal to largest Group
-		 * depth of any visible node. */
-		private int _getNeededImagers(RenderSettings settings) {
-			NodeValidator validator = new NodeValidator() {			
-				@Override
-				public boolean isValid(Node node) {
-					return (node.isVisible() && !(node instanceof GroupNode)
-							&& node.getChildren().size() == 0);
-				}
-
-				@Override
-				public boolean checkChildren(Node node) {
-					return (node.isVisible() && node.getAlpha() > 0);
-				}
-			};
-			
-			List<Node> list = root.getAllNodesST(validator);
-
-			int max = 0;
-			for( Node ancestor : list) {
-				int i = ancestor.getDepthFrom(root);
-				if( i > max) max = i;
-			}
-			
-			return max;
-		}
-		
 		
 		private void _render_rec(GroupNode node, int n, RenderSettings settings) 
 		{
@@ -1072,7 +1000,7 @@ public class RenderEngine
 						setParamsFromNode( node, params, false, 1);
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
 						engine.applyPassProgram(
-								ProgramType.PASS_BASIC, params, null);
+								ProgramType.PASS_RENDER, params, null);
 					}
 				});
 			}
@@ -1117,7 +1045,7 @@ public class RenderEngine
 						
 						params.texture = new GLParameters.GLImageTexture(bi);
 						engine.applyPassProgram(
-								ProgramType.PASS_BASIC, params, trans,
+								ProgramType.PASS_RENDER, params, trans,
 								0, 0, bi.getWidth(), bi.getHeight());
 					}
 				});
@@ -1265,19 +1193,11 @@ public class RenderEngine
 		}
 		
 		@Override
-		public int getDefaultWidth() {
-			return workspace.getWidth();
-		}
-
+		public int getDefaultWidth() { return workspace.getWidth(); }
 		@Override
-		public int getDefaultHeight() {
-			return workspace.getHeight();
-		}
-
+		public int getDefaultHeight() { return workspace.getHeight(); }
 		@Override
 		public List<ImageHandle> getImagesReliedOn() {
-			List<ImageHandle> list = new ArrayList<>();
-			
 			return workspace.getReferenceManager().getDependencies(front);
 		}
 

@@ -139,7 +139,7 @@ public class GLEngine  {
 		CHANGE_COLOR,
 		PASS_BORDER,
 		PASS_INVERT,
-		PASS_BASIC,
+		PASS_RENDER,
 		PASS_ESCALATE,
 		;
 	}
@@ -229,7 +229,7 @@ public class GLEngine  {
         switch( type) {
 		case BASIC_STROKE:
 		case DEFAULT:
-		case PASS_BASIC:
+		case PASS_RENDER:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL3.GL_FUNC_ADD);
@@ -398,10 +398,10 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_invert.frag");
-        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_RENDER.ordinal()] = loadProgramFromResources( 
 				"shaders/pass.vert", 
 				null, 
-				"shaders/pass_basic.frag");
+				"shaders/pass_render.frag");
         programs[ProgramType.PASS_ESCALATE.ordinal()] = loadProgramFromResources( 
 				"shaders/pass.vert", 
 				null, 

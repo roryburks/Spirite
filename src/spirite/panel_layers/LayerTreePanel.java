@@ -682,11 +682,8 @@ public class LayerTreePanel extends ContentTree
 		}
 		
 		private void saveText() {
-			if( editingNode != null) {
-				String text = renderPanel.label.getText();
-
-				workspace.renameNode(editingNode, text);
-			}
+			if( editingNode != null)
+				editingNode.setName(renderPanel.label.getText());
 			
 			editingNode = null;
 		}

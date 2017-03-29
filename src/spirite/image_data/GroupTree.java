@@ -6,6 +6,7 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.RenderEngine.RenderMethod;
+import spirite.image_data.ImageWorkspace.RenameChange;
 import spirite.image_data.layers.Layer;
 
 /***
@@ -16,7 +17,8 @@ import spirite.image_data.layers.Layer;
  * Note: "floating" Nodes which are nested inside a GroupTree, but are not
  *	linked to it through its root-branch system can exist for numerous 
  * 	reasons, such as for storing undo actions or because a UI component
- * 	hasn't re-constructed its data based on the GroupTree changes.
+ * 	hasn't re-constructed its data based on the GroupTree changes.  In other
+ *  words, it is not guaranteed that a Node is valid for any ImageWorkspace.
  * 
  * @author Rory Burks
  */
@@ -29,13 +31,11 @@ public class GroupTree {
 		root = new GroupNode(null);
 	}
 	
-	// :::: Get
-	public GroupNode getRoot() {
-		return root;
-	}
+	// ===============
+	// ==== Get
+	public GroupNode getRoot() { return root; }
 	
-	
-	/** Tests to see if nodeP is a parent of nodeC. */
+	/** Tests to see if nodeC is an ancestor of nodeP. */
 	boolean _isChild( Node nodeP, Node nodeC) {
 		Node n = nodeC;
 		
@@ -47,8 +47,9 @@ public class GroupTree {
 		return false;
 	}
 	
-	
-
+	/** A NodeValidator is an interface used for constructing a list of all 
+	 * Nodes within a certain Node (and all subchildren) that pass th
+	 * provided tests. */
 	public interface NodeValidator {
 		boolean isValid(Node node);
 		boolean checkChildren(Node node);	// Note, root is always checkable
@@ -72,11 +73,13 @@ public class GroupTree {
 		protected String name = "";
 		protected RenderMethod renderMethod = RenderMethod.DEFAULT;
 		protected int renderValue = 0;
+
+		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
+		//	to have for generic purposes
+		private final ArrayList<Node> children = new ArrayList<>();
+		private Node parent = null;
 		
-		Node() {
-			
-		}
-		
+		private Node() {}
 		private Node( Node other, String name) {
 			this.name = name;
 			this.expanded = other.expanded;
@@ -86,7 +89,8 @@ public class GroupTree {
 			this.alpha = other.alpha;
 		}
 
-		// :::: Get/Set
+		// ==============
+		// ==== Get/Set
 		public boolean isVisible() {return (visible && alpha > 0);}
 		public void setVisible( boolean visible) {
 			if( context.nodeInWorkspace(this) && this.visible != visible) {
@@ -122,9 +126,10 @@ public class GroupTree {
 		}
 		
 		public String getName() {return name;}
-		void setName(String name) {
-			if( !this.name.equals(name)) 
-				this.name = name;
+		public void setName(String name) {
+			if( !this.name.equals(name)) {
+				context.executeChange( context.new RenameChange(name, this));
+			}
 		}
 		
 		public RenderMethod getRenderMethod() {return renderMethod;}
@@ -135,22 +140,15 @@ public class GroupTree {
 			}
 			else {this.renderMethod = method; this.renderValue = renderValue;}
 		}
+		public ImageWorkspace getContext() {return context;}
 
 		
-		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
-		//	to have for generic purposes
-		private final ArrayList<Node> children = new ArrayList<>();
-		private Node parent = null;
-		
-		public Node getParent() {
-			return parent;
-		}
+		// =============
+		// ==== Node Structure Querying
+		public Node getParent() { return parent; }
 		
 		public List<Node> getChildren() {
 			return new ArrayList<>(children);
-		}
-		public ImageWorkspace getContext() {
-			return context;
 		}
 
 		/** Gets the depth of the node.  Child of root = 1.
@@ -167,6 +165,8 @@ public class GroupTree {
 			return i;
 		}
 		
+		/** Returns how deep the node is from a given ancestor.
+		 * Returns -1 if this node is not an ancestor of the other node. */
 		public int getDepthFrom( Node ancestor) {
 			Node n = this;
 			int i = 0;
@@ -178,9 +178,10 @@ public class GroupTree {
 			return i;
 		}
 		
-		/** Sure we have Validators to do this, but this is common enough to
-		 * implement.  Plus it grabs itself it's a layer node. */
+		/** Gets all LayerNodes within the given node, including itself. */
 		public List<LayerNode> getAllLayerNodes() {
+			// Sure we have Validators to do this, but this is common enough to
+			// implement.  Plus it grabs itself it's a layer node.
 			List<LayerNode> list = new ArrayList<>();
 			
 			if( this instanceof LayerNode) 
@@ -236,10 +237,8 @@ public class GroupTree {
 			}
 		}
 		
-		/***
-		 * Gets the node that comes after you in the tree.  Or null if you're the last
-		 * node.
-		 */
+		/*** Gets the node that comes after this one in the GroupTree.  Or null
+		 *  if this is the last node. */
 		public Node getNextNode() {
 			if( parent == null) 
 				return null;
@@ -275,8 +274,12 @@ public class GroupTree {
 		}
 		
 		
-		// For simplicity's sake (particularly regarding Observers), only the GroupTree
-		//	has direct access to add/remove commands.
+		// ====================
+		// ==== Direct Adding/Removing Methods
+		
+		/** Adds a Subchild.
+		 * NOTE! Should use ImageWorkspace.add* methods if you want the 
+		 * UndoEngine to track the actions. */
 		protected void _add( Node toAdd, Node before) {
 			int i = children.indexOf(before);
 			
@@ -286,6 +289,9 @@ public class GroupTree {
 				children.add( i, toAdd);
 			toAdd.parent = this;
 		}
+		/** Removes a Subchild 
+		 * NOTE! Should use ImageWorkspace.removeNode if you want the 
+		 * UndoEngine to track the actions. */
 		protected void _rem( Node toRem) {
 			if( children == null) return;
 			
@@ -293,12 +299,16 @@ public class GroupTree {
 			if( toRem.parent == this)
 				toRem.parent = null;
 		}
+		/** Removes this node from its parent.
+		 * NOTE! Should use ImageWorkspace.removeNode if you want the 
+		 * UndoEngine to track the actions. */
 		protected void _del() {
 			if( parent == null) return;
 			parent.children.remove(this);
 		}
 	}
 	
+	/** A GroupNode is a container node which accepts sub-children. */
 	public class GroupNode extends Node {
 		GroupNode( String name) {
 			this.name = name;
@@ -309,9 +319,13 @@ public class GroupTree {
 		
 	}
 	
+	/** A LayerNode is a node container for a Layer.
+	 * 
+	 * Though LayerNodes can technically accept sub-children, doing so may 
+	 * yield unexpected behavior.*/
 	public class LayerNode extends Node {
 		Layer layer;
-//		ImageData data;
+		
 		LayerNode( LayerNode other, Layer layer, String name) {
 			super( other, name);
 			this.layer = layer;

@@ -54,6 +54,8 @@ import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.Method;
+import spirite.pen.StrokeEngine.StrokeParams;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
