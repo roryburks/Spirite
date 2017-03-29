@@ -587,7 +587,8 @@ public class RenderEngine
 			//	default AWT renderer if not
 			
 			NodeRenderer renderer = new GLNodeRenderer(root);
-			return renderer.render(settings, workspace);
+//			NodeRenderer renderer = new AWTNodeRenderer(root);
+			return renderer.render(settings);
 		}
 
 	}
@@ -596,7 +597,7 @@ public class RenderEngine
 	private abstract class NodeRenderer {
 		final GroupNode root;
 		NodeRenderer( GroupNode root) { this.root = root;}
-		public abstract BufferedImage render(RenderSettings settings, ImageWorkspace workspace);
+		public abstract BufferedImage render(RenderSettings settings);
 		
 		/** Determines the number of images needed to properly render 
 		 * the given RenderSettings.  This number is equal to largest Group
@@ -631,13 +632,15 @@ public class RenderEngine
 		float ratioW;
 		BufferedImage buffer[];
 		float ratioH;
+		ImageWorkspace workspace;
 		
 		AWTNodeRenderer( GroupNode node) {
 			super(node);
+			this.workspace = node.getContext();
 		}
 		
 		@Override
-		public BufferedImage render(RenderSettings settings, ImageWorkspace workspace) {		
+		public BufferedImage render(RenderSettings settings) {		
 			try {
 				// Step 1: Determine amount of data needed
 				int n = _getNeededImagers( settings);
@@ -829,13 +832,15 @@ public class RenderEngine
 		GLMultiRenderer glmu[];
 		float ratioW;
 		float ratioH;
+		ImageWorkspace workspace;
 		
 		public GLNodeRenderer( GroupNode node) {
 			super(node);
+			this.workspace = node.getContext();
 		}
 
 		@Override
-		public BufferedImage render(RenderSettings settings, ImageWorkspace workspace) {
+		public BufferedImage render(RenderSettings settings) {
 			try {
 				// Step 1: Determine amount of data needed
 				int n = _getNeededImagers( settings);
@@ -960,7 +965,26 @@ public class RenderEngine
 		{
 			
 			int mask = 0;
-			switch( node.getRenderMethod()) {
+			
+			RenderMethod method;
+			int renderValue = 0;
+			int stage = workspace.getStageManager().getNodeStage(node);
+			
+			if( stage == -1) {
+				method = node.getRenderMethod();
+				renderValue = node.getRenderValue();
+			}
+			else {
+				method = RenderMethod.COLOR_CHANGE;
+				switch( stage % 3) {
+				case 0: renderValue = 0xFF0000;break;
+				case 1: renderValue = 0x00FF00;break;
+				case 2: renderValue = 0x0000FF;break;
+				}
+			}
+			
+			
+			switch( method) {
 			case COLOR_CHANGE:
 				mask = 0b10;
 				break;
@@ -969,6 +993,7 @@ public class RenderEngine
 			
 			}
 			params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));
+			params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
 			params.addParam( new GLParameters.GLParam1i("uComp", mask | ((fullPremult)?1:0)));
 		}
 		

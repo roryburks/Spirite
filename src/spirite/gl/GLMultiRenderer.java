@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 
+import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 
@@ -142,7 +143,7 @@ public class GLMultiRenderer {
 //	public void render
 	
 	public void cleanup() {
-		gl.glDeleteFramebuffers(1, Buffers.newDirectIntBuffer(fbo));
-		gl.glDeleteTextures(1, Buffers.newDirectIntBuffer(tex));
+		gl.glDeleteTextures(1, new int[]{tex}, 0);
+		gl.glDeleteFramebuffers(1, new int[]{fbo}, 0); 
 	}
 }

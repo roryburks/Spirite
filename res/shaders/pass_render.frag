@@ -7,6 +7,7 @@ out vec4 outputColor;
 
 uniform sampler2D myTexture;
 uniform float uAlpha;
+uniform unsigned int uValue;
 
 // 00000000 00000000 00000000 0000BBBA
 // A: how to combine the color and alpha
@@ -16,7 +17,10 @@ uniform float uAlpha;
 uniform int uComp;	
 
 vec4 changeColor(vec4 texCol) {
-	return vec4( 1*texCol.a, 0, 0, texCol.a);
+	float r = ((uValue>>16)&0xFF)/255.0f;
+	float g = ((uValue>>8)&0xFF)/255.0f;
+	float b = ((uValue)&0xFF)/255.0f;
+	return vec4( r*texCol.a, g*texCol.a, b*texCol.a, texCol.a);
 }
 
 void main()

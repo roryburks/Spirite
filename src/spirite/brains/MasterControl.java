@@ -610,9 +610,6 @@ public class MasterControl
     		commandMap.put("redo", new Runnable() {@Override public void run() {
 				workspace.getUndoEngine().redo();
 			}});
-    		commandMap.put("toggle", new Runnable() {@Override public void run() {
-				workspace.toggleQuick();
-			}});
     		commandMap.put("shiftRight", new Runnable() {@Override public void run() {
 				workspace.shiftData(workspace.getSelectedNode(), 1, 0);
 			}});

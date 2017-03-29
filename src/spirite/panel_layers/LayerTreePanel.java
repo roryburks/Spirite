@@ -333,15 +333,17 @@ public class LayerTreePanel extends ContentTree
 			
 			node.setVisible(button.isSelected());
 		}
-		if( button.buttonNum == 1) {
+		else if( button.buttonNum == 1) {
 			// Link Button
 			Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
 			if( button.isSelected()) {
-				node.setRenderMethod(RenderMethod.COLOR_CHANGE, 0);
+				workspace.getStageManager().stageNode(node);
+//				node.setRenderMethod(RenderMethod.COLOR_CHANGE, 0);
 			}
 			else {
-				node.setRenderMethod(RenderMethod.DEFAULT, 0);
+				workspace.getStageManager().unstageNode(node);
+//				node.setRenderMethod(RenderMethod.DEFAULT, 0);
 			}
 /*			if( button.isSelected())
 				workspace.addToggle(node);
@@ -357,6 +359,12 @@ public class LayerTreePanel extends ContentTree
 			button.setSelected( node.isVisible());
 			button.setIcon( Globals.getIcon("visible_off"));
 			button.setSelectedIcon(Globals.getIcon("visible_on"));
+		}
+		else if( button.buttonNum == 1) {
+			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
+			
+			button.setSelected( workspace.getStageManager().getNodeStage(node) != -1);
+			
 		}
 	}
 	@Override

@@ -11,6 +11,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
+import spirite.Globals;
 import spirite.gl.GLEngine.ProgramType;
 import spirite.gl.GLMultiRenderer.GLRenderer;
 import spirite.gl.GLParameters.GLFBOTexture;
@@ -186,7 +187,7 @@ public class GLUIDraw {
 
 		gl.glDeleteVertexArrays(1, vao);
 		gl.glDeleteBuffers(1, positionBufferObject);
-
+		
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage( gl, 0, 0, w, h, true); 

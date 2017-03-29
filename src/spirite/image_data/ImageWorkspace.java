@@ -103,6 +103,7 @@ public class ImageWorkspace {
 	private final SelectionEngine selectionEngine;
 	private final DrawEngine drawEngine;
 	private final ReferenceManager referenceManager;
+	private final StagingManager stagingManager;
 	
 	// External Components
 	private final CacheManager cacheManager;
@@ -125,13 +126,18 @@ public class ImageWorkspace {
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		this.renderEngine = master.getRenderEngine();
-		imageData = new HashMap<>();
-		animationManager = new AnimationManager(this);
+		
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
+		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
 		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
 		referenceManager = new ReferenceManager(this);
+		stagingManager = new StagingManager(this);
+		
+		imageData = new HashMap<>();
+		
+
 	}
 	@Override
 	public String toString() {
@@ -271,6 +277,7 @@ public class ImageWorkspace {
 	public SelectionEngine getSelectionEngine() { return selectionEngine; }
 	public DrawEngine getDrawEngine() { return drawEngine; }
 	public ReferenceManager getReferenceManager() { return referenceManager; }
+	public StagingManager getStageManager() {return stagingManager;}
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
@@ -1895,7 +1902,8 @@ public class ImageWorkspace {
     			obs.structureChanged( new StructureChangeEvent(evt,undo));
     	}
     }
-    synchronized void triggerImageRefresh(ImageChangeEvent evt) {
+    void triggerImageRefresh(ImageChangeEvent evt) {
+    	evt.workspace = this;
     	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
     	
     	if( evt.selectionLayerChange ) {
@@ -2060,36 +2068,5 @@ public class ImageWorkspace {
 		}
 		
 		undoEngine.cleanup();
-	}
-    
-	
-	// DEBUG
-	List<Node> toggleList = new ArrayList<>();
-	int toggleid = 0;
-	
-	public void toggleQuick() {
-		for( Node n : toggleList) {
-			n.alpha = 0.3f;
-		}
-		
-		toggleid++;
-		if( toggleid >= toggleList.size())
-			toggleid = 0;
-		
-		if( toggleid < toggleList.size())
-			toggleList.get(toggleid).alpha = 1.0f;
-		
-		ImageChangeEvent evt = new ImageChangeEvent();
-		evt.workspace = this;
-		evt.nodesChanged = new ArrayList<>(toggleList);
-		triggerImageRefresh(evt);
-	}
-	
-	public void addToggle( Node node) {
-		toggleList.add(node);
-	}
-	
-	public void remToggle( Node node) {
-		toggleList.clear();;
 	}
 }
