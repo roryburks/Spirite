@@ -215,6 +215,7 @@ public class DrawPanel extends JPanel
         
         if( penner.drawsOverlay())
         	penner.paintOverlay(g);
+        
     }
 
 

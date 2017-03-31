@@ -2,14 +2,21 @@ package spirite.gl;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
+import mutil.Interpolation.CubicSplineInterpolator2D;
 import mutil.MatrixBuilder;
 import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
@@ -46,14 +53,14 @@ public class GLStrokeEngine extends StrokeEngine {
 		if( fromState.x == toState.x && fromState.y == toState.y)
 			return false;
 
-		_stroke(composeVBufferFromNew(toState));
+		_stroke(composeVBuffer(prec));
 		return true;
 	}
 	
 	@Override
 	public boolean batchDraw(StrokeEngine.StrokeParams stroke, PenState[] states, BuiltImageData data, BuiltSelection mask) {
 		super.startStroke(stroke, states[0], data, mask);
-		_stroke( composeVBufferFromArray(states));
+		_stroke( composeVBuffer(Arrays.asList(states)));
 		return true;
 	}
 	
@@ -62,71 +69,87 @@ public class GLStrokeEngine extends StrokeEngine {
 		float[] vBuffer;
 		int len;
 	}
-
-	private GLVBuffer composeVBufferFromNew( PenState toStates) {
+	
+	private static final int DISTANCE_THRESHOLD = 5;
+	private GLVBuffer composeVBuffer( List<PenState> states) {
 		GLVBuffer vb = new GLVBuffer();
+		CubicSplineInterpolator2D csi = null;
 		
+		// Step 1: Determine how much space is needed
+		int num = states.size() + 2;
+		for( int i=0; i < states.size()-1; ++i) {
+			PenState ps1 = states.get(i);
+			PenState ps2 = states.get(i+1);
+			
+			double dist = MUtil.distance(ps1.x, ps1.y, ps2.x, ps2.y);
+			
+			if( dist >= DISTANCE_THRESHOLD) {
+				num += ((int)dist)/DISTANCE_THRESHOLD;
+			}
+		}
 		
+		if( num != states.size()+1) {
+			List<Point2D> points = new ArrayList<>(states.size());
+			for( int i=0; i < states.size(); ++i) {
+				PenState ps = states.get(i);
+				points.add(new Point(ps.x, ps.y));
+			}
+			csi = new CubicSplineInterpolator2D(points, true);
+		}
 		
-		// Prepare Data as a buffer
-		float raw[] = new float[6*(prec.size()+3)];
-		
-		raw[4] = -1;
-		for( int i=0; i<prec.size(); ++i) {
-			PenState recState = prec.get(i);
-			int off = (i+1)*6;
+		float raw[] = new float[6*(num)];
+		int o = 1;
+		for( int i=0; i < states.size()-1; ++i) {
+			int off = (o++)*6;
+			
+			PenState ps = states.get(i);
 			// x y z w
-			raw[off+0] = data.convertX(recState.x);
-			raw[off+1] = data.convertY(recState.y);
+			raw[off+0] = data.convertX(ps.x);
+			raw[off+1] = data.convertY(ps.y);
 			raw[off+2] = 0.0f;
 			raw[off+3] = 1.0f;
 			
 			// size pressure
-			raw[off+4] = stroke.getDynamics().getSize(recState) * stroke.getWidth();
-			raw[off+5] = recState.pressure;
+			raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+			raw[off+5] = ps.pressure;
+			
+			if( i == states.size()-1) {
+				off = (o++)*6;
+				// x y z w
+				raw[off+0] = data.convertX(ps.x);
+				raw[off+1] = data.convertY(ps.y);
+				raw[off+2] = 0.0f;
+				raw[off+3] = 1.0f;
+				
+				// size pressure
+				raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+				raw[off+5] = ps.pressure;
+				continue;
+			}
+			
+			PenState psNext = states.get(i+1);
+			double dist = MUtil.distance(ps.x, ps.y, psNext.x, psNext.y);
+			int n = ((int)dist)/DISTANCE_THRESHOLD;
+			
+			for( int j=0; j < n; ++j) {
+				off = (o++)*6;
+				
+				Point2D p2 = csi.f(i + j/(double)n);
+				// x y z w
+				raw[off+0] = data.convertX((int)Math.round(p2.getX()));
+				raw[off+1] = data.convertY((int)Math.round(p2.getY()));
+				raw[off+2] = 0.0f;
+				raw[off+3] = 1.0f;
+				
+				// size pressure
+				raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+				raw[off+5] = ps.pressure * (j/(float)n) + psNext.pressure * (1-j/(float)n);
+				
+			}
 		}
 
-		int off = (prec.size()+1)*6;
-		// x y z w
-		raw[off+0] = toStates.x;
-		raw[off+1] = toStates.y;
-		raw[off+2] = 0.0f;
-		raw[off+3] = 1.0f;
-		
-		// size pressure
-		raw[off+4] = stroke.getDynamics().getSize(toStates) * stroke.getWidth();
-		raw[off+5] = toStates.pressure;
-		
-		raw[ (prec.size()+2)*6+4] = -1;
-		
 		vb.vBuffer = raw;
-		vb.len = prec.size()+3;
-		
-		return vb;
-	}
-	private GLVBuffer composeVBufferFromArray( PenState[] states) {
-		GLVBuffer vb = new GLVBuffer();
-		
-		// Prepare Data as a buffer
-		float raw[] = new float[6*(states.length+2)];
-		
-		raw[4] = -1;
-		for( int i=0; i< states.length; ++i) {
-			int off = (i+1)*6;
-			// x y z w
-			raw[off+0] = data.convertX(states[i].x);
-			raw[off+1] = data.convertY(states[i].y);
-			raw[off+2] = 0.0f;
-			raw[off+3] = 1.0f;
-			
-			// size pressure
-			raw[off+4] = stroke.getDynamics().getSize(states[i]) * stroke.getWidth();
-			raw[off+5] = states[i].pressure;
-		}
-		raw[ (states.length+1)*6+4] = -1;
-		
-		vb.vBuffer = raw;
-		vb.len = states.length+2;
+		vb.len = num-1;
 		
 		return vb;
 	}

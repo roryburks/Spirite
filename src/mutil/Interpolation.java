@@ -65,7 +65,8 @@ public class Interpolation {
 	}
 	
 	/*
-        // Demonstrates Cubic Spline Interpolation
+        
+     // Demonstrates Cubic Spline Interpolation
         List<Point2D> points = Arrays.asList(new Point2D[]{
             	new Point2D.Double(0, 0),
             	new Point2D.Double(200, 20),
@@ -75,10 +76,14 @@ public class Interpolation {
         });
         CubicSplineInterpolator2D csi = new CubicSplineInterpolator2D(points, true);
 
-        int x[] = new int[51];
-        int y[] = new int[51];
+        csi.addPoint(new Point2D.Double(50,50), true);
+        csi.addPoint(new Point2D.Double(0,500), true);
+
+        
+        int x[] = new int[601];
+        int y[] = new int[601];
         int i=0;
-        for( double d = 0; d < 4; d += 0.1) {
+        for( double d = 0; d < csi.getLength(); d += 0.1) {
         	Point2D p = csi.f(d);
         	x[i] = (int) Math.round((float)p.getX());
         	y[i] = (int) Math.round((float)p.getY());
@@ -95,45 +100,73 @@ public class Interpolation {
 	public static class CubicSplineInterpolator2D
 		implements Interpolator2D
 	{
-		private final double kx[];
-		private final double ky[];
-		private final double x_[];
-		private final double y_[];
+		private double kx[];
+		private double ky[];
+		private double x_[];
+		private double y_[];
+		private int length;
+		
 		public CubicSplineInterpolator2D(List<Point2D> points, boolean fast) {
-			kx = new double[points.size()];
-			ky = new double[points.size()];
-			x_ = new double[points.size()];
-			y_ = new double[points.size()];
-			for( int i=0; i<kx.length; ++i) {
+			length = points.size();
+			kx = new double[length];
+			ky = new double[length];
+			x_ = new double[length];
+			y_ = new double[length];
+			for( int i=0; i<length; ++i) {
 				x_[i] = points.get(i).getX();
 				y_[i] = points.get(i).getY();
 			}
 			
-				fastCalculateSlopes();
+			fastCalculateSlopes();
 		}
 		
-		private void fastCalculateSlopes() {
-			if( kx.length == 0) return;
+		public void addPoint(Point2D point, boolean fast) {
+			if( length >= kx.length) {
+				// Expand the internal arrays as needed
+				int l = (kx.length*3 + 1)/2;
+				double t[] = new double[l];
+				System.arraycopy(kx, 0, t, 0, length);
+				kx = t;
+				t = new double[l];
+				System.arraycopy(ky, 0, t, 0, length);
+				ky = t;
+				t = new double[l];
+				System.arraycopy(x_, 0, t, 0, length);
+				x_ = t;
+				t = new double[l];
+				System.arraycopy(y_, 0, t, 0, length);
+				y_ = t;
+			}
 			
-			double angle = Math.atan2(y_[1]-y_[0], x_[1]-x_[0]);
-			double distance = MUtil.distance(x_[0], y_[0], x_[1], y_[1]);
-			kx[0] = Math.cos(angle)*distance/2;
-			ky[0] = Math.sin(angle)*distance/2;
+			x_[length] = point.getX();
+			y_[length] = point.getY();
+
+			
+			if( length >= 2) {
+				kx[length-1] = (x_[length] - x_[length-2])/2;
+				ky[length-1] = (y_[length] - y_[length-2])/2;
+			}
+			kx[length] = (x_[length]-x_[length-1])/4;
+			ky[length] = (y_[length]-y_[length-1])/4;
+			
+			length++;
+		}
+		
+		public int getLength() {return this.length;}
+		
+		private void fastCalculateSlopes() {
+			if( length <= 1) return;
+			
+			kx[0] = (x_[1] - x_[0])/4;
+			ky[0] = (y_[1] - y_[0])/4;
 			
 			int i = 0;
-			for( i = 1; i < kx.length-1; ++i) {
-				double angle1 = Math.atan2(y_[i]-y_[i-1], x_[i]-x_[i-1]);
-				double angle2 = Math.atan2(y_[i+1]-y_[i], x_[i+1]-x_[i]);
-				angle = (angle1+angle2)/2.0;
-				distance = (MUtil.distance(x_[i], y_[i], x_[i+1], y_[i+1])
-						+ MUtil.distance(x_[i], y_[i], x_[i-1], y_[i-1]))/2;
-				kx[i] = Math.cos(angle) * distance;
-				ky[i] = Math.sin(angle) * distance;
+			for( i = 1; i < length-1; ++i) {
+				kx[i] = (x_[i+1]-x_[i-1])/2;
+				ky[i] = (y_[i+1]-y_[i-1])/2;
 			}
-			angle = Math.atan2(y_[i]-y_[i-1], x_[i]-x_[i-1]);
-			distance = MUtil.distance(x_[i], y_[i], x_[i-1], y_[i-1]);
-			kx[i] = Math.cos(angle)*distance/2;
-			ky[i] = Math.sin(angle)*distance/2;
+			kx[i] = (x_[i] - x_[i-1])/4;
+			ky[i] = (y_[i] - y_[i-1])/4;
 		}
 
 		@Override
@@ -141,7 +174,7 @@ public class Interpolation {
 			if( kx.length == 0) return new Point2D.Double(0,0);
 			
 			if( t <= 0) return new Point2D.Double(x_[0], y_[0]);
-			if( t >= kx.length-1) return new Point2D.Double(x_[kx.length-1], y_[kx.length-1]);
+			if( t >= length-1) return new Point2D.Double(x_[kx.length-1], y_[kx.length-1]);
 			
 			int i = (int)t;
 			

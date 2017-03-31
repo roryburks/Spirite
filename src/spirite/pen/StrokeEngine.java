@@ -209,8 +209,13 @@ public abstract class StrokeEngine {
 			return false;
 		}
 		
-		boolean changed = stepDrawStroke( oldState, newState);
-		if( changed) prec.add( new PenState( rawState));
+		boolean changed = false;
+		if( oldState.x != newState.x || oldState.y != newState.y
+				|| oldState.pressure != newState.pressure)
+		{
+			prec.add( new PenState( rawState));
+			changed = stepDrawStroke( oldState, newState);
+		}
 
 		oldState.x = newState.x;
 		oldState.y = newState.y;
