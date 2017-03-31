@@ -9,26 +9,17 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
-
-import com.jogamp.opengl.GL;
 
 import mutil.DataCompaction.IntCompactor;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
-import spirite.gl.GLEngine;
-import spirite.gl.GLEngine.ProgramType;
-import spirite.gl.GLMultiRenderer;
-import spirite.gl.GLMultiRenderer.GLRenderer;
-import spirite.gl.GLParameters;
 import spirite.gl.GLUIDraw;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;

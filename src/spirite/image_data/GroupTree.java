@@ -6,7 +6,6 @@ import java.util.List;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.RenderEngine.RenderMethod;
-import spirite.image_data.ImageWorkspace.RenameChange;
 import spirite.image_data.layers.Layer;
 
 /***

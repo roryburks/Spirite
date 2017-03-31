@@ -6,9 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
-
 import spirite.gl.GLEngine.ProgramType;
 import spirite.gl.GLParameters.GLImageTexture;
 import spirite.gl.GLParameters.GLParam1i;

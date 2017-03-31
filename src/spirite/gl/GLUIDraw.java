@@ -6,12 +6,11 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
-import spirite.Globals;
 import spirite.gl.GLEngine.ProgramType;
 import spirite.gl.GLMultiRenderer.GLRenderer;
 import spirite.gl.GLParameters.GLFBOTexture;
@@ -46,7 +45,7 @@ public class GLUIDraw {
 	{
 		int w = bi.getWidth();
 		int h = bi.getHeight();
-		GL3 gl = engine.getGL3();
+		GL2 gl = engine.getGL2();
 		engine.setSurfaceSize(w, h);
 
 		GLMultiRenderer glmu = new GLMultiRenderer(
@@ -112,7 +111,7 @@ public class GLUIDraw {
 			BufferedImage image, int cycle, AffineTransform trans, int swidth, int sheight) 
 	{
 		GLMultiRenderer glmu = new GLMultiRenderer(swidth, sheight, 
-				engine.getGL3().getGL2());
+				engine.getGL2());
 		engine.setSurfaceSize(swidth, sheight);
 
 		// Render the mask to the a screen-shaped surface
@@ -141,7 +140,7 @@ public class GLUIDraw {
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, swidth, sheight, true); 
+        				engine.getGL2(), 0, 0, swidth, sheight, true); 
        
 		return im;
 	}
@@ -149,7 +148,7 @@ public class GLUIDraw {
 	public static BufferedImage drawColorGradient( float fixed, GradientType type, int w, int h) {
 		engine.setSurfaceSize(w,h);
 		
-		GL3 gl = engine.getGL3();
+		GL2 gl = engine.getGL2();
 		
 
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
@@ -166,20 +165,20 @@ public class GLUIDraw {
 	    IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
 	    
 	    gl.glGenBuffers(1, positionBufferObject);
-	    gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+	    gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
 	    gl.glBufferData(
-	    		GL3.GL_ARRAY_BUFFER, 
+	    		GL2.GL_ARRAY_BUFFER, 
 	    		vertexBuffer.capacity()*Float.BYTES, 
 	    		vertexBuffer, 
-	    		GL3.GL_STATIC_DRAW);
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
+	    		GL2.GL_STATIC_DRAW);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
 		gl.glGenVertexArrays(1, vao);
 		gl.glBindVertexArray(vao.get(0));
 		
 
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 		
 		
 		// Start Draw
@@ -188,16 +187,16 @@ public class GLUIDraw {
         int varCol = gl.glGetUniformLocation( prog, "varCol");
         int fixedCol = gl.glGetUniformLocation( prog, "fixedCol");
         
-		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+		gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
         gl.glEnableVertexAttribArray(GLEngine.Attr.POSITION);
         gl.glEnableVertexAttribArray(GLEngine.Attr.COLOR);
-        gl.glVertexAttribPointer(GLEngine.Attr.POSITION, 4, GL3.GL_FLOAT, false, 4*6, 0);
-        gl.glVertexAttribPointer(GLEngine.Attr.COLOR, 2, GL3.GL_FLOAT, false, 4*6, 4*4);
+        gl.glVertexAttribPointer(GLEngine.Attr.POSITION, 4, GL2.GL_FLOAT, false, 4*6, 0);
+        gl.glVertexAttribPointer(GLEngine.Attr.COLOR, 2, GL2.GL_FLOAT, false, 4*6, 4*4);
 
         gl.glUniform1i( varCol, type.ordinal());
         gl.glUniform1f( fixedCol, fixed);
         
-        gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+        gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
 
 		// End Draw
         

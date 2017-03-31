@@ -1,11 +1,8 @@
 package spirite.gl;
 
-import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL3;
 
-import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 
@@ -62,9 +59,6 @@ public class GLMultiRenderer {
     		break;	
         case GL.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
-    		break;	
-        case GL3.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS :
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
     		break;	
         case GL2.GL_FRAMEBUFFER_UNDEFINED :
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction.GL_FRAMEBUFFER_UNDEFINED");

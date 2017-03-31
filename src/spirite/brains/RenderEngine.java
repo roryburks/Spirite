@@ -4,7 +4,6 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -136,8 +135,17 @@ public class RenderEngine
 	}
 	
 	public enum RenderMethod {
-		DEFAULT, 
-		COLOR_CHANGE,
+		DEFAULT("Normal", 0), 
+		COLOR_CHANGE("As Color", 0xFF0000),
+		
+		;
+		
+		public final String description;
+		public final int defaultValue;
+		private RenderMethod(String description, int def) {
+			this.description = description;
+			this.defaultValue = def;
+		}
 		
 	}
 	
@@ -852,7 +860,7 @@ public class RenderEngine
 				glmu = new GLMultiRenderer[n];
 				for( int i=0; i<n; ++i) {
 					glmu[i] = new GLMultiRenderer(
-							settings.width, settings.height, engine.getGL3().getGL2());
+							settings.width, settings.height, engine.getGL2());
 					glmu[i].init();
 					glmu[i].render(new GLRenderer() {
 						@Override public void render(GL gl) {

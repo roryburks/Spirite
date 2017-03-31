@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
 import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -37,6 +38,14 @@ import sun.awt.image.ByteInterleavedRaster;
  * making sure that they are properly de-allocated inside OpenGL
  * 
  * Uses a Singleton paradigm that can be accessed through GLEngine.getInstance()
+ * 
+ * TODO: Though there is no plan to add software rendering options for every 
+ * feature (JOGL support is reasonably comprehensive), I do want to make some
+ * effort to support machines running earlier GL versions (GL2).
+ * 
+ * Geometry Shaders and LINE_ADJACENCY_STRIPS for the stroke engine could easily
+ * be done in software.  Replacing Framebuffers with some other method would not
+ * be difficult but might be extremely slow.
  * 
  * @author Rory Burks
  */
@@ -75,6 +84,7 @@ public class GLEngine  {
         caps.setBlueBits(8); 
         caps.setGreenBits(8); 
         caps.setOnscreen(false); 
+        
 
 		drawable = fact.createOffscreenAutoDrawable(
 				fact.getDefaultDevice(), 
@@ -114,11 +124,11 @@ public class GLEngine  {
 			this.drawable.setSurfaceSize(width, height);
 		}
 	}
-
-	public GL3 getGL3() {
+	
+	public GL2 getGL2() {
 		drawable.display();
 		drawable.getContext().makeCurrent();
-		return drawable.getGL().getGL3();
+		return drawable.getGL().getGL2();
 	}
 	
 	public GLAutoDrawable getDrawable() {
@@ -127,7 +137,7 @@ public class GLEngine  {
 	
 	public void clearSurface() {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        getGL3().glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+        getGL2().glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
 	
 	// =================
@@ -233,7 +243,7 @@ public class GLEngine  {
 		int w = params.width;
 		int h = params.height;
 		setSurfaceSize(w, h);
-		GL3 gl = getGL3();
+		GL2 gl = getGL2();
 		int prog = getProgram(type);
 		
 
@@ -241,16 +251,16 @@ public class GLEngine  {
         gl.glUseProgram(prog);
         
         // Bind Attribute Streams
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
         gl.glEnableVertexAttribArray(0);
         gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(0, 2, GL3.GL_FLOAT, false, 4*4, 0);
-        gl.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, 4*4, 4*2);
+        gl.glVertexAttribPointer(0, 2, GL2.GL_FLOAT, false, 4*4, 0);
+        gl.glVertexAttribPointer(1, 2, GL2.GL_FLOAT, false, 4*4, 4*2);
 
         // Bind Texture
         if( params.texture != null) {
         	params.texture.load();
-    		gl.glEnable(GL3.GL_TEXTURE_2D);
+    		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
 
@@ -266,7 +276,7 @@ public class GLEngine  {
 		case PASS_RENDER:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
-	        gl.glBlendEquation(GL3.GL_FUNC_ADD);
+	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
 	        break;
 		case PASS_BORDER:
 		case CHANGE_COLOR:
@@ -274,16 +284,16 @@ public class GLEngine  {
 		case SQARE_GRADIENT:
 		case PASS_ESCALATE:
 	        gl.glEnable(GL.GL_BLEND);
-	        gl.glBlendFunc(GL3.GL_ONE, GL3.GL_ONE);
-	        gl.glBlendEquation(GL3.GL_MAX);
+	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
+	        gl.glBlendEquation(GL2.GL_MAX);
 	        break;
         
         }
-		gl.glDrawArrays(GL3.GL_TRIANGLE_STRIP, 0, 4);
+		gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
         gl.glDisable( GL.GL_BLEND);
 		
 		// Finished Drawing
-		gl.glDisable(GL3.GL_TEXTURE_2D);
+		gl.glDisable(GL2.GL_TEXTURE_2D);
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
         gl.glUseProgram(0);
@@ -295,7 +305,7 @@ public class GLEngine  {
 	/** Writes the active GL Surface to a BufferedImage */
 	public BufferedImage glSurfaceToImage() {
         return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( getGL3(), 0, 0, width, height, true); 
+        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true); 
 		
 	}
 	
@@ -315,34 +325,34 @@ public class GLEngine  {
 		
 		public void free() {
 			if( !_free) {
-				GL3 gl = drawable.getGL().getGL3();
+				GL2 gl = drawable.getGL().getGL2();
 				_free = true;
 				gl.glDeleteTextures(1, tex);
 			}
 		}
 	}
 	public PreparedTexture prepareTexture( BufferedImage bi) {
-		GL3 gl = drawable.getGL().getGL3();
+		GL2 gl = drawable.getGL().getGL2();
 		PreparedTexture pt = new PreparedTexture();
 		int w = bi.getWidth();
 		int h = bi.getHeight();
 
 		pt. tex = GLBuffers.newDirectIntBuffer(1);
         gl.glGenTextures(1, pt.tex);
-        gl.glBindTexture(GL3.GL_TEXTURE_2D, pt.tex.get(0));
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE);
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_CLAMP_TO_EDGE);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, pt.tex.get(0));
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		
 		gl.glTexImage2D(
-				GL3.GL_TEXTURE_2D,
+				GL2.GL_TEXTURE_2D,
 				0,
-				GL3.GL_RGBA,
+				GL2.GL_RGBA,
 				w, h,
 				0,
-				GL3.GL_RGBA,
-				GL3.GL_UNSIGNED_INT_8_8_8_8,
+				GL2.GL_RGBA,
+				GL2.GL_UNSIGNED_INT_8_8_8_8,
 				ByteBuffer.wrap(((ByteInterleavedRaster)bi.getRaster()).getDataStorage())
 				);
 		
@@ -365,7 +375,7 @@ public class GLEngine  {
 		public void free() {
 			if( !_free) {
 				_free = true;
-				GL3 gl = drawable.getGL().getGL3();
+				GL2 gl = drawable.getGL().getGL2();
 
 				gl.glDeleteVertexArrays(1, vao);
 				gl.glDeleteBuffers(1, positionBufferObject);
@@ -377,20 +387,20 @@ public class GLEngine  {
 		private IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
 	}
 	public PreparedData prepareRawData( float raw[]) {
-		GL3 gl = drawable.getGL().getGL3();
+		GL2 gl = drawable.getGL().getGL2();
 		
 		PreparedData pd = new PreparedData();
 		
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(raw);
 
 	    gl.glGenBuffers(1, pd.positionBufferObject);
-	    gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
+	    gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
 	    gl.glBufferData(
-	    		GL3.GL_ARRAY_BUFFER, 
+	    		GL2.GL_ARRAY_BUFFER, 
 	    		vertexBuffer.capacity()*Float.BYTES, 
 	    		vertexBuffer, 
-	    		GL3.GL_STREAM_DRAW);
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
+	    		GL2.GL_STREAM_DRAW);
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
 		gl.glGenVertexArrays(1, pd.vao);
 		gl.glBindVertexArray(pd.vao.get(0));
@@ -443,13 +453,13 @@ public class GLEngine  {
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){
-		GL3 gl = drawable.getGL().getGL3();
+		GL2 gl = drawable.getGL().getGL2();
 
         ArrayList<Integer> shaderList = new ArrayList<>();
         
         if( vert != null) {
             shaderList.add( compileShaderFromResource(
-    				gl, GL3.GL_VERTEX_SHADER, vert));
+    				gl, GL2.GL_VERTEX_SHADER, vert));
         }
         if( geom != null) {
             shaderList.add( compileShaderFromResource(
@@ -457,7 +467,7 @@ public class GLEngine  {
         }
         if( frag != null ){
             shaderList.add( compileShaderFromResource(
-    				gl, GL3.GL_FRAGMENT_SHADER, frag));
+    				gl, GL2.GL_FRAGMENT_SHADER, frag));
         }
         
 		int ret = createProgram( gl, shaderList);
@@ -470,7 +480,7 @@ public class GLEngine  {
         return ret;
 	}
 	
-	private int createProgram( GL3 gl, ArrayList<Integer> shaderList) {
+	private int createProgram( GL2 gl, ArrayList<Integer> shaderList) {
 		// Create and Link Program
 		int program = gl.glCreateProgram();
 
@@ -481,11 +491,11 @@ public class GLEngine  {
 		
 		// Check for Errors
 		IntBuffer status = GLBuffers.newDirectIntBuffer(1);
-        gl.glGetProgramiv(program, GL3.GL_LINK_STATUS, status);
-        if (status.get(0) == GL3.GL_FALSE) {
+        gl.glGetProgramiv(program, GL2.GL_LINK_STATUS, status);
+        if (status.get(0) == GL2.GL_FALSE) {
 
             IntBuffer infoLogLength = GLBuffers.newDirectIntBuffer(1);
-            gl.glGetProgramiv(program, GL3.GL_INFO_LOG_LENGTH, infoLogLength);
+            gl.glGetProgramiv(program, GL2.GL_INFO_LOG_LENGTH, infoLogLength);
 
             ByteBuffer bufferInfoLog = GLBuffers.newDirectByteBuffer(infoLogLength.get(0));
             gl.glGetProgramInfoLog(program, infoLogLength.get(0), null, bufferInfoLog);
@@ -506,7 +516,7 @@ public class GLEngine  {
         return program;
 	}
 
-	private int compileShaderFromResource( GL3 gl, int shaderType, String resource) {
+	private int compileShaderFromResource( GL2 gl, int shaderType, String resource) {
 		
 		// Read Shader text from resource file
 		String shaderText = null;
@@ -532,12 +542,12 @@ public class GLEngine  {
 		
 		// Read Status
 		IntBuffer status = GLBuffers.newDirectIntBuffer(1);
-		gl.glGetShaderiv( shader, GL3.GL_COMPILE_STATUS, status);
-		if( status.get(0) == GL3.GL_FALSE) {
+		gl.glGetShaderiv( shader, GL2.GL_COMPILE_STATUS, status);
+		if( status.get(0) == GL2.GL_FALSE) {
 			
 			// Read Compile Errors
 			IntBuffer infoLogLength = GLBuffers.newDirectIntBuffer(1);
-			gl.glGetShaderiv( shader,  GL3.GL_INFO_LOG_LENGTH, infoLogLength);
+			gl.glGetShaderiv( shader,  GL2.GL_INFO_LOG_LENGTH, infoLogLength);
 			
 			ByteBuffer bufferInfoLog = GLBuffers.newDirectByteBuffer(infoLogLength.get(0));
 			gl.glGetShaderInfoLog( shader, infoLogLength.get(0), null, bufferInfoLog);
@@ -547,13 +557,13 @@ public class GLEngine  {
 			
 			String type = "";
 			switch( shaderType) {
-			case GL3.GL_VERTEX_SHADER:
+			case GL2.GL_VERTEX_SHADER:
 				type = "vertex";
 				break;
 			case GL3.GL_GEOMETRY_SHADER:
 				type = "geometry";
 				break;
-			case GL3.GL_FRAGMENT_SHADER:
+			case GL2.GL_FRAGMENT_SHADER:
 				type = "fragment";
 				break;
 			default:

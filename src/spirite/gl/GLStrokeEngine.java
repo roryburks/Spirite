@@ -6,10 +6,9 @@ import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import mutil.MatrixBuilder;
 import spirite.MUtil;
@@ -145,26 +144,26 @@ public class GLStrokeEngine extends StrokeEngine {
 		int h = data.getHeight();
 		
 		engine.setSurfaceSize( w, h);
-		GL3 gl = engine.getGL3();
+		GL2 gl = engine.getGL2();
 		
 		
 		PreparedData pd = engine.prepareRawData(glvb.vBuffer);
 
 		// Clear Surface
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL3.GL_COLOR, 0, clearColor);
+        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 
         int prog = engine.getProgram(ProgramType.BASIC_STROKE);
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
-        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
         gl.glEnableVertexAttribArray( ATTR_POS);
         gl.glEnableVertexAttribArray( ATTR_SIZE);
         gl.glEnableVertexAttribArray( ATTR_PRESSURE);
-        gl.glVertexAttribPointer( ATTR_POS, 4, GL3.GL_FLOAT, false, STRIDE, 0);
-        gl.glVertexAttribPointer( ATTR_SIZE, 1, GL3.GL_FLOAT, false, STRIDE, 4*4);
-        gl.glVertexAttribPointer( ATTR_PRESSURE, 1, GL3.GL_FLOAT, false, STRIDE, 4*5);
+        gl.glVertexAttribPointer( ATTR_POS, 4, GL2.GL_FLOAT, false, STRIDE, 0);
+        gl.glVertexAttribPointer( ATTR_SIZE, 1, GL2.GL_FLOAT, false, STRIDE, 4*4);
+        gl.glVertexAttribPointer( ATTR_PRESSURE, 1, GL2.GL_FLOAT, false, STRIDE, 4*5);
         
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
@@ -180,17 +179,17 @@ public class GLStrokeEngine extends StrokeEngine {
         gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
         
 
-        gl.glEnable(GL3.GL_MULTISAMPLE);
+        gl.glEnable(GL2.GL_MULTISAMPLE);
         gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL3.GL_MAX);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL2.GL_MAX);
 
     	gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
         
 
 
         gl.glDisable( GL.GL_BLEND);
-        gl.glDisable(GL3.GL_MULTISAMPLE);
+        gl.glDisable(GL2.GL_MULTISAMPLE);
 
         gl.glDisableVertexAttribArray( ATTR_POS);
         gl.glDisableVertexAttribArray( ATTR_SIZE);

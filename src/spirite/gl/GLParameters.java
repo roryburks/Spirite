@@ -5,7 +5,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GL2;
 
 import spirite.gl.GLEngine.PreparedTexture;
 
@@ -36,7 +36,7 @@ public class GLParameters {
 		params.add(param);
 	}
 
-	public void apply( GL3 gl, int prog) {
+	public void apply( GL2 gl, int prog) {
 		for( GLParam param : params) {
 			param.apply(gl, prog);
 		}
@@ -78,14 +78,14 @@ public class GLParameters {
 		@Override
 		public int load() {
 	        //set the texture up to be used for painting a surface ...
-			GL3 gl = GLEngine.getInstance().getGL3();
-	        gl.glBindTexture(GL3.GL_TEXTURE_2D, glmu.getTexture());
-	        int textureTarget = GL3.GL_TEXTURE_2D;
+			GL2 gl = GLEngine.getInstance().getGL2();
+	        gl.glBindTexture(GL2.GL_TEXTURE_2D, glmu.getTexture());
+	        int textureTarget = GL2.GL_TEXTURE_2D;
 	        gl.glEnable(textureTarget);
-	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MIN_FILTER,GL3.GL_LINEAR);
-	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_MAG_FILTER,GL3.GL_LINEAR);
-	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_S,GL3.GL_REPEAT);
-	        gl.glTexParameteri(textureTarget,GL3.GL_TEXTURE_WRAP_T,GL3.GL_REPEAT);
+	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_MIN_FILTER,GL2.GL_LINEAR);
+	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_MAG_FILTER,GL2.GL_LINEAR);
+	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_WRAP_S,GL2.GL_REPEAT);
+	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_WRAP_T,GL2.GL_REPEAT);
 	        
 	        return glmu.getTexture();
 		}
@@ -99,8 +99,8 @@ public class GLParameters {
 	public abstract static class GLParam {
 		protected final String name;
 		GLParam( String name) { this.name = name;}
-		public abstract void apply( GL3 gl, int prog);
-		int getUniformLocation( GL3 gl, int prog) {
+		public abstract void apply( GL2 gl, int prog);
+		int getUniformLocation( GL2 gl, int prog) {
 			return gl.glGetUniformLocation( prog, name);
 		}
 	}
@@ -112,7 +112,7 @@ public class GLParameters {
 			this.i1 = i1;
 		}
 		@Override
-		public void apply(GL3 gl, int prog) {
+		public void apply(GL2 gl, int prog) {
 			gl.glUniform1i( getUniformLocation(gl, prog), i1);
 		}
 	}
@@ -123,7 +123,7 @@ public class GLParameters {
 			this.i1 = i1;
 		}
 		@Override
-		public void apply(GL3 gl, int prog) {
+		public void apply(GL2 gl, int prog) {
 			gl.glUniform1ui( getUniformLocation(gl, prog), i1);
 		}
 	}
@@ -134,7 +134,7 @@ public class GLParameters {
 			this.f1 = f1;
 		}
 		@Override
-		public void apply(GL3 gl, int prog) {
+		public void apply(GL2 gl, int prog) {
 			gl.glUniform1f( getUniformLocation(gl, prog), f1);
 		}
 	}
@@ -145,7 +145,7 @@ public class GLParameters {
 			this.f1 = f1; this.f2 = f2; this.f3 = f3; this.f4 = f4;
 		}
 		@Override
-		public void apply(GL3 gl, int prog) {
+		public void apply(GL2 gl, int prog) {
 			gl.glUniform4f( getUniformLocation(gl, prog), 
 					f1, f2, f3, f4);
 		}
@@ -161,7 +161,7 @@ public class GLParameters {
 			this.buffer = buffer;
 		}
 		@Override
-		public void apply(GL3 gl, int prog) {
+		public void apply(GL2 gl, int prog) {
 			gl.glUniformMatrix4fv(getUniformLocation(gl, prog), 
 					count, transpose, buffer);
 		}

@@ -49,7 +49,6 @@ import spirite.MDebug.WarningType;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.RenderMethod;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.file.AnimIO;
 import spirite.image_data.Animation;
