@@ -66,6 +66,8 @@ public class GLStrokeEngine extends StrokeEngine {
 	private GLVBuffer composeVBufferFromNew( PenState toStates) {
 		GLVBuffer vb = new GLVBuffer();
 		
+		
+		
 		// Prepare Data as a buffer
 		float raw[] = new float[6*(prec.size()+3)];
 		

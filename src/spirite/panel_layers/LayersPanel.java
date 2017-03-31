@@ -50,6 +50,8 @@ public class LayersPanel extends OmniComponent {
 	private final JComboBox<RenderTuple> renderCombo;
 	private final RenderOptionCellRenderer renderer = new RenderOptionCellRenderer();
 	
+	private boolean uilocked = false;
+	
 	private class RenderTuple {
 		final RenderMethod method;
 		int value;
@@ -114,14 +116,11 @@ public class LayersPanel extends OmniComponent {
 		});
 		renderCombo.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater( new Runnable() {
-					
-					@Override
-					public void run() {
-						updateSelMethod();
-						resetRCOptionPanel();
-					}
-				});
+				if( !uilocked) {
+					updateSelMethod();
+					resetRCOptionPanel();
+				}
+				
 			}
 		});
 	}
@@ -182,6 +181,7 @@ public class LayersPanel extends OmniComponent {
 	// ================
 	// ==== API
 	public void updateSelected() {
+		uilocked = true;
 		opacitySlider.refresh();
 		
 
@@ -194,6 +194,7 @@ public class LayersPanel extends OmniComponent {
 		}
 		
 		resetRCOptionPanel();
+		uilocked = false;
 	}
 	
 	private void resetRCOptionPanel() {
