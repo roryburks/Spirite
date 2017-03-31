@@ -74,7 +74,7 @@ public class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLFBOTexture(glmu);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
+				engine.applyPassInternal(ProgramType.PASS_BORDER, params);
 			}
 		});
 
@@ -86,42 +86,62 @@ public class GLUIDraw {
     	params.texture = new GLFBOTexture(glmu);
     	
     	engine.clearSurface();
-    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
+    	engine.applyPassInternal(ProgramType.CHANGE_COLOR, params);
         
 		glmu.cleanup();
 		glmub.cleanup();
 
 		GLAutoDrawable drawable = engine.getDrawable();
-        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage(
-        				gl, 0, 0, w, h, false); 
+        BufferedImage im = engine.glSurfaceToImage();
        
 		return im;
 	}
 	
+
 	/**
-	 * Draws a dashed border around the pixels of the image
-	 * @param image
+	 * Draws a border around the given image with the given transform applied to 
+	 * it, returns a BufferedImage of dimensions (swidth x sheight).
+	 * @param image	The image to draw a border around.
+	 * @param cycle	The offset of the cycle in which the dashes are to be drawn
+	 * @param trans	The transform to apply to the image to draw it on the screen
+	 * @param swidth	The width of the screen to draw it on.
+	 * @param sheight	The height of the screen to draw it on.
 	 * @return
 	 */
 	public static BufferedImage drawBounds( 
-			BufferedImage image, int cycle, AffineTransform trans) 
+			BufferedImage image, int cycle, AffineTransform trans, int swidth, int sheight) 
 	{
-		int width = image.getWidth();
-		int height = image.getHeight();
-		GLParameters params = new GLParameters(width, height);
+		GLMultiRenderer glmu = new GLMultiRenderer(swidth, sheight, 
+				engine.getGL3().getGL2());
+		engine.setSurfaceSize(swidth, sheight);
+
+		// Render the mask to the a screen-shaped surface
+		glmu.init();
+		glmu.render( new GLRenderer() {
+			@Override public void render(GL gl) {
+				GLParameters params2 = new GLParameters(swidth, sheight);
+				params2.texture = new GLImageTexture(image);
+				engine.applyPassProgram( ProgramType.CHANGE_COLOR, params2, trans,
+						0, 0, image.getWidth(), image.getHeight());
+			}
+		});
 		
+		// Render the screen-shaped version of the mask using the 
+		//	Border-detecting Shader
+		GLParameters params = new GLParameters(swidth, sheight);
 		params.addParam( new GLParam1i("uCycle", cycle));
-		params.texture = new GLImageTexture(image);
+		params.texture = new GLFBOTexture(glmu);
 
     	engine.clearSurface();
-		engine.applyPassProgram(ProgramType.PASS_BORDER, params, trans,
-				0, 0, image.getWidth(), image.getHeight());
+		engine.applyPassInternal(ProgramType.PASS_BORDER, params);
+		
+		// Clean up and Apply the surface to an image
+		glmu.cleanup();
 
 		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
         		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, width, height, false); 
+        				engine.getGL3(), 0, 0, swidth, sheight, true); 
        
 		return im;
 	}
@@ -188,10 +208,7 @@ public class GLUIDraw {
 		gl.glDeleteVertexArrays(1, vao);
 		gl.glDeleteBuffers(1, positionBufferObject);
 		
-		GLAutoDrawable drawable = engine.getDrawable();
-        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( gl, 0, 0, w, h, true); 
-        
+        BufferedImage im = engine.glSurfaceToImage();
         return im;
 	}
 }

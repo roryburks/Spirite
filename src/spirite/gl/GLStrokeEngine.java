@@ -199,10 +199,7 @@ public class GLStrokeEngine extends StrokeEngine {
         
         pd.free();
 
-		GLAutoDrawable drawable = engine.getDrawable();
-        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage(
-        				gl, 0, 0, w, h, true); 
+        BufferedImage im = engine.glSurfaceToImage(); 
 		MUtil.clearImage(strokeLayer);
 		Graphics2D g2 = (Graphics2D)strokeLayer.getGraphics();
 		g2.drawImage(im, 0, 0, null);

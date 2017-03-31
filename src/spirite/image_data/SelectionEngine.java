@@ -17,11 +17,18 @@ import java.util.List;
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 
+import com.jogamp.opengl.GL;
+
 import mutil.DataCompaction.IntCompactor;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
+import spirite.gl.GLEngine;
+import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLMultiRenderer;
+import spirite.gl.GLMultiRenderer.GLRenderer;
+import spirite.gl.GLParameters;
 import spirite.gl.GLUIDraw;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -831,18 +838,14 @@ public class SelectionEngine {
 		static int c = 0;
 		@Override
 		public void drawSelectionBounds(Graphics g) {
-			// TODO: Make this work as expected (modification of GLRendering needed)
 			Graphics2D g2 = (Graphics2D)g;
-			g2.drawImage(GLUIDraw.drawBounds(bi, c--, null), 0, 0, null);
-//			AffineTransform trans = g2.getTransform();
-//			g2.setTransform( new AffineTransform());
 			
-//			AffineTransform t2 = g2.getTransform();
-//			t2.scale(1,1);
-
-//			Rectangle r = g.getClipBounds();
-//				g2.drawImage(GLUIDraw.drawBounds(bi, c--, t2, r.width, r.height), 0, 0, null);
-//			g2.setTransform(trans);
+			// Uses OpenGL Renderer to render the a border for the selection
+			AffineTransform trans = g2.getTransform();
+			g2.setTransform( new AffineTransform());
+			Rectangle r = g.getClipBounds();
+			g2.drawImage(GLUIDraw.drawBounds(bi, c--, trans, r.width, r.height), 0, 0, null);
+			g2.setTransform(trans);
 		}
 		@Override
 		public void drawSelectionMask(Graphics g) {

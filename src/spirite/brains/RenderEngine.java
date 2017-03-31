@@ -879,7 +879,7 @@ public class RenderEngine
 				GLParameters params = new GLParameters(settings.width, settings.height);
 				params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 		    	engine.clearSurface();
-				engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null);
+				engine.applyPassInternal(ProgramType.PASS_ESCALATE, params, null, 0, 0, settings.width, settings.height);
 				
 				BufferedImage bi = engine.glSurfaceToImage();
 
@@ -1024,8 +1024,8 @@ public class RenderEngine
 						GLParameters params = new GLParameters(settings.width, settings.height);
 						setParamsFromNode( node, params, false, 1);
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
-						engine.applyPassProgram(
-								ProgramType.PASS_RENDER, params, null);
+						engine.applyPassInternal(
+								ProgramType.PASS_RENDER, params, null, 0, 0, params.width, params.height);
 					}
 				});
 			}
@@ -1056,10 +1056,8 @@ public class RenderEngine
 						if( renderable.comp instanceof AlphaComposite)
 							alpha *= ((AlphaComposite)renderable.comp).getAlpha();
 						setParamsFromNode( node, params, true, alpha);
-
 						
-						AffineTransform trans = new AffineTransform();
-						trans.concatenate(transform);
+						AffineTransform trans = new AffineTransform(transform);
 
 						BufferedImage bi =  getCompositeLayer(renderable.handle);
 						if( bi == null) {

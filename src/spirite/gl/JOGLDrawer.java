@@ -61,11 +61,7 @@ public class JOGLDrawer {
     }
     
     private void glSurfaceToImage( BufferedImage bi) {
-
-		GLAutoDrawable drawable = engine.getDrawable();
-        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage(
-        				engine.getGL3(), 0, 0, bi.getWidth(), bi.getHeight(), false); 
+        BufferedImage im = engine.glSurfaceToImage();
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

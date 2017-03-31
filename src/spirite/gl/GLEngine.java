@@ -173,6 +173,7 @@ public class GLEngine  {
 
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		0, params.width, 0, params.height, -1, 1));
+        
         if( trans != null) {
 	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
 	        matrix = matrix2.multiply(matrix);
@@ -180,13 +181,53 @@ public class GLEngine  {
         
         modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
         		"perspectiveMatrix", 1, true, matrix.getBuffer()));
-        
-        applyProgram( type, modifiedParams, x1, y1, x2, y2);
+
+		PreparedData pd = prepareRawData(new float[]{
+			// x  y   u   v
+			x1, y1, 0.0f, 0.0f,
+			x2, y1, 1.0f, 0.0f,
+			x1, y2, 0.0f, 1.0f,
+			x2, y2, 1.0f, 1.0f,
+		});
+        applyProgram( type, modifiedParams, pd, x1, y1, x2, y2);
+        pd.free();
+	}
+	
+
+	/** Use when drawing from one GL Surface (an FBO) to another.
+	 * The texture coordinates are already flipped so they don't need to be
+	 * re-flipped.	 */
+	public void applyPassInternal(ProgramType type, GLParameters params)
+	{
+		applyPassInternal( type, params, null, 0, 0, params.width, params.height);
+	}
+	/** Use when drawing from one GL Surface (an FBO) to another.
+	 * The texture coordinates are already flipped so they don't need to be
+	 * re-flipped.	 */
+	public void applyPassInternal(
+			ProgramType type, GLParameters params, AffineTransform trans,
+			float x1, float y1, float x2, float y2)
+	{
+
+		GLParameters modifiedParams = new GLParameters(params);
+		PreparedData pd = prepareRawData(new float[]{
+			// x  y   u   v
+			x1, y1, 0.0f, 1.0f,
+			x2, y1, 1.0f, 1.0f,
+			x1, y2, 0.0f, 0.0f,
+			x2, y2, 1.0f, 0.0f,
+		});
+        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
+        		0, params.width, 0, params.height, -1, 1));
+        modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
+        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
+        applyProgram( type, modifiedParams, pd, x1, y1, x2, y2);
+        pd.free();
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
-	public void applyProgram( ProgramType type, GLParameters params,
+	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd,
 			float x1, float y1, float x2, float y2) 
 	{
 		int w = params.width;
@@ -194,14 +235,7 @@ public class GLEngine  {
 		setSurfaceSize(w, h);
 		GL3 gl = getGL3();
 		int prog = getProgram(type);
-
-		PreparedData pd = prepareRawData(new float[]{
-			// x  y   u   v
-			x1, h-y1, 0.0f, 0.0f,
-			x2, h-y1, 1.0f, 0.0f,
-			x1, h-y2, 0.0f, 1.0f,
-			x2, h-y2, 1.0f, 1.0f,
-		});
+		
 
         
         gl.glUseProgram(prog);
@@ -253,7 +287,6 @@ public class GLEngine  {
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
         gl.glUseProgram(0);
-		pd.free();
         if( params.texture != null) {
         	params.texture.unload();
         }
@@ -262,7 +295,7 @@ public class GLEngine  {
 	/** Writes the active GL Surface to a BufferedImage */
 	public BufferedImage glSurfaceToImage() {
         return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( getGL3(), 0, 0, width, height, false); 
+        		.readPixelsToBufferedImage( getGL3(), 0, 0, width, height, true); 
 		
 	}
 	
