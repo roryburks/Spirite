@@ -102,7 +102,6 @@ public class LayerTreePanel extends ContentTree
 
 		scrollPane.setAutoscrolls(false);
 		
-		this.context = context;
 
 
 		if( workspace == null)
@@ -111,7 +110,8 @@ public class LayerTreePanel extends ContentTree
 			nodeRoot = workspace.getRootNode();
 
 		constructFromRoot();
-		
+
+		this.context = context;
 	}
 	
 	// LayerTreePanel only needs master to add and remove a WorkspaceObserver
@@ -368,6 +368,7 @@ public class LayerTreePanel extends ContentTree
 	}
 	@Override
 	protected void clickPath(TreePath path, MouseEvent evt) {
+		System.out.println("click");
 		super.clickPath(path, evt);
 		if( evt.getButton() == MouseEvent.BUTTON3) {
 			

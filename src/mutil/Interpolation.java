@@ -1,12 +1,7 @@
 package mutil;
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.List;
-
-import mutil.Interpolation.CubicSplineInterpolator2D;
-import spirite.MUtil;
 
 /**
  * A Package which contains a set of classes for interpolating data.

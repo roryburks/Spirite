@@ -10,7 +10,9 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
@@ -46,14 +48,10 @@ import spirite.image_data.UndoEngine.UndoableAction;
  *
  */
 public class SelectionEngine {
-	public enum SelectionType {
-		RECTANGLE,
-		
-	}
-	
 	private final ImageWorkspace workspace;
 	private final UndoEngine undoEngine;
 	
+	/** Cached ImageChangeEvent that represents a SelectionChange. */
 	private final ImageChangeEvent selChangeEvt = new ImageChangeEvent();
 	
 	// Variables related to Selection state
@@ -61,12 +59,7 @@ public class SelectionEngine {
 	private boolean lifted = false;
 	protected BufferedImage liftedImage = null;
 	
-	private void setBuiltSelection( BuiltSelection sel) {
-		
-		built = (sel == null) ? new BuiltSelection(null, 0, 0) : sel;
-		
-		proposingTransform = false;
-	}
+	
 	
 	// Variables relating to Building
 	private boolean building = false;
@@ -109,15 +102,15 @@ public class SelectionEngine {
 	 * 
 	 * (Consider incorperating SelectedNode into this?)
 	 */
-	public BuiltSelection getBuiltSelection() {
-		return built;
+	public BuiltSelection getBuiltSelection() {	return built;}
+	private void setBuiltSelection( BuiltSelection sel) {
+		built = (sel == null) ? new BuiltSelection(null, 0, 0) : sel;
+		
+		proposingTransform = false;
 	}
-	public Selection getSelection() {
-		return built.selection;
-	}
-	public BufferedImage getLiftedImage() {
-		return liftedImage;
-	}
+	
+	public Selection getSelection() {return built.selection;}
+	public BufferedImage getLiftedImage() {return liftedImage;}
 
 	public AffineTransform getDrawFromTransform() {
 		AffineTransform trans = new AffineTransform();
@@ -131,12 +124,9 @@ public class SelectionEngine {
 			trans.translate(built.offsetX, built.offsetY);
 		return trans;
 	}
-	public int getOffsetX() {
-		return built.offsetX;
-	}
-	public int getOffsetY() {
-		return built.offsetY;
-	}
+	
+	public int getOffsetX() {return built.offsetX;}
+	public int getOffsetY() {return built.offsetY;}
 	public void setOffset( int x, int y) {
 		int dx = x - built.offsetX;
 		int dy = y - built.offsetY;
@@ -171,6 +161,9 @@ public class SelectionEngine {
 		}
 	}
 	
+	
+	// ==================
+	// ==== Data Lifting
 	public void liftData() {
 //		if( !lifted) {
 			if( !validateSelection())
@@ -224,7 +217,24 @@ public class SelectionEngine {
 		undoEngine.storeAction(action);
 		return true;
 	}
+
+	/** Anchors the current floating selection into the active layer*/
+	public void anchorSelection() {
+		if( !lifted) return;
+		
+		List<UndoableAction> actions = new ArrayList<>(2);
+		
+		actions.add(new PasteSelectionAction(
+				liftedImage, 
+				workspace.buildActiveData(),
+				getBuiltSelection()));
+		actions.add(new SetLiftedAction(null));
+		
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
+	}
 	
+	// ==================
+	// ==== Transform proposing
 	public void proposeTransform( AffineTransform trans) {
 		this.proposingTransform = true;
 		this.proposedTransform = trans;
@@ -409,20 +419,6 @@ public class SelectionEngine {
 	}
 	
 
-	/** Anchors the current floating selection into the active layer*/
-	public void anchorSelection() {
-		if( !lifted) return;
-		
-		List<UndoableAction> actions = new ArrayList<>(2);
-		
-		actions.add(new PasteSelectionAction(
-				liftedImage, 
-				workspace.buildActiveData(),
-				getBuiltSelection()));
-		actions.add(new SetLiftedAction(null));
-		
-		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Anchored Selection"));
-	}
 	
 	
 	public void imageToSelection( BufferedImage bi, int ox, int oy) {
@@ -457,7 +453,6 @@ public class SelectionEngine {
 	 * any lifted data will automatically be merged with its dataContext when you
 	 * start building a new selection.
 	 */
-	
 	public boolean validateSelection() {
 		if( building) finishBuildingSelection();
 		
@@ -494,13 +489,12 @@ public class SelectionEngine {
 		else return baseAction;
 	}
 	
-	void voidBuilding() {
+	private void voidBuilding() {
 		building = false;
 	}
 	
-
-	
-	// ============= Selection-Related Undoable Actions
+	// ========================
+	// ==== Selection-Related Undoable Actions
 	/** Since actions on selection care very much about what node is being selected
 	 * make sure all logical selection actions remember and reset that node.*/
 	public abstract class SelectionAction extends NullAction 
@@ -661,7 +655,171 @@ public class SelectionEngine {
 		}
 	}
 	
-	// ========== Selection Database
+	// =============
+	// ==== Selection Classes 
+	/** Selection is a container for the Selection Mask, without any offsets
+	 * or other transforms built into it.*/
+	public static class Selection 
+	{
+		private final BufferedImage bi;
+		
+		/** NOTE: To properly draw the border, the supplied buffered image should
+		 * be cropped with a 1-pixel border (if it's cropped at all).
+		 */
+		Selection(BufferedImage bi) {
+			this.bi = bi;
+		}
+		static int c = 0;
+		
+		public void drawSelectionBounds(Graphics g) {
+			Graphics2D g2 = (Graphics2D)g;
+			
+			// Uses OpenGL Renderer to render the a border for the selection
+			AffineTransform trans = g2.getTransform();
+			g2.setTransform( new AffineTransform());
+			Rectangle r = g.getClipBounds();
+			g2.drawImage(GLUIDraw.drawBounds(bi, c--, trans, r.width, r.height), 0, 0, null);
+			g2.setTransform(trans);
+		}
+		public void drawSelectionMask(Graphics g) {
+			g.drawImage(bi, 0, 0, null);
+		}
+		public boolean contains(int x, int y) {
+			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
+				return false;
+			
+			return ((bi.getRGB(x, y) >>> 24)!= 0);
+		}
+		public Dimension getDimension() {
+			return new Dimension( bi.getWidth(), bi.getHeight());
+		}
+		public Selection clone() {
+			return new Selection(MUtil.deepCopy(bi));
+		}
+	}
+
+	/** BuiltSelection represents a complete Selection, including offsets and 
+	 * other transforms.*/
+	public static class BuiltSelection {
+		public final Selection selection;
+		public final int offsetX;
+		public final int offsetY;
+
+		public BuiltSelection( BufferedImage bi) {
+			Rectangle bounds = null;
+			try {
+				bounds = MUtil.findContentBounds(bi, 2, true);
+			} catch (UnsupportedDataTypeException e) {
+				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
+			}
+			if( bounds == null || bounds.isEmpty()) {
+				selection = null;
+				offsetX = 0;
+				offsetY = 0;
+			}
+			else {
+				BufferedImage bi2 = bi;
+				bi = new BufferedImage( 
+						bounds.width, bounds.height, Globals.BI_FORMAT);
+				Graphics g = bi.getGraphics();
+				g.drawImage(bi2, -bounds.x, -bounds.y, null);
+				g.dispose();
+				
+				selection = new Selection(bi);
+				offsetX = bounds.x;
+				offsetY = bounds.y;
+			}
+		}
+		
+		public BuiltSelection(Selection selection, int offsetX, int offsetY){
+			this.selection = selection;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+		}
+		public void drawSelectionMask(Graphics g) {
+			if( selection == null) return;
+			Graphics2D g2 = (Graphics2D)g;
+			AffineTransform trans = g2.getTransform();
+			
+			g.translate(offsetX, offsetY);
+			selection.drawSelectionMask(g2);
+			
+			g2.setTransform(trans);
+		}
+		
+		private BufferedImage liftSelection( LiftScheme liftScheme) {
+			Rectangle selectionRect = new Rectangle(selection.getDimension());
+			selectionRect.x = this.offsetX;
+			selectionRect.y = this.offsetY;
+			
+			BufferedImage bi = new BufferedImage( 
+					selectionRect.width, selectionRect.height, Globals.BI_FORMAT);
+			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+
+			// Draw the mask, clipping the bounds of drawing to only the part 
+			// that the selection	intersects with the Image so that you do not 
+			//  leave un-applied mask left in the image.
+			Rectangle dataRect = liftScheme.getBounds();
+			Rectangle intersection = dataRect.intersection(selectionRect);
+			
+			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
+					intersection.width, intersection.height);
+			selection.drawSelectionMask(g2);	// Note: Untransformed
+			
+
+			// Copy the data inside the Selection's alphaMask to liftedData
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
+
+			g2.translate(-this.offsetX, -this.offsetY);
+			
+			liftScheme.draw(g2);
+			g2.dispose();
+			
+			return bi;
+		}
+		
+		/** Uses the BuiltSelection to lift the selected portion of the given
+		 * BufferedImage and put it in a new BufferedImage.*/
+		public BufferedImage liftSelectionFromImage( 
+				BufferedImage img, int offsetX, int offsetY)
+		{
+			return liftSelection( new LiftScheme() {
+				@Override
+				public Rectangle getBounds() {
+					return new Rectangle( offsetX, offsetY, img.getWidth(), img.getHeight());
+				}
+				
+				@Override
+				public void draw(Graphics g) {
+					g.drawImage(img, 0, 0, null);
+				}
+			});
+		}
+
+		/** Uses the BuiltSelection to lift the selected portion of the given
+		 * BuiltImageData and put it in a new BufferedImage.*/
+		public BufferedImage liftSelectionFromData( BuiltImageData data) {
+			return liftSelection(new LiftScheme() {
+				@Override
+				public Rectangle getBounds() {
+					return data.getBounds();
+				}
+				
+				@Override
+				public void draw(Graphics g) {
+					data.draw(g);
+				}
+			});
+		}
+	}
+	/** Helper Class to reduce duplicate code. */
+	private interface LiftScheme {
+		void draw(Graphics g);
+		Rectangle getBounds();
+	}
+	
+	// ======================
+	// ==== Selection Builders
 	public abstract static class SelectionBuilder
 	{
 		protected abstract void start( int x, int y);
@@ -670,28 +828,7 @@ public class SelectionEngine {
 		protected abstract void draw( Graphics g);
 	}
 	
-	//
-	public abstract static class Selection 
-	{
-		// Note: SelectionBounds is drawn in image-space (i.e. accounting
-		//	for offsets), whereas SelectionMask is drawn in selection space
-		//	(not accounting for offsets).
-		public abstract void drawSelectionBounds( Graphics g);
-		public abstract void drawSelectionMask( Graphics g);
-		public abstract boolean contains( int x, int y);
-		public abstract Dimension getDimension();
-		
-		public abstract Selection clone();
-	}
-	
-	public static class NullSelection extends Selection {
-		@Override		public void drawSelectionBounds(Graphics g) {}
-		@Override		public void drawSelectionMask(Graphics g) {}
-		@Override		public boolean contains(int x, int y) {return false;}
-		@Override		public Dimension getDimension() {return new Dimension(0,0);}
-		@Override		public Selection clone() { return new NullSelection();}
-	}
-	
+	/** Builds a Rectangular Selection*/
 	public class RectSelectionBuilder extends SelectionBuilder {
 		private int startX;
 		private int startY;
@@ -728,7 +865,8 @@ public class SelectionEngine {
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
 		}
 	}
-	
+
+	/** Builds an Elliptical Selection*/
 	public class OvalSelectionBuilder extends SelectionBuilder {
 		private int startX;
 		private int startY;
@@ -765,6 +903,8 @@ public class SelectionEngine {
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
 		}
 	}
+	
+	/** Builds a polygonal selection using a feed of points. */
 	public class FreeformSelectionBuilder extends SelectionBuilder {
 		IntCompactor compactor = new IntCompactor();
 		@Override
@@ -817,162 +957,12 @@ public class SelectionEngine {
 		
 	}
 	
-	public static class ImageSelection extends Selection {
-		private final BufferedImage bi;
-		
-		/** NOTE: To properly draw the border, the supplied buffered image should
-		 * be cropped with a 1-pixel border (if it's cropped at all).
-		 */
-		public ImageSelection(BufferedImage bi) {
-			this.bi = bi;
-		}
-		static int c = 0;
-		@Override
-		public void drawSelectionBounds(Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			
-			// Uses OpenGL Renderer to render the a border for the selection
-			AffineTransform trans = g2.getTransform();
-			g2.setTransform( new AffineTransform());
-			Rectangle r = g.getClipBounds();
-			g2.drawImage(GLUIDraw.drawBounds(bi, c--, trans, r.width, r.height), 0, 0, null);
-			g2.setTransform(trans);
-		}
-		@Override
-		public void drawSelectionMask(Graphics g) {
-			g.drawImage(bi, 0, 0, null);
-		}
-		@Override
-		public boolean contains(int x, int y) {
-			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
-				return false;
-			
-			return ((bi.getRGB(x, y) >>> 24)!= 0);
-		}
-		@Override
-		public Dimension getDimension() {
-			return new Dimension( bi.getWidth(), bi.getHeight());
-		}
-		@Override
-		public Selection clone() {
-			return new ImageSelection(MUtil.deepCopy(bi));
-		}
-		
-	}
+
+	// ============
+	// ==== Observers
 	
-	/** Helper Class to reduce duplicate code. */
-	private interface LiftScheme {
-		void draw(Graphics g);
-		Rectangle getBounds();
-	}
-	public static class BuiltSelection {
-		public final Selection selection;
-		public final int offsetX;
-		public final int offsetY;
-
-		public BuiltSelection( BufferedImage bi) {
-			Rectangle bounds = null;
-			try {
-				bounds = MUtil.findContentBounds(bi, 2, true);
-			} catch (UnsupportedDataTypeException e) {
-				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
-			}
-			if( bounds == null || bounds.isEmpty()) {
-				selection = null;
-				offsetX = 0;
-				offsetY = 0;
-			}
-			else {
-				BufferedImage bi2 = bi;
-				bi = new BufferedImage( 
-						bounds.width, bounds.height, Globals.BI_FORMAT);
-				Graphics g = bi.getGraphics();
-				g.drawImage(bi2, -bounds.x, -bounds.y, null);
-				g.dispose();
-				
-				selection = new ImageSelection(bi);
-				offsetX = bounds.x;
-				offsetY = bounds.y;
-			}
-		}
-		
-		public BuiltSelection(Selection selection, int offsetX, int offsetY){
-			this.selection = selection;
-			this.offsetX = offsetX;
-			this.offsetY = offsetY;
-		}
-		public void drawSelectionMask(Graphics g) {
-			if( selection == null) return;
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform trans = g2.getTransform();
-			
-			g.translate(offsetX, offsetY);
-			selection.drawSelectionMask(g2);
-			
-			g2.setTransform(trans);
-		}
-		
-		private BufferedImage liftSelection( LiftScheme liftScheme) {
-			Rectangle selectionRect = new Rectangle(selection.getDimension());
-			selectionRect.x = this.offsetX;
-			selectionRect.y = this.offsetY;
-			
-			BufferedImage bi = new BufferedImage( 
-					selectionRect.width, selectionRect.height, Globals.BI_FORMAT);
-			Graphics2D g2 = (Graphics2D)bi.getGraphics();
-
-			// Draw the mask, clipping the bounds of drawing to only the part 
-			// that the selection	intersects with the Image so that you do not 
-			//  leave un-applied mask left in the image.
-			Rectangle dataRect = liftScheme.getBounds();
-			Rectangle intersection = dataRect.intersection(selectionRect);
-			
-			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
-					intersection.width, intersection.height);
-			selection.drawSelectionMask(g2);	// Note: Untransformed
-			
-
-			// Copy the data inside the Selection's alphaMask to liftedData
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
-
-			g2.translate(-this.offsetX, -this.offsetY);
-			
-			liftScheme.draw(g2);
-			g2.dispose();
-			
-			return bi;
-		}
-		public BufferedImage liftSelectionFromImage( 
-				BufferedImage img, int offsetX, int offsetY)
-		{
-			return liftSelection( new LiftScheme() {
-				@Override
-				public Rectangle getBounds() {
-					return new Rectangle( offsetX, offsetY, img.getWidth(), img.getHeight());
-				}
-				
-				@Override
-				public void draw(Graphics g) {
-					g.drawImage(img, 0, 0, null);
-				}
-			});
-		}
-		public BufferedImage liftSelectionFromData( BuiltImageData data) {
-			return liftSelection(new LiftScheme() {
-				@Override
-				public Rectangle getBounds() {
-					return data.getBounds();
-				}
-				
-				@Override
-				public void draw(Graphics g) {
-					data.draw(g);
-				}
-			});
-		}
-	}
-
-	// :::: Observers
+	/** SelectionEngineObservers trigger as the selection that's being built
+	 * changes and when the Built Selection has changed. */
 	public static interface MSelectionEngineObserver {
 		public void selectionBuilt(SelectionEvent evt);
 		public void buildingSelection( SelectionEvent evt);
@@ -980,19 +970,34 @@ public class SelectionEngine {
 	public static class SelectionEvent {
 		Selection selection;
 	}
-    List<MSelectionEngineObserver> selectionObservers = new ArrayList<>();
-    public void addSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.add(obs);}
-	public void removeSelectionObserver( MSelectionEngineObserver obs) { selectionObservers.remove(obs); }
+    List<WeakReference<MSelectionEngineObserver>> selectionObservers = new ArrayList<>();
+    public void addSelectionObserver( MSelectionEngineObserver obs) { 
+    	selectionObservers.add(new WeakReference<MSelectionEngineObserver>(obs));
+    }
+	public void removeSelectionObserver( MSelectionEngineObserver obs) { 
+		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
+		while( it.hasNext()) {
+			MSelectionEngineObserver other = it.next().get();
+			if( other == null || other.equals(obs))
+				it.remove();
+		}
+	}
 	
     void triggerSelectionChanged(SelectionEvent evt) {
-    	for( MSelectionEngineObserver obs : selectionObservers) {
-    		obs.selectionBuilt(evt);
-    	}
+		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
+		while( it.hasNext()) {
+			MSelectionEngineObserver obs = it.next().get();
+			if( obs == null) it.remove();
+			else obs.selectionBuilt(evt);
+		}
     }
     void triggerBuildingSelection(SelectionEvent evt) {
-    	for( MSelectionEngineObserver obs : selectionObservers) {
-    		obs.buildingSelection(evt);
-    	}
+		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
+		while( it.hasNext()) {
+			MSelectionEngineObserver obs = it.next().get();
+			if( obs == null) it.remove();
+			else obs.buildingSelection(evt);
+		}
     }
 
     

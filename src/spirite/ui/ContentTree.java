@@ -64,6 +64,7 @@ public class ContentTree extends JPanel
 	protected final CCTTransferHandler transferHandler;
 	protected final JScrollPane scrollPane;
 	protected final CCPanel container;
+	protected final LockingSelectionModel selectionModel = new LockingSelectionModel();
 	
 	protected final JTree tree;
 	protected final Color bgColor;
@@ -128,7 +129,7 @@ public class ContentTree extends JPanel
 		transferHandler = new CCTTransferHandler();
 		tree.setTransferHandler(null);
 		this.setTransferHandler(transferHandler);	// Prevent default tree copy,paste,and drag/drop
-		tree.setSelectionModel( new LockingSelectionModel());
+		tree.setSelectionModel(selectionModel);
 		
 		initLayout();
 		buttonPanel.reformPanel();
@@ -158,6 +159,7 @@ public class ContentTree extends JPanel
 		});
 		
 		// Link Listener
+		this.addMouseListener(this);
 		container.addMouseListener(this);
 		tree.addMouseListener(this);
 		buttonPanel.addMouseListener(this);
@@ -235,16 +237,7 @@ public class ContentTree extends JPanel
 		buttonPanel.reformPanel();
 	}
 	
-	/** 
-	 * Internal painComponent method which adds more parameters for child
-	 * 	classes to mess with
-	 * 
-	 *   @param drawBG whether or not to draw the base Background Color (so
-	 *   child components can draw behind it)
-	 */
-	protected void paintCCPanel( Graphics g, int width, int height, boolean drawBG) {
-		
-	}
+	
 	protected class CCPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -428,8 +421,8 @@ public class ContentTree extends JPanel
 
 	// Kind of ugly, but this is the easiest way I can determine to prevent the 
 	//	Tree from changing its selection while dragging nodes.
-	private static boolean locked = false;
 	private class LockingSelectionModel extends DefaultTreeSelectionModel {
+		private boolean locked = false;
 		@Override public void addSelectionPath(TreePath path) {
 			if( !locked)
 				super.addSelectionPath(path);
@@ -512,7 +505,7 @@ public class ContentTree extends JPanel
 		
 		@Override
 		public boolean importData(TransferSupport support) {
-			locked = false;
+			selectionModel.locked = false;
 			imported = importInner(support);
 			
 			
@@ -571,7 +564,7 @@ public class ContentTree extends JPanel
 				if( action == DnDConstants.ACTION_MOVE)
 					cursor = DragSource.DefaultMoveDrop;
 				
-				locked = true;
+				selectionModel.locked = true;
 				imported = false;
 				dragSource.startDrag( evt, cursor, trans, this);
 			}
@@ -658,7 +651,7 @@ public class ContentTree extends JPanel
 		// :::: DragSourceListener
 		@Override 		
 		public void dragDropEnd(DragSourceDropEvent arg0) {
-			locked = false;
+			selectionModel.locked = false;
 			if( !imported)
 				importClear( draggingNode);
 			
@@ -674,36 +667,33 @@ public class ContentTree extends JPanel
 
 	
 	// :::: MouseListener
-	@Override	public void mouseEntered(MouseEvent arg0) {}
-	@Override	public void mouseExited(MouseEvent arg0) {}
-	@Override	public void mousePressed(MouseEvent arg0) {	}
-	@Override	public void mouseReleased(MouseEvent arg0) {}
-	@Override
-	public void mouseClicked(MouseEvent evt) {
-		TreePath path = getPathFromY(evt.getY());
+	@Override public void mouseEntered(MouseEvent arg0) {}
+	@Override public void mouseExited(MouseEvent arg0) {}
+	@Override public void mousePressed(MouseEvent arg0) {	}
+	@Override public void mouseClicked(MouseEvent evt) {}
+	@Override	public void mouseReleased(MouseEvent evt) {
+		if(this.transferHandler.dragMode == DragMode.NOT_DRAGGING) {
+			TreePath path = getPathFromY(evt.getY());
 
-		clickPath(path, evt);
+			clickPath(path, evt);
+		}
 	}
 
-
 	// :::: TreeModelListener
-	@Override	public void treeNodesChanged(TreeModelEvent e) {}
+	@Override public void treeNodesChanged(TreeModelEvent e) {}
 	@Override
 	public void treeNodesInserted(TreeModelEvent e) {
 				buttonPanel.reformPanel();
 	}
-
 	@Override
 	public void treeNodesRemoved(TreeModelEvent e) {
 			buttonPanel.reformPanel();
 	}
-
 	@Override
 	public void treeStructureChanged(TreeModelEvent e) {
 			buttonPanel.reformPanel();
 	}
 	
-
 	// :::: TreeSelectionListener
 	@Override
 	public void valueChanged(TreeSelectionEvent arg0) {

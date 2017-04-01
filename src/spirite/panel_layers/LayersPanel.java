@@ -3,13 +3,11 @@ package spirite.panel_layers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -18,9 +16,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListCellRenderer;
 
 import spirite.Globals;
 import spirite.brains.MasterControl;
@@ -38,11 +35,11 @@ public class LayersPanel extends OmniComponent {
 	private final Color comboNill = new Color( 196,196,196);
 	
 
-	final Dialogs dialogs;
+	private final Dialogs dialogs;
 	private final LayerTreePanel layerTreePanel;
-	private final JButton btnNewLayer;
-	private final JButton btnNewGroup;
-	private final OpacitySlider opacitySlider;
+	private final JButton btnNewLayer = new JButton();
+	private final JButton btnNewGroup = new JButton();
+	private final OpacitySlider opacitySlider =  new OpacitySlider();
 	
 	// Render Chooser Components
 	private final JLabel rcLabel = new JLabel("Mode:");
@@ -66,17 +63,13 @@ public class LayersPanel extends OmniComponent {
 	 */
 	public LayersPanel(MasterControl master) {
 		this.dialogs = master.getDialogs();
+		layerTreePanel = new LayerTreePanel(master, this);
 		
 		RenderMethod values[] = RenderMethod.values();
 		RenderTuple options[] = new RenderTuple[ values.length];
 		for( int i=0; i<values.length; ++i)
 			options[i] = new RenderTuple(values[i]);
 		renderCombo = new JComboBox<RenderTuple>(options);
-		
-		opacitySlider = new OpacitySlider();
-		layerTreePanel = new LayerTreePanel(master, this);
-		btnNewLayer = new JButton();
-		btnNewGroup = new JButton();
 		
 		initComponents();
 		initLayout();
