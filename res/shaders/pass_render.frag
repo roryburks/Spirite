@@ -14,6 +14,10 @@ uniform unsigned int uValue;
 //		0: multiply colors by the input alpha
 //		1: multiply colors by total alpha
 // B: which subroutine to use
+//		0: Straight Pass (usually for Porter-Duff SourceOver)
+//		1: As Color (defined by uValue)
+//		2: Disolve
+//		3: 
 uniform int uComp;	
 
 vec4 changeColor(vec4 texCol) {

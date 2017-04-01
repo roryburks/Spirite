@@ -84,14 +84,13 @@ public class GLEngine  {
         caps.setBlueBits(8); 
         caps.setGreenBits(8); 
         caps.setOnscreen(false); 
-        
+
 
 		drawable = fact.createOffscreenAutoDrawable(
 				fact.getDefaultDevice(), 
 				caps,
 				new DefaultGLCapabilitiesChooser(), 
 				1, 1);
-		 
 
 		// The GL object has to be running on the AWTEvent thread for UI objects
 		//	to access it without causing thread-locking.
@@ -131,9 +130,10 @@ public class GLEngine  {
 		return drawable.getGL().getGL2();
 	}
 	
-	public GLAutoDrawable getDrawable() {
+/*	// Probably shoudn't exist.
+ 	public GLAutoDrawable getDrawable() {
 		return drawable;
-	}
+	}*/
 	
 	public void clearSurface() {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -153,6 +153,27 @@ public class GLEngine  {
 		PASS_ESCALATE,
 		;
 	}
+	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
+        switch( type) {
+		case BASIC_STROKE:
+		case DEFAULT:
+		case PASS_RENDER:
+	        gl.glEnable(GL.GL_BLEND);
+	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
+	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+	        break;
+		case PASS_BORDER:
+		case CHANGE_COLOR:
+		case PASS_INVERT:
+		case SQARE_GRADIENT:
+		case PASS_ESCALATE:
+	        gl.glEnable(GL.GL_BLEND);
+	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
+	        gl.glBlendEquation(GL2.GL_MAX);
+	        break;
+        
+        }
+	}
 	
 	private int programs[] = new int[ProgramType.values().length];
 	
@@ -160,27 +181,51 @@ public class GLEngine  {
 		return programs[type.ordinal()];
 	}
 
-	/** Applies the given program using the given parameters, in simple Pass 
-	 * format (i.e. drawing the image onto the screen in a 1:1 way, while 
-	 * applying a certain fragment shader.	 */
-	public void applyPassProgram(ProgramType type, GLParameters params, AffineTransform trans){
-		applyPassProgram( type, params, trans, 0, 0, params.width, params.height);
-	}
-
-	/** Applies the given program using the given parameters, in simple Pass 
-	 * format (i.e. drawing the image onto the screen in a 1:1 way, while 
-	 * applying a certain fragment shader.	 
+	/**
+	 * Applies an OpenGL program to the active GL Surface.
 	 * 
-	 * x1, y1, x2, y2 describes the area of the screen which the Image should 
-	 * be drawn.  For example, when drawing a 128x128 image in a 1000x1000 screen,
-	 * you would use 0, 0, 128, 128.
+	 * @param type		Program to Apply
+	 * @param params	Class containing the Parameters to apply
+	 * @param trans		Transform to apply to the texture (applied in Screen-space).
+	 * 		If null (or is an Identity Transform), then the texture is drawn stretched 
+	 * 		over the GL Surface
+	 * @param internal	Whether or not it is a GL->GL draw 
+	 * 		(if so the texture will not be flipped vertically)
 	 */
 	public void applyPassProgram(
-			ProgramType type, GLParameters params, AffineTransform trans,
-			float x1, float y1, float x2, float y2)
+			ProgramType type,
+			GLParameters params, 
+			AffineTransform trans, 
+			boolean internal)
 	{
-		GLParameters modifiedParams = new GLParameters(params);
+		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal);
+	}
 
+	/**
+	 * Applies an OpenGL program to the active GL Surface.
+	 * 
+	 * @param type		Program to Apply
+	 * @param params	Class containing the Parameters to apply
+	 * @param trans		Transform to apply to the texture (applied in Screen-space).
+	 * 		If null (or is an Identity Transform), then the texture is drawn stretched 
+	 * 		over the GL Surface
+	 * @param x1		Coordinates for where to draw the texture inside the GL Screen
+	 * 		space.  For example if param.width/height was 1000, 1000 and you were drawing
+	 * 		a 128x128 Texture, using x1, y1, x2, y2 = 0, 0, 128, 128 would draw the texture
+	 * 		in the top-left of the GL Screen without any form of stretching
+	 * @param y1 "
+	 * @param x2 "
+	 * @param y2 "
+	 * @param internal	Whether or not it is a GL->GL draw 
+	 * 		(if so the texture will not be flipped vertically)
+	 */
+	public void applyPassProgram(
+			ProgramType type, 
+			GLParameters params, 
+			AffineTransform trans,
+			float x1, float y1, float x2, float y2,
+			boolean internal)
+	{
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		0, params.width, 0, params.height, -1, 1));
         
@@ -189,49 +234,17 @@ public class GLEngine  {
 	        matrix = matrix2.multiply(matrix);
         }
         
-        modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
+        params.addParam( new GLParameters.GLUniformMatrix4fv(
         		"perspectiveMatrix", 1, true, matrix.getBuffer()));
 
 		PreparedData pd = prepareRawData(new float[]{
 			// x  y   u   v
-			x1, y1, 0.0f, 0.0f,
-			x2, y1, 1.0f, 0.0f,
-			x1, y2, 0.0f, 1.0f,
-			x2, y2, 1.0f, 1.0f,
+			x1, y1, 0.0f, (internal)?1.0f:0.0f,
+			x2, y1, 1.0f, (internal)?1.0f:0.0f,
+			x1, y2, 0.0f, (internal)?0.0f:1.0f,
+			x2, y2, 1.0f, (internal)?0.0f:1.0f,
 		});
-        applyProgram( type, modifiedParams, pd, x1, y1, x2, y2);
-        pd.free();
-	}
-	
-
-	/** Use when drawing from one GL Surface (an FBO) to another.
-	 * The texture coordinates are already flipped so they don't need to be
-	 * re-flipped.	 */
-	public void applyPassInternal(ProgramType type, GLParameters params)
-	{
-		applyPassInternal( type, params, null, 0, 0, params.width, params.height);
-	}
-	/** Use when drawing from one GL Surface (an FBO) to another.
-	 * The texture coordinates are already flipped so they don't need to be
-	 * re-flipped.	 */
-	public void applyPassInternal(
-			ProgramType type, GLParameters params, AffineTransform trans,
-			float x1, float y1, float x2, float y2)
-	{
-
-		GLParameters modifiedParams = new GLParameters(params);
-		PreparedData pd = prepareRawData(new float[]{
-			// x  y   u   v
-			x1, y1, 0.0f, 1.0f,
-			x2, y1, 1.0f, 1.0f,
-			x1, y2, 0.0f, 0.0f,
-			x2, y2, 1.0f, 0.0f,
-		});
-        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
-        		0, params.width, 0, params.height, -1, 1));
-        modifiedParams.addParam( new GLParameters.GLUniformMatrix4fv(
-        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
-        applyProgram( type, modifiedParams, pd, x1, y1, x2, y2);
+        applyProgram( type, params, pd, x1, y1, x2, y2);
         pd.free();
 	}
 	
@@ -265,30 +278,22 @@ public class GLEngine  {
         }
 
 		// Bind Uniform
-        
         if( params != null)
         	params.apply(gl, prog);
+        
+        // Set Blend Mode
+        if( params.useBlendMode) {
+	        if( params.useDefaultBlendmode)
+	        	setDefaultBlendMode(gl, type);
+	        else {
+		        gl.glEnable(GL.GL_BLEND);
+		        gl.glBlendFuncSeparate(
+		        		params.bm_sfc, params.bm_dfc, params.bm_sfa, params.bm_dfa);
+		        gl.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
+	        }
+        }
 
 		// Start Draw
-        switch( type) {
-		case BASIC_STROKE:
-		case DEFAULT:
-		case PASS_RENDER:
-	        gl.glEnable(GL.GL_BLEND);
-	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
-	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
-	        break;
-		case PASS_BORDER:
-		case CHANGE_COLOR:
-		case PASS_INVERT:
-		case SQARE_GRADIENT:
-		case PASS_ESCALATE:
-	        gl.glEnable(GL.GL_BLEND);
-	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
-	        gl.glBlendEquation(GL2.GL_MAX);
-	        break;
-        
-        }
 		gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
         gl.glDisable( GL.GL_BLEND);
 		
@@ -449,7 +454,7 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_escalate.frag");
-        		
+
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){

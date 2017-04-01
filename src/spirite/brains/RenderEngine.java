@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.swing.Timer;
 
 import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 
 import spirite.Globals;
 import spirite.MDebug;
@@ -76,7 +77,7 @@ public class RenderEngine
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final CacheManager cacheManager;
 	private final Timer sweepTimer;
-	private GLEngine engine = GLEngine.getInstance();
+	private final GLEngine engine;
 	
 	//  ThumbnailManager needs access to MasterControl to keep track of all
 	//	workspaces that exist (easier and more reliable than hooking into Observers)
@@ -85,6 +86,7 @@ public class RenderEngine
 	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
 	
 	public RenderEngine( MasterControl master) {
+		this.engine = GLEngine.getInstance();
 		this.master = master;
 		this.cacheManager = master.getCacheManager();
 		
@@ -92,7 +94,6 @@ public class RenderEngine
 		for( ImageWorkspace workspace : master.getWorkspaces()) {
 			workspace.addImageObserver( this);
 			workspace.getReferenceManager().addReferenceObserve(this);
-			
 		}
 		
 		sweepTimer = new Timer(3 * 1000 /*3 seconds*/,new ActionListener() {
@@ -137,7 +138,11 @@ public class RenderEngine
 	public enum RenderMethod {
 		DEFAULT("Normal", 0), 
 		COLOR_CHANGE("As Color", 0xFF0000),
-		
+
+		LIGHTEN("Lighten", 0),
+		SUBTRACT("Subtract", 0),
+		MULTIPLY("Multiply",0),
+		SCREEN("Screen",0),
 		;
 		
 		public final String description;
@@ -887,7 +892,8 @@ public class RenderEngine
 				GLParameters params = new GLParameters(settings.width, settings.height);
 				params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 		    	engine.clearSurface();
-				engine.applyPassInternal(ProgramType.PASS_ESCALATE, params, null, 0, 0, settings.width, settings.height);
+				engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null, 
+						0, 0, settings.width, settings.height, true);
 				
 				BufferedImage bi = engine.glSurfaceToImage();
 
@@ -972,8 +978,9 @@ public class RenderEngine
 				Node node, GLParameters params, boolean fullPremult, float moreAlpha) 
 		{
 			
-			int mask = 0;
+			int method_num = 0;
 			
+			boolean premult = true;
 			RenderMethod method;
 			int renderValue = 0;
 			int stage = workspace.getStageManager().getNodeStage(node);
@@ -994,15 +1001,37 @@ public class RenderEngine
 			
 			switch( method) {
 			case COLOR_CHANGE:
-				mask = 0b10;
+				method_num = 1;
 				break;
 			case DEFAULT:
 				break;
-			
+			case LIGHTEN:
+				method_num = 0;
+				params.setBlendModeExt(
+						GL2.GL_ONE, GL2.GL_ONE, GL2.GL_FUNC_ADD,
+						GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+				break;
+			case SUBTRACT:
+				method_num = 0;
+				params.setBlendModeExt(
+						GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_COLOR, GL2.GL_FUNC_ADD,
+						GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+				break;
+			case MULTIPLY:
+				method_num = 0;
+				params.setBlendModeExt(GL2.GL_DST_COLOR, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD,
+						GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+				break;
+			case SCREEN:
+				// C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
+				method_num = 0;
+				params.setBlendModeExt(GL2.GL_ONE_MINUS_DST_COLOR, GL2.GL_ONE, GL2.GL_FUNC_ADD,
+						GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+				break;
 			}
 			params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));
 			params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
-			params.addParam( new GLParameters.GLParam1i("uComp", mask | ((fullPremult)?1:0)));
+			params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) | ((fullPremult&&premult)?1:0)));
 		}
 		
 		private abstract class Drawable {
@@ -1032,8 +1061,8 @@ public class RenderEngine
 						GLParameters params = new GLParameters(settings.width, settings.height);
 						setParamsFromNode( node, params, false, 1);
 						params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
-						engine.applyPassInternal(
-								ProgramType.PASS_RENDER, params, null, 0, 0, params.width, params.height);
+						engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
+								0, 0, params.width, params.height, true);
 					}
 				});
 			}
@@ -1077,7 +1106,7 @@ public class RenderEngine
 						params.texture = new GLParameters.GLImageTexture(bi);
 						engine.applyPassProgram(
 								ProgramType.PASS_RENDER, params, trans,
-								0, 0, bi.getWidth(), bi.getHeight());
+								0, 0, bi.getWidth(), bi.getHeight(), false);
 					}
 				});
 			}

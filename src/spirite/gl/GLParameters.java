@@ -20,16 +20,14 @@ public class GLParameters {
 	public final List<GLParam> params = new ArrayList<>();
 	public GLTexture texture;
 	public int width, height;
+
+	boolean useBlendMode = true;
+	boolean useDefaultBlendmode = true;
+	int bm_sfc, bm_sfa, bm_dfc, bm_dfa, bm_fc, bm_fa;
 	
 	public GLParameters( int width, int height) {
 		this.width = width;
 		this.height = height;
-	}
-	public GLParameters( GLParameters other) {
-		this.width = other.width;
-		this.height = other.height;
-		this.params.addAll(other.params);
-		this.texture = other.texture;
 	}
 	
 	public void addParam( GLParam param) {
@@ -40,6 +38,35 @@ public class GLParameters {
 		for( GLParam param : params) {
 			param.apply(gl, prog);
 		}
+	}
+	
+	// =============
+	// ==== BlendModes
+	public void useDefaultBlendMode() {
+		useDefaultBlendmode = true;
+	}
+	public void setUseBlendMode( boolean use) {
+		useBlendMode = use;
+	}
+	public void setBlendMode( int src_factor, int dst_factor, int formula) {
+		useDefaultBlendmode = false;
+		bm_sfc=bm_sfa = src_factor;
+		bm_dfc=bm_dfa = dst_factor;
+		bm_fc = bm_fa = formula;
+	}
+	public void setBlendModeExt( 
+			int src_factor_color, int dst_factor_color, int formula_color,
+			int src_factor_alpha, int dst_factor_alpha, int formula_alpha)
+	{
+		useDefaultBlendmode = false;
+		bm_sfc=  src_factor_color;
+		bm_dfc= dst_factor_color;
+		bm_fc = formula_color;
+		
+		bm_sfa=  src_factor_alpha;
+		bm_dfa= dst_factor_alpha;
+		bm_fa = formula_alpha;
+		
 	}
 	
 	// ==============

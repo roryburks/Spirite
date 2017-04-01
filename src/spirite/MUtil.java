@@ -33,7 +33,8 @@ public class MUtil {
 	
 	public final static Point ORIGIN = new Point(0,0);
 
-	// :::: Math Functions
+	// ==============
+	// ==== Math Functions
 	public static int packInt( int high, int low) {
 		return ((high&0xffff) << 16) | (low&0xffff);
 	}
@@ -116,16 +117,6 @@ public class MUtil {
 				Math.max( rect1.x + rect1.width, rect2.x + rect2.width),
 				Math.max( rect1.y + rect1.height, rect2.y + rect2.height)
 				);
-	}
-	
-	// ::::
-	public static List<Integer> arrayToList( int arr[]) {
-		List<Integer> list = new ArrayList<>(arr.length);
-		
-		for( int i = 0; i < arr.length; ++i) {
-			list.add(arr[i]);
-		}
-		return list;
 	}
 	
 	// :::: String

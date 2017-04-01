@@ -59,7 +59,7 @@ public class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLImageTexture(bi);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false);
 			}
 		});
 		
@@ -73,7 +73,7 @@ public class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLFBOTexture(glmu);
-				engine.applyPassInternal(ProgramType.PASS_BORDER, params);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true);
 			}
 		});
 
@@ -85,12 +85,11 @@ public class GLUIDraw {
     	params.texture = new GLFBOTexture(glmu);
     	
     	engine.clearSurface();
-    	engine.applyPassInternal(ProgramType.CHANGE_COLOR, params);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, true);
         
 		glmu.cleanup();
 		glmub.cleanup();
 
-		GLAutoDrawable drawable = engine.getDrawable();
         BufferedImage im = engine.glSurfaceToImage();
        
 		return im;
@@ -121,7 +120,7 @@ public class GLUIDraw {
 				GLParameters params2 = new GLParameters(swidth, sheight);
 				params2.texture = new GLImageTexture(image);
 				engine.applyPassProgram( ProgramType.CHANGE_COLOR, params2, trans,
-						0, 0, image.getWidth(), image.getHeight());
+						0, 0, image.getWidth(), image.getHeight(), false);
 			}
 		});
 		
@@ -132,15 +131,12 @@ public class GLUIDraw {
 		params.texture = new GLFBOTexture(glmu);
 
     	engine.clearSurface();
-		engine.applyPassInternal(ProgramType.PASS_BORDER, params);
+		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true);
 		
 		// Clean up and Apply the surface to an image
 		glmu.cleanup();
 
-		GLAutoDrawable drawable = engine.getDrawable();
-        BufferedImage im = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage(
-        				engine.getGL2(), 0, 0, swidth, sheight, true); 
+        BufferedImage im = engine.glSurfaceToImage();
        
 		return im;
 	}
