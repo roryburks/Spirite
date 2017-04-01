@@ -19,6 +19,7 @@ import spirite.gl.GLEngine.PreparedTexture;
 public class GLParameters {
 	public final List<GLParam> params = new ArrayList<>();
 	public GLTexture texture;
+	public GLTexture texture2;
 	public int width, height;
 
 	boolean useBlendMode = true;

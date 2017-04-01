@@ -6,6 +6,7 @@ in vec2 vUV;
 out vec4 outputColor;
 
 uniform sampler2D myTexture;
+//uniform sampler2D myTexture2;
 uniform float uAlpha;
 uniform unsigned int uValue;
 
@@ -26,6 +27,9 @@ vec4 changeColor(vec4 texCol) {
 	float b = ((uValue)&0xFF)/255.0f;
 	return vec4( r*texCol.a, g*texCol.a, b*texCol.a, texCol.a);
 }
+
+
+
 
 void main()
 {

@@ -150,7 +150,7 @@ public class GLEngine  {
 		PASS_BORDER,
 		PASS_INVERT,
 		PASS_RENDER,
-		PASS_ESCALATE,
+		PASS_ESCALATE, STROKE_SPORE,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
@@ -272,9 +272,16 @@ public class GLEngine  {
 
         // Bind Texture
         if( params.texture != null) {
+        	gl.glActiveTexture(GL.GL_TEXTURE0);
         	params.texture.load();
     		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
+        }
+        if( params.texture2 != null) {
+        	gl.glActiveTexture(GL.GL_TEXTURE1);
+        	params.texture2.load();
+    		gl.glEnable(GL2.GL_TEXTURE_2D);
+    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
 
 		// Bind Uniform
@@ -302,9 +309,10 @@ public class GLEngine  {
 		gl.glDisableVertexAttribArray(0);
 		gl.glDisableVertexAttribArray(1);
         gl.glUseProgram(0);
-        if( params.texture != null) {
+        if( params.texture != null)
         	params.texture.unload();
-        }
+        if( params.texture2 != null) 
+        	params.texture2.unload();
 	}
 	
 	/** Writes the active GL Surface to a BufferedImage */
@@ -454,6 +462,10 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_escalate.frag");
+        programs[ProgramType.STROKE_SPORE.ordinal()] = loadProgramFromResources( 
+				"shaders/brushes/brush_spore.vert", 
+				"shaders/brushes/brush_spore.geom", 
+				"shaders/brushes/brush_spore.frag");
 
 	}
 	

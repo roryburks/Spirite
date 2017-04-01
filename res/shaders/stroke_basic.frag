@@ -1,7 +1,5 @@
 #version 330
 
-smooth in vec4 theColor;
-
 in float fWeight;
 flat in float fX, fY, fM;
 

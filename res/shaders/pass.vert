@@ -11,4 +11,5 @@ void main()
 {
 	gl_Position = perspectiveMatrix*vec4(position,0,1);
 	vUV = vertexUV;
+	
 }

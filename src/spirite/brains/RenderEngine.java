@@ -143,6 +143,7 @@ public class RenderEngine
 		SUBTRACT("Subtract", 0),
 		MULTIPLY("Multiply",0),
 		SCREEN("Screen",0),
+		OVERLAY("Overlay",0),
 		;
 		
 		public final String description;
@@ -1027,6 +1028,9 @@ public class RenderEngine
 				method_num = 0;
 				params.setBlendModeExt(GL2.GL_ONE_MINUS_DST_COLOR, GL2.GL_ONE, GL2.GL_FUNC_ADD,
 						GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+				break;
+			case OVERLAY:
+				method_num = 3;
 				break;
 			}
 			params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));

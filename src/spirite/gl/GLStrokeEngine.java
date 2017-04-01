@@ -44,6 +44,7 @@ public class GLStrokeEngine extends StrokeEngine {
 	
 	@Override
 	public boolean startDrawStroke(PenState ps) {
+//		MUtil.clearImage(strokeLayer);
 		return false;
 	}
 
@@ -51,6 +52,8 @@ public class GLStrokeEngine extends StrokeEngine {
 	public boolean stepDrawStroke(PenState fromState, PenState toState) {
 		if( fromState.x == toState.x && fromState.y == toState.y)
 			return false;
+		
+//		_strokeSpore(toState);
 
 		_stroke(composeVBuffer(prec));
 		return true;
@@ -63,6 +66,100 @@ public class GLStrokeEngine extends StrokeEngine {
 		return true;
 	}
 	
+	private void _strokeSpore(PenState ps) {
+
+		float[] raw = new float[4*13];
+		
+		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+		
+		raw[0] = data.convertX(ps.x);
+		raw[1] = data.convertY(ps.y);
+		raw[2] = size;
+		raw[3] = ps.pressure;
+
+		for( int i=0; i<4; ++i) {
+			int off = (i+1)*4;
+			raw[off+0] = data.convertX(ps.x) + size/2.0f * (float)Math.cos(Math.PI/2.0*i);
+			raw[off+1] = data.convertY(ps.y) + size/2.0f * (float)Math.sin(Math.PI/2.0*i);
+			raw[off+2] = stroke.getDynamics().getSize(ps);
+			raw[off+3] = ps.pressure;
+		}
+		for( int i=0; i<8; ++i) {
+			int off = (i+5)*4;
+			raw[off+0] = data.convertX(ps.x) + size * (float)Math.cos(Math.PI/8.0+Math.PI/4.0*i);
+			raw[off+1] = data.convertY(ps.y) + size * (float)Math.sin(Math.PI/8.0+Math.PI/4.0*i);
+			raw[off+2] = stroke.getDynamics().getSize(ps);
+			raw[off+3] = ps.pressure;
+		}
+		
+
+		int w = data.getWidth();
+		int h = data.getHeight();
+		
+		engine.setSurfaceSize( w, h);
+		GL2 gl = engine.getGL2();
+		PreparedData pd = engine.prepareRawData(raw);
+
+		// Clear Surface
+	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+	    gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
+
+        int prog = engine.getProgram(ProgramType.STROKE_SPORE);
+        gl.glUseProgram( prog);
+
+        // Bind Attribute Streams
+        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
+        gl.glEnableVertexAttribArray( 0);
+        gl.glEnableVertexAttribArray( 1);
+        gl.glEnableVertexAttribArray( 2);
+        gl.glVertexAttribPointer( 0, 2, GL2.GL_FLOAT, false, 4*4, 0);
+        gl.glVertexAttribPointer( 1, 1, GL2.GL_FLOAT, false, 4*4, 4*2);
+        gl.glVertexAttribPointer( 2, 1, GL2.GL_FLOAT, false, 4*4, 4*3);
+
+        // Bind Uniforms
+        int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
+        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
+        );
+        gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
+        int uColor = gl.glGetUniformLocation( prog, "uColor");
+        gl.glUniform3f(uColor, 
+        		stroke.getColor().getRed()/255.0f,
+        		stroke.getColor().getGreen()/255.0f,
+        		stroke.getColor().getBlue()/255.0f);
+
+
+        gl.glEnable(GL2.GL_MULTISAMPLE);
+        gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE );
+        gl.glEnable(GL.GL_BLEND);
+        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendEquation(GL2.GL_MAX);
+
+    	gl.glDrawArrays(GL3.GL_POINTS, 0, 13);
+        
+
+
+        gl.glDisable( GL.GL_BLEND);
+        gl.glDisable(GL2.GL_MULTISAMPLE);
+
+        gl.glDisableVertexAttribArray( 0);
+        gl.glDisableVertexAttribArray( 1);
+        gl.glDisableVertexAttribArray( 2);
+        gl.glUseProgram(0);
+        
+        pd.free();
+
+        BufferedImage im = engine.glSurfaceToImage(); 
+//		MUtil.clearImage(strokeLayer);
+		Graphics2D g2 = (Graphics2D)strokeLayer.getGraphics();
+		g2.drawImage(im, 0, 0, null);
+
+		if( sel.selection != null) {
+			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
+			g2.drawImage(selectionMask, 0, 0, null);
+		}
+		g2.dispose();
+	}
 	
 	private class GLVBuffer {
 		float[] vBuffer;
