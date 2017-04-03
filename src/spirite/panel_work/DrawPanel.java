@@ -11,13 +11,17 @@ import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
+import mutil.Interpolation.CubicSplineInterpolator2D;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -210,6 +214,8 @@ public class DrawPanel extends JPanel
         if( penner.drawsOverlay())
         	penner.paintOverlay(g);
         
+        
+
     }
 
 

@@ -15,7 +15,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
-import mutil.Interpolation.CubicSplineInterpolator2D;
+import mutil.Interpolation.CubicSplineInterpolator2DFixed;
 import mutil.MatrixBuilder;
 import spirite.MUtil;
 import spirite.gl.GLEngine.PreparedData;
@@ -169,7 +169,7 @@ public class GLStrokeEngine extends StrokeEngine {
 	private static final int DISTANCE_THRESHOLD = 5;
 	private GLVBuffer composeVBuffer( List<PenState> states) {
 		GLVBuffer vb = new GLVBuffer();
-		CubicSplineInterpolator2D csi = null;
+		CubicSplineInterpolator2DFixed csi = null;
 		
 		// Step 1: Determine how much space is needed
 		int num = states.size() + 2;
@@ -190,12 +190,12 @@ public class GLStrokeEngine extends StrokeEngine {
 				PenState ps = states.get(i);
 				points.add(new Point(ps.x, ps.y));
 			}
-			csi = new CubicSplineInterpolator2D(points, true);
+			csi = new CubicSplineInterpolator2DFixed(points, true);
 		}
 		
 		float raw[] = new float[6*(num)];
 		int o = 1;
-		for( int i=0; i < states.size()-1; ++i) {
+		for( int i=0; i < states.size(); ++i) {
 			int off = (o++)*6;
 			
 			PenState ps = states.get(i);
@@ -230,7 +230,7 @@ public class GLStrokeEngine extends StrokeEngine {
 			for( int j=0; j < n; ++j) {
 				off = (o++)*6;
 				
-				Point2D p2 = csi.f(i + j/(double)n);
+				Point2D p2 = csi.eval(i + j/(double)n);
 				// x y z w
 				raw[off+0] = data.convertX((int)Math.round(p2.getX()));
 				raw[off+1] = data.convertY((int)Math.round(p2.getY()));

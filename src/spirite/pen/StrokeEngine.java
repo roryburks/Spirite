@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,61 +31,76 @@ public abstract class StrokeEngine {
 	 * bar idea.
 	 */
 	public static class StrokeParams {
+		public enum InterpolationMethod {
+			NONE,
+			CUBIC_SPLINE,
+		}
 		
-		Color c = Color.BLACK;
-		StrokeEngine.Method method = StrokeEngine.Method.BASIC;
+		private Color c = Color.BLACK;
+		private StrokeEngine.Method method = StrokeEngine.Method.BASIC;
 		private float width = 1.0f;
 		private float alpha = 1.0f;
 		private boolean hard = false;
 		private PenDynamics dynamics = DrawEngine.getDefaultDynamics();
 		private int maxWidth = 25;
+		private InterpolationMethod interpolationMethod = InterpolationMethod.NONE;
 	
 		private boolean locked = false;
 		
 		public StrokeParams() {}
 		
+		/** If Params are locked, they're being used and can't be changed.
+		 * Only the base StrokeEngine can lock/unlock Params.  Once they are 
+		 * locked they will usually never be unlocked as the UndoEngine needs
+		 * to remember the saved settings.
+		 */
+		public boolean isLocked() {return locked;}
+
+		public Color getColor() {return new Color( c.getRGB());}
 		public void setColor( Color c) {
 			if( !locked)
 				this.c = c;
 		}
-		public Color getColor() {return new Color( c.getRGB());}
-		
+
+		public StrokeEngine.Method getMethod() {return method;}
 		public void setMethod( StrokeEngine.Method method) {
 			if( !locked)
 				this.method = method;
 		}
-		public StrokeEngine.Method getMethod() {return method;}
-		
+
+		public float getWidth() { return width;}
 		public void setWidth( float width) {
 			if( !locked)
 				this.width = width;
 		}
-		public float getWidth() { return width;}
-		
+
+		public float getAlpha() {return alpha;}
 		public void setAlpha( float alpha) {
 			if( !locked)
 				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
 		}
-		public float getAlpha() {return alpha;}
-		
+
+		public boolean getHard() {return hard;}
 		public void setHard( boolean hard) {
 			if( !locked)
 				this.hard = hard;
 		}
-		public boolean getHard() {return hard;}
-		
+
+		public PenDynamics getDynamics() {return dynamics;}
 		public void setDynamics( PenDynamics dynamics) {
 			if( !locked && dynamics != null)
 				this.dynamics = dynamics;
 		}
-		public PenDynamics getDynamics() {
-			return dynamics;
-		}
-		
+
+		public int getMaxWidth() { return this.maxWidth;}
 		public void setMaxWidth( int width) {
 			if( !locked) this.maxWidth = width;
 		}
-		public int getMaxWidth() { return this.maxWidth;}
+
+		public InterpolationMethod getInterpolationMethod() { return this.interpolationMethod;}
+		public void setInterpolationMethod( InterpolationMethod method) {
+			if(!locked) this.interpolationMethod = method;
+		}
 	}
 
 	public enum Method {BASIC, ERASE, PIXEL}
@@ -97,11 +113,11 @@ public abstract class StrokeEngine {
 	protected StrokeEngine.StrokeParams stroke = null;
 	protected BuiltImageData data;
 	protected BufferedImage strokeLayer;
-	protected BufferedImage compositionLayer;
+	private BufferedImage compositionLayer;
 	protected BufferedImage selectionMask;
 	
 	// Recording of raw states
-	protected List<PenState> prec = new LinkedList<>();
+	protected ArrayList<PenState> prec = new ArrayList<>();
 
 	protected BuiltSelection sel;
 	
@@ -148,8 +164,6 @@ public abstract class StrokeEngine {
 		
 		strokeLayer = new BufferedImage( 
 				data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
-		compositionLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
 		
 		sel = selection;
 		
@@ -165,7 +179,7 @@ public abstract class StrokeEngine {
 		}
 		
 		// Starts recording the Pen States
-		prec = new LinkedList<PenState>();
+		prec = new ArrayList<PenState>();
 		Point layerSpace = (data.convert(new Point(ps.x,ps.y)));
 		
 		oldState.x = layerSpace.x;
@@ -239,7 +253,6 @@ public abstract class StrokeEngine {
 		}
 		
 		strokeLayer.flush();
-		compositionLayer.flush();
 		if( selectionMask != null)
 			selectionMask.flush();
 	}
@@ -279,10 +292,5 @@ public abstract class StrokeEngine {
 		}
 		g.drawImage(getStrokeLayer(), 0, 0, null);
 		g2.setComposite( c);
-	}
-	
-	public BufferedImage getCompositionLayer() {
-		MUtil.clearImage(compositionLayer);
-		return compositionLayer;
 	}
 }
