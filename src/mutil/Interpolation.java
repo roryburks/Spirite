@@ -5,10 +5,9 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
-import mutil.Interpolation.CubicSplineInterpolator2D;
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 
 /**
  * A Package which contains a set of classes for interpolating data.
@@ -21,8 +20,23 @@ public class Interpolation {
 	public static interface Interpolator{
 		public double f(double t);
 	}
+	
+	public static class InterpolatedPoint {
+		public final double x, y, lerp;
+		public final int left, right;
+		public InterpolatedPoint( double x, double y, double lerp, int left, int right) {
+			this.x = x;
+			this.y = y;
+			this.lerp = lerp;
+			this.left = left;
+			this.right = right;
+		}
+	}
 	public static interface Interpolator2D{
+		public double getCurveLength();
+		public void addPoint(double x, double y);
 		public Point2D eval(double t);
+		public InterpolatedPoint evalExt(double t);
 	}
 	public static class CubicSplineInterpolator
 		implements Interpolator
@@ -73,13 +87,13 @@ public class Interpolation {
         });
         CubicSplineInterpolator2D csi = new CubicSplineInterpolator2D(points, true);
 
-        csi.addPoint(new Point2D.Double(0, 0));
-    	csi.addPoint(new Point2D.Double(200, 20));
-    	csi.addPoint(new Point2D.Double(260, 80));
-    	csi.addPoint(new Point2D.Double(200, 200));
-    	csi.addPoint(new Point2D.Double(100, 80));
-        csi.addPoint(new Point2D.Double(50,50));
-        csi.addPoint(new Point2D.Double(0,500));
+        csi.addPoint(0, 0);
+    	csi.addPoint(200, 20);
+    	csi.addPoint(260, 80);
+    	csi.addPoint(200, 200);
+    	csi.addPoint(100, 80);
+        csi.addPoint(50,50);
+        csi.addPoint(0,500);
 
         for( int i=0; i < csi.getNumPoints(); ++i) {
         	int dx = (int)Math.round(csi.getX(i));
@@ -167,13 +181,13 @@ public class Interpolation {
 		public double getX(int n) {return x_[n];}
 		public double getY(int n) {return y_[n];}
 
-		public void addPoint(Point2D point) {
+		public void addPoint(double px, double py) {
 			if( kx.length <= length) expand(length+1);
 
 			// Code could be made less verbose in by combining parts of the 
 			//	different cases, but would be less readable
-			x_[length] = point.getX();
-			y_[length] = point.getY();
+			x_[length] = px;
+			y_[length] = py;
 			if( length == 0) {
 				t_[0] = 0;
 			}
@@ -186,11 +200,10 @@ public class Interpolation {
 				ky[0] = ky[1];
 			}
 			else {
-				x_[length] = point.getX();
-				y_[length] = point.getY();
+				x_[length] = px;
+				y_[length] = py;
 				t_[length] = t_[length-1] +
 						MUtil.distance(x_[length-1], y_[length-1], x_[length], y_[length]);
-	
 
 				double dt1 = t_[length] - t_[length-1];
 				double dt2 = t_[length-1] - t_[length-2];
@@ -219,6 +232,7 @@ public class Interpolation {
 				l = (l*3+1)/2;
 
 			double buff[] = new double[l];
+			System.arraycopy(kx, 0, buff, 0, length);
 			kx = buff;
 			buff = new double[l];
 			System.arraycopy(ky, 0, buff, 0, length);
@@ -252,6 +266,7 @@ public class Interpolation {
 				double dt2 = t_[i] - t_[i-1];
 				kx[i] = 0.5*((x_[i+1]-x_[i])/dt1 + (x_[i]-x_[i-1])/dt2);
 				ky[i] = 0.5*((y_[i+1]-y_[i])/dt1 + (y_[i]-y_[i-1])/dt2);
+
 			}
 			dt = t_[i] - t_[i-1];
 			kx[i] = 0.25*(x_[i] - x_[i-1])/dt;
@@ -284,6 +299,31 @@ public class Interpolation {
 			
 			return new Point2D.Double(qx, qy);
 		}
+		@Override
+		public InterpolatedPoint evalExt(double t) {
+			if( kx.length == 0) return new InterpolatedPoint(0, 0, 0, 0, 0);
+			
+			if( t <= 0) return new InterpolatedPoint(x_[0], y_[0], 0, 0, 1);
+			if( t >= distance) return new InterpolatedPoint(x_[kx.length-1], y_[kx.length-1], 1, kx.length-2, kx.length-1);
+			
+			int i = 0;
+			while( t > t_[i] &&  ++i < kx.length);
+			if( i == kx.length) return new InterpolatedPoint(x_[kx.length-1], y_[kx.length-1], 1, kx.length-2, kx.length-1);
+			
+			
+			double dt = t_[i]-t_[i-1];
+			double n = (t - t_[i-1])/dt;
+			
+			double a_x = kx[i-1]*dt - (x_[i] - x_[i-1]);
+			double b_x =-kx[i]*dt + x_[i] - x_[i-1];
+			double a_y = ky[i-1]*dt - (y_[i] - y_[i-1]);
+			double b_y =-ky[i]*dt + y_[i] - y_[i-1];
+			
+			double qx = (1-n)*x_[i-1] + n*x_[i] + n*(1-n)*(a_x*(1-n)+b_x*n);
+			double qy = (1-n)*y_[i-1] + n*y_[i] + n*(1-n)*(a_y*(1-n)+b_y*n);
+			
+			return new InterpolatedPoint(qx, qy, n, i-1, i);
+		}
 		
 	}
 	
@@ -293,7 +333,6 @@ public class Interpolation {
 	 * CubicSplineInterpolator2D, the t-length is determined by distancew
 	 */
 	public static class CubicSplineInterpolator2DFixed
-		implements Interpolator2D
 	{
 		private double kx[];
 		private double ky[];
@@ -315,7 +354,11 @@ public class Interpolation {
 			fastCalculateSlopes();
 		}
 		
-		public void addPoint(Point2D point, boolean fast) {
+		public double getCurveLength() {
+			return this.length;
+		}
+		
+		public void addPoint(double px, double py) {
 			if( length >= kx.length) {
 				// Expand the internal arrays as needed
 				int l = (kx.length*3 + 1)/2;
@@ -333,8 +376,8 @@ public class Interpolation {
 				y_ = t;
 			}
 			
-			x_[length] = point.getX();
-			y_[length] = point.getY();
+			x_[length] = px;
+			y_[length] = py;
 
 			
 			if( length >= 2) {
@@ -366,7 +409,6 @@ public class Interpolation {
 			ky[i] = (y_[i] - y_[i-1])/4;
 		}
 
-		@Override
 		public Point2D eval(double t) {
 			if( kx.length == 0) return new Point2D.Double(0,0);
 			

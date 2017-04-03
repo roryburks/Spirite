@@ -315,30 +315,14 @@ public class DrawEngine {
 		}
 		
 		@Override
-		public boolean startDrawStroke( PenState ps) {
-			int crgb = stroke.getColor().getRGB();
-			if( strokeLayer.getRGB( ps.x, ps.y) != crgb ) {
-				strokeLayer.setRGB( ps.x, ps.y, crgb);
-				return true;
-			}
-			return false;
-		}
-		
-		/***
-		 * Draws the next step in the stroke, assuming that updateStroke was
-		 * already called to update the PenState
-		 * 
-		 * @return true if the step wan't a null-step (non-moving)
-		 */
-		@Override
-		public boolean stepDrawStroke( PenState fromState, PenState toState) {
-			// Draw Stroke (only if the mouse has moved)
-			if( toState.x != fromState.x || toState.y != fromState.y)
-			{
-				Graphics g = strokeLayer.getGraphics();
-				Graphics2D g2 = (Graphics2D)g;
-				g.setColor( stroke.getColor());
+		public boolean drawToLayer(BufferedImage layer, List<PenState> states) {
+			Graphics g = layer.getGraphics();
+			Graphics2D g2 = (Graphics2D)g;
+			g.setColor( stroke.getColor());
 
+			for( int i=1; i < states.size(); ++i) {
+				PenState fromState = states.get(i-1);
+				PenState toState = states.get(i);
 				if( stroke.getMethod() != StrokeEngine.Method.PIXEL){
 					g2.setStroke( new BasicStroke( 
 							stroke.getDynamics().getSize(toState)*stroke.getWidth(), 
@@ -347,19 +331,26 @@ public class DrawEngine {
 				}
 				g2.drawLine( fromState.x, fromState.y, toState.x, toState.y);
 				
-
+	
 				if( sel.selection != null) {
 					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 					g2.drawImage(selectionMask, 0, 0, null);
 				}
-				
-				g.dispose();
-				return true;
 			}
 			
-			
-			return false;
+			g.dispose();
+			return true;
 		}
+		
+/*		@Override
+		public boolean startDrawStroke( PenState ps) {
+			int crgb = stroke.getColor().getRGB();
+			if( displayLayer.getRGB( ps.x, ps.y) != crgb ) {
+				displayLayer.setRGB( ps.x, ps.y, crgb);
+				return true;
+			}
+			return false;
+		}*/
 		
 		
 	}
@@ -445,14 +436,7 @@ public class DrawEngine {
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
 
-			if( !engine.batchDraw(params, points, builtImage, mask)){
-				engine.startStroke(params, points[0], builtImage, mask);
-				for( int i = 1; i < points.length; ++i) {
-					engine.stepStroke( points[i]);
-				}
-			}
-			
-			engine.endStroke();
+			engine.batchDraw(params, points, builtImage, mask);
 		}
 	}
 	public class FillAction extends MaskedImageAction {

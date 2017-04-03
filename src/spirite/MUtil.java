@@ -20,8 +20,6 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
@@ -60,6 +58,10 @@ public class MUtil {
 		if( value < min) return min;
 		if( value > max) return max;
 		return value;
+	}
+	
+	public static double lerp( double a, double b, double t) {
+		return t*b + (1-t)*a;
 	}
 
 	/** 

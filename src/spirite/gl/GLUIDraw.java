@@ -7,9 +7,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import spirite.gl.GLEngine.ProgramType;
 import spirite.gl.GLMultiRenderer.GLRenderer;
