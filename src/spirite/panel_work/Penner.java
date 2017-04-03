@@ -54,6 +54,7 @@ import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
+import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -547,6 +548,7 @@ public class Penner
 			stroke.setAlpha((float)settings.getValue("alpha"));
 			stroke.setHard(true);
 			stroke.setColor( color);
+			stroke.setInterpolationMethod(InterpolationMethod.NONE);
 			startStroke( stroke);
 		}
 	}

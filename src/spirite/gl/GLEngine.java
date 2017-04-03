@@ -2,6 +2,7 @@ package spirite.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -10,6 +11,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import com.hackoeur.jglm.Mat4;
@@ -17,10 +19,14 @@ import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
+import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.TraceGL4;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
@@ -90,6 +96,18 @@ public class GLEngine  {
 				caps,
 				new DefaultGLCapabilitiesChooser(), 
 				1, 1);
+		
+		// Debug
+/*		drawable.addGLEventListener( new GLEventListener() {
+			@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
+			@Override public void dispose(GLAutoDrawable arg0) {}
+			@Override public void display(GLAutoDrawable arg0) {}
+			@Override public void init(GLAutoDrawable gad) {
+				GL gl = gad.getGL();
+				gl = gl.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
+			}
+		});*/
+		
 
 		// The GL object has to be running on the AWTEvent thread for UI objects
 		//	to access it without causing thread-locking.
@@ -133,6 +151,13 @@ public class GLEngine  {
  	public GLAutoDrawable getDrawable() {
 		return drawable;
 	}*/
+
+	/** Writes the active GL Surface to a BufferedImage */
+	public BufferedImage glSurfaceToImage() {
+        return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true); 
+		
+	}
 	
 	public void clearSurface() {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -314,12 +339,6 @@ public class GLEngine  {
         	params.texture2.unload();
 	}
 	
-	/** Writes the active GL Surface to a BufferedImage */
-	public BufferedImage glSurfaceToImage() {
-        return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true); 
-		
-	}
 	
 	// ==================
 	// ==== Texture Preperation
@@ -367,7 +386,7 @@ public class GLEngine  {
 				GL2.GL_UNSIGNED_INT_8_8_8_8,
 				ByteBuffer.wrap(((ByteInterleavedRaster)bi.getRaster()).getDataStorage())
 				);
-		
+
 		return pt;
 	}
 	
@@ -465,6 +484,7 @@ public class GLEngine  {
 				"shaders/brushes/brush_spore.vert", 
 				"shaders/brushes/brush_spore.geom", 
 				"shaders/brushes/brush_spore.frag");
+        
 
 	}
 	

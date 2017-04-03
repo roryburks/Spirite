@@ -90,7 +90,7 @@ public class GLParameters {
 		@Override
 		public int load(){
 			texture = GLEngine.getInstance().prepareTexture(image);
-			
+
 			return texture.getTexID();
 		}
 		@Override
