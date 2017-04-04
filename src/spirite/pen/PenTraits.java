@@ -44,7 +44,7 @@ public class PenTraits {
 
 		@Override
 		public float getSize(PenState ps) {
-			return Math.min(1, Math.max(0, (float) li.f(ps.pressure)));
+			return Math.min(1, Math.max(0, (float) li.eval(ps.pressure)));
 		}
 	}
 

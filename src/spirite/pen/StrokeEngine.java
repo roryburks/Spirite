@@ -241,8 +241,7 @@ public abstract class StrokeEngine {
 		}
 		
 		boolean changed = false;
-		if( oldState.x != newState.x || oldState.y != newState.y
-				|| oldState.pressure != newState.pressure)
+		if( oldState.x != newState.x || oldState.y != newState.y)
 		{
 			prec.add( new PenState( rawState));
 			if( interpolator != null) {

@@ -2,7 +2,9 @@ package mutil;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import spirite.MDebug;
@@ -18,7 +20,7 @@ import spirite.MUtil;
  */
 public class Interpolation {
 	public static interface Interpolator{
-		public double f(double t);
+		public double eval(double t);
 	}
 	
 	public static class InterpolatedPoint {
@@ -38,44 +40,97 @@ public class Interpolation {
 		public Point2D eval(double t);
 		public InterpolatedPoint evalExt(double t);
 	}
+	
 	public static class CubicSplineInterpolator
 		implements Interpolator
 	{
-
 		private final double k[];
 		private final double x_[];
 		private final double y_[];
 
-		public CubicSplineInterpolator(List<Point2D> points, boolean fast) {
+		private final boolean spatial;
+		
+		/**
+		 * 
+		 * @param points_
+		 * @param fast
+		 * @param spatial spatial weighting weights the point slopes not by 
+		 * the total distance between two points, not just the X-distance.  
+		 * Produces a result very similar (though not identical) to a 2D 
+		 * Cubic Spline that only has points with strictly increasing X values.
+		 */
+		public CubicSplineInterpolator(List<Point2D> points_, boolean fast, boolean spatial) {
+			this.spatial = spatial;
+			
+			// Sorts the points by X
+			List<Point2D> points = new ArrayList<>(points_);
+			points.sort( new Comparator<Point2D>() {
+				@Override
+				public int compare(Point2D o1, Point2D o2) {
+					double d = o1.getX() - o2.getX();
+					return (int) Math.signum(d);
+				}
+			});
+			
 			k = new double[points.size()];
 			x_ = new double[points.size()];
 			y_ = new double[points.size()];
+			
+			for( int i=0; i< points.size(); ++i){
+				Point2D p = points.get(i);
+				x_[i] = p.getX();
+				y_[i] = p.getY();
+			}
 
-			for( int i=0; i<k.length; ++i) {
-				x_[i] = points.get(i).getX();
-				y_[i] = points.get(i).getY();
-			}
-			k[0] = y_[1] - y_[0] / (x_[1] - y_[0]);
-			int i;
-			for( i=1; i<k.length-1; ++i) {
-				double a1 = y_[i+1] - y_[i] / (x_[i+1] - y_[i]);
-				double a2 = y_[i] - y_[i-1] / (x_[i] - y_[i-1]);
-				k[i] = (a1+a2)/2;
-			}
-			k[i] = y_[i] - y_[i-1] / (x_[i] - y_[i-1]);
+			fastCalculateSlopes();
 		}
+		
+		private void fastCalculateSlopes(){
+			if( k.length <= 1) return;
+
+			// Note: Enpoint weighting is suppressed a little to avoid wonky
+			//	start/end curves
+			
+			k[0] = (y_[1] - y_[0])/(x_[1]-x_[0]);
+			
+			int i = 0;
+			for( i = 1; i < k.length-1; ++i) {
+				if( spatial) {
+					double d1 = MUtil.distance(x_[i], y_[i], x_[i+1], y_[i+1]);
+					double d2 = MUtil.distance(x_[i-1], y_[i-1], x_[i], y_[i]);
+					
+					k[i] = ((y_[i+1]-y_[i])/d1 + (y_[i]-y_[i-1])/d2) / 
+							((x_[i+1]-x_[i])/d1 + (x_[i]-x_[i-1])/d2);
+				}
+				else {
+
+					k[i] = 0.5*((y_[i+1]-y_[i])/(x_[i+1]-x_[i]) + 
+								(y_[i]-y_[i-1])/(x_[i]-x_[i-1]));
+				}
+			}
+			k[i] = (y_[i] - y_[i-1])/(x_[i]-x_[i-1]);
+		}
+		
 		@Override
-		public double f(double t) {
-			int i=0;
-			while( x_[i] < t) ++i;
+		public double eval(double t) {
+			if( k.length == 0) return 0;
 			
-			double a = k[i-1] - (x_[i] - x_[i-1]);
-			double b =-k[i] + x_[i] - x_[i-1];
 			
-			double n = (t - x_[i-1])/(x_[i]-x_[i-1]);
-			double q = (1-n)*y_[i] + n*y_[i+1] + n*(1-n)*(a*(1-n)+b*n);
+			if( t <= x_[0]) return y_[0];
+			if( t >= x_[k.length-1]) return y_[k.length-1];
 			
-			return q;
+			int i = 0;
+			while( t > x_[i] &&  ++i < k.length);
+			if( i == k.length) return y_[k.length-1];
+			
+			
+			double dx = x_[i]-x_[i-1];
+			double n = (t - x_[i-1])/dx;
+			
+			double a = k[i-1]*dx - (y_[i] - y_[i-1]);
+			double b =-k[i]*dx + (y_[i] - y_[i-1]);
+			
+			return  (1-n)*y_[i-1] + n*y_[i] + n*(1-n)*(a*(1-n)+b*n);
 		}
 		
 	}
@@ -492,7 +547,7 @@ public class Interpolation {
 			}
 		}
 		
-		public double f( double x) {
+		public double eval( double x) {
 			if( coef.length == 0) return 0;
 			double ret = coef[0];
 			double x_to_n = 1;

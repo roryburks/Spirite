@@ -35,6 +35,7 @@ import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 import spirite.pen.StrokeEngine.STATE;
+import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -89,6 +90,7 @@ public class DrawEngine {
 			return false;
 		}
 		else {
+			if( stroke.getHard()) stroke.setInterpolationMethod(InterpolationMethod.NONE);
 			activeEngine = (stroke.getHard())? defEngine : glEngine;
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
@@ -330,6 +332,7 @@ public class DrawEngine {
 							BasicStroke.CAP_SQUARE));
 				}
 				g2.drawLine( fromState.x, fromState.y, toState.x, toState.y);
+	
 				
 	
 				if( sel.selection != null) {

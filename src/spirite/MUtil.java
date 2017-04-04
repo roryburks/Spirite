@@ -54,6 +54,11 @@ public class MUtil {
 		if( value > max) return max;
 		return value;
 	}
+	public static double clip( double min, double value, double max) {
+		if( value < min) return min;
+		if( value > max) return max;
+		return value;
+	}
 	public static float clip( float min, float value, float max) {
 		if( value < min) return min;
 		if( value > max) return max;

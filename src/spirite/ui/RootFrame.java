@@ -176,6 +176,7 @@ public class RootFrame extends javax.swing.JFrame
     			
     			{"&Settings", null, null},
     			{".Manage &Hotkeys", "dialog.HOTKEY", null},
+    			{".&Tablet Settings", "dialog.TABLET", null},
     	};
     	
     	JMenuBar jMenuBar = new JMenuBar();
