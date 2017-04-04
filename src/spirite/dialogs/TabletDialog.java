@@ -8,11 +8,13 @@ import spirite.brains.SettingsManager;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,15 +36,20 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class TabletDialog extends JDialog
 {
+	private final String RAW_LABEL = "Raw Pressure";
+	private final String EFFECTIVE_LABEL = "Effective Pressure";
+	
 	private final MasterControl master;
 	private final SettingsManager settings;
 	
 //	private final JPanel curvePanel = new JPanel();
 	private final StrokeCurvePanel curvePanel = new StrokeCurvePanel();
 	private final JButton btnResetCurve = new JButton("Reset Curve");
+
 
 
 	TabletDialog( MasterControl master) {
@@ -63,24 +70,30 @@ public class TabletDialog extends JDialog
 	private void initLayout() {
 		setBounds(100, 100, 290, 500);
 		
+		JLabel lblDynamics = new JLabel("Tablet Pen Pressure Dynamics");
+		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(btnResetCurve, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(curvePanel, Alignment.LEADING, 250, 250, Short.MAX_VALUE))
-					.addContainerGap(174, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(btnResetCurve, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(curvePanel, Alignment.LEADING, 250, 250, Short.MAX_VALUE))
+						.addComponent(lblDynamics))
+					.addContainerGap(14, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
+					.addComponent(lblDynamics)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(curvePanel, 250, 250, 250)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnResetCurve)
-					.addContainerGap(171, Short.MAX_VALUE))
+					.addContainerGap(162, Short.MAX_VALUE))
 		);
 		getContentPane().setLayout(groupLayout);
 	}
@@ -135,19 +148,36 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
+			// Draw the grid border
 			g.setColor( Color.GRAY);
 			int x_[] = new int[]{ x1, x2, x2, x1, x1};
 			int y_[] = new int[]{ y1, y1, y2, y2, y1};
 			g.drawPolyline(x_, y_, 5);
 			
+			// Draw the grid
+			for( int i=1; i < 5; ++i) {
+				g.drawLine(x1 + ((x2-x1)*i)/5, y1, x1 + ((x2-x1)*i)/5, y2);
+				g.drawLine(x1, y1 + ((y2-y1)*i)/5, x2, y1 +((y2-y1)*i)/5);
+			}
+			
+			// Draw the linear guide
 			g.setColor(Color.BLACK);
 			g.drawLine( x1, y2, x2, y1);
 			
-			g.setColor(Color.BLACK);
-			g2.setStroke( new BasicStroke(2.0f));
+			// Draw the axis labels
+			FontMetrics fontMetrics = g2.getFontMetrics();
+			g.drawString(RAW_LABEL, x2 - fontMetrics.stringWidth(RAW_LABEL)-4, y2 - 4);
+			
+			AffineTransform trans = g2.getTransform();
+			g2.translate(x1+4, y1+4);
+			g2.rotate(Math.PI/2);
+			g.drawString(EFFECTIVE_LABEL, 0, 0);
+			
+			g2.setTransform(trans);
 			
 			
-			g.setColor(Color.red);
+			// Construct a list of Interpolation Curve points, possibly excluding the 
+			//	point you're dragging (if you're dragging it off)
 			List<Point2D> points = new ArrayList<>(weights.size());
 			for( int i=0; i < weights.size(); ++i) {
 				Point2D p2 = weights.get(i);
@@ -164,7 +194,8 @@ public class TabletDialog extends JDialog
 			}
 			
 
-			
+			// :::: Draw a Visual Representation of the Interpolation Curve
+			g.setColor(Color.red);
 			CubicSplineInterpolator csi = new CubicSplineInterpolator(points, true, true);
 
 			g2.setStroke( new BasicStroke(1.0f));

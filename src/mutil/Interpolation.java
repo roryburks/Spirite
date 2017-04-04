@@ -41,6 +41,11 @@ public class Interpolation {
 		public InterpolatedPoint evalExt(double t);
 	}
 	
+	/**
+	 * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to
+	 * construct an interpolation function, f(x) made up of piecewise-cubic
+	 * segments.
+	 */
 	public static class CubicSplineInterpolator
 		implements Interpolator
 	{
@@ -178,6 +183,16 @@ public class Interpolation {
 	}
 	
 	
+	/**
+	 * CubicSplineInterpolator2D is a two-dimensional curve interpolator which
+	 * uses Cubic Hermite Spline interpolation from a given number of points
+	 * to interpolate a 2D curve.  It maintains two seperate Hermite Splines:
+	 * one for the X-axis, and another for the Y-axis, which are both traversed
+	 * along a common axis (t).
+	 * 
+	 * The range of t is determined by the length of the line segments which 
+	 * make up the key-points.
+	 */
 	public static class CubicSplineInterpolator2D 
 		implements Interpolator2D
 	{
@@ -277,7 +292,7 @@ public class Interpolation {
 			length++;
 		}
 		
-		/** Expands the internal arrays in order to accomidate the new length. */
+		/** Expands the internal arrays in order to accommodate the new length. */
 		private void expand(int new_length) {
 			if( kx.length >= new_length) return;
 			
@@ -386,113 +401,14 @@ public class Interpolation {
 		
 	}
 	
-	/**
-	 * CubicSplineInterpolator2DFixed differs from CubicSplineInterpolator2D
-	 * in that each point represents a fixed t-length of 1 whereas in 
-	 * CubicSplineInterpolator2D, the t-length is determined by distancew
-	 */
-	public static class CubicSplineInterpolator2DFixed
-	{
-		private double kx[];
-		private double ky[];
-		private double x_[];
-		private double y_[];
-		private int length;
-		
-		public CubicSplineInterpolator2DFixed(List<Point2D> points, boolean fast) {
-			length = points.size();
-			kx = new double[length];
-			ky = new double[length];
-			x_ = new double[length];
-			y_ = new double[length];
-			for( int i=0; i<length; ++i) {
-				x_[i] = points.get(i).getX();
-				y_[i] = points.get(i).getY();
-			}
-			
-			fastCalculateSlopes();
-		}
-		
-		public double getCurveLength() {
-			return this.length;
-		}
-		
-		public void addPoint(double px, double py) {
-			if( length >= kx.length) {
-				// Expand the internal arrays as needed
-				int l = (kx.length*3 + 1)/2;
-				double t[] = new double[l];
-				System.arraycopy(kx, 0, t, 0, length);
-				kx = t;
-				t = new double[l];
-				System.arraycopy(ky, 0, t, 0, length);
-				ky = t;
-				t = new double[l];
-				System.arraycopy(x_, 0, t, 0, length);
-				x_ = t;
-				t = new double[l];
-				System.arraycopy(y_, 0, t, 0, length);
-				y_ = t;
-			}
-			
-			x_[length] = px;
-			y_[length] = py;
-
-			
-			if( length >= 2) {
-				kx[length-1] = (x_[length] - x_[length-2])/2;
-				ky[length-1] = (y_[length] - y_[length-2])/2;
-			}
-			kx[length] = (x_[length]-x_[length-1])/4;
-			ky[length] = (y_[length]-y_[length-1])/4;
-			
-			length++;
-		}
-		
-
-		
-		public int getLength() {return this.length;}
-		
-		private void fastCalculateSlopes() {
-			if( length <= 1) return;
-			
-			kx[0] = (x_[1] - x_[0])/4;
-			ky[0] = (y_[1] - y_[0])/4;
-			
-			int i = 0;
-			for( i = 1; i < length-1; ++i) {
-				kx[i] = (x_[i+1]-x_[i-1])/2;
-				ky[i] = (y_[i+1]-y_[i-1])/2;
-			}
-			kx[i] = (x_[i] - x_[i-1])/4;
-			ky[i] = (y_[i] - y_[i-1])/4;
-		}
-
-		public Point2D eval(double t) {
-			if( kx.length == 0) return new Point2D.Double(0,0);
-			
-			if( t <= 0) return new Point2D.Double(x_[0], y_[0]);
-			if( t >= length-1) return new Point2D.Double(x_[kx.length-1], y_[kx.length-1]);
-			
-			int i = (int)t;
-			
-			
-			double n = t - i;
-			double a_x = kx[i] - (x_[i+1] - x_[i]);
-			double b_x =-kx[i+1] + x_[i+1] - x_[i];
-			
-			double a_y = ky[i] - (y_[i+1] - y_[i]);
-			double b_y =-ky[i+1] + y_[i+1] - y_[i];
-			double qx = (1-n)*x_[i] + n*x_[i+1] + n*(1-n)*(a_x*(1-n)+b_x*n);
-			double qy = (1-n)*y_[i] + n*y_[i+1] + n*(1-n)*(a_y*(1-n)+b_y*n);
-			
-			return new Point2D.Double(qx, qy);
-		}
-	
-	}
 	
 	/** Constructs a Polygon of degree N-1 which goes through the given N
-	 * points and uses that Polygon to interpolate the data. */
+	 * points and uses that Polygon to interpolate the data. 
+	 * 
+	 * Lagrange Interpolations are a straightforward form of interpolation 
+	 * that results in an infinitely differentiable curve (meaning it is 
+	 * extremely smooth), but creates a curve which can have a lot of hills 
+	 * and valleys, resulting in a very erratic-looking curve. */
 	public static class LagrangeInterpolator 
 		implements Interpolator
 	{

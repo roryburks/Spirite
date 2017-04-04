@@ -646,7 +646,7 @@ public class ImageWorkspace {
 		if( !isValidHandle(image))
 			return null;
 		
-		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
+//		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
 		locked = true;
 		undoEngine.prepareContext(image);
 		
