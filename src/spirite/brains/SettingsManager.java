@@ -1,12 +1,20 @@
 package spirite.brains;
 
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import mutil.Interpolation;
+import mutil.Interpolation.CubicSplineInterpolator;
+import mutil.Interpolation.Interpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 
@@ -132,5 +140,80 @@ public class SettingsManager {
      *  !!! TODO: UNIMPLEMENTED !!*/
     public boolean getAllowsEdittingInvisible() {
     	return false;
+    }
+    
+    
+    // ==============
+    // ==== Tablet Pressure Curve
+
+    CubicSplineInterpolator interpolator = null;
+
+	// tpcPoints format:
+	// [2, short] : Number of points (min 1)
+	// Per point:
+	//		[8, double] : x
+	//		[8, double] : y
+    
+    /** Gets the interpolator for interpreting tablet pressure, either recalling
+     * it from memory or loading it from preferences.
+     */
+    public CubicSplineInterpolator getTabletInterpolator() {
+    	if( interpolator != null)
+    		return interpolator;
+    	byte[] raw = prefs.getByteArray("tpcPoints", null);
+    	Point2D[] points = null;
+    	if( raw != null) {
+			System.out.println("BAD");
+    		try {
+		    	ByteBuffer buff = ByteBuffer.wrap(raw);
+		    	
+		    	int num = buff.getShort();
+		    	points = new Point2D[num];
+		    	for( int i=0; i<num; ++i) {
+		    		double x = buff.getDouble();
+		    		double y = buff.getDouble();
+		    		points[i] = new Point2D.Double(x, y);
+		    	}
+    		} catch( BufferUnderflowException e) {
+    			raw = null;
+    		}
+    	}
+    	if( raw == null){
+    		points = new Point2D[2];
+    		points[0] = new Point2D.Double(0, 0);
+    		points[1] = new Point2D.Double(1, 1);
+    	}
+    	
+    	interpolator = new CubicSplineInterpolator(
+    			Arrays.asList(points), true, true);
+    	
+    	return interpolator;
+    }
+    
+    /** Changes the intepolator for interpetting tablet pressure to one constructed
+     * from the given points, saving it to preferences as it makes it.
+     * 
+     * @param a list of points, must be non-null, at least 1 big, each point should
+     * be in between (0,0) and (1,1), inclusive
+     * @return the constructed Interpolator
+     * */
+    public CubicSplineInterpolator setTabletInterpolationPoints( List<Point2D> points) {
+    	if( points == null || points.size() <= 1 || points.size() > Short.MAX_VALUE)
+    		return getTabletInterpolator();
+    	
+    	ByteBuffer bb = ByteBuffer.allocate( 2 + 8*2*points.size());
+    	
+    	bb.putShort((short)points.size());
+    	for( int i=0; i<points.size(); ++i) {
+    		bb.putDouble(points.get(i).getX());
+    		bb.putDouble(points.get(i).getY());
+    	}
+    	prefs.putByteArray("tpcPoints", bb.array());
+    	
+
+    	interpolator = new CubicSplineInterpolator(
+    			points, true, true);
+    	
+    	return interpolator;
     }
 }

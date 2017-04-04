@@ -4,6 +4,7 @@ import javax.swing.JDialog;
 
 import spirite.MUtil;
 import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -37,6 +38,7 @@ import java.awt.event.ActionEvent;
 public class TabletDialog extends JDialog
 {
 	private final MasterControl master;
+	private final SettingsManager settings;
 	
 //	private final JPanel curvePanel = new JPanel();
 	private final StrokeCurvePanel curvePanel = new StrokeCurvePanel();
@@ -45,10 +47,13 @@ public class TabletDialog extends JDialog
 
 	TabletDialog( MasterControl master) {
 		this.master = master;
+		this.settings = master.getSettingsManager();
 		
-
-		weights.add(new Point2D.Double(0,0));
-		weights.add(new Point2D.Double(1,1));
+		CubicSplineInterpolator csi = settings.getTabletInterpolator();
+		
+		for( int i=0; i < csi.getNumPoints(); ++i) {
+			weights.add(new Point2D.Double(csi.getX(i), csi.getY(i)));
+		}
 		curvePanel.setBackground(bg);
 		curvePanel.setOpaque(true);
 		initLayout();
@@ -86,9 +91,14 @@ public class TabletDialog extends JDialog
 				weights.clear();
 				weights.add(new Point2D.Double(0,0));
 				weights.add(new Point2D.Double(1,1));
+				saveWeights();
 				curvePanel.repaint();
 			}
 		});
+	}
+	
+	private void saveWeights() {
+		settings.setTabletInterpolationPoints(weights);
 	}
 	
 
@@ -276,6 +286,7 @@ public class TabletDialog extends JDialog
 						weights.remove(movingPoint);
 					
 					movingPoint = null;
+					saveWeights();
 					repaint();
 				}
 			}

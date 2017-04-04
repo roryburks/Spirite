@@ -30,6 +30,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderSettings;
+import spirite.brains.SettingsManager;
 import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.brains.ToolsetManager.Tool;
@@ -82,6 +83,7 @@ public class Penner
 	private final DrawEngine drawEngine;
 	private final ToolsetManager toolsetManager;
 	private final PaletteManager paletteManager;
+	private final SettingsManager settingsManager;
 	private final RenderEngine renderEngine;	// used for color picking.
 												// might not belong here, maybe in DrawEngine
 	
@@ -122,6 +124,7 @@ public class Penner
 		this.toolsetManager = master.getToolsetManager();
 		this.paletteManager = master.getPaletteManager();
 		this.renderEngine = master.getRenderEngine();
+		this.settingsManager = master.getSettingsManager();
 		
 		toolsetManager.addToolsetObserver(this);
 		
@@ -411,7 +414,7 @@ public class Penner
 		y = zoomer.stiYm( rawY);
 	}
 	public void rawUpdatePressure( float pressure) {
-		this.pressure = pressure;
+		this.pressure = MUtil.clip(0, (float)settingsManager.getTabletInterpolator().eval(pressure), 1);
 	}
 	
 	// By design, StateBehavior has and should make use of all local variables

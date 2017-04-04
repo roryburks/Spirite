@@ -270,7 +270,7 @@ public class DrawEngine {
 	private static final PenDynamics basicDynamics = new PenDynamics() {
 		@Override
 		public float getSize(PenState ps) {
-			return 1.0f;
+			return ps.pressure;
 		}
 	};
 

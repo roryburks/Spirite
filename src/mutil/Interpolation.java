@@ -111,6 +111,10 @@ public class Interpolation {
 			k[i] = (y_[i] - y_[i-1])/(x_[i]-x_[i-1]);
 		}
 		
+		public int getNumPoints() {return k.length;}
+		public double getX(int n) {return x_[n];}
+		public double getY(int n) {return y_[n];}
+		
 		@Override
 		public double eval(double t) {
 			if( k.length == 0) return 0;

@@ -44,7 +44,7 @@ public abstract class StrokeEngine {
 		private float width = 1.0f;
 		private float alpha = 1.0f;
 		private boolean hard = false;
-		private PenDynamics dynamics = DrawEngine.getDefaultDynamics();
+		private PenDynamics dynamics = DrawEngine.getBasicDynamics();
 		private int maxWidth = 25;
 		private InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC_SPLINE;
 		
