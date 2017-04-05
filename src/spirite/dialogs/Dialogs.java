@@ -31,6 +31,7 @@ public class Dialogs
 	public enum DialogType {
 		HOTKEY,
 		TABLET,
+		DEBUG,
 //		PICK_COLOR,
 	}
 	
@@ -56,6 +57,10 @@ public class Dialogs
 			break;}
 		case TABLET:{
 			TabletDialog dialog = new TabletDialog(master);
+			dialog.setVisible(true);
+			break;}
+		case DEBUG: {
+			DebugDialog dialog = new DebugDialog(master);
 			dialog.setVisible(true);
 			break;}
 		}

@@ -177,7 +177,7 @@ public class DrawEngine {
 				trans.scale(1, -1);
 			selectionEngine.transformSelection(trans);
 		}
-		else if( sel == null)
+		else if( sel == null || sel.selection == null)
 			execute( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
 		else {
 			UndoableAction actions[] = new UndoableAction[2];

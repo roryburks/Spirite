@@ -1,6 +1,7 @@
 
 package spirite.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -13,8 +14,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -44,11 +48,30 @@ import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
  */
 public class RootFrame extends javax.swing.JFrame
         implements KeyEventDispatcher, WindowFocusListener, ActionListener, 
-        	WindowListener, CommandExecuter
+        	WindowListener
 {
 	private static final long serialVersionUID = 1L;
-    
+	
+	// UI Strings to be generalized later
+	private static final String MULTIPLE_WORKSPACES_UNSAVED = "Multiple Workspaces are unsaved, save them before closing?";
+	private static final String CLOSING_PROGRAM = "Closing Program";
+	private static final String FILE_SAVING_CLOSE = "File is still saving, close anyway?";
+	private static final String CLOSING = "Closing Spirite";
+	
     private final MasterControl master;
+
+    private final ContextualCommandExecuter commandExecuter = new ContextualCommandExecuter();
+
+    // :::: UI Components
+    private PalettePanel palettePanel;
+    private ToolsPanel toolsPanel;
+    private ToolSettingsPanel settingPanel;
+    private WorkTabPane workPane;
+    private RigPanel rigPanel;
+    private JPanel leftContainer;
+    private ResizeContainerPanel rightContainer;
+    private ResizeContainerPanel rrContainer;
+    private ResizeContainerPanel container;
 
     public RootFrame( MasterControl master) {
         this.master =  master;
@@ -61,25 +84,13 @@ public class RootFrame extends javax.swing.JFrame
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
         
 
-        master.newWorkspace(640,480,new java.awt.Color(0,0,0,0), true);
+        master.newWorkspace(640,480,new Color(0,0,0,0), true);
         master.getCurrentWorkspace().finishBuilding();
     }
     
-
-    private PalettePanel palettePanel;
-    private ToolsPanel toolsPanel;
-    private ToolSettingsPanel settingPanel;
-    private WorkTabPane workPane;
-    private RigPanel rigPanel;
     
-    private JPanel leftContainer;
-    private ResizeContainerPanel rightContainer;
-    private ResizeContainerPanel rrContainer;
-    
-    private ResizeContainerPanel container;
-
-    
-
+    // ==============
+    // ==== Initialization
     private void initComponents() {
     	this.setLayout(new GridLayout());
     	
@@ -125,11 +136,6 @@ public class RootFrame extends javax.swing.JFrame
         pack();
     }                   
     
-
-
-
-    
-
     private void initMenu() {
     	final String[][] menuScheme = {
     			//Name, actionString, icon
@@ -172,11 +178,11 @@ public class RootFrame extends javax.swing.JFrame
     			{"..&Reference Scheme", "frame.showReferenceFrame", "icon.frame.referenceScheme"},
     			
     			{".&Animation View", "frame.showAnimationView", null},
-    			{".Debug View", "frame.showDebugDialog", null},
     			
     			{"&Settings", null, null},
     			{".Manage &Hotkeys", "dialog.HOTKEY", null},
     			{".&Tablet Settings", "dialog.TABLET", null},
+    			{".&Debug Stats", "dialog.DEBUG", null},
     	};
     	
     	JMenuBar jMenuBar = new JMenuBar();
@@ -186,20 +192,77 @@ public class RootFrame extends javax.swing.JFrame
         setJMenuBar(jMenuBar);
     }
     
+    // ===============
+    // ==== Command Executer
+    public CommandExecuter getCommandExecuter() {
+    	return commandExecuter;
+    }
+    class ContextualCommandExecuter implements CommandExecuter {
+    	private final Map<String, Runnable> commandMap = new HashMap<>();
+    	private WorkPanel workPanel;
+    	private Zoomer zoomer;
+		
+		private ContextualCommandExecuter() {
+			commandMap.put("zoom_in", new Runnable() { @Override public void run() {
+	        	zoomer.zoomIn();
+			}});
+			commandMap.put("zoom_out", new Runnable() { @Override public void run() {
+	        	zoomer.zoomOut();
+			}});
+			commandMap.put("zoom_in_slow", new Runnable() { @Override public void run() {
+	        	zoomer.setZoomLevel(zoomer.getZoomLevel()+1);
+			}});
+			commandMap.put("zoom_out_slow", new Runnable() { @Override public void run() {
+	        	zoomer.setZoomLevel(zoomer.getZoomLevel()-1);
+			}});
+			commandMap.put("zoom_0", new Runnable() { @Override public void run() {
+	        	zoomer.setZoomLevel(0);
+			}});
+		}
+		
+		@Override
+		public List<String> getValidCommands() {
+			return new ArrayList<>(commandMap.keySet());
+		}
+		@Override
+		public String getCommandDomain() {
+			return "context";
+		}
+		
+		@Override
+		public boolean executeCommand(String command) {
+	    	workPanel = workPane.getCurrentWorkPane();
+	    	if( workPanel == null) return true;
+	    	
+	    	zoomer = workPanel.zoomer;
+	    	
+	    	Runnable exe = commandMap.get(command);
+	    	if( exe != null) {
+	    		exe.run();
+	    		return true;
+	    	}
+		    
+			return false;
+		}
+    }
+    
+    WorkTabPane getWTPane() {
+    	return this.workPane;
+    }
+    
+    // ============
+    // ==== Interfaces
+    
     // :::: KeyEventDispatcher
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
-
-
-        // Hotkeys
-        if( e.getID() == KeyEvent.KEY_PRESSED) {
+    	// Dispatches Key Events on a global level to the HotkeyManager
+    	//	then performs the command string (if there is one assosciated
+    	//	with the key press combo)        
+    	if( e.getID() == KeyEvent.KEY_PRESSED) {
             int key = e.getKeyCode();
             int modifier = e.getModifiersEx();
             
-        	// ::: Copy/Cut/Paste have hard-coded hotkeys
-//			int mod = e.getModifiersEx() & (KeyEvent.ALT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK);
-//			if( modifier == mod) {	// I'm not sure why I was compelled to limit it to no extended modifiers, but I don't think there's a good reason
-
             String command = master.getHotekyManager().getCommand( key, modifier);
 
         	if( command != null)
@@ -210,9 +273,6 @@ public class RootFrame extends javax.swing.JFrame
         return false;
     }
     
-    WorkTabPane getWTPane() {
-    	return this.workPane;
-    }
 
     // :::: WindowFocusListener
 	@Override	public void windowLostFocus(WindowEvent arg0) {	}
@@ -243,6 +303,7 @@ public class RootFrame extends javax.swing.JFrame
 	@Override	public void windowOpened(WindowEvent arg0) {}
 	@Override
 	public void windowClosing(WindowEvent evt) {
+		// Prompt the User to save before closing
 		int unsaved = 0;
 		List<ImageWorkspace> workspaces = master.getWorkspaces();
 		
@@ -253,8 +314,8 @@ public class RootFrame extends javax.swing.JFrame
 		
 		if( unsaved > 1) {
 			int response = JOptionPane.showConfirmDialog(this, 
-					"Multiple Workspaces are unsaved, save them before closing?", 
-					"Closing Program",
+					MULTIPLE_WORKSPACES_UNSAVED, 
+					CLOSING_PROGRAM,
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			
 			 if( response == JOptionPane.CANCEL_OPTION)
@@ -311,7 +372,7 @@ public class RootFrame extends javax.swing.JFrame
 						thread.isAlive() &&  option == JOptionPane.NO_OPTION)
 				{
 					thread.join(30*1000);
-					option = JOptionPane.showConfirmDialog(null, "File is still saving, close anyway?", "Closing Spirite", JOptionPane.YES_NO_CANCEL_OPTION);
+					option = JOptionPane.showConfirmDialog(null, FILE_SAVING_CLOSE, CLOSING, JOptionPane.YES_NO_CANCEL_OPTION);
 				}
 				
 				if( option == JOptionPane.CANCEL_OPTION) {
@@ -336,54 +397,4 @@ public class RootFrame extends javax.swing.JFrame
 
 
 
-	// CommandExecuter
-	@Override
-	public List<String> getValidCommands() {
-		// TODO: Less hard-coded.
-		return Arrays.asList(new String[]{
-			"zoom_in",
-			"zoom_out",
-			"zoom_in_slow",
-			"zoom_out_slow",
-			"zoom_0"
-		});
-	}
-
-	@Override
-	public String getCommandDomain() {
-		return "context";
-	}
-	
-	@Override
-	public boolean executeCommand(String command) {
-    	// !!! TODO: As I add new components that can have contextual commands
-    	//	figure out how I want to generalize this
-    	WorkPanel workPanel = workPane.getCurrentWorkPane();
-    	if( workPanel == null) return true;
-    	
-    	Zoomer zoomer = workPanel.zoomer;
-    	
-        if( command.equals("zoom_in")) {
-        	zoomer.zoomIn();
-        	return true;
-        }
-        else if( command.equals("zoom_out")) {
-        	zoomer.zoomOut();
-        	return true;
-        }
-        else if( command.equals("zoom_in_slow")) {
-        	zoomer.setZoomLevel(zoomer.getZoomLevel()+1);
-        	return true;
-        }
-        else if( command.equals("zoom_out_slow")) {
-        	zoomer.setZoomLevel(zoomer.getZoomLevel()-1);
-        	return true;
-        }
-        else if( command.equals("zoom_0")) {
-        	zoomer.setZoomLevel(0);
-        	return true;
-        }
-	    
-		return false;
-	}
 }

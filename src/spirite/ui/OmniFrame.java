@@ -484,7 +484,7 @@ public class OmniFrame extends JPanel
 			
 		}
 
-		// DragSourceListener
+		// :::: DragSourceListener
 		@Override		public void dragEnter(DragSourceDragEvent arg0) {}
 		@Override		public void dragOver(DragSourceDragEvent arg0) {}
 		@Override		public void dropActionChanged(DragSourceDragEvent arg0) {}

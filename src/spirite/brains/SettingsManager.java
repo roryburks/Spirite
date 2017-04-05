@@ -2,9 +2,7 @@ package spirite.brains;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -12,9 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import mutil.Interpolation;
 import mutil.Interpolation.CubicSplineInterpolator;
-import mutil.Interpolation.Interpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 

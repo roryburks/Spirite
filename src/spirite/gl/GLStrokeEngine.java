@@ -153,7 +153,6 @@ public class GLStrokeEngine extends StrokeEngine {
 		int len;
 	}
 	
-	private static final int DISTANCE_THRESHOLD = 5;
 	private GLVBuffer composeVBuffer( List<PenState> states) {
 		GLVBuffer vb = new GLVBuffer();
 		

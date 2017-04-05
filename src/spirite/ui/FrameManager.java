@@ -1,6 +1,8 @@
 package spirite.ui;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
@@ -151,7 +153,9 @@ public class FrameManager
 		
 		if( root != null) {
 			Point p = root.getLocationOnScreen();
-			d.setLocation( p.x + root.getWidth(), p.y);
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			int put_x = Math.min( screenSize.width - d.getWidth(), p.x + root.getWidth());
+			d.setLocation( put_x, p.y);
 		}
 
 		d.setVisible(true);
@@ -271,13 +275,6 @@ public class FrameManager
 			@Override public void run() {
 				JDialog d = new JDialog();
 				d.add(new AnimationPreviewPanel(master));
-				d.pack();
-				d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				d.setVisible(true);
-			}
-		});commandMap.put("showDebugDialog", new Runnable() {
-			@Override public void run() {
-				DebugDialog d = new DebugDialog(master);
 				d.pack();
 				d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				d.setVisible(true);

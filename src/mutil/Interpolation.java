@@ -14,7 +14,7 @@ import spirite.MUtil;
 /**
  * A Package which contains a set of classes for interpolating data.
  * 
- * TODO: Implement Bezier and CubicSpline interpolation
+ * TODO: Implement Bezier interpolation
  * 
  * @author Rory Burks
  */
@@ -59,7 +59,7 @@ public class Interpolation {
 		 * 
 		 * @param points_
 		 * @param fast
-		 * @param spatial spatial weighting weights the point slopes not by 
+		 * @param spatial spatial weighting weights the point slopes by 
 		 * the total distance between two points, not just the X-distance.  
 		 * Produces a result very similar (though not identical) to a 2D 
 		 * Cubic Spline that only has points with strictly increasing X values.

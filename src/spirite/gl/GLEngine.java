@@ -2,7 +2,6 @@ package spirite.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -11,7 +10,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import com.hackoeur.jglm.Mat4;
@@ -19,14 +17,10 @@ import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
-import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.TraceGL4;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
@@ -190,6 +184,7 @@ public class GLEngine  {
 		case CHANGE_COLOR:
 		case PASS_INVERT:
 		case SQARE_GRADIENT:
+		case STROKE_SPORE:
 		case PASS_ESCALATE:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
@@ -457,9 +452,9 @@ public class GLEngine  {
 				null, 
 				"shaders/square_grad.frag");
         programs[ProgramType.BASIC_STROKE.ordinal()] = loadProgramFromResources(
-				"shaders/stroke_basic.vert", 
-				"shaders/stroke_basic.geom", 
-				"shaders/stroke_basic.frag");
+				"shaders/brushes/stroke_basic.vert", 
+				"shaders/brushes/stroke_basic.geom", 
+				"shaders/brushes/stroke_basic.frag");
         programs[ProgramType.CHANGE_COLOR.ordinal()] = loadProgramFromResources( 
 				"shaders/pass.vert", 
 				null, 
@@ -484,8 +479,6 @@ public class GLEngine  {
 				"shaders/brushes/brush_spore.vert", 
 				"shaders/brushes/brush_spore.geom", 
 				"shaders/brushes/brush_spore.frag");
-        
-
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){
@@ -545,8 +538,10 @@ public class GLEngine  {
 			bufferInfoLog.clear();
         }
 
-        shaderList.forEach(shader -> gl.glDetachShader(program, shader));
 
+		for( Integer shader : shaderList){
+			gl.glDetachShader(program, shader);
+		}
         status.clear();
 
         return program;

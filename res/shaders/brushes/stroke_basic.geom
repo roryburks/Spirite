@@ -53,11 +53,11 @@ void main()
     
     gl_Position = perspectiveMatrix*vec4(bl-vec2(cang2,sang2)*w1,0,1);
     EmitVertex();
-    gl_Position = perspectiveMatrix*vec4(bl,0,1);
+    gl_Position = perspectiveMatrix*vec4(bl+vec2(cang2,sang2)*w1,0,1);
     EmitVertex();
     gl_Position = perspectiveMatrix*vec4(br-vec2(cang2,sang2)*w1,0,1);
     EmitVertex();
-    gl_Position = perspectiveMatrix*vec4(br,0,1);
+    gl_Position = perspectiveMatrix*vec4(br+vec2(cang2,sang2)*w1,0,1);
     EmitVertex();
     EndPrimitive();
     
@@ -72,11 +72,11 @@ void main()
 	tr += vec2(sang2, -cang2) * w2;
     gl_Position = perspectiveMatrix*vec4(tl+vec2(cang2,sang2)*w2,0,1);
     EmitVertex();
-    gl_Position = perspectiveMatrix*vec4(tl,0,1);
+    gl_Position = perspectiveMatrix*vec4(tl-vec2(cang2,sang2)*w2,0,1);
     EmitVertex();
     gl_Position = perspectiveMatrix*vec4(tr+vec2(cang2,sang2)*w2,0,1);
     EmitVertex();
-    gl_Position = perspectiveMatrix*vec4(tr,0,1);
+    gl_Position = perspectiveMatrix*vec4(tr-vec2(cang2,sang2)*w2,0,1);
     EmitVertex();
     EndPrimitive();
     

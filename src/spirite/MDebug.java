@@ -1,5 +1,10 @@
 package spirite;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
 /***
@@ -10,6 +15,8 @@ import javax.swing.JOptionPane;
 public class MDebug {
 	
 	public static final boolean DEBUG = true;
+	
+	private static List<String> debugLog = new ArrayList<>();
 	
 	public static enum ErrorType {
 		FILE,
@@ -61,22 +68,68 @@ public class MDebug {
 	
 	public static void handleWarning( WarningType priority, Object source, String message) {
 		System.out.println( "Warning: " + message);
+		pushLog("Warning: " + message);
 	}
 
 	public static void handleError( ErrorType type, String message) {
 		Thread.dumpStack();
         JOptionPane.showMessageDialog(null, "Error: " + message);
+        pushLog("Error: " + message);
 	}
 	public static void handleError( ErrorType type, Exception source, String message) {
 		source.printStackTrace();
         JOptionPane.showMessageDialog(null, "Error: " + message);
+        pushLog("Error: " + message);
 	}
 
     public static void note( String message) {
         JOptionPane.showMessageDialog(null, message);
+        pushLog("Note: " + message);
     }
 
     public static void log( String message) {
 		System.out.println( "Log: " + message);
+		pushLog("Log: " + message);
+    }
+    
+    public static void clearDebugLog() {
+    	debugLog.clear();
+    	triggerLog();
+    }
+    
+    private static void pushLog(String str) {
+    	debugLog.add(str);
+    	triggerLog();
+    }
+    public static List<String> getLog() {
+    	return new ArrayList<>(debugLog);
+    }
+    
+    
+    // ==================
+    // ==== Debug Observer
+    public static interface DebugObserver {
+    	public void logChanged();
+    }
+    private static final List<WeakReference<DebugObserver>> observers = new ArrayList<>();
+    public static void addLogObserver(DebugObserver obs) {
+    	observers.add(new WeakReference<MDebug.DebugObserver>(obs));
+    }
+    public static void removeLogObserver(DebugObserver obs) {
+    	Iterator<WeakReference<DebugObserver>> it = observers.iterator();
+    	while( it.hasNext()) {
+    		DebugObserver other = it.next().get();
+    		if( other == null || other.equals(obs))
+    			it.remove();
+    	}
+    }
+    private static void triggerLog(){
+    	Iterator<WeakReference<DebugObserver>> it = observers.iterator();
+    	while( it.hasNext()) {
+    		DebugObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else
+    			obs.logChanged();
+    	}
     }
 }

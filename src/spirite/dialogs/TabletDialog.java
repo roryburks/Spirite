@@ -1,59 +1,48 @@
 package spirite.dialogs;
 
-import javax.swing.JDialog;
-
-import spirite.MUtil;
-import spirite.brains.MasterControl;
-import spirite.brains.SettingsManager;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import javax.swing.border.BevelBorder;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 import mutil.Interpolation.CubicSplineInterpolator;
-import mutil.Interpolation.CubicSplineInterpolator2D;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JLabel;
+import spirite.MUtil;
+import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
 
 public class TabletDialog extends JDialog
 {
-	private final String RAW_LABEL = "Raw Pressure";
-	private final String EFFECTIVE_LABEL = "Effective Pressure";
+	private static final String RAW_LABEL = "Raw Pressure";
+	private static final String EFFECTIVE_LABEL = "Effective Pressure";
+	private static final String RESET_LABEL = "Reset Curve";
 	
-	private final MasterControl master;
 	private final SettingsManager settings;
 	
 //	private final JPanel curvePanel = new JPanel();
 	private final StrokeCurvePanel curvePanel = new StrokeCurvePanel();
-	private final JButton btnResetCurve = new JButton("Reset Curve");
+	private final JButton btnResetCurve = new JButton(RESET_LABEL);
 
 
 
 	TabletDialog( MasterControl master) {
-		this.master = master;
 		this.settings = master.getSettingsManager();
 		
 		CubicSplineInterpolator csi = settings.getTabletInterpolator();
@@ -186,8 +175,8 @@ public class TabletDialog extends JDialog
 				//	moving and it's been draged left of the previous point or
 				//	right of the next point, don't display it."
 				if( p2 != movingPoint || 
-					!((i > 0 && movingPoint.getX() < weights.get(i-1).getX()) ||
-					 ( i < weights.size()-1 && movingPoint.getX() > weights.get(i+1).getX())))
+					!((i > 0 && movingPoint.getX() <= weights.get(i-1).getX()) ||
+					 ( i < weights.size()-1 && movingPoint.getX() >= weights.get(i+1).getX())))
 				{
 					points.add(p2);	
 				}
@@ -311,9 +300,9 @@ public class TabletDialog extends JDialog
 					
 					// Remove the point you're moving if you've dragged it left
 					//	of the previous or right of the next point.
-					if( i > 0 && movingPoint.getX() < weights.get(i-1).getX())
+					if( i > 0 && movingPoint.getX() <= weights.get(i-1).getX())
 						weights.remove(movingPoint);
-					else if( i < weights.size()-1 && movingPoint.getX() > weights.get(i+1).getX())
+					else if( i < weights.size()-1 && movingPoint.getX() >= weights.get(i+1).getX())
 						weights.remove(movingPoint);
 					
 					movingPoint = null;

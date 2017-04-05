@@ -114,7 +114,7 @@ public class MasterControl
         	toolset,
         	palette,
         	frameManager,
-        	frameManager.getRootFrame(),
+        	frameManager.getRootFrame().getCommandExecuter(),
         	dialog
         };
     }

@@ -335,15 +335,6 @@ public class Penner
 				}
 				break;}
 			case COLOR_CHANGE: {
-/*				// !!! DEBUG!!!
-				try {
-					ImageIO.write(
-					GLUIDraw._ddbounds(selectionEngine.getLiftedImage(), 0),
-					"PNG", new File("E:/test.png"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
 				if( holdingCtrl)  {
 					behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
 					break;
@@ -664,10 +655,8 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			float zoom = zoomer.getZoom();
 			workspace.getReferenceManager().shiftTransform((x-oldX), (y-oldY));
 		}
-		
 	}
 	
 	class FormingSelectionBehavior extends StateBehavior {
@@ -1142,7 +1131,6 @@ public class Penner
 			case READY:
 				break;
 			case RESIZE:{
-				Dimension d = sel.selection.getDimension();
 				Point2D pn = new Point2D.Float();
 				Point2D ps = new Point2D.Float();
 
