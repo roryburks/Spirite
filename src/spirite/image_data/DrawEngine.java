@@ -66,9 +66,6 @@ public class DrawEngine {
 	public boolean strokeIsDrawing() {
 		return activeEngine != null;
 	}
-	public BufferedImage getStrokeLayer() {
-		return (activeEngine == null) ? null : activeEngine.getStrokeLayer();
-	}
 	public StrokeEngine getStrokeEngine() {
 		return activeEngine;
 	}
@@ -313,11 +310,56 @@ public class DrawEngine {
 	 */
 	public class DefaultStrokeEngine extends StrokeEngine
 	{
+		BufferedImage displayLayer;
+		BufferedImage fixedLayer;
+		BufferedImage selectionMask;
+		
 		protected DefaultStrokeEngine() {
 		}
 		
 		@Override
-		public boolean drawToLayer(BufferedImage layer, List<PenState> states) {
+		protected void onStart() {
+			displayLayer = new BufferedImage( 
+					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
+			fixedLayer = new BufferedImage( 
+					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
+			
+			if( sel.selection != null) {
+				selectionMask = new BufferedImage( 
+						data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
+				MUtil.clearImage(selectionMask);
+				
+				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
+				g2.translate(sel.offsetX, sel.offsetY);
+				sel.selection.drawSelectionMask(g2);
+				g2.dispose();
+			}
+		}
+		@Override
+		protected void onEnd() {
+			displayLayer.flush();
+			fixedLayer.flush();
+			displayLayer = null;
+			fixedLayer = null;
+			if( selectionMask != null) {
+				selectionMask.flush();
+				selectionMask = null;
+			}
+		}
+		
+
+		@Override
+		protected void prepareDisplayLayer() {
+			MUtil.clearImage(displayLayer);
+			Graphics g = displayLayer.getGraphics();
+			g.drawImage(fixedLayer, 0, 0, null);
+			
+		}
+		
+		@Override
+		protected boolean drawToLayer(List<PenState> states, boolean permanent) {
+			BufferedImage layer = (permanent)?fixedLayer:displayLayer;
+			
 			Graphics g = layer.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
 			g.setColor( stroke.getColor());
@@ -344,7 +386,12 @@ public class DrawEngine {
 			g.dispose();
 			return true;
 		}
-		
+
+		@Override
+		protected void drawDisplayLayer(Graphics g) {
+			g.drawImage(displayLayer, 0, 0, null);
+		}
+
 /*		@Override
 		public boolean startDrawStroke( PenState ps) {
 			int crgb = stroke.getColor().getRGB();

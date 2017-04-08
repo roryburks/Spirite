@@ -1,6 +1,7 @@
 package spirite.gl;
 
 import java.awt.AlphaComposite;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -14,6 +15,7 @@ import com.jogamp.opengl.util.GLBuffers;
 import mutil.MatrixBuilder;
 import spirite.gl.GLEngine.PreparedData;
 import spirite.gl.GLEngine.ProgramType;
+import spirite.gl.GLMultiRenderer.GLRenderer;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
@@ -26,6 +28,9 @@ import spirite.pen.StrokeEngine;
  */
 public class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
+	private GLMultiRenderer fixedLayer;
+	private GLMultiRenderer displayLayer;
+	private int w, h;
 	
 	public GLStrokeEngine() {
 	}
@@ -33,11 +38,62 @@ public class GLStrokeEngine extends StrokeEngine {
 	protected void finalize() throws Throwable {
 		super.finalize();
 	}
+	@Override
+	protected void onStart() {
+		w = data.getWidth();
+		h = data.getHeight();
+		fixedLayer = new GLMultiRenderer( w, h, engine.getGL2());
+		displayLayer = new GLMultiRenderer( w, h, engine.getGL2());
+		
+		fixedLayer.init();
+		displayLayer.init();
+	}
+	@Override
+	protected void onEnd() {
+		fixedLayer.cleanup();
+		displayLayer.cleanup();
+		fixedLayer = null;
+		displayLayer = null;
+	}
 	
 
 	@Override
-	public boolean drawToLayer( BufferedImage layer, List<PenState> states) {
-		_stroke( composeVBuffer(states));
+	protected void prepareDisplayLayer() {
+		displayLayer.render( new GLRenderer() {
+			@Override
+			public void render(GL gl) {
+				engine.setSurfaceSize(w, h);
+				engine.clearSurface();
+				
+				GLParameters params = new GLParameters(w, h);
+				params.texture = new GLParameters.GLFBOTexture(fixedLayer);
+				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+			}
+		});
+	}
+	@Override
+	protected void drawDisplayLayer(Graphics g) {
+		engine.setSurfaceSize(w, h);
+		engine.clearSurface();
+		GLParameters params = new GLParameters(w, h);
+		params.texture = new GLParameters.GLFBOTexture(displayLayer);
+		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+		
+		BufferedImage bi = engine.glSurfaceToImage();
+		g.drawImage( bi, 0, 0, null);
+	}
+	
+
+	@Override
+	protected boolean drawToLayer( List<PenState> states, boolean permanent) {
+		GLMultiRenderer glmu = (permanent)?fixedLayer:displayLayer;
+		
+		glmu.render( new GLRenderer() {
+			@Override public void render(GL gl) {
+				_stroke( composeVBuffer(states));
+			}
+		});
+/*		_stroke( composeVBuffer(states));
 		
 
         BufferedImage im = engine.glSurfaceToImage(); 
@@ -48,7 +104,7 @@ public class GLStrokeEngine extends StrokeEngine {
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 			g2.drawImage(selectionMask, 0, 0, null);
 		}
-		g2.dispose();
+		g2.dispose();*/
 		
 		return true;
 	}
@@ -220,7 +276,7 @@ public class GLStrokeEngine extends StrokeEngine {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
         gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 
-        int prog = engine.getProgram(ProgramType.BASIC_STROKE);
+        int prog = engine.getProgram(ProgramType.STROKE_BASIC);
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams

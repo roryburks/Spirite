@@ -115,6 +115,7 @@ public class GLUIDraw {
 		glmu.init();
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
+				engine.clearSurface();
 				GLParameters params2 = new GLParameters(swidth, sheight);
 				params2.texture = new GLImageTexture(image);
 				engine.applyPassProgram( ProgramType.CHANGE_COLOR, params2, trans,
@@ -130,7 +131,7 @@ public class GLUIDraw {
 
     	engine.clearSurface();
 		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true);
-		
+
 		// Clean up and Apply the surface to an image
 		glmu.cleanup();
 

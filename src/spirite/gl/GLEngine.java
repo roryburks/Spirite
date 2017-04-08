@@ -163,17 +163,21 @@ public class GLEngine  {
 	public enum ProgramType {
 		DEFAULT,
 		SQARE_GRADIENT,
-		BASIC_STROKE,
 		CHANGE_COLOR,
+		
+		PASS_BASIC,
 		PASS_BORDER,
 		PASS_INVERT,
 		PASS_RENDER,
-		PASS_ESCALATE, STROKE_SPORE,
+		PASS_ESCALATE, 
+		
+		STROKE_SPORE,
+		STROKE_BASIC,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
         switch( type) {
-		case BASIC_STROKE:
+		case STROKE_BASIC:
 		case DEFAULT:
 		case PASS_RENDER:
 	        gl.glEnable(GL.GL_BLEND);
@@ -451,7 +455,7 @@ public class GLEngine  {
 				"shaders/square_grad.vert", 
 				null, 
 				"shaders/square_grad.frag");
-        programs[ProgramType.BASIC_STROKE.ordinal()] = loadProgramFromResources(
+        programs[ProgramType.STROKE_BASIC.ordinal()] = loadProgramFromResources(
 				"shaders/brushes/stroke_basic.vert", 
 				"shaders/brushes/stroke_basic.geom", 
 				"shaders/brushes/stroke_basic.frag");
@@ -479,6 +483,10 @@ public class GLEngine  {
 				"shaders/brushes/brush_spore.vert", 
 				"shaders/brushes/brush_spore.geom", 
 				"shaders/brushes/brush_spore.frag");
+        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/pass_basic.frag");
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){
