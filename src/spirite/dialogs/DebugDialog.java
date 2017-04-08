@@ -161,7 +161,6 @@ public class DebugDialog extends JDialog
 	@Override public void windowOpened(WindowEvent arg0) {}
 	@Override
 	public void windowClosing(WindowEvent arg0) {
-		System.out.println("TEST");
 		t.stop();
 	}
 

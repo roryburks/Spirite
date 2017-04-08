@@ -368,7 +368,6 @@ public class LayerTreePanel extends ContentTree
 	}
 	@Override
 	protected void clickPath(TreePath path, MouseEvent evt) {
-		System.out.println("click");
 		super.clickPath(path, evt);
 		if( evt.getButton() == MouseEvent.BUTTON3) {
 			

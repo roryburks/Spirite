@@ -27,6 +27,7 @@ import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.ui.OmniFrame.OmniComponent;
+import spirite.ui.UIUtil;
 import spirite.ui.components.SliderPanel;
 
 public class LayersPanel extends OmniComponent {
@@ -246,7 +247,7 @@ public class LayersPanel extends OmniComponent {
 			panel.setLayout(new GridLayout());
 			panel.add(lbl);
 			
-			ccPanel.addMouseListener( new MouseAdapter() {
+			ccPanel.addMouseListener( new UIUtil.ClickAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					RenderTuple sel = ((RenderTuple)renderCombo.getSelectedItem());

@@ -247,12 +247,34 @@ public class AnimationSchemeTreePanel extends JPanel
 			this.setLayout(layout);
 		}
 	}
-	class TitlePanel extends BaseTPanel implements MouseListener {
+	class TitlePanel extends BaseTPanel {
 		final Animation animation;
 		
 		TitlePanel( Animation animation) {
 			this.animation = animation;
-			this.addMouseListener(this);
+			this.addMouseListener(new UIUtil.ClickAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent evt) {
+					super.mouseClicked(evt);
+
+					if( manager != null) {
+						switch( evt.getButton()) {
+						case MouseEvent.BUTTON1:
+							manager.setSelectedAnimation(animation);
+							break;
+						case MouseEvent.BUTTON3:
+							contextMenu.animation = animation;
+							Object[][] menuScheme = new Object[][]{
+								{"Delete Animation", "remAnim", null}
+							};
+							contextMenu.removeAll();
+							UIUtil.constructMenu(contextMenu, menuScheme, contextMenu);
+							contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+							break;
+						}
+					}
+				}
+			});
 		}
 		
 		@Override
@@ -262,31 +284,6 @@ public class AnimationSchemeTreePanel extends JPanel
 				g.fillRect(0, 0, getWidth(), getHeight());
 			}
 			super.paintComponent(g);
-		}
-
-		// MouseListener
-		@Override public void mouseEntered(MouseEvent arg0) {}
-		@Override public void mouseExited(MouseEvent arg0) {}
-		@Override public void mousePressed(MouseEvent arg0) {}
-		@Override public void mouseReleased(MouseEvent arg0) {}
-		@Override
-		public void mouseClicked(MouseEvent evt) {
-			if( manager != null) {
-				switch( evt.getButton()) {
-				case MouseEvent.BUTTON1:
-					manager.setSelectedAnimation(animation);
-					break;
-				case MouseEvent.BUTTON3:
-					contextMenu.animation = animation;
-					Object[][] menuScheme = new Object[][]{
-						{"Delete Animation", "remAnim", null}
-					};
-					contextMenu.removeAll();
-					UIUtil.constructMenu(contextMenu, menuScheme, contextMenu);
-					contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-					break;
-				}
-			}
 		}
 	}
 	private final ContextMenu contextMenu = new ContextMenu();

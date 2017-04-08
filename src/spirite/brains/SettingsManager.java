@@ -159,7 +159,6 @@ public class SettingsManager {
     	byte[] raw = prefs.getByteArray("tpcPoints", null);
     	Point2D[] points = null;
     	if( raw != null) {
-			System.out.println("BAD");
     		try {
 		    	ByteBuffer buff = ByteBuffer.wrap(raw);
 		    	

@@ -5,6 +5,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
 import javax.swing.JComponent;
@@ -18,6 +20,7 @@ import javax.swing.tree.TreePath;
 
 import spirite.Globals;
 import spirite.MDebug;
+import spirite.MUtil;
 import spirite.MDebug.WarningType;
 
 public class UIUtil {
@@ -84,6 +87,33 @@ public class UIUtil {
     	while( r < s.length() && s.charAt(r) == '.')
     		r++;
     	return Math.min(r, MAX_LEVEL);
+    }
+    
+    /**
+     * ClickAdapter is an extention of MouseAdapter that has less discriminating
+     * click detection than normal mouse listening.  (In normal Mouse Listening
+     * a click is not detected if the cursor moves even a pixel from its starting
+     * position, making it very difficult to click with touch/pen input).
+     *
+     */
+    public static class ClickAdapter extends MouseAdapter {
+    	int startx, starty;
+    	@Override
+    	public void mousePressed(MouseEvent e) {
+    		super.mousePressed(e);
+    		startx = e.getX();
+    		starty = e.getY();
+    	}
+    	@Override
+    	public void mouseReleased(MouseEvent e) {
+    		super.mouseReleased(e);
+    		
+    		if( e.getComponent().getBounds().contains(e.getPoint())
+    			&& MUtil.distance(startx, starty, e.getX(), e.getY()) < 4)
+    		{
+    			this.mouseClicked(e);
+    		}
+    	}
     }
     
     /***

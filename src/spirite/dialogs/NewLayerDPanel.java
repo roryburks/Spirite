@@ -19,6 +19,7 @@ import javax.swing.border.Border;
 import spirite.brains.MasterControl;
 import spirite.brains.PaletteManager;
 import spirite.image_data.ImageWorkspace;
+import spirite.ui.UIUtil.ClickAdapter;
 import spirite.ui.components.MTextFieldNumber;
 
 public class NewLayerDPanel extends JPanel {
@@ -192,14 +193,14 @@ public class NewLayerDPanel extends JPanel {
 		
 		lblColorFG = new JLabel("Foreground");
 		lblColorFG.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblColorFG.addMouseListener(new MouseAdapter() {
+		lblColorFG.addMouseListener(new ClickAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseClicked(MouseEvent evt) {
 				setSelected(0);
 			}
 		});
 		lblColorBG = new JLabel("Background");
-		lblColorBG.addMouseListener(new MouseAdapter() {
+		lblColorBG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(1);
@@ -207,7 +208,7 @@ public class NewLayerDPanel extends JPanel {
 		});
 		lblColorBG.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblColorT = new JLabel("Transparent");
-		lblColorT.addMouseListener(new MouseAdapter() {
+		lblColorT.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(2);
@@ -216,7 +217,7 @@ public class NewLayerDPanel extends JPanel {
 		lblColorT.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		
 		
-		MouseAdapter selectMA = new MouseAdapter() {
+		MouseAdapter selectMA = new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if( selected == 3 || custom_color == null) {
@@ -365,21 +366,21 @@ public class NewLayerDPanel extends JPanel {
 		);
 		
 		colorPanelFG = new JPanel();
-		colorPanelFG.addMouseListener(new MouseAdapter() {
+		colorPanelFG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(0);
 			}
 		});
 		colorPanelBG = new JPanel();
-		colorPanelBG.addMouseListener(new MouseAdapter() {
+		colorPanelBG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(1);
 			}
 		});
 		colorPanelT = new JPanel();
-		colorPanelT.addMouseListener(new MouseAdapter() {
+		colorPanelT.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(2);

@@ -224,7 +224,7 @@ public class OmniFrame extends JPanel
 	
 	
 	/** Custom Tab Component */
-	public class OmniBar extends JPanel implements MouseListener {
+	public class OmniBar extends JPanel  {
 		private static final long serialVersionUID = 1L;
 		
 		private final JLabel label;
@@ -233,6 +233,7 @@ public class OmniFrame extends JPanel
 		
 		
 		public OmniBar( String title, FrameType type) {
+			// :::: Init Components
 			icon = FrameManager.getIconForType(type);
 			
 			label = new JLabel(title);
@@ -245,7 +246,11 @@ public class OmniFrame extends JPanel
 				}
 			};
 			iconPanel.setOpaque(false);
+			label.setFont( new Font("Tahoma", Font.PLAIN, 10));
+			add( label);
+			this.setOpaque(false);
 			
+			// :::: Init Layout
 			GroupLayout layout = new GroupLayout(this);
 			
 			layout.setHorizontalGroup( layout.createParallelGroup()
@@ -261,31 +266,27 @@ public class OmniFrame extends JPanel
 			
 			this.setLayout(layout);
 			
-			label.setFont( new Font("Tahoma", Font.PLAIN, 10));
-			add( label);
-			this.setOpaque(false);
-			addMouseListener(this);
-		}
+			
+			
+			// :::: Init Bindings
+			addMouseListener(new UIUtil.ClickAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent evt) {
+					super.mouseClicked(evt);
 
-		// Required so that the custom tab component behaves like a tab.
-		@Override
-		public void mouseClicked(MouseEvent evt) {
-			if( evt.getButton() == MouseEvent.BUTTON1) {
-				int i, c;
-				
-				c = root.getTabCount();
-				for( i=0; i<c; ++i) {
-					if( root.getTabComponentAt(i)== this) {
-						root.setSelectedIndex(i);
+					if( evt.getButton() == MouseEvent.BUTTON1) {
+						int i, c;
+						
+						c = root.getTabCount();
+						for( i=0; i<c; ++i) {
+							if( root.getTabComponentAt(i) == OmniBar.this) {
+								root.setSelectedIndex(i);
+							}
+						}
 					}
 				}
-				
-			}
+			});
 		}
-		@Override		public void mouseEntered(MouseEvent e) {}
-		@Override		public void mouseExited(MouseEvent e) {}
-		@Override		public void mousePressed(MouseEvent e) {}
-		@Override		public void mouseReleased(MouseEvent e) {}
 	}
 	
 	/** */
