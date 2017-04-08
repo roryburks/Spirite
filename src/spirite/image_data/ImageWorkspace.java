@@ -34,6 +34,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -109,6 +110,8 @@ public class ImageWorkspace {
 	private final SettingsManager settingsManager;
 	private final RenderEngine renderEngine;
 	
+	private final MasterControl master;	// TODO bad-ish
+	
 	private GroupTree.Node selected = null;
 	private int workingID = 0;	// an incrementing unique ID per imageData
 	
@@ -125,12 +128,13 @@ public class ImageWorkspace {
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		this.renderEngine = master.getRenderEngine();
+		this.master = master;
 		
 		groupTree = new GroupTree(this);
 		undoEngine = new UndoEngine(this);
 		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
-		drawEngine = new DrawEngine(this);	// Depends on UndoEngine, SelectionEngine
+		drawEngine = new DrawEngine(this, master);	// Depends on UndoEngine, SelectionEngine
 		referenceManager = new ReferenceManager(this);
 		stagingManager = new StagingManager(this);
 		
@@ -280,6 +284,7 @@ public class ImageWorkspace {
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
+	public GraphicsContext getGraphicsContext() {return master.getGraphicsContext(); }
 	
 	// Doesn't feel great leaking external components, but they're very
 	//	relevant to images and it's better than given them MasterControl

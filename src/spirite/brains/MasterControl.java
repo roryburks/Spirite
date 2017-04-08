@@ -30,6 +30,8 @@ import spirite.brains.ToolsetManager.Tool;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.gl.GLGraphics;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -157,6 +159,13 @@ public class MasterControl
     public Dialogs getDialogs() {
     	return dialog;
     }
+    
+    // ============
+    // ==== Graphics Context Management
+    private GraphicsContext graphicsContext = new GLGraphics();
+//    private GraphicsContext graphicsContext = new AWTContext();
+    
+    public GraphicsContext getGraphicsContext() {return this.graphicsContext;}
     
     // =============
     // ==== Workspace File Open/Save/Load

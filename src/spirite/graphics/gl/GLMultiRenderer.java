@@ -1,4 +1,4 @@
-package spirite.gl;
+package spirite.graphics.gl;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -15,7 +15,7 @@ import spirite.MDebug.WarningType;
  * @author Rory Burks
  *
  */
-public class GLMultiRenderer {
+class GLMultiRenderer {
 	private final GL2 gl;
 	private final int width, height;
 	

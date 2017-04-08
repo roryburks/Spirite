@@ -1,12 +1,10 @@
 package spirite.dialogs;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.text.DecimalFormat;
 import java.util.Map;
 
@@ -14,18 +12,18 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import spirite.brains.CacheManager.CacheDomain;
 import spirite.MDebug;
 import spirite.MDebug.DebugObserver;
+import spirite.brains.CacheManager.CacheDomain;
 import spirite.brains.MasterControl;
-import javax.swing.JScrollPane;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JLabel;
 
 public class DebugDialog extends JDialog 
 	implements ActionListener, DebugObserver, WindowListener 

@@ -1,4 +1,4 @@
-package spirite.gl;
+package spirite.graphics.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -9,12 +9,12 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.GLBuffers;
 
-import spirite.gl.GLEngine.ProgramType;
-import spirite.gl.GLMultiRenderer.GLRenderer;
-import spirite.gl.GLParameters.GLFBOTexture;
-import spirite.gl.GLParameters.GLImageTexture;
-import spirite.gl.GLParameters.GLParam1i;
-import spirite.gl.GLParameters.GLParam4f;
+import spirite.graphics.gl.GLEngine.ProgramType;
+import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.GLParameters.GLFBOTexture;
+import spirite.graphics.gl.GLParameters.GLImageTexture;
+import spirite.graphics.gl.GLParameters.GLParam1i;
+import spirite.graphics.gl.GLParameters.GLParam4f;
 
 /** 
  * GLUIDraw is a mostly-static class encapsulates some general-purpose 
@@ -23,7 +23,7 @@ import spirite.gl.GLParameters.GLParam4f;
  * @author Rory Burks
  *
  */
-public class GLUIDraw {
+class GLUIDraw {
 	private static final GLEngine engine = GLEngine.getInstance();
 	
 	enum GradientType {
@@ -94,16 +94,7 @@ public class GLUIDraw {
 	}
 	
 
-	/**
-	 * Draws a border around the given image with the given transform applied to 
-	 * it, returns a BufferedImage of dimensions (swidth x sheight).
-	 * @param image	The image to draw a border around.
-	 * @param cycle	The offset of the cycle in which the dashes are to be drawn
-	 * @param trans	The transform to apply to the image to draw it on the screen
-	 * @param swidth	The width of the screen to draw it on.
-	 * @param sheight	The height of the screen to draw it on.
-	 * @return
-	 */
+	/** Draws a border around the given image. */
 	public static BufferedImage drawBounds( 
 			BufferedImage image, int cycle, AffineTransform trans, int swidth, int sheight) 
 	{

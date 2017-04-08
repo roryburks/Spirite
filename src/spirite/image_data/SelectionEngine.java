@@ -22,7 +22,7 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
-import spirite.gl.GLUIDraw;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -662,6 +662,7 @@ public class SelectionEngine {
 	public static class Selection 
 	{
 		private final BufferedImage bi;
+		static int c = 0;
 		
 		/** NOTE: To properly draw the border, the supplied buffered image should
 		 * be cropped with a 1-pixel border (if it's cropped at all).
@@ -669,16 +670,17 @@ public class SelectionEngine {
 		Selection(BufferedImage bi) {
 			this.bi = bi;
 		}
-		static int c = 0;
 		
-		public void drawSelectionBounds(Graphics g) {
+		public void drawSelectionBounds(GraphicsContext context, Graphics g) {
 			Graphics2D g2 = (Graphics2D)g;
 			
 			// Uses OpenGL Renderer to render the a border for the selection
 			AffineTransform trans = g2.getTransform();
 			g2.setTransform( new AffineTransform());
 			Rectangle r = g.getClipBounds();
-			g2.drawImage(GLUIDraw.drawBounds(bi, c--, trans, r.width, r.height), 0, 0, null);
+			
+			
+			g2.drawImage(context.drawBounds(bi, c--, trans, r.width, r.height), 0, 0, null);
 			g2.setTransform(trans);
 		}
 		public void drawSelectionMask(Graphics g) {

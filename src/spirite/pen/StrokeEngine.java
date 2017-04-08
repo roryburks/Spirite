@@ -6,7 +6,6 @@ import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
 import mutil.Interpolation.CubicSplineInterpolator2D;
 import mutil.Interpolation.InterpolatedPoint;
 import mutil.Interpolation.Interpolator2D;
-import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
@@ -34,7 +32,6 @@ public abstract class StrokeEngine {
 	protected abstract void onEnd();
 	protected abstract void drawDisplayLayer( Graphics g);
 	
-	
 
 	// ==== 
 	public enum STATE { READY, DRAWING };
@@ -42,26 +39,21 @@ public abstract class StrokeEngine {
 	
 	private static final double DIFF = 1;
 	
-	private double interpos = 0;
-
+	// Pen States
 	protected PenState oldState = new PenState();
 	protected PenState newState = new PenState();
 	protected PenState rawState = new PenState();	// Needed to prevent UndoAction from double-tranforming
 	protected StrokeEngine.STATE state = StrokeEngine.STATE.READY;
+	protected ArrayList<PenState> prec = new ArrayList<>();	// Recording of raw states
 
+	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
 	protected BuiltImageData data;
-//	private BufferedImage displayLayer;
-//	private BufferedImage fixedLayer;
-//	protected BufferedImage selectionMask;
-	
-
-	private Interpolator2D interpolator = null;
-	
-	// Recording of raw states
-	protected ArrayList<PenState> prec = new ArrayList<>();
-
 	protected BuiltSelection sel;
+	
+	// Interpolation
+	private Interpolator2D interpolator = null;
+	private double interpos = 0;
 	
 	// :::: Get's
 	public StrokeEngine.StrokeParams getParams() {

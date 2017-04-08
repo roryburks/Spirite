@@ -1,8 +1,6 @@
-package spirite.gl;
+package spirite.graphics.gl;
 
-import java.awt.AlphaComposite;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -13,9 +11,9 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
 import mutil.MatrixBuilder;
-import spirite.gl.GLEngine.PreparedData;
-import spirite.gl.GLEngine.ProgramType;
-import spirite.gl.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.GLEngine.PreparedData;
+import spirite.graphics.gl.GLEngine.ProgramType;
+import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
@@ -26,7 +24,7 @@ import spirite.pen.StrokeEngine;
  * @author Rory Burks
  *
  */
-public class GLStrokeEngine extends StrokeEngine {
+class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
 	private GLMultiRenderer fixedLayer;
 	private GLMultiRenderer displayLayer;
@@ -144,8 +142,8 @@ public class GLStrokeEngine extends StrokeEngine {
 		PreparedData pd = engine.prepareRawData(raw);
 
 		// Clear Surface
-	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-	    gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
+//	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+//	    gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 
         int prog = engine.getProgram(ProgramType.STROKE_SPORE);
         gl.glUseProgram( prog);
@@ -273,8 +271,8 @@ public class GLStrokeEngine extends StrokeEngine {
 		PreparedData pd = engine.prepareRawData(glvb.vBuffer);
 
 		// Clear Surface
-	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
+//	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+//        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 
         int prog = engine.getProgram(ProgramType.STROKE_BASIC);
         gl.glUseProgram( prog);

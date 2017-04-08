@@ -51,22 +51,25 @@ public class DrawPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 
-	private final RenderEngine renderEngine;	
+	private final MasterControl master;
+	final ImageWorkspace workspace;
+	private final RenderEngine renderEngine;
+	private final SelectionEngine selectionEngine;
+	
 	private final JPenPenner penner;
 	final WorkPanel context;
 	final Zoomer zoomer;
-	final ImageWorkspace workspace;
-	private final SelectionEngine selectionEngine;
 	private final Timer paint_timer;
 	
 	private int metronome = 0;
 
 	public DrawPanel(WorkPanel context, MasterControl master) {
 		this.renderEngine = master.getRenderEngine();
-		this.context = context;
-		this.zoomer = context.zoomer;
 		this.workspace = context.workspace;
 		this.selectionEngine = workspace.getSelectionEngine();
+		this.master = master;
+		this.context = context;
+		this.zoomer = context.zoomer;
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setOpaque( false);
 
@@ -201,7 +204,7 @@ public class DrawPanel extends JPanel
             	selectionEngine.drawBuildingSelection(g);
             if( selection != null) {
                 g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-            	selection.drawSelectionBounds(g);
+            	selection.drawSelectionBounds(master.getGraphicsContext(),  g);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

@@ -32,6 +32,13 @@ public class SettingsManager {
         prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
 	}
 	
+	/** If true, then the engine is able to use OpenGL functionality.  If false
+	 * (either because the user set it to be false or because OpenGL couldn't 
+	 * initialize properly), then the engine must fall back on basic AWT rendering.*/
+	public boolean glMode() {
+		return false;
+	}
+	
 	// ==============
 	// ==== Palette Saving/Loading: 
 	/** used by PaletteManager to get the raw data corresponding to a palette. */

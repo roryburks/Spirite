@@ -1,4 +1,4 @@
-package spirite.gl;
+package spirite.graphics.gl;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.gl.GLEngine.PreparedTexture;
+import spirite.graphics.gl.GLEngine.PreparedTexture;
 
 /**
  * GLParameters encapsulates the GL Uniform Parameters so that they
@@ -16,7 +16,7 @@ import spirite.gl.GLEngine.PreparedTexture;
  * @author Rory Burks
  *
  */
-public class GLParameters {
+class GLParameters {
 	public final List<GLParam> params = new ArrayList<>();
 	public GLTexture texture;
 	public GLTexture texture2;

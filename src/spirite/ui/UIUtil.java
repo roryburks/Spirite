@@ -20,8 +20,8 @@ import javax.swing.tree.TreePath;
 
 import spirite.Globals;
 import spirite.MDebug;
-import spirite.MUtil;
 import spirite.MDebug.WarningType;
+import spirite.MUtil;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);

@@ -1,4 +1,4 @@
-package spirite.gl;
+package spirite.graphics.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -28,7 +28,7 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.gl.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 
 /**
@@ -45,6 +45,12 @@ import sun.awt.image.ByteInterleavedRaster;
  * Geometry Shaders and LINE_ADJACENCY_STRIPS for the stroke engine could easily
  * be done in software.  Replacing Framebuffers with some other method would not
  * be difficult but might be extremely slow.
+ * 
+ * NOTE: Constructor is private and access to the singly instance is package-scoped
+ * so only the package has access to GLEngine.  Care should be taken to make sure
+ * GLFunctionality does not leak beyond this package so that functions that require
+ * OpenGL are kept explicit and modular (so that you don't try to access OpenGL
+ * when it's not available)
  * 
  * @author Rory Burks
  */
@@ -67,7 +73,7 @@ public class GLEngine  {
     }
 
 	private static final GLEngine singly = new GLEngine();
-	public static GLEngine getInstance() {
+	static GLEngine getInstance() {
 		return singly;
 	}
 	

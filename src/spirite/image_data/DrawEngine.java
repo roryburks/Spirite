@@ -1,7 +1,6 @@
 package spirite.image_data;
 
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -20,8 +19,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
-import spirite.gl.GLStrokeEngine;
-import spirite.gl.JOGLDrawer;
+import spirite.brains.MasterControl;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
@@ -47,20 +45,21 @@ import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
  */
 public class DrawEngine {
 	private final ImageWorkspace workspace;
-	private final DefaultStrokeEngine defEngine = new DefaultStrokeEngine();
-	private final GLStrokeEngine glEngine = new GLStrokeEngine();
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
-	private final JOGLDrawer jogl = new JOGLDrawer();
+	
+	// TODO: I don't necessarily like DrawEngine having MasterAccess, but it needs
+	//	access to the current GraphicsContext at all times
+	private final MasterControl master;
 	
 	private StrokeEngine activeEngine = null;
 	
-	public DrawEngine( ImageWorkspace workspace) {
+	public DrawEngine( ImageWorkspace workspace, MasterControl master) {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
 		this.selectionEngine = workspace.getSelectionEngine();
 		
-		
+		this.master = master;
 	}
 	
 	public boolean strokeIsDrawing() {
@@ -70,7 +69,7 @@ public class DrawEngine {
 		return activeEngine;
 	}
 	public StrokeEngine ___J_defEngine() {
-		return defEngine;
+		return master.getGraphicsContext().getStrokeEngine();
 	}
 	public ImageHandle getStrokeContext() {
 		return (activeEngine == null) ? null : activeEngine.getImageData().handle;
@@ -88,7 +87,7 @@ public class DrawEngine {
 		}
 		else {
 			if( stroke.getHard()) stroke.setInterpolationMethod(InterpolationMethod.NONE);
-			activeEngine = (stroke.getHard())? defEngine : glEngine;
+			activeEngine = master.getGraphicsContext().getStrokeEngine();
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
@@ -289,121 +288,6 @@ public class DrawEngine {
 			return ps.pressure;
 		}
 	};
-	
-	/***
-	 * The StrokeEngine operates asynchronously to the input data.  In general
-	 * the stroke is only drawn at a rate of 60FPS regardless of how fast the 
-	 * pen input is performed.
-	 * 
-	 * The StrokeEngine creates three BufferedImages the size of the ImageData
-	 * in question:
-	 * -The strokeLayer stores the actual stroke visually.  Strokes are drawn on 
-	 *   this layer before being anchored to the ImageData layer at the end of the
-	 *   stroke so that transparency and other blend methods can be performed without
-	 *   worrying about the stroke drawing over itself.
-	 * -The compositionLayer is stored for the benefit of ImageData which needs
-	 *   another layer in order for certain blend modes/Stroke styles to properly
-	 *   render
-	 * -The selectionMask is cached because the memory waste is minimal compared
-	 *   to the amount of extra cycles it'd be to constantly draw an inverse mask
-	 *   of the selection.
-	 */
-	public class DefaultStrokeEngine extends StrokeEngine
-	{
-		BufferedImage displayLayer;
-		BufferedImage fixedLayer;
-		BufferedImage selectionMask;
-		
-		protected DefaultStrokeEngine() {
-		}
-		
-		@Override
-		protected void onStart() {
-			displayLayer = new BufferedImage( 
-					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
-			fixedLayer = new BufferedImage( 
-					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
-			
-			if( sel.selection != null) {
-				selectionMask = new BufferedImage( 
-						data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
-				MUtil.clearImage(selectionMask);
-				
-				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
-				g2.translate(sel.offsetX, sel.offsetY);
-				sel.selection.drawSelectionMask(g2);
-				g2.dispose();
-			}
-		}
-		@Override
-		protected void onEnd() {
-			displayLayer.flush();
-			fixedLayer.flush();
-			displayLayer = null;
-			fixedLayer = null;
-			if( selectionMask != null) {
-				selectionMask.flush();
-				selectionMask = null;
-			}
-		}
-		
-
-		@Override
-		protected void prepareDisplayLayer() {
-			MUtil.clearImage(displayLayer);
-			Graphics g = displayLayer.getGraphics();
-			g.drawImage(fixedLayer, 0, 0, null);
-			
-		}
-		
-		@Override
-		protected boolean drawToLayer(List<PenState> states, boolean permanent) {
-			BufferedImage layer = (permanent)?fixedLayer:displayLayer;
-			
-			Graphics g = layer.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
-			g.setColor( stroke.getColor());
-
-			for( int i=1; i < states.size(); ++i) {
-				PenState fromState = states.get(i-1);
-				PenState toState = states.get(i);
-				if( stroke.getMethod() != StrokeEngine.Method.PIXEL){
-					g2.setStroke( new BasicStroke( 
-							stroke.getDynamics().getSize(toState)*stroke.getWidth(), 
-							BasicStroke.CAP_ROUND, 
-							BasicStroke.CAP_SQUARE));
-				}
-				g2.drawLine( fromState.x, fromState.y, toState.x, toState.y);
-	
-				
-	
-				if( sel.selection != null) {
-					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-					g2.drawImage(selectionMask, 0, 0, null);
-				}
-			}
-			
-			g.dispose();
-			return true;
-		}
-
-		@Override
-		protected void drawDisplayLayer(Graphics g) {
-			g.drawImage(displayLayer, 0, 0, null);
-		}
-
-/*		@Override
-		public boolean startDrawStroke( PenState ps) {
-			int crgb = stroke.getColor().getRGB();
-			if( displayLayer.getRGB( ps.x, ps.y) != crgb ) {
-				displayLayer.setRGB( ps.x, ps.y, crgb);
-				return true;
-			}
-			return false;
-		}*/
-		
-		
-	}
 
 	private void execute( MaskedImageAction action) {
 		action.performImageAction();
@@ -745,7 +629,7 @@ public class DrawEngine {
 		}
 		@Override
 		void applyFilter(BufferedImage image) {
-			jogl.changeColor(image, from, to, mode);
+			workspace.getGraphicsContext().changeColor(image, from, to, mode);
 		}
 	}
 	public class InvertAction extends PerformFilterAction {
@@ -754,7 +638,7 @@ public class DrawEngine {
 		}
 		@Override
 		void applyFilter(BufferedImage image) {
-			jogl.invert(image);
+			workspace.getGraphicsContext().invert(image);
 		}
 	}
 	
