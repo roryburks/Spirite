@@ -97,7 +97,7 @@ class GLNodeRenderer extends NodeRenderer {
 			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 	    	engine.clearSurface();
 			engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null, 
-					0, 0, settings.width, settings.height, true);
+					0, 0, settings.width, settings.height, true, engine.getGL2());
 			
 			BufferedImage bi = engine.glSurfaceToImage();
 
@@ -269,7 +269,7 @@ class GLNodeRenderer extends NodeRenderer {
 					setParamsFromNode( node, params, false, 1);
 					params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
 					engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-							0, 0, params.width, params.height, true);
+							0, 0, params.width, params.height, true, engine.getGL2());
 				}
 			});
 		}
@@ -313,7 +313,7 @@ class GLNodeRenderer extends NodeRenderer {
 					params.texture = new GLParameters.GLImageTexture(bi);
 					engine.applyPassProgram(
 							ProgramType.PASS_RENDER, params, trans,
-							0, 0, bi.getWidth(), bi.getHeight(), false);
+							0, 0, bi.getWidth(), bi.getHeight(), false, engine.getGL2());
 				}
 			});
 		}

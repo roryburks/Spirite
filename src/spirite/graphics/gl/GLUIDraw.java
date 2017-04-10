@@ -47,7 +47,7 @@ class GLUIDraw {
 		engine.setSurfaceSize(w, h);
 
 		GLMultiRenderer glmu = new GLMultiRenderer(
-				w, h, gl.getGL2());
+				w, h, gl);
 		glmu.init();
 		
 		
@@ -57,13 +57,13 @@ class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLImageTexture(bi);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false, gl);
 			}
 		});
 		
 
 		GLMultiRenderer glmub = new GLMultiRenderer(
-				w, h, gl.getGL2());
+				w, h, gl);
 		glmub.init();
 		glmub.render( new GLRenderer() {
 			@Override
@@ -71,7 +71,7 @@ class GLUIDraw {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLFBOTexture(glmu);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true);
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, gl);
 			}
 		});
 
@@ -83,7 +83,7 @@ class GLUIDraw {
     	params.texture = new GLFBOTexture(glmu);
     	
     	engine.clearSurface();
-    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, true);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, true, gl);
         
 		glmu.cleanup();
 		glmub.cleanup();
@@ -110,7 +110,7 @@ class GLUIDraw {
 				GLParameters params2 = new GLParameters(swidth, sheight);
 				params2.texture = new GLImageTexture(image);
 				engine.applyPassProgram( ProgramType.CHANGE_COLOR, params2, trans,
-						0, 0, image.getWidth(), image.getHeight(), false);
+						0, 0, image.getWidth(), image.getHeight(), false, gl.getGL2());
 			}
 		});
 		
@@ -121,7 +121,7 @@ class GLUIDraw {
 		params.texture = new GLFBOTexture(glmu);
 
     	engine.clearSurface();
-		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true);
+		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, engine.getGL2());
 
 		// Clean up and Apply the surface to an image
 		glmu.cleanup();
@@ -131,19 +131,20 @@ class GLUIDraw {
 		return im;
 	}
 	
-	public static BufferedImage drawColorGradient( float fixed, GradientType type, int w, int h) {
-		engine.setSurfaceSize(w,h);
+	public static void drawColorGradient( float fixed, GradientType type, int w, int h, GL2 gl) {
+		GLParameters params = new GLParameters(w, h);
+		params.addParam( new GLParameters.GLParam1i("varCol", type.ordinal()));
+		params.addParam( new GLParameters.GLParam1f("fixedCol", fixed));
 		
-		GL2 gl = engine.getGL2();
-		
-
-		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
+		engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null,
+				0, 0, w, h, true, gl);
+/*		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(
         	new float[] {
     			// x      y     z     w    rsx     rsy
-                -1.0f, -1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-                +1.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-                -1.0f, +1.0f, 0.0f, 1.0f,  0.0f, 1.0f,
-                +1.0f, +1.0f, 0.0f, 1.0f,  1.0f, 1.0f
+                -1.0f, -1.0f, 0.0f, 0.0f,
+                +1.0f, -1.0f, 1.0f, 0.0f,
+                -1.0f, +1.0f, 0.0f, 1.0f,
+                +1.0f, +1.0f, 1.0f, 1.0f
         	}
         );
 		
@@ -191,9 +192,6 @@ class GLUIDraw {
         gl.glUseProgram(0);
 
 		gl.glDeleteVertexArrays(1, vao);
-		gl.glDeleteBuffers(1, positionBufferObject);
-		
-        BufferedImage im = engine.glSurfaceToImage();
-        return im;
+		gl.glDeleteBuffers(1, positionBufferObject);*/
 	}
 }

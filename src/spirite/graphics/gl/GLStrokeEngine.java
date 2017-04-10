@@ -65,7 +65,7 @@ class GLStrokeEngine extends StrokeEngine {
 				
 				GLParameters params = new GLParameters(w, h);
 				params.texture = new GLParameters.GLFBOTexture(fixedLayer);
-				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 			}
 		});
 	}
@@ -75,7 +75,7 @@ class GLStrokeEngine extends StrokeEngine {
 		engine.clearSurface();
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLFBOTexture(displayLayer);
-		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 		
 		BufferedImage bi = engine.glSurfaceToImage();
 		g.drawImage( bi, 0, 0, null);
@@ -139,7 +139,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		engine.setSurfaceSize( w, h);
 		GL2 gl = engine.getGL2();
-		PreparedData pd = engine.prepareRawData(raw);
+		PreparedData pd = engine.prepareRawData(raw, gl);
 
 		// Clear Surface
 //	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -268,7 +268,7 @@ class GLStrokeEngine extends StrokeEngine {
 		GL2 gl = engine.getGL2();
 		
 		
-		PreparedData pd = engine.prepareRawData(glvb.vBuffer);
+		PreparedData pd = engine.prepareRawData(glvb.vBuffer, gl);
 
 		// Clear Surface
 //	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});

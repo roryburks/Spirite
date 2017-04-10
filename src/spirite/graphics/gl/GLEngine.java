@@ -18,6 +18,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
@@ -140,9 +141,13 @@ public class GLEngine  {
 			this.drawable.setSurfaceSize(width, height);
 		}
 	}
+
+	public GLContext getContext() {
+		return drawable.getContext();
+	}
 	
 	public GL2 getGL2() {
-		drawable.display();
+//		drawable.display();
 		drawable.getContext().makeCurrent();
 		return drawable.getGL().getGL2();
 	}
@@ -186,6 +191,7 @@ public class GLEngine  {
 		case STROKE_BASIC:
 		case DEFAULT:
 		case PASS_RENDER:
+		case PASS_BASIC:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
@@ -225,9 +231,10 @@ public class GLEngine  {
 			ProgramType type,
 			GLParameters params, 
 			AffineTransform trans, 
-			boolean internal)
+			boolean internal,
+			GL2 gl)
 	{
-		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal);
+		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal, gl);
 	}
 
 	/**
@@ -253,7 +260,8 @@ public class GLEngine  {
 			GLParameters params, 
 			AffineTransform trans,
 			float x1, float y1, float x2, float y2,
-			boolean internal)
+			boolean internal,
+			GL2 gl)
 	{
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		0, params.width, 0, params.height, -1, 1));
@@ -272,20 +280,19 @@ public class GLEngine  {
 			x2, y1, 1.0f, (internal)?1.0f:0.0f,
 			x1, y2, 0.0f, (internal)?0.0f:1.0f,
 			x2, y2, 1.0f, (internal)?0.0f:1.0f,
-		});
-        applyProgram( type, params, pd, x1, y1, x2, y2);
+		}, gl);
+        applyProgram( type, params, pd, x1, y1, x2, y2, gl);
         pd.free();
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
 	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd,
-			float x1, float y1, float x2, float y2) 
+			float x1, float y1, float x2, float y2, GL2 gl) 
 	{
 		int w = params.width;
 		int h = params.height;
-		setSurfaceSize(w, h);
-		GL2 gl = getGL2();
+//		setSurfaceSize(w, h);
 		int prog = getProgram(type);
 		
 
@@ -302,13 +309,13 @@ public class GLEngine  {
         // Bind Texture
         if( params.texture != null) {
         	gl.glActiveTexture(GL.GL_TEXTURE0);
-        	params.texture.load();
+        	params.texture.load(gl);
     		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
         if( params.texture2 != null) {
         	gl.glActiveTexture(GL.GL_TEXTURE1);
-        	params.texture2.load();
+        	params.texture2.load(gl);
     		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
@@ -349,6 +356,11 @@ public class GLEngine  {
 	// ==== Texture Preperation
 	public class PreparedTexture{
 		private IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
+		private final GL2 gl;
+		
+		PreparedTexture( GL2 gl) {
+			this.gl = gl;
+		}
 		
 		@Override
 		protected void finalize() throws Throwable {
@@ -361,15 +373,13 @@ public class GLEngine  {
 		
 		public void free() {
 			if( !_free) {
-				GL2 gl = drawable.getGL().getGL2();
 				_free = true;
 				gl.glDeleteTextures(1, tex);
 			}
 		}
 	}
-	public PreparedTexture prepareTexture( BufferedImage bi) {
-		GL2 gl = drawable.getGL().getGL2();
-		PreparedTexture pt = new PreparedTexture();
+	public PreparedTexture prepareTexture( BufferedImage bi, GL2 gl) {
+		PreparedTexture pt = new PreparedTexture(gl);
 		int w = bi.getWidth();
 		int h = bi.getHeight();
 
@@ -397,7 +407,11 @@ public class GLEngine  {
 	
 	// =================
 	// ==== Data Buffer Preperation
-	public class PreparedData{		
+	public class PreparedData{
+		private final GL2 gl;
+		PreparedData( GL2 gl) {
+			this.gl = gl;
+		}
 		@Override
 		protected void finalize() throws Throwable {
 			free();
@@ -411,8 +425,6 @@ public class GLEngine  {
 		public void free() {
 			if( !_free) {
 				_free = true;
-				GL2 gl = drawable.getGL().getGL2();
-
 				gl.glDeleteVertexArrays(1, vao);
 				gl.glDeleteBuffers(1, positionBufferObject);
 			}
@@ -422,10 +434,8 @@ public class GLEngine  {
 		private IntBuffer positionBufferObject = GLBuffers.newDirectIntBuffer(1);
 		private IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
 	}
-	public PreparedData prepareRawData( float raw[]) {
-		GL2 gl = drawable.getGL().getGL2();
-		
-		PreparedData pd = new PreparedData();
+	public PreparedData prepareRawData( float raw[], GL2 gl) {
+		PreparedData pd = new PreparedData(gl);
 		
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(raw);
 
@@ -458,7 +468,7 @@ public class GLEngine  {
 				null, 
 				"shaders/square_grad.frag");
         programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources(
-				"shaders/square_grad.vert", 
+				"shaders/pass.vert", 
 				null, 
 				"shaders/square_grad.frag");
         programs[ProgramType.STROKE_BASIC.ordinal()] = loadProgramFromResources(

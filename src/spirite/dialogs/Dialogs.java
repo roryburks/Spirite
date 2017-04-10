@@ -17,6 +17,7 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.CommandExecuter;
 import spirite.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.graphics.gl.TestGLDiag;
 import spirite.image_data.ImageWorkspace;
 
 /***
@@ -32,6 +33,7 @@ public class Dialogs
 		HOTKEY,
 		TABLET,
 		DEBUG,
+		DBGL,
 //		PICK_COLOR,
 	}
 	
@@ -61,6 +63,10 @@ public class Dialogs
 			break;}
 		case DEBUG: {
 			DebugDialog dialog = new DebugDialog(master);
+			dialog.setVisible(true);
+			break;}
+		case DBGL: {
+			TestGLDiag dialog = new TestGLDiag();
 			dialog.setVisible(true);
 			break;}
 		}

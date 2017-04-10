@@ -43,7 +43,7 @@ class JOGLDrawer {
     	params.texture = new GLImageTexture(bi);
 
     	engine.clearSurface();
-    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false, engine.getGL2());
     	
     	glSurfaceToImage(bi);
     }
@@ -53,7 +53,7 @@ class JOGLDrawer {
     	params.texture = new GLImageTexture(bi);
 
     	engine.clearSurface();
-    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false);
+    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, engine.getGL2());
     	glSurfaceToImage(bi);
     }
     

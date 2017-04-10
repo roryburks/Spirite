@@ -31,6 +31,7 @@ import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
 import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.GLGraphics;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;

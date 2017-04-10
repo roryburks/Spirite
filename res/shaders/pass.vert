@@ -1,8 +1,7 @@
-#version 330
+#version 130
 
-
-layout (location = 0) in vec2 position; 
-layout (location = 1) in vec2 vertexUV;
+in vec2 position; 
+in vec2 vertexUV;
 
 out vec2 vUV;
 uniform mat4 perspectiveMatrix;

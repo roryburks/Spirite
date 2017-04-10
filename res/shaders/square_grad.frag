@@ -1,6 +1,6 @@
 #version 330
 
-smooth in vec2 relSpace;
+smooth in vec2 vUV;
 
 uniform float fixedCol;
 
@@ -64,44 +64,44 @@ void main()
 {
 	if( varCol == 0) {
 		outputColor.r = fixedCol;
-		outputColor.g = relSpace.x;
-		outputColor.b = relSpace.y;
+		outputColor.g = vUV.x;
+		outputColor.b = vUV.y;
 	    outputColor.a = 1;
 	}
 	else if( varCol == 1) {
-		outputColor.r = relSpace.x;
+		outputColor.r = vUV.x;
 		outputColor.g = fixedCol;
-		outputColor.b = relSpace.y;
+		outputColor.b = vUV.y;
 	    outputColor.a = 1;
 	}
 	else if( varCol == 2) {
-		outputColor.r = relSpace.x;
-		outputColor.g = relSpace.y;
+		outputColor.r = vUV.x;
+		outputColor.g = vUV.y;
 		outputColor.b = fixedCol;
 	    outputColor.a = 1;
 	}
 	else if( varCol == 3) {
 		vec4 hsv;
 		hsv[0] = fixedCol;
-		hsv[1] = relSpace.x;
-		hsv[2] = relSpace.y;
+		hsv[1] = vUV.x;
+		hsv[2] = vUV.y;
 		hsv[3] = 1;
 		
 		outputColor = HSVtoRGB(hsv);
 	}
 	else if( varCol == 4) {
 		vec4 hsv;
-		hsv[0] = relSpace.x;;
+		hsv[0] = vUV.x;;
 		hsv[1] = fixedCol;
-		hsv[2] = relSpace.y;
+		hsv[2] = vUV.y;
 		hsv[3] = 1;
 		
 		outputColor = HSVtoRGB(hsv);
 	}
 	else if( varCol == 5) {
 		vec4 hsv;
-		hsv[0] = relSpace.x;
-		hsv[1] = relSpace.y;
+		hsv[0] = vUV.x;
+		hsv[1] = vUV.y;
 		hsv[2] = fixedCol;
 		hsv[3] = 1;
 		

@@ -75,7 +75,7 @@ class GLParameters {
 	
 	/** A class storing things that can be transferred into  */
 	public abstract static class GLTexture {
-		public abstract int load();
+		public abstract int load(GL2 gl);
 		public abstract void unload();
 	}
 	
@@ -88,8 +88,8 @@ class GLParameters {
 		}
 
 		@Override
-		public int load(){
-			texture = GLEngine.getInstance().prepareTexture(image);
+		public int load(GL2 gl){
+			texture = GLEngine.getInstance().prepareTexture(image, gl);
 
 			return texture.getTexID();
 		}
@@ -104,9 +104,8 @@ class GLParameters {
 			this.glmu = glmu;
 		}
 		@Override
-		public int load() {
+		public int load(GL2 gl) {
 	        //set the texture up to be used for painting a surface ...
-			GL2 gl = GLEngine.getInstance().getGL2();
 	        gl.glBindTexture(GL2.GL_TEXTURE_2D, glmu.getTexture());
 	        int textureTarget = GL2.GL_TEXTURE_2D;
 	        gl.glEnable(textureTarget);
