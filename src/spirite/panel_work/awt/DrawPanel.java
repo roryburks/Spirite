@@ -56,12 +56,12 @@ public class DrawPanel extends JPanel
 
 	private final MasterControl master;
 	private final RenderEngine renderEngine;
-	private final SelectionEngine selectionEngine;
+	private SelectionEngine selectionEngine;
 
 	// Components other things need access to
-	public final ImageWorkspace workspace;
+	public ImageWorkspace workspace;
 	public final WorkPanel context;
-	public final View zoomer;
+	public View zoomer;
 	
 	private final JPenPenner penner;
 	private final Timer paint_timer;
@@ -70,32 +70,28 @@ public class DrawPanel extends JPanel
 
 	public DrawPanel(WorkPanel context, MasterControl master) {
 		this.renderEngine = master.getRenderEngine();
-		this.workspace = context.workspace;
-		this.selectionEngine = workspace.getSelectionEngine();
 		this.master = master;
 		this.context = context;
-		this.zoomer = context.zoomer;
+		this.zoomer = context.getCurrentView();
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setOpaque( false);
 
-		penner = new JPenPenner( this, master);
-		
-		workspace.addImageObserver(this);
-		workspace.getSelectionEngine().addSelectionObserver(this);
-		workspace.addSelectionObserver(this);
+		penner = context.getJPenner();
+
+		workspace = context.currentWorkspace;
+		if( workspace == null)
+			selectionEngine = null;
+		else {
+			selectionEngine = workspace.getSelectionEngine();
+			workspace.addImageObserver(this);
+			workspace.getSelectionEngine().addSelectionObserver(this);
+			workspace.addSelectionObserver(this);
+		}
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();
 		
 		AwtPenToolkit.addPenListener(this, penner);
-	}
- 
-	public void refreshPennerCoords() {
-		penner.refreshCoordinates();
-	}
-	
-	public Penner getPenner() {
-		return penner.penner;
 	}
 
 	
@@ -103,13 +99,12 @@ public class DrawPanel extends JPanel
     @Override
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        final float zoom = zoomer.getZoom();
         
         if( workspace == null) {
-        	MDebug.handleError(ErrorType.STRUCTURAL, null, "Null Workspaced Draw Panel");
         	return;
         }
+        Graphics2D g2 = (Graphics2D) g;
+        final float zoom = zoomer.getZoom();
         
         final BasicStroke dashedStroke = new BasicStroke(
         		1/(( zoom >= 4)?(zoom/2):zoom), 
@@ -249,11 +244,29 @@ public class DrawPanel extends JPanel
 	public void cleanUp() {
 		AwtPenToolkit.removePenListener(this, penner);
 		paint_timer.stop();
-		penner.cleanUp();
 	}
 
 	@Override
 	public void selectionChanged(Node newSelection) {
     	context.repaint( SwingUtilities.convertRectangle(this, this.getBounds(), context));
+	}
+
+
+	public void changeWorkspace(ImageWorkspace ws, View view) {
+		if( workspace != null) {
+			workspace.removeImageObserver(this);
+			selectionEngine.removeSelectionObserver(this);
+			workspace.removeSelectionObserver(this);
+		}
+		workspace = ws;
+		if( workspace == null)
+			selectionEngine = null;
+		else {
+			selectionEngine = workspace.getSelectionEngine();
+			workspace.addImageObserver(this);
+			workspace.getSelectionEngine().addSelectionObserver(this);
+			workspace.addSelectionObserver(this);
+		}
+		this.zoomer = view;
 	}
 }

@@ -9,7 +9,9 @@ import java.awt.event.MouseWheelListener;
 import javax.swing.GroupLayout;
 
 import spirite.brains.MasterControl;
+import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
+import spirite.panel_work.WorkArea;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
 import spirite.ui.UIUtil;
@@ -22,12 +24,14 @@ import spirite.ui.UIUtil;
  * @author Rory Burks
  */
 public class WorkSplicePanel extends javax.swing.JPanel 
-	implements MReferenceObserver, MouseWheelListener 
+	implements MReferenceObserver, MouseWheelListener, WorkArea
 {
 	private static final long serialVersionUID = 1L;
 	final WorkPanel context;
-	final View zoomer;
+	View zoomer;
     int offsetx, offsety;
+    
+    ImageWorkspace workspace = null;
 
     public final DrawPanel drawPanel;
     private final ReferencePanel previewPanel;
@@ -40,13 +44,12 @@ public class WorkSplicePanel extends javax.swing.JPanel
      */
     public WorkSplicePanel( WorkPanel context, MasterControl master) {
     	this.context = context;
-        this.zoomer = context.zoomer;
+        this.zoomer = context.getCurrentView();
         previewPanel = new ReferencePanel(context, master, true);
         drawPanel = new DrawPanel( context, master);
         previewPanelBack = new ReferencePanel(context, master, false);
         initComponents();
         
-        context.workspace.getReferenceManager().addReferenceObserve(this);
         
         previewPanelBack.addMouseWheelListener(this);
         drawPanel.addMouseWheelListener(this);
@@ -79,14 +82,16 @@ public class WorkSplicePanel extends javax.swing.JPanel
     protected void paintComponent(Graphics g) {
     	super.paintComponent(g);
         // Draw Transparency BG
-        int dx = (zoomer.itsX(0) >= 0)?0:-zoomer.itsX(0);
-        int dy = (zoomer.itsY(0) >= 0)?0:-zoomer.itsY(0);
-        UIUtil.drawTransparencyBG(g, new Rectangle( 
-        		Math.max(0, zoomer.itsX(0)),
-        		Math.max(0, zoomer.itsY(0)),
-        		Math.min(getWidth(), (int)Math.round(context.workspace.getWidth()*zoomer.getZoom())-2-dx),
-        		Math.min(getHeight(), (int)Math.round(context.workspace.getHeight()*zoomer.getZoom())-2-dy)),
-        		8);
+    	if( zoomer != null) {
+	        int dx = (zoomer.itsX(0) >= 0)?0:-zoomer.itsX(0);
+	        int dy = (zoomer.itsY(0) >= 0)?0:-zoomer.itsY(0);
+	        UIUtil.drawTransparencyBG(g, new Rectangle( 
+	        		Math.max(0, zoomer.itsX(0)),
+	        		Math.max(0, zoomer.itsY(0)),
+	        		Math.min(getWidth(), (int)Math.round(context.currentWorkspace.getWidth()*zoomer.getZoom())-2-dx),
+	        		Math.min(getHeight(), (int)Math.round(context.currentWorkspace.getHeight()*zoomer.getZoom())-2-dy)),
+	        		8);
+    	}
     }
 
               
@@ -105,6 +110,19 @@ public class WorkSplicePanel extends javax.swing.JPanel
 			zoomer.zoomIn();
 		else if( evt.getWheelRotation() > 0)
 			zoomer.zoomOut();
+	}
+
+	@Override
+	public void changeWorkspace(ImageWorkspace ws, View view) {
+		if( workspace != null)
+			workspace.getReferenceManager().removeReferenceObserve(this);
+		workspace = ws;
+		if( workspace != null)
+			workspace.getReferenceManager().addReferenceObserve(this);
+
+        this.zoomer = view;
+		drawPanel.changeWorkspace( ws, view);
+		previewPanel.changeWorkspace( ws, view);
 	}        
 
 }

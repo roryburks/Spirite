@@ -32,7 +32,7 @@ public class ReferencePanel extends JPanel
 	private final RenderEngine renderer;
 	private final boolean front;
 	
-	private final View zoomer;
+	private View zoomer;
 	
 	private ImageWorkspace workspace;
 	
@@ -42,14 +42,13 @@ public class ReferencePanel extends JPanel
 		this.renderer = master.getRenderEngine();
 		this.front = front;
 		
-		workspace = context.workspace;
-		if( workspace == null) {
-			MDebug.handleError( ErrorType.FATAL, "Reference Panel with no WS");
+		workspace = context.currentWorkspace;
+		if( workspace != null) {
+			workspace.addImageObserver(this);
+			workspace.getReferenceManager().addReferenceObserve(this);
 		}
-		workspace.addImageObserver(this);
-		workspace.getReferenceManager().addReferenceObserve(this);
 				
-		this.zoomer = context.zoomer;
+		this.zoomer = context.getCurrentView();
 		
 		this.setOpaque(false);
         
@@ -96,4 +95,17 @@ public class ReferencePanel extends JPanel
 	}
 	@Override
 	public void toggleReference(boolean referenceMode) {	}
+	public void changeWorkspace(ImageWorkspace ws, View view) {
+		if( workspace != null) {
+			workspace.removeImageObserver(this);
+			workspace.getReferenceManager().removeReferenceObserve(this);
+		}
+		workspace = ws;
+		if( workspace != null) {
+			workspace.addImageObserver(this);
+			workspace.getReferenceManager().addReferenceObserve(this);
+		}
+		
+		this.zoomer = view;
+	}
 }

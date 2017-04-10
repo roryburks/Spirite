@@ -26,7 +26,7 @@ public class JPenPenner implements PenListener
 	private final ToolsetManager toolsetManager;
 	public final Penner penner;
 	
-	public JPenPenner( DrawPanel context, MasterControl master) {
+	public JPenPenner( WorkPanel context, MasterControl master) {
 		penner = new Penner(context, master);
 		toolsetManager = master.getToolsetManager();
 	}

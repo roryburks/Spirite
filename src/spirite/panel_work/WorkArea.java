@@ -1,7 +1,8 @@
 package spirite.panel_work;
 
-public interface WorkArea {
+import spirite.image_data.ImageWorkspace;
+import spirite.panel_work.WorkPanel.View;
 
-	public void refreshCoordinates( int x, int y);
-	public void cleanup();
+public interface WorkArea {
+	public void changeWorkspace( ImageWorkspace workspace, View view);
 }

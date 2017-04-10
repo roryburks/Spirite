@@ -45,7 +45,8 @@ public class WorkTabPane extends JTabbedPane
 	public WorkTabPane( MasterControl master) {
 		this.master = master;
 //		this.workPanel = new WorkPanel(master);
-		
+
+		workPanel =  new WorkPanel(master);
 		master.addWorkspaceObserver(this);
 		
 		this.addChangeListener(this);
@@ -54,20 +55,10 @@ public class WorkTabPane extends JTabbedPane
 	
 	
 	public View getZoomerForWorkspace( ImageWorkspace ws) {
-		/*for( WorkPanel panel : panels) {
-			if( panel.workspace == ws) {
-				return panel.zoomer;
-			}
-		}*/
-		return workPanel.zoomer;
+		return workPanel.getView(ws);
 	}
 	public Penner getPennerForWorkspace( ImageWorkspace ws) {
-/*		for( WorkPanel panel : panels) {
-			if( panel.workspace == ws) {
-				return panel.workSplicePanel.drawPanel.getPenner();
-			}
-		}*/
-		return workPanel.workSplicePanel.drawPanel.getPenner();
+		return workPanel.getPenner();
 	}
 	
 	// :::: MWorkspaceObserver
@@ -91,11 +82,6 @@ public class WorkTabPane extends JTabbedPane
 		
 		workspaces.add(newWorkspace);
 		
-		// DEBUG TODO
-		if( workPanel == null) { 
-			WorkPanel panel =  new WorkPanel(master, newWorkspace);
-			workPanel = panel;
-		}
 		
 		if( this.getTabCount() == 0)
 			this.addTab(title, workPanel);
@@ -110,7 +96,7 @@ public class WorkTabPane extends JTabbedPane
 				this.removeTabAt(i);
 				workspaces.remove(i);
 				
-				if( i == 0) {
+				if( i == 0 && this.getTabCount() != 0) {
 					this.setComponentAt(0, workPanel);
 				}
 				break;

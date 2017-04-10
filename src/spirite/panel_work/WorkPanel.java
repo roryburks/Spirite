@@ -4,6 +4,7 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -13,6 +14,10 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
@@ -20,7 +25,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
+import com.sun.glass.ui.View;
+
 import spirite.brains.MasterControl;
+import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -52,12 +60,12 @@ import spirite.panel_work.awt.WorkSplicePanel;
  */
 public class WorkPanel extends javax.swing.JPanel 
         implements MImageObserver,
-        	AdjustmentListener, ComponentListener, AWTEventListener
+        	AdjustmentListener, ComponentListener, AWTEventListener, MWorkspaceObserver
 {
 	private static final long serialVersionUID = 1L;
 	
-//	private Point center = new Point(0,0);
-	
+	// ==========
+	// ==== Settings
 	// 1 "tick" of the scrollbar to corresponds to SCROLL_RATIO pixels at zoom 1
 	private static final int SCROLL_RATIO = 10;
 	
@@ -65,18 +73,20 @@ public class WorkPanel extends javax.swing.JPanel
 	// 	negative SCROLL_BUFFER would allow you to scroll the image off-screen entirely.
     private static final int SCROLL_BUFFER = 100;
 
-    // WorkPanel needs Master because some of its components need it
+    
     private final MasterControl master;
-    public final ImageWorkspace workspace;
+    public ImageWorkspace currentWorkspace;
 
+    private final Map<ImageWorkspace,View> views = new HashMap<>();
+//    public final View zoomer = new View();
+    private final JPenPenner jpenner;
 
-    public WorkPanel( MasterControl master, ImageWorkspace workspace) {
+    public WorkPanel( MasterControl master) {
         this.master = master;
-        this.workspace = workspace;
+        
+        jpenner = new JPenPenner(this, master);
         initComponents();
 
-        // Add Listeners/Observers
-        workspace.addImageObserver(this);
 
         jscrollHorizontal.addAdjustmentListener(this);
         jscrollVertical.addAdjustmentListener(this);
@@ -93,24 +103,23 @@ public class WorkPanel extends javax.swing.JPanel
         Toolkit.getDefaultToolkit().addAWTEventListener( this, eventMask);
 
 		calibrateScrolls();
-
-		zoomer.h = workspace.getHeight();
-		zoomer.w = workspace.getWidth();
-		zoomer.h_h = zoomer.h/2;
-		zoomer.h_w = zoomer.w/2;
 		
-		zoomer.cx = workspace.getWidth() / 2;
-		zoomer.cy = workspace.getHeight() / 2;
+		master.addWorkspaceObserver(this);
+
+
 
     }
     
-    public final View zoomer = new View();
+    public Penner getPenner() { return jpenner.penner; }
+    public JPenPenner getJPenner() {return jpenner;}
+    public View getCurrentView() {return views.get(currentWorkspace);}
+    public View getView(ImageWorkspace ws) {return views.get(ws);}
 
     /** The view describes which part of the image is currently being seen and
      * manages conversions between the screen space and the image space. */
     public class View {
-        // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
-        //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
+        /** zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
+         *  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x .... */
         int zoom_level = 0; 
         float zoom = 1.0f;
         
@@ -135,10 +144,12 @@ public class WorkPanel extends javax.swing.JPanel
             zoom = (zoom_level >= 0) ? zoom_level + 1 : 1/(float)(-zoom_level+1);
 
             // Readjust the Scrollbar
+            // TODO: If for whatever reason a non-active zoomer gets zoomed, it 
+            //	presently affects the active view too
             calibrateScrolls();
-            centerAtPos(zoomer.cx, zoomer.cy);
+            centerAtPos(cx, cy);
             
-            workSplicePanel.drawPanel.refreshPennerCoords();
+            jpenner.refreshCoordinates();
             repaint();
         }
         
@@ -159,13 +170,8 @@ public class WorkPanel extends javax.swing.JPanel
             	setZoomLevel(zoom_level - 1);
         }
 
-        public int getZoomLevel( ) {
-            return zoom_level;
-        }
-        
-        public float getZoom() {
-        	return zoom;
-        }
+        public int getZoomLevel( ) { return zoom_level; }
+        public float getZoom() { return zoom; }
 
         // :::: Coordinate Conversion methods
         // its : converts image coordinates to screen coordinates (accounting for zoom)
@@ -193,8 +199,11 @@ public class WorkPanel extends javax.swing.JPanel
     }
     
     private void setCenter( int x, int y) {
-    	zoomer.cx = Math.max(0, Math.min(workspace.getWidth(), x));
-    	zoomer.cy = Math.max(0, Math.min(workspace.getHeight(), y));
+    	View view = views.get(currentWorkspace);
+    	if( view != null) {
+	    	view.cx = Math.max(0, Math.min(currentWorkspace.getWidth(), x));
+	    	view.cy = Math.max(0, Math.min(currentWorkspace.getHeight(), y));
+    	}
     }
     
     // Image Coordinates that you're mouse-over'd displayed in the bottom bar
@@ -205,7 +214,7 @@ public class WorkPanel extends javax.swing.JPanel
     		mx = x;
     		my = y;
     		
-    		Rectangle rect = new Rectangle(0,0,workspace.getWidth(), workspace.getHeight());
+    		Rectangle rect = new Rectangle(0,0,currentWorkspace.getWidth(), currentWorkspace.getHeight());
     		if( rect.contains(x, y)) {
     			coordinateLabel.setText( mx + "," + my);
     		}
@@ -226,7 +235,7 @@ public class WorkPanel extends javax.swing.JPanel
     private boolean calibrating = false;
     private void calibrateScrolls() {
     	calibrating = true;
-        if( workspace == null) {
+        if( currentWorkspace == null) {
             jscrollHorizontal.setEnabled(false);
             jscrollVertical.setEnabled(false);
             return;
@@ -235,15 +244,15 @@ public class WorkPanel extends javax.swing.JPanel
         jscrollHorizontal.setEnabled(true);
         jscrollVertical.setEnabled(true);
 
-        int width = workSplicePanel.getWidth();
-        int height = workSplicePanel.getHeight();
+        int width = workAreaAsComponent.getWidth();
+        int height = workAreaAsComponent.getHeight();
 
         float ratio = SCROLL_RATIO;
 
         float hor_min = -width + SCROLL_BUFFER;
         float vert_min = -height + SCROLL_BUFFER;
-        float hor_max = workspace.getWidth() * zoomer.zoom - SCROLL_BUFFER;
-        float vert_max = workspace.getHeight() * zoomer.zoom - SCROLL_BUFFER;
+        float hor_max = currentWorkspace.getWidth() * views.get(currentWorkspace).zoom - SCROLL_BUFFER;
+        float vert_max = currentWorkspace.getHeight() *  views.get(currentWorkspace).zoom - SCROLL_BUFFER;
 
         jscrollHorizontal.setMinimum( (int)Math.round(hor_min/ratio));
         jscrollVertical.setMinimum( (int)Math.round(vert_min/ratio));
@@ -265,11 +274,14 @@ public class WorkPanel extends javax.swing.JPanel
     private void centerAtPos( int x, int y) {
         final int ratio = SCROLL_RATIO;
 
-        int px = Math.round(x*zoomer.zoom - workSplicePanel.getWidth()/2.0f);
-        int py = Math.round(y*zoomer.zoom - workSplicePanel.getHeight()/2.0f);
-
-        jscrollHorizontal.setValue( Math.round(px / (float)ratio));
-        jscrollVertical.setValue(( Math.round(py / (float)ratio)));
+        View view = views.get(currentWorkspace);
+        if( view != null) {
+	        int px = Math.round(x*view.zoom - workAreaAsComponent.getWidth()/2.0f);
+	        int py = Math.round(y*view.zoom - workAreaAsComponent.getHeight()/2.0f);
+	
+	        jscrollHorizontal.setValue( Math.round(px / (float)ratio));
+	        jscrollVertical.setValue(( Math.round(py / (float)ratio)));
+        }
         
         setCenter( x, y);
     }
@@ -277,37 +289,49 @@ public class WorkPanel extends javax.swing.JPanel
     public Point getCenter() {
     	Point c = new Point();
 
-    	c.x = zoomer.stiXm(workSplicePanel.getWidth()/2);
-    	c.y = zoomer.stiYm(workSplicePanel.getHeight()/2);
+        View view = views.get(currentWorkspace);
+        if( view != null) {
+	    	c.x = view.stiXm(workAreaAsComponent.getWidth()/2);
+	    	c.y = view.stiYm(workAreaAsComponent.getHeight()/2);
+        }
     	
     	return c;
     }
     
 
     private void initComponents() {
-
         jscrollVertical = new JScrollBar();
         jscrollHorizontal = new JScrollBar();
-        workSplicePanel = new WorkSplicePanel( this, master);
+        
+        
+        WorkSplicePanel wsp = new WorkSplicePanel( this, master);
+        workArea = wsp;
+        workAreaAsComponent = wsp;
         coordinateLabel = new JLabel();
         zoomPanel = new JPanel() {
         	@Override
         	protected void paintComponent(Graphics g) {
         		super.paintComponent(g);
+        		
+        		View view = views.get(currentWorkspace);
+        		if( view == null) return;
+        		
         		// :: Draws the zoom level in the bottom right corner
-                if(zoomer.zoom_level >= 0) {
+                if(view.zoom_level >= 0) {
                     g.setFont( new Font("Tahoma", Font.PLAIN, 12));
-                    g.drawString(Integer.toString(zoomer.zoom_level+1), this.getWidth() - ((zoomer.zoom_level > 8) ? 16 : 12), this.getHeight()-5);
+                    g.drawString(Integer.toString(view.zoom_level+1), this.getWidth() - ((view.zoom_level > 8) ? 16 : 12), this.getHeight()-5);
                 }
                 else {
                     g.setFont( new Font("Tahoma", Font.PLAIN, 8));
                     g.drawString("1/", this.getWidth() - 15, this.getHeight() - 10);
                     g.setFont( new Font("Tahoma", Font.PLAIN, 10));
-                    g.drawString(Integer.toString(-zoomer.zoom_level+1), this.getWidth() - ((zoomer.zoom_level < -8) ? 10 : 8), this.getHeight()-4);
+                    g.drawString(Integer.toString(-view.zoom_level+1), this.getWidth() - ((view.zoom_level < -8) ? 10 : 8), this.getHeight()-4);
                 }
         	}
         };
 
+        workAreaContainer.setLayout( new GridLayout());
+        workAreaContainer.add(workAreaAsComponent);
         jscrollHorizontal.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
 
         GroupLayout layout = new GroupLayout(this);
@@ -316,7 +340,7 @@ public class WorkPanel extends javax.swing.JPanel
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(workSplicePanel)
+                    .addComponent(workAreaContainer)
                     .addComponent(jscrollHorizontal, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup( layout.createParallelGroup()
                     .addComponent(jscrollVertical)	
@@ -330,7 +354,7 @@ public class WorkPanel extends javax.swing.JPanel
         layout.setVerticalGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(jscrollVertical, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(workSplicePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(workAreaContainer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup( layout.createParallelGroup()
                 .addComponent(jscrollHorizontal)
                 .addComponent(zoomPanel, 0, 0, jscrollHorizontal.getPreferredSize().height)
@@ -342,9 +366,14 @@ public class WorkPanel extends javax.swing.JPanel
     private JLabel coordinateLabel;
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
-    public WorkSplicePanel workSplicePanel;	// !!!! Maybe should be private with getter
+    
+    private JPanel workAreaContainer = new JPanel();
+    // Very ugly, but neither a strict hierarchy nor an interface alone would work
+    private WorkArea workArea;	
+    private Component workAreaAsComponent;
     private JPanel zoomPanel;
 
+    // ===============
     // ==== Event Listeners and Observers ====
 
     // :::: MImageObserver
@@ -355,9 +384,11 @@ public class WorkPanel extends javax.swing.JPanel
 
 	@Override
 	public void structureChanged(StructureChangeEvent evt) {
-		if( workspace.getWidth() != zoomer.w || workspace.getHeight() != zoomer.h) {
-			zoomer.w = workspace.getWidth();
-			zoomer.h = workspace.getHeight();
+    	View zoomer = views.get(currentWorkspace);
+		if( zoomer != null && (currentWorkspace.getWidth() != zoomer.w 
+				|| currentWorkspace.getHeight() != zoomer.h)) {
+			zoomer.w = currentWorkspace.getWidth();
+			zoomer.h = currentWorkspace.getHeight();
 			zoomer.h_w = zoomer.w/2;
 			zoomer.h_h = zoomer.h/2;
 			
@@ -372,20 +403,23 @@ public class WorkPanel extends javax.swing.JPanel
     // :::: AdjustmentListener
     @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
-        if( e.getSource() == jscrollHorizontal) {
-            zoomer.offsetx = -e.getValue()*SCROLL_RATIO;
-            if( !calibrating)  {
-            	setCenter( zoomer.stiXm(workSplicePanel.getHeight()/2), zoomer.cy);
-            }
-            this.repaint();
-        }
-        if( e.getSource() == jscrollVertical) {
-        	zoomer.offsety = -e.getValue()*SCROLL_RATIO;
-            if( !calibrating) {
-            	setCenter( zoomer.cx, zoomer.stiYm(workSplicePanel.getHeight()/2));
-            }
-            this.repaint();
-        }
+    	View view = views.get(currentWorkspace);
+    	if( view != null) {
+	        if( e.getSource() == jscrollHorizontal) {
+	            view.offsetx = -e.getValue()*SCROLL_RATIO;
+	            if( !calibrating)  {
+	            	setCenter( view.stiXm(workAreaAsComponent.getHeight()/2), view.cy);
+	            }
+	            this.repaint();
+	        }
+	        if( e.getSource() == jscrollVertical) {
+	        	view.offsety = -e.getValue()*SCROLL_RATIO;
+	            if( !calibrating) {
+	            	setCenter( view.cx, view.stiYm(workAreaAsComponent.getHeight()/2));
+	            }
+	            this.repaint();
+	        }
+    	}
         
     }
 
@@ -397,7 +431,9 @@ public class WorkPanel extends javax.swing.JPanel
     public void componentResized(ComponentEvent e) {
         this.calibrateScrolls();
 
-        this.centerAtPos(zoomer.cx, zoomer.cy);
+        View view = views.get(currentWorkspace);
+        if( view != null)
+        	this.centerAtPos(view.cx, view.cy);
     }
 
     // :::: AWTEvent Listener, MOUSE_WHEEL_EVENT_MASK
@@ -415,24 +451,61 @@ public class WorkPanel extends javax.swing.JPanel
 	}
 
 	private void mouseWheelEvent( MouseWheelEvent evt) {
+		View view = views.get(currentWorkspace);
+		if( view == null) return;
+		
 		if(evt.isControlDown()) {			
 			// Verify that the Mouse Event happens within the space of
 			//	the WorkPanel and convert its point to local coordinates.
 			Component source = (Component)evt.getSource();
 			if( SwingUtilities.isDescendingFrom(this, source)) {
+				
 				Point p = SwingUtilities.convertPoint(source, evt.getPoint(), this);
 
 				if( this.contains(p)) {
 				if( evt.getWheelRotation() < 0) {
-					zoomer.cx = (zoomer.cx + zoomer.stiX(p.x))/2;
-					zoomer.cy = (zoomer.cy + zoomer.stiY(p.y))/2;
-					zoomer.zoomIn();
+					view.cx = (view.cx + view.stiX(p.x))/2;
+					view.cy = (view.cy + view.stiY(p.y))/2;
+					view.zoomIn();
 				}
 				else if( evt.getWheelRotation() > 0)
-					zoomer.zoomOut();
+					view.zoomOut();
 				}
 			}
 		}
+	}
+
+	
+	// :::: MWorkspaceObserver
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		currentWorkspace = selected;
+		jpenner.penner.changeWorkspace(currentWorkspace, views.get(selected));
+		workArea.changeWorkspace(selected, views.get(selected));
+	}
+
+	@Override
+	public void newWorkspace(ImageWorkspace newWorkspace) {
+		View view = new View();
+		
+		view.h = newWorkspace.getHeight();
+		view.w = newWorkspace.getWidth();
+		view.h_h = view.h/2;
+		view.h_w = view.w/2;
+		
+		view.cx = newWorkspace.getWidth() / 2;
+		view.cy = newWorkspace.getHeight() / 2;
+		
+		views.put(newWorkspace, view);
+		
+
+        // Add Listeners/Observers
+		newWorkspace.addImageObserver(this);
+	}
+
+	@Override
+	public void removeWorkspace(ImageWorkspace newWorkspace) {
+		views.remove(newWorkspace);
 	}
 
 }

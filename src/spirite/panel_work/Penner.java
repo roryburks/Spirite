@@ -73,13 +73,13 @@ public class Penner
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
 	//	with UI controls
 	private final WorkPanel context;
-	private final View zoomer;	
+	private View view;	
 	
 	
-	private final ImageWorkspace workspace;
-	private final SelectionEngine selectionEngine;
-	private final UndoEngine undoEngine;
-	private final DrawEngine drawEngine;
+	private ImageWorkspace workspace;
+	private SelectionEngine selectionEngine;
+	private UndoEngine undoEngine;
+	private DrawEngine drawEngine;
 	private final ToolsetManager toolsetManager;
 	private final PaletteManager paletteManager;
 	private final SettingsManager settingsManager;
@@ -113,13 +113,9 @@ public class Penner
 	
 	private StateBehavior behavior;
 	
-	public Penner( DrawPanel draw_panel, MasterControl master) {
-		this.zoomer = draw_panel.zoomer;
-		this.context = draw_panel.context;
-		this.workspace = draw_panel.workspace;
-		this.selectionEngine = workspace.getSelectionEngine();
-		this.undoEngine = workspace.getUndoEngine();
-		this.drawEngine = workspace.getDrawEngine();
+	public Penner( WorkPanel context, MasterControl master) {
+		this.view = context.getCurrentView();
+		this.context = context;
 		this.toolsetManager = master.getToolsetManager();
 		this.paletteManager = master.getPaletteManager();
 		this.renderEngine = master.getRenderEngine();
@@ -133,6 +129,23 @@ public class Penner
 	
 	// ==========
 	// ==== Workspace Management
+	public void changeWorkspace( ImageWorkspace newWorkspace, View view) {
+		this.cleanseState();
+
+		workspace = newWorkspace;
+		if( workspace != null) {
+			selectionEngine = workspace.getSelectionEngine();
+			undoEngine = workspace.getUndoEngine();
+			drawEngine = workspace.getDrawEngine();
+		}
+		else {
+			selectionEngine = null;
+			undoEngine = null;
+			drawEngine = null;
+		}
+		
+		this.view = view;
+	}
 	
 	// Since Penner mostly deals in Image Coordinates, not Screen Coordinates,
 	//	when the Image Space changes (such as on zoom-in), the coordinates need
@@ -400,11 +413,11 @@ public class Penner
 	//	problem if they aren't running on the AWTEvent thread.
 	public void rawUpdateX( int raw) {
 		rawX = raw;
-		x = zoomer.stiXm(rawX);
+		x = view.stiXm(rawX);
 	}
 	public void rawUpdateY( int raw) {
 		rawY = raw;
-		y = zoomer.stiYm( rawY);
+		y = view.stiYm( rawY);
 	}
 	public void rawUpdatePressure( float pressure) {
 		this.pressure = MUtil.clip(0, (float)settingsManager.getTabletInterpolator().eval(pressure), 1);
@@ -742,18 +755,18 @@ public class Penner
 				Point p_e = builder.getEnd();
 				
 				g.setColor( Color.BLACK);
-				g.drawLine(zoomer.itsXm(p_e.x), zoomer.itsYm(p_e.y), 
-						zoomer.itsXm(x), zoomer.itsYm(y));
+				g.drawLine(view.itsXm(p_e.x), view.itsYm(p_e.y), 
+						view.itsXm(x), view.itsYm(y));
 
 			}
 
 			Point p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
 				g.setColor( Color.YELLOW);
-				g.fillOval(zoomer.itsXm(p_s.x)-5, zoomer.itsYm(p_s.y) - 5, 10, 10);
+				g.fillOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
 			}
 			else
-				g.drawOval(zoomer.itsXm(p_s.x)-5, zoomer.itsYm(p_s.y) - 5, 10, 10);
+				g.drawOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
 		}
 	}
 	class CroppingBehavior extends DrawnStateBehavior {
@@ -904,17 +917,17 @@ public class Penner
             		new float[]{8,4}, 0);
             g2.setStroke(new_stroke);
             
-            
-            Rectangle r = context.zoomer.itsRm(cropSection);
+            View view = context.getCurrentView();
+            Rectangle r = view.itsRm(cropSection);
             g.drawRect(r.x, r.y, r.width, r.height);
 			
 
             // Grey area outside
 			Composite c = g2.getComposite();
-			int x1 = context.zoomer.itsXm(0);
-			int y1 = context.zoomer.itsYm(0);
-			int x2 = context.zoomer.itsXm(workspace.getWidth());
-			int y2 = context.zoomer.itsYm(workspace.getHeight());
+			int x1 = view.itsXm(0);
+			int y1 = view.itsYm(0);
+			int x2 = view.itsXm(workspace.getWidth());
+			int y2 = view.itsYm(workspace.getHeight());
 
 			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
 			if( r.x + r.width > x2) { r.width = x2 - r.x;}
@@ -930,7 +943,7 @@ public class Penner
 				g2.setStroke(new BasicStroke(2.0f));
 				
 				if( middle.contains(x,y)) {
-					r = context.zoomer.itsRm( middle);
+					r = view.itsRm( middle);
 					g2.setColor(Color.YELLOW);
 		            g.drawRect(r.x, r.y, r.width, r.height);
 				}
@@ -939,28 +952,28 @@ public class Penner
 					g2.setColor(Color.YELLOW);
 				else
 					g2.setColor(Color.WHITE);
-				r = context.zoomer.itsRm(topRight);
+				r = view.itsRm(topRight);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 
 				if( topLeft.contains(x,y))
 					g2.setColor(Color.YELLOW);
 				else
 					g2.setColor(Color.WHITE);
-				r = context.zoomer.itsRm(topLeft);
+				r = view.itsRm(topLeft);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomLeft.contains(x,y))
 					g2.setColor(Color.YELLOW);
 				else
 					g2.setColor(Color.WHITE);
-				r = context.zoomer.itsRm(bottomLeft);
+				r = view.itsRm(bottomLeft);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomRight.contains(x,y))
 					g2.setColor(Color.YELLOW);
 				else
 					g2.setColor(Color.WHITE);
-				r = context.zoomer.itsRm(bottomRight);
+				r = view.itsRm(bottomRight);
 	            g.drawRect(r.x, r.y, r.width, r.height);
 			}
 
@@ -997,7 +1010,7 @@ public class Penner
 		
 		@Override
 		public void paintOverlay(Graphics g) {
-			float zoom = zoomer.getZoom();
+			float zoom = view.getZoom();
 			
 			BuiltSelection sel =selectionEngine.getBuiltSelection();
 			
@@ -1011,7 +1024,7 @@ public class Penner
 			AffineTransform origTrans = g2.getTransform();
 
 			AffineTransform relTrans = new AffineTransform();
-			relTrans.translate(zoomer.itsX(0), zoomer.itsY(0));
+			relTrans.translate(view.itsX(0), view.itsY(0));
 			relTrans.scale(zoom, zoom);
 			relTrans.translate(d.width/2+sel.offsetX, d.height/2+sel.offsetY);
 			relTrans.concatenate(wTrans);
