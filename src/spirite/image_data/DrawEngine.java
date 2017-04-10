@@ -86,7 +86,7 @@ public class DrawEngine {
 			return false;
 		}
 		else {
-			if( stroke.getHard()) stroke.setInterpolationMethod(InterpolationMethod.NONE);
+//			if( activeEngine instanceof AWTStrokeEngine) stroke.setInterpolationMethod(InterpolationMethod.NONE);
 			activeEngine = master.getGraphicsContext().getStrokeEngine();
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))

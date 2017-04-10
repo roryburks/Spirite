@@ -88,7 +88,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
-				_stroke( composeVBuffer(states));
+				_stroke( composeVBuffer(states), stroke.getHard()?1:0);
 			}
 		});
 /*		_stroke( composeVBuffer(states));
@@ -260,7 +260,7 @@ class GLStrokeEngine extends StrokeEngine {
 	 * passes it to a geometry shader that will expand it into a proper shape
 	 * to be filled by the fragment shader.
 	 */
-	private void _stroke( GLVBuffer glvb) {
+	private void _stroke( GLVBuffer glvb, int mode) {
 		int w = data.getWidth();
 		int h = data.getHeight();
 		
@@ -288,16 +288,18 @@ class GLStrokeEngine extends StrokeEngine {
         
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+        int uColor = gl.glGetUniformLocation( prog, "uColor");
+        int uMode = gl.glGetUniformLocation( prog, "uMode");
         FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
         	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
         );
         gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
-        int uColor = gl.glGetUniformLocation( prog, "uColor");
         gl.glUniform3f(uColor, 
         		stroke.getColor().getRed()/255.0f,
         		stroke.getColor().getGreen()/255.0f,
         		stroke.getColor().getBlue()/255.0f);
         gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
+        gl.glUniform1i( uMode, mode);
         
 
         gl.glEnable(GL2.GL_MULTISAMPLE);

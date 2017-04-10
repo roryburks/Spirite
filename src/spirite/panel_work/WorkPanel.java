@@ -50,7 +50,7 @@ import spirite.image_data.ImageWorkspace.StructureChangeEvent;
  * @author Rory Burks
  */
 public class WorkPanel extends javax.swing.JPanel 
-        implements MImageObserver,  
+        implements MImageObserver, WorkArea,
         	AdjustmentListener, ComponentListener, AWTEventListener
 {
 	private static final long serialVersionUID = 1L;
@@ -114,8 +114,6 @@ public class WorkPanel extends javax.swing.JPanel
     public final Zoomer zoomer = new Zoomer();
 
     public class Zoomer {
-
-
         // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
         //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
         int zoom_level = 0; 
@@ -198,7 +196,8 @@ public class WorkPanel extends javax.swing.JPanel
     // Image Coordinates that you're mouse-over'd displayed in the bottom bar
     private int mx = 0;
     private int my = 0;
-    void refreshCoordinates( int x, int y) {
+    @Override
+    public void refreshCoordinates( int x, int y) {
     	if( mx != x || my != y) {
     		mx = x;
     		my = y;

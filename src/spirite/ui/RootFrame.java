@@ -35,8 +35,8 @@ import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
-import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.panel_work.WorkTabPane;
+import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.components.ResizeContainerPanel;
 import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
 

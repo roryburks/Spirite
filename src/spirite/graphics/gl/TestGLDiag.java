@@ -7,7 +7,10 @@ import java.nio.IntBuffer;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.GL2;
@@ -28,14 +31,17 @@ public class TestGLDiag extends JDialog  {
 
 	GLContext cont = null;
 	boolean init = false;
+	int met = 0;
     
     
+	private final JTabbedPane tabbed = new JTabbedPane();
 	
 	public TestGLDiag() {
 		setBounds(100, 100, 450, 500);
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities glcapabilities = new GLCapabilities( glprofile );
 		final GLCanvas glcanvas = new GLCanvas(glcapabilities);
+		
 		
 
 		glcanvas.addGLEventListener( new GLEventListener() {
@@ -73,8 +79,44 @@ public class TestGLDiag extends JDialog  {
 		        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 		        
 		        gl.glViewport( 0, 0, w, h);
-		        GLUIDraw.drawColorGradient(0.4f, GradientType.SATURATION, w, h, gl);
 		        
+		        switch( met) {
+		        case 0:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.RED, w, h, gl);
+			        break;
+		        case 1:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.GREEN, w, h, gl);
+			        break;
+		        case 2:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.BLUE, w, h, gl);
+			        break;
+		        case 3:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.HUE, w, h, gl);
+			        break;
+		        case 4:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.SATURATION, w, h, gl);
+			        break;
+		        case 5:
+			        GLUIDraw.drawColorGradient(0.4f, GradientType.VALUE, w, h, gl);
+			        break;
+		        }
+		        
+			}
+		});
+
+		tabbed.addTab("Red", glcanvas);
+		tabbed.addTab("Green", null);
+		tabbed.addTab("Blue", null);
+		tabbed.addTab("Hue", null);
+		tabbed.addTab("Saturation", null);
+		tabbed.addTab("Value", null);
+		
+		
+		tabbed.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				met = tabbed.getSelectedIndex();
+				glcanvas.repaint();
 			}
 		});
 		
@@ -83,7 +125,7 @@ public class TestGLDiag extends JDialog  {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(glcanvas, 0, 100, Short.MAX_VALUE)
+					.addComponent(tabbed, 0, 100, Short.MAX_VALUE)
 					.addGap(12))
 		);
 		groupLayout.setVerticalGroup(
@@ -91,7 +133,7 @@ public class TestGLDiag extends JDialog  {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup()
-							.addComponent(glcanvas, 0, 241, Short.MAX_VALUE)
+							.addComponent(tabbed, 0, 241, Short.MAX_VALUE)
 					)
 					.addGap(10))
 		);

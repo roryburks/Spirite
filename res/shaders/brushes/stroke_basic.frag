@@ -4,6 +4,7 @@ in float fWeight;
 flat in float fX, fY, fM;
 
 uniform vec3 uColor;
+uniform int uMode;
 
 out vec4 outputColor;
 
@@ -15,5 +16,12 @@ void main()
 	}
 	else w = fWeight;
 	
-    outputColor = vec4(uColor,sqrt(sqrt(w)));
+	switch( uMode) {
+	case 0:
+    	outputColor = vec4(uColor,sqrt(sqrt(w)));
+    	break;
+    case 1:
+    	outputColor = vec4(uColor,(w>0)?1:0);
+	}
+	
 }

@@ -52,13 +52,15 @@ public class DrawPanel extends JPanel
 	private static final long serialVersionUID = 1L;
 
 	private final MasterControl master;
-	final ImageWorkspace workspace;
 	private final RenderEngine renderEngine;
 	private final SelectionEngine selectionEngine;
+
+	// Components other things need access to
+	public final ImageWorkspace workspace;
+	public final WorkPanel context;
+	public final Zoomer zoomer;
 	
 	private final JPenPenner penner;
-	final WorkPanel context;
-	final Zoomer zoomer;
 	private final Timer paint_timer;
 	
 	private int metronome = 0;
@@ -241,7 +243,7 @@ public class DrawPanel extends JPanel
 	
 
 	/** Removes Global references (Swing-Global and JNI-Global) to avoid leaks */
-	void cleanUp() {
+	public void cleanUp() {
 		AwtPenToolkit.removePenListener(this, penner);
 		paint_timer.stop();
 		penner.cleanUp();

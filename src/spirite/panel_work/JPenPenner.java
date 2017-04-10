@@ -23,7 +23,7 @@ import spirite.pen.PenTraits.MButtonEvent;
 public class JPenPenner implements PenListener
 {
 	private final ToolsetManager toolsetManager;
-	final Penner penner;
+	public final Penner penner;
 	
 	public JPenPenner( DrawPanel context, MasterControl master) {
 		penner = new Penner(context, master);

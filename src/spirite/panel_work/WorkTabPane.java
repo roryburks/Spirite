@@ -21,12 +21,22 @@ import spirite.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.panel_work.WorkPanel.Zoomer;
 import spirite.ui.UIUtil;
 
+/**
+ * WorkTabPane is the top-level UI Component for the Work/Draw area.  In addition 
+ * to managing the active Work Area based on tabs, it also handles any interactions 
+ * that outside components might need to have with the work panel
+ * 
+ * 
+ * @author Rory Burks
+ *
+ */
 public class WorkTabPane extends JTabbedPane 
 	implements MWorkspaceObserver, ChangeListener,
 		MouseListener, ActionListener, MWorkspaceFileObserver
 {
-	// Needs to rememver master so it can pass it on to WorkPanel's
 	private final MasterControl master;
+	
+//	private final WorkPanel workPanel;
 	
 	// Panels should maintain a 1:1 assosciation with tabs
 	private final List<WorkPanel> panels = new ArrayList<>();
@@ -34,6 +44,7 @@ public class WorkTabPane extends JTabbedPane
 	
 	public WorkTabPane( MasterControl master) {
 		this.master = master;
+//		this.workPanel = new WorkPanel(master);
 		
 		master.addWorkspaceObserver(this);
 		
@@ -128,6 +139,10 @@ public class WorkTabPane extends JTabbedPane
 	private class WTPContextMenu extends JPopupMenu {
 		int tabID;
 	}
+	@Override	public void mouseClicked(MouseEvent arg0) {}
+	@Override	public void mouseEntered(MouseEvent arg0) {}
+	@Override	public void mouseExited(MouseEvent arg0) {}
+	@Override	public void mouseReleased(MouseEvent arg0) {}
 	@Override
 	public void mousePressed(MouseEvent evt) {
 		if( evt.getButton() == MouseEvent.BUTTON3) {
@@ -148,10 +163,6 @@ public class WorkTabPane extends JTabbedPane
 			}
 		}
 	}
-	@Override	public void mouseClicked(MouseEvent arg0) {}
-	@Override	public void mouseEntered(MouseEvent arg0) {}
-	@Override	public void mouseExited(MouseEvent arg0) {}
-	@Override	public void mouseReleased(MouseEvent arg0) {}
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
