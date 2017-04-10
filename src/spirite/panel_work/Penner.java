@@ -50,7 +50,8 @@ import spirite.image_data.SelectionEngine.SelectionBuilder;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel.View;
+import spirite.panel_work.awt.DrawPanel;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
@@ -72,11 +73,9 @@ public class Penner
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
 	//	with UI controls
 	private final WorkPanel context;
-	private final Zoomer zoomer;	
+	private final View zoomer;	
 	
-	// It might be easier to just link Master instead of linking every
-	//	single Manager in the kitchen, but I like the idea of encouraging
-	//	thinking about why you need a component before actually linking it.
+	
 	private final ImageWorkspace workspace;
 	private final SelectionEngine selectionEngine;
 	private final UndoEngine undoEngine;
@@ -131,6 +130,9 @@ public class Penner
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 			.addKeyEventDispatcher(this);
 	}
+	
+	// ==========
+	// ==== Workspace Management
 	
 	// Since Penner mostly deals in Image Coordinates, not Screen Coordinates,
 	//	when the Image Space changes (such as on zoom-in), the coordinates need

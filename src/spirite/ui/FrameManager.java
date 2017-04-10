@@ -29,7 +29,7 @@ import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
 import spirite.panel_work.Penner;
 import spirite.panel_work.WorkTabPane;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel.View;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 
@@ -212,7 +212,7 @@ public class FrameManager
 		}
 	}
 	
-	public Zoomer getZoomerForWorkspace( ImageWorkspace ws) {
+	public View getZoomerForWorkspace( ImageWorkspace ws) {
 		if( root == null) return null;
 		
 		WorkTabPane wsPane = root.getWTPane();

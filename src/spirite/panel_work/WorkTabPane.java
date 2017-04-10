@@ -18,7 +18,7 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.image_data.ImageWorkspace.MWorkspaceFileObserver;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel.View;
 import spirite.ui.UIUtil;
 
 /**
@@ -36,10 +36,10 @@ public class WorkTabPane extends JTabbedPane
 {
 	private final MasterControl master;
 	
-//	private final WorkPanel workPanel;
+	private WorkPanel workPanel = null;
 	
 	// Panels should maintain a 1:1 assosciation with tabs
-	private final List<WorkPanel> panels = new ArrayList<>();
+	private final List<ImageWorkspace> workspaces= new ArrayList<>();
 	
 	
 	public WorkTabPane( MasterControl master) {
@@ -53,36 +53,28 @@ public class WorkTabPane extends JTabbedPane
 	}
 	
 	
-	public WorkPanel getCurrentWorkPane() {
-		int index = this.getSelectedIndex();
-		if( index != -1)
-			return panels.get(index);
-		
-		return null;
-	}
-	
-	public Zoomer getZoomerForWorkspace( ImageWorkspace ws) {
-		for( WorkPanel panel : panels) {
+	public View getZoomerForWorkspace( ImageWorkspace ws) {
+		/*for( WorkPanel panel : panels) {
 			if( panel.workspace == ws) {
 				return panel.zoomer;
 			}
-		}
-		return null;
+		}*/
+		return workPanel.zoomer;
 	}
 	public Penner getPennerForWorkspace( ImageWorkspace ws) {
-		for( WorkPanel panel : panels) {
+/*		for( WorkPanel panel : panels) {
 			if( panel.workspace == ws) {
 				return panel.workSplicePanel.drawPanel.getPenner();
 			}
-		}
-		return null;
+		}*/
+		return workPanel.workSplicePanel.drawPanel.getPenner();
 	}
 	
 	// :::: MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-		for( int i = 0; i < panels.size(); ++i) {
-			if( panels.get(i).workspace == selected) {
+		for( int i = 0; i < workspaces.size(); ++i) {
+			if( workspaces.get(i) == selected) {
 				setSelectedIndex(i);
 				return;
 			}
@@ -91,30 +83,36 @@ public class WorkTabPane extends JTabbedPane
 	
 	@Override
 	public void newWorkspace( ImageWorkspace newWorkspace) {
-		WorkPanel panel =  new WorkPanel(master, newWorkspace);
+		String title = (newWorkspace.getFile() == null)
+				? "Untitled Image"
+				: newWorkspace.getFile().getName();
+		
 		newWorkspace.addWorkspaceFileObserve(this);
-		panels.add(panel);
 		
-		String title;
+		workspaces.add(newWorkspace);
 		
-		if( newWorkspace.getFile() == null) {
-			title = "Untitled Image";
-		}
-		else {
-			title = newWorkspace.getFile().getName();
+		// DEBUG TODO
+		if( workPanel == null) { 
+			WorkPanel panel =  new WorkPanel(master, newWorkspace);
+			workPanel = panel;
 		}
 		
-		this.addTab(title, panel);
+		if( this.getTabCount() == 0)
+			this.addTab(title, workPanel);
+		else
+			this.add(title, null);
 	}
 	
 	@Override
 	public void removeWorkspace( ImageWorkspace workspace) {
-		for( int i = 0; i < panels.size(); ++i) {
-			WorkPanel panel = panels.get(i);
-			if( panel.workspace == workspace) {
+		for( int i = 0; i < workspaces.size(); ++i) {
+			if( workspaces.get(i) == workspace) {
 				this.removeTabAt(i);
-				panels.remove(i);
-				panel.workSplicePanel.drawPanel.cleanUp();
+				workspaces.remove(i);
+				
+				if( i == 0) {
+					this.setComponentAt(0, workPanel);
+				}
 				break;
 			}
 		}
@@ -126,7 +124,7 @@ public class WorkTabPane extends JTabbedPane
 		if( getSelectedIndex() == -1)
 			return;
 		
-		ImageWorkspace selected = panels.get( getSelectedIndex()).workspace;
+		ImageWorkspace selected = workspaces.get( getSelectedIndex());
 		
 		if( selected != master.getCurrentWorkspace()) {
 			master.setCurrentWorkpace(selected);
@@ -167,8 +165,7 @@ public class WorkTabPane extends JTabbedPane
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if( evt.getActionCommand().equals("close")) {
-			ImageWorkspace workspace = panels.get(contextMenu.tabID).workspace;
-			master.closeWorkspace(workspace);
+			master.closeWorkspace(workspaces.get(contextMenu.tabID));
 		}		
 	}
 
@@ -176,8 +173,8 @@ public class WorkTabPane extends JTabbedPane
 	// :::: MWorkspaceFileObserver
 	@Override
 	public void fileChanged( FileChangeEvent evt) {
-		for( int i = 0; i < panels.size(); ++i) {
-			if( panels.get(i).workspace == evt.getWorkspace()) {
+		for( int i = 0; i < workspaces.size(); ++i) {
+			if( workspaces.get(i) == evt.getWorkspace()) {
 				setTitleAt(i,  evt.getWorkspace().getFileName() + (evt.hasChanged() ? "*" : ""));
 			}
 		}

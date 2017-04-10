@@ -1,4 +1,4 @@
-package spirite.panel_work;
+package spirite.panel_work.awt;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,7 +10,8 @@ import javax.swing.GroupLayout;
 
 import spirite.brains.MasterControl;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel;
+import spirite.panel_work.WorkPanel.View;
 import spirite.ui.UIUtil;
 
 /**
@@ -25,10 +26,10 @@ public class WorkSplicePanel extends javax.swing.JPanel
 {
 	private static final long serialVersionUID = 1L;
 	final WorkPanel context;
-	final Zoomer zoomer;
+	final View zoomer;
     int offsetx, offsety;
 
-    final DrawPanel drawPanel;
+    public final DrawPanel drawPanel;
     private final ReferencePanel previewPanel;
     private final ReferencePanel previewPanelBack;
     

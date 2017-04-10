@@ -1,6 +1,6 @@
 // Rory Burks
 
-package spirite.panel_work;
+package spirite.panel_work.awt;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
@@ -21,7 +21,8 @@ import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.ReferenceManager.Reference;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel;
+import spirite.panel_work.WorkPanel.View;
 
 public class ReferencePanel extends JPanel 
 	implements MImageObserver, MReferenceObserver
@@ -31,7 +32,7 @@ public class ReferencePanel extends JPanel
 	private final RenderEngine renderer;
 	private final boolean front;
 	
-	private final Zoomer zoomer;
+	private final View zoomer;
 	
 	private ImageWorkspace workspace;
 	

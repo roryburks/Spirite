@@ -47,7 +47,7 @@ import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
 import spirite.panel_work.Penner;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel.View;
 import spirite.ui.FrameManager;
 
 /***
@@ -555,7 +555,7 @@ public class MasterControl
 	    			// Paste Data onto Selection Engine (current selected Data)
 	    			int ox = 0, oy=0;
 	    			
-	    			Zoomer zoom = frameManager.getZoomerForWorkspace(currentWorkspace);
+	    			View zoom = frameManager.getZoomerForWorkspace(currentWorkspace);
 
 	    			int min_x = zoom.stiX(0);
 	    			int min_y = zoom.stiY(0);

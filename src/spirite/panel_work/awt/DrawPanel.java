@@ -1,6 +1,6 @@
 //Rory Burks
 
-package spirite.panel_work;
+package spirite.panel_work.awt;
 
 
 import java.awt.BasicStroke;
@@ -36,7 +36,10 @@ import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.JPenPenner;
+import spirite.panel_work.Penner;
+import spirite.panel_work.WorkPanel;
+import spirite.panel_work.WorkPanel.View;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 
@@ -58,7 +61,7 @@ public class DrawPanel extends JPanel
 	// Components other things need access to
 	public final ImageWorkspace workspace;
 	public final WorkPanel context;
-	public final Zoomer zoomer;
+	public final View zoomer;
 	
 	private final JPenPenner penner;
 	private final Timer paint_timer;

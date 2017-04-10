@@ -25,6 +25,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.panel_work.awt.WorkSplicePanel;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external
@@ -50,19 +51,12 @@ import spirite.image_data.ImageWorkspace.StructureChangeEvent;
  * @author Rory Burks
  */
 public class WorkPanel extends javax.swing.JPanel 
-        implements MImageObserver, WorkArea,
+        implements MImageObserver,
         	AdjustmentListener, ComponentListener, AWTEventListener
 {
 	private static final long serialVersionUID = 1L;
-
-	int w = 0;	// Image Width
-	int h = 0;	// Image Height
-	int h_w = 0;	// Half Image Width
-	int h_h = 0;	// Half Image Height
 	
-	// Stores the point where the image is centered at so that the UI components
-	//	don't have to do a lot of guess-work when resizing components etc.
-	private Point center = new Point(0,0);
+//	private Point center = new Point(0,0);
 	
 	// 1 "tick" of the scrollbar to corresponds to SCROLL_RATIO pixels at zoom 1
 	private static final int SCROLL_RATIO = 10;
@@ -75,7 +69,6 @@ public class WorkPanel extends javax.swing.JPanel
     private final MasterControl master;
     public final ImageWorkspace workspace;
 
-    private int offsetx, offsety;
 
     public WorkPanel( MasterControl master, ImageWorkspace workspace) {
         this.master = master;
@@ -101,23 +94,34 @@ public class WorkPanel extends javax.swing.JPanel
 
 		calibrateScrolls();
 
-		h = workspace.getHeight();
-		w = workspace.getWidth();
-		h_h = h/2;
-		h_w = w/2;
+		zoomer.h = workspace.getHeight();
+		zoomer.w = workspace.getWidth();
+		zoomer.h_h = zoomer.h/2;
+		zoomer.h_w = zoomer.w/2;
 		
-		center.x = workspace.getWidth() / 2;
-		center.y = workspace.getHeight() / 2;
+		zoomer.cx = workspace.getWidth() / 2;
+		zoomer.cy = workspace.getHeight() / 2;
 
     }
     
-    public final Zoomer zoomer = new Zoomer();
+    public final View zoomer = new View();
 
-    public class Zoomer {
+    /** The view describes which part of the image is currently being seen and
+     * manages conversions between the screen space and the image space. */
+    public class View {
         // zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
         //  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x ....
         int zoom_level = 0; 
         float zoom = 1.0f;
+        
+        int offsetx, offsety;
+    	int w, h;	// Image Width/Height
+    	int h_w, h_h;	// Half Image Width/Height
+    	
+
+    	// Stores the point where the image is centered at so that the UI components
+    	//	don't have to do a lot of guess-work when resizing components etc.
+    	int cx, cy;
         
         
         // :::: API
@@ -132,7 +136,7 @@ public class WorkPanel extends javax.swing.JPanel
 
             // Readjust the Scrollbar
             calibrateScrolls();
-            centerAtPos(center.x, center.y);
+            centerAtPos(zoomer.cx, zoomer.cy);
             
             workSplicePanel.drawPanel.refreshPennerCoords();
             repaint();
@@ -175,7 +179,7 @@ public class WorkPanel extends javax.swing.JPanel
         // 	mouse input is rounded as visually expected.
         public int itsXm( int x) { return (int) (Math.floor(x * zoom) + offsetx);}
         public int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
-        int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
+        public int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
         public int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
         
         public Rectangle itsRm( Rectangle rect) {
@@ -189,14 +193,13 @@ public class WorkPanel extends javax.swing.JPanel
     }
     
     private void setCenter( int x, int y) {
-    	center.x = Math.max(0, Math.min(workspace.getWidth(), x));
-    	center.y = Math.max(0, Math.min(workspace.getHeight(), y));
+    	zoomer.cx = Math.max(0, Math.min(workspace.getWidth(), x));
+    	zoomer.cy = Math.max(0, Math.min(workspace.getHeight(), y));
     }
     
     // Image Coordinates that you're mouse-over'd displayed in the bottom bar
     private int mx = 0;
     private int my = 0;
-    @Override
     public void refreshCoordinates( int x, int y) {
     	if( mx != x || my != y) {
     		mx = x;
@@ -339,7 +342,7 @@ public class WorkPanel extends javax.swing.JPanel
     private JLabel coordinateLabel;
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
-    WorkSplicePanel workSplicePanel;	// !!!! Maybe should be private with getter
+    public WorkSplicePanel workSplicePanel;	// !!!! Maybe should be private with getter
     private JPanel zoomPanel;
 
     // ==== Event Listeners and Observers ====
@@ -352,15 +355,15 @@ public class WorkPanel extends javax.swing.JPanel
 
 	@Override
 	public void structureChanged(StructureChangeEvent evt) {
-		if( workspace.getWidth() != w || workspace.getHeight() != h) {
-			w = workspace.getWidth();
-			h = workspace.getHeight();
-			h_w = w/2;
-			h_h = h/2;
+		if( workspace.getWidth() != zoomer.w || workspace.getHeight() != zoomer.h) {
+			zoomer.w = workspace.getWidth();
+			zoomer.h = workspace.getHeight();
+			zoomer.h_w = zoomer.w/2;
+			zoomer.h_h = zoomer.h/2;
 			
 	        calibrateScrolls();
 	
-	        centerAtPos( this.center.x, this.center.y);
+	        centerAtPos( zoomer.cx, zoomer.cy);
 	        this.repaint();
 		}
 	}
@@ -370,16 +373,16 @@ public class WorkPanel extends javax.swing.JPanel
     @Override
     public void adjustmentValueChanged(AdjustmentEvent e) {
         if( e.getSource() == jscrollHorizontal) {
-            offsetx = -e.getValue()*SCROLL_RATIO;
+            zoomer.offsetx = -e.getValue()*SCROLL_RATIO;
             if( !calibrating)  {
-            	setCenter( zoomer.stiXm(workSplicePanel.getHeight()/2), center.y);
+            	setCenter( zoomer.stiXm(workSplicePanel.getHeight()/2), zoomer.cy);
             }
             this.repaint();
         }
         if( e.getSource() == jscrollVertical) {
-        	offsety = -e.getValue()*SCROLL_RATIO;
+        	zoomer.offsety = -e.getValue()*SCROLL_RATIO;
             if( !calibrating) {
-            	setCenter( center.x, zoomer.stiYm(workSplicePanel.getHeight()/2));
+            	setCenter( zoomer.cx, zoomer.stiYm(workSplicePanel.getHeight()/2));
             }
             this.repaint();
         }
@@ -394,7 +397,7 @@ public class WorkPanel extends javax.swing.JPanel
     public void componentResized(ComponentEvent e) {
         this.calibrateScrolls();
 
-        this.centerAtPos(center.x, center.y);
+        this.centerAtPos(zoomer.cx, zoomer.cy);
     }
 
     // :::: AWTEvent Listener, MOUSE_WHEEL_EVENT_MASK
@@ -421,8 +424,8 @@ public class WorkPanel extends javax.swing.JPanel
 
 				if( this.contains(p)) {
 				if( evt.getWheelRotation() < 0) {
-					center.x = (center.x + zoomer.stiX(p.x))/2;
-					center.y = (center.y + zoomer.stiY(p.y))/2;
+					zoomer.cx = (zoomer.cx + zoomer.stiX(p.x))/2;
+					zoomer.cy = (zoomer.cy + zoomer.stiY(p.y))/2;
 					zoomer.zoomIn();
 				}
 				else if( evt.getWheelRotation() > 0)

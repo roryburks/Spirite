@@ -36,7 +36,7 @@ import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkTabPane;
-import spirite.panel_work.WorkPanel.Zoomer;
+import spirite.panel_work.WorkPanel.View;
 import spirite.ui.components.ResizeContainerPanel;
 import spirite.ui.components.ResizeContainerPanel.ContainerOrientation;
 
@@ -200,7 +200,7 @@ public class RootFrame extends javax.swing.JFrame
     class ContextualCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
     	private WorkPanel workPanel;
-    	private Zoomer zoomer;
+    	private View zoomer;
 		
 		private ContextualCommandExecuter() {
 			commandMap.put("zoom_in", new Runnable() { @Override public void run() {
@@ -231,10 +231,8 @@ public class RootFrame extends javax.swing.JFrame
 		
 		@Override
 		public boolean executeCommand(String command) {
-	    	workPanel = workPane.getCurrentWorkPane();
-	    	if( workPanel == null) return true;
-	    	
-	    	zoomer = workPanel.zoomer;
+	    	zoomer = workPane.getZoomerForWorkspace(master.getCurrentWorkspace());;
+	    	if( zoomer == null) return true;
 	    	
 	    	Runnable exe = commandMap.get(command);
 	    	if( exe != null) {
