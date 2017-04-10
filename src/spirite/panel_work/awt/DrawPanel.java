@@ -99,7 +99,7 @@ public class DrawPanel extends JPanel
     @Override
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
-        
+
         if( workspace == null) {
         	return;
         }

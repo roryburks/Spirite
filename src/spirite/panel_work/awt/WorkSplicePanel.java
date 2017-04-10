@@ -123,6 +123,7 @@ public class WorkSplicePanel extends javax.swing.JPanel
         this.zoomer = view;
 		drawPanel.changeWorkspace( ws, view);
 		previewPanel.changeWorkspace( ws, view);
+		previewPanelBack.changeWorkspace(ws, view);
 	}        
 
 }

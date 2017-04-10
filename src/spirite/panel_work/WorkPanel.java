@@ -281,6 +281,12 @@ public class WorkPanel extends javax.swing.JPanel
 	
 	        jscrollHorizontal.setValue( Math.round(px / (float)ratio));
 	        jscrollVertical.setValue(( Math.round(py / (float)ratio)));
+	        
+	        // Needed exclusively for when a new image is being created and it
+	        // sets the value to what it already is (thus not triggering the 
+	        // AdjustmentEvent).
+            view.offsetx = -(Math.round(px / (float)ratio))*SCROLL_RATIO;
+            view.offsety = -(Math.round(py / (float)ratio))*SCROLL_RATIO;
         }
         
         setCenter( x, y);
@@ -480,8 +486,16 @@ public class WorkPanel extends javax.swing.JPanel
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		currentWorkspace = selected;
-		jpenner.penner.changeWorkspace(currentWorkspace, views.get(selected));
-		workArea.changeWorkspace(selected, views.get(selected));
+		
+		View view = views.get(selected);
+		jpenner.penner.changeWorkspace(currentWorkspace, view);
+		workArea.changeWorkspace(selected, view);
+
+		if( view != null) {
+			calibrateScrolls();
+			centerAtPos(view.cx, view.cy);
+		}
+		repaint();
 	}
 
 	@Override
