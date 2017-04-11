@@ -264,7 +264,7 @@ public class GLEngine  {
 			GL2 gl)
 	{
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
-        		0, params.width, 0, params.height, -1, 1));
+        		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
         
         if( trans != null) {
 	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
@@ -386,8 +386,8 @@ public class GLEngine  {
 		pt. tex = GLBuffers.newDirectIntBuffer(1);
         gl.glGenTextures(1, pt.tex);
         gl.glBindTexture(GL2.GL_TEXTURE_2D, pt.tex.get(0));
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		

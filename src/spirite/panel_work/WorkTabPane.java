@@ -36,7 +36,7 @@ public class WorkTabPane extends JTabbedPane
 {
 	private final MasterControl master;
 	
-	private WorkPanel workPanel = null;
+	public final WorkPanel workPanel;
 	
 	// Panels should maintain a 1:1 assosciation with tabs
 	private final List<ImageWorkspace> workspaces= new ArrayList<>();

@@ -72,21 +72,10 @@ public class DrawPanel extends JPanel
 		this.renderEngine = master.getRenderEngine();
 		this.master = master;
 		this.context = context;
-		this.zoomer = context.getCurrentView();
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setOpaque( false);
 
 		penner = context.getJPenner();
-
-		workspace = context.currentWorkspace;
-		if( workspace == null)
-			selectionEngine = null;
-		else {
-			selectionEngine = workspace.getSelectionEngine();
-			workspace.addImageObserver(this);
-			workspace.getSelectionEngine().addSelectionObserver(this);
-			workspace.addSelectionObserver(this);
-		}
 		
 		paint_timer = new Timer( 40, this);
 		paint_timer.start();

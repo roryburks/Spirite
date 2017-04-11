@@ -21,6 +21,7 @@ class GLParameters {
 	public GLTexture texture;
 	public GLTexture texture2;
 	public int width, height;
+	public boolean flip = false;
 
 	boolean useBlendMode = true;
 	boolean useDefaultBlendmode = true;
@@ -33,6 +34,10 @@ class GLParameters {
 	
 	public void addParam( GLParam param) {
 		params.add(param);
+	}
+	
+	public void clearParams() {
+		params.clear();
 	}
 
 	public void apply( GL2 gl, int prog) {

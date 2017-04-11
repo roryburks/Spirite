@@ -14,6 +14,7 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.sun.glass.ui.View;
 
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.graphics.gl.GLWorkArea;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -75,7 +77,7 @@ public class WorkPanel extends javax.swing.JPanel
 
     
     private final MasterControl master;
-    public ImageWorkspace currentWorkspace;
+    private ImageWorkspace currentWorkspace;
 
     private final Map<ImageWorkspace,View> views = new HashMap<>();
 //    public final View zoomer = new View();
@@ -114,6 +116,19 @@ public class WorkPanel extends javax.swing.JPanel
     public JPenPenner getJPenner() {return jpenner;}
     public View getCurrentView() {return views.get(currentWorkspace);}
     public View getView(ImageWorkspace ws) {return views.get(ws);}
+    
+    boolean gl = false;
+    public void toggleGL() {
+    	gl = !gl;
+    	
+    	workArea = (gl)
+    			?(new GLWorkArea(this, master))
+    			:(new WorkSplicePanel(this, master));
+    	
+    	workAreaContainer.removeAll();
+    	workAreaContainer.add(workArea.getComponent());
+    	workArea.changeWorkspace(currentWorkspace, getCurrentView());
+    }
 
     /** The view describes which part of the image is currently being seen and
      * manages conversions between the screen space and the image space. */
@@ -187,6 +202,13 @@ public class WorkPanel extends javax.swing.JPanel
         public int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
         public int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
         public int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
+
+        public AffineTransform getViewTransform() {
+        	AffineTransform trans = new AffineTransform();
+        	trans.translate(itsX(0), itsY(0));
+        	trans.scale( getZoom(), getZoom());
+        	return trans;
+        }
         
         public Rectangle itsRm( Rectangle rect) {
         	return new Rectangle(
@@ -244,8 +266,8 @@ public class WorkPanel extends javax.swing.JPanel
         jscrollHorizontal.setEnabled(true);
         jscrollVertical.setEnabled(true);
 
-        int width = workAreaAsComponent.getWidth();
-        int height = workAreaAsComponent.getHeight();
+        int width = workArea.getComponent().getWidth();
+        int height = workArea.getComponent().getHeight();
 
         float ratio = SCROLL_RATIO;
 
@@ -276,8 +298,8 @@ public class WorkPanel extends javax.swing.JPanel
 
         View view = views.get(currentWorkspace);
         if( view != null) {
-	        int px = Math.round(x*view.zoom - workAreaAsComponent.getWidth()/2.0f);
-	        int py = Math.round(y*view.zoom - workAreaAsComponent.getHeight()/2.0f);
+	        int px = Math.round(x*view.zoom - workArea.getComponent().getWidth()/2.0f);
+	        int py = Math.round(y*view.zoom - workArea.getComponent().getHeight()/2.0f);
 	
 	        jscrollHorizontal.setValue( Math.round(px / (float)ratio));
 	        jscrollVertical.setValue(( Math.round(py / (float)ratio)));
@@ -297,8 +319,8 @@ public class WorkPanel extends javax.swing.JPanel
 
         View view = views.get(currentWorkspace);
         if( view != null) {
-	    	c.x = view.stiXm(workAreaAsComponent.getWidth()/2);
-	    	c.y = view.stiYm(workAreaAsComponent.getHeight()/2);
+	    	c.x = view.stiXm(workArea.getComponent().getWidth()/2);
+	    	c.y = view.stiYm(workArea.getComponent().getHeight()/2);
         }
     	
     	return c;
@@ -309,10 +331,13 @@ public class WorkPanel extends javax.swing.JPanel
         jscrollVertical = new JScrollBar();
         jscrollHorizontal = new JScrollBar();
         
+
+    	workArea = (gl)
+    			?(new GLWorkArea(this, master))
+    			:(new WorkSplicePanel(this, master));
+        workArea.changeWorkspace(currentWorkspace, getCurrentView());
         
-        WorkSplicePanel wsp = new WorkSplicePanel( this, master);
-        workArea = wsp;
-        workAreaAsComponent = wsp;
+        
         coordinateLabel = new JLabel();
         zoomPanel = new JPanel() {
         	@Override
@@ -337,7 +362,7 @@ public class WorkPanel extends javax.swing.JPanel
         };
 
         workAreaContainer.setLayout( new GridLayout());
-        workAreaContainer.add(workAreaAsComponent);
+        workAreaContainer.add(workArea.getComponent());
         jscrollHorizontal.setOrientation(javax.swing.JScrollBar.HORIZONTAL);
 
         GroupLayout layout = new GroupLayout(this);
@@ -374,9 +399,7 @@ public class WorkPanel extends javax.swing.JPanel
     private javax.swing.JScrollBar jscrollVertical;
     
     private JPanel workAreaContainer = new JPanel();
-    // Very ugly, but neither a strict hierarchy nor an interface alone would work
-    private WorkArea workArea;	
-    private Component workAreaAsComponent;
+    private WorkArea workArea;
     private JPanel zoomPanel;
 
     // ===============
@@ -414,14 +437,14 @@ public class WorkPanel extends javax.swing.JPanel
 	        if( e.getSource() == jscrollHorizontal) {
 	            view.offsetx = -e.getValue()*SCROLL_RATIO;
 	            if( !calibrating)  {
-	            	setCenter( view.stiXm(workAreaAsComponent.getHeight()/2), view.cy);
+	            	setCenter( view.stiXm(workArea.getComponent().getHeight()/2), view.cy);
 	            }
 	            this.repaint();
 	        }
 	        if( e.getSource() == jscrollVertical) {
 	        	view.offsety = -e.getValue()*SCROLL_RATIO;
 	            if( !calibrating) {
-	            	setCenter( view.cx, view.stiYm(workAreaAsComponent.getHeight()/2));
+	            	setCenter( view.cx, view.stiYm(workArea.getComponent().getHeight()/2));
 	            }
 	            this.repaint();
 	        }
@@ -522,4 +545,12 @@ public class WorkPanel extends javax.swing.JPanel
 		views.remove(newWorkspace);
 	}
 
+	
+	@Override
+	public void repaint() {
+		super.repaint();
+		
+		if( workArea != null && workArea.getComponent() != null)
+		workArea.getComponent().repaint();
+	}
 }

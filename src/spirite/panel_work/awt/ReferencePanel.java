@@ -42,14 +42,6 @@ public class ReferencePanel extends JPanel
 		this.renderer = master.getRenderEngine();
 		this.front = front;
 		
-		workspace = context.currentWorkspace;
-		if( workspace != null) {
-			workspace.addImageObserver(this);
-			workspace.getReferenceManager().addReferenceObserve(this);
-		}
-				
-		this.zoomer = context.getCurrentView();
-		
 		this.setOpaque(false);
         
     }

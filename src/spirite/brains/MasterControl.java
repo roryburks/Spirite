@@ -584,6 +584,9 @@ public class MasterControl
 	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
 	    		}
     		}});
+    		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
+    			frameManager.getWorkPanel().toggleGL();;
+    		}});
     	}
     	
 

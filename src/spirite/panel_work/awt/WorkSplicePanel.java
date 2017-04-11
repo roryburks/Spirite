@@ -1,6 +1,7 @@
 package spirite.panel_work.awt;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
@@ -88,8 +89,8 @@ public class WorkSplicePanel extends javax.swing.JPanel
 	        UIUtil.drawTransparencyBG(g, new Rectangle( 
 	        		Math.max(0, zoomer.itsX(0)),
 	        		Math.max(0, zoomer.itsY(0)),
-	        		Math.min(getWidth(), (int)Math.round(context.currentWorkspace.getWidth()*zoomer.getZoom())-2-dx),
-	        		Math.min(getHeight(), (int)Math.round(context.currentWorkspace.getHeight()*zoomer.getZoom())-2-dy)),
+	        		Math.min(getWidth(), (int)Math.round(workspace.getWidth()*zoomer.getZoom())-2-dx),
+	        		Math.min(getHeight(), (int)Math.round(workspace.getHeight()*zoomer.getZoom())-2-dy)),
 	        		8);
     	}
     }
@@ -112,6 +113,8 @@ public class WorkSplicePanel extends javax.swing.JPanel
 			zoomer.zoomOut();
 	}
 
+	
+	// :::: WorkArea
 	@Override
 	public void changeWorkspace(ImageWorkspace ws, View view) {
 		if( workspace != null)
@@ -124,6 +127,11 @@ public class WorkSplicePanel extends javax.swing.JPanel
 		drawPanel.changeWorkspace( ws, view);
 		previewPanel.changeWorkspace( ws, view);
 		previewPanelBack.changeWorkspace(ws, view);
+	}
+
+	@Override
+	public Component getComponent() {
+		return this;
 	}        
 
 }
