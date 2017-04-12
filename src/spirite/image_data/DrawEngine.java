@@ -33,7 +33,6 @@ import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 import spirite.pen.StrokeEngine.STATE;
-import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 
 /***
  * Pretty much anything which alters the image data directly goes 

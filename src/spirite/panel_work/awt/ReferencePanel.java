@@ -9,8 +9,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import spirite.MDebug;
-import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.ReferenceRenderSource;

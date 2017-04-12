@@ -19,11 +19,12 @@ import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.Globals;
-import spirite.MDebug;
-import spirite.MDebug.ErrorType;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderSettings;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
+import spirite.graphics.gl.GLGraphics;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
@@ -37,7 +38,6 @@ import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
 import spirite.panel_work.JPenPenner;
-import spirite.panel_work.Penner;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
 
@@ -88,6 +88,8 @@ public class DrawPanel extends JPanel
     @Override
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
+        
+        GraphicsContext graphics = new AWTContext(g);
 
         if( workspace == null) {
         	return;
@@ -193,7 +195,9 @@ public class DrawPanel extends JPanel
             	selectionEngine.drawBuildingSelection(g);
             if( selection != null) {
                 g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-            	selection.drawSelectionBounds(master.getGraphicsContext(),  g);
+                AffineTransform toTrans = g2.getTransform();
+                g2.setTransform(trans);
+            	selection.drawSelectionBounds(graphics,  toTrans, g);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

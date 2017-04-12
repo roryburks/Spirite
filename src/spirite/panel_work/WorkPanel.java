@@ -15,9 +15,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.GroupLayout;
@@ -25,8 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
-
-import com.sun.glass.ui.View;
 
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;

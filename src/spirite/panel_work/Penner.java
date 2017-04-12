@@ -51,7 +51,6 @@ import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
 import spirite.panel_work.WorkPanel.View;
-import spirite.panel_work.awt.DrawPanel;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;

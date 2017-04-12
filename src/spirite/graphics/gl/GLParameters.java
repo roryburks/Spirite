@@ -170,6 +170,18 @@ class GLParameters {
 			gl.glUniform1f( getUniformLocation(gl, prog), f1);
 		}
 	}
+	public static class GLParam3f extends GLParam {
+		private final float f1, f2, f3;
+		public GLParam3f( String name, float f1, float f2, float f3) {
+			super(name);
+			this.f1 = f1; this.f2 = f2; this.f3 = f3;
+		}
+		@Override
+		public void apply(GL2 gl, int prog) {
+			gl.glUniform3f( getUniformLocation(gl, prog), 
+					f1, f2, f3);
+		}
+	}
 	public static class GLParam4f extends GLParam {
 		private final float f1, f2, f3, f4;
 		public GLParam4f( String name, float f1, float f2, float f3, float f4) {

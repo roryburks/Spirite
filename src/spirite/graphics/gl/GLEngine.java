@@ -57,8 +57,8 @@ import sun.awt.image.ByteInterleavedRaster;
  */
 public class GLEngine  {
 	private final GLOffscreenAutoDrawable drawable;
-	private int width = 1;
-	private int height = 1;
+	int width = 1;
+	int height = 1;
 
 	
 	/** Namespace for Attribute Bindings 
@@ -175,6 +175,7 @@ public class GLEngine  {
 		DEFAULT,
 		SQARE_GRADIENT,
 		CHANGE_COLOR,
+		GRID,
 		
 		PASS_BASIC,
 		PASS_BORDER,
@@ -182,16 +183,21 @@ public class GLEngine  {
 		PASS_RENDER,
 		PASS_ESCALATE, 
 		
+		
+		
 		STROKE_SPORE,
-		STROKE_BASIC,
+		STROKE_BASIC, 
+		STROKE_PIXEL,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
         switch( type) {
 		case STROKE_BASIC:
+		case STROKE_PIXEL:
 		case DEFAULT:
 		case PASS_RENDER:
 		case PASS_BASIC:
+		case GRID:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
@@ -503,6 +509,14 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_basic.frag");
+        programs[ProgramType.GRID.ordinal()] = loadProgramFromResources( 
+				"shaders/pass.vert", 
+				null, 
+				"shaders/etc/pass_grid.frag");
+        programs[ProgramType.STROKE_PIXEL.ordinal()] = loadProgramFromResources( 
+				"shaders/brushes/stroke_pixel.vert", 
+				null, 
+				"shaders/brushes/stroke_pixel.frag");
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){

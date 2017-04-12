@@ -26,8 +26,12 @@ void main()
 	
 	vec2 bl, bc, br, tl, tc, tr;
 	
-	float w1 = vSize[1]/2;
-	float w2 = vSize[2]/2;
+	float w1 = vSize[1]/2 + 1;
+	float w2 = vSize[2]/2 + 1;
+	float weight1 = ( vSize[1]/2 < 1) ? vSize[1]/2 : 1;
+	float weight2 = ( vSize[2]/2 < 1) ? vSize[2]/2 : 1;
+	float weight_out1 = -1 / (vSize[1]/2);
+	float weight_out2= -1 / (vSize[2]/2);
 	
 	bl = br = bc = vec2( gl_in[1].gl_Position.x, gl_in[1].gl_Position.y);
 	tl = tr = tc = vec2( gl_in[2].gl_Position.x, gl_in[2].gl_Position.y);
@@ -83,32 +87,32 @@ void main()
 	
 	// 1 : Bottomleft
     gl_Position = perspectiveMatrix*vec4(bl,0,1);
-    fWeight = 0;
+    fWeight = weight_out1;
     EmitVertex();
 
 	// 2 : Topleft
     gl_Position = perspectiveMatrix*vec4(tl,0,1);
-    fWeight = 0;
+    fWeight = weight_out2;
     EmitVertex();
     
     // 3 :bottomcenter
     gl_Position = perspectiveMatrix*vec4(bc,0,1);
-    fWeight = 1;
+    fWeight = weight1;
     EmitVertex();
     
     // 4 :topcenter
     gl_Position = perspectiveMatrix*vec4(tc,0,1);
-    fWeight = 1;
+    fWeight = weight2;
     EmitVertex();
     
     // 5: bottomright
     gl_Position = perspectiveMatrix*vec4(br,0,1);
-    fWeight = 0;
+    fWeight = weight_out1;
     EmitVertex();
     
     // 6: topright
     gl_Position = perspectiveMatrix*vec4(tr,0,1);
-    fWeight = 0;
+    fWeight = weight_out2;
     EmitVertex();
     
     EndPrimitive();

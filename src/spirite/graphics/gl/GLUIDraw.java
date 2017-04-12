@@ -2,12 +2,9 @@ package spirite.graphics.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
@@ -95,7 +92,7 @@ class GLUIDraw {
 	
 
 	/** Draws a border around the given image. */
-	public static BufferedImage drawBounds( 
+	public static void drawBounds( 
 			BufferedImage image, int cycle, AffineTransform trans, int swidth, int sheight) 
 	{
 		GLMultiRenderer glmu = new GLMultiRenderer(swidth, sheight, 
@@ -109,7 +106,7 @@ class GLUIDraw {
 				engine.clearSurface();
 				GLParameters params2 = new GLParameters(swidth, sheight);
 				params2.texture = new GLImageTexture(image);
-				engine.applyPassProgram( ProgramType.CHANGE_COLOR, params2, trans,
+				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
 						0, 0, image.getWidth(), image.getHeight(), false, gl.getGL2());
 			}
 		});
@@ -125,10 +122,6 @@ class GLUIDraw {
 
 		// Clean up and Apply the surface to an image
 		glmu.cleanup();
-
-        BufferedImage im = engine.glSurfaceToImage();
-       
-		return im;
 	}
 	
 	public static void drawColorGradient( float fixed, GradientType type, int w, int h, GL2 gl) {

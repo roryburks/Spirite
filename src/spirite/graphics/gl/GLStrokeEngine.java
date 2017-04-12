@@ -88,7 +88,8 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
-				_stroke( composeVBuffer(states), stroke.getHard()?1:0);
+
+					_stroke( composeVBuffer(states), stroke.getHard()?1:0);
 			}
 		});
 /*		_stroke( composeVBuffer(states));
@@ -274,7 +275,18 @@ class GLStrokeEngine extends StrokeEngine {
 //	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
 //        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 
-        int prog = engine.getProgram(ProgramType.STROKE_BASIC);
+        int prog = 0;
+        
+        switch( stroke.getMethod()) {
+		case BASIC:
+		case ERASE:
+        	prog = engine.getProgram(ProgramType.STROKE_BASIC);
+			break;
+		case PIXEL:
+        	prog = engine.getProgram(ProgramType.STROKE_PIXEL);
+			break;
+        
+        }
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams

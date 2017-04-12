@@ -12,7 +12,6 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
-import spirite.panel_work.awt.DrawPanel;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 /**

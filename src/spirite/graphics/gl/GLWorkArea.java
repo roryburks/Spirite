@@ -2,13 +2,12 @@ package spirite.graphics.gl;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
-
-import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -16,7 +15,6 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.GLBuffers;
 
@@ -41,23 +39,23 @@ import spirite.panel_work.WorkPanel.View;
 public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 {
 	private final WorkPanel context;
+	private final GLEngine engine = GLEngine.getInstance();
+	private final GLJPanel canvas;
+	
+	private final GLGraphics graphics;
 	private ImageWorkspace workspace = null;
 	private View view;
-	private GLJPanel canvas;
-	private boolean loaded = false;
-	private final GLEngine engine = GLEngine.getInstance();
-
-	GLContext cont;
 	
 	public GLWorkArea(WorkPanel context, MasterControl master) {
 		this.context = context;
+		this.graphics = (GLGraphics)master.getGraphicsContext();
 		
-		cont = engine.getContext();
-
+		// Create UI Component
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities glcapabilities = new GLCapabilities( glprofile );
 		canvas = new GLJPanel(glcapabilities);
 		
+		// Add Input Listeners
 		AwtPenToolkit.addPenListener(canvas, context.getJPenner());
 		canvas.addGLEventListener(this);
 		canvas.addMouseWheelListener(new MouseWheelListener() {
@@ -80,53 +78,58 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 	@Override
 	public void display(GLAutoDrawable glad) {
 		glad.getContext().makeCurrent();
-		
-		
-		GL2 gl = glad.getGL().getGL2();
-		
-		
+
 		GLParameters params;
 		int w = glad.getSurfaceWidth();
 		int h = glad.getSurfaceHeight();
+		GL2 gl = glad.getGL().getGL2();
+		
+		graphics.setContext(gl, w, h, true);
 		gl.glViewport(0, 0, w, h);
 		
+		// Clear Background Color
 		Color c = context.getBackground();
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( 
 	    		new float[] {c.getRed()/255.0f, c.getGreen()/255.0f, c.getBlue()/255.0f, 0f});
         gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
         
         if( workspace != null) {
-        	AffineTransform viewTrans = view.getViewTransform();
+        	// Draw Background Grid
+
+    		Rectangle rect = new Rectangle( view.itsX(0), view.itsY(0), 
+    				(int)Math.round(workspace.getWidth()*view.getZoom()),
+	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
+    		graphics.drawTransparencyBG(rect, 8);
         	
-        	
-        	
+    		// :::: Draw Back Reference
+    		
         	BuiltImageData bd = workspace.buildActiveData();
         	if( bd != null) {
-        		// Draw Background
+        		// ::: Draw Image
+            	AffineTransform viewTrans = view.getViewTransform();
         		params = new GLParameters(w, h);
         		params.flip = true;
-        		params.addParam( new GLParameters.GLParam1i("varCol", 4));
-        		params.addParam( new GLParameters.GLParam1f("fixedCol", 0.5f));
-        		params.setBlendMode( GL2.GL_ONE, GL2.GL_ZERO, GL2.GL_FUNC_ADD);
-
-        		engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, viewTrans,
-        				0, 0, workspace.getWidth(), workspace.getHeight(), false, gl);
-        		
-        		// Draw one Image
-        		params = new GLParameters(w, h);
-        		params.flip = true;
+        		params.clearParams();
+        		params.setUseBlendMode(true);
         		BufferedImage bi = bd.handle.deepAccess();
         		params.texture = new GLParameters.GLImageTexture(bi);
         		engine.applyPassProgram(ProgramType.PASS_BASIC, params, viewTrans, 
         				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
         	}
+        	
+        	// :::: Draw Front Reference
+        	
+        	// :::: Draw Selection Bounds
         }
 	}
 
 
 	@Override
 	public void init(GLAutoDrawable glad) {
-		// Disassociate old context and assosciate new context.
+		GLContext cont = engine.getContext();
+
+		// Disassociate default context and assosciate the context from teh GLEngine
+		//	(so they can share resources)
 		GLContext old = glad.getContext();
 		old.makeCurrent();
 		glad.setContext(null, true);
@@ -156,17 +159,9 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 		return canvas;
 	}
 
-	@Override
-	public void imageChanged(ImageChangeEvent evt) {
-		canvas.repaint();
-		
-	}
-
-	@Override
-	public void structureChanged(StructureChangeEvent evt) {
-		canvas.repaint();
-		
-	}
+	// :::: MImageObserver
+	@Override public void imageChanged(ImageChangeEvent evt) { canvas.repaint(); }
+	@Override public void structureChanged(StructureChangeEvent evt) { canvas.repaint(); }
 
 	
 

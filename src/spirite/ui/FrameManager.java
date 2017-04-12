@@ -29,8 +29,8 @@ import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
 import spirite.panel_work.Penner;
 import spirite.panel_work.WorkPanel;
-import spirite.panel_work.WorkTabPane;
 import spirite.panel_work.WorkPanel.View;
+import spirite.panel_work.WorkTabPane;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 

@@ -110,7 +110,7 @@ public class MasterControl
         	graphicsContext = new GLGraphics();
 //        	graphicsContext = new AWTContext();
         }catch(Exception e) {
-        	graphicsContext = new AWTContext();
+        	graphicsContext = null;
         }
 
         // As of now I see no reason to dynamically construct this with a series 
