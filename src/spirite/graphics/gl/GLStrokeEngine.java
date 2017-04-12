@@ -57,11 +57,14 @@ class GLStrokeEngine extends StrokeEngine {
 
 	@Override
 	protected void prepareDisplayLayer() {
+		engine.getContext().makeCurrent();
 		displayLayer.render( new GLRenderer() {
 			@Override
 			public void render(GL gl) {
 				engine.setSurfaceSize(w, h);
 				engine.clearSurface(gl.getGL2());
+				gl.glViewport(0, 0, w, h);
+				
 				
 				GLParameters params = new GLParameters(w, h);
 				params.texture = new GLParameters.GLFBOTexture(fixedLayer);
@@ -85,7 +88,7 @@ class GLStrokeEngine extends StrokeEngine {
 	@Override
 	protected boolean drawToLayer( List<PenState> states, boolean permanent) {
 		GLMultiRenderer glmu = (permanent)?fixedLayer:displayLayer;
-		
+
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
 
@@ -191,7 +194,7 @@ class GLStrokeEngine extends StrokeEngine {
         
         pd.free();
 
-        BufferedImage im = engine.glSurfaceToImage(); 
+//        BufferedImage im = engine.glSurfaceToImage(); 
 //		MUtil.clearImage(strokeLayer);
 //		Graphics2D g2 = (Graphics2D)displayLayer.getGraphics();
 //		g2.drawImage(im, 0, 0, null);
@@ -262,11 +265,12 @@ class GLStrokeEngine extends StrokeEngine {
 	 * to be filled by the fragment shader.
 	 */
 	private void _stroke( GLVBuffer glvb, int mode) {
+		GL2 gl = engine.getGL2();
 		int w = data.getWidth();
 		int h = data.getHeight();
 		
 		engine.setSurfaceSize( w, h);
-		GL2 gl = engine.getGL2();
+		
 		
 		
 		PreparedData pd = engine.prepareRawData(glvb.vBuffer, gl);

@@ -39,6 +39,13 @@ public class GLGraphics extends GraphicsContext{
 		this.drawable = engine.getAutoDrawable();
 	}
 	
+
+	public boolean isFlip() {return flip;}
+	public int getWidth() {return width;}
+	public int getHeight() { return height;}
+	
+	public GL2 getGL() { reset();return gl;}
+	
 	private void reset() {
 		this.width = drawable.getSurfaceWidth();
 		this.height = drawable.getSurfaceHeight();
@@ -89,7 +96,7 @@ public class GLGraphics extends GraphicsContext{
 		reset();
 		
 		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
+		params.flip = isFlip();
 		params.addParam(new GLParameters.GLParam3f("uColor1", c1.getRed()/255.0f, c1.getGreen()/255.0f, c1.getBlue()/255.0f));
 		params.addParam(new GLParameters.GLParam3f("uColor2", c2.getRed()/255.0f, c2.getGreen()/255.0f, c2.getBlue()/255.0f));
 		params.addParam(new GLParameters.GLParam1i("uSize", size));
@@ -126,5 +133,10 @@ public class GLGraphics extends GraphicsContext{
 
 		// Clean up and Apply the surface to an image
 		glmu.cleanup();
+	}
+	@Override
+	public void clear() {
+		reset();
+		engine.clearSurface(gl);
 	}
 }

@@ -25,6 +25,9 @@ import spirite.Globals;
 import spirite.MDebug;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsDrawer;
+import spirite.graphics.GraphicsDrawer.RenderRoutine;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -63,18 +66,20 @@ public class RenderEngine
 	implements MImageObserver, MWorkspaceObserver, MReferenceObserver
 {
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
-	private final CacheManager cacheManager;
 	private final Timer sweepTimer;
 	
 	//  ThumbnailManager needs access to MasterControl to keep track of all
 	//	workspaces that exist (easier and more reliable than hooking into Observers)
 	private final MasterControl master;
+	private final SettingsManager settingsManager;
+	private final CacheManager cacheManager;
 	
 	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
 	
 	public RenderEngine( MasterControl master) {
 		this.master = master;
 		this.cacheManager = master.getCacheManager();
+		this.settingsManager = master.getSettingsManager();
 		
 		master.addWorkspaceObserver(this);
 		for( ImageWorkspace workspace : master.getWorkspaces()) {
@@ -142,6 +147,23 @@ public class RenderEngine
 		
 	}
 	
+	/** Renders the Workspace to an Image in its intended form.  */
+	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, AffineTransform trans) {
+
+		buildCompositeLayer(workspace);
+		
+		GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
+		
+		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
+		settings.normalize();
+		
+		NodeRenderer renderer = drawer.createNodeRenderer(workspace.getRootNode(), RenderEngine.this);
+		renderer.render(settings, context, trans);
+
+		if( compositionImage != null) compositionImage.flush();
+		compositionImage = null;
+	}
+	
 	/** Renders the image using the given RenderSettings, accessing it from the
 	 * cache if the image has been already rendered under those settings and no
 	 * relevant ImageData has changed since then. */
@@ -162,8 +184,6 @@ public class RenderEngine
 			
 			cachedImage = cacheManager.cacheImage(settings.target.render(settings),this);
 
-
-			
 			imageCache.put(settings, cachedImage);
 		}
 		
@@ -238,8 +258,6 @@ public class RenderEngine
 	
 	// ===================
 	// ==== Thumbnail Management
-	
-	
 	public BufferedImage accessThumbnail( Node node) {
 		return thumbnailManager.accessThumbnail(node);
 	}
@@ -587,11 +605,21 @@ public class RenderEngine
 			// TODO: Add way to detect if OpenGL is not proprly loaded, and use
 			//	default AWT renderer if not
 			
+			
 			buildCompositeLayer(workspace);
 			
-			NodeRenderer renderer = master.getSettingsManager().getDefaultDrawer().createNodeRenderer(
-					root, RenderEngine.this);
-			return renderer.render(settings);
+			GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
+			
+			BufferedImage bi = drawer.renderToImage( new RenderRoutine() {
+				@Override
+				public void render(GraphicsContext context) {
+					context.clear();
+					NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
+					renderer.render(settings, context, null);
+				}
+			}, settings.width, settings.height);
+			
+			return bi;
 		}
 
 	}
@@ -600,7 +628,7 @@ public class RenderEngine
 	public abstract class NodeRenderer {
 		protected final GroupNode root;
 		protected NodeRenderer( GroupNode root) { this.root = root;}
-		public abstract BufferedImage render(RenderSettings settings);
+		public abstract void render(RenderSettings settings, GraphicsContext context, AffineTransform trans);
 		
 		/** Determines the number of images needed to properly render 
 		 * the given RenderSettings.  This number is equal to largest Group

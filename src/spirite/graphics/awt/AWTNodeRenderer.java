@@ -18,6 +18,7 @@ import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -37,11 +38,13 @@ public class AWTNodeRenderer extends NodeRenderer {
 	}
 	
 	@Override
-	public BufferedImage render(RenderSettings settings) {		
+	public void render(RenderSettings settings, GraphicsContext context, AffineTransform trans) {		
 		try {
+			AWTContext awtc = (AWTContext)context;
+			
 			// Step 1: Determine amount of data needed
 			int n = _getNeededImagers( settings);
-			if( n <= 0) return null;
+			if( n <= 0) return;
 			
 			buffer = new BufferedImage[n];
 			for( int i=0; i<n; ++i) {
@@ -54,11 +57,15 @@ public class AWTNodeRenderer extends NodeRenderer {
 
 			_render_rec( root, 0, settings);
 			
-			// Flush the data we only needed to build the image
-			for( int i=1; i<n;++i)
-				buffer[i].flush();
+			// TODO: can remove 1 buffer
+			Graphics g = awtc.getGraphics();
 			
-			return buffer[0];
+			g.drawImage(buffer[0], 0, 0, null);
+			
+			// Flush the data we only needed to build the image
+			for( int i=0; i<n;++i)
+				buffer[i].flush();
+			g.dispose();
 		}
 		finally {buffer = null;}
 	}

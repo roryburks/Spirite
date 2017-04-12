@@ -20,6 +20,8 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.brains.MasterControl;
+import spirite.brains.RenderEngine;
+import spirite.brains.RenderEngine.RenderSettings;
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -78,6 +80,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	@Override public void dispose(GLAutoDrawable arg0) {}
 	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
 	}
+	
 	@Override
 	public void display(GLAutoDrawable glad) {
 		GLGraphics graphics = new GLGraphics(glad, true);
@@ -104,22 +107,30 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
     				(int)Math.round(workspace.getWidth()*view.getZoom()),
 	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
     		graphics.drawTransparencyBG(rect, 8);
+    		
+
+        	AffineTransform viewTrans = view.getViewTransform();
         	
     		// :::: Draw Back Reference
+        	
+        	
+        	RenderEngine renderEngine = workspace.getRenderEngine();
+        	renderEngine.renderWorkspace(workspace, graphics, viewTrans);
+//        	glad.getContext().makeCurrent();
+/*        	RenderSettings settings = new RenderSettings(
+        			renderEngine.getDefaultRenderTarget(workspace));
+    		BufferedImage image = renderEngine.renderImage(settings);
+
+    		glad.getContext().makeCurrent();
     		
-        	BuiltImageData bd = workspace.buildActiveData();
-        	if( bd != null) {
-        		// ::: Draw Image
-            	AffineTransform viewTrans = view.getViewTransform();
-        		params = new GLParameters(w, h);
-        		params.flip = true;
-        		params.clearParams();
-        		params.setUseBlendMode(true);
-        		BufferedImage bi = bd.handle.deepAccess();
-        		params.texture = new GLParameters.GLImageTexture(bi);
-        		engine.applyPassProgram(ProgramType.PASS_BASIC, params, viewTrans, 
-        				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
-        	}
+			// ::: Draw Image
+    		params = new GLParameters(w, h);
+    		params.flip = true;
+    		params.clearParams();
+    		params.setUseBlendMode(true);
+    		params.texture = new GLParameters.GLImageTexture(image);
+    		engine.applyPassProgram(ProgramType.PASS_BASIC, params, viewTrans, 
+    				0, 0, image.getWidth(), image.getHeight(), false, gl);*/
         	
         	// :::: Draw Front Reference
         	
@@ -127,9 +138,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
             Selection selection = selectionEngine.getSelection();
 
             if( selection != null || selectionEngine.isBuilding()) {
-            	AffineTransform trans = new AffineTransform();
-                trans.translate(view.itsX(0), view.itsY(0));
-                trans.scale(view.getZoom(), view.getZoom());
+            	AffineTransform trans = new AffineTransform(viewTrans);
                 
 //                if(selectionEngine.isBuilding()) 
 //                	selectionEngine.drawBuildingSelection(g);

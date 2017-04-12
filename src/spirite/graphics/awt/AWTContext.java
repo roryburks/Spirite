@@ -30,6 +30,8 @@ public class AWTContext extends GraphicsContext{
 	public AWTContext( Graphics g) {
 		this.g = g;
 	}
+	
+	public Graphics getGraphics() {return g;}
 
 	@Override
 	public void drawBounds(BufferedImage mask, int c, AffineTransform trans) {
@@ -48,5 +50,11 @@ public class AWTContext extends GraphicsContext{
 		g2.dispose();
 		
 		g.drawImage(bi, r.x, r.y, null);
+	}
+
+	@Override
+	public void clear() {
+		Rectangle r = g.getClipBounds();
+		g.clearRect(r.x, r.y, r.width, r.height);
 	}
 }

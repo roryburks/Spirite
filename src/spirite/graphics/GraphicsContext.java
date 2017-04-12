@@ -32,4 +32,6 @@ public abstract class GraphicsContext {
 	 * @return
 	 */
 	public abstract void drawBounds(BufferedImage mask, int c, AffineTransform trans);
+
+	public abstract void clear();
 }

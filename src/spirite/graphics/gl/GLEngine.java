@@ -2,6 +2,7 @@ package spirite.graphics.gl;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -22,7 +23,9 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
+import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -33,6 +36,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
+import sun.awt.image.IntegerInterleavedRaster;
 
 /**
  * GLEngine is the root point for dealing with OpenGL through JOGL.  It handles
@@ -204,6 +208,7 @@ public class GLEngine  {
 		case PASS_RENDER:
 		case PASS_BASIC:
 		case GRID:
+		case PASS_ESCALATE:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
@@ -212,7 +217,6 @@ public class GLEngine  {
 		case PASS_INVERT:
 		case SQARE_GRADIENT:
 		case STROKE_SPORE:
-		case PASS_ESCALATE:
 	        gl.glEnable(GL.GL_BLEND);
 	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
 	        gl.glBlendEquation(GL2.GL_MAX);
@@ -407,17 +411,34 @@ public class GLEngine  {
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		
-		gl.glTexImage2D(
-				GL2.GL_TEXTURE_2D,
-				0,
-				GL2.GL_RGBA,
-				w, h,
-				0,
-				GL2.GL_RGBA,
-				GL2.GL_UNSIGNED_INT_8_8_8_8,
-				ByteBuffer.wrap(((ByteInterleavedRaster)bi.getRaster()).getDataStorage())
-				);
+		WritableRaster rast = bi.getRaster();
 
+		if( rast instanceof ByteInterleavedRaster) {
+			gl.glTexImage2D(
+					GL2.GL_TEXTURE_2D,
+					0,
+					GL2.GL_RGBA,
+					w, h,
+					0,
+					GL2.GL_RGBA,
+					GL2.GL_UNSIGNED_INT_8_8_8_8,
+					ByteBuffer.wrap(((ByteInterleavedRaster)rast).getDataStorage())
+					);
+		}
+		if( rast instanceof IntegerInterleavedRaster) {
+			gl.glTexImage2D(
+					GL2.GL_TEXTURE_2D,
+					0,
+					GL2.GL_RGBA,
+					w, h,
+					0,
+					GL2.GL_BGRA,
+					GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
+					IntBuffer.wrap(((IntegerInterleavedRaster)rast).getDataStorage())
+					);
+		}
+
+		
 		return pt;
 	}
 	

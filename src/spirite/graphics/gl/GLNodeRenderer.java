@@ -18,6 +18,7 @@ import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import spirite.image_data.GroupTree.GroupNode;
@@ -60,20 +61,24 @@ class GLNodeRenderer extends NodeRenderer {
 		this.workspace = node.getContext();
 	}
 
+	private GL2 gl;
 	@Override
-	public BufferedImage render(RenderSettings settings) {
+	public void render(RenderSettings settings, GraphicsContext context, AffineTransform trans) {
 		try {
+			GLGraphics glg = (GLGraphics)context;
+			gl = glg.getGL();
+			
 			// Step 1: Determine amount of data needed
 			int n = _getNeededImagers( settings);
 
-			if( n <= 0) return null;
+//	    	engine.clearSurface(gl);
+			if( n <= 0) return;
 			engine.setSurfaceSize(settings.width, settings.height);
 			
 			// Prepare the FrameBuffers needed for rendering
 			glmu = new GLMultiRenderer[n];
 			for( int i=0; i<n; ++i) {
-				glmu[i] = new GLMultiRenderer(
-						settings.width, settings.height, engine.getGL2());
+				glmu[i] = new GLMultiRenderer( settings.width, settings.height, gl);
 				glmu[i].init();
 				glmu[i].render(new GLRenderer() {
 					@Override public void render(GL gl) {
@@ -92,21 +97,17 @@ class GLNodeRenderer extends NodeRenderer {
 			// surface onto a BufferedImage so that Swing can draw it.
 			// TODO: This last step could be avoided if I used a GLPanel instead
 			//	of a basic Swing Panel
-			engine.setSurfaceSize(settings.width, settings.height);
-			GLParameters params = new GLParameters(settings.width, settings.height);
+//			engine.setSurfaceSize(settings.width, settings.height);
+			GLParameters params = new GLParameters(glg.getWidth(), glg.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
-	    	engine.clearSurface(engine.getGL2());
-			engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null, 
-					0, 0, settings.width, settings.height, true, engine.getGL2());
-			
-			BufferedImage bi = engine.glSurfaceToImage();
+			params.flip = glg.isFlip();
+			engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, trans, 
+					0, 0, settings.width, settings.height, true, gl);
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
 				glmu[i].cleanup();
 			}
-			
-			return bi;
 		}
 		finally {
 			glmu = null;
@@ -269,7 +270,7 @@ class GLNodeRenderer extends NodeRenderer {
 					setParamsFromNode( node, params, false, 1);
 					params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
 					engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-							0, 0, params.width, params.height, true, engine.getGL2());
+							0, 0, params.width, params.height, true, _gl.getGL2());
 				}
 			});
 		}
@@ -313,7 +314,7 @@ class GLNodeRenderer extends NodeRenderer {
 					params.texture = new GLParameters.GLImageTexture(bi);
 					engine.applyPassProgram(
 							ProgramType.PASS_RENDER, params, trans,
-							0, 0, bi.getWidth(), bi.getHeight(), false, engine.getGL2());
+							0, 0, bi.getWidth(), bi.getHeight(), false, _gl.getGL2());
 				}
 			});
 		}
