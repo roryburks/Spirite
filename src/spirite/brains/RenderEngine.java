@@ -589,7 +589,7 @@ public class RenderEngine
 			
 			buildCompositeLayer(workspace);
 			
-			NodeRenderer renderer = master.getGraphicsContext().createNodeRenderer(
+			NodeRenderer renderer = master.getSettingsManager().getDefaultDrawer().createNodeRenderer(
 					root, RenderEngine.this);
 			return renderer.render(settings);
 		}

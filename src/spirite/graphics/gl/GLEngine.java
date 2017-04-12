@@ -17,8 +17,10 @@ import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
@@ -127,7 +129,7 @@ public class GLEngine  {
 	
 	public final GLRenderer clearRenderer = new GLRenderer() {
 		@Override public void render(GL gl) {
-			clearSurface();
+			clearSurface(gl.getGL2());
 		}
 	};
 	
@@ -152,6 +154,10 @@ public class GLEngine  {
 		return drawable.getGL().getGL2();
 	}
 	
+	GLAutoDrawable getAutoDrawable() {
+		return drawable;
+	}
+	
 /*	// Probably shoudn't exist.
  	public GLAutoDrawable getDrawable() {
 		return drawable;
@@ -164,9 +170,9 @@ public class GLEngine  {
 		
 	}
 	
-	public void clearSurface() {
+	public void clearSurface(GL2 gl2) {
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-        getGL2().glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
+        gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
 	
 	// =================
@@ -202,7 +208,6 @@ public class GLEngine  {
 	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
 	        break;
-		case PASS_BORDER:
 		case CHANGE_COLOR:
 		case PASS_INVERT:
 		case SQARE_GRADIENT:
@@ -212,6 +217,10 @@ public class GLEngine  {
 	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
 	        gl.glBlendEquation(GL2.GL_MAX);
 	        break;
+		case PASS_BORDER:
+	        gl.glEnable(GL.GL_BLEND);
+	        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
         
         }
 	}
@@ -300,6 +309,7 @@ public class GLEngine  {
 		int h = params.height;
 //		setSurfaceSize(w, h);
 		int prog = getProgram(type);
+		gl.getGL2().glViewport(0, 0, w, h);
 		
 
         

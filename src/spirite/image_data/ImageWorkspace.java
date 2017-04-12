@@ -284,7 +284,6 @@ public class ImageWorkspace {
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
-	public GraphicsContext getGraphicsContext() {return master.getGraphicsContext(); }
 	
 	// Doesn't feel great leaking external components, but they're very
 	//	relevant to images and it's better than given them MasterControl

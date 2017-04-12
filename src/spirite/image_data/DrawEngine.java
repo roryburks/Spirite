@@ -20,6 +20,8 @@ import spirite.MDebug.ErrorType;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
@@ -46,6 +48,7 @@ public class DrawEngine {
 	private final ImageWorkspace workspace;
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
+	private final SettingsManager settingsManager;
 	
 	// TODO: I don't necessarily like DrawEngine having MasterAccess, but it needs
 	//	access to the current GraphicsContext at all times
@@ -57,6 +60,7 @@ public class DrawEngine {
 		this.workspace = workspace;
 		this.undoEngine = workspace.getUndoEngine();
 		this.selectionEngine = workspace.getSelectionEngine();
+		this.settingsManager = master.getSettingsManager();
 		
 		this.master = master;
 	}
@@ -68,7 +72,7 @@ public class DrawEngine {
 		return activeEngine;
 	}
 	public StrokeEngine ___J_defEngine() {
-		return master.getGraphicsContext().getStrokeEngine();
+		return master.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 	}
 	public ImageHandle getStrokeContext() {
 		return (activeEngine == null) ? null : activeEngine.getImageData().handle;
@@ -86,7 +90,7 @@ public class DrawEngine {
 		}
 		else {
 //			if( activeEngine instanceof AWTStrokeEngine) stroke.setInterpolationMethod(InterpolationMethod.NONE);
-			activeEngine = master.getGraphicsContext().getStrokeEngine();
+			activeEngine = master.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
@@ -628,7 +632,7 @@ public class DrawEngine {
 		}
 		@Override
 		void applyFilter(BufferedImage image) {
-			workspace.getGraphicsContext().changeColor(image, from, to, mode);
+			settingsManager.getDefaultDrawer().changeColor(image, from, to, mode);
 		}
 	}
 	public class InvertAction extends PerformFilterAction {
@@ -637,7 +641,7 @@ public class DrawEngine {
 		}
 		@Override
 		void applyFilter(BufferedImage image) {
-			workspace.getGraphicsContext().invert(image);
+			settingsManager.getDefaultDrawer().invert(image);
 		}
 	}
 	

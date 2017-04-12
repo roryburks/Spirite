@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.NodeRenderer;
@@ -16,75 +19,74 @@ import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import spirite.graphics.gl.GLParameters.GLFBOTexture;
 import spirite.graphics.gl.GLParameters.GLImageTexture;
 import spirite.graphics.gl.GLParameters.GLParam1i;
+import spirite.graphics.gl.GLParameters.GLParam4f;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.pen.StrokeEngine;
 
 public class GLGraphics extends GraphicsContext{
-	private final GLStrokeEngine strokeEngine = new GLStrokeEngine();
-	private final JOGLDrawer glDrawer = new JOGLDrawer();
 	private final GLEngine engine = GLEngine.getInstance();
 	
+	private final GLAutoDrawable drawable;
 	private GL2 gl;
 	private int width, height;
-	private boolean flip;
-	
-	
-	
+	private boolean flip = false;
 
-	@Override
-	public BufferedImage renderToImage(RenderRoutine renderable, int width, int height) {
-		gl = engine.getGL2();
-		engine.setSurfaceSize(width, height);
-
-		renderable.render(this);
-
-		return engine.glSurfaceToImage();
-	}
-	
-	public void setContext(GL2 gl, int width, int height, boolean flip) {
-		this.gl = gl;
-		this.width = width;
-		this.height = height;
+	GLGraphics( GLAutoDrawable drawable, boolean flip) {
+		this.drawable = drawable;
 		this.flip = flip;
 	}
-	public void resetContext() {
-		gl = engine.getGL2(); 
-		width = engine.width;
-		height = engine.height;
-		flip = false;
+	public GLGraphics() {
+		this.drawable = engine.getAutoDrawable();
 	}
 	
-	@Override
-	public NodeRenderer createNodeRenderer(GroupNode node, RenderEngine context) {
-		return new GLNodeRenderer( node, context);
-	}
-
-	@Override
-	public StrokeEngine getStrokeEngine() {
-		return strokeEngine;
+	private void reset() {
+		this.width = drawable.getSurfaceWidth();
+		this.height = drawable.getSurfaceHeight();
+		this.gl = drawable.getGL().getGL2();
+		drawable.getContext().makeCurrent();
+		gl.getGL2().glViewport(0, 0, width, height);
 	}
 
 	@Override
 	public void drawBounds(BufferedImage mask, int c, AffineTransform trans) {
-		GLUIDraw.drawBounds(mask, c, trans, width, height);
-	}
+		reset();
 
-	@Override public void changeColor(BufferedImage image, Color from, Color to, int mode) {
-		glDrawer.changeColor(image, from, to, mode);
-	}
-	@Override public void invert(BufferedImage image) {
-		glDrawer.invert(image);		
+		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
+		engine.setSurfaceSize(width, height);
+
+		// Render the mask to the a screen-shaped surface
+		glmu.init();
+		glmu.render( new GLRenderer() {
+			@Override public void render(GL gl) {
+				GL2 gl2 = gl.getGL2();
+				engine.clearSurface(gl2);
+				GLParameters params2 = new GLParameters(width, height);
+				params2.texture = new GLImageTexture(mask);
+				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
+						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
+			}
+		});
+
+		// Clean up and Apply the surface to an image
+		GLParameters params2 = new GLParameters(width, height);
+		params2.addParam( new GLParam1i("uCycle", c));
+		params2.texture = new GLFBOTexture(glmu);
+		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false, gl.getGL2());
+		
+		glmu.cleanup();
 	}
 
 
 	private static final Color c1 = new Color( 168,168,168);
 	private static final Color c2 = new Color( 192,192,192);
 	public void drawTransparencyBG( Rectangle rect) {
+		reset();
 		drawTransparencyBG( rect, 4);
 	}
 	public void drawTransparencyBG( Rectangle rect, int size) {	
 		if( rect.isEmpty())
 			return;
+		reset();
 		
 		GLParameters params = new GLParameters(width, height);
 		params.flip = flip;
@@ -98,13 +100,14 @@ public class GLGraphics extends GraphicsContext{
 	}
 	
 	public void _drawBounds( BufferedImage mask, int cycle, AffineTransform trans) {
+		reset();
 		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
 
 		// Render the mask to the a screen-shaped surface
 		glmu.init();
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
-				engine.clearSurface();
+				engine.clearSurface(gl.getGL2());
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
 				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
@@ -118,7 +121,7 @@ public class GLGraphics extends GraphicsContext{
 		params.addParam( new GLParam1i("uCycle", cycle));
 		params.texture = new GLFBOTexture(glmu);
 
-    	engine.clearSurface();
+    	engine.clearSurface(gl);
 		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, engine.getGL2());
 
 		// Clean up and Apply the surface to an image

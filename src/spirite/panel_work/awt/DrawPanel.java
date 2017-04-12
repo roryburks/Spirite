@@ -197,7 +197,7 @@ public class DrawPanel extends JPanel
                 g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
                 AffineTransform toTrans = g2.getTransform();
                 g2.setTransform(trans);
-            	selection.drawSelectionBounds(graphics,  toTrans, g);
+            	selection.drawSelectionBounds(graphics,  toTrans);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

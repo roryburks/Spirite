@@ -671,15 +671,8 @@ public class SelectionEngine {
 			this.bi = bi;
 		}
 		
-		public void drawSelectionBounds(GraphicsContext context, AffineTransform transform, Graphics g) {
+		public void drawSelectionBounds(GraphicsContext context, AffineTransform transform) {
 			context.drawBounds(bi, c--, transform);
-			//Graphics2D g2 = (Graphics2D)g;
-			
-			// Uses OpenGL Renderer to render the a border for the selection
-			//AffineTransform trans = g2.getTransform();
-		//	g2.setTransform( new AffineTransform());
-	//		g2.drawImage(context.drawBounds(bi, c--, transform), 0, 0, null);
-//			g2.setTransform(trans);
 		}
 		public void drawSelectionMask(Graphics g) {
 			g.drawImage(bi, 0, 0, null);

@@ -105,13 +105,6 @@ public class MasterControl
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
         frameManager = new FrameManager( this);
-        
-        try {
-        	graphicsContext = new GLGraphics();
-//        	graphicsContext = new AWTContext();
-        }catch(Exception e) {
-        	graphicsContext = null;
-        }
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make
@@ -166,12 +159,6 @@ public class MasterControl
     public Dialogs getDialogs() {
     	return dialog;
     }
-    
-    // ============
-    // ==== Graphics Context Management
-    private GraphicsContext graphicsContext;
-    
-    public GraphicsContext getGraphicsContext() {return this.graphicsContext;}
     
     // =============
     // ==== Workspace File Open/Save/Load

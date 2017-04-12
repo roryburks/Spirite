@@ -18,18 +18,6 @@ import spirite.pen.StrokeEngine;
  *
  */
 public abstract class GraphicsContext {
-	public abstract NodeRenderer createNodeRenderer( GroupNode node, RenderEngine context);
-	public abstract StrokeEngine getStrokeEngine();
-	
-	public static interface RenderRoutine {
-		public void render(GraphicsContext context);
-	}
-	
-	/** Renders the described algorithm to a BufferedImge. */
-	public abstract BufferedImage renderToImage( RenderRoutine renderable, int width, int height);
-	
-	
-	
 	// TODO: the parameters and return value of these methods are expected to change
 	//	as the GraphicsContext works its way into the UI
 	
@@ -44,7 +32,4 @@ public abstract class GraphicsContext {
 	 * @return
 	 */
 	public abstract void drawBounds(BufferedImage mask, int c, AffineTransform trans);
-	
-	public abstract void changeColor( BufferedImage image, Color from, Color to, int mode);
-	public abstract void invert(BufferedImage image);
 }

@@ -77,7 +77,7 @@ class GLNodeRenderer extends NodeRenderer {
 				glmu[i].init();
 				glmu[i].render(new GLRenderer() {
 					@Override public void render(GL gl) {
-						engine.clearSurface();
+						engine.clearSurface(gl.getGL2());
 					}
 				});
 			}
@@ -95,7 +95,7 @@ class GLNodeRenderer extends NodeRenderer {
 			engine.setSurfaceSize(settings.width, settings.height);
 			GLParameters params = new GLParameters(settings.width, settings.height);
 			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
-	    	engine.clearSurface();
+	    	engine.clearSurface(engine.getGL2());
 			engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, null, 
 					0, 0, settings.width, settings.height, true, engine.getGL2());
 			

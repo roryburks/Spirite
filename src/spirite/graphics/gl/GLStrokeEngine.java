@@ -61,7 +61,7 @@ class GLStrokeEngine extends StrokeEngine {
 			@Override
 			public void render(GL gl) {
 				engine.setSurfaceSize(w, h);
-				engine.clearSurface();
+				engine.clearSurface(gl.getGL2());
 				
 				GLParameters params = new GLParameters(w, h);
 				params.texture = new GLParameters.GLFBOTexture(fixedLayer);
@@ -72,7 +72,7 @@ class GLStrokeEngine extends StrokeEngine {
 	@Override
 	protected void drawDisplayLayer(Graphics g) {
 		engine.setSurfaceSize(w, h);
-		engine.clearSurface();
+		engine.clearSurface(engine.getGL2());
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLFBOTexture(displayLayer);
 		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());

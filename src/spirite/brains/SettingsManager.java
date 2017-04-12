@@ -13,6 +13,9 @@ import java.util.prefs.Preferences;
 import mutil.Interpolation.CubicSplineInterpolator;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.graphics.GraphicsDrawer;
+import spirite.graphics.awt.AWTDrawer;
+import spirite.graphics.gl.GLDrawer;
 
 /***
  * SettingsManager will handle all the various properties and settings
@@ -36,7 +39,10 @@ public class SettingsManager {
 	 * (either because the user set it to be false or because OpenGL couldn't 
 	 * initialize properly), then the engine must fall back on basic AWT rendering.*/
 	public boolean glMode() {
-		return false;
+		return true;
+	}
+	public GraphicsDrawer getDefaultDrawer() {
+		return (glMode())?(GLDrawer.getInstance()):(AWTDrawer.getInstance());
 	}
 	
 	// ==============

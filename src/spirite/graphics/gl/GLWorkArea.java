@@ -26,6 +26,10 @@ import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.SelectionEngine;
+import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
+import spirite.image_data.SelectionEngine.Selection;
+import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.panel_work.WorkArea;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
@@ -36,19 +40,18 @@ import spirite.panel_work.WorkPanel.View;
  * 
  * @author Rory Burks
  */
-public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
+public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver
 {
 	private final WorkPanel context;
 	private final GLEngine engine = GLEngine.getInstance();
 	private final GLJPanel canvas;
-	
-	private final GLGraphics graphics;
+
 	private ImageWorkspace workspace = null;
+	private SelectionEngine selectionEngine;
 	private View view;
 	
 	public GLWorkArea(WorkPanel context, MasterControl master) {
 		this.context = context;
-		this.graphics = (GLGraphics)master.getGraphicsContext();
 		
 		// Create UI Component
         GLProfile glprofile = GLProfile.getDefault();
@@ -77,6 +80,8 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 	}
 	@Override
 	public void display(GLAutoDrawable glad) {
+		GLGraphics graphics = new GLGraphics(glad, true);
+		
 		glad.getContext().makeCurrent();
 
 		GLParameters params;
@@ -84,7 +89,6 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 		int h = glad.getSurfaceHeight();
 		GL2 gl = glad.getGL().getGL2();
 		
-		graphics.setContext(gl, w, h, true);
 		gl.glViewport(0, 0, w, h);
 		
 		// Clear Background Color
@@ -120,6 +124,20 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
         	// :::: Draw Front Reference
         	
         	// :::: Draw Selection Bounds
+            Selection selection = selectionEngine.getSelection();
+
+            if( selection != null || selectionEngine.isBuilding()) {
+            	AffineTransform trans = new AffineTransform();
+                trans.translate(view.itsX(0), view.itsY(0));
+                trans.scale(view.getZoom(), view.getZoom());
+                
+//                if(selectionEngine.isBuilding()) 
+//                	selectionEngine.drawBuildingSelection(g);
+                if( selection != null) {
+                	trans.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
+                	selection.drawSelectionBounds(graphics,  trans);
+                }
+            }
         }
 	}
 
@@ -146,10 +164,13 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 		// TODO
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
+			selectionEngine.removeSelectionObserver(this);
 		}
 		workspace = ws;
+		selectionEngine = (ws == null)?null:ws.getSelectionEngine();
 		if( workspace != null) {
 			workspace.addImageObserver(this);
+			selectionEngine.addSelectionObserver(this);
 		}
 		this.view = view;
 	}
@@ -162,6 +183,9 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver
 	// :::: MImageObserver
 	@Override public void imageChanged(ImageChangeEvent evt) { canvas.repaint(); }
 	@Override public void structureChanged(StructureChangeEvent evt) { canvas.repaint(); }
+	// :::: MSelectionObserver
+	@Override public void selectionBuilt(SelectionEvent evt) { canvas.repaint(); }
+	@Override public void buildingSelection(SelectionEvent evt) { canvas.repaint(); }
 
 	
 
