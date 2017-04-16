@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL2;
@@ -21,10 +20,7 @@ import com.jogamp.opengl.util.GLBuffers;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.RenderSettings;
-import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.image_data.ImageWorkspace;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
@@ -52,8 +48,13 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	private SelectionEngine selectionEngine;
 	private View view;
 	
+
+	GLWorkspaceRenderer glwr;
+	
 	public GLWorkArea(WorkPanel context, MasterControl master) {
 		this.context = context;
+
+    	glwr = new GLWorkspaceRenderer(master);
 		
 		// Create UI Component
         GLProfile glprofile = GLProfile.getDefault();
@@ -83,7 +84,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	
 	@Override
 	public void display(GLAutoDrawable glad) {
-		GLGraphics graphics = new GLGraphics(glad, true);
+		GLGraphics glgc = new GLGraphics(glad, true);
 		
 		glad.getContext().makeCurrent();
 
@@ -101,12 +102,11 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
         gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
         
         if( workspace != null) {
-        	// Draw Background Grid
-
+        	// :::: Draw Background Grid
     		Rectangle rect = new Rectangle( view.itsX(0), view.itsY(0), 
     				(int)Math.round(workspace.getWidth()*view.getZoom()),
 	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
-    		graphics.drawTransparencyBG(rect, 8);
+    		glgc.drawTransparencyBG(rect, 8);
     		
 
         	AffineTransform viewTrans = view.getViewTransform();
@@ -115,7 +115,12 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
         	
         	
         	RenderEngine renderEngine = workspace.getRenderEngine();
-        	renderEngine.renderWorkspace(workspace, graphics, viewTrans);
+        	renderEngine.renderWorkspace(workspace, glgc, viewTrans);
+
+//        	glgc.setTransform(viewTrans);
+//        	glwr.renderWorkspace(workspace, glgc);
+        	
+        	
 //        	glad.getContext().makeCurrent();
 /*        	RenderSettings settings = new RenderSettings(
         			renderEngine.getDefaultRenderTarget(workspace));
@@ -138,13 +143,15 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
             Selection selection = selectionEngine.getSelection();
 
             if( selection != null || selectionEngine.isBuilding()) {
-            	AffineTransform trans = new AffineTransform(viewTrans);
-                
-//                if(selectionEngine.isBuilding()) 
-//                	selectionEngine.drawBuildingSelection(g);
+
+            	glgc.setTransform(viewTrans);
+                if(selectionEngine.isBuilding()) 
+                	selectionEngine.drawBuildingSelection(glgc);
                 if( selection != null) {
+                	AffineTransform trans = new AffineTransform(viewTrans);
                 	trans.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-                	selection.drawSelectionBounds(graphics,  trans);
+                	glgc.setTransform(trans);
+                	selection.drawSelectionBounds(glgc);
                 }
             }
         }

@@ -1,16 +1,11 @@
 package spirite.pen;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.sun.xml.internal.ws.api.pipe.Engine;
 
 import mutil.Interpolation.CubicSplineInterpolator2D;
 import mutil.Interpolation.InterpolatedPoint;
@@ -18,6 +13,8 @@ import mutil.Interpolation.Interpolator2D;
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.SelectionEngine.BuiltSelection;
@@ -32,7 +29,7 @@ public abstract class StrokeEngine {
 	protected abstract void prepareDisplayLayer();
 	protected abstract void onStart();
 	protected abstract void onEnd();
-	protected abstract void drawDisplayLayer( Graphics g);
+	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
 
 	// ==== 
@@ -136,10 +133,15 @@ public abstract class StrokeEngine {
 		
 		state = StrokeEngine.STATE.DRAWING;
 		
-		onStart();
+		onStart( );
 		
+		prepareDisplayLayer();
+		
+		
+		drawToLayer( Arrays.asList( new PenState[]{ps,
+				(stroke.method == Method.PIXEL)?new PenState(ps.x, ps.y+1, ps.pressure):ps}), false);
 //		return startDrawStroke( newState);
-		return false;
+		return true;
 	}
 
 	public final boolean stepStroke( PenState ps) {
@@ -179,12 +181,12 @@ public abstract class StrokeEngine {
 				changed = this.drawToLayer(points, false);
 			}
 			else {
-				int d = 2;
-				if( prec.size() >= (d+1)) {
-					changed = this.drawToLayer(prec.subList(prec.size()-(d+1), prec.size()-(d-1)), true);
-				}
+//				int d = 2;
+//				if( prec.size() >= (d+1)) {
+//					changed = this.drawToLayer(prec.subList(prec.size()-(d+1), prec.size()-(d-1)), true);
+//				}
 				prepareDisplayLayer();
-				changed = this.drawToLayer(prec.subList(Math.max(0, prec.size()-(d)), prec.size()), false);
+				changed = this.drawToLayer(prec, false);
 			}
 		}
 
@@ -204,7 +206,8 @@ public abstract class StrokeEngine {
 		
 		if( data != null) {
 			Graphics g = data.checkoutRaw().getGraphics();
-			drawStrokeLayer(g);
+			GraphicsContext gc = new AWTContext(g);
+			drawStrokeLayer(gc);
 			g.dispose();
 			data.checkin();
 		}
@@ -224,7 +227,7 @@ public abstract class StrokeEngine {
 	{
 		this.startStroke(params, points[0], builtImage, mask);
 
-		prepareDisplayLayer();
+		//prepareDisplayLayer();	// Not needed becaus it's done in startStroke, but that might change
 		if( interpolator != null) {
 			// NOTE: startStroke already adds the first Point into the 
 			//	Interpolator, so we start at point 2 (index 1).
@@ -261,8 +264,8 @@ public abstract class StrokeEngine {
 
 
 	// Draws the Stroke Layer onto the graphics
-	public void drawStrokeLayer( Graphics g) {
-		Graphics2D g2 = (Graphics2D)g;
+	public void drawStrokeLayer( GraphicsContext gc) {
+/*		Graphics2D g2 = (Graphics2D)g;
 		Composite c = g2.getComposite();
 		switch( stroke.getMethod()) {
 		case BASIC:
@@ -272,9 +275,9 @@ public abstract class StrokeEngine {
 		case ERASE:
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.getAlpha()));
 			break;
-		}
-		drawDisplayLayer(g);
-		g2.setComposite( c);
+		}*/
+		drawDisplayLayer(gc);
+//		g2.setComposite( c);
 	}
 	
 	

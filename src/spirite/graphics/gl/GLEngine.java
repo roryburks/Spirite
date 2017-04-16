@@ -21,11 +21,8 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.GLDrawable;
 import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
-import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -299,15 +296,46 @@ public class GLEngine  {
 			x2, y1, 1.0f, (internal)?1.0f:0.0f,
 			x1, y2, 0.0f, (internal)?0.0f:1.0f,
 			x2, y2, 1.0f, (internal)?0.0f:1.0f,
-		}, gl);
-        applyProgram( type, params, pd, x1, y1, x2, y2, gl);
+		}, new int[]{2,2}, gl);
+        applyProgram( type, params, pd, gl, GL2.GL_TRIANGLE_STRIP, 4);
         pd.free();
+	}
+
+	public void applyLineProgram( 
+			ProgramType type,
+			int[] xPoints,
+			int[] yPoints, 
+			int numPoints,
+			GLParameters params,
+			AffineTransform trans,
+			GL2 gl) 
+	{
+
+        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
+        		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
+        
+        if( trans != null) {
+	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
+	        matrix = matrix2.multiply(matrix);
+        }
+        
+        params.addParam( new GLParameters.GLUniformMatrix4fv(
+        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
+        
+        float data[] = new float[2*numPoints];
+        for( int i=0; i < numPoints; ++i) {
+        	data[i*2] = (float)xPoints[i];
+        	data[i*2+1] = (float)yPoints[i];
+        }
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
+		pd.free();
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
 	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd,
-			float x1, float y1, float x2, float y2, GL2 gl) 
+			 GL2 gl, int primFormat, int primCount) 
 	{
 		int w = params.width;
 		int h = params.height;
@@ -320,11 +348,7 @@ public class GLEngine  {
         gl.glUseProgram(prog);
         
         // Bind Attribute Streams
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
-        gl.glEnableVertexAttribArray(0);
-        gl.glEnableVertexAttribArray(1);
-        gl.glVertexAttribPointer(0, 2, GL2.GL_FLOAT, false, 4*4, 0);
-        gl.glVertexAttribPointer(1, 2, GL2.GL_FLOAT, false, 4*4, 4*2);
+        pd.init();
 
         // Bind Texture
         if( params.texture != null) {
@@ -357,19 +381,19 @@ public class GLEngine  {
         }
 
 		// Start Draw
-		gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
+		gl.glDrawArrays( primFormat, 0, primCount);
         gl.glDisable( GL.GL_BLEND);
 		
 		// Finished Drawing
 		gl.glDisable(GL2.GL_TEXTURE_2D);
-		gl.glDisableVertexAttribArray(0);
-		gl.glDisableVertexAttribArray(1);
         gl.glUseProgram(0);
+        pd.deinit();
         if( params.texture != null)
         	params.texture.unload();
         if( params.texture2 != null) 
         	params.texture2.unload();
 	}
+
 	
 	
 	// ==================
@@ -455,10 +479,11 @@ public class GLEngine  {
 			super.finalize();
 		}
 		
-		public int getBuffer() {
+/*		public int getBuffer() {
 			return positionBufferObject.get(0);
-		}
+		}*/
 		
+		/** Frees the VBO from GLMemory*/
 		public void free() {
 			if( !_free) {
 				_free = true;
@@ -467,11 +492,35 @@ public class GLEngine  {
 			}
 		}
 		
+		/** Binds the described buffer to the active rendering. */
+		public void init() {
+	        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+	        
+	        System.out.println( positionBufferObject.get(0));
+	        int totalLength = 0;
+	        for( int i=0; i < lengths.length; ++i) {
+		        gl.glEnableVertexAttribArray(i);
+		        totalLength += lengths[i];
+	        }
+	        int offset = 0;
+	        for( int i=0; i < lengths.length; ++i) {
+		        gl.glVertexAttribPointer(i, lengths[i], GL2.GL_FLOAT, false, 4*totalLength, 4*offset);
+		        offset += lengths[i];
+	        }
+
+		}
+		/** Unbind the Vertex Attribute Arrays*/
+		public void deinit() {
+	        for( int i=0; i < lengths.length; ++i) 
+		        gl.glDisableVertexAttribArray(i);
+		}
+		
+		private int[] lengths;
 		private boolean _free = false;
 		private IntBuffer positionBufferObject = GLBuffers.newDirectIntBuffer(1);
 		private IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
 	}
-	public PreparedData prepareRawData( float raw[], GL2 gl) {
+	public PreparedData prepareRawData( float raw[], int[] lengths, GL2 gl) {
 		PreparedData pd = new PreparedData(gl);
 		
 		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(raw);
@@ -487,6 +536,8 @@ public class GLEngine  {
 
 		gl.glGenVertexArrays(1, pd.vao);
 		gl.glBindVertexArray(pd.vao.get(0));
+		
+		pd.lengths = lengths;
 		
 		return pd;
 	}

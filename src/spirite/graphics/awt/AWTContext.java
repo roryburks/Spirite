@@ -1,8 +1,6 @@
 package spirite.graphics.awt;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -10,11 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.Globals;
-import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.graphics.GraphicsContext;
-import spirite.image_data.GroupTree.GroupNode;
-import spirite.pen.StrokeEngine;
 
 /**
  * AWTContext is a GraphicsContext using only native AWT calls (as well as some
@@ -25,36 +19,49 @@ import spirite.pen.StrokeEngine;
  */
 public class AWTContext extends GraphicsContext{
 	
-	private final Graphics g;
+	private final Graphics2D g2;
 	
 	public AWTContext( Graphics g) {
-		this.g = g;
+		this.g2 = (Graphics2D)g;
 	}
 	
-	public Graphics getGraphics() {return g;}
+	public Graphics getGraphics() {return g2;}
 
 	@Override
-	public void drawBounds(BufferedImage mask, int c, AffineTransform trans) {
-		Rectangle r = g.getClipBounds();
+	public void drawBounds(BufferedImage mask, int c) {
+		Rectangle r = g2.getClipBounds();
+		
+		AffineTransform old = g2.getTransform();
+		g2.setTransform(new AffineTransform());
 		
 		BufferedImage bi = new BufferedImage( r.width, r.height, Globals.BI_FORMAT);
-		Graphics2D g2 = (Graphics2D)(bi.getGraphics());
-		g2.setTransform(trans);
-		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-		g2.drawImage(mask, 1, 0, null);
-		g2.drawImage(mask, -1, 0, null);
-		g2.drawImage(mask, 0, 1, null);
-		g2.drawImage(mask, 0, -1, null);
-		g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
-		g2.drawImage(mask, 0, 0, null);
-		g2.dispose();
+		Graphics2D g2BI = (Graphics2D)(bi.getGraphics());
+		g2BI.setTransform(old);
+		g2BI.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		g2BI.drawImage(mask, 1, 0, null);
+		g2BI.drawImage(mask, -1, 0, null);
+		g2BI.drawImage(mask, 0, 1, null);
+		g2BI.drawImage(mask, 0, -1, null);
+		g2BI.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
+		g2BI.drawImage(mask, 0, 0, null);
+		g2BI.dispose();
 		
-		g.drawImage(bi, r.x, r.y, null);
+		g2.drawImage(bi, 0, 0, null);
+		
+		g2.setTransform(old);
 	}
 
 	@Override
 	public void clear() {
-		Rectangle r = g.getClipBounds();
-		g.clearRect(r.x, r.y, r.width, r.height);
+		Rectangle r = g2.getClipBounds();
+		g2.clearRect(r.x, r.y, r.width, r.height);
 	}
+
+	@Override public void setTransform(AffineTransform trans) { g2.setTransform(trans); }
+	@Override public AffineTransform getTransform() { return g2.getTransform(); }
+
+	
+	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}
+	@Override public void drawOval(int x, int y, int w, int h) { g2.drawOval(x,y,w,h);}
+	@Override public void drawPolyLine(int[] x, int[] y, int count) {g2.drawPolyline(x, y, count); }
 }

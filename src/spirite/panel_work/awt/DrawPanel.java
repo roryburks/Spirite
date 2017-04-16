@@ -24,7 +24,6 @@ import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
-import spirite.graphics.gl.GLGraphics;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace;
@@ -89,7 +88,7 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
         
-        GraphicsContext graphics = new AWTContext(g);
+        GraphicsContext gc = new AWTContext(g);
 
         if( workspace == null) {
         	return;
@@ -106,11 +105,6 @@ public class DrawPanel extends JPanel
         		0);
         final Stroke baseStroke = g2.getStroke();
 
-        // Draw Image
-    	RenderSettings settings = new RenderSettings(
-    			renderEngine.getDefaultRenderTarget(workspace));
-
-
         // Draw Border around the Workspace
 /*        g2.setStroke(dashedStroke);
         g2.setColor(Globals.getColor("drawpanel.image.border"));
@@ -118,7 +112,10 @@ public class DrawPanel extends JPanel
         		zoomer.itsY(0)-1,
 	            (int)Math.round(workspace.getWidth()*zoom)+1,
 	            (int)Math.round(workspace.getHeight()*zoom)+1);*/
-
+        
+        // Draw Image
+    	RenderSettings settings = new RenderSettings(
+    			renderEngine.getDefaultRenderTarget(workspace));
         long start = System.currentTimeMillis();
         // Render the image
     	BufferedImage image = renderEngine.renderImage(settings);
@@ -192,12 +189,10 @@ public class DrawPanel extends JPanel
             g2.setColor(Color.black);
             g2.setStroke(dashedStroke);
             if(selectionEngine.isBuilding()) 
-            	selectionEngine.drawBuildingSelection(g);
+            	selectionEngine.drawBuildingSelection(gc);
             if( selection != null) {
                 g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-                AffineTransform toTrans = g2.getTransform();
-                g2.setTransform(trans);
-            	selection.drawSelectionBounds(graphics,  toTrans);
+            	selection.drawSelectionBounds(gc);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

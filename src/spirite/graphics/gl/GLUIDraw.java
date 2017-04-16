@@ -1,12 +1,9 @@
 package spirite.graphics.gl;
 
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;

@@ -91,9 +91,9 @@ public class SelectionEngine {
 	public boolean isBuilding() {
 		return building;
 	}
-	public void drawBuildingSelection( Graphics g) {
+	public void drawBuildingSelection( GraphicsContext gc) {
 		if( selectionBuilder != null)
-			selectionBuilder.draw(g);
+			selectionBuilder.draw(gc);
 	}
 	
 	/** Returns a BuiltSelection which incorporates all relevant offset data
@@ -671,8 +671,8 @@ public class SelectionEngine {
 			this.bi = bi;
 		}
 		
-		public void drawSelectionBounds(GraphicsContext context, AffineTransform transform) {
-			context.drawBounds(bi, c--, transform);
+		public void drawSelectionBounds(GraphicsContext context) {
+			context.drawBounds(bi, c);
 		}
 		public void drawSelectionMask(Graphics g) {
 			g.drawImage(bi, 0, 0, null);
@@ -818,7 +818,7 @@ public class SelectionEngine {
 		protected abstract void start( int x, int y);
 		protected abstract void update( int x, int y);
 		protected abstract BuiltSelection build();
-		protected abstract void draw( Graphics g);
+		protected abstract void draw( GraphicsContext gc);
 	}
 	
 	/** Builds a Rectangular Selection*/
@@ -852,7 +852,7 @@ public class SelectionEngine {
 			return new BuiltSelection( bi);
 		}
 		@Override
-		protected void draw(Graphics g) {
+		protected void draw(GraphicsContext g) {
 			g.drawRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
@@ -890,7 +890,7 @@ public class SelectionEngine {
 			return new BuiltSelection( bi);
 		}
 		@Override
-		protected void draw(Graphics g) {
+		protected void draw(GraphicsContext g) {
 			g.drawOval(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
@@ -928,14 +928,14 @@ public class SelectionEngine {
 		}
 
 		@Override
-		protected void draw(Graphics g) {
+		protected void draw(GraphicsContext g) {
 			int ox = compactor.get(0);
 			int oy = compactor.get(1);
 			int nx, ny;
 			for( int i=2; i<compactor.size(); i+=2) {
 				nx = compactor.get(i);
 				ny = compactor.get(i+1);
-				g.drawLine(ox, oy, nx, ny);
+//				g.drawLine(ox, oy, nx, ny);
 				ox = nx;
 				oy = ny;
 			}

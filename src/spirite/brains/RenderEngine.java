@@ -28,6 +28,7 @@ import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.GraphicsDrawer;
 import spirite.graphics.GraphicsDrawer.RenderRoutine;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -222,22 +223,21 @@ public class RenderEngine
 				
 				g2 = (Graphics2D)bi.getGraphics();
 				
-				g2.setTransform(dataContext.getTransform());
+				g2.setTransform(dataContext.getBaseTransform());
 				dataContext.draw(g2);
-				g2.setTransform(new AffineTransform());
 			
 				
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
-					g2.setTransform( dataContext.getTransform());
+					g2.setTransform( dataContext.getBaseTransform());
 					g2.transform(workspace.getSelectionEngine().getDrawFromTransform());
 					
 					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
-					g2.dispose();
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {
-					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(g2);
-					g2.dispose();
+					g2.setTransform(dataContext.getTransform());
+					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(new AWTContext(g2));
 				}
+				g2.dispose();
 				compositionContext = dataContext.handle;
 				compositionImage = bi;
 			}

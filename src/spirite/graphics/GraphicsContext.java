@@ -1,13 +1,7 @@
 package spirite.graphics;
 
-import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-
-import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.NodeRenderer;
-import spirite.image_data.GroupTree.GroupNode;
-import spirite.pen.StrokeEngine;
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 
@@ -31,7 +25,14 @@ public abstract class GraphicsContext {
 	 * @param sheight	The height of the screen to draw it on.
 	 * @return
 	 */
-	public abstract void drawBounds(BufferedImage mask, int c, AffineTransform trans);
+	public abstract void drawBounds(BufferedImage mask, int c);
 
 	public abstract void clear();
+	
+	public abstract void setTransform( AffineTransform trans);
+	public abstract AffineTransform getTransform();
+
+	public abstract void drawRect(int x, int y, int w, int h);
+	public abstract void drawOval(int x, int y, int w, int h);
+	public abstract void drawPolyLine( int[] x, int[] y, int count);
 }

@@ -34,7 +34,6 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
-import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -424,6 +423,10 @@ public class ImageWorkspace {
 		/** Returns the Tranform needed to convert WorkspaceSpace into DataSpace*/
 		public AffineTransform getTransform() {
 			AffineTransform transform = new AffineTransform();
+			return transform;
+		}
+		public AffineTransform getBaseTransform() {
+			AffineTransform transform = new AffineTransform();
 			transform.translate( -ox, -oy);
 			return transform;
 		}
@@ -452,10 +455,9 @@ public class ImageWorkspace {
 		@Override public int getHeight() {
 			return height;
 		}
-		@Override public Point convert(Point p) {
-			return p;
-//			return new Point(p.x + dii.ox, p.y + dii.oy);
-		}
+		@Override public int convertX( int x) { return x;}
+		@Override public int convertY( int y) { return y;}
+		@Override public Point convert(Point p) {return p;}
 		@Override
 		public void drawBorder(Graphics g) {
 			if( handle == null) return;
@@ -467,11 +469,15 @@ public class ImageWorkspace {
 		@Override
 		public AffineTransform getTransform() {
 			AffineTransform tf = new AffineTransform();
+			tf.translate(-ox, -oy);
 			return tf;
 		}
 		@Override
 		public AffineTransform getDrawTransform() {
 			return new AffineTransform();
+		}
+		public AffineTransform getBaseTransform() {
+			return super.getBaseTransform();
 		}
 		
 		BufferedImage buffer = null;

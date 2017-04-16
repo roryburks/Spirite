@@ -4,24 +4,17 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.util.GLBuffers;
 
-import spirite.brains.RenderEngine;
-import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
 import spirite.graphics.gl.GLParameters.GLFBOTexture;
 import spirite.graphics.gl.GLParameters.GLImageTexture;
 import spirite.graphics.gl.GLParameters.GLParam1i;
-import spirite.graphics.gl.GLParameters.GLParam4f;
-import spirite.image_data.GroupTree.GroupNode;
-import spirite.pen.StrokeEngine;
 
 public class GLGraphics extends GraphicsContext{
 	private final GLEngine engine = GLEngine.getInstance();
@@ -30,6 +23,7 @@ public class GLGraphics extends GraphicsContext{
 	private GL2 gl;
 	private int width, height;
 	private boolean flip = false;
+	private AffineTransform contextTransform = new AffineTransform();
 
 	GLGraphics( GLAutoDrawable drawable, boolean flip) {
 		this.drawable = drawable;
@@ -46,7 +40,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	public GL2 getGL() { reset();return gl;}
 	
-	private void reset() {
+	void reset() {
 		this.width = drawable.getSurfaceWidth();
 		this.height = drawable.getSurfaceHeight();
 		this.gl = drawable.getGL().getGL2();
@@ -55,7 +49,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 
 	@Override
-	public void drawBounds(BufferedImage mask, int c, AffineTransform trans) {
+	public void drawBounds(BufferedImage mask, int c) {
 		reset();
 
 		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
@@ -69,7 +63,7 @@ public class GLGraphics extends GraphicsContext{
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
-				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
+				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
 			}
 		});
@@ -138,5 +132,38 @@ public class GLGraphics extends GraphicsContext{
 	public void clear() {
 		reset();
 		engine.clearSurface(gl);
+	}
+	
+
+	@Override public AffineTransform getTransform() {return contextTransform;}
+	@Override public void setTransform(AffineTransform trans) {
+		if( trans == null) trans = new AffineTransform();
+		contextTransform = trans;
+	}
+	
+	// :::: Line Drawing Methods
+	@Override
+	public void drawRect(int x, int y, int w, int h) {
+		int x_[] = new int[5];
+		int y_[] = new int[5];
+
+		x_[0] = x_[4] = x_[3] = x;
+		y_[0] = y_[4] = y_[1] = y;
+		x_[1] = x_[2] = x + w;
+		y_[2] = y_[3] = y + h;
+		
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 5, params, contextTransform, gl);
+	}
+	@Override
+	public void drawOval(int x, int y, int w, int h) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void drawPolyLine(int[] x, int[] y, int count) {
+		// TODO Auto-generated method stub
+		
 	}
 }

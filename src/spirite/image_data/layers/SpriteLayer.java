@@ -121,10 +121,12 @@ public class SpriteLayer extends Layer
 	public Part grabPart(int x, int y, boolean select) {
 		for( int i=parts.size()-1; i >= 0; --i) {
 			Part part = parts.get(i);
+			int dx = part.handle.getDynamicX();
+			int dy = part.handle.getDynamicY();
 			if( part.isVisible()) {
-				if( !MUtil.coordInImage(x - part.ox, y-part.oy, part.handle.deepAccess()))
+				if( !MUtil.coordInImage(x - part.ox-dx, y-part.oy-dy, part.handle.deepAccess()))
 					continue;
-				int rgb =part.handle.deepAccess().getRGB(x - part.ox, y-part.oy);
+				int rgb =part.handle.deepAccess().getRGB(x - part.ox-dx, y-part.oy-dy);
 				
 				if( ((rgb >>> 24) & 0xFF) == 0) continue; 
 				

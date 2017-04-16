@@ -1,6 +1,7 @@
 package spirite.graphics.gl;
 
-import java.awt.Graphics;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -11,6 +12,8 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
 import mutil.MatrixBuilder;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.GLEngine.PreparedData;
 import spirite.graphics.gl.GLEngine.ProgramType;
 import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
@@ -73,15 +76,50 @@ class GLStrokeEngine extends StrokeEngine {
 		});
 	}
 	@Override
-	protected void drawDisplayLayer(Graphics g) {
-		engine.setSurfaceSize(w, h);
-		engine.clearSurface(engine.getGL2());
-		GLParameters params = new GLParameters(w, h);
-		params.texture = new GLParameters.GLFBOTexture(displayLayer);
-		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
-		
-		BufferedImage bi = engine.glSurfaceToImage();
-		g.drawImage( bi, 0, 0, null);
+	protected void drawDisplayLayer(GraphicsContext gc) {
+		if( gc instanceof AWTContext) {
+			Graphics2D g2 = (Graphics2D)((AWTContext)gc).getGraphics().create();
+
+			switch( stroke.getMethod()) {
+			case BASIC:
+			case PIXEL:
+				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.getAlpha()));
+				break;
+			case ERASE:
+				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.getAlpha()));
+				break;
+			}
+			
+			engine.setSurfaceSize(w, h);
+			engine.clearSurface(engine.getGL2());
+			GLParameters params = new GLParameters(w, h);
+			params.texture = new GLParameters.GLFBOTexture(displayLayer);
+			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
+			
+			BufferedImage bi = engine.glSurfaceToImage();
+			g2.drawImage( bi, 0, 0, null);
+			g2.dispose();
+		}
+		else if( gc instanceof GLGraphics) {
+			GLGraphics glgc = (GLGraphics)gc;
+			glgc.reset();
+			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
+			params.texture = new GLParameters.GLFBOTexture(displayLayer);
+			params.flip = glgc.isFlip();
+
+			switch( stroke.getMethod()) {
+			case BASIC:
+			case PIXEL:
+				params.setBlendMode(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);
+				break;
+			case ERASE:
+				params.setBlendMode(GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);
+				break;
+			}
+			
+			engine.applyPassProgram(ProgramType.PASS_BASIC, params, glgc.getTransform(), 
+					0, 0, w, h, true, glgc.getGL());
+		}
 	}
 	
 
@@ -143,7 +181,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		engine.setSurfaceSize( w, h);
 		GL2 gl = engine.getGL2();
-		PreparedData pd = engine.prepareRawData(raw, gl);
+		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1}, gl);
 
 		// Clear Surface
 //	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -153,13 +191,15 @@ class GLStrokeEngine extends StrokeEngine {
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
+        pd.init();
+        
+/*        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
         gl.glEnableVertexAttribArray( 0);
         gl.glEnableVertexAttribArray( 1);
         gl.glEnableVertexAttribArray( 2);
         gl.glVertexAttribPointer( 0, 2, GL2.GL_FLOAT, false, 4*4, 0);
         gl.glVertexAttribPointer( 1, 1, GL2.GL_FLOAT, false, 4*4, 4*2);
-        gl.glVertexAttribPointer( 2, 1, GL2.GL_FLOAT, false, 4*4, 4*3);
+        gl.glVertexAttribPointer( 2, 1, GL2.GL_FLOAT, false, 4*4, 4*3);*/
 
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
@@ -187,11 +227,9 @@ class GLStrokeEngine extends StrokeEngine {
         gl.glDisable( GL.GL_BLEND);
         gl.glDisable(GL2.GL_MULTISAMPLE);
 
-        gl.glDisableVertexAttribArray( 0);
-        gl.glDisableVertexAttribArray( 1);
-        gl.glDisableVertexAttribArray( 2);
         gl.glUseProgram(0);
-        
+
+        pd.deinit();
         pd.free();
 
 //        BufferedImage im = engine.glSurfaceToImage(); 
@@ -233,19 +271,11 @@ class GLStrokeEngine extends StrokeEngine {
 			raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
 			raw[off+5] = ps.pressure;
 			
-			if( i == states.size()-1) {
-				off = (o++)*6;
-				// x y z w
-				raw[off+0] = data.convertX(ps.x);
-				raw[off+1] = data.convertY(ps.y);
-				raw[off+2] = 0.0f;
-				raw[off+3] = 1.0f;
-				
-				// size pressure
-				raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
-				raw[off+5] = ps.pressure;
-				continue;
-			}
+/*			if( i == states.size()-1 && stroke.getMethod() == Method.PIXEL) {
+				// TODO: Exagerate last line segment so pixel drawing works as expected
+				raw[off+0] = data.convertX(ps.x)+0.5f;
+				raw[off+1] = data.convertY(ps.y)+0.5f;
+			}*/
 		}
 
 		vb.vBuffer = raw;
@@ -273,7 +303,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		
 		
-		PreparedData pd = engine.prepareRawData(glvb.vBuffer, gl);
+		PreparedData pd = engine.prepareRawData(glvb.vBuffer, new int[]{4,1,1}, gl);
 
 		// Clear Surface
 //	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
@@ -294,13 +324,7 @@ class GLStrokeEngine extends StrokeEngine {
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
-        gl.glEnableVertexAttribArray( ATTR_POS);
-        gl.glEnableVertexAttribArray( ATTR_SIZE);
-        gl.glEnableVertexAttribArray( ATTR_PRESSURE);
-        gl.glVertexAttribPointer( ATTR_POS, 4, GL2.GL_FLOAT, false, STRIDE, 0);
-        gl.glVertexAttribPointer( ATTR_SIZE, 1, GL2.GL_FLOAT, false, STRIDE, 4*4);
-        gl.glVertexAttribPointer( ATTR_PRESSURE, 1, GL2.GL_FLOAT, false, STRIDE, 4*5);
+        pd.init();
         
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
@@ -329,12 +353,9 @@ class GLStrokeEngine extends StrokeEngine {
 
         gl.glDisable( GL.GL_BLEND);
         gl.glDisable(GL2.GL_MULTISAMPLE);
-
-        gl.glDisableVertexAttribArray( ATTR_POS);
-        gl.glDisableVertexAttribArray( ATTR_SIZE);
-        gl.glDisableVertexAttribArray( ATTR_PRESSURE);
         gl.glUseProgram(0);
-        
+
+        pd.deinit();
         pd.free();
 	}
 	

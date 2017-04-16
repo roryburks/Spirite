@@ -1,6 +1,8 @@
 package spirite.image_data.animation_data;
 
+import java.awt.Composite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -155,8 +157,13 @@ public class FixedFrameAnimation extends Animation
 		int _t = (int)Math.floor(t);
 		List<TransformedHandle> drawList = getDrawListForFrame(_t);
 		
+		Graphics2D g2 = (Graphics2D)g;
+		Composite c = g2.getComposite();
 		for( TransformedHandle renderable : drawList) {
+			if( renderable.comp != null)
+				g2.setComposite(renderable.comp);
 			renderable.handle.drawLayer(g, renderable.trans);
+			g2.setComposite(c);
 		}
 	}
 	

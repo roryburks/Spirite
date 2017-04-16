@@ -355,7 +355,7 @@ public class RigPanel extends OmniComponent
 		switch( evt.getActionCommand()) {
 		case "newPart":
 			if( rig != null) {
-				BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), Globals.BI_FORMAT);
+				BufferedImage bi = new BufferedImage(1, 1, Globals.BI_FORMAT);
 				
 				workspace.getUndoEngine().performAndStore(
 						rig.createAddPartAction(bi, 0, 0, 0,""));

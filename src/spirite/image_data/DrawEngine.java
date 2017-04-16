@@ -21,7 +21,6 @@ import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.SettingsManager;
-import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
