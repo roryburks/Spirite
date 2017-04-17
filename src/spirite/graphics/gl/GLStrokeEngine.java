@@ -14,9 +14,12 @@ import com.jogamp.opengl.util.GLBuffers;
 import mutil.MatrixBuilder;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
-import spirite.graphics.gl.GLEngine.PreparedData;
-import spirite.graphics.gl.GLEngine.ProgramType;
-import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLMultiRenderer;
+import spirite.graphics.gl.engine.GLParameters;
+import spirite.graphics.gl.engine.GLEngine.PreparedData;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
@@ -284,10 +287,6 @@ class GLStrokeEngine extends StrokeEngine {
 		return vb;
 	}
 
-	private final static int ATTR_POS = 0;
-	private final static int ATTR_SIZE = 1;
-	private final static int ATTR_PRESSURE = 2;
-	private final static int STRIDE = 6*Float.BYTES;
 	/**
 	 * Hardware Accelerated Strokes work by feeding a linestrip with position,
 	 * size, pressure, and color information.  The vertex shader usually just

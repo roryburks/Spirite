@@ -1,5 +1,7 @@
 package spirite.graphics;
 
+import java.awt.Color;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -31,8 +33,20 @@ public abstract class GraphicsContext {
 	
 	public abstract void setTransform( AffineTransform trans);
 	public abstract AffineTransform getTransform();
+	public abstract void setColor(Color color);
+	
+	public enum Composite {SRC_OVER};
+	public abstract void setComposite( Composite composite, float alpha);
 
 	public abstract void drawRect(int x, int y, int w, int h);
 	public abstract void drawOval(int x, int y, int w, int h);
 	public abstract void drawPolyLine( int[] x, int[] y, int count);
+	public abstract void drawLine(int x1, int y1, int x2, int y2);
+	public abstract void draw(Shape shape);
+
+	public abstract void fillRect(int x, int y, int w, int h);	
+	public abstract void fillOval( int x, int y, int w, int h);
+
+
+
 }

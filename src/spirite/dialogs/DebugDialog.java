@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import spirite.MDebug;
 import spirite.MDebug.DebugObserver;
 import spirite.brains.CacheManager.CacheDomain;
+import spirite.graphics.gl.engine.GLEngine;
 import spirite.brains.MasterControl;
 
 public class DebugDialog extends JDialog 
@@ -47,6 +49,7 @@ public class DebugDialog extends JDialog
 	 */
 	public DebugDialog(MasterControl master) {
 		this.master = master;
+		
 		
 		
 		MDebug.addLogObserver(this);
@@ -118,20 +121,26 @@ public class DebugDialog extends JDialog
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		final int fix_y = scrollResources.getVerticalScrollBar().getValue();
+		
 		DecimalFormat df = new DecimalFormat("#.##");
-
 		String str = "Cache Size:"+ df.format(master.getCacheManager().getCacheSize()/(1024.0*1024.0))+"MB\n";
 		
 		Map< Object, CacheDomain> map = master.getCacheManager()._debugGetMap();
 		
 		for( Map.Entry< Object, CacheDomain> set : map.entrySet()) {
-			
 			str += set.getKey().toString() + " :: ";
-			
 			str += df.format(set.getValue().getSize() /(1024.0*1024.0)) + "MB\n";
 		}
-		
 		textResources.setText(str);
+		
+		SwingUtilities.invokeLater(new Runnable(){
+			@Override
+			public void run() {
+				scrollResources.getVerticalScrollBar().setValue(fix_y);
+			}
+		});
+//		textResources.setText(GLEngine.getInstance().dispResourcesUsed());
 	}
 
 	// :::: DebugObserver

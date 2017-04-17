@@ -3,7 +3,6 @@ package spirite.panel_work;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -35,6 +34,8 @@ import spirite.brains.ToolsetManager;
 import spirite.brains.ToolsetManager.MToolsetObserver;
 import spirite.brains.ToolsetManager.Tool;
 import spirite.brains.ToolsetManager.ToolSettings;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
@@ -450,7 +451,7 @@ public class Penner
 			super.end();
 			context.repaint();
 		}
-		public abstract void paintOverlay( Graphics g);
+		public abstract void paintOverlay( GraphicsContext gc);
 	}
 	
 	abstract class StrokeBehavior extends StateBehavior {
@@ -749,7 +750,7 @@ public class Penner
 				selectionEngine.updateBuildingSelection(x, y);
 		}
 		@Override
-		public void paintOverlay(Graphics g) {
+		public void paintOverlay(GraphicsContext g) {
 			if( !drawing) {
 				Point p_e = builder.getEnd();
 				
@@ -902,27 +903,26 @@ public class Penner
 		}
 
 		@Override
-		public void paintOverlay(Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			
-			Stroke s = g2.getStroke();
+		public void paintOverlay(GraphicsContext gc) {
 			
 			// Outline
-            Stroke new_stroke = new BasicStroke(
+			// TODO:
+/*            Stroke new_stroke = new BasicStroke(
             		1, 
             		BasicStroke.CAP_BUTT, 
             		BasicStroke.JOIN_BEVEL, 
             		0, 
             		new float[]{8,4}, 0);
-            g2.setStroke(new_stroke);
+            g2.setStroke(new_stroke);*/
             
             View view = context.getCurrentView();
             Rectangle r = view.itsRm(cropSection);
-            g.drawRect(r.x, r.y, r.width, r.height);
+			gc.setColor(Color.BLACK);
+            gc.drawRect(r.x, r.y, r.width, r.height);
 			
 
             // Grey area outside
-			Composite c = g2.getComposite();
+//			Composite c = gc.getComposite();
 			int x1 = view.itsXm(0);
 			int y1 = view.itsYm(0);
 			int x2 = view.itsXm(workspace.getWidth());
@@ -930,54 +930,56 @@ public class Penner
 
 			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
 			if( r.x + r.width > x2) { r.width = x2 - r.x;}
-			
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
-			g2.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
-			g2.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
-			g2.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
-			g2.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
+
+			gc.setColor(Color.YELLOW);
+			gc.setComposite(Composite.SRC_OVER, 0.4f);
+			gc.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
+			gc.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
+			gc.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
+			gc.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
 			
 			// The various inner rectangles represenging the modification points
 			if( !building) {
-				g2.setStroke(new BasicStroke(2.0f));
+//				gc.setStroke(new BasicStroke(2.0f));
 				
 				if( middle.contains(x,y)) {
 					r = view.itsRm( middle);
-					g2.setColor(Color.YELLOW);
-		            g.drawRect(r.x, r.y, r.width, r.height);
+					gc.setColor(Color.YELLOW);
+		            gc.drawRect(r.x, r.y, r.width, r.height);
 				}
 
 				if( topRight.contains(x,y))
-					g2.setColor(Color.YELLOW);
+					gc.setColor(Color.YELLOW);
 				else
-					g2.setColor(Color.WHITE);
+					gc.setColor(Color.WHITE);
 				r = view.itsRm(topRight);
-	            g.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( topLeft.contains(x,y))
-					g2.setColor(Color.YELLOW);
+					gc.setColor(Color.YELLOW);
 				else
-					g2.setColor(Color.WHITE);
+					gc.setColor(Color.WHITE);
 				r = view.itsRm(topLeft);
-	            g.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomLeft.contains(x,y))
-					g2.setColor(Color.YELLOW);
+					gc.setColor(Color.YELLOW);
 				else
-					g2.setColor(Color.WHITE);
+					gc.setColor(Color.WHITE);
 				r = view.itsRm(bottomLeft);
-	            g.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomRight.contains(x,y))
-					g2.setColor(Color.YELLOW);
+					gc.setColor(Color.YELLOW);
 				else
-					g2.setColor(Color.WHITE);
+					gc.setColor(Color.WHITE);
 				r = view.itsRm(bottomRight);
-	            g.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.x, r.y, r.width, r.height);
 			}
 
-    		g2.setComposite(c);
-    		g2.setStroke(s);
+			gc.setComposite(Composite.SRC_OVER, 1.0f);
+//    		gc.setComposite(c);
+//    		gc.setStroke(s);
 		}
 
 	}
@@ -1008,7 +1010,7 @@ public class Penner
 		// C : Moving
 		
 		@Override
-		public void paintOverlay(Graphics g) {
+		public void paintOverlay(GraphicsContext gc) {
 			float zoom = view.getZoom();
 			
 			BuiltSelection sel =selectionEngine.getBuiltSelection();
@@ -1019,8 +1021,7 @@ public class Penner
 			}
 			Dimension d = sel.selection.getDimension();
 			
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform origTrans = g2.getTransform();
+			AffineTransform origTrans = gc.getTransform();
 
 			AffineTransform relTrans = new AffineTransform();
 			relTrans.translate(view.itsX(0), view.itsY(0));
@@ -1029,13 +1030,14 @@ public class Penner
 			relTrans.concatenate(wTrans);
 			relTrans.translate(-d.width/2, -d.height/2);
 			
-			g2.setTransform(relTrans);
+			gc.setTransform(relTrans);
 
-			g2.drawRect( 0, 0, d.width, d.height);
+			gc.setColor(Color.BLACK);
+			gc.drawRect( 0, 0, d.width, d.height);
 			
 			Stroke defStroke = new BasicStroke( 2/zoom);
-			g2.setColor(Color.GRAY);
-			g2.setStroke(defStroke);
+			gc.setColor(Color.GRAY);
+//			gc.setStroke(defStroke);
 			
 			Point2D p = new Point2D.Float();
 			try {
@@ -1076,18 +1078,18 @@ public class Penner
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
 				if( overlap == i || (overlap == -1 && shape.contains(p))) {
-					g2.setColor(Color.YELLOW);
-					g2.setStroke(new BasicStroke( 4/zoom));
-					g2.draw(shape);
-					g2.setColor(Color.GRAY);
-					g2.setStroke(defStroke);
+					gc.setColor(Color.YELLOW);
+//					gc.setStroke(new BasicStroke( 4/zoom));
+					gc.draw(shape);
+					gc.setColor(Color.GRAY);
+//					gc.setStroke(defStroke);
 					overlap = i;
 				}
-				else g2.draw(shape);
+				else gc.draw(shape);
 			}
 
 			
-			g2.setTransform(origTrans);
+			gc.setTransform(origTrans);
 			
 		}
 
@@ -1247,9 +1249,9 @@ public class Penner
 		return behavior instanceof DrawnStateBehavior;
 	}
 
-	public void paintOverlay(Graphics g) {
+	public void paintOverlay(GraphicsContext gc) {
 		if( behavior instanceof DrawnStateBehavior) {
-			((DrawnStateBehavior)behavior).paintOverlay(g);
+			((DrawnStateBehavior)behavior).paintOverlay(gc);
 		}
 	}
 

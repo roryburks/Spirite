@@ -20,6 +20,8 @@ import com.jogamp.opengl.util.GLBuffers;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLParameters;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -28,6 +30,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
+import spirite.panel_work.JPenPenner;
 import spirite.panel_work.WorkArea;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
@@ -48,6 +51,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	private SelectionEngine selectionEngine;
 	private View view;
 	
+	private final JPenPenner penner;
 
 	GLWorkspaceRenderer glwr;
 	
@@ -60,6 +64,8 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities glcapabilities = new GLCapabilities( glprofile );
 		canvas = new GLJPanel(glcapabilities);
+		
+		this.penner = context.getJPenner();
 		
 		// Add Input Listeners
 		AwtPenToolkit.addPenListener(canvas, context.getJPenner());
@@ -78,12 +84,15 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	}
 	
 	// :::: GLEventListener
-	@Override public void dispose(GLAutoDrawable arg0) {}
+	@Override public void dispose(GLAutoDrawable arg0) {
+		System.out.println("DISPOSE");
+	}
 	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
 	}
 	
 	@Override
 	public void display(GLAutoDrawable glad) {
+		System.out.println("START_DISP");
 		GLGraphics glgc = new GLGraphics(glad, true);
 		
 		glad.getContext().makeCurrent();
@@ -154,6 +163,11 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
                 	selection.drawSelectionBounds(glgc);
                 }
             }
+            
+        	glgc.setTransform(null);
+            if( penner.drawsOverlay())
+            	penner.paintOverlay(glgc);
+    		System.out.println("END_DISP");
         }
 	}
 
@@ -166,7 +180,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 		//	(so they can share resources)
 		GLContext old = glad.getContext();
 		old.makeCurrent();
-		glad.setContext(null, true);
+		glad.setContext(null, true);		
 		
 		GLContext cont2 = glad.createContext(cont);
 		cont2.makeCurrent();
@@ -199,10 +213,8 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	// :::: MImageObserver
 	@Override public void imageChanged(ImageChangeEvent evt) { canvas.repaint(); }
 	@Override public void structureChanged(StructureChangeEvent evt) { canvas.repaint(); }
+	
 	// :::: MSelectionObserver
 	@Override public void selectionBuilt(SelectionEvent evt) { canvas.repaint(); }
 	@Override public void buildingSelection(SelectionEvent evt) { canvas.repaint(); }
-
-	
-
 }

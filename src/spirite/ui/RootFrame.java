@@ -200,7 +200,6 @@ public class RootFrame extends javax.swing.JFrame
     }
     class ContextualCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
-    	private WorkPanel workPanel;
     	private View zoomer;
 		
 		private ContextualCommandExecuter() {
@@ -385,15 +384,18 @@ public class RootFrame extends javax.swing.JFrame
 			}
 			
 			SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+				System.out.println("END_A");
+				try {
 				dispose();
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+				System.out.println("END_B");
 		        System.exit(0);	
+				System.out.println("END_C");
 			}});
 		}});
 
-
 		outer.start();
 	}
-
-
-
 }

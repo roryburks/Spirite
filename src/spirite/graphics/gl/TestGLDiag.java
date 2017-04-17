@@ -20,6 +20,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.graphics.gl.GLUIDraw.GradientType;
+import spirite.graphics.gl.engine.GLEngine;
 
 public class TestGLDiag extends JDialog  {
 

@@ -10,18 +10,21 @@ import com.jogamp.opengl.GL2;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.graphics.GraphicsDrawer;
-import spirite.graphics.gl.GLEngine.ProgramType;
-import spirite.graphics.gl.GLParameters.GLImageTexture;
-import spirite.graphics.gl.GLParameters.GLParam1i;
-import spirite.graphics.gl.GLParameters.GLParam4f;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLParameters;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLParameters.GLImageTexture;
+import spirite.graphics.gl.engine.GLParameters.GLParam1i;
+import spirite.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.pen.StrokeEngine;;
 
 
 /**
+ * GLDrawer is a mostly-static class that changes and creates new BufferedImages
+ * corresponding to various rendering behaviors.
  * 
- * @author Guy
- *
+ * @author Rory Burks
  */
 public class GLDrawer extends GraphicsDrawer {
 	private final GLEngine engine = GLEngine.getInstance();
@@ -29,8 +32,7 @@ public class GLDrawer extends GraphicsDrawer {
 	// TODO: Singly probably isn't the best paradigm for this.
 	private static GLDrawer singly;
 	public static GLDrawer getInstance() {if( singly == null) singly = new GLDrawer(); return singly;}
-	private GLDrawer() {
-	}
+	private GLDrawer() {}
 
 	private final GLStrokeEngine strokeEngine = new GLStrokeEngine();
 	@Override

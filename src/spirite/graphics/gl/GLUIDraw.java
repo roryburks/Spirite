@@ -5,12 +5,15 @@ import java.awt.image.BufferedImage;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
-import spirite.graphics.gl.GLEngine.ProgramType;
-import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
-import spirite.graphics.gl.GLParameters.GLFBOTexture;
-import spirite.graphics.gl.GLParameters.GLImageTexture;
-import spirite.graphics.gl.GLParameters.GLParam1i;
-import spirite.graphics.gl.GLParameters.GLParam4f;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLMultiRenderer;
+import spirite.graphics.gl.engine.GLParameters;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLParameters.GLFBOTexture;
+import spirite.graphics.gl.engine.GLParameters.GLImageTexture;
+import spirite.graphics.gl.engine.GLParameters.GLParam1i;
+import spirite.graphics.gl.engine.GLParameters.GLParam4f;
 
 /** 
  * USE OF GLUIDRAW IS BEING PHASED OUT.  ALL CODE IS BEING MOVED TO GLGraphics

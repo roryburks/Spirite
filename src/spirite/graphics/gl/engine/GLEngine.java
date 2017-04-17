@@ -1,4 +1,4 @@
-package spirite.graphics.gl;
+package spirite.graphics.gl.engine;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
@@ -22,7 +23,9 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
+import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -31,7 +34,9 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLEngine.PolyType;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -42,17 +47,15 @@ import sun.awt.image.IntegerInterleavedRaster;
  * 
  * Uses a Singleton paradigm that can be accessed through GLEngine.getInstance()
  * 
- * TODO: Though there is no plan to add software rendering options for every 
- * feature (JOGL support is reasonably comprehensive), I do want to make some
- * effort to support machines running earlier GL versions (GL2).
+ * TODO: I do want to make some effort to support machines running earlier GL 
+ * versions (GL2).
  * 
  * Geometry Shaders and LINE_ADJACENCY_STRIPS for the stroke engine could easily
  * be done in software.  Replacing Framebuffers with some other method would not
  * be difficult but might be extremely slow.
  * 
- * NOTE: Constructor is private and access to the singly instance is package-scoped
- * so only the package has access to GLEngine.  Care should be taken to make sure
- * GLFunctionality does not leak beyond this package so that functions that require
+ * NOTE:  Care should be taken to make sure
+ * GLFunctionality does not leak beyond the two packages so that functions that require
  * OpenGL are kept explicit and modular (so that you don't try to access OpenGL
  * when it's not available)
  * 
@@ -77,7 +80,7 @@ public class GLEngine  {
     }
 
 	private static final GLEngine singly = new GLEngine();
-	static GLEngine getInstance() {
+	public static GLEngine getInstance() {
 		return singly;
 	}
 	
@@ -102,15 +105,17 @@ public class GLEngine  {
 				1, 1);
 		
 		// Debug
-/*		drawable.addGLEventListener( new GLEventListener() {
+		drawable.addGLEventListener( new GLEventListener() {
 			@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
-			@Override public void dispose(GLAutoDrawable arg0) {}
+			@Override public void dispose(GLAutoDrawable arg0) {
+				System.out.println("DISPOSE_ENGINE");
+			}
 			@Override public void display(GLAutoDrawable arg0) {}
 			@Override public void init(GLAutoDrawable gad) {
-				GL gl = gad.getGL();
-				gl = gl.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
+				//GL gl = gad.getGL();
+				//gl = gl.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
 			}
-		});*/
+		});
 		
 
 		// The GL object has to be running on the AWTEvent thread for UI objects
@@ -120,9 +125,8 @@ public class GLEngine  {
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
-
 				drawable.display();
-				drawable.getContext().makeCurrent();		
+//				drawable.getContext().makeCurrent();		
 				initShaders();
 			}
 		});
@@ -150,24 +154,19 @@ public class GLEngine  {
 	}
 	
 	public GL2 getGL2() {
-//		drawable.display();
 		drawable.getContext().makeCurrent();
 		return drawable.getGL().getGL2();
 	}
 	
-	GLAutoDrawable getAutoDrawable() {
+	public GLAutoDrawable getAutoDrawable() {
 		return drawable;
 	}
-	
-/*	// Probably shoudn't exist.
- 	public GLAutoDrawable getDrawable() {
-		return drawable;
-	}*/
 
 	/** Writes the active GL Surface to a BufferedImage */
 	public BufferedImage glSurfaceToImage() {
-        return new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true); 
+		BufferedImage bi = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true);
+		return bi;
 		
 	}
 	
@@ -194,13 +193,14 @@ public class GLEngine  {
 		
 		STROKE_SPORE,
 		STROKE_BASIC, 
-		STROKE_PIXEL,
+		STROKE_PIXEL, POLY_RENDER,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
         switch( type) {
 		case STROKE_BASIC:
 		case STROKE_PIXEL:
+		case POLY_RENDER:
 		case DEFAULT:
 		case PASS_RENDER:
 		case PASS_BASIC:
@@ -279,16 +279,7 @@ public class GLEngine  {
 			boolean internal,
 			GL2 gl)
 	{
-        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
-        		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
-        
-        if( trans != null) {
-	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
-	        matrix = matrix2.multiply(matrix);
-        }
-        
-        params.addParam( new GLParameters.GLUniformMatrix4fv(
-        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
+		addOrtho(params, trans);
 
 		PreparedData pd = prepareRawData(new float[]{
 			// x  y   u   v
@@ -310,7 +301,98 @@ public class GLEngine  {
 			AffineTransform trans,
 			GL2 gl) 
 	{
+		addOrtho(params, trans);
+        
+        float data[] = new float[2*numPoints];
+        for( int i=0; i < numPoints; ++i) {
+        	data[i*2] = (float)xPoints[i];
+        	data[i*2+1] = (float)yPoints[i];
+        }
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
+		pd.free();
+	}
+	
+	public void applyLineProgram( 
+			ProgramType type,
+			float[] xPoints,
+			float[] yPoints, 
+			int numPoints,
+			GLParameters params,
+			AffineTransform trans,
+			GL2 gl) 
+	{
+		addOrtho(params, trans);
+        
+        float data[] = new float[2*numPoints];
+        for( int i=0; i < numPoints; ++i) {
+        	data[i*2] = xPoints[i];
+        	data[i*2+1] = yPoints[i];
+        }
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
+		pd.free();
+	}
+	
 
+	public enum PolyType {
+		STRIP(GL.GL_TRIANGLE_STRIP), 
+		FAN(GL.GL_TRIANGLE_FAN), 
+		LIST(GL.GL_TRIANGLES);
+		
+		public final int glConst;
+		PolyType( int glc) {this.glConst = glc;}
+	}
+	public void applyPolyProgram( 
+			ProgramType type,
+			int[] xPoints,
+			int[] yPoints, 
+			int numPoints,
+			PolyType polyType,
+			GLParameters params,
+			AffineTransform trans,
+			GL2 gl) 
+	{
+		addOrtho(params, trans);
+        
+        float data[] = new float[2*numPoints];
+        for( int i=0; i < numPoints; ++i) {
+        	data[i*2] = (float)xPoints[i];
+        	data[i*2+1] = (float)yPoints[i];
+        }
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		
+		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
+		pd.free();
+	}
+	public void applyPolyProgram(
+			ProgramType type, 
+			float[] xPoints, 
+			float[] yPoints, 
+			int numPoints, 
+			PolyType polyType,
+			GLParameters params, 
+			AffineTransform trans, 
+			GL2 gl) 
+	{
+		addOrtho(params, trans);
+        
+        float data[] = new float[2*numPoints];
+        for( int i=0; i < numPoints; ++i) {
+        	data[i*2] = xPoints[i];
+        	data[i*2+1] = yPoints[i];
+        }
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		
+		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
+		pd.free();
+		
+	}
+	
+	
+	/** Combines the world AffineTransform with an Orthogonal Transform as 
+	 * defined by the parameters to create a 4D Perspective Matrix*/
+	private void addOrtho( GLParameters params, AffineTransform trans) {
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
         
@@ -321,15 +403,6 @@ public class GLEngine  {
         
         params.addParam( new GLParameters.GLUniformMatrix4fv(
         		"perspectiveMatrix", 1, true, matrix.getBuffer()));
-        
-        float data[] = new float[2*numPoints];
-        for( int i=0; i < numPoints; ++i) {
-        	data[i*2] = (float)xPoints[i];
-        	data[i*2+1] = (float)yPoints[i];
-        }
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
-		pd.free();
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
@@ -401,9 +474,12 @@ public class GLEngine  {
 	public class PreparedTexture{
 		private IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
 		private final GL2 gl;
+		private final int w, h;
 		
-		PreparedTexture( GL2 gl) {
+		PreparedTexture( GL2 gl, int w, int h) {
 			this.gl = gl;
+			this.w = w;
+			this.h = h;
 		}
 		
 		@Override
@@ -419,13 +495,15 @@ public class GLEngine  {
 			if( !_free) {
 				_free = true;
 				gl.glDeleteTextures(1, tex);
+
+				c_texes.remove(this);
 			}
 		}
 	}
 	public PreparedTexture prepareTexture( BufferedImage bi, GL2 gl) {
-		PreparedTexture pt = new PreparedTexture(gl);
 		int w = bi.getWidth();
 		int h = bi.getHeight();
+		PreparedTexture pt = new PreparedTexture(gl, w, h);
 
 		pt. tex = GLBuffers.newDirectIntBuffer(1);
         gl.glGenTextures(1, pt.tex);
@@ -436,6 +514,7 @@ public class GLEngine  {
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		
 		WritableRaster rast = bi.getRaster();
+		
 
 		if( rast instanceof ByteInterleavedRaster) {
 			gl.glTexImage2D(
@@ -461,10 +540,24 @@ public class GLEngine  {
 					IntBuffer.wrap(((IntegerInterleavedRaster)rast).getDataStorage())
 					);
 		}
+		
+/*		__ts[met] = System.currentTimeMillis();
+		__dims[met] = w*h;
+		
+		long tdim = 0;
+		for( int i=0; i < TRACK_PREC; ++i) tdim += __dims[i];
+		System.out.println( 1000 * tdim / (double)(__ts[met] - __ts[(met+1)%TRACK_PREC]));
+		System.out.println( 1000 * 30 / (double)(__ts[met] - __ts[(met+1)%TRACK_PREC]));
+		met = (met+1)%TRACK_PREC;*/
 
+		c_texes.add(pt);
 		
 		return pt;
 	}
+	private static final int TRACK_PREC = 30;
+	private long __ts[] = new long[TRACK_PREC];
+	private int __dims[] = new int[TRACK_PREC];
+	private int met = 0;
 	
 	// =================
 	// ==== Data Buffer Preperation
@@ -489,6 +582,8 @@ public class GLEngine  {
 				_free = true;
 				gl.glDeleteVertexArrays(1, vao);
 				gl.glDeleteBuffers(1, positionBufferObject);
+
+				c_data.remove(this);
 			}
 		}
 		
@@ -496,7 +591,6 @@ public class GLEngine  {
 		public void init() {
 	        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
 	        
-	        System.out.println( positionBufferObject.get(0));
 	        int totalLength = 0;
 	        for( int i=0; i < lengths.length; ++i) {
 		        gl.glEnableVertexAttribArray(i);
@@ -538,6 +632,8 @@ public class GLEngine  {
 		gl.glBindVertexArray(pd.vao.get(0));
 		
 		pd.lengths = lengths;
+		
+		this.c_data.add(pd);
 		
 		return pd;
 	}
@@ -599,6 +695,10 @@ public class GLEngine  {
 				"shaders/brushes/stroke_pixel.vert", 
 				null, 
 				"shaders/brushes/stroke_pixel.frag");
+        programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources( 
+				"shaders/shapes/poly_render.vert", 
+				null, 
+				"shaders/shapes/poly_render.frag");
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){
@@ -731,4 +831,34 @@ public class GLEngine  {
 		
 		return shader;
 	}
+	
+	// =========
+	// ==== Resource Tracking
+	final List<GLMultiRenderer> c_glmus = new ArrayList<>();
+	final List<PreparedTexture> c_texes = new ArrayList<>();
+	final List<PreparedData> c_data = new ArrayList<>();
+	
+	public String dispResourcesUsed() {
+		String str = "";
+		
+//		IntBuffer ib = GLBuffers.newDirectIntBuffer(1);
+//		getGL2().glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, ib);
+//		str += ib.get(0) + "\n";
+		
+		str += "FBOs: \n";
+		for( int i=0; i < c_glmus.size(); ++i) {
+			str += i + "["+c_glmus.get(i).getTexture() +"] : (" + c_glmus.get(i).width + "," + c_glmus.get(i).height + ")\n";
+		}
+		str += "Textures: \n";
+		for( int i=0; i < c_texes.size(); ++i) {
+			str += i + "[" + c_texes.get(i).getTexID()+ "] : (" + c_texes.get(i).w + "," + c_texes.get(i).h + ")\n";
+		}
+		str += "VBOs: \n";
+		for( int i=0; i < c_data.size(); ++i) {
+			str += i + "[" + c_data.get(i).positionBufferObject.get(0)+","+c_data.get(i).vao.get(i)+"] \n";
+		}
+		
+		return str;
+	}
+
 }

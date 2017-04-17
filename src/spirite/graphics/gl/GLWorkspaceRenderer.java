@@ -8,6 +8,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.WorkspaceRenderer;
+import spirite.graphics.gl.engine.GLMultiRenderer;
 import spirite.image_data.ImageWorkspace;
 
 public class GLWorkspaceRenderer extends WorkspaceRenderer implements MWorkspaceObserver {

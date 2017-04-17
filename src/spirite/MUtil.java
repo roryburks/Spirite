@@ -8,12 +8,14 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
+import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -26,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import mutil.ArrayInterpretation.IntCounter;
 import mutil.ArrayInterpretation.InterpretedIntArray;
+import mutil.DataCompaction.FloatCompactor;
 
 public class MUtil {
 	
@@ -212,6 +215,40 @@ public class MUtil {
 		} catch( IOException | UnsupportedFlavorException e) {}
 		
 		return null;
+	}
+	
+	
+	/** Fills the supplied FloatCompactors with points representing the path 
+	 * along the Shape's PathIterator with flatness.	 */
+	public static void shapeToPoints( 
+			Shape shape, 
+			FloatCompactor x_, 
+			FloatCompactor y_, 
+			double flatness, 
+			boolean closed)
+	{
+		PathIterator pi = shape.getPathIterator(null, 1);
+		float coords[] = new float[6];
+		
+		int startx = x_.size();
+		int starty = y_.size();
+		
+		while( !pi.isDone()) {
+			int res = pi.currentSegment(coords);
+			switch( res) {
+			case PathIterator.SEG_LINETO:
+				x_.add(coords[0]);
+				y_.add(coords[1]);
+				break;
+			case PathIterator.SEG_MOVETO:
+			case PathIterator.SEG_CLOSE:break;
+			}
+			pi.next();
+		}
+		if( closed) {
+			x_.add(x_.get(startx));
+			y_.add(y_.get(starty));	
+		}
 	}
 	
 	/**

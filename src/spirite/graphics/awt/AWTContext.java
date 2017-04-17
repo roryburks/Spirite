@@ -1,9 +1,11 @@
 package spirite.graphics.awt;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -60,8 +62,27 @@ public class AWTContext extends GraphicsContext{
 	@Override public void setTransform(AffineTransform trans) { g2.setTransform(trans); }
 	@Override public AffineTransform getTransform() { return g2.getTransform(); }
 
+	@Override public void setColor(Color color) {g2.setColor(color);}
+	@Override
+	public void setComposite(Composite composite, float alpha) {
+		int i = AlphaComposite.SRC_OVER;
+		
+		switch( composite) {
+		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
+		}
+		g2.setComposite( AlphaComposite.getInstance(i, alpha));
+		
+	}
 	
 	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}
 	@Override public void drawOval(int x, int y, int w, int h) { g2.drawOval(x,y,w,h);}
 	@Override public void drawPolyLine(int[] x, int[] y, int count) {g2.drawPolyline(x, y, count); }
+	@Override public void drawLine(int x1, int y1, int x2, int y2) {g2.drawLine(x1, y1, x2, y2);}
+	@Override public void draw(Shape shape) {g2.draw(shape);}
+
+	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
+	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
+
+
+
 }

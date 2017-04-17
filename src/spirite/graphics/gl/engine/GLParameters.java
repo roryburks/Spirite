@@ -1,4 +1,4 @@
-package spirite.graphics.gl;
+package spirite.graphics.gl.engine;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.graphics.gl.GLEngine.PreparedTexture;
+import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
 
 /**
  * GLParameters encapsulates the GL Uniform Parameters so that they
@@ -16,14 +16,14 @@ import spirite.graphics.gl.GLEngine.PreparedTexture;
  * @author Rory Burks
  *
  */
-class GLParameters {
+public class GLParameters {
 	public final List<GLParam> params = new ArrayList<>();
 	public GLTexture texture;
 	public GLTexture texture2;
 	public int width, height;
 	public boolean flip = false;
 
-	boolean useBlendMode = true;
+	public boolean useBlendMode = true;
 	boolean useDefaultBlendmode = true;
 	int bm_sfc, bm_sfa, bm_dfc, bm_dfa, bm_fc, bm_fa;
 	

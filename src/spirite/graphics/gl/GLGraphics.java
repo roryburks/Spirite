@@ -2,20 +2,36 @@ package spirite.graphics.gl;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
+import mutil.DataCompaction.FloatCompactor;
+import spirite.MUtil;
 import spirite.graphics.GraphicsContext;
-import spirite.graphics.gl.GLEngine.ProgramType;
-import spirite.graphics.gl.GLMultiRenderer.GLRenderer;
-import spirite.graphics.gl.GLParameters.GLFBOTexture;
-import spirite.graphics.gl.GLParameters.GLImageTexture;
-import spirite.graphics.gl.GLParameters.GLParam1i;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLMultiRenderer;
+import spirite.graphics.gl.engine.GLParameters;
+import spirite.graphics.gl.engine.GLEngine.PolyType;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLParameters.GLFBOTexture;
+import spirite.graphics.gl.engine.GLParameters.GLImageTexture;
+import spirite.graphics.gl.engine.GLParameters.GLParam1i;
 
+/**
+ * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
+ * substituting) the necessary features of AWT Graphics using OpenGL hardware
+ * rendering.
+ * 
+ * @author Rory Burks
+ *
+ */
 public class GLGraphics extends GraphicsContext{
 	private final GLEngine engine = GLEngine.getInstance();
 	
@@ -24,6 +40,9 @@ public class GLGraphics extends GraphicsContext{
 	private int width, height;
 	private boolean flip = false;
 	private AffineTransform contextTransform = new AffineTransform();
+	private Color color = Color.BLACK;
+	private Composite composite = Composite.SRC_OVER;
+	private float alpha = 1.0f;
 
 	GLGraphics( GLAutoDrawable drawable, boolean flip) {
 		this.drawable = drawable;
@@ -140,6 +159,14 @@ public class GLGraphics extends GraphicsContext{
 		if( trans == null) trans = new AffineTransform();
 		contextTransform = trans;
 	}
+	@Override public void setColor(Color color) {
+		if( color != null) this.color = color;
+	}
+	@Override
+	public void setComposite(Composite composite, float alpha) {
+		this.composite = composite;
+		this.alpha = alpha;
+	}
 	
 	// :::: Line Drawing Methods
 	@Override
@@ -151,19 +178,101 @@ public class GLGraphics extends GraphicsContext{
 		y_[0] = y_[4] = y_[1] = y;
 		x_[1] = x_[2] = x + w;
 		y_[2] = y_[3] = y + h;
-		
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
+
+		GLParameters params =constructLineParams();
 		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 5, params, contextTransform, gl);
 	}
 	@Override
 	public void drawOval(int x, int y, int w, int h) {
-		// TODO Auto-generated method stub
+		draw( new Ellipse2D.Float(x,y,w,h));		
+	}
+	@Override
+	public void drawPolyLine(int[] xPoints, int[] yPoints, int count) {
+		GLParameters params =constructLineParams();
+		engine.applyLineProgram(ProgramType.STROKE_PIXEL, xPoints, yPoints, count, params, contextTransform, gl);
+	}
+	@Override
+	public void drawLine(int x1, int y1, int x2, int y2) {
+		int x_[] = new int[2];
+		int y_[] = new int[2];
+		x_[0] = x1; x_[1] = x2;
+		y_[0] = y1; y_[1] = y2;
+		GLParameters params =constructLineParams();
+		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
 		
 	}
 	@Override
-	public void drawPolyLine(int[] x, int[] y, int count) {
-		// TODO Auto-generated method stub
+	public void draw(Shape shape) {
+		FloatCompactor x_ = new FloatCompactor();
+		FloatCompactor y_ = new FloatCompactor();
 		
+		MUtil.shapeToPoints( shape, x_, y_, 1, true);
+
+		GLParameters params =constructLineParams();
+
+		float xPoints[] = x_.toArray();
+		float yPoints[] = y_.toArray();
+		engine.applyLineProgram(ProgramType.STROKE_PIXEL, xPoints, yPoints, xPoints.length, params, contextTransform, gl);
+	}
+
+	private GLParameters constructLineParams() {
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
+		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		
+		switch( composite) {
+		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		}
+		return params;
+	}
+	
+	// ============
+	// ==== Fill Methods
+	@Override
+	public void fillRect(int x, int y, int w, int h) {
+		int x_[] = new int[4];
+		int y_[] = new int[4];
+
+		x_[0] = x_[1] = x;
+		y_[0] = y_[2] = y;
+		x_[2] = x_[3] = x + w;
+		y_[1] = y_[3] = y + h;
+		
+
+		GLParameters params = constructPolyParams();
+		engine.applyPolyProgram(ProgramType.POLY_RENDER, x_, y_, x_.length, PolyType.STRIP, params, contextTransform, gl);
+		
+	}
+	@Override
+	public void fillOval(int x, int y, int w, int h) {
+
+		FloatCompactor x_ = new FloatCompactor();
+		FloatCompactor y_ = new FloatCompactor();
+
+		x_.add(x + (w/2.0f));
+		y_.add(y + (h/2.0f));
+		
+		Shape shape = new Ellipse2D.Float(x, y, w, h);
+		MUtil.shapeToPoints( shape, x_, y_, 0.01, true);
+
+		GLParameters params = constructPolyParams();
+
+		float xPoints[] = x_.toArray();
+		float yPoints[] = y_.toArray();
+		
+		engine.applyPolyProgram( ProgramType.POLY_RENDER, xPoints, yPoints, xPoints.length, PolyType.FAN, params, contextTransform, gl);
+	}
+	
+	private GLParameters constructPolyParams() {
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
+		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		
+		switch( composite) {
+		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		}
+		return params;
 	}
 }

@@ -1,4 +1,4 @@
-package spirite.graphics.gl;
+package spirite.graphics.gl.engine;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -15,18 +15,20 @@ import spirite.MDebug.WarningType;
  * @author Rory Burks
  *
  */
-class GLMultiRenderer {
+public class GLMultiRenderer {
 	private final GL2 gl;
-	private final int width, height;
-	
+	final int width, height;
+	private static final GLEngine engine = GLEngine.getInstance();
 
 	private int fbo;
+	private int dbo;
 	private int tex;
 	
 	public GLMultiRenderer( int width, int height, GL2 gl) {
 		this.width = width;
 		this.height = height;
 		this.gl = gl;
+		
 	}
 	
 	/** Checks is the FrameBuffer was successfully created, displaying a proper
@@ -35,7 +37,7 @@ class GLMultiRenderer {
 	private void checkFramebuffer() {
         switch( gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)) {
         case GL.GL_FRAMEBUFFER_COMPLETE:
-    		break;
+    		return;
         case GL.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT.");
     		break;	
@@ -95,6 +97,15 @@ class GLMultiRenderer {
         gl.glTexImage2D(GL.GL_TEXTURE_2D,0,GL.GL_RGBA8,
         		width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
         
+        // Create a (nearly) empty depth-buffer as a placeholder
+        gl.glGenRenderbuffers( 1, result, 0);
+        this.dbo = result[0];
+        gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, dbo);
+        gl.glRenderbufferStorage( GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT16, 1, 1);
+        gl.glFramebufferRenderbuffer( GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, dbo);
+        
+        // TODO: Check for Out of Memory and handle appropriately
+//        System.out.println(gl.glGetError());
         
         // Attach Texture to FBO
         gl.glFramebufferTexture2D( GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, 
@@ -102,6 +113,9 @@ class GLMultiRenderer {
         
         checkFramebuffer();
         gl.glBindFramebuffer( GL.GL_FRAMEBUFFER, 0);
+        
+
+		engine.c_glmus.add(this);
 	}
 		
 	/** A GLRenderer is passed to the GLMU's render method.  Any GL code inside
@@ -138,6 +152,9 @@ class GLMultiRenderer {
 	
 	public void cleanup() {
 		gl.glDeleteTextures(1, new int[]{tex}, 0);
+		gl.glDeleteRenderbuffers(1, new int[]{dbo}, 0);
 		gl.glDeleteFramebuffers(1, new int[]{fbo}, 0); 
+
+		engine.c_glmus.remove(this);
 	}
 }

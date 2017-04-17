@@ -899,25 +899,26 @@ public class SelectionEngine {
 	
 	/** Builds a polygonal selection using a feed of points. */
 	public class FreeformSelectionBuilder extends SelectionBuilder {
-		IntCompactor compactor = new IntCompactor();
+		IntCompactor compactor_x = new IntCompactor();
+		IntCompactor compactor_y = new IntCompactor();
 		@Override
 		protected void start(int x, int y) {
-			compactor.add(x);
-			compactor.add(y);
+			compactor_x.add(x);
+			compactor_y.add(y);
 		}
 
 		@Override
 		protected void update(int x, int y) {
-			compactor.add(x);
-			compactor.add(y);
+			compactor_x.add(x);
+			compactor_y.add(y);
 		}
 		@Override
 		protected BuiltSelection build() {
 			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 			
 			Polygon pg = new Polygon();
-			for( int i=0; i<compactor.size(); i += 2) {
-				pg.addPoint(compactor.get(i), compactor.get(i+1));
+			for( int i=0; i<compactor_x.size(); i += 1) {
+				pg.addPoint(compactor_x.get(i), compactor_y.get(i));
 			}
 			Graphics g = bi.getGraphics();
 			g.setColor(Color.WHITE);
@@ -929,23 +930,18 @@ public class SelectionEngine {
 
 		@Override
 		protected void draw(GraphicsContext g) {
-			int ox = compactor.get(0);
-			int oy = compactor.get(1);
-			int nx, ny;
-			for( int i=2; i<compactor.size(); i+=2) {
-				nx = compactor.get(i);
-				ny = compactor.get(i+1);
-//				g.drawLine(ox, oy, nx, ny);
-				ox = nx;
-				oy = ny;
+			for( int i=0; i < compactor_x.getChunkCount(); ++i) {
+				g.drawPolyLine(compactor_x.getChunk(i), 
+							compactor_y.getChunk(i), 
+							compactor_x.getChunkSize(i));
 			}
 		}
 		public Point getStart() {
-			return new Point( compactor.get(0), compactor.get(1));
+			return new Point( compactor_x.get(0), compactor_y.get(0));
 		}
 		public Point getEnd() {
-			int s = compactor.size();
-			return new Point( compactor.get(s-2), compactor.get(s-1));
+			int s = compactor_x.size();
+			return new Point( compactor_x.get(s-1), compactor_y.get(s-1));
 		}
 		
 	}

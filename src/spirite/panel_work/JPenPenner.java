@@ -12,6 +12,7 @@ import jpen.PScrollEvent;
 import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
+import spirite.graphics.GraphicsContext;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 /**
@@ -126,8 +127,8 @@ public class JPenPenner implements PenListener
 		return penner.drawsOverlay();
 	}
 
-	public void paintOverlay(Graphics g) {
-		penner.paintOverlay(g);
+	public void paintOverlay(GraphicsContext gc) {
+		penner.paintOverlay(gc);
 	}
 
 	public void cleanUp() {
