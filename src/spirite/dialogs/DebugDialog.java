@@ -16,16 +16,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import spirite.MDebug;
 import spirite.MDebug.DebugObserver;
 import spirite.brains.CacheManager.CacheDomain;
-import spirite.graphics.gl.engine.GLEngine;
 import spirite.brains.MasterControl;
+import spirite.graphics.gl.engine.GLEngine;
 
 public class DebugDialog extends JDialog 
 	implements ActionListener, DebugObserver, WindowListener 

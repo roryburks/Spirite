@@ -420,23 +420,19 @@ public class ImageWorkspace {
 			return new Rectangle( ox, oy, handle.getWidth(), handle.getHeight());
 		}
 		
-		/** Returns the Tranform needed to convert WorkspaceSpace into DataSpace*/
-		public AffineTransform getTransform() {
-			AffineTransform transform = new AffineTransform();
-			return transform;
-		}
-		public AffineTransform getBaseTransform() {
+		/** Returns a transform converting from screen space to layer space. */
+		public AffineTransform getScreenToImageTransform() {
 			AffineTransform transform = new AffineTransform();
 			transform.translate( -ox, -oy);
 			return transform;
 		}
 
-		/** Returns the Tranform needed to convert DataSpace into Workspace space*/
-		public AffineTransform getDrawTransform() {
-			AffineTransform transform = new AffineTransform();
-			transform.translate( ox, oy);
-			return transform;
-			
+		/** Returns a transform representing how to convert the image from its internal
+		 * image space to a composited image space (for normal Images, this is the
+		 * Identity Matrix, for DynamicImages, since they allow editing anywhere on the
+		 * screen, this is equal to the conversion from layerspace to screen space)*/
+		public AffineTransform getCompositeTransform() {
+			return new AffineTransform();			
 		}
 	}
 	
@@ -467,17 +463,10 @@ public class ImageWorkspace {
 					handle.getWidth(), handle.getHeight());
 		}
 		@Override
-		public AffineTransform getTransform() {
-			AffineTransform tf = new AffineTransform();
-			tf.translate(-ox, -oy);
-			return tf;
-		}
-		@Override
-		public AffineTransform getDrawTransform() {
-			return new AffineTransform();
-		}
-		public AffineTransform getBaseTransform() {
-			return super.getBaseTransform();
+		public AffineTransform getCompositeTransform() {
+			AffineTransform trans = new AffineTransform();
+			trans.translate(ox, oy);
+			return trans;
 		}
 		
 		BufferedImage buffer = null;

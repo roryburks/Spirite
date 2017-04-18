@@ -8,7 +8,6 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 
 import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
-import spirite.image_data.ImageHandle;
 
 /**
  * GLParameters encapsulates many of the attributes representing "how" OpenGL

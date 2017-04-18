@@ -1,7 +1,5 @@
 package spirite.panel_work;
 
-import java.awt.Graphics;
-
 import javax.swing.SwingUtilities;
 
 import jpen.PButtonEvent;

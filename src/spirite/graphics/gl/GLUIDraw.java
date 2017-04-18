@@ -6,10 +6,10 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.graphics.gl.engine.GLEngine;
-import spirite.graphics.gl.engine.GLMultiRenderer;
-import spirite.graphics.gl.engine.GLParameters;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLParameters;
 import spirite.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.graphics.gl.engine.GLParameters.GLParam1i;

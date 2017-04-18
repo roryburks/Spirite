@@ -25,7 +25,6 @@ import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
-import com.jogamp.opengl.GLPipelineFactory;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
@@ -34,9 +33,6 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
-import spirite.graphics.gl.GLGraphics;
-import spirite.graphics.gl.engine.GLEngine.PolyType;
-import spirite.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -86,6 +82,7 @@ public class GLEngine  {
 	}
 	
 	private GLEngine() {
+		System.out.println("GL Creation");
 		// Create Offscreen OpenGl Surface
 		GLProfile profile = GLProfile.getDefault();
         GLDrawableFactory fact = GLDrawableFactory.getFactory(profile);

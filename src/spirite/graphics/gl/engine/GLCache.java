@@ -13,7 +13,6 @@ import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
 import spirite.graphics.gl.engine.GLParameters.GLTexture;
-import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -31,10 +30,9 @@ __ Any time MAX_SIZE is hit, it unloads the least-recently used textures.
  *
  */
 public class GLCache implements MImageObserver {
-	private long MAX_CACHE = 4L*1024L*1024L*1024L;	// 4 Gig
+	private long MAX_CACHE = 4294967296L;	// 4 Gig
 	private long cacheSize = 0;
 	private GLEngine glEngine = null;
-	private final MasterControl master;
 	
 	private class CachedTexture {
 		long lastUsed;
@@ -50,7 +48,6 @@ public class GLCache implements MImageObserver {
 	private final Map<ImageHandle, CachedTexture> cache = new HashMap<>();
 	
 	public GLCache(MasterControl master) {
-		this.master = master;
 		master.addGlobalImageObserver( this);
 	}
 	

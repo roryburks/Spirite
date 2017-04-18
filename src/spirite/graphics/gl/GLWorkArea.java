@@ -85,14 +85,12 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	
 	// :::: GLEventListener
 	@Override public void dispose(GLAutoDrawable arg0) {
-		System.out.println("DISPOSE");
 	}
 	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
 	}
 	
 	@Override
 	public void display(GLAutoDrawable glad) {
-		System.out.println("START_DISP");
 		GLGraphics glgc = new GLGraphics(glad, true);
 		
 		glad.getContext().makeCurrent();
@@ -167,7 +165,6 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
         	glgc.setTransform(null);
             if( penner.drawsOverlay())
             	penner.paintOverlay(glgc);
-    		System.out.println("END_DISP");
         }
 	}
 

@@ -1,10 +1,8 @@
 package spirite.graphics.gl;
 
 import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,9 +10,7 @@ import java.util.ListIterator;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.GLBuffers;
 
-import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.brains.RenderEngine;
@@ -23,19 +19,18 @@ import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.graphics.GraphicsContext;
-import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.engine.GLCache;
 import spirite.graphics.gl.engine.GLEngine;
-import spirite.graphics.gl.engine.GLMultiRenderer;
-import spirite.graphics.gl.engine.GLParameters;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLParameters;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 
 /** 
  * This updated version uses JOGL rendering algorithms instead of 
@@ -154,43 +149,28 @@ class GLNodeRenderer extends NodeRenderer {
 				compositeLayer.render( new GLRenderer() {
 					@Override
 					public void render(GL _gl) {
-						glgc.setTransform(dataContext.getDrawTransform());
+						// Draw Base Image
+						AffineTransform trans = dataContext.getCompositeTransform();
+						trans.translate( dataContext.handle.getDynamicX(), 
+								dataContext.handle.getDynamicY());
+						glgc.setTransform(trans);
 						glgc.drawImage(dataContext.handle.deepAccess(), 0, 0);
 
 						if( workspace.getSelectionEngine().getLiftedImage() != null ){
 							// Draw Lifted Image
-							AffineTransform trans = dataContext.getBaseTransform();
+							trans = dataContext.getScreenToImageTransform();
 							trans.concatenate(workspace.getSelectionEngine().getDrawFromTransform());
 							glgc.setTransform(trans);
 							
-//							GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-							BufferedImage bi = workspace.getSelectionEngine().getLiftedImage();
-							glgc.drawImage( bi, 0, 0);
-//							g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
+							glgc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
 						}
 						if( workspace.getDrawEngine().strokeIsDrawing()) {
-							glgc.setTransform(dataContext.getTransform());
+							// Draw Stroke Layer
+							glgc.setTransform(null);
 							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 						}	
 					}
 				}, glgc);
-/*				AffineTransform baseTrans = dataContext.getBaseTransform();
-				dataContext.draw(g2);
-			
-				
-				if( workspace.getSelectionEngine().getLiftedImage() != null ){
-					g2.setTransform( dataContext.getBaseTransform());
-					g2.transform(workspace.getSelectionEngine().getDrawFromTransform());
-					
-					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
-				}
-				if( workspace.getDrawEngine().strokeIsDrawing()) {
-					g2.setTransform(dataContext.getTransform());
-					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(new AWTContext(g2));
-				}
-				g2.dispose();*/
-//				compositionContext = dataContext.handle;
-//				compositionImage = bi;
 			}
 		}
 	}
@@ -391,17 +371,21 @@ class GLNodeRenderer extends NodeRenderer {
 					AffineTransform trans = new AffineTransform(transform);
 
 					if( compositedHandle == renderable.handle) {
+						if( renderable.handle.isDynamic())
+							trans = new AffineTransform();
 						params.texture = new GLParameters.GLFBOTexture(compositeLayer);
+						engine.applyPassProgram(
+								ProgramType.PASS_RENDER, params, trans,
+								0, 0, compositeLayer.width, compositeLayer.height, false, _gl.getGL2());
 					}
 					else {
-						System.out.println("NONCOMP");
 						trans.translate(renderable.handle.getDynamicX(), 
 								renderable.handle.getDynamicY());
 						params.texture = glcache.new GLHandleTexture(renderable.handle);
+						engine.applyPassProgram(
+								ProgramType.PASS_RENDER, params, trans,
+								0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _gl.getGL2());
 					}
-					engine.applyPassProgram(
-							ProgramType.PASS_RENDER, params, trans,
-							0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _gl.getGL2());
 				}
 			});
 		}

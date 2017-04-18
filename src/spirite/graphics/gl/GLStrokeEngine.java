@@ -15,11 +15,11 @@ import mutil.MatrixBuilder;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.engine.GLEngine;
-import spirite.graphics.gl.engine.GLMultiRenderer;
-import spirite.graphics.gl.engine.GLParameters;
 import spirite.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.graphics.gl.engine.GLMultiRenderer;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.graphics.gl.engine.GLParameters;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
@@ -108,7 +108,6 @@ class GLStrokeEngine extends StrokeEngine {
 			GLGraphics glgc = (GLGraphics)gc;
 			glgc.reset();
 			
-			System.out.println(glgc.getWidth() + "," + glgc.getHeight());
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(displayLayer);
 			params.flip = glgc.isFlip();

@@ -34,7 +34,6 @@ import spirite.panel_toolset.ColorPicker;
 import spirite.panel_toolset.PalettePanel;
 import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.ToolsPanel;
-import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
 import spirite.panel_work.WorkTabPane;
 import spirite.ui.components.ResizeContainerPanel;
@@ -384,15 +383,12 @@ public class RootFrame extends javax.swing.JFrame
 			}
 			
 			SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
-				System.out.println("END_A");
 				try {
 				dispose();
 				}catch (Exception e) {
 					e.printStackTrace();
 				}
-				System.out.println("END_B");
 		        System.exit(0);	
-				System.out.println("END_C");
 			}});
 		}});
 

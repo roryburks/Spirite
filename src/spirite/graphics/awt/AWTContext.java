@@ -56,7 +56,8 @@ public class AWTContext extends GraphicsContext{
 	@Override
 	public void clear() {
 		Rectangle r = g2.getClipBounds();
-		g2.clearRect(r.x, r.y, r.width, r.height);
+		if( r != null)
+			g2.clearRect(r.x, r.y, r.width, r.height);
 	}
 
 	@Override public void setTransform(AffineTransform trans) { g2.setTransform(trans); }
