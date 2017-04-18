@@ -34,6 +34,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
+import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -341,12 +342,10 @@ public class ImageWorkspace {
 			return handle.getHeight();
 		}
 		
-		public void draw(Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			
+		public void draw(GraphicsContext gc) {
 			AffineTransform transform = new AffineTransform();
 			transform.translate(ox, oy);
-			handle.drawLayer(new AWTContext(g2), transform);
+			handle.drawLayer( gc, transform);
 		}
 		
 		public void drawBorder( Graphics g) {

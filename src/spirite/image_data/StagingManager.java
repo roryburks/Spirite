@@ -41,5 +41,4 @@ public class StagingManager {
 	public int getNodeStage(Node node) {
 		return stageList.indexOf(node);
 	}
-
 }

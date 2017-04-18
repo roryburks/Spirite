@@ -1,12 +1,12 @@
 package spirite.image_data.layers;
 
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
@@ -17,7 +17,7 @@ public abstract class Layer {
 	public abstract BuildingImageData getActiveData();
 	public abstract List<ImageHandle> getImageDependencies();
 	public abstract List<BuildingImageData> getDataToBuild();
-	public abstract void draw( Graphics g);
+	public abstract void draw( GraphicsContext gc);
 	public abstract int getWidth();
 	public abstract int getHeight();
 	

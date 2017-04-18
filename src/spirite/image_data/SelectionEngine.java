@@ -23,6 +23,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.MUtil;
 import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -319,10 +320,11 @@ public class SelectionEngine {
 				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		Graphics g = bi.getGraphics();
+		GraphicsContext gc = new AWTContext(g);
 		if( sel1 != null)
-			sel1.drawSelectionMask(g);
+			sel1.drawSelectionMask(gc);
 		if( sel2 != null)
-			sel2.drawSelectionMask(g);
+			sel2.drawSelectionMask(gc);
 		g.dispose();
 		
 		return new BuiltSelection( bi);
@@ -333,11 +335,12 @@ public class SelectionEngine {
 				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
+		GraphicsContext gc = new AWTContext(g2);
 		if( sel1 != null)
-			sel1.drawSelectionMask(g2);
+			sel1.drawSelectionMask(gc);
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 		if( sel2 != null)
-			sel2.drawSelectionMask(g2);
+			sel2.drawSelectionMask(gc);
 		g2.dispose();
 
 		return new BuiltSelection( bi);
@@ -351,12 +354,12 @@ public class SelectionEngine {
 		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		sel1.drawSelectionMask(g2);
+		sel1.drawSelectionMask(new AWTContext(g2));
 		g2.dispose();
 		
 
 		g2 = (Graphics2D)bi2.getGraphics();
-		sel2.drawSelectionMask(g2);
+		sel2.drawSelectionMask(new AWTContext(g2));
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
 		g2.drawImage( bi, 0, 0, null);
 		g2.dispose();
@@ -372,7 +375,7 @@ public class SelectionEngine {
 		g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 		if( sel != null)
-			sel.drawSelectionMask(g2);
+			sel.drawSelectionMask(new AWTContext(g2));
 		g2.dispose();
 
 		return new BuiltSelection( bi);
@@ -386,7 +389,7 @@ public class SelectionEngine {
 		g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
 		g2.transform(trans);
 		g2.translate(-d.width/2, -d.height/2);
-		built.selection.drawSelectionMask(g2);
+		built.selection.drawSelectionMask(new AWTContext(g2));
 		g2.dispose();
 		BuiltSelection sel = new BuiltSelection(bi);
 		
@@ -525,7 +528,7 @@ public class SelectionEngine {
 			
 			Graphics2D g2 = (Graphics2D)g;
 			g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
-			selection.drawSelectionMask(g2);
+			selection.drawSelectionMask(new AWTContext(g2));
 
 			builtImage.checkin();
 		}
@@ -671,11 +674,11 @@ public class SelectionEngine {
 			this.bi = bi;
 		}
 		
-		public void drawSelectionBounds(GraphicsContext context) {
-			context.drawBounds(bi, c);
+		public void drawSelectionBounds(GraphicsContext gc) {
+			gc.drawBounds(bi, c);
 		}
-		public void drawSelectionMask(Graphics g) {
-			g.drawImage(bi, 0, 0, null);
+		public void drawSelectionMask(GraphicsContext gc) {
+			gc.drawImage(bi, 0, 0);
 		}
 		public boolean contains(int x, int y) {
 			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
@@ -729,15 +732,16 @@ public class SelectionEngine {
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
 		}
-		public void drawSelectionMask(Graphics g) {
+		public void drawSelectionMask(GraphicsContext gc) {
 			if( selection == null) return;
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform trans = g2.getTransform();
 			
-			g.translate(offsetX, offsetY);
-			selection.drawSelectionMask(g2);
 			
-			g2.setTransform(trans);
+			AffineTransform trans = gc.getTransform();
+			gc.translate(offsetX, offsetY);
+			
+			selection.drawSelectionMask(gc);
+			
+			gc.setTransform(trans);
 		}
 		
 		private BufferedImage liftSelection( LiftScheme liftScheme) {
@@ -757,7 +761,7 @@ public class SelectionEngine {
 			
 			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
-			selection.drawSelectionMask(g2);	// Note: Untransformed
+			selection.drawSelectionMask(new AWTContext(g2));	// Note: Untransformed
 			
 
 			// Copy the data inside the Selection's alphaMask to liftedData
@@ -765,7 +769,7 @@ public class SelectionEngine {
 
 			g2.translate(-this.offsetX, -this.offsetY);
 			
-			liftScheme.draw(g2);
+			liftScheme.draw(new AWTContext(g2));
 			g2.dispose();
 			
 			return bi;
@@ -783,8 +787,8 @@ public class SelectionEngine {
 				}
 				
 				@Override
-				public void draw(Graphics g) {
-					g.drawImage(img, 0, 0, null);
+				public void draw(GraphicsContext gc) {
+					gc.drawImage(img, 0, 0);
 				}
 			});
 		}
@@ -799,15 +803,15 @@ public class SelectionEngine {
 				}
 				
 				@Override
-				public void draw(Graphics g) {
-					data.draw(g);
+				public void draw(GraphicsContext gc) {
+					data.draw(gc);
 				}
 			});
 		}
 	}
 	/** Helper Class to reduce duplicate code. */
 	private interface LiftScheme {
-		void draw(Graphics g);
+		void draw(GraphicsContext gc);
 		Rectangle getBounds();
 	}
 	
@@ -988,6 +992,4 @@ public class SelectionEngine {
 			else obs.buildingSelection(evt);
 		}
     }
-
-    
 }

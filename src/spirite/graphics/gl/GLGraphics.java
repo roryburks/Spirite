@@ -180,11 +180,15 @@ public class GLGraphics extends GraphicsContext{
 	
 	// =================
 	// ==== Logistical Render Settings
-	@Override public AffineTransform getTransform() {return contextTransform;}
+	@Override public AffineTransform getTransform() {return new AffineTransform(contextTransform);}
 	@Override public void setTransform(AffineTransform trans) {
 		if( trans == null) trans = new AffineTransform();
 		contextTransform = trans;
 	}
+	@Override public void translate(double offsetX, double offsetY) {
+		contextTransform.translate(offsetX, offsetY);
+	}
+	
 	@Override public void setColor(Color color) {
 		if( color != null) this.color = color;
 	}

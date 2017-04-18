@@ -12,7 +12,7 @@ import spirite.MUtil;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.RenderEngine.TransformedHandle;
-import spirite.graphics.awt.AWTContext;
+import spirite.graphics.GraphicsContext;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
 import spirite.image_data.ImageWorkspace;
@@ -38,8 +38,8 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public void draw(Graphics g) {
-		data.drawLayer(new AWTContext(g),null);
+	public void draw(GraphicsContext gc) {
+		data.drawLayer(gc,null);
 	}
 
 	@Override

@@ -553,10 +553,10 @@ public class GLEngine  {
 		
 		return pt;
 	}
-	private static final int TRACK_PREC = 30;
-	private long __ts[] = new long[TRACK_PREC];
-	private int __dims[] = new int[TRACK_PREC];
-	private int met = 0;
+//	private static final int TRACK_PREC = 30;
+//	private long __ts[] = new long[TRACK_PREC];
+//	private int __dims[] = new int[TRACK_PREC];
+//	private int met = 0;
 	
 	// =================
 	// ==== Data Buffer Preperation

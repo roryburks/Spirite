@@ -62,6 +62,7 @@ public class AWTContext extends GraphicsContext{
 
 	@Override public void setTransform(AffineTransform trans) { g2.setTransform(trans); }
 	@Override public AffineTransform getTransform() { return g2.getTransform(); }
+	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}
 
 	@Override public void setColor(Color color) {g2.setColor(color);}
 	@Override
@@ -96,6 +97,7 @@ public class AWTContext extends GraphicsContext{
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
 
 	@Override public void drawImage(BufferedImage bi, int x, int y) {g2.drawImage(bi,  x,  y, null);}
+
 
 
 

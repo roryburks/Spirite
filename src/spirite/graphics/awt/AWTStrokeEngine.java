@@ -50,7 +50,7 @@ class AWTStrokeEngine extends StrokeEngine{
 			
 			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
 			g2.translate(sel.offsetX, sel.offsetY);
-			sel.selection.drawSelectionMask(g2);
+			sel.selection.drawSelectionMask(new AWTContext(g2));
 			g2.dispose();
 		}
 	}

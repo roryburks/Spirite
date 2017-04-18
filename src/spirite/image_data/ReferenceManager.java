@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.layers.Layer;
 
@@ -56,7 +57,7 @@ public class ReferenceManager {
 			AffineTransform t = g2.getTransform();
 			g2.transform(localTransform);
 			
-			layer.draw(g2);
+			layer.draw(new AWTContext(g2));
 			
 			g2.setTransform(t);
 		}

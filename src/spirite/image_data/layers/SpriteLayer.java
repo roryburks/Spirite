@@ -1,8 +1,5 @@
 package spirite.image_data.layers;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -18,7 +15,6 @@ import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.GraphicsContext.Composite;
-import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
@@ -275,22 +271,17 @@ public class SpriteLayer extends Layer
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(GraphicsContext gc) {
 		// Note: Parts are already pre-sorted by depth when they are added and when
 		//	depth is changed.
-		Graphics2D g2 = (Graphics2D)g;
-		
 		List<TransformedHandle> drawList = getDrawList();
 		
 		for( TransformedHandle th : drawList) {
-			th.handle.drawLayer(new AWTContext(g2), th.trans, th.comp, th.alpha);
+			th.handle.drawLayer(gc, th.trans, th.comp, th.alpha);
 		}
 	}
 	
-	public void drawPart( Graphics g, Part part) {
-		Graphics2D g2 = (Graphics2D)g;
-
-		GraphicsContext gc = new AWTContext(g2);
+	public void drawPart( GraphicsContext gc, Part part) {
 		float oldAlpha = gc.getAlpha();
 		Composite oldComp = gc.getComposite();
 		
@@ -298,7 +289,7 @@ public class SpriteLayer extends Layer
 		
 		AffineTransform trans = new AffineTransform();
 		trans.translate(part.ox,part.oy);
-		part.handle.drawLayer(new AWTContext(g2), trans);
+		part.handle.drawLayer( gc, trans);
 		
 		gc.setComposite(oldComp, oldAlpha);
 	}

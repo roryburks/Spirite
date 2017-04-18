@@ -33,6 +33,7 @@ public abstract class GraphicsContext {
 	
 	public abstract void setTransform( AffineTransform trans);
 	public abstract AffineTransform getTransform();
+	public abstract void translate(double offsetX, double offsetY);
 	public abstract void setColor(Color color);
 	
 	public enum Composite {SRC_OVER};
@@ -51,5 +52,6 @@ public abstract class GraphicsContext {
 
 
 	public abstract void drawImage(BufferedImage bi, int x, int y);
+
 
 }

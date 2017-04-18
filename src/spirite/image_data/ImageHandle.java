@@ -1,7 +1,5 @@
 package spirite.image_data;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -9,7 +7,6 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.GraphicsContext.Composite;
-import spirite.graphics.awt.AWTContext;
 import spirite.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.InternalImage;
@@ -25,8 +22,8 @@ import spirite.image_data.ImageWorkspace.InternalImage;
  * use <code>==</code> as it defeats the entire point of handles.
  */
 public class ImageHandle {
+	// These variables are essentially final, but may take a while to be set
 	ImageWorkspace context;
-	
 	int id = -1;
 	
 	// ImageWorkspace.getData should have constant-time access (being implemented
@@ -69,23 +66,12 @@ public class ImageHandle {
 		return context.getData(id).cachedImage.access();
 	}
 
-	public void drawLayer(
-			GraphicsContext gc, AffineTransform transform, Composite composite, float alpha) 
-	{
-		float oldAlpha = gc.getAlpha();
-		Composite oldComposite = gc.getComposite();
-		
-		gc.setComposite( composite, alpha*oldAlpha);
-		
-		drawLayer( gc,transform);
-		
-		gc.setComposite(oldComposite, oldAlpha);
-	}
-	
+
+	public int getID() { return id;}
+	public int getWidth() { return context.getWidthOf(id); }
+	public int getHeight() { return context.getHeightOf(id); }
 	public boolean isDynamic() {
-		if( context != null && context.getData(id) instanceof DynamicInternalImage)
-			return true;
-		return false;
+		return ( context != null && context.getData(id) instanceof DynamicInternalImage);
 	}
 	public int getDynamicX() {
 		if( context == null) return 0;
@@ -102,6 +88,17 @@ public class ImageHandle {
 			return ((DynamicInternalImage) ii).oy;
 		}
 		return 0;
+	}
+	
+	public void drawLayer(
+			GraphicsContext gc, AffineTransform transform, Composite composite, float alpha) 
+	{
+		float oldAlpha = gc.getAlpha();
+		Composite oldComposite = gc.getComposite();
+		
+		gc.setComposite( composite, alpha*oldAlpha);
+		drawLayer( gc,transform);
+		gc.setComposite(oldComposite, oldAlpha);
 	}
 	
 	public void drawLayer(GraphicsContext gc, AffineTransform transform) {
@@ -126,21 +123,8 @@ public class ImageHandle {
 		gc.setTransform(completeTransform);
 		gc.drawImage( ii.cachedImage.access(), 0, 0);
 		gc.setTransform(prev);
-			
+	}
 		
-	}
-	
-	public int getID() {
-		return id;
-	}
-
-	public int getWidth() {
-		return context.getWidthOf(id);
-	}
-	public int getHeight() {
-		return context.getHeightOf(id);
-	}
-	
 	public void refresh() {
 		// Construct ImageChangeEvent and send it
 		ImageChangeEvent evt = new ImageChangeEvent();

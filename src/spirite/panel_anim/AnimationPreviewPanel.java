@@ -30,6 +30,7 @@ import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.file.AnimIO;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.Animation;
 import spirite.image_data.AnimationManager;
 import spirite.image_data.AnimationManager.AnimationStructureEvent;
@@ -332,7 +333,7 @@ public class AnimationPreviewPanel extends OmniComponent
     		if( animation != null) {
     			Graphics2D g2 = (Graphics2D)g;
     			g2.scale(getZoom(), getZoom());
-    			animation.drawFrame(g, animationManager.getAnimationState(animation).getMetronom());
+    			animation.drawFrame(new AWTContext(g), animationManager.getAnimationState(animation).getMetronom());
     		}
     	}
     }

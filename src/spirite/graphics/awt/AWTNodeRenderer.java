@@ -68,7 +68,10 @@ public class AWTNodeRenderer extends NodeRenderer {
 				buffer[i].flush();
 			g.dispose();
 		}
-		finally {buffer = null;}
+		finally {
+			buffer = null;
+			clearCompositeImage();
+		}
 	}
 	
 	private BufferedImage compositionImage;
@@ -114,7 +117,6 @@ public class AWTNodeRenderer extends NodeRenderer {
 			compositionImage.flush();
 		compositionContext = null;
 		compositionImage = null;
-		
 	}
 	
 	private void _render_rec(

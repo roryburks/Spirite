@@ -11,6 +11,9 @@ import spirite.graphics.WorkspaceRenderer;
 import spirite.graphics.gl.engine.GLMultiRenderer;
 import spirite.image_data.ImageWorkspace;
 
+/**
+ * This class is either a replacement for RenderEngine and GLNodeRenderer or will be abandoned.
+ */
 public class GLWorkspaceRenderer extends WorkspaceRenderer implements MWorkspaceObserver {
 	
 	private class GLCache {

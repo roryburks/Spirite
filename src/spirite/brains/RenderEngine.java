@@ -127,7 +127,7 @@ public class RenderEngine
 	// ===== Render Attributes
 	public static class TransformedHandle {
 		public int depth;
-		public Composite comp = null;
+		public Composite comp = Composite.SRC_OVER;
 		public float alpha = 1.0f;
 		public AffineTransform trans = new AffineTransform();
 		public ImageHandle handle;
@@ -734,7 +734,7 @@ public class RenderEngine
 			
 			g2.scale( settings.width / (float)layer.getWidth(),
 					settings.height / (float)layer.getHeight());
-			layer.draw(g);
+			layer.draw(new AWTContext(g2));
 			g.dispose();
 			return bi;
 		}

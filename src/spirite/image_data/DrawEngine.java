@@ -21,6 +21,7 @@ import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
 import spirite.brains.SettingsManager;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageWorkspace.BuildingImageData;
@@ -48,11 +49,6 @@ public class DrawEngine {
 	private final UndoEngine undoEngine;
 	private final SelectionEngine selectionEngine;
 	private final SettingsManager settingsManager;
-	
-	// TODO: I don't necessarily like DrawEngine having MasterAccess, but it needs
-	//	access to the current GraphicsContext at all times
-	private final MasterControl master;
-	
 	private StrokeEngine activeEngine = null;
 	
 	public DrawEngine( ImageWorkspace workspace, MasterControl master) {
@@ -61,23 +57,17 @@ public class DrawEngine {
 		this.selectionEngine = workspace.getSelectionEngine();
 		this.settingsManager = master.getSettingsManager();
 		
-		this.master = master;
 	}
 	
-	public boolean strokeIsDrawing() {
-		return activeEngine != null;
-	}
-	public StrokeEngine getStrokeEngine() {
-		return activeEngine;
-	}
-	public StrokeEngine ___J_defEngine() {
-		return master.getSettingsManager().getDefaultDrawer().getStrokeEngine();
-	}
+	public boolean strokeIsDrawing() {return activeEngine != null;}
+	public StrokeEngine getStrokeEngine() { return activeEngine; }
 	public ImageHandle getStrokeContext() {
 		return (activeEngine == null) ? null : activeEngine.getImageData().handle;
 	}
 	
-	/** @return true if the stroke started, false otherwise	 */
+	/** Starts a Stroke with the provided parameters
+	 * 
+	 * @return true if the stroke started, false otherwise	 */
 	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, BuiltImageData data) {
 		if( activeEngine != null) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
@@ -89,13 +79,15 @@ public class DrawEngine {
 		}
 		else {
 //			if( activeEngine instanceof AWTStrokeEngine) stroke.setInterpolationMethod(InterpolationMethod.NONE);
-			activeEngine = master.getSettingsManager().getDefaultDrawer().getStrokeEngine();
+			activeEngine = settingsManager.getDefaultDrawer().getStrokeEngine();
 			
 			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
 				data.handle.refresh();
 			return true;
 		}
 	}
+	
+	/** Updates the active stroke. */
 	public void stepStroke( PenState ps) {
 		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to step stroke that isn't active.");
@@ -106,6 +98,7 @@ public class DrawEngine {
 				activeEngine.getImageData().handle.refresh();
 		}
 	}
+	/** Ends the active stroke. */
 	public void endStroke( ) {
 		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
 			activeEngine = null;
@@ -128,9 +121,7 @@ public class DrawEngine {
 	}
 	
 
-	/***
-	 * 
-	 */
+	/** Clears the Image Dat to a transparent color. */
 	public void clear( BuiltImageData data) {
 		execute( new ClearAction(data, pollSelectionMask()));
 	}
@@ -164,6 +155,7 @@ public class DrawEngine {
 		return true;
 	}
 	
+	/** Flips the data around either the horizontal or vertical center of the Iamge. */
 	public void flip( BuiltImageData data, boolean horizontal) {
 		BuiltSelection sel = selectionEngine.getBuiltSelection();
 		
@@ -259,9 +251,10 @@ public class DrawEngine {
 	}
 	
 
-
-	// Defauilt Dynamics
+	// ==============
+	// ==== Stroke Dynamics
 	// TODO: This should probably be in some settings area
+	
 	public static PenDynamics getBasicDynamics() {
 		return basicDynamics;
 	}
@@ -296,20 +289,15 @@ public class DrawEngine {
 		undoEngine.storeAction(action);
 	}
 
+	// ===============
+	// ==== Queued Selection
+	// Because many drawing actions can filter based on Selection
+	// Mask, when re-doing them the mask which was active at the time
+	// has to be remembered.  This function will apply the selection mask
+	// to the next draw action performed.  If there is no seletion mask
+	// queued, it will use the active selection.
 	
-	// :::: Other
-	
-	
-	
-	
-
-	/** Because many drawing actions can filter based on Selection
-	 * Mask, when re-doing them the mask which was active at the time
-	 * has to be remembered.  This function will apply the selection mask
-	 * to the next draw action performed.  If there is no seletion mask
-	 * queued, it will use the active selection.
-	 */
-	void queueSelectionMask( BuiltSelection mask) {
+	private void queueSelectionMask( BuiltSelection mask) {
 		queuedSelection = mask;
 	}
 	private BuiltSelection pollSelectionMask() {
@@ -320,15 +308,18 @@ public class DrawEngine {
 		queuedSelection = null;
 		return ret;
 	}
-	BuiltSelection queuedSelection = null;
+	private BuiltSelection queuedSelection = null;
 	
-	// :::: UndoableActions
-	//	All actions 
+	// ==================
+	// ==== UndoableActions
+	//	Note: All actions classes are public so things that peak at the UndoEngine
+	//	can know exactly what actions were performed, but all Constructors are
+	//	(effectively) private so that they can only be created by the DrawEngine
 	
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
 
-		MaskedImageAction(BuiltImageData data, BuiltSelection mask) {
+		private MaskedImageAction(BuiltImageData data, BuiltSelection mask) {
 			super(data);
 			this.mask = mask;
 		}
@@ -339,6 +330,7 @@ public class DrawEngine {
 		private final StrokeEngine.StrokeParams params;
 		private final StrokeEngine engine;
 		
+		// TODO: This is public for Unit Testing purposes, but that's a bad solution
 		public StrokeAction( 
 				StrokeEngine engine,
 				StrokeEngine.StrokeParams params, 
@@ -379,7 +371,7 @@ public class DrawEngine {
 		private final Point p;
 		private final Color color;
 		
-		public FillAction( Point p, Color c, BuiltSelection mask, BuiltImageData data) {
+		private FillAction( Point p, Color c, BuiltSelection mask, BuiltImageData data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -421,7 +413,7 @@ public class DrawEngine {
 				g2.setColor(Color.GREEN);
 				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-				mask.selection.drawSelectionMask(g2);
+				mask.selection.drawSelectionMask(new AWTContext(g2));
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 				g2.drawImage(intermediate, 0, 0, null);
 				g2.dispose();
@@ -464,7 +456,7 @@ public class DrawEngine {
 					//	touches the pixels outside of it with its rasterizer)
 					MUtil.clearImage(intermediate);
 					Graphics2D g2 = (Graphics2D)intermediate.getGraphics();
-					mask.selection.drawSelectionMask(g2);
+					mask.selection.drawSelectionMask(new AWTContext(g2));
 					g2.dispose();
 					
 					g2 = (Graphics2D) bi.getGraphics();
@@ -501,7 +493,7 @@ public class DrawEngine {
 				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.translate(mask.offsetX, mask.offsetY);
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.selection.drawSelectionMask(g2);
+				mask.selection.drawSelectionMask(new AWTContext(g2));
 				builtImage.checkin();
 			}
 
@@ -511,7 +503,7 @@ public class DrawEngine {
 	public class FlipAction extends MaskedImageAction 
 	{
 		private final boolean horizontal;
-		FlipAction(BuiltImageData data, BuiltSelection mask, boolean horizontal) {
+		private FlipAction(BuiltImageData data, BuiltSelection mask, boolean horizontal) {
 			super(data, mask);
 			this.horizontal = horizontal;
 			description = "Flip Action";
@@ -528,7 +520,7 @@ public class DrawEngine {
 
 				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.drawSelectionMask(g2);
+				mask.drawSelectionMask(new AWTContext(g2));
 				
 
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
@@ -573,7 +565,7 @@ public class DrawEngine {
 
 	public class ScaleAction extends MaskedImageAction 
 	{
-		ScaleAction(BuiltImageData data, BuiltSelection mask) {
+		private ScaleAction(BuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		
@@ -585,7 +577,7 @@ public class DrawEngine {
 	public abstract class PerformFilterAction extends MaskedImageAction
 	{
 
-		PerformFilterAction(BuiltImageData data, BuiltSelection mask) {
+		private PerformFilterAction(BuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 
@@ -598,7 +590,7 @@ public class DrawEngine {
 
 				Graphics2D g2 = (Graphics2D) builtImage.checkout();
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.drawSelectionMask(g2);
+				mask.drawSelectionMask(new AWTContext(g2));
 
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
@@ -613,11 +605,12 @@ public class DrawEngine {
 		abstract void applyFilter( BufferedImage image);
 		
 	}
+	
 	public class ColorChangeAction extends PerformFilterAction 
 	{
 		private final Color from, to;
 		private final int mode;
-		ColorChangeAction(
+		private ColorChangeAction(
 				BuiltImageData data, 
 				BuiltSelection mask, 
 				Color from, Color to, 
@@ -634,8 +627,9 @@ public class DrawEngine {
 			settingsManager.getDefaultDrawer().changeColor(image, from, to, mode);
 		}
 	}
+	
 	public class InvertAction extends PerformFilterAction {
-		InvertAction(BuiltImageData data, BuiltSelection mask) {
+		private InvertAction(BuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		@Override
@@ -643,22 +637,4 @@ public class DrawEngine {
 			settingsManager.getDefaultDrawer().invert(image);
 		}
 	}
-	
-
-	public BufferedImage scale(BufferedImage bi) {
-
-		// Might be able to do this single-Image but things get weird if you 
-		//	draw a Buffer onto itself
-		BufferedImage buffer = new BufferedImage( 
-				bi.getWidth()*2, bi.getHeight()*2, Globals.BI_FORMAT);
-		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
-		
-		g2.scale(2, 2);
-		
-		g2.drawImage(bi, 0, 0, null);
-		g2.dispose();
-		
-		return buffer;
-	}
-	
 }

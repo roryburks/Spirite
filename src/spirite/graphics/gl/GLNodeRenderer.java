@@ -1,8 +1,6 @@
 package spirite.graphics.gl;
 
-import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -59,12 +57,10 @@ class GLNodeRenderer extends NodeRenderer {
 	float ratioH;
 	ImageWorkspace workspace;
 	private final GLEngine engine = GLEngine.getInstance();
-	private final RenderEngine context;
 	private final GLCache glcache;
 	
 	public GLNodeRenderer( GroupNode node, RenderEngine context) {
 		context.super(node);
-		this.context = context;
 		this.glcache = context.getGLCache();
 		this.workspace = node.getContext();
 	}

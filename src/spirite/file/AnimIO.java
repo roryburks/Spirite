@@ -22,6 +22,8 @@ import mutil.RectanglePacker.PackedRectangle;
 import spirite.Globals;
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -64,11 +66,12 @@ public class AnimIO {
 		BufferedImage bi = new BufferedImage(width*c, height, Globals.BI_FORMAT);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
+		GraphicsContext gc = new AWTContext(g);
 		MUtil.clearImage(bi);
 		g.translate(-width, 0);
 		for( int i=0; i<c; ++i) {
 			g.translate(width, 0);
-			animation.drawFrame(g, i);
+			animation.drawFrame(gc, i);
 		}
 		g.dispose();
 		
