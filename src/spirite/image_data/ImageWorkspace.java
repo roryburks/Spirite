@@ -34,6 +34,7 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -345,7 +346,7 @@ public class ImageWorkspace {
 			
 			AffineTransform transform = new AffineTransform();
 			transform.translate(ox, oy);
-			handle.drawLayer(g2, transform);
+			handle.drawLayer(new AWTContext(g2), transform);
 		}
 		
 		public void drawBorder( Graphics g) {
@@ -753,7 +754,7 @@ public class ImageWorkspace {
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
 				AffineTransform transform = new AffineTransform();		
 				transform.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
-				handle.drawLayer(g2, transform);
+				handle.drawLayer(new AWTContext(g2), transform);
 				g2.dispose();
 				
 				actions.add( undoEngine.createReplaceAction(handle, image));

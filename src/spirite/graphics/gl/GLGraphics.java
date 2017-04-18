@@ -193,6 +193,8 @@ public class GLGraphics extends GraphicsContext{
 		this.composite = composite;
 		this.alpha = alpha;
 	}
+	public float getAlpha() {return alpha;}
+	public Composite getComposite() {return composite;}
 	
 	// ==============
 	// ==== Line Drawing Methods

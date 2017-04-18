@@ -1,7 +1,5 @@
 package spirite.image_data;
 
-import java.awt.AlphaComposite;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -9,6 +7,9 @@ import java.awt.image.BufferedImage;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.InternalImage;
@@ -68,25 +69,17 @@ public class ImageHandle {
 		return context.getData(id).cachedImage.access();
 	}
 
-	public void drawLayer(Graphics g, AffineTransform transform, Composite composite) {
-		Graphics2D g2 = (Graphics2D)g;
-		Composite c = g2.getComposite();
+	public void drawLayer(
+			GraphicsContext gc, AffineTransform transform, Composite composite, float alpha) 
+	{
+		float oldAlpha = gc.getAlpha();
+		Composite oldComposite = gc.getComposite();
 		
-		if( composite != null) {
-			if( composite instanceof AlphaComposite && c instanceof AlphaComposite) {
-	
-				g2.setComposite( AlphaComposite.getInstance(
-						AlphaComposite.SRC_OVER, 
-						((AlphaComposite)composite).getAlpha()*
-						((AlphaComposite)c).getAlpha()));
-			}
-			else
-				g2.setComposite(composite);
-		}
-		drawLayer(g,transform);
+		gc.setComposite( composite, alpha*oldAlpha);
 		
-//		Globals.BI_FORMAT;
-		g2.setComposite(c);
+		drawLayer( gc,transform);
+		
+		gc.setComposite(oldComposite, oldAlpha);
 	}
 	
 	public boolean isDynamic() {
@@ -111,7 +104,7 @@ public class ImageHandle {
 		return 0;
 	}
 	
-	public void drawLayer(Graphics g, AffineTransform transform) {
+	public void drawLayer(GraphicsContext gc, AffineTransform transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
@@ -120,31 +113,21 @@ public class ImageHandle {
 		
 		if( ii == null) return;
 
-		Graphics2D g2  =(Graphics2D)g;
-		AffineTransform prev= g2.getTransform();
+		AffineTransform prev= gc.getTransform();
 		if (transform == null)
 			transform = new AffineTransform();
-		if( ii instanceof DynamicInternalImage) {
+		if( ii instanceof DynamicInternalImage)
 			transform.translate(
 					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
-		}
 		
-//		if( context.getRenderEngine().getCompositeLayer(this) == null) {
-			g2.transform(transform);
-			g.drawImage( ii.cachedImage.access(), 0, 0, null);
-			g2.setTransform(prev);
-//		}
-//		else {
-//			if( ii instanceof DynamicInternalImage) {
-//				g2.setTransform(new AffineTransform());
-//				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
-//			}
-//			else {
-//				g2.transform(transform);
-//				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
-//				g2.setTransform(prev);
-//			}
-//		}
+		AffineTransform completeTransform = new AffineTransform(prev);
+		completeTransform.concatenate(transform);
+		
+		gc.setTransform(completeTransform);
+		gc.drawImage( ii.cachedImage.access(), 0, 0);
+		gc.setTransform(prev);
+			
+		
 	}
 	
 	public int getID() {

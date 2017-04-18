@@ -37,6 +37,8 @@ public abstract class GraphicsContext {
 	
 	public enum Composite {SRC_OVER};
 	public abstract void setComposite( Composite composite, float alpha);
+	public abstract float getAlpha();
+	public abstract Composite getComposite();
 
 	public abstract void drawRect(int x, int y, int w, int h);
 	public abstract void drawOval(int x, int y, int w, int h);

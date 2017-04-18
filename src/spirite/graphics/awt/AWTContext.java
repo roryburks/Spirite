@@ -72,7 +72,18 @@ public class AWTContext extends GraphicsContext{
 		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
 		}
 		g2.setComposite( AlphaComposite.getInstance(i, alpha));
-		
+	}
+	@Override
+	public float getAlpha() {
+		if( g2.getComposite() instanceof AlphaComposite)
+			return ((AlphaComposite)g2.getComposite()).getAlpha();
+		return 1.0f;
+	}
+	@Override
+	public Composite getComposite() {
+		switch(((AlphaComposite) g2.getComposite()).getRule()) {
+		case AlphaComposite.SRC_OVER: return Composite.SRC_OVER;
+		}return Composite.SRC_OVER;
 	}
 	
 	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}

@@ -39,7 +39,7 @@ public class SettingsManager {
 	 * (either because the user set it to be false or because OpenGL couldn't 
 	 * initialize properly), then the engine must fall back on basic AWT rendering.*/
 	public boolean glMode() {
-		return false;
+		return true;
 	}
 	public GraphicsDrawer getDefaultDrawer() {
 		return (glMode())?(GLDrawer.getInstance()):(AWTDrawer.getInstance());

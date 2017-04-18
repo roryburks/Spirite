@@ -1,7 +1,6 @@
 package spirite.image_data.layers;
 
 import java.awt.AlphaComposite;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -17,6 +16,9 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.ImageHandle;
@@ -281,36 +283,24 @@ public class SpriteLayer extends Layer
 		List<TransformedHandle> drawList = getDrawList();
 		
 		for( TransformedHandle th : drawList) {
-			th.handle.drawLayer(g2, th.trans, th.comp);
+			th.handle.drawLayer(new AWTContext(g2), th.trans, th.comp, th.alpha);
 		}
 	}
 	
 	public void drawPart( Graphics g, Part part) {
 		Graphics2D g2 = (Graphics2D)g;
 
-		Composite comp = g2.getComposite();
+		GraphicsContext gc = new AWTContext(g2);
+		float oldAlpha = gc.getAlpha();
+		Composite oldComp = gc.getComposite();
 		
-
-		if( part.alpha != 1.0f) {
-			// TODO: Fairly debug, eventually, I'll need a way of stacking
-			//	composites on top of each other
-			if( comp instanceof AlphaComposite) {
-				
-				g2.setComposite( AlphaComposite.getInstance(
-						AlphaComposite.SRC_OVER, 
-						((AlphaComposite)comp).getAlpha()*part.alpha));
-			}
-			else {
-				g2.setComposite( AlphaComposite.getInstance(
-					AlphaComposite.SRC_OVER, part.alpha));
-			}
-		}
-
+		gc.setComposite(Composite.SRC_OVER, oldAlpha*part.alpha);
+		
 		AffineTransform trans = new AffineTransform();
 		trans.translate(part.ox,part.oy);
-		part.handle.drawLayer(g, trans);
+		part.handle.drawLayer(new AWTContext(g2), trans);
 		
-		g2.setComposite(comp);
+		gc.setComposite(oldComp, oldAlpha);
 	}
 	
 
@@ -400,7 +390,8 @@ public class SpriteLayer extends Layer
 				
 				TransformedHandle renderable = new TransformedHandle();
 
-				renderable.comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, part.alpha);
+				renderable.comp = Composite.SRC_OVER;
+				renderable.alpha = part.alpha;
 				
 				renderable.handle = part.handle;
 				renderable.trans.translate( part.ox, part.oy);

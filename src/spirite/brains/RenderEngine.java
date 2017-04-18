@@ -1,6 +1,5 @@
 package spirite.brains;
 
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -26,8 +25,10 @@ import spirite.MDebug;
 import spirite.brains.CacheManager.CachedImage;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
 import spirite.graphics.GraphicsDrawer;
 import spirite.graphics.GraphicsDrawer.RenderRoutine;
+import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.engine.GLCache;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
@@ -127,6 +128,7 @@ public class RenderEngine
 	public static class TransformedHandle {
 		public int depth;
 		public Composite comp = null;
+		public float alpha = 1.0f;
 		public AffineTransform trans = new AffineTransform();
 		public ImageHandle handle;
 	}
@@ -191,62 +193,8 @@ public class RenderEngine
 			imageCache.put(settings, cachedImage);
 		}
 		
-//		if( compositionImage != null) compositionImage.flush();
-//		compositionImage = null;
 		return cachedImage.access();
 	}
-	
-	// ====================
-	// ==== Composite Image Management
-	// Perhaps a bit hacky, but when ImageData is in a certain composite state,
-	//	particularly when a stroke is being drawn or if lifted Image data is
-	//	being moved, the RenderImage will compose all the drawn layers onto a single
-	//	image which the ImageHandle's drawLayer will call.  This de-centralizes the
-	//	rendering code somewhat, but saves double-creating layers or missing changes
-	//	to the image data.
-/*	private BufferedImage compositionImage;
-	private ImageHandle compositionContext = null;
-	public BufferedImage getCompositeLayer( ImageHandle handle) {
-		if( handle.equals(compositionContext)){
-			return compositionImage;
-		}
-		return null;
-	}
-	private void buildCompositeLayer(ImageWorkspace workspace) {
-		BuiltImageData dataContext= workspace.buildActiveData();
-		if( dataContext != null) {
-			BufferedImage bi = null;
-			Graphics2D g2;
-			if( workspace.getSelectionEngine().getLiftedImage() != null 
-				||  workspace.getDrawEngine().strokeIsDrawing()) {
-
-				bi= new BufferedImage( 
-						dataContext.getWidth(), dataContext.getHeight(),
-						Globals.BI_FORMAT);
-				
-				g2 = (Graphics2D)bi.getGraphics();
-				
-				g2.setTransform(dataContext.getBaseTransform());
-				dataContext.draw(g2);
-			
-				
-				if( workspace.getSelectionEngine().getLiftedImage() != null ){
-					g2.setTransform( dataContext.getBaseTransform());
-					g2.transform(workspace.getSelectionEngine().getDrawFromTransform());
-					
-					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
-				}
-				if( workspace.getDrawEngine().strokeIsDrawing()) {
-					g2.setTransform(dataContext.getTransform());
-					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(new AWTContext(g2));
-				}
-				g2.dispose();
-				compositionContext = dataContext.handle;
-				compositionImage = bi;
-			}
-		}
-	}*/
-	
 	
 	/** Checks if the given settings have a cached version. */
 	private CachedImage getCachedImage( RenderSettings settings) {
@@ -722,7 +670,7 @@ public class RenderEngine
 			g2.setRenderingHints(settings.hints);
 			g2.scale( settings.width / (float)handle.getWidth(), 
 					  settings.height / (float)handle.getHeight());
-			handle.drawLayer(g,null);
+			handle.drawLayer(new AWTContext(g2),null);
 			g.dispose();
 			return null;
 		}

@@ -124,15 +124,4 @@ class AWTStrokeEngine extends StrokeEngine{
 		
 		g2.dispose();
 	}
-
-/*		@Override
-	public boolean startDrawStroke( PenState ps) {
-		int crgb = stroke.getColor().getRGB();
-		if( displayLayer.getRGB( ps.x, ps.y) != crgb ) {
-			displayLayer.setRGB( ps.x, ps.y, crgb);
-			return true;
-		}
-		return false;
-	}*/
-	
 }

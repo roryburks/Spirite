@@ -166,7 +166,7 @@ class GLNodeRenderer extends NodeRenderer {
 						}
 						if( workspace.getDrawEngine().strokeIsDrawing()) {
 							// Draw Stroke Layer
-							glgc.setTransform(null);
+							glgc.setTransform(new AffineTransform());
 							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 						}	
 					}
@@ -364,8 +364,7 @@ class GLNodeRenderer extends NodeRenderer {
 					GLParameters params = new GLParameters(settings.width, settings.height);
 					
 					float alpha = 1;
-					if( renderable.comp instanceof AlphaComposite)
-						alpha *= ((AlphaComposite)renderable.comp).getAlpha();
+					alpha *= renderable.alpha;
 					setParamsFromNode( node, params, true, alpha);
 					
 					AffineTransform trans = new AffineTransform(transform);

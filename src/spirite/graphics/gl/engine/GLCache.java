@@ -69,7 +69,6 @@ public class GLCache implements MImageObserver {
 			cacheSize += ctex.tex.w*ctex.tex.h*4;
 			
 			if( cacheSize > MAX_CACHE) {
-				System.out.println(cacheSize);
 				ArrayList<Entry<ImageHandle,CachedTexture>> list = new ArrayList<>(cache.entrySet());
 				list.sort( new Comparator<Entry<ImageHandle,CachedTexture>>() {
 					@Override public int compare(Entry<ImageHandle,CachedTexture> o1, Entry<ImageHandle,CachedTexture> o2) {
@@ -99,7 +98,6 @@ public class GLCache implements MImageObserver {
 
 		@Override
 		public int load(GL2 gl) {
-			System.out.println(handle.getID());
 			ctex = accessCache(handle, gl);
 			ctex.locked = true;
 			return ctex.tex.getTexID();

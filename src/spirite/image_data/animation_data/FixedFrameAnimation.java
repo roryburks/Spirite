@@ -1,6 +1,5 @@
 package spirite.image_data.animation_data;
 
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -14,6 +13,8 @@ import java.util.function.Predicate;
 
 import spirite.MUtil;
 import spirite.brains.RenderEngine.TransformedHandle;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.Animation;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.GroupNode;
@@ -157,14 +158,16 @@ public class FixedFrameAnimation extends Animation
 		int _t = (int)Math.floor(t);
 		List<TransformedHandle> drawList = getDrawListForFrame(_t);
 		
-		Graphics2D g2 = (Graphics2D)g;
-		Composite c = g2.getComposite();
+		
+		Graphics2D g2 = (Graphics2D)g.create();
+		GraphicsContext gc = new AWTContext(g2);
+		
 		for( TransformedHandle renderable : drawList) {
-			if( renderable.comp != null)
-				g2.setComposite(renderable.comp);
-			renderable.handle.drawLayer(g, renderable.trans);
-			g2.setComposite(c);
+			gc.setComposite(renderable.comp, renderable.alpha);
+			renderable.handle.drawLayer( gc, renderable.trans);
 		}
+		g2.dispose();
+		
 	}
 	
 	public List<TransformedHandle> getDrawListForFrame( int t) {
