@@ -49,11 +49,11 @@ class GLUIDraw {
 		
 		glmu.render( new GLRenderer() {
 			@Override
-			public void render(GLGraphics glgc) {
+			public void render(GL _gl) {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLImageTexture(bi);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false, glgc.getGL());
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false, _gl.getGL2());
 			}
 		});
 		
@@ -63,11 +63,11 @@ class GLUIDraw {
 		glmub.init();
 		glmub.render( new GLRenderer() {
 			@Override
-			public void render(GLGraphics glgc) {
+			public void render(GL gl) {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
 				params.texture = new GLFBOTexture(glmu);
-				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, glgc.getGL());
+				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, gl.getGL2());
 			}
 		});
 

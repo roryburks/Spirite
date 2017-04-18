@@ -66,8 +66,8 @@ class GLStrokeEngine extends StrokeEngine {
 		engine.getContext().makeCurrent();
 		displayLayer.render( new GLRenderer() {
 			@Override
-			public void render(GLGraphics glgc) {
-				GL2 gl = glgc.getGL();
+			public void render(GL _gl) {
+				GL2 gl = _gl.getGL2();
 				engine.setSurfaceSize(w, h);
 				engine.clearSurface(gl.getGL2());
 				gl.glViewport(0, 0, w, h);
@@ -107,6 +107,8 @@ class GLStrokeEngine extends StrokeEngine {
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;
 			glgc.reset();
+			
+			System.out.println(glgc.getWidth() + "," + glgc.getHeight());
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(displayLayer);
 			params.flip = glgc.isFlip();
@@ -132,8 +134,8 @@ class GLStrokeEngine extends StrokeEngine {
 		GLMultiRenderer glmu = (permanent)?fixedLayer:displayLayer;
 
 		glmu.render( new GLRenderer() {
-			@Override public void render(GLGraphics glgc) {
-				_stroke( composeVBuffer(states), stroke.getHard()?1:0, glgc);
+			@Override public void render(GL gl) {
+				_stroke( composeVBuffer(states), stroke.getHard()?1:0);
 			}
 		});
 /*		_stroke( composeVBuffer(states));
@@ -293,8 +295,8 @@ class GLStrokeEngine extends StrokeEngine {
 	 * passes it to a geometry shader that will expand it into a proper shape
 	 * to be filled by the fragment shader.
 	 */
-	private void _stroke( GLVBuffer glvb, int mode, GLGraphics glgc) {
-		GL2 gl = glgc.getGL();
+	private void _stroke( GLVBuffer glvb, int mode) {
+		GL2 gl = engine.getGL2();
 		int w = data.getWidth();
 		int h = data.getHeight();
 		

@@ -79,10 +79,14 @@ class GLNodeRenderer extends NodeRenderer {
 	@Override
 	public void render(RenderSettings settings, GraphicsContext context, AffineTransform trans) {
 		try {
+			
 			glgc = (GLGraphics)context;
 			gl = glgc.getGL();
+			boolean flip = glgc.isFlip();
 			
-//			buildCompositeLayer(workspace);
+			glgc.setFlip( true);
+			buildCompositeLayer(workspace);
+			glgc.setFlip( false);
 			
 			// Step 1: Determine amount of data needed
 			int n = _getNeededImagers( settings);
@@ -97,8 +101,8 @@ class GLNodeRenderer extends NodeRenderer {
 				glmu[i] = new GLMultiRenderer( settings.width, settings.height, gl);
 				glmu[i].init();
 				glmu[i].render(new GLRenderer() {
-					@Override public void render(GLGraphics glgc) {
-						engine.clearSurface(glgc.getGL());
+					@Override public void render(GL gl) {
+						engine.clearSurface(gl.getGL2());
 					}
 				});
 			}
@@ -114,6 +118,7 @@ class GLNodeRenderer extends NodeRenderer {
 			// TODO: This last step could be avoided if I used a GLPanel instead
 			//	of a basic Swing Panel
 //			engine.setSurfaceSize(settings.width, settings.height);
+			glgc.setFlip(flip);
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 			params.flip = glgc.isFlip();
@@ -145,16 +150,30 @@ class GLNodeRenderer extends NodeRenderer {
 				compositedHandle = dataContext.handle;
 				
 				compositeLayer.init();
-				
+
 				compositeLayer.render( new GLRenderer() {
 					@Override
-					public void render(GLGraphics _glgc) {
+					public void render(GL _gl) {
+						glgc.setTransform(dataContext.getDrawTransform());
+						glgc.drawImage(dataContext.handle.deepAccess(), 0, 0);
+
+						if( workspace.getSelectionEngine().getLiftedImage() != null ){
+							// Draw Lifted Image
+							AffineTransform trans = dataContext.getBaseTransform();
+							trans.concatenate(workspace.getSelectionEngine().getDrawFromTransform());
+							glgc.setTransform(trans);
+							
+//							GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
+							BufferedImage bi = workspace.getSelectionEngine().getLiftedImage();
+							glgc.drawImage( bi, 0, 0);
+//							g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
+						}
 						if( workspace.getDrawEngine().strokeIsDrawing()) {
-							_glgc.setTransform(dataContext.getTransform());
-							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(_glgc);
+							glgc.setTransform(dataContext.getTransform());
+							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 						}	
 					}
-				});
+				}, glgc);
 /*				AffineTransform baseTrans = dataContext.getBaseTransform();
 				dataContext.draw(g2);
 			
@@ -332,12 +351,12 @@ class GLNodeRenderer extends NodeRenderer {
 
 			glmu[n].render( new GLRenderer() {
 				@Override
-				public void render(GLGraphics _glgc) {
+				public void render(GL _gl) {
 					GLParameters params = new GLParameters(settings.width, settings.height);
 					setParamsFromNode( node, params, false, 1);
 					params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
 					engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-							0, 0, params.width, params.height, true, _glgc.getGL());
+							0, 0, params.width, params.height, true, _gl.getGL2());
 				}
 			});
 		}
@@ -360,7 +379,7 @@ class GLNodeRenderer extends NodeRenderer {
 
 			glmu[ind].render( new GLRenderer() {
 				@Override
-				public void render(GLGraphics _glgc) {
+				public void render(GL _gl) {
 					
 					GLParameters params = new GLParameters(settings.width, settings.height);
 					
@@ -382,7 +401,7 @@ class GLNodeRenderer extends NodeRenderer {
 					}
 					engine.applyPassProgram(
 							ProgramType.PASS_RENDER, params, trans,
-							0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _glgc.getGL());
+							0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _gl.getGL2());
 				}
 			});
 		}

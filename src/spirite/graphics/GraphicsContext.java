@@ -48,5 +48,6 @@ public abstract class GraphicsContext {
 	public abstract void fillOval( int x, int y, int w, int h);
 
 
+	public abstract void drawImage(BufferedImage bi, int x, int y);
 
 }

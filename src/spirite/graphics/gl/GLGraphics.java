@@ -43,6 +43,8 @@ public class GLGraphics extends GraphicsContext{
 	private Color color = Color.BLACK;
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
+	
+	private GLMultiRenderer glmu = null;
 
 	GLGraphics( GLAutoDrawable drawable, boolean flip) {
 		this.drawable = drawable;
@@ -59,14 +61,31 @@ public class GLGraphics extends GraphicsContext{
 	
 
 	public boolean isFlip() {return flip;}
+	public void setFlip(boolean b) { flip = b;}
 	public int getWidth() {return width;}
 	public int getHeight() { return height;}
+	public void useFBO( GLMultiRenderer glmu) {
+		this.glmu = glmu;
+		this.width = this.glmu.width;
+		this.height = this.glmu.height;
+	}
+	public void unuseFBO() {
+		this.glmu = null;
+		this.width = drawable.getSurfaceWidth();
+		this.height = drawable.getSurfaceHeight();
+	}
 	
 	public GL2 getGL() { reset();return gl;}
 	
 	void reset() {
-		this.width = drawable.getSurfaceWidth();
-		this.height = drawable.getSurfaceHeight();
+		if( glmu != null) {
+			this.width = this.glmu.width;
+			this.height = this.glmu.height;
+		}
+		else {
+			this.width = drawable.getSurfaceWidth();
+			this.height = drawable.getSurfaceHeight();
+		}
 		this.gl = drawable.getGL().getGL2();
 		drawable.getContext().makeCurrent();
 		gl.getGL2().glViewport(0, 0, width, height);
@@ -82,8 +101,8 @@ public class GLGraphics extends GraphicsContext{
 		// Render the mask to the a screen-shaped surface
 		glmu.init();
 		glmu.render( new GLRenderer() {
-			@Override public void render(GLGraphics glgc) {
-				GL2 gl2 = glgc.getGL();
+			@Override public void render(GL gl) {
+				GL2 gl2 = gl.getGL2();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
@@ -131,8 +150,8 @@ public class GLGraphics extends GraphicsContext{
 		// Render the mask to the a screen-shaped surface
 		glmu.init();
 		glmu.render( new GLRenderer() {
-			@Override public void render(GLGraphics glgc) {
-				GL2 gl2 = glgc.getGL();
+			@Override public void render(GL gl) {
+				GL2 gl2 = gl.getGL2();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
@@ -282,5 +301,16 @@ public class GLGraphics extends GraphicsContext{
 		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
 		}
 		return params;
+	}
+	
+	@Override
+	public void drawImage(BufferedImage bi, int x, int y) {
+		// TODO: Add more features
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		params.texture = new GLParameters.GLImageTexture(bi);
+		engine.applyPassProgram(ProgramType.PASS_BASIC, params, contextTransform,
+				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
+		
 	}
 }

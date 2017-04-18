@@ -126,7 +126,7 @@ public class GLMultiRenderer {
 	 * the render method of the GLRenderer will be applied to the FrameBuffer
 	 * assosciated with the GLMU*/
 	public static interface GLRenderer {
-		public void render(GLGraphics glgc);
+		public void render(GL gl);
 	}
 	
 	/** Renders the given GL code within the context of the encapsulated FrameBuffer */
@@ -136,16 +136,29 @@ public class GLMultiRenderer {
 //		gl.glDepthMask(false);
 		
 		// Bind Framebuffer
-		GLGraphics glgc = new GLGraphics(this);
+//		GLGraphics glgc = new GLGraphics(this);
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
 //		gl.glPushAttrib( GL2.GL_VIEWPORT_BIT);
 //		gl.glViewport(0, 0, width, height);
 
-		renderer.render(glgc);
+		renderer.render(gl);
 //		gl.glPopAttrib();
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
 //		gl.glPopAttrib();
+	}
+	
+	/** In order to use GLGraphics methods from within the GLRenderer, you should
+	 * use this method otherwise the viewport will not get properly updated to match
+	 * the size of the GLMU's FBO
+	 */
+	public void render( GLRenderer renderer, GLGraphics glgc) {
+		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
 
+		glgc.useFBO(this);
+		renderer.render(gl);
+		glgc.unuseFBO();
+		
+		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
 	}
 	
 	/** Gets the ID of the Color Texture that GLMU uses.*/

@@ -134,8 +134,8 @@ public class GLEngine  {
 	}
 	
 	public final GLRenderer clearRenderer = new GLRenderer() {
-		@Override public void render(GLGraphics glgc) {
-			clearSurface(glgc.getGL());
+		@Override public void render(GL gl) {
+			clearSurface(gl.getGL2());
 		}
 	};
 	

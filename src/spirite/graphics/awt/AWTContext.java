@@ -83,6 +83,8 @@ public class AWTContext extends GraphicsContext{
 	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
 
+	@Override public void drawImage(BufferedImage bi, int x, int y) {g2.drawImage(bi,  x,  y, null);}
+
 
 
 }
