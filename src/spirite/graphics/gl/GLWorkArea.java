@@ -122,7 +122,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
         	
     		// :::: Draw Back Reference
         	
-        	
+        	glad.getContext().makeCurrent();
         	RenderEngine renderEngine = workspace.getRenderEngine();
         	renderEngine.renderWorkspace(workspace, glgc, viewTrans);
 

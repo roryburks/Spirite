@@ -5,19 +5,23 @@ import com.jogamp.opengl.GL2;
 
 import spirite.MDebug;
 import spirite.MDebug.WarningType;
+import spirite.graphics.gl.GLGraphics;
 
 
 /**
- * GLMultiRenderer encapsulates the behavior of a FrameBuffer Object, used for
- * multi-pass rendering (rendering an image to a surface in a certain way then
- * rendering THAT surface to the image in a certain way).
+ * GLMultiRenderer encapsulates the behavior of a FrameBuffer Object, used both
+ * for multi-pass rendering and to store off-screen surfaces as cached GL Textures.
+ * 
+ * Being containers for OpenGL resources that need to be de-allocated manually, 
+ * GLMultiRenderers are tied closely to the GLEngine, which keeps a list of all
+ * active GLMultiRenderers at any given time.
  * 
  * @author Rory Burks
  *
  */
 public class GLMultiRenderer {
 	private final GL2 gl;
-	final int width, height;
+	public final int width, height;
 	private static final GLEngine engine = GLEngine.getInstance();
 
 	private int fbo;
@@ -122,7 +126,7 @@ public class GLMultiRenderer {
 	 * the render method of the GLRenderer will be applied to the FrameBuffer
 	 * assosciated with the GLMU*/
 	public static interface GLRenderer {
-		public void render(GL gl);
+		public void render(GLGraphics glgc);
 	}
 	
 	/** Renders the given GL code within the context of the encapsulated FrameBuffer */
@@ -132,12 +136,12 @@ public class GLMultiRenderer {
 //		gl.glDepthMask(false);
 		
 		// Bind Framebuffer
+		GLGraphics glgc = new GLGraphics(this);
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
 //		gl.glPushAttrib( GL2.GL_VIEWPORT_BIT);
 //		gl.glViewport(0, 0, width, height);
 
-		
-		renderer.render(gl);
+		renderer.render(glgc);
 //		gl.glPopAttrib();
 		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
 //		gl.glPopAttrib();

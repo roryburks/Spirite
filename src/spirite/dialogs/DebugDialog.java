@@ -132,7 +132,7 @@ public class DebugDialog extends JDialog
 			str += set.getKey().toString() + " :: ";
 			str += df.format(set.getValue().getSize() /(1024.0*1024.0)) + "MB\n";
 		}
-		textResources.setText(str);
+		textResources.setText(str + "\nGL Resources: \n" + GLEngine.getInstance().dispResourcesUsed());
 		
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override

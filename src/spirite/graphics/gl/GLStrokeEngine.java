@@ -66,7 +66,8 @@ class GLStrokeEngine extends StrokeEngine {
 		engine.getContext().makeCurrent();
 		displayLayer.render( new GLRenderer() {
 			@Override
-			public void render(GL gl) {
+			public void render(GLGraphics glgc) {
+				GL2 gl = glgc.getGL();
 				engine.setSurfaceSize(w, h);
 				engine.clearSurface(gl.getGL2());
 				gl.glViewport(0, 0, w, h);
@@ -131,9 +132,8 @@ class GLStrokeEngine extends StrokeEngine {
 		GLMultiRenderer glmu = (permanent)?fixedLayer:displayLayer;
 
 		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-
-					_stroke( composeVBuffer(states), stroke.getHard()?1:0);
+			@Override public void render(GLGraphics glgc) {
+				_stroke( composeVBuffer(states), stroke.getHard()?1:0, glgc);
 			}
 		});
 /*		_stroke( composeVBuffer(states));
@@ -293,8 +293,8 @@ class GLStrokeEngine extends StrokeEngine {
 	 * passes it to a geometry shader that will expand it into a proper shape
 	 * to be filled by the fragment shader.
 	 */
-	private void _stroke( GLVBuffer glvb, int mode) {
-		GL2 gl = engine.getGL2();
+	private void _stroke( GLVBuffer glvb, int mode, GLGraphics glgc) {
+		GL2 gl = glgc.getGL();
 		int w = data.getWidth();
 		int h = data.getHeight();
 		

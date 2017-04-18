@@ -129,22 +129,22 @@ public class ImageHandle {
 					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
 		}
 		
-		if( context.getRenderEngine().getCompositeLayer(this) == null) {
+//		if( context.getRenderEngine().getCompositeLayer(this) == null) {
 			g2.transform(transform);
 			g.drawImage( ii.cachedImage.access(), 0, 0, null);
 			g2.setTransform(prev);
-		}
-		else {
-			if( ii instanceof DynamicInternalImage) {
-				g2.setTransform(new AffineTransform());
-				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
-			}
-			else {
-				g2.transform(transform);
-				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
-				g2.setTransform(prev);
-			}
-		}
+//		}
+//		else {
+//			if( ii instanceof DynamicInternalImage) {
+//				g2.setTransform(new AffineTransform());
+//				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
+//			}
+//			else {
+//				g2.transform(transform);
+//				g.drawImage( context.getRenderEngine().getCompositeLayer(this), 0, 0,  null);
+//				g2.setTransform(prev);
+//			}
+//		}
 	}
 	
 	public int getID() {

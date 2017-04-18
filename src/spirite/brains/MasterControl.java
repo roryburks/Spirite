@@ -30,6 +30,7 @@ import spirite.brains.ToolsetManager.Tool;
 import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
+import spirite.graphics.gl.engine.GLCache;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -85,6 +86,7 @@ public class MasterControl
     private final SaveEngine saveEngine;
     private final LoadEngine loadEngine;
     private final Dialogs dialog;
+    private GLCache glcache;
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -102,6 +104,7 @@ public class MasterControl
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
         frameManager = new FrameManager( this);
+		glcache = new GLCache(this);
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make
@@ -120,41 +123,22 @@ public class MasterControl
 
 
     // :::: Getters/Setters
-    public HotkeyManager getHotekyManager() {
-        return hotkeys;
-    }
-    public ToolsetManager getToolsetManager() {
-        return toolset;
-    }
-    public PaletteManager getPaletteManager() {
-    	return palette;
-    }
-    public ImageWorkspace getCurrentWorkspace() {
-   		return currentWorkspace;
-    }
-    public List<ImageWorkspace> getWorkspaces() {
-    	return new ArrayList<>(workspaces);
-    }
-    public FrameManager getFrameManager() {
-    	return frameManager;
-    }
-    public RenderEngine getRenderEngine(){
-    	return renderEngine;
-    }
-    public SettingsManager getSettingsManager() {
-    	return settingsManager;
-    }
-    public CacheManager getCacheManager() {
-    	return cacheManager;
-    }
-    public SaveEngine getSaveEngine() {
-    	return saveEngine;
-    }
-    public LoadEngine getLoadEngine() {
-    	return loadEngine;
-    }
-    public Dialogs getDialogs() {
-    	return dialog;
+    public HotkeyManager getHotekyManager() { return hotkeys; }
+    public ToolsetManager getToolsetManager() { return toolset; }
+    public PaletteManager getPaletteManager() { return palette; }
+    public ImageWorkspace getCurrentWorkspace() { return currentWorkspace; }
+    public List<ImageWorkspace> getWorkspaces() { return new ArrayList<>(workspaces); }
+    public FrameManager getFrameManager() { return frameManager;}
+    public RenderEngine getRenderEngine(){ return renderEngine; }
+    public SettingsManager getSettingsManager() { return settingsManager; }
+    public CacheManager getCacheManager() { return cacheManager; }
+    public SaveEngine getSaveEngine() { return saveEngine; }
+    public LoadEngine getLoadEngine() { return loadEngine; }
+    public Dialogs getDialogs() { return dialog; }
+    public GLCache getGLCache() { 
+    	if( glcache == null)
+    		glcache = new GLCache(this);
+    	return glcache;
     }
     
     // =============
@@ -218,6 +202,7 @@ public class MasterControl
     	
     	// Remove the workspace
     	workspace.cleanup();
+    	workspace.removeImageObserver(this);
     	workspaces.remove(i);
     	triggerRemoveWorkspace(workspace);
     	
@@ -831,8 +816,8 @@ public class MasterControl
     		else 
         		other.currentWorkspaceChanged(selected, previous);
     	}
-    	triggerImageStructureRefresh();
-    	triggerImageRefresh();
+   // 	triggerImageStructureRefresh();
+    //	triggerImageRefresh();
     }
     private void triggerNewWorkspace(ImageWorkspace added) {
     	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
@@ -858,60 +843,48 @@ public class MasterControl
     
     // :::: MCurrentImageObserver
     /***
-     * A lot of components only ever draw the currently active image workspace
-     * and redraws on any kind of status change.  For these, MCurrentImageObserver
-     * is easier to use than a putting a MImageObserver on the current workspace
-     *and changing it every time the workspace changes
+     * Many components need to watch changes for all ImageWorkspaces.  Instead
+     * of adding and removing ImageObservers each time a new ImageWorkspace is
+     * added/removed, they can just use a Global Image Observer which will pipe
+     * all (existing in Master space) ImageWorkspaces ImageObserver events
      */
-    public static interface MCurrentImageObserver {
-    	public void imageRefresh();
-    	public void imageStructureRefresh();
-    }
-    List<WeakReference<MCurrentImageObserver>> cimageObservers = new ArrayList<>();
+    List<WeakReference<MImageObserver>> cimageObservers = new ArrayList<>();
 
-    public void addCurrentImageObserver( MCurrentImageObserver obs) { 
-    	cimageObservers.add(new WeakReference<MCurrentImageObserver>(obs));
+    public void addGlobalImageObserver( MImageObserver obs) { 
+    	cimageObservers.add(new WeakReference<MImageObserver>(obs));
     }
-    public void removeCurrentImageObserver( MCurrentImageObserver obs) { 
-    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
+    public void removeGlobalImageObserver( MImageObserver obs) { 
+    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
     	while( it.hasNext()) {
-    		MCurrentImageObserver other = it.next().get();
+    		MImageObserver other = it.next().get();
     		if( obs == other || other == null)
     			it.remove();
     	}
     }
 
-    private void  triggerImageRefresh() {
-    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
-    	while( it.hasNext()) {
-    		MCurrentImageObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else
-    			other.imageRefresh();
-    	}
-    }
-    private void  triggerImageStructureRefresh() {
-    	Iterator<WeakReference<MCurrentImageObserver>> it = cimageObservers.iterator();
-    	while( it.hasNext()) {
-    		MCurrentImageObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else
-    			other.imageStructureRefresh();
-    	}
-    }
-    
-
 	// :::: MImageObserver
 	@Override
 	public void structureChanged(StructureChangeEvent evt) {
-		triggerImageStructureRefresh();
+    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
+    	while( it.hasNext()) {
+    		MImageObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else
+    			other.structureChanged(evt);
+    	}
 	}
 
 	@Override
 	public void imageChanged( ImageChangeEvent evt) {
-		triggerImageRefresh();
+    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
+    	while( it.hasNext()) {
+    		MImageObserver other = it.next().get();
+    		if( other == null)
+    			it.remove();
+    		else
+    			other.imageChanged(evt);
+    	}
 	}
 
 

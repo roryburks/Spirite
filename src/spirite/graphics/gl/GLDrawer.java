@@ -92,7 +92,7 @@ public class GLDrawer extends GraphicsDrawer {
 		
 	}
 	
-
+	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
     private void glSurfaceToImage( BufferedImage bi) {
         BufferedImage im = engine.glSurfaceToImage();
         

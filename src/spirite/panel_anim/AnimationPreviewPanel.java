@@ -28,7 +28,6 @@ import javax.swing.event.DocumentListener;
 import spirite.Globals;
 import spirite.MUtil;
 import spirite.brains.MasterControl;
-import spirite.brains.MasterControl.MCurrentImageObserver;
 import spirite.brains.MasterControl.MWorkspaceObserver;
 import spirite.file.AnimIO;
 import spirite.image_data.Animation;
@@ -37,6 +36,9 @@ import spirite.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.image_data.ImageWorkspace.MImageObserver;
+import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.animation_data.FixedFrameAnimation;
 import spirite.ui.OmniFrame.OmniComponent;
@@ -45,7 +47,7 @@ import spirite.ui.components.MTextFieldNumber;
 
 
 public class AnimationPreviewPanel extends OmniComponent
-        implements MCurrentImageObserver, ActionListener, 
+        implements MImageObserver, ActionListener, 
         	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver, 
         	ChangeListener, MAnimationStateObserver
 {
@@ -98,7 +100,7 @@ public class AnimationPreviewPanel extends OmniComponent
     	}
     	else
     		animationManager = null;
-        master.addCurrentImageObserver(this);
+        master.addGlobalImageObserver(this);
     	
         // Initialize UI
         initComponents();
@@ -289,11 +291,11 @@ public class AnimationPreviewPanel extends OmniComponent
     }
 
     @Override
-    public void imageRefresh() {
+    public void imageChanged(ImageChangeEvent evt) {
     	this.repaint();
     }
 	@Override
-	public void imageStructureRefresh() {
+	public void structureChanged(StructureChangeEvent evt) {
 		this.repaint();
 	}
 	

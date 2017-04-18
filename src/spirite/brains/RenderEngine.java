@@ -29,6 +29,7 @@ import spirite.graphics.GraphicsContext;
 import spirite.graphics.GraphicsDrawer;
 import spirite.graphics.GraphicsDrawer.RenderRoutine;
 import spirite.graphics.awt.AWTContext;
+import spirite.graphics.gl.engine.GLCache;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -118,6 +119,10 @@ public class RenderEngine
 			}
 		}
 	}
+
+	public GLCache getGLCache() {
+		return master.getGLCache();
+	}
 	
 	// ===================
 	// ===== Render Attributes
@@ -151,7 +156,7 @@ public class RenderEngine
 	/** Renders the Workspace to an Image in its intended form.  */
 	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, AffineTransform trans) {
 
-		buildCompositeLayer(workspace);
+//		buildCompositeLayer(workspace);
 		
 		GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
 		
@@ -161,8 +166,8 @@ public class RenderEngine
 		NodeRenderer renderer = drawer.createNodeRenderer(workspace.getRootNode(), RenderEngine.this);
 		renderer.render(settings, context, trans);
 
-		if( compositionImage != null) compositionImage.flush();
-		compositionImage = null;
+//		if( compositionImage != null) compositionImage.flush();
+//		compositionImage = null;
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -188,8 +193,8 @@ public class RenderEngine
 			imageCache.put(settings, cachedImage);
 		}
 		
-		if( compositionImage != null) compositionImage.flush();
-		compositionImage = null;
+//		if( compositionImage != null) compositionImage.flush();
+//		compositionImage = null;
 		return cachedImage.access();
 	}
 	
@@ -201,7 +206,7 @@ public class RenderEngine
 	//	image which the ImageHandle's drawLayer will call.  This de-centralizes the
 	//	rendering code somewhat, but saves double-creating layers or missing changes
 	//	to the image data.
-	private BufferedImage compositionImage;
+/*	private BufferedImage compositionImage;
 	private ImageHandle compositionContext = null;
 	public BufferedImage getCompositeLayer( ImageHandle handle) {
 		if( handle.equals(compositionContext)){
@@ -242,7 +247,7 @@ public class RenderEngine
 				compositionImage = bi;
 			}
 		}
-	}
+	}*/
 	
 	
 	/** Checks if the given settings have a cached version. */
@@ -606,7 +611,7 @@ public class RenderEngine
 			//	default AWT renderer if not
 			
 			
-			buildCompositeLayer(workspace);
+//			buildCompositeLayer(workspace);
 			
 			GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
 			

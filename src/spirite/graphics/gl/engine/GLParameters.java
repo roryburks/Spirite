@@ -8,10 +8,16 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 
 import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
+import spirite.image_data.ImageHandle;
 
 /**
- * GLParameters encapsulates the GL Uniform Parameters so that they
- * can be passed to more abstract GL Rendering methods.
+ * GLParameters encapsulates many of the attributes representing "how" OpenGL
+ * should render data.  These include:
+ * -Shader Uniforms
+ * -Logical Representations of textures to be loaded
+ * -Dimensions of the Orthogonal Projection to be used
+ * -Whether or not that projection should be flipped vertically
+ * -Which BlendModes to use (or if to use them at all) 
  * 
  * @author Rory Burks
  *
@@ -83,6 +89,7 @@ public class GLParameters {
 		public abstract int load(GL2 gl);
 		public abstract void unload();
 	}
+	
 	
 	public static class GLImageTexture extends GLTexture {
 		private PreparedTexture texture;

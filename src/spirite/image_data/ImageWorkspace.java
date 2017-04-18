@@ -2032,7 +2032,6 @@ public class ImageWorkspace {
     	}
     }
     
-    
 
     // =============
     // ==== Resource Management

@@ -34,6 +34,7 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.graphics.gl.GLGraphics;
 import spirite.graphics.gl.engine.GLEngine.PolyType;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
@@ -133,8 +134,8 @@ public class GLEngine  {
 	}
 	
 	public final GLRenderer clearRenderer = new GLRenderer() {
-		@Override public void render(GL gl) {
-			clearSurface(gl.getGL2());
+		@Override public void render(GLGraphics glgc) {
+			clearSurface(glgc.getGL());
 		}
 	};
 	
@@ -426,13 +427,14 @@ public class GLEngine  {
         // Bind Texture
         if( params.texture != null) {
         	gl.glActiveTexture(GL.GL_TEXTURE0);
-        	params.texture.load(gl);
+
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, params.texture.load(gl));
     		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
         if( params.texture2 != null) {
         	gl.glActiveTexture(GL.GL_TEXTURE1);
-        	params.texture2.load(gl);
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, params.texture2.load(gl));
     		gl.glEnable(GL2.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
@@ -505,7 +507,7 @@ public class GLEngine  {
 		int h = bi.getHeight();
 		PreparedTexture pt = new PreparedTexture(gl, w, h);
 
-		pt. tex = GLBuffers.newDirectIntBuffer(1);
+		pt.tex = GLBuffers.newDirectIntBuffer(1);
         gl.glGenTextures(1, pt.tex);
         gl.glBindTexture(GL2.GL_TEXTURE_2D, pt.tex.get(0));
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);

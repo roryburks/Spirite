@@ -48,6 +48,11 @@ public class GLGraphics extends GraphicsContext{
 		this.drawable = drawable;
 		this.flip = flip;
 	}
+	public GLGraphics( GLMultiRenderer glmu ) {
+		this.drawable = engine.getAutoDrawable();
+		this.width = glmu.width;
+		this.height = glmu.height;
+	}
 	public GLGraphics() {
 		this.drawable = engine.getAutoDrawable();
 	}
@@ -77,8 +82,8 @@ public class GLGraphics extends GraphicsContext{
 		// Render the mask to the a screen-shaped surface
 		glmu.init();
 		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-				GL2 gl2 = gl.getGL2();
+			@Override public void render(GLGraphics glgc) {
+				GL2 gl2 = glgc.getGL();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
@@ -126,12 +131,13 @@ public class GLGraphics extends GraphicsContext{
 		// Render the mask to the a screen-shaped surface
 		glmu.init();
 		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-				engine.clearSurface(gl.getGL2());
+			@Override public void render(GLGraphics glgc) {
+				GL2 gl2 = glgc.getGL();
+				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
 				params2.texture = new GLImageTexture(mask);
 				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
-						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
+						0, 0, mask.getWidth(), mask.getHeight(), false, gl2);
 			}
 		});
 		
@@ -153,7 +159,8 @@ public class GLGraphics extends GraphicsContext{
 		engine.clearSurface(gl);
 	}
 	
-
+	// =================
+	// ==== Logistical Render Settings
 	@Override public AffineTransform getTransform() {return contextTransform;}
 	@Override public void setTransform(AffineTransform trans) {
 		if( trans == null) trans = new AffineTransform();
@@ -168,7 +175,8 @@ public class GLGraphics extends GraphicsContext{
 		this.alpha = alpha;
 	}
 	
-	// :::: Line Drawing Methods
+	// ==============
+	// ==== Line Drawing Methods
 	@Override
 	public void drawRect(int x, int y, int w, int h) {
 		int x_[] = new int[5];
