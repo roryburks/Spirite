@@ -476,7 +476,7 @@ public class GLEngine  {
 	public class PreparedTexture{
 		private IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
 		private final GL2 gl;
-		private final int w, h;
+		final int w, h;
 		
 		PreparedTexture( GL2 gl, int w, int h) {
 			this.gl = gl;

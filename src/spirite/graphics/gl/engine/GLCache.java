@@ -1,11 +1,15 @@
 package spirite.graphics.gl.engine;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.MDebug;
 import spirite.brains.MasterControl;
 import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
 import spirite.graphics.gl.engine.GLParameters.GLTexture;
@@ -27,7 +31,8 @@ __ Any time MAX_SIZE is hit, it unloads the least-recently used textures.
  *
  */
 public class GLCache implements MImageObserver {
-	private int MAX_CACHE = 4*1024*1024;	// 4 Gig
+	private long MAX_CACHE = 4L*1024L*1024L*1024L;	// 4 Gig
+	private long cacheSize = 0;
 	private GLEngine glEngine = null;
 	private final MasterControl master;
 	
@@ -38,7 +43,7 @@ public class GLCache implements MImageObserver {
 		
 		CachedTexture( PreparedTexture tex) {
 			this.tex = tex;
-			lastUsed = System.currentTimeMillis();
+//			lastUsed = System.currentTimeMillis();	// Should be called regardless
 		}
 	}
 	
@@ -48,6 +53,8 @@ public class GLCache implements MImageObserver {
 		this.master = master;
 		master.addGlobalImageObserver( this);
 	}
+	
+	public long getCacheSize() {return cacheSize;}
 
 	/** Getter that makes sure glEngine is only loaded if it's needed */
 	private GLEngine getEngine() { 
@@ -61,8 +68,27 @@ public class GLCache implements MImageObserver {
 		if( ctex == null) {
 			ctex = new CachedTexture(
 					getEngine().prepareTexture(handle.deepAccess(), gl));
+			
+			cacheSize += ctex.tex.w*ctex.tex.h*4;
+			
+			if( cacheSize > MAX_CACHE) {
+				System.out.println(cacheSize);
+				ArrayList<Entry<ImageHandle,CachedTexture>> list = new ArrayList<>(cache.entrySet());
+				list.sort( new Comparator<Entry<ImageHandle,CachedTexture>>() {
+					@Override public int compare(Entry<ImageHandle,CachedTexture> o1, Entry<ImageHandle,CachedTexture> o2) {
+						return (int) (o1.getValue().lastUsed-o2.getValue().lastUsed);
+					}
+				});
+				for(Entry<ImageHandle,CachedTexture> entry : list) {
+					MDebug.log("GL Cache Overflow");
+					if( cacheSize < MAX_CACHE) break;
+					voidOutHandle(entry.getKey());
+				}
+			}
+			
 			cache.put(handle, ctex);
 		}
+		ctex.lastUsed = System.currentTimeMillis();
 		return ctex;
 	}
 
@@ -111,6 +137,7 @@ public class GLCache implements MImageObserver {
 		CachedTexture ctex = cache.get(handle);
 		if( ctex != null && !ctex.locked) {
 			ctex.tex.free();
+			cacheSize -= ctex.tex.w*ctex.tex.h*4;
 			cache.remove(handle);
 		}
 	}
