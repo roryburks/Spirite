@@ -43,6 +43,7 @@ public class GLGraphics extends GraphicsContext{
 	private Color color = Color.BLACK;
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
+	private LineAttributes lineAttributes = defaultLA;
 	
 	private GLMultiRenderer glmu = null;
 
@@ -200,6 +201,22 @@ public class GLGraphics extends GraphicsContext{
 	public float getAlpha() {return alpha;}
 	public Composite getComposite() {return composite;}
 	
+	// ================
+	// ==== LineAttributes
+	private static final LineAttributes defaultLA = new LineAttributes(1, CapMethod.NONE, JoinMethod.ROUNDED);
+	@Override
+	public void setLineAttributes(LineAttributes line) {
+		if( line == null)
+			lineAttributes = defaultLA;
+		else
+			lineAttributes = line;
+	}
+	@Override
+	public LineAttributes getLineAttributes() {
+		//	LineAttributes are immutable, so it's fine to pass the internal object
+		return lineAttributes;
+	}
+	
 	// ==============
 	// ==== Line Drawing Methods
 	@Override
@@ -211,9 +228,12 @@ public class GLGraphics extends GraphicsContext{
 		y_[0] = y_[4] = y_[1] = y;
 		x_[1] = x_[2] = x + w;
 		y_[2] = y_[3] = y + h;
-
-		GLParameters params =constructLineParams();
-		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 5, params, contextTransform, gl);
+		
+		GLParameters params = constructLineParams();
+		engine.applyComplexLineProgram( 
+				ProgramType.LINE_RENDER, x_, y_, 5, 
+				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
+				params, contextTransform, gl);
 	}
 	@Override
 	public void drawOval(int x, int y, int w, int h) {
@@ -222,7 +242,10 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void drawPolyLine(int[] xPoints, int[] yPoints, int count) {
 		GLParameters params =constructLineParams();
-		engine.applyLineProgram(ProgramType.STROKE_PIXEL, xPoints, yPoints, count, params, contextTransform, gl);
+		engine.applyComplexLineProgram( 
+				ProgramType.LINE_RENDER, xPoints, yPoints, xPoints.length, 
+				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				params, contextTransform, gl);
 	}
 	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
@@ -231,7 +254,11 @@ public class GLGraphics extends GraphicsContext{
 		x_[0] = x1; x_[1] = x2;
 		y_[0] = y1; y_[1] = y2;
 		GLParameters params =constructLineParams();
-		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
+		engine.applyComplexLineProgram( 
+				ProgramType.LINE_RENDER, x_, y_, 2, 
+				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				params, contextTransform, gl);
+//		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
 		
 	}
 	@Override
@@ -245,7 +272,10 @@ public class GLGraphics extends GraphicsContext{
 
 		float xPoints[] = x_.toArray();
 		float yPoints[] = y_.toArray();
-		engine.applyLineProgram(ProgramType.STROKE_PIXEL, xPoints, yPoints, xPoints.length, params, contextTransform, gl);
+		engine.applyComplexLineProgram( 
+				ProgramType.LINE_RENDER, xPoints, yPoints, xPoints.length, 
+				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
+				params, contextTransform, gl);
 	}
 
 	private GLParameters constructLineParams() {

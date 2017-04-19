@@ -1,4 +1,4 @@
-package spirite.panel_work;
+package spirite.pen;
 
 import javax.swing.SwingUtilities;
 
@@ -11,6 +11,7 @@ import jpen.event.PenListener;
 import spirite.brains.MasterControl;
 import spirite.brains.ToolsetManager;
 import spirite.graphics.GraphicsContext;
+import spirite.panel_work.WorkPanel;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 /**
@@ -49,7 +50,7 @@ public class JPenPenner implements PenListener
 		return mbe;
 	}
 
-	@Override	public void penScrollEvent(PScrollEvent arg0) {}
+	@Override public void penScrollEvent(PScrollEvent arg0) {}
 	@Override
 	public void penButtonEvent(PButtonEvent evt) {
 		if( evt.button.value) {

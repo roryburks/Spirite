@@ -33,6 +33,8 @@ import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
+import spirite.graphics.GraphicsContext.CapMethod;
+import spirite.graphics.GraphicsContext.JoinMethod;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -191,7 +193,7 @@ public class GLEngine  {
 		
 		STROKE_SPORE,
 		STROKE_BASIC, 
-		STROKE_PIXEL, POLY_RENDER,
+		STROKE_PIXEL, POLY_RENDER, LINE_RENDER,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
@@ -199,6 +201,7 @@ public class GLEngine  {
 		case STROKE_BASIC:
 		case STROKE_PIXEL:
 		case POLY_RENDER:
+		case LINE_RENDER:
 		case DEFAULT:
 		case PASS_RENDER:
 		case PASS_BASIC:
@@ -290,35 +293,24 @@ public class GLEngine  {
         pd.free();
 	}
 
-	public void applyLineProgram( 
-			ProgramType type,
-			int[] xPoints,
-			int[] yPoints, 
-			int numPoints,
-			GLParameters params,
-			AffineTransform trans,
-			GL2 gl) 
+	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
+			int numPoints, GLParameters params, AffineTransform trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
-        
+
         float data[] = new float[2*numPoints];
         for( int i=0; i < numPoints; ++i) {
-        	data[i*2] = (float)xPoints[i];
-        	data[i*2+1] = (float)yPoints[i];
+        	data[i*2] = xPoints[i];
+        	data[i*2+1] = yPoints[i];
         }
+        
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
 		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
 	}
 	
-	public void applyLineProgram( 
-			ProgramType type,
-			float[] xPoints,
-			float[] yPoints, 
-			int numPoints,
-			GLParameters params,
-			AffineTransform trans,
-			GL2 gl) 
+	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
+			int numPoints, GLParameters params, AffineTransform trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
         
@@ -331,7 +323,79 @@ public class GLEngine  {
 		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
 	}
+
+	public void applyComplexLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
+			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
+			GLParameters params, AffineTransform trans, GL2 gl) 
+	{
+		addOrtho(params, trans);
+		
+		float data[] = new float[2*(numPoints+2)];
+		for(int i=1; i< numPoints+1; ++i) {
+			data[i*2] = xPoints[i-1];
+			data[i*2+1] = yPoints[i-1];
+		}
+		if( loop) {
+			data[0] = xPoints[numPoints-1];
+			data[1] = yPoints[numPoints-1];
+			data[2*(numPoints+1)] = xPoints[0];
+			data[2*(numPoints+1)+1] = yPoints[0];			
+		}
+		else {
+			data[0] = xPoints[0];
+			data[1] = yPoints[0];
+			data[2*(numPoints+1)] = xPoints[numPoints-1];
+			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
+		}
+		
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		_doCompliexLineProg( type, pd, numPoints+2, cap, join, width, params, trans, gl);
+		pd.free();
+	}
+	public void applyComplexLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
+			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
+			GLParameters params, AffineTransform trans, GL2 gl) 
+	{
+		addOrtho(params, trans);
+		
+		float data[] = new float[2*(numPoints+2)];
+		for(int i=1; i< numPoints+1; ++i) {
+			data[i*2] = xPoints[i-1];
+			data[i*2+1] = yPoints[i-1];
+		}
+		if( loop) {
+			data[0] = xPoints[numPoints-1];
+			data[1] = yPoints[numPoints-1];
+			data[2*(numPoints+1)] = xPoints[0];
+			data[2*(numPoints+1)+1] = yPoints[0];			
+		}
+		else {
+			data[0] = xPoints[0];
+			data[1] = yPoints[0];
+			data[2*(numPoints+1)] = xPoints[numPoints-1];
+			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
+		}
+		
+		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		_doCompliexLineProg( type, pd, numPoints+2, cap, join, width, params, trans, gl);
+		pd.free();
+	}
 	
+	private void _doCompliexLineProg( ProgramType type, PreparedData pd, int count, CapMethod cap, 
+			JoinMethod join, float width, GLParameters params, AffineTransform trans, GL2 gl)
+	{
+		int uJoin = 0;
+		switch( join) {
+			case BEVEL: uJoin = 2;break;
+			case MITER: uJoin = 1; break;
+			case ROUNDED:break;
+		}
+		uJoin = 2;
+		
+		params.addParam(new GLParameters.GLParam1i("uJoin",uJoin));
+		params.addParam(new GLParameters.GLParam1f("uWidth", 5/ 2.0f));
+		applyProgram( type, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
+	}
 
 	public enum PolyType {
 		STRIP(GL.GL_TRIANGLE_STRIP), 
@@ -698,6 +762,10 @@ public class GLEngine  {
 				"shaders/shapes/poly_render.vert", 
 				null, 
 				"shaders/shapes/poly_render.frag");
+        programs[ProgramType.LINE_RENDER.ordinal()] = loadProgramFromResources( 
+				"shaders/shapes/line_render.vert", 
+				"shaders/shapes/line_render.geom", 
+				"shaders/shapes/line_render.frag");
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){

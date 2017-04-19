@@ -14,9 +14,6 @@ import java.awt.image.BufferedImage;
  *
  */
 public abstract class GraphicsContext {
-	// TODO: the parameters and return value of these methods are expected to change
-	//	as the GraphicsContext works its way into the UI
-	
 	/**
 	 * Draws a border around the given image with the given transform applied to 
 	 * it, returns a BufferedImage of dimensions (swidth x sheight).
@@ -31,6 +28,7 @@ public abstract class GraphicsContext {
 
 	public abstract void clear();
 	
+	/** Setting to null produces undefined behavior. */
 	public abstract void setTransform( AffineTransform trans);
 	public abstract AffineTransform getTransform();
 	public abstract void translate(double offsetX, double offsetY);
@@ -40,6 +38,32 @@ public abstract class GraphicsContext {
 	public abstract void setComposite( Composite composite, float alpha);
 	public abstract float getAlpha();
 	public abstract Composite getComposite();
+	
+	public enum JoinMethod {MITER, ROUNDED, BEVEL};
+	public enum CapMethod {NONE, ROUND, SQUARE};
+	public static class LineAttributes {
+		public final float width;
+		public final JoinMethod join;
+		public final CapMethod cap;
+		public final float[] dashes;
+		
+		public LineAttributes( float width, CapMethod cap, JoinMethod join) {
+			this.width = width;
+			this.join = join;
+			this.cap = cap;
+			this.dashes = null;
+		}
+		public LineAttributes( float width, CapMethod cap, JoinMethod join, float[] dashes) {
+			this.width = width;
+			this.join = join;
+			this.cap = cap;
+			this.dashes = dashes;
+		}
+	}
+	public abstract void setLineAttributes( LineAttributes line);
+	/** May return null if the underlying engine's Line Attributes aren't 
+	 * representable by the generic LineAttributes class. */
+	public abstract LineAttributes getLineAttributes();
 
 	public abstract void drawRect(int x, int y, int w, int h);
 	public abstract void drawOval(int x, int y, int w, int h);

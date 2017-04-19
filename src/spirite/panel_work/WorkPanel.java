@@ -32,6 +32,8 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.panel_work.awt.WorkSplicePanel;
+import spirite.pen.JPenPenner;
+import spirite.pen.Penner;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external

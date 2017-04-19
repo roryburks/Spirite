@@ -19,6 +19,7 @@ import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.panel_work.WorkPanel.View;
+import spirite.pen.Penner;
 import spirite.ui.UIUtil;
 
 /**

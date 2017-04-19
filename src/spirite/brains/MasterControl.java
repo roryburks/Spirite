@@ -44,8 +44,8 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.BuiltSelection;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.layers.Layer;
-import spirite.panel_work.Penner;
 import spirite.panel_work.WorkPanel.View;
+import spirite.pen.Penner;
 import spirite.ui.FrameManager;
 
 /***

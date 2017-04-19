@@ -30,10 +30,10 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
-import spirite.panel_work.JPenPenner;
 import spirite.panel_work.WorkArea;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
+import spirite.pen.JPenPenner;
 
 
 /**

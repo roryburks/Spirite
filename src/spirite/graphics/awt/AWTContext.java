@@ -1,11 +1,13 @@
 package spirite.graphics.awt;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
@@ -83,8 +85,63 @@ public class AWTContext extends GraphicsContext{
 	@Override
 	public Composite getComposite() {
 		switch(((AlphaComposite) g2.getComposite()).getRule()) {
-		case AlphaComposite.SRC_OVER: return Composite.SRC_OVER;
-		}return Composite.SRC_OVER;
+		case AlphaComposite.SRC_OVER: 
+		default:
+			return Composite.SRC_OVER;
+		}
+	}
+	
+	// =========
+	// ==== LineAttributes
+	@Override
+	public void setLineAttributes(LineAttributes line) {
+		g2.setStroke(new BasicStroke( line.width, LAtoBSCap(line.cap), 
+				LAtoBSJoin(line.join), 10.0f, line.dashes, 0.0f));
+	}
+	@Override
+	public LineAttributes getLineAttributes() {
+		if( g2.getStroke() instanceof BasicStroke) {
+			BasicStroke bs = (BasicStroke)g2.getStroke();
+			return new LineAttributes( bs.getLineWidth(), BStoLACap(bs.getEndCap()), 
+					BStoLAJoin(bs.getLineJoin()), bs.getDashArray());
+		}
+		return null;
+	}
+	private int LAtoBSCap(CapMethod cap) {
+		switch( cap) {
+			case ROUND: return BasicStroke.CAP_ROUND; 
+			case SQUARE: return BasicStroke.CAP_SQUARE;
+			case NONE: 
+			default:
+				return BasicStroke.CAP_BUTT;
+		}
+	}
+	private int LAtoBSJoin( JoinMethod join) {
+		switch( join) {
+			case BEVEL: return BasicStroke.JOIN_BEVEL;
+			case MITER: return BasicStroke.JOIN_MITER;
+			case ROUNDED:
+			default:
+				return BasicStroke.JOIN_ROUND;
+		}
+	}
+	private CapMethod BStoLACap(int cap) {
+		switch(cap) {
+			case BasicStroke.CAP_ROUND: return CapMethod.ROUND;
+			case BasicStroke.CAP_SQUARE: return CapMethod.SQUARE;
+			case BasicStroke.CAP_BUTT:
+			default:
+				return CapMethod.NONE;
+		}
+	}
+	private JoinMethod BStoLAJoin( int join) {
+		switch(join) {
+			case BasicStroke.JOIN_BEVEL: return JoinMethod.BEVEL;
+			case BasicStroke.JOIN_MITER: return JoinMethod.MITER;
+			case BasicStroke.JOIN_ROUND:
+			default: 
+				return JoinMethod.ROUNDED;
+		}
 	}
 	
 	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}

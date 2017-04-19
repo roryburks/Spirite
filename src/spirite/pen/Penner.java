@@ -1,4 +1,4 @@
-package spirite.panel_work;
+package spirite.pen;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -48,11 +48,11 @@ import spirite.image_data.SelectionEngine.SelectionBuilder;
 import spirite.image_data.UndoEngine;
 import spirite.image_data.layers.SpriteLayer;
 import spirite.image_data.layers.SpriteLayer.Part;
+import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine;
 import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 
 /***

@@ -36,9 +36,9 @@ import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
 import spirite.image_data.layers.Layer;
-import spirite.panel_work.JPenPenner;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
+import spirite.pen.JPenPenner;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 
@@ -53,7 +53,7 @@ public class DrawPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 
-	private final MasterControl master;
+//	private final MasterControl master;
 	private final RenderEngine renderEngine;
 	private SelectionEngine selectionEngine;
 
@@ -69,7 +69,7 @@ public class DrawPanel extends JPanel
 
 	public DrawPanel(WorkPanel context, MasterControl master) {
 		this.renderEngine = master.getRenderEngine();
-		this.master = master;
+//		this.master = master;
 		this.context = context;
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setOpaque( false);

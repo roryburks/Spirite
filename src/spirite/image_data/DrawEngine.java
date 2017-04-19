@@ -39,7 +39,6 @@ import spirite.pen.StrokeEngine.STATE;
 /***
  * Pretty much anything which alters the image data directly goes 
  * through the DrawEngine.
-
  * 
  * @author Rory Burks
  *
