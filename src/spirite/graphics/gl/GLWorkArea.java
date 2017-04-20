@@ -18,13 +18,16 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.GLBuffers;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.graphics.GraphicsContext.Composite;
 import spirite.graphics.gl.engine.GLEngine;
 import spirite.graphics.gl.engine.GLParameters;
+import spirite.image_data.GroupTree;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ReferenceManager;
+import spirite.image_data.ImageWorkspace.BuiltImageData;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
@@ -33,6 +36,7 @@ import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
 import spirite.image_data.SelectionEngine.SelectionEvent;
+import spirite.image_data.layers.Layer;
 import spirite.panel_work.WorkArea;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
@@ -47,8 +51,8 @@ import spirite.pen.JPenPenner;
 public class GLWorkArea 
 	implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver, MReferenceObserver
 {
-	private static final Color normalBG = new Color(238,238,238);
-	private static final Color referenceBG = new Color( 210,210,242);
+	private static final Color normalBG = Globals.getColor("workArea.normalBG");
+	private static final Color referenceBG = Globals.getColor("workArea.referenceBG");
 	
 	private final WorkPanel context;
 	private final GLEngine engine = GLEngine.getInstance();
@@ -123,7 +127,7 @@ public class GLWorkArea
 
         	AffineTransform viewTrans = view.getViewTransform();
 
-        	// Draw Image with References
+        	// :::: Draw Image with References
         	RenderEngine renderEngine = workspace.getRenderEngine();
         	
         	glgc.setTransform(viewTrans);
@@ -134,7 +138,17 @@ public class GLWorkArea
         	glgc.setTransform(viewTrans);
         	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
         	renderEngine.renderReference(workspace, glgc, true);
-        	
+
+            // :::: Draw Border around the active Data
+            BuiltImageData active = workspace.buildActiveData();
+            
+            if( active!= null) {
+                glgc.setColor(Globals.getColor("drawpanel.layer.border"));
+                
+                Rectangle r = active.getBounds();
+                glgc.drawRect( r.x, r.y, r.width, r.height);
+            }
+            
         	// :::: Draw Selection Bounds
             Selection selection = selectionEngine.getSelection();
 

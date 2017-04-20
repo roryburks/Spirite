@@ -9,6 +9,7 @@ import java.awt.event.MouseWheelListener;
 
 import javax.swing.GroupLayout;
 
+import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
@@ -38,8 +39,8 @@ public class WorkSplicePanel extends javax.swing.JPanel
     private final ReferencePanel previewPanel;
     private final ReferencePanel previewPanelBack;
     
-    Color normalBG = new Color(238,238,238);
-    Color referenceBG = new Color( 210,210,242);
+    Color normalBG = Globals.getColor("workArea.normalBG");
+    Color referenceBG = Globals.getColor("workArea.referenceBG");
     /**
      * Creates new form WorkSplicePanel
      */
