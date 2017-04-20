@@ -82,8 +82,10 @@ class GLNodeRenderer extends NodeRenderer {
 			// Step 1: Determine amount of data needed
 			int n = _getNeededImagers( settings);
 
-//	    	engine.clearSurface(gl);
-			if( n <= 0) return;
+			if( n <= 0) {
+				glgc.setFlip(flip);
+				return;
+			}
 			engine.setSurfaceSize(settings.width, settings.height);
 			
 			// Prepare the FrameBuffers needed for rendering
@@ -120,6 +122,8 @@ class GLNodeRenderer extends NodeRenderer {
 			for( int i=0; i<n;++i) {
 				glmu[i].cleanup();
 			}
+		}
+		catch (Exception e) {
 		}
 		finally {
 			glmu = null;
@@ -382,7 +386,7 @@ class GLNodeRenderer extends NodeRenderer {
 								0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _gl.getGL2());
 					}
 				}
-			});
+			}, glgc);
 		}
 		
 	}

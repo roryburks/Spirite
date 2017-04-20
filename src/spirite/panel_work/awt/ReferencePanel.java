@@ -13,6 +13,8 @@ import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.ReferenceRenderSource;
 import spirite.brains.RenderEngine.RenderSettings;
+import spirite.graphics.GraphicsContext;
+import spirite.graphics.awt.AWTContext;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
@@ -54,15 +56,11 @@ public class ReferencePanel extends JPanel
         	BufferedImage buffer = renderer.renderImage(settings);
             
             Graphics2D g2 = (Graphics2D)g;
+            GraphicsContext gc = new AWTContext(g2);
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoomer.getZoom(), zoomer.getZoom());
             
-            for(Reference ref : workspace.getReferenceManager().getList(this.front)) {
-            	if( !ref.isGlobal())
-            		ref.draw(g2);
-            }
-            g2.transform( workspace.getReferenceManager().getTransform());
             g.drawImage( buffer, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
         }
         

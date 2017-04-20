@@ -23,6 +23,7 @@ import spirite.graphics.gl.engine.GLParameters;
 import spirite.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.graphics.gl.engine.GLParameters.GLParam1i;
+import spirite.image_data.ImageHandle;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
@@ -186,6 +187,7 @@ public class GLGraphics extends GraphicsContext{
 	@Override public AffineTransform getTransform() {return new AffineTransform(contextTransform);}
 	@Override public void setTransform(AffineTransform trans) {
 		if( trans == null) trans = new AffineTransform();
+		else trans = new AffineTransform(trans);
 		contextTransform = trans;
 	}
 	@Override public void translate(double offsetX, double offsetY) {
@@ -347,8 +349,19 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params = new GLParameters(width, height);
 		params.flip = flip;
 		params.texture = new GLParameters.GLImageTexture(bi);
-		engine.applyPassProgram(ProgramType.PASS_BASIC, params, contextTransform,
+		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
 		
+	}
+	@Override
+	public void drawHandle(ImageHandle handle, int x, int y) {
+		// TODO: Add more features
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		params.texture = handle.accessGL();
+		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
+				0, 0, params.texture.getWidth(), params.texture.getHeight(), false, gl);
 	}
 }

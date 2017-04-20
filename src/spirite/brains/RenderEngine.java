@@ -155,9 +155,6 @@ public class RenderEngine
 	
 	/** Renders the Workspace to an Image in its intended form.  */
 	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, AffineTransform trans) {
-
-//		buildCompositeLayer(workspace);
-		
 		GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
 		
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
@@ -165,9 +162,14 @@ public class RenderEngine
 		
 		NodeRenderer renderer = drawer.createNodeRenderer(workspace.getRootNode(), RenderEngine.this);
 		renderer.render(settings, context, trans);
-
-//		if( compositionImage != null) compositionImage.flush();
-//		compositionImage = null;
+	}
+	
+	/** Renders the front or back Reference Image. */
+	public void renderReference( ImageWorkspace workspace, GraphicsContext context, boolean front) {
+		List<Reference> refList = workspace.getReferenceManager().getList(front);
+		for( Reference ref : refList ) {
+			ref.draw(context);
+		}
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -764,6 +766,7 @@ public class RenderEngine
 			BufferedImage bi = new BufferedImage(
 					settings.width, settings.height, Globals.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+			GraphicsContext gc = new AWTContext(g2);
 			
 			List<Reference> refList = workspace.getReferenceManager().getList(front);
 			float rw = settings.width / (float)workspace.getWidth();
@@ -771,8 +774,7 @@ public class RenderEngine
 			g2.scale( rw, rh);
 					
 			for( Reference ref : refList ) {
-				if( ref.isGlobal())
-					ref.draw(g2);
+				ref.draw(gc);
 			}
 			
 			g2.dispose();

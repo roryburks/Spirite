@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.layers.Layer;
@@ -39,7 +40,7 @@ public class ReferenceManager {
 	public abstract class Reference {
 		protected boolean global;
 		AffineTransform localTransform = new AffineTransform();
-		public abstract void draw( Graphics g);
+		public abstract void draw( GraphicsContext gc);
 		public final boolean isGlobal() {return global;}
 	}
 	
@@ -52,14 +53,17 @@ public class ReferenceManager {
 		}
 
 		@Override
-		public void draw(Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform t = g2.getTransform();
-			g2.transform(localTransform);
+		public void draw(GraphicsContext gc) {
+			AffineTransform oldTrans = gc.getTransform();
+			AffineTransform newTrans = new AffineTransform(oldTrans);
+			if( global) 
+				newTrans.concatenate(getTransform());
+			newTrans.concatenate(localTransform);
+			gc.setTransform(newTrans);
 			
-			layer.draw(new AWTContext(g2));
+			layer.draw(gc);
 			
-			g2.setTransform(t);
+			gc.setTransform(oldTrans);
 		}
 	}
 	public class ImageReference extends Reference {
@@ -69,14 +73,17 @@ public class ReferenceManager {
 			this.global = false;
 		}
 		@Override
-		public void draw(Graphics g) {
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform t = g2.getTransform();
-			g2.transform(localTransform);
+		public void draw(GraphicsContext gc) {
+			AffineTransform oldTrans = gc.getTransform();
+			AffineTransform newTrans = new AffineTransform(oldTrans);
+			if( global) 
+				newTrans.concatenate(getTransform());
+			newTrans.concatenate(localTransform);
+			gc.setTransform(newTrans);
 			
-			g2.drawImage( image, 0, 0, null);
-			
-			g2.setTransform(t);	
+			gc.drawImage( image, 0, 0);
+
+			gc.setTransform(oldTrans);
 		}
 	}
 	

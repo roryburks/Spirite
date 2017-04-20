@@ -7,6 +7,8 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.GraphicsContext.Composite;
+import spirite.graphics.gl.engine.GLCache;
+import spirite.graphics.gl.engine.GLParameters.GLTexture;
 import spirite.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.InternalImage;
@@ -65,6 +67,14 @@ public class ImageHandle {
 		if( context == null) return null;
 		return context.getData(id).cachedImage.access();
 	}
+	
+	/** Accesses a potentially-cached GLTexture representing the current ImageHandle*/
+	public GLTexture accessGL() {
+		if( context == null) return null;
+		GLCache cache = context.getGLCache();
+		if( cache == null) return null;
+		return cache.new GLHandleTexture(this);
+	}
 
 
 	public int getID() { return id;}
@@ -121,7 +131,7 @@ public class ImageHandle {
 		completeTransform.concatenate(transform);
 		
 		gc.setTransform(completeTransform);
-		gc.drawImage( ii.cachedImage.access(), 0, 0);
+		gc.drawHandle(this, 0, 0);
 		gc.setTransform(prev);
 	}
 		

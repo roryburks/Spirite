@@ -55,8 +55,8 @@ import spirite.image_data.ImageWorkspace.InternalImage;
  */
 public class UndoEngine {
 	private static final int MAX_TICKS_PER_KEY = 10;
-	private int absoluteMaxCache = 200000000;	// 200 m
-	private int maxCacheSize = 50000000;	// 50 m
+	private long absoluteMaxCache = 2000000000L;	// 2 Gig
+	private int maxCacheSize = 100000000;	// 1 Gig
 	private int maxQueueSize = 100;
 	private final List<UndoContext> contexts;
 	private final LinkedList<UndoContext> queue = new LinkedList<>();

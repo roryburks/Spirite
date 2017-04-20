@@ -5,6 +5,8 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import spirite.image_data.ImageHandle;
+
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 
  * which can be rendered by different native engines (e.g. either OpenGL or the
@@ -76,6 +78,6 @@ public abstract class GraphicsContext {
 
 
 	public abstract void drawImage(BufferedImage bi, int x, int y);
-
+	public abstract void drawHandle( ImageHandle handle, int x, int y);
 
 }

@@ -87,6 +87,8 @@ public class GLParameters {
 	public abstract static class GLTexture {
 		public abstract int load(GL2 gl);
 		public abstract void unload();
+		public abstract int getWidth();
+		public abstract int getHeight();
 	}
 	
 	
@@ -108,6 +110,13 @@ public class GLParameters {
 		public void unload(){
 			texture.free();
 		}
+
+		@Override public int getWidth() {
+			return (image == null)?0:image.getWidth();
+		}
+		@Override public int getHeight() {
+			return (image == null)?0:image.getHeight();
+		}
 	}
 	public static class GLFBOTexture extends GLTexture {
 		private final GLMultiRenderer glmu;
@@ -128,7 +137,9 @@ public class GLParameters {
 	        return glmu.getTexture();
 		}
 
-		@Override public void unload() {}	
+		@Override public void unload() {}
+		@Override public int getWidth() { return glmu.width; }
+		@Override public int getHeight() { return glmu.height; }	
 	}
 	
 	// ==============

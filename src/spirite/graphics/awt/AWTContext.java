@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 
 import spirite.Globals;
 import spirite.graphics.GraphicsContext;
+import spirite.image_data.ImageHandle;
 
 /**
  * AWTContext is a GraphicsContext using only native AWT calls (as well as some
@@ -154,6 +155,7 @@ public class AWTContext extends GraphicsContext{
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
 
 	@Override public void drawImage(BufferedImage bi, int x, int y) {g2.drawImage(bi,  x,  y, null);}
+	@Override public void drawHandle(ImageHandle handle, int x, int y) {g2.drawImage( handle.deepAccess(), x, y, null); }
 
 
 

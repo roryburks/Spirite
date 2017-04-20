@@ -85,8 +85,8 @@ public class GLDrawer extends GraphicsDrawer {
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
     	params.texture = new GLImageTexture(image);
 
-    	engine.clearSurface(engine.getGL2());
-    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, engine.getGL2());
+    	engine.clearSurface(gl);
+    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, gl);
 		
     	glSurfaceToImage(image);
 		

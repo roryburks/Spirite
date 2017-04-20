@@ -20,12 +20,15 @@ import com.jogamp.opengl.util.GLBuffers;
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
+import spirite.graphics.GraphicsContext.Composite;
 import spirite.graphics.gl.engine.GLEngine;
 import spirite.graphics.gl.engine.GLParameters;
 import spirite.image_data.ImageWorkspace;
+import spirite.image_data.ReferenceManager;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.image_data.ReferenceManager.MReferenceObserver;
 import spirite.image_data.SelectionEngine;
 import spirite.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.image_data.SelectionEngine.Selection;
@@ -41,14 +44,19 @@ import spirite.pen.JPenPenner;
  * 
  * @author Rory Burks
  */
-public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver
+public class GLWorkArea 
+	implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver, MReferenceObserver
 {
+	private static final Color normalBG = new Color(238,238,238);
+	private static final Color referenceBG = new Color( 210,210,242);
+	
 	private final WorkPanel context;
 	private final GLEngine engine = GLEngine.getInstance();
 	private final GLJPanel canvas;
 
 	private ImageWorkspace workspace = null;
 	private SelectionEngine selectionEngine;
+	private ReferenceManager referenceManager;
 	private View view;
 	
 	private final JPenPenner penner;
@@ -84,11 +92,8 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	}
 	
 	// :::: GLEventListener
-	@Override public void dispose(GLAutoDrawable arg0) {
-	}
-	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
-	}
-	
+	@Override public void dispose(GLAutoDrawable arg0) {}
+	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
 	@Override
 	public void display(GLAutoDrawable glad) {
 		GLGraphics glgc = new GLGraphics(glad, true);
@@ -103,7 +108,7 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 		gl.glViewport(0, 0, w, h);
 		
 		// Clear Background Color
-		Color c = context.getBackground();
+		Color c = (referenceManager == null || !referenceManager.isEditingReference())?normalBG:referenceBG;
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( 
 	    		new float[] {c.getRed()/255.0f, c.getGreen()/255.0f, c.getBlue()/255.0f, 0f});
         gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
@@ -117,34 +122,18 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
     		
 
         	AffineTransform viewTrans = view.getViewTransform();
-        	
-    		// :::: Draw Back Reference
-        	
-        	glad.getContext().makeCurrent();
+
+        	// Draw Image with References
         	RenderEngine renderEngine = workspace.getRenderEngine();
+        	
+        	glgc.setTransform(viewTrans);
+        	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
+        	renderEngine.renderReference(workspace, glgc, false);
+        	glgc.setComposite(Composite.SRC_OVER, 1);
         	renderEngine.renderWorkspace(workspace, glgc, viewTrans);
-
-//        	glgc.setTransform(viewTrans);
-//        	glwr.renderWorkspace(workspace, glgc);
-        	
-        	
-//        	glad.getContext().makeCurrent();
-/*        	RenderSettings settings = new RenderSettings(
-        			renderEngine.getDefaultRenderTarget(workspace));
-    		BufferedImage image = renderEngine.renderImage(settings);
-
-    		glad.getContext().makeCurrent();
-    		
-			// ::: Draw Image
-    		params = new GLParameters(w, h);
-    		params.flip = true;
-    		params.clearParams();
-    		params.setUseBlendMode(true);
-    		params.texture = new GLParameters.GLImageTexture(image);
-    		engine.applyPassProgram(ProgramType.PASS_BASIC, params, viewTrans, 
-    				0, 0, image.getWidth(), image.getHeight(), false, gl);*/
-        	
-        	// :::: Draw Front Reference
+        	glgc.setTransform(viewTrans);
+        	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
+        	renderEngine.renderReference(workspace, glgc, true);
         	
         	// :::: Draw Selection Bounds
             Selection selection = selectionEngine.getSelection();
@@ -192,12 +181,15 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
 			selectionEngine.removeSelectionObserver(this);
+			referenceManager.removeReferenceObserve(this);
 		}
 		workspace = ws;
 		selectionEngine = (ws == null)?null:ws.getSelectionEngine();
+		referenceManager = (ws == null)?null:ws.getReferenceManager();
 		if( workspace != null) {
 			workspace.addImageObserver(this);
 			selectionEngine.addSelectionObserver(this);
+			referenceManager.addReferenceObserve(this);
 		}
 		this.view = view;
 	}
@@ -214,4 +206,8 @@ public class GLWorkArea implements WorkArea, GLEventListener, MImageObserver, MS
 	// :::: MSelectionObserver
 	@Override public void selectionBuilt(SelectionEvent evt) { canvas.repaint(); }
 	@Override public void buildingSelection(SelectionEvent evt) { canvas.repaint(); }
+
+	// :::: MReferenceObserver
+	@Override public void referenceStructureChanged(boolean hard) { canvas.repaint(); }
+	@Override public void toggleReference(boolean referenceMode) { canvas.repaint(); }
 }

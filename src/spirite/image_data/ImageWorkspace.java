@@ -36,6 +36,7 @@ import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.SettingsManager;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
+import spirite.graphics.gl.engine.GLCache;
 import spirite.image_data.GroupTree.GroupNode;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -286,9 +287,8 @@ public class ImageWorkspace {
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
 	
-	// Doesn't feel great leaking external components, but they're very
-	//	relevant to images and it's better than given them MasterControl
 	public CacheManager getCacheManager() { return cacheManager; }
+	GLCache getGLCache() {return master.getGLCache();}
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }

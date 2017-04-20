@@ -108,6 +108,8 @@ public class GLCache implements MImageObserver {
 			ctex.locked = false;
 			ctex = null;
 		}
+		@Override public int getWidth() { return handle.deepAccess().getWidth();}
+		@Override public int getHeight() { return handle.deepAccess().getHeight(); }
 	}
 
 	@Override
