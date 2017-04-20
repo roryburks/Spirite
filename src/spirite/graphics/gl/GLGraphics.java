@@ -78,7 +78,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	public GL2 getGL() { reset();return gl;}
 	
-	void reset() {
+	synchronized void reset() {
 		if( glmu != null) {
 			this.width = this.glmu.width;
 			this.height = this.glmu.height;
@@ -88,7 +88,9 @@ public class GLGraphics extends GraphicsContext{
 			this.height = drawable.getSurfaceHeight();
 		}
 		this.gl = drawable.getGL().getGL2();
-		drawable.getContext().makeCurrent();
+		
+		if( !drawable.getContext().isCurrent())
+			drawable.getContext().makeCurrent();
 		gl.getGL2().glViewport(0, 0, width, height);
 	}
 
@@ -221,17 +223,17 @@ public class GLGraphics extends GraphicsContext{
 	// ==== Line Drawing Methods
 	@Override
 	public void drawRect(int x, int y, int w, int h) {
-		int x_[] = new int[5];
-		int y_[] = new int[5];
+		int x_[] = new int[4];
+		int y_[] = new int[4];
 
-		x_[0] = x_[4] = x_[3] = x;
-		y_[0] = y_[4] = y_[1] = y;
+		x_[0] = x_[3] = x;
+		y_[0] = y_[1] = y;
 		x_[1] = x_[2] = x + w;
 		y_[2] = y_[3] = y + h;
 		
 		GLParameters params = constructLineParams();
 		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, x_, y_, 5, 
+				ProgramType.LINE_RENDER, x_, y_, 4, 
 				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
 				params, contextTransform, gl);
 	}
@@ -243,7 +245,7 @@ public class GLGraphics extends GraphicsContext{
 	public void drawPolyLine(int[] xPoints, int[] yPoints, int count) {
 		GLParameters params =constructLineParams();
 		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, xPoints, yPoints, xPoints.length, 
+				ProgramType.LINE_RENDER, xPoints, yPoints, count, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
 				params, contextTransform, gl);
 	}

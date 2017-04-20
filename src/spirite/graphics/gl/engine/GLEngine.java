@@ -330,7 +330,8 @@ public class GLEngine  {
 	{
 		addOrtho(params, trans);
 		
-		float data[] = new float[2*(numPoints+2)];
+		int size = numPoints+(loop?3:2);
+		float data[] = new float[2*size];
 		for(int i=1; i< numPoints+1; ++i) {
 			data[i*2] = xPoints[i-1];
 			data[i*2+1] = yPoints[i-1];
@@ -339,7 +340,11 @@ public class GLEngine  {
 			data[0] = xPoints[numPoints-1];
 			data[1] = yPoints[numPoints-1];
 			data[2*(numPoints+1)] = xPoints[0];
-			data[2*(numPoints+1)+1] = yPoints[0];			
+			data[2*(numPoints+1)+1] = yPoints[0];	
+			if( numPoints > 2) {
+				data[2*(numPoints+2)] = xPoints[1];
+				data[2*(numPoints+2)+1] = yPoints[1];
+			}
 		}
 		else {
 			data[0] = xPoints[0];
@@ -349,16 +354,18 @@ public class GLEngine  {
 		}
 		
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( type, pd, numPoints+2, cap, join, width, params, trans, gl);
+		_doCompliexLineProg( type, pd, size, cap, join, width, params, trans, gl);
 		pd.free();
 	}
 	public void applyComplexLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, AffineTransform trans, GL2 gl) 
 	{
+		// NOTE: identical code to above but without implicit casting
 		addOrtho(params, trans);
-		
-		float data[] = new float[2*(numPoints+2)];
+
+		int size = numPoints+(loop?3:2);
+		float data[] = new float[2*size];
 		for(int i=1; i< numPoints+1; ++i) {
 			data[i*2] = xPoints[i-1];
 			data[i*2+1] = yPoints[i-1];
@@ -367,7 +374,11 @@ public class GLEngine  {
 			data[0] = xPoints[numPoints-1];
 			data[1] = yPoints[numPoints-1];
 			data[2*(numPoints+1)] = xPoints[0];
-			data[2*(numPoints+1)+1] = yPoints[0];			
+			data[2*(numPoints+1)+1] = yPoints[0];	
+			if( numPoints > 2) {
+				data[2*(numPoints+2)] = xPoints[1];
+				data[2*(numPoints+2)+1] = yPoints[1];
+			}
 		}
 		else {
 			data[0] = xPoints[0];
@@ -377,7 +388,7 @@ public class GLEngine  {
 		}
 		
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( type, pd, numPoints+2, cap, join, width, params, trans, gl);
+		_doCompliexLineProg( type, pd, size, cap, join, width, params, trans, gl);
 		pd.free();
 	}
 	
@@ -390,10 +401,10 @@ public class GLEngine  {
 			case MITER: uJoin = 1; break;
 			case ROUNDED:break;
 		}
-		uJoin = 2;
+		uJoin = 1;
 		
 		params.addParam(new GLParameters.GLParam1i("uJoin",uJoin));
-		params.addParam(new GLParameters.GLParam1f("uWidth", 5/ 2.0f));
+		params.addParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
 		applyProgram( type, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
 	}
 

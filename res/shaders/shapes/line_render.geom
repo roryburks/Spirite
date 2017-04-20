@@ -51,7 +51,7 @@ void doMiter() {
 		vec2 tangent = normalize( normalize(p2-p1) + normalize(p1-p0));
 		vec2 miter = vec2( -tangent.y, tangent.x);
 		vec2 n1 = normalize( vec2(-(p1.y-p0.y), p1.x-p0.x));
-		float length = min( uWidth / dot(miter, n1), MITER_MAX);
+		float length = max(0.5,min( uWidth / dot(miter, n1), MITER_MAX));
 		
 	    gl_Position = perspectiveMatrix*vec4( miter*length + p1, 0, 1);
 	    EmitVertex();
@@ -71,7 +71,7 @@ void doMiter() {
 		vec2 tangent = normalize( normalize(p3-p2) + normalize(p2-p1));
 		vec2 miter = vec2( -tangent.y, tangent.x);
 		vec2 n2 = normalize( vec2(-(p2.y-p1.y), p2.x-p1.x));
-		float length = min(uWidth / dot(miter, n2), MITER_MAX);
+		float length = max(0.5,min(uWidth / dot(miter, n2), MITER_MAX));
 		
 	    gl_Position = perspectiveMatrix*vec4( miter*length + p2, 0, 1);
 	    EmitVertex();
