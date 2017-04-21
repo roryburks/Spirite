@@ -132,12 +132,15 @@ public class GLWorkArea
         	
         	glgc.setTransform(viewTrans);
         	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
-        	renderEngine.renderReference(workspace, glgc, false);
+//        	renderEngine.renderReference(workspace, glgc, false);
+        	
         	glgc.setComposite(Composite.SRC_OVER, 1);
         	renderEngine.renderWorkspace(workspace, glgc, viewTrans);
+
         	glgc.setTransform(viewTrans);
         	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
         	renderEngine.renderReference(workspace, glgc, true);
+        	glgc.setComposite(Composite.SRC_OVER, 1);
 
             // :::: Draw Border around the active Data
             BuiltImageData active = workspace.buildActiveData();
@@ -154,6 +157,7 @@ public class GLWorkArea
 
             if( selection != null || selectionEngine.isBuilding()) {
 
+                glgc.setColor( Color.BLACK);
             	glgc.setTransform(viewTrans);
                 if(selectionEngine.isBuilding()) 
                 	selectionEngine.drawBuildingSelection(glgc);
@@ -191,7 +195,6 @@ public class GLWorkArea
 	// :::: WorkArea
 	@Override
 	public void changeWorkspace(ImageWorkspace ws, View view) {
-		// TODO
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
 			selectionEngine.removeSelectionObserver(this);

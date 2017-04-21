@@ -17,11 +17,14 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.awt.image.ImageConsumer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Hashtable;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
@@ -205,6 +208,7 @@ public class MUtil {
 			// Convert Clipboard image into BufferedImage
 			Image img = (Image)c.getData(DataFlavor.imageFlavor);
 			
+
     		BufferedImage bi = new BufferedImage(  
     				img.getWidth(null), img.getHeight(null), Globals.BI_FORMAT);
     		Graphics g = bi.getGraphics();
@@ -269,23 +273,34 @@ public class MUtil {
 	 * @throws 
 	 * 		UnsupportedDataTypeException if the ColorModel does not conform
 	 * 		to the a supported format
+	 * 
 	 */
 	public static Rectangle findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) 
 			throws UnsupportedDataTypeException 
 	{
-		_ImageCropHelper data = new _ImageCropHelper(image);
+
+		_ImageCropHelper data;
+		
+		int type = image.getType();
+		switch( type) {
+		case BufferedImage.TYPE_4BYTE_ABGR:
+		case BufferedImage.TYPE_4BYTE_ABGR_PRE:
+			data = new _ImageCropHelperByte(image);
+			break;
+		case BufferedImage.TYPE_INT_ARGB:
+		case BufferedImage.TYPE_INT_ARGB_PRE:
+			data = new _ImageCropHelperInt(image);
+			break;
+		default:
+			throw new UnsupportedDataTypeException("Only programmed to deal with 4-byte color data.");
+		}
+
 		int x1 =0, y1=0, x2=0, y2=0;
 				
 		// Don't feel like going through and special-casing 1-size things.
 		if( data.w <2 || data.h < 2) return new Rectangle(0,0,data.w,data.h);
-		
-		int lpp = image.getColorModel().getPixelSize();
-		if( lpp != 4*8) throw new UnsupportedDataTypeException("Only programmed to deal with 4-byte color data.");
 
-		data.bgcolor[0] = data.pixels[0];
-		data.bgcolor[1] = data.pixels[1];
-		data.bgcolor[2] = data.pixels[2];
-		data.bgcolor[3] = data.pixels[3];
+		data.setBG(0, 0);
 
 		// Usually the background color will be the top-left pixel, but
 		//	sometimes it'll be the bottom-right pixel.
@@ -293,15 +308,10 @@ public class MUtil {
 		//	with one of these two pixels, so it'll be one of the two).
 		// Note: this also pulls double-duty of checking the special case
 		//	of the 0th row and column, which simplifies the Binary Search
-		if( !data.rowIsEmpty(0) || ! data.colIsEmpty(0)) {
-			int i = (data.h*data.w - 1)*4;
-			data.bgcolor[0] = data.pixels[i];
-			data.bgcolor[1] = data.pixels[i+1];
-			data.bgcolor[2] = data.pixels[i+2];
-			data.bgcolor[3] = data.pixels[i+3];
-		}
+		if( !data.rowIsEmpty(0) || ! data.colIsEmpty(0))
+			data.setBG(data.h-1, data.w-1);
 		
-		if(transparentOnly && (data.bgcolor[0] != 0))
+		if(transparentOnly && !data.isBGTransparent())
 			return new Rectangle(0,0,data.w,data.h);
 
 		int ret;
@@ -332,27 +342,20 @@ public class MUtil {
 		
 		return new Rectangle( x1, y1, x2-x1+1, y2-y1+1 );
 	}
-	private static class _ImageCropHelper {
+	private static abstract class _ImageCropHelper {
 		final int w;
 		final int h;
-		final byte pixels[];
-		final byte bgcolor[] = new byte[4];
 		
 		_ImageCropHelper( BufferedImage image ) {
-			this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			this.w = image.getWidth();
 			this.h = image.getHeight();
 		}
-		
+
 		// Sanity checks would be inefficient, let's just assume everything
 		//	works correctly because it's already been tested.
-		boolean verify( int x, int y) {
-			int i = (x + y*w)*4;
-			return pixels[i] == bgcolor[0] && 
-					pixels[i+1] == bgcolor[1] && 
-					pixels[i+2] == bgcolor[2] && 
-					pixels[i+3] == bgcolor[3];
-		}
+		abstract boolean verify( int x, int y);
+		abstract void setBG( int x, int y);
+		abstract boolean isBGTransparent();
 		
 		// Kind of Ugly code in here, but it's a bit much to copy all that
 		// code just to swap X and Y and w for h
@@ -389,6 +392,64 @@ public class MUtil {
 					return i;
 			}
 			return -1;
+		}
+	}
+	private static class _ImageCropHelperByte extends _ImageCropHelper {
+		final byte pixels[];
+		final byte bgcolor[] = new byte[4];
+		
+		_ImageCropHelperByte(BufferedImage image) {
+			super(image);
+			this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+		}
+
+		@Override
+		boolean verify(int x, int y) {
+			int i = (x + y*w)*4;
+			return pixels[i] == bgcolor[0] && 
+					pixels[i+1] == bgcolor[1] && 
+					pixels[i+2] == bgcolor[2] && 
+					pixels[i+3] == bgcolor[3];
+		}
+
+		@Override
+		void setBG(int x, int y) {
+			int i = (x + y*w)*4;
+			bgcolor[0] = pixels[i];
+			bgcolor[1] = pixels[i+1];
+			bgcolor[2] = pixels[i+2];
+			bgcolor[3] = pixels[i+3];
+		}
+
+		@Override
+		boolean isBGTransparent() {
+			return bgcolor[0] == 0;
+		}
+	}
+	private static class _ImageCropHelperInt extends _ImageCropHelper {
+		final int pixels[];
+		int bgcolor;
+		
+		_ImageCropHelperInt(BufferedImage image) {
+			super(image);
+			this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		}
+
+		@Override
+		boolean verify(int x, int y) {
+			int i = (x + y*w);
+			return pixels[i] == bgcolor;
+		}
+
+		@Override
+		void setBG(int x, int y) {
+			int i = (x + y*w);
+			bgcolor = pixels[i];
+		}
+
+		@Override
+		boolean isBGTransparent() {
+			return ((bgcolor >>> 24) & 0xFF) == 0;
 		}
 	}
 	

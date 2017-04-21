@@ -1,5 +1,6 @@
 package spirite.pen;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -14,6 +15,7 @@ import spirite.MDebug;
 import spirite.MDebug.WarningType;
 import spirite.MUtil;
 import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
 import spirite.graphics.awt.AWTContext;
 import spirite.image_data.DrawEngine;
 import spirite.image_data.ImageWorkspace.BuiltImageData;
@@ -265,6 +267,18 @@ public abstract class StrokeEngine {
 
 	// Draws the Stroke Layer onto the graphics
 	public void drawStrokeLayer( GraphicsContext gc) {
+		float oldAlpha = gc.getAlpha();
+		Composite oldComp = gc.getComposite();
+		
+		switch( stroke.getMethod()) {
+		case BASIC:
+		case PIXEL:
+			gc.setComposite(Composite.SRC_OVER, stroke.getAlpha());
+			break;
+		case ERASE:
+			gc.setComposite(Composite.DST_OUT, stroke.getAlpha());
+			break;
+		}
 /*		Graphics2D g2 = (Graphics2D)g;
 		Composite c = g2.getComposite();
 		switch( stroke.getMethod()) {
@@ -277,7 +291,7 @@ public abstract class StrokeEngine {
 			break;
 		}*/
 		drawDisplayLayer(gc);
-//		g2.setComposite( c);
+		gc.setComposite( oldComp, oldAlpha);
 	}
 	
 	

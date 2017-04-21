@@ -702,10 +702,7 @@ public class AnimationSchemeTreePanel extends JPanel
 			}
 
 			@Override
-			public void onPress(MouseEvent evt) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void onPress(MouseEvent evt) {}
 		}
 
 		

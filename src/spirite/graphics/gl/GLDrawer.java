@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.Globals;
 import spirite.brains.RenderEngine;
 import spirite.brains.RenderEngine.NodeRenderer;
 import spirite.graphics.GraphicsDrawer;
@@ -52,7 +53,7 @@ public class GLDrawer extends GraphicsDrawer {
 
 		renderable.render( new GLGraphics( engine.getAutoDrawable(), false));
 
-		return engine.glSurfaceToImage();
+		return engine.glSurfaceToImage(Globals.BI_FORMAT);
 	}
 
 	@Override
@@ -94,7 +95,9 @@ public class GLDrawer extends GraphicsDrawer {
 	
 	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
     private void glSurfaceToImage( BufferedImage bi) {
-        BufferedImage im = engine.glSurfaceToImage();
+        BufferedImage im = engine.glSurfaceToImage(Globals.BI_FORMAT);
+        
+        
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

@@ -288,10 +288,15 @@ public class GLGraphics extends GraphicsContext{
 		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
 		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
 		
-		switch( composite) {
-		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
-		}
+		setCompositeBlend(params, composite);
 		return params;
+	}
+	
+	public static void setCompositeBlend( GLParameters params, Composite comp) {
+		switch( comp) {
+		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		case DST_OUT:params.setBlendMode( GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		}
 	}
 	
 	// ============
@@ -336,32 +341,33 @@ public class GLGraphics extends GraphicsContext{
 		params.flip = flip;
 		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
 		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
-		
-		switch( composite) {
-		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
-		}
+		setCompositeBlend(params, composite);
 		return params;
 	}
 	
 	@Override
 	public void drawImage(BufferedImage bi, int x, int y) {
-		// TODO: Add more features
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
+		GLParameters params = constroctImgParams();
 		params.texture = new GLParameters.GLImageTexture(bi);
-		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
 		
 	}
 	@Override
 	public void drawHandle(ImageHandle handle, int x, int y) {
-		// TODO: Add more features
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
+		GLParameters params =constroctImgParams();
 		params.texture = handle.accessGL();
-		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, params.texture.getWidth(), params.texture.getHeight(), false, gl);
+	}
+	
+	private GLParameters constroctImgParams() {
+		GLParameters params = new GLParameters(width, height);
+		params.flip = flip;
+		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+		setCompositeBlend(params, composite);
+		return params;
 	}
 }

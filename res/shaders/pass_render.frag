@@ -28,9 +28,6 @@ vec4 changeColor(vec4 texCol) {
 	return vec4( r*texCol.a, g*texCol.a, b*texCol.a, texCol.a);
 }
 
-
-
-
 void main()
 {
 	vec4 texCol = texture(myTexture, vUV);

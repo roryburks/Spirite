@@ -544,7 +544,6 @@ public class LayerTreePanel extends ContentTree
 			try {
 				AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			break;}

@@ -11,7 +11,9 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
+import jogamp.opengl.macosx.cgl.MacOSXCGLDrawable.GLBackendType;
 import mutil.MatrixBuilder;
+import spirite.Globals;
 import spirite.graphics.GraphicsContext;
 import spirite.graphics.awt.AWTContext;
 import spirite.graphics.gl.engine.GLEngine;
@@ -82,27 +84,14 @@ class GLStrokeEngine extends StrokeEngine {
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
 		if( gc instanceof AWTContext) {
-			Graphics2D g2 = (Graphics2D)((AWTContext)gc).getGraphics().create();
-
-			switch( stroke.getMethod()) {
-			case BASIC:
-			case PIXEL:
-				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.getAlpha()));
-				break;
-			case ERASE:
-				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.getAlpha()));
-				break;
-			}
-			
 			engine.setSurfaceSize(w, h);
 			engine.clearSurface(engine.getGL2());
 			GLParameters params = new GLParameters(w, h);
 			params.texture = new GLParameters.GLFBOTexture(displayLayer);
 			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 			
-			BufferedImage bi = engine.glSurfaceToImage();
-			g2.drawImage( bi, 0, 0, null);
-			g2.dispose();
+			BufferedImage bi = engine.glSurfaceToImage(Globals.BI_FORMAT);
+			gc.drawImage( bi, 0, 0);
 		}
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;
@@ -111,18 +100,12 @@ class GLStrokeEngine extends StrokeEngine {
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(displayLayer);
 			params.flip = glgc.isFlip();
-
-			switch( stroke.getMethod()) {
-			case BASIC:
-			case PIXEL:
-				params.setBlendMode(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);
-				break;
-			case ERASE:
-				params.setBlendMode(GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);
-				break;
-			}
+			params.addParam( new GLParameters.GLParam1i("uComp", 0));
+			params.addParam( new GLParameters.GLParam1f("uAlpha", glgc.getAlpha()));
+//			GLGraphics.setCompositeBlend(params, gc.getComposite());
 			
-			engine.applyPassProgram(ProgramType.PASS_BASIC, params, glgc.getTransform(), 
+			
+			engine.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 
 					0, 0, w, h, true, glgc.getGL());
 		}
 	}
@@ -134,27 +117,15 @@ class GLStrokeEngine extends StrokeEngine {
 
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
+//				_strokeSpore( states.get(states.size()-1));
 				_stroke( composeVBuffer(states), stroke.getHard()?1:0);
 			}
 		});
-/*		_stroke( composeVBuffer(states));
-		
-
-        BufferedImage im = engine.glSurfaceToImage(); 
-		Graphics2D g2 = (Graphics2D)layer.getGraphics();
-		g2.drawImage(im, 0, 0, null);
-
-		if( sel.selection != null) {
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-			g2.drawImage(selectionMask, 0, 0, null);
-		}
-		g2.dispose();*/
 		
 		return true;
 	}
 	
 	private void _strokeSpore(PenState ps) {
-
 		float[] raw = new float[4*13];
 		
 		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
@@ -188,22 +159,11 @@ class GLStrokeEngine extends StrokeEngine {
 		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1}, gl);
 
 		// Clear Surface
-//	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-//	    gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
-
         int prog = engine.getProgram(ProgramType.STROKE_SPORE);
         gl.glUseProgram( prog);
 
         // Bind Attribute Streams
         pd.init();
-        
-/*        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, pd.getBuffer());
-        gl.glEnableVertexAttribArray( 0);
-        gl.glEnableVertexAttribArray( 1);
-        gl.glEnableVertexAttribArray( 2);
-        gl.glVertexAttribPointer( 0, 2, GL2.GL_FLOAT, false, 4*4, 0);
-        gl.glVertexAttribPointer( 1, 1, GL2.GL_FLOAT, false, 4*4, 4*2);
-        gl.glVertexAttribPointer( 2, 1, GL2.GL_FLOAT, false, 4*4, 4*3);*/
 
         // Bind Uniforms
         int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
@@ -235,17 +195,6 @@ class GLStrokeEngine extends StrokeEngine {
 
         pd.deinit();
         pd.free();
-
-//        BufferedImage im = engine.glSurfaceToImage(); 
-//		MUtil.clearImage(strokeLayer);
-//		Graphics2D g2 = (Graphics2D)displayLayer.getGraphics();
-//		g2.drawImage(im, 0, 0, null);
-
-//		if( sel.selection != null) {
-//			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
-//			g2.drawImage(selectionMask, 0, 0, null);
-//		}
-//		g2.dispose();
 	}
 	
 	private class GLVBuffer {
@@ -306,9 +255,6 @@ class GLStrokeEngine extends StrokeEngine {
 		PreparedData pd = engine.prepareRawData(glvb.vBuffer, new int[]{4,1,1}, gl);
 
 		// Clear Surface
-//	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
-//        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
-
         int prog = 0;
         
         switch( stroke.getMethod()) {

@@ -115,8 +115,15 @@ class GLNodeRenderer extends NodeRenderer {
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
 			params.flip = glgc.isFlip();
-			engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, trans, 
-					0, 0, settings.width, settings.height, true, gl);
+			
+//			if( !glgc.isFlip()) {
+//				engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, trans, 
+//						0, 0, settings.width, settings.height, true, gl);
+//			}
+//			else {
+				engine.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
+						0, 0, settings.width, settings.height, true, gl);
+//			}
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
@@ -154,7 +161,14 @@ class GLNodeRenderer extends NodeRenderer {
 						trans.translate( dataContext.handle.getDynamicX(), 
 								dataContext.handle.getDynamicY());
 						glgc.setTransform(trans);
-						glgc.drawImage(dataContext.handle.deepAccess(), 0, 0);
+						
+
+						GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
+						params.texture = dataContext.handle.accessGL();
+						params.addParam( new GLParameters.GLParam1i("uComp", 0));
+						params.addParam( new GLParameters.GLParam1i("uAlpha", 1));
+						engine.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
+								0, 0, params.texture.getWidth(), params.texture.getHeight(), true, gl);
 
 						if( workspace.getSelectionEngine().getLiftedImage() != null ){
 							// Draw Lifted Image
@@ -305,7 +319,7 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));
 		params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
-		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) | ((fullPremult&&premult)?1:0)));
+		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
 	}
 	
 	private abstract class Drawable {

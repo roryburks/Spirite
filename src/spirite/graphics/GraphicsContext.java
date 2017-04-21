@@ -36,7 +36,7 @@ public abstract class GraphicsContext {
 	public abstract void translate(double offsetX, double offsetY);
 	public abstract void setColor(Color color);
 	
-	public enum Composite {SRC_OVER};
+	public enum Composite {SRC_OVER, DST_OUT, };
 	public abstract void setComposite( Composite composite, float alpha);
 	public abstract float getAlpha();
 	public abstract Composite getComposite();

@@ -74,6 +74,7 @@ public class AWTContext extends GraphicsContext{
 		
 		switch( composite) {
 		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
+		case DST_OUT: i = AlphaComposite.DST_OUT; break;
 		}
 		g2.setComposite( AlphaComposite.getInstance(i, alpha));
 	}

@@ -29,9 +29,7 @@ import spirite.MDebug.ErrorType;
  */
 public class Globals {
 	
-	public static int BI_FORMAT = BufferedImage.TYPE_4BYTE_ABGR;
-	
-	
+	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
 	
 	public static Dictionary<String,Color> colors = null;
 	private static void createColorDictionary() {

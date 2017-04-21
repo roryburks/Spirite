@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
+import spirite.Globals;
 import spirite.graphics.gl.engine.GLEngine;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.graphics.gl.engine.GLMultiRenderer;
@@ -84,7 +85,7 @@ class GLUIDraw {
 		glmu.cleanup();
 		glmub.cleanup();
 
-        BufferedImage im = engine.glSurfaceToImage();
+        BufferedImage im = engine.glSurfaceToImage(Globals.BI_FORMAT);
        
 		return im;
 	}

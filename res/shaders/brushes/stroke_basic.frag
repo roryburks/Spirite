@@ -16,12 +16,14 @@ void main()
 	}
 	else w = fWeight;
 	
+	float alpha;
 	switch( uMode) {
 	case 0:
-    	outputColor = vec4(uColor,sqrt(sqrt(w)));
+		alpha = sqrt(sqrt(w));
     	break;
     case 1:
-    	outputColor = vec4(uColor,(w>0)?1:0);
+    	alpha = (w>0)?1:0;
 	}
+   	outputColor = vec4(uColor*alpha,alpha);
 	
 }

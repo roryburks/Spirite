@@ -108,20 +108,6 @@ class AWTStrokeEngine extends StrokeEngine{
 
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
-		Graphics2D g2 = (Graphics2D)((AWTContext)gc).getGraphics().create();
-		
-		switch( stroke.getMethod()) {
-		case BASIC:
-		case PIXEL:
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.getAlpha()));
-			break;
-		case ERASE:
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.getAlpha()));
-			break;
-		}
-		
-		g2.drawImage(displayLayer, 0, 0, null);
-		
-		g2.dispose();
+		gc.drawImage(displayLayer, 0, 0);
 	}
 }

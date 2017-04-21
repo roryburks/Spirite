@@ -1,10 +1,16 @@
 package spirite.graphics.gl.engine;
 
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferInt;
+import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -12,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
 
 import com.hackoeur.jglm.Mat4;
@@ -27,6 +34,7 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
+import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import mutil.MatrixBuilder;
@@ -57,6 +65,8 @@ import sun.awt.image.IntegerInterleavedRaster;
  * GLFunctionality does not leak beyond the two packages so that functions that require
  * OpenGL are kept explicit and modular (so that you don't try to access OpenGL
  * when it's not available)
+ * 
+ * TODO: Make _doComplexLineProg behave more as expected.
  * 
  * @author Rory Burks
  */
@@ -94,9 +104,8 @@ public class GLEngine  {
         caps.setAlphaBits(8); 
         caps.setRedBits(8); 
         caps.setBlueBits(8); 
-        caps.setGreenBits(8); 
-        caps.setOnscreen(false); 
-
+        caps.setGreenBits(3); 
+        caps.setOnscreen(false);
 
 		drawable = fact.createOffscreenAutoDrawable(
 				fact.getDefaultDevice(), 
@@ -163,15 +172,53 @@ public class GLEngine  {
 	}
 
 	/** Writes the active GL Surface to a BufferedImage */
-	public BufferedImage glSurfaceToImage() {
-		BufferedImage bi = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true);
+	public BufferedImage glSurfaceToImage(int type) {
+		GL2 gl = getGL2();
+		BufferedImage bi = null;
+//		long time;
+		
+//		time = System.currentTimeMillis();
+		
+		switch( type) {
+		case BufferedImage.TYPE_INT_ARGB:
+		case BufferedImage.TYPE_INT_ARGB_PRE:
+		bi = new BufferedImage(width, height, type);
+		
+		IntegerInterleavedRaster iir = (IntegerInterleavedRaster)bi.getRaster();
+		IntBuffer ib = IntBuffer.wrap(iir.getDataStorage());
+		
+		gl.glReadPixels( 0, 0, width, height, 
+				GL2.GL_BGRA,
+				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
+				ib);
+		break;
+		default: 
+			return null;
+		}
+		
+		// Flip Vertically
+		if( true) {
+			final WritableRaster raster = bi.getRaster();
+			Object scanline1 = null;
+			Object scanline2 = null;
+			for( int i=0; i<bi.getHeight()/2; ++i) {
+				scanline1 = raster.getDataElements(0, i, bi.getWidth(), 1, scanline1);
+				scanline2 = raster.getDataElements(0, bi.getHeight()-i-1, bi.getWidth(), 1, scanline2);
+				raster.setDataElements(0, i, bi.getWidth(), 1, scanline2);
+				raster.setDataElements(0, bi.getHeight()-i-1, bi.getWidth(), 1, scanline1);
+			}
+		}
+//		time = System.currentTimeMillis();
+//		bi = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
+//        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true);
+//        System.out.println("AWT: " + (System.currentTimeMillis()-time));
+        
 		return bi;
 		
 	}
-	
+
+    public static final FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
 	public void clearSurface(GL2 gl2) {
-	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
         gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
 	
@@ -402,10 +449,12 @@ public class GLEngine  {
 			case ROUNDED:break;
 		}
 		uJoin = 1;
-		
+
+		gl.glEnable(GL2.GL_MULTISAMPLE );
 		params.addParam(new GLParameters.GLParam1i("uJoin",uJoin));
 		params.addParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
 		applyProgram( type, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
+		gl.glDisable(GL2.GL_MULTISAMPLE );
 	}
 
 	public enum PolyType {
@@ -717,10 +766,6 @@ public class GLEngine  {
 	// ==== Initialization
 	
 	private void initShaders() {
-        programs[ProgramType.DEFAULT.ordinal()] = loadProgramFromResources(
-				"shaders/basic.vert", 
-				null, 
-				"shaders/square_grad.frag");
         programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources(
 				"shaders/basic.vert", 
 				null, 
@@ -772,11 +817,11 @@ public class GLEngine  {
         programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources( 
 				"shaders/shapes/poly_render.vert", 
 				null, 
-				"shaders/shapes/poly_render.frag");
+				"shaders/shapes/shape_render.frag");
         programs[ProgramType.LINE_RENDER.ordinal()] = loadProgramFromResources( 
 				"shaders/shapes/line_render.vert", 
 				"shaders/shapes/line_render.geom", 
-				"shaders/shapes/line_render.frag");
+				"shaders/shapes/shape_render.frag");
 	}
 	
 	private int loadProgramFromResources( String vert, String geom, String frag){

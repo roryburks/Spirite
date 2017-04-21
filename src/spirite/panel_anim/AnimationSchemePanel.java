@@ -44,7 +44,6 @@ public class AnimationSchemePanel extends OmniComponent {
 	// :::: OmniComponent
 	@Override
 	public void onCleanup() {
-		// TODO Auto-generated method stub
 		super.onCleanup();
 	}
 }
