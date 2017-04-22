@@ -17,6 +17,7 @@ import spirite.brains.RenderEngine.RenderMethod;
 import spirite.brains.RenderEngine.RenderSettings;
 import spirite.brains.RenderEngine.TransformedHandle;
 import spirite.graphics.GraphicsContext;
+import spirite.graphics.GraphicsContext.Composite;
 import spirite.graphics.gl.engine.GLCache;
 import spirite.graphics.gl.engine.GLEngine;
 import spirite.graphics.gl.engine.GLEngine.ProgramType;
@@ -289,6 +290,7 @@ class GLNodeRenderer extends NodeRenderer {
 			method_num = 1;
 			break;
 		case DEFAULT:
+			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
 			break;
 		case LIGHTEN:
 			method_num = 0;
@@ -383,6 +385,7 @@ class GLNodeRenderer extends NodeRenderer {
 					
 					AffineTransform trans = new AffineTransform(transform);
 
+					GLGraphics.setCompositeBlend(params, glgc.getComposite());
 					if( compositedHandle == renderable.handle) {
 						if( renderable.handle.isDynamic())
 							trans = new AffineTransform();

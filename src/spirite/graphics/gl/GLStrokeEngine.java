@@ -102,7 +102,7 @@ class GLStrokeEngine extends StrokeEngine {
 			params.flip = glgc.isFlip();
 			params.addParam( new GLParameters.GLParam1i("uComp", 0));
 			params.addParam( new GLParameters.GLParam1f("uAlpha", glgc.getAlpha()));
-//			GLGraphics.setCompositeBlend(params, gc.getComposite());
+			GLGraphics.setCompositeBlend(params, gc.getComposite());
 			
 			
 			engine.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 

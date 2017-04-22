@@ -294,7 +294,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	public static void setCompositeBlend( GLParameters params, Composite comp) {
 		switch( comp) {
-		case SRC_OVER: params.setBlendMode( GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		case SRC_OVER: params.setBlendMode( GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
 		case DST_OUT:params.setBlendMode( GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
 		}
 	}
