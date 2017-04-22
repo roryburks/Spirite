@@ -31,6 +31,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
@@ -75,25 +76,26 @@ public class GLEngine  {
 	int width = 1;
 	int height = 1;
 
-	
-	/** Namespace for Attribute Bindings 
-	 * CURRENTLY USED VERY RARELY * */
-    public static class Attr {
-        public static final int POSITION = 0;
-        public static final int NORMAL = 2;
-        public static final int COLOR = 1;
-        public static final int TEXCOORD = 4;
-        public static final int DRAW_ID = 5;
-        public static final int CAMERA_SPHERE_POS = 6;
-        public static final int SPHERE_RADIUS = 7;
-    }
-
-	private static final GLEngine singly = new GLEngine();
+	private static GLEngine singly = null;
 	public static GLEngine getInstance() {
+		if( singly == null) MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, "Attempted to get GL Engine that hasn't been initialized.");
 		return singly;
 	}
 	
-	private GLEngine() {
+	/** Attempts to initialize the GLEngine, throwing an exception if it fails. */
+	public static void initialize() 
+		throws MGLException
+	{
+		if( singly == null)
+			singly = new GLEngine();
+	}
+	public static class MGLException extends Exception {
+		public MGLException(String message) {
+			super(message);
+		}
+	}
+	
+	private GLEngine() throws MGLException {
 		System.out.println("GL Creation");
 		// Create Offscreen OpenGl Surface
 		GLProfile profile = GLProfile.getDefault();
@@ -113,6 +115,8 @@ public class GLEngine  {
 				new DefaultGLCapabilitiesChooser(), 
 				1, 1);
 		
+		ex = null;
+		
 		// Debug
 		drawable.addGLEventListener( new GLEventListener() {
 			@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
@@ -121,26 +125,22 @@ public class GLEngine  {
 			}
 			@Override public void display(GLAutoDrawable arg0) {}
 			@Override public void init(GLAutoDrawable gad) {
+				try {
+				initShaders();
+				} catch (MGLException e) {
+					ex = e;
+				}
 				//GL gl = gad.getGL();
 				//gl = gl.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
 			}
-		});
-		
+		});	
 
-		// The GL object has to be running on the AWTEvent thread for UI objects
-		//	to access it without causing thread-locking.
-		//
-		// TODO: Figure out whether this needs to be SwingUtilities.invokeAndWait
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				drawable.display();
-//				drawable.getContext().makeCurrent();		
-				initShaders();
-			}
-		});
+		drawable.display();
+		
+		if( ex != null) throw ex;
 	}
-	
+	private static MGLException ex = null;
+		
 	public final GLRenderer clearRenderer = new GLRenderer() {
 		@Override public void render(GL gl) {
 			clearSurface(gl.getGL2());
@@ -765,7 +765,7 @@ public class GLEngine  {
 	// ==============
 	// ==== Initialization
 	
-	private void initShaders() {
+	private void initShaders() throws MGLException {
         programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources(
 				"shaders/basic.vert", 
 				null, 
@@ -824,7 +824,9 @@ public class GLEngine  {
 				"shaders/shapes/shape_render.frag");
 	}
 	
-	private int loadProgramFromResources( String vert, String geom, String frag){
+	private int loadProgramFromResources( String vert, String geom, String frag) 
+			throws MGLException
+	{
 		GL2 gl = drawable.getGL().getGL2();
 
         ArrayList<Integer> shaderList = new ArrayList<>();
@@ -852,7 +854,9 @@ public class GLEngine  {
         return ret;
 	}
 	
-	private int createProgram( GL2 gl, ArrayList<Integer> shaderList) {
+	private int createProgram( GL2 gl, ArrayList<Integer> shaderList) 
+			throws MGLException 
+	{
 		// Create and Link Program
 		int program = gl.glCreateProgram();
 
@@ -875,10 +879,10 @@ public class GLEngine  {
             bufferInfoLog.get(bytes);
             String strInfoLog = new String(bytes);
 
-			MDebug.handleError(ErrorType.RESOURCE, "Link Program." + strInfoLog);
-
 			infoLogLength.clear();
 			bufferInfoLog.clear();
+			throw new MGLException("Link Program." + strInfoLog);
+
         }
 
 
@@ -890,8 +894,9 @@ public class GLEngine  {
         return program;
 	}
 
-	private int compileShaderFromResource( GL2 gl, int shaderType, String resource) {
-		
+	private int compileShaderFromResource( GL2 gl, int shaderType, String resource) 
+			throws MGLException 
+	{
 		// Read Shader text from resource file
 		String shaderText = null;
 		try {
@@ -944,10 +949,10 @@ public class GLEngine  {
 				type = "unknown type: " + shaderType;
 				break;
 			}
-			MDebug.handleError(ErrorType.RESOURCE, "Failed to compile GLSL shader (" + type + "): " + strInfoLog);
-			
 			infoLogLength.clear();
 			bufferInfoLog.clear();
+			throw new MGLException("Failed to compile GLSL shader (" + type + "): " + strInfoLog);
+			
 		}
 		lengths.clear();
 		status.clear();

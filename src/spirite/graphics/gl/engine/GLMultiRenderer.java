@@ -25,7 +25,7 @@ public class GLMultiRenderer {
 	private static final GLEngine engine = GLEngine.getInstance();
 
 	private int fbo;
-	private int dbo;
+	private static int dbo = -1;
 	private int tex;
 	
 	public GLMultiRenderer( int width, int height, GL2 gl) {
@@ -102,14 +102,15 @@ public class GLMultiRenderer {
         		width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
         
         // Create a (nearly) empty depth-buffer as a placeholder
-        gl.glGenRenderbuffers( 1, result, 0);
-        this.dbo = result[0];
-        gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, dbo);
-        gl.glRenderbufferStorage( GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT16, 1, 1);
-        gl.glFramebufferRenderbuffer( GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, dbo);
+        if( dbo == -1) {
+	        gl.glGenRenderbuffers( 1, result, 0);
+	        dbo = result[0];
+	        gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, dbo);
+	        gl.glRenderbufferStorage( GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT16, 1, 1);
+	        gl.glFramebufferRenderbuffer( GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, dbo);
+        }
         
         // TODO: Check for Out of Memory and handle appropriately
-//        System.out.println(gl.glGetError());
         
         // Attach Texture to FBO
         gl.glFramebufferTexture2D( GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, 

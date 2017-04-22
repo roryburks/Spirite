@@ -29,17 +29,32 @@ import spirite.graphics.gl.GLDrawer;
  */
 public class SettingsManager {
     private final Preferences prefs;
+    private final MasterControl master;
 	private List<String> paletteList = null;
 	
-	public SettingsManager() {
+	public SettingsManager(MasterControl master) {
+		this.master = master;
         prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
 	}
+	
+	
+	// ================
+	// ==== Graphics Engine Management
+	private boolean glMode = false;
 	
 	/** If true, then the engine is able to use OpenGL functionality.  If false
 	 * (either because the user set it to be false or because OpenGL couldn't 
 	 * initialize properly), then the engine must fall back on basic AWT rendering.*/
 	public boolean glMode() {
-		return true;
+		return glMode;
+	}
+	public void setGL(boolean b) {
+		if(b) {
+			glMode = master.initGL();
+		}
+		else glMode = false;
+		
+		if(!glMode) master.initAWT();
 	}
 	public GraphicsDrawer getDefaultDrawer() {
 		return (glMode())?(GLDrawer.getInstance()):(AWTDrawer.getInstance());
@@ -224,4 +239,5 @@ public class SettingsManager {
     	
     	return interpolator;
     }
+
 }

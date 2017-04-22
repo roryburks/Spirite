@@ -41,10 +41,7 @@ public class GLDrawer extends GraphicsDrawer {
 		return new GLNodeRenderer( node, context);
 	}
 
-	@Override
-	public StrokeEngine getStrokeEngine() {
-		return strokeEngine;
-	}
+	@Override public StrokeEngine getStrokeEngine() { return strokeEngine; }
     
 
 	@Override
@@ -63,7 +60,7 @@ public class GLDrawer extends GraphicsDrawer {
     	GL2 gl = engine.getGL2();
     	engine.setSurfaceSize(image.getWidth(), image.getHeight());
     	
-    	params.addParam( new GLParam1i("optionMask", mode));
+    	params.addParam( new GLParam1i("optionMask", mode | 4));
     	params.addParam( new GLParam4f("cFrom", 
     			from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f));
     	params.addParam( new GLParam4f("cTo", 
@@ -79,7 +76,6 @@ public class GLDrawer extends GraphicsDrawer {
 
 	@Override
 	public void invert(BufferedImage image) {
-
     	GL2 gl = engine.getGL2();
     	engine.setSurfaceSize(image.getWidth(), image.getHeight());
 
@@ -90,14 +86,11 @@ public class GLDrawer extends GraphicsDrawer {
     	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, gl);
 		
     	glSurfaceToImage(image);
-		
 	}
 	
 	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
     private void glSurfaceToImage( BufferedImage bi) {
-        BufferedImage im = engine.glSurfaceToImage(Globals.BI_FORMAT);
-        
-        
+        BufferedImage im = engine.glSurfaceToImage(bi.getType());
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

@@ -1,4 +1,4 @@
-package spirite.graphics.gl;
+package spirite.panel_work.gl;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +22,8 @@ import spirite.Globals;
 import spirite.brains.MasterControl;
 import spirite.brains.RenderEngine;
 import spirite.graphics.GraphicsContext.Composite;
+import spirite.graphics.gl.GLGraphics;
+import spirite.graphics.gl.GLWorkspaceRenderer;
 import spirite.graphics.gl.engine.GLEngine;
 import spirite.graphics.gl.engine.GLParameters;
 import spirite.image_data.GroupTree;

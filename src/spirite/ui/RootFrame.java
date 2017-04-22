@@ -181,7 +181,8 @@ public class RootFrame extends javax.swing.JFrame
     			{".Manage &Hotkeys", "dialog.HOTKEY", null},
     			{".&Tablet Settings", "dialog.TABLET", null},
     			{".&Debug Stats", "dialog.DEBUG", null},
-    			{".Toggle &GL Panel (experimental)", "global.toggleGL", null},
+    			{".Toggle &GL Mode", "global.toggleGL", null},
+    			{".Toggle GL Panel", "global.toggleGLPanel", null},
     			{".&__DB_GL", "dialog.DBGL", null},
     	};
     	

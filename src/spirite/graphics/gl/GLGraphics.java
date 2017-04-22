@@ -48,7 +48,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	private GLMultiRenderer glmu = null;
 
-	GLGraphics( GLAutoDrawable drawable, boolean flip) {
+	public GLGraphics( GLAutoDrawable drawable, boolean flip) {
 		this.drawable = drawable;
 		this.flip = flip;
 	}

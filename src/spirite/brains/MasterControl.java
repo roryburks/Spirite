@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import spirite.MDebug;
 import spirite.MDebug.ErrorType;
@@ -31,6 +32,8 @@ import spirite.dialogs.Dialogs;
 import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
 import spirite.graphics.gl.engine.GLCache;
+import spirite.graphics.gl.engine.GLEngine;
+import spirite.graphics.gl.engine.GLEngine.MGLException;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -94,7 +97,7 @@ public class MasterControl
     
 
     public MasterControl() {
-        settingsManager = new SettingsManager();
+        settingsManager = new SettingsManager(this);
         hotkeys = new HotkeyManager();
         toolset = new ToolsetManager();
         cacheManager = new CacheManager();
@@ -104,7 +107,11 @@ public class MasterControl
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
         frameManager = new FrameManager( this);
-		glcache = new GLCache(this);
+//		glcache = new GLCache(this);
+		
+		settingsManager.setGL( true);
+		System.out.println(settingsManager.glMode());
+//		initGL();
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make
@@ -135,10 +142,33 @@ public class MasterControl
     public SaveEngine getSaveEngine() { return saveEngine; }
     public LoadEngine getLoadEngine() { return loadEngine; }
     public Dialogs getDialogs() { return dialog; }
-    public GLCache getGLCache() { 
-    	if( glcache == null)
+    public GLCache getGLCache() { return glcache;}
+    
+    
+    // ==============
+    // ==== Graphics Engine Management
+    
+    /** Attempts to initialize OpenGL*/
+    boolean initGL() {
+    	try {
+    		GLEngine.initialize();
     		glcache = new GLCache(this);
-    	return glcache;
+    		
+    		// TODO: Kind of bad
+    		SwingUtilities.invokeLater( new Runnable() {
+				@Override public void run() {
+		    		frameManager.getWorkPanel().setGL(true);
+				}
+			});
+    	}catch( Exception e) { 
+    		MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Could not create OpenGL Context: \n" + e.getMessage());
+    		return false;
+    	}
+    	return true;
+    }
+    void initAWT() {
+		frameManager.getWorkPanel().setGL(false);
+    	glcache = null;
     }
     
     // =============
@@ -554,7 +584,10 @@ public class MasterControl
 	    		}
     		}});
     		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
-    			frameManager.getWorkPanel().toggleGL();;
+    			settingsManager.setGL( !settingsManager.glMode());
+    		}});
+    		commandMap.put("toggleGLPanel", new Runnable() {@Override public void run() {
+    			frameManager.getWorkPanel().setGL(!frameManager.getWorkPanel().isGLPanel());
     		}});
     	}
     	

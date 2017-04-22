@@ -25,13 +25,14 @@ import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import spirite.brains.MasterControl;
+import spirite.brains.SettingsManager;
 import spirite.brains.MasterControl.MWorkspaceObserver;
-import spirite.graphics.gl.GLWorkArea;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.panel_work.awt.WorkSplicePanel;
+import spirite.panel_work.gl.GLWorkArea;
 import spirite.pen.JPenPenner;
 import spirite.pen.Penner;
 
@@ -75,6 +76,7 @@ public class WorkPanel extends javax.swing.JPanel
 
     
     private final MasterControl master;
+    private final SettingsManager settingsManager;
     private ImageWorkspace currentWorkspace;
 
     private final Map<ImageWorkspace,View> views = new HashMap<>();
@@ -83,6 +85,7 @@ public class WorkPanel extends javax.swing.JPanel
 
     public WorkPanel( MasterControl master) {
         this.master = master;
+        this.settingsManager = master.getSettingsManager();
         
         jpenner = new JPenPenner(this, master);
         initComponents();
@@ -116,16 +119,28 @@ public class WorkPanel extends javax.swing.JPanel
     public View getView(ImageWorkspace ws) {return views.get(ws);}
     
     boolean gl = false;
-    public void toggleGL() {
-    	gl = !gl;
-    	
-    	workArea = (gl)
-    			?(new GLWorkArea(this, master))
-    			:(new WorkSplicePanel(this, master));
-    	
-    	workAreaContainer.removeAll();
-    	workAreaContainer.add(workArea.getComponent());
-    	workArea.changeWorkspace(currentWorkspace, getCurrentView());
+    public void setGL(boolean b) {
+    	if( b && settingsManager.glMode()) {
+    		if( !gl) {
+    			workArea = new GLWorkArea(this,master);
+    	    	workAreaContainer.removeAll();
+    	    	workAreaContainer.add(workArea.getComponent());
+    	    	workArea.changeWorkspace(currentWorkspace, getCurrentView());
+    		}
+    		gl = true;
+    	}
+    	else {
+    		if( gl) {
+    			workArea = new WorkSplicePanel(this,master);
+    	    	workAreaContainer.removeAll();
+    	    	workAreaContainer.add(workArea.getComponent());
+    	    	workArea.changeWorkspace(currentWorkspace, getCurrentView());
+    		}
+    		gl = false;
+    	}
+    }
+    public boolean isGLPanel() {
+    	return gl;
     }
 
     /** The view describes which part of the image is currently being seen and
