@@ -45,22 +45,18 @@ public class WorkTabPane extends JTabbedPane
 	
 	public WorkTabPane( MasterControl master) {
 		this.master = master;
-//		this.workPanel = new WorkPanel(master);
-
 		workPanel =  new WorkPanel(master);
-		master.addWorkspaceObserver(this);
 		
+		master.addWorkspaceObserver(this);
 		this.addChangeListener(this);
 		this.addMouseListener(this);
 	}
 	
 	
-	public View getZoomerForWorkspace( ImageWorkspace ws) {
-		return workPanel.getView(ws);
-	}
-	public Penner getPennerForWorkspace( ImageWorkspace ws) {
-		return workPanel.getPenner();
-	}
+	public View getZoomerForWorkspace( ImageWorkspace ws) 
+		{return workPanel.getView(ws);}
+	public Penner getPenner() 
+		{return workPanel.getPenner();}
 	
 	// :::: MWorkspaceObserver
 	@Override

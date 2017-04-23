@@ -29,8 +29,8 @@ import spirite.panel_toolset.ToolSettingsPanel;
 import spirite.panel_toolset.UndoPanel;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
-import spirite.pen.Penner;
 import spirite.panel_work.WorkTabPane;
+import spirite.pen.Penner;
 import spirite.ui.OmniFrame.OmniComponent;
 import spirite.ui.OmniFrame.OmniContainer;
 
@@ -219,12 +219,12 @@ public class FrameManager
 		WorkTabPane wsPane = root.getWTPane();
 		return wsPane.getZoomerForWorkspace(ws);
 	}
-	public Penner getPennerForWorkspace( ImageWorkspace ws) {
+	public Penner getPenner() {
 
 		if( root == null) return null;
 		
 		WorkTabPane wsPane = root.getWTPane();
-		return wsPane.getPennerForWorkspace(ws);
+		return wsPane.getPenner();
 	}
 	public WorkPanel getWorkPanel() {
 		return root.getWTPane().workPanel;

@@ -1,25 +1,16 @@
 package spirite.graphics.gl.engine;
 
-import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.activation.UnsupportedDataTypeException;
-import javax.swing.SwingUtilities;
 
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
@@ -31,12 +22,9 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.awt.AWTGLPixelBuffer;
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 
 import mutil.MatrixBuilder;
 import spirite.Globals;
@@ -44,6 +32,7 @@ import spirite.MDebug;
 import spirite.MDebug.ErrorType;
 import spirite.graphics.GraphicsContext.CapMethod;
 import spirite.graphics.GraphicsContext.JoinMethod;
+import spirite.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -236,11 +225,12 @@ public class GLEngine  {
 		PASS_RENDER,
 		PASS_ESCALATE, 
 		
-		
-		
 		STROKE_SPORE,
 		STROKE_BASIC, 
-		STROKE_PIXEL, POLY_RENDER, LINE_RENDER,
+		STROKE_PIXEL, 
+		
+		POLY_RENDER,
+		LINE_RENDER,
 		;
 	}
 	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
@@ -338,6 +328,7 @@ public class GLEngine  {
 		}, new int[]{2,2}, gl);
         applyProgram( type, params, pd, gl, GL2.GL_TRIANGLE_STRIP, 4);
         pd.free();
+        params.clearInternalParams();
 	}
 
 	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
@@ -354,6 +345,7 @@ public class GLEngine  {
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
 		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
+        params.clearInternalParams();
 	}
 	
 	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
@@ -369,9 +361,27 @@ public class GLEngine  {
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
 		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
+        params.clearInternalParams();
 	}
 
-	public void applyComplexLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
+	/**
+	 * Draws a complex line that transforms the line description into a geometric
+	 * shape by combining assorted primitive renders to create the specified 
+	 * join/cap methods.
+	 * 
+	 * @param xPoints	Array containing the x coordinates.
+	 * @param yPoints 	Array containing the x coordinates.
+	 * @param numPoints	Number of points to use for the render.
+	 * @param cap	How to draw the end-points.
+	 * @param join	How to draw the line joints.
+	 * @param loop	Whether or not to close the loop by joining the two end points 
+	 * 	together (cap is ignored if this is true because the curve has no end points)
+	 * @param width	Width of the line.
+	 * @param params	GLParameters describing the GL Attributes to use
+	 * @param trans		Transform to apply to the rendering.
+	 * @param gl
+	 */
+	public void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, AffineTransform trans, GL2 gl) 
 	{
@@ -401,10 +411,30 @@ public class GLEngine  {
 		}
 		
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( type, pd, size, cap, join, width, params, trans, gl);
+		_doCompliexLineProg( pd, size, cap, join, width, params, trans, gl);
 		pd.free();
+        params.clearInternalParams();
 	}
-	public void applyComplexLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
+	
+
+	/**
+	 * Draws a complex line that transforms the line description into a geometric
+	 * shape by combining assorted primitive renders to create the specified 
+	 * join/cap methods.
+	 * 
+	 * @param xPoints	Array containing the x coordinates.
+	 * @param yPoints 	Array containing the x coordinates.
+	 * @param numPoints	Number of points to use for the render.
+	 * @param cap	How to draw the end-points.
+	 * @param join	How to draw the line joints.
+	 * @param loop	Whether or not to close the loop by joining the two end points 
+	 * 	together (cap is ignored if this is true because the curve has no end points)
+	 * @param width	Width of the line.
+	 * @param params	GLParameters describing the GL Attributes to use
+	 * @param trans		Transform to apply to the rendering.
+	 * @param gl
+	 */
+	public void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, AffineTransform trans, GL2 gl) 
 	{
@@ -435,26 +465,28 @@ public class GLEngine  {
 		}
 		
 		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( type, pd, size, cap, join, width, params, trans, gl);
+		_doCompliexLineProg( pd, size, cap, join, width, params, trans, gl);
 		pd.free();
+        params.clearInternalParams();
 	}
 	
-	private void _doCompliexLineProg( ProgramType type, PreparedData pd, int count, CapMethod cap, 
+	private void _doCompliexLineProg( PreparedData pd, int count, CapMethod cap, 
 			JoinMethod join, float width, GLParameters params, AffineTransform trans, GL2 gl)
 	{
+		// TODO: implement Rounded joins and all cap methods
 		int uJoin = 0;
 		switch( join) {
 			case BEVEL: uJoin = 2;break;
 			case MITER: uJoin = 1; break;
 			case ROUNDED:break;
 		}
-		uJoin = 1;
 
 		gl.glEnable(GL2.GL_MULTISAMPLE );
-		params.addParam(new GLParameters.GLParam1i("uJoin",uJoin));
-		params.addParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
-		applyProgram( type, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
+		params.addInternalParam(new GLParameters.GLParam1i("uJoin",uJoin));
+		params.addInternalParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
+		applyProgram( ProgramType.LINE_RENDER, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
 		gl.glDisable(GL2.GL_MULTISAMPLE );
+        params.clearInternalParams();
 	}
 
 	public enum PolyType {
@@ -486,6 +518,7 @@ public class GLEngine  {
 		
 		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
 		pd.free();
+        params.clearInternalParams();
 	}
 	public void applyPolyProgram(
 			ProgramType type, 
@@ -508,6 +541,7 @@ public class GLEngine  {
 		
 		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
 		pd.free();
+        params.clearInternalParams();
 		
 	}
 	
@@ -523,7 +557,7 @@ public class GLEngine  {
 	        matrix = matrix2.multiply(matrix);
         }
         
-        params.addParam( new GLParameters.GLUniformMatrix4fv(
+        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
         		"perspectiveMatrix", 1, true, matrix.getBuffer()));
 	}
 	

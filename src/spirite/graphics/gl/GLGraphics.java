@@ -68,25 +68,37 @@ public class GLGraphics extends GraphicsContext{
 	public int getHeight() { return height;}
 	public void useFBO( GLMultiRenderer glmu) {
 		this.glmu = glmu;
-		this.width = this.glmu.width;
-		this.height = this.glmu.height;
+		setDimensions(this.glmu.width, this.glmu.height);
 	}
 	public void unuseFBO() {
 		this.glmu = null;
-		this.width = drawable.getSurfaceWidth();
-		this.height = drawable.getSurfaceHeight();
+		setDimensions(drawable.getSurfaceWidth()
+				, drawable.getSurfaceHeight());
 	}
-	
 	public GL2 getGL() { reset();return gl;}
+	
+	private void setDimensions(int width, int height) {
+		if( this.width == width && this.height == height)
+			return;
+		this.width = width;
+		this.height = height;
+		if( cachedPolyParams != null) {
+			cachedPolyParams.width = width;
+			cachedPolyParams.height= height;
+		}
+		if( cachedImgParams != null) {
+			cachedImgParams.width = width;
+			cachedImgParams.height= height;
+		}
+	}
 	
 	synchronized void reset() {
 		if( glmu != null) {
-			this.width = this.glmu.width;
-			this.height = this.glmu.height;
+			setDimensions(this.glmu.width, this.glmu.height);
 		}
 		else {
-			this.width = drawable.getSurfaceWidth();
-			this.height = drawable.getSurfaceHeight();
+			setDimensions(drawable.getSurfaceWidth()
+					, drawable.getSurfaceHeight());
 		}
 		this.gl = drawable.getGL().getGL2();
 		
@@ -195,12 +207,18 @@ public class GLGraphics extends GraphicsContext{
 	}
 	
 	@Override public void setColor(Color color) {
-		if( color != null) this.color = color;
+		if( color != null) {
+			this.color = color;
+//			updateImgParams = true;
+			updatePolyParams = true;
+		}
 	}
 	@Override
 	public void setComposite(Composite composite, float alpha) {
 		this.composite = composite;
 		this.alpha = alpha;
+		updateImgParams = true;
+		updatePolyParams = true;
 	}
 	public float getAlpha() {return alpha;}
 	public Composite getComposite() {return composite;}
@@ -233,9 +251,8 @@ public class GLGraphics extends GraphicsContext{
 		x_[1] = x_[2] = x + w;
 		y_[2] = y_[3] = y + h;
 		
-		GLParameters params = constructLineParams();
-		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, x_, y_, 4, 
+		GLParameters params = getLineParams();
+		engine.applyComplexLineProgram( x_, y_, 4, 
 				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
 				params, contextTransform, gl);
 	}
@@ -245,9 +262,8 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void drawPolyLine(int[] xPoints, int[] yPoints, int count) {
-		GLParameters params =constructLineParams();
-		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, xPoints, yPoints, count, 
+		GLParameters params =getLineParams();
+		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
 				params, contextTransform, gl);
 	}
@@ -257,9 +273,8 @@ public class GLGraphics extends GraphicsContext{
 		int y_[] = new int[2];
 		x_[0] = x1; x_[1] = x2;
 		y_[0] = y1; y_[1] = y2;
-		GLParameters params =constructLineParams();
-		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, x_, y_, 2, 
+		GLParameters params =getLineParams();
+		engine.applyComplexLineProgram(  x_, y_, 2, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
 				params, contextTransform, gl);
 //		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
@@ -270,26 +285,15 @@ public class GLGraphics extends GraphicsContext{
 		FloatCompactor x_ = new FloatCompactor();
 		FloatCompactor y_ = new FloatCompactor();
 		
-		MUtil.shapeToPoints( shape, x_, y_, 1, true);
+		MUtil.shapeToPoints( shape, x_, y_, 1, false);
 
-		GLParameters params =constructLineParams();
+		GLParameters params =getLineParams();
 
 		float xPoints[] = x_.toArray();
 		float yPoints[] = y_.toArray();
-		engine.applyComplexLineProgram( 
-				ProgramType.LINE_RENDER, xPoints, yPoints, xPoints.length, 
+		engine.applyComplexLineProgram( xPoints, yPoints, xPoints.length, 
 				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
 				params, contextTransform, gl);
-	}
-
-	private GLParameters constructLineParams() {
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
-		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
-		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
-		
-		setCompositeBlend(params, composite);
-		return params;
 	}
 	
 	public static void setCompositeBlend( GLParameters params, Composite comp) {
@@ -312,7 +316,7 @@ public class GLGraphics extends GraphicsContext{
 		y_[1] = y_[3] = y + h;
 		
 
-		GLParameters params = constructPolyParams();
+		GLParameters params = getPolyParams();
 		engine.applyPolyProgram(ProgramType.POLY_RENDER, x_, y_, x_.length, PolyType.STRIP, params, contextTransform, gl);
 		
 	}
@@ -328,7 +332,7 @@ public class GLGraphics extends GraphicsContext{
 		Shape shape = new Ellipse2D.Float(x, y, w, h);
 		MUtil.shapeToPoints( shape, x_, y_, 0.01, true);
 
-		GLParameters params = constructPolyParams();
+		GLParameters params = getPolyParams();
 
 		float xPoints[] = x_.toArray();
 		float yPoints[] = y_.toArray();
@@ -336,18 +340,10 @@ public class GLGraphics extends GraphicsContext{
 		engine.applyPolyProgram( ProgramType.POLY_RENDER, xPoints, yPoints, xPoints.length, PolyType.FAN, params, contextTransform, gl);
 	}
 	
-	private GLParameters constructPolyParams() {
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
-		params.addParam( new GLParameters.GLParam3f("uColor", color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
-		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
-		setCompositeBlend(params, composite);
-		return params;
-	}
 	
 	@Override
 	public void drawImage(BufferedImage bi, int x, int y) {
-		GLParameters params = constroctImgParams();
+		GLParameters params = getImgParams();
 		params.texture = new GLParameters.GLImageTexture(bi);
 		
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
@@ -356,18 +352,54 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void drawHandle(ImageHandle handle, int x, int y) {
-		GLParameters params =constroctImgParams();
+		GLParameters params =getImgParams();
 		params.texture = handle.accessGL();
 
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, params.texture.getWidth(), params.texture.getHeight(), false, gl);
 	}
 	
-	private GLParameters constroctImgParams() {
-		GLParameters params = new GLParameters(width, height);
-		params.flip = flip;
-		params.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
-		setCompositeBlend(params, composite);
-		return params;
+	
+	// =============
+	// ==== GLParameter Management
+	private GLParameters cachedPolyParams = null;
+	private GLParameters cachedImgParams = null;
+	private boolean updatePolyParams = true;
+	private boolean updateImgParams = true;
+	
+	private GLParameters getLineParams() {
+		return getPolyParams();
+	}
+
+	private GLParameters getPolyParams() {
+		if( cachedPolyParams == null) {
+			cachedPolyParams = new  GLParameters(width, height);
+			updatePolyParams = true;
+		}
+		if( updatePolyParams) {
+			cachedPolyParams.flip = flip;
+			cachedPolyParams.clearParams();
+			cachedPolyParams.addParam( new GLParameters.GLParam3f("uColor", 
+					color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
+			cachedPolyParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+			setCompositeBlend(cachedPolyParams, composite);
+			updatePolyParams = false;
+		}
+		return cachedPolyParams;
+	}
+	
+	private GLParameters getImgParams() {
+		if( cachedImgParams == null) {
+			cachedImgParams = new  GLParameters(width, height);
+			updateImgParams = true;
+		}
+		if( updateImgParams) {
+			cachedImgParams.flip = flip;
+			cachedImgParams.clearParams();
+			cachedImgParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+			setCompositeBlend(cachedImgParams, composite);
+			updateImgParams = false;
+		}
+		return cachedImgParams;
 	}
 }

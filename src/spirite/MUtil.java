@@ -17,14 +17,11 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseEvent;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
-import java.awt.image.ImageConsumer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Hashtable;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
@@ -309,7 +306,7 @@ public class MUtil {
 		// Note: this also pulls double-duty of checking the special case
 		//	of the 0th row and column, which simplifies the Binary Search
 		if( !data.rowIsEmpty(0) || ! data.colIsEmpty(0))
-			data.setBG(data.h-1, data.w-1);
+			data.setBG(data.w-1, data.h-1);
 		
 		if(transparentOnly && !data.isBGTransparent())
 			return new Rectangle(0,0,data.w,data.h);
@@ -483,7 +480,7 @@ public class MUtil {
 		}
 	}
 	
-	// Really seems like this should be a native function
+	// Really seems like this should be a native class
 	public static class TransferableImage implements Transferable {
 		private Image image;
 		public TransferableImage( Image image) {this.image = image;}

@@ -20,7 +20,6 @@ import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;
 import spirite.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.image_data.ReferenceManager.MReferenceObserver;
-import spirite.image_data.ReferenceManager.Reference;
 import spirite.panel_work.WorkPanel;
 import spirite.panel_work.WorkPanel.View;
 

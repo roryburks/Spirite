@@ -25,8 +25,8 @@ import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import spirite.brains.MasterControl;
-import spirite.brains.SettingsManager;
 import spirite.brains.MasterControl.MWorkspaceObserver;
+import spirite.brains.SettingsManager;
 import spirite.image_data.ImageWorkspace;
 import spirite.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.image_data.ImageWorkspace.MImageObserver;

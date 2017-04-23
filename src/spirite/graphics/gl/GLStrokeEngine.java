@@ -1,7 +1,5 @@
 package spirite.graphics.gl;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -11,7 +9,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
-import jogamp.opengl.macosx.cgl.MacOSXCGLDrawable.GLBackendType;
 import mutil.MatrixBuilder;
 import spirite.Globals;
 import spirite.graphics.GraphicsContext;

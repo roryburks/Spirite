@@ -33,7 +33,6 @@ import spirite.file.LoadEngine;
 import spirite.file.SaveEngine;
 import spirite.graphics.gl.engine.GLCache;
 import spirite.graphics.gl.engine.GLEngine;
-import spirite.graphics.gl.engine.GLEngine.MGLException;
 import spirite.image_data.GroupTree;
 import spirite.image_data.GroupTree.LayerNode;
 import spirite.image_data.GroupTree.Node;
@@ -413,8 +412,13 @@ public class MasterControl
     	public boolean executeCommand( String command);
     }
     
-    /** Command Executer for "global.*" commands.  These are abstract or top-level
-     * commands such as "Save", "Undo", "Copy", and "Paste"     */
+    /** 
+     * global.* Command Executer
+     * 
+     * These are abstract or top-level commands such as "Save", "Undo", "Copy", 
+     * "Paste" and other things which have a higher context than manipulating 
+     * data within a single Workspace
+     */
     class GlobalCommandExecuter implements CommandExecuter {
     	final Map<String, Runnable> commandMap = new HashMap<>();
     	GlobalCommandExecuter() {
@@ -523,12 +527,15 @@ public class MasterControl
     			// Copies the current default render to the Clipboard
     			RenderSettings settings = new RenderSettings(
     					renderEngine.getDefaultRenderTarget(currentWorkspace));
-//    			settings.workspace = currentWorkspace;
     			
     			// Should be fine to send Clipboard an internal reference since once
     			//	rendered, the RenderEngine's cache should be immutable
     	    	BufferedImage img = renderEngine.renderImage(settings);
-    	    	TransferableImage transfer = new TransferableImage(img);
+    	    	
+    	    	BufferedImage bi = currentWorkspace.getSelectionEngine().getBuiltSelection()
+    	    			.liftSelectionFromImage(img, 0, 0);
+
+    	    	TransferableImage transfer = new TransferableImage(bi);
     	    	
     	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
     	    	c.setContents(transfer, null);
@@ -614,8 +621,12 @@ public class MasterControl
 		}
     }
 
-    /** Command Executre for "draw.*" commands.  These are commands that make
-     * direct and immediate changes to the image.     */
+    /** 
+     * draw.* Command Executer
+     * 
+     * These are commands that make direct and immediate changes to the current
+     * ImageWorkspace's image data (usually the active data)
+     * */
     class RelativeWorkspaceCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
     	
@@ -707,11 +718,10 @@ public class MasterControl
     		}});
     		commandMap.put("applyTransform", new Runnable() {@Override public void run() {
     			workspace.getSelectionEngine().applyProposedTransform();
-    			Penner p = frameManager.getPennerForWorkspace(workspace);
+    			Penner p = frameManager.getPenner();
     			if( p != null)
     				p.cleanseState();
     		}});
-
     		commandMap.put("toggle_reference", new Runnable() {@Override public void run() {
 					ReferenceManager rm = workspace.getReferenceManager();
 					rm.setEditingReference(!rm.isEditingReference());

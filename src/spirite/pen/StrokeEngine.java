@@ -1,6 +1,5 @@
 package spirite.pen;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;

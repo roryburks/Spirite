@@ -1,7 +1,5 @@
 package spirite.image_data;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
@@ -10,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import spirite.graphics.GraphicsContext;
-import spirite.graphics.awt.AWTContext;
 import spirite.image_data.GroupTree.Node;
 import spirite.image_data.layers.Layer;
 

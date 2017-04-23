@@ -22,7 +22,7 @@ import spirite.graphics.gl.engine.GLEngine.PreparedTexture;
  *
  */
 public class GLParameters {
-	public final List<GLParam> params = new ArrayList<>();
+	final List<GLParam> params = new ArrayList<>();
 	public GLTexture texture;
 	public GLTexture texture2;
 	public int width, height;
@@ -45,10 +45,33 @@ public class GLParameters {
 		params.clear();
 	}
 
-	public void apply( GL2 gl, int prog) {
+	// Not sure if this needs to be package-scoped
+	void apply( GL2 gl, int prog) {
 		for( GLParam param : params) {
 			param.apply(gl, prog);
 		}
+		for( GLParam param : internalParams) {
+			param.apply(gl, prog);
+		}
+	}
+	
+	// =============
+	// ==== Internal Parameters
+	//	In order to make GLParameters re-useable but not add time/energy/modularity
+	//	bloat by copying everything internally, a separate Internal Parameter list
+	//	is maintained where the GLEngine can add GLParams that are needed internally
+	//	(such as the perspectiveMatrix) to be removed once it's finished with them.
+	//
+	//	NOTE: this makes GLParameters somewhat less Multithread friendly, but excessive
+	//	care is already needed working with JOGL in multiple threads.
+
+	final List<GLParam> internalParams = new ArrayList<>();
+	
+	void addInternalParam( GLParam param) {
+		internalParams.add(param);
+	}
+	void clearInternalParams() {
+		internalParams.clear();
 	}
 	
 	// =============
