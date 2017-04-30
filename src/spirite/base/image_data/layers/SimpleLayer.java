@@ -1,6 +1,5 @@
 package spirite.base.image_data.layers;
 
-//import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +18,6 @@ import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
-import spirite.pc.graphics.ImageBI;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;

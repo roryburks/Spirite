@@ -1,4 +1,4 @@
-package spirite.pc.pen;
+package spirite.base.pen;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,15 +12,16 @@ import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.DrawEngine;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
+import spirite.base.pen.PenTraits.PenDynamics;
+import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.Colors;
 import spirite.base.util.Interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.Interpolation.InterpolatedPoint;
 import spirite.base.util.Interpolation.Interpolator2D;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.pen.PenTraits.PenDynamics;
-import spirite.pc.pen.PenTraits.PenState;
 
 public abstract class StrokeEngine {
 
@@ -305,7 +306,7 @@ public abstract class StrokeEngine {
 			CUBIC_SPLINE,
 		}
 		
-		private Color c = Color.BLACK;
+		private int c = Colors.BLACK;
 		private StrokeEngine.Method method = StrokeEngine.Method.BASIC;
 		private float width = 1.0f;
 		private float alpha = 1.0f;
@@ -326,8 +327,8 @@ public abstract class StrokeEngine {
 		 */
 		public boolean isLocked() {return locked;}
 
-		public Color getColor() {return new Color( c.getRGB());}
-		public void setColor( Color c) {
+		public int getColor() {return c;}
+		public void setColor( int c) {
 			if( !locked)
 				this.c = c;
 		}

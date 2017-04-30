@@ -18,7 +18,7 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
-import spirite.pc.pen.Penner;
+import spirite.base.pen.Penner;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 

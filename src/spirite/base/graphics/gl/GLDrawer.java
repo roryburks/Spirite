@@ -17,10 +17,11 @@ import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.util.Colors;
 import spirite.base.image_data.RawImage;
 import spirite.hybrid.HybridHelper;
-import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.StrokeEngine;;
+import spirite.pc.graphics.ImageBI;;
 
 
 /**
@@ -56,7 +57,7 @@ public class GLDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void changeColor(RawImage image, Color from, Color to, int mode) {
+	public void changeColor(RawImage image, int from, int to, int mode) {
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
 
     	GL2 gl = engine.getGL2();
@@ -64,9 +65,9 @@ public class GLDrawer extends GraphicsDrawer {
     	
     	params.addParam( new GLParam1i("optionMask", mode | 4));
     	params.addParam( new GLParam4f("cFrom", 
-    			from.getRed()/255f, from.getGreen()/255f, from.getBlue()/255f, from.getAlpha()/255f));
+    			Colors.getRed(from)/255f, Colors.getGreen(from)/255f, Colors.getBlue(from)/255f, Colors.getAlpha(from)/255f));
     	params.addParam( new GLParam4f("cTo", 
-    			to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f));
+    			Colors.getRed(to)/255f, Colors.getGreen(to)/255f, Colors.getBlue(to)/255f, Colors.getAlpha(to)/255f));
 
     	params.texture = new GLImageTexture( image);
 

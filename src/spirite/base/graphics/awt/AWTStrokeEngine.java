@@ -2,17 +2,18 @@ package spirite.base.graphics.awt;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.MUtil;
 import spirite.hybrid.HybridHelper;
-import spirite.pc.pen.StrokeEngine;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.PenTraits.PenState;
 
 /***
  * The StrokeEngine operates asynchronously to the input data.  In general
@@ -83,7 +84,7 @@ class AWTStrokeEngine extends StrokeEngine{
 		
 		Graphics g = layer.getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
-		g.setColor( stroke.getColor());
+		g.setColor( new Color(stroke.getColor()));
 
 		for( int i=1; i < states.size(); ++i) {
 			PenState fromState = states.get(i-1);

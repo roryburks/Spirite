@@ -33,12 +33,12 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
-import spirite.pc.pen.StrokeEngine;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.PenTraits.PenState;
 
 /**
  * @author Guy
@@ -86,10 +86,10 @@ public class Test1 {
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), HybridHelper.BI_FORMAT);
+			RawImage img = HybridHelper.createImage(rig.getWidth(),rig.getHeight());
 			
 			workspace.getUndoEngine().performAndStore(
-					rig.createAddPartAction(bi, 0, 0, 0,""));
+					rig.createAddPartAction(img, 0, 0, 0,""));
 		}
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	
@@ -256,7 +256,7 @@ public class Test1 {
 			
 			params.setAlpha( rn.nextFloat());
 			params.setMethod((random == 3)?StrokeEngine.Method.BASIC:StrokeEngine.Method.ERASE);
-			params.setColor( randomColor() );
+			params.setColor( randomColor().getRGB() );
 			params.setWidth( rn.nextInt(5));
 			
 			StrokeAction action =

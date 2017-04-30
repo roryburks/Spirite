@@ -31,6 +31,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -356,10 +357,10 @@ public class RigPanel extends OmniComponent
 		switch( evt.getActionCommand()) {
 		case "newPart":
 			if( rig != null) {
-				BufferedImage bi = new BufferedImage(1, 1, HybridHelper.BI_FORMAT);
+				RawImage img = HybridHelper.createImage(1, 1);
 				
 				workspace.getUndoEngine().performAndStore(
-						rig.createAddPartAction(bi, 0, 0, 0,""));
+						rig.createAddPartAction(img, 0, 0, 0,""));
 			}
 			break;
 		case "remPart":

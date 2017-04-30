@@ -66,8 +66,8 @@ public class PaletteManager
     
     // ==================
     // ==== Active Color Methods
-    public Color getActiveColor( int i) {
-    	return active_colors.get(i);
+    public int getActiveColor( int i) {
+    	return active_colors.get(i).getRGB();
     }
     public void setActiveColor( int i, Color color) {
     	active_colors.set(i, color);

@@ -1,21 +1,9 @@
 package spirite.base.image_data;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.activation.UnsupportedDataTypeException;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -28,15 +16,16 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.Colors;
 import spirite.base.util.DataCompaction.IntCompactor;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
+import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.graphics.ImageBI;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -63,7 +52,7 @@ public class SelectionEngine {
 	// Variables related to Selection state
 	private BuiltSelection built = new BuiltSelection(null,0,0);
 	private boolean lifted = false;
-	protected BufferedImage liftedImage = null;
+	protected RawImage liftedImage = null;
 	
 	
 	
@@ -116,7 +105,7 @@ public class SelectionEngine {
 	}
 	
 	public Selection getSelection() {return built.selection;}
-	public BufferedImage getLiftedImage() {return liftedImage;}
+	public RawImage getLiftedImage() {return liftedImage;}
 
 	public MatTrans getDrawFromTransform() {
 		MatTrans trans = new MatTrans();
@@ -321,69 +310,61 @@ public class SelectionEngine {
 	}
 		
 	public BuiltSelection combineSelection( BuiltSelection sel1, BuiltSelection sel2) {
-		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
+		RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
 		
-		Graphics g = bi.getGraphics();
-		GraphicsContext gc = new AWTContext(g, bi.getWidth(), bi.getHeight());
+		GraphicsContext gc = img.getGraphics();
 		if( sel1 != null)
 			sel1.drawSelectionMask(gc);
 		if( sel2 != null)
 			sel2.drawSelectionMask(gc);
-		g.dispose();
+//		g.dispose();
 		
-		return new BuiltSelection( bi);
+		return new BuiltSelection( img);
 	}
 	public BuiltSelection subtractSelection( BuiltSelection sel1, BuiltSelection sel2){
-
-		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
+		RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
 		
-		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		GraphicsContext gc = new AWTContext(g2, bi.getWidth(), bi.getHeight());
+		GraphicsContext gc = img.getGraphics();
 		if( sel1 != null)
 			sel1.drawSelectionMask(gc);
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+		gc.setComposite( Composite.DST_OUT, 1.0f);
 		if( sel2 != null)
 			sel2.drawSelectionMask(gc);
-		g2.dispose();
+//		gc.dispose();
 
-		return new BuiltSelection( bi);
+		return new BuiltSelection( img);
 	}
 	public BuiltSelection intersectSelection( BuiltSelection sel1, BuiltSelection sel2){
-		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
-		BufferedImage bi2 = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
+		RawImage img1 = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
+		RawImage img2 = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
 		
 		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
 		
-		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		sel1.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
-		g2.dispose();
+		GraphicsContext gc = img1.getGraphics();
+		sel1.drawSelectionMask( gc);
+//		g2.dispose();
 		
 
-		g2 = (Graphics2D)bi2.getGraphics();
-		sel2.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
-		g2.drawImage( bi, 0, 0, null);
-		g2.dispose();
+		gc = img2.getGraphics();
+		sel2.drawSelectionMask(gc);
+		gc.setComposite(Composite.DST_IN, 1.0f);
+		gc.drawImage( img1, 0, 0);
+//		g2.dispose();
 
-		return new BuiltSelection( bi2);
+		return new BuiltSelection( img2);
 	}
 	public BuiltSelection invertSelection( BuiltSelection sel) {
-		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
+		RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
 		
-		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
+		GraphicsContext gc = img.getGraphics();
+		gc.setColor(Colors.WHITE);
+		gc.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
+		gc.setComposite(Composite.DST_OUT, 1.0f);
 		if( sel != null)
-			sel.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
-		g2.dispose();
+			sel.drawSelectionMask(gc);
+//		g2.dispose();
 
-		return new BuiltSelection( bi);
+		return new BuiltSelection( img);
 	}
 	public void transformSelection( MatTrans trans) {
 		RawImage img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
@@ -396,7 +377,7 @@ public class SelectionEngine {
 		gc.translate(-d.x/2, -d.y/2);
 		built.selection.drawSelectionMask(gc);
 //		g2.dispose();
-		BuiltSelection sel = new BuiltSelection( ((ImageBI)img).img);
+		BuiltSelection sel = new BuiltSelection( img);
 		
 		List<UndoableAction> actions = new ArrayList<>(2); 
 		actions.add( new SetSelectionAction(sel));
@@ -407,7 +388,7 @@ public class SelectionEngine {
 			gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
 			gc.transform(trans);
 			gc.translate(-d.x/2, -d.y/2);
-			gc.drawImage( new ImageBI(liftedImage), 0, 0);
+			gc.drawImage( liftedImage, 0, 0);
 //			g2.dispose();
 			
 			Vec2i afterDim = sel.selection.getDimension();
@@ -418,7 +399,7 @@ public class SelectionEngine {
 			gc.drawImage(img, -sel.offsetX, -sel.offsetY );
 //			gc.dispose();
 			
-			actions.add( new SetLiftedAction(((ImageBI)afterLift).img));
+			actions.add( new SetLiftedAction(afterLift));
 		}
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Transform Lifted Selection"));
@@ -427,20 +408,18 @@ public class SelectionEngine {
 
 	
 	
-	public void imageToSelection( BufferedImage bi, int ox, int oy) {
-		if( bi == null) return;
-		
-		
+	public void imageToSelection( RawImage img, int ox, int oy) {
+		if( img == null) return;
 		
 		List<UndoableAction> actions = new ArrayList<>(2);
 		actions.add(createNewSelectAction(buildRectSelection(
-				new Rectangle( ox, oy, bi.getWidth(), bi.getHeight()))));
-		actions.add( new SetLiftedAction(bi));
+				new Rect( ox, oy, img.getWidth(), img.getHeight()))));
+		actions.add( new SetLiftedAction(img));
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Pasted Image to Layer"));
 	}
 	
-	public BuiltSelection buildRectSelection( Rectangle rect) {
+	public BuiltSelection buildRectSelection( Rect rect) {
 		RectSelectionBuilder rsb = new RectSelectionBuilder();
 		rsb.start(rect.x, rect.y);
 		rsb.update(rect.x+rect.width, rect.y+rect.height);
@@ -473,7 +452,7 @@ public class SelectionEngine {
 		BuiltSelection mask = getBuiltSelection();
 		BuiltImageData builtImage = workspace.buildData(node);
 		
-		return new SetLiftedAction(((ImageBI)mask.liftSelectionFromData(builtImage)).img);
+		return new SetLiftedAction(mask.liftSelectionFromData(builtImage));
 	}
 	
 	public UndoableAction createNewSelectAction( BuiltSelection selection) {
@@ -538,22 +517,22 @@ public class SelectionEngine {
 	
 	
 	public class PasteSelectionAction extends ImageAction {
-		final BufferedImage liftedImage;
+		final RawImage liftedImage;
 		private final BuiltSelection builtSelection;
 		
 		protected PasteSelectionAction(
-				BufferedImage liftedImage, 
+				RawImage liftedImage2, 
 				BuiltImageData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
 			super(builtActiveData);
-			this.liftedImage = liftedImage;
+			this.liftedImage = liftedImage2;
 			this.builtSelection = builtSelection;
 		}
 		@Override
 		protected void performImageAction() {
 			GraphicsContext gc = builtImage.checkout();
-			gc.drawImage(new ImageBI(liftedImage), builtSelection.offsetX, builtSelection.offsetY);
+			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
 			builtImage.checkin();
 		}
 	}
@@ -636,8 +615,8 @@ public class SelectionEngine {
 		}
 	}
 	public class SetLiftedAction extends SelectionAction {
-		private final BufferedImage newLifted, oldLifted;
-		SetLiftedAction( BufferedImage newLifted) 
+		private final RawImage newLifted, oldLifted;
+		SetLiftedAction( RawImage newLifted) 
 		{
 			super( workspace.getSelectedNode());
 			this.newLifted = newLifted;
@@ -666,21 +645,21 @@ public class SelectionEngine {
 	 * or other transforms built into it.*/
 	public static class Selection 
 	{
-		private final BufferedImage bi;
+		private final RawImage bi;
 		static int c = 0;
 		
 		/** NOTE: To properly draw the border, the supplied buffered image should
 		 * be cropped with a 1-pixel border (if it's cropped at all).
 		 */
-		Selection(BufferedImage bi) {
-			this.bi = bi;
+		Selection(RawImage img) {
+			this.bi = img;
 		}
 		
 		public void drawSelectionBounds(GraphicsContext gc) {
 			gc.drawBounds(bi, c);
 		}
 		public void drawSelectionMask(GraphicsContext gc) {
-			gc.drawImage(new ImageBI(bi), 0, 0);
+			gc.drawImage(bi, 0, 0);
 		}
 		public boolean contains(int x, int y) {
 			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
@@ -692,7 +671,7 @@ public class SelectionEngine {
 			return new Vec2i( bi.getWidth(), bi.getHeight());
 		}
 		public Selection clone() {
-			return new Selection(MUtil.deepCopy(bi));
+			return new Selection(bi.deepCopy());
 		}
 	}
 
@@ -703,11 +682,11 @@ public class SelectionEngine {
 		public final int offsetX;
 		public final int offsetY;
 
-		public BuiltSelection( BufferedImage bi) {
+		public BuiltSelection( RawImage img) {
 			Rect bounds = null;
 			try {
-				bounds = MUtil.findContentBounds(bi, 2, true);
-			} catch (UnsupportedDataTypeException e) {
+				bounds = HybridUtil.findContentBounds(img, 2, true);
+			} catch ( UnsupportedImageTypeException e) {
 				MDebug.handleError(ErrorType.STRUCTURAL, e, e.getMessage());
 			}
 			if( bounds == null || bounds.isEmpty()) {
@@ -716,14 +695,13 @@ public class SelectionEngine {
 				offsetY = 0;
 			}
 			else {
-				BufferedImage bi2 = bi;
-				bi = new BufferedImage( 
-						bounds.width, bounds.height, HybridHelper.BI_FORMAT);
-				Graphics g = bi.getGraphics();
-				g.drawImage(bi2, -bounds.x, -bounds.y, null);
-				g.dispose();
+				RawImage bi2 = img;
+				img = HybridHelper.createImage(bounds.width, bounds.height);
+				GraphicsContext gc = img.getGraphics();
+				gc.drawImage(bi2, -bounds.x, -bounds.y);
+//				g.dispose();
 				
-				selection = new Selection(bi);
+				selection = new Selection(img);
 				offsetX = bounds.x;
 				offsetY = bounds.y;
 			}
@@ -848,15 +826,14 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
-			Graphics g = bi.getGraphics();
-			g.fillRect(
+			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
+			GraphicsContext gc = img.getGraphics();
+			gc.fillRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
-			g.dispose();
+//			g.dispose();
 			
-			return new BuiltSelection( bi);
+			return new BuiltSelection( img);
 		}
 		@Override
 		protected void draw(GraphicsContext g) {
@@ -886,15 +863,14 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
-			Graphics g = bi.getGraphics();
-			g.fillOval(
+			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
+			GraphicsContext gc = img.getGraphics();
+			gc.fillOval(
 					Math.min(startX, currentX), Math.min(startY, currentY),
 					Math.abs(startX-currentX), Math.abs(startY-currentY));
-			g.dispose();
+//			g.dispose();
 			
-			return new BuiltSelection( bi);
+			return new BuiltSelection( img);
 		}
 		@Override
 		protected void draw(GraphicsContext g) {
@@ -921,18 +897,13 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
+			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
+
+			GraphicsContext gc = img.getGraphics();
+			gc.setColor(Colors.WHITE);
+			gc.fillPolygon( compactor_x.toArray(), compactor_y.toArray(), compactor_x.size());
 			
-			Polygon pg = new Polygon();
-			for( int i=0; i<compactor_x.size(); i += 1) {
-				pg.addPoint(compactor_x.get(i), compactor_y.get(i));
-			}
-			Graphics g = bi.getGraphics();
-			g.setColor(Color.WHITE);
-			g.fillPolygon(pg);
-			g.dispose();
-			
-			return new BuiltSelection(bi);
+			return new BuiltSelection(img);
 		}
 
 		@Override
@@ -943,12 +914,12 @@ public class SelectionEngine {
 							compactor_x.getChunkSize(i));
 			}
 		}
-		public Point getStart() {
-			return new Point( compactor_x.get(0), compactor_y.get(0));
+		public Vec2i getStart() {
+			return new Vec2i( compactor_x.get(0), compactor_y.get(0));
 		}
-		public Point getEnd() {
+		public Vec2i getEnd() {
 			int s = compactor_x.size();
-			return new Point( compactor_x.get(s-1), compactor_y.get(s-1));
+			return new Vec2i( compactor_x.get(s-1), compactor_y.get(s-1));
 		}
 		
 	}

@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import javax.activation.UnsupportedDataTypeException;
-
 import spirite.base.brains.CacheManager;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine;
@@ -47,7 +45,6 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-//import spirite.pc.graphics.ImageBI;
 
 
 /***

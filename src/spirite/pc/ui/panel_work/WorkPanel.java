@@ -31,10 +31,10 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.pen.Penner;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.pc.pen.JPenPenner;
-import spirite.pc.pen.Penner;
 import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 import spirite.pc.ui.panel_work.gl.GLWorkArea;
 

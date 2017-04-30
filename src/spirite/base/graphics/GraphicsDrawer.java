@@ -6,8 +6,8 @@ import java.awt.image.BufferedImage;
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.pen.StrokeEngine;
 import spirite.base.image_data.RawImage;
-import spirite.pc.pen.StrokeEngine;
 
 /**
  * Similar to GraphicsContext, GraphicsDrawer encapsulates certain graphics 
@@ -30,6 +30,6 @@ public abstract class GraphicsDrawer {
 	/** Renders the described algorithm to a BufferedImge. */
 	public abstract BufferedImage renderToImage( RenderRoutine renderable, int width, int height);
 	
-	public abstract void changeColor( RawImage image, Color from, Color to, int mode);
+	public abstract void changeColor( RawImage image, int cFrom, int cTo, int mode);
 	public abstract void invert(RawImage image);
 }

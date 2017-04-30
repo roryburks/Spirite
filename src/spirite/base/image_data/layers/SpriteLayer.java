@@ -1,7 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +15,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
@@ -25,7 +24,6 @@ import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.graphics.ImageBI;
 
 
 /**
@@ -167,7 +165,7 @@ public class SpriteLayer extends Layer
 	 * This is the only way to create parts and outside of the ImageData
 	 * namespace, it must be passed through the UndoEngine.performAndStoreAction
 	 * method.*/
-	public UndoableAction createAddPartAction(BufferedImage image, int ox, int oy, int depth, String partName) {
+	public UndoableAction createAddPartAction(RawImage image, int ox, int oy, int depth, String partName) {
 		updateContext();
 		if( context == null)
 			return null;
@@ -194,7 +192,7 @@ public class SpriteLayer extends Layer
 		}
 		
 		
-		Part part = new Part(context.importDynamicData(new ImageBI(image)), testing);
+		Part part = new Part(context.importDynamicData(image), testing);
 		part.ox = ox;
 		part.oy = oy;
 		part.depth = depth;

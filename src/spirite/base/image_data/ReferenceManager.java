@@ -1,7 +1,6 @@
 package spirite.base.image_data;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
+//import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,7 +10,6 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;
-import spirite.pc.graphics.ImageBI;
 
 /**
  * ReferenceManager manages the Reference system.
@@ -66,8 +64,8 @@ public class ReferenceManager {
 		}
 	}
 	public class ImageReference extends Reference {
-		public final BufferedImage image;
-		ImageReference( BufferedImage image) {
+		public final RawImage image;
+		ImageReference( RawImage image) {
 			this.image = image;
 			this.global = false;
 		}
@@ -80,7 +78,7 @@ public class ReferenceManager {
 			newTrans.concatenate(localTransform);
 			gc.setTransform(newTrans);
 			
-			gc.drawImage( new ImageBI(image), 0, 0);
+			gc.drawImage( image, 0, 0);
 
 			gc.setTransform(oldTrans);
 		}
@@ -179,7 +177,7 @@ public class ReferenceManager {
 			triggerReferenceStructureChanged(true);
 		}
 	}
-	public void addReference( BufferedImage toAdd, int index, MatTrans local) {
+	public void addReference( RawImage toAdd, int index, MatTrans local) {
 		if( toAdd != null) {
 			Reference ref = new ImageReference(toAdd);
 			ref.localTransform = local;

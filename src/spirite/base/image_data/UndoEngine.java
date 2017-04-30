@@ -1,9 +1,5 @@
 package spirite.base.image_data;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,11 +17,9 @@ import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;
-import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.graphics.ImageBI;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover

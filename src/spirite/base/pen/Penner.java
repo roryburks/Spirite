@@ -1,4 +1,4 @@
-package spirite.pc.pen;
+package spirite.base.pen;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -48,6 +48,12 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.pen.PenTraits.ButtonType;
+import spirite.base.pen.PenTraits.MButtonEvent;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine.Method;
+import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
@@ -56,10 +62,6 @@ import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.PenTraits.ButtonType;
-import spirite.pc.pen.PenTraits.MButtonEvent;
-import spirite.pc.pen.PenTraits.PenState;
-import spirite.pc.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -340,7 +342,7 @@ public class Penner
 				
 				if( sel == null || sel.selection == null) {
 					selectionEngine.setSelection( selectionEngine.buildRectSelection(
-							new Rectangle(0,0,workspace.getWidth(),workspace.getHeight())));
+							new Rect(0,0,workspace.getWidth(),workspace.getHeight())));
 				}
 				if( !selectionEngine.isLifted())
 					selectionEngine.liftData();
@@ -395,11 +397,11 @@ public class Penner
 	// :::: Single-click actions that don't require StateBehavior
 	private void fill( boolean leftClick) {
 		// Determine Color
-		Color c = (leftClick) ? 
+		int c = (leftClick) ? 
 				paletteManager.getActiveColor(0)
 				: paletteManager.getActiveColor(1);
 				
-		if( holdingCtrl) c = new Color(0,0,0,0);
+		if( holdingCtrl) c = 0x00000000;
 
 		// Grab the Active Data
 		BuiltImageData data = workspace.buildActiveData();
@@ -532,9 +534,9 @@ public class Penner
 	
 
 	class PenBehavior extends StrokeBehavior {
-		final Color color;
-		PenBehavior( Color color) {
-			this.color = color;
+		final int color;
+		PenBehavior( int i) {
+			this.color = i;
 		}
 		@Override
 		public void start() {
@@ -550,9 +552,9 @@ public class Penner
 		}
 	}
 	class PixelBehavior extends StrokeBehavior {
-		final Color color;
-		PixelBehavior( Color color) {
-			this.color = color;
+		final int color;
+		PixelBehavior( int i) {
+			this.color = i;
 		}
 		@Override
 		public void start() {
@@ -736,7 +738,7 @@ public class Penner
 		}
 		@Override public void onTock() {}
 		public boolean testFinish() {
-			Point p_s = builder.getStart();
+			Vec2i p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
 				selectionEngine.finishBuildingSelection();
 				this.end();
@@ -757,7 +759,7 @@ public class Penner
 		@Override
 		public void paintOverlay(GraphicsContext g) {
 			if( !drawing) {
-				Point p_e = builder.getEnd();
+				Vec2i p_e = builder.getEnd();
 				
 				g.setColor( Colors.BLACK);
 				g.drawLine(view.itsXm(p_e.x), view.itsYm(p_e.y), 
@@ -765,7 +767,7 @@ public class Penner
 
 			}
 
-			Point p_s = builder.getStart();
+			Vec2i p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
 				g.setColor( Colors.YELLOW);
 				g.fillOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);

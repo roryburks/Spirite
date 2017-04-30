@@ -305,7 +305,7 @@ public class ReferenceSchemePanel extends OmniComponent
 								g.drawImage(((ImageBI)bi).img, 0, 0, d.width, d.height, null);
 							}
 							else if( reference instanceof ImageReference){
-								BufferedImage bi = ((ImageReference) reference).image;
+								BufferedImage bi = ((ImageBI)((ImageReference) reference).image).img;
 								g.drawImage(bi, 
 										0, 0, bi.getWidth(), bi.getHeight(),
 										0, 0, d.width, d.height, null);

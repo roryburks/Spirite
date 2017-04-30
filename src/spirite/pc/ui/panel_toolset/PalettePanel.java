@@ -146,8 +146,8 @@ public class PalettePanel extends JPanel
     // :: MPaletteObserver
     @Override
     public void colorChanged() {
-        main.setBackground( paletteManager.getActiveColor(0));
-        sub.setBackground( paletteManager.getActiveColor(1));
+        main.setBackground( new Color(paletteManager.getActiveColor(0)));
+        sub.setBackground( new Color(paletteManager.getActiveColor(1)));
         
         repaint();
         palette.repaint();
@@ -258,7 +258,7 @@ public class PalettePanel extends JPanel
             this.index = index;
             this.setBorder( new EtchedBorder(EtchedBorder.LOWERED));
             this.setPreferredSize( new Dimension( 24,24));
-            this.setBackground( paletteManager.getActiveColor(index));
+            this.setBackground( new Color(paletteManager.getActiveColor(index)));
         }
         
         public Color getColor() {
@@ -299,8 +299,8 @@ public class PalettePanel extends JPanel
         @Override
         public void paintComponent( Graphics g) {
         	super.paintComponent(g);
-            Color selected1 = paletteManager.getActiveColor(0);
-            Color selected2 = paletteManager.getActiveColor(1);
+            Color selected1 = new Color(paletteManager.getActiveColor(0));
+            Color selected2 = new Color(paletteManager.getActiveColor(1));
             
             for( Entry<Integer, Color> entry : paletteManager.getPalette()) {
             	Color c = entry.getValue();
@@ -325,7 +325,7 @@ public class PalettePanel extends JPanel
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if( evt.getSource() == btnAddColor) {
-			paletteManager.addPaletteColor( paletteManager.getActiveColor(0));
+			paletteManager.addPaletteColor( new Color(paletteManager.getActiveColor(0)));
 		}
 		else if( evt.getSource() == btnLoadPalette) {
 			List<String> palettes = paletteManager.getStoredPaletteNames();

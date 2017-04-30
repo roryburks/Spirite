@@ -179,7 +179,7 @@ class GLNodeRenderer extends NodeRenderer {
 							trans.concatenate(workspace.getSelectionEngine().getDrawFromTransform());
 							glgc.setTransform(trans);
 							
-							glgc.drawImage( new ImageBI(workspace.getSelectionEngine().getLiftedImage()), 0, 0);
+							glgc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
 						}
 						if( workspace.getDrawEngine().strokeIsDrawing()) {
 							// Draw Stroke Layer

@@ -1,24 +1,13 @@
 package spirite.base.image_data;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
@@ -27,6 +16,11 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.pen.PenTraits;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.PenTraits.PenDynamics;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine.STATE;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
@@ -37,12 +31,7 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.PenTraits;
-import spirite.pc.pen.StrokeEngine;
-import spirite.pc.pen.PenTraits.PenDynamics;
-import spirite.pc.pen.PenTraits.PenState;
-import spirite.pc.pen.StrokeEngine.STATE;
+//import spirite.pc.graphics.ImageBI;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -137,7 +126,7 @@ public class DrawEngine {
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, Color color, BuiltImageData data)
+	public boolean fill( int x, int y, int color, BuiltImageData data)
 	{
 		if( data == null) return false;
 		
@@ -152,12 +141,12 @@ public class DrawEngine {
 		if( mask.selection != null && !mask.selection.contains(x - mask.offsetX, y-mask.offsetY)) {
 			return false;
 		}
-		if( bi.getRGB( p.x, p.y) == color.getRGB()) {
+		if( bi.getRGB( p.x, p.y) == color) {
 			return false;
 		}
 		data.checkin();
 
-		execute( new FillAction(new Point(x,y), color, mask, data));
+		execute( new FillAction(new Vec2i(x,y), color, mask, data));
 
 		return true;
 	}
@@ -193,7 +182,7 @@ public class DrawEngine {
 			img = flipImage(img, horizontal);
 			
 			// TODO: MARK
-			BuiltSelection sel2 =  new BuiltSelection( ((ImageBI)img).img);
+			BuiltSelection sel2 =  new BuiltSelection( img);
 			sel2 = new BuiltSelection( sel2.selection, sel2.offsetX+sel.offsetX, sel2.offsetX+sel.offsetY);
 			actions[1] = selectionEngine.createNewSelectAction(sel2);
 			
@@ -215,7 +204,7 @@ public class DrawEngine {
 	 * <li>1 : Converts RGB matches, ignoring alpha
 	 * <li>2 : Converts all RGB colors to the <code>to</code> color, preserving alpha
 	 */
-	public void changeColor( Color from, Color to, int scope, int mode) {
+	public void changeColor( int from, int to, int scope, int mode) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		
 		Node selected = null;
@@ -377,10 +366,10 @@ public class DrawEngine {
 		}
 	}
 	public class FillAction extends MaskedImageAction {
-		private final Point p;
-		private final Color color;
+		private final Vec2i p;
+		private final int color;
 		
-		private FillAction( Point p, Color c, BuiltSelection mask, BuiltImageData data) {
+		private FillAction( Vec2i p, int c, BuiltSelection mask, BuiltImageData data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -422,7 +411,7 @@ public class DrawEngine {
 //				gc.dispose();
 			}
 
-			DirectDrawer.fill(img, layerSpace.x, layerSpace.y, color.getRGB());
+			DirectDrawer.fill(img, layerSpace.x, layerSpace.y, color);
 
 
 			
@@ -452,8 +441,8 @@ public class DrawEngine {
 			}
 			builtImage.checkin();
 		}
-		public Point getPoint() { return new Point(p);}
-		public Color getColor() { return new Color(color.getRGB());}
+		public Vec2i getPoint() { return new Vec2i(p);}
+		public int getColor() { return color;}
 	}
 
 	public class ClearAction extends MaskedImageAction {
@@ -586,12 +575,12 @@ public class DrawEngine {
 	
 	public class ColorChangeAction extends PerformFilterAction 
 	{
-		private final Color from, to;
+		private final int from, to;
 		private final int mode;
 		private ColorChangeAction(
 				BuiltImageData data, 
 				BuiltSelection mask, 
-				Color from, Color to, 
+				int from, int to, 
 				int mode) 
 		{
 			super(data, mask);

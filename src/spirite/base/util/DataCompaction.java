@@ -37,11 +37,17 @@ public class DataCompaction {
         public int getChunkCount() { return data.size();}
         public int[] getChunk(int i) { return data.get(i);}
         public int getChunkSize(int i) {
-            if( size / CHUNK_SIZE < data.size()-1)
+            if( i < data.size()-1)
                 return CHUNK_SIZE;
-            if( size / CHUNK_SIZE > data.size()-1)
-                return 0;
             return size % CHUNK_SIZE;
+        }
+
+        public int[] toArray() {
+            int ret[] = new int[size];
+            for(int i=0; i <data.size(); ++i) {
+                System.arraycopy(data.get(i), 0, ret, CHUNK_SIZE*i, getChunkSize(i));
+            }
+            return ret;
         }
     }
 

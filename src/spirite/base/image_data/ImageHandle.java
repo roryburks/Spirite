@@ -1,7 +1,5 @@
 package spirite.base.image_data;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -13,7 +11,6 @@ import spirite.base.image_data.ImageWorkspace.InternalImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.graphics.ImageBI;
 
 /**
  * Under normal circumstances an ImageHandle is a logical connection to a

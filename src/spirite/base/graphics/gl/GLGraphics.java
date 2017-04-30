@@ -112,7 +112,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 
 	@Override
-	public void drawBounds(BufferedImage mask, int c) {
+	public void drawBounds(RawImage mask, int c) {
 		reset();
 
 		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
@@ -125,7 +125,7 @@ public class GLGraphics extends GraphicsContext{
 				GL2 gl2 = gl.getGL2();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
-				params2.texture = new GLImageTexture( new ImageBI(mask));
+				params2.texture = new GLImageTexture( mask);
 				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
 			}
@@ -416,5 +416,10 @@ public class GLGraphics extends GraphicsContext{
 			updateImgParams = false;
 		}
 		return cachedImgParams;
+	}
+	@Override
+	public void fillPolygon(int[] x, int[] y, int count) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -84,8 +84,8 @@ public class NewLayerDPanel extends JPanel {
 		initComponents();
 		
 		PaletteManager palette_manager = master.getPaletteManager();
-		colorPanelFG.setBackground( palette_manager.getActiveColor(0));
-		colorPanelBG.setBackground( palette_manager.getActiveColor(1));
+		colorPanelFG.setBackground( new Color(palette_manager.getActiveColor(0),true));
+		colorPanelBG.setBackground( new Color( palette_manager.getActiveColor(1),true));
 		
 
 		tfWidth.setMinMax(0, 16000);

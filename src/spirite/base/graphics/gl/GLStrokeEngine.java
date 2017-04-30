@@ -17,11 +17,12 @@ import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.util.Colors;
 import spirite.base.util.MatrixBuilder;
 import spirite.hybrid.HybridHelper;
-import spirite.pc.pen.StrokeEngine;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.PenTraits.PenState;
 
 /**
  * The GLStrokeEngine is a StrokeEngine that uses OpenGL to create a particular
@@ -170,10 +171,11 @@ class GLStrokeEngine extends StrokeEngine {
         );
         gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
         int uColor = gl.glGetUniformLocation( prog, "uColor");
+        int c = stroke.getColor();
         gl.glUniform3f(uColor, 
-        		stroke.getColor().getRed()/255.0f,
-        		stroke.getColor().getGreen()/255.0f,
-        		stroke.getColor().getBlue()/255.0f);
+        		Colors.getRed(c)/255.0f,
+        		Colors.getGreen(c)/255.0f,
+        		Colors.getBlue(c)/255.0f);
 
 
         gl.glEnable(GL2.GL_MULTISAMPLE);
@@ -278,10 +280,11 @@ class GLStrokeEngine extends StrokeEngine {
         	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
         );
         gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
+        int c = stroke.getColor();
         gl.glUniform3f(uColor, 
-        		stroke.getColor().getRed()/255.0f,
-        		stroke.getColor().getGreen()/255.0f,
-        		stroke.getColor().getBlue()/255.0f);
+        		Colors.getRed(c)/255.0f,
+        		Colors.getGreen(c)/255.0f,
+        		Colors.getBlue(c)/255.0f);
         gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
         gl.glUniform1i( uMode, mode);
         

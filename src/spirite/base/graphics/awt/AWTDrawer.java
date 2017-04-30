@@ -8,12 +8,12 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.pen.StrokeEngine;
 import spirite.base.image_data.RawImage;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.StrokeEngine;
 
 public class AWTDrawer extends GraphicsDrawer {
 
@@ -42,7 +42,7 @@ public class AWTDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void changeColor(RawImage image, Color from, Color to, int mode) {
+	public void changeColor(RawImage image, int cFrom, int cTo, int mode) {
 		if( !(image instanceof ImageBI)) {
 			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image Type in AWTDrawer");
 			return;
@@ -51,8 +51,8 @@ public class AWTDrawer extends GraphicsDrawer {
 		
 		// TODO: Make Better (or at least test if there is a better way to access
 		//	and change a batch of BufferedImage data)
-		int f = (mode == 0) ? from.getRGB() : (from.getRGB() & 0xFFFFFF);
-		int t = (mode == 0) ? to.getRGB() : (to.getRGB() & 0xFFFFFF);
+		int f = (mode == 0) ? cFrom : (cFrom & 0xFFFFFF);
+		int t = (mode == 0) ? cTo : (cTo & 0xFFFFFF);
 		int rgb;
 		for( int x = 0; x < bi.getWidth(); ++x) {
 			for( int y=0; y < bi.getHeight(); ++y) {

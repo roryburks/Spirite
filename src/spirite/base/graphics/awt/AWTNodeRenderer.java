@@ -102,7 +102,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 					MatTrans tt = dataContext.getScreenToImageTransform();
 					tt.concatenate( workspace.getSelectionEngine().getDrawFromTransform());
 					
-					gc.drawImage( new ImageBI(workspace.getSelectionEngine().getLiftedImage()), 0, 0);
+					gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {
 					// Draw

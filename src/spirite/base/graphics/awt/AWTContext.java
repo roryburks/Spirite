@@ -5,6 +5,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -56,22 +57,23 @@ public class AWTContext extends GraphicsContext{
 	public Graphics getGraphics() {return g2;}
 
 	@Override
-	public void drawBounds(BufferedImage mask, int c) {
+	public void drawBounds(RawImage mask, int c) {
 		Rectangle r = g2.getClipBounds();
 		
 		AffineTransform old = g2.getTransform();
 		g2.setTransform(new AffineTransform());
 		
 		BufferedImage bi = new BufferedImage( r.width, r.height, HybridHelper.BI_FORMAT);
-		Graphics2D g2BI = (Graphics2D)(bi.getGraphics());
+		Graphics2D g2BI = (Graphics2D)bi.getGraphics();
 		g2BI.setTransform(old);
-		g2BI.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-		g2BI.drawImage(mask, 1, 0, null);
-		g2BI.drawImage(mask, -1, 0, null);
-		g2BI.drawImage(mask, 0, 1, null);
-		g2BI.drawImage(mask, 0, -1, null);
-		g2BI.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT, 1));
-		g2BI.drawImage(mask, 0, 0, null);
+		GraphicsContext gc = new AWTContext( g2BI, bi.getWidth(), bi.getHeight());
+		gc.setComposite( Composite.SRC_OVER, 0.5f);
+		gc.drawImage(mask, 1, 0);
+		gc.drawImage(mask, -1, 0);
+		gc.drawImage(mask, 0, 1);
+		gc.drawImage(mask, 0, -1);
+		gc.setComposite( Composite.DST_OUT, 1);
+		gc.drawImage(mask, 0, 0);
 		g2BI.dispose();
 		
 		g2.drawImage(bi, 0, 0, null);
@@ -186,6 +188,7 @@ public class AWTContext extends GraphicsContext{
 
 	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
+	@Override public void fillPolygon(int[] x, int[] y, int count) {g2.fillPolygon(x, y, count);}
 
 	@Override public void drawImage(RawImage img, int x, int y) {
 		if( img instanceof ImageBI)

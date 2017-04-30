@@ -43,6 +43,7 @@ import spirite.base.image_data.RawImage;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.pen.Penner;
 import spirite.base.util.MUtil;
 import spirite.base.util.MUtil.TransferableImage;
 import spirite.base.util.glmath.MatTrans;
@@ -55,7 +56,6 @@ import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.Dialogs;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.pen.Penner;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -496,7 +496,7 @@ public class MasterControl
 	    	    	RawImage img;
     				if( currentWorkspace.getSelectionEngine().isLifted()) {
     					// Copies straight from the lifted data
-    					img = new ImageBI(currentWorkspace.getSelectionEngine().getLiftedImage());
+    					img = currentWorkspace.getSelectionEngine().getLiftedImage();
     				}
     				else {
     					BuiltImageData bid = currentWorkspace.buildActiveData();
@@ -550,6 +550,7 @@ public class MasterControl
     			MasterControl.this.executeCommandString("draw.clearLayer");
     		}});
     		commandMap.put("paste", new Runnable() {@Override public void run() {
+    			// TODO: MARK
     			BufferedImage bi = MUtil.imageFromClipboard();
     			if( bi == null) return;
     			
@@ -577,7 +578,7 @@ public class MasterControl
 	    				oy = Math.max(min_y,node.getOffsetY());
 	    			}
 	    			
-	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
+	    			currentWorkspace.getSelectionEngine().imageToSelection(new ImageBI(bi), ox, oy);
 	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
     		}});
@@ -739,7 +740,7 @@ public class MasterControl
     			ReferenceManager rm = workspace.getReferenceManager();
     			
     			BuiltSelection sel = se.getBuiltSelection();
-    			BufferedImage bi = se.getLiftedImage();
+    			RawImage bi = se.getLiftedImage();
     			
     			MatTrans trans = new MatTrans();
     			trans.translate(sel.offsetX, sel.offsetY);
@@ -786,7 +787,7 @@ public class MasterControl
     	public SelectionCommandExecuter() {
     		commandMap.put("all", new Runnable() {@Override public void run() {
     			selectionEngine.setSelection( selectionEngine.buildRectSelection(
-    					new Rectangle(0,0,workspace.getWidth(), workspace.getHeight())));
+    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
 
     		}});
     		commandMap.put("none", new Runnable() {@Override public void run() {

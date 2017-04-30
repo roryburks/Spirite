@@ -27,7 +27,7 @@ public abstract class GraphicsContext {
 	 * @param sheight	The height of the screen to draw it on.
 	 * @return
 	 */
-	public abstract void drawBounds(BufferedImage mask, int c);
+	public abstract void drawBounds(RawImage bi, int c);
 
 	public abstract void clear();
 	
@@ -82,6 +82,8 @@ public abstract class GraphicsContext {
 
 	public abstract void drawImage( RawImage img, int x, int y);
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
+
+	public abstract void fillPolygon(int[] x, int[] y, int count);
 
 
 

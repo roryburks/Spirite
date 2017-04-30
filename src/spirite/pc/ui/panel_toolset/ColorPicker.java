@@ -454,10 +454,10 @@ public class ColorPicker extends OmniComponent
 	}
 	
 	private void refreshColors() {
-		comp1.setColor(paletteManager.getActiveColor(0));
-		comp2.setColor(paletteManager.getActiveColor(1));
-		comp1hsv.setColor(paletteManager.getActiveColor(0));
-		comp2hsv.setColor(paletteManager.getActiveColor(1));
+		comp1.setColor( new Color(paletteManager.getActiveColor(0)));
+		comp2.setColor(new Color(paletteManager.getActiveColor(1)));
+		comp1hsv.setColor(new Color(paletteManager.getActiveColor(0)));
+		comp2hsv.setColor(new Color(paletteManager.getActiveColor(1)));
 	}
 
 	// :::: MPaletteObserver
