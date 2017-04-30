@@ -35,10 +35,10 @@ import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.layers.Layer;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.JPenPenner;
 
 /**
  * DrawPanel is the main UI component for drawing.  It captures the User's input 

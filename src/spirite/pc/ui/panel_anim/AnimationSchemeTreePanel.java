@@ -48,7 +48,7 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends JPanel 

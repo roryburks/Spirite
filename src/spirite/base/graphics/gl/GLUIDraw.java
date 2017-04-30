@@ -14,7 +14,7 @@ import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 
 /** 
  * USE OF GLUIDRAW IS BEING PHASED OUT.  ALL CODE IS BEING MOVED TO GLGraphics

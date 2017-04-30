@@ -1,4 +1,4 @@
-package mutil;
+package spirite.base.util;
 
 
 /**

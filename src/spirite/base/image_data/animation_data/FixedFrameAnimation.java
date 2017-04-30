@@ -9,7 +9,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import mutil.MUtil;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -24,6 +23,7 @@ import spirite.base.image_data.ImageWorkspace.MoveChange;
 import spirite.base.image_data.ImageWorkspace.StructureChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
+import spirite.base.util.MUtil;
 
 /**
  * A FixedFrameAnimation 

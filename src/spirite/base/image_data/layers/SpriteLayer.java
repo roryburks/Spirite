@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import mutil.MUtil;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -22,8 +21,10 @@ import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.WarningType;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 
 
 /**
@@ -344,11 +345,11 @@ public class SpriteLayer extends Layer
 	}
 
 	@Override
-	public List<Rectangle> getBoundList() {
-		List<Rectangle> list = new ArrayList<>(parts.size());
+	public List<Rect> getBoundList() {
+		List<Rect> list = new ArrayList<>(parts.size());
 		
 		for( Part part : parts) {
-			list.add( new Rectangle(part.ox, part.oy, part.handle.getWidth(), part.handle.getHeight()));
+			list.add( new Rect(part.ox, part.oy, part.handle.getWidth(), part.handle.getHeight()));
 		}
 		
 		return list;

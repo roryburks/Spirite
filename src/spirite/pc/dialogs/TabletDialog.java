@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,10 +22,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import mutil.MUtil;
-import mutil.Interpolation.CubicSplineInterpolator;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Vec2;
+import spirite.base.util.Interpolation.CubicSplineInterpolator;
 
 public class TabletDialog extends JDialog
 {
@@ -48,7 +48,7 @@ public class TabletDialog extends JDialog
 		CubicSplineInterpolator csi = settings.getTabletInterpolator();
 		
 		for( int i=0; i < csi.getNumPoints(); ++i) {
-			weights.add(new Point2D.Double(csi.getX(i), csi.getY(i)));
+			weights.add(new Vec2(csi.getX(i), csi.getY(i)));
 		}
 		curvePanel.setBackground(bg);
 		curvePanel.setOpaque(true);
@@ -91,8 +91,8 @@ public class TabletDialog extends JDialog
 		btnResetCurve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				weights.clear();
-				weights.add(new Point2D.Double(0,0));
-				weights.add(new Point2D.Double(1,1));
+				weights.add(new Vec2(0,0));
+				weights.add(new Vec2(1,1));
 				saveWeights();
 				curvePanel.repaint();
 			}
@@ -104,14 +104,14 @@ public class TabletDialog extends JDialog
 	}
 	
 
-	private final List<Point2D> weights = new ArrayList<>();
+	private final List<Vec2> weights = new ArrayList<>();
 	
 	// ===============
 	// ==== Custom Components
 	private final Color bg = Color.WHITE;
 	private class StrokeCurvePanel extends JPanel 
 	{
-		private Point2D movingPoint = null;
+		private Vec2 movingPoint = null;
 		
 		private final SCPAdapter adapter = new SCPAdapter();
 		
@@ -167,16 +167,16 @@ public class TabletDialog extends JDialog
 			
 			// Construct a list of Interpolation Curve points, possibly excluding the 
 			//	point you're dragging (if you're dragging it off)
-			List<Point2D> points = new ArrayList<>(weights.size());
+			List<Vec2> points = new ArrayList<>(weights.size());
 			for( int i=0; i < weights.size(); ++i) {
-				Point2D p2 = weights.get(i);
+				Vec2 p2 = weights.get(i);
 				
 				// Comparison basically says "If the point is the point you're
 				//	moving and it's been draged left of the previous point or
 				//	right of the next point, don't display it."
 				if( p2 != movingPoint || 
-					!((i > 0 && movingPoint.getX() <= weights.get(i-1).getX()) ||
-					 ( i < weights.size()-1 && movingPoint.getX() >= weights.get(i+1).getX())))
+					!((i > 0 && movingPoint.x <= weights.get(i-1).x) ||
+					 ( i < weights.size()-1 && movingPoint.x >= weights.get(i+1).x)))
 				{
 					points.add(p2);	
 				}
@@ -193,7 +193,7 @@ public class TabletDialog extends JDialog
 			int nx, ny;
 			for( int i=0; i<=100; ++i) {
 				nx = (int)Math.round(w*(0.01*i))+x1;
-				ny = (int)Math.round(h*(1-MUtil.clip(0, csi.eval(0.01*i), 1)))+y1;
+				ny = (int)Math.round(h*(1-MUtil.clip(0, csi.eval(0.01f*i), 1)))+y1;
 				if( ox != -999) {
 					g.drawLine(ox, oy, nx, ny);
 				}
@@ -209,7 +209,7 @@ public class TabletDialog extends JDialog
 			ox = -999;
 			oy = -999;
 			for( double t = 0; t < csi2.getCurveLength(); t += 0.01) {
-				Point2D p = csi2.eval(t);
+				Vec2 p = csi2.eval(t);
 				
 				nx = (int)Math.round(w*(p.getX()))+x1;
 				ny = (int)Math.round(h*(1-p.getY()))+y1;
@@ -222,14 +222,14 @@ public class TabletDialog extends JDialog
 			
 			// Draw Marker Circles
 			g.setColor(Color.BLACK);
-			for( Point2D p : weights) {
-				int dx = x1+(int)Math.round(w*(p.getX()));
-				int dy = y1+(int)Math.round(h*(1-p.getY()));
+			for( Vec2 p : weights) {
+				int dx = x1+(int)Math.round(w*(p.x));
+				int dy = y1+(int)Math.round(h*(1-p.y));
 				g.drawOval(dx-DWIDTH, dy-DWIDTH, DWIDTH*2, DWIDTH*2);
 			}
 		}
 		
-		public void screenToLogic(Point2D p) {
+		public void screenToLogic(Vec2 p) {
 			int width = getWidth();
 			int height = getHeight();
 			int x1 = DWIDTH;
@@ -237,10 +237,10 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			p.setLocation( MUtil.clip(0, (p.getX()-x1)/w, 1), 
-				MUtil.clip(0, 1-(p.getY()-y1)/h, 1));
+			p.x =  MUtil.clip(0, (p.x-x1)/w, 1);
+			p.y = MUtil.clip(0, 1-(p.y-y1)/h, 1);
 		}
-		public void logicToScreen(Point2D p){
+		public void logicToScreen(Vec2 p){
 			int width = getWidth();
 			int height = getHeight();
 			int x1 = DWIDTH;
@@ -248,7 +248,8 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			p.setLocation( p.getX()*w+x1,  1-p.getY()*h+y1);
+			p.x = p.x*w+x1;
+			p.y = 1-p.y*h+y1;
 		}
 
 		class SCPAdapter extends MouseAdapter {
@@ -257,25 +258,25 @@ public class TabletDialog extends JDialog
 				super.mousePressed(evt);
 				
 				
-				Point2D p = new Point2D.Double(evt.getX(), evt.getY());
+				Vec2 p = new Vec2(evt.getX(), evt.getY());
 				screenToLogic(p);
 				determineMovingMethod(p);
 				repaint();
 			}
 			
-			private void determineMovingMethod( Point2D p) {
-				for( Point2D weight : weights) {
-					if( MUtil.distance(p.getX(), p.getY(), weight.getX(), weight.getY()) < THRESH) {
+			private void determineMovingMethod( Vec2 p) {
+				for( Vec2 weight : weights) {
+					if( MUtil.distance(p.x, p.y, weight.x, weight.y) < THRESH) {
 						movingPoint = weight;
 						return;
 					}
 				}
 				movingPoint = p;
 				weights.add(p);
-				weights.sort(new Comparator<Point2D>() {
+				weights.sort(new Comparator<Vec2>() {
 					@Override
-					public int compare(Point2D o1, Point2D o2) {
-						double d = o1.getX() - o2.getX();
+					public int compare(Vec2 o1, Vec2 o2) {
+						double d = o1.x - o2.x;
 						return (int) Math.signum(d);
 					}
 				});
@@ -286,7 +287,8 @@ public class TabletDialog extends JDialog
 				super.mouseDragged(evt);
 				
 				if( movingPoint != null) {
-					movingPoint.setLocation(evt.getX(), evt.getY());
+					movingPoint.x = evt.getX();
+					movingPoint.y = evt.getY();
 					screenToLogic(movingPoint);
 					repaint();
 				}
@@ -300,9 +302,9 @@ public class TabletDialog extends JDialog
 					
 					// Remove the point you're moving if you've dragged it left
 					//	of the previous or right of the next point.
-					if( i > 0 && movingPoint.getX() <= weights.get(i-1).getX())
+					if( i > 0 && movingPoint.x <= weights.get(i-1).x)
 						weights.remove(movingPoint);
-					else if( i < weights.size()-1 && movingPoint.getX() >= weights.get(i+1).getX())
+					else if( i < weights.size()-1 && movingPoint.x >= weights.get(i+1).x)
 						weights.remove(movingPoint);
 					
 					movingPoint = null;

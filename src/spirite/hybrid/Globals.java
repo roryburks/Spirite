@@ -1,6 +1,6 @@
 // Rory Burks
 
-package spirite.pc;
+package spirite.hybrid;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,7 +16,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import spirite.pc.MDebug.ErrorType;
+import spirite.hybrid.MDebug.ErrorType;
 
 /**
  * The Globals object will centralize all globals that might have reason to

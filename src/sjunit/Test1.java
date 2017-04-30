@@ -32,9 +32,10 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
-import spirite.pc.Globals;
-import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.StrokeEngine;
+import spirite.pc.pen.PenTraits.PenState;
 
 /**
  * @author Guy
@@ -267,7 +268,7 @@ public class Test1 {
 			LayerNode node = randomLayerNode(workspace);
 			if( node == null) break;
 			
-			workspace.cropNode(node, new Rectangle( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)), false);
+			workspace.cropNode(node, new Rect( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)), false);
 			break;
 		}
 	}

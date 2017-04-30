@@ -18,9 +18,9 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
+import spirite.pc.pen.Penner;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.Penner;
 
 /**
  * WorkTabPane is the top-level UI Component for the Work/Draw area.  In addition 

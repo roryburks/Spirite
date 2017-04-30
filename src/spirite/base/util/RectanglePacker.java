@@ -1,4 +1,4 @@
-package mutil;
+package spirite.base.util;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;

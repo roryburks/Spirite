@@ -18,9 +18,10 @@ import javax.swing.SwingUtilities;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.pen.Penner;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.OmniFrame.OmniContainer;
 import spirite.pc.ui.panel_anim.AnimationPreviewPanel;
@@ -32,7 +33,6 @@ import spirite.pc.ui.panel_toolset.UndoPanel;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkTabPane;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.Penner;
 
 public class FrameManager 
 	implements WindowListener, CommandExecuter

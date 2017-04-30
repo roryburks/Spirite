@@ -12,8 +12,8 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * AnimatonManager manages the animation functionality of an ImageWorkspace.

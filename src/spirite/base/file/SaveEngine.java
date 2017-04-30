@@ -32,9 +32,9 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
 
 /***
  * SaveEngine is a static container for methods which saves images to

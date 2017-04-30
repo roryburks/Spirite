@@ -22,7 +22,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.dialogs.Dialogs;
 import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.UIUtil;

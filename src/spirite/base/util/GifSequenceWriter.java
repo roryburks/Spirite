@@ -1,4 +1,4 @@
-package mutil;
+package spirite.base.util;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;

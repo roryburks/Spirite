@@ -26,14 +26,14 @@ import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.GLBuffers;
 
-import mutil.MatrixBuilder;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.base.util.MatrixBuilder;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 

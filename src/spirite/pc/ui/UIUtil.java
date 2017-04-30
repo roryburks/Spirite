@@ -18,10 +18,10 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import mutil.MUtil;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.WarningType;
+import spirite.base.util.MUtil;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);

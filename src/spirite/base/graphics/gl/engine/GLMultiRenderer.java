@@ -4,8 +4,8 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.gl.GLGraphics;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.WarningType;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 
 
 /**

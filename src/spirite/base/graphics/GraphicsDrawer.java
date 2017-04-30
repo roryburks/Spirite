@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.pen.StrokeEngine;
+import spirite.pc.pen.StrokeEngine;
 
 /**
  * Similar to GraphicsContext, GraphicsDrawer encapsulates certain graphics 

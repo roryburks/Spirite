@@ -24,7 +24,6 @@ import java.util.Queue;
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.JOptionPane;
 
-import mutil.MUtil;
 import spirite.base.brains.CacheManager;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine;
@@ -47,9 +46,11 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 
 /***
@@ -515,7 +516,7 @@ public class ImageWorkspace {
 			dii.oy = activeRect.y - oy;
 			activeRect = null;
 			
-			Rectangle cropped = null;
+			Rect cropped = null;
 			try {
 				cropped = MUtil.findContentBounds(bi, 0, true);
 			} catch (UnsupportedDataTypeException e) {
@@ -703,9 +704,9 @@ public class ImageWorkspace {
 	 * @param inputRect
 	 * @param shrinkOnly
 	 */
-	public void cropNode( Node nodeToCrop, Rectangle inputRect, boolean shrinkOnly) {
+	public void cropNode( Node nodeToCrop, Rect inputRect, boolean shrinkOnly) {
 		
-		inputRect = inputRect.intersection(new Rectangle(0,0,width,height));
+		inputRect = inputRect.intersection(new Rect(0,0,width,height));
 		if( inputRect.isEmpty())return;
 		
 
@@ -724,17 +725,17 @@ public class ImageWorkspace {
 		
 		for( LayerNode node : toCrop ) {
 			List<ImageHandle> handles = node.layer.getImageDependencies();
-			List<Rectangle> imageBounds = node.layer.getBoundList();
+			List<Rect> imageBounds = node.layer.getBoundList();
 
 			if( inputRect == null || handles  == null ) continue;
 			
 			for( int i=0; i < handles.size() && i<imageBounds.size(); ++i) {
 				ImageHandle handle = handles.get(i);
-				Rectangle imageBound = imageBounds.get(i);
+				Rect imageBound = imageBounds.get(i);
 				imageBound.x += node.x;
 				imageBound.y += node.y;
 				
-				Rectangle newBounds;
+				Rect newBounds;
 				
 				if( shrinkOnly) {
 					newBounds = inputRect.intersection(imageBound);

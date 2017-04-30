@@ -25,7 +25,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.MUndoEngineObserver;
 import spirite.base.image_data.UndoEngine.UndoIndex;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 
 /***

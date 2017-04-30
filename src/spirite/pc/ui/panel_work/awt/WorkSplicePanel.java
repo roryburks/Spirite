@@ -12,7 +12,7 @@ import javax.swing.GroupLayout;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;

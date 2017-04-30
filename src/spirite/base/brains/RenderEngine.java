@@ -40,8 +40,8 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
 
 /***
  * The RenderEngine may or may not be a big and necessary component

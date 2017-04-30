@@ -9,7 +9,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
-import mutil.MatrixBuilder;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.graphics.gl.engine.GLEngine;
@@ -18,9 +17,10 @@ import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
-import spirite.pc.Globals;
-import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine;
+import spirite.base.util.MatrixBuilder;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.StrokeEngine;
+import spirite.pc.pen.PenTraits.PenState;
 
 /**
  * The GLStrokeEngine is a StrokeEngine that uses OpenGL to create a particular

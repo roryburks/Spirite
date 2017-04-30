@@ -17,8 +17,8 @@ import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.pc.Globals;
-import spirite.pen.StrokeEngine;;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.StrokeEngine;;
 
 
 /**

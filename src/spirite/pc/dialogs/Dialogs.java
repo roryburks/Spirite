@@ -17,7 +17,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.graphics.gl.TestGLDiag;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
 
 /***

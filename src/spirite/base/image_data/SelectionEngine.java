@@ -17,8 +17,6 @@ import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
 
-import mutil.MUtil;
-import mutil.DataCompaction.IntCompactor;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -29,9 +27,12 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Rect;
+import spirite.base.util.DataCompaction.IntCompactor;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -702,7 +703,7 @@ public class SelectionEngine {
 		public final int offsetY;
 
 		public BuiltSelection( BufferedImage bi) {
-			Rectangle bounds = null;
+			Rect bounds = null;
 			try {
 				bounds = MUtil.findContentBounds(bi, 2, true);
 			} catch (UnsupportedDataTypeException e) {

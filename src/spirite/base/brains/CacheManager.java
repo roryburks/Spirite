@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import mutil.MUtil;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.base.util.MUtil;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * The CacheManager keeps track of all the various dynamic memory 

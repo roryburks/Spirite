@@ -1,4 +1,4 @@
-package mutil;
+package spirite.base.util;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

@@ -16,10 +16,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import mutil.GifSequenceWriter;
-import mutil.MUtil;
-import mutil.RectanglePacker;
-import mutil.RectanglePacker.PackedRectangle;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
@@ -33,7 +29,12 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
-import spirite.pc.Globals;
+import spirite.base.util.GifSequenceWriter;
+import spirite.base.util.MUtil;
+import spirite.base.util.RectanglePacker;
+import spirite.base.util.RectanglePacker.PackedRectangle;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.Globals;
 
 /**
  * AnimIO is a container for static methods that export Animations of various
@@ -158,7 +159,7 @@ public class AnimIO {
 		List<CroppedImage> images = new ArrayList<>(handles.size());
 		List<Dimension> toPack = new ArrayList<>(images.size());
 		for( ImageHandle handle : handles) {
-			Rectangle bounds = MUtil.findContentBounds(handle.deepAccess(), 0, true);
+			Rect bounds = MUtil.findContentBounds(handle.deepAccess(), 0, true);
 
 			
 			if( bounds == null || bounds.isEmpty()) {

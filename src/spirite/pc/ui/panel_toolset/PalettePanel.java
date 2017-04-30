@@ -27,7 +27,7 @@ import javax.swing.border.EtchedBorder;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 import spirite.pc.dialogs.Dialogs;
 import spirite.pc.ui.UIUtil;
 

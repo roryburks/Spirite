@@ -1,4 +1,4 @@
-package spirite.pen;
+package spirite.pc.pen;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,20 +7,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import mutil.MUtil;
-import mutil.Interpolation.CubicSplineInterpolator2D;
-import mutil.Interpolation.InterpolatedPoint;
-import mutil.Interpolation.Interpolator2D;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.DrawEngine;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.WarningType;
-import spirite.pen.PenTraits.PenDynamics;
-import spirite.pen.PenTraits.PenState;
+import spirite.base.util.MUtil;
+import spirite.base.util.Interpolation.CubicSplineInterpolator2D;
+import spirite.base.util.Interpolation.InterpolatedPoint;
+import spirite.base.util.Interpolation.Interpolator2D;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.pen.PenTraits.PenDynamics;
+import spirite.pc.pen.PenTraits.PenState;
 
 public abstract class StrokeEngine {
 
@@ -53,7 +53,7 @@ public abstract class StrokeEngine {
 	
 	// Interpolation
 	private Interpolator2D interpolator = null;
-	private double interpos = 0;
+	private float interpos = 0;
 	
 	// :::: Get's
 	public StrokeEngine.StrokeParams getParams() {

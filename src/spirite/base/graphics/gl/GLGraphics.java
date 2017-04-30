@@ -11,8 +11,6 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
-import mutil.MUtil;
-import mutil.DataCompaction.FloatCompactor;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLMultiRenderer;
@@ -24,6 +22,8 @@ import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.image_data.ImageHandle;
+import spirite.base.util.MUtil;
+import spirite.base.util.DataCompaction.FloatCompactor;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least

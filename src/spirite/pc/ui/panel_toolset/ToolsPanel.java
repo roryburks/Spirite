@@ -28,7 +28,8 @@ import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Tool;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
+import spirite.hybrid.ToolsetIcons;
 
 /**
  * 
@@ -200,7 +201,7 @@ public class ToolsPanel extends JPanel
 
             Graphics2D g2 = (Graphics2D)g;
             g2.translate(ew/2, 0);
-            toolsetManager.drawIcon(g2, tool);
+            ToolsetIcons.drawIcon(g2, tool);
             g2.translate(-ew/2, 0);
             
 

@@ -5,8 +5,8 @@ import java.util.List;
 
 import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.image_data.layers.Layer;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * Though almost all ImageData goes through the group tree before being

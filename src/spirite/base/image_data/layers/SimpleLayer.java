@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import mutil.MUtil;
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.RenderEngine.TransformedHandle;
@@ -19,7 +18,9 @@ import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.pc.Globals;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.Globals;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;
@@ -63,10 +64,10 @@ public class SimpleLayer extends Layer {
 		return new SimpleLayer(data.dupe());
 	}
 	@Override
-	public List<Rectangle> getBoundList() {
+	public List<Rect> getBoundList() {
 		
-		List<Rectangle> list = new ArrayList<>(1);
-		list.add(new Rectangle( 0, 0, data.getWidth(), data.getHeight()));
+		List<Rect> list = new ArrayList<>(1);
+		list.add(new Rect( 0, 0, data.getWidth(), data.getHeight()));
 //		list.add( bounds.intersection(rect));
 		
 		return list;

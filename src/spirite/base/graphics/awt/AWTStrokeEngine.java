@@ -7,11 +7,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import mutil.MUtil;
 import spirite.base.graphics.GraphicsContext;
-import spirite.pc.Globals;
-import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine;
+import spirite.base.util.MUtil;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.StrokeEngine;
+import spirite.pc.pen.PenTraits.PenState;
 
 /***
  * The StrokeEngine operates asynchronously to the input data.  In general

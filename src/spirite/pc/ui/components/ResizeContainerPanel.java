@@ -13,16 +13,14 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-
-import mutil.MUtil;
-
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import spirite.pc.Globals;
+import spirite.base.util.MUtil;
+import spirite.hybrid.Globals;
 
 /**
  * 

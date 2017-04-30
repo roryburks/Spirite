@@ -20,9 +20,9 @@ import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import mutil.MUtil;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.awt.AWTContext;
@@ -26,15 +25,17 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
-import spirite.pen.PenTraits;
-import spirite.pen.PenTraits.PenDynamics;
-import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine;
-import spirite.pen.StrokeEngine.STATE;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Vec2;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.pen.PenTraits;
+import spirite.pc.pen.StrokeEngine;
+import spirite.pc.pen.PenTraits.PenDynamics;
+import spirite.pc.pen.PenTraits.PenState;
+import spirite.pc.pen.StrokeEngine.STATE;
 
 /***
  * Pretty much anything which alters the image data directly goes 
@@ -265,10 +266,10 @@ public class DrawEngine {
 	};
 
 	private static final PenDynamics personalDynamics = new PenTraits.LegrangeDynamics(
-		Arrays.asList( new Point2D[] {
-				new Point2D.Double(0,0),
-				new Point2D.Double(0.25,0),
-				new Point2D.Double(1,1)
+		Arrays.asList( new Vec2[] {
+				new Vec2(0,0),
+				new Vec2(0.25f,0),
+				new Vec2(1,1)
 			}
 		)
 	);

@@ -31,10 +31,11 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.util.glmath.Rect;
+import spirite.pc.pen.JPenPenner;
+import spirite.pc.pen.Penner;
 import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 import spirite.pc.ui.panel_work.gl.GLWorkArea;
-import spirite.pen.JPenPenner;
-import spirite.pen.Penner;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external
@@ -223,12 +224,12 @@ public class WorkPanel extends javax.swing.JPanel
         	return trans;
         }
         
-        public Rectangle itsRm( Rectangle rect) {
-        	return new Rectangle(
-        		itsXm( rect.x),
-        		itsYm( rect.y),
-        		Math.round(rect.width * zoom),
-        		Math.round(rect.height*zoom)
+        public Rect itsRm( Rect cropSection) {
+        	return new Rect(
+        		itsXm( cropSection.x),
+        		itsYm( cropSection.y),
+        		Math.round(cropSection.width * zoom),
+        		Math.round(cropSection.height*zoom)
         	);
         }
     }

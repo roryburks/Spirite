@@ -1,9 +1,10 @@
-package spirite.pen;
+package spirite.pc.pen;
 
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import mutil.Interpolation.LagrangeInterpolator;
+import spirite.base.util.Interpolation.LagrangeInterpolator;
+import spirite.base.util.glmath.Vec2;
 
 public class PenTraits {
 
@@ -38,7 +39,7 @@ public class PenTraits {
 	
 	public static class LegrangeDynamics implements PenDynamics{
 		private final LagrangeInterpolator li;
-		public LegrangeDynamics( List<Point2D> list) {
+		public LegrangeDynamics( List<Vec2> list) {
 			this.li = new LagrangeInterpolator(list);
 		}
 

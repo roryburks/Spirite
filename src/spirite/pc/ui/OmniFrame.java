@@ -38,10 +38,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
 import spirite.base.brains.MasterControl;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.ui.FrameManager.FrameType;
 
 /***

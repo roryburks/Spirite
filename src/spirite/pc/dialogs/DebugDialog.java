@@ -24,8 +24,8 @@ import javax.swing.border.EmptyBorder;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.CacheManager.CacheDomain;
 import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.DebugObserver;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.DebugObserver;
 
 public class DebugDialog extends JDialog 
 	implements ActionListener, DebugObserver, WindowListener 

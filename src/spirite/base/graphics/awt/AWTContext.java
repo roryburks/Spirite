@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageHandle;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 
 /**
  * AWTContext is a GraphicsContext using only native AWT calls (as well as some

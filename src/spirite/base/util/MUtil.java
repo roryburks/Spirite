@@ -1,4 +1,4 @@
-package mutil;
+package spirite.base.util;
 
 import java.awt.AlphaComposite;
 
@@ -23,19 +23,33 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
 
-import mutil.DataCompaction.FloatCompactor;
-import spirite.pc.Globals;
-import mutil.ArrayInterpretation.IntCounter;
-import mutil.ArrayInterpretation.InterpretedIntArray;
+import spirite.base.util.ArrayInterpretation.IntCounter;
+import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
+import spirite.base.util.DataCompaction.FloatCompactor;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.Globals;
 
 public class MUtil {
 	
 	public final static Point ORIGIN = new Point(0,0);
 
+
+    public static String joinString( CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+        StringBuilder builder = new StringBuilder();
+        Iterator<? extends CharSequence> it = elements.iterator();
+        while( it.hasNext()) {
+            builder.append( it.next());
+            if( it.hasNext())
+                builder.append(delimiter);
+        }
+        return builder.toString();
+    }
+    
 	// ==============
 	// ==== Math Functions
 	public static int packInt( int high, int low) {
@@ -104,25 +118,25 @@ public class MUtil {
 	/**
 	 * Constructs a non-negative dimension Rectangle from two coordinates
 	 */
-	public static Rectangle rectFromEndpoints( int x1, int y1, int x2, int y2) {
-		return new Rectangle( Math.min(x1, x2), Math.min(y1, y2),
+	public static Rect rectFromEndpoints( int x1, int y1, int x2, int y2) {
+		return new Rect( Math.min(x1, x2), Math.min(y1, y2),
 				Math.abs(x1-x2), Math.abs(y1-y2));
 	}
 	
 	/** Stretches the Rectangle from the center by a given scaler */
-	public static Rectangle scaleRect( Rectangle rect, float scalar) {
-		return new Rectangle(
-				rect.x - Math.round(rect.width * (scalar-1)/2.0f),
-				rect.y - Math.round(rect.height * (scalar-1)/2.0f),
-				Math.round(rect.width * scalar),
-				Math.round(rect.height * scalar)
+	public static Rect scaleRect( Rect cropSection, float scalar) {
+		return new Rect(
+				cropSection.x - Math.round(cropSection.width * (scalar-1)/2.0f),
+				cropSection.y - Math.round(cropSection.height * (scalar-1)/2.0f),
+				Math.round(cropSection.width * scalar),
+				Math.round(cropSection.height * scalar)
 			);
 		
 	}
 	
 	/** Returns the smallest rectangle such that rect1 and rect2 are contained
 	 * within it.	 */
-	public static Rectangle circumscribe( Rectangle rect1, Rectangle rect2) {
+	public static Rect circumscribe( Rectangle rect1, Rectangle rect2) {
 		return rectFromEndpoints(
 				Math.min( rect1.x, rect2.x),
 				Math.min( rect1.y, rect2.y),
@@ -274,7 +288,7 @@ public class MUtil {
 	 * 		to the a supported format
 	 * 
 	 */
-	public static Rectangle findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) 
+	public static Rect findContentBounds( BufferedImage image, int buffer, boolean transparentOnly) 
 			throws UnsupportedDataTypeException 
 	{
 
@@ -297,7 +311,7 @@ public class MUtil {
 		int x1 =0, y1=0, x2=0, y2=0;
 				
 		// Don't feel like going through and special-casing 1-size things.
-		if( data.w <2 || data.h < 2) return new Rectangle(0,0,data.w,data.h);
+		if( data.w <2 || data.h < 2) return new Rect(0,0,data.w,data.h);
 
 		data.setBG(0, 0);
 
@@ -311,13 +325,13 @@ public class MUtil {
 			data.setBG(data.w-1, data.h-1);
 		
 		if(transparentOnly && !data.isBGTransparent())
-			return new Rectangle(0,0,data.w,data.h);
+			return new Rect(0,0,data.w,data.h);
 
 		int ret;
 		
 		// Left
 		ret = data.findFirstEmptyLine( new IntCounter(0,data.w-1), false);
-		if( ret == -1) return new Rectangle(0,0,0,0);
+		if( ret == -1) return new Rect(0,0,0,0);
 		x1 = ret;
 		
 		// Right
@@ -326,7 +340,7 @@ public class MUtil {
 
 		// Top
 		ret = data.findFirstEmptyLine( new IntCounter(0,data.h-1), true);
-		if( ret == -1) return new Rectangle(0,0,0,0);
+		if( ret == -1) return new Rect(0,0,0,0);
 		y1 =  ret;
 
 		// Bottom
@@ -339,7 +353,7 @@ public class MUtil {
 		y2 = Math.min(data.h-1, y2 + buffer);
 		
 		
-		return new Rectangle( x1, y1, x2-x1+1, y2-y1+1 );
+		return new Rect( x1, y1, x2-x1+1, y2-y1+1 );
 	}
 	private static abstract class _ImageCropHelper {
 		final int w;
@@ -500,6 +514,6 @@ public class MUtil {
 		@Override
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			return flavor == DataFlavor.imageFlavor;
-		}		
+		}
 	}
 }

@@ -1,4 +1,4 @@
-package spirite.pen;
+package spirite.pc.pen;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import mutil.MUtil;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.RenderEngine;
@@ -48,12 +47,14 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Rect;
+import spirite.pc.pen.PenTraits.ButtonType;
+import spirite.pc.pen.PenTraits.MButtonEvent;
+import spirite.pc.pen.PenTraits.PenState;
+import spirite.pc.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.PenTraits.ButtonType;
-import spirite.pen.PenTraits.MButtonEvent;
-import spirite.pen.PenTraits.PenState;
-import spirite.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 
 /***
  * The Penner translates Pen and Mouse input, particularly from the draw
@@ -769,12 +770,12 @@ public class Penner
 	class CroppingBehavior extends DrawnStateBehavior {
 		boolean building = false;
 		boolean modifying = false;
-		Rectangle cropSection = null;
-		Rectangle middle;
-		Rectangle topRight;
-		Rectangle topLeft;
-		Rectangle bottomRight;
-		Rectangle bottomLeft;
+		Rect cropSection = null;
+		Rect middle;
+		Rect topRight;
+		Rect topLeft;
+		Rect bottomRight;
+		Rect bottomLeft;
 		int startx, starty;
 		//	0x1 : Top
 		//	0x2 : Bottom
@@ -793,13 +794,13 @@ public class Penner
 			topLeft = MUtil.scaleRect( cropSection, 0.2f);
 			topLeft.x = cropSection.x;
 			topLeft.y = cropSection.y;
-			topRight = new Rectangle(topLeft);
+			topRight = new Rect(topLeft);
 			topRight.x = cropSection.x + cropSection.width - topRight.width;
 			topRight.y = cropSection.y;
-			bottomLeft = new Rectangle(topLeft);
+			bottomLeft = new Rect(topLeft);
 			bottomLeft.x = cropSection.x;
 			bottomLeft.y = cropSection.y + cropSection.height - bottomLeft.height;
-			bottomRight = new Rectangle(topLeft);
+			bottomRight = new Rect(topLeft);
 			bottomRight.x = cropSection.x + cropSection.width - bottomRight.width;
 			bottomRight.y = cropSection.y + cropSection.height - bottomRight.height;
 		}
@@ -809,7 +810,7 @@ public class Penner
 			building = true;
 			startx = x;
 			starty = y;
-			cropSection = new Rectangle( x, y, 0, 0);
+			cropSection = new Rect( x, y, 0, 0);
 		}
 
 		@Override
@@ -913,7 +914,7 @@ public class Penner
             g2.setStroke(new_stroke);*/
             
             View view = context.getCurrentView();
-            Rectangle r = view.itsRm(cropSection);
+            Rect r = view.itsRm(cropSection);
 			gc.setColor(Color.BLACK);
             gc.drawRect(r.x, r.y, r.width, r.height);
 			

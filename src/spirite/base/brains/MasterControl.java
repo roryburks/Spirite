@@ -1,6 +1,7 @@
 package spirite.base.brains;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -21,8 +22,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import mutil.MUtil;
-import mutil.MUtil.TransferableImage;
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.file.LoadEngine;
@@ -42,13 +41,16 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.layers.Layer;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
+import spirite.base.util.MUtil;
+import spirite.base.util.MUtil.TransferableImage;
+import spirite.base.util.glmath.Rect;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.Dialogs;
+import spirite.pc.pen.Penner;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.Penner;
 
 /***
  * MasterControl is the top level Model object for all non-UI-related data.
@@ -676,8 +678,9 @@ public class MasterControl
 					java.awt.Toolkit.getDefaultToolkit().beep();
 					return;
 				}
-
-				Rectangle rect = new Rectangle(selection.getDimension());
+				
+				Dimension d = selection.getDimension();
+				Rect rect = new Rect(d.width, d.height);
 				rect.x = selectionEngine.getOffsetX();
 				rect.y = selectionEngine.getOffsetY();
 				
@@ -690,7 +693,7 @@ public class MasterControl
 					Layer layer = ((LayerNode)node).getLayer();
 
 					try {
-						Rectangle rect;
+						Rect rect;
 						rect = MUtil.findContentBounds(
 								layer.getActiveData().handle.deepAccess(),
 								1, 
@@ -707,7 +710,7 @@ public class MasterControl
 				Node node = workspace.getSelectedNode();
 				
 				if( node != null)
-					workspace.cropNode(node, new Rectangle(0,0,workspace.getWidth(), workspace.getHeight()), false);
+					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
     		}});
     		commandMap.put("invert", new Runnable() {@Override public void run() {
     			BuiltImageData data= workspace.buildActiveData();

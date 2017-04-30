@@ -15,7 +15,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import mutil.MUtil;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageHandle;
@@ -32,10 +31,11 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
-import spirite.pc.MDebug.ErrorType;
-import spirite.pc.MDebug.WarningType;
+import spirite.base.util.MUtil;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;
 
 /***
  * LoadEngine is a static container for methods which load images from

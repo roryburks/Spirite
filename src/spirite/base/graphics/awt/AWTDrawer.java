@@ -8,8 +8,8 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.pc.Globals;
-import spirite.pen.StrokeEngine;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.StrokeEngine;
 
 public class AWTDrawer extends GraphicsDrawer {
 

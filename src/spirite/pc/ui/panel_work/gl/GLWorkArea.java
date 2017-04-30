@@ -36,11 +36,11 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
+import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
-import spirite.pen.JPenPenner;
 
 
 /**

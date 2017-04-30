@@ -11,7 +11,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
 
-import spirite.pc.Globals;
+import spirite.hybrid.Globals;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;

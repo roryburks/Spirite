@@ -1,4 +1,4 @@
-package spirite.pc;
+package spirite.hybrid;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

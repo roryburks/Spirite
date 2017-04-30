@@ -50,6 +50,7 @@ import spirite.base.image_data.ReferenceManager.LayerReference;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.util.glmath.Vec2;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.SliderPanel;
 
@@ -276,7 +277,10 @@ public class ReferenceSchemePanel extends OmniComponent
 			
 			RLPCellPanel() {
 				GroupLayout layout = new GroupLayout(this);
-				final Dimension d = master.getSettingsManager().getThumbnailSize();
+				
+				// TODO: Meh
+				final Vec2 v2 = master.getSettingsManager().getThumbnailSize();
+				final Dimension d = new Dimension((int)v2.x, (int)v2.y);
 
 				label = new JLabel();
 				thumbnail = new JPanel() {

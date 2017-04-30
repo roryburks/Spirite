@@ -51,8 +51,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 
-import spirite.pc.Globals;
-import spirite.pc.MDebug;
+import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
 
 public class ContentTree extends JPanel
 	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 

@@ -1,7 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +10,8 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2i;
 
 public abstract class Layer {
 	public abstract BuildingImageData getActiveData();
@@ -40,7 +40,7 @@ public abstract class Layer {
 	 * Returns a list of the relative bounds within the Layer where each ImageData
 	 * is drawn.
 	 */
-	public abstract List<Rectangle> getBoundList();
+	public abstract List<Rect> getBoundList();
 	
 	
 	
@@ -63,6 +63,6 @@ public abstract class Layer {
 	 */
 	public static class LayerActionHelper {
 		public List<UndoableAction> actions = new ArrayList<>(0);
-		public Point offsetChange = new Point(0,0);
+		public Vec2i offsetChange = new Vec2i(0,0);
 	}
 }
