@@ -37,7 +37,11 @@ public abstract class GraphicsContext {
 	public abstract void scale(double sx, double sy);
 	public abstract void setColor(int argb);
 	
-	public enum Composite {SRC_OVER, DST_OUT, SRC, SRC_IN, CLEAR, DST_IN, };
+	public enum Composite {
+		SRC, SRC_IN, SRC_OVER, SRC_OUT, SRC_ATOP,
+		DST, DST_IN, DST_OVER, DST_OUT, DST_ATOP,
+		CLEAR, XOR,
+	};
 	public abstract void setComposite( Composite composite, float alpha);
 	public abstract float getAlpha();
 	public abstract Composite getComposite();

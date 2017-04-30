@@ -121,7 +121,7 @@ public class GLWorkArea
         
         if( workspace != null) {
         	// :::: Draw Background Grid
-    		Rectangle rect = new Rectangle( view.itsX(0), view.itsY(0), 
+    		Rect rect = new Rect( view.itsX(0), view.itsY(0), 
     				(int)Math.round(workspace.getWidth()*view.getZoom()),
 	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
     		glgc.drawTransparencyBG(rect, 8);

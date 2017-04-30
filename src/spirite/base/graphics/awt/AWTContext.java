@@ -103,12 +103,18 @@ public class AWTContext extends GraphicsContext{
 		int i = AlphaComposite.SRC_OVER;
 		
 		switch( composite) {
-		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
-		case DST_OUT: i = AlphaComposite.DST_OUT; break;
-		case DST_IN: i = AlphaComposite.DST_IN; break;
 		case SRC: i = AlphaComposite.SRC; break;
 		case SRC_IN: i = AlphaComposite.SRC_IN; break;
+		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
+		case SRC_ATOP: i = AlphaComposite.SRC_ATOP; break;
+		case SRC_OUT: i = AlphaComposite.SRC_OUT; break;
+		case DST: i = AlphaComposite.DST; break;
+		case DST_ATOP: i = AlphaComposite.DST_ATOP; break;
+		case DST_OUT: i = AlphaComposite.DST_OUT; break;
+		case DST_IN: i = AlphaComposite.DST_IN; break;
+		case DST_OVER:i = AlphaComposite.DST_OVER; break;
 		case CLEAR: i = AlphaComposite.CLEAR; break;
+		case XOR: i = AlphaComposite.XOR; break;
 		}
 		g2.setComposite( AlphaComposite.getInstance(i, alpha));
 	}
@@ -121,10 +127,20 @@ public class AWTContext extends GraphicsContext{
 	@Override
 	public Composite getComposite() {
 		switch(((AlphaComposite) g2.getComposite()).getRule()) {
-		case AlphaComposite.SRC_OVER: 
-		default:
-			return Composite.SRC_OVER;
+		case AlphaComposite.SRC: return Composite.SRC;
+		case AlphaComposite.SRC_OUT: return Composite.SRC_OUT;
+		case AlphaComposite.SRC_OVER: return Composite.SRC_OVER;
+		case AlphaComposite.SRC_ATOP: return Composite.SRC_ATOP;
+		case AlphaComposite.SRC_IN: return Composite.SRC_IN;
+		case AlphaComposite.DST: return Composite.SRC;
+		case AlphaComposite.DST_OUT: return Composite.DST_OUT;
+		case AlphaComposite.DST_OVER: return Composite.DST_OVER;
+		case AlphaComposite.DST_ATOP: return Composite.DST_ATOP;
+		case AlphaComposite.DST_IN: return Composite.DST_IN;
+		case AlphaComposite.XOR: return Composite.XOR;
+		case AlphaComposite.CLEAR: return Composite.CLEAR;
 		}
+		return null;
 	}
 	
 	// =========

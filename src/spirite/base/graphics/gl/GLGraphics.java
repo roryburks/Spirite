@@ -1,10 +1,7 @@
 package spirite.base.graphics.gl;
 
-import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
@@ -25,7 +22,7 @@ import spirite.base.image_data.RawImage;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
-import spirite.pc.graphics.ImageBI;
+import spirite.base.util.glmath.Rect;
 import spirite.base.util.Colors;
 import spirite.base.util.DataCompaction.FloatCompactor;
 
@@ -141,21 +138,23 @@ public class GLGraphics extends GraphicsContext{
 	}
 
 
-	private static final Color c1 = new Color( 168,168,168);
-	private static final Color c2 = new Color( 192,192,192);
-	public void drawTransparencyBG( Rectangle rect) {
+	private static final int c1 = 0xFFA8A8A8;
+	private static final int c2 = 0xFFC0C0C0;
+	public void drawTransparencyBG( Rect rect) {
 		reset();
 		drawTransparencyBG( rect, 4);
 	}
-	public void drawTransparencyBG( Rectangle rect, int size) {	
+	public void drawTransparencyBG( Rect rect, int size) {	
 		if( rect.isEmpty())
 			return;
 		reset();
 		
 		GLParameters params = new GLParameters(width, height);
 		params.flip = isFlip();
-		params.addParam(new GLParameters.GLParam3f("uColor1", c1.getRed()/255.0f, c1.getGreen()/255.0f, c1.getBlue()/255.0f));
-		params.addParam(new GLParameters.GLParam3f("uColor2", c2.getRed()/255.0f, c2.getGreen()/255.0f, c2.getBlue()/255.0f));
+		params.addParam(new GLParameters.GLParam3f("uColor1", 
+				Colors.getRed(c1)/255.0f, Colors.getGreen(c1)/255.0f, Colors.getBlue(c1)/255.0f));
+		params.addParam(new GLParameters.GLParam3f("uColor2", 
+				Colors.getRed(c2)/255.0f, Colors.getGreen(c2)/255.0f, Colors.getBlue(c2)/255.0f));
 		params.addParam(new GLParameters.GLParam1i("uSize", size));
 		params.useBlendMode = false;
 		
@@ -278,11 +277,19 @@ public class GLGraphics extends GraphicsContext{
 	
 	public static void setCompositeBlend( GLParameters params, Composite comp) {
 		switch( comp) {
-		case SRC_OVER: params.setBlendMode( GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
-		case DST_OUT:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
-		case DST_IN:params.setBlendMode( GLC.GL_ZERO, GLC.GL_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
 		case SRC:params.setBlendMode( GLC.GL_ONE, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
+		case SRC_OVER: params.setBlendMode( GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
 		case SRC_IN:params.setBlendMode( GLC.GL_DST_ALPHA, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
+		case SRC_ATOP:params.setBlendMode( GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case SRC_OUT:params.setBlendMode( GLC.GL_ONE_MINUS_DST_ALPHA, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
+		
+		case DST:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);break;
+		case DST_OVER:params.setBlendMode( GLC.GL_ONE_MINUS_DST_ALPHA, GLC.GL_ONE, GLC.GL_FUNC_ADD);break;
+		case DST_IN:params.setBlendMode( GLC.GL_ZERO, GLC.GL_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case DST_ATOP:params.setBlendMode( GLC.GL_ONE_MINUS_DST_ALPHA, GLC.GL_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case DST_OUT:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		
+		case XOR:params.setBlendMode( GLC.GL_ONE_MINUS_DST_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
 		case CLEAR:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
 		}
 	}
