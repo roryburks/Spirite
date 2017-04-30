@@ -43,6 +43,7 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.MUtil;
 import spirite.base.util.MUtil.TransferableImage;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -740,7 +741,7 @@ public class MasterControl
     			BuiltSelection sel = se.getBuiltSelection();
     			BufferedImage bi = se.getLiftedImage();
     			
-    			AffineTransform trans = new AffineTransform();
+    			MatTrans trans = new MatTrans();
     			trans.translate(sel.offsetX, sel.offsetY);
     			rm.addReference(bi, rm.getCenter(), trans);
     			

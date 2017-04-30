@@ -40,6 +40,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.pc.graphics.ImageBI;
@@ -130,7 +131,7 @@ public class RenderEngine
 		public int depth;
 		public Composite comp = Composite.SRC_OVER;
 		public float alpha = 1.0f;
-		public AffineTransform trans = new AffineTransform();
+		public MatTrans trans = new MatTrans();
 		public ImageHandle handle;
 	}
 	
@@ -155,7 +156,7 @@ public class RenderEngine
 	}
 	
 	/** Renders the Workspace to an Image in its intended form.  */
-	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, AffineTransform trans) {
+	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, MatTrans trans) {
 		GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
 		
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
@@ -582,7 +583,7 @@ public class RenderEngine
 	public abstract class NodeRenderer {
 		protected final GroupNode root;
 		protected NodeRenderer( GroupNode root) { this.root = root;}
-		public abstract void render(RenderSettings settings, GraphicsContext context, AffineTransform trans);
+		public abstract void render(RenderSettings settings, GraphicsContext context, MatTrans trans);
 		
 		/** Determines the number of images needed to properly render 
 		 * the given RenderSettings.  This number is equal to largest Group
@@ -673,7 +674,7 @@ public class RenderEngine
 			g2.setRenderingHints(settings.hints);
 			g2.scale( settings.width / (float)handle.getWidth(), 
 					  settings.height / (float)handle.getHeight());
-			handle.drawLayer(new AWTContext(g2),null);
+			handle.drawLayer(new AWTContext(g2, bi.getWidth(), bi.getHeight()),null);
 			g.dispose();
 			return null;
 		}
@@ -737,7 +738,7 @@ public class RenderEngine
 			
 			g2.scale( settings.width / (float)layer.getWidth(),
 					settings.height / (float)layer.getHeight());
-			layer.draw(new AWTContext(g2));
+			layer.draw(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 			g.dispose();
 			return bi;
 		}
@@ -767,7 +768,7 @@ public class RenderEngine
 			BufferedImage bi = new BufferedImage(
 					settings.width, settings.height, HybridHelper.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
-			GraphicsContext gc = new AWTContext(g2);
+			GraphicsContext gc = new AWTContext(g2, bi.getWidth(), bi.getHeight());
 			
 			List<Reference> refList = workspace.getReferenceManager().getList(front);
 			float rw = settings.width / (float)workspace.getWidth();

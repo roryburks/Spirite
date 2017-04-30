@@ -10,6 +10,7 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.util.glmath.MatTrans;
 import spirite.pc.graphics.ImageBI;
 
 /**
@@ -23,8 +24,8 @@ public class ReferenceManager {
 	private boolean editingReference = false;
 	private float refAlpha = 1.0f;
 
-	AffineTransform globalTransform = new AffineTransform();
-	AffineTransform calcTransform = new AffineTransform();	// just for caching purposes
+	MatTrans globalTransform = new MatTrans();
+	MatTrans calcTransform = new MatTrans();	// just for caching purposes
 
 	// null signifies the Workspace layer
 	private final List<Reference> references = new ArrayList<>();
@@ -37,7 +38,7 @@ public class ReferenceManager {
 	// ==== Reference Types
 	public abstract class Reference {
 		protected boolean global;
-		AffineTransform localTransform = new AffineTransform();
+		MatTrans localTransform = new MatTrans();
 		public abstract void draw( GraphicsContext gc);
 		public final boolean isGlobal() {return global;}
 	}
@@ -52,8 +53,8 @@ public class ReferenceManager {
 
 		@Override
 		public void draw(GraphicsContext gc) {
-			AffineTransform oldTrans = gc.getTransform();
-			AffineTransform newTrans = new AffineTransform(oldTrans);
+			MatTrans oldTrans = gc.getTransform();
+			MatTrans newTrans = new MatTrans(oldTrans);
 			if( global) 
 				newTrans.concatenate(getTransform());
 			newTrans.concatenate(localTransform);
@@ -72,8 +73,8 @@ public class ReferenceManager {
 		}
 		@Override
 		public void draw(GraphicsContext gc) {
-			AffineTransform oldTrans = gc.getTransform();
-			AffineTransform newTrans = new AffineTransform(oldTrans);
+			MatTrans oldTrans = gc.getTransform();
+			MatTrans newTrans = new MatTrans(oldTrans);
 			if( global) 
 				newTrans.concatenate(getTransform());
 			newTrans.concatenate(localTransform);
@@ -114,8 +115,8 @@ public class ReferenceManager {
 		globalTransform.preConcatenate(calcTransform);
 		triggerReferenceStructureChanged(false);
 	}
-	public AffineTransform getTransform() {
-		return new AffineTransform(globalTransform);
+	public MatTrans getTransform() {
+		return new MatTrans(globalTransform);
 	}
 	
 	
@@ -178,7 +179,7 @@ public class ReferenceManager {
 			triggerReferenceStructureChanged(true);
 		}
 	}
-	public void addReference( BufferedImage toAdd, int index, AffineTransform local) {
+	public void addReference( BufferedImage toAdd, int index, MatTrans local) {
 		if( toAdd != null) {
 			Reference ref = new ImageReference(toAdd);
 			ref.localTransform = local;

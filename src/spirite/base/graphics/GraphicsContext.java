@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
+import spirite.base.util.glmath.MatTrans;
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 
@@ -31,9 +32,10 @@ public abstract class GraphicsContext {
 	public abstract void clear();
 	
 	/** Setting to null produces undefined behavior. */
-	public abstract void setTransform( AffineTransform trans);
-	public abstract AffineTransform getTransform();
+	public abstract void setTransform( MatTrans trans);
+	public abstract MatTrans getTransform();
 	public abstract void translate(double offsetX, double offsetY);
+	public abstract void transform(MatTrans trans);
 	public abstract void setColor(int argb);
 	
 	public enum Composite {SRC_OVER, DST_OUT, SRC, };
@@ -79,5 +81,6 @@ public abstract class GraphicsContext {
 
 	public abstract void drawImage( RawImage img, int x, int y);
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
+
 
 }

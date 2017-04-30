@@ -32,7 +32,7 @@ public class AWTDrawer extends GraphicsDrawer {
 		BufferedImage bi = new BufferedImage( width, height, HybridHelper.BI_FORMAT);
 		
 		Graphics sub = bi.getGraphics();
-		renderable.render(new AWTContext( sub));
+		renderable.render(new AWTContext( sub, bi.getWidth(), bi.getHeight()));
 		sub.dispose();
 		return bi;
 	}

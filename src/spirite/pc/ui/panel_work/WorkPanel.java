@@ -31,6 +31,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.pen.Penner;
@@ -217,8 +218,8 @@ public class WorkPanel extends javax.swing.JPanel
         public int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
         public int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
 
-        public AffineTransform getViewTransform() {
-        	AffineTransform trans = new AffineTransform();
+        public MatTrans getViewTransform() {
+        	MatTrans trans = new MatTrans();
         	trans.translate(itsX(0), itsY(0));
         	trans.scale( getZoom(), getZoom());
         	return trans;

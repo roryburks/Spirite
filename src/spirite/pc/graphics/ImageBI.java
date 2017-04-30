@@ -44,7 +44,7 @@ public class ImageBI extends RawImage {
 
 	@Override
 	public GraphicsContext getGraphics() {
-		return new AWTContext( img.getGraphics());
+		return new AWTContext( img.getGraphics(), img.getWidth(), img.getHeight());
 	}
 
 }

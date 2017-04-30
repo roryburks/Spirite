@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
 import java.nio.FloatBuffer;
 
 import com.jogamp.opengl.GL2;
@@ -37,6 +36,7 @@ import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.util.Colors;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
@@ -127,7 +127,7 @@ public class GLWorkArea
     		glgc.drawTransparencyBG(rect, 8);
     		
 
-        	AffineTransform viewTrans = view.getViewTransform();
+        	MatTrans viewTrans = view.getViewTransform();
 
         	// :::: Draw Image with References
         	RenderEngine renderEngine = workspace.getRenderEngine();
@@ -164,7 +164,7 @@ public class GLWorkArea
                 if(selectionEngine.isBuilding()) 
                 	selectionEngine.drawBuildingSelection(glgc);
                 if( selection != null) {
-                	AffineTransform trans = new AffineTransform(viewTrans);
+                	MatTrans trans = new MatTrans(viewTrans);
                 	trans.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
                 	glgc.setTransform(trans);
                 	selection.drawSelectionBounds(glgc);

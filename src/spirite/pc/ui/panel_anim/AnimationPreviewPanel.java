@@ -333,7 +333,8 @@ public class AnimationPreviewPanel extends OmniComponent
     		if( animation != null) {
     			Graphics2D g2 = (Graphics2D)g;
     			g2.scale(getZoom(), getZoom());
-    			animation.drawFrame(new AWTContext(g), animationManager.getAnimationState(animation).getMetronom());
+    			animation.drawFrame(new AWTContext(g, getWidth(), getHeight()), 
+    					animationManager.getAnimationState(animation).getMetronom());
     		}
     	}
     }

@@ -2,6 +2,8 @@ package spirite.base.util;
 
 import java.awt.geom.AffineTransform;
 
+import spirite.base.util.glmath.MatTrans;
+
 /**
  * A Package containing methods which construct certain frequently-used
  * Matrixes
@@ -24,14 +26,15 @@ public class MatrixBuilder {
 		};
 	}
 	
-	/** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
-	 * which can be fed into OpenGL to behave in the expected way. */
-	public static float[] wrapAffineTransformAs4x4( AffineTransform trans) {
-		return new float[] {
-			(float) trans.getScaleX(), (float) trans.getShearX(),0, (float) trans.getTranslateX(),
-			(float) trans.getShearY(), (float) trans.getScaleY(), 0, (float) trans.getTranslateY(),
-			0, 0, 1, 0,
-			0, 0, 0, 1
-		};
-	}
+
+    /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
+     * which can be fed into OpenGL to behave in the expected way. */
+    public static float[] wrapTransformAs4x4( MatTrans trans) {
+        return new float[] {
+                (float) trans.getM00(), (float) trans.getM01(),0, (float) trans.getM02(),
+                (float) trans.getM10(), (float) trans.getM11(), 0, (float) trans.getM12(),
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        };
+    }
 }

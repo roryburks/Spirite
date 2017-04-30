@@ -67,7 +67,7 @@ public class AnimIO {
 		BufferedImage bi = new BufferedImage(width*c, height, HybridHelper.BI_FORMAT);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
-		GraphicsContext gc = new AWTContext(g);
+		GraphicsContext gc = new AWTContext(g, bi.getWidth(), bi.getHeight());
 		MUtil.clearImage(bi);
 		g.translate(-width, 0);
 		for( int i=0; i<c; ++i) {

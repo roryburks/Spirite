@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -28,9 +29,23 @@ import spirite.pc.graphics.ImageBI;
 public class AWTContext extends GraphicsContext{
 	
 	private final Graphics2D g2;
+	private final int width, height;
 	
-	public AWTContext( Graphics g) {
+	public static AffineTransform toAT( MatTrans trans) {
+		return new AffineTransform(
+				trans.getM00(), trans.getM10(), trans.getM01(),
+				trans.getM11(), trans.getM02(), trans.getM12());
+	}
+	public static MatTrans toMT( AffineTransform trans) {
+		return new MatTrans(
+				(float)trans.getScaleX(), (float)trans.getShearX(), (float)trans.getTranslateX(),
+				(float)trans.getShearY(), (float)trans.getScaleY(), (float)trans.getTranslateY());
+	}
+	
+	public AWTContext( Graphics g, int width, int height) {
 		this.g2 = (Graphics2D)g;
+		this.width = width;
+		this.height = height;
 	}
 	
 	public Graphics getGraphics() {return g2;}
@@ -61,14 +76,18 @@ public class AWTContext extends GraphicsContext{
 
 	@Override
 	public void clear() {
-		Rectangle r = g2.getClipBounds();
-		if( r != null)
-			g2.clearRect(r.x, r.y, r.width, r.height);
+		java.awt.Composite comp = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+		g2.fillRect( 0, 0, width, height);
+		g2.setComposite(comp);
 	}
 
-	@Override public void setTransform(AffineTransform trans) { g2.setTransform(trans); }
-	@Override public AffineTransform getTransform() { return g2.getTransform(); }
-	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}
+	// ==========
+	// ==== Transform Methods
+	@Override public void setTransform(MatTrans trans) { g2.setTransform( toAT(trans)); }
+	@Override public MatTrans getTransform() { return toMT(g2.getTransform()); }
+	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}	
+	@Override public void transform(MatTrans trans) {g2.transform( toAT(trans)); }
 
 	@Override public void setColor(int color) {g2.setColor(new Color(color,true));}
 	@Override
@@ -166,8 +185,4 @@ public class AWTContext extends GraphicsContext{
 			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type");
 	}
 	@Override public void drawHandle(ImageHandle handle, int x, int y) {g2.drawImage( handle.deepAccess(), x, y, null); }
-
-
-
-
 }

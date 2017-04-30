@@ -24,6 +24,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.DynamicImportImage;
 import spirite.base.image_data.ImageWorkspace.ImportImage;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
@@ -36,6 +37,7 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 
 /***
  * LoadEngine is a static container for methods which load images from
@@ -175,7 +177,7 @@ public class LoadEngine {
 			
 			if( helper.version < 2) {
 				for( ImportImage impi : imageMap.values()) {
-					BufferedImage img = impi.image;
+					RawImage img = impi.image;
 					if( img.getWidth() > helper.workspace.getWidth()) {
 						helper.workspace.setWidth(img.getWidth());
 					}
@@ -273,10 +275,10 @@ public class LoadEngine {
 			
 			ImportImage impi;
 			if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
-				 impi = new DynamicImportImage( bi2, ox, oy);
+				 impi = new DynamicImportImage( new ImageBI(bi2), ox, oy);
 			}
 			else
-				impi = new ImportImage( bi2);
+				impi = new ImportImage( new ImageBI(bi2));
 			dataMap.put(identifier, impi);
 			
 		}

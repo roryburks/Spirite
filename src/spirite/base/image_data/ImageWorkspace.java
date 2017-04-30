@@ -1,10 +1,8 @@
 package spirite.base.image_data;
 
-import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
+//import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ import spirite.base.brains.SettingsManager;
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.awt.AWTContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -44,6 +42,7 @@ import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
@@ -344,21 +343,20 @@ public class ImageWorkspace {
 		}
 		
 		public void draw(GraphicsContext gc) {
-			AffineTransform transform = new AffineTransform();
+			MatTrans transform = new MatTrans();
 			transform.translate(ox, oy);
 			handle.drawLayer( gc, transform);
 		}
 		
-		public void drawBorder( Graphics g) {
+		public void drawBorder( GraphicsContext gc) {
 			if( handle == null) return;
 			
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform transform = g2.getTransform();
-			g2.translate(ox, oy);
+			MatTrans transform = gc.getTransform();
+			gc.translate(ox, oy);
 			
-			g2.drawRect(0, 0, handle.getWidth(), handle.getHeight());
+			gc.drawRect(0, 0, handle.getWidth(), handle.getHeight());
 			
-			g2.setTransform( transform);
+			gc.setTransform( transform);
 		}
 		
 		/**
@@ -419,8 +417,8 @@ public class ImageWorkspace {
 		}
 		
 		/** Returns a transform converting from screen space to layer space. */
-		public AffineTransform getScreenToImageTransform() {
-			AffineTransform transform = new AffineTransform();
+		public MatTrans getScreenToImageTransform() {
+			MatTrans transform = new MatTrans();
 			transform.translate( -ox, -oy);
 			return transform;
 		}
@@ -429,8 +427,8 @@ public class ImageWorkspace {
 		 * image space to a composited image space (for normal Images, this is the
 		 * Identity Matrix, for DynamicImages, since they allow editing anywhere on the
 		 * screen, this is equal to the conversion from layerspace to screen space)*/
-		public AffineTransform getCompositeTransform() {
-			return new AffineTransform();			
+		public MatTrans getCompositeTransform() {
+			return new MatTrans();			
 		}
 	}
 	
@@ -454,16 +452,15 @@ public class ImageWorkspace {
 		@Override public int convertY( int y) { return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}
 		@Override
-		public void drawBorder(Graphics g) {
+		public void drawBorder(GraphicsContext gc) {
 			if( handle == null) return;
 			
-			
-			g.drawRect(ox + dii.ox, oy + dii.oy, 
+			gc.drawRect(ox + dii.ox, oy + dii.oy, 
 					handle.getWidth(), handle.getHeight());
 		}
 		@Override
-		public AffineTransform getCompositeTransform() {
-			AffineTransform trans = new AffineTransform();
+		public MatTrans getCompositeTransform() {
+			MatTrans trans = new MatTrans();
 			trans.translate(ox, oy);
 			return trans;
 		}
@@ -491,19 +488,18 @@ public class ImageWorkspace {
 			Rect activeRect = (new Rect(0,0,width,height)).union(
 					new Rect(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
-			BufferedImage bi = new BufferedImage( 
-					activeRect.width, activeRect.height,HybridHelper.BI_FORMAT);
-			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+			RawImage img = HybridHelper.createImage(width, height);
+			GraphicsContext gc = img.getGraphics();
 
 			// Draw the part of the old image over the new one
-			g2.drawImage(this.handle.deepAccess(),
+			gc.drawHandle(handle,
 					ox+dii.ox - activeRect.x, 
-					oy+dii.oy- activeRect.y, null);
+					oy+dii.oy- activeRect.y);
 
 			// Clear the section of the old image that will be replaced by the new one
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-			g2.drawImage(((ImageBI)buffer).img, -activeRect.x, -activeRect.y, null);
-			g2.dispose();
+			gc.setComposite( Composite.SRC, 1.0f);
+			gc.drawImage(buffer, -activeRect.x, -activeRect.y);
+//			g2.dispose();
 
 			dii.ox = activeRect.x - ox;
 			dii.oy = activeRect.y - oy;
@@ -511,33 +507,31 @@ public class ImageWorkspace {
 			
 			Rect cropped = null;
 			try {
-				cropped = MUtil.findContentBounds(bi, 0, true);
+				// TODO: MARK
+				cropped = MUtil.findContentBounds( ((ImageBI)img).img, 0, true);
 			} catch (UnsupportedDataTypeException e) {
 				e.printStackTrace();
 			}
-			BufferedImage nbi;
+			
+			RawImage nri;
 			if( cropped == null || cropped.isEmpty()) {
-				nbi = new BufferedImage( 1,1, HybridHelper.BI_FORMAT);
+				nri = HybridHelper.createImage(1, 1);
 			}
 			else {
-				nbi = new BufferedImage( cropped.width,cropped.height, HybridHelper.BI_FORMAT);
+				nri = HybridHelper.createImage( cropped.width, cropped.height);
 			}
-			g2 = (Graphics2D)nbi.getGraphics();
-			g2.drawImage(bi, -cropped.x, -cropped.y, null);
-			g2.dispose();
+			gc = nri.getGraphics();
+			gc.drawImage( img, -cropped.x, -cropped.y);
+//			gc.dispose();
 			
 			dii.ox += cropped.x;
 			dii.oy += cropped.y;
 			
-			imageData.get(handle.id).cachedImage.replace(new ImageBI(nbi));
+			imageData.get(handle.id).cachedImage.replace(nri);
 			
 			buffer = null;
 			if( g != null)g.dispose();
 			g = null;
-			
-			
-			
-			
 
 			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
@@ -741,16 +735,16 @@ public class ImageWorkspace {
 					continue;
 
 				// Construct a crop action
-				BufferedImage image = new BufferedImage( 
-						newBounds.width, newBounds.height, HybridHelper.BI_FORMAT);
-				MUtil.clearImage(image);
-				Graphics2D g2 = (Graphics2D) image.getGraphics();
-				AffineTransform transform = new AffineTransform();		
-				transform.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
-				handle.drawLayer(new AWTContext(g2), transform);
-				g2.dispose();
+				RawImage img = HybridHelper.createImage(newBounds.width, newBounds.height);
+				GraphicsContext gc = img.getGraphics();
 				
-				actions.add( undoEngine.createReplaceAction(handle, new ImageBI(image)));
+				gc.clear();
+				MatTrans transform = new MatTrans();		
+				transform.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
+				handle.drawLayer(gc, transform);
+//				g2.dispose();
+				
+				actions.add( undoEngine.createReplaceAction(handle, img));
 				handlesCropped.add( new ImageCropHelper( handle, newBounds.x-imageBound.x,  newBounds.y-imageBound.y));
 			}
 	
@@ -849,16 +843,18 @@ public class ImageWorkspace {
 		}
 		@Override
 		protected void performImageAction() {
-			BufferedImage img = ((ImageBI)builtImage.checkoutRaw()).img;
-			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), HybridHelper.BI_FORMAT);
-			MUtil.clearImage(buffer);	
-			Graphics g = buffer.getGraphics();
-			g.drawImage(img, x, y, null);
-			g.dispose();
-			MUtil.clearImage(img);
-			g = img.getGraphics();
-			g.drawImage(buffer, 0, 0, null);
-			g.dispose();
+			RawImage img = builtImage.checkoutRaw();
+			RawImage buffer = HybridHelper.createImage( img.getWidth(), img.getHeight());
+			
+			GraphicsContext gc = buffer.getGraphics();
+			gc.clear();
+			gc.drawImage(img, x, y);
+//			gc.dispose();
+			
+			gc = img.getGraphics();
+			gc.clear();
+			gc.drawImage( buffer, 0, 0);
+//			g.dispose();
 			builtImage.checkin();
 		}
 		@Override
@@ -886,14 +882,14 @@ public class ImageWorkspace {
 	
 	// :::: Content Addition
 	public static class ImportImage {
-		public final BufferedImage image;
-		public ImportImage( BufferedImage image) {
+		public final RawImage image;
+		public ImportImage( RawImage image) {
 			this.image = image;
 		}
 	}
 	public static class DynamicImportImage extends ImportImage {
 		final int ox, oy;
-		public DynamicImportImage(BufferedImage image, int ox, int oy) {
+		public DynamicImportImage(RawImage image, int ox, int oy) {
 			super(image);
 			this.ox = ox;
 			this.oy = oy;
@@ -939,7 +935,7 @@ public class ImageWorkspace {
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
-			CachedImage ci = cacheManager.cacheImage(new ImageBI(entry.getValue().image), this);
+			CachedImage ci = cacheManager.cacheImage(entry.getValue().image, this);
 			ci.reserve(this);
 			
 			if( entry.getValue() instanceof DynamicImportImage) {
@@ -968,8 +964,8 @@ public class ImageWorkspace {
 	 * NOTE: If the ImageHandle is not linked to a Layer in the Workspace
 	 * then the image will get flushed next time the image data is checked
 	 */
-	public ImageHandle importData( BufferedImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(new ImageBI(newImage), this);
+	public ImageHandle importData( RawImage newImage) {
+		CachedImage ci = cacheManager.cacheImage(newImage, this);
 		imageData.put( workingID, new InternalImage(ci));
 		ci.reserve(this);
 		
@@ -981,8 +977,8 @@ public class ImageWorkspace {
 	 * the data (but can only draw on the currently visible part) and it
 	 * will automatically crop the data periodically to only the used area.
 	 */
-	public ImageHandle importDynamicData(BufferedImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(new ImageBI(newImage), this);
+	public ImageHandle importDynamicData(RawImage newImage) {
+		CachedImage ci = cacheManager.cacheImage(newImage, this);
 		imageData.put( workingID, new DynamicInternalImage(ci, 0, 0));
 		ci.reserve(this);
 		
@@ -1101,11 +1097,13 @@ public class ImageWorkspace {
 					ImportImage impi;
 					if( handle.isDynamic()) {
 						DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
-						impi = new DynamicImportImage(MUtil.deepCopy( handle.deepAccess()), 
+						impi = new DynamicImportImage(
+								new ImageBI(MUtil.deepCopy( handle.deepAccess())), 
 								dii.ox, dii.oy);
 					}
 					else {
-						 impi = new ImportImage(MUtil.deepCopy( handle.deepAccess()));
+						 impi = new ImportImage(
+									new ImageBI(MUtil.deepCopy( handle.deepAccess())));
 					}
 					dupeData.put( handle.id, impi);
 				}
@@ -1155,11 +1153,13 @@ public class ImageWorkspace {
 							ImportImage impi;
 							if( handle.isDynamic()) {
 								DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
-								impi = new DynamicImportImage(MUtil.deepCopy( handle.deepAccess()), 
+								impi = new DynamicImportImage(
+										new ImageBI(MUtil.deepCopy( handle.deepAccess())), 
 										dii.ox, dii.oy);
 							}
 							else {
-								 impi = new ImportImage(MUtil.deepCopy( handle.deepAccess()));
+								 impi = new ImportImage(
+											new ImageBI(MUtil.deepCopy( handle.deepAccess())));
 							}
 							dupeData.put(handle.id, impi);
 						}

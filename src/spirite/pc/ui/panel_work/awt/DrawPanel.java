@@ -88,7 +88,7 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g) {
         super.paintComponent(g);
         
-        GraphicsContext gc = new AWTContext(g);
+        GraphicsContext gc = new AWTContext(g, getWidth(), getHeight());
 
         if( workspace == null) {
         	return;

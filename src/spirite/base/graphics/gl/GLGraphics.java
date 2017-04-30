@@ -3,7 +3,6 @@ package spirite.base.graphics.gl;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 
@@ -25,6 +24,7 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.GLC;
+import spirite.base.util.glmath.MatTrans;
 import spirite.pc.graphics.ImageBI;
 import spirite.base.util.Colors;
 import spirite.base.util.DataCompaction.FloatCompactor;
@@ -44,7 +44,7 @@ public class GLGraphics extends GraphicsContext{
 	private GL2 gl;
 	private int width, height;
 	private boolean flip = false;
-	private AffineTransform contextTransform = new AffineTransform();
+	private MatTrans contextTransform = new MatTrans();
 	private int color = Colors.BLACK;
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
@@ -163,7 +163,7 @@ public class GLGraphics extends GraphicsContext{
 				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false, gl);
 	}
 	
-	public void _drawBounds( BufferedImage mask, int cycle, AffineTransform trans) {
+	public void _drawBounds( BufferedImage mask, int cycle, MatTrans trans) {
 		reset();
 		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
 
@@ -200,14 +200,18 @@ public class GLGraphics extends GraphicsContext{
 	
 	// =================
 	// ==== Logistical Render Settings
-	@Override public AffineTransform getTransform() {return new AffineTransform(contextTransform);}
-	@Override public void setTransform(AffineTransform trans) {
-		if( trans == null) trans = new AffineTransform();
-		else trans = new AffineTransform(trans);
+	@Override public MatTrans getTransform() {return new MatTrans(contextTransform);}
+	@Override public void setTransform(MatTrans trans) {
+		if( trans == null) trans = new MatTrans();
+		else trans = new MatTrans(trans);
 		contextTransform = trans;
 	}
 	@Override public void translate(double offsetX, double offsetY) {
-		contextTransform.translate(offsetX, offsetY);
+		contextTransform.translate((float)offsetX, (float)offsetY);
+	}
+	@Override
+	public void transform(MatTrans trans) {
+		contextTransform.concatenate(trans);
 	}
 	
 	@Override public void setColor(int argb) {

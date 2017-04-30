@@ -28,6 +28,7 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
@@ -164,7 +165,7 @@ public class DrawEngine {
 		BuiltSelection sel = selectionEngine.getBuiltSelection();
 		
 		if( selectionEngine.isLifted()) {
-			AffineTransform trans = new AffineTransform();
+			MatTrans trans = new MatTrans();
 			if( horizontal)
 				trans.scale(-1, 1);
 			else
@@ -418,7 +419,7 @@ public class DrawEngine {
 				g2.setColor(Color.GREEN);
 				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-				mask.selection.drawSelectionMask(new AWTContext(g2));
+				mask.selection.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 				g2.drawImage(intermediate, 0, 0, null);
 				g2.dispose();
@@ -461,7 +462,8 @@ public class DrawEngine {
 					//	touches the pixels outside of it with its rasterizer)
 					MUtil.clearImage(intermediate);
 					Graphics2D g2 = (Graphics2D)intermediate.getGraphics();
-					mask.selection.drawSelectionMask(new AWTContext(g2));
+					mask.selection.drawSelectionMask(
+							new AWTContext(g2, intermediate.getWidth(), intermediate.getHeight()));
 					g2.dispose();
 					
 					g2 = (Graphics2D) bi.getGraphics();

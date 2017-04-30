@@ -1,7 +1,6 @@
 package spirite.base.graphics.awt;
 
 import java.awt.AlphaComposite;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -16,15 +15,19 @@ import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
+import spirite.base.image_data.RawImage;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.ImageBI;
 
 public class AWTNodeRenderer extends NodeRenderer {
 	float ratioW, ratioH;	// TODO
@@ -37,7 +40,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 	}
 	
 	@Override
-	public void render(RenderSettings settings, GraphicsContext context, AffineTransform trans) {		
+	public void render(RenderSettings settings, GraphicsContext context, MatTrans trans) {		
 		try {
 			AWTContext awtc = (AWTContext)context;
 			
@@ -74,7 +77,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 		}
 	}
 	
-	private BufferedImage compositionImage;
+	private RawImage compositionImage;
 	private ImageHandle compositionContext = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) {
 		BuiltImageData dataContext= workspace.buildActiveData();
@@ -82,33 +85,31 @@ public class AWTNodeRenderer extends NodeRenderer {
 			if( workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing()) {
 
-				compositionImage= new BufferedImage( 
-						dataContext.getWidth(), dataContext.getHeight(),
-						HybridHelper.BI_FORMAT);
+				compositionImage= 
+						HybridHelper.createImage(dataContext.getWidth(), dataContext.getHeight());
 				compositionContext = dataContext.handle;
 				
-
-				Graphics2D g2 = (Graphics2D)compositionImage.getGraphics();
+				GraphicsContext gc = compositionImage.getGraphics();
 				
 				// Draw Base Image
-				g2.setTransform(dataContext.getCompositeTransform());
-				g2.translate(dataContext.handle.getDynamicX(), 
+				gc.setTransform(dataContext.getCompositeTransform());
+				gc.translate(dataContext.handle.getDynamicX(), 
 						dataContext.handle.getDynamicY());
-				g2.drawImage(dataContext.handle.deepAccess(), 0, 0, null);
+				gc.drawHandle(dataContext.handle, 0, 0);
 			
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
 					// Draw Lifted Image
-					g2.setTransform( dataContext.getScreenToImageTransform());
-					g2.transform( workspace.getSelectionEngine().getDrawFromTransform());
+					MatTrans tt = dataContext.getScreenToImageTransform();
+					tt.concatenate( workspace.getSelectionEngine().getDrawFromTransform());
 					
-					g2.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0, null);
+					gc.drawImage( new ImageBI(workspace.getSelectionEngine().getLiftedImage()), 0, 0);
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {
 					// Draw
-					g2.setTransform(new AffineTransform());
-					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(new AWTContext(g2));
+					gc.setTransform(new MatTrans());
+					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer( gc);
 				}
-				g2.dispose();
+//				g2.dispose();
 			}
 		}
 	}
@@ -184,8 +185,9 @@ public class AWTNodeRenderer extends NodeRenderer {
 		});
 		
 		// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
+		GraphicsContext gc = new AWTContext(g2, buffer[n].getWidth(), buffer[n].getHeight());
 		for( Drawable renderable : renderList) {
-			renderable.draw(g2);
+			renderable.draw(gc);
 		}
 
 		g.dispose();
@@ -194,19 +196,18 @@ public class AWTNodeRenderer extends NodeRenderer {
 	private abstract class Drawable {
 		private int subDepth;
 		protected int depth;
-		public abstract void draw(Graphics g);
+		public abstract void draw(GraphicsContext gc);
 	}
 
-	private Composite cc;
-	private void _setGraphicsSettings( Graphics g, Node node, RenderSettings settings) {
-		final Graphics2D g2 = (Graphics2D)g;
-		 cc = g2.getComposite();
+	private float cc;
+	private void _setGraphicsSettings( GraphicsContext gc, Node node, RenderSettings settings) {
+		 cc = gc.getAlpha();
 		
 		if( node.getAlpha() != 1.0f) 
-			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, node.getAlpha()));
+			gc.setComposite(Composite.SRC_OVER, node.getAlpha() * cc);
 	}
-	private void _resetRenderSettings( Graphics g, Node r, RenderSettings settings) {
-		((Graphics2D)g).setComposite(cc);
+	private void _resetRenderSettings( GraphicsContext gc, Node r, RenderSettings settings) {
+		gc.setComposite( Composite.SRC_OVER, cc);
 	}
 	private class GroupRenderable extends Drawable {
 		private final GroupNode node;
@@ -219,20 +220,18 @@ public class AWTNodeRenderer extends NodeRenderer {
 			this.settings = settings;
 		}
 		@Override
-		public void draw(Graphics g) {
+		public void draw(GraphicsContext gc) {
 			_render_rec(node, n+1, settings);
-			_setGraphicsSettings(g, node,settings);
-			g.drawImage( buffer[n+1],
-					0, 0, 
-					null);
-			_resetRenderSettings(g, node,settings);
+			_setGraphicsSettings(gc, node,settings);
+			gc.drawImage( new ImageBI(buffer[n+1]), 0, 0);
+			_resetRenderSettings(gc, node,settings);
 		}
 	}
 	private class TransformedRenderable extends Drawable {
 		private final TransformedHandle renderable;
 		private final RenderSettings settings;
 		private final LayerNode node;
-		private AffineTransform transform;
+		private MatTrans transform;
 		TransformedRenderable( LayerNode node, TransformedHandle renderable, RenderSettings settings) {
 			this.node = node;
 			this.renderable = renderable;
@@ -242,28 +241,27 @@ public class AWTNodeRenderer extends NodeRenderer {
 			this.transform.translate(node.getOffsetX(), node.getOffsetY());
 		}
 		@Override
-		public void draw(Graphics g) {
+		public void draw(GraphicsContext gc) {
 			
-			_setGraphicsSettings(g, node,settings);
-			Graphics2D g2 = (Graphics2D)g;
-			AffineTransform oldTransform = g2.getTransform();
+			_setGraphicsSettings(gc, node,settings);
+			MatTrans oldTransform = gc.getTransform();
 			
-			AffineTransform drawTrans = new AffineTransform( transform);
+			MatTrans drawTrans = new MatTrans( transform);
 			if( compositionContext == renderable.handle) {
 				if( renderable.handle.isDynamic())
-					drawTrans = new AffineTransform();
-				g2.setTransform(drawTrans);
-				g2.drawImage( compositionImage, 0, 0, null);
+					drawTrans = new MatTrans();
+				gc.setTransform(drawTrans);
+				gc.drawImage( compositionImage, 0, 0);
 			}
 			else {
-				g2.setTransform(drawTrans);
-				g2.translate(renderable.handle.getDynamicX(), 
+				gc.setTransform(drawTrans);
+				gc.translate(renderable.handle.getDynamicX(), 
 						renderable.handle.getDynamicY());
-				g2.drawImage( renderable.handle.deepAccess(), 0, 0, null);
+				gc.drawHandle( renderable.handle, 0, 0);
 			}
 			
-			g2.setTransform(oldTransform);
-			_resetRenderSettings(g, node,settings);
+			gc.setTransform(oldTransform);
+			_resetRenderSettings(gc, node,settings);
 		}
 		
 	}

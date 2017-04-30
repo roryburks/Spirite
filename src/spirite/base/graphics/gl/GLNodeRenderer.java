@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl;
 
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +27,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.pc.graphics.ImageBI;
@@ -70,7 +70,7 @@ class GLNodeRenderer extends NodeRenderer {
 	private GL2 gl;
 	private GLGraphics glgc;
 	@Override
-	public void render(RenderSettings settings, GraphicsContext context, AffineTransform trans) {
+	public void render(RenderSettings settings, GraphicsContext context, MatTrans trans) {
 		try {
 			
 			glgc = (GLGraphics)context;
@@ -159,7 +159,7 @@ class GLNodeRenderer extends NodeRenderer {
 					@Override
 					public void render(GL _gl) {
 						// Draw Base Image
-						AffineTransform trans = dataContext.getCompositeTransform();
+						MatTrans trans = dataContext.getCompositeTransform();
 						trans.translate( dataContext.handle.getDynamicX(), 
 								dataContext.handle.getDynamicY());
 						glgc.setTransform(trans);
@@ -183,7 +183,7 @@ class GLNodeRenderer extends NodeRenderer {
 						}
 						if( workspace.getDrawEngine().strokeIsDrawing()) {
 							// Draw Stroke Layer
-							glgc.setTransform(new AffineTransform());
+							glgc.setTransform(new MatTrans());
 							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 						}	
 					}
@@ -364,7 +364,7 @@ class GLNodeRenderer extends NodeRenderer {
 		private final TransformedHandle renderable;
 		private final RenderSettings settings;
 		private final LayerNode node;
-		private AffineTransform transform;
+		private MatTrans transform;
 		TransformedRenderable( LayerNode node, TransformedHandle renderable, RenderSettings settings) {
 			this.node = node;
 			this.renderable = renderable;
@@ -386,12 +386,12 @@ class GLNodeRenderer extends NodeRenderer {
 					alpha *= renderable.alpha;
 					setParamsFromNode( node, params, true, alpha);
 					
-					AffineTransform trans = new AffineTransform(transform);
+					MatTrans trans = new MatTrans(transform);
 
 					GLGraphics.setCompositeBlend(params, glgc.getComposite());
 					if( compositedHandle == renderable.handle) {
 						if( renderable.handle.isDynamic())
-							trans = new AffineTransform();
+							trans = new MatTrans();
 						params.texture = new GLParameters.GLFBOTexture(compositeLayer);
 						engine.applyPassProgram(
 								ProgramType.PASS_RENDER, params, trans,

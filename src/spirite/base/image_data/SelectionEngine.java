@@ -29,6 +29,7 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.DataCompaction.IntCompactor;
@@ -76,7 +77,7 @@ public class SelectionEngine {
 	
 	// Variables relating to Transforming
 	private boolean proposingTransform = false;
-	AffineTransform proposedTransform = null;
+	MatTrans proposedTransform = null;
 
 	
 	SelectionEngine( ImageWorkspace workspace) {
@@ -117,8 +118,8 @@ public class SelectionEngine {
 	public Selection getSelection() {return built.selection;}
 	public BufferedImage getLiftedImage() {return liftedImage;}
 
-	public AffineTransform getDrawFromTransform() {
-		AffineTransform trans = new AffineTransform();
+	public MatTrans getDrawFromTransform() {
+		MatTrans trans = new MatTrans();
 		if( proposingTransform) {
 			Vec2i d = built.selection.getDimension();
 			trans.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
@@ -240,7 +241,7 @@ public class SelectionEngine {
 	
 	// ==================
 	// ==== Transform proposing
-	public void proposeTransform( AffineTransform trans) {
+	public void proposeTransform( MatTrans trans) {
 		this.proposingTransform = true;
 		this.proposedTransform = trans;
 		workspace.triggerImageRefresh(selChangeEvt);
@@ -324,7 +325,7 @@ public class SelectionEngine {
 				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		Graphics g = bi.getGraphics();
-		GraphicsContext gc = new AWTContext(g);
+		GraphicsContext gc = new AWTContext(g, bi.getWidth(), bi.getHeight());
 		if( sel1 != null)
 			sel1.drawSelectionMask(gc);
 		if( sel2 != null)
@@ -339,7 +340,7 @@ public class SelectionEngine {
 				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		GraphicsContext gc = new AWTContext(g2);
+		GraphicsContext gc = new AWTContext(g2, bi.getWidth(), bi.getHeight());
 		if( sel1 != null)
 			sel1.drawSelectionMask(gc);
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
@@ -358,12 +359,12 @@ public class SelectionEngine {
 		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
-		sel1.drawSelectionMask(new AWTContext(g2));
+		sel1.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 		g2.dispose();
 		
 
 		g2 = (Graphics2D)bi2.getGraphics();
-		sel2.drawSelectionMask(new AWTContext(g2));
+		sel2.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_IN));
 		g2.drawImage( bi, 0, 0, null);
 		g2.dispose();
@@ -379,47 +380,45 @@ public class SelectionEngine {
 		g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
 		if( sel != null)
-			sel.drawSelectionMask(new AWTContext(g2));
+			sel.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 		g2.dispose();
 
 		return new BuiltSelection( bi);
 	}
-	public void transformSelection( AffineTransform trans) {
-		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
-		Graphics2D g2 = (Graphics2D)bi.getGraphics();
+	public void transformSelection( MatTrans trans) {
+		RawImage img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
+		
+		GraphicsContext gc = img.getGraphics();
 		
 		Vec2i d = built.selection.getDimension();
-		g2.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
-		g2.transform(trans);
-		g2.translate(-d.x/2, -d.y/2);
-		built.selection.drawSelectionMask(new AWTContext(g2));
-		g2.dispose();
-		BuiltSelection sel = new BuiltSelection(bi);
+		gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
+		gc.transform(trans);
+		gc.translate(-d.x/2, -d.y/2);
+		built.selection.drawSelectionMask(gc);
+//		g2.dispose();
+		BuiltSelection sel = new BuiltSelection( ((ImageBI)img).img);
 		
 		List<UndoableAction> actions = new ArrayList<>(2); 
 		actions.add( new SetSelectionAction(sel));
 		
 		if( lifted) {
-			bi = new BufferedImage(
-					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
-			g2 = (Graphics2D)bi.getGraphics();
-			g2.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
-			g2.transform(trans);
-			g2.translate(-d.x/2, -d.y/2);
-			g2.drawImage(liftedImage, 0, 0, null);
-			g2.dispose();
+			img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
+			gc = img.getGraphics();
+			gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
+			gc.transform(trans);
+			gc.translate(-d.x/2, -d.y/2);
+			gc.drawImage( new ImageBI(liftedImage), 0, 0);
+//			g2.dispose();
 			
 			Vec2i afterDim = sel.selection.getDimension();
 			
 			
-			BufferedImage afterLift = new BufferedImage(
-					afterDim.x, afterDim.y,  HybridHelper.BI_FORMAT);
-			g2 = (Graphics2D)afterLift.getGraphics();
-			g2.drawImage(bi, -sel.offsetX, -sel.offsetY, null);
-			g2.dispose();
+			RawImage afterLift = HybridHelper.createImage(afterDim.x, afterDim.y );
+			gc = afterLift.getGraphics();
+			gc.drawImage(img, -sel.offsetX, -sel.offsetY );
+//			gc.dispose();
 			
-			actions.add( new SetLiftedAction(afterLift));
+			actions.add( new SetLiftedAction(((ImageBI)afterLift).img));
 		}
 		
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Transform Lifted Selection"));
@@ -739,7 +738,7 @@ public class SelectionEngine {
 			if( selection == null) return;
 			
 			
-			AffineTransform trans = gc.getTransform();
+			MatTrans trans = gc.getTransform();
 			gc.translate(offsetX, offsetY);
 			
 			selection.drawSelectionMask(gc);
@@ -764,7 +763,7 @@ public class SelectionEngine {
 			
 			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
-			selection.drawSelectionMask(new AWTContext(g2));	// Note: Untransformed
+			selection.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));	// Note: Untransformed
 			
 
 			// Copy the data inside the Selection's alphaMask to liftedData
@@ -772,7 +771,7 @@ public class SelectionEngine {
 
 			g2.translate(-this.offsetX, -this.offsetY);
 			
-			liftScheme.draw(new AWTContext(g2));
+			liftScheme.draw(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
 			g2.dispose();
 			
 			return bi;

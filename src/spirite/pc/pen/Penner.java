@@ -49,7 +49,10 @@ import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.pc.pen.PenTraits.ButtonType;
 import spirite.pc.pen.PenTraits.MButtonEvent;
@@ -990,17 +993,17 @@ public class Penner
 	}
 	class ReshapingBehavior extends DrawnStateBehavior {
 		// The Working Transform is the transform which is used for drawing
-		AffineTransform wTrans = new AffineTransform();
+		MatTrans wTrans = new MatTrans();
 		
 		// The Lock Transform is the transform stored at the start of the current
 		//	action, which is used in combination of the transformation of the current
 		//	action to create the Working Transform
-		AffineTransform lockTrans = new AffineTransform();
+		MatTrans lockTrans = new MatTrans();
 		
 		// The Calculation Transform is a version of the Locked Transform which has
 		//	all the relevent offsets built-in so that calculation changes in mouse
 		//	movement with respect to the selection's center can be easily performed.
-		AffineTransform calcTrans = new AffineTransform();
+		MatTrans calcTrans = new MatTrans();
 		ReshapeStates state = ReshapeStates.READY;
 		int startX,startY;
 		int overlap = -1;
@@ -1021,9 +1024,9 @@ public class Penner
 			}
 			Vec2i d = sel.selection.getDimension();
 			
-			AffineTransform origTrans = gc.getTransform();
+			MatTrans origTrans = gc.getTransform();
 
-			AffineTransform relTrans = new AffineTransform();
+			MatTrans relTrans = new MatTrans();
 			relTrans.translate(view.itsX(0), view.itsY(0));
 			relTrans.scale(zoom, zoom);
 			relTrans.translate(d.x/2+sel.offsetX, d.y/2+sel.offsetY);
@@ -1039,10 +1042,10 @@ public class Penner
 			gc.setColor(Colors.GRAY);
 //			gc.setStroke(defStroke);
 			
-			Point2D p = new Point2D.Float();
+			Vec2 p = new Vec2();
 			try {
-				p = relTrans.inverseTransform(new Point(rawX,rawY), p);
-			} catch (NoninvertibleTransformException e) {
+				p = relTrans.inverseTransform(new Vec2(rawX,rawY), p);
+			} catch (NoninvertableException e) {
 				e.printStackTrace();
 			}
 			
@@ -1077,7 +1080,8 @@ public class Penner
 				overlap = -1;
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
-				if( overlap == i || (overlap == -1 && shape.contains(p))) {
+				System.out.println(p.x + "," + p.y);
+				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
 					gc.setColor(Colors.YELLOW);
 //					gc.setStroke(new BasicStroke( 4/zoom));
 					gc.draw(shape);
@@ -1109,8 +1113,8 @@ public class Penner
 				Vec2i d = sel.selection.getDimension();
 				startX = x;
 				startY = y;
-				lockTrans = new AffineTransform(wTrans);
-				calcTrans = new AffineTransform();
+				lockTrans = new MatTrans(wTrans);
+				calcTrans = new MatTrans();
 				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
 				calcTrans.preConcatenate(lockTrans);
 				this.state = ReshapeStates.RESIZE;
@@ -1119,8 +1123,8 @@ public class Penner
 				Vec2i d = sel.selection.getDimension();
 				startX = x;
 				startY = y;
-				lockTrans = new AffineTransform(wTrans);
-				calcTrans = new AffineTransform();
+				lockTrans = new MatTrans(wTrans);
+				calcTrans = new MatTrans();
 				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
 				calcTrans.preConcatenate(lockTrans);
 				this.state = ReshapeStates.ROTATE;
@@ -1147,29 +1151,29 @@ public class Penner
 			case READY:
 				break;
 			case RESIZE:{
-				Point2D pn = new Point2D.Float();
-				Point2D ps = new Point2D.Float();
+				Vec2 pn = new Vec2();
+				Vec2 ps = new Vec2();
 
-				calcTrans.transform(new Point(x,y), pn);
-				calcTrans.transform(new Point(startX,startY), ps);
+				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(startX,startY), ps);
 
-				wTrans = (new AffineTransform(lockTrans));
+				wTrans = (new MatTrans(lockTrans));
 				
-				wTrans.scale(pn.getX()/ps.getX(),pn.getY()/ps.getY());
+				wTrans.scale(pn.x/ps.x,pn.y/ps.y);
 				//wTrans.concatenate(lockTrans);
 				break;}
 			case ROTATE:{
-				Point2D pn = new Point2D.Float();
-				Point2D ps = new Point2D.Float();
+				Vec2 pn = new Vec2();
+				Vec2 ps = new Vec2();
 
-				calcTrans.transform(new Point(x,y), pn);
-				calcTrans.transform(new Point(startX,startY), ps);
+				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(startX,startY), ps);
 				
-				wTrans = (new AffineTransform(lockTrans));
-				
-				double start = Math.atan2(ps.getY(), ps.getX());
-				double end =  Math.atan2(pn.getY(), pn.getX());
-				wTrans.rotate(end-start);
+				wTrans = (new MatTrans(lockTrans));
+
+				double start = Math.atan2(ps.y, ps.x);
+				double end =  Math.atan2(pn.y, pn.x);
+				wTrans.rotate((float)(end-start));
 				break;}
 			
 			}

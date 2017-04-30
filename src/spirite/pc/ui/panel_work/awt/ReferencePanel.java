@@ -55,7 +55,7 @@ public class ReferencePanel extends JPanel
         	BufferedImage buffer = renderer.renderImage(settings);
             
             Graphics2D g2 = (Graphics2D)g;
-            GraphicsContext gc = new AWTContext(g2);
+            GraphicsContext gc = new AWTContext(g2, buffer.getWidth(), buffer.getHeight());
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoomer.getZoom(), zoomer.getZoom());

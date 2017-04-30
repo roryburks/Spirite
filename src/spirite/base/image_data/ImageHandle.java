@@ -10,6 +10,7 @@ import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
@@ -102,7 +103,7 @@ public class ImageHandle {
 	}
 	
 	public void drawLayer(
-			GraphicsContext gc, AffineTransform transform, Composite composite, float alpha) 
+			GraphicsContext gc, MatTrans transform, Composite composite, float alpha) 
 	{
 		float oldAlpha = gc.getAlpha();
 		Composite oldComposite = gc.getComposite();
@@ -112,7 +113,7 @@ public class ImageHandle {
 		gc.setComposite(oldComposite, oldAlpha);
 	}
 	
-	public void drawLayer(GraphicsContext gc, AffineTransform transform) {
+	public void drawLayer(GraphicsContext gc, MatTrans transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
@@ -121,14 +122,14 @@ public class ImageHandle {
 		
 		if( ii == null) return;
 
-		AffineTransform prev= gc.getTransform();
+		MatTrans prev= gc.getTransform();
 		if (transform == null)
-			transform = new AffineTransform();
+			transform = new MatTrans();
 		if( ii instanceof DynamicInternalImage)
 			transform.translate(
 					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
 		
-		AffineTransform completeTransform = new AffineTransform(prev);
+		MatTrans completeTransform = new MatTrans(prev);
 		completeTransform.concatenate(transform);
 		
 		gc.setTransform(completeTransform);

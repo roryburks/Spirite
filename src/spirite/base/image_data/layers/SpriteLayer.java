@@ -21,9 +21,11 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 
 
 /**
@@ -192,7 +194,7 @@ public class SpriteLayer extends Layer
 		}
 		
 		
-		Part part = new Part(context.importDynamicData(image), testing);
+		Part part = new Part(context.importDynamicData(new ImageBI(image)), testing);
 		part.ox = ox;
 		part.oy = oy;
 		part.depth = depth;
@@ -287,7 +289,7 @@ public class SpriteLayer extends Layer
 		
 		gc.setComposite(Composite.SRC_OVER, oldAlpha*part.alpha);
 		
-		AffineTransform trans = new AffineTransform();
+		MatTrans trans = new MatTrans();
 		trans.translate(part.ox,part.oy);
 		part.handle.drawLayer( gc, trans);
 		

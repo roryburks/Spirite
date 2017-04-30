@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl.engine;
 
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.base.util.glmath.MatTrans;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -286,7 +286,7 @@ public class GLEngine  {
 	public void applyPassProgram(
 			ProgramType type,
 			GLParameters params, 
-			AffineTransform trans, 
+			MatTrans trans, 
 			boolean internal,
 			GL2 gl)
 	{
@@ -314,7 +314,7 @@ public class GLEngine  {
 	public void applyPassProgram(
 			ProgramType type, 
 			GLParameters params, 
-			AffineTransform trans,
+			MatTrans trans,
 			float x1, float y1, float x2, float y2,
 			boolean internal,
 			GL2 gl)
@@ -334,7 +334,7 @@ public class GLEngine  {
 	}
 
 	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
-			int numPoints, GLParameters params, AffineTransform trans, GL2 gl) 
+			int numPoints, GLParameters params, MatTrans trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
 
@@ -351,7 +351,7 @@ public class GLEngine  {
 	}
 	
 	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
-			int numPoints, GLParameters params, AffineTransform trans, GL2 gl) 
+			int numPoints, GLParameters params, MatTrans trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
         
@@ -385,7 +385,7 @@ public class GLEngine  {
 	 */
 	public void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, AffineTransform trans, GL2 gl) 
+			GLParameters params, MatTrans trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
 		
@@ -438,7 +438,7 @@ public class GLEngine  {
 	 */
 	public void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, AffineTransform trans, GL2 gl) 
+			GLParameters params, MatTrans trans, GL2 gl) 
 	{
 		// NOTE: identical code to above but without implicit casting
 		addOrtho(params, trans);
@@ -473,7 +473,7 @@ public class GLEngine  {
 	}
 	
 	private void _doCompliexLineProg( PreparedData pd, int count, CapMethod cap, 
-			JoinMethod join, float width, GLParameters params, AffineTransform trans, GL2 gl)
+			JoinMethod join, float width, GLParameters params, MatTrans trans, GL2 gl)
 	{
 		// TODO: implement Rounded joins and all cap methods
 		int uJoin = 0;
@@ -506,7 +506,7 @@ public class GLEngine  {
 			int numPoints,
 			PolyType polyType,
 			GLParameters params,
-			AffineTransform trans,
+			MatTrans trans,
 			GL2 gl) 
 	{
 		addOrtho(params, trans);
@@ -529,7 +529,7 @@ public class GLEngine  {
 			int numPoints, 
 			PolyType polyType,
 			GLParameters params, 
-			AffineTransform trans, 
+			MatTrans trans, 
 			GL2 gl) 
 	{
 		addOrtho(params, trans);
@@ -548,14 +548,14 @@ public class GLEngine  {
 	}
 	
 	
-	/** Combines the world AffineTransform with an Orthogonal Transform as 
+	/** Combines the world MatTrans with an Orthogonal Transform as 
 	 * defined by the parameters to create a 4D Perspective Matrix*/
-	private void addOrtho( GLParameters params, AffineTransform trans) {
+	private void addOrtho( GLParameters params, MatTrans trans) {
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
         
         if( trans != null) {
-	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapAffineTransformAs4x4(trans));
+	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapTransformAs4x4(trans));
 	        matrix = matrix2.multiply(matrix);
         }
         
