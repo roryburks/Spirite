@@ -1,6 +1,5 @@
 package spirite.base.brains;
 
-//import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +10,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import spirite.base.image_data.RawImage;
-import spirite.base.util.MUtil;
-import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 

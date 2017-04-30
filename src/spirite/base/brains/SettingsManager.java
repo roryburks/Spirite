@@ -34,7 +34,7 @@ public class SettingsManager {
 
     public SettingsManager(MasterControl master) {
         this.master = master;
-        prefs = Preferences.userNodeForPackage(SettingsManager.class);
+        prefs = Preferences.userNodeForPackage(spirite.Spirite.class);
     }
 
 

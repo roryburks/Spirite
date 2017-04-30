@@ -1,12 +1,8 @@
 package spirite.base.brains;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,8 +21,6 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.GraphicsDrawer.RenderRoutine;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
@@ -44,7 +38,6 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
-import spirite.pc.graphics.ImageBI;
 
 /***
  * The RenderEngine may or may not be a big and necessary component
@@ -193,7 +186,7 @@ public class RenderEngine
 					|| settings.width == 0 || settings.height == 0) 
 				return null;
 			
-			cachedImage = cacheManager.cacheImage(new ImageBI(settings.target.render(settings)),this);
+			cachedImage = cacheManager.cacheImage( settings.target.render(settings),this);
 
 			imageCache.put(settings, cachedImage);
 		}
@@ -214,7 +207,7 @@ public class RenderEngine
 	
 	// ===================
 	// ==== Thumbnail Management
-	public BufferedImage accessThumbnail( Node node) {
+	public RawImage accessThumbnail( Node node) {
 		return thumbnailManager.accessThumbnail(node);
 	}
 	private final ThumbnailManager thumbnailManager = new ThumbnailManager();
@@ -233,13 +226,13 @@ public class RenderEngine
 
 		private final Map<Node,Thumbnail> thumbnailMap = new HashMap<>();
 		
-		public BufferedImage accessThumbnail( Node node) {
+		public RawImage accessThumbnail( Node node) {
 			Thumbnail thumb = thumbnailManager.thumbnailMap.get(node);
 			
 			if( thumb == null) {
 				return null;
 			}
-			return thumb.bi;
+			return thumb.img;
 		}
 
 		
@@ -261,20 +254,20 @@ public class RenderEngine
 				
 				if( thumb == null) {
 					thumb = new Thumbnail();
-					thumb.bi = renderThumbnail(node);
+					thumb.img = renderThumbnail(node);
 					thumb.changed = false;
 					thumbnailMap.put(node, thumb);
 				}
 				else if( thumb.changed) {
-					if( thumb.bi != null)
-						thumb.bi.flush();
-					thumb.bi = renderThumbnail(node);
+					if( thumb.img != null)
+						thumb.img.flush();
+					thumb.img = renderThumbnail(node);
 					thumb.changed = false;
 				}
 			}
 		}
 		
-		private BufferedImage renderThumbnail( Node node) {
+		private RawImage renderThumbnail( Node node) {
 
 			RenderingHints newHints = new RenderingHints(
 		             RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -294,7 +287,7 @@ public class RenderEngine
 		
 		private class Thumbnail {
 			boolean changed = false;
-			BufferedImage bi;
+			RawImage img;
 		}
 
 		public void imageChanged(ImageChangeEvent evt) {
@@ -447,7 +440,7 @@ public class RenderEngine
 		public abstract int getDefaultHeight();
 		public abstract List<ImageHandle> getImagesReliedOn();
 		public List<Node> getNodesReliedOn() {return new ArrayList<>(0);}
-		public abstract BufferedImage render( RenderSettings settings);
+		public abstract RawImage render( RenderSettings settings);
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -557,25 +550,18 @@ public class RenderEngine
 		}
 
 		@Override
-		public BufferedImage render(RenderSettings settings) {
-			// TODO: Add way to detect if OpenGL is not proprly loaded, and use
-			//	default AWT renderer if not
-			
-			
+		public RawImage render(RenderSettings settings) {
 //			buildCompositeLayer(workspace);
 			
 			GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
 			
-			BufferedImage bi = drawer.renderToImage( new RenderRoutine() {
-				@Override
-				public void render(GraphicsContext context) {
-					context.clear();
-					NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
-					renderer.render(settings, context, null);
-				}
-			}, settings.width, settings.height);
+			RawImage img = HybridHelper.createImage(settings.width, settings.height);
+			GraphicsContext gc = img.getGraphics();
+			gc.clear();;
+			NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
+			renderer.render(settings, gc, null);
 			
-			return bi;
+			return img;
 		}
 
 	}
@@ -665,19 +651,17 @@ public class RenderEngine
 		}
 
 		@Override
-		public BufferedImage render(RenderSettings settings) {
-			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, HybridHelper.BI_FORMAT);
+		public RawImage render(RenderSettings settings) {
+			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			
-			Graphics g = bi.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
+			GraphicsContext gc = img.getGraphics();
 			
-			g2.setRenderingHints(settings.hints);
-			g2.scale( settings.width / (float)handle.getWidth(), 
+//			g2.setRenderingHints(settings.hints);
+			gc.scale( settings.width / (float)handle.getWidth(), 
 					  settings.height / (float)handle.getHeight());
-			handle.drawLayer(new AWTContext(g2, bi.getWidth(), bi.getHeight()),null);
-			g.dispose();
-			return null;
+			handle.drawLayer( gc,null);
+//			g.dispose();
+			return img;
 		}
 	}
 
@@ -730,18 +714,16 @@ public class RenderEngine
 		}
 
 		@Override
-		public BufferedImage render(RenderSettings settings) {
-			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, HybridHelper.BI_FORMAT);
+		public RawImage render(RenderSettings settings) {
+			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			
-			Graphics g = bi.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
+			GraphicsContext gc = img.getGraphics();
 			
-			g2.scale( settings.width / (float)layer.getWidth(),
+			gc.scale( settings.width / (float)layer.getWidth(),
 					settings.height / (float)layer.getHeight());
-			layer.draw(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
-			g.dispose();
-			return bi;
+			layer.draw(gc);
+//			g.dispose();
+			return img;
 		}
 	}
 
@@ -765,23 +747,22 @@ public class RenderEngine
 		}
 
 		@Override
-		public BufferedImage render(RenderSettings settings) {
-			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, HybridHelper.BI_FORMAT);
-			Graphics2D g2 = (Graphics2D)bi.getGraphics();
-			GraphicsContext gc = new AWTContext(g2, bi.getWidth(), bi.getHeight());
+		public RawImage render(RenderSettings settings) {
+			RawImage img = HybridHelper.createImage(settings.width, settings.height);
+			
+			GraphicsContext gc = img.getGraphics();
 			
 			List<Reference> refList = workspace.getReferenceManager().getList(front);
 			float rw = settings.width / (float)workspace.getWidth();
 			float rh = settings.height / (float)workspace.getHeight();
-			g2.scale( rw, rh);
+			gc.scale( rw, rh);
 					
 			for( Reference ref : refList ) {
 				ref.draw(gc);
 			}
 			
-			g2.dispose();
-			return bi;
+//			gc.dispose();
+			return img;
 		}
 
 		@Override

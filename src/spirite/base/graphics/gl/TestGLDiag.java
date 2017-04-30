@@ -19,8 +19,9 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.GLBuffers;
 
-import spirite.base.graphics.gl.GLUIDraw.GradientType;
 import spirite.base.graphics.gl.engine.GLEngine;
+import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLParameters;
 
 public class TestGLDiag extends JDialog  {
 
@@ -67,6 +68,7 @@ public class TestGLDiag extends JDialog  {
 				int w = glad.getSurfaceWidth();
 				int h = glad.getSurfaceHeight();
 				
+				GLEngine engine = GLEngine.getInstance();
 				
 				GL2 gl = glad.getGL().getGL2();
 
@@ -75,27 +77,11 @@ public class TestGLDiag extends JDialog  {
 		        
 		        gl.glViewport( 0, 0, w, h);
 		        
-		        switch( met) {
-		        case 0:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.RED, w, h, gl);
-			        break;
-		        case 1:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.GREEN, w, h, gl);
-			        break;
-		        case 2:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.BLUE, w, h, gl);
-			        break;
-		        case 3:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.HUE, w, h, gl);
-			        break;
-		        case 4:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.SATURATION, w, h, gl);
-			        break;
-		        case 5:
-			        GLUIDraw.drawColorGradient(0.4f, GradientType.VALUE, w, h, gl);
-			        break;
-		        }
-		        
+		        GLParameters params = new GLParameters(w, h);
+		        params.addParam( new GLParameters.GLParam1f("fixedCol", 0.4f));
+		        params.addParam( new GLParameters.GLParam1i("varCol", met));
+
+	        	engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true, gl);
 			}
 		});
 

@@ -45,16 +45,6 @@ public class GLDrawer extends GraphicsDrawer {
 	}
 
 	@Override public StrokeEngine getStrokeEngine() { return strokeEngine; }
-    
-
-	@Override
-	public BufferedImage renderToImage(RenderRoutine renderable, int width, int height) {
-		engine.setSurfaceSize(width, height);
-
-		renderable.render( new GLGraphics( engine.getAutoDrawable(), false));
-
-		return engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
-	}
 
 	@Override
 	public void changeColor(RawImage image, int from, int to, int mode) {

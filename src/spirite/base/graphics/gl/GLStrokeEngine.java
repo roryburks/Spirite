@@ -47,11 +47,11 @@ class GLStrokeEngine extends StrokeEngine {
 	protected void onStart() {
 		w = data.getWidth();
 		h = data.getHeight();
-		fixedLayer = new GLMultiRenderer( w, h, engine.getGL2());
-		displayLayer = new GLMultiRenderer( w, h, engine.getGL2());
+		fixedLayer = new GLMultiRenderer( engine.getGL2());
+		displayLayer = new GLMultiRenderer( engine.getGL2());
 		
-		fixedLayer.init();
-		displayLayer.init();
+		fixedLayer.init(w, h);
+		displayLayer.init(w, h);
 	}
 	@Override
 	protected void onEnd() {

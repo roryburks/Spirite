@@ -987,7 +987,7 @@ public class GLEngine  {
 		
 		str += "FBOs: \n";
 		for( int i=0; i < c_glmus.size(); ++i) {
-			str += i + "["+c_glmus.get(i).getTexture() +"] : (" + c_glmus.get(i).width + "," + c_glmus.get(i).height + ")\n";
+			str += i + "["+c_glmus.get(i).getTexture() +"] : (" + c_glmus.get(i).getWidth() + "," + c_glmus.get(i).getHeight() + ")\n";
 		}
 		str += "Textures: \n";
 		for( int i=0; i < c_texes.size(); ++i) {

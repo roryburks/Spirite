@@ -162,8 +162,8 @@ public class GLParameters {
 		}
 
 		@Override public void unload() {}
-		@Override public int getWidth() { return glmu.width; }
-		@Override public int getHeight() { return glmu.height; }	
+		@Override public int getWidth() { return glmu.getWidth(); }
+		@Override public int getHeight() { return glmu.getHeight(); }	
 	}
 	
 	// ==============

@@ -741,7 +741,7 @@ public class ImageWorkspace {
 			
 			if( layerAction != null ) {
 				actions.addAll( layerAction.actions);
-				if( !layerAction.offsetChange.equals(MUtil.ORIGIN)) {
+				if( layerAction.offsetChange.x !=0 || layerAction.offsetChange.y != 0) {
 					actions.add( new StructureAction(new OffsetChange(node, 
 							node.getOffsetX() + layerAction.offsetChange.x, 
 							node.getOffsetY() + layerAction.offsetChange.y)));

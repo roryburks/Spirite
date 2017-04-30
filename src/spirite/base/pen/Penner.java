@@ -1,23 +1,16 @@
 package spirite.base.pen;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +44,6 @@ import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.pen.StrokeEngine.Method;
-import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
@@ -61,7 +52,6 @@ import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -584,8 +574,7 @@ public class Penner
 			
 			if( !MUtil.coordInImage(x, y, img))
 				return;
-			paletteManager.setActiveColor(
-					(leftClick)?0:1, new Color(img.getRGB(x, y)));
+			paletteManager.setActiveColor( (leftClick)?0:1, img.getRGB(x, y));
 		}
 
 		@Override

@@ -11,7 +11,6 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.util.MUtil;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 
@@ -48,13 +47,12 @@ class AWTStrokeEngine extends StrokeEngine{
 		if( sel.selection != null) {
 			selectionMask = new BufferedImage( 
 					data.getWidth(), data.getHeight(), HybridHelper.BI_FORMAT);
-			MUtil.clearImage(selectionMask);
 			
-			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
-			g2.translate(sel.offsetX, sel.offsetY);
-			sel.selection.drawSelectionMask(
-					new AWTContext(g2, selectionMask.getWidth(), selectionMask.getHeight()));
-			g2.dispose();
+			GraphicsContext gc = new AWTContext(selectionMask);
+			gc.clear();
+			gc.translate(sel.offsetX, sel.offsetY);
+			sel.selection.drawSelectionMask(gc);
+//			g2.dispose();
 		}
 	}
 	@Override
@@ -72,8 +70,8 @@ class AWTStrokeEngine extends StrokeEngine{
 
 	@Override
 	protected void prepareDisplayLayer() {
-		MUtil.clearImage(displayLayer);
 		Graphics g = displayLayer.getGraphics();
+		g.clearRect(0, 0, displayLayer.getWidth(), displayLayer.getHeight());
 		g.drawImage(fixedLayer, 0, 0, null);
 		
 	}

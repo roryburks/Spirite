@@ -1,9 +1,8 @@
 package spirite.base.file;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+//import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +33,7 @@ import spirite.base.util.MUtil;
 import spirite.base.util.RectanglePacker;
 import spirite.base.util.RectanglePacker.PackedRectangle;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
@@ -71,7 +71,7 @@ public class AnimIO {
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		GraphicsContext gc = new AWTContext(g, bi.getWidth(), bi.getHeight());
-		MUtil.clearImage(bi);
+		gc.clear();
 		g.translate(-width, 0);
 		for( int i=0; i<c; ++i) {
 			g.translate(width, 0);
@@ -160,7 +160,7 @@ public class AnimIO {
 
 		// Step 2: Crop the image to only their used bounds
 		List<CroppedImage> images = new ArrayList<>(handles.size());
-		List<Dimension> toPack = new ArrayList<>(images.size());
+		List<Vec2i> toPack = new ArrayList<>(images.size());
 		for( ImageHandle handle : handles) {
 			Rect bounds = null;
 			try {
@@ -193,13 +193,13 @@ public class AnimIO {
 				ci.oy = bounds.y + oy;
 				
 				images.add(ci);
-				toPack.add(new Dimension(bounds.width,bounds.height));
+				toPack.add(new Vec2i(bounds.width,bounds.height));
 			}
 		}
 		
 		// Step 3: Pack the Rectangles in a given area and save to a png
 		PackedRectangle pr = RectanglePacker.modifiedSleatorAlgorithm(toPack);
-		for( Rectangle r : pr.packedRects) {
+		for( Rect r : pr.packedRects) {
 			for( CroppedImage ci : images) {
 				if( ci != null && ci.rectInImage == null &&
 					ci.bi.getWidth() == r.width && ci.bi.getHeight() == r.height) 
@@ -280,7 +280,7 @@ public class AnimIO {
 	private static class CroppedImage {
 		int ox, oy;
 		BufferedImage bi;
-		Rectangle rectInImage;
+		Rect rectInImage;
 	}
 	private static class AAFFrame {
 		ArrayList<AAFSubFrame> frames = new ArrayList<>();

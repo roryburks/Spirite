@@ -1,8 +1,10 @@
 package spirite.hybrid;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,7 +12,9 @@ import java.io.OutputStream;
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.RawImage;
+import spirite.base.util.MUtil;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.glmath.Rect;
@@ -22,6 +26,30 @@ public class HybridUtil {
 		private UnsupportedImageTypeException(String message) {super(message);}
 	}
 	
+	
+	// =======
+	// ==== IO
+	public static RawImage load( File f) throws IOException {
+		BufferedImage bi = ImageIO.read(f);
+		RawImage img = HybridHelper.createImage(bi.getWidth(), bi.getHeight());
+		GraphicsContext gc = img.getGraphics();
+		gc.clear();
+		gc.drawImage( new ImageBI(bi), 0, 0);
+//		g.dispose();
+		
+		return img;
+	}
+
+	public static RawImage load(ByteArrayInputStream byteArrayInputStream) throws IOException {
+		BufferedImage bi = ImageIO.read(byteArrayInputStream);
+		RawImage img = HybridHelper.createImage(bi.getWidth(), bi.getHeight());
+		GraphicsContext gc = img.getGraphics();
+		gc.clear();
+		gc.drawImage( new ImageBI(bi), 0, 0);
+//		g.dispose();
+		
+		return img;
+	}
 	
 	public static void savePNG( RawImage raw, OutputStream os) throws IOException {
 		if( raw instanceof ImageBI) {
@@ -241,6 +269,8 @@ public class HybridUtil {
 			return ((bgcolor >>> 24) & 0xFF) == 0;
 		}
 	}
+
+
 
 
 }

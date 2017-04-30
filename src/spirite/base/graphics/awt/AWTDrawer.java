@@ -30,16 +30,6 @@ public class AWTDrawer extends GraphicsDrawer {
 	public StrokeEngine getStrokeEngine() {
 		return strokeEngine;
 	}
-	
-	@Override
-	public BufferedImage renderToImage(RenderRoutine renderable, int width, int height) {
-		BufferedImage bi = new BufferedImage( width, height, HybridHelper.BI_FORMAT);
-		
-		Graphics sub = bi.getGraphics();
-		renderable.render(new AWTContext( sub, bi.getWidth(), bi.getHeight()));
-		sub.dispose();
-		return bi;
-	}
 
 	@Override
 	public void changeColor(RawImage image, int cFrom, int cTo, int mode) {

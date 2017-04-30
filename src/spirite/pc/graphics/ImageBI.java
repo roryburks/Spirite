@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.RawImage;
-import spirite.base.util.MUtil;
+import spirite.pc.PCUtil;
 
 public class ImageBI extends RawImage {
 	public final BufferedImage img;
@@ -38,7 +38,7 @@ public class ImageBI extends RawImage {
 
 	@Override
 	public RawImage deepCopy() {
-		return new ImageBI( MUtil.deepCopy(img));
+		return new ImageBI( PCUtil.deepCopy(img));
 	}
 
 

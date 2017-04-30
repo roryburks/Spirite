@@ -58,8 +58,8 @@ public class GLGraphics extends GraphicsContext{
 	}
 	public GLGraphics( GLMultiRenderer glmu ) {
 		this.drawable = engine.getAutoDrawable();
-		this.width = glmu.width;
-		this.height = glmu.height;
+		this.width = glmu.getWidth();
+		this.height = glmu.getHeight();
 	}
 	public GLGraphics() {
 		this.drawable = engine.getAutoDrawable();
@@ -72,7 +72,7 @@ public class GLGraphics extends GraphicsContext{
 	public int getHeight() { return height;}
 	public void useFBO( GLMultiRenderer glmu) {
 		this.glmu = glmu;
-		setDimensions(this.glmu.width, this.glmu.height);
+		setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
 	}
 	public void unuseFBO() {
 		this.glmu = null;
@@ -98,7 +98,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	synchronized void reset() {
 		if( glmu != null) {
-			setDimensions(this.glmu.width, this.glmu.height);
+			setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
 		}
 		else {
 			setDimensions(drawable.getSurfaceWidth()
@@ -115,11 +115,11 @@ public class GLGraphics extends GraphicsContext{
 	public void drawBounds(RawImage mask, int c) {
 		reset();
 
-		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
+		GLMultiRenderer glmu = new GLMultiRenderer(gl);
 		engine.setSurfaceSize(width, height);
 
 		// Render the mask to the a screen-shaped surface
-		glmu.init();
+		glmu.init(width, height);
 		glmu.render( new GLRenderer() {
 			@Override public void render(GL gl) {
 				GL2 gl2 = gl.getGL2();
@@ -163,35 +163,6 @@ public class GLGraphics extends GraphicsContext{
 				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false, gl);
 	}
 	
-	public void _drawBounds( BufferedImage mask, int cycle, MatTrans trans) {
-		reset();
-		GLMultiRenderer glmu = new GLMultiRenderer(width, height, gl);
-
-		// Render the mask to the a screen-shaped surface
-		glmu.init();
-		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-				GL2 gl2 = gl.getGL2();
-				engine.clearSurface(gl2);
-				GLParameters params2 = new GLParameters(width, height);
-				params2.texture = new GLImageTexture(new ImageBI(mask));
-				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
-						0, 0, mask.getWidth(), mask.getHeight(), false, gl2);
-			}
-		});
-		
-		// Render the screen-shaped version of the mask using the 
-		//	Border-detecting Shader
-		GLParameters params = new GLParameters(width, height);
-		params.addParam( new GLParam1i("uCycle", cycle));
-		params.texture = new GLFBOTexture(glmu);
-
-    	engine.clearSurface(gl);
-		engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, true, engine.getGL2());
-
-		// Clean up and Apply the surface to an image
-		glmu.cleanup();
-	}
 	@Override
 	public void clear() {
 		reset();

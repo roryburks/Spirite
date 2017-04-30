@@ -44,12 +44,12 @@ public class ColorPicker extends OmniComponent
 		
 		ColorChangeAlerter p1cca = new ColorChangeAlerter() {
 			@Override public void onColorChange(Color c) {
-				paletteManager.setActiveColor(0, c);
+				paletteManager.setActiveColor(0, c.getRGB());
 			}
 		};
 		ColorChangeAlerter p2cca = new ColorChangeAlerter() {
 			@Override public void onColorChange(Color c) {
-				paletteManager.setActiveColor(1, c);
+				paletteManager.setActiveColor(1, c.getRGB());
 			}
 		};
 		comp1.alerter = p1cca;

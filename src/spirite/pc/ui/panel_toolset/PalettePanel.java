@@ -175,9 +175,10 @@ public class PalettePanel extends JPanel
     			Color c = dialogs.pickColor();
     			
     			if( c != null) {
-    				paletteManager.setActiveColor(((ColorPicker)draggedFrom).index, c);
-    				if( !paletteManager.getColors().contains(c))
-    					paletteManager.addPaletteColor(c);
+    				int argb = c.getRGB();
+    				paletteManager.setActiveColor(((ColorPicker)draggedFrom).index, argb);
+    				if( !paletteManager.getColors().contains(argb))
+    					paletteManager.addPaletteColor(argb);
     			}
     		}
     		else if( draggedFrom == palette) {
@@ -186,16 +187,16 @@ public class PalettePanel extends JPanel
     			int startIndex = palette.getIndexAt(startX, startY);
     			int endIndex = palette.getIndexAt(e.getX(), e.getY());
 
-    			Color startC = paletteManager.getPaletteColor(startIndex);
+    			Integer startC = paletteManager.getPaletteColor(startIndex);
     			
     			if( startIndex == -1 || endIndex == -1){}
     			else if( startIndex == endIndex || shortEvt) {
     				if( e.getClickCount() == 2 || startC == null) {
     					// Color Pick new Palette Color
-    					Color c = dialogs.pickColor( startC);
+    					Color c = dialogs.pickColor( new Color(startC));
     					if( c != null)  {
-    						paletteManager.setPaletteColor(startIndex, c);
-        					paletteManager.setActiveColor(e.getButton()/2, c);
+    						paletteManager.setPaletteColor(startIndex, c.getRGB());
+        					paletteManager.setActiveColor(e.getButton()/2, c.getRGB());
     					}
     				}
     				else
@@ -221,7 +222,7 @@ public class PalettePanel extends JPanel
     			// Drag from palette into the Foreground/Background: set FG/BG color as dragged color
     			if( draggedFrom == palette) {
         			int index = palette.getIndexAt(startX, startY);
-        			Color c = paletteManager.getPaletteColor(index);
+        			Integer c = paletteManager.getPaletteColor(index);
         			
         			if( c != null)
         				paletteManager.setActiveColor( ((ColorPicker)draggedTo).index, c);
@@ -233,9 +234,9 @@ public class PalettePanel extends JPanel
     			int index = palette.getIndexAt(converted.x, converted.y);
     			Color c = ((ColorPicker)draggedFrom).getColor();
     			if( index == -1)
-    				paletteManager.addPaletteColor(c);
+    				paletteManager.addPaletteColor(c.getRGB());
     			else
-    				paletteManager.setPaletteColor( index, c);
+    				paletteManager.setPaletteColor( index, c.getRGB());
     		}
     		else {
     			// Drag from X to out of the context
@@ -299,14 +300,14 @@ public class PalettePanel extends JPanel
         @Override
         public void paintComponent( Graphics g) {
         	super.paintComponent(g);
-            Color selected1 = new Color(paletteManager.getActiveColor(0));
-            Color selected2 = new Color(paletteManager.getActiveColor(1));
+            int selected1 = paletteManager.getActiveColor(0);
+            int selected2 = paletteManager.getActiveColor(1);
             
-            for( Entry<Integer, Color> entry : paletteManager.getPalette()) {
-            	Color c = entry.getValue();
+            for( Entry<Integer, Integer> entry : paletteManager.getPalette()) {
+            	int c = entry.getValue();
             	Rectangle rect = getBoundsOfIndex( entry.getKey());
             	
-            	g.setColor(c);;
+            	g.setColor( new Color(c));
             	g.fillRect( rect.x, rect.y, rect.width, rect.height);
             	
 
@@ -325,7 +326,7 @@ public class PalettePanel extends JPanel
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if( evt.getSource() == btnAddColor) {
-			paletteManager.addPaletteColor( new Color(paletteManager.getActiveColor(0)));
+			paletteManager.addPaletteColor( paletteManager.getActiveColor(0));
 		}
 		else if( evt.getSource() == btnLoadPalette) {
 			List<String> palettes = paletteManager.getStoredPaletteNames();

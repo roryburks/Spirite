@@ -47,6 +47,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.file.AnimIO;
+import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.GroupTree;
@@ -62,6 +63,7 @@ import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.OpacityChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ImageWorkspace.VisibilityChange;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
@@ -737,10 +739,10 @@ public class LayerTreePanel extends ContentTree
 				
 				
 				if( node != null) {
-					BufferedImage bi = renderEngine.accessThumbnail(node);
-					if( bi != null) {
-						UIUtil.drawTransparencyBG(g, new Rectangle( bi.getWidth(), bi.getHeight()));
-						g.drawImage(bi, 0, 0, null);
+					RawImage img = renderEngine.accessThumbnail(node);
+					if( img != null) {
+						UIUtil.drawTransparencyBG(g, new Rectangle( img.getWidth(), img.getHeight()));
+						(new AWTContext(g, getWidth(), getHeight())).drawImage( img, 0, 0);
 					}
 					else 
 						UIUtil.drawTransparencyBG(g, null);

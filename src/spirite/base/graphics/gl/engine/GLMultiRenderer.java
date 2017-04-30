@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.gl.GLGraphics;
+import spirite.base.util.glmath.GLC;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 
@@ -21,34 +22,46 @@ import spirite.hybrid.MDebug.WarningType;
  */
 public class GLMultiRenderer {
 	private final GL2 gl;
-	public final int width, height;
 	private static final GLEngine engine = GLEngine.getInstance();
+	private int width, height;
 
 	private int fbo;
 	private static int dbo = -1;
 	private int tex;
 	
-	public GLMultiRenderer( int width, int height, GL2 gl) {
-		this.width = width;
-		this.height = height;
+	// 0: free
+	// 1: internal texture
+	// 2: external texture
+	private int state = 0;
+	
+	public GLMultiRenderer( GL2 gl) {
 		this.gl = gl;
 		
+	}
+	
+	public int getWidth() {return width;}
+	public int getHeight() {return height;}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		cleanup();
+		super.finalize();
 	}
 	
 	/** Checks is the FrameBuffer was successfully created, displaying a proper
 	 * Error message if it wasn't.
 	 */
 	private void checkFramebuffer() {
-        switch( gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)) {
-        case GL.GL_FRAMEBUFFER_COMPLETE:
+        switch( gl.glCheckFramebufferStatus(GLC.GL_FRAMEBUFFER)) {
+        case GLC.GL_FRAMEBUFFER_COMPLETE:
     		return;
-        case GL.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT.");
     		break;	
-        case GL.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
     		break;	
-        case GL.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
     		break;	
         case GL.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
@@ -60,7 +73,7 @@ public class GLMultiRenderer {
         case GL2.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
     		break;	
-        case GL.GL_FRAMEBUFFER_UNSUPPORTED:
+        case GLC.GL_FRAMEBUFFER_UNSUPPORTED:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_UNSUPPORTED");
     		break;	
         case GL.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
@@ -69,7 +82,7 @@ public class GLMultiRenderer {
         case GL2.GL_FRAMEBUFFER_UNDEFINED :
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction.GL_FRAMEBUFFER_UNDEFINED");
     		break;	
-        case GL.GL_INVALID_ENUM:
+        case GLC.GL_INVALID_ENUM:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_INVALID_ENUM");
     		break;	
         default:
@@ -83,7 +96,13 @@ public class GLMultiRenderer {
 	 * NOTE: cleanup() must be called at some point after calling this
 	 * so that the native OpenGL resources get freed.
 	 */
-	public void init() {
+	public void init( int width, int height) {
+		if( state != 0)
+			cleanup();
+		
+		this.width = width;
+		this.height = height;
+		
 		// Allocate FBO
 		int[] result = new int[1];
 		gl.glGenFramebuffers(1, result, 0);
@@ -93,36 +112,67 @@ public class GLMultiRenderer {
 		// Allocate Color Texture
 		gl.glGenTextures(1, result, 0);
 		this.tex = result[0];
-        gl.glBindTexture( GL.GL_TEXTURE_2D, tex);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_NEAREST);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_WRAP_S,GL.GL_CLAMP_TO_EDGE);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_WRAP_T,GL.GL_CLAMP_TO_EDGE);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D,0,GL.GL_RGBA8,
+        gl.glBindTexture( GLC.GL_TEXTURE_2D, tex);
+        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MIN_FILTER,GLC.GL_NEAREST);
+        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MAG_FILTER,GLC.GL_NEAREST);
+        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
+        gl.glTexImage2D(GLC.GL_TEXTURE_2D,0,GL.GL_RGBA8,
         		width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
         
-        // Create a (nearly) empty depth-buffer as a placeholder
-        if( dbo == -1) {
-	        gl.glGenRenderbuffers( 1, result, 0);
-	        dbo = result[0];
-	        gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, dbo);
-	        gl.glRenderbufferStorage( GL.GL_RENDERBUFFER, GL.GL_DEPTH_COMPONENT16, 1, 1);
-	        gl.glFramebufferRenderbuffer( GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, dbo);
-        }
         
         // TODO: Check for Out of Memory and handle appropriately
+        bindPlaceholderDepthBuffer();
         
         // Attach Texture to FBO
-        gl.glFramebufferTexture2D( GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, 
-        		GL.GL_TEXTURE_2D, tex, 0);
+        gl.glFramebufferTexture2D( GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, 
+        		GLC.GL_TEXTURE_2D, tex, 0);
         
         checkFramebuffer();
-        gl.glBindFramebuffer( GL.GL_FRAMEBUFFER, 0);
-        
+        gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
 
 		engine.c_glmus.add(this);
+		state = 1;
 	}
+	
+	public void init( GLImage img) {
+		if( state != 0)
+			cleanup();
 		
+		width = img.getWidth();
+		height = img.getHeight();
+		
+		// Allocate FBO
+		int[] result = new int[1];
+		gl.glGenFramebuffers(1, result, 0);
+		this.fbo = result[0];
+		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
+		
+		this.tex = img.tex;
+		bindPlaceholderDepthBuffer();
+
+        // Attach Texture to FBO
+        gl.glFramebufferTexture2D( GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, 
+        		GLC.GL_TEXTURE_2D, tex, 0);
+        
+        checkFramebuffer();
+        gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
+
+		state = 2;
+	}
+	
+	private void bindPlaceholderDepthBuffer(){
+        // Create a (nearly) empty depth-buffer as a placeholder
+        if( dbo == -1) {
+    		int[] result = new int[1];
+	        gl.glGenRenderbuffers( 1, result, 0);
+	        dbo = result[0];
+	        gl.glBindRenderbuffer(GLC.GL_RENDERBUFFER, dbo);
+	        gl.glRenderbufferStorage( GLC.GL_RENDERBUFFER, GLC.GL_DEPTH_COMPONENT16, 1, 1);
+	        gl.glFramebufferRenderbuffer( GLC.GL_FRAMEBUFFER, GLC.GL_DEPTH_ATTACHMENT, GLC.GL_RENDERBUFFER, dbo);
+        }
+	}
+	
 	/** A GLRenderer is passed to the GLMU's render method.  Any GL code inside
 	 * the render method of the GLRenderer will be applied to the FrameBuffer
 	 * assosciated with the GLMU*/
@@ -166,12 +216,17 @@ public class GLMultiRenderer {
 	public int getTexture() {
 		return this.tex;
 	}
-//	public void render
 	
 	public void cleanup() {
-		gl.glDeleteTextures(1, new int[]{tex}, 0);
-		gl.glDeleteRenderbuffers(1, new int[]{dbo}, 0);
-		gl.glDeleteFramebuffers(1, new int[]{fbo}, 0); 
+		if( state != 0) {
+			if( state == 1)
+				gl.glDeleteTextures(1, new int[]{tex}, 0);
+	//		gl.glDeleteRenderbuffers(1, new int[]{dbo}, 0);
+			gl.glDeleteFramebuffers(1, new int[]{fbo}, 0); 
+		}
+		
+		fbo = 0;
+		tex = 0;
 
 		engine.c_glmus.remove(this);
 	}

@@ -1,6 +1,5 @@
 package spirite.base.pen;
 
-import java.awt.geom.Point2D;
 import java.util.List;
 
 import spirite.base.util.Interpolation.LagrangeInterpolator;

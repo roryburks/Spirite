@@ -1,8 +1,6 @@
 package spirite.base.graphics;
 
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
+import java.awt.Shape;	// TODO
 
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;

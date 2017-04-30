@@ -1,7 +1,5 @@
 package spirite.base.file;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-import javax.swing.Timer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -32,6 +28,7 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.hybrid.HybridTimer;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -45,32 +42,30 @@ import spirite.hybrid.MDebug.WarningType;
  * the conversion from BufferedImage to PNG through ImageIO should not
  * be on the UI thread)
  */
-public class SaveEngine implements ActionListener, MWorkspaceObserver {
-
-	private final Timer autosaveTimer = new Timer(10000, this);
+public class SaveEngine implements MWorkspaceObserver {
+	private final HybridTimer autosaveTimer = new HybridTimer( 10000, new Runnable() {
+		@Override
+		public void run() {
+			long time = System.currentTimeMillis();
+			for( AutoSaveWatcher watcher : watchers) {
+				if( watcher.workspace.getFile() != null &&
+					watcher.interval < (time - watcher.lastTime)/1000 &&
+					watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome() - watcher.lastUndoSpot) 
+				{
+					watcher.lastTime = time;
+					saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
+					watcher.lastTime = time;
+					watcher.lastUndoSpot= watcher.workspace.getUndoEngine().getMetronome();
+				}
+			}
+			
+		}
+	});
 	
 	public SaveEngine( MasterControl master) {
 		autosaveTimer.start();
 		
 		master.addWorkspaceObserver(this);
-	}
-	
-	
-	// Autosave functionality 
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		long time = System.currentTimeMillis();
-		for( AutoSaveWatcher watcher : watchers) {
-			if( watcher.workspace.getFile() != null &&
-				watcher.interval < (time - watcher.lastTime)/1000 &&
-				watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome() - watcher.lastUndoSpot) 
-			{
-				watcher.lastTime = time;
-				saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
-				watcher.lastTime = time;
-				watcher.lastUndoSpot= watcher.workspace.getUndoEngine().getMetronome();
-			}
-		}
 	}
 	
 	// Behavior might warrant a Map<Workspace,ASW>, but the syntax would

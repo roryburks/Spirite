@@ -1,6 +1,5 @@
 package spirite.base.brains;
 
-import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
@@ -12,10 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.util.Colors;
 
-import java.util.Set;
 
 /***
  * The PaletteManager stores both the active colors and the palette
@@ -32,24 +32,24 @@ public class PaletteManager
 	implements CommandExecuter
 {
 	private final SettingsManager settingsManager;
-    private final List<Color> active_colors;
-    private final Map<Integer,Color> palette_colors;
+    private final List<Integer> active_colors;
+    private final Map<Integer,Integer> palette_colors;
 
-    private final static Color default_palette[] = {
-        Color.BLACK, Color.DARK_GRAY, Color.GRAY, Color.LIGHT_GRAY, Color.WHITE,
-        Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.YELLOW,
-        Color.ORANGE, Color.PINK
+    private final static int default_palette[] = {
+        Colors.BLACK, Colors.DARK_GRAY, Colors.GRAY, Colors.LIGHT_GRAY, Colors.WHITE,
+        Colors.RED, Colors.BLUE, Colors.GREEN, Colors.CYAN, Colors.MAGENTA, Colors.YELLOW,
+        Colors.ORANGE, Colors.PINK
     };
 
     PaletteManager( MasterControl master) {
     	settingsManager = master.getSettingsManager();
     	palette_colors = new HashMap<>();
-        active_colors = new ArrayList<Color>();
+        active_colors = new ArrayList<Integer>();
 
-        active_colors.add(0, Color.black);
-        active_colors.add(1, Color.white);
-        active_colors.add(2, Color.RED);
-        active_colors.add(3, Color.BLACK);
+        active_colors.add(0, Colors.BLACK);
+        active_colors.add(1, Colors.WHITE);
+        active_colors.add(2, Colors.RED);
+        active_colors.add(3, Colors.BLACK);
         
         loadDefaultPalette();
     }
@@ -67,14 +67,14 @@ public class PaletteManager
     // ==================
     // ==== Active Color Methods
     public int getActiveColor( int i) {
-    	return active_colors.get(i).getRGB();
+    	return active_colors.get(i);
     }
-    public void setActiveColor( int i, Color color) {
+    public void setActiveColor( int i, int color) {
     	active_colors.set(i, color);
         triggerColorChanged();
     }
     public void toggleActiveColors() {
-    	Color t = active_colors.get(0);
+    	int t = active_colors.get(0);
     	active_colors.set(0, active_colors.get(1));
     	active_colors.set(1, active_colors.get(2));
     	active_colors.set(2, active_colors.get(3));
@@ -82,7 +82,7 @@ public class PaletteManager
         triggerColorChanged();
     }
     public void toggleActiveColorsBackwards() {
-    	Color t = active_colors.get(2);
+    	int t = active_colors.get(2);
     	active_colors.set(2, active_colors.get(1));
     	active_colors.set(1, active_colors.get(0));
     	active_colors.set(0, active_colors.get(3));
@@ -93,14 +93,14 @@ public class PaletteManager
 
     // ===================
     // ==== Palette Color Methods
-    public Color getPaletteColor( int i) {
+    public Integer getPaletteColor( int i) {
     	return palette_colors.get(i);
     }
-    public void setPaletteColor( int i, Color color) {
+    public void setPaletteColor( int i, int color) {
         palette_colors.put(i, color);
         triggerColorChanged();
     }
-    public void addPaletteColor( Color color) {
+    public void addPaletteColor( int color) {
     	for( int i=0; i < 1000; ++i) {
     		if( !palette_colors.containsKey(i)) {
     			palette_colors.put(i, color);
@@ -118,10 +118,10 @@ public class PaletteManager
         return palette_colors.size();
     }
     
-    public Collection<Color> getColors() {
+    public Collection<Integer> getColors() {
     	return palette_colors.values();
     }
-    public Set<Entry<Integer,Color>> getPalette() {
+    public Set<Entry<Integer,Integer>> getPalette() {
     	return palette_colors.entrySet();
     }
     
@@ -183,11 +183,11 @@ public class PaletteManager
         		else {
         			bos.write(tCount);
         			for( int i=0; i<tCount; ++i) {
-        				Color c = palette_colors.get(caret+i);
-        				bos.write(c.getRed());
-        				bos.write(c.getGreen());
-        				bos.write(c.getBlue());
-        				bos.write(c.getAlpha());
+        				int c = palette_colors.get(caret+i);
+        				bos.write(Colors.getRed(c));
+        				bos.write(Colors.getGreen(c));
+        				bos.write(Colors.getBlue(c));
+        				bos.write(Colors.getAlpha(c));
         			}
         		}
         		
@@ -223,7 +223,7 @@ public class PaletteManager
 	    			int g = bis.read();
 	    			int b = bis.read();
 	    			int a = bis.read();
-	    			Color c = new Color( r,g,b,a);
+	    			int c = Colors.toColor(a, r, g, b);
 	    			palette_colors.put(i+caret, c);
 	    		}
 	    		caret += count;

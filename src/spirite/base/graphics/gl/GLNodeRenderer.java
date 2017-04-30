@@ -93,8 +93,8 @@ class GLNodeRenderer extends NodeRenderer {
 			// Prepare the FrameBuffers needed for rendering
 			glmu = new GLMultiRenderer[n];
 			for( int i=0; i<n; ++i) {
-				glmu[i] = new GLMultiRenderer( settings.width, settings.height, gl);
-				glmu[i].init();
+				glmu[i] = new GLMultiRenderer( gl);
+				glmu[i].init(settings.width, settings.height);
 				glmu[i].render(new GLRenderer() {
 					@Override public void render(GL gl) {
 						engine.clearSurface(gl.getGL2());
@@ -149,11 +149,10 @@ class GLNodeRenderer extends NodeRenderer {
 			if( workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing()) {
 				
-				compositeLayer = new GLMultiRenderer( 
-						dataContext.getWidth(), dataContext.getHeight(), gl);
+				compositeLayer = new GLMultiRenderer(gl);
 				compositedHandle = dataContext.handle;
 				
-				compositeLayer.init();
+				compositeLayer.init(dataContext.getWidth(), dataContext.getHeight());
 
 				compositeLayer.render( new GLRenderer() {
 					@Override
@@ -395,7 +394,7 @@ class GLNodeRenderer extends NodeRenderer {
 						params.texture = new GLParameters.GLFBOTexture(compositeLayer);
 						engine.applyPassProgram(
 								ProgramType.PASS_RENDER, params, trans,
-								0, 0, compositeLayer.width, compositeLayer.height, false, _gl.getGL2());
+								0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false, _gl.getGL2());
 					}
 					else {
 						trans.translate(renderable.handle.getDynamicX(), 

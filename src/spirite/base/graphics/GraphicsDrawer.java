@@ -1,7 +1,5 @@
 package spirite.base.graphics;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
@@ -26,9 +24,6 @@ public abstract class GraphicsDrawer {
 	public static interface RenderRoutine {
 		public void render(GraphicsContext context);
 	}
-	
-	/** Renders the described algorithm to a BufferedImge. */
-	public abstract BufferedImage renderToImage( RenderRoutine renderable, int width, int height);
 	
 	public abstract void changeColor( RawImage image, int cFrom, int cTo, int mode);
 	public abstract void invert(RawImage image);

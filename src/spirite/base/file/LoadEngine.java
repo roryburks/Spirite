@@ -1,7 +1,5 @@
 package spirite.base.file;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree;
@@ -32,12 +29,10 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
-import spirite.base.util.MUtil;
-import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.graphics.ImageBI;
 
 /***
  * LoadEngine is a static container for methods which load images from
@@ -59,13 +54,8 @@ public class LoadEngine {
     	{
     		// First try to load the file as normal if it's a normal image format
     		try {
-				BufferedImage bi = ImageIO.read(f);
-				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
-				MUtil.clearImage(bi2);
-				Graphics g = bi2.getGraphics();
-				g.drawImage(bi, 0, 0, null);
-				g.dispose();
-				master.createWorkspaceFromImage(bi2, true).fileSaved(f);
+    			RawImage img = HybridUtil.load(f);
+				master.createWorkspaceFromImage(img, true).fileSaved(f);
 				master.getSettingsManager().setImageFilePath(f);
 				return;
 			} catch (IOException e) {
@@ -87,8 +77,8 @@ public class LoadEngine {
 			//	its extension was not recognized) and loading it as an SIF failed,
 			//	try to load it as a normal Image
     		try {
-				BufferedImage bi = ImageIO.read(f);
-				master.createWorkspaceFromImage(bi, true).fileSaved(f);
+    			RawImage img = HybridUtil.load(f);
+				master.createWorkspaceFromImage(img, true).fileSaved(f);
 				master.getSettingsManager().setImageFilePath(f);
 				return;
 			} catch (IOException e) {}
@@ -266,19 +256,14 @@ public class LoadEngine {
 			byte[] buffer = new byte[imgSize];
 			helper.ra.read(buffer);
 			
-			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
-			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
-			MUtil.clearImage(bi2);
-			Graphics g = bi2.getGraphics();
-			g.drawImage(bi, 0, 0, null);
-			g.dispose();
+			RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 			
 			ImportImage impi;
 			if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
-				 impi = new DynamicImportImage( new ImageBI(bi2), ox, oy);
+				 impi = new DynamicImportImage( img, ox, oy);
 			}
 			else
-				impi = new ImportImage( new ImageBI(bi2));
+				impi = new ImportImage( img);
 			dataMap.put(identifier, impi);
 			
 		}

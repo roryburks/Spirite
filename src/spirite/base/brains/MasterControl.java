@@ -1,13 +1,5 @@
 package spirite.base.brains;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -17,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -44,8 +34,6 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
-import spirite.base.util.MUtil;
-import spirite.base.util.MUtil.TransferableImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
@@ -55,7 +43,6 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.Dialogs;
-import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -220,7 +207,7 @@ public class MasterControl
 //			ImageIO.write( bi, ext, f);
 			settingsManager.setImageFilePath(f);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
+			HybridHelper.showMessage( "", "Failed to Export file: " + e.getMessage());
 			e.printStackTrace();
 		}
     }
@@ -342,10 +329,10 @@ public class MasterControl
 		return workspace;
 	}
 	
-	public ImageWorkspace createWorkspaceFromImage( BufferedImage image, boolean select) {
+	public ImageWorkspace createWorkspaceFromImage( RawImage image, boolean select) {
 		ImageWorkspace workspace = new ImageWorkspace(this);
 		if( image != null)
-			workspace.addNewSimpleLayer(null, new ImageBI(image), "Base Image");
+			workspace.addNewSimpleLayer(null, image, "Base Image");
 		workspace.finishBuilding();
 		
 		this.addWorkpace(workspace, select);
@@ -551,7 +538,7 @@ public class MasterControl
     		}});
     		commandMap.put("paste", new Runnable() {@Override public void run() {
     			// TODO: MARK
-    			BufferedImage bi = MUtil.imageFromClipboard();
+    			RawImage bi = HybridHelper.imageFromClipboard();
     			if( bi == null) return;
     			
 	    		if( currentWorkspace == null) {
@@ -560,7 +547,7 @@ public class MasterControl
 	    		}
 	    		else if( currentWorkspace.buildActiveData() == null){
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), new ImageBI(bi), "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
 	    		}
 	    		else {
 	    			// Paste Data onto Selection Engine (current selected Data)
@@ -578,12 +565,12 @@ public class MasterControl
 	    				oy = Math.max(min_y,node.getOffsetY());
 	    			}
 	    			
-	    			currentWorkspace.getSelectionEngine().imageToSelection(new ImageBI(bi), ox, oy);
+	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
 	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
     		}});
     		commandMap.put("pasteAsLayer", new Runnable() {@Override public void run() {
-    			BufferedImage bi = MUtil.imageFromClipboard();
+    			RawImage bi = HybridHelper.imageFromClipboard();
     			if( bi == null) return;
     			
 	    		if( currentWorkspace == null) {
@@ -592,7 +579,7 @@ public class MasterControl
 	    		}
 	    		else {
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), new ImageBI(bi), "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
 	    		}
     		}});
     		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
