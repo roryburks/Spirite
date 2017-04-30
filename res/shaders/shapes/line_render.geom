@@ -11,9 +11,6 @@ uniform float uWidth;
 
 in float vSize[];
 
-smooth out float fWeight;
-flat out float fX, fY, fM;
-
 void doFlat() {
 	vec2 p1 = vec2(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y);
 	vec2 p2 = vec2(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y);

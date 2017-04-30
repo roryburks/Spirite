@@ -8,10 +8,10 @@ import jpen.PLevel;
 import jpen.PLevelEvent;
 import jpen.PScrollEvent;
 import jpen.event.PenListener;
-import spirite.brains.MasterControl;
-import spirite.brains.ToolsetManager;
-import spirite.graphics.GraphicsContext;
-import spirite.panel_work.WorkPanel;
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.ToolsetManager;
+import spirite.base.graphics.GraphicsContext;
+import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pen.PenTraits.ButtonType;
 import spirite.pen.PenTraits.MButtonEvent;
 /**

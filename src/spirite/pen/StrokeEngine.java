@@ -7,18 +7,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import mutil.MUtil;
 import mutil.Interpolation.CubicSplineInterpolator2D;
 import mutil.Interpolation.InterpolatedPoint;
 import mutil.Interpolation.Interpolator2D;
-import spirite.MDebug;
-import spirite.MDebug.WarningType;
-import spirite.MUtil;
-import spirite.graphics.GraphicsContext;
-import spirite.graphics.GraphicsContext.Composite;
-import spirite.graphics.awt.AWTContext;
-import spirite.image_data.DrawEngine;
-import spirite.image_data.ImageWorkspace.BuiltImageData;
-import spirite.image_data.SelectionEngine.BuiltSelection;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.awt.AWTContext;
+import spirite.base.image_data.DrawEngine;
+import spirite.base.image_data.ImageWorkspace.BuiltImageData;
+import spirite.base.image_data.SelectionEngine.BuiltSelection;
+import spirite.pc.MDebug;
+import spirite.pc.MDebug.WarningType;
 import spirite.pen.PenTraits.PenDynamics;
 import spirite.pen.PenTraits.PenState;
 

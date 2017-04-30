@@ -7,9 +7,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import spirite.MDebug;
-import spirite.MDebug.WarningType;
-import spirite.MUtil;
+import spirite.pc.MDebug;
+import spirite.pc.MDebug.WarningType;
 
 /**
  * A Package which contains a set of classes for interpolating data.

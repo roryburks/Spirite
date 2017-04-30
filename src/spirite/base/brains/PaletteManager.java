@@ -1,0 +1,297 @@
+package spirite.base.brains;
+
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import spirite.base.brains.MasterControl.CommandExecuter;
+
+import java.util.Set;
+
+/***
+ * The PaletteManager stores both the active colors and the palette
+ * of colors stored for easy access. 
+ * 
+ * Palettes are saved using the SettingsManager, which stores them using the 
+ * Preference system.  A list of all saved palettes arestored in "PaletteList" 
+ * and each palette is stored in "palette.[name]"
+ * 
+ * @author Rory Burks
+ *
+ */
+public class PaletteManager 
+	implements CommandExecuter
+{
+	private final SettingsManager settingsManager;
+    private final List<Color> active_colors;
+    private final Map<Integer,Color> palette_colors;
+
+    private final static Color default_palette[] = {
+        Color.BLACK, Color.DARK_GRAY, Color.GRAY, Color.LIGHT_GRAY, Color.WHITE,
+        Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.MAGENTA, Color.YELLOW,
+        Color.ORANGE, Color.PINK
+    };
+
+    PaletteManager( MasterControl master) {
+    	settingsManager = master.getSettingsManager();
+    	palette_colors = new HashMap<>();
+        active_colors = new ArrayList<Color>();
+
+        active_colors.add(0, Color.black);
+        active_colors.add(1, Color.white);
+        active_colors.add(2, Color.RED);
+        active_colors.add(3, Color.BLACK);
+        
+        loadDefaultPalette();
+    }
+    
+    public void loadDefaultPalette() {
+    	palette_colors.clear();
+
+        for( int i = 0; i<default_palette.length; ++i) {
+        	palette_colors.put(i, default_palette[i]);
+        }
+        
+        triggerColorChanged();
+    }
+    
+    // ==================
+    // ==== Active Color Methods
+    public Color getActiveColor( int i) {
+    	return active_colors.get(i);
+    }
+    public void setActiveColor( int i, Color color) {
+    	active_colors.set(i, color);
+        triggerColorChanged();
+    }
+    public void toggleActiveColors() {
+    	Color t = active_colors.get(0);
+    	active_colors.set(0, active_colors.get(1));
+    	active_colors.set(1, active_colors.get(2));
+    	active_colors.set(2, active_colors.get(3));
+    	active_colors.set(3, t);
+        triggerColorChanged();
+    }
+    public void toggleActiveColorsBackwards() {
+    	Color t = active_colors.get(2);
+    	active_colors.set(2, active_colors.get(1));
+    	active_colors.set(1, active_colors.get(0));
+    	active_colors.set(0, active_colors.get(3));
+    	active_colors.set(3, t);
+        triggerColorChanged();
+    }
+
+
+    // ===================
+    // ==== Palette Color Methods
+    public Color getPaletteColor( int i) {
+    	return palette_colors.get(i);
+    }
+    public void setPaletteColor( int i, Color color) {
+        palette_colors.put(i, color);
+        triggerColorChanged();
+    }
+    public void addPaletteColor( Color color) {
+    	for( int i=0; i < 1000; ++i) {
+    		if( !palette_colors.containsKey(i)) {
+    			palette_colors.put(i, color);
+    			break;
+    		}
+    	}
+        triggerColorChanged();
+    }
+    public void removePaletteColor( int i) {
+    	palette_colors.remove(i);
+        triggerColorChanged();
+    }
+    
+    public int getPaletteColorCount() {
+        return palette_colors.size();
+    }
+    
+    public Collection<Color> getColors() {
+    	return palette_colors.values();
+    }
+    public Set<Entry<Integer,Color>> getPalette() {
+    	return palette_colors.entrySet();
+    }
+    
+    public List<String> getStoredPaletteNames() {
+    	return settingsManager.getStoredPalettes();
+    }
+    
+    // ==================
+    // ==== Palette Saving/Loading
+    
+    /** Saves the palette as the given name. */
+    public boolean savePalette( String name) {
+    	// For the most part Palettes are stored as an array of 4 bytes per
+    	//	color in RGBA format/order.  But to preserve dimensionality of 
+    	//	the palette while avoiding excessive "whitespace" bytes, the following
+    	// 	format is used:
+    	
+    	// [1] First byte corresponds to number of consecutive color datas
+    	// [4*n] n*4 bytes representing the color data, in RGBA form
+    	//		(if first byte was 0x00), 
+    	//		[1] next byte represents consecutive empty datas
+    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    	
+    	// Step 1: find the highest Color index
+    	int lastIndex = -1;
+    	
+    	Iterator<Integer> it = palette_colors.keySet().iterator();
+    	while( it.hasNext()) {
+    		int index = it.next();
+    		if( index > lastIndex) lastIndex = index;
+    	}
+    	
+    	// Step 2: itterate through, constructing raw data
+    	int caret = 0;
+    	int peekCount = 0;
+    	boolean data = false;
+    	
+    	
+    	while( caret <= lastIndex) {
+    		data = palette_colors.containsKey(caret);
+    		peekCount = 1;
+    		
+    		while( palette_colors.containsKey(caret + peekCount) == data) {
+    			peekCount++;	// could do with tricky pre-increment, but too unreadable
+    		}
+    		
+    		
+    		while ( peekCount > 0) {
+    			// Note since we're using bytes to denote distance, in the offchance
+    			// that there are more than 255 conescutives, make sure to add
+    			//	intermediate markets
+    			int tCount = (peekCount > 0xff) ? 0xff : peekCount;
+    			
+
+        		if( !data)  {
+        			bos.write( 0x00);
+        			bos.write(tCount);
+        		}
+        		else {
+        			bos.write(tCount);
+        			for( int i=0; i<tCount; ++i) {
+        				Color c = palette_colors.get(caret+i);
+        				bos.write(c.getRed());
+        				bos.write(c.getGreen());
+        				bos.write(c.getBlue());
+        				bos.write(c.getAlpha());
+        			}
+        		}
+        		
+        		peekCount -= tCount;
+        		caret += tCount;
+    		}
+    	}
+
+    	settingsManager.saveRawPalette(name, bos.toByteArray());
+    	
+    	return true;	// Not sure why/if it should ever return false
+    }
+    
+    /** Loads the palette of the given name. */
+    public boolean loadPalette( String name) {
+    	byte raw[] = settingsManager.getRawPalette(name);
+    	if( raw == null) return false;
+    	
+    	palette_colors.clear();
+    	ByteArrayInputStream bis = new ByteArrayInputStream(raw);
+    	
+    	int caret = 0;
+    	int count = bis.read();
+    	
+    	while( bis.available() > 0) {
+	    	if( count == 0) {
+	    		int i = bis.read();
+	    		caret += i;
+	    	}
+	    	else {
+	    		for( int i = 0; i < count; ++i) {
+	    			int r = bis.read();
+	    			int g = bis.read();
+	    			int b = bis.read();
+	    			int a = bis.read();
+	    			Color c = new Color( r,g,b,a);
+	    			palette_colors.put(i+caret, c);
+	    		}
+	    		caret += count;
+	    	}
+	    	count = bis.read();
+    	}
+    	
+    	triggerColorChanged();
+    	
+    	return true;
+    }
+    
+    
+    
+    // :::: Palette Change Observer
+    public static interface MPaletteObserver {
+        public void colorChanged();
+    }
+    
+    List<WeakReference<MPaletteObserver>> paletteObservers = new ArrayList<>();
+    public void addPaletteObserver( MPaletteObserver obs) { 
+    	paletteObservers.add(new WeakReference<PaletteManager.MPaletteObserver>(obs)); 
+    }
+    public void removePaletteObserver( MPaletteObserver obs) {
+    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
+    	while( it.hasNext()) {
+    		MPaletteObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			it.remove();
+    	}
+    }
+    
+    private void triggerColorChanged() {
+    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
+    	while( it.hasNext()) {
+    		MPaletteObserver other = it.next().get();
+    		if( other == null )
+    			it.remove();
+    		else
+                other.colorChanged();
+    	}
+    }
+    
+
+    // ================
+    // ==== Implemented Interfaces
+
+    // :::: CommandExecuter
+	@Override
+	public List<String> getValidCommands() {
+		return Arrays.asList( new String[]{"swap","swapBack"});
+	}
+
+	@Override
+	public String getCommandDomain() {
+		return "palette";
+	}
+
+	@Override
+	public boolean executeCommand(String command) {
+    	switch (command) {
+    	case "swap":
+    		toggleActiveColors();
+    		return true;
+    	case "swapBack":
+    		toggleActiveColorsBackwards();
+    		return true;
+    	}
+		return false;
+	}
+}

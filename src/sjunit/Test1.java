@@ -19,20 +19,20 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
-import spirite.Globals;
-import spirite.brains.MasterControl;
-import spirite.brains.RenderEngine.RenderSettings;
-import spirite.file.LoadEngine.BadSIFFFileException;
-import spirite.image_data.DrawEngine.StrokeAction;
-import spirite.image_data.GroupTree;
-import spirite.image_data.GroupTree.GroupNode;
-import spirite.image_data.GroupTree.LayerNode;
-import spirite.image_data.GroupTree.Node;
-import spirite.image_data.ImageHandle;
-import spirite.image_data.ImageWorkspace;
-import spirite.image_data.UndoEngine;
-import spirite.image_data.layers.Layer;
-import spirite.image_data.layers.SpriteLayer;
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.RenderEngine.RenderSettings;
+import spirite.base.file.LoadEngine.BadSIFFFileException;
+import spirite.base.image_data.GroupTree;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.UndoEngine;
+import spirite.base.image_data.DrawEngine.StrokeAction;
+import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.layers.SpriteLayer;
+import spirite.pc.Globals;
 import spirite.pen.PenTraits.PenState;
 import spirite.pen.StrokeEngine;
 
