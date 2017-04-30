@@ -1,6 +1,6 @@
 package spirite.base.brains;
 
-import java.awt.image.BufferedImage;
+//import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import spirite.base.image_data.RawImage;
 import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
@@ -93,7 +94,7 @@ public class CacheManager {
 			int size = 0;
 			
 			for( CachedImage img : list) {
-				size += (img.data.getWidth() * img.data.getHeight() * img.data.getColorModel().getPixelSize())/8;
+				size += img.data.getByteSize();
 			}
 			return size;
 		}
@@ -106,7 +107,7 @@ public class CacheManager {
 	
 	
 	public class CachedImage {
-		protected BufferedImage data = null;
+		protected RawImage data = null;
 		protected long last_used;
 		protected Collection<WeakReference<Object>> users = new LinkedHashSet<>();
 		Object domain;
@@ -123,23 +124,23 @@ public class CacheManager {
 			context.list.add(this);
 		}
 		
-		public BufferedImage access() {
+		public RawImage access() {
 			last_used = System.currentTimeMillis();
 			return data;
 		}
 		
-		public void replace( BufferedImage bi) {
+		public void replace( RawImage bi) {
 			if( data != null)
 				data.flush();
-			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+			cacheSize -= data.getByteSize();
 			data = bi;
-			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+			cacheSize += data.getByteSize();
 		}
 		
 		public void flush() {
 			if( data == null) return;
 			
-			cacheSize -= (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+			cacheSize -= data.getByteSize();
 			data.flush();
 			data = null;
 			
@@ -150,10 +151,12 @@ public class CacheManager {
 			clearUnusedDomains();
 		}
 		
-		void setData( BufferedImage image) {
+		void setData( RawImage image) {
 			assert( image != null);
+			if( data != null)
+				cacheSize -= data.getByteSize();
 			data = image;
-			cacheSize += (data.getWidth() * data.getHeight() * data.getColorModel().getPixelSize())/8;
+			cacheSize += data.getByteSize();
 		}
 		
 		public void reserve( Object obj) {
@@ -194,28 +197,29 @@ public class CacheManager {
 	}
 	
 	/** Creates a new empty Cached Image*/
-	public CachedImage createImage( int width, int height, Object domain) {
-		if( width <= 0 || height <= 0)
-			return null;
-		
-		CachedImage c = new CachedImage(domain);
-		c.setData(new BufferedImage( width, height, Globals.BI_FORMAT));
-		
-		if( c.data == null) {
-			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
-			return null;
-		}
-		
-		
-		return c;
-	}
+//	public CachedImage createImage( int width, int height, Object domain) {
+//		if( width <= 0 || height <= 0)
+//			return null;
+//		
+//		CachedImage c = new CachedImage(domain);
+//		c.setData(new BufferedImage( width, height, Globals.BI_FORMAT));
+//		
+//		if( c.data == null) {
+//			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
+//			return null;
+//		}
+//		
+//		
+//		return c;
+//	}
 	
 	/** Put an existing image into the Cache. */
-	public CachedImage cacheImage( BufferedImage image, Object domain) {
-		if( image == null) {
-			image = new BufferedImage(1,1,Globals.BI_FORMAT);
-			MUtil.clearImage(image);
-		}
+	public CachedImage cacheImage( RawImage image, Object domain) {
+		assert( image != null);
+//		if( image == null) {
+//			image = new BufferedImage(1,1,Globals.BI_FORMAT);
+//			MUtil.clearImage(image);
+//		}
 		CachedImage c = new CachedImage(domain);
 		c.setData(image);
 		
@@ -223,16 +227,16 @@ public class CacheManager {
 	}
 	
 	/** Creates a new CachedImage by creating a verbatim copy of a given BufferedImage*/
-	public CachedImage createDeepCopy( BufferedImage toCopy, Object domain) {
-		
-		CachedImage c = new CachedImage(domain);
-		c.setData(new BufferedImage( 
-				toCopy.getColorModel(),
-				toCopy.copyData(null),
-				toCopy.isAlphaPremultiplied(),
-				null));
-		
-		
-		return c;
-	}
+//	public CachedImage createDeepCopy( BufferedImage toCopy, Object domain) {
+//		
+//		CachedImage c = new CachedImage(domain);
+//		c.setData(new BufferedImage( 
+//				toCopy.getColorModel(),
+//				toCopy.copyData(null),
+//				toCopy.isAlphaPremultiplied(),
+//				null));
+//		
+//		
+//		return c;
+//	}
 }

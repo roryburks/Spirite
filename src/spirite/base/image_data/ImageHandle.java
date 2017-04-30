@@ -12,6 +12,7 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 
 /**
  * Under normal circumstances an ImageHandle is a logical connection to a
@@ -65,7 +66,7 @@ public class ImageHandle {
 	 *  */
 	public BufferedImage deepAccess() {
 		if( context == null) return null;
-		return context.getData(id).cachedImage.access();
+		return ((ImageBI)context.getData(id).cachedImage.access()).img;
 	}
 	
 	/** Accesses a potentially-cached GLTexture representing the current ImageHandle*/

@@ -42,6 +42,7 @@ import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
+import spirite.pc.graphics.ImageBI;
 
 /***
  * The RenderEngine may or may not be a big and necessary component
@@ -190,12 +191,12 @@ public class RenderEngine
 					|| settings.width == 0 || settings.height == 0) 
 				return null;
 			
-			cachedImage = cacheManager.cacheImage(settings.target.render(settings),this);
+			cachedImage = cacheManager.cacheImage(new ImageBI(settings.target.render(settings)),this);
 
 			imageCache.put(settings, cachedImage);
 		}
 		
-		return cachedImage.access();
+		return ((ImageBI)cachedImage.access()).img;
 	}
 	
 	/** Checks if the given settings have a cached version. */

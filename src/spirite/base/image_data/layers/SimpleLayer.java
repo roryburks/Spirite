@@ -21,6 +21,7 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
+import spirite.pc.graphics.ImageBI;
 
 public class SimpleLayer extends Layer {
 	private final ImageHandle data;
@@ -102,10 +103,10 @@ public class SimpleLayer extends Layer {
 			g.drawImage( image, x-newBounds.x, y-newBounds.y, null);
 			g.dispose();
 			
-			helper.actions.add(workspace.getUndoEngine().createReplaceAction(data, combination));
+			helper.actions.add(workspace.getUndoEngine().createReplaceAction(data, new ImageBI(combination)));
 		}
 		else {
-			CachedImage ci = workspace.getCacheManager().cacheImage(image, workspace.getUndoEngine());
+			CachedImage ci = workspace.getCacheManager().cacheImage(new ImageBI(image), workspace.getUndoEngine());
 			UndoableAction action = new DrawImageAction(workspace.new BuiltImageData(data, x, y), ci);
 			helper.actions.add(action);
 		}

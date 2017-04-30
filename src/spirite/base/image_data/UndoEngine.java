@@ -20,9 +20,11 @@ import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;
+import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover
@@ -451,7 +453,7 @@ public class UndoEngine {
 	 * After creating the image, you should performAction on it as well as store
 	 * it into the UndoEngine or else Undoing might get a little weird.
 	 */
-	public UndoableAction createReplaceAction( ImageHandle handle, BufferedImage newImage) {
+	public UndoableAction createReplaceAction( ImageHandle handle, RawImage newImage) {
 
 		prepareContext(handle);
 		for( UndoContext context : contexts) {
@@ -530,7 +532,8 @@ public class UndoEngine {
 		protected ImageContext( ImageHandle image) {
 			super(image);
 			
-			actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(), UndoEngine.this), null));
+			actions.add(new KeyframeAction(
+					cacheManager.cacheImage(new ImageBI(MUtil.deepCopy(image.deepAccess())), UndoEngine.this), null));
 			
 			met = 0;
 			pointer = 0;
@@ -590,7 +593,7 @@ public class UndoEngine {
 					Graphics2D g2 = (Graphics2D)g;
 					Composite c = g2.getComposite();
 					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-					g2.drawImage( frameCache.access(), 0, 0,  null);
+					g2.drawImage( ((ImageBI)frameCache.access()).img, 0, 0,  null);
 					g2.setComposite( c);
 					g2.dispose();
 					built.checkin();
@@ -629,7 +632,7 @@ public class UndoEngine {
 			boolean freed = false;
 			
 			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
-				super( cacheManager.createDeepCopy(cached.access(), UndoEngine.this), new NilImageAction(data));
+				super( cacheManager.cacheImage(cached.access().deepCopy(), UndoEngine.this), new NilImageAction(data));
 				
 				newCache = cached;
 				previousCache = workspace._accessCache(data);
@@ -685,7 +688,8 @@ public class UndoEngine {
 			// Record a keyframe if it's been a while or the action is a "HeavyAction"
 			//	i.e. an action requiring a lot of computation to perform
 			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
-				actions.add(new KeyframeAction(cacheManager.createDeepCopy(image.deepAccess(),  UndoEngine.this), iaction));
+				actions.add(new KeyframeAction(cacheManager.cacheImage(
+						new ImageBI(MUtil.deepCopy(image.deepAccess())),  UndoEngine.this), iaction));
 				met = 0;
 			}
 			else {
@@ -1307,7 +1311,7 @@ public class UndoEngine {
 		@Override
 		protected void performImageAction() {
 			Graphics g = builtImage.checkout();
-			g.drawImage(stored.access(), 0, 0, null);
+			g.drawImage(((ImageBI)stored.access()).img, 0, 0, null);
 			builtImage.checkin();
 		}
 	}

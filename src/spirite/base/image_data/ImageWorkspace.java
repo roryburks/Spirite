@@ -51,6 +51,7 @@ import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.ImageBI;
 
 
 /***
@@ -536,7 +537,7 @@ public class ImageWorkspace {
 			dii.ox += cropped.x;
 			dii.oy += cropped.y;
 			
-			imageData.get(handle.id).cachedImage.replace(nbi);
+			imageData.get(handle.id).cachedImage.replace(new ImageBI(nbi));
 			
 			buffer = null;
 			if( g != null)g.dispose();
@@ -649,7 +650,7 @@ public class ImageWorkspace {
 		locked = true;
 		undoEngine.prepareContext(image);
 		
-		return imageData.get(image.id).cachedImage.access();
+		return ((ImageBI)imageData.get(image.id).cachedImage.access()).img;
 	}
 	
 	private void _checkinImage( ImageHandle handle) {
@@ -757,7 +758,7 @@ public class ImageWorkspace {
 				handle.drawLayer(new AWTContext(g2), transform);
 				g2.dispose();
 				
-				actions.add( undoEngine.createReplaceAction(handle, image));
+				actions.add( undoEngine.createReplaceAction(handle, new ImageBI(image)));
 				handlesCropped.add( new ImageCropHelper( handle, newBounds.x-imageBound.x,  newBounds.y-imageBound.y));
 			}
 	
@@ -946,7 +947,7 @@ public class ImageWorkspace {
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
-			CachedImage ci = cacheManager.cacheImage(entry.getValue().image, this);
+			CachedImage ci = cacheManager.cacheImage(new ImageBI(entry.getValue().image), this);
 			ci.reserve(this);
 			
 			if( entry.getValue() instanceof DynamicImportImage) {
@@ -976,7 +977,7 @@ public class ImageWorkspace {
 	 * then the image will get flushed next time the image data is checked
 	 */
 	public ImageHandle importData( BufferedImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(newImage, this);
+		CachedImage ci = cacheManager.cacheImage(new ImageBI(newImage), this);
 		imageData.put( workingID, new InternalImage(ci));
 		ci.reserve(this);
 		
@@ -989,7 +990,7 @@ public class ImageWorkspace {
 	 * will automatically crop the data periodically to only the used area.
 	 */
 	public ImageHandle importDynamicData(BufferedImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(newImage, this);
+		CachedImage ci = cacheManager.cacheImage(new ImageBI(newImage), this);
 		imageData.put( workingID, new DynamicInternalImage(ci, 0, 0));
 		ci.reserve(this);
 		
@@ -998,7 +999,7 @@ public class ImageWorkspace {
 	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
-		CachedImage ci = cacheManager.cacheImage(img, this);
+		CachedImage ci = cacheManager.cacheImage(new ImageBI(img), this);
 		ci.reserve(this);
 		imageData.put( workingID, new InternalImage(ci));
 		ImageHandle handle = new ImageHandle( this, workingID);
@@ -1026,7 +1027,7 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
 		BufferedImage bi = new BufferedImage(w,h,Globals.BI_FORMAT);
-		CachedImage ci = cacheManager.cacheImage( bi, this);
+		CachedImage ci = cacheManager.cacheImage( new ImageBI(bi), this);
         Graphics g = bi.createGraphics();
         g.setColor( c);
         g.fillRect( 0, 0, w, h);
