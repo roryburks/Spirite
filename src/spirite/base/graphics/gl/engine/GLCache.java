@@ -65,7 +65,7 @@ public class GLCache implements MImageObserver {
 		CachedTexture ctex = cache.get(handle);
 		if( ctex == null) {
 			ctex = new CachedTexture(
-					getEngine().prepareTexture( new ImageBI(handle.deepAccess()), gl));
+					getEngine().prepareTexture( handle.deepAccess(), gl));
 			
 			cacheSize += ctex.tex.w*ctex.tex.h*4;
 			

@@ -26,6 +26,7 @@ import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.image_data.GroupTree;
@@ -38,6 +39,7 @@ import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.layers.Layer;
@@ -45,6 +47,9 @@ import spirite.base.util.MUtil;
 import spirite.base.util.MUtil.TransferableImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
+import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -197,19 +202,22 @@ public class MasterControl
     	
     	RenderSettings settings = new RenderSettings(
     			renderEngine.getDefaultRenderTarget(workspace));
-    	BufferedImage bi = renderEngine.renderImage(settings);
+    	RawImage img = renderEngine.renderImage(settings);
+    	
     	
     	if( ext.equals("jpg") || ext.equals("jpeg")) {
     		// Remove Alpha Layer of JPG so that encoding works correctly
-    		BufferedImage bi2 = bi;
-    		bi = new BufferedImage( bi2.getWidth(), bi2.getHeight(), BufferedImage.TYPE_INT_RGB);
-    		Graphics g = bi.getGraphics();
-    		g.drawImage(bi2, 0, 0, null);
-    		g.dispose();
+    		RawImage img2 = img;
+    		img = HybridHelper.createImage( img2.getWidth(), img2.getHeight());
+    		
+    		GraphicsContext gc = img.getGraphics();
+    		gc.drawImage( img2, 0, 0);
+//    		g.dispose();
     	}
     	
     	try {
-			ImageIO.write( bi, ext, f);
+    		HybridUtil.savePNG( img, ext, f);
+//			ImageIO.write( bi, ext, f);
 			settingsManager.setImageFilePath(f);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Failed to Export file: " + e.getMessage());
@@ -485,10 +493,10 @@ public class MasterControl
     				currentWorkspace.getSelectionEngine().getSelection() != null) {
         			// Copies the current selection to the Clipboard
 
-	    	    	BufferedImage img;
+	    	    	RawImage img;
     				if( currentWorkspace.getSelectionEngine().isLifted()) {
     					// Copies straight from the lifted data
-    					img = currentWorkspace.getSelectionEngine().getLiftedImage();
+    					img = new ImageBI(currentWorkspace.getSelectionEngine().getLiftedImage());
     				}
     				else {
     					BuiltImageData bid = currentWorkspace.buildActiveData();
@@ -497,7 +505,7 @@ public class MasterControl
     		    	    	RenderSettings settings = new RenderSettings(
     		    	    			renderEngine.getNodeRenderTarget(selected));
     		
-    		    	    	BufferedImage nodeImg = renderEngine.renderImage(settings);
+    		    	    	RawImage nodeImg = renderEngine.renderImage(settings);
     						img = currentWorkspace.getSelectionEngine().getBuiltSelection()
     								.liftSelectionFromImage(nodeImg,0,0);
     					}
@@ -506,10 +514,7 @@ public class MasterControl
 	    						.liftSelectionFromData(currentWorkspace.buildActiveData());
     				}
     				
-	    	    	TransferableImage transfer = new TransferableImage(img);
-	    	    	
-	    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-	    	    	c.setContents(transfer, null);
+    				HybridHelper.imageToClipboard(img);
     			}
     			else {
 	    			// Copies the current selected node to the Clipboard
@@ -518,11 +523,9 @@ public class MasterControl
 	    	    	RenderSettings settings = new RenderSettings(
 	    	    			renderEngine.getNodeRenderTarget(node));
 	
-	    	    	BufferedImage img = renderEngine.renderImage(settings);
-	    	    	TransferableImage transfer = new TransferableImage(img);
+	    	    	RawImage img = renderEngine.renderImage(settings);
 	    	    	
-	    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-	    	    	c.setContents(transfer, null);
+	    	    	HybridHelper.imageToClipboard(img);
     			}
     		}});
     		commandMap.put("copyVisible", new Runnable() {@Override public void run() {
@@ -534,15 +537,12 @@ public class MasterControl
     			
     			// Should be fine to send Clipboard an internal reference since once
     			//	rendered, the RenderEngine's cache should be immutable
-    	    	BufferedImage img = renderEngine.renderImage(settings);
+    	    	RawImage img = renderEngine.renderImage(settings);
     	    	
-    	    	BufferedImage bi = currentWorkspace.getSelectionEngine().getBuiltSelection()
+    	    	RawImage lifted =  currentWorkspace.getSelectionEngine().getBuiltSelection()
     	    			.liftSelectionFromImage(img, 0, 0);
 
-    	    	TransferableImage transfer = new TransferableImage(bi);
-    	    	
-    	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-    	    	c.setContents(transfer, null);
+    	    	HybridHelper.imageToClipboard(lifted);
     		}});
     		commandMap.put("cut", new Runnable() {@Override public void run() {
     			commandMap.get("copy").run();
@@ -695,14 +695,14 @@ public class MasterControl
 
 					try {
 						Rect rect;
-						rect = MUtil.findContentBounds(
+						rect = HybridUtil.findContentBounds(
 								layer.getActiveData().handle.deepAccess(),
 								1, 
 								false);
 						rect.x += node.getOffsetX();
 						rect.y += node.getOffsetY();
 						workspace.cropNode((LayerNode) node, rect, true);
-					} catch (UnsupportedDataTypeException e) {
+					} catch (UnsupportedImageTypeException e) {
 						e.printStackTrace();
 					}
 				}

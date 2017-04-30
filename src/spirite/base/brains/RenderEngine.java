@@ -37,6 +37,7 @@ import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
@@ -177,7 +178,7 @@ public class RenderEngine
 	/** Renders the image using the given RenderSettings, accessing it from the
 	 * cache if the image has been already rendered under those settings and no
 	 * relevant ImageData has changed since then. */
-	public BufferedImage renderImage(RenderSettings settings) {
+	public RawImage renderImage(RenderSettings settings) {
 		settings.normalize();
 		
 		// First Attempt to draw an image from a pre-rendered cache
@@ -197,7 +198,7 @@ public class RenderEngine
 			imageCache.put(settings, cachedImage);
 		}
 		
-		return ((ImageBI)cachedImage.access()).img;
+		return cachedImage.access();
 	}
 	
 	/** Checks if the given settings have a cached version. */

@@ -35,6 +35,9 @@ import spirite.base.util.RectanglePacker;
 import spirite.base.util.RectanglePacker.PackedRectangle;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
+import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
+import spirite.pc.graphics.ImageBI;
 
 /**
  * AnimIO is a container for static methods that export Animations of various
@@ -94,7 +97,7 @@ public class AnimIO {
 			if( node instanceof LayerNode ) {
 				Layer l = ((LayerNode) node).getLayer();
 				if( l instanceof SimpleLayer) {
-					biList.add(l.getActiveData().handle.deepAccess());
+					biList.add( ((ImageBI)l.getActiveData().handle.deepAccess()).img);
 				}
 			}
 		}
@@ -159,8 +162,12 @@ public class AnimIO {
 		List<CroppedImage> images = new ArrayList<>(handles.size());
 		List<Dimension> toPack = new ArrayList<>(images.size());
 		for( ImageHandle handle : handles) {
-			Rect bounds = MUtil.findContentBounds(handle.deepAccess(), 0, true);
-
+			Rect bounds = null;
+			try {
+				bounds = HybridUtil.findContentBounds(handle.deepAccess(), 0, true);
+			} catch (UnsupportedImageTypeException e) {
+				e.printStackTrace();
+			}
 			
 			if( bounds == null || bounds.isEmpty()) {
 				images.add(null);
@@ -173,11 +180,12 @@ public class AnimIO {
 					ox = handle.getDynamicX();
 					oy = handle.getDynamicY();
 				}
+			
 				
 				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, HybridHelper.BI_FORMAT);
-				Graphics g = bi.getGraphics();
-				g.drawImage(handle.deepAccess(), -bounds.x, -bounds.y, null);
-				g.dispose();
+				GraphicsContext gc = new AWTContext( bi);
+				gc.drawImage(handle.deepAccess(), -bounds.x, -bounds.y);
+//				g.dispose();
 				
 				CroppedImage ci = new CroppedImage();
 				ci.bi = bi;

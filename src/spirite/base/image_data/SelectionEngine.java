@@ -473,7 +473,7 @@ public class SelectionEngine {
 		BuiltSelection mask = getBuiltSelection();
 		BuiltImageData builtImage = workspace.buildData(node);
 		
-		return new SetLiftedAction(mask.liftSelectionFromData(builtImage));
+		return new SetLiftedAction(((ImageBI)mask.liftSelectionFromData(builtImage)).img);
 	}
 	
 	public UndoableAction createNewSelectAction( BuiltSelection selection) {
@@ -746,14 +746,13 @@ public class SelectionEngine {
 			gc.setTransform(trans);
 		}
 		
-		private BufferedImage liftSelection( LiftScheme liftScheme) {
+		private RawImage liftSelection( LiftScheme liftScheme) {
 			Rect selectionRect = new Rect(selection.getDimension());
 			selectionRect.x = this.offsetX;
 			selectionRect.y = this.offsetY;
 			
-			BufferedImage bi = new BufferedImage( 
-					selectionRect.width, selectionRect.height, HybridHelper.BI_FORMAT);
-			Graphics2D g2 = (Graphics2D)bi.getGraphics();
+			RawImage img = HybridHelper.createImage(selectionRect.width, selectionRect.height);
+			GraphicsContext gc = img.getGraphics();
 
 			// Draw the mask, clipping the bounds of drawing to only the part 
 			// that the selection	intersects with the Image so that you do not 
@@ -761,43 +760,45 @@ public class SelectionEngine {
 			Rect dataRect = liftScheme.getBounds();
 			Rect intersection = dataRect.intersection(selectionRect);
 			
-			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
+			// TODO
+			((AWTContext)gc).getGraphics().setClip(
+					intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
-			selection.drawSelectionMask(new AWTContext(g2, bi.getWidth(), bi.getHeight()));	// Note: Untransformed
+			selection.drawSelectionMask(gc);	// Note: Untransformed
 			
 
 			// Copy the data inside the Selection's alphaMask to liftedData
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_IN));
+			gc.setComposite( Composite.SRC_IN, 1.0f);
 
-			g2.translate(-this.offsetX, -this.offsetY);
+			gc.translate(-this.offsetX, -this.offsetY);
 			
-			liftScheme.draw(new AWTContext(g2, bi.getWidth(), bi.getHeight()));
-			g2.dispose();
+			liftScheme.draw(gc);
+//			g2.dispose();
 			
-			return bi;
+			return img;
 		}
 		
 		/** Uses the BuiltSelection to lift the selected portion of the given
 		 * BufferedImage and put it in a new BufferedImage.*/
-		public BufferedImage liftSelectionFromImage( 
-				BufferedImage img, int offsetX, int offsetY)
+		public RawImage liftSelectionFromImage( 
+				RawImage nodeImg, int offsetX, int offsetY)
 		{
 			return liftSelection( new LiftScheme() {
 				@Override
 				public Rect getBounds() {
-					return new Rect( offsetX, offsetY, img.getWidth(), img.getHeight());
+					return new Rect( offsetX, offsetY, nodeImg.getWidth(), nodeImg.getHeight());
 				}
 				
 				@Override
 				public void draw(GraphicsContext gc) {
-					gc.drawImage(new ImageBI(img), 0, 0);
+					gc.drawImage(nodeImg, 0, 0);
 				}
 			});
 		}
 
 		/** Uses the BuiltSelection to lift the selected portion of the given
 		 * BuiltImageData and put it in a new BufferedImage.*/
-		public BufferedImage liftSelectionFromData( BuiltImageData data) {
+		public RawImage liftSelectionFromData( BuiltImageData data) {
 			return liftSelection(new LiftScheme() {
 				@Override
 				public Rect getBounds() {

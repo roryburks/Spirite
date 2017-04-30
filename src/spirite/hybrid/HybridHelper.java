@@ -1,13 +1,18 @@
 package spirite.hybrid;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import javax.swing.JOptionPane;
+
 import com.jogamp.opengl.GL2;
 
 import spirite.base.image_data.RawImage;
+import spirite.base.util.MUtil.TransferableImage;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
 import sun.awt.image.ByteInterleavedRaster;
@@ -16,9 +21,28 @@ import sun.awt.image.IntegerInterleavedRaster;
 public class HybridHelper {
 
 	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
+	
+	public static boolean showConfirm( String title, String message) {
+		int r = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION);
+		
+		return r == JOptionPane.YES_OPTION;
+			
+	}
 
 	public static RawImage createImage( int width, int height) {
 		return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
+	}
+	
+	public static void imageToClipboard( RawImage image) {
+		if( image instanceof ImageBI) {
+	    	TransferableImage transfer = new TransferableImage(((ImageBI) image).img);
+	    	
+	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+	    	c.setContents(transfer, null);
+		}
+		else {
+			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image");
+		}
 	}
 
 	public static void loadImageIntoGL(RawImage image, GL2 gl) {
@@ -29,7 +53,6 @@ public class HybridHelper {
 			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image");
 		}
 	}
-	
 	private static void _loadBI( BufferedImage bi, GL2 gl) {
 		WritableRaster rast = bi.getRaster();
 		int w = bi.getWidth();

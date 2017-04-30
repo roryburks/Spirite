@@ -17,4 +17,5 @@ public abstract class RawImage {
     public abstract RawImage deepCopy();
     
     public abstract GraphicsContext getGraphics();
+	public abstract int getRGB(int x, int y);
 }

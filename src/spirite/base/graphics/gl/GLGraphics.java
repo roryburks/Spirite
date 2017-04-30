@@ -209,6 +209,9 @@ public class GLGraphics extends GraphicsContext{
 	@Override public void translate(double offsetX, double offsetY) {
 		contextTransform.translate((float)offsetX, (float)offsetY);
 	}
+	@Override public void scale(double sx, double sy) { 
+		contextTransform.scale((float)sx, (float)sy); 
+	}
 	@Override
 	public void transform(MatTrans trans) {
 		contextTransform.concatenate(trans);
@@ -306,7 +309,10 @@ public class GLGraphics extends GraphicsContext{
 		switch( comp) {
 		case SRC_OVER: params.setBlendMode( GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
 		case DST_OUT:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case DST_IN:params.setBlendMode( GLC.GL_ZERO, GLC.GL_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
 		case SRC:params.setBlendMode( GLC.GL_ONE, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
+		case SRC_IN:params.setBlendMode( GLC.GL_DST_ALPHA, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
+		case CLEAR:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
 		}
 	}
 	

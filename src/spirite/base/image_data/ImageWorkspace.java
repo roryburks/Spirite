@@ -1,8 +1,5 @@
 package spirite.base.image_data;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-//import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -17,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import javax.activation.UnsupportedDataTypeException;
-import javax.swing.JOptionPane;
 
 import spirite.base.brains.CacheManager;
 import spirite.base.brains.MasterControl;
@@ -47,9 +43,11 @@ import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
+import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.graphics.ImageBI;
+//import spirite.pc.graphics.ImageBI;
 
 
 /***
@@ -322,7 +320,6 @@ public class ImageWorkspace {
 		public final ImageHandle handle;
 		final int ox;
 		final int oy;
-		protected Graphics g = null;
 		
 		public BuiltImageData( ImageHandle handle) {
 			this.handle = handle;
@@ -391,14 +388,7 @@ public class ImageWorkspace {
 		 * correctly
 		 */
 		public void checkin() {
-			if( g == null)	{// Should only happen if it was a raw checkout.
-				_checkinImage(handle);
-			}
-			else {
-				_checkinImage(handle);
-				g.dispose();
-			}
-			g = null;
+			_checkinImage(handle);
 		}
 		
 		/** Converts the given point in ImageSpace to BuiltActiveData space*/
@@ -507,9 +497,8 @@ public class ImageWorkspace {
 			
 			Rect cropped = null;
 			try {
-				// TODO: MARK
-				cropped = MUtil.findContentBounds( ((ImageBI)img).img, 0, true);
-			} catch (UnsupportedDataTypeException e) {
+				cropped = HybridUtil.findContentBounds(img, 0, true);
+			} catch (UnsupportedImageTypeException e) {
 				e.printStackTrace();
 			}
 			
@@ -530,8 +519,8 @@ public class ImageWorkspace {
 			imageData.get(handle.id).cachedImage.replace(nri);
 			
 			buffer = null;
-			if( g != null)g.dispose();
-			g = null;
+//			if( gc != null)gc.dispose();
+			gc = null;
 
 			// Construct ImageChangeEvent and send it
 			ImageChangeEvent evt = new ImageChangeEvent();
@@ -699,9 +688,7 @@ public class ImageWorkspace {
 
 		if( nodeToCrop instanceof GroupNode 
 			&& settingsManager.getBoolSetting("promptOnGroupCrop")) {
-			int r = JOptionPane.showConfirmDialog(null, "Crop all Layers within the group?", "Cropping Group", JOptionPane.YES_NO_OPTION);
-			
-			if( r != JOptionPane.YES_OPTION)
+			if(!HybridHelper.showConfirm("Cropping Group", "Crop all Layers within the group?"))
 				return;
 		}
 		
@@ -1098,12 +1085,11 @@ public class ImageWorkspace {
 					if( handle.isDynamic()) {
 						DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
 						impi = new DynamicImportImage(
-								new ImageBI(MUtil.deepCopy( handle.deepAccess())), 
+								handle.deepAccess().deepCopy(), 
 								dii.ox, dii.oy);
 					}
 					else {
-						 impi = new ImportImage(
-									new ImageBI(MUtil.deepCopy( handle.deepAccess())));
+						 impi = new ImportImage(handle.deepAccess().deepCopy());
 					}
 					dupeData.put( handle.id, impi);
 				}
@@ -1153,13 +1139,11 @@ public class ImageWorkspace {
 							ImportImage impi;
 							if( handle.isDynamic()) {
 								DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
-								impi = new DynamicImportImage(
-										new ImageBI(MUtil.deepCopy( handle.deepAccess())), 
+								impi = new DynamicImportImage(handle.deepAccess().deepCopy(), 
 										dii.ox, dii.oy);
 							}
 							else {
-								 impi = new ImportImage(
-											new ImageBI(MUtil.deepCopy( handle.deepAccess())));
+								 impi = new ImportImage(handle.deepAccess().deepCopy());
 							}
 							dupeData.put(handle.id, impi);
 						}

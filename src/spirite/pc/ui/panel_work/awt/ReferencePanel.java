@@ -14,11 +14,13 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.ReferenceRenderSource;
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -52,15 +54,14 @@ public class ReferencePanel extends JPanel
         	RenderSettings settings = new RenderSettings(
         			new ReferenceRenderSource(workspace,front));
         	
-        	BufferedImage buffer = renderer.renderImage(settings);
+        	RawImage buffer = renderer.renderImage(settings);
             
-            Graphics2D g2 = (Graphics2D)g;
-            GraphicsContext gc = new AWTContext(g2, buffer.getWidth(), buffer.getHeight());
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, workspace.getReferenceManager().getRefAlpha()));
-            g2.translate(zoomer.itsX(0), zoomer.itsY(0));
-            g2.scale(zoomer.getZoom(), zoomer.getZoom());
+            GraphicsContext gc = new AWTContext(g, getWidth(), getHeight());
+            gc.setComposite( Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
+            gc.translate(zoomer.itsX(0), zoomer.itsY(0));
+            gc.scale(zoomer.getZoom(), zoomer.getZoom());
             
-            g.drawImage( buffer, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
+            gc.drawImage( buffer, 0, 0);
         }
         
     }

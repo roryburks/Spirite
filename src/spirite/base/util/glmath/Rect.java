@@ -42,6 +42,25 @@ public class Rect {
 		
 		return !( x2 < x || y2 < y || x2 > x+width || y2 > y+height);
 	}
+	public boolean contains( Rect rect) {
+		if( (width | height | rect.width | rect.height) < 0) return false;
+		if( rect.x < this.x || rect.y < this.y) return false;
+		int x2 = x + width;
+		int X2 = rect.x + rect.width;
+		if( X2 < rect.x ) {
+			if( x2 >= x || X2 > x2) return false;
+		} else {
+			if( x2 >= x && X2 > x2) return false;
+		}
+		int y2 = y + height;
+		int Y2 = rect.y + rect.height;
+		if( Y2 < rect.y ) {
+			if( y2 >= y || Y2 > y2) return false;
+		} else {
+			if( y2 >= y && Y2 > y2) return false;
+		}
+		return true;
+	}
 	public Rect union(Rect rect) {
 		if( rect == null || rect.isEmpty()) return new Rect(this);
 		if( isEmpty()) return new Rect(rect);

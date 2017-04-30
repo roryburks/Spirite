@@ -47,4 +47,10 @@ public class ImageBI extends RawImage {
 		return new AWTContext( img.getGraphics(), img.getWidth(), img.getHeight());
 	}
 
+
+	@Override
+	public int getRGB(int x, int y) {
+		return img.getRGB(x, y);
+	}
+
 }

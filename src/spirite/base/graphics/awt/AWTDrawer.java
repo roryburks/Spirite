@@ -8,7 +8,11 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.RawImage;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.StrokeEngine;
 
 public class AWTDrawer extends GraphicsDrawer {
@@ -38,26 +42,32 @@ public class AWTDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void changeColor(BufferedImage image, Color from, Color to, int mode) {
+	public void changeColor(RawImage image, Color from, Color to, int mode) {
+		if( !(image instanceof ImageBI)) {
+			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image Type in AWTDrawer");
+			return;
+		}
+		BufferedImage bi = ((ImageBI)image).img;
+		
 		// TODO: Make Better (or at least test if there is a better way to access
 		//	and change a batch of BufferedImage data)
 		int f = (mode == 0) ? from.getRGB() : (from.getRGB() & 0xFFFFFF);
 		int t = (mode == 0) ? to.getRGB() : (to.getRGB() & 0xFFFFFF);
 		int rgb;
-		for( int x = 0; x < image.getWidth(); ++x) {
-			for( int y=0; y < image.getHeight(); ++y) {
-				rgb = image.getRGB(x, y);
+		for( int x = 0; x < bi.getWidth(); ++x) {
+			for( int y=0; y < bi.getHeight(); ++y) {
+				rgb = bi.getRGB(x, y);
 				switch( mode) {
 				case 0:
 					if( rgb == f)
-						image.setRGB(x, y, t);
+						bi.setRGB(x, y, t);
 					break;
 				case 1:
 					if( (rgb & 0xFFFFFF) == f)
-						image.setRGB(x, y, (rgb & 0xFF000000) | t);
+						bi.setRGB(x, y, (rgb & 0xFF000000) | t);
 					break;
 				case 2:
-					image.setRGB(x, y, (rgb & 0xFF000000) | t);
+					bi.setRGB(x, y, (rgb & 0xFF000000) | t);
 					break;
 				}
 			}
@@ -66,13 +76,19 @@ public class AWTDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void invert(BufferedImage image) {
+	public void invert(RawImage image) {
+		if( !(image instanceof ImageBI)) {
+			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image Type in AWTDrawer");
+			return;
+		}
+		BufferedImage bi = ((ImageBI)image).img;
+		
 		// TODO: Make Better (or at least test if there is a better way to access
 		//	and change a batch of BufferedImage data)
-		for( int x = 0; x < image.getWidth(); ++x) {
-			for( int y=0; y < image.getHeight(); ++y) {
-				int rgb = image.getRGB(x, y);
-				image.setRGB(x, y, (rgb & 0xFF000000) | (0xFFFFFF - (rgb&0xFFFFFF)));
+		for( int x = 0; x < bi.getWidth(); ++x) {
+			for( int y=0; y < bi.getHeight(); ++y) {
+				int rgb = bi.getRGB(x, y);
+				bi.setRGB(x, y, (rgb & 0xFF000000) | (0xFFFFFF - (rgb&0xFFFFFF)));
 			}
 		}
 	}

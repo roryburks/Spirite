@@ -36,9 +36,10 @@ public abstract class GraphicsContext {
 	public abstract MatTrans getTransform();
 	public abstract void translate(double offsetX, double offsetY);
 	public abstract void transform(MatTrans trans);
+	public abstract void scale(double sx, double sy);
 	public abstract void setColor(int argb);
 	
-	public enum Composite {SRC_OVER, DST_OUT, SRC, };
+	public enum Composite {SRC_OVER, DST_OUT, SRC, SRC_IN, CLEAR, DST_IN, };
 	public abstract void setComposite( Composite composite, float alpha);
 	public abstract float getAlpha();
 	public abstract Composite getComposite();
@@ -81,6 +82,7 @@ public abstract class GraphicsContext {
 
 	public abstract void drawImage( RawImage img, int x, int y);
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
+
 
 
 }

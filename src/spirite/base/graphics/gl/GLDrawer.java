@@ -17,6 +17,7 @@ import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.RawImage;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.StrokeEngine;;
@@ -55,7 +56,7 @@ public class GLDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void changeColor(BufferedImage image, Color from, Color to, int mode) {
+	public void changeColor(RawImage image, Color from, Color to, int mode) {
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
 
     	GL2 gl = engine.getGL2();
@@ -67,7 +68,7 @@ public class GLDrawer extends GraphicsDrawer {
     	params.addParam( new GLParam4f("cTo", 
     			to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f));
 
-    	params.texture = new GLImageTexture( new ImageBI(image));
+    	params.texture = new GLImageTexture( image);
 
     	engine.clearSurface(gl);
     	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false, gl);
@@ -76,12 +77,12 @@ public class GLDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void invert(BufferedImage image) {
+	public void invert(RawImage image) {
     	GL2 gl = engine.getGL2();
     	engine.setSurfaceSize(image.getWidth(), image.getHeight());
 
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
-    	params.texture = new GLImageTexture(new ImageBI(image));
+    	params.texture = new GLImageTexture(image);
 
     	engine.clearSurface(gl);
     	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, gl);
@@ -90,7 +91,9 @@ public class GLDrawer extends GraphicsDrawer {
 	}
 	
 	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
-    private void glSurfaceToImage( BufferedImage bi) {
+    private void glSurfaceToImage( RawImage raw) {
+    	//TODO: MARK
+    	BufferedImage bi = ((ImageBI)raw).img;
         BufferedImage im = engine.glSurfaceToImage(bi.getType());
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();

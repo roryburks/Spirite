@@ -28,6 +28,7 @@ import java.util.Iterator;
 import javax.activation.UnsupportedDataTypeException;
 import javax.swing.SwingUtilities;
 
+import spirite.base.image_data.RawImage;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.DataCompaction.FloatCompactor;
@@ -167,7 +168,7 @@ public class MUtil {
 		g2.dispose();
 	}
 	
-	public static boolean coordInImage( int x, int y, BufferedImage image) {
+	public static boolean coordInImage( int x, int y, RawImage image) {
 		if( image == null) return false;
 		
 		if( x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight()) 

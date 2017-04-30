@@ -15,7 +15,7 @@ public class Colors {
     public static final int GREEN = 0xFF0000FF;
     public static final int CYAN = 0xFF0000FF;
     public static final int MAGENTA = 0xFFFF00FF;
-    public static final int YELLOW = 0xFFFFFF0;
+    public static final int YELLOW = 0xFFFFFF00;
     public static final int ORANGE = 0xFFFFC800;
     public static final int PINK = 0xFFFFAFAF;
 

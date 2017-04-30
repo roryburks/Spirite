@@ -534,7 +534,7 @@ public class UndoEngine {
 			super(image);
 			
 			actions.add(new KeyframeAction(
-					cacheManager.cacheImage(new ImageBI(MUtil.deepCopy(image.deepAccess())), UndoEngine.this), null));
+					cacheManager.cacheImage(image.deepAccess().deepCopy(), UndoEngine.this), null));
 			
 			met = 0;
 			pointer = 0;
@@ -686,7 +686,7 @@ public class UndoEngine {
 			//	i.e. an action requiring a lot of computation to perform
 			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
 				actions.add(new KeyframeAction(cacheManager.cacheImage(
-						new ImageBI(MUtil.deepCopy(image.deepAccess())),  UndoEngine.this), iaction));
+						image.deepAccess().deepCopy(),  UndoEngine.this), iaction));
 				met = 0;
 			}
 			else {

@@ -25,6 +25,7 @@ import spirite.base.file.LoadEngine.BadSIFFFileException;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.DrawEngine.StrokeAction;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -36,6 +37,7 @@ import spirite.base.util.Colors;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.pen.StrokeEngine;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.PenTraits.PenState;
 
 /**
@@ -69,7 +71,7 @@ public class Test1 {
 		try {
 			RenderSettings settings = new RenderSettings(
 					master.getRenderEngine().getDefaultRenderTarget(workspace));
-			BufferedImage img = master.getRenderEngine().renderImage(settings);
+			RawImage img = master.getRenderEngine().renderImage(settings);
 			assert( img == null);
 		}catch( Exception e) {
 			e.printStackTrace();
@@ -138,9 +140,8 @@ public class Test1 {
 				while( it1.hasNext()) {
 					assert(
 						compareImages(
-								it1.next().deepAccess(),
-								it2.next().deepAccess()
-								
+								((ImageBI)it1.next().deepAccess()).img,
+								((ImageBI)it2.next().deepAccess()).img
 						));
 				}
 				assert( !it2.hasNext());
@@ -148,8 +149,8 @@ public class Test1 {
 		}
 		
 		for( ImageHandle data : workspace.getAllImages()) {
-			BufferedImage b1 = data.deepAccess();
-			BufferedImage b2 = data.deepAccess();
+			BufferedImage b1 = ((ImageBI)data.deepAccess()).img;
+			BufferedImage b2 = ((ImageBI)data.deepAccess()).img;
 			
 			assert( compareImages(b1,b2));
 		}
@@ -213,7 +214,7 @@ public class Test1 {
 
 		RenderSettings settings = new RenderSettings(
 				master.getRenderEngine().getDefaultRenderTarget(workspace));
-		BufferedImage img = master.getRenderEngine().renderImage(settings);
+		BufferedImage img = ((ImageBI)master.getRenderEngine().renderImage(settings)).img;
 		BufferedImage img2 = deepCopy(img);
 		
 
@@ -221,7 +222,7 @@ public class Test1 {
 		
 		engine.undo();
 		
-		assert compareImages( img2, master.getRenderEngine().renderImage(settings));
+		assert compareImages( img2, ((ImageBI)master.getRenderEngine().renderImage(settings)).img);
 	}
 
 	Random rn = new Random(System.nanoTime());

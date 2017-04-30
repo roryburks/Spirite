@@ -32,6 +32,7 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -304,7 +305,8 @@ public class SaveEngine implements ActionListener, MWorkspaceObserver {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		for( ImageHandle part : helper.reservedCache) {
 			// (Foreach ImageData)
-			ImageIO.write( part.deepAccess(), "png", bos);
+			
+			HybridUtil.savePNG(part.deepAccess(), bos);
 
 			// [4] : Image ID
 			helper.ra.writeInt( part.getID());

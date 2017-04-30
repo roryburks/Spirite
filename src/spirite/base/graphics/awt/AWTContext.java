@@ -48,6 +48,11 @@ public class AWTContext extends GraphicsContext{
 		this.height = height;
 	}
 	
+	public AWTContext(BufferedImage bi) {
+		this.g2 = (Graphics2D)bi.getGraphics();
+		this.width = bi.getWidth();
+		this.height = bi.getHeight();
+	}
 	public Graphics getGraphics() {return g2;}
 
 	@Override
@@ -87,6 +92,7 @@ public class AWTContext extends GraphicsContext{
 	@Override public void setTransform(MatTrans trans) { g2.setTransform( toAT(trans)); }
 	@Override public MatTrans getTransform() { return toMT(g2.getTransform()); }
 	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}	
+	@Override public void scale(double sx, double sy) { g2.scale(sx, sy);}
 	@Override public void transform(MatTrans trans) {g2.transform( toAT(trans)); }
 
 	@Override public void setColor(int color) {g2.setColor(new Color(color,true));}
@@ -97,7 +103,10 @@ public class AWTContext extends GraphicsContext{
 		switch( composite) {
 		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
 		case DST_OUT: i = AlphaComposite.DST_OUT; break;
+		case DST_IN: i = AlphaComposite.DST_IN; break;
 		case SRC: i = AlphaComposite.SRC; break;
+		case SRC_IN: i = AlphaComposite.SRC_IN; break;
+		case CLEAR: i = AlphaComposite.CLEAR; break;
 		}
 		g2.setComposite( AlphaComposite.getInstance(i, alpha));
 	}
@@ -184,5 +193,5 @@ public class AWTContext extends GraphicsContext{
 		else
 			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type");
 	}
-	@Override public void drawHandle(ImageHandle handle, int x, int y) {g2.drawImage( handle.deepAccess(), x, y, null); }
+	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
 }

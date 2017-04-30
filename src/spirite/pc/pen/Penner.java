@@ -40,6 +40,7 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
@@ -54,6 +55,7 @@ import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.PenTraits.ButtonType;
 import spirite.pc.pen.PenTraits.MButtonEvent;
 import spirite.pc.pen.PenTraits.PenState;
@@ -576,7 +578,7 @@ public class Penner
 			// Get the composed image
 			RenderSettings settings = new RenderSettings(
 					renderEngine.getDefaultRenderTarget(workspace));
-			BufferedImage img = renderEngine.renderImage(settings);
+			RawImage img = renderEngine.renderImage(settings);
 			
 			if( !MUtil.coordInImage(x, y, img))
 				return;

@@ -41,7 +41,9 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.RenderEngine.LayerRenderSource;
 import spirite.base.brains.RenderEngine.RenderSettings;
+import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -51,6 +53,7 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.Vec2;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.SliderPanel;
 
@@ -296,9 +299,10 @@ public class ReferenceSchemePanel extends OmniComponent
 								settings.width = d.width;
 								settings.height = d.height;
 							
-								BufferedImage bi = master.getRenderEngine().renderImage(settings);
+								RawImage bi = master.getRenderEngine().renderImage(settings);
 								
-								g.drawImage(bi, 0, 0, d.width, d.height, null);
+								// TODO: MARK
+								g.drawImage(((ImageBI)bi).img, 0, 0, d.width, d.height, null);
 							}
 							else if( reference instanceof ImageReference){
 								BufferedImage bi = ((ImageReference) reference).image;

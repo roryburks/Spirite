@@ -65,9 +65,9 @@ public class ImageHandle {
 	 * will not trigger proper Observers.  And probably other bad stuff 
 	 * will happen if it sticks around in GC
 	 *  */
-	public BufferedImage deepAccess() {
+	public RawImage deepAccess() {
 		if( context == null) return null;
-		return ((ImageBI)context.getData(id).cachedImage.access()).img;
+		return context.getData(id).cachedImage.access();
 	}
 	
 	/** Accesses a potentially-cached GLTexture representing the current ImageHandle*/
