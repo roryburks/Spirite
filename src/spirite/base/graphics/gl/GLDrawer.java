@@ -17,7 +17,8 @@ import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.StrokeEngine;;
 
 
@@ -50,7 +51,7 @@ public class GLDrawer extends GraphicsDrawer {
 
 		renderable.render( new GLGraphics( engine.getAutoDrawable(), false));
 
-		return engine.glSurfaceToImage(Globals.BI_FORMAT);
+		return engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public class GLDrawer extends GraphicsDrawer {
     	params.addParam( new GLParam4f("cTo", 
     			to.getRed()/255f, to.getGreen()/255f, to.getBlue()/255f, to.getAlpha()/255f));
 
-    	params.texture = new GLImageTexture(image);
+    	params.texture = new GLImageTexture( new ImageBI(image));
 
     	engine.clearSurface(gl);
     	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false, gl);
@@ -80,7 +81,7 @@ public class GLDrawer extends GraphicsDrawer {
     	engine.setSurfaceSize(image.getWidth(), image.getHeight());
 
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
-    	params.texture = new GLImageTexture(image);
+    	params.texture = new GLImageTexture(new ImageBI(image));
 
     	engine.clearSurface(gl);
     	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, gl);

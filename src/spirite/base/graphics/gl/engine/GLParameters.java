@@ -8,6 +8,7 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.gl.engine.GLEngine.PreparedTexture;
+import spirite.base.image_data.RawImage;
 
 /**
  * GLParameters encapsulates many of the attributes representing "how" OpenGL
@@ -117,9 +118,9 @@ public class GLParameters {
 	
 	public static class GLImageTexture extends GLTexture {
 		private PreparedTexture texture;
-		private final BufferedImage image;
+		private final RawImage image;
 		
-		public GLImageTexture( BufferedImage image) {
+		public GLImageTexture( RawImage image) {
 			this.image = image;
 		}
 

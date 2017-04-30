@@ -18,6 +18,7 @@ import java.util.List;
 import javax.activation.UnsupportedDataTypeException;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -29,10 +30,12 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.DataCompaction.IntCompactor;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.ImageBI;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -117,10 +120,10 @@ public class SelectionEngine {
 	public AffineTransform getDrawFromTransform() {
 		AffineTransform trans = new AffineTransform();
 		if( proposingTransform) {
-			Dimension d = built.selection.getDimension();
-			trans.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
+			Vec2i d = built.selection.getDimension();
+			trans.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
 			trans.concatenate(proposedTransform);
-			trans.translate(-d.width/2, -d.height/2);
+			trans.translate(-d.x/2, -d.y/2);
 		}
 		else
 			trans.translate(built.offsetX, built.offsetY);
@@ -318,7 +321,7 @@ public class SelectionEngine {
 		
 	public BuiltSelection combineSelection( BuiltSelection sel1, BuiltSelection sel2) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		Graphics g = bi.getGraphics();
 		GraphicsContext gc = new AWTContext(g);
@@ -333,7 +336,7 @@ public class SelectionEngine {
 	public BuiltSelection subtractSelection( BuiltSelection sel1, BuiltSelection sel2){
 
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		GraphicsContext gc = new AWTContext(g2);
@@ -348,9 +351,9 @@ public class SelectionEngine {
 	}
 	public BuiltSelection intersectSelection( BuiltSelection sel1, BuiltSelection sel2){
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		BufferedImage bi2 = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		if( sel1 == null || sel2 == null) return new BuiltSelection( null,0,0);
 		
@@ -369,7 +372,7 @@ public class SelectionEngine {
 	}
 	public BuiltSelection invertSelection( BuiltSelection sel) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		g2.setColor(Color.WHITE);
@@ -383,13 +386,13 @@ public class SelectionEngine {
 	}
 	public void transformSelection( AffineTransform trans) {
 		BufferedImage bi = new BufferedImage(
-				workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+				workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 		Graphics2D g2 = (Graphics2D)bi.getGraphics();
 		
-		Dimension d = built.selection.getDimension();
-		g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
+		Vec2i d = built.selection.getDimension();
+		g2.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
 		g2.transform(trans);
-		g2.translate(-d.width/2, -d.height/2);
+		g2.translate(-d.x/2, -d.y/2);
 		built.selection.drawSelectionMask(new AWTContext(g2));
 		g2.dispose();
 		BuiltSelection sel = new BuiltSelection(bi);
@@ -399,19 +402,19 @@ public class SelectionEngine {
 		
 		if( lifted) {
 			bi = new BufferedImage(
-					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 			g2 = (Graphics2D)bi.getGraphics();
-			g2.translate(built.offsetX+d.width/2, built.offsetY+d.height/2);
+			g2.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
 			g2.transform(trans);
-			g2.translate(-d.width/2, -d.height/2);
+			g2.translate(-d.x/2, -d.y/2);
 			g2.drawImage(liftedImage, 0, 0, null);
 			g2.dispose();
 			
-			Dimension afterDim = sel.selection.getDimension();
+			Vec2i afterDim = sel.selection.getDimension();
 			
 			
 			BufferedImage afterLift = new BufferedImage(
-					afterDim.width, afterDim.height,  Globals.BI_FORMAT);
+					afterDim.x, afterDim.y,  HybridHelper.BI_FORMAT);
 			g2 = (Graphics2D)afterLift.getGraphics();
 			g2.drawImage(bi, -sel.offsetX, -sel.offsetY, null);
 			g2.dispose();
@@ -525,11 +528,10 @@ public class SelectionEngine {
 
 		@Override
 		protected void performImageAction() {
-			Graphics g = builtImage.checkout();
+			GraphicsContext gc = builtImage.checkout();
 			
-			Graphics2D g2 = (Graphics2D)g;
-			g2.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_OUT));
-			selection.drawSelectionMask(new AWTContext(g2));
+			gc.setComposite( Composite.DST_OUT, 1.0f);
+			selection.drawSelectionMask( gc);
 
 			builtImage.checkin();
 		}
@@ -551,8 +553,8 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			Graphics2D g2 = (Graphics2D)builtImage.checkout();
-			g2.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY, null);
+			GraphicsContext gc = builtImage.checkout();
+			gc.drawImage(new ImageBI(liftedImage), builtSelection.offsetX, builtSelection.offsetY);
 			builtImage.checkin();
 		}
 	}
@@ -679,7 +681,7 @@ public class SelectionEngine {
 			gc.drawBounds(bi, c);
 		}
 		public void drawSelectionMask(GraphicsContext gc) {
-			gc.drawImage(bi, 0, 0);
+			gc.drawImage(new ImageBI(bi), 0, 0);
 		}
 		public boolean contains(int x, int y) {
 			if( x < 0 || x >= bi.getWidth() || y < 0 || y >= bi.getHeight())
@@ -687,8 +689,8 @@ public class SelectionEngine {
 			
 			return ((bi.getRGB(x, y) >>> 24)!= 0);
 		}
-		public Dimension getDimension() {
-			return new Dimension( bi.getWidth(), bi.getHeight());
+		public Vec2i getDimension() {
+			return new Vec2i( bi.getWidth(), bi.getHeight());
 		}
 		public Selection clone() {
 			return new Selection(MUtil.deepCopy(bi));
@@ -717,7 +719,7 @@ public class SelectionEngine {
 			else {
 				BufferedImage bi2 = bi;
 				bi = new BufferedImage( 
-						bounds.width, bounds.height, Globals.BI_FORMAT);
+						bounds.width, bounds.height, HybridHelper.BI_FORMAT);
 				Graphics g = bi.getGraphics();
 				g.drawImage(bi2, -bounds.x, -bounds.y, null);
 				g.dispose();
@@ -746,19 +748,19 @@ public class SelectionEngine {
 		}
 		
 		private BufferedImage liftSelection( LiftScheme liftScheme) {
-			Rectangle selectionRect = new Rectangle(selection.getDimension());
+			Rect selectionRect = new Rect(selection.getDimension());
 			selectionRect.x = this.offsetX;
 			selectionRect.y = this.offsetY;
 			
 			BufferedImage bi = new BufferedImage( 
-					selectionRect.width, selectionRect.height, Globals.BI_FORMAT);
+					selectionRect.width, selectionRect.height, HybridHelper.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the mask, clipping the bounds of drawing to only the part 
 			// that the selection	intersects with the Image so that you do not 
 			//  leave un-applied mask left in the image.
-			Rectangle dataRect = liftScheme.getBounds();
-			Rectangle intersection = dataRect.intersection(selectionRect);
+			Rect dataRect = liftScheme.getBounds();
+			Rect intersection = dataRect.intersection(selectionRect);
 			
 			g2.setClip(intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
@@ -783,13 +785,13 @@ public class SelectionEngine {
 		{
 			return liftSelection( new LiftScheme() {
 				@Override
-				public Rectangle getBounds() {
-					return new Rectangle( offsetX, offsetY, img.getWidth(), img.getHeight());
+				public Rect getBounds() {
+					return new Rect( offsetX, offsetY, img.getWidth(), img.getHeight());
 				}
 				
 				@Override
 				public void draw(GraphicsContext gc) {
-					gc.drawImage(img, 0, 0);
+					gc.drawImage(new ImageBI(img), 0, 0);
 				}
 			});
 		}
@@ -799,7 +801,7 @@ public class SelectionEngine {
 		public BufferedImage liftSelectionFromData( BuiltImageData data) {
 			return liftSelection(new LiftScheme() {
 				@Override
-				public Rectangle getBounds() {
+				public Rect getBounds() {
 					return data.getBounds();
 				}
 				
@@ -813,7 +815,7 @@ public class SelectionEngine {
 	/** Helper Class to reduce duplicate code. */
 	private interface LiftScheme {
 		void draw(GraphicsContext gc);
-		Rectangle getBounds();
+		Rect getBounds();
 	}
 	
 	// ======================
@@ -847,7 +849,7 @@ public class SelectionEngine {
 		@Override
 		protected BuiltSelection build() {
 			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 			Graphics g = bi.getGraphics();
 			g.fillRect(
 					Math.min(startX, currentX), Math.min(startY, currentY),
@@ -885,7 +887,7 @@ public class SelectionEngine {
 		@Override
 		protected BuiltSelection build() {
 			BufferedImage bi = new BufferedImage( 
-					workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+					workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 			Graphics g = bi.getGraphics();
 			g.fillOval(
 					Math.min(startX, currentX), Math.min(startY, currentY),
@@ -919,7 +921,7 @@ public class SelectionEngine {
 		}
 		@Override
 		protected BuiltSelection build() {
-			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+			BufferedImage bi = new BufferedImage( workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 			
 			Polygon pg = new Polygon();
 			for( int i=0; i<compactor_x.size(); i += 1) {

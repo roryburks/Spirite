@@ -21,6 +21,11 @@ public class Rect {
 		this.width = other.width;
 		this.height = other.height;
 	}
+	public Rect(Vec2i vec2i) {
+		x = y = 0;
+		this.width = vec2i.x;
+		this.height = vec2i.y;
+	}
 	public boolean isEmpty() {
 		return width <= 0 || height <= 0;
 	}
@@ -36,5 +41,15 @@ public class Rect {
 		if( width <= 0 || height <= 0) return false;
 		
 		return !( x2 < x || y2 < y || x2 > x+width || y2 > y+height);
+	}
+	public Rect union(Rect rect) {
+		if( rect == null || rect.isEmpty()) return new Rect(this);
+		if( isEmpty()) return new Rect(rect);
+		
+		return new Rect(
+				Math.min( x, rect.x),
+				Math.min( y, rect.y),
+				Math.max( x + width, rect.x + rect.width),
+				Math.max( y + height, rect.y + rect.height));
 	}
 }

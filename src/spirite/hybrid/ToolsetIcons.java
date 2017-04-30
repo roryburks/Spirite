@@ -23,7 +23,7 @@ public class ToolsetIcons {
         icon_sheet = null;
         try {
             BufferedImage buff = ImageIO.read ( ToolsetIcons.class.getClassLoader().getResource("tool_icons.png").openStream());
-            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), Globals.BI_FORMAT);
+            icon_sheet = new BufferedImage( buff.getWidth(), buff.getHeight(), HybridHelper.BI_FORMAT);
             
             Graphics g = icon_sheet.getGraphics();
             g.drawImage(buff, 0, 0, null);

@@ -8,7 +8,7 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.pen.StrokeEngine;
 
 public class AWTDrawer extends GraphicsDrawer {
@@ -29,7 +29,7 @@ public class AWTDrawer extends GraphicsDrawer {
 	
 	@Override
 	public BufferedImage renderToImage(RenderRoutine renderable, int width, int height) {
-		BufferedImage bi = new BufferedImage( width, height, Globals.BI_FORMAT);
+		BufferedImage bi = new BufferedImage( width, height, HybridHelper.BI_FORMAT);
 		
 		Graphics sub = bi.getGraphics();
 		renderable.render(new AWTContext( sub));

@@ -18,8 +18,9 @@ import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import spirite.base.util.MatrixBuilder;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.pen.StrokeEngine;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.PenTraits.PenState;
 
 /**
@@ -87,8 +88,8 @@ class GLStrokeEngine extends StrokeEngine {
 			params.texture = new GLParameters.GLFBOTexture(displayLayer);
 			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 			
-			BufferedImage bi = engine.glSurfaceToImage(Globals.BI_FORMAT);
-			gc.drawImage( bi, 0, 0);
+			BufferedImage bi = engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
+			gc.drawImage( new ImageBI(bi), 0, 0);
 		}
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;

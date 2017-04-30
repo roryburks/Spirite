@@ -36,6 +36,7 @@ import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.RigStructureObserver;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -355,7 +356,7 @@ public class RigPanel extends OmniComponent
 		switch( evt.getActionCommand()) {
 		case "newPart":
 			if( rig != null) {
-				BufferedImage bi = new BufferedImage(1, 1, Globals.BI_FORMAT);
+				BufferedImage bi = new BufferedImage(1, 1, HybridHelper.BI_FORMAT);
 				
 				workspace.getUndoEngine().performAndStore(
 						rig.createAddPartAction(bi, 0, 0, 0,""));

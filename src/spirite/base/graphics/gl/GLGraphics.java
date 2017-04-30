@@ -22,7 +22,11 @@ import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.RawImage;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.GLC;
+import spirite.pc.graphics.ImageBI;
+import spirite.base.util.Colors;
 import spirite.base.util.DataCompaction.FloatCompactor;
 
 /**
@@ -41,7 +45,7 @@ public class GLGraphics extends GraphicsContext{
 	private int width, height;
 	private boolean flip = false;
 	private AffineTransform contextTransform = new AffineTransform();
-	private Color color = Color.BLACK;
+	private int color = Colors.BLACK;
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
 	private LineAttributes lineAttributes = defaultLA;
@@ -121,7 +125,7 @@ public class GLGraphics extends GraphicsContext{
 				GL2 gl2 = gl.getGL2();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
-				params2.texture = new GLImageTexture(mask);
+				params2.texture = new GLImageTexture( new ImageBI(mask));
 				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
 			}
@@ -170,7 +174,7 @@ public class GLGraphics extends GraphicsContext{
 				GL2 gl2 = gl.getGL2();
 				engine.clearSurface(gl2);
 				GLParameters params2 = new GLParameters(width, height);
-				params2.texture = new GLImageTexture(mask);
+				params2.texture = new GLImageTexture(new ImageBI(mask));
 				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, trans,
 						0, 0, mask.getWidth(), mask.getHeight(), false, gl2);
 			}
@@ -206,12 +210,10 @@ public class GLGraphics extends GraphicsContext{
 		contextTransform.translate(offsetX, offsetY);
 	}
 	
-	@Override public void setColor(Color color) {
-		if( color != null) {
-			this.color = color;
-//			updateImgParams = true;
-			updatePolyParams = true;
-		}
+	@Override public void setColor(int argb) {
+		this.color = argb;
+//		updateImgParams = true;
+		updatePolyParams = true;
 	}
 	@Override
 	public void setComposite(Composite composite, float alpha) {
@@ -298,8 +300,9 @@ public class GLGraphics extends GraphicsContext{
 	
 	public static void setCompositeBlend( GLParameters params, Composite comp) {
 		switch( comp) {
-		case SRC_OVER: params.setBlendMode( GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
-		case DST_OUT:params.setBlendMode( GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD);break;
+		case SRC_OVER: params.setBlendMode( GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case DST_OUT:params.setBlendMode( GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD);break;
+		case SRC:params.setBlendMode( GLC.GL_ONE, GLC.GL_ZERO, GLC.GL_FUNC_ADD);break;
 		}
 	}
 	
@@ -342,12 +345,12 @@ public class GLGraphics extends GraphicsContext{
 	
 	
 	@Override
-	public void drawImage(BufferedImage bi, int x, int y) {
+	public void drawImage( RawImage img, int x, int y) {
 		GLParameters params = getImgParams();
-		params.texture = new GLParameters.GLImageTexture(bi);
+		params.texture = new GLParameters.GLImageTexture(img);
 
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, bi.getWidth(), bi.getHeight(), false, gl);
+				0, 0, img.getWidth(), img.getHeight(), false, gl);
 		params.texture = null;
 		
 	}
@@ -382,8 +385,8 @@ public class GLGraphics extends GraphicsContext{
 			cachedPolyParams.flip = flip;
 			cachedPolyParams.clearParams();
 			cachedPolyParams.addParam( new GLParameters.GLParam3f("uColor", 
-					color.getRed()/255.0f, color.getGreen()/255.0f, color.getBlue()/255.0f));
-			cachedPolyParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+					Colors.getRed(color)/255.0f, Colors.getGreen(color)/255.0f, Colors.getBlue(color)/255.0f));
+			cachedPolyParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha* Colors.getAlpha(color)/255.0f));
 			setCompositeBlend(cachedPolyParams, composite);
 			updatePolyParams = false;
 		}

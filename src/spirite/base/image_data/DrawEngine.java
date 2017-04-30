@@ -16,6 +16,8 @@ import java.util.Queue;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -27,10 +29,12 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2;
-import spirite.hybrid.Globals;
+import spirite.base.util.glmath.Vec2i;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.PenTraits;
 import spirite.pc.pen.StrokeEngine;
 import spirite.pc.pen.PenTraits.PenDynamics;
@@ -134,9 +138,9 @@ public class DrawEngine {
 	{
 		if( data == null) return false;
 		
-		Point p = data.convert( new Point(x,y));
+		Vec2i p = data.convert( new Vec2i(x,y));
 		
-		BufferedImage bi = data.checkoutRaw();
+		BufferedImage bi = ((ImageBI)data.checkoutRaw()).img;
 		if( !MUtil.coordInImage( p.x, p.y, bi)) {
 			return false;
 		}
@@ -175,7 +179,7 @@ public class DrawEngine {
 			
 			// This is kind of bad
 			BufferedImage bi = new 
-					BufferedImage( workspace.getWidth(), workspace.getHeight(), Globals.BI_FORMAT);
+					BufferedImage( workspace.getWidth(), workspace.getHeight(), HybridHelper.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D) bi.getGraphics();
 			g2.setColor(Color.WHITE);
 			g2.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
@@ -380,16 +384,17 @@ public class DrawEngine {
 
 		@Override
 		protected void performImageAction( ) {
+			// TODO: MARK
 			BufferedImage bi;
-			Point layerSpace;
+			Vec2i layerSpace;
 			BufferedImage intermediate = null;
 			if( mask.selection == null) {
-				bi= builtImage.checkoutRaw();
-				layerSpace = builtImage.convert( new Point(p.x, p.y));
+				bi= ((ImageBI)builtImage.checkoutRaw()).img;
+				layerSpace = builtImage.convert( new Vec2i(p.x, p.y));
 			}
 			else {
 				bi = mask.liftSelectionFromData(builtImage);
-				layerSpace = new Point(p.x - mask.offsetX, p.y - mask.offsetY);
+				layerSpace = new Vec2i(p.x - mask.offsetX, p.y - mask.offsetY);
 			}
 			
 			Queue<Integer> queue = new LinkedList<Integer>();
@@ -408,7 +413,7 @@ public class DrawEngine {
 				//	mask (this has to be done in a couple of renderings).
 				intermediate = bi;
 				bi = new BufferedImage(
-						bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
+						bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
 				g2.setColor(Color.GREEN);
 				g2.fillRect(0, 0, bi.getWidth(), bi.getHeight());
@@ -466,9 +471,9 @@ public class DrawEngine {
 				}
 
 				// Anchor the lifted image to the real image
-				Graphics g = builtImage.checkout();
-				Point p = builtImage.convert(new Point(mask.offsetX,mask.offsetY));
-				g.drawImage( bi, p.x, p.y, null);
+				GraphicsContext gc = builtImage.checkout();
+				Vec2i p = builtImage.convert(new Vec2i(mask.offsetX,mask.offsetY));
+				gc.drawImage(new ImageBI(bi), p.x, p.y);
 			}
 			builtImage.checkin();
 		}
@@ -490,10 +495,10 @@ public class DrawEngine {
 				builtImage.checkin();
 			}
 			else {
-				Graphics2D g2 = (Graphics2D) builtImage.checkout();
-				g2.translate(mask.offsetX, mask.offsetY);
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.selection.drawSelectionMask(new AWTContext(g2));
+				GraphicsContext gc = builtImage.checkout();
+				gc.translate(mask.offsetX, mask.offsetY);
+				gc.setComposite(Composite.DST_OUT, 1);
+				mask.selection.drawSelectionMask(gc);
 				builtImage.checkin();
 			}
 
@@ -518,18 +523,18 @@ public class DrawEngine {
 
 				BufferedImage buffer = flipImage(lifted, horizontal);
 
-				Graphics2D g2 = (Graphics2D) builtImage.checkout();
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.drawSelectionMask(new AWTContext(g2));
-				
+				GraphicsContext gc = builtImage.checkout();
+				gc.setComposite( Composite.DST_OUT, 1.0f);
+				mask.drawSelectionMask( gc);
 
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-				g2.drawImage(buffer, mask.offsetX, mask.offsetY, null);
-				g2.dispose();
+				gc.setComposite(Composite.SRC_OVER, 1.0f);
+				gc.drawImage(new ImageBI(buffer), mask.offsetX, mask.offsetY);
+//				gc.dispose();
+				
 				buffer.flush();
 			}
 			else {
-				BufferedImage bi = builtImage.checkoutRaw();
+				BufferedImage bi = ((ImageBI)builtImage.checkoutRaw()).img;
 				BufferedImage buffer = flipImage( bi, horizontal);
 				
 				Graphics2D g2 = (Graphics2D) bi.getGraphics();
@@ -546,7 +551,7 @@ public class DrawEngine {
 		// Might be able to do this single-Image but things get weird if you 
 		//	draw a Buffer onto itself
 		BufferedImage buffer = new BufferedImage( 
-				bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
+				bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
 		Graphics2D g2 = (Graphics2D)buffer.getGraphics();
 		
 		if( horizontal) {
@@ -588,15 +593,15 @@ public class DrawEngine {
 				BufferedImage lifted = mask.liftSelectionFromData(builtImage);
 				applyFilter(lifted);
 
-				Graphics2D g2 = (Graphics2D) builtImage.checkout();
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.DST_OUT));
-				mask.drawSelectionMask(new AWTContext(g2));
+				GraphicsContext gc = builtImage.checkout();
+				gc.setComposite( Composite.DST_OUT, 1.0f);
+				mask.drawSelectionMask(gc);
 
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-				g2.drawImage( lifted, mask.offsetX, mask.offsetY, null);
+				gc.setComposite( Composite.SRC_OVER, 1.0f);
+				gc.drawImage( new ImageBI(lifted), mask.offsetX, mask.offsetY );
 			}
 			else {
-				BufferedImage bi = builtImage.checkoutRaw();
+				BufferedImage bi = ((ImageBI)builtImage.checkoutRaw()).img;
 				applyFilter(bi);
 			}
 			builtImage.checkin();

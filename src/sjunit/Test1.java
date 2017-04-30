@@ -32,8 +32,9 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.util.Colors;
 import spirite.base.util.glmath.Rect;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.pen.StrokeEngine;
 import spirite.pc.pen.PenTraits.PenState;
 
@@ -76,14 +77,14 @@ public class Test1 {
 		}
 		
 		// Verify Image dimension adjustment
-		workspace.addNewSimpleLayer(null, 100, 100, "Name", new Color(50,50,50));
-		workspace.addNewSimpleLayer(null, 50, 900, "Namex", new Color(50,50,50));
+		workspace.addNewSimpleLayer(null, 100, 100, "Name", Colors.toColor(50,50,50));
+		workspace.addNewSimpleLayer(null, 50, 900, "Namex", Colors.toColor(50,50,50));
 		{
-			LayerNode lnode = workspace.addNewRigLayer(null, 50, 50, "Rig", new Color(0,0,0,0));
+			LayerNode lnode = workspace.addNewRigLayer(null, 50, 50, "Rig", Colors.toColor(0,0,0,0));
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), Globals.BI_FORMAT);
+			BufferedImage bi = new BufferedImage( rig.getWidth(),rig.getHeight(), HybridHelper.BI_FORMAT);
 			
 			workspace.getUndoEngine().performAndStore(
 					rig.createAddPartAction(bi, 0, 0, 0,""));
@@ -91,9 +92,9 @@ public class Test1 {
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	
 		GroupNode beta = workspace.addGroupNode(null, "Beta");
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_1", new Color( 0,100,0));
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_2", new Color( 0,0,100));
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_3", new Color( 100,0,0));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_1", Colors.toColor( 0,100,0));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_2", Colors.toColor( 0,0,100));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_3", Colors.toColor( 100,0,0));
 		
 		// Save file then load it to verify it's working
 		File temp = null;
@@ -199,14 +200,14 @@ public class Test1 {
 	public void tuei() {
 		ImageWorkspace workspace = new ImageWorkspace(master);
 		master.addWorkpace(workspace, false);
-		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", new Color(0,0,0,0))).getLayer();
+		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0))).getLayer();
 		workspace.finishBuilding();
 		
 		UndoEngine engine = workspace.getUndoEngine();
 		
 		assert engine.getQueuePosition() == 0;
 		
-		Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", new Color(0,0,0,0))).getLayer();
+		Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", Colors.toColor(0,0,0,0))).getLayer();
 		
 		
 
@@ -216,7 +217,7 @@ public class Test1 {
 		BufferedImage img2 = deepCopy(img);
 		
 
-		Layer layer3 = ((LayerNode)workspace.addNewSimpleLayer(null, 900, 900, "three", new Color(0,0,0,0))).getLayer();
+		Layer layer3 = ((LayerNode)workspace.addNewSimpleLayer(null, 900, 900, "three", Colors.toColor(0,0,0,0))).getLayer();
 		
 		engine.undo();
 		
@@ -232,7 +233,7 @@ public class Test1 {
 			workspace.addNewSimpleLayer(
 					getRandomNode(workspace), 
 					100 + rn.nextInt(100), 100 + rn.nextInt(100)
-					, Float.toHexString(rn.nextFloat()), randomColor());
+					, Float.toHexString(rn.nextFloat()), randomColor().getRGB());
 			break;
 		case 1:
 			// Add Group
@@ -312,7 +313,7 @@ public class Test1 {
 			workspace.finishBuilding();
 			master.addWorkpace(workspace, false);
 			
-			workspace.addNewSimpleLayer(null, 50, 50, "BASE", new Color(0,0,0,0));
+			workspace.addNewSimpleLayer(null, 50, 50, "BASE", Colors.toColor(0,0,0,0));
 			for( int i=0; i<50; ++i) {
 				performRandomUndoableAction( workspace);
 			}

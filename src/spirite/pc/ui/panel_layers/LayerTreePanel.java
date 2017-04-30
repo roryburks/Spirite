@@ -569,7 +569,7 @@ public class LayerTreePanel extends ContentTree
 			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
 			if( helper != null) {
 				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color);
+						helper.width, helper.height, helper.name, helper.color.getRGB());
 			}
 			break;}
 		case "duplicate":
@@ -588,7 +588,7 @@ public class LayerTreePanel extends ContentTree
 			
 			if( helper != null) 
 				workspace.addNewRigLayer(workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color);
+						helper.width, helper.height, helper.name, helper.color.getRGB());
 			break;}
 		default:
 			MDebug.log(evt.getActionCommand());

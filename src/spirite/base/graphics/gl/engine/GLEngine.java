@@ -30,8 +30,10 @@ import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import sun.awt.image.ByteInterleavedRaster;
@@ -658,9 +660,9 @@ public class GLEngine  {
 			}
 		}
 	}
-	public PreparedTexture prepareTexture( BufferedImage bi, GL2 gl) {
-		int w = bi.getWidth();
-		int h = bi.getHeight();
+	public PreparedTexture prepareTexture( RawImage image, GL2 gl) {
+		int w = image.getWidth();
+		int h = image.getHeight();
 		PreparedTexture pt = new PreparedTexture(gl, w, h);
 
 		pt.tex = GLBuffers.newDirectIntBuffer(1);
@@ -671,33 +673,8 @@ public class GLEngine  {
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		
-		WritableRaster rast = bi.getRaster();
-		
+		HybridHelper.loadImageIntoGL( image, gl);
 
-		if( rast instanceof ByteInterleavedRaster) {
-			gl.glTexImage2D(
-					GL2.GL_TEXTURE_2D,
-					0,
-					GL2.GL_RGBA,
-					w, h,
-					0,
-					GL2.GL_RGBA,
-					GL2.GL_UNSIGNED_INT_8_8_8_8,
-					ByteBuffer.wrap(((ByteInterleavedRaster)rast).getDataStorage())
-					);
-		}
-		if( rast instanceof IntegerInterleavedRaster) {
-			gl.glTexImage2D(
-					GL2.GL_TEXTURE_2D,
-					0,
-					GL2.GL_RGBA,
-					w, h,
-					0,
-					GL2.GL_BGRA,
-					GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
-					IntBuffer.wrap(((IntegerInterleavedRaster)rast).getDataStorage())
-					);
-		}
 		
 /*		__ts[met] = System.currentTimeMillis();
 		__dims[met] = w*h;

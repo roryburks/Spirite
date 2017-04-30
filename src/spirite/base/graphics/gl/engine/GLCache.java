@@ -17,6 +17,7 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.hybrid.MDebug;
+import spirite.pc.graphics.ImageBI;
 
 /** 
  * 
@@ -64,7 +65,7 @@ public class GLCache implements MImageObserver {
 		CachedTexture ctex = cache.get(handle);
 		if( ctex == null) {
 			ctex = new CachedTexture(
-					getEngine().prepareTexture(handle.deepAccess(), gl));
+					getEngine().prepareTexture( new ImageBI(handle.deepAccess()), gl));
 			
 			cacheSize += ctex.tex.w*ctex.tex.h*4;
 			

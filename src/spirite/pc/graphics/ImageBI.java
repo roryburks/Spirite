@@ -2,6 +2,8 @@ package spirite.pc.graphics;
 
 import java.awt.image.BufferedImage;
 
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.MUtil;
 
@@ -37,6 +39,12 @@ public class ImageBI extends RawImage {
 	@Override
 	public RawImage deepCopy() {
 		return new ImageBI( MUtil.deepCopy(img));
+	}
+
+
+	@Override
+	public GraphicsContext getGraphics() {
+		return new AWTContext( img.getGraphics());
 	}
 
 }

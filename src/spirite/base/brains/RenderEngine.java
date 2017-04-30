@@ -40,7 +40,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.pc.graphics.ImageBI;
 
@@ -665,7 +665,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, Globals.BI_FORMAT);
+					settings.width, settings.height, HybridHelper.BI_FORMAT);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -730,7 +730,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, Globals.BI_FORMAT);
+					settings.width, settings.height, HybridHelper.BI_FORMAT);
 			
 			Graphics g = bi.getGraphics();
 			Graphics2D g2 = (Graphics2D)g;
@@ -765,7 +765,7 @@ public class RenderEngine
 		@Override
 		public BufferedImage render(RenderSettings settings) {
 			BufferedImage bi = new BufferedImage(
-					settings.width, settings.height, Globals.BI_FORMAT);
+					settings.width, settings.height, HybridHelper.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 			GraphicsContext gc = new AWTContext(g2);
 			

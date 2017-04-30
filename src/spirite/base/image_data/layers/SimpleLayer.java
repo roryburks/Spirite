@@ -20,7 +20,7 @@ import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 
 public class SimpleLayer extends Layer {
@@ -96,7 +96,7 @@ public class SimpleLayer extends Layer {
 			helper.offsetChange.y = newBounds.y;
 			
 			// Draw both images in their respective spots
-			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, Globals.BI_FORMAT);
+			BufferedImage combination = new BufferedImage( newBounds.width, newBounds.height, HybridHelper.BI_FORMAT);
 			MUtil.clearImage(combination);
 			Graphics g = combination.getGraphics();
 			g.drawImage( data.deepAccess(), 0-newBounds.x, 0-newBounds.y, null);

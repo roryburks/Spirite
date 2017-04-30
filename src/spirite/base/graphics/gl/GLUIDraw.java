@@ -14,7 +14,8 @@ import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
+import spirite.pc.graphics.ImageBI;
 
 /** 
  * USE OF GLUIDRAW IS BEING PHASED OUT.  ALL CODE IS BEING MOVED TO GLGraphics
@@ -53,7 +54,7 @@ class GLUIDraw {
 			public void render(GL _gl) {
 				GLParameters params = new GLParameters(w, h);
 				params.addParam( new GLParam1i("uCycle", cycle));
-				params.texture = new GLImageTexture(bi);
+				params.texture = new GLImageTexture( new ImageBI(bi));
 				engine.applyPassProgram(ProgramType.PASS_BORDER, params, null, false, _gl.getGL2());
 			}
 		});
@@ -85,7 +86,7 @@ class GLUIDraw {
 		glmu.cleanup();
 		glmub.cleanup();
 
-        BufferedImage im = engine.glSurfaceToImage(Globals.BI_FORMAT);
+        BufferedImage im = engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
        
 		return im;
 	}

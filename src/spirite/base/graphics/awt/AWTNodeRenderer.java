@@ -22,7 +22,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -49,7 +49,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 			
 			buffer = new BufferedImage[n];
 			for( int i=0; i<n; ++i) {
-				buffer[i] = new BufferedImage( settings.width, settings.height, Globals.BI_FORMAT);
+				buffer[i] = new BufferedImage( settings.width, settings.height, HybridHelper.BI_FORMAT);
 			}
 
 			// Step 3: Recursively draw the image
@@ -84,7 +84,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 
 				compositionImage= new BufferedImage( 
 						dataContext.getWidth(), dataContext.getHeight(),
-						Globals.BI_FORMAT);
+						HybridHelper.BI_FORMAT);
 				compositionContext = dataContext.handle;
 				
 

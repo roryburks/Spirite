@@ -1,5 +1,7 @@
 package spirite.base.image_data;
 
+import spirite.base.graphics.GraphicsContext;
+
 /**
  * RawImage is a wrapper for multiple different types of more-native image formats
  *
@@ -13,4 +15,6 @@ public abstract class RawImage {
     public abstract int getByteSize();
     
     public abstract RawImage deepCopy();
+    
+    public abstract GraphicsContext getGraphics();
 }

@@ -32,7 +32,7 @@ import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.util.MUtil;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -58,7 +58,7 @@ public class LoadEngine {
     		// First try to load the file as normal if it's a normal image format
     		try {
 				BufferedImage bi = ImageIO.read(f);
-				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
+				BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
 				MUtil.clearImage(bi2);
 				Graphics g = bi2.getGraphics();
 				g.drawImage(bi, 0, 0, null);
@@ -265,7 +265,7 @@ public class LoadEngine {
 			helper.ra.read(buffer);
 			
 			BufferedImage bi = ImageIO.read(new ByteArrayInputStream(buffer));
-			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), Globals.BI_FORMAT);
+			BufferedImage bi2 = new BufferedImage( bi.getWidth(), bi.getHeight(), HybridHelper.BI_FORMAT);
 			MUtil.clearImage(bi2);
 			Graphics g = bi2.getGraphics();
 			g.drawImage(bi, 0, 0, null);

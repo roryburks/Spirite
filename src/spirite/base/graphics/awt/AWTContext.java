@@ -12,7 +12,11 @@ import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageHandle;
-import spirite.hybrid.Globals;
+import spirite.base.image_data.RawImage;
+import spirite.hybrid.HybridHelper;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.graphics.ImageBI;
 
 /**
  * AWTContext is a GraphicsContext using only native AWT calls (as well as some
@@ -38,7 +42,7 @@ public class AWTContext extends GraphicsContext{
 		AffineTransform old = g2.getTransform();
 		g2.setTransform(new AffineTransform());
 		
-		BufferedImage bi = new BufferedImage( r.width, r.height, Globals.BI_FORMAT);
+		BufferedImage bi = new BufferedImage( r.width, r.height, HybridHelper.BI_FORMAT);
 		Graphics2D g2BI = (Graphics2D)(bi.getGraphics());
 		g2BI.setTransform(old);
 		g2BI.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
@@ -66,7 +70,7 @@ public class AWTContext extends GraphicsContext{
 	@Override public AffineTransform getTransform() { return g2.getTransform(); }
 	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}
 
-	@Override public void setColor(Color color) {g2.setColor(color);}
+	@Override public void setColor(int color) {g2.setColor(new Color(color,true));}
 	@Override
 	public void setComposite(Composite composite, float alpha) {
 		int i = AlphaComposite.SRC_OVER;
@@ -74,6 +78,7 @@ public class AWTContext extends GraphicsContext{
 		switch( composite) {
 		case SRC_OVER: i = AlphaComposite.SRC_OVER; break;
 		case DST_OUT: i = AlphaComposite.DST_OUT; break;
+		case SRC: i = AlphaComposite.SRC; break;
 		}
 		g2.setComposite( AlphaComposite.getInstance(i, alpha));
 	}
@@ -154,7 +159,12 @@ public class AWTContext extends GraphicsContext{
 	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
 
-	@Override public void drawImage(BufferedImage bi, int x, int y) {g2.drawImage(bi,  x,  y, null);}
+	@Override public void drawImage(RawImage img, int x, int y) {
+		if( img instanceof ImageBI)
+			g2.drawImage( ((ImageBI)img).img,  x,  y, null);
+		else
+			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type");
+	}
 	@Override public void drawHandle(ImageHandle handle, int x, int y) {g2.drawImage( handle.deepAccess(), x, y, null); }
 
 

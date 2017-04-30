@@ -2,7 +2,6 @@ package spirite.pc.pen;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +13,7 @@ import spirite.base.image_data.DrawEngine;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.Interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.Interpolation.InterpolatedPoint;
 import spirite.base.util.Interpolation.Interpolator2D;
@@ -118,7 +118,7 @@ public abstract class StrokeEngine {
 		
 		// Starts recording the Pen States
 		prec = new ArrayList<PenState>();
-		Point layerSpace = (data.convert(new Point(ps.x,ps.y)));
+		Vec2i layerSpace = (data.convert(new Vec2i(ps.x,ps.y)));
 		
 		oldState.x = layerSpace.x;
 		oldState.y = layerSpace.y;
@@ -146,7 +146,7 @@ public abstract class StrokeEngine {
 	}
 
 	public final boolean stepStroke( PenState ps) {
-		Point layerSpace = data.convert( new Point( ps.x, ps.y));
+		Vec2i layerSpace = data.convert( new Vec2i( ps.x, ps.y));
 		newState.x = layerSpace.x;
 		newState.y = layerSpace.y;
 		newState.pressure = ps.pressure;
@@ -206,10 +206,8 @@ public abstract class StrokeEngine {
 		state = StrokeEngine.STATE.READY;
 		
 		if( data != null) {
-			Graphics g = data.checkoutRaw().getGraphics();
-			GraphicsContext gc = new AWTContext(g);
+			GraphicsContext gc = data.checkoutRaw().getGraphics();
 			drawStrokeLayer(gc);
-			g.dispose();
 			data.checkin();
 		}
 		

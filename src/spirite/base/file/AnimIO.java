@@ -34,7 +34,7 @@ import spirite.base.util.MUtil;
 import spirite.base.util.RectanglePacker;
 import spirite.base.util.RectanglePacker.PackedRectangle;
 import spirite.base.util.glmath.Rect;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 
 /**
  * AnimIO is a container for static methods that export Animations of various
@@ -64,7 +64,7 @@ public class AnimIO {
 		
 		int c = (int)Math.floor(animation.getEndFrame());
 		
-		BufferedImage bi = new BufferedImage(width*c, height, Globals.BI_FORMAT);
+		BufferedImage bi = new BufferedImage(width*c, height, HybridHelper.BI_FORMAT);
 		
 		Graphics2D g = (Graphics2D) bi.getGraphics();
 		GraphicsContext gc = new AWTContext(g);
@@ -174,7 +174,7 @@ public class AnimIO {
 					oy = handle.getDynamicY();
 				}
 				
-				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, Globals.BI_FORMAT);
+				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, HybridHelper.BI_FORMAT);
 				Graphics g = bi.getGraphics();
 				g.drawImage(handle.deepAccess(), -bounds.x, -bounds.y, null);
 				g.dispose();
@@ -203,7 +203,7 @@ public class AnimIO {
 		}
 		
 		BufferedImage output_bi = new BufferedImage(
-				pr.width, pr.height, Globals.BI_FORMAT);
+				pr.width, pr.height, HybridHelper.BI_FORMAT);
 		Graphics g = output_bi.getGraphics();
 		for( CroppedImage ci : images) {
 			if( ci != null && ci.rectInImage != null) {

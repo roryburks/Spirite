@@ -32,7 +32,7 @@ import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.DataCompaction.FloatCompactor;
 import spirite.base.util.glmath.Rect;
-import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 
 public class MUtil {
 	
@@ -223,7 +223,7 @@ public class MUtil {
 			
 
     		BufferedImage bi = new BufferedImage(  
-    				img.getWidth(null), img.getHeight(null), Globals.BI_FORMAT);
+    				img.getWidth(null), img.getHeight(null), HybridHelper.BI_FORMAT);
     		Graphics g = bi.getGraphics();
     		g.drawImage(img, 0, 0, null);
     		g.dispose();

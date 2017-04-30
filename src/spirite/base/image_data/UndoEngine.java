@@ -1,7 +1,6 @@
 package spirite.base.image_data;
 
 import java.awt.AlphaComposite;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -16,6 +15,8 @@ import java.util.ListIterator;
 
 import spirite.base.brains.CacheManager;
 import spirite.base.brains.CacheManager.CachedImage;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
@@ -588,14 +589,10 @@ public class UndoEngine {
 				} 
 				else {
 					BuiltImageData built = workspace.new BuiltImageData(image);
-					BufferedImage bi = built.checkoutRaw();
-					Graphics g = bi.getGraphics();
-					Graphics2D g2 = (Graphics2D)g;
-					Composite c = g2.getComposite();
-					g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-					g2.drawImage( ((ImageBI)frameCache.access()).img, 0, 0,  null);
-					g2.setComposite( c);
-					g2.dispose();
+					RawImage img = built.checkoutRaw();
+					GraphicsContext gc = img.getGraphics();
+					gc.setComposite(Composite.SRC, 1);
+					gc.drawImage(frameCache.access(), 0, 0);
 					built.checkin();
 				}
 			}
@@ -1310,8 +1307,8 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			Graphics g = builtImage.checkout();
-			g.drawImage(((ImageBI)stored.access()).img, 0, 0, null);
+			GraphicsContext gc = builtImage.checkout();
+			gc.drawImage(stored.access(), 0, 0);
 			builtImage.checkin();
 		}
 	}

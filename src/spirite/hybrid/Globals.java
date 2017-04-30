@@ -29,8 +29,6 @@ import spirite.hybrid.MDebug.ErrorType;
  */
 public class Globals {
 	
-	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
-	
 	public static Dictionary<String,Color> colors = null;
 	private static void createColorDictionary() {
 	    final Object data[][] = {
@@ -199,7 +197,7 @@ public class Globals {
     	}
     }
     
-    public static final ImageIcon defaultIcon = new ImageIcon( new BufferedImage(1,1,Globals.BI_FORMAT));
+    public static final ImageIcon defaultIcon = new ImageIcon( new BufferedImage(1,1,HybridHelper.BI_FORMAT));
     public static ImageIcon getIcon( String id) {
     	if( iconSets == null)
     		initIconSets();
@@ -235,7 +233,7 @@ public class Globals {
     private static BufferedImage loadIconSheet( InputStream is) throws IOException 
     {
     	BufferedImage buff = ImageIO.read(is);
-    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), Globals.BI_FORMAT);
+    	BufferedImage img = new BufferedImage( buff.getWidth(), buff.getHeight(), HybridHelper.BI_FORMAT);
     	img.getGraphics().drawImage(buff, 0, 0, null);
         
         // Turns all pixels the same color as the top-left pixel into transparent

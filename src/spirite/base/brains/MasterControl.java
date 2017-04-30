@@ -48,6 +48,7 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.Dialogs;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.pen.Penner;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -335,7 +336,7 @@ public class MasterControl
 	public ImageWorkspace createWorkspaceFromImage( BufferedImage image, boolean select) {
 		ImageWorkspace workspace = new ImageWorkspace(this);
 		if( image != null)
-			workspace.addNewSimpleLayer(null, image, "Base Image");
+			workspace.addNewSimpleLayer(null, new ImageBI(image), "Base Image");
 		workspace.finishBuilding();
 		
 		this.addWorkpace(workspace, select);
@@ -343,8 +344,8 @@ public class MasterControl
 	}
     
 
-    public void newWorkspace( int width, int height) {newWorkspace(width,height,new Color(0,0,0,0), true);}
-    public void newWorkspace( int width, int height, Color color, boolean selectOnCreate) {
+    public void newWorkspace( int width, int height) {newWorkspace(width,height, 0x00000000, true);}
+    public void newWorkspace( int width, int height, int color, boolean selectOnCreate) {
     	ImageWorkspace ws = new ImageWorkspace( this);
     	ws.addNewSimpleLayer(null, width, height, "Background", color);
     	
@@ -557,7 +558,7 @@ public class MasterControl
 	    		}
 	    		else if( currentWorkspace.buildActiveData() == null){
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), new ImageBI(bi), "Pasted Image");
 	    		}
 	    		else {
 	    			// Paste Data onto Selection Engine (current selected Data)
@@ -589,7 +590,7 @@ public class MasterControl
 	    		}
 	    		else {
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), new ImageBI(bi), "Pasted Image");
 	    		}
     		}});
     		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
@@ -658,7 +659,7 @@ public class MasterControl
     		commandMap.put("newLayerQuick", new Runnable() {@Override public void run() {
 				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
 						workspace.getWidth(), workspace.getHeight(), 
-						"New Layer", new Color(0,0,0,0));
+						"New Layer", 0x00000000);
     		}});
     		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
@@ -679,8 +680,7 @@ public class MasterControl
 					return;
 				}
 				
-				Dimension d = selection.getDimension();
-				Rect rect = new Rect(d.width, d.height);
+				Rect rect = new Rect(selection.getDimension());
 				rect.x = selectionEngine.getOffsetX();
 				rect.y = selectionEngine.getOffsetY();
 				

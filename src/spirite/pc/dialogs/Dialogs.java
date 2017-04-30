@@ -242,7 +242,7 @@ public class Dialogs
                 JOptionPane.PLAIN_MESSAGE);
 
         if( response == JOptionPane.OK_OPTION) {
-            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor(), true);
+            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor().getRGB(), true);
             master.getCurrentWorkspace().finishBuilding();
         }
     }

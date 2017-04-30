@@ -47,8 +47,10 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2i;
 import spirite.pc.pen.PenTraits.ButtonType;
 import spirite.pc.pen.PenTraits.MButtonEvent;
 import spirite.pc.pen.PenTraits.PenState;
@@ -752,7 +754,7 @@ public class Penner
 			if( !drawing) {
 				Point p_e = builder.getEnd();
 				
-				g.setColor( Color.BLACK);
+				g.setColor( Colors.BLACK);
 				g.drawLine(view.itsXm(p_e.x), view.itsYm(p_e.y), 
 						view.itsXm(x), view.itsYm(y));
 
@@ -760,7 +762,7 @@ public class Penner
 
 			Point p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				g.setColor( Color.YELLOW);
+				g.setColor( Colors.YELLOW);
 				g.fillOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
 			}
 			else
@@ -915,7 +917,7 @@ public class Penner
             
             View view = context.getCurrentView();
             Rect r = view.itsRm(cropSection);
-			gc.setColor(Color.BLACK);
+			gc.setColor(Colors.BLACK);
             gc.drawRect(r.x, r.y, r.width, r.height);
 			
 
@@ -929,7 +931,7 @@ public class Penner
 			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
 			if( r.x + r.width > x2) { r.width = x2 - r.x;}
 
-			gc.setColor(Color.YELLOW);
+			gc.setColor(Colors.YELLOW);
 			gc.setComposite(Composite.SRC_OVER, 0.4f);
 			gc.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
 			gc.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
@@ -942,35 +944,35 @@ public class Penner
 				
 				if( middle.contains(x,y)) {
 					r = view.itsRm( middle);
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 		            gc.drawRect(r.x, r.y, r.width, r.height);
 				}
 
 				if( topRight.contains(x,y))
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 				else
-					gc.setColor(Color.WHITE);
+					gc.setColor(Colors.WHITE);
 				r = view.itsRm(topRight);
 	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( topLeft.contains(x,y))
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 				else
-					gc.setColor(Color.WHITE);
+					gc.setColor(Colors.WHITE);
 				r = view.itsRm(topLeft);
 	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomLeft.contains(x,y))
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 				else
-					gc.setColor(Color.WHITE);
+					gc.setColor(Colors.WHITE);
 				r = view.itsRm(bottomLeft);
 	            gc.drawRect(r.x, r.y, r.width, r.height);
 
 				if( bottomRight.contains(x,y))
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 				else
-					gc.setColor(Color.WHITE);
+					gc.setColor(Colors.WHITE);
 				r = view.itsRm(bottomRight);
 	            gc.drawRect(r.x, r.y, r.width, r.height);
 			}
@@ -1017,24 +1019,24 @@ public class Penner
 				this.end();
 				return;
 			}
-			Dimension d = sel.selection.getDimension();
+			Vec2i d = sel.selection.getDimension();
 			
 			AffineTransform origTrans = gc.getTransform();
 
 			AffineTransform relTrans = new AffineTransform();
 			relTrans.translate(view.itsX(0), view.itsY(0));
 			relTrans.scale(zoom, zoom);
-			relTrans.translate(d.width/2+sel.offsetX, d.height/2+sel.offsetY);
+			relTrans.translate(d.x/2+sel.offsetX, d.y/2+sel.offsetY);
 			relTrans.concatenate(wTrans);
-			relTrans.translate(-d.width/2, -d.height/2);
+			relTrans.translate(-d.x/2, -d.y/2);
 			
 			gc.setTransform(relTrans);
 
-			gc.setColor(Color.BLACK);
-			gc.drawRect( 0, 0, d.width, d.height);
+			gc.setColor(Colors.BLACK);
+			gc.drawRect( 0, 0, d.x, d.y);
 			
 			Stroke defStroke = new BasicStroke( 2/zoom);
-			gc.setColor(Color.GRAY);
+			gc.setColor(Colors.GRAY);
 //			gc.setStroke(defStroke);
 			
 			Point2D p = new Point2D.Float();
@@ -1044,12 +1046,12 @@ public class Penner
 				e.printStackTrace();
 			}
 			
-			float sw = d.width*0.3f;	// Width of corner rect
-			float sh = d.height*0.3f;	// Height
-			float x2 = d.width*0.7f;	// Offset of right rect
-			float y2 = d.height*0.7f;	// " bottom
-			float di = d.height*0.2f;	// Diameter of rotate thing
-			float of = d.height*0.25f*0.2f;
+			float sw = d.x*0.3f;	// Width of corner rect
+			float sh = d.y*0.3f;	// Height
+			float x2 = d.x*0.7f;	// Offset of right rect
+			float y2 = d.y*0.7f;	// " bottom
+			float di = d.y*0.2f;	// Diameter of rotate thing
+			float of = d.y*0.25f*0.2f;
 
 			float b = 4/zoom;
 			
@@ -1065,9 +1067,9 @@ public class Penner
 			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
 
 			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
-			s.add(new Ellipse2D.Float( d.width-of, -di+of, di, di));	// NE
-			s.add(new Ellipse2D.Float( d.width-of, d.height-of, di, di));	// SE
-			s.add(new Ellipse2D.Float( -di+of, d.height-of, di, di));	// SW
+			s.add(new Ellipse2D.Float( d.x-of, -di+of, di, di));	// NE
+			s.add(new Ellipse2D.Float( d.x-of, d.y-of, di, di));	// SE
+			s.add(new Ellipse2D.Float( -di+of, d.y-of, di, di));	// SW
 
 			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
 			
@@ -1076,10 +1078,10 @@ public class Penner
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
 				if( overlap == i || (overlap == -1 && shape.contains(p))) {
-					gc.setColor(Color.YELLOW);
+					gc.setColor(Colors.YELLOW);
 //					gc.setStroke(new BasicStroke( 4/zoom));
 					gc.draw(shape);
-					gc.setColor(Color.GRAY);
+					gc.setColor(Colors.GRAY);
 //					gc.setStroke(defStroke);
 					overlap = i;
 				}
@@ -1104,22 +1106,22 @@ public class Penner
 			}
 			
 			if( overlap >= 0 && overlap <= 7) {
-				Dimension d = sel.selection.getDimension();
+				Vec2i d = sel.selection.getDimension();
 				startX = x;
 				startY = y;
 				lockTrans = new AffineTransform(wTrans);
 				calcTrans = new AffineTransform();
-				calcTrans.translate(-sel.offsetX-d.width/2.0f, -sel.offsetY-d.height/2.0f);
+				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
 				calcTrans.preConcatenate(lockTrans);
 				this.state = ReshapeStates.RESIZE;
 			}
 			else if( overlap >= 8 && overlap <= 0xB) {
-				Dimension d = sel.selection.getDimension();
+				Vec2i d = sel.selection.getDimension();
 				startX = x;
 				startY = y;
 				lockTrans = new AffineTransform(wTrans);
 				calcTrans = new AffineTransform();
-				calcTrans.translate(-sel.offsetX-d.width/2.0f, -sel.offsetY-d.height/2.0f);
+				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
 				calcTrans.preConcatenate(lockTrans);
 				this.state = ReshapeStates.ROTATE;
 			}

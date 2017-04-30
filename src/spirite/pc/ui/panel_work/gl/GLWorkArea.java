@@ -36,6 +36,8 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
+import spirite.base.util.Colors;
+import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkArea;
@@ -146,9 +148,9 @@ public class GLWorkArea
             BuiltImageData active = workspace.buildActiveData();
             
             if( active!= null) {
-                glgc.setColor(Globals.getColor("drawpanel.layer.border"));
+                glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
                 
-                Rectangle r = active.getBounds();
+                Rect r = active.getBounds();
                 glgc.drawRect( r.x, r.y, r.width, r.height);
             }
             
@@ -157,7 +159,7 @@ public class GLWorkArea
 
             if( selection != null || selectionEngine.isBuilding()) {
 
-                glgc.setColor( Color.BLACK);
+                glgc.setColor( Colors.BLACK);
             	glgc.setTransform(viewTrans);
                 if(selectionEngine.isBuilding()) 
                 	selectionEngine.drawBuildingSelection(glgc);

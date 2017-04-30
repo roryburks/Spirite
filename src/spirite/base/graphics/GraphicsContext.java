@@ -1,11 +1,11 @@
 package spirite.base.graphics;
 
-import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.RawImage;
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 
@@ -34,9 +34,9 @@ public abstract class GraphicsContext {
 	public abstract void setTransform( AffineTransform trans);
 	public abstract AffineTransform getTransform();
 	public abstract void translate(double offsetX, double offsetY);
-	public abstract void setColor(Color color);
+	public abstract void setColor(int argb);
 	
-	public enum Composite {SRC_OVER, DST_OUT, };
+	public enum Composite {SRC_OVER, DST_OUT, SRC, };
 	public abstract void setComposite( Composite composite, float alpha);
 	public abstract float getAlpha();
 	public abstract Composite getComposite();
@@ -77,7 +77,7 @@ public abstract class GraphicsContext {
 	public abstract void fillOval( int x, int y, int w, int h);
 
 
-	public abstract void drawImage(BufferedImage bi, int x, int y);
+	public abstract void drawImage( RawImage img, int x, int y);
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
 
 }

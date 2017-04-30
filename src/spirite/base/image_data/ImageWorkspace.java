@@ -1,11 +1,8 @@
 package spirite.base.image_data;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -48,7 +45,9 @@ import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.pc.graphics.ImageBI;
@@ -369,23 +368,20 @@ public class ImageWorkspace {
 		 * 
 		 * !!! When done modifying the image always call checkout. !!!
 		 */
-		public Graphics checkout() {
+		public GraphicsContext checkout() {
 			if( handle.context != ImageWorkspace.this)
 				MDebug.handleError(ErrorType.STRUCTURAL, null, "Checking out image in wrong workspace");
-			
-			
-			BufferedImage bi = _checkoutImage(handle);
-			g = bi.getGraphics();
-			Graphics2D g2 = (Graphics2D)g;
-			g2.translate(-ox, -oy);
-			return g;
+
+			GraphicsContext gc = _checkoutImage(handle).getGraphics();
+			gc.translate(-ox, -oy);
+			return gc;
 		}
 		
 		/** Retrieves the underlying BufferedImage of the BuiltImage
 		 * 
 		 * !!! When done modifying the image always call checkout. !!!
 		 */
-		public BufferedImage checkoutRaw() {
+		public RawImage checkoutRaw() {
 			return _checkoutImage(handle);
 		}
 		
@@ -408,18 +404,18 @@ public class ImageWorkspace {
 		}
 		
 		/** Converts the given point in ImageSpace to BuiltActiveData space*/
-		public Point convert( Point p) {
+		public Vec2i convert( Vec2i p) {
 			//	Some image modification methods do not use draw actions, but
 			//	 rather alter the image directly.  For example a flood fill action.
 			//	
-			return new Point(p.x-ox, p.y-oy);
+			return new Vec2i(p.x-ox, p.y-oy);
 		}
 		public int convertX( int x) { return x - ox;}
 		public int convertY( int y) { return y - oy;}
 		
 		// TODO: This might be bad if I ever add rotations etc
-		public Rectangle getBounds() {
-			return new Rectangle( ox, oy, handle.getWidth(), handle.getHeight());
+		public Rect getBounds() {
+			return new Rect( ox, oy, handle.getWidth(), handle.getHeight());
 		}
 		
 		/** Returns a transform converting from screen space to layer space. */
@@ -440,6 +436,7 @@ public class ImageWorkspace {
 	
 	public class DynamicImageData extends BuiltImageData{
 		private final DynamicInternalImage dii;
+		RawImage buffer = null;
 		public DynamicImageData(ImageHandle handle, int ox, int oy,
 				DynamicInternalImage dii) 
 		{
@@ -455,7 +452,7 @@ public class ImageWorkspace {
 		}
 		@Override public int convertX( int x) { return x;}
 		@Override public int convertY( int y) { return y;}
-		@Override public Point convert(Point p) {return p;}
+		@Override public Vec2i convert(Vec2i p) {return p;}
 		@Override
 		public void drawBorder(Graphics g) {
 			if( handle == null) return;
@@ -471,36 +468,31 @@ public class ImageWorkspace {
 			return trans;
 		}
 		
-		BufferedImage buffer = null;
 		@Override
-		public Graphics checkout() {
-			g = checkoutRaw().getGraphics();
-			return g;
+		public GraphicsContext checkout() {
+			return checkoutRaw().getGraphics();
 		}
 		
 		@Override
-		public Rectangle getBounds() {
-			return new Rectangle( ox + dii.ox, oy + dii.oy, 
+		public Rect getBounds() {
+			return new Rect( ox + dii.ox, oy + dii.oy, 
 					handle.getWidth(), handle.getHeight());
 		}
 		@Override
-		public BufferedImage checkoutRaw() {
+		public RawImage checkoutRaw() {
 			undoEngine.prepareContext(handle);
-			buffer = new BufferedImage( width, height, Globals.BI_FORMAT);
-			Graphics gr = buffer.getGraphics();
-			gr.drawImage(this.handle.deepAccess(),
-					ox+dii.ox, 
-					oy+dii.oy, null);
-			gr.dispose();
+			buffer = HybridHelper.createImage(width, height);
+			GraphicsContext gc = buffer.getGraphics();
+			gc.drawHandle(this.handle, ox+dii.ox, oy+dii.oy);
 			return buffer;
 		}
 		@Override
 		public void checkin() {
-			Rectangle activeRect = (new Rectangle(0,0,width,height)).union(
-					new Rectangle(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
+			Rect activeRect = (new Rect(0,0,width,height)).union(
+					new Rect(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
 			BufferedImage bi = new BufferedImage( 
-					activeRect.width, activeRect.height,Globals.BI_FORMAT);
+					activeRect.width, activeRect.height,HybridHelper.BI_FORMAT);
 			Graphics2D g2 = (Graphics2D)bi.getGraphics();
 
 			// Draw the part of the old image over the new one
@@ -510,7 +502,7 @@ public class ImageWorkspace {
 
 			// Clear the section of the old image that will be replaced by the new one
 			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC));
-			g2.drawImage(buffer, -activeRect.x, -activeRect.y, null);
+			g2.drawImage(((ImageBI)buffer).img, -activeRect.x, -activeRect.y, null);
 			g2.dispose();
 
 			dii.ox = activeRect.x - ox;
@@ -525,10 +517,10 @@ public class ImageWorkspace {
 			}
 			BufferedImage nbi;
 			if( cropped == null || cropped.isEmpty()) {
-				nbi = new BufferedImage( 1,1, Globals.BI_FORMAT);
+				nbi = new BufferedImage( 1,1, HybridHelper.BI_FORMAT);
 			}
 			else {
-				nbi = new BufferedImage( cropped.width,cropped.height, Globals.BI_FORMAT);
+				nbi = new BufferedImage( cropped.width,cropped.height, HybridHelper.BI_FORMAT);
 			}
 			g2 = (Graphics2D)nbi.getGraphics();
 			g2.drawImage(bi, -cropped.x, -cropped.y, null);
@@ -642,7 +634,7 @@ public class ImageWorkspace {
 	// ===============
 	// ==== Image Checkout (called by BuiltImageData)
 	boolean locked = false;
-	private BufferedImage _checkoutImage( ImageHandle image) {
+	private RawImage _checkoutImage( ImageHandle image) {
 		if( !isValidHandle(image))
 			return null;
 		
@@ -650,7 +642,7 @@ public class ImageWorkspace {
 		locked = true;
 		undoEngine.prepareContext(image);
 		
-		return ((ImageBI)imageData.get(image.id).cachedImage.access()).img;
+		return imageData.get(image.id).cachedImage.access();
 	}
 	
 	private void _checkinImage( ImageHandle handle) {
@@ -750,7 +742,7 @@ public class ImageWorkspace {
 
 				// Construct a crop action
 				BufferedImage image = new BufferedImage( 
-						newBounds.width, newBounds.height, Globals.BI_FORMAT);
+						newBounds.width, newBounds.height, HybridHelper.BI_FORMAT);
 				MUtil.clearImage(image);
 				Graphics2D g2 = (Graphics2D) image.getGraphics();
 				AffineTransform transform = new AffineTransform();		
@@ -857,9 +849,9 @@ public class ImageWorkspace {
 		}
 		@Override
 		protected void performImageAction() {
-			BufferedImage img = builtImage.checkoutRaw();
-			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), Globals.BI_FORMAT);
-			MUtil.clearImage(buffer);
+			BufferedImage img = ((ImageBI)builtImage.checkoutRaw()).img;
+			BufferedImage buffer = new BufferedImage( img.getWidth(), img.getHeight(), HybridHelper.BI_FORMAT);
+			MUtil.clearImage(buffer);	
 			Graphics g = buffer.getGraphics();
 			g.drawImage(img, x, y, null);
 			g.dispose();
@@ -998,8 +990,8 @@ public class ImageWorkspace {
 	}
 	
 	
-	public LayerNode addNewSimpleLayer( GroupTree.Node context, BufferedImage img, String name) {
-		CachedImage ci = cacheManager.cacheImage(new ImageBI(img), this);
+	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
+		CachedImage ci = cacheManager.cacheImage(img, this);
 		ci.reserve(this);
 		imageData.put( workingID, new InternalImage(ci));
 		ImageHandle handle = new ImageHandle( this, workingID);
@@ -1011,13 +1003,13 @@ public class ImageWorkspace {
 		return node;
 	}
 	
-	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, Color c) {
+	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, int argb) {
 		// Create new Image Data and link it to the workspace
-		BufferedImage img = new BufferedImage( w, h, Globals.BI_FORMAT);
-        Graphics g = img.createGraphics();
-        g.setColor( c);
-        g.fillRect( 0, 0, width, height);
-        g.dispose();
+		RawImage img = HybridHelper.createImage(w, h);
+		
+		GraphicsContext gc = img.getGraphics();
+        gc.setColor( argb);
+        gc.fillRect( 0, 0, width, height);
 		
 		return addNewSimpleLayer( 
 				context, 
@@ -1025,13 +1017,13 @@ public class ImageWorkspace {
 				name);
 	}
 	
-	public LayerNode addNewRigLayer( Node context, int w, int h, String name, Color c) {
-		BufferedImage bi = new BufferedImage(w,h,Globals.BI_FORMAT);
-		CachedImage ci = cacheManager.cacheImage( new ImageBI(bi), this);
-        Graphics g = bi.createGraphics();
-        g.setColor( c);
-        g.fillRect( 0, 0, w, h);
-        g.dispose();
+	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
+		RawImage img = HybridHelper.createImage(w, h);
+		CachedImage ci = cacheManager.cacheImage( img, this);
+		
+		GraphicsContext gc = img.getGraphics();
+        gc.setColor( argb);
+        gc.fillRect( 0, 0, w, h);
         
         InternalImage internal = new DynamicInternalImage(ci, 0, 0);
         imageData.put(workingID, internal);

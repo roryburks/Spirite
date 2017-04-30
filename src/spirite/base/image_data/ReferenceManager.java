@@ -10,6 +10,7 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
+import spirite.pc.graphics.ImageBI;
 
 /**
  * ReferenceManager manages the Reference system.
@@ -78,7 +79,7 @@ public class ReferenceManager {
 			newTrans.concatenate(localTransform);
 			gc.setTransform(newTrans);
 			
-			gc.drawImage( image, 0, 0);
+			gc.drawImage( new ImageBI(image), 0, 0);
 
 			gc.setTransform(oldTrans);
 		}
