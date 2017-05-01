@@ -1,7 +1,5 @@
 package spirite.base.util;
 
-import java.awt.geom.AffineTransform;
-
 import spirite.base.util.glmath.MatTrans;
 
 /**

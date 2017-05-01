@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import spirite.base.image_data.RawImage;
+import spirite.base.util.DataCompaction.IntQueue;
 import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
@@ -24,7 +25,7 @@ public class DirectDrawer {
 		int h = bi.getHeight();
 		int bg = bi.getRGB(x, y);
 
-		Queue<Integer> queue = new LinkedList<Integer>();
+		IntQueue queue = new IntQueue();
 		
 		queue.add( MUtil.packInt(x, y));
 		if( bg == c) return;
@@ -36,7 +37,6 @@ public class DirectDrawer {
 			
 			if( bi.getRGB(ix, iy) != bg)
 				continue;
-				
 				
 			bi.setRGB(ix, iy, c);
 

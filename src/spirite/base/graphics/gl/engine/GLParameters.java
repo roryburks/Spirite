@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl.engine;
 
-import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
