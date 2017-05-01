@@ -344,7 +344,13 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		@Override
 		public void draw(int ind) {
-			glmu[n+1].render( engine.clearRenderer);
+			glmu[n+1].render(new GLRenderer() {
+				
+				@Override
+				public void render(GL gl) {
+					engine.clearSurface(gl.getGL2());
+				}
+			});
 			_render_rec(node, n+1, settings);
 
 			glmu[n].render( new GLRenderer() {

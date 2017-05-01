@@ -27,16 +27,15 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
+import spirite.base.util.glmath.GLC;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.base.util.glmath.MatTrans;
-import sun.awt.image.ByteInterleavedRaster;
+import spirite.hybrid.MDebug.WarningType;
 import sun.awt.image.IntegerInterleavedRaster;
 
 /**
@@ -117,7 +116,7 @@ public class GLEngine  {
 			@Override public void display(GLAutoDrawable arg0) {}
 			@Override public void init(GLAutoDrawable gad) {
 				try {
-				initShaders();
+					GLEngine.this.init();
 				} catch (MGLException e) {
 					ex = e;
 				}
@@ -131,12 +130,6 @@ public class GLEngine  {
 		if( ex != null) throw ex;
 	}
 	private static MGLException ex = null;
-		
-	public final GLRenderer clearRenderer = new GLRenderer() {
-		@Override public void render(GL gl) {
-			clearSurface(gl.getGL2());
-		}
-	};
 	
 	// ============
 	// ==== Simple API
@@ -154,7 +147,7 @@ public class GLEngine  {
 	}
 	
 	public GL2 getGL2() {
-		drawable.getContext().makeCurrent();
+//		drawable.getContext().makeCurrent();
 		return drawable.getGL().getGL2();
 	}
 	
@@ -211,6 +204,100 @@ public class GLEngine  {
     public static final FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
 	public void clearSurface(GL2 gl2) {
         gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
+	}
+	
+	// ===========
+	// ==== FrameBufferObject Management
+	private int dbo = -1;
+	private int currentTarget = 0;
+	private int fbo = 0;
+	public int getTarget() {return currentTarget;}
+	public void setTarget( int tex) {
+		GL2 gl = getGL2();
+		if( currentTarget != tex) {
+			// Delete old Framebuffer
+			if( currentTarget != 0) {
+				gl.glDeleteFramebuffers(1, new int[]{fbo}, 0); 
+			}
+			
+			if( tex == 0) {
+		        gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
+				currentTarget = tex;
+			}
+			else {
+				int[] result = new int[1];
+				gl.glGenFramebuffers(1, result, 0);
+				fbo = result[0];
+				gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
+				
+				currentTarget = tex;
+				bindEmptyDB();
+	
+		        // Attach Texture to FBO
+		        gl.glFramebufferTexture2D( GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, 
+		        		GLC.GL_TEXTURE_2D, tex, 0);
+		        
+		        checkFramebuffer();
+			}
+		}
+	}
+	public void setTarget( GLImage img) {
+		if( img == null) {
+			setTarget(0);
+		}
+		else {
+			GL2 gl = getGL2();
+			setTarget(img.getTexID());
+			gl.glViewport(0, 0, img.getWidth(), img.getHeight());
+		}
+	}
+	private void bindEmptyDB() {
+		GL2 gl = getGL2();
+        gl.glBindRenderbuffer(GLC.GL_RENDERBUFFER, dbo);
+        gl.glRenderbufferStorage( GLC.GL_RENDERBUFFER, GLC.GL_DEPTH_COMPONENT16, 1, 1);
+        gl.glFramebufferRenderbuffer( GLC.GL_FRAMEBUFFER, GLC.GL_DEPTH_ATTACHMENT, GLC.GL_RENDERBUFFER, dbo);
+	}
+	private void checkFramebuffer() {
+		// Checks is the FrameBuffer was successfully created, displaying a proper
+		// Error message if it wasn't.
+		GL2 gl = getGL2();
+        switch( gl.glCheckFramebufferStatus(GLC.GL_FRAMEBUFFER)) {
+        case GLC.GL_FRAMEBUFFER_COMPLETE:
+    		return;
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT.");
+    		break;	
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+    		break;	
+        case GLC.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+    		break;	
+        case GL.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_FORMATS");
+    		break;	
+        case GL2.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+    		break;	
+        case GL2.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+    		break;	
+        case GLC.GL_FRAMEBUFFER_UNSUPPORTED:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_UNSUPPORTED");
+    		break;	
+        case GL.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+    		break;	
+        case GL2.GL_FRAMEBUFFER_UNDEFINED :
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction.GL_FRAMEBUFFER_UNDEFINED");
+    		break;	
+        case GLC.GL_INVALID_ENUM:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_INVALID_ENUM");
+    		break;	
+        default:
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction (in an unknown way).");
+    		break;
+        }
 	}
 	
 	// =================
@@ -766,6 +853,8 @@ public class GLEngine  {
 		gl.glGenVertexArrays(1, pd.vao);
 		gl.glBindVertexArray(pd.vao.get(0));
 		
+//		System.out.println("pd.vao:" + pd.vao.get(0) + "::: pd.PBO" + pd.positionBufferObject);
+		
 		pd.lengths = lengths;
 		
 		this.c_data.add(pd);
@@ -776,6 +865,17 @@ public class GLEngine  {
 	
 	// ==============
 	// ==== Initialization
+	private void init() throws MGLException {
+		GL2 gl = drawable.getGL().getGL2();
+		
+        // Create a (nearly) empty depth-buffer as a placeholder
+		int[] result = new int[1];
+        gl.glGenRenderbuffers( 1, result, 0);
+        dbo = result[0];
+//        System.out.println(dbo);
+        
+		initShaders();
+	}
 	
 	private void initShaders() throws MGLException {
         programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources(
@@ -974,7 +1074,7 @@ public class GLEngine  {
 	
 	// =========
 	// ==== Resource Tracking
-	final List<GLMultiRenderer> c_glmus = new ArrayList<>();
+	final List<GLImage> c_img = new ArrayList<>();
 	final List<PreparedTexture> c_texes = new ArrayList<>();
 	final List<PreparedData> c_data = new ArrayList<>();
 	
@@ -986,8 +1086,8 @@ public class GLEngine  {
 //		str += ib.get(0) + "\n";
 		
 		str += "FBOs: \n";
-		for( int i=0; i < c_glmus.size(); ++i) {
-			str += i + "["+c_glmus.get(i).getTexture() +"] : (" + c_glmus.get(i).getWidth() + "," + c_glmus.get(i).getHeight() + ")\n";
+		for( int i=0; i < c_img.size(); ++i) {
+			str += i + "["+c_img.get(i).getTexID() +"] : (" + c_img.get(i).getWidth() + "," + c_img.get(i).getHeight() + ")\n";
 		}
 		str += "Textures: \n";
 		for( int i=0; i < c_texes.size(); ++i) {

@@ -131,7 +131,7 @@ public class GLMultiRenderer {
         checkFramebuffer();
         gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
 
-		engine.c_glmus.add(this);
+//		engine.c_glmus.add(this);
 		state = 1;
 	}
 	
@@ -227,7 +227,8 @@ public class GLMultiRenderer {
 		
 		fbo = 0;
 		tex = 0;
+		state = 0;
 
-		engine.c_glmus.remove(this);
+//		engine.c_glmus.remove(this);
 	}
 }

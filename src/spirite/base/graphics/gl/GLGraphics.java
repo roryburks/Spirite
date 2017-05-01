@@ -13,6 +13,7 @@ import spirite.base.graphics.gl.engine.GLMultiRenderer;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.PolyType;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
 import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
@@ -53,10 +54,10 @@ public class GLGraphics extends GraphicsContext{
 		this.drawable = drawable;
 		this.flip = flip;
 	}
-	public GLGraphics( GLMultiRenderer glmu ) {
+	public GLGraphics( GLImage glImage ) {
 		this.drawable = engine.getAutoDrawable();
-		this.width = glmu.getWidth();
-		this.height = glmu.getHeight();
+		this.width = glImage.getWidth();
+		this.height = glImage.getHeight();
 	}
 	public GLGraphics() {
 		this.drawable = engine.getAutoDrawable();

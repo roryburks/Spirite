@@ -126,13 +126,20 @@ public class GLParameters {
 
 		@Override
 		public int load(GL2 gl){
-			texture = GLEngine.getInstance().prepareTexture(image, gl);
-
-			return texture.getTexID();
+			if( image instanceof GLImage) {
+				return ((GLImage) image).getTexID();
+			}
+			else {
+				texture = GLEngine.getInstance().prepareTexture(image, gl);
+	
+				return texture.getTexID();
+			}
 		}
 		@Override
 		public void unload(){
-			texture.free();
+			if( texture != null)
+				texture.free();
+			texture = null;
 		}
 
 		@Override public int getWidth() {

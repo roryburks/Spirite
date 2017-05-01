@@ -12,11 +12,10 @@ import com.jogamp.opengl.util.GLBuffers;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLMultiRenderer;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
@@ -33,8 +32,8 @@ import spirite.pc.graphics.ImageBI;
  */
 class GLStrokeEngine extends StrokeEngine {
 	private final GLEngine engine = GLEngine.getInstance();
-	private GLMultiRenderer fixedLayer;
-	private GLMultiRenderer displayLayer;
+	private GLImage fixedLayer;
+	private GLImage displayLayer;
 	private int w, h;
 	
 	public GLStrokeEngine() {
@@ -47,16 +46,13 @@ class GLStrokeEngine extends StrokeEngine {
 	protected void onStart() {
 		w = data.getWidth();
 		h = data.getHeight();
-		fixedLayer = new GLMultiRenderer( engine.getGL2());
-		displayLayer = new GLMultiRenderer( engine.getGL2());
-		
-		fixedLayer.init(w, h);
-		displayLayer.init(w, h);
+		fixedLayer = new GLImage( w, h);
+		displayLayer = new GLImage( w, h);
 	}
 	@Override
 	protected void onEnd() {
-		fixedLayer.cleanup();
-		displayLayer.cleanup();
+		fixedLayer.flush();
+		displayLayer.flush();
 		fixedLayer = null;
 		displayLayer = null;
 	}
@@ -64,21 +60,18 @@ class GLStrokeEngine extends StrokeEngine {
 
 	@Override
 	protected void prepareDisplayLayer() {
+		GL2 gl = engine.getGL2();
 		engine.getContext().makeCurrent();
-		displayLayer.render( new GLRenderer() {
-			@Override
-			public void render(GL _gl) {
-				GL2 gl = _gl.getGL2();
-				engine.setSurfaceSize(w, h);
-				engine.clearSurface(gl.getGL2());
-				gl.glViewport(0, 0, w, h);
-				
-				
-				GLParameters params = new GLParameters(w, h);
-				params.texture = new GLParameters.GLFBOTexture(fixedLayer);
-				engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
-			}
-		});
+		
+		engine.setTarget(displayLayer);
+		engine.setSurfaceSize(w, h);
+		engine.clearSurface(gl.getGL2());
+		gl.glViewport(0, 0, w, h);
+		
+		
+		GLParameters params = new GLParameters(w, h);
+		params.texture = new GLParameters.GLImageTexture(fixedLayer);
+		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 	}
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
@@ -86,7 +79,7 @@ class GLStrokeEngine extends StrokeEngine {
 			engine.setSurfaceSize(w, h);
 			engine.clearSurface(engine.getGL2());
 			GLParameters params = new GLParameters(w, h);
-			params.texture = new GLParameters.GLFBOTexture(displayLayer);
+			params.texture = new GLParameters.GLImageTexture(displayLayer);
 			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
 			
 			BufferedImage bi = engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
@@ -97,7 +90,7 @@ class GLStrokeEngine extends StrokeEngine {
 			glgc.reset();
 			
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-			params.texture = new GLParameters.GLFBOTexture(displayLayer);
+			params.texture = new GLParameters.GLImageTexture(displayLayer);
 			params.flip = glgc.isFlip();
 			params.addParam( new GLParameters.GLParam1i("uComp", 0));
 			params.addParam( new GLParameters.GLParam1f("uAlpha", glgc.getAlpha()));
@@ -112,14 +105,11 @@ class GLStrokeEngine extends StrokeEngine {
 
 	@Override
 	protected boolean drawToLayer( List<PenState> states, boolean permanent) {
-		GLMultiRenderer glmu = (permanent)?fixedLayer:displayLayer;
-
-		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-//				_strokeSpore( states.get(states.size()-1));
-				_stroke( composeVBuffer(states), stroke.getHard()?1:0);
-			}
-		});
+		GLImage drawTo = (permanent)?fixedLayer:displayLayer;
+		
+		engine.setTarget(drawTo);
+		_stroke( composeVBuffer(states), stroke.getHard()?1:0);
+		engine.setTarget(0);
 		
 		return true;
 	}
