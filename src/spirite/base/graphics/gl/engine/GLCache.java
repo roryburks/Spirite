@@ -17,7 +17,6 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.hybrid.MDebug;
-import spirite.pc.graphics.ImageBI;
 
 /** 
  * 

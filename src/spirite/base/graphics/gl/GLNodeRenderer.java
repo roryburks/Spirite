@@ -17,20 +17,18 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLMultiRenderer;
-import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.ImageWorkspace;
+import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.graphics.ImageBI;
 
 /** 
  * This updated version uses JOGL rendering algorithms instead of 
@@ -54,7 +52,7 @@ import spirite.pc.graphics.ImageBI;
  * (see "pass_render.frag" for appropriate values).
  */
 class GLNodeRenderer extends NodeRenderer {
-	GLMultiRenderer glmu[];
+	GLImage buffer[];
 	float ratioW;
 	float ratioH;
 	ImageWorkspace workspace;
@@ -91,15 +89,13 @@ class GLNodeRenderer extends NodeRenderer {
 			engine.setSurfaceSize(settings.width, settings.height);
 			
 			// Prepare the FrameBuffers needed for rendering
-			glmu = new GLMultiRenderer[n];
+			buffer = new GLImage[n];
 			for( int i=0; i<n; ++i) {
-				glmu[i] = new GLMultiRenderer( gl);
-				glmu[i].init(settings.width, settings.height);
-				glmu[i].render(new GLRenderer() {
-					@Override public void render(GL gl) {
-						engine.clearSurface(gl.getGL2());
-					}
-				});
+				buffer[i] = new GLImage(settings.width, settings.height);
+				engine.setTarget(buffer[i]);
+				engine.clearSurface(gl.getGL2());
+				engine.setTarget(0);
+
 			}
 
 			// Step 3: Recursively draw the image
@@ -115,7 +111,7 @@ class GLNodeRenderer extends NodeRenderer {
 //			engine.setSurfaceSize(settings.width, settings.height);
 			glgc.setFlip(flip);
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-			params.texture = new GLParameters.GLFBOTexture(glmu[0]);
+			params.texture = new GLParameters.GLImageTexture(buffer[0]);
 			params.flip = glgc.isFlip();
 			
 //			if( !glgc.isFlip()) {
@@ -129,19 +125,19 @@ class GLNodeRenderer extends NodeRenderer {
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
-				glmu[i].cleanup();
+				buffer[i].flush();
 			}
 		}
 		catch (Exception e) {
 		}
 		finally {
-			glmu = null;
+			buffer = null;
 			freeCompositeLayer();
 			//buffer = null;
 		}
 	}
 	
-	GLMultiRenderer compositeLayer = null;
+	GLImage compositeLayer = null;
 	ImageHandle compositedHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) {
 		BuiltImageData dataContext= workspace.buildActiveData();
@@ -149,57 +145,53 @@ class GLNodeRenderer extends NodeRenderer {
 			if( workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing()) {
 				
-				compositeLayer = new GLMultiRenderer(gl);
+				compositeLayer = new GLImage(dataContext.getWidth(), dataContext.getHeight());
 				compositedHandle = dataContext.handle;
 				
-				compositeLayer.init(dataContext.getWidth(), dataContext.getHeight());
+				engine.setTarget(compositeLayer);
+				
+				// Draw Base Image
+				MatTrans trans = dataContext.getCompositeTransform();
+				trans.translate( dataContext.handle.getDynamicX(), 
+						dataContext.handle.getDynamicY());
+				glgc.setTransform(trans);
+				
 
-				compositeLayer.render( new GLRenderer() {
-					@Override
-					public void render(GL _gl) {
-						// Draw Base Image
-						MatTrans trans = dataContext.getCompositeTransform();
-						trans.translate( dataContext.handle.getDynamicX(), 
-								dataContext.handle.getDynamicY());
-						glgc.setTransform(trans);
-						
+				GLParameters params = new GLParameters(dataContext.getWidth(), dataContext.getHeight());
+				params.texture = dataContext.handle.accessGL();
+				params.addParam( new GLParameters.GLParam1i("uComp", 0));
+				params.addParam( new GLParameters.GLParam1f("uAlpha", 1.0f));
+				GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
+				engine.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
+						0, 0, params.texture.getWidth(), params.texture.getHeight(), true, gl);
 
-						GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-						params.texture = dataContext.handle.accessGL();
-						params.addParam( new GLParameters.GLParam1i("uComp", 0));
-						params.addParam( new GLParameters.GLParam1f("uAlpha", 1.0f));
-						GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
-						engine.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
-								0, 0, params.texture.getWidth(), params.texture.getHeight(), true, gl);
-
-						if( workspace.getSelectionEngine().getLiftedImage() != null ){
-							// Draw Lifted Image
-							trans = dataContext.getScreenToImageTransform();
-							trans.concatenate(workspace.getSelectionEngine().getDrawFromTransform());
-							glgc.setTransform(trans);
-							
-							glgc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
-						}
-						if( workspace.getDrawEngine().strokeIsDrawing()) {
-							// Draw Stroke Layer
-							glgc.setTransform(new MatTrans());
-							workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
-						}	
-					}
-				}, glgc);
+				if( workspace.getSelectionEngine().getLiftedImage() != null ){
+					// Draw Lifted Image
+					trans = dataContext.getScreenToImageTransform();
+					trans.concatenate(workspace.getSelectionEngine().getDrawFromTransform());
+					glgc.setTransform(trans);
+					
+					glgc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
+				}
+				if( workspace.getDrawEngine().strokeIsDrawing()) {
+					// Draw Stroke Layer
+					glgc.setTransform(new MatTrans());
+					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
+				}
+				engine.setTarget(0);
 			}
 		}
 	}
 	private void freeCompositeLayer() {
 		if( compositeLayer != null)
-			compositeLayer.cleanup();
+			compositeLayer.flush();
 		compositedHandle = null;
 		compositeLayer = null;
 	}
 	
 	private void _render_rec(GroupNode node, int n, RenderSettings settings) 
 	{
-		if( n < 0 || n >= glmu.length) {
+		if( n < 0 || n >= buffer.length) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Error: propperRender exceeds expected image need.");
 			return;
 		}
@@ -218,7 +210,7 @@ class GLNodeRenderer extends NodeRenderer {
 			Node child = it.previous();
 			if( child.isVisible()) {
 				if( child instanceof GroupNode) {
-					if( n == glmu.length-1) {
+					if( n == buffer.length-1) {
 						// Note: the code can reach here if all the children are invisible.
 						// There might be other, unintended ways for the code to reach here.
 						continue;
@@ -344,25 +336,19 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		@Override
 		public void draw(int ind) {
-			glmu[n+1].render(new GLRenderer() {
-				
-				@Override
-				public void render(GL gl) {
-					engine.clearSurface(gl.getGL2());
-				}
-			});
+			engine.setTarget(buffer[n+1]);
+			engine.clearSurface(gl.getGL2());
+			engine.setTarget(0);
+			
 			_render_rec(node, n+1, settings);
 
-			glmu[n].render( new GLRenderer() {
-				@Override
-				public void render(GL _gl) {
-					GLParameters params = new GLParameters(settings.width, settings.height);
-					setParamsFromNode( node, params, false, 1);
-					params.texture = new GLParameters.GLFBOTexture(glmu[n+1]);
-					engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-							0, 0, params.width, params.height, true, _gl.getGL2());
-				}
-			});
+			engine.setTarget(buffer[n]);
+			GLParameters params = new GLParameters(settings.width, settings.height);
+			setParamsFromNode( node, params, false, 1);
+			params.texture = new GLParameters.GLImageTexture(buffer[n+1]);
+			engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
+					0, 0, params.width, params.height, true, gl);
+			engine.setTarget(0);
 		}
 	}
 	private class TransformedRenderable extends Drawable {
@@ -380,39 +366,34 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		@Override
 		public void draw(int ind) {
+			engine.setTarget( buffer[ind]);
+					
+			GLParameters params = new GLParameters(settings.width, settings.height);
+			
+			float alpha = 1;
+			alpha *= renderable.alpha;
+			setParamsFromNode( node, params, true, alpha);
+			
+			MatTrans trans = new MatTrans(transform);
 
-			glmu[ind].render( new GLRenderer() {
-				@Override
-				public void render(GL _gl) {
-					
-					GLParameters params = new GLParameters(settings.width, settings.height);
-					
-					float alpha = 1;
-					alpha *= renderable.alpha;
-					setParamsFromNode( node, params, true, alpha);
-					
-					MatTrans trans = new MatTrans(transform);
-
-					GLGraphics.setCompositeBlend(params, glgc.getComposite());
-					if( compositedHandle == renderable.handle) {
-						if( renderable.handle.isDynamic())
-							trans = new MatTrans();
-						params.texture = new GLParameters.GLFBOTexture(compositeLayer);
-						engine.applyPassProgram(
-								ProgramType.PASS_RENDER, params, trans,
-								0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false, _gl.getGL2());
-					}
-					else {
-						trans.translate(renderable.handle.getDynamicX(), 
-								renderable.handle.getDynamicY());
-						params.texture = glcache.new GLHandleTexture(renderable.handle);
-						engine.applyPassProgram(
-								ProgramType.PASS_RENDER, params, trans,
-								0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, _gl.getGL2());
-					}
-				}
-			}, glgc);
+			GLGraphics.setCompositeBlend(params, glgc.getComposite());
+			if( compositedHandle == renderable.handle) {
+				if( renderable.handle.isDynamic())
+					trans = new MatTrans();
+				params.texture = new GLParameters.GLImageTexture(compositeLayer);
+				engine.applyPassProgram(
+						ProgramType.PASS_RENDER, params, trans,
+						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false, gl);
+			}
+			else {
+				trans.translate(renderable.handle.getDynamicX(), 
+						renderable.handle.getDynamicY());
+				params.texture = glcache.new GLHandleTexture(renderable.handle);
+				engine.applyPassProgram(
+						ProgramType.PASS_RENDER, params, trans,
+						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, gl);
+			}
+			engine.setTarget(0);
 		}
-		
 	}
 }

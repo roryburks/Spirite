@@ -2,10 +2,7 @@
 
 package spirite.pc.ui.panel_work.awt;
 
-import java.awt.AlphaComposite;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 

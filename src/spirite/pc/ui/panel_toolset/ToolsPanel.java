@@ -23,9 +23,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.HotkeyManager;
+import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager;
-import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.hybrid.Globals;

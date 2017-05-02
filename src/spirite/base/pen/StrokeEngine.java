@@ -11,12 +11,12 @@ import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.util.MUtil;
-import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.Colors;
 import spirite.base.util.Interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.Interpolation.InterpolatedPoint;
 import spirite.base.util.Interpolation.Interpolator2D;
+import spirite.base.util.MUtil;
+import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 

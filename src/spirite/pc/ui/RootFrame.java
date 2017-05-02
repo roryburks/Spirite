@@ -1,7 +1,6 @@
 
 package spirite.pc.ui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -36,8 +35,8 @@ import spirite.pc.ui.panel_toolset.ColorPicker;
 import spirite.pc.ui.panel_toolset.PalettePanel;
 import spirite.pc.ui.panel_toolset.ToolSettingsPanel;
 import spirite.pc.ui.panel_toolset.ToolsPanel;
-import spirite.pc.ui.panel_work.WorkTabPane;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+import spirite.pc.ui.panel_work.WorkTabPane;
 
 /**
  * While the MasterControl is "home base" for all the internals of the program, the root

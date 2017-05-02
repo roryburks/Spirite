@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -27,9 +26,9 @@ import javax.swing.event.ListSelectionListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.UndoableAction;

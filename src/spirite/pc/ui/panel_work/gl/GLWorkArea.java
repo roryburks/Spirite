@@ -2,7 +2,6 @@ package spirite.pc.ui.panel_work.gl;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.nio.FloatBuffer;
@@ -21,17 +20,16 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLGraphics;
-import spirite.base.graphics.gl.GLWorkspaceRenderer;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
@@ -66,13 +64,9 @@ public class GLWorkArea
 	private View view;
 	
 	private final JPenPenner penner;
-
-	GLWorkspaceRenderer glwr;
 	
 	public GLWorkArea(WorkPanel context, MasterControl master) {
 //		this.context = context;
-
-    	glwr = new GLWorkspaceRenderer(master);
 		
 		// Create UI Component
         GLProfile glprofile = GLProfile.getDefault();
@@ -110,6 +104,7 @@ public class GLWorkArea
 		int w = glad.getSurfaceWidth();
 		int h = glad.getSurfaceHeight();
 		GL2 gl = glad.getGL().getGL2();
+		engine.setGL(gl);
 		
 		gl.glViewport(0, 0, w, h);
 		
@@ -175,6 +170,9 @@ public class GLWorkArea
             if( penner.drawsOverlay())
             	penner.paintOverlay(glgc);
         }
+        
+
+		engine.setGL(null);
 	}
 
 

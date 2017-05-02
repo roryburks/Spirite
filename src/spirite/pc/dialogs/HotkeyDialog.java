@@ -25,8 +25,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import spirite.base.brains.HotkeyManager;
-import spirite.base.brains.MasterControl;
 import spirite.base.brains.HotkeyManager.Hotkey;
+import spirite.base.brains.MasterControl;
 import spirite.pc.ui.components.SimpleTree;
 
 /**

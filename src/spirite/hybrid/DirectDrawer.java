@@ -1,8 +1,6 @@
 package spirite.hybrid;
 
 import java.awt.image.BufferedImage;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import spirite.base.image_data.RawImage;
 import spirite.base.util.DataCompaction.IntQueue;

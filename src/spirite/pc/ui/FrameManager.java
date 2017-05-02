@@ -31,8 +31,8 @@ import spirite.pc.ui.panel_layers.ReferenceSchemePanel;
 import spirite.pc.ui.panel_toolset.ToolSettingsPanel;
 import spirite.pc.ui.panel_toolset.UndoPanel;
 import spirite.pc.ui.panel_work.WorkPanel;
-import spirite.pc.ui.panel_work.WorkTabPane;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+import spirite.pc.ui.panel_work.WorkTabPane;
 
 public class FrameManager 
 	implements WindowListener, CommandExecuter

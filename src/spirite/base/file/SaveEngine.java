@@ -11,19 +11,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;

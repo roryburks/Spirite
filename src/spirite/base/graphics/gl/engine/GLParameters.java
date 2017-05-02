@@ -148,29 +148,6 @@ public class GLParameters {
 			return (image == null)?0:image.getHeight();
 		}
 	}
-	public static class GLFBOTexture extends GLTexture {
-		private final GLMultiRenderer glmu;
-		public GLFBOTexture( GLMultiRenderer glmu) {
-			this.glmu = glmu;
-		}
-		@Override
-		public int load(GL2 gl) {
-	        //set the texture up to be used for painting a surface ...
-	        gl.glBindTexture(GL2.GL_TEXTURE_2D, glmu.getTexture());
-	        int textureTarget = GL2.GL_TEXTURE_2D;
-	        gl.glEnable(textureTarget);
-	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_MIN_FILTER,GL2.GL_NEAREST);
-	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_MAG_FILTER,GL2.GL_NEAREST);
-	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_WRAP_S,GL2.GL_REPEAT);
-	        gl.glTexParameteri(textureTarget,GL2.GL_TEXTURE_WRAP_T,GL2.GL_REPEAT);
-	        
-	        return glmu.getTexture();
-		}
-
-		@Override public void unload() {}
-		@Override public int getWidth() { return glmu.getWidth(); }
-		@Override public int getHeight() { return glmu.getHeight(); }	
-	}
 	
 	// ==============
 	// ==== Specific Parameters

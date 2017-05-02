@@ -3,7 +3,6 @@ package spirite.base.graphics.gl.engine;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.GLC;

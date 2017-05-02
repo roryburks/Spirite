@@ -14,7 +14,6 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +24,8 @@ import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.SettingsManager;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.brains.SettingsManager;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;

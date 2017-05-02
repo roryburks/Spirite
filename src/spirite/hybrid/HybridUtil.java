@@ -1,6 +1,5 @@
 package spirite.hybrid;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
@@ -14,7 +13,6 @@ import javax.imageio.ImageIO;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.RawImage;
-import spirite.base.util.MUtil;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.glmath.Rect;

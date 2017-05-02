@@ -11,14 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.DynamicImportImage;
 import spirite.base.image_data.ImageWorkspace.ImportImage;
 import spirite.base.image_data.RawImage;

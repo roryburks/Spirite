@@ -10,12 +10,11 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
-
-import spirite.hybrid.Globals;
-
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+
+import spirite.hybrid.Globals;
 
 public class SimpleTree extends JPanel {
 

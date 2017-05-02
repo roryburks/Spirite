@@ -10,16 +10,15 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam4f;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
-import spirite.base.image_data.RawImage;
-import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;;
 
 

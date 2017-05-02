@@ -9,23 +9,20 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLMultiRenderer;
-import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLEngine.PolyType;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLImage;
-import spirite.base.graphics.gl.engine.GLMultiRenderer.GLRenderer;
-import spirite.base.graphics.gl.engine.GLParameters.GLFBOTexture;
+import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
+import spirite.base.util.Colors;
+import spirite.base.util.DataCompaction.FloatCompactor;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
-import spirite.base.util.Colors;
-import spirite.base.util.DataCompaction.FloatCompactor;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
@@ -48,11 +45,13 @@ public class GLGraphics extends GraphicsContext{
 	private float alpha = 1.0f;
 	private LineAttributes lineAttributes = defaultLA;
 	
-	private GLMultiRenderer glmu = null;
+//	private GLMultiRenderer glmu = null;
 
 	public GLGraphics( GLAutoDrawable drawable, boolean flip) {
 		this.drawable = drawable;
 		this.flip = flip;
+		setDimensions(drawable.getSurfaceWidth()
+				, drawable.getSurfaceHeight());
 	}
 	public GLGraphics( GLImage glImage ) {
 		this.drawable = engine.getAutoDrawable();
@@ -68,15 +67,15 @@ public class GLGraphics extends GraphicsContext{
 	public void setFlip(boolean b) { flip = b;}
 	public int getWidth() {return width;}
 	public int getHeight() { return height;}
-	public void useFBO( GLMultiRenderer glmu) {
-		this.glmu = glmu;
-		setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
-	}
-	public void unuseFBO() {
-		this.glmu = null;
-		setDimensions(drawable.getSurfaceWidth()
-				, drawable.getSurfaceHeight());
-	}
+//	public void useFBO( GLMultiRenderer glmu) {
+//		this.glmu = glmu;
+//		setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
+//	}
+//	public void unuseFBO() {
+//		this.glmu = null;
+//		setDimensions(drawable.getSurfaceWidth()
+//				, drawable.getSurfaceHeight());
+//	}
 	public GL2 getGL() { reset();return gl;}
 	
 	private void setDimensions(int width, int height) {
@@ -95,13 +94,13 @@ public class GLGraphics extends GraphicsContext{
 	}
 	
 	synchronized void reset() {
-		if( glmu != null) {
-			setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
-		}
-		else {
-			setDimensions(drawable.getSurfaceWidth()
-					, drawable.getSurfaceHeight());
-		}
+//		if( glmu != null) {
+//			setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
+//		}
+//		else {
+//			setDimensions(drawable.getSurfaceWidth()
+//					, drawable.getSurfaceHeight());
+//		}
 		this.gl = drawable.getGL().getGL2();
 		
 		if( !drawable.getContext().isCurrent())
@@ -112,30 +111,23 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void drawBounds(RawImage mask, int c) {
 		reset();
-
-		GLMultiRenderer glmu = new GLMultiRenderer(gl);
-		engine.setSurfaceSize(width, height);
-
-		// Render the mask to the a screen-shaped surface
-		glmu.init(width, height);
-		glmu.render( new GLRenderer() {
-			@Override public void render(GL gl) {
-				GL2 gl2 = gl.getGL2();
-				engine.clearSurface(gl2);
-				GLParameters params2 = new GLParameters(width, height);
-				params2.texture = new GLImageTexture( mask);
-				engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
-						0, 0, mask.getWidth(), mask.getHeight(), false, gl.getGL2());
-			}
-		});
+		
+		GLImage img = new GLImage( width, height);
+		engine.setTarget(img);
+		engine.clearSurface(gl);
+		GLParameters params2 = new GLParameters(width, height);
+		params2.texture = new GLImageTexture( mask);
+		engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
+				0, 0, mask.getWidth(), mask.getHeight(), false, gl);
+		engine.setTarget(0);
 
 		// Clean up and Apply the surface to an image
-		GLParameters params2 = new GLParameters(width, height);
+		params2 = new GLParameters(width, height);
 		params2.addParam( new GLParam1i("uCycle", c));
-		params2.texture = new GLFBOTexture(glmu);
-		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false, gl.getGL2());
+		params2.texture = new GLImageTexture(img);
+		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false, gl);
 		
-		glmu.cleanup();
+		img.flush();
 	}
 
 

@@ -23,8 +23,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;

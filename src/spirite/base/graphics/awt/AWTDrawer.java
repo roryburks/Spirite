@@ -1,16 +1,13 @@
 package spirite.base.graphics.awt;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.base.pen.StrokeEngine;
 import spirite.base.image_data.RawImage;
-import spirite.hybrid.HybridHelper;
+import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;

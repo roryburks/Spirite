@@ -146,9 +146,17 @@ public class GLEngine  {
 		return drawable.getContext();
 	}
 	
+	private GL2 currentGL;
 	public GL2 getGL2() {
-//		drawable.getContext().makeCurrent();
-		return drawable.getGL().getGL2();
+		if( currentGL == null) {
+			currentGL = drawable.getGL().getGL2();
+			drawable.getContext().makeCurrent();
+		}
+		
+		return currentGL;
+	}
+	public void setGL( GL2 gl) {
+		currentGL = gl;
 	}
 	
 	public GLAutoDrawable getAutoDrawable() {
@@ -655,6 +663,7 @@ public class GLEngine  {
 	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd,
 			 GL2 gl, int primFormat, int primCount) 
 	{
+		
 		int w = params.width;
 		int h = params.height;
 //		setSurfaceSize(w, h);
