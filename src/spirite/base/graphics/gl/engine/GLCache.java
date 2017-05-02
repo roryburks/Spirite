@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.jogamp.opengl.GL2;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.gl.engine.GLEngine.PreparedTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
@@ -60,11 +58,11 @@ public class GLCache implements MImageObserver {
 		return glEngine;
 	}
 	
-	private CachedTexture accessCache( ImageHandle handle, GL2 gl) {
+	private CachedTexture accessCache( ImageHandle handle) {
 		CachedTexture ctex = cache.get(handle);
 		if( ctex == null) {
 			ctex = new CachedTexture(
-					getEngine().prepareTexture( handle.deepAccess(), gl));
+					getEngine().prepareTexture( handle.deepAccess()));
 			
 			cacheSize += ctex.tex.w*ctex.tex.h*4;
 			
@@ -97,8 +95,8 @@ public class GLCache implements MImageObserver {
 		}
 
 		@Override
-		public int load(GL2 gl) {
-			ctex = accessCache(handle, gl);
+		public int load() {
+			ctex = accessCache(handle);
 			ctex.locked = true;
 			return ctex.tex.getTexID();
 		}

@@ -23,7 +23,6 @@ import com.jogamp.opengl.GLDrawableFactory;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
@@ -120,8 +119,8 @@ public class GLEngine  {
 				} catch (MGLException e) {
 					ex = e;
 				}
-				//GL gl = gad.getGL();
-				//gl = gl.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
+				//GL gli = gad.getGL();
+				//gli = gli.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
 			}
 		});	
 
@@ -133,15 +132,6 @@ public class GLEngine  {
 	
 	// ============
 	// ==== Simple API
-	public void setSurfaceSize( int width, int height) {
-		if( this.width != width || this.height != height) {
-			this.width = width;
-			this.height = height;
-
-			this.drawable.setSurfaceSize(width, height);
-		}
-	}
-
 	public GLContext getContext() {
 		return drawable.getContext();
 	}
@@ -157,10 +147,6 @@ public class GLEngine  {
 	}
 	public void setGL( GL2 gl) {
 		currentGL = gl;
-	}
-	
-	public GLAutoDrawable getAutoDrawable() {
-		return drawable;
 	}
 
 	/** Writes the active GL Surface to a BufferedImage */
@@ -209,7 +195,7 @@ public class GLEngine  {
 		
 	}
 
-    public static final FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0f, 0f, 0f, 0f});
+    public static final FloatBuffer clearColor = FloatBuffer.wrap( new float[] {0f, 0f, 0f, 0f});
 	public void clearSurface(GL2 gl2) {
         gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
@@ -231,6 +217,8 @@ public class GLEngine  {
 			if( tex == 0) {
 		        gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
 				currentTarget = tex;
+				width = drawable.getSurfaceWidth();
+				height = drawable.getSurfaceHeight();
 			}
 			else {
 				int[] result = new int[1];
@@ -257,6 +245,8 @@ public class GLEngine  {
 			GL2 gl = getGL2();
 			setTarget(img.getTexID());
 			gl.glViewport(0, 0, img.getWidth(), img.getHeight());
+			width = img.getWidth();
+			height = img.getHeight();
 		}
 	}
 	private void bindEmptyDB() {
@@ -330,7 +320,8 @@ public class GLEngine  {
 		LINE_RENDER,
 		;
 	}
-	private void setDefaultBlendMode(GL2 gl, ProgramType type) {
+	private void setDefaultBlendMode(ProgramType type) {
+		GL2 gl = getGL2();
         switch( type) {
 		case STROKE_BASIC:
 		case STROKE_PIXEL:
@@ -382,10 +373,9 @@ public class GLEngine  {
 			ProgramType type,
 			GLParameters params, 
 			MatTrans trans, 
-			boolean internal,
-			GL2 gl)
+			boolean internal)
 	{
-		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal, gl);
+		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal);
 	}
 
 	/**
@@ -411,8 +401,7 @@ public class GLEngine  {
 			GLParameters params, 
 			MatTrans trans,
 			float x1, float y1, float x2, float y2,
-			boolean internal,
-			GL2 gl)
+			boolean internal)
 	{
 		addOrtho(params, trans);
 
@@ -422,14 +411,14 @@ public class GLEngine  {
 			x2, y1, 1.0f, (internal)?1.0f:0.0f,
 			x1, y2, 0.0f, (internal)?0.0f:1.0f,
 			x2, y2, 1.0f, (internal)?0.0f:1.0f,
-		}, new int[]{2,2}, gl);
-        applyProgram( type, params, pd, gl, GL2.GL_TRIANGLE_STRIP, 4);
+		}, new int[]{2,2});
+        applyProgram( type, params, pd, GL2.GL_TRIANGLE_STRIP, 4);
         pd.free();
         params.clearInternalParams();
 	}
 
 	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
-			int numPoints, GLParameters params, MatTrans trans, GL2 gl) 
+			int numPoints, GLParameters params, MatTrans trans) 
 	{
 		addOrtho(params, trans);
 
@@ -439,8 +428,8 @@ public class GLEngine  {
         	data[i*2+1] = yPoints[i];
         }
         
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
+		PreparedData pd = prepareRawData(data, new int[]{2});
+		applyProgram( type, params, pd, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
         params.clearInternalParams();
 	}
@@ -455,8 +444,8 @@ public class GLEngine  {
         	data[i*2] = xPoints[i];
         	data[i*2+1] = yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		applyProgram( type, params, pd, gl, GL2.GL_LINE_STRIP, numPoints);
+		PreparedData pd = prepareRawData(data, new int[]{2});
+		applyProgram( type, params, pd, GL2.GL_LINE_STRIP, numPoints);
 		pd.free();
         params.clearInternalParams();
 	}
@@ -480,7 +469,7 @@ public class GLEngine  {
 	 */
 	public void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, MatTrans trans, GL2 gl) 
+			GLParameters params, MatTrans trans) 
 	{
 		addOrtho(params, trans);
 		
@@ -507,8 +496,8 @@ public class GLEngine  {
 			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
 		}
 		
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( pd, size, cap, join, width, params, trans, gl);
+		PreparedData pd = prepareRawData(data, new int[]{2});
+		_doCompliexLineProg( pd, size, cap, join, width, params, trans);
 		pd.free();
         params.clearInternalParams();
 	}
@@ -533,7 +522,7 @@ public class GLEngine  {
 	 */
 	public void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, MatTrans trans, GL2 gl) 
+			GLParameters params, MatTrans trans) 
 	{
 		// NOTE: identical code to above but without implicit casting
 		addOrtho(params, trans);
@@ -561,14 +550,14 @@ public class GLEngine  {
 			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
 		}
 		
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
-		_doCompliexLineProg( pd, size, cap, join, width, params, trans, gl);
+		PreparedData pd = prepareRawData(data, new int[]{2});
+		_doCompliexLineProg( pd, size, cap, join, width, params, trans);
 		pd.free();
         params.clearInternalParams();
 	}
 	
 	private void _doCompliexLineProg( PreparedData pd, int count, CapMethod cap, 
-			JoinMethod join, float width, GLParameters params, MatTrans trans, GL2 gl)
+			JoinMethod join, float width, GLParameters params, MatTrans trans)
 	{
 		// TODO: implement Rounded joins and all cap methods
 		int uJoin = 0;
@@ -578,11 +567,11 @@ public class GLEngine  {
 			case ROUNDED:break;
 		}
 
-		gl.glEnable(GL2.GL_MULTISAMPLE );
+		currentGL.glEnable(GL2.GL_MULTISAMPLE );
 		params.addInternalParam(new GLParameters.GLParam1i("uJoin",uJoin));
 		params.addInternalParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
-		applyProgram( ProgramType.LINE_RENDER, params, pd, gl, GL3.GL_LINE_STRIP_ADJACENCY, count);
-		gl.glDisable(GL2.GL_MULTISAMPLE );
+		applyProgram( ProgramType.LINE_RENDER, params, pd, GL3.GL_LINE_STRIP_ADJACENCY, count);
+		currentGL.glDisable(GL2.GL_MULTISAMPLE );
         params.clearInternalParams();
 	}
 
@@ -611,9 +600,9 @@ public class GLEngine  {
         	data[i*2] = (float)xPoints[i];
         	data[i*2+1] = (float)yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		PreparedData pd = prepareRawData(data, new int[]{2});
 		
-		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
+		applyProgram( type, params, pd, polyType.glConst, numPoints);
 		pd.free();
         params.clearInternalParams();
 	}
@@ -634,9 +623,9 @@ public class GLEngine  {
         	data[i*2] = xPoints[i];
         	data[i*2+1] = yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2}, gl);
+		PreparedData pd = prepareRawData(data, new int[]{2});
 		
-		applyProgram( type, params, pd, gl, polyType.glConst, numPoints);
+		applyProgram( type, params, pd, polyType.glConst, numPoints);
 		pd.free();
         params.clearInternalParams();
 		
@@ -654,68 +643,68 @@ public class GLEngine  {
 	        matrix = matrix2.multiply(matrix);
         }
         
+        matrix = matrix.transpose();
         params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
-        		"perspectiveMatrix", 1, true, matrix.getBuffer()));
+        		"perspectiveMatrix", 1, matrix.getBuffer()));
 	}
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
-	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd,
-			 GL2 gl, int primFormat, int primCount) 
+	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd, int primFormat, int primCount) 
 	{
 		
 		int w = params.width;
 		int h = params.height;
-//		setSurfaceSize(w, h);
+		
 		int prog = getProgram(type);
-		gl.getGL2().glViewport(0, 0, w, h);
+		currentGL.getGL2().glViewport(0, 0, w, h);
 		
 
         
-        gl.glUseProgram(prog);
+        currentGL.glUseProgram(prog);
         
         // Bind Attribute Streams
         pd.init();
 
         // Bind Texture
         if( params.texture != null) {
-        	gl.glActiveTexture(GL.GL_TEXTURE0);
+        	currentGL.glActiveTexture(GL.GL_TEXTURE0);
 
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, params.texture.load(gl));
-    		gl.glEnable(GL2.GL_TEXTURE_2D);
-    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
+            currentGL.glBindTexture(GL2.GL_TEXTURE_2D, params.texture.load());
+    		currentGL.glEnable(GL2.GL_TEXTURE_2D);
+    		currentGL.glUniform1i(currentGL.glGetUniformLocation(prog, "myTexture"), 0);
         }
         if( params.texture2 != null) {
-        	gl.glActiveTexture(GL.GL_TEXTURE1);
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, params.texture2.load(gl));
-    		gl.glEnable(GL2.GL_TEXTURE_2D);
-    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
+        	currentGL.glActiveTexture(GL.GL_TEXTURE1);
+            currentGL.glBindTexture(GL2.GL_TEXTURE_2D, params.texture2.load());
+    		currentGL.glEnable(GL2.GL_TEXTURE_2D);
+    		currentGL.glUniform1i(currentGL.glGetUniformLocation(prog, "myTexture2"), 1);
         }
 
 		// Bind Uniform
         if( params != null)
-        	params.apply(gl, prog);
+        	params.apply(currentGL, prog);
         
         // Set Blend Mode
         if( params.useBlendMode) {
 	        if( params.useDefaultBlendmode) {
-	        	setDefaultBlendMode(gl, type);
+	        	setDefaultBlendMode(type);
 	        }
 	        else {
-		        gl.glEnable(GL.GL_BLEND);
-		        gl.glBlendFuncSeparate(
+		        currentGL.glEnable(GL.GL_BLEND);
+		        currentGL.glBlendFuncSeparate(
 		        		params.bm_sfc, params.bm_dfc, params.bm_sfa, params.bm_dfa);
-		        gl.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
+		        currentGL.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
 	        }
         }
 
 		// Start Draw
-		gl.glDrawArrays( primFormat, 0, primCount);
-        gl.glDisable( GL.GL_BLEND);
+		currentGL.glDrawArrays( primFormat, 0, primCount);
+        currentGL.glDisable( GL.GL_BLEND);
 		
 		// Finished Drawing
-		gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glUseProgram(0);
+		currentGL.glDisable(GL2.GL_TEXTURE_2D);
+        currentGL.glUseProgram(0);
         pd.deinit();
         if( params.texture != null)
         	params.texture.unload();
@@ -728,12 +717,10 @@ public class GLEngine  {
 	// ==================
 	// ==== Texture Preperation
 	public class PreparedTexture{
-		private IntBuffer tex = GLBuffers.newDirectIntBuffer(1);
-		private final GL2 gl;
+		private IntBuffer tex = IntBuffer.allocate(1);
 		final int w, h;
 		
-		PreparedTexture( GL2 gl, int w, int h) {
-			this.gl = gl;
+		PreparedTexture( int w, int h) {
 			this.w = w;
 			this.h = h;
 		}
@@ -750,18 +737,19 @@ public class GLEngine  {
 		public void free() {
 			if( !_free) {
 				_free = true;
-				gl.glDeleteTextures(1, tex);
+				getGL2().glDeleteTextures(1, tex);
 
 				c_texes.remove(this);
 			}
 		}
 	}
-	public PreparedTexture prepareTexture( RawImage image, GL2 gl) {
+	public PreparedTexture prepareTexture( RawImage image) {
 		int w = image.getWidth();
 		int h = image.getHeight();
-		PreparedTexture pt = new PreparedTexture(gl, w, h);
+		GL2 gl = getGL2();
+		PreparedTexture pt = new PreparedTexture(w, h);
 
-		pt.tex = GLBuffers.newDirectIntBuffer(1);
+		pt.tex = IntBuffer.allocate(1);
         gl.glGenTextures(1, pt.tex);
         gl.glBindTexture(GL2.GL_TEXTURE_2D, pt.tex.get(0));
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
@@ -793,10 +781,7 @@ public class GLEngine  {
 	// =================
 	// ==== Data Buffer Preperation
 	public class PreparedData{
-		private final GL2 gl;
-		PreparedData( GL2 gl) {
-			this.gl = gl;
-		}
+		PreparedData() {}
 		@Override
 		protected void finalize() throws Throwable {
 			free();
@@ -811,8 +796,8 @@ public class GLEngine  {
 		public void free() {
 			if( !_free) {
 				_free = true;
-				gl.glDeleteVertexArrays(1, vao);
-				gl.glDeleteBuffers(1, positionBufferObject);
+				currentGL.glDeleteVertexArrays(1, vao);
+				currentGL.glDeleteBuffers(1, positionBufferObject);
 
 				c_data.remove(this);
 			}
@@ -820,16 +805,16 @@ public class GLEngine  {
 		
 		/** Binds the described buffer to the active rendering. */
 		public void init() {
-	        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+			currentGL.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
 	        
 	        int totalLength = 0;
 	        for( int i=0; i < lengths.length; ++i) {
-		        gl.glEnableVertexAttribArray(i);
+	        	currentGL.glEnableVertexAttribArray(i);
 		        totalLength += lengths[i];
 	        }
 	        int offset = 0;
 	        for( int i=0; i < lengths.length; ++i) {
-		        gl.glVertexAttribPointer(i, lengths[i], GL2.GL_FLOAT, false, 4*totalLength, 4*offset);
+	        	currentGL.glVertexAttribPointer(i, lengths[i], GL2.GL_FLOAT, false, 4*totalLength, 4*offset);
 		        offset += lengths[i];
 	        }
 
@@ -837,30 +822,30 @@ public class GLEngine  {
 		/** Unbind the Vertex Attribute Arrays*/
 		public void deinit() {
 	        for( int i=0; i < lengths.length; ++i) 
-		        gl.glDisableVertexAttribArray(i);
+	        	currentGL.glDisableVertexAttribArray(i);
 		}
 		
 		private int[] lengths;
 		private boolean _free = false;
-		private IntBuffer positionBufferObject = GLBuffers.newDirectIntBuffer(1);
-		private IntBuffer vao = GLBuffers.newDirectIntBuffer(1);
+		private IntBuffer positionBufferObject = IntBuffer.allocate(1);
+		private IntBuffer vao = IntBuffer.allocate(1);
 	}
-	public PreparedData prepareRawData( float raw[], int[] lengths, GL2 gl) {
-		PreparedData pd = new PreparedData(gl);
+	public PreparedData prepareRawData( float raw[], int[] lengths) {
+		PreparedData pd = new PreparedData();
 		
-		FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(raw);
+		FloatBuffer vertexBuffer = FloatBuffer.wrap(raw);
 
-	    gl.glGenBuffers(1, pd.positionBufferObject);
-	    gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
-	    gl.glBufferData(
-	    		GL2.GL_ARRAY_BUFFER, 
+		currentGL.glGenBuffers(1, pd.positionBufferObject);
+		currentGL.glBindBuffer( GLC.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
+		currentGL.glBufferData(
+	    		GLC.GL_ARRAY_BUFFER, 
 	    		vertexBuffer.capacity()*Float.BYTES, 
 	    		vertexBuffer, 
-	    		GL2.GL_STREAM_DRAW);
-        gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+	    		GLC.GL_STREAM_DRAW);
+		currentGL.glBindBuffer(GLC.GL_ARRAY_BUFFER, 0);
 
-		gl.glGenVertexArrays(1, pd.vao);
-		gl.glBindVertexArray(pd.vao.get(0));
+		currentGL.glGenVertexArrays(1, pd.vao);
+		currentGL.glBindVertexArray(pd.vao.get(0));
 		
 //		System.out.println("pd.vao:" + pd.vao.get(0) + "::: pd.PBO" + pd.positionBufferObject);
 		
@@ -875,13 +860,16 @@ public class GLEngine  {
 	// ==============
 	// ==== Initialization
 	private void init() throws MGLException {
+		// !!! NOTE: It's important that you don't use GLEngine.getGL2() in 
+		//	initialization since it might cause it to try and switch the offscreen
+		//	drawable to the current context during the initialization of that drawable
+		//	creating a locking conflict
 		GL2 gl = drawable.getGL().getGL2();
 		
         // Create a (nearly) empty depth-buffer as a placeholder
 		int[] result = new int[1];
         gl.glGenRenderbuffers( 1, result, 0);
         dbo = result[0];
-//        System.out.println(dbo);
         
 		initShaders();
 	}
@@ -948,6 +936,10 @@ public class GLEngine  {
 	private int loadProgramFromResources( String vert, String geom, String frag) 
 			throws MGLException
 	{
+		// !!! NOTE: It's important that you don't use GLEngine.getGL2() in 
+		//	initialization since it might cause it to try and switch the offscreen
+		//	drawable to the current context during the initialization of that drawable
+		//	creating a locking conflict
 		GL2 gl = drawable.getGL().getGL2();
 
         ArrayList<Integer> shaderList = new ArrayList<>();
@@ -987,14 +979,14 @@ public class GLEngine  {
 		gl.glLinkProgram(program);
 		
 		// Check for Errors
-		IntBuffer status = GLBuffers.newDirectIntBuffer(1);
+		IntBuffer status = IntBuffer.allocate(1);
         gl.glGetProgramiv(program, GL2.GL_LINK_STATUS, status);
         if (status.get(0) == GL2.GL_FALSE) {
 
-            IntBuffer infoLogLength = GLBuffers.newDirectIntBuffer(1);
+            IntBuffer infoLogLength = IntBuffer.allocate(1);
             gl.glGetProgramiv(program, GL2.GL_INFO_LOG_LENGTH, infoLogLength);
 
-            ByteBuffer bufferInfoLog = GLBuffers.newDirectByteBuffer(infoLogLength.get(0));
+            ByteBuffer bufferInfoLog = ByteBuffer.allocate(infoLogLength.get(0));
             gl.glGetProgramInfoLog(program, infoLogLength.get(0), null, bufferInfoLog);
             byte[] bytes = new byte[infoLogLength.get(0)];
             bufferInfoLog.get(bytes);
@@ -1036,20 +1028,20 @@ public class GLEngine  {
 		
 		// Compile data into buffer form, then feed it to the GPU compiler
 		String[] lines = {shaderText};
-		IntBuffer lengths = GLBuffers.newDirectIntBuffer( new int[]{lines[0].length()});
+		IntBuffer lengths = IntBuffer.wrap( new int[]{lines[0].length()});
 		gl.glShaderSource( shader, 1, lines, lengths);
 		gl.glCompileShader(shader);
 		
 		// Read Status
-		IntBuffer status = GLBuffers.newDirectIntBuffer(1);
+		IntBuffer status = IntBuffer.allocate(1);
 		gl.glGetShaderiv( shader, GL2.GL_COMPILE_STATUS, status);
 		if( status.get(0) == GL2.GL_FALSE) {
 			
 			// Read Compile Errors
-			IntBuffer infoLogLength = GLBuffers.newDirectIntBuffer(1);
+			IntBuffer infoLogLength = IntBuffer.allocate(1);
 			gl.glGetShaderiv( shader,  GL2.GL_INFO_LOG_LENGTH, infoLogLength);
 			
-			ByteBuffer bufferInfoLog = GLBuffers.newDirectByteBuffer(infoLogLength.get(0));
+			ByteBuffer bufferInfoLog = ByteBuffer.allocate( infoLogLength.get(0));
 			gl.glGetShaderInfoLog( shader, infoLogLength.get(0), null, bufferInfoLog);
 			byte[] bytes = new byte[infoLogLength.get(0)];
 			bufferInfoLog.get(bytes);

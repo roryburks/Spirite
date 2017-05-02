@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
@@ -40,6 +41,7 @@ public class HybridHelper {
 	}
 
 	public static RawImage createImage( int width, int height) {
+//		return new GLImage(width,height);
 		return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
 	}
 	

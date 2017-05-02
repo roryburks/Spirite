@@ -108,7 +108,7 @@ public class GLParameters {
 	
 	/** A class storing things that can be transferred into  */
 	public abstract static class GLTexture {
-		public abstract int load(GL2 gl);
+		public abstract int load();
 		public abstract void unload();
 		public abstract int getWidth();
 		public abstract int getHeight();
@@ -124,12 +124,12 @@ public class GLParameters {
 		}
 
 		@Override
-		public int load(GL2 gl){
+		public int load(){
 			if( image instanceof GLImage) {
 				return ((GLImage) image).getTexID();
 			}
 			else {
-				texture = GLEngine.getInstance().prepareTexture(image, gl);
+				texture = GLEngine.getInstance().prepareTexture(image);
 	
 				return texture.getTexID();
 			}
@@ -221,17 +221,15 @@ public class GLParameters {
 	public static class GLUniformMatrix4fv extends GLParam {
 		private final FloatBuffer buffer;
 		private final int count;
-		private final boolean transpose;
-		public GLUniformMatrix4fv( String name, int count, boolean transpose, FloatBuffer buffer) {
+		public GLUniformMatrix4fv( String name, int count, FloatBuffer buffer) {
 			super(name);
 			this.count = count;
-			this.transpose = transpose;
 			this.buffer = buffer;
 		}
 		@Override
 		public void apply(GL2 gl, int prog) {
 			gl.glUniformMatrix4fv(getUniformLocation(gl, prog), 
-					count, transpose, buffer);
+					count, false, buffer);
 		}
 	}
 	

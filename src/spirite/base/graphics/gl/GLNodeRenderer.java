@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.brains.RenderEngine;
@@ -86,7 +85,6 @@ class GLNodeRenderer extends NodeRenderer {
 				glgc.setFlip(flip);
 				return;
 			}
-			engine.setSurfaceSize(settings.width, settings.height);
 			
 			// Prepare the FrameBuffers needed for rendering
 			buffer = new GLImage[n];
@@ -108,20 +106,13 @@ class GLNodeRenderer extends NodeRenderer {
 			// surface onto a BufferedImage so that Swing can draw it.
 			// TODO: This last step could be avoided if I used a GLPanel instead
 			//	of a basic Swing Panel
-//			engine.setSurfaceSize(settings.width, settings.height);
 			glgc.setFlip(flip);
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLImageTexture(buffer[0]);
 			params.flip = glgc.isFlip();
-			
-//			if( !glgc.isFlip()) {
-//				engine.applyPassProgram(ProgramType.PASS_ESCALATE, params, trans, 
-//						0, 0, settings.width, settings.height, true, gl);
-//			}
-//			else {
-				engine.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
-						0, 0, settings.width, settings.height, true, gl);
-//			}
+		
+			engine.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
+					0, 0, settings.width, settings.height, true);
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
@@ -163,7 +154,7 @@ class GLNodeRenderer extends NodeRenderer {
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1.0f));
 				GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
 				engine.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
-						0, 0, params.texture.getWidth(), params.texture.getHeight(), true, gl);
+						0, 0, params.texture.getWidth(), params.texture.getHeight(), true);
 
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
 					// Draw Lifted Image
@@ -347,7 +338,7 @@ class GLNodeRenderer extends NodeRenderer {
 			setParamsFromNode( node, params, false, 1);
 			params.texture = new GLParameters.GLImageTexture(buffer[n+1]);
 			engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-					0, 0, params.width, params.height, true, gl);
+					0, 0, params.width, params.height, true);
 			engine.setTarget(0);
 		}
 	}
@@ -383,7 +374,7 @@ class GLNodeRenderer extends NodeRenderer {
 				params.texture = new GLParameters.GLImageTexture(compositeLayer);
 				engine.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
-						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false, gl);
+						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false);
 			}
 			else {
 				trans.translate(renderable.handle.getDynamicX(), 
@@ -391,7 +382,7 @@ class GLNodeRenderer extends NodeRenderer {
 				params.texture = glcache.new GLHandleTexture(renderable.handle);
 				engine.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
-						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false, gl);
+						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false);
 			}
 			engine.setTarget(0);
 		}

@@ -69,8 +69,8 @@ public class TestGLDiag extends JDialog  {
 				int h = glad.getSurfaceHeight();
 				
 				GLEngine engine = GLEngine.getInstance();
-				
 				GL2 gl = glad.getGL().getGL2();
+				engine.setGL(gl);
 
 			    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( new float[] {0, 0, 0, 0f});
 		        gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
@@ -81,7 +81,8 @@ public class TestGLDiag extends JDialog  {
 		        params.addParam( new GLParameters.GLParam1f("fixedCol", 0.4f));
 		        params.addParam( new GLParameters.GLParam1i("varCol", met));
 
-	        	engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true, gl);
+	        	engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true);
+				engine.setGL(null);
 			}
 		});
 

@@ -11,6 +11,7 @@ import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
@@ -48,8 +49,10 @@ public class GLDrawer extends GraphicsDrawer {
 	public void changeColor(RawImage image, int from, int to, int mode) {
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
 
+    	GLImage img = new GLImage( image.getWidth(), image.getHeight());
     	GL2 gl = engine.getGL2();
-    	engine.setSurfaceSize(image.getWidth(), image.getHeight());
+    	
+    	engine.setTarget(img);
     	
     	params.addParam( new GLParam1i("optionMask", mode | 4));
     	params.addParam( new GLParam4f("cFrom", 
@@ -60,23 +63,27 @@ public class GLDrawer extends GraphicsDrawer {
     	params.texture = new GLImageTexture( image);
 
     	engine.clearSurface(gl);
-    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false, gl);
+    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false);
 		
     	glSurfaceToImage(image);
+    	engine.setTarget(0);
 	}
 
 	@Override
 	public void invert(RawImage image) {
     	GL2 gl = engine.getGL2();
-    	engine.setSurfaceSize(image.getWidth(), image.getHeight());
+    	
+    	GLImage img = new GLImage(image.getWidth(), image.getHeight());
+    	engine.setTarget(img);
 
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
     	params.texture = new GLImageTexture(image);
 
     	engine.clearSurface(gl);
-    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false, gl);
+    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false);
 		
     	glSurfaceToImage(image);
+    	engine.setTarget(0);
 	}
 	
 	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */

@@ -61,29 +61,28 @@ class GLStrokeEngine extends StrokeEngine {
 	@Override
 	protected void prepareDisplayLayer() {
 		GL2 gl = engine.getGL2();
-		engine.getContext().makeCurrent();
 		
 		engine.setTarget(displayLayer);
-		engine.setSurfaceSize(w, h);
 		engine.clearSurface(gl.getGL2());
-		gl.glViewport(0, 0, w, h);
-		
 		
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLImageTexture(fixedLayer);
-		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
+		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+		engine.setTarget(0);
 	}
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
 		if( gc instanceof AWTContext) {
-			engine.setSurfaceSize(w, h);
+			GLImage img = new GLImage(w, h);
+			engine.setTarget(img);
 			engine.clearSurface(engine.getGL2());
 			GLParameters params = new GLParameters(w, h);
 			params.texture = new GLParameters.GLImageTexture(displayLayer);
-			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true, engine.getGL2());
+			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
 			
 			BufferedImage bi = engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
 			gc.drawImage( new ImageBI(bi), 0, 0);
+			engine.setTarget(0);
 		}
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;
@@ -98,7 +97,7 @@ class GLStrokeEngine extends StrokeEngine {
 			
 			
 			engine.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 
-					0, 0, w, h, true, glgc.getGL());
+					0, 0, w, h, true);
 		}
 	}
 	
@@ -143,9 +142,8 @@ class GLStrokeEngine extends StrokeEngine {
 		int w = data.getWidth();
 		int h = data.getHeight();
 		
-		engine.setSurfaceSize( w, h);
 		GL2 gl = engine.getGL2();
-		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1}, gl);
+		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1});
 
 		// Clear Surface
         int prog = engine.getProgram(ProgramType.STROKE_SPORE);
@@ -238,11 +236,9 @@ class GLStrokeEngine extends StrokeEngine {
 		int w = data.getWidth();
 		int h = data.getHeight();
 		
-		engine.setSurfaceSize( w, h);
 		
 		
-		
-		PreparedData pd = engine.prepareRawData(glvb.vBuffer, new int[]{4,1,1}, gl);
+		PreparedData pd = engine.prepareRawData(glvb.vBuffer, new int[]{4,1,1});
 
 		// Clear Surface
         int prog = 0;

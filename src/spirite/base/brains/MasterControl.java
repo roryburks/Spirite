@@ -105,8 +105,12 @@ public class MasterControl
 //		glcache = new GLCache(this);
 		
 		settingsManager.setGL( true);
-		System.out.println(settingsManager.glMode());
+//		System.out.println(settingsManager.glMode());
 //		initGL();
+		
+
+        newWorkspace(640,480,0x00000000, true);
+        getCurrentWorkspace().finishBuilding();
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make

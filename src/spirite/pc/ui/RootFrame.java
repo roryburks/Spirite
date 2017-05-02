@@ -79,10 +79,6 @@ public class RootFrame extends javax.swing.JFrame
         this.addWindowListener(this);
         this.addWindowFocusListener( this);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
-        
-
-        master.newWorkspace(640,480,0x00000000, true);
-        master.getCurrentWorkspace().finishBuilding();
     }
     
     

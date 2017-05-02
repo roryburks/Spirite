@@ -131,7 +131,7 @@ public class AWTContext extends GraphicsContext{
 		case AlphaComposite.SRC_OVER: return Composite.SRC_OVER;
 		case AlphaComposite.SRC_ATOP: return Composite.SRC_ATOP;
 		case AlphaComposite.SRC_IN: return Composite.SRC_IN;
-		case AlphaComposite.DST: return Composite.SRC;
+		case AlphaComposite.DST: return Composite.DST;
 		case AlphaComposite.DST_OUT: return Composite.DST_OUT;
 		case AlphaComposite.DST_OVER: return Composite.DST_OVER;
 		case AlphaComposite.DST_ATOP: return Composite.DST_ATOP;

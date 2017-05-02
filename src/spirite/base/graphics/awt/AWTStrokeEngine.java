@@ -39,14 +39,14 @@ class AWTStrokeEngine extends StrokeEngine{
 	
 	@Override
 	protected void onStart() {
-		displayLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), HybridHelper.BI_FORMAT);
-		fixedLayer = new BufferedImage( 
-				data.getWidth(), data.getHeight(), HybridHelper.BI_FORMAT);
+		int w = data.getWidth();
+		int h = data.getHeight();
+		
+		displayLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
+		fixedLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		
 		if( sel.selection != null) {
-			selectionMask = new BufferedImage( 
-					data.getWidth(), data.getHeight(), HybridHelper.BI_FORMAT);
+			selectionMask = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 			
 			GraphicsContext gc = new AWTContext(selectionMask);
 			gc.clear();
@@ -70,7 +70,8 @@ class AWTStrokeEngine extends StrokeEngine{
 
 	@Override
 	protected void prepareDisplayLayer() {
-		Graphics g = displayLayer.getGraphics();
+		Graphics2D g = (Graphics2D)displayLayer.getGraphics();
+        g.setBackground(new Color(255, 255, 255, 0));
 		g.clearRect(0, 0, displayLayer.getWidth(), displayLayer.getHeight());
 		g.drawImage(fixedLayer, 0, 0, null);
 		

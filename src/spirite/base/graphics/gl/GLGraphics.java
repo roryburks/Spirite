@@ -3,9 +3,7 @@ package spirite.base.graphics.gl;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.engine.GLEngine;
@@ -35,7 +33,6 @@ import spirite.base.util.glmath.Rect;
 public class GLGraphics extends GraphicsContext{
 	private final GLEngine engine = GLEngine.getInstance();
 	
-	private final GLAutoDrawable drawable;
 	private GL2 gl;
 	private int width, height;
 	private boolean flip = false;
@@ -44,22 +41,13 @@ public class GLGraphics extends GraphicsContext{
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
 	private LineAttributes lineAttributes = defaultLA;
-	
-//	private GLMultiRenderer glmu = null;
 
-	public GLGraphics( GLAutoDrawable drawable, boolean flip) {
-		this.drawable = drawable;
+	public GLGraphics( int width, int height, boolean flip) {
 		this.flip = flip;
-		setDimensions(drawable.getSurfaceWidth()
-				, drawable.getSurfaceHeight());
+		setDimensions( width, height);
 	}
 	public GLGraphics( GLImage glImage ) {
-		this.drawable = engine.getAutoDrawable();
-		this.width = glImage.getWidth();
-		this.height = glImage.getHeight();
-	}
-	public GLGraphics() {
-		this.drawable = engine.getAutoDrawable();
+		setDimensions(this.width = glImage.getWidth(), glImage.getHeight());
 	}
 	
 
@@ -67,15 +55,6 @@ public class GLGraphics extends GraphicsContext{
 	public void setFlip(boolean b) { flip = b;}
 	public int getWidth() {return width;}
 	public int getHeight() { return height;}
-//	public void useFBO( GLMultiRenderer glmu) {
-//		this.glmu = glmu;
-//		setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
-//	}
-//	public void unuseFBO() {
-//		this.glmu = null;
-//		setDimensions(drawable.getSurfaceWidth()
-//				, drawable.getSurfaceHeight());
-//	}
 	public GL2 getGL() { reset();return gl;}
 	
 	private void setDimensions(int width, int height) {
@@ -101,10 +80,10 @@ public class GLGraphics extends GraphicsContext{
 //			setDimensions(drawable.getSurfaceWidth()
 //					, drawable.getSurfaceHeight());
 //		}
-		this.gl = drawable.getGL().getGL2();
+		this.gl = engine.getGL2();
 		
-		if( !drawable.getContext().isCurrent())
-			drawable.getContext().makeCurrent();
+//		if( !drawable.getContext().isCurrent())
+//			drawable.getContext().makeCurrent();
 		gl.getGL2().glViewport(0, 0, width, height);
 	}
 
@@ -118,14 +97,14 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params2 = new GLParameters(width, height);
 		params2.texture = new GLImageTexture( mask);
 		engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
-				0, 0, mask.getWidth(), mask.getHeight(), false, gl);
+				0, 0, mask.getWidth(), mask.getHeight(), false);
 		engine.setTarget(0);
 
 		// Clean up and Apply the surface to an image
 		params2 = new GLParameters(width, height);
 		params2.addParam( new GLParam1i("uCycle", c));
 		params2.texture = new GLImageTexture(img);
-		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false, gl);
+		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false);
 		
 		img.flush();
 	}
@@ -152,7 +131,7 @@ public class GLGraphics extends GraphicsContext{
 		params.useBlendMode = false;
 		
 		engine.applyPassProgram(ProgramType.GRID, params, null,
-				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false, gl);
+				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false);
 	}
 	
 	@Override
@@ -226,7 +205,7 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params = getLineParams();
 		engine.applyComplexLineProgram( x_, y_, 4, 
 				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
-				params, contextTransform, gl);
+				params, contextTransform);
 	}
 	@Override
 	public void drawOval(int x, int y, int w, int h) {
@@ -237,7 +216,7 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
-				params, contextTransform, gl);
+				params, contextTransform);
 	}
 	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
@@ -248,7 +227,7 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  x_, y_, 2, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
-				params, contextTransform, gl);
+				params, contextTransform);
 //		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
 		
 	}
@@ -265,7 +244,7 @@ public class GLGraphics extends GraphicsContext{
 		float yPoints[] = y_.toArray();
 		engine.applyComplexLineProgram( xPoints, yPoints, xPoints.length, 
 				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
-				params, contextTransform, gl);
+				params, contextTransform);
 	}
 	
 	public static void setCompositeBlend( GLParameters params, Composite comp) {
@@ -331,7 +310,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = new GLParameters.GLImageTexture(img);
 
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, img.getWidth(), img.getHeight(), false, gl);
+				0, 0, img.getWidth(), img.getHeight(), false);
 		params.texture = null;
 		
 	}
@@ -341,7 +320,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = handle.accessGL();
 
 		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, params.texture.getWidth(), params.texture.getHeight(), false, gl);
+				0, 0, params.texture.getWidth(), params.texture.getHeight(), false);
 		params.texture = null;
 	}
 	

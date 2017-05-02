@@ -96,7 +96,6 @@ public class GLWorkArea
 	@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
 	@Override
 	public void display(GLAutoDrawable glad) {
-		GLGraphics glgc = new GLGraphics(glad, true);
 		
 		glad.getContext().makeCurrent();
 
@@ -104,6 +103,8 @@ public class GLWorkArea
 		int w = glad.getSurfaceWidth();
 		int h = glad.getSurfaceHeight();
 		GL2 gl = glad.getGL().getGL2();
+		GLGraphics glgc = new GLGraphics( w, h, true);
+		
 		engine.setGL(gl);
 		
 		gl.glViewport(0, 0, w, h);
