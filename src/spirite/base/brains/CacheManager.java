@@ -193,23 +193,6 @@ public class CacheManager {
 		}
 	}
 	
-	/** Creates a new empty Cached Image*/
-//	public CachedImage createImage( int width, int height, Object domain) {
-//		if( width <= 0 || height <= 0)
-//			return null;
-//		
-//		CachedImage c = new CachedImage(domain);
-//		c.setData(new BufferedImage( width, height, Globals.BI_FORMAT));
-//		
-//		if( c.data == null) {
-//			MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Failed to create Image Data.");
-//			return null;
-//		}
-//		
-//		
-//		return c;
-//	}
-	
 	/** Put an existing image into the Cache. */
 	public CachedImage cacheImage( RawImage image, Object domain) {
 		assert( image != null);
@@ -222,18 +205,4 @@ public class CacheManager {
 		
 		return c;
 	}
-	
-	/** Creates a new CachedImage by creating a verbatim copy of a given BufferedImage*/
-//	public CachedImage createDeepCopy( BufferedImage toCopy, Object domain) {
-//		
-//		CachedImage c = new CachedImage(domain);
-//		c.setData(new BufferedImage( 
-//				toCopy.getColorModel(),
-//				toCopy.copyData(null),
-//				toCopy.isAlphaPremultiplied(),
-//				null));
-//		
-//		
-//		return c;
-//	}
 }

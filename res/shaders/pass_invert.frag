@@ -10,5 +10,5 @@ void main()
 {
 	vec4 texCol = texture(myTexture, vUV);
 	
-	outputColor = vec4( 1 - texCol.r, 1 - texCol.g, 1 - texCol.b, texCol.a);
+	outputColor = vec4( texCol.a - texCol.r, texCol.a - texCol.g, texCol.a - texCol.b, texCol.a);
 }

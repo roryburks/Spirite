@@ -114,8 +114,8 @@ public class MasterControl
 //		initGL();
 		
 
-        newWorkspace(640,480,0x00000000, true);
-        getCurrentWorkspace().finishBuilding();
+//        newWorkspace(640,480,0x00000000, true);
+//        getCurrentWorkspace().finishBuilding();
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make

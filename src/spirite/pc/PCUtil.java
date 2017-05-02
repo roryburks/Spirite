@@ -6,6 +6,9 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.gl.engine.GLEngine;
+import spirite.base.graphics.gl.engine.GLImage;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -17,6 +20,15 @@ public class PCUtil {
 				toCopy.isAlphaPremultiplied(),
 				null);
 	}
+	
+	public static BufferedImage glToBI( GLImage img) {
+		GLEngine engine = GLEngine.getInstance();
+		engine.setTarget(img);
+		BufferedImage bi = glSurfaceToImage( HybridHelper.BI_FORMAT, img.getWidth(), img.getHeight());
+		engine.setTarget(0);
+		return bi;
+	}
+	
 	/** Writes the active GL Surface to a BufferedImage */
 	public static BufferedImage glSurfaceToImage(int type, int width, int height) {
 		GL2 gl = JOGLCore.getGL2();

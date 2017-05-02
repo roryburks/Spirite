@@ -11,19 +11,55 @@ import java.io.OutputStream;
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
+import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.jogl.JOGLCore;
 
 public class HybridUtil {
 	public static class UnsupportedImageTypeException extends Exception {
 		private UnsupportedImageTypeException(String message) {super(message);}
 	}
 	
+
+	/**
+	 * Converts a RawImage from one type to another.  If it already is that type
+	 * of RawImage, returns it unchanged.
+	 * */
+	public static RawImage convert( RawImage from, Class<? extends RawImage> to) {
+		if( from.getClass() == to) {
+			return from;
+		}
+		
+		if( to == GLImage.class) {
+			GL2 gl = JOGLCore.getGL2();
+			
+			int result[] = new int[1];
+			gl.glGenTextures(1, result, 0);
+			int tex = result[0];
+	        gl.glBindTexture( GLC.GL_TEXTURE_2D, tex);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MIN_FILTER,GLC.GL_NEAREST);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MAG_FILTER,GLC.GL_NEAREST);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
+	        HybridHelper.loadImageIntoGL( from, gl);
+	        return new GLImage( tex, from.getWidth(), from.getHeight());
+		}
+		else {
+			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Conversion( HybridUtil).");
+		}
+		
+		return null;
+	}
 	
 	// =======
 	// ==== IO

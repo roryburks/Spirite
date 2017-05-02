@@ -557,7 +557,7 @@ public class RenderEngine
 			
 			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			GraphicsContext gc = img.getGraphics();
-			gc.clear();;
+			gc.clear();
 			NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
 			renderer.render(settings, gc, null);
 			

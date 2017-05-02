@@ -79,7 +79,7 @@ public class GLEngine  {
 
 
     public static final FloatBuffer clearColor = FloatBuffer.wrap( new float[] {0f, 0f, 0f, 0f});
-	public void clearSurface(GL2 gl2) {
+	void clearSurface(GL2 gl2) {
         gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
 	
@@ -241,6 +241,7 @@ public class GLEngine  {
 	
 	private int programs[] = new int[ProgramType.values().length];
 	
+	// TODO: Make this package-scoped
 	public int getProgram( ProgramType type){
 		return programs[type.ordinal()];
 	}
@@ -256,7 +257,7 @@ public class GLEngine  {
 	 * @param internal	Whether or not it is a GL->GL draw 
 	 * 		(if so the texture will not be flipped vertically)
 	 */
-	public void applyPassProgram(
+	void applyPassProgram(
 			ProgramType type,
 			GLParameters params, 
 			MatTrans trans, 
@@ -283,7 +284,7 @@ public class GLEngine  {
 	 * @param internal	Whether or not it is a GL->GL draw 
 	 * 		(if so the texture will not be flipped vertically)
 	 */
-	public void applyPassProgram(
+	void applyPassProgram(
 			ProgramType type, 
 			GLParameters params, 
 			MatTrans trans,
@@ -304,7 +305,7 @@ public class GLEngine  {
         params.clearInternalParams();
 	}
 
-	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
+	void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
 			int numPoints, GLParameters params, MatTrans trans) 
 	{
 		addOrtho(params, trans);
@@ -321,7 +322,7 @@ public class GLEngine  {
         params.clearInternalParams();
 	}
 	
-	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
+	void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
 			int numPoints, GLParameters params, MatTrans trans, GL2 gl) 
 	{
 		addOrtho(params, trans);
@@ -354,7 +355,7 @@ public class GLEngine  {
 	 * @param trans		Transform to apply to the rendering.
 	 * @param gl
 	 */
-	public void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
+	void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, MatTrans trans) 
 	{
@@ -407,7 +408,7 @@ public class GLEngine  {
 	 * @param trans		Transform to apply to the rendering.
 	 * @param gl
 	 */
-	public void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
+	void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, MatTrans trans) 
 	{

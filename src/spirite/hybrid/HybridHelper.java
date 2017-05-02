@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.hybrid.MDebug.WarningType;
@@ -27,6 +28,9 @@ import sun.awt.image.IntegerInterleavedRaster;
 public class HybridHelper {
 
 	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
+	private static boolean useGL = false;
+	
+	public static boolean isUsingGL() {return useGL;}
 	
 	// ============
 	// ==== Mesages
@@ -41,8 +45,10 @@ public class HybridHelper {
 	}
 
 	public static RawImage createImage( int width, int height) {
-//		return new GLImage(width,height);
-		return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
+		if( useGL)
+			return new GLImage(width,height);
+		else
+			return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
 	}
 	
 	// ===========
@@ -55,7 +61,7 @@ public class HybridHelper {
 	    	c.setContents(transfer, null);
 		}
 		else {
-			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image");
+			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image: to Clipboard");
 		}
 	}
 
@@ -90,8 +96,20 @@ public class HybridHelper {
 		if( image instanceof ImageBI) {
 			_loadBI( ((ImageBI) image).img, gl);
 		}
+		else if( image instanceof GLImage) {
+			GLImage gli = (GLImage)image;
+			GLEngine engine = GLEngine.getInstance();
+			engine.setTarget(gli);
+			gl.glCopyTexImage2D(
+					GL2.GL_TEXTURE_2D,
+					0,
+					GL2.GL_RGBA,
+					0, 0, gli.getWidth(), gli.getHeight(),
+					0);
+			engine.setTarget(0);
+		}
 		else {
-			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image");
+			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported IntoGL");
 		}
 	}
 	private static void _loadBI( BufferedImage bi, GL2 gl) {

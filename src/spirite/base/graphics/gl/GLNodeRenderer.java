@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.jogamp.opengl.GL2;
-
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.brains.RenderEngine.RenderMethod;
@@ -16,6 +14,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.graphics.gl.engine.GLEngine;
+import spirite.base.graphics.gl.engine.GLGraphics;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.graphics.gl.engine.GLParameters;
@@ -25,6 +24,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
+import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -51,10 +51,11 @@ import spirite.hybrid.MDebug.ErrorType;
  * (see "pass_render.frag" for appropriate values).
  */
 class GLNodeRenderer extends NodeRenderer {
-	GLImage buffer[];
-	float ratioW;
-	float ratioH;
-	ImageWorkspace workspace;
+	private GLImage buffer[];
+	private float ratioW;	// TODO: UNUSED
+	private float ratioH;	// TODO: UNUSED
+	
+	private final ImageWorkspace workspace;
 	private final GLEngine engine = GLEngine.getInstance();
 	private final GLCache glcache;
 	
@@ -64,14 +65,11 @@ class GLNodeRenderer extends NodeRenderer {
 		this.workspace = node.getContext();
 	}
 
-	private GL2 gl;
-	private GLGraphics glgc;
 	@Override
 	public void render(RenderSettings settings, GraphicsContext context, MatTrans trans) {
 		try {
 			
-			glgc = (GLGraphics)context;
-			gl = glgc.getGL();
+			GLGraphics glgc = (GLGraphics)context;
 			boolean flip = glgc.isFlip();
 			
 			glgc.setFlip( true);
@@ -90,10 +88,9 @@ class GLNodeRenderer extends NodeRenderer {
 			buffer = new GLImage[n];
 			for( int i=0; i<n; ++i) {
 				buffer[i] = new GLImage(settings.width, settings.height);
-				engine.setTarget(buffer[i]);
-				engine.clearSurface(gl.getGL2());
-				engine.setTarget(0);
-
+				
+				GLGraphics _glgc = buffer[i].getGraphics();
+				_glgc.clear();
 			}
 
 			// Step 3: Recursively draw the image
@@ -111,7 +108,7 @@ class GLNodeRenderer extends NodeRenderer {
 			params.texture = new GLParameters.GLImageTexture(buffer[0]);
 			params.flip = glgc.isFlip();
 		
-			engine.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
+			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
 					0, 0, settings.width, settings.height, true);
 
 			// Flush the data we only needed to build the image
@@ -128,8 +125,8 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 	}
 	
-	GLImage compositeLayer = null;
-	ImageHandle compositedHandle = null;
+	private GLImage compositeLayer = null;
+	private ImageHandle compositedHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) {
 		BuiltImageData dataContext= workspace.buildActiveData();
 		if( dataContext != null) {
@@ -138,7 +135,8 @@ class GLNodeRenderer extends NodeRenderer {
 				
 				compositeLayer = new GLImage(dataContext.getWidth(), dataContext.getHeight());
 				compositedHandle = dataContext.handle;
-				
+
+				GLGraphics glgc = compositeLayer.getGraphics();
 				engine.setTarget(compositeLayer);
 				
 				// Draw Base Image
@@ -153,7 +151,7 @@ class GLNodeRenderer extends NodeRenderer {
 				params.addParam( new GLParameters.GLParam1i("uComp", 0));
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1.0f));
 				GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
-				engine.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
+				glgc.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
 						0, 0, params.texture.getWidth(), params.texture.getHeight(), true);
 
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
@@ -166,6 +164,7 @@ class GLNodeRenderer extends NodeRenderer {
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {
 					// Draw Stroke Layer
+					glgc.setFlip(true);
 					glgc.setTransform(new MatTrans());
 					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 				}
@@ -250,7 +249,6 @@ class GLNodeRenderer extends NodeRenderer {
 		
 		int method_num = 0;
 		
-		boolean premult = true;
 		RenderMethod method;
 		int renderValue = 0;
 		int stage = workspace.getStageManager().getNodeStage(node);
@@ -280,25 +278,25 @@ class GLNodeRenderer extends NodeRenderer {
 		case LIGHTEN:
 			method_num = 0;
 			params.setBlendModeExt(
-					GL2.GL_ONE, GL2.GL_ONE, GL2.GL_FUNC_ADD,
-					GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+					GLC.GL_ONE, GLC.GL_ONE, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case SUBTRACT:
 			method_num = 0;
 			params.setBlendModeExt(
-					GL2.GL_ZERO, GL2.GL_ONE_MINUS_SRC_COLOR, GL2.GL_FUNC_ADD,
-					GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+					GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_COLOR, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case MULTIPLY:
 			method_num = 0;
-			params.setBlendModeExt(GL2.GL_DST_COLOR, GL2.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_FUNC_ADD,
-					GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+			params.setBlendModeExt(GLC.GL_DST_COLOR, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case SCREEN:
 			// C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
 			method_num = 0;
-			params.setBlendModeExt(GL2.GL_ONE_MINUS_DST_COLOR, GL2.GL_ONE, GL2.GL_FUNC_ADD,
-					GL2.GL_ZERO, GL2.GL_ONE, GL2.GL_FUNC_ADD);
+			params.setBlendModeExt(GLC.GL_ONE_MINUS_DST_COLOR, GLC.GL_ONE, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case OVERLAY:
 			method_num = 3;
@@ -327,19 +325,22 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		@Override
 		public void draw(int ind) {
-			engine.setTarget(buffer[n+1]);
-			engine.clearSurface(gl.getGL2());
-			engine.setTarget(0);
+			GLGraphics glgc = buffer[n+1].getGraphics();
+			glgc.clear();
+//			engine.setTarget(buffer[n+1]);
+//			engine.clearSurface(gl.getGL2());
+//			engine.setTarget(0);
 			
 			_render_rec(node, n+1, settings);
 
-			engine.setTarget(buffer[n]);
+			glgc = buffer[n].getGraphics();
+//			engine.setTarget(buffer[n]);
 			GLParameters params = new GLParameters(settings.width, settings.height);
 			setParamsFromNode( node, params, false, 1);
 			params.texture = new GLParameters.GLImageTexture(buffer[n+1]);
-			engine.applyPassProgram(ProgramType.PASS_RENDER, params, null,
+			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, null,
 					0, 0, params.width, params.height, true);
-			engine.setTarget(0);
+//			engine.setTarget(0);
 		}
 	}
 	private class TransformedRenderable extends Drawable {
@@ -357,7 +358,9 @@ class GLNodeRenderer extends NodeRenderer {
 		}
 		@Override
 		public void draw(int ind) {
-			engine.setTarget( buffer[ind]);
+
+			GLGraphics glgc = buffer[ind].getGraphics();
+//			engine.setTarget( buffer[ind]);
 					
 			GLParameters params = new GLParameters(settings.width, settings.height);
 			
@@ -367,12 +370,12 @@ class GLNodeRenderer extends NodeRenderer {
 			
 			MatTrans trans = new MatTrans(transform);
 
-			GLGraphics.setCompositeBlend(params, glgc.getComposite());
+			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
 			if( compositedHandle == renderable.handle) {
 				if( renderable.handle.isDynamic())
 					trans = new MatTrans();
 				params.texture = new GLParameters.GLImageTexture(compositeLayer);
-				engine.applyPassProgram(
+				glgc.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
 						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false);
 			}
@@ -380,7 +383,7 @@ class GLNodeRenderer extends NodeRenderer {
 				trans.translate(renderable.handle.getDynamicX(), 
 						renderable.handle.getDynamicY());
 				params.texture = glcache.new GLHandleTexture(renderable.handle);
-				engine.applyPassProgram(
+				glgc.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
 						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false);
 			}

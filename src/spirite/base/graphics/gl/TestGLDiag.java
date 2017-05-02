@@ -21,6 +21,7 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLGraphics;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.pc.jogl.JOGLCore;
 
@@ -82,7 +83,8 @@ public class TestGLDiag extends JDialog  {
 		        params.addParam( new GLParameters.GLParam1f("fixedCol", 0.4f));
 		        params.addParam( new GLParameters.GLParam1i("varCol", met));
 
-	        	engine.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true);
+		        GLGraphics glgc = new GLGraphics(w, h, false);
+	        	glgc.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true);
 				engine.setGL(null);
 			}
 		});

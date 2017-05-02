@@ -11,12 +11,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
 
 /**
@@ -208,8 +210,12 @@ public class AWTContext extends GraphicsContext{
 	@Override public void drawImage(RawImage img, int x, int y) {
 		if( img instanceof ImageBI)
 			g2.drawImage( ((ImageBI)img).img,  x,  y, null);
-		else
-			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type");
+		else if( img instanceof GLImage) {
+			g2.drawImage( PCUtil.glToBI((GLImage)img), x, y, null);
+		}
+		else {
+			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "AWT Draw Image: Unsupported Image Type");
+		}
 	}
 	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
 }

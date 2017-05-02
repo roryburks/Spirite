@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl;
+package spirite.base.graphics.gl.engine;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -6,13 +6,6 @@ import java.awt.geom.Ellipse2D;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLEngine.PolyType;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLImage;
-import spirite.base.graphics.gl.engine.GLParameters;
-import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
-import spirite.base.graphics.gl.engine.GLParameters.GLParam1i;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.Colors;
@@ -21,6 +14,9 @@ import spirite.base.util.MUtil;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.graphics.gl.engine.GLEngine.PolyType;
+import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLParameters.*;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
@@ -41,12 +37,15 @@ public class GLGraphics extends GraphicsContext{
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
 	private LineAttributes lineAttributes = defaultLA;
+	private final GLImage image;
 
 	public GLGraphics( int width, int height, boolean flip) {
 		this.flip = flip;
 		setDimensions( width, height);
+		this.image = null;
 	}
 	public GLGraphics( GLImage glImage ) {
+		this.image = glImage;
 		setDimensions(this.width = glImage.getWidth(), glImage.getHeight());
 	}
 	
@@ -72,7 +71,7 @@ public class GLGraphics extends GraphicsContext{
 		}
 	}
 	
-	synchronized void reset() {
+	public synchronized void reset() {
 //		if( glmu != null) {
 //			setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
 //		}
@@ -82,6 +81,8 @@ public class GLGraphics extends GraphicsContext{
 //		}
 		this.gl = engine.getGL2();
 		
+		engine.setTarget(image);
+		
 //		if( !drawable.getContext().isCurrent())
 //			drawable.getContext().makeCurrent();
 		gl.getGL2().glViewport(0, 0, width, height);
@@ -89,22 +90,22 @@ public class GLGraphics extends GraphicsContext{
 
 	@Override
 	public void drawBounds(RawImage mask, int c) {
-		reset();
-		
 		GLImage img = new GLImage( width, height);
-		engine.setTarget(img);
-		engine.clearSurface(gl);
+		
+		GLGraphics other = img.getGraphics();
+		other.clear();
+//		engine.setTarget(img);
+//		engine.clearSurface(gl);
 		GLParameters params2 = new GLParameters(width, height);
 		params2.texture = new GLImageTexture( mask);
-		engine.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
+		other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 				0, 0, mask.getWidth(), mask.getHeight(), false);
-		engine.setTarget(0);
-
+		
 		// Clean up and Apply the surface to an image
 		params2 = new GLParameters(width, height);
 		params2.addParam( new GLParam1i("uCycle", c));
 		params2.texture = new GLImageTexture(img);
-		engine.applyPassProgram( ProgramType.PASS_BORDER, params2, null, false);
+		applyPassProgram( ProgramType.PASS_BORDER, params2, null, false);
 		
 		img.flush();
 	}
@@ -130,7 +131,7 @@ public class GLGraphics extends GraphicsContext{
 		params.addParam(new GLParameters.GLParam1i("uSize", size));
 		params.useBlendMode = false;
 		
-		engine.applyPassProgram(ProgramType.GRID, params, null,
+		applyPassProgram(ProgramType.GRID, params, null,
 				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false);
 	}
 	
@@ -194,6 +195,7 @@ public class GLGraphics extends GraphicsContext{
 	// ==== Line Drawing Methods
 	@Override
 	public void drawRect(int x, int y, int w, int h) {
+		reset();
 		int x_[] = new int[4];
 		int y_[] = new int[4];
 
@@ -213,6 +215,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void drawPolyLine(int[] xPoints, int[] yPoints, int count) {
+		reset();
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
@@ -220,6 +223,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
+		reset();
 		int x_[] = new int[2];
 		int y_[] = new int[2];
 		x_[0] = x1; x_[1] = x2;
@@ -233,6 +237,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void draw(Shape shape) {
+		reset();
 		FloatCompactor x_ = new FloatCompactor();
 		FloatCompactor y_ = new FloatCompactor();
 		
@@ -309,7 +314,7 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params = getImgParams();
 		params.texture = new GLParameters.GLImageTexture(img);
 
-		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
+		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, img.getWidth(), img.getHeight(), false);
 		params.texture = null;
 		
@@ -319,7 +324,7 @@ public class GLGraphics extends GraphicsContext{
 		GLParameters params =getImgParams();
 		params.texture = handle.accessGL();
 
-		engine.applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
+		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				0, 0, params.texture.getWidth(), params.texture.getHeight(), false);
 		params.texture = null;
 	}
@@ -372,4 +377,32 @@ public class GLGraphics extends GraphicsContext{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	// =========
+	// ===== Direct 
+	public void applyPassProgram(ProgramType type,GLParameters params, MatTrans trans, boolean internal)
+	{
+		reset();
+		engine.applyPassProgram(type, params, trans, internal);
+	}
+
+	public void applyPassProgram( ProgramType type, GLParameters params, MatTrans trans,
+			float x1, float y1, float x2, float y2, boolean internal)
+	{
+		reset();
+		engine.applyPassProgram(type, params, trans, x1, y1, x2, y2, internal);
+	}
+
+	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
+			int numPoints, GLParameters params, MatTrans trans) {
+		reset();
+		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans);
+	}
+	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
+			int numPoints, GLParameters params, MatTrans trans)  {
+		reset();
+		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans, gl);
+	}
+	
 }

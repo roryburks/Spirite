@@ -12,6 +12,7 @@ import com.jogamp.opengl.util.GLBuffers;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.awt.AWTContext;
 import spirite.base.graphics.gl.engine.GLEngine;
+import spirite.base.graphics.gl.engine.GLGraphics;
 import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLImage;
@@ -64,23 +65,25 @@ class GLStrokeEngine extends StrokeEngine {
 	protected void prepareDisplayLayer() {
 		GL2 gl = engine.getGL2();
 		
-		engine.setTarget(displayLayer);
-		engine.clearSurface(gl.getGL2());
+		GLGraphics glgc = displayLayer.getGraphics();
+//		engine.setTarget(displayLayer);
+		glgc.clear();
 		
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLImageTexture(fixedLayer);
-		engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
-		engine.setTarget(0);
+		glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+//		engine.setTarget(0);
 	}
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
 		if( gc instanceof AWTContext) {
 			GLImage img = new GLImage(w, h);
-			engine.setTarget(img);
-			engine.clearSurface(engine.getGL2());
+			GLGraphics glgc = img.getGraphics();
+			
+			glgc.clear();
 			GLParameters params = new GLParameters(w, h);
 			params.texture = new GLParameters.GLImageTexture(displayLayer);
-			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
 			
 			BufferedImage bi = PCUtil.glSurfaceToImage(
 					HybridHelper.BI_FORMAT, engine.getWidth(), engine.getHeight());
@@ -89,7 +92,7 @@ class GLStrokeEngine extends StrokeEngine {
 		}
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;
-			glgc.reset();
+//			glgc.reset();
 			
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
 			params.texture = new GLParameters.GLImageTexture(displayLayer);
@@ -99,7 +102,7 @@ class GLStrokeEngine extends StrokeEngine {
 			GLGraphics.setCompositeBlend(params, gc.getComposite());
 			
 			
-			engine.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 
+			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 
 					0, 0, w, h, true);
 		}
 	}

@@ -1,16 +1,13 @@
 package spirite.base.graphics.gl;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
-import com.jogamp.opengl.GL2;
-
 import spirite.base.brains.RenderEngine;
 import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
+import spirite.base.graphics.gl.engine.GLGraphics;
 import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLParameters.GLImageTexture;
@@ -20,8 +17,6 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
-import spirite.pc.PCUtil;
-import spirite.pc.graphics.ImageBI;;
 
 
 /**
@@ -51,7 +46,8 @@ public class GLDrawer extends GraphicsDrawer {
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
 
     	GLImage img = new GLImage( image.getWidth(), image.getHeight());
-    	GL2 gl = engine.getGL2();
+    	GLGraphics glgc = img.getGraphics();
+//    	GL2 gl = engine.getGL2();
     	
     	engine.setTarget(img);
     	
@@ -63,41 +59,34 @@ public class GLDrawer extends GraphicsDrawer {
 
     	params.texture = new GLImageTexture( image);
 
-    	engine.clearSurface(gl);
-    	engine.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false);
-		
-    	glSurfaceToImage(image);
-    	engine.setTarget(0);
+    	glgc.clear();
+    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false);
+
+    	GraphicsContext gc = image.getGraphics();
+    	gc.setComposite( Composite.SRC, 1.0f);
+    	gc.drawImage(img, 0, 0);
+    	
     	img.flush();
 	}
 
 	@Override
 	public void invert(RawImage image) {
-    	GL2 gl = engine.getGL2();
+    	//GL2 gl = engine.getGL2();
     	
     	GLImage img = new GLImage(image.getWidth(), image.getHeight());
-    	engine.setTarget(img);
+    	
+    	GLGraphics glgc = img.getGraphics();
 
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
     	params.texture = new GLImageTexture(image);
 
-    	engine.clearSurface(gl);
-    	engine.applyPassProgram( ProgramType.PASS_INVERT, params, null, false);
+    	glgc.clear();
+    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null, false);
 		
-    	glSurfaceToImage(image);
-    	engine.setTarget(0);
+    	GraphicsContext gc = image.getGraphics();
+    	gc.setComposite( Composite.SRC, 1.0f);
+    	gc.drawImage(img, 0, 0);
+    	
     	img.flush();
 	}
-	
-	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
-    private void glSurfaceToImage( RawImage raw) {
-    	//TODO: MARK
-    	BufferedImage bi = ((ImageBI)raw).img;
-        BufferedImage im = PCUtil.glSurfaceToImage(
-        		bi.getType(), engine.getWidth(), engine.getHeight());
-        
-		Graphics2D g = (Graphics2D)bi.getGraphics();
-		g.setComposite(AlphaComposite.Src);
-		g.drawImage(im, 0, 0, null);
-    }
 }
