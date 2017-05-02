@@ -1,7 +1,5 @@
 package spirite.base.graphics.gl.engine;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -12,20 +10,12 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.hackoeur.jglm.Mat4;
-import com.jogamp.opengl.DefaultGLCapabilitiesChooser;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.GLDrawableFactory;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLOffscreenAutoDrawable;
-import com.jogamp.opengl.GLProfile;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
+import spirite.base.graphics.gl.engine.GLCore.MGLException;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
 import spirite.base.util.glmath.GLC;
@@ -35,7 +25,7 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import sun.awt.image.IntegerInterleavedRaster;
+import spirite.pc.jogl.JOGLCore;
 
 /**
  * GLEngine is the root point for dealing with OpenGL through JOGL.  It handles
@@ -61,13 +51,9 @@ import sun.awt.image.IntegerInterleavedRaster;
  * @author Rory Burks
  */
 public class GLEngine  {
-	private final GLOffscreenAutoDrawable drawable;
-	int width = 1;
-	int height = 1;
-
 	private static GLEngine singly = null;
 	public static GLEngine getInstance() {
-		if( singly == null) MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, "Attempted to get GL Engine that hasn't been initialized.");
+		if( singly == null) singly = new GLEngine();
 		return singly;
 	}
 	
@@ -78,122 +64,19 @@ public class GLEngine  {
 		if( singly == null)
 			singly = new GLEngine();
 	}
-	public static class MGLException extends Exception {
-		public MGLException(String message) {
-			super(message);
-		}
-	}
 	
-	private GLEngine() throws MGLException {
-		System.out.println("GL Creation");
-		// Create Offscreen OpenGl Surface
-		GLProfile profile = GLProfile.getDefault();
-        GLDrawableFactory fact = GLDrawableFactory.getFactory(profile);
-		GLCapabilities caps = new GLCapabilities(profile);
-        caps.setHardwareAccelerated(true); 
-        caps.setDoubleBuffered(false); 
-        caps.setAlphaBits(8); 
-        caps.setRedBits(8); 
-        caps.setBlueBits(8); 
-        caps.setGreenBits(3); 
-        caps.setOnscreen(false);
-
-		drawable = fact.createOffscreenAutoDrawable(
-				fact.getDefaultDevice(), 
-				caps,
-				new DefaultGLCapabilitiesChooser(), 
-				1, 1);
-		
-		ex = null;
-		
-		// Debug
-		drawable.addGLEventListener( new GLEventListener() {
-			@Override public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {}
-			@Override public void dispose(GLAutoDrawable arg0) {
-				System.out.println("DISPOSE_ENGINE");
-			}
-			@Override public void display(GLAutoDrawable arg0) {}
-			@Override public void init(GLAutoDrawable gad) {
-				try {
-					GLEngine.this.init();
-				} catch (MGLException e) {
-					ex = e;
-				}
-				//GL gli = gad.getGL();
-				//gli = gli.getContext().setGL(  GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }) );
-			}
-		});	
-
-		drawable.display();
-		
-		if( ex != null) throw ex;
-	}
-	private static MGLException ex = null;
+	private GLEngine() {}
 	
 	// ============
 	// ==== Simple API
-	public GLContext getContext() {
-		return drawable.getContext();
-	}
-	
-	private GL2 currentGL;
 	public GL2 getGL2() {
-		if( currentGL == null) {
-			currentGL = drawable.getGL().getGL2();
-			drawable.getContext().makeCurrent();
-		}
-		
-		return currentGL;
+		return JOGLCore.getGL2();
 	}
 	public void setGL( GL2 gl) {
-		currentGL = gl;
+		JOGLCore.setGL(gl);
 	}
 
-	/** Writes the active GL Surface to a BufferedImage */
-	public BufferedImage glSurfaceToImage(int type) {
-		GL2 gl = getGL2();
-		BufferedImage bi = null;
-//		long time;
-		
-//		time = System.currentTimeMillis();
-		
-		switch( type) {
-		case BufferedImage.TYPE_INT_ARGB:
-		case BufferedImage.TYPE_INT_ARGB_PRE:
-		bi = new BufferedImage(width, height, type);
-		
-		IntegerInterleavedRaster iir = (IntegerInterleavedRaster)bi.getRaster();
-		IntBuffer ib = IntBuffer.wrap(iir.getDataStorage());
-		
-		gl.glReadPixels( 0, 0, width, height, 
-				GL2.GL_BGRA,
-				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
-				ib);
-		break;
-		default: 
-			return null;
-		}
-		
-		// Flip Vertically
-		if( true) {
-			final WritableRaster raster = bi.getRaster();
-			Object scanline1 = null;
-			Object scanline2 = null;
-			for( int i=0; i<bi.getHeight()/2; ++i) {
-				scanline1 = raster.getDataElements(0, i, bi.getWidth(), 1, scanline1);
-				scanline2 = raster.getDataElements(0, bi.getHeight()-i-1, bi.getWidth(), 1, scanline2);
-				raster.setDataElements(0, i, bi.getWidth(), 1, scanline2);
-				raster.setDataElements(0, bi.getHeight()-i-1, bi.getWidth(), 1, scanline1);
-			}
-		}
-//		time = System.currentTimeMillis();
-//		bi = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-//        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true);
-//        System.out.println("AWT: " + (System.currentTimeMillis()-time));
-        
-		return bi;
-		
-	}
+
 
     public static final FloatBuffer clearColor = FloatBuffer.wrap( new float[] {0f, 0f, 0f, 0f});
 	public void clearSurface(GL2 gl2) {
@@ -205,7 +88,11 @@ public class GLEngine  {
 	private int dbo = -1;
 	private int currentTarget = 0;
 	private int fbo = 0;
+	private int width = 1;
+	private int height = 1;
 	public int getTarget() {return currentTarget;}
+	public int getWidth() { return width;}
+	public int getHeight() {return height;}
 	public void setTarget( int tex) {
 		GL2 gl = getGL2();
 		if( currentTarget != tex) {
@@ -217,14 +104,14 @@ public class GLEngine  {
 			if( tex == 0) {
 		        gl.glBindFramebuffer( GLC.GL_FRAMEBUFFER, 0);
 				currentTarget = tex;
-				width = drawable.getSurfaceWidth();
-				height = drawable.getSurfaceHeight();
+				width = 1;
+				height = 1;
 			}
 			else {
 				int[] result = new int[1];
 				gl.glGenFramebuffers(1, result, 0);
 				fbo = result[0];
-				gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo);
+				gl.glBindFramebuffer(GLC.GL_FRAMEBUFFER, fbo);
 				
 				currentTarget = tex;
 				bindEmptyDB();
@@ -271,7 +158,7 @@ public class GLEngine  {
         case GLC.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
     		break;	
-        case GL.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
+        case GL2.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_FORMATS");
     		break;	
         case GL2.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
@@ -283,7 +170,7 @@ public class GLEngine  {
         case GLC.GL_FRAMEBUFFER_UNSUPPORTED:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_UNSUPPORTED");
     		break;	
-        case GL.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
+        case GL2.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
     		break;	
         case GL2.GL_FRAMEBUFFER_UNDEFINED :
@@ -332,20 +219,20 @@ public class GLEngine  {
 		case PASS_BASIC:
 		case GRID:
 		case PASS_ESCALATE:
-	        gl.glEnable(GL.GL_BLEND);
-	        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
-	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
+	        gl.glEnable(GLC.GL_BLEND);
+	        gl.glBlendFunc(GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA);
+	        gl.glBlendEquation(GLC.GL_FUNC_ADD);
 	        break;
 		case CHANGE_COLOR:
 		case PASS_INVERT:
 		case SQARE_GRADIENT:
 		case STROKE_SPORE:
-	        gl.glEnable(GL.GL_BLEND);
+	        gl.glEnable(GLC.GL_BLEND);
 	        gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE);
 	        gl.glBlendEquation(GL2.GL_MAX);
 	        break;
 		case PASS_BORDER:
-	        gl.glEnable(GL.GL_BLEND);
+	        gl.glEnable(GLC.GL_BLEND);
 	        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	        gl.glBlendEquation(GL2.GL_FUNC_ADD);
         
@@ -559,6 +446,8 @@ public class GLEngine  {
 	private void _doCompliexLineProg( PreparedData pd, int count, CapMethod cap, 
 			JoinMethod join, float width, GLParameters params, MatTrans trans)
 	{
+		GL2 gl = getGL2();
+		
 		// TODO: implement Rounded joins and all cap methods
 		int uJoin = 0;
 		switch( join) {
@@ -567,18 +456,18 @@ public class GLEngine  {
 			case ROUNDED:break;
 		}
 
-		currentGL.glEnable(GL2.GL_MULTISAMPLE );
+		gl.glEnable(GL2.GL_MULTISAMPLE );
 		params.addInternalParam(new GLParameters.GLParam1i("uJoin",uJoin));
 		params.addInternalParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
 		applyProgram( ProgramType.LINE_RENDER, params, pd, GL3.GL_LINE_STRIP_ADJACENCY, count);
-		currentGL.glDisable(GL2.GL_MULTISAMPLE );
+		gl.glDisable(GL2.GL_MULTISAMPLE );
         params.clearInternalParams();
 	}
 
 	public enum PolyType {
-		STRIP(GL.GL_TRIANGLE_STRIP), 
-		FAN(GL.GL_TRIANGLE_FAN), 
-		LIST(GL.GL_TRIANGLES);
+		STRIP(GLC.GL_TRIANGLE_STRIP), 
+		FAN(GLC.GL_TRIANGLE_FAN), 
+		LIST(GLC.GL_TRIANGLES);
 		
 		public final int glConst;
 		PolyType( int glc) {this.glConst = glc;}
@@ -652,38 +541,39 @@ public class GLEngine  {
 	 * the basic xyuv texture construction.*/
 	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd, int primFormat, int primCount) 
 	{
+		GL2 gl = getGL2();
 		
 		int w = params.width;
 		int h = params.height;
 		
 		int prog = getProgram(type);
-		currentGL.getGL2().glViewport(0, 0, w, h);
+		gl.getGL2().glViewport(0, 0, w, h);
 		
 
         
-        currentGL.glUseProgram(prog);
+        gl.glUseProgram(prog);
         
         // Bind Attribute Streams
         pd.init();
 
         // Bind Texture
         if( params.texture != null) {
-        	currentGL.glActiveTexture(GL.GL_TEXTURE0);
+        	gl.glActiveTexture(GLC.GL_TEXTURE0);
 
-            currentGL.glBindTexture(GL2.GL_TEXTURE_2D, params.texture.load());
-    		currentGL.glEnable(GL2.GL_TEXTURE_2D);
-    		currentGL.glUniform1i(currentGL.glGetUniformLocation(prog, "myTexture"), 0);
+            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture.load());
+    		gl.glEnable(GLC.GL_TEXTURE_2D);
+    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
         if( params.texture2 != null) {
-        	currentGL.glActiveTexture(GL.GL_TEXTURE1);
-            currentGL.glBindTexture(GL2.GL_TEXTURE_2D, params.texture2.load());
-    		currentGL.glEnable(GL2.GL_TEXTURE_2D);
-    		currentGL.glUniform1i(currentGL.glGetUniformLocation(prog, "myTexture2"), 1);
+        	gl.glActiveTexture(GLC.GL_TEXTURE1);
+            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture2.load());
+    		gl.glEnable(GLC.GL_TEXTURE_2D);
+    		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
 
 		// Bind Uniform
         if( params != null)
-        	params.apply(currentGL, prog);
+        	params.apply(gl, prog);
         
         // Set Blend Mode
         if( params.useBlendMode) {
@@ -691,20 +581,20 @@ public class GLEngine  {
 	        	setDefaultBlendMode(type);
 	        }
 	        else {
-		        currentGL.glEnable(GL.GL_BLEND);
-		        currentGL.glBlendFuncSeparate(
+		        gl.glEnable(GLC.GL_BLEND);
+		        gl.glBlendFuncSeparate(
 		        		params.bm_sfc, params.bm_dfc, params.bm_sfa, params.bm_dfa);
-		        currentGL.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
+		        gl.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
 	        }
         }
 
 		// Start Draw
-		currentGL.glDrawArrays( primFormat, 0, primCount);
-        currentGL.glDisable( GL.GL_BLEND);
+		gl.glDrawArrays( primFormat, 0, primCount);
+        gl.glDisable( GLC.GL_BLEND);
 		
 		// Finished Drawing
-		currentGL.glDisable(GL2.GL_TEXTURE_2D);
-        currentGL.glUseProgram(0);
+		gl.glDisable(GLC.GL_TEXTURE_2D);
+        gl.glUseProgram(0);
         pd.deinit();
         if( params.texture != null)
         	params.texture.unload();
@@ -795,9 +685,11 @@ public class GLEngine  {
 		/** Frees the VBO from GLMemory*/
 		public void free() {
 			if( !_free) {
+				GL2 gl = getGL2();
+				
 				_free = true;
-				currentGL.glDeleteVertexArrays(1, vao);
-				currentGL.glDeleteBuffers(1, positionBufferObject);
+				gl.glDeleteVertexArrays(1, vao);
+				gl.glDeleteBuffers(1, positionBufferObject);
 
 				c_data.remove(this);
 			}
@@ -805,16 +697,17 @@ public class GLEngine  {
 		
 		/** Binds the described buffer to the active rendering. */
 		public void init() {
-			currentGL.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
+			GL2 gl = getGL2();
+			gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, positionBufferObject.get(0));
 	        
 	        int totalLength = 0;
 	        for( int i=0; i < lengths.length; ++i) {
-	        	currentGL.glEnableVertexAttribArray(i);
+	        	gl.glEnableVertexAttribArray(i);
 		        totalLength += lengths[i];
 	        }
 	        int offset = 0;
 	        for( int i=0; i < lengths.length; ++i) {
-	        	currentGL.glVertexAttribPointer(i, lengths[i], GL2.GL_FLOAT, false, 4*totalLength, 4*offset);
+	        	gl.glVertexAttribPointer(i, lengths[i], GL2.GL_FLOAT, false, 4*totalLength, 4*offset);
 		        offset += lengths[i];
 	        }
 
@@ -822,7 +715,7 @@ public class GLEngine  {
 		/** Unbind the Vertex Attribute Arrays*/
 		public void deinit() {
 	        for( int i=0; i < lengths.length; ++i) 
-	        	currentGL.glDisableVertexAttribArray(i);
+	        	getGL2().glDisableVertexAttribArray(i);
 		}
 		
 		private int[] lengths;
@@ -831,21 +724,22 @@ public class GLEngine  {
 		private IntBuffer vao = IntBuffer.allocate(1);
 	}
 	public PreparedData prepareRawData( float raw[], int[] lengths) {
+		GL2 gl = getGL2();
 		PreparedData pd = new PreparedData();
 		
 		FloatBuffer vertexBuffer = FloatBuffer.wrap(raw);
 
-		currentGL.glGenBuffers(1, pd.positionBufferObject);
-		currentGL.glBindBuffer( GLC.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
-		currentGL.glBufferData(
+		gl.glGenBuffers(1, pd.positionBufferObject);
+		gl.glBindBuffer( GLC.GL_ARRAY_BUFFER, pd.positionBufferObject.get(0));
+		gl.glBufferData(
 	    		GLC.GL_ARRAY_BUFFER, 
 	    		vertexBuffer.capacity()*Float.BYTES, 
 	    		vertexBuffer, 
 	    		GLC.GL_STREAM_DRAW);
-		currentGL.glBindBuffer(GLC.GL_ARRAY_BUFFER, 0);
+		gl.glBindBuffer(GLC.GL_ARRAY_BUFFER, 0);
 
-		currentGL.glGenVertexArrays(1, pd.vao);
-		currentGL.glBindVertexArray(pd.vao.get(0));
+		gl.glGenVertexArrays(1, pd.vao);
+		gl.glBindVertexArray(pd.vao.get(0));
 		
 //		System.out.println("pd.vao:" + pd.vao.get(0) + "::: pd.PBO" + pd.positionBufferObject);
 		
@@ -859,89 +753,82 @@ public class GLEngine  {
 	
 	// ==============
 	// ==== Initialization
-	private void init() throws MGLException {
+	public void init(GL2 gl) throws MGLException {
 		// !!! NOTE: It's important that you don't use GLEngine.getGL2() in 
 		//	initialization since it might cause it to try and switch the offscreen
 		//	drawable to the current context during the initialization of that drawable
 		//	creating a locking conflict
-		GL2 gl = drawable.getGL().getGL2();
 		
         // Create a (nearly) empty depth-buffer as a placeholder
 		int[] result = new int[1];
         gl.glGenRenderbuffers( 1, result, 0);
         dbo = result[0];
         
-		initShaders();
+		initShaders(gl);
 	}
 	
-	private void initShaders() throws MGLException {
-        programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources(
+	private void initShaders(GL2 gl) throws MGLException {
+        programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources( gl,
 				"shaders/basic.vert", 
 				null, 
 				"shaders/square_grad.frag");
-        programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources(
+        programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources( gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/square_grad.frag");
-        programs[ProgramType.STROKE_BASIC.ordinal()] = loadProgramFromResources(
+        programs[ProgramType.STROKE_BASIC.ordinal()] = loadProgramFromResources( gl,
 				"shaders/brushes/stroke_basic.vert", 
 				"shaders/brushes/stroke_basic.geom", 
 				"shaders/brushes/stroke_basic.frag");
-        programs[ProgramType.CHANGE_COLOR.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.CHANGE_COLOR.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_change_color.frag");
-        programs[ProgramType.PASS_BORDER.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_BORDER.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_border.frag");
-        programs[ProgramType.PASS_INVERT.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_INVERT.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_invert.frag");
-        programs[ProgramType.PASS_RENDER.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_RENDER.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_render.frag");
-        programs[ProgramType.PASS_ESCALATE.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_ESCALATE.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_escalate.frag");
-        programs[ProgramType.STROKE_SPORE.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.STROKE_SPORE.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/brushes/brush_spore.vert", 
 				"shaders/brushes/brush_spore.geom", 
 				"shaders/brushes/brush_spore.frag");
-        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/pass_basic.frag");
-        programs[ProgramType.GRID.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.GRID.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 
 				"shaders/etc/pass_grid.frag");
-        programs[ProgramType.STROKE_PIXEL.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.STROKE_PIXEL.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/brushes/stroke_pixel.vert", 
 				null, 
 				"shaders/brushes/stroke_pixel.frag");
-        programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/shapes/poly_render.vert", 
 				null, 
 				"shaders/shapes/shape_render.frag");
-        programs[ProgramType.LINE_RENDER.ordinal()] = loadProgramFromResources( 
+        programs[ProgramType.LINE_RENDER.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/shapes/line_render.vert", 
 				"shaders/shapes/line_render.geom", 
 				"shaders/shapes/shape_render.frag");
 	}
 	
-	private int loadProgramFromResources( String vert, String geom, String frag) 
+	private int loadProgramFromResources( GL2 gl, String vert, String geom, String frag) 
 			throws MGLException
 	{
-		// !!! NOTE: It's important that you don't use GLEngine.getGL2() in 
-		//	initialization since it might cause it to try and switch the offscreen
-		//	drawable to the current context during the initialization of that drawable
-		//	creating a locking conflict
-		GL2 gl = drawable.getGL().getGL2();
-
         ArrayList<Integer> shaderList = new ArrayList<>();
         
         if( vert != null) {

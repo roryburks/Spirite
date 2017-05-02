@@ -20,6 +20,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
+import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;;
 
 
@@ -67,6 +68,7 @@ public class GLDrawer extends GraphicsDrawer {
 		
     	glSurfaceToImage(image);
     	engine.setTarget(0);
+    	img.flush();
 	}
 
 	@Override
@@ -84,13 +86,15 @@ public class GLDrawer extends GraphicsDrawer {
 		
     	glSurfaceToImage(image);
     	engine.setTarget(0);
+    	img.flush();
 	}
 	
 	/** Puts the active GL RenderingSurface onto an existing BufferedImage. */
     private void glSurfaceToImage( RawImage raw) {
     	//TODO: MARK
     	BufferedImage bi = ((ImageBI)raw).img;
-        BufferedImage im = engine.glSurfaceToImage(bi.getType());
+        BufferedImage im = PCUtil.glSurfaceToImage(
+        		bi.getType(), engine.getWidth(), engine.getHeight());
         
 		Graphics2D g = (Graphics2D)bi.getGraphics();
 		g.setComposite(AlphaComposite.Src);

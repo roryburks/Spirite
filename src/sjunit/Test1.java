@@ -197,36 +197,51 @@ public class Test1 {
 			}
 		});
 	}
+	
 	public void tuei() {
-		ImageWorkspace workspace = new ImageWorkspace(master);
-		master.addWorkpace(workspace, false);
-		Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0))).getLayer();
-		workspace.finishBuilding();
-		
-		UndoEngine engine = workspace.getUndoEngine();
-		
-		assert engine.getQueuePosition() == 0;
-		
-		Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", Colors.toColor(0,0,0,0))).getLayer();
-		
-		
+		int ROUNDS_TO_TEST = 10;
+		int ACTIONS = 12;
+		int PRE = 7;
+		for( int i=0; i < ROUNDS_TO_TEST; ++i) {
+			ImageWorkspace workspace = new ImageWorkspace(master);
+			master.addWorkpace(workspace, false);
+			Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0))).getLayer();
+			workspace.finishBuilding();
+			
+			UndoEngine engine = workspace.getUndoEngine();
+			
+			assert engine.getQueuePosition() == 0;
+			
+			Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", Colors.toColor(0,0,0,0))).getLayer();
+			
+	
+			for( int j=0; j < PRE; ++j)
+				performRandomUndoableAction(workspace);
+	
+			RenderSettings settings = new RenderSettings(
+					master.getRenderEngine().getDefaultRenderTarget(workspace));
+			BufferedImage img = ((ImageBI)master.getRenderEngine().renderImage(settings)).img;
+			BufferedImage img2 = deepCopy(img);
+			
+			for( int j=0; j < ACTIONS; ++j)
+				performRandomUndoableAction(workspace);
+	
+	//		Layer layer3 = ((LayerNode)workspace.addNewSimpleLayer(null, 900, 900, "three", Colors.toColor(0,0,0,0))).getLayer();
+	
+			for( int j=0; j < ACTIONS; ++j)
+				engine.undo();
+			
+			assert compareImages( img2, ((ImageBI)master.getRenderEngine().renderImage(settings)).img);
+			
 
-		RenderSettings settings = new RenderSettings(
-				master.getRenderEngine().getDefaultRenderTarget(workspace));
-		BufferedImage img = ((ImageBI)master.getRenderEngine().renderImage(settings)).img;
-		BufferedImage img2 = deepCopy(img);
-		
-
-		Layer layer3 = ((LayerNode)workspace.addNewSimpleLayer(null, 900, 900, "three", Colors.toColor(0,0,0,0))).getLayer();
-		
-		engine.undo();
-		
-		assert compareImages( img2, ((ImageBI)master.getRenderEngine().renderImage(settings)).img);
+			for( int j=0; j < PRE; ++j)
+				engine.undo();
+		}
 	}
 
 	Random rn = new Random(System.nanoTime());
 	public void performRandomUndoableAction(ImageWorkspace workspace) {
-		int random = rn.nextInt(5);
+		int random = rn.nextInt(8);
 		switch(random) {
 		case 0:
 			// Add layer
@@ -237,7 +252,7 @@ public class Test1 {
 			break;
 		case 1:
 			// Add Group
-//			workspace.addGroupNode(getRandomNode(workspace), Float.toHexString(rn.nextFloat()));
+			workspace.addGroupNode(getRandomNode(workspace), Float.toHexString(rn.nextFloat()));
 			break;
 		case 2:
 		case 3:
@@ -266,16 +281,35 @@ public class Test1 {
 			workspace.getUndoEngine().storeAction(action);
 			break;
 		case 4:
+			// Crop node
 			LayerNode node = randomLayerNode(workspace);
 			if( node == null) break;
 			
 			workspace.cropNode(node, new Rect( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)), false);
 			break;
+		case 5:
+			// Change Color
+			workspace.setSelectedNode(randomLayerNode(workspace));
+			workspace.getDrawEngine().changeColor(lastColor.getRGB(), randomColor().getRGB(), rn.nextInt(3), rn.nextInt(3));
+			break;
+		case 6:
+			// Invert
+			workspace.setSelectedNode(randomLayerNode(workspace));
+			workspace.getDrawEngine().invert(workspace.buildActiveData());
+			break;
+		case 7:
+			// Flip
+			workspace.setSelectedNode(randomLayerNode(workspace));
+			workspace.getDrawEngine().flip(workspace.buildActiveData(), rn.nextBoolean());
+			break;
+			
 		}
 	}
 	
+	Color lastColor = Color.BLACK;
 	public Color randomColor() {
-		return new Color(rn.nextInt(255),rn.nextInt(255),rn.nextInt(255));
+		lastColor = new Color(rn.nextInt(255),rn.nextInt(255),rn.nextInt(255));
+		return lastColor;
 	}
 	
 	public Node getRandomNode( ImageWorkspace workspace) {
@@ -326,9 +360,10 @@ public class Test1 {
 			
 			master.closeWorkspace(workspace, false);
 
-//			if( master.getCacheManager().getCacheSize() > 30000) {
-	//			fail( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
-		//	}
+			if( master.getCacheManager().getCacheSize() > 3000000) {
+				System.out.println( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
+				fail( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
+			}
 		}
 	}
 }

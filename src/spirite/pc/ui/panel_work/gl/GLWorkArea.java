@@ -37,6 +37,7 @@ import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
+import spirite.pc.jogl.JOGLCore;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;
@@ -179,7 +180,7 @@ public class GLWorkArea
 
 	@Override
 	public void init(GLAutoDrawable glad) {
-		GLContext cont = engine.getContext();
+		GLContext cont = JOGLCore.getContext();
 
 		// Disassociate default context and assosciate the context from teh GLEngine
 		//	(so they can share resources)

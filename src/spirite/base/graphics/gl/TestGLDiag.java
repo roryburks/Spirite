@@ -22,6 +22,7 @@ import com.jogamp.opengl.util.GLBuffers;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
 import spirite.base.graphics.gl.engine.GLParameters;
+import spirite.pc.jogl.JOGLCore;
 
 public class TestGLDiag extends JDialog  {
 
@@ -49,7 +50,7 @@ public class TestGLDiag extends JDialog  {
 			public void init(GLAutoDrawable glad) {
 				SwingUtilities.invokeLater( new Runnable() { @Override public void run() {
 					if( !init) {
-						glad.setContext(glad.createContext(GLEngine.getInstance().getContext()), true);
+						glad.setContext(glad.createContext(JOGLCore.getContext()), true);
 						init = true;
 						System.out.println("INIT");
 						glcanvas.repaint();

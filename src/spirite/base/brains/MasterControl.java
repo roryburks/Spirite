@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import com.jogamp.opengl.GL2;
+
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.file.LoadEngine;
@@ -19,6 +21,7 @@ import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.engine.GLCache;
 import spirite.base.graphics.gl.engine.GLEngine;
+import spirite.base.graphics.gl.engine.GLCore.MGLException;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -43,6 +46,8 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.Dialogs;
+import spirite.pc.jogl.JOGLCore;
+import spirite.pc.jogl.JOGLCore.OnGLLoadObserver;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -150,7 +155,15 @@ public class MasterControl
     /** Attempts to initialize OpenGL*/
     boolean initGL() {
     	try {
-    		GLEngine.initialize();
+    		GLEngine engine = GLEngine.getInstance();
+    		JOGLCore.init(new OnGLLoadObserver() {
+				@Override
+				public void onLoad(GL2 gl) throws MGLException {
+					engine.init(gl);
+				}
+			});
+//    		GLCore.in
+//    		GLEngine.initialize();
     		glcache = new GLCache(this);
     		
     		// TODO: Kind of bad

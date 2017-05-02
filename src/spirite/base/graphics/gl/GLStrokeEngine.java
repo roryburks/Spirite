@@ -20,7 +20,9 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
 import spirite.base.util.MatrixBuilder;
+import spirite.base.util.glmath.GLC;
 import spirite.hybrid.HybridHelper;
+import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
 
 /**
@@ -80,7 +82,8 @@ class GLStrokeEngine extends StrokeEngine {
 			params.texture = new GLParameters.GLImageTexture(displayLayer);
 			engine.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
 			
-			BufferedImage bi = engine.glSurfaceToImage(HybridHelper.BI_FORMAT);
+			BufferedImage bi = PCUtil.glSurfaceToImage(
+					HybridHelper.BI_FORMAT, engine.getWidth(), engine.getHeight());
 			gc.drawImage( new ImageBI(bi), 0, 0);
 			engine.setTarget(0);
 		}
@@ -276,15 +279,13 @@ class GLStrokeEngine extends StrokeEngine {
         
 
         gl.glEnable(GL2.GL_MULTISAMPLE);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glEnable(GLC.GL_BLEND);
+        gl.glBlendFunc(GLC.GL_SRC_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA);
         gl.glBlendEquation(GL2.GL_MAX);
 
     	gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
-        
 
-
-        gl.glDisable( GL.GL_BLEND);
+        gl.glDisable( GLC.GL_BLEND);
         gl.glDisable(GL2.GL_MULTISAMPLE);
         gl.glUseProgram(0);
 
