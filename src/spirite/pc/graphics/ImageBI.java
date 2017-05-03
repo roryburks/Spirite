@@ -53,4 +53,10 @@ public class ImageBI extends RawImage {
 		return img.getRGB(x, y);
 	}
 
+
+	@Override
+	public boolean isGLOriented() {
+		return false;
+	}
+
 }

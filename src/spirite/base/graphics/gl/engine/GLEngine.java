@@ -260,10 +260,9 @@ public class GLEngine  {
 	void applyPassProgram(
 			ProgramType type,
 			GLParameters params, 
-			MatTrans trans, 
-			boolean internal)
+			MatTrans trans)
 	{
-		applyPassProgram( type, params, trans, 0, 0, params.width, params.height, internal);
+		applyPassProgram( type, params, trans, 0, 0, params.width, params.height);
 	}
 
 	/**
@@ -288,17 +287,18 @@ public class GLEngine  {
 			ProgramType type, 
 			GLParameters params, 
 			MatTrans trans,
-			float x1, float y1, float x2, float y2,
-			boolean internal)
+			float x1, float y1, float x2, float y2)
 	{
 		addOrtho(params, trans);
+		
+		boolean internal = (params.texture == null) ? false : !params.texture.isGLOriented();
 
 		PreparedData pd = prepareRawData(new float[]{
 			// x  y   u   v
-			x1, y1, 0.0f, (internal)?1.0f:0.0f,
-			x2, y1, 1.0f, (internal)?1.0f:0.0f,
-			x1, y2, 0.0f, (internal)?0.0f:1.0f,
-			x2, y2, 1.0f, (internal)?0.0f:1.0f,
+			x1, y1, 0.0f, (internal)?0.0f:1.0f,
+			x2, y1, 1.0f, (internal)?0.0f:1.0f,
+			x1, y2, 0.0f, (internal)?1.0f:0.0f,
+			x2, y2, 1.0f, (internal)?1.0f:0.0f,
 		}, new int[]{2,2});
         applyProgram( type, params, pd, GL2.GL_TRIANGLE_STRIP, 4);
         pd.free();
@@ -607,7 +607,7 @@ public class GLEngine  {
 	
 	// ==================
 	// ==== Texture Preperation
-	public class PreparedTexture{
+/*	public class PreparedTexture{
 		private IntBuffer tex = IntBuffer.allocate(1);
 		final int w, h;
 		
@@ -633,41 +633,27 @@ public class GLEngine  {
 				c_texes.remove(this);
 			}
 		}
-	}
-	public PreparedTexture prepareTexture( RawImage image) {
+	}*/
+	public GLImage prepareTexture( RawImage image) {
+		if( image instanceof GLImage) 
+			return (GLImage) image;
+		
 		int w = image.getWidth();
 		int h = image.getHeight();
 		GL2 gl = getGL2();
-		PreparedTexture pt = new PreparedTexture(w, h);
-
-		pt.tex = IntBuffer.allocate(1);
-        gl.glGenTextures(1, pt.tex);
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, pt.tex.get(0));
+		
+		int result[] = new int[1];
+        gl.glGenTextures(1, result, 0);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, result[0]);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
 		
 		HybridHelper.loadImageIntoGL( image, gl);
-
 		
-/*		__ts[met] = System.currentTimeMillis();
-		__dims[met] = w*h;
-		
-		long tdim = 0;
-		for( int i=0; i < TRACK_PREC; ++i) tdim += __dims[i];
-		System.out.println( 1000 * tdim / (double)(__ts[met] - __ts[(met+1)%TRACK_PREC]));
-		System.out.println( 1000 * 30 / (double)(__ts[met] - __ts[(met+1)%TRACK_PREC]));
-		met = (met+1)%TRACK_PREC;*/
-
-		c_texes.add(pt);
-		
-		return pt;
+		return new GLImage( result[0], w, h);
 	}
-//	private static final int TRACK_PREC = 30;
-//	private long __ts[] = new long[TRACK_PREC];
-//	private int __dims[] = new int[TRACK_PREC];
-//	private int met = 0;
 	
 	// =================
 	// ==== Data Buffer Preperation
@@ -678,10 +664,6 @@ public class GLEngine  {
 			free();
 			super.finalize();
 		}
-		
-/*		public int getBuffer() {
-			return positionBufferObject.get(0);
-		}*/
 		
 		/** Frees the VBO from GLMemory*/
 		public void free() {
@@ -741,8 +723,6 @@ public class GLEngine  {
 
 		gl.glGenVertexArrays(1, pd.vao);
 		gl.glBindVertexArray(pd.vao.get(0));
-		
-//		System.out.println("pd.vao:" + pd.vao.get(0) + "::: pd.PBO" + pd.positionBufferObject);
 		
 		pd.lengths = lengths;
 		
@@ -964,7 +944,6 @@ public class GLEngine  {
 	// =========
 	// ==== Resource Tracking
 	final List<GLImage> c_img = new ArrayList<>();
-	final List<PreparedTexture> c_texes = new ArrayList<>();
 	final List<PreparedData> c_data = new ArrayList<>();
 	
 	public String dispResourcesUsed() {
@@ -974,13 +953,9 @@ public class GLEngine  {
 //		getGL2().glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, ib);
 //		str += ib.get(0) + "\n";
 		
-		str += "FBOs: \n";
+		str += "Textures: \n";
 		for( int i=0; i < c_img.size(); ++i) {
 			str += i + "["+c_img.get(i).getTexID() +"] : (" + c_img.get(i).getWidth() + "," + c_img.get(i).getHeight() + ")\n";
-		}
-		str += "Textures: \n";
-		for( int i=0; i < c_texes.size(); ++i) {
-			str += i + "[" + c_texes.get(i).getTexID()+ "] : (" + c_texes.get(i).w + "," + c_texes.get(i).h + ")\n";
 		}
 		str += "VBOs: \n";
 		for( int i=0; i < c_data.size(); ++i) {

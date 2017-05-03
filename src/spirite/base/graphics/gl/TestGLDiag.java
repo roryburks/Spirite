@@ -84,7 +84,7 @@ public class TestGLDiag extends JDialog  {
 		        params.addParam( new GLParameters.GLParam1i("varCol", met));
 
 		        GLGraphics glgc = new GLGraphics(w, h, false);
-	        	glgc.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null, true);
+	        	glgc.applyPassProgram(ProgramType.SQARE_GRADIENT, params, null);
 				engine.setGL(null);
 			}
 		});

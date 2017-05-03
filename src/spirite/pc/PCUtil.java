@@ -33,22 +33,19 @@ public class PCUtil {
 	public static BufferedImage glSurfaceToImage(int type, int width, int height) {
 		GL2 gl = JOGLCore.getGL2();
 		BufferedImage bi = null;
-//		long time;
-		
-//		time = System.currentTimeMillis();
 		
 		switch( type) {
 		case BufferedImage.TYPE_INT_ARGB:
 		case BufferedImage.TYPE_INT_ARGB_PRE:
-		bi = new BufferedImage(width, height, type);
-		
-		IntegerInterleavedRaster iir = (IntegerInterleavedRaster)bi.getRaster();
-		IntBuffer ib = IntBuffer.wrap(iir.getDataStorage());
-		
-		gl.glReadPixels( 0, 0, width, height, 
-				GL2.GL_BGRA,
-				GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
-				ib);
+			bi = new BufferedImage(width, height, type);
+			
+			IntegerInterleavedRaster iir = (IntegerInterleavedRaster)bi.getRaster();
+			IntBuffer ib = IntBuffer.wrap(iir.getDataStorage());
+			
+			gl.glReadPixels( 0, 0, width, height, 
+					GL2.GL_BGRA,
+					GL2.GL_UNSIGNED_INT_8_8_8_8_REV,
+					ib);
 		break;
 		default: 
 			return null;
@@ -66,10 +63,6 @@ public class PCUtil {
 				raster.setDataElements(0, bi.getHeight()-i-1, bi.getWidth(), 1, scanline1);
 			}
 		}
-//		time = System.currentTimeMillis();
-//		bi = new AWTGLReadBufferUtil(drawable.getGLProfile(), true)
-//        		.readPixelsToBufferedImage( getGL2(), 0, 0, width, height, true);
-//        System.out.println("AWT: " + (System.currentTimeMillis()-time));
         
 		return bi;
 		

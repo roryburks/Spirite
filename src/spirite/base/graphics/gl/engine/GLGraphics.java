@@ -94,18 +94,18 @@ public class GLGraphics extends GraphicsContext{
 		
 		GLGraphics other = img.getGraphics();
 		other.clear();
-//		engine.setTarget(img);
-//		engine.clearSurface(gl);
+		
 		GLParameters params2 = new GLParameters(width, height);
 		params2.texture = new GLImageTexture( mask);
 		other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
-				0, 0, mask.getWidth(), mask.getHeight(), false);
+				0, 0, mask.getWidth(), mask.getHeight());
 		
 		// Clean up and Apply the surface to an image
 		params2 = new GLParameters(width, height);
 		params2.addParam( new GLParam1i("uCycle", c));
 		params2.texture = new GLImageTexture(img);
-		applyPassProgram( ProgramType.PASS_BORDER, params2, null, false);
+		params2.flip = flip;
+		applyPassProgram( ProgramType.PASS_BORDER, params2, null);
 		
 		img.flush();
 	}
@@ -132,7 +132,7 @@ public class GLGraphics extends GraphicsContext{
 		params.useBlendMode = false;
 		
 		applyPassProgram(ProgramType.GRID, params, null,
-				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height, false);
+				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height);
 	}
 	
 	@Override
@@ -275,6 +275,7 @@ public class GLGraphics extends GraphicsContext{
 	// ==== Fill Methods
 	@Override
 	public void fillRect(int x, int y, int w, int h) {
+		reset();
 		int x_[] = new int[4];
 		int y_[] = new int[4];
 
@@ -290,6 +291,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	@Override
 	public void fillOval(int x, int y, int w, int h) {
+		reset();
 
 		FloatCompactor x_ = new FloatCompactor();
 		FloatCompactor y_ = new FloatCompactor();
@@ -315,7 +317,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = new GLParameters.GLImageTexture(img);
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, img.getWidth(), img.getHeight(), false);
+				0, 0, img.getWidth(), img.getHeight());
 		params.texture = null;
 		
 	}
@@ -325,7 +327,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = handle.accessGL();
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, params.texture.getWidth(), params.texture.getHeight(), false);
+				0, 0, params.texture.getWidth(), params.texture.getHeight());
 		params.texture = null;
 	}
 	
@@ -381,17 +383,17 @@ public class GLGraphics extends GraphicsContext{
 	
 	// =========
 	// ===== Direct 
-	public void applyPassProgram(ProgramType type,GLParameters params, MatTrans trans, boolean internal)
+	public void applyPassProgram(ProgramType type,GLParameters params, MatTrans trans)
 	{
 		reset();
-		engine.applyPassProgram(type, params, trans, internal);
+		engine.applyPassProgram(type, params, trans);
 	}
 
 	public void applyPassProgram( ProgramType type, GLParameters params, MatTrans trans,
-			float x1, float y1, float x2, float y2, boolean internal)
+			float x1, float y1, float x2, float y2)
 	{
 		reset();
-		engine.applyPassProgram(type, params, trans, x1, y1, x2, y2, internal);
+		engine.applyPassProgram(type, params, trans, x1, y1, x2, y2);
 	}
 
 	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 

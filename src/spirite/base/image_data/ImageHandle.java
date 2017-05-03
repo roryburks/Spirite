@@ -4,6 +4,8 @@ package spirite.base.image_data;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLCache;
+import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
@@ -70,6 +72,11 @@ public class ImageHandle {
 	/** Accesses a potentially-cached GLTexture representing the current ImageHandle*/
 	public GLTexture accessGL() {
 		if( context == null) return null;
+		
+		RawImage image = deepAccess();
+		if( image instanceof GLImage)
+			return new GLParameters.GLImageTexture(image);
+		
 		GLCache cache = context.getGLCache();
 		if( cache == null) return null;
 		return cache.new GLHandleTexture(this);

@@ -71,7 +71,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLImageTexture(fixedLayer);
-		glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+		glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
 //		engine.setTarget(0);
 	}
 	@Override
@@ -83,7 +83,7 @@ class GLStrokeEngine extends StrokeEngine {
 			glgc.clear();
 			GLParameters params = new GLParameters(w, h);
 			params.texture = new GLParameters.GLImageTexture(displayLayer);
-			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null, true);
+			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
 			
 			BufferedImage bi = PCUtil.glSurfaceToImage(
 					HybridHelper.BI_FORMAT, engine.getWidth(), engine.getHeight());
@@ -103,7 +103,7 @@ class GLStrokeEngine extends StrokeEngine {
 			
 			
 			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 
-					0, 0, w, h, true);
+					0, 0, w, h);
 		}
 	}
 	

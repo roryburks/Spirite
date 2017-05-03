@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.graphics.gl.engine.GLEngine.PreparedTexture;
 import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
@@ -34,10 +33,10 @@ public class GLCache implements MImageObserver {
 	
 	private class CachedTexture {
 		long lastUsed;
-		final PreparedTexture tex;
+		final GLImage tex;
 		boolean locked = false;
 		
-		CachedTexture( PreparedTexture tex) {
+		CachedTexture( GLImage tex) {
 			this.tex = tex;
 //			lastUsed = System.currentTimeMillis();	// Should be called regardless
 		}
@@ -64,7 +63,7 @@ public class GLCache implements MImageObserver {
 			ctex = new CachedTexture(
 					getEngine().prepareTexture( handle.deepAccess()));
 			
-			cacheSize += ctex.tex.w*ctex.tex.h*4;
+			cacheSize += ctex.tex.getByteSize();
 			
 			if( cacheSize > MAX_CACHE) {
 				ArrayList<Entry<ImageHandle,CachedTexture>> list = new ArrayList<>(cache.entrySet());
@@ -108,6 +107,11 @@ public class GLCache implements MImageObserver {
 		}
 		@Override public int getWidth() { return handle.deepAccess().getWidth();}
 		@Override public int getHeight() { return handle.deepAccess().getHeight(); }
+
+		@Override
+		public boolean isGLOriented() {
+			return false;
+		}
 	}
 
 	@Override
@@ -131,8 +135,9 @@ public class GLCache implements MImageObserver {
 	private void voidOutHandle(ImageHandle handle) {
 		CachedTexture ctex = cache.get(handle);
 		if( ctex != null && !ctex.locked) {
-			ctex.tex.free();
-			cacheSize -= ctex.tex.w*ctex.tex.h*4;
+			if( ! (ctex.tex instanceof GLImage) )
+				ctex.tex.flush();
+			cacheSize -= ctex.tex.getByteSize();
 			cache.remove(handle);
 		}
 	}

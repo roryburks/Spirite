@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.gl.engine.GLEngine.PreparedTexture;
 import spirite.base.image_data.RawImage;
 
 /**
@@ -112,11 +111,12 @@ public class GLParameters {
 		public abstract void unload();
 		public abstract int getWidth();
 		public abstract int getHeight();
+		public abstract boolean isGLOriented();
 	}
 	
 	
 	public static class GLImageTexture extends GLTexture {
-		private PreparedTexture texture;
+		private GLImage texture;
 		private final RawImage image;
 		
 		public GLImageTexture( RawImage image) {
@@ -137,7 +137,7 @@ public class GLParameters {
 		@Override
 		public void unload(){
 			if( texture != null)
-				texture.free();
+				texture.flush();
 			texture = null;
 		}
 
@@ -146,6 +146,11 @@ public class GLParameters {
 		}
 		@Override public int getHeight() {
 			return (image == null)?0:image.getHeight();
+		}
+
+		@Override
+		public boolean isGLOriented() {
+			return image.isGLOriented();
 		}
 	}
 	

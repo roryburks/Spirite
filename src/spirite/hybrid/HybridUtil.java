@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.IntBuffer;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
@@ -15,6 +16,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.ArrayInterpretation.IntCounter;
@@ -126,25 +128,44 @@ public class HybridUtil {
 	public static Rect findContentBounds( RawImage raw, int buffer, boolean transparentOnly) 
 			throws UnsupportedImageTypeException 
 	{
-		if( !(raw instanceof ImageBI))
-			throw new UnsupportedImageTypeException("Unsupported RawImage type");
-		BufferedImage image = ((ImageBI)raw).img;
-
 		_ImageCropHelper data;
 		
-		int type = image.getType();
-		switch( type) {
-		case BufferedImage.TYPE_4BYTE_ABGR:
-		case BufferedImage.TYPE_4BYTE_ABGR_PRE:
-			data = new _ImageCropHelperByte(image);
-			break;
-		case BufferedImage.TYPE_INT_ARGB:
-		case BufferedImage.TYPE_INT_ARGB_PRE:
-			data = new _ImageCropHelperInt(image);
-			break;
-		default:
-			throw new UnsupportedImageTypeException("Only programmed to deal with 4-byte color data.");
+		if( raw instanceof ImageBI) {
+			BufferedImage image = ((ImageBI)raw).img;
+
+			
+			int type = image.getType();
+			switch( type) {
+			case BufferedImage.TYPE_4BYTE_ABGR:
+			case BufferedImage.TYPE_4BYTE_ABGR_PRE:
+				data = new _ImageCropHelperByte(image);
+				break;
+			case BufferedImage.TYPE_INT_ARGB:
+			case BufferedImage.TYPE_INT_ARGB_PRE:
+				data = new _ImageCropHelperInt(image);
+				break;
+			default:
+				throw new UnsupportedImageTypeException("Only programmed to deal with 4-byte color data.");
+			}
 		}
+		else if( raw instanceof GLImage) {
+			GLImage img = (GLImage)raw;
+			GLEngine engine = GLEngine.getInstance();
+			GL2 gl = engine.getGL2();
+			int w = img.getWidth();
+			int h = img.getHeight();
+			
+			engine.setTarget(img);
+
+			IntBuffer read = IntBuffer.allocate(w*h);
+			gl.glReadnPixels( 0, 0, w, h, 
+					GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4*w*h, read);
+			
+			data = new _ImageCropHelperInt(read.array(), w, h);
+		}
+		else 
+			throw new UnsupportedImageTypeException("Unsupported RawImage type");
+
 
 		int x1 =0, y1=0, x2=0, y2=0;
 				
@@ -190,7 +211,6 @@ public class HybridUtil {
 		x2 = Math.min(data.w-1, x2 + buffer);
 		y2 = Math.min(data.h-1, y2 + buffer);
 		
-		
 		return new Rect( x1, y1, x2-x1+1, y2-y1+1 );
 	}
 	private static abstract class _ImageCropHelper {
@@ -200,6 +220,10 @@ public class HybridUtil {
 		_ImageCropHelper( BufferedImage image ) {
 			this.w = image.getWidth();
 			this.h = image.getHeight();
+		}
+		_ImageCropHelper( int w, int h) {
+			this.w = w;
+			this.h = h;
 		}
 
 		// Sanity checks would be inefficient, let's just assume everything
@@ -284,6 +308,10 @@ public class HybridUtil {
 		_ImageCropHelperInt(BufferedImage image) {
 			super(image);
 			this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		}
+		_ImageCropHelperInt( int[] data, int w, int h) {
+			super(w, h);
+			this.pixels = data;
 		}
 
 		@Override

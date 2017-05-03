@@ -21,6 +21,7 @@ import spirite.base.brains.RenderEngine;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.engine.GLEngine;
 import spirite.base.graphics.gl.engine.GLGraphics;
+import spirite.base.graphics.gl.engine.GLImage;
 import spirite.base.graphics.gl.engine.GLParameters;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
@@ -37,6 +38,8 @@ import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridUtil;
+import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.pc.jogl.JOGLCore;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkArea;
@@ -173,6 +176,7 @@ public class GLWorkArea
             	penner.paintOverlay(glgc);
         }
         
+        engine.setTarget(0);
 
 		engine.setGL(null);
 	}

@@ -393,6 +393,8 @@ public class DrawEngine {
 
 			int bg = img.getRGB(layerSpace.x, layerSpace.y);
 			
+			System.out.println(bg);
+			
 			if( mask.selection != null && bg == 0){
 				// A lot of work for a singular yet common case: 
 				// When coloring into transparent data, create an image which has

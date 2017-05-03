@@ -109,7 +109,7 @@ class GLNodeRenderer extends NodeRenderer {
 			params.flip = glgc.isFlip();
 		
 			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
-					0, 0, settings.width, settings.height, true);
+					0, 0, settings.width, settings.height);
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
@@ -152,7 +152,7 @@ class GLNodeRenderer extends NodeRenderer {
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1.0f));
 				GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
 				glgc.applyPassProgram(ProgramType.PASS_RENDER, params, trans, 
-						0, 0, params.texture.getWidth(), params.texture.getHeight(), true);
+						0, 0, params.texture.getWidth(), params.texture.getHeight());
 
 				if( workspace.getSelectionEngine().getLiftedImage() != null ){
 					// Draw Lifted Image
@@ -164,7 +164,6 @@ class GLNodeRenderer extends NodeRenderer {
 				}
 				if( workspace.getDrawEngine().strokeIsDrawing()) {
 					// Draw Stroke Layer
-					glgc.setFlip(true);
 					glgc.setTransform(new MatTrans());
 					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 				}
@@ -339,7 +338,7 @@ class GLNodeRenderer extends NodeRenderer {
 			setParamsFromNode( node, params, false, 1);
 			params.texture = new GLParameters.GLImageTexture(buffer[n+1]);
 			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, null,
-					0, 0, params.width, params.height, true);
+					0, 0, params.width, params.height);
 //			engine.setTarget(0);
 		}
 	}
@@ -377,15 +376,15 @@ class GLNodeRenderer extends NodeRenderer {
 				params.texture = new GLParameters.GLImageTexture(compositeLayer);
 				glgc.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
-						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight(), false);
+						0, 0, compositeLayer.getWidth(), compositeLayer.getHeight());
 			}
 			else {
 				trans.translate(renderable.handle.getDynamicX(), 
 						renderable.handle.getDynamicY());
-				params.texture = glcache.new GLHandleTexture(renderable.handle);
+				params.texture = renderable.handle.accessGL();
 				glgc.applyPassProgram(
 						ProgramType.PASS_RENDER, params, trans,
-						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight(), false);
+						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight());
 			}
 			engine.setTarget(0);
 		}

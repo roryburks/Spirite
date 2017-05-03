@@ -60,7 +60,7 @@ public class GLDrawer extends GraphicsDrawer {
     	params.texture = new GLImageTexture( image);
 
     	glgc.clear();
-    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null, false);
+    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
 
     	GraphicsContext gc = image.getGraphics();
     	gc.setComposite( Composite.SRC, 1.0f);
@@ -81,7 +81,7 @@ public class GLDrawer extends GraphicsDrawer {
     	params.texture = new GLImageTexture(image);
 
     	glgc.clear();
-    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null, false);
+    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null);
 		
     	GraphicsContext gc = image.getGraphics();
     	gc.setComposite( Composite.SRC, 1.0f);

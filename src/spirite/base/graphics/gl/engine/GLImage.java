@@ -2,7 +2,6 @@ package spirite.base.graphics.gl.engine;
 
 import java.nio.IntBuffer;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.image_data.RawImage;
@@ -27,8 +26,8 @@ public class GLImage extends RawImage {
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MAG_FILTER,GLC.GL_NEAREST);
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
-        gl.glTexImage2D(GLC.GL_TEXTURE_2D,0,GL.GL_RGBA8,
-        		width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
+        gl.glTexImage2D(GLC.GL_TEXTURE_2D,0,GL2.GL_RGBA8,
+        		width, height, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, null);
 	}
 	
 	public GLImage( GLImage toCopy) {
@@ -45,13 +44,11 @@ public class GLImage extends RawImage {
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MAG_FILTER,GLC.GL_NEAREST);
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
-        gl.glCopyTexImage2D(GLC.GL_TEXTURE_2D,0,GL.GL_RGBA8,
+        gl.glCopyTexImage2D(GLC.GL_TEXTURE_2D,0,GL2.GL_RGBA8,
         		0, 0, width, height, 0);
 	}
 	
 	public GLImage( int texID, int width, int height) {
-		GL2 gl = engine.getGL2();
-		
 		this.tex = texID;
 		this.width = width;
 		this.height = height;
@@ -88,11 +85,18 @@ public class GLImage extends RawImage {
 
 	@Override
 	public int getRGB(int x, int y) {
+		if( x < 0 || y < 0 || x >= width || y >= height) return 0;
 		GL2 gl = engine.getGL2();
 		
+		engine.setTarget(this);
 		IntBuffer read = IntBuffer.allocate(1);
-		gl.glReadnPixels( x, y, 1, 1, GL.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read);
+		gl.glReadnPixels( x, height-y, 1, 1, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read);
 		return read.get(0);
+	}
+
+	@Override
+	public boolean isGLOriented() {
+		return true;
 	}
 
 }
