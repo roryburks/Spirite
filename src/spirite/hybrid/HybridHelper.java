@@ -28,7 +28,7 @@ import sun.awt.image.IntegerInterleavedRaster;
 public class HybridHelper {
 
 	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
-	private static boolean useGL = false;
+	private static boolean useGL = true;
 	
 	public static boolean isUsingGL() {return useGL;}
 	

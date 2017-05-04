@@ -7,6 +7,7 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.image_data.RawImage;
+import spirite.base.util.glmath.Rect;
 
 /**
  * GLParameters encapsulates many of the attributes representing "how" OpenGL
@@ -26,6 +27,7 @@ public class GLParameters {
 	public GLTexture texture2;
 	public int width, height;
 	public boolean flip = false;
+	public Rect clipRect;
 
 	public boolean useBlendMode = true;
 	boolean useDefaultBlendmode = true;

@@ -739,7 +739,7 @@ public class SelectionEngine {
 			Rect intersection = dataRect.intersection(selectionRect);
 			
 			// TODO
-			((AWTContext)gc).getGraphics().setClip(
+			gc.setClip(
 					intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
 			selection.drawSelectionMask(gc);	// Note: Untransformed

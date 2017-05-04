@@ -20,6 +20,7 @@ import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -525,8 +526,21 @@ public class GLEngine  {
 	/** Combines the world MatTrans with an Orthogonal Transform as 
 	 * defined by the parameters to create a 4D Perspective Matrix*/
 	private void addOrtho( GLParameters params, MatTrans trans) {
+		int x1, y1, x2, y2;
+		if( params.clipRect == null) {
+			x1 = 0; x2 = params.width;
+			y1 = 0; y2 = params.height;
+		}
+		else {
+			x1 = params.clipRect.x;
+			x2 = params.clipRect.x+params.clipRect.width;
+			y1 = params.clipRect.y;
+			y2 = params.clipRect.y+params.clipRect.height;
+		}
+		
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
-        		0, params.width, (params.flip)?params.height:0, (params.flip)?0:params.height, -1, 1));
+        		x1, x2, (params.flip)?y2:y1, (params.flip)?y1:y2, -1, 1));
+//		x1, x2, (params.flip)?params.height-y1:y1, (params.flip)?params.height-y2:y2, -1, 1));
         
         if( trans != null) {
 	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapTransformAs4x4(trans));
@@ -548,7 +562,12 @@ public class GLEngine  {
 		int h = params.height;
 		
 		int prog = getProgram(type);
-		gl.getGL2().glViewport(0, 0, w, h);
+		
+		Rect r = params.clipRect;
+		if( r == null)
+			gl.getGL2().glViewport(0, 0, w, h);
+		else
+			gl.getGL2().glViewport(r.x, r.y, r.width, r.height);
 		
 
         

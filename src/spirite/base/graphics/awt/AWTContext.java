@@ -218,4 +218,5 @@ public class AWTContext extends GraphicsContext{
 		}
 	}
 	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
+	@Override public void setClip(int x, int y, int width, int height) { g2.setClip(x, y, width, height); }
 }

@@ -87,6 +87,8 @@ public abstract class GraphicsContext {
 
 	public abstract void fillPolygon(int[] x, int[] y, int count);
 
+	public abstract void setClip(int i, int j, int width, int height);
+
 
 
 }

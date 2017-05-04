@@ -38,6 +38,7 @@ public class GLGraphics extends GraphicsContext{
 	private float alpha = 1.0f;
 	private LineAttributes lineAttributes = defaultLA;
 	private final GLImage image;
+	private Rect clipRect;
 
 	public GLGraphics( int width, int height, boolean flip) {
 		this.flip = flip;
@@ -349,6 +350,7 @@ public class GLGraphics extends GraphicsContext{
 			updatePolyParams = true;
 		}
 		if( updatePolyParams) {
+			cachedPolyParams.clipRect = clipRect;
 			cachedPolyParams.flip = flip;
 			cachedPolyParams.clearParams();
 			cachedPolyParams.addParam( new GLParameters.GLParam3f("uColor", 
@@ -366,6 +368,7 @@ public class GLGraphics extends GraphicsContext{
 			updateImgParams = true;
 		}
 		if( updateImgParams) {
+			cachedImgParams.clipRect = clipRect;
 			cachedImgParams.flip = flip;
 			cachedImgParams.clearParams();
 			cachedImgParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
@@ -405,6 +408,12 @@ public class GLGraphics extends GraphicsContext{
 			int numPoints, GLParameters params, MatTrans trans)  {
 		reset();
 		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans, gl);
+	}
+	@Override
+	public void setClip(int x, int y, int width, int height) {
+		clipRect = new Rect( x, y, width, height);
+		updatePolyParams = true;
+		updateImgParams = true;
 	}
 	
 }
