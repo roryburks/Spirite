@@ -17,20 +17,29 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLImage;
+import spirite.base.graphics.gl.wrap.GLCore;
 import spirite.base.image_data.RawImage;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 public class HybridHelper {
 
-	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB_PRE;
+	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB;
+	
+	private static GLCore core;
 	private static boolean useGL = true;
 	
 	public static boolean isUsingGL() {return useGL;}
+	
+	public static GLCore getGLCore() {
+		if( core == null) core = new JOGLCore();
+		return core;
+	}
 	
 	// ============
 	// ==== Mesages

@@ -3,10 +3,10 @@ package spirite.base.image_data;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.gl.engine.GLCache;
-import spirite.base.graphics.gl.engine.GLImage;
-import spirite.base.graphics.gl.engine.GLParameters;
-import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
+import spirite.base.graphics.gl.GLCache;
+import spirite.base.graphics.gl.GLImage;
+import spirite.base.graphics.gl.GLParameters;
+import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.InternalImage;

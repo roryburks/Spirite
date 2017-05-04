@@ -1,4 +1,4 @@
-package spirite.base.graphics.awt;
+package spirite.pc.graphics.awt;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -11,7 +11,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.MatTrans;
@@ -33,17 +33,6 @@ public class AWTContext extends GraphicsContext{
 	private final Graphics2D g2;
 	private final int width, height;
 	
-	public static AffineTransform toAT( MatTrans trans) {
-		return new AffineTransform(
-				trans.getM00(), trans.getM10(), trans.getM01(),
-				trans.getM11(), trans.getM02(), trans.getM12());
-	}
-	public static MatTrans toMT( AffineTransform trans) {
-		return new MatTrans(
-				(float)trans.getScaleX(), (float)trans.getShearX(), (float)trans.getTranslateX(),
-				(float)trans.getShearY(), (float)trans.getScaleY(), (float)trans.getTranslateY());
-	}
-	
 	public AWTContext( Graphics g, int width, int height) {
 		this.g2 = (Graphics2D)g;
 		this.width = width;
@@ -57,48 +46,33 @@ public class AWTContext extends GraphicsContext{
 	}
 	public Graphics getGraphics() {return g2;}
 
-	@Override
-	public void drawBounds(RawImage mask, int c) {
-		Rectangle r = g2.getClipBounds();
-		
-		AffineTransform old = g2.getTransform();
-		g2.setTransform(new AffineTransform());
-		
-		BufferedImage bi = new BufferedImage( r.width, r.height, HybridHelper.BI_FORMAT);
-		Graphics2D g2BI = (Graphics2D)bi.getGraphics();
-		g2BI.setTransform(old);
-		GraphicsContext gc = new AWTContext( g2BI, bi.getWidth(), bi.getHeight());
-		gc.setComposite( Composite.SRC_OVER, 0.5f);
-		gc.drawImage(mask, 1, 0);
-		gc.drawImage(mask, -1, 0);
-		gc.drawImage(mask, 0, 1);
-		gc.drawImage(mask, 0, -1);
-		gc.setComposite( Composite.DST_OUT, 1);
-		gc.drawImage(mask, 0, 0);
-		g2BI.dispose();
-		
-		g2.drawImage(bi, 0, 0, null);
-		
-		g2.setTransform(old);
-	}
-
-	@Override
-	public void clear() {
-		java.awt.Composite comp = g2.getComposite();
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-		g2.fillRect( 0, 0, width, height);
-		g2.setComposite(comp);
-	}
 
 	// ==========
-	// ==== Transform Methods
-	@Override public void setTransform(MatTrans trans) { g2.setTransform( toAT(trans)); }
-	@Override public MatTrans getTransform() { return toMT(g2.getTransform()); }
+	// ==== Simple Pass-through methods
+	@Override public void setTransform(MatTrans trans) { g2.setTransform( PCUtil.toAT(trans)); }
+	@Override public MatTrans getTransform() { return PCUtil.toMT(g2.getTransform()); }
 	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}	
 	@Override public void scale(double sx, double sy) { g2.scale(sx, sy);}
-	@Override public void transform(MatTrans trans) {g2.transform( toAT(trans)); }
+	@Override public void transform(MatTrans trans) {g2.transform( PCUtil.toAT(trans)); }
 
 	@Override public void setColor(int color) {g2.setColor(new Color(color,true));}
+	
+	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}
+	@Override public void drawOval(int x, int y, int w, int h) { g2.drawOval(x,y,w,h);}
+	@Override public void drawPolyLine(int[] x, int[] y, int count) {g2.drawPolyline(x, y, count); }
+	@Override public void drawLine(int x1, int y1, int x2, int y2) {g2.drawLine(x1, y1, x2, y2);}
+	@Override public void draw(Shape shape) {g2.draw(shape);}
+
+	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
+	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
+	@Override public void fillPolygon(int[] x, int[] y, int count) {g2.fillPolygon(x, y, count);}
+
+	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
+	@Override public void setClip(int x, int y, int width, int height) { g2.setClip(x, y, width, height); }
+	@Override public void dispose() {g2.dispose();}
+	
+	// ===============
+	// ==== Composite Methods
 	@Override
 	public void setComposite(Composite composite, float alpha) {
 		int i = AlphaComposite.SRC_OVER;
@@ -197,16 +171,6 @@ public class AWTContext extends GraphicsContext{
 		}
 	}
 	
-	@Override public void drawRect(int x, int y, int w, int h) { g2.drawRect(x, y, w, h);}
-	@Override public void drawOval(int x, int y, int w, int h) { g2.drawOval(x,y,w,h);}
-	@Override public void drawPolyLine(int[] x, int[] y, int count) {g2.drawPolyline(x, y, count); }
-	@Override public void drawLine(int x1, int y1, int x2, int y2) {g2.drawLine(x1, y1, x2, y2);}
-	@Override public void draw(Shape shape) {g2.draw(shape);}
-
-	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
-	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
-	@Override public void fillPolygon(int[] x, int[] y, int count) {g2.fillPolygon(x, y, count);}
-
 	@Override public void drawImage(RawImage img, int x, int y) {
 		if( img instanceof ImageBI)
 			g2.drawImage( ((ImageBI)img).img,  x,  y, null);
@@ -217,6 +181,42 @@ public class AWTContext extends GraphicsContext{
 			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "AWT Draw Image: Unsupported Image Type");
 		}
 	}
-	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
-	@Override public void setClip(int x, int y, int width, int height) { g2.setClip(x, y, width, height); }
+	
+	// =========
+	// ==== Custom Drawing Methods
+	@Override
+	public void drawBounds(RawImage mask, int c) {
+		Rectangle r = g2.getClipBounds();
+		
+		AffineTransform old = g2.getTransform();
+		g2.setTransform(new AffineTransform());
+		
+		// Draw the image 4 times, offset up, down, left, and right
+		// then erase the image so that you're left with a border
+		BufferedImage bi = new BufferedImage( r.width, r.height, HybridHelper.BI_FORMAT);
+		Graphics2D g2BI = (Graphics2D)bi.getGraphics();
+		g2BI.setTransform(old);
+		GraphicsContext gc = new AWTContext( g2BI, bi.getWidth(), bi.getHeight());
+		gc.setComposite( Composite.SRC_OVER, 0.5f);
+		gc.drawImage(mask, 1, 0);
+		gc.drawImage(mask, -1, 0);
+		gc.drawImage(mask, 0, 1);
+		gc.drawImage(mask, 0, -1);
+		gc.setComposite( Composite.DST_OUT, 1);
+		gc.drawImage(mask, 0, 0);
+		g2BI.dispose();
+		
+		g2.drawImage(bi, 0, 0, null);
+		
+		g2.setTransform(old);
+	}
+
+	@Override
+	public void clear() {
+		java.awt.Composite comp = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+		g2.fillRect( 0, 0, width, height);
+		g2.setComposite(comp);
+	}
+	
 }

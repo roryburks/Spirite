@@ -7,7 +7,6 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
@@ -26,6 +25,7 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.awt.AWTContext;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from

@@ -12,12 +12,7 @@ import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.gl.engine.GLCache;
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLGraphics;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLImage;
-import spirite.base.graphics.gl.engine.GLParameters;
+import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -49,6 +44,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * This is done using the PASS_ESCALATE shader.  All other actions are
  * accomplished using PASS_RENDER and appropriate uComp values.
  * (see "pass_render.frag" for appropriate values).
+ * 
  */
 class GLNodeRenderer extends NodeRenderer {
 	private GLImage buffer[];
@@ -56,12 +52,9 @@ class GLNodeRenderer extends NodeRenderer {
 	private float ratioH;	// TODO: UNUSED
 	
 	private final ImageWorkspace workspace;
-	private final GLEngine engine = GLEngine.getInstance();
-	private final GLCache glcache;
 	
 	public GLNodeRenderer( GroupNode node, RenderEngine context) {
 		context.super(node);
-		this.glcache = context.getGLCache();
 		this.workspace = node.getContext();
 	}
 
@@ -69,28 +62,23 @@ class GLNodeRenderer extends NodeRenderer {
 	public void render(RenderSettings settings, GraphicsContext context, MatTrans trans) {
 		try {
 			
-			GLGraphics glgc = (GLGraphics)context;
-			boolean flip = glgc.isFlip();
+			GraphicsContext glgc = context;
 			
-			glgc.setFlip( true);
 			buildCompositeLayer(workspace);
-			glgc.setFlip( false);
 			
 			// Step 1: Determine amount of data needed
 			int n = _getNeededImagers( settings);
 
-			if( n <= 0) {
-				glgc.setFlip(flip);
+			if( n <= 0) 
 				return;
-			}
 			
 			// Prepare the FrameBuffers needed for rendering
 			buffer = new GLImage[n];
 			for( int i=0; i<n; ++i) {
 				buffer[i] = new GLImage(settings.width, settings.height);
 				
-				GLGraphics _glgc = buffer[i].getGraphics();
-				_glgc.clear();
+				GraphicsContext _gc = buffer[i].getGraphics();
+				_gc.clear();
 			}
 
 			// Step 3: Recursively draw the image
@@ -103,13 +91,7 @@ class GLNodeRenderer extends NodeRenderer {
 			// surface onto a BufferedImage so that Swing can draw it.
 			// TODO: This last step could be avoided if I used a GLPanel instead
 			//	of a basic Swing Panel
-			glgc.setFlip(flip);
-			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-			params.texture = new GLParameters.GLImageTexture(buffer[0]);
-			params.flip = glgc.isFlip();
-		
-			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, trans, 
-					0, 0, settings.width, settings.height);
+			glgc.drawImage(buffer[0], 0, 0);
 
 			// Flush the data we only needed to build the image
 			for( int i=0; i<n;++i) {
@@ -137,7 +119,6 @@ class GLNodeRenderer extends NodeRenderer {
 				compositedHandle = dataContext.handle;
 
 				GLGraphics glgc = compositeLayer.getGraphics();
-				engine.setTarget(compositeLayer);
 				
 				// Draw Base Image
 				MatTrans trans = dataContext.getCompositeTransform();
@@ -167,7 +148,6 @@ class GLNodeRenderer extends NodeRenderer {
 					glgc.setTransform(new MatTrans());
 					workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer(glgc);
 				}
-				engine.setTarget(0);
 			}
 		}
 	}
@@ -386,7 +366,6 @@ class GLNodeRenderer extends NodeRenderer {
 						ProgramType.PASS_RENDER, params, trans,
 						0, 0, renderable.handle.getWidth(), renderable.handle.getHeight());
 			}
-			engine.setTarget(0);
 		}
 	}
 }

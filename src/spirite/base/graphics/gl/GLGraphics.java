@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.engine;
+package spirite.base.graphics.gl;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -6,6 +6,9 @@ import java.awt.geom.Ellipse2D;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.gl.GLEngine.PolyType;
+import spirite.base.graphics.gl.GLEngine.ProgramType;
+import spirite.base.graphics.gl.GLParameters.*;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.Colors;
@@ -14,9 +17,6 @@ import spirite.base.util.MUtil;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
-import spirite.base.graphics.gl.engine.GLEngine.PolyType;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLParameters.*;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
@@ -400,11 +400,18 @@ public class GLGraphics extends GraphicsContext{
 		reset();
 		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans, gl);
 	}
+	
+	// =========
+	// ==== Etc
 	@Override
 	public void setClip(int x, int y, int width, int height) {
 		clipRect = new Rect( x, y, width, height);
 		updatePolyParams = true;
 		updateImgParams = true;
+	}
+	@Override
+	public void dispose() {
+		engine.setTarget(0);		
 	}
 	
 }

@@ -21,7 +21,7 @@ import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.gl.engine.GLCache;
+import spirite.base.graphics.gl.GLCache;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;

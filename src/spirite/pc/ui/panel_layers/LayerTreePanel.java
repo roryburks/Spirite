@@ -46,7 +46,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.RenderEngine;
 import spirite.base.file.AnimIO;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.GroupTree;
@@ -68,6 +67,7 @@ import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
 import spirite.pc.ui.UIUtil;
 

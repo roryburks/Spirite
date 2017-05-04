@@ -28,7 +28,6 @@ import javax.swing.event.DocumentListener;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.file.AnimIO;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
@@ -42,6 +41,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
+import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.MTextFieldNumber;
 

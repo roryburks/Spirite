@@ -12,13 +12,13 @@ import spirite.base.brains.RenderEngine.ReferenceRenderSource;
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 

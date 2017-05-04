@@ -1,21 +1,22 @@
-package spirite.base.graphics.gl.engine;
+package spirite.base.graphics.gl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL3;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
-import spirite.base.graphics.gl.engine.GLCore.MGLException;
+import spirite.base.graphics.gl.GLGeom.Primitive;
+import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
 import spirite.base.util.glmath.GLC;
@@ -147,7 +148,9 @@ public class GLEngine  {
 		// Checks is the FrameBuffer was successfully created, displaying a proper
 		// Error message if it wasn't.
 		GL2 gl = getGL2();
-        switch( gl.glCheckFramebufferStatus(GLC.GL_FRAMEBUFFER)) {
+		
+		int result = gl.glCheckFramebufferStatus(GLC.GL_FRAMEBUFFER);
+        switch( result) {
         case GLC.GL_FRAMEBUFFER_COMPLETE:
     		return;
         case GLC.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
@@ -159,29 +162,29 @@ public class GLEngine  {
         case GLC.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
     		break;	
-        case GL2.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_FORMATS");
-    		break;	
-        case GL2.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
-    		break;	
-        case GL2.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
-    		break;	
+//        case GLC.GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
+//        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_FORMATS");
+//    		break;	
+//        case GLC.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+//        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+//    		break;	
+//        case GLC.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+//        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+//    		break;	
         case GLC.GL_FRAMEBUFFER_UNSUPPORTED:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_UNSUPPORTED");
-    		break;	
-        case GL2.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
-    		break;	
-        case GL2.GL_FRAMEBUFFER_UNDEFINED :
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction.GL_FRAMEBUFFER_UNDEFINED");
-    		break;	
+    		break;
+//        case GLC.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE :
+//        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+//    		break;	
+//        case GLC.GL_FRAMEBUFFER_UNDEFINED :
+//        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction.GL_FRAMEBUFFER_UNDEFINED");
+//    		break;	
         case GLC.GL_INVALID_ENUM:
         	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. GL_INVALID_ENUM");
-    		break;	
+    		break;
         default:
-        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction (in an unknown way).");
+        	MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Bad FrameBuffer construction. " + result);
     		break;
         }
 	}
@@ -189,7 +192,6 @@ public class GLEngine  {
 	// =================
 	// ==== Program Management
 	public enum ProgramType {
-		DEFAULT,
 		SQARE_GRADIENT,
 		CHANGE_COLOR,
 		GRID,
@@ -215,7 +217,6 @@ public class GLEngine  {
 		case STROKE_PIXEL:
 		case POLY_RENDER:
 		case LINE_RENDER:
-		case DEFAULT:
 		case PASS_RENDER:
 		case PASS_BASIC:
 		case GRID:
@@ -294,15 +295,18 @@ public class GLEngine  {
 		
 		boolean internal = (params.texture == null) ? false : !params.texture.isGLOriented();
 
-		PreparedData pd = prepareRawData(new float[]{
-			// x  y   u   v
-			x1, y1, 0.0f, (internal)?0.0f:1.0f,
-			x2, y1, 1.0f, (internal)?0.0f:1.0f,
-			x1, y2, 0.0f, (internal)?1.0f:0.0f,
-			x2, y2, 1.0f, (internal)?1.0f:0.0f,
-		}, new int[]{2,2});
-        applyProgram( type, params, pd, GL2.GL_TRIANGLE_STRIP, 4);
-        pd.free();
+
+		PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+			new float[]{
+				// x  y   u   v
+				x1, y1, 0.0f, (internal)?0.0f:1.0f,
+				x2, y1, 1.0f, (internal)?0.0f:1.0f,
+				x1, y2, 0.0f, (internal)?1.0f:0.0f,
+				x2, y2, 1.0f, (internal)?1.0f:0.0f,
+			}, new int[]{2,2}, GL2.GL_TRIANGLE_STRIP, new int[]{4}));
+		prim.prepare();
+        applyProgram( type, params, prim);
+        prim.free();
         params.clearInternalParams();
 	}
 
@@ -316,10 +320,12 @@ public class GLEngine  {
         	data[i*2] = xPoints[i];
         	data[i*2+1] = yPoints[i];
         }
-        
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		applyProgram( type, params, pd, GL2.GL_LINE_STRIP, numPoints);
-		pd.free();
+
+		PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+				data, new int[]{2}, GL2.GL_TRIANGLE_STRIP, new int[]{numPoints}));
+		prim.prepare();
+		applyProgram( type, params, prim);
+		prim.free();
         params.clearInternalParams();
 	}
 	
@@ -333,9 +339,26 @@ public class GLEngine  {
         	data[i*2] = xPoints[i];
         	data[i*2+1] = yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		applyProgram( type, params, pd, GL2.GL_LINE_STRIP, numPoints);
-		pd.free();
+		PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+				data, new int[]{2}, GL2.GL_TRIANGLE_STRIP, new int[]{numPoints}));
+		prim.prepare();
+		applyProgram( type, params, prim);
+		prim.free();
+        params.clearInternalParams();
+	}
+
+	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim) {
+
+        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
+        		-0.5f, params.width-0.5f, -0.5f, params.height-0.5f, -1, 1));
+        matrix = matrix.transpose();
+        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
+        		"perspectiveMatrix", 1, matrix.getBuffer()));
+        
+		PreparedPrimitive pprim = new PreparedPrimitive( prim);
+		pprim.prepare();
+		applyProgram( type, params, pprim);
+		pprim.free();
         params.clearInternalParams();
 	}
 
@@ -360,8 +383,6 @@ public class GLEngine  {
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
 			GLParameters params, MatTrans trans) 
 	{
-		addOrtho(params, trans);
-		
 		int size = numPoints+(loop?3:2);
 		float data[] = new float[2*size];
 		for(int i=1; i< numPoints+1; ++i) {
@@ -385,10 +406,7 @@ public class GLEngine  {
 			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
 		}
 		
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		_doCompliexLineProg( pd, size, cap, join, width, params, trans);
-		pd.free();
-        params.clearInternalParams();
+		_doCompliexLineProg( data, size, cap, join, width, params, trans);
 	}
 	
 
@@ -414,7 +432,6 @@ public class GLEngine  {
 			GLParameters params, MatTrans trans) 
 	{
 		// NOTE: identical code to above but without implicit casting
-		addOrtho(params, trans);
 
 		int size = numPoints+(loop?3:2);
 		float data[] = new float[2*size];
@@ -439,16 +456,14 @@ public class GLEngine  {
 			data[2*(numPoints+1)+1] = yPoints[numPoints-1];	
 		}
 		
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		_doCompliexLineProg( pd, size, cap, join, width, params, trans);
-		pd.free();
-        params.clearInternalParams();
+		_doCompliexLineProg( data, size, cap, join, width, params, trans);
 	}
 	
-	private void _doCompliexLineProg( PreparedData pd, int count, CapMethod cap, 
+	private void _doCompliexLineProg( float[] data, int count, CapMethod cap, 
 			JoinMethod join, float width, GLParameters params, MatTrans trans)
 	{
 		GL2 gl = getGL2();
+		addOrtho(params, trans);
 		
 		// TODO: implement Rounded joins and all cap methods
 		int uJoin = 0;
@@ -457,12 +472,27 @@ public class GLEngine  {
 			case MITER: uJoin = 1; break;
 			case ROUNDED:break;
 		}
+		uJoin = 1;
 
-		gl.glEnable(GL2.GL_MULTISAMPLE );
-		params.addInternalParam(new GLParameters.GLParam1i("uJoin",uJoin));
-		params.addInternalParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
-		applyProgram( ProgramType.LINE_RENDER, params, pd, GL3.GL_LINE_STRIP_ADJACENCY, count);
-		gl.glDisable(GL2.GL_MULTISAMPLE );
+		if( HybridHelper.getGLCore().getShaderVersion() >= 330) {
+			PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+					data, new int[]{2}, GLC.GL_LINE_STRIP_ADJACENCY, new int[]{count}));
+			prim.prepare();
+			
+			gl.glEnable(GLC.GL_MULTISAMPLE );
+			params.addInternalParam(new GLParameters.GLParam1i("uJoin",uJoin));
+			params.addInternalParam(new GLParameters.GLParam1f("uWidth", width/ 2.0f));
+			applyProgram( ProgramType.LINE_RENDER, params, prim);
+			gl.glDisable(GLC.GL_MULTISAMPLE );
+			
+			prim.free();
+		}
+		else {
+			PreparedPrimitive prim = new PreparedPrimitive(GLGeom.lineRenderGeom(data, uJoin, width/2.0f));
+			prim.prepare();
+			applyProgram( ProgramType.POLY_RENDER, params, prim);
+			prim.free();
+		}
         params.clearInternalParams();
 	}
 
@@ -491,10 +521,12 @@ public class GLEngine  {
         	data[i*2] = (float)xPoints[i];
         	data[i*2+1] = (float)yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		
-		applyProgram( type, params, pd, polyType.glConst, numPoints);
-		pd.free();
+
+		PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+				data, new int[]{2}, polyType.glConst, new int[]{numPoints}));
+		prim.prepare();
+		applyProgram( type, params, prim);
+		prim.free();
         params.clearInternalParams();
 	}
 	public void applyPolyProgram(
@@ -514,10 +546,11 @@ public class GLEngine  {
         	data[i*2] = xPoints[i];
         	data[i*2+1] = yPoints[i];
         }
-		PreparedData pd = prepareRawData(data, new int[]{2});
-		
-		applyProgram( type, params, pd, polyType.glConst, numPoints);
-		pd.free();
+		PreparedPrimitive prim = new PreparedPrimitive( new Primitive(
+				data, new int[]{2}, polyType.glConst, new int[]{numPoints}));
+		prim.prepare();
+		applyProgram( type, params, prim);
+		prim.free();
         params.clearInternalParams();
 		
 	}
@@ -554,12 +587,13 @@ public class GLEngine  {
 	
 	/** Applies the specified Shader Program with the provided parameters, using 
 	 * the basic xyuv texture construction.*/
-	private void applyProgram( ProgramType type, GLParameters params, PreparedData pd, int primFormat, int primCount) 
+	private void applyProgram( ProgramType type, GLParameters params, PreparedPrimitive pprim) 
 	{
 		GL2 gl = getGL2();
 		
 		int w = params.width;
 		int h = params.height;
+        GLGeom.Primitive primitive = pprim.base;
 		
 		int prog = getProgram(type);
 		
@@ -574,6 +608,7 @@ public class GLEngine  {
         gl.glUseProgram(prog);
         
         // Bind Attribute Streams
+        PreparedData pd = pprim.pd;
         pd.init();
 
         // Bind Texture
@@ -609,7 +644,11 @@ public class GLEngine  {
         }
 
 		// Start Draw
-		gl.glDrawArrays( primFormat, 0, primCount);
+        int start = 0;
+        for( int i=0; i < primitive.primitiveLengths.length; ++i) {
+        	gl.glDrawArrays(primitive.primitiveType,  start, primitive.primitiveLengths[i]);
+            start += primitive.primitiveLengths[i];
+        }
         gl.glDisable( GLC.GL_BLEND);
 		
 		// Finished Drawing
@@ -749,7 +788,29 @@ public class GLEngine  {
 		
 		return pd;
 	}
-	
+
+    public class PreparedPrimitive{
+        private final GLGeom.Primitive base;
+        private GLEngine.PreparedData pd = null;
+        private boolean prepared = false;
+
+        public PreparedPrimitive( GLGeom.Primitive primitive) {
+            this.base = primitive;
+        }
+
+        public void prepare() {
+            if( prepared)
+                free();
+
+            pd = prepareRawData( base.raw, base.attrLengths);
+            prepared = true;
+        }
+
+        public void free() {
+            pd.free();
+            pd = null;
+        }
+    }
 	
 	// ==============
 	// ==== Initialization
@@ -768,10 +829,18 @@ public class GLEngine  {
 	}
 	
 	private void initShaders(GL2 gl) throws MGLException {
-        programs[ProgramType.DEFAULT.ordinal()] =  loadProgramFromResources( gl,
-				"shaders/basic.vert", 
-				null, 
-				"shaders/square_grad.frag");
+		try {
+			initShaders330(gl);
+			HybridHelper.getGLCore().setShaderVersion(330);
+			return;
+		}catch (MGLException e) {
+			MDebug.log("Failed to load #version 330: " + e.getMessage() + "\nAttempting to load #version 100 Shaders.");
+		}
+		initShaders100(gl);
+		HybridHelper.getGLCore().setShaderVersion(100);
+	}
+
+	private void initShaders330( GL2 gl) throws MGLException {
         programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources( gl,
 				"shaders/pass.vert", 
 				null, 
@@ -824,6 +893,35 @@ public class GLEngine  {
 				"shaders/shapes/line_render.vert", 
 				"shaders/shapes/line_render.geom", 
 				"shaders/shapes/shape_render.frag");
+		
+	}
+	private void initShaders100( GL2 gl) throws MGLException {
+        programs[ProgramType.SQARE_GRADIENT.ordinal()] =  loadProgramFromResources( gl,
+				"shaders/100/pass.vert", null, "shaders/100/etc/square_grad.frag");
+        programs[ProgramType.CHANGE_COLOR.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/pass_change_color.frag");
+        programs[ProgramType.GRID.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/etc/pass_grid.frag");
+
+        programs[ProgramType.PASS_INVERT.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/pass_invert.frag");
+        programs[ProgramType.PASS_BORDER.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/pass_border.frag");
+        programs[ProgramType.PASS_RENDER.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/pass_render.frag");
+        programs[ProgramType.PASS_ESCALATE.ordinal()] = 0;
+        programs[ProgramType.PASS_BASIC.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/pass.vert", null, "shaders/100/pass_basic.frag");
+        
+        programs[ProgramType.STROKE_BASIC.ordinal()] = loadProgramFromResources( gl,
+				"shaders/100/brushes/stroke_basic.vert", null, "shaders/100/brushes/stroke_basic.frag");
+        programs[ProgramType.STROKE_SPORE.ordinal()] = 0;
+        programs[ProgramType.STROKE_PIXEL.ordinal()] = 0;
+        
+        programs[ProgramType.LINE_RENDER.ordinal()] = 0;
+        programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/100/shapes/poly_render.vert", null, "shaders/100/shapes/shape_render.frag");
+		
 	}
 	
 	private int loadProgramFromResources( GL2 gl, String vert, String geom, String frag) 
@@ -833,15 +931,15 @@ public class GLEngine  {
         
         if( vert != null) {
             shaderList.add( compileShaderFromResource(
-    				gl, GL2.GL_VERTEX_SHADER, vert));
+    				gl, GLC.GL_VERTEX_SHADER, vert));
         }
         if( geom != null) {
             shaderList.add( compileShaderFromResource(
-    				gl, GL3.GL_GEOMETRY_SHADER, geom));
+    				gl, GLC.GL_GEOMETRY_SHADER, geom));
         }
         if( frag != null ){
             shaderList.add( compileShaderFromResource(
-    				gl, GL2.GL_FRAGMENT_SHADER, frag));
+    				gl, GLC.GL_FRAGMENT_SHADER, frag));
         }
         
 		int ret = createProgram( gl, shaderList);
@@ -907,7 +1005,7 @@ public class GLEngine  {
 			shaderText = scanner.next();
 			scanner.close();
 		} catch (IOException e) {
-			MDebug.handleError(ErrorType.RESOURCE, e, "Couldn't Load Shader");
+			MDebug.handleError(ErrorType.RESOURCE, e, "Couldn't Load Shader [" + resource + "]");
 			return -1;
 		}
 		
@@ -936,13 +1034,13 @@ public class GLEngine  {
 			
 			String type = "";
 			switch( shaderType) {
-			case GL2.GL_VERTEX_SHADER:
+			case GLC.GL_VERTEX_SHADER:
 				type = "vertex";
 				break;
-			case GL3.GL_GEOMETRY_SHADER:
+			case GLC.GL_GEOMETRY_SHADER:
 				type = "geometry";
 				break;
-			case GL2.GL_FRAGMENT_SHADER:
+			case GLC.GL_FRAGMENT_SHADER:
 				type = "fragment";
 				break;
 			default:
@@ -951,7 +1049,7 @@ public class GLEngine  {
 			}
 			infoLogLength.clear();
 			bufferInfoLog.clear();
-			throw new MGLException("Failed to compile GLSL shader (" + type + "): " + strInfoLog);
+			throw new MGLException("Failed to compile GLSL shader [" + resource + "] (" + type + "): " + strInfoLog);
 			
 		}
 		lengths.clear();
@@ -966,22 +1064,23 @@ public class GLEngine  {
 	final List<PreparedData> c_data = new ArrayList<>();
 	
 	public String dispResourcesUsed() {
-		String str = "";
+		StringBuilder sb = new StringBuilder();
+		DecimalFormat df = new DecimalFormat("#.##");
 		
-//		IntBuffer ib = GLBuffers.newDirectIntBuffer(1);
-//		getGL2().glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, ib);
-//		str += ib.get(0) + "\n";
+		long size = 0;
+		for( GLImage img : c_img) 
+			size += img.getByteSize();
+		sb.append("Total Texture Size: " + df.format(size / 1048576.0f) + "MB\n");
+
+		sb.append("Textures (" + c_img.size() + ": \n");
+		for( GLImage img : c_img) 
+			sb.append( "["+img.getTexID() +"] : (" + img.getWidth() + "," + img.getHeight() + ")\n");
+
+		sb.append("VBOs: (" + c_data.size() + "\n");
+		for( PreparedData pd : c_data)
+			sb.append("[" + pd.positionBufferObject.get(0)+","+pd.vao.get(0)+"] \n");
 		
-		str += "Textures: \n";
-		for( int i=0; i < c_img.size(); ++i) {
-			str += i + "["+c_img.get(i).getTexID() +"] : (" + c_img.get(i).getWidth() + "," + c_img.get(i).getHeight() + ")\n";
-		}
-		str += "VBOs: \n";
-		for( int i=0; i < c_data.size(); ++i) {
-			str += i + "[" + c_data.get(i).positionBufferObject.get(0)+","+c_data.get(i).vao.get(i)+"] \n";
-		}
-		
-		return str;
+		return sb.toString();
 	}
 
 }

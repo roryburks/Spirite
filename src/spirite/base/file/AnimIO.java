@@ -17,7 +17,6 @@ import javax.imageio.stream.ImageOutputStream;
 
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -37,6 +36,7 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.graphics.awt.AWTContext;
 
 /**
  * AnimIO is a container for static methods that export Animations of various

@@ -1,4 +1,4 @@
-package spirite.base.graphics.awt;
+package spirite.pc.graphics.awt;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;

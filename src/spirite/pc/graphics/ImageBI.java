@@ -3,9 +3,9 @@ package spirite.pc.graphics;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.awt.AWTContext;
 import spirite.base.image_data.RawImage;
 import spirite.pc.PCUtil;
+import spirite.pc.graphics.awt.AWTContext;
 
 public class ImageBI extends RawImage {
 	public final BufferedImage img;

@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.engine;
+package spirite.base.graphics.gl;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;

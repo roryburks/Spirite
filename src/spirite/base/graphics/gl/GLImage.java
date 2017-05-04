@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.engine;
+package spirite.base.graphics.gl;
 
 import java.nio.IntBuffer;
 
@@ -13,6 +13,7 @@ public class GLImage extends RawImage {
 	int tex;
 	
 	public GLImage( int width, int height) {
+		engine.c_img.add(this);
 		GL2 gl = engine.getGL2();
 		
 		this.width = width;
@@ -31,6 +32,7 @@ public class GLImage extends RawImage {
 	}
 	
 	public GLImage( GLImage toCopy) {
+		engine.c_img.add(this);
 		GL2 gl = engine.getGL2();
 		this.width = toCopy.width;
 		this.height = toCopy.height;
@@ -49,6 +51,7 @@ public class GLImage extends RawImage {
 	}
 	
 	public GLImage( int texID, int width, int height) {
+		engine.c_img.add(this);
 		this.tex = texID;
 		this.width = width;
 		this.height = height;
@@ -61,6 +64,7 @@ public class GLImage extends RawImage {
 	@Override
 	public void flush() {
 		if( tex != 0) {
+			engine.c_img.remove(this);
 			GL2 gl = engine.getGL2();
 			if( engine.getTarget() == tex)
 				engine.setTarget(0);

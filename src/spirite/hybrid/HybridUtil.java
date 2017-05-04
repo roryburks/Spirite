@@ -15,8 +15,8 @@ import javax.imageio.ImageIO;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
@@ -82,7 +82,7 @@ public class HybridUtil {
 		GraphicsContext gc = img.getGraphics();
 		gc.clear();
 		gc.drawImage( new ImageBI(bi), 0, 0);
-//		g.dispose();
+		gc.dispose();
 		
 		return img;
 	}
@@ -93,7 +93,7 @@ public class HybridUtil {
 		GraphicsContext gc = img.getGraphics();
 		gc.clear();
 		gc.drawImage( new ImageBI(bi), 0, 0);
-//		g.dispose();
+		gc.dispose();
 		
 		return img;
 	}

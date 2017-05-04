@@ -193,7 +193,7 @@ public class PalettePanel extends JPanel
     			else if( startIndex == endIndex || shortEvt) {
     				if( e.getClickCount() == 2 || startC == null) {
     					// Color Pick new Palette Color
-    					Color c = dialogs.pickColor( new Color(startC));
+    					Color c = dialogs.pickColor( (startC == null)?null:new Color(startC));
     					if( c != null)  {
     						paletteManager.setPaletteColor(startIndex, c.getRGB());
         					paletteManager.setActiveColor(e.getButton()/2, c.getRGB());

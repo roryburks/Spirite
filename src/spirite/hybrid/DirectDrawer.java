@@ -6,8 +6,8 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.DataCompaction.IntQueue;
 import spirite.base.util.MUtil;

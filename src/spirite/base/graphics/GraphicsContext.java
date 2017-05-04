@@ -89,6 +89,12 @@ public abstract class GraphicsContext {
 
 	public abstract void setClip(int i, int j, int width, int height);
 
+	/** Marks the Graphic Context as no longer being used.  Strictly speaking, 
+	 * calling this method shouldn't be necessary, but that relies on native
+	 * implementations of AWT's Graphics context.
+	 * */
+	public abstract void dispose();
+
 
 
 }

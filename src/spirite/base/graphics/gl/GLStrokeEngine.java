@@ -10,13 +10,10 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.awt.AWTContext;
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLGraphics;
-import spirite.base.graphics.gl.engine.GLEngine.PreparedData;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLImage;
-import spirite.base.graphics.gl.engine.GLParameters;
+import spirite.base.graphics.gl.GLEngine.PreparedData;
+import spirite.base.graphics.gl.GLEngine.PreparedPrimitive;
+import spirite.base.graphics.gl.GLEngine.ProgramType;
+import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
@@ -25,6 +22,7 @@ import spirite.base.util.glmath.GLC;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.graphics.awt.AWTContext;
 
 /**
  * The GLStrokeEngine is a StrokeEngine that uses OpenGL to create a particular
@@ -106,6 +104,7 @@ class GLStrokeEngine extends StrokeEngine {
 					0, 0, w, h);
 		}
 	}
+	
 	
 
 	@Override
@@ -195,28 +194,27 @@ class GLStrokeEngine extends StrokeEngine {
 		float[] vBuffer;
 		int len;
 	}
-	
+
+	private final static int BASIC_STRIDE = 3;
 	private GLVBuffer composeVBuffer( List<PenState> states) {
 		GLVBuffer vb = new GLVBuffer();
 		
 		// Step 1: Determine how much space is needed
 		int num = states.size() + 2;
 
-		float raw[] = new float[6*(num)];
+		float raw[] = new float[BASIC_STRIDE*(num)];
 		int o = 1;	// first point is 0,0,0,0
 		for( int i=0; i < states.size(); ++i) {
-			int off = (o++)*6;
+			int off = (o++)*BASIC_STRIDE;
 			
 			PenState ps = states.get(i);
 			// x y z w
 			raw[off+0] = data.convertX(ps.x);
 			raw[off+1] = data.convertY(ps.y);
-			raw[off+2] = 0.0f;
-			raw[off+3] = 1.0f;
 			
 			// size pressure
-			raw[off+4] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
-			raw[off+5] = ps.pressure;
+			raw[off+2] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+//			raw[off+3] = ps.pressure;
 			
 /*			if( i == states.size()-1 && stroke.getMethod() == Method.PIXEL) {
 				// TODO: Exagerate last line segment so pixel drawing works as expected
@@ -238,62 +236,30 @@ class GLStrokeEngine extends StrokeEngine {
 	 * to be filled by the fragment shader.
 	 */
 	private void _stroke( GLVBuffer glvb, int mode) {
-		GL2 gl = engine.getGL2();
-		int w = data.getWidth();
-		int h = data.getHeight();
-		
-		
-		
-		PreparedData pd = engine.prepareRawData(glvb.vBuffer, new int[]{4,1,1});
+		ProgramType type = (stroke.getMethod() ==Method.PIXEL) 
+				? ProgramType.STROKE_PIXEL
+				: ProgramType.STROKE_BASIC;
 
-		// Clear Surface
-        int prog = 0;
-        
-        switch( stroke.getMethod()) {
-		case BASIC:
-		case ERASE:
-        	prog = engine.getProgram(ProgramType.STROKE_BASIC);
-			break;
-		case PIXEL:
-        	prog = engine.getProgram(ProgramType.STROKE_PIXEL);
-			break;
-        
-        }
-        gl.glUseProgram( prog);
+		GLParameters params = new GLParameters(w, h);
 
-        // Bind Attribute Streams
-        pd.init();
-        
-        // Bind Uniforms
-        int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
-        int uColor = gl.glGetUniformLocation( prog, "uColor");
-        int uMode = gl.glGetUniformLocation( prog, "uMode");
-        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
-        );
-        gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
-        int c = stroke.getColor();
-        gl.glUniform3f(uColor, 
-        		Colors.getRed(c)/255.0f,
-        		Colors.getGreen(c)/255.0f,
-        		Colors.getBlue(c)/255.0f);
-        gl.glUniform1f( gl.glGetUniformLocation(prog, "uH"), (float)h);
-        gl.glUniform1i( uMode, mode);
-        
+		int c = stroke.getColor();
+		params.addParam( new GLParameters.GLParam3f("uColor", 
+				Colors.getRed(c)/255.0f,
+				Colors.getGreen(c)/255.0f,
+				Colors.getBlue(c)/255.0f));
+		params.addParam( new GLParameters.GLParam1i("uMode", mode));
+		params.addParam( new GLParameters.GLParam1f("uH", h));
+		params.setBlendMode(GLC.GL_SRC_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA, GL2.GL_MAX);
 
-        gl.glEnable(GL2.GL_MULTISAMPLE);
-        gl.glEnable(GLC.GL_BLEND);
-        gl.glBlendFunc(GLC.GL_SRC_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_MAX);
+		if( HybridHelper.getGLCore().getShaderVersion() >= 330) {
+			params.addParam( new GLParameters.GLParam1f("uH", h));
+			engine.applyPrimitiveProgram( type, params, new Primitive(
+					glvb.vBuffer, new int[]{2,1}, GL3.GL_LINE_STRIP_ADJACENCY, new int[]{glvb.len}));
+		}
+		else {
+			engine.applyPrimitiveProgram(type, params, GLGeom.strokeBasicGeom(glvb.vBuffer, h));
+		}
 
-    	gl.glDrawArrays(GL3.GL_LINE_STRIP_ADJACENCY, 0, glvb.len);
-
-        gl.glDisable( GLC.GL_BLEND);
-        gl.glDisable(GL2.GL_MULTISAMPLE);
-        gl.glUseProgram(0);
-
-        pd.deinit();
-        pd.free();
 	}
 	
 }

@@ -1,13 +1,15 @@
 package spirite.pc;
 
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLImage;
+import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLImage;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -66,5 +68,18 @@ public class PCUtil {
         
 		return bi;
 		
+	}
+	
+	/** Converts a MatTrans to an AffineTransform */
+	public static AffineTransform toAT( MatTrans trans) {
+		return new AffineTransform(
+				trans.getM00(), trans.getM10(), trans.getM01(),
+				trans.getM11(), trans.getM02(), trans.getM12());
+	}
+	/** Converts an AffineTransform to a MatTrans */
+	public static MatTrans toMT( AffineTransform trans) {
+		return new MatTrans(
+				(float)trans.getScaleX(), (float)trans.getShearX(), (float)trans.getTranslateX(),
+				(float)trans.getShearY(), (float)trans.getScaleY(), (float)trans.getTranslateY());
 	}
 }

@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import spirite.base.graphics.GraphicsDrawer;
-import spirite.base.graphics.awt.AWTDrawer;
 import spirite.base.graphics.gl.GLDrawer;
 import spirite.base.util.Interpolation.CubicSplineInterpolator;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.awt.AWTDrawer;
 
 /***
  * SettingsManager will handle all the various properties and settings

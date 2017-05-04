@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl.engine;
+package spirite.base.graphics.gl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.graphics.gl.engine.GLParameters.GLTexture;
+import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -16,13 +16,12 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.hybrid.MDebug;
 
 /** 
+ * TODO:
+ * GLCache is most likely out-dated and unnecessary.  It existed to cache 
+ * conversions from BufferedImages into OpenGL textures so that they were
+ * not done many dozen times per second.  But now use of BufferedImages
+ * in GLMode have almost entirely been elimitated.
  * 
-__ Stores a loaded texture object as required by ImageHandles
-__ ImageWorkspace ties checkins/checkouts directly to GLCache so that only textures whose data has changed get deleted.
-__GLParameters.GLHandleTexture accesses from GLCache, GLCache will either create new or retrieves them from memory
-__Any time ImageHandles are deleted, the corresponding cache gets destroyed (even if undo actions could presumably recreate them)
-__ Any time MAX_SIZE is hit, it unloads the least-recently used textures.
-
  * @author Rory Burks
  *
  */

@@ -1,4 +1,4 @@
-package spirite.base.graphics.gl;
+package spirite.pc.ui;
 
 import java.nio.FloatBuffer;
 
@@ -19,10 +19,10 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.GLBuffers;
 
-import spirite.base.graphics.gl.engine.GLEngine;
-import spirite.base.graphics.gl.engine.GLEngine.ProgramType;
-import spirite.base.graphics.gl.engine.GLGraphics;
-import spirite.base.graphics.gl.engine.GLParameters;
+import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLGraphics;
+import spirite.base.graphics.gl.GLParameters;
+import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.pc.jogl.JOGLCore;
 
 public class TestGLDiag extends JDialog  {
