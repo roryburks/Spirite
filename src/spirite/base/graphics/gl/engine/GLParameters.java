@@ -37,6 +37,23 @@ public class GLParameters {
 		this.width = width;
 		this.height = height;
 	}
+	public GLParameters( GLParameters other) {
+		this.params.addAll(other.params);
+		this.texture = other.texture;
+		this.texture2 = other.texture2;
+		this.width = other.width;
+		this.height = other.height;
+		this.flip = other.flip;
+		this.clipRect = (other.clipRect == null)?null:new Rect(other.clipRect);
+		this.useBlendMode = other.useBlendMode;
+		this.useDefaultBlendmode = other.useDefaultBlendmode;
+		this.bm_dfa = other.bm_dfa;
+		this.bm_dfc = other.bm_dfc;
+		this.bm_sfa = other.bm_sfa;
+		this.bm_sfc = other.bm_sfc;
+		this.bm_fa = other.bm_fa;
+		this.bm_fc = other.bm_fc;
+	}
 	
 	public void addParam( GLParam param) {
 		params.add(param);

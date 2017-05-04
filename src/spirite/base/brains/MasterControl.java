@@ -228,7 +228,7 @@ public class MasterControl
     	}
     	
     	try {
-    		HybridUtil.savePNG( img, ext, f);
+    		HybridUtil.saveEXT( img, ext, f);
 //			ImageIO.write( bi, ext, f);
 			settingsManager.setImageFilePath(f);
 		} catch (IOException e) {

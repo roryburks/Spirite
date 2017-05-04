@@ -12,7 +12,6 @@ import java.nio.IntBuffer;
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
@@ -24,6 +23,7 @@ import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.jogl.JOGLCore;
 
@@ -36,6 +36,13 @@ public class HybridUtil {
 	/**
 	 * Converts a RawImage from one type to another.  If it already is that type
 	 * of RawImage, returns it unchanged.
+	 * <br><br>
+	 * Supported Conversions:
+	 *  <li>ImageBI -> GLImage
+	 * 	<li>GLImage -> ImageBI
+	 * @param from Image to Convert
+	 * @param to Class to convert it to
+	 * @see HybridHelper.loadImageIntoGL
 	 * */
 	public static RawImage convert( RawImage from, Class<? extends RawImage> to) {
 		if( from.getClass() == to) {
@@ -56,9 +63,13 @@ public class HybridUtil {
 	        HybridHelper.loadImageIntoGL( from, gl);
 	        return new GLImage( tex, from.getWidth(), from.getHeight());
 		}
-		else {
-			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Conversion( HybridUtil).");
+		if( to == ImageBI.class) {
+			if( from.getClass() == GLImage.class) {
+				return new ImageBI(PCUtil.glToBI((GLImage)from));
+			}
 		}
+		
+		MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Conversion (in HybridUtil).\nFrom:"+from.getClass() +"\nTo:" +to);
 		
 		return null;
 	}
@@ -88,21 +99,11 @@ public class HybridUtil {
 	}
 	
 	public static void savePNG( RawImage raw, OutputStream os) throws IOException {
-		if( raw instanceof ImageBI) {
-			ImageIO.write( ((ImageBI) raw).img, "png", os);
-		}
-		else {
-			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type in savePNG");
-		}
+		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, "png", os);
 	}
 
-	public static void savePNG(RawImage raw, String ext, File f) throws IOException {
-		if( raw instanceof ImageBI) {
-			ImageIO.write( ((ImageBI) raw).img, ext, f);
-		}
-		else {
-			MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Image Type in savePNG");
-		}
+	public static void saveEXT(RawImage raw, String ext, File f) throws IOException {
+		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, ext, f);
 	}
 	
 	/**
@@ -210,6 +211,12 @@ public class HybridUtil {
 		y1 = Math.max(0, y1 - buffer);
 		x2 = Math.min(data.w-1, x2 + buffer);
 		y2 = Math.min(data.h-1, y2 + buffer);
+		
+		if( raw.isGLOriented()) {
+			int t = y1;
+			y1 = data.h-y2;
+			y2 = data.h-t;
+		}
 		
 		return new Rect( x1, y1, x2-x1+1, y2-y1+1 );
 	}

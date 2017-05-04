@@ -50,19 +50,18 @@ public class HybridHelper {
 		else
 			return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
 	}
+	public static Class<? extends RawImage> getImageType() {
+		return (useGL)?GLImage.class:ImageBI.class;
+	}
 	
 	// ===========
 	// ==== Clipboard
 	public static void imageToClipboard( RawImage image) {
-		if( image instanceof ImageBI) {
-	    	TransferableImage transfer = new TransferableImage(((ImageBI) image).img);
-	    	
-	    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-	    	c.setContents(transfer, null);
-		}
-		else {
-			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image: to Clipboard");
-		}
+    	TransferableImage transfer = new TransferableImage(
+    			((ImageBI)HybridUtil.convert(image, ImageBI.class)).img);
+    	
+    	Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	c.setContents(transfer, null);
 	}
 
 

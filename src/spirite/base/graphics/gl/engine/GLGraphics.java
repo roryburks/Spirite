@@ -47,7 +47,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	public GLGraphics( GLImage glImage ) {
 		this.image = glImage;
-		setDimensions(this.width = glImage.getWidth(), glImage.getHeight());
+		setDimensions(glImage.getWidth(), glImage.getHeight());
 	}
 	
 
@@ -73,39 +73,30 @@ public class GLGraphics extends GraphicsContext{
 	}
 	
 	public synchronized void reset() {
-//		if( glmu != null) {
-//			setDimensions(this.glmu.getWidth(), this.glmu.getHeight());
-//		}
-//		else {
-//			setDimensions(drawable.getSurfaceWidth()
-//					, drawable.getSurfaceHeight());
-//		}
 		this.gl = engine.getGL2();
 		
 		engine.setTarget(image);
-		
-//		if( !drawable.getContext().isCurrent())
-//			drawable.getContext().makeCurrent();
-		gl.getGL2().glViewport(0, 0, width, height);
 	}
 
 	@Override
 	public void drawBounds(RawImage mask, int c) {
+//		drawImage(mask, 0, 0);
+		
 		GLImage img = new GLImage( width, height);
 		
 		GLGraphics other = img.getGraphics();
 		other.clear();
 		
-		GLParameters params2 = new GLParameters(width, height);
+		GLParameters params2 = new GLParameters(getImgParams());
 		params2.texture = new GLImageTexture( mask);
 		other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 				0, 0, mask.getWidth(), mask.getHeight());
+		
 		
 		// Clean up and Apply the surface to an image
 		params2 = new GLParameters(width, height);
 		params2.addParam( new GLParam1i("uCycle", c));
 		params2.texture = new GLImageTexture(img);
-		params2.flip = flip;
 		applyPassProgram( ProgramType.PASS_BORDER, params2, null);
 		
 		img.flush();
@@ -318,7 +309,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = new GLParameters.GLImageTexture(img);
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, img.getWidth(), img.getHeight());
+				x, y, x+img.getWidth(), y+img.getHeight());
 		params.texture = null;
 		
 	}
@@ -328,7 +319,7 @@ public class GLGraphics extends GraphicsContext{
 		params.texture = handle.accessGL();
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, params.texture.getWidth(), params.texture.getHeight());
+				x, y, x+params.texture.getWidth(), y+params.texture.getHeight());
 		params.texture = null;
 	}
 	

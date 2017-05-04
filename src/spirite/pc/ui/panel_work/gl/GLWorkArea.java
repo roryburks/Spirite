@@ -110,6 +110,7 @@ public class GLWorkArea
 		GLGraphics glgc = new GLGraphics( w, h, true);
 		
 		engine.setGL(gl);
+		engine.setTarget(0);
 		
 		gl.glViewport(0, 0, w, h);
 		
