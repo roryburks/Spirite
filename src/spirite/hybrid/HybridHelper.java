@@ -27,15 +27,32 @@ import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
+
+/** 
+ * 
+ * 
+ * @author Rory Burks
+ *
+ */
 public class HybridHelper {
+//	public class HybridHelper {
+//		public static GLCore getGLCore() {return null;}
+//		public static boolean showConfirm( String title, String message) {return false;}
+//		public static void showMessage( String title, String message) {}
+//		public static RawImage createImage( int width, int height) {}
+//		public static Class<? extends RawImage> getImageType() {}
+//		
+//		public static void imageToClipboard( RawImage image) {}
+//		public static RawImage imageFromClipboard() {}
+//		public static void loadImageIntoGL(RawImage image, GL2 gl) {}
+//	}
 
 	public static int BI_FORMAT = BufferedImage.TYPE_INT_ARGB;
 	
-	private static GLCore core;
 	private static boolean useGL = true;
-	
 	public static boolean isUsingGL() {return useGL;}
-	
+
+	private static GLCore core;
 	public static GLCore getGLCore() {
 		if( core == null) core = new JOGLCore();
 		return core;

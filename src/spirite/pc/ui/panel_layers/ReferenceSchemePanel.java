@@ -301,6 +301,7 @@ public class ReferenceSchemePanel extends OmniComponent
 								RawImage bi = master.getRenderEngine().renderImage(settings);
 								
 								// TODO: MARK
+								
 								g.drawImage(((ImageBI)bi).img, 0, 0, d.width, d.height, null);
 							}
 							else if( reference instanceof ImageReference){
