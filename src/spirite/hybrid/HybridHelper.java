@@ -20,10 +20,13 @@ import com.jogamp.opengl.GL2;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.wrap.GLCore;
+import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.image_data.RawImage;
+import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.jogl.JOGLCore;
+import spirite.pc.jogl.JOGLCore.OnGLLoadObserver;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
@@ -57,6 +60,22 @@ public class HybridHelper {
 		if( core == null) core = new JOGLCore();
 		return core;
 	}
+
+    private static boolean initGL() {
+    	try {
+    		GLEngine engine = GLEngine.getInstance();
+    		JOGLCore.init(new OnGLLoadObserver() {
+				@Override
+				public void onLoad(GL2 gl) throws MGLException {
+					engine.init(gl);
+				}
+			});
+    	}catch( Exception e) { 
+    		MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Could not create OpenGL Context: \n" + e.getMessage());
+    		return false;
+    	}
+    	return true;
+    }
 	
 	// ============
 	// ==== Mesages
@@ -71,8 +90,10 @@ public class HybridHelper {
 	}
 
 	public static RawImage createImage( int width, int height) {
-		if( useGL)
+		if( useGL) {
+			initGL();
 			return new GLImage(width,height);
+		}
 		else
 			return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
 	}

@@ -527,8 +527,10 @@ public class UndoEngine {
 		protected ImageContext( ImageHandle image) {
 			super(image);
 			
+			RawImage img = image.deepAccess().deepCopy();
+			
 			actions.add(new KeyframeAction(
-					cacheManager.cacheImage(image.deepAccess().deepCopy(), UndoEngine.this), null));
+					cacheManager.cacheImage(img, UndoEngine.this), null));
 			
 			met = 0;
 			pointer = 0;
