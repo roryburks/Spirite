@@ -52,6 +52,7 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.Vec2;
+import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.SliderPanel;
@@ -302,10 +303,12 @@ public class ReferenceSchemePanel extends OmniComponent
 								
 								// TODO: MARK
 								
-								g.drawImage(((ImageBI)bi).img, 0, 0, d.width, d.height, null);
+								g.drawImage(((ImageBI)HybridUtil.convert(bi, ImageBI.class)).img, 0, 0, d.width, d.height, null);
 							}
 							else if( reference instanceof ImageReference){
-								BufferedImage bi = ((ImageBI)((ImageReference) reference).image).img;
+								RawImage raw = ((ImageReference) reference).image;
+								
+								BufferedImage bi = ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img;
 								g.drawImage(bi, 
 										0, 0, bi.getWidth(), bi.getHeight(),
 										0, 0, d.width, d.height, null);

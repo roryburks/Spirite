@@ -471,8 +471,6 @@ public class LayerTreePanel extends ContentTree
 	
 	
 	
-	
-	
 	private final LTPContextMenu contextMenu = new LTPContextMenu();
 	class LTPContextMenu extends JPopupMenu {
 		Node node = null;

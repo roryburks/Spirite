@@ -98,7 +98,7 @@ public class GLImage extends RawImage {
 		
 		engine.setTarget(this);
 		IntBuffer read = IntBuffer.allocate(1);
-		gl.glReadnPixels( x, height-y, 1, 1, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read);
+		gl.glReadnPixels( x, height-y-1, 1, 1, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read);
 		return read.get(0);
 	}
 

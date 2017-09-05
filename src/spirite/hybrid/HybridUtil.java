@@ -218,7 +218,8 @@ public class HybridUtil {
 			y2 = data.h-t;
 		}
 		
-		return new Rect( x1, y1, x2-x1+1, y2-y1+1 );
+		// TODO: Figure out why the -1 in y1-1 is needed.  It definitely shouldn't be.
+		return new Rect( x1, y1-1, x2-x1+1, y2-y1+1 );
 	}
 	private static abstract class _ImageCropHelper {
 		final int w;
