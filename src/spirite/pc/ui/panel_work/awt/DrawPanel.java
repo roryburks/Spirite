@@ -35,6 +35,7 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.pen.JPenPenner;
@@ -119,7 +120,7 @@ public class DrawPanel extends JPanel
     			renderEngine.getDefaultRenderTarget(workspace));
         long start = System.currentTimeMillis();
         // Render the image
-    	BufferedImage image = ((ImageBI)renderEngine.renderImage(settings)).img;
+    	BufferedImage image = ((ImageBI)HybridUtil.convert(renderEngine.renderImage(settings), ImageBI.class)).img;
 
     	if( image != null) {
         g.drawImage( image, zoomer.itsX(0), zoomer.itsY(0),

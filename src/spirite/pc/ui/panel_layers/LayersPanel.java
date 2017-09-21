@@ -15,6 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
 
@@ -40,6 +41,8 @@ public class LayersPanel extends OmniComponent {
 	private final JButton btnNewLayer = new JButton();
 	private final JButton btnNewGroup = new JButton();
 	private final OpacitySlider opacitySlider =  new OpacitySlider();
+	private final LayerAnimView layerAnimView;
+	private final LayerTabPane layerTabPane;
 	
 	// Render Chooser Components
 	private final JLabel rcLabel = new JLabel("Mode:");
@@ -57,6 +60,13 @@ public class LayersPanel extends OmniComponent {
 			this.value = method.defaultValue;
 		}
 	}
+	
+	class LayerTabPane extends JTabbedPane {
+		LayerTabPane() {
+			this.addTab("Normal View", layerTreePanel);
+			this.addTab("AnimView", layerAnimView);
+		}
+	}
 		
 	/**
 	 * Create the panel.
@@ -64,6 +74,8 @@ public class LayersPanel extends OmniComponent {
 	public LayersPanel(MasterControl master) {
 		this.dialogs = master.getDialogs();
 		layerTreePanel = new LayerTreePanel(master, this);
+		layerAnimView = new LayerAnimView();
+		layerTabPane = new LayerTabPane();	// must be after its sub-components
 		
 		RenderMethod values[] = RenderMethod.values();
 		RenderTuple options[] = new RenderTuple[ values.length];
@@ -144,7 +156,7 @@ public class LayersPanel extends OmniComponent {
 							.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
 							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
-						.addComponent(layerTreePanel, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
+						.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
 					.addGap(3))
 		);
 		groupLayout.setVerticalGroup(
@@ -158,7 +170,7 @@ public class LayersPanel extends OmniComponent {
 					)
 					.addComponent(opacitySlider, 32, 32, 32)
 					.addGap(0)
-					.addComponent(layerTreePanel, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+					.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
