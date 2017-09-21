@@ -40,6 +40,7 @@ public class BetterTree extends JPanel {
 		RebuildTree();
 	}
 	
+	
 	private void RebuildTree() {
 		this.removeAll();
 		
@@ -56,12 +57,23 @@ public class BetterTree extends JPanel {
 		}
 		
 		layout.setHorizontalGroup(horGroup);
-		layout.setVerticalGroup(vertGroup);
+		layout.setVerticalGroup(vertGroup.addGap(0, Short.MAX_VALUE, Short.MAX_VALUE));
 		
 		this.setLayout(layout);
 		this.repaint();
 		this.revalidate();
 		this.doLayout();
+	}
+	
+	public List<BTNode> GetRoots() {
+		return new ArrayList<>(roots);
+	}
+	
+	public void AddRoot( BTNode node) {
+		if( node != null) {
+			roots.add(node);
+			RebuildTree();
+		}
 	}
 	
 	

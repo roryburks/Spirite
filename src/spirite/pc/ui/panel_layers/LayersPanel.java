@@ -74,7 +74,7 @@ public class LayersPanel extends OmniComponent {
 	public LayersPanel(MasterControl master) {
 		this.dialogs = master.getDialogs();
 		layerTreePanel = new LayerTreePanel(master, this);
-		layerAnimView = new LayerAnimView();
+		layerAnimView = new LayerAnimView( master);
 		layerTabPane = new LayerTabPane();	// must be after its sub-components
 		
 		RenderMethod values[] = RenderMethod.values();

@@ -299,6 +299,8 @@ public class FixedFrameAnimation extends Animation
 			private int length;
 			private LayerNode node;
 			private Marker marker;
+			
+			
 			private Frame( LayerNode node, int length, Marker marker) {
 				this.node = node;
 				this.length = length;
@@ -325,14 +327,22 @@ public class FixedFrameAnimation extends Animation
 				
 				_triggerChange();
 			}
+			
 		}
 
 		protected GroupNode group;
+		protected String name;
 		protected final ArrayList<Frame> frames = new ArrayList<>();
 		protected boolean asynchronous = false;
 		
 		private AnimationLayer() {}
-		
+
+		public String getName() {
+			return (group == null)?name:group.getName();
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
 		
 		public void moveNode(LayerNode moveNode) {
 			Iterator<Frame> it = frames.iterator();

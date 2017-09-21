@@ -171,7 +171,7 @@ public class AnimationManager implements MImageObserver {
     		MAnimationStructureObserver obs = it.next().get();
     		if( obs == null) it.remove();
     		else  
-    			obs.animationAdded( evt);
+    			obs.animationRemoved(evt);
     	}
 	}
     
@@ -186,7 +186,7 @@ public class AnimationManager implements MImageObserver {
     		MAnimationStructureObserver obs = it.next().get();
     		if( obs == null) it.remove();
     		else  
-    			obs.animationAdded( evt);
+    			obs.animationChanged( evt);
     	}
 	}
 	
