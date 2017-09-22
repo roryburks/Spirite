@@ -1,6 +1,8 @@
 package spirite.pc.ui.panel_layers;
 
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -17,6 +19,8 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	MasterControl master;
 	BetterTree tree = new BetterTree();
 	
+	List<AnimationSchemePanel> panels = new ArrayList<>();
+	
 	public LayerAnimView(MasterControl master) {
 		this.master = master;
 		InitComponents();
@@ -28,11 +32,18 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		this.add(tree);
 	}
 
+	private void Rebuild() {
+		for( AnimationSchemePanel panel : panels) {
+			panel.Rebuild();
+		}
+	}
+	
 	// AnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
-		tree.AddRoot( tree.new LeafNode(new JButton("SN")));
-		//tree.AddRoot( tree.new LeafNode(new AnimationSchemePanel((FixedFrameAnimation)evt.getAnimation())));
+		AnimationSchemePanel newPanel = new AnimationSchemePanel((FixedFrameAnimation)evt.getAnimation());
+		panels.add(newPanel);
+		tree.AddRoot( tree.new LeafNode(newPanel));
 	}
 
 	@Override
@@ -43,7 +54,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 
 	@Override
 	public void animationChanged(AnimationStructureEvent evt) {
-		// TODO Auto-generated method stub
+		this.Rebuild();
 		
 	}
 
