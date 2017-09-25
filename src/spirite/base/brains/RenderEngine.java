@@ -37,6 +37,7 @@ import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 
 /***
@@ -210,6 +211,9 @@ public class RenderEngine
 	public RawImage accessThumbnail( Node node) {
 		return thumbnailManager.accessThumbnail(node);
 	}
+	public RawImage accessThumbnail( Node node, Class<? extends RawImage> as) {
+		return thumbnailManager.accessThumbnail(node, as);
+	}
 	private final ThumbnailManager thumbnailManager = new ThumbnailManager();
 	public ThumbnailManager getThumbnailManager() {return thumbnailManager;}
 	/** 
@@ -222,17 +226,49 @@ public class RenderEngine
 	public class ThumbnailManager {
 		int thumbWidth = 32;
 		int thumbHeight = 32;
-		private ThumbnailManager(){}
+		private ThumbnailManager(){
+			workingClass = HybridHelper.getImageType();
+			thumbnailAtlas.put( workingClass, thumbnailPrimaryMap);
+		}
 
-		private final Map<Node,Thumbnail> thumbnailMap = new HashMap<>();
+		private final Map<Class<? extends RawImage>,Map<Node,Thumbnail>> thumbnailAtlas = new HashMap<>();
+		private final Map<Node,Thumbnail> thumbnailPrimaryMap = new HashMap<>();
+		private Class<? extends RawImage> workingClass;
 		
 		public RawImage accessThumbnail( Node node) {
-			Thumbnail thumb = thumbnailManager.thumbnailMap.get(node);
+			Thumbnail thumb = thumbnailPrimaryMap.get(node);
 			
 			if( thumb == null) {
 				return null;
 			}
 			return thumb.img;
+		}
+		public RawImage accessThumbnail( Node node, Class<? extends RawImage> as) {
+			if( !thumbnailAtlas.containsKey(as)) 
+				thumbnailAtlas.put(as, new HashMap<>());
+			
+			Map<Node,Thumbnail> map = thumbnailAtlas.get(as);
+			
+			Thumbnail thumb = map.get(node);
+			if( thumb == null) {
+				RawImage raw = accessThumbnail( node);
+				if( raw == null)
+					return null;
+				
+				RawImage converted = HybridUtil.convert(raw, as);
+				map.put(node, new Thumbnail(converted));
+				return converted;
+			}
+			else {
+				if( !thumb.changed)
+					return thumb.img;
+				
+				RawImage raw = accessThumbnail( node);
+				thumb.img = HybridUtil.convert(raw,as);
+				thumb.changed = false;
+				
+				return thumb.img;
+			}
 		}
 
 		
@@ -246,23 +282,36 @@ public class RenderEngine
 			}
 			
 			// Remove all entries of nodes that no longer exist.
-			thumbnailMap.keySet().retainAll(allNodes);
+			thumbnailPrimaryMap.keySet().retainAll(allNodes);
 			
 			// Then go through and update all thumbnails
 			for(Node node : allNodes) {
-				Thumbnail thumb = thumbnailMap.get(node);
+				Thumbnail thumb = thumbnailPrimaryMap.get(node);
 				
 				if( thumb == null) {
-					thumb = new Thumbnail();
-					thumb.img = renderThumbnail(node);
-					thumb.changed = false;
-					thumbnailMap.put(node, thumb);
+					thumb = new Thumbnail(renderThumbnail(node));
+					thumbnailPrimaryMap.put(node, thumb);
 				}
 				else if( thumb.changed) {
 					if( thumb.img != null)
 						thumb.img.flush();
 					thumb.img = renderThumbnail(node);
 					thumb.changed = false;
+					
+					// Tell all derived thumbnail that they're out of date, but don't
+					//	update them until they're needed
+					Iterator<Entry<Class<? extends RawImage>,Map<Node,Thumbnail>>> itOut = thumbnailAtlas.entrySet().iterator();
+					while( itOut.hasNext()) {
+						Entry<Class<? extends RawImage>,Map<Node,Thumbnail>> entry = itOut.next();
+						
+						if(entry.getKey() == workingClass)
+							continue;
+						
+						Map<Node,Thumbnail> map = entry.getValue();
+						Thumbnail otherThumb = map.get(node);
+						if( otherThumb != null)
+							otherThumb.changed = true;
+					}
 				}
 			}
 		}
@@ -288,13 +337,15 @@ public class RenderEngine
 		private class Thumbnail {
 			boolean changed = false;
 			RawImage img;
+			Thumbnail( RawImage img) {this.img = img;}
 		}
 
 		public void imageChanged(ImageChangeEvent evt) {
 			List<ImageHandle> relevantData = evt.getChangedImages();
 			List<Node> changedNodes = evt.getChangedNodes();
+		
+			Iterator<Entry<Node,Thumbnail>> it = thumbnailPrimaryMap.entrySet().iterator();
 			
-			Iterator<Entry<Node,Thumbnail>> it = thumbnailMap.entrySet().iterator();
 			while( it.hasNext()) {
 				Entry<Node,Thumbnail> entry = it.next();
 				if( entry.getValue().changed) continue;

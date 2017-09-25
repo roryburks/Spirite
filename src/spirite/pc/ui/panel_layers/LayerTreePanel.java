@@ -67,6 +67,7 @@ import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
 import spirite.pc.ui.UIUtil;
@@ -736,7 +737,7 @@ public class LayerTreePanel extends ContentTree
 				
 				
 				if( node != null) {
-					RawImage img = renderEngine.accessThumbnail(node);
+					RawImage img = renderEngine.accessThumbnail(node, ImageBI.class);
 					if( img != null) {
 						UIUtil.drawTransparencyBG(g, new Rectangle( img.getWidth(), img.getHeight()));
 						(new AWTContext(g, getWidth(), getHeight())).drawImage( img, 0, 0);

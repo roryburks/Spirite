@@ -24,6 +24,7 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.hybrid.Globals;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.OmniEye;
 
 
@@ -238,8 +239,8 @@ public class AnimationSchemePanel extends JPanel {
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				
-				g.drawOval(0, 0, this.getWidth(), this.getHeight());
-				//master.getRenderEngine().accessThumbnail(frame.getLayerNode());
+				ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLayerNode(), ImageBI.class);
+				g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 			}
 		};
 		
