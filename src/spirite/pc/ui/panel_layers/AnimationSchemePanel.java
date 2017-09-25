@@ -3,6 +3,7 @@ package spirite.pc.ui.panel_layers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +14,25 @@ import javax.swing.GroupLayout.Group;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
+import spirite.base.brains.MasterControl;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.hybrid.Globals;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.pc.ui.components.OmniEye;
 
 
 /***
  * AnimationSchemePanel is a grid 
  */
 public class AnimationSchemePanel extends JPanel {
+	private final MasterControl master;
+	
 	private FixedFrameAnimation animation;
 	private final JPanel topLeft = new JPanel();
 	private final JPanel bottomRight = new JPanel();
@@ -34,8 +41,12 @@ public class AnimationSchemePanel extends JPanel {
 	private final int BOTTOM_BAR_HEIGHT = 16;
 	private final int TL_WIDTH = 16;
 	private final int ROW_HEIGHT = 32;
+
+	private static final Color ARROW_COLOR = Color.RED;
+	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
 	
-	public AnimationSchemePanel( FixedFrameAnimation fixedFrameAnimation) {
+	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
+		this.master = master;
 		this.animation = fixedFrameAnimation;
 		BuildFromAnimation();
 		
@@ -81,35 +92,55 @@ public class AnimationSchemePanel extends JPanel {
 		
 		// Animation Bars
 		Component[] ticks = new Component[Math.max(0,end-start)];
-		Group[] vertGroups = new Group[Math.max(0, end-start)];
-		for( int i = start; i < end; ++i) {
-			vertGroups[i-start]= layout.createParallelGroup();
-			vertGroup.addGroup(vertGroups[i-start]);
-			
-			ticks[i-start] = new TickPanel(i);
-			horGroups[0].addComponent(ticks[i-start], TL_WIDTH,TL_WIDTH,TL_WIDTH);
-			vertGroups[i-start].addComponent(ticks[i-start],ROW_HEIGHT,ROW_HEIGHT,ROW_HEIGHT);
+		Group vertMid = layout.createParallelGroup();
+		vertGroup.addGroup(vertMid);
+		{
+			Group vertInner = layout.createSequentialGroup();
+			vertMid.addGroup(vertInner);
+			for( int i = start; i < end; ++i) {
+				
+				ticks[i-start] = new TickPanel(i);
+				horGroups[0].addComponent(ticks[i-start], TL_WIDTH,TL_WIDTH,TL_WIDTH);
+				vertInner.addComponent(ticks[i-start],ROW_HEIGHT,ROW_HEIGHT,ROW_HEIGHT);
+				System.out.println(i);
+			}
 		}
+		
 		layout.linkSize(SwingConstants.VERTICAL, ticks);
 		
 		// Fill out the animation
 		for( int i=0; i < layers.size(); ++i) {
+			Group vertInner = layout.createSequentialGroup();
+			vertMid.addGroup(vertInner);
 			AnimationLayer layer = layers.get(i);
+			
+			int currentTick = start;
+			
+			List<Component> linked = new ArrayList<>();
 			
 			for(Frame frame : layer.getFrames()) {
 				if( frame.getMarker() == Marker.FRAME)
 				{
-					int fs = Math.max(start, frame.getStart());
-					int fe = Math.min( end, Math.max(fs, frame.getEnd()));
+					int fs = Math.max( currentTick,frame.getStart());
+					int fe = Math.max(fs, Math.min(end, frame.getEnd()));
 					
 					if( fs < fe) {
-						Component component = new FramePanel();
+						if( fs > currentTick)
+							vertInner.addGap(ROW_HEIGHT * fs - currentTick);
+						
+						Component component = new FramePanel( frame, fe-fs-1);
+						linked.add(component);
 						int h = ROW_HEIGHT * (fe-fs);
-						vertGroups[fs-start].addComponent(component,h,h,h);
+						vertInner.addComponent(component,h,h,h);
 						horGroups[1+i].addComponent(component);
+												
+						currentTick = fe;
 					}
 				}
 			}
+
+			linked.add(titles[i]);
+			layout.linkSize(SwingConstants.HORIZONTAL, linked.toArray( new Component[linked.size()]));
 		}
 		
 		// Lower Bar
@@ -121,7 +152,12 @@ public class AnimationSchemePanel extends JPanel {
 
 		for( int j=0; j < layers.size(); ++j) {
 			AnimationLayer layer = layers.get(j);
-			// TODO
+			
+			Component c = new BottomPanel();
+			
+			horGroups[j+1].addComponent(c);
+			bottomVertGroup.addComponent(c);
+			layout.linkSize(SwingConstants.HORIZONTAL, c, titles[j]);
 		}
 		
 		layout.setHorizontalGroup(horGroup);
@@ -155,7 +191,7 @@ public class AnimationSchemePanel extends JPanel {
 			this.tick = tick;
 			label.setText(""+tick);
 			
-			this.setBackground( new Color((int)(Math.random()*0xfffff)));
+			this.setBackground( tickColor);
 			
 			label.setFont( new Font("Tahoma",Font.BOLD, 10));
 
@@ -163,9 +199,105 @@ public class AnimationSchemePanel extends JPanel {
 		}
 	}
 	
-	private class FramePanel extends JPanel {
-		private FramePanel() {
+	private class BottomPanel extends JPanel {
+		private final JToggleButton btnLock = new JToggleButton("X");
+		private final JToggleButton btnSettings = new JToggleButton("S");
+		private final JToggleButton omniEye = new OmniEye();
+		
+		private BottomPanel() {
+			btnLock.setBorder(null);
+			btnSettings.setBorder(null);
+			
+
+			GroupLayout layout = new GroupLayout(this);
+			layout.setHorizontalGroup( layout.createSequentialGroup()
+					.addGroup( layout.createParallelGroup()
+							.addComponent(btnLock)
+							.addComponent(btnSettings))
+					.addComponent(omniEye));
 			this.setBorder( BorderFactory.createLineBorder(Color.BLACK));
+			layout.setVerticalGroup( layout.createParallelGroup()
+					.addGroup( layout.createSequentialGroup()
+							.addComponent(btnLock)
+							.addComponent(btnSettings))
+					.addComponent(omniEye));
+			
+			layout.linkSize( SwingConstants.VERTICAL, btnLock,btnSettings);
+			
+			this.setLayout(layout);
 		}
 	}
+	
+	private class FramePanel extends JPanel {
+		private final Frame frame;
+		
+		private final JToggleButton btnVLock = new JToggleButton("V");
+		private final JToggleButton btnLLock = new JToggleButton("L");
+		private final JPanel drawPanel = new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				
+				g.drawOval(0, 0, this.getWidth(), this.getHeight());
+				//master.getRenderEngine().accessThumbnail(frame.getLayerNode());
+			}
+		};
+		
+		private FramePanel( Frame frame, int extendHeight) {
+			this.frame = frame;
+			btnVLock.setBorder(null);
+			btnLLock.setBorder(null);
+			
+			GroupLayout layout = new GroupLayout(this);
+			
+			Group hor = layout.createParallelGroup();
+			hor.addGroup(layout.createSequentialGroup()
+					.addGroup( layout.createParallelGroup()
+							.addComponent(btnVLock)
+							.addComponent(btnLLock))
+					.addComponent(drawPanel));
+			
+			Group vert = layout.createSequentialGroup();
+			vert.addGroup(layout.createParallelGroup()
+					.addGroup( layout.createSequentialGroup()
+							.addComponent(btnVLock)
+							.addComponent(btnLLock))
+					.addComponent(drawPanel, ROW_HEIGHT,ROW_HEIGHT,ROW_HEIGHT));
+			
+			layout.setHorizontalGroup( hor);
+			layout.setVerticalGroup( vert);
+			
+			if( extendHeight > 0) {
+				Component c = new FrameExtendPanel();
+				vert.addComponent(c);
+				hor.addComponent(c);
+			}
+
+			drawPanel.setBorder( BorderFactory.createLineBorder(Color.BLACK));
+			
+			layout.linkSize( SwingConstants.VERTICAL, btnVLock,btnLLock);
+			
+			this.setLayout(layout);
+		}
+
+		private class FrameExtendPanel extends JPanel {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.setColor(ARROW_COLOR);
+				
+				int b = 2;
+				int tw = 2;
+				int hw = 8;
+				int hh = 8;
+				int c = this.getWidth() / 2;
+				int H = this.getHeight();
+				int W = this.getWidth();
+
+				g.fillRect( c - tw/2, b, tw, H - 2*b - hh);
+				g.fillPolygon( new int[] {(W-hw)/2,(W+hw)/2,c}, new int[] {H-b-hh,H-b-hh,H-b}, 3);
+			};
+		}
+	}
+	
+	
 }

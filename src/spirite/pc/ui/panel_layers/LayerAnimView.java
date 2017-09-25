@@ -16,10 +16,10 @@ import spirite.pc.ui.generic.BetterTree;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 
 public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver {
-	MasterControl master;
-	BetterTree tree = new BetterTree();
+	private final MasterControl master;
+	private final BetterTree tree = new BetterTree();
 	
-	List<AnimationSchemePanel> panels = new ArrayList<>();
+	private final List<AnimationSchemePanel> panels = new ArrayList<>();
 	
 	public LayerAnimView(MasterControl master) {
 		this.master = master;
@@ -41,7 +41,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	// AnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
-		AnimationSchemePanel newPanel = new AnimationSchemePanel((FixedFrameAnimation)evt.getAnimation());
+		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
 		panels.add(newPanel);
 		tree.AddRoot( tree.new LeafNode(newPanel));
 	}
