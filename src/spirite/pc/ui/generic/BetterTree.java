@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
+import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -36,6 +37,7 @@ public class BetterTree extends JPanel {
 						new LeafNode( new JButton("Test4")),
 						nodeInner
 				})));
+		roots.add( new BranchingNode(new JButton("Test5")));
 		
 		RebuildTree();
 	}
@@ -47,7 +49,7 @@ public class BetterTree extends JPanel {
 		GroupLayout layout = new GroupLayout(this);
 		
 		Group horGroup = layout.createParallelGroup();
-		Group vertGroup = layout.createSequentialGroup();
+		SequentialGroup vertGroup = layout.createSequentialGroup();
 		
 		for( BTNode node : roots) {
 			Component toAdd = node.BuildContent();
@@ -57,7 +59,7 @@ public class BetterTree extends JPanel {
 		}
 		
 		layout.setHorizontalGroup(horGroup);
-		layout.setVerticalGroup(vertGroup.addGap(0, Short.MAX_VALUE, Short.MAX_VALUE));
+		layout.setVerticalGroup(vertGroup.addContainerGap());
 		
 		this.setLayout(layout);
 		this.repaint();

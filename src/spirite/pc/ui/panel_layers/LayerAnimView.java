@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -21,15 +22,18 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	
 	private final List<AnimationSchemePanel> panels = new ArrayList<>();
 	
+	private final JScrollPane scroll;
+	
 	public LayerAnimView(MasterControl master) {
 		this.master = master;
+		scroll = new JScrollPane(tree);
 		InitComponents();
 		master.addWorkspaceObserver(this);
 	}
 	
 	private void InitComponents() {
     	this.setLayout(new GridLayout());
-		this.add(tree);
+		this.add(scroll);
 	}
 
 	private void Rebuild() {

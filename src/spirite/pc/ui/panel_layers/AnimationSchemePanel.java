@@ -240,7 +240,9 @@ public class AnimationSchemePanel extends JPanel {
 				super.paintComponent(g);
 				
 				ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLayerNode(), ImageBI.class);
-				g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
+				
+				if( img != null)
+					g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 			}
 		};
 		
