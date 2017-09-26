@@ -55,7 +55,9 @@ public abstract class Layer {
 	 * ImageHandles.
 	 */
 	public abstract Layer logicalDuplicate();
-	
+
+	public abstract int getDynamicOffsetX();
+	public abstract int getDynamicOffsetY();
 	
 	/** 
 	 * Contains all the logical information for the workspace to create

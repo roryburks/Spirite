@@ -3,6 +3,7 @@ package spirite.pc.ui.panel_layers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -95,7 +96,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			horGroups[i] = layout.createParallelGroup();
 			horGroup.addGroup(horGroups[i]);
 		}
-		
+
 		// Title Bar
 		Group titleVertGroup = layout.createParallelGroup();
 		vertGroup.addGroup(titleVertGroup);
@@ -184,7 +185,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		
 		layout.setHorizontalGroup(horGroup);
 		layout.setVerticalGroup(vertGroup);
-		
+
 		this.setLayout(layout);
 	}
 	
@@ -471,8 +472,10 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 
 			@Override
 			void EndState() {
+				System.out.println("target:"+target);
+				
 				if( target != frame.getStart()) {
-					frame.getLayerContext().moveFrame(frame, target);
+					frame.getLayerContext().moveFrame(frame, target, target >= frame.getStart());
 				}
 				
 				//frame.getLayerContext().moveNode(moveNode);

@@ -710,7 +710,8 @@ public class RenderEngine
 //			g2.setRenderingHints(settings.hints);
 			gc.scale( settings.width / (float)handle.getWidth(), 
 					  settings.height / (float)handle.getHeight());
-			handle.drawLayer( gc,null);
+			handle.drawLayer( gc, null);
+			
 //			g.dispose();
 			return img;
 		}
@@ -772,8 +773,9 @@ public class RenderEngine
 			
 			gc.scale( settings.width / (float)layer.getWidth(),
 					settings.height / (float)layer.getHeight());
+			gc.translate(-layer.getDynamicOffsetX(), -layer.getDynamicOffsetY());
+			
 			layer.draw(gc);
-//			g.dispose();
 			return img;
 		}
 	}

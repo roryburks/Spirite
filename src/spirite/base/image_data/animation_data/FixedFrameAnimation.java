@@ -371,14 +371,14 @@ public class FixedFrameAnimation extends Animation
 		}
 		
 		// :::: Direct Action
+		
+		/*** Adds an empty frame to fill the gap starting at StartTick of length length. */
 		public void addGap( int startTick, int length) {
 			Frame frame = getFrameForMet(startTick);
 			int before = frames.indexOf(getFrameForMet(startTick));
 			int start = (before == -1) ? startTick : Math.min(startTick,frames.get(before).getStart());
 			
-			System.out.println("b4:"+before + ":" + frame + ":::" + startTick);
-			
-			Frame toAdd = new Frame(null, length, Marker.EMPTY);
+			Frame toAdd = new Frame(null, start-startTick + length, Marker.EMPTY);
 			context.getUndoEngine().performAndStore( new NullAction() {
 				@Override protected void undoAction() {
 					frames.remove(toAdd);
@@ -399,15 +399,25 @@ public class FixedFrameAnimation extends Animation
 			});
 		}
 		
-		public void moveFrame( Frame frameToMove, int startTick) {
-//			ImageWorkspace ws = group.getContext();
-//
-//			if( frameBefore == null)
-//				ws.moveInto(frameToMove.getLayerNode(), group, true);
-//			else
-//				ws.moveAbove(frameToMove.getLayerNode(), frameBefore.getLayerNode());
-//			
-//			System.out.println("S");
+		/** Moves a given frame into this animation layer at the given startTick.
+		 * 
+		 *  Note: does not necessarily have to be a frame from this AnimationLayer
+		 *  or even this animation. */
+		public void moveFrame( Frame frameToMove, int startTick, boolean above) {
+			Frame frame = getFrameForMet( startTick);
+			int before = frames.indexOf(frame);
+			int length = frameToMove.length;
+			
+			if( frame == null)
+				context.moveInto( frameToMove.getLayerNode(), group, true);
+			else if( above)
+				context.moveAbove(frameToMove.getLayerNode(), frame.getLayerNode());
+			else 
+				context.moveBelow(frameToMove.getLayerNode(), frame.getLayerNode());
+			//context.getUndoEngine().pause();
+
+			// TODO: Not entirely properly undoable
+			// TODO: Make it erase gaps
 		}
 		
 		public void addNode( LayerNode toAdd, Frame frameBefore) {

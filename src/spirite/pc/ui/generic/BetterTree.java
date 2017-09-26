@@ -180,7 +180,7 @@ public class BetterTree extends JPanel {
 			GroupLayout layout = new GroupLayout(rootPanel);
 			layout.setHorizontalGroup( layout.createSequentialGroup()
 					.addGap(propBranchWidth)
-					.addComponent(content, 0, 0, Short.MAX_VALUE));
+					.addComponent(content, 0, GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE));
 			layout.setVerticalGroup( layout.createParallelGroup().addComponent(content));
 			rootPanel.setLayout( layout);
 		}

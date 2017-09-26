@@ -133,6 +133,13 @@ public class SimpleLayer extends Layer {
 		}
 		return null;
 	}
+
+	@Override public int getDynamicOffsetX() {
+		return data.getDynamicX();
+	}
+	@Override public int getDynamicOffsetY() {
+		return data.getDynamicY();
+	}
 	
 	
 

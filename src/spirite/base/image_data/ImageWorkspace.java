@@ -968,7 +968,7 @@ public class ImageWorkspace {
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
 		CachedImage ci = cacheManager.cacheImage(img, this);
 		ci.reserve(this);
-		imageData.put( workingID, new InternalImage(ci));
+		imageData.put( workingID, new DynamicInternalImage(ci,0, 0));
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 

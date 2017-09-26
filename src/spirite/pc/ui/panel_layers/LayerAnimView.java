@@ -1,5 +1,6 @@
 package spirite.pc.ui.panel_layers;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,10 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		scroll = new JScrollPane(tree);
 		InitComponents();
 		master.addWorkspaceObserver(this);
+		
+		scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
+		scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
+		//scroll.getVerticalScrollBar().getUI().s
 	}
 	
 	private void InitComponents() {
