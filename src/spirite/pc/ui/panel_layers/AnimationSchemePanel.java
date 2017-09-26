@@ -148,7 +148,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 					
 					if( fs < fe) {
 						if( fs > currentTick)
-							vertInner.addGap(ROW_HEIGHT * fs - currentTick);
+							vertInner.addGap(ROW_HEIGHT * (fs - currentTick));
 						
 						Component component = new FramePanel( frame, col);
 						linked.add(component);
@@ -328,6 +328,8 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 
 			drawPanel.setOpaque(false);
 			
+			this.setBackground(Color.RED);
+			
 			this.addMouseListener( adapter);
 			this.addMouseMotionListener(adapter);
 			//drawPanel.addMouseListener( adapter);
@@ -366,7 +368,14 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		
 		@Override
 		protected void paintComponent(Graphics g) {
-			setBackground( (ws != null && ws.getSelectedNode() == frame.getLayerNode()) ? Color.YELLOW : Color.WHITE );
+			if( ws == null)
+				setBackground( Color.WHITE);
+			else if( ws.getAnimationManager().getSelectedFrame() == frame)
+				setBackground( Color.YELLOW);
+			else if( ws.getSelectedNode() == frame.getLayerNode())
+				setBackground( new Color(122,170,170));
+			else
+				setBackground( Color.WHITE);
 			
 			super.paintComponent(g);
 		}
@@ -419,7 +428,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 					else if( e.getY() > getHeight() - DRAG_BORDER)
 						setState( new ResizingState(false));
 					else {
-						ws.setSelectedNode(frame.getLayerNode());
+						ws.getAnimationManager().selectFrame(frame);
 						setState( new DraggingFrameState());
 					}
 				}

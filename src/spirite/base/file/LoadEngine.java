@@ -403,7 +403,7 @@ public class LoadEngine {
 	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
-		FixedFrameAnimation animation = new FixedFrameAnimation(name);
+		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
 		
 		int layerCount = helper.ra.readShort();
 		

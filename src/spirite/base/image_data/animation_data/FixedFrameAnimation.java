@@ -23,6 +23,7 @@ import spirite.base.image_data.ImageWorkspace.DeletionChange;
 import spirite.base.image_data.ImageWorkspace.MoveChange;
 import spirite.base.image_data.ImageWorkspace.StructureChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 import spirite.base.util.MUtil;
 
@@ -36,14 +37,17 @@ public class FixedFrameAnimation extends Animation
 	private ArrayList<AnimationLayer> layers = new ArrayList<>();
 	private int startFrame;
 	private int endFrame;
+	private final ImageWorkspace context;
 
 	public FixedFrameAnimation(GroupNode group) {
+		context = group.getContext();
 		layers.add( constructFromGroup(group));
 		name = group.getName();
 		recalculateMetrics();
 	}
 	
-	public FixedFrameAnimation( String name) {
+	public FixedFrameAnimation( String name, ImageWorkspace workspace) {
+		this.context = workspace;
 		this.name = name;
 	}
 	
@@ -186,7 +190,7 @@ public class FixedFrameAnimation extends Animation
 				localMet = MUtil.cycle(start, end, t);
 			}
 			
-			LayerNode node = layer.getFrame(localMet);
+			LayerNode node = layer.getLayerForMet(localMet);
 			
 			if( node != null) {
 				for( TransformedHandle tr  : node.getLayer().getDrawList()) {
@@ -292,7 +296,7 @@ public class FixedFrameAnimation extends Animation
 		START_LOCAL_LOOP,	
 		END_LOCAL_LOOP,
 		END_AND_LOOP,
-		NIL_OUT,
+		EMPTY,
 	}
 
 	public class AnimationLayer {
@@ -325,11 +329,29 @@ public class FixedFrameAnimation extends Animation
 			public void setLength( int newLength) {
 				if( newLength < 0) 
 					throw new IndexOutOfBoundsException();
+				if( length == newLength)
+					return;
 				
-				if( length != newLength) {
-					length = newLength;
-					_triggerChange();
-				}
+				// Kind of ugly, but since Frames are generally only produced
+				//	indirectly by links to other things, you can't rely on
+				//	the frame objects themselves being stored and saved in any
+				//	UndoAction, so the only reliable thing is the frame position
+				int oldLength = length;
+				int frame = getLayerContext().frames.indexOf(this);
+				context.getUndoEngine().performAndStore( new NullAction() {
+					@Override protected void undoAction() {
+						getLayerContext().frames.get(frame).length = oldLength;
+						_triggerChange();
+					}
+					
+					@Override protected void performAction() {
+						getLayerContext().frames.get(frame).length = newLength;
+						_triggerChange();
+					}
+					@Override public String getDescription() {
+						return "Change Frame Length";
+					}
+				});
 			}
 			
 		}
@@ -349,6 +371,34 @@ public class FixedFrameAnimation extends Animation
 		}
 		
 		// :::: Direct Action
+		public void addGap( int startTick, int length) {
+			Frame frame = getFrameForMet(startTick);
+			int before = frames.indexOf(getFrameForMet(startTick));
+			int start = (before == -1) ? startTick : Math.min(startTick,frames.get(before).getStart());
+			
+			System.out.println("b4:"+before + ":" + frame + ":::" + startTick);
+			
+			Frame toAdd = new Frame(null, length, Marker.EMPTY);
+			context.getUndoEngine().performAndStore( new NullAction() {
+				@Override protected void undoAction() {
+					frames.remove(toAdd);
+					_triggerChange();
+				}
+				
+				@Override protected void performAction() {
+					if( before == -1)
+						frames.add(toAdd);
+					else
+						frames.add(before,toAdd);
+					_triggerChange();
+				}
+				@Override
+				public String getDescription() {
+					return "Add Animation Gap";
+				}
+			});
+		}
+		
 		public void moveFrame( Frame frameToMove, int startTick) {
 //			ImageWorkspace ws = group.getContext();
 //
@@ -427,7 +477,19 @@ public class FixedFrameAnimation extends Animation
 			return i;
 		}
 		
-		public LayerNode getFrame( int met) {
+		public Frame getFrameForMet( int met) {
+			int wm = 0;
+			for( int i=0; i < frames.size(); ++i) {
+				Frame frame = frames.get(i);
+				if( met - wm < frame.length)
+					return frame;
+				wm += frame.length;
+			}
+			
+			return null;
+		}
+		
+		public LayerNode getLayerForMet( int met) {
 			int tick = 0;
 			boolean looping = false;
 			int startLoop = 0;
@@ -458,7 +520,7 @@ public class FixedFrameAnimation extends Animation
 					looping = false;
 					loopSize = tick - startLoop;
 					break;
-				case NIL_OUT:
+				case EMPTY:
 					layer = null;
 					break;
 				}

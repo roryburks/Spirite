@@ -522,7 +522,7 @@ public class AnimationSchemeTreePanel extends JPanel
 						break;
 					case END_LOCAL_LOOP:
 					case START_LOCAL_LOOP:
-					case NIL_OUT:
+					case EMPTY:
 						break;
 					case FRAME:
 						behavior = new FrameFrameBehavior(frame);

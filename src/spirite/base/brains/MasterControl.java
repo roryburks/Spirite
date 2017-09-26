@@ -35,6 +35,7 @@ import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
+import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
 import spirite.base.util.glmath.MatTrans;
@@ -760,6 +761,15 @@ public class MasterControl
     			
     			se.attemptClearSelection();
 			}});
+    		
+
+    		commandMap.put("addGapQuick", new Runnable() {@Override public void run() {
+    			Frame frame = workspace.getAnimationManager().getSelectedFrame();
+    			if( frame != null) {
+    				frame.getLayerContext().addGap(frame.getEnd(), 1);
+    				//frame.getLayerContext().
+    			}
+    		}});
     	}
 
 		@Override public List<String> getValidCommands() {

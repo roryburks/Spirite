@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
+import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.animation_data.FixedFrameAnimation;
+import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -22,7 +26,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * @author RoryBurks
  *
  */
-public class AnimationManager implements MImageObserver {
+public class AnimationManager implements MImageObserver, MSelectionObserver {
 	private final ImageWorkspace context;
 	
 	private ArrayList<Animation> animations = new ArrayList<>();
@@ -31,6 +35,7 @@ public class AnimationManager implements MImageObserver {
 
 	AnimationManager( ImageWorkspace context) {
 		this.context = context;
+		context.addSelectionObserver(this);
 		context.addImageObserver(this);
 	}
 	
@@ -102,30 +107,40 @@ public class AnimationManager implements MImageObserver {
 		triggerRemoveAnimation(animation);
 	}
 	
+	// :::: Frame Selection
 	
-	// :::: Animation Links
-/*	private class Link {
-		 Animation animation;
-		 GroupNode group;
-	}
-	private final List<Link> links = new ArrayList<>();
+	// Since there is a 1:many relationship between nodes and animations, sometimes
+	//	you need a finer selection
 	
-	public void linkAnimation( Animation animation, GroupNode group ) {
-		Link link = new Link();
-		link.animation = animation;
-		link.group = group;
+	public AnimationLayer.Frame getSelectedFrame() {
+		if( selectedFrame != null)
+			return selectedFrame;
 		
-		links.add(link);
+		Node node = context.getSelectedNode();
+		
+		if( node instanceof LayerNode && selectedAnimation instanceof FixedFrameAnimation) 
+		{
+			FixedFrameAnimation anim = (FixedFrameAnimation)selectedAnimation;
+			
+			for( AnimationLayer layer : anim.getLayers()) {
+				for( AnimationLayer.Frame frame:  layer.getFrames())
+				{
+					if( frame.getLayerNode() == node)
+						return frame;
+				}
+			}
+		}
+		
+		
+		return null;
 	}
-	public void unlinkAnimation(Animation animation, GroupNode group) {
+	public void selectFrame( AnimationLayer.Frame frame) {
+		context.setSelectedNode( frame == null ? null : frame.getLayerNode());
+		selectedFrame = frame;
 	}
 	
-	public boolean isLinked(Animation animation, GroupNode group) {
-		return false;
-	}
+	private AnimationLayer.Frame selectedFrame;
 	
-	public void destroyLinked( Animation animation, GroupNode group) {
-	}*/
 	
 	
 	// :::: Observers
@@ -263,9 +278,6 @@ public class AnimationManager implements MImageObserver {
     			it.remove();
     	}
 	}
-	
-	
-	
 
 	// :::: MImageObserver
 	@Override	public void imageChanged(ImageChangeEvent evt) {}
@@ -280,5 +292,12 @@ public class AnimationManager implements MImageObserver {
 					animation.interpretChange(node, evt);
 			}
 		}
+	}
+
+	// :::: MSelectionObserver
+	@Override
+	public void selectionChanged(Node newSelection) {
+		// TODO Auto-generated method stub
+		
 	}
 }

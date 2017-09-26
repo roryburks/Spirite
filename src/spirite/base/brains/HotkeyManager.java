@@ -87,6 +87,9 @@ public class HotkeyManager {
                 {"global.pasteAsLayer", (new Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
                 {"global.cut", (new Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK))},
                 
+                // TODO: This should really be anim., but that might require restructuring/rethinking of
+                //	command execution system.
+                {"draw.addGapQuick", new Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK)},
             }
         );
         
