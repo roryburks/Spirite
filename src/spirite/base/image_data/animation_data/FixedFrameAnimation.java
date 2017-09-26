@@ -218,9 +218,9 @@ public class FixedFrameAnimation extends Animation
 					AdditionChange addition = (AdditionChange)change;
 					if( addition.parent == layer.group && addition.node instanceof LayerNode) {
 						if( evt.reversed)
-							layer.removeNode( (LayerNode) addition.node);
+							layer.nodeRemoved( (LayerNode) addition.node);
 						else
-							layer.addNode( (LayerNode) addition.node);
+							layer.nodeAdded( (LayerNode) addition.node);
 					}
 				}
 				else if( change instanceof DeletionChange) {
@@ -230,9 +230,9 @@ public class FixedFrameAnimation extends Animation
 							&& layer.getLayers().contains(deletion.node)) 
 					{
 						if( evt.reversed)
-							layer.addNode( (LayerNode) deletion.node);
+							layer.nodeAdded( (LayerNode) deletion.node);
 						else
-							layer.removeNode( (LayerNode)deletion.node);
+							layer.nodeRemoved( (LayerNode)deletion.node);
 					}
 				}
 				else if( change instanceof MoveChange) {
@@ -241,19 +241,19 @@ public class FixedFrameAnimation extends Animation
 					if( movement.moveNode instanceof LayerNode) {
 						if( movement.oldParent == layer.group &&
 							movement.oldParent == movement.newParent) {
-							layer.moveNode( (LayerNode) movement.moveNode);
+							layer.nodeMoved( (LayerNode) movement.moveNode);
 						}
 						else if( movement.oldParent == layer.group) {
 							if( evt.reversed)
-								layer.addNode( (LayerNode) movement.moveNode);
+								layer.nodeAdded( (LayerNode) movement.moveNode);
 							else
-								layer.removeNode((LayerNode) movement.moveNode);
+								layer.nodeRemoved((LayerNode) movement.moveNode);
 						}
 						else if( movement.newParent == layer.group) {
 							if( evt.reversed)
-								layer.removeNode( (LayerNode) movement.moveNode);
+								layer.nodeRemoved( (LayerNode) movement.moveNode);
 							else
-								layer.addNode((LayerNode) movement.moveNode);
+								layer.nodeAdded((LayerNode) movement.moveNode);
 						}
 					}
 				}
@@ -319,13 +319,16 @@ public class FixedFrameAnimation extends Animation
 			public int getLength() {return length;}
 			public LayerNode getLayerNode() { return node; }
 			public Marker getMarker() { return marker;}
+			public AnimationLayer getLayerContext( ) {return AnimationLayer.this;}
 			
 			public void setLength( int newLength) {
 				if( newLength < 0) 
 					throw new IndexOutOfBoundsException();
-				length = newLength;
 				
-				_triggerChange();
+				if( length != newLength) {
+					length = newLength;
+					_triggerChange();
+				}
 			}
 			
 		}
@@ -344,33 +347,38 @@ public class FixedFrameAnimation extends Animation
 			this.name = name;
 		}
 		
-		public void moveNode(LayerNode moveNode) {
+		// :::: Direct Action
+		public void addNode( LayerNode toAdd, Frame frameBefore) {
+			
+		}
+		public void removeNode( LayerNode toAdd, Frame frameBefore) {
+			
+		}
+		
+		// :::: Link Interpretation
+		public void nodeMoved(LayerNode moveNode) {
 			Iterator<Frame> it = frames.iterator();
 			while( it.hasNext()) {
 				Frame frame = it.next();
 				
 				if( frame.getLayerNode() == moveNode) {
 					it.remove();
-					addFrame(moveNode,frame);
+					frameAdded(moveNode,frame);
 					return;
 				}
 			}
 		}
-
-
-		public void removeNode(LayerNode node) {
+		public void nodeRemoved(LayerNode node) {
 			frames.removeIf( new Predicate<Frame>() {
 				@Override public boolean test(Frame t) {
 					return ( t.node == node);
 				}
 			});
 		}
-
-
-		public void addNode(LayerNode node) { 
-			addFrame( node, new Frame(node, 1, Marker.FRAME));
+		public void nodeAdded(LayerNode node) { 
+			frameAdded( node, new Frame(node, 1, Marker.FRAME));
 		}
-		private void addFrame(LayerNode node, Frame frame) { 
+		private void frameAdded(LayerNode node, Frame frame) { 
 			Node nodeBefore = node.getPreviousNode();
 			
 			while( nodeBefore != null && !(nodeBefore instanceof LayerNode))

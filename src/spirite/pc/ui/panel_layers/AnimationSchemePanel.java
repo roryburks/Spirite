@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -54,8 +55,11 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private final int ROW_HEIGHT = 32;
 
 	private static final Color ARROW_COLOR = Color.RED;
+	private static final Color DRAG_BORDER_COLOR = Color.green;
 	private static final Color TITLE_BG = Color.WHITE;
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
+	
+	private Component[] titles = null;
 	
 	
 	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
@@ -98,7 +102,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		horGroups[0].addComponent(topLeft, TL_WIDTH,TL_WIDTH,TL_WIDTH);
 		titleVertGroup.addComponent(topLeft, TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT);
 		
-		Component[] titles= new Component[layers.size()];
+		titles= new Component[layers.size()];
 		
 		for( int i=0; i < layers.size(); ++i) {
 			AnimationLayer layer = layers.get(i);
@@ -127,10 +131,10 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		layout.linkSize(SwingConstants.VERTICAL, ticks);
 		
 		// Fill out the animation
-		for( int i=0; i < layers.size(); ++i) {
+		for( int col=0; col < layers.size(); ++col) {
 			Group vertInner = layout.createSequentialGroup();
 			vertMid.addGroup(vertInner);
-			AnimationLayer layer = layers.get(i);
+			AnimationLayer layer = layers.get(col);
 			
 			int currentTick = start;
 			
@@ -146,18 +150,18 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 						if( fs > currentTick)
 							vertInner.addGap(ROW_HEIGHT * fs - currentTick);
 						
-						Component component = new FramePanel( frame, fe-fs-1);
+						Component component = new FramePanel( frame, col);
 						linked.add(component);
 						int h = ROW_HEIGHT * (fe-fs);
 						vertInner.addComponent(component,h,h,h);
-						horGroups[1+i].addComponent(component);
+						horGroups[1+col].addComponent(component);
 												
 						currentTick = fe;
 					}
 				}
 			}
 
-			linked.add(titles[i]);
+			linked.add(titles[col]);
 			layout.linkSize(SwingConstants.HORIZONTAL, linked.toArray( new Component[linked.size()]));
 		}
 		
@@ -196,9 +200,20 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			state.Draw(g);
 	}
 	
-	private Rectangle GetFrameBounts( int layer, int tick) {
-		// TODO
-		return null;
+	private Rectangle GetFrameBounds( int layer, int tick) {
+		
+		int sx = TL_WIDTH;
+		int sy = TITLE_BAR_HEIGHT;
+		
+		sy += ROW_HEIGHT * (tick - animation.getStart());
+		
+		for( int i=0; i < layer; ++i)
+			sx += titles[i].getWidth();
+		
+		return new Rectangle( sx, sy, titles[layer].getWidth(), ROW_HEIGHT);
+	}
+	private int TickAtY( int y) {
+		return (y - TITLE_BAR_HEIGHT)/ROW_HEIGHT;
 	}
 	
 	// :::: WorkspaceObserver
@@ -287,9 +302,11 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	
 	private class FramePanel extends JPanel {
 		private final Frame frame;
+		private final int column;
 		
 		private final JToggleButton btnVLock = new JToggleButton("V");
 		private final JToggleButton btnLLock = new JToggleButton("L");
+		
 		private final JPanel drawPanel = new JPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
@@ -302,8 +319,10 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			}
 		};
 		
-		private FramePanel( Frame frame, int extendHeight) {
+		private FramePanel( Frame frame, int column) {
 			this.frame = frame;
+			this.column = column;
+			
 			btnVLock.setBorder(null);
 			btnLLock.setBorder(null);
 
@@ -332,7 +351,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			layout.setHorizontalGroup( hor);
 			layout.setVerticalGroup( vert);
 			
-			if( extendHeight > 0) {
+			if( frame.getLength() > 1) {
 				Component c = new FrameExtendPanel();
 				vert.addComponent(c);
 				hor.addComponent(c);
@@ -374,10 +393,15 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			};
 		}
 		
+		private boolean hasLowerExpand() {
+			// TODO: Implement later
+			return false;
+		}
+		
 		private final MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-				if( e.getY() <  DRAG_BORDER)
+				if( e.getY() <  DRAG_BORDER && hasLowerExpand())
 					setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
 				else if( e.getY() > getHeight() - DRAG_BORDER)
 					setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
@@ -390,12 +414,14 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if( state == null) {
-					if( e.getY() <  DRAG_BORDER)
-						setState( new ResizingState(e.getX(), e.getY(), true));
+					if( e.getY() <  DRAG_BORDER && hasLowerExpand())
+						setState( new ResizingState(true));
 					else if( e.getY() > getHeight() - DRAG_BORDER)
-						setState( new ResizingState(e.getX(), e.getY(), false));
-					else
+						setState( new ResizingState(false));
+					else {
 						ws.setSelectedNode(frame.getLayerNode());
+						setState( new DraggingFrameState());
+					}
 				}
 				
 				super.mousePressed(e);
@@ -403,38 +429,92 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				setState(null);
+				if( state instanceof FrameState)
+					setState(null);
 			};
 			
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if( state != null)
+				if( state instanceof FrameState) {
+					((FrameState)state).mouseDragged(e);
 					AnimationSchemePanel.this.repaint();
+				}
 			}
 		};
 		
-		private class ResizingState extends State {
-			int sx, sy;
-			boolean north;
+		private abstract class FrameState extends State {
+			abstract void mouseDragged(MouseEvent e);
+		}
+		
+		private class DraggingFrameState extends FrameState {
+			int target;
 			
-			ResizingState( int sx, int sy, boolean northOrientation) {
-				this.sx = sx;
-				this.sy = sy;
-				this.north = northOrientation;
+			DraggingFrameState() {
+				this.target = frame.getStart();
 			}
+			
+			@Override
+			void mouseDragged(MouseEvent e) {
+				target = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, AnimationSchemePanel.this).getY());
+				if( target > frame.getStart() && target < frame.getEnd())
+					target = frame.getStart();
+			}
+
 			@Override
 			void EndState() {
-				
+				// TODO Auto-generated method stub
+				//frame.getLayerContext().moveNode(moveNode);
 			}
 
 			@Override
 			void StartState() {
+				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			void Draw(Graphics g) {
-				g.drawRect(0, 0, (int)(Math.random()*100), (int)(Math.random()*100));
+				Rectangle rect = GetFrameBounds( column, target);
+				
+				g.setColor( DRAG_BORDER_COLOR);
+				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+			}
+		}
+		
+		private class ResizingState extends FrameState {
+			int floatTick;
+			boolean north;
+			
+			ResizingState(boolean northOrientation) {
+				this.north = northOrientation;
+				this.floatTick = (north) ? frame.getStart():frame.getEnd();
+			}
+			@Override
+			void EndState() {
+				int length = floatTick - frame.getStart();
+				frame.setLength(length);
+			}
+			@Override void StartState() {}
+			
+			@Override
+			void mouseDragged(MouseEvent e) {
+				int tickAt = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, AnimationSchemePanel.this).getY() + ROW_HEIGHT/2);
+				
+				floatTick = (north) ?
+						Math.min( frame.getEnd(), tickAt + 1) :
+						Math.max( frame.getStart(), tickAt);
+			}
+			
+			@Override
+			void Draw(Graphics g) {
+				System.out.println(floatTick);
+				Rectangle startRect = GetFrameBounds( column, (north)?floatTick:frame.getStart());
+				Rectangle endRect = GetFrameBounds( column, north?frame.getEnd():floatTick);
+				
+				int dy = startRect.y;
+				int dh = endRect.y - startRect.y;
+				
+				g.drawRect( startRect.x, dy, startRect.width, dh);
 			}
 			
 		}
@@ -445,12 +525,17 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	// state management
 	private State state = null;
 	private void setState( State newState) {
+		if( state == newState)
+			return;
+		
 		if( state != null)
 			state.EndState();
 		
 		state = newState;
 		if( state != null)
 			state.StartState();
+		
+		repaint();
 	}
 	
 	private abstract class State {
