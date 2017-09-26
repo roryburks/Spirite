@@ -2,9 +2,14 @@ package spirite.pc.ui.panel_layers;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +56,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private static final Color ARROW_COLOR = Color.RED;
 	private static final Color TITLE_BG = Color.WHITE;
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
+	
 	
 	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
 		this.master = master;
@@ -178,6 +184,23 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		this.setLayout(layout);
 	}
 	
+//	@Override
+//	protected void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//
+//	}
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		if( state != null)
+			state.Draw(g);
+	}
+	
+	private Rectangle GetFrameBounts( int layer, int tick) {
+		// TODO
+		return null;
+	}
+	
 	// :::: WorkspaceObserver
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {	}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {	}
@@ -286,6 +309,9 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 
 			drawPanel.setOpaque(false);
 			
+			this.addMouseListener( adapter);
+			this.addMouseMotionListener(adapter);
+			//drawPanel.addMouseListener( adapter);
 			
 			GroupLayout layout = new GroupLayout(this);
 			
@@ -323,8 +349,6 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		protected void paintComponent(Graphics g) {
 			setBackground( (ws != null && ws.getSelectedNode() == frame.getLayerNode()) ? Color.YELLOW : Color.WHITE );
 			
-			//g.fillRect( 0, 0, this.getWidth(), this.getHeight());
-			
 			super.paintComponent(g);
 		}
 
@@ -349,7 +373,89 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 				g.fillPolygon( new int[] {(W-hw)/2,(W+hw)/2,c}, new int[] {H-b-hh,H-b-hh,H-b}, 3);
 			};
 		}
+		
+		private final MouseAdapter adapter = new MouseAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				if( e.getY() <  DRAG_BORDER)
+					setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+				else if( e.getY() > getHeight() - DRAG_BORDER)
+					setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+				else
+					setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				
+				super.mouseMoved(e);
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( state == null) {
+					if( e.getY() <  DRAG_BORDER)
+						setState( new ResizingState(e.getX(), e.getY(), true));
+					else if( e.getY() > getHeight() - DRAG_BORDER)
+						setState( new ResizingState(e.getX(), e.getY(), false));
+					else
+						ws.setSelectedNode(frame.getLayerNode());
+				}
+				
+				super.mousePressed(e);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				setState(null);
+			};
+			
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if( state != null)
+					AnimationSchemePanel.this.repaint();
+			}
+		};
+		
+		private class ResizingState extends State {
+			int sx, sy;
+			boolean north;
+			
+			ResizingState( int sx, int sy, boolean northOrientation) {
+				this.sx = sx;
+				this.sy = sy;
+				this.north = northOrientation;
+			}
+			@Override
+			void EndState() {
+				
+			}
+
+			@Override
+			void StartState() {
+				
+			}
+			
+			@Override
+			void Draw(Graphics g) {
+				g.drawRect(0, 0, (int)(Math.random()*100), (int)(Math.random()*100));
+			}
+			
+		}
 	}
 
+	private static final int DRAG_BORDER = 4;
 	
+	// state management
+	private State state = null;
+	private void setState( State newState) {
+		if( state != null)
+			state.EndState();
+		
+		state = newState;
+		if( state != null)
+			state.StartState();
+	}
+	
+	private abstract class State {
+		abstract void EndState();
+		abstract void StartState();
+		void Draw( Graphics g) {}
+	}
 }
