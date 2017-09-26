@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -30,6 +32,8 @@ import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.UndoEngine.CompositeAction;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
@@ -176,7 +180,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		for( int j=0; j < layers.size(); ++j) {
 			AnimationLayer layer = layers.get(j);
 			
-			Component c = new BottomPanel();
+			Component c = new BottomPanel(j, layer);
 			
 			horGroups[j+1].addComponent(c);
 			bottomVertGroup.addComponent(c);
@@ -265,6 +269,12 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			label.setText(""+tick);
 			
 			this.setBackground( tickColor);
+			this.addMouseListener( new MouseAdapter() {
+				@Override
+				public void mousePressed(MouseEvent e) {
+					ws.getAnimationManager().getAnimationState(animation).setMetronome(tick);	
+				}
+			});
 			
 			label.setFont( new Font("Tahoma",Font.BOLD, 10));
 
@@ -276,8 +286,15 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		private final JToggleButton btnLock = new JToggleButton("X");
 		private final JToggleButton btnSettings = new JToggleButton("S");
 		private final JToggleButton omniEye = new OmniEye();
+		private final int column;
+		private final AnimationLayer layer;
 		
-		private BottomPanel() {
+		private boolean visible = true;
+		
+		private BottomPanel( int col, AnimationLayer layer) {
+			this.column = col;
+			this.layer = layer;
+			
 			btnLock.setBorder(null);
 			btnSettings.setBorder(null);
 			
@@ -294,6 +311,21 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 							.addComponent(btnLock)
 							.addComponent(btnSettings))
 					.addComponent(omniEye));
+			
+			omniEye.addActionListener( new ActionListener() {
+				@Override public void actionPerformed(ActionEvent e) {
+					UndoEngine ue = ws.getUndoEngine();
+					ue.pause();
+
+					visible = !visible;
+					for( Frame frame : layer.getFrames()) {
+						if(frame.getLayerNode() != null)
+							frame.getLayerNode().setVisible(visible);
+					}
+					CompositeAction action = ue.unpause("Toggle Layer Visibility");
+					ue.performAndStore(action);
+				}
+			});
 			
 			layout.linkSize( SwingConstants.VERTICAL, btnLock,btnSettings);
 			

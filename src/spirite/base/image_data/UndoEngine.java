@@ -382,7 +382,7 @@ public class UndoEngine {
 	 * @param description User-readable description for the aggregate action
 	 */
 	public CompositeAction unpause(String description) {
-		if( !isPaused)
+		if( !isPaused || queuedActions == null || queuedActions.isEmpty())
 			return null;
 		
 		isPaused = false;

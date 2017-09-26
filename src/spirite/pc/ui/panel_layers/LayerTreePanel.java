@@ -70,6 +70,7 @@ import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
+import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.UIUtil;
 
 
@@ -321,7 +322,7 @@ public class LayerTreePanel extends ContentTree
 	
 	protected Node nodeFromTransfer( Transferable trans ) throws UnsupportedFlavorException, IOException 
 	{
-		Node node = ((NodeTransferable)trans.getTransferData(FLAVOR)).node;
+		Node node = ((NodeTransferable)trans.getTransferData(NodeTransferable.FLAVOR)).node;
 		return node;
 	}
 	
@@ -432,22 +433,6 @@ public class LayerTreePanel extends ContentTree
 	
 
 	
-	public static class NodeTransferable implements Transferable {
-		public final Node node;
-		NodeTransferable( Node node) {
-			this.node = node;
-		}
-		@Override
-		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-			if( flavor.equals(FLAVOR))	return this;
-			else throw new UnsupportedFlavorException(flavor);
-		}	
-		@Override public DataFlavor[] getTransferDataFlavors() {return flavors;}
-		@Override public boolean isDataFlavorSupported(DataFlavor flavor) {return flavor.equals(FLAVOR);}
-	}
-	final static public DataFlavor FLAVOR = new DataFlavor( NodeTransferable.class, "Group Tree Node");
-	private static final DataFlavor flavors[] = {FLAVOR};
-	
 	@Override
 	protected boolean allowsHoverOut() {
 		return true;
@@ -462,7 +447,7 @@ public class LayerTreePanel extends ContentTree
 	@Override
 	protected boolean validTransferable(DataFlavor[] dfs) {
 		for( int i=0; i<dfs.length; ++i) {
-			if(dfs[i] == FLAVOR) {
+			if(dfs[i] == NodeTransferable.FLAVOR) {
 				return true;
 			}
 		}

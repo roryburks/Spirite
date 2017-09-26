@@ -59,7 +59,7 @@ public class ReferenceManager {
 			gc.setTransform(newTrans);
 			
 			layer.draw(gc);
-			
+			 
 			gc.setTransform(oldTrans);
 		}
 	}

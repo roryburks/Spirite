@@ -3,6 +3,20 @@ package spirite.pc.ui.generic;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -24,6 +38,8 @@ import spirite.hybrid.Globals;
 public class BetterTree extends JPanel {
 	private final List<BTNode> roots = new ArrayList<>();
 	
+	private final BTDnDManager dnd = new BTDnDManager();
+	
 	public BetterTree() {
 		BTNode nodeInner =  new BranchingNode(new JButton("Test"),
 				Arrays.asList( new BTNode[] {
@@ -38,6 +54,8 @@ public class BetterTree extends JPanel {
 						nodeInner
 				})));
 		roots.add( new BranchingNode(new JButton("Test5")));
+		
+		this.setDropTarget(dnd);
 		
 		RebuildTree();
 	}
@@ -216,5 +234,67 @@ public class BetterTree extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			node.SetExpanded(isSelected());
 		}
+	}
+	
+	// :::: Drag and Drop Management
+	public interface BTDnDModule {
+		public DataFlavor[] getAcceptedDataFlavors();
+		public void interpetDrop(Transferable trans);
+	}
+	private final List<BTDnDModule> dndModules = new ArrayList<>();
+	
+	private class BTDnDManager extends DropTarget 
+		implements DragGestureListener, DragSourceListener 
+	{
+		private final DragSource dragSource = DragSource.getDefaultDragSource();
+		
+		BTDnDManager() {
+			dragSource.createDefaultDragGestureRecognizer(
+					BetterTree.this, DnDConstants.ACTION_COPY_OR_MOVE, this);
+		}
+		
+		// :::: Inhereted from DropTarget, hears all sources of drags and drops
+		@Override
+		public synchronized void dragOver(DropTargetDragEvent evt) {
+			boolean accepted = false;
+			
+			for( BTDnDModule module : dndModules) {
+				for( DataFlavor df : module.getAcceptedDataFlavors()) {
+					if( evt.isDataFlavorSupported(df)) 
+						accepted = true;
+				}
+			}
+			if( accepted)
+				evt.acceptDrag( DnDConstants.ACTION_REFERENCE);
+			else
+				evt.rejectDrag();
+		}
+		
+		@Override
+		public synchronized void drop(DropTargetDropEvent evt) {
+			for( BTDnDModule module : dndModules) {
+				for( DataFlavor df : module.getAcceptedDataFlavors()) {
+					if( evt.isDataFlavorSupported(df)) {
+						module.interpetDrop(evt.getTransferable());
+					}
+				}
+			}
+		}
+		
+		// :::: DragGestureListener/DragSourceListener for drags originating from the tree
+		@Override public void dragDropEnd(DragSourceDropEvent arg0) {
+			System.out.println("DRAGENTER");}
+		@Override public void dragEnter(DragSourceDragEvent arg0) {
+			System.out.println("DRAGENTER");}
+		@Override public void dragExit(DragSourceEvent arg0) {
+			System.out.println("DRAGENTER");}
+		@Override public void dragOver(DragSourceDragEvent arg0) {
+			System.out.println("DRAGOVER");
+			
+		}
+		@Override public void dropActionChanged(DragSourceDragEvent arg0) {
+			System.out.println("DRAGENTER");}
+		@Override public void dragGestureRecognized(DragGestureEvent arg0) {
+			System.out.println("DRAGENTER");}
 	}
 }

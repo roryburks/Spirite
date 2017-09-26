@@ -55,6 +55,7 @@ import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.OmniFrame.OmniComponent;
+import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.components.SliderPanel;
 
 /**
@@ -390,7 +391,7 @@ public class ReferenceSchemePanel extends OmniComponent
 			public synchronized void dragOver(DropTargetDragEvent evt) {
 				super.dragOver(evt);
 				
-				if( !evt.isDataFlavorSupported(LayerTreePanel.FLAVOR) && 
+				if( !evt.isDataFlavorSupported(NodeTransferable.FLAVOR) && 
 					!evt.isDataFlavorSupported(REF_FLAVOR))
 					return;
 				
@@ -424,9 +425,9 @@ public class ReferenceSchemePanel extends OmniComponent
 			// :::: DropTarget
 			@Override
 			public synchronized void drop(DropTargetDropEvent dtde) {
-				if( refMan != null && dtde.isDataFlavorSupported(LayerTreePanel.FLAVOR)) {
+				if( refMan != null && dtde.isDataFlavorSupported(NodeTransferable.FLAVOR)) {
 					try {
-						Node node = ((LayerTreePanel.NodeTransferable)dtde.getTransferable().getTransferData(LayerTreePanel.FLAVOR)).node;
+						Node node = ((NodeTransferable)dtde.getTransferable().getTransferData(NodeTransferable.FLAVOR)).node;
 						
 						if( node instanceof LayerNode) {
 							Layer layer = ((LayerNode) node).getLayer();
