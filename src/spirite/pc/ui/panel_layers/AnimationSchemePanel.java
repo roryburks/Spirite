@@ -18,7 +18,11 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
+import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
@@ -31,8 +35,9 @@ import spirite.pc.ui.components.OmniEye;
 /***
  * AnimationSchemePanel is a grid 
  */
-public class AnimationSchemePanel extends JPanel {
+public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, MSelectionObserver {
 	private final MasterControl master;
+	private ImageWorkspace ws = null;
 	
 	private FixedFrameAnimation animation;
 	private final JPanel topLeft = new JPanel();
@@ -44,6 +49,7 @@ public class AnimationSchemePanel extends JPanel {
 	private final int ROW_HEIGHT = 32;
 
 	private static final Color ARROW_COLOR = Color.RED;
+	private static final Color TITLE_BG = Color.WHITE;
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
 	
 	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
@@ -51,6 +57,11 @@ public class AnimationSchemePanel extends JPanel {
 		this.animation = fixedFrameAnimation;
 		BuildFromAnimation();
 		
+		master.addWorkspaceObserver(this);
+		ws = master.getCurrentWorkspace();
+		if( ws != null) {
+			ws.addSelectionObserver(this);
+		}
 	}
 	
 	public void Rebuild() {
@@ -167,6 +178,28 @@ public class AnimationSchemePanel extends JPanel {
 		this.setLayout(layout);
 	}
 	
+	// :::: WorkspaceObserver
+	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {	}
+	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {	}
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		if( ws != null) {
+			ws.removeSelectionObserver(this);
+		}
+		ws = selected;
+		if( ws != null) {
+			ws.addSelectionObserver(this);
+		}
+		
+		Rebuild();
+	}
+	
+	// :::: SelectionOberver
+	@Override
+	public void selectionChanged(Node newSelection) {
+		this.repaint();
+	}
+	
 	private class TitleBar extends JPanel {
 		String title;
 		private final JLabel label = new JLabel();
@@ -174,7 +207,7 @@ public class AnimationSchemePanel extends JPanel {
 		private TitleBar( String title) {
 			//this.setLayout(new GridLayout());
 			
-			this.setBackground( new Color((int)(Math.random()*0xfffff)));
+			this.setBackground(TITLE_BG );
 			this.title = title;
 			
 			label.setFont( new Font("Tahoma",Font.BOLD, 10));
@@ -250,6 +283,9 @@ public class AnimationSchemePanel extends JPanel {
 			this.frame = frame;
 			btnVLock.setBorder(null);
 			btnLLock.setBorder(null);
+
+			drawPanel.setOpaque(false);
+			
 			
 			GroupLayout layout = new GroupLayout(this);
 			
@@ -282,8 +318,21 @@ public class AnimationSchemePanel extends JPanel {
 			
 			this.setLayout(layout);
 		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			setBackground( (ws != null && ws.getSelectedNode() == frame.getLayerNode()) ? Color.YELLOW : Color.WHITE );
+			
+			//g.fillRect( 0, 0, this.getWidth(), this.getHeight());
+			
+			super.paintComponent(g);
+		}
 
 		private class FrameExtendPanel extends JPanel {
+			public FrameExtendPanel() {
+				this.setOpaque(false);
+			}
+			
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				g.setColor(ARROW_COLOR);
@@ -301,6 +350,6 @@ public class AnimationSchemePanel extends JPanel {
 			};
 		}
 	}
-	
+
 	
 }

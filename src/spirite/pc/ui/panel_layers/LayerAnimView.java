@@ -58,6 +58,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 
 	@Override
 	public void animationChanged(AnimationStructureEvent evt) {
+		
 		this.Rebuild();
 		
 	}

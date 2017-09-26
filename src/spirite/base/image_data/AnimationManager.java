@@ -140,6 +140,7 @@ public class AnimationManager implements MImageObserver {
 		private StructureChangeType type;
 		public Animation getAnimation() {return animation;}
 		public StructureChangeType getType() {return type;}
+
 	}
 
     private void triggerNewAnimation( Animation anim) {

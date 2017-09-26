@@ -59,7 +59,7 @@ public class BetterTree extends JPanel {
 		}
 		
 		layout.setHorizontalGroup(horGroup);
-		layout.setVerticalGroup(vertGroup.addContainerGap());
+		layout.setVerticalGroup(vertGroup.addContainerGap(0,0));
 		
 		this.setLayout(layout);
 		this.repaint();
@@ -132,6 +132,7 @@ public class BetterTree extends JPanel {
 			
 			ExpandButton button = new ExpandButton(this);
 			JPanel branch = new JPanel();
+			branch.setBackground(Color.red);
 			
 			innerHorGroup.addComponent(title, 0, 0, Short.MAX_VALUE);
 			innerVertGroup.addComponent(title);
@@ -146,17 +147,18 @@ public class BetterTree extends JPanel {
 			
 			outerHorGroup.addGroup( layout.createParallelGroup()
 					.addComponent(button, propBranchWidth, propBranchWidth, propBranchWidth)
-					.addComponent(branch, propBranchWidth, propBranchWidth, propBranchWidth))
+					/*.addComponent(branch, propBranchWidth, propBranchWidth, propBranchWidth)*/)
 				.addGroup( innerHorGroup);
 			
 			outerVertGroup.addGroup( layout.createSequentialGroup()
 					.addComponent(button, propExpandButtonHeight,propExpandButtonHeight,propExpandButtonHeight)
-					.addComponent(branch))
+					/*.addComponent(branch, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)*/)
 				.addGroup( innerVertGroup);
 			
 			layout.setHorizontalGroup(outerHorGroup);
 			layout.setVerticalGroup(outerVertGroup);
 			
+			rootPanel.setBackground(Color.BLUE);
 			rootPanel.setLayout(layout);
 			
 			return rootPanel;
