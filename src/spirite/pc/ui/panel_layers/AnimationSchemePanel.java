@@ -462,7 +462,10 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 
 			@Override
 			void EndState() {
-				// TODO Auto-generated method stub
+				if( target != frame.getStart()) {
+					frame.getLayerContext().moveFrame(frame, target);
+				}
+				
 				//frame.getLayerContext().moveNode(moveNode);
 			}
 

@@ -146,13 +146,11 @@ public class SelectionEngine {
 					
 			
 			UndoableAction action = undoEngine.new StackableCompositeAction(actions, actions.get(2).description);
-			action.performAction();
-			undoEngine.storeAction(action);
+			undoEngine.performAndStore(action);
 		}
 		else {
 			UndoableAction action = new MoveSelectionAction(dx, dy);
-			action.performAction();
-			undoEngine.storeAction(action);
+			undoEngine.performAndStore(action);
 		}
 	}
 	
@@ -177,9 +175,8 @@ public class SelectionEngine {
 					workspace.buildData(node)));
 					
 			
-			UndoableAction action = undoEngine.new StackableCompositeAction(actions, "Lift Data");
-			action.performAction();
-			undoEngine.storeAction(action);
+			undoEngine.performAndStore(
+					undoEngine.new StackableCompositeAction(actions, "Lift Data"));
 //		}
 	}
 	
@@ -189,9 +186,7 @@ public class SelectionEngine {
 		if( lifted) {
 			// If you have lifted data, it clears the lifted data without changing the
 			//	 fact that it is lifted
-			UndoableAction action = new SetLiftedAction(null);
-			action.performAction();
-			undoEngine.storeAction( action);
+			undoEngine.performAndStore( new SetLiftedAction(null));
 			return true;
 		}
 		
@@ -205,11 +200,9 @@ public class SelectionEngine {
 		LayerNode node = (LayerNode)snode;
 		
 		
-		ImageAction action = new ClearSelectionAction(
+		undoEngine.performAndStore(new ClearSelectionAction(
 				getBuiltSelection(),
-				workspace.buildData(node));
-		action.performImageAction();
-		undoEngine.storeAction(action);
+				workspace.buildData(node)));
 		return true;
 	}
 
@@ -428,9 +421,8 @@ public class SelectionEngine {
 	
 	
 	public void unselect() {
-		UndoableAction action = createNewSelectAction( new BuiltSelection(null, 0, 0));
-		action.performAction();
-		undoEngine.storeAction(action);
+		undoEngine.performAndStore(
+				createNewSelectAction( new BuiltSelection(null, 0, 0)));
 	}
 	
 	/***

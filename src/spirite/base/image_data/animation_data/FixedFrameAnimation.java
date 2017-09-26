@@ -17,6 +17,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.AdditionChange;
 import spirite.base.image_data.ImageWorkspace.DeletionChange;
 import spirite.base.image_data.ImageWorkspace.MoveChange;
@@ -348,6 +349,17 @@ public class FixedFrameAnimation extends Animation
 		}
 		
 		// :::: Direct Action
+		public void moveFrame( Frame frameToMove, int startTick) {
+//			ImageWorkspace ws = group.getContext();
+//
+//			if( frameBefore == null)
+//				ws.moveInto(frameToMove.getLayerNode(), group, true);
+//			else
+//				ws.moveAbove(frameToMove.getLayerNode(), frameBefore.getLayerNode());
+//			
+//			System.out.println("S");
+		}
+		
 		public void addNode( LayerNode toAdd, Frame frameBefore) {
 			
 		}

@@ -277,8 +277,7 @@ public class Test1 {
 			workspace.getDrawEngine().new StrokeAction(
 					master.getSettingsManager().getDefaultDrawer().getStrokeEngine(),params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
 			
-			action.performImageAction();
-			workspace.getUndoEngine().storeAction(action);
+			workspace.getUndoEngine().performAndStore(action);
 			break;
 		case 4:
 			// Crop node

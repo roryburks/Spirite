@@ -248,11 +248,35 @@ public class UndoEngine {
 	
 	
 	/** 
-	 * For integrity's sake I should probably be performing this not just for
-	 * components that don't have visibility on performAction, but in general
-	 * for everything except continuous events (StrokeActions mostly).
+	 * Stores the action into the undo engine as it gets performed.
+	 * 
+	 * NOTE: As a principal all actions that can be undoed should go through this.
+	 * Should never perform their action (for a first time) outside of this method.
 	 */
 	public void performAndStore( UndoableAction action) {
+		if( action != null) {
+			if( isPaused)
+				queuedActions.add(action);
+			else {
+			action.performAction();
+			storeAction(action);
+			}
+		}
+		else
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Attempted to store null as an action.");
+	}
+	
+	/***
+	 * Stores an action into the undo engine that has already been performed (but
+	 * the action still contains data to recreate it).
+	 * 
+	 * Note: This action will screw up advanced UndoEngine behavior like pausing/
+	 * unpausing.  It should only be used for complex actions that need to be 
+	 * performed (e.g. for user feedback) as it is being inputted such as with
+	 * the stroke engine.  It may be phased out entirely in the future in favor
+	 * of undoing the action and re-doing it.
+	 */
+	public void storePerformedAction( UndoableAction action) {
 		if( action != null) {
 			action.performAction();
 			storeAction(action);
@@ -343,6 +367,30 @@ public class UndoEngine {
 		// Cull 
 		cull();
 	}
+	
+	/** Makes it so that between now and the time the undo engine is unpaused, all
+	 * incoming actions are stored into a list rather than performed.  Once unpaused
+	 * the actions are aggregated and then performed
+	 */
+	public void pause() {
+		queuedActions = new ArrayList<>();
+		isPaused = true;
+	}
+	/** Performs all actions that were queued while the undo engine was paused, aggregating
+	 * them into a single Composite Action.
+	 * 
+	 * @param description User-readable description for the aggregate action
+	 */
+	public CompositeAction unpause(String description) {
+		if( !isPaused)
+			return null;
+		
+		isPaused = false;
+		return new CompositeAction( queuedActions, description);
+	}
+	
+	private boolean isPaused = false;
+	private List<UndoableAction> queuedActions;
 	
 	/** Checks to see if there are too many UndoActions (using the behavior determined
 	 * by the cullBehavior) and gets rid of the oldest undo actions until there

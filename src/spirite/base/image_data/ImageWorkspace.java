@@ -148,7 +148,7 @@ public class ImageWorkspace {
 	
 	/** Goes through the imageData cache, removing anything that is not needed
 	 * by any current Layers or anything stored in the UndoEngine */
-	public void cleanDataCache() {
+	void cleanDataCache() {
 		if( building) return;
 		
 		List<Integer> dataToRemove = new LinkedList<>();
@@ -786,9 +786,7 @@ public class ImageWorkspace {
 			
 		actions.add(new StructureAction( 
 				new DeletionChange(source, source.getParent(), source.getNextNode())));
-		CompositeAction composite = undoEngine.new CompositeAction(actions, "Merge Action");
-		composite.performAction();
-		undoEngine.storeAction(composite);
+		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Merge Action"));
 	}
 	
 	
@@ -809,10 +807,8 @@ public class ImageWorkspace {
 		for( ImageHandle handle : data) 
 			actions.add(new ShiftDataAction(handle, shiftX, shiftY));
 		
-		CompositeAction composte = undoEngine.new StackableCompositeAction(actions, "Shift Image Data");
-		composte.performAction();
-		
-		undoEngine.storeAction(composte);
+		undoEngine.performAndStore(
+				undoEngine.new StackableCompositeAction(actions, "Shift Image Data"));
 	}
 	
 	private class ShiftDataAction extends ImageAction
@@ -1042,13 +1038,7 @@ public class ImageWorkspace {
 							Math.max(height, node.getLayer().getHeight()))
 					));
 			
-			CompositeAction action = undoEngine.new CompositeAction( actions, actions.get(0).description);
-			executeComposite(action);
-			
-			// It's important that you add the action to the UndoEngine AFTER
-			//	you add the node to the GroupTree by calling executingComposite
-			//	otherwise the UndoEngine will cull the imageData before it's linked
-			undoEngine.storeAction(action);
+			undoEngine.performAndStore(undoEngine.new CompositeAction( actions, actions.get(0).description));
 		}
 		else
 			executeChange( createAdditionChange(node,context));
@@ -1728,24 +1718,11 @@ public class ImageWorkspace {
 		executeChange(change, true);
 	}
 	public void executeChange( StructureChange change, boolean addUndo) {
-		change.execute();
 		if( !building && addUndo) {
 			if( change instanceof StackableStructureChange) 
-				undoEngine.storeAction(new StackableStructureAction(change));
+				undoEngine.performAndStore(new StackableStructureAction(change));
 			else 
-				undoEngine.storeAction(new StructureAction(change));
-		}
-		change.alert(false);
-	}
-	
-	/** Executes all StructureChanges (if any) in the given CompositeAction */
-	public void executeComposite( CompositeAction composite) {
-		for( UndoableAction action : composite.getActions()) {
-			if( action instanceof StructureAction) {
-				StructureChange change = ((StructureAction)action).change;
-				change.execute();
-				change.alert(false);
-			}
+				undoEngine.performAndStore(new StructureAction(change));
 		}
 	}
 	

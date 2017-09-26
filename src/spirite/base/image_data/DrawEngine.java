@@ -283,8 +283,7 @@ public class DrawEngine {
 	};
 
 	private void execute( MaskedImageAction action) {
-		action.performImageAction();
-		undoEngine.storeAction(action);
+		undoEngine.performAndStore(action);
 	}
 
 	// ===============
