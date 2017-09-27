@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.ImageWorkspace;
@@ -20,8 +21,9 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation;
 public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver {
 	private final MasterControl master;
 	private final BetterTree tree = new BetterTree();
+	private ImageWorkspace ws;
 	
-	private final List<AnimationSchemePanel> panels = new ArrayList<>();
+	//private final List<AnimationSchemePanel> panels = new ArrayList<>();
 	
 	private final JScrollPane scroll;
 	
@@ -30,6 +32,10 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		scroll = new JScrollPane(tree);
 		InitComponents();
 		master.addWorkspaceObserver(this);
+		
+		ws = master.getCurrentWorkspace();
+		if( ws != null)
+			ws.getAnimationManager().addAnimationStructureObserver(this);;
 		
 		scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
 		scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
@@ -42,48 +48,44 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	}
 
 	private void Rebuild() {
-		for( AnimationSchemePanel panel : panels) {
-			panel.Rebuild();
+		tree.ClearRoots();
+		if( ws != null) {
+			for( Animation anim : ws.getAnimationManager().getAnimations()) {
+				tree.AddRoot( tree.new LeafNode(new AnimationSchemePanel(master, (FixedFrameAnimation)anim)));
+				System.out.println("Anim");
+			}
 		}
+		tree.repaint();
 	}
 	
 	// AnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
-		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
-		panels.add(newPanel);
-		tree.AddRoot( tree.new LeafNode(newPanel));
+		Rebuild();
+//		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
+//		panels.add(newPanel);
+//		tree.AddRoot( tree.new LeafNode(newPanel));
 	}
 
 	@Override
 	public void animationRemoved(AnimationStructureEvent evt) {
-		// TODO Auto-generated method stub
-		
+		Rebuild();
 	}
 
 	@Override
 	public void animationChanged(AnimationStructureEvent evt) {
-		
-		this.Rebuild();
-		
+		Rebuild();
 	}
 
 	// WorkspaceObserver
+	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		selected.getAnimationManager().addAnimationStructureObserver(this);
-		
-	}
-
-	@Override
-	public void newWorkspace(ImageWorkspace newWorkspace) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeWorkspace(ImageWorkspace newWorkspace) {
-		// TODO Auto-generated method stub
-		
+		if( ws != null)
+			ws.getAnimationManager().removeAnimationStructureObserver(this);
+		ws = selected;
+		if( ws != null)
+			ws.getAnimationManager().addAnimationStructureObserver(this);
 	}
 }

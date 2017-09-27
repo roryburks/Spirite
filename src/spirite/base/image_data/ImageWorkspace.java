@@ -1724,6 +1724,8 @@ public class ImageWorkspace {
 			else 
 				undoEngine.performAndStore(new StructureAction(change));
 		}
+		else
+			change.execute();
 	}
 	
 	// :::: StructureChangeEvent Creation Methods for simplifying the process

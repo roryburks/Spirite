@@ -95,6 +95,14 @@ public class BetterTree extends JPanel {
 			RebuildTree();
 		}
 	}
+	public void RemoveRoot( BTNode node) {
+		roots.remove(node);
+		RebuildTree();
+	}
+	public void ClearRoots() {
+		roots.clear();
+		RebuildTree();
+	}
 	
 	
 	// Properties

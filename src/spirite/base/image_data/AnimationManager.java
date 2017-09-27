@@ -44,9 +44,11 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		return selectedAnimation;
 	}
 	public void setSelectedAnimation( Animation anim) {
-		Animation previous = selectedAnimation;
-		selectedAnimation = anim;
-		triggerAnimationSelectionChange(previous);
+		if( selectedAnimation != anim) {
+			Animation previous = selectedAnimation;
+			selectedAnimation = anim;
+			triggerAnimationSelectionChange(previous);
+		}
 	}
 	public List<Animation> getAnimations() {
 		return new ArrayList<> (animations);
@@ -79,32 +81,96 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 			}
 		}
 	}
-	
-	
-	// Add/Remove
-	public Animation addAnimation( Animation animation) {
-		animations.add(animation);
-		animation.context = this;
-		setSelectedAnimation(animation);
-		triggerNewAnimation(animation);
-		return animation;
+
+	// :: Internal Add/Remove
+	private void _addAnimation(Animation anim, AnimationState as) {
+		_addAnimation(anim,as,animations.size());
+	}
+	private void _addAnimation(Animation anim, AnimationState as, int index) {
+		animations.add(index, anim);
+    	stateMap.put(anim, new AnimationState());
+		triggerNewAnimation(anim);
+	}
+	private void _removeAnimation(Animation anim) {
+		animations.remove(anim);
+		stateMap.remove(anim);
+		triggerRemoveAnimation(anim);
 	}
 	
-	public void removeAnimation( Animation animation) {
-		int index = animations.indexOf(animation);
+	// :: AddAnimation
+	public void addAnimation( Animation animation) {
+		animation.context = this;
+		context.getUndoEngine().performAndStore( new AddAnimationAction(animation));
+	}
+	public class AddAnimationAction extends UndoEngine.NullAction {
+		private final Animation previousSelected;
+		private final Animation animation;
+		private final AnimationState as;
 		
-		if( index == -1) {
+		private AddAnimationAction( Animation animation) {
+			this.animation = animation;
+			previousSelected = getSelectedAnimation();
+			as = new AnimationState();
+		}
+
+		@Override
+		protected void performAction() {
+			_addAnimation( animation, as);
+			setSelectedAnimation(animation);
+		}
+
+		@Override
+		protected void undoAction() {
+			_removeAnimation(animation);
+			setSelectedAnimation(previousSelected);
+		}
+		
+		@Override
+		public String getDescription() {
+			return "Add Animation";
+		}
+	}
+	
+	
+	// :: RemoveAnimation
+	public void removeAnimation( Animation animation) {
+		if( !animations.contains(animation)) {
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Attempted to remove Animation that isn't tracked.");			
 			return;
 		}
+
+		context.getUndoEngine().performAndStore( new RemoveAnimationAction(animation));
+	}
+	public class RemoveAnimationAction extends UndoEngine.NullAction {
+		private final Animation toRemove;
+		private final boolean wasSelected;
+		private int oldIndex;
+		private final AnimationState as;
 		
-		
-		if( selectedAnimation == animation) {
-			selectedAnimation = null;
-			triggerAnimationSelectionChange(animation);
+		private RemoveAnimationAction( Animation toRemove) {
+			this.toRemove = toRemove;
+			wasSelected = (selectedAnimation == toRemove);
+			oldIndex = animations.indexOf(toRemove);
+			as = stateMap.get(toRemove);
 		}
-		animations.remove(index);
-		triggerRemoveAnimation(animation);
+		
+		@Override
+		protected void performAction() {
+			if( wasSelected)
+				setSelectedAnimation(null);
+			_removeAnimation(toRemove);
+		}
+
+		@Override
+		protected void undoAction() {
+			if( wasSelected) 
+				setSelectedAnimation(toRemove);
+			_addAnimation( toRemove, as, oldIndex);
+		}
+		@Override
+		public String getDescription() {
+			return "Remove Animation";
+		}
 	}
 	
 	// :::: Frame Selection
@@ -163,9 +229,6 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
     	evt.animation = anim;
     	evt.type = StructureChangeType.ADD;
     	
-    	// This might not belong here
-    	stateMap.put(anim, new AnimationState());
-    	
     	Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
     	while( it.hasNext()) {
     		MAnimationStructureObserver obs = it.next().get();
@@ -178,9 +241,6 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
     	AnimationStructureEvent evt = new AnimationStructureEvent();
     	evt.animation = anim;
     	evt.type = StructureChangeType.REMOVE;
-    	
-    	// This might not belong here
-    	stateMap.remove(anim);
     	
     	Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
     	while( it.hasNext()) {
