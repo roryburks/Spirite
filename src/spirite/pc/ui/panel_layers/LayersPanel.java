@@ -26,11 +26,11 @@ import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.hybrid.Globals;
-import spirite.pc.dialogs.Dialogs;
-import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
+import spirite.pc.ui.dialogs.Dialogs;
+import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 public class LayersPanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;

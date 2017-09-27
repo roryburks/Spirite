@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -28,7 +30,9 @@ import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.Animation;
+import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -41,6 +45,7 @@ import spirite.hybrid.Globals;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.OmniEye;
+import spirite.pc.ui.dialogs.RenderPropertiesDialog;
 
 
 /***
@@ -308,7 +313,18 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			this.addMouseListener( new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
-					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
+					if( e.getButton() == MouseEvent.BUTTON1)
+						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
+					else if( e.getButton() == MouseEvent.BUTTON3) {
+						RenderPropertiesDialog dialog = new RenderPropertiesDialog(new RenderProperties());
+						JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+						
+						AnimationState as = ws.getAnimationManager().getAnimationState(animation);
+						int T = (int)Math.floor(as.getSelectedMetronome());
+						int L = animation.getEnd() - animation.getStart();
+						int relTick = ((((tick - T) % L) + L + L/2) % L) - L/2;	// angle_difference
+						as.putSubstateForRelativeTick(relTick, dialog.getResult());
+					}
 				}
 			});
 			

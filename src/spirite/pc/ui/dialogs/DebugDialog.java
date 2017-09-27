@@ -1,4 +1,4 @@
-package spirite.pc.dialogs;
+package spirite.pc.ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

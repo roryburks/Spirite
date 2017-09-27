@@ -1,4 +1,4 @@
-package spirite.pc.dialogs;
+package spirite.pc.ui.dialogs;
 
 /**
  * CURRENTLY UNUSED (uses the default Swing color picker for now)

@@ -67,11 +67,11 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
 import spirite.pc.ui.Transferables.NodeTransferable;
+import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.UIUtil;
 
 

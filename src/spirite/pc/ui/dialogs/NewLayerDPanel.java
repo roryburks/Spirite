@@ -1,4 +1,4 @@
-package spirite.pc.dialogs;
+package spirite.pc.ui.dialogs;
 
 import java.awt.Color;
 import java.awt.Font;

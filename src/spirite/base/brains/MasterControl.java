@@ -46,10 +46,10 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.dialogs.Dialogs;
 import spirite.pc.jogl.JOGLCore;
 import spirite.pc.jogl.JOGLCore.OnGLLoadObserver;
 import spirite.pc.ui.FrameManager;
+import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
 /***

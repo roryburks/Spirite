@@ -28,8 +28,8 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
 import spirite.hybrid.Globals;
-import spirite.pc.dialogs.Dialogs;
 import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.dialogs.Dialogs;
 
 public class PalettePanel extends JPanel 
         implements MouseListener, MPaletteObserver, ActionListener
