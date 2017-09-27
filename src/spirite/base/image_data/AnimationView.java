@@ -1,7 +1,6 @@
 package spirite.base.image_data;
 
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.base.image_data.layers.AnimationLayer;
 
 public class AnimationView {
 	private final ImageWorkspace context;
@@ -17,7 +16,7 @@ public class AnimationView {
 	}
 
 	public void addNode(Animation animation) {
-		tree.getRoot()._add(tree.new LayerNode(new AnimationLayer(animation), animation.getName()), null);
+		tree.getRoot()._add(tree.new AnimationNode(animation, animation.getName()), null);
 		context.triggerFlash();
 	}
 }

@@ -12,7 +12,9 @@ import java.util.function.Predicate;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.Animation;
+import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -209,6 +211,68 @@ public class FixedFrameAnimation extends Animation
 		});
 		
 		return drawList;
+	}
+
+	@Override
+	public List<List<TransformedHandle>> getDrawTable( float t, AnimationState state) {
+		int T = (int)Math.floor(t);
+		int L = endFrame-startFrame;
+		
+		int st = ((int)Math.floor(t) - L/2)%L + startFrame;
+
+		List<List<TransformedHandle>> drawTable = new ArrayList<>();
+		for( int i= -L/2; i< (L+1)/2; ++i) {
+			List<TransformedHandle> drawList = new ArrayList<>();
+			
+			if( !state.getSubstateForRelativeTick(i).isVisible())
+				continue;
+			
+			int met = MUtil.cycle(startFrame, endFrame, i + T);
+			
+			// START (mostly) DUPLICATE CODE FROM getDrawList
+			for( AnimationLayer layer : layers) {
+				if( layer.getFrames().size() == 0) continue;
+				
+				RenderProperties properties = state.getPropertiesForFrame(layer, met);
+				if( !properties.isVisible()) continue;
+				
+				int start = layer.getStart();
+				int end = layer.getEnd();
+				int localMet = met;
+
+				// Based on the layer timing type, determine the local frame
+				//	index to use (if any)
+				if( layer.asynchronous) {
+					localMet = MUtil.cycle(start, end, i + T);
+				}
+				
+				LayerNode node = layer.getLayerForMet(localMet);
+				
+				if( node != null) {
+					for( TransformedHandle tr  : node.getLayer().getDrawList()) {
+						tr.trans.translate(node.getOffsetX(), node.getOffsetY());
+						tr.alpha = properties.alpha;
+						drawList.add( tr);
+					}
+				}
+			}
+			
+			drawList.sort( new  Comparator<TransformedHandle>() {
+				@Override
+				public int compare(TransformedHandle o1, TransformedHandle o2) {
+					return o1.depth - o2.depth;
+				}
+			});
+			// END (mostly) DUPLICATE CODE FROM getDrawList
+			
+			if( !drawList.isEmpty())
+				drawTable.add(drawList);
+		}
+		
+		
+		
+		
+		return drawTable;
 	}
 
 	@Override
@@ -590,6 +654,8 @@ public class FixedFrameAnimation extends Animation
 			return new ArrayList<>(keyTimes);
 		}*/
 	}
+
+
 
 
 

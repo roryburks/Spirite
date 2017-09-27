@@ -308,7 +308,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			this.addMouseListener( new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
-					ws.getAnimationManager().getAnimationState(animation).setMetronome(tick);	
+					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
 				}
 			});
 			

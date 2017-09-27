@@ -375,4 +375,18 @@ public class GroupTree {
 			return layer;
 		}
 	}
+	
+	public class AnimationNode extends Node {
+		private final Animation animation;
+		
+		AnimationNode( Animation animation, String name) {
+			this.animation = animation;
+			this.name = name;
+		}
+		
+		public Animation getAnimation() {
+			return animation;
+		}
+		
+	}
 }

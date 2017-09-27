@@ -12,7 +12,11 @@ import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
+import spirite.base.image_data.Animation;
+import spirite.base.image_data.AnimationManager.AnimationState;
+import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -189,15 +193,15 @@ class GLNodeRenderer extends NodeRenderer {
 //					renderable.subDepth = count++;
 //					renderList.add(renderable);
 				}
-				else {
+				else if( child instanceof LayerNode){
 					// Step 1: Construct a list of all components that need to be rendered
 					int count = 0;	// This subDepth counter is used to make sure Renderables of
 									// the same depth are rendered in the correct order.
 					List<TransformedHandle> sub = ((LayerNode)child).getLayer().getDrawList();
 					
 					for( TransformedHandle subRend : sub) {
-						Drawable renderable = new TransformedRenderable(
-								(LayerNode) child, subRend, settings);
+						Drawable renderable = new TransformedRenderable( 
+								child.getRender(), subRend, settings, child.getOffsetX(), child.getOffsetY());
 						renderable.subDepth = count++;
 						renderList.add(renderable );
 					}
@@ -217,6 +221,17 @@ class GLNodeRenderer extends NodeRenderer {
 						renderable.draw(n);
 					}
 				}
+				else if( child instanceof AnimationNode) {
+					Animation anim = ((AnimationNode)child).getAnimation();
+					AnimationState as = workspace.getAnimationManager().getAnimationState(anim);
+					List<List<TransformedHandle>> table = anim.getDrawTable(as.getSelectedMetronome(), as);
+					
+					for( List<TransformedHandle> list : table) {
+						for( TransformedHandle th : list) {
+							(new TransformedRenderable( new RenderProperties(), th, settings, 0, 0)).draw(n);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -224,28 +239,29 @@ class GLNodeRenderer extends NodeRenderer {
 	// ==================
 	// ==== Node-specific Drawing
 	private void setParamsFromNode(
-			Node node, GLParameters params, boolean fullPremult, float moreAlpha) 
+			RenderProperties properties, GLParameters params, boolean fullPremult, float moreAlpha) 
 	{
 		
 		int method_num = 0;
 		
 		RenderMethod method;
 		int renderValue = 0;
-		int stage = workspace.getStageManager().getNodeStage(node);
-		
-		if( stage == -1) {
-			method = node.getRender().getMethod();
-			renderValue = node.getRender().getRenderValue();
-		}
-		else {
-			method = RenderMethod.COLOR_CHANGE;
-			switch( stage % 3) {
-			case 0: renderValue = 0xFF0000;break;
-			case 1: renderValue = 0x00FF00;break;
-			case 2: renderValue = 0x0000FF;break;
-			}
-		}
-		
+//		int stage = workspace.getStageManager().getNodeStage(node);
+//		
+//		if( stage == -1) {
+//			method = node.getRender().getMethod();
+//			renderValue = node.getRender().getRenderValue();
+//		}
+//		else {
+//			method = RenderMethod.COLOR_CHANGE;
+//			switch( stage % 3) {
+//			case 0: renderValue = 0xFF0000;break;
+//			case 1: renderValue = 0x00FF00;break;
+//			case 2: renderValue = 0x0000FF;break;
+////			}
+//		}
+		method = properties.getMethod();
+		renderValue = properties.getRenderValue();
 		
 		switch( method) {
 		case COLOR_CHANGE:
@@ -282,7 +298,7 @@ class GLNodeRenderer extends NodeRenderer {
 			method_num = 3;
 			break;
 		}
-		params.addParam( new GLParameters.GLParam1f("uAlpha", node.getRender().getAlpha()*moreAlpha));
+		params.addParam( new GLParameters.GLParam1f("uAlpha", properties.getAlpha()*moreAlpha));
 		params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
 		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
 	}
@@ -316,7 +332,7 @@ class GLNodeRenderer extends NodeRenderer {
 			glgc = buffer[n].getGraphics();
 //			engine.setTarget(buffer[n]);
 			GLParameters params = new GLParameters(settings.width, settings.height);
-			setParamsFromNode( node, params, false, 1);
+			setParamsFromNode( node.getRender(), params, false, 1);
 			params.texture = new GLParameters.GLImageTexture(buffer[n+1]);
 			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, null,
 					0, 0, params.width, params.height);
@@ -326,15 +342,17 @@ class GLNodeRenderer extends NodeRenderer {
 	private class TransformedRenderable extends Drawable {
 		private final TransformedHandle renderable;
 		private final RenderSettings settings;
-		private final LayerNode node;
+		private final RenderProperties properties;
+		//private final LayerNode node;
 		private MatTrans transform;
-		TransformedRenderable( LayerNode node, TransformedHandle renderable, RenderSettings settings) {
-			this.node = node;
+		TransformedRenderable( RenderProperties properties, TransformedHandle renderable, RenderSettings settings, int ox, int oy) {
+			//this.node = node;
+			this.properties = properties;
 			this.renderable = renderable;
 			this.depth = renderable.depth;
 			this.settings = settings;
 			this.transform = renderable.trans;
-			this.transform.translate(node.getOffsetX(), node.getOffsetY());
+			this.transform.translate(ox, oy);
 		}
 		@Override
 		public void draw(int ind) {
@@ -346,7 +364,7 @@ class GLNodeRenderer extends NodeRenderer {
 			
 			float alpha = 1;
 			alpha *= renderable.alpha;
-			setParamsFromNode( node, params, true, alpha);
+			setParamsFromNode( properties, params, true, alpha);
 			
 			MatTrans trans = new MatTrans(transform);
 

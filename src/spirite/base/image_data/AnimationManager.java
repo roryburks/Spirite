@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -63,19 +64,19 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	public AnimationState getAnimationState( Animation animation) {
 		return stateMap.get(animation);
 	}
-	public class AnimationState {
-		public class SubState {
-			public final RenderProperties properties = new RenderProperties();
-			
-			private SubState() {}
-		}
+	public class AnimationState implements RenderProperties.Trigger{
 		
 		private float met;
-		private float selectMet;
-		private Map<AnimationLayer,SubState> subStates = new HashMap<>();
 		private boolean expanded = true;
+		private float selectMet;
+		private Map<AnimationLayer,RenderProperties> substates = new HashMap<>();
+		private Map<Integer,RenderProperties> byTick = new HashMap<>();	
+		private RenderProperties defaultProperties = new RenderProperties();
 		
-		private AnimationState(){}
+		private AnimationState(){
+			defaultProperties.visible = false;
+			resetSubstatesForTicks();
+		}
 		
 		public boolean getExpanded() {return expanded;}
 		public void setExpanded( boolean expanded) {
@@ -90,6 +91,62 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 				this.met = metronome;
 				triggerStateChanged();
 			}
+		}
+		
+		public float getSelectedMetronome() {return selectMet;}
+		public void setSelectedMetronome(float t) {
+			selectMet = t;
+			context.triggerFlash();
+		}
+		
+		// Vert/Hor Visibility Settings
+		public RenderProperties getSubstateForLayer( AnimationLayer al) {
+			RenderProperties ss = substates.get(al);
+			return (ss == null) ? defaultProperties : ss;
+		}
+		public void putSubstateForLayer( AnimationLayer al, RenderProperties properties) {
+			substates.remove(al);
+			substates.put( al, new RenderProperties(properties,this));
+		}
+		public void resetSubstatesForLayers() {
+			substates.clear();
+		}
+		
+		public RenderProperties getSubstateForRelativeTick( int tick) {
+			RenderProperties ss = byTick.get(tick);
+			return (ss == null) ? defaultProperties : ss;
+		}
+		public void putSubstateForRelativeTick( int tick, RenderProperties properties) {
+			byTick.remove(tick);
+			byTick.put( tick, new RenderProperties(properties,this));
+		}
+		public void resetSubstatesForTicks() {
+			byTick.clear();
+			byTick.put(0, new RenderProperties(this));
+		}
+		
+		// :::: Specific Get
+		public RenderProperties getPropertiesForFrame(AnimationLayer layer, int tick) {
+			int _met = (int)Math.floor(selectMet);
+			int offset = tick - _met;
+			
+			RenderProperties properties = byTick.get(offset);
+			if( properties == null) properties = defaultProperties;
+			
+			return properties;
+		}
+
+		@Override public boolean visibilityChanged(boolean newVisible) {
+			context.triggerFlash();
+			return true;
+		}
+		@Override public boolean alphaChanged(float newAlpha) {
+			context.triggerFlash();
+			return true;
+		}
+		@Override public boolean methodChanged(RenderMethod newMethod, int newValue) {
+			context.triggerFlash();
+			return true;
 		}
 	}
 

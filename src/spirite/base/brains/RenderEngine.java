@@ -128,6 +128,9 @@ public class RenderEngine
 		public float alpha = 1.0f;
 		public MatTrans trans = new MatTrans();
 		public ImageHandle handle;
+		
+		// TODO: Replace some things with this
+		//public RenderProperties properties;
 	}
 	
 	public enum RenderMethod {
