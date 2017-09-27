@@ -54,7 +54,14 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private final JPanel topLeft = new JPanel();
 	private final JPanel bottomRight = new JPanel();
 	private final MainTitleBar titleBar = new MainTitleBar();
-	private final JPanel content = new JPanel();
+	private final JPanel content = new JPanel() {
+		@Override
+		public void paint(Graphics g) {
+			super.paint(g);
+			if( state != null)
+				state.Draw(g);
+		}
+	};
 
 	private final int MAIN_TITLE_BAR_HEIGHT = 24;
 	private final int LAYER_TITLE_BAR_HEIGHT = 16;
@@ -144,7 +151,6 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 				ticks[i-start] = new TickPanel(i);
 				horGroups[0].addComponent(ticks[i-start], TL_WIDTH,TL_WIDTH,TL_WIDTH);
 				vertInner.addComponent(ticks[i-start],ROW_HEIGHT,ROW_HEIGHT,ROW_HEIGHT);
-				System.out.println(i);
 			}
 		}
 		
@@ -213,12 +219,6 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 //		super.paintComponent(g);
 //
 //	}
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		if( state != null)
-			state.Draw(g);
-	}
 	
 	private Rectangle GetFrameBounds( int layer, int tick) {
 		
@@ -356,7 +356,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 					visible = !visible;
 					for( Frame frame : layer.getFrames()) {
 						if(frame.getLayerNode() != null)
-							frame.getLayerNode().setVisible(visible);
+							frame.getLayerNode().getRender().setVisible(visible);
 					}
 					CompositeAction action = ue.unpause("Toggle Layer Visibility");
 					ue.performAndStore(action);
@@ -515,7 +515,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			public void mouseDragged(MouseEvent e) {
 				if( state instanceof FrameState) {
 					((FrameState)state).mouseDragged(e);
-					AnimationSchemePanel.this.repaint();
+					content.repaint();
 				}
 			}
 		};
@@ -533,15 +533,13 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			
 			@Override
 			void mouseDragged(MouseEvent e) {
-				target = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, AnimationSchemePanel.this).getY());
+				target = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, content).getY());
 				if( target > frame.getStart() && target < frame.getEnd())
 					target = frame.getStart();
 			}
 
 			@Override
 			void EndState() {
-				System.out.println("target:"+target);
-				
 				if( target != frame.getStart()) {
 					frame.getLayerContext().moveFrame(frame, target, target >= frame.getStart());
 				}
@@ -581,7 +579,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			
 			@Override
 			void mouseDragged(MouseEvent e) {
-				int tickAt = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, AnimationSchemePanel.this).getY() + ROW_HEIGHT/2);
+				int tickAt = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, content).getY() + ROW_HEIGHT/2);
 				
 				floatTick = (north) ?
 						Math.min( frame.getEnd(), tickAt + 1) :
@@ -590,7 +588,6 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			
 			@Override
 			void Draw(Graphics g) {
-				System.out.println(floatTick);
 				Rectangle startRect = GetFrameBounds( column, (north)?floatTick:frame.getStart());
 				Rectangle endRect = GetFrameBounds( column, north?frame.getEnd():floatTick);
 				

@@ -1073,7 +1073,6 @@ public class Penner
 				overlap = -1;
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
-				System.out.println(p.x + "," + p.y);
 				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
 					gc.setColor(Colors.YELLOW);
 //					gc.setStroke(new BasicStroke( 4/zoom));

@@ -146,7 +146,7 @@ public class LayersPanel extends OmniComponent {
 		GroupTree.Node selected = layerTreePanel.getSelectedNode();
 		if( selected != null) {
 			RenderTuple sel = ((RenderTuple)renderCombo.getSelectedItem());
-			selected.setRenderMethod(sel.method, sel.value);
+			selected.getRender().setMethod(sel.method, sel.value);
 		}
 		
 	}
@@ -204,10 +204,10 @@ public class LayersPanel extends OmniComponent {
 
 		GroupTree.Node selected = layerTreePanel.getSelectedNode();
 		if( selected != null) {
-			renderCombo.setSelectedIndex(selected.getRenderMethod().ordinal());
+			renderCombo.setSelectedIndex(selected.getRender().getMethod().ordinal());
 			
-			renderCombo.getItemAt(selected.getRenderMethod().ordinal()).value 
-				= selected.getRenderValue();
+			renderCombo.getItemAt(selected.getRender().getMethod().ordinal()).value 
+				= selected.getRender().getRenderValue();
 		}
 		
 		resetRCOptionPanel();
@@ -245,7 +245,7 @@ public class LayersPanel extends OmniComponent {
 			if( layerTreePanel == null) return;
 			GroupTree.Node selected = layerTreePanel.getSelectedNode();
 			if( selected != null) {
-				setValue( selected.getAlpha());
+				setValue( selected.getRender().getAlpha());
 			}
 		}
 		
@@ -253,7 +253,7 @@ public class LayersPanel extends OmniComponent {
 		public void onValueChanged(float newValue) {
 			GroupTree.Node selected = layerTreePanel.getSelectedNode();
 			if( selected != null) {
-				selected.setAlpha(getValue());
+				selected.getRender().setAlpha(getValue());
 			}
 			super.onValueChanged(newValue);
 		}

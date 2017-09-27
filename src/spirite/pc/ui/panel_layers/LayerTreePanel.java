@@ -60,9 +60,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
-import spirite.base.image_data.ImageWorkspace.OpacityChange;
+import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.ImageWorkspace.VisibilityChange;
 import spirite.base.image_data.RawImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.hybrid.Globals;
@@ -175,10 +174,10 @@ public class LayerTreePanel extends ContentTree
 				
     			List<Node> layerNodes = ((GroupNode)obj).getAllNodesST( new NodeValidator() {
 					@Override public boolean isValid(Node node) {
-						return (node.isVisible() && node instanceof LayerNode);
+						return (node.getRender().isVisible() && node instanceof LayerNode);
 					}
 					@Override public boolean checkChildren(Node node) {
-						return node.isVisible();
+						return node.getRender().isVisible();
 					}
 				});
     			
@@ -204,21 +203,18 @@ public class LayerTreePanel extends ContentTree
     }
 	@Override
 	public void structureChanged( StructureChangeEvent evt) {
-		if( evt.change instanceof VisibilityChange) {
+		if( evt.change instanceof RenderPropertiesChange) {
 			Node changedNode = evt.change.getChangedNodes().get(0);	// should be no need to sanity check
 			
 			for( int i = 0; i<buttonPanel.getButtonRowCount(); ++i) {
 				CCButton button = buttonPanel.getButtonAt( i, 0);
 				Node node = (Node)((DefaultMutableTreeNode)button.getAssosciatedTreePath().getLastPathComponent()).getUserObject();
 				if( node == changedNode) {
-					button.setSelected(node.isVisible());
+					button.setSelected(node.getRender().isVisible());
 					break;
 				}
 			}
-		}else if( evt.change instanceof OpacityChange) {
-//			if( evt.get)
 		}
-		
 
 		if( evt.change.isGroupTreeChange()) {
 			constructFromRoot();
@@ -335,7 +331,7 @@ public class LayerTreePanel extends ContentTree
 			// Visibility Button
 			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
-			node.setVisible(button.isSelected());
+			node.getRender().setVisible(button.isSelected());
 		}
 		else if( button.buttonNum == 1) {
 			// Link Button
@@ -360,7 +356,7 @@ public class LayerTreePanel extends ContentTree
 		if( button.buttonNum == 0) {
 			GroupTree.Node node = getNodeFromPath( button.getAssosciatedTreePath());
 			
-			button.setSelected( node.isVisible());
+			button.setSelected( node.getRender().isVisible());
 			button.setIcon( Globals.getIcon("visible_off"));
 			button.setSelectedIcon(Globals.getIcon("visible_on"));
 		}

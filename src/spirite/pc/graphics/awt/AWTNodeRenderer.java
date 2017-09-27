@@ -145,7 +145,7 @@ public class AWTNodeRenderer extends NodeRenderer {
 		List< Drawable> renderList = new ArrayList<>();
 		while( it.hasPrevious()) {
 			Node child = it.previous();
-			if( child.isVisible()) {
+			if( child.getRender().isVisible()) {
 				if( child instanceof GroupNode) {
 					if( n == buffer.length-1) {
 						// Note: the code can reach here if all the children are invisible.
@@ -201,8 +201,8 @@ public class AWTNodeRenderer extends NodeRenderer {
 	private void _setGraphicsSettings( GraphicsContext gc, Node node, RenderSettings settings) {
 		 cc = gc.getAlpha();
 		
-		if( node.getAlpha() != 1.0f) 
-			gc.setComposite(Composite.SRC_OVER, node.getAlpha() * cc);
+		if( node.getRender().getAlpha() != 1.0f) 
+			gc.setComposite(Composite.SRC_OVER, node.getRender().getAlpha() * cc);
 	}
 	private void _resetRenderSettings( GraphicsContext gc, Node r, RenderSettings settings) {
 		gc.setComposite( Composite.SRC_OVER, cc);

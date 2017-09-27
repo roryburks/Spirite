@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -63,7 +64,15 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		return stateMap.get(animation);
 	}
 	public class AnimationState {
+		public class SubState {
+			public final RenderProperties properties = new RenderProperties();
+			
+			private SubState() {}
+		}
+		
 		private float met;
+		private float selectMet;
+		private Map<AnimationLayer,SubState> subStates = new HashMap<>();
 		private boolean expanded = true;
 		
 		private AnimationState(){}

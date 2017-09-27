@@ -16,6 +16,10 @@ import spirite.base.util.glmath.Rect;
  */
 public class AnimationLayer extends Layer {
 	private Animation animation;
+	
+	public AnimationLayer( Animation animation) {
+		this.animation = animation;
+	}
 
 	@Override
 	public BuildingImageData getActiveData() {
@@ -58,7 +62,8 @@ public class AnimationLayer extends Layer {
 
 	@Override
 	public List<TransformedHandle> getDrawList() {
-		return animation.getDrawList(0);
+		List<TransformedHandle> list = animation.getDrawList(0);
+		return list;
 	}
 
 	@Override

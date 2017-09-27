@@ -21,6 +21,7 @@ import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -206,7 +207,6 @@ public class ImageWorkspace {
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
-			System.out.println("Removing : " + i);
 			imageData.get(i).cachedImage.relinquish(this);
 			imageData.remove(i);
 		}
@@ -1211,10 +1211,9 @@ public class ImageWorkspace {
 					dupe = groupTree.new LayerNode( layer, next.toDupe.getName());
 				}
 
-				dupe.alpha = next.toDupe.alpha;
 				dupe.x = next.toDupe.x;
 				dupe.y = next.toDupe.y;
-				dupe.visible = next.toDupe.visible;
+				dupe.render.directCopy(next.toDupe.render);
 				dupe.expanded = next.toDupe.expanded;
 				
 				
@@ -1584,51 +1583,32 @@ public class ImageWorkspace {
 	}
 	
 	/** Changing the node's visibility */
-	public class VisibilityChange extends NodeAtributeChange {
-		public final boolean visibleAfter;
+	public class RenderPropertiesChange extends NodeAtributeChange {
+		public final RenderProperties before;
+		public final RenderProperties after;
 		
-		VisibilityChange( Node node, boolean visible) {
+		RenderPropertiesChange( Node node, RenderProperties newProperties) {
 			super(node);
-			this.visibleAfter = visible;
 			
-			this.description = "Visibility Changed";
+			this.before = new RenderProperties( node.getRender());
+			this.after = newProperties;
+			this.description = "Visibility/Display Style Changed";
 		}
 
 		@Override
 		public void execute() {
-			node.visible = visibleAfter;
+			node.render.alpha = after.alpha;
+			node.render.visible = after.visible;
+			node.render.method = after.method;
+			node.render.renderValue = after.renderValue;
 		}
 
 		@Override
 		public void unexecute() {
-			node.visible = !visibleAfter;
-		}
-	}
-	
-	/** Changing the node's Opacity */
-	public class OpacityChange extends NodeAtributeChange
-		implements StackableStructureChange
-	{
-		float opacityBefore;
-		float opacityAfter;
-		
-		OpacityChange( Node node, float opacity) {
-			super(node);
-			this.opacityBefore = node.alpha;
-			this.opacityAfter = opacity;
-			
-			this.description = "Opacity Changed";
-		}
-
-		@Override public void execute() { node.alpha = opacityAfter;}
-		@Override public void unexecute() { node.alpha = opacityBefore;}
-		@Override public void stackNewChange(StructureChange newChange) {
-			OpacityChange change = (OpacityChange)newChange;
-			this.opacityAfter = change.opacityAfter;
-		}
-		@Override public boolean canStack(StructureChange newChange) {
-			OpacityChange change = (OpacityChange)newChange;
-			return (node == change.node);
+			node.render.alpha = before.alpha;
+			node.render.visible = before.visible;
+			node.render.method = before.method;
+			node.render.renderValue = before.renderValue;
 		}
 	}
 	
@@ -1681,40 +1661,6 @@ public class ImageWorkspace {
 		}
 		@Override public boolean canStack(StructureChange newChange) {
 			OffsetChange change = (OffsetChange)newChange;
-			return (node == change.node);
-		}
-	}
-	public class MethodChange extends NodeAtributeChange
-		implements StackableStructureChange
-	{
-		private RenderMethod newMethod, oldMethod;
-		private int newValue, oldValue;
-		
-		MethodChange( Node node, RenderMethod method, int value) {
-			super(node);
-			this.newMethod = method;
-			this.newValue = value;
-			this.oldMethod = node.renderMethod;
-			this.oldValue = node.renderValue;
-			
-			this.description = "Changed Node Render Method";
-		}
-	
-		@Override public void execute() { 
-			node.renderMethod = newMethod; 
-			node.renderValue = newValue;
-		}
-		@Override public void unexecute()  { 
-			node.renderMethod = oldMethod; 
-			node.renderValue = oldValue;
-		}
-		@Override public void stackNewChange(StructureChange newChange) {
-			MethodChange change = (MethodChange)newChange;
-			this.newMethod = change.newMethod;
-			this.newValue = change.newValue;
-		}
-		@Override public boolean canStack(StructureChange newChange) {
-			MethodChange change = (MethodChange)newChange;
 			return (node == change.node);
 		}
 	}

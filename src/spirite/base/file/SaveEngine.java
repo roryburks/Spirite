@@ -210,7 +210,7 @@ public class SaveEngine implements MWorkspaceObserver {
 		helper.ra.writeByte( depth);
 		
 		// [4] : alpha
-		helper.ra.writeFloat(node.getAlpha());
+		helper.ra.writeFloat(node.getRender().getAlpha());
 		
 		// [2] : x offset [2] : y offset
 		helper.ra.writeShort( node.getOffsetX());
@@ -218,7 +218,7 @@ public class SaveEngine implements MWorkspaceObserver {
 
 		// [1] : bitmask
 		int mask = 
-				(node.isVisible() ? SaveLoadUtil.VISIBLE_MASK : 0) | 
+				(node.getRender().isVisible() ? SaveLoadUtil.VISIBLE_MASK : 0) | 
 				(node.isExpanded() ? SaveLoadUtil.EXPANDED_MASK : 0);
 
 		helper.ra.writeByte( mask);

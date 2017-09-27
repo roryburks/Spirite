@@ -174,7 +174,7 @@ class GLNodeRenderer extends NodeRenderer {
 		List< Drawable> renderList = new ArrayList<>();
 		while( it.hasPrevious()) {
 			Node child = it.previous();
-			if( child.isVisible()) {
+			if( child.getRender().isVisible()) {
 				if( child instanceof GroupNode) {
 					if( n == buffer.length-1) {
 						// Note: the code can reach here if all the children are invisible.
@@ -234,8 +234,8 @@ class GLNodeRenderer extends NodeRenderer {
 		int stage = workspace.getStageManager().getNodeStage(node);
 		
 		if( stage == -1) {
-			method = node.getRenderMethod();
-			renderValue = node.getRenderValue();
+			method = node.getRender().getMethod();
+			renderValue = node.getRender().getRenderValue();
 		}
 		else {
 			method = RenderMethod.COLOR_CHANGE;
@@ -282,7 +282,7 @@ class GLNodeRenderer extends NodeRenderer {
 			method_num = 3;
 			break;
 		}
-		params.addParam( new GLParameters.GLParam1f("uAlpha", node.getAlpha()*moreAlpha));
+		params.addParam( new GLParameters.GLParam1f("uAlpha", node.getRender().getAlpha()*moreAlpha));
 		params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
 		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
 	}

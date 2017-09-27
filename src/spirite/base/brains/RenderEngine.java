@@ -368,11 +368,11 @@ public class RenderEngine
 				List<Node> nodeDependency = entry.getKey().getAllNodesST(new NodeValidator() {
 					@Override
 					public boolean isValid(Node node) {
-						return node.isVisible();
+						return node.getRender().isVisible();
 					}
 					@Override
 					public boolean checkChildren(Node node) {
-						return node.isVisible();
+						return node.getRender().isVisible();
 					}
 				});
 				if( !Collections.disjoint(changedNodes, nodeDependency)){
@@ -633,13 +633,13 @@ public class RenderEngine
 			NodeValidator validator = new NodeValidator() {			
 				@Override
 				public boolean isValid(Node node) {
-					return (node.isVisible() && !(node instanceof GroupNode)
+					return (node.getRender().isVisible() && !(node instanceof GroupNode)
 							&& node.getChildren().size() == 0);
 				}
 
 				@Override
 				public boolean checkChildren(Node node) {
-					return (node.isVisible() && node.getAlpha() > 0);
+					return (node.getRender().isVisible());
 				}
 			};
 			

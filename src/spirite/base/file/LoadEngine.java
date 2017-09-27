@@ -369,10 +369,10 @@ public class LoadEngine {
 			}
 			if( node != null) {
 				helper.nodes.add(node);
-				node.setAlpha(alpha);
+				node.getRender().setAlpha(alpha);
 				
 				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
-				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
+				node.getRender().setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
 				node.setOffset(ox, oy);
 			}
 		}
@@ -498,10 +498,10 @@ public class LoadEngine {
 				}
 			}
 			if( node != null) {
-				node.setAlpha(alpha);
+				node.getRender().setAlpha(alpha);
 				
 				node.setExpanded( (bitmask & SaveLoadUtil.EXPANDED_MASK) != 0);
-				node.setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
+				node.getRender().setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
 				node.setOffset(ox, oy);
 			}
 		}

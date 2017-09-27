@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.brains.RenderEngine.RenderMethod;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -63,52 +64,95 @@ public class GroupTree {
 	
 	
 	// ::: Nodes
-	public abstract class Node  {
-		protected float alpha = 1.0f;
-		protected boolean visible = true;
+	public abstract class Node  implements RenderProperties.Trigger{
+		protected RenderProperties render;
+		
 		protected int x = 0;
 		protected int y = 0;
 		protected boolean expanded = true;
 		protected String name = "";
-		protected RenderMethod renderMethod = RenderMethod.DEFAULT;
-		protected int renderValue = 0;
 
 		// !!!! Note: even though Non-Group Nodes will never use it, it's still useful 
 		//	to have for generic purposes
 		private final ArrayList<Node> children = new ArrayList<>();
 		private Node parent = null;
 		
-		private Node() {}
+		private Node() {
+			render = new RenderProperties( this);
+		}
 		private Node( Node other, String name) {
 			this.name = name;
 			this.expanded = other.expanded;
 			this.x = other.x;
 			this.y = other.y;
-			this.visible = other.visible;
-			this.alpha = other.alpha;
+			
+			render = new RenderProperties(other.render, this);
 		}
 
 		// ==============
 		// ==== Get/Set
-		public boolean isVisible() {return (visible && alpha > 0);}
-		public void setVisible( boolean visible) {
-			if( context.nodeInWorkspace(this) && this.visible != visible) {
-				context.executeChange( context.new VisibilityChange(this, visible));
-			}
-			else if( context.getReferenceManager().isReferenceNode(this)) {
-				this.visible = visible;
-				context.getReferenceManager().triggerReferenceStructureChanged(false);
-			}
-			else { this.visible = visible;}
+		
+		// :::: From RenderProperties.Trigger
+		@Override
+		public boolean visibilityChanged( boolean newVisible) {
+			RenderProperties copy = new RenderProperties(this.render);
+			copy.visible = newVisible;
+			return _changeProperties(copy);
+		}
+		@Override
+		public boolean alphaChanged ( float newAlpha) {
+			RenderProperties copy = new RenderProperties(this.render);
+			copy.alpha = newAlpha;
+			return _changeProperties(copy);
+		}
+		@Override
+		public boolean methodChanged(RenderMethod newMethod, int newValue) {
+			RenderProperties copy = new RenderProperties(this.render);
+			copy.method = newMethod;
+			copy.renderValue = newValue;
+			return _changeProperties(copy);
 		}
 		
-		public float getAlpha() {return alpha;}
-		public void setAlpha( float alpha) {
-			if( context.nodeInWorkspace(this) && this.alpha != alpha) {
-				context.executeChange( context.new OpacityChange( this, alpha));
+		private boolean _changeProperties( RenderProperties newProps) {
+			if( context.nodeInWorkspace(this)) {
+				context.executeChange( context.new RenderPropertiesChange(this, newProps));
+				return false;
 			}
-			else { this.alpha = alpha;}
+			else if( context.getReferenceManager().isReferenceNode(this))
+				context.getReferenceManager().triggerReferenceStructureChanged(false);
+			context.triggerFlash();
+			return true;
 		}
+		
+		
+		public RenderProperties getRender() {return render;}
+//		public boolean isVisible() {return (render.isVisible() && render.getAlpha() > 0);}
+//		public void setVisible( boolean visible) {
+//			if( context.nodeInWorkspace(this) && this.visible != visible) {
+//				context.executeChange( context.new VisibilityChange(this, visible));
+//			}
+//			else if( context.getReferenceManager().isReferenceNode(this)) {
+//				this.visible = visible;
+//				context.getReferenceManager().triggerReferenceStructureChanged(false);
+//			}
+//			else { this.visible = visible;}
+//		}
+//		
+//		public float getAlpha() {return alpha;}
+//		public void setAlpha( float alpha) {
+//			if( context.nodeInWorkspace(this) && this.alpha != alpha) {
+//				context.executeChange( context.new OpacityChange( this, alpha));
+//			}
+//			else { this.alpha = alpha;}
+//		}
+//		public RenderMethod getRenderMethod() {return renderMethod;}
+//		public int getRenderValue() {return renderValue;}
+//		public void setRenderMethod( RenderMethod method, int renderValue) {
+//			if( context.nodeInWorkspace(this) && (renderMethod != method || this.renderValue != renderValue)) {
+//				context.executeChange( context.new MethodChange( this, method, renderValue));
+//			}
+//			else {this.renderMethod = method; this.renderValue = renderValue;}
+//		}
 		
 		public int getOffsetX() {return x;}
 		public int getOffsetY() {return y;}
@@ -131,14 +175,6 @@ public class GroupTree {
 			}
 		}
 		
-		public RenderMethod getRenderMethod() {return renderMethod;}
-		public int getRenderValue() {return renderValue;}
-		public void setRenderMethod( RenderMethod method, int renderValue) {
-			if( context.nodeInWorkspace(this) && (renderMethod != method || this.renderValue != renderValue)) {
-				context.executeChange( context.new MethodChange( this, method, renderValue));
-			}
-			else {this.renderMethod = method; this.renderValue = renderValue;}
-		}
 		public ImageWorkspace getContext() {return context;}
 
 		
