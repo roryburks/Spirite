@@ -39,10 +39,10 @@ public class FixedFrameAnimation extends Animation
 	private int endFrame;
 	private final ImageWorkspace context;
 
-	public FixedFrameAnimation(GroupNode group) {
+	public FixedFrameAnimation(GroupNode group, String name) {
 		context = group.getContext();
 		layers.add( constructFromGroup(group));
-		name = group.getName();
+		this.name = name;
 		recalculateMetrics();
 	}
 	
@@ -159,7 +159,7 @@ public class FixedFrameAnimation extends Animation
 	@Override
 	public void drawFrame(GraphicsContext gc, float t) {
 		int _t = (int)Math.floor(t);
-		List<TransformedHandle> drawList = getDrawListForFrame(_t);
+		List<TransformedHandle> drawList = getDrawList(_t);
 		
 		float alpha = gc.getAlpha();
 		Composite comp = gc.getComposite();
@@ -168,11 +168,12 @@ public class FixedFrameAnimation extends Animation
 			renderable.handle.drawLayer( gc, renderable.trans);
 		}
 		gc.setComposite(comp, alpha);
-		
 	}
-	
-	public List<TransformedHandle> getDrawListForFrame( int t) {
-		int met = MUtil.cycle(startFrame, endFrame, t);
+	@Override
+	public List<TransformedHandle> getDrawList(float t) {
+		int _t = (int)Math.floor(t);
+		
+		int met = MUtil.cycle(startFrame, endFrame, _t);
 		
 		List<TransformedHandle> drawList = new ArrayList<>();
 		
@@ -187,7 +188,7 @@ public class FixedFrameAnimation extends Animation
 			// Based on the layer timing type, determine the local frame
 			//	index to use (if any)
 			if( layer.asynchronous) {
-				localMet = MUtil.cycle(start, end, t);
+				localMet = MUtil.cycle(start, end, _t);
 			}
 			
 			LayerNode node = layer.getLayerForMet(localMet);
@@ -589,5 +590,7 @@ public class FixedFrameAnimation extends Animation
 			return new ArrayList<>(keyTimes);
 		}*/
 	}
+
+
 
 }

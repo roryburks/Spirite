@@ -168,9 +168,6 @@ class GLNodeRenderer extends NodeRenderer {
 		// Go through the node's children (in reverse), drawing any visible group
 		//	found recursively and drawing any Layer found plainly.
 		
-		// Step 1: Construct a list of all components that need to be rendered
-		int count = 0;	// This subDepth counter is used to make sure Renderables of
-						// the same depth are rendered in the correct order.
 		
 		
 		ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
@@ -188,10 +185,14 @@ class GLNodeRenderer extends NodeRenderer {
 					Drawable renderable;
 					renderable =  new GroupRenderable(
 							(GroupNode) child, n, settings);
-					renderable.subDepth = count++;
-					renderList.add(renderable);
+					renderable.draw(n);
+//					renderable.subDepth = count++;
+//					renderList.add(renderable);
 				}
 				else {
+					// Step 1: Construct a list of all components that need to be rendered
+					int count = 0;	// This subDepth counter is used to make sure Renderables of
+									// the same depth are rendered in the correct order.
 					List<TransformedHandle> sub = ((LayerNode)child).getLayer().getDrawList();
 					
 					for( TransformedHandle subRend : sub) {
@@ -200,23 +201,23 @@ class GLNodeRenderer extends NodeRenderer {
 						renderable.subDepth = count++;
 						renderList.add(renderable );
 					}
+					
+					// Step 2: Sort the list by depth then subdepth, increasing.
+					renderList.sort( new Comparator<Drawable>() {
+						@Override
+						public int compare(Drawable o1, Drawable o2) {
+							if( o1.depth == o2.depth)
+								return o1.subDepth - o2.subDepth;
+							return o1.depth - o2.depth;
+						}
+					});
+					
+					// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
+					for( Drawable renderable : renderList) {
+						renderable.draw(n);
+					}
 				}
 			}
-		}
-		
-		// Step 2: Sort the list by depth then subdepth, increasing.
-		renderList.sort( new Comparator<Drawable>() {
-			@Override
-			public int compare(Drawable o1, Drawable o2) {
-				if( o1.depth == o2.depth)
-					return o1.subDepth - o2.subDepth;
-				return o1.depth - o2.depth;
-			}
-		});
-		
-		// Step 3: Draw each one (note: GroupRenderables will recursively call _propperRec
-		for( Drawable renderable : renderList) {
-			renderable.draw(n);
 		}
 	}
 	

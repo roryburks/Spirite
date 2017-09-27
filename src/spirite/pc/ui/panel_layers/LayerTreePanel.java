@@ -23,8 +23,10 @@ import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import javax.print.attribute.standard.JobMessageFromOperator;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -521,8 +523,11 @@ public class LayerTreePanel extends ContentTree
 		switch( evt.getActionCommand()) {
 		case "animfromgroup":{
 			GroupNode group = (GroupNode)contextMenu.node;
+			
+			String name = JOptionPane.showInputDialog("Enter name for new Animation:", group.getName());
+			
 			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new FixedFrameAnimation(group));
+			manager.addAnimation(new FixedFrameAnimation(group, name));
 			break;}
 		case "giffromgroup":{
 			GroupNode group = (GroupNode)contextMenu.node;

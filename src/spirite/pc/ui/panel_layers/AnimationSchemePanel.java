@@ -53,8 +53,11 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private FixedFrameAnimation animation;
 	private final JPanel topLeft = new JPanel();
 	private final JPanel bottomRight = new JPanel();
+	private final MainTitleBar titleBar = new MainTitleBar();
+	private final JPanel content = new JPanel();
 
-	private final int TITLE_BAR_HEIGHT = 16;
+	private final int MAIN_TITLE_BAR_HEIGHT = 24;
+	private final int LAYER_TITLE_BAR_HEIGHT = 16;
 	private final int BOTTOM_BAR_HEIGHT = 16;
 	private final int TL_WIDTH = 16;
 	private final int ROW_HEIGHT = 32;
@@ -88,9 +91,21 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		int end = animation.getEnd();
 		
 		this.removeAll();
+		
+		titleBar.setTitle(animation.getName());
+		
+		GroupLayout primaryLayout = new GroupLayout(this);
+		primaryLayout.setHorizontalGroup( primaryLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addComponent(titleBar)
+				.addComponent(content));
+		primaryLayout.setVerticalGroup( primaryLayout.createSequentialGroup()
+				.addComponent(titleBar, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT)
+				.addComponent(content));
+		this.setLayout(primaryLayout);
+		
 		List<AnimationLayer> layers = animation.getLayers();
 		
-		GroupLayout layout = new GroupLayout(this);
+		GroupLayout layout = new GroupLayout(content);
 		
 		Group horGroup = layout.createSequentialGroup();
 		Group vertGroup = layout.createSequentialGroup();
@@ -105,15 +120,15 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		Group titleVertGroup = layout.createParallelGroup();
 		vertGroup.addGroup(titleVertGroup);
 		horGroups[0].addComponent(topLeft, TL_WIDTH,TL_WIDTH,TL_WIDTH);
-		titleVertGroup.addComponent(topLeft, TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT);
+		titleVertGroup.addComponent(topLeft, LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT);
 		
 		titles= new Component[layers.size()];
 		
 		for( int i=0; i < layers.size(); ++i) {
 			AnimationLayer layer = layers.get(i);
-			titles[i] = new TitleBar(layer.getName());
+			titles[i] = new LayerTitleBar(layer.getName());
 			horGroups[i+1].addComponent(titles[i]);
-			titleVertGroup.addComponent( titles[i], TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT,TITLE_BAR_HEIGHT);
+			titleVertGroup.addComponent( titles[i], LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT);
 		}
 		layout.linkSize(SwingConstants.HORIZONTAL, titles);
 		
@@ -190,7 +205,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		layout.setHorizontalGroup(horGroup);
 		layout.setVerticalGroup(vertGroup);
 
-		this.setLayout(layout);
+		content.setLayout(layout);
 	}
 	
 //	@Override
@@ -208,7 +223,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private Rectangle GetFrameBounds( int layer, int tick) {
 		
 		int sx = TL_WIDTH;
-		int sy = TITLE_BAR_HEIGHT;
+		int sy = LAYER_TITLE_BAR_HEIGHT;
 		
 		sy += ROW_HEIGHT * (tick - animation.getStart());
 		
@@ -218,7 +233,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		return new Rectangle( sx, sy, titles[layer].getWidth(), ROW_HEIGHT);
 	}
 	private int TickAtY( int y) {
-		return (y - TITLE_BAR_HEIGHT)/ROW_HEIGHT;
+		return (y - LAYER_TITLE_BAR_HEIGHT)/ROW_HEIGHT;
 	}
 	
 	// :::: WorkspaceObserver
@@ -243,11 +258,32 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		this.repaint();
 	}
 	
-	private class TitleBar extends JPanel {
+	private class MainTitleBar extends JPanel {
 		String title;
 		private final JLabel label = new JLabel();
 		
-		private TitleBar( String title) {
+		private MainTitleBar() {
+			//this.setLayout(new GridLayout());
+			
+			this.setBackground(TITLE_BG );
+			
+			label.setFont( new Font("Tahoma",Font.BOLD, 12));
+
+			this.add(label);
+			label.setText(title);
+		}
+		
+		public void setTitle(String title) {
+			this.title = title;
+			label.setText(title);
+		}
+	}
+	
+	private class LayerTitleBar extends JPanel {
+		String title;
+		private final JLabel label = new JLabel();
+		
+		private LayerTitleBar( String title) {
 			//this.setLayout(new GridLayout());
 			
 			this.setBackground(TITLE_BG );

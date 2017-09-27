@@ -630,7 +630,7 @@ public class UndoEngine {
 					((DynamicInternalImage) ii).ox  = ii_ox;
 					((DynamicInternalImage) ii).oy  = ii_oy;
 					workspace._replaceIamge(image, cacheManager.cacheImage(frameCache.access(), workspace));
-				} 
+				}
 				else {
 					BuiltImageData built = workspace.new BuiltImageData(image);
 					RawImage img = built.checkoutRaw();
@@ -760,11 +760,14 @@ public class UndoEngine {
 				}
 				met = i;
 			}
+			
+			System.out.println("met:"+(pointer-met));
 						
 			// Refresh the Image to the current most recent keyframe
 			actions.get(pointer-met).performImageAction();
 
 			for( int i = pointer - met+1; i <= pointer; ++i) {
+				System.out.println("met:"+(i));
 				actions.get(i).performImageAction();
 			}
 

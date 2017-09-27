@@ -323,7 +323,7 @@ public class GroupTree {
 	 * Though LayerNodes can technically accept sub-children, doing so may 
 	 * yield unexpected behavior.*/
 	public class LayerNode extends Node {
-		Layer layer;
+		private final Layer layer;
 		
 		LayerNode( LayerNode other, Layer layer, String name) {
 			super( other, name);

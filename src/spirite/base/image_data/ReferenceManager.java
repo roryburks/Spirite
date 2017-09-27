@@ -10,6 +10,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;
+import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 
 /**
  * ReferenceManager manages the Reference system.
@@ -19,6 +20,7 @@ import spirite.base.util.glmath.MatTrans;
  *	-Floating Images pasted into the floating reference section.
  */
 public class ReferenceManager {
+	private final ImageWorkspace context;
 	private boolean editingReference = false;
 	private float refAlpha = 1.0f;
 
@@ -29,6 +31,7 @@ public class ReferenceManager {
 	private final List<Reference> references = new ArrayList<>();
 	
 	ReferenceManager(ImageWorkspace imageWorkspace) {
+		this.context = imageWorkspace;
 		references.add(null);
 	}
 	
@@ -233,6 +236,7 @@ public class ReferenceManager {
     		else
             	obs.referenceStructureChanged( hard);
     	}
+    	context.triggerFlash();
     }
     private void triggerReferenceToggle(boolean edit) {
     	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
@@ -242,6 +246,7 @@ public class ReferenceManager {
     		else
             	obs.toggleReference( edit);
     	}
+    	context.triggerFlash();
     }
 
     public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(new WeakReference<MReferenceObserver>(obs));}

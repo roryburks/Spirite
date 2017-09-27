@@ -14,6 +14,7 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.pc.ui.generic.BetterTree;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
@@ -62,6 +63,8 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
 		Rebuild();
+		
+		ws.getAnimationManager().getView().addNode(evt.getAnimation());
 //		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
 //		panels.add(newPanel);
 //		tree.AddRoot( tree.new LeafNode(newPanel));

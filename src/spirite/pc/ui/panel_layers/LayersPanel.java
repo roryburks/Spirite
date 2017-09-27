@@ -17,6 +17,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.ListCellRenderer;
 
 import spirite.base.brains.MasterControl;
@@ -88,6 +90,16 @@ public class LayersPanel extends OmniComponent {
 		initBindings();
 		
 		updateSelected();
+		
+		layerTabPane.addChangeListener( new ChangeListener() {
+			@Override public void stateChanged(ChangeEvent arg0) {
+				ImageWorkspace ws = master.getCurrentWorkspace();
+				if( ws != null) {
+					ws.setUsingAnimationView( layerTabPane.getSelectedIndex() == 1);
+					ws.triggerFlash();
+				}
+			}
+		});
 	}
 	
 	private void initComponents() {

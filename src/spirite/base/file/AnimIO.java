@@ -135,7 +135,7 @@ public class AnimIO {
 		
 		// Step 1: Interpret animation data as AAF Data
 		for( int i=0; i < animation.getEnd() ; ++i) {
-			List<TransformedHandle> drawList = animation.getDrawListForFrame(i);
+			List<TransformedHandle> drawList = animation.getDrawList(i);
 			AAFFrame aframe = new AAFFrame();
 			
 			for( TransformedHandle th : drawList) {

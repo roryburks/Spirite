@@ -31,10 +31,12 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	
 	private ArrayList<Animation> animations = new ArrayList<>();
 	private Animation selectedAnimation = null;
+	private final AnimationView view;
 	
 
 	AnimationManager( ImageWorkspace context) {
 		this.context = context;
+		this.view = new AnimationView(context);
 		context.addSelectionObserver(this);
 		context.addImageObserver(this);
 	}
@@ -53,13 +55,13 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	public List<Animation> getAnimations() {
 		return new ArrayList<> (animations);
 	}
-	
+	public AnimationView getView() {return view;}
+
+	// :: Animation States
+	private final Map<Animation,AnimationState> stateMap = new HashMap<>();
 	public AnimationState getAnimationState( Animation animation) {
 		return stateMap.get(animation);
 	}
-	
-	private final Map<Animation,AnimationState> stateMap = new HashMap<>();
-	
 	public class AnimationState {
 		private float met;
 		private boolean expanded = true;

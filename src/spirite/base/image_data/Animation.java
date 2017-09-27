@@ -2,6 +2,7 @@ package spirite.base.image_data;
 
 import java.util.List;
 
+import spirite.base.brains.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
@@ -12,6 +13,7 @@ public abstract class Animation {
 	
 	protected void triggerChange() {if( context != null) context.triggerChangeAnimation(this);}
 	public abstract void drawFrame( GraphicsContext gc, float t);
+	public abstract List<TransformedHandle> getDrawList( float t);
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();
 	public abstract void importGroup( GroupNode node);

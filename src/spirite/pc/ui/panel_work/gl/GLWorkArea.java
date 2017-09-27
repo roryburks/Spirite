@@ -26,6 +26,7 @@ import spirite.base.graphics.gl.GLParameters;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
@@ -53,7 +54,7 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  * @author Rory Burks
  */
 public class GLWorkArea 
-	implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver, MReferenceObserver
+	implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver, MReferenceObserver, MFlashObserver
 {
 	private static final Color normalBG = Globals.getColor("workArea.normalBG");
 	private static final Color referenceBG = Globals.getColor("workArea.referenceBG");
@@ -126,7 +127,6 @@ public class GLWorkArea
     				(int)Math.round(workspace.getWidth()*view.getZoom()),
 	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
     		glgc.drawTransparencyBG(rect, 8);
-    		
 
         	MatTrans viewTrans = view.getViewTransform();
 
@@ -204,6 +204,7 @@ public class GLWorkArea
 	public void changeWorkspace(ImageWorkspace ws, View view) {
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
+			workspace.removeFlashObserve(this);
 			selectionEngine.removeSelectionObserver(this);
 			referenceManager.removeReferenceObserve(this);
 		}
@@ -212,6 +213,7 @@ public class GLWorkArea
 		referenceManager = (ws == null)?null:ws.getReferenceManager();
 		if( workspace != null) {
 			workspace.addImageObserver(this);
+			workspace.addFlashObserve(this);
 			selectionEngine.addSelectionObserver(this);
 			referenceManager.addReferenceObserve(this);
 		}
@@ -234,4 +236,7 @@ public class GLWorkArea
 	// :::: MReferenceObserver
 	@Override public void referenceStructureChanged(boolean hard) { canvas.repaint(); }
 	@Override public void toggleReference(boolean referenceMode) { canvas.repaint(); }
+
+	// :::: MFlashObserver
+	@Override public void flash() {canvas.repaint(); }
 }

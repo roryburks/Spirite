@@ -157,7 +157,10 @@ public class RenderEngine
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
 		settings.normalize();
 		
-		NodeRenderer renderer = drawer.createNodeRenderer(workspace.getRootNode(), RenderEngine.this);
+		GroupNode root = (workspace.isUsingAnimationView()) 
+				? workspace.getAnimationManager().getView().getRoot()
+				: workspace.getRootNode();
+		NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
 		renderer.render(settings, context, trans);
 	}
 	

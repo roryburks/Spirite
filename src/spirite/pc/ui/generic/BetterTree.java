@@ -77,7 +77,7 @@ public class BetterTree extends JPanel {
 		}
 		
 		layout.setHorizontalGroup(horGroup);
-		layout.setVerticalGroup(vertGroup.addContainerGap(0,0));
+		layout.setVerticalGroup(vertGroup);
 		
 		this.setLayout(layout);
 		this.repaint();

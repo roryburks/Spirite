@@ -119,6 +119,8 @@ public class ImageWorkspace {
 	private boolean building = true;	// While building, no UndoActionsare stored
 										// and no cache is cleared
 	
+	private boolean animationView = false;
+	
 	
 	public ImageWorkspace( MasterControl master) {
 		this.cacheManager = master.getCacheManager();
@@ -204,6 +206,7 @@ public class ImageWorkspace {
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
+			System.out.println("Removing : " + i);
 			imageData.get(i).cachedImage.relinquish(this);
 			imageData.remove(i);
 		}
@@ -259,14 +262,17 @@ public class ImageWorkspace {
 		}
 	}
 	
-	public File getFile() {return file;} 
+	public boolean isUsingAnimationView() {return animationView;}
+	public void setUsingAnimationView( boolean using) { this.animationView = using;}
 	
+	public File getFile() {return file;} 
 	public String getFileName() {
 		if( file == null) 
 			return "Untitled Image";
 		else
 			return file.getName();
 	}
+	
 	
 	public boolean hasChanged() { return changed; }
 	
@@ -694,8 +700,8 @@ public class ImageWorkspace {
 		List<ImageCropHelper> handlesCropped = new ArrayList<>();
 		
 		for( LayerNode node : toCrop ) {
-			List<ImageHandle> handles = node.layer.getImageDependencies();
-			List<Rect> imageBounds = node.layer.getBoundList();
+			List<ImageHandle> handles = node.getLayer().getImageDependencies();
+			List<Rect> imageBounds = node.getLayer().getBoundList();
 
 			if( inputRect == null || handles  == null ) continue;
 			
@@ -968,7 +974,7 @@ public class ImageWorkspace {
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
 		CachedImage ci = cacheManager.cacheImage(img, this);
 		ci.reserve(this);
-		imageData.put( workingID, new DynamicInternalImage(ci,0, 0));
+		imageData.put( workingID, new InternalImage(ci));
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 
@@ -1842,6 +1848,7 @@ public class ImageWorkspace {
     	}
     	
     	triggerImageRefresh(evt);
+        triggerFlash();
     }
     private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
     	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
@@ -1852,6 +1859,7 @@ public class ImageWorkspace {
     		else
     			obs.structureChanged( new StructureChangeEvent(evt,undo));
     	}
+        triggerFlash();
     }
     void triggerImageRefresh(ImageChangeEvent evt) {
     	evt.workspace = this;
@@ -1880,6 +1888,7 @@ public class ImageWorkspace {
 			changed = true;
 			triggerFileChange();
 		}
+        triggerFlash();
     }
 
     public void addImageObserver( MImageObserver obs) { imageObservers.add(new WeakReference<>(obs));}
@@ -1973,6 +1982,32 @@ public class ImageWorkspace {
     			it.remove();
     	}
     }
+
+    /** MFlashObserver is an extremely light observer that triggers any time an image has
+     * been changed or whenever told to trigger from the outside.  Its primary purpose
+     * is to cause the Workspace to be redrawn, e.g. from important UI settings changes.     */
+	public static interface MFlashObserver {
+		public void flash();
+	}
+    List<WeakReference<MFlashObserver>> flashObservers = new ArrayList<>();
+    public void addFlashObserve( MFlashObserver obs) { flashObservers.add(new WeakReference<>(obs));}
+    public void removeFlashObserve( MFlashObserver obs) {
+    	Iterator<WeakReference<MFlashObserver>> it = flashObservers.iterator();
+    	while( it.hasNext()) {
+    		MFlashObserver other = it.next().get();
+    		if( other == null || other == obs)
+    			it.remove();
+    	}
+    }
+	public void triggerFlash() {
+    	Iterator<WeakReference<MFlashObserver>> it = flashObservers.iterator();
+    	while( it.hasNext()) {
+    		MFlashObserver obs = it.next().get();
+    		if( obs == null) it.remove();
+    		else 
+    			obs.flash();
+    	}
+	}
     
 
     // =============
@@ -2019,4 +2054,5 @@ public class ImageWorkspace {
 		
 		undoEngine.cleanup();
 	}
+	
 }
