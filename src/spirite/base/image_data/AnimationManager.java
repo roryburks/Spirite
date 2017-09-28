@@ -118,8 +118,11 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		}
 		
 		public int cannonizeRelTick( int t) {
+			return cannonizeRelTick( t, (int)Math.floor(selectMet));
+		}
+		public int cannonizeRelTick( int t, int center) {
 			int L = (int)animation.getEndFrame() - (int)animation.getStartFrame();
-			return ((((t - (int)Math.floor(selectMet)) % L) + L + L/2) % L) - L/2;
+			return ((((t - center) % L) + L + L/2) % L) - L/2;
 		}
 
 		// Vert/Hor Visibility Settings
@@ -158,13 +161,15 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		
 		// :::: Specific Get
 		public RenderProperties getPropertiesForFrame(AnimationLayer layer, int tick) {
-			int _met = (int)Math.floor(selectMet);
-			int offset = tick - _met;
-			
-			RenderProperties properties = byTick.get(offset);
-			if( properties == null) properties = defaultProperties;
-			
-			return properties;
+			return getSubstateForRelativeTick(tick);
+//			int _met = (int)Math.floor(selectMet);
+//			int offset = tick - _met;
+//
+//			
+//			RenderProperties properties = byTick.get(tick);
+//			if( properties == null) properties = defaultProperties;
+//			
+//			return properties;
 		}
 
 		private final RenderProperties.Trigger trigger=new RenderProperties.Trigger(){@Override public boolean visibilityChanged(boolean newVisible){context.triggerFlash();return true;}@Override public boolean alphaChanged(float newAlpha){context.triggerFlash();return true;}@Override public boolean methodChanged(RenderMethod newMethod,int newValue){context.triggerFlash();return true;}};

@@ -849,7 +849,14 @@ public class MasterControl
     	
     }
     
-    
+//    public abstract static class TrackingObserver<T> {
+//    	protected abstract void _addObserver( T obs);
+//    	protected abstract void _removeObserver( T obs);
+//    }
+//    
+//    public <T> void addTrackingObserver( TrackingObserver<T> tracker, T t) {
+//    	Object a = T.class;
+//    }
 
     // ===============
     // ==== Observer Interfaces ====
