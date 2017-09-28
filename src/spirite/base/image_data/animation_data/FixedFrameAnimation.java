@@ -166,7 +166,7 @@ public class FixedFrameAnimation extends Animation
 		float alpha = gc.getAlpha();
 		Composite comp = gc.getComposite();
 		for( TransformedHandle renderable : drawList) {
-			gc.setComposite(renderable.comp, renderable.alpha);
+			gc.setComposite(comp, renderable.alpha);
 			renderable.handle.drawLayer( gc, renderable.trans);
 		}
 		gc.setComposite(comp, alpha);

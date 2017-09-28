@@ -277,7 +277,7 @@ public class SpriteLayer extends Layer
 		List<TransformedHandle> drawList = getDrawList();
 		
 		for( TransformedHandle th : drawList) {
-			th.handle.drawLayer(gc, th.trans, th.comp, th.alpha);
+			th.handle.drawLayer(gc, th.trans, gc.getComposite(), th.alpha);
 		}
 	}
 	
@@ -381,7 +381,6 @@ public class SpriteLayer extends Layer
 				
 				TransformedHandle renderable = new TransformedHandle();
 
-				renderable.comp = Composite.SRC_OVER;
 				renderable.alpha = part.alpha;
 				
 				renderable.handle = part.handle;

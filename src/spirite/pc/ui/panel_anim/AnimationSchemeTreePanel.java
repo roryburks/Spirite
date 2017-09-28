@@ -952,6 +952,7 @@ public class AnimationSchemeTreePanel extends JPanel
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 
 	// :::: MAnimationStateObserver
+	@Override	public void viewStateChanged(MAnimationStateEvent evt) {}
 	@Override
 	public void selectedAnimationChanged(MAnimationStateEvent evt) {
 		repaint();
@@ -961,6 +962,7 @@ public class AnimationSchemeTreePanel extends JPanel
 	public void animationFrameChanged(MAnimationStateEvent evt) {
 		repaint();
 	}
+
 
 
 	

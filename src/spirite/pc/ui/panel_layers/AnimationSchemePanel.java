@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -33,6 +34,8 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
+import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
+import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -43,15 +46,19 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.hybrid.Globals;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.util.Colors;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
+import spirite.pc.ui.generic.SquarePanel;
 
 
 /***
  * AnimationSchemePanel is a grid 
  */
-public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, MSelectionObserver {
+public class AnimationSchemePanel extends JPanel 
+	implements MWorkspaceObserver, MSelectionObserver, MAnimationStateObserver 
+{
 	private final MasterControl master;
 	private ImageWorkspace ws = null;
 	
@@ -60,6 +67,34 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private final JPanel bottomRight = new JPanel();
 	private final MainTitleBar titleBar = new MainTitleBar();
 	private final JPanel content = new JPanel() {
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			int s = animation.getStart();
+			int e = animation.getEnd();
+			AnimationState as = ws.getAnimationManager().getAnimationState(animation);
+			int selT = (int)Math.floor(as.getSelectedMetronome());
+			
+			for( int t=s; t<e; ++t) {
+				Color c = Color.WHITE;
+				if(  selT == t)
+					c = Color.YELLOW;
+				else {
+					if( as.hasSubstateForRelativeTick(as.cannonizeRelTick(t)))
+						c = Color.green;
+				}
+				
+				if( (int)Math.floor(as.getMetronom()) == t)
+					c = Colors.darken(c);
+				
+				//c = new Color( (int)(0xFFFFFF*Math.random()));
+				
+				g.setColor(c);
+				g.fillRect( 0, LAYER_TITLE_BAR_HEIGHT + ROW_HEIGHT * (t - animation.getStart()), getWidth(), ROW_HEIGHT);
+			}
+		}
+		
 		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
@@ -83,6 +118,8 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	
 	
 	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
+		if( fixedFrameAnimation == null)
+			throw new RuntimeException("Null Animation for AnimationSchemePanel");
 		this.master = master;
 		this.animation = fixedFrameAnimation;
 		BuildFromAnimation();
@@ -91,6 +128,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		ws = master.getCurrentWorkspace();
 		if( ws != null) {
 			ws.addSelectionObserver(this);
+			ws.getAnimationManager().addAnimationStateObserver(this);
 		}
 	}
 	
@@ -228,9 +266,8 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	private Rectangle GetFrameBounds( int layer, int tick) {
 		
 		int sx = TL_WIDTH;
-		int sy = LAYER_TITLE_BAR_HEIGHT;
+		int sy = LAYER_TITLE_BAR_HEIGHT + ROW_HEIGHT * (tick - animation.getStart());
 		
-		sy += ROW_HEIGHT * (tick - animation.getStart());
 		
 		for( int i=0; i < layer; ++i)
 			sx += titles[i].getWidth();
@@ -248,10 +285,12 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		if( ws != null) {
 			ws.removeSelectionObserver(this);
+			ws.getAnimationManager().removeAnimationStateObserver(this);
 		}
 		ws = selected;
 		if( ws != null) {
 			ws.addSelectionObserver(this);
+			ws.getAnimationManager().addAnimationStateObserver(this);
 		}
 		
 		Rebuild();
@@ -306,6 +345,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		private final JLabel label = new JLabel();
 		
 		private TickPanel( int tick) {
+			this.setOpaque(false);
 			this.tick = tick;
 			label.setText(""+tick);
 			
@@ -320,10 +360,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 						JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 						
 						AnimationState as = ws.getAnimationManager().getAnimationState(animation);
-						int T = (int)Math.floor(as.getSelectedMetronome());
-						int L = animation.getEnd() - animation.getStart();
-						int relTick = ((((tick - T) % L) + L + L/2) % L) - L/2;	// angle_difference
-						as.putSubstateForRelativeTick(relTick, dialog.getResult());
+						as.putSubstateForRelativeTick( as.cannonizeRelTick(tick), dialog.getResult());
 					}
 				}
 			});
@@ -331,6 +368,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			label.setFont( new Font("Tahoma",Font.BOLD, 10));
 
 			this.add(label);
+			
 		}
 	}
 	
@@ -389,8 +427,8 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		private final Frame frame;
 		private final int column;
 		
-		private final JToggleButton btnVLock = new JToggleButton("V");
-		private final JToggleButton btnLLock = new JToggleButton("L");
+		private final JPanel btnVLock = new JPanel();
+		private final JPanel btnLLock = new JPanel();
 		
 		private final JPanel drawPanel = new JPanel() {
 			@Override
@@ -410,10 +448,10 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			
 			btnVLock.setBorder(null);
 			btnLLock.setBorder(null);
+			btnVLock.setBackground(Color.RED);
+			btnLLock.setBackground(Color.ORANGE);
 
-			drawPanel.setOpaque(false);
-			
-			this.setBackground(Color.RED);
+			this.setOpaque(false);
 			
 			this.addMouseListener( adapter);
 			this.addMouseMotionListener(adapter);
@@ -421,19 +459,29 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 			
 			GroupLayout layout = new GroupLayout(this);
 			
+			int LBTN_WIDTH = 8;
 			Group hor = layout.createParallelGroup();
 			hor.addGroup(layout.createSequentialGroup()
+					.addGap(2)
 					.addGroup( layout.createParallelGroup()
-							.addComponent(btnVLock)
-							.addComponent(btnLLock))
-					.addComponent(drawPanel));
+							.addComponent(btnVLock, LBTN_WIDTH, LBTN_WIDTH, LBTN_WIDTH)
+							.addComponent(btnLLock, LBTN_WIDTH, LBTN_WIDTH, LBTN_WIDTH))
+					.addGap(2,2, Short.MAX_VALUE)
+					.addComponent(drawPanel)
+					.addGap(2,2, Short.MAX_VALUE));
 			
 			Group vert = layout.createSequentialGroup();
 			vert.addGroup(layout.createParallelGroup()
 					.addGroup( layout.createSequentialGroup()
+							.addGap(2)
 							.addComponent(btnVLock)
-							.addComponent(btnLLock))
-					.addComponent(drawPanel, ROW_HEIGHT,ROW_HEIGHT,ROW_HEIGHT));
+							.addGap(2)
+							.addComponent(btnLLock)
+							.addGap(2))
+					.addGroup( layout.createSequentialGroup()
+							.addGap(2)
+							.addComponent(drawPanel, ROW_HEIGHT - 4,ROW_HEIGHT - 4,ROW_HEIGHT - 4)
+							.addGap(2)));
 			
 			layout.setHorizontalGroup( hor);
 			layout.setVerticalGroup( vert);
@@ -444,7 +492,7 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 				hor.addComponent(c);
 			}
 
-			drawPanel.setBorder( BorderFactory.createLineBorder(Color.BLACK));
+			drawPanel.setBorder( BorderFactory.createLineBorder(Color.BLACK,2));
 			
 			layout.linkSize( SwingConstants.VERTICAL, btnVLock,btnLLock);
 			
@@ -638,5 +686,19 @@ public class AnimationSchemePanel extends JPanel implements MWorkspaceObserver, 
 		abstract void EndState();
 		abstract void StartState();
 		void Draw( Graphics g) {}
+	}
+
+	// :::: MAnimationStateObserver
+	@Override
+	public void selectedAnimationChanged(MAnimationStateEvent evt) {
+		repaint();
+	}
+	@Override
+	public void animationFrameChanged(MAnimationStateEvent evt) {
+		repaint();
+	}
+	@Override
+	public void viewStateChanged(MAnimationStateEvent evt) {
+		repaint();
 	}
 }

@@ -455,15 +455,16 @@ public class AnimationPreviewPanel extends OmniComponent
 		} catch( NullPointerException e) {}
 	}
 	
-	// MAnimationStateObserver
-		@Override
-		public void selectedAnimationChanged(MAnimationStateEvent evt) {
-			refresh();
-		}
-		@Override
-		public void animationFrameChanged(MAnimationStateEvent evt) {
-			repaint();
-		}
+	// :::: MAnimationStateObserver
+	@Override	public void viewStateChanged(MAnimationStateEvent evt) {}
+	@Override
+	public void selectedAnimationChanged(MAnimationStateEvent evt) {
+		refresh();
+	}
+	@Override
+	public void animationFrameChanged(MAnimationStateEvent evt) {
+		repaint();
+	}
 	
 	// :::: Inherited from OmniContainer
 	@Override

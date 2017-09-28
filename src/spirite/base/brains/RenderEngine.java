@@ -18,7 +18,7 @@ import javax.swing.Timer;
 
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.graphics.AbstractNodeRenderer;
+import spirite.base.graphics.HybridNodeRenderer;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLCache;
@@ -125,13 +125,9 @@ public class RenderEngine
 	// ===== Render Attributes
 	public static class TransformedHandle {
 		public int depth;
-		public Composite comp = Composite.SRC_OVER;
 		public float alpha = 1.0f;
 		public MatTrans trans = new MatTrans();
 		public ImageHandle handle;
-		
-		// TODO: Replace some things with this
-		//public RenderProperties properties;
 	}
 	
 	public enum RenderMethod {
@@ -164,7 +160,7 @@ public class RenderEngine
 		GroupNode root = (workspace.isUsingAnimationView()) 
 				? workspace.getAnimationManager().getView().getRoot()
 				: workspace.getRootNode();
-		NodeRenderer renderer = new AbstractNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
+		NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
 		renderer.render(settings, context, trans);
 	}
 	
@@ -616,7 +612,7 @@ public class RenderEngine
 			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			GraphicsContext gc = img.getGraphics();
 			gc.clear();
-			NodeRenderer renderer = new AbstractNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
+			NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
 			renderer.render(settings, gc, null);
 			
 			return img;

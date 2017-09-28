@@ -24,7 +24,12 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
-public class AbstractNodeRenderer extends NodeRenderer{
+/***
+ * 
+ * 
+ * !!! Note: 
+ */
+public class HybridNodeRenderer extends NodeRenderer{
 	
 	private final ImageWorkspace workspace;
 	
@@ -32,7 +37,7 @@ public class AbstractNodeRenderer extends NodeRenderer{
 	private float ratioW;
 	private float ratioH;
 
-	public AbstractNodeRenderer(RenderEngine renderEngine, GroupNode root) {
+	public HybridNodeRenderer(RenderEngine renderEngine, GroupNode root) {
 		renderEngine.super(root);
 		this.workspace = root.getContext();
 	}
@@ -42,7 +47,7 @@ public class AbstractNodeRenderer extends NodeRenderer{
 		try {
 			buildCompositeLayer(workspace);
 			
-			// Step 1: Determine the ammount of data needed
+			// Step 1: Determine the amount of data needed
 			int n = _getNeededImagers( settings);
 			if( n <= 0) return;
 			
@@ -214,14 +219,13 @@ public class AbstractNodeRenderer extends NodeRenderer{
 			gc.renderImage( buffer[n+1], 0, 0, node.getRender());
 		}
 	}
-	
 
 	private class TransformedRenderable extends Drawable {
 		private final TransformedHandle renderable;
 		private final RenderSettings settings;
 		private final RenderProperties properties;
-		//private final LayerNode node;
-		private MatTrans transform;
+		private final MatTrans transform;
+		
 		TransformedRenderable( RenderProperties properties, TransformedHandle renderable, RenderSettings settings, int ox, int oy) {
 			//this.node = node;
 			this.properties = new RenderProperties(properties);

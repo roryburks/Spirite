@@ -1,5 +1,7 @@
 package spirite.base.util;
 
+import java.awt.Color;
+
 /**
  * Created by Guy on 4/29/2017.
  */
@@ -36,5 +38,12 @@ public class Colors {
     }
     public static int toColor(  int r, int g, int b) {
         return (0xFF << 24) | ((r&0xFF) << 16) | ((g&0xFF) << 8) | ((b&0xFF));
+    }
+    
+    public static Color darken( Color color) {
+    	float[] hsv = new float[3];
+    	Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsv);
+    	hsv[2] = Math.max(0, hsv[2]-0.1f);
+    	return new Color(Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]));
     }
 }
