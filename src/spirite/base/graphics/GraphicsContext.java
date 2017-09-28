@@ -96,5 +96,9 @@ public abstract class GraphicsContext {
 	public abstract void dispose();
 
 
+	public abstract void renderImage(RawImage rawImage, int x, int y, RenderProperties render);
+	public abstract void renderHandle( ImageHandle handle, int x, int y, RenderProperties render);
+
+
 
 }

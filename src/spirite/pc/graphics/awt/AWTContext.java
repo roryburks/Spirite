@@ -11,6 +11,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RenderProperties;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
@@ -217,6 +219,26 @@ public class AWTContext extends GraphicsContext{
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
 		g2.fillRect( 0, 0, width, height);
 		g2.setComposite(comp);
+	}
+
+	@Override
+	public void renderImage(RawImage rawImage, int x, int y, RenderProperties render) {
+		float cc = getAlpha();
+		
+		if( render.getAlpha() != 1.0f) 
+			setComposite(Composite.SRC_OVER, render.getAlpha() * cc);
+		drawImage( rawImage, x, y);
+		setComposite( Composite.SRC_OVER, cc);
+	}
+
+	@Override
+	public void renderHandle(ImageHandle handle, int x, int y, RenderProperties render) {
+		float cc = getAlpha();
+		
+		if( render.getAlpha() != 1.0f) 
+			setComposite(Composite.SRC_OVER, render.getAlpha() * cc);
+		drawHandle( handle, x, y);
+		setComposite( Composite.SRC_OVER, cc);
 	}
 	
 }

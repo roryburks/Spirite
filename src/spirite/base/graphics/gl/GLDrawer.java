@@ -30,10 +30,6 @@ public class GLDrawer extends GraphicsDrawer {
 	private GLDrawer() {}
 
 	private final GLStrokeEngine strokeEngine = new GLStrokeEngine();
-	@Override
-	public NodeRenderer createNodeRenderer(GroupNode node, RenderEngine context) {
-		return new GLNodeRenderer( node, context);
-	}
 
 	@Override public StrokeEngine getStrokeEngine() { return strokeEngine; }
 

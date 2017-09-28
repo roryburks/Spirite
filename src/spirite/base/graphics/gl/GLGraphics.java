@@ -5,7 +5,10 @@ import java.awt.geom.Ellipse2D;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RenderProperties;
+import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.*;
@@ -412,6 +415,85 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void dispose() {
 		engine.setTarget(0);		
+	}
+	
+	
+	// ========
+	// ==== Rendering
+	@Override
+	public void renderImage(RawImage rawImage, int x, int y, RenderProperties render) {
+		_renderImage(  new GLParameters.GLImageTexture(rawImage), x, y, render);
+	}
+	@Override
+	public void renderHandle(ImageHandle handle, int x, int y, RenderProperties render) {
+		_renderImage(  handle.accessGL(), x, y, render);
+	}
+	
+	private void _renderImage(GLTexture texture, int x, int y, RenderProperties render) {
+		GLParameters params = new GLParameters( texture.getWidth(), texture.getHeight());
+
+		
+		int method_num = 0;
+		
+		RenderMethod method = render.getMethod();
+		int renderValue = render.getRenderValue();
+//		int stage = workspace.getStageManager().getNodeStage(node);
+//		
+//		if( stage == -1) {
+//			method = node.getRender().getMethod();
+//			renderValue = node.getRender().getRenderValue();
+//		}
+//		else {
+//			method = RenderMethod.COLOR_CHANGE;
+//			switch( stage % 3) {
+//			case 0: renderValue = 0xFF0000;break;
+//			case 1: renderValue = 0x00FF00;break;
+//			case 2: renderValue = 0x0000FF;break;
+////			}
+//		}
+		
+		switch( method) {
+		case COLOR_CHANGE:
+			method_num = 1;
+			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
+			break;
+		case DEFAULT:
+			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
+			break;
+		case LIGHTEN:
+			method_num = 0;
+			params.setBlendModeExt(
+					GLC.GL_ONE, GLC.GL_ONE, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+			break;
+		case SUBTRACT:
+			method_num = 0;
+			params.setBlendModeExt(
+					GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_COLOR, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+			break;
+		case MULTIPLY:
+			method_num = 0;
+			params.setBlendModeExt(GLC.GL_DST_COLOR, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+			break;
+		case SCREEN:
+			// C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
+			method_num = 0;
+			params.setBlendModeExt(GLC.GL_ONE_MINUS_DST_COLOR, GLC.GL_ONE, GLC.GL_FUNC_ADD,
+					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+			break;
+		case OVERLAY:
+			method_num = 3;
+			break;
+		}
+		params.addParam( new GLParameters.GLParam1f("uAlpha", render.getAlpha()));
+		params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
+		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
+		
+		params.texture = texture;
+		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
+				0, 0, params.width, params.height);
 	}
 	
 }

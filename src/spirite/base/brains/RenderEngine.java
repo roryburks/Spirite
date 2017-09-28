@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.graphics.AbstractNodeRenderer;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLCache;
@@ -163,7 +164,7 @@ public class RenderEngine
 		GroupNode root = (workspace.isUsingAnimationView()) 
 				? workspace.getAnimationManager().getView().getRoot()
 				: workspace.getRootNode();
-		NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
+		NodeRenderer renderer = new AbstractNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
 		renderer.render(settings, context, trans);
 	}
 	
@@ -615,7 +616,7 @@ public class RenderEngine
 			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			GraphicsContext gc = img.getGraphics();
 			gc.clear();
-			NodeRenderer renderer = drawer.createNodeRenderer(root, RenderEngine.this);
+			NodeRenderer renderer = new AbstractNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
 			renderer.render(settings, gc, null);
 			
 			return img;

@@ -18,10 +18,6 @@ public class AWTDrawer extends GraphicsDrawer {
 	public static AWTDrawer getInstance() {if( singly == null) singly = new AWTDrawer(); return singly;}
 	private AWTDrawer() {}
 	AWTStrokeEngine strokeEngine = new AWTStrokeEngine();
-	@Override
-	public NodeRenderer createNodeRenderer(GroupNode node, RenderEngine context) {
-		return new AWTNodeRenderer(node, context);
-	}
 
 	@Override
 	public StrokeEngine getStrokeEngine() {

@@ -18,7 +18,6 @@ import spirite.base.pen.StrokeEngine;
  *
  */
 public abstract class GraphicsDrawer {
-	public abstract NodeRenderer createNodeRenderer( GroupNode node, RenderEngine context);
 	public abstract StrokeEngine getStrokeEngine();
 
 	public static interface RenderRoutine {
