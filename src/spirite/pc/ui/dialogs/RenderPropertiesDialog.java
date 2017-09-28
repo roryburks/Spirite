@@ -7,21 +7,30 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.graphics.RenderProperties;
+import spirite.pc.ui.components.RenderOptionsCombo;
 import spirite.pc.ui.components.SliderPanel;
+import spirite.pc.ui.panel_layers.LayersPanel.RenderOptionCellRenderer;
+import spirite.pc.ui.panel_layers.LayersPanel.RenderTuple;
 
 public class RenderPropertiesDialog extends JPanel {
 	private SliderPanel slider;
 	
 	private final RenderProperties properties;
+	private final RenderOptionsCombo renderCombo;
+//
 	
-	public RenderPropertiesDialog(RenderProperties properties) {
+	public RenderPropertiesDialog(RenderProperties properties, MasterControl master) {
 		this.properties = new RenderProperties(properties);
-		
+		renderCombo = new RenderOptionsCombo(master);
+
 		initLayout();
 		initBindings();
 	}
@@ -51,11 +60,14 @@ public class RenderPropertiesDialog extends JPanel {
 		layout.setHorizontalGroup( layout.createSequentialGroup()
 				.addGap(3)
 				.addGroup( layout.createParallelGroup()
-					.addComponent(slider))
+					.addComponent(slider)
+					.addComponent(renderCombo))
 				.addGap(3));
 		layout.setVerticalGroup( layout.createSequentialGroup()
 				.addGap(3)
 				.addComponent(slider, 24, 24, 24)
+				.addGap(3)
+				.addComponent(renderCombo)
 				.addGap( 3, 3, Short.MAX_VALUE));
 		this.setLayout(layout);
 	}
@@ -64,6 +76,8 @@ public class RenderPropertiesDialog extends JPanel {
 	}
 	
 	public RenderProperties getResult() {
+		properties.method = renderCombo.getMethod();
+		properties.renderValue = renderCombo.getRenderValue();
 		return properties;
 	}
 }

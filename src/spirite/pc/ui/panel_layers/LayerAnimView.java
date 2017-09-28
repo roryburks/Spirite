@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -63,8 +64,10 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
 		Rebuild();
-		
+
+		// !!! DEBUG
 		ws.getAnimationManager().getView().addNode(evt.getAnimation());
+		// !!! DEBUG
 //		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
 //		panels.add(newPanel);
 //		tree.AddRoot( tree.new LeafNode(newPanel));
@@ -90,5 +93,18 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		ws = selected;
 		if( ws != null)
 			ws.getAnimationManager().addAnimationStructureObserver(this);
+		
+		// !!! DEBUG
+		for( Animation a : ws.getAnimationManager().getAnimations())
+			ws.getAnimationManager().getView().addNode(a);
+		// !!! DEBUG
+		
+		SwingUtilities.invokeLater( new Runnable() {
+			
+			@Override
+			public void run() {
+				Rebuild();	
+			}
+		});
 	}
 }

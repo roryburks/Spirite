@@ -54,7 +54,7 @@ public class LayersPanel extends OmniComponent {
 	
 	private boolean uilocked = false;
 	
-	private class RenderTuple {
+	public class RenderTuple {
 		final RenderMethod method;
 		int value;
 		RenderTuple( RenderMethod method) {
@@ -137,7 +137,6 @@ public class LayersPanel extends OmniComponent {
 					updateSelMethod();
 					resetRCOptionPanel();
 				}
-				
 			}
 		});
 	}
@@ -260,13 +259,13 @@ public class LayersPanel extends OmniComponent {
 	}
 	
 	/** CellRenderer for the RenderOption Combo Box. */
-	class RenderOptionCellRenderer implements ListCellRenderer<RenderTuple> {
+	public class RenderOptionCellRenderer implements ListCellRenderer<RenderTuple> {
 		private final JPanel panel = new JPanel();
 		private final JLabel lbl = new JLabel();
 		
 		private JPanel ccPanel = new JPanel();
 		
-		RenderOptionCellRenderer() {
+		public RenderOptionCellRenderer() {
 			panel.setLayout(new GridLayout());
 			panel.add(lbl);
 			

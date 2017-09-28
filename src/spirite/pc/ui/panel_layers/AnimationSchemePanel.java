@@ -356,7 +356,7 @@ public class AnimationSchemePanel extends JPanel
 					if( e.getButton() == MouseEvent.BUTTON1)
 						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
 					else if( e.getButton() == MouseEvent.BUTTON3) {
-						RenderPropertiesDialog dialog = new RenderPropertiesDialog(new RenderProperties());
+						RenderPropertiesDialog dialog = new RenderPropertiesDialog(new RenderProperties(), master);
 						JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 						
 						AnimationState as = ws.getAnimationManager().getAnimationState(animation);
