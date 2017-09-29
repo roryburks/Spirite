@@ -2,6 +2,7 @@ package spirite.pc.ui.panel_layers;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -12,6 +13,9 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.GroupTree.AnimationNode;
+import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.pc.ui.generic.BetterTree;
@@ -48,8 +52,23 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	private void Rebuild() {
 		tree.ClearRoots();
 		if( ws != null) {
-			for( Animation anim : ws.getAnimationManager().getAnimations()) {
-				tree.AddRoot( tree.new LeafNode(new AnimationSchemePanel(master, (FixedFrameAnimation)anim)));
+			
+			List<Node> nodes = ws.getAnimationManager().getView().getRoot().getAllNodesST( new NodeValidator() {
+				@Override
+				public boolean isValid(Node node) {
+					return node instanceof AnimationNode;
+				}
+				
+				@Override
+				public boolean checkChildren(Node node) {
+					return true;
+				}
+			});
+			
+			
+			for( Node node : nodes) {
+				AnimationNode anode = ((AnimationNode)node);
+				tree.AddRoot( tree.new LeafNode(new AnimationSchemePanel(master, anode)));
 			}
 		}
 		tree.repaint();

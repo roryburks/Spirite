@@ -30,6 +30,7 @@ import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
+import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -55,17 +56,52 @@ public class AnimationSchemePanel extends JPanel
 	// :::: Control Links
 	private final MasterControl master;
 	private ImageWorkspace ws = null;
-	private FixedFrameAnimation animation;
 	
 	// ::: etc
 	private Component[] titles = null;
 	private boolean expanded = true; // Needs to be set before MainTitleBar is created
 	
+
+	// :::: Constants
+	private final int MAIN_TITLE_BAR_HEIGHT = 24;
+	private final int LAYER_TITLE_BAR_HEIGHT = 16;
+	private final int BOTTOM_BAR_HEIGHT = 16;
+	private final int TL_WIDTH = 16;
+	private final int ROW_HEIGHT = 32;
+
+	private static final Color ARROW_COLOR = Color.RED;
+	private static final Color DRAG_BORDER_COLOR = Color.green;
+	private static final Color TITLE_BG = Color.WHITE;
+	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
+	private final int HOLD_DELAY = 400;
+
+	private final FixedFrameAnimation animation;
+	private final AnimationNode node;
 	
+	
+	public AnimationSchemePanel( MasterControl master, AnimationNode node) {
+		if( node == null)
+			throw new RuntimeException("Null Animation for AnimationSchemePanel");
+		this.node = node;
+		this.master = master;
+		this.animation = (FixedFrameAnimation)node.getAnimation();
+		
+		this.titleBar = new MainTitleBar();
+		BuildFromAnimation();
+		Rebuild();
+		
+		master.addWorkspaceObserver(this);
+		ws = master.getCurrentWorkspace();
+		if( ws != null) {
+			ws.addSelectionObserver(this);
+			ws.getAnimationManager().addAnimationStateObserver(this);
+		}
+	}
+
 	// :::: Components
 	private final JPanel topLeft = new JPanel();
 	private final JPanel bottomRight = new JPanel();
-	private final MainTitleBar titleBar = new MainTitleBar();
+	private final MainTitleBar titleBar;
 	private final JPanel content = new JPanel() {
 		@Override
 		protected void paintComponent(Graphics g) {
@@ -88,8 +124,6 @@ public class AnimationSchemePanel extends JPanel
 				if( (int)Math.floor(as.getMetronom()) == t)
 					c = Colors.darken(c);
 				
-				//c = new Color( (int)(0xFFFFFF*Math.random()));
-				
 				g.setColor(c);
 				g.fillRect( 0, LAYER_TITLE_BAR_HEIGHT + ROW_HEIGHT * (t - animation.getStart()), getWidth(), ROW_HEIGHT);
 			}
@@ -102,39 +136,8 @@ public class AnimationSchemePanel extends JPanel
 				state.Draw(g);
 		}
 	};
-
-	// :::: Constants
-	private final int MAIN_TITLE_BAR_HEIGHT = 24;
-	private final int LAYER_TITLE_BAR_HEIGHT = 16;
-	private final int BOTTOM_BAR_HEIGHT = 16;
-	private final int TL_WIDTH = 16;
-	private final int ROW_HEIGHT = 32;
-
-	private static final Color ARROW_COLOR = Color.RED;
-	private static final Color DRAG_BORDER_COLOR = Color.green;
-	private static final Color TITLE_BG = Color.WHITE;
-	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
-	private final int HOLD_DELAY = 400;
-	
-	
-	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
-		if( fixedFrameAnimation == null)
-			throw new RuntimeException("Null Animation for AnimationSchemePanel");
-		this.master = master;
-		this.animation = fixedFrameAnimation;
-		BuildFromAnimation();
-		Rebuild();
-		
-		master.addWorkspaceObserver(this);
-		ws = master.getCurrentWorkspace();
-		if( ws != null) {
-			ws.addSelectionObserver(this);
-			ws.getAnimationManager().addAnimationStateObserver(this);
-		}
-	}
 	
 	public void Rebuild() {
-
 		GroupLayout primaryLayout = new GroupLayout(this);
 
 		Group hor = primaryLayout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(titleBar);
@@ -150,6 +153,8 @@ public class AnimationSchemePanel extends JPanel
 	}
 	
 	private void BuildFromAnimation() {
+		// Called once at the beginning, would only need to be re-called if animation structure changed
+		//	(but for now the entire tree is rebuilt on animation structure change)
 		int start = animation.getStart();
 		int end = animation.getEnd();
 		
@@ -348,7 +353,9 @@ public class AnimationSchemePanel extends JPanel
 			
 			initLayout();
 			initBindings();
+			
 			btnExpand.setSelected(expanded);
+			btnVisible.setSelected(node.getRender().isVisible());
 		}
 		
 		private void initLayout() {
@@ -375,6 +382,13 @@ public class AnimationSchemePanel extends JPanel
 				@Override public void actionPerformed(ActionEvent e) {
 					expanded = btnExpand.isSelected();
 					Rebuild();
+				}
+			});
+			btnVisible.addActionListener( new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					node.getRender().setVisible(btnVisible.isSelected());
+					repaint();
 				}
 			});
 		}

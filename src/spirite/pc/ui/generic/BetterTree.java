@@ -20,7 +20,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -29,6 +31,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.hybrid.Globals;
 
 public class BetterTree extends JPanel {
@@ -70,6 +74,7 @@ public class BetterTree extends JPanel {
 			
 			horGroup.addComponent(toAdd);
 			vertGroup.addComponent(toAdd);
+			dnd.addDropSource(toAdd);
 		}
 		
 		layout.setHorizontalGroup(horGroup);
@@ -100,6 +105,8 @@ public class BetterTree extends JPanel {
 		RebuildTree();
 	}
 	
+//	public void onAttemptMoveAbove( BTNode nodeToMove, BTNode node)
+	
 	
 	// Properties
 	private int propBranchWidth = 16;
@@ -112,7 +119,9 @@ public class BetterTree extends JPanel {
 		
 		abstract Component BuildContent();
 		abstract List<BTNode> GetLeafs();
+		public Component getTitle() {return title;}
 	}
+	
 	
 	/**
 	 * 
@@ -193,11 +202,10 @@ public class BetterTree extends JPanel {
 	}
 	
 	public class LeafNode extends BTNode {
-		private Component content;
 		private final JPanel rootPanel = new JPanel();
 		
 		public LeafNode( Component content) {
-			this.content = content;
+			this.title = content;
 			
 			GroupLayout layout = new GroupLayout(rootPanel);
 			layout.setHorizontalGroup( layout.createSequentialGroup()
@@ -253,8 +261,11 @@ public class BetterTree extends JPanel {
 		private final DragSource dragSource = DragSource.getDefaultDragSource();
 		
 		BTDnDManager() {
+		}
+		
+		void addDropSource(Component component) {
 			dragSource.createDefaultDragGestureRecognizer(
-					BetterTree.this, DnDConstants.ACTION_COPY_OR_MOVE, this);
+					component, DnDConstants.ACTION_COPY_OR_MOVE, this);
 		}
 		
 		// :::: Inhereted from DropTarget, hears all sources of drags and drops
@@ -287,18 +298,20 @@ public class BetterTree extends JPanel {
 		
 		// :::: DragGestureListener/DragSourceListener for drags originating from the tree
 		@Override public void dragDropEnd(DragSourceDropEvent arg0) {
-			System.out.println("DRAGENTER");}
+			System.out.println("DRAGENTER1");}
 		@Override public void dragEnter(DragSourceDragEvent arg0) {
-			System.out.println("DRAGENTER");}
+			System.out.println("DRAGENTER2");}
 		@Override public void dragExit(DragSourceEvent arg0) {
-			System.out.println("DRAGENTER");}
+			System.out.println("DRAGENTER3");}
 		@Override public void dragOver(DragSourceDragEvent arg0) {
 			System.out.println("DRAGOVER");
 			
 		}
 		@Override public void dropActionChanged(DragSourceDragEvent arg0) {
 			System.out.println("DRAGENTER");}
-		@Override public void dragGestureRecognized(DragGestureEvent arg0) {
-			System.out.println("DRAGENTER");}
+		@Override public void dragGestureRecognized(DragGestureEvent evt) {
+			System.out.println(evt.getComponent());
+			
+		}
 	}
 }
