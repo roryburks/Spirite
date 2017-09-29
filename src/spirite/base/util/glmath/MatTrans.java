@@ -138,4 +138,9 @@ public class MatTrans {
     {
         return m00 * m11 - m01 * m10;
     }
+    
+    @Override
+    public String toString() {
+    	return m00 + "\t" + m01 + "\t" + m02 + "\n" + m10 + "\t" + m11 + "\t" + m12 + "\n1\t0\t1";
+    }
 }

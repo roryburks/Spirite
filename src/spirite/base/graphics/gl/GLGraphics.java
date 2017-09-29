@@ -430,8 +430,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 	
 	private void _renderImage(GLTexture texture, int x, int y, RenderProperties render) {
-		GLParameters params = new GLParameters( texture.getWidth(), texture.getHeight());
-
+		GLParameters intParams = new GLParameters(width, height);
 		
 		int method_num = 0;
 		
@@ -455,45 +454,45 @@ public class GLGraphics extends GraphicsContext{
 		switch( method) {
 		case COLOR_CHANGE:
 			method_num = 1;
-			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
+			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
 			break;
 		case DEFAULT:
-			GLGraphics.setCompositeBlend(params, Composite.SRC_OVER);
+			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
 			break;
 		case LIGHTEN:
 			method_num = 0;
-			params.setBlendModeExt(
+			intParams.setBlendModeExt(
 					GLC.GL_ONE, GLC.GL_ONE, GLC.GL_FUNC_ADD,
 					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case SUBTRACT:
 			method_num = 0;
-			params.setBlendModeExt(
+			intParams.setBlendModeExt(
 					GLC.GL_ZERO, GLC.GL_ONE_MINUS_SRC_COLOR, GLC.GL_FUNC_ADD,
 					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case MULTIPLY:
 			method_num = 0;
-			params.setBlendModeExt(GLC.GL_DST_COLOR, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD,
+			intParams.setBlendModeExt(GLC.GL_DST_COLOR, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD,
 					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case SCREEN:
 			// C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
 			method_num = 0;
-			params.setBlendModeExt(GLC.GL_ONE_MINUS_DST_COLOR, GLC.GL_ONE, GLC.GL_FUNC_ADD,
+			intParams.setBlendModeExt(GLC.GL_ONE_MINUS_DST_COLOR, GLC.GL_ONE, GLC.GL_FUNC_ADD,
 					GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
 			break;
 		case OVERLAY:
 			method_num = 3;
 			break;
 		}
-		params.addParam( new GLParameters.GLParam1f("uAlpha", render.getAlpha()));
-		params.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
-		params.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
+		intParams.addParam( new GLParameters.GLParam1f("uAlpha", render.getAlpha()));
+		intParams.addParam( new GLParameters.GLParam1ui("uValue", renderValue));
+		intParams.addParam( new GLParameters.GLParam1i("uComp", (method_num << 1) ));
 		
-		params.texture = texture;
-		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
-				0, 0, params.width, params.height);
+		intParams.texture = texture;
+		applyPassProgram(ProgramType.PASS_RENDER, intParams, contextTransform,
+				x, y, intParams.texture.getWidth(), intParams.texture.getHeight());
 	}
 	
 }

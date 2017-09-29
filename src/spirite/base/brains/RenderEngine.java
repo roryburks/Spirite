@@ -18,11 +18,11 @@ import javax.swing.Timer;
 
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.graphics.HybridNodeRenderer;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.GraphicsDrawer;
+import spirite.base.graphics.HybridNodeRenderer;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -160,7 +160,7 @@ public class RenderEngine
 		GroupNode root = (workspace.isUsingAnimationView()) 
 				? workspace.getAnimationManager().getView().getRoot()
 				: workspace.getRootNode();
-		NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
+		NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);
 		renderer.render(settings, context, trans);
 	}
 	
@@ -612,7 +612,7 @@ public class RenderEngine
 			RawImage img = HybridHelper.createImage(settings.width, settings.height);
 			GraphicsContext gc = img.getGraphics();
 			gc.clear();
-			NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);//drawer.createNodeRenderer(root, RenderEngine.this);
+			NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);
 			renderer.render(settings, gc, null);
 			
 			return img;

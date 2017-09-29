@@ -248,9 +248,9 @@ public class HybridNodeRenderer extends NodeRenderer{
 				gc.renderImage( compositionImage, 0, 0, properties);
 			}
 			else {
-				gc.setTransform(drawTrans);
 				drawTrans.translate( renderable.handle.getDynamicX(), 
 						renderable.handle.getDynamicY());
+				gc.setTransform(drawTrans);
 				gc.renderHandle(renderable.handle, 0, 0, properties);
 			}
 			
