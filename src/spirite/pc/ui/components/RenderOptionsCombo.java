@@ -18,7 +18,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
-import spirite.pc.ui.panel_layers.LayersPanel.RenderTuple;
 
 
 public class RenderOptionsCombo extends JPanel {

@@ -1,7 +1,6 @@
 package spirite.hybrid;
 
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL2;
@@ -13,8 +12,6 @@ import spirite.base.util.DataCompaction.IntQueue;
 import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.jogl.JOGLCore;
-import sun.awt.image.ByteInterleavedRaster;
 
 public class DirectDrawer {
 	public static void fill( RawImage img, int x, int y, int color) {

@@ -2,10 +2,7 @@ package spirite.pc.graphics.awt;
 
 import java.awt.image.BufferedImage;
 
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.NodeRenderer;
 import spirite.base.graphics.GraphicsDrawer;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.MDebug;

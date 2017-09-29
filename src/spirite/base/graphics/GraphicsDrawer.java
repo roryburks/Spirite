@@ -1,9 +1,6 @@
 package spirite.base.graphics;
 
 
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.NodeRenderer;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 

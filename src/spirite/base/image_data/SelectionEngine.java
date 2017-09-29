@@ -25,7 +25,6 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.graphics.awt.AWTContext;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from

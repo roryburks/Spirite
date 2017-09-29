@@ -11,7 +11,6 @@ import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.GLProfile;
 
 import spirite.base.graphics.gl.wrap.GLCore;
-import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 
 /**
  * GLCore wraps the core initialization and binding of the OpenGL engine.

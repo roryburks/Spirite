@@ -142,7 +142,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 
 		public RenderProperties getSubstateForRelativeTick(int tick) {
 			RenderProperties ss = byTick.get(tick);
-			return (ss == null) ? defaultProperties : ss;
+			return new RenderProperties((ss == null) ? defaultProperties : ss);
 		}
 		public boolean hasSubstateForRelativeTick( int tick) {
 			return byTick.get(tick) != null;
@@ -151,6 +151,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		public void putSubstateForRelativeTick(int tick, RenderProperties properties) {
 			byTick.remove(tick);
 			byTick.put(tick, new RenderProperties(properties, trigger));
+			triggerInnerStateChange(animation);
 		}
 
 		public void resetSubstatesForTicks() {
@@ -172,7 +173,17 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 //			return properties;
 		}
 
-		private final RenderProperties.Trigger trigger=new RenderProperties.Trigger(){@Override public boolean visibilityChanged(boolean newVisible){context.triggerFlash();return true;}@Override public boolean alphaChanged(float newAlpha){context.triggerFlash();return true;}@Override public boolean methodChanged(RenderMethod newMethod,int newValue){context.triggerFlash();return true;}};
+		private final RenderProperties.Trigger trigger=new RenderProperties.Trigger(){
+			@Override public boolean visibilityChanged(boolean newVisible) {
+				triggerInnerStateChange(animation);
+				return true;
+			}@Override public boolean alphaChanged(float newAlpha){
+				triggerInnerStateChange(animation);
+				return true;
+			}@Override public boolean methodChanged(RenderMethod newMethod,int newValue){
+				triggerInnerStateChange(animation);
+				return true;
+		}};
 	}
 
 	// :: Internal Add/Remove
@@ -439,6 +450,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 			else
 				obs.selectedAnimationChanged(evt);
 		}
+		context.triggerFlash();
 	}
 
 	private void triggerFrameChanged() {
@@ -453,6 +465,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 			else
 				obs.animationFrameChanged(evt);
 		}
+		context.triggerFlash();
 	}
 
 	private void triggerInnerStateChange(Animation animation) {
@@ -467,6 +480,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 			else
 				obs.viewStateChanged(evt);
 		}
+		context.triggerFlash();
 	}
 
 	List<WeakReference<MAnimationStateObserver>> animationStateObservers = new ArrayList<>();

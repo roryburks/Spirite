@@ -1,24 +1,12 @@
 package spirite.pc.ui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.graphics.RenderProperties;
 import spirite.pc.ui.components.RenderOptionsCombo;
 import spirite.pc.ui.components.SliderPanel;
-import spirite.pc.ui.panel_layers.LayersPanel.RenderOptionCellRenderer;
-import spirite.pc.ui.panel_layers.LayersPanel.RenderTuple;
 
 public class RenderPropertiesDialog extends JPanel {
 	private SliderPanel slider;
@@ -29,6 +17,7 @@ public class RenderPropertiesDialog extends JPanel {
 	
 	public RenderPropertiesDialog(RenderProperties properties, MasterControl master) {
 		this.properties = new RenderProperties(properties);
+		this.properties.visible = true;
 		renderCombo = new RenderOptionsCombo(master);
 
 		initLayout();

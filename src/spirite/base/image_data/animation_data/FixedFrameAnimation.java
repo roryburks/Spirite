@@ -221,15 +221,12 @@ public class FixedFrameAnimation extends Animation
 		int st = ((int)Math.floor(t) - L/2)%L + startFrame;
 
 		List<List<TransformedHandle>> drawTable = new ArrayList<>();
-		System.out.println("start");
 		for( int i= -(L-1)/2; i< (L)/2; ++i) {
 			List<TransformedHandle> drawList = new ArrayList<>();
 			int met = MUtil.cycle(startFrame, endFrame-1, i + T);
 			
 			if( !state.getSubstateForRelativeTick( i).isVisible())
 				continue;
-			
-			System.out.println(met);
 			
 			// START (mostly) DUPLICATE CODE FROM getDrawList
 			for( AnimationLayer layer : layers) {

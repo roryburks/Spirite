@@ -122,9 +122,6 @@ public class GLEngine  {
 		        gl.glFramebufferTexture2D( GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, 
 		        		GLC.GL_TEXTURE_2D, tex, 0);
 		        
-		        if( !gl.glIsTexture(tex))
-		        	System.out.println("bad:"+tex);
-		        
 		        checkFramebuffer();
 			}
 		}

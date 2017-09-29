@@ -654,14 +654,10 @@ public class MasterControl
     	private ImageWorkspace workspace;
     	RelativeWorkspaceCommandExecuter() {
     		commandMap.put("undo", new Runnable() {@Override public void run() {
-    			System.out.println( "ub:"+ workspace.buildActiveData().handle.deepAccess().getRGB(50, 50));
     			workspace.getUndoEngine().undo();
-    			System.out.println( "ua:"+workspace.buildActiveData().handle.deepAccess().getRGB(50, 50));
     		}});
     		commandMap.put("redo", new Runnable() {@Override public void run() {
-    			System.out.println( "rb:"+workspace.buildActiveData().handle.deepAccess().getRGB(50, 50));
 				workspace.getUndoEngine().redo();
-    			System.out.println( "ra:"+workspace.buildActiveData().handle.deepAccess().getRGB(50, 50));
 			}});
     		commandMap.put("shiftRight", new Runnable() {@Override public void run() {
 				workspace.shiftData(workspace.getSelectedNode(), 1, 0);

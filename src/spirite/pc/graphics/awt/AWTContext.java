@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RenderProperties;
-import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;

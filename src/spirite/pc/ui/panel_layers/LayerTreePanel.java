@@ -23,7 +23,6 @@ import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import javax.print.attribute.standard.JobMessageFromOperator;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JOptionPane;
@@ -71,8 +70,8 @@ import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
 import spirite.pc.ui.Transferables.NodeTransferable;
-import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 
 public class LayerTreePanel extends ContentTree 

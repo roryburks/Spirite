@@ -10,7 +10,6 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;
-import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 
 /**
  * ReferenceManager manages the Reference system.

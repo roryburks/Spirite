@@ -1,7 +1,5 @@
 package sjunit;
 
-import static org.junit.Assert.*;
-
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;

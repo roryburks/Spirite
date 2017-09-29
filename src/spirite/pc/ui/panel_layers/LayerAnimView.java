@@ -2,10 +2,7 @@ package spirite.pc.ui.panel_layers;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -15,10 +12,9 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.pc.ui.generic.BetterTree;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
+import spirite.pc.ui.generic.BetterTree;
 
 public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver {
 	private final MasterControl master;
@@ -54,7 +50,6 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		if( ws != null) {
 			for( Animation anim : ws.getAnimationManager().getAnimations()) {
 				tree.AddRoot( tree.new LeafNode(new AnimationSchemePanel(master, (FixedFrameAnimation)anim)));
-				System.out.println("Anim");
 			}
 		}
 		tree.repaint();

@@ -17,7 +17,6 @@ import spirite.base.brains.CacheManager;
 import spirite.base.brains.CacheManager.CachedImage;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.RenderMethod;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;

@@ -20,9 +20,9 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.graphics.gl.GLParameters;
-import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.pc.jogl.JOGLCore;
 
 public class TestGLDiag extends JDialog  {

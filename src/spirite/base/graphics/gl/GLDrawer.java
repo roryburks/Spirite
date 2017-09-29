@@ -1,15 +1,12 @@
 package spirite.base.graphics.gl;
 
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.NodeRenderer;
-import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.GLParameters.GLParam4f;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;

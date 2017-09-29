@@ -1,28 +1,13 @@
 package sjunit;
 
-import static org.junit.Assert.*;
-
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
-
 import org.junit.Test;
 
-import com.jogamp.opengl.GL2;
-
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.gl.GLCache;
-import spirite.base.graphics.gl.GLEngine;
-import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.jogl.JOGLCore;
-import spirite.pc.jogl.JOGLCore.OnGLLoadObserver;
 
 public class BasicImageTest {
 	final static boolean deep = false;

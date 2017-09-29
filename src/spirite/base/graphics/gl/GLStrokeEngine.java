@@ -11,7 +11,6 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
-import spirite.base.graphics.gl.GLEngine.PreparedPrimitive;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.pen.PenTraits.PenState;

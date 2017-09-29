@@ -3,54 +3,47 @@ package spirite.pc.ui.panel_layers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.RenderProperties;
-import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
-import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.UndoEngine;
+import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.hybrid.Globals;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.util.Colors;
+import spirite.hybrid.Globals;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
-import spirite.pc.ui.generic.SquarePanel;
 
 
 /***
@@ -59,10 +52,17 @@ import spirite.pc.ui.generic.SquarePanel;
 public class AnimationSchemePanel extends JPanel 
 	implements MWorkspaceObserver, MSelectionObserver, MAnimationStateObserver 
 {
+	// :::: Control Links
 	private final MasterControl master;
 	private ImageWorkspace ws = null;
-	
 	private FixedFrameAnimation animation;
+	
+	// ::: etc
+	private Component[] titles = null;
+	private boolean expanded = true; // Needs to be set before MainTitleBar is created
+	
+	
+	// :::: Components
 	private final JPanel topLeft = new JPanel();
 	private final JPanel bottomRight = new JPanel();
 	private final MainTitleBar titleBar = new MainTitleBar();
@@ -103,6 +103,7 @@ public class AnimationSchemePanel extends JPanel
 		}
 	};
 
+	// :::: Constants
 	private final int MAIN_TITLE_BAR_HEIGHT = 24;
 	private final int LAYER_TITLE_BAR_HEIGHT = 16;
 	private final int BOTTOM_BAR_HEIGHT = 16;
@@ -113,8 +114,7 @@ public class AnimationSchemePanel extends JPanel
 	private static final Color DRAG_BORDER_COLOR = Color.green;
 	private static final Color TITLE_BG = Color.WHITE;
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
-	
-	private Component[] titles = null;
+	private final int HOLD_DELAY = 400;
 	
 	
 	public AnimationSchemePanel( MasterControl master, FixedFrameAnimation fixedFrameAnimation) {
@@ -123,6 +123,7 @@ public class AnimationSchemePanel extends JPanel
 		this.master = master;
 		this.animation = fixedFrameAnimation;
 		BuildFromAnimation();
+		Rebuild();
 		
 		master.addWorkspaceObserver(this);
 		ws = master.getCurrentWorkspace();
@@ -133,7 +134,19 @@ public class AnimationSchemePanel extends JPanel
 	}
 	
 	public void Rebuild() {
-		BuildFromAnimation();	
+
+		GroupLayout primaryLayout = new GroupLayout(this);
+
+		Group hor = primaryLayout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(titleBar);
+		Group vert= primaryLayout.createSequentialGroup()
+						.addComponent(titleBar, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT);
+		if( expanded) {
+			hor.addComponent(content);
+			vert.addComponent(content);
+		}
+		primaryLayout.setHorizontalGroup(hor);
+		primaryLayout.setVerticalGroup(vert);
+		this.setLayout(primaryLayout);
 	}
 	
 	private void BuildFromAnimation() {
@@ -144,14 +157,6 @@ public class AnimationSchemePanel extends JPanel
 		
 		titleBar.setTitle(animation.getName());
 		
-		GroupLayout primaryLayout = new GroupLayout(this);
-		primaryLayout.setHorizontalGroup( primaryLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-				.addComponent(titleBar)
-				.addComponent(content));
-		primaryLayout.setVerticalGroup( primaryLayout.createSequentialGroup()
-				.addComponent(titleBar, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT, MAIN_TITLE_BAR_HEIGHT)
-				.addComponent(content));
-		this.setLayout(primaryLayout);
 		
 		List<AnimationLayer> layers = animation.getLayers();
 		
@@ -257,6 +262,19 @@ public class AnimationSchemePanel extends JPanel
 		content.setLayout(layout);
 	}
 	
+	private void initBindings() {
+//		content.addMouseListener( new MouseAdapter() {
+//			@Override
+//			public void mouseClicked(MouseEvent e) {
+//				if( e.getButton() == MouseEvent.BUTTON1) {
+//					int tick = TickAtY( e.getY());
+//					if( tick >= animation.getStart() && tick <= animation.getEnd())
+//						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
+//				}
+//			}
+//		});
+	}
+	
 //	@Override
 //	protected void paintComponent(Graphics g) {
 //		super.paintComponent(g);
@@ -292,8 +310,6 @@ public class AnimationSchemePanel extends JPanel
 			ws.addSelectionObserver(this);
 			ws.getAnimationManager().addAnimationStateObserver(this);
 		}
-		
-		Rebuild();
 	}
 	
 	// :::: SelectionOberver
@@ -305,16 +321,62 @@ public class AnimationSchemePanel extends JPanel
 	private class MainTitleBar extends JPanel {
 		String title;
 		private final JLabel label = new JLabel();
+		private final JToggleButton btnExpand = new JToggleButton();
+		private final JToggleButton btnVisible = new JToggleButton();
 		
 		private MainTitleBar() {
-			//this.setLayout(new GridLayout());
+			btnExpand.setOpaque(false);
+			btnExpand.setBackground(new Color(0,0,0,0));
+			btnExpand.setBorder(null);
+
+			btnVisible.setOpaque(false);
+			btnVisible.setBackground(new Color(0,0,0,0));
+			btnVisible.setBorder(null);
+
+			btnExpand.setIcon(Globals.getIcon("icon.expanded"));
+			btnExpand.setRolloverIcon(Globals.getIcon("icon.expandedHL"));
+			btnExpand.setSelectedIcon(Globals.getIcon("icon.unexpanded"));
+			btnExpand.setRolloverSelectedIcon(Globals.getIcon("icon.unexpandedHL"));
+
+			btnVisible.setIcon(Globals.getIcon("visible_off"));
+			btnVisible.setSelectedIcon(Globals.getIcon("visible_on"));
 			
 			this.setBackground(TITLE_BG );
 			
 			label.setFont( new Font("Tahoma",Font.BOLD, 12));
-
-			this.add(label);
 			label.setText(title);
+			
+			initLayout();
+			initBindings();
+			btnExpand.setSelected(expanded);
+		}
+		
+		private void initLayout() {
+			GroupLayout layout = new GroupLayout(this);
+			
+			layout.setHorizontalGroup( layout.createSequentialGroup()
+					.addGap(2)
+					.addComponent(btnExpand, 12, 12, 12)
+					.addGap(2)
+					.addComponent(btnVisible, 24, 24, 24)
+					.addGap(4)
+					.addComponent(label)
+					.addContainerGap(0, Short.MAX_VALUE));
+			layout.setVerticalGroup( layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+					.addComponent(btnExpand)
+					.addComponent(btnVisible)
+					.addComponent(label));
+			
+			this.setLayout(layout);
+		}
+		
+		private void initBindings() {
+			btnExpand.addActionListener(new ActionListener() {
+				@Override public void actionPerformed(ActionEvent e) {
+					expanded = btnExpand.isSelected();
+					Rebuild();
+				}
+			});
 		}
 		
 		public void setTitle(String title) {
@@ -343,33 +405,96 @@ public class AnimationSchemePanel extends JPanel
 	private class TickPanel extends JPanel {
 		private int tick;
 		private final JLabel label = new JLabel();
+		private final JPanel eyeIcon = new JPanel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				AnimationState as = ws.getAnimationManager().getAnimationState(animation);
+				String icon = as.getSubstateForRelativeTick( as.cannonizeRelTick(tick)).isVisible() ? "icon.rig.visOn" : "icon.rig.visOff";
+				g.drawImage( Globals.getIcon(icon).getImage(), 0, 0, null);
+				super.paintComponent(g);
+			}
+		};
 		
 		private TickPanel( int tick) {
 			this.setOpaque(false);
 			this.tick = tick;
+			
 			label.setText(""+tick);
+			label.setFont( new Font("Tahoma",Font.BOLD, 10));
+			eyeIcon.setOpaque(false);
 			
 			this.setBackground( tickColor);
-			this.addMouseListener( new MouseAdapter() {
-				@Override
-				public void mousePressed(MouseEvent e) {
-					if( e.getButton() == MouseEvent.BUTTON1)
-						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
-					else if( e.getButton() == MouseEvent.BUTTON3) {
-						RenderPropertiesDialog dialog = new RenderPropertiesDialog(new RenderProperties(), master);
-						JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-						
-						AnimationState as = ws.getAnimationManager().getAnimationState(animation);
-						as.putSubstateForRelativeTick( as.cannonizeRelTick(tick), dialog.getResult());
-					}
-				}
-			});
+			this.addMouseListener( adapter);
 			
-			label.setFont( new Font("Tahoma",Font.BOLD, 10));
+			GroupLayout layout = new GroupLayout(this);
+			layout.setHorizontalGroup( layout.createSequentialGroup()
+					.addGap(2)
+					.addGroup( layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+						.addComponent(label)
+						.addComponent(eyeIcon, 12, 12, 12))
+					.addGap(2));
+			layout.setVerticalGroup( layout.createSequentialGroup()
+					.addComponent(label)
+					.addGap(2)
+					.addComponent(eyeIcon, 12, 12, 12));
+			
+			this.setLayout(layout);
 
 			this.add(label);
-			
 		}
+		
+		private boolean rcConsumed;
+		private final MouseAdapter adapter = new MouseAdapter() {
+			Timer timer;
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if( e.getButton() == MouseEvent.BUTTON1)
+					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( e.getButton() == MouseEvent.BUTTON3) {
+					if( timer != null)
+						timer.stop();
+					
+					rcConsumed = false;
+					timer = 
+					(new Timer( HOLD_DELAY, new ActionListener() { @Override public void actionPerformed(ActionEvent e) {
+						if( !rcConsumed) {
+							rcConsumed = true;
+							AnimationState as = ws.getAnimationManager().getAnimationState(animation);
+							int relTick = as.cannonizeRelTick(tick);
+							RenderPropertiesDialog dialog = new RenderPropertiesDialog(as.getSubstateForRelativeTick(relTick), master);
+							JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+							
+							as.putSubstateForRelativeTick( relTick, dialog.getResult());
+							timer = null;
+						}
+					}}));
+					timer.start();
+				}
+			}
+			
+			public void mouseReleased(MouseEvent e) {
+				if( e.getButton() == MouseEvent.BUTTON3 & !rcConsumed) {
+					rcConsumed = true;
+					if( timer != null) {
+						timer.stop();
+						timer= null;
+					}
+					
+					AnimationState as = ws.getAnimationManager().getAnimationState(animation);
+					int relTick = as.cannonizeRelTick(tick);
+					RenderProperties properties = as.getSubstateForRelativeTick(relTick);
+					properties.visible = !properties.visible;
+					as.putSubstateForRelativeTick(relTick, properties);
+					
+					
+				}
+			};
+		};
 	}
 	
 	private class BottomPanel extends JPanel {

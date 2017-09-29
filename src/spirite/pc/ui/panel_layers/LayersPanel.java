@@ -17,9 +17,9 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.ListCellRenderer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.RenderEngine.RenderMethod;
