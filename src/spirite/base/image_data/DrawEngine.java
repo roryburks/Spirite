@@ -377,6 +377,7 @@ public class DrawEngine {
 
 		@Override
 		protected void performImageAction( ) {
+			System.out.println("perform");
 			RawImage img;
 			Vec2i layerSpace;
 			if( mask.selection == null) {

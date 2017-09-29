@@ -267,6 +267,8 @@ public class RenderEngine
 					return thumb.img;
 				
 				RawImage raw = accessThumbnail( node);
+				if( raw == null)
+					return null;
 				thumb.img = HybridUtil.convert(raw,as);
 				thumb.changed = false;
 				

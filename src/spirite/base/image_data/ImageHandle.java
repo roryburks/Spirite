@@ -149,7 +149,7 @@ public class ImageHandle {
 		context.triggerImageRefresh(evt);
 	}
 	
-	void flush() {
-		context.getData(id).cachedImage.flush();
-	}
+//	void flush() {
+//		context.getData(id).cachedImage.flush();
+//	}
 }

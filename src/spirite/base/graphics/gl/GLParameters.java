@@ -155,8 +155,8 @@ public class GLParameters {
 		}
 		@Override
 		public void unload(){
-			if( texture != null)
-				texture.flush();
+			//if( texture != null)
+			//	texture.flush();
 			texture = null;
 		}
 

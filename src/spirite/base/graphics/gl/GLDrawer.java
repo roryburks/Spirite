@@ -58,7 +58,7 @@ public class GLDrawer extends GraphicsDrawer {
     	gc.setComposite( Composite.SRC, 1.0f);
     	gc.drawImage(img, 0, 0);
     	
-    	img.flush();
+    	//img.flush();
 	}
 
 	@Override

@@ -47,6 +47,9 @@ import spirite.hybrid.MDebug.WarningType;
  * -SelectionEngine
  * ~~Penner has access to it for ending the Stroke, should probably fix that.
  * 
+ * TODO: Get rid of Image Actions with non-image components to avoid weird 
+ * needs to call performImageAction
+ * 
  * @author Rory Burks
  *
  */
@@ -258,8 +261,8 @@ public class UndoEngine {
 			if( isPaused)
 				queuedActions.add(action);
 			else {
-			action.performAction();
-			storeAction(action);
+				action.performAction();
+				storeAction(action);
 			}
 		}
 		else
@@ -577,8 +580,7 @@ public class UndoEngine {
 			
 			RawImage img = image.deepAccess().deepCopy();
 			
-			actions.add(new KeyframeAction(
-					cacheManager.cacheImage(img, UndoEngine.this), null));
+			actions.add(new KeyframeAction(img, null));
 			
 			met = 0;
 			pointer = 0;
@@ -590,16 +592,14 @@ public class UndoEngine {
 		 * action that it's "supposed" to be in hiddenAction and performs
 		 * its logical components (if it has any).*/
 		private class KeyframeAction extends ImageAction {
-			CachedImage frameCache;
+			protected CachedImage frameCache;
 			ImageAction hiddenAction;
 			private final int ii_ox, ii_oy;
 			boolean freed = false;
-			KeyframeAction( CachedImage frame, ImageAction action) {
+			KeyframeAction( RawImage raw, ImageAction action) {
 				super(workspace.new BuiltImageData(image));
-				this.frameCache = frame;
+				this.frameCache = cacheManager.cacheImage(raw.deepCopy(), this);
 				this.hiddenAction = action;
-				frameCache.reserve(this);
-				
 
 				InternalImage ii = workspace.getData(image.id);
 				if( ii instanceof DynamicInternalImage) {
@@ -608,7 +608,7 @@ public class UndoEngine {
 				} else {ii_ox=0;ii_oy=0;}
 			}
 			@Override 
-			public void performAction() {
+			public void performNonimageAction() {
 				if( hiddenAction != null)
 					hiddenAction.performAction();
 			}
@@ -629,11 +629,11 @@ public class UndoEngine {
 				if( ii instanceof DynamicInternalImage) {
 					((DynamicInternalImage) ii).ox  = ii_ox;
 					((DynamicInternalImage) ii).oy  = ii_oy;
-					workspace._replaceIamge(image, cacheManager.cacheImage(frameCache.access(), workspace));
+					workspace._replaceIamge(image, frameCache.access().deepCopy());
 				}
 				else {
 					BuiltImageData built = workspace.new BuiltImageData(image);
-					RawImage img = built.checkoutRaw();
+					RawImage img = built.checkoutRaw();	
 					GraphicsContext gc = img.getGraphics();
 					gc.setComposite(Composite.SRC, 1);
 					gc.drawImage(frameCache.access(), 0, 0);
@@ -669,15 +669,12 @@ public class UndoEngine {
 		 */
 		class ReplaceImageAction extends KeyframeAction {
 			private final CachedImage previousCache;
-			private final CachedImage newCache;
 			boolean freed = false;
 			
 			protected ReplaceImageAction(ImageHandle data, CachedImage cached) {
-				super( cacheManager.cacheImage(cached.access().deepCopy(), UndoEngine.this), new NilImageAction(data));
+				super( cached.access(), new NilImageAction(data));
 				
-				newCache = cached;
 				previousCache = workspace._accessCache(data);
-				newCache.reserve(this);
 				previousCache.reserve(this);
 			}
 			@Override
@@ -687,18 +684,17 @@ public class UndoEngine {
 			@Override
 			protected void onDispatch() {
 				previousCache.relinquish(this);
-				newCache.relinquish(this);
 				freed = true;
 				super.onDispatch();
 			}
 			@Override
-			public void performAction() {
-				workspace._replaceIamge(builtImage.handle, newCache);
+			public void performNonimageAction() {
+				workspace._replaceIamge(builtImage.handle, this.frameCache.access().deepCopy());
 			}
 			
 			@Override
 			public void undoAction() {
-				workspace._replaceIamge(builtImage.handle, previousCache);
+				workspace._replaceIamge(builtImage.handle, previousCache.access().deepCopy());
 			}
 			
 			@Override
@@ -708,7 +704,7 @@ public class UndoEngine {
 				//	onAdd as it might already be flushed by then).
 				if( !freed) {
 					previousCache.relinquish(this);
-					newCache.relinquish(this);
+					this.frameCache.relinquish(this);
 				}
 				super.finalize();
 			}
@@ -729,8 +725,7 @@ public class UndoEngine {
 			// Record a keyframe if it's been a while or the action is a "HeavyAction"
 			//	i.e. an action requiring a lot of computation to perform
 			if( met == MAX_TICKS_PER_KEY || iaction.isHeavyAction()) {
-				actions.add(new KeyframeAction(cacheManager.cacheImage(
-						image.deepAccess().deepCopy(),  UndoEngine.this), iaction));
+				actions.add(new KeyframeAction( image.deepAccess(), iaction));
 				met = 0;
 			}
 			else {
@@ -789,7 +784,6 @@ public class UndoEngine {
 			}
 			for( int i = pointer - met; i <= pointer; ++i) {
 				actions.get(i).performAction();
-				actions.get(i).performImageAction();
 			}
 
 			// Construct ImageChangeEvent and send it
@@ -1164,8 +1158,13 @@ public class UndoEngine {
 		protected ImageAction( BuiltImageData data) {
 			this.builtImage = data;
 		}
-		@Override protected void performAction() {}
+		@Override protected final void performAction() 
+		{
+			performNonimageAction();
+			performImageAction();
+		}
 		@Override protected void undoAction() {}
+		protected void performNonimageAction() {}
 		protected abstract void performImageAction( );
 		protected boolean isHeavyAction() {return false;}
 	}
@@ -1262,9 +1261,6 @@ public class UndoEngine {
 			// 
 			for( int i = 0; i<contexts.length; ++i) {
 				actions[i].performAction();
-				if( actions[i] instanceof ImageAction){
-					((ImageAction)actions[i]).performImageAction();
-				}
 			}
 		}
 		@Override		protected void undoAction() {throw new UnsupportedOperationException();}

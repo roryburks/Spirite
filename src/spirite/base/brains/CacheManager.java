@@ -3,10 +3,12 @@ package spirite.base.brains;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import spirite.base.image_data.RawImage;
@@ -60,21 +62,23 @@ public class CacheManager {
 	/**Removes Caches which are empty (have no CacheImages or are the 
 	 * domain of an empty Reference).	 */
 	public void clearUnusedDomains() {
-		// !!!! For domains that get removed through WeakReference erasure,
-		//	it MIGHT be necessary to manually flush and de-link CachedImages
-		//	but that might screw up multi-object CachedImages and GC SHOULD
-		//	take care of them anyway.
-		List<CacheDomain> toRem = new ArrayList<CacheDomain>();
-		for( CacheDomain context : toRem) {
-			if( context.list.isEmpty() ||
-				context.context.get()==null) {
-				toRem.add(context);
+		Iterator<Entry<Object, CacheDomain>> itOut = cache.entrySet().iterator();
+		while(itOut.hasNext()) {
+			CacheDomain domain = itOut.next().getValue();
+			
+			Iterator<CachedImage> itIn = domain.list.iterator();
+			while( itIn.hasNext()) {
+				CachedImage image = itIn.next();
+				image._checkForCull();
+				if( image.isNull())
+					itIn.remove();
 			}
-		}
-		for( CacheDomain rem : toRem) {
-			cacheSize -= rem.getSize();
-			rem.flush();
-			cache.remove(rem.context);
+			
+			if( domain.list.isEmpty() || domain.context.get() == null) {
+				//cacheSize -= domain.getSize();
+				domain.flush();
+				itOut.remove();
+			}
 		}
 	}
 	
@@ -111,6 +115,7 @@ public class CacheManager {
 		
 		CachedImage(Object domain) {
 			last_used = System.currentTimeMillis();
+			this.domain = domain;
 			
 			CacheDomain context = cache.get(domain);
 			
@@ -119,6 +124,7 @@ public class CacheManager {
 				cache.put(domain, context);
 			}
 			context.list.add(this);
+			reserve(domain);
 		}
 		
 		public RawImage access() {
@@ -127,8 +133,8 @@ public class CacheManager {
 		}
 		
 		public void replace( RawImage bi) {
-			if( data != null)
-				data.flush();
+			//if( data != null)
+			//	data.flush();
 			cacheSize -= data.getByteSize();
 			data = bi;
 			cacheSize += data.getByteSize();
@@ -156,24 +162,45 @@ public class CacheManager {
 			cacheSize += data.getByteSize();
 		}
 		
+		public boolean isNull() {
+			return data == null;
+		}
+		
 		public void reserve( Object obj) {
+			for( WeakReference<Object> user : users) {
+				if( user.get() == obj)
+					return;
+			}
 			users.add(new WeakReference<>(obj));
 		}
 		public void relinquish( Object obj) {
-			
-			WeakReference<Object> toRem = null;
-			
-			for( WeakReference<Object> wr : users) {
-				if( wr.get() == obj) {
-					toRem = wr;
-					break;
+			boolean removed = false;
+
+			Iterator<WeakReference<Object>> it = users.iterator();
+			while( it.hasNext()) {
+				Object user = it.next().get();
+				if( user == null || user == obj) {
+					it.remove();
+					removed = true;
 				}
 			}
-			if( toRem == null) {
+			if( !removed) {
 				MDebug.handleError( ErrorType.STRUCTURAL, "Tried to relinquish from a non-reserved object (this probably means the intended relinquish will never happen).");
 			}
 			
-			users.remove(toRem);
+			if( users.isEmpty()) {
+				flush();
+			}
+		}
+		
+		private void _checkForCull() {
+			Iterator<WeakReference<Object>> it = users.iterator();
+			while( it.hasNext()) {
+				Object user = it.next().get();
+				if( user == null )
+					it.remove();
+			}
+			
 			if( users.isEmpty()) {
 				flush();
 			}
@@ -186,7 +213,12 @@ public class CacheManager {
 			
 			// Note: Assumes that if one WeakReference of a certain Object has been
 			//	cleared by GC then all others will as well.
-			users.remove(obj);
+			Iterator<WeakReference<Object>> it = users.iterator();
+			while( it.hasNext()) {
+				Object user = it.next().get();
+				if( user == null || user == obj)
+					it.remove();
+			}
 			if( users.isEmpty()) {
 				flush();
 			}

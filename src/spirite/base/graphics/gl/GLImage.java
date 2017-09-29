@@ -13,6 +13,8 @@ public class GLImage extends RawImage {
 	int tex;
 	
 	public GLImage( int width, int height) {
+		if( width == 0 || height == 0)
+			System.out.println("ZERO");
 		engine.c_img.add(this);
 		GL2 gl = engine.getGL2();
 		
@@ -73,7 +75,14 @@ public class GLImage extends RawImage {
 			if( engine.getTarget() == tex)
 				engine.setTarget(0);
 			gl.glDeleteTextures(1, new int[]{tex}, 0);
+			tex = 0;
 		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		flush();
+		super.finalize();
 	}
 
 	@Override

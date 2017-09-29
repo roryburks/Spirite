@@ -513,15 +513,16 @@ public class ImageWorkspace {
 			}
 			gc = nri.getGraphics();
 			gc.drawImage( img, -cropped.x, -cropped.y);
-//			gc.dispose();
 			
 			dii.ox += cropped.x;
 			dii.oy += cropped.y;
 			
-			imageData.get(handle.id).cachedImage.replace(nri);
+			imageData.get(handle.id).cachedImage.relinquish(ImageWorkspace.this);
+			imageData.get(handle.id).cachedImage = cacheManager.cacheImage(nri, ImageWorkspace.this);
 			
+			buffer.flush();
+			img.flush();
 			buffer = null;
-//			if( gc != null)gc.dispose();
 			gc = null;
 
 			// Construct ImageChangeEvent and send it
@@ -646,18 +647,18 @@ public class ImageWorkspace {
 	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 * and 
 	 */
-	void _replaceIamge( ImageHandle old, CachedImage newImg) {
+	void _replaceIamge( ImageHandle old, RawImage img) {
 		InternalImage internal = imageData.get(old.id);
 		
-		internal.cachedImage.relinquish(this);
-		internal.cachedImage = newImg;
-		newImg.reserve(this);
+		CachedImage cached = internal.cachedImage;
+		cached.relinquish(this);
+		internal.cachedImage = cacheManager.cacheImage(img, this);
 		
 		
 		
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.dataChanged = new  ArrayList<ImageHandle>(1);
-		evt.dataChanged.add(old);		
+		evt.dataChanged.add(old);
 		triggerImageRefresh(evt);
 	}
 	
@@ -921,7 +922,6 @@ public class ImageWorkspace {
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
 			CachedImage ci = cacheManager.cacheImage(entry.getValue().image, this);
-			ci.reserve(this);
 			
 			if( entry.getValue() instanceof DynamicImportImage) {
 				DynamicImportImage dimpi = (DynamicImportImage)entry.getValue();
@@ -952,7 +952,6 @@ public class ImageWorkspace {
 	public ImageHandle importData( RawImage newImage) {
 		CachedImage ci = cacheManager.cacheImage(newImage, this);
 		imageData.put( workingID, new InternalImage(ci));
-		ci.reserve(this);
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
@@ -965,7 +964,6 @@ public class ImageWorkspace {
 	public ImageHandle importDynamicData(RawImage newImage) {
 		CachedImage ci = cacheManager.cacheImage(newImage, this);
 		imageData.put( workingID, new DynamicInternalImage(ci, 0, 0));
-		ci.reserve(this);
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
@@ -973,7 +971,6 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
 		CachedImage ci = cacheManager.cacheImage(img, this);
-		ci.reserve(this);
 		imageData.put( workingID, new InternalImage(ci));
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
@@ -1008,7 +1005,6 @@ public class ImageWorkspace {
         
         InternalImage internal = new DynamicInternalImage(ci, 0, 0);
         imageData.put(workingID, internal);
-        ci.reserve(this);
         ImageHandle handle= new ImageHandle(this, workingID++);
         
 		LayerNode node = groupTree.new LayerNode( new SpriteLayer(handle), name);
