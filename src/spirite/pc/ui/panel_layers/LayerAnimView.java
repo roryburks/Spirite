@@ -5,6 +5,9 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.nio.file.NotDirectoryException;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -16,7 +19,10 @@ import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.AnimationView;
+import spirite.base.image_data.AnimationView.MAnimationViewObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
+import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
@@ -27,7 +33,7 @@ import spirite.pc.ui.generic.BetterTree.BTNode;
 import spirite.pc.ui.generic.BetterTree.DnDBinding;
 import spirite.pc.ui.generic.BetterTree.DropDirection;
 
-public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver {
+public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
 	private final MasterControl master;
 	private final BetterTree tree = new BetterTree();
 	private ImageWorkspace ws;
@@ -43,35 +49,63 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		master.addWorkspaceObserver(this);
 		
 		ws = master.getCurrentWorkspace();
-		if( ws != null)
+		if( ws != null) {
 			ws.getAnimationManager().addAnimationStructureObserver(this);;
+			ws.getAnimationManager().getView().addAnimationViewObserver(this);
+			tree.setRootBinding( new NodeBinding(ws.getAnimationManager().getView().getRoot()));
+		}
 		
 		scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
 		scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
 		//scroll.getVerticalScrollBar().getUI().s
 		
-		tree.setRootBinding( new DnDBinding() {
-			@Override
-			public void interpretDrop(Transferable trans, DropDirection direction) {
-				
-			}
-			
-			@Override
-			public DataFlavor[] getAcceptedDataFlavors() {
-				return flavors;
-			}
-			
-			@Override
-			public Image drawCursor() {
-				return null;
-			}
-			
-			@Override
-			public Transferable buildTransferable() {
-				return null;
-			}
-		});
 	}
+	
+	private class NodeBinding implements DnDBinding {
+		final Node node;
+		
+		NodeBinding( Node node) {
+			this.node = node;
+		}
+
+		@Override
+		public Transferable buildTransferable() {
+			return new Transferables.NodeTransferable(node);
+		}
+
+		@Override
+		public Image drawCursor() {
+			return null;
+		}
+
+		@Override
+		public DataFlavor[] getAcceptedDataFlavors() {
+			return flavors;
+		}
+
+		@Override
+		public void interpretDrop(Transferable trans, DropDirection direction) {
+			AnimationView av = ws.getAnimationManager().getView();
+			Node nodeToMove = null;
+			try {
+				nodeToMove = ((Transferables.NodeTransferable)trans.getTransferData(flavors[0])).node;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			switch( direction) {
+			case ABOVE:
+				av.moveAbove(nodeToMove, node);
+				break;
+			case BELOW:
+				av.moveBelow(nodeToMove, node);
+				break;
+			case INTO:
+				av.moveInto(nodeToMove, (GroupNode)node, false);
+			}
+			
+		}
+	}
+	private final DataFlavor[] flavors = new DataFlavor[] {Transferables.NodeTransferable.FLAVOR};
 	
 	private void InitComponents() {
     	this.setLayout(new GridLayout());
@@ -99,34 +133,13 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 				AnimationNode anode = ((AnimationNode)node);
 				
 				BTNode btnode = tree.new LeafNode( new AnimationSchemePanel(master, anode));
-				btnode.setDnDBindings( new DnDBinding() {
-					@Override
-					public Image drawCursor() {
-						return null;
-					}
-					
-					@Override
-					public Transferable buildTransferable() {
-						return new Transferables.NodeTransferable(anode);
-					}
-
-					@Override
-					public DataFlavor[] getAcceptedDataFlavors() {
-						return flavors;
-					}
-
-					@Override
-					public void interpretDrop(Transferable trans, DropDirection direction) {
-						System.out.println("DROPPED");
-					}
-				});
+				btnode.setDnDBindings( new NodeBinding(node));
 				
 				tree.AddRoot( btnode);
 			}
 		}
 		tree.repaint();
 	}
-	private final DataFlavor[] flavors = new DataFlavor[] {Transferables.NodeTransferable.FLAVOR};
 	
 	// AnimationStructureObserver
 	@Override
@@ -156,11 +169,17 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		if( ws != null)
+		if( ws != null) {
+			tree.setRootBinding( null);
 			ws.getAnimationManager().removeAnimationStructureObserver(this);
+			ws.getAnimationManager().getView().removeAnimationViewObserver(this);
+		}
 		ws = selected;
-		if( ws != null)
+		if( ws != null) {
+			tree.setRootBinding( new NodeBinding(ws.getAnimationManager().getView().getRoot()));
 			ws.getAnimationManager().addAnimationStructureObserver(this);
+			ws.getAnimationManager().getView().addAnimationViewObserver(this);
+		}
 		
 		// !!! DEBUG
 		for( Animation a : ws.getAnimationManager().getAnimations())
@@ -174,5 +193,11 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 				Rebuild();	
 			}
 		});
+	}
+
+	// :::: MAnimationViewObserver
+	@Override
+	public void viewChanged() {
+		Rebuild();
 	}
 }

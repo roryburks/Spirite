@@ -419,13 +419,12 @@ public class BetterTree extends JPanel {
 			else
 				evt.rejectDrag();
 			
-			if( oldDir != draggingDirection && oldNode != draggingRelativeTo)
+			if( oldDir != draggingDirection || oldNode != draggingRelativeTo)
 				BetterTree.this.repaint();
 		}
 		
 		@Override
 		public synchronized void drop(DropTargetDropEvent evt) {
-			System.out.println("DDD");
 			DnDBinding binding = (draggingRelativeTo == null) ? rootBinding : draggingRelativeTo.binding;
 			
 			if( binding != null) {
