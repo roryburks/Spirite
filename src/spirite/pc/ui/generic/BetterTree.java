@@ -1,7 +1,14 @@
 package spirite.pc.ui.generic;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -17,12 +24,14 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -30,13 +39,20 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
+
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
+import spirite.pc.ui.Transferables.NodeTransferable;;
 
 public class BetterTree extends JPanel {
 	private final List<BTNode> roots = new ArrayList<>();
+	private final BidiMap<Component,BTNode> nodeLink = new DualHashBidiMap<>();
 	
 	private final BTDnDManager dnd = new BTDnDManager();
 	
@@ -63,6 +79,7 @@ public class BetterTree extends JPanel {
 	
 	private void RebuildTree() {
 		this.removeAll();
+		nodeLink.clear();
 		
 		GroupLayout layout = new GroupLayout(this);
 		
@@ -75,6 +92,7 @@ public class BetterTree extends JPanel {
 			horGroup.addComponent(toAdd);
 			vertGroup.addComponent(toAdd);
 			dnd.addDropSource(toAdd);
+			nodeLink.put( toAdd, node);
 		}
 		
 		layout.setHorizontalGroup(horGroup);
@@ -84,6 +102,51 @@ public class BetterTree extends JPanel {
 		this.repaint();
 		this.revalidate();
 		this.doLayout();
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setStroke( new BasicStroke(2));
+		g2.setColor(Color.BLACK);
+		
+		if( dragging != null) {
+			if( draggingRelativeTo == null) {
+				if( draggingDirection == DropDirection.ABOVE) {
+					int dy = (roots.isEmpty()) ? 0 : nodeLink.getKey(roots.get(0)).getY();
+					g2.drawLine(0, dy, this.getWidth(), dy);
+				}
+				else if( draggingDirection == DropDirection.BELOW) {
+					BTNode lowest = GetLowestChild();
+					if( lowest == null)
+						g2.drawLine(0, 0, this.getWidth(), 0);
+					else {
+						Component linked = nodeLink.getKey(lowest);
+						int dy = linked.getY() + linked.getHeight();
+						g2.drawLine(0, dy, this.getWidth(), dy);
+					}
+				}
+			}
+			else if( draggingRelativeTo == dragging) {
+				// Self-drag
+			}
+			else {
+				Component linked = nodeLink.getKey(draggingRelativeTo);
+				if( draggingDirection == DropDirection.ABOVE) {
+					int dy = linked.getY();
+					g2.drawLine(0, dy, this.getWidth(), dy);
+				}
+				else if( draggingDirection == DropDirection.INTO) {
+					g2.drawRect(0, linked.getY(), this.getWidth(), linked.getHeight());
+				}
+				else if( draggingDirection == DropDirection.BELOW) {
+					int dy = linked.getY() + linked.getHeight();
+					g2.drawLine(0, dy, this.getWidth(), dy);
+				}
+			}
+		}
 	}
 	
 	public List<BTNode> GetRoots() {
@@ -105,6 +168,22 @@ public class BetterTree extends JPanel {
 		RebuildTree();
 	}
 	
+	BTNode GetLowestChild() {
+		if( roots.isEmpty())
+			return null;
+		
+		BTNode node = roots.get(roots.size()-1);
+		
+		while( node instanceof BranchingNode) {
+			List<BTNode> branches = node.GetLeafs();
+			if( branches.isEmpty())
+				return node;
+			node = branches.get(branches.size()-1);
+		}
+		
+		return node;
+	}
+	
 //	public void onAttemptMoveAbove( BTNode nodeToMove, BTNode node)
 	
 	
@@ -112,14 +191,27 @@ public class BetterTree extends JPanel {
 	private int propBranchWidth = 16;
 	private int propExpandButtonHeight = 16;
 	
-	abstract class BTNode {
+	public abstract class BTNode {
 		protected Component title;
+		private DnDBinding binding = null;
 		
 		protected final JPanel rootPanel = new JPanel();
 		
-		abstract Component BuildContent();
+		protected abstract Component BuildContent();
 		abstract List<BTNode> GetLeafs();
 		public Component getTitle() {return title;}
+		
+		public void setDnDBindings(DnDBinding binding) { this.binding = binding;}
+		public DnDBinding getBinding() {return binding;}
+	}
+	
+	
+	public BTNode getNodeAtPoint( Point p) {
+		for( Entry<Component,BTNode> entry : nodeLink.entrySet()){
+			if( entry.getKey().getY() <= p.y && entry.getKey().getY() + entry.getKey().getHeight() > p.y)
+				return entry.getValue();
+		}
+		return null;
 	}
 	
 	
@@ -151,7 +243,7 @@ public class BetterTree extends JPanel {
 			return subNodes;
 		}
 		@Override
-		Component BuildContent() {
+		protected Component BuildContent() {
 			rootPanel.removeAll();
 			GroupLayout layout = new GroupLayout( rootPanel);
 			
@@ -216,7 +308,7 @@ public class BetterTree extends JPanel {
 		}
 
 		@Override
-		Component BuildContent() {
+		protected Component BuildContent() {
 			return rootPanel;
 		}
 		
@@ -249,11 +341,24 @@ public class BetterTree extends JPanel {
 	}
 	
 	// :::: Drag and Drop Management
-	public interface BTDnDModule {
+	public interface DnDBinding {
+		public Transferable buildTransferable();
+		public Image drawCursor();
+
 		public DataFlavor[] getAcceptedDataFlavors();
-		public void interpetDrop(Transferable trans);
+		public void interpretDrop( Transferable trans, DropDirection direction);
 	}
-	private final List<BTDnDModule> dndModules = new ArrayList<>();
+	public enum DropDirection {
+		ABOVE, BELOW, INTO
+	}
+
+	private BTNode dragging = null;
+	private BTNode draggingRelativeTo = null;
+	private DropDirection draggingDirection = DropDirection.ABOVE; 	// 0: into, 1: Above, -1: Bellow
+	private DnDBinding rootBinding = null;
+	
+	public void setRootBinding( DnDBinding binding) { this.rootBinding = binding;}
+	
 	
 	private class BTDnDManager extends DropTarget 
 		implements DragGestureListener, DragSourceListener 
@@ -271,26 +376,62 @@ public class BetterTree extends JPanel {
 		// :::: Inhereted from DropTarget, hears all sources of drags and drops
 		@Override
 		public synchronized void dragOver(DropTargetDragEvent evt) {
-			boolean accepted = false;
+			BTNode oldNode = draggingRelativeTo;
+			DropDirection oldDir = draggingDirection;
 			
-			for( BTDnDModule module : dndModules) {
-				for( DataFlavor df : module.getAcceptedDataFlavors()) {
+			draggingRelativeTo = getNodeAtPoint(evt.getLocation());
+			int my = evt.getLocation().y;
+			if( draggingRelativeTo == null) {
+				BTNode lowest = GetLowestChild();
+				draggingDirection = DropDirection.ABOVE;
+				
+				if( lowest != null) {
+					Rectangle bounds = nodeLink.getKey(lowest).getBounds();
+					if( my > bounds.y + bounds.height)
+						draggingDirection = DropDirection.BELOW;
+				}
+			}
+			else {
+				Rectangle bounds = nodeLink.getKey(draggingRelativeTo).getBounds();
+				if( draggingRelativeTo instanceof BranchingNode && 
+					my > bounds.y + bounds.height/4 &&
+					my < bounds.y + (bounds.height*3)/4) 
+				{
+					draggingDirection = DropDirection.INTO;
+				}
+				else if( my < bounds.y + bounds.height/2)
+					draggingDirection = DropDirection.ABOVE;
+				else
+					draggingDirection = DropDirection.BELOW;
+			}
+			
+			DnDBinding binding = (draggingRelativeTo == null) ? rootBinding : draggingRelativeTo.binding;
+
+			boolean accepted = false;
+			if( binding != null) {
+				for( DataFlavor df : binding.getAcceptedDataFlavors()) {
 					if( evt.isDataFlavorSupported(df)) 
 						accepted = true;
 				}
 			}
 			if( accepted)
-				evt.acceptDrag( DnDConstants.ACTION_REFERENCE);
+				evt.acceptDrag( DnDConstants.ACTION_COPY);
 			else
 				evt.rejectDrag();
+			
+			if( oldDir != draggingDirection && oldNode != draggingRelativeTo)
+				BetterTree.this.repaint();
 		}
 		
 		@Override
 		public synchronized void drop(DropTargetDropEvent evt) {
-			for( BTDnDModule module : dndModules) {
-				for( DataFlavor df : module.getAcceptedDataFlavors()) {
+			System.out.println("DDD");
+			DnDBinding binding = (draggingRelativeTo == null) ? rootBinding : draggingRelativeTo.binding;
+			
+			if( binding != null) {
+				for( DataFlavor df : binding.getAcceptedDataFlavors()) {
 					if( evt.isDataFlavorSupported(df)) {
-						module.interpetDrop(evt.getTransferable());
+						binding.interpretDrop(evt.getTransferable(), draggingDirection);
 					}
 				}
 			}
@@ -298,20 +439,36 @@ public class BetterTree extends JPanel {
 		
 		// :::: DragGestureListener/DragSourceListener for drags originating from the tree
 		@Override public void dragDropEnd(DragSourceDropEvent arg0) {
-			System.out.println("DRAGENTER1");}
-		@Override public void dragEnter(DragSourceDragEvent arg0) {
-			System.out.println("DRAGENTER2");}
-		@Override public void dragExit(DragSourceEvent arg0) {
-			System.out.println("DRAGENTER3");}
-		@Override public void dragOver(DragSourceDragEvent arg0) {
-			System.out.println("DRAGOVER");
-			
+			dragging = null;
+			BetterTree.this.repaint();
 		}
+		@Override public void dragEnter(DragSourceDragEvent arg0) {}
+		@Override public void dragExit(DragSourceEvent arg0) {}
+		@Override public void dragOver(DragSourceDragEvent arg0) {}
 		@Override public void dropActionChanged(DragSourceDragEvent arg0) {
 			System.out.println("DRAGENTER");}
 		@Override public void dragGestureRecognized(DragGestureEvent evt) {
-			System.out.println(evt.getComponent());
+			if( dragging != null)
+				return;
 			
+			BTNode node = nodeLink.get( evt.getComponent());
+			
+			if( node != null) {
+				DnDBinding binding = node.getBinding();
+				if( binding != null) {
+					dragging = node;
+
+					Cursor cursor = DragSource.DefaultMoveDrop;
+					dragSource.startDrag( 
+							evt, 
+							cursor, 
+							binding.drawCursor(),
+							new Point(10,10),
+							binding.buildTransferable(), 
+							this);
+				}
+			}
 		}
+		
 	}
 }
