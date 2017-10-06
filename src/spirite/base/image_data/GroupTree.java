@@ -341,6 +341,12 @@ public class GroupTree {
 			if( parent == null) return;
 			parent.children.remove(this);
 		}
+		public Node getRoot() {
+			Node node = this;
+			while(node.parent != null)
+				node = node.parent;
+			return node;
+		}
 	}
 	
 	/** A GroupNode is a container node which accepts sub-children. */

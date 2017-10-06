@@ -99,7 +99,9 @@ public class AnimationView {
 			Node newParent,
 			Node newNext) 
 	{
-		moveNode._del();
+		if( moveNode.getRoot() == getRoot()) {
+			moveNode._del();	
+		}
 		newParent._add(moveNode, newNext);
 		_triggerViewChange();
 	}

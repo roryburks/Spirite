@@ -425,8 +425,12 @@ public class BetterTree extends JPanel {
 		
 		@Override
 		public synchronized void drop(DropTargetDropEvent evt) {
-			DnDBinding binding = (draggingRelativeTo == null) ? rootBinding : draggingRelativeTo.binding;
 			
+			if( draggingRelativeTo == dragging && dragging != null)
+				return;
+			
+			DnDBinding binding = (draggingRelativeTo == null) ? rootBinding : draggingRelativeTo.binding;
+
 			if( binding != null) {
 				for( DataFlavor df : binding.getAcceptedDataFlavors()) {
 					if( evt.isDataFlavorSupported(df)) {
