@@ -331,6 +331,8 @@ public class RenderEngine
 					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
 			RenderSource rs = getNodeRenderTarget(node);
+			if( rs == null)
+				return null;
 			RenderSettings settings = new RenderSettings(rs);
 			settings.height = thumbHeight;
 			settings.width = thumbWidth;
@@ -469,8 +471,10 @@ public class RenderEngine
 		if( node instanceof LayerNode) {
 			return new LayerRenderSource(node.getContext(),((LayerNode) node).getLayer());
 		}
-		else
+		else if( node instanceof GroupNode)
 			return new NodeRenderSource((GroupNode) node);
+		
+		return null;
 	}
 	
 	

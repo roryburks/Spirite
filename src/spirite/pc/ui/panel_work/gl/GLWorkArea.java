@@ -149,7 +149,7 @@ public class GLWorkArea
                 glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
                 
                 Rect r = active.getBounds();
-                glgc.drawRect( r.x, r.y, r.width, r.height);
+                glgc.drawRect( r.x-1, r.y-1, r.width+2, r.height+2);
             }
             
         	// :::: Draw Selection Bounds

@@ -8,16 +8,11 @@ import java.awt.datatransfer.Transferable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.sun.glass.events.DndEvent;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
-import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
-import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
-import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
@@ -25,7 +20,6 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.pc.ui.Transferables;
-import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.generic.BetterTree;
 import spirite.pc.ui.generic.BetterTree.BTNode;
 import spirite.pc.ui.generic.BetterTree.BranchingNode;

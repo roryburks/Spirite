@@ -1,16 +1,10 @@
 package spirite.pc.ui.panel_layers;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.nio.file.NotDirectoryException;
-import java.util.List;
-import java.util.Stack;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,9 +22,7 @@ import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;

@@ -24,13 +24,10 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.GroupLayout;
@@ -44,11 +41,7 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.base.image_data.GroupTree.Node;
-import spirite.base.util.MUtil;
-import spirite.hybrid.Globals;
-import spirite.pc.ui.Transferables.NodeTransferable;;
+import spirite.hybrid.Globals;;
 
 public class BetterTree extends JPanel {
 	private final List<BTNode> roots = new ArrayList<>();
@@ -57,20 +50,6 @@ public class BetterTree extends JPanel {
 	private final BTDnDManager dnd = new BTDnDManager();
 	
 	public BetterTree() {
-		BTNode nodeInner =  new BranchingNode(new JButton("Test"),
-				Arrays.asList( new BTNode[] {
-						new LeafNode( new JButton("Test2")),
-						new LeafNode( new JButton("Test3"))
-				}));
-		
-
-		roots.add( new BranchingNode(new JButton("Test3"),
-				Arrays.asList( new BTNode[] {
-						new LeafNode( new JButton("Test4")),
-						nodeInner
-				})));
-		roots.add( new BranchingNode(new JButton("Test5")));
-		
 		this.setDropTarget(dnd);
 		
 		RebuildTree();
@@ -207,9 +186,47 @@ public class BetterTree extends JPanel {
 	
 	
 	public BTNode getNodeAtPoint( Point p) {
+		for( BTNode node : roots) {
+			Component comp = nodeLink.getKey(node);
+			
+			if( comp == null)
+				continue;
+			if( comp.getY() <= p.y && comp.getY() + comp.getHeight() > p.y ) {
+				if( node instanceof BranchingNode) {
+					Point p2 = new Point(p);
+					p2 = SwingUtilities.convertPoint(this, p, comp);
+					BTNode ret = _getNodeAtPointSub(p2, (BranchingNode)node);
+					if( ret != null)
+						return ret;
+				}
+				return node;
+			}
+		}
+		
 		for( Entry<Component,BTNode> entry : nodeLink.entrySet()){
-			if( entry.getKey().getY() <= p.y && entry.getKey().getY() + entry.getKey().getHeight() > p.y)
-				return entry.getValue();
+			if( entry.getKey().getY() <= p.y && entry.getKey().getY() + entry.getKey().getHeight() > p.y) {
+
+				return entry.getValue();	
+			}
+		}
+		return null;
+	}
+	public BTNode _getNodeAtPointSub( Point p, BranchingNode branch) {
+		for( BTNode node : branch.subNodes) {
+			Component comp = nodeLink.getKey(node);
+			
+			if( comp == null)
+				continue;
+			if( comp.getY() <= p.y && comp.getY() + comp.getHeight() > p.y ) {
+				if( node instanceof BranchingNode) {
+					Point p2 = new Point(p);
+					p2 = SwingUtilities.convertPoint( nodeLink.getKey(branch), p, comp);
+					BTNode ret = _getNodeAtPointSub(p2, (BranchingNode)node);
+					if( ret != null)
+						return ret;
+				}
+				return node;
+			}
 		}
 		return null;
 	}

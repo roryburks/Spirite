@@ -5,14 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import spirite.base.image_data.AnimationManager.AnimationState;
-import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
-import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageWorkspace.MoveChange;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
 
 public class AnimationView {
 	private final ImageWorkspace workspace;
@@ -59,8 +53,6 @@ public class AnimationView {
 				|| nodeToMove.getParent() == null || tree._isChild( nodeToMove, nodeAbove.getParent()))
 			return;
 		move(nodeToMove,
-			nodeToMove.getParent(),
-			nodeToMove.getNextNode(),
 			nodeAbove.getParent(),
 			nodeAbove);
 	}
@@ -79,8 +71,6 @@ public class AnimationView {
 			nodeBefore = children.get(i+1);
 		
 		move(nodeToMove,
-			nodeToMove.getParent(),
-			nodeToMove.getNextNode(),
 			nodeUnder.getParent(),
 			nodeBefore);
 	}
@@ -95,16 +85,12 @@ public class AnimationView {
 		}
 
 		move(nodeToMove,
-			nodeToMove.getParent(),
-			nodeToMove.getNextNode(),
 			nodeInto,
 			nodeBefore);
 	}
 	
 	private void move(
 			Node moveNode,
-			Node oldParent,
-			Node oldNext,
 			Node newParent,
 			Node newNext) 
 	{
