@@ -18,6 +18,7 @@ import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.GroupTree;
+import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
@@ -52,16 +53,36 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 		tree.ClearRoots();
 		if( ws != null) {
 			BranchingNode branch = tree.new BranchingNode(new JLabel("Animations"));
+			
 			for( Animation anim : ws.getAnimationManager().getAnimations()) {
 				BTNode toAdd = tree.new LeafNode( new JLabel(anim.getName()));
 				toAdd.setDnDBindings( new AnimBinding( anim));
 				branch.AddNode(toAdd);
 			}
 			tree.AddRoot( branch);
+			
+			for( Node node : ws.getRootNode().getChildren()) 
+				RebuildSub(node, null);
 		}
 	}
 	private void RebuildSub( Node node, BranchingNode branch) {
+		BTNode nodeToAdd = null;
+		if( node instanceof GroupNode) {
+			BranchingNode nextBranch = tree.new BranchingNode(new JLabel(node.getName()));
+			for( Node child : node.getChildren())
+				RebuildSub(child, nextBranch);
+			nodeToAdd = nextBranch;
+			nextBranch.SetExpanded(node.isExpanded());
+		}
+		else {
+			nodeToAdd = tree.new LeafNode( new JLabel(node.getName()));
+		}
 		
+		nodeToAdd.setDnDBindings( new NodeBinding(node));
+		if( branch == null)
+			tree.AddRoot(nodeToAdd);
+		else
+			branch.AddNode(nodeToAdd);
 	}
 
 	private class AnimBinding implements BetterTree.DnDBinding {
@@ -74,6 +95,7 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 		@Override public Image drawCursor() {return null;}
 		@Override public DataFlavor[] getAcceptedDataFlavors() {return new DataFlavor[] {};}
 		@Override	public void interpretDrop(Transferable trans, DropDirection direction) {}
+		@Override public void dragOut() {}
 	}
 	private class NodeBinding implements BetterTree.DnDBinding {
 		private final Node node;
@@ -85,6 +107,7 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 		@Override public Image drawCursor() {return null;}
 		@Override public DataFlavor[] getAcceptedDataFlavors() {return new DataFlavor[] {};}
 		@Override	public void interpretDrop(Transferable trans, DropDirection direction) {}
+		@Override public void dragOut() {}
 	}
 
 	// :: MWorkspaceObserver
@@ -102,6 +125,8 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 			ws.getAnimationManager().addAnimationStructureObserver(this);
 			ws.addImageObserver(this);
 		}
+		
+		Rebuild();
 	}
 
 	// :: MImageObserver

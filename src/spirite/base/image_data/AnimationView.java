@@ -29,17 +29,26 @@ public class AnimationView {
 		return tree.getRoot();
 	}
 
-	public void addNode(Animation animation) {
-		tree.getRoot()._add(tree.new AnimationNode(animation, animation.getName()), null);
+	public Node addNode(Animation animation) {
+		Node node = tree.new AnimationNode(animation, animation.getName());
+		tree.getRoot()._add(node, null);
 		workspace.triggerFlash();
+		
+		return node;
 	}
 	
 	private boolean nodeIsInView( Node node) {
+		while( node != null) {
+			if( node == tree.getRoot())
+				return true;
+			node = node.getParent();
+		}
 		return false;
 	}
 	public void RemoveNode( Node node) {
 		if(!nodeIsInView(node) || node == tree.getRoot())
 			return;
+		
 		
 		node._del();
 		_triggerViewChange();
@@ -131,5 +140,6 @@ public class AnimationView {
 			else
 				other.viewChanged();
 		}
+		workspace.triggerFlash();
 	}
 }

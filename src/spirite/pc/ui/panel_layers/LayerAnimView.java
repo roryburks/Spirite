@@ -81,19 +81,25 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		public void interpretDrop(Transferable trans, DropDirection direction) {
 			AnimationView av = ws.getAnimationManager().getView();
 			GroupNode root = av.getRoot();
-			Node nodeToMove = null;
 			try {
-				nodeToMove = ((Transferables.NodeTransferable)trans.getTransferData(flavors[0])).node;
+				Node nodeToMove = null;
+				if( trans.isDataFlavorSupported(flavors[0])) 
+					nodeToMove = ((Transferables.NodeTransferable)trans.getTransferData(flavors[0])).node;
+				else if( trans.isDataFlavorSupported(flavors[1])) {
+					Animation anim = ((Transferables.AnimationTransferable)trans.getTransferData(flavors[1])).animation;
+					nodeToMove = av.addNode(anim);
+				}
+				
+				switch( direction) {
+				case ABOVE:
+					av.moveInto(nodeToMove, root, true);
+					break;
+				case BELOW:
+				case INTO:
+					av.moveInto(nodeToMove, root, false);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
-			switch( direction) {
-			case ABOVE:
-				av.moveInto(nodeToMove, root, true);
-				break;
-			case BELOW:
-			case INTO:
-				av.moveInto(nodeToMove, root, false);
 			}
 		}
 		
@@ -102,6 +108,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		}
 		@Override public Image drawCursor() {return null;}
 		@Override public Transferable buildTransferable() {return null;}
+		@Override public void dragOut() {}
 	};
 	
 	private class NodeBinding implements DnDBinding {
@@ -129,26 +136,37 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 				return;
 			
 			AnimationView av = ws.getAnimationManager().getView();
-			Node nodeToMove = null;
 			try {
-				nodeToMove = ((Transferables.NodeTransferable)trans.getTransferData(flavors[0])).node;
+				Node nodeToMove = null;
+				if( trans.isDataFlavorSupported(flavors[0])) 
+					nodeToMove = ((Transferables.NodeTransferable)trans.getTransferData(flavors[0])).node;
+				else if( trans.isDataFlavorSupported(flavors[1])) {
+					Animation anim = ((Transferables.AnimationTransferable)trans.getTransferData(flavors[1])).animation;
+					nodeToMove = av.addNode(anim);
+				}
+
+				switch( direction) {
+				case ABOVE:
+					av.moveAbove(nodeToMove, node);
+					break;
+				case BELOW:
+					av.moveBelow(nodeToMove, node);
+					break;
+				case INTO:
+					av.moveInto(nodeToMove, (GroupNode)node, false);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			switch( direction) {
-			case ABOVE:
-				av.moveAbove(nodeToMove, node);
-				break;
-			case BELOW:
-				av.moveBelow(nodeToMove, node);
-				break;
-			case INTO:
-				av.moveInto(nodeToMove, (GroupNode)node, false);
+		}
+
+		@Override public void dragOut() {
+			if( ws != null) {
+				ws.getAnimationManager().getView().RemoveNode(node);
 			}
-			
 		}
 	}
-	private final DataFlavor[] flavors = new DataFlavor[] {Transferables.NodeTransferable.FLAVOR};
+	private final DataFlavor[] flavors = new DataFlavor[] {Transferables.NodeTransferable.FLAVOR, Transferables.AnimationTransferable.FLAVOR};
 	
 	private void InitComponents() {
     	this.setLayout(new GridLayout());

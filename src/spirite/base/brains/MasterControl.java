@@ -757,8 +757,6 @@ public class MasterControl
     				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
     				trans.translate( translation.x, translation.y);
     				workspace.getSelectionEngine().transformSelection(trans);
-//    				workspace.getSelectionEngine().proposeTransform( trans);
-  //  				workspace.getSelectionEngine().applyProposedTransform();
     				
     				if(!wasLifted)
     					workspace.getSelectionEngine().anchorSelection();

@@ -265,6 +265,8 @@ public class BetterTree extends JPanel {
 					Component component = node.BuildContent();
 					innerHorGroup.addComponent(component, 0, 0, Short.MAX_VALUE);
 					innerVertGroup.addComponent(component);
+					dnd.addDropSource(component);
+					nodeLink.put(component, node);
 				}
 			}
 			
@@ -281,16 +283,16 @@ public class BetterTree extends JPanel {
 			layout.setHorizontalGroup(outerHorGroup);
 			layout.setVerticalGroup(outerVertGroup);
 			
-			rootPanel.setBackground(Color.BLUE);
+			//rootPanel.setBackground(Color.BLUE);
 			rootPanel.setLayout(layout);
 			
 			return rootPanel;
 		}
-		void SetExpanded( boolean expanded) {
+		public void SetExpanded( boolean expanded) {
 			_expanded = expanded;
 			RebuildTree();
 		}
-		boolean GetExpanded() {return _expanded;}
+		public boolean GetExpanded() {return _expanded;}
 	}
 	
 	public class LeafNode extends BTNode {
@@ -344,6 +346,7 @@ public class BetterTree extends JPanel {
 	public interface DnDBinding {
 		public Transferable buildTransferable();
 		public Image drawCursor();
+		public void dragOut();
 
 		public DataFlavor[] getAcceptedDataFlavors();
 		public void interpretDrop( Transferable trans, DropDirection direction);
@@ -441,19 +444,29 @@ public class BetterTree extends JPanel {
 		}
 		
 		// :::: DragGestureListener/DragSourceListener for drags originating from the tree
-		@Override public void dragDropEnd(DragSourceDropEvent arg0) {
+		@Override public void dragDropEnd(DragSourceDropEvent evt) {
+			Point p = evt.getLocation();
+			p = SwingUtilities.convertPoint( 
+					evt.getDragSourceContext().getComponent(), p, BetterTree.this);
+			
+			if( !contains(p) && dragging != null) {
+				DnDBinding binding = dragging.getBinding();
+				if( binding != null)
+					binding.dragOut();
+			}
+			
 			dragging = null;
 			BetterTree.this.repaint();
 		}
 		@Override public void dragEnter(DragSourceDragEvent arg0) {}
 		@Override public void dragExit(DragSourceEvent arg0) {}
 		@Override public void dragOver(DragSourceDragEvent arg0) {}
-		@Override public void dropActionChanged(DragSourceDragEvent arg0) {
-			System.out.println("DRAGENTER");}
+		@Override public void dropActionChanged(DragSourceDragEvent arg0) {}
 		@Override public void dragGestureRecognized(DragGestureEvent evt) {
 			if( dragging != null)
 				return;
 			
+
 			BTNode node = nodeLink.get( evt.getComponent());
 			
 			if( node != null) {
