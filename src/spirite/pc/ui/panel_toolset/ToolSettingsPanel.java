@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.jar.JarInputStream;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -21,6 +22,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -32,7 +36,10 @@ import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
+import spirite.base.util.glmath.Vec2;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.OmniFrame.OmniComponent;
+import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.panel_toolset.PropertyPanels.SizeSlider;
 
@@ -205,6 +212,7 @@ public class ToolSettingsPanel extends OmniComponent
 			JComboBox<String> comboBox = new JComboBox<>();
 			activeMap.put( comboBox, node);
 			JLabel label = new JLabel(node.getName() + ":");
+			label.setFont( Globals.getFont("toolset.dropdown"));
 			
 			String options[] = (String[])node.getExtra();
 			
@@ -262,6 +270,87 @@ public class ToolSettingsPanel extends OmniComponent
 			}
 			horizontal.addGroup(horSub);
 			break;}
+		case FLOAT_BOX:{
+			JLabel label = new JLabel(node.getName() + ":");
+			MTextFieldNumber textField = new MTextFieldNumber(true, true);
+			
+			label.setFont( Globals.getFont("toolset.dropdown"));
+			textField.setText( String.valueOf((float)node.getValue()));
+			
+			// Listener
+			textField.getDocument().addDocumentListener( new DocumentListener() {
+				public void changedUpdate(DocumentEvent arg0) {
+					settings.setValue(node.getId(), textField.getFloat());
+				}
+				public void insertUpdate(DocumentEvent arg0) {
+					settings.setValue(node.getId(), textField.getFloat());
+				}
+				public void removeUpdate(DocumentEvent arg0) {
+					settings.setValue(node.getId(), textField.getFloat());
+				}
+			});
+			
+			horizontal.addGroup(layout.createSequentialGroup()
+					.addComponent(label)
+					.addGap(3)
+					.addComponent(textField, 0, 0, Short.MAX_VALUE));
+			vertical.addGroup( layout.createParallelGroup()
+					.addComponent(label)
+					.addComponent(textField, 16, 16, 16));
+			break;}
+		case DUAL_FLOAT_BOX:{
+			JLabel labelMain = new JLabel(node.getName() + ":");
+			JLabel label1 = new JLabel( ((String[])node.getExtra())[0]);
+			JLabel label2 = new JLabel( ((String[])node.getExtra())[1]);
+			MTextFieldNumber textField1 = new MTextFieldNumber(true, true);
+			MTextFieldNumber textField2 = new MTextFieldNumber(true, true);
+			
+			labelMain.setFont( Globals.getFont("toolset.dropdown"));
+			label1.setFont( Globals.getFont("toolset.dropdown"));
+			label2.setFont( Globals.getFont("toolset.dropdown"));
+			Vec2 val = (Vec2)node.getValue();
+			textField1.setText( String.valueOf(val.x));
+			textField2.setText( String.valueOf(val.y));
+			
+			
+			
+			// Listener
+			DocumentListener listener = new DocumentListener() {
+				public void changedUpdate(DocumentEvent e) {
+					settings.setValue( node.getId(), new Vec2(textField1.getFloat(), textField2.getFloat()));
+				}
+				public void insertUpdate(DocumentEvent e) {
+					settings.setValue( node.getId(), new Vec2(textField1.getFloat(), textField2.getFloat()));
+				}
+				public void removeUpdate(DocumentEvent e) {
+					settings.setValue( node.getId(), new Vec2(textField1.getFloat(), textField2.getFloat()));
+				}
+			};
+			textField1.getDocument().addDocumentListener(listener);
+			textField2.getDocument().addDocumentListener(listener);
+			
+			
+			// Layout
+			horizontal.addGroup(layout.createParallelGroup()
+				.addComponent(labelMain)
+				.addGroup(layout.createSequentialGroup()
+					.addComponent(textField1, 0, 0, Short.MAX_VALUE)
+					.addGap(3)
+					.addComponent(label1)
+					.addGap(5)
+					.addComponent(textField2, 0, 0, Short.MAX_VALUE)
+					.addGap(3)
+					.addComponent(label2)));
+			vertical.addGroup(layout.createSequentialGroup()
+				.addComponent(labelMain)
+				.addGroup(layout.createParallelGroup()
+					.addComponent(textField1, 16, 16, 16)
+					.addComponent(textField2, 16, 16, 16)
+					.addComponent(label1)
+					.addComponent(label2)));
+			
+			break;}
+			
 		}
 	}
 	

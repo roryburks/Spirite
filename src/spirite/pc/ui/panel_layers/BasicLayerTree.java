@@ -51,7 +51,6 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 	private void Rebuild() {
 		tree.ClearRoots();
 		if( ws != null) {
-			System.out.println("TEST");
 			BranchingNode branch = tree.new BranchingNode(new JLabel("Animations"));
 			for( Animation anim : ws.getAnimationManager().getAnimations()) {
 				BTNode toAdd = tree.new LeafNode( new JLabel(anim.getName()));

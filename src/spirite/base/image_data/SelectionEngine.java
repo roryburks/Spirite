@@ -240,6 +240,7 @@ public class SelectionEngine {
 			proposingTransform = false;
 		}
 	}
+	public boolean isProposingTransform() {return proposingTransform;}
 	
 	// ===================
 	// ==== Selection Building
@@ -374,7 +375,7 @@ public class SelectionEngine {
 		List<UndoableAction> actions = new ArrayList<>(2); 
 		actions.add( new SetSelectionAction(sel));
 		
-		if( lifted) {
+		if( lifted && sel.selection != null) {
 			img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
 			gc = img.getGraphics();
 			gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);

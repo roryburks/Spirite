@@ -16,6 +16,7 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
@@ -40,6 +41,7 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
@@ -735,7 +737,38 @@ public class MasterControl
     			}
     		}});
     		commandMap.put("applyTransform", new Runnable() {@Override public void run() {
-    			workspace.getSelectionEngine().applyProposedTransform();
+				ToolSettings settings = toolset.getToolSettings( Tool.RESHAPER);
+    			if( workspace.getSelectionEngine().isProposingTransform()) 
+    				workspace.getSelectionEngine().applyProposedTransform();
+    			else {
+    				boolean wasLifted = workspace.getSelectionEngine().isLifted();
+    				
+    				workspace.getUndoEngine().pause();
+    				if( !wasLifted)
+    					workspace.getSelectionEngine().liftData();
+    				MatTrans trans = new MatTrans();
+    				
+    				Vec2 scale = (Vec2)settings.getValue("scale");
+    				Vec2 translation = (Vec2)settings.getValue("translation");
+    				float rotation = (float)settings.getValue("rotation");
+    				System.out.println( scale.x +"," + scale.y + ":" + rotation);
+    				
+    				trans.scale( scale.x, scale.y);
+    				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
+    				trans.translate( translation.x, translation.y);
+    				workspace.getSelectionEngine().proposeTransform( trans);
+    				workspace.getSelectionEngine().applyProposedTransform();
+    				
+    				if(!wasLifted)
+    					workspace.getSelectionEngine().anchorSelection();
+    				workspace.getUndoEngine().performAndStore(
+    						workspace.getUndoEngine().unpause("Manual Transform"));
+    			}
+
+//    			settings.setValue("scale", new Vec2(1,1));
+//    			settings.setValue("translation", new Vec2(0,0));
+//    			settings.setValue("rotation", 0f);
+    			
     			Penner p = frameManager.getPenner();
     			if( p != null)
     				p.cleanseState();

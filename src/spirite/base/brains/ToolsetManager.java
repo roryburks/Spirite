@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -187,7 +188,9 @@ public class ToolsetManager
         //	time.
         RADIO_BUTTON,
         // DropDown
-        DROP_DOWN
+        DROP_DOWN, 
+        // Input Boxes
+        DUAL_FLOAT_BOX, FLOAT_BOX
     }
 
     // =======================
@@ -256,7 +259,10 @@ public class ToolsetManager
     }
     private ToolSettings constructReshapeSettings() {
         final Object[][] scheme = {
-                {"cropSelection", PropertyType.BUTTON, "Apply Transformation", "draw.applyTransform",  DISABLE_ON_NO_SELECTION},
+                {"cropSelection", PropertyType.BUTTON, "Apply Transform", "draw.applyTransform",  DISABLE_ON_NO_SELECTION},
+                {"scale", PropertyType.DUAL_FLOAT_BOX, "Scale", new Vec2(1,1), DISABLE_ON_NO_SELECTION, new String[] {"x","y"}},
+                {"translation", PropertyType.DUAL_FLOAT_BOX, "Translation", new Vec2(0,0), DISABLE_ON_NO_SELECTION, new String[] {"x","y"}},
+                {"rotation", PropertyType.FLOAT_BOX, "Rotation", (float)0, DISABLE_ON_NO_SELECTION},
         };
         return constructFromScheme(scheme);
     }
@@ -315,16 +321,20 @@ public class ToolsetManager
      * should be, so that the proper error can be Managed inside this class. */
     private Class<?> getValueClassFromType( PropertyType type) {
         switch( type) {
-            case SIZE:
-            case OPACITY:
-                return Float.class;
-            case BUTTON:
-                return String.class;
-            case CHECK_BOX:
-                return Boolean.class;
-            case DROP_DOWN:
-            case RADIO_BUTTON:
-                return Integer.class;
+        case SIZE:
+        case OPACITY:
+            return Float.class;
+        case BUTTON:
+            return String.class;
+        case CHECK_BOX:
+            return Boolean.class;
+        case DROP_DOWN:
+        case RADIO_BUTTON:
+            return Integer.class;
+		case DUAL_FLOAT_BOX:
+			return Vec2.class;
+		case FLOAT_BOX:
+			return Float.class;
         }
 
         return null;	// Should be no way to reach this

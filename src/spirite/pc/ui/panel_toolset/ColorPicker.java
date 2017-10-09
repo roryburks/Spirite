@@ -259,10 +259,10 @@ public class ColorPicker extends OmniComponent
 				private void doIt() {
 					if(!changing && alerter != null) {
 						alerter.onColorChange( new Color(
-							rText.getNumber(),
-							gText.getNumber(),
-							bText.getNumber(),
-							aText.getNumber()));
+							rText.getInt(),
+							gText.getInt(),
+							bText.getInt(),
+							aText.getInt()));
 					}
 				}
 				@Override public void changedUpdate(DocumentEvent arg0) {
@@ -382,14 +382,14 @@ public class ColorPicker extends OmniComponent
 				if(!lock && alerter != null) {
 					lock = true;
 					int rgb =  Color.HSBtoRGB(
-							hText.getNumber() / 360.0f, 
-							sText.getNumber() / 100.0f, 
-							vText.getNumber() / 100.0f);
+							hText.getInt() / 360.0f, 
+							sText.getInt() / 100.0f, 
+							vText.getInt() / 100.0f);
 					Color c =  new Color(
 							(rgb >> 16) & 0xFF,
 							(rgb >> 8) & 0xFF,
 							(rgb) & 0xFF,
-							aText.getNumber());
+							aText.getInt());
 					alerter.onColorChange( c);
 					
 					uiToUIChange( binding, c);
@@ -420,13 +420,13 @@ public class ColorPicker extends OmniComponent
 			else if( source == aSlider) 
 				aText.setText(Integer.toString(aSlider.getValue()));
 			else if( source == hText) 
-				hSlider.setValue(hText.getNumber());
+				hSlider.setValue(hText.getInt());
 			else if( source == sText) 
-				sSlider.setValue(sText.getNumber());
+				sSlider.setValue(sText.getInt());
 			else if( source == vText) 
-				vSlider.setValue(vText.getNumber());
+				vSlider.setValue(vText.getInt());
 			else if( source == aText) 
-				aSlider.setValue(aText.getNumber());
+				aSlider.setValue(aText.getInt());
 			
 		}
 

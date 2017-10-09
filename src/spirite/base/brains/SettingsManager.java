@@ -165,6 +165,7 @@ public class SettingsManager {
     public boolean getAllowsEdittingInvisible() {
         return false;
     }
+    
 
 
     // ==============

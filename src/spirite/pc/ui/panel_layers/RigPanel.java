@@ -441,17 +441,17 @@ public class RigPanel extends OmniComponent
 		building = true;
 		if( rig != null && rig.getActivePart() != null) {
 			Part part = rig.getActivePart();
-			if( part.getOffsetX() != tfOffsetX.getNumber() ||
-				part.getOffsetY() != tfOffsetY.getNumber() ||
-				part.getDepth() != tfDepth.getNumber() ||
+			if( part.getOffsetX() != tfOffsetX.getInt() ||
+				part.getOffsetY() != tfOffsetY.getInt() ||
+				part.getDepth() != tfDepth.getInt() ||
 				!part.getTypeName().equals(tfName.getText()) ||
 				part.isVisible() != bNodeVisiblity.isSelected() ||
 				part.getAlpha() != opacitySlider.getValue()) 
 			{
 				
 				UndoableAction action = rig.createModifyPartAction(
-						part, tfOffsetX.getNumber(), tfOffsetY.getNumber(), 
-						tfDepth.getNumber(), tfName.getText(), 
+						part, tfOffsetX.getInt(), tfOffsetY.getInt(), 
+						tfDepth.getInt(), tfName.getText(), 
 						bNodeVisiblity.isSelected(), opacitySlider.getValue());
 				
 				if( action != null)

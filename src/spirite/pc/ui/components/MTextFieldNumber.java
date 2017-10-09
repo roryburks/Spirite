@@ -75,10 +75,19 @@ public class MTextFieldNumber extends JTextField implements DocumentListener {
 		this.min = min;
 		this.max = max;
 	}
-	public int getNumber() {
+	public int getInt() {
 		try {
 			int i = Integer.parseInt( this.getText());
 			return i;
+		}
+		catch( NumberFormatException e) {
+			return 0;
+		}
+	}
+	public float getFloat() {
+		try {
+			float f = Float.parseFloat( this.getText());
+			return f;
 		}
 		catch( NumberFormatException e) {
 			return 0;

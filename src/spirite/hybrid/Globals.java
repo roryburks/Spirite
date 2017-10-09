@@ -4,6 +4,7 @@ package spirite.hybrid;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -249,5 +250,10 @@ public class Globals {
         }
         
     	return img;
+    }
+    
+    private static final Font defaultFont = new Font("Tahoma", Font.PLAIN, 10);
+    public static Font getFont( String name) {
+    	return defaultFont;
     }
 }

@@ -29,8 +29,8 @@ public class NewLayerDPanel extends JPanel {
 		public final String name;
 		public final String type;
 		private NewLayerHelper() {
-			width = tfWidth.getNumber();
-			height = tfHeight.getNumber();
+			width = tfWidth.getInt();
+			height = tfHeight.getInt();
 			color = getValueColor();
 			name = tfPartName.getText();
 			type = tfPartType.getText();
@@ -112,10 +112,10 @@ public class NewLayerDPanel extends JPanel {
 	}
 	
 	public int getValueWidth() {
-		return tfWidth.getNumber();
+		return tfWidth.getInt();
 	}
 	public int getValueHeight() {
-		return tfHeight.getNumber();
+		return tfHeight.getInt();
 	}
 	public String getValueName() {
 		return tfPartName.getText();
