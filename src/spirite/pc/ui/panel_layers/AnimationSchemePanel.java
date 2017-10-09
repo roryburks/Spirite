@@ -551,8 +551,7 @@ public class AnimationSchemePanel extends JPanel
 						if(frame.getLayerNode() != null)
 							frame.getLayerNode().getRender().setVisible(visible);
 					}
-					CompositeAction action = ue.unpause("Toggle Layer Visibility");
-					ue.performAndStore(action);
+					ue.unpause("Toggle Layer Visibility");
 				}
 			});
 			

@@ -258,12 +258,11 @@ public class UndoEngine {
 	 */
 	public void performAndStore( UndoableAction action) {
 		if( action != null) {
+			action.performAction();
 			if( isPaused)
 				queuedActions.add(action);
-			else {
-				action.performAction();
+			else 
 				storeAction(action);
-			}
 		}
 		else
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Attempted to store null as an action.");
@@ -384,12 +383,14 @@ public class UndoEngine {
 	 * 
 	 * @param description User-readable description for the aggregate action
 	 */
-	public CompositeAction unpause(String description) {
+	public void unpause(String description) {
 		if( !isPaused || queuedActions == null || queuedActions.isEmpty())
-			return null;
+			return ;
 		
 		isPaused = false;
-		return new CompositeAction( queuedActions, description);
+		
+		
+		storeAction(new CompositeAction( queuedActions, description));
 	}
 	
 	private boolean isPaused = false;

@@ -756,13 +756,13 @@ public class MasterControl
     				trans.scale( scale.x, scale.y);
     				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
     				trans.translate( translation.x, translation.y);
-    				workspace.getSelectionEngine().proposeTransform( trans);
-    				workspace.getSelectionEngine().applyProposedTransform();
+    				workspace.getSelectionEngine().transformSelection(trans);
+//    				workspace.getSelectionEngine().proposeTransform( trans);
+  //  				workspace.getSelectionEngine().applyProposedTransform();
     				
     				if(!wasLifted)
     					workspace.getSelectionEngine().anchorSelection();
-    				workspace.getUndoEngine().performAndStore(
-    						workspace.getUndoEngine().unpause("Manual Transform"));
+					workspace.getUndoEngine().unpause("Manual Transform");
     			}
 
 //    			settings.setValue("scale", new Vec2(1,1));
