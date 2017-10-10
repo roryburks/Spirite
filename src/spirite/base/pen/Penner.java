@@ -21,6 +21,7 @@ import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
+import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.graphics.GraphicsContext;
@@ -1252,6 +1253,7 @@ public class Penner
 	}
 
 	// :::: MToolsetObserver
+	@Override public void toolsetPropertyChanged(Tool tool, Property property) {}
 	@Override
 	public void toolsetChanged(Tool newTool) {
 		if(behavior != null)

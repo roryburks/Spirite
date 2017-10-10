@@ -616,6 +616,10 @@ public class MasterControl
     		commandMap.put("toggleGLPanel", new Runnable() {@Override public void run() {
     			frameManager.getWorkPanel().setGL(!frameManager.getWorkPanel().isGLPanel());
     		}});
+    		
+    		commandMap.put("debug1", new Runnable() {@Override public void run() {
+    			toolset.getToolSettings(Tool.PEN).setValue("alpha", 0.5f);
+    		}});
     	}
     	
 

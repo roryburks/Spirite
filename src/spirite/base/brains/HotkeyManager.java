@@ -90,6 +90,8 @@ public class HotkeyManager {
                 // TODO: This should really be anim., but that might require restructuring/rethinking of
                 //	command execution system.
                 {"draw.addGapQuick", new Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK)},
+
+                {"global.debug1", (new Hotkey( KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
             }
         );
         

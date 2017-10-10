@@ -41,7 +41,7 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import spirite.hybrid.Globals;;
+import spirite.hybrid.Globals;
 
 public class BetterTree extends JPanel {
 	private final List<BTNode> roots = new ArrayList<>();

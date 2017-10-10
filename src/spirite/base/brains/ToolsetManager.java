@@ -122,6 +122,11 @@ public class ToolsetManager
      */
     public class ToolSettings {
         Property properties[];
+        Tool tool;
+        
+        ToolSettings( Tool tool) {
+        	
+        }
 
         public Property[] getPropertyScheme() {
             Property ret[] = new Property[properties.length];
@@ -132,6 +137,16 @@ public class ToolsetManager
             return ret;
         }
 
+        public Property getProperty(String id) {
+            for( int i=0; i<properties.length; ++i) {
+                if( properties[i].id.equals(id)) {
+                    return properties[i];
+                }
+            }
+
+            return null;
+        }
+        
         public Object getValue( String id) {
             for( int i=0; i<properties.length; ++i) {
                 if( properties[i].id.equals(id)) {
@@ -148,6 +163,7 @@ public class ToolsetManager
                     if(!getValueClassFromType(properties[i].type).isInstance(value))
                         throw new ClassCastException("Value type does not match Property scheme.");
                     properties[i].value = value;
+                    triggerToolsetPropertyChanged( this.tool, properties[i]);
                 }
             }
         }
@@ -202,7 +218,7 @@ public class ToolsetManager
                 {"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.PEN);
     }
     private ToolSettings constructEraseSettings() {
         final Object[][] scheme = {
@@ -211,14 +227,14 @@ public class ToolsetManager
                 {"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.ERASER);
     }
     private ToolSettings constructPixelSettings() {
         final Object[][] scheme = {
                 {"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.PIXEL);
     }
     private ToolSettings constructBoxSelectionSettings() {
         final Object[][] scheme = {
@@ -226,7 +242,7 @@ public class ToolsetManager
                         new String[]{"Rectangle","Oval"}},
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.BOX_SELECTION);
     }
     private ToolSettings constructCropperSettings() {
         final Object[][] scheme = {
@@ -235,7 +251,7 @@ public class ToolsetManager
                 {"shrinkOnly", PropertyType.CHECK_BOX, "Shrink-only Crop", false},
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.CROP);
     }
     private ToolSettings constructFlipperSettings() {
         final Object[][] scheme = {
@@ -244,7 +260,7 @@ public class ToolsetManager
                 },
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.FLIPPER);
     }
 
     private ToolSettings constructColorChangeSettings() {
@@ -255,7 +271,7 @@ public class ToolsetManager
                 },
         };
 
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.COLOR_CHANGE);
     }
     private ToolSettings constructReshapeSettings() {
         final Object[][] scheme = {
@@ -264,7 +280,7 @@ public class ToolsetManager
                 {"translation", PropertyType.DUAL_FLOAT_BOX, "Translation", new Vec2(0,0), DISABLE_ON_NO_SELECTION, new String[] {"x","y"}},
                 {"rotation", PropertyType.FLOAT_BOX, "Rotation", (float)0, DISABLE_ON_NO_SELECTION},
         };
-        return constructFromScheme(scheme);
+        return constructFromScheme(scheme, Tool.RESHAPER);
     }
 
     public static final int DISABLE_ON_NO_SELECTION = 0x01;
@@ -284,8 +300,8 @@ public class ToolsetManager
      * 	such as when the GUI element should be disabled
      * 5: (optional) any additional type-specific data needed
      </pre>*/
-    ToolSettings constructFromScheme( Object[][] scheme) {
-        ToolSettings settings = new ToolSettings();
+    ToolSettings constructFromScheme( Object[][] scheme, Tool tool) {
+        ToolSettings settings = new ToolSettings(tool);
         settings.properties = new Property[scheme.length];
 
         for(int i=0; i<scheme.length; ++i) {
@@ -344,7 +360,7 @@ public class ToolsetManager
     // ==== Toolset Observer
     public interface MToolsetObserver {
         public void toolsetChanged( Tool newTool);
-//        public void toolsetPropertyChanged( Tool tool);
+        public void toolsetPropertyChanged( Tool tool, Property property);
     }
 
     List<WeakReference<MToolsetObserver>> toolsetObserver = new ArrayList<>();
@@ -368,6 +384,16 @@ public class ToolsetManager
                 it.remove();
             else
                 obs.toolsetChanged(newTool);
+        }
+    }
+    private void triggerToolsetPropertyChanged( Tool tool, Property property) {
+        Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
+        while( it.hasNext()) {
+            MToolsetObserver obs = it.next().get();
+            if( obs == null )
+                it.remove();
+            else
+                obs.toolsetPropertyChanged( tool, property);
         }
     }
 
