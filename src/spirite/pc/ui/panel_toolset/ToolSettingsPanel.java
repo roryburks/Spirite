@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -378,8 +379,6 @@ public class ToolSettingsPanel extends OmniComponent
 			Vec2 val = (Vec2)node.getValue();
 			textField1.setText( String.valueOf(val.x));
 			textField2.setText( String.valueOf(val.y));
-			
-			
 			
 			// Listener
 			DocumentListener listener = new DocumentListener() {

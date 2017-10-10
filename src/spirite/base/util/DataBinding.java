@@ -5,25 +5,24 @@ package spirite.base.util;
  * both are listening for each other thus need to be locked out of endless loops
  */
 public class DataBinding {
-	private boolean uiLock = false;
-	private boolean dataLock = false;
+	private boolean lock = false;
 	DBSub link;
 	
 	public void uiChange( Object newValue) {
-		if( uiLock )
+		if( lock )
 			return;
-		uiLock = true;
+		lock = true;
 		if( link != null)
 			link.doUIChange( newValue);
-		uiLock = false;
+		lock = false;
 	}
 	public void dataChange( Object newValue) {
-		if( dataLock)
+		if( lock)
 			return;
-		dataLock = true;
+		lock = true;
 		if( link != null)
 			link.doDataChange(newValue);
-		dataLock = false;
+		lock = false;
 	}
 	public void setLink( DBSub sub) {this.link = sub;}
 

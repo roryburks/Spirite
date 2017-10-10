@@ -756,9 +756,9 @@ public class MasterControl
     				Vec2 translation = (Vec2)settings.getValue("translation");
     				float rotation = (float)settings.getValue("rotation");
     				System.out.println( scale.x +"," + scale.y + ":" + rotation);
-    				
-    				trans.scale( scale.x, scale.y);
+
     				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
+    				trans.scale( scale.x, scale.y);
     				trans.translate( translation.x, translation.y);
     				workspace.getSelectionEngine().transformSelection(trans);
     				
@@ -767,9 +767,9 @@ public class MasterControl
 					workspace.getUndoEngine().unpause("Manual Transform");
     			}
 
-//    			settings.setValue("scale", new Vec2(1,1));
-//    			settings.setValue("translation", new Vec2(0,0));
-//    			settings.setValue("rotation", 0f);
+    			settings.setValue("scale", new Vec2(1,1));
+    			settings.setValue("translation", new Vec2(0,0));
+    			settings.setValue("rotation", 0f);
     			
     			Penner p = frameManager.getPenner();
     			if( p != null)

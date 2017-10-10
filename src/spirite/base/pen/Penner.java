@@ -986,6 +986,225 @@ public class Penner
 		READY, ROTATE, RESIZE, MOVING
 	}
 	class ReshapingBehavior extends DrawnStateBehavior {
+		ReshapeStates state = ReshapeStates.READY;
+		
+		// The Lock Transform is the transform stored at the start of the current
+		//	action, which is used in combination of the transformation of the current
+		//	action to create the Working Transform
+		MatTrans lockTrans = new MatTrans();
+		
+		// The Calculation Transform is a version of the Locked Transform which has
+		//	all the relevent offsets built-in so that calculation changes in mouse
+		//	movement with respect to the selection's center can be easily performed.
+		MatTrans calcTrans = new MatTrans();
+		
+		int startX, startY;
+		
+		float oldScaleX, oldScaleY;
+		float oldRot;
+		
+		int overlap = -1;
+		// 0123 : NESW
+		// 4567 : NW NE SE SW
+		// 89AB : NW NE SE SW (rotation)
+		// C : Moving
+		
+		private MatTrans getWorkingTransform() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+
+			MatTrans wTrans = new MatTrans();
+			Vec2 scale = (Vec2)settings.getValue("scale");
+			Vec2 translation = (Vec2)settings.getValue("translation");
+			float rotation = (float)settings.getValue("rotation");
+
+			wTrans.rotate(rotation);
+			wTrans.scale(scale.x, scale.y);
+			wTrans.translate(translation.x, translation.y);
+			return wTrans;
+		}
+
+		@Override
+		public void start() {
+			state = ReshapeStates.READY;
+		}
+		@Override public void onTock() {}
+		
+		@Override
+		public void paintOverlay(GraphicsContext gc) {
+			MatTrans wTrans = getWorkingTransform();
+			
+			float zoom = view.getZoom();
+			
+			BuiltSelection sel =selectionEngine.getBuiltSelection();
+			
+			if( sel == null || sel.selection == null){
+				this.end();
+				return;
+			}
+			Vec2i d = sel.selection.getDimension();
+			
+			MatTrans origTrans = gc.getTransform();
+
+			MatTrans relTrans = new MatTrans();
+			relTrans.translate(view.itsX(0), view.itsY(0));
+			relTrans.scale(zoom, zoom);
+			relTrans.translate(d.x/2+sel.offsetX, d.y/2+sel.offsetY);
+			relTrans.concatenate(wTrans);
+			relTrans.translate(-d.x/2, -d.y/2);
+			
+			gc.setTransform(relTrans);
+
+			gc.setColor(Colors.BLACK);
+			gc.drawRect( 0, 0, d.x, d.y);
+			
+			Stroke defStroke = new BasicStroke( 2/zoom);
+			gc.setColor(Colors.GRAY);
+//			gc.setStroke(defStroke);
+			
+			Vec2 p = new Vec2();
+			try {
+				p = relTrans.inverseTransform(new Vec2(rawX,rawY), p);
+			} catch (NoninvertableException e) {
+				e.printStackTrace();
+			}
+			
+			float sw = d.x*0.3f;	// Width of corner rect
+			float sh = d.y*0.3f;	// Height
+			float x2 = d.x*0.7f;	// Offset of right rect
+			float y2 = d.y*0.7f;	// " bottom
+			float di = d.y*0.2f;	// Diameter of rotate thing
+			float of = d.y*0.25f*0.2f;
+
+			float b = 4/zoom;
+			
+			List<Shape> s = new ArrayList<>(12);
+			s.add(new Rectangle2D.Float(sw+b, b, x2-sw-b*2, sh-b*2));	// N
+			s.add(new Rectangle2D.Float(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
+			s.add(new Rectangle2D.Float(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
+			s.add(new Rectangle2D.Float(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
+			
+			s.add(new Rectangle2D.Float(b, b, sw-b*2, sh-b*2));			// NW
+			s.add(new Rectangle2D.Float(x2+b, b, sw-b*2, sh-b*2));		// NE
+			s.add(new Rectangle2D.Float(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
+			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
+
+			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
+			s.add(new Ellipse2D.Float( d.x-of, -di+of, di, di));	// NE
+			s.add(new Ellipse2D.Float( d.x-of, d.y-of, di, di));	// SE
+			s.add(new Ellipse2D.Float( -di+of, d.y-of, di, di));	// SW
+
+			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
+			
+			if( this.state == ReshapeStates.READY)
+				overlap = -1;
+			for( int i=0; i<s.size(); ++i) {
+				Shape shape = s.get(i);
+				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
+					gc.setColor(Colors.YELLOW);
+//					gc.setStroke(new BasicStroke( 4/zoom));
+					gc.draw(shape);
+					gc.setColor(Colors.GRAY);
+//					gc.setStroke(defStroke);
+					overlap = i;
+				}
+				else gc.draw(shape);
+			}
+
+			
+			gc.setTransform(origTrans);
+		}
+
+
+		@Override public void onPenUp() {
+			this.state = ReshapeStates.READY;
+		}
+		@Override
+		public void onPenDown() {
+			BuiltSelection sel =selectionEngine.getBuiltSelection();
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			
+			if( sel == null || sel.selection == null){
+				this.end();
+				return;
+			}
+			
+			if( overlap >= 0 && overlap <= 7) {
+				Vec2i d = sel.selection.getDimension();
+				startX = x;
+				startY = y;
+				lockTrans = new MatTrans(getWorkingTransform());
+				calcTrans = new MatTrans();
+				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
+				calcTrans.preConcatenate(lockTrans);
+				Vec2 scale = (Vec2)settings.getValue("scale");
+				oldScaleX = scale.x;
+				oldScaleY = scale.y;
+				this.state = ReshapeStates.RESIZE;
+			}
+			else if( overlap >= 8 && overlap <= 0xB) {
+				Vec2i d = sel.selection.getDimension();
+				startX = x;
+				startY = y;
+				lockTrans = new MatTrans(getWorkingTransform());
+				calcTrans = new MatTrans();
+				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
+				calcTrans.preConcatenate(lockTrans);
+				oldRot = (float)settings.getValue("rotation");
+				this.state = ReshapeStates.ROTATE;
+			}
+			else if( overlap == 0xC)
+				this.state = ReshapeStates.MOVING;
+		}
+
+		@Override
+		public void onMove() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			Vec2 scale = (Vec2)settings.getValue("scale");
+			Vec2 translation = (Vec2)settings.getValue("translation");
+			float rotation = (float)settings.getValue("rotation");
+			
+			switch( this.state) {
+			case MOVING:
+				
+				if( oldX != x || oldY != y) {
+					settings.setValue( "translation", new Vec2( translation.x + x - oldX, translation.y + y - oldY ));
+				}
+				break;
+			case READY:
+				break;
+			case RESIZE:{
+				Vec2 pn = new Vec2();
+				Vec2 ps = new Vec2();
+
+				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(startX,startY), ps);
+
+				float sx = (overlap == 0 || overlap == 2) ? scale.x : pn.x/ps.x * oldScaleX;
+				float sy = (overlap == 1 || overlap == 3) ? scale.y : pn.y/ps.y * oldScaleY;
+				
+				settings.setValue("scale", new Vec2(sx, sy));
+				break;}
+			case ROTATE:{
+				Vec2 pn = new Vec2();
+				Vec2 ps = new Vec2();
+
+				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(startX,startY), ps);
+				
+
+				double start = Math.atan2(ps.y, ps.x);
+				double end =  Math.atan2(pn.y, pn.x);
+				
+				settings.setValue("rotation", (float)(end-start + oldRot));
+				break;}
+			
+			}
+			
+			selectionEngine.proposeTransform(getWorkingTransform());
+		}
+		
+	}
+	class OLDReshapingBehavior extends DrawnStateBehavior {
 		// The Working Transform is the transform which is used for drawing
 		MatTrans wTrans = new MatTrans();
 		
