@@ -1,4 +1,4 @@
-package spirite.base.brains.renderer;
+package spirite.base.graphics.renderer;
 
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -19,14 +19,14 @@ import javax.swing.Timer;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.brains.renderer.CacheManager.CachedImage;
-import spirite.base.brains.renderer.sources.LayerRenderSource;
-import spirite.base.brains.renderer.sources.NodeRenderSource;
-import spirite.base.brains.renderer.sources.ReferenceRenderSource;
-import spirite.base.brains.renderer.sources.RenderSource;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.GLCache;
+import spirite.base.graphics.renderer.CacheManager.CachedImage;
+import spirite.base.graphics.renderer.sources.LayerRenderSource;
+import spirite.base.graphics.renderer.sources.NodeRenderSource;
+import spirite.base.graphics.renderer.sources.ReferenceRenderSource;
+import spirite.base.graphics.renderer.sources.RenderSource;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;

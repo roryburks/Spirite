@@ -39,8 +39,8 @@ import javax.swing.border.EtchedBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
-import spirite.base.brains.renderer.sources.LayerRenderSource;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
+import spirite.base.graphics.renderer.sources.LayerRenderSource;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;

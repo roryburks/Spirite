@@ -3,7 +3,8 @@ package spirite.base.util.glmath;
 import com.hackoeur.jglm.support.FastMath;
 
 /**
- *
+ * MatTrans is a library-independent implementation of a 2D translation matrix.  Much of it
+ * mimicks the behavior of AWT's AffineTransform
  *
  * @author Rory Burks
  */
@@ -45,6 +46,8 @@ public class MatTrans {
 		m02 += ox * m00 + oy * m01;
 		m12 += ox * m10 + oy * m11;
 	}
+	
+	// THIS = THIS * tx
 	public void concatenate(MatTrans tx) {
         float n00 = m00 * tx.m00 + m01 * tx.m10;
         float n01 = m00 * tx.m01 + m01 * tx.m11;
@@ -60,6 +63,7 @@ public class MatTrans {
         m12 = n12;
 	}
 
+	// THIS = tx * THIS
 	public void preConcatenate(MatTrans tx) {
         float n00 = m00 * tx.m00 + m01 * tx.m10;
         float n01 = m00 * tx.m01 + m01 * tx.m11;

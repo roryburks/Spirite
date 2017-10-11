@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
-import spirite.base.brains.renderer.CacheManager;
-import spirite.base.brains.renderer.RenderEngine;
-import spirite.base.brains.renderer.CacheManager.CachedImage;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLCache;
+import spirite.base.graphics.renderer.CacheManager;
+import spirite.base.graphics.renderer.RenderEngine;
+import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;

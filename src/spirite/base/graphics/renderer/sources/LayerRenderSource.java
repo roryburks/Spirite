@@ -1,9 +1,9 @@
-package spirite.base.brains.renderer.sources;
+package spirite.base.graphics.renderer.sources;
 
 import java.util.List;
 
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.RawImage;

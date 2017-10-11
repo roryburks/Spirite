@@ -3,8 +3,8 @@ package spirite.base.image_data.layers;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;

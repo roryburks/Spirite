@@ -16,15 +16,15 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
-import spirite.base.brains.renderer.CacheManager;
-import spirite.base.brains.renderer.RenderEngine;
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
+import spirite.base.graphics.renderer.CacheManager;
+import spirite.base.graphics.renderer.RenderEngine;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;

@@ -9,10 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import spirite.base.brains.renderer.CacheManager;
-import spirite.base.brains.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.renderer.CacheManager;
+import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;

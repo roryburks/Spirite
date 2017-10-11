@@ -1,15 +1,15 @@
-package spirite.base.brains.renderer.sources;
+package spirite.base.graphics.renderer.sources;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.renderer.HybridNodeRenderer;
-import spirite.base.brains.renderer.RenderEngine;
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
+import spirite.base.graphics.renderer.HybridNodeRenderer;
+import spirite.base.graphics.renderer.RenderEngine;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.image_data.GroupTree.GroupNode;

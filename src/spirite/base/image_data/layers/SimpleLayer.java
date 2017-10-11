@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import spirite.base.brains.renderer.CacheManager.CachedImage;
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
-import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.renderer.CacheManager.CachedImage;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;

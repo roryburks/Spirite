@@ -22,8 +22,8 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.renderer.CacheManager.CacheDomain;
 import spirite.base.graphics.gl.GLEngine;
+import spirite.base.graphics.renderer.CacheManager.CacheDomain;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.DebugObserver;
 

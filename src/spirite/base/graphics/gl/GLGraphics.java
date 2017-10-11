@@ -5,7 +5,6 @@ import java.awt.geom.Ellipse2D;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.brains.renderer.RenderEngine.RenderMethod;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;
@@ -13,6 +12,7 @@ import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.GLParameters.GLTexture;
+import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.RawImage;
 import spirite.base.util.Colors;

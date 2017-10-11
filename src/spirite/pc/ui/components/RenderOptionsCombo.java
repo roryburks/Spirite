@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.renderer.RenderEngine.RenderMethod;
+import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
 

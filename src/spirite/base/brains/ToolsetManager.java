@@ -132,7 +132,7 @@ public class ToolsetManager
         Tool tool;
         
         ToolSettings( Tool tool) {
-        	
+        	this.tool = tool;
         }
 
         public Property[] getPropertyScheme() {
@@ -150,7 +150,6 @@ public class ToolsetManager
                     return properties[i];
                 }
             }
-
             return null;
         }
         
@@ -160,7 +159,6 @@ public class ToolsetManager
                     return properties[i].getValue();
                 }
             }
-
             return null;
         }
 
@@ -172,18 +170,6 @@ public class ToolsetManager
                 }
             }
         }
-
-        /** Extra Data is data stored with certain PropertyType's, usually
-         * StringArrays of Human-Readable formats of the options the property has,
-         * stored for constructing the UI Component.*/
-//        public Object getExtra(String id) {
-//            for( int i=0; i<properties.length; ++i) {
-//                if( properties[i].id.equals(id)) {
-//                    return properties[i].extra;
-//                }
-//            }
-//            return null;
-//        }
     }
     public static abstract class Property
     {
@@ -250,7 +236,6 @@ public class ToolsetManager
 
         return constructFromScheme(props, Tool.FLIPPER);
     }
-
     private ToolSettings constructColorChangeSettings() {
     	Property[] props = {
     		new DropDownProperty("scope", "Scope", 0, new String[]{"Local","Entire Layer/Group","Entire Project"}),

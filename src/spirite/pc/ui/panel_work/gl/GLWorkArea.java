@@ -17,11 +17,11 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.renderer.RenderEngine;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.graphics.gl.GLParameters;
+import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;

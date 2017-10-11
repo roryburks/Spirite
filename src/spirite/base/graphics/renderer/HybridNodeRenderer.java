@@ -1,14 +1,14 @@
-package spirite.base.brains.renderer;
+package spirite.base.graphics.renderer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
-import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RenderProperties;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.AnimationNode;
@@ -63,7 +63,6 @@ public class HybridNodeRenderer {
 			ratioH = settings.height / (float)workspace.getHeight();
 			
 			_render_rec( root, 0, settings);
-			
 			gc.drawImage(buffer[0], 0, 0);
 			
 			// Flush the data
@@ -77,12 +76,15 @@ public class HybridNodeRenderer {
 		}
 	}
 
+	// ==== Composite Layer
 	private RawImage compositionImage;
 	private ImageHandle compositionHandle = null;
-	private void buildCompositeLayer(ImageWorkspace workspace) {
+	private void buildCompositeLayer(ImageWorkspace workspace) 
+	{
 		BuiltImageData dataContext= workspace.buildActiveData();
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
-				||  workspace.getDrawEngine().strokeIsDrawing())) {
+				||  workspace.getDrawEngine().strokeIsDrawing())) 
+		{
 			compositionImage= 
 					HybridHelper.createImage(dataContext.getWidth(), dataContext.getHeight());
 			compositionHandle = dataContext.handle;
@@ -105,15 +107,13 @@ public class HybridNodeRenderer {
 				gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
 			}
 			if( workspace.getDrawEngine().strokeIsDrawing()) {
-				// Draw
+				// Draw the Stroke
 				gc.setTransform(new MatTrans());
 				workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer( gc);
 			}
-//			g2.dispose();
 		}
 	
 	}
-
 	private void clearCompositeImage() {
 		if( compositionImage != null)
 			compositionImage.flush();
@@ -121,6 +121,7 @@ public class HybridNodeRenderer {
 		compositionImage = null;
 	}
 
+	// ==== Rendering
 	private void _render_rec(
 			GroupNode node, 
 			int n, 
@@ -136,7 +137,6 @@ public class HybridNodeRenderer {
 		//	found recursively and drawing any Layer found plainly.
 		
 		ListIterator<Node> it = node.getChildren().listIterator(node.getChildren().size());
-		List< Drawable> renderList = new ArrayList<>();
 		while( it.hasPrevious()) {
 			Node child = it.previous();
 			if( child.getRender().isVisible()) {
@@ -153,9 +153,12 @@ public class HybridNodeRenderer {
 					renderable.draw(buffer[n].getGraphics());
 				}
 				else if( child instanceof LayerNode) {
+					List< Drawable> renderList = new ArrayList<>();
+					
 					// Step 1: Construct a list of all components that need to be rendered
 					int count = 0;	// This subDepth counter is used to make sure Renderables of
 									// the same depth are rendered in the correct order.
+					
 					List<TransformedHandle> sub = ((LayerNode)child).getLayer().getDrawList();
 					
 					for( TransformedHandle subRend : sub) {

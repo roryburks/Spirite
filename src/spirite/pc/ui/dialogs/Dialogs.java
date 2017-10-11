@@ -141,6 +141,12 @@ public class Dialogs
     	if( val == JFileChooser.APPROVE_OPTION) {
     		File ret = fc.getSelectedFile();
     		
+    		if( ret.getName().lastIndexOf('.') == -1 ) {
+    			ret = new File(ret.getAbsoluteFile() + ".sif");    		
+    			if( ret.exists() && JOptionPane.showConfirmDialog(null, "Overwrite Existing " + ret.getName() + "?", "", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+    					return null;
+    		}
+    		
     		if( ret.getName().endsWith(".sif") || ret.getName().endsWith(".sif~"))
     			master.getSettingsManager().setWorkspaceFilePath(ret);
     		else

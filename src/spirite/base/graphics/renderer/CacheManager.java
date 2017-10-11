@@ -1,4 +1,4 @@
-package spirite.base.brains.renderer;
+package spirite.base.graphics.renderer;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;

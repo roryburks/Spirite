@@ -7,11 +7,11 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.renderer.RenderEngine;
-import spirite.base.brains.renderer.RenderEngine.RenderSettings;
-import spirite.base.brains.renderer.sources.ReferenceRenderSource;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.renderer.RenderEngine;
+import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
+import spirite.base.graphics.renderer.sources.ReferenceRenderSource;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
