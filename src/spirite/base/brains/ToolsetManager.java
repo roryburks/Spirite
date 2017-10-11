@@ -184,29 +184,15 @@ public class ToolsetManager
     public static abstract class Property
     {
         protected String id;
-        protected PropertyType type;
         protected String hiName;
         protected int mask;
 
         public String getId() {return id;}
-        public PropertyType getType() {return type;}
         public String getName() {return hiName;}
         public int getMask() {return mask;}
         
         public abstract Object getValue();
         protected abstract void setValue(Object newValue);
-    }
-
-    public enum PropertyType {
-        SIZE, OPACITY, CHECK_BOX,BUTTON,
-        // RADIO_BUTTON is a special Property Type in that contains an finite
-        //	amount of on-off options, only one of which can be active at a given
-        //	time.
-        RADIO_BUTTON,
-        // DropDown
-        DROP_DOWN, 
-        // Input Boxes
-        DUAL_FLOAT_BOX, FLOAT_BOX
     }
 
     // =======================
@@ -272,10 +258,10 @@ public class ToolsetManager
     }
     private ToolSettings constructReshapeSettings() {
     	Property[] props = {
-    		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master),
-    		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y"),
-    		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y"),
-    		new FloatBoxProperty( "rotation", "Rotation", 0)
+    		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master, DISABLE_ON_NO_SELECTION),
+    		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y", DISABLE_ON_NO_SELECTION),
+    		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y", DISABLE_ON_NO_SELECTION),
+    		new FloatBoxProperty( "rotation", "Rotation", 0, DISABLE_ON_NO_SELECTION)
     	};
     	
         return constructFromScheme( props, Tool.RESHAPER);

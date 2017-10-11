@@ -40,11 +40,15 @@ public class ToolProperties {
 	
 	public static class SizeProperty extends SwingToolProperty {
 		private float value;
-		
+
 		public SizeProperty( String id, String hrName, float defaultValue) {
+			this( id, hrName, defaultValue, 0);
+		}
+		public SizeProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
 			this.hiName = hrName;
 			this.id = id;
+			this.mask = mask;
 		}
 
 		@Override public Float getValue() { return value; }
@@ -81,14 +85,18 @@ public class ToolProperties {
 			return Arrays.asList(new JComponent[] {slider});
 		}
 	}
-	
+
 	public static class OpacityProperty extends SwingToolProperty {
 		private float value;
-		
+
 		public OpacityProperty( String id, String hrName, float defaultValue) {
+			this( id, hrName, defaultValue, 0);
+		}
+		public OpacityProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
 			this.hiName = hrName;
 			this.id = id;
+			this.mask = mask;
 		}
 
 		@Override public Float getValue() { return value; }
@@ -135,12 +143,16 @@ public class ToolProperties {
 	public static class ButtonProperty extends SwingToolProperty {
 		private final MasterControl master;	// I don't love this
 		private String command;
-		
+
 		public ButtonProperty( String id, String hrName, String actionCommand, MasterControl master) {
+			this( id, hrName, actionCommand, master, 0);
+		}
+		public ButtonProperty( String id, String hrName, String actionCommand, MasterControl master, int mask) {
 			this.command = actionCommand;
 			this.master = master;
 			this.hiName = hrName;
 			this.id = id;
+			this.mask = mask;
 		}
 
 		@Override public String getValue() { return command; }
@@ -171,11 +183,15 @@ public class ToolProperties {
 	
 	public static class CheckBoxProperty extends SwingToolProperty {
 		private boolean value;
-		
+
 		public CheckBoxProperty( String id, String hrName, boolean defaultValue) {
+			this(id, hrName, defaultValue, 0);
+		}
+		public CheckBoxProperty( String id, String hrName, boolean defaultValue, int mask) {
 			this.value = defaultValue;
 			this.id = id;
 			this.hiName = hrName;
+			this.mask = mask;
 		}
 		
 		@Override public Boolean getValue() {return value;}
@@ -215,12 +231,16 @@ public class ToolProperties {
 	public static class DropDownProperty extends SwingToolProperty {
 		private int value;
 		private String[] options;
-		
+
 		public DropDownProperty( String id, String hrName, int defaultValue, String[] options) {
+			this(id, hrName, defaultValue, options, 0);
+		}
+		public DropDownProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
 			this.value = defaultValue;
 			this.id = id;
 			this.hiName = hrName;
 			this.options = options;
+			this.mask = mask;
 		}
 		
 		@Override public Integer getValue() {return value;}
@@ -272,16 +292,19 @@ public class ToolProperties {
 		}
 	}
 	
-
 	public static class RadioButtonProperty extends SwingToolProperty {
 		private int value;
 		private String[] options;
-		
+
 		public RadioButtonProperty( String id, String hrName, int defaultValue, String[] options) {
+			this( id, hrName, defaultValue, options, 0);
+		}
+		public RadioButtonProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
 			this.value = defaultValue;
 			this.id = id;
 			this.hiName = hrName;
 			this.options = options;
+			this.mask = mask;
 		}
 		
 		@Override public Integer getValue() {return value;}
@@ -331,11 +354,15 @@ public class ToolProperties {
 
 	public static class FloatBoxProperty extends SwingToolProperty {
 		private float value;
-		
+
 		public FloatBoxProperty( String id, String hrName, float defaultValue) {
+			this( id, hrName, defaultValue, 0);
+		}
+		public FloatBoxProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
 			this.id = id;
 			this.hiName = hrName;
+			this.mask = mask;
 		}
 		
 		@Override public Float getValue() {return value;}
@@ -389,14 +416,18 @@ public class ToolProperties {
 	public static class DualFloatBoxProperty extends SwingToolProperty {
 		private float x, y;
 		private String _label1, _label2;
-		
+
 		public DualFloatBoxProperty( String id, String hrName, float defaultX, float defaultY, String label1, String label2) {
+			this(id, hrName, defaultX, defaultY, label1, label2, 0);
+		}
+		public DualFloatBoxProperty( String id, String hrName, float defaultX, float defaultY, String label1, String label2, int mask) {
 			this.x = defaultX;
 			this.y = defaultY;
 			this.id = id;
 			this.hiName = hrName;
 			this._label1 = label1;
 			this._label2 = label2;
+			this.mask = mask;
 		}
 		
 		@Override public Vec2 getValue() {return new Vec2(x,y);}
