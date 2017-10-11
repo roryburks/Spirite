@@ -139,8 +139,9 @@ public class RenderEngine
 		DEFAULT("Normal", 0), 
 		COLOR_CHANGE_HUE("As Color", 0xFF0000),
 		COLOR_CHANGE_FULL("As Color (fully)", 0xFF0000),
-		
-		DISOLVE("Disolve", 0b11110000_01010101),
+
+		DISOLVE("Disolve", 0b11011111_11111111),
+		//DISOLVE("Disolve", 0b01110010_00101111),
 
 		LIGHTEN("Lighten", 0),
 		SUBTRACT("Subtract", 0),

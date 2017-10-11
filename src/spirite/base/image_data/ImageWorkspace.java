@@ -291,7 +291,7 @@ public class ImageWorkspace {
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }
-	public GroupTree getGroupTree() { return groupTree; }
+	//public GroupTree getGroupTree() { return groupTree; }	// This probably shouldn't exist as it opens up the possibility of people creating all sorts of weird nodes un-linked to the GroupTree
 	
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
@@ -861,7 +861,6 @@ public class ImageWorkspace {
 			
 			return true;
 		}
-		
 	}
 	
 	

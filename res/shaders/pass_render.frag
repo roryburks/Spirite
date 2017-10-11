@@ -24,7 +24,7 @@ uniform int uComp;
 vec4 disolve( vec4 tex)
 {
 	if( uValue &
-			(1 << (   (int(gl_FragCoord.x) % 4) + (4*(int(gl_FragCoord.y) % 4)))))
+			(1 << (   (int(gl_FragCoord.x) % 4) + 4*( int(gl_FragCoord.y) %  4))))
 	{
 
 		return tex;
