@@ -137,7 +137,10 @@ public class RenderEngine
 	
 	public enum RenderMethod {
 		DEFAULT("Normal", 0), 
-		COLOR_CHANGE("As Color", 0xFF0000),
+		COLOR_CHANGE_HUE("As Color", 0xFF0000),
+		COLOR_CHANGE_FULL("As Color (fully)", 0xFF0000),
+		
+		DISOLVE("Disolve", 0b11110000_01010101),
 
 		LIGHTEN("Lighten", 0),
 		SUBTRACT("Subtract", 0),

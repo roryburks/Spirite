@@ -453,11 +453,16 @@ public class GLGraphics extends GraphicsContext{
 //		}
 		
 		switch( method) {
-		case COLOR_CHANGE:
+		case COLOR_CHANGE_HUE:
 			method_num = 1;
 			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
 			break;
-		case DEFAULT:
+		case COLOR_CHANGE_FULL:
+			method_num = 2;
+			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
+			break;
+		case DISOLVE:
+			method_num = 3;
 			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
 			break;
 		case LIGHTEN:
@@ -485,6 +490,9 @@ public class GLGraphics extends GraphicsContext{
 			break;
 		case OVERLAY:
 			method_num = 3;
+			break;
+		case DEFAULT:
+			GLGraphics.setCompositeBlend(intParams, Composite.SRC_OVER);
 			break;
 		}
 		intParams.addParam( new GLParameters.GLParam1f("uAlpha", render.getAlpha()));

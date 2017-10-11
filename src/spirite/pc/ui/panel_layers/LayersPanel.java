@@ -217,7 +217,7 @@ public class LayersPanel extends OmniComponent {
 		rcOptions.removeAll();
 		RenderTuple sel = ((RenderTuple)renderCombo.getSelectedItem());
 		switch( sel.method) {
-		case COLOR_CHANGE:
+		case COLOR_CHANGE_HUE:
 			renderer.ccPanel.setBackground(new Color(sel.value));
 			rcOptions.add(renderer.ccPanel);
 			break;
