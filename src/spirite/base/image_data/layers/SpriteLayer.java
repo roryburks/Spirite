@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import spirite.base.brains.RenderEngine.TransformedHandle;
+import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.GroupTree.LayerNode;

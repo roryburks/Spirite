@@ -9,7 +9,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import spirite.base.brains.RenderEngine.TransformedHandle;
+import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RenderProperties;

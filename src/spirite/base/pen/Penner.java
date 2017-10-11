@@ -16,14 +16,14 @@ import java.util.List;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.RenderSettings;
+import spirite.base.brains.SettingsManager;
+import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
-import spirite.base.brains.SettingsManager;
-import spirite.base.brains.ToolsetManager;
+import spirite.base.brains.renderer.RenderEngine;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.DrawEngine;

@@ -1,6 +1,5 @@
 package spirite.hybrid;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,17 +10,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager;
@@ -46,7 +45,7 @@ public class ToolProperties {
 		}
 		public SizeProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.id = id;
 			this.mask = mask;
 		}
@@ -66,7 +65,7 @@ public class ToolProperties {
 				}
 			};
 			slider.setValue( (float)value);
-			slider.setLabel( hiName + " : ");
+			slider.setLabel( hrName + " : ");
 			
 			binding.setLink( new DBSub() {
 				@Override public void doUIChange(Object newValue) {
@@ -94,7 +93,7 @@ public class ToolProperties {
 		}
 		public OpacityProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.id = id;
 			this.mask = mask;
 		}
@@ -120,7 +119,7 @@ public class ToolProperties {
 			};
 			
 			slider.setValue(value);
-			slider.setLabel(hiName + " : ");
+			slider.setLabel(hrName + " : ");
 
 			binding.setLink( new DBSub() {
 				@Override public void doUIChange(Object newValue) {
@@ -150,7 +149,7 @@ public class ToolProperties {
 		public ButtonProperty( String id, String hrName, String actionCommand, MasterControl master, int mask) {
 			this.command = actionCommand;
 			this.master = master;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.id = id;
 			this.mask = mask;
 		}
@@ -163,7 +162,7 @@ public class ToolProperties {
 		public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 				GroupLayout layout, ToolSettings settings) 
 		{
-			JButton button = new JButton(hiName);
+			JButton button = new JButton(hrName);
 			JPanel panel = new JPanel();
 			
 			button.setActionCommand( command);
@@ -190,7 +189,7 @@ public class ToolProperties {
 		public CheckBoxProperty( String id, String hrName, boolean defaultValue, int mask) {
 			this.value = defaultValue;
 			this.id = id;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.mask = mask;
 		}
 		
@@ -201,7 +200,7 @@ public class ToolProperties {
 		public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 				GroupLayout layout, ToolSettings settings) 
 		{
-			JCheckBox checkbox = new JCheckBox(hiName);
+			JCheckBox checkbox = new JCheckBox(hrName);
 			
 			checkbox.addActionListener(new ActionListener() {
 				@Override
@@ -238,7 +237,7 @@ public class ToolProperties {
 		public DropDownProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
 			this.value = defaultValue;
 			this.id = id;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.options = options;
 			this.mask = mask;
 		}
@@ -252,7 +251,7 @@ public class ToolProperties {
 				GroupLayout layout, ToolSettings settings) 
 		{
 			JComboBox<String> comboBox = new JComboBox<>();
-			JLabel label = new JLabel( hiName + ":");
+			JLabel label = new JLabel( hrName + ":");
 			label.setFont( Globals.getFont("toolset.dropdown"));
 			
 			// Init Components
@@ -302,7 +301,7 @@ public class ToolProperties {
 		public RadioButtonProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
 			this.value = defaultValue;
 			this.id = id;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.options = options;
 			this.mask = mask;
 		}
@@ -361,7 +360,7 @@ public class ToolProperties {
 		public FloatBoxProperty( String id, String hrName, float defaultValue, int mask) {
 			this.value = defaultValue;
 			this.id = id;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this.mask = mask;
 		}
 		
@@ -373,7 +372,7 @@ public class ToolProperties {
 		public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 				GroupLayout layout, ToolSettings settings) 
 		{
-			JLabel label = new JLabel( hiName + ":");
+			JLabel label = new JLabel( hrName + ":");
 			MTextFieldNumber textField = new MTextFieldNumber(true, true);
 			
 			label.setFont( Globals.getFont("toolset.dropdown"));
@@ -424,7 +423,7 @@ public class ToolProperties {
 			this.x = defaultX;
 			this.y = defaultY;
 			this.id = id;
-			this.hiName = hrName;
+			this.hrName = hrName;
 			this._label1 = label1;
 			this._label2 = label2;
 			this.mask = mask;
@@ -441,7 +440,7 @@ public class ToolProperties {
 		public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 				GroupLayout layout, ToolSettings settings) 
 		{
-			JLabel labelMain = new JLabel(hiName + ":");
+			JLabel labelMain = new JLabel(hrName + ":");
 			JLabel label1 = new JLabel( _label1);
 			JLabel label2 = new JLabel( _label2);
 			MTextFieldNumber textField1 = new MTextFieldNumber(true, true);

@@ -25,7 +25,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -33,7 +32,6 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -466,7 +464,7 @@ public class BetterTree extends JPanel {
 			p = SwingUtilities.convertPoint( 
 					evt.getDragSourceContext().getComponent(), p, BetterTree.this);
 			
-			if( !contains(p) && dragging != null) {
+			if( !BetterTree.this.contains(p) && dragging != null) {
 				DnDBinding binding = dragging.getBinding();
 				if( binding != null)
 					binding.dragOut();

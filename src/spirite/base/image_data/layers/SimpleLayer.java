@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import spirite.base.brains.CacheManager.CachedImage;
-import spirite.base.brains.RenderEngine.RenderSettings;
-import spirite.base.brains.RenderEngine.TransformedHandle;
+import spirite.base.brains.renderer.CacheManager.CachedImage;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
+import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;

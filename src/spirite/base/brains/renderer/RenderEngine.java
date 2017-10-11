@@ -1,4 +1,4 @@
-package spirite.base.brains;
+package spirite.base.brains.renderer;
 
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -16,11 +16,16 @@ import java.util.Set;
 
 import javax.swing.Timer;
 
-import spirite.base.brains.CacheManager.CachedImage;
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.SettingsManager;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.brains.renderer.CacheManager.CachedImage;
+import spirite.base.brains.renderer.sources.LayerRenderSource;
+import spirite.base.brains.renderer.sources.NodeRenderSource;
+import spirite.base.brains.renderer.sources.ReferenceRenderSource;
+import spirite.base.brains.renderer.sources.RenderSource;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
-import spirite.base.graphics.HybridNodeRenderer;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -61,7 +66,6 @@ import spirite.hybrid.MDebug;
  *
  */
 public class RenderEngine 
-	implements MImageObserver, MWorkspaceObserver, MReferenceObserver
 {
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final Timer sweepTimer;
@@ -79,10 +83,12 @@ public class RenderEngine
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		
-		master.addWorkspaceObserver(this);
+		System.out.println("io:"+imageObserver);
+		
+		master.addWorkspaceObserver(workspaceObserver);
 		for( ImageWorkspace workspace : master.getWorkspaces()) {
-			workspace.addImageObserver( this);
-			workspace.getReferenceManager().addReferenceObserve(this);
+			workspace.addImageObserver( imageObserver);
+			workspace.getReferenceManager().addReferenceObserve(referenceObserver);
 		}
 		
 		// 3-second timer that checks for cache time-outs
@@ -100,7 +106,7 @@ public class RenderEngine
 		return "Rendering Engine";
 	}
 	
-	/** Clears the cache of entries which haven't been used in a long time. */
+	/** Clears the cache of entries which haven't been used in MAX_CACHE_RESERVE ms. */
 	public void ageOutCache() {
 
 		long currentTime = System.currentTimeMillis();
@@ -159,16 +165,15 @@ public class RenderEngine
 		GroupNode root = (workspace.isUsingAnimationView()) 
 				? workspace.getAnimationManager().getView().getRoot()
 				: workspace.getRootNode();
-		NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);
+		HybridNodeRenderer renderer = new HybridNodeRenderer(root);
 		renderer.render(settings, context, trans);
 	}
 	
 	/** Renders the front or back Reference Image. */
 	public void renderReference( ImageWorkspace workspace, GraphicsContext context, boolean front) {
 		List<Reference> refList = workspace.getReferenceManager().getList(front);
-		for( Reference ref : refList ) {
+		for( Reference ref : refList )
 			ref.draw(context);
-		}
 	}
 	
 	/** Renders the image using the given RenderSettings, accessing it from the
@@ -465,484 +470,113 @@ public class RenderEngine
 	}
 	
 	public RenderSource getDefaultRenderTarget( ImageWorkspace workspace) {
-		return new NodeRenderSource(workspace.getRootNode());
+		return new NodeRenderSource(workspace.getRootNode(), master);
 	}
 	public RenderSource getNodeRenderTarget( Node node) {
 		if( node instanceof LayerNode) {
 			return new LayerRenderSource(node.getContext(),((LayerNode) node).getLayer());
 		}
 		else if( node instanceof GroupNode)
-			return new NodeRenderSource((GroupNode) node);
+			return new NodeRenderSource((GroupNode) node, master);
 		
 		return null;
 	}
 	
-	
-	// ================
-	// ==== Render Sources
-	/**
-	 * A RenderSource corresponds to an object which can be rendered and it implements
-	 * everything needed to perform a Render using certain RenderSettings.
-	 *
-	 * Note: It is important that subclasses overload the equals and hashCode methods
-	 * of each RenderSource since the RenderEngine uses them to determine if you
-	 * are rendering the same thing as something that has already been rendered.
-	 * If you just go on the built-in uniqueness test and pass them through renderImage
-	 * then unless you are storing the RenderSource locally yourself (which is possible
-	 * and not harmful but defeats the purpose of RenderEngine), then RenderEngine 
-	 * will get clogged remembering different renders of the same image.
-	 */
-	public static abstract class RenderSource {
-		final ImageWorkspace workspace;
-		RenderSource( ImageWorkspace workspace) {this.workspace = workspace;}
-		public abstract int getDefaultWidth();
-		public abstract int getDefaultHeight();
-		public abstract List<ImageHandle> getImagesReliedOn();
-		public List<Node> getNodesReliedOn() {return new ArrayList<>(0);}
-		public abstract RawImage render( RenderSettings settings);
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((workspace == null) ? 0 : workspace.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			RenderSource other = (RenderSource) obj;
-			if (workspace == null) {
-				if (other.workspace != null)
-					return false;
-			} else if (!workspace.equals(other.workspace))
-				return false;
-			return true;
-		}
-	}
-	
-	/** 
-	 * This Class will draw a group as it's "intended" to be seen,
-	 * requiring extra intermediate image data to combine the layers
-	 * properly.
-	 */
-	public class NodeRenderSource extends RenderSource {
-		private final GroupNode root;
-		public NodeRenderSource( GroupNode node) {
-			super(node.getContext());
-			this.root = node;
-		}
-		
-		@Override
-		public int getDefaultWidth() {
-			return workspace.getWidth();
-		}
-		@Override
-		public int getDefaultHeight() {
-			return workspace.getHeight();
-		}
-		@Override
-		public List<Node> getNodesReliedOn() {
-			List<Node> list =  new LinkedList<>();
-			list.addAll( root.getAllAncestors());
-			return list;
-		}
-		@Override
-		public List<ImageHandle> getImagesReliedOn() {
-			// Get a list of all layer nodes then get a list of all ImageData
-			//	contained within those nodes
-			List<Node> layerNodes = root.getAllNodesST( new NodeValidator() {
-				@Override
-				public boolean isValid(Node node) {
-					return (node instanceof LayerNode);
-				}
-				@Override public boolean checkChildren(Node node) {return true;}
-			});
-			
-			List<ImageHandle> list = new LinkedList<>();
-			
-			Iterator<Node> it = layerNodes.iterator();
-			while( it.hasNext()){
-				for( ImageHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
-					// Avoiding duplicates should make the intersection method quicker
-					if( list.indexOf(data) == -1)
-						list.add(data);
-				}
-			}
-			return list;
-		}
-		
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((root == null) ? 0 : root.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			NodeRenderSource other = (NodeRenderSource) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (root == null) {
-				if (other.root != null)
-					return false;
-			} else if (!root.equals(other.root))
-				return false;
-			return true;
-		}
-		private RenderEngine getOuterType() {
-			return RenderEngine.this;
-		}
-
-		@Override
-		public RawImage render(RenderSettings settings) {
-//			buildCompositeLayer(workspace);
-			
-			GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
-			
-			RawImage img = HybridHelper.createImage(settings.width, settings.height);
-			GraphicsContext gc = img.getGraphics();
-			gc.clear();
-			NodeRenderer renderer = new HybridNodeRenderer(RenderEngine.this, root);
-			renderer.render(settings, gc, null);
-			
-			return img;
-		}
-
-	}
-	
-	/** */
-	public abstract class NodeRenderer {
-		protected final GroupNode root;
-		protected NodeRenderer( GroupNode root) { this.root = root;}
-		public abstract void render(RenderSettings settings, GraphicsContext context, MatTrans trans);
-		
-		/** Determines the number of images needed to properly render 
-		 * the given RenderSettings.  This number is equal to largest Group
-		 * depth of any visible node. */
-		protected int _getNeededImagers(RenderSettings settings) {
-			NodeValidator validator = new NodeValidator() {			
-				@Override
-				public boolean isValid(Node node) {
-					return (node.getRender().isVisible() && !(node instanceof GroupNode)
-							&& node.getChildren().size() == 0);
-				}
-
-				@Override
-				public boolean checkChildren(Node node) {
-					return (node.getRender().isVisible());
-				}
-			};
-			
-			List<Node> list = root.getAllNodesST(validator);
-
-			int max = 0;
-			for( Node ancestor : list) {
-				int i = ancestor.getDepthFrom(root);
-				if( i > max) max = i;
-			}
-			
-			return max;
-		}
-	}
-
-
-	
-	/** This renders an Image rather plainly. */
-	public static class ImageRenderSource extends RenderSource {
-		private final ImageHandle handle;
-		public ImageRenderSource( ImageHandle handle) {
-			super(handle.getContext());
-			this.handle = handle;
-		}
-		
-		@Override
-		public int getDefaultWidth() {
-			return handle.getWidth();
-		}
-		@Override
-		public int getDefaultHeight() {
-			return handle.getHeight();
-		}
-
-		@Override
-		public List<ImageHandle> getImagesReliedOn() {
-			return Arrays.asList(handle);
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + ((handle == null) ? 0 : handle.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ImageRenderSource other = (ImageRenderSource) obj;
-			if (handle == null) {
-				if (other.handle != null)
-					return false;
-			} else if (!handle.equals(other.handle))
-				return false;
-			return true;
-		}
-
-		@Override
-		public RawImage render(RenderSettings settings) {
-			RawImage img = HybridHelper.createImage(settings.width, settings.height);
-			
-			GraphicsContext gc = img.getGraphics();
-			
-//			g2.setRenderingHints(settings.hints);
-			gc.scale( settings.width / (float)handle.getWidth(), 
-					  settings.height / (float)handle.getHeight());
-			handle.drawLayer( gc, null);
-			
-//			g.dispose();
-			return img;
-		}
-	}
-
-	
-	public static class LayerRenderSource extends RenderSource {
-		private final Layer layer;
-		public LayerRenderSource( ImageWorkspace workspace, Layer layer) {
-			super(workspace);
-			this.layer = layer;
-		}
-		
-		@Override
-		public int getDefaultWidth() {
-			return layer.getWidth();
-		}
-
-		@Override
-		public int getDefaultHeight() {
-			return layer.getHeight();
-		}
-
-		@Override
-		public List<ImageHandle> getImagesReliedOn() {
-			return layer.getImageDependencies();
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + ((layer == null) ? 0 : layer.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			LayerRenderSource other = (LayerRenderSource) obj;
-			if (layer == null) {
-				if (other.layer != null)
-					return false;
-			} else if (!layer.equals(other.layer))
-				return false;
-			return true;
-		}
-
-		@Override
-		public RawImage render(RenderSettings settings) {
-			RawImage img = HybridHelper.createImage(settings.width, settings.height);
-			
-			GraphicsContext gc = img.getGraphics();
-			
-			gc.scale( settings.width / (float)layer.getWidth(),
-					settings.height / (float)layer.getHeight());
-			gc.translate(-layer.getDynamicOffsetX(), -layer.getDynamicOffsetY());
-			
-			layer.draw(gc);
-			return img;
-		}
-	}
-
-	/** This renders the Reference section, either the front section (the part placed
-	 * over the image) or the back section (the part placed behind). */
-	public static class ReferenceRenderSource extends RenderSource {
-
-		private final boolean front;
-		public ReferenceRenderSource( ImageWorkspace workspace, boolean front) {
-			super(workspace);
-			this.front = front;
-		}
-		
-		@Override
-		public int getDefaultWidth() { return workspace.getWidth(); }
-		@Override
-		public int getDefaultHeight() { return workspace.getHeight(); }
-		@Override
-		public List<ImageHandle> getImagesReliedOn() {
-			return workspace.getReferenceManager().getDependencies(front);
-		}
-
-		@Override
-		public RawImage render(RenderSettings settings) {
-			RawImage img = HybridHelper.createImage(settings.width, settings.height);
-			
-			GraphicsContext gc = img.getGraphics();
-			
-			List<Reference> refList = workspace.getReferenceManager().getList(front);
-			float rw = settings.width / (float)workspace.getWidth();
-			float rh = settings.height / (float)workspace.getHeight();
-			gc.scale( rw, rh);
-					
-			for( Reference ref : refList ) {
-				ref.draw(gc);
-			}
-			
-//			gc.dispose();
-			return img;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + (front ? 1231 : 1237);
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ReferenceRenderSource other = (ReferenceRenderSource) obj;
-			if (front != other.front)
-				return false;
-			return true;
-		}
-	}
-	
-	
 	// ===================
 	// ==== Implemented Interfaces
-
-	// :::: MImageObserver
-	@Override	public void structureChanged(StructureChangeEvent evt) {	}
-	@Override
-	public void imageChanged( ImageChangeEvent evt) {
-		// Remove all caches whose renderings would have been effected by this change
-		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
-		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
+	private final MImageObserver imageObserver = new MImageObserver() {
+		@Override public void structureChanged(StructureChangeEvent evt) {}
+		@Override public void imageChanged(ImageChangeEvent evt) {
+			// Remove all caches whose renderings would have been effected by this change
+			Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
+			Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 
 
-		List<ImageHandle> relevantData = evt.getChangedImages();
-		List<ImageHandle> relevantDataSel = evt.getChangedImages();
-		if( evt.isSelectionLayerChange() && evt.getWorkspace().getSelectionEngine().isLifted()
-				&& evt.getWorkspace().buildActiveData() != null) 
-		{
-			relevantDataSel.add(  evt.getWorkspace().buildActiveData().handle);
+			List<ImageHandle> relevantData = evt.getChangedImages();
+			List<ImageHandle> relevantDataSel = evt.getChangedImages();
+			if( evt.isSelectionLayerChange() && evt.getWorkspace().getSelectionEngine().isLifted()
+					&& evt.getWorkspace().buildActiveData() != null) 
+			{
+				relevantDataSel.add(  evt.getWorkspace().buildActiveData().handle);
+			}
+			while( it.hasNext()) {
+				Entry<RenderSettings,CachedImage> entry = it.next();
+				
+				RenderSettings setting = entry.getKey();
+				
+				if( setting.target.workspace == evt.getWorkspace()) {
+					// Make sure that the particular ImageData changed is
+					//	used by the Cache (if not, don't remove it)
+					List<ImageHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
+					dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
+					
+					List<Node> nodesInCommon = evt.getChangedNodes();
+					nodesInCommon.retainAll(setting.target.getNodesReliedOn());
+					
+					if( !dataInCommon.isEmpty() || !nodesInCommon.isEmpty()) {
+						// Flush the visual data from memory, then remove the entry
+						entry.getValue().flush();
+						it.remove();
+					}
+				}
+			}
+			thumbnailManager.imageChanged(evt);
 		}
-		while( it.hasNext()) {
-			Entry<RenderSettings,CachedImage> entry = it.next();
+	};
+	
+	private final MWorkspaceObserver workspaceObserver = new MWorkspaceObserver() {
+		@Override public void removeWorkspace(ImageWorkspace ws) {}
+		@Override public void newWorkspace(ImageWorkspace ws) {
+			ws.addImageObserver( imageObserver);
+			ws.getReferenceManager().addReferenceObserve(referenceObserver);
+		}
+		
+		@Override
+		public void currentWorkspaceChanged(ImageWorkspace ws, ImageWorkspace previous) {
+			// Remove all caches whose workspace is the removed workspace
+			Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
 			
-			RenderSettings setting = entry.getKey();
-			
-			if( setting.target.workspace == evt.getWorkspace()) {
-				// Make sure that the particular ImageData changed is
-				//	used by the Cache (if not, don't remove it)
-				List<ImageHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
-				dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
+			Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
+		
+			while( it.hasNext()) {
+				Entry<RenderSettings,CachedImage> entry = it.next();
 				
-				List<Node> nodesInCommon = evt.getChangedNodes();
-				nodesInCommon.retainAll(setting.target.getNodesReliedOn());
-				
-				if( !dataInCommon.isEmpty() || !nodesInCommon.isEmpty()) {
+				RenderSettings setting = entry.getKey();
+				if( setting.target.workspace == ws) {
 					// Flush the visual data from memory, then remove the entry
 					entry.getValue().flush();
 					it.remove();
 				}
 			}
 		}
-		thumbnailManager.imageChanged(evt);
-	}
+	};
 	
-
-	// :::: MWorkspaceObserver
-	@Override	public void currentWorkspaceChanged( ImageWorkspace ws, ImageWorkspace old) {}
-	@Override	public void newWorkspace( ImageWorkspace ws) {
-		ws.addImageObserver( this);
-		ws.getReferenceManager().addReferenceObserve(this);
-	}
-	@Override
-	public void removeWorkspace( ImageWorkspace ws) {
-		// Remove all caches whose workspace is the removed workspace
-		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
-		
-		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
-	
-		while( it.hasNext()) {
-			Entry<RenderSettings,CachedImage> entry = it.next();
+	private final MReferenceObserver referenceObserver = new MReferenceObserver() {
+		@Override public void referenceStructureChanged(boolean hard) {}
+		@Override
+		public void toggleReference(boolean referenceMode) {
+			// TODO: Make this far more discriminating with a proper Event object
+			//	passing workspace and whether the front/back are changed
+			//
+			//	Low Priority: References are changed rarely, it's tedious to determine
+			//	if front/back are effected often, and if a Workspace isn't being effected
+			//	by a reference change chances are it isn't drawing the reference anyway
 			
-			RenderSettings setting = entry.getKey();
-			if( setting.target.workspace == ws) {
-				// Flush the visual data from memory, then remove the entry
-				entry.getValue().flush();
-				it.remove();
+
+			Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
+			
+			Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
+		
+			while( it.hasNext()) {
+				Entry<RenderSettings,CachedImage> entry = it.next();
+				
+				RenderSettings setting = entry.getKey();
+				if( setting.target instanceof ReferenceRenderSource) {
+					// Flush the visual data from memory, then remove the entry
+					entry.getValue().flush();
+					it.remove();
+				}
 			}
 		}
-	}
-	@Override
-	public void referenceStructureChanged(boolean hard) {
-		// TODO: Make this far more discriminating with a proper Event object
-		//	passing workspace and whether the front/back are changed
-		//
-		//	Low Priority: References are changed rarely, it's tedious to determine
-		//	if front/back are effected often, and if a Workspace isn't being effected
-		//	by a reference change chances are it isn't drawing the reference anyway
-		
-
-		Set<Entry<RenderSettings,CachedImage>> entrySet = imageCache.entrySet();
-		
-		Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
-	
-		while( it.hasNext()) {
-			Entry<RenderSettings,CachedImage> entry = it.next();
-			
-			RenderSettings setting = entry.getKey();
-			if( setting.target instanceof ReferenceRenderSource) {
-				// Flush the visual data from memory, then remove the entry
-				entry.getValue().flush();
-				it.remove();
-			}
-		}
-	}
-	@Override	public void toggleReference(boolean referenceMode) {}
-
+	};
 }

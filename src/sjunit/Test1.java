@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.RenderEngine.RenderSettings;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
 import spirite.base.image_data.DrawEngine.StrokeAction;
 import spirite.base.image_data.GroupTree;

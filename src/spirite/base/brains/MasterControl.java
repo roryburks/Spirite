@@ -14,9 +14,11 @@ import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.brains.RenderEngine.RenderSettings;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.renderer.CacheManager;
+import spirite.base.brains.renderer.RenderEngine;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
@@ -113,10 +115,6 @@ public class MasterControl
 //		glcache = new GLCache(this);
 		
 		settingsManager.setGL( true);
-//		System.out.println(settingsManager.glMode());
-//		initGL();
-		
-
 
         // As of now I see no reason to dynamically construct this with a series 
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make
@@ -132,6 +130,7 @@ public class MasterControl
         	dialog
         };
         
+        // One of the few usages of invokeLater that seems appropriate
         SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
@@ -173,8 +172,6 @@ public class MasterControl
 					engine.init(gl);
 				}
 			});
-//    		GLCore.in
-//    		GLEngine.initialize();
     		glcache = new GLCache(this);
     		
     		// TODO: Kind of bad

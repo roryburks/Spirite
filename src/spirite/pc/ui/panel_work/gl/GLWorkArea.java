@@ -17,7 +17,7 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.RenderEngine;
+import spirite.base.brains.renderer.RenderEngine;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLGraphics;

@@ -1,20 +1,21 @@
-package spirite.base.graphics;
+package spirite.base.brains.renderer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.NodeRenderer;
-import spirite.base.brains.RenderEngine.RenderSettings;
-import spirite.base.brains.RenderEngine.TransformedHandle;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
+import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuiltImageData;
@@ -29,7 +30,8 @@ import spirite.hybrid.MDebug.ErrorType;
  * 
  * !!! Note: 
  */
-public class HybridNodeRenderer extends NodeRenderer{
+public class HybridNodeRenderer {
+	protected final GroupNode root;
 	
 	private final ImageWorkspace workspace;
 	
@@ -37,12 +39,11 @@ public class HybridNodeRenderer extends NodeRenderer{
 	private float ratioW;
 	private float ratioH;
 
-	public HybridNodeRenderer(RenderEngine renderEngine, GroupNode root) {
-		renderEngine.super(root);
+	public HybridNodeRenderer(GroupNode root) {
+		this.root= root;
 		this.workspace = root.getContext();
 	}
 
-	@Override
 	public void render(RenderSettings settings, GraphicsContext gc, MatTrans trans) {
 		try {
 			buildCompositeLayer(workspace);
@@ -258,5 +259,34 @@ public class HybridNodeRenderer extends NodeRenderer{
 			gc.setTransform(oldTansform);
 			
 		}
+	}
+	
+
+	/** Determines the number of images needed to properly render 
+	 * the given RenderSettings.  This number is equal to largest Group
+	 * depth of any visible node. */
+	protected int _getNeededImagers(RenderSettings settings) {
+		NodeValidator validator = new NodeValidator() {			
+			@Override
+			public boolean isValid(Node node) {
+				return (node.getRender().isVisible() && !(node instanceof GroupNode)
+						&& node.getChildren().size() == 0);
+			}
+
+			@Override
+			public boolean checkChildren(Node node) {
+				return (node.getRender().isVisible());
+			}
+		};
+		
+		List<Node> list = root.getAllNodesST(validator);
+
+		int max = 0;
+		for( Node ancestor : list) {
+			int i = ancestor.getDepthFrom(root);
+			if( i > max) max = i;
+		}
+		
+		return max;
 	}
 }

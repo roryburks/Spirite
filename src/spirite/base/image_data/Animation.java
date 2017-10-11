@@ -2,7 +2,7 @@ package spirite.base.image_data;
 
 import java.util.List;
 
-import spirite.base.brains.RenderEngine.TransformedHandle;
+import spirite.base.brains.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;

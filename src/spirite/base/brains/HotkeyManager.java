@@ -150,7 +150,6 @@ public class HotkeyManager {
     
     public void setCommand( int key, int modifier, String command) {
     	hotkey_map.put( new Hotkey( key, modifier), command);
-//    	hotkey_map.put(arg0, arg1)
     }
     
 

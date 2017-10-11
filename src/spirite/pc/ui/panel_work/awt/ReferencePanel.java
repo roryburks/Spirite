@@ -7,9 +7,9 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.RenderEngine;
-import spirite.base.brains.RenderEngine.ReferenceRenderSource;
-import spirite.base.brains.RenderEngine.RenderSettings;
+import spirite.base.brains.renderer.RenderEngine;
+import spirite.base.brains.renderer.RenderEngine.RenderSettings;
+import spirite.base.brains.renderer.sources.ReferenceRenderSource;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace;

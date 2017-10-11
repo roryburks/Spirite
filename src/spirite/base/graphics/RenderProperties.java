@@ -1,6 +1,6 @@
 package spirite.base.graphics;
 
-import spirite.base.brains.RenderEngine.RenderMethod;
+import spirite.base.brains.renderer.RenderEngine.RenderMethod;
 
 public class RenderProperties {
 	private final Trigger trigger;

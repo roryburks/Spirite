@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,7 +110,8 @@ public class AnimationSchemePanel extends JPanel
 			int s = animation.getStart();
 			int e = animation.getEnd();
 			AnimationState as = ws.getAnimationManager().getAnimationState(animation);
-			int selT = (int)Math.floor(as.getSelectedMetronome());
+			
+			int selT = (as == null)?0:(int)Math.floor(as.getSelectedMetronome());
 			
 			for( int t=s; t<e; ++t) {
 				Color c = Color.WHITE;
@@ -265,25 +267,6 @@ public class AnimationSchemePanel extends JPanel
 
 		content.setLayout(layout);
 	}
-	
-	private void initBindings() {
-//		content.addMouseListener( new MouseAdapter() {
-//			@Override
-//			public void mouseClicked(MouseEvent e) {
-//				if( e.getButton() == MouseEvent.BUTTON1) {
-//					int tick = TickAtY( e.getY());
-//					if( tick >= animation.getStart() && tick <= animation.getEnd())
-//						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
-//				}
-//			}
-//		});
-	}
-	
-//	@Override
-//	protected void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//
-//	}
 	
 	private Rectangle GetFrameBounds( int layer, int tick) {
 		
@@ -462,8 +445,9 @@ public class AnimationSchemePanel extends JPanel
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if( e.getButton() == MouseEvent.BUTTON1)
+				if( e.getButton() == MouseEvent.BUTTON1) {
 					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(tick);
+				}
 			}
 			
 			@Override
@@ -702,6 +686,12 @@ public class AnimationSchemePanel extends JPanel
 						setState( new DraggingFrameState());
 					}
 				}
+				
+				ws.setSelectedNode(frame.getLayerNode());
+				
+				Point p = e.getPoint();
+				p = SwingUtilities.convertPoint( FramePanel.this, p, content);
+				ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(TickAtY(p.y));
 				
 				super.mousePressed(e);
 			}

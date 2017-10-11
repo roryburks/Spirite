@@ -5,7 +5,7 @@ import java.awt.geom.Ellipse2D;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.brains.RenderEngine.RenderMethod;
+import spirite.base.brains.renderer.RenderEngine.RenderMethod;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;

@@ -1,34 +1,23 @@
 package spirite.pc.ui.panel_toolset;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
@@ -37,14 +26,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
-import spirite.base.util.glmath.Vec2;
-import spirite.hybrid.Globals;
 import spirite.hybrid.ToolProperties.SwingToolProperty;
 import spirite.pc.ui.OmniFrame.OmniComponent;
-import spirite.pc.ui.components.MTextFieldNumber;
-import spirite.pc.ui.components.SliderPanel;
-import spirite.pc.ui.panel_toolset.PropertyPanels.SizeSlider;
 
 public class ToolSettingsPanel extends OmniComponent
 	implements MToolsetObserver, MWorkspaceObserver, MSelectionEngineObserver, ActionListener

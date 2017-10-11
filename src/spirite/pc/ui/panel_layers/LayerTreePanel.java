@@ -45,7 +45,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.brains.RenderEngine;
+import spirite.base.brains.renderer.RenderEngine;
 import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;

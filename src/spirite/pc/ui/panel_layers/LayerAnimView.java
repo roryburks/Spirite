@@ -204,13 +204,6 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	// AnimationStructureObserver
 	@Override
 	public void animationAdded(AnimationStructureEvent evt) {
-
-		// !!! DEBUG
-		ws.getAnimationManager().getView().addNode(evt.getAnimation());
-		// !!! DEBUG
-//		AnimationSchemePanel newPanel = new AnimationSchemePanel(master, (FixedFrameAnimation)evt.getAnimation());
-//		panels.add(newPanel);
-//		tree.AddRoot( tree.new LeafNode(newPanel));
 		Rebuild();
 	}
 
@@ -238,11 +231,6 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 			ws.getAnimationManager().addAnimationStructureObserver(this);
 			ws.getAnimationManager().getView().addAnimationViewObserver(this);
 		}
-		
-		// !!! DEBUG
-		for( Animation a : ws.getAnimationManager().getAnimations())
-			ws.getAnimationManager().getView().addNode(a);
-		// !!! DEBUG
 		
 		SwingUtilities.invokeLater( new Runnable() {
 			

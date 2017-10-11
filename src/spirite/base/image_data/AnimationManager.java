@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import spirite.base.brains.RenderEngine.RenderMethod;
+import spirite.base.brains.renderer.RenderEngine.RenderMethod;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;

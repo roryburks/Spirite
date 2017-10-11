@@ -22,7 +22,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.RenderEngine.RenderMethod;
+import spirite.base.brains.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.hybrid.Globals;

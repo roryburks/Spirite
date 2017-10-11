@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
-import spirite.base.util.glmath.Vec2;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
-import spirite.hybrid.ToolProperties.*;
+import spirite.hybrid.ToolProperties.ButtonProperty;
+import spirite.hybrid.ToolProperties.CheckBoxProperty;
+import spirite.hybrid.ToolProperties.DropDownProperty;
+import spirite.hybrid.ToolProperties.DualFloatBoxProperty;
+import spirite.hybrid.ToolProperties.FloatBoxProperty;
+import spirite.hybrid.ToolProperties.OpacityProperty;
+import spirite.hybrid.ToolProperties.RadioButtonProperty;
+import spirite.hybrid.ToolProperties.SizeProperty;
 
 /**
  * The ToolsetManager manages the set of Tools available, which tool is
@@ -184,11 +188,11 @@ public class ToolsetManager
     public static abstract class Property
     {
         protected String id;
-        protected String hiName;
+        protected String hrName;
         protected int mask;
 
         public String getId() {return id;}
-        public String getName() {return hiName;}
+        public String getName() {return hrName;}
         public int getMask() {return mask;}
         
         public abstract Object getValue();

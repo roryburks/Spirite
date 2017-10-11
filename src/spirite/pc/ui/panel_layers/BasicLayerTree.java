@@ -109,7 +109,6 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		System.out.println("TEST");
 		if( ws != null) {
 			ws.getAnimationManager().removeAnimationStructureObserver(this);;
 			ws.removeImageObserver(this);
