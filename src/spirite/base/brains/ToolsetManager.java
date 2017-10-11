@@ -12,6 +12,7 @@ import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.ToolProperties.*;
 
 /**
  * The ToolsetManager manages the set of Tools available, which tool is
@@ -22,6 +23,7 @@ import spirite.hybrid.MDebug.ErrorType;
 public class ToolsetManager
         implements CommandExecuter
 {
+	private final MasterControl master;
 
     public static enum Tool {
         PEN("Pen", 0),
@@ -57,7 +59,8 @@ public class ToolsetManager
     private final Map<Cursor, Tool> selected = new EnumMap<>(Cursor.class);
     private final Map<Tool,ToolSettings> toolSettings = new HashMap<>();
 
-    public ToolsetManager() {
+    public ToolsetManager(MasterControl master) {
+    	this.master = master;
         selected.put(Cursor.MOUSE, Tool.PEN);
         selected.put(Cursor.STYLUS, Tool.PEN);
         selected.put(Cursor.ERASER, Tool.ERASER);
@@ -150,7 +153,7 @@ public class ToolsetManager
         public Object getValue( String id) {
             for( int i=0; i<properties.length; ++i) {
                 if( properties[i].id.equals(id)) {
-                    return properties[i].value;
+                    return properties[i].getValue();
                 }
             }
 
@@ -160,9 +163,7 @@ public class ToolsetManager
         public void setValue( String id, Object value) {
             for( int i=0; i<properties.length; ++i) {
                 if( properties[i].id.equals(id)) {
-                    if(!getValueClassFromType(properties[i].type).isInstance(value))
-                        throw new ClassCastException("Value type does not match Property scheme.");
-                    properties[i].value = value;
+                    properties[i].setValue(value);
                     triggerToolsetPropertyChanged( this.tool, properties[i]);
                 }
             }
@@ -171,30 +172,29 @@ public class ToolsetManager
         /** Extra Data is data stored with certain PropertyType's, usually
          * StringArrays of Human-Readable formats of the options the property has,
          * stored for constructing the UI Component.*/
-        public Object getExtra(String id) {
-            for( int i=0; i<properties.length; ++i) {
-                if( properties[i].id.equals(id)) {
-                    return properties[i].extra;
-                }
-            }
-            return null;
-        }
+//        public Object getExtra(String id) {
+//            for( int i=0; i<properties.length; ++i) {
+//                if( properties[i].id.equals(id)) {
+//                    return properties[i].extra;
+//                }
+//            }
+//            return null;
+//        }
     }
-    public static class Property
+    public static abstract class Property
     {
-        String id;
-        PropertyType type;
-        String hiName;
-        Object value;
-        Object extra;
-        int mask;
+        protected String id;
+        protected PropertyType type;
+        protected String hiName;
+        protected int mask;
 
         public String getId() {return id;}
         public PropertyType getType() {return type;}
         public String getName() {return hiName;}
-        public Object getValue() {return value;}
-        public Object getExtra() {return extra;}
         public int getMask() {return mask;}
+        
+        public abstract Object getValue();
+        protected abstract void setValue(Object newValue);
     }
 
     public enum PropertyType {
@@ -212,148 +212,81 @@ public class ToolsetManager
     // =======================
     // ==== Setting Schemes
     private ToolSettings constructPenSettings() {
-        final Object[][] scheme = {
-                {"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
-                {"width", PropertyType.SIZE, "Width", 5.0f},
-                {"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
+        Property[] props = {
+	        	new OpacityProperty("alpha", "Opacity", 1.0f),
+	        	new SizeProperty("width","Width", 5.0f),
+	        	new CheckBoxProperty("hard","Hard Edged",false)
         };
 
-        return constructFromScheme(scheme, Tool.PEN);
+        return constructFromScheme(props, Tool.PEN);
     }
     private ToolSettings constructEraseSettings() {
-        final Object[][] scheme = {
-                {"alpha", PropertyType.OPACITY, "Opacity", 5.0f},
-                {"width",  PropertyType.SIZE, "Width", 5.0f},
-                {"hard", PropertyType.CHECK_BOX, "Hard Edged", false},
+        Property[] props = {
+            	new OpacityProperty("alpha", "Opacity", 1.0f),
+            	new SizeProperty("width","Width", 5.0f),
+            	new CheckBoxProperty("hard","Hard Edged",false)
         };
 
-        return constructFromScheme(scheme, Tool.ERASER);
+        return constructFromScheme(props, Tool.ERASER);
     }
     private ToolSettings constructPixelSettings() {
-        final Object[][] scheme = {
-                {"alpha", PropertyType.OPACITY, "Opacity", 1.0f},
+        Property[] props = {
+        		new OpacityProperty("alpha", "Opacity", 1.0f)
         };
 
-        return constructFromScheme(scheme, Tool.PIXEL);
+        return constructFromScheme(props, Tool.PIXEL);
     }
     private ToolSettings constructBoxSelectionSettings() {
-        final Object[][] scheme = {
-                {"shape", PropertyType.DROP_DOWN, "Shape", 0, 0,
-                        new String[]{"Rectangle","Oval"}},
+        Property[] props = {
+        		new DropDownProperty("shape","Shape", 0, new String[]{"Rectangle","Oval"})
         };
 
-        return constructFromScheme(scheme, Tool.BOX_SELECTION);
+        return constructFromScheme(props, Tool.BOX_SELECTION);
     }
     private ToolSettings constructCropperSettings() {
-        final Object[][] scheme = {
-                {"cropSelection", PropertyType.BUTTON, "Crop Selection", "draw.cropSelection",  DISABLE_ON_NO_SELECTION},
-                {"quickCrop", PropertyType.CHECK_BOX, "Crop on Finish", false},
-                {"shrinkOnly", PropertyType.CHECK_BOX, "Shrink-only Crop", false},
+        Property[] props = {
+        		new ButtonProperty("cropSelection","Crop Selection", "draw.cropSelection", this.master),
+        		new CheckBoxProperty("quickCrop", "Crop on Finish", false),
+        		new CheckBoxProperty("shrinkOnly", "Shrink-only Crop", false)
         };
-
-        return constructFromScheme(scheme, Tool.CROP);
+        
+        return constructFromScheme(props, Tool.CROP);
     }
     private ToolSettings constructFlipperSettings() {
-        final Object[][] scheme = {
-                {"flipMode", PropertyType.RADIO_BUTTON, "Flip Mode", 2, 0,
-                        new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}
-                },
+        Property[] props = {
+        		new RadioButtonProperty( "flipMode", "Flip Mode", 2, 
+        				new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}),
         };
 
-        return constructFromScheme(scheme, Tool.FLIPPER);
+        return constructFromScheme(props, Tool.FLIPPER);
     }
 
     private ToolSettings constructColorChangeSettings() {
-        final Object[][] scheme = {
-                {"scope", PropertyType.DROP_DOWN,"Scope",  0, 0, new String[]{"Local","Entire Layer/Group","Entire Project"}},
-                {"mode", PropertyType.RADIO_BUTTON, "Apply Mode", 0, 0,
-                        new String[] {"Check Alpha", "Ignore Alpha", "Change All"}
-                },
-        };
+    	Property[] props = {
+    		new DropDownProperty("scope", "Scope", 0, new String[]{"Local","Entire Layer/Group","Entire Project"}),
+    		new RadioButtonProperty("mode", "Apply Mode", 0,
+                    new String[] {"Check Alpha", "Ignore Alpha", "Change All"})
+    	};
 
-        return constructFromScheme(scheme, Tool.COLOR_CHANGE);
+        return constructFromScheme( props, Tool.COLOR_CHANGE);
     }
     private ToolSettings constructReshapeSettings() {
-        final Object[][] scheme = {
-                {"cropSelection", PropertyType.BUTTON, "Apply Transform", "draw.applyTransform",  DISABLE_ON_NO_SELECTION},
-                {"scale", PropertyType.DUAL_FLOAT_BOX, "Scale", new Vec2(1,1), DISABLE_ON_NO_SELECTION, new String[] {"x","y"}},
-                {"translation", PropertyType.DUAL_FLOAT_BOX, "Translation", new Vec2(0,0), DISABLE_ON_NO_SELECTION, new String[] {"x","y"}},
-                {"rotation", PropertyType.FLOAT_BOX, "Rotation", (float)0, DISABLE_ON_NO_SELECTION},
-        };
-        return constructFromScheme(scheme, Tool.RESHAPER);
+    	Property[] props = {
+    		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master),
+    		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y"),
+    		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y"),
+    		new FloatBoxProperty( "rotation", "Rotation", 0)
+    	};
+    	
+        return constructFromScheme( props, Tool.RESHAPER);
     }
 
     public static final int DISABLE_ON_NO_SELECTION = 0x01;
 
-    /**<pre>
-     * Constructs ToolSettings from a Nx4 Scheme, returning null if the
-     * scheme is malformed.
-     *
-     * Setting Scheme Format: a Nx4 array with each 4-length entry
-     *	corresponding to:
-     * 0: the id which is used to access/refer to it
-     * 1: an identifier of the type of preference, which determines both
-     *	the GUI element that appears for it and the data-type of the value
-     * 2: A human-readable label that appears on GUI and tooltips
-     * 3: the default value
-     * 4: (optional) an integer mask that corresponds to various behavior
-     * 	such as when the GUI element should be disabled
-     * 5: (optional) any additional type-specific data needed
-     </pre>*/
-    ToolSettings constructFromScheme( Object[][] scheme, Tool tool) {
+    ToolSettings constructFromScheme( Property[] properties, Tool tool) {
         ToolSettings settings = new ToolSettings(tool);
-        settings.properties = new Property[scheme.length];
-
-        for(int i=0; i<scheme.length; ++i) {
-            try {
-                if( scheme[i].length < 4)
-                    throw new Exception("Bad Row Type");
-
-                settings.properties[i] = new Property();
-                settings.properties[i].id = (String)scheme[i][0];
-                settings.properties[i].type = (PropertyType)scheme[i][1];
-                settings.properties[i].hiName = (String)scheme[i][2];
-                if( scheme[i].length > 4)
-                    settings.properties[i].mask = (int)scheme[i][4];
-                if( scheme[i].length > 5)
-                    settings.properties[i].extra = scheme[i][5];
-
-                if(  !getValueClassFromType(settings.properties[i].type).isInstance(scheme[i][3])) {
-                    throw new Exception("Value Class does not match type. Expected: " + getValueClassFromType(settings.properties[i].type).getClass() + " got: " + scheme[i][3].getClass() );
-                }
-                settings.properties[i].value = scheme[i][3];
-
-            } catch( Exception e) {
-                MDebug.handleError(ErrorType.STRUCTURAL, e, "Improper Toolset Settings Scheme: " + e.getMessage());
-                return null;
-            }
-        }
-
+        settings.properties = properties;
         return settings;
-    }
-
-    /** This method exists mostly for development purposes, it verifies that
-     * the value you are trying to set a property to is the type that it
-     * should be, so that the proper error can be Managed inside this class. */
-    private Class<?> getValueClassFromType( PropertyType type) {
-        switch( type) {
-        case SIZE:
-        case OPACITY:
-            return Float.class;
-        case BUTTON:
-            return String.class;
-        case CHECK_BOX:
-            return Boolean.class;
-        case DROP_DOWN:
-        case RADIO_BUTTON:
-            return Integer.class;
-		case DUAL_FLOAT_BOX:
-			return Vec2.class;
-		case FLOAT_BOX:
-			return Float.class;
-        }
-
-        return null;	// Should be no way to reach this
     }
 
     // ===============

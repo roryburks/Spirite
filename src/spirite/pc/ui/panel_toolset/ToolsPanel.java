@@ -24,11 +24,11 @@ import javax.swing.SwingUtilities;
 
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
-import spirite.base.brains.MasterControl;
-import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.ToolsetManager;
 import spirite.hybrid.Globals;
 import spirite.hybrid.ToolsetIcons;
 

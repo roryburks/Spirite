@@ -102,7 +102,7 @@ public class MasterControl
     public MasterControl() {
         settingsManager = new SettingsManager(this);
         hotkeys = new HotkeyManager();
-        toolset = new ToolsetManager();
+        toolset = new ToolsetManager(this);
         cacheManager = new CacheManager();
         renderEngine = new RenderEngine( this);	
         palette = new PaletteManager( this);
@@ -755,7 +755,6 @@ public class MasterControl
     				Vec2 scale = (Vec2)settings.getValue("scale");
     				Vec2 translation = (Vec2)settings.getValue("translation");
     				float rotation = (float)settings.getValue("rotation");
-    				System.out.println( scale.x +"," + scale.y + ":" + rotation);
 
     				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
     				trans.scale( scale.x, scale.y);
