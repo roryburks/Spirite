@@ -244,10 +244,10 @@ public class ToolSettingsPanel extends OmniComponent
 			
 			binding.setLink( new DBSub() {
 				@Override public void doUIChange(Object newValue) {
-					settings.setValue(node.getId(), checkbox.isSelected());
+					settings.setValue(node.getId(), newValue);
 				}
 				@Override public void doDataChange(Object newValue) {
-					checkbox.setSelected((Boolean)node.getValue());
+					checkbox.setSelected((Boolean)newValue);
 				}
 			});
 			
