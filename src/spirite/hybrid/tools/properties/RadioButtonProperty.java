@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import javax.swing.JRadioButton;
-import javax.swing.GroupLayout.Group;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.hybrid.tools.properties.SwingToolProperty;
 
 public class RadioButtonProperty extends SwingToolProperty {
 	private int value;

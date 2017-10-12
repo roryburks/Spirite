@@ -3,8 +3,6 @@ package spirite.base.graphics.gl;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.util.ArrayInterpretation.BackwardsArray;
-import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;
 import spirite.base.util.glmath.GLC;
@@ -369,12 +367,12 @@ public class GLGeom {
         		else builder2.emitPrimitive();
         	}
         	else {
-                Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
-                Vec2 miter = new Vec2( -tangent.y, tangent.x);
-                Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
+//                Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
+//                Vec2 miter = new Vec2( -tangent.y, tangent.x);
+//                Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
                 
                 
-                float length = size1;
+                float length = Math.max(0,size1 - 0.5f);
 //                float length = Math.max( 0.5f, Math.min( MITER_MAX2*size1, size1 / miter.dot(n1)));
 
                 float[] left = new float[] {p1.x + (p2.y - p0.y)* length/2, p1.y - (p2.x - p0.x) * length/2};
@@ -384,8 +382,8 @@ public class GLGeom {
                 builder1.emitVertexBack(right);
         		if( length > 0.5) {
         			float s = length;//-0.5f;
-        			builder2.emitVertex(new float[] { miter.x*s + p1.x, miter.y*s + p1.y});
-        			builder2.emitVertex(new float[] { -miter.x*s + p1.x, -miter.y*s + p1.y});
+        			builder2.emitVertex(left);
+        			builder2.emitVertex(right);
         		}
         		else builder2.emitPrimitive();
 //
@@ -399,8 +397,9 @@ public class GLGeom {
 //        		else builder2.emitPrimitive();
         	}
         	if( p2.equals(p3)) {
-        		builder1.emitVertexFront(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
-        		builder1.emitVertexBack(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+                float length = Math.max(0,size2 - 0.5f);
+        		builder1.emitVertexFront(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
+        		builder1.emitVertexBack(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
         		if( size2 > 0.5) {
         			float s = size2;//-0.5f;
         			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});

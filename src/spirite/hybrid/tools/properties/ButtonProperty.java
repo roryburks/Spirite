@@ -6,16 +6,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.hybrid.tools.properties.SwingToolProperty;
 
 public class ButtonProperty extends SwingToolProperty {
 	private final MasterControl master;	// I don't love this

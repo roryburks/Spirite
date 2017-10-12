@@ -356,7 +356,7 @@ public abstract class StrokeEngine {
 				this.alpha = Math.max(0.0f, Math.min(1.0f, alpha));
 		}
 
-		public boolean getHard() {return hard;}
+		public boolean isHard() {return hard;}
 		public void setHard( boolean hard) {
 			if( !locked)
 				this.hard = hard;

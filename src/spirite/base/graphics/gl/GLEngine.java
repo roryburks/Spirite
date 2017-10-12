@@ -643,7 +643,7 @@ public class GLEngine  {
 	        }
         }
         //gl.glEnable(GLC.GL_MULTISAMPLE);
-        if( type == ProgramType.STROKE_PIXEL) {
+        if( type == ProgramType.STROKE_V2_LINE_PASS) {
 	        gl.glEnable(GLC.GL_LINE_SMOOTH);
 	        gl.glEnable(GL2.GL_BLEND);
 	        gl.glEnable(GL2.GL_LINE_WIDTH);
@@ -893,6 +893,7 @@ public class GLEngine  {
 				"shaders/pass.vert", 
 				null, 
 				"shaders/etc/pass_grid.frag");
+        programs[ProgramType.STROKE_V2_LINE_PASS.ordinal()] =
         programs[ProgramType.STROKE_PIXEL.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/brushes/stroke_pixel.vert", 
 				null, 
@@ -905,10 +906,6 @@ public class GLEngine  {
 				"shaders/shapes/line_render.vert", 
 				"shaders/shapes/line_render.geom", 
 				"shaders/shapes/shape_render.frag");
-        programs[ProgramType.STROKE_V2_LINE_PASS.ordinal()] = loadProgramFromResources(  gl,
-				"shaders/brushes/stroke_basic.vert", 
-				"shaders/brushes/stroke_v2_line_pass.geom", 
-				"shaders/brushes/brush_simple.frag");
         programs[ProgramType.STROKE_AFTERPASS_INTENSIFY.ordinal()] = loadProgramFromResources(  gl,
 				"shaders/pass.vert", 
 				null, 

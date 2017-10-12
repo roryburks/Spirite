@@ -8,14 +8,13 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.renderer.HybridNodeRenderer;
-import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.RawImage;
 import spirite.hybrid.HybridHelper;
 
 /** 

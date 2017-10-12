@@ -11,8 +11,8 @@ import java.util.function.Predicate;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.graphics.RenderProperties;
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree;

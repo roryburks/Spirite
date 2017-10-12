@@ -20,8 +20,8 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager;
-import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
+import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -399,8 +399,6 @@ public class ImageWorkspace {
 			//	
 			return new Vec2i(p.x-ox, p.y-oy);
 		}
-		public int convertX( int x) { return x - ox;}
-		public int convertY( int y) { return y - oy;}
 		public float convertX( float x) {return x - ox;}
 		public float convertY( float y) {return y - oy;}
 		
@@ -441,8 +439,6 @@ public class ImageWorkspace {
 		@Override public int getHeight() {
 			return height;
 		}
-		@Override public int convertX( int x) { return x;}
-		@Override public int convertY( int y) { return y;}
 		@Override public float convertX( float x) {return x;}
 		@Override public float convertY( float y) {return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}

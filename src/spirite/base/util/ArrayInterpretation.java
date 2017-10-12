@@ -3,7 +3,8 @@ package spirite.base.util;
 
 /**
  * This namespace provides functions for reinterpretting Array Address
- * space through the length and get methods without allocating any new data.
+ * space through the length and get methods without allocating the data to an entirely
+ * new array.
  */
 public class ArrayInterpretation {
 

@@ -20,7 +20,7 @@ import spirite.hybrid.MDebug;
  * GLCache is most likely out-dated and unnecessary.  It existed to cache 
  * conversions from BufferedImages into OpenGL textures so that they were
  * not done many dozen times per second.  But now use of BufferedImages
- * in GLMode have almost entirely been elimitated.
+ * in GLMode have almost entirely been eliminated.
  * 
  * @author Rory Burks
  *

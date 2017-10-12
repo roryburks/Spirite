@@ -4,13 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.GroupLayout;
-import javax.swing.JComponent;
 import javax.swing.GroupLayout.Group;
+import javax.swing.JComponent;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
-import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.panel_toolset.PropertyPanels.SizeSlider;
 
 public class SizeProperty extends SwingToolProperty {
