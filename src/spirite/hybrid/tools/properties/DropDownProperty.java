@@ -14,7 +14,7 @@ import javax.swing.GroupLayout.Group;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 
@@ -55,12 +55,12 @@ public class DropDownProperty extends SwingToolProperty {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if( e.getStateChange() == ItemEvent.SELECTED)
-					binding.uiChange(comboBox.getSelectedIndex());			
+					binding.triggerUIChanged(comboBox.getSelectedIndex());			
 			}
 		});
 		
 		// Binding
-		binding.setLink( new DBSub() {
+		binding.setLink( new ChangeExecuter() {
 			@Override public void doUIChange(Object newValue) {
 				settings.setValue( id, newValue);
 			}

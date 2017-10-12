@@ -3,6 +3,7 @@
 #define PI 3.1415926
 #define PI1_5 4.7123889
 #define PI2 6.2831852
+#define MITER_MAX 10.0f
 
 layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 17) out;

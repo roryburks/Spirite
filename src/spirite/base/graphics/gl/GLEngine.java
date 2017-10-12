@@ -59,14 +59,6 @@ public class GLEngine  {
 		return singly;
 	}
 	
-	/** Attempts to initialize the GLEngine, throwing an exception if it fails. */
-	public static void initialize() 
-		throws MGLException
-	{
-		if( singly == null)
-			singly = new GLEngine();
-	}
-	
 	private GLEngine() {}
 	
 	// ============
@@ -80,7 +72,7 @@ public class GLEngine  {
 
 
 
-    public static final FloatBuffer clearColor = FloatBuffer.wrap( new float[] {0f, 0f, 0f, 0f});
+    static final FloatBuffer clearColor = FloatBuffer.wrap( new float[] {0f, 0f, 0f, 0f});
 	void clearSurface(GL2 gl2) {
         gl2.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
 	}
@@ -205,6 +197,8 @@ public class GLEngine  {
 		STROKE_SPORE,
 		STROKE_BASIC, 
 		STROKE_PIXEL, 
+		STROKE_V2_LINE_PASS,
+		STROKE_AFTERPASS_INTENSIFY,
 		
 		POLY_RENDER,
 		LINE_RENDER,
@@ -220,9 +214,15 @@ public class GLEngine  {
 		case PASS_RENDER:
 		case PASS_BASIC:
 		case GRID:
+		case STROKE_V2_LINE_PASS:
 		case PASS_ESCALATE:
 	        gl.glEnable(GLC.GL_BLEND);
 	        gl.glBlendFunc(GLC.GL_ONE, GLC.GL_ONE_MINUS_SRC_ALPHA);
+	        gl.glBlendEquation(GLC.GL_FUNC_ADD);
+	        break;
+		case STROKE_AFTERPASS_INTENSIFY:
+	        gl.glEnable(GLC.GL_BLEND);
+	        gl.glBlendFunc(GLC.GL_ONE, GLC.GL_ZERO);
 	        gl.glBlendEquation(GLC.GL_FUNC_ADD);
 	        break;
 		case CHANGE_COLOR:
@@ -243,8 +243,7 @@ public class GLEngine  {
 	
 	private int programs[] = new int[ProgramType.values().length];
 	
-	// TODO: Make this package-scoped
-	public int getProgram( ProgramType type){
+	int getProgram( ProgramType type){
 		return programs[type.ordinal()];
 	}
 
@@ -504,7 +503,7 @@ public class GLEngine  {
 		public final int glConst;
 		PolyType( int glc) {this.glConst = glc;}
 	}
-	public void applyPolyProgram( 
+	void applyPolyProgram( 
 			ProgramType type,
 			int[] xPoints,
 			int[] yPoints, 
@@ -529,7 +528,7 @@ public class GLEngine  {
 		prim.free();
         params.clearInternalParams();
 	}
-	public void applyPolyProgram(
+	void applyPolyProgram(
 			ProgramType type, 
 			float[] xPoints, 
 			float[] yPoints, 
@@ -625,6 +624,7 @@ public class GLEngine  {
     		gl.glEnable(GLC.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
+        
 
 		// Bind Uniform
         if( params != null)
@@ -642,6 +642,14 @@ public class GLEngine  {
 		        gl.glBlendEquationSeparate(params.bm_fc, params.bm_fa);
 	        }
         }
+        //gl.glEnable(GLC.GL_MULTISAMPLE);
+        if( type == ProgramType.STROKE_PIXEL) {
+	        gl.glEnable(GLC.GL_LINE_SMOOTH);
+	        gl.glEnable(GL2.GL_BLEND);
+	        gl.glEnable(GL2.GL_LINE_WIDTH);
+	        gl.glDepthMask(false);
+	        gl.glLineWidth(1);
+        }
 
 		// Start Draw
         int start = 0;
@@ -650,6 +658,10 @@ public class GLEngine  {
             start += primitive.primitiveLengths[i];
         }
         gl.glDisable( GLC.GL_BLEND);
+        gl.glDisable(GLC.GL_LINE_SMOOTH);
+        gl.glDisable(GL2.GL_BLEND);
+        gl.glDisable(GL2.GL_LINE_WIDTH);
+        gl.glDepthMask(true);
 		
 		// Finished Drawing
 		gl.glDisable(GLC.GL_TEXTURE_2D);
@@ -692,7 +704,7 @@ public class GLEngine  {
 			}
 		}
 	}*/
-	public GLImage prepareTexture( RawImage image) {
+	GLImage prepareTexture( RawImage image) {
 		if( image instanceof GLImage) 
 			return (GLImage) image;
 		
@@ -764,7 +776,7 @@ public class GLEngine  {
 		private IntBuffer positionBufferObject = IntBuffer.allocate(1);
 		private IntBuffer vao = IntBuffer.allocate(1);
 	}
-	public PreparedData prepareRawData( float raw[], int[] lengths) {
+	PreparedData prepareRawData( float raw[], int[] lengths) {
 		GL2 gl = getGL2();
 		PreparedData pd = new PreparedData();
 		
@@ -789,7 +801,7 @@ public class GLEngine  {
 		return pd;
 	}
 
-    public class PreparedPrimitive{
+    class PreparedPrimitive{
         private final GLGeom.Primitive base;
         private GLEngine.PreparedData pd = null;
         private boolean prepared = false;
@@ -893,6 +905,14 @@ public class GLEngine  {
 				"shaders/shapes/line_render.vert", 
 				"shaders/shapes/line_render.geom", 
 				"shaders/shapes/shape_render.frag");
+        programs[ProgramType.STROKE_V2_LINE_PASS.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/brushes/stroke_basic.vert", 
+				"shaders/brushes/stroke_v2_line_pass.geom", 
+				"shaders/brushes/brush_simple.frag");
+        programs[ProgramType.STROKE_AFTERPASS_INTENSIFY.ordinal()] = loadProgramFromResources(  gl,
+				"shaders/pass.vert", 
+				null, 
+				"shaders/brushes/brush_intensify.frag");
 		
 	}
 	private void initShaders100( GL2 gl) throws MGLException {
@@ -917,6 +937,7 @@ public class GLEngine  {
 				"shaders/100/brushes/stroke_basic.vert", null, "shaders/100/brushes/stroke_basic.frag");
         programs[ProgramType.STROKE_SPORE.ordinal()] = 0;
         programs[ProgramType.STROKE_PIXEL.ordinal()] = 0;
+        
         
         programs[ProgramType.LINE_RENDER.ordinal()] = 0;
         programs[ProgramType.POLY_RENDER.ordinal()] = loadProgramFromResources(  gl,

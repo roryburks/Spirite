@@ -182,7 +182,7 @@ public class ToolSettingsPanel extends OmniComponent
 			DataBinding binding = bindingMap.get(property.getId());
 			
 			if( binding != null) {
-				binding.dataChange(property.getValue());
+				binding.triggerDataChanged(property.getValue());
 			}
 		//}
 	}

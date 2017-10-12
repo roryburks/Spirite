@@ -8,8 +8,8 @@ import com.jogamp.opengl.GL2;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.RawImage;
-import spirite.base.util.DataCompaction.IntQueue;
 import spirite.base.util.MUtil;
+import spirite.base.util.compaction.DataCompaction.IntQueue;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
 

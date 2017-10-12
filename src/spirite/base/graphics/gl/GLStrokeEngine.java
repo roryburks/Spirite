@@ -18,6 +18,7 @@ import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
 import spirite.base.util.MatrixBuilder;
 import spirite.base.util.glmath.GLC;
+import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
@@ -112,6 +113,15 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		engine.setTarget(drawTo);
 		_stroke( composeVBuffer(states), stroke.getHard()?1:0);
+		
+		if( stroke.getMethod() == Method.PIXEL) {
+			GLParameters params = new GLParameters(w, h);
+			params.texture = new GLParameters.GLImageTexture(drawTo);
+			
+			engine.applyPassProgram(ProgramType.STROKE_AFTERPASS_INTENSIFY, params, new MatTrans(), 
+					0, 0, w, h);
+		}
+		
 		engine.setTarget(0);
 		
 		return true;
@@ -222,6 +232,11 @@ class GLStrokeEngine extends StrokeEngine {
 			}*/
 		}
 
+		raw[0] = raw[BASIC_STRIDE];
+		raw[1] = raw[BASIC_STRIDE+1];
+		raw[(1 + states.size())*BASIC_STRIDE] = raw[(states.size())*BASIC_STRIDE];
+		raw[(1 + states.size())*BASIC_STRIDE+1] = raw[(states.size())*BASIC_STRIDE+1];
+
 		vb.vBuffer = raw;
 		vb.len = num;
 		
@@ -235,9 +250,6 @@ class GLStrokeEngine extends StrokeEngine {
 	 * to be filled by the fragment shader.
 	 */
 	private void _stroke( GLVBuffer glvb, int mode) {
-		ProgramType type = (stroke.getMethod() ==Method.PIXEL) 
-				? ProgramType.STROKE_PIXEL
-				: ProgramType.STROKE_BASIC;
 
 		GLParameters params = new GLParameters(w, h);
 
@@ -252,10 +264,24 @@ class GLStrokeEngine extends StrokeEngine {
 
 		if( HybridHelper.getGLCore().getShaderVersion() >= 330) {
 			params.addParam( new GLParameters.GLParam1f("uH", h));
-			engine.applyPrimitiveProgram( type, params, new Primitive(
-					glvb.vBuffer, new int[]{2,1}, GL3.GL_LINE_STRIP_ADJACENCY, new int[]{glvb.len}));
+
+			if( stroke.getMethod() == Method.PIXEL) {
+				engine.applyPrimitiveProgram( ProgramType.STROKE_PIXEL, params, new Primitive(
+						glvb.vBuffer, new int[]{2,1}, GL3.GL_LINE_STRIP_ADJACENCY, new int[]{glvb.len}));
+			}
+			else {
+				Primitive[] prims = GLGeom.strokeV2LinePassGeom( glvb.vBuffer);
+
+//				params.texture = new ;
+				params.addParam( new GLParameters.GLParam1f("uAlpha", 1));
+				engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
+				engine.applyPrimitiveProgram( ProgramType.STROKE_PIXEL, params, prims[0]);
+			}
 		}
 		else {
+			ProgramType type = (stroke.getMethod() ==Method.PIXEL) 
+					? ProgramType.STROKE_PIXEL
+					: ProgramType.STROKE_BASIC;
 			engine.applyPrimitiveProgram(type, params, GLGeom.strokeBasicGeom(glvb.vBuffer, h));
 		}
 

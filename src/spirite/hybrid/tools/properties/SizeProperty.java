@@ -9,7 +9,7 @@ import javax.swing.GroupLayout.Group;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.panel_toolset.PropertyPanels.SizeSlider;
 
@@ -36,14 +36,14 @@ public class SizeProperty extends SwingToolProperty {
 		SizeSlider slider = new SizeSlider() {
 			@Override
 			public void onValueChanged(float newValue) {
-				binding.uiChange(newValue);
+				binding.triggerUIChanged(newValue);
 				super.onValueChanged(newValue);
 			}
 		};
 		slider.setValue( (float)value);
 		slider.setLabel( hrName + " : ");
 		
-		binding.setLink( new DBSub() {
+		binding.setLink( new ChangeExecuter() {
 			@Override public void doUIChange(Object newValue) {
 				settings.setValue( id, newValue);
 			}

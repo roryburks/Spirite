@@ -3,7 +3,9 @@ package spirite.base.graphics.gl;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.util.DataCompaction.FloatCompactor;
+import spirite.base.util.ArrayInterpretation.BackwardsArray;
+import spirite.base.util.compaction.FloatCompactor;
+import spirite.base.util.compaction.ReverseFloatCompactor;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.Vec2;
 
@@ -90,6 +92,58 @@ public class GLGeom {
             primitive.primitiveLengths = new int[primitiveLengths.size()];
             for( int i=0; i < primitiveLengths.size(); ++i)
                 primitive.primitiveLengths[i] = primitiveLengths.get(i);
+
+            return primitive;
+        }
+    }
+    private static class DoubleEndedSinglePrimitiveBuilder {
+        private final int primitiveType;
+        private final int attrLengths[];
+        private final int totalAttrLength;
+        private final FloatCompactor forward;
+        private final ReverseFloatCompactor backward;
+
+        private DoubleEndedSinglePrimitiveBuilder( int attrLengths[], int primitiveType) {
+            this.primitiveType = primitiveType;
+            this.attrLengths = attrLengths;
+
+            forward = new FloatCompactor();
+            backward = new ReverseFloatCompactor();
+
+            // Calculate Total Vertex Length
+            int t = 0;
+            for( int i=0; i < attrLengths.length; ++i)
+                t += attrLengths[i];
+            totalAttrLength = t;
+        }
+
+        private void emitVertexFront( float[] vertexData) {
+            int vl = (vertexData == null) ? 0 : vertexData.length;
+
+            for( int i=0; i < totalAttrLength; ++i) {
+            	forward.add( i < vl ? vertexData[i] : 0.0f);
+            }
+        }
+        private void emitVertexBack( float[] vertexData) {
+            int vl = (vertexData == null) ? 0 : vertexData.length;
+
+            for( int i=0; i < totalAttrLength; ++i) {
+            	backward.add( i < vl ? vertexData[totalAttrLength-i-1] : 0.0f);
+            }
+        }
+
+        private Primitive build() {
+            Primitive primitive = new Primitive();
+            primitive.primitiveType = primitiveType;
+            primitive.attrLengths = attrLengths;
+            primitive.raw = new float[ forward.size() +backward.size()];
+            forward.insertIntoArray(primitive.raw, 0);
+            backward.insertIntoArray(primitive.raw, forward.size());
+            
+            int stride = 0;
+            for( int len : attrLengths)
+            	stride += len;
+            primitive.primitiveLengths = new int[]{primitive.raw.length / stride};
 
             return primitive;
         }
@@ -274,5 +328,104 @@ public class GLGeom {
             builder.emitVertex( new float[] { normal2.y * uWidth + p2.x, -normal2.x * uWidth + p2.y});
             builder.emitPrimitive();
         }
+    }
+    
+
+    private final static int SV2_STRIDE = 3;
+    public static Primitive[] strokeV2LinePassGeom(float[] raw) {
+        DoubleEndedSinglePrimitiveBuilder builder1 = new DoubleEndedSinglePrimitiveBuilder(
+                // [x, y]
+                new int[]{2},
+                GLC.GL_LINE_STRIP
+                );
+        PrimitiveBuilder builder2 = new PrimitiveBuilder(
+                // [x, y]
+                new int[]{2},
+                GLC.GL_TRIANGLE_STRIP
+                );
+        for( int i=0; i < (raw.length / SV2_STRIDE) - 3; i++) {
+        	Vec2 p0 = new Vec2( raw[(i+0)*SV2_STRIDE], raw[(i+0)*SV2_STRIDE+1]);
+        	Vec2 p1 = new Vec2( raw[(i+1)*SV2_STRIDE], raw[(i+1)*SV2_STRIDE+1]);
+        	Vec2 p2 = new Vec2( raw[(i+2)*SV2_STRIDE], raw[(i+2)*SV2_STRIDE+1]);
+        	Vec2 p3 = new Vec2( raw[(i+3)*SV2_STRIDE], raw[(i+3)*SV2_STRIDE+1]);
+        	float size1 = raw[(i+1)*SV2_STRIDE+2]/2;
+        	float size2 = raw[(i+2)*SV2_STRIDE+2]/2;
+        	Vec2 normal = p2.sub(p1).normalize();
+        	
+        	if( p0.equals(p1)) {
+        		builder1.emitVertexFront(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        		builder1.emitVertexBack(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        		builder2.emitVertex(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        		builder2.emitVertex(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        	}
+        	else {
+                Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
+                Vec2 miter = new Vec2( -tangent.y, tangent.x);
+                Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
+                float length = Math.max( 0.5f, Math.min( MITER_MAX, size1 / miter.dot(n1)));
+
+                builder1.emitVertexFront(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
+                builder1.emitVertexBack(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
+                builder2.emitVertex(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
+                builder2.emitVertex(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
+        	}
+        	if( p2.equals(p3)) {
+        		builder1.emitVertexFront(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+        		builder1.emitVertexBack(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+        		builder2.emitVertex(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+        		builder2.emitVertex(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+        		builder2.emitPrimitive();
+        	}
+        	else {
+                Vec2 tangent = p3.sub(p2).normalize().add( p2.sub(p1).normalize()).normalize();
+                Vec2 miter = new Vec2( -tangent.y, tangent.x);
+                Vec2 n2 = (new Vec2( -(p2.y - p1.y), p2.x - p1.x)).normalize();
+                float length = Math.max( 0.5f, Math.min( MITER_MAX, size2 / miter.dot(n2)));
+
+                builder1.emitVertexFront( new float[]{ miter.x*length + p2.x, miter.y*length + p2.y});
+                builder1.emitVertexBack( new float[]{ -miter.x*length + p2.x, -miter.y*length + p2.y});
+        	}
+        }
+        
+        return new Primitive[] {builder1.build(), builder2.build()};
+        
+    	/*vec2 p0 = vec2(gl_in[0].gl_Position.x,gl_in[0].gl_Position.y);
+    	vec2 p1 = vec2(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y);
+    	vec2 p2 = vec2(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y);
+    	vec2 p3 = vec2(gl_in[3].gl_Position.x,gl_in[3].gl_Position.y);
+    	vec2 n01 = normalize( p1 - p1);
+    	vec2 normal = normalize( p2 - p1);
+    	vec2 n23 = normalize( p3 - p2);
+
+    	vec4 out1a;
+    	vec4 out1b;
+    	vec4 out2a;
+    	vec4 out2b;
+
+    	if( p0 == p1) {
+    		out1a = out2a = perspectiveMatrix*vec4(p1 - (normal * vSize[1]), 0, 1);
+    	}
+    	else {
+    		vec2 tangent = normalize( normalize(p2-p1) + normalize(p1-p0));
+    		vec2 miter = vec2( -tangent.y, tangent.x);
+    		vec2 n1 = normalize( vec2(-(p1.y-p0.y), p1.x-p0.x));
+    		float length = max(0.5,min(vSize[1] / dot(miter, n1), MITER_MAX));
+
+    		out1a = perspectiveMatrix*vec4( miter*length + p1, 0, 1);
+    		out2a = perspectiveMatrix*vec4( -miter*length + p1, 0, 1);
+    	}
+
+    	if( p2 == p3) {
+    		out2b = out1b = perspectiveMatrix*vec4(p2 + (normal * vSize[2]), 0, 1);
+    	}
+    	else {
+    		vec2 tangent = normalize( normalize(p3-p2) + normalize(p2-p1));
+    		vec2 miter = vec2( -tangent.y, tangent.x);
+    		vec2 n2 = normalize( vec2(-(p2.y-p1.y), p2.x-p1.x));
+    		float length = max(0.5,min(vSize[2] / dot(miter, n2), MITER_MAX));
+
+    	    out1b = perspectiveMatrix*vec4( miter*length + p2, 0, 1);
+    	    out2b = perspectiveMatrix*vec4( -miter*length + p2, 0, 1);
+    	}*/
     }
 }

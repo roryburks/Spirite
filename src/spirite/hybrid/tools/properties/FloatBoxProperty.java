@@ -12,7 +12,7 @@ import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -47,17 +47,17 @@ public class FloatBoxProperty extends SwingToolProperty {
 		// Listener
 		textField.getDocument().addDocumentListener( new DocumentListener() {
 			public void changedUpdate(DocumentEvent arg0) {
-				binding.uiChange(textField.getFloat());
+				binding.triggerUIChanged(textField.getFloat());
 			}
 			public void insertUpdate(DocumentEvent arg0) {
-				binding.uiChange(textField.getFloat());
+				binding.triggerUIChanged(textField.getFloat());
 			}
 			public void removeUpdate(DocumentEvent arg0) {
-				binding.uiChange(textField.getFloat());
+				binding.triggerUIChanged(textField.getFloat());
 			}
 		});
 		
-		binding.setLink( new DBSub() {
+		binding.setLink( new ChangeExecuter() {
 			@Override public void doUIChange(Object newValue) {
 				settings.setValue( id, newValue);
 			}

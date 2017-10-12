@@ -6,7 +6,7 @@ import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
 import spirite.base.image_data.RawImage;
-import spirite.base.util.DataCompaction.FloatCompactor;
+import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.Rect;
 
 public class MUtil {

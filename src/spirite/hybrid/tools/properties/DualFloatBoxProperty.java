@@ -12,7 +12,7 @@ import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.properties.SwingToolProperty;
@@ -61,19 +61,19 @@ public class DualFloatBoxProperty extends SwingToolProperty {
 		// Listener
 		DocumentListener listener = new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
-				binding.uiChange(new Vec2(textField1.getFloat(), textField2.getFloat()));
+				binding.triggerUIChanged(new Vec2(textField1.getFloat(), textField2.getFloat()));
 			}
 			public void insertUpdate(DocumentEvent e) {
-				binding.uiChange(new Vec2(textField1.getFloat(), textField2.getFloat()));
+				binding.triggerUIChanged(new Vec2(textField1.getFloat(), textField2.getFloat()));
 			}
 			public void removeUpdate(DocumentEvent e) {
-				binding.uiChange(new Vec2(textField1.getFloat(), textField2.getFloat()));
+				binding.triggerUIChanged(new Vec2(textField1.getFloat(), textField2.getFloat()));
 			}
 		};
 		textField1.getDocument().addDocumentListener(listener);
 		textField2.getDocument().addDocumentListener(listener);
 		
-		binding.setLink( new DBSub() {
+		binding.setLink( new ChangeExecuter() {
 			public void doUIChange(Object newValue) {
 				settings.setValue( id, newValue);
 			}

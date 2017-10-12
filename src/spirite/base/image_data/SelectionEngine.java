@@ -16,7 +16,7 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.Colors;
-import spirite.base.util.DataCompaction.IntCompactor;
+import spirite.base.util.compaction.IntCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;

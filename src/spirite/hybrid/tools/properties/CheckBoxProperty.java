@@ -13,7 +13,7 @@ import javax.swing.GroupLayout.Group;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
-import spirite.base.util.DataBinding.DBSub;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 
 public class CheckBoxProperty extends SwingToolProperty {
@@ -41,13 +41,13 @@ public class CheckBoxProperty extends SwingToolProperty {
 		checkbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				binding.uiChange(checkbox.isSelected());
+				binding.triggerUIChanged(checkbox.isSelected());
 			}
 		});
 		checkbox.setFont(new Font("Tahoma",Font.PLAIN, 10));
 		checkbox.setSelected(value);
 		
-		binding.setLink( new DBSub() {
+		binding.setLink( new ChangeExecuter() {
 			@Override public void doUIChange(Object newValue) {
 				settings.setValue( id, newValue);
 			}
