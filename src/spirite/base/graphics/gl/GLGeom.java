@@ -419,27 +419,28 @@ public class GLGeom {
         	}*/
         }
         
-        if( builder1.forward.size() > 800) {
-        	Primitive[] p =new Primitive[] {builder1.build(), builder2.build()};
-
-        	List<Float> angle = new ArrayList<>();
-        	List<Float> distance= new ArrayList<>();
-        	for( int i=0; i < raw.length/3-2; i+=2) {
-        		float x1 = raw[i*3];
-        		float x2 = raw[(i+1)*3];
-        		float y1 = raw[i*3+1];
-        		float y2 = raw[(i+1)*3+1];
-        		angle.add( (float)Math.atan2(y2-y1, x2-x1));
-        		distance.add( (float)MUtil.distance(x1, y1, x2, y2));
-        	}
-        	float[] anglesArray = new float[angle.size()];
-        	float[] distancesArray = new float[angle.size()];
-        	for( int i=0; i < angle.size(); ++i){
-        		anglesArray[i] = angle.get(i);
-        		distancesArray[i] = distance.get(i);
-        	}
-        	System.out.println("S");
-        }
+        // !!!! USED FOR DEBUGING !!!!
+//        if( builder1.forward.size() > 800) {
+//        	Primitive[] p =new Primitive[] {builder1.build(), builder2.build()};
+//
+//        	List<Float> angle = new ArrayList<>();
+//        	List<Float> distance= new ArrayList<>();
+//        	for( int i=0; i < raw.length/3-2; i+=2) {
+//        		float x1 = raw[i*3];
+//        		float x2 = raw[(i+1)*3];
+//        		float y1 = raw[i*3+1];
+//        		float y2 = raw[(i+1)*3+1];
+//        		angle.add( (float)Math.atan2(y2-y1, x2-x1));
+//        		distance.add( (float)MUtil.distance(x1, y1, x2, y2));
+//        	}
+//        	float[] anglesArray = new float[angle.size()];
+//        	float[] distancesArray = new float[angle.size()];
+//        	for( int i=0; i < angle.size(); ++i){
+//        		anglesArray[i] = angle.get(i);
+//        		distancesArray[i] = distance.get(i);
+//        	}
+//        	System.out.println("S");
+//        }
         
         
         return new Primitive[] {builder1.build(), builder2.build()};

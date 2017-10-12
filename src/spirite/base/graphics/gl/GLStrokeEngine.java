@@ -276,7 +276,7 @@ class GLStrokeEngine extends StrokeEngine {
 
 //				params.texture = new ;
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1));
-				//engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
+				engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
 				engine.applyPrimitiveProgram( ProgramType.STROKE_PIXEL, params, prims[0]);
 			}
 		}
