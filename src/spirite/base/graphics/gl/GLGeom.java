@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.util.ArrayInterpretation.BackwardsArray;
+import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;
 import spirite.base.util.glmath.GLC;
@@ -80,7 +81,8 @@ public class GLGeom {
         }
 
         private void emitPrimitive() {
-            primitiveLengths.add(plen);
+        	if( plen > 0)
+        		primitiveLengths.add(plen);
             plen = 0;
         }
 
@@ -332,6 +334,7 @@ public class GLGeom {
     
 
     private final static int SV2_STRIDE = 3;
+    private final static float MITER_MAX2 = 2.0f;
     public static Primitive[] strokeV2LinePassGeom(float[] raw) {
         DoubleEndedSinglePrimitiveBuilder builder1 = new DoubleEndedSinglePrimitiveBuilder(
                 // [x, y]
@@ -350,42 +353,94 @@ public class GLGeom {
         	Vec2 p3 = new Vec2( raw[(i+3)*SV2_STRIDE], raw[(i+3)*SV2_STRIDE+1]);
         	float size1 = raw[(i+1)*SV2_STRIDE+2]/2;
         	float size2 = raw[(i+2)*SV2_STRIDE+2]/2;
+        	Vec2 n10 = p1.sub(p0).normalize();
         	Vec2 normal = p2.sub(p1).normalize();
+        	Vec2 n32 = p3.sub(p2).normalize();
         	
         	if( p0.equals(p1)) {
         		builder1.emitVertexFront(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
         		builder1.emitVertexBack(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
-        		builder2.emitVertex(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
-        		builder2.emitVertex(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        		
+        		if( size1 > 0.5) {
+        			float s = size1;//-0.5f;
+        			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
+        			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
+        		}
+        		else builder2.emitPrimitive();
         	}
         	else {
                 Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
                 Vec2 miter = new Vec2( -tangent.y, tangent.x);
                 Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
-                float length = Math.max( 0.5f, Math.min( MITER_MAX, size1 / miter.dot(n1)));
+                
+                
+                float length = size1;
+//                float length = Math.max( 0.5f, Math.min( MITER_MAX2*size1, size1 / miter.dot(n1)));
 
-                builder1.emitVertexFront(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
-                builder1.emitVertexBack(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
-                builder2.emitVertex(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
-                builder2.emitVertex(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
+                float[] left = new float[] {p1.x + (p2.y - p0.y)* length/2, p1.y - (p2.x - p0.x) * length/2};
+                float[] right = new float[] {p1.x - (p2.y - p0.y)* length/2, p1.y + (p2.x - p0.x) * length/2};
+
+                builder1.emitVertexFront(left);
+                builder1.emitVertexBack(right);
+        		if( length > 0.5) {
+        			float s = length;//-0.5f;
+        			builder2.emitVertex(new float[] { miter.x*s + p1.x, miter.y*s + p1.y});
+        			builder2.emitVertex(new float[] { -miter.x*s + p1.x, -miter.y*s + p1.y});
+        		}
+        		else builder2.emitPrimitive();
+//
+//                builder1.emitVertexFront(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
+//                builder1.emitVertexBack(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
+//        		if( length > 0.5) {
+//        			float s = length;//-0.5f;
+//        			builder2.emitVertex(new float[] { miter.x*s + p1.x, miter.y*s + p1.y});
+//        			builder2.emitVertex(new float[] { -miter.x*s + p1.x, -miter.y*s + p1.y});
+//        		}
+//        		else builder2.emitPrimitive();
         	}
         	if( p2.equals(p3)) {
         		builder1.emitVertexFront(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
         		builder1.emitVertexBack(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
-        		builder2.emitVertex(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
-        		builder2.emitVertex(new float[] { p2.x + normal.x * size2/2, p2.y + normal.y * size2/2});
+        		if( size2 > 0.5) {
+        			float s = size2;//-0.5f;
+        			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
+        			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
+        		}
         		builder2.emitPrimitive();
         	}
-        	else {
+        	/*else {
                 Vec2 tangent = p3.sub(p2).normalize().add( p2.sub(p1).normalize()).normalize();
                 Vec2 miter = new Vec2( -tangent.y, tangent.x);
                 Vec2 n2 = (new Vec2( -(p2.y - p1.y), p2.x - p1.x)).normalize();
-                float length = Math.max( 0.5f, Math.min( MITER_MAX, size2 / miter.dot(n2)));
+                float length = Math.max( 0.5f, Math.min( MITER_MAX2, size2 / miter.dot(n2)));
 
                 builder1.emitVertexFront( new float[]{ miter.x*length + p2.x, miter.y*length + p2.y});
                 builder1.emitVertexBack( new float[]{ -miter.x*length + p2.x, -miter.y*length + p2.y});
-        	}
+        	}*/
         }
+        
+        if( builder1.forward.size() > 800) {
+        	Primitive[] p =new Primitive[] {builder1.build(), builder2.build()};
+
+        	List<Float> angle = new ArrayList<>();
+        	List<Float> distance= new ArrayList<>();
+        	for( int i=0; i < raw.length/3-2; i+=2) {
+        		float x1 = raw[i*3];
+        		float x2 = raw[(i+1)*3];
+        		float y1 = raw[i*3+1];
+        		float y2 = raw[(i+1)*3+1];
+        		angle.add( (float)Math.atan2(y2-y1, x2-x1));
+        		distance.add( (float)MUtil.distance(x1, y1, x2, y2));
+        	}
+        	float[] anglesArray = new float[angle.size()];
+        	float[] distancesArray = new float[angle.size()];
+        	for( int i=0; i < angle.size(); ++i){
+        		anglesArray[i] = angle.get(i);
+        		distancesArray[i] = distance.get(i);
+        	}
+        	System.out.println("S");
+        }
+        
         
         return new Primitive[] {builder1.build(), builder2.build()};
         

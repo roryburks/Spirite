@@ -17,7 +17,7 @@ public class PenTraits {
 	
 	public static class PenState {
 		public PenState(){}
-		public PenState( int x, int y, float pressure) {
+		public PenState( float x, float y, float pressure) {
 			this.x = x;
 			this.y = y;
 			this.pressure = pressure;
@@ -27,8 +27,8 @@ public class PenTraits {
 			this.y = other.y;
 			this.pressure = other.pressure;
 		}
-		public int x;
-		public int y;
+		public float x;
+		public float y;
 		public float pressure = 1.0f;
 	}
 

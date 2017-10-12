@@ -17,7 +17,7 @@ void main()
 
 	switch( uMode) {
 	case 0:
-		newAlpha = (alpha > 0.5)?sqrt(alpha):pow(alpha,1.5);
+		newAlpha = (alpha > 0.5)?pow(alpha,0.3):pow(alpha,1.5);
 	}
    	outputColor = vec4(texCol.rgb*newAlpha/alpha,newAlpha);
 }

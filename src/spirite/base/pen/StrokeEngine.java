@@ -30,12 +30,13 @@ public abstract class StrokeEngine {
 	protected abstract void onEnd();
 	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
+	
 
 	// ==== 
 	public enum STATE { READY, DRAWING };
 	public enum Method {BASIC, ERASE, PIXEL};
 	
-	private static final double DIFF = 5;
+	private static final double DIFF = 1;
 	
 	// Pen States
 	protected PenState oldState = new PenState();
@@ -116,7 +117,7 @@ public abstract class StrokeEngine {
 		
 		// Starts recording the Pen States
 		prec = new ArrayList<PenState>();
-		Vec2i layerSpace = (data.convert(new Vec2i(ps.x,ps.y)));
+		Vec2i layerSpace = (data.convert(new Vec2i((int)Math.round(ps.x),(int)Math.round(ps.y))));
 		
 		oldState.x = layerSpace.x;
 		oldState.y = layerSpace.y;
@@ -144,7 +145,7 @@ public abstract class StrokeEngine {
 	}
 
 	public final boolean stepStroke( PenState ps) {
-		Vec2i layerSpace = data.convert( new Vec2i( ps.x, ps.y));
+		Vec2i layerSpace = data.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
 		newState.x = layerSpace.x;
 		newState.y = layerSpace.y;
 		newState.pressure = ps.pressure;
@@ -168,12 +169,15 @@ public abstract class StrokeEngine {
 
 				interpos = 0;
 				InterpolatedPoint ip = interpolator.evalExt(interpos);
+				InterpolatedPoint op = ip;
 				points.add(new PenState((int)Math.round(ip.x), (int)Math.round(ip.y), 
 						(float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp)));
 				while( interpos + DIFF < interpolator.getCurveLength()) {
 					interpos += DIFF;
+					op = ip;
 					ip = interpolator.evalExt(interpos);
-					points.add(new PenState((int)Math.round(ip.x), (int)Math.round(ip.y), 
+					
+					points.add(new PenState(ip.x, ip.y, 
 							(float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp)));
 				}
 				prepareDisplayLayer();
@@ -238,18 +242,22 @@ public abstract class StrokeEngine {
 				interpos = 0;
 				InterpolatedPoint ip = interpolator.evalExt(interpos);
 				iPoints.add(new PenState(
-						(int)Math.round(ip.x), 
-						(int)Math.round(ip.y), 
+						ip.x, 
+						ip.y, 
 						(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
 				while( interpos + DIFF < interpolator.getCurveLength()) {
 					interpos += DIFF;
 					ip = interpolator.evalExt(interpos);
 					
 					iPoints.add(new PenState(
-							(int)Math.round(ip.x), 
-							(int)Math.round(ip.y), 
+							ip.x, 
+							ip.y, 
 							(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
 				}
+				iPoints.add(new PenState(
+						ip.x, 
+						ip.y, 
+						(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
 				this.drawToLayer(iPoints, false);
 			}
 		}

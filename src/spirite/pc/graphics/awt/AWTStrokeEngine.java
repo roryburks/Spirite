@@ -94,7 +94,7 @@ class AWTStrokeEngine extends StrokeEngine{
 						BasicStroke.CAP_ROUND, 
 						BasicStroke.CAP_SQUARE));
 			}
-			g2.drawLine( fromState.x, fromState.y, toState.x, toState.y);
+			g2.drawLine( (int)fromState.x, (int)fromState.y, (int)toState.x, (int)toState.y);
 
 			
 

@@ -129,25 +129,27 @@ class GLStrokeEngine extends StrokeEngine {
 	
 	private void _strokeSpore(PenState ps) {
 		float[] raw = new float[4*13];
+		float x = ps.x;
+		float y = ps.y;
 		
 		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
 		
-		raw[0] = data.convertX(ps.x);
-		raw[1] = data.convertY(ps.y);
+		raw[0] = data.convertX(x);
+		raw[1] = data.convertY(y);
 		raw[2] = size;
 		raw[3] = ps.pressure;
 
 		for( int i=0; i<4; ++i) {
 			int off = (i+1)*4;
-			raw[off+0] = data.convertX(ps.x) + size/2.0f * (float)Math.cos(Math.PI/2.0*i);
-			raw[off+1] = data.convertY(ps.y) + size/2.0f * (float)Math.sin(Math.PI/2.0*i);
+			raw[off+0] = data.convertX(x) + size/2.0f * (float)Math.cos(Math.PI/2.0*i);
+			raw[off+1] = data.convertY(y) + size/2.0f * (float)Math.sin(Math.PI/2.0*i);
 			raw[off+2] = stroke.getDynamics().getSize(ps);
 			raw[off+3] = ps.pressure;
 		}
 		for( int i=0; i<8; ++i) {
 			int off = (i+5)*4;
-			raw[off+0] = data.convertX(ps.x) + size * (float)Math.cos(Math.PI/8.0+Math.PI/4.0*i);
-			raw[off+1] = data.convertY(ps.y) + size * (float)Math.sin(Math.PI/8.0+Math.PI/4.0*i);
+			raw[off+0] = data.convertX(x) + size * (float)Math.cos(Math.PI/8.0+Math.PI/4.0*i);
+			raw[off+1] = data.convertY(y) + size * (float)Math.sin(Math.PI/8.0+Math.PI/4.0*i);
 			raw[off+2] = stroke.getDynamics().getSize(ps);
 			raw[off+3] = ps.pressure;
 		}
@@ -274,7 +276,7 @@ class GLStrokeEngine extends StrokeEngine {
 
 //				params.texture = new ;
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1));
-				engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
+				//engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
 				engine.applyPrimitiveProgram( ProgramType.STROKE_PIXEL, params, prims[0]);
 			}
 		}

@@ -401,6 +401,8 @@ public class ImageWorkspace {
 		}
 		public int convertX( int x) { return x - ox;}
 		public int convertY( int y) { return y - oy;}
+		public float convertX( float x) {return x - ox;}
+		public float convertY( float y) {return y - oy;}
 		
 		// TODO: This might be bad if I ever add rotations etc
 		public Rect getBounds() {
@@ -441,6 +443,8 @@ public class ImageWorkspace {
 		}
 		@Override public int convertX( int x) { return x;}
 		@Override public int convertY( int y) { return y;}
+		@Override public float convertX( float x) {return x;}
+		@Override public float convertY( float y) {return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}
 		@Override
 		public void drawBorder(GraphicsContext gc) {
