@@ -30,7 +30,7 @@ import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.hybrid.Globals;
-import spirite.hybrid.ToolsetIcons;
+import spirite.hybrid.tools.ToolsetIcons;
 
 /**
  * 

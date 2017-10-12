@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
-import spirite.hybrid.ToolProperties.ButtonProperty;
-import spirite.hybrid.ToolProperties.CheckBoxProperty;
-import spirite.hybrid.ToolProperties.DropDownProperty;
-import spirite.hybrid.ToolProperties.DualFloatBoxProperty;
-import spirite.hybrid.ToolProperties.FloatBoxProperty;
-import spirite.hybrid.ToolProperties.OpacityProperty;
-import spirite.hybrid.ToolProperties.RadioButtonProperty;
-import spirite.hybrid.ToolProperties.SizeProperty;
+import spirite.hybrid.tools.properties.ButtonProperty;
+import spirite.hybrid.tools.properties.CheckBoxProperty;
+import spirite.hybrid.tools.properties.DropDownProperty;
+import spirite.hybrid.tools.properties.DualFloatBoxProperty;
+import spirite.hybrid.tools.properties.FloatBoxProperty;
+import spirite.hybrid.tools.properties.OpacityProperty;
+import spirite.hybrid.tools.properties.RadioButtonProperty;
+import spirite.hybrid.tools.properties.SizeProperty;
 
 /**
  * The ToolsetManager manages the set of Tools available, which tool is

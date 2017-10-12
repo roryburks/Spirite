@@ -9,20 +9,24 @@ public class DataBinding {
 	DBSub link;
 	
 	public void uiChange( Object newValue) {
+		System.out.println("UIChangeStart");
 		if( lock )
 			return;
 		lock = true;
 		if( link != null)
 			link.doUIChange( newValue);
 		lock = false;
+		System.out.println("UIChangeEnd");
 	}
 	public void dataChange( Object newValue) {
+		System.out.println("DataChangeStart");
 		if( lock)
 			return;
 		lock = true;
 		if( link != null)
 			link.doDataChange(newValue);
 		lock = false;
+		System.out.println("DataChangeEnd");
 	}
 	public void setLink( DBSub sub) {this.link = sub;}
 

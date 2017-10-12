@@ -26,7 +26,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.util.DataBinding;
-import spirite.hybrid.ToolProperties.SwingToolProperty;
+import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.OmniFrame.OmniComponent;
 
 public class ToolSettingsPanel extends OmniComponent
