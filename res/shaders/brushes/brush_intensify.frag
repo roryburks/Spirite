@@ -19,5 +19,5 @@ void main()
 	case 0:
 		newAlpha = (alpha > 0.5)?pow(alpha,0.3):pow(alpha,1.5);
 	}
-   	outputColor = vec4(texCol.rgb*newAlpha/alpha,newAlpha);
+   	outputColor = vec4(texCol.rgb*newAlpha,newAlpha);
 }

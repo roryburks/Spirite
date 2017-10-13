@@ -359,12 +359,12 @@ public class GLGeom {
         		builder1.emitVertexFront(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
         		builder1.emitVertexBack(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
         		
-        		if( size1 > 0.5) {
+        		//if( size1 > 0.5) {
         			float s = size1;//-0.5f;
         			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
         			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
-        		}
-        		else builder2.emitPrimitive();
+        		//}
+        		//else builder2.emitPrimitive();
         	}
         	else {
 //                Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
@@ -380,12 +380,12 @@ public class GLGeom {
 
                 builder1.emitVertexFront(left);
                 builder1.emitVertexBack(right);
-        		if( length > 0.5) {
+        		//if( length > 0.5) {
         			float s = length;//-0.5f;
         			builder2.emitVertex(left);
         			builder2.emitVertex(right);
-        		}
-        		else builder2.emitPrimitive();
+        		//}
+        		//else builder2.emitPrimitive();
 //
 //                builder1.emitVertexFront(new float[] { miter.x*length + p1.x, miter.y*length + p1.y});
 //                builder1.emitVertexBack(new float[] { -miter.x*length + p1.x, -miter.y*length + p1.y});
@@ -400,11 +400,11 @@ public class GLGeom {
                 float length = Math.max(0,size2 - 0.5f);
         		builder1.emitVertexFront(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
         		builder1.emitVertexBack(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
-        		if( size2 > 0.5) {
+        		//if( size2 > 0.5) {
         			float s = size2;//-0.5f;
         			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
         			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
-        		}
+        		//}
         		builder2.emitPrimitive();
         	}
         	/*else {
