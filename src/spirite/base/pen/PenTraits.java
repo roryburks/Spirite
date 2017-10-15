@@ -2,8 +2,8 @@ package spirite.base.pen;
 
 import java.util.List;
 
-import spirite.base.util.Interpolation.LagrangeInterpolator;
 import spirite.base.util.glmath.Vec2;
+import spirite.base.util.interpolation.LagrangeInterpolator;
 
 public class PenTraits {
 

@@ -16,7 +16,7 @@ import java.util.Queue;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager;
@@ -31,17 +31,15 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.HybridUtil;
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -66,35 +64,15 @@ public class ImageWorkspace {
 	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
 	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
 	//	by ImageWorkspace.
-	private final Map<Integer,InternalImage> imageData;
+	final Map<Integer,InternalImage> imageData;
 	
-	class InternalImage {
-		CachedImage cachedImage;
-		InternalImage( CachedImage ci) { this.cachedImage = ci;}
-		
-		int getWidth() {
-			return cachedImage.access().getWidth();
-		}
-		int getHeight() {
-			return cachedImage.access().getHeight();
-		}
-	}
-	class DynamicInternalImage extends InternalImage {
-		int ox, oy;
-		DynamicInternalImage(CachedImage ci, int ox, int oy) {
-			super(ci);
-			this.ox = ox;
-			this.oy = oy;
-		}
-	}
-	
-	private boolean isValidHandle(ImageHandle handle) {
+	public boolean isValidHandle(ImageHandle handle) {
 		return ( handle.context == this && imageData.containsKey(handle.id));
 	}
 	
 	// Internal Components
 	private final GroupTree groupTree;
-	private final UndoEngine undoEngine;
+	final UndoEngine undoEngine;
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
 	private final DrawEngine drawEngine;
@@ -111,8 +89,8 @@ public class ImageWorkspace {
 	private GroupTree.Node selected = null;
 	private int workingID = 0;	// an incrementing unique ID per imageData
 	
-	private int width = 0;
-	private int height = 0;
+	int width = 0;
+	int height = 0;
 	
 	private File file = null;
 	private boolean changed = false;
@@ -302,234 +280,11 @@ public class ImageWorkspace {
 		
 		return list;
 	}
-
-	// ===============
-	// ==== Data Building
 	
-	// TODO: Figure out how much of this is really needed
-	/**
-	 * A BuildActiveData is a helper class which is intended to be used
-	 * by Image-modification functions which operate in Image Space.  It
-	 * combines all applied transform properties such that when a function 
-	 * draws on the BuiltActiveData at X, Y, it'll be modifying the ImageData
-	 * which APPEARS at X,Y.
-	 * 
-	 * Right now only incorporates Offset, but can be modified to incorperate
-	 * any kind of draw action in the future.
-	 */
-	public class BuiltImageData {
-		public final ImageHandle handle;
-		final int ox;
-		final int oy;
+	public void replaceCache( ImageHandle handle, RawImage nri) {
+		imageData.get(handle.id).cachedImage.relinquish(this);
+		imageData.get(handle.id).cachedImage = cacheManager.cacheImage(nri, this);
 		
-		public BuiltImageData( ImageHandle handle) {
-			this.handle = handle;
-			this.ox = 0;
-			this.oy = 0;
-		}
-		public BuiltImageData( ImageHandle handle, int ox, int oy) {
-			this.handle = handle;
-			this.ox = ox;
-			this.oy = oy;
-		}
-		
-		public int getWidth() {
-			return handle.getWidth();
-		}
-		public int getHeight() {
-			return handle.getHeight();
-		}
-		
-		public void draw(GraphicsContext gc) {
-			MatTrans transform = new MatTrans();
-			transform.translate(ox, oy);
-			handle.drawLayer( gc, transform);
-		}
-		
-		public void drawBorder( GraphicsContext gc) {
-			if( handle == null) return;
-			
-			MatTrans transform = gc.getTransform();
-			gc.translate(ox, oy);
-			
-			gc.drawRect(0, 0, handle.getWidth(), handle.getHeight());
-			
-			gc.setTransform( transform);
-		}
-		
-		/**
-		 * Creates a graphical object with transforms applied such that
-		 * drawing on the returned Graphics will draw on the correct Image
-		 * Data spot.
-		 * 
-		 * !!! When done modifying the image always call checkout. !!!
-		 */
-		public GraphicsContext checkout() {
-			if( handle.context != ImageWorkspace.this)
-				MDebug.handleError(ErrorType.STRUCTURAL, null, "Checking out image in wrong workspace");
-
-			GraphicsContext gc = _checkoutImage(handle).getGraphics();
-			gc.translate(-ox, -oy);
-			return gc;
-		}
-		
-		/** Retrieves the underlying BufferedImage of the BuiltImage
-		 * 
-		 * !!! When done modifying the image always call checkout. !!!
-		 */
-		public RawImage checkoutRaw() {
-			return _checkoutImage(handle);
-		}
-		
-		/**
-		 * Once finished drawn you must checkin your data.  Not only does this
-		 * dispose the Graphics (which is debatably necessary), but it triggers
-		 * the appropriate ImageChange actions.  And if the ImageHandle is 
-		 * Dynamic, it's VERY important to call this so that it gets anchored
-		 * correctly
-		 */
-		public void checkin() {
-			_checkinImage(handle);
-		}
-		
-		/** Converts the given point in ImageSpace to BuiltActiveData space*/
-		public Vec2i convert( Vec2i p) {
-			//	Some image modification methods do not use draw actions, but
-			//	 rather alter the image directly.  For example a flood fill action.
-			//	
-			return new Vec2i(p.x-ox, p.y-oy);
-		}
-		public float convertX( float x) {return x - ox;}
-		public float convertY( float y) {return y - oy;}
-		
-		// TODO: This might be bad if I ever add rotations etc
-		public Rect getBounds() {
-			return new Rect( ox, oy, handle.getWidth(), handle.getHeight());
-		}
-		
-		/** Returns a transform converting from screen space to layer space. */
-		public MatTrans getScreenToImageTransform() {
-			MatTrans transform = new MatTrans();
-			transform.translate( -ox, -oy);
-			return transform;
-		}
-
-		/** Returns a transform representing how to convert the image from its internal
-		 * image space to a composited image space (for normal Images, this is the
-		 * Identity Matrix, for DynamicImages, since they allow editing anywhere on the
-		 * screen, this is equal to the conversion from layerspace to screen space)*/
-		public MatTrans getCompositeTransform() {
-			return new MatTrans();			
-		}
-	}
-	
-	public class DynamicImageData extends BuiltImageData{
-		private final DynamicInternalImage dii;
-		RawImage buffer = null;
-		public DynamicImageData(ImageHandle handle, int ox, int oy,
-				DynamicInternalImage dii) 
-		{
-			super(handle, ox, oy);
-			this.dii = dii;
-		}
-		
-		@Override public int getWidth() {
-			return width;
-		} 
-		@Override public int getHeight() {
-			return height;
-		}
-		@Override public float convertX( float x) {return x;}
-		@Override public float convertY( float y) {return y;}
-		@Override public Vec2i convert(Vec2i p) {return p;}
-		@Override
-		public void drawBorder(GraphicsContext gc) {
-			if( handle == null) return;
-			
-			gc.drawRect(ox + dii.ox, oy + dii.oy, 
-					handle.getWidth(), handle.getHeight());
-		}
-		@Override
-		public MatTrans getCompositeTransform() {
-			MatTrans trans = new MatTrans();
-			trans.translate(ox, oy);
-			return trans;
-		}
-		
-		@Override
-		public GraphicsContext checkout() {
-			return checkoutRaw().getGraphics();
-		}
-		
-		@Override
-		public Rect getBounds() {
-			return new Rect( ox + dii.ox, oy + dii.oy, 
-					handle.getWidth(), handle.getHeight());
-		}
-		@Override
-		public RawImage checkoutRaw() {
-			undoEngine.prepareContext(handle);
-			buffer = HybridHelper.createImage(width, height);
-			GraphicsContext gc = buffer.getGraphics();
-			gc.drawHandle(this.handle, ox+dii.ox, oy+dii.oy);
-			return buffer;
-		}
-		@Override
-		public void checkin() {
-			Rect activeRect = (new Rect(0,0,width,height)).union(
-					new Rect(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
-
-			RawImage img = HybridHelper.createImage(width, height);
-			GraphicsContext gc = img.getGraphics();
-
-			// Draw the part of the old image over the new one
-			gc.drawHandle(handle,
-					ox+dii.ox - activeRect.x, 
-					oy+dii.oy- activeRect.y);
-
-			// Clear the section of the old image that will be replaced by the new one
-			gc.setComposite( Composite.SRC, 1.0f);
-			gc.drawImage(buffer, -activeRect.x, -activeRect.y);
-//			g2.dispose();
-
-			dii.ox = activeRect.x - ox;
-			dii.oy = activeRect.y - oy;
-			activeRect = null;
-			
-			Rect cropped = null;
-			try {
-				cropped = HybridUtil.findContentBounds(img, 0, true);
-			} catch (UnsupportedImageTypeException e) {
-				e.printStackTrace();
-			}
-			
-			RawImage nri;
-			if( cropped == null || cropped.isEmpty()) {
-				nri = HybridHelper.createImage(1, 1);
-			}
-			else {
-				nri = HybridHelper.createImage( cropped.width, cropped.height);
-			}
-			gc = nri.getGraphics();
-			gc.drawImage( img, -cropped.x, -cropped.y);
-			
-			dii.ox += cropped.x;
-			dii.oy += cropped.y;
-			
-			imageData.get(handle.id).cachedImage.relinquish(ImageWorkspace.this);
-			imageData.get(handle.id).cachedImage = cacheManager.cacheImage(nri, ImageWorkspace.this);
-			
-			buffer.flush();
-			img.flush();
-			buffer = null;
-			gc = null;
-
-			// Construct ImageChangeEvent and send it
-			ImageChangeEvent evt = new ImageChangeEvent();
-			evt.dataChanged.add(handle);
-			evt.workspace = ImageWorkspace.this;
-			triggerImageRefresh( evt);
-		}
 	}
 
 	/**
@@ -554,7 +309,7 @@ public class ImageWorkspace {
 	}
 	
 	/** Returns the Active Data in its Built form, with all the offsets applied. */
-	public BuiltImageData buildActiveData() {
+	public IBuiltImageData buildActiveData() {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;
 		
@@ -565,7 +320,7 @@ public class ImageWorkspace {
 	}
 	
 	/** Builds all applied offsets into a LayerNode. */
-	public BuiltImageData buildData( LayerNode node) {
+	public IBuiltImageData buildData( LayerNode node) {
 		BuildingImageData data = node.getLayer().getActiveData();
 		
 		if( data == null) return null;
@@ -573,26 +328,18 @@ public class ImageWorkspace {
 		InternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
-		if( ii instanceof DynamicInternalImage)		
-			return new DynamicImageData(data.handle,
-				data.ox + node.x, data.oy + node.y, (DynamicInternalImage) ii);
-		else return new BuiltImageData( data.handle,
-				data.ox + node.x, data.oy + node.y);
+		return ii.build(data.handle, data.ox + node.x, data.oy + node.y);
 	}
 	
 	/** Converts BuildingImageData (which is provided by Layers to describe all
 	 * sub-parts in a partially-built form) into fully-built Image Data	 */
-	public BuiltImageData buildData( BuildingImageData data) {
+	public IBuiltImageData buildData( BuildingImageData data) {
 		if( data == null) return null;
 		
 		InternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
-		if( ii instanceof DynamicInternalImage)		
-			return new DynamicImageData(data.handle,
-				data.ox, data.oy, (DynamicInternalImage) ii);
-		else return new BuiltImageData( data.handle,
-				data.ox, data.oy);
+		return ii.build(data.handle, data.ox, data.oy);
 	}
 	
 	// ==============
@@ -618,30 +365,6 @@ public class ImageWorkspace {
 	
 	// ===============
 	// ==== Image Checkout (called by BuiltImageData)
-	boolean locked = false;
-	private RawImage _checkoutImage( ImageHandle image) {
-		if( !isValidHandle(image))
-			return null;
-		
-//		if( locked) throw new ConcurrentModificationException("Can't check out two images at once.");
-		locked = true;
-		undoEngine.prepareContext(image);
-		
-		return imageData.get(image.id).cachedImage.access();
-	}
-	
-	private void _checkinImage( ImageHandle handle) {
-		locked = false;
-		if( !isValidHandle(handle))
-			return;
-
-		// Construct ImageChangeEvent and send it
-		ImageChangeEvent evt = new ImageChangeEvent();
-		evt.dataChanged.add(handle);
-		evt.workspace = this;
-		triggerImageRefresh( evt);
-	}
-	
 	/** Internal method should not be called by external methods (if so
 	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 * and 
@@ -822,7 +545,7 @@ public class ImageWorkspace {
 	{
 		private int x, y;
 		protected ShiftDataAction(ImageHandle data, int x, int y) {
-			super( new BuiltImageData(data));
+			super( data.build());
 			this.x = x;
 			this.y = y;
 		}
@@ -1806,8 +1529,9 @@ public class ImageWorkspace {
     	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
     	
     	if( evt.selectionLayerChange ) {
-    		BuiltImageData bid = buildActiveData();
-    		if( bid != null) {
+    		if(selected != null && (selected instanceof LayerNode) ) {
+    			BuildingImageData bid = ((LayerNode)selected).getLayer().getActiveData();
+    			if( bid != null)
     			evt.dataChanged.add( bid.handle);
     		}
     		

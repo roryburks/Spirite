@@ -3,7 +3,7 @@ package spirite.pc.graphics;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.image_data.RawImage;
+import spirite.base.graphics.RawImage;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.awt.AWTContext;
 

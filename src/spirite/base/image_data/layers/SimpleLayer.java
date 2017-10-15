@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
@@ -13,7 +14,6 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.glmath.Rect;
@@ -103,7 +103,7 @@ public class SimpleLayer extends Layer {
 		}
 		else {
 			CachedImage ci = workspace.getCacheManager().cacheImage( image, workspace.getUndoEngine());
-			UndoableAction action = new DrawImageAction(workspace.new BuiltImageData(data, x, y), ci);
+			UndoableAction action = new DrawImageAction(  data.build(x, y), ci);
 			helper.actions.add(action);
 		}
 		

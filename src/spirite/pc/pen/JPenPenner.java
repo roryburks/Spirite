@@ -1,5 +1,9 @@
 package spirite.pc.pen;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+
 import javax.swing.SwingUtilities;
 
 import jpen.PButtonEvent;
@@ -29,7 +33,25 @@ public class JPenPenner implements PenListener
 	public JPenPenner( WorkPanel context, MasterControl master) {
 		penner = new Penner(context, master);
 		toolsetManager = master.getToolsetManager();
+
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+		.addKeyEventDispatcher( dispatcher);
 	}
+	KeyEventDispatcher dispatcher = new KeyEventDispatcher() {
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent evt) {
+			boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
+			boolean ctrl = (( evt.getModifiers() & KeyEvent.CTRL_MASK) != 0);
+			boolean alt = (( evt.getModifiers() & KeyEvent.ALT_MASK) != 0);
+				
+			penner.holdingShift = shift;
+			penner.holdingCtrl = ctrl;
+			penner.holdingAlt = alt;
+			return false;
+		}
+	};
+	
+	
 
 	private final MButtonEvent MButtonFromPButton( PButtonEvent pbe) {
 		MButtonEvent mbe = new MButtonEvent();
@@ -131,7 +153,13 @@ public class JPenPenner implements PenListener
 		penner.paintOverlay(gc);
 	}
 
+	/** Cleans up resources that have a global-level context in Swing to avoid
+	 * Memory Leaks. 
+	 * 
+	 * NOTE: Never called
+	 * */
+	final
 	public void cleanUp() {
-		penner.cleanUp();
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 	}
 }

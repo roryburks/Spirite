@@ -96,7 +96,6 @@ public class CompactionTests {
 				t2.wait();
 		    }
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -1,13 +1,6 @@
 package spirite.base.pen;
 
-import java.awt.BasicStroke;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -24,6 +17,7 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.DrawEngine;
@@ -31,14 +25,13 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -65,7 +58,7 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  * @author Rory Burks
  */
 public class Penner 
-	implements KeyEventDispatcher, ActionListener, MToolsetObserver
+	implements MToolsetObserver
 {
 	// Contains "Image to Screen" and "Screen to Image" methods.
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
@@ -85,9 +78,10 @@ public class Penner
 												// might not belong here, maybe in DrawEngine
 	
 
-	private boolean holdingShift = false;
-	private boolean holdingCtrl = false;
-	private boolean holdingAlt = false;
+	public boolean holdingShift = false;
+	public boolean holdingCtrl = false;
+	public boolean holdingAlt = false;
+	
 	
 	// Naturally, being a mouse (or drawing tablet)-based input handler with
 	//	a variety of states, a large number of coordinate sets need to be 
@@ -121,8 +115,6 @@ public class Penner
 		
 		toolsetManager.addToolsetObserver(this);
 		
-		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-			.addKeyEventDispatcher(this);
 	}
 	
 	// ==========
@@ -199,15 +191,15 @@ public class Penner
 		else if( workspace.getReferenceManager().isEditingReference()) {
 			// Special Reference behavior
 			if( holdingCtrl) {
-				behavior = new ZoomingReference();
+				behavior = new ZoomingReferenceBehavior();
 				behavior.start();
 			}
 			else if( holdingShift) {
-				behavior = new RotatingReference();
+				behavior = new RotatingReferenceBehavior();
 				behavior.start();
 			}
 			else {
-				behavior = new GlobalRefMove();
+				behavior = new GlobalRefMoveBehavior();
 				behavior.start();
 			}
 		}
@@ -304,12 +296,13 @@ public class Penner
 					break;
 				
 				SpriteLayer rig = (SpriteLayer)(((LayerNode)workspace.getSelectedNode()).getLayer());
-				SpriteLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);
-				
+				SpriteLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);				
 				if( part == null) part = rig.getActivePart();
 				
-				if( holdingShift)
-					behavior = new MovingRigPart(rig, part);
+				behavior = new RigManipulationBehavior(part, node);
+//				
+//				if( holdingShift)
+//					behavior = new MovingRigPart(rig, part);
 				
 				break;
 			case FLIPPER:{
@@ -395,7 +388,7 @@ public class Penner
 		if( holdingCtrl) c = 0x00000000;
 
 		// Grab the Active Data
-		BuiltImageData data = workspace.buildActiveData();
+		IBuiltImageData data = workspace.buildActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
 		if( data != null && node != null) {
@@ -463,7 +456,7 @@ public class Penner
 			if( workspace != null && workspace.buildActiveData() != null) {
 				shiftX = rawX;
 				shiftY = rawY;
-				BuiltImageData data = workspace.buildActiveData();
+				IBuiltImageData data = workspace.buildActiveData();
 //				GroupTree.Node node = workspace.getSelectedNode();
 				
 				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
@@ -615,30 +608,7 @@ public class Penner
 						selectionEngine.getOffsetY() + (y - oldY));
 		}
 	}
-	class MovingRigPart extends StateBehavior {
-		private final SpriteLayer rig;
-		private final Part part;
-		MovingRigPart( SpriteLayer rig, Part part) {
-			this.rig = rig;
-			this.part = part;
-		}
-
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			undoEngine.performAndStore(
-					rig.createModifyPartAction( part, 
-							part.getOffsetX() + (x - oldX),
-							part.getOffsetY() + (y - oldY), 
-							part.getDepth(), 
-							part.getTypeName(), 
-							part.isVisible(), 
-							part.getAlpha())
-				);
-		}
-	}
-	class ZoomingReference extends StateBehavior {
+	class ZoomingReferenceBehavior extends StateBehavior {
 		int startx = x;
 		int starty = y;
 		@Override public void start() {}
@@ -649,7 +619,7 @@ public class Penner
 					(float)Math.pow(1.0015, 1+(rawY - oldRawY)), startx, starty);
 		}
 	}
-	class RotatingReference extends StateBehavior {
+	class RotatingReferenceBehavior extends StateBehavior {
 		int startx = x;
 		int starty = y;
 		int ox = rawX;
@@ -662,7 +632,7 @@ public class Penner
 			workspace.getReferenceManager().rotateTransform(theta, startx, starty);
 		}
 	}
-	class GlobalRefMove extends StateBehavior {
+	class GlobalRefMoveBehavior extends StateBehavior {
 		@Override public void start() {}
 		@Override public void onTock() {}
 		@Override
@@ -766,6 +736,7 @@ public class Penner
 				g.drawOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
 		}
 	}
+	
 	class CroppingBehavior extends DrawnStateBehavior {
 		boolean building = false;
 		boolean modifying = false;
@@ -978,86 +949,99 @@ public class Penner
 //    		gc.setComposite(c);
 //    		gc.setStroke(s);
 		}
-
 	}
 	
 
-	enum ReshapeStates {
-		READY, ROTATE, RESIZE, MOVING
+	enum TransormStates {
+		READY, ROTATE, RESIZE, MOVING, INACTIVE
 	}
-	class ReshapingBehavior extends DrawnStateBehavior {
-		ReshapeStates state = ReshapeStates.READY;
+	abstract class TransformBehavior extends DrawnStateBehavior {
 		
-		// The Lock Transform is the transform stored at the start of the current
-		//	action, which is used in combination of the transformation of the current
-		//	action to create the Working Transform
-		MatTrans lockTrans = new MatTrans();
+		private TransormStates state = TransormStates.READY;
 		
 		// The Calculation Transform is a version of the Locked Transform which has
 		//	all the relevent offsets built-in so that calculation changes in mouse
 		//	movement with respect to the selection's center can be easily performed.
-		MatTrans calcTrans = new MatTrans();
+		private MatTrans calcTrans = new MatTrans();
 		
-		int startX, startY;
+		private int startX, startY;
 		
-		float oldScaleX, oldScaleY;
-		float oldRot;
+		private float oldScaleX, oldScaleY;
+		private float oldRot;
 		
-		int overlap = -1;
+		protected int overlap = -1;
+		
+		protected float scaleX, scaleY;
+		protected float translateX, translateY;
+		protected float rotation;
+		protected Rect region;
+
+		protected abstract void onScaleChanged();
+		protected abstract void onTrnalsationChanged();
+		protected abstract void onRotationChanged();
+		
+		private void _internetSetScale( float scaleX, float scaleY) {
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
+			onScaleChanged();
+		}
+		private void _internalSetTranslation( float transX, float transY) {
+			translateX = transX;
+			translateY = transY;
+			onTrnalsationChanged();
+		}
+		private void _internalSetRotion( float rotation) {
+			this.rotation = rotation;
+			onRotationChanged();
+		}
+		
+		
+		
 		// 0123 : NESW
 		// 4567 : NW NE SE SW
 		// 89AB : NW NE SE SW (rotation)
 		// C : Moving
 		
-		private MatTrans getWorkingTransform() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-
+		protected MatTrans getWorkingTransform() {
 			MatTrans wTrans = new MatTrans();
-			Vec2 scale = (Vec2)settings.getValue("scale");
-			Vec2 translation = (Vec2)settings.getValue("translation");
-			float rotation = (float)settings.getValue("rotation");
 
-			wTrans.rotate(rotation);
-			wTrans.scale(scale.x, scale.y);
-			wTrans.translate(translation.x, translation.y);
+			wTrans.preScale(scaleX, scaleY);
+			wTrans.preRotate(rotation);
+			wTrans.preTranslate( translateX, translateY);
 			return wTrans;
 		}
-
-		@Override
-		public void start() {
-			state = ReshapeStates.READY;
+		
+		protected MatTrans calcDisplayTransform() {
+			float zoom = view.getZoom();
+			MatTrans relTrans = new MatTrans();
+			relTrans.preTranslate(-region.width/2, -region.height/2);
+			relTrans.preConcatenate(getWorkingTransform());
+			relTrans.preTranslate(region.width/2+region.x, region.height/2+region.y);
+			relTrans.preScale(zoom, zoom);
+			relTrans.preTranslate(view.itsX(0), view.itsY(0));
+			
+			return relTrans;
 		}
-		@Override public void onTock() {}
+
 		
 		@Override
 		public void paintOverlay(GraphicsContext gc) {
-			MatTrans wTrans = getWorkingTransform();
+			if( region == null || region.isEmpty() || state == TransormStates.INACTIVE)
+				return;
 			
 			float zoom = view.getZoom();
 			
-			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			
-			if( sel == null || sel.selection == null){
-				this.end();
-				return;
-			}
-			Vec2i d = sel.selection.getDimension();
-			
 			MatTrans origTrans = gc.getTransform();
-
-			MatTrans relTrans = new MatTrans();
-			relTrans.translate(view.itsX(0), view.itsY(0));
-			relTrans.scale(zoom, zoom);
-			relTrans.translate(d.x/2+sel.offsetX, d.y/2+sel.offsetY);
-			relTrans.concatenate(wTrans);
-			relTrans.translate(-d.x/2, -d.y/2);
+			MatTrans relTrans = calcDisplayTransform();
 			
 			gc.setTransform(relTrans);
 
+			int w = region.width;
+			int h = region.height;
 			gc.setColor(Colors.BLACK);
-			gc.drawRect( 0, 0, d.x, d.y);
+			gc.drawRect( 0, 0, w, h);
 			
-			Stroke defStroke = new BasicStroke( 2/zoom);
+//			Stroke defStroke = new BasicStroke( 2/zoom);
 			gc.setColor(Colors.GRAY);
 //			gc.setStroke(defStroke);
 			
@@ -1068,14 +1052,14 @@ public class Penner
 				e.printStackTrace();
 			}
 			
-			float sw = d.x*0.3f;	// Width of corner rect
-			float sh = d.y*0.3f;	// Height
-			float x2 = d.x*0.7f;	// Offset of right rect
-			float y2 = d.y*0.7f;	// " bottom
-			float di = d.y*0.2f;	// Diameter of rotate thing
-			float of = d.y*0.25f*0.2f;
+			float sw = w*0.3f;	// Width of corner rect
+			float sh = h*0.3f;	// Height
+			float x2 = w*0.7f;	// Offset of right rect
+			float y2 = h*0.7f;	// " bottom
+			float di = Math.max(h*0.2f, 10);	// Diameter of rotate thing
+			float of = h*0.25f*0.2f;
 
-			float b = 4/zoom;
+			float b =1/zoom;
 			
 			List<Shape> s = new ArrayList<>(12);
 			s.add(new Rectangle2D.Float(sw+b, b, x2-sw-b*2, sh-b*2));	// N
@@ -1089,13 +1073,14 @@ public class Penner
 			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
 
 			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
-			s.add(new Ellipse2D.Float( d.x-of, -di+of, di, di));	// NE
-			s.add(new Ellipse2D.Float( d.x-of, d.y-of, di, di));	// SE
-			s.add(new Ellipse2D.Float( -di+of, d.y-of, di, di));	// SW
+			s.add(new Ellipse2D.Float( w-of, -di+of, di, di));	// NE
+			s.add(new Ellipse2D.Float( w-of, h-of, di, di));	// SE
+			s.add(new Ellipse2D.Float( -di+of, h-of, di, di));	// SW
 
 			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
-			
-			if( this.state == ReshapeStates.READY)
+
+			gc.setComposite(gc.getComposite(), 0.5f);
+			if( this.state == TransormStates.READY)
 				overlap = -1;
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
@@ -1109,65 +1094,19 @@ public class Penner
 				}
 				else gc.draw(shape);
 			}
+			gc.setComposite(gc.getComposite(), 1f);
 
 			
 			gc.setTransform(origTrans);
 		}
 
-
-		@Override public void onPenUp() {
-			this.state = ReshapeStates.READY;
-		}
-		@Override
-		public void onPenDown() {
-			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			
-			if( sel == null || sel.selection == null){
-				this.end();
-				return;
-			}
-			
-			if( overlap >= 0 && overlap <= 7) {
-				Vec2i d = sel.selection.getDimension();
-				startX = x;
-				startY = y;
-				lockTrans = new MatTrans(getWorkingTransform());
-				calcTrans = new MatTrans();
-				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
-				calcTrans.preConcatenate(lockTrans);
-				Vec2 scale = (Vec2)settings.getValue("scale");
-				oldScaleX = scale.x;
-				oldScaleY = scale.y;
-				this.state = ReshapeStates.RESIZE;
-			}
-			else if( overlap >= 8 && overlap <= 0xB) {
-				Vec2i d = sel.selection.getDimension();
-				startX = x;
-				startY = y;
-				lockTrans = new MatTrans(getWorkingTransform());
-				calcTrans = new MatTrans();
-				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
-				calcTrans.preConcatenate(lockTrans);
-				oldRot = (float)settings.getValue("rotation");
-				this.state = ReshapeStates.ROTATE;
-			}
-			else if( overlap == 0xC)
-				this.state = ReshapeStates.MOVING;
-		}
-
 		@Override
 		public void onMove() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			Vec2 scale = (Vec2)settings.getValue("scale");
-			Vec2 translation = (Vec2)settings.getValue("translation");
-			float rotation = (float)settings.getValue("rotation");
-			
 			switch( this.state) {
 			case MOVING:
 				
 				if( oldX != x || oldY != y) {
-					settings.setValue( "translation", new Vec2( translation.x + x - oldX, translation.y + y - oldY ));
+					_internalSetTranslation( translateX + x - oldX, translateY + y - oldY );
 				}
 				break;
 			case READY:
@@ -1176,141 +1115,99 @@ public class Penner
 				Vec2 pn = new Vec2();
 				Vec2 ps = new Vec2();
 
-				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(rawX,rawY), pn);
 				calcTrans.transform(new Vec2(startX,startY), ps);
 
-				float sx = (overlap == 0 || overlap == 2) ? scale.x : pn.x/ps.x * oldScaleX;
-				float sy = (overlap == 1 || overlap == 3) ? scale.y : pn.y/ps.y * oldScaleY;
+				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.x/ps.x * oldScaleX;
+				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.y/ps.y * oldScaleY;
 				
-				settings.setValue("scale", new Vec2(sx, sy));
+				_internetSetScale(sx, sy);
 				break;}
 			case ROTATE:{
 				Vec2 pn = new Vec2();
 				Vec2 ps = new Vec2();
 
-				calcTrans.transform(new Vec2(x,y), pn);
+				calcTrans.transform(new Vec2(rawX,rawY), pn);
 				calcTrans.transform(new Vec2(startX,startY), ps);
 				
 
 				double start = Math.atan2(ps.y, ps.x);
 				double end =  Math.atan2(pn.y, pn.x);
 				
-				settings.setValue("rotation", (float)(end-start + oldRot));
+				_internalSetRotion((float)(end-start + oldRot));
 				break;}
-			
+			default:
+				break;
 			}
 			
 			selectionEngine.proposeTransform(getWorkingTransform());
 		}
-		
+
+		public TransormStates getState() {return state;}
+		protected void setState( TransormStates newState) {
+			switch( newState) {
+			case RESIZE:
+				startX = rawX;
+				startY = rawY;
+				
+				calcTrans = calcDisplayTransform();
+				oldScaleX = scaleX;
+				oldScaleY = scaleY;
+				try {
+					calcTrans = calcTrans.createInverse();
+				} catch (NoninvertableException e) {
+					e.printStackTrace();
+				}
+				break;
+			case ROTATE:
+				startX = rawX;
+				startY = rawY;
+
+				calcTrans = calcDisplayTransform();
+				oldRot = rotation;
+				this.state = TransormStates.ROTATE;
+				try {
+					calcTrans = calcTrans.createInverse();
+				} catch (NoninvertableException e) {
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+			}
+
+			this.state = newState;
+		}
 	}
-	class OLDReshapingBehavior extends DrawnStateBehavior {
-		// The Working Transform is the transform which is used for drawing
-		MatTrans wTrans = new MatTrans();
-		
-		// The Lock Transform is the transform stored at the start of the current
-		//	action, which is used in combination of the transformation of the current
-		//	action to create the Working Transform
-		MatTrans lockTrans = new MatTrans();
-		
-		// The Calculation Transform is a version of the Locked Transform which has
-		//	all the relevent offsets built-in so that calculation changes in mouse
-		//	movement with respect to the selection's center can be easily performed.
-		MatTrans calcTrans = new MatTrans();
-		ReshapeStates state = ReshapeStates.READY;
-		int startX,startY;
-		int overlap = -1;
-		// 0123 : NESW
-		// 4567 : NW NE SE SW
-		// 89AB : NW NE SE SW (rotation)
-		// C : Moving
-		
+
+	class ReshapingBehavior extends TransformBehavior {
 		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			float zoom = view.getZoom();
+		public void start() {
+			setState(TransormStates.READY);
+		}
+
+		@Override public void onTock() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			Vec2 scale = (Vec2)settings.getValue("scale");
+			Vec2 translation = (Vec2)settings.getValue("translation");
+			this.scaleX = scale.x;
+			this.scaleY = scale.y;
+			this.translateX = translation.x;
+			this.translateY = translation.y;
+			this.rotation = (float)settings.getValue("rotation");
 			
 			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			
 			if( sel == null || sel.selection == null){
 				this.end();
 				return;
 			}
+			
 			Vec2i d = sel.selection.getDimension();
-			
-			MatTrans origTrans = gc.getTransform();
-
-			MatTrans relTrans = new MatTrans();
-			relTrans.translate(view.itsX(0), view.itsY(0));
-			relTrans.scale(zoom, zoom);
-			relTrans.translate(d.x/2+sel.offsetX, d.y/2+sel.offsetY);
-			relTrans.concatenate(wTrans);
-			relTrans.translate(-d.x/2, -d.y/2);
-			
-			gc.setTransform(relTrans);
-
-			gc.setColor(Colors.BLACK);
-			gc.drawRect( 0, 0, d.x, d.y);
-			
-			Stroke defStroke = new BasicStroke( 2/zoom);
-			gc.setColor(Colors.GRAY);
-//			gc.setStroke(defStroke);
-			
-			Vec2 p = new Vec2();
-			try {
-				p = relTrans.inverseTransform(new Vec2(rawX,rawY), p);
-			} catch (NoninvertableException e) {
-				e.printStackTrace();
-			}
-			
-			float sw = d.x*0.3f;	// Width of corner rect
-			float sh = d.y*0.3f;	// Height
-			float x2 = d.x*0.7f;	// Offset of right rect
-			float y2 = d.y*0.7f;	// " bottom
-			float di = d.y*0.2f;	// Diameter of rotate thing
-			float of = d.y*0.25f*0.2f;
-
-			float b = 4/zoom;
-			
-			List<Shape> s = new ArrayList<>(12);
-			s.add(new Rectangle2D.Float(sw+b, b, x2-sw-b*2, sh-b*2));	// N
-			s.add(new Rectangle2D.Float(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
-			s.add(new Rectangle2D.Float(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
-			s.add(new Rectangle2D.Float(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
-			
-			s.add(new Rectangle2D.Float(b, b, sw-b*2, sh-b*2));			// NW
-			s.add(new Rectangle2D.Float(x2+b, b, sw-b*2, sh-b*2));		// NE
-			s.add(new Rectangle2D.Float(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
-			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
-
-			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
-			s.add(new Ellipse2D.Float( d.x-of, -di+of, di, di));	// NE
-			s.add(new Ellipse2D.Float( d.x-of, d.y-of, di, di));	// SE
-			s.add(new Ellipse2D.Float( -di+of, d.y-of, di, di));	// SW
-
-			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
-			
-			if( this.state == ReshapeStates.READY)
-				overlap = -1;
-			for( int i=0; i<s.size(); ++i) {
-				Shape shape = s.get(i);
-				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
-					gc.setColor(Colors.YELLOW);
-//					gc.setStroke(new BasicStroke( 4/zoom));
-					gc.draw(shape);
-					gc.setColor(Colors.GRAY);
-//					gc.setStroke(defStroke);
-					overlap = i;
-				}
-				else gc.draw(shape);
-			}
-
-			
-			gc.setTransform(origTrans);
-			
+			this.region = new Rect( sel.offsetX, sel.offsetY, d.x, d.y);
 		}
 
 		@Override public void onPenUp() {
-			this.state = ReshapeStates.READY;
+			setState(TransormStates.READY);
 		}
 		@Override
 		public void onPenDown() {
@@ -1321,89 +1218,105 @@ public class Penner
 				return;
 			}
 			
-			if( overlap >= 0 && overlap <= 7) {
-				Vec2i d = sel.selection.getDimension();
-				startX = x;
-				startY = y;
-				lockTrans = new MatTrans(wTrans);
-				calcTrans = new MatTrans();
-				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
-				calcTrans.preConcatenate(lockTrans);
-				this.state = ReshapeStates.RESIZE;
-			}
-			else if( overlap >= 8 && overlap <= 0xB) {
-				Vec2i d = sel.selection.getDimension();
-				startX = x;
-				startY = y;
-				lockTrans = new MatTrans(wTrans);
-				calcTrans = new MatTrans();
-				calcTrans.translate(-sel.offsetX-d.x/2.0f, -sel.offsetY-d.y/2.0f);
-				calcTrans.preConcatenate(lockTrans);
-				this.state = ReshapeStates.ROTATE;
-			}
+			if( overlap >= 0 && overlap <= 7)
+				this.setState(TransormStates.RESIZE);
+			else if( overlap >= 8 && overlap <= 0xB)
+				this.setState(TransormStates.ROTATE);
 			else if( overlap == 0xC)
-				this.state = ReshapeStates.MOVING;
+				this.setState(TransormStates.MOVING);
 		}
-		@Override
-		public void onMove() {
-			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			
-			if( sel == null || sel.selection == null){
-				this.end();
-				return;
-			}
-			
-			switch( this.state) {
-			case MOVING:
-				if( oldX != x || oldY != y) 
-					selectionEngine.setOffset(
-							selectionEngine.getOffsetX() + (x - oldX),
-							selectionEngine.getOffsetY() + (y - oldY));
-				break;
-			case READY:
-				break;
-			case RESIZE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
 
-				calcTrans.transform(new Vec2(x,y), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
-
-				wTrans = (new MatTrans(lockTrans));
-				
-				wTrans.scale(pn.x/ps.x,pn.y/ps.y);
-				//wTrans.concatenate(lockTrans);
-				break;}
-			case ROTATE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
-
-				calcTrans.transform(new Vec2(x,y), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
-				
-				wTrans = (new MatTrans(lockTrans));
-
-				double start = Math.atan2(ps.y, ps.x);
-				double end =  Math.atan2(pn.y, pn.x);
-				wTrans.rotate((float)(end-start));
-				break;}
-			
-			}
-			
-			selectionEngine.proposeTransform(wTrans);
+		@Override protected void onScaleChanged() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			settings.setValue("scale", new Vec2(scaleX, scaleY));
 		}
+		@Override protected void onTrnalsationChanged() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			settings.setValue("translation", new Vec2(translateX, translateY));
+		}
+		@Override protected void onRotationChanged() {
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			settings.setValue("rotation", rotation);
+		}
+	}
+	
+	class RigManipulationBehavior extends TransformBehavior {
+		Part selectedPart;
+		final SpriteLayer sprite;
+		final Node node;
+		
+		RigManipulationBehavior( Part selectedPart, Node node) {
+			this.node = node;
+			this.selectedPart = selectedPart;
+			sprite = selectedPart.getContext();
+		}
+		
 		@Override
 		public void start() {
-		}
-
-		@Override
-		public void end() {
-			super.end();
-			selectionEngine.stopProposintTransform();
+			this.setState(TransormStates.INACTIVE);
+			
 		}
 		@Override
-		public void onTock() {}
+		public void paintOverlay(GraphicsContext gc) {
+			if( !(getState() == TransormStates.READY && holdingCtrl))
+				super.paintOverlay(gc);
+		}
+		
+		@Override
+		public void onTock() {
+			Node node = workspace.getSelectedNode();
+			
+			if( workspace.getSelectedNode() != node) 
+				end();
+			else {
+				region = new Rect( 
+						node.getOffsetX() + selectedPart.getImageHandle().getDynamicX(),
+						node.getOffsetY() + selectedPart.getImageHandle().getDynamicY(),
+						selectedPart.getImageHandle().getWidth(),
+						selectedPart.getImageHandle().getHeight());
+				translateX = selectedPart.getTranslationX();
+				translateY = selectedPart.getTranslationY();
+				scaleX = selectedPart.getScaleX();
+				scaleY = selectedPart.getScaleY();
+				rotation = selectedPart.getRotation();
+			}
+			
+			//selectedPart.
+		}
 
+		@Override public void onPenUp() {
+			setState(TransormStates.READY);
+		}
+		@Override
+		public void onPenDown() {
+			if( holdingCtrl) {
+				Part p = sprite.grabPart(x - node.getOffsetX(), y - node.getOffsetY(), true);
+				if( p != null)
+					selectedPart = p;
+			}
+			else {
+				if( overlap >= 0 && overlap <= 7)
+					this.setState(TransormStates.RESIZE);
+				else if( overlap >= 8 && overlap <= 0xB)
+					this.setState(TransormStates.ROTATE);
+				else if( overlap == 0xC)
+					this.setState(TransormStates.MOVING);
+			}
+		}
+
+		@Override protected void onScaleChanged() {_perform();}
+		@Override protected void onTrnalsationChanged() {_perform();}
+		@Override protected void onRotationChanged() { _perform();}
+		private void _perform() {
+			SpriteLayer.PartStructure structure = selectedPart.getStructure();
+			structure.transX = translateX;
+			structure.transY = translateY;
+			structure.scaleX = scaleX;
+			structure.scaleY = scaleY;
+			structure.rot = rotation;
+
+			undoEngine.performAndStore( sprite.createModifyPartAction( selectedPart, structure));
+		}
 	}
 
 	class FlippingBehavior extends StateBehavior {
@@ -1420,7 +1333,7 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			BuiltImageData data =  workspace.buildActiveData();
+			IBuiltImageData data =  workspace.buildActiveData();
 			if( data != null) {
 				if( MUtil.distance(x , y, startX, startY) < 5 ||
 					Math.abs(x - startX) > Math.abs(y - startY))
@@ -1434,35 +1347,9 @@ public class Penner
 		@Override public void onTock() {}
 	}
 	
-	// :::: KeyEventDispatcher
-	@Override
-	public boolean dispatchKeyEvent(KeyEvent evt) {
-		boolean shift =(( evt.getModifiers() & KeyEvent.SHIFT_MASK) != 0);
-		boolean ctrl = (( evt.getModifiers() & KeyEvent.CTRL_MASK) != 0);
-		boolean alt = (( evt.getModifiers() & KeyEvent.ALT_MASK) != 0);
-			
-		holdingShift = shift;
-		holdingCtrl = ctrl;
-		holdingAlt = alt;
-		return false;
-	}
 	
-	// :::: ActionListener
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-	}
-	
-
-	/** Cleans up resources that have a global-level context in Swing to avoid
-	 * Memory Leaks. */
-	public void cleanUp() {
-		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-			.removeKeyEventDispatcher(this);
-		
-	}
-
 	public boolean drawsOverlay() {
-		return behavior instanceof DrawnStateBehavior;
+		return (behavior instanceof DrawnStateBehavior);
 	}
 
 	public void paintOverlay(GraphicsContext gc) {

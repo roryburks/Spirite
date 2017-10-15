@@ -7,14 +7,15 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.Colors;
 import spirite.base.util.compaction.IntCompactor;
 import spirite.base.util.glmath.MatTrans;
@@ -110,12 +111,12 @@ public class SelectionEngine {
 		MatTrans trans = new MatTrans();
 		if( proposingTransform) {
 			Vec2i d = built.selection.getDimension();
-			trans.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
-			trans.concatenate(proposedTransform);
-			trans.translate(-d.x/2, -d.y/2);
+			trans.preTranslate(-d.x/2, -d.y/2);
+			trans.preConcatenate(proposedTransform);
+			trans.preTranslate(built.offsetX+d.x/2, built.offsetY+d.y/2);
 		}
 		else
-			trans.translate(built.offsetX, built.offsetY);
+			trans.preTranslate(built.offsetX, built.offsetY);
 		return trans;
 	}
 	
@@ -360,14 +361,17 @@ public class SelectionEngine {
 		return new BuiltSelection( img);
 	}
 	public void transformSelection( MatTrans trans) {
+		MatTrans _trans = new MatTrans();
 		RawImage img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
 		
 		GraphicsContext gc = img.getGraphics();
 		
 		Vec2i d = built.selection.getDimension();
-		gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
-		gc.transform(trans);
-		gc.translate(-d.x/2, -d.y/2);
+		
+		_trans.preTranslate(-d.x/2, -d.y/2);
+		_trans.preConcatenate(trans);
+		_trans.preTranslate(built.offsetX+d.x/2, built.offsetY+d.y/2);
+		gc.setTransform(_trans);
 		built.selection.drawSelectionMask(gc);
 //		g2.dispose();
 		BuiltSelection sel = new BuiltSelection( img);
@@ -378,9 +382,7 @@ public class SelectionEngine {
 		if( lifted && sel.selection != null) {
 			img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
 			gc = img.getGraphics();
-			gc.translate(built.offsetX+d.x/2, built.offsetY+d.y/2);
-			gc.transform(trans);
-			gc.translate(-d.x/2, -d.y/2);
+			gc.setTransform(_trans);
 			gc.drawImage( liftedImage, 0, 0);
 //			g2.dispose();
 			
@@ -442,7 +444,7 @@ public class SelectionEngine {
 	
 	private SetLiftedAction createLiftAction(LayerNode node) {
 		BuiltSelection mask = getBuiltSelection();
-		BuiltImageData builtImage = workspace.buildData(node);
+		IBuiltImageData builtImage = workspace.buildData(node);
 		
 		return new SetLiftedAction(mask.liftSelectionFromData(builtImage));
 	}
@@ -490,7 +492,7 @@ public class SelectionEngine {
 	public class ClearSelectionAction extends ImageAction {
 		private final BuiltSelection selection;
 		
-		public ClearSelectionAction(BuiltSelection builtSelection, BuiltImageData builtData) {
+		public ClearSelectionAction(BuiltSelection builtSelection, IBuiltImageData builtData) {
 			super(builtData);
 			this.selection = builtSelection;
 			this.description = "Deleted Selected Data";
@@ -514,7 +516,7 @@ public class SelectionEngine {
 		
 		protected PasteSelectionAction(
 				RawImage liftedImage2, 
-				BuiltImageData builtActiveData, 
+				IBuiltImageData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
 			super(builtActiveData);
@@ -767,8 +769,8 @@ public class SelectionEngine {
 		}
 
 		/** Uses the BuiltSelection to lift the selected portion of the given
-		 * BuiltImageData and put it in a new BufferedImage.*/
-		public RawImage liftSelectionFromData( BuiltImageData data) {
+		 * IBuiltImageData and put it in a new BufferedImage.*/
+		public RawImage liftSelectionFromData( IBuiltImageData data) {
 			return liftSelection(new LiftScheme() {
 				@Override
 				public Rect getBounds() {

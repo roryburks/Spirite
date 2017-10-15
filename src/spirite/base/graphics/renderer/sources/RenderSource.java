@@ -3,11 +3,11 @@ package spirite.base.graphics.renderer.sources;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.RawImage;
 
 /**
  * A RenderSource corresponds to an object which can be rendered and it implements

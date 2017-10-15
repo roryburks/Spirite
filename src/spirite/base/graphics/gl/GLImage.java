@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.image_data.RawImage;
+import spirite.base.graphics.RawImage;
 import spirite.base.util.glmath.GLC;
 
 public class GLImage extends RawImage {

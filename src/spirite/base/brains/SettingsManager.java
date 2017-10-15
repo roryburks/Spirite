@@ -10,9 +10,9 @@ import java.util.prefs.Preferences;
 
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.GLDrawer;
-import spirite.base.util.Interpolation.CubicSplineInterpolator;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2;
+import spirite.base.util.interpolation.CubicSplineInterpolator;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.pc.graphics.awt.AWTDrawer;

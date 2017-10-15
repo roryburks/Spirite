@@ -7,16 +7,16 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.DrawEngine;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
-import spirite.base.util.Interpolation.CubicSplineInterpolator2D;
-import spirite.base.util.Interpolation.InterpolatedPoint;
-import spirite.base.util.Interpolation.Interpolator2D;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.interpolation.CubicSplineInterpolator2D;
+import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.interpolation.Interpolator2D.InterpolatedPoint;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 
@@ -47,7 +47,7 @@ public abstract class StrokeEngine {
 
 	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
-	protected BuiltImageData data;
+	protected IBuiltImageData data;
 	protected BuiltSelection sel;
 	
 	// Interpolation
@@ -58,7 +58,7 @@ public abstract class StrokeEngine {
 	public StrokeEngine.StrokeParams getParams() {
 		return stroke;
 	}
-	public BuiltImageData getImageData() {
+	public IBuiltImageData getImageData() {
 		return data;
 	}
 	public StrokeEngine.STATE getState() {
@@ -82,7 +82,7 @@ public abstract class StrokeEngine {
 	public final boolean startStroke( 
 			StrokeParams params, 
 			PenState ps, 
-			BuiltImageData data,
+			IBuiltImageData data,
 			BuiltSelection selection) 
 	{
 
@@ -169,12 +169,10 @@ public abstract class StrokeEngine {
 
 				interpos = 0;
 				InterpolatedPoint ip = interpolator.evalExt(interpos);
-				InterpolatedPoint op = ip;
 				points.add(new PenState((int)Math.round(ip.x), (int)Math.round(ip.y), 
 						(float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp)));
 				while( interpos + DIFF < interpolator.getCurveLength()) {
 					interpos += DIFF;
-					op = ip;
 					ip = interpolator.evalExt(interpos);
 					
 					points.add(new PenState(ip.x, ip.y, 
@@ -224,7 +222,7 @@ public abstract class StrokeEngine {
 	 */
 	
 
-	public void batchDraw(StrokeParams params, PenState[] points, BuiltImageData builtImage, BuiltSelection mask) 
+	public void batchDraw(StrokeParams params, PenState[] points, IBuiltImageData builtImage, BuiltSelection mask) 
 	{
 		this.startStroke(params, points[0], builtImage, mask);
 

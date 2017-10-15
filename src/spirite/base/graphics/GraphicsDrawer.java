@@ -1,7 +1,6 @@
 package spirite.base.graphics;
 
 
-import spirite.base.image_data.RawImage;
 import spirite.base.pen.StrokeEngine;
 
 /**

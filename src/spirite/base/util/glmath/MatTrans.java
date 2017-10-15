@@ -35,6 +35,24 @@ public class MatTrans {
     	m11 = other.m11;
     	m12 = other.m12;
     }
+    public static MatTrans TranslationMatrix( float transX, float transY) {
+    	return new MatTrans( 
+    			1, 0, transX,
+    			0, 1, transY);
+    }
+    public static MatTrans ScaleMatrix( float scaleX, float scaleY) {
+    	return new MatTrans( 
+    			scaleX, 0, 0,
+    			0, scaleY, 0);
+    }
+    public static MatTrans RotationMatrix( float theta) {
+        float c = (float) Math.cos(theta);
+        float s = (float) FastMath.sin(theta);
+    	return new MatTrans( 
+    			c, -s, 0,
+    			s, c, 0);
+    }
+    
     public float getM00() {return m00;}
     public float getM01() {return m01;}
     public float getM02() {return m02;}
@@ -46,37 +64,41 @@ public class MatTrans {
 		m02 += ox * m00 + oy * m01;
 		m12 += ox * m10 + oy * m11;
 	}
+	public void preTranslate( float ox, float oy) {
+		m02 += ox;
+		m12 += oy;
+	}
 	
 	// THIS = THIS * tx
 	public void concatenate(MatTrans tx) {
-        float n00 = m00 * tx.m00 + m01 * tx.m10;
-        float n01 = m00 * tx.m01 + m01 * tx.m11;
-        float n02 = m00 * tx.m02 + m01 * tx.m12 + m02;
-        float n10 = m10 * tx.m00 + m11 * tx.m10;
-        float n11 = m10 * tx.m01 + m11 * tx.m11;
-        float n12 = m10 * tx.m02 + m11 * tx.m12 + m12;
-        m00 = n00;
-        m01 = n01;
-        m02 = n02;
-        m10 = n10;
-        m11 = n11;
-        m12 = n12;
+		float n00 = m00 * tx.m00 + m01 * tx.m10;
+		float n01 = m00 * tx.m01 + m01 * tx.m11;
+		float n02 = m00 * tx.m02 + m01 * tx.m12 + m02;
+		float n10 = m10 * tx.m00 + m11 * tx.m10;
+		float n11 = m10 * tx.m01 + m11 * tx.m11;
+		float n12 = m10 * tx.m02 + m11 * tx.m12 + m12;
+		m00 = n00;
+		m01 = n01;
+		m02 = n02;
+		m10 = n10;
+		m11 = n11;
+		m12 = n12;
 	}
 
 	// THIS = tx * THIS
 	public void preConcatenate(MatTrans tx) {
-        float n00 = m00 * tx.m00 + m01 * tx.m10;
-        float n01 = m00 * tx.m01 + m01 * tx.m11;
-        float n02 = m00 * tx.m02 + m01 * tx.m12 + m02;
-        float n10 = m10 * tx.m00 + m11 * tx.m10;
-        float n11 = m10 * tx.m01 + m11 * tx.m11;
-        float n12 = m10 * tx.m02 + m11 * tx.m12 + m12;
-        m00 = n00;
-        m01 = n01;
-        m02 = n02;
-        m10 = n10;
-        m11 = n11;
-        m12 = n12;
+		float n00 = tx.m00 * m00 + tx.m01 * m10;
+		float n01 = tx.m00 * m01 + tx.m01 * m11;
+		float n02 = tx.m00 * m02 + tx.m01 * m12 + tx.m02;
+		float n10 = tx.m10 * m00 + tx.m11 * m10;
+		float n11 = tx.m10 * m01 + tx.m11 * m11;
+		float n12 = tx.m10 * m02 + tx.m11 * m12 + tx.m12;
+		m00 = n00;
+		m01 = n01;
+		m02 = n02;
+		m10 = n10;
+		m11 = n11;
+		m12 = n12;
 	}
 	
 	public void setToIdentity() {
@@ -84,7 +106,7 @@ public class MatTrans {
 		m02 = m01 = m10 = m12 = 0;
 	}
 	public void rotate(float theta) {
-        float c = (float) FastMath.cos(theta);
+        float c = (float) Math.cos(theta);
         float s = (float) FastMath.sin(theta);
         float n00 = m00 *  c + m01 * s;
         float n01 = m00 * -s + m01 * c;
@@ -94,13 +116,36 @@ public class MatTrans {
         m01 = n01;
         m10 = n10;
         m11 = n11;
-		
+	}
+	public void preRotate(float theta) {
+        float c = (float) FastMath.cos(theta);
+        float s = (float) FastMath.sin(theta);
+        float n00 = c*m00 - s*m10;
+        float n01 = c*m01 - s*m11;
+        float n02 = c*m02 - s*m12;
+        float n10 = s*m00 + c*m10;
+        float n11 = s*m01 + c*m11;
+        float n12 = s*m02 + c*m12;
+		m00 = n00;
+		m01 = n01;
+		m02 = n02;
+		m10 = n10;
+		m11 = n11;
+		m12 = n12;
 	}
 	public void scale(float sx, float sy) {
         m00 *= sx;
         m01 *= sy;
         m10 *= sx;
         m11 *= sy;
+	}
+	public void preScale( float sx, float sy) {
+		m00 *= sx;
+		m01 *= sx;
+		m02 *= sx;
+		m10 *= sy;
+		m11 *= sy;
+		m12 *= sy;
 	}
 	public float getTranslateX() {return m02;}
 	public float getTranslateY() {return m12;}

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.MatTrans;

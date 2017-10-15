@@ -39,12 +39,12 @@ import javax.swing.border.EtchedBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.sources.LayerRenderSource;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.ReferenceManager.ImageReference;
 import spirite.base.image_data.ReferenceManager.LayerReference;

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
@@ -16,10 +17,9 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
-import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -81,7 +81,7 @@ public class HybridNodeRenderer {
 	private ImageHandle compositionHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) 
 	{
-		BuiltImageData dataContext= workspace.buildActiveData();
+		IBuiltImageData dataContext= workspace.buildActiveData();
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing())) 
 		{
@@ -92,16 +92,17 @@ public class HybridNodeRenderer {
 			GraphicsContext gc = compositionImage.getGraphics();
 			
 			// Draw the Base Image
-			gc.setTransform(dataContext.getCompositeTransform());
-			gc.translate(dataContext.handle.getDynamicX(), 
+			MatTrans drawTrans = dataContext.getCompositeTransform();
+			drawTrans.preTranslate(dataContext.handle.getDynamicX(), 
 					dataContext.handle.getDynamicY());
+			gc.setTransform(drawTrans);
 			gc.drawHandle( dataContext.handle, 0, 0);
 			
 
 			if( workspace.getSelectionEngine().getLiftedImage() != null ){
 				// Draw Lifted Image
-				MatTrans tt = dataContext.getScreenToImageTransform();
-				tt.concatenate( workspace.getSelectionEngine().getDrawFromTransform());
+				MatTrans tt = workspace.getSelectionEngine().getDrawFromTransform();
+				tt.preConcatenate(dataContext.getScreenToImageTransform() );
 				
 				gc.setTransform(tt);
 				gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
@@ -238,7 +239,7 @@ public class HybridNodeRenderer {
 			this.depth = renderable.depth;
 			this.settings = settings;
 			this.transform = renderable.trans;
-			this.transform.translate(ox, oy);
+			this.transform.preTranslate(ox, oy);
 		}
 		@Override
 		public void draw(GraphicsContext gc) {
@@ -252,8 +253,7 @@ public class HybridNodeRenderer {
 				gc.renderImage( compositionImage, 0, 0, properties);
 			}
 			else {
-				drawTrans.translate( renderable.handle.getDynamicX(), 
-						renderable.handle.getDynamicY());
+				drawTrans.preTranslate(renderable.handle.getDynamicX(),renderable.handle.getDynamicY());
 				gc.setTransform(drawTrans);
 				gc.renderHandle(renderable.handle, 0, 0, properties);
 			}

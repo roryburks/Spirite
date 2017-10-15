@@ -11,12 +11,11 @@ import java.util.ListIterator;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
-import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.InternalImage;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -598,7 +597,7 @@ public class UndoEngine {
 			private final int ii_ox, ii_oy;
 			boolean freed = false;
 			KeyframeAction( RawImage raw, ImageAction action) {
-				super(workspace.new BuiltImageData(image));
+				super( image.build());
 				this.frameCache = cacheManager.cacheImage(raw.deepCopy(), this);
 				this.hiddenAction = action;
 
@@ -633,7 +632,7 @@ public class UndoEngine {
 					workspace._replaceIamge(image, frameCache.access().deepCopy());
 				}
 				else {
-					BuiltImageData built = workspace.new BuiltImageData(image);
+					IBuiltImageData built = image.build();
 					RawImage img = built.checkoutRaw();	
 					GraphicsContext gc = img.getGraphics();
 					gc.setComposite(Composite.SRC, 1);
@@ -1155,8 +1154,8 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final BuiltImageData builtImage;
-		protected ImageAction( BuiltImageData data) {
+		protected final IBuiltImageData builtImage;
+		protected ImageAction( IBuiltImageData data) {
 			this.builtImage = data;
 		}
 		@Override protected final void performAction() 
@@ -1173,7 +1172,7 @@ public class UndoEngine {
 	// For internal use only.  Why would you want make an empty Image Action?
 	class NilImageAction extends ImageAction {
 		protected NilImageAction(ImageHandle data) {
-			super(workspace.new BuiltImageData(data));
+			super( data.build());
 		}
 		@Override		protected void performImageAction() {}
 		
@@ -1336,7 +1335,7 @@ public class UndoEngine {
 //		private final int dx;
 	//	private final int dy;
 		
-		public DrawImageAction(BuiltImageData data, CachedImage other) {
+		public DrawImageAction(IBuiltImageData data, CachedImage other) {
 			super(data);
 			this.stored = other;
 		}

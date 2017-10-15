@@ -5,9 +5,11 @@ import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
-import spirite.base.image_data.RawImage;
+import spirite.base.graphics.RawImage;
 import spirite.base.util.compaction.FloatCompactor;
+import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 
 public class MUtil {
 
@@ -86,6 +88,24 @@ public class MUtil {
 			return 0;
 		
 		return ((((t - start) % diff) + diff) % diff) + start;
+	}
+	
+	/**
+	 * Finds the bounds of a rectangle tranformed by a matrix
+	 */
+	public static Rect findBounds( Rect region, MatTrans matrix) {
+		// Might be some slightly-more-clever way to determing this
+		Vec2 p1 = matrix.transform(new Vec2(region.x, region.y),  new Vec2());
+		Vec2 p2 = matrix.transform(new Vec2(region.x+region.width, region.y),  new Vec2());
+		Vec2 p3 = matrix.transform(new Vec2(region.x, region.y + region.height),  new Vec2());
+		Vec2 p4 = matrix.transform(new Vec2(region.x+region.width, region.y + region.height),  new Vec2());
+
+		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
+		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
+		int x2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.x, p2.x), p3.x), p4.y));
+		int y2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.x, p2.x), p3.x), p4.y));
+		
+		return new Rect( x1, y1, x2-x1, y2-y1);
 	}
 	
 	/**

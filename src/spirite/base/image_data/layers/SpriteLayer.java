@@ -8,6 +8,7 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -15,13 +16,14 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 
@@ -41,12 +43,15 @@ public class SpriteLayer extends Layer
 	
 	public SpriteLayer( ImageHandle handle) {
 		context = handle.getContext();
-		active = new Part(handle, "Base");
+		active = new Part(new PartStructure(handle, "Base"));
 		parts.add( active);
 	}
 	
-	public SpriteLayer( List<Part> parts) {
-		this.parts.addAll(parts);
+	public SpriteLayer( List<PartStructure> structures) {
+		
+		for( PartStructure pstruct : structures) {
+			this.parts.add( new Part( new PartStructure( pstruct)));
+		}
 		
 		if( !this.parts.isEmpty())
 			active = this.parts.get(0);
@@ -55,51 +60,106 @@ public class SpriteLayer extends Layer
 		updateContext();
 	}
 	
-	public static class Part {
-		private final ImageHandle handle;
-		private int ox, oy;
-		private int depth;	
-		private String partName;
-		private boolean visible = true;
-		private float alpha = 1.0f;
+	public static class PartStructure {
+		public ImageHandle handle;
+		public int depth;
+		public String partName;
+		public boolean visible = true;
+		public float alpha = 1.0f;
+		public float transX, transY;
+		public int ox, oy;
+		public float scaleX = 1.0f;
+		public float scaleY = 1.0f;
+		public float rot;
 		
-		public Part( ImageHandle handle, String pName, int ox, int oy, int depth, 
-				boolean visible, float alpha) 
+		public PartStructure() {}
+		private PartStructure(ImageHandle handle, String partName) {
+			this( handle, partName, 0, 0, 0, 0, 1, 1, 0, 0, true, 1);
+		}
+		public PartStructure( 
+				ImageHandle handle, String pName, int ox, int oy, 
+				int depth, boolean visible, float alpha) 
+		{
+			this( handle, pName, ox, oy, 0, 0, 1, 1, 0, depth, visible, alpha);
+		}
+		public PartStructure( 
+				ImageHandle handle, String pName, int ox, int oy,
+				float transX, float transY, float scaleX, float scaleY, float rotation,
+				int depth, boolean visible, float alpha) 
 		{
 			this.handle = handle;
 			this.partName = pName;
 			this.ox = ox;
 			this.oy = oy;
+			this.transX = transX;
+			this.transY = transY;
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
+			this.rot = rotation;
 			this.depth = depth;
 			this.visible = visible;
 			this.alpha = alpha;
 		}
-		
-		private Part(ImageHandle handle, String partName) {
-			this.handle = handle;
-			this.partName = partName;
+		public PartStructure( PartStructure other) {
+			copyFrom( other);
 		}
 		
-		public int getDepth() {
-			return depth;
+		public void copyFrom( PartStructure other) {
+			this.handle = other.handle;
+			this.partName = other.partName;
+			this.transX = other.transX;
+			this.transY = other.transY;
+			this.scaleX = other.scaleX;
+			this.scaleY = other.scaleY;
+			this.ox = other.ox;
+			this.oy = other.oy;
+			this.rot = other.rot;
+			this.depth = other.depth;
+			this.visible = other.visible;
+			this.alpha = other.alpha;
 		}
-		public int getOffsetX() {
-			return ox;
+	}
+	public class Part {
+		private final PartStructure structure = new PartStructure();
+		
+		private Part( PartStructure structure) {
+			this.structure.copyFrom(structure);
 		}
-		public int getOffsetY() {
-			return oy;
+		
+		public int getDepth() { return structure.depth;}
+		public float getTranslationX() {return structure.transX;}
+		public float getTranslationY() {return structure.transY;}
+		public float getScaleX() {return structure.scaleX;}
+		public float getScaleY() {return structure.scaleY;}
+		public float getRotation() {return structure.rot;}
+		public String getTypeName() {return structure.partName;}
+		public ImageHandle getImageHandle() {return structure.handle;}
+		public boolean isVisible() {return structure.visible;}
+		public float getAlpha() {return structure.alpha;}
+		public SpriteLayer getContext() {return SpriteLayer.this;}
+		public PartStructure getStructure() {return new PartStructure(structure);}
+		public MatTrans buildTransform() {
+			MatTrans ret = new MatTrans();
+			ret.preTranslate(-structure.handle.getWidth()/2, -structure.handle.getHeight()/2);
+			ret.preScale(structure.scaleX, structure.scaleY);
+			ret.preRotate(structure.rot);
+			ret.preTranslate(structure.transX+structure.handle.getWidth()/2, 
+					structure.transY+structure.handle.getHeight()/2);
+			return ret;
 		}
-		public String getTypeName() {
-			return partName;
+		public MatTrans buildInverseTransform() {
+			try {
+				return buildTransform().createInverse();
+			} catch (NoninvertableException e) {
+				e.printStackTrace();
+				return new MatTrans();
+			}
 		}
-		public ImageHandle getImageHandle() {
-			return handle;
+		public int _getOX() {
+			return (int)structure.transX;
 		}
-		public boolean isVisible() {
-			return visible;
-		}
-		public float getAlpha() {
-			return alpha;
+		public int _getOY() {
+			return (int)structure.transY;
 		}
 	}
 	
@@ -119,12 +179,16 @@ public class SpriteLayer extends Layer
 	public Part grabPart(int x, int y, boolean select) {
 		for( int i=parts.size()-1; i >= 0; --i) {
 			Part part = parts.get(i);
-			int dx = part.handle.getDynamicX();
-			int dy = part.handle.getDynamicY();
+			int dx = part.structure.handle.getDynamicX();
+			int dy = part.structure.handle.getDynamicY();
 			if( part.isVisible()) {
-				if( !MUtil.coordInImage(x - part.ox-dx, y-part.oy-dy, part.handle.deepAccess()))
+				MatTrans invTrans = part.buildInverseTransform();
+				Vec2 from = new Vec2( x - dx, y-dy);
+				Vec2 to = invTrans.transform(from, new Vec2());
+				
+				if( !MUtil.coordInImage( (int)to.x, (int)to.y, part.structure.handle.deepAccess()))
 					continue;
-				int rgb =part.handle.deepAccess().getRGB(x - part.ox-dx, y-part.oy-dy);
+				int rgb =part.structure.handle.deepAccess().getRGB((int)to.x, (int)to.y);
 				
 				if( ((rgb >>> 24) & 0xFF) == 0) continue; 
 				
@@ -140,20 +204,13 @@ public class SpriteLayer extends Layer
 	}
 	
 	/** Outside classes should use createModifyPartAction */
-	private void _setPartDepth( Part part, int newDepth) {
-		if( !parts.contains(part))
-			return;
-
-		if ( part.depth != newDepth) {
-			part.depth = newDepth;
-			
-			parts.sort( new Comparator<Part>() {
-				@Override
-				public int compare(Part o1, Part o2) {
-					return o1.depth - o2.depth;
-				}
-			});
-		}
+	private void _sortByDepth() {
+		parts.sort( new Comparator<Part>() {
+			@Override
+			public int compare(Part o1, Part o2) {
+				return o1.structure.depth - o2.structure.depth;
+			}
+		});
 	}
 	
 	public List<Part> getParts() {
@@ -183,7 +240,7 @@ public class SpriteLayer extends Layer
 		while( !free) {
 			free = true;
 			for( Part part : parts) {
-				if( part.partName.equals(testing)) {
+				if( part.structure.partName.equals(testing)) {
 					testing = partName + "_" + (++i);
 					free = false;
 					break;
@@ -192,13 +249,39 @@ public class SpriteLayer extends Layer
 		}
 		
 		
-		Part part = new Part(context.importDynamicData(image), testing);
-		part.ox = ox;
-		part.oy = oy;
-		part.depth = depth;
+		final Part toAdd = new Part( new PartStructure(
+				context.importDynamicData(image), testing, ox, oy, depth, true, 1));
 		
 		
-		return new AddPartAction( part);
+		return new NullAction() {
+			
+			@Override
+			protected void performAction() {
+				parts.add( toAdd);
+				active = toAdd;
+				parts.sort( new Comparator<Part>() {
+					@Override
+					public int compare(Part o1, Part o2) {
+						return o1.structure.depth - o2.structure.depth;
+					}
+				});
+				_trigger();
+			}
+			@Override
+			protected void undoAction() {
+				if (active == toAdd)
+					active = null;
+				parts.remove(toAdd);
+				_trigger();
+			}
+			@Override public boolean reliesOnData() {return true;}
+			@Override
+			public Collection<ImageHandle> getDependencies() {
+				return Arrays.asList(new ImageHandle[] {toAdd.structure.handle});
+			}
+			@Override
+			public String getDescription() {return "Added Part to Rig.";}
+		};
 	}
 	
 	/** Removes an UndoableAction representing the Creation of a new part.
@@ -208,10 +291,36 @@ public class SpriteLayer extends Layer
 	 * method.
 	 * 
 	 * Can return null if the part is not in the RigLayer*/
-	public UndoableAction createRemovePartAction( Part part) {
-		if( !parts.contains(part))
+	public UndoableAction createRemovePartAction( final Part toRemove) {
+		if( !parts.contains(toRemove))
 			return null;
-		return new RemovePartAction(part);
+		return new NullAction() {
+			@Override
+			protected void performAction() {
+				if (active == toRemove)
+					active = null;
+				parts.remove(toRemove);
+				_trigger();
+			}
+			@Override
+			protected void undoAction() {
+				parts.add( toRemove);
+				parts.sort( new Comparator<Part>() {
+					@Override
+					public int compare(Part o1, Part o2) {
+						return o1.structure.depth - o2.structure.depth;
+					}
+				});	
+				_trigger();
+			}
+			
+			@Override public String getDescription() { return "Removed Part from Rig";}
+			@Override public boolean reliesOnData() {return true;}
+			@Override
+			public Collection<ImageHandle> getDependencies() {
+				return Arrays.asList(new ImageHandle[] {toRemove.structure.handle});
+			}
+		};
 	}
 
 	/** Creates an action representing a change to a single Part's structure
@@ -222,13 +331,56 @@ public class SpriteLayer extends Layer
 	 * method.
 	 * 
 	 * Can return null if the part is not in the RigLayer*/
-	public UndoableAction createModifyPartAction( Part part, int ox, int oy, 
-			int depth, String partName, boolean visible, float alpha) 
+	public UndoableAction createModifyPartAction( 
+			Part part, PartStructure newStructure) 
 	{
 
 		if( !parts.contains(part))
 			return null;
-		return new ChangePartAttributesAction(part, ox, oy, depth, partName, visible, alpha);
+		return new ChangePartAttributesAction( part, newStructure);
+	}
+	public class ChangePartAttributesAction extends NullAction 
+		implements StackableAction
+	{
+		private final Part part;
+		private final PartStructure oldStructure;
+		private final PartStructure newStructure;
+		ChangePartAttributesAction( 
+				Part part, PartStructure newStructure) 
+		{
+			this.part = part;
+			this.oldStructure = new PartStructure(part.structure);
+			this.newStructure = new PartStructure( newStructure);
+		}
+		
+		@Override
+		protected void performAction() {
+			part.structure.copyFrom(newStructure);
+			_sortByDepth();
+			_trigger();
+		}
+	
+		@Override
+		protected void undoAction() {
+			part.structure.copyFrom(oldStructure);
+			_sortByDepth();
+			_trigger();
+		}
+	
+		@Override
+		public void stackNewAction(UndoableAction newAction) {
+			if( canStack(newAction));
+			
+			ChangePartAttributesAction other = (ChangePartAttributesAction)newAction;
+			this.newStructure.copyFrom(other.newStructure);
+		}
+	
+		@Override
+		public boolean canStack(UndoableAction newAction) {
+			return ((newAction instanceof ChangePartAttributesAction) &&
+				((ChangePartAttributesAction)newAction).part == part);
+		}
+		
 	}
 	
 	
@@ -236,7 +388,7 @@ public class SpriteLayer extends Layer
 		if( parts.isEmpty())
 			return;
 		
-		context =  parts.get(0).handle.getContext();
+		context =  parts.get(0).structure.handle.getContext();
 	}
 	
 
@@ -249,14 +401,14 @@ public class SpriteLayer extends Layer
 			return null;
 		
 		
-		return new BuildingImageData(active.handle, active.ox, active.oy);
+		return new BuildingImageData(active.structure.handle, active._getOX(), active._getOY());
 	}
 
 	@Override
 	public List<BuildingImageData> getDataToBuild(){
 		List<BuildingImageData> list = new ArrayList<>(parts.size());
 		for( Part p : parts) {
-			list.add( new BuildingImageData( p.handle, p.ox, p.oy));
+			list.add( new BuildingImageData( p.structure.handle, p._getOX(), p. _getOY()));
 		}
 		return list;
 	}
@@ -265,7 +417,7 @@ public class SpriteLayer extends Layer
 	public List<ImageHandle> getImageDependencies() {
 		List<ImageHandle> handles = new ArrayList<>( parts.size());
 		for( Part part : parts) {
-			handles.add(part.handle);
+			handles.add(part.structure.handle);
 		}
 		return handles;
 	}
@@ -285,11 +437,11 @@ public class SpriteLayer extends Layer
 		float oldAlpha = gc.getAlpha();
 		Composite oldComp = gc.getComposite();
 		
-		gc.setComposite(Composite.SRC_OVER, oldAlpha*part.alpha);
+		gc.setComposite(Composite.SRC_OVER, oldAlpha*part.structure.alpha);
 		
 		MatTrans trans = new MatTrans();
-		trans.translate(part.ox,part.oy);
-		part.handle.drawLayer( gc, trans);
+		trans.translate(part._getOX(),part._getOY());
+		part.structure.handle.drawLayer( gc, trans);
 		
 		gc.setComposite(oldComp, oldAlpha);
 	}
@@ -301,9 +453,9 @@ public class SpriteLayer extends Layer
 		int x2 = 0;
 		
 		for( Part part : parts) {
-			if( part.ox < x1) x1 = part.ox;
+			if( part._getOX() < x1) x1 = part._getOY();
 			
-			int px2 = part.ox + part.handle.getWidth();
+			int px2 = part._getOX() + part.structure.handle.getWidth();
 			if( px2 > x2) x2 = px2;
 		}
 		
@@ -316,9 +468,9 @@ public class SpriteLayer extends Layer
 		int y2 = 0;
 		
 		for( Part part : parts) {
-			if( part.oy < y1) y1 = part.oy;
+			if( part._getOY() < y1) y1 = part._getOY();
 			
-			int py2 = part.oy + part.handle.getHeight();
+			int py2 = part._getOY() + part.structure.handle.getHeight();
 			if( py2 > y2) y2 = py2;
 		}
 		return y2 - 0;
@@ -348,7 +500,7 @@ public class SpriteLayer extends Layer
 		List<Rect> list = new ArrayList<>(parts.size());
 		
 		for( Part part : parts) {
-			list.add( new Rect(part.ox, part.oy, part.handle.getWidth(), part.handle.getHeight()));
+			list.add( new Rect(part._getOX(), part._getOY(), part.structure.handle.getWidth(), part.structure.handle.getHeight()));
 		}
 		
 		return list;
@@ -356,17 +508,10 @@ public class SpriteLayer extends Layer
 
 	@Override
 	public Layer logicalDuplicate() {
-		List<Part> dupeParts = new ArrayList<Part>(parts.size());
+		List<PartStructure> dupeParts = new ArrayList<PartStructure>(parts.size());
 		for( Part part : parts) {
-			dupeParts.add(new Part(
-				part.handle.dupe(),
-				part.partName,
-				part.ox,
-				part.oy,
-				part.depth,
-				part.visible,
-				part.alpha
-			));
+			PartStructure structure = new PartStructure(part.structure);
+			dupeParts.add(structure);
 		}
 		return new SpriteLayer( dupeParts);
 	}
@@ -381,11 +526,11 @@ public class SpriteLayer extends Layer
 				
 				TransformedHandle renderable = new TransformedHandle();
 
-				renderable.alpha = part.alpha;
+				renderable.alpha = part.structure.alpha;
 				
-				renderable.handle = part.handle;
-				renderable.trans.translate( part.ox, part.oy);
-				renderable.depth = part.depth;
+				renderable.handle = part.structure.handle;
+				renderable.trans = part.buildTransform();
+				renderable.depth = part.structure.depth;
 				list.add(renderable);
 			}
 		}
@@ -393,144 +538,6 @@ public class SpriteLayer extends Layer
 		return list;
 	}
 	
-	
-	// :::: Rig Modification related 
-	public class AddPartAction extends NullAction {
-		private final Part added;
-		
-		AddPartAction( Part part) {
-			added = part;
-			this.description = "Added Part to Rig";
-		}
-		
-		public Part getPart() {
-			return added;
-		}
-		@Override
-		protected void performAction() {
-			parts.add( added);
-			active = added;
-			parts.sort( new Comparator<Part>() {
-				@Override
-				public int compare(Part o1, Part o2) {
-					return o1.depth - o2.depth;
-				}
-			});
-			_trigger();
-		}
-		@Override
-		protected void undoAction() {
-			if (active == added)
-				active = null;
-			parts.remove(added);
-			_trigger();
-		}
-		@Override public boolean reliesOnData() {return true;}
-		@Override
-		public Collection<ImageHandle> getDependencies() {
-			return Arrays.asList(new ImageHandle[] {added.handle});
-		}
-	}
-	public class RemovePartAction extends NullAction {
-		private final Part removed;
-		
-		RemovePartAction( Part part) {
-			removed = part;
-			this.description = "Removed Part from Rig";
-		}
-		@Override
-		protected void performAction() {
-			if (active == removed)
-				active = null;
-			parts.remove(removed);
-			_trigger();
-		}
-		@Override
-		protected void undoAction() {
-			parts.add( removed);
-			parts.sort( new Comparator<Part>() {
-				@Override
-				public int compare(Part o1, Part o2) {
-					return o1.depth - o2.depth;
-				}
-			});	
-			_trigger();
-		}
-		@Override public boolean reliesOnData() {return true;}
-		@Override
-		public Collection<ImageHandle> getDependencies() {
-			return Arrays.asList(new ImageHandle[] {removed.handle});
-		}
-	}
-
-	public class ChangePartAttributesAction extends NullAction 
-		implements StackableAction
-	{
-		private final Part part;
-		private int old_ox, old_oy, new_ox, new_oy;
-		private int old_depth, new_depth;
-		private String oldName, newName;
-		private boolean oldVisible, newVisible;
-		private float oldAlpha, newAlpha;
-		
-		ChangePartAttributesAction( Part part, int ox, int oy, int depth, String name,
-				boolean visible, float alpha) 
-		{
-			this.part = part;
-			this.old_ox = part.ox;
-			this.old_oy = part.oy;
-			this.old_depth = part.depth;
-			this.oldName = part.partName;
-			this.oldAlpha = part.alpha;
-			this.oldVisible = part.visible;
-			this.new_ox = ox;
-			this.new_oy = oy;
-			this.new_depth = depth;
-			this.newName = name;
-			this.newAlpha = alpha;
-			this.newVisible = visible;
-		}
-		
-		@Override
-		protected void performAction() {
-			part.ox = new_ox;
-			part.oy = new_oy;
-			_setPartDepth(part, new_depth);
-			part.partName = newName;
-			part.visible = newVisible;
-			part.alpha = newAlpha;
-			_trigger();
-		}
-
-		@Override
-		protected void undoAction() {
-			part.ox = old_ox;
-			part.oy = old_oy;
-			_setPartDepth(part, old_depth);
-			part.partName = oldName;
-			part.visible = oldVisible;
-			part.alpha = oldAlpha;
-			_trigger();
-		}
-
-		@Override
-		public void stackNewAction(UndoableAction newAction) {
-			if( canStack(newAction));
-			
-			ChangePartAttributesAction other = (ChangePartAttributesAction)newAction;
-			this.new_depth = other.new_depth;
-			this.new_ox = other.new_ox;
-			this.new_oy = other.new_oy;
-			this.newName = other.newName;
-		}
-
-		@Override
-		public boolean canStack(UndoableAction newAction) {
-			return ((newAction instanceof ChangePartAttributesAction) &&
-				((ChangePartAttributesAction)newAction).part == part);
-		}
-		
-	}
 	
 	private void _trigger() {
 		updateContext();
@@ -558,13 +565,14 @@ public class SpriteLayer extends Layer
 		
 		for( ImageCropHelper crop : crops) {
 			for( Part part : parts) {
-				if( crop.handle.equals(part.handle)) {
+				if( crop.handle.equals(part.structure.handle)) {
 					if( helper == null)
 						helper = new LayerActionHelper();
 					
-					helper.actions.add( new ChangePartAttributesAction(
-							part, part.ox + crop.dx, part.oy + crop.dy, 
-							part.depth, part.partName, part.visible, part.alpha));
+					// TODO
+//					helper.actions.add( new ChangePartAttributesAction(
+//							part, part.ox + crop.dx, part.oy + crop.dy, 
+//							part.depth, part.partName, part.visible, part.alpha));
 				}
 			}
 		}

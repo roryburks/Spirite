@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -20,14 +21,13 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.DynamicImportImage;
 import spirite.base.image_data.ImageWorkspace.ImportImage;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
-import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -344,21 +344,35 @@ public class LoadEngine {
 					break;
 				case SaveLoadUtil.NODE_RIG_LAYER: {
 					int partCount = helper.ra.readByte();
-					List<Part> parts = new ArrayList<Part>( partCount);
+					List<PartStructure> parts = new ArrayList<>( partCount);
 					
 					
 					for( int i=0; i<partCount; ++i) {
-						String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
-						int pox = helper.ra.readShort();
-						int poy = helper.ra.readShort();
-						int pdepth = helper.ra.readInt();
-						int pid = helper.ra.readInt();
+						PartStructure part = new PartStructure();
+						if( helper.version <= 4) {
+							part.partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+							
+							part.transX = helper.ra.readShort();
+							part.transY =  helper.ra.readShort();
+							part.depth = helper.ra.readInt();
+							
+							int pid = helper.ra.readInt();
+							part.handle = new ImageHandle(null, pid);
+						}
+						else {
+							part.partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+
+							part.transX = helper.ra.readFloat();
+							part.transY = helper.ra.readFloat();
+							part.scaleX = helper.ra.readFloat();
+							part.scaleY = helper.ra.readFloat();
+							part.rot = helper.ra.readFloat();
+							part.depth = helper.ra.readInt();
+							int pid = helper.ra.readInt();
+							part.handle = new ImageHandle( null, pid);
+						}
 						
-						parts.add( new Part( 
-								new ImageHandle( null, pid),
-								partName,
-								pox, poy, pdepth,
-								true, 1.0f));
+						parts.add(part);
 					}
 					
 					

@@ -15,9 +15,9 @@ import javax.imageio.ImageIO;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
-import spirite.base.image_data.RawImage;
 import spirite.base.util.ArrayInterpretation.IntCounter;
 import spirite.base.util.ArrayInterpretation.InterpretedIntArray;
 import spirite.base.util.glmath.GLC;

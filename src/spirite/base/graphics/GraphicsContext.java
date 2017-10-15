@@ -3,7 +3,6 @@ package spirite.base.graphics;
 import java.awt.Shape;	// TODO
 
 import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.RawImage;
 import spirite.base.util.glmath.MatTrans;
 
 /**

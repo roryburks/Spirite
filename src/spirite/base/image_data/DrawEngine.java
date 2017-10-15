@@ -8,13 +8,14 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.PenTraits;
 import spirite.base.pen.PenTraits.PenDynamics;
@@ -64,7 +65,7 @@ public class DrawEngine {
 	/** Starts a Stroke with the provided parameters
 	 * 
 	 * @return true if the stroke started, false otherwise	 */
-	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, BuiltImageData data) {
+	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, IBuiltImageData data) {
 		if( activeEngine != null) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
@@ -118,7 +119,7 @@ public class DrawEngine {
 	
 
 	/** Clears the Image Dat to a transparent color. */
-	public void clear( BuiltImageData data) {
+	public void clear( IBuiltImageData data) {
 		execute( new ClearAction(data, pollSelectionMask()));
 	}
 
@@ -126,7 +127,7 @@ public class DrawEngine {
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, int color, BuiltImageData data)
+	public boolean fill( int x, int y, int color, IBuiltImageData data)
 	{
 		if( data == null) return false;
 		
@@ -152,7 +153,7 @@ public class DrawEngine {
 	}
 	
 	/** Flips the data around either the horizontal or vertical center of the Iamge. */
-	public void flip( BuiltImageData data, boolean horizontal) {
+	public void flip( IBuiltImageData data, boolean horizontal) {
 		BuiltSelection sel = selectionEngine.getBuiltSelection();
 		
 		if( selectionEngine.isLifted()) {
@@ -211,7 +212,7 @@ public class DrawEngine {
 		
 		switch( scope) {
 		case 0:	// Local
-			BuiltImageData bid = workspace.buildActiveData();
+			IBuiltImageData bid = workspace.buildActiveData();
 			if( bid != null) {
 				execute( new ColorChangeAction(bid, mask, from, to, mode));
 			}
@@ -243,7 +244,7 @@ public class DrawEngine {
 			break;
 		}
 	}
-	public void invert(BuiltImageData data) {
+	public void invert(IBuiltImageData data) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		execute( new InvertAction(data, mask));
 	}
@@ -316,7 +317,7 @@ public class DrawEngine {
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
 
-		private MaskedImageAction(BuiltImageData data, BuiltSelection mask) {
+		private MaskedImageAction(IBuiltImageData data, BuiltSelection mask) {
 			super(data);
 			this.mask = mask;
 		}
@@ -333,7 +334,7 @@ public class DrawEngine {
 				StrokeEngine.StrokeParams params, 
 				PenState[] points, 
 				BuiltSelection mask, 
-				BuiltImageData data)
+				IBuiltImageData data)
 		{
 			super(data, mask);
 			this.engine = engine;
@@ -368,7 +369,7 @@ public class DrawEngine {
 		private final Vec2i p;
 		private final int color;
 		
-		private FillAction( Vec2i p, int c, BuiltSelection mask, BuiltImageData data) {
+		private FillAction( Vec2i p, int c, BuiltSelection mask, IBuiltImageData data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -445,7 +446,7 @@ public class DrawEngine {
 	}
 
 	public class ClearAction extends MaskedImageAction {
-		private ClearAction(BuiltImageData data, BuiltSelection mask) {
+		private ClearAction(IBuiltImageData data, BuiltSelection mask) {
 			super(data, mask); 
 			description = "Clear Image";
 		}
@@ -470,7 +471,7 @@ public class DrawEngine {
 	public class FlipAction extends MaskedImageAction 
 	{
 		private final boolean horizontal;
-		private FlipAction(BuiltImageData data, BuiltSelection mask, boolean horizontal) {
+		private FlipAction(IBuiltImageData data, BuiltSelection mask, boolean horizontal) {
 			super(data, mask);
 			this.horizontal = horizontal;
 			description = "Flip Action";
@@ -531,7 +532,7 @@ public class DrawEngine {
 
 	public class ScaleAction extends MaskedImageAction 
 	{
-		private ScaleAction(BuiltImageData data, BuiltSelection mask) {
+		private ScaleAction(IBuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		
@@ -543,7 +544,7 @@ public class DrawEngine {
 	public abstract class PerformFilterAction extends MaskedImageAction
 	{
 
-		private PerformFilterAction(BuiltImageData data, BuiltSelection mask) {
+		private PerformFilterAction(IBuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 
@@ -577,7 +578,7 @@ public class DrawEngine {
 		private final int from, to;
 		private final int mode;
 		private ColorChangeAction(
-				BuiltImageData data, 
+				IBuiltImageData data, 
 				BuiltSelection mask, 
 				int from, int to, 
 				int mode) 
@@ -595,7 +596,7 @@ public class DrawEngine {
 	}
 	
 	public class InvertAction extends PerformFilterAction {
-		private InvertAction(BuiltImageData data, BuiltSelection mask) {
+		private InvertAction(IBuiltImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		@Override

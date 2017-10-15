@@ -23,7 +23,6 @@ import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -34,6 +33,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -143,13 +143,15 @@ public class GLWorkArea
         	glgc.setComposite(Composite.SRC_OVER, 1);
 
             // :::: Draw Border around the active Data
-            BuiltImageData active = workspace.buildActiveData();
+            IBuiltImageData active = workspace.buildActiveData();
             
             if( active!= null) {
+            	glgc.setComposite(glgc.getComposite(), 0.3f);
                 glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
                 
                 Rect r = active.getBounds();
                 glgc.drawRect( r.x-1, r.y-1, r.width+2, r.height+2);
+            	glgc.setComposite(glgc.getComposite(), 1);
             }
             
         	// :::: Draw Selection Bounds

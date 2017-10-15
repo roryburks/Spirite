@@ -19,6 +19,7 @@ import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
@@ -29,16 +30,15 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuiltImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
 import spirite.base.util.glmath.MatTrans;
@@ -511,7 +511,7 @@ public class MasterControl
     					img = currentWorkspace.getSelectionEngine().getLiftedImage();
     				}
     				else {
-    					BuiltImageData bid = currentWorkspace.buildActiveData();
+    					IBuiltImageData bid = currentWorkspace.buildActiveData();
     					
     					if( bid == null) {
     		    	    	RenderSettings settings = new RenderSettings(
@@ -683,7 +683,7 @@ public class MasterControl
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
 					//	accessing handle directly is appropriate.
-					BuiltImageData image = workspace.buildActiveData();
+					IBuiltImageData image = workspace.buildActiveData();
 					if( image != null) 
 						workspace.getDrawEngine().clear(image);
 				}
@@ -731,7 +731,7 @@ public class MasterControl
 					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
     		}});
     		commandMap.put("invert", new Runnable() {@Override public void run() {
-    			BuiltImageData data= workspace.buildActiveData();
+    			IBuiltImageData data= workspace.buildActiveData();
     			
     			if( data != null) {
     				workspace.getDrawEngine().invert(data);
@@ -747,15 +747,15 @@ public class MasterControl
     				workspace.getUndoEngine().pause();
     				if( !wasLifted)
     					workspace.getSelectionEngine().liftData();
-    				MatTrans trans = new MatTrans();
     				
     				Vec2 scale = (Vec2)settings.getValue("scale");
     				Vec2 translation = (Vec2)settings.getValue("translation");
     				float rotation = (float)settings.getValue("rotation");
 
-    				trans.rotate( (float)(rotation * 180.0f /(Math.PI)));
-    				trans.scale( scale.x, scale.y);
-    				trans.translate( translation.x, translation.y);
+    				MatTrans trans = new MatTrans();
+    				trans.preScale(scale.x, scale.y);
+    				trans.preRotate((float)(rotation * 180.0f /(Math.PI)));
+    				trans.preTranslate(translation.x, translation.y);
     				workspace.getSelectionEngine().transformSelection(trans);
     				
     				if(!wasLifted)

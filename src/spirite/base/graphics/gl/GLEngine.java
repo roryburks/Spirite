@@ -15,9 +15,9 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
-import spirite.base.image_data.RawImage;
 import spirite.base.util.MatrixBuilder;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
@@ -572,7 +572,6 @@ public class GLEngine  {
 		
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
         		x1, x2, (params.flip)?y2:y1, (params.flip)?y1:y2, -1, 1));
-//		x1, x2, (params.flip)?params.height-y1:y1, (params.flip)?params.height-y2:y2, -1, 1));
         
         if( trans != null) {
 	        Mat4 matrix2 = new Mat4( MatrixBuilder.wrapTransformAs4x4(trans));

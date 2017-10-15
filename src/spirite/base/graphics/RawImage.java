@@ -1,6 +1,4 @@
-package spirite.base.image_data;
-
-import spirite.base.graphics.GraphicsContext;
+package spirite.base.graphics;
 
 /**
  * RawImage is a wrapper for multiple different types of more-native image formats

@@ -24,9 +24,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
-import spirite.base.util.Interpolation.CubicSplineInterpolator;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Vec2;
+import spirite.base.util.interpolation.CubicSplineInterpolator;
 
 public class TabletDialog extends JDialog
 {

@@ -3,6 +3,7 @@ package spirite.pc.ui.panel_layers;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,14 +27,15 @@ import javax.swing.event.ListSelectionListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.base.image_data.layers.SpriteLayer.RigStructureObserver;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
@@ -47,8 +49,11 @@ public class RigPanel extends OmniComponent
 		ListSelectionListener, RigStructureObserver, DocumentListener 
 {
 	private final JList<Part> listPanel = new JList<Part>();
-	private final MTextFieldNumber tfOffsetX = new MTextFieldNumber(true,false);
-	private final MTextFieldNumber tfOffsetY = new MTextFieldNumber(true,false);
+	private final MTextFieldNumber tfTransX = new MTextFieldNumber(true,true);
+	private final MTextFieldNumber tfTransY = new MTextFieldNumber(true,true);
+	private final MTextFieldNumber tfScaleX = new MTextFieldNumber(true,true);
+	private final MTextFieldNumber tfScaleY = new MTextFieldNumber(true,true);
+	private final MTextFieldNumber tfRot = new MTextFieldNumber(true,true);
 	private final MTextFieldNumber tfDepth = new MTextFieldNumber(true,false);
 	private final JTextField tfName= new JTextField();
 	private final JButton bNewPart = new JButton();
@@ -116,13 +121,20 @@ public class RigPanel extends OmniComponent
 		}
 	};
 	
+	private static final Font f = new Font("Tahoma", 0, 10);
+	private class SubLabel extends JLabel { SubLabel(String txt) {super(txt);this.setFont(f);}}
 	private void initComponents() {
 		GroupLayout layout = new GroupLayout(this);
-		
-		JLabel jOffsetX = new JLabel("X:");
-		JLabel jOffsetY = new JLabel("Y:");
-		JLabel jOffsetD = new JLabel("Depth:");
-		JLabel jOffsetT = new JLabel("Type:");
+
+		JLabel lTrans = new SubLabel("Translation");
+		JLabel lScale = new SubLabel("Scale: ");
+		JLabel lRot = new SubLabel("Rotation:");
+		JLabel lTX = new SubLabel("x");
+		JLabel lTY = new SubLabel("y");
+		JLabel lSX = new SubLabel("x");
+		JLabel lSY = new SubLabel("y");
+		JLabel lDepth = new SubLabel("Depth:");
+		JLabel Ttype = new SubLabel("Type:");
 		JScrollPane jscroll = new JScrollPane(listPanel);
 
 		bNewPart.setToolTipText("Create New Part");
@@ -140,8 +152,11 @@ public class RigPanel extends OmniComponent
 		bNodeVisiblity.setSelectedIcon(Globals.getIcon("icon.rig.visOn"));
 		bNodeVisiblity.setIcon(Globals.getIcon("icon.rig.visOff"));
 
-		tfOffsetX.getDocument().addDocumentListener(this);
-		tfOffsetY.getDocument().addDocumentListener(this);
+		tfTransX.getDocument().addDocumentListener(this);
+		tfTransY.getDocument().addDocumentListener(this);
+		tfScaleX.getDocument().addDocumentListener(this);
+		tfScaleY.getDocument().addDocumentListener(this);
+		tfRot.getDocument().addDocumentListener(this);
 		tfDepth.getDocument().addDocumentListener(this);
 		tfName.getDocument().addDocumentListener(this);
 		
@@ -158,21 +173,27 @@ public class RigPanel extends OmniComponent
 				.addComponent(opacitySlider, bSize.height, bSize.height, bSize.height)
 			)
 			.addGap(3)
+			.addComponent(lTrans)
 			.addGroup( layout.createParallelGroup()
-				.addComponent(jOffsetT)
-				.addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(lTX)
+				.addComponent(lTY)
+				.addComponent(tfTransX)
+				.addComponent(tfTransY)
+			)
+			.addComponent(lScale)
+			.addGroup( layout.createParallelGroup()
+				.addComponent(lSX)
+				.addComponent(lSY)
+				.addComponent(tfScaleX)
+				.addComponent(tfScaleY)
 			)
 			.addGroup( layout.createParallelGroup()
-				.addComponent(jOffsetX)
-				.addComponent(tfOffsetX, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(lRot)
+				.addComponent(tfRot)
 			)
 			.addGroup( layout.createParallelGroup()
-				.addComponent(jOffsetY)
-				.addComponent(tfOffsetY, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			)
-			.addGroup( layout.createParallelGroup()
-				.addComponent(jOffsetD)
-				.addComponent(tfDepth, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(lDepth)
+				.addComponent(tfDepth)
 			)
 			.addContainerGap()
 		);
@@ -181,25 +202,42 @@ public class RigPanel extends OmniComponent
 			.addGap(3)
 			.addGroup( layout.createParallelGroup()
 				.addComponent(jscroll, 0, 200, Short.MAX_VALUE)
-				.addGroup(layout.createSequentialGroup()
-					.addGroup(layout.createParallelGroup()
-						.addComponent(jOffsetX)
-						.addComponent(jOffsetY)
-						.addComponent(jOffsetD)
+				.addComponent(lTrans)
+				.addComponent(lScale)
+				.addGroup( layout.createSequentialGroup()
+					.addGroup( layout.createParallelGroup()
+						.addComponent(tfTransX)
+						.addComponent(tfScaleX)
 					)
-					.addGap(10)
-					.addGroup(layout.createParallelGroup()
-						.addComponent(tfOffsetX, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-						.addComponent(tfOffsetY, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-						.addComponent(tfDepth, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+					.addGap(3)
+					.addGroup( layout.createParallelGroup()
+						.addComponent(lTX)
+						.addComponent(lSX)
 					)
-					.addContainerGap()
+					.addGap(3)
+					.addGroup( layout.createParallelGroup()
+						.addComponent(tfTransY)
+						.addComponent(tfScaleY)
+					)
+					.addGap(3)
+					.addGroup( layout.createParallelGroup()
+						.addComponent(lTY)
+						.addComponent(lSY)
+					)
 				)
-				.addGroup(layout.createSequentialGroup()
-					.addComponent(jOffsetT)
-					.addGap(10)
-					.addComponent(tfName, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+				.addGroup( layout.createSequentialGroup()
+					.addComponent(lRot)
+					.addComponent(tfRot)
 				)
+				.addGroup( layout.createSequentialGroup()
+					.addComponent(lDepth)
+					.addComponent(tfDepth)
+				)
+//				.addGroup(layout.createSequentialGroup()
+//					.addComponent(labelT)
+//					.addGap(10)
+//					.addComponent(tfName, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+//				)
 				.addGroup(layout.createSequentialGroup()
 					.addGap(3)
 					.addComponent(opacitySlider)
@@ -214,6 +252,8 @@ public class RigPanel extends OmniComponent
 			)
 			.addGap(3)
 		);
+		
+//		layout.linkSize( tfTransX, tfTransY, tfScaleX, tfTransY);
 		this.setLayout(layout);
 		
 	}
@@ -281,8 +321,11 @@ public class RigPanel extends OmniComponent
 			if( part != null) {
 				tfDepth.setText(""+part.getDepth());
 				tfName.setText(part.getTypeName());
-				tfOffsetX.setText(""+part.getOffsetX());
-				tfOffsetY.setText(""+part.getOffsetY());
+				tfTransX.setText(""+part.getTranslationX());
+				tfTransY.setText(""+part.getTranslationY());
+				tfScaleX.setText(""+part.getScaleX());
+				tfScaleY.setText(""+part.getScaleY());
+				tfRot.setText(""+part.getRotation());
 				bNodeVisiblity.setSelected(part.isVisible());
 				opacitySlider.setValue(part.getAlpha());
 			}
@@ -293,8 +336,11 @@ public class RigPanel extends OmniComponent
 		bNodeVisiblity.setEnabled(!(rig==null));
 		tfDepth.setEnabled(!(rig==null));
 		tfName.setEnabled(!(rig==null));
-		tfOffsetX.setEnabled(!(rig==null));
-		tfOffsetY.setEnabled(!(rig==null));
+		tfTransX.setEnabled(!(rig==null));
+		tfTransY.setEnabled(!(rig==null));
+		tfScaleX.setEnabled(!(rig==null));
+		tfScaleY.setEnabled(!(rig==null));
+		tfRot.setEnabled(!(rig==null));
 		listPanel.setEnabled(!(rig==null));
 		opacitySlider.setEnabled(!(rig==null));
 		
@@ -303,8 +349,11 @@ public class RigPanel extends OmniComponent
 		listPanel.setBackground(c);
 		tfDepth.setBackground(c);
 		tfName.setBackground(c);
-		tfOffsetX.setBackground(c);
-		tfOffsetY.setBackground(c);
+		tfTransX.setBackground(c);
+		tfTransY.setBackground(c);
+		tfScaleX.setBackground(c);
+		tfScaleY.setBackground(c);
+		tfRot.setBackground(c);
 		
 		
 
@@ -402,8 +451,11 @@ public class RigPanel extends OmniComponent
 
 				tfDepth.setText(""+part.getDepth());
 				tfName.setText(part.getTypeName());
-				tfOffsetX.setText(""+part.getOffsetX());
-				tfOffsetY.setText(""+part.getOffsetY());
+				tfTransX.setText(""+part.getTranslationX());
+				tfTransY.setText(""+part.getTranslationY());
+				tfScaleX.setText(""+part.getScaleX());
+				tfScaleY.setText(""+part.getScaleY());
+				tfRot.setText(""+part.getRotation());
 				building = false;
 			}
 		});
@@ -439,20 +491,33 @@ public class RigPanel extends OmniComponent
 	
 	private void changePartAttributes() {
 		building = true;
+		
 		if( rig != null && rig.getActivePart() != null) {
 			Part part = rig.getActivePart();
-			if( part.getOffsetX() != tfOffsetX.getInt() ||
-				part.getOffsetY() != tfOffsetY.getInt() ||
+			float rot = (float) ((float)tfRot.getFloat()/180*Math.PI);
+			
+			if( part.getTranslationX() != tfTransX.getFloat() ||
+				part.getTranslationY() != tfTransY.getFloat() ||
+				part.getScaleX() != tfScaleX.getFloat() ||
+				part.getScaleY() != tfScaleY.getFloat() ||
+				part.getRotation() != rot ||
 				part.getDepth() != tfDepth.getInt() ||
 				!part.getTypeName().equals(tfName.getText()) ||
 				part.isVisible() != bNodeVisiblity.isSelected() ||
 				part.getAlpha() != opacitySlider.getValue()) 
 			{
+				PartStructure ps = part.getStructure();
+				ps.transX = tfTransX.getFloat();
+				ps.transY = tfTransY.getFloat();
+				ps.scaleX = tfScaleX.getFloat();
+				ps.scaleY = tfScaleY.getFloat();
+				ps.rot = rot;
+				ps.depth = tfDepth.getInt();
+				ps.partName = tfName.getText();
+				ps.visible = bNodeVisiblity.isSelected();
+				ps.alpha = opacitySlider.getValue();
 				
-				UndoableAction action = rig.createModifyPartAction(
-						part, tfOffsetX.getInt(), tfOffsetY.getInt(), 
-						tfDepth.getInt(), tfName.getText(), 
-						bNodeVisiblity.isSelected(), opacitySlider.getValue());
+				UndoableAction action = rig.createModifyPartAction( part,ps);
 				
 				if( action != null)
 					workspace.getUndoEngine().performAndStore(action);

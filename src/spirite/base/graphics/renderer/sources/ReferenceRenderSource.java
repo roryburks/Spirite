@@ -3,10 +3,10 @@ package spirite.base.graphics.renderer.sources;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.hybrid.HybridHelper;
 

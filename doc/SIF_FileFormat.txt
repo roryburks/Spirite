@@ -1,68 +1,71 @@
-Version 0004
+Version 0005
 
 Compatibility Issues: extra byte per Image in ImageData section.
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
 Header
- [4] "SIFF"
- [4] Version number
- [2] Image Width
- [2] Image Height
+ [4, UTF8 str] "SIFF"
+ [4, int] Version number
+ [2, short] Image Width
+ [2, short] Image Height
  
  Per Group:
- [4] 4-character chunk identifier
- [4] n: size of chunk
- [n] chunk data
+ [4, UTF8 str] 4-character chunk identifier
+ [4, int] n: size of chunk
+ [n, RAW] chunk data
  
  ---- GRPT - Group Tree Chunk ----
  Per Group:
- [1]: Depth of the GroupTree
- [1] : various single-bit settings
+ [1, byte]: Depth of the GroupTree
+ [1, byte] : various single-bit settings
     1st bit: Visibility
     2nd bit: Expanded
- [4] : alpha
- [2] : X offset
- [2] : Y offset
- [n] : UTF8 : Node name
- [1] : Node Type ID:
+ [4, float] : alpha
+ [2, short] : X offset
+ [2, short] : Y offset
+ [n, UTF8 str] : Node name
+ [1, byte] : Node Type ID:
     0x00 : Group Node
     0x01 : Simple Layer
-        [4] : ID of linked ImageData
+        [4, int] : ID of linked ImageData
     0x02 : Rig Layer
-        [1] : Number of Parts
+        [1, byte] : Number of Parts
         Per Part:
-            [n] : UTF8 : Part Type name
-            [2] : X offset
-            [2] : Y offset
-            [4] : draw depth
-            [4] : ImageID
+            [n, UTF8 str] : Part Type name
+            [4, float] : translationX
+            [4, float] : translationY
+            [4, float] : scaleX
+            [4, float] : scaleY
+            [4, float] : rotation
+            [4, int] : draw depth
+            [4, int] : ImageID
 
  ---- IMGD - Image Data Chunk ----
  Per Iamge:
- [4] : Image ID
- [1] : Mask
+ [4, int] : Image ID
+ [1, byte] : Mask
     1st bit: Dynamic
       if Dynamic:
-        [2] : Dynamic offsetX 
-        [2] : Dynamic offsetY
- [4] : Size of Image Data
- [n] : PNG-saved Image File
+        [2, ushort] : Dynamic offsetX 
+        [2, ushort] : Dynamic offsetY
+ [4, int] : Size of Image Data
+ [n, RAW] : PNG-saved Image File
 
 ---- ANIM - Animation Data Chunk
 Per Animation:
-[n] : UTF8 : Animation Name
-[1] : Animation Type ID:
+[n, UTF8 str] : Animation Name
+[1, byte] : Animation Type ID:
     0x01 : FixedFrameAnimation
-        [2] : Number of Layers
+        [2, ushort] : Number of Layers
         Per Layer:
-            [4] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
-            [2] : Number of Frames
+            [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
+            [2, ushort] : Number of Frames
             Per Frame:
-                [1] : MarkerID
-                [2] : Length
+                [1, byte] : MarkerID
+                [2, ushort] : Length
                 If MarkerID == FRAME
-                    [4] : NodeID of LayerNode Bound to (see Bellow)
+                    [4, int] : NodeID of LayerNode Bound to (see Bellow)
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 

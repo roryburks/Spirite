@@ -17,11 +17,11 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.wrap.GLCore;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
-import spirite.base.image_data.RawImage;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;

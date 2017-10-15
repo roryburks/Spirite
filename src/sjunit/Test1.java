@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.DrawEngine.StrokeAction;
 import spirite.base.image_data.GroupTree;
@@ -28,7 +29,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.RawImage;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;

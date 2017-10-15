@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
-import spirite.base.image_data.RawImage;
+import spirite.base.graphics.RawImage;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 

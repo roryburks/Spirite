@@ -3,13 +3,13 @@ package spirite.base.image_data;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.gl.GLParameters.GLTexture;
-import spirite.base.image_data.ImageWorkspace.DynamicInternalImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.InternalImage;
+import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -130,7 +130,7 @@ public class ImageHandle {
 		if (transform == null)
 			transform = new MatTrans();
 		if( ii instanceof DynamicInternalImage)
-			transform.translate(
+			transform.preTranslate(
 					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
 		
 		MatTrans completeTransform = new MatTrans(prev);
@@ -148,8 +148,9 @@ public class ImageHandle {
 		evt.dataChanged.add(this);
 		context.triggerImageRefresh(evt);
 	}
-	
-//	void flush() {
-//		context.getData(id).cachedImage.flush();
-//	}
+
+	public IBuiltImageData build() { return build(0,0);}
+	public IBuiltImageData build( int ox, int oy) {
+		return context.getData(id).build(this, ox, oy);
+	}
 }

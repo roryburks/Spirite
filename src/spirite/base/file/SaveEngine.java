@@ -267,10 +267,15 @@ public class SaveEngine implements MWorkspaceObserver {
 				for(Part part : parts) {
 					// [n]: null-terminated UTF-8 String
 					helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
-					
-					// [2] : OffsetX, [2] :OffsetY
-					helper.ra.writeShort(part.getOffsetX());
-					helper.ra.writeShort(part.getOffsetY());
+
+					// [4] : TranslationX, [4] TranslationY
+					helper.ra.writeFloat(part.getTranslationX());
+					helper.ra.writeFloat(part.getTranslationY());
+					// [4] : ScaleX, [4] ScaleY
+					helper.ra.writeFloat(part.getScaleX());
+					helper.ra.writeFloat(part.getScaleY());
+					// [4] : Rotation
+					helper.ra.writeFloat(part.getRotation());
 					
 					// [4] : Depth
 					helper.ra.writeInt( part.getDepth());
