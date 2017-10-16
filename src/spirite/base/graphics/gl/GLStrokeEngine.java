@@ -8,6 +8,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
+import com.sun.xml.internal.ws.api.config.management.policy.ManagementAssertion.Setting;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
@@ -97,7 +98,22 @@ class GLStrokeEngine extends StrokeEngine {
 			params.flip = glgc.isFlip();
 			params.addParam( new GLParameters.GLParam1i("uComp", 0));
 			params.addParam( new GLParameters.GLParam1f("uAlpha", glgc.getAlpha()));
+
 			GLGraphics.setCompositeBlend(params, gc.getComposite());
+			
+			switch( stroke.getMode()) {
+			case KEEP_ALPHA:
+				params.setBlendModeExt( 
+						GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_SRC_ALPHA, GLC.GL_FUNC_ADD,
+						GLC.GL_ZERO, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+				break;
+			case BEHIND:
+				params.setBlendMode(
+						GLC.GL_ONE_MINUS_DST_ALPHA, GLC.GL_ONE, GLC.GL_FUNC_ADD);
+				break;
+			case NORMAL:
+				break;
+			}
 			
 			
 			glgc.applyPassProgram(ProgramType.PASS_RENDER, params, glgc.getTransform(), 

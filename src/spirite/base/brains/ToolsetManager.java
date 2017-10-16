@@ -187,18 +187,18 @@ public class ToolsetManager
 
     // =======================
     // ==== Setting Schemes
-    public enum DrawMode {
+    public enum PenDrawMode {
     	NORMAL("Normal"),
-    	ALPHA_ONLY("Alpha-Only"),
+    	KEEP_ALPHA("Preserve Alpha"),
     	BEHIND("Behind");
     	
     	public final String hrName;
-    	DrawMode( String hrName) {this.hrName = hrName;}
+    	PenDrawMode( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
     }
     private ToolSettings constructPenSettings() {
         Property[] props = {
-	        	new DropDownProperty<DrawMode>("mode", "Draw Mode", DrawMode.NORMAL, DrawMode.class),
+	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
 	        	new OpacityProperty("alpha", "Opacity", 1.0f),
 	        	new SizeProperty("width","Width", 5.0f),
 	        	new CheckBoxProperty("hard","Hard Edged",false),

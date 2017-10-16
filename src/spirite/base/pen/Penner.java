@@ -13,6 +13,7 @@ import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.BoxSelectionShape;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
@@ -529,6 +530,7 @@ public class Penner
 			ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
 			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
 			stroke.setColor( color);
+			stroke.setMode((PenDrawMode)settings.getValue("mode"));
 			stroke.setWidth((float)settings.getValue("width"));
 			stroke.setAlpha((float)settings.getValue("alpha"));
 			stroke.setHard((Boolean)settings.getValue("hard"));

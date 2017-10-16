@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import spirite.base.brains.ToolsetManager;
+import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.DrawEngine;
@@ -311,6 +313,7 @@ public abstract class StrokeEngine {
 		
 		private int c = Colors.BLACK;
 		private StrokeEngine.Method method = StrokeEngine.Method.BASIC;
+		private PenDrawMode mode = PenDrawMode.NORMAL;
 		private float width = 1.0f;
 		private float alpha = 1.0f;
 		private boolean hard = false;
@@ -340,6 +343,12 @@ public abstract class StrokeEngine {
 		public void setMethod( StrokeEngine.Method method) {
 			if( !locked)
 				this.method = method;
+		}
+		
+		public PenDrawMode getMode() {return mode;}
+		public void setMode( PenDrawMode mode) {
+			if( !locked) 
+				this.mode = mode;				
 		}
 
 		public float getWidth() { return width;}
