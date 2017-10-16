@@ -55,7 +55,7 @@ void main()
 		distance(cFrom.b , checkCol.b) < thresh &&
 		(mode == 1 || distance(cFrom.a , texCol.a) < thresh) ))
 	{
-		if( hueOnly) {
+		if( !hueOnly) {
 			outputColor.rgb = (premult)?cTo.rgb * texCol.a:cTo.rgb;
 			outputColor.a = texCol.a;
 		}

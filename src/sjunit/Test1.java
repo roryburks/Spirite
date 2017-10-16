@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -289,7 +290,7 @@ public class Test1 {
 		case 5:
 			// Change Color
 			workspace.setSelectedNode(randomLayerNode(workspace));
-			workspace.getDrawEngine().changeColor(lastColor.getRGB(), randomColor().getRGB(), rn.nextInt(3), rn.nextInt(3));
+			workspace.getDrawEngine().changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
 			break;
 		case 6:
 			// Invert

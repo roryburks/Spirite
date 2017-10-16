@@ -17,44 +17,44 @@ import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.Globals;
 
-public class DropDownProperty extends SwingToolProperty {
-	private int value;
-	private String[] options;
+public class DropDownProperty<T extends Enum<T>> extends SwingToolProperty {
+	private T value;
+	private final Class<T> type;
 
-	public DropDownProperty( String id, String hrName, int defaultValue, String[] options) {
-		this(id, hrName, defaultValue, options, 0);
+	public DropDownProperty( String id, String hrName, T defaultValue, Class<T> type) {
+		this(id, hrName, defaultValue,  0, type);
 	}
-	public DropDownProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
+	public DropDownProperty( String id, String hrName, T defaultValue, int mask, Class<T> type) {
 		this.value = defaultValue;
 		this.id = id;
 		this.hrName = hrName;
-		this.options = options;
 		this.mask = mask;
+		this.type = type;
 	}
 	
-	@Override public Integer getValue() {return value;}
-	@Override protected void setValue(Object newValue) { this.value = (Integer)newValue;}
+	@Override public T getValue() {return value;}
+	@Override protected void setValue(Object newValue) { this.value = (T)newValue;}
 	
 
 	@Override
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JComboBox<String> comboBox = new JComboBox<>();
+		JComboBox<T> comboBox = new JComboBox<>();
 		JLabel label = new JLabel( hrName + ":");
 		label.setFont( Globals.getFont("toolset.dropdown"));
 		
 		// Init Components
-		for( int i=0; i<options.length; ++i) {
-			comboBox.addItem(options[i]);
+		for( T t : type.getEnumConstants()) {
+			comboBox.addItem(t);
 		}
 		comboBox.setFont(new Font("Tahoma",Font.PLAIN, 10));
-		comboBox.setSelectedIndex(value);
+		comboBox.setSelectedIndex(value.ordinal());
 		comboBox.addItemListener( new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if( e.getStateChange() == ItemEvent.SELECTED)
-					binding.triggerUIChanged(comboBox.getSelectedIndex());			
+					binding.triggerUIChanged(comboBox.getSelectedItem());			
 			}
 		});
 		
@@ -65,7 +65,7 @@ public class DropDownProperty extends SwingToolProperty {
 			}
 			@Override
 			public void doDataChange(Object newValue) {
-				comboBox.setSelectedIndex((Integer)newValue);
+				comboBox.setSelectedItem((T)newValue);
 			}
 		});
 		

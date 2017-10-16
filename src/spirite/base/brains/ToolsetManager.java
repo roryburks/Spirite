@@ -187,11 +187,21 @@ public class ToolsetManager
 
     // =======================
     // ==== Setting Schemes
+    public enum DrawMode {
+    	NORMAL("Normal"),
+    	ALPHA_ONLY("Alpha-Only"),
+    	BEHIND("Behind");
+    	
+    	public final String hrName;
+    	DrawMode( String hrName) {this.hrName = hrName;}
+    	@Override public String toString() {return hrName;}
+    }
     private ToolSettings constructPenSettings() {
         Property[] props = {
+	        	new DropDownProperty<DrawMode>("mode", "Draw Mode", DrawMode.NORMAL, DrawMode.class),
 	        	new OpacityProperty("alpha", "Opacity", 1.0f),
 	        	new SizeProperty("width","Width", 5.0f),
-	        	new CheckBoxProperty("hard","Hard Edged",false)
+	        	new CheckBoxProperty("hard","Hard Edged",false),
         };
 
         return constructFromScheme(props, Tool.PEN);
@@ -212,9 +222,19 @@ public class ToolsetManager
 
         return constructFromScheme(props, Tool.PIXEL);
     }
+    
+    public enum BoxSelectionShape {
+    	RECTANGLE("Rectangle"),
+    	OVAL("Oval"),
+    	;
+    	
+    	public final String hrName;
+    	BoxSelectionShape( String hrName) {this.hrName = hrName;}
+    	@Override public String toString() {return hrName;}
+    }
     private ToolSettings constructBoxSelectionSettings() {
         Property[] props = {
-        		new DropDownProperty("shape","Shape", 0, new String[]{"Rectangle","Oval"})
+        		new DropDownProperty<BoxSelectionShape>("shape","Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.class)
         };
 
         return constructFromScheme(props, Tool.BOX_SELECTION);
@@ -236,9 +256,19 @@ public class ToolsetManager
 
         return constructFromScheme(props, Tool.FLIPPER);
     }
+    public enum ColorChangeScopes {
+    	LOCAL("Local"),
+    	GROUP("Entire Layer/Group"),
+    	PROJECT("Entire Project")
+    	;
+    	
+    	public final String hrName;
+    	ColorChangeScopes( String hrName) {this.hrName = hrName;}
+    	@Override public String toString() {return hrName;}
+    }
     private ToolSettings constructColorChangeSettings() {
     	Property[] props = {
-    		new DropDownProperty("scope", "Scope", 0, new String[]{"Local","Entire Layer/Group","Entire Project"}),
+    		new DropDownProperty<ColorChangeScopes>("scope", "Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.class),
     		new RadioButtonProperty("mode", "Apply Mode", 0,
                     new String[] {"Check Alpha", "Ignore Alpha", "Change All"})
     	};

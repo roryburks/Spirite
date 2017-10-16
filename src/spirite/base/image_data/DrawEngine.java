@@ -6,6 +6,7 @@ import java.util.List;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
+import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
@@ -205,23 +206,23 @@ public class DrawEngine {
 	 * <li>1 : Converts RGB matches, ignoring alpha
 	 * <li>2 : Converts all RGB colors to the <code>to</code> color, preserving alpha
 	 */
-	public void changeColor( int from, int to, int scope, int mode) {
+	public void changeColor( int from, int to, ColorChangeScopes scope, int mode) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		
 		Node selected = null;
 		
 		switch( scope) {
-		case 0:	// Local
+		case LOCAL:
 			IBuiltImageData bid = workspace.buildActiveData();
 			if( bid != null) {
 				execute( new ColorChangeAction(bid, mask, from, to, mode));
 			}
 			break;
-		case 1: // Group/Layer
+		case GROUP:
 			// Switch statement is kind of awkward.  Just roll with it.
 			selected = workspace.getSelectedNode();
 			if( selected == null) return;
-		case 2: // Global
+		case PROJECT:
 			if( selected == null) 
 				selected = workspace.getRootNode();
 

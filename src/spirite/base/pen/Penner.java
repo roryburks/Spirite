@@ -11,6 +11,8 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
+import spirite.base.brains.ToolsetManager.BoxSelectionShape;
+import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
@@ -241,7 +243,7 @@ public class Penner
 					else if( holdingCtrl)
 						mode = BuildMode.SUBTRACT;
 					else mode = BuildMode.DEFAULT;
-					behavior = new FormingSelectionBehavior((Integer)settings.getValue("shape"), mode);
+					behavior = new FormingSelectionBehavior((BoxSelectionShape)settings.getValue("shape"), mode);
 				}
 				break;}
 			case FREEFORM_SELECTION: {
@@ -347,7 +349,7 @@ public class Penner
 				}
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
 				
-				int scope = (Integer)settings.getValue("scope");
+				ColorChangeScopes scope = (ColorChangeScopes)settings.getValue("scope");
 				int mode = (Integer)settings.getValue("mode");
 				
 				if( mbe.buttonType == ButtonType.LEFT) {
@@ -642,9 +644,9 @@ public class Penner
 	}
 	
 	class FormingSelectionBehavior extends StateBehavior {
-		private final int shape;
+		private final BoxSelectionShape shape;
 		private final BuildMode mode;
-		FormingSelectionBehavior( int shape, BuildMode mode) {
+		FormingSelectionBehavior( BoxSelectionShape shape, BuildMode mode) {
 			this.shape = shape;
 			this.mode = mode;
 		}
@@ -653,10 +655,10 @@ public class Penner
 			SelectionBuilder builder = null;
 			
 			switch( shape) {
-			case 0:
+			case RECTANGLE:
 				builder = selectionEngine.new RectSelectionBuilder();
 				break;
-			case 1:
+			case OVAL:
 				builder = selectionEngine.new OvalSelectionBuilder();
 				break;
 			}
