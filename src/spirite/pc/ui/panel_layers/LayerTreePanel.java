@@ -554,7 +554,7 @@ public class LayerTreePanel extends ContentTree
 			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
 			if( helper != null) {
 				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color.getRGB());
+						helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 			break;}
 		case "duplicate":

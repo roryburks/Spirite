@@ -127,9 +127,8 @@ public class ImageHandle {
 		MatTrans prev= gc.getTransform();
 		if (transform == null)
 			transform = new MatTrans();
-		if( ii instanceof DynamicInternalImage)
-			transform.preTranslate(
-					((DynamicInternalImage) ii).getDynamicX(), ((DynamicInternalImage) ii).getDynamicY());
+		//context.buildData(new BuildingImageData(this,0,0)).draw(gc);
+		transform.preTranslate( ii.getDynamicX(), ii.getDynamicY());
 		
 		MatTrans completeTransform = new MatTrans(prev);
 		completeTransform.concatenate(transform);

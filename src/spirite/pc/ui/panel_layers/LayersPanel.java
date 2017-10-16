@@ -120,7 +120,7 @@ public class LayersPanel extends OmniComponent {
 				ImageWorkspace workspace = layerTreePanel.workspace;
 				NewLayerHelper helper = dialogs.callNewLayerDialog(workspace);
 				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color.getRGB());
+						helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 		});
 		btnNewGroup.addActionListener(new ActionListener() {

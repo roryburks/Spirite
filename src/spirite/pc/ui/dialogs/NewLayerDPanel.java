@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -19,6 +21,7 @@ import javax.swing.border.Border;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.components.MTextFieldNumber;
 
@@ -28,12 +31,14 @@ public class NewLayerDPanel extends JPanel {
 		public final Color color;
 		public final String name;
 		public final String type;
+		public final InternalImageTypes imgType;
 		private NewLayerHelper() {
 			width = tfWidth.getInt();
 			height = tfHeight.getInt();
 			color = getValueColor();
 			name = tfPartName.getText();
 			type = tfPartType.getText();
+			imgType = (InternalImageTypes) comboImgType.getSelectedItem();
 		}
 	}
 	
@@ -46,6 +51,7 @@ public class NewLayerDPanel extends JPanel {
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
+	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>();
 	private JLabel lblPartType;
 	private JPanel colorPanelFG;
 	private JPanel colorPanelBG;

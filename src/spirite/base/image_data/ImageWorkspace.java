@@ -14,13 +14,13 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager;
-import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -35,6 +35,8 @@ import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.InternalImage;
+import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -263,6 +265,7 @@ public class ImageWorkspace {
 	public DrawEngine getDrawEngine() { return drawEngine; }
 	public ReferenceManager getReferenceManager() { return referenceManager; }
 	public StagingManager getStageManager() {return stagingManager;}
+	public PaletteManager getPaletteManageR() {return master.getPaletteManager();}	// Might be removed in the future
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
@@ -389,7 +392,6 @@ public class ImageWorkspace {
 	 * @param shrinkOnly
 	 */
 	public void cropNode( Node nodeToCrop, Rect inputRect, boolean shrinkOnly) {
-		
 		inputRect = inputRect.intersection(new Rect(0,0,width,height));
 		if( inputRect.isEmpty())return;
 		
@@ -505,7 +507,7 @@ public class ImageWorkspace {
 	/** 
 	 * Shifts all image data of the node.
 	 */
-	public void shiftData( Node target, int shiftX, int shiftY) {
+	public void shiftData( Node target, final int shiftX, final int shiftY) {
 		List<LayerNode> layerNodes = target.getAllLayerNodes();
 		LinkedHashSet<ImageHandle> data = new LinkedHashSet<>();
 		
@@ -522,7 +524,6 @@ public class ImageWorkspace {
 		undoEngine.performAndStore(
 				undoEngine.new StackableCompositeAction(actions, "Shift Image Data"));
 	}
-	
 	private class ShiftDataAction extends ImageAction
 		implements StackableAction
 	{
@@ -572,22 +573,6 @@ public class ImageWorkspace {
 	
 	
 	// :::: Content Addition
-	// TODO: These probably shouldn't exist
-	public static class ImportImage {
-		public final RawImage image;
-		public ImportImage( RawImage image) {
-			this.image = image;
-		}
-	}
-	public static class DynamicImportImage extends ImportImage {
-		final int ox, oy;
-		public DynamicImportImage(RawImage image, int ox, int oy) {
-			super(image);
-			this.ox = ox;
-			this.oy = oy;
-		}
-	}
-	
 	/** Imports the given Group Node and all included ImageData into it.
 	 * 
 	 * Importing Data works like this: it goes through the node and converts
@@ -602,7 +587,7 @@ public class ImageWorkspace {
 	 */
 	public void importNodeWithData( 
 			Node node, 
-			Map<Integer,ImportImage> newData)
+			Map<Integer,IInternalImage> newData)
 	{
 		// Construct a list of all LayerNodes within the context.
 		if( node == null) 
@@ -626,13 +611,8 @@ public class ImageWorkspace {
 		
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
-		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
-			if( entry.getValue() instanceof DynamicImportImage) {
-				DynamicImportImage dimpi = (DynamicImportImage)entry.getValue();
-				imageData.put( workingID, new DynamicInternalImage(entry.getValue().image, dimpi.ox, dimpi.oy, this));
-			}
-			else
-				imageData.put( workingID, new InternalImage(entry.getValue().image, this));
+		for( Entry<Integer,IInternalImage> entry : newData.entrySet()) {
+			imageData.put(workingID, entry.getValue());
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -671,8 +651,23 @@ public class ImageWorkspace {
 	}
 	
 	
-	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
-		imageData.put( workingID, new InternalImage(img, this));
+	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name, InternalImageTypes type) {
+		IInternalImage ii = null;
+		
+		switch( type) {
+		case DYNAMIC:
+			ii = new DynamicInternalImage(img, 0, 0, this);
+			break;
+		case NORMAL:
+			ii = new InternalImage(img, this);
+			break;
+		case PRISMATIC:
+			ii = new PrismaticInternalImage();
+			break;
+		
+		}
+		
+		imageData.put( workingID, ii);
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 
@@ -682,7 +677,7 @@ public class ImageWorkspace {
 		return node;
 	}
 	
-	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, int argb) {
+	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, int argb, InternalImageTypes type) {
 		// Create new Image Data and link it to the workspace
 		RawImage img = HybridHelper.createImage(w, h);
 		
@@ -690,10 +685,7 @@ public class ImageWorkspace {
         gc.setColor( argb);
         gc.fillRect( 0, 0, width, height);
 		
-		return addNewSimpleLayer( 
-				context, 
-				img, 
-				name);
+		return addNewSimpleLayer( context, img, name, type);
 	}
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
@@ -766,20 +758,10 @@ public class ImageWorkspace {
 			Layer dupe = layer.logicalDuplicate();
 			
 			// Duplicate all used Data into a map
-			Map< Integer, ImportImage> dupeData = new HashMap<>();
+			Map< Integer, IInternalImage> dupeData = new HashMap<>();
 			for( ImageHandle handle : layer.getImageDependencies()) {
 				if( !dupeData.containsKey(handle.id)) {
-					ImportImage impi;
-					if( handle.isDynamic()) {
-						DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
-						impi = new DynamicImportImage(
-								handle.deepAccess().deepCopy(), 
-								dii.getDynamicX(), dii.getDynamicY());
-					}
-					else {
-						 impi = new ImportImage(handle.deepAccess().deepCopy());
-					}
-					dupeData.put( handle.id, impi);
+					dupeData.put(handle.id, imageData.get(handle.id).dupe());
 				}
 			}
 			
@@ -797,7 +779,7 @@ public class ImageWorkspace {
 		}
 		else if( toDupe instanceof GroupNode) {
 			GroupNode dupeRoot= groupTree.new GroupNode((GroupNode) toDupe, toDupe.name + " copy");
-			Map< Integer, ImportImage> dupeData = new HashMap<>();
+			Map< Integer, IInternalImage> dupeData = new HashMap<>();
 
 			// Breadth-first queue for Duping
 			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
@@ -823,18 +805,8 @@ public class ImageWorkspace {
 					// Deep Copy any not-yet-duplicated Image data into the
 					//	dupeData map
 					for( ImageHandle handle : layer.getImageDependencies()) {
-						if( !dupeData.containsKey(handle.id)) {
-							ImportImage impi;
-							if( handle.isDynamic()) {
-								DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
-								impi = new DynamicImportImage(handle.deepAccess().deepCopy(), 
-										dii.getDynamicX(), dii.getDynamicY());
-							}
-							else {
-								 impi = new ImportImage(handle.deepAccess().deepCopy());
-							}
-							dupeData.put(handle.id, impi);
-						}
+						if( !dupeData.containsKey(handle.id))
+							dupeData.put(handle.id, imageData.get(handle.id).dupe());
 					}
 					
 					dupe = groupTree.new LayerNode( 
@@ -1654,9 +1626,11 @@ public class ImageWorkspace {
     
 
     // =============
-    // ==== Resource Management
-    private final Map<List<ImageHandle>,List<CachedImage>> reserveMap = new HashMap<>();
-    
+    // ==== This section is 
+    public static class LogicalImage {
+    	public int handleID;
+    	public IInternalImage iimg;
+    }
     
     /**
      * By reserving the cache, you are preserving its state in memory until you
@@ -1665,36 +1639,32 @@ public class ImageWorkspace {
      * uses of the data (for example File Saving) does not get corrupted while 
      * not leaking access to CachedImages
      */
-    public List<ImageHandle> reserveCache() {
-    	List<ImageHandle> handles = new ArrayList<>(imageData.size());
+    public List<LogicalImage> reserveCache() {
+    	List<LogicalImage> handles = new ArrayList<>(imageData.size());
     	// TODO
 //    	List<CachedImage> caches = new ArrayList<>(imageData.size());
 //        	
-//    	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
-//    		handles.add( new ImageHandle(this, entry.getKey()));
-//    		caches.add( entry.getValue().cachedImage);
-//    	}
-//    	for( CachedImage ci :  caches) {
-//    		ci.reserve(handles);
-//    	}
-//    	
-//    	reserveMap.put(handles, caches);
+    	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
+    		LogicalImage li = new LogicalImage();
+    		li.handleID = entry.getKey();
+    		li.iimg = entry.getValue().dupe();
+    		handles.add(li);
+    	}
 
     	return handles;
     }
     
     /** Relinquish a state of  CachedImages as given by reserveCache */
-    public void relinquishCache( List<ImageHandle> handles) {
-    	for( CachedImage ci :  reserveMap.get(handles)) {
-    		ci.relinquish(handles);
-    	}
-    	reserveMap.remove(handles);
+    public void relinquishCache( List<LogicalImage> handles) {
+//    	for( CachedImage ci :  reserveMap.get(handles)) {
+//    		ci.relinquish(handles);
+//    	}
+//    	reserveMap.remove(handles);
     }
     
 	public void cleanup() {
-//		for( IInternalImage img : imageData.values()) {
-//			img.cachedImage.relinquish(this);
-//		}
+		for( IInternalImage img : imageData.values())
+			img.flush();
 		
 		undoEngine.cleanup();
 	}

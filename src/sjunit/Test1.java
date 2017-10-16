@@ -28,6 +28,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
@@ -79,8 +80,8 @@ public class Test1 {
 		}
 		
 		// Verify Image dimension adjustment
-		workspace.addNewSimpleLayer(null, 100, 100, "Name", Colors.toColor(50,50,50));
-		workspace.addNewSimpleLayer(null, 50, 900, "Namex", Colors.toColor(50,50,50));
+		workspace.addNewSimpleLayer(null, 100, 100, "Name", Colors.toColor(50,50,50), InternalImageTypes.NORMAL);
+		workspace.addNewSimpleLayer(null, 50, 900, "Namex", Colors.toColor(50,50,50), InternalImageTypes.NORMAL);
 		{
 			LayerNode lnode = workspace.addNewRigLayer(null, 50, 50, "Rig", Colors.toColor(0,0,0,0));
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
@@ -94,9 +95,9 @@ public class Test1 {
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	
 		GroupNode beta = workspace.addGroupNode(null, "Beta");
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_1", Colors.toColor( 0,100,0));
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_2", Colors.toColor( 0,0,100));
-		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_3", Colors.toColor( 100,0,0));
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_1", Colors.toColor( 0,100,0), InternalImageTypes.NORMAL);
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_2", Colors.toColor( 0,0,100), InternalImageTypes.NORMAL);
+		workspace.addNewSimpleLayer(beta, 50,  50, "Beta_3", Colors.toColor( 100,0,0), InternalImageTypes.NORMAL);
 		
 		// Save file then load it to verify it's working
 		File temp = null;
@@ -206,14 +207,14 @@ public class Test1 {
 		for( int i=0; i < ROUNDS_TO_TEST; ++i) {
 			ImageWorkspace workspace = new ImageWorkspace(master);
 			master.addWorkpace(workspace, false);
-			Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0))).getLayer();
+			Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0),InternalImageTypes.NORMAL)).getLayer();
 			workspace.finishBuilding();
 			
 			UndoEngine engine = workspace.getUndoEngine();
 			
 			assert engine.getQueuePosition() == 0;
 			
-			Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", Colors.toColor(0,0,0,0))).getLayer();
+			Layer layer2 = ((LayerNode)workspace.addNewSimpleLayer(null, 160, 160, "two", Colors.toColor(0,0,0,0),InternalImageTypes.NORMAL)).getLayer();
 			
 	
 			for( int j=0; j < PRE; ++j)
@@ -249,7 +250,7 @@ public class Test1 {
 			workspace.addNewSimpleLayer(
 					getRandomNode(workspace), 
 					100 + rn.nextInt(100), 100 + rn.nextInt(100)
-					, Float.toHexString(rn.nextFloat()), randomColor().getRGB());
+					, Float.toHexString(rn.nextFloat()), randomColor().getRGB(), InternalImageTypes.NORMAL);
 			break;
 		case 1:
 			// Add Group
@@ -347,7 +348,7 @@ public class Test1 {
 			workspace.finishBuilding();
 			master.addWorkpace(workspace, false);
 			
-			workspace.addNewSimpleLayer(null, 50, 50, "BASE", Colors.toColor(0,0,0,0));
+			workspace.addNewSimpleLayer(null, 50, 50, "BASE", Colors.toColor(0,0,0,0), InternalImageTypes.NORMAL);
 			for( int i=0; i<50; ++i) {
 				performRandomUndoableAction( workspace);
 			}

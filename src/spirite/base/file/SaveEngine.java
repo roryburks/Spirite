@@ -19,10 +19,12 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -302,22 +304,24 @@ public class SaveEngine implements MWorkspaceObserver {
 		helper.ra.writeInt(0);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		for( ImageHandle part : helper.reservedCache) {
+		for( LogicalImage part : helper.reservedCache) {
 			// (Foreach ImageData)
 			
-			HybridUtil.savePNG(part.deepAccess(), bos);
+			HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
 
 			// [4] : Image ID
-			helper.ra.writeInt( part.getID());
-			// [1] : Bitwise map (for now only one entry, 0th bit for whether or not it's dynamic)
-			int mask = part.isDynamic() ? SaveLoadUtil.DYNMIC_MASK : 0;
+			helper.ra.writeInt( part.handleID);
+			// [1] : Image Type
+			int mask = part.iimg.getType().ordinal();
 			helper.ra.writeByte(mask);
-			if( part.isDynamic()) {
+			
+			if( part.iimg instanceof DynamicInternalImage) {
 				// If Dynamic
 				// [2] : Dynamic offsetX
-				helper.ra.writeShort(part.getDynamicX());
+				helper.ra.writeShort(part.iimg.getDynamicX());
 				// [2] : Dynamic offsetY
-				helper.ra.writeShort(part.getDynamicY());
+				helper.ra.writeShort(part.iimg.getDynamicY());
+				
 			}
 			// [4] : Size of Image Data
 			helper.ra.writeInt( bos.size());
@@ -400,7 +404,7 @@ public class SaveEngine implements MWorkspaceObserver {
 	private class SaveHelper {
 		final Map<Node, Integer> nodeMap = new HashMap<>();
 		int nmMet = 0;
-		final List<ImageHandle> reservedCache;
+		final List<LogicalImage> reservedCache;
 		final GroupNode dupeRoot;
 		final ImageWorkspace workspace;
 		RandomAccessFile ra;

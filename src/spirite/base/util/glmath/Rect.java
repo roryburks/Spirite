@@ -71,6 +71,9 @@ public class Rect {
 				Math.max( x + width, rect.x + rect.width),
 				Math.max( y + height, rect.y + rect.height));
 	}
+	public Rect union(int x, int y, int w, int h) {
+		return union(new Rect(x, y, w, h));
+	}
 	public boolean intersects(Rect r) {
          int tw = this.width;
          int th = this.height;

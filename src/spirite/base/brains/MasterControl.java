@@ -40,6 +40,7 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
 import spirite.base.util.glmath.MatTrans;
@@ -358,7 +359,7 @@ public class MasterControl
 	public ImageWorkspace createWorkspaceFromImage( RawImage image, boolean select) {
 		ImageWorkspace workspace = new ImageWorkspace(this);
 		if( image != null)
-			workspace.addNewSimpleLayer(null, image, "Base Image");
+			workspace.addNewSimpleLayer(null, image, "Base Image", InternalImageTypes.NORMAL);
 		workspace.finishBuilding();
 		
 		this.addWorkpace(workspace, select);
@@ -369,7 +370,7 @@ public class MasterControl
     public void newWorkspace( int width, int height) {newWorkspace(width,height, 0x00000000, true);}
     public void newWorkspace( int width, int height, int color, boolean selectOnCreate) {
     	ImageWorkspace ws = new ImageWorkspace( this);
-    	ws.addNewSimpleLayer(null, width, height, "Background", color);
+    	ws.addNewSimpleLayer(null, width, height, "Background", color, InternalImageTypes.NORMAL);
     	
     	workspaces.add( ws);
     	ws.addImageObserver( this);
@@ -573,7 +574,7 @@ public class MasterControl
 	    		}
 	    		else if( currentWorkspace.buildActiveData() == null){
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image", InternalImageTypes.NORMAL);
 	    		}
 	    		else {
 	    			// Paste Data onto Selection Engine (current selected Data)
@@ -605,7 +606,7 @@ public class MasterControl
 	    		}
 	    		else {
 	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image");
+	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image", InternalImageTypes.NORMAL);
 	    		}
     		}});
     		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
@@ -678,7 +679,7 @@ public class MasterControl
     		commandMap.put("newLayerQuick", new Runnable() {@Override public void run() {
 				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
 						workspace.getWidth(), workspace.getHeight(), 
-						"New Layer", 0x00000000);
+						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
     		}});
     		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {

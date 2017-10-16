@@ -19,11 +19,12 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.DynamicImportImage;
-import spirite.base.image_data.ImageWorkspace.ImportImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.images.DynamicInternalImage;
+import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -132,7 +133,7 @@ public class LoadEngine {
 			}
 			
 			helper.workspace = new ImageWorkspace(master);
-			Map<Integer,ImportImage> imageMap = new HashMap<>();
+			Map<Integer,IInternalImage> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
 			parseChunks( helper);
@@ -165,8 +166,7 @@ public class LoadEngine {
 			helper.ra.close();
 			
 			if( helper.version < 2) {
-				for( ImportImage impi : imageMap.values()) {
-					RawImage img = impi.image;
+				for( IInternalImage img : imageMap.values()) {
 					if( img.getWidth() > helper.workspace.getWidth()) {
 						helper.workspace.setWidth(img.getWidth());
 					}
@@ -229,11 +229,11 @@ public class LoadEngine {
 	 * Read ImageData Section Data
 	 * [IMGD]
 	 */
-	private Map<Integer, ImportImage> parseImageDataSection(
+	private Map<Integer, IInternalImage> parseImageDataSection(
 			LoadHelper helper, int chunkSize) 
 			throws IOException 
 	{
-		Map<Integer,ImportImage> dataMap = new HashMap<>();
+		Map<Integer,IInternalImage> dataMap = new HashMap<>();
 		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int identifier;
 		int imgSize;
@@ -257,12 +257,12 @@ public class LoadEngine {
 			
 			RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 			
-			ImportImage impi;
+			IInternalImage impi;
 			if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
-				 impi = new DynamicImportImage( img, ox, oy);
+				 impi = new DynamicInternalImage( img, ox, oy, helper.workspace);
 			}
 			else
-				impi = new ImportImage( img);
+				impi = new InternalImage( img, helper.workspace);
 			dataMap.put(identifier, impi);
 			
 		}

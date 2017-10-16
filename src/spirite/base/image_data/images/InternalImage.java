@@ -9,9 +9,9 @@ import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 
-/**
- * Note: For Organization purposes I really wish I could insert this into the image_data.images package,
- * but it needed far too much internal scope access.
+/***
+ * Normal Internal Image.  Has a RawImage (cached) that represents its image data
+ * and that RawImage is drawn to.
  */
 public class InternalImage implements IInternalImage {
 	CachedImage cachedImage;
@@ -143,4 +143,5 @@ public class InternalImage implements IInternalImage {
 
 	@Override public int getDynamicX() {return 0;}
 	@Override public int getDynamicY() {return 0;}
+	@Override public InternalImageTypes getType() {return InternalImageTypes.NORMAL;}
 }

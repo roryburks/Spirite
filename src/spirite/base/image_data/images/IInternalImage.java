@@ -12,4 +12,11 @@ public interface IInternalImage {
 	public IInternalImage dupe();
 	public void flush();
 	public RawImage readOnlyAccess();
+	public InternalImageTypes getType();
+	
+	public static enum InternalImageTypes {
+		NORMAL,		// 0
+		DYNAMIC,	// 1
+		PRISMATIC	// 2
+	}
 }

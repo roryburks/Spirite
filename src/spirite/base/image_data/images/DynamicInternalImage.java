@@ -6,6 +6,7 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -13,6 +14,13 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
+/***
+ * A Dynamic Internal Image is a kind of image that automatically resizes itself
+ * to its content bounds as it is drawn on top of.  This slightly increases the 
+ * time it takes to commit an image change, but reduces memory overhead as well as
+ * the number of pixels pushed to re-draw the Workspace
+ * 
+ */
 public class DynamicInternalImage implements IInternalImage {
 	CachedImage cachedImage;
 	protected final ImageWorkspace context;
@@ -32,29 +40,19 @@ public class DynamicInternalImage implements IInternalImage {
 	public IInternalImage dupe() {
 		return new DynamicInternalImage( cachedImage.access().deepCopy(), ox, oy, context);
 	}
-	public int getWidth() {
-		return cachedImage.access().getWidth();
-	}
-	public int getHeight() {
-		return cachedImage.access().getHeight();
-	}
+	public int getWidth() {return cachedImage.access().getWidth();}
+	public int getHeight() {return cachedImage.access().getHeight();}
 	public void flush() {
 		if( !flushed) {
 			cachedImage.relinquish(this);
 			flushed = true;
 		}
 	}
-	@Override
-	protected void finalize() throws Throwable {
-		flush();
-	}
-	@Override
-	public RawImage readOnlyAccess() {
-		return cachedImage.access();
-	}
-
+	@Override protected void finalize() throws Throwable {flush();}
+	@Override public RawImage readOnlyAccess() { return cachedImage.access();}
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
+	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
 	
 	public class DynamicBuiltImageData extends IBuiltImageData{
 		final int box;
