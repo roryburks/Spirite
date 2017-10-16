@@ -281,12 +281,6 @@ public class ImageWorkspace {
 		return list;
 	}
 	
-	public void replaceCache( ImageHandle handle, RawImage nri) {
-		imageData.get(handle.id).cachedImage.relinquish(this);
-		imageData.get(handle.id).cachedImage = cacheManager.cacheImage(nri, this);
-		
-	}
-
 	/**
 	 * BuiltActiveData's should be immutable, but after the Layers give their
 	 * BuiltData to the ImageWorkspace and before the ImageWorkspace gives it
@@ -369,19 +363,12 @@ public class ImageWorkspace {
 	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 * and 
 	 */
-	void _replaceIamge( ImageHandle old, RawImage img) {
+	void _replaceIamge( ImageHandle old, InternalImage img) {
 		InternalImage internal = imageData.get(old.id);
+		imageData.get(old.id).flush();
+		imageData.put(old.id, img.dupe());
 		
-		CachedImage cached = internal.cachedImage;
-		cached.relinquish(this);
-		internal.cachedImage = cacheManager.cacheImage(img, this);
-		
-		
-		
-		ImageChangeEvent evt = new ImageChangeEvent();
-		evt.dataChanged = new  ArrayList<ImageHandle>(1);
-		evt.dataChanged.add(old);
-		triggerImageRefresh(evt);
+		old.refresh();
 	}
 	
 	/** I don't like that this function exists, but it was naive to think I
@@ -642,14 +629,12 @@ public class ImageWorkspace {
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,ImportImage> entry : newData.entrySet()) {
-			CachedImage ci = cacheManager.cacheImage(entry.getValue().image, this);
-			
 			if( entry.getValue() instanceof DynamicImportImage) {
 				DynamicImportImage dimpi = (DynamicImportImage)entry.getValue();
-				imageData.put( workingID, new DynamicInternalImage(ci, dimpi.ox, dimpi.oy));
+				imageData.put( workingID, new DynamicInternalImage(entry.getValue().image, dimpi.ox, dimpi.oy, this));
 			}
 			else
-				imageData.put( workingID, new InternalImage(ci));
+				imageData.put( workingID, new InternalImage(entry.getValue().image, this));
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -671,8 +656,7 @@ public class ImageWorkspace {
 	 * then the image will get flushed next time the image data is checked
 	 */
 	public ImageHandle importData( RawImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(newImage, this);
-		imageData.put( workingID, new InternalImage(ci));
+		imageData.put( workingID, new InternalImage(newImage, this));
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
@@ -683,16 +667,14 @@ public class ImageWorkspace {
 	 * will automatically crop the data periodically to only the used area.
 	 */
 	public ImageHandle importDynamicData(RawImage newImage) {
-		CachedImage ci = cacheManager.cacheImage(newImage, this);
-		imageData.put( workingID, new DynamicInternalImage(ci, 0, 0));
+		imageData.put( workingID, new DynamicInternalImage(newImage, 0, 0, this));
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
 	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name) {
-		CachedImage ci = cacheManager.cacheImage(img, this);
-		imageData.put( workingID, new InternalImage(ci));
+		imageData.put( workingID, new InternalImage(img, this));
 		ImageHandle handle = new ImageHandle( this, workingID);
 		workingID++;
 
@@ -718,13 +700,12 @@ public class ImageWorkspace {
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
 		RawImage img = HybridHelper.createImage(w, h);
-		CachedImage ci = cacheManager.cacheImage( img, this);
 		
 		GraphicsContext gc = img.getGraphics();
         gc.setColor( argb);
         gc.fillRect( 0, 0, w, h);
         
-        InternalImage internal = new DynamicInternalImage(ci, 0, 0);
+        InternalImage internal = new DynamicInternalImage(img, 0, 0, this);
         imageData.put(workingID, internal);
         ImageHandle handle= new ImageHandle(this, workingID++);
         

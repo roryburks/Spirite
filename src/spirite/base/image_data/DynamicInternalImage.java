@@ -14,26 +14,29 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
 class DynamicInternalImage extends InternalImage {
 		int ox, oy;
-		DynamicInternalImage(CachedImage ci, int ox, int oy) {
-			super(ci);
+		DynamicInternalImage(RawImage raw, int ox, int oy, ImageWorkspace context) {
+			super(raw, context);
 			this.ox = ox;
 			this.oy = oy;
 		}
 		IBuiltImageData build( ImageHandle handle, int ox, int oy) {
-			return new DynamicBuiltImageData(handle, ox, oy, this);
+			return new DynamicBuiltImageData(handle, ox, oy);
 		}
-		public class DynamicBuiltImageData extends IBuiltImageData{
+		@Override
+		InternalImage dupe() {
+			return new DynamicInternalImage( cachedImage.access().deepCopy(), ox, oy, context);
+		}
+		
+		public static class DynamicBuiltImageData extends IBuiltImageData{
 			final int ox;
 			final int oy;
-			private final DynamicInternalImage dii;
 			RawImage buffer = null;
-			public DynamicBuiltImageData(ImageHandle handle, int ox, int oy,
-					DynamicInternalImage dii) 
+			
+			public DynamicBuiltImageData(ImageHandle handle, int ox, int oy) 
 			{
 				super(handle);
 				this.ox = ox;
 				this.oy = oy;
-				this.dii = dii;
 			}
 			
 			@Override public int getWidth() {
@@ -49,7 +52,7 @@ class DynamicInternalImage extends InternalImage {
 			public void drawBorder(GraphicsContext gc) {
 				if( handle == null) return;
 				
-				gc.drawRect(ox + dii.ox, oy + dii.oy, 
+				gc.drawRect(ox + handle.getDynamicX(), oy + handle.getDynamicY(), 
 						handle.getWidth(), handle.getHeight());
 			}
 			@Override
@@ -66,7 +69,7 @@ class DynamicInternalImage extends InternalImage {
 			
 			@Override
 			public Rect getBounds() {
-				return new Rect( ox + dii.ox, oy + dii.oy, 
+				return new Rect( ox + handle.getDynamicX(), oy + handle.getDynamicY(), 
 						handle.getWidth(), handle.getHeight());
 			}
 			@Override
@@ -74,13 +77,16 @@ class DynamicInternalImage extends InternalImage {
 				handle.context.undoEngine.prepareContext(handle);
 				buffer = HybridHelper.createImage(handle.context.width, handle.context.height);
 				GraphicsContext gc = buffer.getGraphics();
-				gc.drawHandle(this.handle, ox+dii.ox, oy+dii.oy);
+				gc.drawHandle(this.handle, ox+handle.getDynamicX(), oy+handle.getDynamicY());
 				return buffer;
 			}
 			@Override
 			public void checkin() {
 				int w = handle.context.width;
 				int h = handle.context.height;
+				
+				DynamicInternalImage dii = (DynamicInternalImage)handle.context.getData(handle.id);
+				
 				Rect activeRect = (new Rect(0,0,w,h)).union(
 						new Rect(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
 
@@ -121,7 +127,8 @@ class DynamicInternalImage extends InternalImage {
 				dii.ox += cropped.x;
 				dii.oy += cropped.y;
 				
-				handle.context.replaceCache( handle, nri);
+				dii.cachedImage.relinquish(dii);
+				dii.cachedImage = handle.context.getCacheManager().cacheImage(nri, dii);
 				
 				buffer.flush();
 				img.flush();

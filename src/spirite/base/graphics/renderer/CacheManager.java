@@ -139,6 +139,8 @@ public class CacheManager {
 			cacheSize += data.getByteSize();
 		}
 		
+		public CacheManager getContext() {return CacheManager.this;}
+		
 		public void flush() {
 			if( data == null) return;
 			

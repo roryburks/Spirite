@@ -14,7 +14,13 @@ import spirite.base.util.glmath.Vec2i;
  */
 class InternalImage {
 	CachedImage cachedImage;
-	InternalImage( CachedImage ci) { this.cachedImage = ci;}
+	protected final ImageWorkspace context;
+	boolean flushed = false;
+	
+	InternalImage( RawImage raw, ImageWorkspace context) { 
+		this.context = context;
+		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
+	}
 	
 	int getWidth() {
 		return cachedImage.access().getWidth();
@@ -25,6 +31,21 @@ class InternalImage {
 	IBuiltImageData build( ImageHandle handle, int ox, int oy) {
 		return new BuiltImageData(handle);
 	}
+	
+	InternalImage dupe() {
+		return new InternalImage(cachedImage.access().deepCopy(), context);
+	}
+	void flush() {
+		if( !flushed) {
+			cachedImage.relinquish(this);
+			flushed = true;
+		}
+	}
+	@Override
+	protected void finalize() throws Throwable {
+		flush();
+	}
+	
 	public class BuiltImageData extends IBuiltImageData {
 		final int ox;
 		final int oy;
