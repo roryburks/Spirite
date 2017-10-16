@@ -10,6 +10,7 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
@@ -141,7 +142,7 @@ public class SelectionEngine {
 			
 			actions.add(new ClearSelectionAction(
 					getBuiltSelection(),
-					workspace.buildData(node)));
+					workspace.buildDataFromNode(node)));
 			actions.add( new MoveSelectionAction(dx,dy));
 					
 			
@@ -172,7 +173,7 @@ public class SelectionEngine {
 			actions.add( createLiftAction(node));
 			actions.add(new ClearSelectionAction(
 					getBuiltSelection(),
-					workspace.buildData(node)));
+					workspace.buildDataFromNode(node)));
 					
 			
 			undoEngine.performAndStore(
@@ -202,7 +203,7 @@ public class SelectionEngine {
 		
 		undoEngine.performAndStore(new ClearSelectionAction(
 				getBuiltSelection(),
-				workspace.buildData(node)));
+				workspace.buildDataFromNode(node)));
 		return true;
 	}
 
@@ -444,9 +445,9 @@ public class SelectionEngine {
 	
 	private SetLiftedAction createLiftAction(LayerNode node) {
 		BuiltSelection mask = getBuiltSelection();
-		IBuiltImageData builtImage = workspace.buildData(node);
+		IBuiltImageData builtImage = workspace.buildData(workspace.buildDataFromNode(node));
 		
-		return new SetLiftedAction(mask.liftSelectionFromData(builtImage));
+		return new SetLiftedAction( mask.liftSelectionFromData(builtImage));
 	}
 	
 	public UndoableAction createNewSelectAction( BuiltSelection selection) {
@@ -492,7 +493,7 @@ public class SelectionEngine {
 	public class ClearSelectionAction extends ImageAction {
 		private final BuiltSelection selection;
 		
-		public ClearSelectionAction(BuiltSelection builtSelection, IBuiltImageData builtData) {
+		public ClearSelectionAction(BuiltSelection builtSelection, BuildingImageData builtData) {
 			super(builtData);
 			this.selection = builtSelection;
 			this.description = "Deleted Selected Data";
@@ -500,12 +501,13 @@ public class SelectionEngine {
 
 		@Override
 		protected void performImageAction() {
-			GraphicsContext gc = builtImage.checkout();
+			IBuiltImageData built = workspace.buildData(builtImage);
+			GraphicsContext gc = built.checkout();
 			
 			gc.setComposite( Composite.DST_OUT, 1.0f);
 			selection.drawSelectionMask( gc);
 
-			builtImage.checkin();
+			built.checkin();
 		}
 	}
 	
@@ -516,7 +518,7 @@ public class SelectionEngine {
 		
 		protected PasteSelectionAction(
 				RawImage liftedImage2, 
-				IBuiltImageData builtActiveData, 
+				BuildingImageData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
 			super(builtActiveData);
@@ -525,9 +527,10 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			GraphicsContext gc = builtImage.checkout();
+			IBuiltImageData built = workspace.buildData(builtImage);
+			GraphicsContext gc = built.checkout();
 			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
-			builtImage.checkin();
+			built.checkin();
 		}
 	}
 
@@ -769,7 +772,7 @@ public class SelectionEngine {
 		}
 
 		/** Uses the BuiltSelection to lift the selected portion of the given
-		 * IBuiltImageData and put it in a new BufferedImage.*/
+		 * BuildingImageData and put it in a new BufferedImage.*/
 		public RawImage liftSelectionFromData( IBuiltImageData data) {
 			return liftSelection(new LiftScheme() {
 				@Override

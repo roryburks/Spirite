@@ -1,12 +1,11 @@
-package spirite.base.image_data;
+package spirite.base.image_data.images;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
-import spirite.base.image_data.InternalImage.BuiltImageData;
-import spirite.base.image_data.images.IBuiltImageData;
-import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -14,13 +13,13 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
-class DynamicInternalImage implements IInternalImage {
+public class DynamicInternalImage implements IInternalImage {
 	CachedImage cachedImage;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
 	int ox, oy;
-	DynamicInternalImage(RawImage raw, int ox, int oy, ImageWorkspace context) {
+	public DynamicInternalImage(RawImage raw, int ox, int oy, ImageWorkspace context) {
 		this.context = context;
 		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
 		this.ox = ox;
@@ -53,24 +52,27 @@ class DynamicInternalImage implements IInternalImage {
 	public RawImage readOnlyAccess() {
 		return cachedImage.access();
 	}
+
+	@Override public int getDynamicX() {return ox;}
+	@Override public int getDynamicY() {return oy;}
 	
-	public static class DynamicBuiltImageData extends IBuiltImageData{
-		final int ox;
-		final int oy;
+	public class DynamicBuiltImageData extends IBuiltImageData{
+		final int box;
+		final int boy;
 		RawImage buffer = null;
 		
 		public DynamicBuiltImageData(ImageHandle handle, int ox, int oy) 
 		{
 			super(handle);
-			this.ox = ox;
-			this.oy = oy;
+			this.box = ox;
+			this.boy = oy;
 		}
 		
 		@Override public int getWidth() {
-			return handle.context.width;
+			return handle.getContext().getWidth();
 		} 
 		@Override public int getHeight() {
-			return handle.context.height;
+			return handle.getContext().getHeight();
 		}
 		@Override public float convertX( float x) {return x;}
 		@Override public float convertY( float y) {return y;}
@@ -79,13 +81,13 @@ class DynamicInternalImage implements IInternalImage {
 		public void drawBorder(GraphicsContext gc) {
 			if( handle == null) return;
 			
-			gc.drawRect(ox + handle.getDynamicX(), oy + handle.getDynamicY(), 
+			gc.drawRect(box + ox, boy + oy, 
 					handle.getWidth(), handle.getHeight());
 		}
 		@Override
 		public MatTrans getCompositeTransform() {
 			MatTrans trans = new MatTrans();
-			trans.preTranslate(ox, oy);
+			trans.preTranslate(box, boy);
 			return trans;
 		}
 		
@@ -96,42 +98,40 @@ class DynamicInternalImage implements IInternalImage {
 		
 		@Override
 		public Rect getBounds() {
-			return new Rect( ox + handle.getDynamicX(), oy + handle.getDynamicY(), 
+			return new Rect( box + handle.getDynamicX(), boy + handle.getDynamicY(), 
 					handle.getWidth(), handle.getHeight());
 		}
 		@Override
 		public RawImage checkoutRaw() {
-			handle.context.undoEngine.prepareContext(handle);
-			buffer = HybridHelper.createImage(handle.context.width, handle.context.height);
+			handle.getContext().getUndoEngine().prepareContext(handle);
+			buffer = HybridHelper.createImage(handle.getContext().getWidth(), handle.getContext().getHeight());
 			GraphicsContext gc = buffer.getGraphics();
-			gc.drawHandle(this.handle, ox+handle.getDynamicX(), oy+handle.getDynamicY());
+			gc.drawHandle(this.handle, box+handle.getDynamicX(), boy+handle.getDynamicY());
 			return buffer;
 		}
 		@Override
 		public void checkin() {
-			int w = handle.context.width;
-			int h = handle.context.height;
-			
-			DynamicInternalImage dii = (DynamicInternalImage)handle.context.getData(handle.id);
+			int w = handle.getContext().getWidth();
+			int h = handle.getContext().getHeight();
 			
 			Rect activeRect = (new Rect(0,0,w,h)).union(
-					new Rect(ox+dii.ox, oy+dii.oy, handle.getWidth(), handle.getHeight()));
+					new Rect(box+ox, boy+oy, handle.getWidth(), handle.getHeight()));
 
 			RawImage img = HybridHelper.createImage(w, h);
 			GraphicsContext gc = img.getGraphics();
 
 			// Draw the part of the old image over the new one
 			gc.drawHandle(handle,
-					ox+dii.ox - activeRect.x, 
-					oy+dii.oy- activeRect.y);
+					box+ox - activeRect.x, 
+					boy+oy- activeRect.y);
 
 			// Clear the section of the old image that will be replaced by the new one
 			gc.setComposite( Composite.SRC, 1.0f);
 			gc.drawImage(buffer, -activeRect.x, -activeRect.y);
 //				g2.dispose();
 
-			dii.ox = activeRect.x - ox;
-			dii.oy = activeRect.y - oy;
+			ox = activeRect.x - box;
+			oy = activeRect.y - boy;
 			activeRect = null;
 			
 			Rect cropped = null;
@@ -151,11 +151,11 @@ class DynamicInternalImage implements IInternalImage {
 			gc = nri.getGraphics();
 			gc.drawImage( img, -cropped.x, -cropped.y);
 			
-			dii.ox += cropped.x;
-			dii.oy += cropped.y;
+			ox += cropped.x;
+			oy += cropped.y;
 			
-			dii.cachedImage.relinquish(dii);
-			dii.cachedImage = handle.context.getCacheManager().cacheImage(nri, dii);
+			cachedImage.relinquish(DynamicInternalImage.this);
+			cachedImage = handle.getContext().getCacheManager().cacheImage(nri, DynamicInternalImage.this);
 			
 			buffer.flush();
 			img.flush();
@@ -168,15 +168,16 @@ class DynamicInternalImage implements IInternalImage {
 
 		@Override
 		public void draw(GraphicsContext gc) {
-			MatTrans transform = MatTrans.TranslationMatrix(ox, oy);
+			MatTrans transform = MatTrans.TranslationMatrix(box, boy);
 			handle.drawLayer( gc, transform);
 		}
 
 		@Override
 		public MatTrans getScreenToImageTransform() {
 			MatTrans transform = new MatTrans();
-			transform.preTranslate( -ox, -oy);
+			transform.preTranslate( -box, -boy);
 			return transform;
 		}
 	}
+
 }

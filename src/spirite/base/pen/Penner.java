@@ -28,6 +28,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
@@ -391,7 +392,7 @@ public class Penner
 		if( holdingCtrl) c = 0x00000000;
 
 		// Grab the Active Data
-		IBuiltImageData data = workspace.buildActiveData();
+		BuildingImageData data = workspace.buildActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
 		if( data != null && node != null) {
@@ -459,7 +460,7 @@ public class Penner
 			if( workspace != null && workspace.buildActiveData() != null) {
 				shiftX = rawX;
 				shiftY = rawY;
-				IBuiltImageData data = workspace.buildActiveData();
+				BuildingImageData data = workspace.buildActiveData();
 //				GroupTree.Node node = workspace.getSelectedNode();
 				
 				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
@@ -1337,7 +1338,7 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			IBuiltImageData data =  workspace.buildActiveData();
+			BuildingImageData data =  workspace.buildActiveData();
 			if( data != null) {
 				if( MUtil.distance(x , y, startX, startY) < 5 ||
 					Math.abs(x - startX) > Math.abs(y - startY))

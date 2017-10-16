@@ -63,10 +63,12 @@ public class DrawEngine {
 		return (activeEngine == null) ? null : activeEngine.getImageData().handle;
 	}
 	
+	private BuildingImageData workingData;
 	/** Starts a Stroke with the provided parameters
 	 * 
 	 * @return true if the stroke started, false otherwise	 */
-	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, IBuiltImageData data) {
+	public boolean startStroke(StrokeEngine.StrokeParams stroke, PenState ps, BuildingImageData data) {
+		workingData = data;
 		if( activeEngine != null) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
 			return false;
@@ -79,7 +81,7 @@ public class DrawEngine {
 //			if( activeEngine instanceof AWTStrokeEngine) stroke.setInterpolationMethod(InterpolationMethod.NONE);
 			activeEngine = settingsManager.getDefaultDrawer().getStrokeEngine();
 			
-			if( activeEngine.startStroke(stroke, ps, data, pollSelectionMask()))
+			if( activeEngine.startStroke(stroke, ps, workspace.buildData(data), pollSelectionMask()))
 				data.handle.refresh();
 			return true;
 		}
@@ -112,7 +114,7 @@ public class DrawEngine {
 					activeEngine.getParams(),
 					activeEngine.getHistory(),
 					activeEngine.getLastSelection(),
-					activeEngine.getImageData()));
+					workingData));
 			activeEngine = null;
 		}
 		
@@ -120,7 +122,7 @@ public class DrawEngine {
 	
 
 	/** Clears the Image Dat to a transparent color. */
-	public void clear( IBuiltImageData data) {
+	public void clear( BuildingImageData data) {
 		execute( new ClearAction(data, pollSelectionMask()));
 	}
 
@@ -128,9 +130,10 @@ public class DrawEngine {
 	 * Simple queue-based flood fill.
 	 * @return true if any changes were made
 	 */
-	public boolean fill( int x, int y, int color, IBuiltImageData data)
+	public boolean fill( int x, int y, int color, BuildingImageData _data)
 	{
-		if( data == null) return false;
+		if( _data == null) return false;
+		IBuiltImageData data = workspace.buildData(_data);
 		
 		Vec2i p = data.convert( new Vec2i(x,y));
 		
@@ -148,13 +151,13 @@ public class DrawEngine {
 		}
 		data.checkin();
 
-		execute( new FillAction(new Vec2i(x,y), color, mask, data));
+		execute( new FillAction(new Vec2i(x,y), color, mask, _data));
 
 		return true;
 	}
 	
 	/** Flips the data around either the horizontal or vertical center of the Iamge. */
-	public void flip( IBuiltImageData data, boolean horizontal) {
+	public void flip( BuildingImageData data, boolean horizontal) {
 		BuiltSelection sel = selectionEngine.getBuiltSelection();
 		
 		if( selectionEngine.isLifted()) {
@@ -213,7 +216,7 @@ public class DrawEngine {
 		
 		switch( scope) {
 		case LOCAL:
-			IBuiltImageData bid = workspace.buildActiveData();
+			BuildingImageData bid = workspace.buildActiveData();
 			if( bid != null) {
 				execute( new ColorChangeAction(bid, mask, from, to, mode));
 			}
@@ -235,7 +238,7 @@ public class DrawEngine {
 					data.ox += lnode.x;
 					data.oy += lnode.y;
 					actions.add( new ColorChangeAction(
-							workspace.buildData(data),
+							data,
 							mask, from, to, mode));
 				}
 			}
@@ -245,7 +248,7 @@ public class DrawEngine {
 			break;
 		}
 	}
-	public void invert(IBuiltImageData data) {
+	public void invert(BuildingImageData data) {
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		execute( new InvertAction(data, mask));
 	}
@@ -318,7 +321,7 @@ public class DrawEngine {
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
 
-		private MaskedImageAction(IBuiltImageData data, BuiltSelection mask) {
+		private MaskedImageAction(BuildingImageData data, BuiltSelection mask) {
 			super(data);
 			this.mask = mask;
 		}
@@ -335,7 +338,7 @@ public class DrawEngine {
 				StrokeEngine.StrokeParams params, 
 				PenState[] points, 
 				BuiltSelection mask, 
-				IBuiltImageData data)
+				BuildingImageData data)
 		{
 			super(data, mask);
 			this.engine = engine;
@@ -362,15 +365,16 @@ public class DrawEngine {
 		@Override
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
-
-			engine.batchDraw(params, points, builtImage, mask);
+			
+			IBuiltImageData built = workspace.buildData(builtImage);
+			engine.batchDraw(params, points, built, mask);
 		}
 	}
 	public class FillAction extends MaskedImageAction {
 		private final Vec2i p;
 		private final int color;
 		
-		private FillAction( Vec2i p, int c, BuiltSelection mask, IBuiltImageData data) {
+		private FillAction( Vec2i p, int c, BuiltSelection mask, BuildingImageData data) {
 			super(data, mask);
 			this.p = p;
 			this.color = c;
@@ -381,12 +385,13 @@ public class DrawEngine {
 		protected void performImageAction( ) {
 			RawImage img;
 			Vec2i layerSpace;
+			IBuiltImageData built = workspace.buildData(builtImage);
 			if( mask.selection == null) {
-				img = builtImage.checkoutRaw();
-				layerSpace = builtImage.convert( new Vec2i(p.x, p.y));
+				img = built.checkoutRaw();
+				layerSpace = built.convert( new Vec2i(p.x, p.y));
 			}
 			else {
-				img = mask.liftSelectionFromData(builtImage);
+				img = mask.liftSelectionFromData(built);
 				layerSpace = new Vec2i(p.x - mask.offsetX, p.y - mask.offsetY);
 			}
 
@@ -436,43 +441,42 @@ public class DrawEngine {
 				}
 
 				// Anchor the lifted image to the real image
-				GraphicsContext gc = builtImage.checkout();
-				Vec2i p = builtImage.convert(new Vec2i(mask.offsetX,mask.offsetY));
+				GraphicsContext gc = built.checkout();
+				Vec2i p = built.convert(new Vec2i(mask.offsetX,mask.offsetY));
 				gc.drawImage( img, p.x, p.y);
 			}
-			builtImage.checkin();
+			built.checkin();
 		}
 		public Vec2i getPoint() { return new Vec2i(p);}
 		public int getColor() { return color;}
 	}
 
 	public class ClearAction extends MaskedImageAction {
-		private ClearAction(IBuiltImageData data, BuiltSelection mask) {
+		private ClearAction(BuildingImageData data, BuiltSelection mask) {
 			super(data, mask); 
 			description = "Clear Image";
 		}
 		@Override
 		protected void performImageAction() {
-			
+			IBuiltImageData built = workspace.buildData(builtImage);
 			if( mask.selection == null) {
-				builtImage.checkout().clear();
-				builtImage.checkin();
+				built.checkout().clear();
+				built.checkin();
 			}
 			else {
-				GraphicsContext gc = builtImage.checkout();
+				GraphicsContext gc = built.checkout();
 				gc.translate(mask.offsetX, mask.offsetY);
 				gc.setComposite(Composite.DST_OUT, 1);
 				mask.selection.drawSelectionMask(gc);
-				builtImage.checkin();
+				built.checkin();
 			}
-
 		}
 	}
 	
 	public class FlipAction extends MaskedImageAction 
 	{
 		private final boolean horizontal;
-		private FlipAction(IBuiltImageData data, BuiltSelection mask, boolean horizontal) {
+		private FlipAction(BuildingImageData data, BuiltSelection mask, boolean horizontal) {
 			super(data, mask);
 			this.horizontal = horizontal;
 			description = "Flip Action";
@@ -480,14 +484,15 @@ public class DrawEngine {
 
 		@Override
 		protected void performImageAction() {
+			IBuiltImageData built = workspace.buildData(builtImage);
 			
 			if( mask != null && mask.selection != null) {
 				
-				RawImage lifted = mask.liftSelectionFromData(builtImage);
+				RawImage lifted = mask.liftSelectionFromData(built);
 
 				RawImage buffer = flipImage(lifted, horizontal);
 
-				GraphicsContext gc = builtImage.checkout();
+				GraphicsContext gc = built.checkout();
 				gc.setComposite( Composite.DST_OUT, 1.0f);
 				mask.drawSelectionMask( gc);
 
@@ -498,7 +503,7 @@ public class DrawEngine {
 				buffer.flush();
 			}
 			else {
-				RawImage bi = builtImage.checkoutRaw();
+				RawImage bi = built.checkoutRaw();
 				RawImage buffer = flipImage( bi, horizontal);
 				
 				GraphicsContext gc = bi.getGraphics();
@@ -507,7 +512,7 @@ public class DrawEngine {
 //				g2.dispose();
 				buffer.flush();
 			}
-			builtImage.checkin();
+			built.checkin();
 			
 		}
 	}
@@ -533,7 +538,7 @@ public class DrawEngine {
 
 	public class ScaleAction extends MaskedImageAction 
 	{
-		private ScaleAction(IBuiltImageData data, BuiltSelection mask) {
+		private ScaleAction(BuildingImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		
@@ -545,18 +550,19 @@ public class DrawEngine {
 	public abstract class PerformFilterAction extends MaskedImageAction
 	{
 
-		private PerformFilterAction(IBuiltImageData data, BuiltSelection mask) {
+		private PerformFilterAction(BuildingImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 
 		@Override
 		protected void performImageAction() {
+			IBuiltImageData built = workspace.buildData(builtImage);
 			if( mask != null && mask.selection != null) {
 				// Lift the Selection
-				RawImage lifted = mask.liftSelectionFromData(builtImage);
+				RawImage lifted = mask.liftSelectionFromData(built);
 				applyFilter(lifted);
 
-				GraphicsContext gc = builtImage.checkout();
+				GraphicsContext gc = built.checkout();
 				gc.setComposite( Composite.DST_OUT, 1.0f);
 				mask.drawSelectionMask(gc);
 
@@ -564,10 +570,10 @@ public class DrawEngine {
 				gc.drawImage( lifted, mask.offsetX, mask.offsetY );
 			}
 			else {
-				RawImage bi = builtImage.checkoutRaw();
+				RawImage bi = built.checkoutRaw();
 				applyFilter(bi);
 			}
-			builtImage.checkin();
+			built.checkin();
 		}
 		
 		abstract void applyFilter( RawImage image);
@@ -579,7 +585,7 @@ public class DrawEngine {
 		private final int from, to;
 		private final int mode;
 		private ColorChangeAction(
-				IBuiltImageData data, 
+				BuildingImageData data, 
 				BuiltSelection mask, 
 				int from, int to, 
 				int mode) 
@@ -597,7 +603,7 @@ public class DrawEngine {
 	}
 	
 	public class InvertAction extends PerformFilterAction {
-		private InvertAction(IBuiltImageData data, BuiltSelection mask) {
+		private InvertAction(BuildingImageData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 		@Override

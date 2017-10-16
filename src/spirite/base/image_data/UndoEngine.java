@@ -14,9 +14,11 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.InternalImage;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -225,7 +227,7 @@ public class UndoEngine {
 	 * 
 	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
-	void prepareContext( ImageHandle data) {
+	public void prepareContext( ImageHandle data) {
 		for( UndoContext context : contexts) {
 			if( context.image == null) continue;
 			if( context.image.equals(data))
@@ -597,7 +599,7 @@ public class UndoEngine {
 			ImageAction hiddenAction;
 			boolean freed = false;
 			KeyframeAction( ImageAction action) {
-				super( image.build());
+				super( new BuildingImageData(image, 0, 0));
 				this.hiddenAction = action;
 
 				_ii = workspace.getData(image.id).dupe();
@@ -1135,8 +1137,8 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final IBuiltImageData builtImage;
-		protected ImageAction( IBuiltImageData data) {
+		protected final BuildingImageData builtImage;
+		protected ImageAction( BuildingImageData data) {
 			this.builtImage = data;
 		}
 		@Override protected final void performAction() 
@@ -1153,7 +1155,7 @@ public class UndoEngine {
 	// For internal use only.  Why would you want make an empty Image Action?
 	class NilImageAction extends ImageAction {
 		protected NilImageAction(ImageHandle data) {
-			super( data.build());
+			super( new BuildingImageData(data, 0, 0));
 		}
 		@Override		protected void performImageAction() {}
 		
@@ -1316,7 +1318,7 @@ public class UndoEngine {
 //		private final int dx;
 	//	private final int dy;
 		
-		public DrawImageAction(IBuiltImageData data, CachedImage other) {
+		public DrawImageAction(BuildingImageData data, CachedImage other) {
 			super(data);
 			this.stored = other;
 		}
@@ -1328,9 +1330,10 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			GraphicsContext gc = builtImage.checkout();
+			IBuiltImageData ibid = builtImage.handle.context.buildData(builtImage);
+			GraphicsContext gc = ibid.checkout();
 			gc.drawImage(stored.access(), 0, 0);
-			builtImage.checkin();
+			ibid.checkin();
 		}
 	}
 	

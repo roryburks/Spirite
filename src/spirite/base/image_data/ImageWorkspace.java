@@ -31,8 +31,10 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -303,27 +305,27 @@ public class ImageWorkspace {
 		}
 	}
 	
+	
 	/** Returns the Active Data in its Built form, with all the offsets applied. */
-	public IBuiltImageData buildActiveData() {
+	public BuildingImageData buildActiveData() {
 		getSelectedNode();	// Makes sure the selected node is refreshed
 		if( selected == null) return null;
 		
 		if( selected instanceof LayerNode) {
-			return buildData( (LayerNode) selected);
+			return buildDataFromNode( (LayerNode) selected);
 		}
 		return null;
 	}
 	
 	/** Builds all applied offsets into a LayerNode. */
-	public IBuiltImageData buildData( LayerNode node) {
+	public BuildingImageData buildDataFromNode( LayerNode node) {
 		BuildingImageData data = node.getLayer().getActiveData();
 		
 		if( data == null) return null;
 		
-		IInternalImage ii = imageData.get(data.handle.id);
-		if( ii == null) return null;
-		
-		return ii.build(data.handle, data.ox + node.x, data.oy + node.y);
+		data.ox += node.x;
+		data.oy += node.y;
+		return data;
 	}
 	
 	/** Converts BuildingImageData (which is provided by Layers to describe all
@@ -526,13 +528,14 @@ public class ImageWorkspace {
 	{
 		private int x, y;
 		protected ShiftDataAction(ImageHandle data, int x, int y) {
-			super( data.build());
+			super( new BuildingImageData(data, 0, 0));
 			this.x = x;
 			this.y = y;
 		}
 		@Override
 		protected void performImageAction() {
-			RawImage img = builtImage.checkoutRaw();
+			IBuiltImageData built = buildData(builtImage);
+			RawImage img = built.checkoutRaw();
 			RawImage buffer = HybridHelper.createImage( img.getWidth(), img.getHeight());
 			
 			GraphicsContext gc = buffer.getGraphics();
@@ -544,7 +547,7 @@ public class ImageWorkspace {
 			gc.clear();
 			gc.drawImage( buffer, 0, 0);
 //			g.dispose();
-			builtImage.checkin();
+			built.checkin();
 		}
 		@Override
 		public void stackNewAction(UndoableAction newAction) {
@@ -569,6 +572,7 @@ public class ImageWorkspace {
 	
 	
 	// :::: Content Addition
+	// TODO: These probably shouldn't exist
 	public static class ImportImage {
 		public final RawImage image;
 		public ImportImage( RawImage image) {
@@ -770,7 +774,7 @@ public class ImageWorkspace {
 						DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
 						impi = new DynamicImportImage(
 								handle.deepAccess().deepCopy(), 
-								dii.ox, dii.oy);
+								dii.getDynamicX(), dii.getDynamicY());
 					}
 					else {
 						 impi = new ImportImage(handle.deepAccess().deepCopy());
@@ -824,7 +828,7 @@ public class ImageWorkspace {
 							if( handle.isDynamic()) {
 								DynamicInternalImage dii = (DynamicInternalImage) imageData.get(handle.id);
 								impi = new DynamicImportImage(handle.deepAccess().deepCopy(), 
-										dii.ox, dii.oy);
+										dii.getDynamicX(), dii.getDynamicY());
 							}
 							else {
 								 impi = new ImportImage(handle.deepAccess().deepCopy());

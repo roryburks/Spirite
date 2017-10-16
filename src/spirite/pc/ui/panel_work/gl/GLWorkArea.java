@@ -143,7 +143,7 @@ public class GLWorkArea
         	glgc.setComposite(Composite.SRC_OVER, 1);
 
             // :::: Draw Border around the active Data
-            IBuiltImageData active = workspace.buildActiveData();
+            IBuiltImageData active = workspace.buildData(workspace.buildActiveData());
             
             if( active!= null) {
             	glgc.setComposite(glgc.getComposite(), 0.3f);

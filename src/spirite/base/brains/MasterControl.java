@@ -30,6 +30,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
@@ -511,7 +512,7 @@ public class MasterControl
     					img = currentWorkspace.getSelectionEngine().getLiftedImage();
     				}
     				else {
-    					IBuiltImageData bid = currentWorkspace.buildActiveData();
+    					IBuiltImageData bid = currentWorkspace.buildData(currentWorkspace.buildActiveData());
     					
     					if( bid == null) {
     		    	    	RenderSettings settings = new RenderSettings(
@@ -523,7 +524,7 @@ public class MasterControl
     					}
     					else
 	    					img = currentWorkspace.getSelectionEngine().getBuiltSelection()
-	    						.liftSelectionFromData(currentWorkspace.buildActiveData());
+	    						.liftSelectionFromData(bid);
     				}
     				
     				HybridHelper.imageToClipboard(img);
@@ -683,7 +684,7 @@ public class MasterControl
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
 					//	accessing handle directly is appropriate.
-					IBuiltImageData image = workspace.buildActiveData();
+					BuildingImageData image = workspace.buildActiveData();
 					if( image != null) 
 						workspace.getDrawEngine().clear(image);
 				}
@@ -731,7 +732,7 @@ public class MasterControl
 					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
     		}});
     		commandMap.put("invert", new Runnable() {@Override public void run() {
-    			IBuiltImageData data= workspace.buildActiveData();
+    			BuildingImageData data= workspace.buildActiveData();
     			
     			if( data != null) {
     				workspace.getDrawEngine().invert(data);

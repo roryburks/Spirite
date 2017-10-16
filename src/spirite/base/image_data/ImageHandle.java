@@ -8,7 +8,9 @@ import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.gl.GLParameters.GLTexture;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.util.glmath.MatTrans;
@@ -94,18 +96,12 @@ public class ImageHandle {
 	public int getDynamicX() {
 		if( context == null) return 0;
 		IInternalImage ii = context.getData(id);
-		if( ii instanceof DynamicInternalImage) {
-			return ((DynamicInternalImage) ii).ox;
-		}
-		return 0;
+		return ii.getDynamicX();
 	}
 	public int getDynamicY() {
 		if( context == null) return 0;
 		IInternalImage ii = context.getData(id);
-		if( ii instanceof DynamicInternalImage) {
-			return ((DynamicInternalImage) ii).oy;
-		}
-		return 0;
+		return ii.getDynamicY();
 	}
 	
 	public void drawLayer(
@@ -133,7 +129,7 @@ public class ImageHandle {
 			transform = new MatTrans();
 		if( ii instanceof DynamicInternalImage)
 			transform.preTranslate(
-					((DynamicInternalImage) ii).ox, ((DynamicInternalImage) ii).oy);
+					((DynamicInternalImage) ii).getDynamicX(), ((DynamicInternalImage) ii).getDynamicY());
 		
 		MatTrans completeTransform = new MatTrans(prev);
 		completeTransform.concatenate(transform);
@@ -149,10 +145,5 @@ public class ImageHandle {
 		evt.workspace = context;
 		evt.dataChanged.add(this);
 		context.triggerImageRefresh(evt);
-	}
-
-	public IBuiltImageData build() { return build(0,0);}
-	public IBuiltImageData build( int ox, int oy) {
-		return context.getData(id).build(this, ox, oy);
 	}
 }

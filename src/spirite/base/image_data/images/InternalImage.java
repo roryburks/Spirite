@@ -1,10 +1,10 @@
-package spirite.base.image_data;
+package spirite.base.image_data.images;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
-import spirite.base.image_data.images.IBuiltImageData;
-import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -13,12 +13,12 @@ import spirite.base.util.glmath.Vec2i;
  * Note: For Organization purposes I really wish I could insert this into the image_data.images package,
  * but it needed far too much internal scope access.
  */
-class InternalImage implements IInternalImage {
+public class InternalImage implements IInternalImage {
 	CachedImage cachedImage;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
-	InternalImage( RawImage raw, ImageWorkspace context) { 
+	public InternalImage( RawImage raw, ImageWorkspace context) { 
 		this.context = context;
 		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
 	}
@@ -101,18 +101,16 @@ class InternalImage implements IInternalImage {
 		
 		private RawImage _checkoutImage() {
 			ImageWorkspace context = handle.getContext();
-			if( !context.isValidHandle(handle))
-				return null;
 			
 			context.getUndoEngine().prepareContext(handle);
 			
-			return  ((InternalImage)context.imageData.get(handle.id)).cachedImage.access();
+			return cachedImage.access();
 		}
 		
 		public void checkin() {
 			//locked = false;
-			if( !handle.context.isValidHandle(handle))
-				return;
+//			if( !handle.context.isValidHandle(handle))
+//				return;
 
 			// Construct ImageChangeEvent and send it
 			handle.refresh();
@@ -142,4 +140,7 @@ class InternalImage implements IInternalImage {
 			return new MatTrans();			
 		}
 	}
+
+	@Override public int getDynamicX() {return 0;}
+	@Override public int getDynamicY() {return 0;}
 }

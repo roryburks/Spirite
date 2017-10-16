@@ -81,7 +81,7 @@ public class HybridNodeRenderer {
 	private ImageHandle compositionHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) 
 	{
-		IBuiltImageData dataContext= workspace.buildActiveData();
+		IBuiltImageData dataContext= workspace.buildData(workspace.buildActiveData());
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing())) 
 		{
