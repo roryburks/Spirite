@@ -32,6 +32,7 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -64,7 +65,7 @@ public class ImageWorkspace {
 	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
 	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
 	//	by ImageWorkspace.
-	final Map<Integer,InternalImage> imageData;
+	final Map<Integer,IInternalImage> imageData;
 	
 	public boolean isValidHandle(ImageHandle handle) {
 		return ( handle.context == this && imageData.containsKey(handle.id));
@@ -184,12 +185,12 @@ public class ImageWorkspace {
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
-			imageData.get(i).cachedImage.relinquish(this);
+			imageData.get(i).flush();
 			imageData.remove(i);
 		}
 	}
 	
-	InternalImage getData(int i) {
+	IInternalImage getData(int i) {
 		return imageData.get(i);
 	}
 
@@ -274,7 +275,7 @@ public class ImageWorkspace {
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
 		
-		for( Entry<Integer,InternalImage> entry : imageData.entrySet()) {
+		for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
 			list.add( new ImageHandle( this, entry.getKey()));
 		}
 		
@@ -319,7 +320,7 @@ public class ImageWorkspace {
 		
 		if( data == null) return null;
 		
-		InternalImage ii = imageData.get(data.handle.id);
+		IInternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
 		return ii.build(data.handle, data.ox + node.x, data.oy + node.y);
@@ -330,7 +331,7 @@ public class ImageWorkspace {
 	public IBuiltImageData buildData( BuildingImageData data) {
 		if( data == null) return null;
 		
-		InternalImage ii = imageData.get(data.handle.id);
+		IInternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
 		return ii.build(data.handle, data.ox, data.oy);
@@ -363,19 +364,12 @@ public class ImageWorkspace {
 	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 * and 
 	 */
-	void _replaceIamge( ImageHandle old, InternalImage img) {
-		InternalImage internal = imageData.get(old.id);
+	void _replaceIamge( ImageHandle old, IInternalImage img) {
+		IInternalImage internal = imageData.get(old.id);
 		imageData.get(old.id).flush();
 		imageData.put(old.id, img.dupe());
 		
 		old.refresh();
-	}
-	
-	/** I don't like that this function exists, but it was naive to think I
-	 * could avoid it. 
-	 * ONLY USE IF YOU REALLY NEED THE CACHEDIMAGE, NOT JUST THE BUFFEREDIMAGE*/
-	CachedImage _accessCache( ImageHandle handle) {
-		return imageData.get(handle.id).cachedImage;
 	}
 	
 	/** Creates a Group Node that's detached from the ImageWorkspace, but still
@@ -705,7 +699,7 @@ public class ImageWorkspace {
         gc.setColor( argb);
         gc.fillRect( 0, 0, w, h);
         
-        InternalImage internal = new DynamicInternalImage(img, 0, 0, this);
+        IInternalImage internal = new DynamicInternalImage(img, 0, 0, this);
         imageData.put(workingID, internal);
         ImageHandle handle= new ImageHandle(this, workingID++);
         
@@ -1669,17 +1663,18 @@ public class ImageWorkspace {
      */
     public List<ImageHandle> reserveCache() {
     	List<ImageHandle> handles = new ArrayList<>(imageData.size());
-    	List<CachedImage> caches = new ArrayList<>(imageData.size());
-        	
-    	for( Entry<Integer,InternalImage> entry : imageData.entrySet()) {
-    		handles.add( new ImageHandle(this, entry.getKey()));
-    		caches.add( entry.getValue().cachedImage);
-    	}
-    	for( CachedImage ci :  caches) {
-    		ci.reserve(handles);
-    	}
-    	
-    	reserveMap.put(handles, caches);
+    	// TODO
+//    	List<CachedImage> caches = new ArrayList<>(imageData.size());
+//        	
+//    	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
+//    		handles.add( new ImageHandle(this, entry.getKey()));
+//    		caches.add( entry.getValue().cachedImage);
+//    	}
+//    	for( CachedImage ci :  caches) {
+//    		ci.reserve(handles);
+//    	}
+//    	
+//    	reserveMap.put(handles, caches);
 
     	return handles;
     }
@@ -1693,9 +1688,9 @@ public class ImageWorkspace {
     }
     
 	public void cleanup() {
-		for( InternalImage img : imageData.values()) {
-			img.cachedImage.relinquish(this);
-		}
+//		for( IInternalImage img : imageData.values()) {
+//			img.cachedImage.relinquish(this);
+//		}
 		
 		undoEngine.cleanup();
 	}

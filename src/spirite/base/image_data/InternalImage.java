@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.IInternalImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -12,7 +13,7 @@ import spirite.base.util.glmath.Vec2i;
  * Note: For Organization purposes I really wish I could insert this into the image_data.images package,
  * but it needed far too much internal scope access.
  */
-class InternalImage {
+class InternalImage implements IInternalImage {
 	CachedImage cachedImage;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
@@ -22,20 +23,20 @@ class InternalImage {
 		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
 	}
 	
-	int getWidth() {
+	public int getWidth() {
 		return cachedImage.access().getWidth();
 	}
-	int getHeight() {
+	public int getHeight() {
 		return cachedImage.access().getHeight();
 	}
-	IBuiltImageData build( ImageHandle handle, int ox, int oy) {
-		return new BuiltImageData(handle);
+	public IBuiltImageData build( ImageHandle handle, int ox, int oy) {
+		return new BuiltImageData(handle, ox, oy);
 	}
 	
-	InternalImage dupe() {
+	public InternalImage dupe() {
 		return new InternalImage(cachedImage.access().deepCopy(), context);
 	}
-	void flush() {
+	public void flush() {
 		if( !flushed) {
 			cachedImage.relinquish(this);
 			flushed = true;
@@ -44,6 +45,10 @@ class InternalImage {
 	@Override
 	protected void finalize() throws Throwable {
 		flush();
+	}
+	@Override
+	public RawImage readOnlyAccess() {
+		return cachedImage.access();
 	}
 	
 	public class BuiltImageData extends IBuiltImageData {
@@ -101,7 +106,7 @@ class InternalImage {
 			
 			context.getUndoEngine().prepareContext(handle);
 			
-			return  context.imageData.get(handle.id).cachedImage.access();
+			return  ((InternalImage)context.imageData.get(handle.id)).cachedImage.access();
 		}
 		
 		public void checkin() {

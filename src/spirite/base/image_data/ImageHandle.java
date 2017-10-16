@@ -10,6 +10,7 @@ import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.IInternalImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -65,8 +66,9 @@ public class ImageHandle {
 	 * will happen if it sticks around in GC
 	 *  */
 	public RawImage deepAccess() {
+		// TODO: BAD
 		if( context == null) return null;
-		return context.getData(id).cachedImage.access();
+		return context.getData(id).readOnlyAccess();
 	}
 	
 	/** Accesses a potentially-cached GLTexture representing the current ImageHandle*/
@@ -91,7 +93,7 @@ public class ImageHandle {
 	}
 	public int getDynamicX() {
 		if( context == null) return 0;
-		InternalImage ii = context.getData(id);
+		IInternalImage ii = context.getData(id);
 		if( ii instanceof DynamicInternalImage) {
 			return ((DynamicInternalImage) ii).ox;
 		}
@@ -99,7 +101,7 @@ public class ImageHandle {
 	}
 	public int getDynamicY() {
 		if( context == null) return 0;
-		InternalImage ii = context.getData(id);
+		IInternalImage ii = context.getData(id);
 		if( ii instanceof DynamicInternalImage) {
 			return ((DynamicInternalImage) ii).oy;
 		}
@@ -122,7 +124,7 @@ public class ImageHandle {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
 		}
-		InternalImage ii = context.getData(id);
+		IInternalImage ii = context.getData(id);
 		
 		if( ii == null) return;
 
