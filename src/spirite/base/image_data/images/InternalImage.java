@@ -5,6 +5,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -29,8 +30,8 @@ public class InternalImage implements IInternalImage {
 	public int getHeight() {
 		return cachedImage.access().getHeight();
 	}
-	public IBuiltImageData build( ImageHandle handle, int ox, int oy) {
-		return new BuiltImageData(handle, ox, oy);
+	public IBuiltImageData build( BuildingImageData building) {
+		return new BuiltImageData( building);
 	}
 	
 	public InternalImage dupe() {
@@ -55,15 +56,10 @@ public class InternalImage implements IInternalImage {
 		final int ox;
 		final int oy;
 		
-		public BuiltImageData( ImageHandle handle) {
-			super(handle);
-			this.ox = 0;
-			this.oy = 0;
-		}
-		public BuiltImageData( ImageHandle handle, int ox, int oy) {
-			super(handle);
-			this.ox = ox;
-			this.oy = oy;
+		public BuiltImageData( BuildingImageData building) {
+			super(building.handle);
+			this.ox = building.ox;
+			this.oy = building.oy;
 		}
 		
 		public int getWidth() {

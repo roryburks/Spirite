@@ -193,8 +193,12 @@ public class ImageWorkspace {
 		}
 	}
 	
-	IInternalImage getData(int i) {
+	// meh
+	public IInternalImage getData(int i) {
 		return imageData.get(i);
+	}
+	public IInternalImage getData(ImageHandle handle) {
+		return imageData.get(handle.id);
 	}
 
 	int getWidthOf( int i) {
@@ -300,6 +304,7 @@ public class ImageWorkspace {
 		public final ImageHandle handle;
 		public int ox;
 		public int oy;
+		public int color;
 		public BuildingImageData( ImageHandle handle, int ox, int oy) {
 			this.handle = handle;
 			this.ox = ox;
@@ -327,6 +332,7 @@ public class ImageWorkspace {
 		
 		data.ox += node.x;
 		data.oy += node.y;
+		data.color = master.getPaletteManager().getActiveColor(0)&0xFFFFFF;
 		return data;
 	}
 	
@@ -338,7 +344,7 @@ public class ImageWorkspace {
 		IInternalImage ii = imageData.get(data.handle.id);
 		if( ii == null) return null;
 		
-		return ii.build(data.handle, data.ox, data.oy);
+		return ii.build(data);
 	}
 	
 	// ==============

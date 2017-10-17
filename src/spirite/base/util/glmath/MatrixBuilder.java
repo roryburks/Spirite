@@ -1,6 +1,4 @@
-package spirite.base.util;
-
-import spirite.base.util.glmath.MatTrans;
+package spirite.base.util.glmath;
 
 /**
  * A Package containing methods which construct certain frequently-used

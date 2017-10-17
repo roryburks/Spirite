@@ -7,6 +7,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -99,8 +100,8 @@ public class PrismaticInternalImage implements IInternalImage {
 	}
 
 	@Override
-	public IBuiltImageData build(ImageHandle handle, int ox, int oy) {
-		return new PrismaticBuiltImageData(handle, ox, oy);
+	public IBuiltImageData build( BuildingImageData building) {
+		return new PrismaticBuiltImageData( building);
 	}
 
 	@Override
@@ -159,14 +160,14 @@ public class PrismaticInternalImage implements IInternalImage {
 		final int boy;
 		RawImage buffer = null;
 		int workingColor;
-		
-		public PrismaticBuiltImageData(ImageHandle handle, int ox, int oy) 
-		{
-			super(handle);
-			this.box = ox;
-			this.boy = oy;
-			workingColor = (handle.getContext().getPaletteManageR().getActiveColor(0))&0xFFFFFF;
+
+		public PrismaticBuiltImageData(BuildingImageData building) {
+			super(building.handle);
+			this.box = building.ox;
+			this.boy = building.oy;
+			workingColor = building.color;
 		}
+
 
 		@Override public int getWidth() {return handle.getContext().getWidth();}
 		@Override public int getHeight() { return handle.getContext().getHeight();}

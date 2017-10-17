@@ -2,8 +2,10 @@ package spirite.base.brains;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,10 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
+import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.SelectionEngine;
@@ -444,7 +449,7 @@ public class MasterControl
      * "Paste" and other things which have a higher context than manipulating 
      * data within a single Workspace
      */
-    class GlobalCommandExecuter implements CommandExecuter {
+    private class GlobalCommandExecuter implements CommandExecuter {
     	final Map<String, Runnable> commandMap = new HashMap<>();
     	GlobalCommandExecuter() {
     		commandMap.put("save_image", new Runnable() {
@@ -649,7 +654,7 @@ public class MasterControl
      * These are commands that make direct and immediate changes to the current
      * ImageWorkspace's image data (usually the active data)
      * */
-    class RelativeWorkspaceCommandExecuter implements CommandExecuter {
+    private class RelativeWorkspaceCommandExecuter implements CommandExecuter {
     	private final Map<String, Runnable> commandMap = new HashMap<>();
     	
     	// For simplicity's sake, workspaces are stored in the Class
@@ -899,6 +904,7 @@ public class MasterControl
     
     private void triggerWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
     	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.currentWorkspaceChanged(selected, previous);});
+    	_triggerWSChangedForTracking( selected, previous);
    // 	triggerImageStructureRefresh();
     //	triggerImageRefresh();
     }
@@ -930,5 +936,82 @@ public class MasterControl
 	@Override
 	public void imageChanged( ImageChangeEvent evt) {
 		cimageObs.trigger((MImageObserver obs) -> {obs.imageChanged(evt);});
+	}
+	
+	// :::: Tracking Map Observer: 
+	// This entire section is very ugly on the inside
+	private class TrackingObserver<T> {
+		private final WeakReference<T> baseObserver;
+		private final FastTrack<T> ftt;
+		private TrackingObserver( T obs, FastTrack<T> ftt) {
+			this.baseObserver = new WeakReference<>(obs);
+			this.ftt = ftt;
+		}
+		private void rem(ImageWorkspace ws) {ftt.onRemove.Do(ws, baseObserver.get()); }
+		private void add(ImageWorkspace ws) {ftt.onAdd.Do(ws, baseObserver.get()); }
+	}
+	private final List<TrackingObserver<?>> trackingObservers = new ArrayList<>();
+	
+	public <T> void addTrackingObserver(Class<T> tclass, T observer) {
+		FastTrack<T> ftt = (FastTrack<T>)trackMap.get(tclass);
+		if( ftt == null)
+			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, null, "Failed to find the requested observer type.");
+		
+		TrackingObserver<T> newObs = new TrackingObserver<T>(observer, ftt);
+		trackingObservers.add(newObs);
+		
+		if( currentWorkspace != null) {
+			ftt.onAdd.Do(currentWorkspace, observer);
+		}
+	}
+	public void removeTrackingObserver( Object observer) {
+		Iterator<TrackingObserver<?>> it = trackingObservers.iterator();
+		
+		while( it.hasNext()) {
+			TrackingObserver<?> tobs = it.next();
+			if( tobs.baseObserver.get() == null || tobs.baseObserver.get() == observer)
+				it.remove();
+		}
+	}
+	
+	private void _triggerWSChangedForTracking(ImageWorkspace newWorkspace, ImageWorkspace oldWorkspace) {
+		Iterator<TrackingObserver<?>> it = trackingObservers.iterator();
+		
+		while( it.hasNext()) {
+			TrackingObserver<?> tobs = it.next();
+			if( tobs.baseObserver.get() == null)
+				it.remove();
+			else {
+				if( oldWorkspace != null)
+					tobs.rem(oldWorkspace);
+				if( newWorkspace != null)
+					tobs.add(newWorkspace);
+			}
+		}
+	}
+	
+
+	private interface DoOnWS<T> { void Do(ImageWorkspace ws, T obs);}
+	private static class FastTrack<T> {
+		DoOnWS<T> onAdd;
+		DoOnWS<T> onRemove;
+		FastTrack( DoOnWS<T> add, DoOnWS<T> rem) {this.onAdd = add; this.onRemove = rem;}
+	}
+	private final static Map<Class<?>,FastTrack<?>> trackMap = new HashMap<>();
+	static {
+		// ImageWorkapace
+		trackMap.put(MImageObserver.class, new FastTrack<MImageObserver>( 
+				(ImageWorkspace ws, MImageObserver obs)->ws.addImageObserver(obs),
+				(ImageWorkspace ws, MImageObserver obs)->ws.removeImageObserver(obs)));
+		trackMap.put(MSelectionObserver.class, new FastTrack<MSelectionObserver>( 
+				(ImageWorkspace ws, MSelectionObserver obs)->ws.addSelectionObserver(obs),
+				(ImageWorkspace ws, MSelectionObserver obs)->ws.removeSelectionObserver(obs)));
+		trackMap.put(MWorkspaceFileObserver.class, new FastTrack<MWorkspaceFileObserver>( 
+				(ImageWorkspace ws, MWorkspaceFileObserver obs)->ws.addWorkspaceFileObserve(obs),
+				(ImageWorkspace ws, MWorkspaceFileObserver obs)->ws.removeWorkspaceFileObserve(obs)));
+		trackMap.put(MFlashObserver.class, new FastTrack<MFlashObserver>( 
+				(ImageWorkspace ws, MFlashObserver obs)->ws.addFlashObserve(obs),
+				(ImageWorkspace ws, MFlashObserver obs)->ws.removeFlashObserve(obs)));
+		
 	}
 }

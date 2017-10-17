@@ -51,9 +51,6 @@ public class GLImage extends RawImage {
         gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
         gl.glCopyTexImage2D(GLC.GL_TEXTURE_2D,0,GL2.GL_RGBA8,
         		0, 0, width, height, 0);
-        
-        int i = toCopy.width;
-        i++;
 	}
 	
 	public GLImage( int texID, int width, int height) {

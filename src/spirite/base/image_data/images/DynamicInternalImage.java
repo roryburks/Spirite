@@ -6,6 +6,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -32,8 +33,8 @@ public class DynamicInternalImage implements IInternalImage {
 		this.ox = ox;
 		this.oy = oy;
 	}
-	public IBuiltImageData build( ImageHandle handle, int ox, int oy) {
-		return new DynamicBuiltImageData(handle, ox, oy);
+	public IBuiltImageData build( BuildingImageData building) {
+		return new DynamicBuiltImageData(building);
 	}
 	@Override
 	public IInternalImage dupe() {
@@ -58,11 +59,11 @@ public class DynamicInternalImage implements IInternalImage {
 		final int boy;
 		RawImage buffer = null;
 		
-		public DynamicBuiltImageData(ImageHandle handle, int ox, int oy) 
+		public DynamicBuiltImageData(BuildingImageData building) 
 		{
-			super(handle);
-			this.box = ox;
-			this.boy = oy;
+			super(building.handle);
+			this.box = building.ox;
+			this.boy = building.oy;
 		}
 		
 		@Override public int getWidth() {
