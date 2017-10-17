@@ -64,6 +64,7 @@ public class AnimationPreviewPanel extends OmniComponent
 	private float end = 2.0f;
 	private float tps = 8.0f;
 	private int zoom_level = 1;
+	private boolean isFixedFrame = true;
 	
 
 	private final MasterControl master;
@@ -287,7 +288,7 @@ public class AnimationPreviewPanel extends OmniComponent
 
         slider.setPaintLabels(true);
     	slider.setPaintTicks(true);
-    	slider.setSnapToTicks(true);
+    	slider.setSnapToTicks(isFixedFrame);
     	slider.setMajorTickSpacing(1);
     }
 
@@ -305,6 +306,7 @@ public class AnimationPreviewPanel extends OmniComponent
 			start = 0;
 			end = 1;
 			slider.setValue(0);
+			isFixedFrame = true;
 			updateSlider();
 		}
 		else {
@@ -315,6 +317,7 @@ public class AnimationPreviewPanel extends OmniComponent
 				start = animation.getStartFrame();
 				end = animation.getEndFrame();
 				slider.setValue(0);
+				isFixedFrame = animation.isFixedFrame();
 		
 				updateSlider();
 			}
@@ -340,7 +343,7 @@ public class AnimationPreviewPanel extends OmniComponent
     }
     
     
-    // :::: ActionListener for Timper
+    // :::: ActionListener for Timer
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		Object source = evt.getSource();
@@ -350,12 +353,11 @@ public class AnimationPreviewPanel extends OmniComponent
 		
 		if( source == timer) {
 			if( isPlaying) {
-				
 				float met = animationManager.getAnimationState(animation).getMetronom() +  16.0f * tps / 1000.0f;
 				met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
 				animationManager.getAnimationState(animation).setMetronome(met);
-				slider.setValue((int) Math.floor(met));
 				
+				slider.setValue((int) Math.floor(met));
 			}
 		}else if( source == buttonPlay) {
 			isPlaying = buttonPlay.isSelected();

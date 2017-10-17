@@ -52,7 +52,7 @@ public class FixedFrameAnimation extends Animation
 		this.context = workspace;
 		this.name = name;
 	}
-	
+
 	public void addBuiltLayer(AnimationLayerBuilder builder) {
 		
 		AnimationLayer layer = new AnimationLayer();
@@ -100,6 +100,7 @@ public class FixedFrameAnimation extends Animation
 			LayerNode node;
 		}
 	}
+	@Override public boolean isFixedFrame() {return true;}
 	
 	
 	private AnimationLayer constructFromGroup( GroupNode group) {
@@ -653,6 +654,8 @@ public class FixedFrameAnimation extends Animation
 			return new ArrayList<>(keyTimes);
 		}*/
 	}
+
+
 
 
 

@@ -1,4 +1,4 @@
-package spirite.pc.ui.panel_layers;
+package spirite.pc.ui.panel_layers.anim;
 
 import java.awt.GridLayout;
 import java.awt.Image;

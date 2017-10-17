@@ -1,4 +1,4 @@
-package spirite.pc.ui.panel_layers;
+package spirite.pc.ui.panel_layers.anim;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -22,6 +22,8 @@ import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.animation_data.FixedFrameAnimation;
+import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.ResizeContainerPanel;
@@ -31,6 +33,7 @@ import spirite.pc.ui.generic.BetterTree.BTNode;
 import spirite.pc.ui.generic.BetterTree.BranchingNode;
 import spirite.pc.ui.generic.BetterTree.DnDBinding;
 import spirite.pc.ui.generic.BetterTree.DropDirection;
+import spirite.pc.ui.panel_layers.LayersPanel;
 
 public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
 	private final MasterControl master;
@@ -187,7 +190,11 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		}
 		else if( node instanceof AnimationNode) {
 			AnimationNode anode = ((AnimationNode)node);
-			toAdd = tree.new LeafNode( new AnimationSchemePanel(master, anode));
+			
+			if( anode.getAnimation() instanceof FixedFrameAnimation)
+				toAdd = tree.new LeafNode( new FFAnimationSchemePanel(master, anode));
+			else if( anode.getAnimation() instanceof RigAnimation)
+				toAdd = tree.new LeafNode( new RigAnimationSchemePanel(master, anode));
 		}
 		if( toAdd == null)
 			return;

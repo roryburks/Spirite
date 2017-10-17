@@ -158,7 +158,8 @@ public class ImageHandle {
 		if( ii instanceof PrismaticInternalImage) {
 			((PrismaticInternalImage) ii).drawFront(gc, context.getPaletteManageR().getActiveColor(0));
 		}
-		else drawLayer(gc,null);
+		else 
+			gc.drawHandle(this, 0, 0);
 	}
 	// !!! END BAD
 		

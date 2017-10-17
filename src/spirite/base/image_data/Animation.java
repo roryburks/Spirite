@@ -19,6 +19,7 @@ public abstract class Animation {
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();
 	public abstract void importGroup( GroupNode node);
+	public abstract boolean isFixedFrame();
 
 	public abstract List<GroupNode> getGroupLinks();
 	public abstract void interpretChange( GroupNode node, StructureChangeEvent evt);

@@ -22,11 +22,10 @@ public class RigAnimation extends Animation {
 	// 4 : rot
 	
 	//class RigAnimLayer {
-		SpriteLayer sprite;
+	public SpriteLayer sprite;
 //	}
 	
 	boolean interpolatorIsConstructed = false;
-	String name;
 	
 	public RigAnimation( SpriteLayer sprite, String name) {
 		this.sprite = sprite;
@@ -58,7 +57,7 @@ public class RigAnimation extends Animation {
 
 	@Override
 	public float getEndFrame() {
-		return 0;
+		return 10;
 	}
 
 	@Override
@@ -73,4 +72,7 @@ public class RigAnimation extends Animation {
 	@Override
 	public void interpretChange(GroupNode node, StructureChangeEvent evt) {
 	}
+
+
+	@Override public boolean isFixedFrame() {return false; }
 }

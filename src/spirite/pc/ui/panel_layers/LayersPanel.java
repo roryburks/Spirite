@@ -31,6 +31,7 @@ import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.pc.ui.panel_layers.anim.LayerAnimView;
 
 public class LayersPanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;

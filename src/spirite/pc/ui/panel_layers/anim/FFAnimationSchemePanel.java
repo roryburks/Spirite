@@ -1,4 +1,4 @@
-package spirite.pc.ui.panel_layers;
+package spirite.pc.ui.panel_layers.anim;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -50,7 +50,7 @@ import spirite.pc.ui.dialogs.RenderPropertiesDialog;
 /***
  * AnimationSchemePanel is a grid 
  */
-public class AnimationSchemePanel extends JPanel 
+public class FFAnimationSchemePanel extends JPanel 
 	implements MWorkspaceObserver, MSelectionObserver, MAnimationStateObserver 
 {
 	// :::: Control Links
@@ -79,7 +79,7 @@ public class AnimationSchemePanel extends JPanel
 	private final AnimationNode node;
 	
 	
-	public AnimationSchemePanel( MasterControl master, AnimationNode node) {
+	public FFAnimationSchemePanel( MasterControl master, AnimationNode node) {
 		if( node == null)
 			throw new RuntimeException("Null Animation for AnimationSchemePanel");
 		this.node = node;
