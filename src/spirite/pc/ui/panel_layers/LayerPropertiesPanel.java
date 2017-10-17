@@ -64,7 +64,6 @@ public class LayerPropertiesPanel extends JPanel implements MSelectionObserver, 
 			}
 			
 			repaint();
-			
 		}
 		
 		public void mouseReleased(MouseEvent e) {

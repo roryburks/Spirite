@@ -11,6 +11,7 @@ import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -113,6 +114,7 @@ public class ImageHandle {
 		gc.setComposite(oldComposite, oldAlpha);
 	}
 	
+	
 	public void drawLayer(GraphicsContext gc, MatTrans transform) {
 		if( context == null) {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
@@ -125,7 +127,6 @@ public class ImageHandle {
 		MatTrans prev= gc.getTransform();
 		if (transform == null)
 			transform = new MatTrans();
-		//context.buildData(new BuildingImageData(this,0,0)).draw(gc);
 		transform.preTranslate( ii.getDynamicX(), ii.getDynamicY());
 		
 		MatTrans completeTransform = new MatTrans(prev);
@@ -135,6 +136,31 @@ public class ImageHandle {
 		gc.drawHandle(this, 0, 0);
 		gc.setTransform(prev);
 	}
+	
+	// !!! START BAD
+	public void drawBehindStroke( GraphicsContext gc) {
+		if( context == null) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
+			return;
+		}
+		IInternalImage ii = context.getData(id);
+		if( ii instanceof PrismaticInternalImage) {
+			((PrismaticInternalImage) ii).drawBehind(gc, context.getPaletteManageR().getActiveColor(0));
+		}
+	}
+	public void drawInFrontOfStroke( GraphicsContext gc) {
+		if( context == null) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
+			return;
+		}
+		IInternalImage ii = context.getData(id);
+		if( ii == null) return;
+		if( ii instanceof PrismaticInternalImage) {
+			((PrismaticInternalImage) ii).drawFront(gc, context.getPaletteManageR().getActiveColor(0));
+		}
+		else drawLayer(gc,null);
+	}
+	// !!! END BAD
 		
 	public void refresh() {
 		// Construct ImageChangeEvent and send it

@@ -96,7 +96,8 @@ public class HybridNodeRenderer {
 			drawTrans.preTranslate(dataContext.handle.getDynamicX(), 
 					dataContext.handle.getDynamicY());
 			gc.setTransform(drawTrans);
-			gc.drawHandle( dataContext.handle, 0, 0);
+			
+			dataContext.handle.drawBehindStroke(gc);
 			
 
 			if( workspace.getSelectionEngine().getLiftedImage() != null ){
@@ -112,6 +113,9 @@ public class HybridNodeRenderer {
 				gc.setTransform(new MatTrans());
 				workspace.getDrawEngine().getStrokeEngine().drawStrokeLayer( gc);
 			}
+			
+			gc.setTransform(drawTrans);
+			dataContext.handle.drawInFrontOfStroke(gc);
 		}
 	
 	}

@@ -99,6 +99,23 @@ public class PrismaticInternalImage implements IInternalImage {
 		compIsBuilt = true;
 	}
 
+	public void drawBehind( GraphicsContext gc, int color) {
+		for( LImg img : layers) {
+			gc.drawImage(img.img, img.ox - compRect.x, img.oy - compRect.y);
+			if( (img.color & 0xFFFFFF) == (color & 0xFFFFFF)) return;
+		}
+	}
+	public void drawFront( GraphicsContext gc, int color) {
+		boolean drawing = false;
+		for( LImg img : layers) {
+			if( drawing) 
+				gc.drawImage(img.img, img.ox - compRect.x, img.oy - compRect.y);
+			else if( (img.color & 0xFFFFFF) == (color & 0xFFFFFF)) 
+				drawing = true;
+		}
+		
+	}
+
 	@Override
 	public IBuiltImageData build( BuildingImageData building) {
 		return new PrismaticBuiltImageData( building);

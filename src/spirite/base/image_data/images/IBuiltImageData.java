@@ -9,6 +9,13 @@ import spirite.base.util.glmath.Vec2i;
 
 // ===============
 // ==== Data Building
+/***
+ * An IBuiltImageData is an interface for dealing with data that has a variety of transforms 
+ * and scopes imposed on it.  The IBuiltImageData interface is meant to be short-lived,
+ * representing Data that has been linked up to be written to and shouldn't be stored
+ * over long terms.
+ *
+ */
 public abstract class IBuiltImageData {
 	public final ImageHandle handle;
 	
