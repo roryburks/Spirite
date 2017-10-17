@@ -1,15 +1,11 @@
 package spirite.base.image_data.images;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -20,6 +16,10 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
+/***
+ * PrismaticInternalImages are a type of Internal Image that behave similarly to 
+ * Dynamic images, but separate each layer by color.
+ */
 public class PrismaticInternalImage implements IInternalImage {
 	public static class LImg {
 		// NOTE: Setting all of these to public SHOULD be fine so that

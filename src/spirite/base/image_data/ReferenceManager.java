@@ -1,15 +1,13 @@
 package spirite.base.image_data;
 
-//import java.awt.image.BufferedImage;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 
 /**
@@ -221,42 +219,24 @@ public class ReferenceManager {
      * when the way References are drawn is changed, or when the input method
      * is toggled between reference of non-reference.
      */
+	private final ObserverHandler<MReferenceObserver> referenceObs = new ObserverHandler<>();
+    public void addReferenceObserve( MReferenceObserver obs) { referenceObs.addObserver(obs);}
+    public void removeReferenceObserve( MReferenceObserver obs) { referenceObs.removeObserver(obs);}
+	
     public static interface MReferenceObserver {
     	public void referenceStructureChanged( boolean hard);
 //    	public void referenceImageChanged();
     	public void toggleReference( boolean referenceMode);
     }
-    private final List<WeakReference<MReferenceObserver>> referenceObservers = new ArrayList<>();
 
     public void triggerReferenceStructureChanged(boolean hard) {
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-            	obs.referenceStructureChanged( hard);
-    	}
+    	referenceObs.trigger((MReferenceObserver obs) -> {obs.referenceStructureChanged(hard);});
     	context.triggerFlash();
     }
     private void triggerReferenceToggle(boolean edit) {
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-            	obs.toggleReference( edit);
-    	}
+    	referenceObs.trigger((MReferenceObserver obs) -> {obs.toggleReference(edit);});
     	context.triggerFlash();
     }
 
-    public void addReferenceObserve( MReferenceObserver obs) { referenceObservers.add(new WeakReference<MReferenceObserver>(obs));}
-    public void removeReferenceObserve( MReferenceObserver obs) { 
-    	Iterator<WeakReference<MReferenceObserver>> it = referenceObservers.iterator();
-    	while( it.hasNext()) {
-    		MReferenceObserver other = it.next().get();
-    		if( other == obs || other == null)
-    			it.remove();
-    	}
-    }
 
 }

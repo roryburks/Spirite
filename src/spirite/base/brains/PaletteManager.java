@@ -2,7 +2,6 @@ package spirite.base.brains;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +14,7 @@ import java.util.Set;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.util.Colors;
+import spirite.base.util.ObserverHandler;
 
 
 /***
@@ -242,29 +242,12 @@ public class PaletteManager
     public static interface MPaletteObserver {
         public void colorChanged();
     }
-    
-    List<WeakReference<MPaletteObserver>> paletteObservers = new ArrayList<>();
-    public void addPaletteObserver( MPaletteObserver obs) { 
-    	paletteObservers.add(new WeakReference<PaletteManager.MPaletteObserver>(obs)); 
-    }
-    public void removePaletteObserver( MPaletteObserver obs) {
-    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
-    	while( it.hasNext()) {
-    		MPaletteObserver other = it.next().get();
-    		if( other == null || other == obs)
-    			it.remove();
-    	}
-    }
+    ObserverHandler<MPaletteObserver> paletteObs = new ObserverHandler<>();
+    public void addPaletteObserver( MPaletteObserver obs) { paletteObs.addObserver(obs);}
+    public void removePaletteObserver( MPaletteObserver obs) { paletteObs.removeObserver(obs);}
     
     private void triggerColorChanged() {
-    	Iterator<WeakReference<MPaletteObserver>> it = paletteObservers.iterator();
-    	while( it.hasNext()) {
-    		MPaletteObserver other = it.next().get();
-    		if( other == null )
-    			it.remove();
-    		else
-                other.colorChanged();
-    	}
+    	paletteObs.trigger((MPaletteObserver obs) -> {obs.colorChanged();});
     }
     
 

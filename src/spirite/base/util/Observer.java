@@ -7,6 +7,7 @@ import java.util.List;
 
 
 public class Observer {
+	
 
 	// Exists just for copy-paste purposes
 	// Change REPLACE -> Something

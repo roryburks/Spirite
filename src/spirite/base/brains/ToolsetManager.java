@@ -1,14 +1,13 @@
 package spirite.base.brains;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.util.ObserverHandler;
 import spirite.hybrid.tools.properties.ButtonProperty;
 import spirite.hybrid.tools.properties.CheckBoxProperty;
 import spirite.hybrid.tools.properties.DropDownProperty;
@@ -300,39 +299,16 @@ public class ToolsetManager
         public void toolsetChanged( Tool newTool);
         public void toolsetPropertyChanged( Tool tool, Property property);
     }
+    private final ObserverHandler<MToolsetObserver> toolsetObs = new ObserverHandler<>();
+    public void addToolsetObserver( MToolsetObserver obs) { toolsetObs.addObserver(obs);}
+    public void removeToolsetObserver( MToolsetObserver obs) {toolsetObs.removeObserver(obs);}
 
-    List<WeakReference<MToolsetObserver>> toolsetObserver = new ArrayList<>();
-    public void addToolsetObserver( MToolsetObserver obs) {
-        toolsetObserver.add( new WeakReference<ToolsetManager.MToolsetObserver>(obs));
-    }
-    public void removeToolsetObserver( MToolsetObserver obs) {
-        Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
-        while( it.hasNext()) {
-            MToolsetObserver other = it.next().get();
-            if( other == null || other == obs)
-                it.remove();
-        }
-    }
+    private void triggerToolsetChanged( Tool newTool) { 
+    	toolsetObs.trigger((MToolsetObserver obs)-> {obs.toolsetChanged(newTool);});
 
-    private void triggerToolsetChanged( Tool newTool) {
-        Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
-        while( it.hasNext()) {
-            MToolsetObserver obs = it.next().get();
-            if( obs == null )
-                it.remove();
-            else
-                obs.toolsetChanged(newTool);
-        }
     }
     private void triggerToolsetPropertyChanged( Tool tool, Property property) {
-        Iterator<WeakReference<MToolsetObserver>> it = toolsetObserver.iterator();
-        while( it.hasNext()) {
-            MToolsetObserver obs = it.next().get();
-            if( obs == null )
-                it.remove();
-            else
-                obs.toolsetPropertyChanged( tool, property);
-        }
+    	toolsetObs.trigger((MToolsetObserver obs)-> {obs.toolsetPropertyChanged(tool, property);});
     }
 
     // :::: CommandExecuter

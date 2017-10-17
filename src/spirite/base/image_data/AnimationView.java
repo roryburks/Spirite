@@ -1,12 +1,10 @@
 package spirite.base.image_data;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.util.ObserverHandler;
 
 public class AnimationView {
 	private final ImageWorkspace workspace;
@@ -102,30 +100,16 @@ public class AnimationView {
 	}
 	
 	// Observers
+	private final ObserverHandler<MAnimationViewObserver> animationViewObs = new ObserverHandler<>();
+	public void addAnimationViewObserver(MAnimationViewObserver obs) { animationViewObs.addObserver(obs);}
+	public void removeAnimationViewObserver(MAnimationViewObserver obs) { animationViewObs.removeObserver(obs);}
+	
 	public static interface MAnimationViewObserver {
 		public void viewChanged();
 	}
-	List<WeakReference<MAnimationViewObserver>> animationViewObservers = new ArrayList<>();
-	public void addAnimationViewObserver(MAnimationViewObserver obs) {
-		animationViewObservers.add(new WeakReference<>(obs));
-	}
-	public void removeAnimationViewObserver(MAnimationViewObserver obs) {
-		Iterator<WeakReference<MAnimationViewObserver>> it = animationViewObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationViewObserver other = it.next().get();
-			if (other == obs || other == null)
-				it.remove();
-		}
-	}
+	
 	private void _triggerViewChange() {
-		Iterator<WeakReference<MAnimationViewObserver>> it = animationViewObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationViewObserver other = it.next().get();
-			if (other == null)
-				it.remove();
-			else
-				other.viewChanged();
-		}
+		animationViewObs.trigger( (MAnimationViewObserver obs) ->{ obs.viewChanged();});
 		workspace.triggerFlash();
 	}
 }

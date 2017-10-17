@@ -2,10 +2,8 @@ package spirite.base.brains;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +41,7 @@ import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
+import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
@@ -882,15 +881,6 @@ public class MasterControl
     	
     }
     
-//    public abstract static class TrackingObserver<T> {
-//    	protected abstract void _addObserver( T obs);
-//    	protected abstract void _removeObserver( T obs);
-//    }
-//    
-//    public <T> void addTrackingObserver( TrackingObserver<T> tracker, T t) {
-//    	Object a = T.class;
-//    }
-
     // ===============
     // ==== Observer Interfaces ====
     /***
@@ -903,51 +893,20 @@ public class MasterControl
         public void newWorkspace( ImageWorkspace newWorkspace);
         public void removeWorkspace( ImageWorkspace newWorkspace);
     }
-    List<WeakReference<MWorkspaceObserver>> workspaceObservers = new ArrayList<>();
-
-    public void addWorkspaceObserver( MWorkspaceObserver obs) {
-    	workspaceObservers.add(new WeakReference<MasterControl.MWorkspaceObserver>(obs));
-    }
-    public void removeWorkspaceObserver( MWorkspaceObserver obs) {
-    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceObserver other = it.next().get();
-    		if( other == null || other == obs)
-    			it.remove();
-    	}
-    }
+    private final ObserverHandler<MWorkspaceObserver> workspaceObs = new ObserverHandler<>();
+    public void addWorkspaceObserver( MWorkspaceObserver obs) { workspaceObs.addObserver(obs);}
+    public void removeWorkspaceObserver( MWorkspaceObserver obs) {workspaceObs.removeObserver(obs);}
     
     private void triggerWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else 
-        		other.currentWorkspaceChanged(selected, previous);
-    	}
+    	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.currentWorkspaceChanged(selected, previous);});
    // 	triggerImageStructureRefresh();
     //	triggerImageRefresh();
     }
     private void triggerNewWorkspace(ImageWorkspace added) {
-    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else 
-        		other.newWorkspace(added);
-    	}
+    	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.newWorkspace(added);});
     }
     private void triggerRemoveWorkspace(ImageWorkspace removed) {
-    	Iterator<WeakReference<MWorkspaceObserver>> it = workspaceObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else 
-        		other.removeWorkspace(removed);
-    	}
+    	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.removeWorkspace(removed);});
     }
     
     
@@ -958,44 +917,18 @@ public class MasterControl
      * added/removed, they can just use a Global Image Observer which will pipe
      * all (existing in Master space) ImageWorkspaces ImageObserver events
      */
-    List<WeakReference<MImageObserver>> cimageObservers = new ArrayList<>();
-
-    public void addGlobalImageObserver( MImageObserver obs) { 
-    	cimageObservers.add(new WeakReference<MImageObserver>(obs));
-    }
-    public void removeGlobalImageObserver( MImageObserver obs) { 
-    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
-    	while( it.hasNext()) {
-    		MImageObserver other = it.next().get();
-    		if( obs == other || other == null)
-    			it.remove();
-    	}
-    }
+    private final ObserverHandler<MImageObserver> cimageObs = new ObserverHandler<>();
+    public void addGlobalImageObserver( MImageObserver obs) { cimageObs.addObserver(obs);}
+    public void removeGlobalImageObserver( MImageObserver obs) { cimageObs.removeObserver(obs);}
 
 	// :::: MImageObserver
 	@Override
 	public void structureChanged(StructureChangeEvent evt) {
-    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
-    	while( it.hasNext()) {
-    		MImageObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else
-    			other.structureChanged(evt);
-    	}
+		cimageObs.trigger((MImageObserver obs) -> {obs.structureChanged(evt);});
 	}
 
 	@Override
 	public void imageChanged( ImageChangeEvent evt) {
-    	Iterator<WeakReference<MImageObserver>> it = cimageObservers.iterator();
-    	while( it.hasNext()) {
-    		MImageObserver other = it.next().get();
-    		if( other == null)
-    			it.remove();
-    		else
-    			other.imageChanged(evt);
-    	}
+		cimageObs.trigger((MImageObserver obs) -> {obs.imageChanged(evt);});
 	}
-
-
 }

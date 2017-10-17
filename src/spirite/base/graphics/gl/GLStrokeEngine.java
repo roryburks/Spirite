@@ -8,7 +8,6 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
-import com.sun.xml.internal.ws.api.config.management.policy.ManagementAssertion.Setting;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.gl.GLEngine.PreparedData;

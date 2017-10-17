@@ -1,11 +1,9 @@
 package spirite.base.image_data;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,13 +32,14 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
@@ -1448,7 +1447,10 @@ public class ImageWorkspace {
     		this.reversed = reversed;
     	}
     }
-    List<WeakReference<MImageObserver>> imageObservers = new ArrayList<>();
+    
+    private final ObserverHandler<MImageObserver> imageObs = new ObserverHandler<>();
+    public void addImageObserver( MImageObserver obs) { imageObs.addObserver(obs);}
+    public void removeImageObserver( MImageObserver obs) { imageObs.removeObserver(obs);}
 
     public void triggerInternalLayerChange( Layer layer) {
     	ImageChangeEvent evt = new ImageChangeEvent();
@@ -1465,35 +1467,23 @@ public class ImageWorkspace {
         triggerFlash();
     }
     private void triggerGroupStructureChanged( StructureChange evt, boolean undo) {
-    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
+    	StructureChangeEvent scevt = new StructureChangeEvent(evt,undo);
+    	imageObs.trigger((MImageObserver obs)->{obs.structureChanged(scevt);});
     	
-    	while( it.hasNext()) {
-    		MImageObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-    			obs.structureChanged( new StructureChangeEvent(evt,undo));
-    	}
         triggerFlash();
     }
     void triggerImageRefresh(ImageChangeEvent evt) {
+    	// Construct the event object
     	evt.workspace = this;
-    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
-    	
     	if( evt.selectionLayerChange ) {
     		if(selected != null && (selected instanceof LayerNode) ) {
     			BuildingImageData bid = ((LayerNode)selected).getLayer().getActiveData();
     			if( bid != null)
     			evt.dataChanged.add( bid.handle);
     		}
-    		
     	}
     	
-    	while( it.hasNext()) {
-    		MImageObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else
-    			obs.imageChanged(evt);
-    	}
+    	imageObs.trigger((MImageObserver obs)->{obs.imageChanged(evt);});
         
         if( evt.isUndoEngineEvent && undoEngine.atSaveSpot()) {
 			changed = false;
@@ -1506,46 +1496,19 @@ public class ImageWorkspace {
         triggerFlash();
     }
 
-    public void addImageObserver( MImageObserver obs) { imageObservers.add(new WeakReference<>(obs));}
-    public void removeImageObserver( MImageObserver obs) { 
-    	Iterator<WeakReference<MImageObserver>> it = imageObservers.iterator();
-    	while( it.hasNext()) {
-    		MImageObserver other= it.next().get();
-    		if( other == obs || other == null)
-    			it.remove(); 
-    	}
-    }
-    
-
-
     /**
      * SelectionObserver - triggers when a different Layer has been selected
      */
+    private final ObserverHandler<MSelectionObserver> selectionObs = new ObserverHandler<>();
+    public void addSelectionObserver( MSelectionObserver obs) { selectionObs.addObserver(obs);}
+    public void removeSelectionObserver( MSelectionObserver obs) { selectionObs.removeObserver(obs);}
     public static interface MSelectionObserver{
     	public void selectionChanged( Node newSelection);
     }
-    List<WeakReference<MSelectionObserver>> selectionObservers = new ArrayList<>();
     
     private synchronized void triggerSelectedChanged() {
-    	Iterator<WeakReference<MSelectionObserver>> it = selectionObservers.iterator();
-    	while( it.hasNext()) {
-    		MSelectionObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else  
-    			obs.selectionChanged( selected);
-    	}
+    	selectionObs.trigger( (MSelectionObserver t) -> {t.selectionChanged(selected);});
 	}
-
-    public void addSelectionObserver( MSelectionObserver obs) { selectionObservers.add(new WeakReference<>(obs));}
-    public void removeSelectionObserver( MSelectionObserver obs) { 
-    	Iterator<WeakReference<MSelectionObserver>> it = selectionObservers.iterator();
-    	while( it.hasNext()) {
-    		MSelectionObserver other = it.next().get();
-    		if( other == obs || other == null)
-    			it.remove();
-    	}
-    }
-    
     
     
     /**
@@ -1576,26 +1539,14 @@ public class ImageWorkspace {
     		return changed;
     	}
     }
-    List<WeakReference<MWorkspaceFileObserver>> fileObservers = new ArrayList<>();
+
+    private final ObserverHandler<MWorkspaceFileObserver> fileObs = new ObserverHandler<>();
+    public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObs.addObserver(obs);}
+    public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObs.removeObserver(obs);}
     
     private synchronized void triggerFileChange() {
-    	Iterator<WeakReference<MWorkspaceFileObserver>> it = fileObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceFileObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else 
-    			obs.fileChanged( new FileChangeEvent( ImageWorkspace.this, file, changed));
-    	}
-    }
-
-    public void addWorkspaceFileObserve( MWorkspaceFileObserver obs) { fileObservers.add(new WeakReference<>(obs));}
-    public void removeWorkspaceFileObserve( MWorkspaceFileObserver obs) {
-    	Iterator<WeakReference<MWorkspaceFileObserver>> it = fileObservers.iterator();
-    	while( it.hasNext()) {
-    		MWorkspaceFileObserver other = it.next().get();
-    		if( other == null || other == obs)
-    			it.remove();
-    	}
+    	FileChangeEvent evt = new FileChangeEvent( ImageWorkspace.this, file, changed);
+    	fileObs.trigger( (MWorkspaceFileObserver obs) -> { obs.fileChanged(evt);});
     }
 
     /** MFlashObserver is an extremely light observer that triggers any time an image has
@@ -1604,24 +1555,11 @@ public class ImageWorkspace {
 	public static interface MFlashObserver {
 		public void flash();
 	}
-    List<WeakReference<MFlashObserver>> flashObservers = new ArrayList<>();
-    public void addFlashObserve( MFlashObserver obs) { flashObservers.add(new WeakReference<>(obs));}
-    public void removeFlashObserve( MFlashObserver obs) {
-    	Iterator<WeakReference<MFlashObserver>> it = flashObservers.iterator();
-    	while( it.hasNext()) {
-    		MFlashObserver other = it.next().get();
-    		if( other == null || other == obs)
-    			it.remove();
-    	}
-    }
+	private final ObserverHandler<MFlashObserver> flashObs = new ObserverHandler<>();
+    public void addFlashObserve( MFlashObserver obs) { flashObs.addObserver(obs);}
+    public void removeFlashObserve( MFlashObserver obs) { flashObs.removeObserver(obs);}
 	public void triggerFlash() {
-    	Iterator<WeakReference<MFlashObserver>> it = flashObservers.iterator();
-    	while( it.hasNext()) {
-    		MFlashObserver obs = it.next().get();
-    		if( obs == null) it.remove();
-    		else 
-    			obs.flash();
-    	}
+		flashObs.trigger((MFlashObserver obs)->{obs.flash();});
 	}
     
 
@@ -1641,9 +1579,6 @@ public class ImageWorkspace {
      */
     public List<LogicalImage> reserveCache() {
     	List<LogicalImage> handles = new ArrayList<>(imageData.size());
-    	// TODO
-//    	List<CachedImage> caches = new ArrayList<>(imageData.size());
-//        	
     	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
     		LogicalImage li = new LogicalImage();
     		li.handleID = entry.getKey();
@@ -1656,10 +1591,8 @@ public class ImageWorkspace {
     
     /** Relinquish a state of  CachedImages as given by reserveCache */
     public void relinquishCache( List<LogicalImage> handles) {
-//    	for( CachedImage ci :  reserveMap.get(handles)) {
-//    		ci.relinquish(handles);
-//    	}
-//    	reserveMap.remove(handles);
+    	for( LogicalImage limg : handles)
+    		limg.iimg.flush();
     }
     
 	public void cleanup() {

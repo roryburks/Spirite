@@ -1,8 +1,6 @@
 package spirite.base.image_data;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
@@ -18,6 +16,7 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.Colors;
+import spirite.base.util.ObserverHandler;
 import spirite.base.util.compaction.IntCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -924,6 +923,9 @@ public class SelectionEngine {
 
 	// ============
 	// ==== Observers
+	private final ObserverHandler<MSelectionEngineObserver> selectionObs = new ObserverHandler<>();
+    public void addSelectionObserver( MSelectionEngineObserver obs) { selectionObs.addObserver(obs);}
+	public void removeSelectionObserver( MSelectionEngineObserver obs) { selectionObs.removeObserver(obs);}
 	
 	/** SelectionEngineObservers trigger as the selection that's being built
 	 * changes and when the Built Selection has changed. */
@@ -934,33 +936,11 @@ public class SelectionEngine {
 	public static class SelectionEvent {
 		Selection selection;
 	}
-    List<WeakReference<MSelectionEngineObserver>> selectionObservers = new ArrayList<>();
-    public void addSelectionObserver( MSelectionEngineObserver obs) { 
-    	selectionObservers.add(new WeakReference<MSelectionEngineObserver>(obs));
-    }
-	public void removeSelectionObserver( MSelectionEngineObserver obs) { 
-		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
-		while( it.hasNext()) {
-			MSelectionEngineObserver other = it.next().get();
-			if( other == null || other.equals(obs))
-				it.remove();
-		}
-	}
 	
     void triggerSelectionChanged(SelectionEvent evt) {
-		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
-		while( it.hasNext()) {
-			MSelectionEngineObserver obs = it.next().get();
-			if( obs == null) it.remove();
-			else obs.selectionBuilt(evt);
-		}
+    	selectionObs.trigger((MSelectionEngineObserver obs) -> {obs.selectionBuilt(evt);});
     }
     void triggerBuildingSelection(SelectionEvent evt) {
-		Iterator<WeakReference<MSelectionEngineObserver>> it = selectionObservers.iterator();
-		while( it.hasNext()) {
-			MSelectionEngineObserver obs = it.next().get();
-			if( obs == null) it.remove();
-			else obs.buildingSelection(evt);
-		}
+    	selectionObs.trigger((MSelectionEngineObserver obs) -> {obs.buildingSelection(evt);});
     }
 }

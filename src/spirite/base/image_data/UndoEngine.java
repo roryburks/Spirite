@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
@@ -19,6 +18,7 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.InternalImage;
+import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
@@ -510,8 +510,6 @@ public class UndoEngine {
 					ImageContext icontext = (ImageContext)context;
 					
 				if( icontext.image.equals(handle)) {
-					CachedImage ci = cacheManager.cacheImage(newImage, workspace);
-					
 					ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, new InternalImage(newImage, workspace));
 					return action;
 				}
@@ -581,7 +579,7 @@ public class UndoEngine {
 		protected ImageContext( ImageHandle image) {
 			super(image);
 			
-			RawImage img = image.deepAccess().deepCopy();
+			//RawImage img = image.deepAccess().deepCopy();
 			
 			actions.add(new KeyframeAction(null));
 			
@@ -1339,31 +1337,25 @@ public class UndoEngine {
 	
 	
 	// :::: MUndoEngineObserver
+	private final ObserverHandler<MUndoEngineObserver> undoObs = new ObserverHandler<>();
+    public void addUndoEngineObserver( MUndoEngineObserver obs) { undoObs.addObserver(obs);}
+    public void removeUndoEngineObserver( MUndoEngineObserver obs) { undoObs.removeObserver(obs); }
+	
     public static interface MUndoEngineObserver {
     	public void historyChanged(List<UndoIndex> undoHistory);
     	public void undo();
     	public void redo();
     }
-    List<MUndoEngineObserver> undoObservers = new ArrayList<>();
-    public void addUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.add(obs);}
-    public void removeUndoEngineObserver( MUndoEngineObserver obs) { undoObservers.remove(obs); }
 
     private void triggerHistoryChanged() {
     	List<UndoIndex> list = constructUndoHistory();
-    	
-    	for( MUndoEngineObserver obs : undoObservers) {
-    		obs.historyChanged(list);
-    	}
+    	undoObs.trigger((MUndoEngineObserver obs) -> {obs.historyChanged(list);});
     } 
     private void  triggerUndo() {
-    	for( MUndoEngineObserver obs : undoObservers) {
-    		obs.undo();
-    	}
+    	undoObs.trigger((MUndoEngineObserver obs) -> {obs.undo();});
     }
     private void  triggerRedo() {
-    	for( MUndoEngineObserver obs : undoObservers) {
-    		obs.redo();
-    	}
+    	undoObs.trigger((MUndoEngineObserver obs) -> {obs.redo();});
     }
 
 	public void cleanup() {

@@ -1,9 +1,7 @@
 package spirite.base.image_data;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +16,7 @@ import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
+import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -314,18 +313,17 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	private AnimationLayer.Frame selectedFrame;
 
 	// :::: Observers
+	private final ObserverHandler<MAnimationStructureObserver> animationStructureObs = new ObserverHandler<>();
+	public void addAnimationStructureObserver(MAnimationStructureObserver obs) {animationStructureObs.addObserver(obs);}
+	public void removeAnimationStructureObserver(MAnimationStructureObserver obs) {animationStructureObs.removeObserver(obs);}
 	public static interface MAnimationStructureObserver {
 		public void animationAdded(AnimationStructureEvent evt);
-
 		public void animationRemoved(AnimationStructureEvent evt);
-
 		public void animationChanged(AnimationStructureEvent evt);
 	}
-
 	enum StructureChangeType {
 		ADD, REMOVE, CHANGE
 	};
-
 	public static class AnimationStructureEvent {
 		private Animation animation;
 		private StructureChangeType type;
@@ -344,15 +342,8 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		AnimationStructureEvent evt = new AnimationStructureEvent();
 		evt.animation = anim;
 		evt.type = StructureChangeType.ADD;
-
-		Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationStructureObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.animationAdded(evt);
-		}
+		
+		animationStructureObs.trigger((MAnimationStructureObserver obs) -> {obs.animationAdded(evt);}); 
 	}
 
 	private void triggerRemoveAnimation(Animation anim) {
@@ -360,14 +351,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		evt.animation = anim;
 		evt.type = StructureChangeType.REMOVE;
 
-		Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationStructureObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.animationRemoved(evt);
-		}
+		animationStructureObs.trigger((MAnimationStructureObserver obs) -> {obs.animationRemoved(evt);}); 
 	}
 
 	// Non-private so Animations can trigger it
@@ -376,36 +360,18 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		evt.animation = anim;
 		evt.type = StructureChangeType.CHANGE;
 
-		Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationStructureObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.animationChanged(evt);
-		}
+		animationStructureObs.trigger((MAnimationStructureObserver obs) -> {obs.animationChanged(evt);}); 
 	}
 
-	List<WeakReference<MAnimationStructureObserver>> animationStructureObservers = new ArrayList<>();
-
-	public void addAnimationStructureObserver(MAnimationStructureObserver obs) {
-		animationStructureObservers.add(new WeakReference<>(obs));
-	}
-
-	public void removeAnimationStructureObserver(MAnimationStructureObserver obs) {
-		Iterator<WeakReference<MAnimationStructureObserver>> it = animationStructureObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationStructureObserver other = it.next().get();
-			if (other == obs || other == null)
-				it.remove();
-		}
-	}
 
 	/**
 	 * AnimationStateObserver triggers any time the "selection" state of the
 	 * animation changes, either from selecting a new animation or changing the
 	 * frame.
 	 */
+	private final ObserverHandler<MAnimationStateObserver> animationStateObs = new ObserverHandler<>();
+	public void addAnimationStateObserver(MAnimationStateObserver obs) { animationStateObs.addObserver(obs);}
+	public void removeAnimationStateObserver(MAnimationStateObserver obs) { animationStateObs.removeObserver(obs);}
 	public static interface MAnimationStateObserver {
 		public void selectedAnimationChanged(MAnimationStateEvent evt);
 
@@ -438,65 +404,27 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	}
 
 	private void triggerAnimationSelectionChange(Animation previous) {
-		Iterator<WeakReference<MAnimationStateObserver>> it = animationStateObservers.iterator();
-
 		MAnimationStateEvent evt = new MAnimationStateEvent();
 		evt.previous = previous;
-
-		while (it.hasNext()) {
-			MAnimationStateObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.selectedAnimationChanged(evt);
-		}
+		
+		animationStateObs.trigger((MAnimationStateObserver obs) -> {obs.selectedAnimationChanged(evt);});
 		context.triggerFlash();
 	}
 
 	private void triggerFrameChanged() {
-		Iterator<WeakReference<MAnimationStateObserver>> it = animationStateObservers.iterator();
-
 		MAnimationStateEvent evt = new MAnimationStateEvent();
 
-		while (it.hasNext()) {
-			MAnimationStateObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.animationFrameChanged(evt);
-		}
+		animationStateObs.trigger((MAnimationStateObserver obs) -> {obs.animationFrameChanged(evt);});
 		context.triggerFlash();
 	}
 
 	private void triggerInnerStateChange(Animation animation) {
-		Iterator<WeakReference<MAnimationStateObserver>> it = animationStateObservers.iterator();
-
 		MAnimationStateEvent evt = new MAnimationStateEvent();
 
-		while (it.hasNext()) {
-			MAnimationStateObserver obs = it.next().get();
-			if (obs == null)
-				it.remove();
-			else
-				obs.viewStateChanged(evt);
-		}
+		animationStateObs.trigger((MAnimationStateObserver obs) -> {obs.viewStateChanged(evt);});
 		context.triggerFlash();
 	}
 
-	List<WeakReference<MAnimationStateObserver>> animationStateObservers = new ArrayList<>();
-
-	public void addAnimationStateObserver(MAnimationStateObserver obs) {
-		animationStateObservers.add(new WeakReference<>(obs));
-	}
-
-	public void removeAnimationStateObserver(MAnimationStateObserver obs) {
-		Iterator<WeakReference<MAnimationStateObserver>> it = animationStateObservers.iterator();
-		while (it.hasNext()) {
-			MAnimationStateObserver other = it.next().get();
-			if (other == obs || other == null)
-				it.remove();
-		}
-	}
 
 	// :::: MImageObserver
 	@Override
