@@ -366,6 +366,7 @@ public class SaveEngine implements MWorkspaceObserver {
 				helper.ra.writeShort( layers.size());
 				
 				for( AnimationLayer layer : layers) {
+					if( layer == null) break;
 					// [4] : Group Node Bound to
 					helper.ra.writeInt(helper.nodeMap.get(layer.getGroupLink()));
 					
