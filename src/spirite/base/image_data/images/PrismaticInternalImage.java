@@ -115,6 +115,11 @@ public class PrismaticInternalImage implements IInternalImage {
 		return pii;
 	}
 	
+	public void moveLayer(int draggingFromIndex, int draggingToIndex) {
+		layers.add(draggingToIndex, layers.remove(draggingFromIndex));
+		compIsBuilt = false;
+	}
+	
 	/** Note: the LImg's it returns are copies.  Changing the internal data will
 	 * not change the PrismaticImage's data, but drawing to the image WILL effect
 	 * the PrismaticImage. */

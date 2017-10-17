@@ -26,6 +26,8 @@ import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
+import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
+import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -938,8 +940,7 @@ public class MasterControl
 		cimageObs.trigger((MImageObserver obs) -> {obs.imageChanged(evt);});
 	}
 	
-	// :::: Tracking Map Observer: 
-	// This entire section is very ugly on the inside
+	// :::: Tracking Map Observer:
 	private class TrackingObserver<T> {
 		private final WeakReference<T> baseObserver;
 		private final FastTrack<T> ftt;
@@ -950,9 +951,24 @@ public class MasterControl
 		private void rem(ImageWorkspace ws) {ftt.onRemove.Do(ws, baseObserver.get()); }
 		private void add(ImageWorkspace ws) {ftt.onAdd.Do(ws, baseObserver.get()); }
 	}
+	private interface DoOnWS<T> { void Do(ImageWorkspace ws, T obs);}
+	private static class FastTrack<T> {
+		DoOnWS<T> onAdd;
+		DoOnWS<T> onRemove;
+		FastTrack( DoOnWS<T> add, DoOnWS<T> rem) {this.onAdd = add; this.onRemove = rem;}
+	}
+	
 	private final List<TrackingObserver<?>> trackingObservers = new ArrayList<>();
 	
+	/**
+	 * Since so many UI components need to update their observers every time that the workspace
+	 * is changed, TrackingObservers exist to streamline the process.  Instead of adding a 
+	 * workspace observer and removing/adding observers as they're changed, a Tracking Observer
+	 * does the work for you.
+	 */
 	public <T> void addTrackingObserver(Class<T> tclass, T observer) {
+		// Should by typesafe everywhere except here, and here it's typesafe assuming
+		//	trackMap is correctly constructed
 		FastTrack<T> ftt = (FastTrack<T>)trackMap.get(tclass);
 		if( ftt == null)
 			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, null, "Failed to find the requested observer type.");
@@ -991,12 +1007,8 @@ public class MasterControl
 	}
 	
 
-	private interface DoOnWS<T> { void Do(ImageWorkspace ws, T obs);}
-	private static class FastTrack<T> {
-		DoOnWS<T> onAdd;
-		DoOnWS<T> onRemove;
-		FastTrack( DoOnWS<T> add, DoOnWS<T> rem) {this.onAdd = add; this.onRemove = rem;}
-	}
+	
+	// Ugly
 	private final static Map<Class<?>,FastTrack<?>> trackMap = new HashMap<>();
 	static {
 		// ImageWorkapace
@@ -1012,6 +1024,15 @@ public class MasterControl
 		trackMap.put(MFlashObserver.class, new FastTrack<MFlashObserver>( 
 				(ImageWorkspace ws, MFlashObserver obs)->ws.addFlashObserve(obs),
 				(ImageWorkspace ws, MFlashObserver obs)->ws.removeFlashObserve(obs)));
+		
+		// AnimationManager
+		trackMap.put(MAnimationStructureObserver.class, new FastTrack<MAnimationStructureObserver>( 
+				(ImageWorkspace ws, MAnimationStructureObserver obs)->ws.getAnimationManager().addAnimationStructureObserver(obs),
+				(ImageWorkspace ws, MAnimationStructureObserver obs)->ws.getAnimationManager().removeAnimationStructureObserver(obs)));
+		trackMap.put(MAnimationStateObserver.class, new FastTrack<MAnimationStateObserver>( 
+				(ImageWorkspace ws, MAnimationStateObserver obs)->ws.getAnimationManager().addAnimationStateObserver(obs),
+				(ImageWorkspace ws, MAnimationStateObserver obs)->ws.getAnimationManager().removeAnimationStateObserver(obs)));
+		
 		
 	}
 }

@@ -2,6 +2,9 @@ package spirite.pc.ui.panel_layers;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -15,17 +18,72 @@ import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage.LImg;
+import spirite.base.util.glmath.Rect;
 
 public class LayerPropertiesPanel extends JPanel implements MSelectionObserver, MFlashObserver{
 	private final MasterControl master;
 	private IInternalImage iimg;
-	boolean yes = false;
+	private boolean yes = false;
 	
 	public LayerPropertiesPanel(MasterControl master) {
 		this.master = master;
 		master.addTrackingObserver(MSelectionObserver.class, this);
 		master.addTrackingObserver(MFlashObserver.class, this);
+
+		this.addMouseListener(mouser);
+		this.addMouseMotionListener(mouser);
 	}
+	MouseAdapter mouser = new MouseAdapter() {
+		public void mousePressed(MouseEvent e) {
+			if( iimg instanceof PrismaticInternalImage) {
+				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+				List<LImg> colorLayers = piimg.getColorLayers();
+				
+				int index = getIndexFromPoint(e.getPoint());
+				
+				if( index >= 0 && index < colorLayers.size())
+					draggingFromIndex = index;
+				else 
+					draggingFromIndex = -1;
+			}
+			
+			repaint();
+		}
+		
+		public void mouseDragged(MouseEvent e) {
+			if( draggingFromIndex != -1 && iimg instanceof PrismaticInternalImage) {
+				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+				List<LImg> colorLayers = piimg.getColorLayers();
+				
+				int index = getIndexFromPoint(e.getPoint());
+				
+				if( index >= 0 && index < colorLayers.size())
+					draggingToIndex = index;
+				else 
+					draggingToIndex = -1;
+			}
+			
+			repaint();
+			
+		}
+		
+		public void mouseReleased(MouseEvent e) {
+			if( draggingFromIndex != -1 && draggingToIndex != -1 
+					&& draggingFromIndex != draggingToIndex && iimg instanceof PrismaticInternalImage) 
+			{
+
+				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+				piimg.moveLayer( draggingFromIndex,draggingToIndex);
+				master.getCurrentWorkspace().triggerFlash();
+			}
+			draggingToIndex = -1;
+			draggingFromIndex = -1;
+			repaint();
+		}
+	};
+
+	int draggingFromIndex = -1;
+	int draggingToIndex = -1;
 	
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -33,18 +91,49 @@ public class LayerPropertiesPanel extends JPanel implements MSelectionObserver, 
 		
 		if( iimg instanceof PrismaticInternalImage) {
 			PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
-			
 			List<LImg> colorLayers = piimg.getColorLayers();
+			
+			int dx = 0;
+			int dy = 0;
 			for( int i=0; i<colorLayers.size(); ++i) {
 				g.setColor(new Color(colorLayers.get(i).color));
-				g.fillRect( 20*i + 2, 2, 18, 18);
+				g.fillRect( dx + 1, dy + 1, 14, 14);
+
+				if( draggingFromIndex == i) {
+					g.setColor(Color.GRAY);
+					g.drawRect(dx, dy, 15, 15);
+				}if( draggingToIndex == i) {
+					g.setColor(Color.BLACK);
+					g.drawRect(dx, dy, 15, 15);
+				}
+				
+				dx += 16;
+				if( dx >= getWidth()) {
+					dx = 0;
+					dy += 16;
+				}
 			}
 		}
+	}
+	
+	private int getIndexFromPoint( Point p) {
+		int w = Math.max(1, getWidth()/16);
+		if( p.x < 0 || p.y < 0 || p.x > w*16 )
+			return -1;
+		
+		return (p.x / 16) + (p.y / 16) * w;
+	}
+	private Rect getBoundsFromIndex( int i) {
+		int w = Math.max(1, getWidth()/16);
+		
+		int dx = (i % w)*16;
+		int dy = (i / w)*16;
+		
+		return new Rect(dx, dy, 16,16);
 	}
 
 	@Override
 	public void selectionChanged(Node newSelection) {
-		System.out.println("TEST");
 		yes = false;
 		ImageWorkspace ws = master.getCurrentWorkspace();
 		if( ws != null) {
