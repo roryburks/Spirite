@@ -663,13 +663,13 @@ public class ImageWorkspace {
 		case DYNAMIC:
 			ii = new DynamicInternalImage(img, 0, 0, this);
 			break;
-		case NORMAL:
-			ii = new InternalImage(img, this);
-			break;
 		case PRISMATIC:
 			ii = new PrismaticInternalImage();
 			break;
-		
+
+		case NORMAL:
+			ii = new InternalImage(img, this);
+			break;
 		}
 		
 		imageData.put( workingID, ii);

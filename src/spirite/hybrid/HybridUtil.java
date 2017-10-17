@@ -45,9 +45,8 @@ public class HybridUtil {
 	 * @see HybridHelper.loadImageIntoGL
 	 * */
 	public static RawImage convert( RawImage from, Class<? extends RawImage> to) {
-		if( from.getClass() == to) {
+		if( from.getClass() == to)
 			return from;
-		}
 		
 		if( to == GLImage.class) {
 			GL2 gl = JOGLCore.getGL2();

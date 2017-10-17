@@ -50,7 +50,7 @@ public class NewLayerDPanel extends JPanel {
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
-	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>();
+	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>(InternalImageTypes.values());
 	private JLabel lblPartType;
 	private JPanel colorPanelFG;
 	private JPanel colorPanelBG;
@@ -263,7 +263,7 @@ public class NewLayerDPanel extends JPanel {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(lblNewLabel)
+									.addComponent(comboImgType)
 									.addPreferredGap(ComponentPlacement.RELATED, 163, Short.MAX_VALUE))
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(separator_2, GroupLayout.PREFERRED_SIZE, 263, Short.MAX_VALUE)
@@ -323,7 +323,7 @@ public class NewLayerDPanel extends JPanel {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel)
+					.addComponent(comboImgType)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(separator_2, GroupLayout.PREFERRED_SIZE, 4, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)

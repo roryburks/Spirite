@@ -49,7 +49,7 @@ public class HybridNodeRenderer {
 			buildCompositeLayer(workspace);
 			
 			// Step 1: Determine the amount of data needed
-			int n = _getNeededImagers( settings);
+			int n = _getNeededImages( settings);
 			if( n <= 0) return;
 			
 			buffer = new RawImage[n];
@@ -272,7 +272,7 @@ public class HybridNodeRenderer {
 	/** Determines the number of images needed to properly render 
 	 * the given RenderSettings.  This number is equal to largest Group
 	 * depth of any visible node. */
-	protected int _getNeededImagers(RenderSettings settings) {
+	protected int _getNeededImages(RenderSettings settings) {
 		NodeValidator validator = new NodeValidator() {			
 			@Override
 			public boolean isValid(Node node) {

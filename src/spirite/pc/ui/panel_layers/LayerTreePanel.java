@@ -63,6 +63,8 @@ import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
+import spirite.base.image_data.animation_data.RigAnimation;
+import spirite.base.image_data.layers.SpriteLayer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -417,6 +419,9 @@ public class LayerTreePanel extends ContentTree
 					if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
 						menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
 					}
+					if( ((LayerNode) usrObj).getLayer() instanceof SpriteLayer) {
+						menuScheme.add( new String[] {"Construct &Rig Animation From Sprite", "animFromRig",null});
+					}
 				}
 			}
 
@@ -531,6 +536,15 @@ public class LayerTreePanel extends ContentTree
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			break;}
+		case "animFromRig": {
+			SpriteLayer sprite = (SpriteLayer)((LayerNode)contextMenu.node).getLayer();
+			
+			String name = JOptionPane.showInputDialog("Enter name for new Animation:", contextMenu.node.getName());
+			
+			AnimationManager manager = workspace.getAnimationManager();
+			manager.addAnimation(new RigAnimation(sprite, name));
+			
 			break;}
 		case "animinsert":{
 			GroupNode group = (GroupNode)contextMenu.node;
