@@ -1,5 +1,9 @@
 package spirite.base.image_data.images;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,25 +18,37 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 public class PrismaticInternalImage implements IInternalImage {
-	private class LImg {
-		int ox;
-		int oy;
-		int color;
-		RawImage img;
+	public static class LImg {
+		// NOTE: Setting all of these to public SHOULD be fine so that
+		//	PrismaticInternalImages can easily be externally built and loaded in
+		//	but then you have to make sure you never pass the internal LImgs
+		public int ox;
+		public int oy;
+		public int color;
+		public RawImage img;
 		
-		LImg() {}
-		LImg(LImg other) {
+		public LImg() {}
+		public LImg(LImg other, boolean deepcopy) {
 			ox = other.ox;
 			oy = other.oy;
-			img = other.img.deepCopy();
+			color = other.color;
+			img = (deepcopy)?other.img.deepCopy():other.img;
 		}
 	}
-	List<LImg> layers = new ArrayList<>();
-	RawImage compositionImg;
-	boolean compIsBuilt = false;
-	Rect compRect = null;
+	private List<LImg> layers = new ArrayList<>();
+	private RawImage compositionImg;
+	private boolean compIsBuilt = false;
+	private Rect compRect = null;
+	
+	public PrismaticInternalImage() {}
+	public PrismaticInternalImage( List<LImg> toImport) {
+		for( LImg limg : toImport) {
+			layers.add(new LImg(limg, false));
+		}
+	}
 
 	@Override
 	public int getWidth() {
@@ -72,10 +88,10 @@ public class PrismaticInternalImage implements IInternalImage {
 			compositionImg = HybridHelper.createImage(1, 1);
 		}
 		else {
-			compositionImg = HybridHelper.createImage(r.x, r.y);
+			compositionImg = HybridHelper.createImage(r.width, r.height);
 			GraphicsContext gc = compositionImg.getGraphics();
 			for( LImg img : layers) {
-				gc.drawImage(img.img, img.ox, img.oy);
+				gc.drawImage(img.img, img.ox - r.x, img.oy - r.y);
 			}
 		}
 		
@@ -93,9 +109,22 @@ public class PrismaticInternalImage implements IInternalImage {
 		
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
-			pii.layers.add(new LImg(img));
+			pii.layers.add(new LImg(img, true));
 		}
 		return pii;
+	}
+	
+	/** Note: the LImg's it returns are copies.  Changing the internal data will
+	 * not change the PrismaticImage's data, but drawing to the image WILL effect
+	 * the PrismaticImage. */
+	public List<LImg> getColorLayers() {
+		ArrayList<LImg> list = new ArrayList<LImg>(layers.size());
+		
+		for( LImg limg : layers) {
+			list.add( new LImg(limg, false));
+		}
+		
+		return list;
 	}
 
 	boolean flushed = false;
@@ -104,7 +133,8 @@ public class PrismaticInternalImage implements IInternalImage {
 		if( !flushed) {
 			for( LImg img : layers)
 				img.img.flush();
-			compositionImg.flush();
+			if( compositionImg != null)
+				compositionImg.flush();
 			flushed = true;
 		}
 	}
@@ -135,7 +165,7 @@ public class PrismaticInternalImage implements IInternalImage {
 			super(handle);
 			this.box = ox;
 			this.boy = oy;
-			int workingColor = (handle.getContext().getPaletteManageR().getActiveColor(0))&0xFFFFFF;
+			workingColor = (handle.getContext().getPaletteManageR().getActiveColor(0))&0xFFFFFF;
 		}
 
 		@Override public int getWidth() {return handle.getContext().getWidth();}
@@ -157,7 +187,7 @@ public class PrismaticInternalImage implements IInternalImage {
 
 		@Override
 		public GraphicsContext checkout() {
-			return buffer.getGraphics();
+			return checkoutRaw().getGraphics();
 		}
 
 		@Override
@@ -166,10 +196,15 @@ public class PrismaticInternalImage implements IInternalImage {
 			buffer = HybridHelper.createImage(handle.getContext().getWidth(), handle.getContext().getHeight());
 			GraphicsContext gc = buffer.getGraphics();
 			buildComposition();
+
+			LImg img = null;
+			for( LImg other : layers) {
+				if( other.color == workingColor)
+					img = other;
+			}
+			if( img != null)
+				gc.drawImage(img.img, img.ox + box, img.oy + boy);
 			
-			gc.drawHandle(this.handle, box + compRect.x, boy + compRect.y);
-			
-			//gc.drawHandle(this.handle, box+handle.getDynamicX(), boy+handle.getDynamicY());
 			return buffer;
 		}
 
@@ -185,6 +220,7 @@ public class PrismaticInternalImage implements IInternalImage {
 			}
 			
 			if( img == null) {
+				// Create new Layer for the color
 				Rect r = null;
 				try {
 					r = HybridUtil.findContentBounds(buffer, 0, true);
@@ -205,54 +241,46 @@ public class PrismaticInternalImage implements IInternalImage {
 				img.ox = r.x;
 				img.oy = r.y;
 				layers.add(img);
-				compIsBuilt = false;
 			}
-//			Rect activeRect = (new Rect(0,0,w,h)).union(
-//					new Rect(box+ox, boy+oy, handle.getWidth(), handle.getHeight()));
-//
-//			RawImage img = HybridHelper.createImage(w, h);
-//			GraphicsContext gc = img.getGraphics();
-//
-//			// Draw the part of the old image over the new one
-//			gc.drawHandle(handle,
-//					box+ox - activeRect.x, 
-//					boy+oy- activeRect.y);
-//
-//			// Clear the section of the old image that will be replaced by the new one
-//			gc.setComposite( Composite.SRC, 1.0f);
-//			gc.drawImage(buffer, -activeRect.x, -activeRect.y);
-////				g2.dispose();
-//
-//			ox = activeRect.x - box;
-//			oy = activeRect.y - boy;
-//			activeRect = null;
-//			
-//			Rect cropped = null;
-//			try {
-//				cropped = HybridUtil.findContentBounds(img, 0, true);
-//			} catch (UnsupportedImageTypeException e) {
-//				e.printStackTrace();
-//			}
-//			
-//			RawImage nri;
-//			if( cropped == null || cropped.isEmpty()) {
-//				nri = HybridHelper.createImage(1, 1);
-//			}
-//			else {
-//				nri = HybridHelper.createImage( cropped.width, cropped.height);
-//			}
-//			gc = nri.getGraphics();
-//			gc.drawImage( img, -cropped.x, -cropped.y);
-//			
-//			ox += cropped.x;
-//			oy += cropped.y;
-//			
-//			cachedImage.relinquish(DynamicInternalImage.this);
-//			cachedImage = handle.getContext().getCacheManager().cacheImage(nri, DynamicInternalImage.this);
-//			
-//			img.flush();
-//			buffer = null;
-//			gc = null;
+			else {
+				// Update the layer for the color: mostly duplicate code from DynamicInternalImage
+				Rect activeRect = (new Rect(0,0,w,h))
+						.union(img.ox+box, img.oy+boy, img.img.getWidth(), img.img.getHeight());
+				
+				RawImage raw = HybridHelper.createImage(activeRect.width, activeRect.height);
+				GraphicsContext gc = raw.getGraphics();
+
+				// Draw the part of the old image over the new one
+				gc.drawImage(img.img, box+img.ox-activeRect.x, boy+img.oy-activeRect.y);
+
+				// Clear the section of the old image that will be replaced by the new one
+				gc.setComposite(Composite.SRC, 1.0f);
+				gc.drawImage(buffer,  -activeRect.x, -activeRect.y);
+				
+				Rect cropped = null;
+				try {
+					cropped = HybridUtil.findContentBounds( buffer, 0, true);
+				} catch (UnsupportedImageTypeException e) 
+					{MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, e, e.getMessage());}
+				
+				RawImage nri;
+				if( cropped == null || cropped.isEmpty()) {
+					img.img.flush();
+					layers.remove(img);
+				}
+				else {
+					nri = HybridHelper.createImage(cropped.width, cropped.height);
+					gc = nri.getGraphics();
+					gc.drawImage( raw, -cropped.x, -cropped.y);
+
+					img.ox = activeRect.x - box + cropped.x;
+					img.oy = activeRect.y - boy + cropped.y;
+					
+					img.img.flush();
+					img.img = nri;
+				}
+			}
+			compIsBuilt = false;
 			buffer.flush();
 			buffer = null;
 

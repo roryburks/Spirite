@@ -1,4 +1,4 @@
-Version 0005
+Version 0006
 
 Compatibility Issues: extra byte per Image in ImageData section.
 
@@ -44,13 +44,24 @@ Header
  ---- IMGD - Image Data Chunk ----
  Per Iamge:
  [4, int] : Image ID
- [1, byte] : Mask
-    1st bit: Dynamic
-      if Dynamic:
-        [2, ushort] : Dynamic offsetX 
-        [2, ushort] : Dynamic offsetY
- [4, int] : Size of Image Data
- [n, RAW] : PNG-saved Image File
+ [1, byte] : Type
+     SWITCH:
+     CASE 0 (Plain) :
+        [4, int] : Size of Image Data
+        [n, RAW] : PNG-saved Image File
+     CASE 1 (Dynamic) :
+        [2, short] : Dynamic offsetX 
+        [2, short] : Dynamic offsetY
+        [4, int] : Size of Image Data
+        [n, RAW] : PNG-saved Image File
+    CASE 2 (Prismatic) :
+        [2, ushort] : number of color layers
+        Per Color Layer:
+			[4, int] : color
+			[2, short] : Dynamic offsetX
+			[2, short] : Dynamic offsetY
+			[4, int] : Size of Image Data
+			[n, RAW] : PNG-saved Image File
 
 ---- ANIM - Animation Data Chunk
 Per Animation:
@@ -75,6 +86,7 @@ NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The n
 ::::Nodes
 [ubyte] limit for GroupDepth (i.e. group of group of group....)
 [ushort] limit of all dimensions
+[ushort] limit for number of color layers in Prismatic Images
 
 :::: Animations:
 [short] limit for Frame Length

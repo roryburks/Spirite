@@ -2,6 +2,7 @@ package spirite.base.file;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
@@ -25,6 +26,7 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.images.DynamicInternalImage;
+import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -307,13 +309,61 @@ public class SaveEngine implements MWorkspaceObserver {
 		for( LogicalImage part : helper.reservedCache) {
 			// (Foreach ImageData)
 			
-			HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
 
 			// [4] : Image ID
 			helper.ra.writeInt( part.handleID);
 			// [1] : Image Type
 			int mask = part.iimg.getType().ordinal();
 			helper.ra.writeByte(mask);
+			
+			switch( part.iimg.getType()) {
+			case NORMAL:
+				HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
+				// [4] : Size of Image Data
+				helper.ra.writeInt( bos.size());
+				// [x] : Image Data
+				helper.ra.write(bos.toByteArray());
+				bos.reset();
+				break;
+			case DYNAMIC:
+				// [2] : Dynamic offsetX
+				helper.ra.writeShort(part.iimg.getDynamicX());
+				// [2] : Dynamic offsetY
+				helper.ra.writeShort(part.iimg.getDynamicY());
+				
+				HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
+				// [4] : Size of Image Data
+				helper.ra.writeInt( bos.size());
+				// [x] : Image Data
+				helper.ra.write(bos.toByteArray());
+				bos.reset();
+				break;
+			case PRISMATIC:{
+				PrismaticInternalImage pii = (PrismaticInternalImage)part.iimg;
+				List<PrismaticInternalImage.LImg> list = pii.getColorLayers();
+				
+				// [2] : Number of Color Layers
+				helper.ra.writeShort(list.size());
+
+				for( PrismaticInternalImage.LImg limg : list) {
+					// [4] : color
+					helper.ra.writeInt(limg.color);
+					// [2, 2] : Dynamic offset X,Y
+					helper.ra.writeShort( limg.ox);
+					helper.ra.writeShort( limg.oy);
+
+					HybridUtil.savePNG(limg.img, bos);
+					// [4] : Size of Image Data
+					helper.ra.writeInt( bos.size());
+					// [x] : Image Data
+					helper.ra.write(bos.toByteArray());
+					bos.reset();
+				}
+				break;}
+			default:
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Null Image Type.  Attempting to ignore.");
+				break;
+			}
 			
 			if( part.iimg instanceof DynamicInternalImage) {
 				// If Dynamic
@@ -323,11 +373,6 @@ public class SaveEngine implements MWorkspaceObserver {
 				helper.ra.writeShort(part.iimg.getDynamicY());
 				
 			}
-			// [4] : Size of Image Data
-			helper.ra.writeInt( bos.size());
-			// [x] : Image Data
-			helper.ra.write(bos.toByteArray());
-			bos.reset();
 		}
 		
 		long filePointer2 = helper.ra.getFilePointer();
@@ -363,10 +408,10 @@ public class SaveEngine implements MWorkspaceObserver {
 				
 				// [2] : Number of Layers
 				List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
+				layers.remove(null);
 				helper.ra.writeShort( layers.size());
 				
 				for( AnimationLayer layer : layers) {
-					if( layer == null) break;
 					// [4] : Group Node Bound to
 					helper.ra.writeInt(helper.nodeMap.get(layer.getGroupLink()));
 					

@@ -24,7 +24,9 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.InternalImage;
+import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -236,35 +238,56 @@ public class LoadEngine {
 		Map<Integer,IInternalImage> dataMap = new HashMap<>();
 		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int identifier;
-		int imgSize;
-		int mask = 0;
-		int ox = 0;
-		int oy = 0;
 		
 		while( helper.ra.getFilePointer() < endPointer) {
 			identifier = helper.ra.readInt();
-			if( helper.version >= 4) {
-				mask = helper.ra.readByte();
-				if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
-					ox = helper.ra.readShort();
-					oy = helper.ra.readShort();
-				}
-			}
+			
+			int typeId = (helper.version <4)?0:helper.ra.readByte();
+			InternalImageTypes type = InternalImageTypes.values()[typeId];
+			
+			switch( type) {
+			case NORMAL: {
+				int imgSize = helper.ra.readInt();
+				
+				byte[] buffer = new byte[imgSize];
+				helper.ra.read(buffer);
+				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 
-			imgSize = helper.ra.readInt();
-			byte[] buffer = new byte[imgSize];
-			helper.ra.read(buffer);
-			
-			RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
-			
-			IInternalImage impi;
-			if( ((mask & SaveLoadUtil.DYNMIC_MASK) != 0)) {
-				 impi = new DynamicInternalImage( img, ox, oy, helper.workspace);
+				dataMap.put(identifier, new InternalImage(img,helper.workspace));
+				break;}
+			case DYNAMIC: {
+				int ox = helper.ra.readShort();
+				int oy = helper.ra.readShort();
+				int imgSize = helper.ra.readInt();
+				
+				byte[] buffer = new byte[imgSize];
+				helper.ra.read(buffer);
+				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
+
+				dataMap.put(identifier, new DynamicInternalImage(img,ox,oy,helper.workspace));
+				break;}
+			case PRISMATIC: {
+				int colorCount = helper.ra.readShort();
+				
+				List<PrismaticInternalImage.LImg> loadingList = new ArrayList<>(colorCount);
+				for( int i=0; i<colorCount; ++i) {
+					PrismaticInternalImage.LImg limg = new PrismaticInternalImage.LImg();
+
+					limg.color = helper.ra.readInt();
+					limg.ox = helper.ra.readShort();
+					limg.oy = helper.ra.readShort();
+					int imgSize = helper.ra.readInt();
+					
+					byte[] buffer = new byte[imgSize];
+					helper.ra.read(buffer);
+					limg.img = HybridUtil.load(new ByteArrayInputStream(buffer));
+
+					loadingList.add(limg);
+				}
+				
+				dataMap.put(identifier, new PrismaticInternalImage(loadingList));				
+				break;}
 			}
-			else
-				impi = new InternalImage( img, helper.workspace);
-			dataMap.put(identifier, impi);
-			
 		}
 		
 		return dataMap;

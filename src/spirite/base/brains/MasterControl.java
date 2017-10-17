@@ -679,7 +679,7 @@ public class MasterControl
     		commandMap.put("newLayerQuick", new Runnable() {@Override public void run() {
 				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
 						workspace.getWidth(), workspace.getHeight(), 
-						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
+						"New Layer", 0x00000000, InternalImageTypes.PRISMATIC);
     		}});
     		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
