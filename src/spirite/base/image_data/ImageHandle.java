@@ -145,8 +145,10 @@ public class ImageHandle {
 		}
 		IInternalImage ii = context.getData(id);
 		if( ii instanceof PrismaticInternalImage) {
-			((PrismaticInternalImage) ii).drawBehind(gc, context.getPaletteManageR().getActiveColor(0));
+			((PrismaticInternalImage) ii).drawBehind(gc, context.getPaletteManager().getActiveColor(0));
 		}
+		else 
+			gc.drawHandle(this, 0, 0);
 	}
 	public void drawInFrontOfStroke( GraphicsContext gc) {
 		if( context == null) {
@@ -154,12 +156,9 @@ public class ImageHandle {
 			return;
 		}
 		IInternalImage ii = context.getData(id);
-		if( ii == null) return;
 		if( ii instanceof PrismaticInternalImage) {
-			((PrismaticInternalImage) ii).drawFront(gc, context.getPaletteManageR().getActiveColor(0));
+			((PrismaticInternalImage) ii).drawFront(gc, context.getPaletteManager().getActiveColor(0));
 		}
-		else 
-			gc.drawHandle(this, 0, 0);
 	}
 	// !!! END BAD
 		

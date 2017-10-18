@@ -1,8 +1,5 @@
 package spirite.base.graphics.renderer;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +23,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 

@@ -1,10 +1,12 @@
 package spirite.base.image_data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.ObserverHandler;
@@ -139,7 +141,13 @@ public class ReferenceManager {
 		triggerReferenceStructureChanged(false);
 	}
 	public boolean isReferenceNode( Node node) {
-		return ( node != null && references.contains(node));
+		if( node == null || !(node instanceof LayerNode)) return false;
+		
+		for( Reference reference : references) {
+			if( reference instanceof LayerReference && ((LayerReference) reference).layer == ((LayerNode)node).getLayer())
+				return true;
+		}
+		return false;
 	}
 	
 	public List<Reference> getList( boolean front) {
@@ -205,10 +213,14 @@ public class ReferenceManager {
 		triggerReferenceStructureChanged(true);
 	}
 	public void clearReference( Layer toRem) {
-		if( toRem != null) {
-			while( references.contains(toRem))
-				references.remove(toRem);
-			triggerReferenceStructureChanged(true);
+		if( toRem == null) return;
+		
+		Iterator<Reference> it = references.iterator();
+		while( it.hasNext()) {
+			Reference reference = it.next();
+
+			if( reference instanceof LayerReference && ((LayerReference) reference).layer == toRem)
+				it.remove();
 		}
 	}
 	

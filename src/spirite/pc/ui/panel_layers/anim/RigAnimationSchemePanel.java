@@ -1,7 +1,6 @@
 package spirite.pc.ui.panel_layers.anim;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -9,7 +8,6 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.AnimationNode;

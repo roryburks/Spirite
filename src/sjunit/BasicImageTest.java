@@ -14,7 +14,7 @@ public class BasicImageTest {
 
 	@Test
 	public void fill() {
-		RawImage img = HybridHelper.createImageNonNillable(500, 400);
+		RawImage img = HybridHelper.createImage(500, 400);
 		
 		assert(img.getWidth() == 500);
 		assert(img.getHeight() == 400);
@@ -41,7 +41,7 @@ public class BasicImageTest {
 	
 	@Test
 	public void testContentBounds() throws UnsupportedImageTypeException {
-		RawImage img = HybridHelper.createImageNonNillable(10, 10);
+		RawImage img = HybridHelper.createImage(10, 10);
 		
 
 		GraphicsContext gc = img.getGraphics();
@@ -53,7 +53,7 @@ public class BasicImageTest {
 		assert( r.x == 2 && r.y == 3 && r.width == 4 && r.height == 3);
 		
 
-		RawImage nri = HybridHelper.createImageNonNillable(r.width, r.height);
+		RawImage nri = HybridHelper.createImage(r.width, r.height);
 		gc = nri.getGraphics();
 		gc.clear();
 		gc.drawImage( img, -r.x, -r.y);
@@ -65,7 +65,7 @@ public class BasicImageTest {
 		assert( r.x == 0 && r.y == 0 && r.width == 4 && r.height == 3);
 		
 
-		RawImage img3 = HybridHelper.createImageNonNillable(10, 10);
+		RawImage img3 = HybridHelper.createImage(10, 10);
 		gc = img3.getGraphics();
 		gc.clear();
 		gc.fillRect(5, 5, 5, 5);
@@ -75,8 +75,8 @@ public class BasicImageTest {
 
 	@Test
 	public void deepCopy() {
-		RawImage img1 = HybridHelper.createImageNonNillable(10, 10);
-		RawImage img3 = HybridHelper.createImageNonNillable(10, 10);
+		RawImage img1 = HybridHelper.createImage(10, 10);
+		RawImage img3 = HybridHelper.createImage(10, 10);
 
 		GraphicsContext gc1 = img1.getGraphics();
 		gc1.clear();
@@ -123,7 +123,7 @@ public class BasicImageTest {
 	
 	@Test
 	public void t() {
-		RawImage img = HybridHelper.createImageNonNillable(10, 10);
+		RawImage img = HybridHelper.createImage(10, 10);
 		
 	}
 }

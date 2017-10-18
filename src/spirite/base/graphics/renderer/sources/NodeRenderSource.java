@@ -6,7 +6,6 @@ import java.util.List;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.HybridNodeRenderer;
@@ -26,11 +25,11 @@ import spirite.hybrid.HybridHelper;
 public class NodeRenderSource extends RenderSource {
 
 	private final GroupNode root;
-	private final MasterControl master;
+	//private final MasterControl master;
 	
 	public NodeRenderSource( GroupNode node, MasterControl master) {
 		super(node.getContext());
-		this.master = master;
+		//this.master = master;
 		this.root = node;
 	}
 	

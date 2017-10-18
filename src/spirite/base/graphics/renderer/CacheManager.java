@@ -38,7 +38,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * only thing that really uses it as intended, all other use cases should be handled
  * by regular Garbage Collection.  It DOES keep track of memory usage so that UndoEngine
  * can remove undos once memory usage gets too big, but that can be done with substantially
- * less code and less scopes.
+ * less code and less complexity.
  * 
  * @author Rory Burks
  *

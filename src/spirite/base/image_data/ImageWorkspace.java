@@ -87,6 +87,7 @@ public class ImageWorkspace {
 	private final CacheManager cacheManager;
 	private final SettingsManager settingsManager;
 	private final RenderEngine renderEngine;
+	private final PaletteManager paletteManager;
 	
 	private final MasterControl master;	// TODO bad-ish
 	
@@ -108,6 +109,7 @@ public class ImageWorkspace {
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		this.renderEngine = master.getRenderEngine();
+		this.paletteManager = master.getPaletteManager();
 		this.master = master;
 		
 		groupTree = new GroupTree(this);
@@ -268,7 +270,7 @@ public class ImageWorkspace {
 	public DrawEngine getDrawEngine() { return drawEngine; }
 	public ReferenceManager getReferenceManager() { return referenceManager; }
 	public StagingManager getStageManager() {return stagingManager;}
-	public PaletteManager getPaletteManageR() {return master.getPaletteManager();}	// Might be removed in the future
+	public PaletteManager getPaletteManager() {return paletteManager;}	// Might be removed in the future
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
@@ -332,7 +334,7 @@ public class ImageWorkspace {
 		
 		data.ox += node.x;
 		data.oy += node.y;
-		data.color = master.getPaletteManager().getActiveColor(0)&0xFFFFFF;
+		data.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
 		return data;
 	}
 	
@@ -375,7 +377,6 @@ public class ImageWorkspace {
 	 * and 
 	 */
 	void _replaceIamge( ImageHandle old, IInternalImage img) {
-		IInternalImage internal = imageData.get(old.id);
 		imageData.get(old.id).flush();
 		imageData.put(old.id, img.dupe());
 		

@@ -87,7 +87,7 @@ public class Test1 {
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			RawImage img = HybridHelper.createImageNonNillable(rig.getWidth(),rig.getHeight());
+			RawImage img = HybridHelper.createImage(rig.getWidth(),rig.getHeight());
 			
 			workspace.getUndoEngine().performAndStore(
 					rig.createAddPartAction(img, 0, 0, 0,""));
@@ -275,11 +275,11 @@ public class Test1 {
 			params.setColor( randomColor().getRGB() );
 			params.setWidth( rn.nextInt(5));
 			
-			StrokeAction action =
-			workspace.getDrawEngine().new StrokeAction(
-					master.getSettingsManager().getDefaultDrawer().getStrokeEngine(),params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
-			
-			workspace.getUndoEngine().performAndStore(action);
+//			StrokeAction action =
+//			workspace.getDrawEngine().new StrokeAction(
+//					master.getSettingsManager().getDefaultDrawer().getStrokeEngine(),params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
+//			
+//			workspace.getUndoEngine().performAndStore(action);
 			break;
 		case 4:
 			// Crop node

@@ -16,9 +16,7 @@ import javax.swing.Timer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
@@ -70,7 +68,7 @@ public class RenderEngine
 	//  ThumbnailManager needs access to MasterControl to keep track of all
 	//	workspaces that exist (easier and more reliable than hooking into Observers)
 	private final MasterControl master;
-	private final SettingsManager settingsManager;
+	//private final SettingsManager settingsManager;
 	private final CacheManager cacheManager;
 	
 	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
@@ -78,7 +76,7 @@ public class RenderEngine
 	public RenderEngine( MasterControl master) {
 		this.master = master;
 		this.cacheManager = master.getCacheManager();
-		this.settingsManager = master.getSettingsManager();
+		//this.settingsManager = master.getSettingsManager();
 		
 		master.addWorkspaceObserver(workspaceObserver);
 		for( ImageWorkspace workspace : master.getWorkspaces()) {
@@ -158,8 +156,6 @@ public class RenderEngine
 	
 	/** Renders the Workspace to an Image in its intended form.  */
 	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, MatTrans trans) {
-		GraphicsDrawer drawer = settingsManager.getDefaultDrawer();
-		
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
 		settings.normalize();
 		

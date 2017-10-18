@@ -186,7 +186,6 @@ public class DrawEngine {
 			
 			img = flipImage(img, horizontal);
 			
-			// TODO: MARK
 			BuiltSelection sel2 =  new BuiltSelection( img);
 			sel2 = new BuiltSelection( sel2.selection, sel2.offsetX+sel.offsetX, sel2.offsetX+sel.offsetY);
 			actions[1] = selectionEngine.createNewSelectAction(sel2);
@@ -333,7 +332,7 @@ public class DrawEngine {
 		private final StrokeEngine engine;
 		
 		// TODO: This is public for Unit Testing purposes, but that's a bad solution
-		public StrokeAction( 
+		StrokeAction( 
 				StrokeEngine engine,
 				StrokeEngine.StrokeParams params, 
 				PenState[] points, 

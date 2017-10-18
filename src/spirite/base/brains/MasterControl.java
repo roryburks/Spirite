@@ -228,7 +228,7 @@ public class MasterControl
     	if( ext.equals("jpg") || ext.equals("jpeg")) {
     		// Remove Alpha Layer of JPG so that encoding works correctly
     		RawImage img2 = img;
-    		img = HybridHelper.createImageNonNillable( img2.getWidth(), img2.getHeight());
+    		img = HybridHelper.createImage( img2.getWidth(), img2.getHeight());
     		
     		GraphicsContext gc = img.getGraphics();
     		gc.drawImage( img2, 0, 0);

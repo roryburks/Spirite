@@ -580,15 +580,6 @@ public class SpriteLayer extends Layer
 		return helper;
 	}
 
-	@Override
-	public int getDynamicOffsetX() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getDynamicOffsetY() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	@Override public int getDynamicOffsetX() {return 0;}
+	@Override public int getDynamicOffsetY() {return 0;}
 }

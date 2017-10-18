@@ -1,9 +1,7 @@
 package spirite.base.image_data.animation_data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.TreeMap;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
@@ -12,7 +10,6 @@ import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.layers.SpriteLayer;
-import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 
 public class RigAnimation extends Animation {
 	// 0 : tx

@@ -111,14 +111,11 @@ public class FixedFrameAnimation extends Animation
 		
 		ListIterator<GroupTree.Node> it = group.getChildren().listIterator(group.getChildren().size());
 		
-		int met = 0;
 		while( it.hasPrevious()) {
 			GroupTree.Node node = it.previous();
 			
-			if( node instanceof LayerNode) {
+			if( node instanceof LayerNode)
 				layer.frames.add( layer.new Frame((LayerNode) node, 1, Marker.FRAME));
-				met += 1;
-			}
 		}
 		
 		layer.frames.add(layer.new Frame(null, 0, Marker.END_AND_LOOP));
@@ -218,8 +215,6 @@ public class FixedFrameAnimation extends Animation
 	public List<List<TransformedHandle>> getDrawTable( float t, AnimationState state) {
 		int T = (int)Math.floor(t);
 		int L = endFrame-startFrame;
-		
-		int st = ((int)Math.floor(t) - L/2)%L + startFrame;
 
 		List<List<TransformedHandle>> drawTable = new ArrayList<>();
 		for( int i= -(L-1)/2; i< (L)/2; ++i) {
@@ -441,7 +436,6 @@ public class FixedFrameAnimation extends Animation
 		
 		/*** Adds an empty frame to fill the gap starting at StartTick of length length. */
 		public void addGap( int startTick, int length) {
-			Frame frame = getFrameForMet(startTick);
 			int before = frames.indexOf(getFrameForMet(startTick));
 			int start = (before == -1) ? startTick : Math.min(startTick,frames.get(before).getStart());
 			

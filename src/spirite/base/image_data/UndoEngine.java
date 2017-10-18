@@ -994,17 +994,17 @@ public class UndoEngine {
 		}
 
 		// Might be unnecessary
-		protected Collection<UndoContext> getUsedContexts() {
-			Collection<UndoContext> ret = new LinkedHashSet<>();
-			
-			for( CompositeAction action : actions) {
-				for( UndoContext context : action.contexts) {
-					ret.add(context);
-				}
-			}
-			
-			return ret;
-		}
+//		protected Collection<UndoContext> getUsedContexts() {
+//			Collection<UndoContext> ret = new LinkedHashSet<>();
+//			
+//			for( CompositeAction action : actions) {
+//				for( UndoContext context : action.contexts) {
+//					ret.add(context);
+//				}
+//			}
+//			
+//			return ret;
+//		}
 
 		@Override
 		protected void addAction(UndoableAction action) {

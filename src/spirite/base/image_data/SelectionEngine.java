@@ -734,7 +734,6 @@ public class SelectionEngine {
 			Rect dataRect = liftScheme.getBounds();
 			Rect intersection = dataRect.intersection(selectionRect);
 			
-			// TODO
 			gc.setClip(
 					intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
 					intersection.width, intersection.height);
