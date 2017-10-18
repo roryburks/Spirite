@@ -174,9 +174,9 @@ public class HotkeyManager {
             buff.putInt(key);
             buff.putInt(modifier);
 
-            // !!! Bad
+            // !!! TODO: Bad (I don't remember why)
             try {
-            	String str = new String(buff.array(), "ISO-8859-1");
+            	//String str = new String(buff.array(), "ISO-8859-1");
                 return new String(buff.array(), "ISO-8859-1");//buff.array().toString();
             } catch (UnsupportedEncodingException ex) {
                 return "";

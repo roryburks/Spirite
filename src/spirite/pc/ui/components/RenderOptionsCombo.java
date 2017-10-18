@@ -87,12 +87,12 @@ public class RenderOptionsCombo extends JPanel {
 		RenderTuple sel = ((RenderTuple)comboBox.getSelectedItem());
 		switch( sel.method) {
 		case COLOR_CHANGE_HUE:
+		case COLOR_CHANGE_FULL:
 			renderer.ccPanel.setBackground(new Color(sel.value));
 			rcOptions.add(renderer.ccPanel);
 			break;
-		case DEFAULT:
+		default:
 			break;
-		
 		}
 		rcOptions.doLayout();
 		rcOptions.revalidate();

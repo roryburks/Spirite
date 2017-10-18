@@ -5,6 +5,7 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.ImageHandle;
 import spirite.hybrid.HybridHelper;
@@ -47,15 +48,19 @@ public class ImageRenderSource extends RenderSource {
 
 	@Override
 	public RawImage render(RenderSettings settings) {
-		RawImage img = HybridHelper.createImage(settings.width, settings.height);
-		
-		GraphicsContext gc = img.getGraphics();
-		
-//		g2.setRenderingHints(settings.hints);
-		gc.scale( settings.width / (float)handle.getWidth(), 
-				  settings.height / (float)handle.getHeight());
-		handle.drawLayer( gc, null);
-		
-		return img;
+		try {
+			RawImage img = HybridHelper.createImageNonNillable(settings.width, settings.height);
+			
+			GraphicsContext gc = img.getGraphics();
+			
+	//		g2.setRenderingHints(settings.hints);
+			gc.scale( settings.width / (float)handle.getWidth(), 
+					  settings.height / (float)handle.getHeight());
+			handle.drawLayer( gc, null);
+			
+			return img;
+    	} catch(InvalidImageDimensionsExeption e) {
+    		return HybridHelper.createNillImage();
+    	}
 	}
 }

@@ -12,9 +12,9 @@ public class GLImage extends RawImage {
 	private final int width, height;
 	int tex;
 	
-	public GLImage( int width, int height) {
-		if( width == 0 || height == 0)
-			System.out.println("ZERO");
+	public GLImage( int width, int height) throws InvalidImageDimensionsExeption {
+		if( width <= 0 || height <= 0)
+			throw new InvalidImageDimensionsExeption("Invalid Image Dimensions");
 		engine.c_img.add(this);
 		GL2 gl = engine.getGL2();
 		

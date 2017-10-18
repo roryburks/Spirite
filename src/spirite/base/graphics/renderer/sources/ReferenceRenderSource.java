@@ -4,6 +4,7 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
@@ -31,21 +32,25 @@ public class ReferenceRenderSource extends RenderSource {
 
 	@Override
 	public RawImage render(RenderSettings settings) {
-		RawImage img = HybridHelper.createImage(settings.width, settings.height);
-		
-		GraphicsContext gc = img.getGraphics();
-		
-		List<Reference> refList = workspace.getReferenceManager().getList(front);
-		float rw = settings.width / (float)workspace.getWidth();
-		float rh = settings.height / (float)workspace.getHeight();
-		gc.scale( rw, rh);
-				
-		for( Reference ref : refList ) {
-			ref.draw(gc);
-		}
-		
-//		gc.dispose();
-		return img;
+		try {
+			RawImage img = HybridHelper.createImageNonNillable(settings.width, settings.height);
+			
+			GraphicsContext gc = img.getGraphics();
+			
+			List<Reference> refList = workspace.getReferenceManager().getList(front);
+			float rw = settings.width / (float)workspace.getWidth();
+			float rh = settings.height / (float)workspace.getHeight();
+			gc.scale( rw, rh);
+					
+			for( Reference ref : refList ) {
+				ref.draw(gc);
+			}
+			
+	//		gc.dispose();
+			return img;
+    	} catch(InvalidImageDimensionsExeption e) {
+    		return HybridHelper.createNillImage();
+    	}
 	}
 
 	@Override

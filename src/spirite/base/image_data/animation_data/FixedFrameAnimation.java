@@ -252,6 +252,8 @@ public class FixedFrameAnimation extends Animation
 					for( TransformedHandle tr  : node.getLayer().getDrawList()) {
 						tr.trans.translate(node.getOffsetX(), node.getOffsetY());
 						tr.alpha = properties.alpha;
+						tr.method = properties.method;
+						tr.renderValue = properties.renderValue;
 						drawList.add( tr);
 					}
 				}

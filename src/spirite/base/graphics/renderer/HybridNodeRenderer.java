@@ -1,5 +1,8 @@
 package spirite.base.graphics.renderer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -7,6 +10,7 @@ import java.util.ListIterator;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
@@ -22,6 +26,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -54,7 +59,7 @@ public class HybridNodeRenderer {
 			
 			buffer = new RawImage[n];
 			for( int i=0; i<n; ++i) {
-				buffer[i] = HybridHelper.createImage(settings.width, settings.height);
+				buffer[i] = HybridHelper.createImageNonNillable(settings.width, settings.height);
 				buffer[i].getGraphics().clear();
 			}
 			
@@ -69,7 +74,7 @@ public class HybridNodeRenderer {
 			for( int i=0; i<n; ++i)
 				buffer[i].flush();
 			gc.dispose();
-		}
+		}catch( InvalidImageDimensionsExeption e) {}
 		finally {
 			buffer = null;
 			clearCompositeImage();
@@ -79,14 +84,14 @@ public class HybridNodeRenderer {
 	// ==== Composite Layer
 	private RawImage compositionImage;
 	private ImageHandle compositionHandle = null;
-	private void buildCompositeLayer(ImageWorkspace workspace) 
+	private void buildCompositeLayer(ImageWorkspace workspace) throws InvalidImageDimensionsExeption 
 	{
 		IBuiltImageData dataContext= workspace.buildData(workspace.buildActiveData());
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
 				||  workspace.getDrawEngine().strokeIsDrawing())) 
 		{
 			compositionImage= 
-					HybridHelper.createImage(dataContext.getWidth(), dataContext.getHeight());
+					HybridHelper.createImageNonNillable(dataContext.getWidth(), dataContext.getHeight());
 			compositionHandle = dataContext.handle;
 
 			GraphicsContext gc = compositionImage.getGraphics();
@@ -223,7 +228,7 @@ public class HybridNodeRenderer {
 		@Override
 		public void draw(GraphicsContext gc) {
 			buffer[n+1].getGraphics().clear();	// Not pressent in AWTNodeRenderer
-			
+
 			_render_rec(node, n+1, settings);
 			gc.renderImage( buffer[n+1], 0, 0, node.getRender());
 		}
@@ -238,12 +243,18 @@ public class HybridNodeRenderer {
 		TransformedRenderable( RenderProperties properties, TransformedHandle renderable, RenderSettings settings, int ox, int oy) {
 			//this.node = node;
 			this.properties = new RenderProperties(properties);
-			this.properties.alpha *= renderable.alpha;
 			this.renderable = renderable;
 			this.depth = renderable.depth;
 			this.settings = settings;
 			this.transform = renderable.trans;
 			this.transform.preTranslate(ox, oy);
+
+			// Concatenate
+			this.properties.alpha *= renderable.alpha;
+			if( renderable.method!= null) {
+				this.properties.method = renderable.method;
+				this.properties.renderValue = renderable.renderValue;
+			}
 		}
 		@Override
 		public void draw(GraphicsContext gc) {
@@ -267,6 +278,8 @@ public class HybridNodeRenderer {
 			
 		}
 	}
+	
+	static int cc=0;
 	
 
 	/** Determines the number of images needed to properly render 

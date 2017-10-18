@@ -141,7 +141,7 @@ public class DynamicInternalImage implements IInternalImage {
 			
 			RawImage nri;
 			if( cropped == null || cropped.isEmpty()) {
-				nri = HybridHelper.createImage(1, 1);
+				nri = HybridHelper.createNillImage();
 			}
 			else {
 				nri = HybridHelper.createImage( cropped.width, cropped.height);

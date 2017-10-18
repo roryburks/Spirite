@@ -49,6 +49,7 @@ import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -206,7 +207,11 @@ public class Penner
 				behavior.start();
 			}
 		}
-		else {
+		else if( settingsManager.getAllowsEdittingInvisible() || 
+				(workspace.getSelectedNode() != null && workspace.getSelectedNode().getRender().isVisible()))
+		{
+				
+			
 			// Tool-based State-starting
 			Tool tool = toolsetManager.getSelectedTool();
 			
@@ -370,6 +375,9 @@ public class Penner
 			
 			if( behavior != null)
 				behavior.start();
+		}
+		else {
+			HybridHelper.beep();
 		}
 	}
 	

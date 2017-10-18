@@ -80,8 +80,6 @@ public class RenderEngine
 		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		
-		System.out.println("io:"+imageObserver);
-		
 		master.addWorkspaceObserver(workspaceObserver);
 		for( ImageWorkspace workspace : master.getWorkspaces()) {
 			workspace.addImageObserver( imageObserver);
@@ -130,6 +128,8 @@ public class RenderEngine
 		public float alpha = 1.0f;
 		public MatTrans trans = new MatTrans();
 		public ImageHandle handle;
+		public RenderMethod method = null;
+		public int renderValue = 0;
 	}
 	
 	public enum RenderMethod {

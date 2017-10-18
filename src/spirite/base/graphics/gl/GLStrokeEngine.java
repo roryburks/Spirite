@@ -10,6 +10,7 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
@@ -47,13 +48,17 @@ class GLStrokeEngine extends StrokeEngine {
 	protected void onStart() {
 		w = data.getWidth();
 		h = data.getHeight();
-		fixedLayer = new GLImage( w, h);
-		displayLayer = new GLImage( w, h);
+		try {
+			fixedLayer = new GLImage( w, h);
+			displayLayer = new GLImage( w, h);
+		}catch(InvalidImageDimensionsExeption e) {}
 	}
 	@Override
 	protected void onEnd() {
-		fixedLayer.flush();
-		displayLayer.flush();
+		if( fixedLayer != null)
+			fixedLayer.flush();
+		if( displayLayer != null)
+			displayLayer.flush();
 		fixedLayer = null;
 		displayLayer = null;
 	}
@@ -61,32 +66,32 @@ class GLStrokeEngine extends StrokeEngine {
 
 	@Override
 	protected void prepareDisplayLayer() {
-		GL2 gl = engine.getGL2();
+		engine.getGL2();	// Makes sure GL is loaded (really no reason why it shouldn't be, though)
 		
 		GLGraphics glgc = displayLayer.getGraphics();
-//		engine.setTarget(displayLayer);
 		glgc.clear();
 		
 		GLParameters params = new GLParameters(w, h);
 		params.texture = new GLParameters.GLImageTexture(fixedLayer);
 		glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
-//		engine.setTarget(0);
 	}
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
 		if( gc instanceof AWTContext) {
-			GLImage img = new GLImage(w, h);
-			GLGraphics glgc = img.getGraphics();
-			
-			glgc.clear();
-			GLParameters params = new GLParameters(w, h);
-			params.texture = new GLParameters.GLImageTexture(displayLayer);
-			glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
-			
-			BufferedImage bi = PCUtil.glSurfaceToImage(
-					HybridHelper.BI_FORMAT, engine.getWidth(), engine.getHeight());
-			gc.drawImage( new ImageBI(bi), 0, 0);
-			engine.setTarget(0);
+			try {
+				GLImage img = new GLImage(w, h);
+				GLGraphics glgc = img.getGraphics();
+				
+				glgc.clear();
+				GLParameters params = new GLParameters(w, h);
+				params.texture = new GLParameters.GLImageTexture(displayLayer);
+				glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
+				
+				BufferedImage bi = PCUtil.glSurfaceToImage(
+						HybridHelper.BI_FORMAT, engine.getWidth(), engine.getHeight());
+				gc.drawImage( new ImageBI(bi), 0, 0);
+				engine.setTarget(0);
+			}catch(InvalidImageDimensionsExeption e) {}
 		}
 		else if( gc instanceof GLGraphics) {
 			GLGraphics glgc = (GLGraphics)gc;

@@ -87,7 +87,7 @@ public class Test1 {
 			SpriteLayer rig = (SpriteLayer)lnode.getLayer();
 			
 
-			RawImage img = HybridHelper.createImage(rig.getWidth(),rig.getHeight());
+			RawImage img = HybridHelper.createImageNonNillable(rig.getWidth(),rig.getHeight());
 			
 			workspace.getUndoEngine().performAndStore(
 					rig.createAddPartAction(img, 0, 0, 0,""));

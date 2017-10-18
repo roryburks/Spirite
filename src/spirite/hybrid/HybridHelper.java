@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.wrap.GLCore;
@@ -89,7 +90,9 @@ public class HybridHelper {
 		JOptionPane.showMessageDialog(null, message, title, JOptionPane.OK_OPTION);
 	}
 
-	public static RawImage createImage( int width, int height) {
+	public static RawImage createImageNonNillable( int width, int height) throws InvalidImageDimensionsExeption {
+		if( width <= 0 || height <= 0)
+			throw new InvalidImageDimensionsExeption("Bad Image Dimensions");
 		if( useGL) {
 			initGL();
 			return new GLImage(width,height);
@@ -97,6 +100,23 @@ public class HybridHelper {
 		else
 			return new ImageBI(new BufferedImage(width, height, BI_FORMAT));
 	}
+	public static RawImage createImage( int width, int height) {
+		try {
+			return createImageNonNillable(width,height);
+		} catch (InvalidImageDimensionsExeption e) {
+			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, e, "Couldn't create 1x1 image");
+			return null;
+		}
+	}
+	public static RawImage createNillImage() {
+		try {
+			return createImageNonNillable(1,1);
+		} catch (InvalidImageDimensionsExeption e) {
+			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, e, "Couldn't create 1x1 image");
+			return null;
+		}
+	}
+	
 	public static Class<? extends RawImage> getImageType() {
 		return (useGL)?GLImage.class:ImageBI.class;
 	}
@@ -209,5 +229,11 @@ public class HybridHelper {
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			return flavor == DataFlavor.imageFlavor;
 		}
+	}
+
+
+	public static void beep() {
+		java.awt.Toolkit.getDefaultToolkit().beep();
+		
 	}
 }

@@ -13,7 +13,7 @@ public class RenderPropertiesDialog extends JPanel {
 	
 	private final RenderProperties properties;
 	private final RenderOptionsCombo renderCombo;
-//
+	
 	
 	public RenderPropertiesDialog(RenderProperties properties, MasterControl master) {
 		this.properties = new RenderProperties(properties);

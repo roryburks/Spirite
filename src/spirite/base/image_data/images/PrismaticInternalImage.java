@@ -86,7 +86,7 @@ public class PrismaticInternalImage implements IInternalImage {
 		if( compositionImg != null)
 			compositionImg.flush();
 		if( compRect == null || compRect.isEmpty()) {
-			compositionImg = HybridHelper.createImage(1, 1);
+			compositionImg = HybridHelper.createNillImage();
 		}
 		else {
 			compositionImg = HybridHelper.createImage(r.width, r.height);

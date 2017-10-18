@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
@@ -32,28 +33,33 @@ public class GLDrawer extends GraphicsDrawer {
 
 	@Override
 	public void changeColor(RawImage image, int from, int to, int mode) {
+		if( image.getWidth() <= 0 || image.getHeight() <= 0)
+			return;
+		
     	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
 
-    	GLImage img = new GLImage( image.getWidth(), image.getHeight());
-    	GLGraphics glgc = img.getGraphics();
-//    	GL2 gl = engine.getGL2();
-    	
-    	engine.setTarget(img);
-    	
-    	params.addParam( new GLParam1i("optionMask", mode | 4));
-    	params.addParam( new GLParam4f("cFrom", 
-    			Colors.getRed(from)/255f, Colors.getGreen(from)/255f, Colors.getBlue(from)/255f, Colors.getAlpha(from)/255f));
-    	params.addParam( new GLParam4f("cTo", 
-    			Colors.getRed(to)/255f, Colors.getGreen(to)/255f, Colors.getBlue(to)/255f, Colors.getAlpha(to)/255f));
-
-    	params.texture = new GLImageTexture( image);
-
-    	glgc.clear();
-    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
-
-    	GraphicsContext gc = image.getGraphics();
-    	gc.setComposite( Composite.SRC, 1.0f);
-    	gc.drawImage(img, 0, 0);
+    	try {
+	    	GLImage img = new GLImage( image.getWidth(), image.getHeight());
+	    	GLGraphics glgc = img.getGraphics();
+	//    	GL2 gl = engine.getGL2();
+	    	
+	    	engine.setTarget(img);
+	    	
+	    	params.addParam( new GLParam1i("optionMask", mode | 4));
+	    	params.addParam( new GLParam4f("cFrom", 
+	    			Colors.getRed(from)/255f, Colors.getGreen(from)/255f, Colors.getBlue(from)/255f, Colors.getAlpha(from)/255f));
+	    	params.addParam( new GLParam4f("cTo", 
+	    			Colors.getRed(to)/255f, Colors.getGreen(to)/255f, Colors.getBlue(to)/255f, Colors.getAlpha(to)/255f));
+	
+	    	params.texture = new GLImageTexture( image);
+	
+	    	glgc.clear();
+	    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
+	
+	    	GraphicsContext gc = image.getGraphics();
+	    	gc.setComposite( Composite.SRC, 1.0f);
+	    	gc.drawImage(img, 0, 0);
+    	} catch(InvalidImageDimensionsExeption e) {};
     	
     	//img.flush();
 	}
@@ -62,20 +68,22 @@ public class GLDrawer extends GraphicsDrawer {
 	public void invert(RawImage image) {
     	//GL2 gl = engine.getGL2();
     	
-    	GLImage img = new GLImage(image.getWidth(), image.getHeight());
-    	
-    	GLGraphics glgc = img.getGraphics();
-
-    	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
-    	params.texture = new GLImageTexture(image);
-
-    	glgc.clear();
-    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null);
-		
-    	GraphicsContext gc = image.getGraphics();
-    	gc.setComposite( Composite.SRC, 1.0f);
-    	gc.drawImage(img, 0, 0);
-    	
-    	img.flush();
+		try {
+	    	GLImage img = new GLImage(image.getWidth(), image.getHeight());
+	    	
+	    	GLGraphics glgc = img.getGraphics();
+	
+	    	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
+	    	params.texture = new GLImageTexture(image);
+	
+	    	glgc.clear();
+	    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null);
+			
+	    	GraphicsContext gc = image.getGraphics();
+	    	gc.setComposite( Composite.SRC, 1.0f);
+	    	gc.drawImage(img, 0, 0);
+	    	
+	    	img.flush();
+    	} catch(InvalidImageDimensionsExeption e) {};
 	}
 }

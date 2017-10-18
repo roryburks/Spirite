@@ -8,6 +8,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.HybridNodeRenderer;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -76,16 +77,19 @@ public class NodeRenderSource extends RenderSource {
 	@Override
 	public RawImage render(RenderSettings settings) {
 //		buildCompositeLayer(workspace);
-		
-		GraphicsDrawer drawer = master.getSettingsManager().getDefaultDrawer();
-		
-		RawImage img = HybridHelper.createImage(settings.width, settings.height);
-		GraphicsContext gc = img.getGraphics();
-		gc.clear();
-		HybridNodeRenderer renderer = new HybridNodeRenderer(root);
-		renderer.render(settings, gc, null);
-		
-		return img;
+		try {
+			//GraphicsDrawer drawer = master.getSettingsManager().getDefaultDrawer();
+			
+			RawImage img = HybridHelper.createImageNonNillable(settings.width, settings.height);
+			GraphicsContext gc = img.getGraphics();
+			gc.clear();
+			HybridNodeRenderer renderer = new HybridNodeRenderer(root);
+			renderer.render(settings, gc, null);
+			
+			return img;
+    	} catch(InvalidImageDimensionsExeption e) {
+    		return HybridHelper.createNillImage();
+    	}
 	}
 
 	@Override

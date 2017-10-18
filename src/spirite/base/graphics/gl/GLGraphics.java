@@ -7,6 +7,7 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
@@ -84,26 +85,26 @@ public class GLGraphics extends GraphicsContext{
 
 	@Override
 	public void drawBounds(RawImage mask, int c) {
-//		drawImage(mask, 0, 0);
-		
-		GLImage img = new GLImage( width, height);
-		
-		GLGraphics other = img.getGraphics();
-		other.clear();
-		
-		GLParameters params2 = new GLParameters(getImgParams());
-		params2.texture = new GLImageTexture( mask);
-		other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
-				0, 0, mask.getWidth(), mask.getHeight());
-		
-		
-		// Clean up and Apply the surface to an image
-		params2 = new GLParameters(width, height);
-		params2.addParam( new GLParam1i("uCycle", c));
-		params2.texture = new GLImageTexture(img);
-		applyPassProgram( ProgramType.PASS_BORDER, params2, null);
-		
-		img.flush();
+		try {
+			GLImage img = new GLImage( width, height);
+			
+			GLGraphics other = img.getGraphics();
+			other.clear();
+			
+			GLParameters params2 = new GLParameters(getImgParams());
+			params2.texture = new GLImageTexture( mask);
+			other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
+					0, 0, mask.getWidth(), mask.getHeight());
+			
+			
+			// Clean up and Apply the surface to an image
+			params2 = new GLParameters(width, height);
+			params2.addParam( new GLParam1i("uCycle", c));
+			params2.texture = new GLImageTexture(img);
+			applyPassProgram( ProgramType.PASS_BORDER, params2, null);
+			
+			img.flush();
+    	} catch(InvalidImageDimensionsExeption e) {};
 	}
 
 
@@ -351,6 +352,8 @@ public class GLGraphics extends GraphicsContext{
 			cachedPolyParams.addParam( new GLParameters.GLParam3f("uColor", 
 					Colors.getRed(color)/255.0f, Colors.getGreen(color)/255.0f, Colors.getBlue(color)/255.0f));
 			cachedPolyParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha* Colors.getAlpha(color)/255.0f));
+			cachedPolyParams.addParam( new GLParameters.GLParam1i("uComp", 0 ));
+			// uValue is ignored for uComp = 0
 			setCompositeBlend(cachedPolyParams, composite);
 			updatePolyParams = false;
 		}
@@ -367,6 +370,8 @@ public class GLGraphics extends GraphicsContext{
 			cachedImgParams.flip = flip;
 			cachedImgParams.clearParams();
 			cachedImgParams.addParam( new GLParameters.GLParam1f("uAlpha", alpha));
+			cachedImgParams.addParam( new GLParameters.GLParam1i("uComp", 0 ));
+			// uValue is ignored for uComp = 0
 			setCompositeBlend(cachedImgParams, composite);
 			updateImgParams = false;
 		}

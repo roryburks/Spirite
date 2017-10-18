@@ -201,7 +201,6 @@ public class LayersPanel extends OmniComponent {
 		uilocked = true;
 		opacitySlider.refresh();
 		
-
 		GroupTree.Node selected = layerTreePanel.getSelectedNode();
 		if( selected != null) {
 			renderCombo.setSelectedIndex(selected.getRender().getMethod().ordinal());
@@ -223,7 +222,7 @@ public class LayersPanel extends OmniComponent {
 			renderer.ccPanel.setBackground(new Color(sel.value));
 			rcOptions.add(renderer.ccPanel);
 			break;
-		case DEFAULT:
+		default:
 			break;
 		
 		}

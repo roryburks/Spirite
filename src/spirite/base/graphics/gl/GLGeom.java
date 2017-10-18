@@ -330,7 +330,8 @@ public class GLGeom {
         }
     }
     
-
+    
+    // TODO: Figure out if Mitering is worth doing (probably is as without it huge brushes are ugly AF
     private final static int SV2_STRIDE = 3;
     private final static float MITER_MAX2 = 2.0f;
     public static Primitive[] strokeV2LinePassGeom(float[] raw) {
@@ -351,9 +352,9 @@ public class GLGeom {
         	Vec2 p3 = new Vec2( raw[(i+3)*SV2_STRIDE], raw[(i+3)*SV2_STRIDE+1]);
         	float size1 = raw[(i+1)*SV2_STRIDE+2]/2;
         	float size2 = raw[(i+2)*SV2_STRIDE+2]/2;
-        	Vec2 n10 = p1.sub(p0).normalize();
+        	//Vec2 n10 = p1.sub(p0).normalize();
         	Vec2 normal = p2.sub(p1).normalize();
-        	Vec2 n32 = p3.sub(p2).normalize();
+        	//Vec2 n32 = p3.sub(p2).normalize();
         	
         	if( p0.equals(p1)) {
         		builder1.emitVertexFront(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
@@ -438,7 +439,6 @@ public class GLGeom {
 //        		anglesArray[i] = angle.get(i);
 //        		distancesArray[i] = distance.get(i);
 //        	}
-//        	System.out.println("S");
 //        }
         
         

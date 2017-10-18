@@ -23,6 +23,9 @@ import spirite.pc.graphics.awt.AWTDrawer;
  * by Swing's default components.
  *
  * It saves and load data persistantly using Java's Preferences package.
+ * 
+ * TODO: Make a ToolsetManager-esque system for constructing UI for
+ * settings so that they can be altered and saved and loaded easily.
  *
  * @author Rory Burks
  *
@@ -159,9 +162,7 @@ public class SettingsManager {
     }
 
     /** Returns whether or not the editor will allow editing of image data which
-     * is currently not visible.
-     *
-     *  !!! TODO: UNIMPLEMENTED !!*/
+     * is currently not visible. */
     public boolean getAllowsEdittingInvisible() {
         return false;
     }

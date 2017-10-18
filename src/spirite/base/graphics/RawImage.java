@@ -7,6 +7,10 @@ package spirite.base.graphics;
  */
 
 public abstract class RawImage {
+	public static class InvalidImageDimensionsExeption extends Exception {
+		public InvalidImageDimensionsExeption( String message) {super(message);}
+	}
+	
 	/** Gets the Width of the underlying image. */
     public abstract int getWidth();
     

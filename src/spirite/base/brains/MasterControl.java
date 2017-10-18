@@ -182,7 +182,7 @@ public class MasterControl
 			});
     		glcache = new GLCache(this);
     		
-    		// TODO: Kind of bad
+    		// TODO: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
     		SwingUtilities.invokeLater( new Runnable() {
 				@Override public void run() {
 		    		frameManager.getWorkPanel().setGL(true);
@@ -228,7 +228,7 @@ public class MasterControl
     	if( ext.equals("jpg") || ext.equals("jpeg")) {
     		// Remove Alpha Layer of JPG so that encoding works correctly
     		RawImage img2 = img;
-    		img = HybridHelper.createImage( img2.getWidth(), img2.getHeight());
+    		img = HybridHelper.createImageNonNillable( img2.getWidth(), img2.getHeight());
     		
     		GraphicsContext gc = img.getGraphics();
     		gc.drawImage( img2, 0, 0);
@@ -570,7 +570,6 @@ public class MasterControl
     			MasterControl.this.executeCommandString("draw.clearLayer");
     		}});
     		commandMap.put("paste", new Runnable() {@Override public void run() {
-    			// TODO: MARK
     			RawImage bi = HybridHelper.imageFromClipboard();
     			if( bi == null) return;
     			
@@ -969,7 +968,9 @@ public class MasterControl
 	public <T> void addTrackingObserver(Class<T> tclass, T observer) {
 		// Should by typesafe everywhere except here, and here it's typesafe assuming
 		//	trackMap is correctly constructed
+		@SuppressWarnings("unchecked")
 		FastTrack<T> ftt = (FastTrack<T>)trackMap.get(tclass);
+		
 		if( ftt == null)
 			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, null, "Failed to find the requested observer type.");
 		
@@ -1006,9 +1007,8 @@ public class MasterControl
 		}
 	}
 	
-
-	
-	// Ugly
+	// Ugly, but the alternative (somehow giving Master a moving track of all the ObserverHandlers)
+	//	is far far too much a convoluted pain in the ass.
 	private final static Map<Class<?>,FastTrack<?>> trackMap = new HashMap<>();
 	static {
 		// ImageWorkapace
