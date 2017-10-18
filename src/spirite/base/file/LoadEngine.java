@@ -264,12 +264,10 @@ public class LoadEngine {
 				int ox = helper.ra.readShort();
 				int oy = helper.ra.readShort();
 				int imgSize = helper.ra.readInt();
-				System.out.println(imgSize+ "::" + helper.ra.getFilePointer());
 				
 				byte[] buffer = new byte[imgSize];
 				helper.ra.read(buffer);
 				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
-				System.out.println(imgSize+ "::" + helper.ra.getFilePointer());
 
 				dataMap.put(identifier, new DynamicInternalImage(img,ox,oy,helper.workspace));
 				break;}
@@ -513,6 +511,7 @@ public class LoadEngine {
 				}
 			}
 		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards

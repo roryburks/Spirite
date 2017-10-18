@@ -88,7 +88,6 @@ public class HybridUtil {
 
 	public static RawImage load(ByteArrayInputStream byteArrayInputStream) throws IOException {
 		BufferedImage bi = ImageIO.read(byteArrayInputStream);
-		System.out.println(bi);
 		RawImage img = HybridHelper.createImage(bi.getWidth(), bi.getHeight());
 		GraphicsContext gc = img.getGraphics();
 		gc.clear();

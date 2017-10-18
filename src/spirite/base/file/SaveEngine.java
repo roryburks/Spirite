@@ -337,10 +337,8 @@ public class SaveEngine implements MWorkspaceObserver {
 				HybridUtil.savePNG(   part.iimg.readOnlyAccess(), bos);
 				// [4] : Size of Image Data
 				helper.ra.writeInt( bos.size());
-				System.out.println(bos.size() + "::" + helper.ra.getFilePointer());
 				// [x] : Image Data
 				helper.ra.write(bos.toByteArray());
-				System.out.println(bos.size() + "::" + helper.ra.getFilePointer());
 				bos.reset();
 				break;}
 			case PRISMATIC:{

@@ -33,7 +33,6 @@ public class JOGLCore extends GLCore {
 	public static void init(OnGLLoadObserver obs) throws MGLException {
 		if( initialized) return;
 		
-		System.out.println("GL Creation");
 		// Create Offscreen OpenGl Surface
 		GLProfile profile = GLProfile.getDefault();
         GLDrawableFactory fact = GLDrawableFactory.getFactory(profile);

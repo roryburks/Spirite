@@ -31,8 +31,6 @@ public class CubicSplineInterpolatorND {
     		t_[w] = points[w][N];
     		
     	}
-
-    	System.out.println(t_[0] +"," + t_[1] + "," + t_[2]);
     	
     	this.fast = fast;
     	calculateDifferentials();

@@ -462,7 +462,6 @@ public class BetterTree extends JPanel {
 			SwingUtilities.convertPointFromScreen(p, BetterTree.this);
 			
 			if( !BetterTree.this.contains(p) && dragging != null) {
-				System.out.println(p + "::" + BetterTree.this.getBounds());
 				DnDBinding binding = dragging.getBinding();
 				if( binding != null)
 					binding.dragOut();

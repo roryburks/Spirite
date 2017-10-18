@@ -128,8 +128,6 @@ public class RigAnimation extends Animation {
 						List<Entry<Float,PartKeyFrame>> entries = new ArrayList<>(frameMap.entrySet());
 						float[][] data = new float[entries.size()][];
 						
-						System.out.println("BUILD");
-						
 						
 						for( int i=0; i < entries.size(); ++i) {
 							data[i] = new float[6];

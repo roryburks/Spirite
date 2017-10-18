@@ -53,7 +53,6 @@ public class TestGLDiag extends JDialog  {
 					if( !init) {
 						glad.setContext(glad.createContext(JOGLCore.getContext()), true);
 						init = true;
-						System.out.println("INIT");
 						glcanvas.repaint();
 					}
 				}});
