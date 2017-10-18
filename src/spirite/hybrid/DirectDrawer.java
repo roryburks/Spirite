@@ -36,7 +36,7 @@ public class DirectDrawer {
 		engine.setTarget(img);
 
 		IntBuffer read = IntBuffer.allocate(w*h);
-		int buffer[] = read.array();
+		//int buffer[] = read.array();
 		gl.glReadnPixels( 0, 0, w, h, 
 				GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4*w*h, read);
 

@@ -28,6 +28,7 @@ import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.AnimationView.MAnimationViewObserver;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -1033,6 +1034,9 @@ public class MasterControl
 				(ImageWorkspace ws, MAnimationStateObserver obs)->ws.getAnimationManager().addAnimationStateObserver(obs),
 				(ImageWorkspace ws, MAnimationStateObserver obs)->ws.getAnimationManager().removeAnimationStateObserver(obs)));
 		
-		
+		// AnimationView
+		trackMap.put(MAnimationViewObserver.class, new FastTrack<MAnimationViewObserver>(
+				(ImageWorkspace ws, MAnimationViewObserver obs)->ws.getAnimationManager().getView().addAnimationViewObserver(obs),
+				(ImageWorkspace ws, MAnimationViewObserver obs)->ws.getAnimationManager().getView().removeAnimationViewObserver(obs)));
 	}
 }

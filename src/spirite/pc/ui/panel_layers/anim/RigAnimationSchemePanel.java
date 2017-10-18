@@ -15,11 +15,11 @@ import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 
 public class RigAnimationSchemePanel extends JPanel {
-	private final MasterControl mater;
+	private final MasterControl master;
 	private final RigAnimation animation;
 
 	public RigAnimationSchemePanel(MasterControl master, AnimationNode anode) {
-		this.mater = master;
+		this.master = master;
 		this.animation = (RigAnimation) anode.getAnimation();
 		
 		rebuildLayout();
@@ -40,7 +40,7 @@ public class RigAnimationSchemePanel extends JPanel {
 		Group subHor = layout.createSequentialGroup();
 		Group subVert = layout.createParallelGroup();
 		
-		List<Part> parts = animation.sprite.getParts();
+		List<Part> parts = animation.getSprites().get(0).getParts();	// TODO
 		JComponent[] tickers = new JComponent[parts.size()];
 		for( int i=0; i<parts.size(); ++i) {
 			Part part = parts.get(i);

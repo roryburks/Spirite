@@ -60,10 +60,8 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		tree.setRootBinding( rootBinding);
 		
 		ws = master.getCurrentWorkspace();
-		if( ws != null) {
-			ws.getAnimationManager().addAnimationStructureObserver(this);;
-			ws.getAnimationManager().getView().addAnimationViewObserver(this);
-		}
+		master.addTrackingObserver(MAnimationStructureObserver.class, this);
+		master.addTrackingObserver(MAnimationViewObserver.class, this);
 		
 		scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
 		scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
@@ -229,18 +227,8 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		if( ws != null) {
-			ws.getAnimationManager().removeAnimationStructureObserver(this);
-			ws.getAnimationManager().getView().removeAnimationViewObserver(this);
-		}
 		ws = selected;
-		if( ws != null) {
-			ws.getAnimationManager().addAnimationStructureObserver(this);
-			ws.getAnimationManager().getView().addAnimationViewObserver(this);
-		}
-		
 		SwingUtilities.invokeLater( new Runnable() {
-			
 			@Override
 			public void run() {
 				Rebuild();	
@@ -251,6 +239,10 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	// :::: MAnimationViewObserver
 	@Override
 	public void viewChanged() {
+		Rebuild();
+	}
+	@Override
+	public void viewSelectionChange(Node selected) {
 		Rebuild();
 	}
 }

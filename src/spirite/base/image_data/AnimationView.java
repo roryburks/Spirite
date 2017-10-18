@@ -21,13 +21,6 @@ public class AnimationView {
 		return tree.getRoot();
 	}
 
-	public Node addNode(Animation animation) {
-		Node node = tree.new AnimationNode(animation, animation.getName());
-		tree.getRoot()._add(node, null);
-		workspace.triggerFlash();
-		
-		return node;
-	}
 	
 	private boolean nodeIsInView( Node node) {
 		while( node != null) {
@@ -37,6 +30,27 @@ public class AnimationView {
 		}
 		return false;
 	}
+	
+	// ===================
+	// ==== Selection ====
+	private Node selected;
+	public Node getSelectedNode() {
+		return selected;
+	}
+	public void setSelectedNode(Node sel) {
+		selected = sel;
+		_triggerViewSelectionChange(sel);
+	}
+	
+	// ===========================
+	// ==== Node Add/Subtract ====
+	public Node addNode(Animation animation) {
+		Node node = tree.new AnimationNode(animation, animation.getName());
+		tree.getRoot()._add(node, null);
+		workspace.triggerFlash();
+		
+		return node;
+	}
 	public void RemoveNode( Node node) {
 		if(!nodeIsInView(node) || node == tree.getRoot())
 			return;
@@ -45,7 +59,6 @@ public class AnimationView {
 		node._del();
 		_triggerViewChange();
 	}
-
 	public void moveAbove( Node nodeToMove, Node nodeAbove) {
 		if( nodeToMove == null || nodeAbove == null || nodeAbove.getParent() == null 
 				|| nodeToMove.getParent() == null || tree._isChild( nodeToMove, nodeAbove.getParent()))
@@ -106,10 +119,15 @@ public class AnimationView {
 	
 	public static interface MAnimationViewObserver {
 		public void viewChanged();
+		public void viewSelectionChange( Node selected);
 	}
-	
+
 	private void _triggerViewChange() {
 		animationViewObs.trigger( (MAnimationViewObserver obs) ->{ obs.viewChanged();});
+		workspace.triggerFlash();
+	}
+	private void _triggerViewSelectionChange( Node selected) {
+		animationViewObs.trigger( (MAnimationViewObserver obs) ->{ obs.viewSelectionChange(selected);});
 		workspace.triggerFlash();
 	}
 }

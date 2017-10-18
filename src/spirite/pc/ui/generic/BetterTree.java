@@ -161,8 +161,6 @@ public class BetterTree extends JPanel {
 		return node;
 	}
 	
-//	public void onAttemptMoveAbove( BTNode nodeToMove, BTNode node)
-	
 	
 	// Properties
 	private int propBranchWidth = 16;
@@ -461,10 +459,10 @@ public class BetterTree extends JPanel {
 		// :::: DragGestureListener/DragSourceListener for drags originating from the tree
 		@Override public void dragDropEnd(DragSourceDropEvent evt) {
 			Point p = evt.getLocation();
-			p = SwingUtilities.convertPoint( 
-					evt.getDragSourceContext().getComponent(), p, BetterTree.this);
+			SwingUtilities.convertPointFromScreen(p, BetterTree.this);
 			
 			if( !BetterTree.this.contains(p) && dragging != null) {
+				System.out.println(p + "::" + BetterTree.this.getBounds());
 				DnDBinding binding = dragging.getBinding();
 				if( binding != null)
 					binding.dragOut();
