@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
@@ -23,7 +24,10 @@ import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
+import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
@@ -144,6 +148,7 @@ public class SaveEngine implements MWorkspaceObserver {
 	public void saveWorkspace( ImageWorkspace workspace, File file, boolean track) {
 		lockCount++;
 		SaveHelper helper = new SaveHelper(workspace);
+		workspace.getAnimationManager().purge();
 
 		try {
 			if( file.exists()) {
@@ -152,7 +157,6 @@ public class SaveEngine implements MWorkspaceObserver {
 			file.createNewFile();
 			
 			helper.ra = new RandomAccessFile(file, "rw");
-	
 			
 			
 			// [4] Header
@@ -324,19 +328,21 @@ public class SaveEngine implements MWorkspaceObserver {
 				helper.ra.write(bos.toByteArray());
 				bos.reset();
 				break;
-			case DYNAMIC:
+			case DYNAMIC: {
 				// [2] : Dynamic offsetX
 				helper.ra.writeShort(part.iimg.getDynamicX());
 				// [2] : Dynamic offsetY
 				helper.ra.writeShort(part.iimg.getDynamicY());
 				
-				HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
+				HybridUtil.savePNG(   part.iimg.readOnlyAccess(), bos);
 				// [4] : Size of Image Data
 				helper.ra.writeInt( bos.size());
+				System.out.println(bos.size() + "::" + helper.ra.getFilePointer());
 				// [x] : Image Data
 				helper.ra.write(bos.toByteArray());
+				System.out.println(bos.size() + "::" + helper.ra.getFilePointer());
 				bos.reset();
-				break;
+				break;}
 			case PRISMATIC:{
 				PrismaticInternalImage pii = (PrismaticInternalImage)part.iimg;
 				List<PrismaticInternalImage.LImg> list = pii.getColorLayers();
@@ -362,15 +368,6 @@ public class SaveEngine implements MWorkspaceObserver {
 			default:
 				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Null Image Type.  Attempting to ignore.");
 				break;
-			}
-			
-			if( part.iimg instanceof DynamicInternalImage) {
-				// If Dynamic
-				// [2] : Dynamic offsetX
-				helper.ra.writeShort(part.iimg.getDynamicX());
-				// [2] : Dynamic offsetY
-				helper.ra.writeShort(part.iimg.getDynamicY());
-				
 			}
 		}
 		
@@ -431,7 +428,42 @@ public class SaveEngine implements MWorkspaceObserver {
 						}
 					}
 				}
+			}
+			else if( animation instanceof RigAnimation) {
+				RigAnimation rigAnimation = (RigAnimation)animation;
+				// [1] : ID
+				helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
 				
+				// [2] : Number of Sprites
+				List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
+				helper.ra.writeShort(spriteLayers.size());
+			
+				for( RigAnimLayer spriteLayer : spriteLayers) {
+					// [4] : NodeID of Sprite
+					helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
+					
+					// [2] : Number of Parts
+					List<Part> parts = spriteLayer.sprite.getParts();
+					helper.ra.writeShort(parts.size());
+					for( Part part : parts) {
+						// [n, UTF8 str] : Part Type Name
+						helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
+
+						List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
+						// [2] : Number of Key Frames;
+						helper.ra.writeShort(keyFrames.size());
+						
+						for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
+							helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
+							
+							helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
+							helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
+							helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
+							helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
+							helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
+						}
+					}
+				}
 			}
 			else {
 				helper.ra.writeByte(SaveLoadUtil.UNKNOWN);

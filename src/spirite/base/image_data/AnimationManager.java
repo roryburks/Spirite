@@ -204,7 +204,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 
 	// :: AddAnimation
 	public void addAnimation(Animation animation) {
-		animation.context = this;
+		animation.setContext(this.context);
 		context.getUndoEngine().performAndStore(new AddAnimationAction(animation));
 	}
 
@@ -311,6 +311,11 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	}
 
 	private AnimationLayer.Frame selectedFrame;
+	
+	// Goes through all the animations and purges them of orphaned data
+	public void purge() {
+		
+	}
 
 	// :::: Observers
 	private final ObserverHandler<MAnimationStructureObserver> animationStructureObs = new ObserverHandler<>();

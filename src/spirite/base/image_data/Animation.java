@@ -10,9 +10,21 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 
 public abstract class Animation {
 	protected String name;
-	AnimationManager context;
+	protected ImageWorkspace context;
+	protected AnimationManager animationManager;
 	
-	protected void triggerChange() {if( context != null) context.triggerChangeAnimation(this);}
+	protected Animation( ImageWorkspace context) {
+		this.context = context;
+		this.animationManager = context.getAnimationManager();
+	}
+	
+	void setContext(ImageWorkspace context) {
+		this.context = context;
+		this.animationManager = context.getAnimationManager();
+	}
+	
+	
+	protected void triggerChange() {if( animationManager != null) animationManager.triggerChangeAnimation(this);}
 	public abstract void drawFrame( GraphicsContext gc, float t);
 	public abstract List<TransformedHandle> getDrawList( float t);
 	public abstract List<List<TransformedHandle>> getDrawTable( float t, AnimationState state);
@@ -20,6 +32,7 @@ public abstract class Animation {
 	public abstract float getEndFrame();
 	public abstract void importGroup( GroupNode node);
 	public abstract boolean isFixedFrame();
+	public abstract void purge();
 
 	public abstract List<GroupNode> getGroupLinks();
 	public abstract void interpretChange( GroupNode node, StructureChangeEvent evt);

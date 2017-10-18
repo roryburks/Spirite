@@ -1,0 +1,5 @@
+004: added Dynamic [Image Type]
+   : added Expanded bitflag to Nodes
+005: added Scale and Rotation to Rig Parts
+006: added Prismatic [Image Type]
+007: added RigAnimLayers [Animation Type]

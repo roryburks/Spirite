@@ -77,6 +77,21 @@ Per Animation:
                 [2, ushort] : Length
                 If MarkerID == FRAME
                     [4, int] : NodeID of LayerNode Bound to (see Bellow)
+    0x02 : RigAnimation
+        [2, ushort] : Number of Sprites
+        Per Sprite:
+        	[4, int] : NodeID of LayerNode of Sprite
+            [2, ushort] : Number of Parts
+            Per Part:
+                [n, UTF8 str] : Part Type Name
+                [2, ushort] : Number of Key Frames
+                Per Key Frame:
+                	[4, float] : time index
+		            [4, float] : translationX
+		            [4, float] : translationY
+		            [4, float] : scaleX
+		            [4, float] : scaleY
+		            [4, float] : rotation
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 

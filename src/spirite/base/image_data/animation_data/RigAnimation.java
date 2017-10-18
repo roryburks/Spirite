@@ -10,12 +10,15 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javafx.util.Pair;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -26,13 +29,13 @@ import spirite.base.util.interpolation.CubicSplineInterpolatorND;
 
 public class RigAnimation extends Animation {
 	public static class PartKeyFrame {
-		float tx;
-		float ty;
-		float sx = 1f;
-		float sy = 1f;
-		float rot;
-		PartKeyFrame() {}
-		PartKeyFrame(float tx, float ty, float sx, float sy, float rot) {
+		public float tx;
+		public float ty;
+		public float sx = 1f;
+		public float sy = 1f;
+		public float rot;
+		public PartKeyFrame() {}
+		public PartKeyFrame(float tx, float ty, float sx, float sy, float rot) {
 			this.tx = tx;
 			this.ty = ty;
 			this.sx = sx;
@@ -44,9 +47,11 @@ public class RigAnimation extends Animation {
 	public class RigAnimLayer {
 		private final Map<Part, PartFrames> map = new HashMap<>();
 		public final SpriteLayer sprite;
+		public final LayerNode layer;
 		
-		RigAnimLayer( SpriteLayer sprite) {
-			this.sprite = sprite;
+		RigAnimLayer( LayerNode layer) {
+			this.sprite = (SpriteLayer) layer.getLayer();
+			this.layer = layer;
 		}
 		public PartFrames getPartFrames( Part part) {
 			PartFrames frames = map.get(part);
@@ -57,7 +62,8 @@ public class RigAnimation extends Animation {
 			return frames;
 		}
 		
-		class PartFrames {
+		
+		public class PartFrames {
 			TreeMap<Float, PartKeyFrame> frameMap = new TreeMap<>();
 			
 			// 0 : tx
@@ -102,6 +108,16 @@ public class RigAnimation extends Animation {
 				return new PartKeyFrame(datum[0], datum[1], datum[2], datum[3], datum[4]);
 			}
 			
+
+			public List<Pair<Float,PartKeyFrame>> getKeyFrames() {
+				List<Pair<Float,PartKeyFrame>> list = new ArrayList<>(frameMap.entrySet().size());
+				for( Entry<Float,PartKeyFrame> entry : frameMap.entrySet()) {
+					list.add( new Pair<Float,PartKeyFrame>(entry.getKey(), entry.getValue()));
+				}
+				
+				return list;
+			}
+			
 			
 			/** Builds the interpolator if it needs to be updated.  NOTE: May be null. */
 			private void buildInterpolator() {
@@ -139,13 +155,21 @@ public class RigAnimation extends Animation {
 	private final List<RigAnimLayer> rigLayers = new ArrayList<>();
 	
 	boolean interpolatorIsConstructed = false;
+
+	public RigAnimation( ImageWorkspace context, String name) {
+		super(context);
+		this.name = name;
+	}
 	
-	public RigAnimation( SpriteLayer sprite, String name) {
-		this.rigLayers.add( new RigAnimLayer(sprite));
+	public RigAnimation( LayerNode node, String name) {
+		super( node.getContext());
+		this.rigLayers.add( new RigAnimLayer(node));
 		this.name = name;
 		
 		Random r = new Random();
-		for( Part part : sprite.getParts()) {
+		
+		// !!!! DEBUG !!!!
+		for( Part part : this.rigLayers.get(0).sprite.getParts()) {
 			//PartFrames pfs = rigLayers.get(0).getPartFrames(part);
 			for( int i=0; i<=10; ++i) {
 				PartKeyFrame key = new PartKeyFrame();
@@ -155,14 +179,23 @@ public class RigAnimation extends Animation {
 				rigLayers.get(0).getPartFrames(part).frameMap.put((float)i, key);
 			}
 		}
+		// !!!! DEBUG !!!!
 	}
 	
+	public List<RigAnimLayer> getSpriteLayers() {
+		return new ArrayList<>(rigLayers);
+	}
 	public List<SpriteLayer> getSprites() {
 		List<SpriteLayer> layer = new ArrayList<>(rigLayers.size());
 		for( RigAnimLayer rail : rigLayers)
 			layer.add(rail.sprite);
 		
 		return layer;
+	}
+	public RigAnimLayer addSprite( LayerNode node) {
+		RigAnimLayer rain = new RigAnimLayer(node);
+		this.rigLayers.add( rain);
+		return rain;
 	}
 	
 	@Override
@@ -242,4 +275,14 @@ public class RigAnimation extends Animation {
 
 
 	@Override public boolean isFixedFrame() {return false; }
+
+	@Override
+	public void purge() {
+		Iterator<RigAnimLayer> it = rigLayers.iterator();
+		while( it.hasNext()) {
+			RigAnimLayer rail = it.next();
+			if( !context.nodeInWorkspace(rail.layer))
+				it.remove();
+		}
+	}
 }

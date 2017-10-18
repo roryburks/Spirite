@@ -22,6 +22,10 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.animation_data.RigAnimation;
+import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
+import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
+import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
@@ -30,6 +34,7 @@ import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
@@ -259,10 +264,12 @@ public class LoadEngine {
 				int ox = helper.ra.readShort();
 				int oy = helper.ra.readShort();
 				int imgSize = helper.ra.readInt();
+				System.out.println(imgSize+ "::" + helper.ra.getFilePointer());
 				
 				byte[] buffer = new byte[imgSize];
 				helper.ra.read(buffer);
 				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
+				System.out.println(imgSize+ "::" + helper.ra.getFilePointer());
 
 				dataMap.put(identifier, new DynamicInternalImage(img,ox,oy,helper.workspace));
 				break;}
@@ -427,9 +434,10 @@ public class LoadEngine {
 			
 			int type = helper.ra.readByte();
 			
-			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) {
+			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) 
 				loadFixedFrameAnimation( helper, name);
-			}
+			else if( type == SaveLoadUtil.ANIM_RIG)
+				loatRigAnimation( helper, name);
 			else {
 				MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unrecognized Animation Type: " + type);
 				return;
@@ -466,6 +474,45 @@ public class LoadEngine {
 			animation.addBuiltLayer(builder);
 		}
 		helper.workspace.getAnimationManager().addAnimation(animation);
+	}
+	private void loatRigAnimation( LoadHelper helper, String name) 
+			throws IOException 
+	{
+		RigAnimation animation = new RigAnimation(helper.workspace, name);
+		
+		// [2] : Number of Sprites
+		int numSprites = helper.ra.readUnsignedShort();
+		
+		for( int i=0; i<numSprites; ++i) {
+			int spriteNodeId = helper.ra.readInt();			// [4] : NodeID of Sprite
+			int numParts = helper.ra.readUnsignedShort();	// [2] : Number of Parts
+			
+			RigAnimLayer rail = animation.addSprite((LayerNode) helper.nodes.get(spriteNodeId));
+			SpriteLayer sprite = (SpriteLayer)((LayerNode) helper.nodes.get(spriteNodeId)).getLayer();
+			List<Part> parts = sprite.getParts();
+			
+			for( int p=0; p<numParts; ++p) {
+				String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);	// [n] : Part Type Name
+				int numKeyFrames = helper.ra.readUnsignedShort();	// [2] : Number of Key Frames
+				
+				Part part = null;
+				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
+				
+				PartFrames partFrames = rail.getPartFrames(part);
+				
+				for( int k=0; k<numKeyFrames; ++k) {
+					float t = helper.ra.readFloat();
+					PartKeyFrame keyframe = new PartKeyFrame(
+							helper.ra.readFloat(),	//tx
+							helper.ra.readFloat(),	//ty
+							helper.ra.readFloat(),	//sx
+							helper.ra.readFloat(),	//sy
+							helper.ra.readFloat());	//rot
+					
+					partFrames.addKeyFrame(t, keyframe);
+				}
+			}
+		}
 	}
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards

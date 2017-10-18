@@ -39,17 +39,16 @@ public class FixedFrameAnimation extends Animation
 	private ArrayList<AnimationLayer> layers = new ArrayList<>();
 	private int startFrame;
 	private int endFrame;
-	private final ImageWorkspace context;
 
 	public FixedFrameAnimation(GroupNode group, String name) {
-		context = group.getContext();
+		super( group.getContext());
 		layers.add( constructFromGroup(group));
 		this.name = name;
 		recalculateMetrics();
 	}
 	
 	public FixedFrameAnimation( String name, ImageWorkspace workspace) {
-		this.context = workspace;
+		super( workspace);
 		this.name = name;
 	}
 
@@ -650,11 +649,13 @@ public class FixedFrameAnimation extends Animation
 			return new ArrayList<>(keyTimes);
 		}*/
 	}
-
-
-
-
-
-
-
+	@Override
+	public void purge() {
+		Iterator<AnimationLayer> it = layers.iterator();
+		while(it.hasNext() ) {
+			AnimationLayer layer = it.next();
+			if( layer.group != null && !context.nodeInWorkspace(layer.group))
+				it.remove();
+		}		
+	}
 }

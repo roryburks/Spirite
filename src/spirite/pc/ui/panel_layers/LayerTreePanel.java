@@ -543,7 +543,7 @@ public class LayerTreePanel extends ContentTree
 			String name = JOptionPane.showInputDialog("Enter name for new Animation:", contextMenu.node.getName());
 			
 			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new RigAnimation(sprite, name));
+			manager.addAnimation(new RigAnimation((LayerNode) contextMenu.node, name));
 			
 			break;}
 		case "animinsert":{

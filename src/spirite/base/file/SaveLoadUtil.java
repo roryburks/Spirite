@@ -24,6 +24,7 @@ public class SaveLoadUtil {
 	public static final byte NODE_RIG_LAYER = 0x02;	
 	// :::: Animation Type Identifiers
 	public static final byte ANIM_FIXED_FRAME = 0x01;
+	public static final byte ANIM_RIG = 0x02;
 	
 	
 	
