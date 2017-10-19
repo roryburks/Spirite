@@ -1,5 +1,6 @@
 package spirite.base.image_data.animation_data;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 import spirite.base.util.MUtil;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 
 /**
  * A FixedFrameAnimation 
@@ -116,8 +119,6 @@ public class FixedFrameAnimation extends Animation
 			if( node instanceof LayerNode)
 				layer.frames.add( layer.new Frame((LayerNode) node, 1, Marker.FRAME));
 		}
-		
-		layer.frames.add(layer.new Frame(null, 0, Marker.END_AND_LOOP));
 		
 		return layer;
 	}
@@ -356,10 +357,8 @@ public class FixedFrameAnimation extends Animation
 		FRAME,
 		START_LOCAL_LOOP,	
 		END_LOCAL_LOOP,
-		END_AND_LOOP,
 		EMPTY,
 	}
-
 	public class AnimationLayer {
 		public class Frame {
 			private int length;
@@ -432,6 +431,28 @@ public class FixedFrameAnimation extends Animation
 		}
 		
 		// :::: Direct Action
+		private void performFrameStateChange( final List<Frame> newStructure, String description) {
+			final List<Frame> oldList = new ArrayList<>(frames);
+			context.getUndoEngine().performAndStore( new NullAction() {
+				@Override
+				protected void performAction() {
+					frames.clear();
+					frames.addAll(newStructure);
+					_triggerChange();
+				}
+
+				@Override
+				protected void undoAction() {
+					frames.clear();
+					frames.addAll(oldList);
+					_triggerChange();
+				}
+				@Override
+				public String getDescription() {
+					return description;
+				}
+			});
+		}
 		
 		/*** Adds an empty frame to fill the gap starting at StartTick of length length. */
 		public void addGap( int startTick, int length) {
@@ -439,24 +460,11 @@ public class FixedFrameAnimation extends Animation
 			int start = (before == -1) ? startTick : Math.min(startTick,frames.get(before).getStart());
 			
 			Frame toAdd = new Frame(null, start-startTick + length, Marker.EMPTY);
-			context.getUndoEngine().performAndStore( new NullAction() {
-				@Override protected void undoAction() {
-					frames.remove(toAdd);
-					_triggerChange();
-				}
-				
-				@Override protected void performAction() {
-					if( before == -1)
-						frames.add(toAdd);
-					else
-						frames.add(before,toAdd);
-					_triggerChange();
-				}
-				@Override
-				public String getDescription() {
-					return "Add Animation Gap";
-				}
-			});
+			List<Frame> newStructure = new ArrayList<>(frames.size()+1);
+			newStructure.addAll( frames.subList(0, before));
+			newStructure.add(toAdd);
+			newStructure.addAll( frames.subList(before, frames.size()));
+			performFrameStateChange(newStructure, "Add Animation Gap");
 		}
 		
 		/** Moves a given frame into this animation layer at the given startTick.
@@ -480,14 +488,8 @@ public class FixedFrameAnimation extends Animation
 			// TODO: Make it erase gaps
 		}
 		
-		public void addNode( LayerNode toAdd, Frame frameBefore) {
-			
-		}
-		public void removeNode( LayerNode toAdd, Frame frameBefore) {
-			
-		}
-		
-		// :::: Link Interpretation
+		// ============================
+		// ==== Link Interpretation ====
 		public void nodeMoved(LayerNode moveNode) {
 			Iterator<Frame> it = frames.iterator();
 			while( it.hasNext()) {
@@ -528,81 +530,91 @@ public class FixedFrameAnimation extends Animation
 		}
 
 
+		// =============================
+		// ==== Frame Index Methods ====
 		public int getStart() {
-			int i = 0;
-			for( Frame frame : frames) {
-				if( frame.marker == Marker.FRAME) {
-					return i;
-				}
-				i += frame.length;
-			}
-			return -1;
+			return 0;
 		}
 		public int getEnd() {
-			int i = 0;
-			for( Frame frame : frames) {
-				i += frame.length;
-				
+			int caret = 0;
+			for( int i=0; i<frames.size(); ++i) {
+				caret += frames.get(i).length;
+				if( frames.get(i).marker == Marker.START_LOCAL_LOOP)
+					while( frames.get(++i).marker != Marker.END_LOCAL_LOOP);
 			}
-			return i;
+			
+			return caret;
 		}
 		
 		public Frame getFrameForMet( int met) {
-			int wm = 0;
-			for( int i=0; i < frames.size(); ++i) {
-				Frame frame = frames.get(i);
-				if( met - wm < frame.length)
-					return frame;
-				wm += frame.length;
-			}
+			return getFrameForMet( met, false);
+		}
+		public Frame getFrameForMet( int met, boolean noLoop) {
+			int caret = 0;
+			int index = 0;
+			int loopLen = 0;
 			
-			return null;
+			if( frames.isEmpty())
+				return null;
+			
+			while( true) {
+				Frame frame = frames.get(index++);	// Watch the early increment
+				if( (met - caret) < frame.length ) {
+					switch( frame.marker) {
+					case START_LOCAL_LOOP:
+						return _getFrameFromLocalLoop( index, met-caret);
+					case FRAME:
+						return frame;
+					case END_LOCAL_LOOP:
+						MDebug.handleWarning(WarningType.STRUCTURAL, this, "Malformed Animation (END_LOCAL_LOOP with length > 1)");
+					case EMPTY:
+						return null;
+					}
+				}
+				
+				if( index == frames.size()) {
+					if( noLoop || loopLen == 0) 
+						return null;
+					index = 0;
+				}
+				
+				loopLen += frame.length;
+				caret += frame.length;
+			}
+		}
+		
+		private Frame _getFrameFromLocalLoop( int start, int offset) {
+			int index = start + 1;
+			int caret = offset;
+			int loopLen = 0;
+			
+			while( true) {
+				Frame frame = frames.get(index);
+				
+				if( (offset - caret) < frame.length) {
+					switch( frame.marker) {
+					case START_LOCAL_LOOP:
+						return _getFrameFromLocalLoop( index, offset-caret);
+					case FRAME:
+						return frame;
+					case END_LOCAL_LOOP:
+						if( loopLen == 0)
+							return null;
+						else 
+							index = 0;
+						break;
+					case EMPTY:
+						return null;
+					}
+				}
+				loopLen += frame.length;
+				caret += frame.length;
+			}
 		}
 		
 		public LayerNode getLayerForMet( int met) {
-			int tick = 0;
-			boolean looping = false;
-			int startLoop = 0;
-			int loopSize;
-			LayerNode layer = null;
-			List<LayerNode> loopLayer = new ArrayList<>(0);
-			List<Integer> loopmarkers = new ArrayList<>(0);
-			
-			
-			for( int index=0; index < frames.size(); ++index) {
-				Frame frame = frames.get(index);
-
-				tick += frame.length;
-				switch( frame.marker) {
-				case FRAME:
-					layer = frame.node;
-					break;
-				case START_LOCAL_LOOP:
-					looping = true;
-					startLoop = tick;
-					break;
-				case END_AND_LOOP:
-					if( tick == 0)
-						return null;
-					index = -1;
-					break;
-				case END_LOCAL_LOOP:
-					looping = false;
-					loopSize = tick - startLoop;
-					break;
-				case EMPTY:
-					layer = null;
-					break;
-				}
-				if( tick > met) {
-					if( looping) {
-						// TODO
-					}
-					else return layer;
-				}
-			}
-			
-			return layer;
+			Frame f = getFrameForMet(met);
+			return (f == null) ? null : f.node;
 		}
 		
 		public GroupNode getGroupLink() {

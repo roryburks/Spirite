@@ -517,9 +517,9 @@ public class AnimationSchemeTreePanel extends JPanel
 					FrameTypeBehavior behavior = null;
 					
 					switch( frame.getMarker()) {
-					case END_AND_LOOP:
-						behavior = new EndMarkerBehavior();
-						break;
+//					case END_AND_LOOP:
+//						behavior = new EndMarkerBehavior();
+//						break;
 					case END_LOCAL_LOOP:
 					case START_LOCAL_LOOP:
 					case EMPTY:

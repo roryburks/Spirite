@@ -20,6 +20,7 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -32,6 +33,7 @@ import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
+import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -42,7 +44,10 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.util.Colors;
 import spirite.hybrid.Globals;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
 
@@ -264,10 +269,72 @@ public class FFAnimationSchemePanel extends JPanel
 		
 		layout.setHorizontalGroup(horGroup);
 		layout.setVerticalGroup(vertGroup);
+		
+		content.addMouseListener( new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				int t = TickAtY(e.getY());
+				if( t >= 0 && t < end)
+					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(t);
+			}
+		});
 
 		content.setLayout(layout);
 	}
 	
+	
+	// ======================
+	// ==== Context Menu ====
+	private final JPopupMenu contextMenu = new JPopupMenu();
+	private Object cmenuObject;
+	private final ActionListener cmenuListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			switch( e.getActionCommand()) {
+			case "duplicate": {
+				ws.duplicateNode(((Frame)cmenuObject).getLayerNode());
+				break;}
+			case "insertEmpty":{
+				Frame f = (Frame)cmenuObject;
+				f.getLayerContext().addGap(f.getEnd(), 1);
+				break;}
+			case "localLoop":{
+				break;}
+			default: 
+				MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
+			}
+		}
+	};
+	
+	private void _openContextMenuForFrame( int layerIndex, int tick, Point p) {
+		List<AnimationLayer> layers = animation.getLayers();
+		if( layerIndex < 0 || layerIndex >= layers.size())
+			return;
+		
+		_openContextMenuForFrame(layers.get(layerIndex), tick, p);
+	}
+	
+	private void _openContextMenuForFrame(AnimationLayer layer, int tick, Point p) {
+		Frame frame = layer.getFrameForMet(tick, true);
+		_openContextMenuForFrame( frame, p);
+	}
+	private void _openContextMenuForFrame(Frame frame, Point p) {
+		if( frame.getMarker() == Marker.FRAME) {
+			contextMenu.removeAll();
+			
+			Object[][] menuScheme = {
+				{"Duplicate Node", "duplicate"},
+				{"Insert Empty After", "insertEmpty"},
+				{"Wrap in Local Loop","localLoop"}
+			};
+			cmenuObject = frame;
+			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+			contextMenu.show(this, p.x, p.y);
+		}
+	}
+	
+	
+	// =====================================
+	// ==== Coordinate / Position Stuff ====
 	private Rectangle GetFrameBounds( int layer, int tick) {
 		
 		int sx = TL_WIDTH;
@@ -281,6 +348,12 @@ public class FFAnimationSchemePanel extends JPanel
 	}
 	private int TickAtY( int y) {
 		return (y - LAYER_TITLE_BAR_HEIGHT)/ROW_HEIGHT;
+	}
+	private AnimationLayer LayerAtX( int x) {
+		int ind = (x - TL_WIDTH) / LAYER_TITLE_BAR_HEIGHT;
+		List<AnimationLayer> layers = animation.getLayers();
+		
+		return (ind < 0 || ind >= layers.size()) ? null : layers.get(ind);
 	}
 	
 	// :::: WorkspaceObserver
@@ -676,23 +749,27 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if( state == null) {
-					if( e.getY() <  DRAG_BORDER && hasLowerExpand())
-						setState( new ResizingState(true));
-					else if( e.getY() > getHeight() - DRAG_BORDER)
-						setState( new ResizingState(false));
-					else {
-						ws.getAnimationManager().selectFrame(frame);
-						setState( new DraggingFrameState());
+				if( e.getButton() == MouseEvent.BUTTON1) {
+					if( state == null) {
+						if( e.getY() <  DRAG_BORDER && hasLowerExpand())
+							setState( new ResizingState(true));
+						else if( e.getY() > getHeight() - DRAG_BORDER)
+							setState( new ResizingState(false));
+						else {
+							ws.getAnimationManager().selectFrame(frame);
+							setState( new DraggingFrameState());
+						}
 					}
+					
+					ws.setSelectedNode(frame.getLayerNode());
+					
+					Point p = e.getPoint();
+					p = SwingUtilities.convertPoint( FramePanel.this, p, content);
+					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(TickAtY(p.y));
 				}
-				
-				ws.setSelectedNode(frame.getLayerNode());
-				
-				Point p = e.getPoint();
-				p = SwingUtilities.convertPoint( FramePanel.this, p, content);
-				ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(TickAtY(p.y));
-				
+				else if( e.getButton() == MouseEvent.BUTTON3) {
+					_openContextMenuForFrame(frame, e.getPoint());
+				}
 				super.mousePressed(e);
 			}
 
