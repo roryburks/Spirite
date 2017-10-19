@@ -30,6 +30,7 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 
 /**
@@ -372,11 +373,22 @@ public class FixedFrameAnimation extends Animation
 				this.marker = marker;
 			}
 			public int getStart() { 
-				int i = 0;
-				for( Frame frame : frames) {
-					if( frame == this)
-						return i;
-					i += frame.length;
+				// Ugly?
+				List<Integer> carets = new ArrayList<>(1);
+				carets.add(0, 0);
+				int loopDepth = 0;
+				for( int index = 0; index < frames.size(); ++index) {
+					if( frames.get(index) == this)
+						return carets.get(loopDepth);
+					carets.set(loopDepth, carets.get(loopDepth) + frames.get(index).length);
+					if( frames.get(index).marker == Marker.START_LOCAL_LOOP) {
+						carets.add(loopDepth + 1, carets.get(loopDepth) - frames.get(index).length);
+						loopDepth++;
+					}
+					if( frames.get(index).marker == Marker.END_LOCAL_LOOP) {
+						carets.remove(loopDepth);
+						loopDepth--;
+					}
 				}
 				return Integer.MIN_VALUE; 
 			}
@@ -414,6 +426,20 @@ public class FixedFrameAnimation extends Animation
 				});
 			}
 			
+			public int getLoopDepth() {
+				int depth = 0;
+				for( Frame f : frames) {
+					if( f == this)
+						return depth;
+					if( f.marker == Marker.START_LOCAL_LOOP)
+						depth += 1;
+					if( f.marker == Marker.END_LOCAL_LOOP)
+						depth -= 1;
+				}
+				if( depth != 0)
+					MDebug.handleError(ErrorType.STRUCTURAL, "Start-End loop mismatch");
+				return depth;
+			}
 		}
 
 		protected GroupNode group;
@@ -430,7 +456,8 @@ public class FixedFrameAnimation extends Animation
 			this.name = name;
 		}
 		
-		// :::: Direct Action
+		// =============================
+		// ==== State Based Actions ====
 		private void performFrameStateChange( final List<Frame> newStructure, String description) {
 			final List<Frame> oldList = new ArrayList<>(frames);
 			context.getUndoEngine().performAndStore( new NullAction() {
@@ -465,6 +492,45 @@ public class FixedFrameAnimation extends Animation
 			newStructure.add(toAdd);
 			newStructure.addAll( frames.subList(before, frames.size()));
 			performFrameStateChange(newStructure, "Add Animation Gap");
+		}
+		
+		/** Adds a START_LOCAL_LOOP before this frame and a END_LOCAL_LOOP after it. */
+		public void wrapInLoop(Frame frame) {
+			int before = frames.indexOf(frame);
+
+			Frame SoL = new Frame(null, frame.length, Marker.START_LOCAL_LOOP);
+			Frame EoL = new Frame(null, 0, Marker.END_LOCAL_LOOP);
+			List<Frame> newStructure = new ArrayList<>(frames.size()+2);
+			newStructure.addAll(frames.subList(0, before));
+			newStructure.add(SoL);
+			newStructure.add(frame);
+			newStructure.add(EoL);
+			newStructure.addAll(frames.subList(before+1, frames.size()));
+			performFrameStateChange(newStructure, "Added Local Loop");
+			
+		}
+		
+		/** Re-arranges a START_LOCAL_LOOP frame such that it re-wraps around the defined bounds. 
+		 * @param doNotCut if true, it will only resize up until the closest SoF if nested 
+		 * */
+		public void reWrap(Frame sofFrame, int start, int end, boolean doNotCut) {
+			if( sofFrame.getMarker() != Marker.START_LOCAL_LOOP) {
+				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to re-wrap something other than a Start of Local Loop");
+				return;
+			}
+			int sofIndex = frames.indexOf(sofFrame);
+			int eofIndex = sofIndex;
+			while( frames.get(++eofIndex).marker != Marker.END_LOCAL_LOOP);
+			Frame eofFrame  = frames.get(eofIndex);
+			
+
+			List<Frame> newStructure = new ArrayList<>(frames.size());
+			newStructure.addAll(frames.subList(0, start));
+			newStructure.add(sofFrame);
+			newStructure.addAll(frames.subList(start+1, end));
+			newStructure.add(eofFrame);
+			newStructure.addAll(frames.subList(end+1, frames.size()));
+			performFrameStateChange(newStructure, "Resized Local Loop");
 		}
 		
 		/** Moves a given frame into this animation layer at the given startTick.
@@ -571,6 +637,8 @@ public class FixedFrameAnimation extends Animation
 						return null;
 					}
 				}
+				if( frame.marker == Marker.START_LOCAL_LOOP)
+					while( frames.get(index).marker != Marker.END_LOCAL_LOOP) index++;
 				
 				if( index == frames.size()) {
 					if( noLoop || loopLen == 0) 
@@ -584,7 +652,7 @@ public class FixedFrameAnimation extends Animation
 		}
 		
 		private Frame _getFrameFromLocalLoop( int start, int offset) {
-			int index = start + 1;
+			int index = start;
 			int caret = offset;
 			int loopLen = 0;
 			
@@ -656,6 +724,7 @@ public class FixedFrameAnimation extends Animation
 			}
 			return map;
 		}
+
 		
 /*		public List<Integer> getKeyTimes() {
 			return new ArrayList<>(keyTimes);

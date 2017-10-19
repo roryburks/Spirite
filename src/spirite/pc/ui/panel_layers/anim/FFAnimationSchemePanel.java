@@ -76,6 +76,7 @@ public class FFAnimationSchemePanel extends JPanel
 
 	private static final Color ARROW_COLOR = Color.RED;
 	private static final Color DRAG_BORDER_COLOR = Color.green;
+	private static final Color DRAG_LOOP_COLOR = Color.BLACK;
 	private static final Color TITLE_BG = Color.WHITE;
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
 	private final int HOLD_DELAY = 400;
@@ -224,7 +225,34 @@ public class FFAnimationSchemePanel extends JPanel
 			int currentTick = start;
 			
 			List<Component> linked = new ArrayList<>();
+			for(Frame frame : layer.getFrames()) {
+				if( frame.getMarker() == Marker.START_LOCAL_LOOP) {
+					int fs = frame.getStart();
+					int fe = frame.getEnd();
+
+					Component component1 = new SoFFramePanel(frame, col);
+					Component component2 = new EoFFramePanel(frame, col);
+					linked.add(component1);
+					linked.add(component2);
+
+					int h1 = SoFFramePanel.HEIGHT;
+					int h2 = EoFFramePanel.HEIGHT;
+					if( fs > currentTick)
+						vertInner.addGap(ROW_HEIGHT * (fs - currentTick));
+					vertInner.addComponent(component1, h1, h1, h1);
+					vertInner.addGap( ROW_HEIGHT*(fe-fs) - h1 - h2);
+					vertInner.addComponent(component2, h2, h2, h2);
+					horGroups[1+col].addComponent(component1);
+					horGroups[1+col].addComponent(component2);
+					
+					currentTick = fe;
+				}
+			}
 			
+			
+			vertInner = layout.createSequentialGroup();
+			vertMid.addGroup(vertInner);
+			currentTick = start;
 			for(Frame frame : layer.getFrames()) {
 				if( frame.getMarker() == Marker.FRAME)
 				{
@@ -235,7 +263,7 @@ public class FFAnimationSchemePanel extends JPanel
 						if( fs > currentTick)
 							vertInner.addGap(ROW_HEIGHT * (fs - currentTick));
 						
-						Component component = new FramePanel( frame, col);
+						Component component = new FrameFramePanel( frame, col);
 						linked.add(component);
 						int h = ROW_HEIGHT * (fe-fs);
 						vertInner.addComponent(component,h,h,h);
@@ -298,6 +326,8 @@ public class FFAnimationSchemePanel extends JPanel
 				f.getLayerContext().addGap(f.getEnd(), 1);
 				break;}
 			case "localLoop":{
+				Frame f = (Frame)cmenuObject;
+				f.getLayerContext().wrapInLoop(f);
 				break;}
 			default: 
 				MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
@@ -617,7 +647,99 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	}
 	
-	private class FramePanel extends JPanel {
+	private class SoFFramePanel extends JPanel {
+		private static final int HEIGHT = 6;
+		private final Frame frame;
+		private final int column;
+		
+		SoFFramePanel( Frame frame, int column) {
+			this.frame = frame;
+			this.column = column;
+			this.setBackground(Color.ORANGE);
+
+			this.addMouseListener(adapter);
+			this.addMouseMotionListener(adapter);
+		}
+		
+		
+		MouseAdapter adapter = new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd()-1, frame));
+			}
+			public void mouseDragged(MouseEvent e) {
+				if( state instanceof ResizingLoopState) {
+					((ResizingLoopState) state).start = TickAtY( SwingUtilities.convertMouseEvent(SoFFramePanel.this, e, content).getY());
+					content.repaint();
+				}
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				setState( null);
+			}
+		};
+	}
+	private class EoFFramePanel extends JPanel {
+		private static final int HEIGHT = 6;
+		private final Frame frame;
+		private final int column;
+		
+		EoFFramePanel( Frame frame, int column) {
+			this.frame = frame;
+			this.column = column;
+			this.setBackground(Color.ORANGE);
+
+			this.addMouseListener(adapter);
+			this.addMouseMotionListener(adapter);
+		}
+
+		MouseAdapter adapter = new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd()-1, frame));
+			}
+			public void mouseDragged(MouseEvent e) {
+				if( state instanceof ResizingLoopState) {
+					((ResizingLoopState) state).end = TickAtY( SwingUtilities.convertMouseEvent(EoFFramePanel.this, e, content).getY());
+					content.repaint();
+				}
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				setState( null);
+			}
+		};
+	}
+	private class ResizingLoopState extends State {
+		int column;
+		int start = 0;
+		int end = 0;
+		Frame sofFrame;
+		
+		ResizingLoopState( int c, int s, int e, Frame sofFrame) 
+		{this.column = c; this.start = s; this.end = e; this.sofFrame = sofFrame;}
+
+		@Override
+		void EndState() {
+			if( end >= start) {
+				sofFrame.getLayerContext().reWrap(sofFrame, start, end, true);
+			}
+		}
+
+		@Override
+		void StartState() {
+			
+		}
+		
+		@Override
+		void Draw(Graphics g) {
+			Rectangle rect = GetFrameBounds( column, start)
+					.union( GetFrameBounds(column, end));
+			
+			g.setColor( DRAG_LOOP_COLOR);
+			g.drawRect(rect.x, rect.y, rect.width, rect.height);
+		}
+	}
+	
+	private class FrameFramePanel extends JPanel {
 		private final Frame frame;
 		private final int column;
 		
@@ -629,14 +751,17 @@ public class FFAnimationSchemePanel extends JPanel
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				
-				ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLayerNode(), ImageBI.class);
+				if( frame.getMarker() == Marker.FRAME) {
+					ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLayerNode(), ImageBI.class);
+					
+					if( img != null)
+						g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
+				}
 				
-				if( img != null)
-					g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 			}
 		};
 		
-		private FramePanel( Frame frame, int column) {
+		private FrameFramePanel( Frame frame, int column) {
 			this.frame = frame;
 			this.column = column;
 			
@@ -764,7 +889,7 @@ public class FFAnimationSchemePanel extends JPanel
 					ws.setSelectedNode(frame.getLayerNode());
 					
 					Point p = e.getPoint();
-					p = SwingUtilities.convertPoint( FramePanel.this, p, content);
+					p = SwingUtilities.convertPoint( FrameFramePanel.this, p, content);
 					ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(TickAtY(p.y));
 				}
 				else if( e.getButton() == MouseEvent.BUTTON3) {
@@ -801,7 +926,7 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			@Override
 			void mouseDragged(MouseEvent e) {
-				target = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, content).getY());
+				target = TickAtY( SwingUtilities.convertMouseEvent(FrameFramePanel.this, e, content).getY());
 				if( target > frame.getStart() && target < frame.getEnd())
 					target = frame.getStart();
 			}
@@ -847,7 +972,7 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			@Override
 			void mouseDragged(MouseEvent e) {
-				int tickAt = TickAtY( SwingUtilities.convertMouseEvent(FramePanel.this, e, content).getY() + ROW_HEIGHT/2);
+				int tickAt = TickAtY( SwingUtilities.convertMouseEvent(FrameFramePanel.this, e, content).getY() + ROW_HEIGHT/2);
 				
 				floatTick = (north) ?
 						Math.min( frame.getEnd(), tickAt + 1) :
