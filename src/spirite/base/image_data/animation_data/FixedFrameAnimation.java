@@ -26,6 +26,7 @@ import spirite.base.image_data.ImageWorkspace.DeletionChange;
 import spirite.base.image_data.ImageWorkspace.MoveChange;
 import spirite.base.image_data.ImageWorkspace.StructureChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
 import spirite.base.util.MUtil;
@@ -288,7 +289,7 @@ public class FixedFrameAnimation extends Animation
 						if( evt.reversed)
 							layer.nodeRemoved( (LayerNode) addition.node);
 						else
-							layer.nodeAdded( (LayerNode) addition.node);
+							layer.nodeAdded( addition.nodeBefore, (LayerNode) addition.node);
 					}
 				}
 				else if( change instanceof DeletionChange) {
@@ -298,7 +299,7 @@ public class FixedFrameAnimation extends Animation
 							&& layer.getLayers().contains(deletion.node)) 
 					{
 						if( evt.reversed)
-							layer.nodeAdded( (LayerNode) deletion.node);
+							layer.nodeAdded( deletion.nodeBefore, (LayerNode) deletion.node);
 						else
 							layer.nodeRemoved( (LayerNode)deletion.node);
 					}
@@ -309,11 +310,11 @@ public class FixedFrameAnimation extends Animation
 					if( movement.moveNode instanceof LayerNode) {
 						if( movement.oldParent == layer.group &&
 							movement.oldParent == movement.newParent) {
-							layer.nodeMoved( (LayerNode) movement.moveNode);
+							layer.nodeMoved( (evt.reversed)? movement.oldNext:movement.newNext, (LayerNode) movement.moveNode);
 						}
 						else if( movement.oldParent == layer.group) {
 							if( evt.reversed)
-								layer.nodeAdded( (LayerNode) movement.moveNode);
+								layer.nodeAdded( movement.oldNext, (LayerNode) movement.moveNode);
 							else
 								layer.nodeRemoved((LayerNode) movement.moveNode);
 						}
@@ -321,7 +322,7 @@ public class FixedFrameAnimation extends Animation
 							if( evt.reversed)
 								layer.nodeRemoved( (LayerNode) movement.moveNode);
 							else
-								layer.nodeAdded((LayerNode) movement.moveNode);
+								layer.nodeAdded( movement.newNext, (LayerNode) movement.moveNode);
 						}
 					}
 				}
@@ -542,28 +543,33 @@ public class FixedFrameAnimation extends Animation
 			int before = frames.indexOf(frame);
 			int length = frameToMove.length;
 			
+			//context.getUndoEngine().pause();
+
 			if( frame == null)
 				context.moveInto( frameToMove.getLayerNode(), group, true);
 			else if( above)
 				context.moveAbove(frameToMove.getLayerNode(), frame.getLayerNode());
 			else 
 				context.moveBelow(frameToMove.getLayerNode(), frame.getLayerNode());
-			//context.getUndoEngine().pause();
-
+			
+			
+			
+			
+			
 			// TODO: Not entirely properly undoable
 			// TODO: Make it erase gaps
 		}
 		
 		// ============================
 		// ==== Link Interpretation ====
-		public void nodeMoved(LayerNode moveNode) {
+		public void nodeMoved(Node nodeBefore, LayerNode moveNode) {
 			Iterator<Frame> it = frames.iterator();
 			while( it.hasNext()) {
 				Frame frame = it.next();
 				
 				if( frame.getLayerNode() == moveNode) {
 					it.remove();
-					frameAdded(moveNode,frame);
+					frameAdded( nodeBefore, moveNode,frame);
 					return;
 				}
 			}
@@ -575,19 +581,15 @@ public class FixedFrameAnimation extends Animation
 				}
 			});
 		}
-		public void nodeAdded(LayerNode node) { 
-			frameAdded( node, new Frame(node, 1, Marker.FRAME));
+		public void nodeAdded( Node nodeBefore, LayerNode node) { 
+			frameAdded(nodeBefore, node, new Frame(node, 1, Marker.FRAME));
 		}
-		private void frameAdded(LayerNode node, Frame frame) { 
-			Node nodeBefore = node.getPreviousNode();
-			
-			while( nodeBefore != null && !(nodeBefore instanceof LayerNode))
-				nodeBefore = nodeBefore.getPreviousNode();
+		private void frameAdded(Node nodeBefore, LayerNode node, Frame frame) { 
 			
 
 			for( int i=0; i<frames.size(); ++i) {
 				if( frames.get(i).node == nodeBefore) {
-					frames.add(i, frame);
+					frames.add(i + 1, frame);
 					return;
 				}
 			}
