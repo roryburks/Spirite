@@ -592,7 +592,7 @@ public class FixedFrameAnimation extends Animation
 				}
 			}
 				
-			frames.add( frames.size()-1, frame);
+			frames.add( Math.max(frames.size()-1, 0), frame);
 		}
 
 
