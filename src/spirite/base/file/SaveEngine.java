@@ -407,23 +407,26 @@ public class SaveEngine implements MWorkspaceObserver {
 				
 				for( AnimationLayer layer : layers) {
 					// [4] : Group Node Bound to
-					helper.ra.writeInt(helper.nodeMap.get(layer.getGroupLink()));
+					helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
+					
+					// [1] : bit mask
+					helper.ra.writeByte( (layer.includesSubtrees())?1:0);
 					
 					// [2] : Number of Frames
-					List<Frame> frames = layer.getFrames();
-					helper.ra.writeShort(frames.size());
+					List<Frame> linkedFrames = layer.getFrames();
+					linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
+					helper.ra.writeShort(linkedFrames.size());
 					
-					for( Frame frame : frames) {
-						// [1] : Marker
-						helper.ra.writeByte(frame.getMarker().ordinal());
-						
+					for( Frame frame : linkedFrames) {
+						// [4] : NodeID of LayerNode linked to
+						helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
+
 						// [2] : Length
 						helper.ra.writeShort(frame.getLength());
-						
-						if( frame.getMarker() == Marker.FRAME) {
-							// [4] : LayerID (corresponding to order it appears in the file)
-							helper.ra.writeInt( helper.nodeMap.get(frame.getLayerNode()));
-						}
+						// [2] : Gap Before
+						helper.ra.writeShort(frame.getGapBefore());
+						// [2] : Gap After
+						helper.ra.writeShort(frame.getGapAfter());
 					}
 				}
 			}

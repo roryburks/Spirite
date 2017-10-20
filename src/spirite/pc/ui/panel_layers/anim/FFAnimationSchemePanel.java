@@ -321,7 +321,7 @@ public class FFAnimationSchemePanel extends JPanel
 		public void actionPerformed(ActionEvent e) {
 			switch( e.getActionCommand()) {
 			case "duplicate": {
-				ws.duplicateNode(((Frame)cmenuObject).getLayerNode());
+				ws.duplicateNode(((Frame)cmenuObject).getLinkedNode());
 				break;}
 			case "insertEmpty":{
 				Frame f = (Frame)cmenuObject;
@@ -636,8 +636,8 @@ public class FFAnimationSchemePanel extends JPanel
 
 					visible = !visible;
 					for( Frame frame : layer.getFrames()) {
-						if(frame.getLayerNode() != null)
-							frame.getLayerNode().getRender().setVisible(visible);
+						if(frame.getLinkedNode() != null)
+							frame.getLinkedNode().getRender().setVisible(visible);
 					}
 					ue.unpause("Toggle Layer Visibility");
 				}
@@ -754,7 +754,7 @@ public class FFAnimationSchemePanel extends JPanel
 				super.paintComponent(g);
 				
 				if( frame.getMarker() == Marker.FRAME) {
-					ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLayerNode(), ImageBI.class);
+					ImageBI img = (ImageBI)master.getRenderEngine().accessThumbnail(frame.getLinkedNode(), ImageBI.class);
 					
 					if( img != null)
 						g.drawImage( img.img, 0, 0, this.getWidth(), this.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
@@ -780,9 +780,20 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			GroupLayout layout = new GroupLayout(this);
 			
+			
 			int LBTN_WIDTH = 8;
 			Group hor = layout.createParallelGroup();
-			hor.addGroup(layout.createSequentialGroup()
+			Group vert = layout.createSequentialGroup();
+			
+			int before = frame.getGapBefore();
+			if( before > 1) {
+				Component c = new NillFramePanel(false);
+				vert.addComponent(c, before*ROW_HEIGHT,before*ROW_HEIGHT,before*ROW_HEIGHT);
+				hor.addComponent(c);
+			}
+			
+			hor.addGroup(
+					layout.createSequentialGroup()
 					.addGap(2)
 					.addGroup( layout.createParallelGroup()
 							.addComponent(btnVLock, LBTN_WIDTH, LBTN_WIDTH, LBTN_WIDTH)
@@ -791,7 +802,6 @@ public class FFAnimationSchemePanel extends JPanel
 					.addComponent(drawPanel)
 					.addGap(2,2, Short.MAX_VALUE));
 			
-			Group vert = layout.createSequentialGroup();
 			vert.addGroup(layout.createParallelGroup()
 					.addGroup( layout.createSequentialGroup()
 							.addGap(2)
@@ -806,10 +816,18 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			layout.setHorizontalGroup( hor);
 			layout.setVerticalGroup( vert);
-			
-			if( frame.getLength() > 1) {
+
+			int after = frame.getGapAfter();
+			int ext = frame.getLength() - before - after;
+			if( ext > 1) {
 				Component c = new FrameExtendPanel();
 				vert.addComponent(c);
+				hor.addComponent(c, ext*ROW_HEIGHT, ext*ROW_HEIGHT, ext*ROW_HEIGHT);
+			}
+			
+			if( after > 1) {
+				Component c = new NillFramePanel(true);
+				vert.addComponent(c, after*ROW_HEIGHT,after*ROW_HEIGHT,after*ROW_HEIGHT);
 				hor.addComponent(c);
 			}
 
@@ -826,7 +844,7 @@ public class FFAnimationSchemePanel extends JPanel
 				setBackground( Color.WHITE);
 			else if( ws.getAnimationManager().getSelectedFrame() == frame)
 				setBackground( Color.YELLOW);
-			else if( ws.getSelectedNode() == frame.getLayerNode())
+			else if( ws.getSelectedNode() == frame.getLinkedNode())
 				setBackground( new Color(122,170,170));
 			else
 				setBackground( Color.WHITE);
@@ -854,6 +872,21 @@ public class FFAnimationSchemePanel extends JPanel
 				g.fillRect( c - tw/2, b, tw, H - 2*b - hh);
 				g.fillPolygon( new int[] {(W-hw)/2,(W+hw)/2,c}, new int[] {H-b-hh,H-b-hh,H-b}, 3);
 			};
+		}
+		
+		private class NillFramePanel extends JPanel {
+			boolean isAfter;
+			NillFramePanel(boolean isAfter) {
+				this.isAfter = isAfter;
+				this.setOpaque(false);
+			}
+			
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				
+				g.drawRect( 2, 2, getWidth()-4, getHeight()-4);
+			}
 		}
 		
 		private boolean hasLowerExpand() {
@@ -888,7 +921,7 @@ public class FFAnimationSchemePanel extends JPanel
 						}
 					}
 					
-					ws.setSelectedNode(frame.getLayerNode());
+					ws.setSelectedNode(frame.getLinkedNode());
 					
 					Point p = e.getPoint();
 					p = SwingUtilities.convertPoint( FrameFramePanel.this, p, content);

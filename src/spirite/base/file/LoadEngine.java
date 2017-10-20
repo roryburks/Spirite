@@ -447,19 +447,50 @@ public class LoadEngine {
 		}
 	}
 	
-
 //    [2, ushort] : Number of Layers
 //    Per Layer:
 //        [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
-//        [2, ushort] : Number of Frames
+//		  [1, byte] : 0 bit: whether or not subgroups are linked
+//        [2, ushort] : Number of Frames that have information
 //        Per Frame:
-//            [1, byte] : MarkerID
+//            [4, byte] : NodeID 
+//				(note, if it's a LayerNode it's a FrameFrame.  if it's a GroupNode it's a Start_of_loop frame)
 //            [2, ushort] : Length
-//            If MarkerID == FRAME
-//                [4, int] : NodeID of LayerNode Bound to (see Bellow)
+//			[2, ushort] : Gap Before
+//			[2, ushort] : Gap After
 	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
+			throws IOException 
 	{
+		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
 		
+		int layerCount = helper.ra.readUnsignedShort();
+		
+		for( int i=0; i<layerCount; ++i) {
+			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
+			
+			int groupNodeID = helper.ra.readInt();
+			int mask = helper.ra.readByte();
+			int frameCount = helper.ra.readUnsignedShort();
+			
+			
+			GroupNode linkedGroup = ( groupNodeID > 0) ? (GroupNode) helper.nodes.get(groupNodeID) : null;
+			boolean usesSubgroups = ((mask & 1) == 1);
+			
+			for( int j=0; j<frameCount; ++j) {
+				Node node = helper.nodes.get(helper.ra.readInt());
+				int length = helper.ra.readUnsignedShort();
+				int gapBefore = helper.ra.readUnsignedShort();
+				int gapAfter = helper.ra.readUnsignedShort();
+
+				if( node instanceof LayerNode)
+					nodeMap.put( node, new FrameAbstract( node, length, Marker.FRAME, gapBefore, gapAfter));
+				if( node instanceof GroupNode)
+					nodeMap.put( node, new FrameAbstract( node, length, Marker.START_LOCAL_LOOP, gapBefore, gapAfter));
+			}
+			
+			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, usesSubgroups);
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	private void loatRigAnimation( LoadHelper helper, String name) 
@@ -607,7 +638,7 @@ public class LoadEngine {
 				}
 			}
 			
-			animation.addBuiltLinkedLayer(linkedGroup, nodeMap);
+			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, false);
 		}
 		helper.workspace.getAnimationManager().addAnimation(animation);
 	}

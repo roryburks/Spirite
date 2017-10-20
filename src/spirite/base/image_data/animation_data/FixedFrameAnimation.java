@@ -56,7 +56,7 @@ public class FixedFrameAnimation extends Animation
 		this.name = name;
 	}
 	
-	public void addBuiltLinkedLayer( GroupNode link, Map<Node,FrameAbstract> frameMap) {
+	public void addBuiltLinkedLayer( GroupNode link, Map<Node,FrameAbstract> frameMap, boolean usesSubgroups) {
 		
 		AnimationLayer layer = new AnimationLayer();
 		layer.groupLink = link;		
@@ -66,12 +66,7 @@ public class FixedFrameAnimation extends Animation
 			layer.nodeLinks.put(entry.getKey(), layer.new Frame(entry.getValue()));
 		}
 		
-//		layer.groupLink = builder.group;
-//		for( BuildFrame frame : builder.frames) {
-//			layer.frames.add( layer.new Frame(frame.node, frame.length, frame.marker));
-//		}
-//		
-//		layers.add(layer);
+		layer.includeSubtrees = usesSubgroups;
 		layer.groupLinkUpdated();
 		layers.add(layer);
 		_triggerChange();
@@ -281,6 +276,22 @@ public class FixedFrameAnimation extends Animation
 		public void setName(String name) {this.name = name;}
 		public boolean isAsynchronous() {return asynchronous;}
 		public void setAsynchronous(boolean asynchronous) {this.asynchronous = asynchronous;}
+		public boolean includesSubtrees() {return includeSubtrees;}
+		
+		public void setIncludeSubTrees( final boolean newInclude) {
+			final boolean oldInclude = includeSubtrees;
+			context.getUndoEngine().performAndStore( new NullAction() {
+				protected void performAction() {
+					includeSubtrees = newInclude;
+					_triggerChange();
+				}
+				protected void undoAction() {
+					includeSubtrees = oldInclude;
+					_triggerChange();
+				}
+				
+			});
+		}
 
 		public GroupNode getGroupLink() {return groupLink;}
 		public List<Frame> getFrames() { return new ArrayList<>(frames); }
@@ -359,11 +370,11 @@ public class FixedFrameAnimation extends Animation
 			}
 			else {
 				if( frameRelativeTo == null)
-					context.moveInto( frameToMove.getLayerNode(), groupLink, true);
+					context.moveInto( frameToMove.getLinkedNode(), groupLink, true);
 				else if( above)
-					context.moveAbove(frameToMove.getLayerNode(), frameRelativeTo.getLayerNode());
+					context.moveAbove(frameToMove.getLinkedNode(), frameRelativeTo.getLinkedNode());
 				else 
-					context.moveBelow(frameToMove.getLayerNode(), frameRelativeTo.getLayerNode());				
+					context.moveBelow(frameToMove.getLinkedNode(), frameRelativeTo.getLinkedNode());				
 			}
 		}
 		
@@ -441,6 +452,7 @@ public class FixedFrameAnimation extends Animation
 			
 			while( true) {
 				Frame frame = frames.get(index++);	// Watch the early increment
+				loopLen += frame.length;
 				if( (met - caret) < frame.length ) {
 					switch( frame.marker) {
 					case START_LOCAL_LOOP:
@@ -455,12 +467,12 @@ public class FixedFrameAnimation extends Animation
 					while( frames.get(index).marker != Marker.END_LOCAL_LOOP) index++;
 				
 				if( index == frames.size()) {
+					System.out.println("Loop");
 					if( noLoop || loopLen == 0) 
 						return null;
 					index = 0;
 				}
-				
-				loopLen += frame.length;
+
 				caret += frame.length;
 			}
 		}
@@ -494,7 +506,7 @@ public class FixedFrameAnimation extends Animation
 		
 		public LayerNode getLayerForMet( int met) {
 			Frame f = getFrameForMet(met);
-			return (f == null) ? null : f.node;
+			return (f == null) ? null : (LayerNode)f.node;
 		}
 		
 
@@ -533,12 +545,11 @@ public class FixedFrameAnimation extends Animation
 			}
 			public int getEnd() { return getStart()+length; }
 			public int getLength() {return length;}
-			public LayerNode getLayerNode() { return node; }
+			public Node getLinkedNode() { return node; }
 			public Marker getMarker() { return marker;}
 			public AnimationLayer getLayerContext( ) {return AnimationLayer.this;}
 			public int getGapBefore() {return gapBefore;}
 			public int getGapAfter() {return gapAfter;}
-			
 			
 			public void setLength( final int newLength) {
 				if( newLength < 0) 
@@ -625,7 +636,7 @@ public class FixedFrameAnimation extends Animation
 
 	public static class FrameAbstract {
 		protected int length;
-		protected LayerNode node;
+		protected Node node;
 		protected Marker marker;
 		protected int gapBefore;
 		protected int gapAfter;
@@ -638,7 +649,7 @@ public class FixedFrameAnimation extends Animation
 			this.gapBefore = other.gapBefore;
 			this.gapAfter = other.gapAfter;
 		}
-		public FrameAbstract( LayerNode node, int length, Marker marker, int gapBefore, int gapAfter) {
+		public FrameAbstract( Node node, int length, Marker marker, int gapBefore, int gapAfter) {
 			this.length = length;
 			this.node = node;
 			this.marker = marker;

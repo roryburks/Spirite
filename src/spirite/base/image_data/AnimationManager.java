@@ -296,7 +296,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 
 			for (AnimationLayer layer : anim.getLayers()) {
 				for (AnimationLayer.Frame frame : layer.getFrames()) {
-					if (frame.getLayerNode() == node)
+					if (frame.getLinkedNode() == node)
 						return frame;
 				}
 			}
@@ -306,7 +306,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 	}
 
 	public void selectFrame(AnimationLayer.Frame frame) {
-		context.setSelectedNode(frame == null ? null : frame.getLayerNode());
+		context.setSelectedNode(frame == null ? null : frame.getLinkedNode());
 		selectedFrame = frame;
 	}
 

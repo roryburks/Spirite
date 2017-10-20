@@ -637,7 +637,7 @@ public class AnimationSchemeTreePanel extends JPanel
 
 			@Override
 			public void drawBackground(Graphics g, Rectangle bounds) {
-				if( workspace.getSelectedNode() == frame.getLayerNode()) {
+				if( workspace.getSelectedNode() == frame.getLinkedNode()) {
 					g.setColor(pseudoselectColor);
 					g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 				}
@@ -666,7 +666,7 @@ public class AnimationSchemeTreePanel extends JPanel
 					startState( new ResizingFrameState(link, frame) );
 				}
 				else
-					workspace.setSelectedNode(frame.getLayerNode());
+					workspace.setSelectedNode(frame.getLinkedNode());
 			}
 			@Override
 			public void onMouseover(MouseEvent evt) {

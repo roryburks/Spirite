@@ -58,8 +58,8 @@ public class AnimIO {
 		for( AnimationLayer layer : animation.getLayers()) {
 			for( Frame frame : layer.getFrames()) {
 				if( frame.getMarker() == Marker.FRAME) {
-					width = Math.max( width, frame.getLayerNode().getLayer().getWidth());
-					height = Math.max( height, frame.getLayerNode().getLayer().getHeight());
+					width = Math.max( width, ((LayerNode)frame.getLinkedNode()).getLayer().getWidth());
+					height = Math.max( height, ((LayerNode)frame.getLinkedNode()).getLayer().getHeight());
 				}
 			}
 		}
