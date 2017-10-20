@@ -3,7 +3,7 @@ Version 0001
 
 An AAF file is linked to a PNG file.  The PNG file stores a bunch of animation frames packed into a single sheet and the AAF file describes how to unpack them and how to interpret them as an animation.
 
-Note, unlike SIF files, AAF files are versioned for backwards compatibility.  A simpler file format intended to be used as an end-product if conversions are needed scripts can be made manually.
+Note, unlike SIF files, AAF files are not versioned for backwards compatibility.  A simpler file format intended to be used as an end-product if conversions are needed scripts can be made manually.
 
 [4] : version number
 [2] : Number of Animations

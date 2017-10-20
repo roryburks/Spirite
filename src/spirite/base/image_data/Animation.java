@@ -6,7 +6,6 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 
 public abstract class Animation {
 	protected String name;

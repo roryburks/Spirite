@@ -3,3 +3,4 @@
 005: added Scale and Rotation to Rig Parts
 006: added Prismatic [Image Type]
 007: added RigAnimLayers [Animation Type]
+008: Updated FixedFrameAnimation saving/loading (full backwards compatibility not implemented for unusual animations)

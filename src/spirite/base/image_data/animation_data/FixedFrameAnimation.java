@@ -5,10 +5,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -16,19 +14,11 @@ import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
-import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.AdditionChange;
-import spirite.base.image_data.ImageWorkspace.DeletionChange;
-import spirite.base.image_data.ImageWorkspace.MoveChange;
-import spirite.base.image_data.ImageWorkspace.StructureChange;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.UndoEngine.NullAction;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -467,7 +457,6 @@ public class FixedFrameAnimation extends Animation
 					while( frames.get(index).marker != Marker.END_LOCAL_LOOP) index++;
 				
 				if( index == frames.size()) {
-					System.out.println("Loop");
 					if( noLoop || loopLen == 0) 
 						return null;
 					index = 0;
@@ -521,7 +510,7 @@ public class FixedFrameAnimation extends Animation
 				super( other);
 			}
 			public boolean isInGap(int internalMet) {
-				return ( internalMet < gapBefore || (length-1) - internalMet < gapBefore);
+				return ( internalMet < gapBefore || (length-1) - internalMet < gapAfter);
 			}
 			public int getStart() { 
 				// Ugly?
@@ -573,7 +562,7 @@ public class FixedFrameAnimation extends Animation
 			public void setGapBefore( final int newGap) {
 				if( newGap < 0) 
 					throw new IndexOutOfBoundsException();
-				if( length == newGap)
+				if( gapBefore == newGap)
 					return;
 
 				final int oldGap = gapBefore;
@@ -596,7 +585,7 @@ public class FixedFrameAnimation extends Animation
 			public void setGapAfter( final int newGap) {
 				if( newGap < 0) 
 					throw new IndexOutOfBoundsException();
-				if( length == newGap)
+				if( gapAfter == newGap)
 					return;
 				
 				final int oldGap = gapAfter;

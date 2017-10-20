@@ -22,7 +22,6 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLEngine;
-import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -60,7 +59,6 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.jogl.JOGLCore;
-import spirite.pc.jogl.JOGLCore.OnGLLoadObserver;
 import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -175,20 +173,11 @@ public class MasterControl
     boolean initGL() {
     	try {
     		GLEngine engine = GLEngine.getInstance();
-    		JOGLCore.init(new OnGLLoadObserver() {
-				@Override
-				public void onLoad(GL2 gl) throws MGLException {
-					engine.init(gl);
-				}
-			});
+    		JOGLCore.init( (GL2 gl) ->{engine.init(gl);});
     		glcache = new GLCache(this);
     		
     		// TODO: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
-    		SwingUtilities.invokeLater( new Runnable() {
-				@Override public void run() {
-		    		frameManager.getWorkPanel().setGL(true);
-				}
-			});
+    		SwingUtilities.invokeLater( () -> {frameManager.getWorkPanel().setGL(true);});
     	}catch( Exception e) { 
     		MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Could not create OpenGL Context: \n" + e.getMessage());
     		return false;
@@ -233,12 +222,10 @@ public class MasterControl
     		
     		GraphicsContext gc = img.getGraphics();
     		gc.drawImage( img2, 0, 0);
-//    		g.dispose();
     	}
     	
     	try {
     		HybridUtil.saveEXT( img, ext, f);
-//			ImageIO.write( bi, ext, f);
 			settingsManager.setImageFilePath(f);
 		} catch (IOException e) {
 			HybridHelper.showMessage( "", "Failed to Export file: " + e.getMessage());
@@ -455,56 +442,46 @@ public class MasterControl
     private class GlobalCommandExecuter implements CommandExecuter {
     	final Map<String, Runnable> commandMap = new HashMap<>();
     	GlobalCommandExecuter() {
-    		commandMap.put("save_image", new Runnable() {
-				@Override public void run() {
-		    		if( currentWorkspace == null)
-		    			return;
-		    		
-		        	File f=currentWorkspace.getFile();
+    		commandMap.put("save_image",() -> {
+	    		if( currentWorkspace == null)
+	    			return;
+	    		
+	        	File f=currentWorkspace.getFile();
 
-		        	if( currentWorkspace.hasChanged() || f == null) {
-			        	if( f == null)
-			        		f = dialog.pickFileSave();
-			        	
-			        	if( f != null) {
-			        		saveWorkspace(currentWorkspace, f);
-			        		settingsManager.setWorkspaceFilePath(f);
-			        	}
+	        	if( currentWorkspace.hasChanged() || f == null) {
+		        	if( f == null)
+		        		f = dialog.pickFileSave();
+		        	
+		        	if( f != null) {
+		        		saveWorkspace(currentWorkspace, f);
+		        		settingsManager.setWorkspaceFilePath(f);
 		        	}
+	        	}
+			});
+    		commandMap.put("save_image_as", () -> {
+				File f = dialog.pickFileSave();
+				
+				if( f != null) {
+					saveWorkspace(currentWorkspace, f);
 				}
 			});
-    		commandMap.put("save_image_as", new Runnable() {
-				@Override public void run() {
-					File f = dialog.pickFileSave();
-					
-					if( f != null) {
-						saveWorkspace(currentWorkspace, f);
-					}
-				}
-			});
-    		commandMap.put("new_image", new Runnable() {
-				@Override public void run() {
-		    		dialog.promptNewImage();
-				}
-			});
-    		commandMap.put("open_image", new Runnable() {
-    			@Override public void run() {
-	    			File f =dialog.pickFileOpen();
-	    			
-	    			if( f != null) {
-	    	        	loadEngine.openFile( f);
-	    			}
+    		commandMap.put("new_image", () -> {dialog.promptNewImage();});
+    		commandMap.put("open_image", () -> {
+    			File f =dialog.pickFileOpen();
+    			
+    			if( f != null) {
+    	        	loadEngine.openFile( f);
     			}
     		});
-    		commandMap.put("export", new Runnable() {@Override public void run() {
+    		commandMap.put("export", () -> {
 				File f = dialog.pickFileExport();
 				
 				if( f != null) {
 					exportWorkspaceToFile( currentWorkspace, f);
 				}
-			}});
+			});
     		commandMap.put("export_as", commandMap.get("export"));
-    		commandMap.put("copy", new Runnable() {@Override public void run() {
+    		commandMap.put("copy", () -> {
     			if( currentWorkspace == null) return;
     			Node selected = currentWorkspace.getSelectedNode();
     			
@@ -548,8 +525,8 @@ public class MasterControl
 	    	    	
 	    	    	HybridHelper.imageToClipboard(img);
     			}
-    		}});
-    		commandMap.put("copyVisible", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("copyVisible", () -> {
     			if( currentWorkspace == null) return;
     			
     			// Copies the current default render to the Clipboard
@@ -564,13 +541,13 @@ public class MasterControl
     	    			.liftSelectionFromImage(img, 0, 0);
 
     	    	HybridHelper.imageToClipboard(lifted);
-    		}});
-    		commandMap.put("cut", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("cut", () -> {
     			commandMap.get("copy").run();
     			
     			MasterControl.this.executeCommandString("draw.clearLayer");
-    		}});
-    		commandMap.put("paste", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("paste",() -> {
     			RawImage bi = HybridHelper.imageFromClipboard();
     			if( bi == null) return;
     			
@@ -601,8 +578,8 @@ public class MasterControl
 	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
 	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
-    		}});
-    		commandMap.put("pasteAsLayer", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("pasteAsLayer", () -> {
     			RawImage bi = HybridHelper.imageFromClipboard();
     			if( bi == null) return;
     			
@@ -614,17 +591,17 @@ public class MasterControl
 	    			//	Paste Data as new layer
 	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image", InternalImageTypes.NORMAL);
 	    		}
-    		}});
-    		commandMap.put("toggleGL", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("toggleGL", () -> {
     			settingsManager.setGL( !settingsManager.glMode());
-    		}});
-    		commandMap.put("toggleGLPanel", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("toggleGLPanel", () -> {
     			frameManager.getWorkPanel().setGL(!frameManager.getWorkPanel().isGLPanel());
-    		}});
+    		});
     		
-    		commandMap.put("debug1", new Runnable() {@Override public void run() {
+    		commandMap.put("debug1", () -> {
     			toolset.getToolSettings(Tool.PEN).setValue("alpha", 0.5f);
-    		}});
+    		});
     	}
     	
 
@@ -664,30 +641,26 @@ public class MasterControl
     	//	anonymous Runnable's
     	private ImageWorkspace workspace;
     	RelativeWorkspaceCommandExecuter() {
-    		commandMap.put("undo", new Runnable() {@Override public void run() {
-    			workspace.getUndoEngine().undo();
-    		}});
-    		commandMap.put("redo", new Runnable() {@Override public void run() {
-				workspace.getUndoEngine().redo();
-			}});
-    		commandMap.put("shiftRight", new Runnable() {@Override public void run() {
+    		commandMap.put("undo", ()  -> {workspace.getUndoEngine().undo();});
+    		commandMap.put("redo", () -> {workspace.getUndoEngine().redo();});
+    		commandMap.put("shiftRight", () -> {
 				workspace.shiftData(workspace.getSelectedNode(), 1, 0);
-			}});
-    		commandMap.put("shiftLeft", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("shiftLeft", () -> {
 				workspace.shiftData(workspace.getSelectedNode(), -1, 0);
-			}});
-    		commandMap.put("shiftDown", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("shiftDown", () -> {
 				workspace.shiftData(workspace.getSelectedNode(), 0, 1);
-    		}});
-    		commandMap.put("shiftUp", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("shiftUp", () -> {
 				workspace.shiftData(workspace.getSelectedNode(), 0, -1);
-			}});
-    		commandMap.put("newLayerQuick", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("newLayerQuick", () -> {
 				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
 						workspace.getWidth(), workspace.getHeight(), 
 						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
-    		}});
-    		commandMap.put("clearLayer", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("clearLayer", () -> {
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
 					//	accessing handle directly is appropriate.
@@ -695,8 +668,8 @@ public class MasterControl
 					if( image != null) 
 						workspace.getDrawEngine().clear(image);
 				}
-			}});
-    		commandMap.put("cropSelection", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("cropSelection", () -> {
 				Node node = workspace.getSelectedNode();
 				SelectionEngine selectionEngine = workspace.getSelectionEngine();
 				
@@ -711,8 +684,8 @@ public class MasterControl
 				rect.y = selectionEngine.getOffsetY();
 				
 				workspace.cropNode(node, rect, false);
-			}});
-    		commandMap.put("autocroplayer", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("autocroplayer", () -> {
 				Node node = workspace.getSelectedNode();
 				
 				if( node instanceof LayerNode) {
@@ -731,21 +704,21 @@ public class MasterControl
 						e.printStackTrace();
 					}
 				}
-    		}});
-    		commandMap.put("layerToImageSize", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("layerToImageSize", () -> {
 				Node node = workspace.getSelectedNode();
 				
 				if( node != null)
 					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
-    		}});
-    		commandMap.put("invert", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("invert", () -> {
     			BuildingImageData data= workspace.buildActiveData();
     			
     			if( data != null) {
     				workspace.getDrawEngine().invert(data);
     			}
-    		}});
-    		commandMap.put("applyTransform", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("applyTransform", () -> {
 				ToolSettings settings = toolset.getToolSettings( Tool.RESHAPER);
     			if( workspace.getSelectionEngine().isProposingTransform()) 
     				workspace.getSelectionEngine().applyProposedTransform();
@@ -778,16 +751,16 @@ public class MasterControl
     			Penner p = frameManager.getPenner();
     			if( p != null)
     				p.cleanseState();
-    		}});
-    		commandMap.put("toggle_reference", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("toggle_reference", () -> {
 					ReferenceManager rm = workspace.getReferenceManager();
 					rm.setEditingReference(!rm.isEditingReference());
-			}});
-    		commandMap.put("reset_reference", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("reset_reference", () -> {
 					ReferenceManager rm = workspace.getReferenceManager();
 					rm.resetTransform();
-			}});
-    		commandMap.put("lift_to_reference", new Runnable() {@Override public void run() {
+			});
+    		commandMap.put("lift_to_reference", () -> {
     			SelectionEngine se = workspace.getSelectionEngine();
     			ReferenceManager rm = workspace.getReferenceManager();
     			
@@ -799,15 +772,15 @@ public class MasterControl
     			rm.addReference(bi, rm.getCenter(), trans);
     			
     			se.attemptClearSelection();
-			}});
+			});
     		
 
-    		commandMap.put("addGapQuick", new Runnable() {@Override public void run() {
+    		commandMap.put("addGapQuick", () -> {
     			Frame frame = workspace.getAnimationManager().getSelectedFrame();
     			if( frame != null) {
     				frame.setGapAfter(frame.getGapAfter()+1);
     			}
-    		}});
+    		});
     	}
 
 		@Override public List<String> getValidCommands() {
@@ -845,18 +818,18 @@ public class MasterControl
     	private SelectionEngine selectionEngine;
     	
     	public SelectionCommandExecuter() {
-    		commandMap.put("all", new Runnable() {@Override public void run() {
+    		commandMap.put("all", () -> {
     			selectionEngine.setSelection( selectionEngine.buildRectSelection(
     					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
 
-    		}});
-    		commandMap.put("none", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("none", () -> {
     			selectionEngine.unselect();
-    		}});
-    		commandMap.put("invert", new Runnable() {@Override public void run() {
+    		});
+    		commandMap.put("invert", () -> {
     			BuiltSelection sel = selectionEngine.getBuiltSelection();
     			selectionEngine.setSelection( selectionEngine.invertSelection(sel));
-    		}});
+    		});
 		}
     	
 		@Override

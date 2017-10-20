@@ -1,4 +1,4 @@
-Version 0006
+Version 0008
 
 Compatibility Issues: extra byte per Image in ImageData section.
 
@@ -71,12 +71,14 @@ Per Animation:
         [2, ushort] : Number of Layers
         Per Layer:
             [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
-            [2, ushort] : Number of Frames
+			[1, byte] : 0 bit: whether or not subgroups are linked
+            [2, ushort] : Number of Frames that have information
             Per Frame:
-                [1, byte] : MarkerID
+                [4, byte] : NodeID 
+					(note, if it's a LayerNode it's a FrameFrame.  if it's a GroupNode it's a Start_of_loop frame)
                 [2, ushort] : Length
-                If MarkerID == FRAME
-                    [4, int] : NodeID of LayerNode Bound to (see Bellow)
+				[2, ushort] : Gap Before
+				[2, ushort] : Gap After
     0x02 : RigAnimation
         [2, ushort] : Number of Sprites
         Per Sprite:

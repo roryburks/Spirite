@@ -78,7 +78,6 @@ public class DrawEngine {
 			return false;
 		}
 		else {
-//			if( activeEngine instanceof AWTStrokeEngine) stroke.setInterpolationMethod(InterpolationMethod.NONE);
 			activeEngine = settingsManager.getDefaultDrawer().getStrokeEngine();
 			
 			if( activeEngine.startStroke(stroke, ps, workspace.buildData(data), pollSelectionMask()))
@@ -331,7 +330,6 @@ public class DrawEngine {
 		private final StrokeEngine.StrokeParams params;
 		private final StrokeEngine engine;
 		
-		// TODO: This is public for Unit Testing purposes, but that's a bad solution
 		StrokeAction( 
 				StrokeEngine engine,
 				StrokeEngine.StrokeParams params, 

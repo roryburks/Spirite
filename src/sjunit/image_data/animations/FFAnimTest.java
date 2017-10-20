@@ -10,7 +10,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.HybridUtil;
 
 public class FFAnimTest {
 

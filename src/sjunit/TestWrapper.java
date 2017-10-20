@@ -1,12 +1,8 @@
 package sjunit;
 
-import java.util.concurrent.ExecutorCompletionService;
-
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
 
 public class TestWrapper {
 	private static class CarryInfo {

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,6 @@ import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
-import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -323,9 +323,21 @@ public class FFAnimationSchemePanel extends JPanel
 			case "duplicate": {
 				ws.duplicateNode(((Frame)cmenuObject).getLinkedNode());
 				break;}
+			case "insertEmptyBefore":{
+				Frame f = (Frame)cmenuObject;
+				f.setGapBefore(f.getGapBefore()+1);
+				break;}
 			case "insertEmpty":{
 				Frame f = (Frame)cmenuObject;
 				f.setGapAfter(f.getGapAfter()+1);
+				break;}
+			case "removeGapBefore":{
+				Frame f = (Frame)cmenuObject;
+				f.setGapBefore(0);
+				break;}
+			case "removeGapAfter":{
+				Frame f = (Frame)cmenuObject;
+				f.setGapAfter(0);
 				break;}
 			case "localLoop":{
 				Frame f = (Frame)cmenuObject;
@@ -355,6 +367,7 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			Object[][] menuScheme = {
 				{"Duplicate Node", "duplicate"},
+				{"Insert Empty Before", "insertEmptyBefore"},
 				{"Insert Empty After", "insertEmpty"},
 				{"Wrap in Local Loop","localLoop"}
 			};
@@ -786,7 +799,7 @@ public class FFAnimationSchemePanel extends JPanel
 			Group vert = layout.createSequentialGroup();
 			
 			int before = frame.getGapBefore();
-			if( before > 1) {
+			if( before > 0) {
 				Component c = new NillFramePanel(false);
 				vert.addComponent(c, before*ROW_HEIGHT,before*ROW_HEIGHT,before*ROW_HEIGHT);
 				hor.addComponent(c);
@@ -818,6 +831,7 @@ public class FFAnimationSchemePanel extends JPanel
 			layout.setVerticalGroup( vert);
 
 			int after = frame.getGapAfter();
+			System.out.println(after);
 			int ext = frame.getLength() - before - after;
 			if( ext > 1) {
 				Component c = new FrameExtendPanel();
@@ -825,7 +839,8 @@ public class FFAnimationSchemePanel extends JPanel
 				hor.addComponent(c, ext*ROW_HEIGHT, ext*ROW_HEIGHT, ext*ROW_HEIGHT);
 			}
 			
-			if( after > 1) {
+			if( after > 0) {
+				
 				Component c = new NillFramePanel(true);
 				vert.addComponent(c, after*ROW_HEIGHT,after*ROW_HEIGHT,after*ROW_HEIGHT);
 				hor.addComponent(c);
@@ -875,22 +890,38 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 		
 		private class NillFramePanel extends JPanel {
-			boolean isAfter;
 			NillFramePanel(boolean isAfter) {
-				this.isAfter = isAfter;
 				this.setOpaque(false);
+				
+				this.addMouseListener( new MouseAdapter() {
+					@Override
+					public void mousePressed(MouseEvent e) {
+						if( e.getButton() == MouseEvent.BUTTON3 ) {
+							contextMenu.removeAll();
+							Object[][] menuScheme = {{"Remove Gap", (isAfter)?"removeGapAfter":"removeGapBefore"}};
+							cmenuObject = frame;
+							UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+							contextMenu.show(NillFramePanel.this, e.getX(), e.getY());
+						}
+						
+						Point p = e.getPoint();
+						p = SwingUtilities.convertPoint(NillFramePanel.this, p, content);
+						ws.getAnimationManager().getAnimationState(animation).setSelectedMetronome(
+								TickAtY(p.y));
+					}
+				});
 			}
 			
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				
-				g.drawRect( 2, 2, getWidth()-4, getHeight()-4);
+
+				g.setColor(Color.CYAN);
+				g.fillRect(2, 2, getWidth()-4, getHeight()-4);
 			}
 		}
 		
 		private boolean hasLowerExpand() {
-			// TODO: Implement later
 			return false;
 		}
 		
