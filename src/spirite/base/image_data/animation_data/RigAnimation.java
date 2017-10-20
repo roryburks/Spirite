@@ -268,7 +268,7 @@ public class RigAnimation extends Animation {
 	}
 
 	@Override
-	public void interpretChange(GroupNode node, StructureChangeEvent evt) {
+	public void groupChanged( GroupNode node)  {
 	}
 
 

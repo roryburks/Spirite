@@ -20,7 +20,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder;
+import spirite.base.image_data.animation_data.FixedFrameAnimation.FrameAbstract;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
 import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
@@ -309,7 +309,7 @@ public class LoadEngine {
 	{
 
 		if( helper.version <= 1) {
-			_legacyHandleGroupTree0001(helper.workspace, helper.ra, chunkSize, helper);
+			_LEGACY_HandleGroupTree0001(helper.workspace, helper.ra, chunkSize, helper);
 			return;
 		}
 		
@@ -432,8 +432,12 @@ public class LoadEngine {
 			
 			int type = helper.ra.readByte();
 			
-			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) 
-				loadFixedFrameAnimation( helper, name);
+			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) {
+				if( helper.version < 8)
+					_LEGACY_loadFFA(helper, name);
+				else
+					loadFixedFrameAnimation( helper, name);
+			}
 			else if( type == SaveLoadUtil.ANIM_RIG)
 				loatRigAnimation( helper, name);
 			else {
@@ -443,36 +447,21 @@ public class LoadEngine {
 		}
 	}
 	
+
+//    [2, ushort] : Number of Layers
+//    Per Layer:
+//        [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
+//        [2, ushort] : Number of Frames
+//        Per Frame:
+//            [1, byte] : MarkerID
+//            [2, ushort] : Length
+//            If MarkerID == FRAME
+//                [4, int] : NodeID of LayerNode Bound to (see Bellow)
 	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
-			throws IOException 
 	{
-		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
 		
-		int layerCount = helper.ra.readShort();
-		
-		for( int i=0; i<layerCount; ++i) {
-			AnimationLayerBuilder builder = new AnimationLayerBuilder();
-			
-			int groupNodeID = helper.ra.readInt();
-			int frameCount = helper.ra.readShort();
-			
-			if( groupNodeID > 0)
-				builder.setGroupLink((GroupNode) helper.nodes.get(groupNodeID));
-			
-			for( int j=0; j<frameCount; ++j) {
-				Marker marker = Marker.values()[helper.ra.readByte()];
-				int length = helper.ra.readShort();
-				LayerNode node = (marker == Marker.FRAME) 
-						? (LayerNode)helper.nodes.get(helper.ra.readInt())
-						: null;
-				
-				builder.addFrame(marker, length, node);
-			}
-			
-			animation.addBuiltLayer(builder);
-		}
-		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
+	
 	private void loatRigAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
@@ -516,7 +505,7 @@ public class LoadEngine {
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards
 	//	without cluttering code too much
-	private static void _legacyHandleGroupTree0001(
+	private static void _LEGACY_HandleGroupTree0001(
 			ImageWorkspace workspace, 
 			RandomAccessFile ra,
 			int chunkSize,
@@ -588,6 +577,39 @@ public class LoadEngine {
 				node.setOffset(ox, oy);
 			}
 		}
+	}
+
+	private void _LEGACY_loadFFA( LoadHelper helper, String name) 
+			throws IOException 
+	{
+		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
+		
+		int layerCount = helper.ra.readUnsignedShort();
+		
+		for( int i=0; i<layerCount; ++i) {
+			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
+			
+			int groupNodeID = helper.ra.readInt();
+			int frameCount = helper.ra.readUnsignedShort();
+			
+			GroupNode linkedGroup = null;
+			if( groupNodeID > 0) {
+				linkedGroup = (GroupNode) helper.nodes.get(groupNodeID);
+			}
+			for( int j=0; j<frameCount; ++j) {
+				int marker = helper.ra.readByte();
+				int length = helper.ra.readShort();
+				int nodeLink = (marker == 0) ? helper.ra.readInt() : 0;
+				
+				if( nodeLink > 0) {
+					Node node = helper.nodes.get(nodeLink);
+					nodeMap.put( node, new FrameAbstract( (LayerNode) node, length, Marker.FRAME, 0, 0));
+				}
+			}
+			
+			animation.addBuiltLinkedLayer(linkedGroup, nodeMap);
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	public static class BadSIFFFileException extends Exception {

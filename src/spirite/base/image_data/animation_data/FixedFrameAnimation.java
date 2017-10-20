@@ -1,6 +1,5 @@
 package spirite.base.image_data.animation_data;
 
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import spirite.base.graphics.GraphicsContext;
@@ -28,7 +28,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.UndoEngine.NullAction;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayerBuilder.BuildFrame;
+import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.util.MUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -51,76 +51,40 @@ public class FixedFrameAnimation extends Animation
 		this.name = name;
 		recalculateMetrics();
 	}
-	
 	public FixedFrameAnimation( String name, ImageWorkspace workspace) {
 		super( workspace);
 		this.name = name;
 	}
-
-	public void addBuiltLayer(AnimationLayerBuilder builder) {
+	
+	public void addBuiltLinkedLayer( GroupNode link, Map<Node,FrameAbstract> frameMap) {
 		
 		AnimationLayer layer = new AnimationLayer();
-		layer.group = builder.group;
-		for( BuildFrame frame : builder.frames) {
-			layer.frames.add( layer.new Frame(frame.node, frame.length, frame.marker));
+		layer.groupLink = link;		
+		layer.nodeLinks = new HashMap<>();
+		
+		for( Entry<Node,FrameAbstract> entry : frameMap.entrySet()) {
+			layer.nodeLinks.put(entry.getKey(), layer.new Frame(entry.getValue()));
 		}
 		
+//		layer.groupLink = builder.group;
+//		for( BuildFrame frame : builder.frames) {
+//			layer.frames.add( layer.new Frame(frame.node, frame.length, frame.marker));
+//		}
+//		
+//		layers.add(layer);
+		layer.groupLinkUpdated();
 		layers.add(layer);
 		_triggerChange();
 	}
 	
-	public static class AnimationLayerBuilder {
-		private final List<BuildFrame> frames = new ArrayList<>();
-		private GroupNode group;
-		
-		/**
-		 *  Adds the described frame to the list of Frames.  
-		 * 
-		 * @return true if added, false if the frame is malformed or you can't
-		 * add any more frames
-		 */
-		public boolean addFrame( Marker marker, int length, LayerNode node) {
-			BuildFrame frame = new BuildFrame();
-
-			frame.marker = marker;
-			frame.length = length;
-			if( marker == Marker.FRAME) {
-				frame.node = node;
-			}
-			frames.add(frame);
-			
-			return true;
-			
-//			return false;
-		}
-		
-		public void setGroupLink( GroupNode group) {
-			this.group = group;
-		}
-		
-		class BuildFrame {
-			Marker marker;
-			int length;
-			LayerNode node;
-		}
-	}
 	@Override public boolean isFixedFrame() {return true;}
 	
 	
 	private AnimationLayer constructFromGroup( GroupNode group) {
 
 		AnimationLayer layer = new AnimationLayer();
-		layer.group = group;
-		name = group.getName();
-		
-		ListIterator<GroupTree.Node> it = group.getChildren().listIterator(group.getChildren().size());
-		
-		while( it.hasPrevious()) {
-			GroupTree.Node node = it.previous();
-			
-			if( node instanceof LayerNode)
-				layer.frames.add( layer.new Frame((LayerNode) node, 1, Marker.FRAME));
-		}
+		layer.groupLink = group;
+		layer.groupLinkUpdated();
 		
 		return layer;
 	}
@@ -138,26 +102,18 @@ public class FixedFrameAnimation extends Animation
 		}
 	}
 	
-	@Override
-	public float getStartFrame() {
-		return startFrame;
-	}
-	public int getStart() {
-		return startFrame;
-	}
-	@Override
-	public float getEndFrame() {
-		return endFrame-1;
-	}
-	public int getEnd() {
-		return endFrame-1;
-	}
+	@Override public float getStartFrame() { return startFrame; }
+	@Override public float getEndFrame() { return endFrame-1; }
+	public int getStart() { return startFrame; }
+	public int getEnd() { return endFrame-1; }
 	
 	@SuppressWarnings("unchecked")
 	public List<AnimationLayer> getLayers() {
 		return (List<AnimationLayer>) layers.clone();
 	}
 
+	// =================
+	// ==== Drawing ====
 	@Override
 	public void drawFrame(GraphicsContext gc, float t) {
 		int _t = (int)Math.floor(t);
@@ -275,60 +231,11 @@ public class FixedFrameAnimation extends Animation
 	}
 
 	@Override
-	public void interpretChange(GroupNode node, StructureChangeEvent evt) {
-		
-		for( int i=0; i<layers.size(); ++i) {
-			AnimationLayer layer = layers.get(i);
-			
-			if( layer.group == node) {
-				StructureChange change = evt.change;
-				
-				if( change instanceof AdditionChange) {
-					AdditionChange addition = (AdditionChange)change;
-					if( addition.parent == layer.group && addition.node instanceof LayerNode) {
-						if( evt.reversed)
-							layer.nodeRemoved( (LayerNode) addition.node);
-						else
-							layer.nodeAdded( addition.nodeBefore, (LayerNode) addition.node);
-					}
-				}
-				else if( change instanceof DeletionChange) {
-					DeletionChange deletion = (DeletionChange)change;
-					
-					if( deletion.parent == layer.group
-							&& layer.getLayers().contains(deletion.node)) 
-					{
-						if( evt.reversed)
-							layer.nodeAdded( deletion.nodeBefore, (LayerNode) deletion.node);
-						else
-							layer.nodeRemoved( (LayerNode)deletion.node);
-					}
-				}
-				else if( change instanceof MoveChange) {
-					MoveChange movement = (MoveChange)change;
-					
-					if( movement.moveNode instanceof LayerNode) {
-						if( movement.oldParent == layer.group &&
-							movement.oldParent == movement.newParent) {
-							layer.nodeMoved( (evt.reversed)? movement.oldNext:movement.newNext, (LayerNode) movement.moveNode);
-						}
-						else if( movement.oldParent == layer.group) {
-							if( evt.reversed)
-								layer.nodeAdded( movement.oldNext, (LayerNode) movement.moveNode);
-							else
-								layer.nodeRemoved((LayerNode) movement.moveNode);
-						}
-						else if( movement.newParent == layer.group) {
-							if( evt.reversed)
-								layer.nodeRemoved( (LayerNode) movement.moveNode);
-							else
-								layer.nodeAdded( movement.newNext, (LayerNode) movement.moveNode);
-						}
-					}
-				}
-			}
+	public void groupChanged( GroupNode node) {
+		for( AnimationLayer layer : layers) {
+			if( layer.groupLink == node)
+				layer.groupLinkUpdated();
 		}
-
 
 		_triggerChange();
 	}
@@ -337,11 +244,9 @@ public class FixedFrameAnimation extends Animation
 	public List<GroupNode> getGroupLinks() {
 		List<GroupNode> list = new ArrayList<>(layers.size());
 		
-		for( AnimationLayer layer : layers) {
-			if( layer.group != null) {
-				list.add(layer.group);
-			}
-		}
+		for( AnimationLayer layer : layers) 
+			if( layer.groupLink != null) 
+				list.add(layer.groupLink);
 		
 		return list;
 	}
@@ -359,106 +264,29 @@ public class FixedFrameAnimation extends Animation
 		FRAME,
 		START_LOCAL_LOOP,	
 		END_LOCAL_LOOP,
-		EMPTY,
 	}
 	public class AnimationLayer {
-		public class Frame {
-			private int length;
-			private LayerNode node;
-			private Marker marker;
-			
-			
-			private Frame( LayerNode node, int length, Marker marker) {
-				this.node = node;
-				this.length = length;
-				this.marker = marker;
-			}
-			public int getStart() { 
-				// Ugly?
-				List<Integer> carets = new ArrayList<>(1);
-				carets.add(0, 0);
-				int loopDepth = 0;
-				for( int index = 0; index < frames.size(); ++index) {
-					if( frames.get(index) == this)
-						return carets.get(loopDepth);
-					carets.set(loopDepth, carets.get(loopDepth) + frames.get(index).length);
-					if( frames.get(index).marker == Marker.START_LOCAL_LOOP) {
-						carets.add(loopDepth + 1, carets.get(loopDepth) - frames.get(index).length);
-						loopDepth++;
-					}
-					if( frames.get(index).marker == Marker.END_LOCAL_LOOP) {
-						carets.remove(loopDepth);
-						loopDepth--;
-					}
-				}
-				return Integer.MIN_VALUE; 
-			}
-			public int getEnd() { return getStart()+length; }
-			public int getLength() {return length;}
-			public LayerNode getLayerNode() { return node; }
-			public Marker getMarker() { return marker;}
-			public AnimationLayer getLayerContext( ) {return AnimationLayer.this;}
-			
-			public void setLength( int newLength) {
-				if( newLength < 0) 
-					throw new IndexOutOfBoundsException();
-				if( length == newLength)
-					return;
-				
-				// Kind of ugly, but since Frames are generally only produced
-				//	indirectly by links to other things, you can't rely on
-				//	the frame objects themselves being stored and saved in any
-				//	UndoAction, so the only reliable thing is the frame position
-				int oldLength = length;
-				int frame = getLayerContext().frames.indexOf(this);
-				context.getUndoEngine().performAndStore( new NullAction() {
-					@Override protected void undoAction() {
-						getLayerContext().frames.get(frame).length = oldLength;
-						_triggerChange();
-					}
-					
-					@Override protected void performAction() {
-						getLayerContext().frames.get(frame).length = newLength;
-						_triggerChange();
-					}
-					@Override public String getDescription() {
-						return "Change Frame Length";
-					}
-				});
-			}
-			
-			public int getLoopDepth() {
-				int depth = 0;
-				for( Frame f : frames) {
-					if( f == this)
-						return depth;
-					if( f.marker == Marker.START_LOCAL_LOOP)
-						depth += 1;
-					if( f.marker == Marker.END_LOCAL_LOOP)
-						depth -= 1;
-				}
-				if( depth != 0)
-					MDebug.handleError(ErrorType.STRUCTURAL, "Start-End loop mismatch");
-				return depth;
-			}
-		}
-
-		protected GroupNode group;
+		protected GroupNode groupLink;
 		protected String name;
 		protected final ArrayList<Frame> frames = new ArrayList<>();
 		protected boolean asynchronous = false;
+
+		// Irrelevant if groupLink == null
+		protected Map<Node,Frame> nodeLinks;
+		protected boolean includeSubtrees = false;
 		
 		private AnimationLayer() {}
 
-		public String getName() {
-			return (group == null)?name:group.getName();
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
+		public String getName() { return (groupLink==null)?name:groupLink.getName();}
+		public void setName(String name) {this.name = name;}
+		public boolean isAsynchronous() {return asynchronous;}
+		public void setAsynchronous(boolean asynchronous) {this.asynchronous = asynchronous;}
+
+		public GroupNode getGroupLink() {return groupLink;}
+		public List<Frame> getFrames() { return new ArrayList<>(frames); }
 		
-		// =============================
-		// ==== State Based Actions ====
+		// =========================================================
+		// ==== State Based Actions (for non-linked Animations) ====
 		private void performFrameStateChange( final List<Frame> newStructure, String description) {
 			final List<Frame> oldList = new ArrayList<>(frames);
 			context.getUndoEngine().performAndStore( new NullAction() {
@@ -482,19 +310,6 @@ public class FixedFrameAnimation extends Animation
 			});
 		}
 		
-		/*** Adds an empty frame to fill the gap starting at StartTick of length length. */
-		public void addGap( int startTick, int length) {
-			int before = frames.indexOf(getFrameForMet(startTick));
-			int start = (before == -1) ? startTick : Math.min(startTick,frames.get(before).getStart());
-			
-			Frame toAdd = new Frame(null, start-startTick + length, Marker.EMPTY);
-			List<Frame> newStructure = new ArrayList<>(frames.size()+1);
-			newStructure.addAll( frames.subList(0, before));
-			newStructure.add(toAdd);
-			newStructure.addAll( frames.subList(before, frames.size()));
-			performFrameStateChange(newStructure, "Add Animation Gap");
-		}
-		
 		/** Adds a START_LOCAL_LOOP before this frame and a END_LOCAL_LOOP after it. */
 		public void wrapInLoop(Frame frame) {
 			int before = frames.indexOf(frame);
@@ -508,7 +323,6 @@ public class FixedFrameAnimation extends Animation
 			newStructure.add(EoL);
 			newStructure.addAll(frames.subList(before+1, frames.size()));
 			performFrameStateChange(newStructure, "Added Local Loop");
-			
 		}
 		
 		/** Re-arranges a START_LOCAL_LOOP frame such that it re-wraps around the defined bounds. 
@@ -538,71 +352,71 @@ public class FixedFrameAnimation extends Animation
 		 * 
 		 *  Note: does not necessarily have to be a frame from this AnimationLayer
 		 *  or even this animation. */
-		public void moveFrame( Frame frameToMove, int startTick, boolean above) {
-			Frame frame = getFrameForMet( startTick);
-			int before = frames.indexOf(frame);
-			int length = frameToMove.length;
+		public void moveFrame( Frame frameToMove, Frame frameRelativeTo, boolean above) {
 			
-			//context.getUndoEngine().pause();
-
-			if( frame == null)
-				context.moveInto( frameToMove.getLayerNode(), group, true);
-			else if( above)
-				context.moveAbove(frameToMove.getLayerNode(), frame.getLayerNode());
-			else 
-				context.moveBelow(frameToMove.getLayerNode(), frame.getLayerNode());
-			
-			
-			
-			
-			
-			// TODO: Not entirely properly undoable
-			// TODO: Make it erase gaps
+			if( groupLink == null) {
+				// TODO
+			}
+			else {
+				if( frameRelativeTo == null)
+					context.moveInto( frameToMove.getLayerNode(), groupLink, true);
+				else if( above)
+					context.moveAbove(frameToMove.getLayerNode(), frameRelativeTo.getLayerNode());
+				else 
+					context.moveBelow(frameToMove.getLayerNode(), frameRelativeTo.getLayerNode());				
+			}
 		}
 		
 		// ============================
 		// ==== Link Interpretation ====
-		public void nodeMoved(Node nodeBefore, LayerNode moveNode) {
-			Iterator<Frame> it = frames.iterator();
-			while( it.hasNext()) {
-				Frame frame = it.next();
+		private void groupLinkUpdated() {
+			if( groupLink != null) {
+				Map<Node,Frame> oldMap = nodeLinks;
+				Map<Node,Frame> newMap = new HashMap<>();
+				frames.clear();
 				
-				if( frame.getLayerNode() == moveNode) {
-					it.remove();
-					frameAdded( nodeBefore, moveNode,frame);
-					return;
-				}
+				_gluRec( oldMap, newMap, groupLink);
+				
+				nodeLinks = newMap;
 			}
 		}
-		public void nodeRemoved(LayerNode node) {
-			frames.removeIf( new Predicate<Frame>() {
-				@Override public boolean test(Frame t) {
-					return ( t.node == node);
+		private int _gluRec( Map<Node,Frame> oldMap, Map<Node,Frame> newMap, GroupNode node) {
+			int len = 0;
+			List<Node> children = node.getChildren();
+			for( int i=children.size()-1; i>=0; --i) {
+				Node child = children.get(i);
+				if( child instanceof GroupNode && includeSubtrees) {
+					boolean usingNew = (oldMap == null || !oldMap.containsKey(child));
+					Frame solFrame = (usingNew) 
+							? new Frame(null, 0, Marker.START_LOCAL_LOOP)
+							: oldMap.get(child);
+					
+					frames.add(solFrame);
+					int subLen = _gluRec( oldMap, newMap, node);
+					if( usingNew)
+						solFrame.length = subLen;
+					frames.add(new Frame(null, 0, Marker.END_LOCAL_LOOP));
+					
+					len += solFrame.length;
+					newMap.put(child, solFrame);
 				}
-			});
-		}
-		public void nodeAdded( Node nodeBefore, LayerNode node) { 
-			frameAdded(nodeBefore, node, new Frame(node, 1, Marker.FRAME));
-		}
-		private void frameAdded(Node nodeBefore, LayerNode node, Frame frame) { 
-			
-
-			for( int i=0; i<frames.size(); ++i) {
-				if( frames.get(i).node == nodeBefore) {
-					frames.add(i + 1, frame);
-					return;
+				else if( child instanceof LayerNode) {
+					Frame newFrame = (oldMap == null || !oldMap.containsKey(child))
+							? new Frame( (LayerNode) child, 1, Marker.FRAME)
+							: oldMap.get(child);
+					frames.add(newFrame);
+					
+					len += newFrame.length;
+					newMap.put(child, newFrame);
 				}
 			}
-				
-			frames.add( Math.max(frames.size()-1, 0), frame);
+			return len;
 		}
 
 
 		// =============================
 		// ==== Frame Index Methods ====
-		public int getStart() {
-			return 0;
-		}
+		public int getStart() { return 0; }
 		public int getEnd() {
 			int caret = 0;
 			for( int i=0; i<frames.size(); ++i) {
@@ -632,11 +446,9 @@ public class FixedFrameAnimation extends Animation
 					case START_LOCAL_LOOP:
 						return _getFrameFromLocalLoop( index, met-caret);
 					case FRAME:
-						return frame;
+						return (frame.isInGap(met-caret) ? null : frame);
 					case END_LOCAL_LOOP:
 						MDebug.handleWarning(WarningType.STRUCTURAL, this, "Malformed Animation (END_LOCAL_LOOP with length > 1)");
-					case EMPTY:
-						return null;
 					}
 				}
 				if( frame.marker == Marker.START_LOCAL_LOOP)
@@ -666,15 +478,13 @@ public class FixedFrameAnimation extends Animation
 					case START_LOCAL_LOOP:
 						return _getFrameFromLocalLoop( index, offset-caret);
 					case FRAME:
-						return frame;
+						return frame.isInGap(offset-caret) ? null : frame;
 					case END_LOCAL_LOOP:
 						if( loopLen == 0)
 							return null;
 						else 
 							index = 0;
 						break;
-					case EMPTY:
-						return null;
 					}
 				}
 				loopLen += frame.length;
@@ -687,57 +497,162 @@ public class FixedFrameAnimation extends Animation
 			return (f == null) ? null : f.node;
 		}
 		
-		public GroupNode getGroupLink() {
-			return group;
-		}
-		
-		
-		public boolean isAsynchronous() {
-			return asynchronous;
-		}
-		public void setAsynchronous(boolean asynchronous) {
-			this.asynchronous = asynchronous;
-		}
-		
-		public List<Frame> getFrames() {
-			return new ArrayList<>(frames);
-		}
-		
-		
 
-		private List<LayerNode> getLayers() {
-			ArrayList<LayerNode> list = new ArrayList<>();
-			for( Frame frame : frames) {
-				if( frame.marker == Marker.FRAME)
-					list.add(frame.node);
+		public class Frame extends FrameAbstract {
+			private Frame( LayerNode node, int length, Marker marker) {
+				super(node, length, marker, 0, 0);
 			}
-			return list;
-		}
-		
-		/** A map of where each Layer exists within the Frame list*/
-		private Map<LayerNode,Integer> getLayerMap() {
-			Map<LayerNode,Integer> map = new HashMap<>();
-			for( int i=0; i<frames.size(); ++i) {
-				Frame frame = frames.get(i);
-				
-				if( frame.getMarker() == Marker.FRAME) {
-					map.put(frame.getLayerNode(), i);
+			private Frame( LayerNode node, int length, Marker marker, int gapBefore, int gapAfter) {
+				super(node, length, marker, gapBefore, gapAfter);
+			}
+			private Frame( FrameAbstract other) {
+				super( other);
+			}
+			public boolean isInGap(int internalMet) {
+				return ( internalMet < gapBefore || (length-1) - internalMet < gapBefore);
+			}
+			public int getStart() { 
+				// Ugly?
+				List<Integer> carets = new ArrayList<>(1);
+				carets.add(0, 0);
+				int loopDepth = 0;
+				for( int index = 0; index < frames.size(); ++index) {
+					if( frames.get(index) == this)
+						return carets.get(loopDepth);
+					carets.set(loopDepth, carets.get(loopDepth) + frames.get(index).length);
+					if( frames.get(index).marker == Marker.START_LOCAL_LOOP) {
+						carets.add(loopDepth + 1, carets.get(loopDepth) - frames.get(index).length);
+						loopDepth++;
+					}
+					if( frames.get(index).marker == Marker.END_LOCAL_LOOP) {
+						carets.remove(loopDepth);
+						loopDepth--;
+					}
 				}
+				return Integer.MIN_VALUE; 
 			}
-			return map;
-		}
+			public int getEnd() { return getStart()+length; }
+			public int getLength() {return length;}
+			public LayerNode getLayerNode() { return node; }
+			public Marker getMarker() { return marker;}
+			public AnimationLayer getLayerContext( ) {return AnimationLayer.this;}
+			public int getGapBefore() {return gapBefore;}
+			public int getGapAfter() {return gapAfter;}
+			
+			
+			public void setLength( final int newLength) {
+				if( newLength < 0) 
+					throw new IndexOutOfBoundsException();
+				if( length == newLength)
+					return;
+				
+				final int oldLength = length;
+				context.getUndoEngine().performAndStore( new NullAction() {
+					protected void performAction() { 
+						length = newLength;
+						_triggerChange();
+					}
+					protected void undoAction() { 
+						length = oldLength;
+						_triggerChange();
+					}
+					public String getDescription() { return "Resize Animation Frame Length";}
+				});
+			}
+			public void setGapBefore( final int newGap) {
+				if( newGap < 0) 
+					throw new IndexOutOfBoundsException();
+				if( length == newGap)
+					return;
 
-		
-/*		public List<Integer> getKeyTimes() {
-			return new ArrayList<>(keyTimes);
-		}*/
+				final int oldGap = gapBefore;
+				final int oldLength = length;
+				final int newLength = length + (newGap-oldGap);
+				context.getUndoEngine().performAndStore( new NullAction() {
+					protected void performAction() {
+						gapBefore = newGap; 
+						length = newLength;
+						_triggerChange();
+					}
+					protected void undoAction() { 
+						gapBefore = oldGap;
+						length = oldLength;
+						_triggerChange();
+					}
+					public String getDescription() { return "Resize Animation Frame Gaps";}
+				});
+			}
+			public void setGapAfter( final int newGap) {
+				if( newGap < 0) 
+					throw new IndexOutOfBoundsException();
+				if( length == newGap)
+					return;
+				
+				final int oldGap = gapAfter;
+				final int oldLength = length;
+				final int newLength = length + (newGap-oldGap);
+				context.getUndoEngine().performAndStore( new NullAction() {
+					protected void performAction() { 
+						gapAfter = newGap; 
+						length = newLength;
+						_triggerChange();
+					}
+					protected void undoAction() { 
+						gapAfter = oldGap;
+						length = oldLength;
+						_triggerChange();
+					}
+					public String getDescription() { return "Resize Animation Frame Gaps";}
+				});
+			}
+			
+			public int getLoopDepth() {
+				int depth = 0;
+				for( Frame f : frames) {
+					if( f == this)
+						return depth;
+					if( f.marker == Marker.START_LOCAL_LOOP)
+						depth += 1;
+					if( f.marker == Marker.END_LOCAL_LOOP)
+						depth -= 1;
+				}
+				if( depth != 0)
+					MDebug.handleError(ErrorType.STRUCTURAL, "Start-End loop mismatch");
+				return depth;
+			}
+		}
 	}
+
+	public static class FrameAbstract {
+		protected int length;
+		protected LayerNode node;
+		protected Marker marker;
+		protected int gapBefore;
+		protected int gapAfter;
+
+		public FrameAbstract() {}
+		public FrameAbstract(FrameAbstract other) {
+			this.length = other.length;
+			this.node = other.node;
+			this.marker = other.marker;
+			this.gapBefore = other.gapBefore;
+			this.gapAfter = other.gapAfter;
+		}
+		public FrameAbstract( LayerNode node, int length, Marker marker, int gapBefore, int gapAfter) {
+			this.length = length;
+			this.node = node;
+			this.marker = marker;
+			this.gapAfter = gapAfter;
+			this.gapBefore = gapBefore;
+		}
+	}
+	
 	@Override
 	public void purge() {
 		Iterator<AnimationLayer> it = layers.iterator();
 		while(it.hasNext() ) {
 			AnimationLayer layer = it.next();
-			if( layer.group != null && !context.nodeInWorkspace(layer.group))
+			if( layer.groupLink != null && !context.nodeInWorkspace(layer.groupLink))
 				it.remove();
 		}		
 	}

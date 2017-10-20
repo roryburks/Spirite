@@ -197,7 +197,8 @@ public class FFAnimationSchemePanel extends JPanel
 			horGroups[i+1].addComponent(titles[i]);
 			titleVertGroup.addComponent( titles[i], LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT);
 		}
-		layout.linkSize(SwingConstants.HORIZONTAL, titles);
+		if( titles.length > 0)
+			layout.linkSize(SwingConstants.HORIZONTAL, titles);
 		
 		// Animation Bars
 		Component[] ticks = new Component[Math.max(0,end-start)];
@@ -214,7 +215,8 @@ public class FFAnimationSchemePanel extends JPanel
 			}
 		}
 		
-		layout.linkSize(SwingConstants.VERTICAL, ticks);
+		if( ticks.length > 0)
+			layout.linkSize(SwingConstants.VERTICAL, ticks);
 		
 		// Fill out the animation
 		for( int col=0; col < layers.size(); ++col) {
@@ -323,7 +325,7 @@ public class FFAnimationSchemePanel extends JPanel
 				break;}
 			case "insertEmpty":{
 				Frame f = (Frame)cmenuObject;
-				f.getLayerContext().addGap(f.getEnd(), 1);
+				f.setGapAfter(f.getGapAfter()+1);
 				break;}
 			case "localLoop":{
 				Frame f = (Frame)cmenuObject;
@@ -934,7 +936,15 @@ public class FFAnimationSchemePanel extends JPanel
 			@Override
 			void EndState() {
 				if( target != frame.getStart()) {
-					frame.getLayerContext().moveFrame(frame, target, target >= frame.getStart());
+					
+					frame.getLayerContext().moveFrame(frame, frame.getLayerContext().getFrameForMet(target), target >= frame.getStart());
+					// TODO
+					// TODO
+					// TODO
+					// TODO
+					// TODO
+					// TODO
+					//frame.getLayerContext().moveFrame(frame, target, target >= frame.getStart());
 				}
 				
 				//frame.getLayerContext().moveNode(moveNode);

@@ -443,7 +443,7 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		for (Animation animation : animations) {
 			for (GroupNode node : animation.getGroupLinks()) {
 				if (changed.contains(node))
-					animation.interpretChange(node, evt);
+					animation.groupChanged(node);
 			}
 		}
 	}

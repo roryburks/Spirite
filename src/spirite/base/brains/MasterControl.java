@@ -805,8 +805,7 @@ public class MasterControl
     		commandMap.put("addGapQuick", new Runnable() {@Override public void run() {
     			Frame frame = workspace.getAnimationManager().getSelectedFrame();
     			if( frame != null) {
-    				frame.getLayerContext().addGap(frame.getEnd(), 1);
-    				//frame.getLayerContext().
+    				frame.setGapAfter(frame.getGapAfter()+1);
     			}
     		}});
     	}

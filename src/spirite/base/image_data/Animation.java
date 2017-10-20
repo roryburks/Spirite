@@ -35,7 +35,7 @@ public abstract class Animation {
 	public abstract void purge();
 
 	public abstract List<GroupNode> getGroupLinks();
-	public abstract void interpretChange( GroupNode node, StructureChangeEvent evt);
+	public abstract void groupChanged( GroupNode node);
 	
 	public String getName() {
 		return name;
