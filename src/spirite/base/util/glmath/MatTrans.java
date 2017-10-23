@@ -52,6 +52,18 @@ public class MatTrans {
     			c, -s, 0,
     			s, c, 0);
     }
+    public static MatTrans ConvertTri(
+    		float fx1, float fy1, float fx2, float fy2, float fx3, float fy3,
+    		float tx1, float ty1, float tx2, float ty2, float tx3, float ty3) throws NoninvertableException
+    {
+    	MatTrans from = new MatTrans( fx3-fx2, fx2-fx1, fx1, fy3-fy2, fy2-fy1, fy1);
+    	MatTrans to = new MatTrans( tx3-tx2, tx2-tx1, tx1, ty3-ty2, ty2-ty1, ty1);
+
+    	MatTrans result = from.createInverse();
+    	result.preConcatenate(to);
+    	
+    	return result;
+    }
     
     public float getM00() {return m00;}
     public float getM01() {return m01;}

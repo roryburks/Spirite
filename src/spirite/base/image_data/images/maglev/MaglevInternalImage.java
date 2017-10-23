@@ -3,19 +3,16 @@ package spirite.base.image_data.images.maglev;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -23,10 +20,11 @@ import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 
 /**
- * A Maglev Internal Image is essentially a kind of scalable vector image.
- * 
- * 
- *
+ * A Maglev Internal Image is an image that floats just above the surface, 
+ * not quite planting its feat in the ground.  Essentially it is a kind of 
+ * Scalable Vector Image, storing all the different stroke and fill actions
+ * as logical vertex data rather than rendered pixel data, allowing them to
+ * be scaled/rotated without generation loss	.
  */
 public class MaglevInternalImage implements IInternalImage {
 	final List<MagLevStroke> strokes;
@@ -50,14 +48,8 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 	}
 	
-	void addStroke( MagLevStroke stroke) {
-		strokes.add(stroke);
-		System.out.println("PUSH: " + strokes.size() + "." + this);
-	}
-	void popStroke() {
-		System.out.println("POP" + strokes.size() + "." +this);
-		strokes.remove(strokes.size()-1);
-	}
+	void addStroke( MagLevStroke stroke) {strokes.add(stroke);}
+	void popStroke() {strokes.remove(strokes.size()-1);}
 	void unbuild() {
 		if( this.isBuilt) {
 			this.isBuilt = false;

@@ -7,17 +7,15 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
-import spirite.base.image_data.UndoEngine.CompositeAction;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.image_data.images.drawer.DefaultImageDrawer.StrokeAction;
-import spirite.base.image_data.images.drawer.IImageDrawer.*;
+import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.Method;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
@@ -43,7 +41,7 @@ public class MaglevImageDrawer
 
 	@Override
 	public boolean canDoStroke(StrokeParams params) {
-		return params.getMethod() == Method.BASIC;
+		return true;
 	}
 
 	@Override
@@ -70,7 +68,7 @@ public class MaglevImageDrawer
 		strokeEngine.endStroke();
 		
 		final PenState[] states = strokeEngine.getHistory();
-		final StrokeParams params = strokeEngine.getParams();
+		final StrokeParams params = StrokeParams.bakeAndNormalize(strokeEngine.getParams(), states);
 		final MagLevStroke stroke = img.new MagLevStroke(states, params);
 		final BuiltSelection mask = new BuiltSelection(null, 0, 0);
 		//final StrokeEngine _engine = strokeEngine;

@@ -658,6 +658,12 @@ public class MasterControl
 			});
     		commandMap.put("shiftDown", () -> {
 				IImageDrawer drawer = workspace.getActiveDrawer();
+//				if( drawer instanceof ITransformModule ) {
+//					MatTrans trans = MatTrans.TranslationMatrix(-workspace.getWidth()/2, -workspace.getHeight()/2);
+//					trans.scale(1.1f, 1.1f);
+//					trans.preTranslate(+workspace.getWidth()/2, +workspace.getHeight()/2);
+//					((ITransformModule)drawer).transform(trans);
+//				}
 				if( drawer instanceof ITransformModule ) 
 					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, 1));
     		});

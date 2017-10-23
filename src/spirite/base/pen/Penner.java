@@ -418,12 +418,14 @@ public class Penner
 		
 		IImageDrawer drawer = workspace.getDrawerFromHandle(data.handle);
 
-		if( data != null && node != null &&  drawer!= null && drawer instanceof IFillModule) {
+		if( drawer instanceof IFillModule) {
 			((IFillModule)drawer).fill(x, y, c, data);
 			// Perform the fill Action, only store the UndoAction if 
 			//	an actual change is made.
 			//drawEngine.fill( x, y, c, data);
 		} 
+		else
+			HybridHelper.beep();
 	}
 
 	

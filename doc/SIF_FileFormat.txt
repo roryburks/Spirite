@@ -1,6 +1,4 @@
-Version 0008
-
-Compatibility Issues: extra byte per Image in ImageData section.
+Version 0009
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -62,6 +60,17 @@ Header
 			[2, short] : Dynamic offsetY
 			[4, int] : Size of Image Data
 			[n, RAW] : PNG-saved Image File
+	CASE 3 (Maglev) :
+		[2, ushort] : number of strokes
+		Per Stroke : 
+			[4, int] : color
+			[1, byte] : Stroke Method
+			[2, ushort] : number of vertices
+			[4, float] : width of stroke
+			Per vertex:
+				[4, float] : x
+				[4, float] : y
+				[4, float] : pressure
 
 ---- ANIM - Animation Data Chunk
 Per Animation:

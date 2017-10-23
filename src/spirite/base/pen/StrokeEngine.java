@@ -309,6 +309,7 @@ public abstract class StrokeEngine {
 			CUBIC_SPLINE,
 		}
 		
+		
 		private int c = Colors.BLACK;
 		private StrokeEngine.Method method = StrokeEngine.Method.BASIC;
 		private PenDrawMode mode = PenDrawMode.NORMAL;
@@ -381,6 +382,29 @@ public abstract class StrokeEngine {
 		public InterpolationMethod getInterpolationMethod() { return this.interpolationMethod;}
 		public void setInterpolationMethod( InterpolationMethod method) {
 			if(!locked) this.interpolationMethod = method;
+		}
+		
+
+		/**
+		 * Bakes the PenDynamics of the original StrokeParameters and bakes its dynamics
+		 * in-place over the given penStates, returning an equivalent StrokeParams, but 
+		 * with Linear Dynamics
+		 */
+		public static StrokeParams bakeAndNormalize( StrokeParams original, PenState[] penStates) {
+			StrokeParams out = new StrokeParams();
+			out.alpha = original.alpha;
+			out.c = original.c;
+			out.dynamics = PenDynamicsConstants.LinearDynamics();
+			out.hard = original.hard;
+			out.interpolationMethod = original.interpolationMethod;
+			out.method = original.method;
+			out.mode = original.mode;
+			out.width = original.width;
+			
+			for( int i=0; i<penStates.length; ++i)
+				penStates[i].pressure = original.getDynamics().getSize(penStates[i]);
+			
+			return out;
 		}
 	}
 }

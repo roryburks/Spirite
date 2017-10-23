@@ -37,7 +37,7 @@ public class PenDynamicsConstants {
 		)
 	);
 	
-	public static PenDynamics getDefaultDynamics() {
+	public static PenDynamics LinearDynamics() {
 		return personalDynamics;
 	}
 	private static final PenDynamics defaultDynamics = new PenDynamics() {
