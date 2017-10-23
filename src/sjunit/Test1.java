@@ -32,7 +32,9 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.pen.PenTraits.PenState;
@@ -289,23 +291,28 @@ public class Test1 {
 			
 			workspace.cropNode(node, new Rect( rn.nextInt(30), rn.nextInt(30), 50+rn.nextInt(120), 50+rn.nextInt(120)), false);
 			break;
-		case 5:
+		case 5: {
 			// Change Color
 			workspace.setSelectedNode(randomLayerNode(workspace));
-			workspace.getDrawEngine().changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
-			break;
-		case 6:
+			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
+			if( drawer instanceof IColorChangeModule)
+				((IColorChangeModule) drawer).changeColor(workspace.buildActiveData(), lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
+			break;}
+		case 6: {
 			// Invert
 			workspace.setSelectedNode(randomLayerNode(workspace));
-			workspace.getDrawEngine().invert(workspace.buildActiveData());
-			break;
-		case 7:
+
+			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
+			if( drawer instanceof IInvertModule)
+				((IInvertModule) drawer).invert(workspace.buildActiveData());
+			break;}
+		case 7:{
 			// Flip
 			workspace.setSelectedNode(randomLayerNode(workspace));
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IFlipModule) 
 				((IFlipModule) drawer).flip(workspace.buildActiveData(), rn.nextBoolean());
-			break;
+			break;}
 			
 		}
 	}

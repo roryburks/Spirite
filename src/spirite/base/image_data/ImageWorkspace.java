@@ -275,6 +275,7 @@ public class ImageWorkspace {
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
+	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
 	
 	public CacheManager getCacheManager() { return cacheManager; }
 	GLCache getGLCache() {return master.getGLCache();}
@@ -519,74 +520,6 @@ public class ImageWorkspace {
 		actions.add(new StructureAction( 
 				new DeletionChange(source, source.getParent(), source.getNextNode())));
 		undoEngine.performAndStore(undoEngine.new CompositeAction(actions, "Merge Action"));
-	}
-	
-	
-	/** 
-	 * Shifts all image data of the node.
-	 */
-	public void shiftData( Node target, final int shiftX, final int shiftY) {
-		List<LayerNode> layerNodes = target.getAllLayerNodes();
-		LinkedHashSet<ImageHandle> data = new LinkedHashSet<>();
-		
-		for( LayerNode node : layerNodes) {
-			data.addAll( node.getLayer().getImageDependencies());
-		}
-
-		if( data.isEmpty())
-			return;
-		List<UndoableAction> actions = new LinkedList<>();
-		for( ImageHandle handle : data) 
-			actions.add(new ShiftDataAction(handle, shiftX, shiftY));
-		
-		undoEngine.performAndStore(
-				undoEngine.new StackableCompositeAction(actions, "Shift Image Data"));
-	}
-	private class ShiftDataAction extends ImageAction
-		implements StackableAction
-	{
-		private int x, y;
-		protected ShiftDataAction(ImageHandle data, int x, int y) {
-			super( new BuildingImageData(data, 0, 0));
-			this.x = x;
-			this.y = y;
-		}
-		@Override
-		protected void performImageAction() {
-			IBuiltImageData built = buildData(builtImage);
-			RawImage img = built.checkoutRaw();
-			RawImage buffer = HybridHelper.createImage( img.getWidth(), img.getHeight());
-			
-			GraphicsContext gc = buffer.getGraphics();
-			gc.clear();
-			gc.drawImage(img, x, y);
-//			gc.dispose();
-			
-			gc = img.getGraphics();
-			gc.clear();
-			gc.drawImage( buffer, 0, 0);
-//			g.dispose();
-			built.checkin();
-		}
-		@Override
-		public void stackNewAction(UndoableAction newAction) {
-			ShiftDataAction other = (ShiftDataAction) newAction;
-			x += other.x;
-			y += other.y;
-		}
-		@Override
-		public boolean canStack(UndoableAction action) {
-			if(! (action instanceof ShiftDataAction)) return false;
-			ShiftDataAction other = (ShiftDataAction) action;
-
-			if( other.builtImage.handle != this.builtImage.handle) return false;
-			if( other.x <0 && x > 0) return false;
-			if( other.x >0 && x < 0) return false;
-			if( other.y >0 && y < 0) return false;
-			if( other.y <0 && y > 0) return false;
-			
-			return true;
-		}
 	}
 	
 	

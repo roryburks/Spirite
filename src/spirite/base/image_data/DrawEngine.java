@@ -116,64 +116,6 @@ public class DrawEngine {
 		
 	}
 	
-	/**
-	 * Changes all pixels of one color into another color.
-	 * 
-	 * @param from Color which will be changed
-	 * @param to Color that it'll be changed to
-	 * @param scope
-	 * <li>0 : Local (applies to only the active data)
-	 * <li>1 : Node (applies to all ImageData in the selected Group/Layer)
-	 * <li>2 : Global (applies to ALL ImageData in the workspace)
-	 * @param mode 
-	 * <li>0 : Converts only exact RGBA matches.
-	 * <li>1 : Converts RGB matches, ignoring alpha
-	 * <li>2 : Converts all RGB colors to the <code>to</code> color, preserving alpha
-	 */
-	public void changeColor( int from, int to, ColorChangeScopes scope, int mode) {
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
-		
-		Node selected = null;
-		
-		switch( scope) {
-		case LOCAL:
-			BuildingImageData bid = workspace.buildActiveData();
-			if( bid != null) {
-				execute( new ColorChangeAction(bid, mask, from, to, mode));
-			}
-			break;
-		case GROUP:
-			// Switch statement is kind of awkward.  Just roll with it.
-			selected = workspace.getSelectedNode();
-			if( selected == null) return;
-		case PROJECT:
-			if( selected == null) 
-				selected = workspace.getRootNode();
-
-			List<UndoableAction> actions = new ArrayList<>();
-			
-			for( LayerNode lnode : selected.getAllLayerNodes()) {
-				Layer layer = lnode.getLayer();
-				
-				for( BuildingImageData data : layer.getDataToBuild()) {
-					data.ox += lnode.x;
-					data.oy += lnode.y;
-					actions.add( new ColorChangeAction(
-							data,
-							mask, from, to, mode));
-				}
-			}
-			
-			UndoableAction action = undoEngine.new CompositeAction(actions, "Color Change Action");
-			undoEngine.performAndStore(action);
-			break;
-		}
-	}
-	public void invert(BuildingImageData data) {
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
-		execute( new InvertAction(data, mask));
-	}
-	
 
 	// ==============
 	// ==== Stroke Dynamics
@@ -288,70 +230,6 @@ public class DrawEngine {
 			
 			IBuiltImageData built = workspace.buildData(builtImage);
 			engine.batchDraw(params, points, built, mask);
-		}
-	}
-	public abstract class PerformFilterAction extends MaskedImageAction
-	{
-
-		private PerformFilterAction(BuildingImageData data, BuiltSelection mask) {
-			super(data, mask);
-		}
-
-		@Override
-		protected void performImageAction() {
-			IBuiltImageData built = workspace.buildData(builtImage);
-			if( mask != null && mask.selection != null) {
-				// Lift the Selection
-				RawImage lifted = mask.liftSelectionFromData(built);
-				applyFilter(lifted);
-
-				GraphicsContext gc = built.checkout();
-				gc.setComposite( Composite.DST_OUT, 1.0f);
-				mask.drawSelectionMask(gc);
-
-				gc.setComposite( Composite.SRC_OVER, 1.0f);
-				gc.drawImage( lifted, mask.offsetX, mask.offsetY );
-			}
-			else {
-				RawImage bi = built.checkoutRaw();
-				applyFilter(bi);
-			}
-			built.checkin();
-		}
-		
-		abstract void applyFilter( RawImage image);
-		
-	}
-	
-	public class ColorChangeAction extends PerformFilterAction 
-	{
-		private final int from, to;
-		private final int mode;
-		private ColorChangeAction(
-				BuildingImageData data, 
-				BuiltSelection mask, 
-				int from, int to, 
-				int mode) 
-		{
-			super(data, mask);
-			this.from = from;
-			this.to = to;
-			this.mode = mode;
-			description = "Color Change Action";
-		}
-		@Override
-		void applyFilter(RawImage image) {
-			settingsManager.getDefaultDrawer().changeColor(image, from, to, mode);
-		}
-	}
-	
-	public class InvertAction extends PerformFilterAction {
-		private InvertAction(BuildingImageData data, BuiltSelection mask) {
-			super(data, mask);
-		}
-		@Override
-		void applyFilter(RawImage image) {
-			settingsManager.getDefaultDrawer().invert(image);
 		}
 	}
 }

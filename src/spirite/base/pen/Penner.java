@@ -36,6 +36,7 @@ import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.UndoEngine;
@@ -370,19 +371,26 @@ public class Penner
 				
 				ColorChangeScopes scope = (ColorChangeScopes)settings.getValue("scope");
 				int mode = (Integer)settings.getValue("mode");
+				BuildingImageData bid = workspace.buildActiveData();
+				IImageDrawer drawer = workspace.getDrawerFromBID(bid);
 				
-				if( mbe.buttonType == ButtonType.LEFT) {
-					drawEngine.changeColor(
-							paletteManager.getActiveColor(0),
-							paletteManager.getActiveColor(1),
-							scope, mode);
+				if( drawer instanceof IColorChangeModule) {
+					if( mbe.buttonType == ButtonType.LEFT) {
+						((IColorChangeModule) drawer).changeColor(bid, 
+								paletteManager.getActiveColor(0),
+								paletteManager.getActiveColor(1),
+								scope, mode);
+					}
+					else {
+						((IColorChangeModule) drawer).changeColor(bid, 
+								paletteManager.getActiveColor(1),
+								paletteManager.getActiveColor(0),
+								scope, mode);
+					}
 				}
-				else {
-					drawEngine.changeColor(
-							paletteManager.getActiveColor(1),
-							paletteManager.getActiveColor(0),
-							scope, mode);
-				}
+				else
+					HybridHelper.beep();
+				
 				break;}
 			}
 			

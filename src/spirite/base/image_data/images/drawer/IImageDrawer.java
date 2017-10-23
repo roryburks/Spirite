@@ -6,6 +6,7 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.util.glmath.MatTrans;
 
 public interface IImageDrawer {
 
@@ -42,10 +43,14 @@ public interface IImageDrawer {
 	}
 	
 	public interface IColorChangeModule {
-		public void changeColor( int from, int to, ColorChangeScopes scope, int mode);
+		public void changeColor(  BuildingImageData data, int from, int to, ColorChangeScopes scope, int mode);
 	}
 	
 	public interface IInvertModule {
 		public void invert(BuildingImageData data);
+	}
+	
+	public interface ITransformModule {
+		public void transform( BuildingImageData data, MatTrans trans);
 	}
 }

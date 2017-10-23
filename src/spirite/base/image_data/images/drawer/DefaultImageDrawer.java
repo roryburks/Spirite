@@ -1,19 +1,26 @@
 package spirite.base.image_data.images.drawer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.UndoEngine;
+import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.drawer.IImageDrawer.*;	// Bad, but auto-complete include isn't working with my Eclipse
+import spirite.base.image_data.layers.Layer;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
@@ -25,7 +32,10 @@ public class DefaultImageDrawer
 	implements 	IImageDrawer,
 				IFillModule,
 				IClearModule,
-				IFlipModule
+				IFlipModule,
+				IColorChangeModule,
+				IInvertModule,
+				ITransformModule
 {
 	private final IInternalImage img;
 	
@@ -176,8 +186,6 @@ public class DefaultImageDrawer
 			}
 			@Override public String getDescription() {return "Clear Layer";}
 		});
-		// TODO Auto-generated method stub
-		
 	}
 
 	// :::: IFlipModule
@@ -283,5 +291,147 @@ public class DefaultImageDrawer
 //		g2.dispose();
 		
 		return buffer;
+	}
+
+
+	// :::: IColorChangeModule
+	@Override
+	public void changeColor( BuildingImageData _data, int from, int to, ColorChangeScopes scope, int mode) {
+		ImageWorkspace workspace = _data.handle.getContext();
+		SelectionEngine selectionEngine = workspace.getSelectionEngine();
+		UndoEngine undoEngine = workspace.getUndoEngine();
+
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		
+		Node selected = null;
+		
+		switch( scope) {
+		case LOCAL:
+			BuildingImageData bid = workspace.buildActiveData();
+			if( bid != null) {
+				undoEngine.performAndStore( new ColorChangeAction(bid, mask, from, to, mode));
+			}
+			break;
+		case GROUP:
+			// Switch statement is kind of awkward.  Just roll with it.
+			selected = workspace.getSelectedNode();
+			if( selected == null) return;
+		case PROJECT:
+			if( selected == null) 
+				selected = workspace.getRootNode();
+
+			List<UndoableAction> actions = new ArrayList<>();
+			
+			for( LayerNode lnode : selected.getAllLayerNodes()) {
+				Layer layer = lnode.getLayer();
+				
+				for( BuildingImageData data : layer.getDataToBuild()) {
+					data.ox += lnode.getOffsetX();
+					data.oy += lnode.getOffsetY();
+					actions.add( new ColorChangeAction(
+							data,
+							mask, from, to, mode));
+				}
+			}
+			
+			UndoableAction action = undoEngine.new CompositeAction(actions, "Color Change Action");
+			undoEngine.performAndStore(action);
+			break;
+		}
+	}
+
+	public abstract class PerformFilterAction extends MaskedImageAction
+	{
+		private PerformFilterAction(BuildingImageData data, BuiltSelection mask) {
+			super(data, mask);
+		}
+
+		@Override
+		protected void performImageAction() {
+			IBuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+			if( mask != null && mask.selection != null) {
+				// Lift the Selection
+				RawImage lifted = mask.liftSelectionFromData(built);
+				applyFilter(lifted);
+
+				GraphicsContext gc = built.checkout();
+				gc.setComposite( Composite.DST_OUT, 1.0f);
+				mask.drawSelectionMask(gc);
+
+				gc.setComposite( Composite.SRC_OVER, 1.0f);
+				gc.drawImage( lifted, mask.offsetX, mask.offsetY );
+			}
+			else {
+				RawImage bi = built.checkoutRaw();
+				applyFilter(bi);
+			}
+			built.checkin();
+		}
+		
+		abstract void applyFilter( RawImage image);
+		
+	}
+	public class ColorChangeAction extends PerformFilterAction 
+	{
+		private final int from, to;
+		private final int mode;
+		private ColorChangeAction(
+				BuildingImageData data, 
+				BuiltSelection mask, 
+				int from, int to, 
+				int mode) 
+		{
+			super(data, mask);
+			this.from = from;
+			this.to = to;
+			this.mode = mode;
+			description = "Color Change Action";
+		}
+		@Override
+		void applyFilter(RawImage image) {
+			GraphicsDrawer directDrawer = builtImage.handle.getContext().getSettingsManager().getDefaultDrawer();
+			directDrawer.changeColor(image, from, to, mode);
+		}
+	}
+	
+	// :::: IInvertModule
+	@Override
+	public void invert(BuildingImageData data) {
+		ImageWorkspace workspace = data.handle.getContext();
+		SelectionEngine selectionEngine = workspace.getSelectionEngine();
+		UndoEngine undoEngine = workspace.getUndoEngine();
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		
+		undoEngine.performAndStore( new PerformFilterAction(data, mask) {
+			@Override void applyFilter(RawImage image) {
+				GraphicsDrawer directDrawer = builtImage.handle.getContext().getSettingsManager().getDefaultDrawer();
+				directDrawer.invert(image);
+			}
+		});
+	}
+
+	// :::: ITramsformModule
+	@Override
+	public void transform(BuildingImageData data, final MatTrans trans) {
+
+		ImageWorkspace workspace = data.handle.getContext();
+		SelectionEngine selectionEngine = workspace.getSelectionEngine();
+		UndoEngine undoEngine = workspace.getUndoEngine();
+		BuiltSelection mask = selectionEngine.getBuiltSelection();
+
+		undoEngine.performAndStore(new MaskedImageAction(data, mask) {
+			@Override
+			protected void performImageAction() {
+				IBuiltImageData built = workspace.buildData(builtImage);
+				RawImage img = built.checkoutRaw();
+				RawImage img2 = img.deepCopy();
+				GraphicsContext gc = img.getGraphics();
+				gc.clear();
+				gc.setTransform(trans);
+				gc.drawImage(img2, 0, 0);
+				built.checkin();
+			}
+			@Override public String getDescription() {return "Transform Layer";}
+		});
 	}
 }
