@@ -23,7 +23,6 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
@@ -414,7 +413,6 @@ public class Penner
 
 		// Grab the Active Data
 		BuildingImageData data = workspace.buildActiveData();
-		GroupTree.Node node = workspace.getSelectedNode();
 		
 		IImageDrawer drawer = workspace.getDrawerFromHandle(data.handle);
 
