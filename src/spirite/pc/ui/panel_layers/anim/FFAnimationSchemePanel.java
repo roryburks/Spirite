@@ -124,11 +124,11 @@ public class FFAnimationSchemePanel extends JPanel
 				if(  selT == t)
 					c = Color.YELLOW;
 				else {
-					if( as.hasSubstateForRelativeTick(as.cannonizeRelTick(t)))
+					if( as != null && as.hasSubstateForRelativeTick(as.cannonizeRelTick(t)))
 						c = Color.green;
 				}
 				
-				if( (int)Math.floor(as.getMetronom()) == t)
+				if( as != null && (int)Math.floor(as.getMetronom()) == t)
 					c = Colors.darken(c);
 				
 				g.setColor(c);
@@ -831,12 +831,11 @@ public class FFAnimationSchemePanel extends JPanel
 			layout.setVerticalGroup( vert);
 
 			int after = frame.getGapAfter();
-			System.out.println(after);
 			int ext = frame.getLength() - before - after;
 			if( ext > 1) {
 				Component c = new FrameExtendPanel();
-				vert.addComponent(c);
-				hor.addComponent(c, ext*ROW_HEIGHT, ext*ROW_HEIGHT, ext*ROW_HEIGHT);
+				vert.addComponent(c, ext*ROW_HEIGHT, ext*ROW_HEIGHT, ext*ROW_HEIGHT);
+				hor.addComponent(c);
 			}
 			
 			if( after > 0) {
