@@ -144,6 +144,7 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	};
 	
+	
 	public void Rebuild() {
 		GroupLayout primaryLayout = new GroupLayout(this);
 
@@ -316,36 +317,33 @@ public class FFAnimationSchemePanel extends JPanel
 	// ==== Context Menu ====
 	private final JPopupMenu contextMenu = new JPopupMenu();
 	private Object cmenuObject;
-	private final ActionListener cmenuListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			switch( e.getActionCommand()) {
-			case "duplicate": {
-				ws.duplicateNode(((Frame)cmenuObject).getLinkedNode());
-				break;}
-			case "insertEmptyBefore":{
-				Frame f = (Frame)cmenuObject;
-				f.setGapBefore(f.getGapBefore()+1);
-				break;}
-			case "insertEmpty":{
-				Frame f = (Frame)cmenuObject;
-				f.setGapAfter(f.getGapAfter()+1);
-				break;}
-			case "removeGapBefore":{
-				Frame f = (Frame)cmenuObject;
-				f.setGapBefore(0);
-				break;}
-			case "removeGapAfter":{
-				Frame f = (Frame)cmenuObject;
-				f.setGapAfter(0);
-				break;}
-			case "localLoop":{
-				Frame f = (Frame)cmenuObject;
-				f.getLayerContext().wrapInLoop(f);
-				break;}
-			default: 
-				MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
-			}
+	private final ActionListener cmenuListener = (ActionEvent e) -> {
+		switch( e.getActionCommand()) {
+		case "duplicate": {
+			ws.duplicateNode(((Frame)cmenuObject).getLinkedNode());
+			break;}
+		case "insertEmptyBefore":{
+			Frame f = (Frame)cmenuObject;
+			f.setGapBefore(f.getGapBefore()+1);
+			break;}
+		case "insertEmpty":{
+			Frame f = (Frame)cmenuObject;
+			f.setGapAfter(f.getGapAfter()+1);
+			break;}
+		case "removeGapBefore":{
+			Frame f = (Frame)cmenuObject;
+			f.setGapBefore(0);
+			break;}
+		case "removeGapAfter":{
+			Frame f = (Frame)cmenuObject;
+			f.setGapAfter(0);
+			break;}
+		case "localLoop":{
+			Frame f = (Frame)cmenuObject;
+			f.getLayerContext().wrapInLoop(f);
+			break;}
+		default: 
+			MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
 		}
 	};
 	
@@ -831,7 +829,7 @@ public class FFAnimationSchemePanel extends JPanel
 			layout.setVerticalGroup( vert);
 
 			int after = frame.getGapAfter();
-			System.out.println(after);
+			
 			int ext = frame.getLength() - before - after;
 			if( ext > 1) {
 				Component c = new FrameExtendPanel();
@@ -999,27 +997,12 @@ public class FFAnimationSchemePanel extends JPanel
 
 			@Override
 			void EndState() {
-				if( target != frame.getStart()) {
-					
+				if( target != frame.getStart()) 
 					frame.getLayerContext().moveFrame(frame, frame.getLayerContext().getFrameForMet(target), target >= frame.getStart());
-					// TODO
-					// TODO
-					// TODO
-					// TODO
-					// TODO
-					// TODO
-					//frame.getLayerContext().moveFrame(frame, target, target >= frame.getStart());
-				}
 				
-				//frame.getLayerContext().moveNode(moveNode);
 			}
 
-			@Override
-			void StartState() {
-				// TODO Auto-generated method stub
-				
-			}
-			
+			@Override void StartState() {}
 			@Override
 			void Draw(Graphics g) {
 				Rectangle rect = GetFrameBounds( column, target);
