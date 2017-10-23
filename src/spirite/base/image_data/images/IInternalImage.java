@@ -2,6 +2,7 @@ package spirite.base.image_data.images;
 
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 
 /**
  * IInternalImages are a form of base data type that serves as an intermediate between
@@ -27,10 +28,12 @@ public interface IInternalImage {
 	public void flush();
 	public RawImage readOnlyAccess();
 	public InternalImageTypes getType();
+	public IImageDrawer getImageDrawer();
 	
 	public static enum InternalImageTypes {
 		NORMAL,		// 0
 		DYNAMIC,	// 1
 		PRISMATIC	// 2
 	}
+
 }

@@ -5,6 +5,8 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.images.drawer.DefaultImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -139,4 +141,5 @@ public class InternalImage implements IInternalImage {
 	@Override public int getDynamicX() {return 0;}
 	@Override public int getDynamicY() {return 0;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.NORMAL;}
+	@Override public IImageDrawer getImageDrawer() {return new DefaultImageDrawer(this);}
 }

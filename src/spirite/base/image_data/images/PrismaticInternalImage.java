@@ -7,6 +7,8 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.images.drawer.DefaultImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -332,4 +334,6 @@ public class PrismaticInternalImage implements IInternalImage {
 			return trans;
 		}
 	}
+
+	@Override public IImageDrawer getImageDrawer() {return new DefaultImageDrawer(this);}
 }

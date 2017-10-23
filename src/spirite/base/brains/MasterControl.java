@@ -46,6 +46,8 @@ import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.Penner;
 import spirite.base.util.ObserverHandler;
@@ -664,9 +666,12 @@ public class MasterControl
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
 					//	accessing handle directly is appropriate.
-					BuildingImageData image = workspace.buildActiveData();
-					if( image != null) 
-						workspace.getDrawEngine().clear(image);
+					BuildingImageData data = workspace.buildActiveData();
+					IImageDrawer drawer = workspace.getDrawerFromBID(data);
+					if( drawer instanceof IClearModule )
+						((IClearModule) drawer).clear(data);
+					else
+						HybridHelper.beep();
 				}
 			});
     		commandMap.put("cropSelection", () -> {

@@ -31,6 +31,8 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.pen.PenTraits.PenState;
@@ -300,7 +302,9 @@ public class Test1 {
 		case 7:
 			// Flip
 			workspace.setSelectedNode(randomLayerNode(workspace));
-			workspace.getDrawEngine().flip(workspace.buildActiveData(), rn.nextBoolean());
+			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
+			if( drawer instanceof IFlipModule) 
+				((IFlipModule) drawer).flip(workspace.buildActiveData(), rn.nextBoolean());
 			break;
 			
 		}

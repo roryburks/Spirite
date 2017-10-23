@@ -6,6 +6,8 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.images.drawer.DefaultImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
@@ -52,6 +54,7 @@ public class DynamicInternalImage implements IInternalImage {
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
+	@Override public IImageDrawer getImageDrawer() { return new DefaultImageDrawer(this);}
 	
 	public class DynamicBuiltImageData extends IBuiltImageData{
 		final int box;
@@ -176,5 +179,6 @@ public class DynamicInternalImage implements IInternalImage {
 			return transform;
 		}
 	}
+
 
 }

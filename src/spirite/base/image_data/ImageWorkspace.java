@@ -33,6 +33,7 @@ import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
@@ -312,6 +313,17 @@ public class ImageWorkspace {
 			this.ox = ox;
 			this.oy = oy;
 		}
+	}
+	
+
+	public IImageDrawer getDrawerFromBID( BuildingImageData img) {
+		if( img == null) return null;
+		IInternalImage iimg = imageData.get(img.handle.id);
+		return (iimg == null) ? null : iimg.getImageDrawer();
+	}
+	public IImageDrawer getDrawerFromHandle( ImageHandle handle) {
+		IInternalImage iimg = imageData.get(handle.id);
+		return (iimg == null) ? null : iimg.getImageDrawer();
 	}
 	
 	

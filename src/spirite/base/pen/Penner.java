@@ -35,6 +35,9 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
+import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -316,18 +319,28 @@ public class Penner
 			case FLIPPER:{
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
 				Integer flipMode = (Integer)settings.getValue("flipMode");
-				
-				switch( flipMode) {
-				case 0:	// Horizontal
-					drawEngine.flip( workspace.buildActiveData(), true);
-					break;
-				case 1:	// Vertical
-					drawEngine.flip( workspace.buildActiveData(), false);
-					break;
-				case 2:
-					behavior = new FlippingBehavior();
+
+				BuildingImageData data = workspace.buildActiveData();
+				if( data == null) {
+					HybridHelper.beep();
 					break;
 				}
+				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				if( drawer instanceof IFlipModule) {
+					switch( flipMode) {
+					case 0:	// Horizontal
+						((IFlipModule) drawer).flip( workspace.buildActiveData(), true);
+						break;
+					case 1:	// Vertical
+						((IFlipModule) drawer).flip( workspace.buildActiveData(), false);
+						break;
+					case 2:
+						behavior = new FlippingBehavior();
+						break;
+					}
+				}
+				else 
+					HybridHelper.beep();
 				break;}
 			case RESHAPER:{
 				BuiltSelection sel =selectionEngine.getBuiltSelection();
@@ -402,10 +415,13 @@ public class Penner
 		BuildingImageData data = workspace.buildActiveData();
 		GroupTree.Node node = workspace.getSelectedNode();
 		
-		if( data != null && node != null) {
+		IImageDrawer drawer = workspace.getDrawerFromHandle(data.handle);
+
+		if( data != null && node != null &&  drawer!= null && drawer instanceof IFillModule) {
+			((IFillModule)drawer).fill(x, y, c, data);
 			// Perform the fill Action, only store the UndoAction if 
 			//	an actual change is made.
-			drawEngine.fill( x, y, c, data);
+			//drawEngine.fill( x, y, c, data);
 		} 
 	}
 
@@ -886,7 +902,6 @@ public class Penner
 		public void paintOverlay(GraphicsContext gc) {
 			
 			// Outline
-			// TODO:
 /*            Stroke new_stroke = new BasicStroke(
             		1, 
             		BasicStroke.CAP_BUTT, 
@@ -1346,12 +1361,15 @@ public class Penner
 		@Override
 		public void onPenUp() {
 			BuildingImageData data =  workspace.buildActiveData();
+			IImageDrawer drawer = workspace.getDrawerFromBID(data);
+			
 			if( data != null) {
-				if( MUtil.distance(x , y, startX, startY) < 5 ||
-					Math.abs(x - startX) > Math.abs(y - startY))
-					drawEngine.flip( data, true);
-				else
-					drawEngine.flip( data, false);
+				if( drawer instanceof IFlipModule) {
+					boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
+							||Math.abs(x - startX) > Math.abs(y - startY);
+					((IFlipModule) drawer).flip( data, horizontal);
+				}
+				else HybridHelper.beep();
 			}
 			
 			super.onPenUp();
