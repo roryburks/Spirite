@@ -28,7 +28,7 @@ public interface IInternalImage {
 	public void flush();
 	public RawImage readOnlyAccess();
 	public InternalImageTypes getType();
-	public IImageDrawer getImageDrawer();
+	public IImageDrawer getImageDrawer(BuildingImageData building);
 	
 	public static enum InternalImageTypes {
 		NORMAL,		// 0

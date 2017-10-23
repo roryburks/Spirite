@@ -335,5 +335,5 @@ public class PrismaticInternalImage implements IInternalImage {
 		}
 	}
 
-	@Override public IImageDrawer getImageDrawer() {return new DefaultImageDrawer(this);}
+	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}
 }

@@ -25,7 +25,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.UndoEngine.CompositeAction;
-import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
@@ -33,13 +32,15 @@ import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
-import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.drawer.GroupNodeDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.pen.StrokeEngine;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -80,7 +81,6 @@ public class ImageWorkspace {
 	final UndoEngine undoEngine;
 	private final AnimationManager animationManager;
 	private final SelectionEngine selectionEngine;
-	private final DrawEngine drawEngine;
 	private final ReferenceManager referenceManager;
 	private final StagingManager stagingManager;
 	
@@ -117,7 +117,6 @@ public class ImageWorkspace {
 		undoEngine = new UndoEngine(this);
 		animationManager = new AnimationManager(this);
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
-		drawEngine = new DrawEngine(this, master);	// Depends on UndoEngine, SelectionEngine
 		referenceManager = new ReferenceManager(this);
 		stagingManager = new StagingManager(this);
 		
@@ -268,7 +267,6 @@ public class ImageWorkspace {
 	public UndoEngine getUndoEngine() { return undoEngine; }
 	public AnimationManager getAnimationManager() { return animationManager; }
 	public SelectionEngine getSelectionEngine() { return selectionEngine; }
-	public DrawEngine getDrawEngine() { return drawEngine; }
 	public ReferenceManager getReferenceManager() { return referenceManager; }
 	public StagingManager getStageManager() {return stagingManager;}
 	public PaletteManager getPaletteManager() {return paletteManager;}	// Might be removed in the future
@@ -276,13 +274,11 @@ public class ImageWorkspace {
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
 	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
-	
 	public CacheManager getCacheManager() { return cacheManager; }
 	GLCache getGLCache() {return master.getGLCache();}
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }
-	//public GroupTree getGroupTree() { return groupTree; }	// This probably shouldn't exist as it opens up the possibility of people creating all sorts of weird nodes un-linked to the GroupTree
 	
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
@@ -293,6 +289,9 @@ public class ImageWorkspace {
 		
 		return list;
 	}
+	
+	
+	// ============== Building Active Data ==================
 	
 	/**
 	 * BuiltActiveData's should be immutable, but after the Layers give their
@@ -317,14 +316,31 @@ public class ImageWorkspace {
 	}
 	
 
+	public IImageDrawer getActiveDrawer() {
+		getSelectedNode();	// Makes sure the selected node is refreshed
+		return getDrawerFromNode( selected);
+	}
+	public IImageDrawer getDrawerFromNode( Node node) {
+		if( node instanceof LayerNode) {
+			Layer layer = ((LayerNode) node).getLayer();
+			BuildingImageData bid = layer.getActiveData();
+			IInternalImage iimg = imageData.get(bid.handle.id);
+			return (iimg == null) ? null : iimg.getImageDrawer(bid);
+		}
+		else if( node instanceof GroupNode) {
+			return new GroupNodeDrawer((GroupNode)node);
+		}
+		
+		return null;
+	}
 	public IImageDrawer getDrawerFromBID( BuildingImageData img) {
 		if( img == null) return null;
 		IInternalImage iimg = imageData.get(img.handle.id);
-		return (iimg == null) ? null : iimg.getImageDrawer();
+		return (iimg == null) ? null : iimg.getImageDrawer(img);
 	}
 	public IImageDrawer getDrawerFromHandle( ImageHandle handle) {
 		IInternalImage iimg = imageData.get(handle.id);
-		return (iimg == null) ? null : iimg.getImageDrawer();
+		return (iimg == null) ? null : iimg.getImageDrawer(new BuildingImageData(handle, 0, 0));
 	}
 	
 	
@@ -362,6 +378,22 @@ public class ImageWorkspace {
 		return ii.build(data);
 	}
 	
+	
+	// =========
+	// ==== Stroke Engine Piping
+	StrokeEngine activeSE = null;
+	public StrokeEngine getAcrtiveStrokeEngine() {
+		return activeSE;
+	}
+	/** REALLY shouldn't be called by anything other than an IImageDrawer, but Java's mandatory package scoping is annoying. */
+	public void setActiveStrokeEngine( StrokeEngine stroke) {
+		if( activeSE == null || stroke == null)
+			activeSE = stroke;
+		else
+			HybridHelper.beep();
+	}
+	
+	
 	// ==============
 	// ==== Node Selection 
 	
@@ -385,9 +417,8 @@ public class ImageWorkspace {
 	
 	// ===============
 	// ==== Image Checkout (called by BuiltImageData)
-	/** Internal method should not be called by external methods (if so
-	 * it'd screw up the UndoEngine).  Instead create an ImageDataReplacedAction
-	 * and 
+	/** Internal method should not be called by external methods (if so it'd
+	 * 110% screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 */
 	void _replaceIamge( ImageHandle old, IInternalImage img) {
 		imageData.get(old.id).flush();

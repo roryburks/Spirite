@@ -23,7 +23,6 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.DrawEngine;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -35,11 +34,12 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionBuilder;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
-import spirite.base.image_data.UndoEngine;
+import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.pen.PenTraits.ButtonType;
@@ -78,7 +78,7 @@ public class Penner
 	private ImageWorkspace workspace;
 	private SelectionEngine selectionEngine;
 	private UndoEngine undoEngine;
-	private DrawEngine drawEngine;
+	//private DrawEngine drawEngine;
 	private final ToolsetManager toolsetManager;
 	private final PaletteManager paletteManager;
 	private final SettingsManager settingsManager;
@@ -134,12 +134,10 @@ public class Penner
 		if( workspace != null) {
 			selectionEngine = workspace.getSelectionEngine();
 			undoEngine = workspace.getUndoEngine();
-			drawEngine = workspace.getDrawEngine();
 		}
 		else {
 			selectionEngine = null;
 			undoEngine = null;
-			drawEngine = null;
 		}
 		
 		this.view = view;
@@ -321,19 +319,14 @@ public class Penner
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
 				Integer flipMode = (Integer)settings.getValue("flipMode");
 
-				BuildingImageData data = workspace.buildActiveData();
-				if( data == null) {
-					HybridHelper.beep();
-					break;
-				}
-				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof IFlipModule) {
 					switch( flipMode) {
 					case 0:	// Horizontal
-						((IFlipModule) drawer).flip( workspace.buildActiveData(), true);
+						((IFlipModule) drawer).flip( true);
 						break;
 					case 1:	// Vertical
-						((IFlipModule) drawer).flip( workspace.buildActiveData(), false);
+						((IFlipModule) drawer).flip( false);
 						break;
 					case 2:
 						behavior = new FlippingBehavior();
@@ -371,18 +364,18 @@ public class Penner
 				
 				ColorChangeScopes scope = (ColorChangeScopes)settings.getValue("scope");
 				int mode = (Integer)settings.getValue("mode");
-				BuildingImageData bid = workspace.buildActiveData();
-				IImageDrawer drawer = workspace.getDrawerFromBID(bid);
+				
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				
 				if( drawer instanceof IColorChangeModule) {
 					if( mbe.buttonType == ButtonType.LEFT) {
-						((IColorChangeModule) drawer).changeColor(bid, 
+						((IColorChangeModule) drawer).changeColor( 
 								paletteManager.getActiveColor(0),
 								paletteManager.getActiveColor(1),
 								scope, mode);
 					}
 					else {
-						((IColorChangeModule) drawer).changeColor(bid, 
+						((IColorChangeModule) drawer).changeColor(
 								paletteManager.getActiveColor(1),
 								paletteManager.getActiveColor(0),
 								scope, mode);
@@ -486,16 +479,24 @@ public class Penner
 		int dx = x;
 		int dy = y;
 		private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
+		protected IStrokeModule drawer;
 		
 		public void startStroke (StrokeEngine.StrokeParams stroke) {
 			if( workspace != null && workspace.buildActiveData() != null) {
 				shiftX = rawX;
 				shiftY = rawY;
-				BuildingImageData data = workspace.buildActiveData();
-//				GroupTree.Node node = workspace.getSelectedNode();
 				
-				if( !drawEngine.startStroke(stroke, new PenState(x,y,pressure), data))
+				IImageDrawer drawer = workspace.getActiveDrawer();
+				if( drawer instanceof IStrokeModule 
+						&& ((IStrokeModule) drawer).canDoStroke(stroke)
+						&&((IStrokeModule)drawer).startStroke(stroke, new PenState(x,y,pressure))) 
+				{
+					this.drawer = (IStrokeModule) drawer;
+					workspace.setActiveStrokeEngine(this.drawer.getStrokeEngine());
+				}
+				else {
 					end();
+				}
 			}
 		}
 		
@@ -524,17 +525,23 @@ public class Penner
 				dx = x;
 				dy = y;
 			}
-			drawEngine.stepStroke( new PenState( dx, dy, pressure));
+			drawer.stepStroke( new PenState( dx, dy, pressure));
 
 		}
 
 		@Override
 		public void onPenUp() {
-			drawEngine.endStroke();
+			drawer.endStroke();
 			super.onPenUp();
 		}
 		
 		@Override public void onMove() {}
+		
+		@Override
+		public void end() {
+			workspace.setActiveStrokeEngine(null);
+			super.end();
+		}
 	}
 	
 	class EraseBehavior extends StrokeBehavior {
@@ -1368,17 +1375,14 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			BuildingImageData data =  workspace.buildActiveData();
-			IImageDrawer drawer = workspace.getDrawerFromBID(data);
+			IImageDrawer drawer = workspace.getActiveDrawer();
 			
-			if( data != null) {
-				if( drawer instanceof IFlipModule) {
-					boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
-							||Math.abs(x - startX) > Math.abs(y - startY);
-					((IFlipModule) drawer).flip( data, horizontal);
-				}
-				else HybridHelper.beep();
+			if( drawer instanceof IFlipModule) {
+				boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
+						||Math.abs(x - startX) > Math.abs(y - startY);
+				((IFlipModule) drawer).flip( horizontal);
 			}
+			else HybridHelper.beep();
 			
 			super.onPenUp();
 		}

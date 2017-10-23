@@ -32,7 +32,6 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -648,28 +647,24 @@ public class MasterControl
     		commandMap.put("undo", ()  -> {workspace.getUndoEngine().undo();});
     		commandMap.put("redo", () -> {workspace.getUndoEngine().redo();});
     		commandMap.put("shiftRight", () -> {
-				BuildingImageData data = workspace.buildActiveData();
-				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(data, MatTrans.TranslationMatrix(1, 0));
+					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(1, 0));
 			});
     		commandMap.put("shiftLeft", () -> {
-				BuildingImageData data = workspace.buildActiveData();
-				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(data, MatTrans.TranslationMatrix(-1, 0));
+					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(-1, 0));
 			});
     		commandMap.put("shiftDown", () -> {
-				BuildingImageData data = workspace.buildActiveData();
-				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(data, MatTrans.TranslationMatrix(0, 1));
+					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, 1));
     		});
     		commandMap.put("shiftUp", () -> {
-				BuildingImageData data = workspace.buildActiveData();
-				IImageDrawer drawer = workspace.getDrawerFromBID(data);
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(data, MatTrans.TranslationMatrix(-1, 0));
+					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(-1, 0));
 			});
     		commandMap.put("newLayerQuick", () -> {
 				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
@@ -680,10 +675,9 @@ public class MasterControl
 				if(!workspace.getSelectionEngine().attemptClearSelection()) {
 					// Note: transforms are irrelevant for this action, so 
 					//	accessing handle directly is appropriate.
-					BuildingImageData data = workspace.buildActiveData();
-					IImageDrawer drawer = workspace.getDrawerFromBID(data);
+					IImageDrawer drawer = workspace.getActiveDrawer();
 					if( drawer instanceof IClearModule )
-						((IClearModule) drawer).clear(data);
+						((IClearModule) drawer).clear();
 					else
 						HybridHelper.beep();
 				}
@@ -731,11 +725,10 @@ public class MasterControl
 					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
     		});
     		commandMap.put("invert", () -> {
-    			BuildingImageData data= workspace.buildActiveData();
-    			IImageDrawer drawer = workspace.getDrawerFromBID(data);
+    			IImageDrawer drawer = workspace.getActiveDrawer();
     			
     			if( drawer instanceof IInvertModule) 
-    				((IInvertModule) drawer).invert(data);
+    				((IInvertModule) drawer).invert();
     			else
     				HybridHelper.beep();
     		});

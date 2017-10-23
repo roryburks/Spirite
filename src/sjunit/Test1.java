@@ -296,7 +296,7 @@ public class Test1 {
 			workspace.setSelectedNode(randomLayerNode(workspace));
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IColorChangeModule)
-				((IColorChangeModule) drawer).changeColor(workspace.buildActiveData(), lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
+				((IColorChangeModule) drawer).changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
 			break;}
 		case 6: {
 			// Invert
@@ -304,14 +304,14 @@ public class Test1 {
 
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IInvertModule)
-				((IInvertModule) drawer).invert(workspace.buildActiveData());
+				((IInvertModule) drawer).invert();
 			break;}
 		case 7:{
 			// Flip
 			workspace.setSelectedNode(randomLayerNode(workspace));
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IFlipModule) 
-				((IFlipModule) drawer).flip(workspace.buildActiveData(), rn.nextBoolean());
+				((IFlipModule) drawer).flip(rn.nextBoolean());
 			break;}
 			
 		}

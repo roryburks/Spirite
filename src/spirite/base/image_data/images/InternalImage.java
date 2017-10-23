@@ -141,5 +141,5 @@ public class InternalImage implements IInternalImage {
 	@Override public int getDynamicX() {return 0;}
 	@Override public int getDynamicY() {return 0;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.NORMAL;}
-	@Override public IImageDrawer getImageDrawer() {return new DefaultImageDrawer(this);}
+	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}
 }

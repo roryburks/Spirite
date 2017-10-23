@@ -23,15 +23,16 @@ public interface IImageDrawer {
 	//	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't 
 	//	make sense for the data type).
 	public interface IStrokeModule {
-		public boolean strokeIsDrawing();
+		//public boolean strokeIsDrawing();	// SHOULD be true iff getStrokeEngine = null
 		public StrokeEngine getStrokeEngine();
-		public boolean startStroke( StrokeEngine.StrokeParams params, PenState ps, BuildingImageData bis);
-		public boolean stepStroke( PenState ps);
+		public boolean canDoStroke( StrokeEngine.StrokeParams params);	// EG: some Drawers might be able to erase, but not draw
+		public boolean startStroke( StrokeEngine.StrokeParams params, PenState ps);
+		public void stepStroke( PenState ps);
 		public void endStroke();
 	}
 	
 	public interface IClearModule {
-		public void clear( BuildingImageData data);
+		public void clear();
 	}
 	
 	public interface IFillModule {
@@ -39,18 +40,18 @@ public interface IImageDrawer {
 	}
 	
 	public interface IFlipModule {
-		public void flip( BuildingImageData data, boolean horizontal);
+		public void flip( boolean horizontal);
 	}
 	
 	public interface IColorChangeModule {
-		public void changeColor(  BuildingImageData data, int from, int to, ColorChangeScopes scope, int mode);
+		public void changeColor(  int from, int to, ColorChangeScopes scope, int mode);
 	}
 	
 	public interface IInvertModule {
-		public void invert(BuildingImageData data);
+		public void invert();
 	}
 	
 	public interface ITransformModule {
-		public void transform( BuildingImageData data, MatTrans trans);
+		public void transform( MatTrans trans);
 	}
 }

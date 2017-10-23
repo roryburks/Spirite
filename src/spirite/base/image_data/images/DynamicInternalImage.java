@@ -54,7 +54,7 @@ public class DynamicInternalImage implements IInternalImage {
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
-	@Override public IImageDrawer getImageDrawer() { return new DefaultImageDrawer(this);}
+	@Override public IImageDrawer getImageDrawer(BuildingImageData building) { return new DefaultImageDrawer(this, building);}
 	
 	public class DynamicBuiltImageData extends IBuiltImageData{
 		final int box;

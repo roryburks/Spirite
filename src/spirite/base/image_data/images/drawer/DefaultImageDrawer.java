@@ -6,27 +6,41 @@ import java.util.List;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
+import spirite.base.graphics.RawImage;
+import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.UndoEngine;
-import spirite.base.image_data.GroupTree.LayerNode;
-import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.drawer.IImageDrawer.*;	// Bad, but auto-complete include isn't working with my Eclipse
+// Bad, but auto-complete include isn't working with my Eclipse
+import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IInvertModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeEngine.STATE;
+import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.DirectDrawer;
-import spirite.hybrid.HybridHelper;;
+import spirite.hybrid.HybridHelper;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.hybrid.MDebug.WarningType;;
 
 public class DefaultImageDrawer 
 	implements 	IImageDrawer,
@@ -35,12 +49,15 @@ public class DefaultImageDrawer
 				IFlipModule,
 				IColorChangeModule,
 				IInvertModule,
-				ITransformModule
+				ITransformModule,
+				IStrokeModule
 {
+	private BuildingImageData building;
 	private final IInternalImage img;
 	
-	public DefaultImageDrawer( IInternalImage img) {
+	public DefaultImageDrawer( IInternalImage img, BuildingImageData building) {
 		this.img = img;
+		this.building = building;
 	}
 
 	// ===============
@@ -165,10 +182,10 @@ public class DefaultImageDrawer
 
 	// :::: IClearModule
 	@Override
-	public void clear(BuildingImageData data) {
-		final ImageWorkspace workspace = data.handle.getContext();
+	public void clear() {
+		final ImageWorkspace workspace = building.handle.getContext();
 		BuiltSelection sel = pollSelectionMask(workspace);
-		workspace.getUndoEngine().performAndStore(new MaskedImageAction(data, sel) {
+		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
 			protected void performImageAction() {
 				IBuiltImageData built = workspace.buildData(builtImage);
@@ -190,8 +207,8 @@ public class DefaultImageDrawer
 
 	// :::: IFlipModule
 	@Override
-	public void flip(BuildingImageData data, boolean horizontal) {
-		ImageWorkspace workspace = data.handle.getContext();
+	public void flip( boolean horizontal) {
+		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 
@@ -206,10 +223,10 @@ public class DefaultImageDrawer
 			selectionEngine.transformSelection(trans);
 		}
 		else if( sel == null || sel.selection == null)
-			undoEngine.performAndStore( new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal));
+			undoEngine.performAndStore( new FlipAction(building, selectionEngine.getBuiltSelection(), horizontal));
 		else {
 			UndoableAction actions[] = new UndoableAction[2];
-			actions[0] = new FlipAction(data, selectionEngine.getBuiltSelection(), horizontal);
+			actions[0] = new FlipAction(building, selectionEngine.getBuiltSelection(), horizontal);
 			
 			// This is kind of bad
 			RawImage img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
@@ -296,8 +313,8 @@ public class DefaultImageDrawer
 
 	// :::: IColorChangeModule
 	@Override
-	public void changeColor( BuildingImageData _data, int from, int to, ColorChangeScopes scope, int mode) {
-		ImageWorkspace workspace = _data.handle.getContext();
+	public void changeColor( int from, int to, ColorChangeScopes scope, int mode) {
+		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 
@@ -396,13 +413,13 @@ public class DefaultImageDrawer
 	
 	// :::: IInvertModule
 	@Override
-	public void invert(BuildingImageData data) {
-		ImageWorkspace workspace = data.handle.getContext();
+	public void invert() {
+		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 		
-		undoEngine.performAndStore( new PerformFilterAction(data, mask) {
+		undoEngine.performAndStore( new PerformFilterAction(building, mask) {
 			@Override void applyFilter(RawImage image) {
 				GraphicsDrawer directDrawer = builtImage.handle.getContext().getSettingsManager().getDefaultDrawer();
 				directDrawer.invert(image);
@@ -412,14 +429,14 @@ public class DefaultImageDrawer
 
 	// :::: ITramsformModule
 	@Override
-	public void transform(BuildingImageData data, final MatTrans trans) {
+	public void transform(final MatTrans trans) {
 
-		ImageWorkspace workspace = data.handle.getContext();
+		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
 
-		undoEngine.performAndStore(new MaskedImageAction(data, mask) {
+		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
 			protected void performImageAction() {
 				IBuiltImageData built = workspace.buildData(builtImage);
@@ -433,5 +450,104 @@ public class DefaultImageDrawer
 			}
 			@Override public String getDescription() {return "Transform Layer";}
 		});
+	}
+
+	
+
+	private StrokeEngine activeEngine = null;
+
+	@Override public StrokeEngine getStrokeEngine() {return activeEngine;}
+	@Override public boolean canDoStroke(StrokeParams params) {return true;}
+
+	@Override
+	public boolean startStroke(StrokeParams params, PenState ps) {
+		ImageWorkspace workspace = building.handle.getContext();
+		
+		if( activeEngine != null) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to draw two strokes at once within the DrawEngine (if you need to do that, manually instantiate a separate StrokeEngine.");
+			return false;
+		}
+		else {
+			activeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
+			
+			if( activeEngine.startStroke( params, ps, workspace.buildData(building), pollSelectionMask(workspace)))
+				building.handle.refresh();
+			return true;
+		}
+	}
+
+	@Override
+	public void stepStroke(PenState ps) {
+		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to step stroke that isn't active.");
+			return ;
+		}
+		else {
+			if(activeEngine.stepStroke(ps))
+				activeEngine.getImageData().handle.refresh();
+		}
+	}
+
+	@Override
+	public void endStroke() {
+		if( activeEngine == null || activeEngine.getState() != STATE.DRAWING) {
+			activeEngine = null;
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to end stroke that isn't active.");
+			return ;
+		}
+		else {
+			activeEngine.endStroke();
+				
+			building.handle.getContext().getUndoEngine().storeAction(
+				new StrokeAction(
+					activeEngine,
+					activeEngine.getParams(),
+					activeEngine.getHistory(),
+					activeEngine.getLastSelection(),
+					building));
+			activeEngine = null;
+		}
+	}
+	public class StrokeAction extends MaskedImageAction {
+		private final PenState[] points;
+		private final StrokeEngine.StrokeParams params;
+		private final StrokeEngine engine;
+		
+		StrokeAction( 
+				StrokeEngine engine,
+				StrokeEngine.StrokeParams params, 
+				PenState[] points, 
+				BuiltSelection mask, 
+				BuildingImageData data)
+		{
+			super(data, mask);
+			this.engine = engine;
+			this.params = params;
+			this.points = points;
+			
+			switch( params.getMethod()) {
+			case BASIC:
+				description = "Basic Stroke Action";
+				break;
+			case ERASE:
+				description = "Erase Stroke Action";
+				break;
+			case PIXEL:
+				description = "Pixel Stroke Action";
+				break;
+			}
+		}
+		
+		public StrokeEngine.StrokeParams getParams() {
+			return params;
+		}
+		
+		@Override
+		public void performImageAction( ) {
+			queueSelectionMask(mask);
+			
+			IBuiltImageData built = building.handle.getContext().buildData(builtImage);
+			engine.batchDraw(params, points, built, mask);
+		}
 	}
 }

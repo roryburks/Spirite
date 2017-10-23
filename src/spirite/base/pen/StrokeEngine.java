@@ -7,7 +7,6 @@ import java.util.List;
 import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.image_data.DrawEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.IBuiltImageData;
 import spirite.base.pen.PenTraits.PenDynamics;
@@ -316,7 +315,7 @@ public abstract class StrokeEngine {
 		private float width = 1.0f;
 		private float alpha = 1.0f;
 		private boolean hard = false;
-		private PenDynamics dynamics = DrawEngine.getBasicDynamics();
+		private PenDynamics dynamics = PenDynamicsConstants.getBasicDynamics();
 		private int maxWidth = 25;
 		private InterpolationMethod interpolationMethod = InterpolationMethod.CUBIC_SPLINE;
 		
