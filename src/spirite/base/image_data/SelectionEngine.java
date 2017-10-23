@@ -14,7 +14,7 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.compaction.IntCompactor;
@@ -444,7 +444,7 @@ public class SelectionEngine {
 	
 	private SetLiftedAction createLiftAction(LayerNode node) {
 		BuiltSelection mask = getBuiltSelection();
-		IBuiltImageData builtImage = workspace.buildData(workspace.buildDataFromNode(node));
+		ABuiltImageData builtImage = workspace.buildData(workspace.buildDataFromNode(node));
 		
 		return new SetLiftedAction( mask.liftSelectionFromData(builtImage));
 	}
@@ -500,7 +500,7 @@ public class SelectionEngine {
 
 		@Override
 		protected void performImageAction() {
-			IBuiltImageData built = workspace.buildData(builtImage);
+			ABuiltImageData built = workspace.buildData(builtImage);
 			GraphicsContext gc = built.checkout();
 			
 			gc.setComposite( Composite.DST_OUT, 1.0f);
@@ -526,7 +526,7 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			IBuiltImageData built = workspace.buildData(builtImage);
+			ABuiltImageData built = workspace.buildData(builtImage);
 			GraphicsContext gc = built.checkout();
 			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
 			built.checkin();
@@ -771,7 +771,7 @@ public class SelectionEngine {
 
 		/** Uses the BuiltSelection to lift the selected portion of the given
 		 * BuildingImageData and put it in a new BufferedImage.*/
-		public RawImage liftSelectionFromData( IBuiltImageData data) {
+		public RawImage liftSelectionFromData( ABuiltImageData data) {
 			return liftSelection(new LiftScheme() {
 				@Override
 				public Rect getBounds() {

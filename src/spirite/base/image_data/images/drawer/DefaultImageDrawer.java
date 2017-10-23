@@ -17,7 +17,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 // Bad, but auto-complete include isn't working with my Eclipse
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
@@ -88,7 +88,7 @@ public class DefaultImageDrawer
 		
 		ImageWorkspace workspace = _data.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
-		IBuiltImageData data = workspace.buildData(_data);
+		ABuiltImageData data = workspace.buildData(_data);
 		
 		Vec2i p = data.convert( new Vec2i(x,y));
 		
@@ -111,7 +111,7 @@ public class DefaultImageDrawer
 			protected void performImageAction() {
 				RawImage img;
 				Vec2i layerSpace;
-				IBuiltImageData built = workspace.buildData(builtImage);
+				ABuiltImageData built = workspace.buildData(builtImage);
 				if( mask.selection == null) {
 					img = built.checkoutRaw();
 					layerSpace = built.convert( new Vec2i(p.x, p.y));
@@ -188,7 +188,7 @@ public class DefaultImageDrawer
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
 			protected void performImageAction() {
-				IBuiltImageData built = workspace.buildData(builtImage);
+				ABuiltImageData built = workspace.buildData(builtImage);
 				if( mask.selection == null) {
 					built.checkout().clear();
 					built.checkin();
@@ -258,7 +258,7 @@ public class DefaultImageDrawer
 
 		@Override
 		protected void performImageAction() {
-			IBuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+			ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
 			
 			if( mask != null && mask.selection != null) {
 				
@@ -365,7 +365,7 @@ public class DefaultImageDrawer
 
 		@Override
 		protected void performImageAction() {
-			IBuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+			ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
 			if( mask != null && mask.selection != null) {
 				// Lift the Selection
 				RawImage lifted = mask.liftSelectionFromData(built);
@@ -439,7 +439,7 @@ public class DefaultImageDrawer
 		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
 			protected void performImageAction() {
-				IBuiltImageData built = workspace.buildData(builtImage);
+				ABuiltImageData built = workspace.buildData(builtImage);
 				RawImage img = built.checkoutRaw();
 				RawImage img2 = img.deepCopy();
 				GraphicsContext gc = img.getGraphics();
@@ -546,7 +546,7 @@ public class DefaultImageDrawer
 		public void performImageAction( ) {
 			queueSelectionMask(mask);
 			
-			IBuiltImageData built = building.handle.getContext().buildData(builtImage);
+			ABuiltImageData built = building.handle.getContext().buildData(builtImage);
 			engine.batchDraw(params, points, built, mask);
 		}
 	}

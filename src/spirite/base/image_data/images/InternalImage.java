@@ -31,7 +31,7 @@ public class InternalImage implements IInternalImage {
 	public int getHeight() {
 		return cachedImage.access().getHeight();
 	}
-	public IBuiltImageData build( BuildingImageData building) {
+	public ABuiltImageData build( BuildingImageData building) {
 		return new BuiltImageData( building);
 	}
 	
@@ -53,7 +53,7 @@ public class InternalImage implements IInternalImage {
 		return cachedImage.access();
 	}
 	
-	public class BuiltImageData extends IBuiltImageData {
+	public class BuiltImageData extends ABuiltImageData {
 		final int ox;
 		final int oy;
 		

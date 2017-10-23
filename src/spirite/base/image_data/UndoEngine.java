@@ -15,7 +15,7 @@ import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.util.ObserverHandler;
@@ -1328,7 +1328,7 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction() {
-			IBuiltImageData ibid = builtImage.handle.context.buildData(builtImage);
+			ABuiltImageData ibid = builtImage.handle.context.buildData(builtImage);
 			GraphicsContext gc = ibid.checkout();
 			gc.drawImage(stored.access(), 0, 0);
 			ibid.checkin();

@@ -33,7 +33,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -143,7 +143,7 @@ public class GLWorkArea
         	glgc.setComposite(Composite.SRC_OVER, 1);
 
             // :::: Draw Border around the active Data
-            IBuiltImageData active = workspace.buildData(workspace.buildActiveData());
+            ABuiltImageData active = workspace.buildData(workspace.buildActiveData());
             
             if( active!= null) {
             	glgc.setComposite(glgc.getComposite(), 0.3f);

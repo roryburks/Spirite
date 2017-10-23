@@ -23,7 +23,7 @@ public interface IInternalImage {
 	public int getHeight();
 	public int getDynamicX();
 	public int getDynamicY();
-	public IBuiltImageData build( BuildingImageData building);
+	public ABuiltImageData build( BuildingImageData building);
 	public IInternalImage dupe();
 	public void flush();
 	public RawImage readOnlyAccess();
@@ -31,9 +31,25 @@ public interface IInternalImage {
 	public IImageDrawer getImageDrawer(BuildingImageData building);
 	
 	public static enum InternalImageTypes {
-		NORMAL,		// 0
-		DYNAMIC,	// 1
-		PRISMATIC	// 2
+		NORMAL(0),
+		DYNAMIC(1),
+		PRISMATIC(2),
+		MAGLEV(3),
+		;
+		
+		// This way, these values can be used in saving and loading without failing when
+		//	an Enum is removed
+		public final int permanentCode;
+		InternalImageTypes( int i) {this.permanentCode = i;}
+		
+		public InternalImageTypes fromCode( int code) {
+			InternalImageTypes[] values = InternalImageTypes.values();
+			for( int i=0; i < values.length; ++i )
+				if( values[i].permanentCode == code)
+					return values[i];
+				
+			return null;
+		}
 	}
 
 }

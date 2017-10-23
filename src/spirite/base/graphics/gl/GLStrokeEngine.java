@@ -77,6 +77,7 @@ class GLStrokeEngine extends StrokeEngine {
 	}
 	@Override
 	protected void drawDisplayLayer(GraphicsContext gc) {
+		if( displayLayer == null) return;
 		if( gc instanceof AWTContext) {
 			try {
 				GLImage img = new GLImage(w, h);

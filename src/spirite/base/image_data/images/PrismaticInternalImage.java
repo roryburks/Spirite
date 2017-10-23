@@ -118,7 +118,7 @@ public class PrismaticInternalImage implements IInternalImage {
 	}
 
 	@Override
-	public IBuiltImageData build( BuildingImageData building) {
+	public ABuiltImageData build( BuildingImageData building) {
 		return new PrismaticBuiltImageData( building);
 	}
 
@@ -178,7 +178,7 @@ public class PrismaticInternalImage implements IInternalImage {
 		return InternalImageTypes.PRISMATIC;
 	}
 
-	public class PrismaticBuiltImageData extends IBuiltImageData {
+	public class PrismaticBuiltImageData extends ABuiltImageData {
 		final int box;
 		final int boy;
 		RawImage buffer = null;

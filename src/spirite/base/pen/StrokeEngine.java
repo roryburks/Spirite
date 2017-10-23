@@ -8,7 +8,7 @@ import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
@@ -47,7 +47,7 @@ public abstract class StrokeEngine {
 
 	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
-	protected IBuiltImageData data;
+	protected ABuiltImageData data;
 	protected BuiltSelection sel;
 	
 	// Interpolation
@@ -58,7 +58,7 @@ public abstract class StrokeEngine {
 	public StrokeEngine.StrokeParams getParams() {
 		return stroke;
 	}
-	public IBuiltImageData getImageData() {
+	public ABuiltImageData getImageData() {
 		return data;
 	}
 	public StrokeEngine.STATE getState() {
@@ -82,7 +82,7 @@ public abstract class StrokeEngine {
 	public final boolean startStroke( 
 			StrokeParams params, 
 			PenState ps, 
-			IBuiltImageData data,
+			ABuiltImageData data,
 			BuiltSelection selection) 
 	{
 
@@ -222,7 +222,7 @@ public abstract class StrokeEngine {
 	 */
 	
 
-	public void batchDraw(StrokeParams params, PenState[] points, IBuiltImageData builtImage, BuiltSelection mask) 
+	public void batchDraw(StrokeParams params, PenState[] points, ABuiltImageData builtImage, BuiltSelection mask) 
 	{
 		this.startStroke(params, points[0], builtImage, mask);
 
@@ -321,7 +321,7 @@ public abstract class StrokeEngine {
 		
 	
 		private boolean locked = false;
-		
+
 		public StrokeParams() {}
 		
 		/** If Params are locked, they're being used and can't be changed.

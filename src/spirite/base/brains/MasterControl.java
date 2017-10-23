@@ -43,7 +43,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
@@ -500,7 +500,7 @@ public class MasterControl
     					img = currentWorkspace.getSelectionEngine().getLiftedImage();
     				}
     				else {
-    					IBuiltImageData bid = currentWorkspace.buildData(currentWorkspace.buildActiveData());
+    					ABuiltImageData bid = currentWorkspace.buildData(currentWorkspace.buildActiveData());
     					
     					if( bid == null) {
     		    	    	RenderSettings settings = new RenderSettings(
@@ -658,7 +658,7 @@ public class MasterControl
 			});
     		commandMap.put("shiftDown", () -> {
 				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof ITransformModule )
+				if( drawer instanceof ITransformModule ) 
 					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, 1));
     		});
     		commandMap.put("shiftUp", () -> {

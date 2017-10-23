@@ -16,10 +16,10 @@ import spirite.base.util.glmath.Vec2i;
  * over long terms.
  *
  */
-public abstract class IBuiltImageData {
+public abstract class ABuiltImageData {
 	public final ImageHandle handle;
 	
-	public IBuiltImageData( ImageHandle handle) {this.handle = handle;}
+	public ABuiltImageData( ImageHandle handle) {this.handle = handle;}
 	
 	public abstract int getWidth();
 	public abstract int getHeight();

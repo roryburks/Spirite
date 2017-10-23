@@ -34,7 +34,7 @@ public class DynamicInternalImage implements IInternalImage {
 		this.ox = ox;
 		this.oy = oy;
 	}
-	public IBuiltImageData build( BuildingImageData building) {
+	public ABuiltImageData build( BuildingImageData building) {
 		return new DynamicBuiltImageData(building);
 	}
 	@Override
@@ -56,7 +56,7 @@ public class DynamicInternalImage implements IInternalImage {
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
 	@Override public IImageDrawer getImageDrawer(BuildingImageData building) { return new DefaultImageDrawer(this, building);}
 	
-	public class DynamicBuiltImageData extends IBuiltImageData{
+	public class DynamicBuiltImageData extends ABuiltImageData{
 		final int box;
 		final int boy;
 		RawImage buffer = null;
@@ -68,12 +68,8 @@ public class DynamicInternalImage implements IInternalImage {
 			this.boy = building.oy;
 		}
 		
-		@Override public int getWidth() {
-			return handle.getContext().getWidth();
-		} 
-		@Override public int getHeight() {
-			return handle.getContext().getHeight();
-		}
+		@Override public int getWidth() {return handle.getContext().getWidth();} 
+		@Override public int getHeight() {return handle.getContext().getHeight();}
 		@Override public float convertX( float x) {return x;}
 		@Override public float convertY( float y) {return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}
@@ -84,12 +80,10 @@ public class DynamicInternalImage implements IInternalImage {
 			gc.drawRect(box + ox, boy + oy, 
 					handle.getWidth(), handle.getHeight());
 		}
-		@Override
-		public MatTrans getCompositeTransform() {
-			MatTrans trans = new MatTrans();
-			trans.preTranslate(box, boy);
-			return trans;
-		}
+		@Override public MatTrans getCompositeTransform() 
+			{return MatTrans.TranslationMatrix(box, boy);}
+		@Override public MatTrans getScreenToImageTransform() 
+			{return MatTrans.TranslationMatrix(-box, -boy);}
 		
 		@Override
 		public GraphicsContext checkout() {
@@ -172,12 +166,6 @@ public class DynamicInternalImage implements IInternalImage {
 			handle.drawLayer( gc, transform);
 		}
 
-		@Override
-		public MatTrans getScreenToImageTransform() {
-			MatTrans transform = new MatTrans();
-			transform.preTranslate( -box, -boy);
-			return transform;
-		}
 	}
 
 

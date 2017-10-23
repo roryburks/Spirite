@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,13 +30,14 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.DynamicInternalImage;
-import spirite.base.image_data.images.IBuiltImageData;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.images.drawer.GroupNodeDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.maglev.MaglevInternalImage;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -369,7 +371,7 @@ public class ImageWorkspace {
 	
 	/** Converts BuildingImageData (which is provided by Layers to describe all
 	 * sub-parts in a partially-built form) into fully-built Image Data	 */
-	public IBuiltImageData buildData( BuildingImageData data) {
+	public ABuiltImageData buildData( BuildingImageData data) {
 		if( data == null) return null;
 		
 		IInternalImage ii = imageData.get(data.handle.id);
@@ -421,8 +423,9 @@ public class ImageWorkspace {
 	 * 110% screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 */
 	void _replaceIamge( ImageHandle old, IInternalImage img) {
-		imageData.get(old.id).flush();
+		IInternalImage oldII = imageData.get(old.id);
 		imageData.put(old.id, img.dupe());
+		oldII.flush();
 		
 		old.refresh();
 	}
@@ -643,9 +646,11 @@ public class ImageWorkspace {
 		case PRISMATIC:
 			ii = new PrismaticInternalImage();
 			break;
-
 		case NORMAL:
 			ii = new InternalImage(img, this);
+			break;
+		case MAGLEV:
+			ii = new MaglevInternalImage(this);
 			break;
 		}
 		
@@ -1583,6 +1588,17 @@ public class ImageWorkspace {
 			img.flush();
 		
 		undoEngine.cleanup();
+	}
+	public ImageHandle getHandleFor(IInternalImage iimg) {
+		Iterator<Entry<Integer,IInternalImage>> it = imageData.entrySet().iterator();
+		
+		while( it.hasNext()) {
+			Entry<Integer,IInternalImage> entry = it.next();
+			if( entry.getValue() == iimg)
+				return new ImageHandle(this, entry.getKey());
+		}
+		
+		return null;
 	}
 	
 }
