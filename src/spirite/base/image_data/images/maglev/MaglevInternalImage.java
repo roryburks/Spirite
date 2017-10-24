@@ -27,29 +27,32 @@ import spirite.hybrid.HybridHelper;
  * be scaled/rotated without generation loss	.
  */
 public class MaglevInternalImage implements IInternalImage {
-	final List<MagLevStroke> strokes;
+	//final List<MagLevStroke> strokes;
+	//final List<MagLevFill> fills;
+	final List<MagLevThing> things;
+	
 	private ImageWorkspace context;
-	private RawImage builtImage = null;
+	RawImage builtImage = null;
 	private boolean isBuilt = false;
 	
 	public MaglevInternalImage( ImageWorkspace context) {
 		this.context = context;
-		this.strokes =  new ArrayList<>();
+		this.things =  new ArrayList<>();
 		if( context != null) {
 			// TODO: unflag "isBuilt" when Workspace changes size
 		}
 	}
 	private MaglevInternalImage( MaglevInternalImage other) {
 		this.context = other.context;
-		this.strokes = new ArrayList<>(other.strokes.size());
+		this.things = new ArrayList<>(other.things.size());
 		
-		for( MagLevStroke stroke : other.strokes) {
-			this.strokes.add(stroke.clone());
-		}
+		for( MagLevThing thing : other.things)
+			this.things.add(thing.clone());
 	}
 	
-	void addStroke( MagLevStroke stroke) {strokes.add(stroke);}
-	void popStroke() {strokes.remove(strokes.size()-1);}
+	void addThing( MagLevThing thing) {things.add(thing);}
+	void popThing() {things.remove(things.size()-1);}
+		
 	void unbuild() {
 		if( this.isBuilt) {
 			this.isBuilt = false;
@@ -58,7 +61,13 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 	}
 	
-	public class MagLevStroke {
+	public static abstract class MagLevThing {
+		abstract float[] getPoints();
+		abstract void setPoints(float[] xy);
+		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context );
+		protected abstract MagLevThing clone();
+	}
+	public static class MagLevStroke extends MagLevThing {
 		PenState[] states;
 		StrokeParams params;
 		
@@ -74,6 +83,64 @@ public class MaglevInternalImage implements IInternalImage {
 			}
 			
 			return new MagLevStroke(newStates, params);
+		}
+
+		@Override
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context) {
+			StrokeEngine _engine = context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
+			_engine.batchDraw(params, states, built, mask);
+		}
+
+		@Override
+		float[] getPoints() {
+			float[] data = new float[states.length*2];
+			for( int i=0; i<states.length;++i) {
+				data[i*2] = states[i].x;
+				data[i*2+1] = states[i].y;
+			}
+			return data;
+		}
+
+		@Override
+		void setPoints(float[] xy) {
+			for( int i=0; i<states.length; ++i) {
+				states[i].x = xy[i*2];
+				states[i].y = xy[i*2+1];
+			}
+		}
+	}
+	public static class MagLevFill extends MagLevThing {
+		float[] x;
+		float[] y;
+		int color;
+		public MagLevFill( float[] x, float[] y, int color) {
+			this.x = x;
+			this.y = y;
+			this.color = color;
+		}
+		protected MagLevFill clone()  {
+			return new MagLevFill(x.clone(),y.clone(), color);
+		}
+		@Override
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		float[] getPoints() {
+			float[] xy = new float[x.length*2];
+			for( int i=0; i < x.length; ++i) {
+				xy[i*2] = x[i];
+				xy[i*2+1] = y[i];
+			}
+			return xy;
+		}
+		@Override
+		void setPoints(float[] xy) {
+			for( int i=0; i < x.length; ++i) {
+				x[i] = xy[i*2];
+				y[i] = xy[i*2+1];
+			}
 		}
 	}
 
@@ -108,18 +175,17 @@ public class MaglevInternalImage implements IInternalImage {
 
 	// ==== Hard Junk
 	boolean building = false;
-	private void Build() {
+	void Build() {
 		if( !building) {
 			building = true;
 			if( !isBuilt) {
 				builtImage = HybridHelper.createImage(getWidth(), getHeight());
+				GraphicsContext gc = builtImage.getGraphics();
 	
 				ABuiltImageData built = this.build(new BuildingImageData(context.getHandleFor(this), 0, 0));
 				BuiltSelection mask = new BuiltSelection(null, 0, 0);
-				for( MagLevStroke stroke : strokes) {
-	
-					StrokeEngine _engine = context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
-					_engine.batchDraw(stroke.params, stroke.states, built, mask);
+				for( MagLevThing thing : things) {
+					thing.draw( built, mask, gc, context);
 				}
 			}
 			isBuilt = true;

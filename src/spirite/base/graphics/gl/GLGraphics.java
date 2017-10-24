@@ -11,7 +11,6 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
-import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.GLParameters.GLTexture;
@@ -282,7 +281,6 @@ public class GLGraphics extends GraphicsContext{
 		y_[0] = y_[2] = y;
 		x_[2] = x_[3] = x + w;
 		y_[1] = y_[3] = y + h;
-		
 
 		GLParameters params = getPolyParams();
 		engine.applyPolyProgram(ProgramType.POLY_RENDER, x_, y_, x_.length, PolyType.STRIP, params, contextTransform, gl);
@@ -312,9 +310,11 @@ public class GLGraphics extends GraphicsContext{
 	public void fillPolygon(int[] x, int[] y, int count) {
 		reset();
 		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count));
-		// TODO Auto-generated method stub
-		Primitive prim;
-		//engine.applyPrimitiveProgram(type, params, prim);
+	}
+	@Override
+	public void fillPolygon(float[] x, float[] y, int count) {
+		reset();
+		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count));
 	}
 	
 	

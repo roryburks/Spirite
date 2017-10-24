@@ -1,6 +1,7 @@
 package spirite.base.image_data.images.drawer;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
@@ -53,5 +54,16 @@ public interface IImageDrawer {
 	
 	public interface ITransformModule {
 		public void transform( MatTrans trans);
+	}
+	
+	public interface IMagneticFillModule {
+		public void startMagneticFill();
+		public void endMagneticFill();
+		public float[][] anchorPoints( float x1, float y1, float r1, float x2, float y2, float r2);
+		public float[][] anchorPointsHard( float x, float y, float r);
+		//public float[] interpretFillPoint( int x, int y, float weight);
+		//public float[] rightExistingPoints( float[] x, float[] y);
+		
+		public void interpretFill( float[] curveRaw, int color);
 	}
 }

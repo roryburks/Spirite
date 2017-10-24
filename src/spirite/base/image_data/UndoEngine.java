@@ -260,6 +260,8 @@ public class UndoEngine {
 	 */
 	public void performAndStore( UndoableAction action) {
 		if( action != null) {
+			if( action instanceof ImageAction)
+				prepareContext(((ImageAction) action).builtImage.handle);
 			action.performAction();
 			if( isPaused)
 				queuedActions.add(action);

@@ -9,7 +9,6 @@ import com.jogamp.opengl.glu.GLUtessellatorCallback;
 
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.glmath.GLC;
 
 public class GLUtil {
 	public static Primitive tesselatePolygon(int[] x, int[] y, int count) {
@@ -55,7 +54,7 @@ public class GLUtil {
 	    GLU.gluTessBeginContour(tess);
 	    for( int i=0; i < count; ++i) {
 			double[] buffer = new double[] {x[i],y[i],0};
-	    	GLU.gluTessVertex(tess, buffer, 0, null);
+	    	GLU.gluTessVertex(tess, buffer, 0, buffer);
 	    }
 	    GLU.gluTessEndContour(tess);
 	    GLU.gluTessEndPolygon(tess);

@@ -85,6 +85,7 @@ public abstract class GraphicsContext {
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
 
 	public abstract void fillPolygon(int[] x, int[] y, int count);
+	public abstract void fillPolygon(float[] x, float[] y, int length);
 
 	public abstract void setClip(int i, int j, int width, int height);
 
@@ -97,6 +98,7 @@ public abstract class GraphicsContext {
 
 	public abstract void renderImage(RawImage rawImage, int x, int y, RenderProperties render);
 	public abstract void renderHandle( ImageHandle handle, int x, int y, RenderProperties render);
+
 
 
 

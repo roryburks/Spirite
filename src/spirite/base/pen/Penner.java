@@ -38,6 +38,7 @@ import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -47,6 +48,7 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
+import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
@@ -384,6 +386,13 @@ public class Penner
 					HybridHelper.beep();
 				
 				break;}
+			case MAGLEV_FILL:
+
+				IImageDrawer drawer = workspace.getActiveDrawer();
+				if( drawer instanceof IMagneticFillModule) {
+					behavior = new MagFilling((IMagneticFillModule) drawer);
+				}
+				else HybridHelper.beep();
 			}
 			
 			if( behavior != null)
@@ -1389,6 +1398,46 @@ public class Penner
 		@Override public void onTock() {}
 	}
 	
+	
+	class MagFilling extends DrawnStateBehavior {
+		FloatCompactor fc = new FloatCompactor();
+		IMagneticFillModule drawer;
+		
+		MagFilling( IMagneticFillModule drawer) {
+			this.drawer = drawer;
+		}
+		
+		@Override
+		public void paintOverlay(GraphicsContext gc) {
+			gc.setTransform(view.getViewTransform());
+			gc.setColor(paletteManager.getActiveColor(0));
+			for( int i=0; i < fc.size()-3; i+=2) {
+				gc.drawLine((int)fc.get(i), (int)fc.get(i+1), (int)fc.get(i+2), (int)fc.get(i+3));
+			}
+		}
+
+		@Override public void start() {
+			drawer.startMagneticFill();
+		}
+		@Override public void onTock() {}
+		@Override
+		public void onMove() {
+			float[][] f = drawer.anchorPoints(oldX, oldY, 5, x, y, 5);
+			
+			for( float[] point : f) {
+				fc.add(point[0]);
+				fc.add(point[1]);
+			}
+		}
+		@Override
+		public void onPenUp() {
+			drawer.anchorPointsHard(x, y, 5);
+			drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
+			drawer.endMagneticFill();
+			super.onPenUp();
+		}
+		
+	}
 	
 	public boolean drawsOverlay() {
 		return (behavior instanceof DrawnStateBehavior);

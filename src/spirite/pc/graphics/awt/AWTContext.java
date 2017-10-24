@@ -67,6 +67,14 @@ public class AWTContext extends GraphicsContext{
 	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}
 	@Override public void fillOval(int x, int y, int w, int h) {g2.fillOval(x, y, w, h);}
 	@Override public void fillPolygon(int[] x, int[] y, int count) {g2.fillPolygon(x, y, count);}
+	@Override public void fillPolygon(float[] x, float[] y, int count) {
+		int[] _x = new int[count];
+		int[] _y = new int[count];
+		for( int i=0; i<count; ++count) {
+			_x[i] = (int)x[i];
+			_y[i] = (int)y[i];
+		}
+		g2.fillPolygon(_x, _y, count);}
 
 	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
 	@Override public void setClip(int x, int y, int width, int height) { g2.setClip(x, y, width, height); }
