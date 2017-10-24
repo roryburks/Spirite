@@ -62,47 +62,8 @@ public class GLUtil {
 		
 		return callback.buildPrimitive();
 	}
-
-	public static void tesselate() {
-		GLUtessellator tess = GLU.gluNewTess();
-		GLUTCB callback = new GLUTCB();
-
-		GLU.gluTessCallback(tess, GLU.GLU_TESS_VERTEX, callback);// vertexCallback);
-		GLU.gluTessCallback(tess, GLU.GLU_TESS_BEGIN, callback);// beginCallback);
-		GLU.gluTessCallback(tess, GLU.GLU_TESS_END, callback);// endCallback);
-		GLU.gluTessCallback(tess, GLU.GLU_TESS_ERROR, callback);// errorCallback);
-		GLU.gluTessCallback(tess, GLU.GLU_TESS_COMBINE, callback);// combineCallback);
-
-		double[][] data = { 
-				{0, 0, 0},
-				{25, 25, 0},
-				{60, 0, 0},
-				{70, 70, 0},
-				{50, 70, 0},
-				{50, 50, 0},
-				{100, 50, 0},
-				{100, 100, 0},
-				{-25, 100, 0},
-				{-25, 125, 0},
-				{50, 125, 0},
-				{50, 70, 0},
-				{0, 70, 0},
-			};
-		
-	    GLU.gluTessProperty(tess,
-	        GLU.GLU_TESS_WINDING_RULE, 
-	        GLU.GLU_TESS_WINDING_ODD);
-	    GLU.gluTessBeginPolygon(tess, null);
-	    GLU.gluTessBeginContour(tess);
-	    for( int i=0; i < data.length; ++i) 
-	    	GLU.gluTessVertex(tess, data[i], 0, data[i]);
-	    GLU.gluTessEndContour(tess);
-	    GLU.gluTessEndPolygon(tess);
-	    GLU.gluDeleteTess(tess);
-		System.out.println("End.");
-	}
 	
-	private static class GLUTCB implements GLUtessellatorCallback {
+	public static class GLUTCB implements GLUtessellatorCallback {
 		private final FloatCompactor data = new FloatCompactor();
 		private final List<Integer> types = new ArrayList<>();
 		private final List<Integer> lengths = new ArrayList<>();
@@ -115,9 +76,7 @@ public class GLUtil {
 		@Override public void combine(double[] coords, Object[] data, float[] weight, Object[] out) {
 			out[0] = coords;
 		}
-		@Override public void edgeFlag(boolean arg0) {
-			System.out.println("Edge Flag");
-		}
+		@Override public void edgeFlag(boolean arg0) {}
 
 		@Override
 		public void end() {
@@ -141,7 +100,6 @@ public class GLUtil {
 		}
 		
 		Primitive buildPrimitive() {
-			System.out.println(types.size() + "," + lengths.size());
 			int len = Math.min(types.size(), lengths.size());
 			int[] ptypes = new int[len];
 			int[] plengths = new int[len];

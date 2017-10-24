@@ -1,6 +1,7 @@
 package spirite.base.image_data.images.maglev;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
@@ -20,6 +21,8 @@ import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.util.MUtil;
+import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
 
@@ -117,29 +120,22 @@ public class MaglevImageDrawer
 
 	
 	// :::: IMagnetifFillModule
-	@Override public void startMagneticFill() {}
-
-	@Override public void endMagneticFill() {}
-
-	@Override
-	public float[][] anchorPoints(float x1, float y1, float r1, float x2, float y2, float r2) {
-		return new float[][] {{x1,y1}};
+	StrokeSegment ss;
+	FloatCompactor out_x;
+	FloatCompactor out_y;
+	private class StrokeSegment {
+		MagLevStroke stroke;
+		int start;
+		int end;
+		int direction = 0;	// 0 means unknown, 1 means forward, -1 means nil
 	}
-
-	@Override
-	public float[][] anchorPointsHard(float x, float y, float r) {
-		return new float[][] {{x,y}};
+	@Override public void startMagneticFill() { 
+		ss = null;
+		out_x = new FloatCompactor();
+		out_y = new FloatCompactor();
 	}
-
-	@Override
-	public void interpretFill(float[] curve, int color) {
-		float[] x = new float[curve.length/2];
-		float[] y = new float[curve.length/2];
-		for( int i=0; i < x.length; ++i) {
-			x[i] = curve[i*2];
-			y[i] = curve[i*2+1];
-		}
-		MagLevFill fill = new MagLevFill(x, y, color);
+	@Override public void endMagneticFill( int color) {
+		MagLevFill fill = new MagLevFill(out_x.toArray(), out_y.toArray(), color);
 		
 
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
@@ -160,5 +156,121 @@ public class MaglevImageDrawer
 				return "Fill Action on MagLev Image";
 			}
 		});
+		
+		ss = null;
+		out_x = null;
+		out_y = null;
 	}
+
+	@Override
+	public void anchorPoints(float x1, float y1, float r1, float x2, float y2, float r2) {
+		if( ss == null) {
+			// Find the closest stroke to anchor to
+			float closestDistance = r1+0.0001f;
+			int closestIndex = -1;
+			MagLevStroke closestStroke = null;
+			for( MagLevThing thing : img.things) {
+				if( thing instanceof MagLevStroke) {
+					MagLevStroke stroke = (MagLevStroke)thing;
+					for( int i=0; i < stroke.states.length; ++i) {
+						float distance = (float) MUtil.distance(x1, y1, stroke.states[i].x, stroke.states[i].y);
+						if( distance < closestDistance) {
+							closestIndex = i;
+							closestStroke = stroke;
+							closestDistance = distance;
+						}
+					}
+				}
+			}
+			
+			if( closestStroke != null) {
+				ss = new StrokeSegment();
+				ss.start = ss.end = closestIndex;
+				ss.stroke = closestStroke;
+			}
+		}
+		if( ss != null) {
+			if( ss.direction == 0) {
+				boolean soft = false;
+				for( int i=ss.start; i >=0; --i) {
+					if( (float) MUtil.distance(x1, y1, ss.stroke.states[i].x, ss.stroke.states[i].y) < r1) {
+						ss.start = i;
+						soft = true;
+					}
+					else break;
+				}
+				for( int i=ss.end; i <ss.stroke.states.length; ++i) {
+					if( (float) MUtil.distance(x1, y1, ss.stroke.states[i].x, ss.stroke.states[i].y) < r1) {
+						ss.end= i;
+						soft = true;
+					}
+					else break;
+				}
+				if( !soft) {
+					if(MUtil.distance(x2, y2, ss.stroke.states[ss.start].x, ss.stroke.states[ss.start].y) < 
+							MUtil.distance(x2, y2, ss.stroke.states[ss.end].x, ss.stroke.states[ss.end].y)) 
+					{
+						ss.direction = -1;
+						for( int i=ss.end; i >= ss.start; --i) {
+							out_x.add(ss.stroke.states[i].x);
+							out_y.add(ss.stroke.states[i].y);
+						}
+					}
+					else {
+						ss.direction = 1;
+						for( int i=ss.start; i <= ss.end; ++i) {
+							out_x.add(ss.stroke.states[i].x);
+							out_y.add(ss.stroke.states[i].y);
+						}
+					}
+					
+				}
+			}
+			else {
+				boolean hard = false;
+				if( ss.direction == -1) {
+					for( int i= ss.start; i >= 0; --i) {
+						if( (float) MUtil.distance(x2, y2, ss.stroke.states[i].x, ss.stroke.states[i].y) < r2) { 
+							hard = true;
+							if( ss.start != i) {
+								out_x.add(ss.stroke.states[i].x);
+								out_y.add(ss.stroke.states[i].y);
+							}
+								
+							ss.start = i;
+						}
+					}
+				}
+				if( ss.direction == 1) {
+					for( int i= ss.end; i < ss.stroke.states.length ; ++i) {
+						if( (float) MUtil.distance(x2, y2, ss.stroke.states[i].x, ss.stroke.states[i].y) < r2) { 
+							hard = true;
+							if( ss.end != i) {
+								out_x.add(ss.stroke.states[i].x);
+								out_y.add(ss.stroke.states[i].y);
+							}
+							ss.end = i;
+						}
+					}
+				}
+				if( !hard) {
+					// TODO
+				}
+			}
+		}
+	}
+	@Override
+	public float[] getXs() {
+		return out_x.toArray();
+	}
+
+	@Override
+	public float[] getYs() {
+		return out_y.toArray();
+	}
+
+	@Override
+	public void interpretFill(float[] curve, int color) {
+	}
+
 }

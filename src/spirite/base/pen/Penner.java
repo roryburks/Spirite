@@ -1400,7 +1400,6 @@ public class Penner
 	
 	
 	class MagFilling extends DrawnStateBehavior {
-		FloatCompactor fc = new FloatCompactor();
 		IMagneticFillModule drawer;
 		
 		MagFilling( IMagneticFillModule drawer) {
@@ -1410,9 +1409,13 @@ public class Penner
 		@Override
 		public void paintOverlay(GraphicsContext gc) {
 			gc.setTransform(view.getViewTransform());
-			gc.setColor(paletteManager.getActiveColor(0));
-			for( int i=0; i < fc.size()-3; i+=2) {
-				gc.drawLine((int)fc.get(i), (int)fc.get(i+1), (int)fc.get(i+2), (int)fc.get(i+3));
+			gc.setColor(0xFFFFFF ^ paletteManager.getActiveColor(0));
+
+			float[] fx = drawer.getXs();
+			float[] fy = drawer.getYs();
+			
+			for( int i=0; i < fx.length-1; ++i){
+				gc.drawLine((int)fx[i],(int)fy[i],(int)fx[i+1],(int)fy[i+1]);
 			}
 		}
 
@@ -1422,18 +1425,13 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			float[][] f = drawer.anchorPoints(oldX, oldY, 5, x, y, 5);
-			
-			for( float[] point : f) {
-				fc.add(point[0]);
-				fc.add(point[1]);
-			}
+			drawer.anchorPoints(oldX, oldY, 10, x, y, 10);
 		}
 		@Override
 		public void onPenUp() {
-			drawer.anchorPointsHard(x, y, 5);
-			drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
-			drawer.endMagneticFill();
+			//drawer.anchorPointsHard(x, y, 5);
+			//drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
+			drawer.endMagneticFill(paletteManager.getActiveColor(0));
 			super.onPenUp();
 		}
 		
