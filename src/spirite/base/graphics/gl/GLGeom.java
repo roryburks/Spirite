@@ -17,17 +17,25 @@ import spirite.base.util.glmath.Vec2;
 public class GLGeom {
 
     public static class Primitive {
-        float raw[];
-        int attrLengths[];
-        int primitiveType;
-        int primitiveLengths[];
+        float[] raw;
+        int[] attrLengths;
+        int[] primitiveTypes;
+        int[] primitiveLengths;
 
         public Primitive() {}
-        public Primitive(float raw[], int attrLengths[], int primitiveType, int[] primitiveLengths){
+        public Primitive(float[] raw, int[] attrLengths, int primitiveType, int[] primitiveLengths){
             this.raw = raw;
             this.attrLengths = attrLengths;
-            this.primitiveType = primitiveType;
+            this.primitiveTypes = new int[primitiveLengths.length];
+            for( int i=0; i < primitiveLengths.length; ++i)
+            	this.primitiveTypes[i] = primitiveType;
             this.primitiveLengths = primitiveLengths;
+        }
+        public Primitive(float[] raw, int[] attrLengths, int[] primitiveTypes, int[] primitiveLengths){
+            this.raw = raw;
+            this.attrLengths = attrLengths;
+            this.primitiveTypes = primitiveTypes;
+            this.primitiveLengths = primitiveLengths;        	
         }
     }
 
@@ -85,15 +93,11 @@ public class GLGeom {
         }
 
         private Primitive build() {
-            Primitive primitive = new Primitive();
-            primitive.primitiveType = primitiveType;
-            primitive.attrLengths = attrLengths;
-            primitive.raw = output.toArray();
-            primitive.primitiveLengths = new int[primitiveLengths.size()];
+        	int[] primLens = new int[primitiveLengths.size()];
             for( int i=0; i < primitiveLengths.size(); ++i)
-                primitive.primitiveLengths[i] = primitiveLengths.get(i);
-
-            return primitive;
+                primLens[i] = primitiveLengths.get(i);
+            
+            return new Primitive(output.toArray(), attrLengths, primitiveType, primLens);
         }
     }
     private static class DoubleEndedSinglePrimitiveBuilder {
@@ -134,8 +138,8 @@ public class GLGeom {
 
         private Primitive build() {
             Primitive primitive = new Primitive();
-            primitive.primitiveType = primitiveType;
             primitive.attrLengths = attrLengths;
+            primitive.primitiveTypes = new int[] {primitiveType};
             primitive.raw = new float[ forward.size() +backward.size()];
             forward.insertIntoArray(primitive.raw, 0);
             backward.insertIntoArray(primitive.raw, forward.size());
@@ -145,6 +149,7 @@ public class GLGeom {
             	stride += len;
             primitive.primitiveLengths = new int[]{primitive.raw.length / stride};
 
+            
             return primitive;
         }
     }

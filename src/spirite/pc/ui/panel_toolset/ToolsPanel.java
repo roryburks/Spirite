@@ -16,6 +16,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -25,10 +26,14 @@ import javax.swing.SwingUtilities;
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 
@@ -44,11 +49,12 @@ import spirite.hybrid.tools.ToolsetIcons;
  *
  */
 public class ToolsPanel extends JPanel
-        implements ComponentListener, MToolsetObserver
+        implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MSelectionObserver
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
     private final ToolsetManager toolsetManager;
     private final HotkeyManager hotkeyManager;
+    private ImageWorkspace workspace;
     
 	private static final long serialVersionUID = 1L;
 	private static final int BUTTON_WIDTH = 24;
@@ -67,6 +73,8 @@ public class ToolsPanel extends JPanel
     	this.hotkeyManager = master.getHotekyManager();
 
     	toolsetManager.addToolsetObserver(this);
+    	master.addWorkspaceObserver(this);
+    	this.currentWorkspaceChanged(master.getCurrentWorkspace(), null);
 
         initComponents();
         
@@ -87,15 +95,23 @@ public class ToolsPanel extends JPanel
 
         container = new JPanel();
         add(container);
+    }
+    
+    private void Build( List<Tool> tools) {
+    	container.removeAll();
 
-        // :: Add Toolset Buttons
-        tool_len = toolsetManager.getToolCount();
-
-        buttons = new ToolButton[tool_len];
-        for( int i = 0; i < tool_len; ++i) {
-            buttons[i] = new ToolButton( toolsetManager.getNthTool(i));
-            container.add( buttons[i]);
-        }
+    	if( tools == null) {
+    		buttons = null;
+    		tool_len = 0;
+    	}
+    	else {
+	        buttons = new ToolButton[tools.size()];
+	        tool_len = tools.size();
+	        for( int i=0; i < tools.size(); ++i) {
+	        	buttons[i] = new ToolButton( tools.get(i));
+	        	container.add(buttons[i]);
+	        }
+    	}
 
         // Calibrate the grid
         // Note, this is invoked later so that getWidth works correctly
@@ -104,7 +120,6 @@ public class ToolsPanel extends JPanel
                 calibrateGrid();
             }
         });
-
     }
 
     /**
@@ -141,6 +156,8 @@ public class ToolsPanel extends JPanel
     @Override public void toolsetPropertyChanged(Tool tool, Property property) {}
     @Override
     public void toolsetChanged( Tool newTool) {
+    	if( buttons == null)
+    		return;
         for( ToolButton button : buttons) {
             if( button.tool.equals(newTool)) {
                 if( !button.isSelected()) {
@@ -243,5 +260,28 @@ public class ToolsPanel extends JPanel
             this.repaint();
         }
     }
+
+
+	@Override
+	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		if( workspace != null) {
+			workspace.removeSelectionObserver(this);
+		}
+		this.workspace = selected;
+		if( workspace != null) {
+			workspace.addSelectionObserver(this);
+		}
+		selectionChanged((workspace == null) ? null : workspace.getSelectedNode());
+	}
+	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
+
+
+	@Override
+	public void selectionChanged(Node newSelection) {
+		if( workspace == null)
+			return;
+		Build( toolsetManager.getToolsForDrawer(workspace.getDrawerFromNode(newSelection)));
+	}
 
 }

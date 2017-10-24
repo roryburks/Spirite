@@ -84,17 +84,17 @@ public class DynamicInternalImage implements IInternalImage {
 			{return MatTrans.TranslationMatrix(box, boy);}
 		@Override public MatTrans getScreenToImageTransform() 
 			{return MatTrans.TranslationMatrix(-box, -boy);}
+		@Override
+		public Rect getBounds() {
+			return new Rect( box + handle.getDynamicX(), boy + handle.getDynamicY(), 
+					handle.getWidth(), handle.getHeight());
+		}
 		
 		@Override
 		public GraphicsContext checkout() {
 			return checkoutRaw().getGraphics();
 		}
 		
-		@Override
-		public Rect getBounds() {
-			return new Rect( box + handle.getDynamicX(), boy + handle.getDynamicY(), 
-					handle.getWidth(), handle.getHeight());
-		}
 		@Override
 		public RawImage checkoutRaw() {
 			handle.getContext().getUndoEngine().prepareContext(handle);

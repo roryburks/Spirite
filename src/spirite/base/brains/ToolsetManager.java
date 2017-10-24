@@ -1,12 +1,17 @@
 package spirite.base.brains;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.image_data.images.drawer.DefaultImageDrawer;
+import spirite.base.image_data.images.drawer.GroupNodeDrawer;
+import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.maglev.MaglevImageDrawer;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.tools.properties.ButtonProperty;
 import spirite.hybrid.tools.properties.CheckBoxProperty;
@@ -41,7 +46,9 @@ public class ToolsetManager
         FLIPPER("Horizontal/Vertical Flipping",9),
         RESHAPER("Reshaping Tool",10),
         COLOR_CHANGE("Color Change Tool",11),
-        COLOR_PICKER("Color Picker",12),;
+        COLOR_PICKER("Color Picker",12),
+        MAGLEV_FILL("Magnetic Fill",13),
+        ;
 
         public final String description;
         public final int iconLocation;
@@ -118,6 +125,30 @@ public class ToolsetManager
         return toolSettings.get(tool);
     }
 
+    public List<Tool> getToolsForDrawer( IImageDrawer drawer) {
+    	if( drawer instanceof DefaultImageDrawer)
+    		return Arrays.asList(ToolsForDefaultDrawer);
+    	if( drawer instanceof GroupNodeDrawer)
+    		return Arrays.asList(ToolsForDefaultDrawer);
+    		//return Arrays.asList(ToolsForGroupDrawer);
+    	if( drawer instanceof MaglevImageDrawer)
+    		return Arrays.asList(ToolsForMaglevDrawer);
+    	return null;
+    }
+    private static Tool[] ToolsForDefaultDrawer = {
+    		Tool.PEN, Tool.ERASER, Tool.FILL, Tool.BOX_SELECTION, Tool.FREEFORM_SELECTION,
+    		Tool.MOVE, Tool.PIXEL, Tool.CROP, Tool.COMPOSER, Tool.FLIPPER,
+    		Tool.RESHAPER, Tool.COLOR_CHANGE, Tool.COLOR_PICKER
+    };
+    private static Tool[] ToolsForGroupDrawer = {
+    		Tool.BOX_SELECTION, Tool.FREEFORM_SELECTION,
+    		Tool.MOVE, Tool.PIXEL, Tool.CROP, Tool.COMPOSER, Tool.FLIPPER,
+    		Tool.RESHAPER, Tool.COLOR_CHANGE, Tool.COLOR_PICKER
+    };
+    private static Tool[] ToolsForMaglevDrawer = {
+    		Tool.PEN, Tool.ERASER, Tool.PIXEL,
+    		Tool.MAGLEV_FILL
+    };
 
     /**
      * ToolSettins is an abstract to describe all the settings a particular tool

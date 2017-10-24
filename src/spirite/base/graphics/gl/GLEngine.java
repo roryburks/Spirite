@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.glu.GLU;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
@@ -653,7 +654,7 @@ public class GLEngine  {
 		// Start Draw
         int start = 0;
         for( int i=0; i < primitive.primitiveLengths.length; ++i) {
-        	gl.glDrawArrays(primitive.primitiveType,  start, primitive.primitiveLengths[i]);
+        	gl.glDrawArrays(primitive.primitiveTypes[i],  start, primitive.primitiveLengths[i]);
             start += primitive.primitiveLengths[i];
         }
         gl.glDisable( GLC.GL_BLEND);
