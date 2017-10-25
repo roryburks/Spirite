@@ -40,9 +40,9 @@ import spirite.base.image_data.layers.SpriteLayer.RigStructureObserver;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
-import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class RigPanel extends OmniComponent 
 	implements MWorkspaceObserver, MSelectionObserver, ActionListener,

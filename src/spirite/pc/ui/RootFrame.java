@@ -241,7 +241,7 @@ public class RootFrame extends javax.swing.JFrame
 		}
     }
     
-    WorkTabPane getWTPane() {
+    public WorkTabPane getWTPane() {
     	return this.workPane;
     }
     

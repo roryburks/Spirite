@@ -54,9 +54,9 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.components.SliderPanel;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 /**
  * 

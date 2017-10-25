@@ -35,9 +35,9 @@ public class FixedFrameAnimation extends Animation
 	private int startFrame;
 	private int endFrame;
 
-	public FixedFrameAnimation(GroupNode group, String name) {
+	public FixedFrameAnimation(GroupNode group, String name, boolean includeSubtrees) {
 		super( group.getContext());
-		layers.add( constructFromGroup(group));
+		layers.add( constructFromGroup(group, includeSubtrees));
 		this.name = name;
 		recalculateMetrics();
 	}
@@ -46,7 +46,7 @@ public class FixedFrameAnimation extends Animation
 		this.name = name;
 	}
 	
-	public void addBuiltLinkedLayer( GroupNode link, Map<Node,FrameAbstract> frameMap, boolean usesSubgroups) {
+	public void addBuiltLinkedLayer( GroupNode link, Map<Node,FrameAbstract> frameMap, boolean includeSubtrees) {
 		
 		AnimationLayer layer = new AnimationLayer();
 		layer.groupLink = link;		
@@ -56,7 +56,7 @@ public class FixedFrameAnimation extends Animation
 			layer.nodeLinks.put(entry.getKey(), layer.new Frame(entry.getValue()));
 		}
 		
-		layer.includeSubtrees = usesSubgroups;
+		layer.includeSubtrees = includeSubtrees;
 		layer.groupLinkUpdated();
 		layers.add(layer);
 		_triggerChange();
@@ -65,10 +65,11 @@ public class FixedFrameAnimation extends Animation
 	@Override public boolean isFixedFrame() {return true;}
 	
 	
-	private AnimationLayer constructFromGroup( GroupNode group) {
+	private AnimationLayer constructFromGroup( GroupNode group, boolean includeSubtrees) {
 
 		AnimationLayer layer = new AnimationLayer();
 		layer.groupLink = group;
+		layer.includeSubtrees = includeSubtrees;
 		layer.groupLinkUpdated();
 		
 		return layer;
@@ -216,7 +217,7 @@ public class FixedFrameAnimation extends Animation
 	}
 
 	@Override
-	public void groupChanged( GroupNode node) {
+	public void nodeChanged( Node node) {
 		for( AnimationLayer layer : layers) {
 			if( layer.groupLink == node)
 				layer.groupLinkUpdated();
@@ -226,8 +227,8 @@ public class FixedFrameAnimation extends Animation
 	}
 	
 	@Override
-	public List<GroupNode> getGroupLinks() {
-		List<GroupNode> list = new ArrayList<>(layers.size());
+	public List<Node> getNodeLinks() {
+		List<Node> list = new ArrayList<>(layers.size());
 		
 		for( AnimationLayer layer : layers) 
 			if( layer.groupLink != null) 
@@ -237,9 +238,8 @@ public class FixedFrameAnimation extends Animation
 	}
 	
 	
-	@Override
-	public void importGroup(GroupNode node) {
-		layers.add( constructFromGroup(node));
+	public void importGroup(GroupNode node, boolean includeSubtrees) {
+		layers.add( constructFromGroup(node, includeSubtrees));
 		_triggerChange();
 	}
 	
@@ -329,25 +329,25 @@ public class FixedFrameAnimation extends Animation
 		/** Re-arranges a START_LOCAL_LOOP frame such that it re-wraps around the defined bounds. 
 		 * @param doNotCut if true, it will only resize up until the closest SoF if nested 
 		 * */
-		public void reWrap(Frame sofFrame, int start, int end, boolean doNotCut) {
-			if( sofFrame.getMarker() != Marker.START_LOCAL_LOOP) {
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to re-wrap something other than a Start of Local Loop");
-				return;
-			}
-			int sofIndex = frames.indexOf(sofFrame);
-			int eofIndex = sofIndex;
-			while( frames.get(++eofIndex).marker != Marker.END_LOCAL_LOOP);
-			Frame eofFrame  = frames.get(eofIndex);
-			
-
-			List<Frame> newStructure = new ArrayList<>(frames.size());
-			newStructure.addAll(frames.subList(0, start));
-			newStructure.add(sofFrame);
-			newStructure.addAll(frames.subList(start+1, end));
-			newStructure.add(eofFrame);
-			newStructure.addAll(frames.subList(end+1, frames.size()));
-			performFrameStateChange(newStructure, "Resized Local Loop");
-		}
+//		public void reWrap(Frame sofFrame, int start, int end, boolean doNotCut) {
+//			if( sofFrame.getMarker() != Marker.START_LOCAL_LOOP) {
+//				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to re-wrap something other than a Start of Local Loop");
+//				return;
+//			}
+//			int sofIndex = frames.indexOf(sofFrame);
+//			int eofIndex = sofIndex;
+//			while( frames.get(++eofIndex).marker != Marker.END_LOCAL_LOOP);
+//			Frame eofFrame  = frames.get(eofIndex);
+//			
+//
+//			List<Frame> newStructure = new ArrayList<>(frames.size());
+//			newStructure.addAll(frames.subList(0, start));
+//			newStructure.add(sofFrame);
+//			newStructure.addAll(frames.subList(start+1, end));
+//			newStructure.add(eofFrame);
+//			newStructure.addAll(frames.subList(end+1, frames.size()));
+//			performFrameStateChange(newStructure, "Resized Local Loop");
+//		}
 		
 		/** Moves a given frame into this animation layer at the given startTick.
 		 * 
@@ -393,7 +393,7 @@ public class FixedFrameAnimation extends Animation
 							: oldMap.get(child);
 					
 					frames.add(solFrame);
-					int subLen = _gluRec( oldMap, newMap, node);
+					int subLen = _gluRec( oldMap, newMap, (GroupNode)child);
 					if( usingNew)
 						solFrame.length = subLen;
 					frames.add(new Frame(null, 0, Marker.END_LOCAL_LOOP));
@@ -468,11 +468,11 @@ public class FixedFrameAnimation extends Animation
 		
 		private Frame _getFrameFromLocalLoop( int start, int offset) {
 			int index = start;
-			int caret = offset;
+			int caret = 0;
 			int loopLen = 0;
 			
 			while( true) {
-				Frame frame = frames.get(index);
+				Frame frame = frames.get(index++);
 				
 				if( (offset - caret) < frame.length) {
 					switch( frame.marker) {
@@ -481,12 +481,13 @@ public class FixedFrameAnimation extends Animation
 					case FRAME:
 						return frame.isInGap(offset-caret) ? null : frame;
 					case END_LOCAL_LOOP:
-						if( loopLen == 0)
-							return null;
-						else 
-							index = 0;
-						break;
+						return null;
 					}
+				}
+				if( frame.marker == Marker.END_LOCAL_LOOP) {
+					if( loopLen == 0)
+						return null;
+					index = start;
 				}
 				loopLen += frame.length;
 				caret += frame.length;

@@ -1,4 +1,4 @@
-package spirite.pc.ui;
+package spirite.pc.ui.omni;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -42,7 +42,9 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.ui.FrameManager.FrameType;
+import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.UIUtil.ClickAdapter;
+import spirite.pc.ui.omni.FrameManager.FrameType;
 
 /***
  * 
@@ -311,6 +313,7 @@ public class OmniFrame extends JPanel
 	 */
 	public static abstract class OmniComponent extends JPanel{
 		public void onCleanup() {}
+		public boolean duplicateable() {return false;}
 	}
 	
 	

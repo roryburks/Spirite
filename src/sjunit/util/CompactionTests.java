@@ -2,6 +2,7 @@ package sjunit.util;
 
 import org.junit.Test;
 
+import spirite.base.util.compaction.DoubleEndedFloatCompactor;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;
 
@@ -108,6 +109,41 @@ public class CompactionTests {
 		}
 		for( int i=0; i < 9999; ++i) {
 			assert( result[9999+9999-1-i] == -i);
+		}
+	}
+	
+	@Test
+	public void TestDoubleEndedCompaction() {
+		DoubleEndedFloatCompactor defc = new DoubleEndedFloatCompactor();
+		
+		defc.addHead(1);
+		defc.addHead(2);
+		defc.addHead(3);
+		defc.addTail(-1);
+		defc.addTail(-2);
+		defc.addTail(-3);
+		
+		float[] result = new float[6];
+		defc.insertIntoArray(result, 0);
+
+		assert(result[0] == -3);
+		assert(result[5] == 3);
+		assert(result[2] == -1);
+		
+		defc = new DoubleEndedFloatCompactor();
+		
+		for( int i=0; i<9999; ++i) {
+			defc.addHead(i);
+			defc.addTail(-i);
+		}
+		result = new float[9999*2];
+		defc.insertIntoArray(result, 0);
+		for( int i=0; i<9999*2; ++i) {
+			System.out.println(i + "," + result[i]);
+			if( i < 9999)
+				assert( result[i] == -(9998-i));
+			else
+				assert( result[i] == i - 9999);
 		}
 	}
 }

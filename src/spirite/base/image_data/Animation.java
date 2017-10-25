@@ -6,6 +6,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;
+import spirite.base.image_data.GroupTree.Node;
 
 public abstract class Animation {
 	protected String name;
@@ -29,12 +30,11 @@ public abstract class Animation {
 	public abstract List<List<TransformedHandle>> getDrawTable( float t, AnimationState state);
 	public abstract float getStartFrame();
 	public abstract float getEndFrame();
-	public abstract void importGroup( GroupNode node);
 	public abstract boolean isFixedFrame();
 	public abstract void purge();
 
-	public abstract List<GroupNode> getGroupLinks();
-	public abstract void groupChanged( GroupNode node);
+	public abstract List<Node> getNodeLinks();
+	public abstract void nodeChanged( Node node);
 	
 	public String getName() {
 		return name;

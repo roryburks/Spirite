@@ -27,7 +27,7 @@ import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.util.DataBinding;
 import spirite.hybrid.tools.properties.SwingToolProperty;
-import spirite.pc.ui.OmniFrame.OmniComponent;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class ToolSettingsPanel extends OmniComponent
 	implements MToolsetObserver, MWorkspaceObserver, MSelectionEngineObserver, ActionListener

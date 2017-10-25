@@ -441,9 +441,9 @@ public class AnimationManager implements MImageObserver, MSelectionObserver {
 		List<Node> changed = evt.change.getChangedNodes();
 
 		for (Animation animation : animations) {
-			for (GroupNode node : animation.getGroupLinks()) {
+			for (Node node : animation.getNodeLinks()) {
 				if (changed.contains(node))
-					animation.groupChanged(node);
+					animation.nodeChanged(node);
 			}
 		}
 	}

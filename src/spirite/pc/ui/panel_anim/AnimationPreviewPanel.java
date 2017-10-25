@@ -42,8 +42,8 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.pc.graphics.awt.AWTContext;
-import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.components.MTextFieldNumber;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 
 

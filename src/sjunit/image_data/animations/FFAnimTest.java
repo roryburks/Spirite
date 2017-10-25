@@ -21,7 +21,7 @@ public class FFAnimTest {
 
 			GroupNode animRoot = ws.addGroupNode(ws.getRootNode(), "AnimRoot");
 			
-			FixedFrameAnimation ffa = new FixedFrameAnimation(animRoot, "FFA");
+			FixedFrameAnimation ffa = new FixedFrameAnimation(animRoot, "FFA", true);
 			ws.getAnimationManager().addAnimation(ffa);
 
 			LayerNode layer1 = ws.addNewSimpleLayer(animRoot, HybridHelper.createImage(1, 1), "1", InternalImageTypes.DYNAMIC);

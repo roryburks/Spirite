@@ -411,7 +411,7 @@ public class LayerTreePanel extends ContentTree
 				if( usrObj instanceof GroupNode) {
 					menuScheme.add( new String[] {"-"});
 					menuScheme.add( new String[] {"&Construct Simple Animation From Group", "animfromgroup", null});
-					if( workspace.getAnimationManager().getSelectedAnimation() != null)
+					if( workspace.getAnimationManager().getSelectedAnimation() instanceof FixedFrameAnimation)
 						menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
 					menuScheme.add( new String[] {"&Write Group To GIF Animation", "giffromgroup", null});
 				}
@@ -527,7 +527,7 @@ public class LayerTreePanel extends ContentTree
 			String name = JOptionPane.showInputDialog("Enter name for new Animation:", group.getName());
 			
 			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new FixedFrameAnimation(group, name));
+			manager.addAnimation(new FixedFrameAnimation(group, name, true));
 			break;}
 		case "giffromgroup":{
 			GroupNode group = (GroupNode)contextMenu.node;
@@ -550,9 +550,9 @@ public class LayerTreePanel extends ContentTree
 			GroupNode group = (GroupNode)contextMenu.node;
 			AnimationManager manager = workspace.getAnimationManager();
 			Animation anim  = manager.getSelectedAnimation();
-			if( anim == null) break;
-			
-			anim.importGroup(group);
+			if( anim instanceof FixedFrameAnimation) {
+				((FixedFrameAnimation) anim).importGroup(group, true);
+			}
 			
 			break;}
 		case "animBreakBind":

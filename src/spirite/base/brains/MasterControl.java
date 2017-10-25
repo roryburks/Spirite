@@ -62,8 +62,8 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.jogl.JOGLCore;
-import spirite.pc.ui.FrameManager;
 import spirite.pc.ui.dialogs.Dialogs;
+import spirite.pc.ui.omni.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
 /***

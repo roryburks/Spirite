@@ -1,4 +1,24 @@
-package spirite.pc.ui.components;
+package spirite.pc.ui.omni;
+
+
+import java.awt.Component;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JComponent;
+
+import spirite.pc.ui.components.ResizeContainerPanel;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -34,7 +54,7 @@ import spirite.hybrid.Globals;
  * @author Rory Burks
  *
  */
-public class ResizeContainerPanel extends JPanel{
+public class OmniResizeContainerPanel extends JPanel{
 	protected int min_stretch = 0;
 	protected final List<ResizeBar> leadingBars;
 	protected final List<ResizeBar> trailingBars;
@@ -51,7 +71,7 @@ public class ResizeContainerPanel extends JPanel{
 		VERTICAL
 	}
 	
-	public ResizeContainerPanel(JComponent component, ContainerOrientation orientation) {
+	public OmniResizeContainerPanel(JComponent component, ContainerOrientation orientation) {
 		leadingBars = new ArrayList<>();
 		trailingBars = new ArrayList<>();
 		this.cOrientation = orientation;
@@ -354,7 +374,7 @@ public class ResizeContainerPanel extends JPanel{
 	    		Point p = SwingUtilities.convertPoint( 
 	    				e.getComponent(),
 	    				e.getPoint(), 
-	    				ResizeContainerPanel.this);
+	    				OmniResizeContainerPanel.this);
 
 				reserved = 0;
 
@@ -402,7 +422,7 @@ public class ResizeContainerPanel extends JPanel{
 	    		Point p = SwingUtilities.convertPoint( 
 	    				e.getComponent(),
 	    				e.getPoint(), 
-	    				ResizeContainerPanel.this);
+	    				OmniResizeContainerPanel.this);
 
 	    		
 	    		switch( cOrientation) {
@@ -415,7 +435,7 @@ public class ResizeContainerPanel extends JPanel{
 	        		size = MUtil.clip( 
 	        				min_size , 
 	        				size,
-	        				ResizeContainerPanel.this.getWidth()-min_stretch - reserved);
+	        				OmniResizeContainerPanel.this.getWidth()-min_stretch - reserved);
 	        		break;
 	    		case VERTICAL:
 	    			if(trailing)
@@ -425,7 +445,7 @@ public class ResizeContainerPanel extends JPanel{
 	        		size = MUtil.clip( 
 	        				min_size , 
 	        				size,
-	        				ResizeContainerPanel.this.getHeight()-min_stretch - reserved);
+	        				OmniResizeContainerPanel.this.getHeight()-min_stretch - reserved);
 	        		break;
 	    		}
 	    		
@@ -434,5 +454,62 @@ public class ResizeContainerPanel extends JPanel{
 	    		super.mouseDragged(e);
 	    	}
 	    }
+	}
+
+	private final ORCPDnDManager dnd = new ORCPDnDManager();
+	protected class ORCPDnDManager extends DropTarget 
+		implements DragGestureListener, DragSourceListener 
+	{
+		private final DragSource dragSource = DragSource.getDefaultDragSource();
+		List<DragGestureRecognizer> recognizers = new ArrayList<>();
+		
+		ORCPDnDManager() {
+		}
+		
+		void addDropSource(Component component) {
+			recognizers.add(dragSource.createDefaultDragGestureRecognizer(
+					component, DnDConstants.ACTION_COPY_OR_MOVE, this));
+		}
+		void clearAllSources() {
+			for( DragGestureRecognizer re : recognizers)
+				re.setComponent(null);
+			recognizers.clear();
+		}
+
+		@Override
+		public void dragDropEnd(DragSourceDropEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dragEnter(DragSourceDragEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dragExit(DragSourceEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dragOver(DragSourceDragEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dropActionChanged(DragSourceDragEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dragGestureRecognized(DragGestureEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 }

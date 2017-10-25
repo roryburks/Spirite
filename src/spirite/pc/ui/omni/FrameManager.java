@@ -1,4 +1,4 @@
-package spirite.pc.ui;
+package spirite.pc.ui.omni;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -22,8 +22,9 @@ import spirite.base.pen.Penner;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.ui.OmniFrame.OmniComponent;
-import spirite.pc.ui.OmniFrame.OmniContainer;
+import spirite.pc.ui.RootFrame;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
+import spirite.pc.ui.omni.OmniFrame.OmniContainer;
 import spirite.pc.ui.panel_anim.AnimationPreviewPanel;
 import spirite.pc.ui.panel_anim.AnimationSchemePanel;
 import spirite.pc.ui.panel_layers.LayersPanel;
@@ -62,9 +63,15 @@ public class FrameManager
 		REFERENCE("Reference Scheme"),
 		;
 		
-		private String name;
+		final String name;
+		final String icon;
+		FrameType( String str, String icon) {
+			name = str;
+			this.icon = icon;
+		}
 		FrameType( String str) {
 			name = str;
+			this.icon = "";
 		}
 		public String getName() {
 			return name;

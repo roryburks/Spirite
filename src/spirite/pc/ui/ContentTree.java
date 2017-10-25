@@ -53,6 +53,7 @@ import javax.swing.tree.TreePath;
 
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
+import spirite.pc.ui.omni.OmniFrame;
 
 public class ContentTree extends JPanel
 	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 

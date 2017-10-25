@@ -26,11 +26,11 @@ import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.hybrid.Globals;
-import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 import spirite.pc.ui.panel_layers.anim.LayerAnimView;
 
 public class LayersPanel extends OmniComponent {

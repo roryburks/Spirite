@@ -4,7 +4,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 
 import spirite.base.brains.MasterControl;
-import spirite.pc.ui.OmniFrame.OmniComponent;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class AnimationSchemePanel extends OmniComponent {
 	private static final long serialVersionUID = 1L;

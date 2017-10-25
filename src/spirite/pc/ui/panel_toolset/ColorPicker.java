@@ -19,9 +19,9 @@ import javax.swing.event.DocumentListener;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
-import spirite.pc.ui.OmniFrame.OmniComponent;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.MTextFieldNumber;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class ColorPicker extends OmniComponent 
 	implements MPaletteObserver

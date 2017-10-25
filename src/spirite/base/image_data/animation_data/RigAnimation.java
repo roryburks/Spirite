@@ -16,6 +16,7 @@ import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -255,17 +256,14 @@ public class RigAnimation extends Animation {
 		return 10;
 	}
 
-	@Override
-	public void importGroup(GroupNode node) {
-	}
 
 	@Override
-	public List<GroupNode> getGroupLinks() {
+	public List<Node> getNodeLinks() {
 		return null;
 	}
 
 	@Override
-	public void groupChanged( GroupNode node)  {
+	public void nodeChanged( Node node)  {
 	}
 
 

@@ -732,7 +732,8 @@ public class FFAnimationSchemePanel extends JPanel
 		@Override
 		void EndState() {
 			if( end >= start) {
-				sofFrame.getLayerContext().reWrap(sofFrame, start, end, true);
+				sofFrame.setLength(end-start);
+				//sofFrame.getLayerContext().reWrap(sofFrame, start, end, true);
 			}
 		}
 

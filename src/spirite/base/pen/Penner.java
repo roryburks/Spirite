@@ -73,7 +73,7 @@ public class Penner
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
 	//	with UI controls
 	private final WorkPanel context;
-	private View view;	
+	View view;	
 	
 	
 	private ImageWorkspace workspace;
@@ -81,7 +81,7 @@ public class Penner
 	private UndoEngine undoEngine;
 	//private DrawEngine drawEngine;
 	private final ToolsetManager toolsetManager;
-	private final PaletteManager paletteManager;
+	final PaletteManager paletteManager;
 	private final SettingsManager settingsManager;
 	private final RenderEngine renderEngine;	// used for color picking.
 												// might not belong here, maybe in DrawEngine
@@ -99,8 +99,8 @@ public class Penner
 	//	of RAM
 	//private int startX;	// Set at the start 
 //	private int startY;
-	private int oldX;	// OldX and OldY are the last-checked X and Y primarily used
-	private int oldY;	// 	for things that only happen if they change
+	int oldX;	// OldX and OldY are the last-checked X and Y primarily used
+	int oldY;	// 	for things that only happen if they change
 	private int rawX;	// raw position are the last-recorded coordinates in pure form
 	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
 	private int oldRawX;	// Similar to oldX and oldY but for 
@@ -109,7 +109,8 @@ public class Penner
 	
 	private float pressure = 1.0f;
 	
-	private int x, y;
+	int x;
+	int y;
 
 	
 	private StateBehavior behavior;
@@ -390,7 +391,7 @@ public class Penner
 
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof IMagneticFillModule) {
-					behavior = new MagFilling((IMagneticFillModule) drawer);
+					behavior = new MagFilling(this, (IMagneticFillModule) drawer);
 				}
 				else HybridHelper.beep();
 			}
@@ -1398,18 +1399,20 @@ public class Penner
 		@Override public void onTock() {}
 	}
 	
-	
-	class MagFilling extends DrawnStateBehavior {
+	class MagFilling extends Penner.DrawnStateBehavior {
+		private final Penner penner;
 		IMagneticFillModule drawer;
 		
-		MagFilling( IMagneticFillModule drawer) {
+		MagFilling( Penner penner, IMagneticFillModule drawer) {
+			penner.super();
+			this.penner = penner;
 			this.drawer = drawer;
 		}
 		
 		@Override
 		public void paintOverlay(GraphicsContext gc) {
-			gc.setTransform(view.getViewTransform());
-			gc.setColor(0xFFFFFF ^ paletteManager.getActiveColor(0));
+			gc.setTransform(this.penner.view.getViewTransform());
+			gc.setColor(0xFFFFFF ^ this.penner.paletteManager.getActiveColor(0));
 
 			float[] fx = drawer.getXs();
 			float[] fy = drawer.getYs();
@@ -1425,16 +1428,15 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			drawer.anchorPoints(oldX, oldY, 10, x, y, 10);
+			drawer.anchorPoints(this.penner.oldX, this.penner.oldY, 10, this.penner.x, this.penner.y, 10);
 		}
 		@Override
 		public void onPenUp() {
 			//drawer.anchorPointsHard(x, y, 5);
 			//drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
-			drawer.endMagneticFill(paletteManager.getActiveColor(0));
+			drawer.endMagneticFill(this.penner.paletteManager.getActiveColor(0));
 			super.onPenUp();
 		}
-		
 	}
 	
 	public boolean drawsOverlay() {
