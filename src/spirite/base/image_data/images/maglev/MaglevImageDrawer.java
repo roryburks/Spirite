@@ -32,7 +32,7 @@ public class MaglevImageDrawer
 				IStrokeModule,
 				ITransformModule,
 				IMagneticFillModule,
-				IWeightEraser
+				IWeightEraserModule
 {
 
 	private final BuildingImageData building;
@@ -275,22 +275,31 @@ public class MaglevImageDrawer
 	public void interpretFill(float[] curve, int color) {
 	}
 
-	// ::: IWeightEraser
+	// ::: IWeightEraserModule
 	static Object iweIDLocker = new Object();
 	static int iweIDCounter = 0;
 	int iweId = -1;
 	@Override
 	public void weightErase(float x, float y, float w) {
+		List<MagLevThing> thingsToRemove = new ArrayList<>();
 		for( MagLevThing thing : img.things) {
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
-				
-				
+
+				for( int i=0; i < stroke.direct.length; ++i) {
+					if( MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]) < w) {
+						thingsToRemove.add(stroke);
+						break;
+					}
+				}
 			}
 		}
+		
+		if( thingsToRemove.size() > 0) {
+			this.building.handle.getContext().getUndoEngine().performAndStore(
+					new MagWeightEraseAction(building, thingsToRemove, iweId));
+		}
 //		
-//		this.building.handle.getContext().getUndoEngine().performAndStore(
-//				new MagWeightEraseAction(building, strokeToErase, iweId));
 	}
 
 	@Override
@@ -306,12 +315,12 @@ public class MaglevImageDrawer
 	class MagWeightEraseAction extends ImageAction implements StackableAction {
 		private final List<MagLevThing> thingsToErase;
 		private final int id;
-		MagWeightEraseAction(BuildingImageData data, MagLevThing thingToErase, int id)
+		MagWeightEraseAction(BuildingImageData data, List<MagLevThing> thingsToErase, int id)
 		{
 			super(data);
 			this.id = id;
-			thingsToErase = new ArrayList<>(1);
-			thingsToErase.add(thingToErase);
+			this.thingsToErase = new ArrayList<>(1);
+			this.thingsToErase.addAll(thingsToErase);
 		}
 
 		@Override public boolean canStack(UndoableAction newAction) {
@@ -330,6 +339,11 @@ public class MaglevImageDrawer
 				mimg.things.remove(toErase);
 			}
 			mimg.unbuild();
+			builtImage.handle.refresh();
+		}
+		@Override
+		public String getDescription() {
+			return "Erase Mag Stroke";
 		}
 	}
 

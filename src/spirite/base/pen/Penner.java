@@ -40,6 +40,7 @@ import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.pen.PenTraits.ButtonType;
@@ -396,8 +397,12 @@ public class Penner
 				else HybridHelper.beep();
 				break;}
 			case EXCISE_ERASER: {
+				IImageDrawer drawer = workspace.getActiveDrawer();
 				
-				
+				if( drawer instanceof IWeightEraserModule) {
+					behavior = new ExciseBehavior( (IWeightEraserModule)drawer);
+				}
+				else HybridHelper.beep();
 				break;}
 			}
 			
@@ -1445,14 +1450,27 @@ public class Penner
 	}
 	
 	class ExciseBehavior extends StateBehavior {
+		private final IWeightEraserModule drawer;
+		
+		ExciseBehavior( IWeightEraserModule drawer) {
+			this.drawer = drawer;
+		}
+		
 		@Override public void start() {
+			drawer.startWeightErase();
 			onMove();
 		}
 		@Override public void onTock() {}
 
 		@Override
 		public void onMove() {
-			
+			drawer.weightErase(x, y, (Float)toolsetManager.getToolSettings(Tool.EXCISE_ERASER).getProperty("width").getValue());
+		}
+		
+		@Override
+		public void end() {
+			drawer.endWeightErase();
+			super.end();
 		}
 	}
 	

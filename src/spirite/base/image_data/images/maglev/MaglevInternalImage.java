@@ -1,6 +1,7 @@
 package spirite.base.image_data.images.maglev;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
@@ -13,10 +14,13 @@ import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.interpolation.CubicSplineInterpolator2D;
+import spirite.base.util.interpolation.Interpolator2D;
 import spirite.hybrid.HybridHelper;
 
 /**
@@ -70,10 +74,26 @@ public class MaglevInternalImage implements IInternalImage {
 	public static class MagLevStroke extends MagLevThing {
 		PenState[] states;
 		StrokeParams params;
+		DrawPoints direct;
 		
 		MagLevStroke( PenState[] states, StrokeParams params) {
 			this.states = states;
 			this.params = params;
+			
+			Interpolator2D interpolator;
+			switch( params.getInterpolationMethod()){
+			case CUBIC_SPLINE:
+				interpolator = new CubicSplineInterpolator2D(null, true);
+				break;
+			default:
+				interpolator = null;
+				break;
+			}
+			if( interpolator != null) {
+				for( PenState ps : states)
+					interpolator.addPoint(ps.x, ps.y);
+			}
+			direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
 		}
 		
 		protected MagLevStroke clone() {

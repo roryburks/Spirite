@@ -32,12 +32,12 @@ public abstract class StrokeEngine {
 	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
 	// Made as a class instead of parameters for extendability
-	protected class DrawPoints {
+	public static class DrawPoints {
 		public final float[] x;
 		public final float[] y;
 		public final float[] w;
 		public final int length;
-		DrawPoints( float[] x, float[] y, float[] w) {
+		public DrawPoints( float[] x, float[] y, float[] w) {
 			this.x = x;
 			this.y = y;
 			this.w = w;
@@ -200,7 +200,7 @@ public abstract class StrokeEngine {
 				_interpolator.addPoint(rawState.x, rawState.y);
 
 			prepareDisplayLayer();
-			changed = this.drawToLayer( buildPoints(_interpolator, prec), false);
+			changed = this.drawToLayer( buildPoints(_interpolator, prec, stroke), false);
 		}
 
 		oldState.x = newState.x;
@@ -246,7 +246,7 @@ public abstract class StrokeEngine {
 			}
 		}
 
-		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points)), false);
+		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points), stroke), false);
 		
 		if( data != null) {
 			GraphicsContext gc = data.checkoutRaw().getGraphics();
@@ -257,7 +257,7 @@ public abstract class StrokeEngine {
 		_interpolator = null;
 	}
 	
-	private DrawPoints buildPoints(Interpolator2D localInterpolator, List<PenState> penStates) {
+	public static DrawPoints buildPoints(Interpolator2D localInterpolator, List<PenState> penStates, StrokeParams params) {
 		PenState buff;
 		
 		if( localInterpolator != null) {
@@ -267,10 +267,10 @@ public abstract class StrokeEngine {
 	
 			float localInterpos = 0;
 			InterpolatedPoint ip = localInterpolator.evalExt(localInterpos);
-			buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp));
+			buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(penStates.get(ip.left).pressure, penStates.get(ip.right).pressure, ip.lerp));
 			fcx.add(ip.x);
 			fcy.add(ip.y);
-			fcw.add(stroke.dynamics.getSize(buff));
+			fcw.add(params.dynamics.getSize(buff));
 			
 			while( localInterpos + DIFF < localInterpolator.getCurveLength()) {
 				localInterpos += DIFF;
@@ -279,9 +279,8 @@ public abstract class StrokeEngine {
 				buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(penStates.get(ip.left).pressure, penStates.get(ip.right).pressure, ip.lerp));
 				fcx.add(ip.x);
 				fcy.add(ip.y);
-				fcw.add(stroke.dynamics.getSize(buff));
+				fcw.add(params.dynamics.getSize(buff));
 			}
-			prepareDisplayLayer();
 			
 			return new DrawPoints(fcx.toArray(), fcy.toArray(), fcw.toArray());
 		}
@@ -289,29 +288,26 @@ public abstract class StrokeEngine {
 			float[] xs = new float[penStates.size()];
 			float[] ys = new float[penStates.size()];
 			float[] ws = new float[penStates.size()];
-			for( int i=0; i < prec.size(); ++i) {
+			for( int i=0; i < penStates.size(); ++i) {
 				xs[i] = penStates.get(i).x;
 				ys[i] = penStates.get(i).y;
-				ws[i] = stroke.dynamics.getSize(penStates.get(i));
+				ws[i] = params.dynamics.getSize(penStates.get(i));
 			}
 			return new DrawPoints( xs, ys, ws);
 		}
 	}
 	
-	public BuiltStroke buildStroke(StrokeParams params, PenState[] points, ABuiltImageData builtImage, BuiltSelection mask) {
-		
-		
-		return null;
-	}
-	public static class BuiltStroke {
-		public float[] x;
-		public float[] y;
-		public float[] w;
-	}
-	
-	public void batchDraw( StrokeParams params, Interpolator2D interpolator, ABuiltImageData builtImage, BuiltSelection mask) 
+	public void batchDraw( DrawPoints points, ABuiltImageData builtImage, BuiltSelection mask) 
 	{
+		prepareStroke(null, builtImage, mask);
+
+		this.drawToLayer( points, false);
 		
+		if( data != null) {
+			GraphicsContext gc = data.checkoutRaw().getGraphics();
+			drawStrokeLayer(gc);
+			data.checkin();
+		}
 	}
 
 

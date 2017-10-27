@@ -56,7 +56,7 @@ public interface IImageDrawer {
 		public void transform( MatTrans trans);
 	}
 	
-	public interface IWeightEraser {
+	public interface IWeightEraserModule {
 		public void startWeightErase();
 		public void endWeightErase();
 		public void weightErase( float x, float y, float w);
