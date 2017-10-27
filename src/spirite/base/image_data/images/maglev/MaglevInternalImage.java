@@ -12,6 +12,8 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
@@ -54,21 +56,17 @@ public class MaglevInternalImage implements IInternalImage {
 			this.things.add(thing.clone());
 	}
 	
-	void addThing( MagLevThing thing) {things.add(thing);}
-	void popThing() {things.remove(things.size()-1);}
-		
-	void unbuild() {
-		if( this.isBuilt) {
-			this.isBuilt = false;
-			builtImage.flush();
-			builtImage = null;
-		}
+	void addThing( MagLevThing thing) {
+		things.add(thing);
 	}
-	
+	void popThing() {
+		things.remove(things.size()-1);
+	}
+		
 	public static abstract class MagLevThing {
 		abstract float[] getPoints();
 		abstract void setPoints(float[] xy);
-		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context );
+		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context );
 		protected abstract MagLevThing clone();
 	}
 	public static class MagLevStroke extends MagLevThing {
@@ -106,8 +104,8 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context) {
-			StrokeEngine _engine = context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context) {
+			StrokeEngine _engine = context.context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			_engine.batchDraw(params, states, built, mask);
 		}
 
@@ -130,38 +128,64 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 	}
 	public static class MagLevFill extends MagLevThing {
-		float[] x;
-		float[] y;
+
+		static class StrokeSegment {
+			int strokeIndex;
+			int pivot;
+			int travel;
+			public StrokeSegment() {}
+			public StrokeSegment( StrokeSegment other) {
+				this.strokeIndex = other.strokeIndex;
+				this.pivot = other.pivot;
+				this.travel = other.travel;
+			}
+		}
+		
+		List<StrokeSegment> segments;
 		int color;
-		public MagLevFill( float[] x, float[] y, int color) {
-			this.x = x;
-			this.y = y;
+		public MagLevFill( List<StrokeSegment> segments, int color) {
+			this.segments = new ArrayList<>(segments.size());
+			this.segments.addAll(segments);
 			this.color = color;
 		}
+		public MagLevFill( MagLevFill other) {
+			this.segments = new ArrayList<>(other.segments.size());
+			this.color = other.color;
+			for( int i=0; i < segments.size(); ++i)
+				this.segments.add( new StrokeSegment(other.segments.get(i)));
+		}
 		protected MagLevFill clone()  {
-			return new MagLevFill(x.clone(),y.clone(), color);
+			return new MagLevFill(this);
 		}
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, ImageWorkspace context) {
-			// TODO Auto-generated method stub
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context) {
+			int totalLen = 0;
+			for( StrokeSegment s : segments)
+				totalLen += Math.abs(s.travel) + 1;
+
+			float[] outx = new float[totalLen];
+			float[] outy = new float[totalLen];
+			int index = 0;
+			for( StrokeSegment s : segments) {
+				MagLevStroke stroke = (MagLevStroke)context.things.get(s.strokeIndex);
+				for( int c=0; c <= Math.abs(s.travel); ++c) {
+					if( s.pivot + c * ((s.travel > 0)? 1 : -1) < 0 || s.pivot + c * ((s.travel > 0)? 1 : -1) > stroke.direct.length)
+						System.out.println("break");
+					
+					outx[index] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+					outy[index] = stroke.direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+					++index;
+				}
+			}
+			
+			gc.setColor(color);
+			gc.fillPolygon(outx, outy, outx.length);
 			
 		}
-		@Override
-		float[] getPoints() {
-			float[] xy = new float[x.length*2];
-			for( int i=0; i < x.length; ++i) {
-				xy[i*2] = x[i];
-				xy[i*2+1] = y[i];
-			}
-			return xy;
-		}
-		@Override
-		void setPoints(float[] xy) {
-			for( int i=0; i < x.length; ++i) {
-				x[i] = xy[i*2];
-				y[i] = xy[i*2+1];
-			}
-		}
+		
+		// Since MagLevFill operates on references, it doesn't get changed itself
+		@Override float[] getPoints() { return null;}
+		@Override void setPoints(float[] xy) {}
 	}
 
 	// ==== Easy Junk
@@ -205,13 +229,21 @@ public class MaglevInternalImage implements IInternalImage {
 				ABuiltImageData built = this.build(new BuildingImageData(context.getHandleFor(this), 0, 0));
 				BuiltSelection mask = new BuiltSelection(null, 0, 0);
 				for( MagLevThing thing : things) {
-					thing.draw( built, mask, gc, context);
+					thing.draw( built, mask, gc, this);
 				}
 			}
 			isBuilt = true;
 			building = false;
 		}
 	}
+	void unbuild() {
+		if( this.isBuilt) {
+			this.isBuilt = false;
+			builtImage.flush();
+			builtImage = null;
+		}
+	}
+	
 
 	public class MaglevBuiltImageData extends ABuiltImageData {
 

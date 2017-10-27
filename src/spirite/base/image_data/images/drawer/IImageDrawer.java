@@ -65,9 +65,9 @@ public interface IImageDrawer {
 	public interface IMagneticFillModule {
 		public void startMagneticFill();
 		public void endMagneticFill( int color);
-		public void anchorPoints(float x1, float y1, float r1, float x2, float y2, float r2);
-		public float[] getXs();
-		public float[] getYs();
+		public void anchorPoints(float x, float y, float r);
+		public float[] getMagFillXs();
+		public float[] getMagFillYs();
 		//public float[] interpretFillPoint( int x, int y, float weight);
 		//public float[] rightExistingPoints( float[] x, float[] y);
 		

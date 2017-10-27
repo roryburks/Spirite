@@ -17,6 +17,7 @@ import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.*;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
 import spirite.base.pen.PenTraits.PenState;
@@ -109,6 +110,7 @@ public class MaglevImageDrawer
 	public void transform(MatTrans trans) {
 		for( MagLevThing things : img.things) {
 			float xy[] = things.getPoints();
+			if( xy == null) continue;
 			for( int i=0; i < xy.length/2; ++i) {
 				Vec2 to = trans.transform(new Vec2(xy[i*2],xy[i*2+1]), new Vec2(0,0));
 				xy[i*2] = to.x;
@@ -123,23 +125,14 @@ public class MaglevImageDrawer
 	
 	// :::: IMagnetifFillModule
 	StrokeSegment ss;
-	FloatCompactor out_x;
-	FloatCompactor out_y;
-	private class StrokeSegment {
-		MagLevStroke stroke;
-		int start;
-		int end;
-		int direction = 0;	// 0 means unknown, 1 means forward, -1 means nil
-	}
+	List<StrokeSegment> strokeSegments;
 	@Override public void startMagneticFill() { 
 		ss = null;
-		out_x = new FloatCompactor();
-		out_y = new FloatCompactor();
+		strokeSegments = new ArrayList<>();
 	}
 	@Override public void endMagneticFill( int color) {
-		MagLevFill fill = new MagLevFill(out_x.toArray(), out_y.toArray(), color);
+		MagLevFill fill = new MagLevFill( strokeSegments, color);
 		
-
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
 			protected void performImageAction() {
@@ -148,9 +141,9 @@ public class MaglevImageDrawer
 				mimg.Build();
 				
 				mimg.addThing(fill);
+				
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				gc.setColor(color);
-				gc.fillPolygon(fill.x, fill.y, fill.x.length);
+				fill.draw(img.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
 				
 			}
 			@Override
@@ -160,115 +153,121 @@ public class MaglevImageDrawer
 		});
 		
 		ss = null;
-		out_x = null;
-		out_y = null;
+		strokeSegments = null;
 	}
 
+	private static final double MAX_JUMP = 50;
 	@Override
-	public void anchorPoints(float x1, float y1, float r1, float x2, float y2, float r2) {
+	public void anchorPoints(float x, float y, float r) {
 		if( ss == null) {
-			// Find the closest stroke to anchor to
-			float closestDistance = r1+0.0001f;
+			// [Behavior Part 1]: Latching onto a stroke.  Before it starts filling, first
+			//	it has to find a stroke.  It'll latch onto to the first stroke it touches
+			//	(the closest if it touches multiple stries).
+			float closestDistance = Float.MAX_VALUE;
 			int closestIndex = -1;
-			MagLevStroke closestStroke = null;
-			for( MagLevThing thing : img.things) {
+			int closestStrokeIndex = -1;
+			for( int thingIndex = 0; thingIndex < img.things.size(); ++thingIndex) {
+				MagLevThing thing = img.things.get(thingIndex);
 				if( thing instanceof MagLevStroke) {
 					MagLevStroke stroke = (MagLevStroke)thing;
-					for( int i=0; i < stroke.states.length; ++i) {
-						float distance = (float) MUtil.distance(x1, y1, stroke.states[i].x, stroke.states[i].y);
+					for( int i=0; i < stroke.direct.length; ++i) {
+						float distance = (float) MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]);
 						if( distance < closestDistance) {
 							closestIndex = i;
-							closestStroke = stroke;
+							closestStrokeIndex = thingIndex;
 							closestDistance = distance;
 						}
 					}
 				}
 			}
 			
-			if( closestStroke != null) {
+			System.out.println(closestIndex);
+			
+			if( closestStrokeIndex != -1 && closestDistance <= r) {
 				ss = new StrokeSegment();
-				ss.start = ss.end = closestIndex;
-				ss.stroke = closestStroke;
+				ss.pivot = closestIndex;
+				ss.strokeIndex = closestStrokeIndex;
+				ss.travel = 0;
+				strokeSegments.add(ss);
 			}
 		}
 		if( ss != null) {
-			if( ss.direction == 0) {
-				boolean soft = false;
-				for( int i=ss.start; i >=0; --i) {
-					if( (float) MUtil.distance(x1, y1, ss.stroke.states[i].x, ss.stroke.states[i].y) < r1) {
-						ss.start = i;
-						soft = true;
-					}
-					else break;
-				}
-				for( int i=ss.end; i <ss.stroke.states.length; ++i) {
-					if( (float) MUtil.distance(x1, y1, ss.stroke.states[i].x, ss.stroke.states[i].y) < r1) {
-						ss.end= i;
-						soft = true;
-					}
-					else break;
-				}
-				if( !soft) {
-					if(MUtil.distance(x2, y2, ss.stroke.states[ss.start].x, ss.stroke.states[ss.start].y) < 
-							MUtil.distance(x2, y2, ss.stroke.states[ss.end].x, ss.stroke.states[ss.end].y)) 
-					{
-						ss.direction = -1;
-						for( int i=ss.end; i >= ss.start; --i) {
-							out_x.add(ss.stroke.states[i].x);
-							out_y.add(ss.stroke.states[i].y);
-						}
-					}
-					else {
-						ss.direction = 1;
-						for( int i=ss.start; i <= ss.end; ++i) {
-							out_x.add(ss.stroke.states[i].x);
-							out_y.add(ss.stroke.states[i].y);
-						}
-					}
-					
-				}
+			MagLevStroke stroke = (MagLevStroke)img.things.get(ss.strokeIndex);
+			int sLen = stroke.direct.length;
+			int abovePivot = 0;
+			int belowPivot = 0;
+			int found;
+			for( found = -1; ss.pivot + abovePivot < sLen; ++abovePivot) {
+				int index = abovePivot + ss.pivot;
+				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
+					found = abovePivot;
+				else if( found > ss.travel)	// Quit if you found a point and broke it
+					break;
+				
+				// Don't Look for connections above MAX_JUMP distance from the pivot point
+				if( (abovePivot - Math.max(ss.travel, 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
+					break;
 			}
-			else {
-				boolean hard = false;
-				if( ss.direction == -1) {
-					for( int i= ss.start; i >= 0; --i) {
-						if( (float) MUtil.distance(x2, y2, ss.stroke.states[i].x, ss.stroke.states[i].y) < r2) { 
-							hard = true;
-							if( ss.start != i) {
-								out_x.add(ss.stroke.states[i].x);
-								out_y.add(ss.stroke.states[i].y);
-							}
-								
-							ss.start = i;
-						}
-					}
-				}
-				if( ss.direction == 1) {
-					for( int i= ss.end; i < ss.stroke.states.length ; ++i) {
-						if( (float) MUtil.distance(x2, y2, ss.stroke.states[i].x, ss.stroke.states[i].y) < r2) { 
-							hard = true;
-							if( ss.end != i) {
-								out_x.add(ss.stroke.states[i].x);
-								out_y.add(ss.stroke.states[i].y);
-							}
-							ss.end = i;
-						}
-					}
-				}
-				if( !hard) {
-					// TODO
-				}
+			abovePivot = found;
+			
+			for( found = -1; ss.pivot - belowPivot >= 0; ++belowPivot) {
+				int index = ss.pivot - belowPivot;
+
+				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
+					found = belowPivot;
+				else if( found > -ss.travel)	// Quit if you found a point and broke it
+					break;
+				
+				// Don't Look for connections above MAX_JUMP distance from the pivot point
+				if( (belowPivot - Math.max(Math.abs(ss.travel), 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
+					break;
 			}
+			belowPivot = found;
+			
+			if( abovePivot == -1 && belowPivot == -1) {
+				// No matches found, look for a jump
+				// TODO
+			}
+			else
+				ss.travel = (abovePivot > belowPivot) ? abovePivot : -belowPivot;
 		}
 	}
 	@Override
-	public float[] getXs() {
-		return out_x.toArray();
+	public float[] getMagFillXs() {
+		int totalLen = 0;
+		for( StrokeSegment s : strokeSegments)
+			totalLen += Math.abs(s.travel) + 1;
+		
+		float[] out = new float[totalLen];
+		int index = 0;
+		for( StrokeSegment s : strokeSegments) {
+			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			for( int c=0; c <= Math.abs(s.travel); ++c) {
+				if( s.pivot + c * ((s.travel > 0)? 1 : -1) < 0 || s.pivot + c * ((s.travel > 0)? 1 : -1) > stroke.direct.length)
+					System.out.println("break");
+				out[index++] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+			}
+		}
+		
+		
+		return out;
 	}
 
 	@Override
-	public float[] getYs() {
-		return out_y.toArray();
+	public float[] getMagFillYs() {
+		int totalLen = 0;
+		for( StrokeSegment s : strokeSegments)
+			totalLen += Math.abs(s.travel) + 1;
+		
+		float[] out = new float[totalLen];
+		int index = 0;
+		for( StrokeSegment s : strokeSegments) {
+			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			for( int c=0; c <= Math.abs(s.travel); ++c)
+				out[index++] = stroke.direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+		}
+		
+		return out;
 	}
 
 	@Override

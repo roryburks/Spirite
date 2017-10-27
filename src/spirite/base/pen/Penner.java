@@ -1424,12 +1424,10 @@ public class Penner
 			gc.setTransform(this.penner.view.getViewTransform());
 			gc.setColor(0xFFFFFF ^ this.penner.paletteManager.getActiveColor(0));
 
-			float[] fx = drawer.getXs();
-			float[] fy = drawer.getYs();
+			float[] fx = drawer.getMagFillXs();
+			float[] fy = drawer.getMagFillYs();
 			
-			for( int i=0; i < fx.length-1; ++i){
-				gc.drawLine((int)fx[i],(int)fy[i],(int)fx[i+1],(int)fy[i+1]);
-			}
+			gc.drawPolyLine(fx, fy, fx.length);
 		}
 
 		@Override public void start() {
@@ -1438,7 +1436,7 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			drawer.anchorPoints(this.penner.oldX, this.penner.oldY, 10, this.penner.x, this.penner.y, 10);
+			drawer.anchorPoints(this.penner.x, this.penner.y, 10);
 		}
 		@Override
 		public void onPenUp() {

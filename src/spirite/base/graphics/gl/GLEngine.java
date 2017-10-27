@@ -432,6 +432,7 @@ public class GLEngine  {
 			GLParameters params, MatTrans trans) 
 	{
 		// NOTE: identical code to above but without implicit casting
+		if( xPoints.length < 2) return;
 
 		int size = numPoints+(loop?3:2);
 		float data[] = new float[2*size];

@@ -220,6 +220,14 @@ public class GLGraphics extends GraphicsContext{
 				params, contextTransform);
 	}
 	@Override
+	public void drawPolyLine(float[] xPoints, float[] yPoints, int count) {
+		reset();
+		GLParameters params =getLineParams();
+		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
+				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				params, contextTransform);
+	}
+	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
 		reset();
 		int x_[] = new int[2];

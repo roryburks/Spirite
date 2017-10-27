@@ -74,6 +74,15 @@ public abstract class GraphicsContext {
 	public abstract void drawRect(int x, int y, int w, int h);
 	public abstract void drawOval(int x, int y, int w, int h);
 	public abstract void drawPolyLine( int[] x, int[] y, int count);
+	public void drawPolyLine( float[] x, float[] y, int count) {
+		int[] _x = new int[count];
+		int[] _y = new int[count];
+		for( int i=0; i < count; ++i) {
+			_x[i] = (int)x[i];
+			_y[i] = (int)y[i];
+		}
+		drawPolyLine( x, y, count);
+	}
 	public abstract void drawLine(int x1, int y1, int x2, int y2);
 	public abstract void draw(Shape shape);
 

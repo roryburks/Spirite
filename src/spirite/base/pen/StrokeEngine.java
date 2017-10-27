@@ -53,7 +53,7 @@ public abstract class StrokeEngine {
 	public enum STATE { READY, DRAWING };
 	public enum Method {BASIC, ERASE, PIXEL};
 	
-	private static final double DIFF = 1;
+	public static final double DIFF = 1;
 	
 	// Pen States
 	protected PenState oldState = new PenState();
