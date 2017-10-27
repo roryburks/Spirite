@@ -12,8 +12,6 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
@@ -70,8 +68,8 @@ public class MaglevInternalImage implements IInternalImage {
 		protected abstract MagLevThing clone();
 	}
 	public static class MagLevStroke extends MagLevThing {
-		PenState[] states;
-		StrokeParams params;
+		public final PenState[] states;
+		public final StrokeParams params;
 		DrawPoints direct;
 		
 		MagLevStroke( PenState[] states, StrokeParams params) {
@@ -129,10 +127,10 @@ public class MaglevInternalImage implements IInternalImage {
 	}
 	public static class MagLevFill extends MagLevThing {
 
-		static class StrokeSegment {
-			int strokeIndex;
-			int pivot;
-			int travel;
+		public static class StrokeSegment {
+			public int strokeIndex;
+			public int pivot;
+			public int travel;
 			public StrokeSegment() {}
 			public StrokeSegment( StrokeSegment other) {
 				this.strokeIndex = other.strokeIndex;
@@ -141,7 +139,7 @@ public class MaglevInternalImage implements IInternalImage {
 			}
 		}
 		
-		List<StrokeSegment> segments;
+		public final List<StrokeSegment> segments;
 		int color;
 		public MagLevFill( List<StrokeSegment> segments, int color) {
 			this.segments = new ArrayList<>(segments.size());
@@ -169,8 +167,6 @@ public class MaglevInternalImage implements IInternalImage {
 			for( StrokeSegment s : segments) {
 				MagLevStroke stroke = (MagLevStroke)context.things.get(s.strokeIndex);
 				for( int c=0; c <= Math.abs(s.travel); ++c) {
-					if( s.pivot + c * ((s.travel > 0)? 1 : -1) < 0 || s.pivot + c * ((s.travel > 0)? 1 : -1) > stroke.direct.length)
-						System.out.println("break");
 					
 					outx[index] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
 					outy[index] = stroke.direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
@@ -242,6 +238,10 @@ public class MaglevInternalImage implements IInternalImage {
 			builtImage.flush();
 			builtImage = null;
 		}
+	}
+	/** Be careful with these things, they can break. */
+	public List<MagLevThing> getThings() {
+		return new ArrayList<MagLevThing>(things);
 	}
 	
 

@@ -51,7 +51,21 @@ public abstract class StrokeEngine {
 
 	// ==== 
 	public enum STATE { READY, DRAWING };
-	public enum Method {BASIC, ERASE, PIXEL};
+	public enum Method {
+		BASIC(0), 
+		ERASE(1), 
+		PIXEL(2)
+		;
+		
+		public final int fileId;
+		private Method( int fid) {this.fileId = fid;}
+		public Method fromFileId(int fid) {
+			for( Method m : Method.values())
+				if( m.fileId == fid)
+					return m;
+			return null;
+		}
+	};
 	
 	public static final double DIFF = 1;
 	

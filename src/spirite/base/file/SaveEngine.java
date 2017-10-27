@@ -30,11 +30,16 @@ import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.maglev.MaglevInternalImage;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.pen.PenTraits.PenState;
 import spirite.hybrid.HybridTimer;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
@@ -377,6 +382,45 @@ public class SaveEngine implements MWorkspaceObserver {
 					// [x] : Image Data
 					helper.ra.write(bos.toByteArray());
 					bos.reset();
+				}
+				break;}
+			case MAGLEV: {
+				MaglevInternalImage mimg = (MaglevInternalImage)part.iimg;
+				
+				List<MagLevThing> things = mimg.getThings();
+				helper.ra.writeShort(things.size());
+				
+				for( MagLevThing thing : things) {
+					if( thing instanceof MagLevStroke) {
+						MagLevStroke stroke = (MagLevStroke)thing;
+						
+						helper.ra.writeByte(0);		//	[1] : thing type
+						
+						helper.ra.writeInt( stroke.params.getColor());			// [4] : Color
+						helper.ra.writeByte( stroke.params.getMethod().fileId);	// [1] : Method Type
+						helper.ra.writeFloat(stroke.params.getWidth());			// [4] : Width
+						
+						helper.ra.writeShort( stroke.states.length);	// [2] : Number of Vertices
+						
+						for( PenState ps : stroke.states) {
+							helper.ra.writeFloat( ps.x);		// [4] : x
+							helper.ra.writeFloat( ps.y);		// [4] : y
+							helper.ra.writeFloat( ps.pressure);	// [4] : pressure
+						}
+						
+					}
+					else if( thing instanceof MagLevFill) {
+						MagLevFill fill = (MagLevFill)thing;
+						helper.ra.writeByte(1);		// [1] : thing type
+						
+						helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
+
+						for( MaglevInternalImage.MagLevFill.StrokeSegment seg : fill.segments) {
+							helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
+							helper.ra.writeInt( seg.pivot);			// [4] : pivot
+							helper.ra.writeInt( seg.travel);		// [4] : travel
+						}
+					}
 				}
 				break;}
 			default:

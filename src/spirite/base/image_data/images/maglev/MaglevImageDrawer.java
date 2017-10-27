@@ -83,18 +83,20 @@ public class MaglevImageDrawer
 		final BuiltSelection mask = new BuiltSelection(null, 0, 0);
 		//final StrokeEngine _engine = strokeEngine;
 		
-		
-		undoEngine.performAndStore(new ImageAction(building) {
+		// NOTE: Rather unusual to prepare, perform, then store.
+		//	Should really change strokes from writing automatically since 
+		//	they're batched anyway (At least in GL Mode)
+		img.addThing(stroke);
+		undoEngine.prepareContext(building.handle);
+		undoEngine.storeAction(new ImageAction(building) {
 			@Override
 			protected void performImageAction() {
 				ImageWorkspace ws = builtImage.handle.getContext();
 				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
 				mimg.Build();
-				
-				mimg.addThing(stroke);
-				ABuiltImageData built = building.handle.getContext().buildData(builtImage);
-				StrokeEngine _engine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
-				_engine.batchDraw(params, states, built, mask);
+
+				GraphicsContext gc = mimg.builtImage.getGraphics();
+				stroke.draw(img.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
 			}
 			@Override
 			public String getDescription() {
@@ -156,42 +158,25 @@ public class MaglevImageDrawer
 		strokeSegments = null;
 	}
 
-	private static final double MAX_JUMP = 50;
+	// The MAX_JUMP distance exists to avoid trying to connect to other ends of long loops
+	//	and generally to give the user control (or at least a sense of it)
+	private static final double MAX_JUMP = 100;
 	@Override
 	public void anchorPoints(float x, float y, float r) {
 		if( ss == null) {
 			// [Behavior Part 1]: Latching onto a stroke.  Before it starts filling, first
 			//	it has to find a stroke.  It'll latch onto to the first stroke it touches
 			//	(the closest if it touches multiple stries).
-			float closestDistance = Float.MAX_VALUE;
-			int closestIndex = -1;
-			int closestStrokeIndex = -1;
-			for( int thingIndex = 0; thingIndex < img.things.size(); ++thingIndex) {
-				MagLevThing thing = img.things.get(thingIndex);
-				if( thing instanceof MagLevStroke) {
-					MagLevStroke stroke = (MagLevStroke)thing;
-					for( int i=0; i < stroke.direct.length; ++i) {
-						float distance = (float) MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]);
-						if( distance < closestDistance) {
-							closestIndex = i;
-							closestStrokeIndex = thingIndex;
-							closestDistance = distance;
-						}
-					}
-				}
-			}
+			StrokeSegment cloestSegment = new StrokeSegment();
+			float closestDistance = findClosestStroke( x, y, cloestSegment);
 			
-			System.out.println(closestIndex);
-			
-			if( closestStrokeIndex != -1 && closestDistance <= r) {
-				ss = new StrokeSegment();
-				ss.pivot = closestIndex;
-				ss.strokeIndex = closestStrokeIndex;
-				ss.travel = 0;
+			if( cloestSegment.strokeIndex != -1 && closestDistance <= r) {
+				ss = cloestSegment;
 				strokeSegments.add(ss);
 			}
 		}
 		if( ss != null) {
+			// [Behavior Part 2]: When latched on, the 
 			MagLevStroke stroke = (MagLevStroke)img.things.get(ss.strokeIndex);
 			int sLen = stroke.direct.length;
 			int abovePivot = 0;
@@ -226,12 +211,47 @@ public class MaglevImageDrawer
 			
 			if( abovePivot == -1 && belowPivot == -1) {
 				// No matches found, look for a jump
-				// TODO
+				// TODO: Make this better, so that it latches on to things closer to where the segment should
+				//	logically break.
+				StrokeSegment closestSegment = new StrokeSegment();
+				float closestDistance = findClosestStroke( x, y, closestSegment);
+				
+				if( closestSegment.strokeIndex != -1 && closestDistance <= r
+						&& (ss == null || closestSegment.strokeIndex != ss.strokeIndex)) 
+				{
+					ss = closestSegment;
+					strokeSegments.add(ss);
+				}
 			}
 			else
 				ss.travel = (abovePivot > belowPivot) ? abovePivot : -belowPivot;
 		}
 	}
+	private float findClosestStroke( float x, float y, StrokeSegment out)
+	{
+		float closestDistance = Float.MAX_VALUE;
+		int closestIndex = -1;
+		int closestStrokeIndex = -1;
+		for( int thingIndex = 0; thingIndex < img.things.size(); ++thingIndex) {
+			MagLevThing thing = img.things.get(thingIndex);
+			if( thing instanceof MagLevStroke) {
+				MagLevStroke stroke = (MagLevStroke)thing;
+				for( int i=0; i < stroke.direct.length; ++i) {
+					float distance = (float) MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]);
+					if( distance < closestDistance) {
+						closestIndex = i;
+						closestStrokeIndex = thingIndex;
+						closestDistance = distance;
+					}
+				}
+			}
+		}
+		
+		out.pivot = closestIndex;
+		out.strokeIndex = closestStrokeIndex;
+		return closestDistance;
+	}
+	
 	@Override
 	public float[] getMagFillXs() {
 		int totalLen = 0;
@@ -242,11 +262,8 @@ public class MaglevImageDrawer
 		int index = 0;
 		for( StrokeSegment s : strokeSegments) {
 			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
-			for( int c=0; c <= Math.abs(s.travel); ++c) {
-				if( s.pivot + c * ((s.travel > 0)? 1 : -1) < 0 || s.pivot + c * ((s.travel > 0)? 1 : -1) > stroke.direct.length)
-					System.out.println("break");
+			for( int c=0; c <= Math.abs(s.travel); ++c) 
 				out[index++] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
-			}
 		}
 		
 		
