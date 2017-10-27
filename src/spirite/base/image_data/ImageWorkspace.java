@@ -39,6 +39,7 @@ import spirite.base.image_data.images.drawer.GroupNodeDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.maglev.MaglevInternalImage;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
@@ -689,6 +690,12 @@ public class ImageWorkspace {
 		LayerNode node = groupTree.new LayerNode( new SpriteLayer(handle), name);
 		_addLayer(node,context);
 		
+		return node;
+	}
+	
+	public LayerNode addNewReferenceLayer(Node context, LayerNode underlying, String name) {
+		LayerNode node = groupTree.new LayerNode( new ReferenceLayer(underlying), name);
+		_addLayer(node,context);
 		return node;
 	}
 	

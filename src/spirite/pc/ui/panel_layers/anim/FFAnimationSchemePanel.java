@@ -33,6 +33,7 @@ import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
+import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
@@ -41,6 +42,7 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.util.Colors;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
@@ -228,7 +230,7 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			List<Component> linked = new ArrayList<>();
 			for(Frame frame : layer.getFrames()) {
-				if( frame.getMarker() == Marker.START_LOCAL_LOOP) {
+				if( frame.getMarker() == Marker.START_LOCAL_LOOP && frame.getLength() > 0) {
 					int fs = frame.getStart();
 					int fe = frame.getEnd();
 
@@ -329,6 +331,9 @@ public class FFAnimationSchemePanel extends JPanel
 			Frame f = (Frame)cmenuObject;
 			f.setGapAfter(f.getGapAfter()+1);
 			break;}
+		case "deleteNode":{
+			ws.removeNode(((Frame)cmenuObject).getLinkedNode());
+			break;}
 		case "removeGapBefore":{
 			Frame f = (Frame)cmenuObject;
 			f.setGapBefore(0);
@@ -340,6 +345,13 @@ public class FFAnimationSchemePanel extends JPanel
 		case "localLoop":{
 			Frame f = (Frame)cmenuObject;
 			f.getLayerContext().wrapInLoop(f);
+			break;}
+		case "refer":{
+			LayerNode ln = ((LayerNode)((Frame)cmenuObject).getLinkedNode());
+			if( ln.getLayer() instanceof ReferenceLayer)
+				ws.addNewReferenceLayer(ln.getParent(), ((ReferenceLayer)ln.getLayer()).getUnderlying(), ln.getName());
+			else
+				ws.addNewReferenceLayer(ln.getParent(), ln, "*"+ln.getName()+"*");;
 			break;}
 		default: 
 			MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
@@ -363,10 +375,12 @@ public class FFAnimationSchemePanel extends JPanel
 			contextMenu.removeAll();
 			
 			Object[][] menuScheme = {
-				{"Duplicate Node", "duplicate"},
-				{"Insert Empty Before", "insertEmptyBefore"},
-				{"Insert Empty After", "insertEmpty"},
-				{"Wrap in Local Loop","localLoop"}
+				{"D&uplicate Node", "duplicate"},
+				{"Insert Empty &Before", "insertEmptyBefore"},
+				{"Insert &Empty After", "insertEmpty"},
+				//{"Wrap in Local Loop","localLoop"},
+				{"&Delete Node","deleteNode"},
+				{"Copy As Reference","refer"},
 			};
 			cmenuObject = frame;
 			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);

@@ -56,6 +56,12 @@ public interface IImageDrawer {
 		public void transform( MatTrans trans);
 	}
 	
+	public interface IWeightEraser {
+		public void startWeightErase();
+		public void endWeightErase();
+		public void weightErase( float x, float y, float w);
+	}
+	
 	public interface IMagneticFillModule {
 		public void startMagneticFill();
 		public void endMagneticFill( int color);

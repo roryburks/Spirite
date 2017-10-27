@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
@@ -32,6 +33,7 @@ import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -328,6 +330,8 @@ public class LoadEngine {
 			nodeLayer[i] = null;
 		}
 		
+		Map<LayerNode, Integer> referencesToMap = new HashMap<>();
+		
 		while( helper.ra.getFilePointer() < endPointer) {
 			
 			// Default values
@@ -407,6 +411,15 @@ public class LoadEngine {
 					SpriteLayer rig = new SpriteLayer( parts);
 					node = helper.workspace.addShellLayer(nodeLayer[depth-1], rig, name);
 					break;}
+				case SaveLoadUtil.NODE_REFERENCE_LAYER: {
+					node = helper.workspace.addNewReferenceLayer(nodeLayer[depth-1], null, "");
+					referencesToMap.put((LayerNode)node, helper.ra.readInt());
+					//LayerNode node 
+					//node = helper.workspace.addShellLayer(nodeLayer[depth-1], new ReferenceLayer(helper.nodes.get(helper.ra.readInt())), name)
+//						helper.w
+//						// [4] : NodeID of referenced node
+//						helper.ra.writeInt(helper.nodeMap.get(((ReferenceLayer)layer).underlying));
+					break;}
 				}
 			}
 			if( node != null) {
@@ -417,6 +430,10 @@ public class LoadEngine {
 				node.getRender().setVisible( (bitmask & SaveLoadUtil.VISIBLE_MASK) != 0);
 				node.setOffset(ox, oy);
 			}
+		}
+		
+		for(Entry<LayerNode,Integer> entry :  referencesToMap.entrySet()) {
+			
 		}
 	}
 	

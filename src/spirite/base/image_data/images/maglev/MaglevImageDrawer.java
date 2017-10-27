@@ -11,6 +11,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
+import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
@@ -30,7 +31,8 @@ public class MaglevImageDrawer
 	implements 	IImageDrawer,
 				IStrokeModule,
 				ITransformModule,
-				IMagneticFillModule
+				IMagneticFillModule,
+				IWeightEraser
 {
 
 	private final BuildingImageData building;
@@ -271,6 +273,64 @@ public class MaglevImageDrawer
 
 	@Override
 	public void interpretFill(float[] curve, int color) {
+	}
+
+	// ::: IWeightEraser
+	static Object iweIDLocker = new Object();
+	static int iweIDCounter = 0;
+	int iweId = -1;
+	@Override
+	public void weightErase(float x, float y, float w) {
+		for( MagLevThing thing : img.things) {
+			if( thing instanceof MagLevStroke) {
+				MagLevStroke stroke = (MagLevStroke)thing;
+				
+				
+			}
+		}
+//		
+//		this.building.handle.getContext().getUndoEngine().performAndStore(
+//				new MagWeightEraseAction(building, strokeToErase, iweId));
+	}
+
+	@Override
+	public void startWeightErase() {
+		synchronized( iweIDLocker) {
+			iweId = iweIDCounter++;
+		}
+	}
+	@Override
+	public void endWeightErase() {
+		iweId = -1;
+	}
+	class MagWeightEraseAction extends ImageAction implements StackableAction {
+		private final List<MagLevThing> thingsToErase;
+		private final int id;
+		MagWeightEraseAction(BuildingImageData data, MagLevThing thingToErase, int id)
+		{
+			super(data);
+			this.id = id;
+			thingsToErase = new ArrayList<>(1);
+			thingsToErase.add(thingToErase);
+		}
+
+		@Override public boolean canStack(UndoableAction newAction) {
+			return ( newAction instanceof MagWeightEraseAction && ((MagWeightEraseAction) newAction).id == id);
+		}
+		@Override public void stackNewAction(UndoableAction newAction) {
+			thingsToErase.addAll(((MagWeightEraseAction)newAction).thingsToErase);
+		}
+
+		@Override
+		protected void performImageAction() {
+			ImageWorkspace ws = builtImage.handle.getContext();
+			MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
+			
+			for( MagLevThing toErase : thingsToErase) {
+				mimg.things.remove(toErase);
+			}
+			mimg.unbuild();
+		}
 	}
 
 }

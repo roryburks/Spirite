@@ -48,6 +48,7 @@ public class ToolsetManager
         COLOR_CHANGE("Color Change Tool",11),
         COLOR_PICKER("Color Picker",12),
         MAGLEV_FILL("Magnetic Fill",13),
+        EXCISE_ERASER("Stroke Erasor", 14),
         ;
 
         public final String description;
@@ -75,14 +76,7 @@ public class ToolsetManager
         selected.put(Cursor.STYLUS, Tool.PEN);
         selected.put(Cursor.ERASER, Tool.ERASER);
 
-        toolSettings.put( Tool.PEN, constructPenSettings());
-        toolSettings.put( Tool.PIXEL, constructPixelSettings());
-        toolSettings.put( Tool.ERASER, constructEraseSettings());
-        toolSettings.put( Tool.BOX_SELECTION, constructBoxSelectionSettings());
-        toolSettings.put( Tool.CROP, constructCropperSettings());
-        toolSettings.put( Tool.FLIPPER, constructFlipperSettings());
-        toolSettings.put( Tool.COLOR_CHANGE, constructColorChangeSettings());
-        toolSettings.put( Tool.RESHAPER, constructReshapeSettings());
+        constructSettings();
     }
 
     // ===============
@@ -136,18 +130,38 @@ public class ToolsetManager
     	return null;
     }
     private static Tool[] ToolsForDefaultDrawer = {
-    		Tool.PEN, Tool.ERASER, Tool.FILL, Tool.BOX_SELECTION, Tool.FREEFORM_SELECTION,
-    		Tool.MOVE, Tool.PIXEL, Tool.CROP, Tool.COMPOSER, Tool.FLIPPER,
-    		Tool.RESHAPER, Tool.COLOR_CHANGE, Tool.COLOR_PICKER
+    		Tool.PEN, 
+    		Tool.ERASER, 
+    		Tool.FILL, 
+    		Tool.BOX_SELECTION, 
+    		Tool.FREEFORM_SELECTION,
+    		Tool.MOVE, 
+    		Tool.PIXEL, 
+    		Tool.CROP, 
+    		Tool.COMPOSER, 
+    		Tool.FLIPPER,
+    		Tool.RESHAPER, 
+    		Tool.COLOR_CHANGE, 
+    		Tool.COLOR_PICKER
     };
     private static Tool[] ToolsForGroupDrawer = {
-    		Tool.BOX_SELECTION, Tool.FREEFORM_SELECTION,
-    		Tool.MOVE, Tool.PIXEL, Tool.CROP, Tool.COMPOSER, Tool.FLIPPER,
-    		Tool.RESHAPER, Tool.COLOR_CHANGE, Tool.COLOR_PICKER
+    		Tool.BOX_SELECTION, 
+    		Tool.FREEFORM_SELECTION,
+    		Tool.MOVE, 
+    		Tool.PIXEL, 
+    		Tool.CROP, 
+    		Tool.COMPOSER, 
+    		Tool.FLIPPER,
+    		Tool.RESHAPER, 
+    		Tool.COLOR_CHANGE, 
+    		Tool.COLOR_PICKER
     };
     private static Tool[] ToolsForMaglevDrawer = {
-    		Tool.PEN, Tool.ERASER, Tool.PIXEL,
-    		Tool.MAGLEV_FILL
+    		Tool.PEN, 
+    		Tool.ERASER, 
+    		Tool.PIXEL,
+    		Tool.MAGLEV_FILL,
+    		Tool.EXCISE_ERASER
     };
 
     /**
@@ -226,33 +240,6 @@ public class ToolsetManager
     	PenDrawMode( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
     }
-    private ToolSettings constructPenSettings() {
-        Property[] props = {
-	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
-	        	new OpacityProperty("alpha", "Opacity", 1.0f),
-	        	new SizeProperty("width","Width", 5.0f),
-	        	new CheckBoxProperty("hard","Hard Edged",false),
-        };
-
-        return constructFromScheme(props, Tool.PEN);
-    }
-    private ToolSettings constructEraseSettings() {
-        Property[] props = {
-            	new OpacityProperty("alpha", "Opacity", 1.0f),
-            	new SizeProperty("width","Width", 5.0f),
-            	new CheckBoxProperty("hard","Hard Edged",false)
-        };
-
-        return constructFromScheme(props, Tool.ERASER);
-    }
-    private ToolSettings constructPixelSettings() {
-        Property[] props = {
-        		new OpacityProperty("alpha", "Opacity", 1.0f)
-        };
-
-        return constructFromScheme(props, Tool.PIXEL);
-    }
-    
     public enum BoxSelectionShape {
     	RECTANGLE("Rectangle"),
     	OVAL("Oval"),
@@ -261,30 +248,6 @@ public class ToolsetManager
     	public final String hrName;
     	BoxSelectionShape( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
-    }
-    private ToolSettings constructBoxSelectionSettings() {
-        Property[] props = {
-        		new DropDownProperty<BoxSelectionShape>("shape","Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.class)
-        };
-
-        return constructFromScheme(props, Tool.BOX_SELECTION);
-    }
-    private ToolSettings constructCropperSettings() {
-        Property[] props = {
-        		new ButtonProperty("cropSelection","Crop Selection", "draw.cropSelection", this.master),
-        		new CheckBoxProperty("quickCrop", "Crop on Finish", false),
-        		new CheckBoxProperty("shrinkOnly", "Shrink-only Crop", false)
-        };
-        
-        return constructFromScheme(props, Tool.CROP);
-    }
-    private ToolSettings constructFlipperSettings() {
-        Property[] props = {
-        		new RadioButtonProperty( "flipMode", "Flip Mode", 2, 
-        				new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}),
-        };
-
-        return constructFromScheme(props, Tool.FLIPPER);
     }
     public enum ColorChangeScopes {
     	LOCAL("Local"),
@@ -296,24 +259,48 @@ public class ToolsetManager
     	ColorChangeScopes( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
     }
-    private ToolSettings constructColorChangeSettings() {
-    	Property[] props = {
-    		new DropDownProperty<ColorChangeScopes>("scope", "Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.class),
-    		new RadioButtonProperty("mode", "Apply Mode", 0,
-                    new String[] {"Check Alpha", "Ignore Alpha", "Change All"})
-    	};
-
-        return constructFromScheme( props, Tool.COLOR_CHANGE);
-    }
-    private ToolSettings constructReshapeSettings() {
-    	Property[] props = {
-    		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master, DISABLE_ON_NO_SELECTION),
-    		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y", DISABLE_ON_NO_SELECTION),
-    		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y", DISABLE_ON_NO_SELECTION),
-    		new FloatBoxProperty( "rotation", "Rotation", 0, DISABLE_ON_NO_SELECTION)
-    	};
-    	
-        return constructFromScheme( props, Tool.RESHAPER);
+    private void constructSettings() {
+        toolSettings.put( Tool.PEN, constructFromScheme( new Property[] {
+	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
+	        	new OpacityProperty("alpha", "Opacity", 1.0f),
+	        	new SizeProperty("width","Width", 5.0f),
+	        	new CheckBoxProperty("hard","Hard Edged",false),
+        }, Tool.PEN));
+        toolSettings.put( Tool.PIXEL, constructFromScheme( new Property[] {
+        		new OpacityProperty("alpha", "Opacity", 1.0f)
+        }, Tool.PIXEL));
+        toolSettings.put( Tool.ERASER, constructFromScheme( new Property[] {
+            	new OpacityProperty("alpha", "Opacity", 1.0f),
+            	new SizeProperty("width","Width", 5.0f),
+            	new CheckBoxProperty("hard","Hard Edged",false)
+        }, Tool.ERASER));
+        toolSettings.put( Tool.BOX_SELECTION, constructFromScheme( new Property[] {
+        		new DropDownProperty<BoxSelectionShape>("shape","Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.class)
+        }, Tool.BOX_SELECTION));
+        toolSettings.put( Tool.CROP, constructFromScheme( new Property[] {
+        		new ButtonProperty("cropSelection","Crop Selection", "draw.cropSelection", this.master),
+        		new CheckBoxProperty("quickCrop", "Crop on Finish", false),
+        		new CheckBoxProperty("shrinkOnly", "Shrink-only Crop", false)
+        }, Tool.CROP));
+        toolSettings.put( Tool.FLIPPER, constructFromScheme( new Property[] {
+        		new RadioButtonProperty( "flipMode", "Flip Mode", 2, 
+        				new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}),
+        }, Tool.FLIPPER));
+        toolSettings.put( Tool.COLOR_CHANGE, constructFromScheme( new Property[] {
+        		new DropDownProperty<ColorChangeScopes>("scope", "Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.class),
+        		new RadioButtonProperty("mode", "Apply Mode", 0,
+                        new String[] {"Check Alpha", "Ignore Alpha", "Change All"})
+        }, Tool.COLOR_CHANGE));
+        toolSettings.put( Tool.RESHAPER, constructFromScheme( new Property[] {
+        		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master, DISABLE_ON_NO_SELECTION),
+        		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y", DISABLE_ON_NO_SELECTION),
+        		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y", DISABLE_ON_NO_SELECTION),
+        		new FloatBoxProperty( "rotation", "Rotation", 0, DISABLE_ON_NO_SELECTION)
+        }, Tool.RESHAPER));
+        toolSettings.put( Tool.EXCISE_ERASER, constructFromScheme( new Property[]{
+        		new SizeProperty("width", "Width", 5.0f),
+        		new CheckBoxProperty("full", "Full Erase", true)
+        }, Tool.EXCISE_ERASER));
     }
 
     public static final int DISABLE_ON_NO_SELECTION = 0x01;

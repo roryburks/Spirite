@@ -78,23 +78,23 @@ class AWTStrokeEngine extends StrokeEngine{
 	}
 	
 	@Override
-	protected boolean drawToLayer(List<PenState> states, boolean permanent) {
+	protected boolean drawToLayer(DrawPoints states, boolean permanent) {
 		BufferedImage layer = (permanent)?fixedLayer:displayLayer;
 		
 		Graphics g = layer.getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
 		g.setColor( new Color(stroke.getColor()));
 
-		for( int i=1; i < states.size(); ++i) {
-			PenState fromState = states.get(i-1);
-			PenState toState = states.get(i);
+		for( int i=1; i < states.length; ++i) {
+//			PenState fromState = states.get(i-1);
+//			PenState toState = states.get(i);
 			if( stroke.getMethod() != StrokeEngine.Method.PIXEL){
 				g2.setStroke( new BasicStroke( 
-						stroke.getDynamics().getSize(toState)*stroke.getWidth(), 
+						states.w[i] * stroke.getWidth(),
 						BasicStroke.CAP_ROUND, 
 						BasicStroke.CAP_SQUARE));
 			}
-			g2.drawLine( (int)fromState.x, (int)fromState.y, (int)toState.x, (int)toState.y);
+			g2.drawLine( (int)states.x[i-1], (int)states.y[i-1], (int)states.x[i], (int)states.y[i]);
 
 			
 

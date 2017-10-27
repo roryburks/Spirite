@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.webkit.graphics.Ref;
+
 import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -29,6 +31,7 @@ import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -197,6 +200,7 @@ public class SaveEngine implements MWorkspaceObserver {
 		long startPointer = helper.ra.getFilePointer();
 		helper.ra.writeInt(0);
 		
+		_sgt_buildReferences_rec( helper, helper.dupeRoot, depth);
 		_sgt_rec( helper, helper.dupeRoot, depth);
 
 		long endPointer = helper.ra.getFilePointer();
@@ -206,6 +210,15 @@ public class SaveEngine implements MWorkspaceObserver {
 		helper.ra.writeInt( (int)(endPointer - startPointer - 4));
 		
 		helper.ra.seek(endPointer);
+	}
+	private void _sgt_buildReferences_rec( SaveHelper helper, GroupTree.Node node, byte depth) 
+			throws UnsupportedEncodingException, IOException 
+	{
+		helper.nodeMap.put( node, helper.nmMet++);
+		if( node instanceof GroupNode) {
+			for( GroupTree.Node child : node.getChildren())
+				_sgt_buildReferences_rec( helper, child, (byte) (depth+1));
+		}
 	}
 	// Recursive should be fine since there's a depth limit of 255
 	private void _sgt_rec( SaveHelper helper, GroupTree.Node node, byte depth) 
@@ -231,7 +244,6 @@ public class SaveEngine implements MWorkspaceObserver {
 		// [n] : Null-terminated UTF-8 String for Layer name
 		helper.ra.write( SaveLoadUtil.strToByteArrayUTF8( node.getName()));
 
-		helper.nodeMap.put( node, helper.nmMet++);
 		if( node instanceof GroupTree.GroupNode) {
 			// [1] : Node Type ID
 			helper.ra.write( SaveLoadUtil.NODE_GROUP);
@@ -288,6 +300,12 @@ public class SaveEngine implements MWorkspaceObserver {
 					// [4] ImageHandle ID
 					helper.ra.writeInt(part.getImageHandle().getID());
 				}
+			}
+			if( layer instanceof ReferenceLayer) {
+				// [1] : Node Type ID
+				helper.ra.writeByte(SaveLoadUtil.NODE_REFERENCE_LAYER);
+				// [4] : NodeID of referenced node
+				helper.ra.writeInt(helper.nodeMap.get(((ReferenceLayer)layer).getUnderlying()));
 			}
 		}
 		else {

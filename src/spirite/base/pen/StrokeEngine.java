@@ -13,6 +13,7 @@ import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
+import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
@@ -24,12 +25,28 @@ public abstract class StrokeEngine {
 
 	// =============
 	// ==== Abstract Methods
-	protected abstract boolean drawToLayer( List<PenState> states, boolean permanent);
+	protected abstract boolean drawToLayer( DrawPoints points, boolean permanent);
 	protected abstract void prepareDisplayLayer();
 	protected abstract void onStart();
 	protected abstract void onEnd();
 	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
+	// Made as a class instead of parameters for extendability
+	protected class DrawPoints {
+		public final float[] x;
+		public final float[] y;
+		public final float[] w;
+		public final int length;
+		DrawPoints( float[] x, float[] y, float[] w) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			
+			this.length = x.length;
+			if( x.length != y.length || x.length != w.length)
+				System.out.println("BAD");
+		}
+	}
 	
 
 	// ==== 
@@ -51,7 +68,7 @@ public abstract class StrokeEngine {
 	protected BuiltSelection sel;
 	
 	// Interpolation
-	private Interpolator2D interpolator = null;
+	private Interpolator2D _interpolator = null;
 	private float interpos = 0;
 	
 	// :::: Get's
@@ -85,16 +102,9 @@ public abstract class StrokeEngine {
 			ABuiltImageData data,
 			BuiltSelection selection) 
 	{
-
-		if( data == null) 
+		if( ! prepareStroke(params, data, selection))
 			return false;
-		
-		this.data = data;
-		stroke = params;
-
-		
-		sel = selection;
-		interpos = 0;
+		buildInterpolator(params, ps);
 		
 		if( sel.selection != null) {
 /*			selectionMask = new BufferedImage( 
@@ -105,14 +115,6 @@ public abstract class StrokeEngine {
 			g2.translate(sel.offsetX, sel.offsetY);
 			sel.selection.drawSelectionMask(g2);
 			g2.dispose();*/
-		}
-		switch( params.interpolationMethod){
-		case CUBIC_SPLINE:
-			interpolator = new CubicSplineInterpolator2D(null, true);
-			break;
-		default:
-			interpolator = null;
-			break;
 		}
 		
 		// Starts recording the Pen States
@@ -129,23 +131,55 @@ public abstract class StrokeEngine {
 		rawState.y = ps.y;
 		rawState.pressure = ps.pressure;
 		prec.add( ps);
-		if( interpolator != null) interpolator.addPoint(ps.x, ps.y);
 		
 		state = StrokeEngine.STATE.DRAWING;
 		
-		onStart( );
-		
-		prepareDisplayLayer();
 		
 		
-		drawToLayer( Arrays.asList( new PenState[]{ps,
-				(stroke.method == Method.PIXEL)?new PenState(ps.x, ps.y+1, ps.pressure):ps}), false);
+		drawToLayer( new DrawPoints( 
+				new float[] {ps.x},
+				new float[] {ps.y}, 
+				new float[] {params.dynamics.getSize(ps)}),
+				false);
 //		return startDrawStroke( newState);
 		return true;
+	}
+	
+	private boolean prepareStroke( 
+			StrokeParams params, 
+			ABuiltImageData data,
+			BuiltSelection selection)
+	{
+		if( data == null) 
+			return false;
+		
+		this.data = data;
+		stroke = params;
+
+		
+		sel = selection;
+		interpos = 0;
+		onStart( );
+		prepareDisplayLayer();
+		return true;
+	}
+	
+	private void buildInterpolator( StrokeParams params, PenState ps)
+	{
+		switch( params.interpolationMethod){
+		case CUBIC_SPLINE:
+			_interpolator = new CubicSplineInterpolator2D(null, true);
+			break;
+		default:
+			_interpolator = null;
+			break;
+		}
+		if( _interpolator != null) _interpolator.addPoint(ps.x, ps.y);
 	}
 
 	public final boolean stepStroke( PenState ps) {
 		Vec2i layerSpace = data.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
+		PenState buff;
 		newState.x = layerSpace.x;
 		newState.y = layerSpace.y;
 		newState.pressure = ps.pressure;
@@ -162,33 +196,11 @@ public abstract class StrokeEngine {
 		if( oldState.x != newState.x || oldState.y != newState.y)
 		{
 			prec.add( new PenState( rawState));
-			if( interpolator != null) {
-				interpolator.addPoint(rawState.x, rawState.y);
+			if( _interpolator != null) 
+				_interpolator.addPoint(rawState.x, rawState.y);
 
-				List<PenState> points = new ArrayList<>();
-
-				interpos = 0;
-				InterpolatedPoint ip = interpolator.evalExt(interpos);
-				points.add(new PenState((int)Math.round(ip.x), (int)Math.round(ip.y), 
-						(float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp)));
-				while( interpos + DIFF < interpolator.getCurveLength()) {
-					interpos += DIFF;
-					ip = interpolator.evalExt(interpos);
-					
-					points.add(new PenState(ip.x, ip.y, 
-							(float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp)));
-				}
-				prepareDisplayLayer();
-				changed = this.drawToLayer(points, false);
-			}
-			else {
-//				int d = 2;
-//				if( prec.size() >= (d+1)) {
-//					changed = this.drawToLayer(prec.subList(prec.size()-(d+1), prec.size()-(d-1)), true);
-//				}
-				prepareDisplayLayer();
-				changed = this.drawToLayer(prec, false);
-			}
+			prepareDisplayLayer();
+			changed = this.drawToLayer( buildPoints(_interpolator, prec), false);
 		}
 
 		oldState.x = newState.x;
@@ -212,6 +224,7 @@ public abstract class StrokeEngine {
 		}
 		
 		onEnd();
+		_interpolator = null;
 	}
 	
 	
@@ -220,49 +233,85 @@ public abstract class StrokeEngine {
 	 * draw commands into a single command instead of updating the stroke layer
 	 * repeatedly.
 	 */
-	
-
 	public void batchDraw(StrokeParams params, PenState[] points, ABuiltImageData builtImage, BuiltSelection mask) 
 	{
-		this.startStroke(params, points[0], builtImage, mask);
+		prepareStroke(params, builtImage, mask);
+		buildInterpolator(params, points[0]);
 
-		//prepareDisplayLayer();	// Not needed becaus it's done in startStroke, but that might change
-		if( interpolator != null) {
+		if( _interpolator != null) {
 			// NOTE: startStroke already adds the first Point into the 
 			//	Interpolator, so we start at point 2 (index 1).
 			for( int i=1; i < points.length; ++i) {
-				interpolator.addPoint(points[i].x, points[i].y);
-			}
-			
-			if( points.length >= 2) {
-				// Go through and Interpolate, DIFF pixels at a time
-				List<PenState> iPoints = new ArrayList<>();
-				interpos = 0;
-				InterpolatedPoint ip = interpolator.evalExt(interpos);
-				iPoints.add(new PenState(
-						ip.x, 
-						ip.y, 
-						(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
-				while( interpos + DIFF < interpolator.getCurveLength()) {
-					interpos += DIFF;
-					ip = interpolator.evalExt(interpos);
-					
-					iPoints.add(new PenState(
-							ip.x, 
-							ip.y, 
-							(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
-				}
-				iPoints.add(new PenState(
-						ip.x, 
-						ip.y, 
-						(float) MUtil.lerp(points[ip.left].pressure, points[ip.right].pressure, ip.lerp)));
-				this.drawToLayer(iPoints, false);
+				_interpolator.addPoint(points[i].x, points[i].y);
 			}
 		}
-		else
-			drawToLayer(Arrays.asList(points), false);
+
+		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points)), false);
 		
-		this.endStroke();
+		if( data != null) {
+			GraphicsContext gc = data.checkoutRaw().getGraphics();
+			drawStrokeLayer(gc);
+			data.checkin();
+		}
+		
+		_interpolator = null;
+	}
+	
+	private DrawPoints buildPoints(Interpolator2D localInterpolator, List<PenState> penStates) {
+		PenState buff;
+		
+		if( localInterpolator != null) {
+			FloatCompactor fcx = new FloatCompactor();
+			FloatCompactor fcy = new FloatCompactor();
+			FloatCompactor fcw = new FloatCompactor();
+	
+			float localInterpos = 0;
+			InterpolatedPoint ip = localInterpolator.evalExt(localInterpos);
+			buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(prec.get(ip.left).pressure, prec.get(ip.right).pressure, ip.lerp));
+			fcx.add(ip.x);
+			fcy.add(ip.y);
+			fcw.add(stroke.dynamics.getSize(buff));
+			
+			while( localInterpos + DIFF < localInterpolator.getCurveLength()) {
+				localInterpos += DIFF;
+				ip = localInterpolator.evalExt(localInterpos);
+	
+				buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(penStates.get(ip.left).pressure, penStates.get(ip.right).pressure, ip.lerp));
+				fcx.add(ip.x);
+				fcy.add(ip.y);
+				fcw.add(stroke.dynamics.getSize(buff));
+			}
+			prepareDisplayLayer();
+			
+			return new DrawPoints(fcx.toArray(), fcy.toArray(), fcw.toArray());
+		}
+		else{
+			float[] xs = new float[penStates.size()];
+			float[] ys = new float[penStates.size()];
+			float[] ws = new float[penStates.size()];
+			for( int i=0; i < prec.size(); ++i) {
+				xs[i] = penStates.get(i).x;
+				ys[i] = penStates.get(i).y;
+				ws[i] = stroke.dynamics.getSize(penStates.get(i));
+			}
+			return new DrawPoints( xs, ys, ws);
+		}
+	}
+	
+	public BuiltStroke buildStroke(StrokeParams params, PenState[] points, ABuiltImageData builtImage, BuiltSelection mask) {
+		
+		
+		return null;
+	}
+	public static class BuiltStroke {
+		public float[] x;
+		public float[] y;
+		public float[] w;
+	}
+	
+	public void batchDraw( StrokeParams params, Interpolator2D interpolator, ABuiltImageData builtImage, BuiltSelection mask) 
+	{
+		
 	}
 
 

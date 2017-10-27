@@ -387,13 +387,18 @@ public class Penner
 					HybridHelper.beep();
 				
 				break;}
-			case MAGLEV_FILL:
+			case MAGLEV_FILL:{
 
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof IMagneticFillModule) {
-					behavior = new MagFilling(this, (IMagneticFillModule) drawer);
+					behavior = new MagFillingBehavior(this, (IMagneticFillModule) drawer);
 				}
 				else HybridHelper.beep();
+				break;}
+			case EXCISE_ERASER: {
+				
+				
+				break;}
 			}
 			
 			if( behavior != null)
@@ -1399,11 +1404,11 @@ public class Penner
 		@Override public void onTock() {}
 	}
 	
-	class MagFilling extends Penner.DrawnStateBehavior {
+	class MagFillingBehavior extends Penner.DrawnStateBehavior {
 		private final Penner penner;
 		IMagneticFillModule drawer;
 		
-		MagFilling( Penner penner, IMagneticFillModule drawer) {
+		MagFillingBehavior( Penner penner, IMagneticFillModule drawer) {
 			penner.super();
 			this.penner = penner;
 			this.drawer = drawer;
@@ -1436,6 +1441,18 @@ public class Penner
 			//drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
 			drawer.endMagneticFill(this.penner.paletteManager.getActiveColor(0));
 			super.onPenUp();
+		}
+	}
+	
+	class ExciseBehavior extends StateBehavior {
+		@Override public void start() {
+			onMove();
+		}
+		@Override public void onTock() {}
+
+		@Override
+		public void onMove() {
+			
 		}
 	}
 	

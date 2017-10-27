@@ -129,7 +129,10 @@ class GLStrokeEngine extends StrokeEngine {
 	
 
 	@Override
-	protected boolean drawToLayer( List<PenState> states, boolean permanent) {
+	protected boolean drawToLayer( DrawPoints states, boolean permanent) {
+		if( states == null || states.length <= 0)
+			return false;
+		
 		GLImage drawTo = (permanent)?fixedLayer:displayLayer;
 		
 		engine.setTarget(drawTo);
@@ -228,24 +231,24 @@ class GLStrokeEngine extends StrokeEngine {
 	}
 
 	private final static int BASIC_STRIDE = 3;
-	private GLVBuffer composeVBuffer( List<PenState> states) {
+	private GLVBuffer composeVBuffer(  DrawPoints states) {
+		
 		GLVBuffer vb = new GLVBuffer();
 		
 		// Step 1: Determine how much space is needed
-		int num = states.size() + 2;
+		int num = states.length + 2;
 
 		float raw[] = new float[BASIC_STRIDE*(num)];
 		int o = 1;	// first point is 0,0,0,0
-		for( int i=0; i < states.size(); ++i) {
+		for( int i=0; i < states.length; ++i) {
 			int off = (o++)*BASIC_STRIDE;
 			
-			PenState ps = states.get(i);
 			// x y z w
-			raw[off+0] = data.convertX(ps.x);
-			raw[off+1] = data.convertY(ps.y);
+			raw[off+0] = data.convertX(states.x[i]);
+			raw[off+1] = data.convertY(states.y[i]);
 			
 			// size pressure
-			raw[off+2] = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+			raw[off+2] = states.w[i] * stroke.getWidth();
 //			raw[off+3] = ps.pressure;
 			
 /*			if( i == states.size()-1 && stroke.getMethod() == Method.PIXEL) {
@@ -257,8 +260,8 @@ class GLStrokeEngine extends StrokeEngine {
 
 		raw[0] = raw[BASIC_STRIDE];
 		raw[1] = raw[BASIC_STRIDE+1];
-		raw[(1 + states.size())*BASIC_STRIDE] = raw[(states.size())*BASIC_STRIDE];
-		raw[(1 + states.size())*BASIC_STRIDE+1] = raw[(states.size())*BASIC_STRIDE+1];
+		raw[(1 + states.length)*BASIC_STRIDE] = raw[(states.length)*BASIC_STRIDE];
+		raw[(1 + states.length)*BASIC_STRIDE+1] = raw[(states.length)*BASIC_STRIDE+1];
 
 		vb.vBuffer = raw;
 		vb.len = num;
