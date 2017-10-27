@@ -32,12 +32,20 @@ import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.maglev.MaglevInternalImage;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -294,6 +302,63 @@ public class LoadEngine {
 				
 				dataMap.put(identifier, new PrismaticInternalImage(loadingList));				
 				break;}
+			case MAGLEV: {
+				int thingsLeftToRead = helper.ra.readUnsignedShort();
+				
+				List<MagLevThing> things = new ArrayList<>(thingsLeftToRead);
+				
+				for( ; thingsLeftToRead != 0; --thingsLeftToRead) {
+					int thingType = helper.ra.readByte();
+					
+					switch( thingType) {
+					case 0:{	// Stroke
+						int color = helper.ra.readInt();
+						StrokeEngine.Method method = StrokeEngine.Method.fromFileId(helper.ra.readUnsignedByte());
+						float width = helper.ra.readFloat();
+						int numPenStatesToRead = helper.ra.readUnsignedShort();
+						
+						PenState[] pss = new PenState[numPenStatesToRead];
+						for( int i=0; i < numPenStatesToRead; ++i) {
+							float x = helper.ra.readFloat();
+							float y = helper.ra.readFloat();
+							float p = helper.ra.readFloat();
+							
+							pss[i] = new PenState(x, y, p);
+						}
+						StrokeParams params = new StrokeParams();
+						params.setWidth(width);
+						params.setMethod(method);
+						params.setColor(color);
+						
+						things.add(new MagLevStroke(pss, params));
+						
+						break;}
+					case 1:{	// Fill
+						int color = helper.ra.readInt();
+						int numSegmentsToRead = helper.ra.readUnsignedShort();
+						
+						List<StrokeSegment> segments = new ArrayList<>(numSegmentsToRead);
+						
+						for( ; numSegmentsToRead > 0; --numSegmentsToRead) {
+							StrokeSegment ss = new StrokeSegment();
+							
+							ss.strokeIndex = helper.ra.readUnsignedShort();
+							ss.pivot = helper.ra.readInt();
+							ss.travel = helper.ra.readInt();
+							
+							segments.add(ss);
+						}
+						
+						things.add( new MagLevFill(segments, color));
+						
+						break;}
+					}
+				}
+				
+
+				dataMap.put(identifier, new MaglevInternalImage(helper.workspace, things));	
+				
+				break;}
 			}
 		}
 		
@@ -432,8 +497,11 @@ public class LoadEngine {
 			}
 		}
 		
+		// Link the reference nodes (needs to be done afterwards because it might link to a node yet
+		//	added to the node map since nodeIDs are based on depth-first Group Tree order, 
+		//	not creation order)
 		for(Entry<LayerNode,Integer> entry :  referencesToMap.entrySet()) {
-			
+			((ReferenceLayer)entry.getKey().getLayer()).setUnderlying((LayerNode) helper.nodes.get(entry.getValue()));
 		}
 	}
 	

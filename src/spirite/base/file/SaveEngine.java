@@ -388,7 +388,8 @@ public class SaveEngine implements MWorkspaceObserver {
 				MaglevInternalImage mimg = (MaglevInternalImage)part.iimg;
 				
 				List<MagLevThing> things = mimg.getThings();
-				helper.ra.writeShort(things.size());
+				//	[2] : Number of things
+				helper.ra.writeShort(things.size());	
 				
 				for( MagLevThing thing : things) {
 					if( thing instanceof MagLevStroke) {
@@ -412,6 +413,8 @@ public class SaveEngine implements MWorkspaceObserver {
 					else if( thing instanceof MagLevFill) {
 						MagLevFill fill = (MagLevFill)thing;
 						helper.ra.writeByte(1);		// [1] : thing type
+
+						helper.ra.writeInt( fill.getColor());			// [4] : Color
 						
 						helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
 

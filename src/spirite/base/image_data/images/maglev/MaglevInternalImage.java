@@ -35,7 +35,7 @@ public class MaglevInternalImage implements IInternalImage {
 	//final List<MagLevFill> fills;
 	final List<MagLevThing> things;
 	
-	private ImageWorkspace context;
+	private final ImageWorkspace context;
 	RawImage builtImage = null;
 	private boolean isBuilt = false;
 	
@@ -45,6 +45,11 @@ public class MaglevInternalImage implements IInternalImage {
 		if( context != null) {
 			// TODO: unflag "isBuilt" when Workspace changes size
 		}
+	}
+	public MaglevInternalImage( ImageWorkspace context, List<MagLevThing> things) {
+		this.context = context;
+		this.things = new ArrayList<>( things.size());
+		this.things.addAll(things);
 	}
 	private MaglevInternalImage( MaglevInternalImage other) {
 		this.context = other.context;
@@ -72,7 +77,7 @@ public class MaglevInternalImage implements IInternalImage {
 		public final StrokeParams params;
 		DrawPoints direct;
 		
-		MagLevStroke( PenState[] states, StrokeParams params) {
+		public MagLevStroke( PenState[] states, StrokeParams params) {
 			this.states = states;
 			this.params = params;
 			
@@ -182,6 +187,9 @@ public class MaglevInternalImage implements IInternalImage {
 		// Since MagLevFill operates on references, it doesn't get changed itself
 		@Override float[] getPoints() { return null;}
 		@Override void setPoints(float[] xy) {}
+		public int getColor() {
+			return color;
+		}
 	}
 
 	// ==== Easy Junk

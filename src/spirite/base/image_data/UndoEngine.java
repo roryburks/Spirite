@@ -42,12 +42,20 @@ import spirite.hybrid.MDebug.WarningType;
  *   from realtime execution code (though calling similar methods).
  * All NullActions are performed in a centralized place (ImageWorkspace.executeAction)
  * 
+ * 
+ * XXXXXXXXXXXX OUTDATED XXXXXXXXXXXXXXX
  * Events which update the undo engine with undo-able commands should come from
  *  a limited number of places to promote code maintainability.  As of now, only:
  * -ImageWorkspace
  * -DrawEngine
  * -SelectionEngine
  * ~~Penner has access to it for ending the Stroke, should probably fix that.
+ * XXXXXXXXXXXX OUTDATED XXXXXXXXXXXXXXX
+ * Ultimately this philosophy was abandoned as it would lead to monolythic ImageWorkspaces
+ * and non-modular code.  Instead perform and store were hard-coupled such that performance
+ * IS undoability, though care needs to be made between dealing with hard references 
+ * (i.e. Java references) and soft references (e.g. relative positions on lists)
+ * XXXXXXXXXXXX OUTDATED XXXXXXXXXXXXXXX
  * 
  * TODO: Get rid of Image Actions with non-image components to avoid weird 
  * needs to call performImageAction

@@ -59,7 +59,7 @@ public abstract class StrokeEngine {
 		
 		public final int fileId;
 		private Method( int fid) {this.fileId = fid;}
-		public Method fromFileId(int fid) {
+		public static Method fromFileId(int fid) {
 			for( Method m : Method.values())
 				if( m.fileId == fid)
 					return m;
