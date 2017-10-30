@@ -348,7 +348,7 @@ public class LoadEngine {
 							
 							segments.add(ss);
 						}
-						
+
 						things.add( new MagLevFill(segments, color));
 						
 						break;}
@@ -519,7 +519,7 @@ public class LoadEngine {
 			
 			if( type == SaveLoadUtil.ANIM_FIXED_FRAME) {
 				if( helper.version < 8)
-					_LEGACY_loadFFA(helper, name);
+					_LEGACY_loadFFA0007(helper, name);
 				else
 					loadFixedFrameAnimation( helper, name);
 			}
@@ -695,7 +695,7 @@ public class LoadEngine {
 		}
 	}
 
-	private void _LEGACY_loadFFA( LoadHelper helper, String name) 
+	private void _LEGACY_loadFFA0007( LoadHelper helper, String name) 
 			throws IOException 
 	{
 		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);

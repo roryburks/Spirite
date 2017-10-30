@@ -128,6 +128,20 @@ public class MaglevInternalImage implements IInternalImage {
 				states[i].x = xy[i*2];
 				states[i].y = xy[i*2+1];
 			}
+			Interpolator2D interpolator;
+			switch( params.getInterpolationMethod()){
+			case CUBIC_SPLINE:
+				interpolator = new CubicSplineInterpolator2D(null, true);
+				break;
+			default:
+				interpolator = null;
+				break;
+			}
+			if( interpolator != null) {
+				for( PenState ps : states)
+					interpolator.addPoint(ps.x, ps.y);
+			}
+			direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
 		}
 	}
 	public static class MagLevFill extends MagLevThing {
@@ -154,7 +168,7 @@ public class MaglevInternalImage implements IInternalImage {
 		public MagLevFill( MagLevFill other) {
 			this.segments = new ArrayList<>(other.segments.size());
 			this.color = other.color;
-			for( int i=0; i < segments.size(); ++i)
+			for( int i=0; i < other.segments.size(); ++i)
 				this.segments.add( new StrokeSegment(other.segments.get(i)));
 		}
 		protected MagLevFill clone()  {

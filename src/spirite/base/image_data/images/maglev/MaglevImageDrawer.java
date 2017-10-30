@@ -92,9 +92,11 @@ public class MaglevImageDrawer
 				ImageWorkspace ws = builtImage.handle.getContext();
 				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
 				mimg.Build();
+				
+				mimg.addThing(stroke);
 
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				stroke.draw(img.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
+				stroke.draw(mimg.build(new BuildingImageData(builtImage.handle, 0, 0)), null, gc, mimg);
 			}
 			@Override
 			public String getDescription() {
@@ -125,6 +127,7 @@ public class MaglevImageDrawer
 	
 	// :::: IMagnetifFillModule
 	StrokeSegment ss;
+	int floatSoft;
 	List<StrokeSegment> strokeSegments;
 	@Override public void startMagneticFill() { 
 		ss = null;
@@ -143,7 +146,7 @@ public class MaglevImageDrawer
 				mimg.addThing(fill);
 				
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				fill.draw(img.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
+				fill.draw(mimg.build(new BuildingImageData(builtImage.handle, 0, 0)), null, gc, mimg);
 				
 			}
 			@Override
@@ -160,7 +163,7 @@ public class MaglevImageDrawer
 	//	and generally to give the user control (or at least a sense of it)
 	private static final double MAX_JUMP = 100;
 	@Override
-	public void anchorPoints(float x, float y, float r) {
+	public void anchorPoints(float x, float y, float r, boolean locked, boolean relooping) {
 		if( ss == null) {
 			// [Behavior Part 1]: Latching onto a stroke.  Before it starts filling, first
 			//	it has to find a stroke.  It'll latch onto to the first stroke it touches
@@ -285,10 +288,6 @@ public class MaglevImageDrawer
 		return out;
 	}
 
-	@Override
-	public void interpretFill(float[] curve, int color) {
-	}
-
 	// ::: IWeightEraserModule
 	static Object iweIDLocker = new Object();
 	static int iweIDCounter = 0;
@@ -359,6 +358,11 @@ public class MaglevImageDrawer
 		public String getDescription() {
 			return "Erase Mag Stroke";
 		}
+	}
+
+	@Override
+	public void erasePoints( float x, float y, float r) {
+		
 	}
 
 }

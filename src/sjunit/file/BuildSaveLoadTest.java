@@ -161,7 +161,7 @@ public class BuildSaveLoadTest {
 			IMagneticFillModule mag = (IMagneticFillModule)ws.getDrawerFromNode(node1);
 			mag.startMagneticFill();
 			for( int i=0; i<20; ++i)
-				mag.anchorPoints(i, i, 10);
+				mag.anchorPoints(i, i, 10, true, false);
 			mag.endMagneticFill( 0xff0ff0a0);
 
 			master.saveWorkspace(ws, temp);
@@ -226,12 +226,13 @@ public class BuildSaveLoadTest {
 	
 	private void VerifyImageEquivalent( ImageHandle img1, ImageHandle img2, Map<Integer,Integer> checkedIImgMap)
 	{
-		if( checkedIImgMap.containsKey(img1.getID())) {
+		if( checkedIImgMap != null  &&checkedIImgMap.containsKey(img1.getID())) {
 			assert( checkedIImgMap.get(img1.getID()).equals(img2.getID()));
 		}
 		else {
-			for( Entry<Integer,Integer> entry: checkedIImgMap.entrySet())
-				assert( !entry.getValue().equals(img2.getID()));
+			if( checkedIImgMap != null)
+				for( Entry<Integer,Integer> entry: checkedIImgMap.entrySet())
+					assert( !entry.getValue().equals(img2.getID()));
 
 			IInternalImage iimg1 = img1.getContext().getData(img1);
 			IInternalImage iimg2 = img2.getContext().getData(img2);
@@ -316,7 +317,8 @@ public class BuildSaveLoadTest {
 				}
 			}
 			
-			checkedIImgMap.put( img1.getID(), img2.getID());
+			if( checkedIImgMap != null)
+				checkedIImgMap.put( img1.getID(), img2.getID());
 		}
 	}
 	private void VerifyRawImages( RawImage raw1, RawImage raw2) {

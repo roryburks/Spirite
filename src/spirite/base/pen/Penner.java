@@ -1435,7 +1435,7 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			drawer.anchorPoints(this.penner.x, this.penner.y, 10);
+			drawer.anchorPoints(this.penner.x, this.penner.y, 10, holdingShift, holdingCtrl);
 		}
 		@Override
 		public void onPenUp() {

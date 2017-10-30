@@ -61,16 +61,28 @@ Header
 			[4, int] : Size of Image Data
 			[n, RAW] : PNG-saved Image File
 	CASE 3 (Maglev) :
-		[2, ushort] : number of strokes
+		// NOTE: Maglev structure is likely to change tremendously in the future
+		[2, ushort] : number of things
+		Per Thing:
+			[1, byte] : thing type
+			SWITCH:
+			Case 0 (Stroke):
+				[4, int] : color
+				[1, byte] : Stroke Method
+				[4, float] : width of stroke
+				[2, ushort] : number of vertices
+				Per vertex:
+					[4, float] : x
+					[4, float] : y
+					[4, float] : pressure
+			Case 1 (Fill) :
+				[4, int] : color
+				[2, ushort] : number of stroke segments
+				Per reference:
+					[2, ushort] : refrence to stroke
+					[4, int] : pivot point on stroke
+					[4, int] : travel
 		Per Stroke : 
-			[4, int] : color
-			[1, byte] : Stroke Method
-			[2, ushort] : number of vertices
-			[4, float] : width of stroke
-			Per vertex:
-				[4, float] : x
-				[4, float] : y
-				[4, float] : pressure
 
 ---- ANIM - Animation Data Chunk
 Per Animation:
