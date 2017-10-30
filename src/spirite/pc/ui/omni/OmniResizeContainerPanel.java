@@ -1,7 +1,11 @@
 package spirite.pc.ui.omni;
 
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -12,18 +16,6 @@ import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.DropTarget;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
-
-import spirite.pc.ui.components.ResizeContainerPanel;
-import spirite.pc.ui.omni.OmniFrame.OmniComponent;
-
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;

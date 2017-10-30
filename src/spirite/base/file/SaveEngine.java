@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.webkit.graphics.Ref;
-
 import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;

@@ -43,7 +43,6 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.ui.UIUtil;
-import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.omni.FrameManager.FrameType;
 
 /***

@@ -12,7 +12,7 @@ public class TestWrapper {
 		AssertionError assertFail = null;
 	}
 	public interface DoOnMaster {
-		public void Do(MasterControl master);
+		public void Do(MasterControl master) throws Exception;
 	}
 	public static void performTest( DoOnMaster runner) throws Exception {
 		final CarryInfo info = new CarryInfo();

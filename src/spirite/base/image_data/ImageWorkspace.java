@@ -39,8 +39,8 @@ import spirite.base.image_data.images.drawer.GroupNodeDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.maglev.MaglevInternalImage;
 import spirite.base.image_data.layers.Layer;
-import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
+import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.pen.StrokeEngine;
@@ -327,6 +327,8 @@ public class ImageWorkspace {
 		if( node instanceof LayerNode) {
 			Layer layer = ((LayerNode) node).getLayer();
 			BuildingImageData bid = layer.getActiveData();
+
+			bid.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
 			IInternalImage iimg = imageData.get(bid.handle.id);
 			return (iimg == null) ? null : iimg.getImageDrawer(bid);
 		}

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;

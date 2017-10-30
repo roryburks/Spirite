@@ -6,10 +6,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;

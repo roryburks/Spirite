@@ -2,7 +2,6 @@ package spirite.base.graphics.gl;
 
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
-import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;

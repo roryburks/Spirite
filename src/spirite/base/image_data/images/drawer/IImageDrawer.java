@@ -1,7 +1,6 @@
 package spirite.base.image_data.images.drawer;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
-import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;

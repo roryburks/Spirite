@@ -49,7 +49,6 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
-import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;

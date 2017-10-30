@@ -1,11 +1,9 @@
 package spirite.base.image_data.images.maglev;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
@@ -13,9 +11,11 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.image_data.images.drawer.IImageDrawer.*;
+import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
 import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
@@ -24,7 +24,6 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
-import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
 
@@ -57,7 +56,7 @@ public class MaglevImageDrawer
 	@Override
 	public boolean startStroke(StrokeParams params, PenState ps) {
 		ImageWorkspace workspace = building.handle.getContext();
-		
+		workspace.getUndoEngine().prepareContext(building.handle);
 		strokeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 		
 		if( strokeEngine.startStroke( params, ps, workspace.buildData(building), workspace.getSelectionEngine().getBuiltSelection()))
@@ -87,7 +86,6 @@ public class MaglevImageDrawer
 		//	Should really change strokes from writing automatically since 
 		//	they're batched anyway (At least in GL Mode)
 		img.addThing(stroke);
-		undoEngine.prepareContext(building.handle);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
 			protected void performImageAction() {

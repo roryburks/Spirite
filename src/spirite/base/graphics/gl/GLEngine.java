@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.glu.GLU;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
