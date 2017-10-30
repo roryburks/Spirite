@@ -145,7 +145,7 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 		
 		public final List<StrokeSegment> segments;
-		int color;
+		public final int color;
 		public MagLevFill( List<StrokeSegment> segments, int color) {
 			this.segments = new ArrayList<>(segments.size());
 			this.segments.addAll(segments);

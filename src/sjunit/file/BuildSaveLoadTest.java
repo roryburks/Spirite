@@ -22,9 +22,14 @@ import spirite.base.image_data.images.DynamicInternalImage;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
 import spirite.base.image_data.images.maglev.MaglevInternalImage;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
 import spirite.base.image_data.images.InternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage.LImg;
+import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
@@ -123,6 +128,49 @@ public class BuildSaveLoadTest {
 		});
 		temp.delete();
 	}
+
+	@Test
+	public void MagLevImgBuildSaveLoadFileTest() throws Exception {
+		final File temp;
+		temp = File.createTempFile("BasicBuildSaveLoadFileTest.sif", Long.toString(System.nanoTime()));
+		
+		TestWrapper.performTest((MasterControl master) -> {
+			ImageWorkspace ws = new ImageWorkspace(master);
+			ws.setWidth(20);
+			ws.setHeight(20);
+			ws.finishBuilding();
+			Node node1 = ws.addNewSimpleLayer( null, HybridHelper.createImage(10, 10), "prismaticLayer", InternalImageTypes.MAGLEV);
+			
+			int[] colors = new int[] {0xffff0000,0xff00ff00,0xff0000ff};
+			float[][][] strokes = new float[][][] {
+				{{0, 0, 1}, {15, 15, 1}, {20,20,20,1}},
+				{{0, 0, 1}, {5, 5, 1}, {20,20,20,1}},
+				{{20, 0, 1}, {0, 20, 1}, {20,20,20,1}},
+			};
+			for( int i=0; i < colors.length; ++i) {
+				IStrokeModule drawer = (IStrokeModule)ws.getDrawerFromNode(node1);
+				StrokeParams params = new StrokeParams();
+				params.setColor(colors[i]);
+				drawer.startStroke(new StrokeParams(), new PenState( strokes[i][0][0], strokes[i][0][1], strokes[i][0][2]));
+				
+				for( int j=1; j < strokes[i].length; ++j) 
+					drawer.stepStroke(new PenState( strokes[i][j][0], strokes[i][j][1], strokes[i][j][2]));
+				drawer.endStroke();
+			}
+
+			IMagneticFillModule mag = (IMagneticFillModule)ws.getDrawerFromNode(node1);
+			mag.startMagneticFill();
+			for( int i=0; i<20; ++i)
+				mag.anchorPoints(i, i, 10);
+			mag.endMagneticFill( 0xff0ff0a0);
+
+			master.saveWorkspace(ws, temp);
+			ImageWorkspace ws2 = master.getLoadEngine().loadWorkspace(temp);
+			
+			VerifyWorkspacesEquivalent( ws, ws2);
+		});
+		temp.delete();
+	}
 	
 	private void VerifyWorkspacesEquivalent(ImageWorkspace ws1, ImageWorkspace ws2) {
 		GroupNode groupRoot1 = ws1.getRootNode();
@@ -192,14 +240,16 @@ public class BuildSaveLoadTest {
 				assert( iimg2 instanceof InternalImage);
 
 				VerifyRawImages( iimg1.readOnlyAccess(), iimg2.readOnlyAccess());
-			}else if( iimg1 instanceof DynamicInternalImage) {
+			}
+			else if( iimg1 instanceof DynamicInternalImage) {
 				assert( iimg2 instanceof DynamicInternalImage);
 
 				assert( iimg1.getDynamicX() == iimg2.getDynamicX());
 				assert( iimg1.getDynamicY() == iimg2.getDynamicY());
 				
 				VerifyRawImages( iimg1.readOnlyAccess(), iimg2.readOnlyAccess());
-			}else if( iimg1 instanceof PrismaticInternalImage) {
+			}
+			else if( iimg1 instanceof PrismaticInternalImage) {
 				assert( iimg2 instanceof PrismaticInternalImage);
 
 				PrismaticInternalImage pii1 = (PrismaticInternalImage)iimg1;
@@ -210,17 +260,60 @@ public class BuildSaveLoadTest {
 
 				assert( colors1.size() == colors2.size());
 				for( int i=0; i < colors1.size(); ++i) {
-					System.out.println(colors1.get(i).color);
 					assert(colors1.get(i).color == colors2.get(i).color);
 					assert(colors1.get(i).ox == colors2.get(i).ox);
 					assert(colors1.get(i).oy == colors2.get(i).oy);
 					
 					VerifyRawImages(colors1.get(i).img,colors2.get(i).img);
 				}
-			}else if( iimg1 instanceof MaglevInternalImage) {
+			}
+			else if( iimg1 instanceof MaglevInternalImage) {
 				assert( iimg2 instanceof MaglevInternalImage);
-				
-				// TODO
+
+				MaglevInternalImage mag1 = (MaglevInternalImage)iimg1;
+				MaglevInternalImage mag2 = (MaglevInternalImage)iimg2;
+
+				List<MagLevThing> things1 = mag1.getThings();
+				List<MagLevThing> things2 = mag2.getThings();
+				assert( things1.size() == things2.size());
+				for( int i=0; i < things1.size(); ++i) {
+					if( things1.get(i) instanceof MagLevStroke) {
+						assert( things2.get(i) instanceof MagLevStroke);
+
+						MagLevStroke stroke1 = (MagLevStroke)things1.get(i);
+						MagLevStroke stroke2 = (MagLevStroke)things2.get(i);
+						
+						assert(stroke1.params.getWidth() == stroke2.params.getWidth());
+						assert(stroke1.params.getAlpha() == stroke2.params.getAlpha());
+						assert(stroke1.params.getColor() == stroke2.params.getColor());
+						assert(stroke1.params.getMethod() == stroke2.params.getMethod());
+						assert(stroke1.params.getMode() == stroke2.params.getMode());
+						// stroke1.params == stroke2.params
+						
+						assert( stroke1.states.length == stroke2.states.length);
+						for( int j=0; j<stroke1.states.length; ++j) {
+							assert( stroke1.states[j].pressure == stroke2.states[j].pressure);
+							assert( stroke1.states[j].x == stroke2.states[j].x);
+							assert( stroke1.states[j].y == stroke2.states[j].y);
+						}
+					}else if( things1.get(i) instanceof MagLevFill) {
+						assert( things2.get(i) instanceof MagLevFill);
+
+						MagLevFill fill1 = (MagLevFill)things1.get(i);
+						MagLevFill fill2 = (MagLevFill)things2.get(i);
+						
+						assert( fill1.color == fill2.color);
+						List<StrokeSegment> segments1 = fill1.segments;
+						List<StrokeSegment> segments2 = fill1.segments;
+						
+						assert( segments1.size() == segments2.size());
+						for( int j=0; j<segments1.size(); ++j) {
+							assert( segments1.get(j).pivot == segments2.get(j).pivot);
+							assert( segments1.get(j).strokeIndex == segments2.get(j).strokeIndex);
+							assert( segments1.get(j).travel == segments2.get(j).travel);
+						}
+					}
+				}
 			}
 			
 			checkedIImgMap.put( img1.getID(), img2.getID());
