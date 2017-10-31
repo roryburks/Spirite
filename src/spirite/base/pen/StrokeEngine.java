@@ -67,6 +67,7 @@ public abstract class StrokeEngine {
 		}
 	};
 	
+	// The Interpolator tick distance.  Lower means smoother but more rendering time (especially with Maglev layers)
 	public static final double DIFF = 1;
 	
 	// Pen States

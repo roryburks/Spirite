@@ -46,4 +46,12 @@ public class Colors {
     	hsv[2] = Math.max(0, hsv[2]-0.1f);
     	return new Color(Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]));
     }
+    
+    public static double colorDistance( int color1, int color2) {
+    	int dr = getRed(color1) - getRed(color2);
+    	int dg = getGreen(color1) - getGreen(color2);
+    	int db = getBlue(color1) - getBlue(color2);
+    	int da = getAlpha(color1) - getAlpha(color2);
+    	return Math.sqrt(dr*dr + dg*dg + db*db + da*da);
+    }
 }

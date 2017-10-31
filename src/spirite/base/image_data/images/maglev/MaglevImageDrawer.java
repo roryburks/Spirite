@@ -159,9 +159,6 @@ public class MaglevImageDrawer
 		strokeSegments = null;
 	}
 
-	// The MAX_JUMP distance exists to avoid trying to connect to other ends of long loops
-	//	and generally to give the user control (or at least a sense of it)
-	private static final double MAX_JUMP = 100;
 	@Override
 	public void anchorPoints(float x, float y, float r, boolean locked, boolean relooping) {
 		if( ss == null) {
@@ -183,7 +180,7 @@ public class MaglevImageDrawer
 			if( closestSegment.strokeIndex == ss.strokeIndex && closestDistance <= r) {
 				MagLevStroke stroke = (MagLevStroke) img.things.get(ss.strokeIndex);
 				
-				if( Math.abs(ss.travel - (closestSegment.pivot - ss.pivot)) > 
+				if( Math.abs(ss.travel - (closestSegment.pivot - ss.pivot) * StrokeEngine.DIFF) > 
 					1.5 * MUtil.distance(stroke.direct.x[ss.pivot + ss.travel], stroke.direct.y[ss.pivot + ss.travel],
 							stroke.direct.x[closestSegment.pivot], stroke.direct.y[closestSegment.pivot]) && !locked)
 				{

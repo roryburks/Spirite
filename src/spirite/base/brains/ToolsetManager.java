@@ -142,7 +142,8 @@ public class ToolsetManager
     		Tool.FLIPPER,
     		Tool.RESHAPER, 
     		Tool.COLOR_CHANGE, 
-    		Tool.COLOR_PICKER
+    		Tool.COLOR_PICKER,
+    		Tool.MAGLEV_FILL
     };
     private static Tool[] ToolsForGroupDrawer = {
     		Tool.BOX_SELECTION, 
@@ -154,7 +155,8 @@ public class ToolsetManager
     		Tool.FLIPPER,
     		Tool.RESHAPER, 
     		Tool.COLOR_CHANGE, 
-    		Tool.COLOR_PICKER
+    		Tool.COLOR_PICKER,
+    		Tool.MAGLEV_FILL
     };
     private static Tool[] ToolsForMaglevDrawer = {
     		Tool.PEN, 

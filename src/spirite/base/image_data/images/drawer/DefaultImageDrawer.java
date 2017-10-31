@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.sun.prism.paint.Color;
+
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -19,7 +21,7 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.IInternalImage;
-// Bad, but auto-complete include isn't working with my Eclipse
+// Auto-complete include isn't working so this comment is a marker for easy finding
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
@@ -27,6 +29,7 @@ import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -34,7 +37,9 @@ import spirite.base.pen.StrokeEngine.STATE;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
+import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.DirectDrawer;
 import spirite.hybrid.HybridHelper;
@@ -50,7 +55,8 @@ public class DefaultImageDrawer
 				IColorChangeModule,
 				IInvertModule,
 				ITransformModule,
-				IStrokeModule
+				IStrokeModule,
+				IMagneticFillModule
 {
 	private BuildingImageData building;
 	private final IInternalImage img;
@@ -548,5 +554,100 @@ public class DefaultImageDrawer
 			ABuiltImageData built = building.handle.getContext().buildData(builtImage);
 			engine.batchDraw(params, points, built, mask);
 		}
+	}
+	
+	
+	// :::: IMagneticFillModule
+	FloatCompactor fx;
+	FloatCompactor fy;
+	@Override
+	public void startMagneticFill() {
+		fx = new FloatCompactor();
+		fy = new FloatCompactor();
+	}
+
+	@Override
+	public void endMagneticFill(final int color) {
+		final ImageWorkspace workspace = building.handle.getContext();
+		BuiltSelection sel = pollSelectionMask(workspace);
+		final float[] fill_x = fx.toArray();
+		final float[] fill_y = fy.toArray();
+		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
+			@Override
+			protected void performImageAction() {
+				ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+				
+				GraphicsContext gc = built.checkout();
+				gc.setColor(color);
+				gc.fillPolygon(fill_x, fill_y, fill_x.length);
+			}
+			@Override
+			public String getDescription() {
+				return "Magnetic Fill";
+			}
+		
+		});
+		
+		fx = null;
+		fy = null;
+	}
+
+	@Override
+	public void anchorPoints(float x, float y, float r, boolean locked, boolean relooping) {
+		final ImageWorkspace workspace = building.handle.getContext();
+		int lockedColor = (locked)?workspace.getPaletteManager().getActiveColor(0):0;
+
+		Vec2 start = building.trans.transform(new Vec2(x,y), new Vec2());
+		int sx= Math.round(start.x);
+		int sy = Math.round(start.y);
+		RawImage img = building.handle.deepAccess();
+		
+		if( tryPixel( sx, sy, img, lockedColor, locked))
+			return;
+		
+		for( int tr = 1; tr < r+1; ++tr) {
+			for( int snake = 0; snake < tr; ++snake) {
+				// Topleft->topright
+				if( tryPixel( sx-tr+snake, sy-tr, img, lockedColor, locked))
+					return;
+				//TR->BR
+				if( tryPixel(sx+tr, sy-tr+snake, img, lockedColor, locked))
+					return;
+				//BR->BL
+				if( tryPixel(sx+tr-snake, sy+tr, img, lockedColor, locked))
+					return;
+				//BL->TL
+				if( tryPixel(sx-tr, sy+tr-snake, img, lockedColor, locked))
+					return;
+			}
+		}
+	}
+	private boolean tryPixel( int x, int y, RawImage raw, int lockedColor, boolean locked) {
+		if( x == fx.get( fx.size()-1) && y == fy.get(fy.size()))
+			return false;
+		int c = raw.getRGB(x, y);
+		if( (locked && Colors.colorDistance(c, lockedColor) < 25) ||
+				(!locked && Colors.getAlpha(c) > 230 )) 
+		{
+			fx.add(x);
+			fy.add(y);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void erasePoints(float x, float y, float r) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public float[] getMagFillXs() {
+		return fx.toArray();
+	}
+
+	@Override
+	public float[] getMagFillYs() {
+		return fy.toArray();
 	}
 }
