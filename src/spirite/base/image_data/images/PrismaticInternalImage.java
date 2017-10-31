@@ -9,10 +9,12 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
@@ -180,36 +182,43 @@ public class PrismaticInternalImage implements IInternalImage {
 	}
 
 	public class PrismaticBuiltImageData extends ABuiltImageData {
-		final int box;
-		final int boy;
+		final MatTrans trans;
+		MatTrans invTrans;
 		RawImage buffer = null;
 		int workingColor;
 
 		public PrismaticBuiltImageData(BuildingImageData building) {
 			super(building.handle);
-			// TODO
-			this.box = (int) building.trans.getM02();
-			this.boy = (int) building.trans.getM12();
+			this.trans = building.trans;
 			workingColor = building.color;
+			try {
+				this.invTrans = trans.createInverse();
+			} catch (NoninvertableException e) {
+				this.invTrans = new MatTrans();
+			}
 		}
 
 
 		@Override public int getWidth() {return handle.getContext().getWidth();}
 		@Override public int getHeight() { return handle.getContext().getHeight();}
+		@Override public Vec2i convert(Vec2i p) {return p;}
+		@Override public Vec2 convert(Vec2 p) {return p;}
+		@Override public MatTrans getCompositeTransform() {return new MatTrans(trans);}
+		@Override public MatTrans getScreenToImageTransform() {return new MatTrans(invTrans);}
 
-		@Override
-		public void draw(GraphicsContext gc) {
-			buildComposition();
-			MatTrans transform = MatTrans.TranslationMatrix(box, boy);
-			handle.drawLayer( gc, transform);
-		}
-
+		@Override public Rect getBounds() {return MUtil.circumscribeTrans( compRect, trans); }
 		@Override
 		public void drawBorder(GraphicsContext gc) {
 			if( handle == null) return;
 			
-			gc.drawRect(box + compRect.x, boy + compRect.y, compRect.width, compRect.height);
+			MatTrans oldTrans = gc.getTransform();
+			gc.preTransform(trans);
+			gc.drawRect(compRect.x-1, compRect.y-1, 
+					compRect.width+2, compRect.height+2);
+			gc.setTransform(oldTrans);
 		}
+		@Override public void draw(GraphicsContext gc) {handle.drawLayer( gc, trans);}
+
 
 		@Override
 		public GraphicsContext checkout() {
@@ -228,8 +237,10 @@ public class PrismaticInternalImage implements IInternalImage {
 				if( other.color == workingColor)
 					img = other;
 			}
-			if( img != null)
-				gc.drawImage(img.img, img.ox + box, img.oy + boy);
+			if( img != null) {
+				gc.setTransform(trans);
+				gc.drawImage(img.img, img.ox, img.oy);
+			}
 			
 			return buffer;
 		}
@@ -259,6 +270,7 @@ public class PrismaticInternalImage implements IInternalImage {
 				
 				RawImage nri = HybridHelper.createImage(r.width, r.height); 
 				GraphicsContext gc = nri.getGraphics();
+				gc.setTransform(invTrans);
 				gc.drawImage(buffer, -r.x, -r.y);
 				
 				img = new LImg();
@@ -270,18 +282,19 @@ public class PrismaticInternalImage implements IInternalImage {
 			}
 			else {
 				// Update the layer for the color: mostly duplicate code from DynamicInternalImage
-				Rect activeRect = (new Rect(0,0,w,h))
-						.union(img.ox+box, img.oy+boy, img.img.getWidth(), img.img.getHeight());
-				
-				RawImage raw = HybridHelper.createImage(activeRect.width, activeRect.height);
+				Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
+						new Rect(img.ox,img.oy, img.img.getWidth(), img.img.getHeight()));
+
+				RawImage raw = HybridHelper.createImage(drawAreaInImageSpace.width, drawAreaInImageSpace.height);
 				GraphicsContext gc = raw.getGraphics();
 
-				// Draw the part of the old image over the new one
-				gc.drawImage(img.img, box+img.ox-activeRect.x, boy+img.oy-activeRect.y);
+				// Draw the old image
+				gc.drawImage(img.img, img.ox - drawAreaInImageSpace.x, img.oy - drawAreaInImageSpace.y);
 
 				// Clear the section of the old image that will be replaced by the new one
+				gc.transform(trans);
 				gc.setComposite(Composite.SRC, 1.0f);
-				gc.drawImage(buffer,  -activeRect.x, -activeRect.y);
+				gc.drawImage(buffer, 0, 0);
 				
 				Rect cropped = null;
 				try {
@@ -299,8 +312,8 @@ public class PrismaticInternalImage implements IInternalImage {
 					gc = nri.getGraphics();
 					gc.drawImage( raw, -cropped.x, -cropped.y);
 
-					img.ox = activeRect.x - box + cropped.x;
-					img.oy = activeRect.y - boy + cropped.y;
+					img.ox = cropped.x-drawAreaInImageSpace.x;
+					img.oy = cropped.y-drawAreaInImageSpace.y;
 					
 					img.img.flush();
 					img.img = nri;
@@ -314,26 +327,8 @@ public class PrismaticInternalImage implements IInternalImage {
 			handle.refresh();
 		}
 
-		@Override
-		public MatTrans getScreenToImageTransform() {
-			MatTrans transform = new MatTrans();
-			transform.preTranslate( -box, -boy);
-			return transform;
-		}
 
-		@Override public Vec2i convert(Vec2i p) {return p;}
-		@Override public Vec2 convert(Vec2 p) {return p;}
-		@Override
-		public Rect getBounds() {
-			return new Rect(box + compRect.x, boy + compRect.y, compRect.width, compRect.height);
-		}
 
-		@Override
-		public MatTrans getCompositeTransform() {
-			MatTrans trans = new MatTrans();
-			trans.preTranslate(box, boy);
-			return trans;
-		}
 	}
 
 	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}

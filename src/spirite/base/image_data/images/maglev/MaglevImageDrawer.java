@@ -177,55 +177,75 @@ public class MaglevImageDrawer
 			}
 		}
 		if( ss != null) {
-			// [Behavior Part 2]: When latched on, the 
-			MagLevStroke stroke = (MagLevStroke)img.things.get(ss.strokeIndex);
-			int sLen = stroke.direct.length;
-			int abovePivot = 0;
-			int belowPivot = 0;
-			int found;
-			for( found = -1; ss.pivot + abovePivot < sLen; ++abovePivot) {
-				int index = abovePivot + ss.pivot;
-				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
-					found = abovePivot;
-				else if( found > ss.travel)	// Quit if you found a point and broke it
-					break;
-				
-				// Don't Look for connections above MAX_JUMP distance from the pivot point
-				if( (abovePivot - Math.max(ss.travel, 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
-					break;
-			}
-			abovePivot = found;
+			StrokeSegment closestSegment = new StrokeSegment();
+			float closestDistance = findClosestStroke( x, y, closestSegment);
 			
-			for( found = -1; ss.pivot - belowPivot >= 0; ++belowPivot) {
-				int index = ss.pivot - belowPivot;
-
-				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
-					found = belowPivot;
-				else if( found > -ss.travel)	// Quit if you found a point and broke it
-					break;
+			if( closestSegment.strokeIndex == ss.strokeIndex && closestDistance <= r) {
+				MagLevStroke stroke = (MagLevStroke) img.things.get(ss.strokeIndex);
 				
-				// Don't Look for connections above MAX_JUMP distance from the pivot point
-				if( (belowPivot - Math.max(Math.abs(ss.travel), 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
-					break;
-			}
-			belowPivot = found;
-			
-			if( abovePivot == -1 && belowPivot == -1) {
-				// No matches found, look for a jump
-				// TODO: Make this better, so that it latches on to things closer to where the segment should
-				//	logically break.
-				StrokeSegment closestSegment = new StrokeSegment();
-				float closestDistance = findClosestStroke( x, y, closestSegment);
-				
-				if( closestSegment.strokeIndex != -1 && closestDistance <= r
-						&& (ss == null || closestSegment.strokeIndex != ss.strokeIndex)) 
+				if( Math.abs(ss.travel - (closestSegment.pivot - ss.pivot)) > 
+					1.5 * MUtil.distance(stroke.direct.x[ss.pivot + ss.travel], stroke.direct.y[ss.pivot + ss.travel],
+							stroke.direct.x[closestSegment.pivot], stroke.direct.y[closestSegment.pivot]) && !locked)
 				{
 					ss = closestSegment;
 					strokeSegments.add(ss);
 				}
+				else
+					ss.travel = closestSegment.pivot - ss.pivot;
 			}
-			else
-				ss.travel = (abovePivot > belowPivot) ? abovePivot : -belowPivot;
+			else if( !locked &&closestSegment.strokeIndex != -1 && closestDistance <= r) {
+				ss = closestSegment;
+				strokeSegments.add(ss);
+			}
+//			// [Behavior Part 2]: When latched on, the 
+//			MagLevStroke stroke = (MagLevStroke)img.things.get(ss.strokeIndex);
+//			int sLen = stroke.direct.length;
+//			int abovePivot = 0;
+//			int belowPivot = 0;
+//			int found;
+//			for( found = -1; ss.pivot + abovePivot < sLen; ++abovePivot) {
+//				int index = abovePivot + ss.pivot;
+//				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
+//					found = abovePivot;
+//				else if( found > ss.travel)	// Quit if you found a point and broke it
+//					break;
+//				
+//				// Don't Look for connections above MAX_JUMP distance from the pivot point
+//				if( (abovePivot - Math.max(ss.travel, 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
+//					break;
+//			}
+//			abovePivot = found;
+//			
+//			for( found = -1; ss.pivot - belowPivot >= 0; ++belowPivot) {
+//				int index = ss.pivot - belowPivot;
+//
+//				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
+//					found = belowPivot;
+//				else if( found > -ss.travel)	// Quit if you found a point and broke it
+//					break;
+//				
+//				// Don't Look for connections above MAX_JUMP distance from the pivot point
+//				if( (belowPivot - Math.max(Math.abs(ss.travel), 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
+//					break;
+//			}
+//			belowPivot = found;
+//			
+//			if( abovePivot == -1 && belowPivot == -1) {
+//				// No matches found, look for a jump
+//				// TODO: Make this better, so that it latches on to things closer to where the segment should
+//				//	logically break.
+//				StrokeSegment closestSegment = new StrokeSegment();
+//				float closestDistance = findClosestStroke( x, y, closestSegment);
+//				
+//				if( closestSegment.strokeIndex != -1 && closestDistance <= r
+//						&& (ss == null || closestSegment.strokeIndex != ss.strokeIndex)) 
+//				{
+//					ss = closestSegment;
+//					strokeSegments.add(ss);
+//				}
+//			}
+//			else
+//				ss.travel = (abovePivot > belowPivot) ? abovePivot : -belowPivot;
 		}
 	}
 	private float findClosestStroke( float x, float y, StrokeSegment out)

@@ -79,6 +79,12 @@ public class DynamicInternalImage implements IInternalImage {
 		@Override public int getHeight() {return handle.getContext().getHeight();}
 		@Override public Vec2i convert(Vec2i p) {return p;}
 		@Override public Vec2 convert(Vec2 p) {return p;}
+		@Override public MatTrans getCompositeTransform() {return new MatTrans(trans);}
+		@Override public MatTrans getScreenToImageTransform() {return new MatTrans(invTrans);}
+		@Override
+		public Rect getBounds() {
+			return MUtil.circumscribeTrans( new Rect(ox, oy, handle.getWidth(), handle.getHeight()), trans);
+		}
 		@Override
 		public void drawBorder(GraphicsContext gc) {
 			if( handle == null) return;
@@ -89,13 +95,9 @@ public class DynamicInternalImage implements IInternalImage {
 					handle.getWidth()+2, handle.getHeight()+2);
 			gc.setTransform(oldTrans);
 		}
-		@Override public MatTrans getCompositeTransform() 
-			{return new MatTrans(trans);}
-		@Override public MatTrans getScreenToImageTransform() 
-			{return new MatTrans(invTrans);}
 		@Override
-		public Rect getBounds() {
-			return MUtil.circumscribeTrans( new Rect(ox, oy, handle.getWidth(), handle.getHeight()), trans);
+		public void draw(GraphicsContext gc) {
+			handle.drawLayer( gc, trans);
 		}
 		
 		@Override
@@ -121,7 +123,7 @@ public class DynamicInternalImage implements IInternalImage {
 			Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
 							new Rect(ox,oy, getWidth(), getHeight()));
 
-			RawImage img = HybridHelper.createImage(w, h);
+			RawImage img = HybridHelper.createImage(drawAreaInImageSpace.width, drawAreaInImageSpace.height);
 			GraphicsContext gc = img.getGraphics();
 
 			// Draw the old image
@@ -166,10 +168,6 @@ public class DynamicInternalImage implements IInternalImage {
 			handle.refresh();
 		}
 
-		@Override
-		public void draw(GraphicsContext gc) {
-			handle.drawLayer( gc, trans);
-		}
 
 	}
 

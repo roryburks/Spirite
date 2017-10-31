@@ -310,14 +310,13 @@ public class ImageWorkspace {
 		public final ImageHandle handle;
 		
 		public MatTrans trans;
-		//public int ox;
-		//public int oy;
 		public int color;
+		public BuildingImageData( ImageHandle handle) {
+			this.handle = handle;
+		}
 		public BuildingImageData( ImageHandle handle, int ox, int oy) {
 			this.handle = handle;
 			this.trans = MatTrans.TranslationMatrix(ox, oy);
-			//this.ox = ox;
-			//this.oy = oy;
 		}
 	}
 	
