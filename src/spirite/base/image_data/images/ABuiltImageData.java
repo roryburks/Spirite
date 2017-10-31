@@ -5,6 +5,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 
 // ===============
@@ -52,9 +53,8 @@ public abstract class ABuiltImageData {
 	public abstract MatTrans getScreenToImageTransform();
 
 	/** Converts the given point in ImageSpace to BuiltActiveData space*/
-	public abstract float convertX( float x);
-	public abstract float convertY( float y);
 	public abstract Vec2i convert( Vec2i p);
+	public abstract Vec2 convert( Vec2 p);
 
 	public abstract Rect getBounds();
 

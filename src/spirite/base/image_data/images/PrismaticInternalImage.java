@@ -11,6 +11,7 @@ import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
@@ -186,8 +187,9 @@ public class PrismaticInternalImage implements IInternalImage {
 
 		public PrismaticBuiltImageData(BuildingImageData building) {
 			super(building.handle);
-			this.box = building.ox;
-			this.boy = building.oy;
+			// TODO
+			this.box = (int) building.trans.getM02();
+			this.boy = (int) building.trans.getM12();
 			workingColor = building.color;
 		}
 
@@ -319,9 +321,8 @@ public class PrismaticInternalImage implements IInternalImage {
 			return transform;
 		}
 
-		@Override public float convertX( float x) {return x;}
-		@Override public float convertY( float y) {return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}
+		@Override public Vec2 convert(Vec2 p) {return p;}
 		@Override
 		public Rect getBounds() {
 			return new Rect(box + compRect.x, boy + compRect.y, compRect.width, compRect.height);

@@ -32,6 +32,7 @@ public abstract class GraphicsContext {
 	public abstract void setTransform( MatTrans trans);
 	public abstract MatTrans getTransform();
 	public abstract void translate(double offsetX, double offsetY);
+	public abstract void preTransform(MatTrans trans);
 	public abstract void transform(MatTrans trans);
 	public abstract void scale(double sx, double sy);
 	public abstract void setColor(int argb);
@@ -107,6 +108,7 @@ public abstract class GraphicsContext {
 
 	public abstract void renderImage(RawImage rawImage, int x, int y, RenderProperties render);
 	public abstract void renderHandle( ImageHandle handle, int x, int y, RenderProperties render);
+
 
 
 

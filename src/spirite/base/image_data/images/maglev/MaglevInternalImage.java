@@ -17,7 +17,9 @@ import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
@@ -57,6 +59,9 @@ public class MaglevInternalImage implements IInternalImage {
 		
 		for( MagLevThing thing : other.things)
 			this.things.add(thing.clone());
+		
+		this.isBuilt = other.isBuilt;
+		this.builtImage = other.builtImage.deepCopy();
 	}
 	
 	void addThing( MagLevThing thing) {
@@ -268,34 +273,51 @@ public class MaglevInternalImage implements IInternalImage {
 	
 
 	public class MaglevBuiltImageData extends ABuiltImageData {
-
-		final int box;
-		final int boy;
+		MatTrans trans;
+		//final int box;
+		//final int boy;
 		
 		public MaglevBuiltImageData(BuildingImageData building) 
 		{
 			super(building.handle);
-			this.box = building.ox;
-			this.boy = building.oy;
+			this.trans = building.trans;
 		}
 
 		@Override public int getWidth() {return context.getWidth(); }
 		@Override public int getHeight() {return context.getHeight();}
 
-		@Override public float convertX(float x) {return x;}
-		@Override public float convertY(float y) {return y;}
 		@Override public Vec2i convert(Vec2i p) {return p;}
+		@Override public Vec2 convert(Vec2 p) {return p;}
 
 		@Override public Rect getBounds() 
-			{return new Rect( box, boy, context.getWidth(), context.getHeight());}
+		{
+			// TODO
+			return new Rect( (int)trans.getM02(), (int)trans.getM12(), context.getWidth(), context.getHeight());
+		}
 		@Override public void draw(GraphicsContext gc) 
-			{gc.drawImage(builtImage, box, boy);}
+		{
+			MatTrans oldTrans = gc.getTransform();
+			gc.preTransform(trans);
+			gc.drawImage(builtImage, 0, 0);
+			gc.setTransform(oldTrans);
+		}
 		@Override public void drawBorder(GraphicsContext gc) 
-			{gc.drawRect(box, boy, context.getWidth(), context.getHeight());}
+		{
+			MatTrans oldTrans = gc.getTransform();
+			gc.preTransform(trans);
+			gc.drawRect(0, 0, context.getWidth(), context.getHeight());
+			gc.setTransform(oldTrans);
+		}
 		@Override public MatTrans getCompositeTransform() 
-			{return MatTrans.TranslationMatrix(box, boy);}
+			{return new MatTrans(trans);}
 		@Override public MatTrans getScreenToImageTransform() 
-			{return MatTrans.TranslationMatrix(-box, -boy);}
+		{
+			try {
+				return trans.createInverse();
+			} catch (NoninvertableException e) {
+				return new MatTrans();
+			}
+		}
 
 		// Counter-intuitively, checking in and checking out of a MaglevInternalImage
 		//	can be a thing that makes sense to do as the StrokeEngine uses it for the

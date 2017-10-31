@@ -7,9 +7,12 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 
 /***
  * Normal Internal Image.  Has a RawImage (cached) that represents its image data
@@ -54,13 +57,17 @@ public class InternalImage implements IInternalImage {
 	}
 	
 	public class BuiltImageData extends ABuiltImageData {
-		final int ox;
-		final int oy;
+		MatTrans trans;
+		MatTrans invTrans;
 		
 		public BuiltImageData( BuildingImageData building) {
 			super(building.handle);
-			this.ox = building.ox;
-			this.oy = building.oy;
+			this.trans = building.trans;
+			try {
+				this.invTrans = trans.createInverse();
+			} catch (NoninvertableException e) {
+				this.invTrans = new MatTrans();
+			}
 		}
 		
 		public int getWidth() {
@@ -71,15 +78,14 @@ public class InternalImage implements IInternalImage {
 		}
 		
 		public void draw(GraphicsContext gc) {
-			MatTrans transform = MatTrans.TranslationMatrix(ox, oy);
-			handle.drawLayer( gc, transform);
+			handle.drawLayer( gc, trans);
 		}
 		
 		public void drawBorder( GraphicsContext gc) {
 			if( handle == null) return;
 			
 			MatTrans transform = gc.getTransform();
-			gc.translate(ox, oy);
+			gc.preTransform(trans);
 			
 			gc.drawRect(0, 0, handle.getWidth(), handle.getHeight());
 			
@@ -88,7 +94,7 @@ public class InternalImage implements IInternalImage {
 		
 		public GraphicsContext checkout() {
 			GraphicsContext gc = _checkoutImage().getGraphics();
-			gc.translate(-ox, -oy);
+			gc.preTransform(invTrans);
 			return gc;
 		}
 		
@@ -118,19 +124,23 @@ public class InternalImage implements IInternalImage {
 			//	Some image modification methods do not use draw actions, but
 			//	 rather alter the image directly.  For example a flood fill action.
 			//	
-			return new Vec2i(p.x-ox, p.y-oy);
+			Vec2 inverted = invTrans.transform(new  Vec2(p.x, p.y), new Vec2());
+			return new Vec2i((int)inverted.x, (int)inverted.y);
 		}
-		public float convertX( float x) {return x - ox;}
-		public float convertY( float y) {return y - oy;}
+		public Vec2 convert( Vec2 p) {
+			//	Some image modification methods do not use draw actions, but
+			//	 rather alter the image directly.  For example a flood fill action.
+			//	
+			return invTrans.transform(new  Vec2(p.x, p.y), new Vec2());
+			
+		}
 		
 		public Rect getBounds() {
-			return new Rect( ox, oy, handle.getWidth(), handle.getHeight());
+			return MUtil.circumscribeTrans(new Rect(0,0,getWidth(), getHeight()), trans);
 		}
 		
 		public MatTrans getScreenToImageTransform() {
-			MatTrans transform = new MatTrans();
-			transform.preTranslate( -ox, -oy);
-			return transform;
+			return new MatTrans(invTrans);
 		}
 
 		public MatTrans getCompositeTransform() {

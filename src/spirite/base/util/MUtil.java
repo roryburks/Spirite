@@ -138,6 +138,20 @@ public class MUtil {
 				);
 	}
 	
+	public static Rect circumscribeTrans( Rect oldRect, MatTrans trans) {
+		Vec2 p1 =  trans.transform( new Vec2(oldRect.x, oldRect.y), new Vec2());
+		Vec2 p2 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y), new Vec2());
+		Vec2 p3 =  trans.transform( new Vec2(oldRect.x, oldRect.y+oldRect.height), new Vec2());
+		Vec2 p4 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height), new Vec2());
+
+		int x1 = (int)Math.min( Math.floor(p1.x), Math.min(Math.floor(p2.x), Math.min(Math.floor(p3.x), Math.floor(p4.x))));
+		int y1 = (int)Math.min( Math.floor(p1.y), Math.min(Math.floor(p2.y), Math.min(Math.floor(p3.y), Math.floor(p4.y))));
+		int x2 = (int)Math.max( Math.ceil(p1.x), Math.max(Math.ceil(p2.x), Math.max(Math.ceil(p3.x), Math.ceil(p4.x))));
+		int y2 = (int)Math.max( Math.ceil(p1.y), Math.max(Math.ceil(p2.y), Math.max(Math.ceil(p3.y), Math.ceil(p4.y))));
+		
+		return rectFromEndpoints(x1,y1,x2,y2);
+	}
+	
 	// :::: String
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHex(byte[] bytes) {

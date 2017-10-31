@@ -149,9 +149,10 @@ public class GLWorkArea
             	glgc.setComposite(glgc.getComposite(), 0.3f);
                 glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
                 
-                Rect r = active.getBounds();
-                glgc.drawRect( r.x-1, r.y-1, r.width+2, r.height+2);
-            	glgc.setComposite(glgc.getComposite(), 1);
+                active.drawBorder(glgc);
+                //Rect r = active.getBounds();
+                //glgc.drawRect( r.x-1, r.y-1, r.width+2, r.height+2);
+            	//glgc.setComposite(glgc.getComposite(), 1);
             }
             
         	// :::: Draw Selection Bounds

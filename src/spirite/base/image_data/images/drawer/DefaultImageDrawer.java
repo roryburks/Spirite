@@ -343,8 +343,7 @@ public class DefaultImageDrawer
 				Layer layer = lnode.getLayer();
 				
 				for( BuildingImageData data : layer.getDataToBuild()) {
-					data.ox += lnode.getOffsetX();
-					data.oy += lnode.getOffsetY();
+					data.trans.preTranslate( lnode.getOffsetX(), lnode.getOffsetY());
 					actions.add( new ColorChangeAction(
 							data,
 							mask, from, to, mode));

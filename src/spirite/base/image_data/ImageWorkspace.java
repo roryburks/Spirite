@@ -308,13 +308,16 @@ public class ImageWorkspace {
 	 */
 	public static class BuildingImageData {
 		public final ImageHandle handle;
-		public int ox;
-		public int oy;
+		
+		public MatTrans trans;
+		//public int ox;
+		//public int oy;
 		public int color;
 		public BuildingImageData( ImageHandle handle, int ox, int oy) {
 			this.handle = handle;
-			this.ox = ox;
-			this.oy = oy;
+			this.trans = MatTrans.TranslationMatrix(ox, oy);
+			//this.ox = ox;
+			//this.oy = oy;
 		}
 	}
 	
@@ -366,8 +369,7 @@ public class ImageWorkspace {
 		
 		if( data == null) return null;
 		
-		data.ox += node.x;
-		data.oy += node.y;
+		data.trans.preTranslate(node.x, node.y);
 		data.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
 		return data;
 	}
