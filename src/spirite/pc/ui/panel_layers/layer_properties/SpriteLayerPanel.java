@@ -1,4 +1,4 @@
-package spirite.pc.ui.panel_layers;
+package spirite.pc.ui.panel_layers.layer_properties;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -31,7 +31,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -44,9 +44,12 @@ import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
-public class RigPanel extends OmniComponent 
-	implements MWorkspaceObserver, MSelectionObserver, ActionListener,
-		ListSelectionListener, RigStructureObserver, DocumentListener 
+public class SpriteLayerPanel extends JPanel 
+	implements 
+		ActionListener,
+		ListSelectionListener, 
+		RigStructureObserver, 
+		DocumentListener 
 {
 	private final JList<Part> listPanel = new JList<Part>();
 	private final MTextFieldNumber tfTransX = new MTextFieldNumber(true,true);
@@ -66,16 +69,11 @@ public class RigPanel extends OmniComponent
 	private ImageWorkspace workspace;
 	private SpriteLayer rig;
 	
-	public RigPanel( MasterControl master) {
+	public SpriteLayerPanel( MasterControl master) {
 		this.master = master;
 		initComponents();
 		
 		listPanel.setModel(model);
-		master.addWorkspaceObserver(this);
-		
-		workspace = master.getCurrentWorkspace();
-		if( workspace != null)
-			workspace.addSelectionObserver(this);
 		
 		listPanel.addListSelectionListener(this);
 		listPanel.setCellRenderer(renderer);
@@ -283,11 +281,12 @@ public class RigPanel extends OmniComponent
 	}
 	
 	
-	private void setRig( SpriteLayer setTo) {
+	void setRig( SpriteLayer setTo, ImageWorkspace ws) {
 		if( rig != null) 
 			rig.removeRigObserver(this);
 		
 		rig = setTo;
+		workspace = ws;
 		
 		if( rig != null)
 			rig.addRigObserver(this);
@@ -374,40 +373,6 @@ public class RigPanel extends OmniComponent
 
 	}
 
-	// :::: OmniComponent
-	@Override
-	public void onCleanup() {
-		master.removeWorkspaceObserver(this);
-	}
-
-	// :::: MWorkspaceObserver
-	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
-	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
-	@Override
-	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		setRig(null);
-		if( workspace != null) {
-			workspace.removeSelectionObserver(this);
-		}
-		workspace = selected;
-		if( workspace != null) {
-			workspace.addSelectionObserver(this);
-		}
-	}	
-
-	// :::: MSelectionListener
-	@Override
-	public void selectionChanged(Node newSelection) {
-		if( newSelection instanceof LayerNode) {
-			LayerNode ln = (LayerNode)newSelection;
-			if( ln.getLayer() instanceof SpriteLayer) {
-				setRig( (SpriteLayer)ln.getLayer());
-				return;
-			}
-		}
-		setRig(null);
-	}
-
 	// :::: ActionListener
 	@Override
 	public void actionPerformed(ActionEvent evt) {
@@ -454,7 +419,7 @@ public class RigPanel extends OmniComponent
 				if( rect != null)
 					listPanel.scrollRectToVisible( rect);
 				
-					Part part = RigPanel.this.model.getElementAt(i);
+					Part part = SpriteLayerPanel.this.model.getElementAt(i);
 				if( rig.getActivePart() != part) {
 					rig.setActivePart(part);
 				}

@@ -59,7 +59,7 @@ import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
@@ -77,7 +77,7 @@ import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 
 public class LayerTreePanel extends ContentTree 
-	implements MImageObserver, MWorkspaceObserver, MSelectionObserver,
+	implements MImageObserver, MWorkspaceObserver, MNodeSelectionObserver,
 	 TreeSelectionListener, TreeExpansionListener, ActionListener
 {
 	private final LayersPanel context;

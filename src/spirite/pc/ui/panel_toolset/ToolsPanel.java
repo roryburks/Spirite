@@ -33,7 +33,7 @@ import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 
@@ -49,7 +49,7 @@ import spirite.hybrid.tools.ToolsetIcons;
  *
  */
 public class ToolsPanel extends JPanel
-        implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MSelectionObserver
+        implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MNodeSelectionObserver
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
     private final ToolsetManager toolsetManager;

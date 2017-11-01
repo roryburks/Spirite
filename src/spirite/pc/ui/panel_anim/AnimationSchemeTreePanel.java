@@ -43,7 +43,7 @@ import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
@@ -52,7 +52,7 @@ import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends JPanel 
-	implements  MAnimationStructureObserver, MSelectionObserver, 
+	implements  MAnimationStructureObserver, MNodeSelectionObserver, 
 		MWorkspaceObserver, MAnimationStateObserver
 {
 	private static final long serialVersionUID = 1L;

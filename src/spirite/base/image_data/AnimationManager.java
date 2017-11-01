@@ -11,7 +11,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
@@ -26,7 +26,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * @author RoryBurks
  *
  */
-public class AnimationManager implements MImageObserver, MSelectionObserver {
+public class AnimationManager implements MImageObserver, MNodeSelectionObserver {
 	private final ImageWorkspace context;
 
 	private ArrayList<Animation> animations = new ArrayList<>();

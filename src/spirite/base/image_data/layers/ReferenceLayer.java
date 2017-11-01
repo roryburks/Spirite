@@ -42,12 +42,12 @@ public class ReferenceLayer extends Layer {
 		{if( layer != null)layer.draw(gc);}
 
 	@Override public int getWidth() 
-		{return (layer == null)? null : layer.getWidth();}
+		{return (layer == null)? 0 : layer.getWidth();}
 	@Override public int getHeight() 
-		{return (layer == null)? null : layer.getHeight();}
+		{return (layer == null)? 0 : layer.getHeight();}
 
 	@Override public boolean canMerge(Node node) 
-		{return (layer == null)? null : layer.canMerge(node);}
+		{return (layer == null)? false : layer.canMerge(node);}
 
 	@Override public List<TransformedHandle> getDrawList() 
 		{return (layer == null)? null : layer.getDrawList();}
@@ -65,7 +65,7 @@ public class ReferenceLayer extends Layer {
 		{return new ReferenceLayer(underlying);}
 
 	@Override public int getDynamicOffsetX() 
-		{return (layer == null)? null : layer.getDynamicOffsetX();}
+		{return (layer == null)? 0 : layer.getDynamicOffsetX();}
 	@Override public int getDynamicOffsetY() 
-		{return (layer == null)? null : layer.getDynamicOffsetY();}
+		{return (layer == null)? 0 : layer.getDynamicOffsetY();}
 }

@@ -27,7 +27,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
@@ -51,7 +51,7 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  */
 public class DrawPanel extends JPanel
      implements MImageObserver, ActionListener, MSelectionEngineObserver, 
-     	MSelectionObserver
+     	MNodeSelectionObserver
 {
 	private static final long serialVersionUID = 1L;
 

@@ -36,7 +36,7 @@ import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
@@ -57,7 +57,7 @@ import spirite.pc.ui.dialogs.RenderPropertiesDialog;
  * AnimationSchemePanel is a grid 
  */
 public class FFAnimationSchemePanel extends JPanel 
-	implements MWorkspaceObserver, MSelectionObserver, MAnimationStateObserver 
+	implements MWorkspaceObserver, MNodeSelectionObserver, MAnimationStateObserver 
 {
 	// :::: Control Links
 	private final MasterControl master;

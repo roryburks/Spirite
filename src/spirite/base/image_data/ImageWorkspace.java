@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
@@ -63,7 +64,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * @author Rory Burks
  *
  */
-public class ImageWorkspace {
+public class ImageWorkspace implements MWorkspaceObserver {
 	// ImageData is tracked in ImageWorkspace if it is either part of the active
 	//	Image Data (used by something in the GroupTree) or it used by a component
 	//	stored in the UndoEngine.
@@ -124,6 +125,7 @@ public class ImageWorkspace {
 		stagingManager = new StagingManager(this);
 		
 		imageData = new HashMap<>();
+		master.addWorkspaceObserver(this);
 		
 
 	}
@@ -1497,15 +1499,15 @@ public class ImageWorkspace {
     /**
      * SelectionObserver - triggers when a different Layer has been selected
      */
-    private final ObserverHandler<MSelectionObserver> selectionObs = new ObserverHandler<>();
-    public void addSelectionObserver( MSelectionObserver obs) { selectionObs.addObserver(obs);}
-    public void removeSelectionObserver( MSelectionObserver obs) { selectionObs.removeObserver(obs);}
-    public static interface MSelectionObserver{
+    private final ObserverHandler<MNodeSelectionObserver> selectionObs = new ObserverHandler<>();
+    public void addSelectionObserver( MNodeSelectionObserver obs) { selectionObs.addObserver(obs);}
+    public void removeSelectionObserver( MNodeSelectionObserver obs) { selectionObs.removeObserver(obs);}
+    public static interface MNodeSelectionObserver{
     	public void selectionChanged( Node newSelection);
     }
     
     private synchronized void triggerSelectedChanged() {
-    	selectionObs.trigger( (MSelectionObserver t) -> {t.selectionChanged(selected);});
+    	selectionObs.trigger( (MNodeSelectionObserver t) -> {t.selectionChanged(selected);});
 	}
     
     
@@ -1610,5 +1612,14 @@ public class ImageWorkspace {
 		
 		return null;
 	}
+	
+	
+	// :: MWorkspaceObserver
+	@Override	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
+		if( selected == this) 
+			triggerSelectedChanged();
+	}
+	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
+	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	
 }

@@ -35,7 +35,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
@@ -897,8 +897,8 @@ public class MasterControl
     public void removeWorkspaceObserver( MWorkspaceObserver obs) {workspaceObs.removeObserver(obs);}
     
     private void triggerWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-    	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.currentWorkspaceChanged(selected, previous);});
     	_triggerWSChangedForTracking( selected, previous);
+    	workspaceObs.trigger((MWorkspaceObserver obs)->{obs.currentWorkspaceChanged(selected, previous);});
    // 	triggerImageStructureRefresh();
     //	triggerImageRefresh();
     }
@@ -1008,9 +1008,9 @@ public class MasterControl
 		trackMap.put(MImageObserver.class, new FastTrack<MImageObserver>( 
 				(ImageWorkspace ws, MImageObserver obs)->ws.addImageObserver(obs),
 				(ImageWorkspace ws, MImageObserver obs)->ws.removeImageObserver(obs)));
-		trackMap.put(MSelectionObserver.class, new FastTrack<MSelectionObserver>( 
-				(ImageWorkspace ws, MSelectionObserver obs)->ws.addSelectionObserver(obs),
-				(ImageWorkspace ws, MSelectionObserver obs)->ws.removeSelectionObserver(obs)));
+		trackMap.put(MNodeSelectionObserver.class, new FastTrack<MNodeSelectionObserver>( 
+				(ImageWorkspace ws, MNodeSelectionObserver obs)->ws.addSelectionObserver(obs),
+				(ImageWorkspace ws, MNodeSelectionObserver obs)->ws.removeSelectionObserver(obs)));
 		trackMap.put(MWorkspaceFileObserver.class, new FastTrack<MWorkspaceFileObserver>( 
 				(ImageWorkspace ws, MWorkspaceFileObserver obs)->ws.addWorkspaceFileObserve(obs),
 				(ImageWorkspace ws, MWorkspaceFileObserver obs)->ws.removeWorkspaceFileObserve(obs)));

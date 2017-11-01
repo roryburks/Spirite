@@ -14,20 +14,20 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
-import spirite.base.image_data.ImageWorkspace.MSelectionObserver;
+import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.images.IInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage;
 import spirite.base.image_data.images.PrismaticInternalImage.LImg;
 import spirite.base.util.glmath.Rect;
 
-public class LayerPropertiesPanel extends JPanel implements MSelectionObserver, MFlashObserver{
+public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserver, MFlashObserver{
 	private final MasterControl master;
 	private IInternalImage iimg;
 	private boolean yes = false;
 	
-	public LayerPropertiesPanel(MasterControl master) {
+	public IImgPropertiesPanel(MasterControl master) {
 		this.master = master;
-		master.addTrackingObserver(MSelectionObserver.class, this);
+		master.addTrackingObserver(MNodeSelectionObserver.class, this);
 		master.addTrackingObserver(MFlashObserver.class, this);
 
 		this.addMouseListener(mouser);
