@@ -29,6 +29,9 @@ public class ReferenceLayer extends Layer {
 	public LayerNode getUnderlying() {
 		return this.underlying;
 	}
+	public Layer getUnderlyingLayer() {
+		return layer;
+	}
 	
 
 	@Override public BuildingImageData getActiveData() 

@@ -254,8 +254,15 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 	}
 	
-	public boolean isUsingAnimationView() {return animationView;}
-	public void setUsingAnimationView( boolean using) { this.animationView = using;}
+	public boolean isUsingAnimationView() {
+		return animationView;
+	}
+	public void setUsingAnimationView( boolean using) { 
+		if( this.animationView != using) {
+			this.animationView = using;
+			triggerSelectedChanged();
+		}
+	}
 	
 	public File getFile() {return file;} 
 	public String getFileName() {
@@ -406,9 +413,16 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	// ==== Node Selection 
 	
 	public GroupTree.Node getSelectedNode() {
+		if( !animationView)
+			return getLocalSelectedNode();
+		else
+			return animationManager.getView().getSelectedNode();
+	}
+	public GroupTree.Node getLocalSelectedNode() {
 		if( !nodeInWorkspace(selected))
 			setSelectedNode(null);
 		return selected;
+		
 	}
 	public void setSelectedNode( GroupTree.Node node) {
 		if( node != null && !nodeInWorkspace(node))  {
@@ -704,6 +718,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		return node;
 	}
 	
+	
 	/** A Shell Layer is a layer whose ImageHandles are not yet linked to
 	 * the Workspace.  When creating a complex custom Layer or constructing
 	 * multiple layers at once (e.g. when loading), it is useful to do this
@@ -742,6 +757,27 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		GroupTree.GroupNode newNode = groupTree.new GroupNode(name);
 		
 		executeChange(createAdditionChange(newNode,context));
+		
+		return newNode;
+	}
+	
+	public LayerNode referenceNodeDeposition( final LayerNode node, String name) {
+		if( !nodeInWorkspace(node))
+			return null;
+		final ReferenceLayer ref = (ReferenceLayer) node.getLayer();
+		undoEngine.pause();
+		
+		final LayerNode newNode = (LayerNode) duplicateNode(ref.getUnderlying());
+		newNode.name = name;
+		newNode.render.directCopy(node.render);
+		newNode.x = node.x;
+		newNode.y = node.y;
+		
+		removeNode(node);
+		
+		undoEngine.unpause("Convert Reference to Deep Copy");
+		
+		triggerSelectedChanged();
 		
 		return newNode;
 	}
@@ -1399,7 +1435,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			if( node == null)
 				return false;
 			
-			node = node.getParent();
+			Node parent = node.getParent();
+			if( parent == null || !parent.getChildren().contains(node))
+				return false;
+			node = parent;
 			++i;
 		}
 		if( i == 1000) {

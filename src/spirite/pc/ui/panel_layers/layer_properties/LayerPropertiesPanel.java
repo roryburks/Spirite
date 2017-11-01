@@ -46,10 +46,6 @@ public class LayerPropertiesPanel extends OmniComponent
 
 	@Override
 	public void selectionChanged(Node newSelection) {
-		// NOTE: SwingUtilities.invokeLater is "needed" because this is being called
-		//	from a selection change and will potentially cause new selection changes to 
-		//	be created.  The alternative is to load all Panel types before they're needed
-
 		if( newSelection instanceof LayerNode) {
 			Layer layer = ((LayerNode) newSelection).getLayer();
 
@@ -63,7 +59,7 @@ public class LayerPropertiesPanel extends OmniComponent
 				return;
 			}
 			if( layer instanceof ReferenceLayer) {
-				rlp.setReference((ReferenceLayer)layer, master.getCurrentWorkspace());
+				rlp.setReference((LayerNode) newSelection, master.getCurrentWorkspace());
 				initComponent(rlp);
 				return;
 			}

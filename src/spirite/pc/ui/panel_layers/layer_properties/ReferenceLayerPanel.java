@@ -11,6 +11,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.sources.LayerRenderSource;
+import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
@@ -19,6 +20,7 @@ import spirite.pc.graphics.ImageBI;
 
 public class ReferenceLayerPanel extends JPanel {
 	private final MasterControl master;
+	LayerNode node;
 	ReferenceLayer ref;
 	ImageWorkspace workspace;
 	
@@ -29,6 +31,10 @@ public class ReferenceLayerPanel extends JPanel {
 	ReferenceLayerPanel( MasterControl master) {
 		this.master = master;
 		initLayout();
+		
+		btnDeep.addActionListener((evt) -> {
+			workspace.referenceNodeDeposition(node, node.getName() + "_");
+		}); 
 	}
 	
 	private void initLayout() {
@@ -55,8 +61,10 @@ public class ReferenceLayerPanel extends JPanel {
 	}
 	
 
-	void setReference( ReferenceLayer ref, ImageWorkspace workspace) {
-		this.ref = ref;
+	void setReference( LayerNode node, ImageWorkspace workspace) 
+	{
+		this.node = node;
+		this.ref = (ReferenceLayer) node.getLayer();
 		this.workspace = workspace;
 		lblRefTo.setText("Reference to: " + ref.getUnderlying().getName());
 		drawPanel.repaint();
