@@ -12,9 +12,9 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
@@ -41,7 +41,7 @@ public class SpriteLayer extends Layer
 	private ImageWorkspace context;
 	int originX, originY;
 	
-	public SpriteLayer( ImageHandle handle) {
+	public SpriteLayer( MediumHandle handle) {
 		context = handle.getContext();
 		active = new Part(new PartStructure(handle, "Base"));
 		parts.add( active);
@@ -61,7 +61,7 @@ public class SpriteLayer extends Layer
 	}
 	
 	public static class PartStructure {
-		public ImageHandle handle;
+		public MediumHandle handle;
 		public int depth;
 		public String partName;
 		public boolean visible = true;
@@ -73,17 +73,17 @@ public class SpriteLayer extends Layer
 		public float rot;
 		
 		public PartStructure() {}
-		private PartStructure(ImageHandle handle, String partName) {
+		private PartStructure(MediumHandle handle, String partName) {
 			this( handle, partName, 0, 0, 0, 0, 1, 1, 0, 0, true, 1);
 		}
 		public PartStructure( 
-				ImageHandle handle, String pName, int ox, int oy, 
+				MediumHandle handle, String pName, int ox, int oy, 
 				int depth, boolean visible, float alpha) 
 		{
 			this( handle, pName, ox, oy, 0, 0, 1, 1, 0, depth, visible, alpha);
 		}
 		public PartStructure( 
-				ImageHandle handle, String pName, int ox, int oy,
+				MediumHandle handle, String pName, int ox, int oy,
 				float transX, float transY, float scaleX, float scaleY, float rotation,
 				int depth, boolean visible, float alpha) 
 		{
@@ -133,7 +133,7 @@ public class SpriteLayer extends Layer
 		public float getScaleY() {return structure.scaleY;}
 		public float getRotation() {return structure.rot;}
 		public String getTypeName() {return structure.partName;}
-		public ImageHandle getImageHandle() {return structure.handle;}
+		public MediumHandle getImageHandle() {return structure.handle;}
 		public boolean isVisible() {return structure.visible;}
 		public float getAlpha() {return structure.alpha;}
 		public SpriteLayer getContext() {return SpriteLayer.this;}
@@ -276,8 +276,8 @@ public class SpriteLayer extends Layer
 			}
 			@Override public boolean reliesOnData() {return true;}
 			@Override
-			public Collection<ImageHandle> getDependencies() {
-				return Arrays.asList(new ImageHandle[] {toAdd.structure.handle});
+			public Collection<MediumHandle> getDependencies() {
+				return Arrays.asList(new MediumHandle[] {toAdd.structure.handle});
 			}
 			@Override
 			public String getDescription() {return "Added Part to Rig.";}
@@ -317,8 +317,8 @@ public class SpriteLayer extends Layer
 			@Override public String getDescription() { return "Removed Part from Rig";}
 			@Override public boolean reliesOnData() {return true;}
 			@Override
-			public Collection<ImageHandle> getDependencies() {
-				return Arrays.asList(new ImageHandle[] {toRemove.structure.handle});
+			public Collection<MediumHandle> getDependencies() {
+				return Arrays.asList(new MediumHandle[] {toRemove.structure.handle});
 			}
 		};
 	}
@@ -396,26 +396,26 @@ public class SpriteLayer extends Layer
 	
 	// :::: Layer
 	@Override
-	public BuildingImageData getActiveData() {
+	public BuildingMediumData getActiveData() {
 		if( active == null)
 			return null;
 		
 		
-		return new BuildingImageData(active.structure.handle, active._getOX(), active._getOY());
+		return new BuildingMediumData(active.structure.handle, active._getOX(), active._getOY());
 	}
 
 	@Override
-	public List<BuildingImageData> getDataToBuild(){
-		List<BuildingImageData> list = new ArrayList<>(parts.size());
+	public List<BuildingMediumData> getDataToBuild(){
+		List<BuildingMediumData> list = new ArrayList<>(parts.size());
 		for( Part p : parts) {
-			list.add( new BuildingImageData( p.structure.handle, p._getOX(), p. _getOY()));
+			list.add( new BuildingMediumData( p.structure.handle, p._getOX(), p. _getOY()));
 		}
 		return list;
 	}
 
 	@Override
-	public List<ImageHandle> getImageDependencies() {
-		List<ImageHandle> handles = new ArrayList<>( parts.size());
+	public List<MediumHandle> getImageDependencies() {
+		List<MediumHandle> handles = new ArrayList<>( parts.size());
 		for( Part part : parts) {
 			handles.add(part.structure.handle);
 		}

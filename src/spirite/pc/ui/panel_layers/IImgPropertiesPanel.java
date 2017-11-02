@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.images.IMedium;
@@ -136,7 +136,7 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		yes = false;
 		ImageWorkspace ws = master.getCurrentWorkspace();
 		if( ws != null) {
-			BuildingImageData bid = ws.buildActiveData();
+			BuildingMediumData bid = ws.buildActiveData();
 			if( bid != null && bid.handle != null) {
 				this.iimg = ws.getData(bid.handle);
 			}

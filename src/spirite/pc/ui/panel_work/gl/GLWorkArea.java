@@ -23,7 +23,7 @@ import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -34,7 +34,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -145,7 +145,7 @@ public class GLWorkArea
 
             // :::: Draw Border around the active Data
         	
-        	BuildingImageData active = workspace.buildActiveData();
+        	BuildingMediumData active = workspace.buildActiveData();
         	
         	if( active != null) {
         		active.doOnBuiltData((built) -> {

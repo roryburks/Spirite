@@ -8,7 +8,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.images.DynamicInternalImage;
+import spirite.base.image_data.images.DynamicMedium;
 import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.PrismaticMedium;
 import spirite.base.util.glmath.MatTrans;
@@ -25,7 +25,7 @@ import spirite.hybrid.MDebug.WarningType;
  * !!!! NOTE: Use .equals().  There should be little to no reason to ever
  * use <code>==</code> as it defeats the entire point of handles.
  */
-public class ImageHandle {
+public class MediumHandle {
 	// These variables are essentially final, but may take a while to be set
 	ImageWorkspace context;
 	int id = -1;
@@ -34,21 +34,21 @@ public class ImageHandle {
 	//	with a HashTable, so there's probably no point to remember the
 	//	CachedImage and doing so might lead to unnecessary bugs.
 	
-	public ImageHandle( ImageWorkspace context, int id) {
+	public MediumHandle( ImageWorkspace context, int id) {
 		this.context = context;
 		this.id = id;
 	}
 	
 	/** Returns a null-context duplicate (just preserves the ID) */
-	public ImageHandle dupe() {
-		return new ImageHandle( null, this.id);
+	public MediumHandle dupe() {
+		return new MediumHandle( null, this.id);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if( !( obj instanceof ImageHandle))
+		if( !( obj instanceof MediumHandle))
 			return false;
-		ImageHandle other = (ImageHandle)obj;
+		MediumHandle other = (MediumHandle)obj;
 		
 		return (this.context == other.context) && (this.id == other.id);
 	}
@@ -76,7 +76,7 @@ public class ImageHandle {
 	public int getWidth() { return context.getWidthOf(id); }
 	public int getHeight() { return context.getHeightOf(id); }
 	public boolean isDynamic() {
-		return ( context != null && context.getData(id) instanceof DynamicInternalImage);
+		return ( context != null && context.getData(id) instanceof DynamicMedium);
 	}
 	public int getDynamicX() {
 		if( context == null) return 0;

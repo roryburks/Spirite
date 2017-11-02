@@ -13,7 +13,7 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
@@ -46,7 +46,7 @@ class GLStrokeEngine extends StrokeEngine {
 		super.finalize();
 	}
 	@Override
-	protected void onStart(ABuiltImageData built) {
+	protected void onStart(ABuiltMediumData built) {
 		w = built.getWidth();
 		h = built.getHeight();
 		try {
@@ -130,7 +130,7 @@ class GLStrokeEngine extends StrokeEngine {
 	
 
 	@Override
-	protected boolean drawToLayer( DrawPoints states, boolean permanent, ABuiltImageData built) {
+	protected boolean drawToLayer( DrawPoints states, boolean permanent, ABuiltMediumData built) {
 		if( states == null || states.length <= 0)
 			return false;
 		
@@ -152,7 +152,7 @@ class GLStrokeEngine extends StrokeEngine {
 		return true;
 	}
 	
-	private void _strokeSpore(PenState ps, ABuiltImageData built) {
+	private void _strokeSpore(PenState ps, ABuiltMediumData built) {
 		float[] raw = new float[4*13];
 		float x = ps.x;
 		float y = ps.y;
@@ -233,7 +233,7 @@ class GLStrokeEngine extends StrokeEngine {
 	}
 
 	private final static int BASIC_STRIDE = 3;
-	private GLVBuffer composeVBuffer(  DrawPoints states, ABuiltImageData built) {
+	private GLVBuffer composeVBuffer(  DrawPoints states, ABuiltMediumData built) {
 		
 		GLVBuffer vb = new GLVBuffer();
 		

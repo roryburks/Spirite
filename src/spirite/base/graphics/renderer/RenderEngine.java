@@ -27,7 +27,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -120,7 +120,7 @@ public class RenderEngine
 		public int depth;
 		public float alpha = 1.0f;
 		public MatTrans trans = new MatTrans();
-		public ImageHandle handle;
+		public MediumHandle handle;
 		public RenderMethod method = null;
 		public int renderValue = 0;
 	}
@@ -344,7 +344,7 @@ public class RenderEngine
 		}
 
 		public void imageChanged(ImageChangeEvent evt) {
-			List<ImageHandle> relevantData = evt.getChangedImages();
+			List<MediumHandle> relevantData = evt.getChangedImages();
 			List<Node> changedNodes = evt.getChangedNodes();
 		
 			Iterator<Entry<Node,Thumbnail>> it = thumbnailPrimaryMap.entrySet().iterator();
@@ -484,8 +484,8 @@ public class RenderEngine
 			Iterator<Entry<RenderSettings,CachedImage>> it = entrySet.iterator();
 
 
-			List<ImageHandle> relevantData = evt.getChangedImages();
-			List<ImageHandle> relevantDataSel = evt.getChangedImages();
+			List<MediumHandle> relevantData = evt.getChangedImages();
+			List<MediumHandle> relevantDataSel = evt.getChangedImages();
 			if( evt.isSelectionLayerChange() && evt.getWorkspace().getSelectionEngine().isLifted()
 					&& evt.getWorkspace().buildActiveData() != null) 
 			{
@@ -499,7 +499,7 @@ public class RenderEngine
 				if( setting.target.workspace == evt.getWorkspace()) {
 					// Make sure that the particular ImageData changed is
 					//	used by the Cache (if not, don't remove it)
-					List<ImageHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
+					List<MediumHandle> dataInCommon = new ArrayList<>(setting.target.getImagesReliedOn());
 					dataInCommon.retainAll( (setting.drawSelection) ? relevantDataSel : relevantData);
 					
 					List<Node> nodesInCommon = evt.getChangedNodes();

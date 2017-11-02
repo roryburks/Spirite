@@ -6,7 +6,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.HybridHelper;
@@ -20,7 +20,7 @@ public class LayerRenderSource extends RenderSource {
 		
 		@Override public int getDefaultWidth() { return layer.getWidth(); }
 		@Override public int getDefaultHeight() { return layer.getHeight(); }
-		@Override public List<ImageHandle> getImagesReliedOn() {return layer.getImageDependencies(); }
+		@Override public List<MediumHandle> getImagesReliedOn() {return layer.getImageDependencies(); }
 
 		@Override
 		public int hashCode() {

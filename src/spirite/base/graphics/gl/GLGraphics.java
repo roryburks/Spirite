@@ -14,7 +14,7 @@ import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
@@ -331,7 +331,7 @@ public class GLGraphics extends GraphicsContext{
 		
 	}
 	@Override
-	public void drawHandle(ImageHandle handle, int x, int y) {
+	public void drawHandle(MediumHandle handle, int x, int y) {
 		GLParameters params =getImgParams();
 		params.texture = (GLImage)HybridUtil.convert(handle.deepAccess(), GLImage.class);
 
@@ -438,7 +438,7 @@ public class GLGraphics extends GraphicsContext{
 		_renderImage( (GLImage)HybridUtil.convert(rawImage, GLImage.class), x, y, render);
 	}
 	@Override
-	public void renderHandle(ImageHandle handle, int x, int y, RenderProperties render) {
+	public void renderHandle(MediumHandle handle, int x, int y, RenderProperties render) {
 		renderImage(  handle.deepAccess(), x, y, render);
 	}
 	

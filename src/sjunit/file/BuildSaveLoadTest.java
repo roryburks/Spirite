@@ -17,9 +17,9 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.images.DynamicInternalImage;
+import spirite.base.image_data.images.DynamicMedium;
 import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.base.image_data.images.maglev.MaglevMedium;
@@ -225,7 +225,7 @@ public class BuildSaveLoadTest {
 		assert( nodeStack2.isEmpty());
 	}
 	
-	private void VerifyImageEquivalent( ImageHandle img1, ImageHandle img2, Map<Integer,Integer> checkedIImgMap)
+	private void VerifyImageEquivalent( MediumHandle img1, MediumHandle img2, Map<Integer,Integer> checkedIImgMap)
 	{
 		if( checkedIImgMap != null  &&checkedIImgMap.containsKey(img1.getID())) {
 			assert( checkedIImgMap.get(img1.getID()).equals(img2.getID()));
@@ -243,8 +243,8 @@ public class BuildSaveLoadTest {
 
 				VerifyRawImages( iimg1.readOnlyAccess(), iimg2.readOnlyAccess());
 			}
-			else if( iimg1 instanceof DynamicInternalImage) {
-				assert( iimg2 instanceof DynamicInternalImage);
+			else if( iimg1 instanceof DynamicMedium) {
+				assert( iimg2 instanceof DynamicMedium);
 
 				assert( iimg1.getDynamicX() == iimg2.getDynamicX());
 				assert( iimg1.getDynamicY() == iimg2.getDynamicY());

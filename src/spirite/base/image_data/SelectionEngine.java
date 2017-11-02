@@ -9,13 +9,13 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.compaction.IntCompactor;
@@ -498,14 +498,14 @@ public class SelectionEngine {
 	public class ClearSelectionAction extends ImageAction {
 		private final BuiltSelection selection;
 		
-		public ClearSelectionAction(BuiltSelection builtSelection, BuildingImageData builtData) {
+		public ClearSelectionAction(BuiltSelection builtSelection, BuildingMediumData builtData) {
 			super(builtData);
 			this.selection = builtSelection;
 			this.description = "Deleted Selected Data";
 		}
 
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			GraphicsContext gc = built.checkout();
 			
 			gc.setComposite( Composite.DST_OUT, 1.0f);
@@ -522,7 +522,7 @@ public class SelectionEngine {
 		
 		protected PasteSelectionAction(
 				RawImage liftedImage2, 
-				BuildingImageData builtActiveData, 
+				BuildingMediumData builtActiveData, 
 				BuiltSelection builtSelection) 
 		{
 			super(builtActiveData);
@@ -530,7 +530,7 @@ public class SelectionEngine {
 			this.builtSelection = builtSelection;
 		}
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			GraphicsContext gc = built.checkout();
 			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
 			built.checkin();
@@ -775,7 +775,7 @@ public class SelectionEngine {
 
 		/** Uses the BuiltSelection to lift the selected portion of the given
 		 * BuildingImageData and put it in a new BufferedImage.*/
-		public RawImage liftSelectionFromData( ABuiltImageData data) {
+		public RawImage liftSelectionFromData( ABuiltMediumData data) {
 			return liftSelection(new LiftScheme() {
 				@Override
 				public Rect getBounds() {

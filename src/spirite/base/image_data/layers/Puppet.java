@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.Vec2;
 
 public class Puppet {
 	public final List<Part> parts = new ArrayList<>();
 	
 	public class Part {
-		public final ImageHandle handle = null;
+		public final MediumHandle handle = null;
 		BoneBase boneBase;
 		Part parent = null;
 		float origin_x, origin_y;

@@ -5,7 +5,7 @@ import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
@@ -36,7 +36,7 @@ public class FlatMedium implements IMedium {
 	public int getHeight() {
 		return image.getHeight();
 	}
-	public ABuiltImageData build( BuildingImageData building) {
+	public ABuiltMediumData build( BuildingMediumData building) {
 		return new BuiltImageData( building);
 	}
 	
@@ -57,11 +57,11 @@ public class FlatMedium implements IMedium {
 		return image;
 	}
 	
-	public class BuiltImageData extends ABuiltImageData {
+	public class BuiltImageData extends ABuiltMediumData {
 		MatTrans trans;
 		MatTrans invTrans;
 		
-		public BuiltImageData( BuildingImageData building) {
+		public BuiltImageData( BuildingMediumData building) {
 			super(building.handle);
 			this.trans = building.trans;
 			try {
@@ -152,6 +152,6 @@ public class FlatMedium implements IMedium {
 	@Override public int getDynamicX() {return 0;}
 	@Override public int getDynamicY() {return 0;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.NORMAL;}
-	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}
+	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) {return new DefaultImageDrawer(this, building);}
 
 }

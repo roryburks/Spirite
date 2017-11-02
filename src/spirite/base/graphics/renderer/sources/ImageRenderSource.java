@@ -7,20 +7,20 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
 
 /** This renders an Image rather plainly. */
 public class ImageRenderSource extends RenderSource {
-	private final ImageHandle handle;
-	public ImageRenderSource( ImageHandle handle) {
+	private final MediumHandle handle;
+	public ImageRenderSource( MediumHandle handle) {
 		super(handle.getContext());
 		this.handle = handle;
 	}
 	
 	@Override public int getDefaultWidth() { return handle.getWidth(); }
 	@Override public int getDefaultHeight() { return handle.getHeight(); }
-	@Override public List<ImageHandle> getImagesReliedOn() { return Arrays.asList(handle); }
+	@Override public List<MediumHandle> getImagesReliedOn() { return Arrays.asList(handle); }
 
 	@Override
 	public int hashCode() {

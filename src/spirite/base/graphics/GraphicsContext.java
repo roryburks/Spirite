@@ -2,7 +2,7 @@ package spirite.base.graphics;
 
 import java.awt.Shape;	// TODO
 
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
 
 /**
@@ -92,7 +92,7 @@ public abstract class GraphicsContext {
 
 
 	public abstract void drawImage( IImage img, int x, int y);
-	public abstract void drawHandle( ImageHandle handle, int x, int y);
+	public abstract void drawHandle( MediumHandle handle, int x, int y);
 
 	public abstract void fillPolygon(int[] x, int[] y, int count);
 	public abstract void fillPolygon(float[] x, float[] y, int length);
@@ -107,7 +107,7 @@ public abstract class GraphicsContext {
 
 
 	public abstract void renderImage(IImage rawImage, int x, int y, RenderProperties render);
-	public abstract void renderHandle( ImageHandle handle, int x, int y, RenderProperties render);
+	public abstract void renderHandle( MediumHandle handle, int x, int y, RenderProperties render);
 
 
 

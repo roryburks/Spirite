@@ -6,7 +6,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.hybrid.HybridHelper;
@@ -26,7 +26,7 @@ public class ReferenceRenderSource extends RenderSource {
 	@Override
 	public int getDefaultHeight() { return workspace.getHeight(); }
 	@Override
-	public List<ImageHandle> getImagesReliedOn() {
+	public List<MediumHandle> getImagesReliedOn() {
 		return workspace.getReferenceManager().getDependencies(front);
 	}
 

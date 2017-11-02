@@ -18,7 +18,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.FrameAbstract;
@@ -27,7 +27,7 @@ import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
-import spirite.base.image_data.images.DynamicInternalImage;
+import spirite.base.image_data.images.DynamicMedium;
 import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.base.image_data.images.FlatMedium;
@@ -279,7 +279,7 @@ public class LoadEngine {
 				helper.ra.read(buffer);
 				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 
-				dataMap.put(identifier, new DynamicInternalImage(img,ox,oy,helper.workspace));
+				dataMap.put(identifier, new DynamicMedium(img,ox,oy,helper.workspace));
 				break;}
 			case PRISMATIC: {
 				int colorCount = helper.ra.readShort();
@@ -436,7 +436,7 @@ public class LoadEngine {
 					break;
 				case SaveLoadUtil.NODE_SIMPLE_LAYER:
 					identifier = helper.ra.readInt();
-					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
+					Layer layer = new SimpleLayer( new MediumHandle(null, identifier));
 					node = helper.workspace.addShellLayer( nodeLayer[depth-1], layer, name);
 					break;
 				case SaveLoadUtil.NODE_RIG_LAYER: {
@@ -454,7 +454,7 @@ public class LoadEngine {
 							part.depth = helper.ra.readInt();
 							
 							int pid = helper.ra.readInt();
-							part.handle = new ImageHandle(null, pid);
+							part.handle = new MediumHandle(null, pid);
 						}
 						else {
 							part.partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
@@ -466,7 +466,7 @@ public class LoadEngine {
 							part.rot = helper.ra.readFloat();
 							part.depth = helper.ra.readInt();
 							int pid = helper.ra.readInt();
-							part.handle = new ImageHandle( null, pid);
+							part.handle = new MediumHandle( null, pid);
 						}
 						
 						parts.add(part);
@@ -680,7 +680,7 @@ public class LoadEngine {
 					nodeLayer[depth].setExpanded(true);
 					break;
 				case SaveLoadUtil.NODE_SIMPLE_LAYER:
-					Layer layer = new SimpleLayer( new ImageHandle(null, identifier));
+					Layer layer = new SimpleLayer( new MediumHandle(null, identifier));
 					node = workspace.addShellLayer( nodeLayer[depth-1], layer, name);
 					break;
 				}

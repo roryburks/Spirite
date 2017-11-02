@@ -7,7 +7,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
@@ -128,7 +128,7 @@ public class PrismaticMedium implements IMedium {
 	}
 
 	@Override
-	public ABuiltImageData build( BuildingImageData building) {
+	public ABuiltMediumData build( BuildingMediumData building) {
 		return new PrismaticBuiltImageData( building);
 	}
 
@@ -198,13 +198,13 @@ public class PrismaticMedium implements IMedium {
 		return InternalImageTypes.PRISMATIC;
 	}
 
-	public class PrismaticBuiltImageData extends ABuiltImageData {
+	public class PrismaticBuiltImageData extends ABuiltMediumData {
 		final MatTrans trans;
 		MatTrans invTrans;
 		RawImage buffer = null;
 		int workingColor;
 
-		public PrismaticBuiltImageData(BuildingImageData building) {
+		public PrismaticBuiltImageData(BuildingMediumData building) {
 			super(building.handle);
 			this.trans = building.trans;
 			workingColor = building.color;
@@ -348,5 +348,5 @@ public class PrismaticMedium implements IMedium {
 
 	}
 
-	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}
+	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) {return new DefaultImageDrawer(this, building);}
 }

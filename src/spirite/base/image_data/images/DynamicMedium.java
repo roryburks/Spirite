@@ -6,7 +6,7 @@ import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
@@ -26,28 +26,28 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
  * the number of pixels pushed to re-draw the Workspace
  * 
  */
-public class DynamicInternalImage implements IMedium {
+public class DynamicMedium implements IMedium {
 	RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
 	int ox, oy;
-	public DynamicInternalImage(RawImage raw, int ox, int oy, ImageWorkspace context) {
+	public DynamicMedium(RawImage raw, int ox, int oy, ImageWorkspace context) {
 		this.context = context;
 		this.image = raw;
 		this.ox = ox;
 		this.oy = oy;
 	}
-	public ABuiltImageData build( BuildingImageData building) {
+	public ABuiltMediumData build( BuildingMediumData building) {
 		return new DynamicBuiltImageData(building);
 	}
 	@Override
 	public IMedium dupe() {
-		return new DynamicInternalImage( image.deepCopy(), ox, oy, context);
+		return new DynamicMedium( image.deepCopy(), ox, oy, context);
 	}
 	@Override
 	public IMedium copyForSaving() {
-		return new DynamicInternalImage( HybridUtil.copyForSaving(image), ox, oy, context);
+		return new DynamicMedium( HybridUtil.copyForSaving(image), ox, oy, context);
 	}
 	public int getWidth() {return image.getWidth();}
 	public int getHeight() {return image.getHeight();}
@@ -62,14 +62,14 @@ public class DynamicInternalImage implements IMedium {
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
-	@Override public IImageDrawer getImageDrawer(BuildingImageData building) { return new DefaultImageDrawer(this, building);}
+	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) { return new DefaultImageDrawer(this, building);}
 	
-	public class DynamicBuiltImageData extends ABuiltImageData{
+	public class DynamicBuiltImageData extends ABuiltMediumData{
 		MatTrans trans;
 		MatTrans invTrans;
 		RawImage buffer = null;
 		
-		public DynamicBuiltImageData(BuildingImageData building) 
+		public DynamicBuiltImageData(BuildingMediumData building) 
 		{
 			super(building.handle);
 			this.trans = building.trans;

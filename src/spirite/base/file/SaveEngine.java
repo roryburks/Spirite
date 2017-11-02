@@ -20,7 +20,7 @@ import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
@@ -283,7 +283,7 @@ public class SaveEngine implements MWorkspaceObserver {
 				// [1] : Node Type ID
 				helper.ra.write( SaveLoadUtil.NODE_SIMPLE_LAYER);
 				
-				ImageHandle data = ((SimpleLayer) layer).getData();
+				MediumHandle data = ((SimpleLayer) layer).getData();
 				// [4] : ID of ImageData linked to this LayerNode
 				helper.ra.writeInt( data.getID());
 			}

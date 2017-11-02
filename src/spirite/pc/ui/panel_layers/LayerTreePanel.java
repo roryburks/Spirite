@@ -55,7 +55,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -159,13 +159,13 @@ public class LayerTreePanel extends ContentTree
     	Enumeration<DefaultMutableTreeNode> e =
     			((DefaultMutableTreeNode)tree.getModel().getRoot()).depthFirstEnumeration();
 
-		List<ImageHandle> changedImages = evt.getChangedImages();
+		List<MediumHandle> changedImages = evt.getChangedImages();
     	
     	while( e.hasMoreElements()) {
     		DefaultMutableTreeNode treeNode = e.nextElement();
     		Object obj = treeNode.getUserObject();
     		
-    		Collection<ImageHandle> dataUsed;
+    		Collection<MediumHandle> dataUsed;
     		
     		if( obj instanceof LayerNode) {
     			dataUsed = ((LayerNode)obj).getLayer().getImageDependencies();
@@ -190,7 +190,7 @@ public class LayerTreePanel extends ContentTree
     			continue;
     		
     		// Test the intersection of changedImages and dataUsed to see if the node needs to be re-drawn
-    		List<ImageHandle> intersection = new ArrayList<>(dataUsed);
+    		List<MediumHandle> intersection = new ArrayList<>(dataUsed);
     		intersection.retainAll(changedImages);
     		
     		if( !dataUsed.isEmpty()) {

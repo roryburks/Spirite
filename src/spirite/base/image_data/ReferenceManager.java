@@ -157,9 +157,9 @@ public class ReferenceManager {
 			return new ArrayList<Reference>(references.subList(references.indexOf(null)+1, references.size()));
 	}
 
-	public List<ImageHandle> getDependencies( boolean front) {
+	public List<MediumHandle> getDependencies( boolean front) {
 		List<Reference> refs = getList(front);
-		List<ImageHandle> dependencies = new ArrayList<>();
+		List<MediumHandle> dependencies = new ArrayList<>();
 		
 		for( Reference ref : refs) {
 			if( ref instanceof LayerReference) {

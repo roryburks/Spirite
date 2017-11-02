@@ -6,7 +6,7 @@ import java.util.List;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 
 /**
@@ -26,7 +26,7 @@ public abstract class RenderSource {
 	RenderSource( ImageWorkspace workspace) {this.workspace = workspace;}
 	public abstract int getDefaultWidth();
 	public abstract int getDefaultHeight();
-	public abstract List<ImageHandle> getImagesReliedOn();
+	public abstract List<MediumHandle> getImagesReliedOn();
 	public List<Node> getNodesReliedOn() {return new ArrayList<>(0);}
 	public abstract RawImage render( RenderSettings settings);
 	

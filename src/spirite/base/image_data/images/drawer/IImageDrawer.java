@@ -1,7 +1,7 @@
 package spirite.base.image_data.images.drawer;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.pen.PenTraits.PenState;
@@ -13,7 +13,7 @@ public interface IImageDrawer {
 	public abstract class MaskedImageAction extends ImageAction {
 		protected final BuiltSelection mask;
 
-		protected MaskedImageAction(BuildingImageData data, BuiltSelection mask) {
+		protected MaskedImageAction(BuildingMediumData data, BuiltSelection mask) {
 			super(data);
 			this.mask = mask;
 		}
@@ -36,7 +36,7 @@ public interface IImageDrawer {
 	}
 	
 	public interface IFillModule {
-		public boolean fill( int x, int y, int color, BuildingImageData _data);
+		public boolean fill( int x, int y, int color, BuildingMediumData _data);
 	}
 	
 	public interface IFlipModule {

@@ -15,7 +15,7 @@ import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLImage;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -83,7 +83,7 @@ public class AWTContext extends GraphicsContext{
 		}
 		g2.fillPolygon(_x, _y, count);}
 
-	@Override public void drawHandle(ImageHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
+	@Override public void drawHandle(MediumHandle handle, int x, int y) { drawImage( handle.deepAccess(), x, y); }
 	@Override public void setClip(int x, int y, int width, int height) { g2.setClip(x, y, width, height); }
 	@Override public void dispose() {g2.dispose();}
 	
@@ -246,7 +246,7 @@ public class AWTContext extends GraphicsContext{
 	}
 
 	@Override
-	public void renderHandle(ImageHandle handle, int x, int y, RenderProperties render) {
+	public void renderHandle(MediumHandle handle, int x, int y, RenderProperties render) {
 		float cc = getAlpha();
 		
 		if( render.getAlpha() != 1.0f) 

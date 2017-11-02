@@ -8,9 +8,9 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.pen.PenTraits.PenState;
@@ -75,7 +75,7 @@ public class MaglevMedium implements IMedium {
 	public static abstract class MagLevThing {
 		abstract float[] getPoints();
 		abstract void setPoints(float[] xy);
-		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context );
+		abstract void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context );
 		protected abstract MagLevThing clone();
 	}
 	public static class MagLevStroke extends MagLevThing {
@@ -113,7 +113,7 @@ public class MaglevMedium implements IMedium {
 		}
 
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
+		void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
 			StrokeEngine _engine = context.context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			_engine.batchDraw(params, states, built, mask);
 		}
@@ -181,7 +181,7 @@ public class MaglevMedium implements IMedium {
 			return new MagLevFill(this);
 		}
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
+		void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
 			int totalLen = 0;
 			for( StrokeSegment s : segments)
 				totalLen += Math.abs(s.travel) + 1;
@@ -219,8 +219,8 @@ public class MaglevMedium implements IMedium {
 	@Override public int getDynamicX() { return 0; }
 	@Override public int getDynamicY() { return 0; }
 
-	@Override public ABuiltImageData build(BuildingImageData building) {return new MaglevBuiltImageData(building);}
-	@Override public IImageDrawer getImageDrawer(BuildingImageData building) 
+	@Override public ABuiltMediumData build(BuildingMediumData building) {return new MaglevBuiltImageData(building);}
+	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) 
 		{return new MaglevImageDrawer(this, building);}
 
 	@Override public IMedium dupe() {return new MaglevMedium(this);}
@@ -251,7 +251,7 @@ public class MaglevMedium implements IMedium {
 				builtImage = HybridHelper.createImage(getWidth(), getHeight());
 				GraphicsContext gc = builtImage.getGraphics();
 	
-				ABuiltImageData built = this.build(new BuildingImageData(context.getHandleFor(this), 0, 0));
+				ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
 				BuiltSelection mask = new BuiltSelection(null, 0, 0);
 				for( MagLevThing thing : things) {
 					thing.draw( built, mask, gc, this);
@@ -274,12 +274,12 @@ public class MaglevMedium implements IMedium {
 	}
 	
 
-	public class MaglevBuiltImageData extends ABuiltImageData {
+	public class MaglevBuiltImageData extends ABuiltMediumData {
 		MatTrans trans;
 		//final int box;
 		//final int boy;
 		
-		public MaglevBuiltImageData(BuildingImageData building) 
+		public MaglevBuiltImageData(BuildingMediumData building) 
 		{
 			super(building.handle);
 			this.trans = building.trans;

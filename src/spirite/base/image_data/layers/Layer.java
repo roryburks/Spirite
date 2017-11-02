@@ -6,17 +6,17 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 
 public abstract class Layer {
-	public abstract BuildingImageData getActiveData();
-	public abstract List<ImageHandle> getImageDependencies();
-	public abstract List<BuildingImageData> getDataToBuild();
+	public abstract BuildingMediumData getActiveData();
+	public abstract List<MediumHandle> getImageDependencies();
+	public abstract List<BuildingMediumData> getDataToBuild();
 	public abstract void draw( GraphicsContext gc);
 	public abstract int getWidth();
 	public abstract int getHeight();

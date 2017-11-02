@@ -27,7 +27,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.images.IMedium.InternalImageTypes;
@@ -138,8 +138,8 @@ public class Test1 {
 			assert( g1.getClass().equals(g2.getClass()));
 			
 			if( g1 instanceof LayerNode) {
-				Iterator<ImageHandle> it1 = ((LayerNode)g1).getLayer().getImageDependencies().iterator();
-				Iterator<ImageHandle> it2 = ((LayerNode)g2).getLayer().getImageDependencies().iterator();
+				Iterator<MediumHandle> it1 = ((LayerNode)g1).getLayer().getImageDependencies().iterator();
+				Iterator<MediumHandle> it2 = ((LayerNode)g2).getLayer().getImageDependencies().iterator();
 
 				while( it1.hasNext()) {
 					/*assert(
@@ -152,7 +152,7 @@ public class Test1 {
 			}
 		}
 		
-		for( ImageHandle data : workspace.getAllImages()) {
+		for( MediumHandle data : workspace.getAllImages()) {
 			BufferedImage b1 = ((ImageBI)data.deepAccess()).img;
 			BufferedImage b2 = ((ImageBI)data.deepAccess()).img;
 			

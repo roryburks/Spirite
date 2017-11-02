@@ -8,9 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
@@ -27,9 +27,9 @@ public abstract class StrokeEngine {
 
 	// =============
 	// ==== Abstract Methods
-	protected abstract boolean drawToLayer( DrawPoints points, boolean permanent, ABuiltImageData built);
+	protected abstract boolean drawToLayer( DrawPoints points, boolean permanent, ABuiltMediumData built);
 	protected abstract void prepareDisplayLayer();
-	protected abstract void onStart(ABuiltImageData built);
+	protected abstract void onStart(ABuiltMediumData built);
 	protected abstract void onEnd();
 	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
@@ -81,7 +81,7 @@ public abstract class StrokeEngine {
 
 	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
-	protected BuildingImageData building;
+	protected BuildingMediumData building;
 	//protected ABuiltImageData data;
 	protected BuiltSelection sel;
 	
@@ -114,7 +114,7 @@ public abstract class StrokeEngine {
 	public final boolean startStroke( 
 			StrokeParams params, 
 			PenState ps, 
-			BuildingImageData building,
+			BuildingMediumData building,
 			BuiltSelection selection) 
 	{
 		this.building = building;
@@ -171,7 +171,7 @@ public abstract class StrokeEngine {
 	
 	private boolean prepareStroke( 
 			StrokeParams params, 
-			ABuiltImageData built,
+			ABuiltMediumData built,
 			BuiltSelection selection)
 	{
 		if( built == null) 
@@ -261,7 +261,7 @@ public abstract class StrokeEngine {
 	 * draw commands into a single command instead of updating the stroke layer
 	 * repeatedly.
 	 */
-	public void batchDraw(StrokeParams params, PenState[] points, ABuiltImageData builtImage, BuiltSelection mask) 
+	public void batchDraw(StrokeParams params, PenState[] points, ABuiltMediumData builtImage, BuiltSelection mask) 
 	{
 		prepareStroke(params, builtImage, mask);
 		buildInterpolator(params, points[0]);
@@ -325,7 +325,7 @@ public abstract class StrokeEngine {
 		}
 	}
 	
-	public void batchDraw( DrawPoints points, ABuiltImageData builtImage, BuiltSelection mask) 
+	public void batchDraw( DrawPoints points, ABuiltMediumData builtImage, BuiltSelection mask) 
 	{
 		prepareStroke(null, builtImage, mask);
 
@@ -483,7 +483,7 @@ public abstract class StrokeEngine {
 
 
 
-	public BuildingImageData getImageData() {
+	public BuildingMediumData getImageData() {
 		return building;
 	}
 }

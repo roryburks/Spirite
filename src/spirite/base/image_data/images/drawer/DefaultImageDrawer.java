@@ -16,12 +16,12 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.image_data.images.IMedium;
 // Auto-complete include isn't working so this comment is a marker for easy finding
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
@@ -60,10 +60,10 @@ public class DefaultImageDrawer
 				IStrokeModule,
 				IMagneticFillModule
 {
-	private BuildingImageData building;
+	private BuildingMediumData building;
 	private final IMedium img;
 	
-	public DefaultImageDrawer( IMedium img, BuildingImageData building) {
+	public DefaultImageDrawer( IMedium img, BuildingMediumData building) {
 		this.img = img;
 		this.building = building;
 	}
@@ -91,7 +91,7 @@ public class DefaultImageDrawer
 
 	// :::: IFillModule
 	@Override
-	public boolean fill(int x, int y, int color, BuildingImageData _data) {
+	public boolean fill(int x, int y, int color, BuildingMediumData _data) {
 		if( _data == null) return false;
 		ImageWorkspace workspace = _data.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
@@ -123,7 +123,7 @@ public class DefaultImageDrawer
 
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				RawImage img;
 				Vec2i layerSpace;
 				Vec2i p = built.convert( new Vec2i(x,y));
@@ -202,7 +202,7 @@ public class DefaultImageDrawer
 		BuiltSelection sel = pollSelectionMask(workspace);
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				if( mask.selection == null) {
 					built.checkout().clear();
 					built.checkin();
@@ -264,14 +264,14 @@ public class DefaultImageDrawer
 	public class FlipAction extends MaskedImageAction 
 	{
 		private final boolean horizontal;
-		private FlipAction(BuildingImageData data, BuiltSelection mask, boolean horizontal) {
+		private FlipAction(BuildingMediumData data, BuiltSelection mask, boolean horizontal) {
 			super(data, mask);
 			this.horizontal = horizontal;
 			description = "Flip Action";
 		}
 
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			
 			if( mask != null && mask.selection != null) {
 				
@@ -337,7 +337,7 @@ public class DefaultImageDrawer
 		
 		switch( scope) {
 		case LOCAL:
-			BuildingImageData bid = workspace.buildActiveData();
+			BuildingMediumData bid = workspace.buildActiveData();
 			if( bid != null) {
 				undoEngine.performAndStore( new ColorChangeAction(bid, mask, from, to, mode));
 			}
@@ -355,7 +355,7 @@ public class DefaultImageDrawer
 			for( LayerNode lnode : selected.getAllLayerNodes()) {
 				Layer layer = lnode.getLayer();
 				
-				for( BuildingImageData data : layer.getDataToBuild()) {
+				for( BuildingMediumData data : layer.getDataToBuild()) {
 					data.trans.preTranslate( lnode.getOffsetX(), lnode.getOffsetY());
 					actions.add( new ColorChangeAction(
 							data,
@@ -371,12 +371,12 @@ public class DefaultImageDrawer
 
 	public abstract class PerformFilterAction extends MaskedImageAction
 	{
-		private PerformFilterAction(BuildingImageData data, BuiltSelection mask) {
+		private PerformFilterAction(BuildingMediumData data, BuiltSelection mask) {
 			super(data, mask);
 		}
 
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			if( mask != null && mask.selection != null) {
 				// Lift the Selection
 				RawImage lifted = mask.liftSelectionFromData(built);
@@ -404,7 +404,7 @@ public class DefaultImageDrawer
 		private final int from, to;
 		private final int mode;
 		private ColorChangeAction(
-				BuildingImageData data, 
+				BuildingMediumData data, 
 				BuiltSelection mask, 
 				int from, int to, 
 				int mode) 
@@ -449,7 +449,7 @@ public class DefaultImageDrawer
 
 		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				RawImage img = built.checkoutRaw();
 				RawImage img2 = img.deepCopy();
 				GraphicsContext gc = img.getGraphics();
@@ -528,7 +528,7 @@ public class DefaultImageDrawer
 				StrokeEngine.StrokeParams params, 
 				PenState[] points, 
 				BuiltSelection mask, 
-				BuildingImageData data)
+				BuildingMediumData data)
 		{
 			super(data, mask);
 			this.engine = engine;
@@ -553,7 +553,7 @@ public class DefaultImageDrawer
 		}
 		
 		@Override
-		public void performImageAction(ABuiltImageData built ) {
+		public void performImageAction(ABuiltMediumData built ) {
 			queueSelectionMask(mask);
 			
 			engine.batchDraw(params, points, built, mask);
@@ -578,7 +578,7 @@ public class DefaultImageDrawer
 		final float[] fill_y = fy.toArray();
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				
 				GraphicsContext gc = built.checkout();
 				gc.setColor(color);

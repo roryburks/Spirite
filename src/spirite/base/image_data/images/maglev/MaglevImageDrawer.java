@@ -5,13 +5,13 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
@@ -36,10 +36,10 @@ public class MaglevImageDrawer
 				IWeightEraserModule
 {
 
-	private final BuildingImageData building;
+	private final BuildingMediumData building;
 	private final MaglevMedium img;
 	
-	public MaglevImageDrawer( MaglevMedium img, BuildingImageData building) {
+	public MaglevImageDrawer( MaglevMedium img, BuildingMediumData building) {
 		this.img = img;
 		this.building = building;
 	}
@@ -89,7 +89,7 @@ public class MaglevImageDrawer
 		img.addThing(stroke);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				ImageWorkspace ws = built.handle.getContext();
 				MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 				mimg.Build();
@@ -97,7 +97,7 @@ public class MaglevImageDrawer
 				mimg.addThing(stroke);
 
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				stroke.draw(mimg.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
+				stroke.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, gc, mimg);
 			}
 			@Override
 			public String getDescription() {
@@ -139,7 +139,7 @@ public class MaglevImageDrawer
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
-			protected void performImageAction(ABuiltImageData built) {
+			protected void performImageAction(ABuiltMediumData built) {
 				ImageWorkspace ws = built.handle.getContext();
 				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
 				mimg.Build();
@@ -147,7 +147,7 @@ public class MaglevImageDrawer
 				mimg.addThing(fill);
 				
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				fill.draw(mimg.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
+				fill.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, gc, mimg);
 				
 			}
 			@Override
@@ -346,7 +346,7 @@ public class MaglevImageDrawer
 	class MagWeightEraseAction extends ImageAction implements StackableAction {
 		private final List<MagLevThing> thingsToErase;
 		private final int id;
-		MagWeightEraseAction(BuildingImageData data, List<MagLevThing> thingsToErase, int id)
+		MagWeightEraseAction(BuildingMediumData data, List<MagLevThing> thingsToErase, int id)
 		{
 			super(data);
 			this.id = id;
@@ -362,7 +362,7 @@ public class MaglevImageDrawer
 		}
 
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			ImageWorkspace ws = building.handle.getContext();
 			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 			

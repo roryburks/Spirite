@@ -14,7 +14,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
 
 /** 
@@ -48,7 +48,7 @@ public class NodeRenderSource extends RenderSource {
 		return list;
 	}
 	@Override
-	public List<ImageHandle> getImagesReliedOn() {
+	public List<MediumHandle> getImagesReliedOn() {
 		// Get a list of all layer nodes then get a list of all ImageData
 		//	contained within those nodes
 		List<Node> layerNodes = root.getAllNodesST( new NodeValidator() {
@@ -59,11 +59,11 @@ public class NodeRenderSource extends RenderSource {
 			@Override public boolean checkChildren(Node node) {return true;}
 		});
 		
-		List<ImageHandle> list = new LinkedList<>();
+		List<MediumHandle> list = new LinkedList<>();
 		
 		Iterator<Node> it = layerNodes.iterator();
 		while( it.hasNext()){
-			for( ImageHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
+			for( MediumHandle data : ((LayerNode)it.next()).getLayer().getImageDependencies()) {
 				// Avoiding duplicates should make the intersection method quicker
 				if( list.indexOf(data) == -1)
 					list.add(data);

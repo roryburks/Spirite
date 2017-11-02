@@ -20,7 +20,7 @@ import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
@@ -124,7 +124,7 @@ public class AnimIO {
 	public static void exportFFAnim( FixedFrameAnimation animation, File file) 
 			throws IOException 
 	{
-		List<ImageHandle> handles = new ArrayList<>();
+		List<MediumHandle> handles = new ArrayList<>();
 		List<AAFFrame> frames = new ArrayList<>();
 		
 		// Step 0: Convert the given filename to a uniform format
@@ -160,7 +160,7 @@ public class AnimIO {
 		// Step 2: Crop the image to only their used bounds
 		List<CroppedImage> images = new ArrayList<>(handles.size());
 		List<Vec2i> toPack = new ArrayList<>(images.size());
-		for( ImageHandle handle : handles) {
+		for( MediumHandle handle : handles) {
 			Rect bounds = null;
 			try {
 				bounds = HybridUtil.findContentBounds(handle.deepAccess(), 0, true);

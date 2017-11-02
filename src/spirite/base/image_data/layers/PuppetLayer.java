@@ -6,9 +6,9 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.util.glmath.Rect;
 
@@ -24,7 +24,7 @@ public class PuppetLayer extends Layer {
 	}
 
 	@Override
-	public BuildingImageData getActiveData() {
+	public BuildingMediumData getActiveData() {
 		if( selectedPart == null) return null;
 		
 		//BuildingImageData data = new BuildingImageData(handle, ox, oy)
@@ -32,8 +32,8 @@ public class PuppetLayer extends Layer {
 	}
 
 	@Override
-	public List<ImageHandle> getImageDependencies() {
-		List<ImageHandle> ret = new ArrayList<>(puppet.parts.size());
+	public List<MediumHandle> getImageDependencies() {
+		List<MediumHandle> ret = new ArrayList<>(puppet.parts.size());
 		
 		for( Puppet.Part part : puppet.parts)
 			ret.add(part.handle);
@@ -42,7 +42,7 @@ public class PuppetLayer extends Layer {
 	}
 
 	@Override
-	public List<BuildingImageData> getDataToBuild() {
+	public List<BuildingMediumData> getDataToBuild() {
 		// TODO Auto-generated method stub
 		return null;
 	}

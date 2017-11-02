@@ -26,7 +26,7 @@ import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
@@ -431,7 +431,7 @@ public class Penner
 		if( holdingCtrl) c = 0x00000000;
 
 		// Grab the Active Data
-		BuildingImageData data = workspace.buildActiveData();
+		BuildingMediumData data = workspace.buildActiveData();
 		
 		IImageDrawer drawer = workspace.getDrawerFromHandle(data.handle);
 

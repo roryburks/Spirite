@@ -10,9 +10,9 @@ import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
@@ -20,18 +20,18 @@ import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
 
 public class SimpleLayer extends Layer {
-	private final ImageHandle data;
+	private final MediumHandle data;
 	
-	public SimpleLayer( ImageHandle data) {
+	public SimpleLayer( MediumHandle data) {
 		this.data = data;
 	}
 	
-	public ImageHandle getData() {
+	public MediumHandle getData() {
 		return data;
 	}
 
 	@Override
-	public List<ImageHandle> getImageDependencies() {
+	public List<MediumHandle> getImageDependencies() {
 		return Arrays.asList(data);
 	}
 
@@ -41,12 +41,12 @@ public class SimpleLayer extends Layer {
 	}
 
 	@Override
-	public BuildingImageData getActiveData() {
-		return new BuildingImageData(data, 0, 0);
+	public BuildingMediumData getActiveData() {
+		return new BuildingMediumData(data, 0, 0);
 	}
 	@Override
-	public List<BuildingImageData> getDataToBuild(){
-		return Arrays.asList( new BuildingImageData[] {new BuildingImageData(data, 0, 0)});
+	public List<BuildingMediumData> getDataToBuild(){
+		return Arrays.asList( new BuildingMediumData[] {new BuildingMediumData(data, 0, 0)});
 	}
 	@Override
 	public int getWidth() {
@@ -103,7 +103,7 @@ public class SimpleLayer extends Layer {
 		}
 		else {
 			CachedImage ci = workspace.getCacheManager().cacheImage( image, workspace.getUndoEngine());
-			UndoableAction action = new DrawImageAction(  new BuildingImageData(data,x, y), ci);
+			UndoableAction action = new DrawImageAction(  new BuildingMediumData(data,x, y), ci);
 			helper.actions.add(action);
 		}
 		

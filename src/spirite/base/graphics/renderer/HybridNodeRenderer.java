@@ -18,10 +18,10 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
@@ -81,10 +81,10 @@ public class HybridNodeRenderer {
 
 	// ==== Composite Layer
 	private RawImage compositionImage;
-	private ImageHandle compositionHandle = null;
+	private MediumHandle compositionHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) throws InvalidImageDimensionsExeption 
 	{
-		BuildingImageData dataContext = workspace.buildActiveData();
+		BuildingMediumData dataContext = workspace.buildActiveData();
 		StrokeEngine strokeEngine = workspace.getAcrtiveStrokeEngine();
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
 				||  (strokeEngine != null)))

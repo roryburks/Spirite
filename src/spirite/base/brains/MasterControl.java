@@ -32,7 +32,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -44,7 +44,7 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
@@ -497,7 +497,7 @@ public class MasterControl
     					img.set(currentWorkspace.getSelectionEngine().getLiftedImage());
     				}
     				else {
-    					BuildingImageData building = currentWorkspace.buildActiveData();
+    					BuildingMediumData building = currentWorkspace.buildActiveData();
     					
     					if( building == null) {
     		    	    	RenderSettings settings = new RenderSettings(

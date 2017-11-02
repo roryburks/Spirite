@@ -6,8 +6,8 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageHandle;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.util.glmath.Rect;
 
@@ -34,11 +34,11 @@ public class ReferenceLayer extends Layer {
 	}
 	
 
-	@Override public BuildingImageData getActiveData() 
+	@Override public BuildingMediumData getActiveData() 
 		{return (layer == null)? null : layer.getActiveData();}
-	@Override public List<ImageHandle> getImageDependencies() 
+	@Override public List<MediumHandle> getImageDependencies() 
 		{return (layer == null)? null : layer.getImageDependencies();}
-	@Override public List<BuildingImageData> getDataToBuild() 
+	@Override public List<BuildingMediumData> getDataToBuild() 
 	
 		{return (layer == null)? null : layer.getDataToBuild();}
 	@Override public void draw(GraphicsContext gc) 

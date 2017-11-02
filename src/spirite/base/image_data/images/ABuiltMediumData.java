@@ -2,7 +2,7 @@ package spirite.base.image_data.images;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.image_data.ImageHandle;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
@@ -17,10 +17,10 @@ import spirite.base.util.glmath.Vec2i;
  * over long terms.
  *
  */
-public abstract class ABuiltImageData {
-	public final ImageHandle handle;
+public abstract class ABuiltMediumData {
+	public final MediumHandle handle;
 	
-	public ABuiltImageData( ImageHandle handle) {this.handle = handle;}
+	public ABuiltMediumData( MediumHandle handle) {this.handle = handle;}
 	
 	public abstract int getWidth();
 	public abstract int getHeight();

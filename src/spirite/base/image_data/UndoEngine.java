@@ -13,9 +13,9 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
-import spirite.base.image_data.ImageWorkspace.BuildingImageData;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.images.ABuiltImageData;
+import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.FlatMedium;
 import spirite.base.util.ObserverHandler;
@@ -167,8 +167,8 @@ public class UndoEngine {
 	
 	// :::: Called by ImageWorkapce
 	/** Gets a list of all Data used in the UndoEngine. */
-	List<ImageHandle> getDataUsed() {
-		LinkedHashSet<ImageHandle> set = new LinkedHashSet<>();
+	List<MediumHandle> getDataUsed() {
+		LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
 		
 		for( UndoContext context : contexts) {
 			if( context instanceof NullContext) {
@@ -220,9 +220,9 @@ public class UndoEngine {
 		return queue.getLast().getLast();
 	}
 	public static class UndoIndex {
-		public ImageHandle data;
+		public MediumHandle data;
 		public UndoableAction action;
-		public UndoIndex( ImageHandle data, UndoableAction action) {
+		public UndoIndex( MediumHandle data, UndoableAction action) {
 			this.data = data;
 			this.action = action;
 		}
@@ -235,7 +235,7 @@ public class UndoEngine {
 	 * 
 	 * Should only be called by ImageWorkspace.checkoutImage
 	 */
-	public void prepareContext( ImageHandle data) {
+	public void prepareContext( MediumHandle data) {
 		for( UndoContext context : contexts) {
 			if( context.image == null) continue;
 			if( context.image.equals(data))
@@ -245,7 +245,7 @@ public class UndoEngine {
 		assert( data != null);
 		contexts.add( new ImageContext( data));
 	}
-	private UndoContext contextOf( ImageHandle data) {
+	private UndoContext contextOf( MediumHandle data) {
 		assert( data != null);
 
 		for( UndoContext context : contexts) {
@@ -512,7 +512,7 @@ public class UndoEngine {
 	 * After creating the image, you should performAction on it as well as store
 	 * it into the UndoEngine or else Undoing might get a little weird.
 	 */
-	public UndoableAction createReplaceAction( ImageHandle handle, RawImage newImage) {
+	public UndoableAction createReplaceAction( MediumHandle handle, RawImage newImage) {
 
 		prepareContext(handle);
 		for( UndoContext context : contexts) {
@@ -544,9 +544,9 @@ public class UndoEngine {
 	 * -NullContext of which only one exists, for changes outside any image data.
 	 */
 	private abstract class UndoContext {
-		ImageHandle image;
+		MediumHandle image;
 
-		UndoContext( ImageHandle data) {
+		UndoContext( MediumHandle data) {
 			this.image = data;
 		}
 
@@ -586,7 +586,7 @@ public class UndoEngine {
 								// this increments until it hits a Keyframe, then it removes
 								// the old base keyframe and adjusts
 		
-		protected ImageContext( ImageHandle image) {
+		protected ImageContext( MediumHandle image) {
 			super(image);
 			
 			//RawImage img = image.deepAccess().deepCopy();
@@ -607,7 +607,7 @@ public class UndoEngine {
 			ImageAction hiddenAction;
 			boolean freed = false;
 			KeyframeAction( ImageAction action) {
-				super( new BuildingImageData(image, 0, 0));
+				super( new BuildingMediumData(image, 0, 0));
 				this.hiddenAction = action;
 
 				_ii = workspace.getData(image.id).dupe();
@@ -628,7 +628,7 @@ public class UndoEngine {
 					hiddenAction.onAdd();
 			}
 			@Override
-			public void performImageAction(ABuiltImageData built) {
+			public void performImageAction(ABuiltMediumData built) {
 				workspace._replaceIamge(image, _ii);
 			}
 
@@ -662,7 +662,7 @@ public class UndoEngine {
 			private final IMedium previousII;
 			boolean freed = false;
 			
-			protected ReplaceImageAction(ImageHandle data, IMedium previous) {
+			protected ReplaceImageAction(MediumHandle data, IMedium previous) {
 				super( new NilImageAction(data));
 				
 				previousII = previous.dupe();
@@ -887,8 +887,8 @@ public class UndoEngine {
 			super(null);
 		}
 		
-		protected Collection<ImageHandle> getImageDependency() {
-			LinkedHashSet<ImageHandle> set = new LinkedHashSet<>();
+		protected Collection<MediumHandle> getImageDependency() {
+			LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
 			
 			
 			for( NullAction action : actions){
@@ -1146,8 +1146,8 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final BuildingImageData building;
-		protected ImageAction( BuildingImageData data) {
+		protected final BuildingMediumData building;
+		protected ImageAction( BuildingMediumData data) {
 			this.building = data;
 		}
 		@Override protected final void performAction() 
@@ -1157,16 +1157,16 @@ public class UndoEngine {
 		}
 		@Override protected void undoAction() {}
 		protected void performNonimageAction() {}
-		protected abstract void performImageAction(ABuiltImageData built );
+		protected abstract void performImageAction(ABuiltMediumData built );
 		protected boolean isHeavyAction() {return false;}
 	}
 	
 	// For internal use only.  Why would you want make an empty Image Action?
 	class NilImageAction extends ImageAction {
-		protected NilImageAction(ImageHandle data) {
-			super( new BuildingImageData(data, 0, 0));
+		protected NilImageAction(MediumHandle data) {
+			super( new BuildingMediumData(data, 0, 0));
 		}
-		@Override		protected void performImageAction(ABuiltImageData built) {}
+		@Override		protected void performImageAction(ABuiltMediumData built) {}
 		
 	}
 	
@@ -1178,7 +1178,7 @@ public class UndoEngine {
 	 */
 	public static abstract class NullAction extends UndoableAction {
 		public boolean reliesOnData() {return false;}
-		public Collection<ImageHandle> getDependencies() { return null;}
+		public Collection<MediumHandle> getDependencies() { return null;}
 	}
 	
 	/** A StackableAction is an action that if performed multiple times in
@@ -1327,7 +1327,7 @@ public class UndoEngine {
 //		private final int dx;
 	//	private final int dy;
 		
-		public DrawImageAction(BuildingImageData data, CachedImage other) {
+		public DrawImageAction(BuildingMediumData data, CachedImage other) {
 			super(data);
 			this.stored = other;
 		}
@@ -1338,7 +1338,7 @@ public class UndoEngine {
 			stored.relinquish(this);
 		}
 		@Override
-		protected void performImageAction(ABuiltImageData built) {
+		protected void performImageAction(ABuiltMediumData built) {
 			GraphicsContext gc = built.checkout();
 			gc.drawImage(stored.access(), 0, 0);
 			built.checkin();
