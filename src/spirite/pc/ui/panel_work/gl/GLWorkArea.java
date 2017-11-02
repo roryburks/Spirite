@@ -23,6 +23,7 @@ import spirite.base.graphics.gl.GLGraphics;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -143,17 +144,18 @@ public class GLWorkArea
         	glgc.setComposite(Composite.SRC_OVER, 1);
 
             // :::: Draw Border around the active Data
-            ABuiltImageData active = workspace.buildData(workspace.buildActiveData());
-            
-            if( active!= null) {
-            	glgc.setComposite(glgc.getComposite(), 0.3f);
-                glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
-                
-                active.drawBorder(glgc);
-                //Rect r = active.getBounds();
-                //glgc.drawRect( r.x-1, r.y-1, r.width+2, r.height+2);
-            	//glgc.setComposite(glgc.getComposite(), 1);
-            }
+        	
+        	BuildingImageData active = workspace.buildActiveData();
+        	
+        	if( active != null) {
+        		active.doOnBuiltData((built) -> {
+
+                	glgc.setComposite(glgc.getComposite(), 0.3f);
+                    glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
+                    
+                    built.drawBorder(glgc);
+        		});
+        	}
             
         	// :::: Draw Selection Bounds
             Selection selection = selectionEngine.getSelection();

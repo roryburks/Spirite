@@ -13,37 +13,37 @@ import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
+import spirite.hybrid.HybridUtil;
 
 /***
  * Normal Internal Image.  Has a RawImage (cached) that represents its image data
  * and that RawImage is drawn to.
  */
 public class InternalImage implements IInternalImage {
-	CachedImage cachedImage;
+	RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
 	public InternalImage( RawImage raw, ImageWorkspace context) { 
 		this.context = context;
-		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
+		this.image = raw;
 	}
 	
 	public int getWidth() {
-		return cachedImage.access().getWidth();
+		return image.getWidth();
 	}
 	public int getHeight() {
-		return cachedImage.access().getHeight();
+		return image.getHeight();
 	}
 	public ABuiltImageData build( BuildingImageData building) {
 		return new BuiltImageData( building);
 	}
 	
-	public InternalImage dupe() {
-		return new InternalImage(cachedImage.access().deepCopy(), context);
-	}
+	@Override public InternalImage dupe() {return new InternalImage(image.deepCopy(), context);}
+	@Override public IInternalImage copyForSaving() {return new InternalImage( HybridUtil.copyForSaving(image), context);}
 	public void flush() {
 		if( !flushed) {
-			cachedImage.relinquish(this);
+			image.flush();
 			flushed = true;
 		}
 	}
@@ -53,7 +53,7 @@ public class InternalImage implements IInternalImage {
 	}
 	@Override
 	public RawImage readOnlyAccess() {
-		return cachedImage.access();
+		return image;
 	}
 	
 	public class BuiltImageData extends ABuiltImageData {
@@ -107,7 +107,7 @@ public class InternalImage implements IInternalImage {
 			
 			context.getUndoEngine().prepareContext(handle);
 			
-			return cachedImage.access();
+			return image;
 		}
 		
 		public void checkin() {
@@ -152,4 +152,5 @@ public class InternalImage implements IInternalImage {
 	@Override public int getDynamicY() {return 0;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.NORMAL;}
 	@Override public IImageDrawer getImageDrawer(BuildingImageData building) {return new DefaultImageDrawer(this, building);}
+
 }

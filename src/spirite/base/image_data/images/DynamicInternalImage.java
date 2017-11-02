@@ -26,14 +26,14 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
  * 
  */
 public class DynamicInternalImage implements IInternalImage {
-	CachedImage cachedImage;
+	RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
 	int ox, oy;
 	public DynamicInternalImage(RawImage raw, int ox, int oy, ImageWorkspace context) {
 		this.context = context;
-		this.cachedImage = context.getCacheManager().cacheImage(raw, this);
+		this.image = raw;
 		this.ox = ox;
 		this.oy = oy;
 	}
@@ -42,18 +42,22 @@ public class DynamicInternalImage implements IInternalImage {
 	}
 	@Override
 	public IInternalImage dupe() {
-		return new DynamicInternalImage( cachedImage.access().deepCopy(), ox, oy, context);
+		return new DynamicInternalImage( image.deepCopy(), ox, oy, context);
 	}
-	public int getWidth() {return cachedImage.access().getWidth();}
-	public int getHeight() {return cachedImage.access().getHeight();}
+	@Override
+	public IInternalImage copyForSaving() {
+		return new DynamicInternalImage( HybridUtil.copyForSaving(image), ox, oy, context);
+	}
+	public int getWidth() {return image.getWidth();}
+	public int getHeight() {return image.getHeight();}
 	public void flush() {
 		if( !flushed) {
-			cachedImage.relinquish(this);
+			image.flush();
 			flushed = true;
 		}
 	}
 	@Override protected void finalize() throws Throwable {flush();}
-	@Override public RawImage readOnlyAccess() { return cachedImage.access();}
+	@Override public RawImage readOnlyAccess() { return image;}
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
@@ -156,8 +160,8 @@ public class DynamicInternalImage implements IInternalImage {
 			ox = cropped.x-drawAreaInImageSpace.x;
 			oy = cropped.y-drawAreaInImageSpace.y;
 			
-			cachedImage.relinquish(DynamicInternalImage.this);
-			cachedImage = handle.getContext().getCacheManager().cacheImage(nri, DynamicInternalImage.this);
+			image.flush();
+			image = nri;
 			
 			buffer.flush();
 			img.flush();
@@ -167,9 +171,5 @@ public class DynamicInternalImage implements IInternalImage {
 			// Construct ImageChangeEvent and send it
 			handle.refresh();
 		}
-
-
 	}
-
-
 }

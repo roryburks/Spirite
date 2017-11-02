@@ -42,6 +42,12 @@ public class PrismaticInternalImage implements IInternalImage {
 			color = other.color;
 			img = (deepcopy)?other.img.deepCopy():other.img;
 		}
+		public LImg(LImg other, boolean deepcopy, boolean copyForSave_IGNORED) {
+			ox = other.ox;
+			oy = other.oy;
+			color = other.color;
+			img = HybridUtil.copyForSaving(other.img);
+		}
 	}
 	private List<LImg> layers = new ArrayList<>();
 	private RawImage compositionImg;
@@ -132,6 +138,16 @@ public class PrismaticInternalImage implements IInternalImage {
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
 			pii.layers.add(new LImg(img, true));
+		}
+		return pii;
+	}
+	@Override
+	public IInternalImage copyForSaving() {
+		PrismaticInternalImage pii = new PrismaticInternalImage();
+		
+		pii.layers = new ArrayList<>(this.layers.size());
+		for( LImg img : this.layers) {
+			pii.layers.add(new LImg(img, true, true));
 		}
 		return pii;
 	}

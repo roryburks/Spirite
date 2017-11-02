@@ -515,7 +515,12 @@ public class Penner
 				}
 				else {
 					end();
+					HybridHelper.beep();
 				}
+			}
+			else {
+				end();
+				HybridHelper.beep();
 			}
 		}
 		

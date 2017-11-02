@@ -20,6 +20,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.glmath.MatTrans;
@@ -83,42 +84,45 @@ public class HybridNodeRenderer {
 	private ImageHandle compositionHandle = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) throws InvalidImageDimensionsExeption 
 	{
-		ABuiltImageData dataContext= workspace.buildData(workspace.buildActiveData());
+		BuildingImageData dataContext = workspace.buildActiveData();
 		StrokeEngine strokeEngine = workspace.getAcrtiveStrokeEngine();
 		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
 				||  (strokeEngine != null)))
 		{
-			compositionImage= 
-					HybridHelper.createImageNonNillable(dataContext.getWidth(), dataContext.getHeight());
-			compositionHandle = dataContext.handle;
+			dataContext.doOnBuiltData((built) -> {
+				compositionImage= 
+						HybridHelper.createImage(built.getWidth(), built.getHeight());
+				compositionHandle = dataContext.handle;
 
-			GraphicsContext gc = compositionImage.getGraphics();
-			
-			// Draw the Base Image
-			MatTrans drawTrans = dataContext.getCompositeTransform();
-			drawTrans.preTranslate(dataContext.handle.getDynamicX(), 
-					dataContext.handle.getDynamicY());
-			gc.setTransform(drawTrans);
-			
-			dataContext.handle.drawBehindStroke(gc);
-			
-
-			if( workspace.getSelectionEngine().getLiftedImage() != null ){
-				// Draw Lifted Image
-				MatTrans tt = workspace.getSelectionEngine().getDrawFromTransform();
-				tt.preConcatenate(dataContext.getScreenToImageTransform() );
+				GraphicsContext gc = compositionImage.getGraphics();
 				
-				gc.setTransform(tt);
-				gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
-			}
-			if( strokeEngine != null) {
-				// Draw the Stroke
-				gc.setTransform(new MatTrans());
-				strokeEngine.drawStrokeLayer(gc);
-			}
-			
-			gc.setTransform(drawTrans);
-			dataContext.handle.drawInFrontOfStroke(gc);
+				// Draw the Base Image
+				MatTrans drawTrans = built.getCompositeTransform();
+				drawTrans.preTranslate(dataContext.handle.getDynamicX(), 
+						dataContext.handle.getDynamicY());
+				gc.setTransform(drawTrans);
+				
+				dataContext.handle.drawBehindStroke(gc);
+				
+
+				if( workspace.getSelectionEngine().getLiftedImage() != null ){
+					// Draw Lifted Image
+					MatTrans tt = workspace.getSelectionEngine().getDrawFromTransform();
+					tt.preConcatenate(built.getScreenToImageTransform() );
+					
+					gc.setTransform(tt);
+					gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
+				}
+				if( strokeEngine != null) {
+					// Draw the Stroke
+					gc.setTransform(new MatTrans());
+					strokeEngine.drawStrokeLayer(gc);
+				}
+				
+				gc.setTransform(drawTrans);
+				dataContext.handle.drawInFrontOfStroke(gc);
+			});
+
 		}
 	
 	}

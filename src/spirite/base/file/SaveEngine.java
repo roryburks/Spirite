@@ -53,7 +53,9 @@ import spirite.hybrid.MDebug.WarningType;
  * be on the UI thread)
  */
 public class SaveEngine implements MWorkspaceObserver {
-	private final HybridTimer autosaveTimer = new HybridTimer( 10000, new Runnable() {
+	boolean MULTITHREADED = true;
+	
+	Runnable tick = new Runnable() {
 		@Override
 		public void run() {
 			long time = System.currentTimeMillis();
@@ -70,6 +72,13 @@ public class SaveEngine implements MWorkspaceObserver {
 			}
 			
 		}
+	};
+	
+	private final HybridTimer autosaveTimer = new HybridTimer( 10000, () -> {
+		if( MULTITHREADED)
+			(new Thread(tick)).run();
+		else
+			tick.run();
 	});
 	
 	public SaveEngine( MasterControl master) {
@@ -330,7 +339,7 @@ public class SaveEngine implements MWorkspaceObserver {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		for( LogicalImage part : helper.reservedCache) {
 			// (Foreach ImageData)
-			
+			part.Float();			
 
 			// [4] : Image ID
 			helper.ra.writeInt( part.handleID);

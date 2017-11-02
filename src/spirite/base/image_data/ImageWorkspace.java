@@ -385,14 +385,15 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	
 	/** Converts BuildingImageData (which is provided by Layers to describe all
 	 * sub-parts in a partially-built form) into fully-built Image Data	 */
-	public ABuiltImageData buildData( BuildingImageData data) {
-		if( data == null) return null;
-		
-		IInternalImage ii = imageData.get(data.handle.id);
-		if( ii == null) return null;
-		
-		return ii.build(data);
-	}
+	// Retired.  Use doOnBuiltData
+//	public ABuiltImageData buildData( BuildingImageData data) {
+//		if( data == null) return null;
+//		
+//		IInternalImage ii = imageData.get(data.handle.id);
+//		if( ii == null) return null;
+//		
+//		return ii.build(data);
+//	}
 	public void doOnBuiltData( BuildingImageData data, DoOnABID doer) {
 		if( data == null)
 			doer.Do(null);
@@ -400,8 +401,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		IInternalImage ii = imageData.get(data.handle.id);
 		if( ii == null)
 			doer.Do(null);
-		else
-			doer.Do(ii.build(data));
+		else {
+			synchronized(ii) {
+				floatIImage(data.handle);
+				doer.Do(ii.build(data));
+			}
+		}
 	}
 	public interface DoOnABID {
 		public void Do( ABuiltImageData abid);
@@ -1618,9 +1623,20 @@ public class ImageWorkspace implements MWorkspaceObserver {
 
     // =============
     // ==== This section is 
-    public static class LogicalImage {
+    public class LogicalImage {
     	public int handleID;
     	public IInternalImage iimg;
+    	private boolean floating = false;
+    	
+    	public void Float() {
+    		if( !floating) {
+    			synchronized(imageData.get(handleID)) {
+    				iimg = imageData.get(handleID).copyForSaving();
+    			}
+    			floating = true;
+    		}
+    	}
+    	public boolean isFloating() {return floating;}
     }
     
     /**
@@ -1630,20 +1646,54 @@ public class ImageWorkspace implements MWorkspaceObserver {
      * uses of the data (for example File Saving) does not get corrupted while 
      * not leaking access to CachedImages
      */
+    private Map<Integer,List<LogicalImage>> reserveMap = new HashMap<>();
+    
     public List<LogicalImage> reserveCache() {
+
     	List<LogicalImage> handles = new ArrayList<>(imageData.size());
     	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
     		LogicalImage li = new LogicalImage();
     		li.handleID = entry.getKey();
-    		li.iimg = entry.getValue().dupe();
     		handles.add(li);
+    		
+    		List<LogicalImage> reserves = reserveMap.get(entry.getKey());
+    		if( reserves == null) {
+    			reserves = new ArrayList<>(1);
+    			reserveMap.put(entry.getKey(), reserves);
+    		}
+    		
+    		reserves.add(li);
     	}
 
     	return handles;
     }
     
+    /** If a collection of images is reserved for any reason (probably saving), changes
+     * to the image should trigger a float action which will create a deep copy of the
+     * image saving its previous state, otherwise it'll wait until it's needed. */
+    private void floatIImage( ImageHandle handle) {
+    	List<LogicalImage> reserves = reserveMap.get(handle.id);
+    	if( reserves != null)
+    		for( LogicalImage reserve : reserves)
+    			reserve.Float();
+    }
+    
     /** Relinquish a state of  CachedImages as given by reserveCache */
     public void relinquishCache( List<LogicalImage> handles) {
+    	for( LogicalImage toRemove : handles) {
+
+        	Iterator<List<LogicalImage>> it = reserveMap.values().iterator(); 
+        	while( it.hasNext()) {
+        		List<LogicalImage> reserves = it.next();
+        		
+        		reserves.remove(toRemove);
+        		if( reserves.isEmpty())
+        			it.remove();
+        	}
+
+        	if( toRemove.iimg != null)
+        		toRemove.iimg.flush();
+    	}
     	for( LogicalImage limg : handles)
     		limg.iimg.flush();
     }

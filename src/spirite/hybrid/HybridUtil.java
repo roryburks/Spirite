@@ -100,6 +100,13 @@ public class HybridUtil {
 	public static void savePNG( RawImage raw, OutputStream os) throws IOException {
 		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, "png", os);
 	}
+	
+	public static RawImage copyForSaving( RawImage raw) {
+		if( raw instanceof ImageBI)
+			return raw.deepCopy();
+		else 
+			return (ImageBI)HybridUtil.convert(raw, ImageBI.class);
+	}
 
 	public static void saveEXT(RawImage raw, String ext, File f) throws IOException {
 		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, ext, f);

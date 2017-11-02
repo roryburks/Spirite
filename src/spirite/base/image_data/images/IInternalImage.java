@@ -25,6 +25,8 @@ public interface IInternalImage {
 	public int getDynamicY();
 	public ABuiltImageData build( BuildingImageData building);
 	public IInternalImage dupe();
+	public IInternalImage copyForSaving();	// Probably not best to offload this work to individual
+											// internal image types, but it's the least immediate work
 	public void flush();
 	public RawImage readOnlyAccess();
 	public InternalImageTypes getType();

@@ -223,6 +223,7 @@ public class MaglevInternalImage implements IInternalImage {
 		{return new MaglevImageDrawer(this, building);}
 
 	@Override public IInternalImage dupe() {return new MaglevInternalImage(this);}
+	@Override public IInternalImage copyForSaving() {return new MaglevInternalImage(this);}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.MAGLEV;}
 
 	@Override public RawImage readOnlyAccess() {
