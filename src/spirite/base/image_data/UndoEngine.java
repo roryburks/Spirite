@@ -16,8 +16,8 @@ import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.ABuiltImageData;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.InternalImage;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.FlatMedium;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -520,7 +520,7 @@ public class UndoEngine {
 					ImageContext icontext = (ImageContext)context;
 					
 				if( icontext.image.equals(handle)) {
-					ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, new InternalImage(newImage, workspace));
+					ImageContext.ReplaceImageAction action = icontext.new ReplaceImageAction(handle, new FlatMedium(newImage, workspace));
 					return action;
 				}
 			}
@@ -603,7 +603,7 @@ public class UndoEngine {
 		 * action that it's "supposed" to be in hiddenAction and performs
 		 * its logical components (if it has any).*/
 		private class KeyframeAction extends ImageAction {
-			protected IInternalImage _ii;
+			protected IMedium _ii;
 			ImageAction hiddenAction;
 			boolean freed = false;
 			KeyframeAction( ImageAction action) {
@@ -659,10 +659,10 @@ public class UndoEngine {
 		 * entire image has been replaced with another one.
 		 */
 		class ReplaceImageAction extends KeyframeAction {
-			private final IInternalImage previousII;
+			private final IMedium previousII;
 			boolean freed = false;
 			
-			protected ReplaceImageAction(ImageHandle data, IInternalImage previous) {
+			protected ReplaceImageAction(ImageHandle data, IMedium previous) {
 				super( new NilImageAction(data));
 				
 				previousII = previous.dupe();

@@ -17,10 +17,10 @@ import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IWeightEraserModule;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill.StrokeSegment;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
@@ -37,9 +37,9 @@ public class MaglevImageDrawer
 {
 
 	private final BuildingImageData building;
-	private final MaglevInternalImage img;
+	private final MaglevMedium img;
 	
-	public MaglevImageDrawer( MaglevInternalImage img, BuildingImageData building) {
+	public MaglevImageDrawer( MaglevMedium img, BuildingImageData building) {
 		this.img = img;
 		this.building = building;
 	}
@@ -91,7 +91,7 @@ public class MaglevImageDrawer
 			@Override
 			protected void performImageAction(ABuiltImageData built) {
 				ImageWorkspace ws = built.handle.getContext();
-				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(building.handle);
+				MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 				mimg.Build();
 				
 				mimg.addThing(stroke);
@@ -141,7 +141,7 @@ public class MaglevImageDrawer
 			@Override
 			protected void performImageAction(ABuiltImageData built) {
 				ImageWorkspace ws = built.handle.getContext();
-				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(built.handle);
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
 				mimg.Build();
 				
 				mimg.addThing(fill);
@@ -364,7 +364,7 @@ public class MaglevImageDrawer
 		@Override
 		protected void performImageAction(ABuiltImageData built) {
 			ImageWorkspace ws = building.handle.getContext();
-			MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(building.handle);
+			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 			
 			for( MagLevThing toErase : thingsToErase) {
 				mimg.things.remove(toErase);

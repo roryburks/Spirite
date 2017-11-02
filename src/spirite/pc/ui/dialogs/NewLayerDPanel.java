@@ -20,7 +20,7 @@ import javax.swing.border.Border;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.components.MTextFieldNumber;
 

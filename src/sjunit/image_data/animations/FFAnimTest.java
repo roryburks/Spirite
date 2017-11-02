@@ -8,7 +8,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animation_data.FixedFrameAnimation;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.hybrid.HybridHelper;
 
 public class FFAnimTest {

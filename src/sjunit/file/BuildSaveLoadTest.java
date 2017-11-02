@@ -12,6 +12,7 @@ import org.junit.Test;
 import sjunit.TestWrapper;
 import spirite.base.brains.MasterControl;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -19,16 +20,16 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.images.DynamicInternalImage;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
-import spirite.base.image_data.images.maglev.MaglevInternalImage;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
-import spirite.base.image_data.images.InternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage.LImg;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
+import spirite.base.image_data.images.maglev.MaglevMedium;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill.StrokeSegment;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevThing;
+import spirite.base.image_data.images.FlatMedium;
+import spirite.base.image_data.images.PrismaticMedium;
+import spirite.base.image_data.images.PrismaticMedium.LImg;
 import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.layers.Layer;
@@ -234,11 +235,11 @@ public class BuildSaveLoadTest {
 				for( Entry<Integer,Integer> entry: checkedIImgMap.entrySet())
 					assert( !entry.getValue().equals(img2.getID()));
 
-			IInternalImage iimg1 = img1.getContext().getData(img1);
-			IInternalImage iimg2 = img2.getContext().getData(img2);
+			IMedium iimg1 = img1.getContext().getData(img1);
+			IMedium iimg2 = img2.getContext().getData(img2);
 
-			if( iimg1 instanceof InternalImage) {
-				assert( iimg2 instanceof InternalImage);
+			if( iimg1 instanceof FlatMedium) {
+				assert( iimg2 instanceof FlatMedium);
 
 				VerifyRawImages( iimg1.readOnlyAccess(), iimg2.readOnlyAccess());
 			}
@@ -250,11 +251,11 @@ public class BuildSaveLoadTest {
 				
 				VerifyRawImages( iimg1.readOnlyAccess(), iimg2.readOnlyAccess());
 			}
-			else if( iimg1 instanceof PrismaticInternalImage) {
-				assert( iimg2 instanceof PrismaticInternalImage);
+			else if( iimg1 instanceof PrismaticMedium) {
+				assert( iimg2 instanceof PrismaticMedium);
 
-				PrismaticInternalImage pii1 = (PrismaticInternalImage)iimg1;
-				PrismaticInternalImage pii2 = (PrismaticInternalImage)iimg2;
+				PrismaticMedium pii1 = (PrismaticMedium)iimg1;
+				PrismaticMedium pii2 = (PrismaticMedium)iimg2;
 
 				List<LImg> colors1 = pii1.getColorLayers();
 				List<LImg> colors2 = pii2.getColorLayers();
@@ -268,11 +269,11 @@ public class BuildSaveLoadTest {
 					VerifyRawImages(colors1.get(i).img,colors2.get(i).img);
 				}
 			}
-			else if( iimg1 instanceof MaglevInternalImage) {
-				assert( iimg2 instanceof MaglevInternalImage);
+			else if( iimg1 instanceof MaglevMedium) {
+				assert( iimg2 instanceof MaglevMedium);
 
-				MaglevInternalImage mag1 = (MaglevInternalImage)iimg1;
-				MaglevInternalImage mag2 = (MaglevInternalImage)iimg2;
+				MaglevMedium mag1 = (MaglevMedium)iimg1;
+				MaglevMedium mag2 = (MaglevMedium)iimg2;
 
 				List<MagLevThing> things1 = mag1.getThings();
 				List<MagLevThing> things2 = mag2.getThings();
@@ -321,7 +322,7 @@ public class BuildSaveLoadTest {
 				checkedIImgMap.put( img1.getID(), img2.getID());
 		}
 	}
-	private void VerifyRawImages( RawImage raw1, RawImage raw2) {
+	private void VerifyRawImages( IImage raw1, IImage raw2) {
 		assert( raw1.getWidth() == raw2.getWidth());
 		assert( raw1.getHeight() == raw2.getHeight());
 		

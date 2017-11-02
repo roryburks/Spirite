@@ -15,14 +15,14 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage.LImg;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.PrismaticMedium;
+import spirite.base.image_data.images.PrismaticMedium.LImg;
 import spirite.base.util.glmath.Rect;
 
 public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserver, MFlashObserver{
 	private final MasterControl master;
-	private IInternalImage iimg;
+	private IMedium iimg;
 	private boolean yes = false;
 	
 	public IImgPropertiesPanel(MasterControl master) {
@@ -35,8 +35,8 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 	}
 	MouseAdapter mouser = new MouseAdapter() {
 		public void mousePressed(MouseEvent e) {
-			if( iimg instanceof PrismaticInternalImage) {
-				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+			if( iimg instanceof PrismaticMedium) {
+				PrismaticMedium piimg = (PrismaticMedium)iimg;
 				List<LImg> colorLayers = piimg.getColorLayers();
 				
 				int index = getIndexFromPoint(e.getPoint());
@@ -51,8 +51,8 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		}
 		
 		public void mouseDragged(MouseEvent e) {
-			if( draggingFromIndex != -1 && iimg instanceof PrismaticInternalImage) {
-				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+			if( draggingFromIndex != -1 && iimg instanceof PrismaticMedium) {
+				PrismaticMedium piimg = (PrismaticMedium)iimg;
 				List<LImg> colorLayers = piimg.getColorLayers();
 				
 				int index = getIndexFromPoint(e.getPoint());
@@ -68,10 +68,10 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		
 		public void mouseReleased(MouseEvent e) {
 			if( draggingFromIndex != -1 && draggingToIndex != -1 
-					&& draggingFromIndex != draggingToIndex && iimg instanceof PrismaticInternalImage) 
+					&& draggingFromIndex != draggingToIndex && iimg instanceof PrismaticMedium) 
 			{
 
-				PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+				PrismaticMedium piimg = (PrismaticMedium)iimg;
 				piimg.moveLayer( draggingFromIndex,draggingToIndex);
 				master.getCurrentWorkspace().triggerFlash();
 			}
@@ -88,8 +88,8 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if( iimg instanceof PrismaticInternalImage) {
-			PrismaticInternalImage piimg = (PrismaticInternalImage)iimg;
+		if( iimg instanceof PrismaticMedium) {
+			PrismaticMedium piimg = (PrismaticMedium)iimg;
 			List<LImg> colorLayers = piimg.getColorLayers();
 			
 			int dx = 0;

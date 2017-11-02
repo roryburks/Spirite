@@ -45,7 +45,7 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.images.ABuiltImageData;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IInvertModule;

@@ -28,15 +28,15 @@ import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.images.DynamicInternalImage;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
-import spirite.base.image_data.images.InternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage;
-import spirite.base.image_data.images.maglev.MaglevInternalImage;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill.StrokeSegment;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
+import spirite.base.image_data.images.FlatMedium;
+import spirite.base.image_data.images.PrismaticMedium;
+import spirite.base.image_data.images.maglev.MaglevMedium;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill.StrokeSegment;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevThing;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -150,7 +150,7 @@ public class LoadEngine {
 			}
 			
 			helper.workspace = new ImageWorkspace(master);
-			Map<Integer,IInternalImage> imageMap = new HashMap<>();
+			Map<Integer,IMedium> imageMap = new HashMap<>();
 
 			// Load Chunks until you've reached the end
 			parseChunks( helper);
@@ -183,7 +183,7 @@ public class LoadEngine {
 			helper.ra.close();
 			
 			if( helper.version < 2) {
-				for( IInternalImage img : imageMap.values()) {
+				for( IMedium img : imageMap.values()) {
 					if( img.getWidth() > helper.workspace.getWidth()) {
 						helper.workspace.setWidth(img.getWidth());
 					}
@@ -246,11 +246,11 @@ public class LoadEngine {
 	 * Read ImageData Section Data
 	 * [IMGD]
 	 */
-	private Map<Integer, IInternalImage> parseImageDataSection(
+	private Map<Integer, IMedium> parseImageDataSection(
 			LoadHelper helper, int chunkSize) 
 			throws IOException 
 	{
-		Map<Integer,IInternalImage> dataMap = new HashMap<>();
+		Map<Integer,IMedium> dataMap = new HashMap<>();
 		long endPointer = helper.ra.getFilePointer() + chunkSize;
 		int identifier;
 		
@@ -268,7 +268,7 @@ public class LoadEngine {
 				helper.ra.read(buffer);
 				RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 
-				dataMap.put(identifier, new InternalImage(img,helper.workspace));
+				dataMap.put(identifier, new FlatMedium(img,helper.workspace));
 				break;}
 			case DYNAMIC: {
 				int ox = helper.ra.readShort();
@@ -284,9 +284,9 @@ public class LoadEngine {
 			case PRISMATIC: {
 				int colorCount = helper.ra.readShort();
 				
-				List<PrismaticInternalImage.LImg> loadingList = new ArrayList<>(colorCount);
+				List<PrismaticMedium.LImg> loadingList = new ArrayList<>(colorCount);
 				for( int i=0; i<colorCount; ++i) {
-					PrismaticInternalImage.LImg limg = new PrismaticInternalImage.LImg();
+					PrismaticMedium.LImg limg = new PrismaticMedium.LImg();
 
 					limg.color = helper.ra.readInt();
 					limg.ox = helper.ra.readShort();
@@ -300,7 +300,7 @@ public class LoadEngine {
 					loadingList.add(limg);
 				}
 				
-				dataMap.put(identifier, new PrismaticInternalImage(loadingList));				
+				dataMap.put(identifier, new PrismaticMedium(loadingList));				
 				break;}
 			case MAGLEV: {
 				int thingsLeftToRead = helper.ra.readUnsignedShort();
@@ -356,7 +356,7 @@ public class LoadEngine {
 				}
 				
 
-				dataMap.put(identifier, new MaglevInternalImage(helper.workspace, things));	
+				dataMap.put(identifier, new MaglevMedium(helper.workspace, things));	
 				
 				break;}
 			}

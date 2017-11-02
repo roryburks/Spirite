@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.ABuiltImageData;
-import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.IMedium;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -32,7 +33,7 @@ import spirite.hybrid.HybridHelper;
  * as logical vertex data rather than rendered pixel data, allowing them to
  * be scaled/rotated without generation loss	.
  */
-public class MaglevInternalImage implements IInternalImage {
+public class MaglevMedium implements IMedium {
 	//final List<MagLevStroke> strokes;
 	//final List<MagLevFill> fills;
 	final List<MagLevThing> things;
@@ -41,19 +42,19 @@ public class MaglevInternalImage implements IInternalImage {
 	RawImage builtImage = null;
 	private boolean isBuilt = false;
 	
-	public MaglevInternalImage( ImageWorkspace context) {
+	public MaglevMedium( ImageWorkspace context) {
 		this.context = context;
 		this.things =  new ArrayList<>();
 		if( context != null) {
 			// TODO: unflag "isBuilt" when Workspace changes size
 		}
 	}
-	public MaglevInternalImage( ImageWorkspace context, List<MagLevThing> things) {
+	public MaglevMedium( ImageWorkspace context, List<MagLevThing> things) {
 		this.context = context;
 		this.things = new ArrayList<>( things.size());
 		this.things.addAll(things);
 	}
-	private MaglevInternalImage( MaglevInternalImage other) {
+	private MaglevMedium( MaglevMedium other) {
 		this.context = other.context;
 		this.things = new ArrayList<>(other.things.size());
 		
@@ -74,7 +75,7 @@ public class MaglevInternalImage implements IInternalImage {
 	public static abstract class MagLevThing {
 		abstract float[] getPoints();
 		abstract void setPoints(float[] xy);
-		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context );
+		abstract void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context );
 		protected abstract MagLevThing clone();
 	}
 	public static class MagLevStroke extends MagLevThing {
@@ -112,7 +113,7 @@ public class MaglevInternalImage implements IInternalImage {
 		}
 
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context) {
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
 			StrokeEngine _engine = context.context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			_engine.batchDraw(params, states, built, mask);
 		}
@@ -180,7 +181,7 @@ public class MaglevInternalImage implements IInternalImage {
 			return new MagLevFill(this);
 		}
 		@Override
-		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevInternalImage context) {
+		void draw(ABuiltImageData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
 			int totalLen = 0;
 			for( StrokeSegment s : segments)
 				totalLen += Math.abs(s.travel) + 1;
@@ -222,11 +223,11 @@ public class MaglevInternalImage implements IInternalImage {
 	@Override public IImageDrawer getImageDrawer(BuildingImageData building) 
 		{return new MaglevImageDrawer(this, building);}
 
-	@Override public IInternalImage dupe() {return new MaglevInternalImage(this);}
-	@Override public IInternalImage copyForSaving() {return new MaglevInternalImage(this);}
+	@Override public IMedium dupe() {return new MaglevMedium(this);}
+	@Override public IMedium copyForSaving() {return new MaglevMedium(this);}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.MAGLEV;}
 
-	@Override public RawImage readOnlyAccess() {
+	@Override public IImage readOnlyAccess() {
 		Build();
 		return builtImage;
 	}

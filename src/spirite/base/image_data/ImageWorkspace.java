@@ -31,13 +31,13 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.DynamicInternalImage;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
-import spirite.base.image_data.images.InternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
+import spirite.base.image_data.images.FlatMedium;
+import spirite.base.image_data.images.PrismaticMedium;
 import spirite.base.image_data.images.drawer.GroupNodeDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.image_data.images.maglev.MaglevInternalImage;
+import spirite.base.image_data.images.maglev.MaglevMedium;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
 import spirite.base.image_data.layers.ReferenceLayer;
@@ -73,7 +73,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
 	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
 	//	by ImageWorkspace.
-	final Map<Integer,IInternalImage> imageData;
+	final Map<Integer,IMedium> imageData;
 	
 	public boolean isValidHandle(ImageHandle handle) {
 		return ( handle.context == this && imageData.containsKey(handle.id));
@@ -200,10 +200,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	
 	// meh
-	public IInternalImage getData(int i) {
+	public IMedium getData(int i) {
 		return imageData.get(i);
 	}
-	public IInternalImage getData(ImageHandle handle) {
+	public IMedium getData(ImageHandle handle) {
 		return imageData.get(handle.id);
 	}
 
@@ -293,7 +293,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	public List<ImageHandle> getAllImages() {
 		List<ImageHandle> list = new ArrayList<>(imageData.size());
 		
-		for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
+		for( Entry<Integer,IMedium> entry : imageData.entrySet()) {
 			list.add( new ImageHandle( this, entry.getKey()));
 		}
 		
@@ -341,7 +341,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			BuildingImageData bid = layer.getActiveData();
 
 			bid.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
-			IInternalImage iimg = imageData.get(bid.handle.id);
+			IMedium iimg = imageData.get(bid.handle.id);
 			return (iimg == null) ? null : iimg.getImageDrawer(bid);
 		}
 		else if( node instanceof GroupNode) {
@@ -352,11 +352,11 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	public IImageDrawer getDrawerFromBID( BuildingImageData img) {
 		if( img == null) return null;
-		IInternalImage iimg = imageData.get(img.handle.id);
+		IMedium iimg = imageData.get(img.handle.id);
 		return (iimg == null) ? null : iimg.getImageDrawer(img);
 	}
 	public IImageDrawer getDrawerFromHandle( ImageHandle handle) {
-		IInternalImage iimg = imageData.get(handle.id);
+		IMedium iimg = imageData.get(handle.id);
 		return (iimg == null) ? null : iimg.getImageDrawer(new BuildingImageData(handle, 0, 0));
 	}
 	
@@ -398,7 +398,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		if( data == null)
 			doer.Do(null);
 
-		IInternalImage ii = imageData.get(data.handle.id);
+		IMedium ii = imageData.get(data.handle.id);
 		if( ii == null)
 			doer.Do(null);
 		else {
@@ -461,8 +461,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	/** Internal method should not be called by external methods (if so it'd
 	 * 110% screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 */
-	void _replaceIamge( ImageHandle old, IInternalImage img) {
-		IInternalImage oldII = imageData.get(old.id);
+	void _replaceIamge( ImageHandle old, IMedium img) {
+		IMedium oldII = imageData.get(old.id);
 		imageData.put(old.id, img.dupe());
 		oldII.flush();
 		
@@ -611,7 +611,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 */
 	public void importNodeWithData( 
 			Node node, 
-			Map<Integer,IInternalImage> newData)
+			Map<Integer,IMedium> newData)
 	{
 		// Construct a list of all LayerNodes within the context.
 		if( node == null) 
@@ -635,7 +635,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
-		for( Entry<Integer,IInternalImage> entry : newData.entrySet()) {
+		for( Entry<Integer,IMedium> entry : newData.entrySet()) {
 			imageData.put(workingID, entry.getValue());
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
@@ -658,7 +658,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 * then the image will get flushed next time the image data is checked
 	 */
 	public ImageHandle importData( RawImage newImage) {
-		imageData.put( workingID, new InternalImage(newImage, this));
+		imageData.put( workingID, new FlatMedium(newImage, this));
 		
 		return new ImageHandle(this, workingID++);	// Postincriment
 	}
@@ -676,20 +676,20 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name, InternalImageTypes type) {
-		IInternalImage ii = null;
+		IMedium ii = null;
 		
 		switch( type) {
 		case DYNAMIC:
 			ii = new DynamicInternalImage(img, 0, 0, this);
 			break;
 		case PRISMATIC:
-			ii = new PrismaticInternalImage();
+			ii = new PrismaticMedium();
 			break;
 		case NORMAL:
-			ii = new InternalImage(img, this);
+			ii = new FlatMedium(img, this);
 			break;
 		case MAGLEV:
-			ii = new MaglevInternalImage(this);
+			ii = new MaglevMedium(this);
 			break;
 		}
 		
@@ -721,7 +721,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
         gc.setColor( argb);
         gc.fillRect( 0, 0, w, h);
         
-        IInternalImage internal = new DynamicInternalImage(img, 0, 0, this);
+        IMedium internal = new DynamicInternalImage(img, 0, 0, this);
         imageData.put(workingID, internal);
         ImageHandle handle= new ImageHandle(this, workingID++);
         
@@ -812,7 +812,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			Layer dupe = layer.logicalDuplicate();
 			
 			// Duplicate all used Data into a map
-			Map< Integer, IInternalImage> dupeData = new HashMap<>();
+			Map< Integer, IMedium> dupeData = new HashMap<>();
 			for( ImageHandle handle : layer.getImageDependencies()) {
 				if( !dupeData.containsKey(handle.id)) {
 					dupeData.put(handle.id, imageData.get(handle.id).dupe());
@@ -833,7 +833,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 		else if( toDupe instanceof GroupNode) {
 			GroupNode dupeRoot= groupTree.new GroupNode((GroupNode) toDupe, toDupe.name + " copy");
-			Map< Integer, IInternalImage> dupeData = new HashMap<>();
+			Map< Integer, IMedium> dupeData = new HashMap<>();
 
 			// Breadth-first queue for Duping
 			Queue<NodeContext> dupeQueue = new LinkedList<NodeContext>();
@@ -1625,7 +1625,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
     // ==== This section is 
     public class LogicalImage {
     	public int handleID;
-    	public IInternalImage iimg;
+    	public IMedium iimg;
     	private boolean floating = false;
     	
     	public void Float() {
@@ -1651,7 +1651,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
     public List<LogicalImage> reserveCache() {
 
     	List<LogicalImage> handles = new ArrayList<>(imageData.size());
-    	for( Entry<Integer,IInternalImage> entry : imageData.entrySet()) {
+    	for( Entry<Integer,IMedium> entry : imageData.entrySet()) {
     		LogicalImage li = new LogicalImage();
     		li.handleID = entry.getKey();
     		handles.add(li);
@@ -1699,16 +1699,16 @@ public class ImageWorkspace implements MWorkspaceObserver {
     }
     
 	public void cleanup() {
-		for( IInternalImage img : imageData.values())
+		for( IMedium img : imageData.values())
 			img.flush();
 		
 		undoEngine.cleanup();
 	}
-	public ImageHandle getHandleFor(IInternalImage iimg) {
-		Iterator<Entry<Integer,IInternalImage>> it = imageData.entrySet().iterator();
+	public ImageHandle getHandleFor(IMedium iimg) {
+		Iterator<Entry<Integer,IMedium>> it = imageData.entrySet().iterator();
 		
 		while( it.hasNext()) {
-			Entry<Integer,IInternalImage> entry = it.next();
+			Entry<Integer,IMedium> entry = it.next();
 			if( entry.getValue() == iimg)
 				return new ImageHandle(this, entry.getKey());
 		}

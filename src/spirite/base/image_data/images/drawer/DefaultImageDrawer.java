@@ -22,7 +22,7 @@ import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.images.ABuiltImageData;
-import spirite.base.image_data.images.IInternalImage;
+import spirite.base.image_data.images.IMedium;
 // Auto-complete include isn't working so this comment is a marker for easy finding
 import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
@@ -61,9 +61,9 @@ public class DefaultImageDrawer
 				IMagneticFillModule
 {
 	private BuildingImageData building;
-	private final IInternalImage img;
+	private final IMedium img;
 	
-	public DefaultImageDrawer( IInternalImage img, BuildingImageData building) {
+	public DefaultImageDrawer( IMedium img, BuildingImageData building) {
 		this.img = img;
 		this.building = building;
 	}

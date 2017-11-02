@@ -1,5 +1,6 @@
 package spirite.base.image_data.images;
 
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
@@ -18,17 +19,17 @@ import spirite.base.image_data.images.drawer.IImageDrawer;
  * @author Rory Burks
  *
  */
-public interface IInternalImage {
+public interface IMedium {
 	public int getWidth();
 	public int getHeight();
 	public int getDynamicX();
 	public int getDynamicY();
 	public ABuiltImageData build( BuildingImageData building);
-	public IInternalImage dupe();
-	public IInternalImage copyForSaving();	// Probably not best to offload this work to individual
+	public IMedium dupe();
+	public IMedium copyForSaving();	// Probably not best to offload this work to individual
 											// internal image types, but it's the least immediate work
 	public void flush();
-	public RawImage readOnlyAccess();
+	public IImage readOnlyAccess();
 	public InternalImageTypes getType();
 	public IImageDrawer getImageDrawer(BuildingImageData building);
 	

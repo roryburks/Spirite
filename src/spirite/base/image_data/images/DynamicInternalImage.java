@@ -2,6 +2,7 @@ package spirite.base.image_data.images;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
@@ -25,7 +26,7 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
  * the number of pixels pushed to re-draw the Workspace
  * 
  */
-public class DynamicInternalImage implements IInternalImage {
+public class DynamicInternalImage implements IMedium {
 	RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
@@ -41,11 +42,11 @@ public class DynamicInternalImage implements IInternalImage {
 		return new DynamicBuiltImageData(building);
 	}
 	@Override
-	public IInternalImage dupe() {
+	public IMedium dupe() {
 		return new DynamicInternalImage( image.deepCopy(), ox, oy, context);
 	}
 	@Override
-	public IInternalImage copyForSaving() {
+	public IMedium copyForSaving() {
 		return new DynamicInternalImage( HybridUtil.copyForSaving(image), ox, oy, context);
 	}
 	public int getWidth() {return image.getWidth();}
@@ -57,7 +58,7 @@ public class DynamicInternalImage implements IInternalImage {
 		}
 	}
 	@Override protected void finalize() throws Throwable {flush();}
-	@Override public RawImage readOnlyAccess() { return image;}
+	@Override public IImage readOnlyAccess() { return image;}
 	@Override public int getDynamicX() {return ox;}
 	@Override public int getDynamicY() {return oy;}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}

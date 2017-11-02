@@ -29,11 +29,11 @@ import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer
 import spirite.base.image_data.animation_data.RigAnimation;
 import spirite.base.image_data.animation_data.RigAnimation.PartKeyFrame;
 import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer;
-import spirite.base.image_data.images.PrismaticInternalImage;
-import spirite.base.image_data.images.maglev.MaglevInternalImage;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevFill;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevStroke;
-import spirite.base.image_data.images.maglev.MaglevInternalImage.MagLevThing;
+import spirite.base.image_data.images.PrismaticMedium;
+import spirite.base.image_data.images.maglev.MaglevMedium;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevFill;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevStroke;
+import spirite.base.image_data.images.maglev.MaglevMedium.MagLevThing;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -376,13 +376,13 @@ public class SaveEngine implements MWorkspaceObserver {
 				bos.reset();
 				break;}
 			case PRISMATIC:{
-				PrismaticInternalImage pii = (PrismaticInternalImage)part.iimg;
-				List<PrismaticInternalImage.LImg> list = pii.getColorLayers();
+				PrismaticMedium pii = (PrismaticMedium)part.iimg;
+				List<PrismaticMedium.LImg> list = pii.getColorLayers();
 				
 				// [2] : Number of Color Layers
 				helper.ra.writeShort(list.size());
 
-				for( PrismaticInternalImage.LImg limg : list) {
+				for( PrismaticMedium.LImg limg : list) {
 					// [4] : color
 					helper.ra.writeInt(limg.color);
 					// [2, 2] : Dynamic offset X,Y
@@ -398,7 +398,7 @@ public class SaveEngine implements MWorkspaceObserver {
 				}
 				break;}
 			case MAGLEV: {
-				MaglevInternalImage mimg = (MaglevInternalImage)part.iimg;
+				MaglevMedium mimg = (MaglevMedium)part.iimg;
 				
 				List<MagLevThing> things = mimg.getThings();
 				//	[2] : Number of things
@@ -431,7 +431,7 @@ public class SaveEngine implements MWorkspaceObserver {
 						
 						helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
 
-						for( MaglevInternalImage.MagLevFill.StrokeSegment seg : fill.segments) {
+						for( MaglevMedium.MagLevFill.StrokeSegment seg : fill.segments) {
 							helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
 							helper.ra.writeInt( seg.pivot);			// [4] : pivot
 							helper.ra.writeInt( seg.travel);		// [4] : travel

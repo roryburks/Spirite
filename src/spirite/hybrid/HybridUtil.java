@@ -138,7 +138,7 @@ public class HybridUtil {
 		return img;
 	}
 	
-	public static void savePNG( RawImage raw, OutputStream os) throws IOException {
+	public static void savePNG( IImage raw, OutputStream os) throws IOException {
 		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, "png", os);
 	}
 	

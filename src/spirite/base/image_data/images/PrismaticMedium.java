@@ -5,6 +5,7 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;
@@ -25,7 +26,7 @@ import spirite.hybrid.MDebug.ErrorType;
  * PrismaticInternalImages are a type of Internal Image that behave similarly to 
  * Dynamic images, but separate each layer by color.
  */
-public class PrismaticInternalImage implements IInternalImage {
+public class PrismaticMedium implements IMedium {
 	public static class LImg {
 		// NOTE: Setting all of these to public SHOULD be fine so that
 		//	PrismaticInternalImages can easily be externally built and loaded in
@@ -54,8 +55,8 @@ public class PrismaticInternalImage implements IInternalImage {
 	private boolean compIsBuilt = false;
 	private Rect compRect = null;
 	
-	public PrismaticInternalImage() {}
-	public PrismaticInternalImage( List<LImg> toImport) {
+	public PrismaticMedium() {}
+	public PrismaticMedium( List<LImg> toImport) {
 		for( LImg limg : toImport) {
 			layers.add(new LImg(limg, false));
 		}
@@ -132,8 +133,8 @@ public class PrismaticInternalImage implements IInternalImage {
 	}
 
 	@Override
-	public IInternalImage dupe() {
-		PrismaticInternalImage pii = new PrismaticInternalImage();
+	public IMedium dupe() {
+		PrismaticMedium pii = new PrismaticMedium();
 		
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
@@ -142,8 +143,8 @@ public class PrismaticInternalImage implements IInternalImage {
 		return pii;
 	}
 	@Override
-	public IInternalImage copyForSaving() {
-		PrismaticInternalImage pii = new PrismaticInternalImage();
+	public IMedium copyForSaving() {
+		PrismaticMedium pii = new PrismaticMedium();
 		
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
@@ -187,7 +188,7 @@ public class PrismaticInternalImage implements IInternalImage {
 	}
 
 	@Override
-	public RawImage readOnlyAccess() {
+	public IImage readOnlyAccess() {
 		buildComposition();
 		return compositionImg;
 	}

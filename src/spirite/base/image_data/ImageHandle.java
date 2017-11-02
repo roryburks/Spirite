@@ -9,8 +9,8 @@ import spirite.base.graphics.gl.GLImage;
 import spirite.base.graphics.gl.GLParameters;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.DynamicInternalImage;
-import spirite.base.image_data.images.IInternalImage;
-import spirite.base.image_data.images.PrismaticInternalImage;
+import spirite.base.image_data.images.IMedium;
+import spirite.base.image_data.images.PrismaticMedium;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -80,12 +80,12 @@ public class ImageHandle {
 	}
 	public int getDynamicX() {
 		if( context == null) return 0;
-		IInternalImage ii = context.getData(id);
+		IMedium ii = context.getData(id);
 		return ii.getDynamicX();
 	}
 	public int getDynamicY() {
 		if( context == null) return 0;
-		IInternalImage ii = context.getData(id);
+		IMedium ii = context.getData(id);
 		return ii.getDynamicY();
 	}
 	
@@ -106,7 +106,7 @@ public class ImageHandle {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
 		}
-		IInternalImage ii = context.getData(id);
+		IMedium ii = context.getData(id);
 		
 		if( ii == null) return;
 
@@ -129,9 +129,9 @@ public class ImageHandle {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
 		}
-		IInternalImage ii = context.getData(id);
-		if( ii instanceof PrismaticInternalImage) {
-			((PrismaticInternalImage) ii).drawBehind(gc, context.getPaletteManager().getActiveColor(0));
+		IMedium ii = context.getData(id);
+		if( ii instanceof PrismaticMedium) {
+			((PrismaticMedium) ii).drawBehind(gc, context.getPaletteManager().getActiveColor(0));
 		}
 		else 
 			gc.drawHandle(this, 0, 0);
@@ -141,9 +141,9 @@ public class ImageHandle {
 			MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.");
 			return;
 		}
-		IInternalImage ii = context.getData(id);
-		if( ii instanceof PrismaticInternalImage) {
-			((PrismaticInternalImage) ii).drawFront(gc, context.getPaletteManager().getActiveColor(0));
+		IMedium ii = context.getData(id);
+		if( ii instanceof PrismaticMedium) {
+			((PrismaticMedium) ii).drawFront(gc, context.getPaletteManager().getActiveColor(0));
 		}
 	}
 	// !!! END BAD

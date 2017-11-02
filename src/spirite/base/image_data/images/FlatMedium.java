@@ -1,6 +1,7 @@
 package spirite.base.image_data.images;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
@@ -19,12 +20,12 @@ import spirite.hybrid.HybridUtil;
  * Normal Internal Image.  Has a RawImage (cached) that represents its image data
  * and that RawImage is drawn to.
  */
-public class InternalImage implements IInternalImage {
+public class FlatMedium implements IMedium {
 	RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
-	public InternalImage( RawImage raw, ImageWorkspace context) { 
+	public FlatMedium( RawImage raw, ImageWorkspace context) { 
 		this.context = context;
 		this.image = raw;
 	}
@@ -39,8 +40,8 @@ public class InternalImage implements IInternalImage {
 		return new BuiltImageData( building);
 	}
 	
-	@Override public InternalImage dupe() {return new InternalImage(image.deepCopy(), context);}
-	@Override public IInternalImage copyForSaving() {return new InternalImage( HybridUtil.copyForSaving(image), context);}
+	@Override public FlatMedium dupe() {return new FlatMedium(image.deepCopy(), context);}
+	@Override public IMedium copyForSaving() {return new FlatMedium( HybridUtil.copyForSaving(image), context);}
 	public void flush() {
 		if( !flushed) {
 			image.flush();
@@ -52,7 +53,7 @@ public class InternalImage implements IInternalImage {
 		flush();
 	}
 	@Override
-	public RawImage readOnlyAccess() {
+	public IImage readOnlyAccess() {
 		return image;
 	}
 	

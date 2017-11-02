@@ -30,7 +30,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
-import spirite.base.image_data.images.IInternalImage.InternalImageTypes;
+import spirite.base.image_data.images.IMedium.InternalImageTypes;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
