@@ -2,6 +2,8 @@ package spirite.base.graphics.gl;
 
 import java.nio.IntBuffer;
 
+import javax.swing.SwingUtilities;
+
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.RawImage;
@@ -16,7 +18,7 @@ public class GLImage extends RawImage {
 	public GLImage( int width, int height) throws InvalidImageDimensionsExeption {
 		if( width <= 0 || height <= 0)
 			throw new InvalidImageDimensionsExeption("Invalid Image Dimensions");
-		engine.c_img.add(this);
+		engine.glImageLoaded(this);
 		GL2 gl = engine.getGL2();
 		
 		this.width = width;
@@ -35,7 +37,7 @@ public class GLImage extends RawImage {
 	}
 	
 	public GLImage( GLImage toCopy) {
-		engine.c_img.add(this);
+		engine.glImageLoaded(this);
 		GL2 gl = engine.getGL2();
 		this.width = toCopy.width;
 		this.height = toCopy.height;
@@ -55,7 +57,7 @@ public class GLImage extends RawImage {
 	}
 	
 	public GLImage( int texID, int width, int height, boolean glOriented) {
-		engine.c_img.add(this);
+		engine.glImageLoaded(this);
 		this.tex = texID;
 		this.width = width;
 		this.height = height;
@@ -69,12 +71,17 @@ public class GLImage extends RawImage {
 	@Override
 	public void flush() {
 		if( tex != 0) {
-			engine.c_img.remove(this);
-			GL2 gl = engine.getGL2();
-			if( engine.getTarget() == tex)
-				engine.setTarget(0);
-			gl.glDeleteTextures(1, new int[]{tex}, 0);
+			final int toDel = tex;
 			tex = 0;
+			
+			// This is needed to make sure that it happens on the AWT Thread to prevent JOGL-internal deadlocks
+			SwingUtilities.invokeLater( () -> {
+				engine.glImageUnloaded(this);
+				GL2 gl = engine.getGL2();
+				if( engine.getTarget() == toDel)
+					engine.setTarget(0);
+				gl.glDeleteTextures(1, new int[]{toDel}, 0);
+			});
 		}
 	}
 	

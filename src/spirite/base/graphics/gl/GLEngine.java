@@ -2,11 +2,13 @@ package spirite.base.graphics.gl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -710,6 +712,8 @@ public class GLEngine  {
 		PreparedData() {}
 		@Override
 		protected void finalize() throws Throwable {
+			if(!_free)
+				System.out.println("BAD: PreparedData (VBO wrapper) not freed before being finalized.");
 			free();
 			super.finalize();
 		}
@@ -723,7 +727,7 @@ public class GLEngine  {
 				gl.glDeleteVertexArrays(1, vao);
 				gl.glDeleteBuffers(1, positionBufferObject);
 
-				c_data.remove(this);
+				//c_data.remove(this);
 			}
 		}
 		
@@ -775,7 +779,7 @@ public class GLEngine  {
 		
 		pd.lengths = lengths;
 		
-		this.c_data.add(pd);
+		//this.c_data.add(pd);
 		
 		return pd;
 	}
@@ -1057,26 +1061,42 @@ public class GLEngine  {
 	
 	// =========
 	// ==== Resource Tracking
-	final List<GLImage> c_img = new ArrayList<>();
-	final List<PreparedData> c_data = new ArrayList<>();
+	private final List<WeakReference<GLImage>> c_img = new ArrayList<>();
+	
+	void glImageLoaded( GLImage img) {
+		c_img.add(new WeakReference<GLImage>(img));
+		
+		Iterator<WeakReference<GLImage>> it = c_img.iterator();
+		while( it.hasNext()) {
+			if( it.next().get() == null) it.remove();
+		}
+	}
+	
+	void glImageUnloaded( GLImage img) {
+		Iterator<WeakReference<GLImage>> it = c_img.iterator();
+		while( it.hasNext()) {
+			GLImage _img = it.next().get();
+			if( _img == null || _img == img) it.remove();
+		}
+	}
 	
 	public String dispResourcesUsed() {
 		StringBuilder sb = new StringBuilder();
 		DecimalFormat df = new DecimalFormat("#.##");
 		
 		long size = 0;
-		for( GLImage img : c_img) 
-			size += img.getByteSize();
+		for( WeakReference<GLImage> img : c_img)  {
+			if( img.get() != null)
+				size += img.get().getByteSize();
+		}
 		sb.append("Total Texture Size: " + df.format(size / 1048576.0f) + "MB\n");
 
 		sb.append("Textures (" + c_img.size() + ": \n");
-		for( GLImage img : c_img) 
-			sb.append( "["+img.getTexID() +"] : (" + img.getWidth() + "," + img.getHeight() + ")\n");
+		for( WeakReference<GLImage> img : c_img) {
+			if( img.get() != null)
+				sb.append( "["+img.get().getTexID() +"] : (" + img.get().getWidth() + "," + img.get().getHeight() + ")\n");
+		}
 
-		sb.append("VBOs: (" + c_data.size() + "\n");
-		for( PreparedData pd : c_data)
-			sb.append("[" + pd.positionBufferObject.get(0)+","+pd.vao.get(0)+"] \n");
-		
 		return sb.toString();
 	}
 
