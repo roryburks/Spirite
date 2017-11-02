@@ -133,7 +133,7 @@ public class DebugDialog extends JDialog
 			str += df.format(set.getValue().getSize() /(1024.0*1024.0)) + "MB\n";
 		}
 		if(master.getSettingsManager().glMode()) {
-			str +=  "\nGL Resources: ["+df.format(master.getGLCache().getCacheSize()/(1024.0*1024.0))+"MB in cache]\n" + GLEngine.getInstance().dispResourcesUsed();
+//			str +=  "\nGL Resources: ["+df.format(master.getGLCache().getCacheSize()/(1024.0*1024.0))+"MB in cache]\n" + GLEngine.getInstance().dispResourcesUsed();
 		}
 		textResources.setText(str);
 		

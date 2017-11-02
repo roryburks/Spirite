@@ -18,7 +18,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.sources.LayerRenderSource;
 import spirite.base.graphics.renderer.sources.NodeRenderSource;
@@ -113,10 +112,6 @@ public class RenderEngine
 				it.remove();
 			}
 		}
-	}
-
-	public GLCache getGLCache() {
-		return master.getGLCache();
 	}
 	
 	// ===================

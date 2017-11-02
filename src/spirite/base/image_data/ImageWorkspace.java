@@ -19,7 +19,6 @@ import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
-import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -287,7 +286,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	public RenderEngine getRenderEngine() { return renderEngine; }
 	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
 	public CacheManager getCacheManager() { return cacheManager; }
-	GLCache getGLCache() {return master.getGLCache();}
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }

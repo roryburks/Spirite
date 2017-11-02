@@ -21,7 +21,6 @@ import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.gl.GLCache;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
@@ -106,7 +105,6 @@ public class MasterControl
     private final SaveEngine saveEngine;
     private final LoadEngine loadEngine;
     private final Dialogs dialog;
-    private GLCache glcache;
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -168,7 +166,6 @@ public class MasterControl
     public SaveEngine getSaveEngine() { return saveEngine; }
     public LoadEngine getLoadEngine() { return loadEngine; }
     public Dialogs getDialogs() { return dialog; }
-    public GLCache getGLCache() { return glcache;}
     
     
     // ==============
@@ -179,7 +176,6 @@ public class MasterControl
     	try {
     		GLEngine engine = GLEngine.getInstance();
     		JOGLCore.init( (GL2 gl) ->{engine.init(gl);});
-    		glcache = new GLCache(this);
     		
     		// TODO: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
     		SwingUtilities.invokeLater( () -> {frameManager.getWorkPanel().setGL(true);});
@@ -191,7 +187,6 @@ public class MasterControl
     }
     void initAWT() {
 		frameManager.getWorkPanel().setGL(false);
-    	glcache = null;
     }
     
     // =============
