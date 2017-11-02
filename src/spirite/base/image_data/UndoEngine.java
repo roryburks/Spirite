@@ -269,7 +269,7 @@ public class UndoEngine {
 	public void performAndStore( UndoableAction action) {
 		if( action != null) {
 			if( action instanceof ImageAction)
-				prepareContext(((ImageAction) action).builtImage.handle);
+				prepareContext(((ImageAction) action).building.handle);
 			action.performAction();
 			if( isPaused)
 				queuedActions.add(action);
@@ -353,7 +353,7 @@ public class UndoEngine {
 			
 			for( UndoContext test : contexts) {
 				if( test.image == null) continue;
-				if( test.image.equals(iaction.builtImage.handle)) {
+				if( test.image.equals(iaction.building.handle)) {
 					context = test;
 					break;
 				}
@@ -373,7 +373,7 @@ public class UndoEngine {
 		}
 		else {
 			assert( action instanceof ImageAction);
-			contexts.add(new ImageContext( ((ImageAction)action).builtImage.handle));
+			contexts.add(new ImageContext( ((ImageAction)action).building.handle));
 		}
 		
 		met++;
@@ -628,7 +628,7 @@ public class UndoEngine {
 					hiddenAction.onAdd();
 			}
 			@Override
-			public void performImageAction() {
+			public void performImageAction(ABuiltImageData built) {
 				workspace._replaceIamge(image, _ii);
 			}
 
@@ -680,12 +680,12 @@ public class UndoEngine {
 			}
 			@Override
 			public void performNonimageAction() {
-				workspace._replaceIamge(builtImage.handle, _ii.dupe() );
+				workspace._replaceIamge(building.handle, _ii.dupe() );
 			}
 			
 			@Override
 			public void undoAction() {
-				workspace._replaceIamge(builtImage.handle, previousII.dupe());
+				workspace._replaceIamge(building.handle, previousII.dupe());
 			}
 			
 			@Override
@@ -748,10 +748,11 @@ public class UndoEngine {
 			}
 						
 			// Refresh the Image to the current most recent keyframe
-			actions.get(pointer-met).performImageAction();
+			actions.get(pointer-met).building.doOnBuiltData((built)-> {actions.get(pointer-met).performImageAction(built);});
 
 			for( int i = pointer - met+1; i <= pointer; ++i) {
-				actions.get(i).performImageAction();
+				int index = i;
+				actions.get(index).building.doOnBuiltData((built)-> {actions.get(index).performImageAction(built);});
 			}
 
 			// Construct ImageChangeEvent and send it
@@ -1145,18 +1146,18 @@ public class UndoEngine {
 	 * sequentially as normal, but also has a performImageAction which writes
 	 * to the imageData (additively from the last keyframe). */
 	public static abstract class ImageAction extends UndoableAction {
-		protected final BuildingImageData builtImage;
+		protected final BuildingImageData building;
 		protected ImageAction( BuildingImageData data) {
-			this.builtImage = data;
+			this.building = data;
 		}
 		@Override protected final void performAction() 
 		{
 			performNonimageAction();
-			performImageAction();
+			building.doOnBuiltData((built) -> {performImageAction(built);});
 		}
 		@Override protected void undoAction() {}
 		protected void performNonimageAction() {}
-		protected abstract void performImageAction( );
+		protected abstract void performImageAction(ABuiltImageData built );
 		protected boolean isHeavyAction() {return false;}
 	}
 	
@@ -1165,7 +1166,7 @@ public class UndoEngine {
 		protected NilImageAction(ImageHandle data) {
 			super( new BuildingImageData(data, 0, 0));
 		}
-		@Override		protected void performImageAction() {}
+		@Override		protected void performImageAction(ABuiltImageData built) {}
 		
 	}
 	
@@ -1232,7 +1233,7 @@ public class UndoEngine {
 				if( action instanceof NullAction)
 					this.contexts[i] = UndoEngine.this.contexts.get(0);
 				else if( action instanceof ImageAction) {
-					this.contexts[i] = contextOf( ((ImageAction)action).builtImage.handle);
+					this.contexts[i] = contextOf( ((ImageAction)action).building.handle);
 				}
 			}
 		}
@@ -1337,11 +1338,10 @@ public class UndoEngine {
 			stored.relinquish(this);
 		}
 		@Override
-		protected void performImageAction() {
-			ABuiltImageData ibid = builtImage.handle.context.buildData(builtImage);
-			GraphicsContext gc = ibid.checkout();
+		protected void performImageAction(ABuiltImageData built) {
+			GraphicsContext gc = built.checkout();
 			gc.drawImage(stored.access(), 0, 0);
-			ibid.checkin();
+			built.checkin();
 		}
 	}
 	

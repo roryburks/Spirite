@@ -11,6 +11,7 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.image_data.images.drawer.IImageDrawer;
 import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
@@ -88,15 +89,15 @@ public class MaglevImageDrawer
 		img.addThing(stroke);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
-			protected void performImageAction() {
-				ImageWorkspace ws = builtImage.handle.getContext();
-				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
+			protected void performImageAction(ABuiltImageData built) {
+				ImageWorkspace ws = built.handle.getContext();
+				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(building.handle);
 				mimg.Build();
 				
 				mimg.addThing(stroke);
 
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				stroke.draw(mimg.build(new BuildingImageData(builtImage.handle, 0, 0)), null, gc, mimg);
+				stroke.draw(mimg.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
 			}
 			@Override
 			public String getDescription() {
@@ -138,15 +139,15 @@ public class MaglevImageDrawer
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
-			protected void performImageAction() {
-				ImageWorkspace ws = builtImage.handle.getContext();
-				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
+			protected void performImageAction(ABuiltImageData built) {
+				ImageWorkspace ws = built.handle.getContext();
+				MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(built.handle);
 				mimg.Build();
 				
 				mimg.addThing(fill);
 				
 				GraphicsContext gc = mimg.builtImage.getGraphics();
-				fill.draw(mimg.build(new BuildingImageData(builtImage.handle, 0, 0)), null, gc, mimg);
+				fill.draw(mimg.build(new BuildingImageData(building.handle, 0, 0)), null, gc, mimg);
 				
 			}
 			@Override
@@ -361,15 +362,15 @@ public class MaglevImageDrawer
 		}
 
 		@Override
-		protected void performImageAction() {
-			ImageWorkspace ws = builtImage.handle.getContext();
-			MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(builtImage.handle);
+		protected void performImageAction(ABuiltImageData built) {
+			ImageWorkspace ws = building.handle.getContext();
+			MaglevInternalImage mimg = (MaglevInternalImage)ws.getData(building.handle);
 			
 			for( MagLevThing toErase : thingsToErase) {
 				mimg.things.remove(toErase);
 			}
 			mimg.unbuild();
-			builtImage.handle.refresh();
+			building.handle.refresh();
 		}
 		@Override
 		public String getDescription() {

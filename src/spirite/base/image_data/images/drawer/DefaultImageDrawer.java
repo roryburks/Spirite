@@ -114,10 +114,9 @@ public class DefaultImageDrawer
 
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
-			protected void performImageAction() {
+			protected void performImageAction(ABuiltImageData built) {
 				RawImage img;
 				Vec2i layerSpace;
-				ABuiltImageData built = workspace.buildData(builtImage);
 				if( mask.selection == null) {
 					img = built.checkoutRaw();
 					layerSpace = built.convert( new Vec2i(p.x, p.y));
@@ -193,8 +192,7 @@ public class DefaultImageDrawer
 		BuiltSelection sel = pollSelectionMask(workspace);
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction() {
-				ABuiltImageData built = workspace.buildData(builtImage);
+			protected void performImageAction(ABuiltImageData built) {
 				if( mask.selection == null) {
 					built.checkout().clear();
 					built.checkin();
@@ -263,8 +261,7 @@ public class DefaultImageDrawer
 		}
 
 		@Override
-		protected void performImageAction() {
-			ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+		protected void performImageAction(ABuiltImageData built) {
 			
 			if( mask != null && mask.selection != null) {
 				
@@ -369,8 +366,7 @@ public class DefaultImageDrawer
 		}
 
 		@Override
-		protected void performImageAction() {
-			ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+		protected void performImageAction(ABuiltImageData built) {
 			if( mask != null && mask.selection != null) {
 				// Lift the Selection
 				RawImage lifted = mask.liftSelectionFromData(built);
@@ -411,7 +407,7 @@ public class DefaultImageDrawer
 		}
 		@Override
 		void applyFilter(RawImage image) {
-			GraphicsDrawer directDrawer = builtImage.handle.getContext().getSettingsManager().getDefaultDrawer();
+			GraphicsDrawer directDrawer = building.handle.getContext().getSettingsManager().getDefaultDrawer();
 			directDrawer.changeColor(image, from, to, mode);
 		}
 	}
@@ -426,7 +422,7 @@ public class DefaultImageDrawer
 		
 		undoEngine.performAndStore( new PerformFilterAction(building, mask) {
 			@Override void applyFilter(RawImage image) {
-				GraphicsDrawer directDrawer = builtImage.handle.getContext().getSettingsManager().getDefaultDrawer();
+				GraphicsDrawer directDrawer = building.handle.getContext().getSettingsManager().getDefaultDrawer();
 				directDrawer.invert(image);
 			}
 		});
@@ -443,8 +439,7 @@ public class DefaultImageDrawer
 
 		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
-			protected void performImageAction() {
-				ABuiltImageData built = workspace.buildData(builtImage);
+			protected void performImageAction(ABuiltImageData built) {
 				RawImage img = built.checkoutRaw();
 				RawImage img2 = img.deepCopy();
 				GraphicsContext gc = img.getGraphics();
@@ -548,10 +543,9 @@ public class DefaultImageDrawer
 		}
 		
 		@Override
-		public void performImageAction( ) {
+		public void performImageAction(ABuiltImageData built ) {
 			queueSelectionMask(mask);
 			
-			ABuiltImageData built = building.handle.getContext().buildData(builtImage);
 			engine.batchDraw(params, points, built, mask);
 		}
 	}
@@ -574,8 +568,7 @@ public class DefaultImageDrawer
 		final float[] fill_y = fy.toArray();
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction() {
-				ABuiltImageData built = builtImage.handle.getContext().buildData(builtImage);
+			protected void performImageAction(ABuiltImageData built) {
 				
 				GraphicsContext gc = built.checkout();
 				gc.setColor(color);

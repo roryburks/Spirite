@@ -499,8 +499,7 @@ public class SelectionEngine {
 		}
 
 		@Override
-		protected void performImageAction() {
-			ABuiltImageData built = workspace.buildData(builtImage);
+		protected void performImageAction(ABuiltImageData built) {
 			GraphicsContext gc = built.checkout();
 			
 			gc.setComposite( Composite.DST_OUT, 1.0f);
@@ -525,8 +524,7 @@ public class SelectionEngine {
 			this.builtSelection = builtSelection;
 		}
 		@Override
-		protected void performImageAction() {
-			ABuiltImageData built = workspace.buildData(builtImage);
+		protected void performImageAction(ABuiltImageData built) {
 			GraphicsContext gc = built.checkout();
 			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
 			built.checkin();
