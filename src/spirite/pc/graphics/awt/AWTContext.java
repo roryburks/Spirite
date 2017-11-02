@@ -11,6 +11,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLImage;
@@ -186,7 +187,7 @@ public class AWTContext extends GraphicsContext{
 		}
 	}
 	
-	@Override public void drawImage(RawImage img, int x, int y) {
+	@Override public void drawImage(IImage img, int x, int y) {
 		if( img instanceof ImageBI)
 			g2.drawImage( ((ImageBI)img).img,  x,  y, null);
 		else if( img instanceof GLImage) {
@@ -235,12 +236,12 @@ public class AWTContext extends GraphicsContext{
 	}
 
 	@Override
-	public void renderImage(RawImage rawImage, int x, int y, RenderProperties render) {
+	public void renderImage(IImage image, int x, int y, RenderProperties render) {
 		float cc = getAlpha();
 		
 		if( render.getAlpha() != 1.0f) 
 			setComposite(Composite.SRC_OVER, render.getAlpha() * cc);
-		drawImage( rawImage, x, y);
+		drawImage( image, x, y);
 		setComposite( Composite.SRC_OVER, cc);
 	}
 

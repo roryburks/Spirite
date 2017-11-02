@@ -9,7 +9,7 @@ import com.jogamp.opengl.GL2;
 import spirite.base.graphics.RawImage;
 import spirite.base.util.glmath.GLC;
 
-public class GLImage extends RawImage {
+public class GLImage implements RawImage {
 	private static final GLEngine engine = GLEngine.getInstance();
 	private final int width, height;
 	int tex;

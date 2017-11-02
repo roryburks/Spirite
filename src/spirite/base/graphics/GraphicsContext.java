@@ -91,7 +91,7 @@ public abstract class GraphicsContext {
 	public abstract void fillOval( int x, int y, int w, int h);
 
 
-	public abstract void drawImage( RawImage img, int x, int y);
+	public abstract void drawImage( IImage img, int x, int y);
 	public abstract void drawHandle( ImageHandle handle, int x, int y);
 
 	public abstract void fillPolygon(int[] x, int[] y, int count);
@@ -106,7 +106,7 @@ public abstract class GraphicsContext {
 	public abstract void dispose();
 
 
-	public abstract void renderImage(RawImage rawImage, int x, int y, RenderProperties render);
+	public abstract void renderImage(IImage rawImage, int x, int y, RenderProperties render);
 	public abstract void renderHandle( ImageHandle handle, int x, int y, RenderProperties render);
 
 

@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
@@ -45,6 +46,46 @@ public class HybridUtil {
 	 * @see HybridHelper.loadImageIntoGL
 	 * */
 	public static RawImage convert( RawImage from, Class<? extends RawImage> to) {
+		if( from.getClass() == to)
+			return from;
+		
+		if( to == GLImage.class) {
+			GL2 gl = JOGLCore.getGL2();
+			
+			int result[] = new int[1];
+			gl.glGenTextures(1, result, 0);
+			int tex = result[0];
+	        gl.glBindTexture( GLC.GL_TEXTURE_2D, tex);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MIN_FILTER,GLC.GL_NEAREST);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_MAG_FILTER,GLC.GL_NEAREST);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
+	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
+	        HybridHelper.loadImageIntoGL( from, gl);
+	        return new GLImage( tex, from.getWidth(), from.getHeight(), false);
+		}
+		if( to == ImageBI.class) {
+			if( from.getClass() == GLImage.class) {
+				return new ImageBI(PCUtil.glToBI((GLImage)from));
+			}
+		}
+		
+		MDebug.handleWarning(WarningType.UNSUPPORTED, null, "Unsupported Conversion (in HybridUtil).\nFrom:"+from.getClass() +"\nTo:" +to);
+		
+		return null;
+	}
+	
+	/**
+	 * Converts a RawImage from one type to another.  If it already is that type
+	 * of RawImage, returns it unchanged.
+	 * <br><br>
+	 * Supported Conversions:
+	 *  <li>ImageBI -> GLImage
+	 * 	<li>GLImage -> ImageBI
+	 * @param from Image to Convert
+	 * @param to Class to convert it to
+	 * @see HybridHelper.loadImageIntoGL
+	 * */
+	public static IImage convert( IImage from, Class<? extends RawImage> to) {
 		if( from.getClass() == to)
 			return from;
 		
@@ -132,7 +173,7 @@ public class HybridUtil {
 	 * 		to the a supported format
 	 * 
 	 */
-	public static Rect findContentBounds( RawImage raw, int buffer, boolean transparentOnly) 
+	public static Rect findContentBounds( IImage raw, int buffer, boolean transparentOnly) 
 			throws UnsupportedImageTypeException 
 	{
 		_ImageCropHelper data;

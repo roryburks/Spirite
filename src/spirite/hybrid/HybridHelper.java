@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine;
@@ -158,7 +159,7 @@ public class HybridHelper {
 
 	// =========
 	// === GL
-	public static void loadImageIntoGL(RawImage image, GL2 gl) {
+	public static void loadImageIntoGL(IImage image, GL2 gl) {
 		if( image instanceof ImageBI) {
 			_loadBI( ((ImageBI) image).img, gl);
 		}

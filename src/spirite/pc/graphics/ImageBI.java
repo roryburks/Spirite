@@ -7,7 +7,7 @@ import spirite.base.graphics.RawImage;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.awt.AWTContext;
 
-public class ImageBI extends RawImage {
+public class ImageBI implements RawImage {
 	public final BufferedImage img;
 
 	public ImageBI( BufferedImage bi) {

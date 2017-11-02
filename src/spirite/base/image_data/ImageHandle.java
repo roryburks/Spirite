@@ -2,6 +2,7 @@ package spirite.base.image_data;
 
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLImage;
@@ -64,7 +65,7 @@ public class ImageHandle {
 	 * will not trigger proper Observers.  And probably other bad stuff 
 	 * will happen if it sticks around in GC
 	 *  */
-	public RawImage deepAccess() {
+	public IImage deepAccess() {
 		// TODO: BAD
 		if( context == null) return null;
 		return context.getData(id).readOnlyAccess();

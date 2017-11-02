@@ -5,6 +5,7 @@ import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
@@ -166,7 +167,7 @@ public class MUtil {
 	
 	// :::: Image-related
 	
-	public static boolean coordInImage( int x, int y, RawImage image) {
+	public static boolean coordInImage( int x, int y, IImage image) {
 		if( image == null) return false;
 		
 		if( x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight()) 

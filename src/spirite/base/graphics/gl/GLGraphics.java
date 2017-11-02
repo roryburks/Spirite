@@ -6,6 +6,7 @@ import java.awt.geom.Ellipse2D;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
@@ -320,7 +321,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	
 	@Override
-	public void drawImage( RawImage img, int x, int y) {
+	public void drawImage( IImage img, int x, int y) {
 		GLParameters params = getImgParams();
 		params.texture = (GLImage)HybridUtil.convert(img, GLImage.class);
 
@@ -433,7 +434,7 @@ public class GLGraphics extends GraphicsContext{
 	// ========
 	// ==== Rendering
 	@Override
-	public void renderImage(RawImage rawImage, int x, int y, RenderProperties render) {
+	public void renderImage(IImage rawImage, int x, int y, RenderProperties render) {
 		_renderImage( (GLImage)HybridUtil.convert(rawImage, GLImage.class), x, y, render);
 	}
 	@Override

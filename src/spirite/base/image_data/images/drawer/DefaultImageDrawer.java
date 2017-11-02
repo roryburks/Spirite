@@ -11,6 +11,7 @@ import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -602,7 +603,7 @@ public class DefaultImageDrawer
 		Vec2 start = building.trans.transform(new Vec2(x,y), new Vec2());
 		int sx= Math.round(start.x);
 		int sy = Math.round(start.y);
-		RawImage img = building.handle.deepAccess();
+		IImage img = building.handle.deepAccess();
 		
 		if( tryPixel( sx, sy, img, lockedColor, locked))
 			return;
@@ -624,7 +625,7 @@ public class DefaultImageDrawer
 			}
 		}
 	}
-	private boolean tryPixel( int x, int y, RawImage raw, int lockedColor, boolean locked) {
+	private boolean tryPixel( int x, int y, IImage raw, int lockedColor, boolean locked) {
 		if( x == fx.get( fx.size()-1) && y == fy.get(fy.size()))
 			return false;
 		int c = raw.getRGB(x, y);
