@@ -85,7 +85,7 @@ public class LoadEngine {
 			ImageWorkspace ws = master.getLoadEngine().loadWorkspace( f);
 			ws.fileSaved(f);
 			master.addWorkpace( ws, true);
-			master.getSaveEngine().triggerAutosave(ws, 5*60, 10);	// Autosave every 5 minutes
+			master.getSaveEngine().triggerAutosave(ws, 5, 1);	// Autosave every 5 minutes
 			master.getSettingsManager().setWorkspaceFilePath(f);
 			return;
 		} catch (BadSIFFFileException e) {}

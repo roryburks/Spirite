@@ -147,13 +147,13 @@ public class SettingsManager {
     public int getDefaultWidth() {return 640;}
     public int getDefaultHeight() { return 480;}
 
-    public boolean getBoolSetting( String setting) {
+    public boolean getBoolSetting( String setting, boolean defaultValue) {
         switch( setting) {
             case "promptOnGroupCrop":
                 return true;
             default:
-                MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Setting String Requested: " + setting);
-                return false;
+                //MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Setting String Requested: " + setting);
+                return defaultValue;
         }
     }
 

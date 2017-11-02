@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -47,17 +49,18 @@ import spirite.hybrid.MDebug.WarningType;
 /***
  * SaveEngine is a static container for methods which saves images to
  * various file formats (but particularly the native SIF format)
- * 
- * TODO: Figure out a stable way to multi-thread backups (one thing is for sure
- * the conversion from BufferedImage to PNG through ImageIO should not
- * be on the UI thread)
  */
 public class SaveEngine implements MWorkspaceObserver {
-	boolean MULTITHREADED = true;
+	private final MasterControl master;
+	boolean MULTITHREADED = false;
 	
-	Runnable tick = new Runnable() {
-		@Override
-		public void run() {
+	private final HybridTimer autosaveTimer;
+	
+	public SaveEngine( MasterControl master) {
+		this.master = master;
+		
+		final Runnable tick = () -> {
+			master.getFrameManager().getWorkPanel().setMessage("Saving File...");
 			long time = System.currentTimeMillis();
 			for( AutoSaveWatcher watcher : watchers) {
 				if( watcher.workspace.getFile() != null &&
@@ -65,23 +68,22 @@ public class SaveEngine implements MWorkspaceObserver {
 					watcher.undoCount < watcher.workspace.getUndoEngine().getMetronome() - watcher.lastUndoSpot) 
 				{
 					watcher.lastTime = time;
-					saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false);
+					if(!saveWorkspace( watcher.workspace, new File(  watcher.workspace.getFile().getAbsolutePath() + "~"), false))
+						JOptionPane.showMessageDialog(null, "Failed to autosave");
 					watcher.lastTime = time;
 					watcher.lastUndoSpot= watcher.workspace.getUndoEngine().getMetronome();
 				}
 			}
-			
-		}
-	};
-	
-	private final HybridTimer autosaveTimer = new HybridTimer( 10000, () -> {
-		if( MULTITHREADED)
-			(new Thread(tick)).run();
-		else
-			tick.run();
-	});
-	
-	public SaveEngine( MasterControl master) {
+			master.getFrameManager().getWorkPanel().setMessage("");
+		};
+		
+		autosaveTimer = new HybridTimer( 10000, () -> {
+			if( MULTITHREADED) {
+				(new Thread(tick)).run();
+			}
+			else
+				tick.run();
+		});
 		autosaveTimer.start();
 		
 		master.addWorkspaceObserver(this);
@@ -143,25 +145,27 @@ public class SaveEngine implements MWorkspaceObserver {
 	}
 	
 	public void removeAutosaved( ImageWorkspace workspace) {
-/*		TODO: Reimplement when things are more stable
- * 		File f = workspace.getFile();
-		if( f != null) {
-			 f= new File(workspace.getFile().getAbsolutePath() + "~");
-			 if( f.exists()) {
-				 f.delete();
-			 }
-		}*/
+		if( master.getSettingsManager().getBoolSetting("removeAutoSaves", false)) {
+			File f = workspace.getFile();
+			if( f != null) {
+				 f= new File(workspace.getFile().getAbsolutePath() + "~");
+				 if( f.exists()) {
+					 f.delete();
+				 }
+			}
+		}
 	}
 	
 
 	/** Attempts to save the workspace to a SIF (native image format) file. */
-	public void saveWorkspace( ImageWorkspace workspace, File file) {
-		saveWorkspace( workspace, file, true);
+	public boolean saveWorkspace( ImageWorkspace workspace, File file) {
+		return saveWorkspace( workspace, file, true);
 	}
-	public void saveWorkspace( ImageWorkspace workspace, File file, boolean track) {
+	public boolean saveWorkspace( ImageWorkspace workspace, File file, boolean track) {
 		lockCount++;
 		SaveHelper helper = new SaveHelper(workspace);
 		workspace.getAnimationManager().purge();
+		boolean good=  true;
 
 		try {
 			if( file.exists()) {
@@ -192,7 +196,8 @@ public class SaveEngine implements MWorkspaceObserver {
 				workspace.fileSaved(file);
 		}catch (UnsupportedEncodingException e) {
 			MDebug.handleError(ErrorType.FILE, null, "UTF-8 Format Unsupported (somehow).");
-		}catch( IOException e) {}
+			good = false;
+		}catch( IOException e) {good = false;}
 		finally {
 			try {
 				if( helper.ra != null)
@@ -201,6 +206,7 @@ public class SaveEngine implements MWorkspaceObserver {
 			lockCount--;
 		}
 		workspace.relinquishCache(helper.reservedCache);
+		return good;
 	}
 	
 	/** Saves the GRPT chunk containing the Group Tree data */

@@ -258,6 +258,9 @@ public class WorkPanel extends javax.swing.JPanel
     			coordinateLabel.setText("");
     	}
     }
+    public void setMessage( String message) {
+    	messageLabel.setText(message);
+    }
     
     
 
@@ -353,6 +356,7 @@ public class WorkPanel extends javax.swing.JPanel
         
         
         coordinateLabel = new JLabel();
+        messageLabel = new JLabel();
         zoomPanel = new JPanel() {
         	@Override
         	protected void paintComponent(Graphics g) {
@@ -394,7 +398,12 @@ public class WorkPanel extends javax.swing.JPanel
                  // !!!!
                 )
             )
-            .addComponent(coordinateLabel)
+            .addGroup(layout.createSequentialGroup()
+            	// Bottom Bar
+                .addComponent(coordinateLabel)
+                .addGap(0, 3, Short.MAX_VALUE)
+                .addComponent(messageLabel)
+            )
         );
         layout.setVerticalGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -404,11 +413,17 @@ public class WorkPanel extends javax.swing.JPanel
                 .addComponent(jscrollHorizontal)
                 .addComponent(zoomPanel, 0, 0, jscrollHorizontal.getPreferredSize().height)
             )
-            .addComponent(coordinateLabel, 24,24,24)
+            .addGroup(layout.createParallelGroup()
+            	// Bottom Bar
+                .addComponent(coordinateLabel, 24,24,24)
+                .addComponent(messageLabel, 24,24,24)
+            )
+            
         );
     }
-    
+
     private JLabel coordinateLabel;
+    private JLabel messageLabel;
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
     

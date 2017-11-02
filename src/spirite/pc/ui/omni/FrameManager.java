@@ -226,6 +226,10 @@ public class FrameManager
 		WorkTabPane wsPane = root.getWTPane();
 		return wsPane.getZoomerForWorkspace(ws);
 	}
+//	public void setBottomBarMessage(String s) {
+//		root.getWTPane().set
+//	}
+	
 	public Penner getPenner() {
 
 		if( root == null) return null;

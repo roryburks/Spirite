@@ -489,7 +489,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		
 
 		if( nodeToCrop instanceof GroupNode 
-			&& settingsManager.getBoolSetting("promptOnGroupCrop")) {
+			&& settingsManager.getBoolSetting("promptOnGroupCrop", true)) {
 			if(!HybridHelper.showConfirm("Cropping Group", "Crop all Layers within the group?"))
 				return;
 		}
