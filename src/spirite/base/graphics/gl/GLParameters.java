@@ -23,8 +23,8 @@ import spirite.base.util.glmath.Rect;
  */
 public class GLParameters {
 	final List<GLParam> params = new ArrayList<>();
-	public GLTexture texture;
-	public GLTexture texture2;
+	public GLImage texture;
+	public GLImage texture2;
 	public int width, height;
 	public boolean flip = false;
 	public Rect clipRect;
@@ -119,58 +119,6 @@ public class GLParameters {
 		bm_dfa= dst_factor_alpha;
 		bm_fa = formula_alpha;
 		
-	}
-	
-	// ==============
-	// ==== Textures
-	
-	/** A class storing things that can be transferred into  */
-	public abstract static class GLTexture {
-		public abstract int load();
-		public abstract void unload();
-		public abstract int getWidth();
-		public abstract int getHeight();
-		public abstract boolean isGLOriented();
-	}
-	
-	
-	public static class GLImageTexture extends GLTexture {
-		private GLImage texture;
-		private final RawImage image;
-		
-		public GLImageTexture( RawImage image) {
-			this.image = image;
-		}
-
-		@Override
-		public int load(){
-			if( image instanceof GLImage) {
-				return ((GLImage) image).getTexID();
-			}
-			else {
-				texture = GLEngine.getInstance().prepareTexture(image);
-	
-				return texture.getTexID();
-			}
-		}
-		@Override
-		public void unload(){
-			//if( texture != null)
-			//	texture.flush();
-			texture = null;
-		}
-
-		@Override public int getWidth() {
-			return (image == null)?0:image.getWidth();
-		}
-		@Override public int getHeight() {
-			return (image == null)?0:image.getHeight();
-		}
-
-		@Override
-		public boolean isGLOriented() {
-			return image.isGLOriented();
-		}
 	}
 	
 	// ==============

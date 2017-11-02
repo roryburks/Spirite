@@ -60,7 +60,7 @@ public class HybridUtil {
 	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
 	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
 	        HybridHelper.loadImageIntoGL( from, gl);
-	        return new GLImage( tex, from.getWidth(), from.getHeight());
+	        return new GLImage( tex, from.getWidth(), from.getHeight(), false);
 		}
 		if( to == ImageBI.class) {
 			if( from.getClass() == GLImage.class) {

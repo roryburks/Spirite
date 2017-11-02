@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -56,62 +55,6 @@ public class GLCache implements MImageObserver {
 		return glEngine;
 	}
 	
-	private CachedTexture accessCache( ImageHandle handle) {
-		CachedTexture ctex = cache.get(handle);
-		if( ctex == null) {
-			ctex = new CachedTexture(
-					getEngine().prepareTexture( handle.deepAccess()));
-			
-			cacheSize += ctex.tex.getByteSize();
-			
-			if( cacheSize > MAX_CACHE) {
-				ArrayList<Entry<ImageHandle,CachedTexture>> list = new ArrayList<>(cache.entrySet());
-				list.sort( new Comparator<Entry<ImageHandle,CachedTexture>>() {
-					@Override public int compare(Entry<ImageHandle,CachedTexture> o1, Entry<ImageHandle,CachedTexture> o2) {
-						return (int) (o1.getValue().lastUsed-o2.getValue().lastUsed);
-					}
-				});
-				for(Entry<ImageHandle,CachedTexture> entry : list) {
-					MDebug.log("GL Cache Overflow");
-					if( cacheSize < MAX_CACHE) break;
-					voidOutHandle(entry.getKey());
-				}
-			}
-			
-			cache.put(handle, ctex);
-		}
-		ctex.lastUsed = System.currentTimeMillis();
-		return ctex;
-	}
-
-	public class GLHandleTexture extends GLTexture {
-		private final ImageHandle handle;
-		CachedTexture ctex;
-		
-		public GLHandleTexture( ImageHandle handle) {
-			this.handle = handle;
-		}
-
-		@Override
-		public int load() {
-			ctex = accessCache(handle);
-			ctex.locked = true;
-			return ctex.tex.getTexID();
-		}
-
-		@Override
-		public void unload() {
-			ctex.locked = false;
-			ctex = null;
-		}
-		@Override public int getWidth() { return handle.deepAccess().getWidth();}
-		@Override public int getHeight() { return handle.deepAccess().getHeight(); }
-
-		@Override
-		public boolean isGLOriented() {
-			return false;
-		}
-	}
 
 	@Override
 	public void imageChanged(ImageChangeEvent evt) {

@@ -614,13 +614,13 @@ public class GLEngine  {
         if( params.texture != null) {
         	gl.glActiveTexture(GLC.GL_TEXTURE0);
 
-            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture.load());
+            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture.tex);
     		gl.glEnable(GLC.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture"), 0);
         }
         if( params.texture2 != null) {
         	gl.glActiveTexture(GLC.GL_TEXTURE1);
-            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture2.load());
+            gl.glBindTexture(GLC.GL_TEXTURE_2D, params.texture2.tex);
     		gl.glEnable(GLC.GL_TEXTURE_2D);
     		gl.glUniform1i(gl.glGetUniformLocation(prog, "myTexture2"), 1);
         }
@@ -667,10 +667,10 @@ public class GLEngine  {
 		gl.glDisable(GLC.GL_TEXTURE_2D);
         gl.glUseProgram(0);
         pd.deinit();
-        if( params.texture != null)
-        	params.texture.unload();
-        if( params.texture2 != null) 
-        	params.texture2.unload();
+//        if( params.texture != null)
+//        	params.texture.unload();
+//        if( params.texture2 != null) 
+//        	params.texture2.unload();
 	}
 
 	
@@ -704,27 +704,6 @@ public class GLEngine  {
 			}
 		}
 	}*/
-	GLImage prepareTexture( RawImage image) {
-		if( image instanceof GLImage) 
-			return (GLImage) image;
-		
-		int w = image.getWidth();
-		int h = image.getHeight();
-		GL2 gl = getGL2();
-		
-		int result[] = new int[1];
-        gl.glGenTextures(1, result, 0);
-        gl.glBindTexture(GL2.GL_TEXTURE_2D, result[0]);
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
-		
-		HybridHelper.loadImageIntoGL( image, gl);
-		
-		return new GLImage( result[0], w, h);
-	}
-	
 	// =================
 	// ==== Data Buffer Preperation
 	public class PreparedData{

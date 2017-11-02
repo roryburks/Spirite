@@ -3,6 +3,7 @@ package spirite.base.image_data.images.drawer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.sun.prism.paint.Color;
 
@@ -91,32 +92,40 @@ public class DefaultImageDrawer
 	@Override
 	public boolean fill(int x, int y, int color, BuildingImageData _data) {
 		if( _data == null) return false;
-		
 		ImageWorkspace workspace = _data.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
-		ABuiltImageData data = workspace.buildData(_data);
-		
-		Vec2i p = data.convert( new Vec2i(x,y));
-		
-		RawImage bi = data.checkoutRaw();
-		if( !MUtil.coordInImage( p.x, p.y, bi)) {
-			return false;
-		}
-		
 		BuiltSelection mask = selectionEngine.getBuiltSelection();
-		if( mask.selection != null && !mask.selection.contains(x - mask.offsetX, y-mask.offsetY)) {
-			return false;
-		}
-		if( bi.getRGB( p.x, p.y) == color) {
-			return false;
-		}
-		data.checkin();
+		
+		AtomicReference<Boolean> aborted = new AtomicReference<Boolean>(false);
+		_data.doOnBuiltData((built) -> {
+
+			
+			Vec2i p = built.convert( new Vec2i(x,y));
+			
+			RawImage bi = built.checkoutRaw();
+			if( !MUtil.coordInImage( p.x, p.y, bi)) {
+				aborted.set(true);
+				return;
+			}
+			
+			if( mask.selection != null && !mask.selection.contains(x - mask.offsetX, y-mask.offsetY)) {
+				aborted.set(true);
+				return;
+			}
+			if( bi.getRGB( p.x, p.y) == color) {
+				aborted.set(true);
+				return ;
+			}
+			//built.checkin();	// Probably not needed as it's read-only
+		});
+		if( aborted.get()) return false;
 
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
 			protected void performImageAction(ABuiltImageData built) {
 				RawImage img;
 				Vec2i layerSpace;
+				Vec2i p = built.convert( new Vec2i(x,y));
 				if( mask.selection == null) {
 					img = built.checkoutRaw();
 					layerSpace = built.convert( new Vec2i(p.x, p.y));
@@ -173,8 +182,8 @@ public class DefaultImageDrawer
 
 					// Anchor the lifted image to the real image
 					GraphicsContext gc = built.checkout();
-					Vec2i p = built.convert(new Vec2i(mask.offsetX,mask.offsetY));
-					gc.drawImage( img, p.x, p.y);
+					Vec2i p2 = built.convert(new Vec2i(mask.offsetX,mask.offsetY));
+					gc.drawImage( img, p2.x, p2.y);
 				}
 				built.checkin();
 			}

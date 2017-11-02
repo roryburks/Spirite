@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -32,6 +33,7 @@ import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -494,28 +496,31 @@ public class MasterControl
     				currentWorkspace.getSelectionEngine().getSelection() != null) {
         			// Copies the current selection to the Clipboard
 
-	    	    	RawImage img;
+	    	    	AtomicReference<RawImage> img = new AtomicReference<>(null);
     				if( currentWorkspace.getSelectionEngine().isLifted()) {
     					// Copies straight from the lifted data
-    					img = currentWorkspace.getSelectionEngine().getLiftedImage();
+    					img.set(currentWorkspace.getSelectionEngine().getLiftedImage());
     				}
     				else {
-    					ABuiltImageData bid = currentWorkspace.buildData(currentWorkspace.buildActiveData());
+    					BuildingImageData building = currentWorkspace.buildActiveData();
     					
-    					if( bid == null) {
+    					if( building == null) {
     		    	    	RenderSettings settings = new RenderSettings(
     		    	    			renderEngine.getNodeRenderTarget(selected));
     		
     		    	    	RawImage nodeImg = renderEngine.renderImage(settings);
-    						img = currentWorkspace.getSelectionEngine().getBuiltSelection()
-    								.liftSelectionFromImage(nodeImg,0,0);
+    						img.set(currentWorkspace.getSelectionEngine().getBuiltSelection()
+    								.liftSelectionFromImage(nodeImg,0,0));
     					}
-    					else
-	    					img = currentWorkspace.getSelectionEngine().getBuiltSelection()
-	    						.liftSelectionFromData(bid);
+    					else {
+    						building.doOnBuiltData((built) -> {
+		    					img.set(currentWorkspace.getSelectionEngine().getBuiltSelection()
+		    						.liftSelectionFromData(built));
+    						});
+    					}
     				}
     				
-    				HybridHelper.imageToClipboard(img);
+    				HybridHelper.imageToClipboard(img.get());
     			}
     			else {
 	    			// Copies the current selected node to the Clipboard

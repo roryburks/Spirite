@@ -11,9 +11,7 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
-import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
-import spirite.base.graphics.gl.GLParameters.GLTexture;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.ImageHandle;
 import spirite.base.util.Colors;
@@ -23,6 +21,7 @@ import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glu.GLUtil;
+import spirite.hybrid.HybridUtil;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least
@@ -93,7 +92,7 @@ public class GLGraphics extends GraphicsContext{
 			other.clear();
 			
 			GLParameters params2 = new GLParameters(getImgParams());
-			params2.texture = new GLImageTexture( mask);
+			params2.texture = (GLImage)HybridUtil.convert(mask, GLImage.class);
 			other.applyPassProgram( ProgramType.PASS_BASIC, params2, contextTransform,
 					0, 0, mask.getWidth(), mask.getHeight());
 			
@@ -101,7 +100,7 @@ public class GLGraphics extends GraphicsContext{
 			// Clean up and Apply the surface to an image
 			params2 = new GLParameters(width, height);
 			params2.addParam( new GLParam1i("uCycle", c));
-			params2.texture = new GLImageTexture(img);
+			params2.texture = (GLImage)HybridUtil.convert(img, GLImage.class);
 			applyPassProgram( ProgramType.PASS_BORDER, params2, null);
 			
 			img.flush();
@@ -323,7 +322,7 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void drawImage( RawImage img, int x, int y) {
 		GLParameters params = getImgParams();
-		params.texture = new GLParameters.GLImageTexture(img);
+		params.texture = (GLImage)HybridUtil.convert(img, GLImage.class);
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				x, y, x+img.getWidth(), y+img.getHeight());
@@ -333,7 +332,7 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void drawHandle(ImageHandle handle, int x, int y) {
 		GLParameters params =getImgParams();
-		params.texture = handle.accessGL();
+		params.texture = (GLImage)HybridUtil.convert(handle.deepAccess(), GLImage.class);
 
 		applyPassProgram(ProgramType.PASS_RENDER, params, contextTransform,
 				x, y, x+params.texture.getWidth(), y+params.texture.getHeight());
@@ -435,14 +434,14 @@ public class GLGraphics extends GraphicsContext{
 	// ==== Rendering
 	@Override
 	public void renderImage(RawImage rawImage, int x, int y, RenderProperties render) {
-		_renderImage(  new GLParameters.GLImageTexture(rawImage), x, y, render);
+		_renderImage( (GLImage)HybridUtil.convert(rawImage, GLImage.class), x, y, render);
 	}
 	@Override
 	public void renderHandle(ImageHandle handle, int x, int y, RenderProperties render) {
-		_renderImage(  handle.accessGL(), x, y, render);
+		renderImage(  handle.deepAccess(), x, y, render);
 	}
 	
-	private void _renderImage(GLTexture texture, int x, int y, RenderProperties render) {
+	private void _renderImage(GLImage texture, int x, int y, RenderProperties render) {
 		GLParameters intParams = new GLParameters(width, height);
 		
 		int method_num = 0;

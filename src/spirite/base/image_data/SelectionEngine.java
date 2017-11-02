@@ -2,6 +2,7 @@ package spirite.base.image_data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -444,9 +445,14 @@ public class SelectionEngine {
 	
 	private SetLiftedAction createLiftAction(LayerNode node) {
 		BuiltSelection mask = getBuiltSelection();
-		ABuiltImageData builtImage = workspace.buildData(workspace.buildDataFromNode(node));
 		
-		return new SetLiftedAction( mask.liftSelectionFromData(builtImage));
+		AtomicReference<SetLiftedAction> action = new AtomicReference<SelectionEngine.SetLiftedAction>(null);
+		
+		workspace.doOnBuiltData(workspace.buildDataFromNode(node), (built) -> {
+			action.set(new SetLiftedAction( mask.liftSelectionFromData(built)));
+		});
+		
+		return action.get();
 	}
 	
 	public UndoableAction createNewSelectAction( BuiltSelection selection) {

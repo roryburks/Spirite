@@ -73,7 +73,7 @@ class GLStrokeEngine extends StrokeEngine {
 		glgc.clear();
 		
 		GLParameters params = new GLParameters(w, h);
-		params.texture = new GLParameters.GLImageTexture(fixedLayer);
+		params.texture = fixedLayer;
 		glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
 	}
 	@Override
@@ -86,7 +86,7 @@ class GLStrokeEngine extends StrokeEngine {
 				
 				glgc.clear();
 				GLParameters params = new GLParameters(w, h);
-				params.texture = new GLParameters.GLImageTexture(displayLayer);
+				params.texture = displayLayer;
 				glgc.applyPassProgram(ProgramType.PASS_BASIC, params, null);
 				
 				BufferedImage bi = PCUtil.glSurfaceToImage(
@@ -100,7 +100,7 @@ class GLStrokeEngine extends StrokeEngine {
 //			glgc.reset();
 			
 			GLParameters params = new GLParameters(glgc.getWidth(), glgc.getHeight());
-			params.texture = new GLParameters.GLImageTexture(displayLayer);
+			params.texture = displayLayer;
 			params.flip = glgc.isFlip();
 			params.addParam( new GLParameters.GLParam1i("uComp", 0));
 			params.addParam( new GLParameters.GLParam1f("uAlpha", glgc.getAlpha()));
@@ -141,7 +141,7 @@ class GLStrokeEngine extends StrokeEngine {
 		
 		if( stroke.getMethod() == Method.BASIC) {
 			GLParameters params = new GLParameters(w, h);
-			params.texture = new GLParameters.GLImageTexture(drawTo);
+			params.texture = drawTo;
 			
 			engine.applyPassProgram(ProgramType.STROKE_AFTERPASS_INTENSIFY, params, new MatTrans(), 
 					0, 0, w, h);

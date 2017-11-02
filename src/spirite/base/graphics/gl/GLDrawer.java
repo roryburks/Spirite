@@ -6,11 +6,11 @@ import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
-import spirite.base.graphics.gl.GLParameters.GLImageTexture;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
 import spirite.base.graphics.gl.GLParameters.GLParam4f;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
+import spirite.hybrid.HybridUtil;
 
 
 /**
@@ -51,7 +51,7 @@ public class GLDrawer extends GraphicsDrawer {
 	    	params.addParam( new GLParam4f("cTo", 
 	    			Colors.getRed(to)/255f, Colors.getGreen(to)/255f, Colors.getBlue(to)/255f, Colors.getAlpha(to)/255f));
 	
-	    	params.texture = new GLImageTexture( image);
+	    	params.texture = (GLImage)HybridUtil.convert(image, GLImage.class);
 	
 	    	glgc.clear();
 	    	glgc.applyPassProgram(ProgramType.CHANGE_COLOR, params, null);
@@ -74,7 +74,7 @@ public class GLDrawer extends GraphicsDrawer {
 	    	GLGraphics glgc = img.getGraphics();
 	
 	    	GLParameters params = new GLParameters(image.getWidth(), image.getHeight());
-	    	params.texture = new GLImageTexture(image);
+	    	params.texture = (GLImage)HybridUtil.convert(image, GLImage.class);
 	
 	    	glgc.clear();
 	    	glgc.applyPassProgram( ProgramType.PASS_INVERT, params, null);

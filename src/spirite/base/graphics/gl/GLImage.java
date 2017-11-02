@@ -11,6 +11,7 @@ public class GLImage extends RawImage {
 	private static final GLEngine engine = GLEngine.getInstance();
 	private final int width, height;
 	int tex;
+	boolean glOriented = true;
 	
 	public GLImage( int width, int height) throws InvalidImageDimensionsExeption {
 		if( width <= 0 || height <= 0)
@@ -53,11 +54,12 @@ public class GLImage extends RawImage {
         		0, 0, width, height, 0);
 	}
 	
-	public GLImage( int texID, int width, int height) {
+	public GLImage( int texID, int width, int height, boolean glOriented) {
 		engine.c_img.add(this);
 		this.tex = texID;
 		this.width = width;
 		this.height = height;
+		this.glOriented = glOriented;
 	}
 	
 	@Override public int getWidth() { return width; }
@@ -108,9 +110,10 @@ public class GLImage extends RawImage {
 		return read.get(0);
 	}
 
+	public void setGLOriented( boolean set) {this.glOriented = set;}
 	@Override
 	public boolean isGLOriented() {
-		return true;
+		return glOriented;
 	}
 
 }
