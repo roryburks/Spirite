@@ -59,7 +59,7 @@ public class MaglevImageDrawer
 		workspace.getUndoEngine().prepareContext(building.handle);
 		strokeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 		
-		if( strokeEngine.startStroke( params, ps, workspace.buildData(building), workspace.getSelectionEngine().getBuiltSelection()))
+		if( strokeEngine.startStroke( params, ps, building, workspace.getSelectionEngine().getBuiltSelection()))
 			building.handle.refresh();
 		return true;
 	}

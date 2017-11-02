@@ -327,6 +327,9 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			this.handle = handle;
 			this.trans = MatTrans.TranslationMatrix(ox, oy);
 		}
+		public void doOnBuiltData( DoOnABID doer) {
+			handle.context.doOnBuiltData(this, doer);
+		}
 	}
 	
 
@@ -391,6 +394,19 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		if( ii == null) return null;
 		
 		return ii.build(data);
+	}
+	public void doOnBuiltData( BuildingImageData data, DoOnABID doer) {
+		if( data == null)
+			doer.Do(null);
+
+		IInternalImage ii = imageData.get(data.handle.id);
+		if( ii == null)
+			doer.Do(null);
+		else
+			doer.Do(ii.build(data));
+	}
+	public interface DoOnABID {
+		public void Do( ABuiltImageData abid);
 	}
 	
 	

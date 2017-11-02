@@ -475,7 +475,7 @@ public class DefaultImageDrawer
 		else {
 			activeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			
-			if( activeEngine.startStroke( params, ps, workspace.buildData(building), pollSelectionMask(workspace)))
+			if( activeEngine.startStroke( params, ps, building, pollSelectionMask(workspace)))
 				building.handle.refresh();
 			return true;
 		}

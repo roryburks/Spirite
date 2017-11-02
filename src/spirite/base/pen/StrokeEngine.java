@@ -3,10 +3,12 @@ package spirite.base.pen;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.image_data.ImageWorkspace.BuildingImageData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.pen.PenTraits.PenDynamics;
@@ -25,9 +27,9 @@ public abstract class StrokeEngine {
 
 	// =============
 	// ==== Abstract Methods
-	protected abstract boolean drawToLayer( DrawPoints points, boolean permanent);
+	protected abstract boolean drawToLayer( DrawPoints points, boolean permanent, ABuiltImageData built);
 	protected abstract void prepareDisplayLayer();
-	protected abstract void onStart();
+	protected abstract void onStart(ABuiltImageData built);
 	protected abstract void onEnd();
 	protected abstract void drawDisplayLayer( GraphicsContext gc);
 	
@@ -79,7 +81,8 @@ public abstract class StrokeEngine {
 
 	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
-	protected ABuiltImageData data;
+	protected BuildingImageData building;
+	//protected ABuiltImageData data;
 	protected BuiltSelection sel;
 	
 	// Interpolation
@@ -89,9 +92,6 @@ public abstract class StrokeEngine {
 	// :::: Get's
 	public StrokeEngine.StrokeParams getParams() {
 		return stroke;
-	}
-	public ABuiltImageData getImageData() {
-		return data;
 	}
 	public StrokeEngine.STATE getState() {
 		return state;
@@ -114,67 +114,75 @@ public abstract class StrokeEngine {
 	public final boolean startStroke( 
 			StrokeParams params, 
 			PenState ps, 
-			ABuiltImageData data,
+			BuildingImageData building,
 			BuiltSelection selection) 
 	{
-		if( ! prepareStroke(params, data, selection))
-			return false;
-		buildInterpolator(params, ps);
+		this.building = building;
 		
-		if( sel.selection != null) {
-/*			selectionMask = new BufferedImage( 
-					data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
-			MUtil.clearImage(selectionMask);
+		AtomicReference<Boolean> changed= new AtomicReference<Boolean>(false);
+		building.doOnBuiltData((built) -> {
+
+			if( ! prepareStroke(params, built, selection))
+				return;
+			buildInterpolator(params, ps);
 			
-			Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
-			g2.translate(sel.offsetX, sel.offsetY);
-			sel.selection.drawSelectionMask(g2);
-			g2.dispose();*/
-		}
+			if( sel.selection != null) {
+	/*			selectionMask = new BufferedImage( 
+						data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
+				MUtil.clearImage(selectionMask);
+				
+				Graphics2D g2 = (Graphics2D)selectionMask.getGraphics();
+				g2.translate(sel.offsetX, sel.offsetY);
+				sel.selection.drawSelectionMask(g2);
+				g2.dispose();*/
+			}
+			
+			// Starts recording the Pen States
+			prec = new ArrayList<PenState>();
+			Vec2i layerSpace = (built.convert(new Vec2i((int)Math.round(ps.x),(int)Math.round(ps.y))));
+			
+			oldState.x = layerSpace.x;
+			oldState.y = layerSpace.y;
+			oldState.pressure = ps.pressure;
+			newState.x = layerSpace.x;
+			newState.y = layerSpace.y;
+			newState.pressure = ps.pressure;
+			rawState.x = ps.x;
+			rawState.y = ps.y;
+			rawState.pressure = ps.pressure;
+			prec.add( ps);
+			
+			state = StrokeEngine.STATE.DRAWING;
+			
+			
+			
+			drawToLayer( new DrawPoints( 
+					new float[] {ps.x},
+					new float[] {ps.y}, 
+					new float[] {params.dynamics.getSize(ps)}),
+					false, built);
+			
+			changed.set(true);
+		});
 		
-		// Starts recording the Pen States
-		prec = new ArrayList<PenState>();
-		Vec2i layerSpace = (data.convert(new Vec2i((int)Math.round(ps.x),(int)Math.round(ps.y))));
-		
-		oldState.x = layerSpace.x;
-		oldState.y = layerSpace.y;
-		oldState.pressure = ps.pressure;
-		newState.x = layerSpace.x;
-		newState.y = layerSpace.y;
-		newState.pressure = ps.pressure;
-		rawState.x = ps.x;
-		rawState.y = ps.y;
-		rawState.pressure = ps.pressure;
-		prec.add( ps);
-		
-		state = StrokeEngine.STATE.DRAWING;
-		
-		
-		
-		drawToLayer( new DrawPoints( 
-				new float[] {ps.x},
-				new float[] {ps.y}, 
-				new float[] {params.dynamics.getSize(ps)}),
-				false);
 //		return startDrawStroke( newState);
-		return true;
+		return changed.get();
 	}
 	
 	private boolean prepareStroke( 
 			StrokeParams params, 
-			ABuiltImageData data,
+			ABuiltImageData built,
 			BuiltSelection selection)
 	{
-		if( data == null) 
+		if( built == null) 
 			return false;
 		
-		this.data = data;
 		stroke = params;
 
 		
 		sel = selection;
 		interpos = 0;
-		onStart( );
+		onStart( built);
 		prepareDisplayLayer();
 		return true;
 	}
@@ -193,36 +201,39 @@ public abstract class StrokeEngine {
 	}
 
 	public final boolean stepStroke( PenState ps) {
-		Vec2i layerSpace = data.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
-		PenState buff;
-		newState.x = layerSpace.x;
-		newState.y = layerSpace.y;
-		newState.pressure = ps.pressure;
-		rawState.x = ps.x;
-		rawState.y = ps.y;
-		rawState.pressure = ps.pressure;
-		
-		if( state != StrokeEngine.STATE.DRAWING || data == null) {
-			MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
-			return false;
-		}
-		
-		boolean changed = false;
-		if( oldState.x != newState.x || oldState.y != newState.y)
-		{
-			prec.add( new PenState( rawState));
-			if( _interpolator != null) 
-				_interpolator.addPoint(rawState.x, rawState.y);
+		AtomicReference<Boolean> changed=  new AtomicReference<Boolean>(false);
+		building.doOnBuiltData((built) -> {
 
-			prepareDisplayLayer();
-			changed = this.drawToLayer( buildPoints(_interpolator, prec, stroke), false);
-		}
+			Vec2i layerSpace = built.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
+			PenState buff;
+			newState.x = layerSpace.x;
+			newState.y = layerSpace.y;
+			newState.pressure = ps.pressure;
+			rawState.x = ps.x;
+			rawState.y = ps.y;
+			rawState.pressure = ps.pressure;
+			
+			if( state != StrokeEngine.STATE.DRAWING || built == null) {
+				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
+				return;
+			}
+			
+			if( oldState.x != newState.x || oldState.y != newState.y)
+			{
+				prec.add( new PenState( rawState));
+				if( _interpolator != null) 
+					_interpolator.addPoint(rawState.x, rawState.y);
 
-		oldState.x = newState.x;
-		oldState.y = newState.y;
-		oldState.pressure = newState.pressure;
+				prepareDisplayLayer();
+				changed.set( this.drawToLayer( buildPoints(_interpolator, prec, stroke), false, built));
+			}
+
+			oldState.x = newState.x;
+			oldState.y = newState.y;
+			oldState.pressure = newState.pressure;
+		});
 		
-		return changed;
+		return changed.get();
 	}
 	
 
@@ -232,10 +243,12 @@ public abstract class StrokeEngine {
 
 		state = StrokeEngine.STATE.READY;
 		
-		if( data != null) {
-			GraphicsContext gc = data.checkoutRaw().getGraphics();
-			drawStrokeLayer(gc);
-			data.checkin();
+		if( building != null) {
+			building.doOnBuiltData((built) -> {
+				GraphicsContext gc = built.checkoutRaw().getGraphics();
+				drawStrokeLayer(gc);
+				built.checkin();
+			});
 		}
 		
 		onEnd();
@@ -261,12 +274,12 @@ public abstract class StrokeEngine {
 			}
 		}
 
-		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points), stroke), false);
+		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points), stroke), false, builtImage);
 		
-		if( data != null) {
-			GraphicsContext gc = data.checkoutRaw().getGraphics();
+		if( builtImage != null) {
+			GraphicsContext gc = builtImage.checkoutRaw().getGraphics();
 			drawStrokeLayer(gc);
-			data.checkin();
+			builtImage.checkin();
 		}
 		
 		_interpolator = null;
@@ -316,12 +329,12 @@ public abstract class StrokeEngine {
 	{
 		prepareStroke(null, builtImage, mask);
 
-		this.drawToLayer( points, false);
+		this.drawToLayer( points, false, builtImage);
 		
-		if( data != null) {
-			GraphicsContext gc = data.checkoutRaw().getGraphics();
+		if( builtImage != null) {
+			GraphicsContext gc = builtImage.checkoutRaw().getGraphics();
 			drawStrokeLayer(gc);
-			data.checkin();
+			builtImage.checkin();
 		}
 	}
 
@@ -466,5 +479,11 @@ public abstract class StrokeEngine {
 			
 			return out;
 		}
+	}
+
+
+
+	public BuildingImageData getImageData() {
+		return building;
 	}
 }

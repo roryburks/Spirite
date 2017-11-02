@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
@@ -36,9 +37,9 @@ class AWTStrokeEngine extends StrokeEngine{
 	BufferedImage selectionMask;
 	
 	@Override
-	protected void onStart() {
-		int w = data.getWidth();
-		int h = data.getHeight();
+	protected void onStart(ABuiltImageData built) {
+		int w = built.getWidth();
+		int h = built.getHeight();
 		
 		displayLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		fixedLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
@@ -76,7 +77,7 @@ class AWTStrokeEngine extends StrokeEngine{
 	}
 	
 	@Override
-	protected boolean drawToLayer(DrawPoints states, boolean permanent) {
+	protected boolean drawToLayer(DrawPoints states, boolean permanent, ABuiltImageData built) {
 		BufferedImage layer = (permanent)?fixedLayer:displayLayer;
 		
 		Graphics g = layer.getGraphics();

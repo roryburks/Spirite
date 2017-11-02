@@ -13,6 +13,7 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
+import spirite.base.image_data.images.ABuiltImageData;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
@@ -45,9 +46,9 @@ class GLStrokeEngine extends StrokeEngine {
 		super.finalize();
 	}
 	@Override
-	protected void onStart() {
-		w = data.getWidth();
-		h = data.getHeight();
+	protected void onStart(ABuiltImageData built) {
+		w = built.getWidth();
+		h = built.getHeight();
 		try {
 			fixedLayer = new GLImage( w, h);
 			displayLayer = new GLImage( w, h);
@@ -129,14 +130,14 @@ class GLStrokeEngine extends StrokeEngine {
 	
 
 	@Override
-	protected boolean drawToLayer( DrawPoints states, boolean permanent) {
+	protected boolean drawToLayer( DrawPoints states, boolean permanent, ABuiltImageData built) {
 		if( states == null || states.length <= 0)
 			return false;
 		
 		GLImage drawTo = (permanent)?fixedLayer:displayLayer;
 		
 		engine.setTarget(drawTo);
-		_stroke( composeVBuffer(states), stroke.isHard()?1:0);
+		_stroke( composeVBuffer(states, built), stroke.isHard()?1:0);
 		
 		if( stroke.getMethod() == Method.BASIC) {
 			GLParameters params = new GLParameters(w, h);
@@ -151,14 +152,14 @@ class GLStrokeEngine extends StrokeEngine {
 		return true;
 	}
 	
-	private void _strokeSpore(PenState ps) {
+	private void _strokeSpore(PenState ps, ABuiltImageData built) {
 		float[] raw = new float[4*13];
 		float x = ps.x;
 		float y = ps.y;
 		
 		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
 		
-		Vec2 xy = data.convert(new Vec2(x,y));
+		Vec2 xy = built.convert(new Vec2(x,y));
 		raw[0] = xy.x;
 		raw[1] = xy.y;
 		raw[2] = size;
@@ -180,8 +181,8 @@ class GLStrokeEngine extends StrokeEngine {
 		}
 		
 
-		int w = data.getWidth();
-		int h = data.getHeight();
+		int w = built.getWidth();
+		int h = built.getHeight();
 		
 		GL2 gl = engine.getGL2();
 		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1});
@@ -232,7 +233,7 @@ class GLStrokeEngine extends StrokeEngine {
 	}
 
 	private final static int BASIC_STRIDE = 3;
-	private GLVBuffer composeVBuffer(  DrawPoints states) {
+	private GLVBuffer composeVBuffer(  DrawPoints states, ABuiltImageData built) {
 		
 		GLVBuffer vb = new GLVBuffer();
 		
@@ -245,7 +246,7 @@ class GLStrokeEngine extends StrokeEngine {
 			int off = (o++)*BASIC_STRIDE;
 			
 			// x y z w
-			Vec2 xy = data.convert(new Vec2(states.x[i],states.y[i]));
+			Vec2 xy = built.convert(new Vec2(states.x[i],states.y[i]));
 			raw[off+0] = xy.x;
 			raw[off+1] = xy.y;
 			
