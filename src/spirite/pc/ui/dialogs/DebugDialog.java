@@ -124,14 +124,8 @@ public class DebugDialog extends JDialog
 		final int fix_y = scrollResources.getVerticalScrollBar().getValue();
 		
 		DecimalFormat df = new DecimalFormat("#.##");
-		String str = "Cache Size:"+ df.format(master.getCacheManager().getCacheSize()/(1024.0*1024.0))+"MB\n";
+		String str = "";
 		
-		Map< Object, CacheDomain> map = master.getCacheManager()._debugGetMap();
-		
-		for( Map.Entry< Object, CacheDomain> set : map.entrySet()) {
-			str += set.getKey().toString() + " :: ";
-			str += df.format(set.getValue().getSize() /(1024.0*1024.0)) + "MB\n";
-		}
 		if(master.getSettingsManager().glMode()) {
 //			str +=  "\nGL Resources: ["+df.format(master.getGLCache().getCacheSize()/(1024.0*1024.0))+"MB in cache]\n" + GLEngine.getInstance().dispResourcesUsed();
 			str += GLEngine.getInstance().dispResourcesUsed();

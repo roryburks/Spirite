@@ -6,7 +6,6 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
@@ -102,8 +101,7 @@ public class SimpleLayer extends Layer {
 			helper.actions.add(workspace.getUndoEngine().createReplaceAction(data, combination));
 		}
 		else {
-			CachedImage ci = workspace.getCacheManager().cacheImage( image, workspace.getUndoEngine());
-			UndoableAction action = new DrawImageAction(  new BuildingMediumData(data,x, y), ci);
+			UndoableAction action = new DrawImageAction(  new BuildingMediumData(data,x, y), image);
 			helper.actions.add(action);
 		}
 		

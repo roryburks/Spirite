@@ -22,7 +22,6 @@ import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
-import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
@@ -98,7 +97,6 @@ public class MasterControl
     private final HotkeyManager hotkeys;
     private final ToolsetManager toolset;
     private final SettingsManager settingsManager;
-    private final CacheManager cacheManager;
     private final FrameManager frameManager;
     private final PaletteManager palette;	// Requires SettingsManager
     private final RenderEngine renderEngine;// Require CacheManager
@@ -115,7 +113,6 @@ public class MasterControl
         settingsManager = new SettingsManager(this);
         hotkeys = new HotkeyManager();
         toolset = new ToolsetManager(this);
-        cacheManager = new CacheManager();
         renderEngine = new RenderEngine( this);	
         palette = new PaletteManager( this);
         loadEngine = new LoadEngine(this);
@@ -162,7 +159,6 @@ public class MasterControl
     public FrameManager getFrameManager() { return frameManager;}
     public RenderEngine getRenderEngine(){ return renderEngine; }
     public SettingsManager getSettingsManager() { return settingsManager; }
-    public CacheManager getCacheManager() { return cacheManager; }
     public SaveEngine getSaveEngine() { return saveEngine; }
     public LoadEngine getLoadEngine() { return loadEngine; }
     public Dialogs getDialogs() { return dialog; }

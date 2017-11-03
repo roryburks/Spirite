@@ -19,7 +19,6 @@ import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RenderProperties;
-import spirite.base.graphics.renderer.CacheManager;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -73,10 +72,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	//	chance of duplicate IDs on non-duplicate Data, but doing so would just invite
 	//	hard-to-trace bugs if IDs are ever messed with too much before being tracked
 	//	by ImageWorkspace.
-	final Map<Integer,IMedium> imageData;
+	final Map<Integer,IMedium> mediumData;
 	
 	public boolean isValidHandle(MediumHandle handle) {
-		return ( handle.context == this && imageData.containsKey(handle.id));
+		return ( handle.context == this && mediumData.containsKey(handle.id));
 	}
 	
 	// Internal Components
@@ -88,7 +87,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	private final StagingManager stagingManager;
 	
 	// External Components
-	private final CacheManager cacheManager;
 	private final SettingsManager settingsManager;
 	private final RenderEngine renderEngine;
 	private final PaletteManager paletteManager;
@@ -110,7 +108,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	
 	
 	public ImageWorkspace( MasterControl master) {
-		this.cacheManager = master.getCacheManager();
 		this.settingsManager = master.getSettingsManager();
 		this.renderEngine = master.getRenderEngine();
 		this.paletteManager = master.getPaletteManager();
@@ -123,7 +120,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		referenceManager = new ReferenceManager(this);
 		stagingManager = new StagingManager(this);
 		
-		imageData = new HashMap<>();
+		mediumData = new HashMap<>();
 		master.addWorkspaceObserver(this);
 		
 
@@ -162,7 +159,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 		
 		// Step 1: Go through each tracked ImageData and find unused entries
-		for( Integer id : imageData.keySet()) {
+		for( Integer id : mediumData.keySet()) {
 			MediumHandle handleToTest = new MediumHandle(this, id);
 			
 			if( undoImageSet.contains(handleToTest))
@@ -183,35 +180,35 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		// Step 2: Go through all used entries and make sure they're tracked
 		for( List<MediumHandle> layerData : layerDataUsed) {
 			for( MediumHandle data : layerData) {
-				if( data.context != this || !imageData.containsKey(data.id))
+				if( data.context != this || !mediumData.containsKey(data.id))
 					MDebug.handleError(ErrorType.STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace.");
 			}
 		}
 		for( MediumHandle data : undoImageSet) {
-			if( data.context != this || !imageData.containsKey(data.id))
+			if( data.context != this || !mediumData.containsKey(data.id))
 				MDebug.handleError(ErrorType.STRUCTURAL, "Untracked Image Data found from UndoEngine.");
 		}
 
 		// Remove Unused Entries
 		for( Integer i : dataToRemove) {
-			imageData.get(i).flush();
-			imageData.remove(i);
+			mediumData.get(i).flush();
+			mediumData.remove(i);
 		}
 	}
 	
 	// meh
 	public IMedium getData(int i) {
-		return imageData.get(i);
+		return mediumData.get(i);
 	}
 	public IMedium getData(MediumHandle handle) {
-		return imageData.get(handle.id);
+		return mediumData.get(handle.id);
 	}
 
 	int getWidthOf( int i) {
-		return imageData.get(i).getWidth();
+		return mediumData.get(i).getWidth();
 	}
 	int getHeightOf( int i) {
-		return imageData.get(i).getHeight();
+		return mediumData.get(i).getHeight();
 	}
 
 	/** Called when an image is first made or is first loaded, resets the UndoEngine
@@ -285,15 +282,14 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
 	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
-	public CacheManager getCacheManager() { return cacheManager; }
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }
 	
 	public List<MediumHandle> getAllImages() {
-		List<MediumHandle> list = new ArrayList<>(imageData.size());
+		List<MediumHandle> list = new ArrayList<>(mediumData.size());
 		
-		for( Entry<Integer,IMedium> entry : imageData.entrySet()) {
+		for( Entry<Integer,IMedium> entry : mediumData.entrySet()) {
 			list.add( new MediumHandle( this, entry.getKey()));
 		}
 		
@@ -341,8 +337,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			BuildingMediumData bid = layer.getActiveData();
 
 			bid.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
-			IMedium iimg = imageData.get(bid.handle.id);
-			return (iimg == null) ? null : iimg.getImageDrawer(bid);
+			IMedium medium = mediumData.get(bid.handle.id);
+			return (medium == null) ? null : medium.getImageDrawer(bid);
 		}
 		else if( node instanceof GroupNode) {
 			return new GroupNodeDrawer((GroupNode)node);
@@ -352,12 +348,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	public IImageDrawer getDrawerFromBID( BuildingMediumData img) {
 		if( img == null) return null;
-		IMedium iimg = imageData.get(img.handle.id);
-		return (iimg == null) ? null : iimg.getImageDrawer(img);
+		IMedium medium = mediumData.get(img.handle.id);
+		return (medium == null) ? null : medium.getImageDrawer(img);
 	}
 	public IImageDrawer getDrawerFromHandle( MediumHandle handle) {
-		IMedium iimg = imageData.get(handle.id);
-		return (iimg == null) ? null : iimg.getImageDrawer(new BuildingMediumData(handle, 0, 0));
+		IMedium medium = mediumData.get(handle.id);
+		return (medium == null) ? null : medium.getImageDrawer(new BuildingMediumData(handle, 0, 0));
 	}
 	
 	
@@ -398,13 +394,13 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		if( data == null)
 			doer.Do(null);
 
-		IMedium ii = imageData.get(data.handle.id);
-		if( ii == null)
+		IMedium medium = mediumData.get(data.handle.id);
+		if( medium == null)
 			doer.Do(null);
 		else {
-			synchronized(ii) {
+			synchronized(medium) {
 				floatIImage(data.handle);
-				doer.Do(ii.build(data));
+				doer.Do(medium.build(data));
 			}
 		}
 	}
@@ -461,12 +457,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	/** Internal method should not be called by external methods (if so it'd
 	 * 110% screw up the UndoEngine).  Instead create an ImageDataReplacedAction
 	 */
-	void _replaceIamge( MediumHandle old, IMedium img) {
-		IMedium oldII = imageData.get(old.id);
-		imageData.put(old.id, img.dupe());
-		oldII.flush();
+	void _replaceIamge( MediumHandle oldHandle, IMedium newMedium) {
+		IMedium oldMedium = mediumData.get(oldHandle.id);
+		mediumData.put(oldHandle.id, newMedium.dupe());
+		oldMedium.flush();
 		
-		old.refresh();
+		oldHandle.refresh();
 	}
 	
 	/** Creates a Group Node that's detached from the ImageWorkspace, but still
@@ -636,7 +632,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		// Step 2: Put the new data into the imageData map, creating
 		//	a map to rebing old IDs into valid IDs
 		for( Entry<Integer,IMedium> entry : newData.entrySet()) {
-			imageData.put(workingID, entry.getValue());
+			mediumData.put(workingID, entry.getValue());
 			rebindMap.put( entry.getKey(), workingID);
 			++workingID;
 		}
@@ -658,7 +654,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 * then the image will get flushed next time the image data is checked
 	 */
 	public MediumHandle importData( RawImage newImage) {
-		imageData.put( workingID, new FlatMedium(newImage, this));
+		mediumData.put( workingID, new FlatMedium(newImage, this));
 		
 		return new MediumHandle(this, workingID++);	// Postincriment
 	}
@@ -669,7 +665,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 * will automatically crop the data periodically to only the used area.
 	 */
 	public MediumHandle importDynamicData(RawImage newImage) {
-		imageData.put( workingID, new DynamicMedium(newImage, 0, 0, this));
+		mediumData.put( workingID, new DynamicMedium(newImage, 0, 0, this));
 		
 		return new MediumHandle(this, workingID++);	// Postincriment
 	}
@@ -693,7 +689,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			break;
 		}
 		
-		imageData.put( workingID, ii);
+		mediumData.put( workingID, ii);
 		MediumHandle handle = new MediumHandle( this, workingID);
 		workingID++;
 
@@ -722,7 +718,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
         gc.fillRect( 0, 0, w, h);
         
         IMedium internal = new DynamicMedium(img, 0, 0, this);
-        imageData.put(workingID, internal);
+        mediumData.put(workingID, internal);
         MediumHandle handle= new MediumHandle(this, workingID++);
         
 		LayerNode node = groupTree.new LayerNode( new SpriteLayer(handle), name);
@@ -815,7 +811,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			Map< Integer, IMedium> dupeData = new HashMap<>();
 			for( MediumHandle handle : layer.getImageDependencies()) {
 				if( !dupeData.containsKey(handle.id)) {
-					dupeData.put(handle.id, imageData.get(handle.id).dupe());
+					dupeData.put(handle.id, mediumData.get(handle.id).dupe());
 				}
 			}
 			
@@ -860,7 +856,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 					//	dupeData map
 					for( MediumHandle handle : layer.getImageDependencies()) {
 						if( !dupeData.containsKey(handle.id))
-							dupeData.put(handle.id, imageData.get(handle.id).dupe());
+							dupeData.put(handle.id, mediumData.get(handle.id).dupe());
 					}
 					
 					dupe = groupTree.new LayerNode( 
@@ -1630,8 +1626,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
     	
     	public void Float() {
     		if( !floating) {
-    			synchronized(imageData.get(handleID)) {
-    				iimg = imageData.get(handleID).copyForSaving();
+    			synchronized(mediumData.get(handleID)) {
+    				iimg = mediumData.get(handleID).copyForSaving();
     			}
     			floating = true;
     		}
@@ -1650,8 +1646,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
     
     public List<LogicalImage> reserveCache() {
 
-    	List<LogicalImage> handles = new ArrayList<>(imageData.size());
-    	for( Entry<Integer,IMedium> entry : imageData.entrySet()) {
+    	List<LogicalImage> handles = new ArrayList<>(mediumData.size());
+    	for( Entry<Integer,IMedium> entry : mediumData.entrySet()) {
     		LogicalImage li = new LogicalImage();
     		li.handleID = entry.getKey();
     		handles.add(li);
@@ -1699,13 +1695,13 @@ public class ImageWorkspace implements MWorkspaceObserver {
     }
     
 	public void cleanup() {
-		for( IMedium img : imageData.values())
+		for( IMedium img : mediumData.values())
 			img.flush();
 		
 		undoEngine.cleanup();
 	}
 	public MediumHandle getHandleFor(IMedium iimg) {
-		Iterator<Entry<Integer,IMedium>> it = imageData.entrySet().iterator();
+		Iterator<Entry<Integer,IMedium>> it = mediumData.entrySet().iterator();
 		
 		while( it.hasNext()) {
 			Entry<Integer,IMedium> entry = it.next();

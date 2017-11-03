@@ -1099,5 +1099,14 @@ public class GLEngine  {
 
 		return sb.toString();
 	}
+	
+	public long getUsedResources() {
+		long used = 0;
+		for( WeakReference<GLImage> img : c_img)  {
+			if( img.get() != null)
+				used += img.get().getByteSize();
+		}
+		return used;
+	}
 
 }

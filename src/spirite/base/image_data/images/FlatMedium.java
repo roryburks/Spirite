@@ -3,7 +3,6 @@ package spirite.base.image_data.images;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.images.drawer.DefaultImageDrawer;

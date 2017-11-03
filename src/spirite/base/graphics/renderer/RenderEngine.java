@@ -18,7 +18,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.renderer.CacheManager.CachedImage;
 import spirite.base.graphics.renderer.sources.LayerRenderSource;
 import spirite.base.graphics.renderer.sources.NodeRenderSource;
 import spirite.base.graphics.renderer.sources.ReferenceRenderSource;
@@ -61,20 +60,36 @@ import spirite.hybrid.MDebug;
  */
 public class RenderEngine 
 {
+	private class CachedImage {
+		long last_used;
+		RawImage image;
+		
+		CachedImage( RawImage image) {
+			this.image = image;
+			last_used = System.currentTimeMillis();
+		}
+		
+		RawImage access() {
+			last_used = System.currentTimeMillis();
+			return image;
+		}
+		
+		void flush() {
+			image.flush();
+		}
+	}
+	
 	private final Map<RenderSettings,CachedImage> imageCache = new HashMap<>();
 	private final Timer sweepTimer;
 	
 	//  ThumbnailManager needs access to MasterControl to keep track of all
 	//	workspaces that exist (easier and more reliable than hooking into Observers)
 	private final MasterControl master;
-	//private final SettingsManager settingsManager;
-	private final CacheManager cacheManager;
 	
 	private final static long MAX_CACHE_RESERVE = 5*60*1000;	// 5 min
 	
 	public RenderEngine( MasterControl master) {
 		this.master = master;
-		this.cacheManager = master.getCacheManager();
 		//this.settingsManager = master.getSettingsManager();
 		
 		master.addWorkspaceObserver(workspaceObserver);
@@ -186,7 +201,7 @@ public class RenderEngine
 					|| settings.width == 0 || settings.height == 0) 
 				return null;
 			
-			cachedImage = cacheManager.cacheImage( settings.target.render(settings),this);
+			cachedImage = new CachedImage(settings.target.render(settings));
 
 			imageCache.put(settings, cachedImage);
 		}

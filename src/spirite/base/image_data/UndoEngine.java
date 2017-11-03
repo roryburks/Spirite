@@ -11,8 +11,7 @@ import java.util.ListIterator;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.renderer.CacheManager;
-import spirite.base.graphics.renderer.CacheManager.CachedImage;
+import spirite.base.graphics.gl.GLEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.images.ABuiltMediumData;
@@ -73,7 +72,6 @@ public class UndoEngine {
 	private ListIterator<UndoContext> queuePosition = null;
 	
 	private final ImageWorkspace workspace;
-	private final CacheManager cacheManager;
 	
 	private int met = 0;	// Keeps track of how many changes there have been
 							// since the last reset.
@@ -97,7 +95,6 @@ public class UndoEngine {
 	
 	public UndoEngine(ImageWorkspace workspace) {
 		this.workspace = workspace;
-		this.cacheManager = workspace.getCacheManager();
 		
 		contexts = new ArrayList<UndoContext>();
 		contexts.add( new NullContext());
@@ -412,35 +409,38 @@ public class UndoEngine {
 	 * by the cullBehavior) and gets rid of the oldest undo actions until there
 	 * aren't. */
 	private void cull() {
-		while( queue.size() > 0 && cacheManager.getCacheSize() > absoluteMaxCache) {
+		while( queue.size() > 0 && GLEngine.getInstance().getUsedResources() > absoluteMaxCache) {
 
 			MDebug.log("Cull (Max)");
 			clipTail();
 		}
 		
+		// TODO: Make more general
 		switch( cullBehavior) {
 		case CACHE_AND_COUNT:
-			while( cacheManager.getCacheSize() > maxCacheSize 
-					&& queue.size() > cacheManager.getCacheSize()) {
+			while( GLEngine.getInstance().getUsedResources() > maxCacheSize 
+					&& queue.size() > maxQueueSize) {
 
 				MDebug.log("Cull (CaC)");
 				clipTail();
+				System.gc();
 			}
 			break;
 		case ONLY_CACHE:
-			while( cacheManager.getCacheSize() > maxCacheSize
+			while( GLEngine.getInstance().getUsedResources() > maxCacheSize
 					&& queue.size() > 0) {
 				MDebug.log("Cull (Cache)");
 				clipTail();
+				System.gc();
 			}
 			break;
 		case ONLY_UNDO_COUNT:
 			while( queue.size() > maxQueueSize){
 				MDebug.log("Cull Queue");
 				clipTail();
+				System.gc();
 			}
 			break;
-			
 		}
 		// Note: it SHOULD be impossible for a action to be culled if it is
 		//	the current pointer on the UndoQueue, but it might happen.
@@ -1323,24 +1323,23 @@ public class UndoEngine {
 	
 	// Typically non-special UndoActions shouldn't go here but I don't see w
 	public static class DrawImageAction extends ImageAction {
-		private final CachedImage stored;
+		private final RawImage stored;
 //		private final int dx;
 	//	private final int dy;
 		
-		public DrawImageAction(BuildingMediumData data, CachedImage other) {
+		public DrawImageAction(BuildingMediumData data, RawImage other) {
 			super(data);
 			this.stored = other;
 		}
 		@Override protected void onAdd() {
-			stored.reserve(this);
 		}
 		@Override protected void onDispatch() {
-			stored.relinquish(this);
+			stored.flush();
 		}
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
 			GraphicsContext gc = built.checkout();
-			gc.drawImage(stored.access(), 0, 0);
+			gc.drawImage(stored, 0, 0);
 			built.checkin();
 		}
 	}

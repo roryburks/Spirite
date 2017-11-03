@@ -363,11 +363,11 @@ public class Test1 {
 			master.getRenderEngine().renderImage(settings);
 			
 			master.closeWorkspace(workspace, false);
-
-			if( master.getCacheManager().getCacheSize() > 3000000) {
-				System.out.println( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
-				fail( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
-			}
+//
+//			if( master.getCacheManager().getCacheSize() > 3000000) {
+//				System.out.println( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
+//				fail( "Cache uncleared." +  master.getCacheManager().getCacheSize() + ":" + round);
+//			}
 		}
 	}
 }
