@@ -38,7 +38,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.animation_data.FixedFrameAnimation;
+import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.pc.graphics.awt.AWTContext;

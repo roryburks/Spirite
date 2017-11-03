@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import spirite.base.image_data.MediumHandle;
-import spirite.base.util.glmath.Vec2;
 
 public class Puppet {
 	public final List<Part> parts = new ArrayList<>();

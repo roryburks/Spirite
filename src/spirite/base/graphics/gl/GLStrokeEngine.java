@@ -13,7 +13,7 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.PreparedData;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
-import spirite.base.image_data.images.ABuiltMediumData;
+import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;

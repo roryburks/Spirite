@@ -1,4 +1,4 @@
-package spirite.base.image_data.images;
+package spirite.base.image_data.mediums;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;

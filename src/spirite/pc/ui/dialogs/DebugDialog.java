@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.DecimalFormat;
-import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,7 +22,6 @@ import javax.swing.border.EmptyBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.gl.GLEngine;
-import spirite.base.graphics.renderer.CacheManager.CacheDomain;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.DebugObserver;
 

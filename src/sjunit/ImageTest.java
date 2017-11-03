@@ -1,9 +1,5 @@
 package sjunit;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
-
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;

@@ -6,8 +6,8 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
-import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.HybridHelper;
 

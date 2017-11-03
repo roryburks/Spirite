@@ -1,4 +1,4 @@
-package spirite.base.image_data.animation_data;
+package spirite.base.image_data.animations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.animations.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animation_data.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;

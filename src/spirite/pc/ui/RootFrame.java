@@ -32,7 +32,6 @@ import spirite.pc.ui.panel_layers.IImgPropertiesPanel;
 import spirite.pc.ui.panel_layers.LayersPanel;
 import spirite.pc.ui.panel_layers.ReferenceSchemePanel;
 import spirite.pc.ui.panel_layers.layer_properties.LayerPropertiesPanel;
-import spirite.pc.ui.panel_layers.layer_properties.SpriteLayerPanel;
 import spirite.pc.ui.panel_toolset.ColorPicker;
 import spirite.pc.ui.panel_toolset.PalettePanel;
 import spirite.pc.ui.panel_toolset.ToolSettingsPanel;

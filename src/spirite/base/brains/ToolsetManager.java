@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
-import spirite.base.image_data.images.drawer.DefaultImageDrawer;
-import spirite.base.image_data.images.drawer.GroupNodeDrawer;
-import spirite.base.image_data.images.drawer.IImageDrawer;
-import spirite.base.image_data.images.maglev.MaglevImageDrawer;
+import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
+import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.maglev.MaglevImageDrawer;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.tools.properties.ButtonProperty;
 import spirite.hybrid.tools.properties.CheckBoxProperty;

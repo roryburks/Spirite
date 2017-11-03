@@ -1,10 +1,9 @@
-package spirite.base.image_data.images.drawer;
+package spirite.base.image_data.mediums.drawer;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
-// Bad, but auto-complete include isn't working with my Eclipse
-import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
 import spirite.base.util.glmath.MatTrans;
 
 public class GroupNodeDrawer 

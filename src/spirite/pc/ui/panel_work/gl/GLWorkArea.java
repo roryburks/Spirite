@@ -34,7 +34,6 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
-import spirite.base.image_data.images.ABuiltMediumData;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;

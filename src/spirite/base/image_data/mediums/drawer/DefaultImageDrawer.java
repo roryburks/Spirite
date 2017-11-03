@@ -1,11 +1,9 @@
-package spirite.base.image_data.images.drawer;
+package spirite.base.image_data.mediums.drawer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.sun.prism.paint.Color;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
@@ -21,18 +19,17 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltMediumData;
-import spirite.base.image_data.images.IMedium;
-// Auto-complete include isn't working so this comment is a marker for easy finding
-import spirite.base.image_data.images.drawer.IImageDrawer.IClearModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IColorChangeModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IFillModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IFlipModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IInvertModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IStrokeModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.ITransformModule;
-import spirite.base.image_data.images.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.STATE;

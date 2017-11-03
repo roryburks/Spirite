@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.image_data.images.ABuiltMediumData;
+import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;

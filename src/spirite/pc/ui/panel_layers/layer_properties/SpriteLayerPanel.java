@@ -26,12 +26,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.RawImage;
-import spirite.base.image_data.GroupTree.LayerNode;
-import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -42,7 +38,6 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
-import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class SpriteLayerPanel extends JPanel 
 	implements 

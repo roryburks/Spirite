@@ -15,9 +15,9 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.images.IMedium;
-import spirite.base.image_data.images.PrismaticMedium;
-import spirite.base.image_data.images.PrismaticMedium.LImg;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.PrismaticMedium;
+import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.util.glmath.Rect;
 
 public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserver, MFlashObserver{

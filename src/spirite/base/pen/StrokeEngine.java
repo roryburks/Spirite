@@ -10,7 +10,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.images.ABuiltMediumData;
+import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;

@@ -6,10 +6,10 @@ import java.util.List;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.Rect;
 
 public class PuppetLayer extends Layer {

@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.RawImage;
 import spirite.base.util.glmath.Rect;
 
 /**

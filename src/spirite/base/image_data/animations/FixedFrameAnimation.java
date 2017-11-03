@@ -1,4 +1,4 @@
-package spirite.base.image_data.animation_data;
+package spirite.base.image_data.animations;
 
 import java.util.ArrayList;
 import java.util.Comparator;

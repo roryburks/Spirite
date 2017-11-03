@@ -2,15 +2,12 @@ package spirite.base.image_data;
 
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.IImage;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.RawImage;
-import spirite.base.graphics.gl.GLImage;
-import spirite.base.graphics.gl.GLParameters;
+import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.images.DynamicMedium;
-import spirite.base.image_data.images.IMedium;
-import spirite.base.image_data.images.PrismaticMedium;
+import spirite.base.image_data.mediums.DynamicMedium;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;

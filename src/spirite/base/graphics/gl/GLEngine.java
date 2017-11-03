@@ -17,7 +17,6 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.util.glmath.GLC;

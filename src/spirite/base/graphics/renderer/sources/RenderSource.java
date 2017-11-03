@@ -6,8 +6,8 @@ import java.util.List;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.MediumHandle;
 
 /**
  * A RenderSource corresponds to an object which can be rendered and it implements

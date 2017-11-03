@@ -44,10 +44,10 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.animation_data.FixedFrameAnimation;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.base.image_data.animation_data.FixedFrameAnimation.Marker;
+import spirite.base.image_data.animations.FixedFrameAnimation;
+import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
+import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
+import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 

@@ -6,8 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import sjunit.file.BuildSaveLoadTest;
 import sjunit.image_data.animations.FFAnimTest;
-import sjunit.util.InterpolationTests;
 import sjunit.util.CompactionTests;
+import sjunit.util.InterpolationTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({ 

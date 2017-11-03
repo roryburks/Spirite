@@ -6,7 +6,6 @@ import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
 import spirite.base.graphics.IImage;
-import spirite.base.graphics.RawImage;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;

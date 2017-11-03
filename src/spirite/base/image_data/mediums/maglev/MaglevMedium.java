@@ -1,4 +1,4 @@
-package spirite.base.image_data.images.maglev;
+package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +10,9 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.images.ABuiltMediumData;
-import spirite.base.image_data.images.IMedium;
-import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;

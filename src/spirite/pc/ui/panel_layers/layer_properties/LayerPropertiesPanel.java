@@ -4,7 +4,6 @@ import java.awt.GridLayout;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.LayerNode;

@@ -1,4 +1,4 @@
-package spirite.base.image_data.images.drawer;
+package spirite.base.image_data.mediums.drawer;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;

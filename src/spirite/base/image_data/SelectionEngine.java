@@ -15,7 +15,7 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.images.ABuiltMediumData;
+import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.compaction.IntCompactor;

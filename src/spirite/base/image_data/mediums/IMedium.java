@@ -1,9 +1,8 @@
-package spirite.base.image_data.images;
+package spirite.base.image_data.mediums;
 
 import spirite.base.graphics.IImage;
-import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.images.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 
 /**
  * IInternalImages are a form of base data type that serves as an intermediate between

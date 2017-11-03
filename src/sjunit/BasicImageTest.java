@@ -7,7 +7,6 @@ import spirite.base.graphics.RawImage;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
 public class BasicImageTest {
 	final static boolean deep = false;

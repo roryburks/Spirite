@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.AnimationNode;
-import spirite.base.image_data.animation_data.RigAnimation;
+import spirite.base.image_data.animations.RigAnimation;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 
 public class RigAnimationSchemePanel extends JPanel {
