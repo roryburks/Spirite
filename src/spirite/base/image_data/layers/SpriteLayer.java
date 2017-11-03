@@ -421,17 +421,6 @@ public class SpriteLayer extends Layer
 		}
 		return handles;
 	}
-
-	@Override
-	public void draw(GraphicsContext gc) {
-		// Note: Parts are already pre-sorted by depth when they are added and when
-		//	depth is changed.
-		List<TransformedHandle> drawList = getDrawList();
-		
-		for( TransformedHandle th : drawList) {
-			th.handle.drawLayer(gc, th.trans, gc.getComposite(), th.alpha);
-		}
-	}
 	
 	public void drawPart( GraphicsContext gc, Part part) {
 		float oldAlpha = gc.getAlpha();

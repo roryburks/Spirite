@@ -41,8 +41,6 @@ public class ReferenceLayer extends Layer {
 	@Override public List<BuildingMediumData> getDataToBuild() 
 	
 		{return (layer == null)? null : layer.getDataToBuild();}
-	@Override public void draw(GraphicsContext gc) 
-		{if( layer != null)layer.draw(gc);}
 
 	@Override public int getWidth() 
 		{return (layer == null)? 0 : layer.getWidth();}

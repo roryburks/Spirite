@@ -34,10 +34,6 @@ public class SimpleLayer extends Layer {
 		return Arrays.asList(data);
 	}
 
-	@Override
-	public void draw(GraphicsContext gc) {
-		data.drawLayer(gc,null);
-	}
 
 	@Override
 	public BuildingMediumData getActiveData() {

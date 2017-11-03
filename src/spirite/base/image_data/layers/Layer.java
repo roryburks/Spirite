@@ -17,7 +17,13 @@ public abstract class Layer {
 	public abstract BuildingMediumData getActiveData();
 	public abstract List<MediumHandle> getImageDependencies();
 	public abstract List<BuildingMediumData> getDataToBuild();
-	public abstract void draw( GraphicsContext gc);
+	public final void draw( GraphicsContext gc) {
+		List<TransformedHandle> drawList = getDrawList();
+		
+		for( TransformedHandle th : drawList) {
+			th.handle.drawLayer(gc, th.trans, gc.getComposite(), th.alpha);
+		}
+	}
 	public abstract int getWidth();
 	public abstract int getHeight();
 	

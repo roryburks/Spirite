@@ -30,6 +30,7 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
+import spirite.base.image_data.layers.PuppetLayer;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.DynamicMedium;
 import spirite.base.image_data.mediums.FlatMedium;
@@ -316,6 +317,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		public int color;
 		public BuildingMediumData( MediumHandle handle) {
 			this.handle = handle;
+			this.trans = new MatTrans();
 		}
 		public BuildingMediumData( MediumHandle handle, int ox, int oy) {
 			this.handle = handle;
@@ -394,6 +396,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		if( data == null)
 			doer.Do(null);
 
+		System.out.println(data.handle.id);
 		IMedium medium = mediumData.get(data.handle.id);
 		if( medium == null)
 			doer.Do(null);
@@ -671,7 +674,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	
 	
-	public LayerNode addNewSimpleLayer( GroupTree.Node context, RawImage img, String name, InternalImageTypes type) {
+	public LayerNode addNewSimpleLayer( GroupTree.Node contextNode, RawImage img, String name, InternalImageTypes type) {
 		IMedium ii = null;
 		
 		switch( type) {
@@ -693,13 +696,13 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		MediumHandle handle = new MediumHandle( this, workingID);
 		workingID++;
 
-		LayerNode node = groupTree.new LayerNode( new SimpleLayer(handle), name);
-		_addLayer(node, context);
+		LayerNode insertedNode = groupTree.new LayerNode( new SimpleLayer(handle), name);
+		_addLayer(insertedNode, contextNode);
 		
-		return node;
+		return insertedNode;
 	}
 	
-	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, int argb, InternalImageTypes type) {
+	public LayerNode addNewSimpleLayer(  GroupTree.Node contextNode, int w, int h, String name, int argb, InternalImageTypes type) {
 		// Create new Image Data and link it to the workspace
 		RawImage img = HybridHelper.createImage(w, h);
 		
@@ -707,10 +710,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
         gc.setColor( argb);
         gc.fillRect( 0, 0, width, height);
 		
-		return addNewSimpleLayer( context, img, name, type);
+		return addNewSimpleLayer( contextNode, img, name, type);
 	}
 	
-	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
+	public LayerNode addNewRigLayer( Node contextNode, int w, int h, String name, int argb) {
 		RawImage img = HybridHelper.createImage(w, h);
 		
 		GraphicsContext gc = img.getGraphics();
@@ -721,10 +724,22 @@ public class ImageWorkspace implements MWorkspaceObserver {
         mediumData.put(workingID, internal);
         MediumHandle handle= new MediumHandle(this, workingID++);
         
-		LayerNode node = groupTree.new LayerNode( new SpriteLayer(handle), name);
-		_addLayer(node,context);
+		LayerNode insertedNode = groupTree.new LayerNode( new SpriteLayer(handle), name);
+		_addLayer(insertedNode,contextNode);
 		
-		return node;
+		return insertedNode;
+	}
+
+	public LayerNode addNewPuppetLayer( Node contextNode, String name) {
+		
+		IMedium internal = new MaglevMedium(this);
+		mediumData.put(workingID, internal);
+		MediumHandle handle = new MediumHandle( this, workingID++);
+		
+		LayerNode insertedNode = groupTree.new LayerNode( new PuppetLayer(this, handle), name);
+		_addLayer(insertedNode, contextNode);
+		
+		return insertedNode;
 	}
 	
 	public LayerNode addNewReferenceLayer(Node context, LayerNode underlying, String name) {
@@ -738,33 +753,33 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 * the Workspace.  When creating a complex custom Layer or constructing
 	 * multiple layers at once (e.g. when loading), it is useful to do this
 	 * and then call ImportData with the Data Map to add a Layer.*/
-	public LayerNode addShellLayer(GroupTree.Node context, Layer layer, String name ){
-		LayerNode node = groupTree.new LayerNode( layer, name);
+	public LayerNode addShellLayer(GroupTree.Node contextNode, Layer layer, String name ){
+		LayerNode insertedNode = groupTree.new LayerNode( layer, name);
 		
-		executeChange( createAdditionChange(node, context));
+		executeChange( createAdditionChange(insertedNode, contextNode));
 		
-		return node;
+		return insertedNode;
 	}
 	
 	/** Internal addLayer method adds the Layer, tagging a Workspace Resize action
 	 * along with it if one is warranted.
 	 */
-	private void _addLayer(LayerNode node, Node context) 
+	private void _addLayer(LayerNode insertedNode, Node contextNode) 
 	{
-		if( width < node.getLayer().getWidth() || height < node.getLayer().getHeight()) {
+		if( width < insertedNode.getLayer().getWidth() || height < insertedNode.getLayer().getHeight()) {
 			List<UndoableAction> actions = new ArrayList<>(2);
 
-			actions.add(new StructureAction( createAdditionChange(node,context)));
+			actions.add(new StructureAction( createAdditionChange(insertedNode,contextNode)));
 			actions.add(new StructureAction( 
 					new DimensionChange( 
-							Math.max(width, node.getLayer().getWidth()),
-							Math.max(height, node.getLayer().getHeight()))
+							Math.max(width, insertedNode.getLayer().getWidth()),
+							Math.max(height, insertedNode.getLayer().getHeight()))
 					));
 			
 			undoEngine.performAndStore(undoEngine.new CompositeAction( actions, actions.get(0).description));
 		}
 		else
-			executeChange( createAdditionChange(node,context));
+			executeChange( createAdditionChange(insertedNode,contextNode));
 	}
 	
 	/** Adds a GroupNode at the given context. */
@@ -1720,5 +1735,29 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
+	
+	public String getNonDuplicateName(String string) {
+		int i = 0;
+		boolean conflict = true;
+		String tryName = string;
+		
+		List<Node> nodes = groupTree.getRoot().getAllAncestors();
+		while( conflict) {
+			conflict = false;
+			tryName = i == 0 ? string : string + "_" + i;
+			
+			for( Node node : nodes) {
+				if( node.getName() == tryName) {
+					conflict = true;
+					break;
+				}
+			}
+			
+			++i;
+		}
+		
+		
+		return tryName;
+	}
 	
 }

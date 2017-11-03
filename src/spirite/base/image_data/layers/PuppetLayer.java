@@ -1,6 +1,7 @@
 package spirite.base.image_data.layers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
@@ -10,31 +11,34 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.util.glmath.Rect;
 
 public class PuppetLayer extends Layer {
 	public final Puppet puppet;
 	public final ImageWorkspace context;
 	
+	MediumHandle __D__medium;
+	
 	private Puppet.Part selectedPart;
 	
-	public PuppetLayer( ImageWorkspace context) {
+	public PuppetLayer( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
 		this.puppet = new Puppet();
+		
+		__D__medium = firstMedium;
 	}
 
 	@Override
 	public BuildingMediumData getActiveData() {
-		if( selectedPart == null) return null;
-		
-		//BuildingImageData data = new BuildingImageData(handle, ox, oy)
-		return null;
+		return new BuildingMediumData(__D__medium);
 	}
 
 	@Override
 	public List<MediumHandle> getImageDependencies() {
 		List<MediumHandle> ret = new ArrayList<>(puppet.parts.size());
 		
+		ret.add(__D__medium);
 		for( Puppet.Part part : puppet.parts)
 			ret.add(part.handle);
 		
@@ -43,38 +47,32 @@ public class PuppetLayer extends Layer {
 
 	@Override
 	public List<BuildingMediumData> getDataToBuild() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<BuildingMediumData>(0);
 	}
 
-	@Override
-	public void draw(GraphicsContext gc) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public boolean canMerge(Node node) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public List<TransformedHandle> getDrawList() {
-		// TODO Auto-generated method stub
-		return null;
+		TransformedHandle renderable = new TransformedHandle();
+		renderable.handle = __D__medium;
+		renderable.depth = 0;
+		
+		return Arrays.asList( new TransformedHandle[]{renderable});
 	}
 
 	@Override

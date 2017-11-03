@@ -379,7 +379,8 @@ public class LayerTreePanel extends ContentTree
 					{"&New..."},
 					{".New Simple &Layer", "newLayer", "new_layer"},
 					{".New Layer &Group", "newGroup", "new_group"},
-					{".New &Rig Layer", "newRig", null}
+					{".New &Rig Layer", "newRig", null},
+					{".New &Puppet Layer", "newPuppet", null},
 				})
 			);
 			contextMenu.node = null;
@@ -588,6 +589,12 @@ public class LayerTreePanel extends ContentTree
 			if( helper != null) 
 				workspace.addNewRigLayer(workspace.getSelectedNode(), 
 						helper.width, helper.height, helper.name, helper.color.getRGB());
+			break;}
+		case "newPuppet": {
+			String name = JOptionPane.showInputDialog("Enter name for new Animation:", 
+					workspace.getNonDuplicateName("puppetLayer"));
+			workspace.addNewPuppetLayer( workspace.getSelectedNode(), name);
+			
 			break;}
 		default:
 			MDebug.log(evt.getActionCommand());
