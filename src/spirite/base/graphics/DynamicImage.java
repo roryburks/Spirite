@@ -12,6 +12,13 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
+/**
+ * DynamicImage
+ * 	A wrapper for a RawImage which automatically resizes itself to 
+ * 
+ *	Although much of this is simply splitting DynamicMedium's code over two objects, since 
+ *	other mediums commonly use this behavior, putting it in its own scope.
+ */
 public class DynamicImage {
 	private ImageWorkspace context;
 	private int ox, oy;

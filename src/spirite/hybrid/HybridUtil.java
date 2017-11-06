@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.IntBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.activation.UnsupportedDataTypeException;
 import javax.imageio.ImageIO;
@@ -233,26 +234,46 @@ public class HybridUtil {
 		
 		if(transparentOnly && !data.isBGTransparent())
 			return new Rect(0,0,data.w,data.h);
-
-		int ret;
 		
-		// Left
-		ret = data.findFirstEmptyLine( new IntCounter(0,data.w-1), false);
-		if( ret == -1) return new Rect(0,0,0,0);
-		x1 = ret;
+		AtomicReference<Integer> leftRet = new AtomicReference<Integer>(null);
+		Thread left = new Thread(() -> {
+			leftRet.set(data.findFirstEmptyLine( new IntCounter(0,data.w-1), false));
+		});
+		AtomicReference<Integer> rightRet = new AtomicReference<Integer>(null);
+		Thread right = new Thread(() -> {
+			rightRet.set(data.findFirstEmptyLine( new IntCounter(data.w-1, 0), false));
+		});
+		AtomicReference<Integer> topRet = new AtomicReference<Integer>(null);
+		Thread top = new Thread(() -> {
+			topRet.set(data.findFirstEmptyLine( new IntCounter(0,data.h-1), true));
+		});
+		AtomicReference<Integer> bottomRet = new AtomicReference<Integer>(null);
+		Thread bottom = new Thread(() -> {
+			bottomRet.set(data.findFirstEmptyLine( new IntCounter(data.h-1, 0), true));
+		});
 		
-		// Right
-		ret = data.findFirstEmptyLine( new IntCounter(data.w-1, 0), false);
-		x2 = (ret == -1) ? data.w-1 : data.w-1-ret;
-
-		// Top
-		ret = data.findFirstEmptyLine( new IntCounter(0,data.h-1), true);
-		if( ret == -1) return new Rect(0,0,0,0);
-		y1 =  ret;
-
-		// Bottom
-		ret = data.findFirstEmptyLine( new IntCounter(data.h-1, 0), true);
-		y2 = (ret == -1) ? data.h-1 : data.h-1-ret;
+		left.start();
+		right.start();
+		top.start();
+		bottom.start();
+		try {
+			left.join();
+			right.join();
+			top.join();
+			bottom.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if( leftRet.get() == -1)
+			return new Rect(0,0,0,0);
+		x1 = leftRet.get();
+		x2 = (rightRet.get() == -1) ? data.w-1 : data.w-1-rightRet.get();
+		
+		if( topRet.get() == -1)
+			return new Rect(0,0,0,0);
+		y1 = topRet.get();
+		y2 = (bottomRet.get() == -1) ? data.h-1 : data.h-1-bottomRet.get();
 
 		x1 = Math.max(0, x1 - buffer);
 		y1 = Math.max(0, y1 - buffer);

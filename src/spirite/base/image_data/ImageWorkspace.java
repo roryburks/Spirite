@@ -383,20 +383,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	
 	/** Converts BuildingImageData (which is provided by Layers to describe all
 	 * sub-parts in a partially-built form) into fully-built Image Data	 */
-	// Retired.  Use doOnBuiltData
-//	public ABuiltImageData buildData( BuildingImageData data) {
-//		if( data == null) return null;
-//		
-//		IInternalImage ii = imageData.get(data.handle.id);
-//		if( ii == null) return null;
-//		
-//		return ii.build(data);
-//	}
 	public void doOnBuiltData( BuildingMediumData data, DoOnABID doer) {
 		if( data == null)
 			doer.Do(null);
 
-		System.out.println(data.handle.id);
 		IMedium medium = mediumData.get(data.handle.id);
 		if( medium == null)
 			doer.Do(null);
@@ -1755,8 +1745,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			
 			++i;
 		}
-		
-		
 		return tryName;
 	}
 	
