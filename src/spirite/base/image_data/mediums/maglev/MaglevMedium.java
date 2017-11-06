@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
@@ -26,6 +27,8 @@ import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.hybrid.HybridHelper;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 /**
  * A Maglev Internal Image is an image that floats just above the surface, 
@@ -40,7 +43,7 @@ public class MaglevMedium implements IMedium {
 	final List<MagLevThing> things;
 	
 	private final ImageWorkspace context;
-	RawImage builtImage = null;
+	DynamicImage builtImage = null;
 	private boolean isBuilt = false;
 	
 	public MaglevMedium( ImageWorkspace context) {
@@ -78,6 +81,7 @@ public class MaglevMedium implements IMedium {
 			for( int i=0; i < toTransform.length; i += 2) {
 				Vec2 a = new Vec2(toTransform[i]-x1, toTransform[i+1]-y1);
 				
+				float scale_a = a.getMag();
 				float a1 = a.getMag();
 				Vec2 a2 = a.sub(b.scalar(a.dot(b)/b.dot(b)));
 			}
@@ -236,8 +240,8 @@ public class MaglevMedium implements IMedium {
 	@Override public int getWidth() {return context.getWidth(); }
 	@Override public int getHeight() {return context.getHeight();}
 
-	@Override public int getDynamicX() { return 0; }
-	@Override public int getDynamicY() { return 0; }
+	@Override public int getDynamicX() { return (isBuilt) ? builtImage.getXOffset() : 0; }
+	@Override public int getDynamicY() { return (isBuilt) ? builtImage.getYOffset() : 0; }
 
 	@Override public ABuiltMediumData build(BuildingMediumData building) {return new MaglevBuiltImageData(building);}
 	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) 
@@ -249,7 +253,7 @@ public class MaglevMedium implements IMedium {
 
 	@Override public IImage readOnlyAccess() {
 		Build();
-		return builtImage;
+		return builtImage.getBase();
 	}
 	
 	@Override
@@ -268,14 +272,16 @@ public class MaglevMedium implements IMedium {
 		if( !building) {
 			building = true;
 			if( !isBuilt) {
-				builtImage = HybridHelper.createImage(getWidth(), getHeight());
-				GraphicsContext gc = builtImage.getGraphics();
+				builtImage = new DynamicImage(context, HybridHelper.createNillImage(), 0, 0);
+				GraphicsContext gc = builtImage.checkout(new MatTrans());
 	
 				ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
 				BuiltSelection mask = new BuiltSelection(null, 0, 0);
 				for( MagLevThing thing : things) {
 					thing.draw( built, mask, gc, this);
 				}
+				
+				builtImage.checkin();
 			}
 			isBuilt = true;
 			building = false;
@@ -320,7 +326,7 @@ public class MaglevMedium implements IMedium {
 		{
 			MatTrans oldTrans = gc.getTransform();
 			gc.preTransform(trans);
-			gc.drawImage(builtImage, 0, 0);
+			gc.drawImage(builtImage.getBase(), builtImage.getXOffset(), builtImage.getYOffset());
 			gc.setTransform(oldTrans);
 		}
 		@Override public void drawBorder(GraphicsContext gc) 
@@ -344,11 +350,16 @@ public class MaglevMedium implements IMedium {
 		// Counter-intuitively, checking in and checking out of a MaglevInternalImage
 		//	can be a thing that makes sense to do as the StrokeEngine uses it for the
 		//	behavior we want.
-		@Override public GraphicsContext checkout() { return checkoutRaw().getGraphics();}
-		@Override public void checkin() { handle.refresh();}
-		@Override public RawImage checkoutRaw() {
-			Build();
-			return builtImage;
+		@Override
+		protected void _doOnGC(DoerOnGC doer) {
+			doer.Do(builtImage.checkout(trans));
+			builtImage.checkin();
+		}
+
+		@Override
+		protected void _doOnRaw(DoerOnRaw doer) {
+			doer.Do(builtImage.checkoutRaw(trans));
+			builtImage.checkin();
 		}
 	}
 }

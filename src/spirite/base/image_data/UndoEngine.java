@@ -1338,9 +1338,9 @@ public class UndoEngine {
 		}
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
-			GraphicsContext gc = built.checkout();
-			gc.drawImage(stored, 0, 0);
-			built.checkin();
+			built.doOnGC((gc) -> {
+				gc.drawImage(stored, 0, 0);
+			});
 		}
 	}
 	

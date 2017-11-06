@@ -92,23 +92,6 @@ public class FlatMedium implements IMedium {
 			gc.setTransform( transform);
 		}
 		
-		public GraphicsContext checkout() {
-			GraphicsContext gc = _checkoutImage().getGraphics();
-			gc.preTransform(invTrans);
-			return gc;
-		}
-		
-		public RawImage checkoutRaw() {
-			return _checkoutImage();
-		}
-		
-		private RawImage _checkoutImage() {
-			ImageWorkspace context = handle.getContext();
-			
-			context.getUndoEngine().prepareContext(handle);
-			
-			return image;
-		}
 		
 		public void checkin() {
 			//locked = false;
@@ -145,6 +128,16 @@ public class FlatMedium implements IMedium {
 
 		public MatTrans getCompositeTransform() {
 			return new MatTrans();			
+		}
+
+		@Override
+		protected void _doOnGC(DoerOnGC doer) {
+			doer.Do( image.getGraphics());
+		}
+
+		@Override
+		protected void _doOnRaw(DoerOnRaw doer) {
+			doer.Do( image);
 		}
 	}
 

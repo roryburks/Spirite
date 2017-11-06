@@ -96,8 +96,9 @@ public class MaglevImageDrawer
 				
 				mimg.addThing(stroke);
 
-				GraphicsContext gc = mimg.builtImage.getGraphics();
+				GraphicsContext gc = mimg.builtImage.checkout(new MatTrans());
 				stroke.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, gc, mimg);
+				mimg.builtImage.checkin();
 			}
 			@Override
 			public String getDescription() {
@@ -145,9 +146,10 @@ public class MaglevImageDrawer
 				mimg.Build();
 				
 				mimg.addThing(fill);
-				
-				GraphicsContext gc = mimg.builtImage.getGraphics();
+
+				GraphicsContext gc = mimg.builtImage.checkout(new MatTrans());
 				fill.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, gc, mimg);
+				mimg.builtImage.checkin();
 				
 			}
 			@Override
