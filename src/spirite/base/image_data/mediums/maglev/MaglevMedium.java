@@ -273,15 +273,14 @@ public class MaglevMedium implements IMedium {
 			building = true;
 			if( !isBuilt) {
 				builtImage = new DynamicImage(context, HybridHelper.createNillImage(), 0, 0);
-				GraphicsContext gc = builtImage.checkout(new MatTrans());
-	
-				ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
-				BuiltSelection mask = new BuiltSelection(null, 0, 0);
-				for( MagLevThing thing : things) {
-					thing.draw( built, mask, gc, this);
-				}
 				
-				builtImage.checkin();
+				builtImage.doOnGC( (gc) -> {
+					ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
+					BuiltSelection mask = new BuiltSelection(null, 0, 0);
+					for( MagLevThing thing : things) {
+						thing.draw( built, mask, gc, this);
+					}	
+				}, new MatTrans());
 			}
 			isBuilt = true;
 			building = false;
@@ -352,14 +351,12 @@ public class MaglevMedium implements IMedium {
 		//	behavior we want.
 		@Override
 		protected void _doOnGC(DoerOnGC doer) {
-			doer.Do(builtImage.checkout(trans));
-			builtImage.checkin();
+			builtImage.doOnGC(doer, trans);
 		}
 
 		@Override
 		protected void _doOnRaw(DoerOnRaw doer) {
-			doer.Do(builtImage.checkoutRaw(trans));
-			builtImage.checkin();
+			builtImage.doOnRaw(doer, trans);
 		}
 	}
 }

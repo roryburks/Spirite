@@ -110,14 +110,12 @@ public class DynamicMedium implements IMedium {
 
 		@Override
 		protected void _doOnGC(DoerOnGC doer) {
-			doer.Do(image.checkout(trans));
-			image.checkin();
+			image.doOnGC(doer, trans);
 		}
 
 		@Override
 		protected void _doOnRaw(DoerOnRaw doer) {
-			doer.Do(image.checkoutRaw(trans));
-			image.checkin();
+			image.doOnRaw(doer, trans);
 		}
 	}
 }
