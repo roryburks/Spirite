@@ -2,24 +2,18 @@ package spirite.base.image_data.mediums;
 
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
-import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * A Dynamic Internal Image is a kind of image that automatically resizes itself

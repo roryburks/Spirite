@@ -19,7 +19,6 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.compaction.IntCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;

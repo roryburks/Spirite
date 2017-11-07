@@ -283,22 +283,20 @@ public class ColorPicker extends OmniComponent
 
 		private boolean changing = false;
 		public void setColor( Color c) {
-			SwingUtilities.invokeLater( new Runnable() { @Override
-				public void run() {
-					changing = true;
-					rSlider.setValue(c.getRed());
-					gSlider.setValue(c.getGreen());
-					bSlider.setValue(c.getBlue());
-					aSlider.setValue(c.getAlpha());
+			SwingUtilities.invokeLater( () -> {
+				changing = true;
+				rSlider.setValue(c.getRed());
+				gSlider.setValue(c.getGreen());
+				bSlider.setValue(c.getBlue());
+				aSlider.setValue(c.getAlpha());
 
-					rText.setText(Integer.toString(c.getRed()));
-					gText.setText(Integer.toString(c.getGreen()));
-					bText.setText(Integer.toString(c.getBlue()));
-					aText.setText(Integer.toString(c.getAlpha()));
-					
-					cPanel.setBackground(c);
-					changing = false;
-				}
+				rText.setText(Integer.toString(c.getRed()));
+				gText.setText(Integer.toString(c.getGreen()));
+				bText.setText(Integer.toString(c.getBlue()));
+				aText.setText(Integer.toString(c.getAlpha()));
+				
+				cPanel.setBackground(c);
+				changing = false;
 			});
 		}
 	}

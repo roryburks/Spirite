@@ -4,8 +4,6 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
-import javax.swing.SwingUtilities;
-
 import jpen.PButtonEvent;
 import jpen.PKindEvent;
 import jpen.PLevel;
@@ -18,11 +16,13 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.Penner;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
 /**
  * 
- * Uses the JPen2 library,
- * @author Guy
+ * Uses the JPen2 library.
+ * 
+ * NOTE: Since JPen is running asynchronously, queueToRun should be used.
  *
  */
 public class JPenPenner implements PenListener
@@ -77,14 +77,14 @@ public class JPenPenner implements PenListener
 	@Override
 	public void penButtonEvent(PButtonEvent evt) {
 		if( evt.button.value) {
-			SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
+			HybridHelper.queueToRun(() -> {
 				penner.penDownEvent(MButtonFromPButton(evt));
-			}});
+			});
 		}
 		else {
-			SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
+			HybridHelper.queueToRun(() -> {
 				penner.penUpEvent(MButtonFromPButton(evt));
-			}});
+			});
 		}
 	}
 
@@ -131,9 +131,7 @@ public class JPenPenner implements PenListener
 
 	@Override
 	public void penTock(long arg0) {
-		SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
-			penner.step();
-		}});
+		HybridHelper.queueToRun(() -> {penner.step();});
 	}
 
 	

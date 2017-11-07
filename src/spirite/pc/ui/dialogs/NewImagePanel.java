@@ -87,12 +87,10 @@ public class NewImagePanel extends javax.swing.JPanel
         MouseListener ml = new MouseAdapter() {
             @Override
             public void mousePressed(final MouseEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        JTextField tf = (JTextField)e.getSource();
-                        int offset = tf.viewToModel(e.getPoint());
-                        tf.setCaretPosition(offset);
-                    }
+                SwingUtilities.invokeLater( () -> {
+                    JTextField tf = (JTextField)e.getSource();
+                    int offset = tf.viewToModel(e.getPoint());
+                    tf.setCaretPosition(offset);
                 });
             }
         };

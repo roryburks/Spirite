@@ -27,6 +27,7 @@ public class Spirite{
 
             setLookAndFeel();
 
+            // So that it's run on the UI thread.
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() { createUI();}
             });

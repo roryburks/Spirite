@@ -131,11 +131,9 @@ public class DebugDialog extends JDialog
 		textResources.setText(str);
 		
 		
-		SwingUtilities.invokeLater(new Runnable(){
-			@Override
-			public void run() {
-				scrollResources.getVerticalScrollBar().setValue(fix_y);
-			}
+		// Avoids recursive dead-locks
+		SwingUtilities.invokeLater( () -> {
+			scrollResources.getVerticalScrollBar().setValue(fix_y);
 		});
 //		textResources.setText(GLEngine.getInstance().dispResourcesUsed());
 	}

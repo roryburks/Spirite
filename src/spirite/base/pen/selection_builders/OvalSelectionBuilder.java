@@ -3,7 +3,6 @@ package spirite.base.pen.selection_builders;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.hybrid.HybridHelper;
 
 public class OvalSelectionBuilder extends ASelectionBuilder {

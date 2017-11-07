@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;

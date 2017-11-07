@@ -179,12 +179,7 @@ public class UndoPanel extends OmniComponent
 	// :::: MUndoEngineObserver
 	@Override
 	public void historyChanged(List<UndoIndex> undoHistory) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				constructFromHistory( undoHistory);
-			}
-		});
+		SwingUtilities.invokeLater( () -> { constructFromHistory( undoHistory);});
 		
 	}
 
@@ -206,22 +201,19 @@ public class UndoPanel extends OmniComponent
 		if( constructing) return;
 		
 		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				if( engine == null)
-					return;
-				
-				
-				ListSelectionModel model = (ListSelectionModel) evt.getSource();
-				int i = model.getMinSelectionIndex();
-				Rectangle rect = list.getCellBounds(i,i);
-				if( rect != null)
-					list.scrollRectToVisible( rect);
-				
-				if( i != engine.getQueuePosition()) {
-					engine.setQueuePosition(i);
-				}
+		SwingUtilities.invokeLater( () -> {
+			if( engine == null)
+				return;
+			
+			
+			ListSelectionModel model = (ListSelectionModel) evt.getSource();
+			int i = model.getMinSelectionIndex();
+			Rectangle rect = list.getCellBounds(i,i);
+			if( rect != null)
+				list.scrollRectToVisible( rect);
+			
+			if( i != engine.getQueuePosition()) {
+				engine.setQueuePosition(i);
 			}
 		});
 	}

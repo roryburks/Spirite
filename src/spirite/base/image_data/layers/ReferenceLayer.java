@@ -2,7 +2,6 @@ package spirite.base.image_data.layers;
 
 import java.util.List;
 
-import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;

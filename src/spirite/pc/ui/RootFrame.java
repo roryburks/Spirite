@@ -349,8 +349,8 @@ public class RootFrame extends javax.swing.JFrame
 		glassPane.setCursor(Cursor.getPredefinedCursor(cursorType));
 		glassPane.setVisible(true);
 		
-		Thread outer = new Thread( new Runnable() {@Override public void run() {
-			Thread thread = new Thread(new Runnable() {@Override public void run() {
+		Thread outer = new Thread( () -> {
+			Thread thread = new Thread(() -> {
 				while( master.getSaveEngine().isLocked() ) {
 					try {
 						Thread.sleep(100);
@@ -358,7 +358,7 @@ public class RootFrame extends javax.swing.JFrame
 						e.printStackTrace();
 					}
 				}
-			}});
+			});
 			try {
 				int option = JOptionPane.NO_OPTION;
 				thread.start();
@@ -371,24 +371,24 @@ public class RootFrame extends javax.swing.JFrame
 				}
 				
 				if( option == JOptionPane.CANCEL_OPTION) {
-					SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+					SwingUtilities.invokeLater( () -> {
 						glassPane.setVisible(false);
-					}});
+					});
 					return;
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
-			SwingUtilities.invokeLater(new Runnable() {@Override public void run() {
+			SwingUtilities.invokeLater( () -> {
 				try {
 				dispose();
 				}catch (Exception e) {
 					e.printStackTrace();
 				}
 		        System.exit(0);	
-			}});
-		}});
+			});
+		});
 
 		outer.start();
 	}

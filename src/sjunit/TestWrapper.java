@@ -3,6 +3,7 @@ package sjunit;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
+import spirite.hybrid.HybridHelper;
 
 public class TestWrapper {
 	private static class CarryInfo {
@@ -19,26 +20,24 @@ public class TestWrapper {
 		MasterControl master;
         master = new MasterControl();
 
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() { 
-            	info.swingThread = Thread.currentThread();
-            	synchronized (info.swingThread) {
-            		try {
-            			runner.Do(master);
-            		}
-            		catch( Exception e) { info.e = e;}
-            		catch( AssertionError e) { info.assertFail = e;}
-            		finally {
-	            		info.completed = true;
-	            		info.swingThread.notify();
-            		}
-				}
-            }
+        HybridHelper.queueToRun(() -> {
+        	info.swingThread = Thread.currentThread();
+        	synchronized (info.swingThread) {
+        		try {
+        			runner.Do(master);
+        		}
+        		catch( Exception e) { info.e = e;}
+        		catch( AssertionError e) { info.assertFail = e;}
+        		finally {
+            		info.completed = true;
+            		info.swingThread.notify();
+        		}
+			}
         });
         
         
         while( info.swingThread == null)
-        	Thread.currentThread().sleep(100);
+			Thread.sleep(100);
         while( !info.completed)
         	synchronized (info.swingThread) 
         		{info.swingThread.wait(100);}

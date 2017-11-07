@@ -403,31 +403,28 @@ public class SpriteLayerPanel extends JPanel
 		if( building ) return;
 		
 		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				if( rig == null) return;
-				building = true;
-				ListSelectionModel model =  listPanel.getSelectionModel();
-				int i = model.getMinSelectionIndex();
-				Rectangle rect = listPanel.getCellBounds(i,i);
-				if( rect != null)
-					listPanel.scrollRectToVisible( rect);
-				
-					Part part = SpriteLayerPanel.this.model.getElementAt(i);
-				if( rig.getActivePart() != part) {
-					rig.setActivePart(part);
-				}
-
-				tfDepth.setText(""+part.getDepth());
-				tfName.setText(part.getTypeName());
-				tfTransX.setText(""+part.getTranslationX());
-				tfTransY.setText(""+part.getTranslationY());
-				tfScaleX.setText(""+part.getScaleX());
-				tfScaleY.setText(""+part.getScaleY());
-				tfRot.setText(""+part.getRotation());
-				building = false;
+		SwingUtilities.invokeLater( () -> {
+			if( rig == null) return;
+			building = true;
+			ListSelectionModel model =  listPanel.getSelectionModel();
+			int i = model.getMinSelectionIndex();
+			Rectangle rect = listPanel.getCellBounds(i,i);
+			if( rect != null)
+				listPanel.scrollRectToVisible( rect);
+			
+				Part part = SpriteLayerPanel.this.model.getElementAt(i);
+			if( rig.getActivePart() != part) {
+				rig.setActivePart(part);
 			}
+
+			tfDepth.setText(""+part.getDepth());
+			tfName.setText(part.getTypeName());
+			tfTransX.setText(""+part.getTranslationX());
+			tfTransY.setText(""+part.getTranslationY());
+			tfScaleX.setText(""+part.getScaleX());
+			tfScaleY.setText(""+part.getScaleY());
+			tfRot.setText(""+part.getRotation());
+			building = false;
 		});
 	}
 

@@ -22,9 +22,9 @@ import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
-import spirite.base.image_data.ImageWorkspace;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
@@ -228,12 +228,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	@Override
 	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
 		ws = selected;
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				Rebuild();	
-			}
-		});
+		SwingUtilities.invokeLater( () ->{Rebuild();});
 	}
 
 	// :::: MAnimationViewObserver

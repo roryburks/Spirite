@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.GL2;
 
@@ -137,15 +136,10 @@ public class MasterControl
         };
         
         // One of the few usages of invokeLater that seems appropriate
-        SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-
-		        newWorkspace(640,480,0x00000000, true);
-		        getCurrentWorkspace().finishBuilding();
-			}
-		});
+        HybridHelper.queueToRun( () -> {
+	        newWorkspace(640,480,0x00000000, true);
+	        getCurrentWorkspace().finishBuilding();
+        });
     }
 
 
@@ -173,7 +167,7 @@ public class MasterControl
     		JOGLCore.init( (GL2 gl) ->{engine.init(gl);});
     		
     		// TODO: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
-    		SwingUtilities.invokeLater( () -> {frameManager.getWorkPanel().setGL(true);});
+    		HybridHelper.queueToRun( () -> {frameManager.getWorkPanel().setGL(true);});
     	}catch( Exception e) { 
     		MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Could not create OpenGL Context: \n" + e.getMessage());
     		return false;
@@ -689,7 +683,7 @@ public class MasterControl
 				
 				Selection selection = selectionEngine.getSelection();
 				if( selection == null) {
-					java.awt.Toolkit.getDefaultToolkit().beep();
+					HybridHelper.beep();
 					return;
 				}
 				

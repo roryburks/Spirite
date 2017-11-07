@@ -2,8 +2,6 @@ package spirite.base.util.glmath;
 
 import com.hackoeur.jglm.support.FastMath;
 
-import spirite.base.util.MUtil;
-
 /**
  * Created by Rory Burks on 4/28/2017.
  */

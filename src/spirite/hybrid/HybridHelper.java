@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import com.jogamp.opengl.GL2;
 
@@ -233,8 +234,14 @@ public class HybridHelper {
 	}
 
 
+	/** Gives a simple audible feedback to tell you that what you're trying to do can't be done. */
 	public static void beep() {
-		java.awt.Toolkit.getDefaultToolkit().beep();
-		
+		java.awt.Toolkit.getDefaultToolkit().beep();	
+	}
+	
+	/** Queues the runnable to run the next time the UI thread is free (usually to avoid cyclical dead-locks
+	 *  and such)*/
+	public static void queueToRun( Runnable runner) {
+		SwingUtilities.invokeLater(runner);
 	}
 }

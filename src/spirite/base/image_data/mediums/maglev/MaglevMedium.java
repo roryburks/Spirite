@@ -7,7 +7,6 @@ import java.util.List;
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
-import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
@@ -18,7 +17,6 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
-import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
@@ -27,8 +25,6 @@ import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
 
 /**
  * A Maglev Internal Image is an image that floats just above the surface, 

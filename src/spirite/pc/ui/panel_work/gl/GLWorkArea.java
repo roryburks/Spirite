@@ -20,7 +20,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLGraphics;
-import spirite.base.graphics.gl.GLParameters;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
@@ -34,7 +33,6 @@ import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
-import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
@@ -101,7 +99,6 @@ public class GLWorkArea
 		
 		glad.getContext().makeCurrent();
 
-		GLParameters params;
 		int w = glad.getSurfaceWidth();
 		int h = glad.getSurfaceHeight();
 		GL2 gl = glad.getGL().getGL2();

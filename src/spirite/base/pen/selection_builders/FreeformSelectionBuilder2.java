@@ -3,7 +3,6 @@ package spirite.base.pen.selection_builders;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.util.Colors;
 import spirite.base.util.compaction.IntCompactor;
 import spirite.base.util.glmath.Vec2i;

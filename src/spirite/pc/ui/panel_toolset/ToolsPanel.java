@@ -115,11 +115,7 @@ public class ToolsPanel extends JPanel
 
         // Calibrate the grid
         // Note, this is invoked later so that getWidth works correctly
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                calibrateGrid();
-            }
-        });
+        SwingUtilities.invokeLater( () -> {calibrateGrid();});
     }
 
     /**

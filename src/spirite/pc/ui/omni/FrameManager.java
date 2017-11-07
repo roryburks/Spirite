@@ -210,11 +210,8 @@ public class FrameManager
 		//	than get the Default Toolkit
 		for( OmniDialog d : dialogs) {
 			if( d.frame == frame) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						d.dispatchEvent( new WindowEvent(d,WindowEvent.WINDOW_CLOSING));
-					}
+				SwingUtilities.invokeLater( () -> {
+					d.dispatchEvent( new WindowEvent(d,WindowEvent.WINDOW_CLOSING));
 				});
 			}
 		}

@@ -40,7 +40,6 @@ import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.hybrid.DirectDrawer;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;

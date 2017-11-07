@@ -46,8 +46,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
-import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
+import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 
@@ -914,12 +914,12 @@ public class AnimationSchemeTreePanel extends JPanel
 		// Attempt to minimize reconstructs in the case multiple triggers happen
 		//	in quick succession (before the Panel needs to be redrawn)
 		reconstructed = false;
-		SwingUtilities.invokeLater( new Runnable() {@Override public void run() {
+		SwingUtilities.invokeLater( () -> {
 			if( !reconstructed) {
 				reconstructed = true;
 				reconstruct();
 			}
-		}});	
+		});	
 	}
 
 	// :::: MSelectionObserver

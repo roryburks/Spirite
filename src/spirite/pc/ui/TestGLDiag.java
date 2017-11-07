@@ -49,13 +49,14 @@ public class TestGLDiag extends JDialog  {
 			
 			@Override
 			public void init(GLAutoDrawable glad) {
-				SwingUtilities.invokeLater( new Runnable() { @Override public void run() {
+				// So that it's run on the UI thread
+				SwingUtilities.invokeLater( () ->  {
 					if( !init) {
 						glad.setContext(glad.createContext(JOGLCore.getContext()), true);
 						init = true;
 						glcanvas.repaint();
 					}
-				}});
+				});
 			}
 			
 			@Override

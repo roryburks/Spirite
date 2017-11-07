@@ -3,7 +3,6 @@ package spirite.base.image_data.mediums.maglev;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
@@ -18,9 +17,9 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill;
+import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevThing;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill.StrokeSegment;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;

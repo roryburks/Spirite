@@ -8,6 +8,7 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.RawImage;
 import spirite.base.util.glmath.GLC;
+import spirite.hybrid.HybridHelper;
 
 public class GLImage implements RawImage {
 	private static final GLEngine engine = GLEngine.getInstance();
@@ -75,7 +76,7 @@ public class GLImage implements RawImage {
 			tex = 0;
 			
 			// This is needed to make sure that it happens on the AWT Thread to prevent JOGL-internal deadlocks
-			SwingUtilities.invokeLater( () -> {
+			HybridHelper.queueToRun( () -> {
 				engine.glImageUnloaded(this);
 				GL2 gl = engine.getGL2();
 				if( engine.getTarget() == toDel)
