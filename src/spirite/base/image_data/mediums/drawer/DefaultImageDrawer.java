@@ -16,7 +16,6 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
@@ -30,6 +29,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.STATE;
@@ -72,18 +72,18 @@ public class DefaultImageDrawer
 	// to the next draw action performed.  If there is no seletion mask
 	// queued, it will use the active selection.
 	
-	private void queueSelectionMask( BuiltSelection mask) {
+	private void queueSelectionMask( SelectionMask mask) {
 		queuedSelection = mask;
 	}
-	private BuiltSelection pollSelectionMask(ImageWorkspace workspace) {
+	private SelectionMask pollSelectionMask(ImageWorkspace workspace) {
 		if( queuedSelection == null)
-			return workspace.getSelectionEngine().getBuiltSelection();
+			return workspace.getSelectionEngine().getSelection();
 
-		BuiltSelection ret = queuedSelection;
+		SelectionMask ret = queuedSelection;
 		queuedSelection = null;
 		return ret;
 	}
-	private BuiltSelection queuedSelection = null;
+	private SelectionMask queuedSelection = null;
 
 	// :::: IFillModule
 	@Override
@@ -91,7 +91,7 @@ public class DefaultImageDrawer
 		if( _data == null) return false;
 		ImageWorkspace workspace = _data.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		SelectionMask mask = selectionEngine.getSelection();
 		
 		AtomicReference<Boolean> aborted = new AtomicReference<Boolean>(false);
 		_data.doOnBuiltData((built) -> {
@@ -105,7 +105,7 @@ public class DefaultImageDrawer
 					return;
 				}
 				
-				if( mask.selection != null && !mask.selection.contains(x - mask.offsetX, y-mask.offsetY)) {
+				if( mask != null && !mask.contains(x, y)) {
 					aborted.set(true);
 					return;
 				}
@@ -195,18 +195,18 @@ public class DefaultImageDrawer
 	@Override
 	public void clear() {
 		final ImageWorkspace workspace = building.handle.getContext();
-		BuiltSelection sel = pollSelectionMask(workspace);
+		SelectionMask sel = pollSelectionMask(workspace);
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
-				if( mask.selection == null) {
+				if( mask == null) {
 					built.doOnGC((gc) -> {gc.clear();});
 				}
 				else {
 					built.doOnGC((gc) -> {
-						gc.translate(mask.offsetX, mask.offsetY);
+						gc.translate(mask.getOX(), mask.getOY());
 						gc.setComposite(Composite.DST_OUT, 1);
-						mask.selection.drawSelectionMask(gc);
+						mask.drawMask(gc);
 					});
 				}
 			}
@@ -221,7 +221,7 @@ public class DefaultImageDrawer
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 
-		BuiltSelection sel = selectionEngine.getBuiltSelection();
+		SelectionMask sel = selectionEngine.getSelection();
 		
 		if( selectionEngine.isLifted()) {
 			MatTrans trans = new MatTrans();
@@ -229,13 +229,13 @@ public class DefaultImageDrawer
 				trans.scale(-1, 1);
 			else
 				trans.scale(1, -1);
-			selectionEngine.transformSelection(trans);
+			//selectionEngine.transformSelection(trans);
 		}
-		else if( sel == null || sel.selection == null)
-			undoEngine.performAndStore( new FlipAction(building, selectionEngine.getBuiltSelection(), horizontal));
+		else if( sel == null)
+			undoEngine.performAndStore( new FlipAction(building, selectionEngine.getSelection(), horizontal));
 		else {
 			UndoableAction actions[] = new UndoableAction[2];
-			actions[0] = new FlipAction(building, selectionEngine.getBuiltSelection(), horizontal);
+			actions[0] = new FlipAction(building, sel, horizontal);
 			
 			// This is kind of bad
 			RawImage img = HybridHelper.createImage(workspace.getWidth(), workspace.getHeight());
@@ -245,21 +245,21 @@ public class DefaultImageDrawer
 			gc.fillRect(0, 0, workspace.getWidth(), workspace.getHeight());
 //			g2.dispose();
 			
-			img = sel.liftSelectionFromImage(img, 0, 0);
+			img = sel.liftRawImage(img, 0, 0);
 			
 			img = flipImage(img, horizontal);
 			
-			BuiltSelection sel2 =  new BuiltSelection( img);
-			sel2 = new BuiltSelection( sel2.selection, sel2.offsetX+sel.offsetX, sel2.offsetX+sel.offsetY);
-			actions[1] = selectionEngine.createNewSelectAction(sel2);
+			//SelectionMask sel2 =  new BuiltSelection( img);
+			//sel2 = new BuiltSelection( sel2.selection, sel2.offsetX+sel.offsetX, sel2.offsetX+sel.offsetY);
+			//actions[1] = selectionEngine.createNewSelectAction(sel2);
 			
-			undoEngine.performAndStore( undoEngine.new CompositeAction(Arrays.asList(actions), actions[0].getDescription()));
+			//undoEngine.performAndStore( undoEngine.new CompositeAction(Arrays.asList(actions), actions[0].getDescription()));
 		}
 	}
 	public class FlipAction extends MaskedImageAction 
 	{
 		private final boolean horizontal;
-		private FlipAction(BuildingMediumData data, BuiltSelection mask, boolean horizontal) {
+		private FlipAction(BuildingMediumData data, SelectionMask mask, boolean horizontal) {
 			super(data, mask);
 			this.horizontal = horizontal;
 			description = "Flip Action";
@@ -268,7 +268,7 @@ public class DefaultImageDrawer
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
 			
-			if( mask != null && mask.selection != null) {
+			if( mask != null) {
 				
 				RawImage lifted = mask.liftSelectionFromData(built);
 
@@ -276,10 +276,10 @@ public class DefaultImageDrawer
 
 				built.doOnGC((gc) -> {
 					gc.setComposite( Composite.DST_OUT, 1.0f);
-					mask.drawSelectionMask( gc);
+					mask.drawMask( gc);
 
 					gc.setComposite(Composite.SRC_OVER, 1.0f);
-					gc.drawImage(buffer, mask.offsetX, mask.offsetY);
+					gc.drawImage(buffer, mask.getOX(), mask.getOY());
 					
 					buffer.flush();
 				});
@@ -324,7 +324,7 @@ public class DefaultImageDrawer
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		SelectionMask mask = selectionEngine.getSelection();
 		
 		Node selected = null;
 		
@@ -364,23 +364,23 @@ public class DefaultImageDrawer
 
 	public abstract class PerformFilterAction extends MaskedImageAction
 	{
-		private PerformFilterAction(BuildingMediumData data, BuiltSelection mask) {
+		private PerformFilterAction(BuildingMediumData data, SelectionMask mask) {
 			super(data, mask);
 		}
 
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
-			if( mask != null && mask.selection != null) {
+			if( mask != null) {
 				// Lift the Selection
 				RawImage lifted = mask.liftSelectionFromData(built);
 				applyFilter(lifted);
 
 				built.doOnGC((gc) -> {
 					gc.setComposite( Composite.DST_OUT, 1.0f);
-					mask.drawSelectionMask(gc);
+					mask.drawMask(gc);
 
 					gc.setComposite( Composite.SRC_OVER, 1.0f);
-					gc.drawImage( lifted, mask.offsetX, mask.offsetY );
+					gc.drawImage( lifted, mask.getOX(), mask.getOY());
 				});
 			}
 			else {
@@ -397,7 +397,7 @@ public class DefaultImageDrawer
 		private final int mode;
 		private ColorChangeAction(
 				BuildingMediumData data, 
-				BuiltSelection mask, 
+				SelectionMask mask, 
 				int from, int to, 
 				int mode) 
 		{
@@ -420,7 +420,7 @@ public class DefaultImageDrawer
 		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		SelectionMask mask = selectionEngine.getSelection();
 		
 		undoEngine.performAndStore( new PerformFilterAction(building, mask) {
 			@Override void applyFilter(RawImage image) {
@@ -437,7 +437,7 @@ public class DefaultImageDrawer
 		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
-		BuiltSelection mask = selectionEngine.getBuiltSelection();
+		SelectionMask mask = selectionEngine.getSelection();
 
 		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
@@ -519,7 +519,7 @@ public class DefaultImageDrawer
 				StrokeEngine engine,
 				StrokeEngine.StrokeParams params, 
 				PenState[] points, 
-				BuiltSelection mask, 
+				SelectionMask mask, 
 				BuildingMediumData data)
 		{
 			super(data, mask);
@@ -565,7 +565,7 @@ public class DefaultImageDrawer
 	@Override
 	public void endMagneticFill(final int color) {
 		final ImageWorkspace workspace = building.handle.getContext();
-		BuiltSelection sel = pollSelectionMask(workspace);
+		SelectionMask sel = pollSelectionMask(workspace);
 		final float[] fill_x = fx.toArray();
 		final float[] fill_y = fy.toArray();
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {

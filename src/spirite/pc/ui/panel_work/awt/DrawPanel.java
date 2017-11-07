@@ -31,9 +31,9 @@ import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
-import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -182,7 +182,7 @@ public class DrawPanel extends JPanel
         
 
         // Draw Border around Selection
-        Selection selection = selectionEngine.getSelection();
+        SelectionMask selection = selectionEngine.getSelection();
 
         if( selection != null ) {
         	AffineTransform trans = g2.getTransform();
@@ -191,8 +191,8 @@ public class DrawPanel extends JPanel
             g2.setColor(Color.black);
             g2.setStroke(dashedStroke);
             if( selection != null) {
-                g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-            	selection.drawSelectionBounds(gc);
+                g2.translate( selection.getOX(), selection.getOY());
+            	selection.drawBounds(gc);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

@@ -9,10 +9,10 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
@@ -95,7 +95,7 @@ public class MaglevMedium implements IMedium {
 	public static abstract class MagLevThing {
 		abstract float[] getPoints();
 		abstract void setPoints(float[] xy);
-		abstract void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context );
+		abstract void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context );
 		protected abstract MagLevThing clone();
 	}
 	public static class MagLevStroke extends MagLevThing {
@@ -133,7 +133,7 @@ public class MaglevMedium implements IMedium {
 		}
 
 		@Override
-		void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
+		void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
 			StrokeEngine _engine = context.context.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 			_engine.batchDraw(params, states, built, mask);
 		}
@@ -201,7 +201,7 @@ public class MaglevMedium implements IMedium {
 			return new MagLevFill(this);
 		}
 		@Override
-		void draw(ABuiltMediumData built, BuiltSelection mask, GraphicsContext gc, MaglevMedium context) {
+		void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
 			int totalLen = 0;
 			for( StrokeSegment s : segments)
 				totalLen += Math.abs(s.travel) + 1;
@@ -272,7 +272,7 @@ public class MaglevMedium implements IMedium {
 				
 				builtImage.doOnGC( (gc) -> {
 					ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
-					BuiltSelection mask = new BuiltSelection(null, 0, 0);
+					SelectionMask mask = null;
 					for( MagLevThing thing : things) {
 						thing.draw( built, mask, gc, this);
 					}	

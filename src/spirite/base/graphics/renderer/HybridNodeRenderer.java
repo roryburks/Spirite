@@ -21,6 +21,7 @@ import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.glmath.MatTrans;
 import spirite.hybrid.HybridHelper;
@@ -85,7 +86,9 @@ public class HybridNodeRenderer {
 	{
 		BuildingMediumData dataContext = workspace.buildActiveData();
 		StrokeEngine strokeEngine = workspace.getAcrtiveStrokeEngine();
-		if( dataContext != null && (workspace.getSelectionEngine().getLiftedImage() != null 
+		SelectionEngine selectionEngine = workspace.getSelectionEngine();
+		
+		if( dataContext != null && (selectionEngine.isLifted()
 				||  (strokeEngine != null)))
 		{
 			dataContext.doOnBuiltData((built) -> {
@@ -104,13 +107,13 @@ public class HybridNodeRenderer {
 				dataContext.handle.drawBehindStroke(gc);
 				
 
-				if( workspace.getSelectionEngine().getLiftedImage() != null ){
+				if( selectionEngine.isLifted()){
 					// Draw Lifted Image
-					MatTrans tt = workspace.getSelectionEngine().getDrawFromTransform();
-					tt.preConcatenate(built.getScreenToImageTransform() );
-					
-					gc.setTransform(tt);
-					gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
+//					MatTrans tt = selectionEngine.getDrawFromTransform();
+//					tt.preConcatenate(built.getScreenToImageTransform() );
+//					
+//					gc.setTransform(tt);
+//					gc.drawImage( workspace.getSelectionEngine().getLiftedImage(), 0, 0);
 				}
 				if( strokeEngine != null) {
 					// Draw the Stroke

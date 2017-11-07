@@ -29,8 +29,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuildMode;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -41,6 +39,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.PenTraits.PenState;
@@ -237,13 +236,10 @@ public class Penner
 				fill( mbe.buttonType == ButtonType.LEFT);
 				break;
 			case BOX_SELECTION: {
-				Selection selection = selectionEngine.getSelection();
+				SelectionMask selection = selectionEngine.getSelection();
 				
-				if( selection != null &&  !holdingShift && !holdingCtrl &&
-						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
-				{
+				if( selection != null &&  !holdingShift && !holdingCtrl && selection.contains(x,y)) 
 					behavior = new MovingSelectionBehavior();
-				}
 				else  {
 					ToolSettings settings = toolsetManager.getToolSettings(Tool.BOX_SELECTION);
 
@@ -259,13 +255,10 @@ public class Penner
 				}
 				break;}
 			case FREEFORM_SELECTION: {
-				Selection selection = selectionEngine.getSelection();
+				SelectionMask selection = selectionEngine.getSelection();
 				
-				if( selection != null && !holdingShift && !holdingCtrl &&
-						selection.contains(x-selectionEngine.getOffsetX(),y-selectionEngine.getOffsetY())) 
-				{
+				if( selection != null && !holdingShift && !holdingCtrl && selection.contains(x,y)) 
 					behavior = new MovingSelectionBehavior();
-				}
 				else  {
 					BuildMode mode;
 					if( holdingShift && holdingCtrl)
@@ -279,7 +272,7 @@ public class Penner
 				}
 				break;}
 			case MOVE:{
-				Selection selection = selectionEngine.getSelection();
+				SelectionMask selection = selectionEngine.getSelection();
 				
 				if(selection != null)
 					behavior = new MovingSelectionBehavior();
@@ -341,23 +334,23 @@ public class Penner
 					HybridHelper.beep();
 				break;}
 			case RESHAPER:{
-				BuiltSelection sel =selectionEngine.getBuiltSelection();
-				
-				if( sel == null || sel.selection == null) {
-					selectionEngine.setSelection( selectionEngine.buildRectSelection(
-							new Rect(0,0,workspace.getWidth(),workspace.getHeight())));
-				}
-				if( !selectionEngine.isLifted())
-					selectionEngine.liftData();
-				if( mbe.buttonType == ButtonType.LEFT) {
-					behavior = new ReshapingBehavior();
-/*					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
-							workspace.buildActiveData().handle, 
-							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
-					workspace.getUndoEngine().performAndStore(ra);*/
-				}
-				else {
-				}
+				SelectionMask sel =selectionEngine.getSelection();
+//				
+//				if( sel == null) {
+//					selectionEngine.setSelection( selectionEngine.buildRectSelection(
+//							new Rect(0,0,workspace.getWidth(),workspace.getHeight())));
+//				}
+//				if( !selectionEngine.isLifted())
+//					selectionEngine.liftData();
+//				if( mbe.buttonType == ButtonType.LEFT) {
+//					behavior = new ReshapingBehavior();
+///*					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
+//							workspace.buildActiveData().handle, 
+//							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
+//					workspace.getUndoEngine().performAndStore(ra);*/
+//				}
+//				else {
+//				}
 				break;}
 			case COLOR_CHANGE: {
 				if( holdingCtrl)  {
@@ -671,10 +664,14 @@ public class Penner
 		@Override public void onTock() {}
 		@Override
 		public void onMove() {
-			if( oldX != x || oldY != y) 
-				selectionEngine.setOffset(
-						selectionEngine.getOffsetX() + (x - oldX),
-						selectionEngine.getOffsetY() + (y - oldY));
+			SelectionMask selection = selectionEngine.getSelection();
+			if( selection == null) 
+				end();
+			else if( oldX != x || oldY != y) {
+//				selectionEngine.setOffset( 
+//						selection.getOX() + (x - oldX),
+//						selection.getOY() + (y - oldY));
+			}
 		}
 	}
 	class ZoomingReferenceBehavior extends StateBehavior {
@@ -743,7 +740,7 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
+			//selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
 			//selectionEngine.
 			//selectionEngine.finishBuildingSelection();
 			super.onPenUp();
@@ -790,7 +787,7 @@ public class Penner
 		public boolean testFinish() {
 			Vec2i p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
+				//selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
 				//selectionEngine.finishBuildingSelection();
 				this.end();
 				return true;
@@ -1236,8 +1233,8 @@ public class Penner
 			default:
 				break;
 			}
-			
-			selectionEngine.proposeTransform(getWorkingTransform());
+			// TODO
+			//selectionEngine.proposeTransform(getWorkingTransform());
 		}
 
 		public TransormStates getState() {return state;}
@@ -1292,15 +1289,16 @@ public class Penner
 			this.translateX = translation.x;
 			this.translateY = translation.y;
 			this.rotation = (float)settings.getValue("rotation");
-			
-			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			if( sel == null || sel.selection == null){
-				this.end();
-				return;
-			}
-			
-			Vec2i d = sel.selection.getDimension();
-			this.region = new Rect( sel.offsetX, sel.offsetY, d.x, d.y);
+
+			// TODO
+//			BuiltSelection sel =selectionEngine.getBuiltSelection();
+//			if( sel == null || sel.selection == null){
+//				this.end();
+//				return;
+//			}
+//			
+//			Vec2i d = sel.selection.getDimension();
+//			this.region = new Rect( sel.offsetX, sel.offsetY, d.x, d.y);
 		}
 
 		@Override public void onPenUp() {
@@ -1308,19 +1306,20 @@ public class Penner
 		}
 		@Override
 		public void onPenDown() {
-			BuiltSelection sel =selectionEngine.getBuiltSelection();
-			
-			if( sel == null || sel.selection == null){
-				this.end();
-				return;
-			}
-			
-			if( overlap >= 0 && overlap <= 7)
-				this.setState(TransormStates.RESIZE);
-			else if( overlap >= 8 && overlap <= 0xB)
-				this.setState(TransormStates.ROTATE);
-			else if( overlap == 0xC)
-				this.setState(TransormStates.MOVING);
+			// TODO
+//			BuiltSelection sel =selectionEngine.getBuiltSelection();
+//			
+//			if( sel == null || sel.selection == null){
+//				this.end();
+//				return;
+//			}
+//			
+//			if( overlap >= 0 && overlap <= 7)
+//				this.setState(TransormStates.RESIZE);
+//			else if( overlap >= 8 && overlap <= 0xB)
+//				this.setState(TransormStates.ROTATE);
+//			else if( overlap == 0xC)
+//				this.setState(TransormStates.MOVING);
 		}
 
 		@Override protected void onScaleChanged() {

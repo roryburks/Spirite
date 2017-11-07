@@ -125,7 +125,7 @@ public class HybridHelper {
 	
 	// ===========
 	// ==== Clipboard
-	public static void imageToClipboard( RawImage image) {
+	public static void imageToClipboard( IImage image) {
     	TransferableImage transfer = new TransferableImage(
     			((ImageBI)HybridUtil.convert(image, ImageBI.class)).img);
     	

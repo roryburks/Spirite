@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.graphics.IImage;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.file.LoadEngine;
@@ -39,8 +40,6 @@ import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.SelectionEngine.Selection;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
@@ -471,19 +470,20 @@ public class MasterControl
 			});
     		commandMap.put("export_as", commandMap.get("export"));
     		commandMap.put("copy", () -> {
+    			SelectionEngine selectionEngine= currentWorkspace.getSelectionEngine();
     			if( currentWorkspace == null) return;
     			Node selected = currentWorkspace.getSelectedNode();
     			
     			if( selected == null) commandMap.get("copyVisible").run();; 
     			
     			if(currentWorkspace.getSelectedNode() != null &&
-    				currentWorkspace.getSelectionEngine().getSelection() != null) {
+    					selectionEngine.getSelection() != null) {
         			// Copies the current selection to the Clipboard
 
-	    	    	AtomicReference<RawImage> img = new AtomicReference<>(null);
-    				if( currentWorkspace.getSelectionEngine().isLifted()) {
+	    	    	AtomicReference<IImage> img = new AtomicReference<>(null);
+    				if( selectionEngine.isLifted()) {
     					// Copies straight from the lifted data
-    					img.set(currentWorkspace.getSelectionEngine().getLiftedImage());
+    					img.set(selectionEngine.getLiftedData().readonlyAccess());
     				}
     				else {
     					BuildingMediumData building = currentWorkspace.buildActiveData();
@@ -493,13 +493,11 @@ public class MasterControl
     		    	    			renderEngine.getNodeRenderTarget(selected));
     		
     		    	    	RawImage nodeImg = renderEngine.renderImage(settings);
-    						img.set(currentWorkspace.getSelectionEngine().getBuiltSelection()
-    								.liftSelectionFromImage(nodeImg,0,0));
+    						img.set(selectionEngine.getSelection().liftRawImage(nodeImg, 0, 0));
     					}
     					else {
     						building.doOnBuiltData((built) -> {
-		    					img.set(currentWorkspace.getSelectionEngine().getBuiltSelection()
-		    						.liftSelectionFromData(built));
+		    					img.set(selectionEngine.getSelection().liftSelectionFromData(built));
     						});
     					}
     				}
@@ -529,8 +527,8 @@ public class MasterControl
     			//	rendered, the RenderEngine's cache should be immutable
     	    	RawImage img = renderEngine.renderImage(settings);
     	    	
-    	    	RawImage lifted =  currentWorkspace.getSelectionEngine().getBuiltSelection()
-    	    			.liftSelectionFromImage(img, 0, 0);
+    	    	RawImage lifted =  currentWorkspace.getSelectionEngine().getSelection()
+    	    			.liftRawImage(img, 0, 0);
 
     	    	HybridHelper.imageToClipboard(lifted);
     		});
@@ -567,7 +565,9 @@ public class MasterControl
 	    				oy = Math.max(min_y,node.getOffsetY());
 	    			}
 	    			
-	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
+	    			// TODO
+	    			//currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
+	    			// TODO
 	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
 	    		}
     		});
@@ -667,31 +667,31 @@ public class MasterControl
 						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
     		});
     		commandMap.put("clearLayer", () -> {
-				if(!workspace.getSelectionEngine().attemptClearSelection()) {
-					// Note: transforms are irrelevant for this action, so 
-					//	accessing handle directly is appropriate.
-					IImageDrawer drawer = workspace.getActiveDrawer();
-					if( drawer instanceof IClearModule )
-						((IClearModule) drawer).clear();
-					else
-						HybridHelper.beep();
-				}
+//				if(!workspace.getSelectionEngine().attemptClearSelection()) {
+//					// Note: transforms are irrelevant for this action, so 
+//					//	accessing handle directly is appropriate.
+//					IImageDrawer drawer = workspace.getActiveDrawer();
+//					if( drawer instanceof IClearModule )
+//						((IClearModule) drawer).clear();
+//					else
+//						HybridHelper.beep();
+//				}
 			});
     		commandMap.put("cropSelection", () -> {
-				Node node = workspace.getSelectedNode();
-				SelectionEngine selectionEngine = workspace.getSelectionEngine();
-				
-				Selection selection = selectionEngine.getSelection();
-				if( selection == null) {
-					HybridHelper.beep();
-					return;
-				}
-				
-				Rect rect = new Rect(selection.getDimension());
-				rect.x = selectionEngine.getOffsetX();
-				rect.y = selectionEngine.getOffsetY();
-				
-				workspace.cropNode(node, rect, false);
+//				Node node = workspace.getSelectedNode();
+//				SelectionEngine selectionEngine = workspace.getSelectionEngine();
+//				
+//				Selection selection = selectionEngine.getSelection();
+//				if( selection == null) {
+//					HybridHelper.beep();
+//					return;
+//				}
+//				
+//				Rect rect = new Rect(selection.getDimension());
+//				rect.x = selectionEngine.getOffsetX();
+//				rect.y = selectionEngine.getOffsetY();
+//				
+//				workspace.cropNode(node, rect, false);
 			});
     		commandMap.put("autocroplayer", () -> {
 				Node node = workspace.getSelectedNode();
@@ -728,38 +728,38 @@ public class MasterControl
     				HybridHelper.beep();
     		});
     		commandMap.put("applyTransform", () -> {
-				ToolSettings settings = toolset.getToolSettings( Tool.RESHAPER);
-    			if( workspace.getSelectionEngine().isProposingTransform()) 
-    				workspace.getSelectionEngine().applyProposedTransform();
-    			else {
-    				boolean wasLifted = workspace.getSelectionEngine().isLifted();
-    				
-    				workspace.getUndoEngine().pause();
-    				if( !wasLifted)
-    					workspace.getSelectionEngine().liftData();
-    				
-    				Vec2 scale = (Vec2)settings.getValue("scale");
-    				Vec2 translation = (Vec2)settings.getValue("translation");
-    				float rotation = (float)settings.getValue("rotation");
-
-    				MatTrans trans = new MatTrans();
-    				trans.preScale(scale.x, scale.y);
-    				trans.preRotate((float)(rotation * 180.0f /(Math.PI)));
-    				trans.preTranslate(translation.x, translation.y);
-    				workspace.getSelectionEngine().transformSelection(trans);
-    				
-    				if(!wasLifted)
-    					workspace.getSelectionEngine().anchorSelection();
-					workspace.getUndoEngine().unpause("Manual Transform");
-    			}
-
-    			settings.setValue("scale", new Vec2(1,1));
-    			settings.setValue("translation", new Vec2(0,0));
-    			settings.setValue("rotation", 0f);
-    			
-    			Penner p = frameManager.getPenner();
-    			if( p != null)
-    				p.cleanseState();
+//				ToolSettings settings = toolset.getToolSettings( Tool.RESHAPER);
+//    			if( workspace.getSelectionEngine().isProposingTransform()) 
+//    				workspace.getSelectionEngine().applyProposedTransform();
+//    			else {
+//    				boolean wasLifted = workspace.getSelectionEngine().isLifted();
+//    				
+//    				workspace.getUndoEngine().pause();
+//    				if( !wasLifted)
+//    					workspace.getSelectionEngine().liftData();
+//    				
+//    				Vec2 scale = (Vec2)settings.getValue("scale");
+//    				Vec2 translation = (Vec2)settings.getValue("translation");
+//    				float rotation = (float)settings.getValue("rotation");
+//
+//    				MatTrans trans = new MatTrans();
+//    				trans.preScale(scale.x, scale.y);
+//    				trans.preRotate((float)(rotation * 180.0f /(Math.PI)));
+//    				trans.preTranslate(translation.x, translation.y);
+//    				workspace.getSelectionEngine().transformSelection(trans);
+//    				
+//    				if(!wasLifted)
+//    					workspace.getSelectionEngine().anchorSelection();
+//					workspace.getUndoEngine().unpause("Manual Transform");
+//    			}
+//
+//    			settings.setValue("scale", new Vec2(1,1));
+//    			settings.setValue("translation", new Vec2(0,0));
+//    			settings.setValue("rotation", 0f);
+//    			
+//    			Penner p = frameManager.getPenner();
+//    			if( p != null)
+//    				p.cleanseState();
     		});
     		commandMap.put("toggle_reference", () -> {
 					ReferenceManager rm = workspace.getReferenceManager();
@@ -770,17 +770,17 @@ public class MasterControl
 					rm.resetTransform();
 			});
     		commandMap.put("lift_to_reference", () -> {
-    			SelectionEngine se = workspace.getSelectionEngine();
-    			ReferenceManager rm = workspace.getReferenceManager();
-    			
-    			BuiltSelection sel = se.getBuiltSelection();
-    			RawImage bi = se.getLiftedImage();
-    			
-    			MatTrans trans = new MatTrans();
-    			trans.translate(sel.offsetX, sel.offsetY);
-    			rm.addReference(bi, rm.getCenter(), trans);
-    			
-    			se.attemptClearSelection();
+//    			SelectionEngine se = workspace.getSelectionEngine();
+//    			ReferenceManager rm = workspace.getReferenceManager();
+//    			
+//    			BuiltSelection sel = se.getBuiltSelection();
+//    			RawImage bi = se.getLiftedImage();
+//    			
+//    			MatTrans trans = new MatTrans();
+//    			trans.translate(sel.offsetX, sel.offsetY);
+//    			rm.addReference(bi, rm.getCenter(), trans);
+//    			
+//    			se.attemptClearSelection();
 			});
     		
 
@@ -827,18 +827,18 @@ public class MasterControl
     	private SelectionEngine selectionEngine;
     	
     	public SelectionCommandExecuter() {
-    		commandMap.put("all", () -> {
-    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
-    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
-
-    		});
-    		commandMap.put("none", () -> {
-    			selectionEngine.unselect();
-    		});
-    		commandMap.put("invert", () -> {
-    			BuiltSelection sel = selectionEngine.getBuiltSelection();
-    			selectionEngine.setSelection( selectionEngine.invertSelection(sel));
-    		});
+//    		commandMap.put("all", () -> {
+//    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
+//    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
+//
+//    		});
+//    		commandMap.put("none", () -> {
+//    			selectionEngine.unselect();
+//    		});
+//    		commandMap.put("invert", () -> {
+//    			BuiltSelection sel = selectionEngine.getBuiltSelection();
+//    			selectionEngine.setSelection( selectionEngine.invertSelection(sel));
+//    		});
 		}
     	
 		@Override

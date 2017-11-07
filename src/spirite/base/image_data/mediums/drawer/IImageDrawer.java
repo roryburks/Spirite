@@ -2,8 +2,8 @@ package spirite.base.image_data.mediums.drawer;
 
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine.ImageAction;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.glmath.MatTrans;
@@ -11,9 +11,9 @@ import spirite.base.util.glmath.MatTrans;
 public interface IImageDrawer {
 
 	public abstract class MaskedImageAction extends ImageAction {
-		protected final BuiltSelection mask;
+		protected final SelectionMask mask;
 
-		protected MaskedImageAction(BuildingMediumData data, BuiltSelection mask) {
+		protected MaskedImageAction(BuildingMediumData data, SelectionMask mask) {
 			super(data);
 			this.mask = mask;
 		}

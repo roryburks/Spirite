@@ -44,13 +44,13 @@ class AWTStrokeEngine extends StrokeEngine{
 		displayLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		fixedLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		
-		if( sel.selection != null) {
+		if( sel != null) {
 			selectionMask = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 			
 			GraphicsContext gc = new AWTContext(selectionMask);
 			gc.clear();
-			gc.translate(sel.offsetX, sel.offsetY);
-			sel.selection.drawSelectionMask(gc);
+			gc.translate(sel.getOX(), sel.getOY());
+			sel.drawMask(gc);
 //			g2.dispose();
 		}
 	}
@@ -97,7 +97,7 @@ class AWTStrokeEngine extends StrokeEngine{
 
 			
 
-			if( sel.selection != null) {
+			if( sel != null) {
 				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 				g2.drawImage(selectionMask, 0, 0, null);
 			}

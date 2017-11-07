@@ -5,7 +5,6 @@ import java.util.List;
 
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
@@ -20,6 +19,7 @@ import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevThing;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
@@ -59,7 +59,7 @@ public class MaglevImageDrawer
 		workspace.getUndoEngine().prepareContext(building.handle);
 		strokeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 		
-		if( strokeEngine.startStroke( params, ps, building, workspace.getSelectionEngine().getBuiltSelection()))
+		if( strokeEngine.startStroke( params, ps, building, workspace.getSelectionEngine().getSelection()))
 			building.handle.refresh();
 		return true;
 	}
@@ -79,7 +79,7 @@ public class MaglevImageDrawer
 		final PenState[] states = strokeEngine.getHistory();
 		final StrokeParams params = StrokeParams.bakeAndNormalize(strokeEngine.getParams(), states);
 		final MagLevStroke stroke = new MagLevStroke(states, params);
-		final BuiltSelection mask = new BuiltSelection(null, 0, 0);
+		final SelectionMask mask = null;
 		//final StrokeEngine _engine = strokeEngine;
 		
 		// NOTE: Rather unusual to prepare, perform, then store.

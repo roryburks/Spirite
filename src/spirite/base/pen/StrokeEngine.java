@@ -9,8 +9,8 @@ import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine.BuiltSelection;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.Colors;
@@ -83,7 +83,7 @@ public abstract class StrokeEngine {
 	protected StrokeEngine.StrokeParams stroke = null;
 	protected BuildingMediumData building;
 	//protected ABuiltImageData data;
-	protected BuiltSelection sel;
+	protected SelectionMask sel;
 	
 	// Interpolation
 	private Interpolator2D _interpolator = null;
@@ -102,7 +102,7 @@ public abstract class StrokeEngine {
 		PenState[] array = new PenState[prec.size()];
 		return prec.toArray(array);
 	}
-	public BuiltSelection getLastSelection() {
+	public SelectionMask getLastSelection() {
 		return sel;
 	}
 
@@ -115,7 +115,7 @@ public abstract class StrokeEngine {
 			StrokeParams params, 
 			PenState ps, 
 			BuildingMediumData building,
-			BuiltSelection selection) 
+			SelectionMask selection) 
 	{
 		this.building = building;
 		
@@ -126,7 +126,7 @@ public abstract class StrokeEngine {
 				return;
 			buildInterpolator(params, ps);
 			
-			if( sel.selection != null) {
+			if( sel != null) {
 	/*			selectionMask = new BufferedImage( 
 						data.getWidth(), data.getHeight(), Globals.BI_FORMAT);
 				MUtil.clearImage(selectionMask);
@@ -172,7 +172,7 @@ public abstract class StrokeEngine {
 	private boolean prepareStroke( 
 			StrokeParams params, 
 			ABuiltMediumData built,
-			BuiltSelection selection)
+			SelectionMask selection)
 	{
 		if( built == null) 
 			return false;
@@ -261,7 +261,7 @@ public abstract class StrokeEngine {
 	 * draw commands into a single command instead of updating the stroke layer
 	 * repeatedly.
 	 */
-	public void batchDraw(StrokeParams params, PenState[] points, ABuiltMediumData builtImage, BuiltSelection mask) 
+	public void batchDraw(StrokeParams params, PenState[] points, ABuiltMediumData builtImage, SelectionMask mask) 
 	{
 		prepareStroke(params, builtImage, mask);
 		buildInterpolator(params, points[0]);
@@ -325,7 +325,7 @@ public abstract class StrokeEngine {
 		}
 	}
 	
-	public void batchDraw( DrawPoints points, ABuiltMediumData builtImage, BuiltSelection mask) 
+	public void batchDraw( DrawPoints points, ABuiltMediumData builtImage, SelectionMask mask) 
 	{
 		prepareStroke(null, builtImage, mask);
 

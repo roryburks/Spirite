@@ -1746,5 +1746,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 		return tryName;
 	}
+	public void triggerSelectionRefresh() {
+		ImageChangeEvent evt = new ImageChangeEvent();
+		evt.workspace = this;
+		evt.isStructureChange = true;
+		triggerImageRefresh(evt);
+		
+	}
 	
 }
