@@ -1,5 +1,6 @@
 package spirite.base.image_data.mediums;
 
+import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
@@ -16,7 +17,9 @@ import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
+import spirite.hybrid.MDebug;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
+import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * A Dynamic Internal Image is a kind of image that automatically resizes itself
@@ -26,30 +29,30 @@ import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
  * 
  */
 public class DynamicMedium implements IMedium {
-	RawImage image;
+	DynamicImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
-	
-	int ox, oy;
 	public DynamicMedium(RawImage raw, int ox, int oy, ImageWorkspace context) {
 		this.context = context;
-		this.image = raw;
-		this.ox = ox;
-		this.oy = oy;
+		this.image = new DynamicImage(context, raw, ox, oy);
+	}
+	DynamicMedium(DynamicImage image, ImageWorkspace context) {
+		this.context = context;
+		this.image = image;
 	}
 	public ABuiltMediumData build( BuildingMediumData building) {
 		return new DynamicBuiltImageData(building);
 	}
 	@Override
 	public IMedium dupe() {
-		return new DynamicMedium( image.deepCopy(), ox, oy, context);
+		return new DynamicMedium( image.deepCopy(), context);
 	}
 	@Override
 	public IMedium copyForSaving() {
-		return new DynamicMedium( HybridUtil.copyForSaving(image), ox, oy, context);
+		return new DynamicMedium( HybridUtil.copyForSaving(image.getBase()), image.getXOffset(), image.getYOffset(), context);
 	}
-	public int getWidth() {return image.getWidth();}
-	public int getHeight() {return image.getHeight();}
+	public int getWidth() {return image.getBase().getWidth();}
+	public int getHeight() {return image.getBase().getHeight();}
 	public void flush() {
 		if( !flushed) {
 			image.flush();
@@ -57,9 +60,9 @@ public class DynamicMedium implements IMedium {
 		}
 	}
 	@Override protected void finalize() throws Throwable {flush();}
-	@Override public IImage readOnlyAccess() { return image;}
-	@Override public int getDynamicX() {return ox;}
-	@Override public int getDynamicY() {return oy;}
+	@Override public IImage readOnlyAccess() { return image.getBase();}
+	@Override public int getDynamicX() {return image.getXOffset();}
+	@Override public int getDynamicY() {return image.getYOffset();}
 	@Override public InternalImageTypes getType() {return InternalImageTypes.DYNAMIC;}
 	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) { return new DefaultImageDrawer(this, building);}
 	
@@ -87,7 +90,7 @@ public class DynamicMedium implements IMedium {
 		@Override public MatTrans getScreenToImageTransform() {return new MatTrans(invTrans);}
 		@Override
 		public Rect getBounds() {
-			return MUtil.circumscribeTrans( new Rect(ox, oy, handle.getWidth(), handle.getHeight()), trans);
+			return image.getDrawBounds(trans);
 		}
 		@Override
 		public void drawBorder(GraphicsContext gc) {
@@ -95,7 +98,7 @@ public class DynamicMedium implements IMedium {
 			
 			MatTrans oldTrans = gc.getTransform();
 			gc.preTransform(trans);
-			gc.drawRect(ox-1, oy-1, 
+			gc.drawRect(image.getXOffset()-1, image.getYOffset()-1, 
 					handle.getWidth()+2, handle.getHeight()+2);
 			gc.setTransform(oldTrans);
 		}
@@ -104,72 +107,15 @@ public class DynamicMedium implements IMedium {
 			handle.drawLayer( gc, trans);
 		}
 		
+
 		@Override
-		public GraphicsContext checkout() {
-			return checkoutRaw().getGraphics();
+		protected void _doOnGC(DoerOnGC doer) {
+			image.doOnGC(doer, trans);
 		}
-		
+
 		@Override
-		public RawImage checkoutRaw() {
-			handle.getContext().getUndoEngine().prepareContext(handle);
-			buffer = HybridHelper.createImage(handle.getContext().getWidth(), handle.getContext().getHeight());
-			GraphicsContext gc = buffer.getGraphics();
-			gc.setTransform(trans);
-			gc.drawHandle(this.handle, handle.getDynamicX(), handle.getDynamicY());
-			return buffer;
-		}
-		@Override
-		public void checkin() {
-			int w = handle.getContext().getWidth();
-			int h = handle.getContext().getHeight();
-			
-			
-			Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
-							new Rect(ox,oy, getWidth(), getHeight()));
-
-			RawImage img = HybridHelper.createImage(drawAreaInImageSpace.width, drawAreaInImageSpace.height);
-			GraphicsContext gc = img.getGraphics();
-
-			// Draw the old image
-			gc.drawHandle(handle, ox - drawAreaInImageSpace.x, oy - drawAreaInImageSpace.y);
-
-			// Clear the section of the old image that will be replaced by the new one
-			gc.transform(trans);
-			gc.setComposite( Composite.SRC, 1.0f);
-			gc.drawImage(buffer, 0, 0);
-//				g2.dispose();
-
-			
-			Rect cropped = null;
-			try {
-				cropped = HybridUtil.findContentBounds(img, 0, true);
-			} catch (UnsupportedImageTypeException e) {
-				e.printStackTrace();
-			}
-			
-			RawImage nri;
-			if( cropped == null || cropped.isEmpty()) {
-				nri = HybridHelper.createNillImage();
-			}
-			else {
-				nri = HybridHelper.createImage( cropped.width, cropped.height);
-			}
-			gc = nri.getGraphics();
-			gc.drawImage( img, -cropped.x, -cropped.y);
-			
-			ox = cropped.x-drawAreaInImageSpace.x;
-			oy = cropped.y-drawAreaInImageSpace.y;
-			
-			image.flush();
-			image = nri;
-			
-			buffer.flush();
-			img.flush();
-			buffer = null;
-			gc = null;
-
-			// Construct ImageChangeEvent and send it
-			handle.refresh();
+		protected void _doOnRaw(DoerOnRaw doer) {
+			image.doOnRaw(doer, trans);
 		}
 	}
 }

@@ -245,9 +245,9 @@ public abstract class StrokeEngine {
 		
 		if( building != null) {
 			building.doOnBuiltData((built) -> {
-				GraphicsContext gc = built.checkoutRaw().getGraphics();
-				drawStrokeLayer(gc);
-				built.checkin();
+				built.doOnRaw( (raw) -> {
+					drawStrokeLayer( raw.getGraphics());
+				});
 			});
 		}
 		
@@ -277,9 +277,9 @@ public abstract class StrokeEngine {
 		this.drawToLayer( buildPoints(_interpolator, Arrays.asList(points), stroke), false, builtImage);
 		
 		if( builtImage != null) {
-			GraphicsContext gc = builtImage.checkoutRaw().getGraphics();
-			drawStrokeLayer(gc);
-			builtImage.checkin();
+			builtImage.doOnRaw( (raw) -> {
+				drawStrokeLayer( raw.getGraphics());
+			});
 		}
 		
 		_interpolator = null;
@@ -332,9 +332,9 @@ public abstract class StrokeEngine {
 		this.drawToLayer( points, false, builtImage);
 		
 		if( builtImage != null) {
-			GraphicsContext gc = builtImage.checkoutRaw().getGraphics();
-			drawStrokeLayer(gc);
-			builtImage.checkin();
+			builtImage.doOnRaw( (raw) -> {
+				drawStrokeLayer( raw.getGraphics());
+			});
 		}
 	}
 

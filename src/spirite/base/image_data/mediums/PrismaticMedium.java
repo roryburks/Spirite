@@ -237,12 +237,10 @@ public class PrismaticMedium implements IMedium {
 		@Override public void draw(GraphicsContext gc) {handle.drawLayer( gc, trans);}
 
 
-		@Override
 		public GraphicsContext checkout() {
 			return checkoutRaw().getGraphics();
 		}
 
-		@Override
 		public RawImage checkoutRaw() {
 			handle.getContext().getUndoEngine().prepareContext(handle);
 			buffer = HybridHelper.createImage(handle.getContext().getWidth(), handle.getContext().getHeight());
@@ -262,7 +260,6 @@ public class PrismaticMedium implements IMedium {
 			return buffer;
 		}
 
-		@Override
 		public void checkin() {
 			int w = handle.getContext().getWidth();
 			int h = handle.getContext().getHeight();
@@ -342,6 +339,20 @@ public class PrismaticMedium implements IMedium {
 
 			// Construct ImageChangeEvent and send it
 			handle.refresh();
+		}
+
+
+		@Override
+		protected void _doOnGC(DoerOnGC doer) {
+			doer.Do(checkout());
+			checkin();
+		}
+
+
+		@Override
+		protected void _doOnRaw(DoerOnRaw doer) {
+			doer.Do(checkoutRaw());
+			checkin();
 		}
 
 

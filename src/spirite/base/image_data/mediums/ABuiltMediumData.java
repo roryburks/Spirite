@@ -7,6 +7,8 @@ import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.ErrorType;
 
 // ===============
 // ==== Data Building
@@ -27,27 +29,59 @@ public abstract class ABuiltMediumData {
 	public abstract void draw(GraphicsContext gc);
 	public abstract void drawBorder( GraphicsContext gc);
 
+	public interface DoerOnGC {
+		public void Do( GraphicsContext gc);
+	}
+	public interface DoerOnRaw {
+		public void Do( RawImage raw);
+	}
+
+	private boolean doing = false;
+	public final void doOnGC( DoerOnGC doer) {
+		if( doing) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to recursively check-out");
+			return;
+		}
+		handle.getContext().getUndoEngine().prepareContext(handle);
+		doing = true;
+		_doOnGC(doer);
+		doing = false;
+	}
+	public final void doOnRaw( DoerOnRaw doer) {
+		if( doing) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to recursively check-out");
+			return;
+		}
+		handle.getContext().getUndoEngine().prepareContext(handle);
+		doing = true;
+		_doOnRaw(doer);
+		doing = false;
+	}
+	protected abstract void _doOnGC( DoerOnGC doer);
+	protected abstract void _doOnRaw( DoerOnRaw doer);
+	
+	
 	/**
 	 * Creates a graphical object with transforms applied such that
 	 * drawing on the returned Graphics will draw on the correct Image
 	 * Data spot.
 	 * 
 	 * !!! When done modifying the image always call checkout. !!!
-	 */
-	public abstract GraphicsContext checkout();
-
-	/** Retrieves the underlying BufferedImage of the BuiltImage
-	 * 
-	 * !!! When done modifying the image always call checkout. !!!
-	 */
-	public abstract RawImage checkoutRaw();
-
-	/**
-	 * Once finished drawn you must checkin your data.  Not only does this
-	 * dispose the Graphics (which is debatably necessary), but it triggers
-	 * the appropriate ImageChange actions and re-fits the Dynamic data.
-	 */
-	public abstract void checkin();
+//	 */
+//	public abstract GraphicsContext checkout();
+//
+//	/** Retrieves the underlying BufferedImage of the BuiltImage
+//	 * 
+//	 * !!! When done modifying the image always call checkout. !!!
+//	 */
+//	public abstract RawImage checkoutRaw();
+//
+//	/**
+//	 * Once finished drawn you must checkin your data.  Not only does this
+//	 * dispose the Graphics (which is debatably necessary), but it triggers
+//	 * the appropriate ImageChange actions and re-fits the Dynamic data.
+//	 */
+//	public abstract void checkin();
 	
 	/** Returns a transform converting from screen space to layer space. */
 	public abstract MatTrans getScreenToImageTransform();

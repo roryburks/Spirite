@@ -506,12 +506,10 @@ public class SelectionEngine {
 
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
-			GraphicsContext gc = built.checkout();
-			
-			gc.setComposite( Composite.DST_OUT, 1.0f);
-			selection.drawSelectionMask( gc);
-
-			built.checkin();
+			built.doOnGC((gc) -> {
+				gc.setComposite( Composite.DST_OUT, 1.0f);
+				selection.drawSelectionMask( gc);
+			});
 		}
 	}
 	
@@ -531,9 +529,9 @@ public class SelectionEngine {
 		}
 		@Override
 		protected void performImageAction(ABuiltMediumData built) {
-			GraphicsContext gc = built.checkout();
-			gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
-			built.checkin();
+			built.doOnGC((gc) -> {
+				gc.drawImage(liftedImage, builtSelection.offsetX, builtSelection.offsetY);
+			});
 		}
 	}
 
