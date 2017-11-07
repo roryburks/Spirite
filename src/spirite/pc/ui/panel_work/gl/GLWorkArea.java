@@ -159,18 +159,11 @@ public class GLWorkArea
         	// :::: Draw Selection Bounds
             Selection selection = selectionEngine.getSelection();
 
-            if( selection != null || selectionEngine.isBuilding()) {
-
-                glgc.setColor( Colors.BLACK);
-            	glgc.setTransform(viewTrans);
-                if(selectionEngine.isBuilding()) 
-                	selectionEngine.drawBuildingSelection(glgc);
-                if( selection != null) {
-                	MatTrans trans = new MatTrans(viewTrans);
-                	trans.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
-                	glgc.setTransform(trans);
-                	selection.drawSelectionBounds(glgc);
-                }
+            if( selection != null) {
+            	MatTrans selectionTrans = new MatTrans(viewTrans);
+            	selectionTrans.preTranslate(selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
+            	glgc.setTransform(selectionTrans);
+            	selection.drawSelectionBounds(glgc);
             }
             
         	glgc.setTransform(null);

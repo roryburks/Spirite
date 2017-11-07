@@ -184,14 +184,12 @@ public class DrawPanel extends JPanel
         // Draw Border around Selection
         Selection selection = selectionEngine.getSelection();
 
-        if( selection != null || selectionEngine.isBuilding()) {
+        if( selection != null ) {
         	AffineTransform trans = g2.getTransform();
             g2.translate(zoomer.itsX(0), zoomer.itsY(0));
             g2.scale(zoom, zoom);
             g2.setColor(Color.black);
             g2.setStroke(dashedStroke);
-            if(selectionEngine.isBuilding()) 
-            	selectionEngine.drawBuildingSelection(gc);
             if( selection != null) {
                 g2.translate( selectionEngine.getOffsetX(), selectionEngine.getOffsetY());
             	selection.drawSelectionBounds(gc);

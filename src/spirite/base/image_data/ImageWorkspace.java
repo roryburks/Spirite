@@ -381,8 +381,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		return data;
 	}
 	
-	/** Converts BuildingImageData (which is provided by Layers to describe all
-	 * sub-parts in a partially-built form) into fully-built Image Data	 */
+	/** Performs the given script using data built from the given building data. */
 	public void doOnBuiltData( BuildingMediumData data, DoOnABID doer) {
 		if( data == null)
 			doer.Do(null);

@@ -16,6 +16,7 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.compaction.IntCompactor;
@@ -58,12 +59,9 @@ public class SelectionEngine {
 	
 	
 	// Variables relating to Building
-	private boolean building = false;
-	private SelectionBuilder selectionBuilder;	// Only used when building a selection
 	public enum BuildMode {
 		DEFAULT, ADD, SUBTRACT, INTERSECTION
 	};
-	private BuildMode buildMode;
 	
 	// Variables relating to Transforming
 	private boolean proposingTransform = false;
@@ -82,14 +80,6 @@ public class SelectionEngine {
 	// :::: Get/Set
 	public boolean isLifted() {
 		return lifted;
-	}
-	
-	public boolean isBuilding() {
-		return building;
-	}
-	public void drawBuildingSelection( GraphicsContext gc) {
-		if( selectionBuilder != null)
-			selectionBuilder.draw(gc);
 	}
 	
 	/** Returns a BuiltSelection which incorporates all relevant offset data
@@ -247,51 +237,24 @@ public class SelectionEngine {
 	// ===================
 	// ==== Selection Building
 	// ===================
-	public void startBuildingSelection( SelectionBuilder builder, int x, int y, BuildMode mode) {
-		if( builder == null) return;
+	public void setBuiltSelection( BuiltSelection built, BuildMode mode) {
 		
-		// Start building
-		building = true;
-		selectionBuilder = builder;
-		buildMode = mode;
-		selectionBuilder.start(x, y);
-	}
-	
-	public void updateBuildingSelection( int x, int y) {
-		if(!building) return;
-		
-		selectionBuilder.update(x, y);
-		
-		SelectionEvent evt = new SelectionEvent();
-		
-		triggerBuildingSelection( evt);
-		
-	}
-
-	public void finishBuildingSelection() {
-		building = false;
-		
-		switch( buildMode) {
+		switch( mode) {
 		case DEFAULT:
-			setSelection(selectionBuilder.build());
+			setSelection(built);
 			break;
 		case ADD:
-			setSelection(combineSelection(getBuiltSelection(),selectionBuilder.build()));
+			setSelection(combineSelection(getBuiltSelection(),built));
 			break;
 		case SUBTRACT:
-			setSelection(subtractSelection(getBuiltSelection(),selectionBuilder.build()));
+			setSelection(subtractSelection(getBuiltSelection(),built));
 			break;
 		case INTERSECTION:
-			setSelection(intersectSelection(getBuiltSelection(),selectionBuilder.build()));
+			setSelection(intersectSelection(getBuiltSelection(),built));
 			break;
 		}
 	}
 	
-	public void cancelBuildingSelection() {
-		selectionBuilder = null;
-		building = false;
-		triggerBuildingSelection(null);
-	}
 	
 	// ==============
 	// ==== Selection modification
@@ -416,10 +379,10 @@ public class SelectionEngine {
 	}
 	
 	public BuiltSelection buildRectSelection( Rect rect) {
-		RectSelectionBuilder rsb = new RectSelectionBuilder();
+		RectSelectionBuilder rsb = new RectSelectionBuilder(workspace);
 		rsb.start(rect.x, rect.y);
 		rsb.update(rect.x+rect.width, rect.y+rect.height);
-		return rsb.build();
+		return new BuiltSelection(rsb.build());
 	}
 	
 	
@@ -434,8 +397,6 @@ public class SelectionEngine {
 	 * start building a new selection.
 	 */
 	public boolean validateSelection() {
-		if( building) finishBuildingSelection();
-		
 		if( built == null)
 			return false;
 		
@@ -472,10 +433,6 @@ public class SelectionEngine {
 			return undoEngine.new CompositeAction(actions, baseAction.description);
 		}
 		else return baseAction;
-	}
-	
-	private void voidBuilding() {
-		building = false;
 	}
 	
 	// ========================
@@ -593,7 +550,7 @@ public class SelectionEngine {
 		@Override
 		protected void performAction() {
 			super.performAction();
-			voidBuilding();
+			//voidBuilding();
 
 			setBuiltSelection(newSelection);
 			
@@ -604,7 +561,7 @@ public class SelectionEngine {
 		@Override
 		protected void undoAction() {
 			super.undoAction();
-			voidBuilding();
+			//voidBuilding();
 
 			setBuiltSelection(oldSelection);
 			
@@ -792,135 +749,6 @@ public class SelectionEngine {
 		void draw(GraphicsContext gc);
 		Rect getBounds();
 	}
-	
-	// ======================
-	// ==== Selection Builders
-	public abstract static class SelectionBuilder
-	{
-		protected abstract void start( int x, int y);
-		protected abstract void update( int x, int y);
-		protected abstract BuiltSelection build();
-		protected abstract void draw( GraphicsContext gc);
-	}
-	
-	/** Builds a Rectangular Selection*/
-	public class RectSelectionBuilder extends SelectionBuilder {
-		private int startX;
-		private int startY;
-		private int currentX;
-		private int currentY;
-		
-		@Override
-		protected void start(int x, int y) {
-			startX = currentX = x;
-			startY = currentY = y;
-		}
-
-		@Override
-		protected void update(int x, int y) {
-			currentX = x;
-			currentY = y;
-		}
-		@Override
-		protected BuiltSelection build() {
-			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
-			GraphicsContext gc = img.getGraphics();
-			gc.fillRect(
-					Math.min(startX, currentX), Math.min(startY, currentY),
-					Math.abs(startX-currentX), Math.abs(startY-currentY));
-//			g.dispose();
-			
-			return new BuiltSelection( img);
-		}
-		@Override
-		protected void draw(GraphicsContext g) {
-			g.drawRect(
-					Math.min(startX, currentX), Math.min(startY, currentY),
-					Math.abs(startX-currentX), Math.abs(startY-currentY));
-		}
-	}
-
-	/** Builds an Elliptical Selection*/
-	public class OvalSelectionBuilder extends SelectionBuilder {
-		private int startX;
-		private int startY;
-		private int currentX;
-		private int currentY;
-		
-		@Override
-		protected void start(int x, int y) {
-			startX = currentX = x;
-			startY = currentY = y;
-		}
-	
-		@Override
-		protected void update(int x, int y) {
-			currentX = x;
-			currentY = y;
-		}
-		@Override
-		protected BuiltSelection build() {
-			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
-			GraphicsContext gc = img.getGraphics();
-			gc.fillOval(
-					Math.min(startX, currentX), Math.min(startY, currentY),
-					Math.abs(startX-currentX), Math.abs(startY-currentY));
-//			g.dispose();
-			
-			return new BuiltSelection( img);
-		}
-		@Override
-		protected void draw(GraphicsContext g) {
-			g.drawOval(
-					Math.min(startX, currentX), Math.min(startY, currentY),
-					Math.abs(startX-currentX), Math.abs(startY-currentY));
-		}
-	}
-	
-	/** Builds a polygonal selection using a feed of points. */
-	public class FreeformSelectionBuilder extends SelectionBuilder {
-		IntCompactor compactor_x = new IntCompactor();
-		IntCompactor compactor_y = new IntCompactor();
-		@Override
-		protected void start(int x, int y) {
-			compactor_x.add(x);
-			compactor_y.add(y);
-		}
-
-		@Override
-		protected void update(int x, int y) {
-			compactor_x.add(x);
-			compactor_y.add(y);
-		}
-		@Override
-		protected BuiltSelection build() {
-			RawImage img = HybridHelper.createImage( workspace.getWidth(), workspace.getHeight());
-
-			GraphicsContext gc = img.getGraphics();
-			gc.setColor(Colors.WHITE);
-			gc.fillPolygon( compactor_x.toArray(), compactor_y.toArray(), compactor_x.size());
-			
-			return new BuiltSelection(img);
-		}
-
-		@Override
-		protected void draw(GraphicsContext g) {
-			for( int i=0; i < compactor_x.getChunkCount(); ++i) {
-				g.drawPolyLine(compactor_x.getChunk(i), 
-							compactor_y.getChunk(i), 
-							compactor_x.getChunkSize(i));
-			}
-		}
-		public Vec2i getStart() {
-			return new Vec2i( compactor_x.get(0), compactor_y.get(0));
-		}
-		public Vec2i getEnd() {
-			int s = compactor_x.size();
-			return new Vec2i( compactor_x.get(s-1), compactor_y.get(s-1));
-		}
-		
-	}
-	
 
 	// ============
 	// ==== Observers

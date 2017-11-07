@@ -30,9 +30,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.SelectionEngine.BuiltSelection;
-import spirite.base.image_data.SelectionEngine.FreeformSelectionBuilder;
 import spirite.base.image_data.SelectionEngine.Selection;
-import spirite.base.image_data.SelectionEngine.SelectionBuilder;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -47,6 +45,10 @@ import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
+import spirite.base.pen.selection_builders.ASelectionBuilder;
+import spirite.base.pen.selection_builders.FreeformSelectionBuilder2;
+import spirite.base.pen.selection_builders.OvalSelectionBuilder;
+import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
@@ -708,66 +710,88 @@ public class Penner
 		}
 	}
 	
-	class FormingSelectionBehavior extends StateBehavior {
+	class FormingSelectionBehavior extends DrawnStateBehavior {
 		private final BoxSelectionShape shape;
 		private final BuildMode mode;
+		private ASelectionBuilder builder;
+		
 		FormingSelectionBehavior( BoxSelectionShape shape, BuildMode mode) {
 			this.shape = shape;
 			this.mode = mode;
 		}
 		@Override
 		public void start() {
-			SelectionBuilder builder = null;
 			
 			switch( shape) {
 			case RECTANGLE:
-				builder = selectionEngine.new RectSelectionBuilder();
+				builder = new RectSelectionBuilder(workspace);
+				//builder = selectionEngine.new RectSelectionBuilder();
 				break;
 			case OVAL:
-				builder = selectionEngine.new OvalSelectionBuilder();
+				builder = new OvalSelectionBuilder(workspace);
+				//builder = selectionEngine.new OvalSelectionBuilder();
 				break;
 			}
 			
-			selectionEngine.startBuildingSelection( builder, x, y, mode);
+			builder.start(x, y);
+			//selectionEngine.startBuildingSelection( builder, x, y, mode);
 		}
 		@Override
 		public void onMove() {
-			selectionEngine.updateBuildingSelection(x, y);
+			builder.update(x, y);
+			//selectionEngine.updateBuildingSelection(x, y);
 		}
 		@Override
 		public void onPenUp() {
-			selectionEngine.finishBuildingSelection();
+			selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
+			//selectionEngine.
+			//selectionEngine.finishBuildingSelection();
 			super.onPenUp();
 		}
 		@Override
 		public void onTock() {
 //			selectionEngine.updateBuildingSelection(x, y);
 		}
+		
+		@Override
+		public void paintOverlay(GraphicsContext gc) {
+			if( builder != null) {
+	            MatTrans trans = new MatTrans(gc.getTransform());
+	        	gc.preTransform(view.getViewTransform());
+				gc.setColor( Colors.BLACK);
+				builder.draw(gc);
+				gc.setTransform(trans);
+			}
+		}
 	}
 
 	class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 		private boolean drawing = true;
 		private final BuildMode mode;
-		private FreeformSelectionBuilder builder;
+		private FreeformSelectionBuilder2 builder;
 		FreeFormingSelectionBehavior( BuildMode mode) {
 			this.mode = mode;
 		}
 		@Override
 		public void start() {
-			builder = selectionEngine.new FreeformSelectionBuilder();
-			selectionEngine.startBuildingSelection( builder, x, y, mode);
+			builder = new FreeformSelectionBuilder2(workspace);
+			builder.start(x, y);
+			//builder = selectionEngine.new FreeformSelectionBuilder();
+			//selectionEngine.startBuildingSelection( builder, x, y, mode);
 		}
 
 		@Override
 		public void onMove() {
 			if( drawing && (x != oldX || y != oldY))
-				selectionEngine.updateBuildingSelection(x, y);
+				builder.update(x, y);
+				//selectionEngine.updateBuildingSelection(x, y);
 		}
 		@Override public void onTock() {}
 		public boolean testFinish() {
 			Vec2i p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				selectionEngine.finishBuildingSelection();
+				selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
+				//selectionEngine.finishBuildingSelection();
 				this.end();
 				return true;
 			}
@@ -781,10 +805,17 @@ public class Penner
 		public void onPenDown() {
 			drawing = true;
 			if( !testFinish())
-				selectionEngine.updateBuildingSelection(x, y);
+				builder.update(x, y);
+				//selectionEngine.updateBuildingSelection(x, y);
 		}
 		@Override
 		public void paintOverlay(GraphicsContext g) {
+            MatTrans trans = new MatTrans(g.getTransform());
+        	g.preTransform(view.getViewTransform());
+			g.setColor( Colors.BLACK);
+			builder.draw(g);
+			g.setTransform(trans);
+			
 			if( !drawing) {
 				Vec2i p_e = builder.getEnd();
 				
@@ -1493,9 +1524,6 @@ public class Penner
 		if(behavior != null)
 			behavior.end();
 		behavior = null;
-		if( selectionEngine.isBuilding()) {
-			selectionEngine.cancelBuildingSelection();
-		}
 	}
 
 }
