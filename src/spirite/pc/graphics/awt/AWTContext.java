@@ -59,8 +59,22 @@ public class AWTContext extends GraphicsContext{
 	@Override
 	public void preTransform(MatTrans trans) {
 		MatTrans buffer = PCUtil.toMT(g2.getTransform());
-		trans.preConcatenate(trans);
+		buffer.preConcatenate(trans);
 		g2.setTransform(PCUtil.toAT(buffer));
+	}
+	@Override
+	public void preTranslate(double offsetX, double offsetY) {
+		MatTrans buffer = PCUtil.toMT(g2.getTransform());
+		buffer.preTranslate((float)offsetX, (float)offsetY);
+		g2.setTransform(PCUtil.toAT(buffer));
+	}
+
+	@Override
+	public void preScale(double sx, double sy) {
+		MatTrans buffer = PCUtil.toMT(g2.getTransform());
+		buffer.preScale((float)sx, (float)sy);
+		g2.setTransform(PCUtil.toAT(buffer));
+		
 	}
 
 	@Override public void setColor(int color) {g2.setColor(new Color(color,true));}
@@ -254,6 +268,7 @@ public class AWTContext extends GraphicsContext{
 		drawHandle( handle, x, y);
 		setComposite( Composite.SRC_OVER, cc);
 	}
+
 
 	
 }

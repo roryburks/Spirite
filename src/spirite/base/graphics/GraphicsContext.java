@@ -1,6 +1,7 @@
 package spirite.base.graphics;
 
 import java.awt.Shape;	// TODO
+import java.util.Stack;
 
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
@@ -31,9 +32,11 @@ public abstract class GraphicsContext {
 	/** Setting to null produces undefined behavior. */
 	public abstract void setTransform( MatTrans trans);
 	public abstract MatTrans getTransform();
+	public abstract void preTranslate(double offsetX, double offsetY);
 	public abstract void translate(double offsetX, double offsetY);
 	public abstract void preTransform(MatTrans trans);
 	public abstract void transform(MatTrans trans);
+	public abstract void preScale(double sx, double sy);
 	public abstract void scale(double sx, double sy);
 	public abstract void setColor(int argb);
 	
@@ -109,8 +112,11 @@ public abstract class GraphicsContext {
 	public abstract void renderImage(IImage rawImage, int x, int y, RenderProperties render);
 	public abstract void renderHandle( MediumHandle handle, int x, int y, RenderProperties render);
 
-
-
-
-
+	private Stack<MatTrans> stack = new Stack<>();
+	public void pushTransform() {
+		stack.push( getTransform());
+	}
+	public void popTransform() {
+		setTransform(stack.pop());
+	}
 }

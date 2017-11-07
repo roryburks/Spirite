@@ -148,7 +148,9 @@ public class GLGraphics extends GraphicsContext{
 		contextTransform = trans;
 	}
 	@Override public void translate(double offsetX, double offsetY) {contextTransform.translate((float)offsetX, (float)offsetY);}
+	@Override public void preTranslate(double offsetX, double offsetY) {contextTransform.preTranslate((float)offsetX, (float)offsetY);}
 	@Override public void scale(double sx, double sy) { contextTransform.scale((float)sx, (float)sy); }
+	@Override public void preScale(double sx, double sy) { contextTransform.preScale((float)sx, (float)sy); }
 	@Override public void transform(MatTrans trans) { contextTransform.concatenate(trans); }
 	@Override public void preTransform( MatTrans trans) {contextTransform.preConcatenate(trans);}
 	
