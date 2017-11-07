@@ -19,6 +19,8 @@ import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
@@ -194,6 +196,92 @@ public class SelectionEngine {
 		rsb.update(rect.x+rect.width, rect.y+rect.height);
 		return new SelectionMask( rsb.build());
 	}
+	private void modifySelection( int ox, int oy) {
+		undoEngine.performAndStore(new ModifyingSelection(ox, oy));
+	}
+	class ModifyingSelection extends NullAction implements StackableAction 
+	{
+		int oldOx, oldOy, newOx, newOy;
+		
+		public ModifyingSelection( int newOx, int newOy) {
+			this.newOx = newOx;
+			this.newOy = newOy;
+			this.oldOx = selection.ox;
+			this.oldOy = selection.oy;
+		}
+		
+		@Override protected void performAction() {
+			selection = new SelectionMask(selection, newOx, newOy);
+			workspace.triggerSelectionRefresh();
+		}
+		@Override protected void undoAction() {
+			selection = new SelectionMask(selection, oldOx, oldOy);
+			workspace.triggerSelectionRefresh();
+		}
+		@Override public boolean canStack(UndoableAction newAction) {
+			return newAction instanceof ModifyingSelection;
+		}
+		@Override public void stackNewAction(UndoableAction newAction) {
+			newOx = ((ModifyingSelection)newAction).newOx;
+			newOy = ((ModifyingSelection)newAction).newOy;
+		}
+		@Override
+		public String getDescription() {
+			return "Moving Selection";
+		}
+	}
+	
+	// =======
+	// === Transforming Lifted Data
+	MatTrans liftedTrans = new MatTrans();
+	public MatTrans getLiftedDrawTrans() {
+		MatTrans trans = new MatTrans();
+		trans.preTranslate(-lifted.getWidth()/2, -lifted.getHeight()/2);
+		trans.preConcatenate(liftedTrans);
+		int dx = (selection == null) ? 0 : selection.ox;
+		int dy = (selection == null) ? 0 : selection.oy;
+		trans.preTranslate(lifted.getWidth()/2 + dx, lifted.getHeight()/2 + dy);
+		
+		return trans;
+	}
+	
+	public void setOffset(int ox, int oy) {
+		if( !isLifted()) {
+			attemptLiftData( workspace.getSelectedNode());
+		}
+		
+		modifySelection(ox, oy);
+	}
+	
+	// ============
+	// ==== Lifting Data
+	public void attemptLiftData( final Node node ) {
+		IImageDrawer drawer =  workspace.getDrawerFromNode( node);
+		
+		if( drawer instanceof ILiftSelectionModule) {
+			final ALiftedSelection newLifted = ((ILiftSelectionModule) drawer).liftSelection(selection);
+			final ALiftedSelection oldLifted = lifted;
+			
+			List<UndoableAction> actions = new ArrayList<>(2);
+			
+			actions.add(new NullAction() {
+				@Override
+				protected void performAction() {
+					lifted = newLifted;
+				}
+
+				@Override
+				protected void undoAction() {
+					lifted = oldLifted;
+				}
+			});
+			actions.add( new ModifyingSelection(selection.ox, selection.oy));
+			
+			undoEngine.performAndStore(undoEngine.new StackableCompositeAction(actions, "Lift and Move Data"));
+		}
+		else
+			HybridHelper.beep();
+	}
 	
 	// =========
 	// ==== Automatic
@@ -223,4 +311,5 @@ public class SelectionEngine {
     void triggerBuildingSelection(SelectionEvent evt) {
     	selectionObs.trigger((MSelectionEngineObserver obs) -> {obs.buildingSelection(evt);});
     }
+
 }

@@ -266,11 +266,12 @@ public class UndoEngine {
 		if( action != null) {
 			if( action instanceof ImageAction)
 				prepareContext(((ImageAction) action).building.handle);
-			action.performAction();
 			if( isPaused)
 				queuedActions.add(action);
-			else 
+			else {
+				action.performAction();
 				storeAction(action);
+			}
 		}
 		else
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Attempted to store null as an action.");
@@ -398,7 +399,16 @@ public class UndoEngine {
 		isPaused = false;
 		
 		
-		storeAction(new CompositeAction( queuedActions, description));
+		performAndStore(new CompositeAction( queuedActions, description));
+	}
+	
+	/** Aggregates the stored actions without performing them. */
+	public CompositeAction popUnpauseQueue(String description) {
+		if( !isPaused || queuedActions == null || queuedActions.isEmpty())
+			return null;
+		
+		isPaused = false;
+		return new CompositeAction( queuedActions, description);
 	}
 	
 	private boolean isPaused = false;

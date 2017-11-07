@@ -2,10 +2,9 @@ package spirite.base.image_data.selection;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
+import spirite.base.util.glmath.MatTrans;
 
 public abstract class ALiftedSelection {
-	ALiftedSelection() {}
-	
 	public abstract void drawLiftedData( GraphicsContext gc);
 	public abstract int getWidth();
 	public abstract int getHeight();

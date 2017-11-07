@@ -3,6 +3,8 @@ package spirite.base.image_data.mediums.drawer;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
+import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.selection.ALiftedSelection;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -68,5 +70,9 @@ public interface IImageDrawer {
 		public void erasePoints( float x, float y, float r);
 		public float[] getMagFillXs();
 		public float[] getMagFillYs();
+	}
+	
+	public interface ILiftSelectionModule {
+		public ALiftedSelection liftSelection(SelectionMask selection);
 	}
 }

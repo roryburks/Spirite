@@ -668,9 +668,9 @@ public class Penner
 			if( selection == null) 
 				end();
 			else if( oldX != x || oldY != y) {
-//				selectionEngine.setOffset( 
-//						selection.getOX() + (x - oldX),
-//						selection.getOY() + (y - oldY));
+				selectionEngine.setOffset( 
+						selection.getOX() + (x - oldX),
+						selection.getOY() + (y - oldY));
 			}
 		}
 	}

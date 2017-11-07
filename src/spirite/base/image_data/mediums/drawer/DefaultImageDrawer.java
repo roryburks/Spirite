@@ -28,6 +28,9 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
+import spirite.base.image_data.selection.ALiftedSelection;
+import spirite.base.image_data.selection.FlatLiftedSelection;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
@@ -54,7 +57,8 @@ public class DefaultImageDrawer
 				IInvertModule,
 				ITransformModule,
 				IStrokeModule,
-				IMagneticFillModule
+				IMagneticFillModule,
+				ILiftSelectionModule
 {
 	private BuildingMediumData building;
 	private final IMedium img;
@@ -644,5 +648,44 @@ public class DefaultImageDrawer
 	@Override
 	public float[] getMagFillYs() {
 		return fy.toArray();
+	}
+
+	// ::: ILiftSelectionModule
+	@Override
+	public ALiftedSelection liftSelection(final SelectionMask selection) {
+		// Lift and Clear
+		AtomicReference<ALiftedSelection> lifted = new AtomicReference<>(null);
+		
+		building.doOnBuiltData((built) -> {
+			built.doOnRaw((raw) -> {
+				lifted.set(new FlatLiftedSelection(selection.liftRawImage(raw, 0, 0)));
+			});
+		});
+		
+		UndoEngine ue = building.handle.getContext().getUndoEngine();
+		
+		ue.performAndStore(new MaskedImageAction(building, selection) {
+			@Override
+			protected void performImageAction(ABuiltMediumData built) {
+				clearUnderSelection(built, selection);
+			}
+			@Override
+			public String getDescription() {
+				return "Clear Data That Was Lifted";
+			}
+		});
+		
+		return lifted.get();
+	}
+	
+	private void clearUnderSelection( ABuiltMediumData built, SelectionMask selection) {
+		if( selection == null)
+			built.doOnGC((gc) -> gc.clear());
+		else {
+			built.doOnGC((gc) -> {
+				gc.setComposite( Composite.DST_OUT, 1.0f);
+				selection.drawMask(gc, true);
+			});
+		}
 	}
 }

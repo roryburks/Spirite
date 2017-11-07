@@ -130,7 +130,7 @@ public class SelectionMask {
 	public boolean contains(int x, int y) {
 		if( x < ox || x > ox + mask.getWidth() || y < oy || y > oy + mask.getHeight())
 			return false;
-		return Colors.getAlpha(mask.getRGB(x-ox, y-oy)) == 0;
+		return Colors.getAlpha(mask.getRGB(x-ox, y-oy)) != 0;
 	}
 
 
