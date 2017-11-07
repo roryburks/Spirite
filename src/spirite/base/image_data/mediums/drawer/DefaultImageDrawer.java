@@ -623,7 +623,7 @@ public class DefaultImageDrawer
 		}
 	}
 	private boolean tryPixel( int x, int y, IImage raw, int lockedColor, boolean locked) {
-		if( x == fx.get( fx.size()-1) && y == fy.get(fy.size()))
+		if( fx.size() > 1 && x == fx.get( fx.size()-1) && y == fy.get(fy.size()))
 			return false;
 		int c = raw.getRGB(x, y);
 		if( (locked && Colors.colorDistance(c, lockedColor) < 25) ||
