@@ -13,39 +13,54 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
+/**
+ * NOTE: SelectionMask is immutable.  Technically the mask is mutable, but only if
+ * the IImage contract is breached.
+ */
 public class SelectionMask {
-	RawImage mask;
-	int ox, oy;
-	
-	public SelectionMask() {}
+	final IImage mask;
+	final int ox, oy;
+
 	public SelectionMask( IImage mask) {
+		this(mask,0,0);
+	}
+	public SelectionMask( IImage mask, int x, int y) {
 		Rect cropped = null;
 		try {
 			cropped = HybridUtil.findContentBounds(mask, 1, true);
 		} catch (UnsupportedImageTypeException e) {
 			e.printStackTrace();
 		}
-		this.mask = HybridHelper.createImage(cropped.width, cropped.height);
-		GraphicsContext gc = this.mask.getGraphics();
+		
+		
+		RawImage maskBeingBuilt = HybridHelper.createImage(cropped.width, cropped.height);
+		GraphicsContext gc = maskBeingBuilt.getGraphics();
 		gc.drawImage(mask, -cropped.x, -cropped.y);
+		
+		this.mask = maskBeingBuilt;
+		this.ox = cropped.x + x;
+		this.oy = cropped.y + y;
+	}
+	SelectionMask( SelectionMask other, int ox, int oy) {
+		this.mask = other.mask;
+		this.ox = ox;
+		this.oy = oy;
 	}
 
-	public int getOX() {
-		return ox;
-	}
-
-	public int getOY() {
-		return oy;
-	}
+	public int getOX() {return ox;}
+	public int getOY() {return oy;}
+	public int getWidth() {return mask.getWidth();}
+	public int getHeight() {return mask.getHeight();}
 	
 	public Vec2i getDimension() {
 		return new Vec2i(mask.getWidth(), mask.getHeight());
 	}
 	
-	public void drawMask( GraphicsContext gc) {
-		//gc.pushTransform();
-		gc.drawImage(mask, ox, oy);
-		//gc.popTransform();
+	public void drawMask( GraphicsContext gc, boolean withOffset) {
+		if( withOffset)
+			gc.drawImage(mask, ox, oy);
+		else
+			gc.drawImage(mask, 0, 0);
 	}
 
 	public RawImage liftRawImage( IImage image, int ox, int oy) {
@@ -119,11 +134,15 @@ public class SelectionMask {
 	}
 
 
-	public void drawBounds(GraphicsContext gc) {
-		gc.pushTransform();
-		gc.preTranslate(ox, oy);
-		gc.drawBounds(mask, 0);
-		gc.popTransform();
+	public void drawBounds(GraphicsContext gc, boolean withOffset) {
+		if( withOffset) {
+			gc.pushTransform();
+			gc.preTranslate(ox, oy);
+			gc.drawBounds(mask, 0);
+			gc.popTransform();
+		}
+		else
+			gc.drawBounds(mask, 0);
 	}
 
 

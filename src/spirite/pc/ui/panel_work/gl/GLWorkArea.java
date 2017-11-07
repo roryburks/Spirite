@@ -29,10 +29,10 @@ import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
-import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
-import spirite.base.image_data.SelectionEngine.SelectionEvent;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
+import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
@@ -157,10 +157,8 @@ public class GLWorkArea
         	SelectionMask selection = selectionEngine.getSelection();
 
             if( selection != null) {
-            	MatTrans selectionTrans = new MatTrans(viewTrans);
-            	selectionTrans.preTranslate(selection.getOX(), selection.getOY());
-            	glgc.setTransform(selectionTrans);
-            	selection.drawBounds(glgc);
+            	glgc.setTransform(viewTrans);
+            	selection.drawBounds(glgc, true);
             }
             
         	glgc.setTransform(null);

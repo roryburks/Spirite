@@ -85,7 +85,7 @@ public class GLGraphics extends GraphicsContext{
 	}
 
 	@Override
-	public void drawBounds(RawImage mask, int c) {
+	public void drawBounds(IImage mask, int c) {
 		try {
 			GLImage img = new GLImage( width, height);
 			

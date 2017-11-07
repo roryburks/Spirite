@@ -27,8 +27,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.SelectionEngine.BuildMode;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
@@ -39,7 +37,9 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.PenTraits.PenState;
@@ -740,9 +740,7 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			//selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
-			//selectionEngine.
-			//selectionEngine.finishBuildingSelection();
+			selectionEngine.mergeSelection(new SelectionMask(builder.build()), mode);
 			super.onPenUp();
 		}
 		@Override
@@ -787,8 +785,7 @@ public class Penner
 		public boolean testFinish() {
 			Vec2i p_s = builder.getStart();
 			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				//selectionEngine.setBuiltSelection(new BuiltSelection(builder.build()), mode);
-				//selectionEngine.finishBuildingSelection();
+				selectionEngine.mergeSelection(new SelectionMask(builder.build()), mode);
 				this.end();
 				return true;
 			}

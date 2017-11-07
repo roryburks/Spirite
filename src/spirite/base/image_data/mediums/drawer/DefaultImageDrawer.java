@@ -15,7 +15,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
@@ -29,6 +28,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -204,9 +204,8 @@ public class DefaultImageDrawer
 				}
 				else {
 					built.doOnGC((gc) -> {
-						gc.translate(mask.getOX(), mask.getOY());
 						gc.setComposite(Composite.DST_OUT, 1);
-						mask.drawMask(gc);
+						mask.drawMask(gc, true);
 					});
 				}
 			}
@@ -276,7 +275,7 @@ public class DefaultImageDrawer
 
 				built.doOnGC((gc) -> {
 					gc.setComposite( Composite.DST_OUT, 1.0f);
-					mask.drawMask( gc);
+					mask.drawMask( gc, true);
 
 					gc.setComposite(Composite.SRC_OVER, 1.0f);
 					gc.drawImage(buffer, mask.getOX(), mask.getOY());
@@ -377,7 +376,7 @@ public class DefaultImageDrawer
 
 				built.doOnGC((gc) -> {
 					gc.setComposite( Composite.DST_OUT, 1.0f);
-					mask.drawMask(gc);
+					mask.drawMask(gc, true);
 
 					gc.setComposite( Composite.SRC_OVER, 1.0f);
 					gc.drawImage( lifted, mask.getOX(), mask.getOY());

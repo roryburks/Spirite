@@ -215,7 +215,7 @@ public class AWTContext extends GraphicsContext{
 	// =========
 	// ==== Custom Drawing Methods
 	@Override
-	public void drawBounds(RawImage mask, int c) {
+	public void drawBounds(IImage mask, int c) {
 		Rectangle r = g2.getClipBounds();
 		
 		AffineTransform old = g2.getTransform();

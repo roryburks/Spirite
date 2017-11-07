@@ -106,8 +106,7 @@ public class HybridHelper {
 		try {
 			return createImageNonNillable(width,height);
 		} catch (InvalidImageDimensionsExeption e) {
-			MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, e, "Couldn't create 1x1 image");
-			return null;
+			return createNillImage();
 		}
 	}
 	public static RawImage createNillImage() {

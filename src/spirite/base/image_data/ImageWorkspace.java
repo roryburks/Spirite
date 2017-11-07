@@ -43,6 +43,7 @@ import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;

@@ -39,7 +39,6 @@ import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.SelectionEngine;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
@@ -47,6 +46,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.Penner;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
@@ -827,18 +827,17 @@ public class MasterControl
     	private SelectionEngine selectionEngine;
     	
     	public SelectionCommandExecuter() {
-//    		commandMap.put("all", () -> {
-//    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
-//    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
-//
-//    		});
-//    		commandMap.put("none", () -> {
-//    			selectionEngine.unselect();
-//    		});
-//    		commandMap.put("invert", () -> {
-//    			BuiltSelection sel = selectionEngine.getBuiltSelection();
-//    			selectionEngine.setSelection( selectionEngine.invertSelection(sel));
-//    		});
+    		commandMap.put("all", () -> {
+    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
+    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
+
+    		});
+    		commandMap.put("none", () -> {
+    			selectionEngine.setSelection(null);
+    		});
+    		commandMap.put("invert", () -> {
+    			selectionEngine.setSelection( selectionEngine.invertSelection(selectionEngine.getSelection()));
+    		});
 		}
     	
 		@Override

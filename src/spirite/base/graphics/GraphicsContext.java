@@ -25,7 +25,7 @@ public abstract class GraphicsContext {
 	 * @param sheight	The height of the screen to draw it on.
 	 * @return
 	 */
-	public abstract void drawBounds(RawImage bi, int c);
+	public abstract void drawBounds(IImage bi, int c);
 
 	public abstract void clear();
 	

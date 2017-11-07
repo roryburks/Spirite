@@ -29,11 +29,11 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.SelectionEngine;
-import spirite.base.image_data.SelectionEngine.MSelectionEngineObserver;
-import spirite.base.image_data.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
+import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -191,8 +191,7 @@ public class DrawPanel extends JPanel
             g2.setColor(Color.black);
             g2.setStroke(dashedStroke);
             if( selection != null) {
-                g2.translate( selection.getOX(), selection.getOY());
-            	selection.drawBounds(gc);
+            	selection.drawBounds(gc, true);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

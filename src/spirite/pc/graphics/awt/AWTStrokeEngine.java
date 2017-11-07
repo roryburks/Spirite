@@ -49,8 +49,7 @@ class AWTStrokeEngine extends StrokeEngine{
 			
 			GraphicsContext gc = new AWTContext(selectionMask);
 			gc.clear();
-			gc.translate(sel.getOX(), sel.getOY());
-			sel.drawMask(gc);
+			sel.drawMask(gc, true);
 //			g2.dispose();
 		}
 	}
