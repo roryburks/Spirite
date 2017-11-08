@@ -2,23 +2,15 @@ package spirite.base.image_data.selection;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicReference;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
-import spirite.base.image_data.GroupTree.LayerNode;
-import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
@@ -27,12 +19,7 @@ import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.HybridUtil;
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.ErrorType;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from
@@ -62,9 +49,6 @@ public class SelectionEngine {
 	// Variables relating to Transforming
 	private SelectionMask selection = null;
 	private ALiftedData lifted = null;
-	
-	private boolean proposingTransform = false;
-	MatTrans proposedTransform = null;
 
 	
 	public SelectionEngine( ImageWorkspace workspace) {
@@ -87,6 +71,7 @@ public class SelectionEngine {
 		
 		undoEngine.doAsAggregateAction(() -> {
 			finalizeSelection();
+			liftedTrans = new MatTrans();
 			undoEngine.performAndStore( new NullAction() {
 				@Override
 				protected void undoAction() {
@@ -197,6 +182,60 @@ public class SelectionEngine {
 		rsb.update(rect.x+rect.width, rect.y+rect.height);
 		return new SelectionMask( rsb.build());
 	}
+	
+	// =======
+	// === Transforming Lifted Data
+	MatTrans liftedTrans = new MatTrans();
+	MatTrans proposedLiftedTrans = new MatTrans();
+	public MatTrans getLiftedDrawTrans() {return getLiftedDrawTrans(true);}
+	public MatTrans getLiftedDrawTrans( boolean withProposed) {
+		MatTrans trans = new MatTrans();
+
+		if( isLifted()) {
+			trans.preTranslate(-lifted.getWidth()/2, -lifted.getHeight()/2);
+			trans.preConcatenate(liftedTrans);
+			if( withProposed && proposedLiftedTrans != null)
+				trans.preConcatenate(proposedLiftedTrans);
+			trans.preTranslate(lifted.getWidth()/2, lifted.getHeight()/2);
+		}
+		int dx = (selection == null) ? 0 : selection.ox;
+		int dy = (selection == null) ? 0 : selection.oy;
+		trans.preTranslate(dx, dy);
+		
+		return trans;
+	}
+	
+	public void transformSelection( MatTrans trans) {
+		liftedTrans.preConcatenate(trans);
+		workspace.triggerSelectionRefresh();
+	}
+	
+	// ========
+	// ==== Proposing Transform
+	public void proposeTransform( MatTrans trans) {
+		proposedLiftedTrans = trans;
+		workspace.triggerSelectionRefresh();
+	}
+	public boolean isProposingTransform() {return proposedLiftedTrans != null;}
+	public void applyProposedTransform() {
+		liftedTrans.preConcatenate(proposedLiftedTrans);
+		proposedLiftedTrans = null;
+		workspace.triggerSelectionRefresh();
+	}
+	
+	// ==========
+	// ==== Selection Moving
+	public void setOffset(int ox, int oy) {
+		List<UndoableAction> actions = undoEngine.aggregateActions(() -> {
+			if( !isLifted()) {
+				attemptLiftData( workspace.getActiveDrawer());
+			}
+		});
+		
+		actions.add(new ModifyingSelection(ox, oy));
+		undoEngine.performAndStore(undoEngine.new StackableCompositeAction(actions, "Moving Selection"));
+	}
+
 	class ModifyingSelection extends NullAction implements StackableAction 
 	{
 		int oldOx, oldOy, newOx, newOy;
@@ -229,39 +268,14 @@ public class SelectionEngine {
 		}
 	}
 	
-	// =======
-	// === Transforming Lifted Data
-	MatTrans liftedTrans = new MatTrans();
-	public MatTrans getLiftedDrawTrans() {
-		MatTrans trans = new MatTrans();
-		trans.preTranslate(-lifted.getWidth()/2, -lifted.getHeight()/2);
-		trans.preConcatenate(liftedTrans);
-		int dx = (selection == null) ? 0 : selection.ox;
-		int dy = (selection == null) ? 0 : selection.oy;
-		trans.preTranslate(lifted.getWidth()/2 + dx, lifted.getHeight()/2 + dy);
-		
-		return trans;
-	}
-	
-	public void setOffset(int ox, int oy) {
-		List<UndoableAction> actions = undoEngine.aggregateActions(() -> {
-			if( !isLifted()) {
-				attemptLiftData( workspace.getSelectedNode());
-			}
-		});
-		
-		actions.add(new ModifyingSelection(ox, oy));
-		undoEngine.performAndStore(undoEngine.new StackableCompositeAction(actions, "Moving Selection"));
-	}
-	
 	// ============
 	// ==== Lifting Data
-	public void attemptLiftData( final Node node ) {
-		IImageDrawer drawer =  workspace.getDrawerFromNode( node);
+	public void attemptLiftData( IImageDrawer drawer) {
 		
 		if( drawer instanceof ILiftSelectionModule) {
 			final ALiftedData newLifted = ((ILiftSelectionModule) drawer).liftSelection(selection);
 			final ALiftedData oldLifted = lifted;
+			liftedTrans = new MatTrans();
 			
 			List<UndoableAction> actions = new ArrayList<>(2);
 			
@@ -311,6 +325,24 @@ public class SelectionEngine {
 			lifted = null;
 		}
 	}
+
+	public void imageToSelection(RawImage bi, int ox, int oy) {
+		undoEngine.doAsAggregateAction(() -> {
+			setSelection(buildRectSelection(new Rect(ox, oy, bi.getWidth(), bi.getHeight())));
+			
+			final FlatLiftedData newLifted = new FlatLiftedData(bi);
+			undoEngine.performAndStore(new NullAction() {				
+				@Override protected void performAction() {
+					lifted = newLifted;
+					workspace.triggerSelectionRefresh();
+				}
+				@Override protected void undoAction() {
+					lifted = null;
+					workspace.triggerSelectionRefresh();
+				}
+			});
+		}, "Pasted Image to Layer");
+	}
 	
 
 	// ============
@@ -335,5 +367,4 @@ public class SelectionEngine {
     void triggerBuildingSelection(SelectionEvent evt) {
     	selectionObs.trigger((MSelectionEngineObserver obs) -> {obs.buildingSelection(evt);});
     }
-
 }

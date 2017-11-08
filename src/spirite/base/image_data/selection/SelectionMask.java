@@ -1,11 +1,10 @@
 package spirite.base.image_data.selection;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.image_data.selection.SelectionMask.LiftScheme;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
@@ -77,15 +76,8 @@ public class SelectionMask {
 	}
 
 
-	public void drawBounds(GraphicsContext gc, boolean withOffset) {
-		if( withOffset) {
-			gc.pushTransform();
-			gc.preTranslate(ox, oy);
-			gc.drawBounds(mask, 0);
-			gc.popTransform();
-		}
-		else
-			gc.drawBounds(mask, 0);
+	public void drawBounds(GraphicsContext gc) {
+		gc.drawBounds(mask, 0);
 	}
 
 	// ===========

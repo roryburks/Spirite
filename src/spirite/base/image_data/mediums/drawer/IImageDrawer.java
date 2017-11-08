@@ -3,7 +3,6 @@ package spirite.base.image_data.mediums.drawer;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
-import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;

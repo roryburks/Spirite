@@ -31,9 +31,9 @@ import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.selection.SelectionEngine;
-import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -186,12 +186,14 @@ public class DrawPanel extends JPanel
 
         if( selection != null ) {
         	AffineTransform trans = g2.getTransform();
-            g2.translate(zoomer.itsX(0), zoomer.itsY(0));
-            g2.scale(zoom, zoom);
+        	AffineTransform trans2 = g2.getTransform();
+        	g2.translate(zoomer.itsX(0), zoomer.itsY(0));
+        	g2.scale(zoom, zoom);
             g2.setColor(Color.black);
             g2.setStroke(dashedStroke);
             if( selection != null) {
-            	selection.drawBounds(gc, true);
+            	// TODO
+            	selection.drawBounds(gc);
             }
             g2.setStroke(baseStroke);
             g2.setTransform(trans);

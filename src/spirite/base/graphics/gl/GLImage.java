@@ -2,8 +2,6 @@ package spirite.base.graphics.gl;
 
 import java.nio.IntBuffer;
 
-import javax.swing.SwingUtilities;
-
 import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.RawImage;

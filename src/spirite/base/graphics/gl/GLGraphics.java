@@ -7,7 +7,6 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;

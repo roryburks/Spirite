@@ -2,7 +2,6 @@ package spirite.base.image_data.selection;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
-import spirite.base.util.glmath.MatTrans;
 
 public abstract class ALiftedData {
 	public abstract void drawLiftedData( GraphicsContext gc);

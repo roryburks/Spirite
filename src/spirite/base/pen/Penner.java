@@ -34,12 +34,13 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.selection.SelectionEngine;
-import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.image_data.selection.SelectionEngine.BuildMode;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.PenTraits.PenState;
@@ -316,41 +317,39 @@ public class Penner
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
 				Integer flipMode = (Integer)settings.getValue("flipMode");
 
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof IFlipModule) {
-					switch( flipMode) {
-					case 0:	// Horizontal
-						((IFlipModule) drawer).flip( true);
-						break;
-					case 1:	// Vertical
-						((IFlipModule) drawer).flip( false);
-						break;
-					case 2:
-						behavior = new FlippingBehavior();
-						break;
-					}
+				switch( flipMode) {
+				case 0:	// Horizontal
+					tryFlip(true);
+					break;
+				case 1:	// Vertical
+					tryFlip(false);
+					break;
+				case 2:
+					behavior = new FlippingBehavior();
+					break;
 				}
-				else 
-					HybridHelper.beep();
 				break;}
 			case RESHAPER:{
 				SelectionMask sel =selectionEngine.getSelection();
-//				
-//				if( sel == null) {
-//					selectionEngine.setSelection( selectionEngine.buildRectSelection(
-//							new Rect(0,0,workspace.getWidth(),workspace.getHeight())));
-//				}
-//				if( !selectionEngine.isLifted())
-//					selectionEngine.liftData();
-//				if( mbe.buttonType == ButtonType.LEFT) {
-//					behavior = new ReshapingBehavior();
-///*					UndoableAction ra = workspace.getUndoEngine().createReplaceAction(
-//							workspace.buildActiveData().handle, 
-//							drawEngine.scale(workspace.buildActiveData().handle.deepAccess()));
-//					workspace.getUndoEngine().performAndStore(ra);*/
-//				}
-//				else {
-//				}
+				
+				if( sel == null) {
+					selectionEngine.setSelection( selectionEngine.buildRectSelection(
+							new Rect(0,0,workspace.getWidth(),workspace.getHeight())));
+				}
+				if( !selectionEngine.isLifted()) {
+					IImageDrawer drawer = workspace.getActiveDrawer();
+					if( drawer instanceof ILiftSelectionModule)
+						selectionEngine.attemptLiftData(drawer);	
+					else {
+						HybridHelper.beep();
+						break;
+					}
+				}
+				if( mbe.buttonType == ButtonType.LEFT) {
+					behavior = new ReshapingBehavior();
+				}
+				else {
+				}
 				break;}
 			case COLOR_CHANGE: {
 				if( holdingCtrl)  {
@@ -1274,7 +1273,17 @@ public class Penner
 	class ReshapingBehavior extends TransformBehavior {
 		@Override
 		public void start() {
+			selectionEngine.proposeTransform(new MatTrans());
 			setState(TransormStates.READY);
+		}
+		@Override
+		public void end() {
+			selectionEngine.proposeTransform(null);
+			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
+			settings.setValue("scale", new Vec2(1, 1));
+			settings.setValue("translation", new Vec2(0, 0));
+			settings.setValue("rotation", (float)0);
+			super.end();
 		}
 
 		@Override public void onTock() {
@@ -1287,15 +1296,17 @@ public class Penner
 			this.translateY = translation.y;
 			this.rotation = (float)settings.getValue("rotation");
 
-			// TODO
-//			BuiltSelection sel =selectionEngine.getBuiltSelection();
-//			if( sel == null || sel.selection == null){
-//				this.end();
-//				return;
-//			}
-//			
-//			Vec2i d = sel.selection.getDimension();
-//			this.region = new Rect( sel.offsetX, sel.offsetY, d.x, d.y);
+			SelectionMask sel = selectionEngine.getSelection();
+			if( selectionEngine.getSelection() == null){
+				this.end();
+				return;
+			}
+			this.region = MUtil.circumscribeTrans(new Rect(0, 0, sel.getWidth(), sel.getHeight()), selectionEngine.getLiftedDrawTrans(false));
+			
+			Vec2i d = sel.getDimension();
+			
+
+			selectionEngine.proposeTransform(this.getWorkingTransform());
 		}
 
 		@Override public void onPenUp() {
@@ -1303,20 +1314,19 @@ public class Penner
 		}
 		@Override
 		public void onPenDown() {
-			// TODO
-//			BuiltSelection sel =selectionEngine.getBuiltSelection();
-//			
-//			if( sel == null || sel.selection == null){
-//				this.end();
-//				return;
-//			}
-//			
-//			if( overlap >= 0 && overlap <= 7)
-//				this.setState(TransormStates.RESIZE);
-//			else if( overlap >= 8 && overlap <= 0xB)
-//				this.setState(TransormStates.ROTATE);
-//			else if( overlap == 0xC)
-//				this.setState(TransormStates.MOVING);
+			SelectionMask sel =selectionEngine.getSelection();
+			
+			if( sel == null){
+				this.end();
+				return;
+			}
+			
+			if( overlap >= 0 && overlap <= 7)
+				this.setState(TransormStates.RESIZE);
+			else if( overlap >= 8 && overlap <= 0xB)
+				this.setState(TransormStates.ROTATE);
+			else if( overlap == 0xC)
+				this.setState(TransormStates.MOVING);
 		}
 
 		@Override protected void onScaleChanged() {
@@ -1426,18 +1436,41 @@ public class Penner
 		}
 		@Override
 		public void onPenUp() {
-			IImageDrawer drawer = workspace.getActiveDrawer();
-			
-			if( drawer instanceof IFlipModule) {
-				boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
-						||Math.abs(x - startX) > Math.abs(y - startY);
-				((IFlipModule) drawer).flip( horizontal);
-			}
-			else HybridHelper.beep();
+			boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
+					||Math.abs(x - startX) > Math.abs(y - startY);
+			tryFlip( horizontal);
 			
 			super.onPenUp();
 		}
 		@Override public void onTock() {}
+		
+		
+	}
+	public void tryFlip( boolean horizontal) {
+		IImageDrawer drawer = workspace.getActiveDrawer();
+		SelectionMask selected = selectionEngine.getSelection();
+		
+		
+		if( selectionEngine.isLifted()) {
+			selectionEngine.transformSelection((horizontal)
+					? MatTrans.ScaleMatrix(-1, 1)
+					: MatTrans.ScaleMatrix(1, -1));
+		}
+		else if( selected == null) {
+			if( drawer instanceof IFlipModule) {
+				((IFlipModule) drawer).flip(horizontal);
+			}
+			else HybridHelper.beep();
+		}
+		else {
+			if( drawer instanceof ILiftSelectionModule) {
+				selectionEngine.attemptLiftData(drawer);
+				selectionEngine.transformSelection((horizontal)
+						? MatTrans.ScaleMatrix(-1, 1)
+						: MatTrans.ScaleMatrix(1, -1));
+			}
+			else HybridHelper.beep();
+		}
 	}
 	
 	class MagFillingBehavior extends Penner.DrawnStateBehavior {

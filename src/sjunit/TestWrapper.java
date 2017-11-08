@@ -1,7 +1,5 @@
 package sjunit;
 
-import javax.swing.SwingUtilities;
-
 import spirite.base.brains.MasterControl;
 import spirite.hybrid.HybridHelper;
 

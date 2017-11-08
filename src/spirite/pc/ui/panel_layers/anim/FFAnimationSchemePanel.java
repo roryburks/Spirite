@@ -37,7 +37,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
