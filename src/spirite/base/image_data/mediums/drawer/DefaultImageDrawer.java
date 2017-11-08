@@ -29,8 +29,9 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
-import spirite.base.image_data.selection.ALiftedSelection;
-import spirite.base.image_data.selection.FlatLiftedSelection;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
+import spirite.base.image_data.selection.ALiftedData;
+import spirite.base.image_data.selection.FlatLiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
@@ -46,7 +47,8 @@ import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
-import spirite.hybrid.MDebug.WarningType;;
+import spirite.hybrid.MDebug.WarningType;
+import spirite.base.image_data.UndoEngine.ImageAction;
 
 public class DefaultImageDrawer 
 	implements 	IImageDrawer,
@@ -58,7 +60,8 @@ public class DefaultImageDrawer
 				ITransformModule,
 				IStrokeModule,
 				IMagneticFillModule,
-				ILiftSelectionModule
+				ILiftSelectionModule,
+				IAnchorLiftModule
 {
 	private BuildingMediumData building;
 	private final IMedium img;
@@ -652,13 +655,13 @@ public class DefaultImageDrawer
 
 	// ::: ILiftSelectionModule
 	@Override
-	public ALiftedSelection liftSelection(final SelectionMask selection) {
+	public ALiftedData liftSelection(final SelectionMask selection) {
 		// Lift and Clear
-		AtomicReference<ALiftedSelection> lifted = new AtomicReference<>(null);
+		AtomicReference<ALiftedData> lifted = new AtomicReference<>(null);
 		
 		building.doOnBuiltData((built) -> {
 			built.doOnRaw((raw) -> {
-				lifted.set(new FlatLiftedSelection(selection.liftRawImage(raw, 0, 0)));
+				lifted.set(new FlatLiftedData(selection.liftRawImage(raw, 0, 0)));
 			});
 		});
 		
@@ -687,5 +690,26 @@ public class DefaultImageDrawer
 				selection.drawMask(gc, true);
 			});
 		}
+	}
+
+	// :: IAnchorLiftModule
+	@Override
+	public boolean acceptsLifted(ALiftedData lifted) {
+		return (lifted != null);
+	}
+
+	@Override
+	public void anchorLifted(final ALiftedData lifted, final MatTrans trans) {
+		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
+		
+		undoEngine.performAndStore( new ImageAction(building) { 
+			@Override
+			protected void performImageAction(ABuiltMediumData built) {
+				built.doOnGC((gc) ->  {
+					gc.transform(trans);
+					gc.drawImage( lifted.readonlyAccess(), 0, 0);
+				});
+			}
+		});
 	}
 }

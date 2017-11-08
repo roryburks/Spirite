@@ -21,15 +21,13 @@ public class GroupNodeDrawer
 		ImageWorkspace workspace = group.getContext();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 		
-		undoEngine.pause();
-		
-		for( Node child : group.getChildren()) {
-			IImageDrawer drawer = workspace.getDrawerFromNode(child);
-			if( drawer instanceof ITransformModule)
-				((ITransformModule) drawer).transform(trans);
-		}
-		
-		undoEngine.unpause("Batch Transform");
+		undoEngine.doAsAggregateAction(() -> {
+			for( Node child : group.getChildren()) {
+				IImageDrawer drawer = workspace.getDrawerFromNode(child);
+				if( drawer instanceof ITransformModule)
+					((ITransformModule) drawer).transform(trans);
+			}	
+		}, "Batch Transform");
 	}
 
 }

@@ -143,7 +143,7 @@ public class HybridUtil {
 		ImageIO.write( ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img, "png", os);
 	}
 	
-	public static RawImage copyForSaving( RawImage raw) {
+	public static RawImage copyForSaving( IImage raw) {
 		if( raw instanceof ImageBI)
 			return raw.deepCopy();
 		else 

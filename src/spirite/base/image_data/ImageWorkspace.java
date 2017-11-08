@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Queue;
 
 import spirite.base.brains.MasterControl;
@@ -785,21 +786,23 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		if( !nodeInWorkspace(node))
 			return null;
 		final ReferenceLayer ref = (ReferenceLayer) node.getLayer();
-		undoEngine.pause();
 		
-		final LayerNode newNode = (LayerNode) duplicateNode(ref.getUnderlying());
-		newNode.name = name;
-		newNode.render.directCopy(node.render);
-		newNode.x = node.x;
-		newNode.y = node.y;
-		
-		removeNode(node);
-		
-		undoEngine.unpause("Convert Reference to Deep Copy");
+		AtomicReference<LayerNode> newNodeRef = new AtomicReference<GroupTree.LayerNode>(null);
+		undoEngine.doAsAggregateAction(() -> {
+
+			final LayerNode newNode = (LayerNode) duplicateNode(ref.getUnderlying());
+			newNode.name = name;
+			newNode.render.directCopy(node.render);
+			newNode.x = node.x;
+			newNode.y = node.y;
+			newNodeRef.set(newNode);
+			
+			removeNode(node);
+		}, "Convert Reference to Deep Copy");
 		
 		triggerSelectedChanged();
 		
-		return newNode;
+		return newNodeRef.get();
 	}
 	
 	

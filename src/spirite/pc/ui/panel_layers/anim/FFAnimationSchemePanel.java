@@ -653,18 +653,14 @@ public class FFAnimationSchemePanel extends JPanel
 							.addComponent(btnSettings))
 					.addComponent(omniEye));
 			
-			omniEye.addActionListener( new ActionListener() {
-				@Override public void actionPerformed(ActionEvent e) {
-					UndoEngine ue = ws.getUndoEngine();
-					ue.pause();
-
+			omniEye.addActionListener( (e) -> {
+				ws.getUndoEngine().doAsAggregateAction(() -> {
 					visible = !visible;
 					for( Frame frame : layer.getFrames()) {
 						if(frame.getLinkedNode() != null)
 							frame.getLinkedNode().getRender().setVisible(visible);
 					}
-					ue.unpause("Toggle Layer Visibility");
-				}
+				}, "Toggle Layer Visibility");
 			});
 			
 			layout.linkSize( SwingConstants.VERTICAL, btnLock,btnSettings);

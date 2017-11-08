@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Stack;
 
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
@@ -266,8 +267,8 @@ public class UndoEngine {
 		if( action != null) {
 			if( action instanceof ImageAction)
 				prepareContext(((ImageAction) action).building.handle);
-			if( isPaused)
-				queuedActions.add(action);
+			if( activeStoreState != null)
+				activeStoreState.add(action);
 			else {
 				action.performAction();
 				storeAction(action);
@@ -379,40 +380,52 @@ public class UndoEngine {
 		cull();
 	}
 	
-	/** Makes it so that between now and the time the undo engine is unpaused, all
-	 * incoming actions are stored into a list rather than performed.  Once unpaused
-	 * the actions are aggregated and then performed
-	 */
-	public void pause() {
-		queuedActions = new ArrayList<>();
-		isPaused = true;
-	}
-	/** Performs all actions that were queued while the undo engine was paused, aggregating
-	 * them into a single Composite Action.
-	 * 
-	 * @param description User-readable description for the aggregate action
-	 */
-	public void unpause(String description) {
-		if( !isPaused || queuedActions == null || queuedActions.isEmpty())
-			return ;
+	// =================
+	// ==== Store States
+	//private boolean isPaused = false;
+	//private List<UndoableAction> queuedActions;
+	private final Stack<List<UndoableAction>> storeStates = new Stack<>();
+	private List<UndoableAction> activeStoreState = null;
+	
+	public void doAsAggregateAction( Runnable doer, String description) {
+		List<UndoableAction> storeState = new ArrayList<>(2);
+		storeStates.push(storeState);
+		activeStoreState = storeState;
 		
-		isPaused = false;
+		doer.run();
+		storeStates.pop();
 		
-		
-		performAndStore(new CompositeAction( queuedActions, description));
+		if( storeStates.size() > 0) {
+			List<UndoableAction> topList = storeStates.peek();
+			topList.addAll(storeState);
+			activeStoreState = topList;
+		}
+		else {
+			performAndStore( new CompositeAction(storeState, description));
+			activeStoreState = null;
+		}
 	}
 	
-	/** Aggregates the stored actions without performing them. */
-	public CompositeAction popUnpauseQueue(String description) {
-		if( !isPaused || queuedActions == null || queuedActions.isEmpty())
-			return null;
+	public List<UndoableAction> aggregateActions( Runnable doer) {
+		List<UndoableAction> storeState = new ArrayList<>(2);
+		storeStates.push(storeState);
+		activeStoreState = storeState;
 		
-		isPaused = false;
-		return new CompositeAction( queuedActions, description);
+		doer.run();
+		storeStates.pop();
+		
+		if( storeStates.size() > 0) {
+			List<UndoableAction> topList = storeStates.peek();
+			topList.addAll(storeState);
+			activeStoreState = topList;
+			return topList;
+		}
+		else {
+			activeStoreState = null;
+			return storeState;
+		}
 	}
 	
-	private boolean isPaused = false;
-	private List<UndoableAction> queuedActions;
 	
 	/** Checks to see if there are too many UndoActions (using the behavior determined
 	 * by the cullBehavior) and gets rid of the oldest undo actions until there

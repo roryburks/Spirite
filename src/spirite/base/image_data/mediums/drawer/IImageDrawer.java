@@ -4,7 +4,7 @@ import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.image_data.selection.ALiftedSelection;
+import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -73,6 +73,11 @@ public interface IImageDrawer {
 	}
 	
 	public interface ILiftSelectionModule {
-		public ALiftedSelection liftSelection(SelectionMask selection);
+		public ALiftedData liftSelection(SelectionMask selection);
+	}
+	
+	public interface IAnchorLiftModule {
+		public boolean acceptsLifted( ALiftedData lifted);
+		public void anchorLifted( ALiftedData lifted, MatTrans trans);
 	}
 }

@@ -20,11 +20,11 @@ import spirite.hybrid.HybridUtil;
  * and that RawImage is drawn to.
  */
 public class FlatMedium implements IMedium {
-	RawImage image;
+	private final RawImage image;
 	protected final ImageWorkspace context;
 	boolean flushed = false;
 	
-	public FlatMedium( RawImage raw, ImageWorkspace context) { 
+	public FlatMedium( RawImage raw, ImageWorkspace context) {
 		this.context = context;
 		this.image = raw;
 	}

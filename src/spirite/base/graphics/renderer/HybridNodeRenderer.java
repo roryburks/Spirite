@@ -20,7 +20,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.selection.ALiftedSelection;
+import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.pen.StrokeEngine;
@@ -110,7 +110,7 @@ public class HybridNodeRenderer {
 
 				if( selectionEngine.isLifted()){
 					// Draw Lifted Image
-					ALiftedSelection lifted = selectionEngine.getLiftedData();
+					ALiftedData lifted = selectionEngine.getLiftedData();
 					
 					MatTrans tt = selectionEngine.getLiftedDrawTrans();
 					tt.preConcatenate(built.getScreenToImageTransform());

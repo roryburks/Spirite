@@ -4,16 +4,21 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 
-public class FlatLiftedSelection extends ALiftedSelection {
-	RawImage lifted;
+/**
+ * A simple LiftedData containing an IImage
+ * 
+ * Immutable
+ */
+public class FlatLiftedData extends ALiftedData {
+	private final IImage lifted;
 	
-	public FlatLiftedSelection( RawImage lifted) {
+	public FlatLiftedData( IImage lifted) {
 		this.lifted = lifted;
 	}
 
 	@Override
-	public ALiftedSelection asType( Class<? extends ALiftedSelection> tclass) {
-		if( tclass == FlatLiftedSelection.class)
+	public ALiftedData asType( Class<? extends ALiftedData> tclass) {
+		if( tclass == FlatLiftedData.class)
 			return this;
 		return null;
 	}

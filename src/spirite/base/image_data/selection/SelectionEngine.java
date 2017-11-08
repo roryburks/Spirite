@@ -20,6 +20,7 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
@@ -60,7 +61,7 @@ public class SelectionEngine {
 	
 	// Variables relating to Transforming
 	private SelectionMask selection = null;
-	private ALiftedSelection lifted = null;
+	private ALiftedData lifted = null;
 	
 	private boolean proposingTransform = false;
 	MatTrans proposedTransform = null;
@@ -77,7 +78,7 @@ public class SelectionEngine {
 	// ==== Basic Gets
 	public SelectionMask getSelection() {return selection;}
 	public boolean isLifted() {return lifted != null;}
-	public ALiftedSelection getLiftedData() {return lifted;}
+	public ALiftedData getLiftedData() {return lifted;}
 	
 	// =======
 	// ==== Basic and complicated Selection settings
@@ -259,8 +260,8 @@ public class SelectionEngine {
 		IImageDrawer drawer =  workspace.getDrawerFromNode( node);
 		
 		if( drawer instanceof ILiftSelectionModule) {
-			final ALiftedSelection newLifted = ((ILiftSelectionModule) drawer).liftSelection(selection);
-			final ALiftedSelection oldLifted = lifted;
+			final ALiftedData newLifted = ((ILiftSelectionModule) drawer).liftSelection(selection);
+			final ALiftedData oldLifted = lifted;
 			
 			List<UndoableAction> actions = new ArrayList<>(2);
 			
@@ -286,8 +287,19 @@ public class SelectionEngine {
 	// =========
 	// ==== Automatic
 	private void finalizeSelection() {
-		
+		if( isLifted()) {
+			IImageDrawer drawer = workspace.getActiveDrawer();
+			
+			if( drawer instanceof IAnchorLiftModule && ((IAnchorLiftModule) drawer).acceptsLifted(lifted)) {
+				((IAnchorLiftModule)drawer).anchorLifted(lifted, getLiftedDrawTrans());
+			}
+			else 
+				HybridHelper.beep();
+			
+			lifted = null;
+		}
 	}
+	
 
 	// ============
 	// ==== Observers

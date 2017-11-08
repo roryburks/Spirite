@@ -7,6 +7,7 @@ import spirite.base.graphics.IImage;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.selection.SelectionMask.LiftScheme;
 import spirite.base.util.Colors;
+import spirite.base.util.MUtil;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
@@ -14,6 +15,7 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 
 /**
+ * 
  * NOTE: SelectionMask is immutable.  Technically the mask is mutable, but only if
  * the IImage contract is breached.
  */
@@ -21,6 +23,8 @@ public class SelectionMask {
 	final IImage mask;
 	final int ox, oy;
 
+	// ===========
+	// ==== Constructors
 	public SelectionMask( IImage mask) {
 		this(mask,0,0);
 	}
@@ -47,15 +51,18 @@ public class SelectionMask {
 		this.oy = oy;
 	}
 
+	// ==========
+	// ==== Gets
 	public int getOX() {return ox;}
 	public int getOY() {return oy;}
 	public int getWidth() {return mask.getWidth();}
 	public int getHeight() {return mask.getHeight();}
-	
 	public Vec2i getDimension() {
 		return new Vec2i(mask.getWidth(), mask.getHeight());
 	}
 	
+	// ============
+	// ==== Common Functionality
 	public void drawMask( GraphicsContext gc, boolean withOffset) {
 		if( withOffset)
 			gc.drawImage(mask, ox, oy);
@@ -63,11 +70,31 @@ public class SelectionMask {
 			gc.drawImage(mask, 0, 0);
 	}
 
+	public boolean contains(int x, int y) {
+		if( x < ox || x > ox + mask.getWidth() || y < oy || y > oy + mask.getHeight())
+			return false;
+		return Colors.getAlpha(mask.getRGB(x-ox, y-oy)) != 0;
+	}
+
+
+	public void drawBounds(GraphicsContext gc, boolean withOffset) {
+		if( withOffset) {
+			gc.pushTransform();
+			gc.preTranslate(ox, oy);
+			gc.drawBounds(mask, 0);
+			gc.popTransform();
+		}
+		else
+			gc.drawBounds(mask, 0);
+	}
+
+	// ===========
+	// ==== Lifting
 	public RawImage liftRawImage( IImage image, int ox, int oy) {
 		return _liftFromScheme(new LiftScheme() {
 			@Override
 			public void draw(GraphicsContext gc) {
-				gc.drawImage(image, 0, 0);
+				gc.drawImage(image, ox, oy);
 			}
 
 			@Override
@@ -82,13 +109,16 @@ public class SelectionMask {
 			@Override
 			public void draw(GraphicsContext gc) {
 				built.doOnRaw((raw) -> {
+					gc.pushTransform();
+					gc.transform(built.getCompositeTransform());
 					gc.drawImage(raw, 0, 0);
+					gc.popTransform();
 				});
 			}
 
 			@Override
 			public Rect getBounds() {
-				return new Rect(0,0,built.getWidth(),built.getHeight());
+				return MUtil.circumscribeTrans(new Rect(0,0,built.getWidth(),built.getHeight()), built.getCompositeTransform());
 			}
 		});
 	}
@@ -127,23 +157,6 @@ public class SelectionMask {
 		Rect getBounds();
 	}
 
-	public boolean contains(int x, int y) {
-		if( x < ox || x > ox + mask.getWidth() || y < oy || y > oy + mask.getHeight())
-			return false;
-		return Colors.getAlpha(mask.getRGB(x-ox, y-oy)) != 0;
-	}
-
-
-	public void drawBounds(GraphicsContext gc, boolean withOffset) {
-		if( withOffset) {
-			gc.pushTransform();
-			gc.preTranslate(ox, oy);
-			gc.drawBounds(mask, 0);
-			gc.popTransform();
-		}
-		else
-			gc.drawBounds(mask, 0);
-	}
 
 
 	
