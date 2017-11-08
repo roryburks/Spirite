@@ -278,7 +278,6 @@ public class SaveEngine implements MWorkspaceObserver {
 		else if( node instanceof GroupTree.LayerNode) {
 			Layer layer = ((GroupTree.LayerNode) node).getLayer();
 			
-			
 			if( layer instanceof SimpleLayer) {
 				// [1] : Node Type ID
 				helper.ra.write( SaveLoadUtil.NODE_SIMPLE_LAYER);
@@ -290,7 +289,6 @@ public class SaveEngine implements MWorkspaceObserver {
 			if( layer instanceof SpriteLayer) {
 				SpriteLayer rig = (SpriteLayer)layer;
 				List<Part> parts = rig.getParts();
-				
 				
 				// [1] : Node Type ID
 				helper.ra.writeByte(SaveLoadUtil.NODE_RIG_LAYER);
@@ -578,6 +576,4 @@ public class SaveEngine implements MWorkspaceObserver {
 	@Override public void removeWorkspace(ImageWorkspace workspace) {
 		untriggerAutosave( workspace);
 	}
-
-
 }

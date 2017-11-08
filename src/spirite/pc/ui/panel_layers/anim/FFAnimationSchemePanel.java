@@ -3,6 +3,7 @@ package spirite.pc.ui.panel_layers.anim;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -50,6 +51,7 @@ import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
+import spirite.pc.ui.panel_layers.anim.dialogs.ResizeLocalLoopDialog;
 
 
 /***
@@ -61,6 +63,7 @@ public class FFAnimationSchemePanel extends JPanel
 	// :::: Control Links
 	private final MasterControl master;
 	private ImageWorkspace ws = null;
+	Point cmenuPoint;
 	
 	// ::: etc
 	private Component[] titles = null;
@@ -352,6 +355,40 @@ public class FFAnimationSchemePanel extends JPanel
 			else
 				ws.addNewReferenceLayer(ln.getParent(), ln, "*"+ln.getName()+"*");;
 			break;}
+		case "resizeLocalLoop":{
+			Frame frame = ((Frame)cmenuObject);
+			ResizeLocalLoopDialog dia = new ResizeLocalLoopDialog(frame.getLength(), false);
+			Point p = new Point(cmenuPoint);
+			SwingUtilities.convertPointToScreen(p, this);
+			
+			dia.setLocation(p);
+			dia.setVisible(true);
+			
+			if( dia.success) {
+				if( dia.inLoops) {
+					int loopLen = 0;
+					
+					Frame frameIt = frame.next();
+					
+					int depth = 0;
+					while( depth >= 0) {
+						if( depth == 0)
+							loopLen += frameIt.getLength();
+						if( frameIt.getMarker() == Marker.START_LOCAL_LOOP)
+							depth++;
+						if( frameIt.getMarker() == Marker.END_LOCAL_LOOP)
+							depth--;
+						frameIt = frameIt.next();
+					}
+					
+					System.out.println(loopLen);
+					
+					frame.setLength(dia.length * loopLen);
+				}
+				else
+					frame.setLength(dia.length);
+			}
+			break;}
 		default: 
 			MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
 		}
@@ -370,9 +407,13 @@ public class FFAnimationSchemePanel extends JPanel
 		_openContextMenuForFrame( frame, p);
 	}
 	private void _openContextMenuForFrame(Frame frame, Point p) {
-		if( frame.getMarker() == Marker.FRAME) {
-			contextMenu.removeAll();
-			
+		contextMenu.removeAll();
+		cmenuObject = frame;
+		cmenuPoint = p;
+		SwingUtilities.convertPointFromScreen(cmenuPoint, this);
+		
+		switch( frame.getMarker()) {
+		case FRAME:{
 			Object[][] menuScheme = {
 				{"D&uplicate Node", "duplicate"},
 				{"Insert Empty &Before", "insertEmptyBefore"},
@@ -381,9 +422,21 @@ public class FFAnimationSchemePanel extends JPanel
 				{"&Delete Node","deleteNode"},
 				{"Copy As Reference","refer"},
 			};
+			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+			contextMenu.show(this, cmenuPoint.x, cmenuPoint.y);
+			break;}
+		case START_LOCAL_LOOP:{
+			contextMenu.removeAll();
+			
+			Object[][] menuScheme = {
+				{"&Resize Local Loop", "resizeLocalLoop"},
+			};
 			cmenuObject = frame;
 			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
-			contextMenu.show(this, p.x, p.y);
+			contextMenu.show(this, cmenuPoint.x, cmenuPoint.y);
+			break;}
+		default:
+			break;
 		}
 	}
 	
@@ -685,7 +738,13 @@ public class FFAnimationSchemePanel extends JPanel
 		
 		MouseAdapter adapter = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd()-1, frame));
+				if( e.getButton() == MouseEvent.BUTTON1) 
+					setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd(), frame));
+				else if( e.getButton() == MouseEvent.BUTTON3) {
+					Point p = e.getPoint();
+					SwingUtilities.convertPointToScreen(p, SoFFramePanel.this);
+					_openContextMenuForFrame( frame, p);
+				}
 			}
 			public void mouseDragged(MouseEvent e) {
 				if( state instanceof ResizingLoopState) {
@@ -699,6 +758,7 @@ public class FFAnimationSchemePanel extends JPanel
 			}
 		};
 	}
+	
 	private class EoFFramePanel extends JPanel {
 		private static final int HEIGHT = 6;
 		private final Frame frame;
@@ -715,11 +775,17 @@ public class FFAnimationSchemePanel extends JPanel
 
 		MouseAdapter adapter = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd()-1, frame));
+				if( e.getButton() == MouseEvent.BUTTON1) 
+					setState(new ResizingLoopState(column, frame.getStart(), frame.getEnd(), frame));
+				else if( e.getButton() == MouseEvent.BUTTON3) {
+					Point p = e.getPoint();
+					SwingUtilities.convertPointToScreen(p, EoFFramePanel.this);
+					_openContextMenuForFrame( frame, p);
+				}
 			}
 			public void mouseDragged(MouseEvent e) {
 				if( state instanceof ResizingLoopState) {
-					((ResizingLoopState) state).end = TickAtY( SwingUtilities.convertMouseEvent(EoFFramePanel.this, e, content).getY());
+					((ResizingLoopState) state).end = TickAtY( SwingUtilities.convertMouseEvent(EoFFramePanel.this, e, content).getY()) +1;
 					content.repaint();
 				}
 			}
@@ -741,7 +807,7 @@ public class FFAnimationSchemePanel extends JPanel
 		@Override
 		void EndState() {
 			if( end >= start) {
-				sofFrame.setLength(end-start);
+				sofFrame.setLength(end-start+1);
 				//sofFrame.getLayerContext().reWrap(sofFrame, start, end, true);
 			}
 		}

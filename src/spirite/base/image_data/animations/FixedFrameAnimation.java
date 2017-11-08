@@ -620,6 +620,14 @@ public class FixedFrameAnimation extends Animation
 					MDebug.handleError(ErrorType.STRUCTURAL, "Start-End loop mismatch");
 				return depth;
 			}
+
+			public Frame next() {
+				int i = this.getLayerContext().frames.indexOf(this);
+				if( i == -1 || (i+1) >= this.getLayerContext().frames.size())
+					return null;
+				else
+					return this.getLayerContext().frames.get(i+1);
+			}
 		}
 	}
 
