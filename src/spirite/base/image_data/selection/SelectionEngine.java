@@ -297,6 +297,22 @@ public class SelectionEngine {
 		else
 			HybridHelper.beep();
 	}
+	public void clearLifted() {
+		ALiftedData oldLifted = lifted;
+		undoEngine.performAndStore(new NullAction() {
+			@Override protected void performAction() {
+				lifted = null;
+				workspace.triggerSelectionRefresh();
+			}
+			@Override protected void undoAction() {
+				lifted = oldLifted;
+				workspace.triggerSelectionRefresh();
+			}
+			@Override public String getDescription() {
+				return "Clear Lifted Selection";
+			}
+		});
+	}
 	
 	// =========
 	// ==== Automatic

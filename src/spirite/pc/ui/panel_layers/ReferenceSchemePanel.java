@@ -39,6 +39,7 @@ import javax.swing.border.EtchedBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.sources.LayerRenderSource;
@@ -307,7 +308,7 @@ public class ReferenceSchemePanel extends OmniComponent
 								g.drawImage(((ImageBI)HybridUtil.convert(bi, ImageBI.class)).img, 0, 0, d.width, d.height, null);
 							}
 							else if( reference instanceof ImageReference){
-								RawImage raw = ((ImageReference) reference).image;
+								IImage raw = ((ImageReference) reference).image;
 								
 								BufferedImage bi = ((ImageBI)HybridUtil.convert(raw, ImageBI.class)).img;
 								g.drawImage(bi, 

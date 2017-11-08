@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -67,9 +68,9 @@ public class ReferenceManager {
 		}
 	}
 	public class ImageReference extends Reference {
-		public final RawImage image;
-		ImageReference( RawImage image) {
-			this.image = image;
+		public final IImage image;
+		ImageReference( IImage iImage) {
+			this.image = iImage;
 			this.global = false;
 		}
 		@Override
@@ -186,9 +187,9 @@ public class ReferenceManager {
 			triggerReferenceStructureChanged(true);
 		}
 	}
-	public void addReference( RawImage toAdd, int index, MatTrans local) {
-		if( toAdd != null) {
-			Reference ref = new ImageReference(toAdd);
+	public void addReference( IImage iImage, int index, MatTrans local) {
+		if( iImage != null) {
+			Reference ref = new ImageReference(iImage);
 			ref.localTransform = local;
 			references.add(index, ref);
 			triggerReferenceStructureChanged(true);

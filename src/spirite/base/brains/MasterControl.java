@@ -43,6 +43,7 @@ import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Fra
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.selection.SelectionEngine;
@@ -646,12 +647,6 @@ public class MasterControl
 			});
     		commandMap.put("shiftDown", () -> {
 				IImageDrawer drawer = workspace.getActiveDrawer();
-//				if( drawer instanceof ITransformModule ) {
-//					MatTrans trans = MatTrans.TranslationMatrix(-workspace.getWidth()/2, -workspace.getHeight()/2);
-//					trans.scale(1.1f, 1.1f);
-//					trans.preTranslate(+workspace.getWidth()/2, +workspace.getHeight()/2);
-//					((ITransformModule)drawer).transform(trans);
-//				}
 				if( drawer instanceof ITransformModule ) 
 					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, 1));
     		});
@@ -666,15 +661,17 @@ public class MasterControl
 						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
     		});
     		commandMap.put("clearLayer", () -> {
-//				if(!workspace.getSelectionEngine().attemptClearSelection()) {
-//					// Note: transforms are irrelevant for this action, so 
-//					//	accessing handle directly is appropriate.
-//					IImageDrawer drawer = workspace.getActiveDrawer();
-//					if( drawer instanceof IClearModule )
-//						((IClearModule) drawer).clear();
-//					else
-//						HybridHelper.beep();
-//				}
+				
+				if( workspace.getSelectionEngine().isLifted()) {
+					workspace.getSelectionEngine().clearLifted();
+				}
+				else {
+					IImageDrawer drawer = workspace.getActiveDrawer();
+					if( drawer instanceof IClearModule )
+						((IClearModule) drawer).clear();
+					else
+						HybridHelper.beep();
+				}
 			});
     		commandMap.put("cropSelection", () -> {
 				Node node = workspace.getSelectedNode();
@@ -760,17 +757,13 @@ public class MasterControl
 					rm.resetTransform();
 			});
     		commandMap.put("lift_to_reference", () -> {
-//    			SelectionEngine se = workspace.getSelectionEngine();
-//    			ReferenceManager rm = workspace.getReferenceManager();
-//    			
-//    			BuiltSelection sel = se.getBuiltSelection();
-//    			RawImage bi = se.getLiftedImage();
-//    			
-//    			MatTrans trans = new MatTrans();
-//    			trans.translate(sel.offsetX, sel.offsetY);
-//    			rm.addReference(bi, rm.getCenter(), trans);
-//    			
-//    			se.attemptClearSelection();
+    			SelectionEngine se = workspace.getSelectionEngine();
+    			ReferenceManager rm = workspace.getReferenceManager();
+    			
+    			if( se.isLifted()) {
+	    			rm.addReference(se.getLiftedData().readonlyAccess(), rm.getCenter(), se.getLiftedDrawTrans());
+	    			se.clearLifted();
+    			}
 			});
     		
 

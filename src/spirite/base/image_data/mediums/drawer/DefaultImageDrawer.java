@@ -205,15 +205,8 @@ public class DefaultImageDrawer
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
-				if( mask == null) {
-					built.doOnGC((gc) -> {gc.clear();});
-				}
-				else {
-					built.doOnGC((gc) -> {
-						gc.setComposite(Composite.DST_OUT, 1);
-						mask.drawMask(gc, true);
-					});
-				}
+				clearUnderSelection( built, sel);
+				built.handle.refresh();
 			}
 			@Override public String getDescription() {return "Clear Layer";}
 		});
