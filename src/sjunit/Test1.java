@@ -92,8 +92,7 @@ public class Test1 {
 
 			RawImage img = HybridHelper.createImage(rig.getWidth(),rig.getHeight());
 			
-			workspace.getUndoEngine().performAndStore(
-					rig.createAddPartAction(img, 0, 0, 0,""));
+			rig.addPart(img, "");
 		}
 		assert( workspace.getWidth() == 100 && workspace.getHeight() == 900);
 	

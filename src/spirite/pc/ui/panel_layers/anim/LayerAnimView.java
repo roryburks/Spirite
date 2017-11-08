@@ -27,11 +27,11 @@ import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
-import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.BetterTree.BTNode;
 import spirite.pc.ui.components.BetterTree.BranchingNode;
 import spirite.pc.ui.components.BetterTree.DnDBinding;
 import spirite.pc.ui.components.BetterTree.DropDirection;
+import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.panel_layers.LayersPanel;
 

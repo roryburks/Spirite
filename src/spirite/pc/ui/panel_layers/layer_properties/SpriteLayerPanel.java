@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -18,11 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -31,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine.UndoableAction;
@@ -51,11 +47,9 @@ import spirite.pc.ui.components.SliderPanel;
 public class SpriteLayerPanel extends JPanel 
 	implements 
 		ActionListener,
-		ListSelectionListener, 
 		RigStructureObserver, 
 		DocumentListener 
 {
-	//private final JList<Part> listPanel = new JList<Part>();
 	private final MTextFieldNumber tfTransX = new MTextFieldNumber(true,true);
 	private final MTextFieldNumber tfTransY = new MTextFieldNumber(true,true);
 	private final MTextFieldNumber tfScaleX = new MTextFieldNumber(true,true);
@@ -80,14 +74,8 @@ public class SpriteLayerPanel extends JPanel
 		this.master = master;
 		initComponents();
 		
-//		listPanel.setModel(model);
-//		
-//		listPanel.addListSelectionListener(this);
-//		listPanel.setCellRenderer(renderer);
-		
 		boxList.setRenderer( (part, index) -> {
 			return new PartButton(part);
-//			return new JLabel(part.getTypeName());
 		});
 		
 		refresh();
@@ -433,14 +421,12 @@ public class SpriteLayerPanel extends JPanel
 			if( rig != null) {
 				RawImage img = HybridHelper.createImage(1, 1);
 				
-				workspace.getUndoEngine().performAndStore(
-						rig.createAddPartAction(img, 0, 0, 0,""));
+				rig.addPart(img, "");
 			}
 			break;
 		case "remPart":
 			if( rig != null && rig.getActivePart() != null) {
-				workspace.getUndoEngine().performAndStore(
-						rig.createRemovePartAction(rig.getActivePart()));
+				rig.removePart(rig.getActivePart());
 			}
 			break;
 		case "toggleVis":
@@ -449,38 +435,6 @@ public class SpriteLayerPanel extends JPanel
 		default:
 			MDebug.log(evt.getActionCommand());
 		}
-	}
-
-
-	// ::: ListSelectionListener
-	@Override
-	public void valueChanged(ListSelectionEvent evt) {
-		if( building ) return;
-		
-		// Compared to other Listeners, ListSelectionListeners seem really loosey goosey
-		SwingUtilities.invokeLater( () -> {
-			if( rig == null) return;
-			building = true;
-			//ListSelectionModel model =  listPanel.getSelectionModel();
-			//int i = model.getMinSelectionIndex();
-//			Rectangle rect = listPanel.getCellBounds(i,i);
-//			if( rect != null)
-//				listPanel.scrollRectToVisible( rect);
-//			
-//				Part part = SpriteLayerPanel.this.model.getElementAt(i);
-//			if( rig.getActivePart() != part) {
-//				rig.setActivePart(part);
-//			}
-//
-//			tfDepth.setText(""+part.getDepth());
-//			tfName.setText(part.getTypeName());
-//			tfTransX.setText(""+part.getTranslationX());
-//			tfTransY.setText(""+part.getTranslationY());
-//			tfScaleX.setText(""+part.getScaleX());
-//			tfScaleY.setText(""+part.getScaleY());
-//			tfRot.setText(""+part.getRotation());
-//			building = false;
-		});
 	}
 
 	// :::: RigStructureObserver
@@ -539,10 +493,7 @@ public class SpriteLayerPanel extends JPanel
 				ps.visible = bNodeVisiblity.isSelected();
 				ps.alpha = opacitySlider.getValue();
 				
-				UndoableAction action = rig.createModifyPartAction( part,ps);
-				
-				if( action != null)
-					workspace.getUndoEngine().performAndStore(action);
+				rig.modifyPart( part,ps);
 			}
 		}
 		building = false;

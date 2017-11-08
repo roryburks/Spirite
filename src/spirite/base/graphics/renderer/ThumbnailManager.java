@@ -13,12 +13,12 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.sources.RenderSource;
-import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
+import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 

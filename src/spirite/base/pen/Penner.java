@@ -1418,7 +1418,7 @@ public class Penner
 			structure.scaleY = scaleY;
 			structure.rot = rotation;
 
-			undoEngine.performAndStore( sprite.createModifyPartAction( selectedPart, structure));
+			sprite.modifyPart( selectedPart, structure);
 		}
 	}
 

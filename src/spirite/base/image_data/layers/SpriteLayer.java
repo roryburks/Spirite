@@ -16,6 +16,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
@@ -205,11 +206,8 @@ public class SpriteLayer extends Layer
 	
 	/** Outside classes should use createModifyPartAction */
 	private void _sortByDepth() {
-		parts.sort( new Comparator<Part>() {
-			@Override
-			public int compare(Part o1, Part o2) {
-				return o1.structure.depth - o2.structure.depth;
-			}
+		parts.sort( (o1, o2) -> {
+			return o1.structure.depth - o2.structure.depth;
 		});
 	}
 	
@@ -222,66 +220,86 @@ public class SpriteLayer extends Layer
 	 * This is the only way to create parts and outside of the ImageData
 	 * namespace, it must be passed through the UndoEngine.performAndStoreAction
 	 * method.*/
-	public UndoableAction createAddPartAction(RawImage image, int ox, int oy, int depth, String partName) {
-		updateContext();
+	public void addPart( RawImage image, String partName) {
 		if( context == null)
-			return null;
-		
+			return;
+
 		if( parts.size() >= 255) {
 			// Primarily for save/load simplicity
 			MDebug.handleWarning(WarningType.UNSUPPORTED, this, "Only 255 parts per rig currently supported.");
-			return null;
+			return;
 		}
 		
-		// Make sure you create a non-duplicate part name
-		String testing = (partName == null || partName=="")?"_":partName;
-		int i=0;
-		boolean free = false;
-		while( !free) {
-			free = true;
-			for( Part part : parts) {
-				if( part.structure.partName.equals(testing)) {
-					testing = partName + "_" + (++i);
-					free = false;
-					break;
+		UndoEngine undoEngine = context.getUndoEngine();
+		
+		undoEngine.doAsAggregateAction(() -> {
+			// Note: Because of how doAsAggregateAction prevents action until it's completed,
+			//	the logic in this method is counter-intuitively valid, as all of the checks
+			//	are done before the new part gets added, even though it's done using 
+			//	a performAndStore that happens before them.  Probably bad design.
+			
+			int index = (active == null) ? parts.size() : parts.indexOf(active) + 1;
+			
+			int dlow = (index == 0) 
+					? ((parts.size() == 0) ? 0 : parts.get(0).structure.depth )
+					: parts.get(index-1).structure.depth + 1;
+	
+
+			// Make sure you create a non-duplicate part name
+			String testing = (partName == null || partName=="")?"_":partName;
+			int i=0;
+			boolean free = false;
+			while( !free) {
+				free = true;
+				for( Part part : parts) {
+					if( part.structure.partName.equals(testing)) {
+						testing = partName + "_" + (++i);
+						free = false;
+						break;
+					}
 				}
 			}
-		}
-		
-		
-		final Part toAdd = new Part( new PartStructure(
-				context.importDynamicData(image), testing, ox, oy, depth, true, 1));
-		
-		
-		return new NullAction() {
 			
-			@Override
-			protected void performAction() {
-				parts.add( toAdd);
-				active = toAdd;
-				parts.sort( new Comparator<Part>() {
-					@Override
-					public int compare(Part o1, Part o2) {
-						return o1.structure.depth - o2.structure.depth;
-					}
-				});
-				_trigger();
+			final Part toAdd = new Part( new PartStructure(
+					context.importDynamicData(image), testing, 0, 0, dlow++, true, 1));
+
+			undoEngine.performAndStore( new NullAction() {
+				protected void performAction() {
+					parts.add( toAdd);
+					active = toAdd;
+					_sortByDepth();
+					_trigger();
+				}
+				protected void undoAction() {
+					if (active == toAdd)
+						active = null;
+					parts.remove(toAdd);
+					_trigger();
+				}
+				public boolean reliesOnData() {return true;}
+				public Collection<MediumHandle> getDependencies() {
+					return Arrays.asList(new MediumHandle[] {toAdd.structure.handle});
+				}
+			});
+			
+			// Bubble up the depth of anything that matches this depth
+			for( i=index; i < parts.size(); ++i) {
+				PartStructure structure = parts.get(i).getStructure();
+				
+				System.out.println(structure.depth + "," + dlow);
+				if( structure.depth < dlow) {
+					structure.depth = dlow++;
+					modifyPart(parts.get(i), structure);
+				}
+				else 
+					break;
 			}
-			@Override
-			protected void undoAction() {
-				if (active == toAdd)
-					active = null;
-				parts.remove(toAdd);
-				_trigger();
-			}
-			@Override public boolean reliesOnData() {return true;}
-			@Override
-			public Collection<MediumHandle> getDependencies() {
-				return Arrays.asList(new MediumHandle[] {toAdd.structure.handle});
-			}
-			@Override
-			public String getDescription() {return "Added Part to Rig.";}
-		};
+			
+		}, "Add New Part");
+		
+		if( active == null) {
+			
+		}
 	}
 	
 	/** Removes an UndoableAction representing the Creation of a new part.
@@ -291,18 +309,18 @@ public class SpriteLayer extends Layer
 	 * method.
 	 * 
 	 * Can return null if the part is not in the RigLayer*/
-	public UndoableAction createRemovePartAction( final Part toRemove) {
+	public void removePart( final Part toRemove) {
 		if( !parts.contains(toRemove))
-			return null;
-		return new NullAction() {
-			@Override
+			return;
+		
+		context.getUndoEngine().performAndStore(new NullAction() {
 			protected void performAction() {
 				if (active == toRemove)
 					active = null;
 				parts.remove(toRemove);
 				_trigger();
 			}
-			@Override
+			
 			protected void undoAction() {
 				parts.add( toRemove);
 				parts.sort( new Comparator<Part>() {
@@ -314,13 +332,12 @@ public class SpriteLayer extends Layer
 				_trigger();
 			}
 			
-			@Override public String getDescription() { return "Removed Part from Rig";}
-			@Override public boolean reliesOnData() {return true;}
-			@Override
+			public String getDescription() { return "Removed Part from Rig";}
+			public boolean reliesOnData() {return true;}
 			public Collection<MediumHandle> getDependencies() {
 				return Arrays.asList(new MediumHandle[] {toRemove.structure.handle});
 			}
-		};
+		});
 	}
 
 	/** Creates an action representing a change to a single Part's structure
@@ -331,13 +348,13 @@ public class SpriteLayer extends Layer
 	 * method.
 	 * 
 	 * Can return null if the part is not in the RigLayer*/
-	public UndoableAction createModifyPartAction( 
+	public void modifyPart( 
 			Part part, PartStructure newStructure) 
 	{
-
 		if( !parts.contains(part))
-			return null;
-		return new ChangePartAttributesAction( part, newStructure);
+			return;
+		
+		context.getUndoEngine().performAndStore(new ChangePartAttributesAction( part, newStructure));
 	}
 	public class ChangePartAttributesAction extends NullAction 
 		implements StackableAction
