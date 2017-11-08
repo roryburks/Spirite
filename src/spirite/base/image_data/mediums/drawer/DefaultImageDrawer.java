@@ -44,6 +44,7 @@ import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.hybrid.DirectDrawer;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -63,10 +64,10 @@ public class DefaultImageDrawer
 				IAnchorLiftModule
 {
 	private BuildingMediumData building;
-	private final IMedium img;
+	//private final IMedium img;
 	
 	public DefaultImageDrawer( IMedium img, BuildingMediumData building) {
-		this.img = img;
+		//this.img = img;
 		this.building = building;
 	}
 
@@ -98,8 +99,9 @@ public class DefaultImageDrawer
 		ImageWorkspace workspace = _data.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		SelectionMask mask = selectionEngine.getSelection();
-		
-		AtomicReference<Boolean> aborted = new AtomicReference<Boolean>(false);
+
+		AtomicReference<Boolean> aborted = new AtomicReference<>(false);
+		AtomicReference<Integer> bgREF = new AtomicReference<>(0);
 		_data.doOnBuiltData((built) -> {
 
 			
@@ -115,80 +117,78 @@ public class DefaultImageDrawer
 					aborted.set(true);
 					return;
 				}
-				if( bi.getRGB( p.x, p.y) == color) {
+				
+				bgREF.set(bi.getRGB(p.x, p.y));
+				
+				if( bgREF.get() == color) {
 					aborted.set(true);
 					return ;
 				}
 			});
 		});
 		if( aborted.get()) return false;
+		
+		final int bg = bgREF.get();
 
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
-//				RawImage img;
-//				Vec2i layerSpace;
-//				Vec2i p = built.convert( new Vec2i(x,y));
-//				if( mask.selection == null) {
-//					img = built.checkoutRaw();
-//					layerSpace = built.convert( new Vec2i(p.x, p.y));
-//				}
-//				else {
-//					img = mask.liftSelectionFromData(built);
-//					layerSpace = new Vec2i(p.x - mask.offsetX, p.y - mask.offsetY);
-//				}
-//
-//				RawImage intermediate = null;
-//
-//				int bg = img.getRGB(layerSpace.x, layerSpace.y);
-//				
-//				if( mask.selection != null && bg == 0){
-//					// A lot of work for a singular yet common case: 
-//					// When coloring into transparent data, create an image which has
-//					//	a color other than 0 (pure transparent) outside of its selection
-//					//	mask (this has to be done in a couple of renderings).
-//					intermediate = img;
-//					img = HybridHelper.createImage( img.getWidth(), img.getHeight());
-//					
-//					GraphicsContext gc = img.getGraphics();
-//					gc.setColor( Colors.GREEN);
-//					gc.fillRect(0, 0, img.getWidth(), img.getHeight());
-//					gc.setComposite( Composite.CLEAR, 1.0f);
-//					mask.selection.drawSelectionMask( gc);
-//					gc.setComposite( Composite.SRC_OVER, 1.0f);
-//					gc.drawImage(intermediate, 0, 0 );
-////					gc.dispose();
-//				}
-//
-//				DirectDrawer.fill(img, layerSpace.x, layerSpace.y, color);
-//
-//
-//				
-//				if( mask.selection != null) {
-//					if( bg == 0) { 
-//						// Continuing from above, after the fill is done, crop out the
-//						//	green outer mask out of the result image.  (This requires
-//						//	re-using the second BufferedImage since selection masks will
-//						//	most often be using a geometric rendering that never actually
-//						//	touches the pixels outside of it with its rasterizer)
-//						GraphicsContext gc = intermediate.getGraphics();
-//						gc.clear();
-//						mask.selection.drawSelectionMask( gc);
-////						g2.dispose();
-//						
-//						gc = img.getGraphics();
-////						g2 = (Graphics2D) bi.getGraphics();
-//						gc.setComposite( Composite.DST_IN, 1.0f);;
-//						gc.drawImage(intermediate, 0, 0 );
-////						g2.dispose();
-//					}
-//
-//					// Anchor the lifted image to the real image
-//					GraphicsContext gc = built.checkout();
-//					Vec2i p2 = built.convert(new Vec2i(mask.offsetX,mask.offsetY));
-//					gc.drawImage( img, p2.x, p2.y);
-//				}
-//				built.checkin();
+				Vec2i p = built.convert( new Vec2i(x,y));
+				if( mask == null) {
+					built.doOnRaw((raw) -> {
+						DirectDrawer.fill( raw, p.x, p.y, color);
+					});
+				}
+				else {
+					RawImage img = mask.liftSelectionFromData(built);
+					Vec2i layerSpace = new Vec2i(p.x - mask.getOX(), p.y - mask.getOY());
+					
+					RawImage intermediate = null;
+					
+					if( bg == 0) {
+						// A lot of work for a singular yet common case: 
+						// When coloring into transparent data, create an image which has
+						//	a color other than 0 (pure transparent) outside of its selection
+						//	mask (this has to be done in a couple of renderings).
+						intermediate = img;
+						img = HybridHelper.createImage( img.getWidth(), img.getHeight());
+						
+						GraphicsContext gc = img.getGraphics();
+						gc.setColor( Colors.GREEN);
+						gc.fillRect(0, 0, img.getWidth(), img.getHeight());
+						gc.setComposite( Composite.CLEAR, 1.0f);
+						mask.drawMask(gc, true);
+						gc.setComposite( Composite.SRC_OVER, 1.0f);
+						gc.drawImage(intermediate, 0, 0 );
+					}
+					
+					DirectDrawer.fill(img, layerSpace.x, layerSpace.y, color);
+
+					if( bg == 0) { 
+						// Continuing from above, after the fill is done, crop out the
+						//	green outer mask out of the result image.  (This requires
+						//	re-using the second BufferedImage since selection masks will
+						//	most often be using a geometric rendering that never actually
+						//	touches the pixels outside of it with its rasterizer)
+						GraphicsContext gc = intermediate.getGraphics();
+						gc.clear();
+						mask.drawMask(gc, true);
+						
+						gc = img.getGraphics();
+						gc.setComposite( Composite.DST_IN, 1.0f);;
+						gc.drawImage(intermediate, 0, 0 );
+					}
+					
+					final RawImage img_ = img;
+
+					// Anchor the lifted image to the real image
+					built.doOnGC((gc) -> {
+						Vec2i p2 = built.convert(new Vec2i(mask.getOX(),mask.getOY()));
+						gc.drawImage( img_, p2.x, p2.y);
+						
+					});
+				}
+				built.handle.refresh();
 			}
 			
 			@Override public String getDescription() {return "Fill";}

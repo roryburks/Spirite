@@ -8,18 +8,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.brains.ToolsetManager.Tool;
-import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.commands.GlobalCommandExecuter;
+import spirite.base.brains.commands.RelativeWorkspaceCommandExecuter;
+import spirite.base.brains.commands.SelectionCommandExecuter;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.renderer.RenderEngine;
@@ -27,42 +26,23 @@ import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.AnimationView.MAnimationViewObserver;
-import spirite.base.image_data.GroupTree;
-import spirite.base.image_data.GroupTree.LayerNode;
-import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
-import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
-import spirite.base.image_data.selection.SelectionEngine;
-import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.pen.Penner;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.jogl.JOGLCore;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.omni.FrameManager;
-import spirite.pc.ui.panel_work.WorkPanel.View;
 
 /***
  * MasterControl is the top level Model object for all non-UI-related data.
@@ -117,7 +97,6 @@ public class MasterControl
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
         frameManager = new FrameManager( this);
-//		glcache = new GLCache(this);
 		
 		settingsManager.setGL( true);
 
@@ -125,9 +104,9 @@ public class MasterControl
         //	of addCommandExecuter and removeCommandExecuter methods.  I could make
         //	command execution modular that way, but it'd invite forgotten GC links.
         executers = new CommandExecuter[] {
-        	new GlobalCommandExecuter(),
-        	new RelativeWorkspaceCommandExecuter(),
-        	new SelectionCommandExecuter(),
+        	new GlobalCommandExecuter(this),
+        	new RelativeWorkspaceCommandExecuter(this),
+        	new SelectionCommandExecuter(this),
         	toolset,
         	palette,
         	frameManager,
@@ -166,7 +145,7 @@ public class MasterControl
     		GLEngine engine = GLEngine.getInstance();
     		JOGLCore.init( (GL2 gl) ->{engine.init(gl);});
     		
-    		// TODO: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
+    		// NOTE: Kind of bad, but probably necessary.  Might require some locks to prevent bad things happening
     		HybridHelper.queueToRun( () -> {frameManager.getWorkPanel().setGL(true);});
     	}catch( Exception e) { 
     		MDebug.handleError(ErrorType.ALLOCATION_FAILED, "Could not create OpenGL Context: \n" + e.getMessage());
@@ -196,7 +175,7 @@ public class MasterControl
      * Supported Image Formats are those supported by the native implementation
      * of ImageIO (PNG, JPG, GIF should be guaranteed to work)
      */
-    private void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
+    public void exportWorkspaceToFile( ImageWorkspace workspace, File f) {
     	String ext = f.getName().substring( f.getName().lastIndexOf(".")+1);
     	
     	RenderSettings settings = new RenderSettings(
@@ -421,438 +400,13 @@ public class MasterControl
     	public boolean executeCommand( String command);
     }
     
-    /** 
-     * global.* Command Executer
-     * 
-     * These are abstract or top-level commands such as "Save", "Undo", "Copy", 
-     * "Paste" and other things which have a higher context than manipulating 
-     * data within a single Workspace
-     */
-    private class GlobalCommandExecuter implements CommandExecuter {
-    	final Map<String, Runnable> commandMap = new HashMap<>();
-    	GlobalCommandExecuter() {
-    		commandMap.put("save_image",() -> {
-	    		if( currentWorkspace == null)
-	    			return;
-	    		
-	        	File f=currentWorkspace.getFile();
+   
 
-	        	if( currentWorkspace.hasChanged() || f == null) {
-		        	if( f == null)
-		        		f = dialog.pickFileSave();
-		        	
-		        	if( f != null) {
-		        		saveWorkspace(currentWorkspace, f);
-		        		settingsManager.setWorkspaceFilePath(f);
-		        	}
-	        	}
-			});
-    		commandMap.put("save_image_as", () -> {
-				File f = dialog.pickFileSave();
-				
-				if( f != null) {
-					saveWorkspace(currentWorkspace, f);
-				}
-			});
-    		commandMap.put("new_image", () -> {dialog.promptNewImage();});
-    		commandMap.put("open_image", () -> {
-    			File f =dialog.pickFileOpen();
-    			
-    			if( f != null) {
-    	        	loadEngine.openFile( f);
-    			}
-    		});
-    		commandMap.put("export", () -> {
-				File f = dialog.pickFileExport();
-				
-				if( f != null) {
-					exportWorkspaceToFile( currentWorkspace, f);
-				}
-			});
-    		commandMap.put("export_as", commandMap.get("export"));
-    		commandMap.put("copy", () -> {
-    			SelectionEngine selectionEngine= currentWorkspace.getSelectionEngine();
-    			if( currentWorkspace == null) return;
-    			Node selected = currentWorkspace.getSelectedNode();
-    			
-    			if( selected == null) commandMap.get("copyVisible").run();; 
-    			
-    			if(currentWorkspace.getSelectedNode() != null &&
-    					selectionEngine.getSelection() != null) {
-        			// Copies the current selection to the Clipboard
-
-	    	    	AtomicReference<IImage> img = new AtomicReference<>(null);
-    				if( selectionEngine.isLifted()) {
-    					// Copies straight from the lifted data
-    					img.set(selectionEngine.getLiftedData().readonlyAccess());
-    				}
-    				else {
-    					BuildingMediumData building = currentWorkspace.buildActiveData();
-    					
-    					if( building == null) {
-    		    	    	RenderSettings settings = new RenderSettings(
-    		    	    			renderEngine.getNodeRenderTarget(selected));
-    		
-    		    	    	RawImage nodeImg = renderEngine.renderImage(settings);
-    						img.set(selectionEngine.getSelection().liftRawImage(nodeImg, 0, 0));
-    					}
-    					else {
-    						building.doOnBuiltData((built) -> {
-		    					img.set(selectionEngine.getSelection().liftSelectionFromData(built));
-    						});
-    					}
-    				}
-    				
-    				HybridHelper.imageToClipboard(img.get());
-    			}
-    			else {
-	    			// Copies the current selected node to the Clipboard
-	    	    	GroupTree.Node node = currentWorkspace.getSelectedNode();
-	
-	    	    	RenderSettings settings = new RenderSettings(
-	    	    			renderEngine.getNodeRenderTarget(node));
-	
-	    	    	RawImage img = renderEngine.renderImage(settings);
-	    	    	
-	    	    	HybridHelper.imageToClipboard(img);
-    			}
-    		});
-    		commandMap.put("copyVisible", () -> {
-    			if( currentWorkspace == null) return;
-    			
-    			// Copies the current default render to the Clipboard
-    			RenderSettings settings = new RenderSettings(
-    					renderEngine.getDefaultRenderTarget(currentWorkspace));
-    			
-    			// Should be fine to send Clipboard an internal reference since once
-    			//	rendered, the RenderEngine's cache should be immutable
-    	    	RawImage img = renderEngine.renderImage(settings);
-    	    	
-    	    	RawImage lifted =  currentWorkspace.getSelectionEngine().getSelection()
-    	    			.liftRawImage(img, 0, 0);
-
-    	    	HybridHelper.imageToClipboard(lifted);
-    		});
-    		commandMap.put("cut", () -> {
-    			commandMap.get("copy").run();
-    			
-    			MasterControl.this.executeCommandString("draw.clearLayer");
-    		});
-    		commandMap.put("paste",() -> {
-    			RawImage bi = HybridHelper.imageFromClipboard();
-    			if( bi == null) return;
-    			
-	    		if( currentWorkspace == null) {
-		    		// Create new Workspace from Pasted Data
-	    			createWorkspaceFromImage(bi, true);
-	    		}
-	    		else if( currentWorkspace.buildActiveData() == null){
-	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image", InternalImageTypes.NORMAL);
-	    		}
-	    		else {
-	    			// Paste Data onto Selection Engine (current selected Data)
-	    			int ox = 0, oy=0;
-	    			
-	    			View zoom = frameManager.getZoomerForWorkspace(currentWorkspace);
-
-	    			int min_x = zoom.stiX(0);
-	    			int min_y = zoom.stiY(0);
-	    			
-	    			Node node = currentWorkspace.getSelectedNode();
-	    			if( node != null) {
-	    				
-	    				ox = Math.max(min_x,node.getOffsetX());
-	    				oy = Math.max(min_y,node.getOffsetY());
-	    			}
-
-	    			currentWorkspace.getSelectionEngine().imageToSelection(bi, ox, oy);
-	    			
-	    			toolset.setSelectedTool(Tool.BOX_SELECTION);
-	    		}
-    		});
-    		commandMap.put("pasteAsLayer", () -> {
-    			RawImage bi = HybridHelper.imageFromClipboard();
-    			if( bi == null) return;
-    			
-	    		if( currentWorkspace == null) {
-		    		// Create new Workspace from Pasted Data
-	    			createWorkspaceFromImage(bi, true);
-	    		}
-	    		else {
-	    			//	Paste Data as new layer
-	    			currentWorkspace.addNewSimpleLayer(currentWorkspace.getSelectedNode(), bi, "Pasted Image", InternalImageTypes.NORMAL);
-	    		}
-    		});
-    		commandMap.put("toggleGL", () -> {
-    			settingsManager.setGL( !settingsManager.glMode());
-    		});
-    		commandMap.put("toggleGLPanel", () -> {
-    			frameManager.getWorkPanel().setGL(!frameManager.getWorkPanel().isGLPanel());
-    		});
-    		
-    		commandMap.put("debug1", () -> {
-    			toolset.getToolSettings(Tool.PEN).setValue("alpha", 0.5f);
-    		});
-    	}
-    	
-
-		@Override public List<String> getValidCommands() {
-			return new ArrayList<>(commandMap.keySet());
-		}
-
-		@Override
-		public String getCommandDomain() {
-			return "global";
-		}
-
-		@Override
-		public boolean executeCommand(String command) {
-			Runnable runnable = commandMap.get(command);
-			
-			if( runnable != null) {
-				runnable.run();
-				return true;
-			}
-			else
-				return false;
-		}
-    }
-
-    /** 
-     * draw.* Command Executer
-     * 
-     * These are commands that make direct and immediate changes to the current
-     * ImageWorkspace's image data (usually the active data)
-     * */
-    private class RelativeWorkspaceCommandExecuter implements CommandExecuter {
-    	private final Map<String, Runnable> commandMap = new HashMap<>();
-    	
-    	// For simplicity's sake, workspaces are stored in the Class
-    	//	scope and checked for non-null there before being passed to the
-    	//	anonymous Runnable's
-    	private ImageWorkspace workspace;
-    	RelativeWorkspaceCommandExecuter() {
-    		commandMap.put("undo", ()  -> {workspace.getUndoEngine().undo();});
-    		commandMap.put("redo", () -> {workspace.getUndoEngine().redo();});
-    		commandMap.put("shiftRight", () -> {
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(1, 0));
-			});
-    		commandMap.put("shiftLeft", () -> {
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(-1, 0));
-			});
-    		commandMap.put("shiftDown", () -> {
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof ITransformModule ) 
-					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, 1));
-    		});
-    		commandMap.put("shiftUp", () -> {
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof ITransformModule )
-					((ITransformModule)drawer).transform(MatTrans.TranslationMatrix(0, -1));
-			});
-    		commandMap.put("newLayerQuick", () -> {
-				workspace.addNewSimpleLayer(workspace.getSelectedNode(), 
-						workspace.getWidth(), workspace.getHeight(), 
-						"New Layer", 0x00000000, InternalImageTypes.DYNAMIC);
-    		});
-    		commandMap.put("clearLayer", () -> {
-				
-				if( workspace.getSelectionEngine().isLifted()) {
-					workspace.getSelectionEngine().clearLifted();
-				}
-				else {
-					IImageDrawer drawer = workspace.getActiveDrawer();
-					if( drawer instanceof IClearModule )
-						((IClearModule) drawer).clear();
-					else
-						HybridHelper.beep();
-				}
-			});
-    		commandMap.put("cropSelection", () -> {
-				Node node = workspace.getSelectedNode();
-				SelectionEngine selectionEngine = workspace.getSelectionEngine();
-				
-				SelectionMask selection = selectionEngine.getSelection();
-				if( selection == null) {
-					HybridHelper.beep();
-					return;
-				}
-				
-				Rect rect = new Rect(selection.getDimension());
-				rect.x = selection.getOX();
-				rect.y = selection.getOY();
-				
-				workspace.cropNode(node, rect, false);
-			});
-    		commandMap.put("autocroplayer", () -> {
-				Node node = workspace.getSelectedNode();
-				
-				if( node instanceof LayerNode) {
-					Layer layer = ((LayerNode)node).getLayer();
-
-					try {
-						Rect rect;
-						rect = HybridUtil.findContentBounds(
-								layer.getActiveData().handle.deepAccess(),
-								1, 
-								false);
-						rect.x += node.getOffsetX();
-						rect.y += node.getOffsetY();
-						workspace.cropNode((LayerNode) node, rect, true);
-					} catch (UnsupportedImageTypeException e) {
-						e.printStackTrace();
-					}
-				}
-    		});
-    		commandMap.put("layerToImageSize", () -> {
-				Node node = workspace.getSelectedNode();
-				
-				if( node != null)
-					workspace.cropNode(node, new Rect(0,0,workspace.getWidth(), workspace.getHeight()), false);
-    		});
-    		commandMap.put("invert", () -> {
-    			IImageDrawer drawer = workspace.getActiveDrawer();
-    			
-    			if( drawer instanceof IInvertModule) 
-    				((IInvertModule) drawer).invert();
-    			else
-    				HybridHelper.beep();
-    		});
-    		commandMap.put("applyTransform", () -> {
-				ToolSettings settings = toolset.getToolSettings( Tool.RESHAPER);
-    			if( workspace.getSelectionEngine().isProposingTransform()) 
-    				workspace.getSelectionEngine().applyProposedTransform();
-    			else {
-    				Vec2 scale = (Vec2)settings.getValue("scale");
-    				Vec2 translation = (Vec2)settings.getValue("translation");
-    				float rotation = (float)settings.getValue("rotation");
-
-    				MatTrans trans = new MatTrans();
-    				trans.preScale(scale.x, scale.y);
-    				trans.preRotate((float)(rotation * 180.0f /(Math.PI)));
-    				trans.preTranslate(translation.x, translation.y);
-    				workspace.getSelectionEngine().transformSelection(trans);
-    				
-    			}
-
-    			settings.setValue("scale", new Vec2(1,1));
-    			settings.setValue("translation", new Vec2(0,0));
-    			settings.setValue("rotation", 0f);
-    			
-    			Penner p = frameManager.getPenner();
-    			if( p != null)
-    				p.cleanseState();
-    		});
-    		commandMap.put("toggle_reference", () -> {
-					ReferenceManager rm = workspace.getReferenceManager();
-					rm.setEditingReference(!rm.isEditingReference());
-			});
-    		commandMap.put("reset_reference", () -> {
-					ReferenceManager rm = workspace.getReferenceManager();
-					rm.resetTransform();
-			});
-    		commandMap.put("lift_to_reference", () -> {
-    			SelectionEngine se = workspace.getSelectionEngine();
-    			ReferenceManager rm = workspace.getReferenceManager();
-    			
-    			if( se.isLifted()) {
-	    			rm.addReference(se.getLiftedData().readonlyAccess(), rm.getCenter(), se.getLiftedDrawTrans());
-	    			se.clearLifted();
-    			}
-			});
-    		
-
-    		commandMap.put("addGapQuick", () -> {
-    			Frame frame = workspace.getAnimationManager().getSelectedFrame();
-    			if( frame != null) {
-    				frame.setGapAfter(frame.getGapAfter()+1);
-    			}
-    		});
-    	}
-
-		@Override public List<String> getValidCommands() {
-			return new ArrayList<>(commandMap.keySet());
-		}
-
-		@Override
-		public String getCommandDomain() {
-			return "draw";
-		}
-
-		@Override
-		public boolean executeCommand(String command) {
-			Runnable runnable = commandMap.get(command);
-			
-			if( runnable != null) {
-				if( currentWorkspace != null) {
-					workspace = currentWorkspace;
-					runnable.run();
-				}
-				return true;
-			}
-			else
-				return false;
-		}
-    }
     
-    /** CommandExecuter for "select.*" commands.  Commands which affect the 
-     * selection form.     */
-    private class SelectionCommandExecuter implements CommandExecuter {
-    	private final Map<String, Runnable> commandMap = new HashMap<>();
-    	
-    	// For simplicity's sake, stored before executing the command
-    	private ImageWorkspace workspace;
-    	private SelectionEngine selectionEngine;
-    	
-    	public SelectionCommandExecuter() {
-    		commandMap.put("all", () -> {
-    			selectionEngine.setSelection( selectionEngine.buildRectSelection(
-    					new Rect(0,0,workspace.getWidth(), workspace.getHeight())));
-
-    		});
-    		commandMap.put("none", () -> {
-    			selectionEngine.setSelection(null);
-    		});
-    		commandMap.put("invert", () -> {
-    			selectionEngine.setSelection( selectionEngine.invertSelection(selectionEngine.getSelection()));
-    		});
-		}
-    	
-		@Override
-		public List<String> getValidCommands() {
-			return new ArrayList<>(commandMap.keySet());
-		}
-
-		@Override
-		public String getCommandDomain() {
-			return "select";
-		}
-
-		@Override
-		public boolean executeCommand(String command) {
-			Runnable runnable = commandMap.get(command);
-			
-			if( runnable != null) {
-				if( currentWorkspace != null) {
-					workspace = currentWorkspace;
-					selectionEngine = currentWorkspace.getSelectionEngine();
-					runnable.run();
-				}
-				return true;
-			}
-			else
-				return false;
-		}
-    	
-    }
+    
     
     // ===============
-    // ==== Observer Interfaces ====
+    // ==== Observer Interfaces
     /***
      * A WorkspaceObserver watches for changes in which workspace is being 
      * actively selected, it doesn't watch for changes inside any Workspace
