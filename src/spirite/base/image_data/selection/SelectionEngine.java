@@ -84,23 +84,23 @@ public class SelectionEngine {
 	// ==== Basic and complicated Selection settings
 	public void setSelection( final SelectionMask newSelection) {
 		final SelectionMask oldSelection = selection;
-		finalizeSelection();
-		undoEngine.performAndStore( new NullAction() {
-			@Override
-			protected void undoAction() {
-				selection = oldSelection;
-				workspace.triggerSelectionRefresh();
-			}
-			
-			@Override
-			protected void performAction() {
-				selection = newSelection;
-				workspace.triggerSelectionRefresh();
-			}
-			@Override public String getDescription() {
-				return "Change Selection";
-			}
-		});
+		
+		undoEngine.doAsAggregateAction(() -> {
+			finalizeSelection();
+			undoEngine.performAndStore( new NullAction() {
+				@Override
+				protected void undoAction() {
+					selection = oldSelection;
+					workspace.triggerSelectionRefresh();
+				}
+				
+				@Override
+				protected void performAction() {
+					selection = newSelection;
+					workspace.triggerSelectionRefresh();
+				}
+			});
+		}, "Change Selection");
 	}
 	public void mergeSelection(SelectionMask newSelection, BuildMode mode) {
 		
@@ -197,9 +197,6 @@ public class SelectionEngine {
 		rsb.update(rect.x+rect.width, rect.y+rect.height);
 		return new SelectionMask( rsb.build());
 	}
-	private void modifySelection( int ox, int oy) {
-		undoEngine.performAndStore(new ModifyingSelection(ox, oy));
-	}
 	class ModifyingSelection extends NullAction implements StackableAction 
 	{
 		int oldOx, oldOy, newOx, newOy;
@@ -247,11 +244,14 @@ public class SelectionEngine {
 	}
 	
 	public void setOffset(int ox, int oy) {
-		if( !isLifted()) {
-			attemptLiftData( workspace.getSelectedNode());
-		}
+		List<UndoableAction> actions = undoEngine.aggregateActions(() -> {
+			if( !isLifted()) {
+				attemptLiftData( workspace.getSelectedNode());
+			}
+		});
 		
-		modifySelection(ox, oy);
+		actions.add(new ModifyingSelection(ox, oy));
+		undoEngine.performAndStore(undoEngine.new StackableCompositeAction(actions, "Moving Selection"));
 	}
 	
 	// ============
@@ -288,13 +288,25 @@ public class SelectionEngine {
 	// ==== Automatic
 	private void finalizeSelection() {
 		if( isLifted()) {
-			IImageDrawer drawer = workspace.getActiveDrawer();
+			undoEngine.doAsAggregateAction(() -> {
+				IImageDrawer drawer = workspace.getActiveDrawer();
+				if( drawer instanceof IAnchorLiftModule && ((IAnchorLiftModule) drawer).acceptsLifted(lifted)) {
+					((IAnchorLiftModule)drawer).anchorLifted(lifted, getLiftedDrawTrans());
+				}
+				else 
+					HybridHelper.beep();
+				
+				final ALiftedData oldLifted = lifted;
+				undoEngine.performAndStore( new NullAction() {
+					@Override protected void performAction() {
+						lifted = null;
+					}
+					@Override protected void undoAction() {
+						lifted = oldLifted;
+					}
+				});
+			}, "Anchor Lifted Selection");
 			
-			if( drawer instanceof IAnchorLiftModule && ((IAnchorLiftModule) drawer).acceptsLifted(lifted)) {
-				((IAnchorLiftModule)drawer).anchorLifted(lifted, getLiftedDrawTrans());
-			}
-			else 
-				HybridHelper.beep();
 			
 			lifted = null;
 		}

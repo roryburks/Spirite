@@ -401,8 +401,8 @@ public class UndoEngine {
 			activeStoreState = topList;
 		}
 		else {
-			performAndStore( new CompositeAction(storeState, description));
 			activeStoreState = null;
+			performAndStore( new CompositeAction(storeState, description));
 		}
 	}
 	
