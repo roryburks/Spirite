@@ -20,10 +20,10 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.pc.ui.Transferables;
-import spirite.pc.ui.generic.BetterTree;
-import spirite.pc.ui.generic.BetterTree.BTNode;
-import spirite.pc.ui.generic.BetterTree.BranchingNode;
-import spirite.pc.ui.generic.BetterTree.DropDirection;;
+import spirite.pc.ui.components.BetterTree;
+import spirite.pc.ui.components.BetterTree.BTNode;
+import spirite.pc.ui.components.BetterTree.BranchingNode;
+import spirite.pc.ui.components.BetterTree.DropDirection;;
 
 public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImageObserver, MAnimationStructureObserver {
 	private final MasterControl master;

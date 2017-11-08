@@ -2,19 +2,24 @@ package spirite.base.image_data;
 
 import java.util.List;
 
+import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
+import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.util.ObserverHandler;
 
-public class AnimationView {
+public class AnimationView implements MAnimationStructureObserver {
 	private final ImageWorkspace workspace;
-	//private final AnimationManager context;
+	private final AnimationManager context;
 	private final GroupTree tree;
 
-	AnimationView(ImageWorkspace workspace) {
+	AnimationView(ImageWorkspace workspace, AnimationManager context) {
 		this.workspace = workspace;
-		//this.context = workspace.getAnimationManager();
+		this.context = context;
 		this.tree = new GroupTree(workspace);
+
+		context.addAnimationStructureObserver(this);
 	}
 
 	public GroupNode getRoot() {
@@ -130,4 +135,15 @@ public class AnimationView {
 		animationViewObs.trigger( (MAnimationViewObserver obs) ->{ obs.viewSelectionChange(selected);});
 		workspace.triggerFlash();
 	}
+
+	// :: MAnimationStructureObserver
+	@Override public void animationAdded(AnimationStructureEvent evt) {}
+	@Override public void animationChanged(AnimationStructureEvent evt) {}
+	@Override public void animationRemoved(AnimationStructureEvent evt) {
+		for( Node node : tree.getRoot().getAllAncestors()) {
+			if( node instanceof AnimationNode && ((AnimationNode) node).getAnimation() == evt.getAnimation())
+				node._del();
+		}
+	}
+
 }

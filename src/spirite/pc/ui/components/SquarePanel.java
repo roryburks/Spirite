@@ -1,4 +1,4 @@
-package spirite.pc.ui.generic;
+package spirite.pc.ui.components;
 
 import java.awt.Container;
 import java.awt.Dimension;

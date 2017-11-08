@@ -11,9 +11,9 @@ import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
 
 /** This renders an Image rather plainly. */
-public class ImageRenderSource extends RenderSource {
+public class HandleRenderSource extends RenderSource {
 	private final MediumHandle handle;
-	public ImageRenderSource( MediumHandle handle) {
+	public HandleRenderSource( MediumHandle handle) {
 		super(handle.getContext());
 		this.handle = handle;
 	}
@@ -37,7 +37,7 @@ public class ImageRenderSource extends RenderSource {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ImageRenderSource other = (ImageRenderSource) obj;
+		HandleRenderSource other = (HandleRenderSource) obj;
 		if (handle == null) {
 			if (other.handle != null)
 				return false;

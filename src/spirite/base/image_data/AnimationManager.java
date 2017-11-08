@@ -35,7 +35,7 @@ public class AnimationManager implements MImageObserver, MNodeSelectionObserver 
 
 	AnimationManager(ImageWorkspace context) {
 		this.context = context;
-		this.view = new AnimationView(context);
+		this.view = new AnimationView(context, this);
 		context.addSelectionObserver(this);
 		context.addImageObserver(this);
 	}

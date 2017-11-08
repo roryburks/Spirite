@@ -1,4 +1,4 @@
-package spirite.pc.ui.generic;
+package spirite.pc.ui.components;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

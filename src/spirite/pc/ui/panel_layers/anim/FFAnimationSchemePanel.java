@@ -36,6 +36,7 @@ import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
+import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.animations.FixedFrameAnimation;
@@ -172,7 +173,21 @@ public class FFAnimationSchemePanel extends JPanel
 		this.removeAll();
 		
 		titleBar.setTitle(animation.getName());
-		
+		titleBar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( e.getButton() == MouseEvent.BUTTON3) {
+					contextMenu.removeAll();
+					
+
+					UIUtil.constructMenu(contextMenu, new Object[][] {
+						{"&Delete Animation", "deleteAnimation"},
+					}, cmenuListener);
+					
+					contextMenu.show(titleBar, e.getX(), e.getY());
+				}
+			}
+		});
 		
 		List<AnimationLayer> layers = animation.getLayers();
 		
@@ -321,7 +336,10 @@ public class FFAnimationSchemePanel extends JPanel
 	private final JPopupMenu contextMenu = new JPopupMenu();
 	private Object cmenuObject;
 	private final ActionListener cmenuListener = (ActionEvent e) -> {
-		switch( e.getActionCommand()) {
+		_doAction(e.getActionCommand());
+	};
+	private void _doAction( String command) {
+		switch( command) {
 		case "duplicate": {
 			ws.duplicateNode(((Frame)cmenuObject).getLinkedNode());
 			break;}
@@ -366,6 +384,7 @@ public class FFAnimationSchemePanel extends JPanel
 			
 			if( dia.success) {
 				if( dia.inLoops) {
+					// Get "Default" Local Loop Length
 					int loopLen = 0;
 					
 					Frame frameIt = frame.next();
@@ -381,18 +400,19 @@ public class FFAnimationSchemePanel extends JPanel
 						frameIt = frameIt.next();
 					}
 					
-					System.out.println(loopLen);
-					
 					frame.setLength(dia.length * loopLen);
 				}
 				else
 					frame.setLength(dia.length);
 			}
 			break;}
+		case "deleteAnimation":{
+			ws.getAnimationManager().removeAnimation(animation);
+			break;}
 		default: 
-			MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + e.getActionCommand());
+			MDebug.handleWarning(WarningType.REFERENCE, null, "Unrecognized Menu Item for FFAnimationPanel Context Menu: " + command);
 		}
-	};
+	}
 	
 	private void _openContextMenuForFrame( int layerIndex, int tick, Point p) {
 		List<AnimationLayer> layers = animation.getLayers();

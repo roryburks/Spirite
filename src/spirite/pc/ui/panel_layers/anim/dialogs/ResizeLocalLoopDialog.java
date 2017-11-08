@@ -1,6 +1,5 @@
 package spirite.pc.ui.panel_layers.anim.dialogs;
 
-import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
@@ -9,7 +8,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 
 import spirite.pc.ui.components.MTextFieldNumber;
 

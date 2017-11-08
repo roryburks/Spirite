@@ -26,13 +26,13 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
 import spirite.pc.ui.Transferables;
+import spirite.pc.ui.components.BetterTree;
 import spirite.pc.ui.components.ResizeContainerPanel;
+import spirite.pc.ui.components.BetterTree.BTNode;
+import spirite.pc.ui.components.BetterTree.BranchingNode;
+import spirite.pc.ui.components.BetterTree.DnDBinding;
+import spirite.pc.ui.components.BetterTree.DropDirection;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
-import spirite.pc.ui.generic.BetterTree;
-import spirite.pc.ui.generic.BetterTree.BTNode;
-import spirite.pc.ui.generic.BetterTree.BranchingNode;
-import spirite.pc.ui.generic.BetterTree.DnDBinding;
-import spirite.pc.ui.generic.BetterTree.DropDirection;
 import spirite.pc.ui.panel_layers.LayersPanel;
 
 public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
