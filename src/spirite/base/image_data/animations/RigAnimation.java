@@ -262,7 +262,7 @@ public class RigAnimation extends Animation {
 	}
 
 	@Override
-	public void nodeChanged( Node node)  {
+	public void nodesChanged( List<Node> nodes)  {
 	}
 
 

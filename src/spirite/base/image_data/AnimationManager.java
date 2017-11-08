@@ -440,10 +440,7 @@ public class AnimationManager implements MImageObserver, MNodeSelectionObserver 
 		List<Node> changed = evt.change.getChangedNodes();
 
 		for (Animation animation : animations) {
-			for (Node node : animation.getNodeLinks()) {
-				if (changed.contains(node))
-					animation.nodeChanged(node);
-			}
+			animation.nodesChanged(changed);
 		}
 	}
 

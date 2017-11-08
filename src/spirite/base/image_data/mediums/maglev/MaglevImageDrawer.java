@@ -19,7 +19,6 @@ import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevThing;
-import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
@@ -79,7 +78,7 @@ public class MaglevImageDrawer
 		final PenState[] states = strokeEngine.getHistory();
 		final StrokeParams params = StrokeParams.bakeAndNormalize(strokeEngine.getParams(), states);
 		final MagLevStroke stroke = new MagLevStroke(states, params);
-		final SelectionMask mask = null;
+		//final SelectionMask mask = null;
 		//final StrokeEngine _engine = strokeEngine;
 		
 		// NOTE: Rather unusual to prepare, perform, then store.

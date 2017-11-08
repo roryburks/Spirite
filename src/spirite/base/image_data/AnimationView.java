@@ -8,12 +8,12 @@ import spirite.base.util.ObserverHandler;
 
 public class AnimationView {
 	private final ImageWorkspace workspace;
-	private final AnimationManager context;
+	//private final AnimationManager context;
 	private final GroupTree tree;
 
 	AnimationView(ImageWorkspace workspace) {
 		this.workspace = workspace;
-		this.context = workspace.getAnimationManager();
+		//this.context = workspace.getAnimationManager();
 		this.tree = new GroupTree(workspace);
 	}
 

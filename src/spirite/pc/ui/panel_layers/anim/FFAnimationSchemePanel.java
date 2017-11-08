@@ -533,7 +533,7 @@ public class FFAnimationSchemePanel extends JPanel
 			@Override
 			protected void paintComponent(Graphics g) {
 				AnimationState as = ws.getAnimationManager().getAnimationState(animation);
-				String icon = as.getSubstateForRelativeTick( as.cannonizeRelTick(tick)).isVisible() ? "icon.rig.visOn" : "icon.rig.visOff";
+				String icon = (as != null && as.getSubstateForRelativeTick( as.cannonizeRelTick(tick)).isVisible()) ? "icon.rig.visOn" : "icon.rig.visOff";
 				g.drawImage( Globals.getIcon(icon).getImage(), 0, 0, null);
 				super.paintComponent(g);
 			}

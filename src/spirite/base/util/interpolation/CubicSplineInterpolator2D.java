@@ -8,7 +8,7 @@ import spirite.base.util.glmath.Vec2;
 /**
  * CubicSplineInterpolator2D is a two-dimensional curve interpolator which
  * uses Cubic Hermite Spline interpolation from a given number of points
- * to interpolate a 2D curve.  It maintains two seperate Hermite Splines:
+ * to interpolate a 2D curve.  It maintains two separate Hermite Splines:
  * one for the X-axis, and another for the Y-axis, which are both traversed
  * along a common axis (t).
  *

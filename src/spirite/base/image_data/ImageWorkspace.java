@@ -422,10 +422,11 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	// ==== Node Selection 
 	
 	public GroupTree.Node getSelectedNode() {
-		if( !animationView)
+//		if( !animationView)
 			return getLocalSelectedNode();
-		else
-			return animationManager.getView().getSelectedNode();
+	//	else {
+		//	return asLocalNode(animationManager.getView().getSelectedNode());
+		//}
 	}
 	public GroupTree.Node getLocalSelectedNode() {
 		if( !nodeInWorkspace(selected))
@@ -443,6 +444,16 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			selected = node;
 			triggerSelectedChanged();
 		}
+	}
+	private Node asLocalNode( Node node) {
+		if( node instanceof LayerNode) {
+			for( Node toCheck : groupTree.getRoot().getAllAncestors()) {
+				if( toCheck instanceof LayerNode && ((LayerNode) toCheck).getLayer() == ((LayerNode) node).getLayer()) {
+					return toCheck;
+				}
+			}
+		}
+		return null;
 	}
 	
 	
@@ -1757,5 +1768,4 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		triggerImageRefresh(evt);
 		
 	}
-	
 }

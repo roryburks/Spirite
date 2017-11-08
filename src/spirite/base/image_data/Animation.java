@@ -33,7 +33,7 @@ public abstract class Animation {
 	public abstract void purge();
 
 	public abstract List<Node> getNodeLinks();
-	public abstract void nodeChanged( Node node);
+	public abstract void nodesChanged( List<Node> nodes);
 	
 	public String getName() {
 		return name;

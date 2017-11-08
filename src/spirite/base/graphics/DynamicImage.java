@@ -30,6 +30,8 @@ public class DynamicImage {
 	public DynamicImage( ImageWorkspace context, RawImage raw, int ox, int oy) {
 		this.context = context;
 		this.base = raw;
+		this.ox = ox;
+		this.oy = oy;
 	}
 	
 	public int getXOffset() {return ox;}

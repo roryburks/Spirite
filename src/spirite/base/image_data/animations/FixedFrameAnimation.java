@@ -217,10 +217,9 @@ public class FixedFrameAnimation extends Animation
 	}
 
 	@Override
-	public void nodeChanged( Node node) {
+	public void nodesChanged( List<Node> nodes) {
 		for( AnimationLayer layer : layers) {
-			if( layer.groupLink == node)
-				layer.groupLinkUpdated();
+			layer.groupLinkUpdated();
 		}
 
 		_triggerChange();
@@ -389,7 +388,7 @@ public class FixedFrameAnimation extends Animation
 				if( child instanceof GroupNode && includeSubtrees) {
 					boolean usingNew = (oldMap == null || !oldMap.containsKey(child));
 					Frame solFrame = (usingNew) 
-							? new Frame(null, 0, Marker.START_LOCAL_LOOP)
+							? new Frame(child, 0, Marker.START_LOCAL_LOOP)
 							: oldMap.get(child);
 					
 					frames.add(solFrame);
@@ -501,8 +500,8 @@ public class FixedFrameAnimation extends Animation
 		
 
 		public class Frame extends FrameAbstract {
-			private Frame( LayerNode node, int length, Marker marker) {
-				super(node, length, marker, 0, 0);
+			private Frame( Node child, int length, Marker marker) {
+				super(child, length, marker, 0, 0);
 			}
 			private Frame( LayerNode node, int length, Marker marker, int gapBefore, int gapAfter) {
 				super(node, length, marker, gapBefore, gapAfter);
