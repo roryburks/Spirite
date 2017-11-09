@@ -22,6 +22,7 @@ public class LayerPropertiesPanel extends OmniComponent
 	final SpriteLayerPanel slp;
 	final PuppetLayerPanel plp;
 	final ReferenceLayerPanel rlp;
+	JComponent active = null;
 	JPanel nillJPanel = new JPanel();
 	
 	public LayerPropertiesPanel( MasterControl master) {
@@ -41,6 +42,7 @@ public class LayerPropertiesPanel extends OmniComponent
 		this.removeAll();
 		this.add(comp);
 		this.repaint();
+		active = comp;
 	}
 
 	@Override
@@ -67,4 +69,9 @@ public class LayerPropertiesPanel extends OmniComponent
 		initComponent(nillJPanel);
 	}
 
+	@Override
+	public void requestFocus() {
+		if( active != null)
+			active.requestFocus();
+	}
 }

@@ -92,6 +92,8 @@ public class HotkeyManager {
                 {"draw.addGapQuick", new Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK)},
 
                 {"global.debug1", (new Hotkey( KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK))},
+                
+                {"frame.focus.LAYER_PROPERTIES",(new Hotkey(KeyEvent.VK_R, InputEvent.SHIFT_DOWN_MASK))},
             }
         );
         

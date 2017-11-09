@@ -170,6 +170,9 @@ public class SpriteLayer extends Layer
 	public Part getActivePart() {
 		return active;
 	}
+	public int getActivePartIndex() {
+		return parts.indexOf(active);
+	}
 	public void setActivePart(Part part) {
 		if( parts.contains(part))
 			active = part;
@@ -221,6 +224,10 @@ public class SpriteLayer extends Layer
 	 * namespace, it must be passed through the UndoEngine.performAndStoreAction
 	 * method.*/
 	public void addPart( RawImage image, String partName) {
+		PartStructure struct = new PartStructure( context.importDynamicData(image), partName, 0, 0, 0, true, 1);
+		addPart( struct, (active == null) ? parts.size() : parts.indexOf(active) + 1);
+	}
+	private void addPart( PartStructure structure, int index) {
 		if( context == null)
 			return;
 
@@ -231,6 +238,8 @@ public class SpriteLayer extends Layer
 		}
 		
 		UndoEngine undoEngine = context.getUndoEngine();
+		PartStructure newStructure = new PartStructure(structure);
+		
 		
 		undoEngine.doAsAggregateAction(() -> {
 			// Note: Because of how doAsAggregateAction prevents action until it's completed,
@@ -238,34 +247,22 @@ public class SpriteLayer extends Layer
 			//	are done before the new part gets added, even though it's done using 
 			//	a performAndStore that happens before them.  Probably bad design.
 			
-			int index = (active == null) ? parts.size() : parts.indexOf(active) + 1;
+			int dlow = Math.max( newStructure.depth, 
+					(index == 0) ? -Integer.MIN_VALUE : parts.get(index-1).structure.depth+1);
 			
-			int dlow = (index == 0) 
-					? ((parts.size() == 0) ? 0 : parts.get(0).structure.depth )
-					: parts.get(index-1).structure.depth + 1;
-	
-
-			// Make sure you create a non-duplicate part name
-			String testing = (partName == null || partName=="")?"_":partName;
-			int i=0;
-			boolean free = false;
-			while( !free) {
-				free = true;
-				for( Part part : parts) {
-					if( part.structure.partName.equals(testing)) {
-						testing = partName + "_" + (++i);
-						free = false;
-						break;
-					}
-				}
-			}
+			List<String> names = new ArrayList<>(parts.size());
+			for( Part part : parts)
+				names.add(part.getTypeName());
+			String name = MUtil.getNonDuplicateName(names, newStructure.partName);
 			
-			final Part toAdd = new Part( new PartStructure(
-					context.importDynamicData(image), testing, 0, 0, dlow++, true, 1));
+			newStructure.partName = name;
+			newStructure.depth = dlow++;
+			
+			final Part toAdd = new Part( newStructure);
 
 			undoEngine.performAndStore( new NullAction() {
 				protected void performAction() {
-					parts.add( toAdd);
+					parts.add( index, toAdd);
 					active = toAdd;
 					_sortByDepth();
 					_trigger();
@@ -283,13 +280,11 @@ public class SpriteLayer extends Layer
 			});
 			
 			// Bubble up the depth of anything that matches this depth
-			for( i=index; i < parts.size(); ++i) {
-				PartStructure structure = parts.get(i).getStructure();
-				
-				System.out.println(structure.depth + "," + dlow);
-				if( structure.depth < dlow) {
-					structure.depth = dlow++;
-					modifyPart(parts.get(i), structure);
+			for( int i=index; i < parts.size(); ++i) {
+				PartStructure structureToChange = parts.get(i).getStructure();
+				if( structureToChange.depth < dlow) {
+					structureToChange.depth = dlow++;
+					modifyPart(parts.get(i), structureToChange);
 				}
 				else 
 					break;
@@ -338,6 +333,19 @@ public class SpriteLayer extends Layer
 				return Arrays.asList(new MediumHandle[] {toRemove.structure.handle});
 			}
 		});
+	}
+	
+
+	/** Moves the part at from and moves it such that it index is to */
+	public void movePart(int fromInd, int toInd) {
+		UndoEngine undoEngine = context.getUndoEngine();
+
+		Part toMove = parts.get(fromInd);
+		undoEngine.doAsAggregateAction(() -> {
+			removePart(toMove);
+			
+			addPart( toMove.structure, toInd);
+		}, "Move Part");
 	}
 
 	/** Creates an action representing a change to a single Part's structure
@@ -587,5 +595,7 @@ public class SpriteLayer extends Layer
 		
 		return helper;
 	}
+
+
 
 }

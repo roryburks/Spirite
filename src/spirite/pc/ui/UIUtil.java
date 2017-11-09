@@ -11,14 +11,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -27,6 +31,7 @@ import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+import spirite.pc.ui.components.BoxList;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);
@@ -268,5 +273,14 @@ public class UIUtil {
 	}
 	public interface ActionPipe {
 		public void actionPerformed( ActionEvent evt);
+	}
+
+	/** Loads up an Action Map */
+	public static void buildActionMap(JComponent component, Map<KeyStroke, Action> actionMap) {
+		for(Entry<KeyStroke,Action> entry : actionMap.entrySet()) {
+			String id = entry.getKey().toString();
+			component.getInputMap().put(entry.getKey(), id);
+			component.getActionMap().put(id, entry.getValue());
+		}
 	}
 }

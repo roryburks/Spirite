@@ -3,19 +3,29 @@ package spirite.pc.ui.components;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
+
+import spirite.base.util.MUtil;
+import spirite.pc.ui.UIUtil;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 
 public class BoxList<T> extends JPanel {
 	private int box_w, box_h;
@@ -34,6 +44,7 @@ public class BoxList<T> extends JPanel {
 		this.setLayout(new GridLayout());
 		this.add(scroll);
 		
+		initMap();
 		rebuild();
 		
 		this.addComponentListener(new ComponentAdapter() {
@@ -57,6 +68,7 @@ public class BoxList<T> extends JPanel {
 		});
 	}
 	
+	private int num_per_row;
 	private List<Component> components = null;
 	private void rebuild() {
 		content.removeAll();
@@ -64,7 +76,7 @@ public class BoxList<T> extends JPanel {
 		int w = scroll.getViewport().getWidth();
 		//int h = content.getHeight();
 
-		int num_per_row = Math.max(1, w / box_w);
+		num_per_row = Math.max(1, w / box_w);
 		int dw = w / num_per_row;
 		
 		//int dh = (entries.size() - 1)/num_per_row + 1;
@@ -103,7 +115,33 @@ public class BoxList<T> extends JPanel {
 	}
 	
 	// ========
+	// ==== SimpleAPI
+	public int getNumPerRow() {return num_per_row;}
+	
+	// ========
 	// ==== Input
+	private void initMap() {
+		Map<KeyStroke, Action> actionMap = new HashMap<>(4);
+
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),  UIUtil.buildAction( (e) -> {
+			if( selectedIndex != -1)
+				this.setSelectedIndex(Math.max(0, selectedIndex - num_per_row));
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),  UIUtil.buildAction( (e) -> {
+			if( selectedIndex != -1) 
+				this.setSelectedIndex(Math.min(components.size()-1, selectedIndex+num_per_row));
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),  UIUtil.buildAction( (e) -> {
+			if( selectedIndex != -1)
+				this.setSelectedIndex(Math.max(0, selectedIndex-1));
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),  UIUtil.buildAction( (e) -> {
+			if( selectedIndex != -1) 
+				this.setSelectedIndex(Math.min(components.size()-1, selectedIndex+1));
+		}));
+		
+		UIUtil.buildActionMap( this, actionMap);
+	}
 	
 	// =======
 	// ==== Node Renderer
@@ -134,7 +172,8 @@ public class BoxList<T> extends JPanel {
 		rebuild();
 	}
 	
-	public void resetEntries( Collection<T> newEntries) {
+	public void resetEntries( Collection<T> newEntries, int selected) {
+		selectedIndex = selected;
 		entries.clear();
 		entries.addAll(newEntries);
 		rebuild();
@@ -154,7 +193,11 @@ public class BoxList<T> extends JPanel {
 	}
 	
 	public void setSelectedIndex(int i) {
+		i = MUtil.clip(-1, i, entries.size()-1);
 		selectedIndex = i;
+		
+		scroll.scrollRectToVisible((i == -1) ? new Rectangle(0,0,1,1) : components.get(i).getBounds());
+		
 		if( selectionAction != null)
 			selectionAction.onSelectionChanged(i);
 	}

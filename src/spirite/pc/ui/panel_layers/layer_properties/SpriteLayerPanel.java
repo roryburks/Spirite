@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -251,18 +253,56 @@ public class SpriteLayerPanel extends JPanel
 		);
 		
 		if( rig != null)
-			boxListBinding.triggerDataChanged(rig.getParts().indexOf(rig.getActivePart()));
+			boxListBinding.triggerDataChanged(rig.getActivePartIndex());
 //		layout.linkSize( tfTransX, tfTransY, tfScaleX, tfTransY);
 		this.setLayout(layout);
 	}
 	
 	private void initBindings() {
-		
-		
-		boxList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "mleft");
-		boxList.getActionMap().put("mleft", UIUtil.buildAction( (e) -> {
-			System.out.println("SS");
+		Map<KeyStroke,Action> actionMap = new HashMap<>();
+
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int index = rig.getActivePartIndex();
+			
+			if( index != -1 && index != 0) {
+				rig.movePart( index, index-1);	
+			}
 		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int index = rig.getActivePartIndex();
+			
+			if( index != -1 && index != rig.getParts().size()-1) {
+				rig.movePart( index, index+1);
+				
+				// TODO: Bad
+				SwingUtilities.invokeLater(() -> {
+					rig.setActivePart(rig.getParts().get(index+1));
+					refresh();
+				});
+			}
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int index = rig.getActivePartIndex();
+			
+			if( index != -1) {
+				int to = Math.max(0, index - boxList.getNumPerRow());
+				
+				if( to != index)
+					rig.movePart( index, to);	
+			}
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int index = rig.getActivePartIndex();
+			
+			if( index != -1) {
+				int to = Math.min(rig.getParts().size()-1, index + boxList.getNumPerRow());
+				
+				if( to != index)
+					rig.movePart( index, to);	
+			}
+		}));
+		
+		UIUtil.buildActionMap(boxList, actionMap);
 	}
 	
 	
@@ -301,14 +341,12 @@ public class SpriteLayerPanel extends JPanel
 		
 		building = true;
 
-		if( rig != null)
-			boxListBinding.triggerDataChanged(rig.getParts().indexOf(rig.getActivePart()));
 		
 		if( rig != null) {
 			bNewPart.setEnabled(true);
 			bRemovePart.setEnabled(true);
 			
-			boxList.resetEntries(rig.getParts());
+			boxList.resetEntries(rig.getParts(), rig.getParts().indexOf(rig.getActivePart()));
 
 			Part part = rig.getActivePart();
 			
@@ -379,6 +417,8 @@ public class SpriteLayerPanel extends JPanel
 		default:
 			MDebug.log(evt.getActionCommand());
 		}
+		
+		boxList.requestFocus();
 	}
 
 	// :::: RigStructureObserver
@@ -495,5 +535,10 @@ public class SpriteLayerPanel extends JPanel
 			changePartAttributes();
 			super.onValueChanged(newValue);
 		}
+	}
+	
+	@Override
+	public void requestFocus() {
+		boxList.requestFocus();
 	}
 }

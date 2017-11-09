@@ -28,6 +28,9 @@ import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
+import spirite.pc.ui.omni.FrameManager;
+import spirite.pc.ui.omni.FrameManager.FrameType;
+import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 import spirite.pc.ui.panel_layers.IImgPropertiesPanel;
 import spirite.pc.ui.panel_layers.LayersPanel;
 import spirite.pc.ui.panel_layers.ReferenceSchemePanel;
@@ -57,6 +60,7 @@ public class RootFrame extends javax.swing.JFrame
 	private static final String CLOSING = "Closing Spirite";
 	
     private final MasterControl master;
+    private final FrameManager frameManager;
 
     private final ContextualCommandExecuter commandExecuter = new ContextualCommandExecuter();
 
@@ -65,14 +69,15 @@ public class RootFrame extends javax.swing.JFrame
     private ToolsPanel toolsPanel;
     private ToolSettingsPanel settingPanel;
     private WorkTabPane workPane;
-    private LayerPropertiesPanel rigPanel;
+    private OmniComponent rigPanel;
     private JPanel leftContainer;
     private ResizeContainerPanel rightContainer;
     private ResizeContainerPanel rrContainer;
     private ResizeContainerPanel container;
 
-    public RootFrame( MasterControl master) {
+    public RootFrame( MasterControl master, FrameManager frameManager) {
         this.master =  master;
+        this.frameManager = frameManager;
         
         initComponents();
         
@@ -92,7 +97,7 @@ public class RootFrame extends javax.swing.JFrame
     	toolsPanel = new ToolsPanel( master);
     	palettePanel = new PalettePanel( master);
     	settingPanel = new ToolSettingsPanel( master);
-    	rigPanel = new LayerPropertiesPanel(master);
+    	rigPanel = frameManager.createOmniComponent(FrameType.LAYER_PROPERTIES);
     	ReferenceSchemePanel rsp =  new ReferenceSchemePanel(master);
     	
     	leftContainer = new JPanel();

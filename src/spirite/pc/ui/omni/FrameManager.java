@@ -5,8 +5,10 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.pen.Penner;
 import spirite.hybrid.Globals;
@@ -29,6 +32,7 @@ import spirite.pc.ui.panel_anim.AnimationPreviewPanel;
 import spirite.pc.ui.panel_anim.AnimationSchemePanel;
 import spirite.pc.ui.panel_layers.LayersPanel;
 import spirite.pc.ui.panel_layers.ReferenceSchemePanel;
+import spirite.pc.ui.panel_layers.layer_properties.LayerPropertiesPanel;
 import spirite.pc.ui.panel_toolset.ToolSettingsPanel;
 import spirite.pc.ui.panel_toolset.UndoPanel;
 import spirite.pc.ui.panel_work.WorkPanel;
@@ -49,8 +53,13 @@ public class FrameManager
 	public FrameManager( MasterControl master) {
 		this.master = master;
 
-        root = new RootFrame( master);
+        activeMap = new HashMap<>(FrameType.values().length);
+        for( FrameType type : FrameType.values()) 
+        	activeMap.put(type, new ArrayList<>());
+        
+        root = new RootFrame( master, this);
         initCommandMap();
+        
 	}
 	
 	/** A Collection of identifiers for all the dockable Frames. */
@@ -61,6 +70,7 @@ public class FrameManager
 		ANIMATION_SCHEME ("Anim","icon.frame.animationScheme"),
 		UNDO("Undo History","icon.frame.undoHistory"),
 		REFERENCE("Reference Scheme","icon.frame.referenceScheme"),
+		LAYER_PROPERTIES("Layer Properties",null)
 		;
 		
 		final String name;
@@ -75,28 +85,49 @@ public class FrameManager
 		public ImageIcon getIcon() {
 			return (icon == null) ? null : Globals.getIcon(icon);
 		}
+		
+		public static FrameType fromString( String string) {
+	        for( FrameType check : FrameType.values()) {
+	            if( check.name().equals(string))
+	            	return check;
+	        }
+	        return null;
+		}
 	}
 	
 	/** The facroty which creates Docked panels based on their type identifier.	 */
 	public OmniComponent createOmniComponent( FrameType type) {
+		OmniComponent toAdd = null;
 		switch( type) {
 		case LAYER:
-			return new LayersPanel( master);
+			toAdd = new LayersPanel( master);
+			break;
 		case TOOL_SETTINGS:
-			return new ToolSettingsPanel( master);
-//			return new ToolsPanel(master);
+			toAdd = new ToolSettingsPanel( master);
+			break;
 		case ANIMATION_SCHEME:
-			return new AnimationSchemePanel(master);
+			toAdd =  new AnimationSchemePanel(master);
+			break;
 		case UNDO:
-			return new UndoPanel(master);
+			toAdd = new UndoPanel(master);
+			break;
 		case REFERENCE:
-			return new ReferenceSchemePanel(master);
+			toAdd = new ReferenceSchemePanel(master);
+			break;
 		case BAD:
 			break;
+		case LAYER_PROPERTIES:
+			toAdd = new LayerPropertiesPanel(master);
+			break;
 		}
+
+		if( toAdd != null)
+			activeMap.get(type).add(new WeakReference<>(toAdd));
 		
-		return null;
+		return toAdd;
 	}
+	
+	private final Map<FrameType, List<WeakReference<OmniComponent>>> activeMap;
 	
 	
 	
@@ -293,8 +324,15 @@ public class FrameManager
 		int dot = command.indexOf('.');
 		
 		if( dot != -1) {
-			switch( command.substring(dot+1)) {
+			FrameType type = FrameType.fromString(command.substring(dot+1));
 			
+			if( type == null)
+				return false;
+				
+			switch( command.substring(0, dot)) {
+			case "focus":
+				focusFrame( type);
+				return true;
 			}
 		}
 		
@@ -305,5 +343,23 @@ public class FrameManager
 		}
 		return false;
 		
+	}
+
+	/** Requests focus for the first frame of the given type. */
+	public void focusFrame(FrameType type) {
+		if( type == null) return;
+		
+		boolean done = false;
+		Iterator<WeakReference<OmniComponent>> it = activeMap.get(type).iterator();
+		while( it.hasNext()) {
+			WeakReference<OmniComponent> ref = it.next();
+			
+			if( ref.get() == null)
+				it.remove();
+			else if(!done) {
+				ref.get().requestFocus();
+				done = true;
+			}
+		}
 	}
 }
