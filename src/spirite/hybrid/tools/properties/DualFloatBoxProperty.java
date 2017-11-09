@@ -73,10 +73,10 @@ public class DualFloatBoxProperty extends SwingToolProperty {
 		textField2.getDocument().addDocumentListener(listener);
 		
 		binding.setLink( new ChangeExecuter() {
-			public void doUIChange(Object newValue) {
+			public void doUIChanged(Object newValue) {
 				settings.setValue( id, newValue);
 			}
-			public void doDataChange(Object newValue) {
+			public void doDataChanged(Object newValue) {
 				Vec2 val = (Vec2)newValue;
 				textField1.setText( String.valueOf(val.x));
 				textField2.setText( String.valueOf(val.y));

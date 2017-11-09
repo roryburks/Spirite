@@ -47,10 +47,10 @@ public class CheckBoxProperty extends SwingToolProperty {
 		checkbox.setSelected(value);
 		
 		binding.setLink( new ChangeExecuter() {
-			@Override public void doUIChange(Object newValue) {
+			@Override public void doUIChanged(Object newValue) {
 				settings.setValue( id, newValue);
 			}
-			@Override public void doDataChange(Object newValue) {
+			@Override public void doDataChanged(Object newValue) {
 				checkbox.setSelected((Boolean)newValue);
 			}
 		});

@@ -1,9 +1,12 @@
 package spirite.pc.ui.components;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,13 +41,28 @@ public class BoxList<T> extends JPanel {
 				rebuild();
 			}
 		});
+		
+		content.addMouseListener( new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				requestFocus();
+				
+				Component clicked = content.getComponentAt(e.getPoint());
+				if( components != null && clicked != null) {
+					int i = components.indexOf(clicked);
+					if( i != -1) 
+						setSelectedIndex(i);
+				}
+			}
+		});
 	}
 	
+	private List<Component> components = null;
 	private void rebuild() {
 		content.removeAll();
 		
-		int w = content.getWidth();
-		int h = content.getHeight();
+		int w = scroll.getViewport().getWidth();
+		//int h = content.getHeight();
 
 		int num_per_row = Math.max(1, w / box_w);
 		int dw = w / num_per_row;
@@ -60,6 +78,7 @@ public class BoxList<T> extends JPanel {
 		Group horSub = null;
 		
 		int x = 0;
+		components = new ArrayList<>(entries.size());
 		for( int i=0; i < entries.size(); ++i) {
 			if( x == 0) {
 				vertSub = layout.createParallelGroup();
@@ -68,7 +87,8 @@ public class BoxList<T> extends JPanel {
 				horMain.addGroup(horSub);
 			}
 			
-			Component c = renderer.getNodeFor(entries.get(i), i);
+			Component c = renderer.getNodeFor(entries.get(i), i, i == selectedIndex);
+			components.add(c);
 			vertSub.addComponent(c, box_h, box_h, box_h);
 			horSub.addComponent(c, dw, dw, dw);
 			
@@ -82,9 +102,12 @@ public class BoxList<T> extends JPanel {
 		content.setLayout(layout);
 	}
 	
+	// ========
+	// ==== Input
+	
 	// =======
 	// ==== Node Renderer
-	private BoxListNodeRenderer<T> renderer = (t, index) -> {
+	private BoxListNodeRenderer<T> renderer = (t, index, selected) -> {
 		return new JLabel(t.toString());
 	};
 	
@@ -94,7 +117,7 @@ public class BoxList<T> extends JPanel {
 	}
 	
 	public interface BoxListNodeRenderer<T> {
-		public Component getNodeFor( T t, int index);
+		public Component getNodeFor( T t, int index, boolean selected);
 	}
 	
 	// ========
@@ -116,4 +139,24 @@ public class BoxList<T> extends JPanel {
 		entries.addAll(newEntries);
 		rebuild();
 	}
+	
+	// ==========
+	// ==== Selection
+	private int selectedIndex = -1;
+	
+	@FunctionalInterface
+	public interface SelectionAction {
+		public void onSelectionChanged(int newSelection);
+	}
+	SelectionAction selectionAction = null;
+	public void setSelectionAction( SelectionAction action) {
+		this.selectionAction = action;
+	}
+	
+	public void setSelectedIndex(int i) {
+		selectedIndex = i;
+		if( selectionAction != null)
+			selectionAction.onSelectionChanged(i);
+	}
+	public int getSelectedIndex() {return selectedIndex;}
 }

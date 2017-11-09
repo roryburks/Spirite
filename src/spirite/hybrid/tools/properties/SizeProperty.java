@@ -43,12 +43,12 @@ public class SizeProperty extends SwingToolProperty {
 		slider.setLabel( hrName + " : ");
 		
 		binding.setLink( new ChangeExecuter() {
-			@Override public void doUIChange(Object newValue) {
+			@Override public void doUIChanged(Object newValue) {
 				settings.setValue( id, newValue);
 			}
 
 			@Override
-			public void doDataChange(Object newValue) {
+			public void doDataChanged(Object newValue) {
 				slider.setValue((float)newValue);
 			}
 		});

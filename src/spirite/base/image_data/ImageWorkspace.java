@@ -46,6 +46,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.util.MUtil;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -671,7 +672,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 */
 	public MediumHandle importDynamicData(RawImage newImage) {
 		mediumData.put( workingID, new DynamicMedium(newImage, 0, 0, this));
-		
+
 		return new MediumHandle(this, workingID++);	// Postincriment
 	}
 	
@@ -698,7 +699,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		MediumHandle handle = new MediumHandle( this, workingID);
 		workingID++;
 
-		LayerNode insertedNode = groupTree.new LayerNode( new SimpleLayer(handle), name);
+		LayerNode insertedNode = groupTree.new LayerNode( new SimpleLayer(handle), getNonDuplicateName(name));
 		_addLayer(insertedNode, contextNode);
 		
 		return insertedNode;
@@ -726,7 +727,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
         mediumData.put(workingID, internal);
         MediumHandle handle= new MediumHandle(this, workingID++);
         
-		LayerNode insertedNode = groupTree.new LayerNode( new SpriteLayer(handle), name);
+		LayerNode insertedNode = groupTree.new LayerNode( new SpriteLayer(handle), getNonDuplicateName(name));
 		_addLayer(insertedNode,contextNode);
 		
 		return insertedNode;
@@ -738,14 +739,14 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		mediumData.put(workingID, internal);
 		MediumHandle handle = new MediumHandle( this, workingID++);
 		
-		LayerNode insertedNode = groupTree.new LayerNode( new PuppetLayer(this, handle), name);
+		LayerNode insertedNode = groupTree.new LayerNode( new PuppetLayer(this, handle), getNonDuplicateName(name));
 		_addLayer(insertedNode, contextNode);
 		
 		return insertedNode;
 	}
 	
 	public LayerNode addNewReferenceLayer(Node context, LayerNode underlying, String name) {
-		LayerNode node = groupTree.new LayerNode( new ReferenceLayer(underlying), name);
+		LayerNode node = groupTree.new LayerNode( new ReferenceLayer(underlying), getNonDuplicateName(name));
 		_addLayer(node,context);
 		return node;
 	}
@@ -1721,32 +1722,20 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	
-	public String getNonDuplicateName(String string) {
-		int i = 0;
-		boolean conflict = true;
-		String tryName = string;
-		
-		List<Node> nodes = groupTree.getRoot().getAllAncestors();
-		while( conflict) {
-			conflict = false;
-			tryName = i == 0 ? string : string + "_" + i;
-			
-			for( Node node : nodes) {
-				if( node.getName() == tryName) {
-					conflict = true;
-					break;
-				}
-			}
-			
-			++i;
-		}
-		return tryName;
-	}
 	public void triggerSelectionRefresh() {
 		ImageChangeEvent evt = new ImageChangeEvent();
 		evt.workspace = this;
 		evt.isStructureChange = true;
 		triggerImageRefresh(evt);
 		
+	}
+	public String getNonDuplicateName(String name) {
+		List<Node> nodes = groupTree.getRoot().getAllAncestors();
+		List<String> strings = new ArrayList<>(nodes.size());
+		
+		for( Node node : nodes)
+			strings.add(node.name);
+		
+		return MUtil.getNonDuplicateName(strings, name);
 	}
 }

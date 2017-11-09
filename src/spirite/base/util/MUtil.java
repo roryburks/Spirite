@@ -4,8 +4,10 @@ package spirite.base.util;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
+import java.util.List;
 
 import spirite.base.graphics.IImage;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -90,6 +92,8 @@ public class MUtil {
 		return ((((t - start) % diff) + diff) % diff) + start;
 	}
 	
+	// ======
+	// ==== Rectangle Functions
 	/**
 	 * Finds the bounds of a rectangle tranformed by a matrix
 	 */
@@ -207,5 +211,38 @@ public class MUtil {
 			x_.add(x_.get(startx));
 			y_.add(y_.get(starty));	
 		}
+	}
+	
+
+	// ======
+	// ==== String Functions
+	public static String getNonDuplicateName(List<String> existingNames, String string) {
+		int i = 0;
+		String tryName = (string == null) ? "_" : string;;
+		String baseName = "_";
+		
+		if( string != null) {
+			int _loc = string.indexOf('_');
+			if( _loc == -1)
+				baseName = string;
+			else {
+				try {
+					i = Integer.parseInt(string.substring(_loc+1));
+					baseName = string.substring(0, _loc);
+				} catch( Exception e)
+				{
+					baseName = string;
+				}
+			}
+		}
+		
+		
+		int conflict = existingNames.indexOf(tryName);
+		while( conflict != -1) {
+			tryName = baseName + "_" + (++i);
+			conflict = existingNames.indexOf(tryName);
+		}
+		
+		return tryName;
 	}
 }

@@ -6,11 +6,13 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -253,5 +255,18 @@ public class UIUtil {
 			else {
 			}
 		}
+	}
+	
+	/** Exists purely to make use of lambdas to simplify code appearance. */
+	public static AbstractAction buildAction(ActionPipe pipe ) {
+		return new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pipe.actionPerformed(e);
+			}
+		};
+	}
+	public interface ActionPipe {
+		public void actionPerformed( ActionEvent evt);
 	}
 }

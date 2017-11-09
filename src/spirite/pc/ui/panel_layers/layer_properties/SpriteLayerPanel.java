@@ -7,9 +7,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -19,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -26,20 +30,25 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import javafx.beans.binding.DoubleBinding;
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
+import spirite.base.graphics.RenderProperties.Trigger;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.base.image_data.layers.SpriteLayer.RigStructureObserver;
+import spirite.base.util.DataBinding;
+import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.pc.graphics.ImageBI;
+import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.BoxList;
 import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
@@ -60,7 +69,6 @@ public class SpriteLayerPanel extends JPanel
 	private final JButton bNewPart = new JButton();
 	private final JButton bRemovePart = new JButton();
 	private final JToggleButton bNodeVisiblity = new JToggleButton();
-	private final DefaultListModel<Part> model = new DefaultListModel<>();
 	private final OpacitySlider opacitySlider = new OpacitySlider();
 	private final BoxList<Part> boxList = new BoxList<>(null, 24,24);
 	
@@ -68,95 +76,38 @@ public class SpriteLayerPanel extends JPanel
 	private ImageWorkspace workspace;
 	private SpriteLayer rig;
 	
-	private Part selectedPart = null;
+	DataBinding<Integer> boxListBinding = new DataBinding<>();
 	
 	public SpriteLayerPanel( MasterControl master) {
 		this.master = master;
 		initComponents();
+		initBindings();
 		
-		boxList.setRenderer( (part, index) -> {
-			return new PartButton(part);
+		boxListBinding.setLink(new ChangeExecuter<Integer>() {
+			@Override
+			public void doUIChanged(Integer newValue) {
+				if( newValue != -1) {
+					rig.setActivePart(rig.getParts().get(newValue));
+					refresh();
+				}
+			}
+			@Override
+			public void doDataChanged(Integer newValue) {
+				boxList.setSelectedIndex(newValue);
+			}
+		});
+		
+		boxList.setRenderer( (part, index, selected) -> {
+			return new PartButton(part, selected);
+		});
+		boxList.setSelectionAction((index) -> {
+			boxListBinding.triggerUIChanged(index);
 		});
 		
 		refresh();
 	}
 	
-	class PartButton extends JPanel {
-		private final Part part;
-		
-		PartButton( Part part) {
-			this.part = part;
-			this.setBorder(BorderFactory.createLineBorder(Color.black));
-			this.addMouseListener( new MouseAdapter() {
-				@Override
-				public void mousePressed(MouseEvent e) {
-					rig.setActivePart(part);
-					refresh();
-				}
-			});
-		}
-		
-		@Override
-		protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			
-			//IImage img = part.getImageHandle().deepAccess();
-			
-			float sx = 24f/(float)part.getImageHandle().getWidth();
-			float sy = 24f/(float)part.getImageHandle().getHeight();
-			
-			float scale = Math.min( sx, sy);
-			
-			RawImage img2 = HybridHelper.createImage(24, 24);
-			GraphicsContext gc = img2.getGraphics();
-			gc.scale(scale, scale);
-			gc.drawHandle(part.getImageHandle(), 0, 0);
-			
-			
-			g.drawImage( ((ImageBI)HybridUtil.convert(img2, ImageBI.class)).img, 
-					0, 0, null);
-		}
-	}
-	
-	//private final ListCellRenderer<Part> renderer = new RigCellRender();
-			
-	class RigCellRender implements ListCellRenderer<SpriteLayer.Part> {
-		private JPanel renderPanel = new JPanel();
-		private JLabel label = new JLabel();
-		private Color bgColor = new Color( 255,255,255);
-		private Color selColor = new Color( 90,90,160);
-		
-		
-		RigCellRender() {
-			GroupLayout layout = new GroupLayout(renderPanel);
-			
-			layout.setVerticalGroup( layout.createSequentialGroup()
-				.addComponent(label,16,16,16)
-			);
-			layout.setHorizontalGroup( layout.createSequentialGroup()
-				.addComponent(label)
-			);
-			
-			renderPanel.setLayout(layout);
-			
-		}
-		
-		@Override
-		public Component getListCellRendererComponent(
-				JList<? extends Part> list, 
-				Part value, 
-				int index, 
-				boolean isSelected,
-				boolean cellHasFocus)
-		{
-			label.setText(value.getTypeName());
-			renderPanel.setBackground(isSelected?selColor:bgColor);
-			return renderPanel;
-		}
-	};
-	
-	private static final Font f = new Font("Tahoma", 0, 10);
-	private class SubLabel extends JLabel { SubLabel(String txt) {super(txt);this.setFont(f);}}
+
 	private void initComponents() {
 		GroupLayout layout = new GroupLayout(this);
 
@@ -299,24 +250,21 @@ public class SpriteLayerPanel extends JPanel
 			.addGap(3)
 		);
 		
+		if( rig != null)
+			boxListBinding.triggerDataChanged(rig.getParts().indexOf(rig.getActivePart()));
 //		layout.linkSize( tfTransX, tfTransY, tfScaleX, tfTransY);
 		this.setLayout(layout);
-		
 	}
 	
-	class OpacitySlider extends SliderPanel {
-		OpacitySlider() {
-			setMin(0.0f);
-			setMax(1.0f);
-			setLabel("Opacity: ");
-		}
+	private void initBindings() {
 		
-		@Override
-		public void onValueChanged(float newValue) {
-			changePartAttributes();
-			super.onValueChanged(newValue);
-		}
+		
+		boxList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "mleft");
+		boxList.getActionMap().put("mleft", UIUtil.buildAction( (e) -> {
+			System.out.println("SS");
+		}));
 	}
+	
 	
 	
 	void setRig( SpriteLayer setTo, ImageWorkspace ws) {
@@ -352,15 +300,14 @@ public class SpriteLayerPanel extends JPanel
 		if( building) return;
 		
 		building = true;
-		model.clear();
+
+		if( rig != null)
+			boxListBinding.triggerDataChanged(rig.getParts().indexOf(rig.getActivePart()));
 		
 		if( rig != null) {
 			bNewPart.setEnabled(true);
 			bRemovePart.setEnabled(true);
 			
-			for( Part part : rig.getParts()) {
-				model.addElement(part);
-			}
 			boxList.resetEntries(rig.getParts());
 
 			Part part = rig.getActivePart();
@@ -404,9 +351,6 @@ public class SpriteLayerPanel extends JPanel
 		
 		
 
-		if( rig != null) {
-			//listPanel.setSelectedIndex(model.indexOf(rig.getActivePart()));
-		}
 		
 		building = false;
 
@@ -497,6 +441,59 @@ public class SpriteLayerPanel extends JPanel
 			}
 		}
 		building = false;
+	}
+	
+
+	private class PartButton extends JPanel {
+		private final Part part;
 		
+		PartButton( Part part, boolean selected) {
+			this.part = part;
+			this.setBorder(BorderFactory.createLineBorder((selected)?Color.blue:Color.black));
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			//IImage img = part.getImageHandle().deepAccess();
+			
+			float sx = 24f/(float)part.getImageHandle().getWidth();
+			float sy = 24f/(float)part.getImageHandle().getHeight();
+			
+			float scale = Math.min( sx, sy);
+			
+			RawImage img2 = HybridHelper.createImage(24, 24);
+			GraphicsContext gc = img2.getGraphics();
+			gc.scale(scale, scale);
+			gc.drawHandle(part.getImageHandle(), 0, 0);
+			
+			
+			g.drawImage( ((ImageBI)HybridUtil.convert(img2, ImageBI.class)).img, 
+					0, 0, null);
+		}
+	}
+	
+
+	private static final Font f = new Font("Tahoma", 0, 10);
+	private class SubLabel extends JLabel { 
+		SubLabel(String txt) {
+			super(txt);
+			this.setFont(f);
+		}
+	}
+
+	private class OpacitySlider extends SliderPanel {
+		OpacitySlider() {
+			setMin(0.0f);
+			setMax(1.0f);
+			setLabel("Opacity: ");
+		}
+		
+		@Override
+		public void onValueChanged(float newValue) {
+			changePartAttributes();
+			super.onValueChanged(newValue);
+		}
 	}
 }

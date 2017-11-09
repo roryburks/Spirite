@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  */
 public class MDebug {
 	
-	public static final boolean DEBUG = true;
+	//public static final boolean DEBUG = true;
 	
 	private static List<String> debugLog = new ArrayList<>();
 	

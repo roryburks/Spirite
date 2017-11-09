@@ -60,11 +60,11 @@ public class DropDownProperty<T extends Enum<T>> extends SwingToolProperty {
 		
 		// Binding
 		binding.setLink( new ChangeExecuter() {
-			@Override public void doUIChange(Object newValue) {
+			@Override public void doUIChanged(Object newValue) {
 				settings.setValue( id, newValue);
 			}
 			@Override
-			public void doDataChange(Object newValue) {
+			public void doDataChanged(Object newValue) {
 				comboBox.setSelectedItem((T)newValue);
 			}
 		});

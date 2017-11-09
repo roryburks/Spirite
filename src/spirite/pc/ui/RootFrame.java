@@ -251,6 +251,7 @@ public class RootFrame extends javax.swing.JFrame
     // :::: KeyEventDispatcher
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
+    	
     	// Dispatches Key Events on a global level to the HotkeyManager
     	//	then performs the command string (if there is one assosciated
     	//	with the key press combo)        

@@ -234,7 +234,7 @@ public class OmniFrame extends JPanel
 		
 		public OmniBar( String title, FrameType type) {
 			// :::: Init Components
-			icon = FrameManager.getIconForType(type);
+			icon = type.getIcon();
 			
 			label = new JLabel(title);
 			iconPanel = new JPanel() {

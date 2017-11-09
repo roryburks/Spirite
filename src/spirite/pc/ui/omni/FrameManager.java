@@ -55,12 +55,12 @@ public class FrameManager
 	
 	/** A Collection of identifiers for all the dockable Frames. */
 	public static enum FrameType {
-		BAD (""),
-		LAYER ("Layers"),
-		TOOL_SETTINGS ("Tool Settings"),
-		ANIMATION_SCHEME ("Anim"),
-		UNDO("Undo History"),
-		REFERENCE("Reference Scheme"),
+		BAD ("", null),
+		LAYER ("Layers","icon.frame.layers"),
+		TOOL_SETTINGS ("Tool Settings","icon.frame.toolSettings"),
+		ANIMATION_SCHEME ("Anim","icon.frame.animationScheme"),
+		UNDO("Undo History","icon.frame.undoHistory"),
+		REFERENCE("Reference Scheme","icon.frame.referenceScheme"),
 		;
 		
 		final String name;
@@ -69,12 +69,11 @@ public class FrameManager
 			name = str;
 			this.icon = icon;
 		}
-		FrameType( String str) {
-			name = str;
-			this.icon = "";
-		}
 		public String getName() {
 			return name;
+		}
+		public ImageIcon getIcon() {
+			return (icon == null) ? null : Globals.getIcon(icon);
 		}
 	}
 	
@@ -96,24 +95,6 @@ public class FrameManager
 			break;
 		}
 		
-		return null;
-	}
-
-	public static ImageIcon getIconForType( FrameType type) {
-		switch( type) {
-		case LAYER:
-			return Globals.getIcon("icon.frame.layers");
-		case TOOL_SETTINGS:
-			return Globals.getIcon("icon.frame.toolSettings");
-		case ANIMATION_SCHEME:
-			return Globals.getIcon("icon.frame.animationScheme");
-		case UNDO:
-			return Globals.getIcon("icon.frame.undoHistory");
-		case REFERENCE:
-			return Globals.getIcon("icon.frame.referenceScheme");
-		case BAD:
-			return null;
-		}
 		return null;
 	}
 	
@@ -238,7 +219,10 @@ public class FrameManager
 		return root.getWTPane().workPanel;
 	}
 	
-	// :::: WindowListener
+	// ======= 
+	// ==== Component Tracking
+	
+	// :: WindowListener
 	@Override	public void windowClosing(WindowEvent evt) {
 		if( !dialogs.contains(evt.getWindow())) {
 			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, null, "Unknown Dialog Closing in Frame Manager");
@@ -306,12 +290,20 @@ public class FrameManager
 
 	@Override
 	public boolean executeCommand(String command) {
-		Runnable runnable = commandMap.get(command);
+		int dot = command.indexOf('.');
 		
+		if( dot != -1) {
+			switch( command.substring(dot+1)) {
+			
+			}
+		}
+		
+		Runnable runnable = commandMap.get(command);
 		if( runnable != null) {
 			runnable.run();
 			return true;
 		}
 		return false;
+		
 	}
 }

@@ -151,6 +151,8 @@ public class SettingsManager {
         switch( setting) {
             case "promptOnGroupCrop":
                 return true;
+            case "DEBUG":
+            	return false;
             default:
                 //MDebug.handleWarning( MDebug.WarningType.REFERENCE, this, "Unknown Setting String Requested: " + setting);
                 return defaultValue;
