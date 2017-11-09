@@ -82,12 +82,10 @@ public abstract class StrokeEngine {
 	// Context
 	protected StrokeEngine.StrokeParams stroke = null;
 	protected BuildingMediumData building;
-	//protected ABuiltImageData data;
 	protected SelectionMask sel;
 	
 	// Interpolation
 	private Interpolator2D _interpolator = null;
-	private float interpos = 0;
 	
 	// :::: Get's
 	public StrokeEngine.StrokeParams getParams() {
@@ -181,7 +179,6 @@ public abstract class StrokeEngine {
 
 		
 		sel = selection;
-		interpos = 0;
 		onStart( built);
 		prepareDisplayLayer();
 		return true;
@@ -205,7 +202,6 @@ public abstract class StrokeEngine {
 		building.doOnBuiltData((built) -> {
 
 			Vec2i layerSpace = built.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
-			PenState buff;
 			newState.x = layerSpace.x;
 			newState.y = layerSpace.y;
 			newState.pressure = ps.pressure;
@@ -288,7 +284,10 @@ public abstract class StrokeEngine {
 	public static DrawPoints buildPoints(Interpolator2D localInterpolator, List<PenState> penStates, StrokeParams params) {
 		PenState buff;
 		
+		
 		if( localInterpolator != null) {
+			if( penStates.size() <= 1)
+				return new DrawPoints(new float[0],new float[0],new float[0]);
 			FloatCompactor fcx = new FloatCompactor();
 			FloatCompactor fcy = new FloatCompactor();
 			FloatCompactor fcw = new FloatCompactor();
@@ -353,17 +352,6 @@ public abstract class StrokeEngine {
 			gc.setComposite(Composite.DST_OUT, stroke.getAlpha());
 			break;
 		}
-/*		Graphics2D g2 = (Graphics2D)g;
-		Composite c = g2.getComposite();
-		switch( stroke.getMethod()) {
-		case BASIC:
-		case PIXEL:
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER,stroke.getAlpha()));
-			break;
-		case ERASE:
-			g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_OUT,stroke.getAlpha()));
-			break;
-		}*/
 		drawDisplayLayer(gc);
 		gc.setComposite( oldComp, oldAlpha);
 	}

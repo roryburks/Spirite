@@ -445,7 +445,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			triggerSelectedChanged();
 		}
 	}
-	private Node asLocalNode( Node node) {
+	Node asLocalNode( Node node) {
 		if( node instanceof LayerNode) {
 			for( Node toCheck : groupTree.getRoot().getAllAncestors()) {
 				if( toCheck instanceof LayerNode && ((LayerNode) toCheck).getLayer() == ((LayerNode) node).getLayer()) {
@@ -768,20 +768,19 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 */
 	private void _addLayer(LayerNode insertedNode, Node contextNode) 
 	{
-		if( width < insertedNode.getLayer().getWidth() || height < insertedNode.getLayer().getHeight()) {
-			List<UndoableAction> actions = new ArrayList<>(2);
+		
+		UndoableAction addAction = new StructureAction(createAdditionChange(insertedNode, contextNode));
+		
+		undoEngine.doAsAggregateAction(() -> {
+			undoEngine.performAndStore(addAction);
 
-			actions.add(new StructureAction( createAdditionChange(insertedNode,contextNode)));
-			actions.add(new StructureAction( 
-					new DimensionChange( 
-							Math.max(width, insertedNode.getLayer().getWidth()),
-							Math.max(height, insertedNode.getLayer().getHeight()))
-					));
-			
-			undoEngine.performAndStore(undoEngine.new CompositeAction( actions, actions.get(0).description));
-		}
-		else
-			executeChange( createAdditionChange(insertedNode,contextNode));
+			if( width < insertedNode.getLayer().getWidth() || height < insertedNode.getLayer().getHeight()) {
+				undoEngine.performAndStore(new StructureAction( new DimensionChange( 
+						Math.max(width, insertedNode.getLayer().getWidth()),
+						Math.max(height, insertedNode.getLayer().getHeight()))
+				));
+			}
+		}, "Add New Layer");
 	}
 	
 	/** Adds a GroupNode at the given context. */
@@ -1067,9 +1066,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		protected void onDispatch() {
 			change.cauterize();
 		}
-		@Override
-		public String getDescription() {
-			return change.description;
+		@Override public String getDescription() {
+			return change.getDescription();
 		}
 		@Override
 		public boolean reliesOnData() {
@@ -1117,7 +1115,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	 * these methods are called both for the initial execution and from the UndoEngine
 	 */
 	public abstract class StructureChange {
-		public String description = "Unknown Structure Change";
 		boolean imageChange = true;
 		boolean groupTreeChange = false;
 		public abstract void execute();
@@ -1140,6 +1137,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				triggerImageRefresh( evt);
 			}
 		}
+		public String getDescription() {return "Unknown Structure Change";}
 	}
 	
 	/** A StackableStructureChange corresponds to a StackableAction (see 
@@ -1161,7 +1159,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				GroupTree.Node parent,
 				GroupTree.Node before) 
 		{
-			description = "Added Node";
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
@@ -1187,6 +1184,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			list.add(parent);
 			return list;
 		}
+		@Override
+		public String getDescription() { return "Added Node";};
 	}
 	
 	/** Removing a Node from the tree */
@@ -1200,7 +1199,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				GroupTree.Node parent,
 				GroupTree.Node before) 
 		{
-			description = "Deleted Node";
 			this.node = node;
 			this.parent = parent;
 			this.nodeBefore = before;
@@ -1235,6 +1233,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			
 			return dependencies;
 		}
+		public String getDescription() {return "Deleted Node";};
 	}
 	
 	/** Moving the node from one place to another. */
@@ -1253,7 +1252,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				Node newParent,
 				Node newNext) 
 		{
-			description = "Moved Node";
 			this.moveNode = moveNode;
 			this.oldParent = oldParent;
 			this.oldNext = oldNext;
@@ -1279,6 +1277,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			list.add(newParent);
 			return list;
 		}
+		@Override
+		public String getDescription() { return "Moved Node";}
 	}
 	
 	/** Renaming the node */
@@ -1291,21 +1291,15 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				String newName,
 				Node node) 
 		{
-			description = "Renamed Node";
 			imageChange = false;
 			this.newName = newName;
 			this.oldName = node.name;
 			this.node = node;
 		}
 
-		@Override
-		public void execute() {
-			node.name = newName;
-		}
-		@Override
-		public void unexecute() {
-			node.name = oldName;
-		}
+		@Override public void execute() {node.name = newName;}
+		@Override public void unexecute() {node.name = oldName;}
+		@Override public String getDescription() { return "Renamed Node";}
 	}
 	
 	public abstract class NodeAtributeChange extends StructureChange {
@@ -1329,24 +1323,11 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			
 			this.before = new RenderProperties( node.getRender());
 			this.after = newProperties;
-			this.description = "Visibility/Display Style Changed";
 		}
 
-		@Override
-		public void execute() {
-			node.render.alpha = after.alpha;
-			node.render.visible = after.visible;
-			node.render.method = after.method;
-			node.render.renderValue = after.renderValue;
-		}
-
-		@Override
-		public void unexecute() {
-			node.render.alpha = before.alpha;
-			node.render.visible = before.visible;
-			node.render.method = before.method;
-			node.render.renderValue = before.renderValue;
-		}
+		@Override public void execute() {node.render.directCopy(after);}
+		@Override public void unexecute() { node.render.directCopy(before);}
+		@Override public String getDescription() { return "Visibility/Display Style Changed";}
 	}
 	
 	/** Change the Workspace's Dimensions */
@@ -1373,6 +1354,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			width = oldWidth;
 			height = oldHeight;
 		}
+		@Override public String getDescription() {return "Workspace Dimension Change";}
 		
 	}
 
@@ -1385,8 +1367,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			super(node);
 			this.dx = newX - node.x;
 			this.dy = newY - node.y;
-			
-			this.description = "Changed Node Offset";
 		}
 
 		@Override public void execute() { node.x += dx; node.y += dy;}
@@ -1400,6 +1380,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			OffsetChange change = (OffsetChange)newChange;
 			return (node == change.node);
 		}
+		@Override public String getDescription() {return "Changed Node Offset";}
 	}
 	
 	/** Executes the given change and stores it in the UndoEngine */

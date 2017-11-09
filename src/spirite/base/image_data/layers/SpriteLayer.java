@@ -453,6 +453,8 @@ public class SpriteLayer extends Layer
 	}
 	
 
+	@Override public int getDynamicOffsetX() {return 0;}
+	@Override public int getDynamicOffsetY() {return 0;}
 	@Override
 	public int getWidth() {
 		int x1 = 0;
@@ -586,6 +588,4 @@ public class SpriteLayer extends Layer
 		return helper;
 	}
 
-	@Override public int getDynamicOffsetX() {return 0;}
-	@Override public int getDynamicOffsetY() {return 0;}
 }
