@@ -36,9 +36,9 @@ import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
+import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.hybrid.HybridTimer;
 import spirite.hybrid.HybridUtil;
@@ -429,7 +429,7 @@ public class SaveEngine implements MWorkspaceObserver {
 						
 						helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
 
-						for( MaglevMedium.MagLevFill.StrokeSegment seg : fill.segments) {
+						for( MagLevFill.StrokeSegment seg : fill.segments) {
 							helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
 							helper.ra.writeInt( seg.pivot);			// [4] : pivot
 							helper.ra.writeInt( seg.travel);		// [4] : travel

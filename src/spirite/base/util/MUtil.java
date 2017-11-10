@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.IImage;
-import spirite.base.image_data.GroupTree.Node;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;

@@ -31,7 +31,6 @@ import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
-import spirite.pc.ui.components.BoxList;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);

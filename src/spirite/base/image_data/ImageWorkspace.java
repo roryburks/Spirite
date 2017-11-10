@@ -31,7 +31,7 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
-import spirite.base.image_data.layers.PuppetLayer;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;

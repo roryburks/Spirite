@@ -10,9 +10,9 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.layers.Layer;
-import spirite.base.image_data.layers.PuppetLayer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 public class LayerPropertiesPanel extends OmniComponent

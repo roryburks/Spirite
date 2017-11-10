@@ -36,6 +36,9 @@ public class DynamicImage {
 	
 	public int getXOffset() {return ox;}
 	public int getYOffset() {return oy;}
+	public int getWidth() {return (base == null) ? 0 : base.getWidth();}
+	public int getHeight() {return (base == null) ? 0 : base.getHeight();}
+	
 	public RawImage getBase() {return base;}
 	public ImageWorkspace getContext() {return context;}
 	public void setContext( ImageWorkspace ws) {context = ws;}

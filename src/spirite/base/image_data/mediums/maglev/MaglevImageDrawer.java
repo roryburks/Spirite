@@ -15,12 +15,13 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevFill.StrokeSegment;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.MaglevMedium.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
+import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
@@ -180,10 +181,11 @@ public class MaglevImageDrawer
 			
 			if( closestSegment.strokeIndex == ss.strokeIndex && closestDistance <= r) {
 				MagLevStroke stroke = (MagLevStroke) img.things.get(ss.strokeIndex);
+				DrawPoints direct = stroke.getDirect();
 				
 				if( Math.abs(ss.travel - (closestSegment.pivot - ss.pivot) * StrokeEngine.DIFF) > 
-					1.5 * MUtil.distance(stroke.direct.x[ss.pivot + ss.travel], stroke.direct.y[ss.pivot + ss.travel],
-							stroke.direct.x[closestSegment.pivot], stroke.direct.y[closestSegment.pivot]) && !locked)
+					1.5 * MUtil.distance(direct.x[ss.pivot + ss.travel], direct.y[ss.pivot + ss.travel],
+							direct.x[closestSegment.pivot], direct.y[closestSegment.pivot]) && !locked)
 				{
 					ss = closestSegment;
 					strokeSegments.add(ss);
@@ -255,8 +257,9 @@ public class MaglevImageDrawer
 			MagLevThing thing = img.things.get(thingIndex);
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
-				for( int i=0; i < stroke.direct.length; ++i) {
-					float distance = (float) MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]);
+				DrawPoints direct = stroke.getDirect();
+				for( int i=0; i < direct.length; ++i) {
+					float distance = (float) MUtil.distance(x, y, direct.x[i], direct.y[i]);
 					if( distance < closestDistance) {
 						closestIndex = i;
 						closestStrokeIndex = thingIndex;
@@ -281,8 +284,9 @@ public class MaglevImageDrawer
 		int index = 0;
 		for( StrokeSegment s : strokeSegments) {
 			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c) 
-				out[index++] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+				out[index++] = direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
 		}
 		
 		
@@ -299,8 +303,9 @@ public class MaglevImageDrawer
 		int index = 0;
 		for( StrokeSegment s : strokeSegments) {
 			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c)
-				out[index++] = stroke.direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
+				out[index++] = direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
 		}
 		
 		return out;
@@ -316,9 +321,10 @@ public class MaglevImageDrawer
 		for( MagLevThing thing : img.things) {
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
+				DrawPoints direct = stroke.getDirect();
 
-				for( int i=0; i < stroke.direct.length; ++i) {
-					if( MUtil.distance(x, y, stroke.direct.x[i], stroke.direct.y[i]) < w) {
+				for( int i=0; i < direct.length; ++i) {
+					if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
 						thingsToRemove.add(stroke);
 						break;
 					}

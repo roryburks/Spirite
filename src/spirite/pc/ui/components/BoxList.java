@@ -1,6 +1,5 @@
 package spirite.pc.ui.components;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
@@ -18,14 +17,13 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
-
-import spirite.base.util.MUtil;
-import spirite.pc.ui.UIUtil;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+
+import spirite.base.util.MUtil;
+import spirite.pc.ui.UIUtil;
 
 public class BoxList<T> extends JPanel {
 	private int box_w, box_h;
@@ -33,6 +31,14 @@ public class BoxList<T> extends JPanel {
 
 	private final JPanel content = new JPanel();
 	private final JScrollPane scroll = new JScrollPane(content);
+	
+	// ========
+	// ==== Semi-Abstract
+	protected boolean attemptMove(int from, int to) {
+		entries.add(to, entries.remove(from));
+		return true;
+	}
+	
 	
 	public BoxList(Collection<T> entries, int width, int height) {
 		this.box_w = width;
@@ -138,6 +144,36 @@ public class BoxList<T> extends JPanel {
 		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),  UIUtil.buildAction( (e) -> {
 			if( selectedIndex != -1) 
 				this.setSelectedIndex(Math.min(components.size()-1, selectedIndex+1));
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			if( selectedIndex != -1 && selectedIndex != 0) {
+				if( attemptMove( selectedIndex, selectedIndex-1))
+					selectedIndex = selectedIndex-1;
+			}
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			if( selectedIndex != -1 && selectedIndex != entries.size()-1) {
+				if( attemptMove( selectedIndex, selectedIndex+1))
+					selectedIndex = selectedIndex+1;
+			}
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int to = Math.max(0, selectedIndex - num_per_row);
+			
+			if( selectedIndex != -1 && to != selectedIndex) {
+				if( attemptMove( selectedIndex, to))
+					selectedIndex = to;
+				
+			}
+		}));
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
+			int to = Math.min(entries.size()-1, selectedIndex + num_per_row);
+			
+			if( selectedIndex != -1 && to != selectedIndex) {
+				if( attemptMove( selectedIndex, to))
+					selectedIndex = to;
+				
+			}
 		}));
 		
 		UIUtil.buildActionMap( this, actionMap);

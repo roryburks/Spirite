@@ -19,7 +19,6 @@ import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
-import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.pen.Penner;
 import spirite.hybrid.Globals;
@@ -311,7 +310,14 @@ public class FrameManager
 	
 	@Override
 	public List<String> getValidCommands() {
-		return new ArrayList<>(commandMap.keySet());
+		ArrayList<String> entries = new ArrayList<>( commandMap.size() + FrameType.values().length);
+		
+		entries.addAll(commandMap.keySet());
+		
+		for( FrameType type : FrameType.values()) 
+			entries.add( "focus." + type.toString());
+		
+		return entries;
 	}
 
 	@Override

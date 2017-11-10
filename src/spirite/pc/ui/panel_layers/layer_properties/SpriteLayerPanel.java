@@ -1,44 +1,32 @@
 package spirite.pc.ui.panel_layers.layer_properties;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import javafx.beans.binding.DoubleBinding;
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.graphics.RenderProperties.Trigger;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
@@ -72,7 +60,7 @@ public class SpriteLayerPanel extends JPanel
 	private final JButton bRemovePart = new JButton();
 	private final JToggleButton bNodeVisiblity = new JToggleButton();
 	private final OpacitySlider opacitySlider = new OpacitySlider();
-	private final BoxList<Part> boxList = new BoxList<>(null, 24,24);
+	private final BoxList<Part> boxList;
 	
 	private final MasterControl master;
 	private ImageWorkspace workspace;
@@ -82,6 +70,21 @@ public class SpriteLayerPanel extends JPanel
 	
 	public SpriteLayerPanel( MasterControl master) {
 		this.master = master;
+		
+		boxList = new BoxList<Part>(null, 24,24) {
+			@Override
+			protected boolean attemptMove(int from, int to) {
+				rig.movePart(from, to);
+				
+				// TODO : Bad
+				SwingUtilities.invokeLater(() -> {
+					rig.setActivePart(rig.getParts().get(to));
+					refresh();
+				});
+				return true;
+			}
+		};
+
 		initComponents();
 		initBindings();
 		
@@ -261,45 +264,8 @@ public class SpriteLayerPanel extends JPanel
 	private void initBindings() {
 		Map<KeyStroke,Action> actionMap = new HashMap<>();
 
-		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
-			int index = rig.getActivePartIndex();
-			
-			if( index != -1 && index != 0) {
-				rig.movePart( index, index-1);	
-			}
-		}));
-		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
-			int index = rig.getActivePartIndex();
-			
-			if( index != -1 && index != rig.getParts().size()-1) {
-				rig.movePart( index, index+1);
-				
-				// TODO: Bad
-				SwingUtilities.invokeLater(() -> {
-					rig.setActivePart(rig.getParts().get(index+1));
-					refresh();
-				});
-			}
-		}));
-		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
-			int index = rig.getActivePartIndex();
-			
-			if( index != -1) {
-				int to = Math.max(0, index - boxList.getNumPerRow());
-				
-				if( to != index)
-					rig.movePart( index, to);	
-			}
-		}));
-		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK),  UIUtil.buildAction((e) -> {
-			int index = rig.getActivePartIndex();
-			
-			if( index != -1) {
-				int to = Math.min(rig.getParts().size()-1, index + boxList.getNumPerRow());
-				
-				if( to != index)
-					rig.movePart( index, to);	
-			}
+		actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), UIUtil.buildAction((evt) -> {
+			System.out.println("TEST" + evt.getSource());
 		}));
 		
 		UIUtil.buildActionMap(boxList, actionMap);
