@@ -13,6 +13,13 @@ import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.Interpolator2D;
 
+/**
+ * A DerivedMaglevMedium is a second-hand medium that relies on a MaglevMedium.
+ * PuppetLayers use these to create complexly-transformed variations of MaglevMediums
+ * without destroying data.  For the most part it is a bone-transformed variation
+ * of the MaglevMedium, but it can have additional stroke and fill components for
+ * touch-ups, e.g. if bending the bone a certain way exposes some seams in the geometry.
+ */
 public class DerivedMaglevMedium 
 	implements IMedium
 {

@@ -79,4 +79,10 @@ public interface IImageDrawer {
 		public boolean acceptsLifted( ALiftedData lifted);
 		public void anchorLifted( ALiftedData lifted, MatTrans trans);
 	}
+	
+	public interface IBoneDrawer {
+		public void startBone( int x, int y);
+		public void updateBone( int x, int y);
+		public void endBone( int x, int y);
+	}
 }

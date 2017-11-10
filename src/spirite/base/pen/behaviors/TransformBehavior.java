@@ -11,9 +11,9 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.MatTrans.NoninvertableException;
 
 abstract class TransformBehavior extends DrawnStateBehavior {
 	

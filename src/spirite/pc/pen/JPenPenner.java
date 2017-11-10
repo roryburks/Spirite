@@ -13,9 +13,9 @@ import jpen.event.PenListener;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.pen.Penner;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
+import spirite.base.pen.Penner;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
 /**

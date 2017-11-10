@@ -56,6 +56,7 @@ public class ToolsetManager
         COLOR_PICKER("Color Picker",12),
         MAGLEV_FILL("Magnetic Fill",13),
         EXCISE_ERASER("Stroke Erasor", 14),
+        BONE("Bone Constructor", 15),
         ;
 
         public final String description;

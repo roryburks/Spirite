@@ -3,11 +3,9 @@
 package spirite.pc.ui.panel_toolset;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -19,11 +17,8 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
 
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;

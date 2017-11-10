@@ -1,8 +1,8 @@
 package spirite.base.pen.behaviors;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.image_data.selection.SelectionEngine.BuildMode;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.Penner;
 import spirite.base.pen.selection_builders.FreeformSelectionBuilder2;
 import spirite.base.util.Colors;

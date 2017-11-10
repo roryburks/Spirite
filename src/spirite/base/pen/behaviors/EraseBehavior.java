@@ -4,8 +4,6 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.Method;
-import spirite.base.pen.StrokeEngine.StrokeParams;
 
 public class EraseBehavior extends StrokeBehavior {
 	public EraseBehavior(Penner penner) {

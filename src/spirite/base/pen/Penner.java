@@ -393,6 +393,8 @@ public class Penner
 				}
 				else HybridHelper.beep();
 				break;}
+			case BONE: {
+				break;}
 			}
 			
 			if( behavior != null)

@@ -5,7 +5,6 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.StrokeParams;
 
 public class PenBehavior extends StrokeBehavior {
 	final int color;
