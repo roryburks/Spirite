@@ -56,6 +56,7 @@ public class LayerPropertiesPanel extends OmniComponent
 				return;
 			}
 			if( layer instanceof PuppetLayer) {
+				plp.setPuppet((PuppetLayer)layer, master.getCurrentWorkspace());
 				initComponent(plp);
 				return;
 			}

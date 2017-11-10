@@ -399,9 +399,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			}
 		}
 	}
-	public interface DoOnABID {
-		public void Do( ABuiltMediumData abid);
-	}
+	public interface DoOnABID { public void Do( ABuiltMediumData abid); }
 	
 	
 	// =========
@@ -743,6 +741,11 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		_addLayer(insertedNode, contextNode);
 		
 		return insertedNode;
+	}
+	public LayerNode addNewDerivedPuppetLayer( Node contextNode, String name, PuppetLayer puppet) {
+		LayerNode inserted = groupTree.new LayerNode( new PuppetLayer(this, puppet.getBase()), getNonDuplicateName(name));
+		
+		return inserted;
 	}
 	
 	public LayerNode addNewReferenceLayer(Node context, LayerNode underlying, String name) {

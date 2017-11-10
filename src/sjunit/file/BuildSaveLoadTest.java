@@ -33,7 +33,7 @@ import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.hybrid.HybridHelper;
@@ -273,8 +273,8 @@ public class BuildSaveLoadTest {
 				MaglevMedium mag1 = (MaglevMedium)iimg1;
 				MaglevMedium mag2 = (MaglevMedium)iimg2;
 
-				List<MagLevThing> things1 = mag1.getThings();
-				List<MagLevThing> things2 = mag2.getThings();
+				List<AMagLevThing> things1 = mag1.getThings();
+				List<AMagLevThing> things2 = mag2.getThings();
 				assert( things1.size() == things2.size());
 				for( int i=0; i < things1.size(); ++i) {
 					if( things1.get(i) instanceof MagLevStroke) {

@@ -8,7 +8,7 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 
-public class MagLevFill extends MagLevThing {
+public class MagLevFill extends AMagLevThing {
 
 	public static class StrokeSegment {
 		public int strokeIndex;
@@ -40,7 +40,7 @@ public class MagLevFill extends MagLevThing {
 	}
 	@Override
 	public void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
-		List<MagLevThing> things = context.getThings();
+		List<AMagLevThing> things = context.getThings();
 		int totalLen = 0;
 		int index = 0;
 		

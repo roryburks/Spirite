@@ -5,34 +5,83 @@ import java.util.List;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
+import spirite.base.util.glmath.MatTrans;
 
-public class BasePuppet {
-	BasePart rootPart;	// Nill part
+public class BasePuppet implements IPuppet {
+	BasePart rootPart = new BasePart();	// Nill part
 
+	public BasePuppet( MediumHandle firstMedium) {
+		rootPart.addPart(firstMedium);
+	}
+
+	@Override public BasePuppet getBase() { return this;}
+	@Override
 	public List<MediumHandle> getDependencies() {
-		List<MediumHandle> list = new ArrayList<>();
+		List<BasePart> parts = getParts();
+		List<MediumHandle> list = new ArrayList<>(parts.size());
 		
+		for( BasePart part : parts)
+			list.add(part.hadle);
+		
+		return list;
+	}
+	@Override
+	public List<BasePart> getParts() {
+		List<BasePart> list = new ArrayList<>();
+
 		Stack<BasePart> toCheckStack = new Stack<>();
 		toCheckStack.push(rootPart);
 		
 		while(!toCheckStack.isEmpty()) {
 			BasePart toCheck = toCheckStack.pop();
-			if( toCheck.medium != null)
-				list.add(toCheck.medium);
+			if( toCheck.hadle != null)
+				list.add(toCheck);
+			for( BasePart child : toCheck.children)
+				toCheckStack.push(child);
 		}
 		
 		return list;
 	}
+	@Override
+	public List<TransformedHandle> getDrawList() {
+		List<BasePart> parts = getParts();
+		List<TransformedHandle> list = new ArrayList<>(parts.size());
+		
+		for( BasePart part : parts) {
+			TransformedHandle th = new TransformedHandle();
+			th.trans = MatTrans.TranslationMatrix(part.ox, part.oy);
+			th.handle = part.hadle;
+			list.add(th);
+		}
+		
+		
+		return list;
+	}
 	
-	public class BasePart {
+	public class BasePart implements IPuppet.IPart {
 		BasePart parent;
 		final List<BasePart> children = new ArrayList<>(2);
 		
 		int ox, oy;
-		MediumHandle medium;	// Note: must be maglev medium
+		MediumHandle hadle;	// Note: must be maglev medium
 		BaseBone bone;
+		
+		@Override
+		public BuildingMediumData buildData() {
+			return new BuildingMediumData(hadle, ox, oy);
+		}
+		BasePart addPart(MediumHandle medium) {
+			BasePart part = new BasePart();
+			part.parent = this;
+			part.hadle = medium;
+			this.children.add(part);
+			
+			return part;
+		}
 	}
 	
 	public class BaseBone {
@@ -45,4 +94,6 @@ public class BasePuppet {
 			weightMap.put(1f, width);
 		}
 	}
+
+
 }

@@ -64,7 +64,9 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
+import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -417,11 +419,16 @@ public class LayerTreePanel extends ContentTree
 					menuScheme.add( new String[] {"&Write Group To GIF Animation", "giffromgroup", null});
 				}
 				else if( usrObj instanceof LayerNode) {
-					if( ((LayerNode) usrObj).getNextNode() instanceof LayerNode) {
+					menuScheme.add( new String[] {"-"});
+					Layer layer = ((LayerNode) usrObj).getLayer();
+					if( layer.canMerge(((LayerNode)usrObj).getNextNode())) {
 						menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
 					}
-					if( ((LayerNode) usrObj).getLayer() instanceof SpriteLayer) {
+					if( layer instanceof SpriteLayer) {
 						menuScheme.add( new String[] {"Construct &Rig Animation From Sprite", "animFromRig",null});
+					}
+					if( layer instanceof PuppetLayer) {
+						menuScheme.add( new String[] {"Add &Derived Puppet Layer", "newDerivedPuppet", null});
 					}
 				}
 			}
@@ -596,6 +603,10 @@ public class LayerTreePanel extends ContentTree
 			workspace.addNewPuppetLayer( workspace.getSelectedNode(), name);
 			
 			break;}
+		case "newDerivedPuppet": {
+			PuppetLayer puppet = ((PuppetLayer)((LayerNode)contextMenu.node).getLayer());
+			workspace.addNewDerivedPuppetLayer(workspace.getSelectedNode(), contextMenu.node.getName(), puppet);
+		}
 		default:
 			MDebug.log(evt.getActionCommand());
 		}

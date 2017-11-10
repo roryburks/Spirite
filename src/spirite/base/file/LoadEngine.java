@@ -42,7 +42,7 @@ import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
@@ -305,7 +305,7 @@ public class LoadEngine {
 			case MAGLEV: {
 				int thingsLeftToRead = helper.ra.readUnsignedShort();
 				
-				List<MagLevThing> things = new ArrayList<>(thingsLeftToRead);
+				List<AMagLevThing> things = new ArrayList<>(thingsLeftToRead);
 				
 				for( ; thingsLeftToRead != 0; --thingsLeftToRead) {
 					int thingType = helper.ra.readByte();

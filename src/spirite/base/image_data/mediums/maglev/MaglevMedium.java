@@ -11,7 +11,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
@@ -31,7 +31,7 @@ import spirite.hybrid.HybridHelper;
 public class MaglevMedium implements IMedium {
 	//final List<MagLevStroke> strokes;
 	//final List<MagLevFill> fills;
-	final List<MagLevThing> things;
+	final List<AMagLevThing> things;
 	
 	final ImageWorkspace context;
 	DynamicImage builtImage = null;
@@ -44,7 +44,7 @@ public class MaglevMedium implements IMedium {
 			// TODO: unflag "isBuilt" when Workspace changes size
 		}
 	}
-	public MaglevMedium( ImageWorkspace context, List<MagLevThing> things) {
+	public MaglevMedium( ImageWorkspace context, List<AMagLevThing> things) {
 		this.context = context;
 		this.things = new ArrayList<>( things.size());
 		this.things.addAll(things);
@@ -53,7 +53,7 @@ public class MaglevMedium implements IMedium {
 		this.context = other.context;
 		this.things = new ArrayList<>(other.things.size());
 		
-		for( MagLevThing thing : other.things)
+		for( AMagLevThing thing : other.things)
 			this.things.add(thing.clone());
 		
 		this.isBuilt = other.isBuilt;
@@ -82,7 +82,7 @@ public class MaglevMedium implements IMedium {
 //		}
 //	}
 	
-	void addThing( MagLevThing thing) {
+	void addThing( AMagLevThing thing) {
 		things.add(thing);
 	}
 	void popThing() {
@@ -130,7 +130,7 @@ public class MaglevMedium implements IMedium {
 				builtImage.doOnGC( (gc) -> {
 					ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
 					SelectionMask mask = null;
-					for( MagLevThing thing : things) {
+					for( AMagLevThing thing : things) {
 						thing.draw( built, mask, gc, this);
 					}	
 				}, new MatTrans());
@@ -147,8 +147,8 @@ public class MaglevMedium implements IMedium {
 		}
 	}
 	/** Be careful with these things, they can break. */
-	public List<MagLevThing> getThings() {
-		return new ArrayList<MagLevThing>(things);
+	public List<AMagLevThing> getThings() {
+		return new ArrayList<AMagLevThing>(things);
 	}
 	
 

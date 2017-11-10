@@ -14,30 +14,64 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.Rect;
 
 public class PuppetLayer extends Layer {
-	public final Puppet puppet;
+	public final IPuppet puppet;
 	public final ImageWorkspace context;
 	
-	MediumHandle __D__medium;
-	
-	private Puppet.Part selectedPart;
+	private IPuppet.IPart selectedPart;
 	
 	public PuppetLayer( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
-		this.puppet = new Puppet();
+		this.puppet = new BasePuppet(firstMedium);
 		
-		__D__medium = firstMedium;
+		usingBase = true;
+
+		selectedPart = puppet.getParts().get(0);
+	}
+	public PuppetLayer( ImageWorkspace context, BasePuppet base) {
+		this.context = context;
+		this.puppet = new Puppet(base);
+		
+		usingBase = false;
+		selectedPart = puppet.getParts().get(0);
+	}
+	
+	
+	// =========
+	// ==== Toggleable Properties
+	boolean usingBase = true;
+	boolean skeletonVisible = false;
+	
+	public boolean isBaseOnly() {return puppet instanceof BasePuppet;}
+	public boolean isUsingBase() {return usingBase;}
+	public void setUsingBase( boolean using) {
+		if( !isBaseOnly()) {
+			usingBase = using;
+			context.triggerFlash();
+		}
+	}
+	
+	public boolean isSkeletonVisible() {return skeletonVisible;}
+	public void setSkeletonVisible(boolean visible) {
+		skeletonVisible = visible;
+		context.triggerFlash();
+	}
+	public BasePuppet getBase() {
+		return puppet.getBase();
 	}
 
+	// ==========
+	// ==== DERIVED
 	@Override
 	public BuildingMediumData getActiveData() {
-		return new BuildingMediumData(__D__medium);
+		return selectedPart.buildData();
+		//return new BuildingMediumData(__D__medium);
 	}
 
 	@Override
 	public List<MediumHandle> getImageDependencies() {
 		List<MediumHandle> ret = new ArrayList<>();
 		
-		ret.add(__D__medium);
+		//ret.add(__D__medium);
 		
 		ret.addAll(puppet.getDependencies());
 		
@@ -60,11 +94,14 @@ public class PuppetLayer extends Layer {
 
 	@Override
 	public List<TransformedHandle> getDrawList() {
-		TransformedHandle renderable = new TransformedHandle();
-		renderable.handle = __D__medium;
-		renderable.depth = 0;
+		if( puppet instanceof BasePuppet || !usingBase) 
+			return puppet.getDrawList();
+		
+//		TransformedHandle renderable = new TransformedHandle();
+//		renderable.handle = __D__medium;
+//		renderable.depth = 0;
 			
-		return Arrays.asList( new TransformedHandle[]{renderable});
+		return Arrays.asList( new TransformedHandle[0]);
 	}
 
 

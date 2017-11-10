@@ -38,7 +38,7 @@ import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.hybrid.HybridTimer;
 import spirite.hybrid.HybridUtil;
@@ -398,11 +398,11 @@ public class SaveEngine implements MWorkspaceObserver {
 			case MAGLEV: {
 				MaglevMedium mimg = (MaglevMedium)part.iimg;
 				
-				List<MagLevThing> things = mimg.getThings();
+				List<AMagLevThing> things = mimg.getThings();
 				//	[2] : Number of things
 				helper.ra.writeShort(things.size());	
 				
-				for( MagLevThing thing : things) {
+				for( AMagLevThing thing : things) {
 					if( thing instanceof MagLevStroke) {
 						MagLevStroke stroke = (MagLevStroke)thing;
 						

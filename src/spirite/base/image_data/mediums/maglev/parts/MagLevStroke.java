@@ -14,7 +14,7 @@ import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
 
-public class MagLevStroke extends MagLevThing {
+public class MagLevStroke extends AMagLevThing {
 	public final PenState[] states;
 	public final StrokeParams params;
 	DrawPoints direct;

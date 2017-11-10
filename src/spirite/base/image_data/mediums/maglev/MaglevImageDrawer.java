@@ -17,7 +17,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.image_data.mediums.maglev.parts.MagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
@@ -111,7 +111,7 @@ public class MaglevImageDrawer
 	// :::: ITransformModule
 	@Override
 	public void transform(MatTrans trans) {
-		for( MagLevThing things : img.things) {
+		for( AMagLevThing things : img.things) {
 			float xy[] = things.getPoints();
 			if( xy == null) continue;
 			for( int i=0; i < xy.length/2; ++i) {
@@ -254,7 +254,7 @@ public class MaglevImageDrawer
 		int closestIndex = -1;
 		int closestStrokeIndex = -1;
 		for( int thingIndex = 0; thingIndex < img.things.size(); ++thingIndex) {
-			MagLevThing thing = img.things.get(thingIndex);
+			AMagLevThing thing = img.things.get(thingIndex);
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
 				DrawPoints direct = stroke.getDirect();
@@ -317,8 +317,8 @@ public class MaglevImageDrawer
 	int iweId = -1;
 	@Override
 	public void weightErase(float x, float y, float w) {
-		List<MagLevThing> thingsToRemove = new ArrayList<>();
-		for( MagLevThing thing : img.things) {
+		List<AMagLevThing> thingsToRemove = new ArrayList<>();
+		for( AMagLevThing thing : img.things) {
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
 				DrawPoints direct = stroke.getDirect();
@@ -350,9 +350,9 @@ public class MaglevImageDrawer
 		iweId = -1;
 	}
 	class MagWeightEraseAction extends ImageAction implements StackableAction {
-		private final List<MagLevThing> thingsToErase;
+		private final List<AMagLevThing> thingsToErase;
 		private final int id;
-		MagWeightEraseAction(BuildingMediumData data, List<MagLevThing> thingsToErase, int id)
+		MagWeightEraseAction(BuildingMediumData data, List<AMagLevThing> thingsToErase, int id)
 		{
 			super(data);
 			this.id = id;
@@ -372,7 +372,7 @@ public class MaglevImageDrawer
 			ImageWorkspace ws = building.handle.getContext();
 			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 			
-			for( MagLevThing toErase : thingsToErase) {
+			for( AMagLevThing toErase : thingsToErase) {
 				mimg.things.remove(toErase);
 			}
 			mimg.unbuild();
