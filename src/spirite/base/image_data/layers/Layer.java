@@ -10,11 +10,16 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2i;
 
 public abstract class Layer {
 	public abstract BuildingMediumData getActiveData();
+	public IImageDrawer getDrawer(BuildingMediumData building, IMedium medium) {
+		return medium.getImageDrawer(building);
+	}
 	public abstract List<MediumHandle> getImageDependencies();
 	public abstract List<BuildingMediumData> getDataToBuild();
 	public final void draw( GraphicsContext gc) {
@@ -26,6 +31,7 @@ public abstract class Layer {
 	}
 	public abstract int getWidth();
 	public abstract int getHeight();
+
 	
 	public abstract boolean canMerge( GroupTree.Node node);
 	

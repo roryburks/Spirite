@@ -37,6 +37,7 @@ public interface IMedium {
 		DYNAMIC(1),
 		PRISMATIC(2),
 		MAGLEV(3),
+		DERIVED_MAGLEV(4),
 		;
 		
 		// This way, these values can be used in saving and loading without failing when

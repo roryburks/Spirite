@@ -31,10 +31,10 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.Layer.LayerActionHelper;
-import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.DynamicMedium;
 import spirite.base.image_data.mediums.FlatMedium;
@@ -342,8 +342,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			BuildingMediumData bid = layer.getActiveData();
 
 			bid.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
-			IMedium medium = mediumData.get(bid.handle.id);
-			return (medium == null) ? null : medium.getImageDrawer(bid);
+			return layer.getDrawer(bid, mediumData.get(bid.handle.id));
 		}
 		else if( node instanceof GroupNode) {
 			return new GroupNodeDrawer((GroupNode)node);
@@ -650,30 +649,17 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 	}
 	
-	/**
-	 * Puts the newImage into the Workspace space (caching it and assigning
-	 * it a handle) and returns that handle.
+	/** Used by Layers which have dynamic amounts of mediums attatched to
+	 * them, links an externally-created Medium to ImageWorkspace
 	 * 
-	 * NOTE: If the ImageHandle is not linked to a Layer in the Workspace
-	 * then the image will get flushed next time the image data is checked
+	 * NOTE: If the MediumHandle is not marked as a dependancy for a Layer
+	 * in the workspace (by returning it in getDependencies), then it will
+	 * get de-allocated and flushed the next time mediumData is checked
 	 */
-	public MediumHandle importData( RawImage newImage) {
-		mediumData.put( workingID, new FlatMedium(newImage, this));
-		
-		return new MediumHandle(this, workingID++);	// Postincriment
+	public MediumHandle importMedium( IMedium medium) {
+		mediumData.put( workingID, medium);
+		return new MediumHandle( this, workingID++);
 	}
-	
-	/**
-	 * DynamicData resizes its area such that you never reach the "end" of 
-	 * the data (but can only draw on the currently visible part) and it
-	 * will automatically crop the data periodically to only the used area.
-	 */
-	public MediumHandle importDynamicData(RawImage newImage) {
-		mediumData.put( workingID, new DynamicMedium(newImage, 0, 0, this));
-
-		return new MediumHandle(this, workingID++);	// Postincriment
-	}
-	
 	
 	public LayerNode addNewSimpleLayer( GroupTree.Node contextNode, RawImage img, String name, InternalImageTypes type) {
 		IMedium ii = null;
@@ -703,7 +689,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		return insertedNode;
 	}
 	
-	public LayerNode addNewSimpleLayer(  GroupTree.Node contextNode, int w, int h, String name, int argb, InternalImageTypes type) {
+	public LayerNode addNewSimpleLayer(  GroupTree.Node context, int w, int h, String name, int argb, InternalImageTypes type) {
 		// Create new Image Data and link it to the workspace
 		RawImage img = HybridHelper.createImage(w, h);
 		
@@ -711,10 +697,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
         gc.setColor( argb);
         gc.fillRect( 0, 0, width, height);
 		
-		return addNewSimpleLayer( contextNode, img, name, type);
+		return addNewSimpleLayer( context, img, name, type);
 	}
 	
-	public LayerNode addNewRigLayer( Node contextNode, int w, int h, String name, int argb) {
+	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
 		RawImage img = HybridHelper.createImage(w, h);
 		
 		GraphicsContext gc = img.getGraphics();
@@ -725,26 +711,26 @@ public class ImageWorkspace implements MWorkspaceObserver {
         mediumData.put(workingID, internal);
         MediumHandle handle= new MediumHandle(this, workingID++);
         
-		LayerNode insertedNode = groupTree.new LayerNode( new SpriteLayer(handle), getNonDuplicateName(name));
-		_addLayer(insertedNode,contextNode);
+		LayerNode inserted = groupTree.new LayerNode( new SpriteLayer(handle), getNonDuplicateName(name));
+		_addLayer(inserted,context);
 		
-		return insertedNode;
+		return inserted;
 	}
 
-	public LayerNode addNewPuppetLayer( Node contextNode, String name) {
+	public LayerNode addNewPuppetLayer( Node context, String name) {
 		
 		IMedium internal = new MaglevMedium(this);
 		mediumData.put(workingID, internal);
 		MediumHandle handle = new MediumHandle( this, workingID++);
 		
-		LayerNode insertedNode = groupTree.new LayerNode( new PuppetLayer(this, handle), getNonDuplicateName(name));
-		_addLayer(insertedNode, contextNode);
+		LayerNode inserted = groupTree.new LayerNode( new PuppetLayer(this, handle), getNonDuplicateName(name));
+		_addLayer(inserted, context);
 		
-		return insertedNode;
+		return inserted;
 	}
-	public LayerNode addNewDerivedPuppetLayer( Node contextNode, String name, PuppetLayer puppet) {
+	public LayerNode addNewDerivedPuppetLayer( Node context, String name, PuppetLayer puppet) {
 		LayerNode inserted = groupTree.new LayerNode( new PuppetLayer(this, puppet.getBase()), getNonDuplicateName(name));
-		
+		_addLayer(inserted, context);
 		return inserted;
 	}
 	

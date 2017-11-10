@@ -18,7 +18,6 @@ import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.base.util.interpolation.Interpolator2D;
 import spirite.hybrid.HybridHelper;
 
 /**
@@ -96,7 +95,7 @@ public class MaglevMedium implements IMedium {
 	@Override public int getDynamicX() { return (isBuilt) ? builtImage.getXOffset() : 0; }
 	@Override public int getDynamicY() { return (isBuilt) ? builtImage.getYOffset() : 0; }
 
-	@Override public ABuiltMediumData build(BuildingMediumData building) {return new MaglevBuiltImageData(building);}
+	@Override public ABuiltMediumData build(BuildingMediumData building) {return new MaglevBuiltData(building);}
 	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) 
 		{return new MaglevImageDrawer(this, building);}
 
@@ -152,12 +151,12 @@ public class MaglevMedium implements IMedium {
 	}
 	
 
-	public class MaglevBuiltImageData extends ABuiltMediumData {
+	public class MaglevBuiltData extends ABuiltMediumData {
 		MatTrans trans;
 		//final int box;
 		//final int boy;
 		
-		public MaglevBuiltImageData(BuildingMediumData building) 
+		public MaglevBuiltData(BuildingMediumData building) 
 		{
 			super(building.handle);
 			this.trans = building.trans;

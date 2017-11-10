@@ -1,16 +1,20 @@
 package spirite.base.image_data.layers.puppet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
-import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.SkeletonStateDrawer;
 import spirite.base.util.glmath.Rect;
 
 public class PuppetLayer extends Layer {
@@ -29,7 +33,7 @@ public class PuppetLayer extends Layer {
 	}
 	public PuppetLayer( ImageWorkspace context, BasePuppet base) {
 		this.context = context;
-		this.puppet = new Puppet(base);
+		this.puppet = new Puppet(base, context);
 		
 		usingBase = false;
 		selectedPart = puppet.getParts().get(0);
@@ -49,14 +53,18 @@ public class PuppetLayer extends Layer {
 			context.triggerFlash();
 		}
 	}
+	public BasePuppet getBase() {
+		return puppet.getBase();
+	}
+
 	
 	public boolean isSkeletonVisible() {return skeletonVisible;}
 	public void setSkeletonVisible(boolean visible) {
 		skeletonVisible = visible;
 		context.triggerFlash();
 	}
-	public BasePuppet getBase() {
-		return puppet.getBase();
+	public void drawSkeleton( GraphicsContext gc) {
+		
 	}
 
 	// ==========
@@ -65,6 +73,17 @@ public class PuppetLayer extends Layer {
 	public BuildingMediumData getActiveData() {
 		return selectedPart.buildData();
 		//return new BuildingMediumData(__D__medium);
+	}
+	@Override
+	public IImageDrawer getDrawer(BuildingMediumData building, IMedium medium) {
+		if( skeletonVisible) {
+			if( usingBase)
+				return new BaseSkeletonDrawer(puppet.getBase());
+			else if( puppet instanceof Puppet)
+				return new SkeletonStateDrawer((Puppet)puppet);
+		}
+		
+		return super.getDrawer(building, medium);
 	}
 
 	@Override
@@ -94,14 +113,10 @@ public class PuppetLayer extends Layer {
 
 	@Override
 	public List<TransformedHandle> getDrawList() {
-		if( puppet instanceof BasePuppet || !usingBase) 
-			return puppet.getDrawList();
-		
-//		TransformedHandle renderable = new TransformedHandle();
-//		renderable.handle = __D__medium;
-//		renderable.depth = 0;
-			
-		return Arrays.asList( new TransformedHandle[0]);
+		if( usingBase)
+			return puppet.getBase().getDrawList();
+		return puppet.getDrawList();
+
 	}
 
 

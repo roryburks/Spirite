@@ -20,6 +20,9 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.NullAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.mediums.DynamicMedium;
+import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
@@ -224,7 +227,8 @@ public class SpriteLayer extends Layer
 	 * namespace, it must be passed through the UndoEngine.performAndStoreAction
 	 * method.*/
 	public void addPart( RawImage image, String partName) {
-		PartStructure struct = new PartStructure( context.importDynamicData(image), partName, 0, 0, 0, true, 1);
+		PartStructure struct = new PartStructure( context.importMedium( new DynamicMedium(image, 0, 0, context))
+				, partName, 0, 0, 0, true, 1);
 		addPart( struct, (active == null) ? parts.size() : parts.indexOf(active) + 1);
 	}
 	private void addPart( PartStructure structure, int index) {
@@ -425,8 +429,11 @@ public class SpriteLayer extends Layer
 		if( active == null)
 			return null;
 		
-		
 		return new BuildingMediumData(active.structure.handle, active._getOX(), active._getOY());
+	}
+	@Override
+	public IImageDrawer getDrawer(BuildingMediumData building, IMedium medium) {
+		return medium.getImageDrawer(building);
 	}
 
 	@Override
@@ -595,7 +602,5 @@ public class SpriteLayer extends Layer
 		
 		return helper;
 	}
-
-
 
 }

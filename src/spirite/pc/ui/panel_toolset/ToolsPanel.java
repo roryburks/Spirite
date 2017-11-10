@@ -19,6 +19,8 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -33,9 +35,11 @@ import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
+import spirite.pc.ui.components.BoxList;
 
 /**
  * 
@@ -49,7 +53,7 @@ import spirite.hybrid.tools.ToolsetIcons;
  *
  */
 public class ToolsPanel extends JPanel
-        implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MNodeSelectionObserver
+        implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MNodeSelectionObserver, MFlashObserver
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
     private final ToolsetManager toolsetManager;
@@ -65,7 +69,8 @@ public class ToolsPanel extends JPanel
 
     JPanel container;
 
-    ToolButton buttons[];
+    //ToolButton buttons[];
+    BoxList<Tool> boxList = new BoxList<>(null, BUTTON_WIDTH, BUTTON_HEIGHT);
 
 
     public ToolsPanel( MasterControl master) {
@@ -74,6 +79,8 @@ public class ToolsPanel extends JPanel
 
     	toolsetManager.addToolsetObserver(this);
     	master.addWorkspaceObserver(this);
+    	master.addTrackingObserver(MFlashObserver.class, this);
+    	
     	this.currentWorkspaceChanged(master.getCurrentWorkspace(), null);
 
         initComponents();
@@ -93,53 +100,29 @@ public class ToolsPanel extends JPanel
         this.addComponentListener(this);
         this.setPreferredSize(new java.awt.Dimension(140, 140));
 
-        container = new JPanel();
-        add(container);
+        
+        boxList.setRenderer((t, index, selected) -> {
+        	ToolButton btn = new ToolButton(t);
+        	btn.setSelected(selected);
+        	return btn;
+        });
+        boxList.setFocusable(false);
+        
+        //container = new JPanel();
+        add(boxList);
     }
     
+    private List<Tool> currentTools;
     private void Build( List<Tool> tools) {
-    	container.removeAll();
-
-    	if( tools == null) {
-    		buttons = null;
-    		tool_len = 0;
-    	}
-    	else {
-	        buttons = new ToolButton[tools.size()];
-	        tool_len = tools.size();
-	        for( int i=0; i < tools.size(); ++i) {
-	        	buttons[i] = new ToolButton( tools.get(i));
-	        	container.add(buttons[i]);
-	        }
-    	}
-
-        // Calibrate the grid
-        // Note, this is invoked later so that getWidth works correctly
-        SwingUtilities.invokeLater( () -> {calibrateGrid();});
-    }
-
-    /**
-     * Calibrates the Grid such that each button is as close to BUTTON_WIDTH
-     * wide and is exactly BUTTON_HEIGHT tall (unless it needs to squash to fit)
-     */
-    private void calibrateGrid() {
-        GridLayout layout = new GridLayout();
-
-        int cols = Math.max(1, getWidth() / BUTTON_WIDTH);
-        int rows = (int) Math.ceil( tool_len / (float)cols);
-        layout.setColumns( cols);
-        layout.setRows(0);
-        layout.setHgap(0);
-        layout.setVgap(0);
-        container.setLayout(layout);
-
-        container.setMaximumSize(new Dimension( 9999, rows*BUTTON_HEIGHT));
+    	currentTools = tools;
+    	
+    	boxList.resetEntries(tools, -1);
     }
 
     // :::: Component Listener
     @Override
     public void componentResized(ComponentEvent e) {
-        calibrateGrid();
+        //calibrateGrid();
     }
     @Override
     public void componentMoved(ComponentEvent e) {}
@@ -152,20 +135,8 @@ public class ToolsPanel extends JPanel
     @Override public void toolsetPropertyChanged(Tool tool, Property property) {}
     @Override
     public void toolsetChanged( Tool newTool) {
-    	if( buttons == null)
-    		return;
-        for( ToolButton button : buttons) {
-            if( button.tool.equals(newTool)) {
-                if( !button.isSelected()) {
-                    button.setSelected(true);
-                    button.repaint();
-                }
-            }
-            else if( button.isSelected()) {
-                button.setSelected(false);
-                button.repaint();
-            }
-        }
+    	if( currentTools != null)
+    		boxList.setSelectedIndex( currentTools.indexOf(newTool));
     }
 
 
@@ -278,6 +249,12 @@ public class ToolsPanel extends JPanel
 		if( workspace == null)
 			return;
 		Build( toolsetManager.getToolsForDrawer(workspace.getDrawerFromNode(newSelection)));
+	}
+
+
+	@Override
+	public void flash() {
+		//Build( toolsetManager.getToolsForDrawer(workspace.getActiveDrawer()));
 	}
 
 }

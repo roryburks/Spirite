@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.util.glmath.MatTrans;
 
 public class BasePuppet implements IPuppet {

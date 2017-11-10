@@ -606,6 +606,7 @@ public class LayerTreePanel extends ContentTree
 		case "newDerivedPuppet": {
 			PuppetLayer puppet = ((PuppetLayer)((LayerNode)contextMenu.node).getLayer());
 			workspace.addNewDerivedPuppetLayer(workspace.getSelectedNode(), contextMenu.node.getName(), puppet);
+			break;
 		}
 		default:
 			MDebug.log(evt.getActionCommand());
