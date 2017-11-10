@@ -11,7 +11,14 @@ import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.MaglevImageDrawer;
+import spirite.base.pen.StrokeEngine.Method;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.tools.properties.ButtonProperty;
 import spirite.hybrid.tools.properties.CheckBoxProperty;
@@ -120,6 +127,7 @@ public class ToolsetManager
     }
 
     public List<Tool> getToolsForDrawer( IImageDrawer drawer) {
+    	// Hard-coded ones
     	if( drawer instanceof DefaultImageDrawer)
     		return Arrays.asList(ToolsForDefaultDrawer);
     	if( drawer instanceof GroupNodeDrawer)
@@ -127,6 +135,39 @@ public class ToolsetManager
     		//return Arrays.asList(ToolsForGroupDrawer);
     	if( drawer instanceof MaglevImageDrawer)
     		return Arrays.asList(ToolsForMaglevDrawer);
+    	
+    	// Dynamically-constructed ones
+    	List<Tool> list = new ArrayList<>();
+    	
+    	if( drawer instanceof IStrokeModule) {
+    		if( ((IStrokeModule) drawer).canDoStroke(Method.BASIC))
+    			list.add( Tool.PEN);
+    		if( ((IStrokeModule) drawer).canDoStroke(Method.ERASE))
+        		list.add( Tool.ERASER);
+    		if( ((IStrokeModule) drawer).canDoStroke(Method.PIXEL))
+        		list.add( Tool.PIXEL);
+    	}
+    	if( drawer instanceof IFillModule)
+    		list.add(Tool.FILL);
+    	if( drawer instanceof IFlipModule)
+    		list.add(Tool.FLIPPER);
+    	if( drawer instanceof IColorChangeModule)
+    		list.add(Tool.COLOR_CHANGE);
+    	if( drawer instanceof IMagneticFillModule)
+    		list.add( Tool.MAGLEV_FILL);
+    	if( drawer instanceof IWeightEraserModule)
+    		list.add( Tool.EXCISE_ERASER);
+
+    	list.add(Tool.BOX_SELECTION);
+    	list.add(Tool.FREEFORM_SELECTION);
+    	list.add(Tool.MOVE);
+    	list.add(Tool.CROP);
+    	list.add(Tool.RESHAPER);
+    	
+    	list.sort((lhs,rhs) -> {
+    		return lhs.iconLocation - rhs.iconLocation;
+    	});
+    	
     	return null;
     }
     private static Tool[] ToolsForDefaultDrawer = {

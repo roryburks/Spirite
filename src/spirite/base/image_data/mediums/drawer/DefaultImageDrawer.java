@@ -456,7 +456,7 @@ public class DefaultImageDrawer
 	private StrokeEngine activeEngine = null;
 
 	@Override public StrokeEngine getStrokeEngine() {return activeEngine;}
-	@Override public boolean canDoStroke(StrokeParams params) {return true;}
+	@Override public boolean canDoStroke(StrokeEngine.Method method) {return true;}
 
 	@Override
 	public boolean startStroke(StrokeParams params, PenState ps) {

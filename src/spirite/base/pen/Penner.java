@@ -1,12 +1,5 @@
 package spirite.base.pen;
 
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
@@ -14,48 +7,51 @@ import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.BoxSelectionShape;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
-import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;
-import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
-import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
-import spirite.base.pen.PenTraits.PenState;
-import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
-import spirite.base.pen.selection_builders.ASelectionBuilder;
-import spirite.base.pen.selection_builders.FreeformSelectionBuilder2;
-import spirite.base.pen.selection_builders.OvalSelectionBuilder;
-import spirite.base.pen.selection_builders.RectSelectionBuilder;
-import spirite.base.util.Colors;
+import spirite.base.pen.behaviors.CroppingBehavior;
+import spirite.base.pen.behaviors.DrawnStateBehavior;
+import spirite.base.pen.behaviors.EraseBehavior;
+import spirite.base.pen.behaviors.ExciseBehavior;
+import spirite.base.pen.behaviors.FlippingBehavior;
+import spirite.base.pen.behaviors.FormingSelectionBehavior;
+import spirite.base.pen.behaviors.FreeFormingSelectionBehavior;
+import spirite.base.pen.behaviors.GlobalRefMoveBehavior;
+import spirite.base.pen.behaviors.MagFillingBehavior;
+import spirite.base.pen.behaviors.MovingNodeBehavior;
+import spirite.base.pen.behaviors.MovingSelectionBehavior;
+import spirite.base.pen.behaviors.PenBehavior;
+import spirite.base.pen.behaviors.PickBehavior;
+import spirite.base.pen.behaviors.PixelBehavior;
+import spirite.base.pen.behaviors.ReshapingBehavior;
+import spirite.base.pen.behaviors.RigManipulationBehavior;
+import spirite.base.pen.behaviors.RotatingReferenceBehavior;
+import spirite.base.pen.behaviors.StateBehavior;
+import spirite.base.pen.behaviors.ZoomingReferenceBehavior;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.MatTrans.NoninvertableException;
 import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -74,18 +70,18 @@ public class Penner
 	// Contains "Image to Screen" and "Screen to Image" methods.
 	//	Could possibly wrap them in an interface to avoid tempting Penner 
 	//	with UI controls
-	private final WorkPanel context;
-	View view;	
+	public final WorkPanel context;
+	public View view;	
 	
 	
-	private ImageWorkspace workspace;
-	private SelectionEngine selectionEngine;
+	public ImageWorkspace workspace;
+	public SelectionEngine selectionEngine;
 	private UndoEngine undoEngine;
 	//private DrawEngine drawEngine;
-	private final ToolsetManager toolsetManager;
-	final PaletteManager paletteManager;
+	public final ToolsetManager toolsetManager;
+	public final PaletteManager paletteManager;
 	private final SettingsManager settingsManager;
-	private final RenderEngine renderEngine;	// used for color picking.
+	public final RenderEngine renderEngine;	// used for color picking.
 												// might not belong here, maybe in DrawEngine
 	
 
@@ -101,21 +97,21 @@ public class Penner
 	//	of RAM
 	//private int startX;	// Set at the start 
 //	private int startY;
-	int oldX;	// OldX and OldY are the last-checked X and Y primarily used
-	int oldY;	// 	for things that only happen if they change
-	private int rawX;	// raw position are the last-recorded coordinates in pure form
-	private int rawY;	// 	(screen coordinates relative to the component Penner watches over)
-	private int oldRawX;	// Similar to oldX and oldY but for 
-	private int oldRawY;
+	public int oldX;	// OldX and OldY are the last-checked X and Y primarily used
+	public int oldY;	// 	for things that only happen if they change
+	public int rawX;	// raw position are the last-recorded coordinates in pure form
+	public int rawY;	// 	(screen coordinates relative to the component Penner watches over)
+	public int oldRawX;	// Similar to oldX and oldY but for 
+	public int oldRawY;
 	
 	
-	private float pressure = 1.0f;
+	public float pressure = 1.0f;
 	
-	int x;
-	int y;
+	public int x;
+	public int y;
 
 	
-	private StateBehavior behavior;
+	public StateBehavior behavior;
 	
 	public Penner( WorkPanel context, MasterControl master) {
 		this.view = context.getCurrentView();
@@ -201,15 +197,15 @@ public class Penner
 		else if( workspace.getReferenceManager().isEditingReference()) {
 			// Special Reference behavior
 			if( holdingCtrl) {
-				behavior = new ZoomingReferenceBehavior();
+				behavior = new ZoomingReferenceBehavior(this);
 				behavior.start();
 			}
 			else if( holdingShift) {
-				behavior = new RotatingReferenceBehavior();
+				behavior = new RotatingReferenceBehavior(this);
 				behavior.start();
 			}
 			else {
-				behavior = new GlobalRefMoveBehavior();
+				behavior = new GlobalRefMoveBehavior(this);
 				behavior.start();
 			}
 		}
@@ -224,14 +220,14 @@ public class Penner
 			switch( tool) {
 			case PEN:
 				if( holdingCtrl) 
-					behavior = new PickBehavior( mbe.buttonType == ButtonType.LEFT);
+					behavior = new PickBehavior( this, mbe.buttonType == ButtonType.LEFT);
 				else 
-					behavior = new PenBehavior((mbe.buttonType == ButtonType.LEFT) ? 
+					behavior = new PenBehavior(this, (mbe.buttonType == ButtonType.LEFT) ? 
 									paletteManager.getActiveColor(0)
 									: paletteManager.getActiveColor(1));
 				break;
 			case ERASER:
-				behavior = new EraseBehavior();
+				behavior = new EraseBehavior(this);
 				break;
 			case FILL:
 				fill( mbe.buttonType == ButtonType.LEFT);
@@ -240,7 +236,7 @@ public class Penner
 				SelectionMask selection = selectionEngine.getSelection();
 				
 				if( selection != null &&  !holdingShift && !holdingCtrl && selection.contains(x,y)) 
-					behavior = new MovingSelectionBehavior();
+					behavior = new MovingSelectionBehavior(this);
 				else  {
 					ToolSettings settings = toolsetManager.getToolSettings(Tool.BOX_SELECTION);
 
@@ -252,14 +248,14 @@ public class Penner
 					else if( holdingCtrl)
 						mode = BuildMode.SUBTRACT;
 					else mode = BuildMode.DEFAULT;
-					behavior = new FormingSelectionBehavior((BoxSelectionShape)settings.getValue("shape"), mode);
+					behavior = new FormingSelectionBehavior(this, (BoxSelectionShape)settings.getValue("shape"), mode);
 				}
 				break;}
 			case FREEFORM_SELECTION: {
 				SelectionMask selection = selectionEngine.getSelection();
 				
 				if( selection != null && !holdingShift && !holdingCtrl && selection.contains(x,y)) 
-					behavior = new MovingSelectionBehavior();
+					behavior = new MovingSelectionBehavior(this);
 				else  {
 					BuildMode mode;
 					if( holdingShift && holdingCtrl)
@@ -269,33 +265,33 @@ public class Penner
 					else if( holdingCtrl)
 						mode = BuildMode.SUBTRACT;
 					else mode = BuildMode.DEFAULT;
-					behavior = new FreeFormingSelectionBehavior(mode);
+					behavior = new FreeFormingSelectionBehavior(this, mode);
 				}
 				break;}
 			case MOVE:{
 				SelectionMask selection = selectionEngine.getSelection();
 				
 				if(selection != null)
-					behavior = new MovingSelectionBehavior();
+					behavior = new MovingSelectionBehavior(this);
 				else if(workspace.getSelectedNode() != null) 
-					behavior = new MovingNodeBehavior(workspace.getSelectedNode());
+					behavior = new MovingNodeBehavior(this, workspace.getSelectedNode());
 
 				break;}
 			case COLOR_PICKER:
-				behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
+				behavior = new PickBehavior(this, mbe.buttonType == ButtonType.LEFT);
 				break;
 			case PIXEL:
 				if( holdingCtrl)  {
-					behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
+					behavior = new PickBehavior(this, mbe.buttonType == ButtonType.LEFT);
 				}
 				else {
-					behavior = new PixelBehavior((mbe.buttonType == ButtonType.LEFT) ? 
+					behavior = new PixelBehavior(this, (mbe.buttonType == ButtonType.LEFT) ? 
 							paletteManager.getActiveColor(0)
 							: paletteManager.getActiveColor(1));
 				}
 				break;
 			case CROP:
-				behavior = new CroppingBehavior();
+				behavior = new CroppingBehavior(this);
 				break;
 			case COMPOSER:
 				Node node = workspace.getSelectedNode();
@@ -307,7 +303,7 @@ public class Penner
 				SpriteLayer.Part part = rig.grabPart(x-node.getOffsetX(), y-node.getOffsetY(), true);				
 				if( part == null) part = rig.getActivePart();
 				
-				behavior = new RigManipulationBehavior(part, node);
+				behavior = new RigManipulationBehavior(this, part, node);
 //				
 //				if( holdingShift)
 //					behavior = new MovingRigPart(rig, part);
@@ -325,7 +321,7 @@ public class Penner
 					tryFlip(false);
 					break;
 				case 2:
-					behavior = new FlippingBehavior();
+					behavior = new FlippingBehavior(this);
 					break;
 				}
 				break;}
@@ -346,14 +342,14 @@ public class Penner
 					}
 				}
 				if( mbe.buttonType == ButtonType.LEFT) {
-					behavior = new ReshapingBehavior();
+					behavior = new ReshapingBehavior(this);
 				}
 				else {
 				}
 				break;}
 			case COLOR_CHANGE: {
 				if( holdingCtrl)  {
-					behavior = new PickBehavior(mbe.buttonType == ButtonType.LEFT);
+					behavior = new PickBehavior(this, mbe.buttonType == ButtonType.LEFT);
 					break;
 				}
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
@@ -393,7 +389,7 @@ public class Penner
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				
 				if( drawer instanceof IWeightEraserModule) {
-					behavior = new ExciseBehavior( (IWeightEraserModule)drawer);
+					behavior = new ExciseBehavior( this, (IWeightEraserModule)drawer);
 				}
 				else HybridHelper.beep();
 				break;}
@@ -455,997 +451,6 @@ public class Penner
 		this.pressure = MUtil.clip(0, (float)settingsManager.getTabletInterpolator().eval(pressure), 1);
 	}
 	
-	// By design, StateBehavior has and should make use of all local variables
-	//	relevant to it, variables passed to it (if any) are for convenience only
-	//	as the StateBehavior could have either accessed them or caculated them
-	//	itself.
-	abstract class StateBehavior {
-		public abstract void start();
-		public abstract void onTock();
-		public abstract void onMove();
-		
-		// For most StateBehavior, onPenDown will be irrelevant/not make sense
-		//	because their penUp action is to cancel the state.
-		public void onPenDown() {}
-		public void onPenUp() {
-			end();
-		}
-		
-		public void end() {
-			// This effectively ends the state behavior
-			behavior = null;
-		}
-	}
-	
-	abstract class DrawnStateBehavior extends StateBehavior {
-		@Override
-		public void end() {
-			super.end();
-			context.repaint();
-		}
-		public abstract void paintOverlay( GraphicsContext gc);
-	}
-	
-	abstract class StrokeBehavior extends StateBehavior {
-		int shiftX = rawX;
-		int shiftY = rawY;
-		int dx = x;
-		int dy = y;
-		private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
-		protected IStrokeModule drawer;
-		
-		public void startStroke (StrokeEngine.StrokeParams stroke) {
-			if( workspace != null && workspace.buildActiveData() != null) {
-				shiftX = rawX;
-				shiftY = rawY;
-				
-				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof IStrokeModule 
-						&& ((IStrokeModule) drawer).canDoStroke(stroke)
-						&&((IStrokeModule)drawer).startStroke(stroke, new PenState(x,y,pressure))) 
-				{
-					this.drawer = (IStrokeModule) drawer;
-					workspace.setActiveStrokeEngine(this.drawer.getStrokeEngine());
-				}
-				else {
-					end();
-					HybridHelper.beep();
-				}
-			}
-			else {
-				end();
-				HybridHelper.beep();
-			}
-		}
-		
-		@Override
-		public void onTock() {
-			if( holdingShift) {
-				if( shiftMode == -1) {
-					shiftMode = 0;
-					shiftX = rawX;
-					shiftY = rawY;
-				}
-				if( shiftMode == 0) {
-					if( Math.abs(shiftX - rawX) > 10)
-						shiftMode = 1;
-					else if( Math.abs(shiftY - rawY) > 10)
-						shiftMode = 2;
-				}
-				
-				if( shiftMode == 1)
-					dx = x;
-				if( shiftMode == 2)
-					dy = y;
-			}
-			else {
-				shiftMode = -1;
-				dx = x;
-				dy = y;
-			}
-			drawer.stepStroke( new PenState( dx, dy, pressure));
-
-		}
-
-		@Override
-		public void onPenUp() {
-			drawer.endStroke();
-			super.onPenUp();
-		}
-		
-		@Override public void onMove() {}
-		
-		@Override
-		public void end() {
-			workspace.setActiveStrokeEngine(null);
-			super.end();
-		}
-	}
-	
-	class EraseBehavior extends StrokeBehavior {
-		@Override
-		public void start() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.ERASER);
-			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
-			stroke.setMethod( StrokeEngine.Method.ERASE);
-			stroke.setWidth((float)settings.getValue("width"));
-			stroke.setHard((Boolean)settings.getValue("hard"));
-
-			// Start the Stroke
-			startStroke( stroke);
-		}
-	}
-	
-
-	class PenBehavior extends StrokeBehavior {
-		final int color;
-		PenBehavior( int i) {
-			this.color = i;
-		}
-		@Override
-		public void start() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
-			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
-			stroke.setColor( color);
-			stroke.setMode((PenDrawMode)settings.getValue("mode"));
-			stroke.setWidth((float)settings.getValue("width"));
-			stroke.setAlpha((float)settings.getValue("alpha"));
-			stroke.setHard((Boolean)settings.getValue("hard"));
-			
-			// Start the Stroke
-			startStroke( stroke);
-		}
-	}
-	class PixelBehavior extends StrokeBehavior {
-		final int color;
-		PixelBehavior( int i) {
-			this.color = i;
-		}
-		@Override
-		public void start() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
-			StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
-			stroke.setMethod( StrokeEngine.Method.PIXEL);
-			stroke.setAlpha((float)settings.getValue("alpha"));
-			stroke.setHard(true);
-			stroke.setColor( color);
-			stroke.setInterpolationMethod(InterpolationMethod.NONE);
-			startStroke( stroke);
-		}
-	}
-	
-	class PickBehavior extends StateBehavior {
-		final boolean leftClick;
-		
-		PickBehavior( boolean leftClick) {
-			this.leftClick = leftClick;
-		}
-		
-		private void pickColor() {
-			// Get the composed image
-			RenderSettings settings = new RenderSettings(
-					renderEngine.getDefaultRenderTarget(workspace));
-			RawImage img = renderEngine.renderImage(settings);
-			
-			if( !MUtil.coordInImage(x, y, img))
-				return;
-			paletteManager.setActiveColor( (leftClick)?0:1, img.getRGB(x, y));
-		}
-
-		@Override
-		public void start() {
-			pickColor();
-		}
-		@Override
-		public void onMove() {
-			pickColor();
-		}
-		@Override public void onTock() {}
-	}
-	
-	class MovingNodeBehavior extends StateBehavior {
-		final Node node;
-		
-		MovingNodeBehavior( Node node) {
-			this.node = node;
-		}
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			if( node != null && (oldX != x || oldY != y))
-				node.setOffset( node.getOffsetX() + (x - oldX), 
-								 node.getOffsetY() + (y - oldY));
-		}
-	}
-	class MovingSelectionBehavior extends StateBehavior {
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			SelectionMask selection = selectionEngine.getSelection();
-			if( selection == null) 
-				end();
-			else if( oldX != x || oldY != y) {
-				selectionEngine.setOffset( 
-						selection.getOX() + (x - oldX),
-						selection.getOY() + (y - oldY));
-			}
-		}
-	}
-	class ZoomingReferenceBehavior extends StateBehavior {
-		int startx = x;
-		int starty = y;
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			workspace.getReferenceManager().zoomTransform(
-					(float)Math.pow(1.0015, 1+(rawY - oldRawY)), startx, starty);
-		}
-	}
-	class RotatingReferenceBehavior extends StateBehavior {
-		int startx = x;
-		int starty = y;
-		int ox = rawX;
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			float theta = (rawX-ox)*0.05f;
-			ox = rawX;
-			workspace.getReferenceManager().rotateTransform(theta, startx, starty);
-		}
-	}
-	class GlobalRefMoveBehavior extends StateBehavior {
-		@Override public void start() {}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			workspace.getReferenceManager().shiftTransform((x-oldX), (y-oldY));
-		}
-	}
-	
-	class FormingSelectionBehavior extends DrawnStateBehavior {
-		private final BoxSelectionShape shape;
-		private final BuildMode mode;
-		private ASelectionBuilder builder;
-		
-		FormingSelectionBehavior( BoxSelectionShape shape, BuildMode mode) {
-			this.shape = shape;
-			this.mode = mode;
-		}
-		@Override
-		public void start() {
-			
-			switch( shape) {
-			case RECTANGLE:
-				builder = new RectSelectionBuilder(workspace);
-				//builder = selectionEngine.new RectSelectionBuilder();
-				break;
-			case OVAL:
-				builder = new OvalSelectionBuilder(workspace);
-				//builder = selectionEngine.new OvalSelectionBuilder();
-				break;
-			}
-			
-			builder.start(x, y);
-			//selectionEngine.startBuildingSelection( builder, x, y, mode);
-		}
-		@Override
-		public void onMove() {
-			builder.update(x, y);
-			//selectionEngine.updateBuildingSelection(x, y);
-		}
-		@Override
-		public void onPenUp() {
-			selectionEngine.mergeSelection(new SelectionMask(builder.build()), mode);
-			super.onPenUp();
-		}
-		@Override
-		public void onTock() {
-//			selectionEngine.updateBuildingSelection(x, y);
-		}
-		
-		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			if( builder != null) {
-	            MatTrans trans = new MatTrans(gc.getTransform());
-	        	gc.preTransform(view.getViewTransform());
-				gc.setColor( Colors.BLACK);
-				builder.draw(gc);
-				gc.setTransform(trans);
-			}
-		}
-	}
-
-	class FreeFormingSelectionBehavior extends DrawnStateBehavior {
-		private boolean drawing = true;
-		private final BuildMode mode;
-		private FreeformSelectionBuilder2 builder;
-		FreeFormingSelectionBehavior( BuildMode mode) {
-			this.mode = mode;
-		}
-		@Override
-		public void start() {
-			builder = new FreeformSelectionBuilder2(workspace);
-			builder.start(x, y);
-			//builder = selectionEngine.new FreeformSelectionBuilder();
-			//selectionEngine.startBuildingSelection( builder, x, y, mode);
-		}
-
-		@Override
-		public void onMove() {
-			if( drawing && (x != oldX || y != oldY))
-				builder.update(x, y);
-				//selectionEngine.updateBuildingSelection(x, y);
-		}
-		@Override public void onTock() {}
-		public boolean testFinish() {
-			Vec2i p_s = builder.getStart();
-			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				selectionEngine.mergeSelection(new SelectionMask(builder.build()), mode);
-				this.end();
-				return true;
-			}
-			return false;
-		}
-		@Override public void onPenUp() {
-			drawing = false;
-			testFinish();
-		}
-		@Override
-		public void onPenDown() {
-			drawing = true;
-			if( !testFinish())
-				builder.update(x, y);
-				//selectionEngine.updateBuildingSelection(x, y);
-		}
-		@Override
-		public void paintOverlay(GraphicsContext g) {
-            MatTrans trans = new MatTrans(g.getTransform());
-        	g.preTransform(view.getViewTransform());
-			g.setColor( Colors.BLACK);
-			builder.draw(g);
-			g.setTransform(trans);
-			
-			if( !drawing) {
-				Vec2i p_e = builder.getEnd();
-				
-				g.setColor( Colors.BLACK);
-				g.drawLine(view.itsXm(p_e.x), view.itsYm(p_e.y), 
-						view.itsXm(x), view.itsYm(y));
-
-			}
-
-			Vec2i p_s = builder.getStart();
-			if( MUtil.distance(p_s.x, p_s.y, x, y)<=5) {
-				g.setColor( Colors.YELLOW);
-				g.fillOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
-			}
-			else
-				g.drawOval(view.itsXm(p_s.x)-5, view.itsYm(p_s.y) - 5, 10, 10);
-		}
-	}
-	
-	class CroppingBehavior extends DrawnStateBehavior {
-		boolean building = false;
-		boolean modifying = false;
-		Rect cropSection = null;
-		Rect middle;
-		Rect topRight;
-		Rect topLeft;
-		Rect bottomRight;
-		Rect bottomLeft;
-		int startx, starty;
-		//	0x1 : Top
-		//	0x2 : Bottom
-		//	0x4 : Left
-		//	0x8 : Right
-		byte cardinalMap = 0x00;
-
-		static final byte TOPMASK = 0x01;
-		static final byte BOTTOMMASK = 0x02;
-		static final byte LEFTMASK = 0x04;
-		static final byte RIGHTMASK = 0x08;
-//		Rectangle 
-		
-		private void buildCrop( ) {
-			middle = MUtil.scaleRect( cropSection, 0.6f);
-			topLeft = MUtil.scaleRect( cropSection, 0.2f);
-			topLeft.x = cropSection.x;
-			topLeft.y = cropSection.y;
-			topRight = new Rect(topLeft);
-			topRight.x = cropSection.x + cropSection.width - topRight.width;
-			topRight.y = cropSection.y;
-			bottomLeft = new Rect(topLeft);
-			bottomLeft.x = cropSection.x;
-			bottomLeft.y = cropSection.y + cropSection.height - bottomLeft.height;
-			bottomRight = new Rect(topLeft);
-			bottomRight.x = cropSection.x + cropSection.width - bottomRight.width;
-			bottomRight.y = cropSection.y + cropSection.height - bottomRight.height;
-		}
-
-		@Override
-		public void start() {
-			building = true;
-			startx = x;
-			starty = y;
-			cropSection = new Rect( x, y, 0, 0);
-		}
-
-		@Override
-		public void onPenUp() {
-	
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.CROP);
-	
-			cardinalMap = 0;
-
-
-			if( building) {
-				cropSection = MUtil.rectFromEndpoints(
-						startx, starty, x, y);
-				if( (Boolean)settings.getValue("quickCrop")) {
-					workspace.cropNode(
-						workspace.getSelectedNode(), 
-						cropSection,
-						(Boolean)settings.getValue("shrinkOnly"));
-					end();
-				}
-				else
-					buildCrop();
-				
-				building = false;
-			}
-		}
-		
-		@Override public void onTock() {}
-
-		@Override
-		public void onMove() {
-
-			if( building) {
-				cropSection = MUtil.rectFromEndpoints(
-						startx, starty, x, y);
-			}
-			else if( modifying) {
-				if( (cardinalMap & TOPMASK) != 0 ) {
-					cropSection.y += y - oldY;
-					cropSection.height -= (y - oldY);
-				}
-				if( (cardinalMap & BOTTOMMASK) != 0) {
-					cropSection.height += (y - oldY);
-				}
-				if( (cardinalMap & LEFTMASK) != 0) {
-					cropSection.x += (x - oldX);
-					cropSection.width -= (x - oldX);
-				}
-				if( (cardinalMap & RIGHTMASK)!= 0) {
-					cropSection.width+= (x - oldX);
-				}
-				buildCrop();
-			}
-		}
-		
-		@Override
-		public void onPenDown() {
-			if( toolsetManager.getSelectedTool() != Tool.CROP) { end(); return;}
-			
-			if( cropSection == null || !cropSection.contains(x, y)) {
-				building = true;
-				startx = x;
-				starty = y;
-			}
-			else {
-				cardinalMap = 0;
-				
-				if( middle.contains( x, y)) {
-					workspace.cropNode(
-							workspace.getSelectedNode(), 
-							cropSection,
-							(Boolean)toolsetManager.getToolSettings(Tool.CROP).getValue("shrinkOnly"));
-					
-					end();
-				}
-				else if( topRight.contains(x, y)) 
-					cardinalMap = TOPMASK | RIGHTMASK;
-				else if( topLeft.contains(x,y))
-					cardinalMap = TOPMASK | LEFTMASK;
-				else if( bottomLeft.contains(x,y))
-					cardinalMap = BOTTOMMASK| LEFTMASK;
-				else if( bottomRight.contains(x,y))
-					cardinalMap = BOTTOMMASK | RIGHTMASK;
-				
-				if( cardinalMap != 0)
-					modifying = true;
-			}
-		}
-
-		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			
-			// Outline
-/*            Stroke new_stroke = new BasicStroke(
-            		1, 
-            		BasicStroke.CAP_BUTT, 
-            		BasicStroke.JOIN_BEVEL, 
-            		0, 
-            		new float[]{8,4}, 0);
-            g2.setStroke(new_stroke);*/
-            
-            View view = context.getCurrentView();
-            Rect r = view.itsRm(cropSection);
-			gc.setColor(Colors.BLACK);
-            gc.drawRect(r.x, r.y, r.width, r.height);
-			
-
-            // Grey area outside
-//			Composite c = gc.getComposite();
-			int x1 = view.itsXm(0);
-			int y1 = view.itsYm(0);
-			int x2 = view.itsXm(workspace.getWidth());
-			int y2 = view.itsYm(workspace.getHeight());
-
-			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
-			if( r.x + r.width > x2) { r.width = x2 - r.x;}
-
-			gc.setColor(Colors.YELLOW);
-			gc.setComposite(Composite.SRC_OVER, 0.4f);
-			gc.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
-			gc.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
-			gc.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
-			gc.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
-			
-			// The various inner rectangles represenging the modification points
-			if( !building) {
-//				gc.setStroke(new BasicStroke(2.0f));
-				
-				if( middle.contains(x,y)) {
-					r = view.itsRm( middle);
-					gc.setColor(Colors.YELLOW);
-		            gc.drawRect(r.x, r.y, r.width, r.height);
-				}
-
-				if( topRight.contains(x,y))
-					gc.setColor(Colors.YELLOW);
-				else
-					gc.setColor(Colors.WHITE);
-				r = view.itsRm(topRight);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
-
-				if( topLeft.contains(x,y))
-					gc.setColor(Colors.YELLOW);
-				else
-					gc.setColor(Colors.WHITE);
-				r = view.itsRm(topLeft);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
-
-				if( bottomLeft.contains(x,y))
-					gc.setColor(Colors.YELLOW);
-				else
-					gc.setColor(Colors.WHITE);
-				r = view.itsRm(bottomLeft);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
-
-				if( bottomRight.contains(x,y))
-					gc.setColor(Colors.YELLOW);
-				else
-					gc.setColor(Colors.WHITE);
-				r = view.itsRm(bottomRight);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
-			}
-
-			gc.setComposite(Composite.SRC_OVER, 1.0f);
-//    		gc.setComposite(c);
-//    		gc.setStroke(s);
-		}
-	}
-	
-
-	enum TransormStates {
-		READY, ROTATE, RESIZE, MOVING, INACTIVE
-	}
-	abstract class TransformBehavior extends DrawnStateBehavior {
-		
-		private TransormStates state = TransormStates.READY;
-		
-		// The Calculation Transform is a version of the Locked Transform which has
-		//	all the relevent offsets built-in so that calculation changes in mouse
-		//	movement with respect to the selection's center can be easily performed.
-		private MatTrans calcTrans = new MatTrans();
-		
-		private int startX, startY;
-		
-		private float oldScaleX, oldScaleY;
-		private float oldRot;
-		
-		protected int overlap = -1;
-		
-		protected float scaleX, scaleY;
-		protected float translateX, translateY;
-		protected float rotation;
-		protected Rect region;
-
-		protected abstract void onScaleChanged();
-		protected abstract void onTrnalsationChanged();
-		protected abstract void onRotationChanged();
-		
-		private void _internetSetScale( float scaleX, float scaleY) {
-			this.scaleX = scaleX;
-			this.scaleY = scaleY;
-			onScaleChanged();
-		}
-		private void _internalSetTranslation( float transX, float transY) {
-			translateX = transX;
-			translateY = transY;
-			onTrnalsationChanged();
-		}
-		private void _internalSetRotion( float rotation) {
-			this.rotation = rotation;
-			onRotationChanged();
-		}
-		
-		
-		
-		// 0123 : NESW
-		// 4567 : NW NE SE SW
-		// 89AB : NW NE SE SW (rotation)
-		// C : Moving
-		
-		protected MatTrans getWorkingTransform() {
-			MatTrans wTrans = new MatTrans();
-
-			wTrans.preScale(scaleX, scaleY);
-			wTrans.preRotate(rotation);
-			wTrans.preTranslate( translateX, translateY);
-			return wTrans;
-		}
-		
-		protected MatTrans calcDisplayTransform() {
-			float zoom = view.getZoom();
-			MatTrans relTrans = new MatTrans();
-			relTrans.preTranslate(-region.width/2, -region.height/2);
-			relTrans.preConcatenate(getWorkingTransform());
-			relTrans.preTranslate(region.width/2+region.x, region.height/2+region.y);
-			relTrans.preScale(zoom, zoom);
-			relTrans.preTranslate(view.itsX(0), view.itsY(0));
-			
-			return relTrans;
-		}
-
-		
-		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			if( region == null || region.isEmpty() || state == TransormStates.INACTIVE)
-				return;
-			
-			float zoom = view.getZoom();
-			
-			MatTrans origTrans = gc.getTransform();
-			MatTrans relTrans = calcDisplayTransform();
-			
-			gc.setTransform(relTrans);
-
-			int w = region.width;
-			int h = region.height;
-			gc.setColor(Colors.BLACK);
-			gc.drawRect( 0, 0, w, h);
-			
-//			Stroke defStroke = new BasicStroke( 2/zoom);
-			gc.setColor(Colors.GRAY);
-//			gc.setStroke(defStroke);
-			
-			Vec2 p = new Vec2();
-			try {
-				p = relTrans.inverseTransform(new Vec2(rawX,rawY), p);
-			} catch (NoninvertableException e) {
-				e.printStackTrace();
-			}
-			
-			float sw = w*0.3f;	// Width of corner rect
-			float sh = h*0.3f;	// Height
-			float x2 = w*0.7f;	// Offset of right rect
-			float y2 = h*0.7f;	// " bottom
-			float di = Math.max(h*0.2f, 10);	// Diameter of rotate thing
-			float of = h*0.25f*0.2f;
-
-			float b =1/zoom;
-			
-			List<Shape> s = new ArrayList<>(12);
-			s.add(new Rectangle2D.Float(sw+b, b, x2-sw-b*2, sh-b*2));	// N
-			s.add(new Rectangle2D.Float(x2+b, sh+b, sw-b*2, y2-sh-b*2));// E
-			s.add(new Rectangle2D.Float(sw+b, y2+b, x2-sw-b*2, sh-b*2));// S
-			s.add(new Rectangle2D.Float(0+b, sh+b, sw-b*2, y2-sh-b*2));	// W
-			
-			s.add(new Rectangle2D.Float(b, b, sw-b*2, sh-b*2));			// NW
-			s.add(new Rectangle2D.Float(x2+b, b, sw-b*2, sh-b*2));		// NE
-			s.add(new Rectangle2D.Float(x2+b, y2+b, sw-b*2, sh-b*2));	// SE
-			s.add(new Rectangle2D.Float(b, y2+b, sw-b*2, sh-b*2));		// SW
-
-			s.add(new Ellipse2D.Float( -di+of, -di+of, di, di));	// NW
-			s.add(new Ellipse2D.Float( w-of, -di+of, di, di));	// NE
-			s.add(new Ellipse2D.Float( w-of, h-of, di, di));	// SE
-			s.add(new Ellipse2D.Float( -di+of, h-of, di, di));	// SW
-
-			s.add(new Rectangle2D.Float(sw+b, sh+b, x2-sw-b*2, y2-sh-b*2));	// Center
-
-			gc.setComposite(gc.getComposite(), 0.5f);
-			if( this.state == TransormStates.READY)
-				overlap = -1;
-			for( int i=0; i<s.size(); ++i) {
-				Shape shape = s.get(i);
-				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
-					gc.setColor(Colors.YELLOW);
-//					gc.setStroke(new BasicStroke( 4/zoom));
-					gc.draw(shape);
-					gc.setColor(Colors.GRAY);
-//					gc.setStroke(defStroke);
-					overlap = i;
-				}
-				else gc.draw(shape);
-			}
-			gc.setComposite(gc.getComposite(), 1f);
-
-			
-			gc.setTransform(origTrans);
-		}
-
-		@Override
-		public void onMove() {
-			switch( this.state) {
-			case MOVING:
-				
-				if( oldX != x || oldY != y) {
-					_internalSetTranslation( translateX + x - oldX, translateY + y - oldY );
-				}
-				break;
-			case READY:
-				break;
-			case RESIZE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
-
-				calcTrans.transform(new Vec2(rawX,rawY), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
-
-				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.x/ps.x * oldScaleX;
-				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.y/ps.y * oldScaleY;
-				
-				_internetSetScale(sx, sy);
-				break;}
-			case ROTATE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
-
-				calcTrans.transform(new Vec2(rawX,rawY), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
-				
-
-				double start = Math.atan2(ps.y, ps.x);
-				double end =  Math.atan2(pn.y, pn.x);
-				
-				_internalSetRotion((float)(end-start + oldRot));
-				break;}
-			default:
-				break;
-			}
-			// TODO
-			//selectionEngine.proposeTransform(getWorkingTransform());
-		}
-
-		public TransormStates getState() {return state;}
-		protected void setState( TransormStates newState) {
-			switch( newState) {
-			case RESIZE:
-				startX = rawX;
-				startY = rawY;
-				
-				calcTrans = calcDisplayTransform();
-				oldScaleX = scaleX;
-				oldScaleY = scaleY;
-				try {
-					calcTrans = calcTrans.createInverse();
-				} catch (NoninvertableException e) {
-					e.printStackTrace();
-				}
-				break;
-			case ROTATE:
-				startX = rawX;
-				startY = rawY;
-
-				calcTrans = calcDisplayTransform();
-				oldRot = rotation;
-				this.state = TransormStates.ROTATE;
-				try {
-					calcTrans = calcTrans.createInverse();
-				} catch (NoninvertableException e) {
-					e.printStackTrace();
-				}
-				break;
-			default:
-				break;
-			}
-
-			this.state = newState;
-		}
-	}
-
-	class ReshapingBehavior extends TransformBehavior {
-		@Override
-		public void start() {
-			selectionEngine.proposeTransform(new MatTrans());
-			setState(TransormStates.READY);
-		}
-		@Override
-		public void end() {
-			selectionEngine.proposeTransform(null);
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			settings.setValue("scale", new Vec2(1, 1));
-			settings.setValue("translation", new Vec2(0, 0));
-			settings.setValue("rotation", (float)0);
-			super.end();
-		}
-
-		@Override public void onTock() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			Vec2 scale = (Vec2)settings.getValue("scale");
-			Vec2 translation = (Vec2)settings.getValue("translation");
-			this.scaleX = scale.x;
-			this.scaleY = scale.y;
-			this.translateX = translation.x;
-			this.translateY = translation.y;
-			this.rotation = (float)settings.getValue("rotation");
-
-			SelectionMask sel = selectionEngine.getSelection();
-			if( selectionEngine.getSelection() == null){
-				this.end();
-				return;
-			}
-			this.region = MUtil.circumscribeTrans(new Rect(0, 0, sel.getWidth(), sel.getHeight()), selectionEngine.getLiftedDrawTrans(false));
-			
-			Vec2i d = sel.getDimension();
-			
-
-			selectionEngine.proposeTransform(this.getWorkingTransform());
-		}
-
-		@Override public void onPenUp() {
-			setState(TransormStates.READY);
-		}
-		@Override
-		public void onPenDown() {
-			SelectionMask sel =selectionEngine.getSelection();
-			
-			if( sel == null){
-				this.end();
-				return;
-			}
-			
-			if( overlap >= 0 && overlap <= 7)
-				this.setState(TransormStates.RESIZE);
-			else if( overlap >= 8 && overlap <= 0xB)
-				this.setState(TransormStates.ROTATE);
-			else if( overlap == 0xC)
-				this.setState(TransormStates.MOVING);
-		}
-
-		@Override protected void onScaleChanged() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			settings.setValue("scale", new Vec2(scaleX, scaleY));
-		}
-		@Override protected void onTrnalsationChanged() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			settings.setValue("translation", new Vec2(translateX, translateY));
-		}
-		@Override protected void onRotationChanged() {
-			ToolSettings settings = toolsetManager.getToolSettings(Tool.RESHAPER);
-			settings.setValue("rotation", rotation);
-		}
-	}
-	
-	class RigManipulationBehavior extends TransformBehavior {
-		Part selectedPart;
-		final SpriteLayer sprite;
-		final Node node;
-		
-		RigManipulationBehavior( Part selectedPart, Node node) {
-			this.node = node;
-			this.selectedPart = selectedPart;
-			sprite = selectedPart.getContext();
-		}
-		
-		@Override
-		public void start() {
-			this.setState(TransormStates.INACTIVE);
-			
-		}
-		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			if( !(getState() == TransormStates.READY && holdingCtrl))
-				super.paintOverlay(gc);
-		}
-		
-		@Override
-		public void onTock() {
-			Node node = workspace.getSelectedNode();
-			
-			if( workspace.getSelectedNode() != node) 
-				end();
-			else {
-				region = new Rect( 
-						node.getOffsetX() + selectedPart.getImageHandle().getDynamicX(),
-						node.getOffsetY() + selectedPart.getImageHandle().getDynamicY(),
-						selectedPart.getImageHandle().getWidth(),
-						selectedPart.getImageHandle().getHeight());
-				translateX = selectedPart.getTranslationX();
-				translateY = selectedPart.getTranslationY();
-				scaleX = selectedPart.getScaleX();
-				scaleY = selectedPart.getScaleY();
-				rotation = selectedPart.getRotation();
-			}
-			
-			//selectedPart.
-		}
-
-		@Override public void onPenUp() {
-			setState(TransormStates.READY);
-		}
-		@Override
-		public void onPenDown() {
-			if( holdingCtrl) {
-				Part p = sprite.grabPart(x - node.getOffsetX(), y - node.getOffsetY(), true);
-				if( p != null)
-					selectedPart = p;
-			}
-			else {
-				if( overlap >= 0 && overlap <= 7)
-					this.setState(TransormStates.RESIZE);
-				else if( overlap >= 8 && overlap <= 0xB)
-					this.setState(TransormStates.ROTATE);
-				else if( overlap == 0xC)
-					this.setState(TransormStates.MOVING);
-			}
-		}
-
-		@Override protected void onScaleChanged() {_perform();}
-		@Override protected void onTrnalsationChanged() {_perform();}
-		@Override protected void onRotationChanged() { _perform();}
-		private void _perform() {
-			SpriteLayer.PartStructure structure = selectedPart.getStructure();
-			structure.transX = translateX;
-			structure.transY = translateY;
-			structure.scaleX = scaleX;
-			structure.scaleY = scaleY;
-			structure.rot = rotation;
-
-			sprite.modifyPart( selectedPart, structure);
-		}
-	}
-
-	class FlippingBehavior extends StateBehavior {
-		int startX, startY;
-		
-		@Override
-		public void start() {
-			startX = x;
-			startY = y;
-		}
-		@Override
-		public void onMove() {
-			
-		}
-		@Override
-		public void onPenUp() {
-			boolean horizontal = MUtil.distance(x , y, startX, startY) < 5 
-					||Math.abs(x - startX) > Math.abs(y - startY);
-			tryFlip( horizontal);
-			
-			super.onPenUp();
-		}
-		@Override public void onTock() {}
-		
-		
-	}
 	public void tryFlip( boolean horizontal) {
 		IImageDrawer drawer = workspace.getActiveDrawer();
 		SelectionMask selected = selectionEngine.getSelection();
@@ -1470,69 +475,6 @@ public class Penner
 						: MatTrans.ScaleMatrix(1, -1));
 			}
 			else HybridHelper.beep();
-		}
-	}
-	
-	class MagFillingBehavior extends Penner.DrawnStateBehavior {
-		private final Penner penner;
-		IMagneticFillModule drawer;
-		
-		MagFillingBehavior( Penner penner, IMagneticFillModule drawer) {
-			penner.super();
-			this.penner = penner;
-			this.drawer = drawer;
-		}
-		
-		@Override
-		public void paintOverlay(GraphicsContext gc) {
-			gc.setTransform(this.penner.view.getViewTransform());
-			gc.setColor(0xFFFFFF ^ this.penner.paletteManager.getActiveColor(0));
-
-			float[] fx = drawer.getMagFillXs();
-			float[] fy = drawer.getMagFillYs();
-			
-			gc.drawPolyLine(fx, fy, fx.length);
-		}
-
-		@Override public void start() {
-			drawer.startMagneticFill();
-		}
-		@Override public void onTock() {}
-		@Override
-		public void onMove() {
-			drawer.anchorPoints(this.penner.x, this.penner.y, 10, holdingShift, holdingCtrl);
-		}
-		@Override
-		public void onPenUp() {
-			//drawer.anchorPointsHard(x, y, 5);
-			//drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
-			drawer.endMagneticFill(this.penner.paletteManager.getActiveColor(0));
-			super.onPenUp();
-		}
-	}
-	
-	class ExciseBehavior extends StateBehavior {
-		private final IWeightEraserModule drawer;
-		
-		ExciseBehavior( IWeightEraserModule drawer) {
-			this.drawer = drawer;
-		}
-		
-		@Override public void start() {
-			drawer.startWeightErase();
-			onMove();
-		}
-		@Override public void onTock() {}
-
-		@Override
-		public void onMove() {
-			drawer.weightErase(x, y, (Float)toolsetManager.getToolSettings(Tool.EXCISE_ERASER).getProperty("width").getValue());
-		}
-		
-		@Override
-		public void end() {
-			drawer.endWeightErase();
-			super.end();
 		}
 	}
 	

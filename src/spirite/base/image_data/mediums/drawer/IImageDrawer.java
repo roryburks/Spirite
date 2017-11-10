@@ -26,7 +26,7 @@ public interface IImageDrawer {
 	public interface IStrokeModule {
 		//public boolean strokeIsDrawing();	// SHOULD be true iff getStrokeEngine = null
 		public StrokeEngine getStrokeEngine();
-		public boolean canDoStroke( StrokeEngine.StrokeParams params);	// EG: some Drawers might be able to erase, but not draw
+		public boolean canDoStroke( StrokeEngine.Method method);	// EG: some Drawers might be able to erase, but not draw
 		public boolean startStroke( StrokeEngine.StrokeParams params, PenState ps);
 		public void stepStroke( PenState ps);
 		public void endStroke();

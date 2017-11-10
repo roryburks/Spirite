@@ -49,7 +49,7 @@ public class MaglevImageDrawer
 	@Override public StrokeEngine getStrokeEngine() {return strokeEngine;}
 
 	@Override
-	public boolean canDoStroke(StrokeParams params) {
+	public boolean canDoStroke(StrokeEngine.Method method) {
 		return true;
 	}
 

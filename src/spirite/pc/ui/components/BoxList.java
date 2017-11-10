@@ -213,6 +213,7 @@ public class BoxList<T> extends JPanel {
 		entries.clear();
 		entries.addAll(newEntries);
 		rebuild();
+    	repaint();
 	}
 	
 	// ==========
@@ -234,6 +235,10 @@ public class BoxList<T> extends JPanel {
 		
 		scroll.scrollRectToVisible((i == -1) ? new Rectangle(0,0,1,1) : components.get(i).getBounds());
 		
+
+		rebuild();
+    	repaint();
+    	
 		if( selectionAction != null)
 			selectionAction.onSelectionChanged(i);
 	}
