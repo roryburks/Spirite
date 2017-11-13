@@ -1,22 +1,37 @@
 package spirite.pc.ui.panel_layers.layer_properties;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.image_data.ImageWorkspace.MFlashObserver;
+import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
+import spirite.base.image_data.layers.puppet.IPuppet.IPart;
 import spirite.base.image_data.layers.puppet.Puppet;
+import spirite.base.image_data.layers.puppet.Puppet.Part;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
+import spirite.hybrid.HybridUtil;
+import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.BoxList;
+import spirite.pc.ui.components.SliderPanel;
 
 public class PuppetLayerPanel extends JPanel 
-	implements ActionListener
+	implements ActionListener, MFlashObserver
 {
 	private final MasterControl master;
 	private ImageWorkspace workspace;
@@ -25,7 +40,10 @@ public class PuppetLayerPanel extends JPanel
 	PuppetLayerPanel(MasterControl master) {
 		this.master = master;
 		
+		master.addTrackingObserver(MFlashObserver.class, this);
+		
 		initLayout();
+		initBindings();
 		refreshProperties();
 	}
 	
@@ -41,7 +59,12 @@ public class PuppetLayerPanel extends JPanel
 	
 	private JToggleButton btnSkeleton = new JToggleButton();
 	private JToggleButton btnBase = new JToggleButton();
-	private BoxList<Puppet.Part> boxPuppetParts = new BoxList<>(null, 24, 24);
+	private BoxList<BasePart> boxPuppetParts = new BoxList<>(null, 24, 24);
+	private final JButton bNewPart = new JButton();
+	private final JButton bRemovePart = new JButton();
+	private final JToggleButton bNodeVisiblity = new JToggleButton();
+	private final OpacitySlider opacitySlider = new OpacitySlider();
+	
 	private void initLayout() {
 		btnSkeleton.setToolTipText("Toggle Skeleton Visibility");
 		btnSkeleton.setActionCommand("toggleSkeleton");
@@ -54,9 +77,14 @@ public class PuppetLayerPanel extends JPanel
 		btnBase.addActionListener(this);
 		btnBase.setMargin(new Insets(0, 0, 0, 0));
 		
+		bNewPart.setIcon(Globals.getIcon("icon.rig.new"));
+		bRemovePart.setIcon(Globals.getIcon("icon.rig.rem"));
+		
 		int btnHeight = 16;
 		int btnSkelWidth = 24;
 		int btnBaseWidth = 48;
+
+		Dimension btnSize = new Dimension( 24,16);
 		
 		GroupLayout layout = new GroupLayout(this);
 		
@@ -68,7 +96,17 @@ public class PuppetLayerPanel extends JPanel
 					.addComponent(btnSkeleton, btnSkelWidth, btnSkelWidth, btnSkelWidth)
 					.addGap(3)
 					.addComponent(btnBase, btnBaseWidth, btnBaseWidth, btnBaseWidth))
-				.addComponent(boxPuppetParts))
+				.addComponent(boxPuppetParts)
+				.addGroup(layout.createSequentialGroup()
+						.addGap(3)
+						.addComponent(opacitySlider)
+						.addGap(3)
+						.addComponent(bNodeVisiblity, btnSize.width, btnSize.width, btnSize.width)
+						.addGap(3)
+						.addComponent(bNewPart, btnSize.width, btnSize.width, btnSize.width)
+						.addGap(3)
+						.addComponent(bRemovePart, btnSize.width, btnSize.width, btnSize.width)
+						.addGap(3)))
 			.addGap(3));
 		layout.setVerticalGroup(layout.createSequentialGroup()
 			.addGap(3)
@@ -77,9 +115,68 @@ public class PuppetLayerPanel extends JPanel
 				.addComponent(btnSkeleton, btnHeight, btnHeight, btnHeight))
 			.addGap(3)
 			.addComponent(boxPuppetParts)
+			.addGap(3)
+			.addGroup( layout.createParallelGroup()
+				.addComponent(bNodeVisiblity, btnSize.height, btnSize.height, btnSize.height)
+				.addComponent(bNewPart, btnSize.height, btnSize.height, btnSize.height)
+				.addComponent(bRemovePart, btnSize.height, btnSize.height, btnSize.height)
+				.addComponent(opacitySlider, btnSize.height, btnSize.height, btnSize.height)
+			)
 			.addGap(3));
 		
 		this.setLayout(layout);
+	}
+	private void initBindings() {
+		bNewPart.addActionListener((evt) -> {
+			puppet.getBase().addNewPart();
+		});
+		
+		boxPuppetParts.setRenderer((t, ind, selected) -> new PartPanel(t, selected)); 
+	}
+	
+	private class PartPanel extends JPanel{
+		final BasePart part;
+		PartPanel(BasePart part, boolean selected) {
+			this.part = part;
+			
+			setBorder(BorderFactory.createLineBorder((selected)? Color.BLUE : Color.BLACK));
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			
+			//IImage img = part.getImageHandle().deepAccess();
+			
+			float sx = 24f/(float)part.handle.getWidth();
+			float sy = 24f/(float)part.handle.getHeight();
+			
+			float scale = Math.min( sx, sy);
+			
+			RawImage img2 = HybridHelper.createImage(24, 24);
+			GraphicsContext gc = img2.getGraphics();
+			gc.scale(scale, scale);
+			gc.drawHandle(part.handle, 0, 0);
+			
+			
+			g.drawImage( ((ImageBI)HybridUtil.convert(img2, ImageBI.class)).img, 
+					0, 0, null);
+		}
+	}
+	
+	private class OpacitySlider extends SliderPanel {
+		OpacitySlider() {
+			setMin(0.0f);
+			setMax(1.0f);
+			setLabel("Opacity: ");
+		}
+		
+		@Override
+		public void onValueChanged(float newValue) {
+			// TODO
+			//changePartAttributes();
+			super.onValueChanged(newValue);
+		}
 	}
 	
 	private void refreshProperties() {
@@ -89,6 +186,8 @@ public class PuppetLayerPanel extends JPanel
 		
 		btnSkeleton.setEnabled( puppet != null);
 		btnSkeleton.setSelected( puppet != null && puppet.isSkeletonVisible());
+		
+		boxPuppetParts.resetEntries(puppet == null ? null : puppet.getBase().getParts(), 0);
 	}
 	
 	
@@ -105,4 +204,6 @@ public class PuppetLayerPanel extends JPanel
 			break;
 		}
 	}
+
+	@Override public void flash() { refreshProperties();}
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -41,33 +42,35 @@ public class ToolsetManager
 	private final MasterControl master;
 
     public static enum Tool {
-        PEN("Pen", 0),
-        ERASER("Eraser",1),
-        FILL("Fill",2),
-        BOX_SELECTION("Box Selection",3),
-        FREEFORM_SELECTION("Free Selection",4),
-        MOVE("Move",5),
-        PIXEL("Pixel",6),
-        CROP("Cropper",7),
-        COMPOSER("Rig Composer",8),
-        FLIPPER("Horizontal/Vertical Flipping",9),
-        RESHAPER("Reshaping Tool",10),
-        COLOR_CHANGE("Color Change Tool",11),
-        COLOR_PICKER("Color Picker",12),
-        MAGLEV_FILL("Magnetic Fill",13),
-        EXCISE_ERASER("Stroke Erasor", 14),
-        BONE("Bone Constructor", 15),
+        PEN("Pen", 0, 0),
+        ERASER("Eraser",1, 0),
+        FILL("Fill",2, 0),
+        BOX_SELECTION("Box Selection",3, 0),
+        FREEFORM_SELECTION("Free Selection", 0, 1),
+        
+        MOVE("Move", 1, 1),
+        PIXEL("Pixel", 2, 1),
+        CROP("Cropper", 3, 1),
+        COMPOSER("Rig Composer",0, 2),
+        FLIPPER("Horizontal/Vertical Flipping", 1, 2),
+       
+        RESHAPER("Reshaping Tool", 2, 2),
+        COLOR_CHANGE("Color Change Tool", 3, 2),
+        COLOR_PICKER("Color Picker", 0, 3),
+        MAGLEV_FILL("Magnetic Fill", 1, 3),
+        EXCISE_ERASER("Stroke Erasor", 2, 3),
+        
+        BONE("Bone Constructor", 4, 0),
+        FLOPPYBONE("Bone Deformer", 4, 1),
         ;
 
         public final String description;
-        public final int iconLocation;
-        Tool( String name, int offset){
+        public final int iconX, iconY;
+        Tool( String name, int xoffset, int yoffset){
             this.description = name;
 
-            // Could be replaced with .ordinal for now, but since these
-            // numbers are also tied to the position they appear on
-            //	tool_icons.png, it's a good idea to allow for more flexibility
-            this.iconLocation = offset;
+            this.iconX = xoffset;
+            this.iconY = yoffset;
         }
     }
 
@@ -133,9 +136,12 @@ public class ToolsetManager
     		return Arrays.asList(ToolsForDefaultDrawer);
     	if( drawer instanceof GroupNodeDrawer)
     		return Arrays.asList(ToolsForDefaultDrawer);
-    		//return Arrays.asList(ToolsForGroupDrawer);
     	if( drawer instanceof MaglevImageDrawer)
     		return Arrays.asList(ToolsForMaglevDrawer);
+    	if( drawer instanceof BaseSkeletonDrawer)
+			return Arrays.asList(new Tool[] {Tool.BONE});
+//    	if( drawer instanceof GroupNodeDrawer)
+//    		return Arrays.asList(ToolsForGroupDrawer);
     	
     	// Dynamically-constructed ones
     	List<Tool> list = new ArrayList<>();
@@ -166,7 +172,7 @@ public class ToolsetManager
     	list.add(Tool.RESHAPER);
     	
     	list.sort((lhs,rhs) -> {
-    		return lhs.iconLocation - rhs.iconLocation;
+    		return (lhs.iconX + lhs.iconY*100) - (rhs.iconX + rhs.iconY*100);
     	});
     	
     	return null;
@@ -205,7 +211,9 @@ public class ToolsetManager
     		Tool.ERASER, 
     		Tool.PIXEL,
     		Tool.MAGLEV_FILL,
-    		Tool.EXCISE_ERASER
+    		Tool.EXCISE_ERASER,
+    		Tool.BONE,
+    		Tool.FLOPPYBONE
     };
 
     /**

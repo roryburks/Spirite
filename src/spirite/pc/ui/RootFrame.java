@@ -166,6 +166,7 @@ public class RootFrame extends javax.swing.JFrame
     			{"&Image", null, null},
     			{".&Invert", "draw.invert", null},
     			{".&To Color", "draw.toColor", null},
+    			{".&Resize Workspace", "draw.resizeWorkspace", null},
     			
     			{"&Window", null, null},
     			{".&Dialogs", null, null},

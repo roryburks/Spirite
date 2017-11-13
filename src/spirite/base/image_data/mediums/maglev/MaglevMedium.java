@@ -8,6 +8,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -15,6 +16,7 @@ import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
+import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
@@ -30,7 +32,7 @@ import spirite.hybrid.HybridHelper;
 public class MaglevMedium implements IMedium {
 	//final List<MagLevStroke> strokes;
 	//final List<MagLevFill> fills;
-	final List<AMagLevThing> things;
+	List<AMagLevThing> things;
 	
 	final ImageWorkspace context;
 	DynamicImage builtImage = null;
@@ -127,6 +129,13 @@ public class MaglevMedium implements IMedium {
 			builtImage = null;
 		}
 	}
+	
+	public void contortBones(BaseBone bone, Interpolator2D state) {
+		this.things = BoneContorter.contortBones(this.things, bone, state);
+		unbuild();
+		context.getHandleFor(this).refresh();
+	}
+	
 	/** Be careful with these things, they can break. */
 	public List<AMagLevThing> getThings() {
 		return new ArrayList<AMagLevThing>(things);

@@ -25,7 +25,7 @@ public class PuppetLayer extends Layer {
 	
 	public PuppetLayer( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
-		this.puppet = new BasePuppet(firstMedium);
+		this.puppet = new BasePuppet(context, firstMedium);
 		
 		usingBase = true;
 
@@ -37,6 +37,11 @@ public class PuppetLayer extends Layer {
 		
 		usingBase = false;
 		selectedPart = puppet.getParts().get(0);
+	}
+	
+	//
+	public IPuppet getActivePuppet() {
+		return (usingBase) ? puppet.getBase() : puppet;
 	}
 	
 	

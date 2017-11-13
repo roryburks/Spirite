@@ -6,14 +6,18 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
 
 public class BasePuppet implements IPuppet {
 	BasePart rootPart = new BasePart();	// Nill part
+	private final ImageWorkspace context;
 
-	public BasePuppet( MediumHandle firstMedium) {
+	public BasePuppet( ImageWorkspace context, MediumHandle firstMedium) {
+		this.context = context;
 		rootPart.addPart(firstMedium);
 	}
 
@@ -24,7 +28,7 @@ public class BasePuppet implements IPuppet {
 		List<MediumHandle> list = new ArrayList<>(parts.size());
 		
 		for( BasePart part : parts)
-			list.add(part.hadle);
+			list.add(part.handle);
 		
 		return list;
 	}
@@ -37,7 +41,7 @@ public class BasePuppet implements IPuppet {
 		
 		while(!toCheckStack.isEmpty()) {
 			BasePart toCheck = toCheckStack.pop();
-			if( toCheck.hadle != null)
+			if( toCheck.handle != null)
 				list.add(toCheck);
 			for( BasePart child : toCheck.children)
 				toCheckStack.push(child);
@@ -53,7 +57,7 @@ public class BasePuppet implements IPuppet {
 		for( BasePart part : parts) {
 			TransformedHandle th = new TransformedHandle();
 			th.trans = MatTrans.TranslationMatrix(part.ox, part.oy);
-			th.handle = part.hadle;
+			th.handle = part.handle;
 			list.add(th);
 		}
 		
@@ -66,25 +70,25 @@ public class BasePuppet implements IPuppet {
 		final List<BasePart> children = new ArrayList<>(2);
 		
 		int ox, oy;
-		MediumHandle hadle;	// Note: must be maglev medium
+		public MediumHandle handle;	// Note: must be maglev medium
 		BaseBone bone;
 		
 		@Override
 		public BuildingMediumData buildData() {
-			return new BuildingMediumData(hadle, ox, oy);
+			return new BuildingMediumData(handle, ox, oy);
 		}
 		BasePart addPart(MediumHandle medium) {
 			BasePart part = new BasePart();
 			part.parent = this;
-			part.hadle = medium;
+			part.handle = medium;
 			this.children.add(part);
 			
 			return part;
 		}
 	}
 	
-	public class BaseBone {
-		public int x1, y1, x2, y2;
+	public static class BaseBone {
+		public float x1, y1, x2, y2;
 
 		public TreeMap<Float,Float> weightMap = new TreeMap<Float,Float>();
 		
@@ -92,6 +96,15 @@ public class BasePuppet implements IPuppet {
 			weightMap.put(0f, width);
 			weightMap.put(1f, width);
 		}
+	}
+
+	public IPart addNewPart() {
+		MaglevMedium mlm = new MaglevMedium(context);
+		
+		
+		IPart added = rootPart.addPart(context.importMedium(mlm));
+		context.triggerFlash();
+		return added;
 	}
 
 

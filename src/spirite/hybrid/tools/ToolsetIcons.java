@@ -41,18 +41,10 @@ public class ToolsetIcons {
     /** Draws the icon for the given tool.*/
     public static void drawIcon( Graphics g, Tool tool) {
     	if( icon_sheet == null) prepareIconSheet();
-    	int ix = getToolix(tool);
-    	int iy = getTooliy(tool);
+    	int ix = tool.iconX;
+    	int iy = tool.iconY;
         g.drawImage( icon_sheet, 0, 0, TOOL_ICON_WIDTH, TOOL_ICON_HEIGHT,
                 ix*(TOOL_ICON_WIDTH+1), iy*(TOOL_ICON_HEIGHT+1), 
                 ix*(TOOL_ICON_WIDTH+1)+TOOL_ICON_WIDTH, iy*(TOOL_ICON_HEIGHT+1)+TOOL_ICON_HEIGHT, null);
-    }
-
-    // Gets the position the toolset is in the icons.png image
-    private static int getToolix( Tool tool) {
-    	return tool.iconLocation % is_width;
-    }
-    private static int getTooliy( Tool tool) {
-        return tool.iconLocation / is_width;
     }
 }

@@ -20,7 +20,6 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
-import spirite.base.image_data.layers.SpriteLayer;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 public class NodeContextCommand implements CommandExecuter {
@@ -53,7 +52,7 @@ public class NodeContextCommand implements CommandExecuter {
 			}
 		});
 		commandMap.put("animFromRig", () -> {
-			SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
+			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
 			
 			String name = JOptionPane.showInputDialog("Enter name for new Animation:", node.getName());
 			

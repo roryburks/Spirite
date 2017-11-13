@@ -42,6 +42,7 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.jogl.JOGLCore;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.omni.FrameManager;
 
@@ -82,6 +83,7 @@ public class MasterControl
     private final SaveEngine saveEngine;
     private final LoadEngine loadEngine;
     private final Dialogs dialog;
+    private final ContextMenus contextMenus;
 
     private final List<ImageWorkspace> workspaces = new ArrayList<>();
     private ImageWorkspace currentWorkspace = null;
@@ -98,6 +100,7 @@ public class MasterControl
         saveEngine = new SaveEngine(this);
         dialog = new Dialogs(this);
         frameManager = new FrameManager( this);
+        contextMenus = new ContextMenus(this);
 		
 		settingsManager.setGL( true);
 
@@ -136,6 +139,7 @@ public class MasterControl
     public SaveEngine getSaveEngine() { return saveEngine; }
     public LoadEngine getLoadEngine() { return loadEngine; }
     public Dialogs getDialogs() { return dialog; }
+    public ContextMenus getContextMenus() { return contextMenus; }
     
     
     // ==============

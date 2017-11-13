@@ -19,6 +19,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
@@ -30,6 +31,7 @@ import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
+import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.pen.behaviors.CroppingBehavior;
 import spirite.base.pen.behaviors.DrawnStateBehavior;
 import spirite.base.pen.behaviors.EraseBehavior;
@@ -394,6 +396,13 @@ public class Penner
 				else HybridHelper.beep();
 				break;}
 			case BONE: {
+				IImageDrawer drawer = workspace.getActiveDrawer();
+				
+				if( drawer instanceof IBoneDrawer) {
+					behavior = new BoneContortionBehavior(this, (IBoneDrawer) drawer);
+				}else HybridHelper.beep();
+				
+				
 				break;}
 			}
 			

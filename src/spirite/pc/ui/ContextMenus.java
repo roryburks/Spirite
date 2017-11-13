@@ -1,6 +1,7 @@
 package spirite.pc.ui;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import spirite.base.brains.MasterControl;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -27,11 +29,45 @@ import spirite.hybrid.MDebug.WarningType;
 
 public class ContextMenus {
 	public final static JPopupMenu cmenu = new JPopupMenu();
-//	
-//	public void doContextMenu( String[][] menuScheme, MouseEvent evt) {
-//		cmenu.removeAll();
-//		constructMenu(cmenu, menuScheme, listener);
-//	}
+	private final MasterControl master;
+	
+	public ContextMenus( MasterControl master) {
+		this.master = master;
+	}
+	
+	public void doContextMenu(MouseEvent evt, Object object) {
+		ImageWorkspace workspace = master.getCurrentWorkspace();
+		if( workspace == null) return;
+		
+		cmenu.removeAll();
+		
+		String[][] menuScheme = null;
+		
+		if( object instanceof Animation) 
+			menuScheme = constructSchemeForAnimation(workspace, (Animation)object);
+		else if( object instanceof Node)
+			menuScheme = constructSchemeForNode(workspace, (Node)object);
+		
+		constructMenu(cmenu, menuScheme, 
+				(e) -> master.executeCommandString(e.getActionCommand(), object));
+		
+		cmenu.show(evt.getComponent(), evt.getX(), evt.getY());
+	}
+	
+	public void doContextMenu(MouseEvent evt, Node node) {
+		ImageWorkspace workspace = master.getCurrentWorkspace();
+		if( workspace == null) return;
+		
+		cmenu.removeAll();
+		
+		constructMenu(
+				cmenu, 
+				constructSchemeForNode(workspace, node), 
+				(e) -> master.executeCommandString(e.getActionCommand(), node));
+		
+		cmenu.show(evt.getComponent(), evt.getX(), evt.getY());
+	
+	}
 	public static String[][] constructSchemeForAnimation(ImageWorkspace workspace, Animation anim) {
 
 		List<String[]> menuScheme = new ArrayList<>(
@@ -126,6 +162,9 @@ public class ContextMenus {
 	 * @param listener the listener which will be sent the Action when an item is selected
 	 */
 	public static void constructMenu( JComponent root, Object menuScheme[][], ActionListener listener) {
+		if( menuScheme == null)
+			return;
+		
 		JMenuItem new_node;
 		JMenuItem[] active_root_tree = new JMenuItem[UIUtil.MAX_LEVEL];
 		

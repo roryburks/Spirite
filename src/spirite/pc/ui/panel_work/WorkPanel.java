@@ -216,6 +216,10 @@ public class WorkPanel extends javax.swing.JPanel
         public int itsYm( int y) { return (int) (Math.floor(y * zoom) + offsety);}
         public int stiXm( int x) { return (int) Math.floor((x - offsetx) / zoom);}
         public int stiYm( int y) { return (int) Math.floor((y - offsety) / zoom);}
+        public int itsXm( float x) { return (int) (Math.floor(x * zoom) + offsetx);}
+        public int itsYm( float y) { return (int) (Math.floor(y * zoom) + offsety);}
+        public int  stiXm( float x) { return (int) Math.floor((x - offsetx) / zoom);}
+        public int stiYm( float y) { return (int) Math.floor((y - offsety) / zoom);}
 
         public MatTrans getViewTransform() {
         	MatTrans trans = new MatTrans();

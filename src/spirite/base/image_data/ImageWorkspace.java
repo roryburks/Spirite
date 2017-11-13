@@ -242,6 +242,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				&& width < Globals.getMetric("workspace.max_size").width) 
 		{
 			this.width = width;
+			triggerFlash();
 		}
 	}
 	
@@ -251,6 +252,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				&& height < Globals.getMetric("workspace.max_size").height)
 		{
 			this.height = height;
+			triggerFlash();
 		}
 	}
 	

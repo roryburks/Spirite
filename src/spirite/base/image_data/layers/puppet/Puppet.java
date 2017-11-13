@@ -72,7 +72,7 @@ public class Puppet implements IPuppet {
 		
 		Part( BasePart base) {
 			this.base = base;
-			MaglevMedium baseMedium = (MaglevMedium) workspace.getData(base.hadle);
+			MaglevMedium baseMedium = (MaglevMedium) workspace.getData(base.handle);
 			handle = workspace.importMedium( new DerivedMaglevMedium(baseMedium));
 		}
 		

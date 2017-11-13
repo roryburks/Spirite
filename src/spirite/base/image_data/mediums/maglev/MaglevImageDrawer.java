@@ -9,8 +9,10 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
@@ -26,13 +28,15 @@ import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Vec2;
+import spirite.base.util.interpolation.Interpolator2D;
 
 public class MaglevImageDrawer 
 	implements 	IImageDrawer,
 				IStrokeModule,
 				ITransformModule,
 				IMagneticFillModule,
-				IWeightEraserModule
+				IWeightEraserModule,
+				IBoneDrawer
 {
 
 	private final BuildingMediumData building;
@@ -387,6 +391,30 @@ public class MaglevImageDrawer
 	@Override
 	public void erasePoints( float x, float y, float r) {
 		
+	}
+
+	// :::: IBoneDrawer
+	@Override
+	public void startBone(int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateBone(int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void endBone(int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void _DBG_contory(BaseBone bone, Interpolator2D to) {
+		this.img.contortBones(bone, to);
 	}
 
 }

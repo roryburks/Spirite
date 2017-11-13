@@ -370,15 +370,7 @@ public class LayerTreePanel extends ContentTree
 				_node = (Node)usrObj;
 			}
 			
-			final Node node = _node;
-			
-			JPopupMenu contextMenu = ContextMenus.cmenu;
-			contextMenu.removeAll();
-			ContextMenus.constructMenu(
-					contextMenu, 
-					ContextMenus.constructSchemeForNode(workspace,node), 
-					(e) -> {master.executeCommandString(e.getActionCommand(), node);});
-			contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+			master.getContextMenus().doContextMenu(evt, _node);
 		}
 	}
 	

@@ -73,7 +73,41 @@ public class CubicSplineInterpolator2D
         fastCalculateSlopes();
     }
 
-    public float getCurveLength() {return this.distance;}
+    public CubicSplineInterpolator2D(float[] xs, float[] ys, boolean fast) {
+        length = Math.min(xs == null ? 0 : xs.length, ys == null ? 0 : ys.length);
+
+        int l = Math.max(length, 10);
+        kx = new float[l];
+        ky = new float[l];
+        x_ = new float[l];
+        y_ = new float[l];
+        t_ = new float[l];
+        distance = 0;
+
+        if( length != 0) {
+            x_[0] = xs[0];
+            y_[0] = ys[0];
+            t_[0] = 0;
+
+        }
+
+        for( int i=1; i<length; ++i) {
+            x_[i] = xs[i];
+            y_[i] = ys[i];
+            t_[i] = (float) (distance + MUtil.distance(x_[i-1], y_[i-1], x_[i], y_[i]));
+            distance = t_[i];
+        }
+
+        this.fast = fast;
+
+//            if( !fast)
+//                MDebug.handleWarning(MDebug.WarningType.UNSUPPORTED, null, "Precise smoothing not implemented.");
+
+        fastCalculateSlopes();
+	}
+    
+
+	public float getCurveLength() {return this.distance;}
     public int getNumPoints() {return this.length;}
     public float getX(int n) {return x_[n];}
     public float getY(int n) {return y_[n];}

@@ -138,4 +138,6 @@ public class MTextFieldNumber extends JTextField implements DocumentListener {
 		checkIfOOB();
 	}
 
+	public void setInt(int width) {setText(Integer.toString(width));}
+
 }

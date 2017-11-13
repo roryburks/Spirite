@@ -3,11 +3,14 @@ package spirite.base.image_data.mediums.drawer;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.interpolation.Interpolator2D;
 
 public interface IImageDrawer {
 
@@ -84,5 +87,6 @@ public interface IImageDrawer {
 		public void startBone( int x, int y);
 		public void updateBone( int x, int y);
 		public void endBone( int x, int y);
+		public void _DBG_contory( BaseBone bone, Interpolator2D to);
 	}
 }

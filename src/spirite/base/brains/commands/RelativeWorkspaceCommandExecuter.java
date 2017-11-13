@@ -179,6 +179,10 @@ public class RelativeWorkspaceCommandExecuter implements CommandExecuter {
 			}
 		});
 		
+		commandMap.put("resizeWorkspace", () -> {
+			master.getDialogs().callResizeLayer(workspace);
+		});
+		
 
 		commandMap.put("addGapQuick", () -> {
 			Frame frame = workspace.getAnimationManager().getSelectedFrame();

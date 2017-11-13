@@ -16,9 +16,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.TestGLDiag;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
+import spirite.pc.ui.dialogs.root.JResizeWorkspace;
 
 /***
  * A static centalized namespace for calling the various Dialogs.
@@ -212,6 +214,23 @@ public class Dialogs
     		return fc.getSelectedFile();
     	}
     	return null;
+    }
+    
+    public void callResizeLayer(ImageWorkspace workspace) {
+    	JResizeWorkspace panel = new JResizeWorkspace(workspace);
+
+		int response = JOptionPane.showConfirmDialog(null,
+			panel,
+			"Resize Workspace",
+			JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.PLAIN_MESSAGE);
+		
+		if( response == JOptionPane.OK_OPTION) {
+			workspace.setWidth(panel.getValueWidth());
+			workspace.setHeight(panel.getValueHeight());
+		}
+		
+		return;
     }
     
     public NewLayerHelper callNewLayerDialog( ImageWorkspace workspace) {
