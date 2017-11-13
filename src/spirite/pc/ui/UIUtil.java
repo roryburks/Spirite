@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
@@ -17,10 +16,6 @@ import java.util.Map.Entry;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -28,9 +23,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import spirite.base.util.MUtil;
-import spirite.hybrid.Globals;
-import spirite.hybrid.MDebug;
-import spirite.hybrid.MDebug.WarningType;
 
 public class UIUtil {
 	private static final Color c1 = new Color( 168,168,168);
@@ -91,7 +83,7 @@ public class UIUtil {
 	}
 	
 	public static final int MAX_LEVEL = 10;
-    private static int _imCountLevel( String s){
+    public static int _imCountLevel( String s){
     	int r = 0;
     	while( r < s.length() && s.charAt(r) == '.')
     		r++;
@@ -126,112 +118,6 @@ public class UIUtil {
     }
     
     /***
-	 * Constructs a menu from an array of objects corresponding to the menu scheme as such:
-	 * 
-	 * The menuScheme is an n-by-3 array 
-	 * -The first string represents the menu title as well as its structure (see below)
-	 * -The second string represents the actionCommand
-	 * -The third string represents the icon associated with it (using Globals.getIcon)
-	 * 
-	 * Each dot before the name indicates the level it should be in.  For example one dot
-	 *   means it goes inside the last zero-dot item, two dots means it should go in the last
-	 *   one-dot item, etc.  Note: if you skip a certain level of dot's (eg: going from
-	 *   two dots to four dots), then the extra dots will be ignored, possibly resulting
-	 *   in unexpected menu form.
-	 * The & character before a letter represents the Mnemonic key that should be associated
-	 *   with it.
-	 * If the title is simply - (perhaps after some .'s representing its depth), then it is
-	 *   will simply construct a separator and will ignore the last two elements in the
-	 *   array (in fact they don't need to exist).
-	 * @param root the Component (be it JPopupMenu or JMenuBar or other) to construct the menu into
-	 * @param menuScheme See Above
-	 * @param listener the listener which will be sent the Action when an item is selected
-     */
-	public static void constructMenu( JComponent root, Object menuScheme[][], ActionListener listener) {
-		JMenuItem new_node;
-    	JMenuItem[] active_root_tree = new JMenuItem[MAX_LEVEL];
-    	
-    	// If root is a JMenuBar, make sure that all top-level nodes are JMenu's
-    	//	instead of JMenuItems (otherwise they glitch out the bar)
-    	boolean isMenuBar = (root instanceof JMenuBar);
-    	boolean isPopupMenu = (root instanceof JPopupMenu);
-    	
-    	// Atempt to construct menu from parsed data in menu_scheme
-    	int active_level = 0;
-    	for( int i = 0; i < menuScheme.length; ++i) {
-    		if( menuScheme[i].length == 0 || !(menuScheme[i][0] instanceof String))
-    			continue;
-    		
-    		String title = (String)menuScheme[i][0];
-    		char mnemonic = '\0';
-    		
-    		// Determine the depth of the node and crop off the extra .'s
-    		int level =_imCountLevel(title);
-    		title = title.substring(level);
-    		
-    		if( level > active_level ) {
-    			MDebug.handleWarning(WarningType.INITIALIZATION, null, "Bad Menu Scheme.");
-    			level = active_level;
-    		}
-    		active_level = level+1;
-    		
-    		// If it's - that means it's a separator
-    		if( title.equals("-")) {
-    			if( level == 0 ) {
-    				if( isPopupMenu)
-    					((JPopupMenu)root).addSeparator();
-    			}
-    			else
-    				((JMenu)active_root_tree[level-1]).addSeparator();
-    			
-    			active_level--;
-    			continue;
-    		}
-    		
-    		// Detect the Mnemonic
-    		int mind = title.indexOf('&');
-    		if( mind != -1 && mind != title.length()-1) {
-    			mnemonic = title.charAt(mind+1);
-    			title = title.substring(0, mind) + title.substring(mind+1);
-    		}
-    		
-    		
-    		// Determine if it needs to be a Menu (which contains other options nested in it)
-    		//	or a plain MenuItem (which doesn't)
-    		if( (level != 0 || !isMenuBar) && (i+1 == menuScheme.length || _imCountLevel((String)menuScheme[i+1][0]) <= level)) {
-    			new_node = new JMenuItem( title);
-    		}
-    		else {
-    			new_node = new JMenu( title);
-    		}
-    		if( mnemonic != '\0') {
-    			new_node.setMnemonic(mnemonic);
-    		}
-    		
-
-    		if( menuScheme[i].length > 1 && menuScheme[i][1] instanceof String) {
-    			new_node.setActionCommand((String)menuScheme[i][1]);
-    			
-    			if( listener != null)
-    				new_node.addActionListener(  listener);
-    		}
-    		
-    		if( menuScheme[i].length > 2 && menuScheme[i][2] instanceof String)
-    			new_node.setIcon(Globals.getIcon((String)menuScheme[i][2]));
-    		
-    		// Add the MenuItem into the appropriate context
-    		if( level == 0) {
-    			root.add( new_node);
-    		}
-    		else {
-    			active_root_tree[level-1].add(new_node);
-    		}
-    		active_root_tree[ level] = new_node;
-    	}
-	}
-	
-
-	/***
 	 * Called when an overlaying component (such as a GlassPane) eats a mouse event, but
 	 * still wants the components bellow to receive it.
 	 */

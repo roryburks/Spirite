@@ -28,7 +28,7 @@ public class MagLevStroke extends AMagLevThing {
 		case CUBIC_SPLINE:
 			interpolator = new CubicSplineInterpolator2D(null, true);
 			break;
-		default:
+		default:	
 			interpolator = null;
 			break;
 		}

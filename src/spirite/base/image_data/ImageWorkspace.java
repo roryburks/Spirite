@@ -701,7 +701,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	
 	public LayerNode addNewRigLayer( Node context, int w, int h, String name, int argb) {
-		RawImage img = HybridHelper.createImage(w, h);
+		RawImage img = HybridHelper.createImage(1, 1);
 		
 		GraphicsContext gc = img.getGraphics();
         gc.setColor( argb);

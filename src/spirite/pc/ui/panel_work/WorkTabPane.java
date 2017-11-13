@@ -19,7 +19,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.pen.Penner;
-import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
 /**
@@ -138,7 +138,7 @@ public class WorkTabPane extends JTabbedPane
 					};
 					
 					contextMenu.removeAll();
-					UIUtil.constructMenu(contextMenu, menuScheme, this);
+					ContextMenus.constructMenu(contextMenu, menuScheme, this);
 					contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 				}
 			}

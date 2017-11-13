@@ -49,6 +49,7 @@ import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.hybrid.Globals;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.UIUtil;
 
 public class AnimationSchemeTreePanel extends JPanel 
@@ -267,7 +268,7 @@ public class AnimationSchemeTreePanel extends JPanel
 								{"Delete Animation", "remAnim", null}
 							};
 							contextMenu.removeAll();
-							UIUtil.constructMenu(contextMenu, menuScheme, contextMenu);
+							ContextMenus.constructMenu(contextMenu, menuScheme, contextMenu);
 							contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 							break;
 						}

@@ -28,7 +28,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
 import spirite.hybrid.Globals;
-import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.dialogs.Dialogs;
 
 public class PalettePanel extends JPanel 
@@ -340,7 +340,7 @@ public class PalettePanel extends JPanel
 			}
 			
 			contextMenu.removeAll();
-			UIUtil.constructMenu(contextMenu, menuScheme, this);
+			ContextMenus.constructMenu(contextMenu, menuScheme, this);
 			contextMenu.show(this, btnLoadPalette.getX() + 24, btnLoadPalette.getY() - 10);
 		}
 		else if( evt.getSource() == btnSavePalette) {
@@ -357,7 +357,7 @@ public class PalettePanel extends JPanel
 			menuScheme[palettes.size()+1] = new String[]{"Save as New Palette", "savenew"};
 			
 			contextMenu.removeAll();
-			UIUtil.constructMenu(contextMenu, menuScheme, this);
+			ContextMenus.constructMenu(contextMenu, menuScheme, this);
 			contextMenu.show(this, btnLoadPalette.getX() + 24, btnLoadPalette.getY() - 10);
 		}
 		else if(evt.getActionCommand() != null) {

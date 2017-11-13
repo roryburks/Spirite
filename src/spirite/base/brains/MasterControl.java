@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import com.jogamp.opengl.GL2;
 
 import spirite.base.brains.commands.GlobalCommandExecuter;
+import spirite.base.brains.commands.NodeContextCommand;
 import spirite.base.brains.commands.RelativeWorkspaceCommandExecuter;
 import spirite.base.brains.commands.SelectionCommandExecuter;
 import spirite.base.file.LoadEngine;
@@ -107,6 +108,7 @@ public class MasterControl
         	new GlobalCommandExecuter(this),
         	new RelativeWorkspaceCommandExecuter(this),
         	new SelectionCommandExecuter(this),
+        	new NodeContextCommand(this),
         	toolset,
         	palette,
         	frameManager,
@@ -348,6 +350,9 @@ public class MasterControl
     // ==========
     // ==== Command Execution
     public void executeCommandString( String command) {
+    	executeCommandString(command, null);
+    }
+    public void executeCommandString( String command, Object extra) {
     	String space = (command == null)?"":command.substring(0, command.indexOf("."));
     	String subCommand = command.substring(space.length()+1);
     	
@@ -357,7 +362,7 @@ public class MasterControl
     	for( CommandExecuter executer : executers) {
     		if( executer.getCommandDomain().equals(space)) {
     			attempted = true;
-    			if(executer.executeCommand(subCommand))
+    			if(executer.executeCommand(subCommand, extra))
     				executed = true;
     		}
     	}
@@ -397,7 +402,7 @@ public class MasterControl
     public interface CommandExecuter {
     	public abstract List<String> getValidCommands();
     	public String getCommandDomain();
-    	public boolean executeCommand( String command);
+    	public boolean executeCommand( String command, Object extra);
     }
     
    

@@ -226,7 +226,7 @@ public class GlobalCommandExecuter implements CommandExecuter {
 	}
 
 	@Override
-	public boolean executeCommand(String command) {
+	public boolean executeCommand(String command, Object extra) {
 		Runnable runnable = commandMap.get(command);
 		currentWorkspace = master.getCurrentWorkspace();
 		

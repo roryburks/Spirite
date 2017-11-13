@@ -193,7 +193,7 @@ public class RelativeWorkspaceCommandExecuter implements CommandExecuter {
 	}
 
 	@Override
-	public boolean executeCommand(String command) {
+	public boolean executeCommand(String command, Object extra) {
 		Runnable runnable = commandMap.get(command);
 		
 		if( runnable != null) {

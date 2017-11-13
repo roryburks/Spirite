@@ -188,7 +188,7 @@ public class RootFrame extends javax.swing.JFrame
     	};
     	
     	JMenuBar jMenuBar = new JMenuBar();
-    	UIUtil.constructMenu(jMenuBar, menuScheme, this);
+    	ContextMenus.constructMenu(jMenuBar, menuScheme, this);
     	
     	
         setJMenuBar(jMenuBar);
@@ -231,7 +231,7 @@ public class RootFrame extends javax.swing.JFrame
 		}
 		
 		@Override
-		public boolean executeCommand(String command) {
+		public boolean executeCommand(String command, Object extra) {
 	    	zoomer = workPane.getZoomerForWorkspace(master.getCurrentWorkspace());;
 	    	if( zoomer == null) return true;
 	    	

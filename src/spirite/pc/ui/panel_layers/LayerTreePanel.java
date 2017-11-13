@@ -8,15 +8,11 @@ import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.EventObject;
@@ -25,7 +21,6 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -45,11 +40,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.file.AnimIO;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;
-import spirite.base.image_data.Animation;
-import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -62,25 +54,20 @@ import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.RigAnimation;
-import spirite.base.image_data.layers.Layer;
-import spirite.base.image_data.layers.SpriteLayer;
-import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.UIUtil;
-import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 
 public class LayerTreePanel extends ContentTree 
 	implements MImageObserver, MWorkspaceObserver, MNodeSelectionObserver,
-	 TreeSelectionListener, TreeExpansionListener, ActionListener
+	 TreeSelectionListener, TreeExpansionListener
 {
 	private final LayersPanel context;
 	public LayerTreePanel(MasterControl master, LayersPanel context) {
@@ -374,69 +361,23 @@ public class LayerTreePanel extends ContentTree
 	protected void clickPath(TreePath path, MouseEvent evt) {
 		super.clickPath(path, evt);
 		if( evt.getButton() == MouseEvent.BUTTON3) {
-			
-			// All-context menu items
-			List<String[]> menuScheme = new ArrayList<>(
-				Arrays.asList(new String[][] {
-					{"&New..."},
-					{".New Simple &Layer", "newLayer", "new_layer"},
-					{".New Layer &Group", "newGroup", "new_group"},
-					{".New &Rig Layer", "newRig", null},
-					{".New &Puppet Layer", "newPuppet", null},
-				})
-			);
-			contextMenu.node = null;
-			
-			// Construct the base Context Menu
-			
-			if( path != null) {
-				DefaultMutableTreeNode node = 
-						(DefaultMutableTreeNode)path.getLastPathComponent();
-				Object usrObj = node.getUserObject();
-				contextMenu.node = (Node)usrObj;
-				
-				String descriptor = "...";
-				if( usrObj instanceof GroupNode) {
-					descriptor = "Layer Group";
-				}
-				if( usrObj instanceof LayerNode) {
-					descriptor = "Layer";
-				}
-	
-				// All-node related menu items
-				menuScheme.addAll(Arrays.asList(new String[][] {
-						{"-"},
-						{"D&uplicate "+descriptor, "duplicate", null}, 
-						{"&Delete  "+descriptor, "delete", null}, 
-				}));
-				
-				// Add parts to the menu scheme depending on node type
-				if( usrObj instanceof GroupNode) {
-					menuScheme.add( new String[] {"-"});
-					menuScheme.add( new String[] {"&Construct Simple Animation From Group", "animfromgroup", null});
-					if( workspace.getAnimationManager().getSelectedAnimation() instanceof FixedFrameAnimation)
-						menuScheme.add( new String[]{"&Add Group To Animation As New Layer", "animinsert", null});
-					menuScheme.add( new String[] {"&Write Group To GIF Animation", "giffromgroup", null});
-				}
-				else if( usrObj instanceof LayerNode) {
-					menuScheme.add( new String[] {"-"});
-					Layer layer = ((LayerNode) usrObj).getLayer();
-					if( layer.canMerge(((LayerNode)usrObj).getNextNode())) {
-						menuScheme.add( new String[]{"&Merge Layer Down", "mergeDown", null});
-					}
-					if( layer instanceof SpriteLayer) {
-						menuScheme.add( new String[] {"Construct &Rig Animation From Sprite", "animFromRig",null});
-					}
-					if( layer instanceof PuppetLayer) {
-						menuScheme.add( new String[] {"Add &Derived Puppet Layer", "newDerivedPuppet", null});
-					}
-				}
-			}
+			Node _node = null;
 
-			// Show the ContextMenu
-			contextMenu.removeAll();
-			UIUtil.constructMenu(contextMenu, menuScheme.toArray( new String[0][]), this);
+			if( path != null) {
+				DefaultMutableTreeNode treeNode = 
+						(DefaultMutableTreeNode)path.getLastPathComponent();
+				Object usrObj = treeNode.getUserObject();
+				_node = (Node)usrObj;
+			}
 			
+			final Node node = _node;
+			
+			JPopupMenu contextMenu = ContextMenus.cmenu;
+			contextMenu.removeAll();
+			ContextMenus.constructMenu(
+					contextMenu, 
+					ContextMenus.constructSchemeForNode(workspace,node), 
+					(e) -> {master.executeCommandString(e.getActionCommand(), node);});
 			contextMenu.show(evt.getComponent(), evt.getX(), evt.getY());
 		}
 	}
@@ -464,15 +405,6 @@ public class LayerTreePanel extends ContentTree
 		return false;
 	}
 	
-	
-	
-	
-	private final LTPContextMenu contextMenu = new LTPContextMenu();
-	class LTPContextMenu extends JPopupMenu {
-		Node node = null;
-		
-		public LTPContextMenu() {}
-	}
 
 	// :::: TreeExpansionListener
 	@Override
@@ -498,9 +430,7 @@ public class LayerTreePanel extends ContentTree
 
 	// :::: WorkspaceObserver
 	@Override
-	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {
-		contextMenu.node = null;
-		
+	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {		
 		// Remove assosciations with the old Workspace and add ones to the new
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
@@ -522,96 +452,6 @@ public class LayerTreePanel extends ContentTree
 	@Override	public void newWorkspace( ImageWorkspace arg0) {}
 	@Override	public void removeWorkspace( ImageWorkspace arg0) {}
 	
-
-	// :::: ActionListener
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		
-		// ActionCommands from JPopupMenu
-		switch( evt.getActionCommand()) {
-		case "animfromgroup":{
-			GroupNode group = (GroupNode)contextMenu.node;
-			
-			String name = JOptionPane.showInputDialog("Enter name for new Animation:", group.getName());
-			
-			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new FixedFrameAnimation(group, name, true));
-			break;}
-		case "giffromgroup":{
-			GroupNode group = (GroupNode)contextMenu.node;
-			try {
-				AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;}
-		case "animFromRig": {
-			SpriteLayer sprite = (SpriteLayer)((LayerNode)contextMenu.node).getLayer();
-			
-			String name = JOptionPane.showInputDialog("Enter name for new Animation:", contextMenu.node.getName());
-			
-			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new RigAnimation((LayerNode) contextMenu.node, name));
-			
-			break;}
-		case "animinsert":{
-			GroupNode group = (GroupNode)contextMenu.node;
-			AnimationManager manager = workspace.getAnimationManager();
-			Animation anim  = manager.getSelectedAnimation();
-			if( anim instanceof FixedFrameAnimation) {
-				((FixedFrameAnimation) anim).importGroup(group, true);
-			}
-			
-			break;}
-		case "animBreakBind":
-			AnimationManager manager = workspace.getAnimationManager();
-//			manager.
-
-			// TODO
-			break;
-		case "newGroup":
-			workspace.addGroupNode(contextMenu.node, "New Group");
-			break;
-		case "newLayer": {
-			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
-			if( helper != null) {
-				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
-			}
-			break;}
-		case "duplicate":
-			workspace.duplicateNode(contextMenu.node);
-			break;
-		case "delete":
-			workspace.removeNode(contextMenu.node);
-			break;
-		case "mergeDown":
-			if( contextMenu.node instanceof LayerNode)	// should be unnecessary
-				workspace.mergeNodes( contextMenu.node.getNextNode(), (LayerNode) contextMenu.node);
-			break;
-		case "newRig":{
-
-			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
-			
-			if( helper != null) 
-				workspace.addNewRigLayer(workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color.getRGB());
-			break;}
-		case "newPuppet": {
-			String name = JOptionPane.showInputDialog("Enter name for new Animation:", 
-					workspace.getNonDuplicateName("puppetLayer"));
-			workspace.addNewPuppetLayer( workspace.getSelectedNode(), name);
-			
-			break;}
-		case "newDerivedPuppet": {
-			PuppetLayer puppet = ((PuppetLayer)((LayerNode)contextMenu.node).getLayer());
-			workspace.addNewDerivedPuppetLayer(workspace.getSelectedNode(), contextMenu.node.getName(), puppet);
-			break;
-		}
-		default:
-			MDebug.log(evt.getActionCommand());
-		}
-	}
 	
 	/** TreeCellRender */
 	private class LTPCellRenderer extends DefaultTreeCellRenderer {
@@ -861,14 +701,13 @@ public class LayerTreePanel extends ContentTree
 	}
 	@Override
 	protected boolean importOut( Transferable trans) {
-			try {
-				workspace.moveInto(nodeFromTransfer(trans), nodeRoot, false);
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) io");
-				return false;
-			}
+		try {
+			workspace.moveInto(nodeFromTransfer(trans), nodeRoot, false);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Bad Transfer (NodeTree) io");
+			return false;
+		}
 	}
 }
-

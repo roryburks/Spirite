@@ -18,7 +18,6 @@ import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.CubicSplineInterpolatorND;
 import spirite.base.util.interpolation.Interpolator2D;
 

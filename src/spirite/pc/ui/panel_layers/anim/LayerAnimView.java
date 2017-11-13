@@ -5,9 +5,12 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
@@ -25,6 +28,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
 import spirite.pc.ui.components.BetterTree.BTNode;
@@ -197,6 +201,7 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 		if( toAdd == null)
 			return;
 
+		toAdd.setUserObject(node);
 		toAdd.setDnDBindings( new NodeBinding(node));
 		
 		if( branch == null)

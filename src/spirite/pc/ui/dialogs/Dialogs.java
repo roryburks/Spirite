@@ -269,7 +269,7 @@ public class Dialogs
 	}
 
 	@Override
-	public boolean executeCommand(String commmand) {
+	public boolean executeCommand(String commmand, Object extra) {
 		return openDialog(commmand);
 	}
 }

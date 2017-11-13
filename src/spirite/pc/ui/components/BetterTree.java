@@ -24,6 +24,9 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -168,16 +171,20 @@ public class BetterTree extends JPanel {
 	
 	public abstract class BTNode {
 		protected Component title;
-		private DnDBinding binding = null;
 		
 		protected final JPanel rootPanel = new JPanel();
 		
 		protected abstract Component BuildContent();
 		abstract List<BTNode> GetLeafs();
 		public Component getTitle() {return title;}
-		
+
+		private DnDBinding binding = null;
 		public void setDnDBindings(DnDBinding binding) { this.binding = binding;}
 		public DnDBinding getBinding() {return binding;}
+		
+		private Object userObject;
+		public void setUserObject(Object object) {this.userObject = object;}
+		public Object getUserObject() {return this.userObject;}
 	}
 	
 	
@@ -276,6 +283,14 @@ public class BetterTree extends JPanel {
 			if( _expanded) {
 				for( BTNode node : subNodes) {
 					Component component = node.BuildContent();
+//					component.addMouseListener(new MouseAdapter() {
+//						public void mousePressed(MouseEvent e) {
+//							System.out.println("TEST");
+//							for( MouseListener other : BetterTree.this.getMouseListeners()) {
+//								other.mousePressed(SwingUtilities.convertMouseEvent((Component) e.getSource(), e, BetterTree.this));
+//							}
+//						};
+//					});
 					innerHorGroup.addComponent(component, 0, 0, Short.MAX_VALUE);
 					innerVertGroup.addComponent(component);
 					dnd.addDropSource(component);

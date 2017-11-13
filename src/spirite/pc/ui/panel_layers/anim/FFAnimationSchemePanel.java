@@ -47,7 +47,7 @@ import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
-import spirite.pc.ui.UIUtil;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
 import spirite.pc.ui.panel_layers.anim.dialogs.ResizeLocalLoopDialog;
@@ -178,7 +178,7 @@ public class FFAnimationSchemePanel extends JPanel
 					contextMenu.removeAll();
 					
 
-					UIUtil.constructMenu(contextMenu, new Object[][] {
+					ContextMenus.constructMenu(contextMenu, new Object[][] {
 						{"&Delete Animation", "deleteAnimation"},
 					}, cmenuListener);
 					
@@ -440,7 +440,7 @@ public class FFAnimationSchemePanel extends JPanel
 				{"&Delete Node","deleteNode"},
 				{"Copy As Reference","refer"},
 			};
-			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+			ContextMenus.constructMenu(contextMenu, menuScheme, cmenuListener);
 			contextMenu.show(this, cmenuPoint.x, cmenuPoint.y);
 			break;}
 		case START_LOCAL_LOOP:{
@@ -450,7 +450,7 @@ public class FFAnimationSchemePanel extends JPanel
 				{"&Resize Local Loop", "resizeLocalLoop"},
 			};
 			cmenuObject = frame;
-			UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+			ContextMenus.constructMenu(contextMenu, menuScheme, cmenuListener);
 			contextMenu.show(this, cmenuPoint.x, cmenuPoint.y);
 			break;}
 		default:
@@ -990,7 +990,7 @@ public class FFAnimationSchemePanel extends JPanel
 							contextMenu.removeAll();
 							Object[][] menuScheme = {{"Remove Gap", (isAfter)?"removeGapAfter":"removeGapBefore"}};
 							cmenuObject = frame;
-							UIUtil.constructMenu(contextMenu, menuScheme, cmenuListener);
+							ContextMenus.constructMenu(contextMenu, menuScheme, cmenuListener);
 							contextMenu.show(NillFramePanel.this, e.getX(), e.getY());
 						}
 						

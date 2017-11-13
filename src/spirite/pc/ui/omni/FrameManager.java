@@ -326,7 +326,7 @@ public class FrameManager
 	}
 
 	@Override
-	public boolean executeCommand(String command) {
+	public boolean executeCommand(String command, Object extra) {
 		int dot = command.indexOf('.');
 		
 		if( dot != -1) {

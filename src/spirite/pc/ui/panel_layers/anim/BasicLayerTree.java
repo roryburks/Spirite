@@ -4,21 +4,26 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
+import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
 import spirite.pc.ui.components.BetterTree.BTNode;
@@ -39,6 +44,39 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 		
     	this.setLayout(new GridLayout());
 		this.add(tree);
+
+		tree.addMouseListener( new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( e.getButton() == MouseEvent.BUTTON3) {
+					JPopupMenu cmenu = ContextMenus.cmenu;
+					cmenu.removeAll();
+					BTNode btnode = tree.getNodeAtPoint(e.getPoint());
+
+					System.out.println(btnode);
+					if( btnode == null)
+						return;
+					
+					Object usrObj = btnode.getUserObject();
+					if( usrObj instanceof AnimationNode) {
+						final Animation animation = ((AnimationNode) usrObj).getAnimation();
+						ContextMenus.constructMenu(
+								cmenu, 
+								ContextMenus.constructSchemeForAnimation(ws, animation),
+								(e2) -> master.executeCommandString(e2.getActionCommand(), animation));
+					}
+					else {
+						final Node node = ((Node)usrObj);
+						ContextMenus.constructMenu(
+								cmenu, 
+								ContextMenus.constructSchemeForNode(ws, node),
+								(e2) -> master.executeCommandString(e2.getActionCommand(), node));
+					}
+					
+					cmenu.show(tree, e.getX(), e.getY());
+				}
+			}
+		});
 		
 		Rebuild();
 	}

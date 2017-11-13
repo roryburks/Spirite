@@ -266,7 +266,7 @@ public class PaletteManager
 	}
 
 	@Override
-	public boolean executeCommand(String command) {
+	public boolean executeCommand(String command, Object extra) {
     	switch (command) {
     	case "swap":
     		toggleActiveColors();
