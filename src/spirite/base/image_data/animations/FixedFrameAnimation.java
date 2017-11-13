@@ -393,7 +393,7 @@ public class FixedFrameAnimation extends Animation
 					
 					frames.add(solFrame);
 					int subLen = _gluRec( oldMap, newMap, (GroupNode)child);
-					if( usingNew)
+					if( usingNew || solFrame.length < subLen)	// Could be a better way to do this
 						solFrame.length = subLen;
 					frames.add(new Frame(null, 0, Marker.END_LOCAL_LOOP));
 					

@@ -84,6 +84,7 @@ public class AnimationPreviewPanel extends OmniComponent
     private final JSlider slider = new JSlider();
     private final SliderLimiter sliderLimiter = new SliderLimiter();
     private final JSpinner spinner = new JSpinner();
+    private final JButton buttonColor = new JButton();
     
 	
     /**
@@ -170,6 +171,8 @@ public class AnimationPreviewPanel extends OmniComponent
             			.addComponent(tfFPS, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
             			.addPreferredGap(ComponentPlacement.RELATED)
             			.addComponent(lblFps)
+            			.addGap(5)
+            			.addComponent(buttonColor, size.width, size.width, size.width)
             			.addContainerGap(0, Short.MAX_VALUE)
             			.addComponent(lbZoom)
             			.addComponent(spinner, 40,40,40)
@@ -209,7 +212,8 @@ public class AnimationPreviewPanel extends OmniComponent
             				.addComponent(buttonForward, size.height, size.height, size.height)
                 			.addComponent(spinner, size.height, size.height, size.height)
                 			.addComponent(lbZoom, size.height, size.height, size.height)
-            				.addComponent(buttonExport, size.height, size.height, size.height))
+            				.addComponent(buttonExport, size.height, size.height, size.height)
+            				.addComponent(buttonColor, size.height, size.height, size.height))
             		)
         		)
     			.addGap(5)
@@ -247,12 +251,14 @@ public class AnimationPreviewPanel extends OmniComponent
 				return zoom_level+1;
 			}
 		});
-        spinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				previewPanel.repaint();
-			}
+        spinner.addChangeListener( (e) -> {
+			previewPanel.repaint();
 		});
+        
+        buttonColor.addActionListener((evt) -> {
+        	previewPanel.setBackground(
+        			master.getDialogs().pickColor(previewPanel.getBackground()));
+        });
     }
     // End Design
     

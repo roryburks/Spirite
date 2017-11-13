@@ -286,8 +286,10 @@ public abstract class StrokeEngine {
 		
 		
 		if( localInterpolator != null) {
-			if( penStates.size() <= 1)
+			if( penStates.size() == 0)
 				return new DrawPoints(new float[0],new float[0],new float[0]);
+			if( penStates.size() == 1)
+				return new DrawPoints(new float[] {penStates.get(0).x},new float[] {penStates.get(0).y},new float[] {params.dynamics.getSize(penStates.get(0))});
 			FloatCompactor fcx = new FloatCompactor();
 			FloatCompactor fcy = new FloatCompactor();
 			FloatCompactor fcw = new FloatCompactor();
