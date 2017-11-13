@@ -61,25 +61,7 @@ public class MaglevMedium implements IMedium {
 	
 	public ImageWorkspace getContext() {return context;}
 	
-//	public void boneConform( float x1, float y1, float x2, float y2, Interpolator2D to) {
-//		Vec2 b = new Vec2(x2-x1, y2-y1);
-//		float scale_b = b.getMag();
-//		float scale_b_s = scale_b*scale_b;
-//		
-//		for( MagLevThing thing : things) {
-//			float[] toTransform = thing.getPoints();
-//			if( toTransform == null) continue;
-//			
-//			for( int i=0; i < toTransform.length; i += 2) {
-//				Vec2 a = new Vec2(toTransform[i]-x1, toTransform[i+1]-y1);
-//				
-//				float scale_a = a.getMag();
-//				float a1 = a.getMag();
-//				Vec2 a2 = a.sub(b.scalar(a.dot(b)/b.dot(b)));
-//			}
-//			
-//		}
-//	}
+
 	
 	void addThing( AMagLevThing thing) {
 		things.add(thing);

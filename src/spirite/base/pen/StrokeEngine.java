@@ -73,9 +73,9 @@ public abstract class StrokeEngine {
 	public static final double DIFF = 1;
 	
 	// Pen States
-	protected PenState oldState = new PenState();
-	protected PenState newState = new PenState();
-	protected PenState rawState = new PenState();	// Needed to prevent UndoAction from double-tranforming
+	protected float oldX, oldY, oldP;
+	protected float newX, newY, newP;
+	protected float rawX, rawY, rawP;	// Needed to prevent UndoAction from double-tranforming
 	protected StrokeEngine.STATE state = StrokeEngine.STATE.READY;
 	protected ArrayList<PenState> prec = new ArrayList<>();	// Recording of raw states
 
@@ -139,15 +139,15 @@ public abstract class StrokeEngine {
 			prec = new ArrayList<PenState>();
 			Vec2i layerSpace = (built.convert(new Vec2i((int)Math.round(ps.x),(int)Math.round(ps.y))));
 			
-			oldState.x = layerSpace.x;
-			oldState.y = layerSpace.y;
-			oldState.pressure = ps.pressure;
-			newState.x = layerSpace.x;
-			newState.y = layerSpace.y;
-			newState.pressure = ps.pressure;
-			rawState.x = ps.x;
-			rawState.y = ps.y;
-			rawState.pressure = ps.pressure;
+			oldX = layerSpace.x;
+			oldY = layerSpace.y;
+			oldP = ps.pressure;
+			newX = layerSpace.x;
+			newY = layerSpace.y;
+			newP = ps.pressure;
+			rawX = ps.x;
+			rawY = ps.y;
+			rawP = ps.pressure;
 			prec.add( ps);
 			
 			state = StrokeEngine.STATE.DRAWING;
@@ -202,31 +202,31 @@ public abstract class StrokeEngine {
 		building.doOnBuiltData((built) -> {
 
 			Vec2i layerSpace = built.convert( new Vec2i( (int)Math.round(ps.x), (int)Math.round(ps.y)));
-			newState.x = layerSpace.x;
-			newState.y = layerSpace.y;
-			newState.pressure = ps.pressure;
-			rawState.x = ps.x;
-			rawState.y = ps.y;
-			rawState.pressure = ps.pressure;
+			newX = layerSpace.x;
+			newY = layerSpace.y;
+			newP = ps.pressure;
+			rawX = ps.x;
+			rawY = ps.y;
+			rawP = ps.pressure;
 			
 			if( state != StrokeEngine.STATE.DRAWING || built == null) {
 				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
 				return;
 			}
 			
-			if( oldState.x != newState.x || oldState.y != newState.y)
+			if( oldX != newX || oldY != newY)
 			{
-				prec.add( new PenState( rawState));
+				prec.add( new PenState( rawX, rawY, rawP));
 				if( _interpolator != null) 
-					_interpolator.addPoint(rawState.x, rawState.y);
+					_interpolator.addPoint(rawX, rawY);
 
 				prepareDisplayLayer();
 				changed.set( this.drawToLayer( buildPoints(_interpolator, prec, stroke), false, built));
 			}
 
-			oldState.x = newState.x;
-			oldState.y = newState.y;
-			oldState.pressure = newState.pressure;
+			oldX = newX;
+			oldY = newY;
+			oldP = newP;
 		});
 		
 		return changed.get();
@@ -464,8 +464,10 @@ public abstract class StrokeEngine {
 			out.mode = original.mode;
 			out.width = original.width;
 			
-			for( int i=0; i<penStates.length; ++i)
-				penStates[i].pressure = original.getDynamics().getSize(penStates[i]);
+			for( int i=0; i<penStates.length; ++i) {
+				penStates[i] = new PenState( penStates[i].x, penStates[i].y,
+						original.getDynamics().getSize(penStates[i]));
+			}
 			
 			return out;
 		}

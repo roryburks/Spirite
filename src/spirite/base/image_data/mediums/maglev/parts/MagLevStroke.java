@@ -72,8 +72,7 @@ public class MagLevStroke extends AMagLevThing {
 	@Override
 	public void setPoints(float[] xy) {
 		for( int i=0; i<states.length; ++i) {
-			states[i].x = xy[i*2];
-			states[i].y = xy[i*2+1];
+			states[i] = new PenState(xy[i*2], xy[i*2+1], states[i].pressure);
 		}
 		Interpolator2D interpolator;
 		switch( params.getInterpolationMethod()){
@@ -89,5 +88,9 @@ public class MagLevStroke extends AMagLevThing {
 				interpolator.addPoint(ps.x, ps.y);
 		}
 		direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
+	}
+
+	public PenState[] getPenstates() {
+		return states;
 	}
 }

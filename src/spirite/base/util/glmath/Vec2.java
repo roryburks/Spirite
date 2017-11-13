@@ -36,6 +36,9 @@ public class Vec2 {
     public float dot( Vec2 rhs) {
         return this.x *rhs.x + this.y * rhs.y;
     }
+	public float cross(Vec2 rhs) {
+		return x*rhs.y - y*rhs.x;
+	}
 
     @Override
     public boolean equals(Object obj) {

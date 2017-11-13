@@ -211,7 +211,7 @@ public class BoxList<T> extends JPanel {
 	public void resetEntries( Collection<T> newEntries, int selected) {
 		selectedIndex = selected;
 		entries.clear();
-		if( newEntries != null)
+		if( newEntries != null && newEntries.size() > 0)
 			entries.addAll(newEntries);
 		rebuild();
     	repaint();

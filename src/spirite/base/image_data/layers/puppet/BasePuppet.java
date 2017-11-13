@@ -84,7 +84,7 @@ public class BasePuppet implements IPuppet {
 	}
 	
 	public class BaseBone {
-		int x1, y1, x2, y2;
+		public int x1, y1, x2, y2;
 
 		public TreeMap<Float,Float> weightMap = new TreeMap<Float,Float>();
 		

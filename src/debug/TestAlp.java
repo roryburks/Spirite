@@ -11,7 +11,22 @@ import spirite.base.util.glu.GLUtil.GLUTCB;
 public class TestAlp {
 
     public static void main(String[] args) {
-    	(new d003_synchronizedLocks())._do();
+    	(new d004_crossProduct())._do();
+    }
+    
+    public static class d004_crossProduct
+    {
+    	public void _do() {
+    		Vec2 b = new Vec2(100,100);
+    		Vec2 a = new Vec2(0, 100);
+			
+			float scale_b = b.getMag();
+			
+			float t =  a.dot(b) / scale_b;
+			float m = a.cross(b) / scale_b;
+			
+			System.out.println((t / scale_b) + ":" + m);
+    	}
     }
     
     public static class d003_synchronizedLocks
