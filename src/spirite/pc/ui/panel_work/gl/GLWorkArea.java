@@ -48,32 +48,20 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  * 
  * @author Rory Burks
  */
-public class GLWorkArea 
-	implements WorkArea, GLEventListener, MImageObserver, MSelectionEngineObserver, MReferenceObserver, MFlashObserver
+public class GLWorkArea extends WorkArea
+	implements GLEventListener
 {
-	private static final Color normalBG = Globals.getColor("workArea.normalBG");
-	private static final Color referenceBG = Globals.getColor("workArea.referenceBG");
-	
-//	private final WorkPanel context;
 	private final GLEngine engine = GLEngine.getInstance();
 	private final GLJPanel canvas;
-
-	private ImageWorkspace workspace = null;
-	private SelectionEngine selectionEngine;
-	private ReferenceManager referenceManager;
-	private View view;
-	
-	private final JPenPenner penner;
 	
 	public GLWorkArea(WorkPanel context, MasterControl master) {
+		super( context);
 //		this.context = context;
 		
 		// Create UI Component
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities glcapabilities = new GLCapabilities( glprofile );
 		canvas = new GLJPanel(glcapabilities);
-		
-		this.penner = context.getJPenner();
 		
 		// Add Input Listeners
 		AwtPenToolkit.addPenListener(canvas, context.getJPenner());
@@ -107,66 +95,14 @@ public class GLWorkArea
 		engine.setGL(gl);
 		engine.setTarget(0);
 		
-		gl.glViewport(0, 0, w, h);
 		
-		// Clear Background Color
+		gl.glViewport(0, 0, w, h);
 		Color c = (referenceManager == null || !referenceManager.isEditingReference())?normalBG:referenceBG;
 	    FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer( 
 	    		new float[] {c.getRed()/255.0f, c.getGreen()/255.0f, c.getBlue()/255.0f, 0f});
         gl.glClearBufferfv(GL2.GL_COLOR, 0, clearColor);
         
-        if( workspace != null) {
-        	// :::: Draw Background Grid
-    		Rect rect = new Rect( view.itsX(0), view.itsY(0), 
-    				(int)Math.round(workspace.getWidth()*view.getZoom()),
-	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
-    		glgc.drawTransparencyBG(rect, 8);
-
-        	MatTrans viewTrans = view.getViewTransform();
-
-        	// :::: Draw Image with References
-        	RenderEngine renderEngine = workspace.getRenderEngine();
-        	
-        	glgc.setTransform(viewTrans);
-        	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
-        	renderEngine.renderReference(workspace, glgc, false);
-        	
-        	glgc.setComposite(Composite.SRC_OVER, 1);
-        	renderEngine.renderWorkspace(workspace, glgc, viewTrans);
-
-        	glgc.setTransform(viewTrans);
-        	glgc.setComposite(Composite.SRC_OVER, workspace.getReferenceManager().getRefAlpha());
-        	renderEngine.renderReference(workspace, glgc, true);
-        	glgc.setComposite(Composite.SRC_OVER, 1);
-
-            // :::: Draw Border around the active Data
-        	
-        	BuildingMediumData active = workspace.buildActiveData();
-        	
-        	if( active != null) {
-        		active.doOnBuiltData((built) -> {
-
-                	glgc.setComposite(glgc.getComposite(), 0.3f);
-                    glgc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
-                    
-                    built.drawBorder(glgc);
-        		});
-        	}
-            
-        	// :::: Draw Selection Bounds
-        	SelectionMask selection = selectionEngine.getSelection();
-
-            if( selection != null) {
-            	MatTrans selTrans = viewTrans;
-            	selTrans.concatenate(selectionEngine.getLiftedDrawTrans());
-            	glgc.setTransform(selTrans);
-            	selection.drawBounds(glgc);
-            }
-            
-        	glgc.setTransform(null);
-            if( penner.drawsOverlay())
-            	penner.paintOverlay(glgc);
-        }
+		drawWork(glgc);
         
         engine.setTarget(0);
 
@@ -192,42 +128,7 @@ public class GLWorkArea
 
 	// :::: WorkArea
 	@Override
-	public void changeWorkspace(ImageWorkspace ws, View view) {
-		if( workspace != null) {
-			workspace.removeImageObserver(this);
-			workspace.removeFlashObserve(this);
-			selectionEngine.removeSelectionObserver(this);
-			referenceManager.removeReferenceObserve(this);
-		}
-		workspace = ws;
-		selectionEngine = (ws == null)?null:ws.getSelectionEngine();
-		referenceManager = (ws == null)?null:ws.getReferenceManager();
-		if( workspace != null) {
-			workspace.addImageObserver(this);
-			workspace.addFlashObserve(this);
-			selectionEngine.addSelectionObserver(this);
-			referenceManager.addReferenceObserve(this);
-		}
-		this.view = view;
-	}
-
-	@Override
 	public Component getComponent() {
 		return canvas;
 	}
-
-	// :::: MImageObserver
-	@Override public void imageChanged(ImageChangeEvent evt) { canvas.repaint(); }
-	@Override public void structureChanged(StructureChangeEvent evt) { canvas.repaint(); }
-	
-	// :::: MSelectionObserver
-	@Override public void selectionBuilt(SelectionEvent evt) { canvas.repaint(); }
-	@Override public void buildingSelection(SelectionEvent evt) { canvas.repaint(); }
-
-	// :::: MReferenceObserver
-	@Override public void referenceStructureChanged(boolean hard) { canvas.repaint(); }
-	@Override public void toggleReference(boolean referenceMode) { canvas.repaint(); }
-
-	// :::: MFlashObserver
-	@Override public void flash() {canvas.repaint(); }
 }

@@ -8,6 +8,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.GroupLayout;
+import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;
@@ -25,8 +26,8 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  *
  * @author Rory Burks
  */
-public class WorkSplicePanel extends javax.swing.JPanel 
-	implements MReferenceObserver, MouseWheelListener, WorkArea
+public class WorkSplicePanel extends WorkArea
+	implements MReferenceObserver, MouseWheelListener
 {
 	private static final long serialVersionUID = 1L;
 	final WorkPanel context;
@@ -39,12 +40,14 @@ public class WorkSplicePanel extends javax.swing.JPanel
     private final ReferencePanel previewPanel;
     private final ReferencePanel previewPanelBack;
     
+    
     Color normalBG = Globals.getColor("workArea.normalBG");
     Color referenceBG = Globals.getColor("workArea.referenceBG");
     /**
      * Creates new form WorkSplicePanel
      */
     public WorkSplicePanel( WorkPanel context, MasterControl master) {
+    	super(context);
     	this.context = context;
         this.zoomer = context.getCurrentView();
         previewPanel = new ReferencePanel(context, master, true);
@@ -60,13 +63,29 @@ public class WorkSplicePanel extends javax.swing.JPanel
         offsetx = 0;
         offsety = 0;
     }
+
+    private final JPanel content = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+        	super.paintComponent(g);
+            // Draw Transparency BG
+        	if( zoomer != null) {
+    	        int dx = (zoomer.itsX(0) >= 0)?0:-zoomer.itsX(0);
+    	        int dy = (zoomer.itsY(0) >= 0)?0:-zoomer.itsY(0);
+    	        UIUtil.drawTransparencyBG(g, new Rectangle( 
+    	        		Math.max(0, zoomer.itsX(0)),
+    	        		Math.max(0, zoomer.itsY(0)),
+    	        		Math.min(getWidth(), (int)Math.round(workspace.getWidth()*zoomer.getZoom())-2-dx),
+    	        		Math.min(getHeight(), (int)Math.round(workspace.getHeight()*zoomer.getZoom())-2-dy)),
+    	        		8);
+        	}
+        }
+    };
  
     private void initComponents() {
+        content.setPreferredSize(new java.awt.Dimension(420, 322));
 
-
-        setPreferredSize(new java.awt.Dimension(420, 322));
-
-        GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new javax.swing.GroupLayout(content);
 
         layout.setHorizontalGroup( layout.createParallelGroup()
         		.addComponent(previewPanel)
@@ -76,33 +95,17 @@ public class WorkSplicePanel extends javax.swing.JPanel
         		.addComponent(previewPanel)
         		.addComponent(drawPanel)
         		.addComponent(previewPanelBack));
-        this.setLayout(layout);
+        content.setLayout(layout);
     }                      
     
 
-    @Override
-    protected void paintComponent(Graphics g) {
-    	super.paintComponent(g);
-        // Draw Transparency BG
-    	if( zoomer != null) {
-	        int dx = (zoomer.itsX(0) >= 0)?0:-zoomer.itsX(0);
-	        int dy = (zoomer.itsY(0) >= 0)?0:-zoomer.itsY(0);
-	        UIUtil.drawTransparencyBG(g, new Rectangle( 
-	        		Math.max(0, zoomer.itsX(0)),
-	        		Math.max(0, zoomer.itsY(0)),
-	        		Math.min(getWidth(), (int)Math.round(workspace.getWidth()*zoomer.getZoom())-2-dx),
-	        		Math.min(getHeight(), (int)Math.round(workspace.getHeight()*zoomer.getZoom())-2-dy)),
-	        		8);
-    	}
-    }
 
               
     // :::: MReferenceObserver
 	@Override	public void referenceStructureChanged(boolean hard) {}
 	@Override
 	public void toggleReference(boolean referenceMode) {
-		setBackground( referenceMode ? referenceBG : normalBG);
-		
+		content.setBackground( referenceMode ? referenceBG : normalBG);
 	}
 
 	// :::: MouseWheelListener
@@ -132,7 +135,7 @@ public class WorkSplicePanel extends javax.swing.JPanel
 
 	@Override
 	public Component getComponent() {
-		return this;
+		return content;
 	}        
 
 }

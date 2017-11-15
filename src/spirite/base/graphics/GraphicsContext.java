@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.Rect;
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 
@@ -118,5 +119,8 @@ public abstract class GraphicsContext {
 	}
 	public void popTransform() {
 		setTransform(stack.pop());
+	}
+
+	public void drawTransparencyBG(Rect rect, int i) {
 	}
 }

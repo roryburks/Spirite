@@ -29,6 +29,26 @@ public abstract class ABuiltMediumData {
 	public abstract void draw(GraphicsContext gc);
 	public abstract void drawBorder( GraphicsContext gc);
 
+	protected abstract void _doOnGC( DoerOnGC doer);
+	protected abstract void _doOnRaw( DoerOnRaw doer);
+	
+	
+	/** Returns a transform converting from screen space to layer space. */
+	public abstract MatTrans getScreenToImageTransform();
+
+	/** Converts the given point in ImageSpace to BuiltActiveData space*/
+	public abstract Vec2i convert( Vec2i p);
+	/** Converts the given point in ImageSpace to BuiltActiveData space*/
+	public abstract Vec2 convert( Vec2 p);
+
+	public abstract Rect getBounds();
+
+	/** Returns a transform representing how to convert the image from its internal
+	 * image space to a composited image space (for normal Images, this is the
+	 * Identity Matrix, for DynamicImages, since they allow editing anywhere on the
+	 * screen, this is equal to the conversion from layerspace to screen space)*/
+	public abstract MatTrans getCompositeTransform();
+
 	public interface DoerOnGC {
 		public void Do( GraphicsContext gc);
 	}
@@ -61,22 +81,4 @@ public abstract class ABuiltMediumData {
 		
 		handle.refresh();
 	}
-	protected abstract void _doOnGC( DoerOnGC doer);
-	protected abstract void _doOnRaw( DoerOnRaw doer);
-	
-	
-	/** Returns a transform converting from screen space to layer space. */
-	public abstract MatTrans getScreenToImageTransform();
-
-	/** Converts the given point in ImageSpace to BuiltActiveData space*/
-	public abstract Vec2i convert( Vec2i p);
-	public abstract Vec2 convert( Vec2 p);
-
-	public abstract Rect getBounds();
-
-	/** Returns a transform representing how to convert the image from its internal
-	 * image space to a composited image space (for normal Images, this is the
-	 * Identity Matrix, for DynamicImages, since they allow editing anywhere on the
-	 * screen, this is equal to the conversion from layerspace to screen space)*/
-	public abstract MatTrans getCompositeTransform();
 }

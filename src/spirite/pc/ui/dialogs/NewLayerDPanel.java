@@ -50,7 +50,7 @@ public class NewLayerDPanel extends JPanel {
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
-	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>(InternalImageTypes.values());
+	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>(InternalImageTypes.createableTypes());
 	private JLabel lblPartType;
 	private JPanel colorPanelFG;
 	private JPanel colorPanelBG;

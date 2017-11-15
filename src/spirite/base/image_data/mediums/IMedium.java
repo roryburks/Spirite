@@ -1,5 +1,11 @@
 package spirite.base.image_data.mediums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.org.apache.bcel.internal.generic.INEG;
+
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -37,13 +43,20 @@ public interface IMedium {
 		DYNAMIC(1),
 		PRISMATIC(2),
 		MAGLEV(3),
-		DERIVED_MAGLEV(4),
+		DERIVED_MAGLEV(4, false),
 		;
 		
 		// This way, these values can be used in saving and loading without failing when
 		//	an Enum is removed
 		public final int permanentCode;
-		InternalImageTypes( int i) {this.permanentCode = i;}
+		public final boolean userCreateable;
+		InternalImageTypes( int i) {
+			this(i, true);
+		}
+		InternalImageTypes( int i, boolean createable) {
+			this.permanentCode = i;
+			this.userCreateable = createable;
+		}
 		
 		public InternalImageTypes fromCode( int code) {
 			InternalImageTypes[] values = InternalImageTypes.values();
@@ -52,6 +65,18 @@ public interface IMedium {
 					return values[i];
 				
 			return null;
+		}
+		private static InternalImageTypes[] _createableTypes = null;
+
+		public static InternalImageTypes[] createableTypes() {
+			if( _createableTypes == null) {
+				List<InternalImageTypes> createables = new ArrayList<>(InternalImageTypes.values().length);
+				createables.addAll(Arrays.asList(InternalImageTypes.values()));
+				createables.removeIf((type) -> !type.userCreateable);
+				_createableTypes = createables.toArray(new InternalImageTypes[0]);
+			}
+			
+			return _createableTypes;
 		}
 	}
 

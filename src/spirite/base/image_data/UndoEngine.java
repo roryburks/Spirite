@@ -168,9 +168,10 @@ public class UndoEngine {
 		LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
 		
 		for( UndoContext context : contexts) {
-			if( context instanceof NullContext) {
+			if( context instanceof NullContext)
 				set.addAll(((NullContext) context).getImageDependency());
-			}
+			else if( context instanceof CompositeContext) 
+				set.addAll(((CompositeContext) context).getImageDependency());
 			else if( context.image != null)
 				set.add(context.image);
 		}
@@ -565,10 +566,10 @@ public class UndoEngine {
 	 * -ImageContext which exist one per image.
 	 * -NullContext of which only one exists, for changes outside any image data.
 	 */
-	private abstract class UndoContext {
+	public abstract static class UndoContext {
 		MediumHandle image;
 
-		UndoContext( MediumHandle data) {
+		protected UndoContext( MediumHandle data) {
 			this.image = data;
 		}
 
@@ -890,129 +891,126 @@ public class UndoEngine {
 			}
 		}
 	}
+
+/***
+ * NullContext is a special context that is not associated with any ImageData
+ * As such the concept of keyframes to work from doesn't make sense.  Instead
+ * Each task is stored.  But since you are not strictly working forwards, the
+ * UndoActions associated with NullContext must have two-way methods for
+ * performing AND undoing.
+ * 
+ * Since it's just a straight queue storing logical data, its behavior is simple
+ * compared to ImageContext.
+ */
+public class NullContext extends UndoContext {
+	private final LinkedList<NullAction> actions = new LinkedList<>();
+	private ListIterator<NullAction> pointer = null;
 	
-	/***
-	 * NullContext is a special context that is not associated with any ImageData
-	 * As such the concept of keyframes to work from doesn't make sense.  Instead
-	 * Each task is stored.  But since you are not strictly working forwards, the
-	 * UndoActions associated with NullContext must have two-way methods for
-	 * performing AND undoing.
-	 * 
-	 * Since it's just a straight queue storing logical data, its behavior is simple
-	 * compared to ImageContext.
-	 */
-	private class NullContext extends UndoContext {
-		private final LinkedList<NullAction> actions = new LinkedList<>();
-		private ListIterator<NullAction> pointer = null;
-		
-		NullContext() {
-			super(null);
-		}
-		
-		protected Collection<MediumHandle> getImageDependency() {
-			LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
-			
-			
-			for( NullAction action : actions){
-				if( action.reliesOnData()) {
-					set.addAll( action.getDependencies());
-				}
-			}
-			
-			return set;
-		}
-
-		@Override
-		protected void addAction(UndoableAction action) {
-			if( action instanceof NullAction) {
-				actions.add( (NullAction) action);
-			}
-			else 
-				MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Attempting to give a null context a non-null Action.");
-		}
-		@Override
-		protected void undo() {
-			if( pointer == null)
-				pointer = actions.listIterator(actions.size());
-			
-			if( !pointer.hasPrevious() || pointer == null) {
-				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Undo).");
-				return;
-			}
-			
-			pointer.previous().undoAction();
-		}
-		
-		@Override
-		protected void redo() {
-			if( pointer == null || !pointer.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
-				return;
-			}
-			
-			pointer.next().performAction();
-		}
-
-
-		@Override
-		protected void cauterize() {
-			if( pointer != null) {
-				List<NullAction> subList = actions.subList(pointer.nextIndex(), actions.size());
-				
-				for( NullAction action : subList) {
-					action.onDispatch();
-				}
-				subList.clear();
-				pointer = null;
-			}
-		}
-
-
-		Iterator<NullAction> iter = null;
-		@Override
-		protected void startIterate() {
-			iter = actions.iterator();
-		}
-		
-		@Override
-		protected UndoableAction iterateNext() {
-			if( !iter.hasNext()) {
-				MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
-				return null;
-			}
-			else
-				return iter.next();
-		}
-
-		@Override
-		protected boolean isEmpty() {
-			return actions.isEmpty();
-		}
-
-		@Override
-		protected UndoableAction getLast() {
-			if( actions.isEmpty())
-				return null;
-			else
-				return actions.getLast();
-		}
-
-		@Override
-		protected void clipTail() {
-			actions.getFirst().onDispatch();
-			actions.removeFirst();
-		}
-		
-		@Override
-		protected void flush() {
-			for( NullAction action : actions)
-				action.onDispatch();
-		}
+	public NullContext() {
+		super(null);
 	}
 	
-	
+	protected Collection<MediumHandle> getImageDependency() {
+		LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
+		
+		
+		for( NullAction action : actions){
+			if( action.reliesOnData()) {
+				set.addAll( action.getDependencies());
+			}
+		}
+		
+		return set;
+	}
 
+	@Override
+	protected void addAction(UndoableAction action) {
+		if( action instanceof NullAction) {
+			actions.add( (NullAction) action);
+		}
+		else 
+			MDebug.handleError(ErrorType.STRUCTURAL_MINOR, "Attempting to give a null context a non-null Action.");
+	}
+	@Override
+	protected void undo() {
+		if( pointer == null)
+			pointer = actions.listIterator(actions.size());
+		
+		if( !pointer.hasPrevious() || pointer == null) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Undo).");
+			return;
+		}
+		
+		pointer.previous().undoAction();
+	}
 	
+	@Override
+	protected void redo() {
+		if( pointer == null || !pointer.hasNext()) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
+			return;
+		}
+		
+		pointer.next().performAction();
+	}
+
+
+	@Override
+	protected void cauterize() {
+		if( pointer != null) {
+			List<NullAction> subList = actions.subList(pointer.nextIndex(), actions.size());
+			
+			for( NullAction action : subList) {
+				action.onDispatch();
+			}
+			subList.clear();
+			pointer = null;
+		}
+	}
+
+
+	Iterator<NullAction> iter = null;
+	@Override
+	protected void startIterate() {
+		iter = actions.iterator();
+	}
+	
+	@Override
+	protected UndoableAction iterateNext() {
+		if( !iter.hasNext()) {
+			MDebug.handleError(ErrorType.STRUCTURAL, "Undo Outer queue desynced with inner queue (Null Redo).");
+			return null;
+		}
+		else
+			return iter.next();
+	}
+
+	@Override
+	protected boolean isEmpty() {
+		return actions.isEmpty();
+	}
+
+	@Override
+	protected UndoableAction getLast() {
+		if( actions.isEmpty())
+			return null;
+		else
+			return actions.getLast();
+	}
+
+	@Override
+	protected void clipTail() {
+		actions.getFirst().onDispatch();
+		actions.removeFirst();
+	}
+	
+	@Override
+	protected void flush() {
+		for( NullAction action : actions)
+			action.onDispatch();
+	}
+}
+
 	/**
 	 * The CompositeContext is a special Context which can store multiple actions
 	 * (both Image and Null) in a single action.  A CompositeAction is performed 
@@ -1026,18 +1024,21 @@ public class UndoEngine {
 			super(null);
 		}
 
-		// Might be unnecessary
-//		protected Collection<UndoContext> getUsedContexts() {
-//			Collection<UndoContext> ret = new LinkedHashSet<>();
-//			
-//			for( CompositeAction action : actions) {
-//				for( UndoContext context : action.contexts) {
-//					ret.add(context);
-//				}
-//			}
-//			
-//			return ret;
-//		}
+		protected Collection<MediumHandle> getImageDependency() {
+			LinkedHashSet<MediumHandle> set = new LinkedHashSet<>();
+			
+			for( CompositeAction action : actions){
+				for( UndoableAction uaction : action.actions) {
+					if( uaction instanceof NullAction) {
+						NullAction naction = (NullAction)uaction;
+						if( naction.reliesOnData())
+							set.addAll(naction.getDependencies());
+					}
+				}
+			}
+			
+			return set;
+		}
 
 		@Override
 		protected void addAction(UndoableAction action) {

@@ -65,7 +65,11 @@ public class MDebug {
 		LOCK_CONFLICT,
 		UNSPECIFIED
 	}
-	
+
+	public static void handleWarning(WarningType priority, String message) {
+		System.out.println( "Warning: " + message);
+		pushLog("Warning: " + message);
+	}
 	public static void handleWarning( WarningType priority, Object source, String message) {
 		System.out.println( "Warning: " + message);
 		pushLog("Warning: " + message);
@@ -132,4 +136,5 @@ public class MDebug {
     			obs.logChanged();
     	}
     }
+
 }

@@ -12,6 +12,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
@@ -59,7 +60,16 @@ public class PuppetLayerPanel extends JPanel
 	
 	private JToggleButton btnSkeleton = new JToggleButton();
 	private JToggleButton btnBase = new JToggleButton();
-	private BoxList<BasePart> boxPuppetParts = new BoxList<>(null, 24, 24);
+	
+	private final int BUTTON_SIZE = 36;
+	private BoxList<BasePart> boxPuppetParts = new BoxList<BasePart>(null, BUTTON_SIZE, BUTTON_SIZE) {
+		protected boolean attemptMove(int from, int to) {
+			puppet.movePart(from,to);
+			puppet.setSelectedIndex(to);
+			
+			return true;
+		};
+	};
 	private final JButton bNewPart = new JButton();
 	private final JButton bRemovePart = new JButton();
 	private final JToggleButton bNodeVisiblity = new JToggleButton();
@@ -128,10 +138,15 @@ public class PuppetLayerPanel extends JPanel
 	}
 	private void initBindings() {
 		bNewPart.addActionListener((evt) -> {
-			puppet.getBase().addNewPart();
+			puppet.addNewPart();
 		});
 		
 		boxPuppetParts.setRenderer((t, ind, selected) -> new PartPanel(t, selected)); 
+		
+		boxPuppetParts.setSelectionAction((i)-> { 
+			if( puppet!= null)
+				puppet.setSelectedIndex(i);
+		});
 	}
 	
 	private class PartPanel extends JPanel{
@@ -148,12 +163,12 @@ public class PuppetLayerPanel extends JPanel
 			
 			//IImage img = part.getImageHandle().deepAccess();
 			
-			float sx = 24f/(float)part.handle.getWidth();
-			float sy = 24f/(float)part.handle.getHeight();
+			float sx = BUTTON_SIZE/(float)part.handle.getWidth();
+			float sy = BUTTON_SIZE/(float)part.handle.getHeight();
 			
 			float scale = Math.min( sx, sy);
 			
-			RawImage img2 = HybridHelper.createImage(24, 24);
+			RawImage img2 = HybridHelper.createImage(BUTTON_SIZE, BUTTON_SIZE);
 			GraphicsContext gc = img2.getGraphics();
 			gc.scale(scale, scale);
 			gc.drawHandle(part.handle, 0, 0);
@@ -187,7 +202,8 @@ public class PuppetLayerPanel extends JPanel
 		btnSkeleton.setEnabled( puppet != null);
 		btnSkeleton.setSelected( puppet != null && puppet.isSkeletonVisible());
 		
-		boxPuppetParts.resetEntries(puppet == null ? null : puppet.getBase().getParts(), 0);
+		if( puppet != null)
+			boxPuppetParts.resetEntries(puppet.getBase().getParts(), puppet.getSelectedIndex());
 	}
 	
 	
@@ -205,5 +221,7 @@ public class PuppetLayerPanel extends JPanel
 		}
 	}
 
-	@Override public void flash() { refreshProperties();}
+	@Override public void flash() { 
+		SwingUtilities.invokeLater(() -> refreshProperties());
+	}
 }

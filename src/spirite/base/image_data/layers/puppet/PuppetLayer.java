@@ -10,7 +10,9 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.Layer;
+import spirite.base.image_data.layers.puppet.IPuppet.IPart;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -21,7 +23,8 @@ public class PuppetLayer extends Layer {
 	public final IPuppet puppet;
 	public final ImageWorkspace context;
 	
-	private IPuppet.IPart selectedPart;
+	private int selected = 0;
+//	private IPuppet.IPart selectedPart;
 	
 	public PuppetLayer( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
@@ -29,14 +32,16 @@ public class PuppetLayer extends Layer {
 		
 		usingBase = true;
 
-		selectedPart = puppet.getParts().get(0);
+		selected = 0;
+		//selectedPart = puppet.getParts().get(0);
 	}
 	public PuppetLayer( ImageWorkspace context, BasePuppet base) {
 		this.context = context;
 		this.puppet = new Puppet(base, context);
 		
 		usingBase = false;
-		selectedPart = puppet.getParts().get(0);
+		selected = 0;
+		//selectedPart = puppet.getParts().get(0);
 	}
 	
 	//
@@ -44,6 +49,25 @@ public class PuppetLayer extends Layer {
 		return (usingBase) ? puppet.getBase() : puppet;
 	}
 	
+	// ==========
+	// ==== Part-creation/modification
+	public int getSelectedIndex() {
+		return selected;
+	}
+	public void setSelectedIndex( int selected) {
+		this.selected = selected;
+	}
+	
+	public void addNewPart() {
+		getBase().addNewPart(selected);
+		selected++;
+	}
+	public void movePart(int from, int to) {
+		getBase().movePart(from,to);
+	}
+	public void removePart( int index) {
+		
+	}
 	
 	// =========
 	// ==== Toggleable Properties
@@ -76,7 +100,12 @@ public class PuppetLayer extends Layer {
 	// ==== DERIVED
 	@Override
 	public BuildingMediumData getActiveData() {
-		return selectedPart.buildData();
+		List<? extends IPart> parts = getActivePuppet().getParts();
+		
+		if( parts.size()-1 < selected)
+			selected = parts.size()-1;
+		
+		return getActivePuppet().getParts().get(selected).buildData();
 		//return new BuildingMediumData(__D__medium);
 	}
 	@Override

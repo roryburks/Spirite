@@ -12,9 +12,9 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
-import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
+import spirite.base.image_data.MediumHandle;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.HybridHelper;
 
