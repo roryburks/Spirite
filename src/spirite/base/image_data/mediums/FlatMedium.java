@@ -92,16 +92,6 @@ public class FlatMedium implements IMedium {
 			gc.setTransform( transform);
 		}
 		
-		
-		public void checkin() {
-			//locked = false;
-//			if( !handle.context.isValidHandle(handle))
-//				return;
-
-			// Construct ImageChangeEvent and send it
-			handle.refresh();
-		}
-		
 		/** Converts the given point in ImageSpace to BuiltActiveData space*/
 		public Vec2i convert( Vec2i p) {
 			//	Some image modification methods do not use draw actions, but

@@ -1,20 +1,44 @@
 package spirite.base.pen.behaviors.stroke;
 
+import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeEngine.StrokeParams;
 
-public class PenBehavior extends StrokeBehavior {
-	final int color;
-	public PenBehavior( Penner penner, int i) {
-		super(penner);
-		this.color = i;
+public class PenBehavior  {
+	public static class Stroke extends StrokeBehavior {
+		private final int color;
+		
+		public Stroke( Penner penner, int color) {
+			super(penner);
+			this.color = color;
+		}
+
+		@Override
+		public StrokeParams makeStroke() {
+			return _makeStroke(penner.toolsetManager, color);
+		}
 	}
-	@Override
-	public void start() {
-		ToolSettings settings = this.penner.toolsetManager.getToolSettings(Tool.PEN);
+	
+	public static class Fixed extends FixedStrokeBehavior {
+		private final int color;
+		
+		public Fixed( Penner penner, int color) {
+			super(penner);
+			this.color = color;
+		}
+
+		@Override
+		public StrokeParams makeStroke() {
+			return _makeStroke(penner.toolsetManager, color);
+		}
+	}
+
+	private static StrokeParams _makeStroke(ToolsetManager toolsetManager, int color) {
+		ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
 		StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
 		stroke.setColor( color);
 		stroke.setMode((PenDrawMode)settings.getValue("mode"));
@@ -22,7 +46,6 @@ public class PenBehavior extends StrokeBehavior {
 		stroke.setAlpha((float)settings.getValue("alpha"));
 		stroke.setHard((Boolean)settings.getValue("hard"));
 		
-		// Start the Stroke
-		startStroke( stroke);
+		return stroke;
 	}
 }

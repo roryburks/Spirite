@@ -188,7 +188,6 @@ public class DefaultImageDrawer
 						
 					});
 				}
-				built.handle.refresh();
 			}
 			
 			@Override public String getDescription() {return "Fill";}
@@ -206,7 +205,6 @@ public class DefaultImageDrawer
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
 				clearUnderSelection( built, sel);
-				built.handle.refresh();
 			}
 			@Override public String getDescription() {return "Clear Layer";}
 		});

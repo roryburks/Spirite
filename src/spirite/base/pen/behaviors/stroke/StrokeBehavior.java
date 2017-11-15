@@ -3,6 +3,7 @@ package spirite.base.pen.behaviors.stroke;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.pen.behaviors.StateBehavior;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
@@ -19,9 +20,15 @@ abstract class StrokeBehavior extends StateBehavior {
 	int dy = this.penner.y;
 	private int shiftMode = -1;	// 0 : accept any, 1 : horizontal, 2: vertical
 	protected IStrokeModule drawer;
+
+	public abstract StrokeParams makeStroke();
 	
-	public void startStroke (StrokeEngine.StrokeParams stroke) {
+	@Override
+	public void start() {
 		IImageDrawer drawer = this.penner.workspace.getActiveDrawer();
+		
+		
+		StrokeParams stroke = makeStroke();
 	
 		if( drawer instanceof IStrokeModule 
 				&& ((IStrokeModule) drawer).canDoStroke(stroke.getMethod())
@@ -37,6 +44,7 @@ abstract class StrokeBehavior extends StateBehavior {
 			HybridHelper.beep();
 		}
 	}
+
 	
 	@Override
 	public void onTock() {

@@ -46,6 +46,8 @@ public abstract class ABuiltMediumData {
 		doing = true;
 		_doOnGC(doer);
 		doing = false;
+		
+		handle.refresh();
 	}
 	public final void doOnRaw( DoerOnRaw doer) {
 		if( doing) {
@@ -56,32 +58,12 @@ public abstract class ABuiltMediumData {
 		doing = true;
 		_doOnRaw(doer);
 		doing = false;
+		
+		handle.refresh();
 	}
 	protected abstract void _doOnGC( DoerOnGC doer);
 	protected abstract void _doOnRaw( DoerOnRaw doer);
 	
-	
-	/**
-	 * Creates a graphical object with transforms applied such that
-	 * drawing on the returned Graphics will draw on the correct Image
-	 * Data spot.
-	 * 
-	 * !!! When done modifying the image always call checkout. !!!
-//	 */
-//	public abstract GraphicsContext checkout();
-//
-//	/** Retrieves the underlying BufferedImage of the BuiltImage
-//	 * 
-//	 * !!! When done modifying the image always call checkout. !!!
-//	 */
-//	public abstract RawImage checkoutRaw();
-//
-//	/**
-//	 * Once finished drawn you must checkin your data.  Not only does this
-//	 * dispose the Graphics (which is debatably necessary), but it triggers
-//	 * the appropriate ImageChange actions and re-fits the Dynamic data.
-//	 */
-//	public abstract void checkin();
 	
 	/** Returns a transform converting from screen space to layer space. */
 	public abstract MatTrans getScreenToImageTransform();

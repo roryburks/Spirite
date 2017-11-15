@@ -49,7 +49,6 @@ import spirite.base.pen.behaviors.RotatingReferenceBehavior;
 import spirite.base.pen.behaviors.StateBehavior;
 import spirite.base.pen.behaviors.ZoomingReferenceBehavior;
 import spirite.base.pen.behaviors.stroke.EraseBehavior;
-import spirite.base.pen.behaviors.stroke.FixedPenBehavior;
 import spirite.base.pen.behaviors.stroke.PenBehavior;
 import spirite.base.pen.behaviors.stroke.PixelBehavior;
 import spirite.base.util.MUtil;
@@ -227,19 +226,35 @@ public class Penner
 				else {
 					int color = paletteManager.getActiveColor( mbe.buttonType == ButtonType.LEFT ? 0 : 1);
 					if( holdingShift)
-						behavior = new FixedPenBehavior(this, color);
+						behavior = new PenBehavior.Fixed(this, color);
 					else 
-						behavior = new PenBehavior(this, color);
+						behavior = new PenBehavior.Stroke(this, color);
+				}
+				
+				break;
+			case PIXEL:
+				if( holdingCtrl) 
+					behavior = new PickBehavior( this, mbe.buttonType == ButtonType.LEFT);
+				else {
+					int color = paletteManager.getActiveColor( mbe.buttonType == ButtonType.LEFT ? 0 : 1);
+					if( holdingShift)
+						behavior = new PixelBehavior.Fixed(this, color);
+					else 
+						behavior = new PixelBehavior.Stroke(this, color);
 				}
 				
 				break;
 			case ERASER:
-				behavior = new EraseBehavior(this);
+				if( holdingShift)
+					behavior = new EraseBehavior.Fixed(this);
+				else
+					behavior = new EraseBehavior.Stroke(this);
 				break;
 			case FILL:
 				fill( mbe.buttonType == ButtonType.LEFT);
 				break;
-			case BOX_SELECTION: {
+			case BOX_SELECTION:
+			case FREEFORM_SELECTION: {
 				SelectionMask selection = selectionEngine.getSelection();
 				
 				if( selection != null &&  !holdingShift && !holdingCtrl && selection.contains(x,y)) 
@@ -254,27 +269,15 @@ public class Penner
 						mode = BuildMode.ADD;
 					else if( holdingCtrl)
 						mode = BuildMode.SUBTRACT;
-					else mode = BuildMode.DEFAULT;
-					behavior = new FormingSelectionBehavior(this, (BoxSelectionShape)settings.getValue("shape"), mode);
+					else 
+						mode = BuildMode.DEFAULT;
+					
+					if( tool == Tool.BOX_SELECTION)
+						behavior = new FormingSelectionBehavior(this, (BoxSelectionShape)settings.getValue("shape"), mode);
+					else if( tool == Tool.FREEFORM_SELECTION)
+						behavior = new FreeFormingSelectionBehavior(this, mode);
 				}
-				break;}
-			case FREEFORM_SELECTION: {
-				SelectionMask selection = selectionEngine.getSelection();
-				
-				if( selection != null && !holdingShift && !holdingCtrl && selection.contains(x,y)) 
-					behavior = new MovingSelectionBehavior(this);
-				else  {
-					BuildMode mode;
-					if( holdingShift && holdingCtrl)
-						mode = BuildMode.INTERSECTION;
-					else if( holdingShift)
-						mode = BuildMode.ADD;
-					else if( holdingCtrl)
-						mode = BuildMode.SUBTRACT;
-					else mode = BuildMode.DEFAULT;
-					behavior = new FreeFormingSelectionBehavior(this, mode);
-				}
-				break;}
+				break;} 
 			case MOVE:{
 				SelectionMask selection = selectionEngine.getSelection();
 				
@@ -286,16 +289,6 @@ public class Penner
 				break;}
 			case COLOR_PICKER:
 				behavior = new PickBehavior(this, mbe.buttonType == ButtonType.LEFT);
-				break;
-			case PIXEL:
-				if( holdingCtrl)  {
-					behavior = new PickBehavior(this, mbe.buttonType == ButtonType.LEFT);
-				}
-				else {
-					behavior = new PixelBehavior(this, (mbe.buttonType == ButtonType.LEFT) ? 
-							paletteManager.getActiveColor(0)
-							: paletteManager.getActiveColor(1));
-				}
 				break;
 			case CROP:
 				behavior = new CroppingBehavior(this);
@@ -348,11 +341,8 @@ public class Penner
 						break;
 					}
 				}
-				if( mbe.buttonType == ButtonType.LEFT) {
+				if( mbe.buttonType == ButtonType.LEFT)
 					behavior = new ReshapingBehavior(this);
-				}
-				else {
-				}
 				break;}
 			case COLOR_CHANGE: {
 				if( holdingCtrl)  {
@@ -387,25 +377,26 @@ public class Penner
 			case MAGLEV_FILL:{
 
 				IImageDrawer drawer = workspace.getActiveDrawer();
-				if( drawer instanceof IMagneticFillModule) {
+				if( drawer instanceof IMagneticFillModule) 
 					behavior = new MagFillingBehavior(this, (IMagneticFillModule) drawer);
-				}
-				else HybridHelper.beep();
+				else 
+					HybridHelper.beep();
 				break;}
 			case EXCISE_ERASER: {
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				
-				if( drawer instanceof IWeightEraserModule) {
+				if( drawer instanceof IWeightEraserModule) 
 					behavior = new ExciseBehavior( this, (IWeightEraserModule)drawer);
-				}
-				else HybridHelper.beep();
+				else 
+					HybridHelper.beep();
 				break;}
 			case BONE: {
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				
-				if( drawer instanceof IBoneDrawer) {
+				if( drawer instanceof IBoneDrawer)
 					behavior = new BoneContortionBehavior(this, (IBoneDrawer) drawer);
-				}else HybridHelper.beep();
+				else 
+					HybridHelper.beep();
 				
 				
 				break;}

@@ -126,7 +126,6 @@ public class MaglevImageDrawer
 			things.setPoints(xy);
 		}
 		img.unbuild();
-		building.handle.refresh();
 	}
 
 	
@@ -380,7 +379,6 @@ public class MaglevImageDrawer
 				mimg.things.remove(toErase);
 			}
 			mimg.unbuild();
-			building.handle.refresh();
 		}
 		@Override
 		public String getDescription() {

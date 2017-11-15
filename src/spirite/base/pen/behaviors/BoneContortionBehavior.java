@@ -87,7 +87,17 @@ public class BoneContortionBehavior extends DrawnStateBehavior {
 			b.y1 = y1;
 			b.x2 = x2;
 			b.y2 = y2;
-			drawer._DBG_contory(b, new CubicSplineInterpolator2D(fx.toArray(), fy.toArray(), false));
+			
+			CubicSplineInterpolator2D prel = new CubicSplineInterpolator2D(fx.toArray(), fy.toArray(), false);
+			CubicSplineInterpolator2D out = new CubicSplineInterpolator2D(null, true);
+			
+			float clen = prel.getCurveLength();
+			for( int i=0; i < 4; ++i) {
+				Vec2 at = prel.eval(i*clen/3);
+				out.addPoint(at.x, at.y);
+			}
+			
+			drawer._DBG_contory(b, out);
 			
 			end();
 		}

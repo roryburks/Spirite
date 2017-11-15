@@ -336,9 +336,6 @@ public class PrismaticMedium implements IMedium {
 			compIsBuilt = false;
 			buffer.flush();
 			buffer = null;
-
-			// Construct ImageChangeEvent and send it
-			handle.refresh();
 		}
 
 

@@ -11,7 +11,7 @@ import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.pen.behaviors.DrawnStateBehavior;
 import spirite.hybrid.HybridHelper;
 
-public abstract class FixedStrokeBehavior extends DrawnStateBehavior{
+abstract class FixedStrokeBehavior extends DrawnStateBehavior{
 	int startX, startY;
 	StrokeParams params;
 	
