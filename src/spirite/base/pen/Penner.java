@@ -25,12 +25,14 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IPuppetBoneDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
+import spirite.base.pen.behaviors.BoneComposingBehavior;
 import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.pen.behaviors.CroppingBehavior;
 import spirite.base.pen.behaviors.DrawnStateBehavior;
@@ -399,6 +401,14 @@ public class Penner
 					HybridHelper.beep();
 				
 				
+				break;}
+			case PUPPET_BONE: {
+				IImageDrawer drawer = workspace.getActiveDrawer();
+				
+				if( drawer instanceof IPuppetBoneDrawer)
+					behavior = new BoneComposingBehavior(this, (IPuppetBoneDrawer) drawer);
+				else 
+					HybridHelper.beep();
 				break;}
 			}
 			

@@ -112,7 +112,7 @@ public class PuppetLayer extends Layer {
 	public IImageDrawer getDrawer(BuildingMediumData building, IMedium medium) {
 		if( skeletonVisible) {
 			if( usingBase)
-				return new BaseSkeletonDrawer(puppet.getBase());
+				return new BaseSkeletonDrawer(this);
 			else if( puppet instanceof Puppet)
 				return new SkeletonStateDrawer((Puppet)puppet);
 		}

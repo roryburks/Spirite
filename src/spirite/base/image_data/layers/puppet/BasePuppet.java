@@ -197,40 +197,36 @@ public class BasePuppet implements IPuppet {
 				part.parent = null;
 			byDepthList = null;
 		}
-//		protected BasePart addPart(MediumHandle medium) {
-//			final BasePart part = new BasePart();
-//			part.parent = this;
-//			part.handle = medium;
-//			
-//			context.getUndoEngine().performAndStore(new UndoEngine.NullAction() {
-//				@Override
-//				protected void performAction() {
-//					BasePart.this.children.add(part);
-//					byDepthList = null;
-//				}
-//				
-//				@Override
-//				protected void undoAction() {
-//					BasePart.this.children.remove(part);
-//					byDepthList = null;
-//				}
-//				
-//				@Override
-//				public Collection<MediumHandle> getDependencies() {
-//					return Arrays.asList(new MediumHandle[] {medium});
-//				}
-//			});
-//			
-//			return part;
-//		}
+		
+		public BaseBone getBone() {return bone;}
+
+		public void setBone(final BaseBone newBone) {
+			final BaseBone oldBone = bone;
+			
+			context.getUndoEngine().performAndStore(new UndoEngine.NullAction() {
+				protected void performAction() {
+					bone = newBone;
+				}
+				protected void undoAction() {
+					bone = oldBone;
+				}
+				public String getDescription() {
+					return "Bone Creation";
+				}
+			});
+		}
 	}
 	
 	public static class BaseBone {
-		public float x1, y1, x2, y2;
+		public final float x1, y1, x2, y2;
 
 		public TreeMap<Float,Float> weightMap = new TreeMap<Float,Float>();
 		
-		public BaseBone(float width) {
+		public BaseBone(float x1, float y1, float x2, float y2, float width) {
+			this.x1 = x1;
+			this.y1 = y1;
+			this.x2 = x2;
+			this.y2 = y2;
 			weightMap.put(0f, width);
 			weightMap.put(1f, width);
 		}

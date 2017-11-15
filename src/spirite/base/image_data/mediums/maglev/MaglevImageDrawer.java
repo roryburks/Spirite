@@ -393,25 +393,7 @@ public class MaglevImageDrawer
 
 	// :::: IBoneDrawer
 	@Override
-	public void startBone(int x, int y) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateBone(int x, int y) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endBone(int x, int y) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void _DBG_contory(BaseBone bone, Interpolator2D to) {
+	public void contort(BaseBone bone, Interpolator2D to) {
 		this.img.contortBones(bone, to);
 	}
 

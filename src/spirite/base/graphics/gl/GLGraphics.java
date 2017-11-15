@@ -233,7 +233,19 @@ public class GLGraphics extends GraphicsContext{
 		engine.applyComplexLineProgram(  x_, y_, 2, 
 				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
 				params, contextTransform);
-//		engine.applyLineProgram(ProgramType.STROKE_PIXEL, x_, y_, 2, params, contextTransform, gl);
+		
+	}
+	@Override
+	public void drawLine(float x1, float y1, float x2, float y2) {
+		reset();
+		float x_[] = new float[2];
+		float y_[] = new float[2];
+		x_[0] = x1; x_[1] = x2;
+		y_[0] = y1; y_[1] = y2;
+		GLParameters params =getLineParams();
+		engine.applyComplexLineProgram(  x_, y_, 2, 
+				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				params, contextTransform);
 		
 	}
 	@Override

@@ -32,6 +32,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 import spirite.pc.ui.components.BoxList;
@@ -247,9 +248,16 @@ public class ToolsPanel extends JPanel
 	}
 
 
+	Class<?> currentDrawerType = null;
 	@Override
 	public void flash() {
-		//Build( toolsetManager.getToolsForDrawer(workspace.getActiveDrawer()));
+		if( currentDrawerType != workspace.getActiveDrawer().getClass() ) {
+			currentDrawerType = workspace.getActiveDrawer().getClass();
+			List<Tool> tools = toolsetManager.getToolsForDrawer(workspace.getActiveDrawer());
+			if(!tools.contains(toolsetManager.getSelectedTool()) && tools.size() != 0)
+				toolsetManager.setSelectedTool(tools.get(0));
+			Build( tools);
+		}
 	}
 
 }

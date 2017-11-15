@@ -8,7 +8,6 @@ import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.interpolation.Interpolator2D;
 
@@ -84,9 +83,11 @@ public interface IImageDrawer {
 	}
 	
 	public interface IBoneDrawer {
-		public void startBone( int x, int y);
-		public void updateBone( int x, int y);
-		public void endBone( int x, int y);
-		public void _DBG_contory( BaseBone bone, Interpolator2D to);
+		public void contort( BaseBone bone, Interpolator2D to);
+	}
+	
+	public interface IPuppetBoneDrawer {
+		public BaseBone grabBone( int x, int y, float width);
+		public void makeBone( float x1, float y1, float x2, float y2);
 	}
 }

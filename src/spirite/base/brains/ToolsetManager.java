@@ -62,6 +62,7 @@ public class ToolsetManager
         
         BONE("Bone Constructor", 4, 0),
         FLOPPYBONE("Bone Deformer", 4, 1),
+        PUPPET_BONE("Puppet Bone Composer", 4, 0)
         ;
 
         public final String description;
@@ -139,7 +140,7 @@ public class ToolsetManager
     	if( drawer instanceof MaglevImageDrawer)
     		return Arrays.asList(ToolsForMaglevDrawer);
     	if( drawer instanceof BaseSkeletonDrawer)
-			return Arrays.asList(new Tool[] {Tool.BONE});
+			return Arrays.asList(new Tool[] {Tool.PUPPET_BONE});
 //    	if( drawer instanceof GroupNodeDrawer)
 //    		return Arrays.asList(ToolsForGroupDrawer);
     	

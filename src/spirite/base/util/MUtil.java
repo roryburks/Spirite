@@ -155,6 +155,27 @@ public class MUtil {
 		return rectFromEndpoints(x1,y1,x2,y2);
 	}
 	
+	// ==========
+	// ==== Vector Functions
+	/** Converts a line segment and a point into two coordinates: the first representing 
+	 * its projection onto the line segment normalized such that t=0 means it's perpendicular
+	 * to (x1,y1) and t=1 for (x2,y2).  The second representing the distance from the line 
+	 * extended from the line segment
+	 */
+	public static Vec2 projectOnto(float x1, float y1, float x2, float y2, Vec2 p) {
+
+		Vec2 b = new Vec2(x2 - x1, y2 - y1);
+		float scale_b = b.getMag();
+		float scale_b2 = scale_b*scale_b;
+		
+		Vec2 a = new Vec2(p.x - x1, p.y - y1);
+		
+		float t =  a.dot(b) / scale_b2;	// the extra / ||b|| is to normalize it to ||b|| = 1
+		float m = a.cross(b) / scale_b;
+		
+		return new Vec2(t,m);
+	}
+	
 	// :::: String
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHex(byte[] bytes) {

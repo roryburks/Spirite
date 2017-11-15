@@ -82,6 +82,7 @@ public class AWTContext extends GraphicsContext{
 	@Override public void drawOval(int x, int y, int w, int h) { g2.drawOval(x,y,w,h);}
 	@Override public void drawPolyLine(int[] x, int[] y, int count) {g2.drawPolyline(x, y, count); }
 	@Override public void drawLine(int x1, int y1, int x2, int y2) {g2.drawLine(x1, y1, x2, y2);}
+	@Override public void drawLine(float x1, float y1, float x2, float y2) {g2.drawLine((int)x1, (int)y1, (int)x2, (int)y2);}
 	@Override public void draw(Shape shape) {g2.draw(shape);}
 
 	@Override public void fillRect(int x, int y, int w, int h) {g2.fillRect(x, y, w, h);}

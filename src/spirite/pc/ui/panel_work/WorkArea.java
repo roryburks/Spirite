@@ -3,18 +3,27 @@ package spirite.pc.ui.panel_work;
 import java.awt.Color;
 import java.awt.Component;
 import java.nio.FloatBuffer;
+import java.util.List;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
+import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
+import spirite.base.graphics.GraphicsContext.JoinMethod;
+import spirite.base.graphics.GraphicsContext.LineAttributes;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.renderer.RenderEngine;
+import spirite.base.image_data.GroupTree.LayerNode;
+import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
+import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
@@ -24,6 +33,7 @@ import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.hybrid.Globals;
@@ -128,6 +138,25 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
         	gc.setTransform(null);
             if( penner.drawsOverlay())
             	penner.paintOverlay(gc);
+            
+            // :::: Draw skeleton
+            Node node = workspace.getSelectedNode();
+            if( node instanceof LayerNode && ((LayerNode) node).getLayer() instanceof PuppetLayer) {
+            	PuppetLayer puppet = (PuppetLayer) ((LayerNode) node).getLayer();
+            	if( puppet.isSkeletonVisible()) {
+    				gc.setTransform(viewTrans);
+    				gc.setLineAttributes(new LineAttributes(4, CapMethod.ROUND, JoinMethod.MITER));
+    				gc.setColor(Colors.WHITE);
+    				gc.setComposite(Composite.SRC_OVER, 1);
+    				
+            		for( BasePart part : puppet.getBase().getParts()) {
+            			BaseBone bone = part.getBone();
+            			if( bone != null) {
+            				gc.drawLine(bone.x1, bone.y1, bone.x2, bone.y2);
+            			}
+            		}
+            	}
+            }
         }
 	}
 	

@@ -82,11 +82,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior {
 			fy = new FloatCompactor();
 		}
 		if( state == State.DEFORMING) {
-			BaseBone b = new BaseBone(1);
-			b.x1 = x1;
-			b.y1 = y1;
-			b.x2 = x2;
-			b.y2 = y2;
+			BaseBone b = new BaseBone(x1, y1, x2, y2, 1);
 			
 			CubicSplineInterpolator2D prel = new CubicSplineInterpolator2D(fx.toArray(), fy.toArray(), false);
 			CubicSplineInterpolator2D out = new CubicSplineInterpolator2D(null, true);
@@ -97,7 +93,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior {
 				out.addPoint(at.x, at.y);
 			}
 			
-			drawer._DBG_contory(b, out);
+			drawer.contort(b, out);
 			
 			end();
 		}
