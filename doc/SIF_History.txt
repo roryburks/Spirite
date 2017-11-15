@@ -1,7 +1,8 @@
-004: added Dynamic [Image Type]
-   : added Expanded bitflag to Nodes
-005: added Scale and Rotation to Rig Parts
-006: added Prismatic [Image Type]
-007: added RigAnimLayers [Animation Type]
-008: Updated FixedFrame [Animation Type] saving/loading (full backwards compatibility not implemented for unusual animations)
-009: added Maglev [Image Type]
+0004: added Dynamic [Image Type]
+    : added Expanded bitflag to Nodes
+0005: added Scale and Rotation to Rig Parts
+0006: added Prismatic [Image Type]
+0007: added RigAnimLayers [Animation Type]
+0008: Updated FixedFrame [Animation Type] saving/loading (full backwards compatibility not implemented for unusual animations)
+0009: added Maglev [Image Type]
+000A: added PuppetLayer [Layer Type]

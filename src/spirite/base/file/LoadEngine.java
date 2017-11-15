@@ -33,6 +33,7 @@ import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.DynamicMedium;
 import spirite.base.image_data.mediums.FlatMedium;
 import spirite.base.image_data.mediums.IMedium;
@@ -430,15 +431,15 @@ public class LoadEngine {
 			}
 			else {
 				switch( type) {
-				case SaveLoadUtil.NODE_GROUP:
+				case SaveLoadUtil.NODE_GROUP: {
 					node = nodeLayer[depth] = helper.workspace.addGroupNode( nodeLayer[depth-1], name);
 					nodeLayer[depth].setExpanded(true);
-					break;
-				case SaveLoadUtil.NODE_SIMPLE_LAYER:
+					break;}
+				case SaveLoadUtil.NODE_SIMPLE_LAYER: {
 					identifier = helper.ra.readInt();
 					Layer layer = new SimpleLayer( new MediumHandle(null, identifier));
 					node = helper.workspace.addShellLayer( nodeLayer[depth-1], layer, name);
-					break;
+					break;}
 				case SaveLoadUtil.NODE_RIG_LAYER: {
 					int partCount = helper.ra.readByte();
 					List<PartStructure> parts = new ArrayList<>( partCount);
@@ -477,13 +478,28 @@ public class LoadEngine {
 					node = helper.workspace.addShellLayer(nodeLayer[depth-1], rig, name);
 					break;}
 				case SaveLoadUtil.NODE_REFERENCE_LAYER: {
-					node = helper.workspace.addNewReferenceLayer(nodeLayer[depth-1], null, "");
+					node = helper.workspace.addNewReferenceLayer(nodeLayer[depth-1], null, name);
 					referencesToMap.put((LayerNode)node, helper.ra.readInt());
-					//LayerNode node 
-					//node = helper.workspace.addShellLayer(nodeLayer[depth-1], new ReferenceLayer(helper.nodes.get(helper.ra.readInt())), name)
-//						helper.w
-//						// [4] : NodeID of referenced node
-//						helper.ra.writeInt(helper.nodeMap.get(((ReferenceLayer)layer).underlying));
+					break;}
+				case SaveLoadUtil.NODE_PUPPET_LAYER: {
+					int btype = helper.ra.readByte();
+					if( btype == 0) {
+						int partCount = helper.ra.readUnsignedShort();
+						List<PuppetPartInfo> parts = new ArrayList<>(partCount);
+						while( partCount-- > 0) {
+							PuppetPartInfo part = new PuppetPartInfo();
+							part.parentId = helper.ra.readUnsignedShort();
+							part.handle = new MediumHandle(null, helper.ra.readInt());
+							part.x1 = helper.ra.readFloat();
+							part.y1 = helper.ra.readFloat();
+							part.x2 = helper.ra.readFloat();
+							part.y2 = helper.ra.readFloat();
+							part.depth = helper.ra.readInt();
+							parts.add(part);
+						}
+						PuppetLayer layer = new PuppetLayer(helper.workspace, parts);
+						helper.workspace.addShellLayer(nodeLayer[depth-1], layer, name);
+					}
 					break;}
 				}
 			}
@@ -503,6 +519,15 @@ public class LoadEngine {
 		for(Entry<LayerNode,Integer> entry :  referencesToMap.entrySet()) {
 			((ReferenceLayer)entry.getKey().getLayer()).setUnderlying((LayerNode) helper.nodes.get(entry.getValue()));
 		}
+	}
+	public static class PuppetPartInfo {
+		private PuppetPartInfo() {}
+		
+		public int parentId;
+		public MediumHandle handle;
+		public float x1, y1, x2, y2;
+		public int depth;
+		
 	}
 	
 

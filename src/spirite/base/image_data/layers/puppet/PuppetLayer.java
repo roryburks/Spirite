@@ -3,6 +3,7 @@ package spirite.base.image_data.layers.puppet;
 import java.util.ArrayList;
 import java.util.List;
 
+import spirite.base.file.LoadEngine.PuppetPartInfo;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.Node;
@@ -25,7 +26,13 @@ public class PuppetLayer extends Layer {
 	
 	private int selected = 0;
 //	private IPuppet.IPart selectedPart;
+
 	
+	public PuppetLayer( ImageWorkspace context, List<PuppetPartInfo> toImport) {
+		this.context = context;
+		this.puppet = new BasePuppet(context, toImport);
+		selected = 0;
+	}
 	public PuppetLayer( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
 		this.puppet = new BasePuppet(context, firstMedium);
@@ -104,6 +111,7 @@ public class PuppetLayer extends Layer {
 		
 		if( parts.size()-1 < selected)
 			selected = parts.size()-1;
+		System.out.println(parts.size());
 		
 		return getActivePuppet().getParts().get(selected).buildData();
 		//return new BuildingMediumData(__D__medium);

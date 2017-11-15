@@ -1,4 +1,4 @@
-Version 0009
+Version 000A
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -38,6 +38,18 @@ Header
             [4, float] : rotation
             [4, int] : draw depth
             [4, int] : ImageID
+	0x03 : Reference Layer
+		[4, int] : Node ID of node referred to
+	0x04 : Puppet Layer
+		[1] : Whether or not is derived
+		SWITCH:
+		CASE 0 (Base):
+			[2, ushort] : Number of Parts
+			Per Part:
+				[2, ushort] parent (0 for root, 1 for 1st part in the list, etc)
+				[4, int] : ImageID
+				[4 4 4 4 (16), float] : bone x1, y1, x2, y2 in that order
+				[4, int] : draw depth
 
  ---- IMGD - Image Data Chunk ----
  Per Iamge:

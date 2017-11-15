@@ -3,10 +3,13 @@ package spirite.base.image_data.layers.puppet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import spirite.base.file.LoadEngine.PuppetPartInfo;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
@@ -26,6 +29,29 @@ public class BasePuppet implements IPuppet {
 	public BasePuppet( ImageWorkspace context, MediumHandle firstMedium) {
 		this.context = context;
 		rootPart._addPart(new BasePart(firstMedium));
+	}
+
+	public BasePuppet(ImageWorkspace context, List<PuppetPartInfo> toImport) {
+		// Ugly, off-by-one math
+		this.context = context;
+		
+		List<BasePart> partsAdded = new ArrayList<>(toImport.size()+1);
+		partsAdded.add(rootPart);
+		for( int i=0; i < toImport.size(); ++i) {
+			PuppetPartInfo info = toImport.get(i);
+			BasePart bp = new BasePart(info.handle);
+			if( info.x1 != Float.NaN)
+				bp.bone = new BaseBone(info.x1, info.y1, info.x2, info.y2, 1);
+			bp.depth = info.depth;
+			
+			partsAdded.add(bp);
+		}
+		
+		for( int i=1; i < partsAdded.size(); ++i) {
+			PuppetPartInfo info = toImport.get(i-1);
+			partsAdded.get(i).parent = partsAdded.get(info.parentId);
+			partsAdded.get(i).parent.children.add(partsAdded.get(i));
+		}
 	}
 
 	@Override public BasePuppet getBase() { return this;}
@@ -186,12 +212,13 @@ public class BasePuppet implements IPuppet {
 			children.add( part);
 			byDepthList = null;
 		}
-		private void _addPart( int index, BasePart part) {
-			
-			part.parent = this;
-			children.add(index, part);
-			byDepthList = null;
-		}
+		// Order probably doesn't matter as things are sorted by depth for accessing
+//		private void _addPart( int index, BasePart part) {
+//			
+//			part.parent = this;
+//			children.add(index, part);
+//			byDepthList = null;
+//		}
 		private void _removePart( BasePart part) {
 			if( children.remove(part))
 				part.parent = null;
@@ -199,6 +226,8 @@ public class BasePuppet implements IPuppet {
 		}
 		
 		public BaseBone getBone() {return bone;}
+		public BasePart getParent() {return parent;}
+		public int getDepth() {return depth;}
 
 		public void setBone(final BaseBone newBone) {
 			final BaseBone oldBone = bone;
@@ -211,7 +240,7 @@ public class BasePuppet implements IPuppet {
 					bone = oldBone;
 				}
 				public String getDescription() {
-					return "Bone Creation";
+					return "Bone Creation / Modification";
 				}
 			});
 		}

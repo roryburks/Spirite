@@ -34,6 +34,10 @@ import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.base.image_data.layers.puppet.IPuppet.IPart;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
+import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
@@ -286,7 +290,7 @@ public class SaveEngine implements MWorkspaceObserver {
 				// [4] : ID of ImageData linked to this LayerNode
 				helper.ra.writeInt( data.getID());
 			}
-			if( layer instanceof SpriteLayer) {
+			else if( layer instanceof SpriteLayer) {
 				SpriteLayer rig = (SpriteLayer)layer;
 				List<Part> parts = rig.getParts();
 				
@@ -317,11 +321,38 @@ public class SaveEngine implements MWorkspaceObserver {
 					helper.ra.writeInt(part.getImageHandle().getID());
 				}
 			}
-			if( layer instanceof ReferenceLayer) {
+			else if( layer instanceof ReferenceLayer) {
 				// [1] : Node Type ID
 				helper.ra.writeByte(SaveLoadUtil.NODE_REFERENCE_LAYER);
 				// [4] : NodeID of referenced node
 				helper.ra.writeInt(helper.nodeMap.get(((ReferenceLayer)layer).getUnderlying()));
+			}
+			else if( layer instanceof PuppetLayer) {
+				PuppetLayer puppet = (PuppetLayer)layer;
+
+				// [1] : Node Type ID
+				helper.ra.writeByte(SaveLoadUtil.NODE_PUPPET_LAYER);
+				// [1] : Whether or not is base
+				helper.ra.writeByte( puppet.isBaseOnly() ? 0 : 1);
+				
+				if( puppet.isBaseOnly()) {
+					List<BasePart> parts = puppet.getBase().getParts();
+					helper.ra.writeShort(parts.size());	// [2] : number of parts
+					
+					for( BasePart part : parts) {
+						int index = parts.indexOf(part.getParent());
+						index = (index == 1)? 0 : index+1;
+						
+						helper.ra.writeShort(index); 	// [2] : Parent
+						helper.ra.writeInt( part.handle.getID());	// [4] : ImageID
+						BaseBone bone = part.getBone();
+						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.x1 );	// [4] : Bone x1
+						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.y1 );	// [4] : y1
+						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.x2 );	// [4] : x2
+						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.y2 );	// [4] : y2
+						helper.ra.writeInt(part.getDepth());
+					}
+				}
 			}
 		}
 		else {

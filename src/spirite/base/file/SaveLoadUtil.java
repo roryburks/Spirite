@@ -23,13 +23,14 @@ public class SaveLoadUtil {
 	public static final byte NODE_SIMPLE_LAYER = 0x01;
 	public static final byte NODE_RIG_LAYER = 0x02;	
 	public static final byte NODE_REFERENCE_LAYER = 0x03;
+	public static final byte NODE_PUPPET_LAYER = 0x04;
 	// :::: Animation Type Identifiers
 	public static final byte ANIM_FIXED_FRAME = 0x01;
 	public static final byte ANIM_RIG = 0x02;
 	
 	
 	
-	public static final int VERSION = 0x0000_0009;
+	public static final int VERSION = 0x0000_000A;
 
 	// Node Attribute Masks
 	public static final int VISIBLE_MASK = 0x01;
