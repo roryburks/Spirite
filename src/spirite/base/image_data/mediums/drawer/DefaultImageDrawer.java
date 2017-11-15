@@ -593,27 +593,33 @@ public class DefaultImageDrawer
 		Vec2 start = building.trans.transform(new Vec2(x,y), new Vec2());
 		int sx= Math.round(start.x);
 		int sy = Math.round(start.y);
-		IImage img = building.handle.deepAccess();
 		
-		if( tryPixel( sx, sy, img, lockedColor, locked))
-			return;
+		building.doOnBuiltData((built) -> {
+			built.doOnRaw((img) -> {
+				if( tryPixel( sx, sy, img, lockedColor, locked))
+					return;
+
+				for( int tr = 1; tr < r+1; ++tr) {
+					for( int snake = 0; snake < tr; ++snake) {
+						// Topleft->topright
+						if( tryPixel( sx-tr+snake, sy-tr, img, lockedColor, locked))
+							return;
+						//TR->BR
+						if( tryPixel(sx+tr, sy-tr+snake, img, lockedColor, locked))
+							return;
+						//BR->BL
+						if( tryPixel(sx+tr-snake, sy+tr, img, lockedColor, locked))
+							return;
+						//BL->TL
+						if( tryPixel(sx-tr, sy+tr-snake, img, lockedColor, locked))
+							return;
+					}
+				}
+			
+			});
+		});
 		
-		for( int tr = 1; tr < r+1; ++tr) {
-			for( int snake = 0; snake < tr; ++snake) {
-				// Topleft->topright
-				if( tryPixel( sx-tr+snake, sy-tr, img, lockedColor, locked))
-					return;
-				//TR->BR
-				if( tryPixel(sx+tr, sy-tr+snake, img, lockedColor, locked))
-					return;
-				//BR->BL
-				if( tryPixel(sx+tr-snake, sy+tr, img, lockedColor, locked))
-					return;
-				//BL->TL
-				if( tryPixel(sx-tr, sy+tr-snake, img, lockedColor, locked))
-					return;
-			}
-		}
+//		}
 	}
 	private boolean tryPixel( int x, int y, IImage raw, int lockedColor, boolean locked) {
 		if( fx.size() > 1 && x == fx.get( fx.size()-1) && y == fy.get(fy.size()))

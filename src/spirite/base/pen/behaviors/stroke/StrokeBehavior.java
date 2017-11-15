@@ -1,8 +1,9 @@
-package spirite.base.pen.behaviors;
+package spirite.base.pen.behaviors.stroke;
 
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.behaviors.StateBehavior;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
@@ -20,22 +21,16 @@ abstract class StrokeBehavior extends StateBehavior {
 	protected IStrokeModule drawer;
 	
 	public void startStroke (StrokeEngine.StrokeParams stroke) {
-		if( this.penner.workspace != null && this.penner.workspace.buildActiveData() != null) {
+		IImageDrawer drawer = this.penner.workspace.getActiveDrawer();
+	
+		if( drawer instanceof IStrokeModule 
+				&& ((IStrokeModule) drawer).canDoStroke(stroke.getMethod())
+				&&((IStrokeModule)drawer).startStroke(stroke, new PenState(this.penner.x,this.penner.y,this.penner.pressure))) 
+		{
 			shiftX = this.penner.rawX;
 			shiftY = this.penner.rawY;
-			
-			IImageDrawer drawer = this.penner.workspace.getActiveDrawer();
-			if( drawer instanceof IStrokeModule 
-					&& ((IStrokeModule) drawer).canDoStroke(stroke.getMethod())
-					&&((IStrokeModule)drawer).startStroke(stroke, new PenState(this.penner.x,this.penner.y,this.penner.pressure))) 
-			{
-				this.drawer = (IStrokeModule) drawer;
-				this.penner.workspace.setActiveStrokeEngine(this.drawer.getStrokeEngine());
-			}
-			else {
-				end();
-				HybridHelper.beep();
-			}
+			this.drawer = (IStrokeModule) drawer;
+			this.penner.workspace.setActiveStrokeEngine(this.drawer.getStrokeEngine());
 		}
 		else {
 			end();

@@ -1,4 +1,4 @@
-package spirite.base.pen.behaviors;
+package spirite.base.pen.behaviors.stroke;
 
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;

@@ -34,7 +34,6 @@ import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.pen.behaviors.CroppingBehavior;
 import spirite.base.pen.behaviors.DrawnStateBehavior;
-import spirite.base.pen.behaviors.EraseBehavior;
 import spirite.base.pen.behaviors.ExciseBehavior;
 import spirite.base.pen.behaviors.FlippingBehavior;
 import spirite.base.pen.behaviors.FormingSelectionBehavior;
@@ -43,14 +42,16 @@ import spirite.base.pen.behaviors.GlobalRefMoveBehavior;
 import spirite.base.pen.behaviors.MagFillingBehavior;
 import spirite.base.pen.behaviors.MovingNodeBehavior;
 import spirite.base.pen.behaviors.MovingSelectionBehavior;
-import spirite.base.pen.behaviors.PenBehavior;
 import spirite.base.pen.behaviors.PickBehavior;
-import spirite.base.pen.behaviors.PixelBehavior;
 import spirite.base.pen.behaviors.ReshapingBehavior;
 import spirite.base.pen.behaviors.RigManipulationBehavior;
 import spirite.base.pen.behaviors.RotatingReferenceBehavior;
 import spirite.base.pen.behaviors.StateBehavior;
 import spirite.base.pen.behaviors.ZoomingReferenceBehavior;
+import spirite.base.pen.behaviors.stroke.EraseBehavior;
+import spirite.base.pen.behaviors.stroke.FixedPenBehavior;
+import spirite.base.pen.behaviors.stroke.PenBehavior;
+import spirite.base.pen.behaviors.stroke.PixelBehavior;
 import spirite.base.util.MUtil;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
@@ -223,10 +224,14 @@ public class Penner
 			case PEN:
 				if( holdingCtrl) 
 					behavior = new PickBehavior( this, mbe.buttonType == ButtonType.LEFT);
-				else 
-					behavior = new PenBehavior(this, (mbe.buttonType == ButtonType.LEFT) ? 
-									paletteManager.getActiveColor(0)
-									: paletteManager.getActiveColor(1));
+				else {
+					int color = paletteManager.getActiveColor( mbe.buttonType == ButtonType.LEFT ? 0 : 1);
+					if( holdingShift)
+						behavior = new FixedPenBehavior(this, color);
+					else 
+						behavior = new PenBehavior(this, color);
+				}
+				
 				break;
 			case ERASER:
 				behavior = new EraseBehavior(this);

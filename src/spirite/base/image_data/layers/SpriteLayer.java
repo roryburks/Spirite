@@ -227,6 +227,7 @@ public class SpriteLayer extends Layer
 	 * namespace, it must be passed through the UndoEngine.performAndStoreAction
 	 * method.*/
 	public void addPart( RawImage image, String partName) {
+		updateContext();
 		PartStructure struct = new PartStructure( context.importMedium( new DynamicMedium(image, 0, 0, context))
 				, partName, 0, 0, 0, true, 1);
 		addPart( struct, (active == null) ? parts.size() : parts.indexOf(active) + 1);
@@ -363,6 +364,7 @@ public class SpriteLayer extends Layer
 	public void modifyPart( 
 			Part part, PartStructure newStructure) 
 	{
+		updateContext();
 		if( !parts.contains(part))
 			return;
 		
