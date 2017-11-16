@@ -129,8 +129,8 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			
 			float clen = prel.getCurveLength();
 			proposedPoints = new ArrayList<>();
-			for( int i=0; i < 4; ++i) {
-				proposedPoints.add(prel.eval(i*clen/3));
+			for( int i=0; i < SUBDIVISIONS+1; ++i) {
+				proposedPoints.add(prel.eval(i*clen/(SUBDIVISIONS)));
 			}
 			proposing = new CubicSplineInterpolator2D(proposedPoints, true);
 			proposing.setExtrapolating(true);

@@ -5,20 +5,28 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.maglev.MaglevImageDrawer.BuildingStrokeSegment;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.base.pen.StrokeEngine;
+import spirite.base.util.compaction.FloatCompactor;
 
 public class MagLevFill extends AMagLevThing {
 
 	public static class StrokeSegment {
-		public int strokeIndex;
-		public int pivot;
-		public int travel;
-		public StrokeSegment() {}
+		public final int strokeIndex;
+		public final float _pivot;
+		public final float _travel;
+		public StrokeSegment(int index, float pivot, float travel) 
+		{
+			this.strokeIndex = index;
+			this._pivot = pivot;
+			this._travel = travel;
+		}
 		public StrokeSegment( MagLevFill.StrokeSegment other) {
 			this.strokeIndex = other.strokeIndex;
-			this.pivot = other.pivot;
-			this.travel = other.travel;
+			this._pivot = other._pivot;
+			this._travel = other._travel;
 		}
 	}
 	
@@ -43,25 +51,29 @@ public class MagLevFill extends AMagLevThing {
 		List<AMagLevThing> things = context.getThings();
 		int totalLen = 0;
 		int index = 0;
-		
-		for( MagLevFill.StrokeSegment s : segments)
-			totalLen += Math.abs(s.travel) + 1;
 
-		float[] outx = new float[totalLen];
-		float[] outy = new float[totalLen];
+		FloatCompactor outx = new FloatCompactor();
+		FloatCompactor outy = new FloatCompactor();
 
 		for( MagLevFill.StrokeSegment s : segments) {
 			MagLevStroke stroke = (MagLevStroke)things.get(s.strokeIndex);
-			for( int c=0; c <= Math.abs(s.travel); ++c) {
-				
-				outx[index] = stroke.direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
-				outy[index] = stroke.direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
-				++index;
+			
+			float curveLen = (float) (stroke.direct.length * StrokeEngine.DIFF);
+			int start = (int)( s._pivot * curveLen);
+			int end = (int) ((s._pivot + s._travel) * curveLen);
+
+			for( int c = start; c <= end; ++c) {
+				outx.add(stroke.direct.x[c]);
+				outy.add(stroke.direct.y[c]);
+			}
+			for( int c = start; c > end; --c) {
+				outx.add(stroke.direct.x[c]);
+				outy.add(stroke.direct.y[c]);
 			}
 		}
 		
 		gc.setColor(color);
-		gc.fillPolygon(outx, outy, outx.length);
+		gc.fillPolygon(outx.toArray(), outy.toArray(), outx.size());
 		
 	}
 	

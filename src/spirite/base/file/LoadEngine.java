@@ -341,13 +341,23 @@ public class LoadEngine {
 						List<StrokeSegment> segments = new ArrayList<>(numSegmentsToRead);
 						
 						for( ; numSegmentsToRead > 0; --numSegmentsToRead) {
-							StrokeSegment ss = new StrokeSegment();
-							
-							ss.strokeIndex = helper.ra.readUnsignedShort();
-							ss.pivot = helper.ra.readInt();
-							ss.travel = helper.ra.readInt();
-							
-							segments.add(ss);
+							if( helper.version < 0x000B) {
+								int strokeIndex = helper.ra.readUnsignedShort();
+								int pivot = helper.ra.readInt();
+								int travel = helper.ra.readInt();
+								MagLevStroke stroke = (MagLevStroke) things.get(strokeIndex);
+								float strokeLen = stroke.getDirect().length;
+								StrokeSegment ss = new StrokeSegment( strokeIndex, pivot/strokeLen, travel/strokeLen);
+								segments.add(ss);
+							}
+							else {
+								int strokeIndex = helper.ra.readUnsignedShort();
+								float pivot = helper.ra.readFloat();
+								float travel = helper.ra.readFloat();
+								StrokeSegment ss = new StrokeSegment( strokeIndex, pivot, travel);
+								segments.add(ss);
+							}
+
 						}
 
 						things.add( new MagLevFill(segments, color));

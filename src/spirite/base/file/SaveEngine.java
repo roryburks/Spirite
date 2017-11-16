@@ -461,8 +461,8 @@ public class SaveEngine implements MWorkspaceObserver {
 
 						for( MagLevFill.StrokeSegment seg : fill.segments) {
 							helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
-							helper.ra.writeInt( seg.pivot);			// [4] : pivot
-							helper.ra.writeInt( seg.travel);		// [4] : travel
+							helper.ra.writeFloat( seg._pivot);			// [4] : pivot
+							helper.ra.writeFloat( seg._travel);		// [4] : travel
 						}
 					}
 				}

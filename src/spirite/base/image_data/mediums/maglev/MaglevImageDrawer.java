@@ -130,15 +130,30 @@ public class MaglevImageDrawer
 
 	
 	// :::: IMagnetifFillModule
-	StrokeSegment ss;
+	public static class BuildingStrokeSegment {
+		public int strokeIndex;
+		public int pivot;
+		public int travel;
+		public BuildingStrokeSegment() {}
+	}
+	BuildingStrokeSegment ss;
 	int floatSoft;
-	List<StrokeSegment> strokeSegments;
+	List<BuildingStrokeSegment> strokeSegments;
 	@Override public void startMagneticFill() { 
 		ss = null;
 		strokeSegments = new ArrayList<>();
 	}
 	@Override public void endMagneticFill( int color) {
-		MagLevFill fill = new MagLevFill( strokeSegments, color);
+		List<StrokeSegment> toInsert = new ArrayList<>(strokeSegments.size());
+		
+		for( BuildingStrokeSegment segment : strokeSegments) {
+			MagLevStroke stroke = (MagLevStroke) img.things.get(segment.strokeIndex);
+			float strokeLen = stroke.getDirect().length;
+			
+			toInsert.add(new StrokeSegment(segment.strokeIndex, segment.pivot / strokeLen, segment.travel/strokeLen));
+		}
+		
+		MagLevFill fill = new MagLevFill( toInsert, color);
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
@@ -150,7 +165,7 @@ public class MaglevImageDrawer
 				mimg.addThing(fill);
 
 				mimg.builtImage.doOnGC((gc) -> {
-					fill.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, gc, mimg);
+					fill.draw(mimg.build(new BuildingMediumData(built.handle, 0, 0)), null, gc, mimg);
 				}, new MatTrans());
 				
 			}
@@ -170,7 +185,7 @@ public class MaglevImageDrawer
 			// [Behavior Part 1]: Latching onto a stroke.  Before it starts filling, first
 			//	it has to find a stroke.  It'll latch onto to the first stroke it touches
 			//	(the closest if it touches multiple stries).
-			StrokeSegment cloestSegment = new StrokeSegment();
+			BuildingStrokeSegment cloestSegment = new BuildingStrokeSegment();
 			float closestDistance = findClosestStroke( x, y, cloestSegment);
 			
 			if( cloestSegment.strokeIndex != -1 && closestDistance <= r) {
@@ -179,7 +194,7 @@ public class MaglevImageDrawer
 			}
 		}
 		if( ss != null) {
-			StrokeSegment closestSegment = new StrokeSegment();
+			BuildingStrokeSegment closestSegment = new BuildingStrokeSegment();
 			float closestDistance = findClosestStroke( x, y, closestSegment);
 			
 			if( closestSegment.strokeIndex == ss.strokeIndex && closestDistance <= r) {
@@ -200,58 +215,9 @@ public class MaglevImageDrawer
 				ss = closestSegment;
 				strokeSegments.add(ss);
 			}
-//			// [Behavior Part 2]: When latched on, the 
-//			MagLevStroke stroke = (MagLevStroke)img.things.get(ss.strokeIndex);
-//			int sLen = stroke.direct.length;
-//			int abovePivot = 0;
-//			int belowPivot = 0;
-//			int found;
-//			for( found = -1; ss.pivot + abovePivot < sLen; ++abovePivot) {
-//				int index = abovePivot + ss.pivot;
-//				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
-//					found = abovePivot;
-//				else if( found > ss.travel)	// Quit if you found a point and broke it
-//					break;
-//				
-//				// Don't Look for connections above MAX_JUMP distance from the pivot point
-//				if( (abovePivot - Math.max(ss.travel, 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
-//					break;
-//			}
-//			abovePivot = found;
-//			
-//			for( found = -1; ss.pivot - belowPivot >= 0; ++belowPivot) {
-//				int index = ss.pivot - belowPivot;
-//
-//				if( MUtil.distance( x, y, stroke.direct.x[index], stroke.direct.y[index]) < r)
-//					found = belowPivot;
-//				else if( found > -ss.travel)	// Quit if you found a point and broke it
-//					break;
-//				
-//				// Don't Look for connections above MAX_JUMP distance from the pivot point
-//				if( (belowPivot - Math.max(Math.abs(ss.travel), 0))* StrokeEngine.DIFF >  +  MAX_JUMP)
-//					break;
-//			}
-//			belowPivot = found;
-//			
-//			if( abovePivot == -1 && belowPivot == -1) {
-//				// No matches found, look for a jump
-//				// TODO: Make this better, so that it latches on to things closer to where the segment should
-//				//	logically break.
-//				StrokeSegment closestSegment = new StrokeSegment();
-//				float closestDistance = findClosestStroke( x, y, closestSegment);
-//				
-//				if( closestSegment.strokeIndex != -1 && closestDistance <= r
-//						&& (ss == null || closestSegment.strokeIndex != ss.strokeIndex)) 
-//				{
-//					ss = closestSegment;
-//					strokeSegments.add(ss);
-//				}
-//			}
-//			else
-//				ss.travel = (abovePivot > belowPivot) ? abovePivot : -belowPivot;
 		}
 	}
-	private float findClosestStroke( float x, float y, StrokeSegment out)
+	private float findClosestStroke( float x, float y, BuildingStrokeSegment out)
 	{
 		float closestDistance = Float.MAX_VALUE;
 		int closestIndex = -1;
@@ -280,12 +246,12 @@ public class MaglevImageDrawer
 	@Override
 	public float[] getMagFillXs() {
 		int totalLen = 0;
-		for( StrokeSegment s : strokeSegments)
+		for( BuildingStrokeSegment s : strokeSegments)
 			totalLen += Math.abs(s.travel) + 1;
 		
 		float[] out = new float[totalLen];
 		int index = 0;
-		for( StrokeSegment s : strokeSegments) {
+		for( BuildingStrokeSegment s : strokeSegments) {
 			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
 			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c) 
@@ -299,12 +265,12 @@ public class MaglevImageDrawer
 	@Override
 	public float[] getMagFillYs() {
 		int totalLen = 0;
-		for( StrokeSegment s : strokeSegments)
+		for( BuildingStrokeSegment s : strokeSegments)
 			totalLen += Math.abs(s.travel) + 1;
 		
 		float[] out = new float[totalLen];
 		int index = 0;
-		for( StrokeSegment s : strokeSegments) {
+		for( BuildingStrokeSegment s : strokeSegments) {
 			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
 			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c)
@@ -393,7 +359,16 @@ public class MaglevImageDrawer
 	// :::: IBoneDrawer
 	@Override
 	public void contort(BaseBone bone, Interpolator2D to) {
-		this.img.contortBones(bone, to);
+
+		ImageWorkspace ws = building.handle.getContext();
+		ws.getUndoEngine().performAndStore(new ImageAction(building) {
+
+			@Override
+			protected void performImageAction(ABuiltMediumData built) {
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+				mimg.contortBones(bone, to);
+			}
+		});
 	}
 
 }

@@ -308,9 +308,9 @@ public class BuildSaveLoadTest {
 						
 						assert( segments1.size() == segments2.size());
 						for( int j=0; j<segments1.size(); ++j) {
-							assert( segments1.get(j).pivot == segments2.get(j).pivot);
+							assert( segments1.get(j)._pivot == segments2.get(j)._pivot);
 							assert( segments1.get(j).strokeIndex == segments2.get(j).strokeIndex);
-							assert( segments1.get(j).travel == segments2.get(j).travel);
+							assert( segments1.get(j)._travel == segments2.get(j)._travel);
 						}
 					}
 				}
