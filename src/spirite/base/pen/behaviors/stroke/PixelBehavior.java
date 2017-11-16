@@ -1,7 +1,6 @@
 package spirite.base.pen.behaviors.stroke;
 
 import spirite.base.brains.ToolsetManager;
-import spirite.base.brains.ToolsetManager.PenDrawMode;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;

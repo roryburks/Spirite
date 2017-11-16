@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;

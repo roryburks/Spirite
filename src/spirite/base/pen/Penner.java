@@ -15,8 +15,8 @@ import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
@@ -32,6 +32,7 @@ import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
+import spirite.base.pen.behaviors.BagBehavior;
 import spirite.base.pen.behaviors.BoneComposingBehavior;
 import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.pen.behaviors.CroppingBehavior;
@@ -223,6 +224,7 @@ public class Penner
 			
 			switch( tool) {
 			case PEN:
+				
 				if( holdingCtrl) 
 					behavior = new PickBehavior( this, mbe.buttonType == ButtonType.LEFT);
 				else {

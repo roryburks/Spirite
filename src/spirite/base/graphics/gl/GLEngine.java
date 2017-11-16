@@ -712,7 +712,7 @@ public class GLEngine  {
 		@Override
 		protected void finalize() throws Throwable {
 			if(!_free)
-				System.out.println("BAD: PreparedData (VBO wrapper) not freed before being finalized.");
+				MDebug.handleWarning(WarningType.STRUCTURAL, "PreparedData (VBO wrapper) not freed before being finalized.");
 			free();
 			super.finalize();
 		}

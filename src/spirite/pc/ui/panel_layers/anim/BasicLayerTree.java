@@ -53,7 +53,6 @@ public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImage
 					cmenu.removeAll();
 					BTNode btnode = tree.getNodeAtPoint(e.getPoint());
 
-					System.out.println(btnode);
 					if( btnode == null)
 						return;
 					

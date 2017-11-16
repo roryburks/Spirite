@@ -46,7 +46,7 @@ public abstract class StrokeEngine {
 			
 			this.length = x.length;
 			if( x.length != y.length || x.length != w.length)
-				System.out.println("BAD");
+				MDebug.handleWarning(WarningType.STRUCTURAL, "Miss-matched x/y array lengths.");
 		}
 	}
 	

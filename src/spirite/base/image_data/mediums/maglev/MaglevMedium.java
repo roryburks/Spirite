@@ -16,10 +16,10 @@ import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
-import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.interpolation.Interpolator2D;
 import spirite.hybrid.HybridHelper;
 
 /**

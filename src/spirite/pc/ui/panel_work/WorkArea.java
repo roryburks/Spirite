@@ -2,33 +2,26 @@ package spirite.pc.ui.panel_work;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.nio.FloatBuffer;
-import java.util.List;
-
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
 import spirite.base.graphics.GraphicsContext.LineAttributes;
-import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.ReferenceManager.MReferenceObserver;
-import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
-import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
-import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.ReferenceManager;
+import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
+import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
+import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;

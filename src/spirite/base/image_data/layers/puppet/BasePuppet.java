@@ -3,9 +3,7 @@ package spirite.base.image_data.layers.puppet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -13,12 +11,12 @@ import spirite.base.file.LoadEngine.PuppetPartInfo;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine;
+import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.util.glmath.MatTrans;
-import spirite.hybrid.MDebug.WarningType;
 import spirite.hybrid.MDebug;
+import spirite.hybrid.MDebug.WarningType;
 
 public class BasePuppet implements IPuppet {
 	BasePart rootPart = new BasePart(null);	// Nill part

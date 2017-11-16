@@ -1,7 +1,6 @@
 package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
@@ -12,13 +11,10 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
-import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.glmath.Vec2i;
-import spirite.base.util.interpolation.CubicSplineInterpolatorND;
 import spirite.base.util.interpolation.Interpolator2D;
 
 /**

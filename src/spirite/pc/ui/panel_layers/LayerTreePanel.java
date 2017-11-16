@@ -22,7 +22,6 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -60,7 +59,6 @@ import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
-import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.UIUtil;
 

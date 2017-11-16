@@ -11,7 +11,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.puppet.IPuppet.IPart;
 import spirite.base.image_data.mediums.IMedium;
@@ -111,7 +110,6 @@ public class PuppetLayer extends Layer {
 		
 		if( parts.size()-1 < selected)
 			selected = parts.size()-1;
-		System.out.println(parts.size());
 		
 		return getActivePuppet().getParts().get(selected).buildData();
 		//return new BuildingMediumData(__D__medium);

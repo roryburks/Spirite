@@ -17,30 +17,11 @@ import com.jogamp.opengl.util.GLBuffers;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.base.brains.MasterControl;
-import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLGraphics;
-import spirite.base.graphics.renderer.RenderEngine;
-import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.MFlashObserver;
-import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.ReferenceManager.MReferenceObserver;
-import spirite.base.image_data.selection.SelectionEngine;
-import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
-import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
-import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.hybrid.Globals;
 import spirite.pc.jogl.JOGLCore;
-import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;
-import spirite.pc.ui.panel_work.WorkPanel.View;
 
 
 /**

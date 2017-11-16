@@ -1,6 +1,5 @@
 package spirite.base.pen.behaviors;
 
-import javafx.scene.paint.Color;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;

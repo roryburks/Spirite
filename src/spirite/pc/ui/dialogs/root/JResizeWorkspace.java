@@ -1,7 +1,5 @@
 package spirite.pc.ui.dialogs.root;
 
-import java.awt.Dimension;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;

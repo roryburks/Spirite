@@ -3,10 +3,9 @@ package spirite.base.pen.behaviors.stroke;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.pen.behaviors.StateBehavior;
-import spirite.base.pen.Penner;
-import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 
 abstract class StrokeBehavior extends StateBehavior {

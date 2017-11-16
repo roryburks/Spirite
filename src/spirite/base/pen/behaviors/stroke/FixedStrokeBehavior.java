@@ -2,7 +2,6 @@ package spirite.base.pen.behaviors.stroke;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.GraphicsContext.LineAttributes;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.pen.PenTraits.PenState;

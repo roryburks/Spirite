@@ -16,7 +16,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.util.glmath.Vec2i;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.TestGLDiag;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;

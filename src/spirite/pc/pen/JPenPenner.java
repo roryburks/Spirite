@@ -131,7 +131,7 @@ public class JPenPenner implements PenListener
 
 	@Override
 	public void penTock(long arg0) {
-		HybridHelper.queueToRun(() -> {penner.step();});
+		HybridHelper.queueToRun(() -> penner.step());
 	}
 
 	
