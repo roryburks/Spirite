@@ -1,5 +1,8 @@
 package spirite.base.pen.behaviors;
 
+import spirite.base.brains.ToolsetManager.MToolsetObserver;
+import spirite.base.brains.ToolsetManager.Property;
+import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
@@ -10,7 +13,7 @@ import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 
-public class BoneComposingBehavior extends DrawnStateBehavior {
+public class BoneComposingBehavior extends DrawnStateBehavior  {
 	private final IPuppetBoneDrawer drawer;
 	
 	float startX, startY;
@@ -26,6 +29,7 @@ public class BoneComposingBehavior extends DrawnStateBehavior {
 
 	public BoneComposingBehavior(Penner penner, IPuppetBoneDrawer drawer) {
 		super(penner);
+		
 		this.drawer = drawer;
 	}
 

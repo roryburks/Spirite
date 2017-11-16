@@ -339,7 +339,6 @@ public class MaglevImageDrawer
 			this.building.handle.getContext().getUndoEngine().performAndStore(
 					new MagWeightEraseAction(building, thingsToRemove, iweId));
 		}
-//		
 	}
 
 	@Override

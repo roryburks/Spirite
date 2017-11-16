@@ -61,8 +61,8 @@ public class BoneContorter {
 					Vec2 p = state.eval(t * clen);
 					float[] normal = normals.eval(t);
 					transformed[i] = new PenState(
-							p.x + normal[0]*m, 
-							p.y + normal[1]*m, 
+							p.x - normal[0]*m, 
+							p.y - normal[1]*m, 
 							toTransform[i].pressure);
 				}
 				

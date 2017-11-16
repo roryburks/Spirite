@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jogamp.opengl.util.av.NullGLMediaPlayer;
 import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
@@ -312,6 +313,17 @@ public class ToolsetManager
     	ColorChangeScopes( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
     }
+    public enum BoneStretchMode {
+    	SCALE("Scale"),
+    	CLIP_HEAD("Clip Head"),
+    	CLIP_EVEN("Clamp"),
+    	SCALE_TO_BONE("Scale perpendicular to bone.")
+    	;
+
+    	public final String hrName;
+    	BoneStretchMode( String hrName) {this.hrName = hrName;}
+    	@Override public String toString() {return hrName;}
+    }
     private void constructSettings() {
         toolSettings.put( Tool.PEN, constructFromScheme( new Property[] {
 	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
@@ -354,6 +366,11 @@ public class ToolsetManager
         		new SizeProperty("width", "Width", 5.0f),
         		new CheckBoxProperty("full", "Full Erase", true)
         }, Tool.EXCISE_ERASER));
+        toolSettings.put( Tool.BONE, constructFromScheme( new Property[]{
+        		new ButtonProperty("resize", "Resize", null, master),
+        		new DropDownProperty<BoneStretchMode>("mode", "Resize Mode", BoneStretchMode.SCALE, BoneStretchMode.class),
+        		new ButtonProperty("do", "Do Bone Transform", null, master),
+        }, Tool.BONE));
     }
 
     public static final int DISABLE_ON_NO_SELECTION = 0x01;

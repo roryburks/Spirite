@@ -29,6 +29,9 @@ public abstract class GraphicsContext {
 	public abstract void drawBounds(IImage bi, int c);
 
 	public abstract void clear();
+
+	public abstract int getWidth();
+	public abstract int getHeight();
 	
 	/** Setting to null produces undefined behavior. */
 	public abstract void setTransform( MatTrans trans);

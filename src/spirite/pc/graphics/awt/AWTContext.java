@@ -47,6 +47,8 @@ public class AWTContext extends GraphicsContext{
 	}
 	public Graphics getGraphics() {return g2;}
 
+	public int getWidth() {return width;}
+	public int getHeight() {return height;}
 
 	// ==========
 	// ==== Simple Pass-through methods

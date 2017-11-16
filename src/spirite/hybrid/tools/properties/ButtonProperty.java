@@ -31,8 +31,9 @@ public class ButtonProperty extends SwingToolProperty {
 		this.mask = mask;
 	}
 
-	@Override public String getValue() { return command; }
-	@Override protected void setValue( Object newValue) { this.command = (String)newValue;}
+	// Note: For Buttons, 
+	@Override public Boolean getValue() { return false; }
+	@Override protected void setValue( Object newValue) { }
 	
 
 	@Override
@@ -45,7 +46,9 @@ public class ButtonProperty extends SwingToolProperty {
 		button.setActionCommand( command);
 		button.addActionListener(new ActionListener() {
 			@Override public void actionPerformed(ActionEvent e) {
-				master.executeCommandString(command);
+				if( command != null)
+					master.executeCommandString(command);
+				settings.setValue(id, null);
 			}
 		});
 
