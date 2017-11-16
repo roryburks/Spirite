@@ -14,54 +14,55 @@ import javax.swing.JRadioButton;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 
-public class RadioButtonProperty extends SwingToolProperty {
-	private int value;
-	private String[] options;
+public class RadioButtonProperty<T extends Enum<T>> extends SwingToolProperty {
+	private T value;
+	private final Class<T> type;
 
-	public RadioButtonProperty( String id, String hrName, int defaultValue, String[] options) {
-		this( id, hrName, defaultValue, options, 0);
+	public RadioButtonProperty( String id, String hrName, T defaultValue, Class<T> type) {
+		this( id, hrName, defaultValue, 0, type);
 	}
-	public RadioButtonProperty( String id, String hrName, int defaultValue, String[] options, int mask) {
+	public RadioButtonProperty( String id, String hrName, T defaultValue, int mask, Class<T> type) {
 		this.value = defaultValue;
 		this.id = id;
 		this.hrName = hrName;
-		this.options = options;
 		this.mask = mask;
+		this.type = type;
 	}
 	
-	@Override public Integer getValue() {return value;}
-	@Override protected void setValue(Object newValue) { this.value = (Integer)newValue;}
+	@Override public T getValue() {return value;}
+	@Override protected void setValue(Object newValue) { this.value = (T)newValue;}
 	
 
 	@Override
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		List<JComponent> links = new ArrayList<>( options.length);
+		int len = type.getEnumConstants().length;
+		List<JComponent> links = new ArrayList<>( len);
 		// TODO : Add Binding
 		
 		
 		// Create Components and their settings
-		JRadioButton[] radioButtons = new JRadioButton[ options.length];
-		for( int i=0; i<options.length; ++i) {
-			radioButtons[i] = new JRadioButton(options[i]);
+		JRadioButton[] radioButtons = new JRadioButton[  len];
+		for( int i=0; i< len; ++i) {
+			radioButtons[i] = new JRadioButton(type.getEnumConstants()[i].toString());
 			links.add( radioButtons[i]);
 			radioButtons[i].setFont(new Font("Tahoma",Font.PLAIN, 10));
 		}
 		
-		radioButtons[value].setSelected(true);
+		radioButtons[value.ordinal()].setSelected(true);
 		
 		// Link actions of the Components, and add them to the layout
 		Group horSub = layout.createParallelGroup();
-		for( int i=0; i<options.length; ++i) {
-			final int index = i;
+		for( int i=0; i< len; ++i) {
+			final T option = type.getEnumConstants()[i];
 			radioButtons[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					for( int i=0; i<options.length; ++i) {
-						radioButtons[i].setSelected(i == index);
+					for( int i=0; i<len; ++i) {
+						radioButtons[i].setSelected(i == option.ordinal());
 					}
-					settings.setValue(id, index);
+					settings.setValue(id, option);
 				}
 			});
 			

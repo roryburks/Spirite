@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.util.glmath.Rect;

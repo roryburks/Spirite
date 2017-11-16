@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.image_data.GroupTree.LayerNode;

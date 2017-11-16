@@ -2,6 +2,7 @@ package spirite.pc.graphics.awt;
 
 import java.awt.image.BufferedImage;
 
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
 import spirite.base.pen.StrokeEngine;
@@ -22,7 +23,7 @@ public class AWTDrawer extends GraphicsDrawer {
 	}
 
 	@Override
-	public void changeColor(RawImage image, int cFrom, int cTo, int mode) {
+	public void changeColor(RawImage image, int cFrom, int cTo, ColorChangeMode mode) {
 		if( !(image instanceof ImageBI)) {
 			MDebug.handleWarning( WarningType.UNSUPPORTED, null, "Unsupported Image Type in AWTDrawer");
 			return;
@@ -31,22 +32,22 @@ public class AWTDrawer extends GraphicsDrawer {
 		
 		// TODO: Make Better (or at least test if there is a better way to access
 		//	and change a batch of BufferedImage data)
-		int f = (mode == 0) ? cFrom : (cFrom & 0xFFFFFF);
-		int t = (mode == 0) ? cTo : (cTo & 0xFFFFFF);
+		int f = (mode == ColorChangeMode.CHECK_ALL) ? cFrom : (cFrom & 0xFFFFFF);
+		int t = (mode == ColorChangeMode.CHECK_ALL) ? cTo : (cTo & 0xFFFFFF);
 		int rgb;
 		for( int x = 0; x < bi.getWidth(); ++x) {
 			for( int y=0; y < bi.getHeight(); ++y) {
 				rgb = bi.getRGB(x, y);
 				switch( mode) {
-				case 0:
+				case CHECK_ALL:
 					if( rgb == f)
 						bi.setRGB(x, y, t);
 					break;
-				case 1:
+				case IGNORE_ALPHA:
 					if( (rgb & 0xFFFFFF) == f)
 						bi.setRGB(x, y, (rgb & 0xFF000000) | t);
 					break;
-				case 2:
+				case AUTO:
 					bi.setRGB(x, y, (rgb & 0xFF000000) | t);
 					break;
 				}

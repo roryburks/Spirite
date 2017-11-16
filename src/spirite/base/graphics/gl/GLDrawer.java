@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl;
 
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
@@ -32,7 +33,7 @@ public class GLDrawer extends GraphicsDrawer {
 	@Override public StrokeEngine getStrokeEngine() { return strokeEngine; }
 
 	@Override
-	public void changeColor(RawImage image, int from, int to, int mode) {
+	public void changeColor(RawImage image, int from, int to, ColorChangeMode mode) {
 		if( image.getWidth() <= 0 || image.getHeight() <= 0)
 			return;
 		
@@ -45,7 +46,7 @@ public class GLDrawer extends GraphicsDrawer {
 	    	
 	    	engine.setTarget(img);
 	    	
-	    	params.addParam( new GLParam1i("optionMask", mode | 4));
+	    	params.addParam( new GLParam1i("optionMask", mode.shaderCode | 4));
 	    	params.addParam( new GLParam4f("cFrom", 
 	    			Colors.getRed(from)/255f, Colors.getGreen(from)/255f, Colors.getBlue(from)/255f, Colors.getAlpha(from)/255f));
 	    	params.addParam( new GLParam4f("cTo", 

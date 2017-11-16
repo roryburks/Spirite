@@ -5,7 +5,9 @@ import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.BoxSelectionShape;
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.ToolsetManager.FlipMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
@@ -32,7 +34,6 @@ import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.ButtonType;
 import spirite.base.pen.PenTraits.MButtonEvent;
-import spirite.base.pen.behaviors.BagBehavior;
 import spirite.base.pen.behaviors.BoneComposingBehavior;
 import spirite.base.pen.behaviors.BoneContortionBehavior;
 import spirite.base.pen.behaviors.CroppingBehavior;
@@ -315,16 +316,16 @@ public class Penner
 				break;
 			case FLIPPER:{
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
-				Integer flipMode = (Integer)settings.getValue("flipMode");
+				FlipMode flipMode = (FlipMode)settings.getValue("flipMode");
 
 				switch( flipMode) {
-				case 0:	// Horizontal
+				case HORIZONTAL:
 					tryFlip(true);
 					break;
-				case 1:	// Vertical
+				case VERTICAL:
 					tryFlip(false);
 					break;
-				case 2:
+				case BY_MOVEMENT:
 					behavior = new FlippingBehavior(this);
 					break;
 				}
@@ -356,7 +357,7 @@ public class Penner
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
 				
 				ColorChangeScopes scope = (ColorChangeScopes)settings.getValue("scope");
-				int mode = (Integer)settings.getValue("mode");
+				ColorChangeMode mode = (ColorChangeMode)settings.getValue("mode");
 				
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				

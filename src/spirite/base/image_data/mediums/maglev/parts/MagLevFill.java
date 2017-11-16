@@ -5,7 +5,6 @@ import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.image_data.mediums.maglev.MaglevImageDrawer.BuildingStrokeSegment;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.StrokeEngine;
@@ -31,7 +30,7 @@ public class MagLevFill extends AMagLevThing {
 	}
 	
 	public final List<MagLevFill.StrokeSegment> segments;
-	public final int color;
+	public int color;
 	public MagLevFill( List<MagLevFill.StrokeSegment> segments, int color) {
 		this.segments = new ArrayList<>(segments.size());
 		this.segments.addAll(segments);

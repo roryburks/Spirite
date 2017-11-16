@@ -18,7 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.pen.Penner;
 import spirite.hybrid.Globals;

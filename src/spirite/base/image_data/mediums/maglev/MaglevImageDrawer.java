@@ -1,8 +1,13 @@
 package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
+import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
@@ -13,6 +18,7 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
@@ -36,7 +42,8 @@ public class MaglevImageDrawer
 				ITransformModule,
 				IMagneticFillModule,
 				IWeightEraserModule,
-				IBoneDrawer
+				IBoneDrawer,
+				IColorChangeModule
 {
 
 	private final BuildingMediumData building;
@@ -369,6 +376,59 @@ public class MaglevImageDrawer
 				mimg.contortBones(bone, to);
 			}
 		});
+	}
+
+	// :::: IColorChangeModule
+	@Override
+	public void changeColor(int from, int to, ColorChangeScopes scope, ColorChangeMode mode) {
+		ImageWorkspace ws = building.handle.getContext();
+		final Map<Integer,Integer> oldColorMap = new HashMap<>();
+		
+		for( int i=0; i < img.things.size(); ++i) {
+			AMagLevThing thing = img.things.get(i);
+			Integer color = null;
+			
+			
+			if( thing instanceof MagLevFill) 
+				color = ((MagLevFill)thing).color;
+			if( thing instanceof MagLevStroke)
+				color =((MagLevStroke) thing).params.getColor();
+			
+			switch( mode) {
+			case CHECK_ALL:
+				if( color == from)
+					oldColorMap.put(i, color);
+				break;
+			case IGNORE_ALPHA:
+				if( color != null && ((color & 0xfffff) == (from & 0xffffff)))
+					oldColorMap.put(i, color);
+				break;
+			case AUTO:
+				oldColorMap.put(i, color);
+				break;
+			}
+		}
+		
+		if( oldColorMap.size() != 0) {
+			ws.getUndoEngine().performAndStore(new ImageAction(building) {
+
+				@Override
+				protected void performImageAction(ABuiltMediumData built) {
+					MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+
+					for( Entry<Integer,Integer> entry : oldColorMap.entrySet()) {
+						AMagLevThing thing = mimg.things.get(entry.getKey());
+						if( thing instanceof MagLevFill) 
+							((MagLevFill)thing).color = to;
+						if( thing instanceof MagLevStroke)
+							((MagLevStroke) thing).params.setColor(to);
+					}
+					
+					mimg.unbuild();
+					mimg.Build();
+				}
+			});
+		}
 	}
 
 }

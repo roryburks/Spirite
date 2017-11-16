@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
 

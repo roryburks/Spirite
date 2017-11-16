@@ -3,8 +3,6 @@ package spirite.base.pen.behaviors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.sampled.FloatControl;
-
 import spirite.base.brains.ToolsetManager.BoneStretchMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
@@ -26,7 +24,6 @@ import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.hybrid.HybridHelper;
-import spirite.hybrid.HybridUtil;
 
 public class BoneContortionBehavior extends DrawnStateBehavior 
 	implements MToolsetObserver 
@@ -36,10 +33,14 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		BETWEEN,
 		DEFORMING,
 		PROPOSING,
+		MOVING_PROP,
+		
 	}
 	State state = State.MAKING;
 	
 	float x1, y1, x2, y2;
+	int startX, startY;
+	
 	FloatCompactor fx, fy;
 	private final IBoneDrawer drawer;
 	CubicSplineInterpolator2D proposing;
@@ -123,7 +124,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			fx = new FloatCompactor();
 			fy = new FloatCompactor();
 		}
-		if( state == State.DEFORMING) {
+		else if( state == State.DEFORMING) {
 			
 			CubicSplineInterpolator2D prel = new CubicSplineInterpolator2D(fx.toArray(), fy.toArray(), false);
 			
@@ -140,6 +141,18 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			//drawer.contort(b, proposing);			
 			//end();
 		}
+		else if( state == State.MOVING_PROP) {
+			if( memoryProposedPoints != null)  {
+				for( Vec2 p : memoryProposedPoints) {
+					p.x += penner.x - startX;
+					p.y += penner.y - startY;
+				}
+				memoryProposition = new CubicSplineInterpolator2D(memoryProposedPoints, false);
+				memoryProposition.setExtrapolating(true);
+			}
+			
+			state = State.PROPOSING;
+		}
 		penner.repaint();
 	}
 	@Override
@@ -148,13 +161,20 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			state = State.DEFORMING;
 		}
 		else if( state == State.PROPOSING) {
-			state = State.DEFORMING;
-			fx = new FloatCompactor();
-			fy = new FloatCompactor();
-			proposing = null;
-			proposedPoints = null;
-			memoryProposition = null;
-			memoryProposedPoints = null;
+			if( penner.holdingShift) {
+				startX = penner.x;
+				startY = penner.y;
+				state = State.MOVING_PROP;
+			}
+			else {
+				state = State.DEFORMING;
+				fx = new FloatCompactor();
+				fy = new FloatCompactor();
+				proposing = null;
+				proposedPoints = null;
+				memoryProposition = null;
+				memoryProposedPoints = null;
+			}
 		}
 	}
 
@@ -167,6 +187,14 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		else if( state == State.DEFORMING){
 			fx.add(penner.x);
 			fy.add(penner.y);
+		}
+		else if( state == State.MOVING_PROP) {
+			for( Vec2 p : proposedPoints) {
+				p.x += penner.x - penner.oldX;
+				p.y += penner.y - penner.oldY;
+			}
+			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
+			proposing.setExtrapolating(true);
 		}
 	}
 
@@ -191,7 +219,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			}
 			else HybridHelper.beep();
 		}
-		if(property.getId().equals("leniency") && memoryProposition != null) {
+		if((property.getId().equals("leniency") || property.getId().equals("mode")) && memoryProposition != null) {
 			_doScale((BoneStretchMode)settings.getProperty("mode").getValue(), 
 					(Float)settings.getProperty("leniency").getValue());
 		}

@@ -1,5 +1,6 @@
 package spirite.base.image_data.mediums.drawer;
 
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
@@ -47,7 +48,7 @@ public interface IImageDrawer {
 	}
 	
 	public interface IColorChangeModule {
-		public void changeColor(  int from, int to, ColorChangeScopes scope, int mode);
+		public void changeColor(  int from, int to, ColorChangeScopes scope, ColorChangeMode mode);
 	}
 	
 	public interface IInvertModule {

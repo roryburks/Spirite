@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
 import spirite.base.graphics.RawImage;
@@ -200,7 +201,7 @@ public class Test1 {
 			int PRE = 7;
 			for( int i=0; i < ROUNDS_TO_TEST; ++i) {
 				ImageWorkspace workspace = new ImageWorkspace(master);
-				master.addWorkpace(workspace, false);
+				master.addCreatedWorkpace(workspace, false);
 				Layer layer1 = ((LayerNode)workspace.addNewSimpleLayer(null, 150, 150, "base", Colors.toColor(0,0,0,0),InternalImageTypes.NORMAL)).getLayer();
 				workspace.finishBuilding();
 				
@@ -288,7 +289,7 @@ public class Test1 {
 			workspace.setSelectedNode(randomLayerNode(workspace));
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IColorChangeModule)
-				((IColorChangeModule) drawer).changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], rn.nextInt(3));
+				((IColorChangeModule) drawer).changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], ColorChangeMode.values()[rn.nextInt(3)]);
 			break;}
 		case 6: {
 			// Invert
@@ -348,7 +349,7 @@ public class Test1 {
 		for( int round=0; round < CACHE_ROUNDS; ++round) {
 			ImageWorkspace workspace = new ImageWorkspace(master);
 			workspace.finishBuilding();
-			master.addWorkpace(workspace, false);
+			master.addCreatedWorkpace(workspace, false);
 			
 			workspace.addNewSimpleLayer(null, 50, 50, "BASE", Colors.toColor(0,0,0,0), InternalImageTypes.NORMAL);
 			for( int i=0; i<50; ++i) {

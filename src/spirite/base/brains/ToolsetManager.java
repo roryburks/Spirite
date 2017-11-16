@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jogamp.opengl.util.av.NullGLMediaPlayer;
-import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
@@ -325,6 +324,30 @@ public class ToolsetManager
     	BoneStretchMode( String hrName) {this.hrName = hrName;}
     	@Override public String toString() {return hrName;}
     }
+    public enum FlipMode {
+    	HORIZONTAL("Horizontal Flipping"),
+    	VERTICAL( "Vertical Flipping"),
+    	BY_MOVEMENT("Determine from Movement"),
+    	;
+
+    	public final String hrName;
+    	FlipMode( String hrName) {this.hrName = hrName;}
+    	@Override public String toString() {return hrName;}
+    }
+    public enum ColorChangeMode {
+    	CHECK_ALL("Check Alpha", 0),
+    	IGNORE_ALPHA("Ignore Alpha", 1),
+    	AUTO("Change All", 2)
+    	;
+
+    	public final String hrName;
+    	public final int shaderCode;
+    	ColorChangeMode( String hrName, int code) {
+    		this.hrName = hrName;
+    		this.shaderCode = code;
+    	}
+    	@Override public String toString() {return hrName;}
+    }
     private void constructSettings() {
         toolSettings.put( Tool.PEN, constructFromScheme( new Property[] {
 	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
@@ -349,13 +372,11 @@ public class ToolsetManager
         		new CheckBoxProperty("shrinkOnly", "Shrink-only Crop", false)
         }, Tool.CROP));
         toolSettings.put( Tool.FLIPPER, constructFromScheme( new Property[] {
-        		new RadioButtonProperty( "flipMode", "Flip Mode", 2, 
-        				new String[] {"Horizontal Flipping", "Vertical Flipping", "Determine from Movement"}),
+        		new RadioButtonProperty<FlipMode>( "flipMode", "Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.class),
         }, Tool.FLIPPER));
         toolSettings.put( Tool.COLOR_CHANGE, constructFromScheme( new Property[] {
         		new DropDownProperty<ColorChangeScopes>("scope", "Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.class),
-        		new RadioButtonProperty("mode", "Apply Mode", 0,
-                        new String[] {"Check Alpha", "Ignore Alpha", "Change All"})
+        		new RadioButtonProperty<ColorChangeMode>("mode", "Apply Mode", ColorChangeMode.CHECK_ALL, ColorChangeMode.class)
         }, Tool.COLOR_CHANGE));
         toolSettings.put( Tool.RESHAPER, constructFromScheme( new Property[] {
         		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master, DISABLE_ON_NO_SELECTION),
@@ -372,6 +393,7 @@ public class ToolsetManager
         		new OpacityProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
         		new DropDownProperty<BoneStretchMode>("mode", "Resize Mode", BoneStretchMode.SCALE, BoneStretchMode.class),
         		new ButtonProperty("do", "Do Bone Transform", null, master),
+        		new CheckBoxProperty("preview", "Preview", false)
         }, Tool.BONE));
     }
 

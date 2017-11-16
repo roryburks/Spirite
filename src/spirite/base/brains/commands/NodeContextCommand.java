@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;

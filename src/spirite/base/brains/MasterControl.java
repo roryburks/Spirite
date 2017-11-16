@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import com.jogamp.opengl.GL2;
 
+import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.brains.commands.GlobalCommandExecuter;
 import spirite.base.brains.commands.NodeContextCommand;
 import spirite.base.brains.commands.RelativeWorkspaceCommandExecuter;
@@ -121,7 +122,7 @@ public class MasterControl
         
         // One of the few usages of invokeLater that seems appropriate
         HybridHelper.queueToRun( () -> {
-	        newWorkspace(640,480,0x00000000, true);
+	        createNewWorkspace(640,480,0x00000000, true);
 	        getCurrentWorkspace().finishBuilding();
         });
     }
@@ -297,7 +298,7 @@ public class MasterControl
     	if( workspace != null && !workspaces.contains(workspace)) {
     		MDebug.handleWarning(WarningType.STRUCTURAL, this, "Tried to assign current workspace to a workspace that MasterControl isn't tracking.");
     		
-    		addWorkpace(workspace, false);
+    		addCreatedWorkpace(workspace, false);
     	}
     	
     	ImageWorkspace previous = currentWorkspace;
@@ -311,7 +312,7 @@ public class MasterControl
      * 	such as with the LoadEngine, rather than making a new one with a default layer.
      * @return 
      */
-	public ImageWorkspace addWorkpace(ImageWorkspace workspace, boolean select) {
+	public ImageWorkspace addCreatedWorkpace(ImageWorkspace workspace, boolean select) {
 		workspaces.add(workspace);
 		triggerNewWorkspace(workspace);
 		
@@ -330,13 +331,13 @@ public class MasterControl
 			workspace.addNewSimpleLayer(null, image, "Base Image", InternalImageTypes.NORMAL);
 		workspace.finishBuilding();
 		
-		this.addWorkpace(workspace, select);
+		this.addCreatedWorkpace(workspace, select);
 		return workspace;
 	}
     
 
-    public void newWorkspace( int width, int height) {newWorkspace(width,height, 0x00000000, true);}
-    public void newWorkspace( int width, int height, int color, boolean selectOnCreate) {
+    public void createNewWorkspace( int width, int height) {createNewWorkspace(width,height, 0x00000000, true);}
+    public void createNewWorkspace( int width, int height, int color, boolean selectOnCreate) {
     	ImageWorkspace ws = new ImageWorkspace( this);
     	ws.addNewSimpleLayer(null, width, height, "Background", color, InternalImageTypes.NORMAL);
     	
@@ -403,17 +404,6 @@ public class MasterControl
     }
     
 
-    public interface CommandExecuter {
-    	public abstract List<String> getValidCommands();
-    	public String getCommandDomain();
-    	public boolean executeCommand( String command, Object extra);
-    }
-    
-   
-
-    
-    
-    
     // ===============
     // ==== Observer Interfaces
     /***

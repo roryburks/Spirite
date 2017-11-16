@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import spirite.base.brains.ToolsetManager.ColorChangeMode;
 import spirite.base.brains.ToolsetManager.ColorChangeScopes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -314,7 +315,7 @@ public class DefaultImageDrawer
 
 	// :::: IColorChangeModule
 	@Override
-	public void changeColor( int from, int to, ColorChangeScopes scope, int mode) {
+	public void changeColor( int from, int to, ColorChangeScopes scope, ColorChangeMode mode) {
 		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
@@ -389,12 +390,12 @@ public class DefaultImageDrawer
 	public class ColorChangeAction extends PerformFilterAction 
 	{
 		private final int from, to;
-		private final int mode;
+		private final ColorChangeMode mode;
 		private ColorChangeAction(
 				BuildingMediumData data, 
 				SelectionMask mask, 
 				int from, int to, 
-				int mode) 
+				ColorChangeMode mode) 
 		{
 			super(data, mask);
 			this.from = from;

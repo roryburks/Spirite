@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
 import spirite.base.brains.ToolsetManager.Tool;

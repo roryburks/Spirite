@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.ImageWorkspace;
 

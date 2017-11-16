@@ -14,7 +14,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.MasterControl.CommandExecuter;
+import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.TestGLDiag;
@@ -266,7 +266,7 @@ public class Dialogs
                 JOptionPane.PLAIN_MESSAGE);
 
         if( response == JOptionPane.OK_OPTION) {
-            master.newWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor().getRGB(), true);
+            master.createNewWorkspace(panel.getValueWidth(), panel.getValueHeight(), panel.getValueColor().getRGB(), true);
             master.getCurrentWorkspace().finishBuilding();
         }
     }

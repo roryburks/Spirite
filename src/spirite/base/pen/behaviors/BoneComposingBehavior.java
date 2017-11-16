@@ -1,8 +1,5 @@
 package spirite.base.pen.behaviors;
 
-import spirite.base.brains.ToolsetManager.MToolsetObserver;
-import spirite.base.brains.ToolsetManager.Property;
-import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.JoinMethod;
