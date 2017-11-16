@@ -27,6 +27,7 @@ public class CubicSplineInterpolator2D
     private float distance = 0;
 
     private final boolean fast;
+    private boolean extrapolate = false;
 
     /**
      *
@@ -107,6 +108,8 @@ public class CubicSplineInterpolator2D
 	}
     
 
+    public boolean isExtrapolating() { return extrapolate;}
+    public void setExtrapolating( boolean extrapolate) {this.extrapolate = extrapolate;}
 	public float getCurveLength() {return this.distance;}
     public int getNumPoints() {return this.length;}
     public float getX(int n) {return x_[n];}
@@ -207,29 +210,48 @@ public class CubicSplineInterpolator2D
 
     @Override
     public Vec2 eval(float t) {
-        if( kx.length == 0) return new Vec2(0,0);
+        if( length == 0) return new Vec2(0,0);
 
-        if( t <= 0) return new Vec2(x_[0], y_[0]);
-        if( t >= distance) return new Vec2(x_[kx.length-1], y_[kx.length-1]);
+        if( t <= 0 && !extrapolate)return new Vec2(x_[0], y_[0]);
+        if( t >= distance && !extrapolate) return new Vec2(x_[length-1], y_[length-1]);
 
         int i = 0;
-        while( t > t_[i] &&  ++i < kx.length);
-        if( i == kx.length) return new Vec2(x_[kx.length-1], y_[kx.length-1]);
+        while( t > t_[i] &&  ++i < length);
+        if( i == length && !extrapolate) return new Vec2(x_[length-1], y_[length-1]);
 
+        if( i == 0) {
+        	Vec2 p1 = _eval(0.075f, 0, 1);
+        	
+        	float dt = (float)MUtil.distance(p1.x, p1.y, x_[0], y_[0]);
+        	float d = t / dt;
+        	
+        	return new Vec2( x_[0] + d * (p1.x - x_[0]),y_[0] + d * (p1.y - y_[0]));
+        }
+        if( i == length) {
 
-        float dt = t_[i]-t_[i-1];
-        float n = (t - t_[i-1])/dt;
+        	Vec2 p1 = _eval(0.925f, length-2, length-1);
+        	
+        	float dt = (float)MUtil.distance(p1.x, p1.y, x_[length-1], y_[length-1]);
+        	float d = (t - distance) / dt + 1;
+        	
+        	return new Vec2( x_[length-1] + d * (x_[length-1]-p1.x ),y_[length-1] + d * ( y_[length-1]- p1.y));
+        }
+        
+        return _eval((t - t_[i-1])/(t_[i]-t_[i-1]), i-1, i);
+    }
+    private Vec2 _eval(float n, int i1, int i2) {
+        float dt = t_[i2]-t_[i1];
+        float a_x = kx[i1]*dt - (x_[i2] - x_[i1]);
+        float b_x =-kx[i2]*dt + x_[i2] - x_[i1];
+        float a_y = ky[i1]*dt - (y_[i2] - y_[i1]);
+        float b_y =-ky[i2]*dt + y_[i2] - y_[i1];
 
-        float a_x = kx[i-1]*dt - (x_[i] - x_[i-1]);
-        float b_x =-kx[i]*dt + x_[i] - x_[i-1];
-        float a_y = ky[i-1]*dt - (y_[i] - y_[i-1]);
-        float b_y =-ky[i]*dt + y_[i] - y_[i-1];
-
-        float qx = (1-n)*x_[i-1] + n*x_[i] + n*(1-n)*(a_x*(1-n)+b_x*n);
-        float qy = (1-n)*y_[i-1] + n*y_[i] + n*(1-n)*(a_y*(1-n)+b_y*n);
+        float qx = (1-n)*x_[i1] + n*x_[i2] + n*(1-n)*(a_x*(1-n)+b_x*n);
+        float qy = (1-n)*y_[i1] + n*y_[i2] + n*(1-n)*(a_y*(1-n)+b_y*n);
 
         return new Vec2(qx, qy);
     }
+    
     @Override
     public InterpolatedPoint evalExt(float t) {
         if( kx.length == 0) return new InterpolatedPoint(0, 0, 0, 0, 0);

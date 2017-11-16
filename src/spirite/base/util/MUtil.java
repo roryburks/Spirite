@@ -59,7 +59,10 @@ public class MUtil {
 		if( value > max) return max;
 		return value;
 	}
-	
+
+	public static float lerp( float a, float b, float t) {
+		return t*b + (1-t)*a;
+	}
 	public static double lerp( double a, double b, double t) {
 		return t*b + (1-t)*a;
 	}

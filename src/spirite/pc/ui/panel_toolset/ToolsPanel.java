@@ -32,6 +32,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
+import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 import spirite.pc.ui.components.BoxList;
