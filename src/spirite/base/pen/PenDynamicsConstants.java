@@ -38,7 +38,7 @@ public class PenDynamicsConstants {
 	);
 	
 	public static PenDynamics LinearDynamics() {
-		return personalDynamics;
+		return defaultDynamics;
 	}
 	private static final PenDynamics defaultDynamics = new PenDynamics() {
 		@Override

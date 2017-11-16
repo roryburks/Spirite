@@ -251,9 +251,10 @@ public class ToolsPanel extends JPanel
 	Class<?> currentDrawerType = null;
 	@Override
 	public void flash() {
-		if( currentDrawerType != workspace.getActiveDrawer().getClass() ) {
-			currentDrawerType = workspace.getActiveDrawer().getClass();
-			List<Tool> tools = toolsetManager.getToolsForDrawer(workspace.getActiveDrawer());
+		IImageDrawer drawer = workspace.getActiveDrawer();
+		if( drawer != null && currentDrawerType != drawer.getClass() ) {
+			currentDrawerType = drawer.getClass();
+			List<Tool> tools = toolsetManager.getToolsForDrawer(drawer);
 			if(!tools.contains(toolsetManager.getSelectedTool()) && tools.size() != 0)
 				toolsetManager.setSelectedTool(tools.get(0));
 			Build( tools);

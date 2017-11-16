@@ -111,7 +111,6 @@ public class PuppetLayer extends Layer {
 		
 		if( parts.size()-1 < selected)
 			selected = parts.size()-1;
-		System.out.println(parts.size());
 		
 		return getActivePuppet().getParts().get(selected).buildData();
 		//return new BuildingMediumData(__D__medium);

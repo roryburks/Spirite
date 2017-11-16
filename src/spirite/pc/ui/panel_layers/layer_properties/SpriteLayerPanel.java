@@ -66,12 +66,14 @@ public class SpriteLayerPanel extends JPanel
 	private ImageWorkspace workspace;
 	private SpriteLayer rig;
 	
+	private final int SIZE = 32;
+	
 	DataBinding<Integer> boxListBinding = new DataBinding<>();
 	
 	public SpriteLayerPanel( MasterControl master) {
 		this.master = master;
 		
-		boxList = new BoxList<Part>(null, 24,24) {
+		boxList = new BoxList<Part>(null, SIZE,SIZE) {
 			@Override
 			protected boolean attemptMove(int from, int to) {
 				rig.movePart(from, to);
@@ -464,12 +466,12 @@ public class SpriteLayerPanel extends JPanel
 			
 			//IImage img = part.getImageHandle().deepAccess();
 			
-			float sx = 24f/(float)part.getImageHandle().getWidth();
-			float sy = 24f/(float)part.getImageHandle().getHeight();
+			float sx = SIZE/(float)part.getImageHandle().getWidth();
+			float sy = SIZE/(float)part.getImageHandle().getHeight();
 			
 			float scale = Math.min( sx, sy);
 			
-			RawImage img2 = HybridHelper.createImage(24, 24);
+			RawImage img2 = HybridHelper.createImage(SIZE, SIZE);
 			GraphicsContext gc = img2.getGraphics();
 			gc.scale(scale, scale);
 			gc.drawHandle(part.getImageHandle(), 0, 0);
