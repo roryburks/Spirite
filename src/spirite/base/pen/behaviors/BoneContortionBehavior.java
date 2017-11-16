@@ -9,6 +9,7 @@ import spirite.base.brains.ToolsetManager.BoneStretchMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -20,6 +21,8 @@ import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
+import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.hybrid.HybridHelper;
@@ -32,7 +35,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		MAKING,
 		BETWEEN,
 		DEFORMING,
-		PROPOSING
+		PROPOSING,
 	}
 	State state = State.MAKING;
 	
@@ -41,6 +44,8 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 	private final IBoneDrawer drawer;
 	CubicSplineInterpolator2D proposing;
 	List<Vec2> proposedPoints;
+	CubicSplineInterpolator2D memoryProposition;
+	List<Vec2> memoryProposedPoints;
 	
 	public BoneContortionBehavior(Penner penner, IBoneDrawer drawer) {
 		super(penner);
@@ -76,7 +81,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			gc.setColor(Colors.BLACK);
 			gc.drawPolyLine(fx.toArray(), fy.toArray(), fx.size());
 		}
-		if( state == State.PROPOSING) {
+		if( proposing != null) {
 			gc.setColor(Colors.BLACK);
 
 			FloatCompactor dx = new FloatCompactor();
@@ -135,11 +140,21 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			//drawer.contort(b, proposing);			
 			//end();
 		}
+		penner.repaint();
 	}
 	@Override
 	public void onPenDown() {
 		if( state == State.BETWEEN) {
 			state = State.DEFORMING;
+		}
+		else if( state == State.PROPOSING) {
+			state = State.DEFORMING;
+			fx = new FloatCompactor();
+			fy = new FloatCompactor();
+			proposing = null;
+			proposedPoints = null;
+			memoryProposition = null;
+			memoryProposedPoints = null;
 		}
 	}
 
@@ -159,31 +174,115 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 	@Override public void toolsetChanged(Tool newTool) {}
 	@Override
 	public void toolsetPropertyChanged(Tool tool, Property property) {
+		if( tool != Tool.BONE)
+			return;
 		
-		if( tool == Tool.BONE && property.getId().equals("resize") && state == State.PROPOSING) {
-			switch( (BoneStretchMode)penner.toolsetManager.getToolSettings(Tool.BONE).getProperty("mode").getValue()) {
-			case CLIP_EVEN:
-				break;
-			case SCALE:
-				break;
-			case SCALE_TO_BONE:
-				break;
-			case CLIP_HEAD: {
-				float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
-				proposedPoints = new ArrayList<>();
-				for( int i=0; i < SUBDIVISIONS+1; ++i) {
-					proposedPoints.add(proposing.eval(i * bone_len / (float)SUBDIVISIONS));
+		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.BONE);
+		
+		if( property.getId().equals("resize") ) {
+			if( state == State.PROPOSING) {
+				if( memoryProposition == null) {
+					memoryProposedPoints = proposedPoints;
+					memoryProposition = proposing;
 				}
-				proposing = new CubicSplineInterpolator2D(proposedPoints, false);
-				proposing.setExtrapolating(true);
-				break;}
+				
+				_doScale((BoneStretchMode)settings.getProperty("mode").getValue(), 
+						(Float)settings.getProperty("leniency").getValue());
 			}
+			else HybridHelper.beep();
 		}
-		if( tool == Tool.BONE && property.getId().equals("do")) {
+		if(property.getId().equals("leniency") && memoryProposition != null) {
+			_doScale((BoneStretchMode)settings.getProperty("mode").getValue(), 
+					(Float)settings.getProperty("leniency").getValue());
+		}
+		if( property.getId().equals("do")) {
 			if( proposing != null)
 				drawer.contort(new BaseBone(x1, y1, x2, y2, 1), proposing);
 			end();
 		}
+	}
+	
+	private void _doScale( BoneStretchMode mode, float leniency) {
+		switch( mode) {
+		case CLIP_EVEN:{
+			// Note: 80% code duplicated from CLIP_HEAD
+			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
+			float curve_len = memoryProposition.getCurveLength();
+			
+			if( bone_len * (1-leniency) > curve_len)
+				bone_len = bone_len * (1-leniency);
+			else if( bone_len*(1 + leniency) > curve_len) {
+				proposing = memoryProposition;
+				break;
+			}
+			else
+				bone_len = bone_len * (1+leniency);
+
+			proposedPoints = new ArrayList<>();
+			float start = (curve_len - bone_len)/2f;
+			float end = curve_len - start;
+			for( int i=0; i < SUBDIVISIONS+1; ++i) {
+				proposedPoints.add(memoryProposition.eval( start + i * (end - start) / (float)SUBDIVISIONS));
+			}
+			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
+			proposing.setExtrapolating(true);
+			break;}
+		case SCALE:{
+			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
+			float curve_len = memoryProposition.getCurveLength();
+
+			if( bone_len * (1-leniency) > curve_len)
+				bone_len = bone_len * (1-leniency);
+			else if( bone_len*(1 + leniency) > curve_len) {
+				proposing = memoryProposition;
+				break;
+			}
+			else
+				bone_len = bone_len * (1+leniency);
+			float scale = bone_len / curve_len;
+
+			Rect rect = MUtil.rectFromPoints(memoryProposedPoints);
+			Vec2 center = new Vec2( rect.x + rect.width/2, rect.y + rect.height/2);
+			
+			MatTrans trans = new MatTrans();
+			trans.preTranslate(-center.x, -center.y);
+			trans.preScale(scale, scale);
+			trans.preTranslate(center.x, center.y);
+			
+			proposedPoints = new ArrayList<>();
+			for( Vec2 p : memoryProposedPoints) {
+				proposedPoints.add( trans.transform(p, new Vec2()));
+			}
+			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
+			proposing.setExtrapolating(true);
+			break;}
+		case SCALE_TO_BONE:
+			break;
+		case CLIP_HEAD: {
+			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
+			float curve_len = memoryProposition.getCurveLength();
+			
+			if( bone_len * (1-leniency) > curve_len)
+				bone_len = bone_len * (1-leniency);
+			else if( bone_len*(1 + leniency) > curve_len) {
+				proposing = memoryProposition;
+				break;
+			}
+			else
+				bone_len = bone_len * (1+leniency);
+			
+			proposedPoints = new ArrayList<>();
+			for( int i=0; i < SUBDIVISIONS+1; ++i) {
+				proposedPoints.add(memoryProposition.eval(i * bone_len / (float)SUBDIVISIONS));
+			}
+			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
+			proposing.setExtrapolating(true);
+			break;}
+		case INTELI: {
+			break;}
+		}
+
+		penner.repaint();
 	}
 	
 	final int SUBDIVISIONS = 4;

@@ -14,15 +14,25 @@ import spirite.pc.ui.components.SliderPanel;
 
 public class OpacityProperty extends SwingToolProperty {
 	private float value;
+	private final float min;
+	private final float max;
 
 	public OpacityProperty( String id, String hrName, float defaultValue) {
-		this( id, hrName, defaultValue, 0);
+		this( id, hrName, defaultValue, 0, 1, 0);
 	}
 	public OpacityProperty( String id, String hrName, float defaultValue, int mask) {
+		this( id, hrName, defaultValue, 0, 1, mask);
+	}
+	public OpacityProperty( String id, String hrName, float defaultValue, float min, float max) {
+		this( id, hrName, defaultValue, min, max, 0);
+	}
+	public OpacityProperty( String id, String hrName, float defaultValue, float min, float max, int mask) {
 		this.value = defaultValue;
 		this.hrName = hrName;
 		this.id = id;
 		this.mask = mask;
+		this.min = min;
+		this.max = max;
 	}
 
 	@Override public Float getValue() { return value; }
@@ -33,7 +43,7 @@ public class OpacityProperty extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		SliderPanel slider = new SliderPanel() {
+		SliderPanel slider = new SliderPanel(min, max) {
 			@Override
 			public void onValueChanged(float newValue) {
 				binding.triggerUIChanged(newValue);

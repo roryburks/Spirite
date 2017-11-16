@@ -516,4 +516,8 @@ public class Penner
 		behavior = null;
 	}
 
+	public void repaint() {
+		context.repaint();
+	}
+
 }

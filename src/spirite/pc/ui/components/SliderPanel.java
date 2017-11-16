@@ -20,8 +20,14 @@ public class SliderPanel extends JPanel {
 	private String label = "";
 	protected boolean hardCapped = true;
 	
-	
+
 	public SliderPanel() {
+		this(0,1);
+	}
+	public SliderPanel( float min, float max) {
+		this.min = min;
+		this.max = max;
+		
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {

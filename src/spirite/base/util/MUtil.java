@@ -121,6 +121,30 @@ public class MUtil {
 		return new Rect( Math.min(x1, x2), Math.min(y1, y2),
 				Math.abs(x1-x2), Math.abs(y1-y2));
 	}
+	/** Creates the smallest rectangle that contains all given points. */
+	public static Rect rectFromPoints(List<Vec2> points) {
+		if( points == null || points.size() == 0) return new Rect(0,0,0,0);
+		int x1 = (int)Math.floor(points.get(0).x);
+		int y1 = (int)Math.floor(points.get(0).y);
+		int x2 = (int)Math.ceil(points.get(0).x);
+		int y2 = (int)Math.ceil(points.get(0).y);
+		
+		Iterator<Vec2> it = points.iterator();
+		it.next();	// Ignore 1 because we already did it
+		while( it.hasNext()) {
+			Vec2 p = it.next();
+			int tx1 = (int)Math.floor(p.x);
+			int ty1 = (int)Math.floor(p.y);
+			int tx2 = (int)Math.ceil(p.x);
+			int ty2 = (int)Math.ceil(p.y);
+			if( tx1 < x1) x1 = tx1;
+			if( ty1 < y1) y1 = ty1;
+			if( tx2 < x2) x2 = tx2;
+			if( ty2 < y2) y2 = ty2;
+		}
+		
+		return new Rect( x1, y1, x2-x1, y2-y1);
+	}
 	
 	/** Stretches the Rectangle from the center by a given scaler */
 	public static Rect scaleRect( Rect cropSection, float scalar) {
@@ -268,4 +292,5 @@ public class MUtil {
 		
 		return tryName;
 	}
+
 }

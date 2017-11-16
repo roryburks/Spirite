@@ -317,7 +317,8 @@ public class ToolsetManager
     	SCALE("Scale"),
     	CLIP_HEAD("Clip Head"),
     	CLIP_EVEN("Clamp"),
-    	SCALE_TO_BONE("Scale perpendicular to bone.")
+    	SCALE_TO_BONE("Scale perpendicular to bone."),
+    	INTELI("Scale LoA")
     	;
 
     	public final String hrName;
@@ -368,6 +369,7 @@ public class ToolsetManager
         }, Tool.EXCISE_ERASER));
         toolSettings.put( Tool.BONE, constructFromScheme( new Property[]{
         		new ButtonProperty("resize", "Resize", null, master),
+        		new OpacityProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
         		new DropDownProperty<BoneStretchMode>("mode", "Resize Mode", BoneStretchMode.SCALE, BoneStretchMode.class),
         		new ButtonProperty("do", "Do Bone Transform", null, master),
         }, Tool.BONE));
