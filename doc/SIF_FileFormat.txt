@@ -1,4 +1,4 @@
-Version 000B
+Version 000D
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -94,7 +94,7 @@ Header
 				Per reference:
 					[2, ushort] : refrence to stroke
 					[4, float] : pivot point on stroke [0,1]
-					[4, float] : travel [-1,1]
+					[4, float] : travel [-pivot,1-pivot]
 		Per Stroke : 
 
 ---- ANIM - Animation Data Chunk
@@ -128,6 +128,16 @@ Per Animation:
 		            [4, float] : scaleX
 		            [4, float] : scaleY
 		            [4, float] : rotation
+---- PLTT - Palatte Data Chunk
+Per Palette:
+[n, UTF8 str] : Palette Name
+[2, ushort] Palette Data Size
+[n, bytes] Palette Data
+	// [1] First byte corresponds to number of consecutive color datas
+	// [4*n] n*4 bytes representing the color data, in RGBA form
+	//		(if first byte was 0x00), 
+	//		[1] next byte represents consecutive empty datas
+	// ex: 00 FF 00 0A 3 [4] [4] [4], 258 whitespaces then 3 color data
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 

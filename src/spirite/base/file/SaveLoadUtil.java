@@ -30,7 +30,7 @@ public class SaveLoadUtil {
 	
 	
 	
-	public static final int VERSION = 0x0000_000C;
+	public static final int VERSION = 0x0000_000D;
 
 	// Node Attribute Masks
 	public static final int VISIBLE_MASK = 0x01;

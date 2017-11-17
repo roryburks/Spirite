@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager;
+import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
@@ -127,7 +128,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		mediumData = new HashMap<>();
 		master.addWorkspaceObserver(this);
 		
-
+		palettes.add(paletteManager.new Palette("Default"));
+		selectedPalette = 0;
 	}
 	@Override
 	public String toString() {
@@ -301,6 +303,31 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		
 		return list;
 	}
+	
+	// ============
+	// ==== Palettes 
+	private List<Palette> palettes = new ArrayList<>();
+	private int selectedPalette;
+	
+	public Palette getCurrentPalette() {
+		return palettes.get(selectedPalette);
+	}
+	public void resetPalettes(Collection<Palette> newPalettes) {
+		palettes = new ArrayList<>(newPalettes.size());
+		palettes.addAll(newPalettes);
+		selectedPalette = 0;
+	}
+	public void addPalette( Palette palette, boolean select) {
+		palettes.add(palette);
+		if( select)
+			selectedPalette = palettes.size()-1;
+		paletteManager.triggerPaletteChange();
+	}
+	public void setSelectedPalette(int i) {
+		selectedPalette = i;
+		paletteManager.triggerPaletteChange();
+	}
+	public List<Palette> getPalettes() { return new ArrayList<>(palettes);}
 	
 	
 	// ============== Building Active Data ==================
@@ -1708,8 +1735,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	
 	// :: MWorkspaceObserver
 	@Override	public void currentWorkspaceChanged(ImageWorkspace selected, ImageWorkspace previous) {
-		if( selected == this) 
+		if( selected == this) {
+			paletteManager.triggerPaletteChange();
 			triggerSelectedChanged();
+		}
 	}
 	@Override public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override public void removeWorkspace(ImageWorkspace newWorkspace) {}

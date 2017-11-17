@@ -338,7 +338,7 @@ public class GLGeom {
     
     // TODO: Figure out if Mitering is worth doing (probably is as without it huge brushes are ugly AF
     private final static int SV2_STRIDE = 3;
-    private final static float MITER_MAX2 = 2.0f;
+    //private final static float MITER_MAX2 = 2.0f;
     public static Primitive[] strokeV2LinePassGeom(float[] raw) {
         DoubleEndedSinglePrimitiveBuilder builder1 = new DoubleEndedSinglePrimitiveBuilder(
                 // [x, y]
@@ -387,7 +387,7 @@ public class GLGeom {
                 builder1.emitVertexFront(left);
                 builder1.emitVertexBack(right);
         		//if( length > 0.5) {
-        			float s = length;//-0.5f;
+        			//float s = length;//-0.5f;
         			builder2.emitVertex(left);
         			builder2.emitVertex(right);
         		//}

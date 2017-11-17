@@ -1,25 +1,19 @@
 package spirite.base.graphics.gl;
 
 import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.util.GLBuffers;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
-import spirite.base.graphics.gl.GLEngine.PreparedData;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.GLC;
 import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.MatrixBuilder;
 import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.PCUtil;
@@ -152,80 +146,80 @@ class GLStrokeEngine extends StrokeEngine {
 		return true;
 	}
 	
-	private void _strokeSpore(PenState ps, ABuiltMediumData built) {
-		float[] raw = new float[4*13];
-		float x = ps.x;
-		float y = ps.y;
-		
-		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
-		
-		Vec2 xy = built.convert(new Vec2(x,y));
-		raw[0] = xy.x;
-		raw[1] = xy.y;
-		raw[2] = size;
-		raw[3] = ps.pressure;
-
-		for( int i=0; i<4; ++i) {
-			int off = (i+1)*4;
-			raw[off+0] = xy.x + size/2.0f * (float)Math.cos(Math.PI/2.0*i);
-			raw[off+1] = xy.y + size/2.0f * (float)Math.sin(Math.PI/2.0*i);
-			raw[off+2] = stroke.getDynamics().getSize(ps);
-			raw[off+3] = ps.pressure;
-		}
-		for( int i=0; i<8; ++i) {
-			int off = (i+5)*4;
-			raw[off+0] = xy.x + size * (float)Math.cos(Math.PI/8.0+Math.PI/4.0*i);
-			raw[off+1] = xy.y + size * (float)Math.sin(Math.PI/8.0+Math.PI/4.0*i);
-			raw[off+2] = stroke.getDynamics().getSize(ps);
-			raw[off+3] = ps.pressure;
-		}
-		
-
-		int w = built.getWidth();
-		int h = built.getHeight();
-		
-		GL2 gl = engine.getGL2();
-		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1});
-
-		// Clear Surface
-        int prog = engine.getProgram(ProgramType.STROKE_SPORE);
-        gl.glUseProgram( prog);
-
-        // Bind Attribute Streams
-        pd.init();
-
-        // Bind Uniforms
-        int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
-        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
-        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
-        );
-        gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
-        int uColor = gl.glGetUniformLocation( prog, "uColor");
-        int c = stroke.getColor();
-        gl.glUniform3f(uColor, 
-        		Colors.getRed(c)/255.0f,
-        		Colors.getGreen(c)/255.0f,
-        		Colors.getBlue(c)/255.0f);
-
-
-        gl.glEnable(GL2.GL_MULTISAMPLE);
-        gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE );
-        gl.glEnable(GL.GL_BLEND);
-        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glBlendEquation(GL2.GL_MAX);
-
-    	gl.glDrawArrays(GL3.GL_POINTS, 0, 13);
-        
-
-
-        gl.glDisable( GL.GL_BLEND);
-        gl.glDisable(GL2.GL_MULTISAMPLE);
-
-        gl.glUseProgram(0);
-
-        pd.deinit();
-        pd.free();
-	}
+//	private void _strokeSpore(PenState ps, ABuiltMediumData built) {
+//		float[] raw = new float[4*13];
+//		float x = ps.x;
+//		float y = ps.y;
+//		
+//		float size = stroke.getDynamics().getSize(ps) * stroke.getWidth();
+//		
+//		Vec2 xy = built.convert(new Vec2(x,y));
+//		raw[0] = xy.x;
+//		raw[1] = xy.y;
+//		raw[2] = size;
+//		raw[3] = ps.pressure;
+//
+//		for( int i=0; i<4; ++i) {
+//			int off = (i+1)*4;
+//			raw[off+0] = xy.x + size/2.0f * (float)Math.cos(Math.PI/2.0*i);
+//			raw[off+1] = xy.y + size/2.0f * (float)Math.sin(Math.PI/2.0*i);
+//			raw[off+2] = stroke.getDynamics().getSize(ps);
+//			raw[off+3] = ps.pressure;
+//		}
+//		for( int i=0; i<8; ++i) {
+//			int off = (i+5)*4;
+//			raw[off+0] = xy.x + size * (float)Math.cos(Math.PI/8.0+Math.PI/4.0*i);
+//			raw[off+1] = xy.y + size * (float)Math.sin(Math.PI/8.0+Math.PI/4.0*i);
+//			raw[off+2] = stroke.getDynamics().getSize(ps);
+//			raw[off+3] = ps.pressure;
+//		}
+//		
+//
+//		int w = built.getWidth();
+//		int h = built.getHeight();
+//		
+//		GL2 gl = engine.getGL2();
+//		PreparedData pd = engine.prepareRawData(raw, new int[]{2,1,1});
+//
+//		// Clear Surface
+//        int prog = engine.getProgram(ProgramType.STROKE_SPORE);
+//        gl.glUseProgram( prog);
+//
+//        // Bind Attribute Streams
+//        pd.init();
+//
+//        // Bind Uniforms
+//        int u_perspectiveMatrix = gl.glGetUniformLocation( prog, "perspectiveMatrix");
+//        FloatBuffer orthagonalMatrix = GLBuffers.newDirectFloatBuffer(
+//        	MatrixBuilder.orthagonalProjectionMatrix(-0.5f, w-0.5f, -0.5f, h-0.5f, -1, 1)
+//        );
+//        gl.glUniformMatrix4fv(u_perspectiveMatrix, 1, true, orthagonalMatrix);
+//        int uColor = gl.glGetUniformLocation( prog, "uColor");
+//        int c = stroke.getColor();
+//        gl.glUniform3f(uColor, 
+//        		Colors.getRed(c)/255.0f,
+//        		Colors.getGreen(c)/255.0f,
+//        		Colors.getBlue(c)/255.0f);
+//
+//
+//        gl.glEnable(GL2.GL_MULTISAMPLE);
+//        gl.glEnable(GL2.GL_VERTEX_PROGRAM_POINT_SIZE );
+//        gl.glEnable(GL.GL_BLEND);
+//        gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+//        gl.glBlendEquation(GL2.GL_MAX);
+//
+//    	gl.glDrawArrays(GL3.GL_POINTS, 0, 13);
+//        
+//
+//
+//        gl.glDisable( GL.GL_BLEND);
+//        gl.glDisable(GL2.GL_MULTISAMPLE);
+//
+//        gl.glUseProgram(0);
+//
+//        pd.deinit();
+//        pd.free();
+//	}
 	
 	private class GLVBuffer {
 		float[] vBuffer;

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree;
@@ -183,7 +184,18 @@ public class LoadEngine {
 					}
 				}
 			}
+
+			// Next Load the Palette data
+			for( ChunkInfo ci : helper.chunkList) {
+				if( ci.header.equals("PLTT")) {
+					System.out.println("TEST");
+					helper.ra.seek(ci.startPointer);
+					parsePaletteSection(helper, ci.size);
+				}
+			}
+			
 			helper.ra.close();
+			
 			
 			if( helper.version < 2) {
 				for( IMedium img : imageMap.values()) {
@@ -555,6 +567,26 @@ public class LoadEngine {
 	}
 	
 
+	private void parsePaletteSection( LoadHelper helper, int chunkSize) 
+			throws IOException 
+	{
+		List<Palette> palettes = new ArrayList<>();
+
+		long endPointer = helper.ra.getFilePointer() + chunkSize;
+		
+		while( helper.ra.getFilePointer() < endPointer) {
+			String name = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);
+			
+			int len = helper.ra.readUnsignedShort();
+			
+			byte[] raw = new byte[len];
+			helper.ra.read(raw);
+			
+			palettes.add(master.getPaletteManager().new Palette(raw, name));
+		}
+		
+		helper.workspace.resetPalettes(palettes);
+	}
 	
 	private void parseAnimationSection(LoadHelper helper, int chunkSize) 
 			throws IOException 
@@ -580,6 +612,7 @@ public class LoadEngine {
 			}
 		}
 	}
+	
 	
 //    [2, ushort] : Number of Layers
 //    Per Layer:

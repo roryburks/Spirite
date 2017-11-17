@@ -10,13 +10,17 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -27,6 +31,12 @@ import javax.swing.border.EtchedBorder;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
+import spirite.base.brains.PaletteManager.Palette;
+import spirite.base.brains.SettingsManager;
+import spirite.base.image_data.ImageWorkspace;
+import spirite.base.util.DataBinding;
+import spirite.base.util.DataBinding.ChangeExecuter;
+import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.dialogs.Dialogs;
@@ -34,7 +44,7 @@ import spirite.pc.ui.dialogs.Dialogs;
 public class PalettePanel extends JPanel 
         implements MouseListener, MPaletteObserver, ActionListener
 {
-	// PalettePanel only needs access to PaletteManager and Dialogs
+	private final MasterControl master;
     private final PaletteManager paletteManager;
     private final Dialogs dialogs;
     
@@ -48,16 +58,27 @@ public class PalettePanel extends JPanel
     private JButton btnSavePalette;
     private JButton btnLoadPalette;
     private JButton btnAddColor;
+    private JComboBox<String> boxPalette;
+    private JButton btnRemovePalette;
+    
+    private Palette wPalette;
+    
+    DataBinding<Integer> selectedBinding = new DataBinding<>();
 
-    public PalettePanel( MasterControl master) {
+    public PalettePanel( MasterControl _master) {
+    	this.master = _master;
     	this.dialogs = master.getDialogs();
         paletteManager = master.getPaletteManager();
 
         initComponents();
+        initBindings();
         palette.addMouseListener(this);
         sub.addMouseListener(this);
 
         paletteManager.addPaletteObserver(this);
+        wPalette = paletteManager.getCurrentPalette();
+        
+        SwingUtilities.invokeLater(() -> colorChanged());
     }
 
     // Set up the GUI
@@ -78,9 +99,12 @@ public class PalettePanel extends JPanel
         btnSavePalette = new JButton();
         btnLoadPalette = new JButton();
         btnAddColor = new JButton();
+        btnRemovePalette = new JButton();
         btnSavePalette.setToolTipText("Save Palette");
         btnLoadPalette.setToolTipText("Load Palette");
         btnAddColor.setToolTipText("Add Color");
+        btnRemovePalette.setToolTipText("Remove Palette");
+        boxPalette = new JComboBox<String>(new String[] {"Default", "2"});
         
         btnSavePalette.addActionListener( this);
         btnLoadPalette.addActionListener( this);
@@ -89,12 +113,15 @@ public class PalettePanel extends JPanel
         btnSavePalette.setIcon(Globals.getIcon("palSavePalette"));
         btnLoadPalette.setIcon(Globals.getIcon("palLoadPalette"));
         btnAddColor.setIcon(Globals.getIcon("palNewColor"));
+        //btnRemovePalette.setIcon(Globals.getIcon("palRemPalette"));
 
         btnSavePalette.setBackground( new Color( 170,170,220));
         btnLoadPalette.setBackground( new Color( 170,170,220));
         btnAddColor.setBackground( new Color( 170,170,220));
+        btnRemovePalette.setBackground( new Color( 170,170,220));
         
         Dimension bsize = new Dimension(24, 12);
+        int ddheight = 16;
         
 
         layout.setHorizontalGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
@@ -112,15 +139,19 @@ public class PalettePanel extends JPanel
 	            	.addGroup(layout.createSequentialGroup()
 	                    .addComponent(container)
 	                )
-	            	.addGroup(layout.createSequentialGroup()
-	            		.addComponent(btnSavePalette, bsize.width, bsize.width, bsize.width)
-	            		.addGap(1)
-	            		.addComponent(btnLoadPalette, bsize.width, bsize.width, bsize.width)
-	            		.addGap(1)
-	            		.addComponent(btnAddColor, bsize.width, bsize.width, bsize.width)
-	            	)
 	            )
             )
+        	.addGroup(layout.createSequentialGroup()
+            		.addComponent(boxPalette)
+            		.addGap(1)
+            		.addComponent(btnRemovePalette, bsize.width, bsize.width, bsize.width))
+            	.addGroup(layout.createSequentialGroup()
+            		.addComponent(btnSavePalette, bsize.width, bsize.width, bsize.width)
+            		.addGap(1)
+            		.addComponent(btnLoadPalette, bsize.width, bsize.width, bsize.width)
+            		.addGap(1)
+            		.addComponent(btnAddColor, bsize.width, bsize.width, bsize.width)
+            	)
 
         );
         layout.setVerticalGroup(layout.createParallelGroup( GroupLayout.Alignment.LEADING)
@@ -134,6 +165,9 @@ public class PalettePanel extends JPanel
                 )
                 .addGroup( layout.createSequentialGroup()
                		.addComponent(container)
+               		.addGroup(layout.createParallelGroup()
+               			.addComponent(boxPalette, ddheight,ddheight,ddheight)
+               			.addComponent(btnRemovePalette, ddheight,ddheight,ddheight))
                		.addGroup( layout.createParallelGroup()
                			.addComponent(btnSavePalette, bsize.height, bsize.height, bsize.height)
                			.addComponent(btnLoadPalette, bsize.height, bsize.height, bsize.height)
@@ -142,12 +176,77 @@ public class PalettePanel extends JPanel
                 )
         );
     }
+    
+    private void initBindings() {
+        btnRemovePalette.addActionListener((e) -> {
+        	ImageWorkspace ws = master.getCurrentWorkspace();
+        	if( ws == null) return;
+        	
+        	
+        	String newName = JOptionPane.showInputDialog(this,"New Palette", getNonDuplicateName("palette_1"));
+        	if( newName != null) 
+        		ws.addPalette(paletteManager.new Palette(newName), true);
+        });
+        
+        
+        
+        // boxPalette
+        boxPalette.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if( e.getStateChange() == ItemEvent.SELECTED)
+	        		selectedBinding.triggerUIChanged(boxPalette.getSelectedIndex());
+				
+				wPalette = paletteManager.getCurrentPalette();
+		        repaint();
+		        palette.repaint();
+			}
+		});
+        selectedBinding.setLink(new ChangeExecuter<Integer>() {
+			@Override
+			public void doUIChanged(Integer newValue) {
+				ImageWorkspace ws = master.getCurrentWorkspace();
+				if( ws != null) {
+					ws.setSelectedPalette(newValue);
+				}
+			}
+			@Override
+			public void doDataChanged(Integer newValue) {
+				doUpdate();
+			}
+		});
+    }
+    
+    private String getNonDuplicateName(String name) {
+    	List<String> names = new ArrayList<>(boxPalette.getItemCount());
+    	for(int i=0; i < boxPalette.getItemCount(); ++i)
+    		names.add( boxPalette.getItemAt(i));
+    	
+    	return MUtil.getNonDuplicateName(names, name);
+    }
 
     // :: MPaletteObserver
     @Override
     public void colorChanged() {
+
+        selectedBinding.triggerDataChanged(null);
+
+    }
+    private void doUpdate() {
         main.setBackground( new Color(paletteManager.getActiveColor(0)));
         sub.setBackground( new Color(paletteManager.getActiveColor(1)));
+        
+        wPalette = paletteManager.getCurrentPalette();
+        
+        boxPalette.removeAllItems();
+        ImageWorkspace ws = master.getCurrentWorkspace();
+        if( ws != null) {
+        	List<Palette> palettes = ws.getPalettes();
+            for( Palette palette : palettes)
+            	boxPalette.addItem(palette.getName());
+            
+            boxPalette.setSelectedIndex(palettes.indexOf(wPalette));
+        }
         
         repaint();
         palette.repaint();
@@ -177,8 +276,8 @@ public class PalettePanel extends JPanel
     			if( c != null) {
     				int argb = c.getRGB();
     				paletteManager.setActiveColor(((ColorPicker)draggedFrom).index, argb);
-    				if( !paletteManager.getColors().contains(argb))
-    					paletteManager.addPaletteColor(argb);
+    				if( !wPalette.getColors().contains(argb))
+    					wPalette.addPaletteColor(argb);
     			}
     		}
     		else if( draggedFrom == palette) {
@@ -187,7 +286,7 @@ public class PalettePanel extends JPanel
     			int startIndex = palette.getIndexAt(startX, startY);
     			int endIndex = palette.getIndexAt(e.getX(), e.getY());
 
-    			Integer startC = paletteManager.getPaletteColor(startIndex);
+    			Integer startC = wPalette.getPaletteColor(startIndex);
     			
     			if( startIndex == -1 || endIndex == -1){}
     			else if( startIndex == endIndex || shortEvt) {
@@ -195,16 +294,16 @@ public class PalettePanel extends JPanel
     					// Color Pick new Palette Color
     					Color c = dialogs.pickColor( (startC == null)?null:new Color(startC));
     					if( c != null)  {
-    						paletteManager.setPaletteColor(startIndex, c.getRGB());
+    						wPalette.setPaletteColor(startIndex, c.getRGB());
         					paletteManager.setActiveColor(e.getButton()/2, c.getRGB());
     					}
     				}
     				else
-    					paletteManager.setActiveColor(e.getButton()/2, paletteManager.getPaletteColor(startIndex));
+    					paletteManager.setActiveColor(e.getButton()/2, wPalette.getPaletteColor(startIndex));
     			}
     			else {
     				// Move color from one place to another
-    				paletteManager.setPaletteColor(endIndex, startC);
+    				wPalette.setPaletteColor(endIndex, startC);
     			}
     		}
     	}
@@ -222,7 +321,7 @@ public class PalettePanel extends JPanel
     			// Drag from palette into the Foreground/Background: set FG/BG color as dragged color
     			if( draggedFrom == palette) {
         			int index = palette.getIndexAt(startX, startY);
-        			Integer c = paletteManager.getPaletteColor(index);
+        			Integer c = wPalette.getPaletteColor(index);
         			
         			if( c != null)
         				paletteManager.setActiveColor( ((ColorPicker)draggedTo).index, c);
@@ -234,9 +333,9 @@ public class PalettePanel extends JPanel
     			int index = palette.getIndexAt(converted.x, converted.y);
     			Color c = ((ColorPicker)draggedFrom).getColor();
     			if( index == -1)
-    				paletteManager.addPaletteColor(c.getRGB());
+    				wPalette.addPaletteColor(c.getRGB());
     			else
-    				paletteManager.setPaletteColor( index, c.getRGB());
+    				wPalette.setPaletteColor( index, c.getRGB());
     		}
     		else {
     			// Drag from X to out of the context
@@ -244,7 +343,7 @@ public class PalettePanel extends JPanel
     				// Drag a Palette color out of context: remove it
         			int index = palette.getIndexAt(startX, startY);
     				if( index != -1)
-    					paletteManager.removePaletteColor(index);
+    					wPalette.removePaletteColor(index);
     			}
     		}
     	}
@@ -303,7 +402,7 @@ public class PalettePanel extends JPanel
             int selected1 = paletteManager.getActiveColor(0);
             int selected2 = paletteManager.getActiveColor(1);
             
-            for( Entry<Integer, Integer> entry : paletteManager.getPalette()) {
+            for( Entry<Integer, Integer> entry : wPalette.getPalette()) {
             	int c = entry.getValue();
             	Rectangle rect = getBoundsOfIndex( entry.getKey());
             	
@@ -326,7 +425,7 @@ public class PalettePanel extends JPanel
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if( evt.getSource() == btnAddColor) {
-			paletteManager.addPaletteColor( paletteManager.getActiveColor(0));
+			wPalette.addPaletteColor( paletteManager.getActiveColor(0));
 		}
 		else if( evt.getSource() == btnLoadPalette) {
 			List<String> palettes = paletteManager.getStoredPaletteNames();
@@ -363,12 +462,17 @@ public class PalettePanel extends JPanel
 		else if(evt.getActionCommand() != null) {
 			String cmd = evt.getActionCommand();
 			if( cmd.startsWith("load.")) {
-				paletteManager.loadPalette(cmd.substring("load.".length()));
+				String name = cmd.substring("load.".length());
+				ImageWorkspace ws = master.getCurrentWorkspace();
+				if( ws != null) {
+					byte[] raw = master.getSettingsManager().getRawPalette(name);
+					ws.addPalette( paletteManager.new Palette(raw, getNonDuplicateName(name)), true);
+				}
 			}
 			if( cmd.startsWith("save.")) {
 				String name = cmd.substring("save.".length());
 				if( JOptionPane.showConfirmDialog(null, "Overwrite " + name +"?") == JOptionPane.YES_OPTION) {
-					paletteManager.savePalette(name);
+					master.getSettingsManager().saveRawPalette(name, wPalette.compress());
 				}
 			}
 			if( cmd.equals("savenew")) {
@@ -381,11 +485,14 @@ public class PalettePanel extends JPanel
 					
 					if( !names.contains(name)
 						|| JOptionPane.showConfirmDialog(null, "Overwrite " + name +"?") == JOptionPane.YES_OPTION) 
-						paletteManager.savePalette(name);
+					master.getSettingsManager().saveRawPalette(name, wPalette.compress());
 				}
 			}
 			if( cmd.equals("loaddefault")) {
-				paletteManager.loadDefaultPalette();
+				ImageWorkspace ws = master.getCurrentWorkspace();
+				if( ws != null) {
+					ws.addPalette(paletteManager.new Palette("default"), true);
+				}
 			}
 		}
 	}

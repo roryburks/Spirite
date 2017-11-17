@@ -324,12 +324,12 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void fillPolygon(int[] x, int[] y, int count) {
 		reset();
-		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count));
+		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count), contextTransform);
 	}
 	@Override
 	public void fillPolygon(float[] x, float[] y, int count) {
 		reset();
-		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count));
+		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count), contextTransform);
 	}
 	
 	

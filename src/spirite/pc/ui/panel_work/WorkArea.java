@@ -29,6 +29,7 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
+import spirite.base.util.glmath.Vec2;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -145,7 +146,16 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
             		for( BasePart part : puppet.getBase().getParts()) {
             			BaseBone bone = part.getBone();
             			if( bone != null) {
-            				gc.drawLine(bone.x1, bone.y1, bone.x2, bone.y2);
+            				Vec2 _n = new Vec2(bone.x2-bone.x1, bone.y2-bone.y1).normalize();
+            				Vec2 n = new Vec2(bone.y1-bone.y2, bone.x2-bone.x1).normalize();
+            				Vec2 mid = new Vec2((bone.x1 + bone.x2)/2f, (bone.y1 + bone.y2)/2f);
+            				float[] x = new float[] 
+            					{bone.x1-n.x, bone.x1, bone.x1+n.x, mid.x+n.x*3, bone.x2+n.x, bone.x2, bone.x2-n.x, mid.x-n.x*3};
+            				float[] y = new float[] 
+            					{bone.y1, bone.y1 - n.x, bone.y1,   mid.y+n.y*3, bone.y2, bone.y2+n.x, bone.y2,     mid.y-n.y*3};
+            				
+            				gc.fillPolygon(x, y, 8);
+            				//gc.drawLine(bone.x1, bone.y1, bone.x2, bone.y2);
             			}
             		}
             	}

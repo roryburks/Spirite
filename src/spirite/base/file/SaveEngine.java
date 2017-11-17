@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -192,6 +193,7 @@ public class SaveEngine implements MWorkspaceObserver {
 			saveGroupTree( helper);
 			saveImageData( helper);
 			saveAnimationData( helper);
+			savePaletteData(helper);
 			
 			helper.ra.close();
 			
@@ -212,25 +214,16 @@ public class SaveEngine implements MWorkspaceObserver {
 		return good;
 	}
 	
+
 	/** Saves the GRPT chunk containing the Group Tree data */
 	private void saveGroupTree( SaveHelper helper) 
 		throws UnsupportedEncodingException, IOException
 	{
-		byte depth = 0;
-		helper.ra.write( "GRPT".getBytes("UTF-8"));
-		long startPointer = helper.ra.getFilePointer();
-		helper.ra.writeInt(0);
-		
-		_sgt_buildReferences_rec( helper, helper.dupeRoot, depth);
-		_sgt_rec( helper, helper.dupeRoot, depth);
-
-		long endPointer = helper.ra.getFilePointer();
-		if( endPointer - startPointer > Integer.MAX_VALUE )
-			MDebug.handleError( ErrorType.OUT_OF_BOUNDS, null, "Image Data Too Big (>2GB).");
-		helper.ra.seek(startPointer);
-		helper.ra.writeInt( (int)(endPointer - startPointer - 4));
-		
-		helper.ra.seek(endPointer);
+		WriteChunk(helper, "GRPT", () -> {
+			byte depth = 0;
+			_sgt_buildReferences_rec( helper, helper.dupeRoot, depth);
+			_sgt_rec( helper, helper.dupeRoot, depth);
+		});
 	}
 	private void _sgt_buildReferences_rec( SaveHelper helper, GroupTree.Node node, byte depth) 
 			throws UnsupportedEncodingException, IOException 
@@ -359,229 +352,253 @@ public class SaveEngine implements MWorkspaceObserver {
 		}
 	}
 	
+
+	private void savePaletteData(SaveHelper helper) 
+			throws UnsupportedEncodingException, IOException 
+	{
+		WriteChunk(helper, "PLTT", () -> {
+			List<Palette> palettes = helper.workspace.getPalettes();
+			
+			for( Palette palette : palettes) {
+				// [n] Palette Name
+				helper.ra.write( SaveLoadUtil.strToByteArrayUTF8(palette.getName()));
+				
+				byte[] raw = palette.compress();
+				helper.ra.writeShort(raw.length);	// [2] Palette Data Size
+				helper.ra.write(raw);
+			}
+		});
+	}
+	
 	/** Saves the IMGD chunk containing the Image data, each in PNG format. */
 	private void saveImageData( SaveHelper helper) 
 			throws UnsupportedEncodingException, IOException 
 	{
-		// [4] : "IMGD" tag
-		helper.ra.write( "IMGD".getBytes("UTF-8"));
-		long filePointer = helper.ra.getFilePointer();
-		
-		// [4] : Length of ImageData Chunk
-		helper.ra.writeInt(0);
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		for( LogicalImage part : helper.reservedCache) {
-			// (Foreach ImageData)
-			part.Float();			
+		WriteChunk(helper, "IMGD", () -> {
 
-			// [4] : Image ID
-			helper.ra.writeInt( part.handleID);
-			// [1] : Image Type
-			int mask = part.iimg.getType().ordinal();
-			helper.ra.writeByte(mask);
-			
-			switch( part.iimg.getType()) {
-			case NORMAL:
-				HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
-				// [4] : Size of Image Data
-				helper.ra.writeInt( bos.size());
-				// [x] : Image Data
-				helper.ra.write(bos.toByteArray());
-				bos.reset();
-				break;
-			case DYNAMIC: {
-				// [2] : Dynamic offsetX
-				helper.ra.writeShort(part.iimg.getDynamicX());
-				// [2] : Dynamic offsetY
-				helper.ra.writeShort(part.iimg.getDynamicY());
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			for( LogicalImage part : helper.reservedCache) {
+				// (Foreach ImageData)
+				part.Float();			
+
+				// [4] : Image ID
+				helper.ra.writeInt( part.handleID);
+				// [1] : Image Type
+				int mask = part.iimg.getType().ordinal();
+				helper.ra.writeByte(mask);
 				
-				HybridUtil.savePNG(   part.iimg.readOnlyAccess(), bos);
-				// [4] : Size of Image Data
-				helper.ra.writeInt( bos.size());
-				// [x] : Image Data
-				helper.ra.write(bos.toByteArray());
-				bos.reset();
-				break;}
-			case PRISMATIC:{
-				PrismaticMedium pii = (PrismaticMedium)part.iimg;
-				List<PrismaticMedium.LImg> list = pii.getColorLayers();
-				
-				// [2] : Number of Color Layers
-				helper.ra.writeShort(list.size());
-
-				for( PrismaticMedium.LImg limg : list) {
-					// [4] : color
-					helper.ra.writeInt(limg.color);
-					// [2, 2] : Dynamic offset X,Y
-					helper.ra.writeShort( limg.ox);
-					helper.ra.writeShort( limg.oy);
-
-					HybridUtil.savePNG(limg.img, bos);
+				switch( part.iimg.getType()) {
+				case NORMAL:
+					HybridUtil.savePNG(part.iimg.readOnlyAccess(), bos);
 					// [4] : Size of Image Data
 					helper.ra.writeInt( bos.size());
 					// [x] : Image Data
 					helper.ra.write(bos.toByteArray());
 					bos.reset();
-				}
-				break;}
-			case MAGLEV: {
-				MaglevMedium mimg = (MaglevMedium)part.iimg;
-				
-				List<AMagLevThing> things = mimg.getThings();
-				//	[2] : Number of things
-				helper.ra.writeShort(things.size());	
-				
-				for( AMagLevThing thing : things) {
-					if( thing instanceof MagLevStroke) {
-						MagLevStroke stroke = (MagLevStroke)thing;
-						
-						helper.ra.writeByte(0);		//	[1] : thing type
-						
-						helper.ra.writeInt( stroke.params.getColor());			// [4] : Color
-						helper.ra.writeByte( stroke.params.getMethod().fileId);	// [1] : Method Type
-						helper.ra.writeFloat(stroke.params.getWidth());			// [4] : Width
-						
-						helper.ra.writeShort( stroke.states.length);	// [2] : Number of Vertices
-						
-						for( PenState ps : stroke.states) {
-							helper.ra.writeFloat( ps.x);		// [4] : x
-							helper.ra.writeFloat( ps.y);		// [4] : y
-							helper.ra.writeFloat( ps.pressure);	// [4] : pressure
-						}
-						
-					}
-					else if( thing instanceof MagLevFill) {
-						MagLevFill fill = (MagLevFill)thing;
-						helper.ra.writeByte(1);		// [1] : thing type
+					break;
+				case DYNAMIC: {
+					// [2] : Dynamic offsetX
+					helper.ra.writeShort(part.iimg.getDynamicX());
+					// [2] : Dynamic offsetY
+					helper.ra.writeShort(part.iimg.getDynamicY());
+					
+					HybridUtil.savePNG(   part.iimg.readOnlyAccess(), bos);
+					// [4] : Size of Image Data
+					helper.ra.writeInt( bos.size());
+					// [x] : Image Data
+					helper.ra.write(bos.toByteArray());
+					bos.reset();
+					break;}
+				case PRISMATIC:{
+					PrismaticMedium pii = (PrismaticMedium)part.iimg;
+					List<PrismaticMedium.LImg> list = pii.getColorLayers();
+					
+					// [2] : Number of Color Layers
+					helper.ra.writeShort(list.size());
 
-						helper.ra.writeInt( fill.getColor());		// [4] : Color
-						helper.ra.writeByte( fill.mode.fileId);		// [1] : Fill Mode
-						
-						helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
+					for( PrismaticMedium.LImg limg : list) {
+						// [4] : color
+						helper.ra.writeInt(limg.color);
+						// [2, 2] : Dynamic offset X,Y
+						helper.ra.writeShort( limg.ox);
+						helper.ra.writeShort( limg.oy);
 
-						for( MagLevFill.StrokeSegment seg : fill.segments) {
-							helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
-							helper.ra.writeFloat( seg._pivot);		// [4] : pivot
-							helper.ra.writeFloat( seg._travel);		// [4] : travel
+						HybridUtil.savePNG(limg.img, bos);
+						// [4] : Size of Image Data
+						helper.ra.writeInt( bos.size());
+						// [x] : Image Data
+						helper.ra.write(bos.toByteArray());
+						bos.reset();
+					}
+					break;}
+				case MAGLEV: {
+					MaglevMedium mimg = (MaglevMedium)part.iimg;
+					
+					List<AMagLevThing> things = mimg.getThings();
+					//	[2] : Number of things
+					helper.ra.writeShort(things.size());	
+					
+					for( AMagLevThing thing : things) {
+						if( thing instanceof MagLevStroke) {
+							MagLevStroke stroke = (MagLevStroke)thing;
+							
+							helper.ra.writeByte(0);		//	[1] : thing type
+							
+							helper.ra.writeInt( stroke.params.getColor());			// [4] : Color
+							helper.ra.writeByte( stroke.params.getMethod().fileId);	// [1] : Method Type
+							helper.ra.writeFloat(stroke.params.getWidth());			// [4] : Width
+							
+							helper.ra.writeShort( stroke.states.length);	// [2] : Number of Vertices
+							
+							for( PenState ps : stroke.states) {
+								helper.ra.writeFloat( ps.x);		// [4] : x
+								helper.ra.writeFloat( ps.y);		// [4] : y
+								helper.ra.writeFloat( ps.pressure);	// [4] : pressure
+							}
+							
+						}
+						else if( thing instanceof MagLevFill) {
+							MagLevFill fill = (MagLevFill)thing;
+							helper.ra.writeByte(1);		// [1] : thing type
+
+							helper.ra.writeInt( fill.getColor());		// [4] : Color
+							helper.ra.writeByte( fill.mode.fileId);		// [1] : Fill Mode
+							
+							helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
+
+							for( MagLevFill.StrokeSegment seg : fill.segments) {
+								helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
+								helper.ra.writeFloat( seg._pivot);		// [4] : pivot
+								helper.ra.writeFloat( seg._travel);		// [4] : travel
+							}
 						}
 					}
+					break;}
+				default:
+					MDebug.handleWarning(WarningType.STRUCTURAL, this, "Null Image Type.  Attempting to ignore.");
+					break;
 				}
-				break;}
-			default:
-				MDebug.handleWarning(WarningType.STRUCTURAL, this, "Null Image Type.  Attempting to ignore.");
-				break;
 			}
-		}
-		
-		long filePointer2 = helper.ra.getFilePointer();
-		helper.ra.seek(filePointer);
-		
-		if( filePointer2 - filePointer > Integer.MAX_VALUE )
-			MDebug.handleError( ErrorType.OUT_OF_BOUNDS, null, "Image Data Too Big (>2GB).");
-		helper.ra.writeInt( (int)(filePointer2 - filePointer-4));
-		
-		helper.ra.seek(filePointer2);
+		});
 	}
 	
 	/** Saves the ANIM chunk containing the Animation structures */
 	private void saveAnimationData( SaveHelper helper)
 			throws UnsupportedEncodingException, IOException 
 	{
-		List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
+		WriteChunk(helper, "ANIM", () -> {
+
+			List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
+			
+			for( Animation animation : animations) {
+				// [n] : UTF8: Animation Name
+				helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
+				
+				if( animation instanceof FixedFrameAnimation) {
+					// [1] : ID
+					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
+					
+					// [2] : Number of Layers
+					List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
+					layers.remove(null);
+					helper.ra.writeShort( layers.size());
+					
+					for( AnimationLayer layer : layers) {
+						// [4] : Group Node Bound to
+						helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
+						
+						// [1] : bit mask
+						helper.ra.writeByte( (layer.includesSubtrees())?1:0);
+						
+						// [2] : Number of Frames
+						List<Frame> linkedFrames = layer.getFrames();
+						linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
+						helper.ra.writeShort(linkedFrames.size());
+						
+						for( Frame frame : linkedFrames) {
+							// [4] : NodeID of LayerNode linked to
+							helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
+
+							// [2] : Length
+							helper.ra.writeShort(frame.getLength());
+							// [2] : Gap Before
+							helper.ra.writeShort(frame.getGapBefore());
+							// [2] : Gap After
+							helper.ra.writeShort(frame.getGapAfter());
+						}
+					}
+				}
+				else if( animation instanceof RigAnimation) {
+					RigAnimation rigAnimation = (RigAnimation)animation;
+					// [1] : ID
+					helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
+					
+					// [2] : Number of Sprites
+					List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
+					helper.ra.writeShort(spriteLayers.size());
+				
+					for( RigAnimLayer spriteLayer : spriteLayers) {
+						// [4] : NodeID of Sprite
+						helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
+						
+						// [2] : Number of Parts
+						List<Part> parts = spriteLayer.sprite.getParts();
+						helper.ra.writeShort(parts.size());
+						for( Part part : parts) {
+							// [n, UTF8 str] : Part Type Name
+							helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
+
+							List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
+							// [2] : Number of Key Frames;
+							helper.ra.writeShort(keyFrames.size());
+							
+							for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
+								helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
+								
+								helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
+								helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
+								helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
+								helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
+								helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
+							}
+						}
+					}
+				}
+				else {
+					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
+				}
+			}
+		});
+	}
+	
+	private void WriteChunk( SaveHelper helper, String tag, ThrowingRunnable run) 
+			throws UnsupportedEncodingException, IOException 
+	{
+		if( tag.length() != 4) {
+			// Perhaps overkill, but this really should be a hard truth
+			MDebug.handleError(ErrorType.FATAL, "Chunk types must be 4-length");
+		}
 		
-		// [4] : "ANIM" tag
-		helper.ra.write( "ANIM".getBytes("UTF-8"));
+		// [4] : Chunk Tag 
+		helper.ra.write( tag.getBytes("UTF-8"));
 		
 		long start = helper.ra.getFilePointer();
 		// [4] : ChunkLength (placeholder for now)
 		helper.ra.writeInt(0);
 		
-		for( Animation animation : animations) {
-			// [n] : UTF8: Animation Name
-			helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
-			
-			if( animation instanceof FixedFrameAnimation) {
-				// [1] : ID
-				helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
-				
-				// [2] : Number of Layers
-				List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
-				layers.remove(null);
-				helper.ra.writeShort( layers.size());
-				
-				for( AnimationLayer layer : layers) {
-					// [4] : Group Node Bound to
-					helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
-					
-					// [1] : bit mask
-					helper.ra.writeByte( (layer.includesSubtrees())?1:0);
-					
-					// [2] : Number of Frames
-					List<Frame> linkedFrames = layer.getFrames();
-					linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
-					helper.ra.writeShort(linkedFrames.size());
-					
-					for( Frame frame : linkedFrames) {
-						// [4] : NodeID of LayerNode linked to
-						helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
+		run.run();
 
-						// [2] : Length
-						helper.ra.writeShort(frame.getLength());
-						// [2] : Gap Before
-						helper.ra.writeShort(frame.getGapBefore());
-						// [2] : Gap After
-						helper.ra.writeShort(frame.getGapAfter());
-					}
-				}
-			}
-			else if( animation instanceof RigAnimation) {
-				RigAnimation rigAnimation = (RigAnimation)animation;
-				// [1] : ID
-				helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
-				
-				// [2] : Number of Sprites
-				List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
-				helper.ra.writeShort(spriteLayers.size());
-			
-				for( RigAnimLayer spriteLayer : spriteLayers) {
-					// [4] : NodeID of Sprite
-					helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
-					
-					// [2] : Number of Parts
-					List<Part> parts = spriteLayer.sprite.getParts();
-					helper.ra.writeShort(parts.size());
-					for( Part part : parts) {
-						// [n, UTF8 str] : Part Type Name
-						helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
-
-						List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
-						// [2] : Number of Key Frames;
-						helper.ra.writeShort(keyFrames.size());
-						
-						for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
-							helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
-							
-							helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
-							helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
-							helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
-							helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
-							helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
-						}
-					}
-				}
-			}
-			else {
-				helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
-			}
-		}
-		
-		
 		long end = helper.ra.getFilePointer();
 		helper.ra.seek(start);
 		if( end - start> Integer.MAX_VALUE )
 			MDebug.handleError( ErrorType.OUT_OF_BOUNDS, null, "Image Data Too Big (>2GB).");
 		helper.ra.writeInt( (int)(end - start-4));
+		helper.ra.seek(end);
+		
+		
+	}
+	private interface ThrowingRunnable {
+		public void run() throws UnsupportedEncodingException, IOException;
 	}
 	
 	private class SaveHelper {

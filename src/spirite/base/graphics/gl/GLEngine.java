@@ -346,14 +346,13 @@ public class GLEngine  {
 		prim.free();
         params.clearInternalParams();
 	}
-
 	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim) {
-
-        Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
-        		-0.5f, params.width-0.5f, -0.5f, params.height-0.5f, -1, 1));
-        matrix = matrix.transpose();
-        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
-        		"perspectiveMatrix", 1, matrix.getBuffer()));
+		applyPrimitiveProgram( type, params, prim, new MatTrans());
+	}
+	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim, MatTrans trans) {
+		addOrtho(params, trans);
+//        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
+//        		"perspectiveMatrix", 1, matrix.getBuffer()));
         
 		PreparedPrimitive pprim = new PreparedPrimitive( prim);
 		pprim.prepare();
@@ -361,6 +360,7 @@ public class GLEngine  {
 		pprim.free();
         params.clearInternalParams();
 	}
+
 
 	/**
 	 * Draws a complex line that transforms the line description into a geometric

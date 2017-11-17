@@ -66,7 +66,7 @@ public class SettingsManager {
     // ==============
     // ==== Palette Saving/Loading:
     /** used by PaletteManager to get the raw data corresponding to a palette. */
-    byte[] getRawPalette( String name) {
+    public byte[] getRawPalette( String name) {
         List<String> names = getStoredPalettes();
 
         if( !names.contains(name))
@@ -74,7 +74,7 @@ public class SettingsManager {
 
         return prefs.getByteArray("palette."+name, null);
     }
-    void saveRawPalette( String name, byte[] raw) {
+    public void saveRawPalette( String name, byte[] raw) {
         if( paletteList == null)
             loadPaletteList();
 
