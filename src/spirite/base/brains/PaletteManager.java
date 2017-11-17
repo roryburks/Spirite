@@ -83,7 +83,7 @@ public class PaletteManager
 		ImageWorkspace ws = master.getCurrentWorkspace();
 		if( ws == null)
 			return defaultPalette;
-		return ws.getCurrentPalette();
+		return ws.getPaletteSet().getCurrentPalette();
 	}
 
 

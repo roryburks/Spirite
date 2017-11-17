@@ -96,7 +96,7 @@ public class LayersPanel extends OmniComponent {
 			@Override public void stateChanged(ChangeEvent arg0) {
 				ImageWorkspace ws = master.getCurrentWorkspace();
 				if( ws != null) {
-					ws.setUsingAnimationView( layerTabPane.getSelectedIndex() == 1);
+					ws.getAnimationManager().getView().setUsingAnimationView( layerTabPane.getSelectedIndex() == 1);
 					ws.triggerFlash();
 				}
 			}

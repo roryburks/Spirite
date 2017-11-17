@@ -20,11 +20,8 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
 /***
- * AnimatonManager manages the animation functionality of an ImageWorkspace.
- * They are tied 1:1, but separated for maintainability.
- * 
- * @author RoryBurks
- *
+ * The AnimationManager stores all of the animations within a workspace and handles messages 
+ * related to changes in the animation, both in their view and in their structure.
  */
 public class AnimationManager implements MImageObserver, MNodeSelectionObserver {
 	private final ImageWorkspace context;

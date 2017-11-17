@@ -13,11 +13,16 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 
 /**
- * Under normal circumstances an ImageHandle is a logical connection to a
- * CachedImage in an ImageWorkspace.  It also helps smooth out the process
- * of building complex data structures relying on Images that should be 
- * Cached by allowing you to create ImageHandles without a null context
- * and then linking them to the ImageWorkspace using importData
+ * A MediumHandle is a reference to a Medium which is being maintained by
+ * an ImageWorkspace.  All Semi-permanent Mediums (other than those in the
+ * UndoEngine) should be managed through Handles and with the Workspace, 
+ * otherwise their low-level Graphical resources will only be released when
+ * the GC gets around to clearing them.
+ * 
+ * Null-context MediumHandles can be created but their intended use is for 
+ * the LoadEngine which loads the logical structure then links the ImageData,
+ * to avoid navigating a complex or even cyclical hierarchy of references
+ * but can presumably be used in a similar fashion, but this is discouraged.
  * 
  * !!!! NOTE: Use .equals().  There should be little to no reason to ever
  * use <code>==</code> as it defeats the entire point of handles.

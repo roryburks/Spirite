@@ -7,6 +7,12 @@ import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.Node;
 
+/**
+ * An animation essentially performs one thing: given a timeframe t, it draws
+ * a certain thing.  In general it relies on Mediums (which must be managed and 
+ * handled separately by being within a node in addition to being in an Animation), 
+ * but it's perfectly possible to construct an entirely abstract Animation.
+ */
 public abstract class Animation {
 	protected String name;
 	protected ImageWorkspace context;

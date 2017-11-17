@@ -9,6 +9,13 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.util.ObserverHandler;
 
+/**
+ * The AnimationView maintains the view-state of the extended AnimationView (the
+ * second tab on the layers panel).  It is primarily just a wrapper for a Group
+ * tree defining its structure, but it also can contain extra-Group-structure 
+ * visual properties such as view properties relative to frame (e.g. one above,
+ * one below), and visual properties based on Animation Layer.
+ */
 public class AnimationView implements MAnimationStructureObserver {
 	private final ImageWorkspace workspace;
 	private final AnimationManager context;
@@ -45,6 +52,19 @@ public class AnimationView implements MAnimationStructureObserver {
 	public void setSelectedNode(Node sel) {
 		selected = sel;
 		_triggerViewSelectionChange(sel);
+	}
+	
+
+
+	private boolean animationView = false;
+	public boolean isUsingAnimationView() {
+		return animationView;
+	}
+	public void setUsingAnimationView( boolean using) { 
+		if( this.animationView != using) {
+			this.animationView = using;
+			//this.context.triggerSelectedChanged();
+		}
 	}
 	
 	// ===========================

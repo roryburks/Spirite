@@ -166,7 +166,7 @@ public class RenderEngine
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
 		settings.normalize();
 		
-		GroupNode root = (workspace.isUsingAnimationView()) 
+		GroupNode root = (workspace.getAnimationManager().getView().isUsingAnimationView()) 
 				? workspace.getAnimationManager().getView().getRoot()
 				: workspace.getRootNode();
 		HybridNodeRenderer renderer = new HybridNodeRenderer(root);

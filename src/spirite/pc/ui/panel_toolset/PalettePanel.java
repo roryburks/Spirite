@@ -200,7 +200,7 @@ public class PalettePanel extends JPanel
         	if( ws == null) return;
         	
         	if( JOptionPane.showConfirmDialog(this, "Delete Palette") == JOptionPane.YES_OPTION)
-        		ws.removePalette(ws.getPalettes().indexOf(wPalette));
+        		ws.getPaletteSet().removePalette(ws.getPaletteSet().getPalettes().indexOf(wPalette));
         });
         btnAddPalette.addActionListener((e) -> {
         	ImageWorkspace ws = master.getCurrentWorkspace();
@@ -208,7 +208,7 @@ public class PalettePanel extends JPanel
         	
         	String newName = JOptionPane.showInputDialog(this,"New Palette", getNonDuplicateName("palette_1"));
         	if( newName != null) 
-        		ws.addPalette(paletteManager.new Palette(newName), true);
+        		ws.getPaletteSet().addPalette(paletteManager.new Palette(newName), true);
         });
         btnCopyPalette.addActionListener((e) -> {
         	copyPalette = wPalette.compress();
@@ -219,7 +219,7 @@ public class PalettePanel extends JPanel
         	if( ws == null) return;
         	
         	if( copyPalette != null && ws != null) {
-        		ws.addPalette(paletteManager.new Palette(copyPalette, getNonDuplicateName(copyName)), true);
+        		ws.getPaletteSet().addPalette(paletteManager.new Palette(copyPalette, getNonDuplicateName(copyName)), true);
         	}else HybridHelper.beep();
         });
         
@@ -242,7 +242,7 @@ public class PalettePanel extends JPanel
 			public void doUIChanged(Integer newValue) {
 				ImageWorkspace ws = master.getCurrentWorkspace();
 				if( ws != null) {
-					ws.setSelectedPalette(newValue);
+					ws.getPaletteSet().setSelectedPalette(newValue);
 				}
 			}
 			@Override
@@ -283,7 +283,7 @@ public class PalettePanel extends JPanel
         boxPalette.removeAllItems();
         ImageWorkspace ws = master.getCurrentWorkspace();
         if( ws != null) {
-        	List<Palette> palettes = ws.getPalettes();
+        	List<Palette> palettes = ws.getPaletteSet().getPalettes();
             for( Palette palette : palettes)
             	boxPalette.addItem(palette.getName());
             
@@ -508,7 +508,7 @@ public class PalettePanel extends JPanel
 				ImageWorkspace ws = master.getCurrentWorkspace();
 				if( ws != null) {
 					byte[] raw = master.getSettingsManager().getRawPalette(name);
-					ws.addPalette( paletteManager.new Palette(raw, getNonDuplicateName(name)), true);
+					ws.getPaletteSet().addPalette( paletteManager.new Palette(raw, getNonDuplicateName(name)), true);
 				}
 			}
 			if( cmd.startsWith("save.")) {
@@ -533,7 +533,7 @@ public class PalettePanel extends JPanel
 			if( cmd.equals("loaddefault")) {
 				ImageWorkspace ws = master.getCurrentWorkspace();
 				if( ws != null) {
-					ws.addPalette(paletteManager.new Palette("default"), true);
+					ws.getPaletteSet().addPalette(paletteManager.new Palette("default"), true);
 				}
 			}
 		}

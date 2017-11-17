@@ -357,7 +357,7 @@ public class SaveEngine implements MWorkspaceObserver {
 			throws UnsupportedEncodingException, IOException 
 	{
 		WriteChunk(helper, "PLTT", () -> {
-			List<Palette> palettes = helper.workspace.getPalettes();
+			List<Palette> palettes = helper.workspace.getPaletteSet().getPalettes();
 			
 			for( Palette palette : palettes) {
 				// [n] Palette Name

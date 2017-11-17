@@ -10,15 +10,14 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
 /***
- * Though almost all ImageData goes through the group tree before being
- * displayed and/or manipulated, GroupTree should function primarily as
- * a container, not as an interface.
- * 
- * Note: "floating" Nodes which are nested inside a GroupTree, but are not
- *	linked to it through its root-branch system can exist for numerous 
- * 	reasons, such as for storing undo actions or because a UI component
- * 	hasn't re-constructed its data based on the GroupTree changes.  In other
- *  words, it is not guaranteed that a Node is valid for any ImageWorkspace.
+ * A GroupTree is a generalized, abstract class for storing assorted image
+ * data (mostly Layers, but can be expanded further) in a tree format (where
+ * non-leaf nodes are specific "Group" nodes.  The primary storage
+ * structure within ImageWorkspace is a GroupTree which
+ * is used both to find the Data and determine if it "exists", but Group
+ * trees outside of that can exist.  One must be careful with these 
+ * group trees, though, as any MediumHandles referred to by them may be
+ * de-contextualized as they are removed from the ImageWorkspace.
  * 
  * @author Rory Burks
  */

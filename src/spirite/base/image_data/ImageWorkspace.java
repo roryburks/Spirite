@@ -59,10 +59,20 @@ import spirite.hybrid.MDebug.ErrorType;
 
 /***
  * An ImageWorkspace is essentially the root class for all aspects of the graphical
- * data, both storage and interface.
+ * data, both storage and interface.  It has many sub-components and bridges access
+ * with SOME of MasterControl's global functionality (should at least be image-related).
+ * ImageWorkspace itself's functionality should be limited to:
+ * -CRUD on Nodes to the Group Tree
+ * -Modification of global Workspace properties (such as Width/Height)
+ * -Accessing and linking Mediums through MediumHandles
+ * 		(including building Data)
  * 
- * Multiple ImageWorkspaces can exist, though their interactions with each other are
- * minimal.
+ * In general only things that deal directly with the GroupTree, MediumHandles, and some
+ * small number of global properties.  Everything else should be delegated out to subcomponents
+ * which can be accessed through ImageWorkspace.
+ * 
+ * Multiple ImageWorkspaces can exist, though their interactions with each other should
+ * be minimal and mediated externally.
  * 
  * @author Rory Burks
  *
@@ -90,6 +100,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	private final SelectionEngine selectionEngine;
 	private final ReferenceManager referenceManager;
 	private final StagingManager stagingManager;
+	private final PaletteSet paletteSet;
 	
 	// External Components
 	private final SettingsManager settingsManager;
@@ -109,7 +120,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	private boolean building = true;	// While building, no UndoActionsare stored
 										// and no cache is cleared
 	
-	private boolean animationView = false;
 	
 	
 	public ImageWorkspace( MasterControl master) {
@@ -124,12 +134,11 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		selectionEngine = new SelectionEngine(this);	// Depends on UndoEngine
 		referenceManager = new ReferenceManager(this);
 		stagingManager = new StagingManager(this);
+		paletteSet = new PaletteSet(this);
 		
 		mediumData = new HashMap<>();
 		master.addWorkspaceObserver(this);
 		
-		palettes.add(paletteManager.new Palette("Default"));
-		selectedPalette = 0;
 	}
 	@Override
 	public String toString() {
@@ -258,16 +267,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		}
 	}
 	
-	public boolean isUsingAnimationView() {
-		return animationView;
-	}
-	public void setUsingAnimationView( boolean using) { 
-		if( this.animationView != using) {
-			this.animationView = using;
-			triggerSelectedChanged();
-		}
-	}
-	
 	public File getFile() {return file;} 
 	public String getFileName() {
 		if( file == null) 
@@ -285,11 +284,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	public SelectionEngine getSelectionEngine() { return selectionEngine; }
 	public ReferenceManager getReferenceManager() { return referenceManager; }
 	public StagingManager getStageManager() {return stagingManager;}
-	public PaletteManager getPaletteManager() {return paletteManager;}	// Might be removed in the future
+	public PaletteSet getPaletteSet() {return paletteSet;}
 	
 	// Super-Components (components rooted in MasterControl, simply being passed on)
 	public RenderEngine getRenderEngine() { return renderEngine; }
 	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
+	public PaletteManager getPaletteManager() {return paletteManager;}	// Might be removed in the future
 	
 	
 	public GroupTree.GroupNode getRootNode() { return groupTree.getRoot(); }
@@ -303,44 +303,6 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		
 		return list;
 	}
-	
-	// ============
-	// ==== Palettes 
-	private List<Palette> palettes = new ArrayList<>();
-	private int selectedPalette;
-	
-	public Palette getCurrentPalette() {
-		return palettes.get(selectedPalette);
-	}
-	public void resetPalettes(Collection<Palette> newPalettes) {
-		palettes = new ArrayList<>(newPalettes.size());
-		palettes.addAll(newPalettes);
-		selectedPalette = 0;
-	}
-	public void addPalette( Palette palette, boolean select) {
-		palettes.add(palette);
-		if( select)
-			selectedPalette = palettes.size()-1;
-		paletteManager.triggerPaletteChange();
-	}
-	public void removePalette( int i) {
-		if( i < 0 || i >= palettes.size())
-			return;
-		
-		palettes.remove(i);
-		if( selectedPalette >= i)
-			selectedPalette--;
-		if( palettes.size() == 0) {
-			palettes.add(paletteManager.new Palette("Default"));
-			selectedPalette = 0;
-		}
-		paletteManager.triggerPaletteChange();
-	}
-	public void setSelectedPalette(int i) {
-		selectedPalette = i;
-		paletteManager.triggerPaletteChange();
-	}
-	public List<Palette> getPalettes() { return new ArrayList<>(palettes);}
 	
 	
 	// ============== Building Active Data ==================

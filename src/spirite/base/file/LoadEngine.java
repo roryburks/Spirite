@@ -582,7 +582,7 @@ public class LoadEngine {
 			palettes.add(master.getPaletteManager().new Palette(raw, name));
 		}
 		
-		helper.workspace.resetPalettes(palettes);
+		helper.workspace.getPaletteSet().resetPalettes(palettes);
 	}
 	
 	private void parseAnimationSection(LoadHelper helper, int chunkSize) 
