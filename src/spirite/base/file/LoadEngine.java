@@ -188,7 +188,6 @@ public class LoadEngine {
 			// Next Load the Palette data
 			for( ChunkInfo ci : helper.chunkList) {
 				if( ci.header.equals("PLTT")) {
-					System.out.println("TEST");
 					helper.ra.seek(ci.startPointer);
 					parsePaletteSection(helper, ci.size);
 				}
@@ -199,12 +198,10 @@ public class LoadEngine {
 			
 			if( helper.version < 2) {
 				for( IMedium img : imageMap.values()) {
-					if( img.getWidth() > helper.workspace.getWidth()) {
+					if( img.getWidth() > helper.workspace.getWidth())
 						helper.workspace.setWidth(img.getWidth());
-					}
-					if( img.getHeight() > helper.workspace.getHeight()) {
+					if( img.getHeight() > helper.workspace.getHeight()) 
 						helper.workspace.setHeight(img.getHeight());
-					}
 				}
 			}
 			

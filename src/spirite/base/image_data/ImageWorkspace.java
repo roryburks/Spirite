@@ -323,6 +323,19 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			selectedPalette = palettes.size()-1;
 		paletteManager.triggerPaletteChange();
 	}
+	public void removePalette( int i) {
+		if( i < 0 || i >= palettes.size())
+			return;
+		
+		palettes.remove(i);
+		if( selectedPalette >= i)
+			selectedPalette--;
+		if( palettes.size() == 0) {
+			palettes.add(paletteManager.new Palette("Default"));
+			selectedPalette = 0;
+		}
+		paletteManager.triggerPaletteChange();
+	}
 	public void setSelectedPalette(int i) {
 		selectedPalette = i;
 		paletteManager.triggerPaletteChange();

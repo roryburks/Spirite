@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
@@ -38,7 +40,9 @@ import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.base.util.MUtil;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.ContextMenus;
+import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
 
 public class PalettePanel extends JPanel 
@@ -55,9 +59,11 @@ public class PalettePanel extends JPanel
     private ColorPicker main, sub;
     private JScrollPane container;
     private PaletteSubpanel palette;
+    private JButton btnCopyPalette;
+    private JButton btnPastePalette;
     private JButton btnSavePalette;
     private JButton btnLoadPalette;
-    private JButton btnAddColor;
+    private JButton btnAddPalette;
     private JComboBox<String> boxPalette;
     private JButton btnRemovePalette;
     
@@ -98,26 +104,29 @@ public class PalettePanel extends JPanel
 
         btnSavePalette = new JButton();
         btnLoadPalette = new JButton();
-        btnAddColor = new JButton();
+        btnAddPalette = new JButton();
         btnRemovePalette = new JButton();
+        btnCopyPalette = new JButton();
+        btnPastePalette = new JButton();
+        btnCopyPalette.setToolTipText("Copy Palette");
+        btnPastePalette.setToolTipText("Paste Palette");
         btnSavePalette.setToolTipText("Save Palette");
         btnLoadPalette.setToolTipText("Load Palette");
-        btnAddColor.setToolTipText("Add Color");
+        btnAddPalette.setToolTipText("Add NewPalette");
         btnRemovePalette.setToolTipText("Remove Palette");
         boxPalette = new JComboBox<String>(new String[] {"Default", "2"});
         
         btnSavePalette.addActionListener( this);
         btnLoadPalette.addActionListener( this);
-        btnAddColor.addActionListener( this);
 
         btnSavePalette.setIcon(Globals.getIcon("palSavePalette"));
         btnLoadPalette.setIcon(Globals.getIcon("palLoadPalette"));
-        btnAddColor.setIcon(Globals.getIcon("palNewColor"));
+        btnAddPalette.setIcon(Globals.getIcon("palNewColor"));
         //btnRemovePalette.setIcon(Globals.getIcon("palRemPalette"));
 
         btnSavePalette.setBackground( new Color( 170,170,220));
         btnLoadPalette.setBackground( new Color( 170,170,220));
-        btnAddColor.setBackground( new Color( 170,170,220));
+        btnAddPalette.setBackground( new Color( 170,170,220));
         btnRemovePalette.setBackground( new Color( 170,170,220));
         
         Dimension bsize = new Dimension(24, 12);
@@ -146,11 +155,15 @@ public class PalettePanel extends JPanel
             		.addGap(1)
             		.addComponent(btnRemovePalette, bsize.width, bsize.width, bsize.width))
             	.addGroup(layout.createSequentialGroup()
+            		.addComponent(btnCopyPalette, bsize.width, bsize.width, bsize.width)
+            		.addGap(1)
+            		.addComponent(btnPastePalette, bsize.width, bsize.width, bsize.width)
+            		.addGap(1)
             		.addComponent(btnSavePalette, bsize.width, bsize.width, bsize.width)
             		.addGap(1)
             		.addComponent(btnLoadPalette, bsize.width, bsize.width, bsize.width)
             		.addGap(1)
-            		.addComponent(btnAddColor, bsize.width, bsize.width, bsize.width)
+            		.addComponent(btnAddPalette, bsize.width, bsize.width, bsize.width)
             	)
 
         );
@@ -169,23 +182,45 @@ public class PalettePanel extends JPanel
                			.addComponent(boxPalette, ddheight,ddheight,ddheight)
                			.addComponent(btnRemovePalette, ddheight,ddheight,ddheight))
                		.addGroup( layout.createParallelGroup()
+               			.addComponent(btnCopyPalette, bsize.height, bsize.height, bsize.height)
+               			.addComponent(btnPastePalette, bsize.height, bsize.height, bsize.height)
                			.addComponent(btnSavePalette, bsize.height, bsize.height, bsize.height)
                			.addComponent(btnLoadPalette, bsize.height, bsize.height, bsize.height)
-               			.addComponent(btnAddColor, bsize.height, bsize.height, bsize.height)
+               			.addComponent(btnAddPalette, bsize.height, bsize.height, bsize.height)
                		)
                 )
         );
     }
     
+    byte[] copyPalette = null;
+    String copyName = null;
     private void initBindings() {
         btnRemovePalette.addActionListener((e) -> {
         	ImageWorkspace ws = master.getCurrentWorkspace();
         	if( ws == null) return;
         	
+        	if( JOptionPane.showConfirmDialog(this, "Delete Palette") == JOptionPane.YES_OPTION)
+        		ws.removePalette(ws.getPalettes().indexOf(wPalette));
+        });
+        btnAddPalette.addActionListener((e) -> {
+        	ImageWorkspace ws = master.getCurrentWorkspace();
+        	if( ws == null) return;
         	
         	String newName = JOptionPane.showInputDialog(this,"New Palette", getNonDuplicateName("palette_1"));
         	if( newName != null) 
         		ws.addPalette(paletteManager.new Palette(newName), true);
+        });
+        btnCopyPalette.addActionListener((e) -> {
+        	copyPalette = wPalette.compress();
+        	copyName = wPalette.getName();
+        });
+        btnPastePalette.addActionListener((e) -> {
+        	ImageWorkspace ws = master.getCurrentWorkspace();
+        	if( ws == null) return;
+        	
+        	if( copyPalette != null && ws != null) {
+        		ws.addPalette(paletteManager.new Palette(copyPalette, getNonDuplicateName(copyName)), true);
+        	}else HybridHelper.beep();
         });
         
         
@@ -215,6 +250,13 @@ public class PalettePanel extends JPanel
 				doUpdate();
 			}
 		});
+        boxPalette.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename");
+        boxPalette.getActionMap().put("rename", UIUtil.buildAction((e) -> {
+        	String name = JOptionPane.showInputDialog(null, "Rename Palette", wPalette.getName());
+        	if( name != null) {
+        		wPalette.setName(getNonDuplicateName(name));
+        	}
+        }));
     }
     
     private String getNonDuplicateName(String name) {
@@ -424,7 +466,7 @@ public class PalettePanel extends JPanel
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		if( evt.getSource() == btnAddColor) {
+		if( evt.getSource() == btnAddPalette) {
 			wPalette.addPaletteColor( paletteManager.getActiveColor(0));
 		}
 		else if( evt.getSource() == btnLoadPalette) {
