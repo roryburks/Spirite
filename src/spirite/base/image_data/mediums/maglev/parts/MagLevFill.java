@@ -8,6 +8,7 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 
 public class MagLevFill extends AMagLevThing {
@@ -57,9 +58,11 @@ public class MagLevFill extends AMagLevThing {
 		for( MagLevFill.StrokeSegment s : segments) {
 			MagLevStroke stroke = (MagLevStroke)things.get(s.strokeIndex);
 			
-			float curveLen = (float) (stroke.direct.length * StrokeEngine.DIFF);
-			int start = (int)( s._pivot * curveLen);
-			int end = (int) ((s._pivot + s._travel) * curveLen);
+			float curveLen = (float) (stroke.direct.length);
+			int start = MUtil.clip(0, (int)( s._pivot * curveLen), stroke.direct.length-1);
+			int end = MUtil.clip(0, (int) ((s._pivot + s._travel) * curveLen), stroke.direct.length-1);
+			
+			System.out.println(s._pivot + "," + s._travel);
 
 			for( int c = start; c <= end; ++c) {
 				outx.add(stroke.direct.x[c]);

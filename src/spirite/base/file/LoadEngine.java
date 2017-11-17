@@ -47,6 +47,7 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.util.MUtil;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -347,7 +348,12 @@ public class LoadEngine {
 								int travel = helper.ra.readInt();
 								MagLevStroke stroke = (MagLevStroke) things.get(strokeIndex);
 								float strokeLen = stroke.getDirect().length;
-								StrokeSegment ss = new StrokeSegment( strokeIndex, pivot/strokeLen, travel/strokeLen);
+								float _pivot = MUtil.clip(0, pivot/strokeLen, 1);
+								float _travel = (travel < 0) 
+										? MUtil.clip(-_pivot, travel/strokeLen, 0)
+										: MUtil.clip(0, travel/strokeLen, 1 - pivot);
+								
+								StrokeSegment ss = new StrokeSegment( strokeIndex,  _pivot, _travel);
 								segments.add(ss);
 							}
 							else {
