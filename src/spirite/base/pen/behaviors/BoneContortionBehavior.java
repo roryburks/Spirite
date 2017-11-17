@@ -8,6 +8,7 @@ import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.brains.tools.ToolSchemes.BoneStretchMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -45,8 +46,8 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 	private final IBoneDrawer drawer;
 	CubicSplineInterpolator2D proposing;
 	List<Vec2> proposedPoints;
-	CubicSplineInterpolator2D memoryProposition;
-	List<Vec2> memoryProposedPoints;
+	CubicSplineInterpolator2D basePropositing;
+	List<Vec2> baseProposedPoints;
 	
 	public BoneContortionBehavior(Penner penner, IBoneDrawer drawer) {
 		super(penner);
@@ -125,30 +126,31 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			fy = new FloatCompactor();
 		}
 		else if( state == State.DEFORMING) {
-			
 			CubicSplineInterpolator2D prel = new CubicSplineInterpolator2D(fx.toArray(), fy.toArray(), false);
 			
 			float clen = prel.getCurveLength();
-			proposedPoints = new ArrayList<>();
+			baseProposedPoints = new ArrayList<>();
 			for( int i=0; i < SUBDIVISIONS+1; ++i) {
-				proposedPoints.add(prel.eval(i*clen/(SUBDIVISIONS)));
+				baseProposedPoints.add(prel.eval(i*clen/(SUBDIVISIONS)));
 			}
-			proposing = new CubicSplineInterpolator2D(proposedPoints, true);
-			proposing.setExtrapolating(true);
+			basePropositing = new CubicSplineInterpolator2D(baseProposedPoints, true);
+			basePropositing.setExtrapolating(true);
 			
 			state = State.PROPOSING;
+			
+			_doScale();
 			//BaseBone b = new BaseBone(x1, y1, x2, y2, 1);
 			//drawer.contort(b, proposing);			
 			//end();
 		}
 		else if( state == State.MOVING_PROP) {
-			if( memoryProposedPoints != null)  {
-				for( Vec2 p : memoryProposedPoints) {
+			if( baseProposedPoints != proposedPoints)  {
+				for( Vec2 p : baseProposedPoints) {
 					p.x += penner.x - startX;
 					p.y += penner.y - startY;
 				}
-				memoryProposition = new CubicSplineInterpolator2D(memoryProposedPoints, false);
-				memoryProposition.setExtrapolating(true);
+				basePropositing = new CubicSplineInterpolator2D(baseProposedPoints, false);
+				basePropositing.setExtrapolating(true);
 			}
 			
 			state = State.PROPOSING;
@@ -172,8 +174,8 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 				fy = new FloatCompactor();
 				proposing = null;
 				proposedPoints = null;
-				memoryProposition = null;
-				memoryProposedPoints = null;
+				basePropositing = null;
+				baseProposedPoints = null;
 			}
 		}
 	}
@@ -205,24 +207,8 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		if( tool != Tool.BONE)
 			return;
 		
-		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.BONE);
+		_doScale();
 		
-		if( property.getId().equals("resize") ) {
-			if( state == State.PROPOSING) {
-				if( memoryProposition == null) {
-					memoryProposedPoints = proposedPoints;
-					memoryProposition = proposing;
-				}
-				
-				_doScale((ToolSchemes.BoneStretchMode)settings.getProperty("mode").getValue(), 
-						(Float)settings.getProperty("leniency").getValue());
-			}
-			else HybridHelper.beep();
-		}
-		if((property.getId().equals("leniency") || property.getId().equals("mode")) && memoryProposition != null) {
-			_doScale((ToolSchemes.BoneStretchMode)settings.getProperty("mode").getValue(), 
-					(Float)settings.getProperty("leniency").getValue());
-		}
 		if( property.getId().equals("do")) {
 			if( proposing != null)
 				drawer.contort(new BaseBone(x1, y1, x2, y2, 1), proposing);
@@ -230,17 +216,31 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		}
 	}
 	
-	private void _doScale( ToolSchemes.BoneStretchMode mode, float leniency) {
+	private void _doScale() {
+		if( basePropositing == null)
+			return;
+		
+		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.BONE);
+		boolean resize = (Boolean) settings.getValue("resize");
+		ToolSchemes.BoneStretchMode mode = (BoneStretchMode) settings.getValue("mode");
+		float leniency = (Float)settings.getValue("leniency");
+		
+		if( !resize) {
+			proposedPoints = baseProposedPoints;
+			proposing = basePropositing;
+			return;
+		}
+		
 		switch( mode) {
 		case CLIP_EVEN:{
 			// Note: 80% code duplicated from CLIP_HEAD
 			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
-			float curve_len = memoryProposition.getCurveLength();
+			float curve_len = basePropositing.getCurveLength();
 			
 			if( bone_len * (1-leniency) > curve_len)
 				bone_len = bone_len * (1-leniency);
 			else if( bone_len*(1 + leniency) > curve_len) {
-				proposing = memoryProposition;
+				proposing = basePropositing;
 				break;
 			}
 			else
@@ -250,26 +250,26 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			float start = (curve_len - bone_len)/2f;
 			float end = curve_len - start;
 			for( int i=0; i < SUBDIVISIONS+1; ++i) {
-				proposedPoints.add(memoryProposition.eval( start + i * (end - start) / (float)SUBDIVISIONS));
+				proposedPoints.add(basePropositing.eval( start + i * (end - start) / (float)SUBDIVISIONS));
 			}
 			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
 			proposing.setExtrapolating(true);
 			break;}
 		case SCALE:{
 			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
-			float curve_len = memoryProposition.getCurveLength();
+			float curve_len = basePropositing.getCurveLength();
 
 			if( bone_len * (1-leniency) > curve_len)
 				bone_len = bone_len * (1-leniency);
 			else if( bone_len*(1 + leniency) > curve_len) {
-				proposing = memoryProposition;
+				proposing = basePropositing;
 				break;
 			}
 			else
 				bone_len = bone_len * (1+leniency);
 			float scale = bone_len / curve_len;
 
-			Rect rect = MUtil.rectFromPoints(memoryProposedPoints);
+			Rect rect = MUtil.rectFromPoints(baseProposedPoints);
 			Vec2 center = new Vec2( rect.x + rect.width/2, rect.y + rect.height/2);
 			
 			MatTrans trans = new MatTrans();
@@ -278,7 +278,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			trans.preTranslate(center.x, center.y);
 			
 			proposedPoints = new ArrayList<>();
-			for( Vec2 p : memoryProposedPoints) {
+			for( Vec2 p : baseProposedPoints) {
 				proposedPoints.add( trans.transform(p, new Vec2()));
 			}
 			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
@@ -288,12 +288,12 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			break;
 		case CLIP_HEAD: {
 			float bone_len = (float)MUtil.distance(x1, y1, x2, y2);
-			float curve_len = memoryProposition.getCurveLength();
+			float curve_len = basePropositing.getCurveLength();
 			
 			if( bone_len * (1-leniency) > curve_len)
 				bone_len = bone_len * (1-leniency);
 			else if( bone_len*(1 + leniency) > curve_len) {
-				proposing = memoryProposition;
+				proposing = basePropositing;
 				break;
 			}
 			else
@@ -301,7 +301,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 			
 			proposedPoints = new ArrayList<>();
 			for( int i=0; i < SUBDIVISIONS+1; ++i) {
-				proposedPoints.add(memoryProposition.eval(i * bone_len / (float)SUBDIVISIONS));
+				proposedPoints.add(basePropositing.eval(i * bone_len / (float)SUBDIVISIONS));
 			}
 			proposing = new CubicSplineInterpolator2D(proposedPoints, false);
 			proposing.setExtrapolating(true);

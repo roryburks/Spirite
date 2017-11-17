@@ -125,7 +125,8 @@ public class ToolSchemes {
     		new CheckBoxProperty("full", "Full Erase", true)
     };
 	public static ToolScheme Bone = (master) -> new Property[]{
-    		new ButtonProperty("resize", "Resize", null, master),
+			new CheckBoxProperty("resize", "Resize", false),
+    		//new ButtonProperty("resize", "Resize", null, master),
     		new OpacityProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
     		new DropDownProperty<ToolSchemes.BoneStretchMode>("mode", "Resize Mode", ToolSchemes.BoneStretchMode.SCALE, ToolSchemes.BoneStretchMode.class),
     		new ButtonProperty("do", "Do Bone Transform", null, master),

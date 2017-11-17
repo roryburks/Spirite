@@ -720,6 +720,9 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		case MAGLEV:
 			ii = new MaglevMedium(this);
 			break;
+		case DERIVED_MAGLEV:
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to add an isolated DerivedMaglev Image ");
+			return null;
 		}
 		
 		mediumData.put( workingID, ii);

@@ -28,8 +28,6 @@ public class SaveLoadUtil {
 	public static final byte ANIM_FIXED_FRAME = 0x01;
 	public static final byte ANIM_RIG = 0x02;
 	
-	
-	
 	public static final int VERSION = 0x0000_000D;
 
 	// Node Attribute Masks
