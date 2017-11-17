@@ -1,6 +1,6 @@
 package spirite.base.pen.behaviors;
 
-import spirite.base.brains.ToolsetManager.BoxSelectionShape;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.selection.SelectionEngine.BuildMode;
 import spirite.base.image_data.selection.SelectionMask;
@@ -12,11 +12,11 @@ import spirite.base.util.Colors;
 import spirite.base.util.glmath.MatTrans;
 
 public class FormingSelectionBehavior extends DrawnStateBehavior {
-		private final BoxSelectionShape shape;
+		private final ToolSchemes.BoxSelectionShape shape;
 		private final BuildMode mode;
 		private ASelectionBuilder builder;
 		
-		public FormingSelectionBehavior( Penner penner, BoxSelectionShape shape, BuildMode mode) {
+		public FormingSelectionBehavior( Penner penner, ToolSchemes.BoxSelectionShape shape, BuildMode mode) {
 			super(penner);
 			this.shape = shape;
 			this.mode = mode;

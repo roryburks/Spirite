@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
-import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
@@ -150,7 +150,7 @@ public class MaglevImageDrawer
 		ss = null;
 		strokeSegments = new ArrayList<>();
 	}
-	@Override public void endMagneticFill( int color) {
+	@Override public void endMagneticFill( int color, MagneticFillMode behind) {
 		List<StrokeSegment> toInsert = new ArrayList<>(strokeSegments.size());
 		
 		for( BuildingStrokeSegment segment : strokeSegments) {
@@ -160,7 +160,7 @@ public class MaglevImageDrawer
 			toInsert.add(new StrokeSegment(segment.strokeIndex, segment.pivot / strokeLen, segment.travel/strokeLen));
 		}
 		
-		MagLevFill fill = new MagLevFill( toInsert, color);
+		MagLevFill fill = new MagLevFill( toInsert, color, behind);
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
@@ -380,7 +380,7 @@ public class MaglevImageDrawer
 
 	// :::: IColorChangeModule
 	@Override
-	public void changeColor(int from, int to, ColorChangeScopes scope, ColorChangeMode mode) {
+	public void changeColor(int from, int to, ToolSchemes.ColorChangeScopes scope, ToolSchemes.ColorChangeMode mode) {
 		ImageWorkspace ws = building.handle.getContext();
 		final Map<Integer,Integer> oldColorMap = new HashMap<>();
 		
@@ -417,11 +417,16 @@ public class MaglevImageDrawer
 					MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
 
 					for( Entry<Integer,Integer> entry : oldColorMap.entrySet()) {
-						AMagLevThing thing = mimg.things.get(entry.getKey());
-						if( thing instanceof MagLevFill) 
-							((MagLevFill)thing).color = to;
-						if( thing instanceof MagLevStroke)
-							((MagLevStroke) thing).params.setColor(to);
+						int index = entry.getKey();
+						AMagLevThing thing = mimg.things.get(index);
+						AMagLevThing dupeThing = thing.clone();
+						if( dupeThing instanceof MagLevFill)
+							((MagLevFill)dupeThing).color = to;
+						else if( dupeThing instanceof MagLevStroke)
+							((MagLevStroke) dupeThing).params.setColor(to);
+						
+						mimg.things.remove(index);
+						mimg.things.add(index, dupeThing);
 					}
 					
 					mimg.unbuild();

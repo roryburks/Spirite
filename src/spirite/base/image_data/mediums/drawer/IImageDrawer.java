@@ -1,7 +1,7 @@
 package spirite.base.image_data.mediums.drawer;
 
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
-import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
@@ -48,7 +48,7 @@ public interface IImageDrawer {
 	}
 	
 	public interface IColorChangeModule {
-		public void changeColor(  int from, int to, ColorChangeScopes scope, ColorChangeMode mode);
+		public void changeColor(  int from, int to, ToolSchemes.ColorChangeScopes scope, ToolSchemes.ColorChangeMode mode);
 	}
 	
 	public interface IInvertModule {
@@ -67,7 +67,7 @@ public interface IImageDrawer {
 	
 	public interface IMagneticFillModule {
 		public void startMagneticFill();
-		public void endMagneticFill( int color);
+		public void endMagneticFill( int color, MagneticFillMode mode);
 		public void anchorPoints(float x, float y, float r, boolean locked, boolean relooping);
 		public void erasePoints( float x, float y, float r);
 		public float[] getMagFillXs();

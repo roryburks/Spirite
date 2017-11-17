@@ -1,6 +1,6 @@
 package spirite.base.graphics.gl;
 
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
@@ -33,7 +33,7 @@ public class GLDrawer extends GraphicsDrawer {
 	@Override public StrokeEngine getStrokeEngine() { return strokeEngine; }
 
 	@Override
-	public void changeColor(RawImage image, int from, int to, ColorChangeMode mode) {
+	public void changeColor(RawImage image, int from, int to, ToolSchemes.ColorChangeMode mode) {
 		if( image.getWidth() <= 0 || image.getHeight() <= 0)
 			return;
 		

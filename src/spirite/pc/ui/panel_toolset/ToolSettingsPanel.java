@@ -22,6 +22,7 @@ import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
@@ -160,7 +161,7 @@ public class ToolSettingsPanel extends OmniComponent
 		for( Entry<JComponent,Property> entry : activeMap.entrySet()) {
 			int mask = entry.getValue().getMask();
 			
-			if( (mask & ToolsetManager.DISABLE_ON_NO_SELECTION) != 0) {
+			if( (mask & ToolSchemes.DISABLE_ON_NO_SELECTION) != 0) {
 				if( workspace == null || workspace.getSelectionEngine().getSelection() == null)  {
 					entry.getKey().setEnabled(false);
 				}

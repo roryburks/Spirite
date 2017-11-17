@@ -6,8 +6,11 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import spirite.base.brains.commands.CommandExecuter;
+import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.brains.tools.ToolSchemes.ToolScheme;
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
@@ -21,14 +24,6 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.MaglevImageDrawer;
 import spirite.base.pen.StrokeEngine.Method;
 import spirite.base.util.ObserverHandler;
-import spirite.hybrid.tools.properties.ButtonProperty;
-import spirite.hybrid.tools.properties.CheckBoxProperty;
-import spirite.hybrid.tools.properties.DropDownProperty;
-import spirite.hybrid.tools.properties.DualFloatBoxProperty;
-import spirite.hybrid.tools.properties.FloatBoxProperty;
-import spirite.hybrid.tools.properties.OpacityProperty;
-import spirite.hybrid.tools.properties.RadioButtonProperty;
-import spirite.hybrid.tools.properties.SizeProperty;
 
 /**
  * The ToolsetManager manages the set of Tools available, which tool is
@@ -213,6 +208,7 @@ public class ToolsetManager
     		Tool.PIXEL,
     		Tool.MAGLEV_FILL,
     		Tool.EXCISE_ERASER,
+    		Tool.COLOR_CHANGE, 
     		Tool.BONE,
     		Tool.FLOPPYBONE
     };
@@ -282,127 +278,18 @@ public class ToolsetManager
         protected abstract void setValue(Object newValue);
     }
 
-    // =======================
-    // ==== Setting Schemes
-    public enum PenDrawMode {
-    	NORMAL("Normal"),
-    	KEEP_ALPHA("Preserve Alpha"),
-    	BEHIND("Behind");
-    	
-    	public final String hrName;
-    	PenDrawMode( String hrName) {this.hrName = hrName;}
-    	@Override public String toString() {return hrName;}
-    }
-    public enum BoxSelectionShape {
-    	RECTANGLE("Rectangle"),
-    	OVAL("Oval"),
-    	;
-    	
-    	public final String hrName;
-    	BoxSelectionShape( String hrName) {this.hrName = hrName;}
-    	@Override public String toString() {return hrName;}
-    }
-    public enum ColorChangeScopes {
-    	LOCAL("Local"),
-    	GROUP("Entire Layer/Group"),
-    	PROJECT("Entire Project")
-    	;
-    	
-    	public final String hrName;
-    	ColorChangeScopes( String hrName) {this.hrName = hrName;}
-    	@Override public String toString() {return hrName;}
-    }
-    public enum BoneStretchMode {
-    	SCALE("Scale"),
-    	CLIP_HEAD("Clip Head"),
-    	CLIP_EVEN("Clamp"),
-    	SCALE_TO_BONE("Scale perpendicular to bone."),
-    	INTELI("Scale LoA")
-    	;
-
-    	public final String hrName;
-    	BoneStretchMode( String hrName) {this.hrName = hrName;}
-    	@Override public String toString() {return hrName;}
-    }
-    public enum FlipMode {
-    	HORIZONTAL("Horizontal Flipping"),
-    	VERTICAL( "Vertical Flipping"),
-    	BY_MOVEMENT("Determine from Movement"),
-    	;
-
-    	public final String hrName;
-    	FlipMode( String hrName) {this.hrName = hrName;}
-    	@Override public String toString() {return hrName;}
-    }
-    public enum ColorChangeMode {
-    	CHECK_ALL("Check Alpha", 0),
-    	IGNORE_ALPHA("Ignore Alpha", 1),
-    	AUTO("Change All", 2)
-    	;
-
-    	public final String hrName;
-    	public final int shaderCode;
-    	ColorChangeMode( String hrName, int code) {
-    		this.hrName = hrName;
-    		this.shaderCode = code;
-    	}
-    	@Override public String toString() {return hrName;}
-    }
     private void constructSettings() {
-        toolSettings.put( Tool.PEN, constructFromScheme( new Property[] {
-	        	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
-	        	new OpacityProperty("alpha", "Opacity", 1.0f),
-	        	new SizeProperty("width","Width", 5.0f),
-	        	new CheckBoxProperty("hard","Hard Edged",false),
-        }, Tool.PEN));
-        toolSettings.put( Tool.PIXEL, constructFromScheme( new Property[] {
-        		new OpacityProperty("alpha", "Opacity", 1.0f)
-        }, Tool.PIXEL));
-        toolSettings.put( Tool.ERASER, constructFromScheme( new Property[] {
-            	new OpacityProperty("alpha", "Opacity", 1.0f),
-            	new SizeProperty("width","Width", 5.0f),
-            	new CheckBoxProperty("hard","Hard Edged",false)
-        }, Tool.ERASER));
-        toolSettings.put( Tool.BOX_SELECTION, constructFromScheme( new Property[] {
-        		new DropDownProperty<BoxSelectionShape>("shape","Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.class)
-        }, Tool.BOX_SELECTION));
-        toolSettings.put( Tool.CROP, constructFromScheme( new Property[] {
-        		new ButtonProperty("cropSelection","Crop Selection", "draw.cropSelection", this.master),
-        		new CheckBoxProperty("quickCrop", "Crop on Finish", false),
-        		new CheckBoxProperty("shrinkOnly", "Shrink-only Crop", false)
-        }, Tool.CROP));
-        toolSettings.put( Tool.FLIPPER, constructFromScheme( new Property[] {
-        		new RadioButtonProperty<FlipMode>( "flipMode", "Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.class),
-        }, Tool.FLIPPER));
-        toolSettings.put( Tool.COLOR_CHANGE, constructFromScheme( new Property[] {
-        		new DropDownProperty<ColorChangeScopes>("scope", "Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.class),
-        		new RadioButtonProperty<ColorChangeMode>("mode", "Apply Mode", ColorChangeMode.CHECK_ALL, ColorChangeMode.class)
-        }, Tool.COLOR_CHANGE));
-        toolSettings.put( Tool.RESHAPER, constructFromScheme( new Property[] {
-        		new ButtonProperty("cropSelection", "Apply Transform", "draw.applyTransform", master, DISABLE_ON_NO_SELECTION),
-        		new DualFloatBoxProperty("scale", "Scale", 1, 1, "x", "y", DISABLE_ON_NO_SELECTION),
-        		new DualFloatBoxProperty("translation", "Translation", 0, 0, "x", "y", DISABLE_ON_NO_SELECTION),
-        		new FloatBoxProperty( "rotation", "Rotation", 0, DISABLE_ON_NO_SELECTION)
-        }, Tool.RESHAPER));
-        toolSettings.put( Tool.EXCISE_ERASER, constructFromScheme( new Property[]{
-        		new SizeProperty("width", "Width", 5.0f),
-        		new CheckBoxProperty("full", "Full Erase", true)
-        }, Tool.EXCISE_ERASER));
-        toolSettings.put( Tool.BONE, constructFromScheme( new Property[]{
-        		new ButtonProperty("resize", "Resize", null, master),
-        		new OpacityProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
-        		new DropDownProperty<BoneStretchMode>("mode", "Resize Mode", BoneStretchMode.SCALE, BoneStretchMode.class),
-        		new ButtonProperty("do", "Do Bone Transform", null, master),
-        		new CheckBoxProperty("preview", "Preview", false)
-        }, Tool.BONE));
+    	for( Entry<Tool,ToolScheme> entries : ToolSchemes.getToolSchemes().entrySet()) {
+            constructFromScheme(entries.getValue(), entries.getKey());
+    	}
     }
 
-    public static final int DISABLE_ON_NO_SELECTION = 0x01;
 
-    ToolSettings constructFromScheme( Property[] properties, Tool tool) {
+    void constructFromScheme( ToolScheme scheme, Tool tool) {
         ToolSettings settings = new ToolSettings(tool);
-        settings.properties = properties;
-        return settings;
+        settings.properties = scheme.getScheme(master);
+        
+        toolSettings.put( tool, settings);
     }
 
     // ===============

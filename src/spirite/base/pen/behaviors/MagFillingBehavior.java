@@ -1,5 +1,8 @@
 package spirite.base.pen.behaviors;
 
+import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.pen.Penner;
@@ -33,9 +36,10 @@ public class MagFillingBehavior extends DrawnStateBehavior {
 	}
 	@Override
 	public void onPenUp() {
+		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.MAGLEV_FILL);
 		//drawer.anchorPointsHard(x, y, 5);
 		//drawer.interpretFill(fc.toArray(), paletteManager.getActiveColor(0));
-		drawer.endMagneticFill(this.penner.paletteManager.getActiveColor(0));
+		drawer.endMagneticFill(this.penner.paletteManager.getActiveColor(0), (MagneticFillMode)settings.getValue("mode"));
 		super.onPenUp();
 	}
 }

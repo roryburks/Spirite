@@ -1,7 +1,7 @@
 package spirite.base.graphics;
 
 
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.pen.StrokeEngine;
 
 /**
@@ -21,6 +21,6 @@ public abstract class GraphicsDrawer {
 		public void render(GraphicsContext context);
 	}
 	
-	public abstract void changeColor( RawImage image, int cFrom, int cTo, ColorChangeMode mode);
+	public abstract void changeColor( RawImage image, int cFrom, int cTo, ToolSchemes.ColorChangeMode mode);
 	public abstract void invert(RawImage image);
 }

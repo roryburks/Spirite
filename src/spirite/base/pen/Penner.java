@@ -4,14 +4,11 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
-import spirite.base.brains.ToolsetManager.BoxSelectionShape;
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
-import spirite.base.brains.ToolsetManager.ColorChangeScopes;
-import spirite.base.brains.ToolsetManager.FlipMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -278,7 +275,7 @@ public class Penner
 						mode = BuildMode.DEFAULT;
 					
 					if( tool == Tool.BOX_SELECTION)
-						behavior = new FormingSelectionBehavior(this, (BoxSelectionShape)settings.getValue("shape"), mode);
+						behavior = new FormingSelectionBehavior(this, (ToolSchemes.BoxSelectionShape)settings.getValue("shape"), mode);
 					else if( tool == Tool.FREEFORM_SELECTION)
 						behavior = new FreeFormingSelectionBehavior(this, mode);
 				}
@@ -316,7 +313,7 @@ public class Penner
 				break;
 			case FLIPPER:{
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.FLIPPER);
-				FlipMode flipMode = (FlipMode)settings.getValue("flipMode");
+				ToolSchemes.FlipMode flipMode = (ToolSchemes.FlipMode)settings.getValue("flipMode");
 
 				switch( flipMode) {
 				case HORIZONTAL:
@@ -356,8 +353,8 @@ public class Penner
 				}
 				ToolSettings settings = toolsetManager.getToolSettings(Tool.COLOR_CHANGE);
 				
-				ColorChangeScopes scope = (ColorChangeScopes)settings.getValue("scope");
-				ColorChangeMode mode = (ColorChangeMode)settings.getValue("mode");
+				ToolSchemes.ColorChangeScopes scope = (ToolSchemes.ColorChangeScopes)settings.getValue("scope");
+				ToolSchemes.ColorChangeMode mode = (ToolSchemes.ColorChangeMode)settings.getValue("mode");
 				
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				
@@ -380,7 +377,6 @@ public class Penner
 				
 				break;}
 			case MAGLEV_FILL:{
-
 				IImageDrawer drawer = workspace.getActiveDrawer();
 				if( drawer instanceof IMagneticFillModule) 
 					behavior = new MagFillingBehavior(this, (IMagneticFillModule) drawer);

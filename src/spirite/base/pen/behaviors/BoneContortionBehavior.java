@@ -3,11 +3,11 @@ package spirite.base.pen.behaviors;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.brains.ToolsetManager.BoneStretchMode;
 import spirite.base.brains.ToolsetManager.MToolsetObserver;
 import spirite.base.brains.ToolsetManager.Property;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -214,13 +214,13 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 					memoryProposition = proposing;
 				}
 				
-				_doScale((BoneStretchMode)settings.getProperty("mode").getValue(), 
+				_doScale((ToolSchemes.BoneStretchMode)settings.getProperty("mode").getValue(), 
 						(Float)settings.getProperty("leniency").getValue());
 			}
 			else HybridHelper.beep();
 		}
 		if((property.getId().equals("leniency") || property.getId().equals("mode")) && memoryProposition != null) {
-			_doScale((BoneStretchMode)settings.getProperty("mode").getValue(), 
+			_doScale((ToolSchemes.BoneStretchMode)settings.getProperty("mode").getValue(), 
 					(Float)settings.getProperty("leniency").getValue());
 		}
 		if( property.getId().equals("do")) {
@@ -230,7 +230,7 @@ public class BoneContortionBehavior extends DrawnStateBehavior
 		}
 	}
 	
-	private void _doScale( BoneStretchMode mode, float leniency) {
+	private void _doScale( ToolSchemes.BoneStretchMode mode, float leniency) {
 		switch( mode) {
 		case CLIP_EVEN:{
 			// Note: 80% code duplicated from CLIP_HEAD

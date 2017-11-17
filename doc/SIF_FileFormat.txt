@@ -89,6 +89,7 @@ Header
 					[4, float] : pressure
 			Case 1 (Fill) :
 				[4, int] : color
+				[1, byte] : Fill Method
 				[2, ushort] : number of stroke segments
 				Per reference:
 					[2, ushort] : refrence to stroke

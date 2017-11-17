@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
-import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
@@ -315,7 +315,7 @@ public class DefaultImageDrawer
 
 	// :::: IColorChangeModule
 	@Override
-	public void changeColor( int from, int to, ColorChangeScopes scope, ColorChangeMode mode) {
+	public void changeColor( int from, int to, ToolSchemes.ColorChangeScopes scope, ToolSchemes.ColorChangeMode mode) {
 		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
 		UndoEngine undoEngine = workspace.getUndoEngine();
@@ -390,12 +390,12 @@ public class DefaultImageDrawer
 	public class ColorChangeAction extends PerformFilterAction 
 	{
 		private final int from, to;
-		private final ColorChangeMode mode;
+		private final ToolSchemes.ColorChangeMode mode;
 		private ColorChangeAction(
 				BuildingMediumData data, 
 				SelectionMask mask, 
 				int from, int to, 
-				ColorChangeMode mode) 
+				ToolSchemes.ColorChangeMode mode) 
 		{
 			super(data, mask);
 			this.from = from;
@@ -559,7 +559,7 @@ public class DefaultImageDrawer
 	}
 
 	@Override
-	public void endMagneticFill(final int color) {
+	public void endMagneticFill(final int color, final MagneticFillMode mode) {
 		final ImageWorkspace workspace = building.handle.getContext();
 		SelectionMask sel = pollSelectionMask(workspace);
 		final float[] fill_x = fx.toArray();
@@ -568,8 +568,10 @@ public class DefaultImageDrawer
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
 				
-				built.doOnGC((gc) -> {
+				built.doOnGC((gc) -> {					
 					gc.setColor(color);
+					if( mode == MagneticFillMode.BEHIND)
+						gc.setComposite(Composite.DST_OVER, 1);
 					gc.fillPolygon(fill_x, fill_y, fill_x.length);
 				});
 			}

@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import sjunit.TestWrapper;
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -161,7 +162,7 @@ public class BuildSaveLoadTest {
 			mag.startMagneticFill();
 			for( int i=0; i<20; ++i)
 				mag.anchorPoints(i, i, 10, true, false);
-			mag.endMagneticFill( 0xff0ff0a0);
+			mag.endMagneticFill( 0xff0ff0a0, MagneticFillMode.NORMAL);
 
 			master.saveWorkspace(ws, temp);
 			ImageWorkspace ws2 = master.getLoadEngine().loadWorkspace(temp);

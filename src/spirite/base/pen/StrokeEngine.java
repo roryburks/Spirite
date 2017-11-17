@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import spirite.base.brains.ToolsetManager.PenDrawMode;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
@@ -76,7 +76,7 @@ public abstract class StrokeEngine {
 	protected float oldX, oldY, oldP;
 	protected float newX, newY, newP;
 	protected float rawX, rawY, rawP;	// Needed to prevent UndoAction from double-tranforming
-	protected StrokeEngine.STATE state = StrokeEngine.STATE.READY;
+	protected STATE state = STATE.READY;
 	protected ArrayList<PenState> prec = new ArrayList<>();	// Recording of raw states
 
 	// Context
@@ -91,7 +91,7 @@ public abstract class StrokeEngine {
 	public StrokeEngine.StrokeParams getParams() {
 		return stroke;
 	}
-	public StrokeEngine.STATE getState() {
+	public STATE getState() {
 		return state;
 	}
 	/** Methods used to record the Stroke so that it can be repeated
@@ -150,7 +150,7 @@ public abstract class StrokeEngine {
 			rawP = ps.pressure;
 			prec.add( ps);
 			
-			state = StrokeEngine.STATE.DRAWING;
+			state = STATE.DRAWING;
 			
 			
 			
@@ -209,7 +209,7 @@ public abstract class StrokeEngine {
 			rawY = ps.y;
 			rawP = ps.pressure;
 			
-			if( state != StrokeEngine.STATE.DRAWING || built == null) {
+			if( state != STATE.DRAWING || built == null) {
 				MDebug.handleWarning( WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)");
 				return;
 			}
@@ -237,7 +237,7 @@ public abstract class StrokeEngine {
 	 * to the data, and flushing the used resources. */
 	public final void endStroke() {
 
-		state = StrokeEngine.STATE.READY;
+		state = STATE.READY;
 		
 		if( building != null) {
 			building.doOnBuiltData((built) -> {
@@ -375,7 +375,7 @@ public abstract class StrokeEngine {
 		
 		private int c = Colors.BLACK;
 		private StrokeEngine.Method method = StrokeEngine.Method.BASIC;
-		private PenDrawMode mode = PenDrawMode.NORMAL;
+		private ToolSchemes.PenDrawMode mode = ToolSchemes.PenDrawMode.NORMAL;
 		private float width = 1.0f;
 		private float alpha = 1.0f;
 		private boolean hard = false;
@@ -407,8 +407,8 @@ public abstract class StrokeEngine {
 				this.method = method;
 		}
 		
-		public PenDrawMode getMode() {return mode;}
-		public void setMode( PenDrawMode mode) {
+		public ToolSchemes.PenDrawMode getMode() {return mode;}
+		public void setMode( ToolSchemes.PenDrawMode mode) {
 			if( !locked) 
 				this.mode = mode;				
 		}

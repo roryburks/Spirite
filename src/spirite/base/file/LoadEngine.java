@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -337,10 +338,17 @@ public class LoadEngine {
 						break;}
 					case 1:{	// Fill
 						int color = helper.ra.readInt();
+						MagneticFillMode mode = MagneticFillMode.NORMAL;
+						
+						if( helper.version >= 0x000C) {
+							int ordinal = helper.ra.readByte();
+							
+							mode = MagneticFillMode.fromFileId(ordinal);
+						}
 						int numSegmentsToRead = helper.ra.readUnsignedShort();
 						
 						List<StrokeSegment> segments = new ArrayList<>(numSegmentsToRead);
-						
+							
 						for( ; numSegmentsToRead > 0; --numSegmentsToRead) {
 							if( helper.version < 0x000B) {
 								int strokeIndex = helper.ra.readUnsignedShort();
@@ -366,7 +374,7 @@ public class LoadEngine {
 
 						}
 
-						things.add( new MagLevFill(segments, color));
+						things.add( new MagLevFill(segments, color, mode));
 						
 						break;}
 					}

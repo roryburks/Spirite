@@ -19,8 +19,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.brains.ToolsetManager.ColorChangeMode;
-import spirite.base.brains.ToolsetManager.ColorChangeScopes;
+import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -289,7 +288,7 @@ public class Test1 {
 			workspace.setSelectedNode(randomLayerNode(workspace));
 			IImageDrawer drawer = workspace.getDrawerFromBID(workspace.buildActiveData());
 			if( drawer instanceof IColorChangeModule)
-				((IColorChangeModule) drawer).changeColor(lastColor.getRGB(), randomColor().getRGB(),  ColorChangeScopes.values()[rn.nextInt(3)], ColorChangeMode.values()[rn.nextInt(3)]);
+				((IColorChangeModule) drawer).changeColor(lastColor.getRGB(), randomColor().getRGB(),  ToolSchemes.ColorChangeScopes.values()[rn.nextInt(3)], ToolSchemes.ColorChangeMode.values()[rn.nextInt(3)]);
 			break;}
 		case 6: {
 			// Invert
