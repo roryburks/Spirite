@@ -52,6 +52,15 @@ public class BasePuppet implements IPuppet {
 		}
 	}
 
+	public BasePuppet(BasePuppet other) {
+		this.context = other.context;
+		
+		for( BasePart child : other.rootPart.children) {
+			BasePart copied = new BasePart(child, rootPart);
+			rootPart.children.add(copied);
+		}
+	}
+
 	@Override public BasePuppet getBase() { return this;}
 	@Override
 	public List<MediumHandle> getDependencies() {
@@ -201,6 +210,19 @@ public class BasePuppet implements IPuppet {
 			this.handle = handle;
 		}
 		
+		public BasePart(BasePart other, BasePart parent) {
+			this.handle = other.handle.dupe();
+			this.parent = other.parent;
+			this.ox = other.ox;
+			this.oy = other.oy;
+			this.bone = other.bone;	// Immutable
+			this.depth = other.depth;
+			
+			for( BasePart child: other.children) {
+				children.add(new BasePart(child,this));
+			}
+		}
+
 		@Override
 		public BuildingMediumData buildData() {
 			return new BuildingMediumData(handle, ox, oy);
@@ -257,6 +279,11 @@ public class BasePuppet implements IPuppet {
 			weightMap.put(0f, width);
 			weightMap.put(1f, width);
 		}
+	}
+
+	@Override
+	public IPuppet dupe() {
+		return new BasePuppet(this);
 	}
 
 	

@@ -49,6 +49,13 @@ public class PuppetLayer extends Layer {
 		selected = 0;
 		//selectedPart = puppet.getParts().get(0);
 	}
+	public PuppetLayer( PuppetLayer other) {
+		this.context = other.context;
+		this.puppet = other.puppet.dupe();
+		this.selected = other.selected;
+		
+		System.out.println(this.selected);
+	}
 	
 	//
 	public IPuppet getActivePuppet() {
@@ -130,6 +137,7 @@ public class PuppetLayer extends Layer {
 	public List<MediumHandle> getImageDependencies() {
 		List<MediumHandle> ret = new ArrayList<>();
 		
+		System.out.println("SSS");
 		//ret.add(__D__medium);
 		
 		ret.addAll(puppet.getDependencies());
@@ -174,8 +182,7 @@ public class PuppetLayer extends Layer {
 
 	@Override
 	public Layer logicalDuplicate() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PuppetLayer(this);
 	}
 
 	@Override

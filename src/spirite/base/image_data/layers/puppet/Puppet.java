@@ -96,4 +96,10 @@ public class Puppet implements IPuppet {
 		return Arrays.asList(new TransformedHandle[0]);
 	}
 
+	@Override
+	public IPuppet dupe() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

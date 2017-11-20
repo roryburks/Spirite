@@ -16,4 +16,5 @@ public interface IPuppet {
 	public List<? extends IPart> getParts();
 	public List<TransformedHandle> getDrawList();
 	public BasePuppet getBase();
+	public IPuppet dupe();
 }
