@@ -1,4 +1,4 @@
-package spirite.pc.ui.panel_layers;
+package spirite.pc.ui.panel_layers.image_properties;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,33 +10,30 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.image_data.GroupTree.Node;
-import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.ImageWorkspace.MFlashObserver;
-import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.util.glmath.Rect;
 
-public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserver, MFlashObserver{
+public class PrismaticImagePropertiesPanel extends JPanel {
 	private final MasterControl master;
-	private IMedium iimg;
-	private boolean yes = false;
+	PrismaticMedium medium;
 	
-	public IImgPropertiesPanel(MasterControl master) {
+	
+	PrismaticImagePropertiesPanel( MasterControl master) {
 		this.master = master;
-		master.addTrackingObserver(MNodeSelectionObserver.class, this);
-		master.addTrackingObserver(MFlashObserver.class, this);
-
+		
 		this.addMouseListener(mouser);
 		this.addMouseMotionListener(mouser);
 	}
+	
+	void setMedium(PrismaticMedium med) {
+		this.medium = med;
+	}
+
 	MouseAdapter mouser = new MouseAdapter() {
 		public void mousePressed(MouseEvent e) {
-			if( iimg instanceof PrismaticMedium) {
-				PrismaticMedium piimg = (PrismaticMedium)iimg;
+			if( medium instanceof PrismaticMedium) {
+				PrismaticMedium piimg = (PrismaticMedium)medium;
 				List<LImg> colorLayers = piimg.getColorLayers();
 				
 				int index = getIndexFromPoint(e.getPoint());
@@ -51,8 +48,8 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		}
 		
 		public void mouseDragged(MouseEvent e) {
-			if( draggingFromIndex != -1 && iimg instanceof PrismaticMedium) {
-				PrismaticMedium piimg = (PrismaticMedium)iimg;
+			if( draggingFromIndex != -1 && medium instanceof PrismaticMedium) {
+				PrismaticMedium piimg = (PrismaticMedium)medium;
 				List<LImg> colorLayers = piimg.getColorLayers();
 				
 				int index = getIndexFromPoint(e.getPoint());
@@ -68,10 +65,10 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		
 		public void mouseReleased(MouseEvent e) {
 			if( draggingFromIndex != -1 && draggingToIndex != -1 
-					&& draggingFromIndex != draggingToIndex && iimg instanceof PrismaticMedium) 
+					&& draggingFromIndex != draggingToIndex && medium instanceof PrismaticMedium) 
 			{
 
-				PrismaticMedium piimg = (PrismaticMedium)iimg;
+				PrismaticMedium piimg = (PrismaticMedium)medium;
 				piimg.moveLayer( draggingFromIndex,draggingToIndex);
 				master.getCurrentWorkspace().triggerFlash();
 			}
@@ -88,8 +85,8 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if( iimg instanceof PrismaticMedium) {
-			PrismaticMedium piimg = (PrismaticMedium)iimg;
+		if( medium instanceof PrismaticMedium) {
+			PrismaticMedium piimg = (PrismaticMedium)medium;
 			List<LImg> colorLayers = piimg.getColorLayers();
 			
 			int dx = 0;
@@ -113,6 +110,7 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 				}
 			}
 		}
+		//else if( iimg instanceof )
 	}
 	
 	private int getIndexFromPoint( Point p) {
@@ -129,24 +127,5 @@ public class IImgPropertiesPanel extends JPanel implements MNodeSelectionObserve
 		int dy = (i / w)*16;
 		
 		return new Rect(dx, dy, 16,16);
-	}
-
-	@Override
-	public void selectionChanged(Node newSelection) {
-		yes = false;
-		ImageWorkspace ws = master.getCurrentWorkspace();
-		if( ws != null) {
-			BuildingMediumData bid = ws.buildActiveData();
-			if( bid != null && bid.handle != null) {
-				this.iimg = ws.getData(bid.handle);
-			}
-		}
-		
-		repaint();
-	}
-
-	@Override
-	public void flash() {
-		repaint();
 	}
 }

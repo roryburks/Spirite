@@ -17,6 +17,8 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
@@ -27,6 +29,9 @@ import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
+import spirite.base.image_data.selection.ALiftedData;
+import spirite.base.image_data.selection.MaglevLiftedData;
+import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
@@ -43,7 +48,9 @@ public class MaglevImageDrawer
 				IMagneticFillModule,
 				IWeightEraserModule,
 				IBoneDrawer,
-				IColorChangeModule
+				IColorChangeModule,
+				ILiftSelectionModule,
+				IAnchorLiftModule
 {
 
 	private final BuildingMediumData building;
@@ -434,6 +441,23 @@ public class MaglevImageDrawer
 				}
 			});
 		}
+	}
+
+	@Override
+	public boolean acceptsLifted(ALiftedData lifted) {
+		return (lifted instanceof MaglevLiftedData);
+	}
+
+	@Override
+	public void anchorLifted(ALiftedData lifted, MatTrans trans) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ALiftedData liftSelection(SelectionMask selection) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

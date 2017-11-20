@@ -31,9 +31,9 @@ import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.omni.FrameManager;
 import spirite.pc.ui.omni.FrameManager.FrameType;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
-import spirite.pc.ui.panel_layers.IImgPropertiesPanel;
 import spirite.pc.ui.panel_layers.LayersPanel;
 import spirite.pc.ui.panel_layers.ReferenceSchemePanel;
+import spirite.pc.ui.panel_layers.image_properties.MediumPropertiesPanel;
 import spirite.pc.ui.panel_toolset.ColorPicker;
 import spirite.pc.ui.panel_toolset.PalettePanel;
 import spirite.pc.ui.panel_toolset.ToolSettingsPanel;
@@ -117,7 +117,7 @@ public class RootFrame extends javax.swing.JFrame
     	rightContainer.addPanel(160, 160, 0, new ColorPicker(master));
     	rightContainer.setStretchArea(80);
 
-    	rrContainer.addPanel( 50, 100, -1, new IImgPropertiesPanel(master));
+    	rrContainer.addPanel( 50, 100, -1, new MediumPropertiesPanel(master));
     	rrContainer.addPanel( 100, 300, -2, rigPanel);
     	rrContainer.setStretchArea(100);
 
