@@ -39,8 +39,8 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.PrismaticMedium;
+import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
@@ -438,7 +438,8 @@ public class SaveEngine implements MWorkspaceObserver {
 					//	[2] : Number of things
 					helper.ra.writeShort(things.size());	
 					
-					for( AMagLevThing thing : things) {
+					for( int thingIndex = 0; thingIndex < things.size(); ++thingIndex) {
+						AMagLevThing thing = things.get(thingIndex);
 						if( thing instanceof MagLevStroke) {
 							MagLevStroke stroke = (MagLevStroke)thing;
 							
@@ -462,12 +463,14 @@ public class SaveEngine implements MWorkspaceObserver {
 							helper.ra.writeByte(1);		// [1] : thing type
 
 							helper.ra.writeInt( fill.getColor());		// [4] : Color
-							helper.ra.writeByte( fill.mode.fileId);		// [1] : Fill Mode
+							helper.ra.writeByte( 0);					// [1] : Fill Mode
 							
 							helper.ra.writeShort(fill.segments.size());	// [2] : number of segments
 
 							for( MagLevFill.StrokeSegment seg : fill.segments) {
-								helper.ra.writeShort( seg.strokeIndex);	// [2] : id of index of stroke
+								int i = things.indexOf(mimg.getThingById( seg.strokeId));
+								System.out.println("::"+i);
+								helper.ra.writeShort( i);	// [2] : id of index of stroke
 								helper.ra.writeFloat( seg._pivot);		// [4] : pivot
 								helper.ra.writeFloat( seg._travel);		// [4] : travel
 							}

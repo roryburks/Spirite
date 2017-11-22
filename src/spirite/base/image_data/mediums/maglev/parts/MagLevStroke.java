@@ -5,6 +5,7 @@ import java.util.Arrays;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
@@ -43,7 +44,7 @@ public class MagLevStroke extends AMagLevThing {
 		return direct;
 	}
 	
-	public MagLevStroke clone() {
+	protected MagLevStroke _clone() {
 		PenState[] newStates = new PenState[states.length];
 		for( int i=0; i < states.length; ++i) {
 			newStates[i] = new PenState( states[i]);

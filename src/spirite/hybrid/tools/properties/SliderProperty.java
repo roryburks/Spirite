@@ -12,21 +12,21 @@ import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.pc.ui.components.SliderPanel;
 
-public class OpacityProperty extends SwingToolProperty {
+public class SliderProperty extends SwingToolProperty {
 	private float value;
 	private final float min;
 	private final float max;
 
-	public OpacityProperty( String id, String hrName, float defaultValue) {
+	public SliderProperty( String id, String hrName, float defaultValue) {
 		this( id, hrName, defaultValue, 0, 1, 0);
 	}
-	public OpacityProperty( String id, String hrName, float defaultValue, int mask) {
+	public SliderProperty( String id, String hrName, float defaultValue, int mask) {
 		this( id, hrName, defaultValue, 0, 1, mask);
 	}
-	public OpacityProperty( String id, String hrName, float defaultValue, float min, float max) {
+	public SliderProperty( String id, String hrName, float defaultValue, float min, float max) {
 		this( id, hrName, defaultValue, min, max, 0);
 	}
-	public OpacityProperty( String id, String hrName, float defaultValue, float min, float max, int mask) {
+	public SliderProperty( String id, String hrName, float defaultValue, float min, float max, int mask) {
 		this.value = defaultValue;
 		this.hrName = hrName;
 		this.id = id;

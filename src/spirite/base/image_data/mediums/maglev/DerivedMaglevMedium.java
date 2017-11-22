@@ -10,7 +10,6 @@ import spirite.base.image_data.layers.puppet.BasePuppet;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.Rect;
 import spirite.base.util.glmath.Vec2;

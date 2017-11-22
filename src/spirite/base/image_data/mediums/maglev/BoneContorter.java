@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.glmath.Vec2;

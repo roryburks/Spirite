@@ -30,8 +30,8 @@ import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
+import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
@@ -310,7 +310,7 @@ public class BuildSaveLoadTest {
 						assert( segments1.size() == segments2.size());
 						for( int j=0; j<segments1.size(); ++j) {
 							assert( segments1.get(j)._pivot == segments2.get(j)._pivot);
-							assert( segments1.get(j).strokeIndex == segments2.get(j).strokeIndex);
+							assert( segments1.get(j).strokeId == segments2.get(j).strokeId);
 							assert( segments1.get(j)._travel == segments2.get(j)._travel);
 						}
 					}

@@ -25,7 +25,6 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
@@ -103,7 +102,7 @@ public class MaglevImageDrawer
 		// NOTE: Rather unusual to prepare, perform, then store.
 		//	Should really change strokes from writing automatically since 
 		//	they're batched anyway (At least in GL Mode)
-		img.addThing(stroke);
+		img.addThing(stroke, false);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
@@ -111,7 +110,7 @@ public class MaglevImageDrawer
 				MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 				mimg.Build();
 				
-				mimg.addThing(stroke);
+				mimg.addThing(stroke, false);
 
 				mimg.builtImage.doOnGC((gc) -> {
 					stroke.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, null, mimg);
@@ -145,10 +144,17 @@ public class MaglevImageDrawer
 	
 	// :::: IMagnetifFillModule
 	public static class BuildingStrokeSegment {
-		public int strokeIndex;
+		public int strokeIndexAbs;
 		public int pivot;
 		public int travel;
 		public BuildingStrokeSegment() {}
+		
+		public StrokeSegment build( List<AMagLevThing> things) {
+			MagLevStroke stroke = (MagLevStroke) things.get(strokeIndexAbs);
+			float strokeLen = stroke.getDirect().length;
+			
+			return new StrokeSegment( stroke.getId(), pivot/strokeLen, travel/strokeLen);
+		}
 	}
 	BuildingStrokeSegment ss;
 	int floatSoft;
@@ -157,17 +163,15 @@ public class MaglevImageDrawer
 		ss = null;
 		strokeSegments = new ArrayList<>();
 	}
-	@Override public void endMagneticFill( int color, MagneticFillMode behind) {
+	@Override public void endMagneticFill( int color, MagneticFillMode mode) {
 		List<StrokeSegment> toInsert = new ArrayList<>(strokeSegments.size());
 		
-		for( BuildingStrokeSegment segment : strokeSegments) {
-			MagLevStroke stroke = (MagLevStroke) img.things.get(segment.strokeIndex);
-			float strokeLen = stroke.getDirect().length;
-			
-			toInsert.add(new StrokeSegment(segment.strokeIndex, segment.pivot / strokeLen, segment.travel/strokeLen));
-		}
+		for( BuildingStrokeSegment segment : strokeSegments)
+			toInsert.add( segment.build(img.things));
 		
-		MagLevFill fill = new MagLevFill( toInsert, color, behind);
+		MagLevFill fill = new MagLevFill( toInsert, color);
+		
+		final boolean behind = (mode == MagneticFillMode.BEHIND);
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
@@ -176,10 +180,10 @@ public class MaglevImageDrawer
 				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
 				mimg.Build();
 				
-				mimg.addThing(fill);
+				mimg.addThing(fill, true);
 
 				mimg.builtImage.doOnGC((gc) -> {
-					fill.draw(mimg.build(new BuildingMediumData(built.handle, 0, 0)), null, gc, mimg);
+					fill._draw(mimg.build(new BuildingMediumData(built.handle, 0, 0)), null, gc, mimg, behind);
 				}, new MatTrans());
 				
 			}
@@ -202,7 +206,7 @@ public class MaglevImageDrawer
 			BuildingStrokeSegment cloestSegment = new BuildingStrokeSegment();
 			float closestDistance = findClosestStroke( x, y, cloestSegment);
 			
-			if( cloestSegment.strokeIndex != -1 && closestDistance <= r) {
+			if( cloestSegment.strokeIndexAbs != -1 && closestDistance <= r) {
 				ss = cloestSegment;
 				strokeSegments.add(ss);
 			}
@@ -211,8 +215,8 @@ public class MaglevImageDrawer
 			BuildingStrokeSegment closestSegment = new BuildingStrokeSegment();
 			float closestDistance = findClosestStroke( x, y, closestSegment);
 			
-			if( closestSegment.strokeIndex == ss.strokeIndex && closestDistance <= r) {
-				MagLevStroke stroke = (MagLevStroke) img.things.get(ss.strokeIndex);
+			if( closestSegment.strokeIndexAbs == ss.strokeIndexAbs && closestDistance <= r) {
+				MagLevStroke stroke = (MagLevStroke) img.things.get(ss.strokeIndexAbs);
 				DrawPoints direct = stroke.getDirect();
 				
 				if( Math.abs(ss.travel - (closestSegment.pivot - ss.pivot) * StrokeEngine.DIFF) > 
@@ -225,7 +229,7 @@ public class MaglevImageDrawer
 				else
 					ss.travel = closestSegment.pivot - ss.pivot;
 			}
-			else if( !locked &&closestSegment.strokeIndex != -1 && closestDistance <= r) {
+			else if( !locked &&closestSegment.strokeIndexAbs != -1 && closestDistance <= r) {
 				ss = closestSegment;
 				strokeSegments.add(ss);
 			}
@@ -253,7 +257,7 @@ public class MaglevImageDrawer
 		}
 		
 		out.pivot = closestIndex;
-		out.strokeIndex = closestStrokeIndex;
+		out.strokeIndexAbs = closestStrokeIndex;
 		return closestDistance;
 	}
 	
@@ -266,7 +270,7 @@ public class MaglevImageDrawer
 		float[] out = new float[totalLen];
 		int index = 0;
 		for( BuildingStrokeSegment s : strokeSegments) {
-			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndexAbs);
 			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c) 
 				out[index++] = direct.x[s.pivot + c * ((s.travel > 0)? 1 : -1)];
@@ -285,7 +289,7 @@ public class MaglevImageDrawer
 		float[] out = new float[totalLen];
 		int index = 0;
 		for( BuildingStrokeSegment s : strokeSegments) {
-			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndex);
+			MagLevStroke stroke = (MagLevStroke)img.things.get(s.strokeIndexAbs);
 			DrawPoints direct = stroke.getDirect();
 			for( int c=0; c <= Math.abs(s.travel); ++c)
 				out[index++] = direct.y[s.pivot + c * ((s.travel > 0)? 1 : -1)];
@@ -456,7 +460,10 @@ public class MaglevImageDrawer
 
 	@Override
 	public ALiftedData liftSelection(SelectionMask selection) {
-		// TODO Auto-generated method stub
+		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
+		
+		
+		
 		return null;
 	}
 

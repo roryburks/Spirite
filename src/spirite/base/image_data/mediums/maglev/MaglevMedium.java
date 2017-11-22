@@ -12,7 +12,8 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
+import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
@@ -49,6 +50,9 @@ public class MaglevMedium implements IMedium {
 		this.context = context;
 		this.things = new ArrayList<>( things.size());
 		this.things.addAll(things);
+		
+		for( AMagLevThing thing : things)
+			thing.id = workingId++;
 	}
 	private MaglevMedium( MaglevMedium other) {
 		this.context = other.context;
@@ -64,14 +68,15 @@ public class MaglevMedium implements IMedium {
 	public ImageWorkspace getContext() {return context;}
 	
 
+	int workingId = 0;
+	void addThing( AMagLevThing thing, boolean back) {
+		thing.id = workingId++;
+		if( back)
+			things.add(0, thing);
+		else
+			things.add(thing);
+	}
 	
-	void addThing( AMagLevThing thing) {
-		things.add(thing);
-	}
-	void popThing() {
-		things.remove(things.size()-1);
-	}
-		
 	// ==== Easy Junk
 	@Override public int getWidth() {return (isBuilt) ? builtImage.getWidth() : context.getWidth(); }
 	@Override public int getHeight() {return (isBuilt) ? builtImage.getHeight() : context.getHeight();}
@@ -202,5 +207,14 @@ public class MaglevMedium implements IMedium {
 		protected void _doOnRaw(DoerOnRaw doer) {
 			builtImage.doOnRaw(doer, trans);
 		}
+	}
+
+
+	public AMagLevThing getThingById(int Id) {
+		for( AMagLevThing thing : things) {
+			if( thing.id == Id)
+				return thing;
+		}
+		return null;
 	}
 }

@@ -11,7 +11,7 @@ import spirite.hybrid.tools.properties.CheckBoxProperty;
 import spirite.hybrid.tools.properties.DropDownProperty;
 import spirite.hybrid.tools.properties.DualFloatBoxProperty;
 import spirite.hybrid.tools.properties.FloatBoxProperty;
-import spirite.hybrid.tools.properties.OpacityProperty;
+import spirite.hybrid.tools.properties.SliderProperty;
 import spirite.hybrid.tools.properties.RadioButtonProperty;
 import spirite.hybrid.tools.properties.SizeProperty;
 
@@ -38,15 +38,15 @@ public class ToolSchemes {
 	
 	public static ToolScheme Pen = (m) -> new Property[] {
         	new DropDownProperty<PenDrawMode>("mode", "Draw Mode", PenDrawMode.NORMAL, PenDrawMode.class),
-        	new OpacityProperty("alpha", "Opacity", 1.0f),
+        	new SliderProperty("alpha", "Opacity", 1.0f),
         	new SizeProperty("width","Width", 5.0f),
         	new CheckBoxProperty("hard","Hard Edged",false),
     };
 	public static ToolScheme Pixel = (m) -> new Property[] {
-    		new OpacityProperty("alpha", "Opacity", 1.0f)
+    		new SliderProperty("alpha", "Opacity", 1.0f)
     };
 	public static ToolScheme Eraser = (m) ->  new Property[] {
-        	new OpacityProperty("alpha", "Opacity", 1.0f),
+        	new SliderProperty("alpha", "Opacity", 1.0f),
         	new SizeProperty("width","Width", 5.0f),
         	new CheckBoxProperty("hard","Hard Edged",false)
     };
@@ -122,12 +122,12 @@ public class ToolSchemes {
 	
 	public static ToolScheme ExciseEraser = (m) -> new Property[]{
     		new SizeProperty("width", "Width", 5.0f),
-    		new CheckBoxProperty("full", "Full Erase", true)
+    		new CheckBoxProperty("precise", "Precise Erase", true)
     };
 	public static ToolScheme Bone = (master) -> new Property[]{
 			new CheckBoxProperty("resize", "Resize", false),
     		//new ButtonProperty("resize", "Resize", null, master),
-    		new OpacityProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
+    		new SliderProperty("leniency", "Resize Leniency", 0.1f, 0, 1),
     		new DropDownProperty<ToolSchemes.BoneStretchMode>("mode", "Resize Mode", ToolSchemes.BoneStretchMode.SCALE, ToolSchemes.BoneStretchMode.class),
     		new ButtonProperty("do", "Do Bone Transform", null, master),
     		new CheckBoxProperty("preview", "Preview", false)
@@ -156,6 +156,7 @@ public class ToolSchemes {
 	public static ToolScheme MagneticFill = (m) -> new Property[] {
 			new DropDownProperty<MagneticFillMode>("mode", "Fill Mode", MagneticFillMode.NORMAL, MagneticFillMode.class)
 	};
+	
 	
 
 	public static Map<Tool,ToolScheme> getToolSchemes() {
@@ -188,7 +189,4 @@ public class ToolSchemes {
 		BoneStretchMode( String hrName) {this.hrName = hrName;}
 		@Override public String toString() {return hrName;}
 	}
-
-
-	
 }

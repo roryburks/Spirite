@@ -41,8 +41,8 @@ import spirite.base.image_data.mediums.FlatMedium;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
 import spirite.base.image_data.mediums.PrismaticMedium;
+import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.image_data.mediums.maglev.parts.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
@@ -383,7 +383,10 @@ public class LoadEngine {
 
 						}
 
-						things.add( new MagLevFill(segments, color, mode));
+						if( mode == MagneticFillMode.BEHIND)
+							things.add(0,  new MagLevFill(segments, color));
+						else
+							things.add(new MagLevFill(segments, color));
 						
 						break;}
 					}
