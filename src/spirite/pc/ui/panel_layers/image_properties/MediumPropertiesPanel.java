@@ -1,12 +1,6 @@
 package spirite.pc.ui.panel_layers.image_properties;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -18,9 +12,7 @@ import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.PrismaticMedium;
-import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.util.glmath.Rect;
 
 public class MediumPropertiesPanel extends JPanel implements MNodeSelectionObserver, MFlashObserver{
 	private final MasterControl master;

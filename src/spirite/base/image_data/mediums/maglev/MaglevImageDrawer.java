@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
+import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
@@ -18,9 +19,9 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
@@ -95,14 +96,19 @@ public class MaglevImageDrawer
 		
 		final PenState[] states = strokeEngine.getHistory();
 		final StrokeParams params = StrokeParams.bakeAndNormalize(strokeEngine.getParams(), states);
+		final boolean behind = params.getMode() == PenDrawMode.BEHIND;
 		final MagLevStroke stroke = new MagLevStroke(states, params);
+		
+		if( behind)
+			params.setMode(PenDrawMode.NORMAL);
+		
 		//final SelectionMask mask = null;
 		//final StrokeEngine _engine = strokeEngine;
 		
 		// NOTE: Rather unusual to prepare, perform, then store.
 		//	Should really change strokes from writing automatically since 
 		//	they're batched anyway (At least in GL Mode)
-		img.addThing(stroke, false);
+		img.addThing(stroke, behind);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
@@ -110,10 +116,10 @@ public class MaglevImageDrawer
 				MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 				mimg.Build();
 				
-				mimg.addThing(stroke, false);
+				mimg.addThing(stroke, behind);
 
 				mimg.builtImage.doOnGC((gc) -> {
-					stroke.draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, null, mimg);
+					stroke._draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, null, mimg, behind);
 				}, new MatTrans());
 			}
 			@Override
@@ -298,35 +304,60 @@ public class MaglevImageDrawer
 		return out;
 	}
 
+	@Override
+	public void erasePoints( float x, float y, float r) {
+		
+	}
+
 	// ::: IWeightEraserModule
 	static Object iweIDLocker = new Object();
 	static int iweIDCounter = 0;
+	boolean weightPrecise;
 	int iweId = -1;
 	@Override
 	public void weightErase(float x, float y, float w) {
-		List<AMagLevThing> thingsToRemove = new ArrayList<>();
-		for( AMagLevThing thing : img.things) {
-			if( thing instanceof MagLevStroke) {
-				MagLevStroke stroke = (MagLevStroke)thing;
-				DrawPoints direct = stroke.getDirect();
+		ImageWorkspace ws = this.building.handle.getContext();
+		
+		if (weightPrecise) {
+			List<BuildingStrokeSegment> toRemove = new ArrayList<>();
+			
 
-				for( int i=0; i < direct.length; ++i) {
-					if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
-						thingsToRemove.add(stroke);
-						break;
-					}
+			for( AMagLevThing thing : img.things) {
+				if( thing instanceof MagLevStroke) {
+					MagLevStroke stroke = (MagLevStroke)thing;
+					DrawPoints direct = stroke.getDirect();
+					
 				}
 			}
 		}
-		
-		if( thingsToRemove.size() > 0) {
-			this.building.handle.getContext().getUndoEngine().performAndStore(
-					new MagWeightEraseAction(building, thingsToRemove, iweId));
+		else {
+
+			List<AMagLevThing> thingsToRemove = new ArrayList<>();
+			
+			for( AMagLevThing thing : img.things) {
+				if( thing instanceof MagLevStroke) {
+					MagLevStroke stroke = (MagLevStroke)thing;
+					DrawPoints direct = stroke.getDirect();
+
+					for( int i=0; i < direct.length; ++i) {
+						if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
+							thingsToRemove.add(stroke);
+							break;
+						}
+					}
+				}
+			}
+			
+			if( thingsToRemove.size() > 0) {
+				ws.getUndoEngine().performAndStore(
+						new MagWeightEraseAction(building, thingsToRemove, iweId));
+			}
 		}
 	}
 
 	@Override
-	public void startWeightErase() {
+	public void startWeightErase(boolean precise) {
+		weightPrecise = precise;
 		synchronized( iweIDLocker) {
 			iweId = iweIDCounter++;
 		}
@@ -359,19 +390,13 @@ public class MaglevImageDrawer
 			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 			
 			for( AMagLevThing toErase : thingsToErase) {
-				mimg.things.remove(toErase);
+				mimg.removeThing(toErase);
 			}
-			mimg.unbuild();
 		}
 		@Override
 		public String getDescription() {
 			return "Erase Mag Stroke";
 		}
-	}
-
-	@Override
-	public void erasePoints( float x, float y, float r) {
-		
 	}
 
 	// :::: IBoneDrawer

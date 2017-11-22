@@ -60,7 +60,7 @@ public interface IImageDrawer {
 	}
 	
 	public interface IWeightEraserModule {
-		public void startWeightErase();
+		public void startWeightErase(boolean precise);
 		public void endWeightErase();
 		public void weightErase( float x, float y, float w);
 	}

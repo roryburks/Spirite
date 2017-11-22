@@ -2,6 +2,7 @@ package spirite.base.image_data.mediums.maglev.parts;
 
 import java.util.Arrays;
 
+import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.ABuiltMediumData;
@@ -40,10 +41,14 @@ public class MagLevStroke extends AMagLevThing {
 		direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
 	}
 	
-	public DrawPoints getDirect() {
-		return direct;
-	}
-	
+	// ===========
+	// ==== Access of Custom Data
+	public DrawPoints getDirect() {return direct;}
+	public PenState[] getPenstates() {return states;}
+
+	// =============
+	// ==== Abstract Implementation
+	@Override
 	protected MagLevStroke _clone() {
 		PenState[] newStates = new PenState[states.length];
 		for( int i=0; i < states.length; ++i) {
@@ -55,9 +60,16 @@ public class MagLevStroke extends AMagLevThing {
 
 	@Override
 	public void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
+		_draw(built,mask,gc,context,false);
+	}
+	public void _draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
 		ImageWorkspace workspace = context.getContext();
 		StrokeEngine _engine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
+		if( behind)
+			params.setMode(PenDrawMode.BEHIND);
 		_engine.batchDraw(params, states, built, mask);
+		if( behind)
+			params.setMode(PenDrawMode.NORMAL);
 	}
 
 	@Override
@@ -89,9 +101,5 @@ public class MagLevStroke extends AMagLevThing {
 				interpolator.addPoint(ps.x, ps.y);
 		}
 		direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
-	}
-
-	public PenState[] getPenstates() {
-		return states;
 	}
 }

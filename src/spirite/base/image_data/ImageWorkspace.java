@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager;
-import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.brains.SettingsManager;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;

@@ -3,7 +3,6 @@ package spirite.base.image_data.mediums.maglev.parts;
 import java.util.ArrayList;
 import java.util.List;
 
-import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.mediums.ABuiltMediumData;
@@ -14,7 +13,6 @@ import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 
 public class MagLevFill extends AMagLevThing {
-
 	public static class StrokeSegment {
 		public final int strokeId;
 		public final float _pivot;
@@ -31,9 +29,9 @@ public class MagLevFill extends AMagLevThing {
 			this._travel = other._travel;
 		}
 	}
-	
 	public final List<MagLevFill.StrokeSegment> segments;
 	public int color;	// Should really be final
+	
 	public MagLevFill( List<MagLevFill.StrokeSegment> segments, int color) {
 		this.segments = new ArrayList<>(segments.size());
 		this.segments.addAll(segments);
@@ -45,11 +43,19 @@ public class MagLevFill extends AMagLevThing {
 		for( int i=0; i < other.segments.size(); ++i)
 			this.segments.add( new StrokeSegment(other.segments.get(i)));
 	}
+	
+	
+	
+	@Override
 	protected MagLevFill _clone()  {return new MagLevFill(this);}
 	@Override
 	public void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
 		_draw(built, mask, gc, context, false);
 	}
+	
+	/**
+	 * 
+	 */
 	public void _draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
 		List<AMagLevThing> things = context.getThings();
 		int totalLen = 0;

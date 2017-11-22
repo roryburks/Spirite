@@ -34,7 +34,6 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
 import spirite.base.brains.PaletteManager.Palette;
-import spirite.base.brains.SettingsManager;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;

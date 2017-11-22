@@ -53,8 +53,6 @@ public class PuppetLayer extends Layer {
 		this.context = other.context;
 		this.puppet = other.puppet.dupe();
 		this.selected = other.selected;
-		
-		System.out.println(this.selected);
 	}
 	
 	//
@@ -137,7 +135,6 @@ public class PuppetLayer extends Layer {
 	public List<MediumHandle> getImageDependencies() {
 		List<MediumHandle> ret = new ArrayList<>();
 		
-		System.out.println("SSS");
 		//ret.add(__D__medium);
 		
 		ret.addAll(puppet.getDependencies());

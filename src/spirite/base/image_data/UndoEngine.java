@@ -266,7 +266,7 @@ public class UndoEngine {
 	 */
 	public void performAndStore( UndoableAction action) {
 		if( action != null) {
-			if( action instanceof ImageAction)
+			if( action instanceof ImageAction) 
 				prepareContext(((ImageAction) action).building.handle);
 			if( activeStoreState != null)
 				activeStoreState.add(action);
@@ -274,6 +274,10 @@ public class UndoEngine {
 				action.performAction();
 				storeAction(action);
 			}
+			
+
+			if( action instanceof ImageAction)
+				((ImageAction) action).building.handle.refresh();
 		}
 		else
 			MDebug.handleWarning(WarningType.STRUCTURAL, this, "Attempted to store null as an action.");

@@ -11,9 +11,9 @@ import spirite.hybrid.tools.properties.CheckBoxProperty;
 import spirite.hybrid.tools.properties.DropDownProperty;
 import spirite.hybrid.tools.properties.DualFloatBoxProperty;
 import spirite.hybrid.tools.properties.FloatBoxProperty;
-import spirite.hybrid.tools.properties.SliderProperty;
 import spirite.hybrid.tools.properties.RadioButtonProperty;
 import spirite.hybrid.tools.properties.SizeProperty;
+import spirite.hybrid.tools.properties.SliderProperty;
 
 public class ToolSchemes {
 	// Property BitMask bits

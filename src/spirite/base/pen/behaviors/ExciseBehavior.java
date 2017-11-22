@@ -1,6 +1,7 @@
 package spirite.base.pen.behaviors;
 
 import spirite.base.brains.ToolsetManager.Tool;
+import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.pen.Penner;
 
@@ -14,7 +15,8 @@ public class ExciseBehavior extends StateBehavior {
 	}
 	
 	@Override public void start() {
-		drawer.startWeightErase();
+		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.EXCISE_ERASER);
+		drawer.startWeightErase((Boolean)settings.getValue("precies"));
 		onMove();
 	}
 	@Override public void onTock() {}

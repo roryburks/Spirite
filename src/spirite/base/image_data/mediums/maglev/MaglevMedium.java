@@ -1,6 +1,7 @@
 package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import spirite.base.graphics.DynamicImage;
@@ -13,7 +14,7 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
-import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
+import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.glmath.MatTrans.NoninvertableException;
@@ -75,6 +76,26 @@ public class MaglevMedium implements IMedium {
 			things.add(0, thing);
 		else
 			things.add(thing);
+	}
+	void removeThing(AMagLevThing toRemove) {
+		
+		System.out.println("SS");
+		int id = toRemove.id;
+		
+		Iterator<AMagLevThing> it = things.iterator();
+		while( it.hasNext()) {
+			AMagLevThing thing = it.next();
+			if( thing instanceof MagLevFill) {
+				List<StrokeSegment> segments = ((MagLevFill) thing).segments;
+				segments.removeIf((s) -> s.strokeId == id);
+			
+				if( segments.size() == 0)
+					it.remove();
+			}
+		}
+		things.remove(toRemove);
+		
+		unbuild();
 	}
 	
 	// ==== Easy Junk
@@ -156,6 +177,7 @@ public class MaglevMedium implements IMedium {
 		public MaglevBuiltData(BuildingMediumData building) 
 		{
 			super(building.handle);
+			Build();
 			this.trans = building.trans;
 		}
 
