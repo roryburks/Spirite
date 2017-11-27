@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -46,7 +47,7 @@ public class LayersPanel extends OmniComponent {
 	private final Dialogs dialogs;
 	private final LayerTreePanel layerTreePanel;
 	private final SButton btnNewLayer = HybridUI.getGuiComposer().Button();
-	private final JButton btnNewGroup = new JButton();
+	private final SButton btnNewGroup = HybridUI.getGuiComposer().Button();
 	private final OpacitySlider opacitySlider =  new OpacitySlider();
 	private final LayerAnimView layerAnimView;
 	private final LayerTabPane layerTabPane;
@@ -78,7 +79,9 @@ public class LayersPanel extends OmniComponent {
 	/**
 	 * Create the panel.
 	 */
-	public LayersPanel(MasterControl master) {
+	public LayersPanel(MasterControl master) {  
+//		/this.setBackground(new Color(152, 166, 173));
+		
 		this.dialogs = master.getDialogs();
 		layerTreePanel = new LayerTreePanel(master, this);
 		layerAnimView = new LayerAnimView( master, this);
@@ -108,11 +111,11 @@ public class LayersPanel extends OmniComponent {
 	}
 	
 	private void initComponents() {
-		btnNewLayer.setTooltipText("New Layer");
+		btnNewLayer.setToolTipText("New Layer");
 		btnNewLayer.setIcon(Globals.getIconImg("new_layer"));
-		
+
 		btnNewGroup.setToolTipText("New Group");
-		btnNewGroup.setIcon( Globals.getIcon("new_group"));
+		btnNewGroup.setIcon( Globals.getIconImg("new_group"));
 		rcLabel.setFont(new Font("Tahoma", 0, 10));
 
 		renderCombo.setRenderer( renderer);
@@ -129,13 +132,11 @@ public class LayersPanel extends OmniComponent {
 					helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 		});
-		btnNewGroup.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Create New Group
-				GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
-				
-				layerTreePanel.workspace.addGroupNode(selected_node, "Test");
-			}
+		btnNewGroup.addActionListner((e) ->{
+			// Create New Group
+			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
+			
+			layerTreePanel.workspace.addGroupNode(selected_node, "Test");
 		});
 		renderCombo.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -153,11 +154,11 @@ public class LayersPanel extends OmniComponent {
 			RenderTuple sel = ((RenderTuple)renderCombo.getSelectedItem());
 			selected.getRender().setMethod(sel.method, sel.value);
 		}
-		
 	}
 	
 	private void initLayout() {
 		JComponent _btnNewLayer = ((SwingGuiButton)btnNewLayer).getComponent();
+		JComponent _btnNewGroup = ((SwingGuiButton)btnNewGroup).getComponent();
 		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
@@ -174,7 +175,7 @@ public class LayersPanel extends OmniComponent {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
-							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addComponent(_btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
 					.addGap(3))
 		);
@@ -193,7 +194,7 @@ public class LayersPanel extends OmniComponent {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+						.addComponent(_btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);
 		setLayout(groupLayout);

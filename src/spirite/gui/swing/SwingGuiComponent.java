@@ -17,7 +17,7 @@ public abstract class SwingGuiComponent
 	public abstract JComponent getComponent();
 	
 	@Override
-	public void setTooltipText( String text) {
+	public void setToolTipText( String text) {
 		getComponent().setToolTipText(text);
 	}
 	
