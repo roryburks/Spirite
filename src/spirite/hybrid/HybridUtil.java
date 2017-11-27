@@ -46,9 +46,9 @@ public class HybridUtil {
 	 * @param to Class to convert it to
 	 * @see HybridHelper.loadImageIntoGL
 	 * */
-	public static RawImage convert( RawImage from, Class<? extends RawImage> to) {
+	public static <T extends RawImage> T convert( RawImage from, Class<? extends T> to) {
 		if( from.getClass() == to)
-			return from;
+			return (T)from;
 		
 		if( to == GLImage.class) {
 			GL2 gl = JOGLCore.getGL2();
@@ -62,11 +62,11 @@ public class HybridUtil {
 	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_S,GLC.GL_CLAMP_TO_EDGE);
 	        gl.glTexParameteri(GLC.GL_TEXTURE_2D,GLC.GL_TEXTURE_WRAP_T,GLC.GL_CLAMP_TO_EDGE);
 	        HybridHelper.loadImageIntoGL( from, gl);
-	        return new GLImage( tex, from.getWidth(), from.getHeight(), false);
+	        return (T)new GLImage( tex, from.getWidth(), from.getHeight(), false);
 		}
 		if( to == ImageBI.class) {
 			if( from.getClass() == GLImage.class) {
-				return new ImageBI(PCUtil.glToBI((GLImage)from));
+				return (T)new ImageBI(PCUtil.glToBI((GLImage)from));
 			}
 		}
 		

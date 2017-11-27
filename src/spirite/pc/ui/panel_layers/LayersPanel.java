@@ -12,6 +12,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -25,7 +26,10 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.gui.generic.SButton;
+import spirite.gui.swing.SwingGuiButton;
 import spirite.hybrid.Globals;
+import spirite.hybrid.HybridUI;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.dialogs.Dialogs;
@@ -41,7 +45,7 @@ public class LayersPanel extends OmniComponent {
 
 	private final Dialogs dialogs;
 	private final LayerTreePanel layerTreePanel;
-	private final JButton btnNewLayer = new JButton();
+	private final SButton btnNewLayer = HybridUI.getGuiComposer().Button();
 	private final JButton btnNewGroup = new JButton();
 	private final OpacitySlider opacitySlider =  new OpacitySlider();
 	private final LayerAnimView layerAnimView;
@@ -104,8 +108,8 @@ public class LayersPanel extends OmniComponent {
 	}
 	
 	private void initComponents() {
-		btnNewLayer.setToolTipText("New Layer");
-		btnNewLayer.setIcon(Globals.getIcon("new_layer"));
+		btnNewLayer.setTooltipText("New Layer");
+		btnNewLayer.setIcon(Globals.getIconImg("new_layer"));
 		
 		btnNewGroup.setToolTipText("New Group");
 		btnNewGroup.setIcon( Globals.getIcon("new_group"));
@@ -115,13 +119,14 @@ public class LayersPanel extends OmniComponent {
 	}
 	
 	private void initBindings() {
-		btnNewLayer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Create New Layer
-				ImageWorkspace workspace = layerTreePanel.workspace;
-				NewLayerHelper helper = dialogs.callNewLayerDialog(workspace);
+		btnNewLayer.addActionListner((e) -> {
+			// Create New Layer
+			ImageWorkspace workspace = layerTreePanel.workspace;
+			NewLayerHelper helper = dialogs.callNewLayerDialog(workspace);
+			
+			if( helper != null ) {
 				workspace.addNewSimpleLayer( workspace.getSelectedNode(), 
-						helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
+					helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 		});
 		btnNewGroup.addActionListener(new ActionListener() {
@@ -151,7 +156,9 @@ public class LayersPanel extends OmniComponent {
 		
 	}
 	
-	private void initLayout() {		
+	private void initLayout() {
+		JComponent _btnNewLayer = ((SwingGuiButton)btnNewLayer).getComponent();
+		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -165,7 +172,7 @@ public class LayersPanel extends OmniComponent {
 						)
 						.addComponent(opacitySlider)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+							.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
 							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
@@ -185,7 +192,7 @@ public class LayersPanel extends OmniComponent {
 					.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+						.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);

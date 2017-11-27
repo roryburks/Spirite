@@ -17,7 +17,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import spirite.base.graphics.RawImage;
 import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.ImageBI;
 
 /**
  * The Globals object will centralize all globals that might have reason to
@@ -136,6 +138,7 @@ public class Globals {
     	String resourceFile;
     	BufferedImage img = null;
     	ImageIcon iconsheet[][] = null;
+    	RawImage imgsheet[][] = null;
     	int widthPerIcon;
     	int heightPerIcon;
     }
@@ -164,9 +167,11 @@ public class Globals {
     			int w = (Integer)row[3];
     			int h = (Integer)row[4];
     			set.iconsheet = new ImageIcon[w][];
+    			set.imgsheet = new RawImage[w][];
     			
     			for( int i = 0; i<w; ++i) {
     				set.iconsheet[i] = new ImageIcon[h];
+    				set.imgsheet[i] = new RawImage[h];
     				for( int j=0; j<h; ++j)
     					set.iconsheet[i][j] = null;
     			}
@@ -196,6 +201,40 @@ public class Globals {
     			iconIDs.put((String)row[0], icon);
     		}
     	}
+    }
+    
+    // TODO: Abstract entirely (move all the BufferedImage stuff into HybridUI or better yet, GuiComposer)
+    public static final RawImage defaultRaw = HybridUI.createImage(1, 1);
+    public static RawImage getIconImg( String id) {
+    	if( iconSets == null)
+    		initIconSets();
+    	
+    	IconID icon = iconIDs.get(id);
+    	if( icon != null) {
+    		IconSet set = icon.set;
+    		if( set.img == null) {
+    			try {
+    				set.img = loadIconSheet(Globals.class.getClassLoader().getResourceAsStream(set.resourceFile));
+    			} catch (Exception e) {
+					MDebug.handleError( ErrorType.RESOURCE, null, e.getMessage());
+			    	return defaultRaw;
+				}
+    		}
+    		
+    		if( set.imgsheet[icon.x][icon.y] == null) {
+
+				BufferedImage img = new BufferedImage(set.widthPerIcon-1,set.heightPerIcon-1, set.img.getType());
+				
+				Graphics g = img.getGraphics();
+				g.drawImage(set.img, -(set.widthPerIcon)*icon.x, -(set.heightPerIcon)*icon.y, null);
+				g.dispose();
+				
+				set.imgsheet[icon.x][icon.y] = new ImageBI(img);
+    		}
+    		return set.imgsheet[icon.x][icon.y];
+    	}
+
+    	return defaultRaw;
     }
     
     public static final ImageIcon defaultIcon = new ImageIcon( new BufferedImage(1,1,HybridHelper.BI_FORMAT));
