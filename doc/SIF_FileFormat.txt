@@ -1,4 +1,4 @@
-Version 000D
+Version 000E
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -92,9 +92,9 @@ Header
 				[1, byte] : Fill Method
 				[2, ushort] : number of stroke segments
 				Per reference:
-					[2, ushort] : refrence to stroke
-					[4, float] : pivot point on stroke [0,1]
-					[4, float] : travel [-pivot,1-pivot]
+					[2, ushort] : reference to stroke
+					[4, float] : start point of stroke
+					[4, float] : end point of stroke
 		Per Stroke : 
 
 ---- ANIM - Animation Data Chunk

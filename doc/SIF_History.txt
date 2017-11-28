@@ -7,5 +7,6 @@
 0009: added Maglev [Image Type]
 000A: added PuppetLayer [Layer Type]
 000B: changed pivot/travel of MagLev Images from ints to floats representing relative distance
-000C: Added FillMode to MagLevFill in MagLev Images
+000C: Added FillMode to MagLevFill in MagLev Mediums
 000D: Added PLTT Chunk
+000E: Changed Indexing in MagLevFills in MagLev Mediums

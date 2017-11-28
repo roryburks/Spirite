@@ -44,7 +44,7 @@ public class MagLevStroke extends AMagLevThing {
 	
 	// ===========
 	// ==== Access of Custom Data
-	public DrawPoints getDirect() {return direct;}
+	public IndexedDrawPoints getDirect() {return direct;}
 	public PenState[] getPenstates() {return states;}
 
 	// =============

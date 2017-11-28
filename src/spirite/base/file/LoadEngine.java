@@ -359,26 +359,38 @@ public class LoadEngine {
 						List<StrokeSegment> segments = new ArrayList<>(numSegmentsToRead);
 							
 						for( ; numSegmentsToRead > 0; --numSegmentsToRead) {
-							if( helper.version < 0x000B) {
+							if (helper.version < 0x000E){
 								int strokeIndex = helper.ra.readUnsignedShort();
-								int pivot = helper.ra.readInt();
-								int travel = helper.ra.readInt();
 								MagLevStroke stroke = (MagLevStroke) things.get(strokeIndex);
-								float strokeLen = stroke.getDirect().length;
-								float _pivot = MUtil.clip(0, pivot/strokeLen, 1);
-								float _travel = (travel < 0) 
-										? MUtil.clip(-_pivot, travel/strokeLen, 0)
-										: MUtil.clip(0, travel/strokeLen, 1 - pivot);
+								float pivot;
+								float travel;
+								if( helper.version < 0x000B) {
+									int _pivot = helper.ra.readInt();
+									int _travel = helper.ra.readInt();
+									float strokeLen = stroke.getDirect().length;
+									pivot = MUtil.clip(0, _pivot/strokeLen, 1);
+									travel = (_travel < 0) 
+											? MUtil.clip(-pivot, _travel/strokeLen, 0)
+											: MUtil.clip(0, _travel/strokeLen, 1 - pivot);
+								}
+								else {
+									pivot = helper.ra.readFloat();
+									travel = helper.ra.readFloat();
+								}
 								
-								StrokeSegment ss = new StrokeSegment( strokeIndex,  _pivot, _travel);
+								float start = pivot * stroke.states.length;
+								float end = (pivot + travel) * stroke.states.length;
+								
+								StrokeSegment ss = new StrokeSegment( strokeIndex, start, end);
 								segments.add(ss);
 							}
 							else {
 								int strokeIndex = helper.ra.readUnsignedShort();
-								float pivot = helper.ra.readFloat();
-								float travel = helper.ra.readFloat();
-								StrokeSegment ss = new StrokeSegment( strokeIndex, pivot, travel);
+								float start = helper.ra.readFloat();
+								float end = helper.ra.readFloat();
+								StrokeSegment ss = new StrokeSegment( strokeIndex, start, end);
 								segments.add(ss);
+								
 							}
 
 						}

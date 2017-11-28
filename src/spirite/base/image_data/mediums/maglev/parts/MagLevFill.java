@@ -15,18 +15,18 @@ import spirite.base.util.compaction.FloatCompactor;
 public class MagLevFill extends AMagLevThing {
 	public static class StrokeSegment {
 		public final int strokeId;
-		public final float _pivot;
-		public final float _travel;
-		public StrokeSegment(int id, float pivot, float travel) 
+		public final float start;
+		public final float end;
+		public StrokeSegment(int id, float start, float end) 
 		{
 			this.strokeId = id;
-			this._pivot = pivot;
-			this._travel = travel;
+			this.start = start;
+			this.end = end;
 		}
 		public StrokeSegment( MagLevFill.StrokeSegment other) {
 			this.strokeId = other.strokeId;
-			this._pivot = other._pivot;
-			this._travel = other._travel;
+			this.start = other.start;
+			this.end = other.end;
 		}
 	}
 	public final List<MagLevFill.StrokeSegment> segments;
@@ -69,16 +69,23 @@ public class MagLevFill extends AMagLevThing {
 			MagLevStroke stroke = (MagLevStroke)context.getThingById( s.strokeId);
 			
 			float curveLen = (float) (stroke.direct.length);
-			int start = MUtil.clip(0, (int)( s._pivot * curveLen), stroke.direct.length-1);
-			int end = MUtil.clip(0, (int) ((s._pivot + s._travel) * curveLen), stroke.direct.length-1);
-
-			for( int c = start; c <= end; ++c) {
-				outx.add(stroke.direct.x[c]);
-				outy.add(stroke.direct.y[c]);
+			float start = stroke.direct.getNearIndex(s.start);
+			float end = stroke.direct.getNearIndex(s.end);
+			
+			if( end > start) {
+				int e = (int)Math.ceil(end);
+				for( int c=(int)Math.floor(start); c < e; ++c) {
+					outx.add(stroke.direct.x[c]);
+					outy.add(stroke.direct.y[c]);
+				}
 			}
-			for( int c = start; c >= end; --c) {
-				outx.add(stroke.direct.x[c]);
-				outy.add(stroke.direct.y[c]);
+			else {
+				int e = (int)Math.ceil(start);
+				for( int c=(int)Math.floor(end); c < e; ++c) {
+					outx.add(stroke.direct.x[c]);
+					outy.add(stroke.direct.y[c]);
+				}
+				
 			}
 		}
 		

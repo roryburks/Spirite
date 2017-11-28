@@ -157,9 +157,11 @@ public class MaglevImageDrawer
 		
 		public StrokeSegment build( List<AMagLevThing> things) {
 			MagLevStroke stroke = (MagLevStroke) things.get(strokeIndexAbs);
-			float strokeLen = stroke.getDirect().length;
 			
-			return new StrokeSegment( stroke.getId(), pivot/strokeLen, travel/strokeLen);
+			float start = stroke.getDirect().t[pivot];
+			float end = stroke.getDirect().t[pivot+travel];
+			
+			return new StrokeSegment( stroke.getId(), start, end);
 		}
 	}
 	BuildingStrokeSegment ss;
