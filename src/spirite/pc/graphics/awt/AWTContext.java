@@ -15,7 +15,7 @@ import spirite.base.graphics.IImage;
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;

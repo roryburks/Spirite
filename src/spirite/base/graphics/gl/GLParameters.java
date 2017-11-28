@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 
 /**
  * GLParameters encapsulates many of the attributes representing "how" OpenGL

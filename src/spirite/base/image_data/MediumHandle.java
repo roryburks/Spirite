@@ -8,7 +8,7 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.mediums.DynamicMedium;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.PrismaticMedium;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 

@@ -17,7 +17,7 @@ import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.SkeletonStateDrawer;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 
 public class PuppetLayer extends Layer {
 	public final IPuppet puppet;

@@ -1,4 +1,4 @@
-package spirite.base.util.glmath;
+package spirite.base.util.glu;
 
 /**
  * GLC is a namespace which includes all needed GL Constants whether the

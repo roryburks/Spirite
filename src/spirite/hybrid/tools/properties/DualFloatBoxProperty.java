@@ -13,7 +13,7 @@ import javax.swing.event.DocumentListener;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.components.MTextFieldNumber;
 

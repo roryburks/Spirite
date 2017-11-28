@@ -2,7 +2,7 @@ package spirite.base.util.interpolation;
 
 import java.util.List;
 
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 /** Constructs a Polygon of degree N-1 which goes through the given N
  * points and uses that Polygon to interpolate the data.

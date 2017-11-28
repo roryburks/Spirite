@@ -52,7 +52,7 @@ import spirite.base.image_data.ReferenceManager.LayerReference;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.Transferables.NodeTransferable;

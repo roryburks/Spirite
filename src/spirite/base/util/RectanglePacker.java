@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2i;
 
 /**
  * The RectPacker class contains algorithm(s) that take a list of Vec2is

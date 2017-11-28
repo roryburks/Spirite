@@ -17,10 +17,10 @@ import spirite.base.util.BinSearch;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.interpolation.Interpolator2D.InterpolatedPoint;
+import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 

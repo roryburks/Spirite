@@ -1,4 +1,4 @@
-package spirite.base.util.glmath;
+package spirite.base.util.linear;
 
 /**
  * A Package containing methods which construct certain frequently-used

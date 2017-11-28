@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 

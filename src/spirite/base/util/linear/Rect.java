@@ -1,4 +1,4 @@
-package spirite.base.util.glmath;
+package spirite.base.util.linear;
 
 public class Rect {
 	public int x, y, width, height;

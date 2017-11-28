@@ -4,8 +4,8 @@ import java.awt.Shape;	// TODO
 import java.util.Stack;
 
 import spirite.base.image_data.MediumHandle;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality 

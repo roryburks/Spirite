@@ -7,7 +7,7 @@ import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
 public class CroppingBehavior extends DrawnStateBehavior {

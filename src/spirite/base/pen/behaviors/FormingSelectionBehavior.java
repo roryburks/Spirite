@@ -9,7 +9,7 @@ import spirite.base.pen.selection_builders.ASelectionBuilder;
 import spirite.base.pen.selection_builders.OvalSelectionBuilder;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 
 public class FormingSelectionBehavior extends DrawnStateBehavior {
 		private final ToolSchemes.BoxSelectionShape shape;

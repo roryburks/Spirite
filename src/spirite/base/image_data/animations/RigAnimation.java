@@ -21,8 +21,8 @@ import spirite.base.image_data.animations.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
-import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.interpolation.CubicSplineInterpolatorND;
+import spirite.base.util.linear.MatTrans;
 
 public class RigAnimation extends Animation {
 	public static class PartKeyFrame {

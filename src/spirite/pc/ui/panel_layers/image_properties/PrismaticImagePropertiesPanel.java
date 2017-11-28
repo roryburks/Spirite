@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.PrismaticMedium.LImg;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 
 public class PrismaticImagePropertiesPanel extends JPanel {
 	private final MasterControl master;

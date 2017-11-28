@@ -3,10 +3,10 @@ package spirite.base.image_data.mediums;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
+import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 

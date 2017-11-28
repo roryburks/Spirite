@@ -1,4 +1,4 @@
-package spirite.base.util.glmath;
+package spirite.base.util.linear;
 
 /**
  * Created by Rory Burks on 4/28/2017.

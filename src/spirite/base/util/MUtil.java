@@ -8,9 +8,9 @@ import java.util.List;
 
 import spirite.base.graphics.IImage;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
 
 public class MUtil {
 

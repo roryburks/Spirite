@@ -6,9 +6,9 @@ import java.util.List;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.util.glmath.Vec2;
 import spirite.base.util.interpolation.CubicSplineInterpolatorND;
 import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.linear.Vec2;
 
 public class BoneContorter {
 	public static List<AMagLevThing> contortBones(List<AMagLevThing> source, BaseBone bone, Interpolator2D state) {

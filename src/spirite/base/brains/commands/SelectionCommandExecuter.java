@@ -8,7 +8,7 @@ import java.util.Map;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.selection.SelectionEngine;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 
 /** CommandExecuter for "select.*" commands.  Commands which affect the 
  * selection form.     */

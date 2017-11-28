@@ -16,7 +16,7 @@ public class ExciseBehavior extends StateBehavior {
 	
 	@Override public void start() {
 		ToolSettings settings = penner.toolsetManager.getToolSettings(Tool.EXCISE_ERASER);
-		drawer.startWeightErase((Boolean)settings.getValue("precies"));
+		drawer.startWeightErase((Boolean)settings.getValue("precise"));
 		onMove();
 	}
 	@Override public void onTock() {}

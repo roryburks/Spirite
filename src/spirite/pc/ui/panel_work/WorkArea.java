@@ -27,9 +27,9 @@ import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserve
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.Colors;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkPanel.View;

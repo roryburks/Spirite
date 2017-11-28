@@ -12,8 +12,8 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2i;
 
 public abstract class Layer {
 	public abstract BuildingMediumData getActiveData();

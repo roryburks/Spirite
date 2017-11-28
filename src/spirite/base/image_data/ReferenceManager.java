@@ -10,7 +10,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 
 /**
  * ReferenceManager manages the Reference system.

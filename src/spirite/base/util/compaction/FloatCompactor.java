@@ -3,9 +3,16 @@ package spirite.base.util.compaction;
 import java.util.ArrayList;
 
 public class FloatCompactor {
-    private final int CHUNK_SIZE = 1024;
+    private final int CHUNK_SIZE;
     private final ArrayList<float[]> data = new ArrayList<>();
     private int size = 0;
+
+    public FloatCompactor() {
+    	CHUNK_SIZE = 1024;
+    }
+    public FloatCompactor(int chunk_size) {
+    	this.CHUNK_SIZE = Math.max(1, chunk_size);
+    }
 
     public void add( float i) {
         if( size != Integer.MAX_VALUE){

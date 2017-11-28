@@ -40,7 +40,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 

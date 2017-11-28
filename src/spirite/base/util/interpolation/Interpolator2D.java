@@ -1,6 +1,6 @@
 package spirite.base.util.interpolation;
 
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 public interface Interpolator2D{
     public static class InterpolatedPoint {

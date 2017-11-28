@@ -20,10 +20,10 @@ import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
 import spirite.hybrid.HybridHelper;
 
 public class BoneContortionBehavior extends DrawnStateBehavior 

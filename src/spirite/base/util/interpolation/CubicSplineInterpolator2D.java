@@ -3,7 +3,7 @@ package spirite.base.util.interpolation;
 import java.util.List;
 
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 /**
  * CubicSplineInterpolator2D is a two-dimensional curve interpolator which

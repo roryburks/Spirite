@@ -31,7 +31,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.MDebug;
 
 /***

@@ -1,4 +1,4 @@
-package spirite.base.util.glmath;
+package spirite.base.util.linear;
 
 import com.hackoeur.jglm.support.FastMath;
 

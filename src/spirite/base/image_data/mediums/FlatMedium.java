@@ -8,11 +8,11 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.MatTrans.NoninvertableException;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
+import spirite.base.util.linear.Vec2i;
+import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.hybrid.HybridUtil;
 
 /***

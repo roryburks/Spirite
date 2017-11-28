@@ -9,8 +9,8 @@ import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.util.glmath.MatTrans;
 import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.linear.MatTrans;
 
 public interface IImageDrawer {
 

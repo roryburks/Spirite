@@ -5,7 +5,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.pen.Penner;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.Rect;
 
 public class RigManipulationBehavior extends TransformBehavior {
 	Part selectedPart;

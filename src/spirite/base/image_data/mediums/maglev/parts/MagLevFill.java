@@ -68,7 +68,6 @@ public class MagLevFill extends AMagLevThing {
 		for( MagLevFill.StrokeSegment s : segments) {
 			MagLevStroke stroke = (MagLevStroke)context.getThingById( s.strokeId);
 			
-			float curveLen = (float) (stroke.direct.length);
 			float start = stroke.direct.getNearIndex(s.start);
 			float end = stroke.direct.getNearIndex(s.end);
 			
@@ -80,12 +79,11 @@ public class MagLevFill extends AMagLevThing {
 				}
 			}
 			else {
-				int e = (int)Math.ceil(start);
-				for( int c=(int)Math.floor(end); c < e; ++c) {
+				int e = (int)Math.floor(end);
+				for( int c=(int)Math.ceil(start); c > e; --c) {
 					outx.add(stroke.direct.x[c]);
 					outy.add(stroke.direct.y[c]);
 				}
-				
 			}
 		}
 		

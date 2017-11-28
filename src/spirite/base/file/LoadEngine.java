@@ -359,31 +359,8 @@ public class LoadEngine {
 						List<StrokeSegment> segments = new ArrayList<>(numSegmentsToRead);
 							
 						for( ; numSegmentsToRead > 0; --numSegmentsToRead) {
-							if (helper.version < 0x000E){
-								int strokeIndex = helper.ra.readUnsignedShort();
-								MagLevStroke stroke = (MagLevStroke) things.get(strokeIndex);
-								float pivot;
-								float travel;
-								if( helper.version < 0x000B) {
-									int _pivot = helper.ra.readInt();
-									int _travel = helper.ra.readInt();
-									float strokeLen = stroke.getDirect().length;
-									pivot = MUtil.clip(0, _pivot/strokeLen, 1);
-									travel = (_travel < 0) 
-											? MUtil.clip(-pivot, _travel/strokeLen, 0)
-											: MUtil.clip(0, _travel/strokeLen, 1 - pivot);
-								}
-								else {
-									pivot = helper.ra.readFloat();
-									travel = helper.ra.readFloat();
-								}
-								
-								float start = pivot * stroke.states.length;
-								float end = (pivot + travel) * stroke.states.length;
-								
-								StrokeSegment ss = new StrokeSegment( strokeIndex, start, end);
-								segments.add(ss);
-							}
+							if (helper.version < 0x000E)
+								segments.add(_LEGACY_buildMagLevFillStrokeSegment000D(helper, things));
 							else {
 								int strokeIndex = helper.ra.readUnsignedShort();
 								float start = helper.ra.readFloat();
@@ -820,6 +797,35 @@ public class LoadEngine {
 			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, false);
 		}
 		helper.workspace.getAnimationManager().addAnimation(animation);
+	}
+	
+	private StrokeSegment _LEGACY_buildMagLevFillStrokeSegment000D( LoadHelper helper, List<AMagLevThing> things) 
+			throws IOException 
+	{
+		int strokeIndex = helper.ra.readUnsignedShort();
+		MagLevStroke stroke = (MagLevStroke) things.get(strokeIndex);
+		float pivot;
+		float travel;
+		if( helper.version < 0x000B) {
+			int _pivot = helper.ra.readInt();
+			int _travel = helper.ra.readInt();
+			float strokeLen = stroke.getDirect().length;
+			pivot = MUtil.clip(0, _pivot/strokeLen, 1);
+			travel = (_travel < 0) 
+					? MUtil.clip(-pivot, _travel/strokeLen, 0)
+					: MUtil.clip(0, _travel/strokeLen, 1 - pivot);
+		}
+		else {
+			pivot = helper.ra.readFloat();
+			travel = helper.ra.readFloat();
+		}
+		
+		float start = pivot * stroke.states.length;
+		float end = (pivot + travel) * stroke.states.length;
+		
+		StrokeSegment ss = new StrokeSegment( strokeIndex, start, end);
+		
+		return ss;
 	}
 	
 	public static class BadSIFFFileException extends Exception {

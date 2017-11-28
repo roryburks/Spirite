@@ -14,14 +14,17 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.MatTrans.NoninvertableException;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.pen.PenTraits.PenState;
+import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
+import spirite.base.util.linear.Vec2i;
+import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.hybrid.HybridHelper;
 
 /**
@@ -78,8 +81,6 @@ public class MaglevMedium implements IMedium {
 			things.add(thing);
 	}
 	void removeThing(AMagLevThing toRemove) {
-		
-		System.out.println("SS");
 		int id = toRemove.id;
 		
 		Iterator<AMagLevThing> it = things.iterator();
@@ -129,6 +130,75 @@ public class MaglevMedium implements IMedium {
 
 
 	// ==== Hard Junk
+	void splitStroke( int strokeId, float[] points) {
+		int index = -1;
+		for( int i=0; i < things.size(); ++i) {
+			if( things.get(i).id == strokeId) {
+				index = i;
+				break;
+			}
+		}
+		
+		MagLevStroke stroke = (MagLevStroke)things.get(index);
+		things.remove(index);
+		IndexedDrawPoints direct = stroke.getDirect();
+		
+		
+		// Step 1: Split the Stroke
+		MagLevStroke[] addedStrokes = new MagLevStroke[points.length/2+1];
+		boolean in = true;
+		float start = 0;
+		for( int i=0; i<points.length || in; ++i) {
+			if( in) {
+				if( (i== points.length && start != stroke.states.length-1 ) || (i < points.length && points[i] != start)) {
+					ArrayList<PenState> states = new ArrayList<>();
+					if( start != Math.round(start)) {
+						int t = (int)Math.floor( direct.getNearIndex(start));
+						
+						states.add(new PenState(direct.x[t], direct.y[t], direct.w[t]));
+					}
+					
+					if( points.length > i) {
+						float endIndex = points[i];
+						
+						for( int c= (int)Math.ceil(start); c < endIndex; ++c) 
+							states.add(stroke.states[c]);
+						
+						if( endIndex != Math.round(endIndex)) {
+							int t = (int)Math.ceil( direct.getNearIndex(endIndex));
+							
+							states.add(new PenState(direct.x[t], direct.y[t], direct.w[t]));
+						}
+					}
+					else {
+						for( int c= (int)Math.ceil(start); c < stroke.states.length; ++c) 
+							states.add(stroke.states[c]);
+					}
+					
+					MagLevStroke newStroke =  new MagLevStroke(states.toArray(new PenState[0]), stroke.params);
+					((AMagLevThing)newStroke).id = workingId++;
+					things.add(index,newStroke);
+					
+					addedStrokes[i/2] = newStroke;
+				}
+			}
+			else {
+				start = points[i];
+			}
+			in = !in;
+		}
+		
+		// Step 2: Re-map the Fills
+		for( AMagLevThing thing : things) {
+			if( thing instanceof MagLevFill) {
+				MagLevFill fill = (MagLevFill)thing;
+				fill.segments.removeIf( (ss) -> ss.strokeId == stroke.getId());
+				// TODO: Make better
+			}
+		}
+	}
+	
+	
 	boolean building = false;
 	void Build() {
 		if( !building) {
@@ -139,9 +209,8 @@ public class MaglevMedium implements IMedium {
 				builtImage.doOnGC( (gc) -> {
 					ABuiltMediumData built = this.build(new BuildingMediumData(context.getHandleFor(this), 0, 0));
 					SelectionMask mask = null;
-					for( AMagLevThing thing : things) {
+					for( AMagLevThing thing : things)
 						thing.draw( built, mask, gc, this);
-					}	
 				}, new MatTrans());
 			}
 			isBuilt = true;

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 /**
  * A Package which contains a set of classes for interpolating data.

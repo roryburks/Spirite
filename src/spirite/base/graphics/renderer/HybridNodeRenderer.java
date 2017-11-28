@@ -24,7 +24,7 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;

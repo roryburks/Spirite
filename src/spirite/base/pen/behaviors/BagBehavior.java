@@ -4,7 +4,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 public class BagBehavior extends DrawnStateBehavior {
 	float startX, startY;

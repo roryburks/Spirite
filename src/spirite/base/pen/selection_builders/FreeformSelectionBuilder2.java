@@ -5,7 +5,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.Colors;
 import spirite.base.util.compaction.IntCompactor;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
 
 public class FreeformSelectionBuilder2 extends ASelectionBuilder {

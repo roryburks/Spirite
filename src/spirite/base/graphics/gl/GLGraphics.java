@@ -17,10 +17,10 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.glmath.GLC;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glu.GLUtil;
+import spirite.base.util.glu.GLC;
+import spirite.base.util.glu.PolygonTesselater;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridUtil;
 
 /**
@@ -324,12 +324,12 @@ public class GLGraphics extends GraphicsContext{
 	@Override
 	public void fillPolygon(int[] x, int[] y, int count) {
 		reset();
-		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count), contextTransform);
+		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), PolygonTesselater.tesselatePolygon(x, y, count), contextTransform);
 	}
 	@Override
 	public void fillPolygon(float[] x, float[] y, int count) {
 		reset();
-		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), GLUtil.tesselatePolygon(x, y, count), contextTransform);
+		engine.applyPrimitiveProgram(ProgramType.POLY_RENDER, getPolyParams(), PolygonTesselater.tesselatePolygon(x, y, count), contextTransform);
 	}
 	
 	

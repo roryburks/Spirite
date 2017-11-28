@@ -5,8 +5,8 @@ import java.util.List;
 
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;
-import spirite.base.util.glmath.GLC;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.glu.GLC;
+import spirite.base.util.linear.Vec2;
 
 /**
  * GLGeom contains methods which performs software alternative to the Geometry Shaders for

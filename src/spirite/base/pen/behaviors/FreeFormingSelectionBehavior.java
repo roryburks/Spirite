@@ -7,8 +7,8 @@ import spirite.base.pen.Penner;
 import spirite.base.pen.selection_builders.FreeformSelectionBuilder2;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Vec2i;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Vec2i;
 
 public class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 	private boolean drawing = true;

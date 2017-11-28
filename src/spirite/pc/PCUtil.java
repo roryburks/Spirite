@@ -9,7 +9,7 @@ import com.jogamp.opengl.GL2;
 
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.IntegerInterleavedRaster;

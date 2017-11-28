@@ -14,7 +14,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.util.glmath.MatTrans;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 

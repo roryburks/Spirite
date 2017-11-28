@@ -3,10 +3,10 @@ package debug;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUtessellator;
 
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.MatTrans.NoninvertableException;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glu.GLUtil.GLUTCB;
+import spirite.base.util.glu.PolygonTesselater.GLUTCB;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Vec2;
+import spirite.base.util.linear.MatTrans.NoninvertableException;
 
 public class TestAlp {
 

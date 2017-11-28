@@ -10,11 +10,11 @@ import spirite.base.image_data.layers.puppet.BasePuppet;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
-import spirite.base.util.glmath.Vec2;
-import spirite.base.util.glmath.Vec2i;
 import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2;
+import spirite.base.util.linear.Vec2i;
 
 /**
  * A DerivedMaglevMedium is a second-hand medium that relies on a MaglevMedium.

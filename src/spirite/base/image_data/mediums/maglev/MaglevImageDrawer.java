@@ -37,9 +37,9 @@ import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Vec2;
 import spirite.base.util.interpolation.Interpolator2D;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Vec2;
 
 public class MaglevImageDrawer 
 	implements 	IImageDrawer,
@@ -56,9 +56,13 @@ public class MaglevImageDrawer
 	private final BuildingMediumData building;
 	private final MaglevMedium img;
 	
+	private final MLDModuleWeightEraser eraserModule;
+	
 	public MaglevImageDrawer( MaglevMedium img, BuildingMediumData building) {
 		this.img = img;
 		this.building = building;
+		
+		eraserModule = new MLDModuleWeightEraser(img, building);
 	}
 
 	
@@ -312,92 +316,14 @@ public class MaglevImageDrawer
 	}
 
 	// ::: IWeightEraserModule
-	static Object iweIDLocker = new Object();
-	static int iweIDCounter = 0;
-	boolean weightPrecise;
-	int iweId = -1;
-	@Override
-	public void weightErase(float x, float y, float w) {
-		ImageWorkspace ws = this.building.handle.getContext();
-		
-		if (weightPrecise) {
-			List<BuildingStrokeSegment> toRemove = new ArrayList<>();
-			
-
-			for( AMagLevThing thing : img.things) {
-				if( thing instanceof MagLevStroke) {
-					MagLevStroke stroke = (MagLevStroke)thing;
-					DrawPoints direct = stroke.getDirect();
-					
-				}
-			}
-		}
-		else {
-			List<AMagLevThing> thingsToRemove = new ArrayList<>();
-			
-			for( AMagLevThing thing : img.things) {
-				if( thing instanceof MagLevStroke) {
-					MagLevStroke stroke = (MagLevStroke)thing;
-					DrawPoints direct = stroke.getDirect();
-
-					for( int i=0; i < direct.length; ++i) {
-						if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
-							thingsToRemove.add(stroke);
-							break;
-						}
-					}
-				}
-			}
-			
-			if( thingsToRemove.size() > 0) {
-				ws.getUndoEngine().performAndStore(
-						new MagWeightEraseAction(building, thingsToRemove, iweId));
-			}
-		}
+	@Override public void startWeightErase(boolean precise) {
+		eraserModule.startWeightErase(precise);
 	}
-
-	@Override
-	public void startWeightErase(boolean precise) {
-		weightPrecise = precise;
-		synchronized( iweIDLocker) {
-			iweId = iweIDCounter++;
-		}
+	@Override public void endWeightErase() {
+		eraserModule.endWeightErase();
 	}
-	@Override
-	public void endWeightErase() {
-		iweId = -1;
-	}
-	class MagWeightEraseAction extends ImageAction implements StackableAction {
-		private final List<AMagLevThing> thingsToErase;
-		private final int id;
-		MagWeightEraseAction(BuildingMediumData data, List<AMagLevThing> thingsToErase, int id)
-		{
-			super(data);
-			this.id = id;
-			this.thingsToErase = new ArrayList<>(1);
-			this.thingsToErase.addAll(thingsToErase);
-		}
-
-		@Override public boolean canStack(UndoableAction newAction) {
-			return ( newAction instanceof MagWeightEraseAction && ((MagWeightEraseAction) newAction).id == id);
-		}
-		@Override public void stackNewAction(UndoableAction newAction) {
-			thingsToErase.addAll(((MagWeightEraseAction)newAction).thingsToErase);
-		}
-
-		@Override
-		protected void performImageAction(ABuiltMediumData built) {
-			ImageWorkspace ws = building.handle.getContext();
-			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
-			
-			for( AMagLevThing toErase : thingsToErase) {
-				mimg.removeThing(toErase);
-			}
-		}
-		@Override
-		public String getDescription() {
-			return "Erase Mag Stroke";
-		}
+	@Override public void weightErase(float x, float y, float w) {
+		eraserModule.weightErase(x,y,w);
 	}
 
 	// :::: IBoneDrawer
@@ -492,5 +418,6 @@ public class MaglevImageDrawer
 		
 		return null;
 	}
+
 
 }

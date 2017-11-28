@@ -17,8 +17,8 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.glmath.MatTrans;
-import spirite.base.util.glmath.Rect;
+import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
 
 /***

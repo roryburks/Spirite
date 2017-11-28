@@ -10,7 +10,7 @@ import com.jogamp.opengl.glu.GLUtessellatorCallback;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.util.compaction.FloatCompactor;
 
-public class GLUtil {
+public class PolygonTesselater {
 	public static Primitive tesselatePolygon(int[] x, int[] y, int count) {
 		GLUtessellator tess = GLU.gluNewTess();
 		GLUTCB callback = new GLUTCB();

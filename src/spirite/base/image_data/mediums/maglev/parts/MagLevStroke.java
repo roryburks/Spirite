@@ -1,6 +1,7 @@
 package spirite.base.image_data.mediums.maglev.parts;
 
 import java.util.Arrays;
+import java.util.List;
 
 import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;

@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 /**
  * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to

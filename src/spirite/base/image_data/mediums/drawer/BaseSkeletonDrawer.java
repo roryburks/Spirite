@@ -8,7 +8,7 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IPuppetBoneDrawer;
 import spirite.base.util.MUtil;
-import spirite.base.util.glmath.Vec2;
+import spirite.base.util.linear.Vec2;
 
 public class BaseSkeletonDrawer 
 	implements 
