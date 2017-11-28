@@ -13,6 +13,7 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
+import spirite.base.util.BinSearch;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
@@ -47,6 +48,21 @@ public abstract class StrokeEngine {
 			this.length = x.length;
 			if( x.length != y.length || x.length != w.length)
 				MDebug.handleWarning(WarningType.STRUCTURAL, "Miss-matched x/y array lengths.");
+		}
+	}
+	public static class IndexedDrawPoints extends DrawPoints {
+		public final float[] t;
+		public IndexedDrawPoints( float[] x, float[] y, float[] w, float[] t) {
+			super(x,y,w);
+			this.t = t;
+		}
+		
+		/**
+		 * @return Returns float in [0,length-1].  Math.round(float) will give the nearest index and 
+		 * 	Math.floor/Math.ceil can be used for a left or right bound
+		 */
+		public float getNearIndex( float met) {
+			return BinSearch.ApproximateBinarySearch(t, met);
 		}
 	}
 	
@@ -280,7 +296,7 @@ public abstract class StrokeEngine {
 		
 		_interpolator = null;
 	}
-	
+
 	public static DrawPoints buildPoints(Interpolator2D localInterpolator, List<PenState> penStates, StrokeParams params) {
 		PenState buff;
 		
@@ -323,6 +339,55 @@ public abstract class StrokeEngine {
 				ws[i] = params.dynamics.getSize(penStates.get(i));
 			}
 			return new DrawPoints( xs, ys, ws);
+		}
+	}
+	public static IndexedDrawPoints buildIndexedPoints(Interpolator2D localInterpolator, List<PenState> penStates, StrokeParams params) {
+		PenState buff;
+		
+		
+		if( localInterpolator != null) {
+			if( penStates.size() == 0)
+				return new IndexedDrawPoints(new float[0],new float[0],new float[0], new float[0]);
+			if( penStates.size() == 1)
+				return new IndexedDrawPoints(new float[] {penStates.get(0).x},new float[] {penStates.get(0).y},new float[] {params.dynamics.getSize(penStates.get(0))}, new float[] {0.0f});
+			FloatCompactor fcx = new FloatCompactor();
+			FloatCompactor fcy = new FloatCompactor();
+			FloatCompactor fcw = new FloatCompactor();
+			FloatCompactor fct = new FloatCompactor();
+	
+			float localInterpos = 0;
+			InterpolatedPoint ip = localInterpolator.evalExt(localInterpos);
+			buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(penStates.get(ip.left).pressure, penStates.get(ip.right).pressure, ip.lerp));
+			fcx.add(ip.x);
+			fcy.add(ip.y);
+			fcw.add(params.dynamics.getSize(buff));
+			fct.add(ip.left + ip.lerp);
+			
+			while( localInterpos + DIFF < localInterpolator.getCurveLength()) {
+				localInterpos += DIFF;
+				ip = localInterpolator.evalExt(localInterpos);
+	
+				buff = new PenState( ip.x, ip.y, (float) MUtil.lerp(penStates.get(ip.left).pressure, penStates.get(ip.right).pressure, ip.lerp));
+				fcx.add(ip.x);
+				fcy.add(ip.y);
+				fcw.add(params.dynamics.getSize(buff));
+				fct.add(ip.left + ip.lerp);
+			}
+			
+			return new IndexedDrawPoints(fcx.toArray(), fcy.toArray(), fcw.toArray(), fct.toArray());
+		}
+		else{
+			float[] xs = new float[penStates.size()];
+			float[] ys = new float[penStates.size()];
+			float[] ws = new float[penStates.size()];
+			float[] ts = new float[penStates.size()];
+			for( int i=0; i < penStates.size(); ++i) {
+				xs[i] = penStates.get(i).x;
+				ys[i] = penStates.get(i).y;
+				ws[i] = params.dynamics.getSize(penStates.get(i));
+				ts[i] = i;
+			}
+			return new IndexedDrawPoints( xs, ys, ws, ts);
 		}
 	}
 	

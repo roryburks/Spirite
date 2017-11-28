@@ -2,11 +2,8 @@
 
 package spirite.pc;
 
-import java.awt.Color;
-
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 
 import spirite.base.brains.MasterControl;
 import spirite.hybrid.MDebug;
@@ -42,8 +39,8 @@ public class Spirite{
     public static void setLookAndFeel() {
         try {
             UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName());
-    		UIManager.getLookAndFeelDefaults().put( "background" , new ColorUIResource(new Color(152, 166, 173) ));
-    		UIManager.getLookAndFeelDefaults().put( "Panel.background" , new ColorUIResource(new Color(152, 166, 173) ));
+    		//UIManager.getLookAndFeelDefaults().put( "background" , new ColorUIResource(new Color(152, 166, 173) ));
+    		//UIManager.getLookAndFeelDefaults().put( "Panel.background" , new ColorUIResource(new Color(152, 166, 173) ));
         }
         catch (Exception e) {
         	MDebug.handleError( ErrorType.RESOURCE, e, "Invalid Look and Feel.");

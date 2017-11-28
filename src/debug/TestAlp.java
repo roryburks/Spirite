@@ -11,7 +11,56 @@ import spirite.base.util.glu.GLUtil.GLUTCB;
 public class TestAlp {
 
     public static void main(String[] args) {
-    	(new d004_crossProduct())._do();
+    	(new d005_BinarySearch())._do();
+    }
+    
+    public static class d005_BinarySearch
+    {
+    	public void _do() {
+    		System.out.println(indexedBinSearch(45));
+    		System.out.println(indexedBinSearch(35));
+    		System.out.println(indexedBinSearch(25));
+    		System.out.println(indexedBinSearch(16));
+    		System.out.println(indexedBinSearch(12));
+    		System.out.println(indexedBinSearch(10));
+    		System.out.println(indexedBinSearch(8));
+    		System.out.println(indexedBinSearch(5));
+    		System.out.println(indexedBinSearch(3.5f));
+    		System.out.println(indexedBinSearch(2));
+    	}
+    	
+    	public float indexedBinSearch(float met) {
+        	float[] t= new float[]{3,4,7,9,11,15,20,30,40};	
+        	int length = t.length;
+        	
+			if( met < 0) return 0;
+			
+			int min=0;
+			int max=length-1;
+			int mid = 0;
+			
+			while( min <= max) {
+				mid = min + ((max-min)/2);
+				
+				if( t[mid] > met)
+					max = mid-1;
+				else if( t[mid] < met)
+					min = mid+1;
+				else
+					return mid;
+			}
+			
+			if( min >= length)
+				return length-1;
+			if( min == 0)
+				return 0;
+			
+			float lerp = (met-t[min-1])/(float)(t[min]-t[min-1]);
+			
+			if( lerp < 0) return min-1;
+			if( lerp > 1) return min+1;
+			return (min-1) + lerp;
+    	}
     }
     
     public static class d004_crossProduct

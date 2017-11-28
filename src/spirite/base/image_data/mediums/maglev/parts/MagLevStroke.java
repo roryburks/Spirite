@@ -12,6 +12,7 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
+import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
@@ -19,7 +20,7 @@ import spirite.base.util.interpolation.Interpolator2D;
 public class MagLevStroke extends AMagLevThing {
 	public final PenState[] states;
 	public final StrokeParams params;
-	DrawPoints direct;
+	IndexedDrawPoints direct;
 	
 	public MagLevStroke( PenState[] states, StrokeParams params) {
 		this.states = states;
@@ -38,7 +39,7 @@ public class MagLevStroke extends AMagLevThing {
 			for( PenState ps : states)
 				interpolator.addPoint(ps.x, ps.y);
 		}
-		direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
+		direct = StrokeEngine.buildIndexedPoints(interpolator, Arrays.asList(states), params);
 	}
 	
 	// ===========
@@ -100,6 +101,6 @@ public class MagLevStroke extends AMagLevThing {
 			for( PenState ps : states)
 				interpolator.addPoint(ps.x, ps.y);
 		}
-		direct = StrokeEngine.buildPoints(interpolator, Arrays.asList(states), params);
+		direct = StrokeEngine.buildIndexedPoints(interpolator, Arrays.asList(states), params);
 	}
 }

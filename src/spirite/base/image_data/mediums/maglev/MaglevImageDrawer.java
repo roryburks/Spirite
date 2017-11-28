@@ -331,7 +331,6 @@ public class MaglevImageDrawer
 			}
 		}
 		else {
-
 			List<AMagLevThing> thingsToRemove = new ArrayList<>();
 			
 			for( AMagLevThing thing : img.things) {

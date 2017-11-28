@@ -1,5 +1,4 @@
 package spirite;
 
-public class Spirite {
-
-}
+// Exists only as a global reference
+public class Spirite {}
