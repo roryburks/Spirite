@@ -2,6 +2,7 @@ package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,8 +14,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
-import spirite.base.image_data.UndoEngine.StackableAction;
-import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -30,11 +29,11 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.ALiftedData;
-import spirite.base.image_data.selection.MaglevLiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
+import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.Interpolator2D;
@@ -57,12 +56,14 @@ public class MaglevImageDrawer
 	private final MaglevMedium img;
 	
 	private final MLDModuleWeightEraser eraserModule;
+	private final MLDModuleLift liftModule;
 	
 	public MaglevImageDrawer( MaglevMedium img, BuildingMediumData building) {
 		this.img = img;
 		this.building = building;
 		
 		eraserModule = new MLDModuleWeightEraser(img, building);
+		liftModule = new MLDModuleLift(img, building);
 	}
 
 	
@@ -399,25 +400,14 @@ public class MaglevImageDrawer
 		}
 	}
 
-	@Override
-	public boolean acceptsLifted(ALiftedData lifted) {
-		return (lifted instanceof MaglevLiftedData);
+	// :::: ILiftSelectionModule, IAnchorLiftModule
+	@Override public boolean acceptsLifted(ALiftedData lifted) {
+		return liftModule.acceptsLifted(lifted);
 	}
-
-	@Override
-	public void anchorLifted(ALiftedData lifted, MatTrans trans) {
-		// TODO Auto-generated method stub
-		
+	@Override public void anchorLifted(ALiftedData lifted, MatTrans trans) {
+		liftModule.anchorLifted(lifted, trans);
 	}
-
-	@Override
-	public ALiftedData liftSelection(SelectionMask selection) {
-		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
-		
-		
-		
-		return null;
+	@Override public ALiftedData liftSelection(SelectionMask selection) {
+		return liftModule.liftSelection(selection);
 	}
-
-
 }

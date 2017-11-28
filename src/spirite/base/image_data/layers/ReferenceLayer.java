@@ -7,8 +7,8 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
-import spirite.base.util.linear.Rect;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.util.linear.Rect;
 
 public class ReferenceLayer extends Layer {
 	private  LayerNode underlying;

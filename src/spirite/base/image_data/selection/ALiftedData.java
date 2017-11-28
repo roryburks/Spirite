@@ -7,6 +7,5 @@ public abstract class ALiftedData {
 	public abstract void drawLiftedData( GraphicsContext gc);
 	public abstract int getWidth();
 	public abstract int getHeight();
-	public abstract ALiftedData asType( Class<? extends ALiftedData> tclass);
 	public abstract IImage readonlyAccess();
 }

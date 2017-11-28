@@ -1,7 +1,6 @@
 package spirite.base.image_data.mediums.maglev.parts;
 
 import java.util.Arrays;
-import java.util.List;
 
 import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
@@ -12,7 +11,6 @@ import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;

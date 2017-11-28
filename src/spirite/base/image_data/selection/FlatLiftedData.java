@@ -16,14 +16,6 @@ public class FlatLiftedData extends ALiftedData {
 	}
 
 	@Override
-	public ALiftedData asType( Class<? extends ALiftedData> tclass) {
-		if( tclass == FlatLiftedData.class)
-			return this;
-		return null;
-	}
-
-
-	@Override
 	public void drawLiftedData(GraphicsContext gc) {
 		gc.drawImage(lifted, 0, 0);
 	}

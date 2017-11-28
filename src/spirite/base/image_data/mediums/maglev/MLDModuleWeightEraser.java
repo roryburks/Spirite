@@ -1,7 +1,6 @@
 package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import spirite.base.image_data.ImageWorkspace;
@@ -11,7 +10,6 @@ import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
-import spirite.base.image_data.mediums.maglev.MaglevImageDrawer.BuildingStrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
@@ -142,6 +140,7 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 				mimg.splitStroke(erase.strokeId, erase.remaining);
 			}
 			mimg.unbuild();
+			mimg.Build();
 		}
 		
 

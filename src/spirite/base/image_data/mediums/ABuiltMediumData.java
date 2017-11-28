@@ -74,11 +74,13 @@ public abstract class ABuiltMediumData {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to recursively check-out");
 			return;
 		}
-		handle.getContext().getUndoEngine().prepareContext(handle);
+		if( handle != null)
+			handle.getContext().getUndoEngine().prepareContext(handle);
 		doing = true;
 		_doOnRaw(doer);
 		doing = false;
-		
-		handle.refresh();
+
+		if( handle != null)
+			handle.refresh();
 	}
 }

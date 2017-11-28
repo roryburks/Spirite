@@ -9,7 +9,6 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 
 public class MagLevFill extends AMagLevThing {
@@ -57,17 +56,14 @@ public class MagLevFill extends AMagLevThing {
 	 * 
 	 */
 	public void _draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
-		List<AMagLevThing> things = context.getThings();
-		int totalLen = 0;
-		int index = 0;
-		int thisIndex = things.indexOf(this);
-
 		FloatCompactor outx = new FloatCompactor();
 		FloatCompactor outy = new FloatCompactor();
 
 		for( MagLevFill.StrokeSegment s : segments) {
 			MagLevStroke stroke = (MagLevStroke)context.getThingById( s.strokeId);
-			
+
+			if(stroke == null)
+				System.out.println("SSS");
 			float start = stroke.direct.getNearIndex(s.start);
 			float end = stroke.direct.getNearIndex(s.end);
 			

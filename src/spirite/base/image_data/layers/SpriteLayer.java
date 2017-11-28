@@ -25,9 +25,9 @@ import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
 import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 

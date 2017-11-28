@@ -14,17 +14,17 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
-import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
 import spirite.base.util.linear.Vec2i;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.hybrid.HybridHelper;
 
 /**
@@ -55,8 +55,11 @@ public class MaglevMedium implements IMedium {
 		this.things = new ArrayList<>( things.size());
 		this.things.addAll(things);
 		
-		for( AMagLevThing thing : things)
-			thing.id = workingId++;
+		for( AMagLevThing thing : things) {
+			if( thing.id == -1)
+				thing.id = workingId++;
+			workingId = Math.max(workingId, thing.id+1);
+		}
 	}
 	private MaglevMedium( MaglevMedium other) {
 		this.context = other.context;
@@ -67,6 +70,7 @@ public class MaglevMedium implements IMedium {
 		
 		this.isBuilt = other.isBuilt;
 		this.builtImage = (other.builtImage == null) ? null : other.builtImage.deepCopy();
+		this.workingId = other.workingId;
 	}
 	
 	public ImageWorkspace getContext() {return context;}
@@ -74,7 +78,9 @@ public class MaglevMedium implements IMedium {
 
 	int workingId = 0;
 	void addThing( AMagLevThing thing, boolean back) {
-		thing.id = workingId++;
+		if( thing.id == -1)
+			thing.id = workingId++;
+		workingId = Math.max(workingId, thing.id+1);
 		if( back)
 			things.add(0, thing);
 		else
@@ -246,7 +252,6 @@ public class MaglevMedium implements IMedium {
 		public MaglevBuiltData(BuildingMediumData building) 
 		{
 			super(building.handle);
-			Build();
 			this.trans = building.trans;
 		}
 

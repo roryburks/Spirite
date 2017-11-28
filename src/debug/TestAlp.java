@@ -5,8 +5,8 @@ import com.jogamp.opengl.glu.GLUtessellator;
 
 import spirite.base.util.glu.PolygonTesselater.GLUTCB;
 import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.Vec2;
 import spirite.base.util.linear.MatTrans.NoninvertableException;
+import spirite.base.util.linear.Vec2;
 
 public class TestAlp {
 
