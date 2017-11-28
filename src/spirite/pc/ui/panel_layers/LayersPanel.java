@@ -78,7 +78,7 @@ public class LayersPanel extends OmniComponent {
 	 * Create the panel.
 	 */
 	public LayersPanel(MasterControl master) {  
-//		/this.setBackground(new Color(152, 166, 173));
+		this.setBackground( Globals.getColor("bg"));
 		
 		this.dialogs = master.getDialogs();
 		layerTreePanel = new LayerTreePanel(master, this);

@@ -33,6 +33,7 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.pen.Penner;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
+import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 import spirite.pc.ui.panel_work.gl.GLWorkArea;
@@ -85,6 +86,7 @@ public class WorkPanel extends javax.swing.JPanel
     private final JPenPenner jpenner;
 
     public WorkPanel( MasterControl master) {
+		this.setBackground( Globals.getColor("bg"));
         this.master = master;
         this.settingsManager = master.getSettingsManager();
         

@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.omni.FrameManager;
@@ -75,6 +76,7 @@ public class RootFrame extends javax.swing.JFrame
     private ResizeContainerPanel container;
 
     public RootFrame( MasterControl master, FrameManager frameManager) {
+		this.setBackground( Globals.getColor("bg"));
         this.master =  master;
         this.frameManager = frameManager;
         

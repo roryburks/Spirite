@@ -1,6 +1,7 @@
 package spirite.gui.swing;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,11 @@ import spirite.pc.graphics.ImageBI;
 public class SwingGuiButton extends SwingGuiComponent 
 	implements SButton
 {
-	private final JButton button = new JButton() ;
+	private final JButton button = new JButton() {
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+		}
+	};
 	private Color bgColor2 = Color.WHITE;
 	private Color bgColor1 = Color.LIGHT_GRAY;
 	

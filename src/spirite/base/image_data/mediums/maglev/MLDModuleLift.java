@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
+import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
-import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
+import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;

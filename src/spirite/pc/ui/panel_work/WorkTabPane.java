@@ -19,6 +19,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.pen.Penner;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -44,6 +45,7 @@ public class WorkTabPane extends JTabbedPane
 	
 	
 	public WorkTabPane( MasterControl master) {
+		this.setBackground( Globals.getColor("bg"));
 		this.master = master;
 		workPanel =  new WorkPanel(master);
 		

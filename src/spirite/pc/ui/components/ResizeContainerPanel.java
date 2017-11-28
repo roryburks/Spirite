@@ -52,6 +52,7 @@ public class ResizeContainerPanel extends JPanel{
 	}
 	
 	public ResizeContainerPanel(JComponent component, ContainerOrientation orientation) {
+		this.setBackground( Globals.getColor("bg"));
 		leadingBars = new ArrayList<>();
 		trailingBars = new ArrayList<>();
 		this.cOrientation = orientation;
@@ -253,6 +254,9 @@ public class ResizeContainerPanel extends JPanel{
 				JComponent component,
 				boolean trailing) 
 		{
+			this.setBackground( Globals.getColor("bg"));
+			pullBar.setBackground(Globals.getColor("bg"));
+			
 			this.min_size = min_size;
 			this.size = default_size;
 			this.component = component;

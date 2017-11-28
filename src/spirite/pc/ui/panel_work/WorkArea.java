@@ -42,7 +42,7 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  */
 public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelectionEngineObserver, MReferenceObserver {
 
-	protected static final Color normalBG = Globals.getColor("workArea.normalBG");
+	protected static final Color normalBG = Globals.getColor("bg");
 	protected static final Color referenceBG = Globals.getColor("workArea.referenceBG");
 	
 //	private final WorkPanel context;

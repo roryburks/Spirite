@@ -51,6 +51,9 @@ public class Globals {
 
 	        {"workArea.normalBG", new Color(238,238,238)},
 	        {"workArea.referenceBG", new Color( 210,210,242)},
+
+	        //{"bg", new Color(152, 166, 173)},
+	        {"bg", new Color( 238,238,238)},
 	    };
 	    colors = new Hashtable<>(data.length);
 	    for( Object[] datum : data) {

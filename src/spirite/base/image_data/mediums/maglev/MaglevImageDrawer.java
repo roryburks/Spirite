@@ -2,7 +2,6 @@ package spirite.base.image_data.mediums.maglev;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,12 +32,10 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.DrawPoints;
-import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.Vec2;
 
 public class MaglevImageDrawer 
 	implements 	IImageDrawer,
@@ -139,17 +136,18 @@ public class MaglevImageDrawer
 	// :::: ITransformModule
 	@Override
 	public void transform(MatTrans trans) {
-		for( AMagLevThing things : img.things) {
-			float xy[] = things.getPoints();
-			if( xy == null) continue;
-			for( int i=0; i < xy.length/2; ++i) {
-				Vec2 to = trans.transform(new Vec2(xy[i*2],xy[i*2+1]), new Vec2(0,0));
-				xy[i*2] = to.x;
-				xy[i*2+1] = to.y;
+		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
+			@Override
+			protected void performImageAction(ABuiltMediumData built) {
+				ImageWorkspace ws = built.handle.getContext();
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+				for( AMagLevThing things : mimg.things) {
+					things.transform(trans);		
+				}
+				mimg.unbuild();
+				mimg.Build();
 			}
-			things.setPoints(xy);
-		}
-		img.unbuild();
+		});
 	}
 
 	
@@ -170,7 +168,6 @@ public class MaglevImageDrawer
 		}
 	}
 	BuildingStrokeSegment ss;
-	int floatSoft;
 	List<BuildingStrokeSegment> strokeSegments;
 	@Override public void startMagneticFill() { 
 		ss = null;
