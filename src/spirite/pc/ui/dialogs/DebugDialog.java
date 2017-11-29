@@ -9,9 +9,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -21,6 +19,8 @@ import javax.swing.border.EmptyBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.gl.GLEngine;
+import spirite.gui.hybrid.SButton;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.DebugObserver;
@@ -38,9 +38,9 @@ public class DebugDialog extends JDialog
 	JTextPane textDebug = new JTextPane();
 	private SPanel buttonPane;
 	private JScrollPane scrollPane;
-	JButton btnReset = new JButton("Reset Debug Log");
-	JLabel lblUsedResources = new JLabel("Used Resources:");
-	JLabel lblDebugLog = new JLabel("Debug Log:");
+	SButton btnReset = new SButton("Reset Debug Log");
+	SLabel lblUsedResources = new SLabel("Used Resources:");
+	SLabel lblDebugLog = new SLabel("Debug Log:");
 	JScrollPane scrollResources = new JScrollPane();
 	/**
 	 * Create the dialog.

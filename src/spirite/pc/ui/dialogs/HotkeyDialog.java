@@ -15,7 +15,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -26,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.MasterControl;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.components.SimpleTree;
 
@@ -123,7 +123,7 @@ public class HotkeyDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				SButton okButton = new SButton("OK");
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				okButton.addActionListener( new ActionListener() {

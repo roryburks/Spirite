@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -14,6 +13,7 @@ import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.base.util.linear.Vec2;
+import spirite.gui.hybrid.SLabel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.components.MTextFieldNumber;
 
@@ -45,9 +45,9 @@ public class DualFloatBoxProperty extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JLabel labelMain = new JLabel(hrName + ":");
-		JLabel label1 = new JLabel( _label1);
-		JLabel label2 = new JLabel( _label2);
+		SLabel labelMain = new SLabel(hrName + ":");
+		SLabel label1 = new SLabel( _label1);
+		SLabel label2 = new SLabel( _label2);
 		MTextFieldNumber textField1 = new MTextFieldNumber(true, true);
 		MTextFieldNumber textField2 = new MTextFieldNumber(true, true);
 		

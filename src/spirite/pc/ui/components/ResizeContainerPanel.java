@@ -14,11 +14,11 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 
@@ -205,7 +205,7 @@ public class ResizeContainerPanel extends SPanel{
 		protected final Icon iconExpanded;
 		protected final Icon iconUnexpanded;
 		protected final Color BAR_LINE_COLOR = Globals.getColor("resizePanel.barLineColor");
-		protected final JButton btnExpand = new JButton();
+		protected final SButton btnExpand = new SButton();
 		protected final SPanel pullBar = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {

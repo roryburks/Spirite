@@ -11,14 +11,14 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import spirite.base.graphics.RawImage;
-import spirite.gui.generic.SButton;
+import spirite.gui.generic.ISButton;
 import spirite.gui.generic.events.SActionEvent;
 import spirite.gui.generic.events.SActionEvent.SActionListener;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 
 public class SwingGuiButton extends SwingGuiComponent 
-	implements SButton
+	implements ISButton
 {
 	private final JButton button = new JButton() {
 		protected void paintComponent(Graphics g) {

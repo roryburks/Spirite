@@ -8,12 +8,12 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
+import spirite.gui.hybrid.SCheckBox;
 
 public class CheckBoxProperty extends SwingToolProperty {
 	private boolean value;
@@ -35,7 +35,7 @@ public class CheckBoxProperty extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JCheckBox checkbox = new JCheckBox(hrName);
+		SCheckBox checkbox = new SCheckBox(hrName);
 		
 		checkbox.addActionListener(new ActionListener() {
 			@Override

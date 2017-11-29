@@ -17,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
+import spirite.hybrid.Globals;
+
 /**
 * This is an implementation of a JScrollPane with a modern UI
 * 
@@ -43,7 +45,8 @@ public class SScrollPane extends JScrollPane {
     }
 
     public SScrollPane(Component view, int vsbPolicy, int hsbPolicy) {
-
+    	this.setBackground(Globals.getColor("bg"));
+    	this.getViewport().setBackground(Globals.getColor("bg"));
         setBorder(null);
 
         // Set ScrollBar UI

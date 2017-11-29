@@ -28,7 +28,6 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
@@ -48,6 +47,7 @@ import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.UIUtil;
@@ -147,7 +147,7 @@ public class AnimationSchemeTreePanel extends SPanel
 	private static final int TITLE_HEIGHT = 24;
 	
 	
-	class ExpandButton extends JToggleButton implements ActionListener {
+	class ExpandButton extends SToggleButton implements ActionListener {
 		private final Component content;
 		private final Animation animation;
 		ExpandButton(Component content, Animation animation) {
@@ -378,7 +378,7 @@ public class AnimationSchemeTreePanel extends SPanel
 			}
 		}
 		
-		private class LinkButton extends JToggleButton implements ActionListener {
+		private class LinkButton extends SToggleButton implements ActionListener {
 			private final AnimationLayer layer;
 			LinkButton(AnimationLayer layer) {
 				this.layer = layer;

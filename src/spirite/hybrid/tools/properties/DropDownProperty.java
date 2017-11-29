@@ -8,13 +8,13 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
+import spirite.gui.hybrid.SComboBox;
+import spirite.gui.hybrid.SLabel;
 import spirite.hybrid.Globals;
 
 public class DropDownProperty<T extends Enum<T>> extends SwingToolProperty {
@@ -40,8 +40,8 @@ public class DropDownProperty<T extends Enum<T>> extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JComboBox<T> comboBox = new JComboBox<>();
-		JLabel label = new JLabel( hrName + ":");
+		SComboBox<T> comboBox = new SComboBox<>();
+		SLabel label = new SLabel( hrName + ":", false);
 		label.setFont( Globals.getFont("toolset.dropdown"));
 		
 		// Init Components

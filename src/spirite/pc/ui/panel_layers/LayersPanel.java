@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
@@ -21,12 +19,10 @@ import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.gui.generic.SButton;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.STabbedPane;
-import spirite.gui.swing.SwingGuiButton;
 import spirite.hybrid.Globals;
-import spirite.hybrid.HybridUI;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
 import spirite.pc.ui.dialogs.Dialogs;
@@ -44,8 +40,8 @@ public class LayersPanel extends SPanel
 
 	private final Dialogs dialogs;
 	private final LayerTreePanel layerTreePanel;
-	private final SButton btnNewLayer = HybridUI.getGuiComposer().Button();
-	private final SButton btnNewGroup = HybridUI.getGuiComposer().Button();
+	private final SButton btnNewLayer = new SButton();
+	private final SButton btnNewGroup = new SButton();
 	private final OpacitySlider opacitySlider =  new OpacitySlider();
 	private final LayerAnimView layerAnimView;
 	private final LayerTabPane layerTabPane;
@@ -107,17 +103,17 @@ public class LayersPanel extends SPanel
 	
 	private void initComponents() {
 		btnNewLayer.setToolTipText("New Layer");
-		btnNewLayer.setIcon(Globals.getIconImg("new_layer"));
+		btnNewLayer.setIcon(Globals.getIcon("new_layer"));
 
 		btnNewGroup.setToolTipText("New Group");
-		btnNewGroup.setIcon( Globals.getIconImg("new_group"));
+		btnNewGroup.setIcon( Globals.getIcon("new_group"));
 		rcLabel.setFont(new Font("Tahoma", 0, 10));
 
 		renderCombo.setRenderer( renderer);
 	}
 	
 	private void initBindings() {
-		btnNewLayer.addActionListner((e) -> {
+		btnNewLayer.addActionListener((evt) -> {
 			// Create New Layer
 			ImageWorkspace workspace = layerTreePanel.workspace;
 			NewLayerHelper helper = dialogs.callNewLayerDialog(workspace);
@@ -127,18 +123,16 @@ public class LayersPanel extends SPanel
 					helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 		});
-		btnNewGroup.addActionListner((e) ->{
+		btnNewGroup.addActionListener((evt) -> {
 			// Create New Group
 			GroupTree.Node selected_node = layerTreePanel.getSelectedNode();
 			
 			layerTreePanel.workspace.addGroupNode(selected_node, "Test");
 		});
-		renderCombo.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if( !uilocked) {
-					updateSelMethod();
-					resetRCOptionPanel();
-				}
+		renderCombo.addActionListener( (evt) -> {
+			if( !uilocked) {
+				updateSelMethod();
+				resetRCOptionPanel();
 			}
 		});
 	}
@@ -152,8 +146,6 @@ public class LayersPanel extends SPanel
 	}
 	
 	private void initLayout() {
-		JComponent _btnNewLayer = ((SwingGuiButton)btnNewLayer).getComponent();
-		JComponent _btnNewGroup = ((SwingGuiButton)btnNewGroup).getComponent();
 		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
@@ -168,9 +160,9 @@ public class LayersPanel extends SPanel
 						)
 						.addComponent(opacitySlider)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 							.addGap(1)
-							.addComponent(_btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
 						.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE))
 					.addGap(3))
 		);
@@ -188,8 +180,8 @@ public class LayersPanel extends SPanel
 					.addComponent(layerTabPane, GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(_btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-						.addComponent(_btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnNewLayer, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNewGroup, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addGap(16))
 		);
 		setLayout(groupLayout);

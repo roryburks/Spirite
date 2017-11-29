@@ -20,11 +20,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
@@ -37,7 +34,10 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SButton;
+import spirite.gui.hybrid.SComboBox;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.ContextMenus;
@@ -56,15 +56,15 @@ public class PalettePanel extends SPanel
     private final static int SMALL_SIZE = 12;
 
     private ColorPicker main, sub;
-    private JScrollPane container;
+    private SScrollPane container;
     private PaletteSubpanel palette;
-    private JButton btnCopyPalette;
-    private JButton btnPastePalette;
-    private JButton btnSavePalette;
-    private JButton btnLoadPalette;
-    private JButton btnAddPalette;
-    private JComboBox<String> boxPalette;
-    private JButton btnRemovePalette;
+    private SButton btnCopyPalette;
+    private SButton btnPastePalette;
+    private SButton btnSavePalette;
+    private SButton btnLoadPalette;
+    private SButton btnAddPalette;
+    private SComboBox<String> boxPalette;
+    private SButton btnRemovePalette;
     
     private Palette wPalette;
     
@@ -98,22 +98,22 @@ public class PalettePanel extends SPanel
 
         palette = new PaletteSubpanel();
 
-        container = new JScrollPane(palette, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        container = new SScrollPane(palette, SScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, SScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         container.getHorizontalScrollBar().setPreferredSize(new Dimension(5, 0));
 
-        btnSavePalette = new JButton();
-        btnLoadPalette = new JButton();
-        btnAddPalette = new JButton();
-        btnRemovePalette = new JButton();
-        btnCopyPalette = new JButton();
-        btnPastePalette = new JButton();
+        btnSavePalette = new SButton();
+        btnLoadPalette = new SButton();
+        btnAddPalette = new SButton();
+        btnRemovePalette = new SButton();
+        btnCopyPalette = new SButton();
+        btnPastePalette = new SButton();
         btnCopyPalette.setToolTipText("Copy Palette");
         btnPastePalette.setToolTipText("Paste Palette");
         btnSavePalette.setToolTipText("Save Palette");
         btnLoadPalette.setToolTipText("Load Palette");
         btnAddPalette.setToolTipText("Add NewPalette");
         btnRemovePalette.setToolTipText("Remove Palette");
-        boxPalette = new JComboBox<String>(new String[] {"Default", "2"});
+        boxPalette = new SComboBox<String>(new String[] {"Default", "2"});
         
         btnSavePalette.addActionListener( this);
         btnLoadPalette.addActionListener( this);
@@ -122,11 +122,6 @@ public class PalettePanel extends SPanel
         btnLoadPalette.setIcon(Globals.getIcon("palLoadPalette"));
         btnAddPalette.setIcon(Globals.getIcon("palNewColor"));
         //btnRemovePalette.setIcon(Globals.getIcon("palRemPalette"));
-
-        btnSavePalette.setBackground( new Color( 170,170,220));
-        btnLoadPalette.setBackground( new Color( 170,170,220));
-        btnAddPalette.setBackground( new Color( 170,170,220));
-        btnRemovePalette.setBackground( new Color( 170,170,220));
         
         Dimension bsize = new Dimension(24, 12);
         int ddheight = 16;

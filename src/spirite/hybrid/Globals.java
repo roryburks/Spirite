@@ -40,8 +40,9 @@ public class Globals {
 	        {"drawpanel.layer.border", new Color(190,190,120)},
 	        {"toolbutton.selected.background", new Color( 128,128,128)},
 
-	        {"contentTree.selectedBGDragging", new Color( 192,192,212)},
-	        {"contentTree.selectedBackground",new Color( 160,160,196)},
+	        {"contentTree.selectedBGDragging", new Color( 160,160,196)},
+	        {"contentTree.selectedBackground",new Color( 128,128,156)},
+	        {"contentTree.background",new Color( 96,96,96)},
 
 	        {"undoPanel.selectedBackground",new Color( 160,160,196)},
 	        {"undoPanel.background",new Color( 238,238,238)},
@@ -53,13 +54,24 @@ public class Globals {
 	        {"workArea.referenceBG", new Color( 210,210,242)},
 
 	        {"resizePanel.barLineColor", new Color( 0,73,98)},
+	        
+	        {"textField.Background", new Color(0,168,223)},
 
 	        {"tabbedPane.SelectedBG", new Color(0,168,223)},
 	        {"tabbedPane.UnselectedBG",  new Color(0, 118, 155)},
 	        {"tabbedPane.TabBorder",  new Color(0, 90, 125)},
 	        {"tabbedPane.TabText", new Color(255,255,255)},
 	        
+	        {"bevelBorderLight",new Color(0,150,203)},
+	        {"bevelBorderMed",  new Color(0, 90, 125)},
+	        {"bevelBorderDark", new Color(0, 72,100)},
+	        {"bevelBorderDarker", new Color(0, 58,80)},
+
+	        {"bgDark", new Color(0, 90, 125)},
 	        {"bg", new Color(0, 118, 155)},
+	        {"fg", new Color(0,168,223)},
+	        {"text", new Color(190,205,220)},
+	        {"textDark", new Color(57,62,66)},
 	        //{"bg", new Color( 238,238,238)},
 	    };
 	    colors = new Hashtable<>(data.length);

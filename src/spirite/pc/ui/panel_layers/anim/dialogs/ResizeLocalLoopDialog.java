@@ -3,12 +3,12 @@ package spirite.pc.ui.panel_layers.anim.dialogs;
 import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import spirite.gui.hybrid.SButton;
 import spirite.pc.ui.components.MTextFieldNumber;
 
 public class ResizeLocalLoopDialog extends JDialog {
@@ -30,8 +30,8 @@ public class ResizeLocalLoopDialog extends JDialog {
 			"Length",
 			"Loop X Times"
 		});
-		JButton btnOK = new JButton("OK");
-		JButton btnCancel = new JButton("Cancel");
+		SButton btnOK = new SButton("OK");
+		SButton btnCancel = new SButton("Cancel");
 
 		cbType.setSelectedIndex((inLoops)?1:0);
 		tfLength.setText(Integer.toString(length));

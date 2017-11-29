@@ -6,13 +6,13 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
+import spirite.gui.hybrid.SLabel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.components.MTextFieldNumber;
 
@@ -37,7 +37,7 @@ public class FloatBoxProperty extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JLabel label = new JLabel( hrName + ":");
+		SLabel label = new SLabel( hrName + ":");
 		MTextFieldNumber textField = new MTextFieldNumber(true, true);
 		
 		label.setFont( Globals.getFont("toolset.dropdown"));

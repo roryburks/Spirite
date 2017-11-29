@@ -1,6 +1,5 @@
 package spirite.gui.hybrid;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -9,7 +8,6 @@ import java.awt.Rectangle;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
-import spirite.base.util.Colors;
 import spirite.hybrid.Globals;
 
 public class STabbedPane extends JTabbedPane {
@@ -60,24 +58,22 @@ public class STabbedPane extends JTabbedPane {
 		protected void paintContentBorderBottomEdge(Graphics g, int tabPlacement, int selectedIndex, int x, int y,
 				int w, int h) 
 		{
-			g.setColor(Globals.getColor("tabbedPane.TabBorder"));
+			g.setColor(Globals.getColor("bevelBorderMed"));
 			g.fillRect(x, y, w, 2);
 			g.fillRect(x, y, 2, h);
 	
-			Color c2 =Colors.darken(Globals.getColor("tabbedPane.TabBorder"));
-			g.setColor(c2);
+			g.setColor(Globals.getColor("bevelBorderDark"));
 			g.fillRect(x+w-4, y, 4, h);
 			g.fillRect(x, y+h-4, w, 4);
 			
 
-			g.setColor(Globals.getColor("tabbedPane.SelectedBG"));
+			g.setColor(Globals.getColor("bevelBorderLight"));
 			g.drawLine(x+1, y+1, x+w-2, y+1);
 			g.drawLine(x+1, y+1, x+1, y+h-2);
 			g.drawLine(x+1, y+h-2, x+w-2, y+h-2);
 			g.drawLine(x+w-2, y+1, x+w-2, y+h-2);
-			
-			Color c3 =Colors.darken(c2);
-			g.setColor(c3);
+
+			g.setColor(Globals.getColor("bevelBorderDarker"));
 			g.drawLine(x, y+h-1, x+w-1, y+h-1);
 			g.drawLine(x+w-1, y, x+w-1, y+h-1);
 		}

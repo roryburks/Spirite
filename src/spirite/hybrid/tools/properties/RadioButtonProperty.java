@@ -9,10 +9,10 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
-import javax.swing.JRadioButton;
 
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SRadioButton;
 
 public class RadioButtonProperty<T extends Enum<T>> extends SwingToolProperty {
 	private T value;
@@ -43,9 +43,9 @@ public class RadioButtonProperty<T extends Enum<T>> extends SwingToolProperty {
 		
 		
 		// Create Components and their settings
-		JRadioButton[] radioButtons = new JRadioButton[  len];
+		SRadioButton[] radioButtons = new SRadioButton[  len];
 		for( int i=0; i< len; ++i) {
-			radioButtons[i] = new JRadioButton(type.getEnumConstants()[i].toString());
+			radioButtons[i] = new SRadioButton(type.getEnumConstants()[i].toString());
 			links.add( radioButtons[i]);
 			radioButtons[i].setFont(new Font("Tahoma",Font.PLAIN, 10));
 		}

@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -19,6 +18,7 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SSlider;
 import spirite.gui.hybrid.STabbedPane;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -188,12 +188,12 @@ public class ColorPicker extends  SPanel
 			);
 	}
 	
-	class ColorSlider extends JSlider {
+	class ColorSlider extends SSlider {
 		ColorSlider() {
 			setMinimum(0);
 			setMaximum(255);
 			setValue(0);
-			setOrientation(JSlider.HORIZONTAL);
+			setOrientation(SSlider.HORIZONTAL);
 		}
 	}
 	class ColorText extends MTextFieldNumber {
@@ -310,10 +310,10 @@ public class ColorPicker extends  SPanel
 	 * robust form of data binding that should be used in general.
 	 */
 	class ComponentsHSVA {
-		final JSlider hSlider = new JSlider();
-		final JSlider sSlider = new JSlider();
-		final JSlider vSlider = new JSlider();
-		final JSlider aSlider = new JSlider();
+		final SSlider hSlider = new SSlider();
+		final SSlider sSlider = new SSlider();
+		final SSlider vSlider = new SSlider();
+		final SSlider aSlider = new SSlider();
 		final MTextFieldNumber hText = new MTextFieldNumber();
 		final MTextFieldNumber sText = new MTextFieldNumber();
 		final MTextFieldNumber vText = new MTextFieldNumber();

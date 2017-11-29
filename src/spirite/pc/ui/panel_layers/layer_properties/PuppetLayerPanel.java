@@ -9,8 +9,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
@@ -20,7 +18,9 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
@@ -55,8 +55,8 @@ public class PuppetLayerPanel extends SPanel
 	private final String bpp_BASE = "Base";
 	
 	
-	private JToggleButton btnSkeleton = new JToggleButton();
-	private JToggleButton btnBase = new JToggleButton();
+	private SToggleButton btnSkeleton = new SToggleButton();
+	private SToggleButton btnBase = new SToggleButton();
 	
 	private final int BUTTON_SIZE = 36;
 	private BoxList<BasePart> boxPuppetParts = new BoxList<BasePart>(null, BUTTON_SIZE, BUTTON_SIZE) {
@@ -67,9 +67,9 @@ public class PuppetLayerPanel extends SPanel
 			return true;
 		};
 	};
-	private final JButton bNewPart = new JButton();
-	private final JButton bRemovePart = new JButton();
-	private final JToggleButton bNodeVisiblity = new JToggleButton();
+	private final SButton bNewPart = new SButton();
+	private final SButton bRemovePart = new SButton();
+	private final SToggleButton bNodeVisiblity = new SToggleButton();
 	private final OpacitySlider opacitySlider = new OpacitySlider();
 	
 	private void initLayout() {

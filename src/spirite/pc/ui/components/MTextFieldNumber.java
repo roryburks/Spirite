@@ -3,12 +3,16 @@ package spirite.pc.ui.components;
 import java.awt.Color;
 import java.awt.Toolkit;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+
+import spirite.hybrid.Globals;
 
 
 /***
@@ -42,6 +46,10 @@ public class MTextFieldNumber extends JTextField implements DocumentListener {
 		init();
 	}
 	private void init() {
+		this.setBackground(Globals.getColor("textField.Background"));
+		this.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED, 
+				Globals.getColor("bevelBorderLight"), 
+				Globals.getColor("bevelBorderDark")));
 		mdocument = new MTFNDocument();
 		this.setDocument(mdocument);
 		this.getDocument().addDocumentListener(this);

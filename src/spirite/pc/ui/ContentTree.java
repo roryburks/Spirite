@@ -121,7 +121,7 @@ public class ContentTree extends SPanel
 		
 		
 		// Make the background invisible as we will draw the background manually
-		bgColor = tree.getBackground();
+		bgColor = Globals.getColor("contentTree.background");//tree.getBackground();
 		container.setOpaque( false);
 		tree.setOpaque(false);
 		buttonPanel.setOpaque(false);

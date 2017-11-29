@@ -32,13 +32,13 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 
 public class BetterTree extends SPanel {
@@ -345,7 +345,7 @@ public class BetterTree extends SPanel {
 		}
 	}
 
-	class ExpandButton extends JToggleButton implements ActionListener {
+	class ExpandButton extends SToggleButton implements ActionListener {
 		private final BranchingNode node;
 		ExpandButton( BranchingNode node) {
 			this.node = node;

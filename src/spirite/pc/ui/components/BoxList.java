@@ -17,12 +17,12 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane;
 import spirite.pc.ui.UIUtil;
 
 public class BoxList<T> extends SPanel {
@@ -30,7 +30,7 @@ public class BoxList<T> extends SPanel {
 	private final List<T> entries = new ArrayList<T>();
 
 	private final SPanel content = new SPanel();
-	private final JScrollPane scroll = new JScrollPane(content);
+	private final SScrollPane scroll = new SScrollPane(content);
 	
 	// ========
 	// ==== Semi-Abstract
@@ -182,7 +182,7 @@ public class BoxList<T> extends SPanel {
 	// =======
 	// ==== Node Renderer
 	private BoxListNodeRenderer<T> renderer = (t, index, selected) -> {
-		return new JLabel(t.toString());
+		return new SLabel(t.toString());
 	};
 	
 	public void setRenderer( BoxListNodeRenderer<T> renderer) {

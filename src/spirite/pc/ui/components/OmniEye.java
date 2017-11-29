@@ -1,7 +1,7 @@
 package spirite.pc.ui.components;
 
-import javax.swing.JToggleButton;
+import spirite.gui.hybrid.SToggleButton;
 
-public class OmniEye extends JToggleButton {
+public class OmniEye extends SToggleButton {
 
 }

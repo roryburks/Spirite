@@ -12,12 +12,9 @@ import java.util.Hashtable;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -40,7 +37,10 @@ import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SSlider;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -79,14 +79,14 @@ public class AnimationPreviewPanel extends SPanel
     private final JLabel lbRight = new JLabel();
     private final DisplayPanel previewPanel = new DisplayPanel();
     private MTextFieldNumber tfFPS;
-    private final JButton buttonBack = new JButton();
-    private final JToggleButton buttonPlay = new JToggleButton();
-    private final JButton buttonForward = new JButton();
-    private final JButton buttonExport = new JButton();
-    private final JSlider slider = new JSlider();
+    private final SButton buttonBack = new SButton();
+    private final SToggleButton buttonPlay = new SToggleButton();
+    private final SButton buttonForward = new SButton();
+    private final SButton buttonExport = new SButton();
+    private final SSlider slider = new SSlider();
     private final SliderLimiter sliderLimiter = new SliderLimiter();
     private final JSpinner spinner = new JSpinner();
-    private final JButton buttonColor = new JButton();
+    private final SButton buttonColor = new SButton();
     
 	
     /**

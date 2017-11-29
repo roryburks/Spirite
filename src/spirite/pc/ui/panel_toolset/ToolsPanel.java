@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.JToggleButton;
 
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
@@ -33,6 +32,7 @@ import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 import spirite.pc.ui.components.BoxList;
@@ -70,6 +70,7 @@ public class ToolsPanel extends SPanel
 
 
     public ToolsPanel( MasterControl master) {
+    	
     	this.toolsetManager = master.getToolsetManager();
     	this.hotkeyManager = master.getHotekyManager();
 
@@ -95,7 +96,6 @@ public class ToolsPanel extends SPanel
         this.setLayout( new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.addComponentListener(this);
         this.setPreferredSize(new java.awt.Dimension(140, 140));
-
         
         boxList.setRenderer((t, index, selected) -> {
         	ToolButton btn = new ToolButton(t);
@@ -139,7 +139,7 @@ public class ToolsPanel extends SPanel
     /**
      * Tool Button
      */
-    class ToolButton extends JToggleButton
+    class ToolButton extends SToggleButton
             implements ActionListener, MouseListener
     {
 		private static final long serialVersionUID = 1L;

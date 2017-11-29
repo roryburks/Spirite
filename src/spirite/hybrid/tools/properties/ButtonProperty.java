@@ -8,12 +8,12 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 
 public class ButtonProperty extends SwingToolProperty {
@@ -40,7 +40,7 @@ public class ButtonProperty extends SwingToolProperty {
 	public List<JComponent> buildComponent(DataBinding binding, Group horizontal, Group vertical,
 			GroupLayout layout, ToolSettings settings) 
 	{
-		JButton button = new JButton(hrName);
+		SButton button = new SButton(hrName);
 		SPanel panel = new SPanel();
 		
 		button.setActionCommand( command);

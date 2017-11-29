@@ -3,7 +3,7 @@ package spirite.gui.generic;
 import spirite.base.graphics.RawImage;
 import spirite.gui.generic.events.SActionEvent.SActionListener;
 
-public interface SButton extends SComponent {
+public interface ISButton extends SComponent {
 	public void setIcon( RawImage img);
 	
 

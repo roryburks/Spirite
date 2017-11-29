@@ -3,7 +3,6 @@ package spirite.pc.ui.panel_layers.layer_properties;
 import java.awt.Graphics;
 
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import spirite.base.brains.MasterControl;
@@ -14,6 +13,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -26,7 +26,7 @@ public class ReferenceLayerPanel extends SPanel {
 	
 	private final JLabel lblRefTo = new JLabel();
 	private final RefDrawArea drawPanel = new RefDrawArea();
-	private final JButton btnDeep = new JButton("Deep Copy");
+	private final SButton btnDeep = new SButton("Deep Copy");
 	
 	ReferenceLayerPanel( MasterControl master) {
 		this.master = master;

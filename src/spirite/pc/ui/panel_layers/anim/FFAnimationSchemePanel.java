@@ -20,7 +20,6 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -42,7 +41,9 @@ import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Fra
 import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.util.Colors;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -506,9 +507,9 @@ public class FFAnimationSchemePanel extends SPanel
 	
 	private class MainTitleBar extends SPanel {
 		String title;
-		private final JLabel label = new JLabel();
-		private final JToggleButton btnExpand = new JToggleButton();
-		private final JToggleButton btnVisible = new JToggleButton();
+		private final SLabel label = new SLabel();
+		private final SToggleButton btnExpand = new SToggleButton();
+		private final SToggleButton btnVisible = new SToggleButton();
 		
 		private MainTitleBar() {
 			btnExpand.setOpaque(false);
@@ -694,9 +695,9 @@ public class FFAnimationSchemePanel extends SPanel
 	}
 	
 	private class BottomPanel extends SPanel {
-		private final JToggleButton btnLock = new JToggleButton("X");
-		private final JToggleButton btnSettings = new JToggleButton("S");
-		private final JToggleButton omniEye = new OmniEye();
+		private final SToggleButton btnLock = new SToggleButton("X");
+		private final SToggleButton btnSettings = new SToggleButton("S");
+		private final SToggleButton omniEye = new OmniEye();
 		private final int column;
 		private final AnimationLayer layer;
 		

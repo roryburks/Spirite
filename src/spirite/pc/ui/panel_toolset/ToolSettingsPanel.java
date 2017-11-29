@@ -1,6 +1,5 @@
 package spirite.pc.ui.panel_toolset;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -11,8 +10,6 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -26,7 +23,10 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane;
+import spirite.hybrid.Globals;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
@@ -54,8 +54,8 @@ public class ToolSettingsPanel extends SPanel
 	private final Map<JComponent,Property> activeMap = new HashMap<>();
 
 	
-	private final JLabel label;
-	private final JScrollPane container;
+	private final SLabel label;
+	private final SScrollPane container;
 	public ToolSettingsPanel( MasterControl master) {
 		this.master = master;
 		this.manager = master.getToolsetManager();
@@ -63,8 +63,8 @@ public class ToolSettingsPanel extends SPanel
 		
 		
 		
-		label = new JLabel();
-		container = new JScrollPane();
+		label = new SLabel(true);
+		container = new SScrollPane(null);
 		
 		initLayout();
 		updatePanel();
@@ -78,7 +78,7 @@ public class ToolSettingsPanel extends SPanel
 	}
 	
 	void initLayout() {
-		setBackground( Color.WHITE);
+		setBackground( Globals.getColor("fg"));
 		GroupLayout layout = new GroupLayout(this);
 		
 		layout.setHorizontalGroup( layout.createSequentialGroup()

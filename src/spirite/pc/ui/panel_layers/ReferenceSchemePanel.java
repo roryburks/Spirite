@@ -29,7 +29,6 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -53,6 +52,7 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.linear.Vec2;
+import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -79,8 +79,8 @@ public class ReferenceSchemePanel extends SPanel
 	implements OmniComponent, MWorkspaceObserver
 {
 	private final ReferenceListPanel referenceListPanel;
-	private final JButton btnReset = new JButton();
-	private final JButton btnLift = new JButton();
+	private final SButton btnReset = new SButton();
+	private final SButton btnLift = new SButton();
 	final OpacitySlider opacitySlider = new OpacitySlider();
 	
 	private final MasterControl master;

@@ -577,6 +577,7 @@ public class LayerTreePanel extends ContentTree
 
 			LTNPPanel() {
 				this.setOpaque(false);
+				label.setForeground(Globals.colors.get("text"));
 			}
 			
 			@Override
