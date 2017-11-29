@@ -19,7 +19,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -43,6 +42,7 @@ import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Fra
 import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.util.Colors;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -56,7 +56,7 @@ import spirite.pc.ui.panel_layers.anim.dialogs.ResizeLocalLoopDialog;
 /***
  * AnimationSchemePanel is a grid 
  */
-public class FFAnimationSchemePanel extends JPanel 
+public class FFAnimationSchemePanel extends SPanel 
 	implements MWorkspaceObserver, MNodeSelectionObserver, MAnimationStateObserver 
 {
 	// :::: Control Links
@@ -107,10 +107,10 @@ public class FFAnimationSchemePanel extends JPanel
 	}
 
 	// :::: Components
-	private final JPanel topLeft = new JPanel();
-	private final JPanel bottomRight = new JPanel();
+	private final SPanel topLeft = new SPanel();
+	private final SPanel bottomRight = new SPanel();
 	private final MainTitleBar titleBar;
-	private final JPanel content = new JPanel() {
+	private final SPanel content = new SPanel() {
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
@@ -504,7 +504,7 @@ public class FFAnimationSchemePanel extends JPanel
 		this.repaint();
 	}
 	
-	private class MainTitleBar extends JPanel {
+	private class MainTitleBar extends SPanel {
 		String title;
 		private final JLabel label = new JLabel();
 		private final JToggleButton btnExpand = new JToggleButton();
@@ -580,7 +580,7 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	}
 	
-	private class LayerTitleBar extends JPanel {
+	private class LayerTitleBar extends SPanel {
 		String title;
 		private final JLabel label = new JLabel();
 		
@@ -597,10 +597,10 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	}
 	
-	private class TickPanel extends JPanel {
+	private class TickPanel extends SPanel {
 		private int tick;
 		private final JLabel label = new JLabel();
-		private final JPanel eyeIcon = new JPanel() {
+		private final SPanel eyeIcon = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 				AnimationState as = ws.getAnimationManager().getAnimationState(animation);
@@ -693,7 +693,7 @@ public class FFAnimationSchemePanel extends JPanel
 		};
 	}
 	
-	private class BottomPanel extends JPanel {
+	private class BottomPanel extends SPanel {
 		private final JToggleButton btnLock = new JToggleButton("X");
 		private final JToggleButton btnSettings = new JToggleButton("S");
 		private final JToggleButton omniEye = new OmniEye();
@@ -739,7 +739,7 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	}
 	
-	private class SoFFramePanel extends JPanel {
+	private class SoFFramePanel extends SPanel {
 		private static final int HEIGHT = 6;
 		private final Frame frame;
 		private final int column;
@@ -777,7 +777,7 @@ public class FFAnimationSchemePanel extends JPanel
 		};
 	}
 	
-	private class EoFFramePanel extends JPanel {
+	private class EoFFramePanel extends SPanel {
 		private static final int HEIGHT = 6;
 		private final Frame frame;
 		private final int column;
@@ -845,14 +845,14 @@ public class FFAnimationSchemePanel extends JPanel
 		}
 	}
 	
-	private class FrameFramePanel extends JPanel {
+	private class FrameFramePanel extends SPanel {
 		private final Frame frame;
 		private final int column;
 		
-		private final JPanel btnVLock = new JPanel();
-		private final JPanel btnLLock = new JPanel();
+		private final SPanel btnVLock = new SPanel();
+		private final SPanel btnLLock = new SPanel();
 		
-		private final JPanel drawPanel = new JPanel() {
+		private final SPanel drawPanel = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -957,7 +957,7 @@ public class FFAnimationSchemePanel extends JPanel
 			super.paintComponent(g);
 		}
 
-		private class FrameExtendPanel extends JPanel {
+		private class FrameExtendPanel extends SPanel {
 			public FrameExtendPanel() {
 				this.setOpaque(false);
 			}
@@ -979,7 +979,7 @@ public class FFAnimationSchemePanel extends JPanel
 			};
 		}
 		
-		private class NillFramePanel extends JPanel {
+		private class NillFramePanel extends SPanel {
 			NillFramePanel(boolean isAfter) {
 				this.setOpaque(false);
 				

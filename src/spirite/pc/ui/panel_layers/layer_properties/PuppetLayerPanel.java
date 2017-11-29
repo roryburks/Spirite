@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
@@ -21,6 +20,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
@@ -28,7 +28,7 @@ import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.BoxList;
 import spirite.pc.ui.components.SliderPanel;
 
-public class PuppetLayerPanel extends JPanel 
+public class PuppetLayerPanel extends SPanel 
 	implements ActionListener, MFlashObserver
 {
 	private final MasterControl master;
@@ -146,7 +146,7 @@ public class PuppetLayerPanel extends JPanel
 		});
 	}
 	
-	private class PartPanel extends JPanel{
+	private class PartPanel extends SPanel{
 		final BasePart part;
 		PartPanel(BasePart part, boolean selected) {
 			this.part = part;

@@ -19,7 +19,6 @@ import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
@@ -33,7 +32,8 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.pen.Penner;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
-import spirite.hybrid.Globals;
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane.ModernScrollBarUI;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 import spirite.pc.ui.panel_work.gl.GLWorkArea;
@@ -61,7 +61,7 @@ import spirite.pc.ui.panel_work.gl.GLWorkArea;
  *
  * @author Rory Burks
  */
-public class WorkPanel extends javax.swing.JPanel 
+public class WorkPanel extends SPanel 
         implements MImageObserver,
         	AdjustmentListener, ComponentListener, AWTEventListener, MWorkspaceObserver
 {
@@ -86,7 +86,6 @@ public class WorkPanel extends javax.swing.JPanel
     private final JPenPenner jpenner;
 
     public WorkPanel( MasterControl master) {
-		this.setBackground( Globals.getColor("bg"));
         this.master = master;
         this.settingsManager = master.getSettingsManager();
         
@@ -352,7 +351,11 @@ public class WorkPanel extends javax.swing.JPanel
 
     private void initComponents() {
         jscrollVertical = new JScrollBar();
+        jscrollVertical.setOpaque(false);
+        jscrollVertical.setUI(new ModernScrollBarUI(this));
         jscrollHorizontal = new JScrollBar();
+        jscrollHorizontal.setOpaque(false);
+        jscrollHorizontal.setUI(new ModernScrollBarUI(this));
         
 
     	workArea = (gl)
@@ -363,7 +366,7 @@ public class WorkPanel extends javax.swing.JPanel
         
         coordinateLabel = new JLabel();
         messageLabel = new JLabel();
-        zoomPanel = new JPanel() {
+        zoomPanel = new SPanel() {
         	@Override
         	protected void paintComponent(Graphics g) {
         		super.paintComponent(g);
@@ -433,9 +436,9 @@ public class WorkPanel extends javax.swing.JPanel
     private javax.swing.JScrollBar jscrollHorizontal;
     private javax.swing.JScrollBar jscrollVertical;
     
-    private JPanel workAreaContainer = new JPanel();
+    private SPanel workAreaContainer = new SPanel();
     private WorkArea workArea;
-    private JPanel zoomPanel;
+    private SPanel zoomPanel;
 
     // ===============
     // ==== Event Listeners and Observers ====

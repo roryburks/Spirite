@@ -13,8 +13,8 @@ import javax.swing.AbstractSpinnerModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
@@ -40,6 +40,7 @@ import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -47,8 +48,9 @@ import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 
 
-public class AnimationPreviewPanel extends OmniComponent
-        implements MImageObserver, ActionListener, 
+public class AnimationPreviewPanel extends SPanel
+        implements OmniComponent,
+        	MImageObserver, ActionListener, 
         	DocumentListener, MWorkspaceObserver, MAnimationStructureObserver, 
         	ChangeListener, MAnimationStateObserver
 {
@@ -264,7 +266,7 @@ public class AnimationPreviewPanel extends OmniComponent
     
     
 
-    class SliderLimiter extends JPanel {
+    class SliderLimiter extends SPanel {
     	
     	@Override
     	public void paintComponent(Graphics g) {
@@ -332,7 +334,7 @@ public class AnimationPreviewPanel extends OmniComponent
 	
 
     
-    private class DisplayPanel extends JPanel {
+    private class DisplayPanel extends SPanel {
     	@Override
     	public void paintComponent(Graphics g) {
     		super.paintComponent(g);
@@ -474,10 +476,13 @@ public class AnimationPreviewPanel extends OmniComponent
 		repaint();
 	}
 	
-	// :::: Inherited from OmniContainer
+	// :::: Omnicomponent
 	@Override
 	public void onCleanup() {
 		timer.stop();
+	}
+	@Override public JComponent getComponent() {
+		return this;
 	}
 	
 	

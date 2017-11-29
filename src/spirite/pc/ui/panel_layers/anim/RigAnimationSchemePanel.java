@@ -7,14 +7,14 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.animations.RigAnimation;
 import spirite.base.image_data.layers.SpriteLayer.Part;
+import spirite.gui.hybrid.SPanel;
 
-public class RigAnimationSchemePanel extends JPanel {
+public class RigAnimationSchemePanel extends SPanel {
 	private final MasterControl master;
 	private final RigAnimation animation;
 
@@ -69,19 +69,19 @@ public class RigAnimationSchemePanel extends JPanel {
 		this.setLayout(layout);
 	}
 
-	private class TitleBar extends JPanel {
+	private class TitleBar extends SPanel {
 		TitleBar() {
 			this.setBackground(new Color(0xFFBBCCBB));
 			this.add(new JLabel(animation.getName()));
 		}
 	}
 	
-	private class BottomBar extends JPanel {
+	private class BottomBar extends SPanel {
 		BottomBar() {
 		}
 	}
 	
-	private class PartLabel extends JPanel {
+	private class PartLabel extends SPanel {
 		Part part;
 		PartLabel(Part part) {
 			this.part = part;
@@ -89,7 +89,7 @@ public class RigAnimationSchemePanel extends JPanel {
 			this.add(new JLabel(part.getTypeName()));
 		}
 	}
-	private class PartTicker extends JPanel {
+	private class PartTicker extends SPanel {
 
 		public PartTicker(Part part) {
 			// TODO Auto-generated constructor stub

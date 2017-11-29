@@ -9,11 +9,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
-import javax.swing.JPanel;
-
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil;
 
-public class SliderPanel extends JPanel {
+public class SliderPanel extends SPanel {
 	private float value = 0.0f;
 	private float min = 0.0f;
 	private float max = 1.0f;

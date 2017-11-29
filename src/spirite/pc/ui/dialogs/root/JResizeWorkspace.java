@@ -3,13 +3,13 @@ package spirite.pc.ui.dialogs.root;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import spirite.base.image_data.ImageWorkspace;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.components.MTextFieldNumber;
 
-public class JResizeWorkspace extends JPanel {
+public class JResizeWorkspace extends SPanel {
 	private final ImageWorkspace workspace;
 	
 	MTextFieldNumber tfWidth = new MTextFieldNumber(false, false);

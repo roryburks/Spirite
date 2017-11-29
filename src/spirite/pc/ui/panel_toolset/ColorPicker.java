@@ -6,10 +6,9 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 
 import javax.swing.GroupLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -19,19 +18,21 @@ import javax.swing.event.DocumentListener;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.brains.PaletteManager.MPaletteObserver;
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.STabbedPane;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
-public class ColorPicker extends OmniComponent 
-	implements MPaletteObserver
+public class ColorPicker extends  SPanel
+	implements OmniComponent, MPaletteObserver
 {
 	private final ComponentsRGBA comp1 = new ComponentsRGBA();
 	private final ComponentsRGBA comp2 = new ComponentsRGBA();
 	private final ComponentsHSVA comp1hsv = new ComponentsHSVA();
 	private final ComponentsHSVA comp2hsv = new ComponentsHSVA();
 
-	private JTabbedPane container = new JTabbedPane();
+	private STabbedPane container = new STabbedPane();
 
 	
 	private final PaletteManager paletteManager;
@@ -64,8 +65,8 @@ public class ColorPicker extends OmniComponent
 		this.setLayout(new GridLayout());
 		this.add( container);
 
-		JPanel rgb = new JPanel();
-		JPanel hsv = new JPanel();
+		SPanel rgb = new SPanel();
+		SPanel hsv = new SPanel();
 		container.addTab("RGB", rgb);
 		container.addTab("HSV", hsv);
 		
@@ -201,7 +202,7 @@ public class ColorPicker extends OmniComponent
 			setColumns(3);
 		}
 	}
-	class ColorPanel extends JPanel {
+	class ColorPanel extends SPanel {
 		ColorPanel() {
 			this.setOpaque(false);
 		}
@@ -462,5 +463,11 @@ public class ColorPicker extends OmniComponent
 	@Override
 	public void colorChanged() {
 		refreshColors();
+	}
+
+
+	// :::: OmniComponent
+	@Override public JComponent getComponent() {
+		return this;
 	}
 }

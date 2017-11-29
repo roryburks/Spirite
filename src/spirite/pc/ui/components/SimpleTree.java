@@ -11,12 +11,12 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 
-public class SimpleTree extends JPanel {
+public class SimpleTree extends SPanel {
 
 	protected final List<TableTab> tabs  = new ArrayList<TableTab>();
 	

@@ -7,14 +7,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.JPanel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.util.linear.Rect;
+import spirite.gui.hybrid.SPanel;
 
-public class PrismaticImagePropertiesPanel extends JPanel {
+public class PrismaticImagePropertiesPanel extends SPanel {
 	private final MasterControl master;
 	PrismaticMedium medium;
 	

@@ -3,7 +3,6 @@ package spirite.pc.ui.panel_layers.layer_properties;
 import java.awt.GridLayout;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -13,17 +12,18 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
-public class LayerPropertiesPanel extends OmniComponent
-	implements MNodeSelectionObserver
+public class LayerPropertiesPanel extends SPanel
+	implements OmniComponent, MNodeSelectionObserver
 {
 	final MasterControl master;
 	final SpriteLayerPanel slp;
 	final PuppetLayerPanel plp;
 	final ReferenceLayerPanel rlp;
 	JComponent active = null;
-	JPanel nillJPanel = new JPanel();
+	SPanel nillSPanel = new SPanel();
 	
 	public LayerPropertiesPanel( MasterControl master) {
 		this.master = master;
@@ -33,7 +33,7 @@ public class LayerPropertiesPanel extends OmniComponent
 
 		
 		this.setLayout( new GridLayout());
-		initComponent(nillJPanel);
+		initComponent(nillSPanel);
 
 		master.addTrackingObserver(MNodeSelectionObserver.class, this);
 		this.selectionChanged(master.getCurrentWorkspace() == null  ? null : master.getCurrentWorkspace().getSelectedNode());
@@ -67,12 +67,15 @@ public class LayerPropertiesPanel extends OmniComponent
 			}
 		}
 
-		initComponent(nillJPanel);
+		initComponent(nillSPanel);
 	}
 
 	@Override
 	public void requestFocus() {
 		if( active != null)
 			active.requestFocus();
+	}
+	@Override public JComponent getComponent() {
+		return this;
 	}
 }

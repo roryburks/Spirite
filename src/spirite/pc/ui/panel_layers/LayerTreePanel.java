@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -53,6 +52,7 @@ import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.MediumHandle;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -564,14 +564,14 @@ public class LayerTreePanel extends ContentTree
 	
 	
 	/** Tree Node Panels */
-	class LayerTreeNodePanel extends JPanel {
+	class LayerTreeNodePanel extends SPanel {
 		private static final long serialVersionUID = 1L;
 		private final JTextField label;
 		private final LTNPPanel ppanel;
 
 		static final int N = 8;
 		/** The Panel that has the Image Thumbnail in it. */
-		class LTNPPanel extends JPanel {
+		class LTNPPanel extends SPanel {
 //			public ImageData image = null;
 			GroupTree.Node node = null;
 

@@ -23,7 +23,6 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -38,13 +37,14 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
 
-public class PalettePanel extends JPanel 
+public class PalettePanel extends SPanel 
         implements MouseListener, MPaletteObserver, ActionListener
 {
 	private final MasterControl master;
@@ -391,7 +391,7 @@ public class PalettePanel extends JPanel
     }
 
     /** Panels for the Foreground and Background colors */
-    class ColorPicker extends JPanel {
+    class ColorPicker extends SPanel {
 		private static final long serialVersionUID = 1L;
 		private final int index;
 
@@ -408,7 +408,7 @@ public class PalettePanel extends JPanel
     }
 
     /** Panel that draws and handles all other Palette colors. */
-    class PaletteSubpanel extends JPanel {
+    class PaletteSubpanel extends SPanel {
 		private static final long serialVersionUID = 1L;
 
 		public PaletteSubpanel() {

@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import spirite.base.brains.HotkeyManager;
@@ -33,6 +32,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 import spirite.pc.ui.components.BoxList;
@@ -48,7 +48,7 @@ import spirite.pc.ui.components.BoxList;
  * @author Rory Burks
  *
  */
-public class ToolsPanel extends JPanel
+public class ToolsPanel extends SPanel
         implements ComponentListener, MToolsetObserver, MWorkspaceObserver, MNodeSelectionObserver, MFlashObserver
 {
 	// ToolsPanel needs access to the ToolsetManager and the HotkeyManager
@@ -63,7 +63,7 @@ public class ToolsPanel extends JPanel
     private int tool_len;
 
 
-    JPanel container;
+    SPanel container;
 
     //ToolButton buttons[];
     BoxList<Tool> boxList = new BoxList<>(null, BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -89,8 +89,8 @@ public class ToolsPanel extends JPanel
 
 
     private void initComponents() {
-        // The toolset panel is simply a JPanel with a Grid Layout inside
-        //  a JPanel with a Box Layout (so that the grid's height can be
+        // The toolset panel is simply a SPanel with a Grid Layout inside
+        //  a SPanel with a Box Layout (so that the grid's height can be
         //  manipulated directly)
         this.setLayout( new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.addComponentListener(this);
@@ -104,7 +104,7 @@ public class ToolsPanel extends JPanel
         });
         boxList.setFocusable(false);
         
-        //container = new JPanel();
+        //container = new SPanel();
         add(boxList);
     }
     

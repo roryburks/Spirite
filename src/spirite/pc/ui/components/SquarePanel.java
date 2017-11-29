@@ -3,11 +3,11 @@ package spirite.pc.ui.components;
 import java.awt.Container;
 import java.awt.Dimension;
 
-import javax.swing.JPanel;
+import spirite.gui.hybrid.SPanel;
 
 
-public class SquarePanel extends JPanel {
 
+public class SquarePanel extends SPanel {
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();

@@ -15,7 +15,6 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -33,6 +32,7 @@ import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.base.image_data.layers.SpriteLayer.RigStructureObserver;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
@@ -43,7 +43,7 @@ import spirite.pc.ui.components.BoxList;
 import spirite.pc.ui.components.MTextFieldNumber;
 import spirite.pc.ui.components.SliderPanel;
 
-public class SpriteLayerPanel extends JPanel 
+public class SpriteLayerPanel extends SPanel 
 	implements 
 		ActionListener,
 		RigStructureObserver, 
@@ -453,7 +453,7 @@ public class SpriteLayerPanel extends JPanel
 	
 	
 
-	private class PartButton extends JPanel {
+	private class PartButton extends SPanel {
 		private final Part part;
 		
 		PartButton( Part part, boolean selected) {

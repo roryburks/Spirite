@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -19,7 +16,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.FileChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
 import spirite.base.pen.Penner;
-import spirite.hybrid.Globals;
+import spirite.gui.hybrid.STabbedPane;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
@@ -32,8 +29,8 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  * @author Rory Burks
  *
  */
-public class WorkTabPane extends JTabbedPane 
-	implements MWorkspaceObserver, ChangeListener,
+public class WorkTabPane extends STabbedPane 
+	implements MWorkspaceObserver,
 		MouseListener, ActionListener, MWorkspaceFileObserver
 {
 	private final MasterControl master;
@@ -45,12 +42,20 @@ public class WorkTabPane extends JTabbedPane
 	
 	
 	public WorkTabPane( MasterControl master) {
-		this.setBackground( Globals.getColor("bg"));
 		this.master = master;
 		workPanel =  new WorkPanel(master);
 		
 		master.addWorkspaceObserver(this);
-		this.addChangeListener(this);
+		this.addChangeListener( (evt) -> {
+			if( getSelectedIndex() == -1)
+				return;
+			
+			ImageWorkspace selected = workspaces.get( getSelectedIndex());
+			
+			if( selected != master.getCurrentWorkspace()) {
+				master.setCurrentWorkpace(selected);
+			}
+		});
 		this.addMouseListener(this);
 	}
 	
@@ -85,7 +90,7 @@ public class WorkTabPane extends JTabbedPane
 		if( this.getTabCount() == 0)
 			this.addTab(title, workPanel);
 		else
-			this.add(title, null);
+			this.addTab(title, workPanel);
 	}
 	
 	@Override
@@ -104,17 +109,6 @@ public class WorkTabPane extends JTabbedPane
 	}
 
 	// :::: ChangeListener
-	@Override
-	public void stateChanged(ChangeEvent evt) {
-		if( getSelectedIndex() == -1)
-			return;
-		
-		ImageWorkspace selected = workspaces.get( getSelectedIndex());
-		
-		if( selected != master.getCurrentWorkspace()) {
-			master.setCurrentWorkpace(selected);
-		}
-	}
 
 
 	// :::: MouseListener, ActionListener for ContextMenu behavior

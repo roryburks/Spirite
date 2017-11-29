@@ -363,7 +363,7 @@ public class FrameManager
 			if( ref.get() == null)
 				it.remove();
 			else if(!done) {
-				ref.get().requestFocus();
+				ref.get().getComponent().requestFocus();
 				done = true;
 			}
 		}

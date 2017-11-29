@@ -25,7 +25,7 @@ import spirite.pc.ui.panel_work.WorkPanel;
 
 
 /**
- * GLWorkArea is a WorkArea that uses GLJPanel for rendering directly from OpenGl
+ * GLWorkArea is a WorkArea that uses GLSPanel for rendering directly from OpenGl
  * 
  * @author Rory Burks
  */

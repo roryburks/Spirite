@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -34,6 +33,7 @@ import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.selection.SelectionMask;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
@@ -49,7 +49,7 @@ import spirite.pc.ui.panel_work.WorkPanel.View;
  * 
  * @author Rory Burks
  */
-public class DrawPanel extends JPanel
+public class DrawPanel extends SPanel
      implements MImageObserver, ActionListener, MSelectionEngineObserver, 
      	MNodeSelectionObserver
 {

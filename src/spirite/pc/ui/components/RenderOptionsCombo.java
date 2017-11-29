@@ -11,18 +11,18 @@ import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
 
 
-public class RenderOptionsCombo extends JPanel {
+public class RenderOptionsCombo extends SPanel {
 	private final JComboBox<RenderTuple> comboBox;
-	private final JPanel rcOptions = new JPanel();
+	private final SPanel rcOptions = new SPanel();
 	private final Dialogs dialogs;
 	private final RenderOptionCellRenderer renderer = new RenderOptionCellRenderer();
 	private final JLabel rcLabel = new JLabel("Mode:");
@@ -101,12 +101,12 @@ public class RenderOptionsCombo extends JPanel {
 
 	/** CellRenderer for the RenderOption Combo Box. */
 	public class RenderOptionCellRenderer implements ListCellRenderer<RenderTuple> {
-		private final JPanel panel = new JPanel();
+		private final SPanel panel = new SPanel();
 		private final JLabel lbl = new JLabel();
 		private final Color comboSel = new Color( 164,164,216);
 		private final Color comboNill = new Color( 196,196,196);
 		
-		private JPanel ccPanel = new JPanel();
+		private SPanel ccPanel = new SPanel();
 		
 		public RenderOptionCellRenderer() {
 			panel.setLayout(new GridLayout());

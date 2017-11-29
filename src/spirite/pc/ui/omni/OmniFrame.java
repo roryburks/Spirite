@@ -33,11 +33,11 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.TransferHandler;
 
 import spirite.base.brains.MasterControl;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -58,7 +58,7 @@ import spirite.pc.ui.omni.FrameManager.FrameType;
  * @author RoryBurks
  *
  */
-public class OmniFrame extends JPanel
+public class OmniFrame extends SPanel
 {	
 	private static final long serialVersionUID = 1L;
 	private final MasterControl master;
@@ -152,7 +152,7 @@ public class OmniFrame extends JPanel
 		
 		if( panel == null) return;
 		
-		root.addTab("tab", panel);
+		root.addTab("tab", panel.getComponent());
 		
 		OmniBar bar = new OmniBar( type.getName(), type);
 		root.setTabComponentAt(root.getTabCount()-1, bar);
@@ -201,12 +201,12 @@ public class OmniFrame extends JPanel
 	}
 	private void addContainer( OmniContainer toAdd, int index) {
 		if( index == -1) {
-			root.add(toAdd.component);
+			root.add(toAdd.component.getComponent());
 			containers.add(toAdd);
 			index = containers.size()-1;
 		}
 		else {
-			root.add(toAdd.component, index);
+			root.add(toAdd.component.getComponent(), index);
 			containers.add(index,toAdd);
 		}
 		toAdd.bar = new OmniBar( toAdd.type.getName(), toAdd.type);
@@ -224,11 +224,11 @@ public class OmniFrame extends JPanel
 	
 	
 	/** Custom Tab Component */
-	public class OmniBar extends JPanel  {
+	public class OmniBar extends SPanel  {
 		private static final long serialVersionUID = 1L;
 		
 		private final JLabel label;
-		private final JPanel iconPanel;
+		private final SPanel iconPanel;
 		final ImageIcon icon;
 		
 		
@@ -237,7 +237,7 @@ public class OmniFrame extends JPanel
 			icon = type.getIcon();
 			
 			label = new JLabel(title);
-			iconPanel = new JPanel() {
+			iconPanel = new SPanel() {
 				@Override
 				protected void paintComponent(Graphics g) {
 					super.paintComponent(g);
@@ -310,10 +310,14 @@ public class OmniFrame extends JPanel
 	 *	listeners, they will need to remove those links when the component is closed
 	 *	so that they can properly be caught by the GC.
 	 */
-	public static abstract class OmniComponent extends JPanel{
-		public void onCleanup() {}
-		public boolean duplicateable() {return false;}
+	public static interface OmniComponent {
+		public JComponent getComponent();
+		public default void onCleanup() {}
 	}
+//	public static abstract class OmniComponent extends SPanel{
+//		public void onCleanup() {}
+//		public boolean duplicateable() {return false;}
+//	}
 	
 	
 	/** Transferable Object storing the data which Component is moving 
@@ -381,7 +385,7 @@ public class OmniFrame extends JPanel
 		}
 		
 		// :::: Export 
-		// Unused because JPanel has no built-in DnD functionality and so the start of 
+		// Unused because SPanel has no built-in DnD functionality and so the start of 
 		//	Dragging has to be added manually with a DragSource object
 		@Override		public int getSourceActions( JComponent c) {return MOVE;}
 		@Override		public Transferable createTransferable( JComponent c) {	return null;}

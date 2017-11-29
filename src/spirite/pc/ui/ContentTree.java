@@ -32,9 +32,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -51,11 +49,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.pc.ui.omni.OmniFrame;
 
-public class ContentTree extends JPanel
+public class ContentTree extends SPanel
 	implements MouseListener, TreeModelListener,TreeExpansionListener, TreeSelectionListener 
 {
 		
@@ -63,7 +63,7 @@ public class ContentTree extends JPanel
 	protected final DefaultMutableTreeNode root;
 	protected final DefaultTreeModel model;
 	protected final CCTTransferHandler transferHandler;
-	protected final JScrollPane scrollPane;
+	protected final SScrollPane scrollPane;
 	protected final CCPanel container;
 	protected final LockingSelectionModel selectionModel = new LockingSelectionModel();
 	
@@ -104,7 +104,7 @@ public class ContentTree extends JPanel
 		
 		buttonPanel = new CCBPanel();
 		tree = new JTree();
-		scrollPane = new JScrollPane(container);
+		scrollPane = new SScrollPane(container);
 		this.add(scrollPane);
 		
 		selectedBG = Globals.getColor("contentTree.selectedBackground");
@@ -239,7 +239,7 @@ public class ContentTree extends JPanel
 	}
 	
 	
-	protected class CCPanel extends JPanel {
+	protected class CCPanel extends SPanel {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public void paintComponent( Graphics g) {
@@ -296,7 +296,7 @@ public class ContentTree extends JPanel
 	/** The panel to the left of the tree that constructs the buttons parallel
 	 * to the tree nodes. 
 	 */
-	public class CCBPanel extends JPanel {
+	public class CCBPanel extends SPanel {
 		private static final long serialVersionUID = 1L;
 		private CCButton[][] buttons = new CCButton[0][];
 		

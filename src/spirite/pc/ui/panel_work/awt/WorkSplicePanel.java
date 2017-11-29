@@ -8,11 +8,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.GroupLayout;
-import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.panel_work.WorkArea;
@@ -64,7 +64,7 @@ public class WorkSplicePanel extends WorkArea
         offsety = 0;
     }
 
-    private final JPanel content = new JPanel() {
+    private final SPanel content = new SPanel() {
         @Override
         protected void paintComponent(Graphics g) {
         	super.paintComponent(g);

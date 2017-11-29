@@ -2,11 +2,15 @@ package spirite.pc.ui.panel_anim;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JComponent;
 
 import spirite.base.brains.MasterControl;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
-public class AnimationSchemePanel extends OmniComponent {
+public class AnimationSchemePanel extends SPanel
+	implements OmniComponent
+{
 	private static final long serialVersionUID = 1L;
 	private MasterControl master;
 
@@ -42,8 +46,7 @@ public class AnimationSchemePanel extends OmniComponent {
 	AnimationSchemeTreePanel animationSchemeTreePanel;
 	
 	// :::: OmniComponent
-	@Override
-	public void onCleanup() {
-		super.onCleanup();
+	@Override public JComponent getComponent() {
+		return this;
 	}
 }

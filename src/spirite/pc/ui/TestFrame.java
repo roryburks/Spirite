@@ -7,15 +7,16 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
+import spirite.gui.hybrid.SPanel;
+
 public class TestFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+	private SPanel contentPane;
 
 	/**
 	 * Launch the application.
@@ -39,7 +40,7 @@ public class TestFrame extends JFrame {
 	public TestFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
+		contentPane = new SPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
@@ -47,11 +48,11 @@ public class TestFrame extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
-		JPanel panel_1 = new JPanel();
+		SPanel panel_1 = new SPanel();
 		tabbedPane.addTab("New tab", null, panel_1, null);
 		
-		JPanel panelA = new JPanel();
-		JPanel panelB = new JPanel();
+		SPanel panelA = new SPanel();
+		SPanel panelB = new SPanel();
 		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(

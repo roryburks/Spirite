@@ -14,18 +14,16 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.gui.generic.SButton;
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.STabbedPane;
 import spirite.gui.swing.SwingGuiButton;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridUI;
@@ -36,7 +34,9 @@ import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 import spirite.pc.ui.panel_layers.anim.LayerAnimView;
 
-public class LayersPanel extends OmniComponent {
+public class LayersPanel extends SPanel
+	implements OmniComponent 
+{
 	private static final long serialVersionUID = 1L;
 	private final Color comboSel = new Color( 164,164,216);
 	private final Color comboNill = new Color( 196,196,196);
@@ -52,7 +52,7 @@ public class LayersPanel extends OmniComponent {
 	
 	// Render Chooser Components
 	private final JLabel rcLabel = new JLabel("Mode:");
-	private final JPanel rcOptions = new JPanel();
+	private final SPanel rcOptions = new SPanel();
 	private final JComboBox<RenderTuple> renderCombo;
 	private final RenderOptionCellRenderer renderer = new RenderOptionCellRenderer();
 	
@@ -67,7 +67,7 @@ public class LayersPanel extends OmniComponent {
 		}
 	}
 	
-	class LayerTabPane extends JTabbedPane {
+	class LayerTabPane extends STabbedPane {
 		LayerTabPane() {
 			this.addTab("Normal View", layerTreePanel);
 			this.addTab("AnimView", layerAnimView);
@@ -78,7 +78,6 @@ public class LayersPanel extends OmniComponent {
 	 * Create the panel.
 	 */
 	public LayersPanel(MasterControl master) {  
-		this.setBackground( Globals.getColor("bg"));
 		
 		this.dialogs = master.getDialogs();
 		layerTreePanel = new LayerTreePanel(master, this);
@@ -97,13 +96,11 @@ public class LayersPanel extends OmniComponent {
 		
 		updateSelected();
 		
-		layerTabPane.addChangeListener( new ChangeListener() {
-			@Override public void stateChanged(ChangeEvent arg0) {
-				ImageWorkspace ws = master.getCurrentWorkspace();
-				if( ws != null) {
-					ws.getAnimationManager().getView().setUsingAnimationView( layerTabPane.getSelectedIndex() == 1);
-					ws.triggerFlash();
-				}
+		layerTabPane.addChangeListener((evt) -> {
+			ImageWorkspace ws = master.getCurrentWorkspace();
+			if( ws != null) {
+				ws.getAnimationManager().getView().setUsingAnimationView( layerTabPane.getSelectedIndex() == 1);
+				ws.triggerFlash();
 			}
 		});
 	}
@@ -267,10 +264,10 @@ public class LayersPanel extends OmniComponent {
 	
 	/** CellRenderer for the RenderOption Combo Box. */
 	public class RenderOptionCellRenderer implements ListCellRenderer<RenderTuple> {
-		private final JPanel panel = new JPanel();
+		private final SPanel panel = new SPanel();
 		private final JLabel lbl = new JLabel();
 		
-		private JPanel ccPanel = new JPanel();
+		private SPanel ccPanel = new SPanel();
 		
 		public RenderOptionCellRenderer() {
 			panel.setLayout(new GridLayout());
@@ -308,8 +305,11 @@ public class LayersPanel extends OmniComponent {
 
 	
 	// :::: OmniContainer
-	@Override
-	public void onCleanup() {
+	@Override public void onCleanup() {
 		layerTreePanel.cleanup();
+	}
+
+	@Override public JComponent getComponent() {
+		return this;
 	}
 }

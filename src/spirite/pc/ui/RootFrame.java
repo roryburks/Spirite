@@ -20,13 +20,12 @@ import java.util.Map;
 
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.hybrid.Globals;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.omni.FrameManager;
@@ -70,13 +69,12 @@ public class RootFrame extends javax.swing.JFrame
     private ToolSettingsPanel settingPanel;
     private WorkTabPane workPane;
     private OmniComponent rigPanel;
-    private JPanel leftContainer;
+    private SPanel leftContainer;
     private ResizeContainerPanel rightContainer;
     private ResizeContainerPanel rrContainer;
     private ResizeContainerPanel container;
 
     public RootFrame( MasterControl master, FrameManager frameManager) {
-		this.setBackground( Globals.getColor("bg"));
         this.master =  master;
         this.frameManager = frameManager;
         
@@ -101,7 +99,7 @@ public class RootFrame extends javax.swing.JFrame
     	rigPanel = frameManager.createOmniComponent(FrameType.LAYER_PROPERTIES);
     	ReferenceSchemePanel rsp =  new ReferenceSchemePanel(master);
     	
-    	leftContainer = new JPanel();
+    	leftContainer = new SPanel();
     	rightContainer = new ResizeContainerPanel(palettePanel, ContainerOrientation.VERTICAL);
     	rrContainer = new ResizeContainerPanel(rsp, ContainerOrientation.VERTICAL);
     	
@@ -120,7 +118,7 @@ public class RootFrame extends javax.swing.JFrame
     	rightContainer.setStretchArea(80);
 
     	rrContainer.addPanel( 50, 100, -1, new MediumPropertiesPanel(master));
-    	rrContainer.addPanel( 100, 300, -2, rigPanel);
+    	rrContainer.addPanel( 100, 300, -2, rigPanel.getComponent());
     	rrContainer.setStretchArea(100);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);

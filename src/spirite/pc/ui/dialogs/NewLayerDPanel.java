@@ -9,7 +9,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -21,10 +20,11 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.components.MTextFieldNumber;
 
-public class NewLayerDPanel extends JPanel {
+public class NewLayerDPanel extends SPanel {
 	public class NewLayerHelper {
 		public final int width, height;
 		public final Color color;
@@ -52,10 +52,10 @@ public class NewLayerDPanel extends JPanel {
 	private JTextField tfPartType;
 	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>(InternalImageTypes.createableTypes());
 	private JLabel lblPartType;
-	private JPanel colorPanelFG;
-	private JPanel colorPanelBG;
-	private JPanel colorPanelT;
-	private JPanel colorPanelSelect;
+	private SPanel colorPanelFG;
+	private SPanel colorPanelBG;
+	private SPanel colorPanelT;
+	private SPanel colorPanelSelect;
 	private JLabel lblColorFG;
 	private JLabel lblColorBG;
 	private JLabel lblColorT;
@@ -194,7 +194,7 @@ public class NewLayerDPanel extends JPanel {
 		
 		JSeparator separator_2 = new JSeparator();
 		
-		JPanel panel_3 = new JPanel();
+		SPanel panel_3 = new SPanel();
 		
 		lblColorFG = new JLabel("Foreground");
 		lblColorFG.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -242,7 +242,7 @@ public class NewLayerDPanel extends JPanel {
 		lblColorSelect = new JLabel("Custom Color:");
 		lblColorSelect.addMouseListener( selectMA);
 		
-		colorPanelSelect = new JPanel();
+		colorPanelSelect = new SPanel();
 		colorPanelSelect.addMouseListener( selectMA);
 		colorPanelSelect.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
@@ -370,21 +370,21 @@ public class NewLayerDPanel extends JPanel {
 					.addGap(71))
 		);
 		
-		colorPanelFG = new JPanel();
+		colorPanelFG = new SPanel();
 		colorPanelFG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(0);
 			}
 		});
-		colorPanelBG = new JPanel();
+		colorPanelBG = new SPanel();
 		colorPanelBG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setSelected(1);
 			}
 		});
-		colorPanelT = new JPanel();
+		colorPanelT = new SPanel();
 		colorPanelT.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

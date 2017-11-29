@@ -12,7 +12,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -22,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.gl.GLEngine;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.DebugObserver;
 
@@ -29,14 +29,14 @@ public class DebugDialog extends JDialog
 	implements ActionListener, DebugObserver, WindowListener 
 {
 
-	private final JPanel contentPanel = new JPanel();
+	private final SPanel contentPanel = new SPanel();
 
 	Timer t = new Timer( 100, this);
 	MasterControl master;
 	
 	JTextPane textResources;
 	JTextPane textDebug = new JTextPane();
-	private JPanel buttonPane;
+	private SPanel buttonPane;
 	private JScrollPane scrollPane;
 	JButton btnReset = new JButton("Reset Debug Log");
 	JLabel lblUsedResources = new JLabel("Used Resources:");

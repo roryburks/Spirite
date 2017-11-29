@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import spirite.base.brains.MasterControl;
@@ -23,6 +22,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
@@ -30,7 +30,7 @@ import spirite.pc.ui.components.BetterTree.BTNode;
 import spirite.pc.ui.components.BetterTree.BranchingNode;
 import spirite.pc.ui.components.BetterTree.DropDirection;;
 
-public class BasicLayerTree extends JPanel implements MWorkspaceObserver, MImageObserver, MAnimationStructureObserver {
+public class BasicLayerTree extends SPanel implements MWorkspaceObserver, MImageObserver, MAnimationStructureObserver {
 	private final MasterControl master;
 	private ImageWorkspace ws = null;
 	

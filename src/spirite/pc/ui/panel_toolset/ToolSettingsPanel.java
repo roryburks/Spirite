@@ -12,7 +12,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import spirite.base.brains.MasterControl;
@@ -27,11 +26,13 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserver;
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
-public class ToolSettingsPanel extends OmniComponent
-	implements MToolsetObserver, MWorkspaceObserver, MSelectionEngineObserver, ActionListener
+public class ToolSettingsPanel extends SPanel
+	implements OmniComponent,
+		MToolsetObserver, MWorkspaceObserver, MSelectionEngineObserver, ActionListener
 {
 	// External Components
 	private final MasterControl master;
@@ -39,7 +40,7 @@ public class ToolSettingsPanel extends OmniComponent
 	private ToolSettings settings;
 	private ImageWorkspace workspace = null;
 	
-	private JPanel settingsPanel = null;
+	private SPanel settingsPanel = null;
 	
 	/**
 	 * The ActiveMap links components to a property such that they can be 
@@ -114,12 +115,12 @@ public class ToolSettingsPanel extends OmniComponent
 		}
 	}
 	
-	JPanel constructFromScheme( Property[] scheme) {
+	SPanel constructFromScheme( Property[] scheme) {
 		bindingMap.clear();
 		activeMap.clear();
 		
 		if( scheme == null) return null;
-		JPanel panel = new JPanel();
+		SPanel panel = new SPanel();
 		
 		GroupLayout layout = new GroupLayout( panel);
 		
@@ -221,6 +222,11 @@ public class ToolSettingsPanel extends OmniComponent
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		master.executeCommandString(evt.getActionCommand());
+	}
+
+	// :::: OmniComponent
+	@Override public JComponent getComponent() {
+		return this;
 	}
 
 }

@@ -28,10 +28,10 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 
 /**
@@ -46,7 +46,7 @@ import spirite.hybrid.Globals;
  * @author Rory Burks
  *
  */
-public class OmniResizeContainerPanel extends JPanel{
+public class OmniResizeContainerPanel extends SPanel{
 	protected int min_stretch = 0;
 	protected final List<ResizeBar> leadingBars;
 	protected final List<ResizeBar> trailingBars;
@@ -206,7 +206,7 @@ public class OmniResizeContainerPanel extends JPanel{
 	}
 	
 	
-	public class ResizeBar extends JPanel {
+	public class ResizeBar extends SPanel {
 		protected final ResizeBarAdapter adapter;
 		protected int size;
 		protected int min_size = 50;
@@ -218,7 +218,7 @@ public class OmniResizeContainerPanel extends JPanel{
 		protected final Icon iconUnexpanded;
 		protected final Color BAR_LINE_COLOR = new Color(190,190,190);
 		protected final JButton btnExpand = new JButton();
-		protected final JPanel pullBar = new JPanel() {
+		protected final SPanel pullBar = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);

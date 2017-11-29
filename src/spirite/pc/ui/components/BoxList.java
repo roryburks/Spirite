@@ -18,18 +18,18 @@ import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil;
 
-public class BoxList<T> extends JPanel {
+public class BoxList<T> extends SPanel {
 	private int box_w, box_h;
 	private final List<T> entries = new ArrayList<T>();
 
-	private final JPanel content = new JPanel();
+	private final SPanel content = new SPanel();
 	private final JScrollPane scroll = new JScrollPane(content);
 	
 	// ========

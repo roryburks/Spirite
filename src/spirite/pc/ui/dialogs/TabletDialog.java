@@ -19,7 +19,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import spirite.base.brains.MasterControl;
@@ -27,6 +26,7 @@ import spirite.base.brains.SettingsManager;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.CubicSplineInterpolator;
 import spirite.base.util.linear.Vec2;
+import spirite.gui.hybrid.SPanel;
 
 public class TabletDialog extends JDialog
 {
@@ -36,7 +36,7 @@ public class TabletDialog extends JDialog
 	
 	private final SettingsManager settings;
 	
-//	private final JPanel curvePanel = new JPanel();
+//	private final SPanel curvePanel = new SPanel();
 	private final StrokeCurvePanel curvePanel = new StrokeCurvePanel();
 	private final JButton btnResetCurve = new JButton(RESET_LABEL);
 
@@ -109,7 +109,7 @@ public class TabletDialog extends JDialog
 	// ===============
 	// ==== Custom Components
 	private final Color bg = Color.WHITE;
-	private class StrokeCurvePanel extends JPanel 
+	private class StrokeCurvePanel extends SPanel 
 	{
 		private Vec2 movingPoint = null;
 		

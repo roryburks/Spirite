@@ -10,11 +10,11 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SPanel;
 
 public class ButtonProperty extends SwingToolProperty {
 	private final MasterControl master;	// I don't love this
@@ -41,7 +41,7 @@ public class ButtonProperty extends SwingToolProperty {
 			GroupLayout layout, ToolSettings settings) 
 	{
 		JButton button = new JButton(hrName);
-		JPanel panel = new JPanel();
+		SPanel panel = new SPanel();
 		
 		button.setActionCommand( command);
 		button.addActionListener(new ActionListener() {

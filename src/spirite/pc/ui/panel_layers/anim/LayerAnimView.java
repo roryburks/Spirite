@@ -7,8 +7,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
@@ -25,6 +23,8 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.RigAnimation;
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SScrollPane;
 import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
 import spirite.pc.ui.components.BetterTree.BTNode;
@@ -35,7 +35,7 @@ import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.panel_layers.LayersPanel;
 
-public class LayerAnimView extends JPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
+public class LayerAnimView extends SPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
 	private final MasterControl master;
 	private final LayersPanel context;
 	private final BetterTree tree = new BetterTree();
@@ -44,13 +44,13 @@ public class LayerAnimView extends JPanel implements MAnimationStructureObserver
 	
 	//private final List<AnimationSchemePanel> panels = new ArrayList<>();
 	
-	private final JScrollPane scroll;
+	private final SScrollPane scroll;
 	
 	public LayerAnimView(MasterControl master, LayersPanel context) {
 		this.master = master;
 		this.context = context;
 		
-		scroll = new JScrollPane(tree);
+		scroll = new SScrollPane(tree);
 		container = new ResizeContainerPanel( scroll, ContainerOrientation.VERTICAL);
 		container.addPanel(0,200, -1, new BasicLayerTree(master));
 //		container.addPanel( 0, 100, -1, new LayerTreePanel(master,context));

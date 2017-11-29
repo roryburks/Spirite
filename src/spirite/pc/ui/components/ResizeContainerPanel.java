@@ -16,10 +16,10 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import spirite.base.util.MUtil;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 
 /**
@@ -34,7 +34,7 @@ import spirite.hybrid.Globals;
  * @author Rory Burks
  *
  */
-public class ResizeContainerPanel extends JPanel{
+public class ResizeContainerPanel extends SPanel{
 	protected int min_stretch = 0;
 	protected final List<ResizeBar> leadingBars;
 	protected final List<ResizeBar> trailingBars;
@@ -52,7 +52,6 @@ public class ResizeContainerPanel extends JPanel{
 	}
 	
 	public ResizeContainerPanel(JComponent component, ContainerOrientation orientation) {
-		this.setBackground( Globals.getColor("bg"));
 		leadingBars = new ArrayList<>();
 		trailingBars = new ArrayList<>();
 		this.cOrientation = orientation;
@@ -195,7 +194,7 @@ public class ResizeContainerPanel extends JPanel{
 	}
 	
 	
-	public class ResizeBar extends JPanel {
+	public class ResizeBar extends SPanel {
 		protected final ResizeBarAdapter adapter;
 		protected int size;
 		protected int min_size = 50;
@@ -205,9 +204,9 @@ public class ResizeContainerPanel extends JPanel{
 
 		protected final Icon iconExpanded;
 		protected final Icon iconUnexpanded;
-		protected final Color BAR_LINE_COLOR = new Color(190,190,190);
+		protected final Color BAR_LINE_COLOR = Globals.getColor("resizePanel.barLineColor");
 		protected final JButton btnExpand = new JButton();
-		protected final JPanel pullBar = new JPanel() {
+		protected final SPanel pullBar = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
@@ -253,10 +252,7 @@ public class ResizeContainerPanel extends JPanel{
 				int min_size, 
 				JComponent component,
 				boolean trailing) 
-		{
-			this.setBackground( Globals.getColor("bg"));
-			pullBar.setBackground(Globals.getColor("bg"));
-			
+		{	
 			this.min_size = min_size;
 			this.size = default_size;
 			this.component = component;

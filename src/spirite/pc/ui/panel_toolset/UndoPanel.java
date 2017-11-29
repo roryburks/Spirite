@@ -9,9 +9,9 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
@@ -25,6 +25,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.MUndoEngineObserver;
 import spirite.base.image_data.UndoEngine.UndoIndex;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
@@ -34,9 +35,10 @@ import spirite.pc.ui.omni.OmniFrame.OmniComponent;
  * 
  * @author Rory Burks
  */
-public class UndoPanel extends OmniComponent
-	implements MUndoEngineObserver, ListCellRenderer<UndoIndex>, ListSelectionListener,
-	MWorkspaceObserver
+public class UndoPanel extends SPanel
+	implements OmniComponent,
+		MUndoEngineObserver, ListCellRenderer<UndoIndex>, 
+		ListSelectionListener, MWorkspaceObserver
 {
 	private static final long serialVersionUID = 1L;
 
@@ -103,11 +105,11 @@ public class UndoPanel extends OmniComponent
 	// :::: Cell Rendering
 	private final UPRPanel renderPanel = new UPRPanel();
 	
-	class UPRPanel extends JPanel {
+	class UPRPanel extends SPanel {
 		private static final long serialVersionUID = 1L;
 		Color selectedColor;
 		Color normalColor;
-		JPanel preview = new JPanel();
+		SPanel preview = new SPanel();
 		JLabel label = new JLabel();
 		
 		
@@ -237,4 +239,7 @@ public class UndoPanel extends OmniComponent
 	}
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {	}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {	}
+
+	// :::: OmniComponent
+	@Override public JComponent getComponent() {return this;}
 }

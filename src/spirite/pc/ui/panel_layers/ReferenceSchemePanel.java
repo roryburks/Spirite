@@ -30,9 +30,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EtchedBorder;
@@ -53,6 +53,7 @@ import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.linear.Vec2;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.Transferables.NodeTransferable;
@@ -74,8 +75,8 @@ import spirite.pc.ui.omni.OmniFrame.OmniComponent;
  * @author Rory Burks
  *
  */
-public class ReferenceSchemePanel extends OmniComponent 
-	implements MWorkspaceObserver
+public class ReferenceSchemePanel extends SPanel
+	implements OmniComponent, MWorkspaceObserver
 {
 	private final ReferenceListPanel referenceListPanel;
 	private final JButton btnReset = new JButton();
@@ -187,7 +188,7 @@ public class ReferenceSchemePanel extends OmniComponent
 		}
 	}
 	
-	public class ReferenceListPanel extends JPanel 
+	public class ReferenceListPanel extends SPanel 
 		implements  ListCellRenderer<Reference>, MReferenceObserver
 	{
 	
@@ -275,9 +276,9 @@ public class ReferenceSchemePanel extends OmniComponent
 		}
 		
 		/** List Cell Component Panel */
-		class RLPCellPanel extends JPanel {
+		class RLPCellPanel extends SPanel {
 			final JLabel label;
-			final JPanel thumbnail;
+			final SPanel thumbnail;
 			Reference reference;
 			
 			RLPCellPanel() {
@@ -288,7 +289,7 @@ public class ReferenceSchemePanel extends OmniComponent
 				final Dimension d = new Dimension((int)v2.x, (int)v2.y);
 
 				label = new JLabel();
-				thumbnail = new JPanel() {
+				thumbnail = new SPanel() {
 					
 					@Override
 					protected void paintComponent(Graphics g) {
@@ -566,8 +567,12 @@ public class ReferenceSchemePanel extends OmniComponent
 	@Override	public void newWorkspace(ImageWorkspace newWorkspace) {}
 	@Override	public void removeWorkspace(ImageWorkspace newWorkspace) {}
 	
+	// :::: OmniComponent
 	@Override
 	public void onCleanup() {
 //		referenceTreePanel.cleanup();
+	}
+	@Override public JComponent getComponent() {
+		return this;
 	}
 }

@@ -32,16 +32,16 @@ import java.util.Map.Entry;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 
-public class BetterTree extends JPanel {
+public class BetterTree extends SPanel {
 	private final List<BTNode> roots = new ArrayList<>();
 	private final BidiMap<Component,BTNode> nodeLink = new DualHashBidiMap<>();
 	
@@ -169,7 +169,7 @@ public class BetterTree extends JPanel {
 	public abstract class BTNode {
 		protected Component title;
 		
-		protected final JPanel rootPanel = new JPanel();
+		protected final SPanel rootPanel = new SPanel();
 		
 		protected abstract Component BuildContent();
 		abstract List<BTNode> GetLeafs();
@@ -271,7 +271,7 @@ public class BetterTree extends JPanel {
 			Group innerVertGroup = layout.createSequentialGroup();
 			
 			ExpandButton button = new ExpandButton(this);
-			JPanel branch = new JPanel();
+			SPanel branch = new SPanel();
 			branch.setBackground(Color.red);
 			
 			innerHorGroup.addComponent(title, 0, 0, Short.MAX_VALUE);
@@ -321,7 +321,7 @@ public class BetterTree extends JPanel {
 	}
 	
 	public class LeafNode extends BTNode {
-		private final JPanel rootPanel = new JPanel();
+		private final SPanel rootPanel = new SPanel();
 		
 		public LeafNode( Component content) {
 			this.title = content;

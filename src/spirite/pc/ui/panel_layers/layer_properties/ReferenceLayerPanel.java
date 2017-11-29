@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
@@ -15,10 +14,11 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 
-public class ReferenceLayerPanel extends JPanel {
+public class ReferenceLayerPanel extends SPanel {
 	private final MasterControl master;
 	LayerNode node;
 	ReferenceLayer ref;
@@ -70,7 +70,7 @@ public class ReferenceLayerPanel extends JPanel {
 		drawPanel.repaint();
 	}
 	
-	class RefDrawArea extends JPanel 
+	class RefDrawArea extends SPanel 
 	{
 		@Override
 		protected void paintComponent(Graphics g) {

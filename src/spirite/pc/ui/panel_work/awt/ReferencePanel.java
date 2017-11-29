@@ -4,8 +4,6 @@ package spirite.pc.ui.panel_work.awt;
 
 import java.awt.Graphics;
 
-import javax.swing.JPanel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -18,11 +16,12 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
+import spirite.gui.hybrid.SPanel;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 
-public class ReferencePanel extends JPanel 
+public class ReferencePanel extends SPanel 
 	implements MImageObserver, MReferenceObserver
 
 {

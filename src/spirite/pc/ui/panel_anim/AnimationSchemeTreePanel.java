@@ -26,7 +26,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
@@ -48,11 +47,12 @@ import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
+import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.UIUtil;
 
-public class AnimationSchemeTreePanel extends JPanel 
+public class AnimationSchemeTreePanel extends SPanel 
 	implements  MAnimationStructureObserver, MNodeSelectionObserver, 
 		MWorkspaceObserver, MAnimationStateObserver
 {
@@ -63,7 +63,7 @@ public class AnimationSchemeTreePanel extends JPanel
 	private ImageWorkspace workspace = null;
 	private AnimationManager manager = null;
 	
-	private final JPanel container = new JPanel();
+	private final SPanel container = new SPanel();
 	private final JScrollPane scrollPane = new JScrollPane(container);
 	
 	/**
@@ -198,8 +198,8 @@ public class AnimationSchemeTreePanel extends JPanel
 		return null;
 	}
 	
-	class BaseTPanel extends JPanel {
-		JPanel imgPanel;
+	class BaseTPanel extends SPanel {
+		SPanel imgPanel;
 		JLabel titleLabel;
 		JLabel startLabel;
 		JLabel endLabel;
@@ -207,7 +207,7 @@ public class AnimationSchemeTreePanel extends JPanel
 		BaseTPanel() {
 			setOpaque(false);
 			
-			imgPanel = new JPanel();
+			imgPanel = new SPanel();
 			titleLabel = new JLabel();
 			startLabel = new JLabel();
 			endLabel = new JLabel();
@@ -309,7 +309,7 @@ public class AnimationSchemeTreePanel extends JPanel
 	private final Color selectedAnimColor = Globals.getColor("contentTree.selectedBackground");
 	// Back-up component for nodes that don't have anything more specific
 	
-	class FixedFramePanel extends JPanel 
+	class FixedFramePanel extends SPanel 
 		implements AnimNodeBuilder
 	{
 		static final int TICK_HEIGHT = 24;
@@ -332,7 +332,7 @@ public class AnimationSchemeTreePanel extends JPanel
 		
 
 		private class FramePanel extends BaseTPanel {}
-		private class MarkerPanel extends JPanel {
+		private class MarkerPanel extends SPanel {
 			final JLabel label = new JLabel();
 			
 			MarkerPanel() {
@@ -350,7 +350,7 @@ public class AnimationSchemeTreePanel extends JPanel
 				this.setLayout(layout);
 			}
 		}
-		private class TickPanel extends JPanel {
+		private class TickPanel extends SPanel {
 			private final JLabel label = new JLabel();
 			private int tick;
 			TickPanel() {
@@ -795,7 +795,7 @@ public class AnimationSchemeTreePanel extends JPanel
 		}
 		
 		
-		class FFPOutline extends JPanel
+		class FFPOutline extends SPanel
 		{
 			final int col;
 			FFPOutline( int col) {

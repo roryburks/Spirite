@@ -52,8 +52,15 @@ public class Globals {
 	        {"workArea.normalBG", new Color(238,238,238)},
 	        {"workArea.referenceBG", new Color( 210,210,242)},
 
-	        //{"bg", new Color(152, 166, 173)},
-	        {"bg", new Color( 238,238,238)},
+	        {"resizePanel.barLineColor", new Color( 0,73,98)},
+
+	        {"tabbedPane.SelectedBG", new Color(0,168,223)},
+	        {"tabbedPane.UnselectedBG",  new Color(0, 118, 155)},
+	        {"tabbedPane.TabBorder",  new Color(0, 90, 125)},
+	        {"tabbedPane.TabText", new Color(255,255,255)},
+	        
+	        {"bg", new Color(0, 118, 155)},
+	        //{"bg", new Color( 238,238,238)},
 	    };
 	    colors = new Hashtable<>(data.length);
 	    for( Object[] datum : data) {
