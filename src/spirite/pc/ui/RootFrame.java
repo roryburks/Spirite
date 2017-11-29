@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -25,7 +26,9 @@ import javax.swing.SwingUtilities;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
+import spirite.gui.hybrid.SMenuBar;
 import spirite.gui.hybrid.SPanel;
+import spirite.hybrid.Globals;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.omni.FrameManager;
@@ -91,6 +94,9 @@ public class RootFrame extends javax.swing.JFrame
     // ==== Initialization
     private void initComponents() {
     	this.setLayout(new GridLayout());
+    	
+    	this.setIconImage(Globals.getIcon("icon.frame.toolSettings").getImage());
+    	this.setTitle("Spirite");
     	
     	workPane = new WorkTabPane( master);
     	toolsPanel = new ToolsPanel( master);
@@ -188,7 +194,7 @@ public class RootFrame extends javax.swing.JFrame
     			{".&__DB_GL", "dialog.DBGL", null},
     	};
     	
-    	JMenuBar jMenuBar = new JMenuBar();
+    	SMenuBar jMenuBar = new SMenuBar();
     	ContextMenus.constructMenu(jMenuBar, menuScheme, this);
     	
     	

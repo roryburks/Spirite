@@ -3,12 +3,12 @@ package spirite.pc.ui.panel_layers.anim.dialogs;
 import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import spirite.gui.hybrid.SButton;
+import spirite.gui.hybrid.SComboBox;
+import spirite.gui.hybrid.SLabel;
 import spirite.pc.ui.components.MTextFieldNumber;
 
 public class ResizeLocalLoopDialog extends JDialog {
@@ -22,11 +22,11 @@ public class ResizeLocalLoopDialog extends JDialog {
 		
 		this.length = length;
 		this.inLoops = inLoops;
-		
 
-		JLabel mainLabel = new JLabel("Resize Local Loop");
+
+		SLabel mainLabel = new SLabel("Resize Local Loop");
 		MTextFieldNumber tfLength = new MTextFieldNumber(false, false);
-		JComboBox<String> cbType = new JComboBox<>(new String[] {
+		SComboBox<String> cbType = new SComboBox<>(new String[] {
 			"Length",
 			"Loop X Times"
 		});

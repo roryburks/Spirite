@@ -22,6 +22,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 
 import spirite.base.brains.MasterControl;
+import spirite.gui.hybrid.SComboBox;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 
 /**
@@ -103,15 +105,15 @@ public class NewImagePanel extends SPanel
     private void initComponents() {
 
         SPanel1 = new SPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new SLabel();
+        jLabel2 = new SLabel();
         jtfWidth = NumberFormattedTextField(true);
-        jLabel3 = new javax.swing.JLabel();
+        jLabel3 = new SLabel();
         jtfHeight = NumberFormattedTextField(false);
         SPanel3 = new SPanel();
-        jLabel4 = new javax.swing.JLabel();
+        jLabel4 = new SLabel();
         colorPanel = new SPanel();
-        colorCombo = new javax.swing.JComboBox<>();
+        colorCombo = new SComboBox<>();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setText("Image Size");
@@ -231,12 +233,12 @@ public class NewImagePanel extends SPanel
 
 
     // Variables declaration - do not modify                     
-    private javax.swing.JComboBox<Color> colorCombo;
+    private SComboBox<Color> colorCombo;
     private SPanel colorPanel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private SLabel jLabel1;
+    private SLabel jLabel2;
+    private SLabel jLabel3;
+    private SLabel jLabel4;
     private SPanel SPanel1;
     private SPanel SPanel3;
     private javax.swing.JTextField jtfHeight;

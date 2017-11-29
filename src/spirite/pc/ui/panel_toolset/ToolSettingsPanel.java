@@ -141,10 +141,10 @@ public class ToolSettingsPanel extends SPanel
 		return panel;
 	}
 	
-	private final Map<String,DataBinding> bindingMap = new HashMap<>();
+	private final Map<String,DataBinding<?>> bindingMap = new HashMap<>();
 	
 	void createNode( Property node, Group horizontal, Group vertical, GroupLayout layout) {
-		DataBinding binding = new DataBinding();
+		DataBinding<?> binding = new DataBinding<>();
 		bindingMap.put(node.getId(), binding);
 		
 		if( node instanceof SwingToolProperty) 

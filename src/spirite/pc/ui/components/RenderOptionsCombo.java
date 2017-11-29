@@ -8,20 +8,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
+import spirite.gui.hybrid.SComboBox;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.dialogs.Dialogs;
 
 
 public class RenderOptionsCombo extends SPanel {
-	private final JComboBox<RenderTuple> comboBox;
+	private final SComboBox<RenderTuple> comboBox;
 	private final SPanel rcOptions = new SPanel();
 	private final Dialogs dialogs;
 	private final RenderOptionCellRenderer renderer = new RenderOptionCellRenderer();
@@ -45,7 +45,7 @@ public class RenderOptionsCombo extends SPanel {
 			options[i] = new RenderTuple( values[i]);
 	
 		
-		comboBox = new JComboBox<>(options);
+		comboBox = new SComboBox<>(options);
 		comboBox.setRenderer(renderer);
 		
 		initLayout();

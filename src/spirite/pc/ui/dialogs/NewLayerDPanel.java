@@ -7,8 +7,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -20,6 +18,8 @@ import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
+import spirite.gui.hybrid.SComboBox;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.components.MTextFieldNumber;
@@ -50,16 +50,16 @@ public class NewLayerDPanel extends SPanel {
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
-	private JComboBox<InternalImageTypes> comboImgType = new JComboBox<>(InternalImageTypes.createableTypes());
-	private JLabel lblPartType;
+	private SComboBox<InternalImageTypes> comboImgType = new SComboBox<>(InternalImageTypes.createableTypes());
+	private SLabel lblPartType;
 	private SPanel colorPanelFG;
 	private SPanel colorPanelBG;
 	private SPanel colorPanelT;
 	private SPanel colorPanelSelect;
-	private JLabel lblColorFG;
-	private JLabel lblColorBG;
-	private JLabel lblColorT;
-	private JLabel lblColorSelect;
+	private SLabel lblColorFG;
+	private SLabel lblColorBG;
+	private SLabel lblColorT;
+	private SLabel lblColorSelect;
 	
 	private Border b_selected;
 	private Border b_unselected;
@@ -167,12 +167,12 @@ public class NewLayerDPanel extends SPanel {
 	 */
 	private void initComponents() {
 		
-		JLabel lblPartName = new JLabel("Layer Name:");
+		SLabel lblPartName = new SLabel("Layer Name:");
 		
 		tfPartName = new JTextField();
 		tfPartName.setColumns(10);
 		
-		JLabel lblWidth = new JLabel("Width:");
+		SLabel lblWidth = new SLabel("Width:");
 		
 		tfWidth = new MTextFieldNumber();
 		tfWidth.setColumns(10);
@@ -180,23 +180,23 @@ public class NewLayerDPanel extends SPanel {
 		tfHeight = new MTextFieldNumber();
 		tfHeight.setColumns(10);
 		
-		JLabel lblHeight = new JLabel("Height:");
+		SLabel lblHeight = new SLabel("Height:");
 		
 		tfPartType = new JTextField();
 		tfPartType.setColumns(10);
 		
-		lblPartType = new JLabel("Base Part:");
+		lblPartType = new SLabel("Base Part:");
 		
 		JSeparator separator = new JSeparator();
 		
-		JLabel lblNewLabel = new JLabel("Create New Part");
+		SLabel lblNewLabel = new SLabel("Create New Part");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JSeparator separator_2 = new JSeparator();
 		
 		SPanel panel_3 = new SPanel();
 		
-		lblColorFG = new JLabel("Foreground");
+		lblColorFG = new SLabel("Foreground");
 		lblColorFG.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblColorFG.addMouseListener(new ClickAdapter() {
 			@Override
@@ -204,7 +204,7 @@ public class NewLayerDPanel extends SPanel {
 				setSelected(0);
 			}
 		});
-		lblColorBG = new JLabel("Background");
+		lblColorBG = new SLabel("Background");
 		lblColorBG.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -212,7 +212,7 @@ public class NewLayerDPanel extends SPanel {
 			}
 		});
 		lblColorBG.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblColorT = new JLabel("Transparent");
+		lblColorT = new SLabel("Transparent");
 		lblColorT.addMouseListener(new ClickAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -239,7 +239,7 @@ public class NewLayerDPanel extends SPanel {
 			}
 		};
 		
-		lblColorSelect = new JLabel("Custom Color:");
+		lblColorSelect = new SLabel("Custom Color:");
 		lblColorSelect.addMouseListener( selectMA);
 		
 		colorPanelSelect = new SPanel();
@@ -253,7 +253,7 @@ public class NewLayerDPanel extends SPanel {
 		JSeparator separator_3 = new JSeparator();
 		separator_3.setOrientation(SwingConstants.VERTICAL);
 		
-		JLabel lblSelectBackgroundColor = new JLabel("Select Background Color:");
+		SLabel lblSelectBackgroundColor = new SLabel("Select Background Color:");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)

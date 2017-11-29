@@ -8,9 +8,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListCellRenderer;
@@ -20,6 +18,8 @@ import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.gui.hybrid.SButton;
+import spirite.gui.hybrid.SComboBox;
+import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.STabbedPane;
 import spirite.hybrid.Globals;
@@ -47,9 +47,9 @@ public class LayersPanel extends SPanel
 	private final LayerTabPane layerTabPane;
 	
 	// Render Chooser Components
-	private final JLabel rcLabel = new JLabel("Mode:");
+	private final SLabel rcLabel = new SLabel("Mode:");
 	private final SPanel rcOptions = new SPanel();
-	private final JComboBox<RenderTuple> renderCombo;
+	private final SComboBox<RenderTuple> renderCombo;
 	private final RenderOptionCellRenderer renderer = new RenderOptionCellRenderer();
 	
 	private boolean uilocked = false;
@@ -84,7 +84,7 @@ public class LayersPanel extends SPanel
 		RenderTuple options[] = new RenderTuple[ values.length];
 		for( int i=0; i<values.length; ++i)
 			options[i] = new RenderTuple(values[i]);
-		renderCombo = new JComboBox<RenderTuple>(options);
+		renderCombo = new SComboBox<RenderTuple>(options);
 		
 		initComponents();
 		initLayout();
@@ -109,6 +109,7 @@ public class LayersPanel extends SPanel
 		btnNewGroup.setIcon( Globals.getIcon("new_group"));
 		rcLabel.setFont(new Font("Tahoma", 0, 10));
 
+		renderCombo.setForeground(Globals.getColor("textDark"));
 		renderCombo.setRenderer( renderer);
 	}
 	
@@ -257,7 +258,7 @@ public class LayersPanel extends SPanel
 	/** CellRenderer for the RenderOption Combo Box. */
 	public class RenderOptionCellRenderer implements ListCellRenderer<RenderTuple> {
 		private final SPanel panel = new SPanel();
-		private final JLabel lbl = new JLabel();
+		private final SLabel lbl = new SLabel(true);
 		
 		private SPanel ccPanel = new SPanel();
 		

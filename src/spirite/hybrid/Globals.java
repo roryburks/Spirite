@@ -33,6 +33,16 @@ import spirite.pc.graphics.ImageBI;
 public class Globals {
 	
 	public static Dictionary<String,Color> colors = null;
+
+	private static final Color baseU =  new Color( 0,73,98);
+	private static final Color baseDDD = new Color(0, 90, 125);
+	private static final Color baseDD = new Color(0, 72,100);
+	private static final Color baseD = new Color(0, 90, 125);
+	private static final Color base = new Color(0, 118, 155);
+	private static final Color fgD = new Color(0,150,203);
+	private static final Color fg = new Color(0,168,223);
+	private static final Color fgL = new Color(0,190,240);
+	
 	private static void createColorDictionary() {
 	    final Object data[][] = {
 	        {"drawpanel.image.border", new Color(190,190,190)},
@@ -53,23 +63,24 @@ public class Globals {
 	        {"workArea.normalBG", new Color(238,238,238)},
 	        {"workArea.referenceBG", new Color( 210,210,242)},
 
-	        {"resizePanel.barLineColor", new Color( 0,73,98)},
+	        {"resizePanel.barLineColor", baseU},
 	        
-	        {"textField.Background", new Color(0,168,223)},
+	        {"textField.Background", fg},
 
-	        {"tabbedPane.SelectedBG", new Color(0,168,223)},
-	        {"tabbedPane.UnselectedBG",  new Color(0, 118, 155)},
-	        {"tabbedPane.TabBorder",  new Color(0, 90, 125)},
+	        {"tabbedPane.SelectedBG", fg},
+	        {"tabbedPane.UnselectedBG",  base},
+	        {"tabbedPane.TabBorder",  baseD},
 	        {"tabbedPane.TabText", new Color(255,255,255)},
 	        
-	        {"bevelBorderLight",new Color(0,150,203)},
-	        {"bevelBorderMed",  new Color(0, 90, 125)},
-	        {"bevelBorderDark", new Color(0, 72,100)},
-	        {"bevelBorderDarker", new Color(0, 58,80)},
+	        {"bevelBorderLight", fgD},
+	        {"bevelBorderMed", baseD},
+	        {"bevelBorderDark", baseDD},
+	        {"bevelBorderDarker", baseDDD},
 
-	        {"bgDark", new Color(0, 90, 125)},
-	        {"bg", new Color(0, 118, 155)},
-	        {"fg", new Color(0,168,223)},
+	        {"bgDark", baseDDD},
+	        {"bg", base},
+	        {"fg", fg},
+	        {"fgL", fgL},
 	        {"text", new Color(190,205,220)},
 	        {"textDark", new Color(57,62,66)},
 	        //{"bg", new Color( 238,238,238)},
