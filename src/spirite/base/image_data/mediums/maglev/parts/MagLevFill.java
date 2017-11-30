@@ -62,8 +62,6 @@ public class MagLevFill extends AMagLevThing {
 		for( MagLevFill.StrokeSegment s : segments) {
 			MagLevStroke stroke = (MagLevStroke)context.getThingById( s.strokeId);
 
-			if(stroke == null)
-				System.out.println("SSS");
 			float start = stroke.direct.getNearIndex(s.start);
 			float end = stroke.direct.getNearIndex(s.end);
 			

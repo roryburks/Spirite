@@ -232,7 +232,7 @@ public class MaglevMedium implements IMedium {
 	}
 	
 	public void contortBones(BaseBone bone, Interpolator2D state) {
-		this.things = BoneContorter.contortBones(this.things, bone, state);
+		this.things = BoneContorterKt.contortBones(this.things, bone, state);
 		unbuild();
 		Build();
 		//context.getHandleFor(this).refresh();

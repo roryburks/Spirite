@@ -20,8 +20,10 @@ public class MagLevStroke extends AMagLevThing {
 	public final PenState[] states;
 	public final StrokeParams params;
 	IndexedDrawPoints direct;
-	
-	public MagLevStroke( PenState[] states, StrokeParams params) {
+
+	public MagLevStroke( PenState[] states, StrokeParams params, int id) {
+		super(id);
+		
 		this.states = states;
 		this.params = params;
 		
@@ -39,6 +41,9 @@ public class MagLevStroke extends AMagLevThing {
 				interpolator.addPoint(ps.x, ps.y);
 		}
 		direct = StrokeEngine.buildIndexedPoints(interpolator, Arrays.asList(states), params);
+	}
+	public MagLevStroke( PenState[] states, StrokeParams params) {
+		this(states,params,-1);
 	}
 	
 	// ===========

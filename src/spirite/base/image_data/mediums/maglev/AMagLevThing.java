@@ -8,6 +8,9 @@ import spirite.base.util.linear.Vec2;
 
 public abstract class AMagLevThing {
 	int id = -1;
+
+	public AMagLevThing() {}
+	public AMagLevThing(int id) {this.id = id;}
 	
 	public int getId() {return id;}
 	

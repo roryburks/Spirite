@@ -13,7 +13,7 @@ import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.util.BinSearch;
+import spirite.base.util.BinSearchKt;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
@@ -62,7 +62,7 @@ public abstract class StrokeEngine {
 		 * 	Math.floor/Math.ceil can be used for a left or right bound
 		 */
 		public float getNearIndex( float met) {
-			return BinSearch.ApproximateBinarySearch(t, met);
+			return BinSearchKt.ApproximateBinarySearch(t, met);
 		}
 	}
 	
