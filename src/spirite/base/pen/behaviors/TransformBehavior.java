@@ -112,9 +112,9 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			gc.setColor(Colors.GRAY);
 //			gc.setStroke(defStroke);
 			
-			Vec2 p = new Vec2();
+			Vec2 p = null;
 			try {
-				p = relTrans.inverseTransform(new Vec2(this.penner.rawX,this.penner.rawY), p);
+				p = relTrans.inverseTransform(new Vec2(this.penner.rawX,this.penner.rawY));
 			} catch (NoninvertableException e) {
 				e.printStackTrace();
 			}
@@ -179,11 +179,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			case READY:
 				break;
 			case RESIZE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
-
-				calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
+				Vec2 pn = calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY));
+				Vec2 ps = calcTrans.transform(new Vec2(startX,startY));
 
 				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.x/ps.x * oldScaleX;
 				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.y/ps.y * oldScaleY;
@@ -191,11 +188,11 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				_internetSetScale(sx, sy);
 				break;}
 			case ROTATE:{
-				Vec2 pn = new Vec2();
-				Vec2 ps = new Vec2();
+				Vec2 pn = calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY));
+				Vec2 ps = calcTrans.transform(new Vec2(startX,startY));
 
-				calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY), pn);
-				calcTrans.transform(new Vec2(startX,startY), ps);
+				
+				
 				
 
 				double start = Math.atan2(ps.y, ps.x);

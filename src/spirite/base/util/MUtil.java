@@ -39,9 +39,12 @@ public class MUtil {
 	public static int high16( int i) {
 		return i >>> 16;
 	}
-	
+
 	public static double distance( double x1, double y1, double x2, double y2) {
 		return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+	}
+	public static float distance( float x1, float y1, float x2, float y2) {
+		return (float) Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 	}
 
 	public static int clip( int min, int value, int max) {
@@ -101,10 +104,10 @@ public class MUtil {
 	 */
 	public static Rect findBounds( Rect region, MatTrans matrix) {
 		// Might be some slightly-more-clever way to determing this
-		Vec2 p1 = matrix.transform(new Vec2(region.x, region.y),  new Vec2());
-		Vec2 p2 = matrix.transform(new Vec2(region.x+region.width, region.y),  new Vec2());
-		Vec2 p3 = matrix.transform(new Vec2(region.x, region.y + region.height),  new Vec2());
-		Vec2 p4 = matrix.transform(new Vec2(region.x+region.width, region.y + region.height),  new Vec2());
+		Vec2 p1 = matrix.transform(new Vec2(region.x, region.y));
+		Vec2 p2 = matrix.transform(new Vec2(region.x+region.width, region.y));
+		Vec2 p3 = matrix.transform(new Vec2(region.x, region.y + region.height));
+		Vec2 p4 = matrix.transform(new Vec2(region.x+region.width, region.y + region.height));
 
 		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
 		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
@@ -169,10 +172,10 @@ public class MUtil {
 	}
 	
 	public static Rect circumscribeTrans( Rect oldRect, MatTrans trans) {
-		Vec2 p1 =  trans.transform( new Vec2(oldRect.x, oldRect.y), new Vec2());
-		Vec2 p2 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y), new Vec2());
-		Vec2 p3 =  trans.transform( new Vec2(oldRect.x, oldRect.y+oldRect.height), new Vec2());
-		Vec2 p4 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height), new Vec2());
+		Vec2 p1 =  trans.transform( new Vec2(oldRect.x, oldRect.y));
+		Vec2 p2 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y));
+		Vec2 p3 =  trans.transform( new Vec2(oldRect.x, oldRect.y+oldRect.height));
+		Vec2 p4 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height));
 
 		int x1 = (int)Math.min( Math.floor(p1.x), Math.min(Math.floor(p2.x), Math.min(Math.floor(p3.x), Math.floor(p4.x))));
 		int y1 = (int)Math.min( Math.floor(p1.y), Math.min(Math.floor(p2.y), Math.min(Math.floor(p3.y), Math.floor(p4.y))));

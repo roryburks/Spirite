@@ -591,7 +591,7 @@ public class DefaultImageDrawer
 		final ImageWorkspace workspace = building.handle.getContext();
 		int lockedColor = (locked)?workspace.getPaletteManager().getActiveColor(0):0;
 
-		Vec2 start = building.trans.transform(new Vec2(x,y), new Vec2());
+		Vec2 start = building.trans.transform(new Vec2(x,y));
 		int sx= Math.round(start.x);
 		int sy = Math.round(start.y);
 		

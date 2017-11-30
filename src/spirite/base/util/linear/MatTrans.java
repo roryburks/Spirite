@@ -162,16 +162,16 @@ public class MatTrans {
 	public float getTranslateX() {return m02;}
 	public float getTranslateY() {return m12;}
 	
-	public Vec2 transform(Vec2 from, Vec2 to) {
+	public Vec2 transform(Vec2 from) {
         float x = from.x;
         float y = from.y;
-        to.x = m00 * x + m01 * y + m02;
-        to.y = m10 * x + m11 * y + m12;
-        return to;
+        return new Vec2(
+        		m00 * x + m01 * y + m02,
+        		m10 * x + m11 * y + m12);
 	}
-	public Vec2 inverseTransform(Vec2 from, Vec2 to) throws NoninvertableException 
+	public Vec2 inverseTransform(Vec2 from) throws NoninvertableException 
 	{
-		return createInverse().transform(from, to);
+		return createInverse().transform(from);
 	}
 	
     public MatTrans createInverse()

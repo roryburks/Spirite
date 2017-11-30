@@ -191,7 +191,7 @@ public class SpriteLayer extends Layer
 			if( part.isVisible()) {
 				MatTrans invTrans = part.buildInverseTransform();
 				Vec2 from = new Vec2( x - dx, y-dy);
-				Vec2 to = invTrans.transform(from, new Vec2());
+				Vec2 to = invTrans.transform(from);
 				
 				if( !MUtil.coordInImage( (int)to.x, (int)to.y, part.structure.handle.deepAccess()))
 					continue;

@@ -30,7 +30,7 @@ public abstract class AMagLevThing {
 		if( points == null)return;
 		
 		for( int i=0; i < points.length; i += 2) {
-			Vec2 to = trans.transform(new Vec2(points[i],points[i+1]), new Vec2());
+			Vec2 to = trans.transform(new Vec2(points[i],points[i+1]));
 			points[i] = to.x;
 			points[i+1] = to.y;
 		}

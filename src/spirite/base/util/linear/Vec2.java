@@ -7,10 +7,9 @@ import com.hackoeur.jglm.support.FastMath;
  */
 
 public class Vec2 {
-    public float x;
-	public float y;
+    public final float x;
+	public final float y;
 	
-	public Vec2() {}
     public Vec2( float x, float y) {
         this.x = x;
         this.y = y;

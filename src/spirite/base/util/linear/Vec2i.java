@@ -5,8 +5,8 @@ package spirite.base.util.linear;
  */
 
 public class Vec2i {
-    public int x;
-	public int y;
+    public final int x;
+	public final int y;
 
     public Vec2i( int x, int y) {
         this.x = x;

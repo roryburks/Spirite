@@ -97,14 +97,14 @@ public class FlatMedium implements IMedium {
 			//	Some image modification methods do not use draw actions, but
 			//	 rather alter the image directly.  For example a flood fill action.
 			//	
-			Vec2 inverted = invTrans.transform(new  Vec2(p.x, p.y), new Vec2());
+			Vec2 inverted = invTrans.transform(new  Vec2(p.x, p.y));
 			return new Vec2i((int)inverted.x, (int)inverted.y);
 		}
 		public Vec2 convert( Vec2 p) {
 			//	Some image modification methods do not use draw actions, but
 			//	 rather alter the image directly.  For example a flood fill action.
 			//	
-			return invTrans.transform(new  Vec2(p.x, p.y), new Vec2());
+			return invTrans.transform(new  Vec2(p.x, p.y));
 			
 		}
 		

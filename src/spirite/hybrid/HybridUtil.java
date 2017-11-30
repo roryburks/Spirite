@@ -46,6 +46,7 @@ public class HybridUtil {
 	 * @param to Class to convert it to
 	 * @see HybridHelper.loadImageIntoGL
 	 * */
+	@SuppressWarnings("unchecked")
 	public static <T extends RawImage> T convert( RawImage from, Class<? extends T> to) {
 		if( from.getClass() == to)
 			return (T)from;

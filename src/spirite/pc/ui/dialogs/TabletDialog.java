@@ -229,7 +229,7 @@ public class TabletDialog extends JDialog
 			}
 		}
 		
-		public void screenToLogic(Vec2 p) {
+		public Vec2 screenToLogic(Vec2 p) {
 			int width = getWidth();
 			int height = getHeight();
 			int x1 = DWIDTH;
@@ -237,10 +237,10 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			p.x =  MUtil.clip(0, (p.x-x1)/w, 1);
-			p.y = MUtil.clip(0, 1-(p.y-y1)/h, 1);
+			return new Vec2(MUtil.clip(0, (p.x-x1)/w, 1),
+					MUtil.clip(0, 1-(p.y-y1)/h, 1));
 		}
-		public void logicToScreen(Vec2 p){
+		public Vec2 logicToScreen(Vec2 p){
 			int width = getWidth();
 			int height = getHeight();
 			int x1 = DWIDTH;
@@ -248,8 +248,7 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			p.x = p.x*w+x1;
-			p.y = 1-p.y*h+y1;
+			return new Vec2( p.x*w+x1, 1-p.y*h+y1);
 		}
 
 		class SCPAdapter extends MouseAdapter {
@@ -287,9 +286,7 @@ public class TabletDialog extends JDialog
 				super.mouseDragged(evt);
 				
 				if( movingPoint != null) {
-					movingPoint.x = evt.getX();
-					movingPoint.y = evt.getY();
-					screenToLogic(movingPoint);
+					movingPoint = screenToLogic( new Vec2(evt.getX(), evt.getY()));
 					repaint();
 				}
 			}

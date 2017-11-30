@@ -16,6 +16,7 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine.DrawImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
 
 public class SimpleLayer extends Layer {
@@ -83,8 +84,7 @@ public class SimpleLayer extends Layer {
 		
 		if( !myBounds.contains( imgBounds)) {
 			Rect newBounds = myBounds.union(imgBounds);
-			helper.offsetChange.x = newBounds.x;
-			helper.offsetChange.y = newBounds.y;
+			helper.offsetChange = new Vec2i(newBounds.x, newBounds.y);
 			
 			// Draw both images in their respective spots
 			RawImage combination = HybridHelper.createImage( newBounds.width, newBounds.height);
@@ -120,8 +120,7 @@ public class SimpleLayer extends Layer {
 		for( ImageCropHelper crop : crops) {
 			if( crop.handle.equals(data)){
 				LayerActionHelper helper = new  LayerActionHelper();
-				helper.offsetChange.x = crop.dx;
-				helper.offsetChange.y = crop.dy;
+				helper.offsetChange = new Vec2i(crop.dx, crop.dy);
 				return helper;
 			}
 		}
