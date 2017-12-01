@@ -23,9 +23,9 @@ import spirite.hybrid.HybridUtil;
  * 
  */
 public class DynamicMedium implements IMedium {
-	DynamicImage image;
+	private DynamicImage image;
 	protected final ImageWorkspace context;
-	boolean flushed = false;
+	private boolean flushed = false;
 	public DynamicMedium(RawImage raw, int ox, int oy, ImageWorkspace context) {
 		this.context = context;
 		this.image = new DynamicImage(context, raw, ox, oy);
@@ -53,7 +53,7 @@ public class DynamicMedium implements IMedium {
 			flushed = true;
 		}
 	}
-	@Override protected void finalize() throws Throwable {flush();}
+	@Override protected void finalize() {flush();}
 	@Override public IImage readOnlyAccess() { return image.getBase();}
 	@Override public int getDynamicX() {return image.getXOffset();}
 	@Override public int getDynamicY() {return image.getYOffset();}
@@ -63,7 +63,6 @@ public class DynamicMedium implements IMedium {
 	public class DynamicBuiltImageData extends ABuiltMediumData{
 		MatTrans trans;
 		MatTrans invTrans;
-		RawImage buffer = null;
 		
 		public DynamicBuiltImageData(BuildingMediumData building) 
 		{

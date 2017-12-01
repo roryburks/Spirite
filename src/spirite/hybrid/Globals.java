@@ -34,9 +34,8 @@ public class Globals {
 	
 	public static Dictionary<String,Color> colors = null;
 
-	private static final Color baseU =  new Color( 0,73,98);
-	private static final Color baseDDD = new Color(0, 90, 125);
-	private static final Color baseDD = new Color(0, 72,100);
+	private static final Color baseDDD = new Color(0, 72,100);
+	private static final Color baseDD = new Color(0, 90, 125);
 	private static final Color baseD = new Color(0, 90, 125);
 	private static final Color base = new Color(0, 118, 155);
 	private static final Color fgD = new Color(0,150,203);
@@ -63,7 +62,7 @@ public class Globals {
 	        {"workArea.normalBG", new Color(238,238,238)},
 	        {"workArea.referenceBG", new Color( 210,210,242)},
 
-	        {"resizePanel.barLineColor", baseU},
+	        {"resizePanel.barLineColor", baseDDD},
 	        
 	        {"textField.Background", fg},
 
@@ -77,7 +76,7 @@ public class Globals {
 	        {"bevelBorderDark", baseDD},
 	        {"bevelBorderDarker", baseDDD},
 
-	        {"bgDark", baseDDD},
+	        {"bgDark", baseDD},
 	        {"bg", base},
 	        {"fg", fg},
 	        {"fgL", fgL},

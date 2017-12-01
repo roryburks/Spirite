@@ -15,21 +15,21 @@ fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D
 	val y2 = bone.y2
 	
 	val b = Vec2(x2-x1, y2-y1)
-	val scale_b = b.mag
-	val scale_b2 = scale_b*scale_b
-	val clen = state.curveLength
+	val scaleB = b.mag
+	val scaleB2 = scaleB*scaleB
+	val cLen = state.curveLength
 	
 	// Construct normal Interpolator
 	val normals = CubicSplineInterpolatorND(arrayOf<FloatArray>(), 2, 0, true)
 	var from = state.eval(0f)
 	
     var s = 1f
-    while (s < clen + 1)
+    while (s < cLen + 1)
     {
       val to = state.eval(s)
       var normal = to.sub(from)
       normal = (Vec2(-normal.y, normal.x)).normalize()	// Rotate 90 degrees, then normalize
-      normals.addPoint(floatArrayOf(normal.x, normal.y, (s - 1) / clen))
+      normals.addPoint(floatArrayOf(normal.x, normal.y, (s - 1) / cLen))
       from = to
       s += 1f
     }
@@ -44,7 +44,7 @@ fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D
 	for( thing in source) {
 		if ( thing is MagLevStroke){
 			val toTransform = thing.penstates
-			if( !(toTransform?.size != 0))
+			if( toTransform?.size ?: 0 == 0)
 				continue
 			
 			val transformed = toTransform.map { 
@@ -53,12 +53,12 @@ fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D
 				//	t = 1, m=0 represents x2, y2
 				//	m represents the distance from the line (left = positive)
 				val a = Vec2(it.x - x1, it.y - y1)
-				val t = a.dot(b) / scale_b2		// the extra / ||b|| is to normalize it to ||b|| = 1
-				val m = a.cross(b) / scale_b
+				val t = a.dot(b) / scaleB2		// the extra / ||b|| is to normalize it to ||b|| = 1
+				val m = a.cross(b) / scaleB
 				
 				// Step 2: Use the t to calculate the point on the interpolator to
 				//	branch off of and use m as the distance to branch off of it
-				val p = state.eval( t*clen)
+				val p = state.eval( t*cLen)
 				val normal = normals.eval(t)
 				
 				PenState(p.x - normal[0]*m, p.y-normal[1]*m, it.pressure)

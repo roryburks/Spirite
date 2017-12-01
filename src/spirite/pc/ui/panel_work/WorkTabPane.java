@@ -8,7 +8,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
@@ -68,12 +68,15 @@ public class WorkTabPane extends STabbedPane
 	// :::: MWorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace selected, ImageWorkspace previous) {
-		for( int i = 0; i < workspaces.size(); ++i) {
-			if( workspaces.get(i) == selected) {
-				setSelectedIndex(i);
-				return;
+		SwingUtilities.invokeLater(()->{
+
+			for( int i = 0; i < workspaces.size(); ++i) {
+				if( workspaces.get(i) == selected) {
+					setSelectedIndex(i);
+					return;
+				}
 			}
-		}
+		});
 	}
 	
 	@Override
@@ -90,7 +93,7 @@ public class WorkTabPane extends STabbedPane
 		if( this.getTabCount() == 0)
 			this.addTab(title, workPanel);
 		else
-			this.addTab(title, workPanel);
+			this.addTab(title, null);
 	}
 	
 	@Override

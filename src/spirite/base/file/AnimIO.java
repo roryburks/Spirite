@@ -28,8 +28,7 @@ import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.util.GifSequenceWriter;
-import spirite.base.util.RectanglePacker;
-import spirite.base.util.RectanglePacker.PackedRectangle;
+import spirite.base.util.RectanglePackerKt;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
@@ -197,8 +196,8 @@ public class AnimIO {
 		}
 		
 		// Step 3: Pack the Rectangles in a given area and save to a png
-		PackedRectangle pr = RectanglePacker.modifiedSleatorAlgorithm(toPack);
-		for( Rect r : pr.packedRects) {
+		spirite.base.util.PackedRectangle pr = RectanglePackerKt.modifiedSleatorAlgorithm(toPack);
+		for( Rect r : pr.getPackedRects()) {
 			for( CroppedImage ci : images) {
 				if( ci != null && ci.rectInImage == null &&
 					ci.bi.getWidth() == r.width && ci.bi.getHeight() == r.height) 
@@ -210,7 +209,7 @@ public class AnimIO {
 		}
 		
 		BufferedImage output_bi = new BufferedImage(
-				pr.width, pr.height, HybridHelper.BI_FORMAT);
+				pr.getWidth(), pr.getHeight(), HybridHelper.BI_FORMAT);
 		Graphics g = output_bi.getGraphics();
 		for( CroppedImage ci : images) {
 			if( ci != null && ci.rectInImage != null) {
