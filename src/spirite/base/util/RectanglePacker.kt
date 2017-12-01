@@ -19,7 +19,7 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle? {
     val cropped = toPack.toMutableList()
 
     // Remove bad Rects
-    cropped.removeIf {it?.x ?: 0 <= 0 || it?.y <= 0}
+    cropped.removeIf {it.x <= 0 || it.y <= 0}
 
     val minWidth = toPack.maxBy { it.x }!!.x
 
