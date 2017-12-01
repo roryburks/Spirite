@@ -72,7 +72,6 @@ import spirite.pc.ui.omni.FrameManager;
  *
  */
 public class MasterControl
-	implements MImageObserver 
 {
 	// Components
     private final HotkeyManager hotkeys;
@@ -207,7 +206,22 @@ public class MasterControl
 			e.printStackTrace();
 		}
     }
-    
+
+
+    MImageObserver imageObserver = new MImageObserver() {
+		@Override
+		public void imageChanged(ImageChangeEvent evt) {
+
+			cimageObs.trigger((MImageObserver obs) -> {obs.imageChanged(evt);});
+		}
+
+		@Override
+		public void structureChanged(StructureChangeEvent evt) {
+
+			cimageObs.trigger((MImageObserver obs) -> {obs.structureChanged(evt);});
+		}
+	};
+
     public void closeWorkspace( ImageWorkspace workspace) {
     	closeWorkspace(workspace, true);
     }
@@ -226,7 +240,7 @@ public class MasterControl
     	
     	// Remove the workspace
     	workspace.cleanup();
-    	workspace.removeImageObserver(this);
+    	workspace.removeImageObserver(imageObserver);
     	workspaces.remove(i);
     	triggerRemoveWorkspace(workspace);
     	
@@ -316,7 +330,7 @@ public class MasterControl
 		workspaces.add(workspace);
 		triggerNewWorkspace(workspace);
 		
-		workspace.addImageObserver(this);
+		workspace.addImageObserver(imageObserver);
 		
 		if( select || currentWorkspace == null) {
 			setCurrentWorkpace(workspace);
@@ -342,7 +356,7 @@ public class MasterControl
     	ws.addNewSimpleLayer(null, width, height, "Background", color, InternalImageTypes.NORMAL);
     	
     	workspaces.add( ws);
-    	ws.addImageObserver( this);
+    	ws.addImageObserver( imageObserver);
     	
     	triggerNewWorkspace(ws);
     	if( selectOnCreate || currentWorkspace == null) {
@@ -444,17 +458,6 @@ public class MasterControl
     private final ObserverHandler<MImageObserver> cimageObs = new ObserverHandler<>();
     public void addGlobalImageObserver( MImageObserver obs) { cimageObs.addObserver(obs);}
     public void removeGlobalImageObserver( MImageObserver obs) { cimageObs.removeObserver(obs);}
-
-	// :::: MImageObserver
-	@Override
-	public void structureChanged(StructureChangeEvent evt) {
-		cimageObs.trigger((MImageObserver obs) -> {obs.structureChanged(evt);});
-	}
-
-	@Override
-	public void imageChanged( ImageChangeEvent evt) {
-		cimageObs.trigger((MImageObserver obs) -> {obs.imageChanged(evt);});
-	}
 	
 	// :::: Tracking Map Observer:
 	private class TrackingObserver<T> {
