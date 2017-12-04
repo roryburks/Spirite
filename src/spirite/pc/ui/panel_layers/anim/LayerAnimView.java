@@ -22,7 +22,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.RigAnimation;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.SScrollPane;
 import spirite.pc.ui.Transferables;
@@ -188,11 +187,14 @@ public class LayerAnimView extends SPanel implements MAnimationStructureObserver
 		}
 		else if( node instanceof AnimationNode) {
 			AnimationNode anode = ((AnimationNode)node);
-			
-			if( anode.getAnimation() instanceof FixedFrameAnimation)
-				toAdd = tree.new LeafNode( new FFAnimationSchemePanel(master, anode));
-			else if( anode.getAnimation() instanceof RigAnimation)
-				toAdd = tree.new LeafNode( new RigAnimationSchemePanel(master, anode));
+			// TODO
+			// TODO
+			// TODO
+//
+//			if( anode.getAnimation() instanceof FixedFrameAnimation)
+//				toAdd = tree.new LeafNode( new FFAnimationSchemePanel(master, anode));
+//			else if( anode.getAnimation() instanceof RigAnimation)
+//				toAdd = tree.new LeafNode( new RigAnimationSchemePanel(master, anode));
 		}
 		if( toAdd == null)
 			return;

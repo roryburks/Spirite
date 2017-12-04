@@ -26,10 +26,6 @@ import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
-import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
-import spirite.base.image_data.animations.RigAnimation;
-import spirite.base.image_data.animations.RigAnimation.PartKeyFrame;
-import spirite.base.image_data.animations.RigAnimation.RigAnimLayer;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -489,87 +485,87 @@ public class SaveEngine implements MWorkspaceObserver {
 			throws UnsupportedEncodingException, IOException 
 	{
 		WriteChunk(helper, "ANIM", () -> {
-
-			List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
-			
-			for( Animation animation : animations) {
-				// [n] : UTF8: Animation Name
-				helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
-				
-				if( animation instanceof FixedFrameAnimation) {
-					// [1] : ID
-					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
-					
-					// [2] : Number of Layers
-					List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
-					layers.remove(null);
-					helper.ra.writeShort( layers.size());
-					
-					for( AnimationLayer layer : layers) {
-						// [4] : Group Node Bound to
-						helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
-						
-						// [1] : bit mask
-						helper.ra.writeByte( (layer.includesSubtrees())?1:0);
-						
-						// [2] : Number of Frames
-						List<Frame> linkedFrames = layer.getFrames();
-						linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
-						helper.ra.writeShort(linkedFrames.size());
-						
-						for( Frame frame : linkedFrames) {
-							// [4] : NodeID of LayerNode linked to
-							helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
-
-							// [2] : Length
-							helper.ra.writeShort(frame.getLength());
-							// [2] : Gap Before
-							helper.ra.writeShort(frame.getGapBefore());
-							// [2] : Gap After
-							helper.ra.writeShort(frame.getGapAfter());
-						}
-					}
-				}
-				else if( animation instanceof RigAnimation) {
-					RigAnimation rigAnimation = (RigAnimation)animation;
-					// [1] : ID
-					helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
-					
-					// [2] : Number of Sprites
-					List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
-					helper.ra.writeShort(spriteLayers.size());
-				
-					for( RigAnimLayer spriteLayer : spriteLayers) {
-						// [4] : NodeID of Sprite
-						helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
-						
-						// [2] : Number of Parts
-						List<Part> parts = spriteLayer.sprite.getParts();
-						helper.ra.writeShort(parts.size());
-						for( Part part : parts) {
-							// [n, UTF8 str] : Part Type Name
-							helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
-
-							List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
-							// [2] : Number of Key Frames;
-							helper.ra.writeShort(keyFrames.size());
-							
-							for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
-								helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
-								
-								helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
-								helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
-								helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
-								helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
-								helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
-							}
-						}
-					}
-				}
-				else {
-					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
-				}
-			}
+//
+//			List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
+//
+//			for( Animation animation : animations) {
+//				// [n] : UTF8: Animation Name
+//				helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
+//
+//				if( animation instanceof FixedFrameAnimation) {
+//					// [1] : ID
+//					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
+//
+//					// [2] : Number of Layers
+//					List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
+//					layers.remove(null);
+//					helper.ra.writeShort( layers.size());
+//
+//					for( AnimationLayer layer : layers) {
+//						// [4] : Group Node Bound to
+//						helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
+//
+//						// [1] : bit mask
+//						helper.ra.writeByte( (layer.includesSubtrees())?1:0);
+//
+//						// [2] : Number of Frames
+//						List<Frame> linkedFrames = layer.getFrames();
+//						linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
+//						helper.ra.writeShort(linkedFrames.size());
+//
+//						for( Frame frame : linkedFrames) {
+//							// [4] : NodeID of LayerNode linked to
+//							helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
+//
+//							// [2] : Length
+//							helper.ra.writeShort(frame.getLength());
+//							// [2] : Gap Before
+//							helper.ra.writeShort(frame.getGapBefore());
+//							// [2] : Gap After
+//							helper.ra.writeShort(frame.getGapAfter());
+//						}
+//					}
+//				}
+//				else if( animation instanceof RigAnimation) {
+//					RigAnimation rigAnimation = (RigAnimation)animation;
+//					// [1] : ID
+//					helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
+//
+//					// [2] : Number of Sprites
+//					List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
+//					helper.ra.writeShort(spriteLayers.size());
+//
+//					for( RigAnimLayer spriteLayer : spriteLayers) {
+//						// [4] : NodeID of Sprite
+//						helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
+//
+//						// [2] : Number of Parts
+//						List<Part> parts = spriteLayer.sprite.getParts();
+//						helper.ra.writeShort(parts.size());
+//						for( Part part : parts) {
+//							// [n, UTF8 str] : Part Type Name
+//							helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
+//
+//							List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
+//							// [2] : Number of Key Frames;
+//							helper.ra.writeShort(keyFrames.size());
+//
+//							for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
+//								helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
+//
+//								helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
+//								helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
+//								helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
+//								helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
+//								helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
+//							}
+//						}
+//					}
+//				}
+//				else {
+//					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
+//				}
+//			}
 		});
 	}
 	

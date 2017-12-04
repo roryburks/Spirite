@@ -5,7 +5,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.renderer.RenderEngine
 
-abstract class AnimationKt constructor( context: ImageWorkspace)
+abstract class Animation constructor(context: ImageWorkspace)
 {
     var context = context
         set( value)  {

@@ -13,8 +13,8 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
+import spirite.base.image_data.animations.AnimationState;
+import spirite.base.image_data.animations.NodeLinkedAnimation;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -65,121 +65,7 @@ public class AnimationManager implements MImageObserver, MNodeSelectionObserver 
 		return stateMap.get(animation);
 	}
 
-	public class AnimationState {
-		private final Animation animation;
-		private float met;
-		private boolean expanded = true;
-		private float selectMet;
-		private Map<AnimationLayer, RenderProperties> substates = new HashMap<>();
-		private Map<Integer, RenderProperties> byTick = new HashMap<>();
-		private RenderProperties defaultProperties = new RenderProperties();
 
-		private AnimationState(Animation animation) {
-			this.animation = animation;
-			defaultProperties.visible = false;
-			resetSubstatesForTicks();
-		}
-
-		public boolean getExpanded() {
-			return expanded;
-		}
-
-		public void setExpanded(boolean expanded) {
-			if (this.expanded != expanded) {
-				this.expanded = expanded;
-				triggerFrameChanged();
-			}
-		}
-
-		public float getMetronom() {
-			return met;
-		}
-
-		public void setMetronome(float metronome) {
-			if (this.met != metronome) {
-				this.met = metronome;
-				triggerFrameChanged();
-			}
-		}
-
-		public float getSelectedMetronome() {
-			return selectMet;
-		}
-
-		public void setSelectedMetronome(float t) {
-			selectMet = t;
-			triggerInnerStateChange(animation);
-			context.triggerFlash();
-		}
-		
-		public int cannonizeRelTick( int t) {
-			return cannonizeRelTick( t, (int)Math.floor(selectMet));
-		}
-		public int cannonizeRelTick( int t, int center) {
-			int L = (int)animation.getEndFrame() - (int)animation.getStartFrame();
-			return ((((t - center) % L) + L + L/2) % L) - L/2;
-		}
-
-		// Vert/Hor Visibility Settings
-		public RenderProperties getSubstateForLayer(AnimationLayer al) {
-			RenderProperties ss = substates.get(al);
-			return (ss == null) ? defaultProperties : ss;
-		}
-
-		public void putSubstateForLayer(AnimationLayer al, RenderProperties properties) {
-			substates.remove(al);
-			substates.put(al, new RenderProperties(properties, trigger));
-		}
-
-		public void resetSubstatesForLayers() {
-			substates.clear();
-		}
-
-		public RenderProperties getSubstateForRelativeTick(int tick) {
-			RenderProperties ss = byTick.get(tick);
-			return new RenderProperties((ss == null) ? defaultProperties : ss);
-		}
-		public boolean hasSubstateForRelativeTick( int tick) {
-			return byTick.get(tick) != null;
-		}
-
-		public void putSubstateForRelativeTick(int tick, RenderProperties properties) {
-			byTick.remove(tick);
-			byTick.put(tick, new RenderProperties(properties, trigger));
-			triggerInnerStateChange(animation);
-		}
-
-		public void resetSubstatesForTicks() {
-			byTick.clear();
-			byTick.put(0, new RenderProperties(trigger));
-		}
-
-		
-		// :::: Specific Get
-		public RenderProperties getPropertiesForFrame(AnimationLayer layer, int tick) {
-			return getSubstateForRelativeTick(tick);
-//			int _met = (int)Math.floor(selectMet);
-//			int offset = tick - _met;
-//
-//			
-//			RenderProperties properties = byTick.get(tick);
-//			if( properties == null) properties = defaultProperties;
-//			
-//			return properties;
-		}
-
-		private final RenderProperties.Trigger trigger=new RenderProperties.Trigger(){
-			@Override public boolean visibilityChanged(boolean newVisible) {
-				triggerInnerStateChange(animation);
-				return true;
-			}@Override public boolean alphaChanged(float newAlpha){
-				triggerInnerStateChange(animation);
-				return true;
-			}@Override public boolean methodChanged(RenderMethod newMethod,int newValue){
-				triggerInnerStateChange(animation);
-				return true;
-		}};
-	}
 
 	// :: Internal Add/Remove
 	private void _addAnimation(Animation anim, AnimationState as) {
@@ -275,38 +161,6 @@ public class AnimationManager implements MImageObserver, MNodeSelectionObserver 
 			return "Remove Animation";
 		}
 	}
-
-	// :::: Frame Selection
-
-	// Since there is a 1:many relationship between nodes and animations, sometimes
-	// you need a finer selection
-
-	public AnimationLayer.Frame getSelectedFrame() {
-		if (selectedFrame != null)
-			return selectedFrame;
-
-		Node node = context.getSelectedNode();
-
-		if (node instanceof LayerNode && selectedAnimation instanceof FixedFrameAnimation) {
-			FixedFrameAnimation anim = (FixedFrameAnimation) selectedAnimation;
-
-			for (AnimationLayer layer : anim.getLayers()) {
-				for (AnimationLayer.Frame frame : layer.getFrames()) {
-					if (frame.getLinkedNode() == node)
-						return frame;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public void selectFrame(AnimationLayer.Frame frame) {
-		context.setSelectedNode(frame == null ? null : frame.getLinkedNode());
-		selectedFrame = frame;
-	}
-
-	private AnimationLayer.Frame selectedFrame;
 	
 	// Goes through all the animations and purges them of orphaned data
 	public void purge() {
@@ -437,7 +291,8 @@ public class AnimationManager implements MImageObserver, MNodeSelectionObserver 
 		List<Node> changed = evt.change.getChangedNodes();
 
 		for (Animation animation : animations) {
-			animation.nodesChanged(changed);
+			if( animation instanceof NodeLinkedAnimation)
+				((NodeLinkedAnimation)animation).nodesChanged(changed);
 		}
 	}
 

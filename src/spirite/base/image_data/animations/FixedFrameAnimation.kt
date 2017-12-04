@@ -1,16 +1,16 @@
 package spirite.base.image_data.animations
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.renderer.RenderEngine
 import spirite.base.image_data.*
 
-class FixedFrameAnimationKt : AnimationKt
+class FixedFrameAnimation : Animation
 {
-    private var startFrame : Int = 0
-    private var endFrame : Int = 0
-    override val StartFrame get() = startFrame.toFloat()
-    override val EndFrame get() = endFrame.toFloat()
+    var start : Int = 0
+        private set
+    var end : Int = 0
+        private set
+    override val StartFrame get() = start.toFloat()
+    override val EndFrame get() = end.toFloat()
     override val IsFixedFrame = true
 
     private val layers = ArrayList<AnimationLayer>()
@@ -33,11 +33,11 @@ class FixedFrameAnimationKt : AnimationKt
         //triggerChange()
     }
     private fun recalculateMetrics() {
-        startFrame = 0
-        endFrame = 0
+        start = 0
+        end = 0
         layers.forEach {
-            if( it.start < startFrame) startFrame = it.start
-            if( it.end >= endFrame) endFrame = it.end+1
+            if( it.start < start) start = it.start
+            if( it.end >= end) end = it.end+1
         }
     }
 

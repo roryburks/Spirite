@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import spirite.base.brains.MasterControl;
-import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -18,7 +17,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.RigAnimation;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 public class NodeContextCommand implements CommandExecuter {
@@ -44,27 +42,28 @@ public class NodeContextCommand implements CommandExecuter {
 		});
 		commandMap.put("giffromgroup", () -> {
 			GroupNode group = (GroupNode)node;
-			try {
-				AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			// TODO
+//			try {
+//				//AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 		});
 		commandMap.put("animFromRig", () -> {
-			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
-			
-			String name = JOptionPane.showInputDialog("Enter name for new Animation:", node.getName());
-			
-			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new RigAnimation((LayerNode)node, name));
+//			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
+//
+//			String name = JOptionPane.showInputDialog("Enter name for new Animation:", node.getName());
+//
+//			AnimationManager manager = workspace.getAnimationManager();
+//			manager.addAnimation(new RigAnimation((LayerNode)node, name));
 		});
 		commandMap.put("animinsert", () -> {
 			GroupNode group = (GroupNode)node;
 			AnimationManager manager = workspace.getAnimationManager();
 			Animation anim  = manager.getSelectedAnimation();
-			
-			if( anim instanceof FixedFrameAnimation) 
-				((FixedFrameAnimation) anim).importGroup(group, true);
+//
+//			if( anim instanceof FixedFrameAnimation)
+//				((FixedFrameAnimation) anim).importGroup(group, true);
 		});
 		commandMap.put("animBreakBind", () -> {
 			// TODO

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
@@ -12,7 +13,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager;
-import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -184,10 +184,7 @@ public class RelativeWorkspaceCommandExecuter implements CommandExecuter {
 		
 
 		commandMap.put("addGapQuick", () -> {
-			Frame frame = workspace.getAnimationManager().getSelectedFrame();
-			if( frame != null) {
-				frame.setGapAfter(frame.getGapAfter()+1);
-			}
+			// TODO
 		});
 	}
 

@@ -24,7 +24,6 @@ import javax.swing.event.DocumentListener;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
-import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
@@ -325,7 +324,7 @@ public class AnimationPreviewPanel extends SPanel
 				start = animation.getStartFrame();
 				end = animation.getEndFrame();
 				slider.setValue(0);
-				isFixedFrame = animation.isFixedFrame();
+				isFixedFrame = animation.getIsFixedFrame();
 		
 				updateSlider();
 			}
@@ -345,7 +344,7 @@ public class AnimationPreviewPanel extends SPanel
     			Graphics2D g2 = (Graphics2D)g;
     			g2.scale(getZoom(), getZoom());
     			animation.drawFrame(new AWTContext(g, getWidth(), getHeight()), 
-    					animationManager.getAnimationState(animation).getMetronom());
+    					animationManager.getAnimationState(animation).getMet());
     		}
     	}
     }
@@ -361,9 +360,9 @@ public class AnimationPreviewPanel extends SPanel
 		
 		if( source == timer) {
 			if( isPlaying) {
-				float met = animationManager.getAnimationState(animation).getMetronom() +  16.0f * tps / 1000.0f;
+				float met = animationManager.getAnimationState(animation).getMet() +  16.0f * tps / 1000.0f;
 				met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
-				animationManager.getAnimationState(animation).setMetronome(met);
+				animationManager.getAnimationState(animation).setMet(met);
 				
 				slider.setValue((int) Math.floor(met));
 			}
@@ -373,25 +372,26 @@ public class AnimationPreviewPanel extends SPanel
 			buttonPlay.setSelected(false);
 			isPlaying = false;
 
-			float met = animationManager.getAnimationState(animation).getMetronom() +  1.0f;
+			float met = animationManager.getAnimationState(animation).getMet() +  1.0f;
 			met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
-			animationManager.getAnimationState(animation).setMetronome(met);
+			animationManager.getAnimationState(animation).setMet(met);
 			slider.setValue((int) Math.floor(met));
 //			((FixedFrameAnimation)animation).save();
 		}else if( source == buttonBack) {
 			buttonPlay.setSelected(false);
 			isPlaying = false;
 
-			float met = animationManager.getAnimationState(animation).getMetronom() -  1.0f;
+			float met = animationManager.getAnimationState(animation).getMet() -  1.0f;
 			met = MUtil.cycle(animation.getStartFrame(), animation.getEndFrame(), met);
-			animationManager.getAnimationState(animation).setMetronome(met);
+			animationManager.getAnimationState(animation).setMet(met);
 			slider.setValue((int) Math.floor(met));
 		}else if( source == buttonExport) {
 			if( animation instanceof FixedFrameAnimation) {
 				try {
 					File f = master.getDialogs().pickAAFExport();
 					if( f != null) {
-						AnimIO.exportFFAnim((FixedFrameAnimation) animation, f);
+						//AnimIO.exportFFAnim((FixedFrameAnimation) animation, f);
+						throw new IOException("meh");
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

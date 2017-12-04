@@ -12,7 +12,6 @@ import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.Animation;
-import spirite.base.image_data.AnimationManager.AnimationState;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -21,6 +20,7 @@ import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.animations.AnimationState;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
@@ -202,13 +202,16 @@ public class HybridNodeRenderer {
 				else if( child instanceof AnimationNode) {
 					Animation anim = ((AnimationNode)child).getAnimation();
 					AnimationState as = workspace.getAnimationManager().getAnimationState(anim);
-					List<List<TransformedHandle>> table = anim.getDrawTable(as.getSelectedMetronome(), as);
-					
-					for( List<TransformedHandle> list : table) {
-						for( TransformedHandle th : list) {
-							(new TransformedRenderable( new RenderProperties(), th, settings, 0, 0)).draw(buffer[n].getGraphics());
-						}
-					}
+					// TODO
+					// TODO
+					// TODO
+					//List<List<TransformedHandle>> table = anim.getDrawTable(as.getSelectedMetronome(), as);
+//
+//					for( List<TransformedHandle> list : table) {
+//						for( TransformedHandle th : list) {
+//							(new TransformedRenderable( new RenderProperties(), th, settings, 0, 0)).draw(buffer[n].getGraphics());
+//						}
+//					}
 				}
 			}
 		}

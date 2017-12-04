@@ -22,13 +22,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.FixedFrameAnimation.FrameAbstract;
-import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
-import spirite.base.image_data.animations.RigAnimation;
-import spirite.base.image_data.animations.RigAnimation.PartKeyFrame;
-import spirite.base.image_data.animations.RigAnimation.RigAnimLayer;
-import spirite.base.image_data.animations.RigAnimation.RigAnimLayer.PartFrames;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -617,77 +610,77 @@ public class LoadEngine {
 	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
-		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
-		
-		int layerCount = helper.ra.readUnsignedShort();
-		
-		for( int i=0; i<layerCount; ++i) {
-			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
-			
-			int groupNodeID = helper.ra.readInt();
-			int mask = helper.ra.readByte();
-			int frameCount = helper.ra.readUnsignedShort();
-			
-			
-			GroupNode linkedGroup = ( groupNodeID > 0) ? (GroupNode) helper.nodes.get(groupNodeID) : null;
-			boolean usesSubgroups = ((mask & 1) == 1);
-			
-			for( int j=0; j<frameCount; ++j) {
-				Node node = helper.nodes.get(helper.ra.readInt());
-				int length = helper.ra.readUnsignedShort();
-				int gapBefore = helper.ra.readUnsignedShort();
-				int gapAfter = helper.ra.readUnsignedShort();
-
-				if( node instanceof LayerNode)
-					nodeMap.put( node, new FrameAbstract( node, length, Marker.FRAME, gapBefore, gapAfter));
-				if( node instanceof GroupNode)
-					nodeMap.put( node, new FrameAbstract( node, length, Marker.START_LOCAL_LOOP, gapBefore, gapAfter));
-			}
-			
-			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, usesSubgroups);
-		}
-		helper.workspace.getAnimationManager().addAnimation(animation);
+//		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
+//
+//		int layerCount = helper.ra.readUnsignedShort();
+//
+//		for( int i=0; i<layerCount; ++i) {
+//			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
+//
+//			int groupNodeID = helper.ra.readInt();
+//			int mask = helper.ra.readByte();
+//			int frameCount = helper.ra.readUnsignedShort();
+//
+//
+//			GroupNode linkedGroup = ( groupNodeID > 0) ? (GroupNode) helper.nodes.get(groupNodeID) : null;
+//			boolean usesSubgroups = ((mask & 1) == 1);
+//
+//			for( int j=0; j<frameCount; ++j) {
+//				Node node = helper.nodes.get(helper.ra.readInt());
+//				int length = helper.ra.readUnsignedShort();
+//				int gapBefore = helper.ra.readUnsignedShort();
+//				int gapAfter = helper.ra.readUnsignedShort();
+//
+//				if( node instanceof LayerNode)
+//					nodeMap.put( node, new FrameAbstract( node, length, Marker.FRAME, gapBefore, gapAfter));
+//				if( node instanceof GroupNode)
+//					nodeMap.put( node, new FrameAbstract( node, length, Marker.START_LOCAL_LOOP, gapBefore, gapAfter));
+//			}
+//
+//			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, usesSubgroups);
+//		}
+//		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	private void loatRigAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
-		RigAnimation animation = new RigAnimation(helper.workspace, name);
-		
-		// [2] : Number of Sprites
-		int numSprites = helper.ra.readUnsignedShort();
-		
-		for( int i=0; i<numSprites; ++i) {
-			int spriteNodeId = helper.ra.readInt();			// [4] : NodeID of Sprite
-			int numParts = helper.ra.readUnsignedShort();	// [2] : Number of Parts
-			
-			RigAnimLayer rail = animation.addSprite((LayerNode) helper.nodes.get(spriteNodeId));
-			SpriteLayer sprite = (SpriteLayer)((LayerNode) helper.nodes.get(spriteNodeId)).getLayer();
-			List<Part> parts = sprite.getParts();
-			
-			for( int p=0; p<numParts; ++p) {
-				String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);	// [n] : Part Type Name
-				int numKeyFrames = helper.ra.readUnsignedShort();	// [2] : Number of Key Frames
-				
-				Part part = null;
-				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
-				
-				PartFrames partFrames = rail.getPartFrames(part);
-				
-				for( int k=0; k<numKeyFrames; ++k) {
-					float t = helper.ra.readFloat();
-					PartKeyFrame keyframe = new PartKeyFrame(
-							helper.ra.readFloat(),	//tx
-							helper.ra.readFloat(),	//ty
-							helper.ra.readFloat(),	//sx
-							helper.ra.readFloat(),	//sy
-							helper.ra.readFloat());	//rot
-					
-					partFrames.addKeyFrame(t, keyframe);
-				}
-			}
-		}
-		helper.workspace.getAnimationManager().addAnimation(animation);
+//		RigAnimation animation = new RigAnimation(helper.workspace, name);
+//
+//		// [2] : Number of Sprites
+//		int numSprites = helper.ra.readUnsignedShort();
+//
+//		for( int i=0; i<numSprites; ++i) {
+//			int spriteNodeId = helper.ra.readInt();			// [4] : NodeID of Sprite
+//			int numParts = helper.ra.readUnsignedShort();	// [2] : Number of Parts
+//
+//			RigAnimLayer rail = animation.addSprite((LayerNode) helper.nodes.get(spriteNodeId));
+//			SpriteLayer sprite = (SpriteLayer)((LayerNode) helper.nodes.get(spriteNodeId)).getLayer();
+//			List<Part> parts = sprite.getParts();
+//
+//			for( int p=0; p<numParts; ++p) {
+//				String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);	// [n] : Part Type Name
+//				int numKeyFrames = helper.ra.readUnsignedShort();	// [2] : Number of Key Frames
+//
+//				Part part = null;
+//				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
+//
+//				PartFrames partFrames = rail.getPartFrames(part);
+//
+//				for( int k=0; k<numKeyFrames; ++k) {
+//					float t = helper.ra.readFloat();
+//					PartKeyFrame keyframe = new PartKeyFrame(
+//							helper.ra.readFloat(),	//tx
+//							helper.ra.readFloat(),	//ty
+//							helper.ra.readFloat(),	//sx
+//							helper.ra.readFloat(),	//sy
+//							helper.ra.readFloat());	//rot
+//
+//					partFrames.addKeyFrame(t, keyframe);
+//				}
+//			}
+//		}
+//		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards
@@ -769,34 +762,34 @@ public class LoadEngine {
 	private void _LEGACY_loadFFA0007( LoadHelper helper, String name) 
 			throws IOException 
 	{
-		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
-		
-		int layerCount = helper.ra.readUnsignedShort();
-		
-		for( int i=0; i<layerCount; ++i) {
-			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
-			
-			int groupNodeID = helper.ra.readInt();
-			int frameCount = helper.ra.readUnsignedShort();
-			
-			GroupNode linkedGroup = null;
-			if( groupNodeID > 0) {
-				linkedGroup = (GroupNode) helper.nodes.get(groupNodeID);
-			}
-			for( int j=0; j<frameCount; ++j) {
-				int marker = helper.ra.readByte();
-				int length = helper.ra.readShort();
-				int nodeLink = (marker == 0) ? helper.ra.readInt() : 0;
-				
-				if( nodeLink > 0) {
-					Node node = helper.nodes.get(nodeLink);
-					nodeMap.put( node, new FrameAbstract( (LayerNode) node, length, Marker.FRAME, 0, 0));
-				}
-			}
-			
-			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, false);
-		}
-		helper.workspace.getAnimationManager().addAnimation(animation);
+//		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
+//
+//		int layerCount = helper.ra.readUnsignedShort();
+//
+//		for( int i=0; i<layerCount; ++i) {
+//			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
+//
+//			int groupNodeID = helper.ra.readInt();
+//			int frameCount = helper.ra.readUnsignedShort();
+//
+//			GroupNode linkedGroup = null;
+//			if( groupNodeID > 0) {
+//				linkedGroup = (GroupNode) helper.nodes.get(groupNodeID);
+//			}
+//			for( int j=0; j<frameCount; ++j) {
+//				int marker = helper.ra.readByte();
+//				int length = helper.ra.readShort();
+//				int nodeLink = (marker == 0) ? helper.ra.readInt() : 0;
+//
+//				if( nodeLink > 0) {
+//					Node node = helper.nodes.get(nodeLink);
+//					nodeMap.put( node, new FrameAbstract( (LayerNode) node, length, Marker.FRAME, 0, 0));
+//				}
+//			}
+//
+//			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, false);
+//		}
+//		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	private StrokeSegment _LEGACY_buildMagLevFillStrokeSegment000D( LoadHelper helper, List<AMagLevThing> things) 
