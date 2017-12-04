@@ -4,12 +4,7 @@ import org.junit.Test;
 
 import sjunit.TestWrapper;
 import spirite.base.brains.MasterControl;
-import spirite.base.image_data.GroupTree.GroupNode;
-import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
-import spirite.hybrid.HybridHelper;
 
 public class FFAnimTest {
 

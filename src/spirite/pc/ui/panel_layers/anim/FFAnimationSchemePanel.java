@@ -36,10 +36,10 @@
 //import spirite.base.image_data.ImageWorkspace;
 //import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 //import spirite.base.image_data.animations.AnimationState;
-//import spirite.base.image_data.animations.FixedFrameAnimation;
-//import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
-//import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
-//import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer.Frame;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.Marker;
 //import spirite.base.image_data.layers.ReferenceLayer;
 //import spirite.base.util.Colors;
 //import spirite.gui.hybrid.SLabel;
@@ -189,7 +189,7 @@
 //			}
 //		});
 //
-//		List<AnimationLayer> layers = animation.getLayers();
+//		List<FFALayer> layers = animation.getLayers();
 //
 //		GroupLayout layout = new GroupLayout(content);
 //
@@ -211,7 +211,7 @@
 //		titles= new Component[layers.size()];
 //
 //		for( int i=0; i < layers.size(); ++i) {
-//			AnimationLayer layer = layers.get(i);
+//			FFALayer layer = layers.get(i);
 //			titles[i] = new LayerTitleBar(layer.getName());
 //			horGroups[i+1].addComponent(titles[i]);
 //			titleVertGroup.addComponent( titles[i], LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT,LAYER_TITLE_BAR_HEIGHT);
@@ -241,7 +241,7 @@
 //		for( int col=0; col < layers.size(); ++col) {
 //			Group vertInner = layout.createSequentialGroup();
 //			vertMid.addGroup(vertInner);
-//			AnimationLayer layer = layers.get(col);
+//			FFALayer layer = layers.get(col);
 //
 //			int currentTick = start;
 //
@@ -307,7 +307,7 @@
 //		horGroups[0].addComponent(bottomRight, TL_WIDTH,TL_WIDTH,TL_WIDTH);
 //
 //		for( int j=0; j < layers.size(); ++j) {
-//			AnimationLayer layer = layers.get(j);
+//			FFALayer layer = layers.get(j);
 //
 //			Component c = new BottomPanel(j, layer);
 //
@@ -415,14 +415,14 @@
 //	}
 //
 //	private void _openContextMenuForFrame( int layerIndex, int tick, Point p) {
-//		List<AnimationLayer> layers = animation.getLayers();
+//		List<FFALayer> layers = animation.getLayers();
 //		if( layerIndex < 0 || layerIndex >= layers.size())
 //			return;
 //
 //		_openContextMenuForFrame(layers.get(layerIndex), tick, p);
 //	}
 //
-//	private void _openContextMenuForFrame(AnimationLayer layer, int tick, Point p) {
+//	private void _openContextMenuForFrame(FFALayer layer, int tick, Point p) {
 //		Frame frame = layer.getFrameForMet(tick, true);
 //		_openContextMenuForFrame( frame, p);
 //	}
@@ -477,9 +477,9 @@
 //	private int TickAtY( int y) {
 //		return (y - LAYER_TITLE_BAR_HEIGHT)/ROW_HEIGHT;
 //	}
-//	private AnimationLayer LayerAtX( int x) {
+//	private FFALayer LayerAtX( int x) {
 //		int ind = (x - TL_WIDTH) / LAYER_TITLE_BAR_HEIGHT;
-//		List<AnimationLayer> layers = animation.getLayers();
+//		List<FFALayer> layers = animation.getLayers();
 //
 //		return (ind < 0 || ind >= layers.size()) ? null : layers.get(ind);
 //	}
@@ -700,11 +700,11 @@
 //		private final SToggleButton btnSettings = new SToggleButton("S");
 //		private final SToggleButton omniEye = new OmniEye();
 //		private final int column;
-//		private final AnimationLayer layer;
+//		private final FFALayer layer;
 //
 //		private boolean visible = true;
 //
-//		private BottomPanel( int col, AnimationLayer layer) {
+//		private BottomPanel( int col, FFALayer layer) {
 //			this.column = col;
 //			this.layer = layer;
 //

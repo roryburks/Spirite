@@ -21,9 +21,9 @@
 //import spirite.base.image_data.GroupTree.LayerNode;
 //import spirite.base.image_data.GroupTree.Node;
 //import spirite.base.image_data.MediumHandle;
-//import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
-//import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer.Frame;
-//import spirite.base.image_data.animations.FixedFrameAnimation.Marker;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer.Frame;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.Marker;
 //import spirite.base.image_data.layers.Layer;
 //import spirite.base.image_data.layers.SimpleLayer;
 //import spirite.base.util.GifSequenceWriter;
@@ -53,7 +53,7 @@
 //		int height = 0;
 //
 //
-//		for( AnimationLayer layer : animation.getLayers()) {
+//		for( FFALayer layer : animation.getLayers()) {
 //			for( Frame frame : layer.getFrames()) {
 //				if( frame.getMarker() == Marker.FRAME) {
 //					width = Math.max( width, ((LayerNode)frame.getLinkedNode()).getLayer().getWidth());

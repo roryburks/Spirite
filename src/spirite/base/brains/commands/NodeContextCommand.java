@@ -1,7 +1,5 @@
 package spirite.base.brains.commands;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +14,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animations.FixedFrameAnimation;
+import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 public class NodeContextCommand implements CommandExecuter {

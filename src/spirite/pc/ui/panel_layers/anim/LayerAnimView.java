@@ -21,7 +21,6 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animations.FixedFrameAnimation;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.SScrollPane;
 import spirite.pc.ui.Transferables;

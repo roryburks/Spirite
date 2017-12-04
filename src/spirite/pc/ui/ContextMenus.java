@@ -19,7 +19,7 @@ import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.animations.FixedFrameAnimation;
+import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.puppet.PuppetLayer;

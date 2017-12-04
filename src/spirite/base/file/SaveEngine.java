@@ -13,19 +13,15 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import javafx.util.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager.Palette;
-import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.animations.FixedFrameAnimation;
-import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -497,11 +493,11 @@ public class SaveEngine implements MWorkspaceObserver {
 //					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
 //
 //					// [2] : Number of Layers
-//					List<AnimationLayer>layers = ((FixedFrameAnimation) animation).getLayers();
+//					List<FFALayer>layers = ((FixedFrameAnimation) animation).getLayers();
 //					layers.remove(null);
 //					helper.ra.writeShort( layers.size());
 //
-//					for( AnimationLayer layer : layers) {
+//					for( FFALayer layer : layers) {
 //						// [4] : Group Node Bound to
 //						helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
 //

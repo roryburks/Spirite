@@ -34,7 +34,7 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
-import spirite.base.image_data.animations.FixedFrameAnimation;
+import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.base.util.MUtil;
 import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;

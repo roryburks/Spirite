@@ -41,7 +41,7 @@
 //import spirite.base.image_data.GroupTree.Node;
 //import spirite.base.image_data.ImageWorkspace;
 //import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-//import spirite.base.image_data.animations.FixedFrameAnimation.AnimationLayer;
+//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer;
 //import spirite.gui.hybrid.SPanel;
 //import spirite.gui.hybrid.SToggleButton;
 //import spirite.hybrid.Globals;
@@ -375,8 +375,8 @@
 //		}
 //
 //		private class LinkButton extends SToggleButton implements ActionListener {
-//			private final AnimationLayer layer;
-//			LinkButton(AnimationLayer layer) {
+//			private final FFALayer layer;
+//			LinkButton(FFALayer layer) {
 //				this.layer = layer;
 //				this.setOpaque(false);
 //				this.setBackground(new Color(0,0,0,0));
@@ -458,7 +458,7 @@
 //		private void constructLayout() {
 //			softResetCache();
 //
-//			List<AnimationLayer> layers = anim.getLayers();
+//			List<FFALayer> layers = anim.getLayers();
 //
 //			frameLinks.clear();
 //			this.removeAll();
