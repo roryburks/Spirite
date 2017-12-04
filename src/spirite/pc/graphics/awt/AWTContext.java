@@ -10,9 +10,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.IImage;
-import spirite.base.graphics.RenderProperties;
+import spirite.base.graphics.*;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.linear.MatTrans;
@@ -29,7 +27,7 @@ import spirite.pc.graphics.ImageBI;
  * @author Rory Burks
  *
  */
-public class AWTContext extends GraphicsContext{
+public class AWTContext extends GraphicsContext {
 	
 	private final Graphics2D g2;
 	private final int width, height;
@@ -154,14 +152,14 @@ public class AWTContext extends GraphicsContext{
 	// ==== LineAttributes
 	@Override
 	public void setLineAttributes(LineAttributes line) {
-		g2.setStroke(new BasicStroke( line.width, LAtoBSCap(line.cap), 
-				LAtoBSJoin(line.join), 10.0f, line.dashes, 0.0f));
+		g2.setStroke(new BasicStroke( line.getWidth(), LAtoBSCap(line.getCap()),
+				LAtoBSJoin(line.getJoin()), 10.0f, line.getDashes(), 0.0f));
 	}
 	@Override
 	public LineAttributes getLineAttributes() {
 		if( g2.getStroke() instanceof BasicStroke) {
 			BasicStroke bs = (BasicStroke)g2.getStroke();
-			return new LineAttributes( bs.getLineWidth(), BStoLACap(bs.getEndCap()), 
+			return new LineAttributes(bs.getLineWidth(), BStoLACap(bs.getEndCap()),
 					BStoLAJoin(bs.getLineJoin()), bs.getDashArray());
 		}
 		return null;

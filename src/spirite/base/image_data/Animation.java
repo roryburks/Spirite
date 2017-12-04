@@ -30,7 +30,7 @@ public abstract class Animation {
 	
 	
 	protected void triggerChange() {if( animationManager != null) animationManager.triggerChangeAnimation(this);}
-	public abstract void drawFrame( GraphicsContext gc, float t);
+	public abstract void drawFrame(GraphicsContext gc, float t);
 	public abstract List<TransformedHandle> getDrawList( float t);
 	public abstract List<List<TransformedHandle>> getDrawTable( float t, AnimationState state);
 	public abstract float getStartFrame();

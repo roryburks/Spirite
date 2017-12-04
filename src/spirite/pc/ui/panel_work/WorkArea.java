@@ -3,11 +3,11 @@ package spirite.pc.ui.panel_work;
 import java.awt.Color;
 import java.awt.Component;
 
+import spirite.base.graphics.CapMethod;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.CapMethod;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.graphics.GraphicsContext.JoinMethod;
-import spirite.base.graphics.GraphicsContext.LineAttributes;
+import spirite.base.graphics.JoinMethod;
+import spirite.base.graphics.LineAttributes;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -139,7 +139,7 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
             	PuppetLayer puppet = (PuppetLayer) ((LayerNode) node).getLayer();
             	if( puppet.isSkeletonVisible()) {
     				gc.setTransform(viewTrans);
-    				gc.setLineAttributes(new LineAttributes(4, CapMethod.ROUND, JoinMethod.MITER));
+    				gc.setLineAttributes(new LineAttributes(4, CapMethod.ROUND, JoinMethod.MITER, null));
     				gc.setColor(Colors.WHITE);
     				gc.setComposite(Composite.SRC_OVER, 1);
     				

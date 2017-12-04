@@ -62,7 +62,7 @@ public class SelectionMask {
 	
 	// ============
 	// ==== Common Functionality
-	public void drawMask( GraphicsContext gc, boolean withOffset) {
+	public void drawMask(GraphicsContext gc, boolean withOffset) {
 		if( withOffset)
 			gc.drawImage(mask, ox, oy);
 		else

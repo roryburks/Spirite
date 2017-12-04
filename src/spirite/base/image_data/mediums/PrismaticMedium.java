@@ -116,7 +116,7 @@ public class PrismaticMedium implements IMedium {
 			if( (img.color & 0xFFFFFF) == (color & 0xFFFFFF)) return;
 		}
 	}
-	public void drawFront( GraphicsContext gc, int color) {
+	public void drawFront(GraphicsContext gc, int color) {
 		boolean drawing = false;
 		for( LImg img : layers) {
 			if( drawing) 

@@ -5,10 +5,8 @@ import java.awt.geom.Ellipse2D;
 
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.IImage;
+import spirite.base.graphics.*;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
-import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.gl.GLEngine.PolyType;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLParameters.GLParam1i;
@@ -31,7 +29,7 @@ import spirite.hybrid.HybridUtil;
  * @author Rory Burks
  *
  */
-public class GLGraphics extends GraphicsContext{
+public class GLGraphics extends GraphicsContext {
 	private final GLEngine engine = GLEngine.getInstance();
 	
 	private GL2 gl;
@@ -170,7 +168,7 @@ public class GLGraphics extends GraphicsContext{
 	
 	// ================
 	// ==== LineAttributes
-	private static final LineAttributes defaultLA = new LineAttributes(1, CapMethod.NONE, JoinMethod.ROUNDED);
+	private static final LineAttributes defaultLA = new LineAttributes(1, CapMethod.NONE, JoinMethod.ROUNDED, null);
 	@Override
 	public void setLineAttributes(LineAttributes line) {
 		if( line == null)
@@ -199,7 +197,7 @@ public class GLGraphics extends GraphicsContext{
 		
 		GLParameters params = getLineParams();
 		engine.applyComplexLineProgram( x_, y_, 4, 
-				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), true, lineAttributes.getWidth(),
 				params, contextTransform);
 	}
 	@Override
@@ -211,7 +209,7 @@ public class GLGraphics extends GraphicsContext{
 		reset();
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
-				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), false, lineAttributes.getWidth(),
 				params, contextTransform);
 	}
 	@Override
@@ -219,7 +217,7 @@ public class GLGraphics extends GraphicsContext{
 		reset();
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  xPoints, yPoints, count, 
-				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), false, lineAttributes.getWidth(),
 				params, contextTransform);
 	}
 	@Override
@@ -231,7 +229,7 @@ public class GLGraphics extends GraphicsContext{
 		y_[0] = y1; y_[1] = y2;
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  x_, y_, 2, 
-				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), false, lineAttributes.getWidth(),
 				params, contextTransform);
 		
 	}
@@ -244,7 +242,7 @@ public class GLGraphics extends GraphicsContext{
 		y_[0] = y1; y_[1] = y2;
 		GLParameters params =getLineParams();
 		engine.applyComplexLineProgram(  x_, y_, 2, 
-				lineAttributes.cap, lineAttributes.join, false, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), false, lineAttributes.getWidth(),
 				params, contextTransform);
 		
 	}
@@ -261,7 +259,7 @@ public class GLGraphics extends GraphicsContext{
 		float xPoints[] = x_.toArray();
 		float yPoints[] = y_.toArray();
 		engine.applyComplexLineProgram( xPoints, yPoints, xPoints.length, 
-				lineAttributes.cap, lineAttributes.join, true, lineAttributes.width, 
+				lineAttributes.getCap(), lineAttributes.getJoin(), true, lineAttributes.getWidth(),
 				params, contextTransform);
 	}
 	

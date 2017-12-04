@@ -111,7 +111,7 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
                     packed.add(newRect)
                     rects.remove(rect)
 
-                    _addRect(packed, newRect, field, width)
+                    _addRect(newRect, field, width)
                     break
                 }
                 x += space
@@ -130,7 +130,7 @@ private fun _newRow( width: Int) : IntArray {
     return ret
 }
 
-private fun _addRect(pr: ArrayList<Rect>, rect:Rect, field: ArrayList<IntArray>, width: Int) {
+private fun _addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
     var buildRow : IntArray? = null
 
     for( y in rect.y until rect.height + rect.y) {

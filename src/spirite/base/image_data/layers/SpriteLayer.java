@@ -456,7 +456,7 @@ public class SpriteLayer extends Layer
 		return handles;
 	}
 	
-	public void drawPart( GraphicsContext gc, Part part) {
+	public void drawPart(GraphicsContext gc, Part part) {
 		float oldAlpha = gc.getAlpha();
 		Composite oldComp = gc.getComposite();
 		

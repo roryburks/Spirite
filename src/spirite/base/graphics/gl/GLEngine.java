@@ -15,8 +15,8 @@ import java.util.Scanner;
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.GL2;
 
-import spirite.base.graphics.GraphicsContext.CapMethod;
-import spirite.base.graphics.GraphicsContext.JoinMethod;
+import spirite.base.graphics.CapMethod;
+import spirite.base.graphics.JoinMethod;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.util.glu.GLC;
@@ -256,8 +256,6 @@ public class GLEngine  {
 	 * @param trans		Transform to apply to the texture (applied in Screen-space).
 	 * 		If null (or is an Identity Transform), then the texture is drawn stretched 
 	 * 		over the GL Surface
-	 * @param internal	Whether or not it is a GL->GL draw 
-	 * 		(if so the texture will not be flipped vertically)
 	 */
 	void applyPassProgram(
 			ProgramType type,
@@ -282,8 +280,6 @@ public class GLEngine  {
 	 * @param y1 "
 	 * @param x2 "
 	 * @param y2 "
-	 * @param internal	Whether or not it is a GL->GL draw 
-	 * 		(if so the texture will not be flipped vertically)
 	 */
 	void applyPassProgram(
 			ProgramType type, 
@@ -377,11 +373,10 @@ public class GLEngine  {
 	 * @param width	Width of the line.
 	 * @param params	GLParameters describing the GL Attributes to use
 	 * @param trans		Transform to apply to the rendering.
-	 * @param gl
 	 */
-	void applyComplexLineProgram( int[] xPoints, int[] yPoints, 
-			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, MatTrans trans) 
+	void applyComplexLineProgram(int[] xPoints, int[] yPoints,
+								 int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
+								 GLParameters params, MatTrans trans)
 	{
 		int size = numPoints+(loop?3:2);
 		float data[] = new float[2*size];
@@ -425,7 +420,6 @@ public class GLEngine  {
 	 * @param width	Width of the line.
 	 * @param params	GLParameters describing the GL Attributes to use
 	 * @param trans		Transform to apply to the rendering.
-	 * @param gl
 	 */
 	void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,

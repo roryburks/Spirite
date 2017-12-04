@@ -266,7 +266,7 @@ public class MaglevMedium implements IMedium {
 			// TODO
 			return new Rect( (int)trans.getM02(), (int)trans.getM12(), context.getWidth(), context.getHeight());
 		}
-		@Override public void draw(GraphicsContext gc) 
+		@Override public void draw(GraphicsContext gc)
 		{
 			MatTrans oldTrans = gc.getTransform();
 			gc.preTransform(trans);

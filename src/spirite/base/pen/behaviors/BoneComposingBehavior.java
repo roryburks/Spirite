@@ -1,9 +1,9 @@
 package spirite.base.pen.behaviors;
 
+import spirite.base.graphics.CapMethod;
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.GraphicsContext.CapMethod;
-import spirite.base.graphics.GraphicsContext.JoinMethod;
-import spirite.base.graphics.GraphicsContext.LineAttributes;
+import spirite.base.graphics.JoinMethod;
+import spirite.base.graphics.LineAttributes;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IPuppetBoneDrawer;
 import spirite.base.pen.Penner;
@@ -34,7 +34,7 @@ public class BoneComposingBehavior extends DrawnStateBehavior  {
 	public void paintOverlay(GraphicsContext gc) {
 		gc.setTransform(penner.view.getViewTransform());
 		gc.setColor(Colors.CYAN);
-		gc.setLineAttributes(new LineAttributes(3, CapMethod.ROUND, JoinMethod.MITER));
+		gc.setLineAttributes(new LineAttributes(3, CapMethod.ROUND, JoinMethod.MITER, null));
 		
 		switch( state) {
 		case MAKING:

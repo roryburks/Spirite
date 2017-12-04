@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
-import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.IImage;
