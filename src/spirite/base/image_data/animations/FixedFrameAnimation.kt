@@ -43,7 +43,8 @@ class FixedFrameAnimationKt : AnimationKt
 
     inner class AnimationLayer(
             includeSubtrees: Boolean
-    ) {
+    )
+    {
         var start = 0
             private set
         var end = 0
@@ -55,21 +56,24 @@ class FixedFrameAnimationKt : AnimationKt
 
 
         var includeSubtrees = includeSubtrees
-            set(value)  {
-                val oldInclude = field
-                context.undoEngine.performAndStore( object: UndoEngine.NullAction() {
-                    override fun performAction() {
-                        field = value
-                        _triggerChange()
-                    }
-                    override fun undoAction() {
-                        field = oldInclude
-                        _triggerChange()
-                    }
-                })
-            }
+        set(value)  {
+            val oldInclude = field
+            context.undoEngine.performAndStore( object: UndoEngine.NullAction() {
+                override fun performAction() {
+                    field = value
+                    _triggerChange()
+                }
+                override fun undoAction() {
+                    field = oldInclude
+                    _triggerChange()
+                }
+            })
+        }
 
 
         var groupLink : GroupTree.GroupNode? = null
+        set(value)  {
+
+        }
     }
 }

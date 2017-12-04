@@ -5,6 +5,7 @@ package spirite.pc.ui.panel_work.awt;
 import java.awt.Graphics;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine;

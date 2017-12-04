@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
 import spirite.base.image_data.GroupTree;

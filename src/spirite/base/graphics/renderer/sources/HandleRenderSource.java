@@ -3,6 +3,7 @@ package spirite.base.graphics.renderer.sources;
 import java.util.Arrays;
 import java.util.List;
 
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;

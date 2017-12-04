@@ -8,15 +8,15 @@ import spirite.base.util.compaction.FloatCompactor
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer
 import spirite.base.util.Colors
 import spirite.base.graphics.GraphicsContext.Composite
-import spirite.base.graphics.GraphicsContext.CapMethod
-import spirite.base.graphics.GraphicsContext.JoinMethod
-import spirite.base.graphics.GraphicsContext.LineAttributes
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridHelper
 import spirite.base.brains.ToolsetManager.Tool
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone
 import spirite.base.brains.tools.ToolSchemes.BoneStretchMode
+import spirite.base.graphics.CapMethod
+import spirite.base.graphics.JoinMethod
+import spirite.base.graphics.LineAttributes
 import spirite.base.util.MUtil
 import spirite.base.util.linear.MatTrans
 

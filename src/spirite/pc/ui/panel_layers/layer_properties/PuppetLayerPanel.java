@@ -12,6 +12,7 @@ import javax.swing.GroupLayout;
 import javax.swing.SwingUtilities;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MFlashObserver;

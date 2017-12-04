@@ -2,6 +2,7 @@ package sjunit;
 
 import org.junit.Test;
 
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;

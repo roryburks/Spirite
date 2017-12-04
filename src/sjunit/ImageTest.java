@@ -3,6 +3,7 @@ package sjunit;
 import org.junit.Test;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLImage;
 

@@ -1,6 +1,7 @@
 package spirite.base.graphics.gl;
 
 import spirite.base.brains.tools.ToolSchemes;
+import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.RawImage;
