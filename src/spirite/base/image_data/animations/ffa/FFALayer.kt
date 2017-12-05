@@ -1,13 +1,10 @@
 package spirite.base.image_data.animations.ffa
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.image_data.GroupTree
 import spirite.base.image_data.ImageWorkspace
-import spirite.base.image_data.UndoEngine
 import spirite.base.util.UndoableDelegate
 import spirite.hybrid.MDebug
 import java.util.*
-import kotlin.collections.HashMap
 
 abstract class FFALayer(
         internal var context: FixedFrameAnimation
@@ -35,11 +32,9 @@ abstract class FFALayer(
     val frames : List<FFAFrame> get() { return _frames.toList()}
 
 
-    // ==============
-    // ==== Frame Access
-    // region
+    // region Frame Access
     fun getFrameForMet( met: Int, noLoop: Boolean = false) : FFAFrame? {
-        if( !frames?.any())
+        if( !frames.any())
             return null
 
         return _getFrameFromLocalLoop(0, met, noLoop)
@@ -51,7 +46,7 @@ abstract class FFALayer(
 
 
         while( true) {
-            var frame = frames[index++]
+            val frame = frames[index++]
             loopLen += frame.length
             if( offset - caret < frame.length) {
                 return when( frame.marker) {
@@ -119,10 +114,9 @@ abstract class FFALayer(
 
         val node : GroupTree.Node? get() = structure.node
         val marker : FFAFrameStructure.Marker get() = structure.marker
-        var gapBefore : Int by UndoableDelegate(structure::gapBefore, ::workspace, "Changing Frame Gap", {context._triggerChange()})
-        var gapAfter : Int by UndoableDelegate(structure::gapAfter, ::workspace, "ChangingFrameGap", {context._triggerChange()})
-
-        var innerLength: Int by UndoableDelegate(structure::length, ::workspace, "Changing Frame Length", {context._triggerChange()})
+        var gapBefore : Int by UndoableDelegate({structure.gapBefore = it; context._triggerChange()}, {structure.gapBefore}, ::workspace,"Changing Frame Gap")
+        var gapAfter : Int by UndoableDelegate({structure.gapAfter = it; context._triggerChange()}, {structure.gapAfter}, ::workspace,"Changing Frame Gap")
+        var innerLength : Int by UndoableDelegate({structure.length = it; context._triggerChange()}, {structure.length}, ::workspace,"Changing Frame Gap")
         var length : Int
             get() = innerLength + gapBefore + gapAfter
             set(value) = run { innerLength = value - gapBefore - gapAfter}

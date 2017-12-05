@@ -6,30 +6,28 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
 class UndoableDelegate <T>(
-        private val maskedProperty : KMutableProperty<T>,
+        private val setter : (T) -> Unit,
+        private val getter : () -> T,
         private val workspaceGetter : KProperty<ImageWorkspace>,
-        private val changeDescription: String,
-        private val onChangeTrigger: ((T) ->Unit)? =  null
+        private val changeDescription: String
 )
 {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return maskedProperty.getter.call()
+        return getter()
     }
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
-        val oldValue = maskedProperty.getter.call()
+        val oldValue = getter()
         if( oldValue == newValue) return
 
         val workspace = workspaceGetter.getter.call()
         workspace.undoEngine.performAndStore( object: UndoEngine.NullAction() {
             override fun performAction() {
-                maskedProperty.setter.call( newValue)
-                onChangeTrigger?.invoke(newValue)
+                setter( newValue)
             }
 
             override fun undoAction() {
-                maskedProperty.setter.call( oldValue)
-                onChangeTrigger?.invoke(oldValue)
+                setter( oldValue)
             }
 
             override fun getDescription(): String {

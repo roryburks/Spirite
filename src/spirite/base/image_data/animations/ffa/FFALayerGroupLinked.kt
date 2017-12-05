@@ -11,7 +11,7 @@ class FFALayerGroupLinked (
     : FFALayer(context)
 {
     private var nodeLinks = HashMap<GroupTree.Node, FFAFrame>()
-    var includeSubtrees  by UndoableDelegate(::_includeSubtrees, ::workspace, "Change Inlcude Subtrees", {groupLinkUdated()})
+    var includeSubtrees  by UndoableDelegate({_includeSubtrees = it},{_includeSubtrees}, ::workspace, "Change Inlcude Subtrees")
 
     init {
         name = groupLink.name
