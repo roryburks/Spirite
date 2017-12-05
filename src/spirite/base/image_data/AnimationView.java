@@ -29,6 +29,8 @@ public class AnimationView implements MAnimationStructureObserver {
 		context.addAnimationStructureObserver(this);
 	}
 
+
+
 	public GroupNode getRoot() {
 		return tree.getRoot();
 	}

@@ -184,6 +184,7 @@ public class RelativeWorkspaceCommandExecuter implements CommandExecuter {
 
 		commandMap.put("addGapQuick", () -> {
 			// TODO
+
 		});
 	}
 

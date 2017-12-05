@@ -2,6 +2,7 @@ package spirite.pc.ui.panel_anim;
 
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
+import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
@@ -382,7 +383,7 @@ public class AnimationPreviewPanel extends SPanel
 				try {
 					File f = master.getDialogs().pickAAFExport();
 					if( f != null) {
-						//AnimIO.exportFFAnim((FixedFrameAnimation) animation, f);
+						AnimIO.exportFFAnim((FixedFrameAnimation) animation, f);
 						throw new IOException("meh");
 					}
 				} catch (IOException e) {

@@ -43,7 +43,7 @@ class FixedFrameAnimationTests {
             ws.addNewSimpleLayer( frame2, 10, 10, "frame1a", 0, IMedium.InternalImageTypes.NORMAL)
 
 
-            var frames = (ffa.layers[0] as FFALayerGroupLinked).frames
+            val frames = (ffa.layers[0] as FFALayerGroupLinked).frames
             assert( frames[0].node?.name == "frame2");
             assert( frames[1].node?.name == "frame1a");
             assert( frames[2].node?.name == "frame1");

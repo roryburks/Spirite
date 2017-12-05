@@ -27,7 +27,6 @@
 //import spirite.base.brains.MasterControl;
 //import spirite.base.brains.MasterControl.MWorkspaceObserver;
 //import spirite.base.graphics.RenderProperties;
-//import spirite.base.image_data.AnimationManager.AnimationState;
 //import spirite.base.image_data.AnimationManager.MAnimationStateEvent;
 //import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 //import spirite.base.image_data.GroupTree.AnimationNode;
@@ -37,9 +36,6 @@
 //import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
 //import spirite.base.image_data.animations.AnimationState;
 //import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
-//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer;
-//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.FFALayer.Frame;
-//import spirite.base.image_data.animations.ffa.FixedFrameAnimation.Marker;
 //import spirite.base.image_data.layers.ReferenceLayer;
 //import spirite.base.util.Colors;
 //import spirite.gui.hybrid.SLabel;

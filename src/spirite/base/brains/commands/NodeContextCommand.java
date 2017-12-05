@@ -1,6 +1,7 @@
 package spirite.base.brains.commands;
 
 import spirite.base.brains.MasterControl;
+import spirite.base.file.AnimIO;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
 import spirite.base.image_data.GroupTree.GroupNode;
@@ -11,6 +12,8 @@ import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +45,11 @@ public class NodeContextCommand implements CommandExecuter {
 		commandMap.put("giffromgroup", () -> {
 			GroupNode group = (GroupNode)node;
 			// TODO
-//			try {
-//				//AnimIO.exportGroupGif(group, new File("E:/test.gif"), 8);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			try {
+				AnimIO.exportGroupGif(group, new File("C:/test.gif"), 8);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 		commandMap.put("animFromRig", () -> {
 //			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
@@ -60,17 +63,15 @@ public class NodeContextCommand implements CommandExecuter {
 			GroupNode group = (GroupNode)node;
 			AnimationManager manager = workspace.getAnimationManager();
 			Animation anim  = manager.getSelectedAnimation();
-//
-//			if( anim instanceof FixedFrameAnimation)
-//				((FixedFrameAnimation) anim).importGroup(group, true);
+
+			if( anim instanceof FixedFrameAnimation)
+				((FixedFrameAnimation) anim).addLinkedLayer(group, true, null);
 		});
 		commandMap.put("animBreakBind", () -> {
 			// TODO
 		});
 		
-		commandMap.put("newGroup", () -> {
-			workspace.addGroupNode(node, "New Group");
-		});
+		commandMap.put("newGroup", () -> workspace.addGroupNode(node, "New Group"));
 		commandMap.put("newLayer", () -> {
 			NewLayerHelper helper = master.getDialogs().callNewLayerDialog(workspace);
 			if( helper != null) {
@@ -78,10 +79,10 @@ public class NodeContextCommand implements CommandExecuter {
 						helper.width, helper.height, helper.name, helper.color.getRGB(), helper.imgType);
 			}
 		});
-		commandMap.put( "duplicate", () -> {workspace.duplicateNode(node);});
-		commandMap.put( "delete", () -> {workspace.removeNode(node);});
-		commandMap.put( "mergeDown", () -> {workspace.mergeNodes( node.getNextNode(), (LayerNode) node);});
-		commandMap.put( "newRig", () -> { workspace.addNewRigLayer(node, 1, 1, "rig", 0);});
+		commandMap.put( "duplicate", () -> workspace.duplicateNode(node));
+		commandMap.put( "delete", () -> workspace.removeNode(node));
+		commandMap.put( "mergeDown", () -> workspace.mergeNodes( node.getNextNode(), (LayerNode) node));
+		commandMap.put( "newRig", () -> workspace.addNewRigLayer(node, 1, 1, "rig", 0));
 		commandMap.put( "newPuppet", () -> {
 			String name = JOptionPane.showInputDialog("Enter name for new Animation:", 
 					workspace.getNonDuplicateName("puppetLayer"));

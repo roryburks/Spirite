@@ -14,7 +14,7 @@ data class PackedRectangle (
     val height: Int = packedRects.map{ it.y + it.height}.max() ?: 0
 }
 
-fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle? {
+fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     val cropped = toPack.toMutableList()
 
     // Remove bad Rects
@@ -30,12 +30,12 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle? {
     //	(probably shouldn't be larger than the square root of the sum except
     //	in weird cases)
     val maxWidth = minWidth*2
-    val inc = round( max( 1f, (maxWidth-minWidth)/10f)).toInt()
+    val inc = round( max( 1f, (maxWidth-minWidth)/10f))
 
     // Go through a set amount of widths to test and use the algorithm to
     //	pack the Rects, testing to see if the result is smaller in
     //	volume than the previous results.
-    return (minWidth..maxWidth step inc).map { msaSub(cropped, it) }.minBy { it.width * it.height }
+    return (minWidth..maxWidth step inc).map { msaSub(cropped, it) }.minBy { it.width * it.height } ?: PackedRectangle( ArrayList<Rect>(0))
 }
 
 private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
@@ -57,7 +57,7 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     var wy = 0
     rects.sortBy { it.x }
 
-    var packed = ArrayList<Rect>()
+    val packed = ArrayList<Rect>()
 
     // Step 1: for each Rect of width greater then half the strip width,
     //	stack them on top of each other
@@ -92,7 +92,7 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     //	y.
     var y=0
     while( rects.any()) {
-        if( field.size < y)
+        if( field.size <= y)
             field.add(_newRow(width))
         val row = field.get(y)
 
