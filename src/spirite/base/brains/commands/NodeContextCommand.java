@@ -36,7 +36,9 @@ public class NodeContextCommand implements CommandExecuter {
 			String name = JOptionPane.showInputDialog("Enter name for new Animation:", group.getName());
 			
 			AnimationManager manager = workspace.getAnimationManager();
-			manager.addAnimation(new FixedFrameAnimation(group, name, true));
+			FixedFrameAnimation ffa = new FixedFrameAnimation(name, workspace);
+			ffa.addLinkedLayer( group, true, null);
+			manager.addAnimation(ffa);
 		});
 		commandMap.put("giffromgroup", () -> {
 			GroupNode group = (GroupNode)node;

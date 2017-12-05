@@ -11,9 +11,11 @@ import spirite.base.util.linear.Vec2;
 public class TestAlp {
 
     public static void main(String[] args) {
-    	(new d005_BinarySearch())._do();
+    	KotlinTestsKt.k002_testPropertyLev();
     }
-    
+
+
+
     public static class d005_BinarySearch
     {
     	public void _do() {

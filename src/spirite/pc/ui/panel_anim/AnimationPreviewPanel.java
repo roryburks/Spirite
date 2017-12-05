@@ -324,7 +324,7 @@ public class AnimationPreviewPanel extends SPanel
 				start = animation.getStartFrame();
 				end = animation.getEndFrame();
 				slider.setValue(0);
-				isFixedFrame = animation.getIsFixedFrame();
+				isFixedFrame = animation.isFixedFrame();
 		
 				updateSlider();
 			}

@@ -5,23 +5,17 @@ import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.renderer.RenderEngine
 
-abstract class Animation constructor(context: ImageWorkspace)
+abstract class Animation constructor(
+        var name: String,
+        var context: ImageWorkspace)
 {
-    var context = context
-        set( value)  {
-            context = value
-            this.animationManager = value?.animationManager
-        }
-    var animationManager : AnimationManager? = context.animationManager
-        private set
-
-
     abstract val StartFrame : Float
     abstract val EndFrame : Float
-    abstract val IsFixedFrame : Boolean
-    lateinit var name : String
+    abstract val isFixedFrame: Boolean
 
-//    protected fun triggerChange() { animationManager?.triggerChangeAnimation(this)}
+    val animationManager :AnimationManager get() = context.animationManager
+
+    protected fun triggerChange() { animationManager?.triggerChangeAnimation(this)}
 
     fun drawFrame( gc: GraphicsContext, t: Float) {
         gc.pushState()

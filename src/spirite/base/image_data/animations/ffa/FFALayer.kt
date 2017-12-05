@@ -1,104 +1,88 @@
 package spirite.base.image_data.animations.ffa
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.image_data.GroupTree
+import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.UndoEngine
+import spirite.base.util.UndoableDelegate
+import spirite.hybrid.MDebug
 import java.util.*
+import kotlin.collections.HashMap
 
-class FFALayer(
-        includeSubtrees: Boolean, private var context: FixedFrameAnimation
+abstract class FFALayer(
+        internal var context: FixedFrameAnimation
 )
 {
-    var start = 0; private set
-    var end = 0; private set
-    var name :String? = null; get() = field ?: groupLink?.name ?: "Unnamed Layer"
+    val start = 0
+    val end : Int get() {
+        var caret = 0
+        var i=0
+        while( i < frames.size) {
+            caret += frames[i].length
+            if( frames[i].marker == FFAFrameStructure.Marker.START_LOCAL_LOOP)
+                while( frames[++i].marker != FFAFrameStructure.Marker.END_LOCAL_LOOP);
+            ++i
+        }
+        return caret
+    }
+
+    val workspace = context.context
+
+    var name :String? = null
     var asynchronous = false
 
-    private val _frames = ArrayList<FFAFrame>()
+    protected val _frames = ArrayList<FFAFrame>()
     val frames : List<FFAFrame> get() { return _frames.toList()}
 
-    private var nodeLinks = HashMap<GroupTree.Node, FFAFrame>()
 
+    // ==============
+    // ==== Frame Access
+    // region
+    fun getFrameForMet( met: Int, noLoop: Boolean = false) : FFAFrame? {
+        if( !frames?.any())
+            return null
 
-
-    var includeSubtrees = includeSubtrees
-    set(value)  {
-        val oldInclude = field
-        context.context.undoEngine.performAndStore( object: UndoEngine.NullAction() {
-            override fun performAction() {
-                field = value
-                context._triggerChange()
-            }
-            override fun undoAction() {
-                field = oldInclude
-                context._triggerChange()
-            }
-        })
+        return _getFrameFromLocalLoop(0, met, noLoop)
     }
+    private fun _getFrameFromLocalLoop( start: Int, offset: Int, noLoop: Boolean) : FFAFrame? {
+        var index = start
+        var caret = 0
+        var loopLen = 0
 
 
-    var groupLink : GroupTree.GroupNode? = null
-    set(value)  {
+        while( true) {
+            var frame = frames[index++]
+            loopLen += frame.length
+            if( offset - caret < frame.length) {
+                return when( frame.marker) {
+                    FFAFrameStructure.Marker.START_LOCAL_LOOP -> _getFrameFromLocalLoop( index, offset-caret, noLoop)
+                    FFAFrameStructure.Marker.FRAME  -> if (frame.isInGap(offset-caret)) null else frame
+                    FFAFrameStructure.Marker.END_LOCAL_LOOP -> {
+                        MDebug.handleWarning(MDebug.WarningType.STRUCTURAL, this, "Malformed Animation (END_LOCAL_LOOP with length > 1)")
+                        null
+                    }
+                }
+            }
+            if( frame.marker == FFAFrameStructure.Marker.START_LOCAL_LOOP)
+                while( frames[index].marker != FFAFrameStructure.Marker.END_LOCAL_LOOP) index++
 
-    }
+            if( index == frames.size) {
+                if( noLoop || loopLen == 0)
+                    return null
+                index = 0
+            }
 
-    // ===========================
-    // ==== Link Interpretation
-    private fun groupLinkUdated() {
-        if( groupLink != null) {
-            var oldMap = nodeLinks
-            var newMap = HashMap<GroupTree.Node, FFAFrame>()
-            _frames.clear()
-            _gluRec(oldMap, newMap, groupLink!!)
-
-            nodeLinks = newMap
+            caret += frame.length
         }
     }
-    private fun _gluRec(
-            oldMap: HashMap<GroupTree.Node, FFAFrame>,
-            newMap: HashMap<GroupTree.Node, FFAFrame>,
-            node: GroupTree.GroupNode):Int
-    {
-        var len=0
 
-        node.children.reversed().forEach  {
-            if( it is GroupTree.GroupNode && includeSubtrees) {
-                val usingNew = (oldMap == null || !oldMap.containsKey(it))
-                val solFrame = if( usingNew)
-                    FFAFrame(0, it, FFAFrameAbstract.Marker.START_LOCAL_LOOP)
-                    else oldMap[it]!!
-
-                _frames.add(solFrame)
-                val subLen = _gluRec( oldMap, newMap, it)
-                if( usingNew || solFrame.length < subLen)
-                    solFrame.length = subLen
-                _frames.add( FFAFrame(0, null, FFAFrameAbstract.Marker.END_LOCAL_LOOP))
-
-                len += solFrame.length
-                newMap.put( it, solFrame)
-            }
-            else if( it is GroupTree.LayerNode) {
-                val newFrame =  if (oldMap == null || !oldMap.containsKey(it))
-                    FFAFrame( 0, it, FFAFrameAbstract.Marker.FRAME)
-                    else oldMap[it]!!
-                _frames.add(newFrame)
-
-                len += newFrame.length
-                newMap.put(it, newFrame)
-            }
-        }
-        return len
-    }
-
+    //endregion
 
     // =========
     // ==== Frame Extension Functions
     inner class FFAFrame(
-            length: Int,
-            node: GroupTree.Node?,
-            marker: Marker,
-            gapBefore: Int = 0,
-            gapAfter: Int = 0)
-        : FFAFrameAbstract(node, marker, length, gapBefore, gapAfter)
+            private val structure: FFAFrameStructure
+    )
     {
         val end: Int get() {return start + length}
         val start: Int get() {
@@ -107,63 +91,44 @@ class FFALayer(
                 if( it == this)
                     return carets.pop()
                 carets.push( carets.pop() + it.length)
-                if( it.marker == FFAFrameAbstract.Marker.START_LOCAL_LOOP)
+                if( it.marker == FFAFrameStructure.Marker.START_LOCAL_LOOP)
                     carets.push( carets.peek() - it.length)
-                if( it.marker == FFAFrameAbstract.Marker.END_LOCAL_LOOP)
+                if( it.marker == FFAFrameStructure.Marker.END_LOCAL_LOOP)
                     carets.pop()
             }
             return Integer.MIN_VALUE
         }
-
-        fun changeFrameProperties(_length: Int = -1, _gapBefore: Int = -1, _gapAfter: Int = -1) {
-            val oldLength = this.length
-            val oldGapB = this.gapBefore
-            val oldGapA = this.gapAfter
-            val newLength = if( _length < 0) this.length else _length
-            val newGapB = if( _gapBefore < 0) this.gapBefore else _gapBefore
-            val newGapA = if( _gapAfter < 0) this.gapAfter else _gapAfter
-
-            if( oldLength == newLength && oldGapA == newGapA && oldGapB == newGapB)
-                return
-
-            context.context.undoEngine.performAndStore( object: UndoEngine.NullAction() {
-                override fun performAction() {
-                    length = newLength
-                    gapBefore = newGapB
-                    gapAfter = newGapA
-                    context._triggerChange()
-                }
-                override fun undoAction() {
-                    length = oldLength
-                    gapBefore = oldGapB
-                    gapAfter = oldGapA
-                    context._triggerChange()
-                }
-                override fun getDescription(): String {
-                    return "Change Animation Lengths"
-                }
-            })
-        }
-
         val loopDepth:Int get() {
             var depth = 0
             _frames.forEach {
                 when {
                     it == this                              -> return depth
-                    it.marker == Marker.START_LOCAL_LOOP    -> ++depth
-                    it.marker == Marker.END_LOCAL_LOOP      -> --depth
+                    it.marker == FFAFrameStructure.Marker.START_LOCAL_LOOP    -> ++depth
+                    it.marker == FFAFrameStructure.Marker.END_LOCAL_LOOP      -> --depth
                 }
             }
             return 0
         }
-
         val next: FFAFrame? get() {
             val i = _frames.indexOf(this)
             if( i == -1 || (i+1) >= _frames.size)
                 return null
             return _frames[i+1]
         }
+        val workspace : ImageWorkspace get() = context.context
 
+        val node : GroupTree.Node? get() = structure.node
+        val marker : FFAFrameStructure.Marker get() = structure.marker
+        var gapBefore : Int by UndoableDelegate(structure::gapBefore, ::workspace, "Changing Frame Gap", {context._triggerChange()})
+        var gapAfter : Int by UndoableDelegate(structure::gapAfter, ::workspace, "ChangingFrameGap", {context._triggerChange()})
 
+        var innerLength: Int by UndoableDelegate(structure::length, ::workspace, "Changing Frame Length", {context._triggerChange()})
+        var length : Int
+            get() = innerLength + gapBefore + gapAfter
+            set(value) = run { innerLength = value - gapBefore - gapAfter}
+
+        fun isInGap( internalMet: Int) : Boolean {
+            return (internalMet < gapBefore || (length-1) - internalMet < gapAfter)
+        }
     }
 }
