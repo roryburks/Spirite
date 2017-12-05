@@ -9,6 +9,8 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.animations.ffa.FFAFrameStructure;
+import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -600,36 +602,36 @@ public class LoadEngine {
 	private void loadFixedFrameAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
-//		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
-//
-//		int layerCount = helper.ra.readUnsignedShort();
-//
-//		for( int i=0; i<layerCount; ++i) {
-//			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
-//
-//			int groupNodeID = helper.ra.readInt();
-//			int mask = helper.ra.readByte();
-//			int frameCount = helper.ra.readUnsignedShort();
-//
-//
-//			GroupNode linkedGroup = ( groupNodeID > 0) ? (GroupNode) helper.nodes.get(groupNodeID) : null;
-//			boolean usesSubgroups = ((mask & 1) == 1);
-//
-//			for( int j=0; j<frameCount; ++j) {
-//				Node node = helper.nodes.get(helper.ra.readInt());
-//				int length = helper.ra.readUnsignedShort();
-//				int gapBefore = helper.ra.readUnsignedShort();
-//				int gapAfter = helper.ra.readUnsignedShort();
-//
-//				if( node instanceof LayerNode)
-//					nodeMap.put( node, new FrameAbstract( node, length, Marker.FRAME, gapBefore, gapAfter));
-//				if( node instanceof GroupNode)
-//					nodeMap.put( node, new FrameAbstract( node, length, Marker.START_LOCAL_LOOP, gapBefore, gapAfter));
-//			}
-//
-//			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, usesSubgroups);
-//		}
-//		helper.workspace.getAnimationManager().addAnimation(animation);
+		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
+
+		int layerCount = helper.ra.readUnsignedShort();
+
+		for( int i=0; i<layerCount; ++i) {
+			Map<Node,FFAFrameStructure> nodeMap = new HashMap<>();
+
+			int groupNodeID = helper.ra.readInt();
+			int mask = helper.ra.readByte();
+			int frameCount = helper.ra.readUnsignedShort();
+
+
+			GroupTree.GroupNode linkedGroup = ( groupNodeID > 0) ? (GroupTree.GroupNode) helper.nodes.get(groupNodeID) : null;
+			boolean usesSubgroups = ((mask & 1) == 1);
+
+			for( int j=0; j<frameCount; ++j) {
+				Node node = helper.nodes.get(helper.ra.readInt());
+				int length = helper.ra.readUnsignedShort();
+				int gapBefore = helper.ra.readUnsignedShort();
+				int gapAfter = helper.ra.readUnsignedShort();
+
+				if( node instanceof LayerNode)
+					nodeMap.put( node, new FFAFrameStructure(node, FFAFrameStructure.Marker.FRAME, length, gapBefore, gapAfter));
+				if( node instanceof GroupTree.GroupNode)
+					nodeMap.put( node, new FFAFrameStructure( node, FFAFrameStructure.Marker.START_LOCAL_LOOP, length, gapBefore, gapAfter));
+			}
+
+			animation.addLinkedLayer( linkedGroup, usesSubgroups, nodeMap);
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	private void loatRigAnimation( LoadHelper helper, String name) 
@@ -752,34 +754,34 @@ public class LoadEngine {
 	private void _LEGACY_loadFFA0007( LoadHelper helper, String name) 
 			throws IOException 
 	{
-//		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
-//
-//		int layerCount = helper.ra.readUnsignedShort();
-//
-//		for( int i=0; i<layerCount; ++i) {
-//			Map<Node,FrameAbstract> nodeMap = new HashMap<>();
-//
-//			int groupNodeID = helper.ra.readInt();
-//			int frameCount = helper.ra.readUnsignedShort();
-//
-//			GroupNode linkedGroup = null;
-//			if( groupNodeID > 0) {
-//				linkedGroup = (GroupNode) helper.nodes.get(groupNodeID);
-//			}
-//			for( int j=0; j<frameCount; ++j) {
-//				int marker = helper.ra.readByte();
-//				int length = helper.ra.readShort();
-//				int nodeLink = (marker == 0) ? helper.ra.readInt() : 0;
-//
-//				if( nodeLink > 0) {
-//					Node node = helper.nodes.get(nodeLink);
-//					nodeMap.put( node, new FrameAbstract( (LayerNode) node, length, Marker.FRAME, 0, 0));
-//				}
-//			}
-//
-//			animation.addBuiltLinkedLayer(linkedGroup, nodeMap, false);
-//		}
-//		helper.workspace.getAnimationManager().addAnimation(animation);
+		FixedFrameAnimation animation = new FixedFrameAnimation(name, helper.workspace);
+
+		int layerCount = helper.ra.readUnsignedShort();
+
+		for( int i=0; i<layerCount; ++i) {
+			Map<Node,FFAFrameStructure> nodeMap = new HashMap<>();
+
+			int groupNodeID = helper.ra.readInt();
+			int frameCount = helper.ra.readUnsignedShort();
+
+			GroupTree.GroupNode linkedGroup = null;
+			if( groupNodeID > 0) {
+				linkedGroup = (GroupTree.GroupNode) helper.nodes.get(groupNodeID);
+			}
+			for( int j=0; j<frameCount; ++j) {
+				int marker = helper.ra.readByte();
+				int length = helper.ra.readShort();
+				int nodeLink = (marker == 0) ? helper.ra.readInt() : 0;
+
+				if( nodeLink > 0) {
+					Node node = helper.nodes.get(nodeLink);
+					nodeMap.put( node, new FFAFrameStructure( node, FFAFrameStructure.Marker.FRAME, length,0, 0));
+				}
+			}
+
+			animation.addLinkedLayer(linkedGroup, false, nodeMap);
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	private StrokeSegment _LEGACY_buildMagLevFillStrokeSegment000D( LoadHelper helper, List<AMagLevThing> things) 

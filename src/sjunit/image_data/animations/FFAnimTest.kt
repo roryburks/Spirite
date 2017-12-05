@@ -5,6 +5,7 @@ import spirite.base.image_data.animations.ffa.FFAFrameStructure
 import spirite.base.image_data.animations.ffa.FFALayerGroupLinked
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation
 import spirite.base.image_data.mediums.IMedium
+import java.io.File
 import org.junit.Test as test
 
 class FixedFrameAnimationTests {
@@ -98,6 +99,38 @@ class FixedFrameAnimationTests {
             ws.undoEngine.undo()
             assert( ffa.end == 4)
 
+        }
+    }
+
+    @test fun SaveAndLoadAnim() {
+        TestWrapper.performTest {
+            val ws = it.currentWorkspace
+            val root = ws.addGroupNode(null, "AnimGroup")
+            val frame1 = ws.addNewSimpleLayer(root, 10, 10, "frame1", 0, IMedium.InternalImageTypes.NORMAL)
+            val inner = ws.addGroupNode(root, "InnerGroup")
+            val frame2 = ws.addNewSimpleLayer(inner, 10, 10, "frame2", 0, IMedium.InternalImageTypes.NORMAL)
+            val frame3 = ws.addNewSimpleLayer(root, 10, 10, "frame3", 0, IMedium.InternalImageTypes.NORMAL)
+            val frame4 = ws.addNewSimpleLayer(frame2, 10, 10, "frame2b", 0, IMedium.InternalImageTypes.NORMAL)
+
+
+            val ffa = FixedFrameAnimation("Animation", ws)
+            ffa.addLinkedLayer(root, true, null)
+            ws.animationManager.addAnimation(ffa)
+
+            val frames = ffa.layers[0].frames
+            frames[0].gapBefore = 1
+            frames[2].gapAfter = 2
+
+            val tempFile = File.createTempFile("ffa_sala","sif")
+            it.saveWorkspace(ws, tempFile)
+
+            val ws2 = it.loadEngine.loadWorkspace(tempFile)
+
+            assert(ws2.animationManager.animations.size != 0)
+            val frames2 = (ws.animationManager.animations[0] as FixedFrameAnimation).layers[0].frames
+            assert(frames2.size == 6)
+            assert(frames2[0].gapBefore == 1)
+            assert(frames2[2].gapAfter == 2)
         }
     }
 }

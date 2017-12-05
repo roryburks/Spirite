@@ -3,12 +3,17 @@ package spirite.base.file;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager.Palette;
+import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.LogicalImage;
 import spirite.base.image_data.MediumHandle;
+import spirite.base.image_data.animations.ffa.FFALayer;
+import spirite.base.image_data.animations.ffa.FFALayer.FFAFrame;
+import spirite.base.image_data.animations.ffa.FFALayerGroupLinked;
+import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -472,47 +477,59 @@ public class SaveEngine implements MWorkspaceObserver {
 			throws UnsupportedEncodingException, IOException 
 	{
 		WriteChunk(helper, "ANIM", () -> {
-//
-//			List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
-//
-//			for( Animation animation : animations) {
-//				// [n] : UTF8: Animation Name
-//				helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
-//
-//				if( animation instanceof FixedFrameAnimation) {
-//					// [1] : ID
-//					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
-//
-//					// [2] : Number of Layers
-//					List<FFALayer>layers = ((FixedFrameAnimation) animation).getLayers();
-//					layers.remove(null);
-//					helper.ra.writeShort( layers.size());
-//
-//					for( FFALayer layer : layers) {
-//						// [4] : Group Node Bound to
-//						helper.ra.writeInt((layer.getGroupLink() == null) ? 0 : helper.nodeMap.get(layer.getGroupLink()));
-//
-//						// [1] : bit mask
-//						helper.ra.writeByte( (layer.includesSubtrees())?1:0);
-//
-//						// [2] : Number of Frames
-//						List<Frame> linkedFrames = layer.getFrames();
-//						linkedFrames.removeIf((Frame f) -> {return (f.getLinkedNode() == null);});
-//						helper.ra.writeShort(linkedFrames.size());
-//
-//						for( Frame frame : linkedFrames) {
-//							// [4] : NodeID of LayerNode linked to
-//							helper.ra.writeInt( helper.nodeMap.get(frame.getLinkedNode()));
-//
-//							// [2] : Length
-//							helper.ra.writeShort(frame.getLength());
-//							// [2] : Gap Before
-//							helper.ra.writeShort(frame.getGapBefore());
-//							// [2] : Gap After
-//							helper.ra.writeShort(frame.getGapAfter());
-//						}
-//					}
-//				}
+
+			List<Animation> animations = helper.workspace.getAnimationManager().getAnimations();
+
+			for( Animation animation : animations) {
+				// [n] : UTF8: Animation Name
+				helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(animation.getName()));
+
+				if( animation instanceof FixedFrameAnimation) {
+					// [1] : ID
+					helper.ra.writeByte(SaveLoadUtil.ANIM_FIXED_FRAME);
+
+					// [2] : Number of Layers
+					List<FFALayer>layers = ((FixedFrameAnimation) animation).getLayers();
+					layers.remove(null);
+					helper.ra.writeShort( layers.size());
+
+					for( FFALayer layer : layers) {
+						GroupNode linked;
+						boolean includesSubtrees;
+
+						if( layer instanceof FFALayerGroupLinked) {
+							linked = ((FFALayerGroupLinked) layer).getGroupLink();
+							includesSubtrees = ((FFALayerGroupLinked) layer).getIncludeSubtrees();
+						}
+						else {
+							linked = null;
+							includesSubtrees = false;
+						}
+
+						// [4] : Group Node Bound to
+						helper.ra.writeInt((linked == null) ? 0 : helper.nodeMap.get(linked));
+
+						// [1] : bit mask
+						helper.ra.writeByte( (includesSubtrees)?1:0);
+
+						// [2] : Number of Frames
+						List<FFAFrame> linkedFrames = layer.getFrames();
+						linkedFrames.removeIf((FFAFrame f) -> {return (f.getNode() == null);});
+						helper.ra.writeShort(linkedFrames.size());
+
+						for( FFAFrame frame : linkedFrames) {
+							// [4] : NodeID of LayerNode linked to
+							helper.ra.writeInt( helper.nodeMap.get(frame.getNode()));
+
+							// [2] : Length
+							helper.ra.writeShort(frame.getLength());
+							// [2] : Gap Before
+							helper.ra.writeShort(frame.getGapBefore());
+							// [2] : Gap After
+							helper.ra.writeShort(frame.getGapAfter());
+						}
+					}
+				}
 //				else if( animation instanceof RigAnimation) {
 //					RigAnimation rigAnimation = (RigAnimation)animation;
 //					// [1] : ID
@@ -549,10 +566,10 @@ public class SaveEngine implements MWorkspaceObserver {
 //						}
 //					}
 //				}
-//				else {
-//					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
-//				}
-//			}
+				else {
+					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
+				}
+			}
 		});
 	}
 	
