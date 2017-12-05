@@ -11,7 +11,7 @@ import spirite.base.image_data.GroupTree.*;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.image_data.animations.AnimationState;
+import spirite.base.image_data.AnimationState;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;

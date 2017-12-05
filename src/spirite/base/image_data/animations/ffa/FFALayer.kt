@@ -10,6 +10,9 @@ abstract class FFALayer(
         internal var context: FixedFrameAnimation
 )
 {
+    abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo:FFAFrame, above: Boolean)
+
+
     val start = 0
     val end : Int get() {
         var caret = 0
@@ -111,6 +114,7 @@ abstract class FFALayer(
             return _frames[i+1]
         }
         val workspace : ImageWorkspace get() = context.context
+        val layerContext : FFALayer get() = this@FFALayer
 
         val node : GroupTree.Node? get() = structure.node
         val marker : FFAFrameStructure.Marker get() = structure.marker

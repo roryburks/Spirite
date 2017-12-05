@@ -1,11 +1,8 @@
 package spirite.base.image_data
 
-import spirite.base.image_data.AnimationManager.StructureChangeType.ADD
-import spirite.base.image_data.AnimationManager.StructureChangeType.REMOVE
 import spirite.base.image_data.GroupTree.Node
 import spirite.base.image_data.ImageWorkspace.*
 import spirite.base.image_data.UndoEngine.NullAction
-import spirite.base.image_data.animations.AnimationState
 import spirite.base.image_data.animations.NodeLinkedAnimation
 import spirite.base.image_data.animations.createStateFromAnimation
 import spirite.base.util.ObserverHandler
@@ -41,7 +38,7 @@ class AnimationManager(
     // region Add/Remove Animation
     fun addAnimation( newAnimation: Animation) {
         val previousSelected = selectedAnimation
-        val animationState = createStateFromAnimation(newAnimation)
+        val animationState = createStateFromAnimation(newAnimation, this)
         newAnimation.context = this.context
 
         context.undoEngine.performAndStore( object: NullAction() {
@@ -83,7 +80,7 @@ class AnimationManager(
             }
         })
     }
-    private fun _addAnimation( animation: Animation, animationState: AnimationState, index : Int? = null) {
+    private fun _addAnimation(animation: Animation, animationState: AnimationState, index : Int? = null) {
         _animations.add( index ?: _animations.size, animation)
         stateMap.put( animation, animationState)
         triggerNewAnimation( animation)
@@ -154,11 +151,11 @@ class AnimationManager(
         animationStateObs.trigger { it.selectedAnimationChanged(evt) }
     }
     private fun triggerFrameChanged() {
-        val evt = MAnimationStateEvent( selectedAnimation, null, null)
+        val evt = MAnimationStateEvent( selectedAnimation, null, stateMap[selectedAnimation])
         animationStateObs.trigger { it.animationFrameChanged(evt) }
     }
-    private fun triggerInnerStateChange() {
-        val evt = MAnimationStateEvent( selectedAnimation, null, null)
+    internal fun triggerInnerStateChange( anim: Animation) {
+        val evt = MAnimationStateEvent( anim, null, stateMap[anim])
         animationStateObs.trigger { it.viewStateChanged(evt) }
 
     }
