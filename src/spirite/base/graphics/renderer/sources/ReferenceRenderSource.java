@@ -1,7 +1,5 @@
 package spirite.base.graphics.renderer.sources;
 
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
@@ -10,6 +8,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ReferenceManager.Reference;
 import spirite.hybrid.HybridHelper;
+
+import java.util.List;
 
 /** This renders the Reference section, either the front section (the part placed
  * over the image) or the back section (the part placed behind). */

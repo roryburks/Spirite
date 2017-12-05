@@ -1,24 +1,5 @@
 package spirite.pc.ui.panel_toolset;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.util.List;
-
-import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.ImageWorkspace;
@@ -28,6 +9,12 @@ import spirite.base.image_data.UndoEngine.UndoIndex;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.util.List;
 
 /***
  * The UndoPanel shows the History of all Undoable actions and lets you navigate them

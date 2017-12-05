@@ -2,10 +2,13 @@
 
 package spirite.hybrid;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
+import spirite.base.graphics.RawImage;
+import spirite.hybrid.MDebug.ErrorType;
+import spirite.pc.graphics.ImageBI;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +16,6 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-
-import spirite.base.graphics.RawImage;
-import spirite.hybrid.MDebug.ErrorType;
-import spirite.pc.graphics.ImageBI;
 
 /**
  * The Globals object will centralize all globals that might have reason to

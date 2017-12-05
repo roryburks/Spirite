@@ -1,14 +1,10 @@
 package spirite.gui.hybrid;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Rectangle;
-
-import javax.swing.JTabbedPane;
-import javax.swing.plaf.basic.BasicTabbedPaneUI;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
+import java.awt.*;
 
 public class STabbedPane extends JTabbedPane {
 	public STabbedPane() {

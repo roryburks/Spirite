@@ -1,9 +1,5 @@
 package spirite.base.image_data;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -11,6 +7,10 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.ObserverHandler;
 import spirite.base.util.linear.MatTrans;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ReferenceManager manages the Reference system.

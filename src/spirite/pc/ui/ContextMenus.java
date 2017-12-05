@@ -1,17 +1,5 @@
 package spirite.pc.ui;
 
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.GroupTree.AnimationNode;
@@ -26,6 +14,13 @@ import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.hybrid.Globals;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ContextMenus {
 	public final static JPopupMenu cmenu = new JPopupMenu();

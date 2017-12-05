@@ -1,21 +1,17 @@
 package spirite.gui.swing;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-
 import spirite.base.graphics.RawImage;
 import spirite.gui.generic.ISButton;
 import spirite.gui.generic.events.SActionEvent;
 import spirite.gui.generic.events.SActionEvent.SActionListener;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SwingGuiButton extends SwingGuiComponent 
 	implements ISButton

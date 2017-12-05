@@ -1,14 +1,5 @@
 package spirite.base.graphics.renderer;
 
-import java.awt.RenderingHints;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -21,6 +12,11 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 /** 
  * The ThumbnailManager keeps track of rendering thumbnails, cacheing them and 

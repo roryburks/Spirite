@@ -1,16 +1,14 @@
 package spirite.hybrid.tools.properties;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.pc.ui.components.SliderPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.util.Arrays;
+import java.util.List;
 
 public class SliderProperty extends SwingToolProperty {
 	private float value;

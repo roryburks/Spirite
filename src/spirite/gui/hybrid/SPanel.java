@@ -1,10 +1,9 @@
 package spirite.gui.hybrid;
 
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SPanel extends JPanel {
 	public SPanel() {

@@ -2,8 +2,6 @@
 
 package spirite.pc.ui.panel_work.awt;
 
-import java.awt.Graphics;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -20,6 +18,8 @@ import spirite.gui.hybrid.SPanel;
 import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+
+import java.awt.*;
 
 public class ReferencePanel extends SPanel 
 	implements MImageObserver, MReferenceObserver

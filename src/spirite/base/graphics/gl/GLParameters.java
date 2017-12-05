@@ -1,12 +1,11 @@
 package spirite.base.graphics.gl;
 
+import com.jogamp.opengl.GL2;
+import spirite.base.util.linear.Rect;
+
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.jogamp.opengl.GL2;
-
-import spirite.base.util.linear.Rect;
 
 /**
  * GLParameters encapsulates many of the attributes representing "how" OpenGL

@@ -1,8 +1,8 @@
 package spirite.gui.hybrid;
 
-import javax.swing.JCheckBox;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SCheckBox extends JCheckBox {
 	public SCheckBox(String label) {

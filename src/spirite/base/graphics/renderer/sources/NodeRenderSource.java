@@ -1,9 +1,5 @@
 package spirite.base.graphics.renderer.sources;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
@@ -16,6 +12,10 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.MediumHandle;
 import spirite.hybrid.HybridHelper;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /** 
  * This Class will draw a group as it's "intended" to be seen,

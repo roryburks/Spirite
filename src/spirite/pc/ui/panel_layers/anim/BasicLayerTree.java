@@ -1,15 +1,5 @@
 package spirite.pc.ui.panel_layers.anim;
 
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
@@ -28,7 +18,16 @@ import spirite.pc.ui.Transferables;
 import spirite.pc.ui.components.BetterTree;
 import spirite.pc.ui.components.BetterTree.BTNode;
 import spirite.pc.ui.components.BetterTree.BranchingNode;
-import spirite.pc.ui.components.BetterTree.DropDirection;;
+import spirite.pc.ui.components.BetterTree.DropDirection;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+;
 
 public class BasicLayerTree extends SPanel implements MWorkspaceObserver, MImageObserver, MAnimationStructureObserver {
 	private final MasterControl master;

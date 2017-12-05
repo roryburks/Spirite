@@ -1,13 +1,5 @@
 package spirite.base.image_data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import spirite.base.graphics.RenderProperties;
-import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
-import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
@@ -18,6 +10,11 @@ import spirite.base.image_data.animations.NodeLinkedAnimation;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /***
  * The AnimationManager stores all of the animations within a workspace and handles messages 

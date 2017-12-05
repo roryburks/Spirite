@@ -1,11 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
@@ -30,6 +24,8 @@ import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+
+import java.util.*;
 
 
 /**

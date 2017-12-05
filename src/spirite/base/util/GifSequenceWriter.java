@@ -1,12 +1,16 @@
 package spirite.base.util;
 
+import javax.imageio.*;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.Iterator;
 
-// 
+//
 //  GifSequenceWriter.java
-//  
+//
 //  Created by Elliot Kroo on 2009-04-25.
 //	Modified by Rory Burks, to see original:
 //	http://elliot.kroo.net/software/java/GifSequenceWriter/GifSequenceWriter.java
@@ -15,15 +19,6 @@ import java.util.Iterator;
 // License. To view a copy of this license, visit
 // http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative
 // Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
-import javax.imageio.IIOException;
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
-import javax.imageio.stream.ImageOutputStream;
 
 /** @author Elliot Kroo (elliot[at]kroo[dot]net) */
 public class GifSequenceWriter {

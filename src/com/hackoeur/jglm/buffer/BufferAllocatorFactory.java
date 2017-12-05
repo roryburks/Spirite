@@ -14,10 +14,10 @@
  */
 package com.hackoeur.jglm.buffer;
 
+import com.hackoeur.jglm.support.JglmConfig;
+
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-
-import com.hackoeur.jglm.support.JglmConfig;
 
 /**
  * Gets an instance of a {@link BufferAllocator}.  There is a pre-configured

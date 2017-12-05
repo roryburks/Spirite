@@ -1,27 +1,10 @@
 package spirite.pc.ui.panel_layers;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.MouseEvent;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListCellRenderer;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.gui.hybrid.SButton;
-import spirite.gui.hybrid.SComboBox;
-import spirite.gui.hybrid.SLabel;
-import spirite.gui.hybrid.SPanel;
-import spirite.gui.hybrid.STabbedPane;
+import spirite.gui.hybrid.*;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.components.SliderPanel;
@@ -29,6 +12,12 @@ import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 import spirite.pc.ui.panel_layers.anim.LayerAnimView;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 public class LayersPanel extends SPanel
 	implements OmniComponent 

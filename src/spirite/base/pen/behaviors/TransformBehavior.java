@@ -1,12 +1,5 @@
 package spirite.base.pen.behaviors;
 
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
@@ -14,6 +7,13 @@ import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 abstract class TransformBehavior extends DrawnStateBehavior {
 	

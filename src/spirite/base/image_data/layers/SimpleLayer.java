@@ -1,9 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -18,6 +14,10 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SimpleLayer extends Layer {
 	private final MediumHandle data;

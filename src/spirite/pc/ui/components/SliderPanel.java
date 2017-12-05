@@ -1,16 +1,12 @@
 package spirite.pc.ui.components;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
+import spirite.gui.hybrid.SPanel;
+import spirite.pc.ui.UIUtil;
+
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-
-import spirite.gui.hybrid.SPanel;
-import spirite.pc.ui.UIUtil;
 
 public class SliderPanel extends SPanel {
 	private float value = 0.0f;

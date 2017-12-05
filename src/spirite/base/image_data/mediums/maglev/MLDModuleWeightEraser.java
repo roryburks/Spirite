@@ -1,8 +1,5 @@
 package spirite.base.image_data.mediums.maglev;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
@@ -15,6 +12,9 @@ import spirite.base.pen.StrokeEngine.DrawPoints;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class MLDModuleWeightEraser implements IWeightEraserModule{
 

@@ -1,11 +1,11 @@
 package spirite.hybrid;
 
-import java.awt.image.BufferedImage;
-
 import spirite.base.graphics.RawImage;
 import spirite.gui.generic.GuiComposer;
 import spirite.gui.swing.SwingGuiComposer;
 import spirite.pc.graphics.ImageBI;
+
+import java.awt.image.BufferedImage;
 
 /**
  * HybridUI

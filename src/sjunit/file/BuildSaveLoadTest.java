@@ -1,14 +1,6 @@
 package sjunit.file;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-
 import org.junit.Test;
-
 import sjunit.TestWrapper;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
@@ -38,6 +30,13 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.hybrid.HybridHelper;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Stack;
 
 public class BuildSaveLoadTest {
 

@@ -1,41 +1,5 @@
 package spirite.pc.ui.panel_layers;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellEditor;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.RawImage;
@@ -46,11 +10,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.GroupTree.NodeValidator;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.ImageWorkspace.RenderPropertiesChange;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.ImageWorkspace.*;
 import spirite.base.image_data.MediumHandle;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.Globals;
@@ -61,6 +21,25 @@ import spirite.pc.graphics.awt.AWTContext;
 import spirite.pc.ui.ContentTree;
 import spirite.pc.ui.Transferables.NodeTransferable;
 import spirite.pc.ui.UIUtil;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 
 public class LayerTreePanel extends ContentTree 

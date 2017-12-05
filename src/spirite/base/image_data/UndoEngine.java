@@ -1,15 +1,5 @@
 package spirite.base.image_data;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Stack;
-
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
@@ -21,6 +11,8 @@ import spirite.base.util.ObserverHandler;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+
+import java.util.*;
 
 /***
  * The UndoEngine stores all undoable actions and the data needed to recover

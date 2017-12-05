@@ -1,11 +1,7 @@
 package debug
 
-import spirite.base.image_data.animations.ffa.FFAFrameStructure
-import java.util.*
-import kotlin.properties.Delegates
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
-import kotlin.reflect.jvm.javaField
 
 //region Test 1
 fun kt001_test() {

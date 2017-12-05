@@ -1,13 +1,5 @@
 package spirite.base.brains;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.brains.tools.ToolSchemes.ToolScheme;
@@ -15,15 +7,13 @@ import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.*;
 import spirite.base.image_data.mediums.maglev.MaglevImageDrawer;
 import spirite.base.pen.StrokeEngine.Method;
 import spirite.base.util.ObserverHandler;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * The ToolsetManager manages the set of Tools available, which tool is

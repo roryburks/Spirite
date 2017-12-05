@@ -1,7 +1,9 @@
 package spirite.base.image_data.animations.ffa
 
 import spirite.base.graphics.renderer.RenderEngine
-import spirite.base.image_data.*
+import spirite.base.image_data.Animation
+import spirite.base.image_data.GroupTree
+import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.animations.NodeLinkedAnimation
 import spirite.base.util.MUtil
 import kotlin.math.floor

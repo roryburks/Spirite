@@ -1,8 +1,5 @@
 package spirite.base.image_data.selection;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.RawImage;
@@ -20,6 +17,9 @@ import spirite.base.util.ObserverHandler;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  *  The SelectionEngine controls the selected image data, moving it from

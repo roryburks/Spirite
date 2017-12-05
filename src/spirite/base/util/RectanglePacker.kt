@@ -1,6 +1,5 @@
 package spirite.base.util
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2i
 import java.lang.Math.max

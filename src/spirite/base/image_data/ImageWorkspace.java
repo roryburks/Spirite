@@ -1,18 +1,5 @@
 package spirite.base.image_data;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicReference;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager;
@@ -35,12 +22,8 @@ import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
-import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.image_data.mediums.DynamicMedium;
-import spirite.base.image_data.mediums.FlatMedium;
-import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.*;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
-import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
@@ -54,6 +37,11 @@ import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /***

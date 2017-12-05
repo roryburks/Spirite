@@ -1,19 +1,5 @@
 package spirite.pc.ui.dialogs;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager;
 import spirite.base.image_data.ImageWorkspace;
@@ -23,6 +9,15 @@ import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.UIUtil.ClickAdapter;
 import spirite.pc.ui.components.MTextFieldNumber;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class NewLayerDPanel extends SPanel {
 	public class NewLayerHelper {

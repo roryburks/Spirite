@@ -1,7 +1,5 @@
 package spirite.base.graphics.renderer.sources;
 
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
@@ -10,6 +8,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.HybridHelper;
+
+import java.util.List;
 
 public class LayerRenderSource extends RenderSource {
 		private final Layer layer;

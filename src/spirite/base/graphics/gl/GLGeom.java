@@ -1,12 +1,12 @@
 package spirite.base.graphics.gl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;
 import spirite.base.util.glu.GLC;
 import spirite.base.util.linear.Vec2;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GLGeom contains methods which performs software alternative to the Geometry Shaders for

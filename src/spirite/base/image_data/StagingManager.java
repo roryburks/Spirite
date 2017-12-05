@@ -1,10 +1,10 @@
 package spirite.base.image_data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The StagingManager

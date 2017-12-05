@@ -1,11 +1,11 @@
 package spirite.base.image_data.mediums.maglev
 
-import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone
-import spirite.base.util.linear.Vec2
-import spirite.base.util.interpolation.CubicSplineInterpolatorND
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke
 import spirite.base.pen.PenTraits.PenState
+import spirite.base.util.interpolation.CubicSplineInterpolatorND
+import spirite.base.util.interpolation.Interpolator2D
+import spirite.base.util.linear.Vec2
 import java.util.*
 
 fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D): List<AMagLevThing> {

@@ -1,12 +1,11 @@
 package spirite.base.graphics.gl;
 
-import java.nio.IntBuffer;
-
 import com.jogamp.opengl.GL2;
-
 import spirite.base.graphics.RawImage;
 import spirite.base.util.glu.GLC;
 import spirite.hybrid.HybridHelper;
+
+import java.nio.IntBuffer;
 
 public class GLImage implements RawImage {
 	private static final GLEngine engine = GLEngine.getInstance();

@@ -1,9 +1,5 @@
 package spirite.base.image_data.mediums.drawer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.GraphicsContext;
@@ -21,16 +17,7 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.*;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.FlatLiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
@@ -50,6 +37,10 @@ import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultImageDrawer 
 	implements 	IImageDrawer,

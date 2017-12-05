@@ -1,16 +1,16 @@
 package spirite.base.util;
 
 
-import java.awt.Shape;
-import java.awt.geom.PathIterator;
-import java.util.Iterator;
-import java.util.List;
-
 import spirite.base.graphics.IImage;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
+
+import java.awt.*;
+import java.awt.geom.PathIterator;
+import java.util.Iterator;
+import java.util.List;
 
 public class MUtil {
 

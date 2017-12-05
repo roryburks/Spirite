@@ -1,17 +1,13 @@
 package spirite.pc.graphics.awt;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /***
  * The StrokeEngine operates asynchronously to the input data.  In general

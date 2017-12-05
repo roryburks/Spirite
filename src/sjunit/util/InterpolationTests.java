@@ -1,7 +1,6 @@
 package sjunit.util;
 
 import org.junit.Test;
-
 import spirite.base.util.interpolation.CubicSplineInterpolatorND;
 
 public class InterpolationTests {

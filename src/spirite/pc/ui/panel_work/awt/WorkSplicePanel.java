@@ -1,14 +1,5 @@
 package spirite.pc.ui.panel_work.awt;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-
-import javax.swing.GroupLayout;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
@@ -18,6 +9,11 @@ import spirite.pc.ui.UIUtil;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 /**
  *WorkSplicePanel is a simple container for the DrawPanel (which displays the 

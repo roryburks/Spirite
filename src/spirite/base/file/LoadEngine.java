@@ -1,23 +1,10 @@
 package spirite.base.file;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree;
-import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
@@ -26,7 +13,6 @@ import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
-import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.DynamicMedium;
@@ -47,6 +33,10 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 /***
  * LoadEngine is a static container for methods which load images from

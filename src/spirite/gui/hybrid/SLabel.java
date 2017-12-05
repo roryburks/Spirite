@@ -1,8 +1,8 @@
 package spirite.gui.hybrid;
 
-import javax.swing.JLabel;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SLabel extends JLabel{
 	public SLabel() {

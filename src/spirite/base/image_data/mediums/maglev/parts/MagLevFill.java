@@ -1,8 +1,5 @@
 package spirite.base.image_data.mediums.maglev.parts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.mediums.ABuiltMediumData;
@@ -10,6 +7,9 @@ import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.compaction.FloatCompactor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MagLevFill extends AMagLevThing {
 	public static class StrokeSegment {

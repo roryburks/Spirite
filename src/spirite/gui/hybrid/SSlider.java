@@ -1,16 +1,10 @@
 package spirite.gui.hybrid;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-
-import javax.swing.JSlider;
-import javax.swing.plaf.SliderUI;
-import javax.swing.plaf.basic.BasicSliderUI;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSliderUI;
+import java.awt.*;
 
 public class SSlider extends JSlider {
 	public SSlider() {

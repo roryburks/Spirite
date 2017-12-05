@@ -1,7 +1,5 @@
 package spirite.base.image_data.mediums.maglev;
 
-import java.util.ArrayList;
-
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
@@ -15,6 +13,8 @@ import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
 import spirite.base.util.linear.Vec2i;
+
+import java.util.ArrayList;
 
 /**
  * A DerivedMaglevMedium is a second-hand medium that relies on a MaglevMedium.

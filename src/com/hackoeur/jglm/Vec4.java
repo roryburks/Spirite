@@ -14,10 +14,10 @@
  */
 package com.hackoeur.jglm;
 
-import java.nio.FloatBuffer;
-
 import com.hackoeur.jglm.support.Compare;
 import com.hackoeur.jglm.support.FastMath;
+
+import java.nio.FloatBuffer;
 
 /**
  * @author James Royalty

@@ -2,22 +2,6 @@
 
 package spirite.pc.ui.panel_toolset;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.List;
-
-import javax.swing.BoxLayout;
-
 import spirite.base.brains.HotkeyManager;
 import spirite.base.brains.HotkeyManager.Hotkey;
 import spirite.base.brains.MasterControl;
@@ -36,6 +20,11 @@ import spirite.gui.hybrid.SToggleButton;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.ToolsetIcons;
 import spirite.pc.ui.components.BoxList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
 
 /**
  * 

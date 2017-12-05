@@ -1,12 +1,5 @@
 package spirite.base.brains.commands;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.Animation;
 import spirite.base.image_data.AnimationManager;
@@ -16,6 +9,12 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NodeContextCommand implements CommandExecuter {
 	private final MasterControl master;

@@ -1,10 +1,10 @@
 package spirite.base.pen;
 
-import java.util.Arrays;
-
 import spirite.base.pen.PenTraits.PenDynamics;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.util.linear.Vec2;
+
+import java.util.Arrays;
 
 /***
  * Pretty much anything which alters the image data directly goes 

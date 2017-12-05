@@ -1,7 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.util.List;
-
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -9,6 +7,8 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageCropHelper;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.linear.Rect;
+
+import java.util.List;
 
 public class ReferenceLayer extends Layer {
 	private  LayerNode underlying;

@@ -2,13 +2,12 @@
 
 package spirite.pc;
 
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
 import spirite.base.brains.MasterControl;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.pc.ui.omni.FrameManager;
+
+import javax.swing.*;
 
 
 

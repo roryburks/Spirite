@@ -1,30 +1,15 @@
 package spirite.pc.ui.dialogs;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.NumberFormat;
-
-import javax.swing.AbstractListModel;
-import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataListener;
-
 import spirite.base.brains.MasterControl;
 import spirite.gui.hybrid.SComboBox;
 import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.NumberFormat;
 
 /**
  *

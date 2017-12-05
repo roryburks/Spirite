@@ -1,9 +1,5 @@
 package spirite.pc.ui.panel_layers.layer_properties;
 
-import java.awt.GridLayout;
-
-import javax.swing.JComponent;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
@@ -14,6 +10,9 @@ import spirite.base.image_data.layers.SpriteLayer;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class LayerPropertiesPanel extends SPanel
 	implements OmniComponent, MNodeSelectionObserver

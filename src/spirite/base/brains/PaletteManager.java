@@ -1,21 +1,14 @@
 package spirite.base.brains;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /***

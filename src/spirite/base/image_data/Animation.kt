@@ -1,7 +1,5 @@
 package spirite.base.image_data
 
-import com.sun.corba.se.impl.orbutil.graph.Graph
-import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.renderer.RenderEngine
 

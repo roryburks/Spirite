@@ -1,11 +1,11 @@
 package spirite.pc.graphics;
 
-import java.awt.image.BufferedImage;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.awt.AWTContext;
+
+import java.awt.image.BufferedImage;
 
 public class ImageBI implements RawImage {
 	public final BufferedImage img;

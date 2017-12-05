@@ -1,13 +1,13 @@
 package spirite.base.image_data;
 
-import java.util.List;
-
 import spirite.base.image_data.AnimationManager.AnimationStructureEvent;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.GroupTree.GroupNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.util.ObserverHandler;
+
+import java.util.List;
 
 /**
  * The AnimationView maintains the view-state of the extended AnimationView (the

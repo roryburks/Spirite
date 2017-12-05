@@ -1,12 +1,12 @@
 package spirite.base.image_data.mediums;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * IInternalImages are a form of base data type that serves as an intermediate between

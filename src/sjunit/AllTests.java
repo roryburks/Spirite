@@ -3,7 +3,6 @@ package sjunit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
 import sjunit.file.BuildSaveLoadTest;
 import sjunit.image_data.animations.FFAnimTest;
 import sjunit.util.CompactionTests;

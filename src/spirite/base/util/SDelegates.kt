@@ -2,7 +2,6 @@ package spirite.base.util
 
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.UndoEngine
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
 class UndoableDelegate <T>(

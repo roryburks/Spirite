@@ -1,11 +1,10 @@
 package spirite.base.graphics
 
-import java.awt.Shape    // TODO
-import java.util.Stack
-
 import spirite.base.image_data.MediumHandle
 import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.Rect
+import java.awt.Shape
+import java.util.*
 
 /**
  * GraphicsContext is an abstract class which wraps all graphical functionality

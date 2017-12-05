@@ -1,8 +1,5 @@
 package spirite.base.image_data.layers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.GroupTree;
@@ -14,6 +11,9 @@ import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2i;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Layer {
 	public abstract BuildingMediumData getActiveData();

@@ -1,12 +1,5 @@
 package spirite.base.image_data.layers.puppet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
@@ -15,6 +8,8 @@ import spirite.base.image_data.layers.puppet.BasePuppet.BasePart;
 import spirite.base.image_data.mediums.maglev.DerivedMaglevMedium;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.util.interpolation.Interpolator2D;
+
+import java.util.*;
 
 public class Puppet implements IPuppet {
 	private final ImageWorkspace workspace;

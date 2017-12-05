@@ -2,17 +2,6 @@
 
 package spirite.pc.ui.dialogs;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JColorChooser;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
@@ -20,6 +9,14 @@ import spirite.hybrid.Globals;
 import spirite.pc.ui.TestGLDiag;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 import spirite.pc.ui.dialogs.root.JResizeWorkspace;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * A static centalized namespace for calling the various Dialogs.

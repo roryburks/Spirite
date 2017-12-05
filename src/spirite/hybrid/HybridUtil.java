@@ -1,20 +1,6 @@
 package spirite.hybrid;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.IntBuffer;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.activation.UnsupportedDataTypeException;
-import javax.imageio.ImageIO;
-
 import com.jogamp.opengl.GL2;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
@@ -28,6 +14,18 @@ import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.jogl.JOGLCore;
+
+import javax.activation.UnsupportedDataTypeException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.IntBuffer;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HybridUtil {
 	public static class UnsupportedImageTypeException extends Exception {

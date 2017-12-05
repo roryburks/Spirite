@@ -1,14 +1,6 @@
 package spirite.pc.pen;
 
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
-
-import jpen.PButtonEvent;
-import jpen.PKindEvent;
-import jpen.PLevel;
-import jpen.PLevelEvent;
-import jpen.PScrollEvent;
+import jpen.*;
 import jpen.event.PenListener;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager;
@@ -18,6 +10,9 @@ import spirite.base.pen.PenTraits.MButtonEvent;
 import spirite.base.pen.Penner;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
 /**
  * 
  * Uses the JPen2 library.

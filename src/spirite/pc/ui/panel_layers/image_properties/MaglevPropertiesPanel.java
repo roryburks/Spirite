@@ -1,12 +1,11 @@
 package spirite.pc.ui.panel_layers.image_properties;
 
-import java.awt.Graphics;
-
-import javax.swing.JLabel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class MaglevPropertiesPanel extends SPanel {
 	private final MasterControl master;

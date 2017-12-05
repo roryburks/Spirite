@@ -1,7 +1,5 @@
 package spirite.base.image_data.mediums.maglev.parts;
 
-import java.util.Arrays;
-
 import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
@@ -15,6 +13,8 @@ import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
+
+import java.util.Arrays;
 
 public class MagLevStroke extends AMagLevThing {
 	public final PenState[] states;

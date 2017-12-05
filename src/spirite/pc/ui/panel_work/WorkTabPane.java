@@ -1,15 +1,5 @@
 package spirite.pc.ui.panel_work;
 
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.ImageWorkspace;
@@ -19,6 +9,15 @@ import spirite.base.pen.Penner;
 import spirite.gui.hybrid.STabbedPane;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * WorkTabPane is the top-level UI Component for the Work/Draw area.  In addition 

@@ -1,17 +1,15 @@
 package spirite.pc.ui.panel_layers.image_properties;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.PrismaticMedium.LImg;
 import spirite.base.util.linear.Rect;
 import spirite.gui.hybrid.SPanel;
+
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
 public class PrismaticImagePropertiesPanel extends SPanel {
 	private final MasterControl master;

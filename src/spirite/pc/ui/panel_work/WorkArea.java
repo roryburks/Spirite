@@ -1,8 +1,5 @@
 package spirite.pc.ui.panel_work;
 
-import java.awt.Color;
-import java.awt.Component;
-
 import spirite.base.graphics.CapMethod;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -12,11 +9,7 @@ import spirite.base.graphics.renderer.RenderEngine;
 import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
-import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.MFlashObserver;
-import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.ImageWorkspace.*;
 import spirite.base.image_data.ReferenceManager;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
@@ -33,6 +26,8 @@ import spirite.base.util.linear.Vec2;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+
+import java.awt.*;
 
 /** A WorkArea is a simple abstraction for encapsulating the interactions of 
  * a UIComponent which handles the Drawn Image area

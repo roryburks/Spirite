@@ -1,9 +1,8 @@
 package spirite.gui.hybrid;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SButton extends JButton {
 	public SButton() {

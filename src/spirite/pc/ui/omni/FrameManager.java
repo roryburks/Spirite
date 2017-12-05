@@ -1,22 +1,5 @@
 package spirite.pc.ui.omni;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.commands.CommandExecuter;
 import spirite.base.image_data.ImageWorkspace;
@@ -37,6 +20,14 @@ import spirite.pc.ui.panel_toolset.UndoPanel;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
 import spirite.pc.ui.panel_work.WorkTabPane;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.List;
 
 public class FrameManager 
 	implements WindowListener, CommandExecuter

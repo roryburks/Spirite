@@ -1,7 +1,6 @@
 package sjunit.image_data.animations;
 
 import org.junit.Test;
-
 import sjunit.TestWrapper;
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.ImageWorkspace;

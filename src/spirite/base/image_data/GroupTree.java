@@ -1,13 +1,13 @@
 package spirite.base.image_data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.RenderProperties;
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 import spirite.base.image_data.layers.Layer;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * A GroupTree is a generalized, abstract class for storing assorted image

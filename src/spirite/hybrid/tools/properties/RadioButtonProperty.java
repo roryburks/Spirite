@@ -1,18 +1,16 @@
 package spirite.hybrid.tools.properties;
 
-import java.awt.Font;
+import spirite.base.brains.ToolsetManager.ToolSettings;
+import spirite.base.util.DataBinding;
+import spirite.gui.hybrid.SRadioButton;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-
-import spirite.base.brains.ToolsetManager.ToolSettings;
-import spirite.base.util.DataBinding;
-import spirite.gui.hybrid.SRadioButton;
 
 public class RadioButtonProperty<T extends Enum<T>> extends SwingToolProperty {
 	private T value;

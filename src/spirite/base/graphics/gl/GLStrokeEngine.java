@@ -1,10 +1,7 @@
 package spirite.base.graphics.gl;
 
-import java.awt.image.BufferedImage;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL3;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
@@ -19,6 +16,8 @@ import spirite.hybrid.HybridHelper;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.graphics.awt.AWTContext;
+
+import java.awt.image.BufferedImage;
 
 /**
  * The GLStrokeEngine is a StrokeEngine that uses OpenGL to create a particular

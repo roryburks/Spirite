@@ -1,20 +1,17 @@
 package spirite.pc.ui.components;
 
-import java.awt.Color;
-import java.awt.Component;
+import spirite.gui.hybrid.SPanel;
+import spirite.gui.hybrid.SToggleButton;
+import spirite.hybrid.Globals;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import javax.swing.GroupLayout.SequentialGroup;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JComponent;
-
-import spirite.gui.hybrid.SPanel;
-import spirite.gui.hybrid.SToggleButton;
-import spirite.hybrid.Globals;
 
 public class SimpleTree extends SPanel {
 

@@ -1,16 +1,5 @@
 package spirite.pc.ui.panel_toolset;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.ToolsetManager;
@@ -29,6 +18,15 @@ import spirite.gui.hybrid.SScrollPane;
 import spirite.hybrid.Globals;
 import spirite.hybrid.tools.properties.SwingToolProperty;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ToolSettingsPanel extends SPanel
 	implements OmniComponent,

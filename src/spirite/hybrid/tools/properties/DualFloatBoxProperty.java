@@ -1,14 +1,5 @@
 package spirite.hybrid.tools.properties;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
@@ -16,6 +7,13 @@ import spirite.base.util.linear.Vec2;
 import spirite.gui.hybrid.SLabel;
 import spirite.hybrid.Globals;
 import spirite.pc.ui.components.MTextFieldNumber;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.util.Arrays;
+import java.util.List;
 
 public class DualFloatBoxProperty extends SwingToolProperty {
 	private float x, y;

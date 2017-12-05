@@ -1,8 +1,8 @@
 package spirite.gui.hybrid;
 
-import javax.swing.JRadioButton;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SRadioButton extends JRadioButton {
 	public SRadioButton( String label) {

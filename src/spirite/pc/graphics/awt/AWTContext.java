@@ -1,15 +1,5 @@
 package spirite.pc.graphics.awt;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-
 import spirite.base.graphics.*;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.MediumHandle;
@@ -19,6 +9,10 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.PCUtil;
 import spirite.pc.graphics.ImageBI;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 /**
  * AWTContext is a GraphicsContext using only native AWT calls (as well as some

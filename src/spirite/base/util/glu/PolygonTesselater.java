@@ -1,14 +1,13 @@
 package spirite.base.util.glu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUtessellator;
 import com.jogamp.opengl.glu.GLUtessellatorCallback;
-
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.util.compaction.FloatCompactor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PolygonTesselater {
 	public static Primitive tesselatePolygon(int[] x, int[] y, int count) {

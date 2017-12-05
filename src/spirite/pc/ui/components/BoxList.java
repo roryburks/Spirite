@@ -1,29 +1,17 @@
 package spirite.pc.ui.components;
 
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Action;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.KeyStroke;
-
 import spirite.base.util.MUtil;
 import spirite.gui.hybrid.SLabel;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.SScrollPane;
 import spirite.pc.ui.UIUtil;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 
 public class BoxList<T> extends SPanel {
 	private int box_w, box_h;

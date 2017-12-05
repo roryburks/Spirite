@@ -1,16 +1,5 @@
 package spirite.pc.ui.panel_layers.layer_properties;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.SwingUtilities;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage;
@@ -27,6 +16,11 @@ import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
 import spirite.pc.ui.components.BoxList;
 import spirite.pc.ui.components.SliderPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class PuppetLayerPanel extends SPanel 
 	implements ActionListener, MFlashObserver

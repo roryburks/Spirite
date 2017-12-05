@@ -1,21 +1,19 @@
 package spirite.hybrid.tools.properties;
 
-import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.base.util.DataBinding.ChangeExecuter;
 import spirite.gui.hybrid.SComboBox;
 import spirite.gui.hybrid.SLabel;
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.List;
 
 public class DropDownProperty<T extends Enum<T>> extends SwingToolProperty {
 	private T value;

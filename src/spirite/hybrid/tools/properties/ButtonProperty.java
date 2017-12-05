@@ -1,20 +1,18 @@
 package spirite.hybrid.tools.properties;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.util.DataBinding;
 import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
 
 public class ButtonProperty extends SwingToolProperty {
 	private final MasterControl master;	// I don't love this

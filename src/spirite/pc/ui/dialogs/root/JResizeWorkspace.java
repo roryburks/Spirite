@@ -1,13 +1,11 @@
 package spirite.pc.ui.dialogs.root;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
 import spirite.base.image_data.ImageWorkspace;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.components.MTextFieldNumber;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 
 public class JResizeWorkspace extends SPanel {
 	private final ImageWorkspace workspace;

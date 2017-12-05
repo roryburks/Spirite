@@ -1,11 +1,11 @@
 package spirite.base.image_data;
 
+import spirite.base.brains.PaletteManager;
+import spirite.base.brains.PaletteManager.Palette;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import spirite.base.brains.PaletteManager;
-import spirite.base.brains.PaletteManager.Palette;
 
 public class PaletteSet {
 	public final ImageWorkspace context;

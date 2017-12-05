@@ -1,13 +1,5 @@
 package spirite.base.brains;
 
-import java.io.File;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.prefs.Preferences;
-
 import spirite.base.graphics.GraphicsDrawer;
 import spirite.base.graphics.gl.GLDrawer;
 import spirite.base.util.MUtil;
@@ -16,6 +8,14 @@ import spirite.base.util.linear.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.pc.graphics.awt.AWTDrawer;
+
+import java.io.File;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 /***
  * SettingsManager will handle all the various properties and settings

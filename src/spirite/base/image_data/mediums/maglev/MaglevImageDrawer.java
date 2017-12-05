@@ -1,11 +1,5 @@
 package spirite.base.image_data.mediums.maglev;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
 import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
@@ -16,14 +10,7 @@ import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IBoneDrawer;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IColorChangeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IMagneticFillModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
+import spirite.base.image_data.mediums.drawer.IImageDrawer.*;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
@@ -36,6 +23,12 @@ import spirite.base.pen.StrokeEngine.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class MaglevImageDrawer 
 	implements 	IImageDrawer,

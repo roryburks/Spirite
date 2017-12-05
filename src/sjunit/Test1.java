@@ -3,21 +3,7 @@
  */
 package sjunit;
 
-import static org.junit.Assert.fail;
-
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import javax.swing.SwingUtilities;
-
 import org.junit.Test;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.file.LoadEngine.BadSIFFFileException;
@@ -43,6 +29,18 @@ import spirite.base.util.Colors;
 import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Guy

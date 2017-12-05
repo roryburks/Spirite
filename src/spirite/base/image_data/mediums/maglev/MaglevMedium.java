@@ -1,9 +1,5 @@
 package spirite.base.image_data.mediums.maglev;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
@@ -26,6 +22,10 @@ import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
 import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A Maglev Internal Image is an image that floats just above the surface, 

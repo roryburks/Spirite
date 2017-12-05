@@ -1,10 +1,6 @@
 package spirite.base.graphics.gl;
 
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-
 import com.jogamp.opengl.GL2;
-
 import spirite.base.graphics.*;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.PolyType;
@@ -20,6 +16,9 @@ import spirite.base.util.glu.PolygonTesselater;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridUtil;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 /**
  * GLGraphics is a GraphicsContext using the GLEngine, duplicating (or at least

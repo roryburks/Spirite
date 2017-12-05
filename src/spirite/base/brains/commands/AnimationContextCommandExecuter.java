@@ -1,13 +1,13 @@
 package spirite.base.brains.commands;
 
+import spirite.base.brains.MasterControl;
+import spirite.base.image_data.Animation;
+import spirite.base.image_data.ImageWorkspace;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import spirite.base.brains.MasterControl;
-import spirite.base.image_data.Animation;
-import spirite.base.image_data.ImageWorkspace;
 
 public class AnimationContextCommandExecuter implements CommandExecuter {
 	private final MasterControl master;

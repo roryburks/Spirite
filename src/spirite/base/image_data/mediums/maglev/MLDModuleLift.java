@@ -1,8 +1,5 @@
 package spirite.base.image_data.mediums.maglev;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
@@ -17,6 +14,9 @@ import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
 import spirite.base.util.linear.MatTrans;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 {

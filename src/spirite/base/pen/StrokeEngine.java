@@ -1,10 +1,5 @@
 package spirite.base.pen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
@@ -23,6 +18,11 @@ import spirite.base.util.interpolation.Interpolator2D.InterpolatedPoint;
 import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class StrokeEngine {
 

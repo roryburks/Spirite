@@ -1,13 +1,11 @@
 package sjunit.image_data.animations
 
-import kotlin.test.*
-import org.junit.Test as test
-import org.junit.Assert.*
 import sjunit.TestWrapper
 import spirite.base.image_data.animations.ffa.FFAFrameStructure
 import spirite.base.image_data.animations.ffa.FFALayerGroupLinked
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation
 import spirite.base.image_data.mediums.IMedium
+import org.junit.Test as test
 
 class FixedFrameAnimationTests {
     @test fun CreateSimpleFourFrameAnimation() {

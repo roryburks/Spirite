@@ -1,15 +1,9 @@
 package spirite.gui.hybrid;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-
-import javax.swing.BorderFactory;
-import javax.swing.JMenuBar;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class SMenuBar extends JMenuBar {
 	public SMenuBar() {

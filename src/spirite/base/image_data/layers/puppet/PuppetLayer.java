@@ -1,8 +1,5 @@
 package spirite.base.image_data.layers.puppet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.file.LoadEngine.PuppetPartInfo;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle;
@@ -18,6 +15,9 @@ import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.SkeletonStateDrawer;
 import spirite.base.util.linear.Rect;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PuppetLayer extends Layer {
 	public final IPuppet puppet;

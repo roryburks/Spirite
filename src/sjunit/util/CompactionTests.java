@@ -1,7 +1,6 @@
 package sjunit.util;
 
 import org.junit.Test;
-
 import spirite.base.util.compaction.DoubleEndedFloatCompactor;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.compaction.ReverseFloatCompactor;

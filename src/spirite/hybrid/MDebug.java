@@ -1,11 +1,10 @@
 package spirite.hybrid;
 
+import javax.swing.*;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 /***
  * 

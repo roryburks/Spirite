@@ -1,12 +1,5 @@
 package spirite.base.brains.commands;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.SettingsManager;
 import spirite.base.brains.ToolsetManager;
@@ -26,6 +19,13 @@ import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.omni.FrameManager;
 import spirite.pc.ui.panel_work.WorkPanel.View;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** 
  * global.* Command Executer

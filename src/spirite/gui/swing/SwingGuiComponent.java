@@ -1,8 +1,8 @@
 package spirite.gui.swing;
 
-import javax.swing.JComponent;
-
 import spirite.gui.generic.SComponent;
+
+import javax.swing.*;
 
 
 public abstract class SwingGuiComponent 

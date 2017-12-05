@@ -1,15 +1,12 @@
 package spirite.pc.ui.panel_layers.anim.dialogs;
 
-import java.awt.event.WindowEvent;
-
-import javax.swing.GroupLayout;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-
 import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SComboBox;
 import spirite.gui.hybrid.SLabel;
 import spirite.pc.ui.components.MTextFieldNumber;
+
+import javax.swing.*;
+import java.awt.event.WindowEvent;
 
 public class ResizeLocalLoopDialog extends JDialog {
 	public boolean success = false;

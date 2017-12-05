@@ -1,9 +1,8 @@
 package spirite.pc.ui.components;
 
-import java.awt.Container;
-import java.awt.Dimension;
-
 import spirite.gui.hybrid.SPanel;
+
+import java.awt.*;
 
 
 

@@ -1,10 +1,17 @@
 package spirite.pc.ui.dialogs;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import spirite.base.brains.MasterControl;
+import spirite.base.brains.SettingsManager;
+import spirite.base.util.MUtil;
+import spirite.base.util.interpolation.CubicSplineInterpolator;
+import spirite.base.util.linear.Vec2;
+import spirite.gui.hybrid.SButton;
+import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -13,20 +20,6 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-
-import spirite.base.brains.MasterControl;
-import spirite.base.brains.SettingsManager;
-import spirite.base.util.MUtil;
-import spirite.base.util.interpolation.CubicSplineInterpolator;
-import spirite.base.util.linear.Vec2;
-import spirite.gui.hybrid.SButton;
-import spirite.gui.hybrid.SPanel;
 
 public class TabletDialog extends JDialog
 {

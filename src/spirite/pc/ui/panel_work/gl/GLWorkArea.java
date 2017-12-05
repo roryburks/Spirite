@@ -1,20 +1,8 @@
 package spirite.pc.ui.panel_work.gl;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.nio.FloatBuffer;
-
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.GLBuffers;
-
 import jpen.owner.multiAwt.AwtPenToolkit;
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.gl.GLEngine;
@@ -22,6 +10,11 @@ import spirite.base.graphics.gl.GLGraphics;
 import spirite.pc.jogl.JOGLCore;
 import spirite.pc.ui.panel_work.WorkArea;
 import spirite.pc.ui.panel_work.WorkPanel;
+
+import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.nio.FloatBuffer;
 
 
 /**

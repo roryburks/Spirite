@@ -1,27 +1,5 @@
 package spirite.pc.ui.panel_work;
 
-import java.awt.AWTEvent;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseWheelEvent;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.GroupLayout;
-import javax.swing.JLabel;
-import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.SettingsManager;
@@ -37,6 +15,12 @@ import spirite.gui.hybrid.SScrollPane.ModernScrollBarUI;
 import spirite.pc.pen.JPenPenner;
 import spirite.pc.ui.panel_work.awt.WorkSplicePanel;
 import spirite.pc.ui.panel_work.gl.GLWorkArea;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *WorkPanel is a container for all the elements of the Draw area.  All external

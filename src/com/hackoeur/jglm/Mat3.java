@@ -14,11 +14,11 @@
  */
 package com.hackoeur.jglm;
 
+import com.hackoeur.jglm.support.Compare;
+
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.hackoeur.jglm.support.Compare;
 
 /**
  * A 3x3 matrix.

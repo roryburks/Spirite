@@ -1,18 +1,15 @@
 package spirite.pc.ui.components;
 
-import java.awt.Color;
-import java.awt.Toolkit;
+import spirite.hybrid.Globals;
 
-import javax.swing.BorderFactory;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-
-import spirite.hybrid.Globals;
+import java.awt.*;
 
 
 /***

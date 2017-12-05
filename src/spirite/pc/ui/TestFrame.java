@@ -1,18 +1,11 @@
 package spirite.pc.ui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.border.EmptyBorder;
-
 import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 public class TestFrame extends JFrame {
 	private static final long serialVersionUID = 1L;

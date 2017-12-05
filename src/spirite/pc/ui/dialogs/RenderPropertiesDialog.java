@@ -1,12 +1,12 @@
 package spirite.pc.ui.dialogs;
 
-import javax.swing.GroupLayout;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RenderProperties;
 import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.components.RenderOptionsCombo;
 import spirite.pc.ui.components.SliderPanel;
+
+import javax.swing.*;
 
 public class RenderPropertiesDialog extends SPanel {
 	private SliderPanel slider;

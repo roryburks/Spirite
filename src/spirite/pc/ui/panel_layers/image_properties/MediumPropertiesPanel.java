@@ -1,7 +1,5 @@
 package spirite.pc.ui.panel_layers.image_properties;
 
-import java.awt.GridLayout;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
@@ -12,6 +10,8 @@ import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.PrismaticMedium;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.gui.hybrid.SPanel;
+
+import java.awt.*;
 
 public class MediumPropertiesPanel extends SPanel implements MNodeSelectionObserver, MFlashObserver{
 	private final MasterControl master;

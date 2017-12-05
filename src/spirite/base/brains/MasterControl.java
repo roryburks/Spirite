@@ -1,23 +1,7 @@
 package spirite.base.brains;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-
 import com.jogamp.opengl.GL2;
-
-import spirite.base.brains.commands.CommandExecuter;
-import spirite.base.brains.commands.GlobalCommandExecuter;
-import spirite.base.brains.commands.NodeContextCommand;
-import spirite.base.brains.commands.RelativeWorkspaceCommandExecuter;
-import spirite.base.brains.commands.SelectionCommandExecuter;
+import spirite.base.brains.commands.*;
 import spirite.base.file.LoadEngine;
 import spirite.base.file.SaveEngine;
 import spirite.base.graphics.GraphicsContext;
@@ -29,12 +13,7 @@ import spirite.base.image_data.AnimationManager.MAnimationStateObserver;
 import spirite.base.image_data.AnimationManager.MAnimationStructureObserver;
 import spirite.base.image_data.AnimationView.MAnimationViewObserver;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.ImageWorkspace.MFlashObserver;
-import spirite.base.image_data.ImageWorkspace.MImageObserver;
-import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.ImageWorkspace.MWorkspaceFileObserver;
-import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
+import spirite.base.image_data.ImageWorkspace.*;
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes;
 import spirite.base.util.ObserverHandler;
 import spirite.hybrid.HybridHelper;
@@ -46,6 +25,12 @@ import spirite.pc.jogl.JOGLCore;
 import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.dialogs.Dialogs;
 import spirite.pc.ui.omni.FrameManager;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 /***
  * MasterControl is the top level Model object for all non-UI-related data.

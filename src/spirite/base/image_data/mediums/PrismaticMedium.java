@@ -1,8 +1,5 @@
 package spirite.base.image_data.mediums;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
@@ -21,6 +18,9 @@ import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * PrismaticInternalImages are a type of Internal Image that behave similarly to 

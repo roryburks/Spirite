@@ -1,14 +1,5 @@
 package spirite.pc.ui.panel_layers.anim;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.image_data.Animation;
@@ -32,6 +23,11 @@ import spirite.pc.ui.components.BetterTree.DropDirection;
 import spirite.pc.ui.components.ResizeContainerPanel;
 import spirite.pc.ui.components.ResizeContainerPanel.ContainerOrientation;
 import spirite.pc.ui.panel_layers.LayersPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 
 public class LayerAnimView extends SPanel implements MAnimationStructureObserver, MWorkspaceObserver, MAnimationViewObserver {
 	private final MasterControl master;

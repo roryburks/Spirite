@@ -1,20 +1,7 @@
 package spirite.base.graphics.gl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-
 import com.hackoeur.jglm.Mat4;
 import com.jogamp.opengl.GL2;
-
 import spirite.base.graphics.CapMethod;
 import spirite.base.graphics.JoinMethod;
 import spirite.base.graphics.gl.GLGeom.Primitive;
@@ -29,6 +16,18 @@ import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 import spirite.hybrid.MDebug.WarningType;
 import spirite.pc.jogl.JOGLCore;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * GLEngine is the root point for dealing with OpenGL through JOGL.  It handles

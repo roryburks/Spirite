@@ -1,10 +1,5 @@
 package spirite.pc.ui.panel_layers.layer_properties;
 
-import java.awt.Graphics;
-
-import javax.swing.GroupLayout;
-import javax.swing.JLabel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.graphics.RawImage;
 import spirite.base.graphics.renderer.RenderEngine.RenderSettings;
@@ -17,6 +12,9 @@ import spirite.gui.hybrid.SButton;
 import spirite.gui.hybrid.SPanel;
 import spirite.hybrid.HybridUtil;
 import spirite.pc.graphics.ImageBI;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class ReferenceLayerPanel extends SPanel {
 	private final MasterControl master;

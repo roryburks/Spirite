@@ -1,8 +1,8 @@
 package spirite.gui.hybrid;
 
-import javax.swing.JComboBox;
-
 import spirite.hybrid.Globals;
+
+import javax.swing.*;
 
 public class SComboBox<E> extends JComboBox<E> {
 	public SComboBox() {

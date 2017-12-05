@@ -1,12 +1,12 @@
 package spirite.pc.ui;
 
+import spirite.base.image_data.Animation;
+import spirite.base.image_data.GroupTree.Node;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-
-import spirite.base.image_data.Animation;
-import spirite.base.image_data.GroupTree.Node;
 
 public class Transferables {
 
