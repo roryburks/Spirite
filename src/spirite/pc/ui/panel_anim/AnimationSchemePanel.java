@@ -5,6 +5,7 @@ import spirite.gui.hybrid.SPanel;
 import spirite.pc.ui.omni.OmniFrame.OmniComponent;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 
 public class AnimationSchemePanel extends SPanel
 	implements OmniComponent
@@ -22,26 +23,26 @@ public class AnimationSchemePanel extends SPanel
 	 */
 	public void initComponents() {
 		
-//		animationSchemeTreePanel = new AnimationSchemeTreePanel(master);
-//		GroupLayout groupLayout = new GroupLayout(this);
-//		groupLayout.setHorizontalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addGroup(groupLayout.createSequentialGroup()
-//					.addContainerGap()
-//					.addComponent(animationSchemeTreePanel, GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
-//					.addContainerGap())
-//		);
-//		groupLayout.setVerticalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addGroup(groupLayout.createSequentialGroup()
-//					.addContainerGap()
-//					.addComponent(animationSchemeTreePanel, 0, 448, Integer.MAX_VALUE)
-//					.addContainerGap(77, Short.MAX_VALUE))
-//		);
-//		setLayout(groupLayout);
-//
+		animationSchemeTreePanel = new AnimationSchemeTreePanel(master);
+		GroupLayout groupLayout = new GroupLayout(this);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(animationSchemeTreePanel, GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(animationSchemeTreePanel, 0, 448, Integer.MAX_VALUE)
+					.addContainerGap(77, Short.MAX_VALUE))
+		);
+		setLayout(groupLayout);
+
 	}
-	//AnimationSchemeTreePanel animationSchemeTreePanel;
+	AnimationSchemeTreePanel animationSchemeTreePanel;
 	
 	// :::: OmniComponent
 	@Override public JComponent getComponent() {

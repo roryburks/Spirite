@@ -657,7 +657,7 @@ public class LoadEngine {
 //				Part part = null;
 //				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
 //
-//				PartFrames partFrames = rail.getPartFrames(part);
+//				RigKeyframeSet partFrames = rail.getPartFrames(part);
 //
 //				for( int k=0; k<numKeyFrames; ++k) {
 //					float t = helper.ra.readFloat();

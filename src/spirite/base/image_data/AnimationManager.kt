@@ -23,6 +23,7 @@ class AnimationManager(
                 triggerAnimationSelectionChange(previous)
             }
         }
+    var pseudoSelectedAnimation : Animation? = null; private set
     private val stateMap = HashMap<Animation, AnimationState>()
 
     init {
@@ -155,6 +156,7 @@ class AnimationManager(
         animationStateObs.trigger { it.animationFrameChanged(evt) }
     }
     internal fun triggerInnerStateChange( anim: Animation) {
+        pseudoSelectedAnimation = anim
         val evt = MAnimationStateEvent( anim, null, stateMap[anim])
         animationStateObs.trigger { it.viewStateChanged(evt) }
 
