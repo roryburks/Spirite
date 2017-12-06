@@ -10,7 +10,7 @@ abstract class FFALayer(
         internal var context: FixedFrameAnimation
 )
 {
-    abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo:FFAFrame, above: Boolean)
+    abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo:FFAFrame?, above: Boolean)
 
 
     val start = 0
@@ -85,6 +85,7 @@ abstract class FFALayer(
         val end: Int get() {return start + length}
         val start: Int get() {
             val carets = Stack<Int>()
+            carets.push(0)
             frames.iterator().forEach {
                 if( it == this)
                     return carets.pop()

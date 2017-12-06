@@ -5,7 +5,9 @@ import spirite.base.image_data.AnimationState
 import java.util.HashMap
 import spirite.base.graphics.RenderProperties
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle
 import spirite.base.image_data.animations.ffa.FFALayer.FFAFrame
+import spirite.base.util.MUtil
 
 
 class FFAAnimationState(
@@ -14,9 +16,12 @@ class FFAAnimationState(
 ) : AnimationState(context, anim )
 {
     var selectedMet: Int = 0
+        set(value) {
+            field = value
+            triggerChange()
+        }
     private val byTick = HashMap<Int, RenderProperties>()
     private val defaultProperties = RenderProperties()
-
     var selectedFrame : FFAFrame? = null
         set(value)  {
             if( value?.node != null) {
@@ -24,6 +29,17 @@ class FFAAnimationState(
             }
             field = value
         }
+
+    init {
+        defaultProperties.isVisible = false
+        resetSubstatesForTicks()
+    }
+
+    fun resetSubstatesForTicks() {
+        byTick.clear()
+        byTick.put( 0, RenderProperties(trigger))
+    }
+
 
     fun getSubstateForRelativeTick(tick: Int): RenderProperties {
         val ss = byTick[tick]
@@ -38,10 +54,34 @@ class FFAAnimationState(
         byTick.put(tick, RenderProperties(properties, trigger))
         triggerChange()
     }
-    fun cannonizeRelTick(t: Int, center: Int? = null): Int {
+    fun canonizeRelTick(t: Int, center: Int? = null): Int {
         val _center = center ?: selectedMet
         val L = anim.end - anim.start
         return ((t - _center) % L + L + L / 2) % L - L / 2
+    }
+
+    override fun buildDrawTable(): List<List<TransformedHandle>> {
+        val table = ArrayList<List<TransformedHandle>>()
+
+        val T = selectedMet
+        val L = anim.end - anim.start + 1
+
+        for( i in -(L-1)/2..L/2) {
+            val properties = getSubstateForRelativeTick(i)
+            if( !properties.isVisible)
+                continue
+
+            val drawList = anim.getDrawList( MUtil.cycle(anim.start, anim.end, i+T).toFloat())
+            for( tr in drawList) {
+                tr.alpha = properties.alpha
+                tr.method = properties.method
+                tr.renderValue = properties.renderValue
+            }
+
+            table.add(drawList)
+        }
+
+        return table
     }
 
     private val trigger = object : RenderProperties.Trigger {

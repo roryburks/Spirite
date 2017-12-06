@@ -21,7 +21,9 @@ class FixedFrameAnimationTests {
 
             val ffa = FixedFrameAnimation("Animation", ws)
             ffa.addLinkedLayer(root, false, null)
-            assert( ffa.end == 5)
+            assert( ffa.end == 4)
+
+            assert( ffa.layers[0].frames[1].start == 1)
 
             ws.animationManager.addAnimation(ffa)
             assert( ws.animationManager.animations[0] == ffa)
@@ -64,10 +66,10 @@ class FixedFrameAnimationTests {
             ffa.addLinkedLayer(root, true, null)
             ws.animationManager.addAnimation(ffa)
 
-            assert( ffa.end == 4)
+            assert( ffa.end == 3)
 
             val frame4 = ws.addNewSimpleLayer(frame2, 10, 10, "frame2b", 0, IMedium.InternalImageTypes.NORMAL)
-            assert( ffa.end == 5)
+            assert( ffa.end == 4)
 
             val frames = ffa.layers[0].frames
             assert( frames[0].marker == FFAFrameStructure.Marker.FRAME )
@@ -94,10 +96,10 @@ class FixedFrameAnimationTests {
 
             ffa.layers[0].frames[1].gapBefore = 10;
 
-            assert( ffa.end == 14)
+            assert( ffa.end == 13)
 
             ws.undoEngine.undo()
-            assert( ffa.end == 4)
+            assert( ffa.end == 3)
 
         }
     }

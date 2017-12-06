@@ -1,6 +1,6 @@
 package spirite.base.image_data.animations.ffa
 
-import spirite.base.graphics.renderer.RenderEngine
+import spirite.base.graphics.renderer.RenderEngine.TransformedHandle
 import spirite.base.image_data.Animation
 import spirite.base.image_data.GroupTree
 import spirite.base.image_data.ImageWorkspace
@@ -11,8 +11,10 @@ import kotlin.math.floor
 class FixedFrameAnimation(name: String, workspace: ImageWorkspace) : Animation(name, workspace),
         NodeLinkedAnimation
 {
+    val start get() = _start
+    val end get() = _end-1
     override val StartFrame get() = start.toFloat()
-    override val EndFrame get() = end.toFloat()
+    override val EndFrame get() = _end-1f
     override val isFixedFrame = true
 
     private val _layers = ArrayList<FFALayer>()
@@ -25,10 +27,10 @@ class FixedFrameAnimation(name: String, workspace: ImageWorkspace) : Animation(n
     }
 
 
-    override fun getDrawList(t: Float): List<RenderEngine.TransformedHandle> {
+    override fun getDrawList(t: Float): List<TransformedHandle> {
         val _t = floor(t).toInt()
         val met = MUtil.cycle( start, end, _t)
-        val drawList = ArrayList<RenderEngine.TransformedHandle>()
+        val drawList = ArrayList<TransformedHandle>()
 
         for( layer in _layers){
             if(layer.frames.isEmpty())
@@ -61,25 +63,23 @@ class FixedFrameAnimation(name: String, workspace: ImageWorkspace) : Animation(n
     }
 
     private var metricsCalculated = false
-    var start : Int = 0
+    private var _start : Int = 0
         get() {
             if(!metricsCalculated) recalculateMetrics()
             return field
         }
-        private set
-    var end : Int = 0
+    private var _end : Int = 0
         get() {
             if(!metricsCalculated) recalculateMetrics()
             return field
         }
-        private set
     private fun recalculateMetrics() {
         metricsCalculated = true
-        start = 0
-        end = 0
+        _start = 0
+        _end = 0
         _layers.forEach {
-            if( it.start < start) start = it.start
-            if( it.end >= end) end = it.end+1
+            if( it.start < _start) _start = it.start
+            if( it.end >= _end) _end = it.end+1
         }
     }
 

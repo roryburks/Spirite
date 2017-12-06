@@ -150,14 +150,15 @@ class AnimationManager(
         val evt = MAnimationStateEvent( selectedAnimation, previous, null)
         animationStateObs.trigger { it.selectedAnimationChanged(evt) }
     }
-    private fun triggerFrameChanged() {
-        val evt = MAnimationStateEvent( selectedAnimation, null, stateMap[selectedAnimation])
+    internal fun triggerFrameChanged(anim: Animation) {
+        val evt = MAnimationStateEvent( anim, null, stateMap[anim])
         animationStateObs.trigger { it.animationFrameChanged(evt) }
     }
     internal fun triggerInnerStateChange( anim: Animation) {
         val evt = MAnimationStateEvent( anim, null, stateMap[anim])
         animationStateObs.trigger { it.viewStateChanged(evt) }
 
+        context.triggerFlash()
     }
 
     // endregion

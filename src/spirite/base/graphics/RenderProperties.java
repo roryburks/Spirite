@@ -4,7 +4,7 @@ import spirite.base.graphics.renderer.RenderEngine.RenderMethod;
 
 public class RenderProperties {
 	private final Trigger trigger;
-	
+
 	public boolean visible = true;
 	public float alpha = 1.0f;
 	public RenderMethod method = RenderMethod.DEFAULT;
@@ -26,7 +26,7 @@ public class RenderProperties {
 		this.method = other.method;
 		this.renderValue = other.renderValue;
 	}
-	
+
 	public void directCopy( RenderProperties other) {
 		this.visible = other.visible;
 		this.alpha = other.alpha;
@@ -54,7 +54,7 @@ public class RenderProperties {
 			this.renderValue = value;
 		}
 	}
-	
+
 	public static interface Trigger {
 		public boolean visibilityChanged( boolean newVisible);
 		public boolean alphaChanged ( float newAlpha);

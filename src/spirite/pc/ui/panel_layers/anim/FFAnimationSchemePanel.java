@@ -34,7 +34,6 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.MNodeSelectionObserver;
-import spirite.base.image_data.AnimationState;
 import spirite.base.image_data.animations.ffa.FFAAnimationState;
 import spirite.base.image_data.animations.ffa.FFAFrameStructure.Marker;
 import spirite.base.image_data.animations.ffa.FFALayer;
@@ -81,7 +80,9 @@ public class FFAnimationSchemePanel extends SPanel
 	private static final Color ARROW_COLOR = Color.RED;
 	private static final Color DRAG_BORDER_COLOR = Color.green;
 	private static final Color DRAG_LOOP_COLOR = Color.BLACK;
-	private static final Color TITLE_BG = Color.WHITE;
+	private static final Color HasSubstateTickColor = Color.GREEN;
+	private static final Color SelectedTickColor = Color.YELLOW;
+	private static final Color TITLE_BG = Globals.getColor("bgDark");
 	private final Color tickColor = Globals.getColor("animSchemePanel.tickBG");
 	private final int HOLD_DELAY = 400;
 
@@ -125,12 +126,14 @@ public class FFAnimationSchemePanel extends SPanel
 			int selT = (int)Math.floor(animState.getSelectedMet());
 
 			for( int t=s; t<e; ++t) {
-				Color c = Color.WHITE;
+				Color c = tickColor;
 				if(  selT == t)
-					c = Color.YELLOW;
+					c = SelectedTickColor;
 				else {
-					if( animState.hasSubstateForRelativeTick(animState.cannonizeRelTick(t, null)))
-						c = Color.green;
+					int _t = animState.canonizeRelTick(t, null);
+					if( animState.hasSubstateForRelativeTick(_t)
+							&& animState.getSubstateForRelativeTick(_t).isVisible())
+						c = HasSubstateTickColor;
 				}
 
 				if( (int)Math.floor(animState.getMet()) == t)
@@ -606,7 +609,7 @@ public class FFAnimationSchemePanel extends SPanel
 		private final SPanel eyeIcon = new SPanel() {
 			@Override
 			protected void paintComponent(Graphics g) {
-				String icon = animState.getSubstateForRelativeTick( animState.cannonizeRelTick(tick, null)).isVisible() ? "icon.rig.visOn" : "icon.rig.visOff";
+				String icon = animState.getSubstateForRelativeTick( animState.canonizeRelTick(tick, null)).isVisible() ? "icon.rig.visOn" : "icon.rig.visOff";
 				g.drawImage( Globals.getIcon(icon).getImage(), 0, 0, null);
 				super.paintComponent(g);
 			}
@@ -662,7 +665,7 @@ public class FFAnimationSchemePanel extends SPanel
 					(new Timer( HOLD_DELAY, new ActionListener() { @Override public void actionPerformed(ActionEvent e) {
 						if( !rcConsumed) {
 							rcConsumed = true;
-							int relTick = animState.cannonizeRelTick(tick, null);
+							int relTick = animState.canonizeRelTick(tick, null);
 							RenderPropertiesDialog dialog = new RenderPropertiesDialog(animState.getSubstateForRelativeTick(relTick), master);
 							JOptionPane.showConfirmDialog(TickPanel.this, dialog, null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
@@ -682,7 +685,7 @@ public class FFAnimationSchemePanel extends SPanel
 						timer= null;
 					}
 
-					int relTick = animState.cannonizeRelTick(tick, null);
+					int relTick = animState.canonizeRelTick(tick, null);
 					RenderProperties properties = animState.getSubstateForRelativeTick(relTick);
 					properties.visible = !properties.visible;
                     animState.putSubstateForRelativeTick(relTick, properties);

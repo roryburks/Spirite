@@ -198,16 +198,14 @@ public class HybridNodeRenderer {
 				else if( child instanceof AnimationNode) {
 					Animation anim = ((AnimationNode)child).getAnimation();
 					AnimationState as = workspace.getAnimationManager().getAnimationState(anim);
-					// TODO
-					// TODO
-					// TODO
-					//List<List<TransformedHandle>> table = anim.getDrawTable(as.getSelectedMetronome(), as);
-//
-//					for( List<TransformedHandle> list : table) {
-//						for( TransformedHandle th : list) {
-//							(new TransformedRenderable( new RenderProperties(), th, settings, 0, 0)).draw(buffer[n].getGraphics());
-//						}
-//					}
+
+					List<List<TransformedHandle>> table = as.buildDrawTable();
+
+					for( List<TransformedHandle> list : table) {
+						for( TransformedHandle th : list) {
+							(new TransformedRenderable( new RenderProperties(), th, settings, 0, 0)).draw(buffer[n].getGraphics());
+						}
+					}
 				}
 			}
 		}

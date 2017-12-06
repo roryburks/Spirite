@@ -19,14 +19,13 @@ class FFALayerGroupLinked (
         groupLinkUdated()
     }
 
-    override fun moveFrame( frameToMove: FFAFrame, frameRelativeTo:FFAFrame, above: Boolean) {
+    override fun moveFrame( frameToMove: FFAFrame, frameRelativeTo:FFAFrame?, above: Boolean) {
         when {
             frameRelativeTo == null     -> context.context.moveInto( frameToMove.node, groupLink, true)
             above                       -> context.context.moveAbove( frameToMove.node, frameRelativeTo.node)
             else                        -> context.context.moveBelow(frameToMove.node, frameRelativeTo.node)
         }
     }
-
 
     // ===========================
     // ==== Link Interpretation
