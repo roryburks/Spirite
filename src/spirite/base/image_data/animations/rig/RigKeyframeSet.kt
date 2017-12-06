@@ -2,10 +2,13 @@ package spirite.base.image_data.animations.rig
 
 import spirite.base.util.interpolation.CubicSplineInterpolatorND
 import java.util.*
+import kotlin.collections.ArrayList
 
 class RigKeyframeSet {
     private val frameMap = TreeMap<Float, RigKeyframe>()
-    val keyFrames : Map<Float,RigKeyframe> get() {return frameMap.toMap()}
+    val keyFrames : List<Pair<Float,RigKeyframe>> get() {
+        return frameMap.keys.sorted().map { Pair(it, frameMap[it]!!) }
+    }
 
 
     private var _interpolator: CubicSplineInterpolatorND? = null

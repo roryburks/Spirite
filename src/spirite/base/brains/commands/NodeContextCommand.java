@@ -9,6 +9,7 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
+import spirite.base.image_data.animations.rig.RigAnimation;
 import spirite.pc.ui.dialogs.NewLayerDPanel.NewLayerHelper;
 
 import javax.swing.*;
@@ -52,12 +53,14 @@ public class NodeContextCommand implements CommandExecuter {
 			}
 		});
 		commandMap.put("animFromRig", () -> {
-//			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
-//
-//			String name = JOptionPane.showInputDialog("Enter name for new Animation:", node.getName());
-//
-//			AnimationManager manager = workspace.getAnimationManager();
-//			manager.addAnimation(new RigAnimation((LayerNode)node, name));
+			//SpriteLayer sprite = (SpriteLayer)((LayerNode)node).getLayer();
+
+			String name = JOptionPane.showInputDialog("Enter name for new Animation:", node.getName());
+
+			AnimationManager manager = workspace.getAnimationManager();
+			RigAnimation anim = new RigAnimation( name, workspace);
+			anim.addLayer((LayerNode)node);
+			manager.addAnimation(anim);
 		});
 		commandMap.put("animinsert", () -> {
 			GroupNode group = (GroupNode)node;

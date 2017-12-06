@@ -1,5 +1,6 @@
 package spirite.base.file;
 
+import kotlin.Pair;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.brains.PaletteManager.Palette;
@@ -14,6 +15,9 @@ import spirite.base.image_data.animations.ffa.FFALayer;
 import spirite.base.image_data.animations.ffa.FFALayer.FFAFrame;
 import spirite.base.image_data.animations.ffa.FFALayerGroupLinked;
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
+import spirite.base.image_data.animations.rig.RigAnimLayer;
+import spirite.base.image_data.animations.rig.RigAnimation;
+import spirite.base.image_data.animations.rig.RigKeyframe;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
@@ -530,42 +534,42 @@ public class SaveEngine implements MWorkspaceObserver {
 						}
 					}
 				}
-//				else if( animation instanceof RigAnimation) {
-//					RigAnimation rigAnimation = (RigAnimation)animation;
-//					// [1] : ID
-//					helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
-//
-//					// [2] : Number of Sprites
-//					List<RigAnimLayer> spriteLayers = rigAnimation.getSpriteLayers();
-//					helper.ra.writeShort(spriteLayers.size());
-//
-//					for( RigAnimLayer spriteLayer : spriteLayers) {
-//						// [4] : NodeID of Sprite
-//						helper.ra.writeInt(helper.nodeMap.get(spriteLayer.layer));
-//
-//						// [2] : Number of Parts
-//						List<Part> parts = spriteLayer.sprite.getParts();
-//						helper.ra.writeShort(parts.size());
-//						for( Part part : parts) {
-//							// [n, UTF8 str] : Part Type Name
-//							helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
-//
-//							List<Pair<Float,PartKeyFrame>> keyFrames = spriteLayer.getPartFrames(part).getKeyFrames();
-//							// [2] : Number of Key Frames;
-//							helper.ra.writeShort(keyFrames.size());
-//
-//							for( Pair<Float,PartKeyFrame> keyFrame : keyFrames) {
-//								helper.ra.writeFloat(keyFrame.getKey());		// [4] time index
-//
-//								helper.ra.writeFloat(keyFrame.getValue().tx);	// [4] translation X
-//								helper.ra.writeFloat(keyFrame.getValue().ty);	// [4] translation Y
-//								helper.ra.writeFloat(keyFrame.getValue().sx);	// [4] scale X
-//								helper.ra.writeFloat(keyFrame.getValue().sy);	// [4] scale Y
-//								helper.ra.writeFloat(keyFrame.getValue().rot);	// [4] rot
-//							}
-//						}
-//					}
-//				}
+				else if( animation instanceof RigAnimation) {
+					RigAnimation rigAnimation = (RigAnimation)animation;
+					// [1] : ID
+					helper.ra.writeByte(SaveLoadUtil.ANIM_RIG);
+
+					// [2] : Number of Sprites
+					List<RigAnimLayer> spriteLayers = rigAnimation.getRigLayers();
+					helper.ra.writeShort(spriteLayers.size());
+
+					for( RigAnimLayer spriteLayer : spriteLayers) {
+						// [4] : NodeID of Sprite
+						helper.ra.writeInt(helper.nodeMap.get(spriteLayer.getLayer()));
+
+						// [2] : Number of Parts
+						List<Part> parts = spriteLayer.getSprite().getParts();
+						helper.ra.writeShort(parts.size());
+						for( Part part : parts) {
+							// [n, UTF8 str] : Part Type Name
+							helper.ra.write(SaveLoadUtil.strToByteArrayUTF8(part.getTypeName()));
+
+							List<Pair<Float,RigKeyframe>> keyFrames = spriteLayer.getPartMap().get(part).getKeyFrames();
+							// [2] : Number of Key Frames;
+							helper.ra.writeShort(keyFrames.size());
+
+							for( Pair<Float,RigKeyframe> keyFrame : keyFrames) {
+								helper.ra.writeFloat(keyFrame.component1());		// [4] time index
+
+								helper.ra.writeFloat(keyFrame.component2().getTx());	// [4] translation X
+								helper.ra.writeFloat(keyFrame.component2().getTy());	// [4] translation Y
+								helper.ra.writeFloat(keyFrame.component2().getSx());	// [4] scale X
+								helper.ra.writeFloat(keyFrame.component2().getSy());	// [4] scale Y
+								helper.ra.writeFloat(keyFrame.component2().getRot());	// [4] rot
+							}
+						}
+					}
+				}
 				else {
 					helper.ra.writeByte(SaveLoadUtil.UNKNOWN);
 				}

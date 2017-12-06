@@ -11,10 +11,15 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.animations.ffa.FFAFrameStructure;
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation;
+import spirite.base.image_data.animations.rig.RigAnimLayer;
+import spirite.base.image_data.animations.rig.RigAnimation;
+import spirite.base.image_data.animations.rig.RigKeyframe;
+import spirite.base.image_data.animations.rig.RigKeyframeSet;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.image_data.layers.ReferenceLayer;
 import spirite.base.image_data.layers.SimpleLayer;
 import spirite.base.image_data.layers.SpriteLayer;
+import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.base.image_data.layers.SpriteLayer.PartStructure;
 import spirite.base.image_data.layers.puppet.PuppetLayer;
 import spirite.base.image_data.mediums.DynamicMedium;
@@ -637,42 +642,42 @@ public class LoadEngine {
 	private void loatRigAnimation( LoadHelper helper, String name) 
 			throws IOException 
 	{
-//		RigAnimation animation = new RigAnimation(helper.workspace, name);
-//
-//		// [2] : Number of Sprites
-//		int numSprites = helper.ra.readUnsignedShort();
-//
-//		for( int i=0; i<numSprites; ++i) {
-//			int spriteNodeId = helper.ra.readInt();			// [4] : NodeID of Sprite
-//			int numParts = helper.ra.readUnsignedShort();	// [2] : Number of Parts
-//
-//			RigAnimLayer rail = animation.addSprite((LayerNode) helper.nodes.get(spriteNodeId));
-//			SpriteLayer sprite = (SpriteLayer)((LayerNode) helper.nodes.get(spriteNodeId)).getLayer();
-//			List<Part> parts = sprite.getParts();
-//
-//			for( int p=0; p<numParts; ++p) {
-//				String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);	// [n] : Part Type Name
-//				int numKeyFrames = helper.ra.readUnsignedShort();	// [2] : Number of Key Frames
-//
-//				Part part = null;
-//				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
-//
-//				RigKeyframeSet partFrames = rail.getPartFrames(part);
-//
-//				for( int k=0; k<numKeyFrames; ++k) {
-//					float t = helper.ra.readFloat();
-//					PartKeyFrame keyframe = new PartKeyFrame(
-//							helper.ra.readFloat(),	//tx
-//							helper.ra.readFloat(),	//ty
-//							helper.ra.readFloat(),	//sx
-//							helper.ra.readFloat(),	//sy
-//							helper.ra.readFloat());	//rot
-//
-//					partFrames.addKeyFrame(t, keyframe);
-//				}
-//			}
-//		}
-//		helper.workspace.getAnimationManager().addAnimation(animation);
+		RigAnimation animation = new RigAnimation(name, helper.workspace);
+
+		// [2] : Number of Sprites
+		int numSprites = helper.ra.readUnsignedShort();
+
+		for( int i=0; i<numSprites; ++i) {
+			int spriteNodeId = helper.ra.readInt();			// [4] : NodeID of Sprite
+			int numParts = helper.ra.readUnsignedShort();	// [2] : Number of Parts
+
+			RigAnimLayer rail = animation.addLayer((LayerNode) helper.nodes.get(spriteNodeId));
+			SpriteLayer sprite = (SpriteLayer)((LayerNode) helper.nodes.get(spriteNodeId)).getLayer();
+			List<Part> parts = sprite.getParts();
+
+			for( int p=0; p<numParts; ++p) {
+				String partName = SaveLoadUtil.readNullTerminatedStringUTF8(helper.ra);	// [n] : Part Type Name
+				int numKeyFrames = helper.ra.readUnsignedShort();	// [2] : Number of Key Frames
+
+				Part part = null;
+				for( Part find : parts) {if( find.getTypeName().equals(partName)) part = find;}
+
+				RigKeyframeSet partFrames = rail.getPartMap().get(part);
+
+				for( int k=0; k<numKeyFrames; ++k) {
+					float t = helper.ra.readFloat();
+					RigKeyframe keyframe = new RigKeyframe(
+							helper.ra.readFloat(),	//tx
+							helper.ra.readFloat(),	//ty
+							helper.ra.readFloat(),	//sx
+							helper.ra.readFloat(),	//sy
+							helper.ra.readFloat());	//rot
+
+					partFrames.addKeyframe(t, keyframe);
+				}
+			}
+		}
+		helper.workspace.getAnimationManager().addAnimation(animation);
 	}
 	
 	// Legacy Methods: Handles conversion of depreciated formats into new standards

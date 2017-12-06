@@ -7,8 +7,9 @@ import spirite.base.image_data.ImageWorkspace
 import spirite.base.util.linear.MatTrans
 
 class RigAnimation( name: String, context: ImageWorkspace) : Animation( name, context) {
-    private val rigLayers = ArrayList<RigAnimLayer>()
-    val spriteLayers get() = rigLayers.map { it.sprite }
+    private val _rigLayers = ArrayList<RigAnimLayer>()
+    val rigLayers get() = _rigLayers.map{it}
+    val spriteLayers get() = _rigLayers.map { it.sprite }
 
     override val StartFrame: Float = 0f
     override val EndFrame: Float = 10f
@@ -17,7 +18,7 @@ class RigAnimation( name: String, context: ImageWorkspace) : Animation( name, co
     override fun getDrawList(t: Float): List<TransformedHandle> {
         val list = ArrayList<TransformedHandle>()
 
-        for( layer in rigLayers) {
+        for( layer in _rigLayers) {
             for( part in layer.map) {
                 val pstruct = part.key.structure    // NOTE: Copy-property
                 val keyframes = part.value
@@ -42,12 +43,12 @@ class RigAnimation( name: String, context: ImageWorkspace) : Animation( name, co
 
     fun addLayer( node: LayerNode) : RigAnimLayer {
         val ral = RigAnimLayer(node)
-        rigLayers.add( ral)
+        _rigLayers.add( ral)
         return ral
     }
 
     // TODO
     fun purge() {
-        rigLayers.removeIf { !context.nodeInWorkspace(it.layer)}
+        _rigLayers.removeIf { !context.nodeInWorkspace(it.layer)}
     }
 }
