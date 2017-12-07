@@ -629,7 +629,7 @@ public class UndoEngine {
 				super( new BuildingMediumData(image, 0, 0));
 				this.hiddenAction = action;
 
-				_ii = workspace.getData(image.id).dupe();
+				_ii = workspace.getData(image.getId()).dupe();
 			}
 			@Override 
 			public void performNonimageAction() {

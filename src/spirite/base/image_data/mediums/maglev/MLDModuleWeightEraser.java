@@ -8,8 +8,8 @@ import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
-import spirite.base.pen.StrokeEngine.DrawPoints;
-import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
+import spirite.base.pen.DrawPoints;
+import spirite.base.pen.IndexedDrawPoints;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 
@@ -39,7 +39,7 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 			List<EraseAction> toRemove = new ArrayList<>();
 			
 
-			for( AMagLevThing thing : img.things) {
+			for( AMagLevThing thing : img.getThings()) {
 				if( thing instanceof MagLevStroke) {
 					FloatCompactor fc = new FloatCompactor(16);
 					
@@ -48,16 +48,16 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 					MagLevStroke stroke = (MagLevStroke)thing;
 					IndexedDrawPoints direct = stroke.getDirect();
 					
-					for( int i=0; i < direct.length; ++i) {
-						if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
+					for(int i = 0; i < direct.getLength(); ++i) {
+						if( MUtil.distance(x, y, direct.getX()[i], direct.getY()[i]) < w) {
 							if( inStroke) {
 								inStroke = false;
-								fc.add(direct.t[i]);
+								fc.add(direct.getT()[i]);
 							}
 						}
 						else if(!inStroke) {
 							inStroke = true;
-							fc.add(direct.t[i]);
+							fc.add(direct.getT()[i]);
 						}
 					}
 					
@@ -74,13 +74,13 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 		else {
 			List<AMagLevThing> thingsToRemove = new ArrayList<>();
 			
-			for( AMagLevThing thing : img.things) {
+			for( AMagLevThing thing : img.getThings()) {
 				if( thing instanceof MagLevStroke) {
 					MagLevStroke stroke = (MagLevStroke)thing;
 					DrawPoints direct = stroke.getDirect();
 
-					for( int i=0; i < direct.length; ++i) {
-						if( MUtil.distance(x, y, direct.x[i], direct.y[i]) < w) {
+					for(int i = 0; i < direct.getLength(); ++i) {
+						if( MUtil.distance(x, y, direct.getX()[i], direct.getY()[i]) < w) {
 							thingsToRemove.add(stroke);
 							break;
 						}

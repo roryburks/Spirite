@@ -136,11 +136,6 @@ public class DerivedMaglevMedium
 		}
 
 		@Override
-		public Vec2i convert(Vec2i p) {
-			return base.convert(p);
-		}
-
-		@Override
 		public Vec2 convert(Vec2 p) {
 			return base.convert(p);
 		}

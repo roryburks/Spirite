@@ -91,15 +91,7 @@ public class FlatMedium implements IMedium {
 			
 			gc.setTransform( transform);
 		}
-		
-		/** Converts the given point in ImageSpace to BuiltActiveData space*/
-		public Vec2i convert( Vec2i p) {
-			//	Some image modification methods do not use draw actions, but
-			//	 rather alter the image directly.  For example a flood fill action.
-			//	
-			Vec2 inverted = invTrans.transform(new  Vec2(p.x, p.y));
-			return new Vec2i((int)inverted.x, (int)inverted.y);
-		}
+
 		public Vec2 convert( Vec2 p) {
 			//	Some image modification methods do not use draw actions, but
 			//	 rather alter the image directly.  For example a flood fill action.
@@ -116,9 +108,7 @@ public class FlatMedium implements IMedium {
 			return new MatTrans(invTrans);
 		}
 
-		public MatTrans getCompositeTransform() {
-			return new MatTrans();			
-		}
+		public MatTrans getCompositeTransform() {return new MatTrans(invTrans);}
 
 		@Override
 		protected void _doOnGC(DoerOnGC doer) {

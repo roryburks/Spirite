@@ -218,7 +218,6 @@ public class PrismaticMedium implements IMedium {
 
 		@Override public int getWidth() {return handle.getContext().getWidth();}
 		@Override public int getHeight() { return handle.getContext().getHeight();}
-		@Override public Vec2i convert(Vec2i p) {return p;}
 		@Override public Vec2 convert(Vec2 p) {return p;}
 		@Override public MatTrans getCompositeTransform() {return new MatTrans(trans);}
 		@Override public MatTrans getScreenToImageTransform() {return new MatTrans(invTrans);}

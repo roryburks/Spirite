@@ -8,7 +8,7 @@ import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.Vec2
 import java.util.*
 
-fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D): List<AMagLevThing> {
+fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D): MutableList<AMagLevThing> {
 	val x1 = bone.x1
 	val y1 = bone.y1
 	val x2 = bone.x2
@@ -38,7 +38,7 @@ fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D
 	//	(possibly implementing some sort of "pinching"
 
 	
-	val myThings = ArrayList<AMagLevThing>(source.size)
+	val myThings = mutableListOf<AMagLevThing>()
 	
 	
 	for( thing in source) {

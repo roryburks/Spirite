@@ -97,10 +97,10 @@ public class DefaultImageDrawer
 		_data.doOnBuiltData((built) -> {
 
 			
-			Vec2i p = built.convert( new Vec2i(x,y));
+			Vec2 p = built.convert( new Vec2(x,y));
 			
 			built.doOnRaw((bi) -> {
-				if( !MUtil.coordInImage( p.x, p.y, bi)) {
+				if( !MUtil.coordInImage( (int)p.x, (int)p.y, bi)) {
 					aborted.set(true);
 					return;
 				}
@@ -110,7 +110,7 @@ public class DefaultImageDrawer
 					return;
 				}
 				
-				bgREF.set(bi.getRGB(p.x, p.y));
+				bgREF.set(bi.getRGB((int)p.x, (int)p.y));
 				
 				if( bgREF.get() == color) {
 					aborted.set(true);
@@ -125,15 +125,15 @@ public class DefaultImageDrawer
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
 			protected void performImageAction(ABuiltMediumData built) {
-				Vec2i p = built.convert( new Vec2i(x,y));
+				Vec2 p = built.convert( new Vec2(x,y));
 				if( mask == null) {
 					built.doOnRaw((raw) -> {
-						DirectDrawer.fill( raw, p.x, p.y, color);
+						DirectDrawer.fill( raw, (int)p.x, (int)p.y, color);
 					});
 				}
 				else {
 					RawImage img = mask.liftSelectionFromData(built);
-					Vec2i layerSpace = new Vec2i(p.x - mask.getOX(), p.y - mask.getOY());
+					Vec2 layerSpace = new Vec2(p.x - mask.getOX(), p.y - mask.getOY());
 					
 					RawImage intermediate = null;
 					
@@ -154,7 +154,7 @@ public class DefaultImageDrawer
 						gc.drawImage(intermediate, 0, 0 );
 					}
 					
-					DirectDrawer.fill(img, layerSpace.x, layerSpace.y, color);
+					DirectDrawer.fill(img, (int)layerSpace.x, (int)layerSpace.y, color);
 
 					if( bg == 0) { 
 						// Continuing from above, after the fill is done, crop out the
@@ -175,9 +175,8 @@ public class DefaultImageDrawer
 
 					// Anchor the lifted image to the real image
 					built.doOnGC((gc) -> {
-						Vec2i p2 = built.convert(new Vec2i(mask.getOX(),mask.getOY()));
-						gc.drawImage( img_, p2.x, p2.y);
-						
+						Vec2 p2 = built.convert(new Vec2(mask.getOX(),mask.getOY()));
+						gc.drawImage( img_, (int)p2.x, (int)p2.y);
 					});
 				}
 			}
@@ -458,7 +457,7 @@ public class DefaultImageDrawer
 		}
 		else {
 			activeEngine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
-			
+
 			if( activeEngine.startStroke( params, ps, building, pollSelectionMask(workspace)))
 				building.handle.refresh();
 			return true;

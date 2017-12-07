@@ -272,7 +272,7 @@ public class SaveEngine implements MWorkspaceObserver {
 				
 				MediumHandle data = ((SimpleLayer) layer).getData();
 				// [4] : ID of ImageData linked to this LayerNode
-				helper.ra.writeInt( data.getID());
+				helper.ra.writeInt( data.getId());
 			}
 			else if( layer instanceof SpriteLayer) {
 				SpriteLayer rig = (SpriteLayer)layer;
@@ -302,7 +302,7 @@ public class SaveEngine implements MWorkspaceObserver {
 					helper.ra.writeInt( part.getDepth());
 					
 					// [4] ImageHandle ID
-					helper.ra.writeInt(part.getImageHandle().getID());
+					helper.ra.writeInt(part.getImageHandle().getId());
 				}
 			}
 			else if( layer instanceof ReferenceLayer) {
@@ -328,7 +328,7 @@ public class SaveEngine implements MWorkspaceObserver {
 						index = (index == 1)? 0 : index+1;
 						
 						helper.ra.writeShort(index); 	// [2] : Parent
-						helper.ra.writeInt( part.handle.getID());	// [4] : ImageID
+						helper.ra.writeInt( part.handle.getId());	// [4] : ImageID
 						BaseBone bone = part.getBone();
 						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.x1 );	// [4] : Bone x1
 						helper.ra.writeFloat( (bone == null) ? Float.NaN : bone.y1 );	// [4] : y1
@@ -438,7 +438,7 @@ public class SaveEngine implements MWorkspaceObserver {
 							helper.ra.writeByte(0);		//	[1] : thing type
 							
 							helper.ra.writeInt( stroke.params.getColor());			// [4] : Color
-							helper.ra.writeByte( stroke.params.getMethod().fileId);	// [1] : Method Type
+							helper.ra.writeByte(stroke.params.getMethod().getFileId());	// [1] : Method Type
 							helper.ra.writeFloat(stroke.params.getWidth());			// [4] : Width
 							
 							helper.ra.writeShort( stroke.states.length);	// [2] : Number of Vertices

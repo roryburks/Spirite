@@ -20,7 +20,7 @@ public class MaglevLiftedData extends ALiftedData {
 
 	@Override
 	public void drawLiftedData(GraphicsContext gc) {
-		gc.drawImage(medium.builtImage.getBase(), medium.builtImage.getXOffset()-iox, medium.builtImage.getYOffset()-ioy);
+		gc.drawImage(medium.getBuiltImage().getBase(), medium.getBuiltImage().getXOffset()-iox, medium.getBuiltImage().getYOffset()-ioy);
 	}
 
 	@Override public int getWidth() {return medium.getWidth();}
@@ -30,10 +30,10 @@ public class MaglevLiftedData extends ALiftedData {
 	public IImage readonlyAccess() {
 		// Somewhat wasteful that we turn the existing built image into a new image
 		//	with a little more padding, but simpler an interface perspective
-		RawImage img = HybridHelper.createImage(medium.getWidth() + medium.builtImage.getXOffset()-iox, 
-				medium.getHeight() + medium.builtImage.getYOffset()-ioy);
+		RawImage img = HybridHelper.createImage(medium.getWidth() + medium.getBuiltImage().getXOffset()-iox,
+				medium.getHeight() + medium.getBuiltImage().getYOffset()-ioy);
 		
-		img.getGraphics().drawImage(medium.builtImage.getBase(), medium.builtImage.getXOffset()-iox, medium.builtImage.getYOffset()-ioy);
+		img.getGraphics().drawImage(medium.getBuiltImage().getBase(), medium.getBuiltImage().getXOffset()-iox, medium.getBuiltImage().getYOffset()-ioy);
 		return img;
 	}
 

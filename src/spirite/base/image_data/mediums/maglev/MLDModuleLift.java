@@ -12,7 +12,7 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.pen.StrokeEngine.IndexedDrawPoints;
+import spirite.base.pen.IndexedDrawPoints;
 import spirite.base.util.linear.MatTrans;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 
 		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
 		undoEngine.doAsAggregateAction(() -> {
-			for( AMagLevThing thing : mlift.medium.things) {
+			for( AMagLevThing thing : mlift.medium.getThings()) {
 				thing.transform(trans);
 				
 
@@ -72,20 +72,20 @@ public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 
 
 		List<AMagLevThing> phaseOne  = new ArrayList<>();
-		for( AMagLevThing thing : img.things) {
+		for( AMagLevThing thing : img.getThings()) {
 			if( thing instanceof MagLevStroke) {
 				MagLevStroke stroke = (MagLevStroke)thing;
 				IndexedDrawPoints direct = stroke.getDirect();
 				
-				for( int i=0; i < direct.length; ++i) {
-					if( selection.contains((int)direct.x[i], (int)direct.y[i])) {
+				for(int i = 0; i < direct.getLength(); ++i) {
+					if( selection.contains((int) direct.getX()[i], (int) direct.getY()[i])) {
 						phaseOne.add(thing);
 						break;
 					}
 				}
 			}
 		}
-		for( AMagLevThing thing : img.things) {
+		for( AMagLevThing thing : img.getThings()) {
 			if( thing instanceof MagLevFill) {
 				MagLevFill fill = (MagLevFill)thing;
 				
@@ -110,7 +110,7 @@ public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 		
 		// Sort things by order they appear in the original maglev
 		List<AMagLevThing> toRemove = new ArrayList<>();
-		for( AMagLevThing thing : img.things) {
+		for( AMagLevThing thing : img.getThings()) {
 			if( phaseOne.contains(thing))
 				toRemove.add(thing);
 		}

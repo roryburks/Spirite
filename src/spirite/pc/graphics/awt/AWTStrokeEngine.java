@@ -2,6 +2,7 @@ package spirite.pc.graphics.awt;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
@@ -40,12 +41,12 @@ class AWTStrokeEngine extends StrokeEngine{
 		displayLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		fixedLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		
-		if( sel != null) {
+		if( getLastSelection() != null) {
 			selectionMask = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 			
 			GraphicsContext gc = new AWTContext(selectionMask);
 			gc.clear();
-			sel.drawMask(gc, true);
+			getLastSelection().drawMask(gc, true);
 //			g2.dispose();
 		}
 	}
@@ -77,22 +78,22 @@ class AWTStrokeEngine extends StrokeEngine{
 		
 		Graphics g = layer.getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
-		g.setColor( new Color(stroke.getColor()));
+		g.setColor( new Color(getParams().getColor()));
 
-		for( int i=1; i < states.length; ++i) {
+		for(int i = 1; i < states.getLength(); ++i) {
 //			PenState fromState = states.get(i-1);
 //			PenState toState = states.get(i);
-			if( stroke.getMethod() != StrokeEngine.Method.PIXEL){
+			if( getParams().getMethod() != StrokeEngine.Method.PIXEL){
 				g2.setStroke( new BasicStroke( 
-						states.w[i] * stroke.getWidth(),
+						states.getW()[i] * getParams().getWidth(),
 						BasicStroke.CAP_ROUND, 
 						BasicStroke.CAP_SQUARE));
 			}
-			g2.drawLine( (int)states.x[i-1], (int)states.y[i-1], (int)states.x[i], (int)states.y[i]);
+			g2.drawLine( (int) states.getX()[i-1], (int) states.getY()[i-1], (int) states.getX()[i], (int) states.getY()[i]);
 
 			
 
-			if( sel != null) {
+			if( getLastSelection() != null) {
 				g2.setComposite( AlphaComposite.getInstance(AlphaComposite.DST_IN));
 				g2.drawImage(selectionMask, 0, 0, null);
 			}

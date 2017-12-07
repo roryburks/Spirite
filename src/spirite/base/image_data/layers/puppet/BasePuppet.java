@@ -73,7 +73,7 @@ public class BasePuppet implements IPuppet {
 	IPart addNewPart( int after) {
 		_updatePartsDepth();
 		
-		MaglevMedium mlm = new MaglevMedium(context);
+		MaglevMedium mlm = new MaglevMedium(context, null);
 		MediumHandle handle = context.importMedium(mlm);
 		BasePart part = new BasePart(handle);
 		if( byDepthList == null || byDepthList.size() == 0 )

@@ -452,7 +452,7 @@ public class LayerTreePanel extends ContentTree
 				String str = ((GroupTree.Node)obj).getName();
 				if( master.getSettingsManager().getBoolSetting("DEBUG", true) && obj instanceof GroupTree.LayerNode) {
 					try {
-						str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().handle.getID();
+						str += " " + ((GroupTree.LayerNode)obj).getLayer().getActiveData().handle.getId();
 					}catch(Exception e) {}
 				}
 				renderPanel.label.setText( str);

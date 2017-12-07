@@ -68,15 +68,15 @@ public class MagLevFill extends AMagLevThing {
 			if( end > start) {
 				int e = (int)Math.ceil(end);
 				for( int c=(int)Math.floor(start); c < e; ++c) {
-					outx.add(stroke.direct.x[c]);
-					outy.add(stroke.direct.y[c]);
+					outx.add(stroke.direct.getX()[c]);
+					outy.add(stroke.direct.getY()[c]);
 				}
 			}
 			else {
 				int e = (int)Math.floor(end);
 				for( int c=(int)Math.ceil(start); c > e; --c) {
-					outx.add(stroke.direct.x[c]);
-					outy.add(stroke.direct.y[c]);
+					outx.add(stroke.direct.getX()[c]);
+					outy.add(stroke.direct.getY()[c]);
 				}
 			}
 		}

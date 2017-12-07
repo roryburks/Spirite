@@ -225,13 +225,13 @@ public class BuildSaveLoadTest {
 	
 	private void VerifyImageEquivalent( MediumHandle img1, MediumHandle img2, Map<Integer,Integer> checkedIImgMap)
 	{
-		if( checkedIImgMap != null  &&checkedIImgMap.containsKey(img1.getID())) {
-			assert( checkedIImgMap.get(img1.getID()).equals(img2.getID()));
+		if( checkedIImgMap != null  &&checkedIImgMap.containsKey(img1.getId())) {
+			assert( checkedIImgMap.get(img1.getId()).equals(img2.getId()));
 		}
 		else {
 			if( checkedIImgMap != null)
 				for( Entry<Integer,Integer> entry: checkedIImgMap.entrySet())
-					assert( !entry.getValue().equals(img2.getID()));
+					assert( !entry.getValue().equals(img2.getId()));
 
 			IMedium iimg1 = img1.getContext().getData(img1);
 			IMedium iimg2 = img2.getContext().getData(img2);
@@ -317,7 +317,7 @@ public class BuildSaveLoadTest {
 			}
 			
 			if( checkedIImgMap != null)
-				checkedIImgMap.put( img1.getID(), img2.getID());
+				checkedIImgMap.put( img1.getId(), img2.getId());
 		}
 	}
 	private void VerifyRawImages( IImage raw1, IImage raw2) {

@@ -315,7 +315,7 @@ public class LoadEngine {
 					switch( thingType) {
 					case 0:{	// Stroke
 						int color = helper.ra.readInt();
-						StrokeEngine.Method method = StrokeEngine.Method.fromFileId(helper.ra.readUnsignedByte());
+						StrokeEngine.Method method = StrokeEngine.Method.Companion.fromFileId(helper.ra.readUnsignedByte());
 						float width = helper.ra.readFloat();
 						int numPenStatesToRead = helper.ra.readUnsignedShort();
 						
@@ -799,7 +799,7 @@ public class LoadEngine {
 		if( helper.version < 0x000B) {
 			int _pivot = helper.ra.readInt();
 			int _travel = helper.ra.readInt();
-			float strokeLen = stroke.getDirect().length;
+			float strokeLen = stroke.getDirect().getLength();
 			pivot = MUtil.clip(0, _pivot/strokeLen, 1);
 			travel = (_travel < 0) 
 					? MUtil.clip(-pivot, _travel/strokeLen, 0)
