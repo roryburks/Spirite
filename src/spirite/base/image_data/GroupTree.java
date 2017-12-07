@@ -125,33 +125,6 @@ public class GroupTree {
 		
 		
 		public RenderProperties getRender() {return render;}
-//		public boolean isVisible() {return (render.isVisible() && render.getAlpha() > 0);}
-//		public void setVisible( boolean visible) {
-//			if( context.nodeInWorkspace(this) && this.visible != visible) {
-//				context.executeChange( context.new VisibilityChange(this, visible));
-//			}
-//			else if( context.getReferenceManager().isReferenceNode(this)) {
-//				this.visible = visible;
-//				context.getReferenceManager().triggerReferenceStructureChanged(false);
-//			}
-//			else { this.visible = visible;}
-//		}
-//		
-//		public float getAlpha() {return alpha;}
-//		public void setAlpha( float alpha) {
-//			if( context.nodeInWorkspace(this) && this.alpha != alpha) {
-//				context.executeChange( context.new OpacityChange( this, alpha));
-//			}
-//			else { this.alpha = alpha;}
-//		}
-//		public RenderMethod getRenderMethod() {return renderMethod;}
-//		public int getRenderValue() {return renderValue;}
-//		public void setRenderMethod( RenderMethod method, int renderValue) {
-//			if( context.nodeInWorkspace(this) && (renderMethod != method || this.renderValue != renderValue)) {
-//				context.executeChange( context.new MethodChange( this, method, renderValue));
-//			}
-//			else {this.renderMethod = method; this.renderValue = renderValue;}
-//		}
 		
 		public int getOffsetX() {return x;}
 		public int getOffsetY() {return y;}
@@ -327,8 +300,6 @@ public class GroupTree {
 		 * NOTE! Should use ImageWorkspace.removeNode if you want the 
 		 * UndoEngine to track the actions. */
 		protected void _rem( Node toRem) {
-			if( children == null) return;
-			
 			children.remove(toRem);
 			if( toRem.parent == this)
 				toRem.parent = null;

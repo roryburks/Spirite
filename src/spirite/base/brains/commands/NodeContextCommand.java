@@ -23,9 +23,9 @@ import java.util.Map;
 public class NodeContextCommand implements CommandExecuter {
 	private final MasterControl master;
 	
-	Node node;
-	ImageWorkspace workspace;
-	final Map<String, Runnable> commandMap = new HashMap<>();
+	private Node node;
+	private ImageWorkspace workspace;
+	private final Map<String, Runnable> commandMap = new HashMap<>();
 	
 	public NodeContextCommand(MasterControl master) {
 		this.master = master;

@@ -13,7 +13,7 @@ abstract class Animation constructor(
 
     val animationManager :AnimationManager get() = context.animationManager
 
-    protected fun triggerChange() { animationManager?.triggerChangeAnimation(this)}
+    protected fun triggerChange() { animationManager.triggerChangeAnimation(this)}
 
     fun drawFrame( gc: GraphicsContext, t: Float) {
         gc.pushState()
