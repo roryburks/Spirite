@@ -50,10 +50,10 @@ class FlatMedium(private val image: RawImage, protected val context: ImageWorksp
     }
 
     inner class BuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val drawTrans: MatTrans get() {return invTrans}
-        override val drawWidth: Int = image.width
-        override val drawHeight:Int = image.height
-        override val sourceTransform: MatTrans get() {return trans}
+        override val _sourceToComposite: MatTrans get() {return MatTrans()}
+        override val _screenToSource: MatTrans get() {return invTrans}
+        override val compositeWidth: Int = image.width
+        override val compositeHeight:Int = image.height
         override val sourceWidth: Int = image.width
         override val sourceHeight: Int = image.height
 

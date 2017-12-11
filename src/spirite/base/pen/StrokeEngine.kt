@@ -107,7 +107,7 @@ abstract class StrokeEngine {
 
             // Starts recording the Pen States
             prec = ArrayList()
-            val layerSpace = built.drawTrans.transform(Vec2(ps.x, ps.y))
+            val layerSpace = built.screenToSource.transform(Vec2(ps.x, ps.y))
 
             oldX = layerSpace.x
             oldY = layerSpace.y
@@ -148,7 +148,7 @@ abstract class StrokeEngine {
 
 
         lastSelection = selection
-        onStart(built.drawTrans, built.drawWidth, built.drawHeight)
+        onStart(built.screenToSource, built.compositeWidth, built.compositeHeight)
         prepareDisplayLayer()
         return true
     }
@@ -165,7 +165,7 @@ abstract class StrokeEngine {
         val changed = AtomicReference(false)
         imageData!!.doOnBuiltData { built ->
 
-            val layerSpace = built!!.drawTrans.transform(Vec2(ps.x, ps.y))
+            val layerSpace = built!!.screenToSource.transform(Vec2(ps.x, ps.y))
             newX = layerSpace.x
             newY = layerSpace.y
             newP = ps.pressure

@@ -116,22 +116,22 @@ public class DerivedMaglevMedium
 
 		@NotNull
 		@Override
-		public MatTrans getDrawTrans() {return base.getDrawTrans();}
+		public MatTrans get_sourceToComposite() {return base.getSourceToComposite();}
 
 		@Override
-		public int getDrawWidth() {
-			return base.getDrawWidth();
+		public int getCompositeWidth() {
+			return base.getCompositeWidth();
 		}
 
 		@Override
-		public int getDrawHeight() {
-			return base.getDrawHeight();
+		public int getCompositeHeight() {
+			return base.getCompositeHeight();
 		}
 
 		@NotNull
 		@Override
-		public MatTrans getSourceTransform() {
-			return base.getSourceTransform();
+		public MatTrans get_screenToSource() {
+			return base.getScreenToSource();
 		}
 
 		@Override

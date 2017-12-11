@@ -101,7 +101,7 @@ public class SelectionMask {
 			public void draw(GraphicsContext gc) {
 				built.doOnRaw((raw) -> {
 					gc.pushTransform();
-					gc.transform(built.getSourceTransform());
+					//gc.preTransform(b]);
 					gc.drawImage(raw, 0, 0);
 					gc.popTransform();
 				});
@@ -111,7 +111,7 @@ public class SelectionMask {
 			public Rect getBounds() {
 				return MUtil.circumscribeTrans(
 						new Rect(0,0,built.getSourceWidth(),built.getSourceHeight()),
-						built.getSourceTransform());
+						built.getScreenToSource());
 			}
 		});
 	}
@@ -149,8 +149,4 @@ public class SelectionMask {
 		void draw(GraphicsContext gc);
 		Rect getBounds();
 	}
-
-
-
-	
 }

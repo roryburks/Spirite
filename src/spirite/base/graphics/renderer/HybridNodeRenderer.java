@@ -79,6 +79,7 @@ public class HybridNodeRenderer {
 	// ==== Composite Layer
 	private RawImage compositionImage;
 	private MediumHandle compositionHandle = null;
+	private MatTrans compositeTrans = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) throws InvalidImageDimensionsExeption 
 	{
 		BuildingMediumData dataContext = workspace.buildActiveData();
@@ -90,14 +91,16 @@ public class HybridNodeRenderer {
 		{
 			dataContext.doOnBuiltData((built) -> {
 				compositionImage= 
-						HybridHelper.createImage(built.getDrawWidth(), built.getDrawHeight());
+						HybridHelper.createImage(built.getCompositeWidth(), built.getCompositeHeight());
 				compositionHandle = dataContext.handle;
 
 				GraphicsContext gc = compositionImage.getGraphics();
-				
+
 				// Draw the Base Image
-				MatTrans drawTrans = built.getSourceTransform();
-				gc.setTransform(drawTrans);
+                compositeTrans = built.getCompositeToScreen();
+
+                MatTrans sourceToComposite = built.getSourceToComposite();
+				gc.setTransform(sourceToComposite);
 				dataContext.handle.drawBehindStroke(gc);
 				
 
@@ -106,7 +109,7 @@ public class HybridNodeRenderer {
 					ALiftedData lifted = selectionEngine.getLiftedData();
 					
 					MatTrans tt = selectionEngine.getLiftedDrawTrans();
-					tt.preConcatenate(built.getDrawTrans());
+					tt.preConcatenate(sourceToComposite);
 					gc.setTransform(tt);
 					lifted.drawLiftedData(gc);
 				}
@@ -116,7 +119,7 @@ public class HybridNodeRenderer {
 					strokeEngine.drawStrokeLayer(gc);
 				}
 				
-				gc.setTransform(drawTrans);
+				gc.setTransform(sourceToComposite);
 				dataContext.handle.drawInFrontOfStroke(gc);
 			});
 
@@ -262,9 +265,7 @@ public class HybridNodeRenderer {
 			
 			MatTrans drawTrans = new MatTrans( transform);
 			if( compositionHandle == renderable.handle) {
-				if( renderable.handle.isDynamic())
-					drawTrans = new MatTrans();
-				gc.setTransform(drawTrans);
+				gc.setTransform(compositeTrans);
 				gc.renderImage( compositionImage, 0, 0, properties);
 			}
 			else {

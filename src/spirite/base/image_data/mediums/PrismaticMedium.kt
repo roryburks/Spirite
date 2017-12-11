@@ -1,28 +1,17 @@
 package spirite.base.image_data.mediums
 
-import jdk.nashorn.internal.runtime.options.Option
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.util.MUtil
 import spirite.base.util.linear.MatTrans
-import spirite.base.util.linear.MatTrans.NoninvertableException
 import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridHelper
-import spirite.hybrid.HybridUtil
-import spirite.hybrid.HybridUtil.UnsupportedImageTypeException
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType
-
-import java.util.ArrayList
-import java.util.Optional
+import java.util.*
 
 /***
  * PrismaticInternalImages are a type of Internal Image that behave similarly to
@@ -200,11 +189,11 @@ class PrismaticMedium : IMedium {
     inner class PrismaticBuiltImageData constructor(building: BuildingMediumData) : BuiltMediumData(building) {
         private val workingColor: Int = building.color
 
-        override val drawTrans: MatTrans get() = MatTrans()
-        override val drawWidth: Int get() = context.width
-        override val drawHeight: Int get() = context.height
+        override val _sourceToComposite: MatTrans get() = MatTrans()
+        override val compositeWidth: Int get() = context.width
+        override val compositeHeight: Int get() = context.height
 
-        override val sourceTransform: MatTrans get() = trans
+        override val _screenToSource: MatTrans get() = trans
         override val sourceWidth: Int get() = width
         override val sourceHeight: Int get() = height
 

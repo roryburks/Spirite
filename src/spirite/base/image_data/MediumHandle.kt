@@ -103,18 +103,11 @@ class MediumHandle(
         }
         val ii = context!!.getData(id) ?: return
 
-        gc.pushTransform()
-
-        gc.transform = MatTrans()
         gc.drawHandle(this, ii.dynamicX, ii.dynamicY)
-
-        gc.popTransform()
     }
 
     // !!! START BAD
     fun drawBehindStroke(gc: GraphicsContext) {
-        gc.pushTransform()
-        gc.transform = MatTrans()
         if (context == null) {
             MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")
             return
@@ -124,19 +117,15 @@ class MediumHandle(
             ii.drawBehind(gc, context!!.paletteManager.getActiveColor(0))
         } else
             gc.drawHandle(this, ii.dynamicX, ii.dynamicY)
-        gc.popTransform()
     }
 
     fun drawInFrontOfStroke(gc: GraphicsContext) {
-        gc.pushTransform()
-        gc.transform = MatTrans()
         if (context == null) {
             MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")
             return
         }
         val ii = context!!.getData(id)
         (ii as? PrismaticMedium)?.drawFront(gc, context!!.paletteManager.getActiveColor(0))
-        gc.popTransform()
     }
     // !!! END BAD
 

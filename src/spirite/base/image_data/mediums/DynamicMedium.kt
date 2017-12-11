@@ -69,10 +69,10 @@ class DynamicMedium : IMedium {
     }
 
     inner class DynamicBuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val drawTrans: MatTrans get() = MatTrans()
-        override val drawWidth: Int get() = context.width
-        override val drawHeight: Int get() = context.height
-        override val sourceTransform: MatTrans get() = trans
+        override val _sourceToComposite: MatTrans get() = MatTrans()
+        override val compositeWidth: Int get() = context.width
+        override val compositeHeight: Int get() = context.height
+        override val _screenToSource: MatTrans get() = trans
         override val sourceWidth: Int get() = image.width
         override val sourceHeight: Int get() = image.height
 

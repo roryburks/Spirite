@@ -9,7 +9,6 @@ import spirite.base.image_data.animations.ffa.FFALayer.FFAFrame
 import spirite.base.util.MUtil
 import java.util.HashMap
 import kotlin.collections.ArrayList
-import kotlin.collections.List
 
 
 class FFAAnimationState(

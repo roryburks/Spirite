@@ -16,11 +16,26 @@ abstract class BuiltMediumData(
         trans.createInverse()
     }
 
-    abstract val drawTrans: MatTrans
-    abstract val drawWidth: Int
-    abstract val drawHeight: Int
+    val sourceToComposite : MatTrans by lazy { _sourceToComposite}
+    val screenToSource : MatTrans by lazy { _screenToSource }
+    val compositeToScreen : MatTrans by lazy {
+        val trans = MatTrans(compositeToSource)
+        trans.preConcatenate(sourceToScreen)
+        trans
+    }
 
-    abstract val sourceTransform : MatTrans
+    val compositeToSource : MatTrans by lazy {
+        sourceToComposite.createInverse()
+    }
+    val sourceToScreen: MatTrans by lazy {
+        screenToSource.createInverse()
+    }
+
+    protected abstract val _sourceToComposite: MatTrans
+    protected abstract val _screenToSource: MatTrans
+
+    abstract val compositeWidth: Int
+    abstract val compositeHeight: Int
     abstract val sourceWidth: Int
     abstract val sourceHeight: Int
 
