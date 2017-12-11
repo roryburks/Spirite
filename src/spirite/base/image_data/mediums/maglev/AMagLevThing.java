@@ -1,7 +1,7 @@
 package spirite.base.image_data.mediums.maglev;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Vec2;
@@ -16,7 +16,7 @@ public abstract class AMagLevThing {
 	
 	public abstract float[] getPoints();
 	public abstract void setPoints(float[] xy);
-	public abstract void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context );
+	public abstract void draw(BuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context );
 	public final AMagLevThing clone() {
 		AMagLevThing other = _clone();
 		other.id = id;

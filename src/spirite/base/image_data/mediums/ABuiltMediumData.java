@@ -1,12 +1,10 @@
 package spirite.base.image_data.mediums;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.graphics.RawImage;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
-import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
 
@@ -49,14 +47,7 @@ public abstract class ABuiltMediumData {
 	 * screen, this is equal to the conversion from layerspace to screen space)*/
 	public abstract MatTrans getCompositeTransform();
 
-	public interface DoerOnGC {
-		public void Do( GraphicsContext gc);
-	}
-	public interface DoerOnRaw {
-		public void Do( RawImage raw);
-	}
-
-	private boolean doing = false;
+    private boolean doing = false;
 	public final void doOnGC( DoerOnGC doer) {
 		if( doing) {
 			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to recursively check-out");

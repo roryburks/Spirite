@@ -1,33 +1,36 @@
 package spirite.base.image_data.mediums
 
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
+import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.MediumHandle
 import spirite.base.util.linear.MatTrans
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 
 abstract class BuiltMediumData(
-    val handle: MediumHandle,
-    protected val trans: MatTrans
+    buildingMediumData: BuildingMediumData
 )
 {
+    val handle: MediumHandle = buildingMediumData.handle
+    protected val trans: MatTrans = buildingMediumData.trans
     protected val invTrans by lazy { trans.createInverse()}
 
-    abstract val destTrans : MatTrans
-    abstract val destWidth : Int
-    abstract val destHeight : Int
+    abstract val drawTrans: MatTrans
+    abstract val drawWidth: Int
+    abstract val drawHeight: Int
 
     abstract val sourceTransform : MatTrans
     abstract val sourceWidth: Int
     abstract val sourceHeight: Int
 
 
-    abstract protected fun _doOnGC(doer : (GraphicsContext) -> Unit  )
-    abstract protected fun _doOnRaw( doer: (RawImage) -> Unit)
+    // Todo: Once a greater portion of the code is in Kotlin, replace these
+    // Todo: with (GraphicsContext) -> Unit, etc
+    abstract protected fun _doOnGC(doer : DoerOnGC)
+    abstract protected fun _doOnRaw( doer: DoerOnRaw)
+
 
     private var doing = false
-    fun doOnGC( doer : (GraphicsContext) -> Unit ) {
+    fun doOnGC( doer : DoerOnGC) {
         if( doing) {
             MDebug.handleError(ErrorType.STRUCTURAL,"Tried to recursively check-out")
             return
@@ -40,7 +43,7 @@ abstract class BuiltMediumData(
         handle.refresh()
     }
 
-    fun doOnRaw( doer: (RawImage) -> Unit) {
+    fun doOnRaw( doer: DoerOnRaw) {
         if( doing) {
             MDebug.handleError(ErrorType.STRUCTURAL,"Tried to recursively check-out")
             return

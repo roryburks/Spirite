@@ -2,8 +2,8 @@ package spirite.base.graphics;
 
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.image_data.ImageWorkspace;
-import spirite.base.image_data.mediums.ABuiltMediumData.DoerOnGC;
-import spirite.base.image_data.mediums.ABuiltMediumData.DoerOnRaw;
+import spirite.base.image_data.mediums.DoerOnGC;
+import spirite.base.image_data.mediums.DoerOnRaw;
 import spirite.base.util.MUtil;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.MatTrans.NoninvertableException;

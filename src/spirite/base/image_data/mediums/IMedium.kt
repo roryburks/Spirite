@@ -27,7 +27,7 @@ interface IMedium {
     val dynamicY: Int
     val type: InternalImageTypes
 
-    fun build(building: BuildingMediumData): ABuiltMediumData
+    fun build(building: BuildingMediumData): BuiltMediumData
     fun dupe(): IMedium
     fun copyForSaving(): IMedium    // Probably not best to offload this work to individual
                                     // internal image types, but it's the least immediate work

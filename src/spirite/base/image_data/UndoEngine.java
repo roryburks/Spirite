@@ -4,7 +4,7 @@ import spirite.base.graphics.RawImage;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.FlatMedium;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.util.ObserverHandler;
@@ -647,7 +647,7 @@ public class UndoEngine {
 					hiddenAction.onAdd();
 			}
 			@Override
-			public void performImageAction(ABuiltMediumData built) {
+			public void performImageAction(BuiltMediumData built) {
 				workspace._replaceIamge(image, _ii);
 			}
 
@@ -1176,7 +1176,7 @@ public class NullContext extends UndoContext {
 		}
 		@Override protected void undoAction() {}
 		protected void performNonimageAction() {}
-		protected abstract void performImageAction(ABuiltMediumData built );
+		protected abstract void performImageAction(BuiltMediumData built );
 		protected boolean isHeavyAction() {return false;}
 	}
 	
@@ -1185,7 +1185,7 @@ public class NullContext extends UndoContext {
 		protected NilImageAction(MediumHandle data) {
 			super( new BuildingMediumData(data, 0, 0));
 		}
-		@Override		protected void performImageAction(ABuiltMediumData built) {}
+		@Override		protected void performImageAction(BuiltMediumData built) {}
 		
 	}
 	
@@ -1356,7 +1356,7 @@ public class NullContext extends UndoContext {
 			stored.flush();
 		}
 		@Override
-		protected void performImageAction(ABuiltMediumData built) {
+		protected void performImageAction(BuiltMediumData built) {
 			built.doOnGC((gc) -> {
 				gc.drawImage(stored, 0, 0);
 			});

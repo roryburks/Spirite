@@ -261,10 +261,10 @@ public class BuildSaveLoadTest {
 				assert( colors1.size() == colors2.size());
 				for( int i=0; i < colors1.size(); ++i) {
 					assert(colors1.get(i).color == colors2.get(i).color);
-					assert(colors1.get(i).ox == colors2.get(i).ox);
-					assert(colors1.get(i).oy == colors2.get(i).oy);
+					assert(colors1.get(i).img.getXOffset() == colors2.get(i).img.getXOffset());
+					assert(colors1.get(i).img.getYOffset() == colors2.get(i).img.getYOffset());
 					
-					VerifyRawImages(colors1.get(i).img,colors2.get(i).img);
+					VerifyRawImages(colors1.get(i).img.getBase(),colors2.get(i).img.getBase());
 				}
 			}
 			else if( iimg1 instanceof MaglevMedium) {

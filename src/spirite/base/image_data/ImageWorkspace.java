@@ -314,7 +314,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			this.handle = handle;
 			this.trans = MatTrans.TranslationMatrix(ox, oy);
 		}
-		public void doOnBuiltData( DoOnABID doer) {
+		public void doOnBuiltData( DoOnBID doer) {
 			handle.getContext().doOnBuiltData(this, doer);
 		}
 	}
@@ -373,7 +373,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	}
 	
 	/** Performs the given script using data built from the given building data. */
-	public void doOnBuiltData( BuildingMediumData data, DoOnABID doer) {
+	public void doOnBuiltData( BuildingMediumData data, DoOnBID doer) {
 		if( data == null)
 			doer.Do(null);
 
@@ -387,7 +387,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			}
 		}
 	}
-	public interface DoOnABID { public void Do( ABuiltMediumData abid); }
+	public interface DoOnBID { public void Do(BuiltMediumData abid); }
 	
 	
 	// =========
@@ -658,7 +658,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			ii = new DynamicMedium(img, 0, 0, this);
 			break;
 		case PRISMATIC:
-			ii = new PrismaticMedium();
+			ii = new PrismaticMedium(this);
 			break;
 		case NORMAL:
 			ii = new FlatMedium(img, this);

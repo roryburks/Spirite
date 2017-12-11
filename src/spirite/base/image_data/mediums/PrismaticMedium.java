@@ -1,9 +1,13 @@
 package spirite.base.image_data.mediums;
 
+import jdk.nashorn.internal.runtime.options.Option;
+import org.jetbrains.annotations.NotNull;
+import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
+import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
@@ -12,7 +16,6 @@ import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
-import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
@@ -21,6 +24,7 @@ import spirite.hybrid.MDebug.ErrorType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /***
  * PrismaticInternalImages are a type of Internal Image that behave similarly to 
@@ -31,32 +35,31 @@ public class PrismaticMedium implements IMedium {
 		// NOTE: Setting all of these to public SHOULD be fine so that
 		//	PrismaticInternalImages can easily be externally built and loaded in
 		//	but then you have to make sure you never pass the internal LImgs
-		public int ox;
-		public int oy;
 		public int color;
-		public RawImage img;
+		public DynamicImage img;
 		
 		public LImg() {}
 		public LImg(LImg other, boolean deepcopy) {
-			ox = other.ox;
-			oy = other.oy;
 			color = other.color;
 			img = (deepcopy)?other.img.deepCopy():other.img;
 		}
 		public LImg(LImg other, boolean deepcopy, boolean copyForSave_IGNORED) {
-			ox = other.ox;
-			oy = other.oy;
 			color = other.color;
-			img = HybridUtil.copyForSaving(other.img);
+            img = (deepcopy)?other.img.deepCopy():other.img;
+			//img = HybridUtil.copyForSaving(other.img);
 		}
 	}
 	private List<LImg> layers = new ArrayList<>();
 	private RawImage compositionImg;
 	private boolean compIsBuilt = false;
 	private Rect compRect = null;
+	private final ImageWorkspace context;
 	
-	public PrismaticMedium() {}
-	public PrismaticMedium( List<LImg> toImport) {
+	public PrismaticMedium( ImageWorkspace context) {
+        this.context = context;
+    }
+	public PrismaticMedium( List<LImg> toImport,ImageWorkspace context) {
+        this.context = context;
 		for( LImg limg : toImport) {
 			layers.add(new LImg(limg, false));
 		}
@@ -91,7 +94,7 @@ public class PrismaticMedium implements IMedium {
 		
 		Rect r = new Rect( 0, 0, 0, 0);
 		for( LImg img : layers)
-			r = r.union(img.ox, img.oy, img.img.getWidth(), img.img.getHeight());
+			r = r.union(img.img.getXOffset(), img.img.getYOffset(), img.img.getWidth(), img.img.getHeight());
 		compRect = r;
 		
 		if( compositionImg != null)
@@ -103,7 +106,7 @@ public class PrismaticMedium implements IMedium {
 			compositionImg = HybridHelper.createImage(r.width, r.height);
 			GraphicsContext gc = compositionImg.getGraphics();
 			for( LImg img : layers) {
-				gc.drawImage(img.img, img.ox - r.x, img.oy - r.y);
+				gc.drawImage(img.img.getBase(), img.img.getXOffset() - r.x, img.img.getYOffset() - r.y);
 			}
 		}
 		
@@ -112,7 +115,7 @@ public class PrismaticMedium implements IMedium {
 
 	public void drawBehind( GraphicsContext gc, int color) {
 		for( LImg img : layers) {
-			gc.drawImage(img.img, img.ox - compRect.x, img.oy - compRect.y);
+			gc.drawImage(img.img.getBase(), img.img.getXOffset() - compRect.x, img.img.getYOffset() - compRect.y);
 			if( (img.color & 0xFFFFFF) == (color & 0xFFFFFF)) return;
 		}
 	}
@@ -120,7 +123,7 @@ public class PrismaticMedium implements IMedium {
 		boolean drawing = false;
 		for( LImg img : layers) {
 			if( drawing) 
-				gc.drawImage(img.img, img.ox - compRect.x, img.oy - compRect.y);
+				gc.drawImage(img.img.getBase(), img.img.getXOffset() - compRect.x, img.img.getYOffset() - compRect.y);
 			else if( (img.color & 0xFFFFFF) == (color & 0xFFFFFF)) 
 				drawing = true;
 		}
@@ -128,13 +131,13 @@ public class PrismaticMedium implements IMedium {
 	}
 
 	@Override
-	public ABuiltMediumData build( BuildingMediumData building) {
+	public BuiltMediumData build( BuildingMediumData building) {
 		return new PrismaticBuiltImageData( building);
 	}
 
 	@Override
 	public IMedium dupe() {
-		PrismaticMedium pii = new PrismaticMedium();
+		PrismaticMedium pii = new PrismaticMedium(context);
 		
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
@@ -144,7 +147,7 @@ public class PrismaticMedium implements IMedium {
 	}
 	@Override
 	public IMedium copyForSaving() {
-		PrismaticMedium pii = new PrismaticMedium();
+		PrismaticMedium pii = new PrismaticMedium(context);
 		
 		pii.layers = new ArrayList<>(this.layers.size());
 		for( LImg img : this.layers) {
@@ -198,161 +201,68 @@ public class PrismaticMedium implements IMedium {
 		return InternalImageTypes.PRISMATIC;
 	}
 
-	public class PrismaticBuiltImageData extends ABuiltMediumData {
-		final MatTrans trans;
-		MatTrans invTrans;
-		RawImage buffer = null;
-		int workingColor;
+	public class PrismaticBuiltImageData extends BuiltMediumData {
+	    private final int workingColor;
+	    private PrismaticBuiltImageData( BuildingMediumData building) {
+	        super(building);
+	        workingColor = building.color;
+        }
 
-		public PrismaticBuiltImageData(BuildingMediumData building) {
-			super(building.handle);
-			this.trans = building.trans;
-			workingColor = building.color;
-			try {
-				this.invTrans = trans.createInverse();
-			} catch (NoninvertableException e) {
-				this.invTrans = new MatTrans();
-			}
-		}
+        @NotNull
+        @Override
+        public MatTrans getDrawTrans() {
+	        return new MatTrans();
+        }
 
+        @Override
+        public int getDrawWidth() {
+            return 0;
+        }
 
-		@Override public int getWidth() {return handle.getContext().getWidth();}
-		@Override public int getHeight() { return handle.getContext().getHeight();}
-		@Override public Vec2 convert(Vec2 p) {return p;}
-		@Override public MatTrans getCompositeTransform() {return new MatTrans(trans);}
-		@Override public MatTrans getScreenToImageTransform() {return new MatTrans(invTrans);}
+        @Override
+        public int getDrawHeight() {
+            return 0;
+        }
 
-		@Override public Rect getBounds() {return MUtil.circumscribeTrans( compRect, trans); }
-		@Override
-		public void drawBorder(GraphicsContext gc) {
-			if( handle == null) return;
-			
-			MatTrans oldTrans = gc.getTransform();
-			gc.preTransform(trans);
-			gc.drawRect(compRect.x-1, compRect.y-1, 
-					compRect.width+2, compRect.height+2);
-			gc.setTransform(oldTrans);
-		}
-		@Override public void draw(GraphicsContext gc) {handle.drawLayer( gc, trans);}
+        @NotNull
+        @Override
+        public MatTrans getSourceTransform() {
+            return getTrans();
+        }
 
+        @Override
+        public int getSourceWidth() {
+            return getWidth();
+        }
 
-		public GraphicsContext checkout() {
-			return checkoutRaw().getGraphics();
-		}
+        @Override
+        public int getSourceHeight() {
+            return getHeight();
+        }
 
-		public RawImage checkoutRaw() {
-			handle.getContext().getUndoEngine().prepareContext(handle);
-			buffer = HybridHelper.createImage(handle.getContext().getWidth(), handle.getContext().getHeight());
-			GraphicsContext gc = buffer.getGraphics();
-			buildComposition();
+        @Override
+        protected void _doOnGC(@NotNull DoerOnGC doer) {
+            prepareLImg().img.doOnGC(doer, getTrans());
+        }
 
-			LImg img = null;
-			for( LImg other : layers) {
-				if( other.color == workingColor)
-					img = other;
-			}
-			if( img != null) {
-				gc.setTransform(trans);
-				gc.drawImage(img.img, img.ox, img.oy);
-			}
-			
-			return buffer;
-		}
+        @Override
+        protected void _doOnRaw(@NotNull DoerOnRaw doer) {
+	        prepareLImg().img.doOnRaw(doer, getTrans());
+        }
 
-		public void checkin() {
-			int w = handle.getContext().getWidth();
-			int h = handle.getContext().getHeight();
-			
-			LImg img = null;
-			for( LImg other : layers) {
-				if( other.color == workingColor)
-					img = other;
-			}
-			
-			if( img == null) {
-				// Create new Layer for the color
-				Rect r = null;
-				try {
-					r = HybridUtil.findContentBounds(buffer, 0, true);
-				} catch (UnsupportedImageTypeException e) {
-					MDebug.handleError(MDebug.ErrorType.STRUCTURAL, e, e.getMessage());
-				}
-				
-				if( r == null || r.isEmpty())
-					return;
-				
-				RawImage nri = HybridHelper.createImage(r.width, r.height); 
-				GraphicsContext gc = nri.getGraphics();
-				gc.setTransform(invTrans);
-				gc.drawImage(buffer, -r.x, -r.y);
-				
-				img = new LImg();
-				img.color = workingColor;
-				img.img = nri;
-				img.ox = r.x;
-				img.oy = r.y;
-				layers.add(img);
-			}
-			else {
-				// Update the layer for the color: mostly duplicate code from DynamicInternalImage
-				Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
-						new Rect(img.ox,img.oy, img.img.getWidth(), img.img.getHeight()));
-
-				RawImage raw = HybridHelper.createImage(drawAreaInImageSpace.width, drawAreaInImageSpace.height);
-				GraphicsContext gc = raw.getGraphics();
-
-				// Draw the old image
-				gc.drawImage(img.img, img.ox - drawAreaInImageSpace.x, img.oy - drawAreaInImageSpace.y);
-
-				// Clear the section of the old image that will be replaced by the new one
-				gc.transform(trans);
-				gc.setComposite(Composite.SRC, 1.0f);
-				gc.drawImage(buffer, 0, 0);
-				
-				Rect cropped = null;
-				try {
-					cropped = HybridUtil.findContentBounds( buffer, 0, true);
-				} catch (UnsupportedImageTypeException e) 
-					{MDebug.handleError(ErrorType.STRUCTURAL_MAJOR, e, e.getMessage());}
-				
-				RawImage nri;
-				if( cropped == null || cropped.isEmpty()) {
-					img.img.flush();
-					layers.remove(img);
-				}
-				else {
-					nri = HybridHelper.createImage(cropped.width, cropped.height);
-					gc = nri.getGraphics();
-					gc.drawImage( raw, -cropped.x, -cropped.y);
-
-					img.ox = cropped.x-drawAreaInImageSpace.x;
-					img.oy = cropped.y-drawAreaInImageSpace.y;
-					
-					img.img.flush();
-					img.img = nri;
-				}
-			}
-			compIsBuilt = false;
-			buffer.flush();
-			buffer = null;
-		}
-
-
-		@Override
-		protected void _doOnGC(DoerOnGC doer) {
-			doer.Do(checkout());
-			checkin();
-		}
-
-
-		@Override
-		protected void _doOnRaw(DoerOnRaw doer) {
-			doer.Do(checkoutRaw());
-			checkin();
-		}
-
-
-
+        private LImg prepareLImg() {
+            Optional<LImg> optionalLImg = layers.stream().filter((limg) -> limg.color == workingColor).findAny();
+            LImg colorLayer;
+            if( optionalLImg.isPresent())
+                colorLayer = optionalLImg.get();
+            else {
+                colorLayer = new LImg();
+                colorLayer.img = new DynamicImage(context, null, 0, 0);
+                colorLayer.color = workingColor;
+                layers.add(colorLayer);
+            }
+            return colorLayer;
+        }
 	}
 
 	@Override public IImageDrawer getImageDrawer(BuildingMediumData building) {return new DefaultImageDrawer(this, building);}

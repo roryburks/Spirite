@@ -1,7 +1,6 @@
 package spirite.pc.graphics.awt;
 
 import spirite.base.graphics.GraphicsContext;
-import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.linear.MatTrans;

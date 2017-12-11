@@ -9,6 +9,7 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.*;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
@@ -106,8 +107,8 @@ public class MaglevImageDrawer
 		img.addThing(stroke, behind);
 		undoEngine.storeAction(new ImageAction(building) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
-				ImageWorkspace ws = built.handle.getContext();
+			protected void performImageAction(BuiltMediumData built) {
+				ImageWorkspace ws = built.getHandle().getContext();
 				MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 				mimg.Build();
 				
@@ -131,9 +132,9 @@ public class MaglevImageDrawer
 	public void transform(MatTrans trans) {
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
-				ImageWorkspace ws = built.handle.getContext();
-				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+			protected void performImageAction(BuiltMediumData built) {
+				ImageWorkspace ws = built.getHandle().getContext();
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.getHandle());
 				for( AMagLevThing things : mimg.getThings()) {
 					things.transform(trans);		
 				}
@@ -178,15 +179,15 @@ public class MaglevImageDrawer
 		
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
-				ImageWorkspace ws = built.handle.getContext();
-				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+			protected void performImageAction(BuiltMediumData built) {
+				ImageWorkspace ws = built.getHandle().getContext();
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.getHandle());
 				mimg.Build();
 				
 				mimg.addThing(fill, true);
 
 				mimg.getBuiltImage().doOnGC((gc) -> {
-					fill._draw(mimg.build(new BuildingMediumData(built.handle, 0, 0)), null, gc, mimg, behind);
+					fill._draw(mimg.build(new BuildingMediumData(built.getHandle(), 0, 0)), null, gc, mimg, behind);
 				}, new MatTrans());
 				
 			}
@@ -325,8 +326,8 @@ public class MaglevImageDrawer
 		ws.getUndoEngine().performAndStore(new ImageAction(building) {
 
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
-				MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+			protected void performImageAction(BuiltMediumData built) {
+				MaglevMedium mimg = (MaglevMedium)ws.getData(built.getHandle());
 				mimg.contortBones(bone, to);
 			}
 		});
@@ -367,8 +368,8 @@ public class MaglevImageDrawer
 			ws.getUndoEngine().performAndStore(new ImageAction(building) {
 
 				@Override
-				protected void performImageAction(ABuiltMediumData built) {
-					MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+				protected void performImageAction(BuiltMediumData built) {
+					MaglevMedium mimg = (MaglevMedium)ws.getData(built.getHandle());
 
 					for( Entry<Integer,Integer> entry : oldColorMap.entrySet()) {
 						int index = entry.getKey();

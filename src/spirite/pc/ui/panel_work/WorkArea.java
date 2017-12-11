@@ -109,8 +109,12 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
 
                 	gc.setComposite(gc.getComposite(), 0.3f);
                     gc.setColor(Globals.getColor("drawpanel.layer.border").getRGB());
-                    
-                    built.drawBorder(gc);
+
+                    gc.pushTransform();
+                    gc.preTransform( built.getSourceTransform());
+                    gc.drawRect(0,0, built.getSourceWidth(), built.getSourceHeight());
+
+                    gc.popTransform();
         		});
         	}
             

@@ -412,10 +412,10 @@ public class SaveEngine implements MWorkspaceObserver {
 						// [4] : color
 						helper.ra.writeInt(limg.color);
 						// [2, 2] : Dynamic offset X,Y
-						helper.ra.writeShort( limg.ox);
-						helper.ra.writeShort( limg.oy);
+						helper.ra.writeShort( limg.img.getXOffset());
+						helper.ra.writeShort( limg.img.getYOffset());
 
-						HybridUtil.savePNG(limg.img, bos);
+						HybridUtil.savePNG(limg.img.getBase(), bos);
 						// [4] : Size of Image Data
 						helper.ra.writeInt( bos.size());
 						// [x] : Image Data

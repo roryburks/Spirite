@@ -4,7 +4,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
 import spirite.base.graphics.IImage;
 import spirite.base.graphics.RawImage;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.linear.Rect;
@@ -70,9 +70,8 @@ public class SelectionMask {
 	}
 
 	public boolean contains(int x, int y) {
-		if( x < ox || x > ox + mask.getWidth() || y < oy || y > oy + mask.getHeight())
-			return false;
-		return Colors.getAlpha(mask.getRGB(x-ox, y-oy)) != 0;
+		return x >= ox && x <= ox + mask.getWidth() && y >= oy && y <= oy + mask.getHeight()
+				&& Colors.getAlpha(mask.getRGB(x - ox, y - oy)) != 0;
 	}
 
 
@@ -96,13 +95,13 @@ public class SelectionMask {
 			
 		});
 	}
-	public RawImage liftSelectionFromData(ABuiltMediumData built) {
+	public RawImage liftSelectionFromData(BuiltMediumData built) {
 		return _liftFromScheme(new LiftScheme() {
 			@Override
 			public void draw(GraphicsContext gc) {
 				built.doOnRaw((raw) -> {
 					gc.pushTransform();
-					gc.transform(built.getCompositeTransform());
+					gc.transform(built.getSourceTransform());
 					gc.drawImage(raw, 0, 0);
 					gc.popTransform();
 				});
@@ -110,7 +109,9 @@ public class SelectionMask {
 
 			@Override
 			public Rect getBounds() {
-				return MUtil.circumscribeTrans(new Rect(0,0,built.getWidth(),built.getHeight()), built.getCompositeTransform());
+				return MUtil.circumscribeTrans(
+						new Rect(0,0,built.getSourceWidth(),built.getSourceHeight()),
+						built.getSourceTransform());
 			}
 		});
 	}

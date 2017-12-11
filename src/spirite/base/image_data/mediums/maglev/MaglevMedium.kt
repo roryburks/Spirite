@@ -6,16 +6,12 @@ import spirite.base.graphics.IImage
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone
-import spirite.base.image_data.mediums.ABuiltMediumData
-import spirite.base.image_data.mediums.IMedium
-import spirite.base.image_data.mediums.IMedium.InternalImageTypes
+import spirite.base.image_data.mediums.*
 import spirite.base.image_data.mediums.drawer.IImageDrawer
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill
-import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke
 import spirite.base.image_data.selection.SelectionMask
 import spirite.base.pen.PenTraits.PenState
-import spirite.base.pen.IndexedDrawPoints
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.MatTrans.NoninvertableException
@@ -96,12 +92,12 @@ class MaglevMedium  (
 
     override val width: Int get() {
         Build()
-        return if (isBuilt) builtImage!!.width else context!!.width
+        return if (isBuilt) builtImage!!.width else context.width
     }
 
     override val height: Int get() {
         Build()
-        return if (isBuilt) builtImage!!.height else context!!.height
+        return if (isBuilt) builtImage!!.height else context.height
     }
 
     override val dynamicX: Int get() {
@@ -114,7 +110,7 @@ class MaglevMedium  (
     }
     override val type = IMedium.InternalImageTypes.MAGLEV
 
-    override fun build(building: BuildingMediumData): ABuiltMediumData {
+    override fun build(building: BuildingMediumData): BuiltMediumData {
         return MaglevBuiltData(building)
     }
 
@@ -248,11 +244,31 @@ class MaglevMedium  (
     }
 
 
-    inner class MaglevBuiltData
-    //final int box;
-    //final int boy;
+    inner class MaglevBuiltData(building: BuildingMediumData) : BuiltMediumData(building) {
+        init {
+            Build()
+        }
 
-    (building: BuildingMediumData) : ABuiltMediumData(building.handle) {
+        override val drawTrans: MatTrans get() = MatTrans()
+        override val drawWidth: Int get() = context.width
+        override val drawHeight: Int get() = context.height
+
+        override val sourceTransform: MatTrans by lazy {
+            val strans = MatTrans(trans)
+            strans.preTranslate(builtImage!!.xOffset.toFloat(), builtImage!!.yOffset.toFloat())
+            strans
+        }
+        override val sourceWidth: Int = builtImage!!.width
+        override val sourceHeight: Int = builtImage!!.height
+
+        override fun _doOnGC(doer: DoerOnGC) {
+            builtImage!!.doOnGC(doer, sourceTransform)
+        }
+
+        override fun _doOnRaw(doer: DoerOnRaw) {
+            builtImage!!.doOnRaw(doer, sourceTransform)
+        }
+        /*
         internal var trans: MatTrans = building.trans
 
         override fun getWidth(): Int {
@@ -302,13 +318,13 @@ class MaglevMedium  (
         // Counter-intuitively, checking in and checking out of a MaglevInternalImage
         //	can be a thing that makes sense to do as the StrokeEngine uses it for the
         //	behavior we want.
-        override fun _doOnGC(doer: ABuiltMediumData.DoerOnGC) {
+        override fun _doOnGC(doer: DoerOnGC) {
             builtImage!!.doOnGC(doer, trans)
         }
 
-        override fun _doOnRaw(doer: ABuiltMediumData.DoerOnRaw) {
+        override fun _doOnRaw(doer: DoerOnRaw) {
             builtImage!!.doOnRaw(doer, trans)
-        }
+        }*/
     }
 
 

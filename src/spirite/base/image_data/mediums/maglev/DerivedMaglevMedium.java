@@ -1,18 +1,17 @@
 package spirite.base.image_data.mediums.maglev;
 
+import org.jetbrains.annotations.NotNull;
 import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.layers.puppet.BasePuppet;
-import spirite.base.image_data.mediums.ABuiltMediumData;
-import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.*;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
 import spirite.base.util.linear.Vec2;
-import spirite.base.util.linear.Vec2i;
 
 import java.util.ArrayList;
 
@@ -76,8 +75,8 @@ public class DerivedMaglevMedium
 	@Override public int getDynamicY() { return (passThrough() ? derivedFrom.getDynamicY() : (built ? rendered.getYOffset() : 0));}
 
 	@Override
-	public ABuiltMediumData build(BuildingMediumData building) {
-		return new DerivedMaglevBuiltData(derivedFrom.build(building));
+	public BuiltMediumData build(BuildingMediumData building) {
+		return new DerivedMaglevBuiltData(derivedFrom.build(building), building);
 	}
 
 	@Override public IMedium dupe() {return new DerivedMaglevMedium(this);}
@@ -107,14 +106,51 @@ public class DerivedMaglevMedium
 	}
 
 	
-	class DerivedMaglevBuiltData extends ABuiltMediumData {
-		ABuiltMediumData base;
+	class DerivedMaglevBuiltData extends BuiltMediumData {
+		BuiltMediumData base;
 
-		public DerivedMaglevBuiltData(ABuiltMediumData base) {
-			super(base.handle);
+		public DerivedMaglevBuiltData(BuiltMediumData base, BuildingMediumData building) {
+			super(building);
 			this.base = base;
 		}
 
+		@NotNull
+		@Override
+		public MatTrans getDrawTrans() {return base.getDrawTrans();}
+
+		@Override
+		public int getDrawWidth() {
+			return base.getDrawWidth();
+		}
+
+		@Override
+		public int getDrawHeight() {
+			return base.getDrawHeight();
+		}
+
+		@NotNull
+		@Override
+		public MatTrans getSourceTransform() {
+			return base.getSourceTransform();
+		}
+
+		@Override
+		public int getSourceWidth() {
+			return base.getSourceWidth();
+		}
+
+		@Override
+		public int getSourceHeight() {
+			return base.getSourceHeight();
+		}
+
+		@Override
+		protected void _doOnGC(@NotNull DoerOnGC doer) {}
+
+		@Override
+		protected void _doOnRaw(@NotNull DoerOnRaw doer) {}
+
+		/*
 		@Override public int getWidth() {return base.getWidth();}
 		@Override public int getHeight() {return base.getHeight();}
 		@Override
@@ -148,7 +184,7 @@ public class DerivedMaglevMedium
 		@Override
 		public MatTrans getCompositeTransform() {
 			return base.getCompositeTransform();
-		}
+		}*/
 		
 	}
 }

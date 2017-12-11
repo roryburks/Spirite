@@ -5,7 +5,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.StackableAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IWeightEraserModule;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.DrawPoints;
@@ -132,9 +132,9 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 
 
 		@Override
-		protected void performImageAction(ABuiltMediumData built) {
-			ImageWorkspace ws = built.handle.getContext();
-			MaglevMedium mimg = (MaglevMedium)ws.getData(built.handle);
+		protected void performImageAction(BuiltMediumData built) {
+			ImageWorkspace ws = built.getHandle().getContext();
+			MaglevMedium mimg = (MaglevMedium)ws.getData(built.getHandle());
 			
 			for( EraseAction erase : erases) {
 				mimg.splitStroke(erase.strokeId, erase.remaining);
@@ -176,7 +176,7 @@ class MLDModuleWeightEraser implements IWeightEraserModule{
 		}
 
 		@Override
-		protected void performImageAction(ABuiltMediumData built) {
+		protected void performImageAction(BuiltMediumData built) {
 			ImageWorkspace ws = building.handle.getContext();
 			MaglevMedium mimg = (MaglevMedium)ws.getData(building.handle);
 			

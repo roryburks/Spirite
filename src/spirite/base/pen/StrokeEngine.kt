@@ -3,7 +3,8 @@ package spirite.base.pen
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
-import spirite.base.image_data.mediums.ABuiltMediumData
+import spirite.base.image_data.mediums.BuiltMediumData
+import spirite.base.image_data.mediums.DoerOnRaw
 import spirite.base.image_data.selection.SelectionMask
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.util.MUtil
@@ -58,7 +59,7 @@ abstract class StrokeEngine {
 
 
     enum class STATE {READY, DRAWING}
-    enum class Method private constructor(val fileId: Int) {
+    enum class Method constructor(val fileId: Int) {
         BASIC(0),
         ERASE(1),
         PIXEL(2);
@@ -108,7 +109,7 @@ abstract class StrokeEngine {
 
             // Starts recording the Pen States
             prec = ArrayList()
-            val layerSpace = built.convert(Vec2(ps.x, ps.y))
+            val layerSpace = built.drawTrans.transform(Vec2(ps.x, ps.y))
 
             oldX = layerSpace.x
             oldY = layerSpace.y
@@ -140,7 +141,7 @@ abstract class StrokeEngine {
 
     private fun prepareStroke(
             params: StrokeParams?,
-            built: ABuiltMediumData?,
+            built: BuiltMediumData?,
             selection: SelectionMask?): Boolean {
         if (built == null)
             return false
@@ -149,7 +150,7 @@ abstract class StrokeEngine {
 
 
         lastSelection = selection
-        onStart(built.screenToImageTransform, built.width, built.height)
+        onStart(built.drawTrans, built.drawWidth, built.drawHeight)
         prepareDisplayLayer()
         return true
     }
@@ -166,7 +167,7 @@ abstract class StrokeEngine {
         val changed = AtomicReference(false)
         imageData!!.doOnBuiltData { built ->
 
-            val layerSpace = built!!.convert(Vec2(ps.x, ps.y))
+            val layerSpace = built!!.drawTrans.transform(Vec2(ps.x, ps.y))
             newX = layerSpace.x
             newY = layerSpace.y
             newP = ps.pressure
@@ -174,7 +175,7 @@ abstract class StrokeEngine {
             rawY = ps.y
             rawP = ps.pressure
 
-            if (state != STATE.DRAWING || built == null) {
+            if (state != STATE.DRAWING ) {
                 MDebug.handleWarning(WarningType.STRUCTURAL, this, "Data Dropped mid-stroke (possible loss of Undo functionality)")
                 return@doOnBuiltData
             }
@@ -204,7 +205,7 @@ abstract class StrokeEngine {
         state = STATE.READY
 
         if (imageData != null) {
-            imageData!!.doOnBuiltData { built -> built.doOnRaw { raw -> drawStrokeLayer(raw.graphics) } }
+            imageData!!.doOnBuiltData { built -> built.doOnRaw(DoerOnRaw { raw -> drawStrokeLayer(raw.graphics) }) }
         }
 
         onEnd()
@@ -217,7 +218,7 @@ abstract class StrokeEngine {
      * draw commands into a single command instead of updating the stroke layer
      * repeatedly.
      */
-    fun batchDraw(params: StrokeParams, points: Array<PenState>, builtImage: ABuiltMediumData?, mask: SelectionMask?) {
+    fun batchDraw(params: StrokeParams, points: Array<PenState>, builtImage: BuiltMediumData?, mask: SelectionMask?) {
         prepareStroke(params, builtImage, mask)
         buildInterpolator(params, points[0])
 
@@ -231,17 +232,17 @@ abstract class StrokeEngine {
 
         this.drawToLayer(buildPoints(_interpolator, Arrays.asList(*points), this.params), false)
 
-        builtImage?.doOnRaw { raw -> drawStrokeLayer(raw.graphics) }
+        builtImage?.doOnRaw( DoerOnRaw{ raw -> drawStrokeLayer(raw.graphics) })
 
         _interpolator = null
     }
 
-    fun batchDraw(points: DrawPoints, builtImage: ABuiltMediumData?, mask: SelectionMask?) {
+    fun batchDraw(points: DrawPoints, builtImage: BuiltMediumData?, mask: SelectionMask?) {
         prepareStroke(null, builtImage, mask)
 
         this.drawToLayer(points, false)
 
-        builtImage?.doOnRaw { raw -> drawStrokeLayer(raw.graphics) }
+        builtImage?.doOnRaw( DoerOnRaw { raw -> drawStrokeLayer(raw.graphics) })
     }
 
 
@@ -279,7 +280,7 @@ abstract class StrokeEngine {
 
                 var localInterpos = 0f
                 var ip: InterpolatedPoint = localInterpolator.evalExt(localInterpos)
-                buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
+                buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                 fcx.add(ip.x)
                 fcy.add(ip.y)
                 fcw.add(params!!.dynamics.getSize(buff))
@@ -288,7 +289,7 @@ abstract class StrokeEngine {
                     localInterpos += DIFF.toFloat()
                     ip = localInterpolator.evalExt(localInterpos)
 
-                    buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
+                    buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcx.add(ip.x)
                     fcy.add(ip.y)
                     fcw.add(params.dynamics.getSize(buff))
@@ -324,7 +325,7 @@ abstract class StrokeEngine {
 
                 var localInterpos = 0f
                 var ip: InterpolatedPoint = localInterpolator.evalExt(localInterpos)
-                buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
+                buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                 fcx.add(ip.x)
                 fcy.add(ip.y)
                 fcw.add(params.dynamics.getSize(buff))
@@ -334,7 +335,7 @@ abstract class StrokeEngine {
                     localInterpos += DIFF.toFloat()
                     ip = localInterpolator.evalExt(localInterpos)
 
-                    buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
+                    buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcx.add(ip.x)
                     fcy.add(ip.y)
                     fcw.add(params.dynamics.getSize(buff))

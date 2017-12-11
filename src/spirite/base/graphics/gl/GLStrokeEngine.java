@@ -6,7 +6,6 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption;
 import spirite.base.graphics.gl.GLEngine.ProgramType;
 import spirite.base.graphics.gl.GLGeom.Primitive;
-import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;

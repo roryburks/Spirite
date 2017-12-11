@@ -12,7 +12,6 @@ import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.MatTrans.NoninvertableException
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec2i
 import spirite.hybrid.HybridUtil
 
 /***
@@ -28,7 +27,7 @@ class FlatMedium(private val image: RawImage, protected val context: ImageWorksp
 
     override val type: IMedium.InternalImageTypes = IMedium.InternalImageTypes.NORMAL
 
-    override fun build(building: BuildingMediumData): ABuiltMediumData {
+    override fun build(building: BuildingMediumData): BuiltMediumData {
         return BuiltImageData(building)
     }
 
@@ -55,68 +54,19 @@ class FlatMedium(private val image: RawImage, protected val context: ImageWorksp
         return image
     }
 
-    inner class BuiltImageData(building: BuildingMediumData) : ABuiltMediumData(building.handle) {
-        internal var trans: MatTrans
-        internal var invTrans: MatTrans
+    inner class BuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
+        override val drawTrans: MatTrans get() = invTrans
+        override val drawWidth: Int = image.width
+        override val drawHeight:Int = image.height
+        override val sourceTransform: MatTrans get() = trans
+        override val sourceWidth: Int = image.width
+        override val sourceHeight: Int = image.height
 
-        init {
-            this.trans = building.trans
-            try {
-                this.invTrans = trans.createInverse()
-            } catch (e: NoninvertableException) {
-                this.invTrans = MatTrans()
-            }
-
-        }
-
-        override fun getWidth(): Int {
-            return handle.width
-        }
-
-        override fun getHeight(): Int {
-            return handle.height
-        }
-
-        override fun draw(gc: GraphicsContext) {
-            handle.drawLayer(gc, trans)
-        }
-
-        override fun drawBorder(gc: GraphicsContext) {
-            if (handle == null) return
-
-            val transform = gc.transform
-            gc.preTransform(trans)
-
-            gc.drawRect(0, 0, handle.width, handle.height)
-
-            gc.transform = transform
-        }
-
-        override fun convert(p: Vec2): Vec2 {
-            //	Some image modification methods do not use draw actions, but
-            //	 rather alter the image directly.  For example a flood fill action.
-            //
-            return invTrans.transform(Vec2(p.x, p.y))
-
-        }
-
-        override fun getBounds(): Rect {
-            return MUtil.circumscribeTrans(Rect(0, 0, width, height), trans)
-        }
-
-        override fun getScreenToImageTransform(): MatTrans {
-            return MatTrans(invTrans)
-        }
-
-        override fun getCompositeTransform(): MatTrans {
-            return MatTrans()
-        }
-
-        override fun _doOnGC(doer: ABuiltMediumData.DoerOnGC) {
+        override fun _doOnGC(doer: DoerOnGC) {
             doer.Do(image.graphics)
         }
 
-        override fun _doOnRaw(doer: ABuiltMediumData.DoerOnRaw) {
+        override fun _doOnRaw(doer: DoerOnRaw) {
             doer.Do(image)
         }
     }

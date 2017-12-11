@@ -3,6 +3,7 @@ package spirite.base.file;
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.PaletteManager.Palette;
 import spirite.base.brains.tools.ToolSchemes.MagneticFillMode;
+import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.RawImage;
 import spirite.base.image_data.GroupTree;
 import spirite.base.image_data.GroupTree.LayerNode;
@@ -291,18 +292,21 @@ public class LoadEngine {
 					PrismaticMedium.LImg limg = new PrismaticMedium.LImg();
 
 					limg.color = helper.ra.readInt();
-					limg.ox = helper.ra.readShort();
-					limg.oy = helper.ra.readShort();
+					int ox = helper.ra.readShort();
+					int oy = helper.ra.readShort();
 					int imgSize = helper.ra.readInt();
 					
 					byte[] buffer = new byte[imgSize];
 					helper.ra.read(buffer);
-					limg.img = HybridUtil.load(new ByteArrayInputStream(buffer));
+
+					RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
+
+					limg.img = new DynamicImage(helper.workspace, img, ox, oy);
 
 					loadingList.add(limg);
 				}
 				
-				dataMap.put(identifier, new PrismaticMedium(loadingList));				
+				dataMap.put(identifier, new PrismaticMedium(loadingList, helper.workspace));
 				break;}
 			case MAGLEV: {
 				int thingsLeftToRead = helper.ra.readUnsignedShort();

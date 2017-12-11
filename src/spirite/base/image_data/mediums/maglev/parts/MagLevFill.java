@@ -2,7 +2,7 @@ package spirite.base.image_data.mediums.maglev.parts;
 
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.graphics.GraphicsContext.Composite;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
@@ -48,14 +48,14 @@ public class MagLevFill extends AMagLevThing {
 	@Override
 	protected MagLevFill _clone()  {return new MagLevFill(this);}
 	@Override
-	public void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
+	public void draw(BuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
 		_draw(built, mask, gc, context, false);
 	}
 	
 	/**
 	 * 
 	 */
-	public void _draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
+	public void _draw(BuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
 		FloatCompactor outx = new FloatCompactor();
 		FloatCompactor outy = new FloatCompactor();
 

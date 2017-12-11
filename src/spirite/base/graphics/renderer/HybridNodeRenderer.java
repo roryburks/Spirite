@@ -90,17 +90,14 @@ public class HybridNodeRenderer {
 		{
 			dataContext.doOnBuiltData((built) -> {
 				compositionImage= 
-						HybridHelper.createImage(built.getWidth(), built.getHeight());
+						HybridHelper.createImage(built.getDrawWidth(), built.getDrawHeight());
 				compositionHandle = dataContext.handle;
 
 				GraphicsContext gc = compositionImage.getGraphics();
 				
 				// Draw the Base Image
-				MatTrans drawTrans = built.getCompositeTransform();
-				drawTrans.preTranslate(dataContext.handle.getDynamicX(), 
-						dataContext.handle.getDynamicY());
+				MatTrans drawTrans = built.getSourceTransform();
 				gc.setTransform(drawTrans);
-				
 				dataContext.handle.drawBehindStroke(gc);
 				
 
@@ -109,7 +106,7 @@ public class HybridNodeRenderer {
 					ALiftedData lifted = selectionEngine.getLiftedData();
 					
 					MatTrans tt = selectionEngine.getLiftedDrawTrans();
-					tt.preConcatenate(built.getScreenToImageTransform());
+					tt.preConcatenate(built.getDrawTrans());
 					gc.setTransform(tt);
 					lifted.drawLiftedData(gc);
 				}

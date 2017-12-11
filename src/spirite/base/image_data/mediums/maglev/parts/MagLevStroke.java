@@ -4,6 +4,7 @@ import spirite.base.brains.tools.ToolSchemes.PenDrawMode;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.maglev.AMagLevThing;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
 import spirite.base.image_data.selection.SelectionMask;
@@ -64,10 +65,10 @@ public class MagLevStroke extends AMagLevThing {
 	}
 
 	@Override
-	public void draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
+	public void draw(BuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context) {
 		_draw(built,mask,gc,context,false);
 	}
-	public void _draw(ABuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
+	public void _draw(BuiltMediumData built, SelectionMask mask, GraphicsContext gc, MaglevMedium context, boolean behind) {
 		ImageWorkspace workspace = context.getContext();
 		StrokeEngine _engine = workspace.getSettingsManager().getDefaultDrawer().getStrokeEngine();
 		if( behind)

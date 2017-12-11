@@ -15,7 +15,7 @@ import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
 import spirite.base.image_data.UndoEngine.UndoableAction;
 import spirite.base.image_data.layers.Layer;
-import spirite.base.image_data.mediums.ABuiltMediumData;
+import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.*;
 import spirite.base.image_data.selection.ALiftedData;
@@ -96,7 +96,7 @@ public class DefaultImageDrawer
 		_data.doOnBuiltData((built) -> {
 
 			
-			Vec2 p = built.convert( new Vec2(x,y));
+			Vec2 p = built.getDrawTrans().transform( new Vec2(x,y));
 			
 			built.doOnRaw((bi) -> {
 				if( !MUtil.coordInImage( (int)p.x, (int)p.y, bi)) {
@@ -123,8 +123,8 @@ public class DefaultImageDrawer
 
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
-				Vec2 p = built.convert( new Vec2(x,y));
+			protected void performImageAction(BuiltMediumData built) {
+				Vec2 p = built.getSourceTransform().transform( new Vec2(x,y));
 				if( mask == null) {
 					built.doOnRaw((raw) -> {
 						DirectDrawer.fill( raw, (int)p.x, (int)p.y, color);
@@ -174,7 +174,7 @@ public class DefaultImageDrawer
 
 					// Anchor the lifted image to the real image
 					built.doOnGC((gc) -> {
-						Vec2 p2 = built.convert(new Vec2(mask.getOX(),mask.getOY()));
+						Vec2 p2 = built.getSourceTransform().transform(new Vec2(mask.getOX(),mask.getOY()));
 						gc.drawImage( img_, (int)p2.x, (int)p2.y);
 					});
 				}
@@ -193,7 +193,7 @@ public class DefaultImageDrawer
 		SelectionMask sel = pollSelectionMask(workspace);
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
+			protected void performImageAction(BuiltMediumData built) {
 				clearUnderSelection( built, sel);
 			}
 			@Override public String getDescription() {return "Clear Layer";}
@@ -251,7 +251,7 @@ public class DefaultImageDrawer
 		}
 
 		@Override
-		protected void performImageAction(ABuiltMediumData built) {
+		protected void performImageAction(BuiltMediumData built) {
 			
 			if( mask != null) {
 				
@@ -354,7 +354,7 @@ public class DefaultImageDrawer
 		}
 
 		@Override
-		protected void performImageAction(ABuiltMediumData built) {
+		protected void performImageAction(BuiltMediumData built) {
 			if( mask != null) {
 				// Lift the Selection
 				RawImage lifted = mask.liftSelectionFromData(built);
@@ -426,7 +426,7 @@ public class DefaultImageDrawer
 
 		undoEngine.performAndStore(new MaskedImageAction(building, mask) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
+			protected void performImageAction(BuiltMediumData built) {
 				built.doOnRaw((raw) -> {
 					RawImage img2 = raw.deepCopy();
 					GraphicsContext gc = raw.getGraphics();
@@ -530,7 +530,7 @@ public class DefaultImageDrawer
 		}
 		
 		@Override
-		public void performImageAction(ABuiltMediumData built ) {
+		public void performImageAction(BuiltMediumData built ) {
 			queueSelectionMask(mask);
 			
 			engine.batchDraw(params, points, built, mask);
@@ -555,7 +555,7 @@ public class DefaultImageDrawer
 		final float[] fill_y = fy.toArray();
 		workspace.getUndoEngine().performAndStore(new MaskedImageAction(building, sel) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
+			protected void performImageAction(BuiltMediumData built) {
 				
 				built.doOnGC((gc) -> {					
 					gc.setColor(color);
@@ -656,7 +656,7 @@ public class DefaultImageDrawer
 		
 		ue.performAndStore(new MaskedImageAction(building, selection) {
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
+			protected void performImageAction(BuiltMediumData built) {
 				clearUnderSelection(built, selection);
 			}
 			@Override
@@ -668,7 +668,7 @@ public class DefaultImageDrawer
 		return lifted.get();
 	}
 	
-	private void clearUnderSelection( ABuiltMediumData built, SelectionMask selection) {
+	private void clearUnderSelection( BuiltMediumData built, SelectionMask selection) {
 		if( selection == null)
 			built.doOnGC((gc) -> gc.clear());
 		else {
@@ -691,7 +691,7 @@ public class DefaultImageDrawer
 		
 		undoEngine.performAndStore( new ImageAction(building) { 
 			@Override
-			protected void performImageAction(ABuiltMediumData built) {
+			protected void performImageAction(BuiltMediumData built) {
 				built.doOnGC((gc) ->  {
 					gc.transform(trans);
 					gc.drawImage( lifted.readonlyAccess(), 0, 0);
