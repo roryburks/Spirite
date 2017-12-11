@@ -28,7 +28,7 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevFill;
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.hybrid.HybridHelper;
 
 import java.io.File;

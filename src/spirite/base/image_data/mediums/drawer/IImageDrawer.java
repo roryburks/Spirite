@@ -9,6 +9,7 @@ import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
 
@@ -30,7 +31,7 @@ public interface IImageDrawer {
 		//public boolean strokeIsDrawing();	// SHOULD be true iff getStrokeEngine = null
 		public StrokeEngine getStrokeEngine();
 		public boolean canDoStroke( StrokeEngine.Method method);	// EG: some Drawers might be able to erase, but not draw
-		public boolean startStroke( StrokeEngine.StrokeParams params, PenState ps);
+		public boolean startStroke(StrokeParams params, PenState ps);
 		public void stepStroke( PenState ps);
 		public void endStroke();
 	}

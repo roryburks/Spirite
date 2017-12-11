@@ -1,14 +1,11 @@
 package spirite.base.pen
 
-import spirite.base.brains.tools.ToolSchemes
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.ABuiltMediumData
 import spirite.base.image_data.selection.SelectionMask
-import spirite.base.pen.PenTraits.PenDynamics
 import spirite.base.pen.PenTraits.PenState
-import spirite.base.util.Colors
 import spirite.base.util.MUtil
 import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
@@ -39,8 +36,7 @@ abstract class StrokeEngine {
     protected var prec = ArrayList<PenState>()    // Recording of raw states
 
     // Context
-    // :::: Get's
-    var params: StrokeEngine.StrokeParams? = null
+    var params: StrokeParams? = null
         protected set
     var imageData: BuildingMediumData? = null
         protected set
@@ -54,7 +50,7 @@ abstract class StrokeEngine {
      * Could possibly combine them into a single class  */
     val history: Array<PenState>
         get() {
-            val array = arrayOfNulls<PenState>(prec.size)
+            //val array = arrayOfNulls<PenState>(prec.size)
             return prec.toTypedArray()
         }
 
@@ -139,7 +135,7 @@ abstract class StrokeEngine {
             drawToLayer(DrawPoints(
                     floatArrayOf(ps.x),
                     floatArrayOf(ps.y),
-                    floatArrayOf(params.getDynamics().getSize(ps))),
+                    floatArrayOf(params.dynamics.getSize(ps))),
                     false, built)
 
             changed.set(true)
@@ -166,8 +162,8 @@ abstract class StrokeEngine {
     }
 
     private fun buildInterpolator(params: StrokeParams, ps: PenState) {
-        when (params.getInterpolationMethod()) {
-            StrokeEngine.StrokeParams.InterpolationMethod.CUBIC_SPLINE -> _interpolator = CubicSplineInterpolator2D(null, true)
+        when (params.interpolationMethod) {
+            StrokeParams.InterpolationMethod.CUBIC_SPLINE -> _interpolator = CubicSplineInterpolator2D(null, true)
             else -> _interpolator = null
         }
         if (_interpolator != null) _interpolator!!.addPoint(ps.x, ps.y)
@@ -261,145 +257,14 @@ abstract class StrokeEngine {
         val oldAlpha = gc.alpha
         val oldComp = gc.composite
 
-        when (params!!.getMethod()) {
-            StrokeEngine.Method.BASIC, StrokeEngine.Method.PIXEL -> gc.setComposite(Composite.SRC_OVER, params!!.getAlpha())
-            StrokeEngine.Method.ERASE -> gc.setComposite(Composite.DST_OUT, params!!.getAlpha())
+        when (params!!.method) {
+            StrokeEngine.Method.BASIC, StrokeEngine.Method.PIXEL -> gc.setComposite(Composite.SRC_OVER, params!!.alpha)
+            StrokeEngine.Method.ERASE -> gc.setComposite(Composite.DST_OUT, params!!.alpha)
         }
         drawDisplayLayer(gc)
         gc.setComposite(oldComp, oldAlpha)
     }
 
-
-    /**
-     * StrokeParams define the style/tool/options of the Stroke.
-     *
-     * lock is not actually used yet, but changing data mid-stroke is a
-     * bar idea.
-     */
-    class StrokeParams {
-
-
-        private var c = Colors.BLACK
-        private var method: StrokeEngine.Method = StrokeEngine.Method.BASIC
-        private var mode: ToolSchemes.PenDrawMode = ToolSchemes.PenDrawMode.NORMAL
-        private var width = 1.0f
-        private var alpha = 1.0f
-        private var hard = false
-        private var dynamics = PenDynamicsConstants.getBasicDynamics()
-        var maxWidth = 25
-            set(width) {
-                if (!isLocked) field = width
-            }
-        private var interpolationMethod = InterpolationMethod.CUBIC_SPLINE
-
-
-        /** If Params are locked, they're being used and can't be changed.
-         * Only the base StrokeEngine can lock/unlock Params.  Once they are
-         * locked they will usually never be unlocked as the UndoEngine needs
-         * to remember the saved settings.
-         */
-        val isLocked = false
-
-        var color: Int
-            get() = c
-            set(c) {
-                if (!isLocked)
-                    this.c = c
-            }
-
-        var isHard: Boolean
-            get() = hard
-            set(hard) {
-                if (!isLocked)
-                    this.hard = hard
-            }
-
-        enum class InterpolationMethod {
-            NONE,
-            CUBIC_SPLINE
-        }
-
-        fun getMethod(): StrokeEngine.Method {
-            return method
-        }
-
-        fun setMethod(method: StrokeEngine.Method) {
-            if (!isLocked)
-                this.method = method
-        }
-
-        fun getMode(): ToolSchemes.PenDrawMode {
-            return mode
-        }
-
-        fun setMode(mode: ToolSchemes.PenDrawMode) {
-            if (!isLocked)
-                this.mode = mode
-        }
-
-        fun getWidth(): Float {
-            return width
-        }
-
-        fun setWidth(width: Float) {
-            if (!isLocked)
-                this.width = width
-        }
-
-        fun getAlpha(): Float {
-            return alpha
-        }
-
-        fun setAlpha(alpha: Float) {
-            if (!isLocked)
-                this.alpha = Math.max(0.0f, Math.min(1.0f, alpha))
-        }
-
-        fun getDynamics(): PenDynamics {
-            return dynamics
-        }
-
-        fun setDynamics(dynamics: PenDynamics?) {
-            if (!isLocked && dynamics != null)
-                this.dynamics = dynamics
-        }
-
-        fun getInterpolationMethod(): InterpolationMethod {
-            return this.interpolationMethod
-        }
-
-        fun setInterpolationMethod(method: InterpolationMethod) {
-            if (!isLocked) this.interpolationMethod = method
-        }
-
-        companion object {
-
-
-            /**
-             * Bakes the PenDynamics of the original StrokeParameters and bakes its dynamics
-             * in-place over the given penStates, returning an equivalent StrokeParams, but
-             * with Linear Dynamics
-             */
-            fun bakeAndNormalize(original: StrokeParams, penStates: Array<PenState>): StrokeParams {
-                val out = StrokeParams()
-                out.alpha = original.alpha
-                out.c = original.c
-                out.dynamics = PenDynamicsConstants.LinearDynamics()
-                out.hard = original.hard
-                out.interpolationMethod = original.interpolationMethod
-                out.method = original.method
-                out.mode = original.mode
-                out.width = original.width
-
-                for (i in penStates.indices) {
-                    penStates[i] = PenState(penStates[i].x, penStates[i].y,
-                            original.getDynamics().getSize(penStates[i]))
-                }
-
-                return out
-            }
-        }
-    }
 
     companion object {
 
@@ -414,7 +279,7 @@ abstract class StrokeEngine {
                 if (penStates.size == 0)
                     return DrawPoints(FloatArray(0), FloatArray(0), FloatArray(0))
                 if (penStates.size == 1)
-                    return DrawPoints(floatArrayOf(penStates[0].x), floatArrayOf(penStates[0].y), floatArrayOf(params!!.getDynamics().getSize(penStates[0])))
+                    return DrawPoints(floatArrayOf(penStates[0].x), floatArrayOf(penStates[0].y), floatArrayOf(params!!.dynamics.getSize(penStates[0])))
                 val fcx = FloatCompactor()
                 val fcy = FloatCompactor()
                 val fcw = FloatCompactor()
@@ -424,7 +289,7 @@ abstract class StrokeEngine {
                 buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
                 fcx.add(ip.x)
                 fcy.add(ip.y)
-                fcw.add(params!!.getDynamics().getSize(buff))
+                fcw.add(params!!.dynamics.getSize(buff))
 
                 while (localInterpos + DIFF < localInterpolator.curveLength) {
                     localInterpos += DIFF.toFloat()
@@ -433,7 +298,7 @@ abstract class StrokeEngine {
                     buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
                     fcx.add(ip.x)
                     fcy.add(ip.y)
-                    fcw.add(params.getDynamics().getSize(buff))
+                    fcw.add(params.dynamics.getSize(buff))
                 }
 
                 return DrawPoints(fcx.toArray(), fcy.toArray(), fcw.toArray())
@@ -444,7 +309,7 @@ abstract class StrokeEngine {
                 for (i in penStates.indices) {
                     xs[i] = penStates[i].x
                     ys[i] = penStates[i].y
-                    ws[i] = params!!.getDynamics().getSize(penStates[i])
+                    ws[i] = params!!.dynamics.getSize(penStates[i])
                 }
                 return DrawPoints(xs, ys, ws)
             }
@@ -458,7 +323,7 @@ abstract class StrokeEngine {
                 if (penStates.size == 0)
                     return IndexedDrawPoints(FloatArray(0), FloatArray(0), FloatArray(0), FloatArray(0))
                 if (penStates.size == 1)
-                    return IndexedDrawPoints(floatArrayOf(penStates[0].x), floatArrayOf(penStates[0].y), floatArrayOf(params.getDynamics().getSize(penStates[0])), floatArrayOf(0.0f))
+                    return IndexedDrawPoints(floatArrayOf(penStates[0].x), floatArrayOf(penStates[0].y), floatArrayOf(params.dynamics.getSize(penStates[0])), floatArrayOf(0.0f))
                 val fcx = FloatCompactor()
                 val fcy = FloatCompactor()
                 val fcw = FloatCompactor()
@@ -469,7 +334,7 @@ abstract class StrokeEngine {
                 buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
                 fcx.add(ip.x)
                 fcy.add(ip.y)
-                fcw.add(params.getDynamics().getSize(buff))
+                fcw.add(params.dynamics.getSize(buff))
                 fct.add(ip.left + ip.lerp)
 
                 while (localInterpos + DIFF < localInterpolator.curveLength) {
@@ -479,7 +344,7 @@ abstract class StrokeEngine {
                     buff = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp).toFloat())
                     fcx.add(ip.x)
                     fcy.add(ip.y)
-                    fcw.add(params.getDynamics().getSize(buff))
+                    fcw.add(params.dynamics.getSize(buff))
                     fct.add(ip.left + ip.lerp)
                 }
 
@@ -492,7 +357,7 @@ abstract class StrokeEngine {
                 for (i in penStates.indices) {
                     xs[i] = penStates[i].x
                     ys[i] = penStates[i].y
-                    ws[i] = params.getDynamics().getSize(penStates[i])
+                    ws[i] = params.dynamics.getSize(penStates[i])
                     ts[i] = i.toFloat()
                 }
                 return IndexedDrawPoints(xs, ys, ws, ts)

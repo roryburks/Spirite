@@ -34,7 +34,7 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment;
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.MDebug;

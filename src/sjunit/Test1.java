@@ -25,6 +25,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IFlipModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.Colors;
 import spirite.base.util.linear.Rect;
 import spirite.hybrid.HybridHelper;
@@ -261,7 +262,7 @@ public class Test1 {
 						 rn.nextFloat());
 			}
 			
-			StrokeEngine.StrokeParams params = new StrokeEngine.StrokeParams();
+			StrokeParams params = new StrokeParams();
 			
 			params.setAlpha( rn.nextFloat());
 			params.setMethod((random == 3)?StrokeEngine.Method.BASIC:StrokeEngine.Method.ERASE);

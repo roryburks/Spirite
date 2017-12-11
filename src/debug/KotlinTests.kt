@@ -73,3 +73,36 @@ class k002_B {
 }
 
 // endregion
+
+// region Test3
+
+fun k003_testDelegates() {
+    var a = k003_A()
+
+    a.pass = "test"
+    System.out.println(a.pass)
+    a.locked = true
+    a.pass = " bad"
+    System.out.println(a.pass)
+}
+class k003_A {
+    var pass : String by LockingDelegate("")
+
+
+    var locked = false
+
+    inner class LockingDelegate<T> (
+            var field: T
+    ){
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+            return field
+        }
+
+        operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
+            if( !locked)
+                field = newValue
+        }
+    }
+}
+
+// endregion

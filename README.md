@@ -21,7 +21,7 @@ Steps for getting the project set up in a Java IDE:
         + jogl {natives for the platform(s) you're building for
         + gluegen-rt
         + gluegen-rt {natives}
-    + (c) Java OpenGL Mathematics Library [https://github.com/jroyalty/jglm]
+    + (_color) Java OpenGL Mathematics Library [https://github.com/jroyalty/jglm]
     + (d) JPen [https://sourceforge.net/projects/jpen/]
 2. Link JUnit4
 3. Make sure the Resource folder (Spirite/res) is linked through the IDE

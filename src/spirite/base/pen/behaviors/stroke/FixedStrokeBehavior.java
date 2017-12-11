@@ -6,7 +6,7 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.Penner;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.base.pen.behaviors.DrawnStateBehavior;
 import spirite.hybrid.HybridHelper;
 

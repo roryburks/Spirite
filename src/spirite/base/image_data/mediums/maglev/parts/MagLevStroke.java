@@ -10,7 +10,7 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.IndexedDrawPoints;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.interpolation.CubicSplineInterpolator2D;
 import spirite.base.util.interpolation.Interpolator2D;
 

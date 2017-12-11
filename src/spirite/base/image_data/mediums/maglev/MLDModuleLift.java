@@ -37,11 +37,11 @@ public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 	@Override
 	public void anchorLifted(ALiftedData lifted, MatTrans trans) {
 		MaglevLiftedData mlift = (MaglevLiftedData)lifted;
-		trans.translate(-mlift.iox, -mlift.ioy);
+		trans.translate(-mlift.getIox(), -mlift.getIoy());
 
 		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
 		undoEngine.doAsAggregateAction(() -> {
-			for( AMagLevThing thing : mlift.medium.getThings()) {
+			for( AMagLevThing thing : mlift.getMedium().getThings()) {
 				thing.transform(trans);
 				
 

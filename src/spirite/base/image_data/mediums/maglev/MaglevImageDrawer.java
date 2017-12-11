@@ -19,7 +19,7 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.DrawPoints;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;

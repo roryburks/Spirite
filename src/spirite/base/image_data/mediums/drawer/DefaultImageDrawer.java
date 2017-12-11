@@ -25,13 +25,12 @@ import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeEngine.STATE;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Vec2;
-import spirite.base.util.linear.Vec2i;
 import spirite.hybrid.DirectDrawer;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -498,12 +497,12 @@ public class DefaultImageDrawer
 	}
 	public class StrokeAction extends MaskedImageAction {
 		private final PenState[] points;
-		private final StrokeEngine.StrokeParams params;
+		private final StrokeParams params;
 		private final StrokeEngine engine;
 		
 		StrokeAction( 
 				StrokeEngine engine,
-				StrokeEngine.StrokeParams params, 
+				StrokeParams params,
 				PenState[] points, 
 				SelectionMask mask, 
 				BuildingMediumData data)
@@ -526,7 +525,7 @@ public class DefaultImageDrawer
 			}
 		}
 		
-		public StrokeEngine.StrokeParams getParams() {
+		public StrokeParams getParams() {
 			return params;
 		}
 		

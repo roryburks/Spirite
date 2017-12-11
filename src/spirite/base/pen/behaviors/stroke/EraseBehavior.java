@@ -5,7 +5,7 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 
 public class EraseBehavior {
 	public static class Stroke extends StrokeBehavior {
@@ -33,7 +33,7 @@ public class EraseBehavior {
 	
 	private static StrokeParams _makeStroke(ToolsetManager toolsetManager) {
 		ToolSettings settings = toolsetManager.getToolSettings(Tool.ERASER);
-		StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
+		StrokeParams stroke = new StrokeParams();
 		stroke.setMethod( StrokeEngine.Method.ERASE);
 		stroke.setWidth((float)settings.getValue("width"));
 		stroke.setHard((Boolean)settings.getValue("hard"));

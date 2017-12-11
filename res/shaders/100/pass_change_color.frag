@@ -27,13 +27,13 @@ void main()
 	if( premult)
 		checkCol /= texCol.a;
 
-	int mode = optionMask & 3;
+	int _mode = optionMask & 3;
 
-	if( mode == 2 ||
+	if( _mode == 2 ||
 		(distance(cFrom.r , checkCol.r) < thresh &&
 		distance(cFrom.g , checkCol.g) < thresh &&
 		distance(cFrom.b , checkCol.b) < thresh &&
-		(mode == 1 || distance(cFrom.a , texCol.a) < thresh) )) {
+		(_mode == 1 || distance(cFrom.a , texCol.a) < thresh) )) {
 		gl_FragColor.rgb = (premult)?cTo.rgb * texCol.a:cTo.rgb;
 	}
 	else

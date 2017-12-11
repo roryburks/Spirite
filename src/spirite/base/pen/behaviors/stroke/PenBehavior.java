@@ -5,8 +5,7 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.brains.tools.ToolSchemes;
 import spirite.base.pen.Penner;
-import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.StrokeParams;
+import spirite.base.pen.StrokeParams;
 
 public class PenBehavior  {
 	public static class Stroke extends StrokeBehavior {
@@ -39,7 +38,7 @@ public class PenBehavior  {
 
 	private static StrokeParams _makeStroke(ToolsetManager toolsetManager, int color) {
 		ToolSettings settings = toolsetManager.getToolSettings(Tool.PEN);
-		StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
+		StrokeParams stroke = new StrokeParams();
 		stroke.setColor( color);
 		stroke.setMode((ToolSchemes.PenDrawMode)settings.getValue("mode"));
 		stroke.setWidth((float)settings.getValue("width"));

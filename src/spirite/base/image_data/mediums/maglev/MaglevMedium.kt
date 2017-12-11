@@ -52,7 +52,7 @@ class MaglevMedium  (
     private var isBuilt = false
 
     private var workingId = 0
-    internal var building = false
+    var building = false; private set
 
     private constructor(other: MaglevMedium) : this( other.context, null) {
         this.things = MutableList( other.things.size, { other.things.get(it).clone()})
@@ -95,18 +95,21 @@ class MaglevMedium  (
 
     // ==== Easy Junk
     override fun getWidth(): Int {
+        Build()
         return if (isBuilt) builtImage!!.width else context!!.width
     }
 
     override fun getHeight(): Int {
+        Build()
         return if (isBuilt) builtImage!!.height else context!!.height
     }
 
     override fun getDynamicX(): Int {
-        return if (isBuilt) builtImage!!.xOffset else 0
+        Build()
+        return builtImage!!.xOffset
     }
-
     override fun getDynamicY(): Int {
+        Build()
         return if (isBuilt) builtImage!!.yOffset else 0
     }
 
@@ -136,37 +139,29 @@ class MaglevMedium  (
     }
 
     override fun flush() {
-        if (builtImage != null)
-            builtImage!!.flush()
+        builtImage?.flush()
         builtImage = null
         isBuilt = false
-        //this.strokes.clear();
     }
 
 
     // ==== Hard Junk
     //internal
     fun splitStroke(strokeId: Int, points: FloatArray) {
-        var index = -1
-        for (i in things.indices) {
-            if (things[i].id == strokeId) {
-                index = i
-                break
-            }
-        }
-
+        val index = things.indices.first { things[it].id == strokeId }
         val stroke = things[index] as MagLevStroke
-        things.removeAt(index)
         val direct = stroke.direct
+
+        things.removeAt(index)
 
 
         // Step 1: Split the Stroke
         val addedStrokes = arrayOfNulls<MagLevStroke>(points.size / 2 + 1)
-        var `in` = true
+        var inStroke = true
         var start = 0f
         var i = 0
-        while (i < points.size || `in`) {
-            if (`in`) {
+        while (i < points.size || inStroke) {
+            if (inStroke) {
                 if (i == points.size && start != (stroke.states.size - 1).toFloat() || i < points.size && points[i] != start) {
                     val states = ArrayList<PenState>()
                     if (start != Math.round(start).toFloat()) {
@@ -203,11 +198,11 @@ class MaglevMedium  (
             } else {
                 start = points[i]
             }
-            `in` = !`in`
+            inStroke = !inStroke
             ++i
         }
 
-        // Step 2: Re-map the Fills
+        // Step 2: Re-map the Fills (todo)
         for (thing in things) {
             (thing as? MagLevFill)?.segments?.removeIf { ss -> ss.strokeId == stroke.id }
         }
@@ -218,14 +213,15 @@ class MaglevMedium  (
         if (!building) {
             building = true
             if (!isBuilt) {
-                builtImage = DynamicImage(context, HybridHelper.createNillImage(), 0, 0)
+                val dyn = DynamicImage(context, HybridHelper.createNillImage(), 0, 0)
 
-                builtImage!!.doOnGC({ gc ->
-                    val built = this.build(BuildingMediumData(context!!.getHandleFor(this), 0, 0))
+                dyn.doOnGC({ gc ->
+                    val built = this.build(BuildingMediumData(context.getHandleFor(this), 0, 0))
                     val mask: SelectionMask? = null
                     for (thing in things)
                         thing.draw(built, mask, gc, this)
                 }, MatTrans())
+                builtImage = dyn
             }
             isBuilt = true
             building = false
@@ -259,11 +255,7 @@ class MaglevMedium  (
     //final int boy;
 
     (building: BuildingMediumData) : ABuiltMediumData(building.handle) {
-        internal var trans: MatTrans
-
-        init {
-            this.trans = building.trans
-        }
+        internal var trans: MatTrans = building.trans
 
         override fun getWidth(): Int {
             return context.width

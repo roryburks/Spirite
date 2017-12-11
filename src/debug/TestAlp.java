@@ -10,7 +10,7 @@ import spirite.base.util.linear.Vec2;
 public class TestAlp {
 
     public static void main(String[] args) {
-    	KotlinTestsKt.k002_testPropertyLev();
+    	KotlinTestsKt.k003_testDelegates();
     }
 
 

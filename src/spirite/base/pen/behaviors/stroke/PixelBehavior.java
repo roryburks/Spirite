@@ -5,8 +5,8 @@ import spirite.base.brains.ToolsetManager.Tool;
 import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.pen.Penner;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.pen.StrokeEngine.StrokeParams;
-import spirite.base.pen.StrokeEngine.StrokeParams.InterpolationMethod;
+import spirite.base.pen.StrokeParams;
+import spirite.base.pen.StrokeParams.InterpolationMethod;
 
 public class PixelBehavior {
 	public static class Stroke extends StrokeBehavior {
@@ -39,7 +39,7 @@ public class PixelBehavior {
 
 	private static StrokeParams _makeStroke(ToolsetManager toolsetManager, int color) {
 		ToolSettings settings = toolsetManager.getToolSettings(Tool.PIXEL);
-		StrokeEngine.StrokeParams stroke = new StrokeEngine.StrokeParams();
+		StrokeParams stroke = new StrokeParams();
 		stroke.setMethod( StrokeEngine.Method.PIXEL);
 		stroke.setAlpha((float)settings.getValue("alpha"));
 		stroke.setHard(true);

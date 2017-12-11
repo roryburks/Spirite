@@ -131,7 +131,7 @@ class GLStrokeEngine extends StrokeEngine {
 		GLImage drawTo = (permanent)?fixedLayer:displayLayer;
 		
 		engine.setTarget(drawTo);
-		_stroke( composeVBuffer(states, built), getParams().isHard()?1:0);
+		_stroke( composeVBuffer(states, built), getParams().getHard()?1:0);
 		
 		if( getParams().getMethod() == Method.BASIC) {
 			GLParameters params = new GLParameters(w, h);
@@ -298,7 +298,7 @@ class GLStrokeEngine extends StrokeEngine {
 //				params.texture = new ;
 				params.addParam( new GLParameters.GLParam1f("uAlpha", 1));
 				engine.applyPrimitiveProgram( ProgramType.POLY_RENDER, params, prims[1]);
-				engine.applyPrimitiveProgram( (getParams().isHard())? ProgramType.STROKE_PIXEL : ProgramType.STROKE_V2_LINE_PASS, params, prims[0]);
+				engine.applyPrimitiveProgram( (getParams().getHard())? ProgramType.STROKE_PIXEL : ProgramType.STROKE_V2_LINE_PASS, params, prims[0]);
 			}
 		}
 		else {

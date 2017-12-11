@@ -256,7 +256,7 @@ public class WorkPanel extends SPanel
 
     // ::: Internal
     /***
-     * Calibrates the Scrollbars to the correct minimum and maximum value
+     * Calibrates the Scrollbars to the correct minimum and maximum field
      * such that you can scroll around the entire image +/- the width of the
      * window (with a little buffer determined by SCREEN_BUFFER)
      */
@@ -311,7 +311,7 @@ public class WorkPanel extends SPanel
 	        jscrollVertical.setValue(( Math.round(py / (float)ratio)));
 	        
 	        // Needed exclusively for when a new image is being created and it
-	        // sets the value to what it already is (thus not triggering the 
+	        // sets the field to what it already is (thus not triggering the
 	        // AdjustmentEvent).
             view.offsetx = -(Math.round(px / (float)ratio))*SCROLL_RATIO;
             view.offsety = -(Math.round(py / (float)ratio))*SCROLL_RATIO;
