@@ -331,6 +331,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			if( bid == null) return null;
 
 			bid.color = paletteManager.getActiveColor(0)&0xFFFFFF;	// BAD?
+			bid.trans.preTranslate(node.getOffsetX(), node.getOffsetY());
 			return layer.getDrawer(bid, mediumData.get(bid.handle.getId()));
 		}
 		else if( node instanceof GroupNode) {

@@ -12,7 +12,9 @@ abstract class BuiltMediumData(
 {
     val handle: MediumHandle = buildingMediumData.handle
     protected val trans: MatTrans = buildingMediumData.trans
-    protected val invTrans by lazy { trans.createInverse()}
+    protected val invTrans by lazy {
+        trans.createInverse()
+    }
 
     abstract val drawTrans: MatTrans
     abstract val drawWidth: Int
