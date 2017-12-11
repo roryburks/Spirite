@@ -32,6 +32,7 @@ class GLStrokeEngine extends StrokeEngine {
 	private GLImage fixedLayer;
 	private GLImage displayLayer;
 	private int w, h;
+	private MatTrans trans;
 	
 	public GLStrokeEngine() {
 	}
@@ -40,9 +41,10 @@ class GLStrokeEngine extends StrokeEngine {
 		super.finalize();
 	}
 	@Override
-	protected void onStart(ABuiltMediumData built) {
-		w = built.getWidth();
-		h = built.getHeight();
+	protected void onStart( MatTrans trans, int w, int h) {
+		this.w = w;
+		this.h = h;
+		this.trans = trans;
 		try {
 			fixedLayer = new GLImage( w, h);
 			displayLayer = new GLImage( w, h);
@@ -124,14 +126,14 @@ class GLStrokeEngine extends StrokeEngine {
 	
 
 	@Override
-	protected boolean drawToLayer(DrawPoints states, boolean permanent, ABuiltMediumData built) {
+	protected boolean drawToLayer(DrawPoints states, boolean permanent) {
 		if( states == null || states.getLength() <= 0)
 			return false;
 		
 		GLImage drawTo = (permanent)?fixedLayer:displayLayer;
 		
 		engine.setTarget(drawTo);
-		_stroke( composeVBuffer(states, built), getParams().getHard()?1:0);
+		_stroke( composeVBuffer(states), getParams().getHard()?1:0);
 		
 		if( getParams().getMethod() == Method.BASIC) {
 			GLParameters params = new GLParameters(w, h);
@@ -227,7 +229,7 @@ class GLStrokeEngine extends StrokeEngine {
 	}
 
 	private final static int BASIC_STRIDE = 3;
-	private GLVBuffer composeVBuffer(  DrawPoints states, ABuiltMediumData built) {
+	private GLVBuffer composeVBuffer(  DrawPoints states) {
 		
 		GLVBuffer vb = new GLVBuffer();
 		
@@ -240,7 +242,7 @@ class GLStrokeEngine extends StrokeEngine {
 			int off = (o++)*BASIC_STRIDE;
 			
 			// x y z w
-			Vec2 xy = built.convert(new Vec2(states.getX()[i], states.getY()[i]));
+			Vec2 xy = trans.transform(new Vec2(states.getX()[i], states.getY()[i]));
 			raw[off+0] = xy.x;
 			raw[off+1] = xy.y;
 			

@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
+import spirite.base.util.linear.MatTrans;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 
@@ -34,9 +35,9 @@ class AWTStrokeEngine extends StrokeEngine{
 	BufferedImage selectionMask;
 	
 	@Override
-	protected void onStart(ABuiltMediumData built) {
-		int w = built.getWidth();
-		int h = built.getHeight();
+	protected void onStart(MatTrans trans, int width, int height) {
+		int w = width;
+		int h = height;
 		
 		displayLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
 		fixedLayer = new BufferedImage( w, h, HybridHelper.BI_FORMAT);
@@ -73,7 +74,7 @@ class AWTStrokeEngine extends StrokeEngine{
 	}
 	
 	@Override
-	protected boolean drawToLayer(DrawPoints states, boolean permanent, ABuiltMediumData built) {
+	protected boolean drawToLayer(DrawPoints states, boolean permanent) {
 		BufferedImage layer = (permanent)?fixedLayer:displayLayer;
 		
 		Graphics g = layer.getGraphics();

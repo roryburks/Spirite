@@ -11,6 +11,7 @@ import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.interpolation.Interpolator2D.InterpolatedPoint
+import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
@@ -49,9 +50,9 @@ abstract class StrokeEngine {
 
     // =============
     // ==== Abstract Methods
-    protected abstract fun drawToLayer(points: DrawPoints, permanent: Boolean, built: ABuiltMediumData?): Boolean
+    protected abstract fun onStart(trans: MatTrans, w: Int, h: Int)
+    protected abstract fun drawToLayer(points: DrawPoints, permanent: Boolean): Boolean
     protected abstract fun prepareDisplayLayer()
-    protected abstract fun onStart(built: ABuiltMediumData)
     protected abstract fun onEnd()
     protected abstract fun drawDisplayLayer(gc: GraphicsContext)
 
@@ -128,7 +129,7 @@ abstract class StrokeEngine {
                     floatArrayOf(ps.x),
                     floatArrayOf(ps.y),
                     floatArrayOf(params.dynamics.getSize(ps))),
-                    false, built)
+                    false)
 
             changed.set(true)
         }
@@ -148,7 +149,7 @@ abstract class StrokeEngine {
 
 
         lastSelection = selection
-        onStart(built)
+        onStart(built.screenToImageTransform, built.width, built.height)
         prepareDisplayLayer()
         return true
     }
@@ -184,7 +185,7 @@ abstract class StrokeEngine {
                     _interpolator!!.addPoint(rawX, rawY)
 
                 prepareDisplayLayer()
-                changed.set(this.drawToLayer(buildPoints(_interpolator, prec, params), false, built))
+                changed.set(this.drawToLayer(buildPoints(_interpolator, prec, params), false))
             }
 
             oldX = newX
@@ -228,7 +229,7 @@ abstract class StrokeEngine {
             }
         }
 
-        this.drawToLayer(buildPoints(_interpolator, Arrays.asList(*points), this.params), false, builtImage)
+        this.drawToLayer(buildPoints(_interpolator, Arrays.asList(*points), this.params), false)
 
         builtImage?.doOnRaw { raw -> drawStrokeLayer(raw.graphics) }
 
@@ -238,7 +239,7 @@ abstract class StrokeEngine {
     fun batchDraw(points: DrawPoints, builtImage: ABuiltMediumData?, mask: SelectionMask?) {
         prepareStroke(null, builtImage, mask)
 
-        this.drawToLayer(points, false, builtImage)
+        this.drawToLayer(points, false)
 
         builtImage?.doOnRaw { raw -> drawStrokeLayer(raw.graphics) }
     }
