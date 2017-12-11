@@ -6,7 +6,6 @@ import spirite.base.pen.PenTraits.PenState
 import spirite.base.util.interpolation.CubicSplineInterpolatorND
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.Vec2
-import java.util.*
 
 fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D): MutableList<AMagLevThing> {
 	val x1 = bone.x1

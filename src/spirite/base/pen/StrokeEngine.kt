@@ -16,9 +16,7 @@ import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
-
-import java.util.ArrayList
-import java.util.Arrays
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 abstract class StrokeEngine {

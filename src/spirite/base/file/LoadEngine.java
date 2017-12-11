@@ -289,9 +289,8 @@ public class LoadEngine {
 				
 				List<PrismaticMedium.LImg> loadingList = new ArrayList<>(colorCount);
 				for( int i=0; i<colorCount; ++i) {
-					PrismaticMedium.LImg limg = new PrismaticMedium.LImg();
 
-					limg.color = helper.ra.readInt();
+					int color = helper.ra.readInt();
 					int ox = helper.ra.readShort();
 					int oy = helper.ra.readShort();
 					int imgSize = helper.ra.readInt();
@@ -301,7 +300,8 @@ public class LoadEngine {
 
 					RawImage img = HybridUtil.load(new ByteArrayInputStream(buffer));
 
-					limg.img = new DynamicImage(helper.workspace, img, ox, oy);
+					PrismaticMedium.LImg limg = new PrismaticMedium.LImg( color,
+							new DynamicImage(helper.workspace, img, ox, oy));
 
 					loadingList.add(limg);
 				}

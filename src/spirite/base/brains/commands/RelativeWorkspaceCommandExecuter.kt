@@ -2,32 +2,19 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.MasterControl
 import spirite.base.brains.ToolsetManager.Tool
-import spirite.base.brains.ToolsetManager.ToolSettings
-import spirite.base.image_data.Animation
 import spirite.base.image_data.GroupTree.LayerNode
-import spirite.base.image_data.GroupTree.Node
 import spirite.base.image_data.ImageWorkspace
-import spirite.base.image_data.ReferenceManager
 import spirite.base.image_data.animations.ffa.FFAAnimationState
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation
-import spirite.base.image_data.layers.Layer
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes
-import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IClearModule
-import spirite.base.image_data.mediums.drawer.IImageDrawer.IInvertModule
-import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule
-import spirite.base.image_data.selection.SelectionEngine
-import spirite.base.image_data.selection.SelectionMask
-import spirite.base.pen.Penner
+import spirite.base.image_data.mediums.drawer.IImageDrawer.*
 import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridHelper
 import spirite.hybrid.HybridUtil
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException
-
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 
 /**
  * draw.* Command Executer

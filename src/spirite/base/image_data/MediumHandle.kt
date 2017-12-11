@@ -6,7 +6,6 @@ import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.graphics.IImage
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent
 import spirite.base.image_data.mediums.DynamicMedium
-import spirite.base.image_data.mediums.IMedium
 import spirite.base.image_data.mediums.PrismaticMedium
 import spirite.base.util.linear.MatTrans
 import spirite.hybrid.MDebug

@@ -4,7 +4,6 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.UndoEngine.ImageAction;
-import spirite.base.image_data.mediums.ABuiltMediumData;
 import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.IAnchorLiftModule;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;

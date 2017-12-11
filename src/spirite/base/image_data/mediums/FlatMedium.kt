@@ -1,17 +1,12 @@
 package spirite.base.image_data.mediums
 
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.util.MUtil
 import spirite.base.util.linear.MatTrans
-import spirite.base.util.linear.MatTrans.NoninvertableException
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridUtil
 
 /***

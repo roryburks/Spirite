@@ -1,8 +1,6 @@
 package spirite.base.image_data
 
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle
-import spirite.base.image_data.Animation
-import spirite.base.image_data.AnimationManager
 
 
 abstract class AnimationState( private val context: AnimationManager, private val anim: Animation) {

@@ -1,29 +1,5 @@
 package spirite.pc.ui.panel_layers.anim;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.brains.MasterControl.MWorkspaceObserver;
 import spirite.base.graphics.RenderProperties;
@@ -52,6 +28,16 @@ import spirite.pc.ui.ContextMenus;
 import spirite.pc.ui.components.OmniEye;
 import spirite.pc.ui.dialogs.RenderPropertiesDialog;
 import spirite.pc.ui.panel_layers.anim.dialogs.ResizeLocalLoopDialog;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /***

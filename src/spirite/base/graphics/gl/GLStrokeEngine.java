@@ -147,7 +147,7 @@ class GLStrokeEngine extends StrokeEngine {
 		return true;
 	}
 	
-//	private void _strokeSpore(PenState ps, ABuiltMediumData built) {
+//	private void _strokeSpore(PenState ps, BuiltMediumData built) {
 //		float[] raw = new float[4*13];
 //		float x = ps.x;
 //		float y = ps.y;

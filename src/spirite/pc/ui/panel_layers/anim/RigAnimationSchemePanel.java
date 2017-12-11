@@ -1,18 +1,15 @@
 package spirite.pc.ui.panel_layers.anim;
 
-import java.awt.Color;
-import java.util.List;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Group;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
 import spirite.base.brains.MasterControl;
 import spirite.base.image_data.GroupTree.AnimationNode;
 import spirite.base.image_data.animations.rig.RigAnimation;
 import spirite.base.image_data.layers.SpriteLayer.Part;
 import spirite.gui.hybrid.SPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Group;
+import java.awt.*;
+import java.util.List;
 
 public class RigAnimationSchemePanel extends SPanel {
 	private final MasterControl master;

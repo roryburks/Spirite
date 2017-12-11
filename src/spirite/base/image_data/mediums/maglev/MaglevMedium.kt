@@ -1,12 +1,14 @@
 package spirite.base.image_data.mediums.maglev
 
 import spirite.base.graphics.DynamicImage
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone
-import spirite.base.image_data.mediums.*
+import spirite.base.image_data.mediums.BuiltMediumData
+import spirite.base.image_data.mediums.DoerOnGC
+import spirite.base.image_data.mediums.DoerOnRaw
+import spirite.base.image_data.mediums.IMedium
 import spirite.base.image_data.mediums.drawer.IImageDrawer
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill
 import spirite.base.image_data.mediums.maglev.parts.MagLevStroke
@@ -14,12 +16,8 @@ import spirite.base.image_data.selection.SelectionMask
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.MatTrans
-import spirite.base.util.linear.MatTrans.NoninvertableException
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridHelper
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * A Maglev Internal Image is an image that floats just above the surface,

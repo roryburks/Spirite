@@ -410,12 +410,12 @@ public class SaveEngine implements MWorkspaceObserver {
 
 					for( PrismaticMedium.LImg limg : list) {
 						// [4] : color
-						helper.ra.writeInt(limg.color);
+						helper.ra.writeInt(limg.getColor());
 						// [2, 2] : Dynamic offset X,Y
-						helper.ra.writeShort( limg.img.getXOffset());
-						helper.ra.writeShort( limg.img.getYOffset());
+						helper.ra.writeShort( limg.getImg().getXOffset());
+						helper.ra.writeShort( limg.getImg().getYOffset());
 
-						HybridUtil.savePNG(limg.img.getBase(), bos);
+						HybridUtil.savePNG(limg.getImg().getBase(), bos);
 						// [4] : Size of Image Data
 						helper.ra.writeInt( bos.size());
 						// [x] : Image Data

@@ -1,13 +1,15 @@
 package spirite.base.image_data.animations.ffa
 
-import spirite.base.image_data.AnimationManager
-import spirite.base.image_data.AnimationState
-import java.util.HashMap
 import spirite.base.graphics.RenderProperties
 import spirite.base.graphics.renderer.RenderEngine.RenderMethod
 import spirite.base.graphics.renderer.RenderEngine.TransformedHandle
+import spirite.base.image_data.AnimationManager
+import spirite.base.image_data.AnimationState
 import spirite.base.image_data.animations.ffa.FFALayer.FFAFrame
 import spirite.base.util.MUtil
+import java.util.HashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.List
 
 
 class FFAAnimationState(

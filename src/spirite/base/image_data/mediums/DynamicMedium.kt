@@ -1,7 +1,6 @@
 package spirite.base.image_data.mediums
 
 import spirite.base.graphics.DynamicImage
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.image_data.ImageWorkspace
@@ -9,9 +8,6 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.MatTrans
-import spirite.base.util.linear.MatTrans.NoninvertableException
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridUtil
 
 /***
@@ -87,65 +83,5 @@ class DynamicMedium : IMedium {
         override fun _doOnRaw(doer: DoerOnRaw) {
             image.doOnRaw( doer, trans)
         }
-        /*
-        internal var trans: MatTrans
-        internal var invTrans: MatTrans
-
-        init {
-            this.trans = building.trans
-            try {
-                this.invTrans = trans.createInverse()
-            } catch (e: NoninvertableException) {
-                this.invTrans = MatTrans()
-            }
-
-        }
-
-        override fun getWidth(): Int {
-            return handle.context!!.width
-        }
-
-        override fun getHeight(): Int {
-            return handle.context!!.height
-        }
-
-        override fun convert(p: Vec2): Vec2 {
-            return p
-        }
-
-        override fun getCompositeTransform(): MatTrans {
-            return MatTrans(trans)
-        }
-
-        override fun getScreenToImageTransform(): MatTrans {
-            return MatTrans(invTrans)
-        }
-
-        override fun getBounds(): Rect {
-            return image!!.getDrawBounds(trans)
-        }
-
-        override fun drawBorder(gc: GraphicsContext) {
-            if (handle == null) return
-
-            val oldTrans = gc.transform
-            gc.preTransform(trans)
-            gc.drawRect(image!!.xOffset - 1, image!!.yOffset - 1,
-                    handle.width + 2, handle.height + 2)
-            gc.transform = oldTrans
-        }
-
-        override fun draw(gc: GraphicsContext) {
-            handle.drawLayer(gc, trans)
-        }
-
-
-        override fun _doOnGC(doer: DoerOnGC) {
-            image!!.doOnGC(doer, trans)
-        }
-
-        override fun _doOnRaw(doer: DoerOnRaw) {
-            image!!.doOnRaw(doer, trans)
-        }*/
     }
 }

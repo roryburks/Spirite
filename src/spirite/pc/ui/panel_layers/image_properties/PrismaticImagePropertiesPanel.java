@@ -89,7 +89,7 @@ public class PrismaticImagePropertiesPanel extends SPanel {
 			int dx = 0;
 			int dy = 0;
 			for( int i=0; i<colorLayers.size(); ++i) {
-				g.setColor(new Color(colorLayers.get(i).color));
+				g.setColor(new Color(colorLayers.get(i).getColor()));
 				g.fillRect( dx + 1, dy + 1, 14, 14);
 
 				if( draggingFromIndex == i) {
