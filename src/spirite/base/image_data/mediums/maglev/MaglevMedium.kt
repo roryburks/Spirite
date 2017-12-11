@@ -8,6 +8,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.layers.puppet.BasePuppet.BaseBone
 import spirite.base.image_data.mediums.ABuiltMediumData
 import spirite.base.image_data.mediums.IMedium
+import spirite.base.image_data.mediums.IMedium.InternalImageTypes
 import spirite.base.image_data.mediums.drawer.IImageDrawer
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill
 import spirite.base.image_data.mediums.maglev.parts.MagLevFill.StrokeSegment
@@ -93,25 +94,25 @@ class MaglevMedium  (
         unbuild()
     }
 
-    // ==== Easy Junk
-    override fun getWidth(): Int {
+    override val width: Int get() {
         Build()
         return if (isBuilt) builtImage!!.width else context!!.width
     }
 
-    override fun getHeight(): Int {
+    override val height: Int get() {
         Build()
         return if (isBuilt) builtImage!!.height else context!!.height
     }
 
-    override fun getDynamicX(): Int {
+    override val dynamicX: Int get() {
         Build()
         return builtImage!!.xOffset
     }
-    override fun getDynamicY(): Int {
+    override val dynamicY: Int get() {
         Build()
         return if (isBuilt) builtImage!!.yOffset else 0
     }
+    override val type = IMedium.InternalImageTypes.MAGLEV
 
     override fun build(building: BuildingMediumData): ABuiltMediumData {
         return MaglevBuiltData(building)
@@ -129,9 +130,6 @@ class MaglevMedium  (
         return MaglevMedium(this)
     }
 
-    override fun getType(): IMedium.InternalImageTypes {
-        return IMedium.InternalImageTypes.MAGLEV
-    }
 
     override fun readOnlyAccess(): IImage {
         Build()

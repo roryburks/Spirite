@@ -45,7 +45,7 @@ public class NewLayerDPanel extends SPanel {
 	private MTextFieldNumber tfHeight;
 	private JTextField tfPartName;
 	private JTextField tfPartType;
-	private SComboBox<InternalImageTypes> comboImgType = new SComboBox<>(InternalImageTypes.createableTypes());
+	private SComboBox<InternalImageTypes> comboImgType = new SComboBox<>(InternalImageTypes.Companion.getCreatableTypes());
 	private SLabel lblPartType;
 	private SPanel colorPanelFG;
 	private SPanel colorPanelBG;

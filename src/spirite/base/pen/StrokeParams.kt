@@ -1,13 +1,9 @@
 package spirite.base.pen
 
 import spirite.base.brains.tools.ToolSchemes.PenDrawMode
-import spirite.base.brains.tools.ToolSchemes.PenDrawMode.NORMAL
-import spirite.base.pen.PenTraits.PenDynamics
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.pen.StrokeEngine.Method
-import spirite.base.pen.StrokeEngine.Method.BASIC
 import spirite.base.util.Colors
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
 /**

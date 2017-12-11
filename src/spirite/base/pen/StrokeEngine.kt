@@ -31,33 +31,25 @@ abstract class StrokeEngine {
     protected var rawX: Float = 0f
     protected var rawY: Float = 0f
     protected var rawP: Float = 0f    // Needed to prevent UndoAction from double-tranforming
-    var state = STATE.READY
-        protected set
+
+    var state = STATE.READY; protected set
     protected var prec = ArrayList<PenState>()    // Recording of raw states
 
     // Context
-    var params: StrokeParams? = null
-        protected set
-    var imageData: BuildingMediumData? = null
-        protected set
-    var lastSelection: SelectionMask? = null
-        protected set
+    var params: StrokeParams? = null; protected set
+    var imageData: BuildingMediumData? = null; protected set
+    var lastSelection: SelectionMask? = null; protected set
 
     // Interpolation
     private var _interpolator: Interpolator2D? = null
 
     /** Methods used to record the Stroke so that it can be repeated
      * Could possibly combine them into a single class  */
-    val history: Array<PenState>
-        get() {
-            //val array = arrayOfNulls<PenState>(prec.size)
-            return prec.toTypedArray()
-        }
+    val history: Array<PenState> get() = prec.toTypedArray()
 
     // =============
     // ==== Abstract Methods
     protected abstract fun drawToLayer(points: DrawPoints, permanent: Boolean, built: ABuiltMediumData?): Boolean
-
     protected abstract fun prepareDisplayLayer()
     protected abstract fun onStart(built: ABuiltMediumData)
     protected abstract fun onEnd()
