@@ -96,7 +96,7 @@ public class DefaultImageDrawer
 		_data.doOnBuiltData((built) -> {
 
 			
-			Vec2 p = built.getScreenToSource().transform( new Vec2(x,y));
+			Vec2 p = built.getScreenToComposite().transform( new Vec2(x,y));
 			
 			built.doOnRaw((bi) -> {
 				if( !MUtil.coordInImage( (int)p.x, (int)p.y, bi)) {
@@ -124,7 +124,7 @@ public class DefaultImageDrawer
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
 			protected void performImageAction(BuiltMediumData built) {
-				Vec2 p = built.getScreenToSource().transform( new Vec2(x,y));
+				Vec2 p = built.getScreenToComposite().transform( new Vec2(x,y));
 				if( mask == null) {
 					built.doOnRaw((raw) -> {
 						DirectDrawer.fill( raw, (int)p.x, (int)p.y, color);
@@ -174,7 +174,7 @@ public class DefaultImageDrawer
 
 					// Anchor the lifted image to the real image
 					built.doOnGC((gc) -> {
-						Vec2 p2 = built.getScreenToSource().transform(new Vec2(mask.getOX(),mask.getOY()));
+						Vec2 p2 = built.getScreenToComposite().transform(new Vec2(mask.getOX(),mask.getOY()));
 						gc.drawImage( img_, (int)p2.x, (int)p2.y);
 					});
 				}

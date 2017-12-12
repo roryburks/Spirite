@@ -128,7 +128,7 @@ class FixedFrameAnimationTests {
 
             val ws2 = it.loadEngine.loadWorkspace(tempFile)
 
-            assert(ws2.animationManager.animations.size != 0)
+            assert(ws2.animationManager.animations.isNotEmpty())
             val frames2 = (ws.animationManager.animations[0] as FixedFrameAnimation).layers[0].frames
             assert(frames2.size == 6)
             assert(frames2[0].gapBefore == 1)

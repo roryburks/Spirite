@@ -55,4 +55,9 @@ public class Vec2 {
 	public Vec2 scalar(float f) {
 		return new Vec2( x*f, y*f);
 	}
+
+    @Override
+    public String toString() {
+        return "<"+x + "," + y + ">";
+    }
 }

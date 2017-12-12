@@ -6,6 +6,13 @@ import spirite.base.util.linear.MatTrans
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 
+enum class MediumSpaces {
+    SOURCE,
+    DESTINATION,
+    COMPOSITE,
+    SCREEN
+}
+
 abstract class BuiltMediumData(
     buildingMediumData: BuildingMediumData
 )
@@ -18,6 +25,9 @@ abstract class BuiltMediumData(
 
     val sourceToComposite : MatTrans by lazy { _sourceToComposite}
     val screenToSource : MatTrans by lazy { _screenToSource }
+    val screenToComposite : MatTrans by lazy {
+        compositeToScreen.createInverse()
+    }
     val compositeToScreen : MatTrans by lazy {
         val trans = MatTrans(compositeToSource)
         trans.preConcatenate(sourceToScreen)
@@ -30,6 +40,8 @@ abstract class BuiltMediumData(
     val sourceToScreen: MatTrans by lazy {
         screenToSource.createInverse()
     }
+
+    // val screenToDynamic
 
     protected abstract val _sourceToComposite: MatTrans
     protected abstract val _screenToSource: MatTrans

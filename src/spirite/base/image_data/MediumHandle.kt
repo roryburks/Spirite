@@ -116,7 +116,7 @@ class MediumHandle(
         if (ii is PrismaticMedium) {
             ii.drawBehind(gc, context!!.paletteManager.getActiveColor(0))
         } else
-            gc.drawHandle(this, ii.dynamicX, ii.dynamicY)
+            gc.drawHandle(this, 0, 0)
     }
 
     fun drawInFrontOfStroke(gc: GraphicsContext) {

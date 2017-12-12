@@ -69,19 +69,27 @@ class DynamicMedium : IMedium {
     }
 
     inner class DynamicBuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val _sourceToComposite: MatTrans get() = MatTrans()
-        override val compositeWidth: Int get() = context.width
-        override val compositeHeight: Int get() = context.height
-        override val _screenToSource: MatTrans get() = trans
-        override val sourceWidth: Int get() = image.width
-        override val sourceHeight: Int get() = image.height
+        override val _sourceToComposite: MatTrans get() {
+            val newTrans = MatTrans(trans)
+            newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
+            return newTrans
+        }
+        override val compositeWidth: Int get() {return context.width}
+        override val compositeHeight: Int get() {return context.height}
+        override val _screenToSource: MatTrans get() {
+            val newTrans = MatTrans(trans)
+            newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
+            return newTrans.createInverse()
+        }
+        override val sourceWidth: Int get() {return image.width}
+        override val sourceHeight: Int get() {return image.height}
 
         override fun _doOnGC(doer: DoerOnGC) {
-            image.doOnGC( doer, trans)
+            image.doOnGC( doer, sourceToComposite)
         }
 
         override fun _doOnRaw(doer: DoerOnRaw) {
-            image.doOnRaw( doer, trans)
+            image.doOnRaw( doer, sourceToComposite)
         }
     }
 }
