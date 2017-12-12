@@ -190,10 +190,11 @@ class PrismaticMedium : IMedium {
         private val workingColor: Int = building.color
 
         override val _sourceToComposite: MatTrans get() = MatTrans()
+        override val _screenToSource: MatTrans get() = trans
+
         override val compositeWidth: Int get() = context.width
         override val compositeHeight: Int get() = context.height
 
-        override val _screenToSource: MatTrans get() = trans
         override val sourceWidth: Int get() = width
         override val sourceHeight: Int get() = height
 

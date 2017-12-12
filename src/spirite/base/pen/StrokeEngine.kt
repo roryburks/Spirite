@@ -165,7 +165,7 @@ abstract class StrokeEngine {
         val changed = AtomicReference(false)
         imageData!!.doOnBuiltData { built ->
 
-            val layerSpace = built!!.screenToComposite.transform(Vec2(ps.x, ps.y))
+            val layerSpace = built.screenToComposite.transform(Vec2(ps.x, ps.y))
             newX = layerSpace.x
             newY = layerSpace.y
             newP = ps.pressure

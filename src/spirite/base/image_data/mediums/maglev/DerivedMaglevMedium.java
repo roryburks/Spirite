@@ -5,10 +5,7 @@ import spirite.base.graphics.DynamicImage;
 import spirite.base.graphics.IImage;
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.layers.puppet.BasePuppet;
-import spirite.base.image_data.mediums.BuiltMediumData;
-import spirite.base.image_data.mediums.DoerOnGC;
-import spirite.base.image_data.mediums.DoerOnRaw;
-import spirite.base.image_data.mediums.IMedium;
+import spirite.base.image_data.mediums.*;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.interpolation.Interpolator2D;
 import spirite.base.util.linear.MatTrans;
@@ -116,7 +113,9 @@ public class DerivedMaglevMedium
 
 		@NotNull
 		@Override
-		public MatTrans get_sourceToComposite() {return base.getSourceToComposite();}
+		public MatTrans get_sourceToComposite() {
+			return base.getSourceToComposite();
+		}
 
 		@Override
 		public int getCompositeWidth() {

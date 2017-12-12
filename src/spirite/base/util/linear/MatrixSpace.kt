@@ -1,24 +1,24 @@
 package spirite.base.util.linear
 
-import com.hackoeur.jglm.Mat
 import java.util.*
 
 /**
  * A MatrixSpace is a collection of Spaces and Matrices defining how to convert from one Space to another.  A connected
  * graph of transformations is given and all other transformations are calculated and cached as requested.
  */
-class MatrixSpace<T : Enum<T>>(
-        private val eclass: Class<T>,
-        map: Map<Pair<T,T>, MatTrans>
+class MatrixSpace(
+        map: Map<Pair<String,String>, MatTrans>
 )
 {
-    private val map = mutableMapOf<Pair<T,T>,MatTrans>()
+    private val map = mutableMapOf<Pair<String,String>,MatTrans>()
+    private val keys : MutableList<String>
 
     init {
         this.map.putAll(map)
+        keys = (map.keys.map { it.first } union map.keys.map{it.second}).distinct().toMutableList()
     }
 
-    fun convertSpace( from: T, to: T):MatTrans {
+    fun convertSpace( from: String, to: String):MatTrans {
         if( from == to)
             return MatTrans()
 
@@ -33,7 +33,7 @@ class MatrixSpace<T : Enum<T>>(
         }
 
         // Bredth-first search for a link
-        val remaining = eclass.enumConstants.filter { it != from }
+        val remaining = keys.filter { it != from }
         val recurseQueue = LinkedList<MapNavigationState>()
         recurseQueue.add(
                 MapNavigationState(from,remaining.toMutableList())
@@ -76,8 +76,8 @@ class MatrixSpace<T : Enum<T>>(
     }
 
     private inner class MapNavigationState(
-            val current : T,
-            val remaining : MutableList<T>,
+            val current : String,
+            val remaining : MutableList<String>,
             val transform : MatTrans = MatTrans()
     ){}
 }

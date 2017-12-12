@@ -7,34 +7,30 @@ import spirite.base.util.linear.Vec2
 import org.junit.Test as test
 
 class MatrixSpaceTests {
-    private enum class TestSpaces {
-        S1, S2, S3, S4
-    }
 
     @test fun TestConnectedness() {
-        val map = mutableMapOf(
-                Pair(TestSpaces.S1,TestSpaces.S2) to MatTrans.TranslationMatrix(50f,50f),
-                Pair(TestSpaces.S2, TestSpaces.S3) to MatTrans.TranslationMatrix(25f, 25f),
-                Pair(TestSpaces.S1, TestSpaces.S4) to MatTrans.TranslationMatrix(100f, 100f)
+        val map = mapOf(
+                Pair("S1","S2") to MatTrans.TranslationMatrix(50f,50f),
+                Pair("S2", "S3") to MatTrans.TranslationMatrix(25f, 25f),
+                Pair("S1", "S4") to MatTrans.TranslationMatrix(100f, 100f)
         )
 
-        val space = MatrixSpace<TestSpaces>(
-                TestSpaces::class.java,
+        val space = MatrixSpace(
                 map
         )
         var verifyMap = mutableMapOf(
-                Pair(TestSpaces.S1,TestSpaces.S2) to Vec2(50f,50f),
-                Pair(TestSpaces.S1,TestSpaces.S3) to Vec2(75f,75f),
-                Pair(TestSpaces.S1,TestSpaces.S4) to Vec2(100f,100f),
-                Pair(TestSpaces.S2,TestSpaces.S1) to Vec2(-50f,-50f),
-                Pair(TestSpaces.S2,TestSpaces.S3) to Vec2(25f,25f),
-                Pair(TestSpaces.S2,TestSpaces.S4) to Vec2(50f,50f),
-                Pair(TestSpaces.S3,TestSpaces.S1) to Vec2(-75f,-75f),
-                Pair(TestSpaces.S3,TestSpaces.S2) to Vec2(-25f,-25f),
-                Pair(TestSpaces.S3,TestSpaces.S4) to Vec2(25f,25f),
-                Pair(TestSpaces.S4,TestSpaces.S1) to Vec2(-100f,-100f),
-                Pair(TestSpaces.S4,TestSpaces.S2) to Vec2(-50f,-50f),
-                Pair(TestSpaces.S4,TestSpaces.S3) to Vec2(-25f,-25f)
+                Pair("S1","S2") to Vec2(50f,50f),
+                Pair("S1","S3") to Vec2(75f,75f),
+                Pair("S1","S4") to Vec2(100f,100f),
+                Pair("S2","S1") to Vec2(-50f,-50f),
+                Pair("S2","S3") to Vec2(25f,25f),
+                Pair("S2","S4") to Vec2(50f,50f),
+                Pair("S3","S1") to Vec2(-75f,-75f),
+                Pair("S3","S2") to Vec2(-25f,-25f),
+                Pair("S3","S4") to Vec2(25f,25f),
+                Pair("S4","S1") to Vec2(-100f,-100f),
+                Pair("S4","S2") to Vec2(-50f,-50f),
+                Pair("S4","S3") to Vec2(-25f,-25f)
         )
 
         for( entry in verifyMap) {

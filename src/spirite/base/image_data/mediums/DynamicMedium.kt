@@ -74,22 +74,24 @@ class DynamicMedium : IMedium {
             newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
             return newTrans
         }
-        override val compositeWidth: Int get() {return context.width}
-        override val compositeHeight: Int get() {return context.height}
         override val _screenToSource: MatTrans get() {
             val newTrans = MatTrans(trans)
             newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
             return newTrans.createInverse()
         }
+        //override val _sourceToDest: MatTrans get() {return MatTrans()}
+
+        override val compositeWidth: Int get() {return context.width}
+        override val compositeHeight: Int get() {return context.height}
         override val sourceWidth: Int get() {return image.width}
         override val sourceHeight: Int get() {return image.height}
 
         override fun _doOnGC(doer: DoerOnGC) {
-            image.doOnGC( doer, sourceToComposite)
+            //image.doOnGC( doer, matrixSpace.convertSpace(SOURCE,DESTINATION))
         }
 
         override fun _doOnRaw(doer: DoerOnRaw) {
-            image.doOnRaw( doer, sourceToComposite)
+            //image.doOnRaw( doer, matrixSpace.convertSpace(SOURCE,DESTINATION))
         }
     }
 }

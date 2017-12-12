@@ -3,43 +3,39 @@ package spirite.base.image_data.mediums
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.MediumHandle
 import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.MatrixSpace
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
-
-enum class MediumSpaces {
-    SOURCE,
-    DESTINATION,
-    COMPOSITE,
-    SCREEN
-}
 
 abstract class BuiltMediumData(
     buildingMediumData: BuildingMediumData
 )
 {
+    private val SOURCE = "src"
+    private val COMPOSITE = "comp"
+    private val SCREEN = "screen"
+
     val handle: MediumHandle = buildingMediumData.handle
     protected val trans: MatTrans = buildingMediumData.trans
     protected val invTrans by lazy {
         trans.createInverse()
     }
 
-    val sourceToComposite : MatTrans by lazy { _sourceToComposite}
-    val screenToSource : MatTrans by lazy { _screenToSource }
-    val screenToComposite : MatTrans by lazy {
-        compositeToScreen.createInverse()
-    }
-    val compositeToScreen : MatTrans by lazy {
-        val trans = MatTrans(compositeToSource)
-        trans.preConcatenate(sourceToScreen)
-        trans
+    private val matrixSpace by lazy{
+        MatrixSpace(
+            mapOf(
+                    Pair(SOURCE, COMPOSITE) to _sourceToComposite,
+                    Pair( SCREEN, SOURCE) to _screenToSource
+            ))
     }
 
-    val compositeToSource : MatTrans by lazy {
-        sourceToComposite.createInverse()
-    }
-    val sourceToScreen: MatTrans by lazy {
-        screenToSource.createInverse()
-    }
+    val screenToComposite: MatTrans get() {return matrixSpace.convertSpace(SCREEN,COMPOSITE)}
+    val compositeToScreen : MatTrans get() {return matrixSpace.convertSpace(COMPOSITE,SCREEN)}
+    val screenToSource :MatTrans get() {return matrixSpace.convertSpace(SCREEN,SOURCE)}
+    val sourceToScreen:MatTrans get() {return matrixSpace.convertSpace(SOURCE,SCREEN)}
+    val sourceToComposite :MatTrans get() {return matrixSpace.convertSpace(SOURCE,COMPOSITE)}
+    val compositeToSource :MatTrans get() {return matrixSpace.convertSpace(COMPOSITE,SOURCE)}
+
 
     // val screenToDynamic
 

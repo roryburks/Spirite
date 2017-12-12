@@ -248,14 +248,15 @@ class MaglevMedium  (
         }
 
         override val _sourceToComposite: MatTrans get() = MatTrans()
-        override val compositeWidth: Int get() = context.width
-        override val compositeHeight: Int get() = context.height
-
         override val _screenToSource: MatTrans by lazy {
             val strans = MatTrans(trans)
             strans.preTranslate(builtImage!!.xOffset.toFloat(), builtImage!!.yOffset.toFloat())
             strans
         }
+
+        override val compositeWidth: Int get() = context.width
+        override val compositeHeight: Int get() = context.height
+
         override val sourceWidth: Int = builtImage!!.width
         override val sourceHeight: Int = builtImage!!.height
 
