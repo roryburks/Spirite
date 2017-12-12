@@ -65,7 +65,7 @@ abstract class Transform()
     }
 
     override fun toString(): String {
-        return m00.toString() + "\t" + m01 + "\t" + m02 + "\n" + m10 + "\t" + m11 + "\t" + m12 + "\n1\t0\t1"
+        return "$m00\t$m01\t$m02\n$m10\r$m11\t$m12\n0\t0\t1"
     }
 
     companion object {
@@ -77,7 +77,7 @@ abstract class Transform()
         fun ScaleMatrix( scaleX: Float, scaleY: Float): Transform{
             return ImmutableTransform(
                     scaleX, 0f, 0f,
-                    scaleY, 0f, 0f)
+                    0f, scaleY, 0f)
         }
         fun RotationMatrix( theta: Float): Transform {
             val c = cos(theta)
