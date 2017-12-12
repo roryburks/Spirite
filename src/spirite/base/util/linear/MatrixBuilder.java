@@ -25,7 +25,7 @@ public class MatrixBuilder {
 
     /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
      * which can be fed into OpenGL to behave in the expected way. */
-    public static float[] wrapTransformAs4x4( MatTrans trans) {
+    public static float[] wrapTransformAs4x4( Transform trans) {
         return new float[] {
                 (float) trans.getM00(), (float) trans.getM01(),0, (float) trans.getM02(),
                 (float) trans.getM10(), (float) trans.getM11(), 0, (float) trans.getM12(),

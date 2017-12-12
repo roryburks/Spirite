@@ -29,8 +29,8 @@ import spirite.base.pen.behaviors.stroke.EraseBehavior;
 import spirite.base.pen.behaviors.stroke.PenBehavior;
 import spirite.base.pen.behaviors.stroke.PixelBehavior;
 import spirite.base.util.MUtil;
-import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.ui.panel_work.WorkPanel;
 import spirite.pc.ui.panel_work.WorkPanel.View;
@@ -450,8 +450,8 @@ public class Penner
 		
 		if( selectionEngine.isLifted()) {
 			selectionEngine.transformSelection((horizontal)
-					? MatTrans.ScaleMatrix(-1, 1)
-					: MatTrans.ScaleMatrix(1, -1));
+					? Transform.Companion.ScaleMatrix(-1, 1)
+					: Transform.Companion.ScaleMatrix(1, -1));
 		}
 		else if( selected == null) {
 			if( drawer instanceof IFlipModule) {
@@ -463,8 +463,8 @@ public class Penner
 			if( drawer instanceof ILiftSelectionModule) {
 				selectionEngine.attemptLiftData(drawer);
 				selectionEngine.transformSelection((horizontal)
-						? MatTrans.ScaleMatrix(-1, 1)
-						: MatTrans.ScaleMatrix(1, -1));
+						? Transform.Companion.ScaleMatrix(-1, 1)
+						: Transform.Companion.ScaleMatrix(1, -1));
 			}
 			else HybridHelper.beep();
 		}

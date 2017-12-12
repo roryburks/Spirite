@@ -29,7 +29,7 @@ import spirite.base.pen.StrokeParams;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 import spirite.hybrid.DirectDrawer;
 import spirite.hybrid.HybridHelper;
@@ -96,7 +96,7 @@ public class DefaultImageDrawer
 		_data.doOnBuiltData((built) -> {
 
 			
-			Vec2 p = built.getScreenToComposite().transform( new Vec2(x,y));
+			Vec2 p = built.getScreenToComposite().apply( new Vec2(x,y));
 			
 			built.doOnRaw((bi) -> {
 				if( !MUtil.coordInImage( (int)p.x, (int)p.y, bi)) {
@@ -124,7 +124,7 @@ public class DefaultImageDrawer
 		workspace.getUndoEngine().performAndStore( new MaskedImageAction(_data, mask) {
 			@Override
 			protected void performImageAction(BuiltMediumData built) {
-				Vec2 p = built.getScreenToComposite().transform( new Vec2(x,y));
+				Vec2 p = built.getScreenToComposite().apply( new Vec2(x,y));
 				if( mask == null) {
 					built.doOnRaw((raw) -> {
 						DirectDrawer.fill( raw, (int)p.x, (int)p.y, color);
@@ -174,7 +174,7 @@ public class DefaultImageDrawer
 
 					// Anchor the lifted image to the real image
 					built.doOnGC((gc) -> {
-						Vec2 p2 = built.getScreenToComposite().transform(new Vec2(mask.getOX(),mask.getOY()));
+						Vec2 p2 = built.getScreenToComposite().apply(new Vec2(mask.getOX(),mask.getOY()));
 						gc.drawImage( img_, (int)p2.x, (int)p2.y);
 					});
 				}
@@ -210,11 +210,8 @@ public class DefaultImageDrawer
 		SelectionMask sel = selectionEngine.getSelection();
 		
 		if( selectionEngine.isLifted()) {
-			MatTrans trans = new MatTrans();
-			if( horizontal)
-				trans.scale(-1, 1);
-			else
-				trans.scale(1, -1);
+			Transform trans = (horizontal) ? Transform.Companion.ScaleMatrix(-1f,1f)
+					: Transform.Companion.ScaleMatrix(1f,-1f);
 			selectionEngine.transformSelection(trans);
 		}
 		else if( sel == null)
@@ -417,7 +414,7 @@ public class DefaultImageDrawer
 
 	// :::: ITramsformModule
 	@Override
-	public void transform(final MatTrans trans) {
+	public void transform(final Transform trans) {
 
 		ImageWorkspace workspace = building.handle.getContext();
 		SelectionEngine selectionEngine = workspace.getSelectionEngine();
@@ -580,7 +577,7 @@ public class DefaultImageDrawer
 		final ImageWorkspace workspace = building.handle.getContext();
 		int lockedColor = (locked)?workspace.getPaletteManager().getActiveColor(0):0;
 
-		Vec2 start = building.trans.transform(new Vec2(x,y));
+		Vec2 start = building.trans.apply(new Vec2(x,y));
 		int sx= Math.round(start.x);
 		int sy = Math.round(start.y);
 		
@@ -686,7 +683,7 @@ public class DefaultImageDrawer
 	}
 
 	@Override
-	public void anchorLifted(final ALiftedData lifted, final MatTrans trans) {
+	public void anchorLifted(final ALiftedData lifted, final Transform trans) {
 		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
 		
 		undoEngine.performAndStore( new ImageAction(building) { 

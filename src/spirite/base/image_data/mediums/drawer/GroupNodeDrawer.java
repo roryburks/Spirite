@@ -4,7 +4,7 @@ import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.mediums.drawer.IImageDrawer.ITransformModule;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 
 public class GroupNodeDrawer 
 	implements	IImageDrawer,
@@ -17,7 +17,7 @@ public class GroupNodeDrawer
 	}
 
 	@Override
-	public void transform(MatTrans trans) {
+	public void transform(Transform trans) {
 		ImageWorkspace workspace = group.getContext();
 		UndoEngine undoEngine = workspace.getUndoEngine();
 		

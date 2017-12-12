@@ -8,7 +8,7 @@ import spirite.base.image_data.layers.puppet.BasePuppet;
 import spirite.base.image_data.mediums.*;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.interpolation.Interpolator2D;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 
 import java.util.ArrayList;
 
@@ -113,7 +113,7 @@ public class DerivedMaglevMedium
 
 		@NotNull
 		@Override
-		public MatTrans get_sourceToComposite() {
+		public Transform get_sourceToComposite() {
 			return base.getSourceToComposite();
 		}
 
@@ -129,7 +129,7 @@ public class DerivedMaglevMedium
 
 		@NotNull
 		@Override
-		public MatTrans get_screenToSource() {
+		public Transform get_screenToSource() {
 			return base.getScreenToSource();
 		}
 

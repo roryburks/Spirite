@@ -13,8 +13,9 @@ import spirite.base.util.MUtil;
 import spirite.base.util.compaction.FloatCompactor;
 import spirite.base.util.glu.GLC;
 import spirite.base.util.glu.PolygonTesselater;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridUtil;
 
 import java.awt.*;
@@ -34,7 +35,7 @@ public class GLGraphics extends GraphicsContext {
 	private GL2 gl;
 	private int width, height;
 	private boolean flip = false;
-	private MatTrans contextTransform = new MatTrans();
+	private MutableTransform contextTransform = MutableTransform.Companion.IdentityMatrix();
 	private int color = Colors.BLACK;
 	private Composite composite = Composite.SRC_OVER;
 	private float alpha = 1.0f;
@@ -137,18 +138,16 @@ public class GLGraphics extends GraphicsContext {
 	
 	// =================
 	// ==== Logistical Render Settings
-	@Override public MatTrans getTransform() {return new MatTrans(contextTransform);}
-	@Override public void setTransform(MatTrans trans) {
-		if( trans == null) trans = new MatTrans();
-		else trans = new MatTrans(trans);
-		contextTransform = trans;
+	@Override public Transform getTransform() {return contextTransform;}
+	@Override public void setTransform(Transform trans) {
+		contextTransform = (trans == null) ? MutableTransform.Companion.IdentityMatrix() : trans.toMutable();
 	}
 	@Override public void translate(double offsetX, double offsetY) {contextTransform.translate((float)offsetX, (float)offsetY);}
 	@Override public void preTranslate(double offsetX, double offsetY) {contextTransform.preTranslate((float)offsetX, (float)offsetY);}
 	@Override public void scale(double sx, double sy) { contextTransform.scale((float)sx, (float)sy); }
 	@Override public void preScale(double sx, double sy) { contextTransform.preScale((float)sx, (float)sy); }
-	@Override public void transform(MatTrans trans) { contextTransform.concatenate(trans); }
-	@Override public void preTransform( MatTrans trans) {contextTransform.preConcatenate(trans);}
+	@Override public void transform(Transform trans) { contextTransform.concatenate(trans); }
+	@Override public void preTransform( Transform trans) {contextTransform.preConcatenate(trans);}
 	
 	@Override public void setColor(int argb) {
 		this.color = argb;
@@ -403,13 +402,13 @@ public class GLGraphics extends GraphicsContext {
 	
 	// =========
 	// ===== Direct 
-	public void applyPassProgram(ProgramType type,GLParameters params, MatTrans trans)
+	public void applyPassProgram(ProgramType type,GLParameters params, Transform trans)
 	{
 		reset();
 		engine.applyPassProgram(type, params, trans);
 	}
 
-	public void applyPassProgram( ProgramType type, GLParameters params, MatTrans trans,
+	public void applyPassProgram( ProgramType type, GLParameters params, Transform trans,
 			float x1, float y1, float x2, float y2)
 	{
 		reset();
@@ -417,12 +416,12 @@ public class GLGraphics extends GraphicsContext {
 	}
 
 	public void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
-			int numPoints, GLParameters params, MatTrans trans) {
+			int numPoints, GLParameters params, Transform trans) {
 		reset();
 		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans);
 	}
 	public void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
-			int numPoints, GLParameters params, MatTrans trans)  {
+			int numPoints, GLParameters params, Transform trans)  {
 		reset();
 		engine.applyLineProgram(type, xPoints, yPoints, numPoints, params, trans, gl);
 	}

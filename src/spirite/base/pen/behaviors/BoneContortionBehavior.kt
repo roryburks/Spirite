@@ -16,7 +16,7 @@ import spirite.base.util.Colors
 import spirite.base.util.MUtil
 import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.HybridHelper
 
@@ -219,12 +219,11 @@ class BoneContortionBehavior(penner: Penner, val drawer : IBoneDrawer) : DrawnSt
 				val rect = MUtil.rectFromPoints(baseProposedPoints)
 				val center = Vec2( rect.x + rect.width/2f, rect.y + rect.height/2f)
 				
-				val trans = MatTrans()
-				trans.preTranslate(-center.x, -center.y)
+				val trans = MutableTransform.TranslationMatrix(-center.x, -center.y)
 				trans.preScale(scale, scale)
 				trans.preTranslate(center.x, center.y)
 				
-				proposedPoints.map{ trans.transform(it)}
+				proposedPoints.map{ trans.apply(it)}
 				
 			}
 			BoneStretchMode.SCALE_TO_BONE-> {proposedPoints}

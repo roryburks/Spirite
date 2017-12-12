@@ -3,7 +3,7 @@ package spirite.pc.graphics.awt;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.graphics.ImageBI;
 
@@ -34,7 +34,7 @@ class AWTStrokeEngine extends StrokeEngine{
 	BufferedImage selectionMask;
 	
 	@Override
-	protected void onStart(MatTrans trans, int width, int height) {
+	protected void onStart(Transform trans, int width, int height) {
 		int w = width;
 		int h = height;
 		

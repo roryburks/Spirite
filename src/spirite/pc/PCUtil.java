@@ -3,7 +3,8 @@ package spirite.pc;
 import com.jogamp.opengl.GL2;
 import spirite.base.graphics.gl.GLEngine;
 import spirite.base.graphics.gl.GLImage;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.jogl.JOGLCore;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -70,14 +71,14 @@ public class PCUtil {
 	}
 	
 	/** Converts a MatTrans to an AffineTransform */
-	public static AffineTransform toAT( MatTrans trans) {
+	public static AffineTransform toAT( Transform trans) {
 		return new AffineTransform(
 				trans.getM00(), trans.getM10(), trans.getM01(),
 				trans.getM11(), trans.getM02(), trans.getM12());
 	}
 	/** Converts an AffineTransform to a MatTrans */
-	public static MatTrans toMT( AffineTransform trans) {
-		return new MatTrans(
+	public static MutableTransform toMT(AffineTransform trans) {
+		return new MutableTransform(
 				(float)trans.getScaleX(), (float)trans.getShearX(), (float)trans.getTranslateX(),
 				(float)trans.getShearY(), (float)trans.getScaleY(), (float)trans.getTranslateY());
 	}

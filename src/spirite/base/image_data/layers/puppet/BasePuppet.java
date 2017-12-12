@@ -7,7 +7,7 @@ import spirite.base.image_data.ImageWorkspace.BuildingMediumData;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.UndoEngine;
 import spirite.base.image_data.mediums.maglev.MaglevMedium;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
 
@@ -183,7 +183,7 @@ public class BasePuppet implements IPuppet {
 		
 		for( BasePart part : parts) {
 			TransformedHandle th = new TransformedHandle();
-			th.trans = MatTrans.TranslationMatrix(part.ox, part.oy);
+			th.trans = MutableTransform.Companion.TranslationMatrix(part.ox, part.oy);
 			th.handle = part.handle;
 			list.add(th);
 		}

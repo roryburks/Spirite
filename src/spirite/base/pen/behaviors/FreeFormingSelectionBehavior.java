@@ -7,7 +7,7 @@ import spirite.base.pen.Penner;
 import spirite.base.pen.selection_builders.FreeformSelectionBuilder2;
 import spirite.base.util.Colors;
 import spirite.base.util.MUtil;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Vec2i;
 
 public class FreeFormingSelectionBehavior extends DrawnStateBehavior {
@@ -55,7 +55,7 @@ public class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 	}
 	@Override
 	public void paintOverlay(GraphicsContext g) {
-        MatTrans trans = new MatTrans(g.getTransform());
+        MutableTransform trans = g.getTransform().toMutable();
     	g.preTransform(this.penner.view.getViewTransform());
 		g.setColor( Colors.BLACK);
 		builder.draw(g);

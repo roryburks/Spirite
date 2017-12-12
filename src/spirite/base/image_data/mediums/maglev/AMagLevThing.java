@@ -3,7 +3,7 @@ package spirite.base.image_data.mediums.maglev;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.image_data.mediums.BuiltMediumData;
 import spirite.base.image_data.selection.SelectionMask;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 
 public abstract class AMagLevThing {
@@ -24,13 +24,13 @@ public abstract class AMagLevThing {
 	}
 	protected abstract AMagLevThing _clone();
 	
-	public void transform(MatTrans trans) {
+	public void transform(Transform trans) {
 		float[] points = getPoints();
 		
 		if( points == null)return;
 		
 		for( int i=0; i < points.length; i += 2) {
-			Vec2 to = trans.transform(new Vec2(points[i],points[i+1]));
+			Vec2 to = trans.apply(new Vec2(points[i],points[i+1]));
 			points[i] = to.x;
 			points[i+1] = to.y;
 		}

@@ -3,8 +3,8 @@ package debug;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUtessellator;
 import spirite.base.util.glu.PolygonTesselater.GLUTCB;
-import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
+import spirite.base.util.linear.ImmutableTransform;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 
 public class TestAlp {
@@ -209,27 +209,28 @@ public class TestAlp {
     	float ty3 = 47;
     	
     	{
-	    	MatTrans trans = new MatTrans( x3-x2, x2-x1, x1, y3-y2, y2-y1, y1);
-	    	Vec2 p = trans.transform(new Vec2(0,0));
+	    	Transform trans = new ImmutableTransform( x3-x2, x2-x1, x1, y3-y2, y2-y1, y1);
+	    	Vec2 p = trans.apply(new Vec2(0,0));
 	    	System.out.println( p.x + "," + p.y);
-	    	Vec2 p2 = trans.transform(new Vec2(0,1));
+	    	Vec2 p2 = trans.apply(new Vec2(0,1));
 	    	System.out.println( p2.x + "," + p2.y);
-	    	Vec2 p3 = trans.transform(new Vec2(1,1));
+	    	Vec2 p3 = trans.apply(new Vec2(1,1));
 	    	System.out.println( p3.x + "," + p3.y);
     	}
-    	
-    	try {
-			MatTrans trans = MatTrans.ConvertTri(x1, y1, x2, y2, x3, y3, tx1, ty1, tx2, ty2, tx3, ty3);
-
-	    	Vec2 p = trans.transform(new Vec2(14,7));
-	    	System.out.println( p.x + "," + p.y);
-	    	Vec2 p2 = trans.transform(new Vec2(8,46));
-	    	System.out.println( p2.x + "," + p2.y);
-	    	Vec2 p3 = trans.transform(new Vec2(74,34));
-	    	System.out.println( p3.x + "," + p3.y);
-		} catch (NoninvertableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	// TODO (or maybe it's no longer relevant)
+//
+//    	try {
+//			Transform trans = Transform.ConvertTri(x1, y1, x2, y2, x3, y3, tx1, ty1, tx2, ty2, tx3, ty3);
+//
+//	    	Vec2 p = trans.transform(new Vec2(14,7));
+//	    	System.out.println( p.x + "," + p.y);
+//	    	Vec2 p2 = trans.transform(new Vec2(8,46));
+//	    	System.out.println( p2.x + "," + p2.y);
+//	    	Vec2 p3 = trans.transform(new Vec2(74,34));
+//	    	System.out.println( p3.x + "," + p3.y);
+//		} catch (NoninvertableException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     }
 }

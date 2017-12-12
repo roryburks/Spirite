@@ -12,7 +12,7 @@ import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.interpolation.Interpolator2D.InterpolatedPoint
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
@@ -49,7 +49,7 @@ abstract class StrokeEngine {
 
     // =============
     // ==== Abstract Methods
-    protected abstract fun onStart(trans: MatTrans, w: Int, h: Int)
+    protected abstract fun onStart(trans: Transform, w: Int, h: Int)
     protected abstract fun drawToLayer(points: DrawPoints, permanent: Boolean): Boolean
     protected abstract fun prepareDisplayLayer()
     protected abstract fun onEnd()
@@ -107,7 +107,7 @@ abstract class StrokeEngine {
 
             // Starts recording the Pen States
             prec = ArrayList()
-            val layerSpace = built.screenToComposite.transform(Vec2(ps.x, ps.y))
+            val layerSpace = built.screenToComposite.apply(Vec2(ps.x, ps.y))
 
             oldX = layerSpace.x
             oldY = layerSpace.y
@@ -165,7 +165,7 @@ abstract class StrokeEngine {
         val changed = AtomicReference(false)
         imageData!!.doOnBuiltData { built ->
 
-            val layerSpace = built.screenToComposite.transform(Vec2(ps.x, ps.y))
+            val layerSpace = built.screenToComposite.apply(Vec2(ps.x, ps.y))
             newX = layerSpace.x
             newY = layerSpace.y
             newP = ps.pressure

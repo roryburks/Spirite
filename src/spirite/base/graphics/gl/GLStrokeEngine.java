@@ -10,7 +10,7 @@ import spirite.base.pen.DrawPoints;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.Colors;
 import spirite.base.util.glu.GLC;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 import spirite.hybrid.HybridHelper;
 import spirite.pc.PCUtil;
@@ -31,7 +31,7 @@ class GLStrokeEngine extends StrokeEngine {
 	private GLImage fixedLayer;
 	private GLImage displayLayer;
 	private int w, h;
-	private MatTrans trans;
+	private Transform trans;
 	
 	public GLStrokeEngine() {
 	}
@@ -40,7 +40,7 @@ class GLStrokeEngine extends StrokeEngine {
 		super.finalize();
 	}
 	@Override
-	protected void onStart( MatTrans trans, int w, int h) {
+	protected void onStart( Transform trans, int w, int h) {
 		this.w = w;
 		this.h = h;
 		this.trans = trans;
@@ -138,7 +138,7 @@ class GLStrokeEngine extends StrokeEngine {
 			GLParameters params = new GLParameters(w, h);
 			params.texture = drawTo;
 			
-			engine.applyPassProgram(ProgramType.STROKE_AFTERPASS_INTENSIFY, params, new MatTrans(), 
+			engine.applyPassProgram(ProgramType.STROKE_AFTERPASS_INTENSIFY, params, Transform.Companion.getIdentityMatrix(),
 					0, 0, w, h);
 		}
 		
@@ -241,7 +241,7 @@ class GLStrokeEngine extends StrokeEngine {
 			int off = (o++)*BASIC_STRIDE;
 			
 			// x y z w
-			Vec2 xy = trans.transform(new Vec2(states.getX()[i], states.getY()[i]));
+			Vec2 xy = trans.apply(new Vec2(states.getX()[i], states.getY()[i]));
 			raw[off+0] = xy.x;
 			raw[off+1] = xy.y;
 			

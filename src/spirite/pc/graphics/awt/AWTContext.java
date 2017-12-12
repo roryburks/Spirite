@@ -3,7 +3,8 @@ package spirite.pc.graphics.awt;
 import spirite.base.graphics.*;
 import spirite.base.graphics.gl.GLImage;
 import spirite.base.image_data.MediumHandle;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -44,27 +45,27 @@ public class AWTContext extends GraphicsContext {
 
 	// ==========
 	// ==== Simple Pass-through methods
-	@Override public void setTransform(MatTrans trans) { g2.setTransform( PCUtil.toAT(trans)); }
-	@Override public MatTrans getTransform() { return PCUtil.toMT(g2.getTransform()); }
+	@Override public void setTransform(Transform trans) { g2.setTransform( PCUtil.toAT(trans)); }
+	@Override public Transform getTransform() { return PCUtil.toMT(g2.getTransform()); }
 	@Override public void translate(double offsetX, double offsetY) {g2.translate(offsetX, offsetY);}	
 	@Override public void scale(double sx, double sy) { g2.scale(sx, sy);}
-	@Override public void transform(MatTrans trans) {g2.transform( PCUtil.toAT(trans)); }
+	@Override public void transform(Transform trans) {g2.transform( PCUtil.toAT(trans)); }
 	@Override
-	public void preTransform(MatTrans trans) {
-		MatTrans buffer = PCUtil.toMT(g2.getTransform());
+	public void preTransform(Transform trans) {
+		MutableTransform buffer = PCUtil.toMT(g2.getTransform());
 		buffer.preConcatenate(trans);
 		g2.setTransform(PCUtil.toAT(buffer));
 	}
 	@Override
 	public void preTranslate(double offsetX, double offsetY) {
-		MatTrans buffer = PCUtil.toMT(g2.getTransform());
+		MutableTransform buffer = PCUtil.toMT(g2.getTransform());
 		buffer.preTranslate((float)offsetX, (float)offsetY);
 		g2.setTransform(PCUtil.toAT(buffer));
 	}
 
 	@Override
 	public void preScale(double sx, double sy) {
-		MatTrans buffer = PCUtil.toMT(g2.getTransform());
+		MutableTransform buffer = PCUtil.toMT(g2.getTransform());
 		buffer.preScale((float)sx, (float)sy);
 		g2.setTransform(PCUtil.toAT(buffer));
 		

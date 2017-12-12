@@ -3,9 +3,9 @@ package spirite.base.pen.behaviors;
 import spirite.base.graphics.GraphicsContext;
 import spirite.base.pen.Penner;
 import spirite.base.util.Colors;
-import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 
 import java.awt.*;
@@ -29,7 +29,7 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 		// The Calculation Transform is a version of the Locked Transform which has
 		//	all the relevent offsets built-in so that calculation changes in mouse
 		//	movement with respect to the selection's center can be easily performed.
-		private MatTrans calcTrans = new MatTrans();
+		private Transform calcTrans = Transform.Companion.getIdentityMatrix();
 		
 		private int startX, startY;
 		
@@ -69,19 +69,17 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 		// 89AB : NW NE SE SW (rotation)
 		// C : Moving
 		
-		protected MatTrans getWorkingTransform() {
-			MatTrans wTrans = new MatTrans();
-
-			wTrans.preScale(scaleX, scaleY);
+		protected Transform getWorkingTransform() {
+			MutableTransform wTrans = MutableTransform.Companion.ScaleMatrix(scaleX,scaleY);
 			wTrans.preRotate(rotation);
 			wTrans.preTranslate( translateX, translateY);
 			return wTrans;
 		}
 		
-		protected MatTrans calcDisplayTransform() {
+		protected Transform calcDisplayTransform() {
 			float zoom = this.penner.view.getZoom();
-			MatTrans relTrans = new MatTrans();
-			relTrans.preTranslate(-region.width/2, -region.height/2);
+
+			MutableTransform relTrans = MutableTransform.Companion.TranslationMatrix(-region.width/2, -region.height/2);
 			relTrans.preConcatenate(getWorkingTransform());
 			relTrans.preTranslate(region.width/2+region.x, region.height/2+region.y);
 			relTrans.preScale(zoom, zoom);
@@ -98,8 +96,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			
 			float zoom = this.penner.view.getZoom();
 			
-			MatTrans origTrans = gc.getTransform();
-			MatTrans relTrans = calcDisplayTransform();
+			Transform origTrans = gc.getTransform();
+			Transform relTrans = calcDisplayTransform();
 			
 			gc.setTransform(relTrans);
 
@@ -112,12 +110,7 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			gc.setColor(Colors.GRAY);
 //			gc.setStroke(defStroke);
 			
-			Vec2 p = null;
-			try {
-				p = relTrans.inverseTransform(new Vec2(this.penner.rawX,this.penner.rawY));
-			} catch (NoninvertableException e) {
-				e.printStackTrace();
-			}
+			Vec2 p = relTrans.invert().apply(new Vec2(this.penner.rawX,this.penner.rawY));
 			
 			float sw = w*0.3f;	// Width of corner rect
 			float sh = h*0.3f;	// Height
@@ -179,8 +172,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			case READY:
 				break;
 			case RESIZE:{
-				Vec2 pn = calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY));
-				Vec2 ps = calcTrans.transform(new Vec2(startX,startY));
+				Vec2 pn = calcTrans.apply(new Vec2(this.penner.rawX,this.penner.rawY));
+				Vec2 ps = calcTrans.apply(new Vec2(startX,startY));
 
 				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.x/ps.x * oldScaleX;
 				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.y/ps.y * oldScaleY;
@@ -188,8 +181,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				_internetSetScale(sx, sy);
 				break;}
 			case ROTATE:{
-				Vec2 pn = calcTrans.transform(new Vec2(this.penner.rawX,this.penner.rawY));
-				Vec2 ps = calcTrans.transform(new Vec2(startX,startY));
+				Vec2 pn = calcTrans.apply(new Vec2(this.penner.rawX,this.penner.rawY));
+				Vec2 ps = calcTrans.apply(new Vec2(startX,startY));
 
 				
 				
@@ -217,11 +210,7 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				calcTrans = calcDisplayTransform();
 				oldScaleX = scaleX;
 				oldScaleY = scaleY;
-				try {
-					calcTrans = calcTrans.createInverse();
-				} catch (NoninvertableException e) {
-					e.printStackTrace();
-				}
+				calcTrans = calcTrans.invert();
 				break;
 			case ROTATE:
 				startX = this.penner.rawX;
@@ -230,11 +219,7 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				calcTrans = calcDisplayTransform();
 				oldRot = rotation;
 				this.state = TransormStates.ROTATE;
-				try {
-					calcTrans = calcTrans.createInverse();
-				} catch (NoninvertableException e) {
-					e.printStackTrace();
-				}
+				calcTrans = calcTrans.invert();
 				break;
 			default:
 				break;

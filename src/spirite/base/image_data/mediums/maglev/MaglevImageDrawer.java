@@ -22,7 +22,7 @@ import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeParams;
 import spirite.base.util.MUtil;
 import spirite.base.util.interpolation.Interpolator2D;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,7 +115,7 @@ public class MaglevImageDrawer
 
 				mimg.getBuiltImage().doOnGC((gc) -> {
 					stroke._draw(mimg.build(new BuildingMediumData(building.handle, 0, 0)), null, null, mimg, behind);
-				}, new MatTrans());
+				}, Transform.Companion.getIdentityMatrix());
 			}
 			@Override
 			public String getDescription() {
@@ -128,7 +128,7 @@ public class MaglevImageDrawer
 
 	// :::: ITransformModule
 	@Override
-	public void transform(MatTrans trans) {
+	public void transform(Transform trans) {
 		building.handle.getContext().getUndoEngine().performAndStore(new ImageAction(building) {
 			@Override
 			protected void performImageAction(BuiltMediumData built) {
@@ -187,7 +187,7 @@ public class MaglevImageDrawer
 
 				mimg.getBuiltImage().doOnGC((gc) -> {
 					fill._draw(mimg.build(new BuildingMediumData(built.getHandle(), 0, 0)), null, gc, mimg, behind);
-				}, new MatTrans());
+				}, Transform.Companion.getIdentityMatrix());
 				
 			}
 			@Override
@@ -394,7 +394,7 @@ public class MaglevImageDrawer
 	@Override public boolean acceptsLifted(ALiftedData lifted) {
 		return liftModule.acceptsLifted(lifted);
 	}
-	@Override public void anchorLifted(ALiftedData lifted, MatTrans trans) {
+	@Override public void anchorLifted(ALiftedData lifted, Transform trans) {
 		liftModule.anchorLifted(lifted, trans);
 	}
 	@Override public ALiftedData liftSelection(SelectionMask selection) {

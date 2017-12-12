@@ -13,7 +13,8 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevStroke;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.IndexedDrawPoints;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +36,16 @@ public class MLDModuleLift implements ILiftSelectionModule, IAnchorLiftModule
 	}
 
 	@Override
-	public void anchorLifted(ALiftedData lifted, MatTrans trans) {
+	public void anchorLifted(ALiftedData lifted, Transform trans) {
 		MaglevLiftedData mlift = (MaglevLiftedData)lifted;
-		trans.translate(-mlift.getIox(), -mlift.getIoy());
+
+		MutableTransform transform = trans.toMutable();
+		transform.translate(-mlift.getIox(), -mlift.getIoy());
 
 		UndoEngine undoEngine = building.handle.getContext().getUndoEngine();
 		undoEngine.doAsAggregateAction(() -> {
 			for( AMagLevThing thing : mlift.getMedium().getThings()) {
-				thing.transform(trans);
+				thing.transform(transform);
 				
 
 				undoEngine.performAndStore(new ImageAction(building) {

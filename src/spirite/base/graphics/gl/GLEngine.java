@@ -7,9 +7,9 @@ import spirite.base.graphics.JoinMethod;
 import spirite.base.graphics.gl.GLGeom.Primitive;
 import spirite.base.graphics.gl.wrap.GLCore.MGLException;
 import spirite.base.util.glu.GLC;
-import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.MatrixBuilder;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -259,7 +259,7 @@ public class GLEngine  {
 	void applyPassProgram(
 			ProgramType type,
 			GLParameters params, 
-			MatTrans trans)
+			Transform trans)
 	{
 		applyPassProgram( type, params, trans, 0, 0, params.width, params.height);
 	}
@@ -282,8 +282,8 @@ public class GLEngine  {
 	 */
 	void applyPassProgram(
 			ProgramType type, 
-			GLParameters params, 
-			MatTrans trans,
+			GLParameters params,
+			Transform trans,
 			float x1, float y1, float x2, float y2)
 	{
 		addOrtho(params, trans);
@@ -306,7 +306,7 @@ public class GLEngine  {
 	}
 
 	void applyLineProgram( ProgramType type, int[] xPoints, int[] yPoints, 
-			int numPoints, GLParameters params, MatTrans trans) 
+			int numPoints, GLParameters params, Transform trans)
 	{
 		addOrtho(params, trans);
 
@@ -325,7 +325,7 @@ public class GLEngine  {
 	}
 	
 	void applyLineProgram( ProgramType type, float[] xPoints, float[] yPoints, 
-			int numPoints, GLParameters params, MatTrans trans, GL2 gl) 
+			int numPoints, GLParameters params, Transform trans, GL2 gl)
 	{
 		addOrtho(params, trans);
         
@@ -342,9 +342,9 @@ public class GLEngine  {
         params.clearInternalParams();
 	}
 	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim) {
-		applyPrimitiveProgram( type, params, prim, new MatTrans());
+		applyPrimitiveProgram( type, params, prim, Transform.Companion.getIdentityMatrix());
 	}
-	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim, MatTrans trans) {
+	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim, Transform trans) {
 		addOrtho(params, trans);
 //        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
 //        		"perspectiveMatrix", 1, matrix.getBuffer()));
@@ -375,7 +375,7 @@ public class GLEngine  {
 	 */
 	void applyComplexLineProgram(int[] xPoints, int[] yPoints,
 								 int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-								 GLParameters params, MatTrans trans)
+								 GLParameters params, Transform trans)
 	{
 		int size = numPoints+(loop?3:2);
 		float data[] = new float[2*size];
@@ -422,7 +422,7 @@ public class GLEngine  {
 	 */
 	void applyComplexLineProgram( float[] xPoints, float[] yPoints, 
 			int numPoints, CapMethod cap, JoinMethod join, boolean loop, float width,
-			GLParameters params, MatTrans trans) 
+			GLParameters params, Transform trans)
 	{
 		// NOTE: identical code to above but without implicit casting
 		if( xPoints.length < 2) return;
@@ -454,7 +454,7 @@ public class GLEngine  {
 	}
 	
 	private void _doCompliexLineProg( float[] data, int count, CapMethod cap, 
-			JoinMethod join, float width, GLParameters params, MatTrans trans)
+			JoinMethod join, float width, GLParameters params, Transform trans)
 	{
 		GL2 gl = getGL2();
 		addOrtho(params, trans);
@@ -505,7 +505,7 @@ public class GLEngine  {
 			int numPoints,
 			PolyType polyType,
 			GLParameters params,
-			MatTrans trans,
+			Transform trans,
 			GL2 gl) 
 	{
 		addOrtho(params, trans);
@@ -529,8 +529,8 @@ public class GLEngine  {
 			float[] yPoints, 
 			int numPoints, 
 			PolyType polyType,
-			GLParameters params, 
-			MatTrans trans, 
+			GLParameters params,
+			Transform trans,
 			GL2 gl) 
 	{
 		addOrtho(params, trans);
@@ -552,7 +552,7 @@ public class GLEngine  {
 	
 	/** Combines the world MatTrans with an Orthogonal Transform as 
 	 * defined by the parameters to create a 4D Perspective Matrix*/
-	private void addOrtho( GLParameters params, MatTrans trans) {
+	private void addOrtho( GLParameters params, Transform trans) {
 		int x1, y1, x2, y2;
 		if( params.clipRect == null) {
 			x1 = 0; x2 = params.width;

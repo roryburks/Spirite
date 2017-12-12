@@ -9,7 +9,7 @@ import spirite.base.pen.selection_builders.ASelectionBuilder;
 import spirite.base.pen.selection_builders.OvalSelectionBuilder;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 
 public class FormingSelectionBehavior extends DrawnStateBehavior {
 		private final ToolSchemes.BoxSelectionShape shape;
@@ -56,7 +56,7 @@ public class FormingSelectionBehavior extends DrawnStateBehavior {
 		@Override
 		public void paintOverlay(GraphicsContext gc) {
 			if( builder != null) {
-	            MatTrans trans = new MatTrans(gc.getTransform());
+				MutableTransform trans = gc.getTransform().toMutable();
 	        	gc.preTransform(this.penner.view.getViewTransform());
 				gc.setColor( Colors.BLACK);
 				builder.draw(gc);

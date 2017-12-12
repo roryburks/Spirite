@@ -5,8 +5,8 @@ import spirite.base.brains.ToolsetManager.ToolSettings;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.pen.Penner;
 import spirite.base.util.MUtil;
-import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 import spirite.base.util.linear.Vec2i;
 
@@ -16,7 +16,7 @@ public class ReshapingBehavior extends TransformBehavior {
 	}
 	@Override
 	public void start() {
-		this.penner.selectionEngine.proposeTransform(new MatTrans());
+		this.penner.selectionEngine.proposeTransform(Transform.Companion.getIdentityMatrix());
 		setState(TransormStates.READY);
 	}
 	@Override
@@ -46,7 +46,7 @@ public class ReshapingBehavior extends TransformBehavior {
 		}
 		this.region = MUtil.circumscribeTrans(new Rect(0, 0, sel.getWidth(), sel.getHeight()), this.penner.selectionEngine.getLiftedDrawTrans(false));
 		
-		Vec2i d = sel.getDimension();
+		//Vec2i d = sel.getDimension();
 		
 
 		this.penner.selectionEngine.proposeTransform(this.getWorkingTransform());
