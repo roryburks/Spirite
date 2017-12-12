@@ -20,8 +20,9 @@ import spirite.base.image_data.selection.SelectionEngine.MSelectionEngineObserve
 import spirite.base.image_data.selection.SelectionEngine.SelectionEvent;
 import spirite.base.image_data.selection.SelectionMask;
 import spirite.base.util.Colors;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 import spirite.hybrid.Globals;
 import spirite.pc.pen.JPenPenner;
@@ -79,11 +80,11 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
         if( workspace != null) {
         	// :::: Draw Background Grid
     		Rect rect = new Rect( view.itsX(0), view.itsY(0), 
-    				(int)Math.round(workspace.getWidth()*view.getZoom()),
-	        		(int)Math.round(workspace.getHeight()*view.getZoom()));
+    				Math.round(workspace.getWidth()*view.getZoom()),
+	        		Math.round(workspace.getHeight()*view.getZoom()));
     		gc.drawTransparencyBG(rect, 8);
 
-        	MatTrans viewTrans = view.getViewTransform();
+        	Transform viewTrans = view.getViewTransform();
 
         	// :::: Draw Image with References
         	RenderEngine renderEngine = workspace.getRenderEngine();
@@ -122,13 +123,13 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
         	SelectionMask selection = selectionEngine.getSelection();
 
             if( selection != null) {
-            	MatTrans selTrans = viewTrans;
+            	MutableTransform selTrans = viewTrans.toMutable();
             	selTrans.concatenate(selectionEngine.getLiftedDrawTrans());
             	gc.setTransform(selTrans);
             	selection.drawBounds(gc);
             }
             
-        	gc.setTransform(null);
+        	gc.setTransform(Transform.Companion.getIdentityMatrix());
             if( penner.drawsOverlay())
             	penner.paintOverlay(gc);
             

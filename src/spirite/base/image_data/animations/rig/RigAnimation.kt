@@ -4,7 +4,7 @@ import spirite.base.graphics.renderer.RenderEngine.TransformedHandle
 import spirite.base.image_data.Animation
 import spirite.base.image_data.GroupTree.LayerNode
 import spirite.base.image_data.ImageWorkspace
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.MutableTransform
 
 class RigAnimation( name: String, context: ImageWorkspace) : Animation( name, context) {
     private val _rigLayers = ArrayList<RigAnimLayer>()
@@ -25,8 +25,7 @@ class RigAnimation( name: String, context: ImageWorkspace) : Animation( name, co
 
                 val key = keyframes.getFrameAtT(t)
 
-                val trans = MatTrans()
-                trans.preRotate(key.rot)
+                val trans = MutableTransform.RotationMatrix(key.rot)
                 trans.preScale(key.sx,key.sy)
                 trans.preTranslate(key.tx, key.ty)
 

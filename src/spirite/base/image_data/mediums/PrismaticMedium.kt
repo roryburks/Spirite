@@ -8,8 +8,8 @@ import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.Rect
+import spirite.base.util.linear.Transform
 import spirite.hybrid.HybridHelper
 import java.util.*
 
@@ -189,8 +189,8 @@ class PrismaticMedium : IMedium {
     inner class PrismaticBuiltImageData constructor(building: BuildingMediumData) : BuiltMediumData(building) {
         private val workingColor: Int = building.color
 
-        override val _sourceToComposite: MatTrans get() = MatTrans()
-        override val _screenToSource: MatTrans get() = trans
+        override val _sourceToComposite: Transform get() = Transform.IdentityMatrix
+        override val _screenToSource: Transform get() = trans
 
         override val compositeWidth: Int get() = context.width
         override val compositeHeight: Int get() = context.height

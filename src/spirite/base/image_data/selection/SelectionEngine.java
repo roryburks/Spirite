@@ -14,8 +14,9 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.ILiftSelectionModule;
 import spirite.base.pen.selection_builders.RectSelectionBuilder;
 import spirite.base.util.Colors;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class SelectionEngine {
 		
 		undoEngine.doAsAggregateAction(() -> {
 			finalizeSelection();
-			liftedTrans = new MatTrans();
+			liftedTrans = Transform.Companion.getIdentityMatrix();
 			undoEngine.performAndStore( new NullAction() {
 				@Override
 				protected void undoAction() {
@@ -185,11 +186,11 @@ public class SelectionEngine {
 	
 	// =======
 	// === Transforming Lifted Data
-	MatTrans liftedTrans = new MatTrans();
-	MatTrans proposedLiftedTrans = new MatTrans();
-	public MatTrans getLiftedDrawTrans() {return getLiftedDrawTrans(true);}
-	public MatTrans getLiftedDrawTrans( boolean withProposed) {
-		MatTrans trans = new MatTrans();
+	Transform liftedTrans = Transform.Companion.getIdentityMatrix();
+	Transform proposedLiftedTrans = Transform.Companion.getIdentityMatrix();
+	public Transform getLiftedDrawTrans() {return getLiftedDrawTrans(true);}
+	public Transform getLiftedDrawTrans( boolean withProposed) {
+		MutableTransform trans = new MutableTransform();
 
 		if( isLifted()) {
 			trans.preTranslate(-lifted.getWidth()/2, -lifted.getHeight()/2);
@@ -205,20 +206,20 @@ public class SelectionEngine {
 		return trans;
 	}
 	
-	public void transformSelection( MatTrans trans) {
-		liftedTrans.preConcatenate(trans);
+	public void transformSelection( Transform trans) {
+		liftedTrans = trans.times( liftedTrans);
 		workspace.triggerSelectionRefresh();
 	}
 	
 	// ========
 	// ==== Proposing Transform
-	public void proposeTransform( MatTrans trans) {
+	public void proposeTransform( Transform trans) {
 		proposedLiftedTrans = trans;
 		workspace.triggerSelectionRefresh();
 	}
 	public boolean isProposingTransform() {return proposedLiftedTrans != null;}
 	public void applyProposedTransform() {
-		liftedTrans.preConcatenate(proposedLiftedTrans);
+		liftedTrans = proposedLiftedTrans.times(liftedTrans);
 		proposedLiftedTrans = null;
 		workspace.triggerSelectionRefresh();
 	}
@@ -275,7 +276,7 @@ public class SelectionEngine {
 		if( drawer instanceof ILiftSelectionModule) {
 			final ALiftedData newLifted = ((ILiftSelectionModule) drawer).liftSelection(selection);
 			final ALiftedData oldLifted = lifted;
-			liftedTrans = new MatTrans();
+			liftedTrans = Transform.Companion.getIdentityMatrix();
 			
 			List<UndoableAction> actions = new ArrayList<>(2);
 			

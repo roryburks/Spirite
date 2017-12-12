@@ -7,7 +7,8 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.pen.StrokeParams
 import spirite.base.util.Colors
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.HybridHelper
 import spirite.hybrid.HybridUtil
 import java.io.File
@@ -51,7 +52,7 @@ class DynamicMediumTests
                 drawer.endStroke()
 
                 val img = HybridHelper.createImage(640, 480)
-                it.renderEngine.renderWorkspace(ws, img.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img.graphics, Transform.IdentityMatrix)
 
                 for (i in 0 until 50) {
                     val rgb = img.getRGB(i, i)
@@ -76,7 +77,7 @@ class DynamicMediumTests
                 //drawer.endStroke()
 
                 val img1 = HybridHelper.createImage(125, 125)
-                it.renderEngine.renderWorkspace(ws, img1.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img1.graphics, Companion.IdentityMatrix)
 
                 HybridUtil.savePNG(img1, FileOutputStream(File("C:/bucket/x.png")));
 
@@ -86,7 +87,7 @@ class DynamicMediumTests
                 drawer.endStroke()
 
                 val img2 = HybridHelper.createImage(125, 125)
-                it.renderEngine.renderWorkspace(ws, img2.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img2.graphics, Companion.IdentityMatrix)
 
 
                 HybridUtil.savePNG(img2, FileOutputStream(File("C:/bucket/x3.png")));

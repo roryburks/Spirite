@@ -18,7 +18,8 @@ import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.ReferenceManager.MReferenceObserver;
 import spirite.base.image_data.ReferenceManager.Reference;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.MDebug;
 
 import javax.swing.Timer;
@@ -126,7 +127,7 @@ public class RenderEngine
 	public static class TransformedHandle {
 		public int depth;
 		public float alpha = 1.0f;
-		public MatTrans trans = new MatTrans();
+		public MutableTransform trans = MutableTransform.Companion.IdentityMatrix();
 		public MediumHandle handle;
 		public RenderMethod method = null;
 		public int renderValue = 0;
@@ -157,7 +158,7 @@ public class RenderEngine
 	}
 	
 	/** Renders the Workspace to an Image in its intended form.  */
-	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, MatTrans trans) {
+	public void renderWorkspace(ImageWorkspace workspace, GraphicsContext context, Transform trans) {
 		RenderSettings settings = new RenderSettings( getDefaultRenderTarget(workspace));
 		settings.normalize();
 		

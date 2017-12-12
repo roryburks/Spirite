@@ -1,8 +1,9 @@
 package spirite.base.graphics
 
 import spirite.base.image_data.MediumHandle
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
+import spirite.base.util.linear.Transform
 import java.awt.Shape
 import java.util.*
 
@@ -18,7 +19,7 @@ abstract class GraphicsContext {
     abstract val height: Int
 
     /** Setting to null produces undefined behavior.  */
-    abstract var transform: MatTrans
+    abstract var transform: Transform
     abstract val alpha: Float
     abstract val composite: Composite
 
@@ -31,8 +32,8 @@ abstract class GraphicsContext {
     abstract fun clear()
     abstract fun preTranslate(offsetX: Double, offsetY: Double)
     abstract fun translate(offsetX: Double, offsetY: Double)
-    abstract fun preTransform(trans: MatTrans)
-    abstract fun transform(trans: MatTrans)
+    abstract fun preTransform(trans: Transform)
+    abstract fun transform(trans: Transform)
     abstract fun preScale(sx: Double, sy: Double)
     abstract fun scale(sx: Double, sy: Double)
     abstract fun setColor(argb: Int)
@@ -87,7 +88,7 @@ abstract class GraphicsContext {
     abstract fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties)
 
 
-    private val transformStack = Stack<MatTrans>()
+    private val transformStack = Stack<Transform>()
     fun pushTransform() {transformStack.push(transform)}
     fun popTransform() {transform = transformStack.pop()}
 
@@ -119,7 +120,7 @@ class LineAttributes (
 ) {}
 
 data class GraphicalState(
-        val trans: MatTrans,
+        val trans: Transform,
         val composite: GraphicsContext.Composite,
         val alpha: Float
 ){}

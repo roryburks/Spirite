@@ -11,7 +11,7 @@ import spirite.base.pen.PenTraits.PenState;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.pen.StrokeParams;
 import spirite.base.util.interpolation.Interpolator2D;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.Transform;
 
 public interface IImageDrawer {
 
@@ -57,7 +57,7 @@ public interface IImageDrawer {
 	}
 	
 	public interface ITransformModule {
-		public void transform( MatTrans trans);
+		public void transform( Transform trans);
 	}
 	
 	public interface IWeightEraserModule {
@@ -81,7 +81,7 @@ public interface IImageDrawer {
 	
 	public interface IAnchorLiftModule {
 		public boolean acceptsLifted( ALiftedData lifted);
-		public void anchorLifted( ALiftedData lifted, MatTrans trans);
+		public void anchorLifted( ALiftedData lifted, Transform trans);
 	}
 	
 	public interface IBoneDrawer {

@@ -8,8 +8,8 @@ import spirite.base.image_data.ImageWorkspace.ImageChangeEvent;
 import spirite.base.image_data.ImageWorkspace.MImageObserver;
 import spirite.base.image_data.ImageWorkspace.StructureChangeEvent;
 import spirite.base.pen.Penner;
-import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.gui.hybrid.SPanel;
 import spirite.gui.hybrid.SScrollPane.ModernScrollBarUI;
 import spirite.pc.pen.JPenPenner;
@@ -206,11 +206,9 @@ public class WorkPanel extends SPanel
         public int  stiXm( float x) { return (int) Math.floor((x - offsetx) / zoom);}
         public int stiYm( float y) { return (int) Math.floor((y - offsety) / zoom);}
 
-        public MatTrans getViewTransform() {
-        	MatTrans trans = new MatTrans();
-        	trans.translate(itsX(0), itsY(0));
-        	trans.scale( getZoom(), getZoom());
-        	return trans;
+        public Transform getViewTransform() {
+        	return Transform.Companion.TranslationMatrix(itsX(0), itsY(0)).times(
+        	        Transform.Companion.ScaleMatrix(getZoom(), getZoom()));
         }
         
         public Rect itsRm( Rect cropSection) {

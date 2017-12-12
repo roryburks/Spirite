@@ -6,7 +6,8 @@ import spirite.base.image_data.GroupTree.LayerNode;
 import spirite.base.image_data.GroupTree.Node;
 import spirite.base.image_data.layers.Layer;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,8 +25,7 @@ public class ReferenceManager {
 	private boolean editingReference = false;
 	private float refAlpha = 1.0f;
 
-	MatTrans globalTransform = new MatTrans();
-	MatTrans calcTransform = new MatTrans();	// just for caching purposes
+	private MutableTransform globalTransform = Transform.Companion.getIdentityMatrix().toMutable();
 
 	// null signifies the Workspace layer
 	private final List<Reference> references = new ArrayList<>();
@@ -39,7 +39,7 @@ public class ReferenceManager {
 	// ==== Reference Types
 	public abstract class Reference {
 		protected boolean global;
-		MatTrans localTransform = new MatTrans();
+		Transform localTransform = Transform.Companion.getIdentityMatrix();
 		public abstract void draw( GraphicsContext gc);
 		public final boolean isGlobal() {return global;}
 	}
@@ -54,8 +54,8 @@ public class ReferenceManager {
 
 		@Override
 		public void draw(GraphicsContext gc) {
-			MatTrans oldTrans = gc.getTransform();
-			MatTrans newTrans = new MatTrans(oldTrans);
+			Transform oldTrans = gc.getTransform();
+			MutableTransform newTrans = oldTrans.toMutable();
 			if( global) 
 				newTrans.concatenate(getTransform());
 			newTrans.concatenate(localTransform);
@@ -74,8 +74,8 @@ public class ReferenceManager {
 		}
 		@Override
 		public void draw(GraphicsContext gc) {
-			MatTrans oldTrans = gc.getTransform();
-			MatTrans newTrans = new MatTrans(oldTrans);
+			Transform oldTrans = gc.getTransform();
+			MutableTransform newTrans = oldTrans.toMutable();
 			if( global) 
 				newTrans.concatenate(getTransform());
 			newTrans.concatenate(localTransform);
@@ -90,18 +90,14 @@ public class ReferenceManager {
 	// ===========
 	// ==== Transform Manipulation
 	public void shiftTransform( float dx, float dy) {
-		calcTransform.setToIdentity();
-		calcTransform.translate(dx, dy);
-		globalTransform.preConcatenate(calcTransform);
+		globalTransform.preTranslate(dx,dy);
 		triggerReferenceStructureChanged(false);
 	}
 	
 	public void rotateTransform( float theta, float x, float y) {
-		calcTransform.setToIdentity();
-		calcTransform.translate(x, y);
-		calcTransform.rotate( theta);
-		calcTransform.translate(-x, -y);
-		globalTransform.preConcatenate(calcTransform);
+	    globalTransform.preTranslate(-x,-y);
+	    globalTransform.preRotate(theta);
+	    globalTransform.preTranslate(x,y);
 		triggerReferenceStructureChanged(false);
 	}
 	public void resetTransform() {
@@ -109,15 +105,13 @@ public class ReferenceManager {
 		triggerReferenceStructureChanged(false);
 	}
 	public void zoomTransform( float zoom, float x, float y) {
-		calcTransform.setToIdentity();
-		calcTransform.translate(x, y);
-		calcTransform.scale(zoom, zoom);
-		calcTransform.translate(-x, -y);
-		globalTransform.preConcatenate(calcTransform);
+        globalTransform.preTranslate(-x,-y);
+        globalTransform.preScale(zoom, zoom);
+        globalTransform.preTranslate(x,y);
 		triggerReferenceStructureChanged(false);
 	}
-	public MatTrans getTransform() {
-		return new MatTrans(globalTransform);
+	public Transform getTransform() {
+		return globalTransform;
 	}
 	
 	
@@ -186,7 +180,7 @@ public class ReferenceManager {
 			triggerReferenceStructureChanged(true);
 		}
 	}
-	public void addReference( IImage iImage, int index, MatTrans local) {
+	public void addReference( IImage iImage, int index, Transform local) {
 		if( iImage != null) {
 			Reference ref = new ImageReference(iImage);
 			ref.localTransform = local;

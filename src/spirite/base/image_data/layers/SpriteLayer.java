@@ -18,9 +18,9 @@ import spirite.base.image_data.mediums.DynamicMedium;
 import spirite.base.image_data.mediums.IMedium;
 import spirite.base.image_data.mediums.drawer.IImageDrawer;
 import spirite.base.util.MUtil;
-import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.WarningType;
@@ -138,22 +138,16 @@ public class SpriteLayer extends Layer
 		public float getAlpha() {return structure.alpha;}
 		public SpriteLayer getContext() {return SpriteLayer.this;}
 		public PartStructure getStructure() {return new PartStructure(structure);}
-		public MatTrans buildTransform() {
-			MatTrans ret = new MatTrans();
-			ret.preTranslate(-structure.handle.getWidth()/2, -structure.handle.getHeight()/2);
-			ret.preScale(structure.scaleX, structure.scaleY);
+		public MutableTransform buildTransform() {
+            MutableTransform ret = MutableTransform.Companion.TranslationMatrix(-structure.handle.getWidth()/2, -structure.handle.getHeight()/2);
+            ret.preScale(structure.scaleX, structure.scaleY);
 			ret.preRotate(structure.rot);
 			ret.preTranslate(structure.transX+structure.handle.getWidth()/2, 
 					structure.transY+structure.handle.getHeight()/2);
 			return ret;
 		}
-		public MatTrans buildInverseTransform() {
-			try {
-				return buildTransform().createInverse();
-			} catch (NoninvertableException e) {
-				e.printStackTrace();
-				return new MatTrans();
-			}
+		public MutableTransform buildInverseTransform() {
+		    return buildTransform().invertM();
 		}
 		public int _getOX() {
 			return (int)structure.transX;
@@ -185,9 +179,9 @@ public class SpriteLayer extends Layer
 			int dx = part.structure.handle.getDynamicX();
 			int dy = part.structure.handle.getDynamicY();
 			if( part.isVisible()) {
-				MatTrans invTrans = part.buildInverseTransform();
+				Transform invTrans = part.buildInverseTransform();
 				Vec2 from = new Vec2( x - dx, y-dy);
-				Vec2 to = invTrans.transform(from);
+				Vec2 to = invTrans.apply(from);
 				
 				if( !MUtil.coordInImage( (int)to.x, (int)to.y, part.structure.handle.deepAccess()))
 					continue;
@@ -458,8 +452,7 @@ public class SpriteLayer extends Layer
 		
 		gc.setComposite(Composite.SRC_OVER, oldAlpha*part.structure.alpha);
 		
-		MatTrans trans = new MatTrans();
-		trans.translate(part._getOX(),part._getOY());
+		Transform trans = Transform.Companion.TranslationMatrix(part._getOX(), part._getOY());
 		part.structure.handle.drawLayer( gc, trans);
 		
 		gc.setComposite(oldComp, oldAlpha);

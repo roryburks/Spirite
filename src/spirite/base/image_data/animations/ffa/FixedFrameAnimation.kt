@@ -6,6 +6,8 @@ import spirite.base.image_data.GroupTree
 import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.animations.NodeLinkedAnimation
 import spirite.base.util.MUtil
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import kotlin.math.floor
 
 class FixedFrameAnimation(name: String, workspace: ImageWorkspace) : Animation(name, workspace),
@@ -47,8 +49,8 @@ class FixedFrameAnimation(name: String, workspace: ImageWorkspace) : Animation(n
 
             if( node is GroupTree.LayerNode) {
                 for( tr in node.layer.drawList) {
-                    tr.trans.translate( node.offsetX.toFloat(), node.offsetY.toFloat())
-                    drawList.add(tr)
+                    tr.trans.preTranslate(node.offsetX.toFloat(), node.offsetY.toFloat())
+                    drawList.add( tr)
                 }
             }
         }

@@ -2,8 +2,8 @@ package spirite.base.image_data.mediums
 
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.MediumHandle
-import spirite.base.util.linear.MatTrans
 import spirite.base.util.linear.MatrixSpace
+import spirite.base.util.linear.Transform
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 
@@ -16,9 +16,9 @@ abstract class BuiltMediumData(
     private val SCREEN = "screen"
 
     val handle: MediumHandle = buildingMediumData.handle
-    protected val trans: MatTrans = buildingMediumData.trans
+    protected val trans: Transform = buildingMediumData.trans
     protected val invTrans by lazy {
-        trans.createInverse()
+        trans.invert()
     }
 
     private val matrixSpace by lazy{
@@ -29,18 +29,18 @@ abstract class BuiltMediumData(
             ))
     }
 
-    val screenToComposite: MatTrans get() {return matrixSpace.convertSpace(SCREEN,COMPOSITE)}
-    val compositeToScreen : MatTrans get() {return matrixSpace.convertSpace(COMPOSITE,SCREEN)}
-    val screenToSource :MatTrans get() {return matrixSpace.convertSpace(SCREEN,SOURCE)}
-    val sourceToScreen:MatTrans get() {return matrixSpace.convertSpace(SOURCE,SCREEN)}
-    val sourceToComposite :MatTrans get() {return matrixSpace.convertSpace(SOURCE,COMPOSITE)}
-    val compositeToSource :MatTrans get() {return matrixSpace.convertSpace(COMPOSITE,SOURCE)}
+    val screenToComposite: Transform get() {return matrixSpace.convertSpace(SCREEN,COMPOSITE)}
+    val compositeToScreen : Transform get() {return matrixSpace.convertSpace(COMPOSITE,SCREEN)}
+    val screenToSource :Transform get() {return matrixSpace.convertSpace(SCREEN,SOURCE)}
+    val sourceToScreen:Transform get() {return matrixSpace.convertSpace(SOURCE,SCREEN)}
+    val sourceToComposite :Transform get() {return matrixSpace.convertSpace(SOURCE,COMPOSITE)}
+    val compositeToSource :Transform get() {return matrixSpace.convertSpace(COMPOSITE,SOURCE)}
 
 
     // val screenToDynamic
 
-    protected abstract val _sourceToComposite: MatTrans
-    protected abstract val _screenToSource: MatTrans
+    protected abstract val _sourceToComposite: Transform
+    protected abstract val _screenToSource: Transform
 
     abstract val compositeWidth: Int
     abstract val compositeHeight: Int

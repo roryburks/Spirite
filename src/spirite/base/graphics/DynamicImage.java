@@ -5,9 +5,8 @@ import spirite.base.image_data.ImageWorkspace;
 import spirite.base.image_data.mediums.DoerOnGC;
 import spirite.base.image_data.mediums.DoerOnRaw;
 import spirite.base.util.MUtil;
-import spirite.base.util.linear.MatTrans;
-import spirite.base.util.linear.MatTrans.NoninvertableException;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.HybridUtil;
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException;
@@ -24,7 +23,7 @@ public class DynamicImage {
 	private int ox, oy;
 	private RawImage base;
 	private RawImage buffer = null;
-	private MatTrans trans = null;
+	private Transform trans = null;
 	int checkoutCtr = 0;
 	
 	public DynamicImage( ImageWorkspace context, RawImage raw, int ox, int oy) {
@@ -43,21 +42,21 @@ public class DynamicImage {
 	public ImageWorkspace getContext() {return context;}
 	public void setContext( ImageWorkspace ws) {context = ws;}
 	
-	public void doOnGC( DoerOnGC doer, MatTrans transform) {
+	public void doOnGC( DoerOnGC doer, Transform transform) {
 		doer.Do(checkoutRaw( transform).getGraphics());
 		checkin();
 	}
-	public void doOnRaw( DoerOnRaw doer, MatTrans transform) {
+	public void doOnRaw( DoerOnRaw doer, Transform transform) {
 		doer.Do(checkoutRaw( transform));
 		checkin();
 	}
-	public Rect getDrawBounds( MatTrans transform) {
+	public Rect getDrawBounds( Transform transform) {
 		return (new Rect( 0, 0, context.getWidth(), context.getHeight())).union(
 				MUtil.circumscribeTrans(new Rect(ox, oy, base.getWidth(), base.getHeight()), transform));
 	}
 
 	int checkoutCnt = 0;
-	private RawImage checkoutRaw(MatTrans transform) {
+	private RawImage checkoutRaw(Transform transform) {
 		if( checkoutCnt++ == 0) {
 			this.trans = transform;
 			buffer = HybridHelper.createImage(context.getWidth(), context.getHeight());
@@ -74,14 +73,8 @@ public class DynamicImage {
 		if( --checkoutCnt == 0) {
 			int w = context.getWidth();
 			int h = context.getHeight();
-			
-			MatTrans invTrans;
-	
-			try {
-				invTrans = trans.createInverse();
-			} catch (NoninvertableException e) {
-				invTrans = new MatTrans();
-			}
+
+			Transform invTrans = trans.invert();
 			
 			Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
 							new Rect(ox,oy, base.getWidth(), base.getHeight()));

@@ -28,8 +28,9 @@ import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
 import spirite.base.util.MUtil;
 import spirite.base.util.ObserverHandler;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.Globals;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
@@ -304,15 +305,15 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	public static class BuildingMediumData {
 		public final MediumHandle handle;
 		
-		public MatTrans trans;
+		public MutableTransform trans;
 		public int color;
 		public BuildingMediumData( MediumHandle handle) {
 			this.handle = handle;
-			this.trans = new MatTrans();
+			this.trans = Transform.Companion.getIdentityMatrix().toMutable();
 		}
 		public BuildingMediumData( MediumHandle handle, int ox, int oy) {
 			this.handle = handle;
-			this.trans = MatTrans.TranslationMatrix(ox, oy);
+			this.trans = Transform.Companion.TranslationMatrix(ox, oy).toMutable();
 		}
 		public void doOnBuiltData( DoOnBID doer) {
 			handle.getContext().doOnBuiltData(this, doer);
@@ -517,8 +518,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				GraphicsContext gc = img.getGraphics();
 				
 				gc.clear();
-				MatTrans transform = new MatTrans();		
-				transform.translate(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
+				Transform transform = Transform.Companion.TranslationMatrix(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
 				handle.drawLayer(gc, transform);
 //				g2.dispose();
 				

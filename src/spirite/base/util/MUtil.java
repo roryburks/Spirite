@@ -3,8 +3,8 @@ package spirite.base.util;
 
 import spirite.base.graphics.IImage;
 import spirite.base.util.compaction.FloatCompactor;
-import spirite.base.util.linear.MatTrans;
 import spirite.base.util.linear.Rect;
+import spirite.base.util.linear.Transform;
 import spirite.base.util.linear.Vec2;
 
 import java.awt.*;
@@ -102,12 +102,12 @@ public class MUtil {
 	/**
 	 * Finds the bounds of a rectangle tranformed by a matrix
 	 */
-	public static Rect findBounds( Rect region, MatTrans matrix) {
+	public static Rect findBounds( Rect region, Transform matrix) {
 		// Might be some slightly-more-clever way to determing this
-		Vec2 p1 = matrix.transform(new Vec2(region.x, region.y));
-		Vec2 p2 = matrix.transform(new Vec2(region.x+region.width, region.y));
-		Vec2 p3 = matrix.transform(new Vec2(region.x, region.y + region.height));
-		Vec2 p4 = matrix.transform(new Vec2(region.x+region.width, region.y + region.height));
+		Vec2 p1 = matrix.apply(new Vec2(region.x, region.y));
+		Vec2 p2 = matrix.apply(new Vec2(region.x+region.width, region.y));
+		Vec2 p3 = matrix.apply(new Vec2(region.x, region.y + region.height));
+		Vec2 p4 = matrix.apply(new Vec2(region.x+region.width, region.y + region.height));
 
 		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
 		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
@@ -171,11 +171,11 @@ public class MUtil {
 				);
 	}
 	
-	public static Rect circumscribeTrans( Rect oldRect, MatTrans trans) {
-		Vec2 p1 =  trans.transform( new Vec2(oldRect.x, oldRect.y));
-		Vec2 p2 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y));
-		Vec2 p3 =  trans.transform( new Vec2(oldRect.x, oldRect.y+oldRect.height));
-		Vec2 p4 =  trans.transform( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height));
+	public static Rect circumscribeTrans( Rect oldRect, Transform trans) {
+		Vec2 p1 =  trans.apply( new Vec2(oldRect.x, oldRect.y));
+		Vec2 p2 =  trans.apply( new Vec2(oldRect.x+oldRect.width, oldRect.y));
+		Vec2 p3 =  trans.apply( new Vec2(oldRect.x, oldRect.y+oldRect.height));
+		Vec2 p4 =  trans.apply( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height));
 
 		int x1 = (int)Math.min( Math.floor(p1.x), Math.min(Math.floor(p2.x), Math.min(Math.floor(p3.x), Math.floor(p4.x))));
 		int y1 = (int)Math.min( Math.floor(p1.y), Math.min(Math.floor(p2.y), Math.min(Math.floor(p3.y), Math.floor(p4.y))));

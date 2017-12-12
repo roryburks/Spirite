@@ -8,9 +8,7 @@ import spirite.base.image_data.animations.ffa.FFAAnimationState
 import spirite.base.image_data.animations.ffa.FixedFrameAnimation
 import spirite.base.image_data.mediums.IMedium.InternalImageTypes
 import spirite.base.image_data.mediums.drawer.IImageDrawer.*
-import spirite.base.util.linear.MatTrans
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Vec2
+import spirite.base.util.linear.*
 import spirite.hybrid.HybridHelper
 import spirite.hybrid.HybridUtil
 import spirite.hybrid.HybridUtil.UnsupportedImageTypeException
@@ -37,22 +35,22 @@ class RelativeWorkspaceCommandExecuter(private val master: MasterControl) : Comm
         commandMap.put("shiftRight",Runnable {
             val drawer = workspace.activeDrawer
             if (drawer is ITransformModule)
-                (drawer as ITransformModule).transform(MatTrans.TranslationMatrix(1f, 0f))
+                (drawer as ITransformModule).transform(Transform.TranslationMatrix(1f, 0f))
         })
         commandMap.put("shiftLeft",Runnable {
             val drawer = workspace.activeDrawer
             if (drawer is ITransformModule)
-                (drawer as ITransformModule).transform(MatTrans.TranslationMatrix(-1f, 0f))
+                (drawer as ITransformModule).transform(Transform.TranslationMatrix(-1f, 0f))
         })
         commandMap.put("shiftDown",Runnable {
             val drawer = workspace.activeDrawer
             if (drawer is ITransformModule)
-                (drawer as ITransformModule).transform(MatTrans.TranslationMatrix(0f, 1f))
+                (drawer as ITransformModule).transform(Transform.TranslationMatrix(0f, 1f))
         })
         commandMap.put("shiftUp",Runnable {
             val drawer = workspace.activeDrawer
             if (drawer is ITransformModule)
-                (drawer as ITransformModule).transform(MatTrans.TranslationMatrix(0f, -1f))
+                (drawer as ITransformModule).transform(Transform.TranslationMatrix(0f, -1f))
         })
         commandMap.put("newLayerQuick",Runnable {
             workspace.addNewSimpleLayer(workspace.selectedNode,
@@ -131,7 +129,7 @@ class RelativeWorkspaceCommandExecuter(private val master: MasterControl) : Comm
                 val translation = settings.getValue("translation") as Vec2
                 val rotation = settings.getValue("rotation") as Float
 
-                val trans = MatTrans()
+                val trans = MutableTransform()
                 trans.preScale(scale.x, scale.y)
                 trans.preRotate((rotation * 180.0f / Math.PI).toFloat())
                 trans.preTranslate(translation.x, translation.y)

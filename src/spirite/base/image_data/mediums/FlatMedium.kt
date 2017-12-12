@@ -6,7 +6,8 @@ import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.HybridUtil
 
 /***
@@ -50,8 +51,8 @@ class FlatMedium(private val image: RawImage, protected val context: ImageWorksp
     }
 
     inner class BuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val _sourceToComposite: MatTrans get() {return MatTrans()}
-        override val _screenToSource: MatTrans get() {return invTrans}
+        override val _sourceToComposite: Transform get() {return Transform.IdentityMatrix}
+        override val _screenToSource: Transform get() {return invTrans}
         override val compositeWidth: Int = image.width
         override val compositeHeight:Int = image.height
         override val sourceWidth: Int = image.width

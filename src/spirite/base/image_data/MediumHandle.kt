@@ -7,7 +7,7 @@ import spirite.base.graphics.IImage
 import spirite.base.image_data.ImageWorkspace.ImageChangeEvent
 import spirite.base.image_data.mediums.DynamicMedium
 import spirite.base.image_data.mediums.PrismaticMedium
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 
@@ -85,7 +85,7 @@ class MediumHandle(
     }
 
     fun drawLayer(
-            gc: GraphicsContext, transform: MatTrans, composite: Composite, alpha: Float) {
+            gc: GraphicsContext, transform: Transform, composite: Composite, alpha: Float) {
         val oldAlpha = gc.alpha
         val oldComposite = gc.composite
 
@@ -95,7 +95,7 @@ class MediumHandle(
     }
 
 
-    fun drawLayer(gc: GraphicsContext, transform: MatTrans?) {
+    fun drawLayer(gc: GraphicsContext, transform: Transform) {
         var transform = transform
         if (context == null) {
             MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")

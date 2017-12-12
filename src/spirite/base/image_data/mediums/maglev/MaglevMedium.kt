@@ -15,7 +15,8 @@ import spirite.base.image_data.mediums.maglev.parts.MagLevStroke
 import spirite.base.image_data.selection.SelectionMask
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.util.interpolation.Interpolator2D
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.HybridHelper
 import java.util.*
 
@@ -212,7 +213,7 @@ class MaglevMedium  (
                     val mask: SelectionMask? = null
                     for (thing in things)
                         thing.draw(built, mask, gc, this)
-                }, MatTrans())
+                }, Transform.IdentityMatrix)
                 builtImage = dyn
             }
             isBuilt = true
@@ -247,9 +248,9 @@ class MaglevMedium  (
             Build()
         }
 
-        override val _sourceToComposite: MatTrans get() = MatTrans()
-        override val _screenToSource: MatTrans by lazy {
-            val strans = MatTrans(trans)
+        override val _sourceToComposite: Transform get() = Companion.IdentityMatrix
+        override val _screenToSource: Transform by lazy {
+            val strans = trans.toMutable()
             strans.preTranslate(builtImage!!.xOffset.toFloat(), builtImage!!.yOffset.toFloat())
             strans
         }

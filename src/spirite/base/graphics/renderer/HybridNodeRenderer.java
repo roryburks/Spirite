@@ -15,7 +15,8 @@ import spirite.base.image_data.MediumHandle;
 import spirite.base.image_data.selection.ALiftedData;
 import spirite.base.image_data.selection.SelectionEngine;
 import spirite.base.pen.StrokeEngine;
-import spirite.base.util.linear.MatTrans;
+import spirite.base.util.linear.MutableTransform;
+import spirite.base.util.linear.Transform;
 import spirite.hybrid.HybridHelper;
 import spirite.hybrid.MDebug;
 import spirite.hybrid.MDebug.ErrorType;
@@ -44,7 +45,7 @@ public class HybridNodeRenderer {
 		this.workspace = root.getContext();
 	}
 
-	public void render(RenderSettings settings, GraphicsContext gc, MatTrans trans) {
+	public void render(RenderSettings settings, GraphicsContext gc, Transform trans) {
 		try {
 			buildCompositeLayer(workspace);
 			
@@ -79,7 +80,7 @@ public class HybridNodeRenderer {
 	// ==== Composite Layer
 	private RawImage compositionImage;
 	private MediumHandle compositionHandle = null;
-	private MatTrans compositeTrans = null;
+	private Transform compositeTrans = null;
 	private void buildCompositeLayer(ImageWorkspace workspace) throws InvalidImageDimensionsExeption 
 	{
 		BuildingMediumData dataContext = workspace.buildActiveData();
@@ -99,7 +100,7 @@ public class HybridNodeRenderer {
 				// Draw the Base Image
                 compositeTrans = built.getCompositeToScreen();
 
-                MatTrans sourceToComposite = built.getSourceToComposite();
+				Transform sourceToComposite = built.getSourceToComposite();
 				gc.setTransform(sourceToComposite);
 				dataContext.handle.drawBehindStroke(gc);
 				
@@ -107,22 +108,21 @@ public class HybridNodeRenderer {
 				if( selectionEngine.isLifted()){
 					// Draw Lifted Image
 					ALiftedData lifted = selectionEngine.getLiftedData();
-					
-					MatTrans tt = selectionEngine.getLiftedDrawTrans();
+
+					MutableTransform tt = selectionEngine.getLiftedDrawTrans().toMutable();
 					tt.preConcatenate(sourceToComposite);
 					gc.setTransform(tt);
 					lifted.drawLiftedData(gc);
 				}
 				if( strokeEngine != null) {
 					// Draw the Stroke
-					gc.setTransform(new MatTrans());
+					gc.setTransform(Transform.Companion.getIdentityMatrix());
 					strokeEngine.drawStrokeLayer(gc);
 				}
 				
 				gc.setTransform(sourceToComposite);
 				dataContext.handle.drawInFrontOfStroke(gc);
 			});
-
 		}
 	
 	}
@@ -241,7 +241,7 @@ public class HybridNodeRenderer {
 		private final TransformedHandle renderable;
 		private final RenderSettings settings;
 		private final RenderProperties properties;
-		private final MatTrans transform;
+		private final MutableTransform transform;
 		
 		TransformedRenderable( RenderProperties properties, TransformedHandle renderable, RenderSettings settings, int ox, int oy) {
 			//this.node = node;
@@ -249,8 +249,8 @@ public class HybridNodeRenderer {
 			this.renderable = renderable;
 			this.depth = renderable.depth;
 			this.settings = settings;
-			this.transform = renderable.trans;
-			this.transform.preTranslate(ox, oy);
+            this.transform = renderable.trans;
+            transform.preTranslate(ox, oy);
 
 			// Concatenate
 			this.properties.alpha *= renderable.alpha;
@@ -261,22 +261,22 @@ public class HybridNodeRenderer {
 		}
 		@Override
 		public void draw(GraphicsContext gc) {
-			MatTrans oldTansform = gc.getTransform();
-			
-			MatTrans drawTrans = new MatTrans( transform);
+			gc.pushTransform();
+
+			Transform drawTrans = transform;
 			if( compositionHandle == renderable.handle) {
 				gc.setTransform(compositeTrans);
 				gc.renderImage( compositionImage, 0, 0, properties);
 			}
 			else {
-				drawTrans.preTranslate(renderable.handle.getDynamicX(),renderable.handle.getDynamicY());
-				gc.setTransform(drawTrans);
+				gc.setTransform(
+				        Transform.Companion.TranslationMatrix(renderable.handle.getDynamicX(),renderable.handle.getDynamicY())
+                                .times(drawTrans));
 				gc.renderHandle(renderable.handle, 0, 0, properties);
 			}
 			
 			//gc.renderImage( renderable.handle.deepAccess(), x, y, render);
-			gc.setTransform(oldTansform);
-			
+			gc.popTransform();
 		}
 	}
 	

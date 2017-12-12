@@ -7,7 +7,8 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenTraits.PenState
 import spirite.base.pen.StrokeParams
 import spirite.base.util.Colors
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.HybridHelper
 import org.junit.Test as test
 
@@ -44,7 +45,7 @@ class FlatImageMediumTests
                 drawer.endStroke()
 
                 val img = HybridHelper.createImage(640, 480)
-                it.renderEngine.renderWorkspace(ws, img.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img.graphics, Transform.IdentityMatrix)
 
                 for (i in 0 until 50) {
                     val rgb = img.getRGB(i, i)
@@ -69,7 +70,7 @@ class FlatImageMediumTests
                 //drawer.endStroke()
 
                 val img1 = HybridHelper.createImage(125, 125)
-                it.renderEngine.renderWorkspace(ws, img1.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img1.graphics, Transform.IdentityMatrix)
 
                 for (i in 50 until 75) {
                     val rgb = img1.getRGB(i, i)
@@ -87,7 +88,7 @@ class FlatImageMediumTests
                 drawer.endStroke()
 
                 val img2 = HybridHelper.createImage(125, 125)
-                it.renderEngine.renderWorkspace(ws, img2.graphics, MatTrans())
+                it.renderEngine.renderWorkspace(ws, img2.graphics, Transform.IdentityMatrix)
 
                 for (i in 50 until 75) {
                     val rgb = img2.getRGB(i, i)

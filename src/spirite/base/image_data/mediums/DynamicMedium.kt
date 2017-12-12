@@ -7,7 +7,7 @@ import spirite.base.image_data.ImageWorkspace
 import spirite.base.image_data.ImageWorkspace.BuildingMediumData
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.IImageDrawer
-import spirite.base.util.linear.MatTrans
+import spirite.base.util.linear.Transform
 import spirite.hybrid.HybridUtil
 
 /***
@@ -69,15 +69,15 @@ class DynamicMedium : IMedium {
     }
 
     inner class DynamicBuiltImageData(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val _sourceToComposite: MatTrans get() {
-            val newTrans = MatTrans(trans)
+        override val _sourceToComposite: Transform get() {
+            val newTrans = trans.toMutable()
             newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
             return newTrans
         }
-        override val _screenToSource: MatTrans get() {
-            val newTrans = MatTrans(trans)
+        override val _screenToSource: Transform get() {
+            val newTrans = trans.toMutable()
             newTrans.preTranslate(image.xOffset.toFloat(), image.yOffset.toFloat())
-            return newTrans.createInverse()
+            return newTrans.invert()
         }
         //override val _sourceToDest: MatTrans get() {return MatTrans()}
 
