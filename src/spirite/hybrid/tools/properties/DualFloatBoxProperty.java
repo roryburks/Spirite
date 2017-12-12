@@ -34,8 +34,8 @@ public class DualFloatBoxProperty extends SwingToolProperty {
 	
 	@Override public Vec2 getValue() {return new Vec2(x,y);}
 	@Override protected void setValue(Object newValue) { 
-		this.x = ((Vec2)newValue).x;
-		this.y = ((Vec2)newValue).y;
+		this.x = ((Vec2) newValue).getX();
+		this.y = ((Vec2) newValue).getY();
 	}
 	
 
@@ -76,8 +76,8 @@ public class DualFloatBoxProperty extends SwingToolProperty {
 			}
 			public void doDataChanged(Object newValue) {
 				Vec2 val = (Vec2)newValue;
-				textField1.setText( String.valueOf(val.x));
-				textField2.setText( String.valueOf(val.y));
+				textField1.setText( String.valueOf(val.getX()));
+				textField2.setText( String.valueOf(val.getY()));
 			}
 		});
 		

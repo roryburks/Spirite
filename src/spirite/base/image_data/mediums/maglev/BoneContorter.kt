@@ -26,7 +26,7 @@ fun contortBones( source:List<AMagLevThing>, bone:BaseBone, state:Interpolator2D
     while (s < cLen + 1)
     {
       val to = state.eval(s)
-      var normal = to.sub(from)
+      var normal = to.minus(from)
       normal = (Vec2(-normal.y, normal.x)).normalize()	// Rotate 90 degrees, then normalize
       normals.addPoint(floatArrayOf(normal.x, normal.y, (s - 1) / cLen))
       from = to

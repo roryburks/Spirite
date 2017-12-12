@@ -99,7 +99,7 @@ public class DefaultImageDrawer
 			Vec2 p = built.getScreenToComposite().apply( new Vec2(x,y));
 			
 			built.doOnRaw((bi) -> {
-				if( !MUtil.coordInImage( (int)p.x, (int)p.y, bi)) {
+				if( !MUtil.coordInImage( (int) p.getX(), (int) p.getY(), bi)) {
 					aborted.set(true);
 					return;
 				}
@@ -109,7 +109,7 @@ public class DefaultImageDrawer
 					return;
 				}
 				
-				bgREF.set(bi.getRGB((int)p.x, (int)p.y));
+				bgREF.set(bi.getRGB((int) p.getX(), (int) p.getY()));
 				
 				if( bgREF.get() == color) {
 					aborted.set(true);
@@ -127,12 +127,12 @@ public class DefaultImageDrawer
 				Vec2 p = built.getScreenToComposite().apply( new Vec2(x,y));
 				if( mask == null) {
 					built.doOnRaw((raw) -> {
-						DirectDrawer.fill( raw, (int)p.x, (int)p.y, color);
+						DirectDrawer.fill( raw, (int) p.getX(), (int) p.getY(), color);
 					});
 				}
 				else {
 					RawImage img = mask.liftSelectionFromData(built);
-					Vec2 layerSpace = new Vec2(p.x - mask.getOX(), p.y - mask.getOY());
+					Vec2 layerSpace = new Vec2(p.getX() - mask.getOX(), p.getY() - mask.getOY());
 					
 					RawImage intermediate = null;
 					
@@ -153,7 +153,7 @@ public class DefaultImageDrawer
 						gc.drawImage(intermediate, 0, 0 );
 					}
 					
-					DirectDrawer.fill(img, (int)layerSpace.x, (int)layerSpace.y, color);
+					DirectDrawer.fill(img, (int) layerSpace.getX(), (int) layerSpace.getY(), color);
 
 					if( bg == 0) { 
 						// Continuing from above, after the fill is done, crop out the
@@ -175,7 +175,7 @@ public class DefaultImageDrawer
 					// Anchor the lifted image to the real image
 					built.doOnGC((gc) -> {
 						Vec2 p2 = built.getScreenToComposite().apply(new Vec2(mask.getOX(),mask.getOY()));
-						gc.drawImage( img_, (int)p2.x, (int)p2.y);
+						gc.drawImage( img_, (int) p2.getX(), (int) p2.getY());
 					});
 				}
 			}
@@ -485,7 +485,7 @@ public class DefaultImageDrawer
 			building.handle.getContext().getUndoEngine().storeAction(
 				new StrokeAction(
 					activeEngine,
-					activeEngine.getParams(),
+					activeEngine.getStrokeParams(),
 					activeEngine.getHistory(),
 					activeEngine.getLastSelection(),
 					building));
@@ -578,8 +578,8 @@ public class DefaultImageDrawer
 		int lockedColor = (locked)?workspace.getPaletteManager().getActiveColor(0):0;
 
 		Vec2 start = building.trans.apply(new Vec2(x,y));
-		int sx= Math.round(start.x);
-		int sy = Math.round(start.y);
+		int sx= Math.round(start.getX());
+		int sy = Math.round(start.getY());
 		
 		building.doOnBuiltData((built) -> {
 			built.doOnRaw((img) -> {

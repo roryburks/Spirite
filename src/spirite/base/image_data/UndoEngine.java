@@ -724,7 +724,7 @@ public class UndoEngine {
 		@Override
 		protected void addAction( UndoableAction action) {
 			if( !(action instanceof ImageAction)) {
-				MDebug.handleError(ErrorType.STRUCTURAL, "Tried to add a non ImageAction to an ImageContext");
+				MDebug.handleError(ErrorType.STRUCTURAL, "Tried to plus a non ImageAction to an ImageContext");
 				return;
 			}
 			final ImageAction iaction = (ImageAction)action;

@@ -197,7 +197,7 @@ public class ReferenceSchemePanel extends SPanel
 		private void initComponents() {
 			GroupLayout layout = new GroupLayout(this);
 			
-			helperLabel.setText("<html><h2>Drag Layers here to add them to the reference section, drag out to remove.");
+			helperLabel.setText("<html><h2>Drag Layers here to plus them to the reference section, drag out to remove.");
 			helperLabel.setForeground(helperColor);
 	
 			layout.setVerticalGroup( layout.createParallelGroup()
@@ -264,7 +264,7 @@ public class ReferenceSchemePanel extends SPanel
 				
 				// TODO: Meh
 				final Vec2 v2 = master.getSettingsManager().getThumbnailSize();
-				final Dimension d = new Dimension((int)v2.x, (int)v2.y);
+				final Dimension d = new Dimension((int) v2.getX(), (int) v2.getY());
 
 				label = new JLabel();
 				thumbnail = new SPanel() {

@@ -109,10 +109,10 @@ public class MUtil {
 		Vec2 p3 = matrix.apply(new Vec2(region.x, region.y + region.height));
 		Vec2 p4 = matrix.apply(new Vec2(region.x+region.width, region.y + region.height));
 
-		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
-		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.x, p2.x), p3.x), p4.y));
-		int x2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.x, p2.x), p3.x), p4.y));
-		int y2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.x, p2.x), p3.x), p4.y));
+		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
+		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
+		int x2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
+		int y2 = (int)Math.ceil(Math.max( Math.max( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
 		
 		return new Rect( x1, y1, x2-x1, y2-y1);
 	}
@@ -127,19 +127,19 @@ public class MUtil {
 	/** Creates the smallest rectangle that contains all given points. */
 	public static Rect rectFromPoints(List<Vec2> points) {
 		if( points == null || points.size() == 0) return new Rect(0,0,0,0);
-		int x1 = (int)Math.floor(points.get(0).x);
-		int y1 = (int)Math.floor(points.get(0).y);
-		int x2 = (int)Math.ceil(points.get(0).x);
-		int y2 = (int)Math.ceil(points.get(0).y);
+		int x1 = (int)Math.floor(points.get(0).getX());
+		int y1 = (int)Math.floor(points.get(0).getY());
+		int x2 = (int)Math.ceil(points.get(0).getX());
+		int y2 = (int)Math.ceil(points.get(0).getY());
 		
 		Iterator<Vec2> it = points.iterator();
 		it.next();	// Ignore 1 because we already did it
 		while( it.hasNext()) {
 			Vec2 p = it.next();
-			int tx1 = (int)Math.floor(p.x);
-			int ty1 = (int)Math.floor(p.y);
-			int tx2 = (int)Math.ceil(p.x);
-			int ty2 = (int)Math.ceil(p.y);
+			int tx1 = (int)Math.floor(p.getX());
+			int ty1 = (int)Math.floor(p.getY());
+			int tx2 = (int)Math.ceil(p.getX());
+			int ty2 = (int)Math.ceil(p.getY());
 			if( tx1 < x1) x1 = tx1;
 			if( ty1 < y1) y1 = ty1;
 			if( tx2 < x2) x2 = tx2;
@@ -177,10 +177,10 @@ public class MUtil {
 		Vec2 p3 =  trans.apply( new Vec2(oldRect.x, oldRect.y+oldRect.height));
 		Vec2 p4 =  trans.apply( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height));
 
-		int x1 = (int)Math.min( Math.floor(p1.x), Math.min(Math.floor(p2.x), Math.min(Math.floor(p3.x), Math.floor(p4.x))));
-		int y1 = (int)Math.min( Math.floor(p1.y), Math.min(Math.floor(p2.y), Math.min(Math.floor(p3.y), Math.floor(p4.y))));
-		int x2 = (int)Math.max( Math.ceil(p1.x), Math.max(Math.ceil(p2.x), Math.max(Math.ceil(p3.x), Math.ceil(p4.x))));
-		int y2 = (int)Math.max( Math.ceil(p1.y), Math.max(Math.ceil(p2.y), Math.max(Math.ceil(p3.y), Math.ceil(p4.y))));
+		int x1 = (int)Math.min( Math.floor(p1.getX()), Math.min(Math.floor(p2.getX()), Math.min(Math.floor(p3.getX()), Math.floor(p4.getX()))));
+		int y1 = (int)Math.min( Math.floor(p1.getY()), Math.min(Math.floor(p2.getY()), Math.min(Math.floor(p3.getY()), Math.floor(p4.getY()))));
+		int x2 = (int)Math.max( Math.ceil(p1.getX()), Math.max(Math.ceil(p2.getX()), Math.max(Math.ceil(p3.getX()), Math.ceil(p4.getX()))));
+		int y2 = (int)Math.max( Math.ceil(p1.getY()), Math.max(Math.ceil(p2.getY()), Math.max(Math.ceil(p3.getY()), Math.ceil(p4.getY()))));
 		
 		return rectFromEndpoints(x1,y1,x2,y2);
 	}
@@ -198,7 +198,7 @@ public class MUtil {
 		float scale_b = b.getMag();
 		float scale_b2 = scale_b*scale_b;
 		
-		Vec2 a = new Vec2(p.x - x1, p.y - y1);
+		Vec2 a = new Vec2(p.getX() - x1, p.getY() - y1);
 		
 		float t =  a.dot(b) / scale_b2;	// the extra / ||b|| is to normalize it to ||b|| = 1
 		float m = a.cross(b) / scale_b;

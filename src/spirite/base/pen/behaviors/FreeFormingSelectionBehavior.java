@@ -35,7 +35,7 @@ public class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 	@Override public void onTock() {}
 	public boolean testFinish() {
 		Vec2i p_s = builder.getStart();
-		if( MUtil.distance(p_s.x, p_s.y, this.penner.x, this.penner.y)<=5) {
+		if( MUtil.distance(p_s.getX(), p_s.getY(), this.penner.x, this.penner.y)<=5) {
 			this.penner.selectionEngine.mergeSelection(new SelectionMask(builder.build()), mode);
 			this.end();
 			return true;
@@ -65,17 +65,17 @@ public class FreeFormingSelectionBehavior extends DrawnStateBehavior {
 			Vec2i p_e = builder.getEnd();
 			
 			g.setColor( Colors.BLACK);
-			g.drawLine(this.penner.view.itsXm(p_e.x), this.penner.view.itsYm(p_e.y), 
+			g.drawLine(this.penner.view.itsXm(p_e.getX()), this.penner.view.itsYm(p_e.getY()),
 					this.penner.view.itsXm(this.penner.x), this.penner.view.itsYm(this.penner.y));
 
 		}
 
 		Vec2i p_s = builder.getStart();
-		if( MUtil.distance(p_s.x, p_s.y, this.penner.x, this.penner.y)<=5) {
+		if( MUtil.distance(p_s.getX(), p_s.getY(), this.penner.x, this.penner.y)<=5) {
 			g.setColor( Colors.YELLOW);
-			g.fillOval(this.penner.view.itsXm(p_s.x)-5, this.penner.view.itsYm(p_s.y) - 5, 10, 10);
+			g.fillOval(this.penner.view.itsXm(p_s.getX())-5, this.penner.view.itsYm(p_s.getY()) - 5, 10, 10);
 		}
 		else
-			g.drawOval(this.penner.view.itsXm(p_s.x)-5, this.penner.view.itsYm(p_s.y) - 5, 10, 10);
+			g.drawOval(this.penner.view.itsXm(p_s.getX())-5, this.penner.view.itsYm(p_s.getY()) - 5, 10, 10);
 	}
 }

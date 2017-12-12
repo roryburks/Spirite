@@ -38,8 +38,8 @@ public class Interpolation {
         int oy = -999;
         for( float d = 0; d < csi.getCurveLength(); d += 1) {
             Vec2 p = csi.eval(d);
-            int nx = (int) Math.round(p.x);
-            int ny = (int) Math.round(p.y);
+            int nx = (int) Math.round(p.getX());
+            int ny = (int) Math.round(p.getY());
 
             if( ox != -999) {
 //                gc.setColor( Colors.toColor( 255, (int) (Math.random()*255) , (int) (Math.random()*255), (int) (Math.random()*255)));

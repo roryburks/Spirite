@@ -42,7 +42,7 @@ public class CubicSplineInterpolator
                 new Comparator<Vec2>() {
                     @Override
                     public int compare(Vec2 o1, Vec2 o2) {
-                        float d = o1.x - o2.x;
+                        float d = o1.getX() - o2.getX();
                         return (int) Math.signum(d);
                     }
                 }
@@ -54,8 +54,8 @@ public class CubicSplineInterpolator
 
         for( int i=0; i< points.size(); ++i){
             Vec2 p = points.get(i);
-            x_[i] = p.x;
-            y_[i] = p.y;
+            x_[i] = p.getX();
+            y_[i] = p.getY();
         }
 
         fastCalculateSlopes();

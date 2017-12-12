@@ -181,44 +181,44 @@ public class GLGeom {
             Vec2 bc= new Vec2( raw[(i+1)*SB_STRIDE], raw[(i+1)*SB_STRIDE+1]);
             Vec2 tc = new Vec2( raw[(i+2)*SB_STRIDE], raw[(i+2)*SB_STRIDE+1]);
 
-            Vec2 dif = tc.sub(bc).normalize();
+            Vec2 dif = tc.minus(bc).normalize();
 
             // Start Dot
-            Vec2 bl = new Vec2( bc.x - dif.y * w1, bc.y + dif.x * w1);
-            Vec2 br = new Vec2( bc.x + dif.y * w1, bc.y - dif.x * w1);
+            Vec2 bl = new Vec2( bc.getX() - dif.getY() * w1, bc.getY() + dif.getX() * w1);
+            Vec2 br = new Vec2( bc.getX() + dif.getY() * w1, bc.getY() - dif.getX() * w1);
             fWeight = -1;
-            fX = bc.x+0.5f;
-            fY = fH - (bc.y+0.5f);
+            fX = bc.getX() +0.5f;
+            fY = fH - (bc.getY() +0.5f);
             fM = w1;
 
-            builder.emitVertex( new float[]{bl.x-dif.x*w1, bl.y-dif.y*w1, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{bl.x+dif.x*w1, bl.y+dif.y*w1, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{br.x-dif.x*w1, br.y-dif.y*w1, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{br.x+dif.x*w1, br.y+dif.y*w1, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{bl.getX() - dif.getX() *w1, bl.getY() - dif.getY() *w1, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{bl.getX() + dif.getX() *w1, bl.getY() + dif.getY() *w1, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{br.getX() - dif.getX() *w1, br.getY() - dif.getY() *w1, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{br.getX() + dif.getX() *w1, br.getY() + dif.getY() *w1, fWeight, fX, fY, fM});
             builder.emitPrimitive();
 
             // End Dot
-            Vec2 tl = new Vec2( tc.x - dif.y * w2, tc.y + dif.x * w2);
-            Vec2 tr = new Vec2( tc.x + dif.y * w2, tc.y - dif.x * w2);
-            fX = tc.x+0.5f;
-            fY = fH-(tc.y+0.5f);
+            Vec2 tl = new Vec2( tc.getX() - dif.getY() * w2, tc.getY() + dif.getX() * w2);
+            Vec2 tr = new Vec2( tc.getX() + dif.getY() * w2, tc.getY() - dif.getX() * w2);
+            fX = tc.getX() +0.5f;
+            fY = fH-(tc.getY() +0.5f);
             fM = w2;
-            builder.emitVertex( new float[]{tl.x-dif.x*w2, tl.y-dif.y*w2, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{tl.x+dif.x*w2, tl.y+dif.y*w2, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{tr.x-dif.x*w2, tr.y-dif.y*w2, fWeight, fX, fY, fM});
-            builder.emitVertex( new float[]{tr.x+dif.x*w2, tr.y+dif.y*w2, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{tl.getX() - dif.getX() *w2, tl.getY() - dif.getY() *w2, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{tl.getX() + dif.getX() *w2, tl.getY() + dif.getY() *w2, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{tr.getX() - dif.getX() *w2, tr.getY() - dif.getY() *w2, fWeight, fX, fY, fM});
+            builder.emitVertex( new float[]{tr.getX() + dif.getX() *w2, tr.getY() + dif.getY() *w2, fWeight, fX, fY, fM});
             builder.emitPrimitive();
 
             fX = 0;
             fY = 0;
             fM = w2;
 
-            builder.emitVertex( new float[]{ bl.x, bl.y, 0, fX, fY, fM});
-            builder.emitVertex( new float[]{ tl.x, tl.y, 0, fX, fY, fM});
-            builder.emitVertex( new float[]{ bc.x, bc.y, 1, fX, fY, fM});
-            builder.emitVertex( new float[]{ tc.x, tc.y, 1, fX, fY, fM});
-            builder.emitVertex( new float[]{ br.x, br.y, 0, fX, fY, fM});
-            builder.emitVertex( new float[]{ tr.x, tr.y, 0, fX, fY, fM});
+            builder.emitVertex( new float[]{bl.getX(), bl.getY(), 0, fX, fY, fM});
+            builder.emitVertex( new float[]{tl.getX(), tl.getY(), 0, fX, fY, fM});
+            builder.emitVertex( new float[]{bc.getX(), bc.getY(), 1, fX, fY, fM});
+            builder.emitVertex( new float[]{tc.getX(), tc.getY(), 1, fX, fY, fM});
+            builder.emitVertex( new float[]{br.getX(), br.getY(), 0, fX, fY, fM});
+            builder.emitVertex( new float[]{tr.getX(), tr.getY(), 0, fX, fY, fM});
             builder.emitPrimitive();
         }
 
@@ -265,14 +265,14 @@ public class GLGeom {
     private static void lrgDoFlat( float[] raw, int index, float uWidth, PrimitiveBuilder builder) {
         Vec2 p1 = new Vec2( raw[(index+1)*LRG_STRIDE ], raw[(index+1)*LRG_STRIDE +1]);
         Vec2 p2 = new Vec2( raw[(index+2)*LRG_STRIDE ], raw[(index+2)*LRG_STRIDE +1]);
-        Vec2 normal = p2.sub(p1).normalize();
-        Vec2 nl = new Vec2( -normal.y, normal.x);
-        Vec2 nr = new Vec2( normal.y, -normal.x);
+        Vec2 normal = p2.minus(p1).normalize();
+        Vec2 nl = new Vec2( -normal.getY(), normal.getX());
+        Vec2 nr = new Vec2(normal.getY(), -normal.getX());
 
-        builder.emitVertex( new float[] { nl.x * uWidth + p1.x, nl.y * uWidth + p1.y});
-        builder.emitVertex( new float[] { nr.x * uWidth + p1.x, nr.y * uWidth + p1.y});
-        builder.emitVertex( new float[] { nl.x * uWidth + p2.x, nl.y * uWidth + p2.y});
-        builder.emitVertex( new float[] { nr.x * uWidth + p2.x, nr.y * uWidth + p2.y});
+        builder.emitVertex( new float[] { nl.getX() * uWidth + p1.getX(), nl.getY() * uWidth + p1.getY()});
+        builder.emitVertex( new float[] { nr.getX() * uWidth + p1.getX(), nr.getY() * uWidth + p1.getY()});
+        builder.emitVertex( new float[] { nl.getX() * uWidth + p2.getX(), nl.getY() * uWidth + p2.getY()});
+        builder.emitVertex( new float[] { nr.getX() * uWidth + p2.getX(), nr.getY() * uWidth + p2.getY()});
         builder.emitPrimitive();
     }
     private static void lrgDoMiter( float[] raw, int index, float uWidth, PrimitiveBuilder builder) {
@@ -280,33 +280,33 @@ public class GLGeom {
         Vec2 p1 = new Vec2( raw[(index+1)*LRG_STRIDE ], raw[(index+1)*LRG_STRIDE +1]);
         Vec2 p2 = new Vec2( raw[(index+2)*LRG_STRIDE ], raw[(index+2)*LRG_STRIDE +1]);
         Vec2 p3 = new Vec2( raw[(index+3)*LRG_STRIDE ], raw[(index+3)*LRG_STRIDE +1]);
-        Vec2 normal = p2.sub( p1).normalize();
+        Vec2 normal = p2.minus( p1).normalize();
 
         if( p0.equals( p1)){
-            builder.emitVertex( new float[]{ -normal.y*uWidth + p1.x, normal.x*uWidth + p1.y});
-            builder.emitVertex( new float[]{ normal.y*uWidth + p1.x, -normal.x*uWidth + p1.y});
+            builder.emitVertex( new float[]{ -normal.getY() *uWidth + p1.getX(), normal.getX() *uWidth + p1.getY()});
+            builder.emitVertex( new float[]{ normal.getY() *uWidth + p1.getX(), -normal.getX() *uWidth + p1.getY()});
         }
         else {
-            Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
-            Vec2 miter = new Vec2( -tangent.y, tangent.x);
-            Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
+            Vec2 tangent = p2.minus(p1).normalize().plus( p1.minus(p0).normalize()).normalize();
+            Vec2 miter = new Vec2( -tangent.getY(), tangent.getX());
+            Vec2 n1 = (new Vec2( -(p1.getY() - p0.getY()), p1.getX() - p0.getX())).normalize();
             float length = Math.max( 0.5f, Math.min( MITER_MAX, uWidth / miter.dot(n1)));
 
-            builder.emitVertex( new float[]{ miter.x*length + p1.x, miter.y*length + p1.y});
-            builder.emitVertex( new float[]{ -miter.x*length + p1.x, -miter.y*length + p1.y});
+            builder.emitVertex( new float[]{ miter.getX() *length + p1.getX(), miter.getY() *length + p1.getY()});
+            builder.emitVertex( new float[]{ -miter.getX() *length + p1.getX(), -miter.getY() *length + p1.getY()});
         }
         if( p2.equals( p3)) {
-            builder.emitVertex( new float[]{ -normal.y*uWidth + p2.x, normal.x*uWidth + p2.y});
-            builder.emitVertex( new float[]{ normal.y*uWidth + p2.x, -normal.x*uWidth + p2.y});
+            builder.emitVertex( new float[]{ -normal.getY() *uWidth + p2.getX(), normal.getX() *uWidth + p2.getY()});
+            builder.emitVertex( new float[]{ normal.getY() *uWidth + p2.getX(), -normal.getX() *uWidth + p2.getY()});
         }
         else {
-            Vec2 tangent = p3.sub(p2).normalize().add( p2.sub(p1).normalize()).normalize();
-            Vec2 miter = new Vec2( -tangent.y, tangent.x);
-            Vec2 n2 = (new Vec2( -(p2.y - p1.y), p2.x - p1.x)).normalize();
+            Vec2 tangent = p3.minus(p2).normalize().plus( p2.minus(p1).normalize()).normalize();
+            Vec2 miter = new Vec2( -tangent.getY(), tangent.getX());
+            Vec2 n2 = (new Vec2( -(p2.getY() - p1.getY()), p2.getX() - p1.getX())).normalize();
             float length = Math.max( 0.5f, Math.min( MITER_MAX, uWidth / miter.dot(n2)));
 
-            builder.emitVertex( new float[]{ miter.x*length + p2.x, miter.y*length + p2.y});
-            builder.emitVertex( new float[]{ -miter.x*length + p2.x, -miter.y*length + p2.y});
+            builder.emitVertex( new float[]{ miter.getX() *length + p2.getX(), miter.getY() *length + p2.getY()});
+            builder.emitVertex( new float[]{ -miter.getX() *length + p2.getX(), -miter.getY() *length + p2.getY()});
 
         }
         builder.emitPrimitive();
@@ -315,22 +315,22 @@ public class GLGeom {
         Vec2 p1 = new Vec2( raw[(index+1)*LRG_STRIDE ], raw[(index+1)*LRG_STRIDE +1]);
         Vec2 p2 = new Vec2( raw[(index+2)*LRG_STRIDE ], raw[(index+2)*LRG_STRIDE +1]);
         Vec2 p3 = new Vec2( raw[(index+3)*LRG_STRIDE ], raw[(index+3)*LRG_STRIDE +1]);
-        Vec2 normal = p2.sub( p1).normalize();
-        Vec2 nl = new Vec2( -normal.y, normal.x);
-        Vec2 nr = new Vec2( normal.y, -normal.x);
+        Vec2 normal = p2.minus( p1).normalize();
+        Vec2 nl = new Vec2( -normal.getY(), normal.getX());
+        Vec2 nr = new Vec2(normal.getY(), -normal.getX());
 
-        builder.emitVertex( new float[] { nl.x * uWidth + p1.x, nl.y * uWidth + p1.y});
-        builder.emitVertex( new float[] { nr.x * uWidth + p1.x, nr.y * uWidth + p1.y});
-        builder.emitVertex( new float[] { nl.x * uWidth + p2.x, nl.y * uWidth + p2.y});
-        builder.emitVertex( new float[] { nr.x * uWidth + p2.x, nr.y * uWidth + p2.y});
+        builder.emitVertex( new float[] { nl.getX() * uWidth + p1.getX(), nl.getY() * uWidth + p1.getY()});
+        builder.emitVertex( new float[] { nr.getX() * uWidth + p1.getX(), nr.getY() * uWidth + p1.getY()});
+        builder.emitVertex( new float[] { nl.getX() * uWidth + p2.getX(), nl.getY() * uWidth + p2.getY()});
+        builder.emitVertex( new float[] { nr.getX() * uWidth + p2.getX(), nr.getY() * uWidth + p2.getY()});
         builder.emitPrimitive();
 
         if( !p3.equals(p2)) {
-            Vec2 normal2 = p3.sub(p2).normalize();
-            builder.emitVertex( new float[] { nl.x * uWidth + p2.x, nl.y * uWidth + p2.y});
-            builder.emitVertex( new float[] { nr.x * uWidth + p2.x, nr.y * uWidth + p2.y});
-            builder.emitVertex( new float[] { -normal2.y * uWidth + p2.x, normal2.x * uWidth + p2.y});
-            builder.emitVertex( new float[] { normal2.y * uWidth + p2.x, -normal2.x * uWidth + p2.y});
+            Vec2 normal2 = p3.minus(p2).normalize();
+            builder.emitVertex( new float[] { nl.getX() * uWidth + p2.getX(), nl.getY() * uWidth + p2.getY()});
+            builder.emitVertex( new float[] { nr.getX() * uWidth + p2.getX(), nr.getY() * uWidth + p2.getY()});
+            builder.emitVertex( new float[] { -normal2.getY() * uWidth + p2.getX(), normal2.getX() * uWidth + p2.getY()});
+            builder.emitVertex( new float[] { normal2.getY() * uWidth + p2.getX(), -normal2.getX() * uWidth + p2.getY()});
             builder.emitPrimitive();
         }
     }
@@ -357,23 +357,23 @@ public class GLGeom {
         	Vec2 p3 = new Vec2( raw[(i+3)*SV2_STRIDE], raw[(i+3)*SV2_STRIDE+1]);
         	float size1 = raw[(i+1)*SV2_STRIDE+2]/2;
         	float size2 = raw[(i+2)*SV2_STRIDE+2]/2;
-        	//Vec2 n10 = p1.sub(p0).normalize();
-        	Vec2 normal = p2.sub(p1).normalize();
-        	//Vec2 n32 = p3.sub(p2).normalize();
+        	//Vec2 n10 = p1.minus(p0).normalize();
+        	Vec2 normal = p2.minus(p1).normalize();
+        	//Vec2 n32 = p3.minus(p2).normalize();
         	
         	if( p0.equals(p1)) {
-        		builder1.emitVertexFront(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
-        		builder1.emitVertexBack(new float[] { p1.x - normal.x * size1/2, p1.y - normal.y * size1/2});
+        		builder1.emitVertexFront(new float[] { p1.getX() - normal.getX() * size1/2, p1.getY() - normal.getY() * size1/2});
+        		builder1.emitVertexBack(new float[] { p1.getX() - normal.getX() * size1/2, p1.getY() - normal.getY() * size1/2});
         		
         		//if( size1 > 0.5) {
         			float s = size1;//-0.5f;
-        			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
-        			builder2.emitVertex(new float[] { p1.x - normal.x * s/2, p1.y - normal.y * s/2});
+        			builder2.emitVertex(new float[] { p1.getX() - normal.getX() * s/2, p1.getY() - normal.getY() * s/2});
+        			builder2.emitVertex(new float[] { p1.getX() - normal.getX() * s/2, p1.getY() - normal.getY() * s/2});
         		//}
         		//else builder2.emitPrimitive();
         	}
         	else {
-//                Vec2 tangent = p2.sub(p1).normalize().add( p1.sub(p0).normalize()).normalize();
+//                Vec2 tangent = p2.minus(p1).normalize().plus( p1.minus(p0).normalize()).normalize();
 //                Vec2 miter = new Vec2( -tangent.y, tangent.x);
 //                Vec2 n1 = (new Vec2( -(p1.y - p0.y), p1.x - p0.x)).normalize();
                 
@@ -381,8 +381,8 @@ public class GLGeom {
                 float length = Math.max(0,size1 - 0.5f);
 //                float length = Math.max( 0.5f, Math.min( MITER_MAX2*size1, size1 / miter.dot(n1)));
 
-                float[] left = new float[] {p1.x + (p2.y - p0.y)* length/2, p1.y - (p2.x - p0.x) * length/2};
-                float[] right = new float[] {p1.x - (p2.y - p0.y)* length/2, p1.y + (p2.x - p0.x) * length/2};
+                float[] left = new float[] {p1.getX() + (p2.getY() - p0.getY())* length/2, p1.getY() - (p2.getX() - p0.getX()) * length/2};
+                float[] right = new float[] {p1.getX() - (p2.getY() - p0.getY())* length/2, p1.getY() + (p2.getX() - p0.getX()) * length/2};
 
                 builder1.emitVertexFront(left);
                 builder1.emitVertexBack(right);
@@ -404,17 +404,17 @@ public class GLGeom {
         	}
         	if( p2.equals(p3)) {
                 float length = Math.max(0,size2 - 0.5f);
-        		builder1.emitVertexFront(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
-        		builder1.emitVertexBack(new float[] { p2.x + normal.x * length/2, p2.y + normal.y * length/2});
+        		builder1.emitVertexFront(new float[] { p2.getX() + normal.getX() * length/2, p2.getY() + normal.getY() * length/2});
+        		builder1.emitVertexBack(new float[] { p2.getX() + normal.getX() * length/2, p2.getY() + normal.getY() * length/2});
         		//if( size2 > 0.5) {
         			float s = size2;//-0.5f;
-        			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
-        			builder2.emitVertex(new float[] { p2.x + normal.x * s/2, p2.y + normal.y * s/2});
+        			builder2.emitVertex(new float[] { p2.getX() + normal.getX() * s/2, p2.getY() + normal.getY() * s/2});
+        			builder2.emitVertex(new float[] { p2.getX() + normal.getX() * s/2, p2.getY() + normal.getY() * s/2});
         		//}
         		builder2.emitPrimitive();
         	}
         	/*else {
-                Vec2 tangent = p3.sub(p2).normalize().add( p2.sub(p1).normalize()).normalize();
+                Vec2 tangent = p3.minus(p2).normalize().plus( p2.minus(p1).normalize()).normalize();
                 Vec2 miter = new Vec2( -tangent.y, tangent.x);
                 Vec2 n2 = (new Vec2( -(p2.y - p1.y), p2.x - p1.x)).normalize();
                 float length = Math.max( 0.5f, Math.min( MITER_MAX2, size2 / miter.dot(n2)));
@@ -435,8 +435,8 @@ public class GLGeom {
 //        		float x2 = raw[(i+1)*3];
 //        		float y1 = raw[i*3+1];
 //        		float y2 = raw[(i+1)*3+1];
-//        		angle.add( (float)Math.atan2(y2-y1, x2-x1));
-//        		distance.add( (float)MUtil.distance(x1, y1, x2, y2));
+//        		angle.plus( (float)Math.atan2(y2-y1, x2-x1));
+//        		distance.plus( (float)MUtil.distance(x1, y1, x2, y2));
 //        	}
 //        	float[] anglesArray = new float[angle.size()];
 //        	float[] distancesArray = new float[angle.size()];

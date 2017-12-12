@@ -45,7 +45,7 @@ public class HotkeyDialog extends JDialog {
 		
 		List<String> commands = master.getAllValidCommands();
 		
-		// Go through all commands them to the list, and add the command and
+		// Go through all commands them to the list, and plus the command and
 		//	corresponding Hotkey to they 
 		for( String command : commands) {
 			String domain = command.substring(0, command.indexOf('.'));

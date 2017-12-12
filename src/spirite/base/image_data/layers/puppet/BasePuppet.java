@@ -231,7 +231,7 @@ public class BasePuppet implements IPuppet {
 //		private void _addPart( int index, BasePart part) {
 //			
 //			part.parent = this;
-//			children.add(index, part);
+//			children.plus(index, part);
 //			byDepthList = null;
 //		}
 		private void _removePart( BasePart part) {

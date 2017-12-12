@@ -33,10 +33,10 @@ public class ReshapingBehavior extends TransformBehavior {
 		ToolSettings settings = this.penner.toolsetManager.getToolSettings(Tool.RESHAPER);
 		Vec2 scale = (Vec2)settings.getValue("scale");
 		Vec2 translation = (Vec2)settings.getValue("translation");
-		this.scaleX = scale.x;
-		this.scaleY = scale.y;
-		this.translateX = translation.x;
-		this.translateY = translation.y;
+		this.scaleX = scale.getX();
+		this.scaleY = scale.getY();
+		this.translateX = translation.getX();
+		this.translateY = translation.getY();
 		this.rotation = (float)settings.getValue("rotation");
 
 		SelectionMask sel = this.penner.selectionEngine.getSelection();

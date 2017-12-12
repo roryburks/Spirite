@@ -285,7 +285,7 @@ public class GroupTree {
 		// ==== Direct Adding/Removing Methods
 		
 		/** Adds a Subchild.
-		 * NOTE! Should use ImageWorkspace.add* methods if you want the 
+		 * NOTE! Should use ImageWorkspace.plus* methods if you want the
 		 * UndoEngine to track the actions. */
 		protected void _add( Node toAdd, Node before) {
 			int i = children.indexOf(before);
@@ -319,7 +319,7 @@ public class GroupTree {
 		}
 	}
 	
-	/** A GroupNode is a container node which accepts sub-children. */
+	/** A GroupNode is a container node which accepts minus-children. */
 	public class GroupNode extends Node {
 		GroupNode( String name) {
 			this.name = name;
@@ -332,7 +332,7 @@ public class GroupTree {
 	
 	/** A LayerNode is a node container for a Layer.
 	 * 
-	 * Though LayerNodes can technically accept sub-children, doing so may 
+	 * Though LayerNodes can technically accept minus-children, doing so may
 	 * yield unexpected behavior.*/
 	public class LayerNode extends Node {
 		private final Layer layer;

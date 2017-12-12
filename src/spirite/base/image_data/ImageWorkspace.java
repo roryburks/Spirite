@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /***
  * An ImageWorkspace is essentially the root class for all aspects of the graphical
- * data, both storage and interface.  It has many sub-components and bridges access
+ * data, both storage and interface.  It has many minus-components and bridges access
  * with SOME of MasterControl's global functionality (should at least be image-related).
  * ImageWorkspace itself's functionality should be limited to:
  * -CRUD on Nodes to the Group Tree
@@ -295,7 +295,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	/**
 	 * BuiltActiveData's should be immutable, but after the Layers give their
 	 * BuiltData to the ImageWorkspace and before the ImageWorkspace gives it
-	 * to the Class that requested it, ImageWorkspace has to add in the Node
+	 * to the Class that requested it, ImageWorkspace has to plus in the Node
 	 * transform data.  BuildingActiveData is an intermediate class that 
 	 * Layers send that have their local transforms.
 	 * 
@@ -535,10 +535,10 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			
 			if( layerAction != null ) {
 				actions.addAll( layerAction.actions);
-				if( layerAction.offsetChange.x !=0 || layerAction.offsetChange.y != 0) {
+				if( layerAction.offsetChange.getX() !=0 || layerAction.offsetChange.getY() != 0) {
 					actions.add( new StructureAction(new OffsetChange(node, 
-							node.getOffsetX() + layerAction.offsetChange.x, 
-							node.getOffsetY() + layerAction.offsetChange.y)));
+							node.getOffsetX() + layerAction.offsetChange.getX(),
+							node.getOffsetY() + layerAction.offsetChange.getY())));
 				}
 			}
 		}
@@ -570,12 +570,12 @@ public class ImageWorkspace implements MWorkspaceObserver {
 		
 		LayerActionHelper helper = destination.getLayer().merge(source, -destination.x+source.x, -destination.y+source.y);
 		actions.addAll( helper.actions);
-		if( helper.offsetChange.x != 0 || helper.offsetChange.y != 0){
+		if( helper.offsetChange.getX() != 0 || helper.offsetChange.getY() != 0){
 			actions.add( new StructureAction(
 					new OffsetChange(
 							destination, 
-							destination.x + helper.offsetChange.x, 
-							destination.y + helper.offsetChange.y)
+							destination.x + helper.offsetChange.getX(),
+							destination.y + helper.offsetChange.getY())
 					));
 		}
 			
@@ -668,7 +668,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			ii = new MaglevMedium(this, null);
 			break;
 		case DERIVED_MAGLEV:
-			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to add an isolated DerivedMaglev Image ");
+			MDebug.handleError(ErrorType.STRUCTURAL, "Tried to plus an isolated DerivedMaglev Image ");
 			return null;
 		}
 		
@@ -737,7 +737,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	/** A Shell Layer is a layer whose ImageHandles are not yet linked to
 	 * the Workspace.  When creating a complex custom Layer or constructing
 	 * multiple layers at once (e.g. when loading), it is useful to do this
-	 * and then call ImportData with the Data Map to add a Layer.*/
+	 * and then call ImportData with the Data Map to plus a Layer.*/
 	public LayerNode addShellLayer(GroupTree.Node contextNode, Layer layer, String name ){
 		LayerNode insertedNode = groupTree.new LayerNode( layer, name);
 		
@@ -843,7 +843,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				Node dupe;
 				
 				if( next.toDupe instanceof GroupNode) {
-					// Clone Group node, and add all its children to the queue
+					// Clone Group node, and plus all its children to the queue
 					dupe = groupTree.new GroupNode( (GroupNode) next.toDupe, next.toDupe.getName()+" copy");
 					
 					for( Node child : next.toDupe.getChildren()) {
@@ -894,7 +894,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 	/**
 	 * A shallow duplication will duplicate all nodes, but all LayerNodes will
 	 * be references to the original, not deep copies.  This Method does not
-	 * automatically add the node to the GroupTree (as it's probably being used
+	 * automatically plus the node to the GroupTree (as it's probably being used
 	 * for something else).
 	 */
 	public Node shallowDuplicateNode( Node toDupe) {
@@ -917,7 +917,7 @@ public class ImageWorkspace implements MWorkspaceObserver {
 				Node dupe;
 				
 				if( next.toDupe instanceof GroupNode) {
-					// Clone Group node, and add all its children to the queue
+					// Clone Group node, and plus all its children to the queue
 					dupe = groupTree.new GroupNode( next.toDupe.getName());
 					
 					for( Node child : next.toDupe.getChildren()) {

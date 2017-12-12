@@ -50,7 +50,7 @@ public class RadioButtonProperty<T extends Enum<T>> extends SwingToolProperty {
 		
 		radioButtons[value.ordinal()].setSelected(true);
 		
-		// Link actions of the Components, and add them to the layout
+		// Link actions of the Components, and plus them to the layout
 		Group horSub = layout.createParallelGroup();
 		for( int i=0; i< len; ++i) {
 			final T option = type.getEnumConstants()[i];

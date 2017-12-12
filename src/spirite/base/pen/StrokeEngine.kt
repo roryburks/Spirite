@@ -36,7 +36,7 @@ abstract class StrokeEngine {
     protected var prec = ArrayList<PenState>()    // Recording of raw states
 
     // Context
-    var params: StrokeParams? = null; protected set
+    var strokeParams: StrokeParams? = null; protected set
     var imageData: BuildingMediumData? = null; protected set
     var lastSelection: SelectionMask? = null; protected set
 
@@ -144,7 +144,7 @@ abstract class StrokeEngine {
         if (built == null)
             return false
 
-        this.params = params
+        this.strokeParams = params
 
 
         lastSelection = selection
@@ -184,7 +184,7 @@ abstract class StrokeEngine {
                     _interpolator!!.addPoint(rawX, rawY)
 
                 prepareDisplayLayer()
-                changed.set(this.drawToLayer(buildPoints(_interpolator, prec, params), false))
+                changed.set(this.drawToLayer(buildPoints(_interpolator, prec, strokeParams), false))
             }
 
             oldX = newX
@@ -228,7 +228,7 @@ abstract class StrokeEngine {
             }
         }
 
-        this.drawToLayer(buildPoints(_interpolator, Arrays.asList(*points), this.params), false)
+        this.drawToLayer(buildPoints(_interpolator, Arrays.asList(*points), this.strokeParams), false)
 
         builtImage?.doOnRaw( DoerOnRaw{ raw -> drawStrokeLayer(raw.graphics) })
 
@@ -249,9 +249,9 @@ abstract class StrokeEngine {
         val oldAlpha = gc.alpha
         val oldComp = gc.composite
 
-        when (params!!.method) {
-            StrokeEngine.Method.BASIC, StrokeEngine.Method.PIXEL -> gc.setComposite(Composite.SRC_OVER, params!!.alpha)
-            StrokeEngine.Method.ERASE -> gc.setComposite(Composite.DST_OUT, params!!.alpha)
+        when (strokeParams!!.method) {
+            StrokeEngine.Method.BASIC, StrokeEngine.Method.PIXEL -> gc.setComposite(Composite.SRC_OVER, strokeParams!!.alpha)
+            StrokeEngine.Method.ERASE -> gc.setComposite(Composite.DST_OUT, strokeParams!!.alpha)
         }
         drawDisplayLayer(gc)
         gc.setComposite(oldComp, oldAlpha)

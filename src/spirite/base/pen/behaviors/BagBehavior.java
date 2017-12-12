@@ -30,8 +30,8 @@ public class BagBehavior extends DrawnStateBehavior {
 	public void paintOverlay(GraphicsContext gc) {
 		cY += 0.8f;
 		Vec2 counter=  new Vec2(cX - startX, cY-startY).scalar(-springConstant);
-		cX += counter.x;
-		cY += counter.y;
+		cX += counter.getX();
+		cY += counter.getY();
 		gc.setColor(Colors.BLACK);
 		gc.setComposite(Composite.SRC_OVER, 1);
 		gc.setTransform(penner.view.getViewTransform());

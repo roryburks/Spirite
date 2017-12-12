@@ -144,7 +144,7 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				overlap = -1;
 			for( int i=0; i<s.size(); ++i) {
 				Shape shape = s.get(i);
-				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.x, p.y)))) {
+				if( overlap == i || (overlap == -1 && shape.contains( new Point2D.Float(p.getX(), p.getY())))) {
 					gc.setColor(Colors.YELLOW);
 //					gc.setStroke(new BasicStroke( 4/zoom));
 					gc.draw(shape);
@@ -175,8 +175,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				Vec2 pn = calcTrans.apply(new Vec2(this.penner.rawX,this.penner.rawY));
 				Vec2 ps = calcTrans.apply(new Vec2(startX,startY));
 
-				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.x/ps.x * oldScaleX;
-				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.y/ps.y * oldScaleY;
+				float sx = (overlap == 0 || overlap == 2) ? scaleX : pn.getX() / ps.getX() * oldScaleX;
+				float sy = (overlap == 1 || overlap == 3) ? scaleY : pn.getY() / ps.getY() * oldScaleY;
 				
 				_internetSetScale(sx, sy);
 				break;}
@@ -188,8 +188,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 				
 				
 
-				double start = Math.atan2(ps.y, ps.x);
-				double end =  Math.atan2(pn.y, pn.x);
+				double start = Math.atan2(ps.getY(), ps.getX());
+				double end =  Math.atan2(pn.getY(), pn.getX());
 				
 				_internalSetRotion((float)(end-start + oldRot));
 				break;}

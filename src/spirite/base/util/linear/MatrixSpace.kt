@@ -4,8 +4,8 @@ import spirite.base.util.linear.Transform.Companion
 import java.util.*
 
 /**
- * A MatrixSpace is a collection of Spaces and Matrices defining how to convert from one Space to another.  A connected
- * graph of transformations is given and all other transformations are calculated and cached as requested.
+ * A MatrixSpace is a collection of Spaces and Matrices defining how to convert from one Space to another.  A (preferably)
+ * connected graph of transformations is given and all other transformations are calculated and cached as requested.
  */
 class MatrixSpace(
         map: Map<Pair<String,String>, Transform>
@@ -27,6 +27,7 @@ class MatrixSpace(
     }
 
     fun convertSpace( from: String, to: String):Transform {
+        // Note: could cache all the transforms from A to B during the attempt to find a link
         if( from == to)
             return Transform.IdentityMatrix
 

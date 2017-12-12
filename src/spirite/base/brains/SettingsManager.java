@@ -232,8 +232,8 @@ public class SettingsManager {
 
         bb.putShort((short)points.size());
         for( int i=0; i<points.size(); ++i) {
-            bb.putDouble(points.get(i).x);
-            bb.putDouble(points.get(i).y);
+            bb.putDouble(points.get(i).getX());
+            bb.putDouble(points.get(i).getY());
         }
         prefs.putByteArray("tpcPoints", bb.array());
 

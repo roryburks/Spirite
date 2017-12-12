@@ -271,7 +271,7 @@ public class Test1 {
 			
 //			StrokeAction action =
 //			workspace.getDrawEngine().new StrokeAction(
-//					master.getSettingsManager().getDefaultDrawer().getStrokeEngine(),params, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
+//					master.getSettingsManager().getDefaultDrawer().getStrokeEngine(),strokeParams, p, workspace.getSelectionEngine().getBuiltSelection(), workspace.buildActiveData());
 //			
 //			workspace.getUndoEngine().performAndStore(action);
 			break;

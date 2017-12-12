@@ -41,7 +41,7 @@ public class AnimationSchemeTreePanel extends SPanel
 {
 	private static final long serialVersionUID = 1L;
 
-	// MasterControl needed to add/remove WorkspaceObserver
+	// MasterControl needed to plus/remove WorkspaceObserver
 	private final MasterControl master;
 	private ImageWorkspace workspace = null;
 	private AnimationManager manager = null;

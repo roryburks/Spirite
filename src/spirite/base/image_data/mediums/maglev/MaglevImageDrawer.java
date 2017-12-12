@@ -90,7 +90,7 @@ public class MaglevImageDrawer
 		strokeEngine.endStroke();
 		
 		final PenState[] states = strokeEngine.getHistory();
-		final StrokeParams params = StrokeParams.Companion.bakeAndNormalize(strokeEngine.getParams(), states);
+		final StrokeParams params = StrokeParams.Companion.bakeAndNormalize(strokeEngine.getStrokeParams(), states);
 		final boolean behind = params.getMode() == PenDrawMode.BEHIND;
 		final MagLevStroke stroke = new MagLevStroke(states, params);
 		

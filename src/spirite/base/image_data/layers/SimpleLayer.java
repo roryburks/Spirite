@@ -61,7 +61,7 @@ public class SimpleLayer extends Layer {
 		
 		List<Rect> list = new ArrayList<>(1);
 		list.add(new Rect( 0, 0, data.getWidth(), data.getHeight()));
-//		list.add( bounds.intersection(rect));
+//		list.plus( bounds.intersection(rect));
 		
 		return list;
 	}
@@ -84,14 +84,14 @@ public class SimpleLayer extends Layer {
 		
 		if( !myBounds.contains( imgBounds)) {
 			Rect newBounds = myBounds.union(imgBounds);
-			helper.offsetChange = new Vec2i(newBounds.x, newBounds.y);
+			helper.offsetChange = new Vec2i(newBounds.getX(), newBounds.getY());
 			
 			// Draw both images in their respective spots
-			RawImage combination = HybridHelper.createImage( newBounds.width, newBounds.height);
+			RawImage combination = HybridHelper.createImage(newBounds.getWidth(), newBounds.getHeight());
 			GraphicsContext gc = combination.getGraphics();
 			gc.clear();
-			gc.drawHandle( data, 0-newBounds.x, 0-newBounds.y);
-			gc.drawImage( image, x-newBounds.x, y-newBounds.y);
+			gc.drawHandle( data, 0- newBounds.getX(), 0- newBounds.getY());
+			gc.drawImage( image, x- newBounds.getX(), y- newBounds.getY());
 //			g.dispose();
 			
 			helper.actions.add(workspace.getUndoEngine().createReplaceAction(data, combination));

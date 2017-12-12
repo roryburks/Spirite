@@ -3,13 +3,13 @@ package spirite.base.util.linear;
 /**
  * A Package containing methods which construct certain frequently-used
  * Matrixes
- * 
+ *
  * @author Rory Burks
  */
 public class MatrixBuilder {
 	/** Creates a transform matrix representing an Orthagonal Projection
 	 * (A flat, rectangular projection in XY coordinates). */
-	public static float[] orthagonalProjectionMatrix( 
+	public static float[] orthagonalProjectionMatrix(
 			float left, float right,
 			float bottom, float top,
 			float near, float far)
@@ -21,7 +21,7 @@ public class MatrixBuilder {
 			0, 0, 0, 1
 		};
 	}
-	
+
 
     /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix
      * which can be fed into OpenGL to behave in the expected way. */

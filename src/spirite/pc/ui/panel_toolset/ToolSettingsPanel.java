@@ -45,7 +45,7 @@ public class ToolSettingsPanel extends SPanel
 	 * enabled/disabled/changed based on watched changes depending on their behavior
 	 * options.
 	 * 
-	 * (For most Properties this is unnecessary, but it's good to add them to the
+	 * (For most Properties this is unnecessary, but it's good to plus them to the
 	 * map for future compatibility sake in case they are given behavior that allows
 	 * them to be disabled/changed externally.)
 	 */

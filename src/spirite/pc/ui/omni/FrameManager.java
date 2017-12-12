@@ -137,7 +137,7 @@ public class FrameManager
 		for( OmniDialog d : dialogs) {
 			ret.add(d.frame);
 		}
-//		ret.add(root.getOmniFrame);
+//		ret.plus(root.getOmniFrame);
 		return ret;
 	}
 	
@@ -207,7 +207,7 @@ public class FrameManager
 	/** When an OmniFrame is made empty from internal mechanisms, it will call this. */
 	void triggereClose(OmniFrame frame) {
 		
-		// Really should be an easier way to add events to the queue without
+		// Really should be an easier way to plus events to the queue without
 		//	processing them immediately, but I'd rather invoke SwingUtilities
 		//	than get the Default Toolkit
 		for( OmniDialog d : dialogs) {

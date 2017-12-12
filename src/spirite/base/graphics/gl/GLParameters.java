@@ -73,9 +73,9 @@ public class GLParameters {
 	
 	// =============
 	// ==== Internal Parameters
-	//	In order to make GLParameters re-useable but not add time/energy/modularity
+	//	In order to make GLParameters re-useable but not plus time/energy/modularity
 	//	bloat by copying everything internally, a separate Internal Parameter list
-	//	is maintained where the GLEngine can add GLParams that are needed internally
+	//	is maintained where the GLEngine can plus GLParams that are needed internally
 	//	(such as the perspectiveMatrix) to be removed once it's finished with them.
 	//
 	//	NOTE: this makes GLParameters somewhat less Multithread friendly, but excessive

@@ -53,15 +53,15 @@ public class CubicSplineInterpolator2D
         distance = 0;
 
         if( length != 0) {
-            x_[0] = points.get(0).x;
-            y_[0] = points.get(0).y;
+            x_[0] = points.get(0).getX();
+            y_[0] = points.get(0).getY();
             t_[0] = 0;
 
         }
 
         for( int i=1; i<length; ++i) {
-            x_[i] = points.get(i).x;
-            y_[i] = points.get(i).y;
+            x_[i] = points.get(i).getX();
+            y_[i] = points.get(i).getY();
             t_[i] = (float) (distance + MUtil.distance(x_[i-1], y_[i-1], x_[i], y_[i]));
             distance = t_[i];
         }
@@ -222,19 +222,19 @@ public class CubicSplineInterpolator2D
         if( i == 0) {
         	Vec2 p1 = _eval(0.075f, 0, 1);
         	
-        	float dt = (float)MUtil.distance(p1.x, p1.y, x_[0], y_[0]);
+        	float dt = (float)MUtil.distance(p1.getX(), p1.getY(), x_[0], y_[0]);
         	float d = t / dt;
         	
-        	return new Vec2( x_[0] + d * (p1.x - x_[0]),y_[0] + d * (p1.y - y_[0]));
+        	return new Vec2( x_[0] + d * (p1.getX() - x_[0]),y_[0] + d * (p1.getY() - y_[0]));
         }
         if( i == length) {
 
         	Vec2 p1 = _eval(0.925f, length-2, length-1);
         	
-        	float dt = (float)MUtil.distance(p1.x, p1.y, x_[length-1], y_[length-1]);
+        	float dt = (float)MUtil.distance(p1.getX(), p1.getY(), x_[length-1], y_[length-1]);
         	float d = (t - distance) / dt + 1;
         	
-        	return new Vec2( x_[length-1] + d * (x_[length-1]-p1.x ),y_[length-1] + d * ( y_[length-1]- p1.y));
+        	return new Vec2( x_[length-1] + d * (x_[length-1]- p1.getX()),y_[length-1] + d * ( y_[length-1]- p1.getY()));
         }
         
         return _eval((t - t_[i-1])/(t_[i]-t_[i-1]), i-1, i);

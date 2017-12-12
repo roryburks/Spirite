@@ -194,7 +194,7 @@ public class PaletteManager
         		
         		while ( peekCount > 0) {
         			// Note since we're using bytes to denote distance, in the offchance
-        			// that there are more than 255 conescutives, make sure to add
+        			// that there are more than 255 conescutives, make sure to plus
         			//	intermediate markets
         			int tCount = (peekCount > 0xff) ? 0xff : peekCount;
         			

@@ -105,23 +105,15 @@ abstract class Transform()
 }
 
 class ImmutableTransform(
-        override val m00: Float = 1f,
-        override val m01: Float = 0f,
-        override val m02: Float = 0f,
-        override val m10: Float = 0f,
-        override val m11: Float = 1f,
-        override val m12: Float = 0f
+        override val m00: Float = 1f, override val m01: Float = 0f, override val m02: Float = 0f,
+        override val m10: Float = 0f, override val m11: Float = 1f, override val m12: Float = 0f
 ) :Transform()
 {
 }
 
 class MutableTransform(
-        m00:Float = 1f,
-        m01:Float = 0f,
-        m02:Float = 0f,
-        m10:Float = 0f,
-        m11:Float = 1f,
-        m12:Float = 0f
+        m00:Float = 1f, m01:Float = 0f, m02:Float = 0f,
+        m10:Float = 0f, m11:Float = 1f, m12:Float = 0f
 ):Transform()
 {
     constructor():this( 1f,0f,0f,0f,1f,0f){}

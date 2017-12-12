@@ -79,11 +79,11 @@ public class DynamicImage {
 			Rect drawAreaInImageSpace = MUtil.circumscribeTrans(new Rect(0,0,w,h), invTrans).union(
 							new Rect(ox,oy, base.getWidth(), base.getHeight()));
 	
-			RawImage img = HybridHelper.createImage(drawAreaInImageSpace.width, drawAreaInImageSpace.height);
+			RawImage img = HybridHelper.createImage(drawAreaInImageSpace.getWidth(), drawAreaInImageSpace.getHeight());
 			GraphicsContext gc = img.getGraphics();
 	
 			// Draw the old image
-			gc.drawImage(base, ox - drawAreaInImageSpace.x, oy - drawAreaInImageSpace.y);
+			gc.drawImage(base, ox - drawAreaInImageSpace.getX(), oy - drawAreaInImageSpace.getY());
 	
 			// Clear the section of the old image that will be replaced by the new one
 			gc.transform(trans);
@@ -104,13 +104,13 @@ public class DynamicImage {
 				nri = HybridHelper.createNillImage();
 			}
 			else {
-				nri = HybridHelper.createImage( cropped.width, cropped.height);
+				nri = HybridHelper.createImage(cropped.getWidth(), cropped.getHeight());
 			}
 			gc = nri.getGraphics();
-			gc.drawImage( img, -cropped.x, -cropped.y);
+			gc.drawImage( img, -cropped.getX(), -cropped.getY());
 			
-			ox = cropped.x-drawAreaInImageSpace.x;
-			oy = cropped.y-drawAreaInImageSpace.y;
+			ox = cropped.getX() - drawAreaInImageSpace.getX();
+			oy = cropped.getY() - drawAreaInImageSpace.getY();
 			
 			base.flush();
 			base = nri;

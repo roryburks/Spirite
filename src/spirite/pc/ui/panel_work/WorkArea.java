@@ -150,9 +150,9 @@ public abstract class WorkArea implements MImageObserver, MFlashObserver, MSelec
             				Vec2 n = new Vec2(bone.y1-bone.y2, bone.x2-bone.x1).normalize();
             				Vec2 mid = new Vec2((bone.x1 + bone.x2)/2f, (bone.y1 + bone.y2)/2f);
             				float[] x = new float[] 
-            					{bone.x1-n.x, bone.x1, bone.x1+n.x, mid.x+n.x*3, bone.x2+n.x, bone.x2, bone.x2-n.x, mid.x-n.x*3};
+            					{bone.x1- n.getX(), bone.x1, bone.x1+ n.getX(), mid.getX() + n.getX() *3, bone.x2+ n.getX(), bone.x2, bone.x2- n.getX(), mid.getX() - n.getX() *3};
             				float[] y = new float[] 
-            					{bone.y1, bone.y1 - n.x, bone.y1,   mid.y+n.y*3, bone.y2, bone.y2+n.x, bone.y2,     mid.y-n.y*3};
+            					{bone.y1, bone.y1 - n.getX(), bone.y1,   mid.getY() + n.getY() *3, bone.y2, bone.y2+ n.getX(), bone.y2,     mid.getY() - n.getY() *3};
             				
             				gc.fillPolygon(x, y, 8);
             				//gc.drawLine(bone.x1, bone.y1, bone.x2, bone.y2);

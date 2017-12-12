@@ -87,11 +87,11 @@ class DynamicMedium : IMedium {
         override val sourceHeight: Int get() {return image.height}
 
         override fun _doOnGC(doer: DoerOnGC) {
-            //image.doOnGC( doer, matrixSpace.convertSpace(SOURCE,DESTINATION))
+            image.doOnGC( doer, trans)
         }
 
         override fun _doOnRaw(doer: DoerOnRaw) {
-            //image.doOnRaw( doer, matrixSpace.convertSpace(SOURCE,DESTINATION))
+            image.doOnRaw( doer, trans)
         }
     }
 }

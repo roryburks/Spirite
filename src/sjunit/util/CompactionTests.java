@@ -58,12 +58,12 @@ public class CompactionTests {
 //		ReverseFloatCompactor rfc = new ReverseFloatCompactor();
 //		FloatCompactor fc = new FloatCompactor();
 //
-//		fc.add(1);
-//		rfc.add(-1);
-//		fc.add(2);
-//		rfc.add(-2);
-//		fc.add(3);
-//		rfc.add(-3);
+//		fc.plus(1);
+//		rfc.plus(-1);
+//		fc.plus(2);
+//		rfc.plus(-2);
+//		fc.plus(3);
+//		rfc.plus(-3);
 //		
 //		float[] result = new float[6];
 //		fc.insertIntoArray(result, 0);
@@ -77,13 +77,13 @@ public class CompactionTests {
 //		Thread t1 = new Thread(new Runnable() {
 //			public void run() {
 //				for( int i=0; i < 9999; ++i)
-//					fc2.add(i);
+//					fc2.plus(i);
 //			}
 //		});
 //		Thread t2 = new Thread(new Runnable() {
 //			public void run() {
 //				for( int i=0; i < 9999; ++i)
-//					rfc2.add(-i);
+//					rfc2.plus(-i);
 //			}
 //		});
 //		t1.start();

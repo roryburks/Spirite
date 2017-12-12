@@ -287,7 +287,7 @@ public class MasterControl
     /***
      * Makes the given workspace the currently selected workspace.
      * 
-     * Note: if the workspace is not already managed by MasterControl it will add it to
+     * Note: if the workspace is not already managed by MasterControl it will plus it to
      * 	management, but you should really be using addWorkspace then.
      */
     public void setCurrentWorkpace( ImageWorkspace workspace) {
@@ -307,7 +307,7 @@ public class MasterControl
     
 
     /***
-     * Called when you want to add a Workspace that has been algorithmically constructed
+     * Called when you want to plus a Workspace that has been algorithmically constructed
      * 	such as with the LoadEngine, rather than making a new one with a default layer.
      */
 	public ImageWorkspace addCreatedWorkpace(ImageWorkspace workspace, boolean select) {

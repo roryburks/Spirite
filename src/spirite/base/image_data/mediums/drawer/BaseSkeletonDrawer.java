@@ -31,10 +31,10 @@ public class BaseSkeletonDrawer
 			BaseBone bone = part.getBone();
 			if(bone != null) {
 				Vec2 projection = MUtil.projectOnto(bone.x1, bone.y1, bone.x2, bone.y2, new Vec2(x, y));
-				if( Math.abs(projection.y) < width) {
+				if( Math.abs(projection.getY()) < width) {
 					
 					float mag = (float) MUtil.distance(bone.x1, bone.y1, bone.x2, bone.y2);
-					float grab = mag * projection.x;
+					float grab = mag * projection.getX();
 					
 					if( grab >= -width && grab <= mag+width) {
 						puppet.setSelectedIndex(i);

@@ -183,9 +183,9 @@ public class SpriteLayer extends Layer
 				Vec2 from = new Vec2( x - dx, y-dy);
 				Vec2 to = invTrans.apply(from);
 				
-				if( !MUtil.coordInImage( (int)to.x, (int)to.y, part.structure.handle.deepAccess()))
+				if( !MUtil.coordInImage( (int) to.getX(), (int) to.getY(), part.structure.handle.deepAccess()))
 					continue;
-				int rgb =part.structure.handle.deepAccess().getRGB((int)to.x, (int)to.y);
+				int rgb =part.structure.handle.deepAccess().getRGB((int) to.getX(), (int) to.getY());
 				
 				if( ((rgb >>> 24) & 0xFF) == 0) continue; 
 				
@@ -584,7 +584,7 @@ public class SpriteLayer extends Layer
 						helper = new LayerActionHelper();
 					
 					// TODO
-//					helper.actions.add( new ChangePartAttributesAction(
+//					helper.actions.plus( new ChangePartAttributesAction(
 //							part, part.ox + crop.dx, part.oy + crop.dy, 
 //							part.depth, part.partName, part.visible, part.alpha));
 				}

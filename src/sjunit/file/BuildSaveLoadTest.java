@@ -288,7 +288,7 @@ public class BuildSaveLoadTest {
 						assert(stroke1.params.getColor() == stroke2.params.getColor());
 						assert(stroke1.params.getMethod() == stroke2.params.getMethod());
 						assert(stroke1.params.getMode() == stroke2.params.getMode());
-						// stroke1.params == stroke2.params
+						// stroke1.strokeParams == stroke2.strokeParams
 						
 						assert( stroke1.states.length == stroke2.states.length);
 						for( int j=0; j<stroke1.states.length; ++j) {

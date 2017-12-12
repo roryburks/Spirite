@@ -96,18 +96,18 @@ public class CroppingBehavior extends DrawnStateBehavior {
 			}
 			else if( modifying) {
 				if( (cardinalMap & TOPMASK) != 0 ) {
-					cropSection.y += this.penner.y - this.penner.oldY;
-					cropSection.height -= (this.penner.y - this.penner.oldY);
+					cropSection.setY(cropSection.getY() + this.penner.y - this.penner.oldY);
+					cropSection.setHeight(cropSection.getHeight() - (this.penner.y - this.penner.oldY));
 				}
 				if( (cardinalMap & BOTTOMMASK) != 0) {
-					cropSection.height += (this.penner.y - this.penner.oldY);
+					cropSection.setHeight(cropSection.getHeight() + (this.penner.y - this.penner.oldY));
 				}
 				if( (cardinalMap & LEFTMASK) != 0) {
-					cropSection.x += (this.penner.x - this.penner.oldX);
-					cropSection.width -= (this.penner.x - this.penner.oldX);
+					cropSection.setX(cropSection.getX() + (this.penner.x - this.penner.oldX));
+					cropSection.setWidth(cropSection.getWidth() - (this.penner.x - this.penner.oldX));
 				}
 				if( (cardinalMap & RIGHTMASK)!= 0) {
-					cropSection.width+= (this.penner.x - this.penner.oldX);
+					cropSection.setWidth(cropSection.getWidth() + (this.penner.x - this.penner.oldX));
 				}
 				buildCrop();
 			}
@@ -162,7 +162,7 @@ public class CroppingBehavior extends DrawnStateBehavior {
             View view = this.penner.context.getCurrentView();
             Rect r = view.itsRm(cropSection);
 			gc.setColor(Colors.BLACK);
-            gc.drawRect(r.x, r.y, r.width, r.height);
+            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 			
 
             // Grey area outside
@@ -172,15 +172,15 @@ public class CroppingBehavior extends DrawnStateBehavior {
 			int x2 = view.itsXm(this.penner.workspace.getWidth());
 			int y2 = view.itsYm(this.penner.workspace.getHeight());
 
-			if( r.x < x1) { r.width -= x1 - r.x; r.x = x1;}
-			if( r.x + r.width > x2) { r.width = x2 - r.x;}
+			if( r.getX() < x1) { r.setWidth(r.getWidth() - (x1 - r.getX())); r.setX(x1);}
+			if( r.getX() + r.getWidth() > x2) { r.setWidth(x2 - r.getX());}
 
 			gc.setColor(Colors.YELLOW);
 			gc.setComposite(Composite.SRC_OVER, 0.4f);
-			gc.fillRect( x1, y1, r.x - x1 - 1, y2-y1);
-			gc.fillRect( r.x-1, y1, r.width+2, r.y - y1 - 1);
-			gc.fillRect( r.x-1, r.y + r.height+1, r.width+2, y2 - (r.height+ r.y) + 1);
-			gc.fillRect( r.x + r.width+1,  y1, x2 - (r.width+r.x)+1, y2-y1);
+			gc.fillRect( x1, y1, r.getX() - x1 - 1, y2-y1);
+			gc.fillRect( r.getX() -1, y1, r.getWidth() +2, r.getY() - y1 - 1);
+			gc.fillRect( r.getX() -1, r.getY() + r.getHeight() +1, r.getWidth() +2, y2 - (r.getHeight() + r.getY()) + 1);
+			gc.fillRect( r.getX() + r.getWidth() +1,  y1, x2 - (r.getWidth() + r.getX())+1, y2-y1);
 			
 			// The various inner rectangles represenging the modification points
 			if( !building) {
@@ -189,7 +189,7 @@ public class CroppingBehavior extends DrawnStateBehavior {
 				if( middle.contains(this.penner.x,this.penner.y)) {
 					r = view.itsRm( middle);
 					gc.setColor(Colors.YELLOW);
-		            gc.drawRect(r.x, r.y, r.width, r.height);
+		            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 				}
 
 				if( topRight.contains(this.penner.x,this.penner.y))
@@ -197,28 +197,28 @@ public class CroppingBehavior extends DrawnStateBehavior {
 				else
 					gc.setColor(Colors.WHITE);
 				r = view.itsRm(topRight);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 
 				if( topLeft.contains(this.penner.x,this.penner.y))
 					gc.setColor(Colors.YELLOW);
 				else
 					gc.setColor(Colors.WHITE);
 				r = view.itsRm(topLeft);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 
 				if( bottomLeft.contains(this.penner.x,this.penner.y))
 					gc.setColor(Colors.YELLOW);
 				else
 					gc.setColor(Colors.WHITE);
 				r = view.itsRm(bottomLeft);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 
 				if( bottomRight.contains(this.penner.x,this.penner.y))
 					gc.setColor(Colors.YELLOW);
 				else
 					gc.setColor(Colors.WHITE);
 				r = view.itsRm(bottomRight);
-	            gc.drawRect(r.x, r.y, r.width, r.height);
+	            gc.drawRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 			}
 
 			gc.setComposite(Composite.SRC_OVER, 1.0f);

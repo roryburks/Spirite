@@ -393,7 +393,7 @@ class FastMathCalc {
      *  This will be close to the right answer, but there will be
      *  some rounding in the calculation of X.  So by carefully
      *  computing 1 - (c+d)(x+y) we can compute an error and
-     *  add that back in.   This is done carefully so that terms
+     *  plus that back in.   This is done carefully so that terms
      *  of similar size are subtracted first.
      *  @param in initial number, in split form
      *  @param result placeholder where to put the result

@@ -58,7 +58,7 @@ public class DerivedMaglevMedium
 //			
 //			float scale_a = a.getMag();
 //			float a1 = a.getMag();
-//			Vec2 a2 = a.sub(b.scalar(a.dot(b)/b.dot(b)));
+//			Vec2 a2 = a.minus(b.scalar(a.dot(b)/b.dot(b)));
 //		}
 //		
 //	}

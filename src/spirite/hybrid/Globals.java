@@ -209,7 +209,7 @@ public class Globals {
     		}
     	}
     	
-    	// Step 2: add the individual table entires
+    	// Step 2: plus the individual table entires
     	iconIDs = new Hashtable<>(icons.length-setCount);
 
     	IconSet set = null;

@@ -211,11 +211,11 @@ public class TestAlp {
     	{
 	    	Transform trans = new ImmutableTransform( x3-x2, x2-x1, x1, y3-y2, y2-y1, y1);
 	    	Vec2 p = trans.apply(new Vec2(0,0));
-	    	System.out.println( p.x + "," + p.y);
+	    	System.out.println( p.getX() + "," + p.getY());
 	    	Vec2 p2 = trans.apply(new Vec2(0,1));
-	    	System.out.println( p2.x + "," + p2.y);
+	    	System.out.println( p2.getX() + "," + p2.getY());
 	    	Vec2 p3 = trans.apply(new Vec2(1,1));
-	    	System.out.println( p3.x + "," + p3.y);
+	    	System.out.println( p3.getX() + "," + p3.getY());
     	}
     	// TODO (or maybe it's no longer relevant)
 //

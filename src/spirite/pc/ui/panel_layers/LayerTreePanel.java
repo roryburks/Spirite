@@ -85,7 +85,7 @@ public class LayerTreePanel extends ContentTree
 		this.context = context;
 	}
 	
-	// LayerTreePanel only needs master to add and remove a WorkspaceObserver
+	// LayerTreePanel only needs master to plus and remove a WorkspaceObserver
 	//	and to hook into the RenderEngine (for drawing the thumbnails)
 	private final MasterControl master;
 	private final RenderEngine renderEngine;
@@ -400,7 +400,7 @@ public class LayerTreePanel extends ContentTree
 	// :::: WorkspaceObserver
 	@Override
 	public void currentWorkspaceChanged( ImageWorkspace current, ImageWorkspace previous) {		
-		// Remove assosciations with the old Workspace and add ones to the new
+		// Remove assosciations with the old Workspace and plus ones to the new
 		if( workspace != null) {
 			workspace.removeImageObserver(this);
 			workspace.removeSelectionObserver(this);

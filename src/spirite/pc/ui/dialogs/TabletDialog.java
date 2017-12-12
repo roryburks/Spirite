@@ -168,8 +168,8 @@ public class TabletDialog extends JDialog
 				//	moving and it's been draged left of the previous point or
 				//	right of the next point, don't display it."
 				if( p2 != movingPoint || 
-					!((i > 0 && movingPoint.x <= weights.get(i-1).x) ||
-					 ( i < weights.size()-1 && movingPoint.x >= weights.get(i+1).x)))
+					!((i > 0 && movingPoint.getX() <= weights.get(i - 1).getX()) ||
+					 ( i < weights.size()-1 && movingPoint.getX() >= weights.get(i + 1).getX())))
 				{
 					points.add(p2);	
 				}
@@ -216,8 +216,8 @@ public class TabletDialog extends JDialog
 			// Draw Marker Circles
 			g.setColor(Color.BLACK);
 			for( Vec2 p : weights) {
-				int dx = x1+(int)Math.round(w*(p.x));
-				int dy = y1+(int)Math.round(h*(1-p.y));
+				int dx = x1+(int)Math.round(w*(p.getX()));
+				int dy = y1+(int)Math.round(h*(1- p.getY()));
 				g.drawOval(dx-DWIDTH, dy-DWIDTH, DWIDTH*2, DWIDTH*2);
 			}
 		}
@@ -230,8 +230,8 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			return new Vec2(MUtil.clip(0, (p.x-x1)/w, 1),
-					MUtil.clip(0, 1-(p.y-y1)/h, 1));
+			return new Vec2(MUtil.clip(0, (p.getX() -x1)/w, 1),
+					MUtil.clip(0, 1-(p.getY() -y1)/h, 1));
 		}
 		public Vec2 logicToScreen(Vec2 p){
 			int width = getWidth();
@@ -241,7 +241,7 @@ public class TabletDialog extends JDialog
 			int w = width-(DWIDTH*2);
 			int h = height-(DWIDTH*2);
 			
-			return new Vec2( p.x*w+x1, 1-p.y*h+y1);
+			return new Vec2( p.getX() *w+x1, 1- p.getY() *h+y1);
 		}
 
 		class SCPAdapter extends MouseAdapter {
@@ -258,7 +258,7 @@ public class TabletDialog extends JDialog
 			
 			private void determineMovingMethod( Vec2 p) {
 				for( Vec2 weight : weights) {
-					if( MUtil.distance(p.x, p.y, weight.x, weight.y) < THRESH) {
+					if( MUtil.distance(p.getX(), p.getY(), weight.getX(), weight.getY()) < THRESH) {
 						movingPoint = weight;
 						return;
 					}
@@ -268,7 +268,7 @@ public class TabletDialog extends JDialog
 				weights.sort(new Comparator<Vec2>() {
 					@Override
 					public int compare(Vec2 o1, Vec2 o2) {
-						double d = o1.x - o2.x;
+						double d = o1.getX() - o2.getX();
 						return (int) Math.signum(d);
 					}
 				});
@@ -292,9 +292,9 @@ public class TabletDialog extends JDialog
 					
 					// Remove the point you're moving if you've dragged it left
 					//	of the previous or right of the next point.
-					if( i > 0 && movingPoint.x <= weights.get(i-1).x)
+					if( i > 0 && movingPoint.getX() <= weights.get(i - 1).getX())
 						weights.remove(movingPoint);
-					else if( i < weights.size()-1 && movingPoint.x >= weights.get(i+1).x)
+					else if( i < weights.size()-1 && movingPoint.getX() >= weights.get(i + 1).getX())
 						weights.remove(movingPoint);
 					
 					movingPoint = null;

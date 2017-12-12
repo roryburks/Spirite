@@ -78,14 +78,14 @@ class AWTStrokeEngine extends StrokeEngine{
 		
 		Graphics g = layer.getGraphics();
 		Graphics2D g2 = (Graphics2D)g;
-		g.setColor( new Color(getParams().getColor()));
+		g.setColor( new Color(getStrokeParams().getColor()));
 
 		for(int i = 1; i < states.getLength(); ++i) {
 //			PenState fromState = states.get(i-1);
 //			PenState toState = states.get(i);
-			if( getParams().getMethod() != StrokeEngine.Method.PIXEL){
+			if( getStrokeParams().getMethod() != StrokeEngine.Method.PIXEL){
 				g2.setStroke( new BasicStroke( 
-						states.getW()[i] * getParams().getWidth(),
+						states.getW()[i] * getStrokeParams().getWidth(),
 						BasicStroke.CAP_ROUND, 
 						BasicStroke.CAP_SQUARE));
 			}

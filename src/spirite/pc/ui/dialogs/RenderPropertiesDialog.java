@@ -30,7 +30,7 @@ public class RenderPropertiesDialog extends SPanel {
 //		getContentPane().setLayout( new BorderLayout());
 //		content.setBorder( new EmptyBorder( 5,5,5,5));
 //		content.setPreferredSize( new Dimension(300, 200));
-//		getContentPane().add( content, BorderLayout.CENTER);
+//		getContentPane().plus( content, BorderLayout.CENTER);
 		
 		GroupLayout layout = new GroupLayout(this);
 		

@@ -346,7 +346,7 @@ public class GLEngine  {
 	}
 	void applyPrimitiveProgram( ProgramType type, GLParameters params, Primitive prim, Transform trans) {
 		addOrtho(params, trans);
-//        params.addInternalParam( new GLParameters.GLUniformMatrix4fv(
+//        strokeParams.addInternalParam( new GLParameters.GLUniformMatrix4fv(
 //        		"perspectiveMatrix", 1, matrix.getBuffer()));
         
 		PreparedPrimitive pprim = new PreparedPrimitive( prim);
@@ -661,10 +661,10 @@ public class GLEngine  {
 		gl.glDisable(GLC.GL_TEXTURE_2D);
         gl.glUseProgram(0);
         pd.deinit();
-//        if( params.texture != null)
-//        	params.texture.unload();
-//        if( params.texture2 != null) 
-//        	params.texture2.unload();
+//        if( strokeParams.texture != null)
+//        	strokeParams.texture.unload();
+//        if( strokeParams.texture2 != null)
+//        	strokeParams.texture2.unload();
 	}
 
 	
@@ -771,7 +771,7 @@ public class GLEngine  {
 		
 		pd.lengths = lengths;
 		
-		//this.c_data.add(pd);
+		//this.c_data.plus(pd);
 		
 		return pd;
 	}

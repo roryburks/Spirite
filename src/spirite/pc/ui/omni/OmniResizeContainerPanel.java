@@ -128,13 +128,13 @@ public class OmniResizeContainerPanel extends SPanel{
 	}
 	
 	/** If the position is less than the smallest or more than the largest,
-	 * it'll add to the closest, so use Integer.MIN_VALUE to add it to the
-	 * left-most right (or up-most down) and Integer.Max_VALUE to add it
+	 * it'll plus to the closest, so use Integer.MIN_VALUE to plus it to the
+	 * left-most right (or up-most down) and Integer.Max_VALUE to plus it
 	 * to the right-most left (or down-most up)
 	 * 
 	 * Alternately use LEADING and TRAILING.
 	 * 
-	 * If position is 0, it'll add it to the left as the right-most.
+	 * If position is 0, it'll plus it to the left as the right-most.
 	 * */
 	public int addPanel( int min_size, int default_size, int position, JComponent component) {
 		if( position == 0) position = Integer.MAX_VALUE;

@@ -32,7 +32,7 @@ public class LagrangeInterpolator
             for( int j=0; j<N; ++j) {
                 if( j == i) continue;
                 p_j = points.get(j);
-                divisor *= (p_i.x - p_j.x);
+                divisor *= (p_i.getX() - p_j.getX());
             }
 
             // Calculate the denominator coefficients that p_i contribute to the
@@ -49,7 +49,7 @@ public class LagrangeInterpolator
                 // * (x - x_j)
                 //	- x_j)
                 for( int k=0; k<N; ++k){
-                    pi_coef2[k] = pi_coef[k] *(- p_j.x);
+                    pi_coef2[k] = pi_coef[k] *(-p_j.getX());
                 }
                 // (x
                 for( int k=N-2; k>=0; --k){
@@ -64,7 +64,7 @@ public class LagrangeInterpolator
             }
             // Add the calculated coefficients to the final coefficients
             for( int j=0; j<N; ++j) {
-                coef[j] += (pi_coef[j] * p_i.y) / divisor;
+                coef[j] += (pi_coef[j] * p_i.getY()) / divisor;
             }
         }
     }
