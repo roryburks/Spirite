@@ -12,10 +12,14 @@ interface IPreferences {
     fun putByteArray( key: String, value: ByteArray)
     fun putInt( key: String, value: Int)
     fun putBoolean( key: String, value: Boolean)
+
+    fun remove( key: String)
 }
 
-class JPreferences : IPreferences {
-    val preferences = Preferences.userNodeForPackage( spirite.Spirite::class.java)
+class JPreferences(
+        userNode : Class<*>
+) : IPreferences {
+    val preferences = Preferences.userNodeForPackage( userNode)
 
     override fun getString(key: String) = preferences.get(key, null)
     override fun getByteArray(key: String) = preferences.getByteArray(key, null)
@@ -26,4 +30,6 @@ class JPreferences : IPreferences {
     override fun putByteArray(key: String, value: ByteArray) = preferences.putByteArray(key, value)
     override fun putInt(key: String, value: Int) = preferences.putInt(key, value)
     override fun putBoolean(key: String, value: Boolean) = preferences.putBoolean(key, value)
+
+    override fun remove(key: String) = preferences.remove(key)
 }
