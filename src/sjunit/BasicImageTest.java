@@ -52,19 +52,19 @@ public class BasicImageTest {
 			
 			Rect r = HybridUtil.findContentBounds(img, 0, true);
 			
-			assert( r.x == 2 && r.y == 3 && r.width == 4 && r.height == 3);
+			assert( r.getX() == 2 && r.getY() == 3 && r.getWidth() == 4 && r.getHeight() == 3);
 			
 	
-			RawImage nri = HybridHelper.createImage(r.width, r.height);
+			RawImage nri = HybridHelper.createImage(r.getWidth(), r.getHeight());
 			gc = nri.getGraphics();
 			gc.clear();
-			gc.drawImage( img, -r.x, -r.y);
+			gc.drawImage( img, -r.getX(), -r.getY());
 			
 			r = HybridUtil.findContentBounds(nri, 0, true);
 			
 	
-			//System.out.println( r.x + "," + r.y + ":" + r.width + "," + r.height);
-			assert( r.x == 0 && r.y == 0 && r.width == 4 && r.height == 3);
+			//System.out.println( r.getX() + "," + r.getY() + ":" + r.getWidth() + "," + r.getHeight());
+			assert( r.getX() == 0 && r.getY() == 0 && r.getWidth() == 4 && r.getHeight() == 3);
 			
 	
 			RawImage img3 = HybridHelper.createImage(10, 10);
@@ -72,7 +72,7 @@ public class BasicImageTest {
 			gc.clear();
 			gc.fillRect(5, 5, 5, 5);
 			r = HybridUtil.findContentBounds(img3, 0, true);
-			assert( r.x == 5 && r.y == 5 && r.width == 5 && r.height == 5);
+			assert( r.getX() == 5 && r.getY() == 5 && r.getWidth() == 5 && r.getHeight() == 5);
 		});
 	}
 

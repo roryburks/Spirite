@@ -498,8 +498,8 @@ public class ImageWorkspace implements MWorkspaceObserver {
 			for( int i=0; i < handles.size() && i<imageBounds.size(); ++i) {
 				MediumHandle handle = handles.get(i);
 				Rect imageBound = imageBounds.get(i);
-				imageBound.x += node.x;
-				imageBound.y += node.y;
+				imageBound.setX( imageBound.getX() + node.x);
+				imageBound.setY( imageBound.getY() + node.y);
 				
 				Rect newBounds;
 				
@@ -514,16 +514,16 @@ public class ImageWorkspace implements MWorkspaceObserver {
 					continue;
 
 				// Construct a crop action
-				RawImage img = HybridHelper.createImage(newBounds.width, newBounds.height);
+				RawImage img = HybridHelper.createImage(newBounds.getWidth(), newBounds.getHeight());
 				GraphicsContext gc = img.getGraphics();
 				
 				gc.clear();
-				Transform transform = Transform.Companion.TranslationMatrix(imageBound.x-newBounds.x, imageBound.y-newBounds.y);
+				Transform transform = Transform.Companion.TranslationMatrix(imageBound.getX()-newBounds.getX(), imageBound.getY()-newBounds.getY());
 				handle.drawLayer(gc, transform);
 //				g2.dispose();
 				
 				actions.add( undoEngine.createReplaceAction(handle, img));
-				handlesCropped.add( new ImageCropHelper( handle, newBounds.x-imageBound.x,  newBounds.y-imageBound.y));
+				handlesCropped.add( new ImageCropHelper( handle, newBounds.getX()-imageBound.getX(),  newBounds.getY()-imageBound.getY()));
 			}
 	
 		}

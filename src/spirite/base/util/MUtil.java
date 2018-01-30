@@ -104,10 +104,10 @@ public class MUtil {
 	 */
 	public static Rect findBounds( Rect region, Transform matrix) {
 		// Might be some slightly-more-clever way to determing this
-		Vec2 p1 = matrix.apply(new Vec2(region.x, region.y));
-		Vec2 p2 = matrix.apply(new Vec2(region.x+region.width, region.y));
-		Vec2 p3 = matrix.apply(new Vec2(region.x, region.y + region.height));
-		Vec2 p4 = matrix.apply(new Vec2(region.x+region.width, region.y + region.height));
+		Vec2 p1 = matrix.apply(new Vec2(region.getX(), region.getY()));
+		Vec2 p2 = matrix.apply(new Vec2(region.getX()+region.getWidth(), region.getY()));
+		Vec2 p3 = matrix.apply(new Vec2(region.getX(), region.getY() + region.getHeight()));
+		Vec2 p4 = matrix.apply(new Vec2(region.getX()+region.getWidth(), region.getY() + region.getHeight()));
 
 		int x1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
 		int y1 = (int)Math.floor( Math.min( Math.min( Math.min(p1.getX(), p2.getX()), p3.getX()), p4.getY()));
@@ -152,10 +152,10 @@ public class MUtil {
 	/** Stretches the Rectangle from the center by a given scaler */
 	public static Rect scaleRect( Rect cropSection, float scalar) {
 		return new Rect(
-				cropSection.x - Math.round(cropSection.width * (scalar-1)/2.0f),
-				cropSection.y - Math.round(cropSection.height * (scalar-1)/2.0f),
-				Math.round(cropSection.width * scalar),
-				Math.round(cropSection.height * scalar)
+				cropSection.getX() - Math.round(cropSection.getWidth() * (scalar-1)/2.0f),
+				cropSection.getY() - Math.round(cropSection.getHeight() * (scalar-1)/2.0f),
+				Math.round(cropSection.getWidth() * scalar),
+				Math.round(cropSection.getHeight() * scalar)
 			);
 		
 	}
@@ -164,18 +164,18 @@ public class MUtil {
 	 * within it.	 */
 	public static Rect circumscribe( Rect rect1, Rect rect2) {
 		return rectFromEndpoints(
-				Math.min( rect1.x, rect2.x),
-				Math.min( rect1.y, rect2.y),
-				Math.max( rect1.x + rect1.width, rect2.x + rect2.width),
-				Math.max( rect1.y + rect1.height, rect2.y + rect2.height)
+				Math.min( rect1.getX(), rect2.getX()),
+				Math.min( rect1.getY(), rect2.getY()),
+				Math.max( rect1.getX() + rect1.getWidth(), rect2.getX() + rect2.getWidth()),
+				Math.max( rect1.getY() + rect1.getHeight(), rect2.getY() + rect2.getHeight())
 				);
 	}
 	
 	public static Rect circumscribeTrans( Rect oldRect, Transform trans) {
-		Vec2 p1 =  trans.apply( new Vec2(oldRect.x, oldRect.y));
-		Vec2 p2 =  trans.apply( new Vec2(oldRect.x+oldRect.width, oldRect.y));
-		Vec2 p3 =  trans.apply( new Vec2(oldRect.x, oldRect.y+oldRect.height));
-		Vec2 p4 =  trans.apply( new Vec2(oldRect.x+oldRect.width, oldRect.y+oldRect.height));
+		Vec2 p1 =  trans.apply( new Vec2(oldRect.getX(), oldRect.getY()));
+		Vec2 p2 =  trans.apply( new Vec2(oldRect.getX()+oldRect.getWidth(), oldRect.getY()));
+		Vec2 p3 =  trans.apply( new Vec2(oldRect.getX(), oldRect.getY()+oldRect.getHeight()));
+		Vec2 p4 =  trans.apply( new Vec2(oldRect.getX()+oldRect.getWidth(), oldRect.getY()+oldRect.getHeight()));
 
 		int x1 = (int)Math.min( Math.floor(p1.getX()), Math.min(Math.floor(p2.getX()), Math.min(Math.floor(p3.getX()), Math.floor(p4.getX()))));
 		int y1 = (int)Math.min( Math.floor(p1.getY()), Math.min(Math.floor(p2.getY()), Math.min(Math.floor(p3.getY()), Math.floor(p4.getY()))));

@@ -559,10 +559,10 @@ public class GLEngine  {
 			y1 = 0; y2 = params.height;
 		}
 		else {
-			x1 = params.clipRect.x;
-			x2 = params.clipRect.x+params.clipRect.width;
-			y1 = params.clipRect.y;
-			y2 = params.clipRect.y+params.clipRect.height;
+			x1 = params.clipRect.getX();
+			x2 = params.clipRect.getX()+params.clipRect.getWidth();
+			y1 = params.clipRect.getY();
+			y2 = params.clipRect.getY()+params.clipRect.getHeight();
 		}
 		
         Mat4 matrix = new Mat4(MatrixBuilder.orthagonalProjectionMatrix(
@@ -594,7 +594,7 @@ public class GLEngine  {
 		if( r == null)
 			gl.getGL2().glViewport(0, 0, w, h);
 		else
-			gl.getGL2().glViewport(r.x, r.y, r.width, r.height);
+			gl.getGL2().glViewport(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 		
 
         

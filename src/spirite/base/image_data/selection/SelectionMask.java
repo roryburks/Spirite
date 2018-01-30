@@ -36,13 +36,13 @@ public class SelectionMask {
 		}
 		
 		
-		RawImage maskBeingBuilt = HybridHelper.createImage(cropped.width, cropped.height);
+		RawImage maskBeingBuilt = HybridHelper.createImage(cropped.getWidth(), cropped.getHeight());
 		GraphicsContext gc = maskBeingBuilt.getGraphics();
-		gc.drawImage(mask, -cropped.x, -cropped.y);
+		gc.drawImage(mask, -cropped.getX(), -cropped.getY());
 		
 		this.mask = maskBeingBuilt;
-		this.ox = cropped.x + x;
-		this.oy = cropped.y + y;
+		this.ox = cropped.getX() + x;
+		this.oy = cropped.getY() + y;
 	}
 	SelectionMask( SelectionMask other, int ox, int oy) {
 		this.mask = other.mask;
@@ -119,7 +119,7 @@ public class SelectionMask {
 	private RawImage _liftFromScheme( LiftScheme liftScheme) {
 		Rect selectionRect = new Rect(ox, oy, mask.getWidth(), mask.getHeight());
 		
-		RawImage img = HybridHelper.createImage(selectionRect.width, selectionRect.height);
+		RawImage img = HybridHelper.createImage(selectionRect.getWidth(), selectionRect.getHeight());
 		GraphicsContext gc = img.getGraphics();
 
 		// Draw the mask, clipping the bounds of drawing to only the part 
@@ -129,8 +129,8 @@ public class SelectionMask {
 		Rect intersection = dataRect.intersection(selectionRect);
 		
 		gc.setClip(
-				intersection.x - selectionRect.x, intersection.y - selectionRect.y, 
-				intersection.width, intersection.height);
+				intersection.getX() - selectionRect.getX(), intersection.getY() - selectionRect.getY(),
+				intersection.getWidth(), intersection.getHeight());
 		gc.drawImage(mask, 0, 0);
 		
 

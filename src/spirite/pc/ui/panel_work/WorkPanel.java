@@ -213,10 +213,10 @@ public class WorkPanel extends SPanel
         
         public Rect itsRm( Rect cropSection) {
         	return new Rect(
-        		itsXm( cropSection.x),
-        		itsYm( cropSection.y),
-        		Math.round(cropSection.width * zoom),
-        		Math.round(cropSection.height*zoom)
+        		itsXm( cropSection.getX()),
+        		itsYm( cropSection.getY()),
+        		Math.round(cropSection.getWidth() * zoom),
+        		Math.round(cropSection.getHeight()*zoom)
         	);
         }
     }

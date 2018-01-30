@@ -127,7 +127,7 @@ public class GLGraphics extends GraphicsContext {
 		params.useBlendMode = false;
 		
 		applyPassProgram(ProgramType.GRID, params, null,
-				rect.x, rect.y, rect.x + rect.width, rect.y+rect.height);
+				rect.getX(), rect.getY(), rect.getX() + rect.getWidth(), rect.getY()+rect.getHeight());
 	}
 	
 	@Override

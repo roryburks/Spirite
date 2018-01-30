@@ -115,16 +115,16 @@ public class SelectionEngine {
 		
 		area = (area1 == null)? area2 : area1.union(area2);
 		
-		RawImage image = HybridHelper.createImage(area.width, area.height);
+		RawImage image = HybridHelper.createImage(area.getWidth(), area.getHeight());
 
 		GraphicsContext gc = image.getGraphics();
-		gc.preTranslate( -area.x, -area.y);
+		gc.preTranslate( -area.getX(), -area.getY());
 		if( sel1 != null)
 			sel1.drawMask(gc, true);
 		if( sel2 != null)
 			sel2.drawMask(gc, true);
 		
-		return new SelectionMask(image, area.x, area.y);
+		return new SelectionMask(image, area.getX(), area.getY());
 	}
 	public SelectionMask subtractSelection( SelectionMask sel1, SelectionMask sel2) {
 		if( sel1 == null) return null;
@@ -132,17 +132,17 @@ public class SelectionEngine {
 		Rect area = new Rect(sel1.ox, sel1.oy, sel1.getWidth(), sel1.getHeight());
 		// No need to union with sel2
 		
-		RawImage image = HybridHelper.createImage(area.width, area.height);
+		RawImage image = HybridHelper.createImage(area.getWidth(), area.getHeight());
 
 		GraphicsContext gc = image.getGraphics();
-		gc.preTranslate( -area.x, -area.y);
+		gc.preTranslate( -area.getX(), -area.getY());
 		if( sel1 != null)
 			sel1.drawMask(gc, true);
 		gc.setComposite( Composite.DST_OUT, 1.0f);
 		if( sel2 != null)
 			sel2.drawMask(gc, true);
 
-		return new SelectionMask(image, area.x, area.y);
+		return new SelectionMask(image, area.getX(), area.getY());
 	}
 	public SelectionMask intersectSelection( SelectionMask sel1, SelectionMask sel2) {
 		if( sel1 == null || sel2 == null) return null;
@@ -152,26 +152,26 @@ public class SelectionEngine {
 		
 		if( area == null || area.isEmpty()) return null;
 
-		RawImage img = HybridHelper.createImage(area.width, area.height);
+		RawImage img = HybridHelper.createImage(area.getWidth(), area.getHeight());
 		
 		GraphicsContext gc = img.getGraphics();
-		gc.preTranslate(-area.x, -area.y);
+		gc.preTranslate(-area.getX(), -area.getY());
 		sel2.drawMask(gc, true);
 		gc.setComposite(Composite.DST_IN, 1.0f);
 		sel1.drawMask(gc, true);
 		//gc.drawImage(img1, 0, 0);
 		
-		return new SelectionMask(img, area.x, area.y);
+		return new SelectionMask(img, area.getX(), area.getY());
 	}
 	public SelectionMask invertSelection( SelectionMask sel) {
 		if( sel == null) return null;
 		
 		Rect area = new Rect(0,0,workspace.getWidth(), workspace.getHeight());
 		
-		RawImage image = HybridHelper.createImage( area.width, area.height);
+		RawImage image = HybridHelper.createImage( area.getWidth(), area.getHeight());
 		GraphicsContext gc = image.getGraphics();
 		gc.setColor(Colors.WHITE);
-		gc.fillRect(0, 0, area.width, area.height);
+		gc.fillRect(0, 0, area.getWidth(), area.getHeight());
 		gc.setComposite(Composite.DST_OUT,  1.0f);
 		sel.drawMask(gc, true);
 		
@@ -179,8 +179,8 @@ public class SelectionEngine {
 	}
 	public SelectionMask buildRectSelection( Rect rect) {
 		RectSelectionBuilder rsb = new RectSelectionBuilder(workspace);
-		rsb.start(rect.x, rect.y);
-		rsb.update(rect.x+rect.width, rect.y+rect.height);
+		rsb.start(rect.getX(), rect.getY());
+		rsb.update(rect.getX()+rect.getWidth(), rect.getY()+rect.getHeight());
 		return new SelectionMask( rsb.build());
 	}
 	

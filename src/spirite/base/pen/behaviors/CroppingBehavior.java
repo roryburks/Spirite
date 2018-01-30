@@ -39,17 +39,17 @@ public class CroppingBehavior extends DrawnStateBehavior {
 		private void buildCrop( ) {
 			middle = MUtil.scaleRect( cropSection, 0.6f);
 			topLeft = MUtil.scaleRect( cropSection, 0.2f);
-			topLeft.x = cropSection.x;
-			topLeft.y = cropSection.y;
+			topLeft.setX(cropSection.getX());
+			topLeft.setY( cropSection.getY());
 			topRight = new Rect(topLeft);
-			topRight.x = cropSection.x + cropSection.width - topRight.width;
-			topRight.y = cropSection.y;
+			topRight.setX( cropSection.getX() + cropSection.getWidth() - topRight.getWidth());
+			topRight.setY( cropSection.getY());
 			bottomLeft = new Rect(topLeft);
-			bottomLeft.x = cropSection.x;
-			bottomLeft.y = cropSection.y + cropSection.height - bottomLeft.height;
+			bottomLeft.setX( cropSection.getX());
+			bottomLeft.setY( cropSection.getY() + cropSection.getHeight() - bottomLeft.getHeight());
 			bottomRight = new Rect(topLeft);
-			bottomRight.x = cropSection.x + cropSection.width - bottomRight.width;
-			bottomRight.y = cropSection.y + cropSection.height - bottomRight.height;
+			bottomRight.setX( cropSection.getX() + cropSection.getWidth() - bottomRight.getWidth());
+			bottomRight.setY( cropSection.getY() + cropSection.getHeight() - bottomRight.getHeight());
 		}
 
 		@Override

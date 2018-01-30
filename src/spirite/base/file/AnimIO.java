@@ -179,18 +179,18 @@ public class AnimIO {
 				}
 
 
-				BufferedImage bi = new BufferedImage( bounds.width, bounds.height, HybridHelper.BI_FORMAT);
+				BufferedImage bi = new BufferedImage( bounds.getWidth(), bounds.getHeight(), HybridHelper.BI_FORMAT);
 				GraphicsContext gc = new AWTContext( bi);
-				gc.drawImage(handle.deepAccess(), -bounds.x, -bounds.y);
+				gc.drawImage(handle.deepAccess(), -bounds.getX(), -bounds.getY());
 //				g.dispose();
 
 				CroppedImage ci = new CroppedImage();
 				ci.bi = bi;
-				ci.ox = bounds.x + ox;
-				ci.oy = bounds.y + oy;
+				ci.ox = bounds.getX() + ox;
+				ci.oy = bounds.getY() + oy;
 
 				images.add(ci);
-				toPack.add(new Vec2i(bounds.width,bounds.height));
+				toPack.add(new Vec2i(bounds.getWidth(),bounds.getHeight()));
 			}
 		}
 
@@ -199,7 +199,7 @@ public class AnimIO {
 		for( Rect r : pr.getPackedRects()) {
 			for( CroppedImage ci : images) {
 				if( ci != null && ci.rectInImage == null &&
-					ci.bi.getWidth() == r.width && ci.bi.getHeight() == r.height)
+					ci.bi.getWidth() == r.getWidth() && ci.bi.getHeight() == r.getHeight())
 				{
 					ci.rectInImage = r;
 					break;
@@ -212,7 +212,7 @@ public class AnimIO {
 		Graphics g = output_bi.getGraphics();
 		for( CroppedImage ci : images) {
 			if( ci != null && ci.rectInImage != null) {
-				g.drawImage(ci.bi, ci.rectInImage.x, ci.rectInImage.y, null);
+				g.drawImage(ci.bi, ci.rectInImage.getX(), ci.rectInImage.getY(), null);
 			}
 		}
 		g.dispose();
@@ -266,10 +266,10 @@ public class AnimIO {
 				ra.writeLong(0x0);
 			}
 			else {
-				ra.writeShort(ci.rectInImage.x);
-				ra.writeShort(ci.rectInImage.y);
-				ra.writeShort(ci.rectInImage.width);
-				ra.writeShort(ci.rectInImage.height);
+				ra.writeShort(ci.rectInImage.getX());
+				ra.writeShort(ci.rectInImage.getY());
+				ra.writeShort(ci.rectInImage.getWidth());
+				ra.writeShort(ci.rectInImage.getHeight());
 			}
 		}
 		ra.close();

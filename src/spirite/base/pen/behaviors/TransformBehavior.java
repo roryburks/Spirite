@@ -79,9 +79,9 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 		protected Transform calcDisplayTransform() {
 			float zoom = this.penner.view.getZoom();
 
-			MutableTransform relTrans = MutableTransform.Companion.TranslationMatrix(-region.width/2, -region.height/2);
+			MutableTransform relTrans = MutableTransform.Companion.TranslationMatrix(-region.getWidth()/2, -region.getHeight()/2);
 			relTrans.preConcatenate(getWorkingTransform());
-			relTrans.preTranslate(region.width/2+region.x, region.height/2+region.y);
+			relTrans.preTranslate(region.getWidth()/2+region.getX(), region.getHeight()/2+region.getY());
 			relTrans.preScale(zoom, zoom);
 			relTrans.preTranslate(this.penner.view.itsX(0), this.penner.view.itsY(0));
 			
@@ -101,8 +101,8 @@ abstract class TransformBehavior extends DrawnStateBehavior {
 			
 			gc.setTransform(relTrans);
 
-			int w = region.width;
-			int h = region.height;
+			int w = region.getWidth();
+			int h = region.getHeight();
 			gc.setColor(Colors.BLACK);
 			gc.drawRect( 0, 0, w, h);
 			
