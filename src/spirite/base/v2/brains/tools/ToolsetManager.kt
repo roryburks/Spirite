@@ -1,5 +1,7 @@
 package spirite.base.v2.brains.tools
 
+// TODO: Finish implementing properties and schemas
+
 import spirite.base.image_data.mediums.drawer.BaseSkeletonDrawer
 import spirite.base.image_data.mediums.drawer.DefaultImageDrawer
 import spirite.base.image_data.mediums.drawer.GroupNodeDrawer
@@ -8,8 +10,12 @@ import spirite.base.image_data.mediums.drawer.IImageDrawer.*
 import spirite.base.image_data.mediums.maglev.MaglevImageDrawer
 import spirite.base.pen.StrokeEngine.Method.*
 import spirite.base.util.ObserverHandler
+import spirite.base.v2.brains.IObservable
+import spirite.base.v2.brains.Observable
 import spirite.base.v2.brains.tools.Cursor.ERASER
 import spirite.base.v2.brains.tools.Cursor.MOUSE
+import spirite.base.v2.brains.tools.ToolsetManager.MToolsetObserver
+import spirite.base.v2.brains.tools.ToolsetManager.ToolSettings
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.REFERENCE
 
@@ -78,8 +84,18 @@ private val ToolsForMaglevDrawer = arrayOf(
         Tool.BONE,
         Tool.FLOPPYBONE)
 
-class ToolsetManager {
-    var selected : Tool
+interface IToolsetManager {
+    var selectedTool: Tool
+    var cursor: Cursor
+
+    fun getToolSettings( tool: Tool) : ToolSettings
+    fun getToolsForDrawer( drawer: IImageDrawer) : List<Tool>
+
+    val toolsetObservable : IObservable<MToolsetObserver>
+}
+
+class ToolsetManager : IToolsetManager {
+    override var selectedTool : Tool
         get() = _selected[cursor.ordinal]
         set(value) {
             _selected[cursor.ordinal] = value
@@ -91,7 +107,7 @@ class ToolsetManager {
         else Tool.PEN
     }.toTypedArray()
 
-    var cursor: Cursor = MOUSE
+    override var cursor: Cursor = MOUSE
         get() = field
         set(value) {
             field = value
@@ -102,10 +118,10 @@ class ToolsetManager {
         ToolSettings(it, listOf())
     }.toTypedArray()
 
-    fun getToolSettings( tool: Tool) = toolSettings[tool.ordinal]
+    override fun getToolSettings( tool: Tool) = toolSettings[tool.ordinal]
 
     // region Tool Groups
-    fun getToolsForDrawer( drawer: IImageDrawer) : List<Tool> = when (drawer) {
+    override fun getToolsForDrawer( drawer: IImageDrawer) : List<Tool> = when (drawer) {
         is DefaultImageDrawer -> ToolsForDefaultDrawer.asList()
         is GroupNodeDrawer -> ToolsForDefaultDrawer.asList()
         is MaglevImageDrawer -> ToolsForMaglevDrawer.asList()
@@ -185,16 +201,12 @@ class ToolsetManager {
         fun toolsetChanged( newTool: Tool)
         fun toolsetPropertyChanged(newTool: Tool, property: ToolProperty)
     }
-    val toolsetObs = ObserverHandler<MToolsetObserver>()
-    fun addToolsetObserver( obs: MToolsetObserver)
-            = toolsetObs.addObserver(obs)
-    fun removeToolsetObserver( obs: MToolsetObserver)
-            = toolsetObs.removeObserver(obs)
+    override val toolsetObservable : IObservable<MToolsetObserver> get() = _toolsetObs
+    val _toolsetObs = Observable<MToolsetObserver>()
 
     fun triggerToolsetChanged( newTool: Tool)
-            = toolsetObs.trigger { it.toolsetChanged(newTool) }
+            = _toolsetObs.trigger { it.toolsetChanged(newTool) }
     fun triggerToolsetPropertyChanged(tool: Tool, property: ToolProperty)
-            = toolsetObs.trigger { it.toolsetPropertyChanged(tool, property) }
-
+            = _toolsetObs.trigger { it.toolsetPropertyChanged(tool, property) }
     // endregion
 }
