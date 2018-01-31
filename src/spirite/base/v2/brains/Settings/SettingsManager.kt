@@ -10,8 +10,6 @@ import kotlin.reflect.KProperty
 class SettingsManager (
         private val preferences: IPreferences
 ){
-
-
     // ================
     // ==== Graphics Engine Management
 
