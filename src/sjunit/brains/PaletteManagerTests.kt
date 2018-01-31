@@ -1,7 +1,7 @@
 package sjunit.brains
 
-import spirite.base.v2.brains.palette.IPaletteManager.MPaletteObserver
-import spirite.base.v2.brains.palette.PaletteManager
+import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
+import spirite.base.brains.palette.PaletteManager
 import kotlin.test.assertEquals
 import org.junit.Test as test
 

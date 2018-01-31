@@ -1,9 +1,9 @@
 package sjunit.brains
 
 
-import spirite.base.v2.brains.Hotkey
-import spirite.base.v2.brains.HotkeyManager
-import spirite.base.v2.brains.Settings.JPreferences
+import spirite.base.brains.Hotkey
+import spirite.base.brains.HotkeyManager
+import spirite.base.brains.Settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import org.junit.Test as test

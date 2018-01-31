@@ -1,7 +1,6 @@
 package spirite.base.graphics
 
-import spirite.base.image_data.MediumHandle
-import spirite.base.util.linear.MutableTransform
+import spirite.base.imageData.MediumHandle
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import java.awt.Shape
