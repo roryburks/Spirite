@@ -1,6 +1,6 @@
 package spirite.base.file
 
-import spirite.base.image_data.ImageWorkspace
+import spirite.base.imageData.ImageWorkspace
 import java.io.File
 
 interface ISaveEngine {

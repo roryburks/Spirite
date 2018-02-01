@@ -72,7 +72,7 @@ data class MediumHandle(
     fun drawLayer(gc: GraphicsContext, transform: Transform) {
         var transform = transform
         if (context == null) {
-            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")
+            MDebug.handleWarning(WarningType.STRUCTURAL, "Tried to render a context-less image.")
             return
         }
         val ii = context!!.getData(id) ?: return
