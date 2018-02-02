@@ -38,10 +38,10 @@ public final class Mat4 extends AbstractMat {
 	 * | C G K O |   | m02 m12 m22 m32 |
 	 * | D H L P |   | m03 m13 m23 m33 |
 	 */
-	final float m00, m10, m20, m30;
-	final float m01, m11, m21, m31;
-	final float m02, m12, m22, m32;
-	final float m03, m13, m23, m33;
+	public final float m00, m10, m20, m30;
+	public final float m01, m11, m21, m31;
+	public final float m02, m12, m22, m32;
+	public final float m03, m13, m23, m33;
 	
 	/**
 	 * Creates a matrix with all elements equal to ZERO.
@@ -373,7 +373,6 @@ public final class Mat4 extends AbstractMat {
         
         /**
          * Multiply this matrix with another and return the result.
-         * @param other
          */
         public Mat4 multiply(final Mat4 right) {            
             float nm00 = this.m00 * right.m00 + this.m10 * right.m01 + this.m20 * right.m02 + this.m30 * right.m03;

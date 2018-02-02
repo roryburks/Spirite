@@ -13,18 +13,24 @@ class GLGraphics : GraphicsContext {
 
     val image : GLImage?
 
-    constructor( width: Int, height: Int, flip: Boolean)  {
+    override val width: Int
+    override val height: Int
+    val gle: GLEngine
+
+    constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine)  {
+        this.width = width
+        this.height = height
         image = null
+        this.gle = gle
     }
     constructor( glImage: GLImage)  {
+        width = glImage.width
+        height = glImage.height
         image = glImage
+        this.gle = glImage.engine
     }
 
 
-    override val width: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val height: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override var transform: Transform
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
@@ -37,6 +43,7 @@ class GLGraphics : GraphicsContext {
         set(value) {}
 
     override fun drawBounds(bi: IImage, c: Int) {
+        val img = GLImage(width, height, gle)
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

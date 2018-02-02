@@ -16,9 +16,9 @@ public class DataCompaction {
     	List<int[]> data = new ArrayList<>();
     	int front = 0;
     	int back = 0;
-    	
+
     	public IntQueue() {}
-    	
+
     	public void add( int n) {
     		if( data.isEmpty()) {
     			data.add( new int[DEFAULT_SIZE]);

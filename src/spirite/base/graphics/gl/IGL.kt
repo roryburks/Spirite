@@ -1,5 +1,7 @@
 package spirite.base.graphics.gl
 
+import java.nio.FloatBuffer
+
 /***
  * IGL is a wrapper interface for OpenGL contexts.  Note: this is still a fairly low-level wrapper and implies manual memory
  * management inherent in OpenGL, so should itself be wrapped in a Graphics Engine and shielded from the use sources.
@@ -39,7 +41,7 @@ interface IGL {
     fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: ITextureSource)
     fun copyTexImage2D(target: Int, level: Int, internalformat: Int, x: Int, y: Int, width: Int, height: Int, border: Int)
 
-    fun createBlankTextureSoutce( width: Int, height: Int) : ITextureSource
+    fun createBlankTextureSource(width: Int, height: Int) : ITextureSource
 
     // Uniform stuff
     fun getUniformLocation( program: IGLProgram, name: String) : IGLUniformLocation?
@@ -71,6 +73,7 @@ interface IGL {
 
     // Source Creation
     fun makeFloat32Source( size: Int) : IFloat32Source
+    fun makeFloat32Source( buffer: FloatBuffer) : IFloat32Source
 
     // Draw
     fun drawArrays( mode: Int,first : Int, count: Int )

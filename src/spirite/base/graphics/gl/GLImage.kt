@@ -32,7 +32,7 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP_TO_EDGE)
         gl.texParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP_TO_EDGE)
         gl.texImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE,
-                gl.createBlankTextureSoutce(width, height))
+                gl.createBlankTextureSource(width, height))
     }
 
     constructor( toCopy: GLImage) {

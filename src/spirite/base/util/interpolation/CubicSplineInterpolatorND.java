@@ -24,25 +24,25 @@ public class CubicSplineInterpolatorND {
     	}
     	if( length != 0) {
     	}
-    	
+
     	for( int w=0; w<length; ++w) {
     		for( int i=0; i<N; ++i)
     			x_[i][w] = points[w][i];
     		t_[w] = points[w][N];
-    		
+
     	}
-    	
+
     	this.fast = fast;
     	calculateDifferentials();
     }
-    
+
     private void calculateDifferentials() {
     	if( length <= 1) return;
-    	
+
     	float dt = t_[1]-t_[0];
     	for( int i=0; i<N; ++i)
     		dx[i][0] = 0.25f*(x_[i][1]-x_[i][0])/dt;
-    	
+
     	int w;
     	for( w=1; w<length-1; ++w) {
     		float dt1 = t_[w+1] - t_[w];
@@ -54,7 +54,7 @@ public class CubicSplineInterpolatorND {
 		for( int i=0; i<N; ++i)
 			dx[i][w] = 0.25f*(x_[i][w] - x_[i][w-1])/dt;
     }
-    
+
     public void addPoint(float[] p) {
         if( x_.length <= length) expand(length+1);
 
@@ -63,7 +63,7 @@ public class CubicSplineInterpolatorND {
         for( int i=0; i<N; ++i)
         	x_[i][length] = p[i];
         t_[length] = p[N];
-        
+
         if( length == 0) {
             t_[0] = 0;
         }
@@ -77,7 +77,7 @@ public class CubicSplineInterpolatorND {
         else {
             float dt1 = t_[length] - t_[length-1];
             float dt2 = t_[length-1] - t_[length-2];
-            
+
     		for( int i=0; i<N; ++i) {
     			dx[i][length-1] = 0.5f * ((x_[i][length]-x_[i][length-1])/dt1 + (x_[i][length-1]-x_[i][length-2])/dt2);
     			dx[i][length] = 0.25f * (x_[i][length] - x_[i][length-1])/dt1;
@@ -86,7 +86,7 @@ public class CubicSplineInterpolatorND {
 
         length++;
     }
-    
+
     /** Expands the internal arrays in order to accommodate the new length. */
     private void expand(int new_length) {
         if( x_.length >= new_length) return;
@@ -113,17 +113,17 @@ public class CubicSplineInterpolatorND {
         System.arraycopy(t_, 0, buff, 0, length);
         t_ = buff;
     }
-    
+
     public float[] eval(float t) {
     	float[] ret = new float[N];
     	if( length == 0) return ret;
-    	
+
     	if( t <= 0) {
     		for( int i=0; i<N; ++i)
     			ret[i] = x_[i][0];
     		return ret;
     	}
-    	
+
     	int w=1;
     	while( t > t_[w] && ++w < length) ;
     	if( w == length) {
@@ -131,16 +131,16 @@ public class CubicSplineInterpolatorND {
     			ret[i] = x_[i][length-1];
     		return ret;
     	}
-    	
+
     	float dt = t_[w]-t_[w-1];
     	float n = (t - t_[w-1])/dt;
-    	
+
     	for( int i=0; i<N; ++i) {
     		float a = dx[i][w-1]*dt - (x_[i][w] - x_[i][w-1]);
     		float b =-dx[i][w]*dt + x_[i][w] - x_[i][w-1];
     		ret[i] = (1-n)*x_[i][w-1] + n*x_[i][w] + n*(n-1)*(a*(1-n) + b*n);
     	}
-    	
+
     	return ret;
     }
 }
