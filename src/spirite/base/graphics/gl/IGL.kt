@@ -1,6 +1,8 @@
 package spirite.base.graphics.gl
 
+import sun.java2d.pipe.RenderBuffer
 import java.nio.FloatBuffer
+import java.nio.IntBuffer
 
 /***
  * IGL is a wrapper interface for OpenGL contexts.  Note: this is still a fairly low-level wrapper and implies manual memory
@@ -13,6 +15,8 @@ interface IGL {
     fun viewport( x: Int, y: Int, w: Int, h: Int)
     fun enable( cap: Int)
     fun disable( cap: Int)
+
+    fun getError() : Int
 
 
     // Shader Stuff
@@ -65,6 +69,19 @@ interface IGL {
     fun disableVertexAttribArray( index: Int)
     fun vertexAttribPointer( index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
 
+    // Framebuffers
+    fun genFramebuffer(): IGLFramebuffer
+    fun deleteFramebuffer( buffer: IGLFramebuffer)
+    fun bindFrameBuffer( target: Int, buffer: IGLFramebuffer?)
+    fun framebufferTexture2D( target: Int, attachment: Int, textarget: Int, texture: IGLTexture, level: Int)
+    fun checkFramebufferStatus( target: Int): Int
+    fun genRenderbuffer() : IGLRenderbuffer
+    fun deleteRenderbuffer(renderBuffer: IGLRenderbuffer)
+    fun bindRenderbuffer( target: Int, renderBuffer: IGLRenderbuffer)
+    fun renderbufferStorage( target: Int, internalformat: Int, width: Int, height: Int)
+    fun framebufferRenderbuffer( target: Int, attachment: Int, renderbuffertarget: Int, renderBuffer: IGLRenderbuffer)
+
+
     // Blend Modes
     fun blendFunc(sfactor: Int, dfactor:Int)
     fun blendEquation(mode:Int)
@@ -74,12 +91,19 @@ interface IGL {
     // Source Creation
     fun makeFloat32Source( size: Int) : IFloat32Source
     fun makeFloat32Source( buffer: FloatBuffer) : IFloat32Source
+    fun makeInt32Source(size: Int): IInt32Source
+    fun makeInt32Source(buffer: IntBuffer): IInt32Source
+
 
     // Draw
     fun drawArrays( mode: Int,first : Int, count: Int )
+
+    fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource )
 }
 
 interface IGLShader{val gl: IGL;fun delete() = gl.deleteShader(this)}
+interface IGLFramebuffer{val gl: IGL;fun delete() = gl.deleteFramebuffer(this)}
+interface IGLRenderbuffer{val gl:IGL;fun delete() = gl.deleteRenderbuffer(this)}
 interface IGLProgram{ val gl: IGL; fun delete() = gl.deleteProgram(this)}
 interface IGLUniformLocation
 interface IGLBuffer{ val gl: IGL; fun delete() = gl.deleteBuffer(this)}
@@ -91,6 +115,11 @@ interface IArraySource
 interface IFloat32Source : IArraySource {
     operator fun get(index: Int) : Float
     operator fun set(index: Int, value : Float)
+    val length: Int
+}
+interface IInt32Source : IArraySource {
+    operator fun get(index: Int) : Int
+    operator fun set(index: Int, value : Int)
     val length: Int
 }
 

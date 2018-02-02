@@ -6,20 +6,25 @@ object JOGLProvider {
     val drawable: GLOffscreenAutoDrawable
     val gl : GL
 
+    fun getGL() : JOGL{
+        this.gl.gl.context.makeCurrent()
+        return JOGL( gl.gL2)
+    }
+
     init {
         val profile = GLProfile.getDefault()
-        val factory = GLDrawableFactory.getFactory(profile)
+        val fact = GLDrawableFactory.getFactory(profile)
         val caps = GLCapabilities(profile)
         caps.hardwareAccelerated = true
         caps.doubleBuffered = false
         caps.alphaBits = 8
         caps.redBits = 8
         caps.blueBits = 8
-        caps.greenBits = 8
+        caps.greenBits = 3
         caps.isOnscreen = false
 
-        drawable = factory.createOffscreenAutoDrawable(
-                factory.defaultDevice,
+        drawable = fact.createOffscreenAutoDrawable(
+                fact.defaultDevice,
                 caps,
                 DefaultGLCapabilitiesChooser(),
                 1, 1)
@@ -44,6 +49,7 @@ object JOGLProvider {
 
         if( exception!= null)
             throw Exception(exception)
+
         this.gl = gl ?: throw NullPointerException("No GL Loaded")
     }
 }

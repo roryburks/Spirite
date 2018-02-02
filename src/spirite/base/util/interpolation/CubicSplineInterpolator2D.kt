@@ -103,9 +103,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         fastCalculateSlopes()
     }
 
-    override fun getCurveLength(): Float {
-        return this.distance
-    }
+    override val curveLength: Float get() = this.distance
 
     fun getX(n: Int): Float {
         return x_[n]

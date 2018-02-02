@@ -1,4 +1,4 @@
-package sjunit.util.dataContainers
+package sjunit.spirite.util.dataContainers
 
 
 import spirite.base.util.dataContainers.MutableOneToManyMap

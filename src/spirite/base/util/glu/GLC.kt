@@ -527,4 +527,5 @@ object GLC {
     val GL_MULTISAMPLE = 32925
     val GL_LINE_SMOOTH = 2848
     val GL_RGBA8 = 32856
+    val GL_COLOR = 6144
 }

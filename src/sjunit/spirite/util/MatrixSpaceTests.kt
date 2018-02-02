@@ -1,4 +1,4 @@
-package sjunit.util
+package sjunit.spirite.util
 
 
 import spirite.base.util.linear.MatrixSpace

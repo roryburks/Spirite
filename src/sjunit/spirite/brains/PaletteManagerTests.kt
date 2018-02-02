@@ -1,4 +1,4 @@
-package sjunit.brains
+package sjunit.spirite.brains
 
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.brains.palette.PaletteManager

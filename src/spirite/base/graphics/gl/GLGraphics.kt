@@ -5,6 +5,7 @@ import spirite.base.graphics.IImage
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.MediumHandle
+import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
 import java.awt.Shape
 
@@ -30,6 +31,10 @@ class GLGraphics : GraphicsContext {
         this.gle = glImage.engine
     }
 
+    private fun reset() {
+        gle.setTarget(image)
+    }
+
 
     override var transform: Transform
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
@@ -48,7 +53,9 @@ class GLGraphics : GraphicsContext {
     }
 
     override fun clear() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        reset()
+        gle.gl.clearColor( 1f, 0f, 0f, 1f)
+        gle.gl.clear(GLC.GL_COLOR)
     }
 
     override fun preTranslate(offsetX: Double, offsetY: Double) {

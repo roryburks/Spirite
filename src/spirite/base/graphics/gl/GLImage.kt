@@ -1,5 +1,6 @@
 package spirite.base.graphics.gl
 
+import com.jogamp.opengl.GL2
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
@@ -63,7 +64,7 @@ class GLImage : RawImage {
     }
     // endregion
 
-    override val graphics: GraphicsContext = GLGraphics(this)
+    override val graphics: GraphicsContext get() = GLGraphics(this)
     override val byteSize: Int get() = width*height*4
 
     override fun flush() {
@@ -82,7 +83,12 @@ class GLImage : RawImage {
     override fun deepCopy(): RawImage = GLImage(this)
 
     override fun getRGB(x: Int, y: Int): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (x < 0 || y < 0 || x >= width || y >= height) return 0
+        val gl = engine.gl
+
+        val read = gl.makeInt32Source(1)
+        gl.readnPixels(x, y, 1, 1, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read )
+        return  read[0]
     }
 
     protected fun finalize() {

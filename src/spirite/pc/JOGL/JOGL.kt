@@ -3,6 +3,7 @@ package spirite.pc.JOGL
 import com.jogamp.opengl.GL2
 import spirite.base.graphics.gl.*
 import spirite.base.util.glu.GLC
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
@@ -14,10 +15,13 @@ class JOGL(
         val gl : GL2
 ) : IGL {
 
-    override fun clearColor(red: Float, green: Float, blue: Float, alpha: Float) =
-        gl.glClearColor(red, green, blue, alpha)
+    var color = FloatBuffer.wrap(floatArrayOf(0f, 0f, 0f, 0f))
+
+    override fun clearColor(red: Float, green: Float, blue: Float, alpha: Float) {
+        color = FloatBuffer.wrap(floatArrayOf(red, green, blue, alpha))
+    }
     override fun clear(mask: Int) =
-        gl.glClear(mask)
+        gl.glClearBufferfv(GLC.GL_COLOR, 0, color)
 
     override fun viewport(x: Int, y: Int, w: Int, h: Int) =
             gl.glViewport(x,y,w,h)
@@ -25,6 +29,8 @@ class JOGL(
             gl.glEnable(cap)
     override fun disable(cap: Int) =
             gl.glDisable(cap)
+
+    override fun getError() =gl.glGetError()
 
 
     // region Shaders
@@ -208,8 +214,50 @@ class JOGL(
             gl.glBlendEquationSeparate( modeRGB, modeAlpha)
     // endregion
 
+    // region Framebuffer
+    inner class JOGLFramebuffer( val fboID : Int) : IGLFramebuffer {
+        override val gl: IGL get() = this@JOGL
+    }
+
+    override fun genFramebuffer(): IGLFramebuffer {
+        val result = IntArray(1)
+        gl.glGenFramebuffers(1, result, 0)
+        return JOGLFramebuffer( result[0])
+    }
+    override fun deleteFramebuffer(buffer: IGLFramebuffer) =
+            gl.glDeleteFramebuffers( 1, intArrayOf((buffer as JOGLFramebuffer).fboID), 0)
+    override fun bindFrameBuffer(target: Int, buffer: IGLFramebuffer?) =
+            gl.glBindFramebuffer( target, (buffer as? JOGLFramebuffer)?.fboID ?: 0)
+    override fun framebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: IGLTexture, level: Int) =
+            gl.glFramebufferTexture2D( target, attachment, textarget, (texture as JOGLTexture).texId, level)
+    override fun checkFramebufferStatus(target: Int) =
+            gl.glCheckFramebufferStatus(target)
+
+    inner class JOGLRenderbuffer(val dboId: Int) : IGLRenderbuffer {
+        override val gl: IGL get() = this@JOGL
+    }
+    override fun genRenderbuffer(): IGLRenderbuffer {
+        val result = IntArray(1)
+        gl.glGenRenderbuffers(1, result, 0)
+        return JOGLRenderbuffer(result[0])
+    }
+
+    override fun deleteRenderbuffer(renderBuffer: IGLRenderbuffer) =
+            gl.glDeleteRenderbuffers(1, intArrayOf((renderBuffer as JOGLRenderbuffer).dboId), 0)
+    override fun bindRenderbuffer(target: Int, renderBuffer: IGLRenderbuffer) =
+            gl.glBindRenderbuffer(target, (renderBuffer as JOGLRenderbuffer).dboId)
+    override fun renderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) =
+            gl.glRenderbufferStorage(target, internalformat, width, height)
+    override fun framebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderBuffer: IGLRenderbuffer) =
+            gl.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, (renderBuffer as JOGLRenderbuffer).dboId)
+    // endregion
+
     // region Data Sources
-    class JOGLFloat32Source : IFloat32Source {
+    interface JOGLArraySource {
+        val data: Buffer
+    }
+
+    class JOGLFloat32Source : IFloat32Source, JOGLArraySource {
         constructor( size: Int) {
             data = FloatBuffer.allocate(size)
             length = size
@@ -220,15 +268,41 @@ class JOGL(
             length = data.capacity()
         }
 
-        val data: FloatBuffer
+        override val data: FloatBuffer
         override fun get(index: Int): Float = data[index]
         override fun set(index: Int, value: Float) {data.put(index, value)}
         override val length : Int
     }
     override fun makeFloat32Source(size: Int): IFloat32Source = JOGLFloat32Source(size)
     override fun makeFloat32Source(buffer: FloatBuffer): IFloat32Source = JOGLFloat32Source(buffer)
+
+
+    class JOGLInt32Source: IInt32Source,JOGLArraySource {
+        constructor( size: Int) {
+            data = IntBuffer.allocate(size)
+            length = size
+        }
+
+        constructor( intBuffer: IntBuffer) {
+            data = intBuffer
+            length = data.capacity()
+        }
+
+        override val data: IntBuffer
+        override fun get(index: Int): Int = data[index]
+        override fun set(index: Int, value: Int) {data.put(index, value)}
+        override val length : Int
+
+    }
+    override fun makeInt32Source(size: Int): IInt32Source = JOGLInt32Source(size)
+    override fun makeInt32Source(buffer: IntBuffer): IInt32Source = JOGLInt32Source(buffer)
     // endregion
 
     override fun drawArrays(mode: Int, first: Int, count: Int) =
             gl.glDrawArrays( mode, first, count)
+
+    override fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource ){
+        if( buffer is JOGLArraySource)
+            gl.glReadnPixels( x, y, w, h, format, type, n, buffer.data)
+    }
 }
