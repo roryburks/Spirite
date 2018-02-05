@@ -1,51 +1,31 @@
-package spirite.base.graphics.gl
+package spirite.pc.graphics.awt
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.MediumHandle
-import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
+import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.Shape
+import java.awt.image.BufferedImage
 
+class AWTGraphicsContext : GraphicsContext {
+    override val width: Int
+    override val height: Int
+    val g2 : Graphics2D
 
-class GLGraphics : GraphicsContext {
-
-    val image : GLImage?
-
-    override var width: Int
-        private set(value) {
-            polyParams.width = value
-            field = value
-        }
-    override var height: Int
-        private set(value) {
-            polyParams.heigth = value
-            field = value
-        }
-
-    val gle: GLEngine
-
-    constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine)  {
+    constructor( g : Graphics, width: Int, height: Int) {
         this.width = width
         this.height = height
-        image = null
-        this.gle = gle
+        this.g2 = g as Graphics2D
     }
-    constructor( glImage: GLImage)  {
-        width = glImage.width
-        height = glImage.height
-        image = glImage
-        this.gle = glImage.engine
+    constructor( bi: BufferedImage) {
+        width = bi.width
+        height = bi.height
+        g2 = bi.graphics as Graphics2D
     }
-
-    private fun reset() {
-        gle.setTarget(image)
-    }
-    private val polyParams = GLParametersMutable(1, 1)
-    private val imgParams = GLParametersMutable(1, 1)
-
 
     override var transform: Transform
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
@@ -59,16 +39,11 @@ class GLGraphics : GraphicsContext {
         set(value) {}
 
     override fun drawBounds(bi: IImage, c: Int) {
-        val img = GLImage(width, height, gle)
-
-        val other = img.graphics
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun clear() {
-        reset()
-        gle.gl.clearColor( 1f, 0f, 0f, 1f)
-        gle.gl.clear(GLC.GL_COLOR)
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun preTranslate(offsetX: Double, offsetY: Double) {

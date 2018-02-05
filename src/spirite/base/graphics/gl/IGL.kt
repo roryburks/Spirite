@@ -99,6 +99,7 @@ interface IGL {
     fun drawArrays( mode: Int,first : Int, count: Int )
 
     fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource )
+    fun readPixels(x:Int, y:Int, w:Int, h:Int, format:Int, type:Int, buffer: IArraySource)
 }
 
 interface IGLShader{val gl: IGL;fun delete() = gl.deleteShader(this)}

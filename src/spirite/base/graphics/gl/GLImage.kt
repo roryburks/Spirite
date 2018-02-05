@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl
 
-import com.jogamp.opengl.GL2
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
@@ -87,7 +86,7 @@ class GLImage : RawImage {
         val gl = engine.gl
 
         val read = gl.makeInt32Source(1)
-        gl.readnPixels(x, y, 1, 1, GL2.GL_BGRA, GL2.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read )
+        gl.readnPixels(x, y, 1, 1, GLC.GL_BGRA, GLC.GL_UNSIGNED_INT_8_8_8_8_REV, 4, read )
         return  read[0]
     }
 

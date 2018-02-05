@@ -1,16 +1,23 @@
 package spirite.base.graphics.gl
 
+import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
 
 class GLEngine(
-        internal val gl: IGL) {
+        internal val gl: IGL,
+        scriptService: IScriptService
+) {
 
+    init {
+
+    }
 
     val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
     lateinit private var fbo : IGLFramebuffer
 
     var width : Int = 1 ; private set
     var height : Int = 1 ; private set
+
 
     var target: IGLTexture? = null
         get

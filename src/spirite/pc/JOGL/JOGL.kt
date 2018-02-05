@@ -305,4 +305,8 @@ class JOGL(
         if( buffer is JOGLArraySource)
             gl.glReadnPixels( x, y, w, h, format, type, n, buffer.data)
     }
+    override fun readPixels(x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, buffer: IArraySource) {
+        if( buffer is JOGLArraySource)
+            gl.glReadPixels( x, y, w, h, format, type, buffer.data)
+    }
 }

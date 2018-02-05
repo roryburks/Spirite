@@ -4,26 +4,46 @@ import com.hackoeur.jglm.Mat4
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.toIFloat32Source
 
+interface GLParameters {
+    var width : Int
+    var heigth: Int
+    var flip: Boolean
+    var clipRect : Rect?
+    var uniforms: List<GLUniform>?
 
-data class GLParameters(
-        val width : Int,
-        val heigth: Int,
-        val flip: Boolean = false,
-        val clipRect : Rect? = null,
-        val uniforms: List<GLUniform>? = null,
+    var texture1 : GLImage?
+    var texture2 : GLImage?
 
-        val texture1 : GLImage? = null,
-        val texture2 : GLImage? = null,
+    var useBlendMode: Boolean
+    var useDefaultBlendMode: Boolean
+    var bm_sfc: Int
+    var bm_sfa: Int
+    var bm_dfc: Int
+    var bm_dfa: Int
+    var bm_fc: Int
+    var bm_fa: Int
 
-        val useBlendMode: Boolean = true,
-        val useDefaultBlendMode: Boolean = true,
-        val bm_sfc: Int = 0,
-        val bm_sfa: Int = 0,
-        val bm_dfc: Int = 0,
-        val bm_dfa: Int = 0,
-        val bm_fc: Int = 0,
-        val bm_fa: Int = 0
-) {}
+}
+
+data class GLParametersMutable (
+        override var width : Int,
+        override var heigth: Int,
+        override var flip: Boolean = false,
+        override var clipRect : Rect? = null,
+        override var uniforms: List<GLUniform>? = null,
+
+        override var texture1 : GLImage? = null,
+        override var texture2 : GLImage? = null,
+
+        override var useBlendMode: Boolean = true,
+        override var useDefaultBlendMode: Boolean = true,
+        override var bm_sfc: Int = 0,
+        override var bm_sfa: Int = 0,
+        override var bm_dfc: Int = 0,
+        override var bm_dfa: Int = 0,
+        override var bm_fc: Int = 0,
+        override var bm_fa: Int = 0
+) : GLParameters
 
 sealed abstract class GLUniform(
         val name: String

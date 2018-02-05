@@ -528,4 +528,6 @@ object GLC {
     val GL_LINE_SMOOTH = 2848
     val GL_RGBA8 = 32856
     val GL_COLOR = 6144
+    val GL_BGRA = 32993
+    val GL_UNSIGNED_INT_8_8_8_8_REV = 33639
 }
