@@ -24,7 +24,7 @@ interface IGL {
     fun deleteShader( shader: IGLShader)
     fun shaderSource( shader: IGLShader, source: String)
     fun compileShader( shader: IGLShader)
-    fun getShaderParameter( shader: IGLShader, param: Int) : Any?
+    fun shaderCompiledSuccessfully(shader: IGLShader) : Boolean
     fun getShaderInfoLog( shader: IGLShader) : String?
 
     // Program Stuff
@@ -32,8 +32,9 @@ interface IGL {
     fun deleteProgram( program: IGLProgram)
     fun useProgram( program: IGLProgram?)
     fun attachShader( program: IGLProgram, shader: IGLShader)
+    fun detatchShader( program: IGLProgram, shader: IGLShader)
     fun linkProgram( program: IGLProgram)
-    fun getProgramParameter( program: IGLProgram, param: Int) : Any?
+    fun programLinkedSuccessfully(program: IGLProgram) : Boolean
     fun getProgramInfoLog( program: IGLProgram) : String?
 
     // Texture Stuff
@@ -100,6 +101,9 @@ interface IGL {
 
     fun readnPixels( x: Int, y: Int, w: Int, h: Int, format: Int, type: Int, n: Int, buffer: IArraySource )
     fun readPixels(x:Int, y:Int, w:Int, h:Int, format:Int, type:Int, buffer: IArraySource)
+
+    fun depthMask( flag: Boolean)
+    fun lineWidth( width: Float)
 }
 
 interface IGLShader{val gl: IGL;fun delete() = gl.deleteShader(this)}

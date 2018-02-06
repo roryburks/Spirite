@@ -1,5 +1,6 @@
 package spirite.pc.JOGL
 
+import com.jogamp.opengl.GL
 import com.jogamp.opengl.GL2
 import spirite.base.graphics.gl.*
 import spirite.base.util.glu.GLC
@@ -21,7 +22,7 @@ class JOGL(
         color = FloatBuffer.wrap(floatArrayOf(red, green, blue, alpha))
     }
     override fun clear(mask: Int) =
-        gl.glClearBufferfv(GLC.GL_COLOR, 0, color)
+        gl.glClearBufferfv(GLC.COLOR, 0, color)
 
     override fun viewport(x: Int, y: Int, w: Int, h: Int) =
             gl.glViewport(x,y,w,h)
@@ -52,16 +53,16 @@ class JOGL(
     }
     override fun compileShader(shader: IGLShader) =
             gl.glCompileShader( (shader as JOGLShader).shaderId)
-    override fun getShaderParameter(shader: IGLShader, param: Int): Any? {
+    override fun shaderCompiledSuccessfully(shader: IGLShader) : Boolean {
         val shaderId = (shader as JOGLShader).shaderId
         val status = IntBuffer.allocate(1)
-        gl.glGetShaderiv(shaderId, param, status)
-        return status[0]
+        gl.glGetShaderiv(shaderId, GLC.COMPILE_STATUS, status)
+        return status[0] == GLC.TRUE
     }
     override fun getShaderInfoLog(shader: IGLShader): String? {
         val shaderId = (shader as JOGLShader).shaderId
         val infoLogLength = IntBuffer.allocate(1)
-        gl.glGetShaderiv(shaderId, GLC.GL_INFO_LOG_LENGTH, infoLogLength)
+        gl.glGetShaderiv(shaderId, GLC.INFO_LOG_LENGTH, infoLogLength)
 
         val bufferInfoLog = ByteBuffer.allocate( infoLogLength[0])
         gl.glGetShaderInfoLog( shaderId, infoLogLength[0], null, bufferInfoLog)
@@ -81,24 +82,26 @@ class JOGL(
         return if(programId == 0) null else JOGLProgram(programId)
     }
     override fun deleteProgram(program: IGLProgram)= gl.glDeleteProgram((program as JOGLProgram).programId)
-    override fun useProgram(program: IGLProgram?) = gl.glUseProgram((program as JOGLProgram).programId)
+    override fun useProgram(program: IGLProgram?) = gl.glUseProgram((program as? JOGLProgram)?.programId ?: 0)
 
     override fun attachShader(program: IGLProgram, shader: IGLShader) =
             gl.glAttachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
+    override fun detatchShader( program: IGLProgram, shader: IGLShader) =
+            gl.glDetachShader( (program as JOGLProgram).programId, (shader as JOGLShader).shaderId)
 
     override fun linkProgram(program: IGLProgram) = gl.glLinkProgram((program as JOGLProgram).programId)
 
-    override fun getProgramParameter(program: IGLProgram, param: Int): Any? {
+    override fun programLinkedSuccessfully(program: IGLProgram): Boolean {
         val programId = (program as JOGLProgram).programId
         val status = IntBuffer.allocate(1)
-        gl.glGetProgramiv(programId, param, status)
-        return status[0]
+        gl.glGetProgramiv(programId, GLC.LINK_STATUS, status)
+        return status[0] == GL.GL_TRUE
     }
 
     override fun getProgramInfoLog(program: IGLProgram): String? {
         val programId = (program as JOGLProgram).programId
         val infoLogLength = IntBuffer.allocate(1)
-        gl.glGetProgramiv(programId, GLC.GL_INFO_LOG_LENGTH, infoLogLength)
+        gl.glGetProgramiv(programId, GLC.INFO_LOG_LENGTH, infoLogLength)
 
         val bufferInfoLog = ByteBuffer.allocate( infoLogLength[0])
         gl.glGetProgramInfoLog( programId, infoLogLength[0], null, bufferInfoLog)
@@ -187,7 +190,7 @@ class JOGL(
     override fun deleteBuffer(buffer: IGLBuffer) =
             gl.glDeleteBuffers(1, intArrayOf((buffer as JOGLBuffer).bufferId), 0)
     override fun bindBuffer(target: Int, buffer: IGLBuffer?) =
-            gl.glBindBuffer(target, (buffer as JOGLBuffer).bufferId)
+            gl.glBindBuffer(target, (buffer as? JOGLBuffer)?.bufferId ?: 0)
 
     override fun bufferData(target: Int, data: IArraySource, usage: Int) {
         if( data is JOGLFloat32Source)
@@ -309,4 +312,8 @@ class JOGL(
         if( buffer is JOGLArraySource)
             gl.glReadPixels( x, y, w, h, format, type, buffer.data)
     }
+
+
+    override fun depthMask(flag: Boolean) = gl.glDepthMask(flag)
+    override fun lineWidth(width: Float) = gl.glLineWidth(width)
 }

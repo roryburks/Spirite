@@ -68,7 +68,7 @@ class GLGraphics : GraphicsContext {
     override fun clear() {
         reset()
         gle.gl.clearColor( 1f, 0f, 0f, 1f)
-        gle.gl.clear(GLC.GL_COLOR)
+        gle.gl.clear(GLC.COLOR)
     }
 
     override fun preTranslate(offsetX: Double, offsetY: Double) {

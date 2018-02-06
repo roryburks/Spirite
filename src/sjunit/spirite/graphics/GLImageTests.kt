@@ -14,9 +14,7 @@ import org.junit.Test as test
 
 class GLImageTests {
     @test fun BasicGLFunctionality() {
-        val gle = GLEngine(JOGLProvider.getGL(), object : IScriptService {
-            override fun loadScript(scriptName: String) = ""
-        })
+        val gle = GLEngine(JOGLProvider.getGL(), TrivialScriptService())
         val glimage = GLImage(10,10,gle)
 
         glimage.graphics.clear()
@@ -26,9 +24,7 @@ class GLImageTests {
         assertEquals(0xffff0000.toInt(), color)
     }
     @test fun SuperBasicFunctionality() {
-        val gle = GLEngine(JOGLProvider.getGL(), object : IScriptService {
-            override fun loadScript(scriptName: String) = ""
-        })
+        val gle = GLEngine(JOGLProvider.getGL(), TrivialScriptService())
         val glimage = GLImage(10,12,gle)
 
         assertEquals( 10, glimage.width)
@@ -36,9 +32,7 @@ class GLImageTests {
     }
 
     @test fun DeepCopy() {
-        val gle = GLEngine(JOGLProvider.getGL(), object : IScriptService {
-            override fun loadScript(scriptName: String) = ""
-        })
+        val gle = GLEngine(JOGLProvider.getGL(),TrivialScriptService())
         val glimage = GLImage(10,10,gle)
 
         glimage.graphics.clear()
@@ -49,9 +43,7 @@ class GLImageTests {
         assertEquals(0xffff0000.toInt(), color)
     }
     @test fun TestConvertToBi() {
-        val gle = GLEngine(JOGLProvider.getGL(), object : IScriptService {
-            override fun loadScript(scriptName: String) = ""
-        })
+        val gle = GLEngine(JOGLProvider.getGL(), TrivialScriptService())
         val glimage = GLImage(10,12,gle)
         glimage.graphics.clear()
 

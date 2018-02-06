@@ -38,8 +38,8 @@ object PCUtil {
                 val ib = IntBuffer.wrap( iir.dataStorage)
 
                 gl.readPixels( 0, 0, width, height,
-                        GLC.GL_BGRA,
-                        GLC.GL_UNSIGNED_INT_8_8_8_8_REV,
+                        GLC.BGRA,
+                        GLC.UNSIGNED_INT_8_8_8_8_REV,
                         JOGLInt32Source(ib))
 
                 bi

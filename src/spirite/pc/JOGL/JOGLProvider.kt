@@ -20,7 +20,7 @@ object JOGLProvider {
         caps.alphaBits = 8
         caps.redBits = 8
         caps.blueBits = 8
-        caps.greenBits = 3
+        caps.greenBits = 8
         caps.isOnscreen = false
 
         drawable = fact.createOffscreenAutoDrawable(

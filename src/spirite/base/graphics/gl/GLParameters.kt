@@ -5,23 +5,23 @@ import spirite.base.util.linear.Rect
 import spirite.base.util.linear.toIFloat32Source
 
 interface GLParameters {
-    var width : Int
-    var heigth: Int
-    var flip: Boolean
-    var clipRect : Rect?
-    var uniforms: List<GLUniform>?
+    val width : Int
+    val heigth: Int
+    val flip: Boolean
+    val clipRect : Rect?
+    val uniforms: List<GLUniform>?
 
-    var texture1 : GLImage?
-    var texture2 : GLImage?
+    val texture1 : GLImage?
+    val texture2 : GLImage?
 
-    var useBlendMode: Boolean
-    var useDefaultBlendMode: Boolean
-    var bm_sfc: Int
-    var bm_sfa: Int
-    var bm_dfc: Int
-    var bm_dfa: Int
-    var bm_fc: Int
-    var bm_fa: Int
+    val useBlendMode: Boolean
+    val useDefaultBlendMode: Boolean
+    val bm_sfc: Int
+    val bm_sfa: Int
+    val bm_dfc: Int
+    val bm_dfa: Int
+    val bm_fc: Int
+    val bm_fa: Int
 
 }
 
