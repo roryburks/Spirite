@@ -1,15 +1,12 @@
 package spirite.base.graphics.gl
 
-import com.hackoeur.jglm.Mat4
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.toIFloat32Source
+import spirite.base.util.linear.*
 
 interface GLParameters {
     val width : Int
     val heigth: Int
     val flip: Boolean
     val clipRect : Rect?
-    val uniforms: List<GLUniform>?
 
     val texture1 : GLImage?
     val texture2 : GLImage?
@@ -30,7 +27,6 @@ data class GLParametersMutable (
         override var heigth: Int,
         override var flip: Boolean = false,
         override var clipRect : Rect? = null,
-        override var uniforms: List<GLUniform>? = null,
 
         override var texture1 : GLImage? = null,
         override var texture2 : GLImage? = null,
@@ -56,17 +52,34 @@ class GLUniform1f(name: String, val x: Float) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
     {gl.uniform1f(getUniformLocation(gl, program) ?: return, x)}
 }
-class GLUniform2f(name: String, val x: Float, val y: Float) : GLUniform(name) {
+class GLUniform2f(name: String, val v: Vec2) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform2f(getUniformLocation(gl, program) ?: return, x, y)}
+    {gl.uniform2f(getUniformLocation(gl, program) ?: return, v.x, v.y)}
 }
-class GLUniform3f(name: String, val x: Float, val y: Float, val z: Float) : GLUniform(name) {
+class GLUniform3f(name: String, val v: Vec3) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform3f(getUniformLocation(gl, program) ?: return, x, y, z)}
+    {gl.uniform3f(getUniformLocation(gl, program) ?: return, v.x, v.y, v.z)}
 }
-class GLUniform4f(name: String, val x: Float, val y: Float, val z: Float, val w: Float) : GLUniform(name) {
+class GLUniform4f(name: String, val v: Vec4) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
-    {gl.uniform4f(getUniformLocation(gl, program) ?: return, x, y, z, w)}
+    {gl.uniform4f(getUniformLocation(gl, program) ?: return, v.x, v.y, v.z, v.w)}
+}
+
+class GLUniform1i(name: String, val x: Int) : GLUniform(name) {
+    override fun apply(gl: IGL, program: IGLProgram)
+    {gl.uniform1i(getUniformLocation(gl, program) ?: return, x)}
+}
+class GLUniform2i(name: String, val x: Int, val y: Int) : GLUniform(name) {
+    override fun apply(gl: IGL, program: IGLProgram)
+    {gl.uniform2i(getUniformLocation(gl, program) ?: return, x, y)}
+}
+class GLUniform3i(name: String, val x: Int, val y: Int, val z: Int) : GLUniform(name) {
+    override fun apply(gl: IGL, program: IGLProgram)
+    {gl.uniform3i(getUniformLocation(gl, program) ?: return, x, y, z)}
+}
+class GLUniform4i(name: String, val x: Int, val y: Int, val z: Int, val w: Int) : GLUniform(name) {
+    override fun apply(gl: IGL, program: IGLProgram)
+    {gl.uniform4i(getUniformLocation(gl, program) ?: return, x, y, z, w)}
 }
 class GLUniformMatrix4fv(name: String, val mat4: Mat4) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)

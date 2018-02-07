@@ -1,29 +1,30 @@
 package spirite.base.graphics.gl
 
-import com.hackoeur.jglm.Mat4
-import spirite.base.graphics.gl.GLEngine.BlendMethod.*
+import spirite.base.graphics.CapMethod
+import spirite.base.graphics.JoinMethod
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
+import spirite.base.util.linear.Mat4
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Vec3
 
 class GLEngine(
         internal val gl: IGL,
         scriptService: IScriptService
 ) {
 
-    val programs = initShaderPrograms(scriptService)
+    private val programs = initShaderPrograms(scriptService)
 
-    val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
-    lateinit private var fbo : IGLFramebuffer
+    private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
+    private lateinit var fbo : IGLFramebuffer
 
     var width : Int = 1 ; private set
     var height : Int = 1 ; private set
 
 
     var target: IGLTexture? = null
-        get
         set(value) {
             if( field != value) {
                 // Delete old Framebuffer
@@ -69,8 +70,101 @@ class GLEngine(
 
     // region Exposed Rendering Methods
 
+    fun applyPassProgram(
+            programCall: ProgramCall,
+            params: GLParameters,
+            trans: Transform?,
+            x1: Float, y1: Float, x2: Float, y2: Float)
+    {
+        val iParams = mutableListOf<GLUniform>()
+        addOrtho(params, iParams, trans)
+
+        val internal = params.texture1?.isGLOriented ?: false
+
+        val preparedPrimitive = PreparedPrimitive( GLPrimitive(
+                gl.makeFloat32Source(floatArrayOf(
+                        // x  y   u   v
+                        x1, y1, 0.0f, if (internal) 0.0f else 1.0f,
+                        x2, y1, 1.0f, if (internal) 0.0f else 1.0f,
+                        x1, y2, 0.0f, if (internal) 1.0f else 0.0f,
+                        x2, y2, 1.0f, if (internal) 1.0f else 0.0f
+                )), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
+                , this)
+        applyProgram( programCall, params, iParams, preparedPrimitive)
+        preparedPrimitive.flush()
+    }
+
+    /**
+     * Draws a complex line that transforms the line description into a geometric
+     * shape by combining assorted primitive renders to create the specified
+     * join/cap methods.
+     *
+     * @param xPoints	Array containing the x coordinates.
+     * @param yPoints 	Array containing the x coordinates.
+     * @param numPoints	Number of points to use for the render.
+     * @param cap	How to draw the end-points.
+     * @param join	How to draw the line joints.
+     * @param loop	Whether or not to close the loop by joining the two end points
+     * 	together (cap is ignored if this is true because the curve has no end points)
+     * @param lineWidth    Width of the line.
+     * @param color     Color of the line
+     * @param alpha     Alpha of the line
+     * @param params	GLParameters describing the GL Attributes to use
+     * @param trans		Transform to apply to the rendering.
+     */
+    fun applyComplexLineProgram(
+            xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
+            cap: CapMethod, join: JoinMethod, loop: Boolean, lineWidth: Float,
+            color: Vec3, alpha: Float,
+            params: GLParameters, trans: Transform?)
+    {
+        if( xPoints.size < 2) return
+
+        val size = numPoints + if(loop) 3 else 2
+        val data = FloatArray(2*size)
+        for( i in 1..numPoints) {
+            data[i*2] = xPoints[i-1]
+            data[i*2+1] = yPoints[i-1]
+        }
+        if (loop) {
+            data[0] = xPoints[numPoints - 1]
+            data[1] = yPoints[numPoints - 1]
+            data[2 * (numPoints + 1)] = xPoints[0]
+            data[2 * (numPoints + 1) + 1] = yPoints[0]
+            if (numPoints > 2) {
+                data[2 * (numPoints + 2)] = xPoints[1]
+                data[2 * (numPoints + 2) + 1] = yPoints[1]
+            }
+        } else {
+            data[0] = xPoints[0]
+            data[1] = yPoints[0]
+            data[2 * (numPoints + 1)] = xPoints[numPoints - 1]
+            data[2 * (numPoints + 1) + 1] = yPoints[numPoints - 1]
+        }
+
+        val iParams = mutableListOf<GLUniform>()
+        addOrtho(params, iParams, trans)
+
+        if( true /* Shaderversion 330 */) {
+            val prim = PreparedPrimitive( GLPrimitive(
+                    gl.makeFloat32Source(data),
+                    intArrayOf(2),
+                    GLC.LINE_STRIP_ADJACENCY,
+                    intArrayOf(size)),
+                    this)
+
+            gl.enable(GLC.MULTISAMPLE)
+            applyProgram(LineRenderCall( join, lineWidth, color, alpha), params, iParams, prim)
+            gl.disable(GLC.MULTISAMPLE)
+
+            prim.flush()
+        }else {
+
+        }
+    }
+
     fun applyPolyProgram(
-            program: ProgramType,
+            programCall: ProgramCall,
             xPoints: List<Float>,
             yPoints: List<Float>,
             numPoints: Int,
@@ -78,15 +172,15 @@ class GLEngine(
             params: GLParameters,
             trans : Transform?
     ) {
-        val iParams = InternalParams(params)
-        addOrtho( iParams, trans)
+        val iParams = mutableListOf<GLUniform>()
+        addOrtho( params, iParams, trans)
 
         val data = gl.makeFloat32Source(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
         yPoints.forEachIndexed { i, y -> data[i*2+1] = y }
         val prim = PreparedPrimitive(GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)), this)
 
-        applyProgram( program, iParams, prim)
+        applyProgram( programCall, params, iParams, prim)
         prim.flush()
     }
 
@@ -94,14 +188,12 @@ class GLEngine(
 
     // region Base Rendering
 
-    private inner class InternalParams(
-            val baseParams: GLParameters
-    ){
-        val internalParams = mutableListOf<GLUniform>()
-    }
-
-    private fun applyProgram( programType: ProgramType, iParams: InternalParams, preparedPrimitive: PreparedPrimitive) {
-        val params = iParams.baseParams
+    private fun applyProgram(
+            programCall: ProgramCall,
+            params: GLParameters,
+            internalParams: List<GLUniform>,
+            preparedPrimitive: PreparedPrimitive)
+    {
         val prim = preparedPrimitive.primative
         val w = params.width
         val h = params.heigth
@@ -112,7 +204,7 @@ class GLEngine(
             else -> gl.viewport(clipRect.x, clipRect.y, clipRect.width, clipRect.height)
         }
 
-        val program = programs[programType.ordinal]
+        val program = programs[programCall.programType.ordinal]
         gl.useProgram(program)
 
         // Bind Attribute Streams
@@ -137,15 +229,15 @@ class GLEngine(
         }
 
         // Bind Uniforms
-        params.uniforms?.forEach { it.apply(gl, program) }
-        iParams.internalParams.forEach { it.apply(gl, program) }
+        programCall.uniforms?.forEach { it.apply(gl, program) }
+        internalParams.forEach { it.apply(gl, program) }
 
         // Set Blend Mode
         if( params.useBlendMode) {
             gl.enable( GLC.BLEND)
             when( params.useDefaultBlendMode) {
                 true -> {
-                    val blendMethod = programType.method
+                    val blendMethod = programCall.programType.method
                     gl.blendFunc(blendMethod.sourceFactor,blendMethod.destFactor)
                     gl.blendEquation(blendMethod.formula)
                 }
@@ -179,17 +271,16 @@ class GLEngine(
         preparedPrimitive.unuse()
     }
 
-    private fun addOrtho( params: InternalParams, trans: Transform?) {
+    private fun addOrtho( params: GLParameters, internalParams: MutableList<GLUniform>, trans: Transform?) {
         val x1 : Float
         val y1 : Float
         val x2 : Float
         val y2 : Float
-        val base = params.baseParams
 
-        val clipRect = base.clipRect
+        val clipRect = params.clipRect
         if( clipRect == null) {
-            x1 = 0f; x2 = base.width + 0f
-            y1 = 0f; y2 = base.heigth + 0f
+            x1 = 0f; x2 = params.width + 0f
+            y1 = 0f; y2 = params.heigth + 0f
         }
         else {
             x1 = clipRect.x + 0f
@@ -199,50 +290,27 @@ class GLEngine(
         }
 
         var matrix = Mat4(orthagonalProjectionMatrix(
-                x1, x2,if( base.flip) y2 else y1, if( base.flip) y1 else y2, -1f, 1f))
+                x1, x2,if( params.flip) y2 else y1, if( params.flip) y1 else y2, -1f, 1f))
 
         if( trans != null) {
             val matrix2 = Mat4( wrapTransformAs4x4(trans))
-            matrix = matrix2.multiply(matrix)
+            matrix = matrix2 * matrix
         }
 
         matrix = matrix.transpose()
-        params.internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", matrix))
+        internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", matrix))
     }
     // endregion
 
     // region Shader Programs
-    private enum class BlendMethod(
-            val sourceFactor: Int,
-            val destFactor: Int,
-            val formula: Int) {
+    enum class BlendMethod(
+            internal val sourceFactor: Int,
+            internal val destFactor: Int,
+            internal val formula: Int) {
         SRC_OVER( GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
         SOURCE(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
         MAX( GLC.ONE, GLC.ONE, GLC.MAX),
         DEST_OVER( GLC.SRC_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
-    }
-
-    enum class ProgramType(
-            internal val method: BlendMethod
-    ) {
-        SQARE_GRADIENT(MAX),
-        CHANGE_COLOR(MAX),
-        GRID(SRC_OVER),
-
-        PASS_BASIC(SRC_OVER),
-        PASS_BORDER(DEST_OVER),
-        PASS_INVERT(MAX),
-        PASS_RENDER(SRC_OVER),
-        PASS_ESCALATE(SRC_OVER),
-
-        STROKE_SPORE(MAX),
-        STROKE_BASIC(SRC_OVER),
-        STROKE_PIXEL(SRC_OVER),
-        STROKE_V2_LINE_PASS(SRC_OVER),
-        STROKE_AFTERPASS_INTENSIFY(SOURCE),
-
-        POLY_RENDER(SRC_OVER),
-        LINE_RENDER(SRC_OVER),
     }
 
     private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {

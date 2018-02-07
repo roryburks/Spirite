@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl
 
-import sun.java2d.pipe.RenderBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 
@@ -92,8 +91,10 @@ interface IGL {
     // Source Creation
     fun makeFloat32Source( size: Int) : IFloat32Source
     fun makeFloat32Source( buffer: FloatBuffer) : IFloat32Source
+    fun makeFloat32Source( array: FloatArray) : IFloat32Source
     fun makeInt32Source(size: Int): IInt32Source
     fun makeInt32Source(buffer: IntBuffer): IInt32Source
+    fun makeInt32Source(array: IntArray): IInt32Source
 
 
     // Draw

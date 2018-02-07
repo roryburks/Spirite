@@ -1,8 +1,5 @@
 package spirite.base.imageData.mediums.drawer
 
-import spirite.base.util.interpolation.Interpolator2D
-import spirite.base.util.linear.Transform
-
 
 interface IImageDrawer {
     // TODO

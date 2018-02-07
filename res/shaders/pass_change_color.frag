@@ -7,8 +7,8 @@ in vec2 vUV;
 out vec4 outputColor; 
 
 uniform sampler2D myTexture;
-uniform vec4 cFrom;
-uniform vec4 cTo;
+uniform vec4 u_fromColor;
+uniform vec4 u_toColor;
 
 // CBAA : 
 //	AA : 0 - Exact Match
@@ -50,18 +50,18 @@ void main()
 	int _mode = optionMask & 3;
 	
 	if( _mode == 2 ||
-		(distance(cFrom.r , checkCol.r) < thresh &&
-		distance(cFrom.g , checkCol.g) < thresh &&
-		distance(cFrom.b , checkCol.b) < thresh &&
-		(_mode == 1 || distance(cFrom.a , texCol.a) < thresh) ))
+		(distance(u_fromColor.r , checkCol.r) < thresh &&
+		distance(u_fromColor.g , checkCol.g) < thresh &&
+		distance(u_fromColor.b , checkCol.b) < thresh &&
+		(_mode == 1 || distance(u_fromColor.a , texCol.a) < thresh) ))
 	{
 		if( !hueOnly) {
-			outputColor.rgb = (premult)?cTo.rgb * texCol.a:cTo.rgb;
+			outputColor.rgb = (premult)?u_toColor.rgb * texCol.a:u_toColor.rgb;
 			outputColor.a = texCol.a;
 		}
 		else {
 			vec3 hsvFrom = premult ? rgb2hsv( texCol.rgb) / texCol.a : rgb2hsv( texCol.rgb);
-			vec3 hsvTo = rgb2hsv( cTo.rgb);
+			vec3 hsvTo = rgb2hsv( u_toColor.rgb);
 			outputColor.rgb = (premult) ? hsv2rgb( vec3(hsvTo[0], hsvFrom[1], hsvFrom[2])) * texCol.a
 					:hsv2rgb( vec3(hsvTo[0], hsvFrom[1], hsvFrom[2]));
 			outputColor.a = texCol.a;

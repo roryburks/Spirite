@@ -1,6 +1,5 @@
 package spirite.base.util.linear
 
-import com.hackoeur.jglm.Mat4
 import spirite.base.graphics.gl.IFloat32Source
 import spirite.base.graphics.gl.IGL
 
@@ -14,10 +13,9 @@ object MatrixBuilder {
     ): FloatArray {
         return floatArrayOf(
                 2f / (right - left), 0f, 0f, -(right + left) / (right - left),
-                0f, 2f / (bottom - top), 0f, -(bottom + top) / (bottom - top),
+                0f, 2f / (top - bottom), 0f, -(bottom + top) / (top - bottom),
                 0f, 0f, -2f / (far - near), -(far + near) / (far - near),
-                0f, 0f, 0f, 1f
-        )
+                0f, 0f, 0f, 1f)
     }
 
     /** Converts a 3x3 AffineTransform into a Quaternion Transformation Matrix

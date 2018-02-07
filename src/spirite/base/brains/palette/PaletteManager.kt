@@ -1,10 +1,10 @@
 package spirite.base.brains.palette
 
-import spirite.base.util.Colors
-import spirite.base.util.MUtil.cycle
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
+import spirite.base.util.Colors
+import spirite.base.util.MUtil.cycle
 
 interface IPaletteManager {
     fun getActiveColor( i : Int) : Int

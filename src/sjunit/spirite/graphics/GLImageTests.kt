@@ -3,13 +3,11 @@ package sjunit.spirite.graphics
 
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
-import spirite.base.resources.IScriptService
 import spirite.pc.JOGL.JOGLProvider
-import java.awt.image.BufferedImage
-import kotlin.test.assertEquals
 import spirite.pc.PCUtil.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class GLImageTests {
@@ -21,7 +19,7 @@ class GLImageTests {
 
         val color = glimage.getRGB(2,2)
 
-        assertEquals(0xffff0000.toInt(), color)
+        assertEquals(0xff000000.toInt(), color)
     }
     @test fun SuperBasicFunctionality() {
         val gle = GLEngine(JOGLProvider.getGL(), TrivialScriptService())
@@ -40,7 +38,7 @@ class GLImageTests {
         val gli2 = glimage.deepCopy()
         val color = gli2.getRGB(2,2)
 
-        assertEquals(0xffff0000.toInt(), color)
+        assertEquals(0xff000000.toInt(), color)
     }
     @test fun TestConvertToBi() {
         val gle = GLEngine(JOGLProvider.getGL(), TrivialScriptService())

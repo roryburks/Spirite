@@ -86,6 +86,15 @@ class GLImage : RawImage {
         val gl = engine.gl
 
         val read = gl.makeInt32Source(1)
+        gl.readnPixels(x, if( isGLOriented) height-y-1 else y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
+        return  read[0]
+    }
+
+    fun getRGBDirect( x: Int, y: Int): Int {
+        if (x < 0 || y < 0 || x >= width || y >= height) return 0
+        val gl = engine.gl
+
+        val read = gl.makeInt32Source(1)
         gl.readnPixels(x, y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
         return  read[0]
     }

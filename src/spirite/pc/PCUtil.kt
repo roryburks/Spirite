@@ -6,7 +6,6 @@ import spirite.base.util.glu.GLC
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 import spirite.hybrid.HybridConfig
-import spirite.hybrid.MDebug
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
 import sun.awt.image.IntegerInterleavedRaster
 import java.awt.geom.AffineTransform
@@ -23,12 +22,12 @@ object PCUtil {
     fun GLImage.toBufferedImage() : BufferedImage {
         val gle = this.engine
         gle.setTarget( this)
-        val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height)
+        val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height, this.isGLOriented)
         engine.setTarget(null)
         return bi
     }
 
-    fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : BufferedImage{
+    fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int, flip: Boolean) : BufferedImage{
         val bi = when( type) {
             BufferedImage.TYPE_INT_ARGB,
             BufferedImage.TYPE_INT_ARGB_PRE -> {
@@ -48,7 +47,7 @@ object PCUtil {
         }
 
         // Flip Vertically
-        if( true) {
+        if( flip) {
             val raster = bi.raster
             var scanline1 : Any? = null
             var scanline2 : Any? = null

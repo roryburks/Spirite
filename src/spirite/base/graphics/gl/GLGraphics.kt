@@ -67,7 +67,7 @@ class GLGraphics : GraphicsContext {
 
     override fun clear() {
         reset()
-        gle.gl.clearColor( 1f, 0f, 0f, 1f)
+        gle.gl.clearColor( 0f, 0f, 0f, 1f)
         gle.gl.clear(GLC.COLOR)
     }
 

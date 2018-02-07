@@ -1,6 +1,6 @@
 package spirite.base.util
 
-import java.awt.*
+import java.awt.Color
 
 /**
  * Created by Guy on 4/29/2017.

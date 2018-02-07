@@ -278,6 +278,7 @@ class JOGL(
     }
     override fun makeFloat32Source(size: Int): IFloat32Source = JOGLFloat32Source(size)
     override fun makeFloat32Source(buffer: FloatBuffer): IFloat32Source = JOGLFloat32Source(buffer)
+    override fun makeFloat32Source(array: FloatArray): IFloat32Source = JOGLFloat32Source(FloatBuffer.wrap(array))
 
 
     class JOGLInt32Source: IInt32Source,JOGLArraySource {
@@ -299,6 +300,7 @@ class JOGL(
     }
     override fun makeInt32Source(size: Int): IInt32Source = JOGLInt32Source(size)
     override fun makeInt32Source(buffer: IntBuffer): IInt32Source = JOGLInt32Source(buffer)
+    override fun makeInt32Source(array: IntArray): IInt32Source = JOGLInt32Source(IntBuffer.wrap(array))
     // endregion
 
     override fun drawArrays(mode: Int, first: Int, count: Int) =

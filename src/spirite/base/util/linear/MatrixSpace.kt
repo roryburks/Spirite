@@ -1,6 +1,5 @@
 package spirite.base.util.linear
 
-import spirite.base.util.linear.Transform.Companion
 import java.util.*
 
 /**

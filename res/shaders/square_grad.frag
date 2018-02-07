@@ -2,12 +2,12 @@
 
 smooth in vec2 vUV;
 
-uniform float fixedCol;
+uniform float u_fixedAmmount;
 
 // which component is fixed:
 // 0: r, 1: g, 2: b
 // 3: h, 2: s, 3: v
-uniform int varCol;
+uniform int u_typeCode;
 
 out vec4 outputColor;
 
@@ -20,45 +20,45 @@ vec3 hsv2rgb(vec3 _color)
 
 void main()
 {
-	if( varCol == 0) {
-		outputColor.r = fixedCol;
+	if( u_typeCode == 0) {
+		outputColor.r = u_fixedAmmount;
 		outputColor.g = vUV.x;
 		outputColor.b = vUV.y;
 	    outputColor.a = 1;
 	}
-	else if( varCol == 1) {
+	else if( u_typeCode == 1) {
 		outputColor.r = vUV.x;
-		outputColor.g = fixedCol;
+		outputColor.g = u_fixedAmmount;
 		outputColor.b = vUV.y;
 	    outputColor.a = 1;
 	}
-	else if( varCol == 2) {
+	else if( u_typeCode == 2) {
 		outputColor.r = vUV.x;
 		outputColor.g = vUV.y;
-		outputColor.b = fixedCol;
+		outputColor.b = u_fixedAmmount;
 	    outputColor.a = 1;
 	}
-	else if( varCol == 3) {
+	else if( u_typeCode == 3) {
 		vec3 hsv;
-		hsv[0] = fixedCol;
+		hsv[0] = u_fixedAmmount;
 		hsv[1] = vUV.x;
 		hsv[2] = vUV.y;
 		
 		outputColor = vec4(hsv2rgb(hsv), 1);
 	}
-	else if( varCol == 4) {
+	else if( u_typeCode == 4) {
 		vec3 hsv;
 		hsv[0] = vUV.x;;
-		hsv[1] = fixedCol;
+		hsv[1] = u_fixedAmmount;
 		hsv[2] = vUV.y;
 		
 		outputColor = vec4(hsv2rgb(hsv), 1);
 	}
-	else if( varCol == 5) {
+	else if( u_typeCode == 5) {
 		vec3 hsv;
 		hsv[0] = vUV.x;
 		hsv[1] = vUV.y;
-		hsv[2] = fixedCol;
+		hsv[2] = u_fixedAmmount;
 		
 		outputColor = vec4(hsv2rgb(hsv), 1);
 	}

@@ -1,7 +1,6 @@
 package spirite.base.util.linear
 
 import com.hackoeur.jglm.support.FastMath
-import com.sun.javafx.geom.transform.Identity
 import kotlin.math.cos
 import kotlin.math.sin
 

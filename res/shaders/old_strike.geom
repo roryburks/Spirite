@@ -26,8 +26,6 @@ float angle_difference( float a1, float a2) {
 
 void main()
 {
-
-	const int i = 1;
 	
 	vec2 bl, bc, br, tl, tc, tr;
 	
@@ -150,11 +148,11 @@ void main()
 	
 	
 	
-	float ssize_1 = vSize[i]/2;
-	float ssize_2 = vSize[i+1]/2;
+	float ssize_1 = vSize[1]/2;
+	float ssize_2 = vSize[2]/2;
 	float angle = atan( 
-		gl_in[i+1].gl_Position.y - gl_in[i].gl_Position.y,
-		gl_in[i+1].gl_Position.x - gl_in[i].gl_Position.x);
+		gl_in[2].gl_Position.y - gl_in[1].gl_Position.y,
+		gl_in[2].gl_Position.x - gl_in[1].gl_Position.x);
 		
 	float cang = cos(angle);
 	float sang = sin(angle);

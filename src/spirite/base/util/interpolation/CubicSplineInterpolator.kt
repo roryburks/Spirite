@@ -2,10 +2,7 @@ package spirite.base.util.interpolation
 
 import spirite.base.util.MUtil
 import spirite.base.util.linear.Vec2
-
-import java.util.ArrayList
-import java.util.Collections
-import java.util.Comparator
+import java.util.*
 
 /**
  * CubicSplineInterpolator uses Cubic Hermite Spline Interpolation to
