@@ -12,6 +12,10 @@ import java.awt.Shape
 import java.awt.image.BufferedImage
 
 class AWTGraphicsContext : GraphicsContext {
+    override var color: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        set(value) {}
+
     override val width: Int
     override val height: Int
     val g2 : Graphics2D
@@ -70,10 +74,6 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun setColor(argb: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun setComposite(composite: Composite, alpha: Float) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -118,11 +118,7 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun fillPolygon(x: IntArray, y: IntArray, count: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun fillPolygon(x: FloatArray, y: FloatArray, length: Int) {
+    override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

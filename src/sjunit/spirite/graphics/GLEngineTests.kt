@@ -3,14 +3,18 @@ package sjunit.spirite.graphics
 
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
-import spirite.base.graphics.gl.GLEngine
-import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.GLParametersMutable
-import spirite.base.graphics.gl.PolyRenderCall
+import spirite.base.graphics.gl.*
+import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.IGNORE_ALPHA
 import spirite.base.graphics.gl.PolyType.STRIP
+import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
+import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.util.linear.Vec3
+import spirite.base.util.linear.Vec4
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
+import spirite.pc.toBufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import org.junit.Test as test
 
@@ -77,5 +81,45 @@ class GLEngineTests {
 
         //val bi = img.toBufferedImage()
         //ImageIO.write(bi, "png", File("C:\\bucket\\t6.png"))
+    }
+    @test fun writeOutPassShaders() {
+        // Draw the base star
+        val star = GLImage( 50, 50, gle)
+        val gc = star.graphics
+
+        val xs = listOf(0f, 50f, 0f, 50f, 25f)
+        val ys = listOf(0f, 40f, 40f, 0f, 50f)
+        gc.color = 0xff0000
+        gc.fillPolygon(xs, ys, 5)
+
+        val image = GLImage( 500, 500, gle)
+        image.graphics.clear()
+        gle.setTarget(image)
+
+        val params = GLParametersMutable(500,500, texture1 = star)
+
+        gle.applyPassProgram( SquareGradientCall(0.5f, GradientType.V),
+                params, null, 0f, 0f, 50f, 50f)
+        gle.applyPassProgram( ChangeColorCall(Vec4(1f, 0f, 0f, 1f), Vec4( 0f, 1f, 0f, 1f), IGNORE_ALPHA),
+                params, null, 50f, 0f, 100f, 50f)
+        gle.applyPassProgram( GridCall(Vec3(0.25f, 0.25f, 0.25f), Vec3( 0.5f, 0.5f, 0.5f), 4),
+                params, null, 100f, 0f, 150f, 50f)
+        gle.applyPassProgram( BasicCall(),
+                params, null, 150f, 0f, 200f, 50f)
+        gle.applyPassProgram( BorderCall(3),
+                params, null, 200f, 0f, 250f, 50f)
+        gle.applyPassProgram( InvertCall(),
+                params, null, 250f, 0f, 300f, 50f)
+        gle.applyPassProgram( RenderCall(0.5f, 0, true, STRAIGHT_PASS),
+                params, null, 0f, 50f, 50f, 100f)
+        gle.applyPassProgram( RenderCall(0.5f, 0xff0000ff.toInt(), true, AS_COLOR),
+                params, null, 50f, 50f, 100f, 100f)
+        gle.applyPassProgram( RenderCall(0.5f, 0xff00ffff.toInt(), true, AS_COLOR_ALL),
+                params, null, 100f, 50f, 150f, 100f)
+        gle.applyPassProgram( RenderCall(0.5f, 4, true, DISOLVE),
+                params, null, 150f, 50f, 200f, 100f)
+
+
+        ImageIO.write(image.toBufferedImage(), "png", File("C:/Bucket/shaders.png"))
     }
 }

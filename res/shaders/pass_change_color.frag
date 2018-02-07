@@ -16,7 +16,7 @@ uniform vec4 u_toColor;
 //		 2 - Change All
 //  B (premult) : whether or not data is premultiplied
 //  C (hueOnly) : whether to change all color data or just the hue
-uniform int optionMask;
+uniform int u_optionMask;
 
 vec3 rgb2hsv(vec3 _color)
 {
@@ -41,13 +41,13 @@ void main()
 	vec4 texCol = texture(myTexture, vUV);
 	vec3 checkCol = vec3(texCol.rgb);
 	
-	bool premult = bool((optionMask >> 2) & 1);
-	bool hueOnly = bool((optionMask >> 3) & 1);
+	bool premult = bool((u_optionMask >> 2) & 1);
+	bool hueOnly = bool((u_optionMask >> 3) & 1);
 	
 	if( premult)
 		checkCol /= texCol.a;
 	
-	int _mode = optionMask & 3;
+	int _mode = u_optionMask & 3;
 	
 	if( _mode == 2 ||
 		(distance(u_fromColor.r , checkCol.r) < thresh &&

@@ -39,7 +39,17 @@ data class GLParametersMutable (
         override var bm_dfa: Int = 0,
         override var bm_fc: Int = 0,
         override var bm_fa: Int = 0
-) : GLParameters
+) : GLParameters {
+    fun setBlendMode(src_factor: Int, dst_factor: Int, formula: Int) {
+        useDefaultBlendMode = false
+        bm_sfa = src_factor
+        bm_sfc = bm_sfa
+        bm_dfa = dst_factor
+        bm_dfc = bm_dfa
+        bm_fa = formula
+        bm_fc = bm_fa
+    }
+}
 
 sealed abstract class GLUniform(
         val name: String

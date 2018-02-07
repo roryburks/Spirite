@@ -4,7 +4,7 @@ package sjunit.spirite.graphics
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.PCUtil.toBufferedImage
+import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import kotlin.test.assertEquals

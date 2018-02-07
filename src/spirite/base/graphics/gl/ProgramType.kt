@@ -2,9 +2,11 @@ package spirite.base.graphics.gl
 
 import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.JoinMethod.*
+import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.*
 import spirite.base.graphics.gl.GLEngine.BlendMethod
 import spirite.base.graphics.gl.GLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
+import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
 
@@ -53,22 +55,32 @@ class SquareGradientCall(
 
 class ChangeColorCall(
         fromColor: Vec4,
-        toColor: Vec4
+        toColor: Vec4,
+        changeMethod: ChangeMethod
 ) : ProgramCall() {
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform4f("u_fromColor", fromColor),
-            GLUniform4f("u_toColor", fromColor))
+            GLUniform4f("u_toColor", toColor),
+            GLUniform1i("u_optionMask", when( changeMethod) {
+                EXACT -> 0
+                IGNORE_ALPHA -> 1
+                CHANGE_ALL -> 2
+            }))
+
+    enum class ChangeMethod { EXACT, IGNORE_ALPHA, CHANGE_ALL}
 
     override val programType: ProgramType = CHANGE_COLOR
 }
 
 class GridCall(
         color1: Vec3,
-        color2: Vec3
+        color2: Vec3,
+        size: Int
 ) : ProgramCall() {
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f( "u_Color1", color1),
-            GLUniform3f( "u_Color2", color2)
+            GLUniform3f( "u_Color2", color2),
+            GLUniform1i( "u_Size", size)
     )
     override val programType: ProgramType = GRID
 }
@@ -83,6 +95,42 @@ class BorderCall(
 ): ProgramCall() {
     override val uniforms: List<GLUniform>? = listOf(GLUniform1i("u_cycle", met))
     override val programType: ProgramType get() = PASS_BORDER
+}
+
+class InvertCall() : ProgramCall() {
+    override val uniforms: List<GLUniform>? get() = null
+    override val programType: ProgramType get() = PASS_INVERT
+}
+
+class RenderCall(
+        alpha: Float,
+        subvariable: Int,
+        premultiplyTotal: Boolean,
+        algorithm : RenderAlgorithm
+) : ProgramCall() {
+    enum class RenderAlgorithm {
+        STRAIGHT_PASS,
+        AS_COLOR,
+        AS_COLOR_ALL,
+        DISOLVE
+    }
+
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform1f("u_alpha", alpha),
+            GLUniform1i("u_value", subvariable),
+            GLUniform1i( "u_composite",
+                    when( premultiplyTotal) {
+                        true -> 1
+                        false -> 0
+                    } or (when( algorithm) {
+                        STRAIGHT_PASS -> 0
+                        AS_COLOR -> 1
+                        AS_COLOR_ALL -> 2
+                        DISOLVE -> 3
+                    } shl 1))
+    )
+
+    override val programType: ProgramType get() = PASS_RENDER
 }
 
 

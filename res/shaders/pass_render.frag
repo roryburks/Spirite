@@ -7,8 +7,8 @@ out vec4 outputColor;
 
 uniform sampler2D myTexture;
 //uniform sampler2D myTexture2;
-uniform float uAlpha;
-uniform unsigned int uValue;
+uniform float u_alpha;
+uniform int u_value;
 
 // 00000000 00000000 00000000 0000BBBA
 // A: how to combine the color and alpha
@@ -19,12 +19,12 @@ uniform unsigned int uValue;
 //		1: As Color (defined by uValue)
 //		2: As Color (all)
 //		3: Disolve
-uniform int uComp;	
+uniform int u_composite;
 
 vec4 disolve( vec4 tex)
 {
-	if( uValue &
-			(1 << (   (int(gl_FragCoord.x) % 4) + 4*( int(gl_FragCoord.y) %  4))))
+	if( (u_value &
+			(1 << (   (int(gl_FragCoord.x) % 4) + 4*( int(gl_FragCoord.y) %  4)))) != 0)
 	{
 
 		return tex;
@@ -52,7 +52,7 @@ vec3 hsv2rgb(vec3 _color)
 
 vec4 changeColorHue(vec4 texCol) {
 	bool premult = false;
-	vec3 cTo = vec3(((uValue>>16)&0xFF)/255.0f, ((uValue>>8)&0xFF)/255.0f, ((uValue)&0xFF)/255.0f);
+	vec3 cTo = vec3(((u_value>>16)&0xFF)/255.0f, ((u_value>>8)&0xFF)/255.0f, ((u_value)&0xFF)/255.0f);
 	vec3 hsvFrom = premult ? rgb2hsv( texCol.rgb) / texCol.a : rgb2hsv( texCol.rgb);
 	vec3 hsvTo = rgb2hsv( cTo.rgb);
 
@@ -63,9 +63,9 @@ vec4 changeColorHue(vec4 texCol) {
 }
 
 vec4 changeColor(vec4 texCol) {
-	float r = ((uValue>>16)&0xFF)/255.0f;
-	float g = ((uValue>>8)&0xFF)/255.0f;
-	float b = ((uValue)&0xFF)/255.0f;
+	float r = ((u_value>>16)&0xFF)/255.0f;
+	float g = ((u_value>>8)&0xFF)/255.0f;
+	float b = ((u_value)&0xFF)/255.0f;
 	return vec4( r*texCol.a, g*texCol.a, b*texCol.a, texCol.a);
 }
 
@@ -74,14 +74,14 @@ void main()
 	vec4 texCol = texture(myTexture, vUV);
 	vec4 oCol;
 	
-	if( uComp%2) {
+	if( u_composite%2 != 0) {
 		// Premultiply incoming data
 		texCol.r *= texCol.a;
 		texCol.g *= texCol.a;
 		texCol.b *= texCol.a;
 	}
 	
-	switch( (uComp >> 1) & 0x7) {
+	switch( (u_composite >> 1) & 0x7) {
 	case 0: 
 		oCol = texCol;
 		break;
@@ -97,5 +97,5 @@ void main()
 	}
 	
 	
-	outputColor = oCol*uAlpha;
+	outputColor = oCol*u_alpha;
 }

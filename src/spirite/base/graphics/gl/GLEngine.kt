@@ -79,16 +79,16 @@ class GLEngine(
         val iParams = mutableListOf<GLUniform>()
         addOrtho(params, iParams, trans)
 
-        val internal = params.texture1?.isGLOriented ?: false
+        val internal = params.texture1?.isGLOriented ?: true
 
         val preparedPrimitive = PreparedPrimitive( GLPrimitive(
-                gl.makeFloat32Source(floatArrayOf(
+                floatArrayOf(
                         // x  y   u   v
                         x1, y1, 0.0f, if (internal) 0.0f else 1.0f,
                         x2, y1, 1.0f, if (internal) 0.0f else 1.0f,
                         x1, y2, 0.0f, if (internal) 1.0f else 0.0f,
                         x2, y2, 1.0f, if (internal) 1.0f else 0.0f
-                )), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
+                ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
                 , this)
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
@@ -147,7 +147,7 @@ class GLEngine(
 
         if( true /* Shaderversion 330 */) {
             val prim = PreparedPrimitive( GLPrimitive(
-                    gl.makeFloat32Source(data),
+                    data,
                     intArrayOf(2),
                     GLC.LINE_STRIP_ADJACENCY,
                     intArrayOf(size)),
@@ -175,13 +175,26 @@ class GLEngine(
         val iParams = mutableListOf<GLUniform>()
         addOrtho( params, iParams, trans)
 
-        val data = gl.makeFloat32Source(2*numPoints)
+        val data = FloatArray(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
         yPoints.forEachIndexed { i, y -> data[i*2+1] = y }
         val prim = PreparedPrimitive(GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)), this)
 
         applyProgram( programCall, params, iParams, prim)
         prim.flush()
+    }
+
+    fun applyPrimitiveProgram(
+            programCall: ProgramCall,
+            primitive: GLPrimitive,
+            params: GLParameters,
+            trans: Transform?
+    ) {
+        val iParams = mutableListOf<GLUniform>()
+        addOrtho( params, iParams, trans)
+        val preparedPrimitive = PreparedPrimitive(primitive, this)
+        applyProgram( programCall, params, iParams, preparedPrimitive)
+        preparedPrimitive.flush()
     }
 
     // endregion

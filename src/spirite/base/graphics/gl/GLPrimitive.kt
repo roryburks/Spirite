@@ -9,12 +9,12 @@ enum class PolyType( val glConst: Int) {
 }
 
 data class GLPrimitive(
-        val raw: IFloat32Source,
+        val raw: FloatArray,
         val attrLengths: IntArray,
         val primitiveTypes: IntArray,
         val primitiveLengths: IntArray
 ) {
-    constructor( raw: IFloat32Source, attrLengths: IntArray, primitiveType: Int, primitiveLengths: IntArray) :
+    constructor( raw: FloatArray, attrLengths: IntArray, primitiveType: Int, primitiveLengths: IntArray) :
             this(raw, attrLengths, IntArray(primitiveLengths.size, {primitiveType}), primitiveLengths)
 }
 
@@ -27,7 +27,7 @@ internal class PreparedPrimitive(
 
     init {
         gl.bindBuffer(GLC.ARRAY_BUFFER, buffer)
-        gl.bufferData(GLC.ARRAY_BUFFER, primative.raw, GLC.STREAM_DRAW)
+        gl.bufferData(GLC.ARRAY_BUFFER, gle.gl.makeFloat32Source(primative.raw), GLC.STREAM_DRAW)
         gl.bindBuffer(GLC.ARRAY_BUFFER, null)
     }
 

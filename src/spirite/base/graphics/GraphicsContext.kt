@@ -21,6 +21,7 @@ abstract class GraphicsContext {
     abstract var transform: Transform
     abstract val alpha: Float
     abstract val composite: Composite
+    abstract var color: Int
 
     /** May return null if the underlying engine's Line Attributes aren't
      * representable by the generic LineAttributes class.  */
@@ -35,7 +36,6 @@ abstract class GraphicsContext {
     abstract fun transform(trans: Transform)
     abstract fun preScale(sx: Double, sy: Double)
     abstract fun scale(sx: Double, sy: Double)
-    abstract fun setColor(argb: Int)
 
 
     enum class Composite {
@@ -71,8 +71,7 @@ abstract class GraphicsContext {
     abstract fun drawImage(img: IImage, x: Int, y: Int)
     abstract fun drawHandle(handle: MediumHandle, x: Int, y: Int)
 
-    abstract fun fillPolygon(x: IntArray, y: IntArray, count: Int)
-    abstract fun fillPolygon(x: FloatArray, y: FloatArray, length: Int)
+    abstract fun fillPolygon(x: List<Float>, y: List<Float>, length: Int)
 
     abstract fun setClip(i: Int, j: Int, width: Int, height: Int)
 
