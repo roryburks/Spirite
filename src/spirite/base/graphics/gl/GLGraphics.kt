@@ -3,6 +3,7 @@ package spirite.base.graphics.gl
 import spirite.base.graphics.*
 import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.imageData.MediumHandle
+import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
@@ -82,17 +83,7 @@ class GLGraphics : GraphicsContext {
 
     // region Other Settings
 
-    override var color = 0xffffffff.toInt()
-        set(value) {
-            field = value
-            _color = null
-        }
-    private var _color : Vec3? = null
-        get() {
-            val f = field ?: Vec3( Colors.getRed(color)/255f,Colors.getBlue(color)/255f,Colors.getBlue(color)/255f)
-            field = f
-            return f
-        }
+    override var color : Color = Colors.BLACK
 
     override fun setComposite(composite: Composite, alpha: Float) {
         this.alpha = alpha
@@ -135,7 +126,7 @@ class GLGraphics : GraphicsContext {
                 x_, y_, 4,
                 lineAttributes.cap, lineAttributes.join,
                 true, lineAttributes.width,
-                _color!!, alpha,
+                color.rgbComponent, alpha,
                 params, _trans)
     }
 
@@ -147,13 +138,13 @@ class GLGraphics : GraphicsContext {
         reset()
         gle.applyComplexLineProgram(
                 x.map { it.toFloat() }, y.map { it.toFloat() }, count, lineAttributes.cap, lineAttributes.join,
-                false, lineAttributes.width, _color!!, alpha, params, _trans)
+                false, lineAttributes.width, color.rgbComponent, alpha, params, _trans)
     }
 
     override fun drawLine(x1: Float, y1: Float, x2: Float, y2: Float) {
         reset()
         gle.applyComplexLineProgram( listOf(x1, x2), listOf(y1, y2), 2, lineAttributes.cap, lineAttributes.join,
-                false, lineAttributes.width, _color!!, alpha, params, _trans)
+                false, lineAttributes.width, color.rgbComponent, alpha, params, _trans)
     }
 
     override fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int) = drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
@@ -170,7 +161,7 @@ class GLGraphics : GraphicsContext {
         val x_ = floatArrayOf(x + 0f, x + w + 0f, x + 0f, x+ w + 0f).toList()
         val y_ = floatArrayOf(y + 0f, y + 0f, y + h + 0f, y + h + 0f).toList()
 
-        gle.applyPolyProgram( PolyRenderCall(_color!!, alpha), x_, y_, 4,
+        gle.applyPolyProgram( PolyRenderCall(color.rgbComponent, alpha), x_, y_, 4,
                 PolyType.STRIP, params, _trans)
     }
 
@@ -181,7 +172,7 @@ class GLGraphics : GraphicsContext {
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         reset()
         val poly = PolygonTesselater.tesselatePolygon(x, y, x.size)
-        gle.applyPrimitiveProgram( PolyRenderCall(_color!!, alpha), poly, params, _trans)
+        gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, params, _trans)
     }
     // endregion
 

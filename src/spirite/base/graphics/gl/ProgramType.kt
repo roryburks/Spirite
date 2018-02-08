@@ -133,6 +133,14 @@ class RenderCall(
     override val programType: ProgramType get() = PASS_RENDER
 }
 
+class StrokeV2LinePass(
+        val color: Vec3
+) : ProgramCall(){
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform3f("u_color", color))
+
+    override val programType: ProgramType get() = STROKE_V2_LINE_PASS
+}
 
 class PolyRenderCall(
         color: Vec3,

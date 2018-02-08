@@ -1,6 +1,7 @@
 package spirite.base.graphics
 
 import spirite.base.imageData.MediumHandle
+import spirite.base.util.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import java.awt.Shape
@@ -21,7 +22,7 @@ abstract class GraphicsContext {
     abstract var transform: Transform
     abstract val alpha: Float
     abstract val composite: Composite
-    abstract var color: Int
+    abstract var color: Color
 
     /** May return null if the underlying engine's Line Attributes aren't
      * representable by the generic LineAttributes class.  */

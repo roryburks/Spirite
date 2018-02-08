@@ -261,7 +261,7 @@ class GLEngine(
             }
         }
 
-        if( program == ProgramType.STROKE_V2_LINE_PASS) {
+        if( programCall.programType == ProgramType.STROKE_V2_LINE_PASS) {
             gl.enable(GLC.LINE_SMOOTH)
             gl.enable(GLC.BLEND)
             gl.depthMask(false)

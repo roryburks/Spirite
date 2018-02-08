@@ -8,6 +8,10 @@ import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.IGNORE_ALPHA
 import spirite.base.graphics.gl.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
+import spirite.base.graphics.gl.stroke.V2PenDrawer
+import spirite.base.pen.DrawPoints
+import spirite.base.util.ColorARGB32
+import spirite.base.util.Colors
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
 import spirite.pc.JOGL.JOGLProvider
@@ -15,6 +19,7 @@ import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import kotlin.math.abs
 import kotlin.test.assertEquals
 import org.junit.Test as test
 
@@ -31,24 +36,23 @@ class GLEngineTests {
 
         gle.setTarget(img)
         gle.applyPolyProgram(
-                PolyRenderCall( Vec3(0f,1f,1f), 1f),
-                listOf(10f,40f,10f, 40f),
+                PolyRenderCall(Vec3(0f, 1f, 1f), 1f),
+                listOf(10f, 40f, 10f, 40f),
                 listOf(10f, 10f, 40f, 40f),
                 4, STRIP,
                 GLParametersMutable(50, 50),
                 null)
 
         // Verify that a square has been drawn
-        val black = 0xff000000.toInt()
         val gb = 0xff00ffff.toInt()
-        assertEquals(gb, img.getRGB(15,15))
-        assertEquals(gb, img.getRGB(15,35))
-        assertEquals(gb, img.getRGB(35,35))
-        assertEquals(gb, img.getRGB(35,15))
-        assertEquals(black, img.getRGB( 5, 5))
-        assertEquals(black, img.getRGB( 45, 5))
-        assertEquals(black, img.getRGB( 5, 45))
-        assertEquals(black, img.getRGB( 45, 45))
+        assertEquals(gb, img.getRGB(15, 15))
+        assertEquals(gb, img.getRGB(15, 35))
+        assertEquals(gb, img.getRGB(35, 35))
+        assertEquals(gb, img.getRGB(35, 15))
+        assertEquals(0, img.getRGB(5, 5))
+        assertEquals(0, img.getRGB(45, 5))
+        assertEquals(0, img.getRGB(5, 45))
+        assertEquals(0, img.getRGB(45, 45))
     }
 
     @test fun TestComplexLineProgram() {
@@ -68,20 +72,21 @@ class GLEngineTests {
                 params, null)
 
         // Verify that a shape has been drawn
-        val black = 0xff000000.toInt()
         val gb = 0xff00ffff.toInt()
 
         assertEquals(gb, img.getRGBDirect(1,1))
         assertEquals(gb, img.getRGBDirect(10,0))
         assertEquals(gb, img.getRGBDirect(49,40))
         assertEquals(gb, img.getRGBDirect(49,49))
-        assertEquals(black, img.getRGBDirect(0,49))
-        assertEquals(black, img.getRGBDirect(49,0))
+        assertEquals(0, img.getRGBDirect(0,49))
+        assertEquals(0, img.getRGBDirect(49,0))
 
 
         //val bi = img.toBufferedImage()
         //ImageIO.write(bi, "png", File("C:\\bucket\\t6.png"))
     }
+
+    // Draws using all the shaders and outputs it to an image
     @test fun writeOutPassShaders() {
         // Draw the base star
         val star = GLImage( 50, 50, gle)
@@ -89,7 +94,7 @@ class GLEngineTests {
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
         val ys = listOf(0f, 40f, 40f, 0f, 50f)
-        gc.color = 0xff0000
+        gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
         val image = GLImage( 500, 500, gle)
@@ -121,5 +126,18 @@ class GLEngineTests {
 
 
         ImageIO.write(image.toBufferedImage(), "png", File("C:/Bucket/shaders.png"))
+    }
+
+    @test fun doStroke() {
+        val image = GLImage( 100, 100, gle)
+
+        gle.setTarget(image)
+        val drawPoints = DrawPoints(
+                FloatArray(100, {it.toFloat()}),
+                FloatArray(100, {it.toFloat()}),
+                FloatArray(100, {1f - abs(50 - it)/50f})
+        )
+        V2PenDrawer.drawStroke(drawPoints, 5f, gle, ColorARGB32(0xffff0000.toInt()), GLParametersMutable(image.width, image.height), null)
+        ImageIO.write(image.toBufferedImage(), "png", File("C:/Bucket/stroke.png"))
     }
 }

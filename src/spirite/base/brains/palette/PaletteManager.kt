@@ -20,7 +20,7 @@ interface IPaletteManager {
 }
 
 class PaletteManager : IPaletteManager {
-    val activeColors = mutableListOf<Int>(Colors.BLACK, Colors.WHITE, Colors.RED, Colors.BLACK)
+    val activeColors = mutableListOf<Int>(Colors.BLACK.argb, Colors.WHITE.argb, Colors.RED.argb, Colors.BLACK.argb)
 
     override fun getActiveColor(i: Int): Int = activeColors[ cycle(0, activeColors.size, i)]
 

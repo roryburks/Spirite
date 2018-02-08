@@ -5,6 +5,7 @@ import spirite.base.graphics.IImage
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.MediumHandle
+import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -12,7 +13,7 @@ import java.awt.Shape
 import java.awt.image.BufferedImage
 
 class AWTGraphicsContext : GraphicsContext {
-    override var color: Int
+    override var color: Color
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
 

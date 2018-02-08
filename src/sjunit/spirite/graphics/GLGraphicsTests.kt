@@ -5,6 +5,7 @@ import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.IGNORE_ALPHA
+import spirite.base.util.Colors
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec2i
 import spirite.base.util.linear.Vec4
@@ -24,7 +25,7 @@ class GLGraphicsTests {
         val img = GLImage( 30, 30, gle)
         val gc = img.graphics
 
-        gc.color = 0xff0000
+        gc.color = Colors.RED
         gc.lineAttributes = LineAttributes(4f, NONE, MITER, null)
         gc.drawRect( 5, 5, 10, 10)
 
@@ -54,7 +55,7 @@ class GLGraphicsTests {
         val img = GLImage( 30, 30, gle)
         val gc = img.graphics
 
-        gc.color = 0xff0000
+        gc.color = Colors.RED
         gc.fillRect( 5, 5, 20, 20)
 
         val red = 0xffff0000.toInt()
@@ -74,7 +75,7 @@ class GLGraphicsTests {
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
         val ys = listOf(0f, 40f, 40f, 0f, 50f)
-        gc.color = 0xff0000
+        gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
         if( save) {
@@ -88,7 +89,7 @@ class GLGraphicsTests {
 
         val xs = listOf(0f, 50f, 0f, 50f, 25f)
         val ys = listOf(0f, 40f, 40f, 0f, 50f)
-        gc.color = 0xff0000
+        gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
         val img2 = GLImage( 50, 50, gle)

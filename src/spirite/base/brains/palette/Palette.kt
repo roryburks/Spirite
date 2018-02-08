@@ -26,7 +26,7 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
 
         if( raw == null) {
             default_palette
-                    .mapIndexed { i, color -> Pair(i, color) }
+                    .mapIndexed { i, color -> Pair(i, color.argb) }
                     .toMap(_colors)
         }
         else {
