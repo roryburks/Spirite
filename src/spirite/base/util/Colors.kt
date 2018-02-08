@@ -31,6 +31,14 @@ class ColorARGB32( val argb: Int) : Color(){
     override val alpha: Float get() = a/255.0f
 }
 
+private class ColorTransparent : Color() {
+    override val argb32: Int get() = 0
+    override val red: Float get() = 0f
+    override val green: Float get() = 0f
+    override val blue: Float get() = 0f
+    override val alpha: Float get() = 0f
+}
+
 object Colors {
     val BLACK = ColorARGB32( 0xFF000000.toInt())
     val DARK_GRAY = ColorARGB32( 0xFF404040.toInt())
@@ -45,6 +53,7 @@ object Colors {
     val YELLOW = ColorARGB32( 0xFFFFFF00.toInt())
     val ORANGE = ColorARGB32( 0xFFFFC800.toInt())
     val PINK = ColorARGB32( 0xFFFFAFAF.toInt())
+    val TRANSPARENT : Color = ColorTransparent()
 
     fun getAlpha(argb: Int): Int {
         return argb.ushr(24) and 0xFF

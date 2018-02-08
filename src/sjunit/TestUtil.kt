@@ -8,5 +8,5 @@ fun verifyRawImagesAreEqual(raw1: IImage, raw2: IImage) {
 
     for (x in 0 until raw1.width)
         for (y in 0 until raw1.height)
-            assert(raw1.getRGB(x, y) == raw2.getRGB(x, y))
+            assert(raw1.getARGB(x, y) == raw2.getARGB(x, y))
 }

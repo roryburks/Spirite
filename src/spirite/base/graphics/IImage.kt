@@ -1,5 +1,7 @@
 package spirite.base.graphics
 
+import spirite.base.util.Color
+
 
 interface IImage {
     /** Gets the Width of the underlying image.  */
@@ -12,7 +14,8 @@ interface IImage {
      * 0,0 at the bottom-left.  If false, the image is oriented with the
      * Y-axis goind downward, with 0,0 at the top-left.
      */
-    val isGLOriented: Boolean
+    // Why would an image care?  It's just data.
+    //val isGLOriented: Boolean
 
     /** Gets the amount of Bytes that the RawImage is using (generally
      * width*height*bytesPerPixel).  This should only be used to try and
@@ -37,6 +40,8 @@ interface IImage {
      * Gets the Color data at the given point in nonGL, top-to-bottom format
      * (point 0,0 would be the top left).
      *
+     * Note: Though you could use getColor().argb, this can often be more efficient
+     *
      * @param x X coordinate
      * @param y Y coordinate (top-to-bottom format)
      * @return an integer packed in ARGB form
@@ -45,5 +50,6 @@ interface IImage {
      *  * bits 8-15: Green
      *  * bits 0-7: Blue
      */
-    fun getRGB(x: Int, y: Int): Int
+    fun getARGB(x: Int, y: Int): Int
+    fun getColor(x: Int, y: Int): Color
 }

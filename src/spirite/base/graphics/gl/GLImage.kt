@@ -3,13 +3,15 @@ package spirite.base.graphics.gl
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
+import spirite.base.util.Color
+import spirite.base.util.ColorARGB32
+import spirite.base.util.Colors
 import spirite.base.util.glu.GLC
 
 class GLImage : RawImage {
     override val width : Int
     override val height: Int
     val engine: GLEngine
-    override var isGLOriented: Boolean
     var tex : IGLTexture?
         get
         private set
@@ -21,7 +23,6 @@ class GLImage : RawImage {
         this.width = width
         this.height = height
         this.engine = glEngine
-        this.isGLOriented = true
 
         val gl = glEngine.gl
 
@@ -39,7 +40,6 @@ class GLImage : RawImage {
         width = toCopy.width
         height = toCopy.height
         engine = toCopy.engine
-        isGLOriented = true
 
         val gl = engine.gl
 
@@ -54,12 +54,11 @@ class GLImage : RawImage {
         gl.copyTexImage2D(GLC.TEXTURE_2D, 0, GLC.RGBA8, 0, 0, width, height, 0)
     }
 
-    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine, isGLOriented: Boolean) {
+    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine) {
         this.tex = tex
         this.width = width
         this.height = height
         this.engine = glEngine
-        this.isGLOriented = isGLOriented
     }
     // endregion
 
@@ -81,16 +80,8 @@ class GLImage : RawImage {
 
     override fun deepCopy(): RawImage = GLImage(this)
 
-    override fun getRGB(x: Int, y: Int): Int {
-        if (x < 0 || y < 0 || x >= width || y >= height) return 0
-        val gl = engine.gl
-
-        val read = gl.makeInt32Source(1)
-        gl.readnPixels(x, if( isGLOriented) height-y-1 else y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
-        return  read[0]
-    }
-
-    fun getRGBDirect( x: Int, y: Int): Int {
+    override fun getColor(x: Int, y: Int) = ColorARGB32(getARGB(x,y))
+    override fun getARGB(x: Int, y: Int): Int {
         if (x < 0 || y < 0 || x >= width || y >= height) return 0
         val gl = engine.gl
 

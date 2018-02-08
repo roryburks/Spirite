@@ -45,14 +45,14 @@ class GLEngineTests {
 
         // Verify that a square has been drawn
         val gb = 0xff00ffff.toInt()
-        assertEquals(gb, img.getRGB(15, 15))
-        assertEquals(gb, img.getRGB(15, 35))
-        assertEquals(gb, img.getRGB(35, 35))
-        assertEquals(gb, img.getRGB(35, 15))
-        assertEquals(0, img.getRGB(5, 5))
-        assertEquals(0, img.getRGB(45, 5))
-        assertEquals(0, img.getRGB(5, 45))
-        assertEquals(0, img.getRGB(45, 45))
+        assertEquals(gb, img.getARGB(15, 15))
+        assertEquals(gb, img.getARGB(15, 35))
+        assertEquals(gb, img.getARGB(35, 35))
+        assertEquals(gb, img.getARGB(35, 15))
+        assertEquals(0, img.getARGB(5, 5))
+        assertEquals(0, img.getARGB(45, 5))
+        assertEquals(0, img.getARGB(5, 45))
+        assertEquals(0, img.getARGB(45, 45))
     }
 
     @test fun TestComplexLineProgram() {
@@ -74,12 +74,12 @@ class GLEngineTests {
         // Verify that a shape has been drawn
         val gb = 0xff00ffff.toInt()
 
-        assertEquals(gb, img.getRGBDirect(1,1))
-        assertEquals(gb, img.getRGBDirect(10,0))
-        assertEquals(gb, img.getRGBDirect(49,40))
-        assertEquals(gb, img.getRGBDirect(49,49))
-        assertEquals(0, img.getRGBDirect(0,49))
-        assertEquals(0, img.getRGBDirect(49,0))
+        assertEquals(gb, img.getARGB(1,1))
+        assertEquals(gb, img.getARGB(10,0))
+        assertEquals(gb, img.getARGB(49,40))
+        assertEquals(gb, img.getARGB(49,49))
+        assertEquals(0, img.getARGB(0,49))
+        assertEquals(0, img.getARGB(49,0))
 
 
         //val bi = img.toBufferedImage()

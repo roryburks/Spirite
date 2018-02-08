@@ -41,14 +41,14 @@ class GLGraphicsTests {
 
         corners.forEach {
             println("$it")
-            assertEquals(red, img.getRGBDirect(it.x+1, it.y+1))
-            assertEquals(red, img.getRGBDirect(it.x-1, it.y-1))
-            assertEquals(transparent, img.getRGBDirect(it.x+3, it.y+3))
-            assertEquals(transparent, img.getRGBDirect(it.x-3, it.y-3))
+            assertEquals(red, img.getARGB(it.x+1, it.y+1))
+            assertEquals(red, img.getARGB(it.x-1, it.y-1))
+            assertEquals(transparent, img.getARGB(it.x+3, it.y+3))
+            assertEquals(transparent, img.getARGB(it.x-3, it.y-3))
         }
-        assertEquals(transparent, img.getRGBDirect(10, 10))
-        assertEquals(transparent, img.getRGBDirect(0, 0))
-        assertEquals(transparent, img.getRGBDirect(29, 29))
+        assertEquals(transparent, img.getARGB(10, 10))
+        assertEquals(transparent, img.getARGB(0, 0))
+        assertEquals(transparent, img.getARGB(29, 29))
     }
 
     @test fun fillRect(){
@@ -59,14 +59,14 @@ class GLGraphicsTests {
         gc.fillRect( 5, 5, 20, 20)
 
         val red = 0xffff0000.toInt()
-        assertEquals(0, img.getRGBDirect(4, 4))
-        assertEquals(0, img.getRGBDirect(4, 26))
-        assertEquals(0, img.getRGBDirect(26, 4))
-        assertEquals(red, img.getRGBDirect(15, 15))
-        assertEquals(red, img.getRGBDirect(6, 6))
-        assertEquals(red, img.getRGBDirect(6, 24))
-        assertEquals(red, img.getRGBDirect(24, 6))
-        assertEquals(red, img.getRGBDirect(24, 24))
+        assertEquals(0, img.getARGB(4, 4))
+        assertEquals(0, img.getARGB(4, 26))
+        assertEquals(0, img.getARGB(26, 4))
+        assertEquals(red, img.getARGB(15, 15))
+        assertEquals(red, img.getARGB(6, 6))
+        assertEquals(red, img.getARGB(6, 24))
+        assertEquals(red, img.getARGB(24, 6))
+        assertEquals(red, img.getARGB(24, 24))
     }
 
     @test fun fillPoly() {

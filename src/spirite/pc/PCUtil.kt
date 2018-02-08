@@ -21,12 +21,12 @@ fun BufferedImage.deepCopy() = BufferedImage(
 fun GLImage.toBufferedImage() : BufferedImage {
     val gle = this.engine
     gle.setTarget( this)
-    val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height, this.isGLOriented)
+    val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height)
     engine.setTarget(null)
     return bi
 }
 
-fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int, flip: Boolean) : BufferedImage{
+fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : BufferedImage{
     val bi = when( type) {
         BufferedImage.TYPE_INT_ARGB,
         BufferedImage.TYPE_INT_ARGB_PRE -> {
@@ -46,17 +46,17 @@ fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int, flip: B
     }
 
     // Flip Vertically
-    if( !flip) {
-        val raster = bi.raster
-        var scanline1 : Any? = null
-        var scanline2 : Any? = null
-        for( i in 0 until bi.height/2) {
-            scanline1 = raster.getDataElements( 0 , i, bi.width, 1, scanline1)
-            scanline2 = raster.getDataElements( 0 , bi.height-i-1, bi.width, 1, scanline2)
-            raster.setDataElements( 0, i, bi.width, 1, scanline2)
-            raster.setDataElements( 0, bi.height-i-1, bi.width, 1, scanline1)
-        }
-    }
+//    if( flip) {
+//        val raster = bi.raster
+//        var scanline1 : Any? = null
+//        var scanline2 : Any? = null
+//        for( i in 0 until bi.height/2) {
+//            scanline1 = raster.getDataElements( 0 , i, bi.width, 1, scanline1)
+//            scanline2 = raster.getDataElements( 0 , bi.height-i-1, bi.width, 1, scanline2)
+//            raster.setDataElements( 0, i, bi.width, 1, scanline2)
+//            raster.setDataElements( 0, bi.height-i-1, bi.width, 1, scanline1)
+//        }
+//    }
 
     return bi
 }

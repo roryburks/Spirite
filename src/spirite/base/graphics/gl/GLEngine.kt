@@ -79,7 +79,7 @@ class GLEngine(
         val iParams = mutableListOf<GLUniform>()
         addOrtho(params, iParams, trans)
 
-        val internal = params.texture1?.isGLOriented ?: true
+        val internal = false
 
         val preparedPrimitive = PreparedPrimitive( GLPrimitive(
                 floatArrayOf(

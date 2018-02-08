@@ -23,7 +23,7 @@ class GLImageTests {
         gc.color = Colors.RED
         gc.fillRect(0, 0, 10, 10)
 
-        val color = glimage.getRGB(2,2)
+        val color = glimage.getARGB(2,2)
 
         assertEquals(Colors.RED.argb, color)
     }
@@ -43,7 +43,7 @@ class GLImageTests {
         gc.fillRect(0, 0, 10, 10)
 
         val gli2 = glimage.deepCopy()
-        val color = gli2.getRGB(2,2)
+        val color = gli2.getARGB(2,2)
 
         assertEquals(Colors.RED.argb, color)
     }
