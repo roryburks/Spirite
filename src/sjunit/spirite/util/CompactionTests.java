@@ -138,7 +138,6 @@ public class CompactionTests {
 		result = new float[9999*2];
 		defc.insertIntoArray(result, 0);
 		for( int i=0; i<9999*2; ++i) {
-			System.out.println(i + "," + result[i]);
 			if( i < 9999)
 				assert( result[i] == -(9998-i));
 			else

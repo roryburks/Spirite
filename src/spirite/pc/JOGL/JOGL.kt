@@ -132,10 +132,20 @@ class JOGL(
             gl.glActiveTexture( texture)
     override fun texParameteri(target: Int, pname: Int, param: Int) =
             gl.glTexParameteri(target, pname, param)
+
+    class JOGLTextureSource(
+            val width: Int,
+            val height: Int,
+            val buffer: Buffer
+    ) : ITextureSource
+
     override fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: ITextureSource) {
-        if( source is JOGLBlankTexture)
-            gl.glTexImage2D( target, level, internalformat, source.width, source.height, 0, format, type, null)
-        // TODO for other sources
+        when( source) {
+            is JOGLBlankTexture ->
+                gl.glTexImage2D( target, level, internalformat, source.width, source.height, 0, format, type, null)
+            is JOGLTextureSource ->
+                gl.glTexImage2D( target, level, internalformat, source.width, source.height, 0, format, type, source.buffer)
+        }
     }
 
     override fun copyTexImage2D(target: Int, level: Int, internalformat: Int, x: Int, y: Int, width: Int, height: Int, border: Int) =
@@ -319,3 +329,4 @@ class JOGL(
     override fun depthMask(flag: Boolean) = gl.glDepthMask(flag)
     override fun lineWidth(width: Float) = gl.glLineWidth(width)
 }
+

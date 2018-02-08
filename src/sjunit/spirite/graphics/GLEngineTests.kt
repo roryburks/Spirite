@@ -1,6 +1,7 @@
 package sjunit.spirite.graphics
 
 
+import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.gl.*
@@ -11,6 +12,7 @@ import spirite.base.graphics.gl.SquareGradientCall.GradientType
 import spirite.base.graphics.gl.stroke.V2PenDrawer
 import spirite.base.pen.DrawPoints
 import spirite.base.util.ColorARGB32
+import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
@@ -40,7 +42,7 @@ class GLEngineTests {
                 listOf(10f, 40f, 10f, 40f),
                 listOf(10f, 10f, 40f, 40f),
                 4, STRIP,
-                GLParametersMutable(50, 50),
+                GLParameters(50, 50),
                 null)
 
         // Verify that a square has been drawn
@@ -53,6 +55,9 @@ class GLEngineTests {
         assertEquals(0, img.getARGB(45, 5))
         assertEquals(0, img.getARGB(5, 45))
         assertEquals(0, img.getARGB(45, 45))
+
+        if( TestConfig.save)
+            ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\basicRendering.png"))
     }
 
     @test fun TestComplexLineProgram() {
@@ -63,7 +68,7 @@ class GLEngineTests {
         val xs = listOf(0, 10, 50, 50)
         val ys = listOf(0, 0, 40, 50)
 
-        val params = GLParametersMutable(img.width, img.height)
+        val params = GLParameters(img.width, img.height)
         gle.setTarget(img)
         gle.applyComplexLineProgram(
                 xs.map { it.toFloat() }, ys.map { it.toFloat() }, 4,
@@ -82,8 +87,8 @@ class GLEngineTests {
         assertEquals(0, img.getARGB(49,0))
 
 
-        //val bi = img.toBufferedImage()
-        //ImageIO.write(bi, "png", File("C:\\bucket\\t6.png"))
+        if( TestConfig.save)
+            ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\complexLineProgram.png"))
     }
 
     // Draws using all the shaders and outputs it to an image
@@ -101,7 +106,7 @@ class GLEngineTests {
         image.graphics.clear()
         gle.setTarget(image)
 
-        val params = GLParametersMutable(500,500, texture1 = star)
+        val params = GLParameters(500,500, texture1 = star)
 
         gle.applyPassProgram( SquareGradientCall(0.5f, GradientType.V),
                 params, null, 0f, 0f, 50f, 50f)
@@ -125,7 +130,8 @@ class GLEngineTests {
                 params, null, 150f, 50f, 200f, 100f)
 
 
-        ImageIO.write(image.toBufferedImage(), "png", File("C:/Bucket/shaders.png"))
+        if( TestConfig.save)
+            ImageIO.write(image.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\shaders.png"))
     }
 
     @test fun doStroke() {
@@ -137,7 +143,9 @@ class GLEngineTests {
                 FloatArray(100, {it.toFloat()}),
                 FloatArray(100, {1f - abs(50 - it)/50f})
         )
-        V2PenDrawer.drawStroke(drawPoints, 5f, gle, ColorARGB32(0xffff0000.toInt()), GLParametersMutable(image.width, image.height), null)
-        ImageIO.write(image.toBufferedImage(), "png", File("C:/Bucket/stroke.png"))
+        V2PenDrawer.drawStroke(drawPoints, 5f, gle, ColorARGB32Normal(0xffff0000.toInt()), GLParameters(image.width, image.height), null)
+
+        if( TestConfig.save)
+            ImageIO.write(image.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\stroke.png"))
     }
 }

@@ -17,18 +17,33 @@ sealed abstract class Color {
     abstract val alpha: Float
 }
 
-class ColorARGB32( val argb: Int) : Color(){
+abstract class ColorARGB32(
+        val argb: Int
+) : Color(){
     override val argb32: Int get() = argb
 
     val a: Int get() = argb ushr 24
     val r: Int get() = (argb ushr 16) and 0xff
     val g: Int get() = (argb ushr 8) and 0xff
     val b: Int get() = argb and 0xff
+}
 
-    override val red: Float get() = r/255.0f
-    override val green: Float get() = g/255.0f
-    override val blue: Float get() = b/255.0f
-    override val alpha: Float get() = a/255.0f
+class ColorARGB32Normal(
+        argb: Int
+) : ColorARGB32(argb) {
+    override val red: Float get() = (r / 255.0f)
+    override val green: Float get() = (g / 255.0f)
+    override val blue: Float get() = (b / 255.0f)
+    override val alpha: Float get() = (a / 255.0f)
+}
+
+class ColorARGB32Premultiplied(
+        argb: Int
+) : ColorARGB32(argb){
+    override val red: Float get() = (r/255.0f) / alpha
+    override val green: Float get() = (g/255.0f) / alpha
+    override val blue: Float get() = (b/255.0f) / alpha
+    override val alpha: Float get() = (a/255.0f)
 }
 
 private class ColorTransparent : Color() {
@@ -40,19 +55,20 @@ private class ColorTransparent : Color() {
 }
 
 object Colors {
-    val BLACK = ColorARGB32( 0xFF000000.toInt())
-    val DARK_GRAY = ColorARGB32( 0xFF404040.toInt())
-    val GRAY = ColorARGB32( 0xFF808080.toInt())
-    val LIGHT_GRAY = ColorARGB32( 0xFFC0C0C0.toInt())
-    val WHITE = ColorARGB32( 0xFFFFFFFF.toInt())
-    val RED = ColorARGB32( 0xFFFF0000.toInt())
-    val BLUE = ColorARGB32( 0xFF0000FF.toInt())
-    val GREEN = ColorARGB32( 0xFF00FF00.toInt())
-    val CYAN = ColorARGB32( 0xFF00FFFF.toInt())
-    val MAGENTA = ColorARGB32( 0xFFFF00FF.toInt())
-    val YELLOW = ColorARGB32( 0xFFFFFF00.toInt())
-    val ORANGE = ColorARGB32( 0xFFFFC800.toInt())
-    val PINK = ColorARGB32( 0xFFFFAFAF.toInt())
+    val BLACK = ColorARGB32Normal( 0xFF000000.toInt())
+    val DARK_GRAY = ColorARGB32Normal( 0xFF404040.toInt())
+    val GRAY = ColorARGB32Normal( 0xFF808080.toInt())
+    val LIGHT_GRAY = ColorARGB32Normal( 0xFFC0C0C0.toInt())
+    val WHITE = ColorARGB32Normal( 0xFFFFFFFF.toInt())
+    val RED = ColorARGB32Normal( 0xFFFF0000.toInt())
+    val BLUE = ColorARGB32Normal( 0xFF0000FF.toInt())
+    val GREEN = ColorARGB32Normal( 0xFF00FF00.toInt())
+    val CYAN = ColorARGB32Normal( 0xFF00FFFF.toInt())
+    val MAGENTA = ColorARGB32Normal( 0xFFFF00FF.toInt())
+    val YELLOW = ColorARGB32Normal( 0xFFFFFF00.toInt())
+    val ORANGE = ColorARGB32Normal( 0xFFFFC800.toInt())
+    val PINK = ColorARGB32Normal( 0xFFFFAFAF.toInt())
+
     val TRANSPARENT : Color = ColorTransparent()
 
     fun getAlpha(argb: Int): Int {

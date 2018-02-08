@@ -2,6 +2,7 @@ package spirite.base.graphics.gl
 
 import spirite.base.graphics.*
 import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
+import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.STRAIGHT_PASS
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Color
 import spirite.base.util.Colors
@@ -10,13 +11,14 @@ import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec3
+import spirite.hybrid.ImageConverter
 import java.awt.Shape
 
 
-class GLGraphics : GraphicsContext {
+class GLGraphicsContext : GraphicsContext {
 
     val image : GLImage?
+    val premultiplied : Boolean
 
     override var width: Int
         private set(value) {
@@ -34,29 +36,45 @@ class GLGraphics : GraphicsContext {
     constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine)  {
         this.width = width
         this.height = height
-        image = null
+        this.image = null
         this.gle = gle
+        this.premultiplied = false
+
+        params.premultiplied = this.premultiplied
     }
     constructor( glImage: GLImage)  {
-        width = glImage.width
-        height = glImage.height
-        image = glImage
+        this.width = glImage.width
+        this.height = glImage.height
+        this.image = glImage
         this.gle = glImage.engine
+        this.premultiplied = glImage.premultiplied
+
+        params.premultiplied = this.premultiplied
     }
 
     private fun reset() {
         gle.setTarget(image)
     }
-    private val params = GLParametersMutable(1, 1)
+    private val params = GLParameters(1, 1)
 
 
 
 
-    override fun drawBounds(bi: IImage, c: Int) {
-        val img = GLImage(width, height, gle)
+    override fun drawBounds(image: IImage, c: Int) {
+        val buffer = GLImage(width, height, gle)
 
-        val other = img.graphics
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val gc = buffer.graphics
+        gc.clear()
+
+        val texture = ImageConverter(gle).convert<GLImage>(image)
+        val bufferParams = params.copy( texture1 = texture)
+        gc.applyPassProgram( BasicCall(),
+                bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
+
+        bufferParams.texture1 = buffer
+        applyPassProgram( BorderCall(c), bufferParams, null)
+
+        buffer.flush()
     }
 
     override fun clear() {
@@ -178,7 +196,12 @@ class GLGraphics : GraphicsContext {
 
 
     override fun drawImage(img: IImage, x: Int, y: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        params.texture1 = ImageConverter(gle).convert<GLImage>(img)
+
+        applyPassProgram( RenderCall(alpha, 0, false, STRAIGHT_PASS),
+                params, _trans, x + 0f, y + 0f, x + img.width + 0f, y + img.height + 0f)
+
+        params.texture1 = null
     }
 
     override fun drawHandle(handle: MediumHandle, x: Int, y: Int) {
@@ -198,5 +221,16 @@ class GLGraphics : GraphicsContext {
     override fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    // region Direct
+    // Note: These exist mostly to make sure Reset is called
+    fun applyPassProgram( programCall: ProgramCall, params: GLParameters, trans: Transform?,
+                          x1: Float = 0f, y1: Float = 0f, x2: Float = width.toFloat(), y2: Float = height.toFloat())
+    {
+        reset()
+        gle.applyPassProgram( programCall, params, trans,  x1, y1, x2, y2)
+    }
+
+    // endregion
 
 }

@@ -11,7 +11,7 @@ import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
 
 class GLEngine(
-        internal val gl: IGL,
+        val gl: IGL,
         scriptService: IScriptService
 ) {
 
@@ -77,17 +77,15 @@ class GLEngine(
             x1: Float, y1: Float, x2: Float, y2: Float)
     {
         val iParams = mutableListOf<GLUniform>()
-        addOrtho(params, iParams, trans)
-
-        val internal = false
+        loadUniversalUniforms(params, iParams, trans)
 
         val preparedPrimitive = PreparedPrimitive( GLPrimitive(
                 floatArrayOf(
                         // x  y   u   v
-                        x1, y1, 0.0f, if (internal) 0.0f else 1.0f,
-                        x2, y1, 1.0f, if (internal) 0.0f else 1.0f,
-                        x1, y2, 0.0f, if (internal) 1.0f else 0.0f,
-                        x2, y2, 1.0f, if (internal) 1.0f else 0.0f
+                        x1, y1, 0.0f, 0.0f,
+                        x2, y1, 1.0f, 0.0f,
+                        x1, y2, 0.0f, 1.0f,
+                        x2, y2, 1.0f, 1.0f
                 ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
                 , this)
         applyProgram( programCall, params, iParams, preparedPrimitive)
@@ -143,7 +141,7 @@ class GLEngine(
         }
 
         val iParams = mutableListOf<GLUniform>()
-        addOrtho(params, iParams, trans)
+        loadUniversalUniforms(params, iParams, trans)
 
         if( true /* Shaderversion 330 */) {
             val prim = PreparedPrimitive( GLPrimitive(
@@ -173,7 +171,7 @@ class GLEngine(
             trans : Transform?
     ) {
         val iParams = mutableListOf<GLUniform>()
-        addOrtho( params, iParams, trans)
+        loadUniversalUniforms( params, iParams, trans)
 
         val data = FloatArray(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
@@ -191,7 +189,7 @@ class GLEngine(
             trans: Transform?
     ) {
         val iParams = mutableListOf<GLUniform>()
-        addOrtho( params, iParams, trans)
+        loadUniversalUniforms( params, iParams, trans)
         val preparedPrimitive = PreparedPrimitive(primitive, this)
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
@@ -284,18 +282,26 @@ class GLEngine(
         preparedPrimitive.unuse()
     }
 
-    private fun addOrtho( params: GLParameters, internalParams: MutableList<GLUniform>, trans: Transform?) {
-        val x1 : Float
-        val y1 : Float
-        val x2 : Float
-        val y2 : Float
+    private fun loadUniversalUniforms(params: GLParameters, internalParams: MutableList<GLUniform>, trans: Transform?) {
+
+        // Construct flags
+        val flags =
+                if( params.premultiplied) 1 else 0
+
+        internalParams.add(GLUniform1i("u_flags", flags))
+
+
+        // Construct Projection Matrix
+        val x1: Float
+        val y1: Float
+        val x2: Float
+        val y2: Float
 
         val clipRect = params.clipRect
-        if( clipRect == null) {
+        if (clipRect == null) {
             x1 = 0f; x2 = params.width + 0f
             y1 = 0f; y2 = params.heigth + 0f
-        }
-        else {
+        } else {
             x1 = clipRect.x + 0f
             x2 = clipRect.x + clipRect.width + 0f
             y1 = clipRect.y + 0f
@@ -303,16 +309,17 @@ class GLEngine(
         }
 
         var matrix = Mat4(orthagonalProjectionMatrix(
-                x1, x2,if( params.flip) y2 else y1, if( params.flip) y1 else y2, -1f, 1f))
+                x1, x2, if (params.flip) y2 else y1, if (params.flip) y1 else y2, -1f, 1f))
 
-        if( trans != null) {
-            val matrix2 = Mat4( wrapTransformAs4x4(trans))
+        if (trans != null) {
+            val matrix2 = Mat4(wrapTransformAs4x4(trans))
             matrix = matrix2 * matrix
         }
 
         matrix = matrix.transpose()
         internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", matrix))
     }
+
     // endregion
 
     // region Shader Programs

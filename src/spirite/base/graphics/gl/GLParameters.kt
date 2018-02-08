@@ -2,44 +2,25 @@ package spirite.base.graphics.gl
 
 import spirite.base.util.linear.*
 
-interface GLParameters {
-    val width : Int
-    val heigth: Int
-    val flip: Boolean
-    val clipRect : Rect?
+data class GLParameters(
+        var width : Int,
+        var heigth: Int,
+        var flip: Boolean = false,
+        var clipRect : Rect? = null,
+        var premultiplied: Boolean = false,
 
-    val texture1 : GLImage?
-    val texture2 : GLImage?
+        var texture1 : GLImage? = null,
+        var texture2 : GLImage? = null,
 
-    val useBlendMode: Boolean
-    val useDefaultBlendMode: Boolean
-    val bm_sfc: Int
-    val bm_sfa: Int
-    val bm_dfc: Int
-    val bm_dfa: Int
-    val bm_fc: Int
-    val bm_fa: Int
-
-}
-
-data class GLParametersMutable (
-        override var width : Int,
-        override var heigth: Int,
-        override var flip: Boolean = false,
-        override var clipRect : Rect? = null,
-
-        override var texture1 : GLImage? = null,
-        override var texture2 : GLImage? = null,
-
-        override var useBlendMode: Boolean = true,
-        override var useDefaultBlendMode: Boolean = true,
-        override var bm_sfc: Int = 0,
-        override var bm_sfa: Int = 0,
-        override var bm_dfc: Int = 0,
-        override var bm_dfa: Int = 0,
-        override var bm_fc: Int = 0,
-        override var bm_fa: Int = 0
-) : GLParameters {
+        var useBlendMode: Boolean = true,
+        var useDefaultBlendMode: Boolean = true,
+        var bm_sfc: Int = 0,
+        var bm_sfa: Int = 0,
+        var bm_dfc: Int = 0,
+        var bm_dfa: Int = 0,
+        var bm_fc: Int = 0,
+        var bm_fa: Int = 0
+) {
     fun setBlendMode(src_factor: Int, dst_factor: Int, formula: Int) {
         useDefaultBlendMode = false
         bm_sfa = src_factor

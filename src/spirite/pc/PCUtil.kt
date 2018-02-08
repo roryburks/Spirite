@@ -21,6 +21,9 @@ fun BufferedImage.deepCopy() = BufferedImage(
 fun GLImage.toBufferedImage() : BufferedImage {
     val gle = this.engine
     gle.setTarget( this)
+
+    val format = if( this.premultiplied) BufferedImage.TYPE_INT_ARGB_PRE else BufferedImage.TYPE_INT_ARGB
+
     val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height)
     engine.setTarget(null)
     return bi

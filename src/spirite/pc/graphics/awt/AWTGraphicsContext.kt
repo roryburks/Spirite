@@ -43,7 +43,7 @@ class AWTGraphicsContext : GraphicsContext {
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
 
-    override fun drawBounds(bi: IImage, c: Int) {
+    override fun drawBounds(image: IImage, c: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

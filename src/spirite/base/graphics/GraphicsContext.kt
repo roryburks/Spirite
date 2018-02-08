@@ -28,7 +28,7 @@ abstract class GraphicsContext {
      * representable by the generic LineAttributes class.  */
     abstract var lineAttributes: LineAttributes
 
-    abstract fun drawBounds(bi: IImage, c: Int)
+    abstract fun drawBounds(image: IImage, c: Int)
 
     abstract fun clear()
     abstract fun preTranslate(offsetX: Double, offsetY: Double)

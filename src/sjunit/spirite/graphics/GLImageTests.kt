@@ -1,6 +1,7 @@
 package sjunit.spirite.graphics
 
 
+import sjunit.TestConfig
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.Colors
@@ -55,6 +56,8 @@ class GLImageTests {
         assertEquals( 12, glimage.height)
 
         val bi = glimage.toBufferedImage()
-        ImageIO.write(bi, "png", File("C:\\bucket\\t6.png"))
+
+        if( TestConfig.save)
+            ImageIO.write(bi, "png", File("${TestConfig.saveLocation}\\testConversion.png"))
     }
 }

@@ -3,8 +3,11 @@ package spirite.pc.graphics
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.util.Color
+import java.awt.image.BufferedImage
 
-class ImageBI : RawImage {
+class ImageBI(
+        val bi: BufferedImage
+) : RawImage {
     override fun getARGB(x: Int, y: Int): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

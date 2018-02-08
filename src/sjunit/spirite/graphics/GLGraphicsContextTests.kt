@@ -1,12 +1,13 @@
 package sjunit.spirite.graphics
 
+import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
+import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.IGNORE_ALPHA
 import spirite.base.util.Colors
-import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec2i
 import spirite.base.util.linear.Vec4
 import spirite.pc.JOGL.JOGLProvider
@@ -17,14 +18,46 @@ import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import org.junit.Test as test
 
-class GLGraphicsTests {
+class GLGraphicsContextTests {
     val gle =  GLEngine(JOGLProvider.getGL(), JClassScriptService())
-    val save = true
+
+    @test fun drawBounds() {
+        val img = GLImage(30, 30, gle)
+
+        val gc = img.graphics
+        gc.color = Colors.RED
+        gc.fillRect( 5, 5, 10, 10)
+
+        val toImage = GLImage(30,30, gle)
+        toImage.graphics.drawBounds( img, 101101)
+
+        if( TestConfig.save)
+            ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawBounds.png"))
+    }
+    @test fun drawImage() {
+        val subImg = GLImage(30, 30, gle)
+
+        val gc = subImg.graphics
+        gc.color = Colors.RED
+        gc.fillRect( 5, 5, 10, 10)
+
+        val toImage = GLImage(30,30, gle)
+        val togc = toImage.graphics
+        togc.setComposite(SRC_OVER, 0.5f)
+        togc.drawImage( subImg, 5, 5)
+
+        val color = toImage.getColor(19,19)
+        assertEquals(1.0f, color.red)
+
+        if( TestConfig.save)
+            ImageIO.write(toImage.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawImage.png"))
+    }
 
     @test fun drawRect(){
         val img = GLImage( 30, 30, gle)
         val gc = img.graphics
 
+        //gc.setComposite(gc.composite, 0.5f)
         gc.color = Colors.RED
         gc.lineAttributes = LineAttributes(4f, NONE, MITER, null)
         gc.drawRect( 5, 5, 10, 10)
@@ -40,7 +73,6 @@ class GLGraphicsTests {
                 Vec2i( 15, 15))
 
         corners.forEach {
-            println("$it")
             assertEquals(red, img.getARGB(it.x+1, it.y+1))
             assertEquals(red, img.getARGB(it.x-1, it.y-1))
             assertEquals(transparent, img.getARGB(it.x+3, it.y+3))
@@ -49,6 +81,9 @@ class GLGraphicsTests {
         assertEquals(transparent, img.getARGB(10, 10))
         assertEquals(transparent, img.getARGB(0, 0))
         assertEquals(transparent, img.getARGB(29, 29))
+
+        if( TestConfig.save)
+            ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_drawRect.png"))
     }
 
     @test fun fillRect(){
@@ -67,6 +102,9 @@ class GLGraphicsTests {
         assertEquals(red, img.getARGB(6, 24))
         assertEquals(red, img.getARGB(24, 6))
         assertEquals(red, img.getARGB(24, 24))
+
+        if( TestConfig.save)
+            ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_fillRect.png"))
     }
 
     @test fun fillPoly() {
@@ -78,28 +116,8 @@ class GLGraphicsTests {
         gc.color = Colors.RED
         gc.fillPolygon(xs, ys, 5)
 
-        if( save) {
-            ImageIO.write(img.toBufferedImage(), "png", File("C:/Bucket/fillPoly.png"))
-        }
-    }
-
-    @test fun test() {
-        val img = GLImage( 50, 50, gle)
-        val gc = img.graphics
-
-        val xs = listOf(0f, 50f, 0f, 50f, 25f)
-        val ys = listOf(0f, 40f, 40f, 0f, 50f)
-        gc.color = Colors.RED
-        gc.fillPolygon(xs, ys, 5)
-
-        val img2 = GLImage( 50, 50, gle)
-        gle.setTarget(img2)
-        gle.applyPassProgram( ChangeColorCall(Vec4(1f, 0f, 0f, 1f), Vec4( 0f, 1f, 0f, 1f), IGNORE_ALPHA),
-                GLParametersMutable(50,50, texture1 = img), null, 0f, 0f, 50f, 50f)
-
-        if( save) {
-            ImageIO.write(img2.toBufferedImage(), "png", File("C:/Bucket/pass.png"))
-        }
+        if( TestConfig.save)
+            ImageIO.write(img.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\gc_fillPoly.png"))
     }
 
 }
