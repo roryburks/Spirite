@@ -30,6 +30,20 @@ data class GLParameters(
         bm_fa = formula
         bm_fc = bm_fa
     }
+
+    fun setBlendModeExt(
+            src_factor_color: Int, dst_factor_color: Int, formula_color: Int,
+            src_factor_alpha: Int, dst_factor_alpha: Int, formula_alpha: Int) {
+        useDefaultBlendMode = false
+        bm_sfc = src_factor_color
+        bm_dfc = dst_factor_color
+        bm_fc = formula_color
+
+        bm_sfa = src_factor_alpha
+        bm_dfa = dst_factor_alpha
+        bm_fa = formula_alpha
+
+    }
 }
 
 sealed abstract class GLUniform(

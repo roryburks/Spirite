@@ -2,6 +2,8 @@ package spirite.base.graphics.gl
 
 import spirite.base.graphics.*
 import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
+import spirite.base.graphics.RenderMethodType.*
+import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.STRAIGHT_PASS
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Color
@@ -19,15 +21,16 @@ class GLGraphicsContext : GraphicsContext {
 
     val image : GLImage?
     val premultiplied : Boolean
+    private val cachedParams = GLParameters(1, 1)
 
     override var width: Int
         private set(value) {
-            params.width = value
+            cachedParams.width = value
             field = value
         }
     override var height: Int
         private set(value) {
-            params.heigth = value
+            cachedParams.heigth = value
             field = value
         }
 
@@ -40,7 +43,7 @@ class GLGraphicsContext : GraphicsContext {
         this.gle = gle
         this.premultiplied = false
 
-        params.premultiplied = this.premultiplied
+        cachedParams.premultiplied = this.premultiplied
     }
     constructor( glImage: GLImage)  {
         this.width = glImage.width
@@ -49,14 +52,10 @@ class GLGraphicsContext : GraphicsContext {
         this.gle = glImage.engine
         this.premultiplied = glImage.premultiplied
 
-        params.premultiplied = this.premultiplied
+        cachedParams.premultiplied = this.premultiplied
     }
 
-    private fun reset() {
-        gle.setTarget(image)
-    }
-    private val params = GLParameters(1, 1)
-
+    private fun reset() = gle.setTarget(image)
 
 
 
@@ -67,7 +66,7 @@ class GLGraphicsContext : GraphicsContext {
         gc.clear()
 
         val texture = ImageConverter(gle).convert<GLImage>(image)
-        val bufferParams = params.copy( texture1 = texture)
+        val bufferParams = cachedParams.copy( texture1 = texture)
         gc.applyPassProgram( BasicCall(),
                 bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
 
@@ -83,7 +82,7 @@ class GLGraphicsContext : GraphicsContext {
         gle.gl.clear(GLC.COLOR)
     }
 
-    // region Transform
+    // region Transforms
     override var transform: Transform
         get() = _trans
         set(value) {_trans = value.toMutable()}
@@ -110,26 +109,34 @@ class GLGraphicsContext : GraphicsContext {
     override var alpha = 1f ; private set
     override var composite = SRC_OVER
         private set(value) {
-            when (value) {
-                GraphicsContext.Composite.SRC -> params.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
-                GraphicsContext.Composite.SRC_OVER -> params.setBlendMode(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-                GraphicsContext.Composite.SRC_IN -> params.setBlendMode(GLC.DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
-                GraphicsContext.Composite.SRC_ATOP -> params.setBlendMode(GLC.DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-                GraphicsContext.Composite.SRC_OUT -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
-
-                GraphicsContext.Composite.DST -> params.setBlendMode(GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-                GraphicsContext.Composite.DST_OVER -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE, GLC.FUNC_ADD)
-                GraphicsContext.Composite.DST_IN -> params.setBlendMode(GLC.ZERO, GLC.SRC_ALPHA, GLC.FUNC_ADD)
-                GraphicsContext.Composite.DST_ATOP -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.SRC_ALPHA, GLC.FUNC_ADD)
-                GraphicsContext.Composite.DST_OUT -> params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-
-                GraphicsContext.Composite.XOR -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-                GraphicsContext.Composite.CLEAR -> params.setBlendMode(GLC.ZERO, GLC.ZERO, GLC.FUNC_ADD)
-            }
+            setCompositeBlend(cachedParams, value)
+            field = value
         }
+    private fun setCompositeBlend( params: GLParameters, composite: Composite) {
+        when (composite) {
+            GraphicsContext.Composite.SRC -> params.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
+            GraphicsContext.Composite.SRC_OVER -> params.setBlendMode(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            GraphicsContext.Composite.SRC_IN -> params.setBlendMode(GLC.DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
+            GraphicsContext.Composite.SRC_ATOP -> params.setBlendMode(GLC.DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            GraphicsContext.Composite.SRC_OUT -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
+
+            GraphicsContext.Composite.DST -> params.setBlendMode(GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+            GraphicsContext.Composite.DST_OVER -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE, GLC.FUNC_ADD)
+            GraphicsContext.Composite.DST_IN -> params.setBlendMode(GLC.ZERO, GLC.SRC_ALPHA, GLC.FUNC_ADD)
+            GraphicsContext.Composite.DST_ATOP -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.SRC_ALPHA, GLC.FUNC_ADD)
+            GraphicsContext.Composite.DST_OUT -> params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+
+            GraphicsContext.Composite.XOR -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            GraphicsContext.Composite.CLEAR -> params.setBlendMode(GLC.ZERO, GLC.ZERO, GLC.FUNC_ADD)
+        }
+    }
 
     private val defaultLA = LineAttributes(1f, CapMethod.NONE, JoinMethod.ROUNDED, null)
     override var lineAttributes: LineAttributes = defaultLA
+
+    override fun setClip(i: Int, j: Int, width: Int, height: Int) {
+        cachedParams.clipRect = Rect( i, j, width, height)
+    }
 
     // endregion
 
@@ -145,7 +152,7 @@ class GLGraphicsContext : GraphicsContext {
                 lineAttributes.cap, lineAttributes.join,
                 true, lineAttributes.width,
                 color.rgbComponent, alpha,
-                params, _trans)
+                cachedParams, _trans)
     }
 
     override fun drawOval(x: Int, y: Int, w: Int, h: Int) {
@@ -156,13 +163,13 @@ class GLGraphicsContext : GraphicsContext {
         reset()
         gle.applyComplexLineProgram(
                 x.map { it.toFloat() }, y.map { it.toFloat() }, count, lineAttributes.cap, lineAttributes.join,
-                false, lineAttributes.width, color.rgbComponent, alpha, params, _trans)
+                false, lineAttributes.width, color.rgbComponent, alpha, cachedParams, _trans)
     }
 
     override fun drawLine(x1: Float, y1: Float, x2: Float, y2: Float) {
         reset()
         gle.applyComplexLineProgram( listOf(x1, x2), listOf(y1, y2), 2, lineAttributes.cap, lineAttributes.join,
-                false, lineAttributes.width, color.rgbComponent, alpha, params, _trans)
+                false, lineAttributes.width, color.rgbComponent, alpha, cachedParams, _trans)
     }
 
     override fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int) = drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
@@ -180,7 +187,7 @@ class GLGraphicsContext : GraphicsContext {
         val y_ = floatArrayOf(y + 0f, y + 0f, y + h + 0f, y + h + 0f).toList()
 
         gle.applyPolyProgram( PolyRenderCall(color.rgbComponent, alpha), x_, y_, 4,
-                PolyType.STRIP, params, _trans)
+                PolyType.STRIP, cachedParams, _trans)
     }
 
     override fun fillOval(x: Int, y: Int, w: Int, h: Int) {
@@ -190,37 +197,81 @@ class GLGraphicsContext : GraphicsContext {
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         reset()
         val poly = PolygonTesselater.tesselatePolygon(x, y, x.size)
-        gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, params, _trans)
+        gle.applyPrimitiveProgram( PolyRenderCall(color.rgbComponent, alpha), poly, cachedParams, _trans)
     }
     // endregion
 
+    // region Images
 
     override fun drawImage(img: IImage, x: Int, y: Int) {
-        params.texture1 = ImageConverter(gle).convert<GLImage>(img)
+        cachedParams.texture1 = ImageConverter(gle).convert<GLImage>(img)
 
         applyPassProgram( RenderCall(alpha, 0, false, STRAIGHT_PASS),
-                params, _trans, x + 0f, y + 0f, x + img.width + 0f, y + img.height + 0f)
+                cachedParams, _trans, x + 0f, y + 0f, x + img.width + 0f, y + img.height + 0f)
 
-        params.texture1 = null
+        cachedParams.texture1 = null
     }
 
-    override fun drawHandle(handle: MediumHandle, x: Int, y: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun setClip(i: Int, j: Int, width: Int, height: Int) {
-        params.clipRect = Rect( i, j, width, height)
-    }
+    override fun drawHandle(handle: MediumHandle, x: Int, y: Int) =
+            drawImage( handle.deepAccess() ?: throw Exception("Handle Missing Data"), x, y)
 
     override fun dispose() { if( gle.target == image?.tex) gle.target = null}
 
     override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val params = this.cachedParams.copy()
+
+        val renderAlgorithm = when (render.method.methodType) {
+            COLOR_CHANGE_HUE -> {
+                setCompositeBlend(params, SRC_OVER)
+                RenderAlgorithm.AS_COLOR
+            }
+            COLOR_CHANGE_FULL -> {
+                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
+                RenderAlgorithm.AS_COLOR_ALL
+            }
+            DISOLVE -> {
+                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
+                RenderAlgorithm.DISOLVE
+            }
+            LIGHTEN -> {
+                params.setBlendModeExt(
+                        GLC.ONE, GLC.ONE, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                RenderAlgorithm.STRAIGHT_PASS
+            }
+            SUBTRACT -> {
+                params.setBlendModeExt(
+                        GLC.ZERO, GLC.ONE_MINUS_SRC_COLOR, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                RenderAlgorithm.STRAIGHT_PASS
+            }
+            MULTIPLY -> {
+                params.setBlendModeExt(GLC.DST_COLOR, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                RenderAlgorithm.STRAIGHT_PASS
+            }
+            SCREEN -> {
+                // C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
+                params.setBlendModeExt(GLC.ONE_MINUS_DST_COLOR, GLC.ONE, GLC.FUNC_ADD,
+                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                RenderAlgorithm.STRAIGHT_PASS
+            }
+            OVERLAY -> RenderAlgorithm.DISOLVE
+            DEFAULT -> {
+                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
+                RenderAlgorithm.STRAIGHT_PASS
+            }
+        }
+
+        params.texture1 = ImageConverter(gle).convert<GLImage>(rawImage)
+        applyPassProgram( RenderCall( alpha, render.method.renderValue, false, renderAlgorithm),
+                params, transform, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
 
-    override fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties) =
+            renderImage(handle.deepAccess() ?: throw Exception("Tried to render empty image"), x, y, render)
+
+    // endregion
 
     // region Direct
     // Note: These exist mostly to make sure Reset is called
