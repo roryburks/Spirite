@@ -4,6 +4,9 @@ import spirite.base.imageData.mediums.IMedium
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
+/**
+ *  The MediumRepository is responsible for storing the direct medium data
+ */
 interface IMediumRepository {
     fun getData( i: Int) : IMedium
     fun clearUnusedCache()
@@ -15,11 +18,14 @@ class MediumRepository(
 ) : IMediumRepository{
     val mediumData = mutableMapOf<Int,IMedium>()
 
-    override fun getData(i: Int): IMedium {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    /** Locks the cache from being cleared. */
+    var locked : Boolean = true
+
+    override fun getData(i: Int) = mediumData[i]!!
 
     override fun clearUnusedCache() {
+        if( locked) return
+
         val undoImages = undoEngine.dataUsed
         val undoImageIds = undoImages.map { it.id }
 

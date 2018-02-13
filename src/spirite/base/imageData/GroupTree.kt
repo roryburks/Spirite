@@ -2,21 +2,37 @@ package spirite.base.imageData
 
 import spirite.base.imageData.layers.Layer
 
-class GroupTree {
-    val root = GroupNode()
+/**
+ * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical
+ * tree structure.
+ */
+class GroupTree(
+        val contex: IImageWorkspace
+) {
+    val root = GroupNode(null, "ROOT")
 
-    abstract inner class Node {
+    abstract inner class Node(
+            val parent: Node?,
+            val name: String
+    ) {
+        val children: List<Node> get() = _children
+        private val _children = mutableListOf<Node>()
+
         fun getLayerNodes() : List<LayerNode> {
             TODO()
         }
     }
 
     inner class LayerNode(
+            parent: Node?,
+            name: String,
             val layer: Layer
-    ) : Node() {
+    ) : Node(parent, name) {
 
     }
-    inner class GroupNode : Node() {
+    inner class GroupNode(
+            parent: Node?,
+            name: String) : Node(parent, name) {
 
     }
 }

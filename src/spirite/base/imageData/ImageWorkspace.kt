@@ -32,9 +32,6 @@ class BuildingMediumData {
 }
 
 interface IImageWorkspace {
-    fun getData( i: Int) : IMedium
-    fun getData( handle: MediumHandle) = getData(handle.id)
-
     var width: Int
     var height: Int
 
@@ -54,6 +51,7 @@ interface IImageWorkspace {
     val selectionEngine : ISelectionEngine
     val referenceManager : ReferenceManager
     val paletteSet : PaletteSet
+    val mediumRepository : IMediumRepository
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -74,10 +72,65 @@ interface IImageWorkspace {
 
 }
 
-class ImageWorkspace {
+class ImageWorkspace(
 
-    private val mediumData = mutableMapOf<Integer, IMedium>()
+) : IImageWorkspace{
 
+    override val undoEngine = UndoEngine()
+    override val mediumRepository = MediumRepository( undoEngine, this)
+
+    override var width: Int
+        get() = TODO("not implemented")
+        set(value) {}
+    override var height: Int
+        get() = TODO("not implemented")
+        set(value) {}
+
+    override fun finishBuilding() {
+        undoEngine.reset()
+        hasChanged = false
+        mediumRepository.locked = false
+    }
+
+    override fun fileSaved(newFile: File) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val file: File?
+        get() = TODO("not implemented")
+    override var hasChanged: Boolean = false
+    override val groupTree: GroupTree
+        get() = TODO("not implemented")
+    override val animationManager: IAnimationManager
+        get() = TODO("not implemented")
+    override val selectionEngine: ISelectionEngine
+        get() = TODO("not implemented")
+    override val referenceManager: ReferenceManager
+        get() = TODO("not implemented")
+    override val paletteSet: PaletteSet
+        get() = TODO("not implemented")
+    override val renderEngine: IRenderEngine
+        get() = TODO("not implemented")
+    override val settingsManager: ISettingsManager
+        get() = TODO("not implemented")
+    override val paletteManager: IPaletteManager
+        get() = TODO("not implemented")
+    override val images: List<MediumHandle>
+        get() = TODO("not implemented")
+    override val activeDrawer: IImageDrawer
+        get() = TODO("not implemented")
+
+    override fun getDrawerFromBMD(bmd: BuildingMediumData): IImageDrawer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getDrawerFromHandle(handle: MediumHandle): IImageDrawer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun buildActiveData(): BuildingMediumData {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 
 }
