@@ -1,8 +1,13 @@
 package spirite.base.imageData
 
+import spirite.base.brains.Settings.ISettingsManager
+import spirite.base.brains.palette.IPaletteManager
+import spirite.base.brains.palette.PaletteSet
+import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.util.linear.MutableTransform
 import java.io.File
 
@@ -30,28 +35,31 @@ interface IImageWorkspace {
     fun getData( i: Int) : IMedium
     fun getData( handle: MediumHandle) = getData(handle.id)
 
+    var width: Int
+    var height: Int
+
+    // File-Related
     fun finishBuilding()
     fun fileSaved( newFile: File)
     val file: File?
     val filename get() = file?.name ?: "Untitled Image"
-
-    var width: Int
-    var height: Int
-
     val hasChanged: Boolean
+
+    val groupTree: GroupTree
+
 
 	// Sub-Components
     val undoEngine : IUndoEngine
-//	public AnimationManager getAnimationManager() { return animationManager; }
-//	public SelectionEngine getSelectionEngine() { return selectionEngine; }
-//	public ReferenceManager getReferenceManager() { return referenceManager; }
+    val animationManager : IAnimationManager
+    val selectionEngine : ISelectionEngine
+    val referenceManager : ReferenceManager
+    val paletteSet : PaletteSet
 //	public StagingManager getStageManager() {return stagingManager;}
-//	public PaletteSet getPaletteSet() {return paletteSet;}
-//
-//	// Super-Components (components rooted in MasterControl, simply being passed on)
-//	public RenderEngine getRenderEngine() { return renderEngine; }
-//	public SettingsManager getSettingsManager() {return master.getSettingsManager();}
-//	public PaletteManager getPaletteManager() {return paletteManager;}	// Might be removed in the future
+
+    // Super-Components
+    val renderEngine : IRenderEngine
+    val settingsManager: ISettingsManager
+    val paletteManager : IPaletteManager
 
 //    val rootNode: GroupTree.GroupNode
     val images: List<MediumHandle>
@@ -62,8 +70,14 @@ interface IImageWorkspace {
     fun getDrawerFromHandle( handle: MediumHandle) : IImageDrawer
 
     fun buildActiveData() : BuildingMediumData
+
+
 }
 
 class ImageWorkspace {
+
+    private val mediumData = mutableMapOf<Integer, IMedium>()
+
+
 
 }

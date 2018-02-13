@@ -3,6 +3,20 @@ package debug
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 
+
+fun main( args: Array<String>) {
+    val listlist = listOf(
+            listOf(1, 2, 3),
+            listOf(1, 2, 5),
+            listOf(1, 7, 8)
+    )
+
+    println(
+            listlist
+                    .reduce { acc, list ->  acc.union(list).toList()})
+
+}
+
 //region Test 1
 fun kt001_test() {
     // Demonstrates how a masking Property can be Delegated in Kotlin

@@ -46,7 +46,7 @@ data class GLParameters(
     }
 }
 
-sealed abstract class GLUniform(
+sealed class GLUniform(
         val name: String
 ) {
     abstract fun apply( gl : IGL, program: IGLProgram)

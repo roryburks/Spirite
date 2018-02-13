@@ -87,8 +87,8 @@ object Colors {
         return argb and 0xFF
     }
 
-    fun toColor(a: Int, r: Int, g: Int, b: Int): Int {
-        return a and 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF)
+    fun toColor(a: Int, r: Int, g: Int, b: Int): Color {
+        return ColorARGB32Normal(a and 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF))
     }
 
     fun toColor(r: Int, g: Int, b: Int): Int {

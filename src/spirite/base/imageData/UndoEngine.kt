@@ -6,6 +6,7 @@ interface IUndoEngine {
     val metronome: Int
 
     fun prepareContext( handle: MediumHandle)
+    val dataUsed : List<MediumHandle>
 
 }
 

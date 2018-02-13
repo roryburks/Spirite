@@ -1,5 +1,6 @@
 package spirite.base.brains.palette
 
+import spirite.base.util.Color
 import spirite.base.util.Colors
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -12,8 +13,8 @@ private val default_palette = arrayOf(
 abstract class Palette( name: String, raw: ByteArray? = null) {
     abstract val onChangeTrigger: (Palette) -> Unit
 
-    val colors : Map<Int,Int> get() = _colors
-    private var _colors = mutableMapOf<Int,Int>()
+    val colors : Map<Int,Color> get() = _colors
+    private var _colors = mutableMapOf<Int,Color>()
     var name: String = name
         get
         set(value) {
@@ -26,7 +27,7 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
 
         if( raw == null) {
             default_palette
-                    .mapIndexed { i, color -> Pair(i, color.argb) }
+                    .mapIndexed { i, color -> Pair(i, color) }
                     .toMap(_colors)
         }
         else {
@@ -56,7 +57,7 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
     }
     // endregion
 
-    fun setPaletteColor( i: Int, color: Int) {
+    fun setPaletteColor( i: Int, color: Color) {
         _colors[i] = color
         onChangeTrigger.invoke(this)
     }
@@ -66,7 +67,7 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
         onChangeTrigger.invoke(this)
     }
 
-    fun addPaletteColor( color: Int) {
+    fun addPaletteColor( color: Color) {
         if( !colors.containsValue( color)) {
             var i = 0
             while( colors.containsKey( i++));
@@ -115,7 +116,7 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
                 else {
                     stream.write(tCount)
                     for( i in 0 until tCount) {
-                        val c = colors[caret+i]!!
+                        val c = colors[caret+i]!!.argb32
                         stream.write(Colors.getRed(c))
                         stream.write(Colors.getGreen(c))
                         stream.write(Colors.getBlue(c))

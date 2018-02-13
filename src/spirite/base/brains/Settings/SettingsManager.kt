@@ -7,6 +7,8 @@ import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty
 
+interface ISettingsManager
+
 class SettingsManager (
         private val preferences: IPreferences
 ){

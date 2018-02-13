@@ -3,12 +3,13 @@ package spirite.base.brains.palette
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
+import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.MUtil.cycle
 
 interface IPaletteManager {
-    fun getActiveColor( i : Int) : Int
-    fun setActiveColor( i: Int, color: Int)
+    fun getActiveColor( i : Int) : Color
+    fun setActiveColor( i: Int, color: Color)
     fun cycleActiveColors( amount: Int)
 
     fun makePaletteSet() : PaletteSet
@@ -20,11 +21,11 @@ interface IPaletteManager {
 }
 
 class PaletteManager : IPaletteManager {
-    val activeColors = mutableListOf<Int>(Colors.BLACK.argb, Colors.WHITE.argb, Colors.RED.argb, Colors.BLACK.argb)
+    val activeColors = mutableListOf<Color>(Colors.BLACK, Colors.WHITE, Colors.RED, Colors.BLACK)
 
-    override fun getActiveColor(i: Int): Int = activeColors[ cycle(0, activeColors.size, i)]
+    override fun getActiveColor(i: Int): Color = activeColors[ cycle(0, activeColors.size, i)]
 
-    override fun setActiveColor(i: Int, color: Int) {
+    override fun setActiveColor(i: Int, color: Color) {
         activeColors[ cycle(0, activeColors.size, i)] = color
     }
 
