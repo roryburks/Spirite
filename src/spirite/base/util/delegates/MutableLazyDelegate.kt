@@ -1,4 +1,4 @@
-package util
+package spirite.base.util.delegates
 
 import kotlin.reflect.KProperty
 

@@ -1,0 +1,15 @@
+package spirite.base.util.delegates
+
+import kotlin.reflect.KProperty
+
+
+class OnChangeDelegate<T>(defaultValue : T, val onChange: (T) -> Unit) {
+    var field = defaultValue
+
+    operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
+
+    operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
+        field = value
+        onChange.invoke(value)
+    }
+}

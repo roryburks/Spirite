@@ -2,7 +2,7 @@ package spirite.base.brains.Settings
 
 import spirite.base.util.interpolation.CubicSplineInterpolator
 import spirite.base.util.linear.Vec2
-import util.MutableLazy
+import spirite.base.util.delegates.MutableLazy
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty
@@ -92,7 +92,7 @@ class SettingsManager (
     // region Tablet Pressure Curve
 
     val tabletPressureInterpolator get() = _tabletPressureInterpolator
-    var _tabletPressureInterpolator : CubicSplineInterpolator by MutableLazy { cubicSplineInterpolatorFromByteArray(preferences.getByteArray("tcpPoints"))}
+    var _tabletPressureInterpolator : CubicSplineInterpolator by MutableLazy { cubicSplineInterpolatorFromByteArray(preferences.getByteArray("tcpPoints")) }
 
     /** Changes the intepolator for interpetting tablet pressure to one constructed
      * from the given points, saving it to preferences as it makes it.
