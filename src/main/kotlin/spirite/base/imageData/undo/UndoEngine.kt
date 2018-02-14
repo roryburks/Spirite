@@ -2,6 +2,9 @@ package spirite.base.imageData.undo
 
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.util.groupExtensions.SinglyList
+import spirite.base.util.groupExtensions.then
+import spirite.debug.SpiriteException
 
 interface IUndoEngine {
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/
@@ -38,8 +41,17 @@ class UndoIndex(
 class UndoEngine(
         val workspace: IImageWorkspace
 ) : IUndoEngine {
-    private val contexts = mutableListOf<UndoContext>()
-    private val undoQueue = mutableListOf<UndoContext>()
+    init {
+        reset()
+    }
+
+    private lateinit var nullContext : NullContext
+    private lateinit var compositeContext: CompositeContext
+    private val imageContexts = mutableListOf<ImageContext>()
+
+    private val contexts get()
+            = SinglyList(nullContext).then(SinglyList(compositeContext)).then(imageContexts)
+    private val undoQueue = mutableListOf<UndoContext<*>>()
     private var _queuePosition = 0
     private var saveSpot = 0
 
@@ -47,9 +59,7 @@ class UndoEngine(
         contexts.forEach { it.flush() }
         undoQueue.clear()
         _queuePosition = 0
-        contexts.clear()
-        contexts.add( NullContext())
-        contexts.add( CompositeContext())
+        imageContexts.clear()
         saveSpot = 0
     }
 
@@ -76,7 +86,7 @@ class UndoEngine(
 
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction)
-            contexts.add( ImageContext( action.building.handle))
+            imageContexts.add( ImageContext( action.building.handle))
 
         when {
             activeStoreState != null -> activeStoreState!!.add(action)
@@ -94,7 +104,7 @@ class UndoEngine(
     private fun storeAction( action: UndoableAction) {
         // Delete all actions stored after the current iterator point
         if( _queuePosition < undoQueue.size-1) {
-            undoQueue.dropLast(undoQueue.size-1-_queuePosition)
+            undoQueue.subList(_queuePosition+1,undoQueue.size).clear()
             contexts.forEach { it.clipHead() }
 
             if( undoQueue.size <= saveSpot)
@@ -108,11 +118,38 @@ class UndoEngine(
             // TODO
         }
 
+        // Determine the context for the given Action and add it
+        val context = when( action) {
+            is NullAction -> {
+                nullContext.addAction( action)
+                nullContext
+            }
+            is CompositeAction -> {
+                compositeContext.addAction(action)
+                compositeContext
+            }
+            is ImageAction -> {
+                var imageContext = contexts.find { it.medium == action.building.handle }
+
+                if( imageContext == null) {
+                    imageContext = ImageContext(action.building.handle)
+                    imageContexts.add(imageContext)
+                }
+
+                imageContext
+            }
+        }
+        action.onAdd()
+
+        undoQueue.add(context)
+        _queuePosition++
+        triggerHistoryChanged()
+        cull()
     }
 
     // region Aggregate Action
-    val storeStack = mutableListOf<MutableList<UndoableAction>>()
-    var activeStoreState : MutableList<UndoableAction>? = null
+    private val storeStack = mutableListOf<MutableList<UndoableAction>>()
+    private var activeStoreState : MutableList<UndoableAction>? = null
 
     override fun doAsAggregateAction(runner: () -> Unit, description: String) {
         val storeState = mutableListOf<UndoableAction>()
@@ -134,6 +171,10 @@ class UndoEngine(
     }
     // endregion
 
+    private fun cull() {
+        // TODO
+    }
+
     override fun undo() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -144,5 +185,9 @@ class UndoEngine(
 
     override fun cleanup() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun triggerHistoryChanged() {
+
     }
 }

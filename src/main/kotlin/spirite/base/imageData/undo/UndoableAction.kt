@@ -1,15 +1,16 @@
 package spirite.base.imageData.undo
 
 import spirite.base.imageData.BuildingMediumData
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.BuiltMediumData
 
 
-abstract class UndoableAction {
+sealed class  UndoableAction {
     abstract val description : String
     abstract fun performAction()
     abstract fun undoAction()
-    open fun onDispatch() {}
-    open fun onAdd() {}
+    fun onDispatch() {}
+    fun onAdd() {}
 }
 
 abstract class ImageAction(
@@ -22,6 +23,13 @@ abstract class ImageAction(
 
     open fun performNonimageAction() {}
     abstract fun performImageAction( built: BuiltMediumData)
+}
+
+/**
+ * In contrast to image actions, most non-image actions are
+ */
+abstract class NullAction() : UndoableAction() {
+    open fun getDependencies(): Collection<MediumHandle>? = null
 }
 
 class CompositeAction(

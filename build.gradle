@@ -26,6 +26,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+    testCompile "io.mockk:mockk:1.7.4"
     compile "com.google.dagger:dagger:2.14.1"
 
     // JOGL
