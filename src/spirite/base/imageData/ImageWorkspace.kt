@@ -5,9 +5,10 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.mediums.BuiltMediumData
-import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
+import spirite.base.imageData.undo.IUndoEngine
+import spirite.base.imageData.undo.UndoEngine
 import spirite.base.util.linear.MutableTransform
 import java.io.File
 
@@ -76,7 +77,7 @@ class ImageWorkspace(
 
 ) : IImageWorkspace{
 
-    override val undoEngine = UndoEngine()
+    override val undoEngine = UndoEngine(this)
     override val mediumRepository = MediumRepository( undoEngine, this)
 
     override var width: Int
