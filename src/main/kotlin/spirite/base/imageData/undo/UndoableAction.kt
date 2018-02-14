@@ -9,8 +9,8 @@ sealed class  UndoableAction {
     abstract val description : String
     abstract fun performAction()
     abstract fun undoAction()
-    fun onDispatch() {}
-    fun onAdd() {}
+    open fun onDispatch() {}
+    open fun onAdd() {}
 }
 
 abstract class ImageAction(
@@ -23,6 +23,7 @@ abstract class ImageAction(
 
     open fun performNonimageAction() {}
     abstract fun performImageAction( built: BuiltMediumData)
+    open val isHeavy = false
 }
 
 /**
@@ -33,16 +34,31 @@ abstract class NullAction() : UndoableAction() {
 }
 
 class CompositeAction(
-        actions: List<UndoableAction>,
+        actions: Iterable<UndoableAction>,
         override val description: String
 ) : UndoableAction() {
-    val actions = actions.toTypedArray()
+
+    internal val actions : List<UndoableAction>
+    init {
+        // Clear all CompositeActions from the list and replace them with
+        //	their list of action.
+        val sanitized = mutableListOf<UndoableAction>()
+
+        actions.forEach { action ->
+            when( action) {
+                is CompositeAction -> action.actions.forEach { sanitized.add(it)}
+                else -> sanitized.add(action)
+            }
+        }
+
+        this.actions = sanitized
+    }
 
     override fun performAction() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        actions.forEach { it.performAction() }
     }
 
     override fun undoAction() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        actions.asReversed().forEach { it.undoAction() }
     }
 }

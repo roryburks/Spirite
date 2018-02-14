@@ -5,6 +5,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.then
 import spirite.debug.SpiriteException
+import spirite.hybrid.MDebug
 
 interface IUndoEngine {
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/
@@ -28,8 +29,8 @@ interface IUndoEngine {
     fun performAndStore( action: UndoableAction)
     fun doAsAggregateAction( runner: () -> Unit, description: String)
 
-    fun undo()
-    fun redo()
+    fun undo() : Boolean
+    fun redo() : Boolean
     fun cleanup()
 }
 
@@ -41,16 +42,13 @@ class UndoIndex(
 class UndoEngine(
         val workspace: IImageWorkspace
 ) : IUndoEngine {
-    init {
-        reset()
-    }
 
-    private lateinit var nullContext : NullContext
-    private lateinit var compositeContext: CompositeContext
+    private var nullContext : NullContext = NullContext()
     private val imageContexts = mutableListOf<ImageContext>()
-
+    private var compositeContext: CompositeContext = CompositeContext(nullContext, imageContexts)
     private val contexts get()
             = SinglyList(nullContext).then(SinglyList(compositeContext)).then(imageContexts)
+
     private val undoQueue = mutableListOf<UndoContext<*>>()
     private var _queuePosition = 0
     private var saveSpot = 0
@@ -61,10 +59,12 @@ class UndoEngine(
         _queuePosition = 0
         imageContexts.clear()
         saveSpot = 0
+        nullContext = NullContext()
+        compositeContext = CompositeContext(nullContext, imageContexts)
     }
 
     override var queuePosition: Int
-        get() = TODO("not implemented")
+        get() = _queuePosition
         set(value) {}
     override val dataUsed: Set<MediumHandle> get() {
         val set = mutableSetOf<MediumHandle>()
@@ -78,12 +78,12 @@ class UndoEngine(
     override val isAtSaveSpot: Boolean = (saveSpot == _queuePosition)
 
     override val undoHistory: List<UndoIndex> get() {
-        val contextIterators = contexts.map { Pair(it, it.iterator()) }.toMap()
-
-        // Note hidden complexity: iterating multiple iterators within iterator
-        return undoQueue.map { UndoIndex(it.medium, contextIterators[it]!!.next() )}
+        // Note: Hidden complexity: iterating multiple iterators within iterator
+        contexts.forEach { it.startIteration() }
+        return undoQueue.map {UndoIndex(it.medium, it.iterateNext() )}
     }
 
+    // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction)
             imageContexts.add( ImageContext( action.building.handle))
@@ -147,6 +147,28 @@ class UndoEngine(
         cull()
     }
 
+    override fun undo() : Boolean {
+        if( _queuePosition == 0)
+            return false
+        else {
+            --_queuePosition
+            undoQueue[_queuePosition].undo()
+            triggerUndo()
+            return true
+        }
+    }
+
+    override fun redo() : Boolean {
+        if( _queuePosition == undoQueue.size)
+            return false
+        else {
+            undoQueue[_queuePosition].redo()
+            ++_queuePosition
+            return true
+        }
+    }
+    // endregion
+
     // region Aggregate Action
     private val storeStack = mutableListOf<MutableList<UndoableAction>>()
     private var activeStoreState : MutableList<UndoableAction>? = null
@@ -175,19 +197,15 @@ class UndoEngine(
         // TODO
     }
 
-    override fun undo() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun redo() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun cleanup() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun triggerHistoryChanged() {
+
+    }
+    private fun triggerUndo() {
 
     }
 }

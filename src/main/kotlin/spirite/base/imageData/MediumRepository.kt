@@ -11,6 +11,10 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 interface IMediumRepository {
     fun getData( i: Int) : IMedium
     fun clearUnusedCache()
+
+    /** WARNING: This method directly replaces the underlying data and us NOT UNDOABLE.  In general should only be called
+     * by the UndoEngine. */
+    fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
 }
 
 class MediumRepository(
@@ -49,5 +53,11 @@ class MediumRepository(
             mediumData[it]?.flush()
             mediumData.remove(it)
         }
+    }
+
+    override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {
+        val oldMedium = mediumData[handle.id]
+        mediumData.put( handle.id, newMedium)
+        oldMedium?.flush()
     }
 }
