@@ -100,7 +100,7 @@ data class MediumHandle(
 //    // !!! END BAD
 //
     fun refresh() {
-        TODO("Not implemented")
+        //TODO("Not implemented")
         // Construct ImageChangeEvent and send it
 //        val evt = ImageChangeEvent()
 //        evt.workspace = context

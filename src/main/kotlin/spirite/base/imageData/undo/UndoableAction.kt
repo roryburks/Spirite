@@ -43,6 +43,7 @@ class CompositeAction(
     init {
         // Clear all CompositeActions from the list and replace them with
         //	their list of action.
+        // Note: No need for recursive checking as CompositeAction is closed to inheritance.
         val sanitized = mutableListOf<UndoableAction>()
 
         actions.forEach { action ->

@@ -16,7 +16,8 @@ class CompositeContext(
 
     override val medium: MediumHandle? = null
     private val actions = mutableListOf<CompositeAction>()
-    private var pointer = 0
+    var pointer = 0 ; private set
+    val size get() = actions.size
 
     override fun addAction(action: CompositeAction) {
         action.actions.forEach { innerAction ->
@@ -29,6 +30,8 @@ class CompositeContext(
                         imageContext = ImageContext(innerAction.building.handle)
                         imageContexts.add(imageContext)
                     }
+
+                    imageContext.addAction( innerAction)
                 }
                 else -> MDebug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${innerAction::class}")
             }
@@ -61,6 +64,7 @@ class CompositeContext(
     override fun clipTail() {
         actions[0].onDispatch()
         actions.removeAt(0)
+        pointer--
     }
 
     override fun isEmpty() = actions.isEmpty()

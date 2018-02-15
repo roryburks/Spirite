@@ -17,6 +17,7 @@ private class ThenIterable<T>
                 doneFirst -> false
                 else -> {
                     iterator = second.iterator()
+                    doneFirst = true
                     iterator.hasNext()
                 }
             }
@@ -27,6 +28,7 @@ private class ThenIterable<T>
                 iterator.hasNext() || doneFirst -> iterator.next()
                 else -> {
                     iterator = second.iterator()
+                    doneFirst = true
                     iterator.next()
                 }
             }

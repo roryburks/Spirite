@@ -1,28 +1,32 @@
 package sjunit.spirite.imageData.undo
 
 import io.mockk.mockk
+import sjunit.spirite.imageData.undo.ImageContextTests.TestImageAction
+import sjunit.spirite.imageData.undo.NullContextTests.TestNullAction
+import spirite.base.imageData.BuildingMediumData
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.undo.NullAction
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.undo.CompositeAction
 import spirite.base.imageData.undo.UndoEngine
-import spirite.base.imageData.undo.UndoableAction
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import org.junit.Test as test
 
 class UndoEngineTests {
-    val _mockImageWorkspace = mockk<IImageWorkspace>(relaxed = true)
-    val engine = UndoEngine( _mockImageWorkspace)
+    private val _mockImageWorkspace = mockk<IImageWorkspace>(relaxed = true)
+    private val engine = UndoEngine( _mockImageWorkspace)
 
     @test fun testPerforms() {
-        val action1 = TestUndoAction()
+        val action1 = TestNullAction()
         engine.performAndStore( action1)
         assertEquals(1, action1.performCount)
         assertEquals(1, engine.queuePosition)
     }
 
     @test fun testPerforms3() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
-        val action3 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
         engine.performAndStore( action1)
         engine.performAndStore( action2)
         engine.performAndStore( action3)
@@ -32,9 +36,9 @@ class UndoEngineTests {
         assertEquals(3, engine.queuePosition)
     }
     @test fun testPerformsAndUndos3() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
-        val action3 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
         engine.performAndStore( action1)
         engine.performAndStore( action2)
         engine.performAndStore( action3)
@@ -56,8 +60,8 @@ class UndoEngineTests {
         assertEquals(3, engine.queuePosition)
     }
     @test fun handlesOverflowUndosAndRedos() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
         engine.performAndStore( action1)
         engine.performAndStore( action2)
         engine.undo()
@@ -79,22 +83,17 @@ class UndoEngineTests {
         assertEquals(2, engine.queuePosition)
     }
 
+    @test fun constructsProperHistory() {
+        val actions = listOf(
+                TestNullAction(),
+                TestImageAction(BuildingMediumData( MediumHandle(_mockImageWorkspace, 1))),
+                CompositeAction(List(2,{TestNullAction()}), "description"),
+                TestImageAction(BuildingMediumData( MediumHandle(_mockImageWorkspace, 2))),
+                TestNullAction())
+        actions.forEach { engine.performAndStore(it) }
 
-    class TestUndoAction() : NullAction() {
-        var performCount = 0
-        var undoCount = 0
-        var met = 0
+        val history = engine.undoHistory
 
-        override val description: String get() = "TUA"
-
-        override fun performAction() {
-            met++
-            performCount++
-        }
-
-        override fun undoAction() {
-            met--
-            undoCount++
-        }
+        actions.zip(history, {action, history -> assertSame(action, history.action)})
     }
 }

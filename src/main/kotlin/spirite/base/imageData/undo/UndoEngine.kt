@@ -117,7 +117,7 @@ class UndoEngine(
         }
 
         // Determine the context for the given Action and add it
-        val context = when( action) {
+        val context : UndoContext<*> = when( action) {
             is NullAction -> {
                 nullContext.addAction( action)
                 nullContext
@@ -127,13 +127,13 @@ class UndoEngine(
                 compositeContext
             }
             is ImageAction -> {
-                var imageContext = contexts.find { it.medium == action.building.handle }
+                var imageContext = imageContexts.find { it.medium == action.building.handle }
 
                 if( imageContext == null) {
                     imageContext = ImageContext(action.building.handle)
                     imageContexts.add(imageContext)
                 }
-
+                imageContext.addAction(action)
                 imageContext
             }
         }

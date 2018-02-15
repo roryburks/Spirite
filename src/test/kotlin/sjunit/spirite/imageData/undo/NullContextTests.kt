@@ -15,9 +15,9 @@ class NullContextTests {
     val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
 
     @test fun doesUndoRedo3() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
-        val action3 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
         underTest.addAction(action1)
         underTest.addAction(action2)
         underTest.addAction(action3)
@@ -36,9 +36,9 @@ class NullContextTests {
     }
 
     @test fun clipsHead() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
-        val action3 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
         underTest.addAction(action1)
         underTest.addAction(action2)
         underTest.addAction(action3)
@@ -61,9 +61,9 @@ class NullContextTests {
     }
 
     @test fun clipsTail() {
-        val action1 = TestUndoAction()
-        val action2 = TestUndoAction()
-        val action3 = TestUndoAction()
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
         underTest.addAction(action1)
         underTest.addAction(action2)
         underTest.addAction(action3)
@@ -83,10 +83,10 @@ class NullContextTests {
     @test fun getsDependencies() {
         val mediumHandle1 = MediumHandle(mockWorkspace, 1)
         val mediumHandle2 = MediumHandle(mockWorkspace, 2)
-        val action1 = TestUndoAction(mediumHandle1)
-        val action2 = TestUndoAction(mediumHandle2)
-        val action3 = TestUndoAction(mediumHandle2)
-        val action4 = TestUndoAction()
+        val action1 = TestNullAction(mediumHandle1)
+        val action2 = TestNullAction(mediumHandle2)
+        val action3 = TestNullAction(mediumHandle2)
+        val action4 = TestNullAction()
         underTest.getImageDependencies()
         underTest.addAction(action1)
         underTest.addAction(action2)
@@ -101,7 +101,7 @@ class NullContextTests {
     }
 
 
-    class TestUndoAction(
+    class TestNullAction(
             val mediumHandle: MediumHandle? = null
     ) : NullAction() {
         var performCount = 0
