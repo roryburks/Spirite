@@ -161,7 +161,7 @@ class ImageContext(override val medium: MediumHandle) : UndoContext<ImageAction>
         }
         override fun onDispatch() {
             // Most of the times, this should be the only thing that has
-            //	a handle on the CachedImage, but in special cases, the
+            //	a medium on the CachedImage, but in special cases, the
             //	cached image might have been passed to it, so a multi-user
             //	scheme is relevant.
             frame.flush()

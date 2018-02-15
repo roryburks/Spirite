@@ -15,9 +15,7 @@ class MatrixSpaceTests {
                 Pair("S1", "S4") to Transform.TranslationMatrix(100f, 100f)
         )
 
-        val space = MatrixSpace(
-                map
-        )
+        val space = MatrixSpace(map)
         val verifyMap = mutableMapOf(
                 Pair("S1","S2") to Vec2(50f,50f),
                 Pair("S1","S3") to Vec2(75f,75f),

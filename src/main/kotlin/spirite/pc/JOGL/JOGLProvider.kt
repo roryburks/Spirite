@@ -3,8 +3,8 @@ package spirite.pc.JOGL
 import com.jogamp.opengl.*
 
 object JOGLProvider {
-    val drawable: GLOffscreenAutoDrawable
-    val gl : GL
+    private val drawable: GLOffscreenAutoDrawable
+    private val gl : GL
 
     fun getGL() : JOGL{
         this.gl.gl.context.makeCurrent()
