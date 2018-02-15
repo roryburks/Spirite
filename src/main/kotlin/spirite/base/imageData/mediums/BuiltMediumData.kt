@@ -2,7 +2,6 @@ package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.BuildingMediumData
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.linear.MatrixSpace
 import spirite.base.util.linear.Transform

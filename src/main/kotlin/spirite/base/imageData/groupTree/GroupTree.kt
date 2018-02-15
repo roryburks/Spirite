@@ -1,12 +1,11 @@
-package spirite.base.imageData
+package spirite.base.imageData.groupTree
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import spirite.base.graphics.RenderProperties
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.Layer
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
-import kotlin.reflect.KProperty
 
 /**
  * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical
@@ -17,14 +16,10 @@ class GroupTree(
 ) {
     val root = GroupNode()
 
-
-    //interface Node
-
     abstract inner class Node(
             parent: GroupNode?,
             name: String
     ) {
-
         // Properties
         var render : RenderProperties by OnChangeDelegate(RenderProperties(), {})
         var x : Int by OnChangeDelegate(0, {})
@@ -37,7 +32,7 @@ class GroupTree(
 
         val depth : Int get() {
             // Note: non-looping integrity is handled by the insert/change parent functionality
-            var node : GroupTree.Node? = this
+            var node : Node? = this
             var d = 0
             while( node != root) {
                 ++d
@@ -50,7 +45,7 @@ class GroupTree(
         val tree get() = this@GroupTree
 
         fun getDepthFrom( ancestor: Node) : Int {
-            var node : GroupTree.Node? = this
+            var node : Node? = this
             var d = 0
             while( node != ancestor) {
                 ++d
@@ -78,7 +73,7 @@ class GroupTree(
         /**
          * Gets ancestors of the current node such that a certain predicate is true.
          * @param checkChildren If Null, will always check children. */
-        fun getAllNodesSuchThat( predicate : (Node) -> Boolean, checkChildren : ((GroupNode) -> Boolean)? = null) : List<Node> {
+        fun getAllNodesSuchThat(predicate : (Node) -> Boolean, checkChildren : ((GroupNode) -> Boolean)? = null) : List<Node> {
             val list = mutableListOf<Node>()
 
             fun sub(nodes: List<Node>) {
@@ -130,7 +125,7 @@ class GroupTree(
     }
 
     inner class GroupNode: Node {
-        constructor( parent: GroupNode?, name: String) : super(parent, name)
+        constructor(parent: GroupNode?, name: String) : super(parent, name)
         internal constructor() : super(null, "ROOT")
 
         val children: List<Node> get() = _children
@@ -148,7 +143,7 @@ class GroupTree(
             return list
         }
 
-        fun add(  toAdd: Node, before: Node?) {
+        fun add(toAdd: Node, before: Node?) {
             // if( toAdd.tree != this@GroupTree)
             // Todo
 

@@ -1,7 +1,7 @@
 package sjunit.spirite.imageData.undo
 
 import io.mockk.mockk
-import spirite.base.imageData.BuildingMediumData
+import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.BuiltMediumData
@@ -16,9 +16,9 @@ class ImageContextTests {
     val contextUnderTest = ImageContext(mediumHandle)
 
     @test fun doesUndoRedo3() {
-        val action1 = TestImageAction( BuildingMediumData(mediumHandle))
-        val action2 = TestImageAction( BuildingMediumData(mediumHandle))
-        val action3 = TestImageAction( BuildingMediumData(mediumHandle))
+        val action1 = TestImageAction(BuildingMediumData(mediumHandle))
+        val action2 = TestImageAction(BuildingMediumData(mediumHandle))
+        val action3 = TestImageAction(BuildingMediumData(mediumHandle))
         contextUnderTest.addAction(action1)
         contextUnderTest.addAction(action2)
         contextUnderTest.addAction(action3)

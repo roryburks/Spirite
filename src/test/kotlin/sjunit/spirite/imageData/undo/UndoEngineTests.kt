@@ -3,7 +3,7 @@ package sjunit.spirite.imageData.undo
 import io.mockk.mockk
 import sjunit.spirite.imageData.undo.ImageContextTests.TestImageAction
 import sjunit.spirite.imageData.undo.NullContextTests.TestNullAction
-import spirite.base.imageData.BuildingMediumData
+import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.CompositeAction
@@ -86,9 +86,9 @@ class UndoEngineTests {
     @test fun constructsProperHistory() {
         val actions = listOf(
                 TestNullAction(),
-                TestImageAction(BuildingMediumData( MediumHandle(_mockImageWorkspace, 1))),
+                TestImageAction(BuildingMediumData(MediumHandle(_mockImageWorkspace, 1))),
                 CompositeAction(List(2,{TestNullAction()}), "description"),
-                TestImageAction(BuildingMediumData( MediumHandle(_mockImageWorkspace, 2))),
+                TestImageAction(BuildingMediumData(MediumHandle(_mockImageWorkspace, 2))),
                 TestNullAction())
         actions.forEach { engine.performAndStore(it) }
 

@@ -4,7 +4,6 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.BuildingMediumData
 import spirite.base.imageData.mediums.IMedium.InternalImageTypes
 import spirite.base.imageData.mediums.IMedium.InternalImageTypes.NORMAL
 import spirite.base.imageData.mediums.drawer.IImageDrawer
