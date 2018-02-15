@@ -1,7 +1,5 @@
 package spirite.base.util.groupExtensions
 
-import kotlin.math.sin
-
 class SinglyList<T>( val singly : T) : List<T> {
     override val size: Int get() = 1
 
@@ -41,7 +39,7 @@ class SinglyList<T>( val singly : T) : List<T> {
         override fun hasNext() = !done
 
         override fun next() = when {
-            done -> {
+            !done -> {
                 done = true
                 singly
             }
@@ -81,6 +79,5 @@ class SinglyList<T>( val singly : T) : List<T> {
             done -> 0
             else -> -1
         }
-
     }
 }

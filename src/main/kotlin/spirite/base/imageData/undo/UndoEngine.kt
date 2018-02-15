@@ -4,8 +4,6 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.then
-import spirite.debug.SpiriteException
-import spirite.hybrid.MDebug
 
 interface IUndoEngine {
     /** Cleans the slate, removing all undoable actions and reinitializing the base contexts*/
@@ -86,7 +84,7 @@ class UndoEngine(
     // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction)
-            imageContexts.add( ImageContext( action.building.handle))
+            imageContexts.add(ImageContext(action.building.handle))
 
         when {
             activeStoreState != null -> activeStoreState!!.add(action)

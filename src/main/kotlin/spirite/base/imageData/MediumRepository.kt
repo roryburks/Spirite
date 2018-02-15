@@ -1,6 +1,7 @@
 package spirite.base.imageData
 
 import spirite.base.imageData.mediums.IMedium
+import spirite.base.imageData.mediums.NillMedium
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -26,7 +27,7 @@ class MediumRepository(
     /** Locks the cache from being cleared. */
     var locked : Boolean = true
 
-    override fun getData(i: Int) = mediumData[i]!!
+    override fun getData(i: Int) = mediumData[i] ?: NillMedium
 
     override fun clearUnusedCache() {
         if( locked) return

@@ -21,6 +21,7 @@ abstract class ImageAction(
         building.doOnBuildData { performImageAction( it) }
     }
 
+    override fun undoAction() {}    // Can have an logical undoAction associated with it (shouldn't effect the image, though)
     open fun performNonimageAction() {}
     abstract fun performImageAction( built: BuiltMediumData)
     open val isHeavy = false

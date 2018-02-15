@@ -1,8 +1,15 @@
 package spirite.base.imageData.mediums
 
+import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
+import spirite.base.graphics.NillImage
+import spirite.base.graphics.RawImage
 import spirite.base.imageData.BuildingMediumData
+import spirite.base.imageData.mediums.IMedium.InternalImageTypes
+import spirite.base.imageData.mediums.IMedium.InternalImageTypes.NORMAL
 import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 
 
 /**
@@ -60,5 +67,33 @@ interface IMedium {
             }
         }
     }
+}
 
+object NillMedium : IMedium{
+    override val width: Int get() = 1
+    override val height: Int get() = 1
+    override val dynamicX: Int get() = 1
+    override val dynamicY: Int get() = 1
+    override val type: InternalImageTypes get() = NORMAL
+
+    override fun build(building: BuildingMediumData) = NillBuiltMedium(building)
+
+    override fun dupe() = this
+    override fun copyForSaving() = this
+    override fun flush() {}
+    override fun readOnlyAccess() = NillImage()
+    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    class NillBuiltMedium(building: BuildingMediumData) : BuiltMediumData(building) {
+        override val _sourceToComposite: Transform get() = Transform.IdentityMatrix
+        override val _screenToSource: Transform get() = Companion.IdentityMatrix
+        override val compositeWidth: Int get() = 1
+        override val compositeHeight: Int get() = 1
+        override val sourceWidth: Int get() = 1
+        override val sourceHeight: Int get() = 1
+        override fun _doOnGC(doer: (GraphicsContext) -> Unit) {}
+        override fun _doOnRaw(doer: (RawImage) -> Unit) {}
+    }
 }

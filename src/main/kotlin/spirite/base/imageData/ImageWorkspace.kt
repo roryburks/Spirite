@@ -27,7 +27,8 @@ class BuildingMediumData {
     }
 
     fun doOnBuildData( doer : (BuiltMediumData) -> Unit) {
-        //handle.context.doOnBuiltData(this, doer)
+        val medium = handle.context.mediumRepository.getData(handle.id)
+        doer.invoke( medium.build(this))
     }
 
 }
