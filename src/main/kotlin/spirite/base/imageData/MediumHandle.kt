@@ -39,22 +39,9 @@ data class MediumHandle(
     // These variables are essentially final, but may take a while to be set
     val width: Int; get() = workspace.mediumRepository.getData(id).width ?: 1
     val height: Int; get() = workspace.mediumRepository.getData(id).height ?: 1
-    //val isDynamic: Boolean get() = workspace?.getData(id) is DynamicMedium
-    val dynamicX: Int get() = workspace.mediumRepository.getData(id).dynamicX ?: 0
-    val dynamicY: Int get() = workspace.mediumRepository.getData(id).dynamicY ?: 0
 
     /** Returns a null-workspace duplicate (just preserves the ID)  */
     fun dupe() = MutableHandle(null, id)
-
-
-    /** Should only be used for reading/copying in things that need direct
-     * access to the BufferedImage.
-     *
-     * RETURN VALUE SHOULD NEVER BE STORED LONG-TERM, if used for writing,
-     * will not trigger proper Observers.  And probably other bad stuff
-     * will happen if it sticks around in GC
-     */
-    fun deepAccess(): IImage? = workspace.mediumRepository.getData(id).readOnlyAccess()
 
     fun drawLayer(
             gc: GraphicsContext, transform: Transform, composite: Composite, alpha: Float) {

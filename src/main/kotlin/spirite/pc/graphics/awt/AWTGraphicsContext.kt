@@ -111,14 +111,6 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun drawImage(img: IImage, x: Int, y: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun drawHandle(handle: MediumHandle, x: Int, y: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -134,9 +126,4 @@ class AWTGraphicsContext : GraphicsContext {
     override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    override fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 }

@@ -203,18 +203,6 @@ class GLGraphicsContext : GraphicsContext {
 
     // region Images
 
-    override fun drawImage(img: IImage, x: Int, y: Int) {
-        cachedParams.texture1 = ImageConverter(gle).convert<GLImage>(img)
-
-        applyPassProgram( RenderCall(alpha, 0, false, STRAIGHT_PASS),
-                cachedParams, _trans, x + 0f, y + 0f, x + img.width + 0f, y + img.height + 0f)
-
-        cachedParams.texture1 = null
-    }
-
-    override fun drawHandle(handle: MediumHandle, x: Int, y: Int) =
-            drawImage( handle.deepAccess() ?: throw Exception("Handle Missing Data"), x, y)
-
     override fun dispose() { if( gle.target == image?.tex) gle.target = null}
 
     override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties) {
@@ -267,9 +255,6 @@ class GLGraphicsContext : GraphicsContext {
         applyPassProgram( RenderCall( alpha, render.method.renderValue, false, renderAlgorithm),
                 params, transform, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
-
-    override fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties) =
-            renderImage(handle.deepAccess() ?: throw Exception("Tried to render empty image"), x, y, render)
 
     // endregion
 

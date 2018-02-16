@@ -68,10 +68,6 @@ abstract class GraphicsContext {
     abstract fun fillRect(x: Int, y: Int, w: Int, h: Int)
     abstract fun fillOval(x: Int, y: Int, w: Int, h: Int)
 
-
-    abstract fun drawImage(img: IImage, x: Int, y: Int)
-    abstract fun drawHandle(handle: MediumHandle, x: Int, y: Int)
-
     abstract fun fillPolygon(x: List<Float>, y: List<Float>, length: Int)
 
     abstract fun setClip(i: Int, j: Int, width: Int, height: Int)
@@ -83,8 +79,7 @@ abstract class GraphicsContext {
     abstract fun dispose()
 
 
-    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties)
-    abstract fun renderHandle(handle: MediumHandle, x: Int, y: Int, render: RenderProperties)
+    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties = RenderProperties())
 
 
     private val transformStack = Stack<Transform>()

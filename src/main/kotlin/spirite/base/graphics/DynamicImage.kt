@@ -13,7 +13,6 @@ import spirite.hybrid.EngineLaunchpoint
  *	other mediums commonly use this behavior, putting it in its own scope.
  */
 class DynamicImage(
-        val workspace: IImageWorkspace,
         raw: RawImage,
         xOffset: Int = 0,
         yOffset: Int = 0)
@@ -25,19 +24,24 @@ class DynamicImage(
     val width = base.width
     val height = base.height
 
-    fun doOnGC( doer: (GraphicsContext) -> Unit, transform: Transform) {
+    fun drawToImage(drawer: (RawImage) -> Unit,
+                    compositingWidth: Int,
+                    compositingHeight: Int
+                    tBaseToCompositing: Transform, useBaseOrientation: Boolean = false) {
+
     }
 
     // region Checkin/Checkout
     private var checkoutCount = 0
     private var workingTransform : Transform? = null
     private var buffer: RawImage? = null
+
     private fun checkoutRaw( transform: Transform) : RawImage {
         if( checkoutCount++ == 0) {
             workingTransform = transform
             buffer = EngineLaunchpoint.createImage(1,1)
             val gc = buffer!!.graphics
-            gc.drawImage(base, xOffset, yOffset)
+            //gc.drawImage(base, xOffset, yOffset)
         }
         return buffer!!
     }

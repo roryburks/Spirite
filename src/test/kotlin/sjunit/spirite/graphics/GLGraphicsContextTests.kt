@@ -44,7 +44,7 @@ class GLGraphicsContextTests {
         val toImage = GLImage(30,30, gle)
         val togc = toImage.graphics
         togc.setComposite(SRC_OVER, 0.5f)
-        togc.drawImage( subImg, 5, 5)
+        togc.renderImage( subImg, 5, 5)
 
         val color = toImage.getColor(19,19)
         assertEquals(1.0f, color.red)
