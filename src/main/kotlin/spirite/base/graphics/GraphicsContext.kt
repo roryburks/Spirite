@@ -78,7 +78,7 @@ abstract class GraphicsContext {
 
     /** Marks the Graphic Context as no longer being used.  Strictly speaking,
      * calling this method shouldn't be necessary, but that relies on native
-     * implementations of AWT's Graphics context.
+     * implementations of AWT's Graphics workspace.
      */
     abstract fun dispose()
 

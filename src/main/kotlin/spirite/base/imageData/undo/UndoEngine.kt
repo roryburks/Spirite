@@ -116,7 +116,7 @@ class UndoEngine(
             // TODO
         }
 
-        // Determine the context for the given Action and add it
+        // Determine the workspace for the given Action and add it
         val context : UndoContext<*> = when( action) {
             is NullAction -> {
                 nullContext.addAction( action)

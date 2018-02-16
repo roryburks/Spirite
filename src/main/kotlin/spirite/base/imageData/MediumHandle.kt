@@ -4,8 +4,6 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.graphics.IImage
 import spirite.base.util.linear.Transform
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType
 
 
 /**
@@ -15,7 +13,7 @@ import spirite.hybrid.MDebug.WarningType
  * otherwise their low-level Graphical resources will only be released when
  * the GC gets around to clearing them.
  *
- * Null-context MediumHandles can be created but their intended use is for
+ * Null-workspace MediumHandles can be created but their intended use is for
  * the LoadEngine which loads the logical structure then links the ImageData,
  * to avoid navigating a complex or even cyclical hierarchy of references
  * but can presumably be used in a similar fashion, but this is discouraged.
@@ -34,18 +32,18 @@ class MutableHandle(
 )
 
 data class MediumHandle(
-        val context: IImageWorkspace,
+        val workspace: IImageWorkspace,
         val id: Int
 )
 {
     // These variables are essentially final, but may take a while to be set
-    val width: Int; get() = context.mediumRepository.getData(id).width ?: 1
-    val height: Int; get() = context.mediumRepository.getData(id).height ?: 1
-    //val isDynamic: Boolean get() = context?.getData(id) is DynamicMedium
-    val dynamicX: Int get() = context.mediumRepository.getData(id).dynamicX ?: 0
-    val dynamicY: Int get() = context.mediumRepository.getData(id).dynamicY ?: 0
+    val width: Int; get() = workspace.mediumRepository.getData(id).width ?: 1
+    val height: Int; get() = workspace.mediumRepository.getData(id).height ?: 1
+    //val isDynamic: Boolean get() = workspace?.getData(id) is DynamicMedium
+    val dynamicX: Int get() = workspace.mediumRepository.getData(id).dynamicX ?: 0
+    val dynamicY: Int get() = workspace.mediumRepository.getData(id).dynamicY ?: 0
 
-    /** Returns a null-context duplicate (just preserves the ID)  */
+    /** Returns a null-workspace duplicate (just preserves the ID)  */
     fun dupe() = MutableHandle(null, id)
 
 
@@ -56,7 +54,7 @@ data class MediumHandle(
      * will not trigger proper Observers.  And probably other bad stuff
      * will happen if it sticks around in GC
      */
-    fun deepAccess(): IImage? = context.mediumRepository.getData(id).readOnlyAccess()
+    fun deepAccess(): IImage? = workspace.mediumRepository.getData(id).readOnlyAccess()
 
     fun drawLayer(
             gc: GraphicsContext, transform: Transform, composite: Composite, alpha: Float) {
@@ -71,31 +69,31 @@ data class MediumHandle(
 
     fun drawLayer(gc: GraphicsContext, transform: Transform) {
         var transform = transform
-        val ii = context.mediumRepository.getData(id) ?: return
+        val ii = workspace.mediumRepository.getData(id) ?: return
 
         //gc.drawHandle(this, ii.dynamicX, ii.dynamicY)
     }
 
     // !!! START BAD
 //    fun drawBehindStroke(gc: GraphicsContext) {
-//        if (context == null) {
-//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")
+//        if (workspace == null) {
+//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a workspace-less image.")
 //            return
 //        }
-//        val ii = context!!.getData(id)
+//        val ii = workspace!!.getData(id)
 //        if (ii is PrismaticMedium) {
-//            ii.drawBehind(gc, context!!.paletteManager.getActiveColor(0))
+//            ii.drawBehind(gc, workspace!!.paletteManager.getActiveColor(0))
 //        } else
 //            gc.drawHandle(this, 0, 0)
 //    }
 //
 //    fun drawInFrontOfStroke(gc: GraphicsContext) {
-//        if (context == null) {
-//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a context-less image.")
+//        if (workspace == null) {
+//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a workspace-less image.")
 //            return
 //        }
-//        val ii = context!!.getData(id)
-//        (ii as? PrismaticMedium)?.drawFront(gc, context!!.paletteManager.getActiveColor(0))
+//        val ii = workspace!!.getData(id)
+//        (ii as? PrismaticMedium)?.drawFront(gc, workspace!!.paletteManager.getActiveColor(0))
 //    }
 //    // !!! END BAD
 //
@@ -103,8 +101,8 @@ data class MediumHandle(
         //TODO("Not implemented")
         // Construct ImageChangeEvent and send it
 //        val evt = ImageChangeEvent()
-//        evt.workspace = context
+//        evt.workspace = workspace
 //        evt.dataChanged.add(this)
-//        context!!.triggerImageRefresh(evt)
+//        workspace!!.triggerImageRefresh(evt)
     }
 }

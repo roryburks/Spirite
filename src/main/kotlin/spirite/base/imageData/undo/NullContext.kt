@@ -5,7 +5,7 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL_MINOR
 
 /***
- * NullContext is a special context that is not associated with any ImageData
+ * NullContext is a special workspace that is not associated with any ImageData
  * As such the concept of keyframes to work from doesn't make sense.  Instead
  * Each task is stored.  But since you are not strictly working forwards, the
  * UndoActions associated with NullContext must have two-way methods for

@@ -4,8 +4,8 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.mediums.IMedium.InternalImageTypes
-import spirite.base.imageData.mediums.IMedium.InternalImageTypes.NORMAL
+import spirite.base.imageData.mediums.IMedium.MediumType
+import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion
@@ -27,72 +27,71 @@ import spirite.base.util.linear.Transform.Companion
 interface IMedium {
     val width: Int
     val height: Int
-    val dynamicX: Int
-    val dynamicY: Int
-    val type: InternalImageTypes
-
+    val type: MediumType
     fun build(building: BuildingMediumData): BuiltMediumData
-    fun dupe(): IMedium
-    fun copyForSaving(): IMedium    // Probably not best to offload this work to individual
-    // internal image types, but it's the least immediate work
-    fun flush()
-
-    fun readOnlyAccess(): IImage
     fun getImageDrawer(building: BuildingMediumData): IImageDrawer
 
-    enum class InternalImageTypes private constructor(
+    fun draw( gc: GraphicsContext)
+
+    fun dupe(): IMedium
+    fun flush()
+
+    enum class MediumType constructor(
             // This way, these values can be used in saving and loading without failing when
             //	an Enum is removed
-            val permanentCode: Int, val userCreateable: Boolean = true
-    ) {
-        NORMAL(0),
+            val permanentCode: Int,
+            // Whether or not the user can directly create them (if they'll show up on the "Create Simple Layer" screen)
+            val userCreatable: Boolean = true)
+    {
+        FLAT(0),
         DYNAMIC(1),
         PRISMATIC(2),
         MAGLEV(3),
         DERIVED_MAGLEV(4, false);
 
-        fun fromCode(code: Int): InternalImageTypes? {
-            val values = InternalImageTypes.values()
-
-            return values.indices
-                    .firstOrNull { values[it].permanentCode == code }
-                    ?.let { values[it] }
-        }
-
         companion object {
-            val creatableTypes: Array<InternalImageTypes> by lazy {
-                val creatables = InternalImageTypes.values().asList()
-                return@lazy creatables.filter { it.userCreateable }.toTypedArray()
+            fun fromCode(code: Int): MediumType? {
+                val values = MediumType.values()
+
+                return values.indices
+                        .firstOrNull { values[it].permanentCode == code }
+                        ?.let { values[it] }
+            }
+
+            val creatableTypes: Array<MediumType> by lazy {
+                MediumType.values().asList().filter { it.userCreatable }.toTypedArray()
             }
         }
     }
 }
 
-object NillMedium : IMedium{
-    override val width: Int get() = 1
-    override val height: Int get() = 1
-    override val dynamicX: Int get() = 1
-    override val dynamicY: Int get() = 1
-    override val type: InternalImageTypes get() = NORMAL
-
-    override fun build(building: BuildingMediumData) = NillBuiltMedium(building)
-
-    override fun dupe() = this
-    override fun copyForSaving() = this
-    override fun flush() {}
-    override fun readOnlyAccess() = NillImage()
-    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+abstract class IComplexMedium : IMedium {
+    override fun draw( gc: GraphicsContext) {
+        drawBehindStroke(gc)
+        drawInFrontOfStroke(gc)
     }
 
-    class NillBuiltMedium(building: BuildingMediumData) : BuiltMediumData(building) {
-        override val _sourceToComposite: Transform get() = Transform.IdentityMatrix
-        override val _screenToSource: Transform get() = Companion.IdentityMatrix
-        override val compositeWidth: Int get() = 1
-        override val compositeHeight: Int get() = 1
-        override val sourceWidth: Int get() = 1
-        override val sourceHeight: Int get() = 1
+    abstract fun drawBehindStroke( gc: GraphicsContext)
+    abstract fun drawInFrontOfStroke( gc: GraphicsContext)
+}
+
+object NilMedium : IMedium {
+    override val width: Int get() = 1
+    override val height: Int get() = 1
+    override val type: MediumType get() = FLAT
+
+    override fun build(building: BuildingMediumData) = NilBuiltMedium(building)
+
+    override fun dupe() = this
+    override fun flush() {}
+    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
+    override fun draw(gc: GraphicsContext) {}
+
+    class NilBuiltMedium(building: BuildingMediumData) : BuiltMediumData(building) {
+        override val width: Int get() = 1
+        override val height: Int get() = 1
+        override val tCompositeToWorkspace: Transform get() = Companion.IdentityMatrix
         override fun _doOnGC(doer: (GraphicsContext) -> Unit) {}
-        override fun _doOnRaw(doer: (RawImage) -> Unit) {}
+        override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {}
     }
 }

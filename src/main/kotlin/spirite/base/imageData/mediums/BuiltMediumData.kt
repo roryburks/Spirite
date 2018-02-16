@@ -2,82 +2,47 @@ package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.MediumHandle
-import spirite.base.util.linear.MatrixSpace
 import spirite.base.util.linear.Transform
 import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType
+import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
-abstract class BuiltMediumData(
-        buildingMediumData: BuildingMediumData
-)
-{
-    private val SOURCE = "src"
-    private val COMPOSITE = "comp"
-    private val SCREEN = "screen"
+abstract class BuiltMediumData( val building: BuildingMediumData) {
+    // Composited Dimensions will be used (by HybridNodeRenderer and StrokeEngines), Dimensions of the underlying RawImage
+    //  will likely not be used.
+    /** width of the composited Image */
+    abstract val width : Int
+    /** height of the composited Image */
+    abstract val height: Int
 
-    val handle: MediumHandle = buildingMediumData.handle
-    protected val trans: Transform = buildingMediumData.trans
-    protected val invTrans by lazy {
-        trans.invert()
-    }
+    abstract val tCompositeToWorkspace: Transform
 
-    private val matrixSpace by lazy{
-        MatrixSpace(
-                mapOf(
-                        Pair(SOURCE, COMPOSITE) to _sourceToComposite,
-                        Pair( SCREEN, SOURCE) to _screenToSource
-                ))
-    }
-
-    val screenToComposite: Transform get() {return matrixSpace.convertSpace(SCREEN,COMPOSITE)}
-    val compositeToScreen : Transform get() {return matrixSpace.convertSpace(COMPOSITE,SCREEN)}
-    val screenToSource : Transform get() {return matrixSpace.convertSpace(SCREEN,SOURCE)}
-    val sourceToScreen: Transform get() {return matrixSpace.convertSpace(SOURCE,SCREEN)}
-    val sourceToComposite : Transform get() {return matrixSpace.convertSpace(SOURCE,COMPOSITE)}
-    val compositeToSource : Transform get() {return matrixSpace.convertSpace(COMPOSITE,SOURCE)}
-
-
-    // val screenToDynamic
-
-    protected abstract val _sourceToComposite: Transform
-    protected abstract val _screenToSource: Transform
-
-    abstract val compositeWidth: Int
-    abstract val compositeHeight: Int
-    abstract val sourceWidth: Int
-    abstract val sourceHeight: Int
-
-
-    // Todo: Once a greater portion of the code is in Kotlin, replace these
-    // Todo: with (GraphicsContext) -> Unit, etc
-    abstract protected fun _doOnGC(doer : (GraphicsContext) -> Unit)
-    abstract protected fun _doOnRaw( doer: (RawImage) -> Unit)
-
-
+    // Note: Can be changed to return Boolean if we want to be able to differentiate between image-changing calls and
+    //  non-image-changing calls (assuming there's ever a need for such a thing)
     private var doing = false
-    fun doOnGC( doer : (GraphicsContext) -> Unit) {
+    fun doOnGC( doer: (GraphicsContext) -> Unit) {
         if( doing) {
-            MDebug.handleError(ErrorType.STRUCTURAL,"Tried to recursively check-out")
+            MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         doing = true
         _doOnGC(doer)
         doing = false
-
-        handle.refresh()
+        building.handle.refresh()
     }
 
-    fun doOnRaw( doer: (RawImage) -> Unit) {
+    fun doOnRaw( doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
         if( doing) {
-            MDebug.handleError(ErrorType.STRUCTURAL,"Tried to recursively check-out")
+            MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         doing = true
         _doOnRaw(doer)
         doing = false
 
-        handle.refresh()
+        building.handle.refresh()
     }
+
+    protected abstract fun _doOnGC( doer: (GraphicsContext) -> Unit)
+    protected abstract fun _doOnRaw( doer: (RawImage, tMediumToRaw: Transform) -> Unit)
 
 }

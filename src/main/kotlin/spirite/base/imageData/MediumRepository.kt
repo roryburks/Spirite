@@ -1,7 +1,7 @@
 package spirite.base.imageData
 
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.NillMedium
+import spirite.base.imageData.mediums.NilMedium
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -27,7 +27,7 @@ class MediumRepository(
     /** Locks the cache from being cleared. */
     var locked : Boolean = true
 
-    override fun getData(i: Int) = mediumData[i] ?: NillMedium
+    override fun getData(i: Int) = mediumData[i] ?: NilMedium
 
     override fun clearUnusedCache() {
         if( locked) return
@@ -44,9 +44,9 @@ class MediumRepository(
                 .filter {undoImageIds.contains( it) || layerImageIds.contains(it)}
 
         // Make sure all used entries are tracked
-        if( layerImages.any { it.context != imageWorkspace || mediumData[it.id] == null })
+        if( layerImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
             MDebug.handleError(STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace")
-        if( undoImages.any { it.context != imageWorkspace || mediumData[it.id] == null })
+        if( undoImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
             MDebug.handleError(STRUCTURAL, "Untracked Image Data found from UndoEngine")
 
         // Remove Unused Entries

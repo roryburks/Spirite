@@ -16,7 +16,7 @@ val MAX_TICKS_PER_KEY = 10
  * changes are stored as images and the in-between frames are calculated working forward from that frame.
  */
 class ImageContext(override val medium: MediumHandle) : UndoContext<ImageAction> {
-    private val workspace get() = medium.context
+    private val workspace get() = medium.workspace
     private val actions = mutableListOf<ImageAction>()
     private var pointer = 0     // The poisition on the actionsList
     private var met = 0         // Amount of actions it's been since a keyframe
@@ -53,7 +53,7 @@ class ImageContext(override val medium: MediumHandle) : UndoContext<ImageAction>
         --pointer
         --met
         if( pointer < 0 )
-            MDebug.handleError(STRUCTURAL, "Internal Undo attempted before start of context.")
+            MDebug.handleError(STRUCTURAL, "Internal Undo attempted before start of workspace.")
 
         // Find the previous KeyframeAction
         if( met < 0) {

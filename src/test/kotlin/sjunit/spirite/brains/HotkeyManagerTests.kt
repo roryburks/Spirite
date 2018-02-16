@@ -13,7 +13,7 @@ class HotkeyManagerTests {
     val hotketManager = HotkeyManager(preferences)
 
     @test fun verifyDefaults() {
-        assertEquals("context.zoom_in", hotketManager.getCommand(Hotkey(KeyEvent.VK_ADD, 0)))
+        assertEquals("workspace.zoom_in", hotketManager.getCommand(Hotkey(KeyEvent.VK_ADD, 0)))
     }
     @test fun do1() {
         hotketManager.setCommand(Hotkey(KeyEvent.VK_A,0), "global.paste")

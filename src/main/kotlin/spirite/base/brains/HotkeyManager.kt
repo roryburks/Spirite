@@ -19,11 +19,11 @@ interface IHotkeyManager {
 }
 
 private val defaultHotkeys = mapOf(
-        "context.zoom_in" to (Hotkey( KeyEvent.VK_ADD, 0)),
-        "context.zoom_out" to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
-        "context.zoom_in_slow" to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
-        "context.zoom_out_slow" to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
-        "context.zoom_0" to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
+        "workspace.zoom_in" to (Hotkey( KeyEvent.VK_ADD, 0)),
+        "workspace.zoom_out" to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
+        "workspace.zoom_in_slow" to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
+        "workspace.zoom_out_slow" to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
+        "workspace.zoom_0" to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
 
         "toolset.PEN" to (Hotkey( KeyEvent.VK_P, 0)),
         "toolset.ERASER" to (Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK)),
