@@ -43,6 +43,6 @@ abstract class BuiltMediumData( val building: BuildingMediumData) {
     }
 
     protected abstract fun _doOnGC( doer: (GraphicsContext) -> Unit)
-    protected abstract fun _doOnRaw( doer: (RawImage, tMediumToRaw: Transform) -> Unit)
+    protected abstract fun _doOnRaw( doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit)
 
 }

@@ -49,7 +49,7 @@ class FlatMedium(
             doer.invoke( gc)
         }
         override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            doer.invoke( rawImage, tCompositeToWorkspace.invert())
+            doer.invoke( rawImage, tWorkspaceToRaw)
         }
     }
 }

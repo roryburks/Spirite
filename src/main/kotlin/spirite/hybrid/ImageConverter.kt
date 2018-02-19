@@ -45,7 +45,7 @@ class ImageConverter(
                     return ImageBI( from.toBufferedImage()) as T
             }
         }
-        MDebug.handleWarning(WarningType.UNSUPPORTED, "Unsupported Conversion (in HybridUtil).\nFrom:${from::class.java}\nTo:${T::class.java}")
+        MDebug.handleWarning(WarningType.UNSUPPORTED, "Unsupported Conversion (in ContentBoundsFinder).\nFrom:${from::class.java}\nTo:${T::class.java}")
         return NillImage() as T
     }
 

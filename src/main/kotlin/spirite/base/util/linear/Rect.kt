@@ -83,4 +83,6 @@ data class Rect(
                 (tw < tx || tw > rx) &&
                 (th < ty || th > ry)
     }
+
+    override fun toString() = "($x,$y),[$width x $height]"
 }
