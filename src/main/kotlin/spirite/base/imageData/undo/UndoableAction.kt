@@ -1,7 +1,7 @@
 package spirite.base.imageData.undo
 
-import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 
 

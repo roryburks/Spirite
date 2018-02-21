@@ -4,7 +4,6 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.groupExtensions.SinglyList
 
 class SimpleLayer(val medium: MediumHandle) : Layer() {

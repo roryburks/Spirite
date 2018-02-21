@@ -57,8 +57,8 @@ class ImageWorkspace(
 
 ) : IImageWorkspace{
 
-    override val undoEngine = UndoEngine(this)
-    override val mediumRepository = MediumRepository( undoEngine, this)
+    override val mediumRepository = MediumRepository( this)
+    override val undoEngine = UndoEngine(this, mediumRepository)
 
     override var width: Int
         get() = TODO("not implemented")

@@ -2,7 +2,6 @@ package spirite.base.imageData
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
-import spirite.base.graphics.IImage
 import spirite.base.util.linear.Transform
 
 

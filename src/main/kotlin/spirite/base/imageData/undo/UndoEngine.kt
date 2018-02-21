@@ -1,6 +1,7 @@
 package spirite.base.imageData.undo
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.then
@@ -38,12 +39,13 @@ class UndoIndex(
 
 
 class UndoEngine(
-        val workspace: IImageWorkspace
+        val workspace: IImageWorkspace,
+        val mediumRepo: MMediumRepository
 ) : IUndoEngine {
 
     private var nullContext : NullContext = NullContext()
     private val imageContexts = mutableListOf<ImageContext>()
-    private var compositeContext: CompositeContext = CompositeContext(nullContext, imageContexts)
+    private var compositeContext: CompositeContext = CompositeContext(nullContext, imageContexts, mediumRepo)
     private val contexts get()
             = SinglyList(nullContext).then(SinglyList(compositeContext)).then(imageContexts)
 
@@ -58,7 +60,7 @@ class UndoEngine(
         imageContexts.clear()
         saveSpot = 0
         nullContext = NullContext()
-        compositeContext = CompositeContext(nullContext, imageContexts)
+        compositeContext = CompositeContext(nullContext, imageContexts, mediumRepo)
     }
 
     override var queuePosition: Int
@@ -84,7 +86,7 @@ class UndoEngine(
     // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction)
-            imageContexts.add(ImageContext(action.building.handle))
+            imageContexts.add(ImageContext(action.building.handle, mediumRepo))
 
         when {
             activeStoreState != null -> activeStoreState!!.add(action)
@@ -130,7 +132,7 @@ class UndoEngine(
                 var imageContext = imageContexts.find { it.medium == action.building.handle }
 
                 if( imageContext == null) {
-                    imageContext = ImageContext(action.building.handle)
+                    imageContext = ImageContext(action.building.handle,mediumRepo)
                     imageContexts.add(imageContext)
                 }
                 imageContext.addAction(action)

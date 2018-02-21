@@ -1,6 +1,8 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.graphics.*
+import spirite.base.graphics.GraphicsContext
+import spirite.base.graphics.RawImage
+import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer

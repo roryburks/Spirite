@@ -3,9 +3,10 @@ package sjunit.spirite.imageData.undo
 import io.mockk.mockk
 import sjunit.spirite.imageData.undo.ImageContextTests.TestImageAction
 import sjunit.spirite.imageData.undo.NullContextTests.TestNullAction
-import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.undo.CompositeAction
 import spirite.base.imageData.undo.UndoEngine
 import kotlin.test.assertEquals
@@ -14,7 +15,8 @@ import org.junit.Test as test
 
 class UndoEngineTests {
     private val _mockImageWorkspace = mockk<IImageWorkspace>(relaxed = true)
-    private val engine = UndoEngine( _mockImageWorkspace)
+    val mockMediumRepo = mockk<MMediumRepository>(relaxed = true)
+    private val engine = UndoEngine( _mockImageWorkspace, mockMediumRepo)
 
     @test fun testPerforms() {
         val action1 = TestNullAction()

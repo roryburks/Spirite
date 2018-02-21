@@ -4,8 +4,6 @@ import spirite.base.graphics.*
 import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
-import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.STRAIGHT_PASS
-import spirite.base.imageData.MediumHandle
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.glu.GLC

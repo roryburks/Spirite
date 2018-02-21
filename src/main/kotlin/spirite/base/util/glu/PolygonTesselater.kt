@@ -4,7 +4,6 @@ import com.jogamp.opengl.glu.GLU
 import com.jogamp.opengl.glu.GLUtessellatorCallback
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor
-import java.util.ArrayList
 
 object PolygonTesselater {
     fun tesselatePolygon( x: List<Float>, y: List<Float>, count: Int) : GLPrimitive {

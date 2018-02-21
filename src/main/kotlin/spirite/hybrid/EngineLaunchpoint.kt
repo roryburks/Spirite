@@ -2,7 +2,6 @@ package spirite.hybrid
 
 import spirite.base.graphics.NillImage
 import spirite.base.graphics.RawImage
-import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.pc.JOGL.JOGLProvider

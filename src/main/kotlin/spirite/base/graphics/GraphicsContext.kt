@@ -1,6 +1,5 @@
 package spirite.base.graphics
 
-import spirite.base.imageData.MediumHandle
 import spirite.base.util.Color
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform

@@ -11,29 +11,30 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
  */
 interface IMediumRepository {
     fun getData( i: Int) : IMedium
-    fun clearUnusedCache()
+    fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
+}
 
-    /** WARNING: This method directly replaces the underlying data and us NOT UNDOABLE.  In general should only be called
-     * by the UndoEngine. */
+interface MMediumRepository : IMediumRepository {
+    fun addMedium( medium: IMedium) : MediumHandle
     fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
 }
 
 class MediumRepository(
-        private val undoEngine: IUndoEngine,
         private val imageWorkspace: IImageWorkspace
-) : IMediumRepository{
+) : MMediumRepository{
     val mediumData = mutableMapOf<Int,IMedium>()
+    var workingId = 0
 
     /** Locks the cache from being cleared. */
     var locked : Boolean = true
 
+    // region IMedium
     override fun getData(i: Int) = mediumData[i] ?: NilMedium
 
-    override fun clearUnusedCache() {
+    override fun clearUnusedCache( externalDataUsed : Set<MediumHandle>) {
         if( locked) return
 
-        val undoImages = undoEngine.dataUsed
-        val undoImageIds = undoImages.map { it.id }
+        val externalImageIds = externalDataUsed.map { it.id }
 
         val layerImages =  imageWorkspace.groupTree.root.getLayerNodes()
                 .map { it.layer.imageDependencies }
@@ -41,12 +42,12 @@ class MediumRepository(
         val layerImageIds = layerImages.map { it.id }.distinct()
 
         val unused = mediumData.keys
-                .filter {undoImageIds.contains( it) || layerImageIds.contains(it)}
+                .filter {externalImageIds.contains( it) || layerImageIds.contains(it)}
 
         // Make sure all used entries are tracked
         if( layerImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
             MDebug.handleError(STRUCTURAL, "Untracked Image Data found when cleaning ImageWorkspace")
-        if( undoImages.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
+        if( externalDataUsed.any { it.workspace != imageWorkspace || mediumData[it.id] == null })
             MDebug.handleError(STRUCTURAL, "Untracked Image Data found from UndoEngine")
 
         // Remove Unused Entries
@@ -55,10 +56,21 @@ class MediumRepository(
             mediumData.remove(it)
         }
     }
+    // endregion
+
+
+    // region MMedium
+
+    override fun addMedium(medium: IMedium) : MediumHandle{
+        mediumData[workingId] = medium
+        return MediumHandle(imageWorkspace, workingId++)
+    }
 
     override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {
         val oldMedium = mediumData[handle.id]
         mediumData.put( handle.id, newMedium)
         oldMedium?.flush()
     }
+
+    // endregion
 }

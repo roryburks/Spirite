@@ -264,36 +264,5 @@ public class MUtil {
 	}
 	
 
-	// ======
-	// ==== String Functions
-	public static String getNonDuplicateName(List<String> existingNames, String string) {
-		int i = 0;
-		String tryName = (string == null) ? "_" : string;;
-		String baseName = "_";
-		
-		if( string != null) {
-			int _loc = string.indexOf('_');
-			if( _loc == -1)
-				baseName = string;
-			else {
-				try {
-					i = Integer.parseInt(string.substring(_loc+1));
-					baseName = string.substring(0, _loc);
-				} catch( Exception e)
-				{
-					baseName = string;
-				}
-			}
-		}
-		
-		
-		int conflict = existingNames.indexOf(tryName);
-		while( conflict != -1) {
-			tryName = baseName + "_" + (++i);
-			conflict = existingNames.indexOf(tryName);
-		}
-		
-		return tryName;
-	}
 
 }

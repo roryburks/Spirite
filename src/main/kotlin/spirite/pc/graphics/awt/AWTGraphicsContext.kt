@@ -4,7 +4,6 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.LineAttributes
 import spirite.base.graphics.RenderProperties
-import spirite.base.imageData.MediumHandle
 import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 import java.awt.Graphics

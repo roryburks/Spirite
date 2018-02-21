@@ -1,9 +1,7 @@
 package spirite.base.graphics.gl
 
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
-import spirite.base.util.ColorARGB32
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.ColorARGB32Premultiplied
 import spirite.base.util.glu.GLC

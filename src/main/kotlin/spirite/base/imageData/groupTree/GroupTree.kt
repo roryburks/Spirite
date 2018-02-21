@@ -1,11 +1,9 @@
 package spirite.base.imageData.groupTree
 
 import spirite.base.graphics.RenderProperties
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
-import spirite.base.util.delegates.OnChangeDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import kotlin.reflect.KProperty
@@ -14,11 +12,22 @@ import kotlin.reflect.KProperty
  * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical
  * tree structure.
  */
-class GroupTree(
-        val undoEngine: IUndoEngine?)
+open class GroupTree( val undoEngine: IUndoEngine?)
 {
     val root = GroupNode()
     var selectedNode : Node? = null
+
+    fun parentOfContext( context: Node?) = when(context) {
+        null -> root
+        is GroupNode -> context
+        else -> context.parent ?: root
+    }
+
+    fun beforeContext( context: Node?) = when(context) {
+        null, is GroupNode -> null
+        else -> context
+    }
+
 
     abstract inner class Node(
             parent: GroupNode?,
@@ -32,7 +41,7 @@ class GroupTree(
         var name : String by UndoableDelegate( name, "Changed Node's Name")
 
         // Structure
-        var parent = parent
+        var parent = parent ; internal set
 
         val depth : Int get() {
             // Note: non-looping integrity is handled by the insert/change parent functionality
@@ -129,7 +138,8 @@ class GroupTree(
 
         inner class UndoableDelegate<T>(
                 defaultValue : T,
-                val changeDescription: String) {
+                val changeDescription: String)
+        {
             var field = defaultValue
 
             operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
@@ -206,7 +216,7 @@ class GroupTree(
             }
         }
 
-        internal fun _add(toAdd: Node, before: Node?) {
+        private fun _add(toAdd: Node, before: Node?) {
             // if( toAdd.tree != this@GroupTree)
             // Todo
 
@@ -218,7 +228,7 @@ class GroupTree(
             }
             toAdd.parent = this
         }
-        internal fun _remove( toRemove: Node) {
+        private fun _remove( toRemove: Node) {
             _children.remove( toRemove)
         }
     }

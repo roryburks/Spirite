@@ -1,8 +1,8 @@
 package spirite.base.brains.Settings
 
+import spirite.base.util.delegates.MutableLazy
 import spirite.base.util.interpolation.CubicSplineInterpolator
 import spirite.base.util.linear.Vec2
-import spirite.base.util.delegates.MutableLazy
 import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty

@@ -1,8 +1,8 @@
 package spirite.base.imageData.layers
 
 import spirite.base.graphics.rendering.TransformedHandle
-import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 
