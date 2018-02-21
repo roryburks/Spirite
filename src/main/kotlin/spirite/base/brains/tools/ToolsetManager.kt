@@ -8,7 +8,7 @@
 //import spirite.base.image_data.mediums.drawer.IImageDrawer
 //import spirite.base.image_data.mediums.drawer.IImageDrawer.*
 //import spirite.base.image_data.mediums.maglev.MaglevImageDrawer
-//import spirite.base.pen.StrokeEngine.Method.*
+//import spirite.base.pen.stroke.StrokeEngine.Method.*
 //import spirite.base.brains.IObservable
 //import spirite.base.brains.Observable
 //import spirite.base.brains.tools.Cursor.ERASER

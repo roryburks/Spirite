@@ -2,22 +2,21 @@ package spirite.base.imageData.mediums.drawer
 
 
 interface IImageDrawer {
-    // TODO
 
 //    abstract class MaskedImageAction protected constructor(data: BuildingMediumData, protected val mask: SelectionMask) : ImageAction(data)
-//
-//    // Modules, an Image Drawer may implement these or they may not.  Not implementing them means
-//    //	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't
-//    //	make sense for the data type).
-//    interface IStrokeModule {
-//        //public boolean strokeIsDrawing();	// SHOULD be true iff getStrokeEngine = null
+
+    // Modules, an Image Drawer may implement these or they may not.  Not implementing them means
+    //	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't
+    //	make sense for the data type).
+    interface IStrokeModule {
+        //public boolean strokeIsDrawing();	// SHOULD be true iff getStrokeEngine = null
 //        val strokeEngine: StrokeEngine
-//
+
 //        fun canDoStroke(method: StrokeEngine.Method): Boolean    // EG: some Drawers might be able to erase, but not draw
 //        fun startStroke(params: StrokeParams, ps: PenState): Boolean
 //        fun stepStroke(ps: PenState)
-//        fun endStroke()
-//    }
+        fun endStroke()
+    }
 //
 //    interface IClearModule {
 //        fun clear()

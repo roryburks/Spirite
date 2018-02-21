@@ -1,7 +1,7 @@
 package spirite.base.graphics.gl.stroke
 
 import spirite.base.graphics.gl.*
-import spirite.base.pen.DrawPoints
+import spirite.base.pen.stroke.DrawPoints
 import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
@@ -24,7 +24,7 @@ object V2PenDrawer {
     }
 
     private val STRIDE = 3
-    private fun composeVBuffer( states: DrawPoints, lineWidth: Float) : FloatArray {
+    private fun composeVBuffer(states: DrawPoints, lineWidth: Float) : FloatArray {
         // Step 1: Determine how much space is needed
         val num = states.length + 2
 
