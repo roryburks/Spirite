@@ -1,5 +1,7 @@
 package spirite.base.imageData.groupTree
 
+import spirite.base.brains.IObservable
+import spirite.base.brains.Observable
 import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
@@ -16,30 +18,32 @@ import kotlin.reflect.KProperty
 open class GroupTree( val undoEngine: IUndoEngine?)
 {
     val root = GroupNode(null, "ROOT")
+    open val treeDescription = "Abstract Group Tree"
+
+    // region Selection (observable)
     var selectedNode : Node? = null
+        set(value) {
+            if( field != value) {
+                val old = field
+                field = value
+                _selectionObserver.trigger { it.selectionChanged(value, old)}
+            }
+        }
 
-    fun parentOfContext( context: Node?) = when(context) {
-        null -> root
-        is GroupNode -> context
-        else -> context.parent ?: root
+    interface NodeSelectionObserver {
+        fun selectionChanged( newSelection: Node?, oldSelection: Node?)
     }
+    val selectionObserver: IObservable<NodeSelectionObserver> get() = _selectionObserver
+    val _selectionObserver = Observable<NodeSelectionObserver>()
+    // endregion
 
-    fun beforeContext( context: Node?) = when(context) {
-        null, is GroupNode -> null
-        else -> context
-    }
-
-
-    abstract inner class Node(
-            parent: GroupNode?,
-            name: String)
-    {
+    abstract inner class Node( parent: GroupNode?, name: String) {
         // Properties
-        var render : RenderProperties by UndoableDelegate(RenderProperties(), undoEngine, "Changed Node's Render Settings")
-        var x : Int by UndoableDelegate(0, undoEngine,"Changed Node's X offset")
-        var y : Int by UndoableDelegate(0, undoEngine,"Changed Node's Y offset")
-        var expanded : Boolean by UndoableDelegate( true, undoEngine,"Expanded/Contracted Node")
-        var name : String by UndoableDelegate( name, undoEngine,"Changed Node's Name")
+        var render : RenderProperties by UndoableDelegate(RenderProperties(), undoEngine, "Changed $treeDescription Node's Render Settings")
+        var x : Int by UndoableDelegate(0, undoEngine,"Changed $treeDescription Node's X offset")
+        var y : Int by UndoableDelegate(0, undoEngine,"Changed $treeDescription Node's Y offset")
+        var expanded : Boolean by UndoableDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node")
+        var name : String by UndoableDelegate( name, undoEngine,"Changed $treeDescription Node's Name")
 
         // Structure
         var parent = parent ; internal set
@@ -59,12 +63,21 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         val tree get() = this@GroupTree
 
         fun getDepthFrom( ancestor: Node) : Int {
-            tailrec fun gdfTR(ancestor: Node, nodeToTest: Node? = null, layer: Int = 0): Int = when (nodeToTest) {
+            tailrec fun sub(nodeToTest: Node?, layer: Int = 0): Int = when (nodeToTest) {
                 null -> -1
                 ancestor -> layer
-                else -> gdfTR(ancestor, nodeToTest.parent, layer + 1)
+                else -> sub(nodeToTest.parent, layer + 1)
             }
-            return gdfTR(ancestor)
+            return sub(this)
+        }
+
+        fun isChildOf( other: Node) : Boolean{
+            tailrec fun sub(nodeCheck: Node?) : Boolean = when( nodeCheck) {
+                other -> true
+                null -> false
+                else -> sub(nodeCheck.parent)
+            }
+            return sub(this)
         }
 
         fun getLayerNodes(): List<LayerNode> {
@@ -136,8 +149,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         }
     }
 
-    inner class GroupNode: Node {
-        constructor(parent: GroupNode?, name: String) : super(parent, name)
+    inner class GroupNode(parent: GroupNode?, name: String) : Node(parent, name) {
 
         val children: List<Node> get() = _children
         private val _children = mutableListOf<Node>()
@@ -154,15 +166,32 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             return list
         }
 
-        fun add(toAdd: Node, before: Node?) {
+        internal fun move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
+            if( undoEngine == null) _move(toMove, newParent, newBefore)
+            else {
+                val oldParent = this
+                val oldBefore = toMove.nextNode
+
+                undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = "Add Node to $treeDescription "
+                    override fun performAction() = _move(toMove, newParent, newBefore)
+                    override fun undoAction() = newParent._move(toMove, oldParent, oldBefore)
+                })
+            }
+
+        }
+        private fun _move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
+            _remove( toMove)
+            newParent._add( toMove, newBefore)
+        }
+
+        internal fun add(toAdd: Node, before: Node?) {
             if( undoEngine == null) _add(toAdd, before)
             else {
                 undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add Node"
+                    override val description: String get() = "Add Node to $treeDescription "
 
-                    override fun performAction() {
-                        _add(toAdd, before)
-                    }
+                    override fun performAction() = _add(toAdd, before)
 
                     override fun undoAction() {
                         _remove(toAdd)
@@ -172,26 +201,6 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 })
             }
         }
-        fun remove( toRemove: Node) {
-            if( undoEngine == null) _remove(toRemove)
-            else {
-                val before = toRemove.nextNode
-                undoEngine.performAndStore(object: NullAction() {
-                    override val description: String get() = "Add Node"
-
-                    override fun performAction() {
-                        _remove(toRemove)
-                        if( selectedNode == toRemove)
-                            selectedNode = null
-                    }
-
-                    override fun undoAction() {
-                        _add(toRemove, before)
-                    }
-                })
-            }
-        }
-
         private fun _add(toAdd: Node, before: Node?) {
             // if( toAdd.tree != this@GroupTree)
             // Todo
@@ -203,6 +212,25 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 else -> _children.add(index, toAdd)
             }
             toAdd.parent = this
+        }
+
+
+        internal fun remove( toRemove: Node) {
+            if( undoEngine == null) _remove(toRemove)
+            else {
+                val before = toRemove.nextNode
+                undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = "Remove Node from $treeDescription "
+
+                    override fun performAction() {
+                        _remove(toRemove)
+                        if( selectedNode == toRemove)
+                            selectedNode = null
+                    }
+
+                    override fun undoAction() = _add(toRemove, before)
+                })
+            }
         }
         private fun _remove( toRemove: Node) {
             _children.remove( toRemove)

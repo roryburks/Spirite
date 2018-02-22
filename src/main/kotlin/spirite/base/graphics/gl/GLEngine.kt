@@ -59,8 +59,6 @@ class GLEngine(
         } else {
             target = img.tex
             gl.viewport(0, 0, img.width, img.height)
-            width = img.width
-            height = img.height
         }
     }
 

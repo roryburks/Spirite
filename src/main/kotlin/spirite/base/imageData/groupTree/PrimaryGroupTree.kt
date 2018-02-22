@@ -1,5 +1,6 @@
 package spirite.base.imageData.groupTree
 
+import spirite.base.brains.IObservable
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
@@ -16,7 +17,8 @@ import spirite.hybrid.EngineLaunchpoint
 class PrimaryGroupTree(
         val workspace: IImageWorkspace,
         val mediumRepo : MMediumRepository
-) : GroupTree( workspace.undoEngine) {
+) : MovableGroupTree( workspace.undoEngine) {
+    override val treeDescription: String get() = "Primary Group Tree"
 
     fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null) : LayerNode{
         val medium = when( type) {
@@ -34,17 +36,6 @@ class PrimaryGroupTree(
         return layerNode
     }
 
-    fun addGroupNode( contextNode: Node?, name: String) : GroupNode {
-        val new = GroupNode(null, name)
-        insertNode(contextNode, new)
-        return new
-    }
-
-    private fun insertNode(contextNode: Node?, nodeToInsert: Node) {
-        val parent = parentOfContext(contextNode)
-        val before = beforeContext(contextNode)
-        parent.add(nodeToInsert, before)
-    }
 
     private fun getNonDuplicateName( name: String) = StringUtil.getNonDuplicateName(root.getAllAncestors().map { it.name }.toList(), name)
 
