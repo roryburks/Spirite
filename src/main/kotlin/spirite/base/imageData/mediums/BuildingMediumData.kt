@@ -13,7 +13,6 @@ class BuildingMediumData(
     constructor(handle: MediumHandle, ox: Float, oy: Float ) : this( handle, MutableTransform.TranslationMatrix(ox, oy))
 
     fun doOnBuildData( doer : (BuiltMediumData) -> Unit) {
-        val medium = handle.workspace.mediumRepository.getData(handle.id)
-        doer.invoke( medium.build(this))
+        doer.invoke( handle.medium.build(this))
     }
 }

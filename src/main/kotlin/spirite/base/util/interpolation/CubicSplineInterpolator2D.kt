@@ -113,13 +113,13 @@ class CubicSplineInterpolator2D : Interpolator2D {
         return y_[n]
     }
 
-    override fun addPoint(px: Float, py: Float) {
+    override fun addPoint(x: Float, y: Float) {
         if (kx.size <= numPoints) expand(numPoints + 1)
 
         // Code could be made less verbose in by combining parts of the
         //	different cases, but would be less readable
-        x_[numPoints] = px
-        y_[numPoints] = py
+        x_[numPoints] = x
+        y_[numPoints] = y
         when (numPoints) {
             0 -> t_[0] = 0f
             1 -> {
@@ -131,8 +131,8 @@ class CubicSplineInterpolator2D : Interpolator2D {
                 ky[0] = ky[1]
             }
             else -> {
-                x_[numPoints] = px
-                y_[numPoints] = py
+                x_[numPoints] = x
+                y_[numPoints] = y
                 t_[numPoints] = t_[numPoints - 1] + MUtil.distance(x_[numPoints - 1], y_[numPoints - 1], x_[numPoints], y_[numPoints])
 
                 val dt1 = t_[numPoints] - t_[numPoints - 1]

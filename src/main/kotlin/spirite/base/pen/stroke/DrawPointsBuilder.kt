@@ -56,7 +56,7 @@ object DrawPointsBuilder {
                 val x_ = penStates.map { it.x }.toFloatArray()
                 val y_ = penStates.map { it.y }.toFloatArray()
                 val w_ = penStates.map { dynamics.getSize(it) }.toFloatArray()
-                val t_ = penStates.mapIndexed { i, ps -> i.toFloat()}.toFloatArray()
+                val t_ = penStates.mapIndexed { it, _ -> it.toFloat()}.toFloatArray()
                 IndexedDrawPoints(x_, y_, w_, t_)
             }
             num == 0 -> IndexedDrawPoints(FloatArray(0), FloatArray(0), FloatArray(0), FloatArray(0))

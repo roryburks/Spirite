@@ -60,8 +60,8 @@ class CubicSplineInterpolator
 
         k[0] = (y_[1] - y_[0]) / (x_[1] - x_[0])
 
-        var i = 0
-        i = 1
+        //var i = 0
+        var i = 1
         while (i < k.size - 1) {
             if (spatial) {
                 val d1 = MUtil.distance(x_[i], y_[i], x_[i + 1], y_[i + 1])

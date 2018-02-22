@@ -22,14 +22,14 @@ class StringUtilTests {
         assertEquals( "a", result)
     }
     @test fun CreatesDuplicateNames3() {
-        val list = listOf<String>("a")
+        val list = listOf("a")
 
         val result = StringUtil.getNonDuplicateName(list, "a_1")
 
         assertEquals( "a_1", result)
     }
     @test fun CreatesDuplicateNames4() {
-        val list = listOf<String>("a_1", "a_2", "a_3")
+        val list = listOf("a_1", "a_2", "a_3")
 
         val result = StringUtil.getNonDuplicateName(list, "a_1")
 

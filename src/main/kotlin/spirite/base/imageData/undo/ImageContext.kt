@@ -157,7 +157,7 @@ class ImageContext(
             mediumRepo.replaceMediumDirect( medium, frame.dupe())
         }
 
-        private val frame = workspace.mediumRepository.getData(medium.id).dupe()
+        private val frame = medium.medium.dupe()
 
         override fun onAdd() {
             underlyingAction?.onAdd()

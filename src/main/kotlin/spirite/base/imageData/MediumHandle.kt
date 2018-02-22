@@ -2,6 +2,7 @@ package spirite.base.imageData
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
+import spirite.base.imageData.mediums.IMedium
 import spirite.base.util.linear.Transform
 
 
@@ -32,12 +33,12 @@ class MutableHandle(
 
 data class MediumHandle(
         val workspace: IImageWorkspace,
-        val id: Int
-)
+        val id: Int)
 {
-    // These variables are essentially final, but may take a while to be set
-    val width: Int; get() = workspace.mediumRepository.getData(id).width ?: 1
-    val height: Int; get() = workspace.mediumRepository.getData(id).height ?: 1
+    val width: Int get() = medium.width
+    val height: Int get() = medium.height
+
+    val medium : IMedium get() = workspace.mediumRepository.getData(id)!!
 
     /** Returns a null-workspace duplicate (just preserves the ID)  */
     fun dupe() = MutableHandle(null, id)

@@ -7,16 +7,22 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 /**
- *  The MediumRepository is responsible for storing the direct medium data
+ *  The MediumRepository is responsible for storing the direct medium data.
  */
+
+/** Read-only Access to the Medium Repository */
 interface IMediumRepository {
-    fun getData( i: Int) : IMedium
-    fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
+    fun getData( i: Int) : IMedium?
 }
 
+/** Read-Write Access to the Medium Repository */
 interface MMediumRepository : IMediumRepository {
+    /** Adds a medium to the repository and returns a MediumHandle that references it. */
     fun addMedium( medium: IMedium) : MediumHandle
+
+
     fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
+    fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
 }
 
 class MediumRepository(
@@ -29,7 +35,11 @@ class MediumRepository(
     var locked : Boolean = true
 
     // region IMedium
-    override fun getData(i: Int) = mediumData[i] ?: NilMedium
+    override fun getData(i: Int) = mediumData[i]
+    // endregion
+
+
+    // region MMedium
 
     override fun clearUnusedCache( externalDataUsed : Set<MediumHandle>) {
         if( locked) return
@@ -56,10 +66,6 @@ class MediumRepository(
             mediumData.remove(it)
         }
     }
-    // endregion
-
-
-    // region MMedium
 
     override fun addMedium(medium: IMedium) : MediumHandle{
         mediumData[workingId] = medium

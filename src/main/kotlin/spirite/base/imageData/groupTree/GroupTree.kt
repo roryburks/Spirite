@@ -4,6 +4,7 @@ import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
+import spirite.base.util.delegates.UndoableDelegate
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import kotlin.reflect.KProperty
@@ -14,7 +15,7 @@ import kotlin.reflect.KProperty
  */
 open class GroupTree( val undoEngine: IUndoEngine?)
 {
-    val root = GroupNode()
+    val root = GroupNode(null, "ROOT")
     var selectedNode : Node? = null
 
     fun parentOfContext( context: Node?) = when(context) {
@@ -34,11 +35,11 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             name: String)
     {
         // Properties
-        var render : RenderProperties by UndoableDelegate(RenderProperties(), "Changed Node's Render Settings")
-        var x : Int by UndoableDelegate(0, "Changed Node's X offset")
-        var y : Int by UndoableDelegate(0, "Changed Node's Y offset")
-        var expanded : Boolean by UndoableDelegate( true, "Expanded/Contracted Node")
-        var name : String by UndoableDelegate( name, "Changed Node's Name")
+        var render : RenderProperties by UndoableDelegate(RenderProperties(), undoEngine, "Changed Node's Render Settings")
+        var x : Int by UndoableDelegate(0, undoEngine,"Changed Node's X offset")
+        var y : Int by UndoableDelegate(0, undoEngine,"Changed Node's Y offset")
+        var expanded : Boolean by UndoableDelegate( true, undoEngine,"Expanded/Contracted Node")
+        var name : String by UndoableDelegate( name, undoEngine,"Changed Node's Name")
 
         // Structure
         var parent = parent ; internal set
@@ -58,14 +59,12 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         val tree get() = this@GroupTree
 
         fun getDepthFrom( ancestor: Node) : Int {
-            var node : Node? = this
-            var d = 0
-            while( node != ancestor) {
-                ++d
-                if( node == null) return -1
-                node = node.parent
+            tailrec fun gdfTR(ancestor: Node, nodeToTest: Node? = null, layer: Int = 0): Int = when (nodeToTest) {
+                null -> -1
+                ancestor -> layer
+                else -> gdfTR(ancestor, nodeToTest.parent, layer + 1)
             }
-            return d
+            return gdfTR(ancestor)
         }
 
         fun getLayerNodes(): List<LayerNode> {
@@ -135,33 +134,10 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             }
             p.remove(this)
         }
-
-        inner class UndoableDelegate<T>(
-                defaultValue : T,
-                val changeDescription: String)
-        {
-            var field = defaultValue
-
-            operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
-
-            operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
-                if( undoEngine == null) field = value
-                else {
-                    val oldValue = field
-                    val newValue = value
-                    undoEngine.performAndStore( object : NullAction() {
-                        override val description: String get() = changeDescription
-                        override fun performAction() {field = newValue}
-                        override fun undoAction() {field = oldValue}
-                    })
-                }
-            }
-        }
     }
 
     inner class GroupNode: Node {
         constructor(parent: GroupNode?, name: String) : super(parent, name)
-        internal constructor() : super(null, "ROOT")
 
         val children: List<Node> get() = _children
         private val _children = mutableListOf<Node>()

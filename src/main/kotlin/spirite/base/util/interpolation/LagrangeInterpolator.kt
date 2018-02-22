@@ -66,13 +66,13 @@ class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
         }
     }
 
-    override fun eval(x: Float): Float {
+    override fun eval(t: Float): Float {
         if (coef.size == 0) return 0f
         var ret = coef[0]
         var x_to_n = 1f
 
         for (i in 1 until coef.size) {
-            x_to_n *= x
+            x_to_n *= t
             ret += x_to_n * coef[i]
         }
         return ret

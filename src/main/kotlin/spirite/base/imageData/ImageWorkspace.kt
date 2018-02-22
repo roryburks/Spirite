@@ -5,11 +5,13 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.BuildingMediumData
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
+import spirite.base.util.delegates.UndoableDelegate
 import java.io.File
 
 interface IImageWorkspace {
@@ -23,7 +25,7 @@ interface IImageWorkspace {
     val filename get() = file?.name ?: "Untitled Image"
     val hasChanged: Boolean
 
-    val groupTree: GroupTree
+    val groupTree: PrimaryGroupTree
 
 
 	// Sub-Components
@@ -54,18 +56,18 @@ interface IImageWorkspace {
 }
 
 class ImageWorkspace(
-
-) : IImageWorkspace{
+        override val renderEngine : IRenderEngine,
+        override val settingsManager: ISettingsManager,
+        override val paletteManager : IPaletteManager,
+        width: Int = 100,
+        height: Int = 100) : IImageWorkspace
+{
 
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
 
-    override var width: Int
-        get() = TODO("not implemented")
-        set(value) {}
-    override var height: Int
-        get() = TODO("not implemented")
-        set(value) {}
+    override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
+    override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
 
     override fun finishBuilding() {
         undoEngine.reset()
@@ -80,8 +82,7 @@ class ImageWorkspace(
     override val file: File?
         get() = TODO("not implemented")
     override var hasChanged: Boolean = false
-    override val groupTree: GroupTree
-        get() = TODO("not implemented")
+    override val groupTree = PrimaryGroupTree(this, mediumRepository)
     override val animationManager: IAnimationManager
         get() = TODO("not implemented")
     override val selectionEngine: ISelectionEngine
@@ -89,12 +90,6 @@ class ImageWorkspace(
     override val referenceManager: ReferenceManager
         get() = TODO("not implemented")
     override val paletteSet: PaletteSet
-        get() = TODO("not implemented")
-    override val renderEngine: IRenderEngine
-        get() = TODO("not implemented")
-    override val settingsManager: ISettingsManager
-        get() = TODO("not implemented")
-    override val paletteManager: IPaletteManager
         get() = TODO("not implemented")
     override val images: List<MediumHandle>
         get() = TODO("not implemented")
@@ -112,6 +107,7 @@ class ImageWorkspace(
     override fun buildActiveData(): BuildingMediumData {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
 
 
 }
