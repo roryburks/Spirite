@@ -5,7 +5,7 @@ import spirite.base.util.linear.MutableTransform
 
 class BuildingMediumData(
         val handle: MediumHandle,
-        var mediumTransform: MutableTransform = MutableTransform.IdentityMatrix()
+        var tMediumToWorkspace: MutableTransform = MutableTransform.IdentityMatrix()
 
 ) {
     var color: Int = 0

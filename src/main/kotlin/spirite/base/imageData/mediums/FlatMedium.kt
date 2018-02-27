@@ -10,7 +10,7 @@ import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 
 /***
- * A FlatMedium
+ * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.
  */
 class FlatMedium(
         private val rawImage: RawImage
@@ -39,9 +39,9 @@ class FlatMedium(
     inner class FlatBuiltMediumData( building: BuildingMediumData) : BuiltMediumData(building) {
         override val width: Int get() = image.width
         override val height: Int get() = image.height
-        override val tCompositeToWorkspace: Transform get() = building.mediumTransform
+        override val tCompositeToWorkspace: Transform get() = building.tMediumToWorkspace
 
-        val tWorkspaceToRaw : Transform by lazy { building.mediumTransform.invert() }
+        val tWorkspaceToRaw : Transform by lazy { building.tMediumToWorkspace.invert() }
 
         override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
             val gc = rawImage.graphics

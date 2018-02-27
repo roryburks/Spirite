@@ -36,7 +36,7 @@ object V2PenDrawer {
 
             // x y z w
             val xy = Vec2(states.x[i], states.y[i])
-            //val xy = mediumTransform!!.apply(Vec2(states.x[i], states.y[i]))
+            //val xy = tMediumToWorkspace!!.apply(Vec2(states.x[i], states.y[i]))
             raw[off + 0] = xy.x
             raw[off + 1] = xy.y
 

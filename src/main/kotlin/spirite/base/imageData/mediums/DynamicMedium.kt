@@ -18,8 +18,8 @@ import spirite.base.util.linear.Transform
  * the number of pixels pushed to constantly re-draw the Workspace.
  */
 class DynamicMedium(
-        val image: DynamicImage,
-        val workspace: IImageWorkspace) : IMedium
+        val workspace: IImageWorkspace,
+        val image: DynamicImage = DynamicImage()) : IMedium
 {
     override val width: Int get() = image.width
     override val height: Int get() = image.height
@@ -38,7 +38,7 @@ class DynamicMedium(
         }
     }
 
-    override fun dupe() = DynamicMedium(image.deepCopy(), workspace)
+    override fun dupe() = DynamicMedium(workspace, image.deepCopy())
 
     override fun flush() {
         image.flush()
@@ -51,12 +51,12 @@ class DynamicMedium(
 
         override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
             image.drawToImage( {raw -> doer.invoke(raw.graphics)},
-                    workspace.width, workspace.height, building.mediumTransform)
+                    workspace.width, workspace.height, building.tMediumToWorkspace)
         }
 
         override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            image.drawToImage( {raw -> doer.invoke(raw, building.mediumTransform.invert())},
-                    workspace.width, workspace.height, building.mediumTransform)
+            image.drawToImage( {raw -> doer.invoke(raw, building.tMediumToWorkspace.invert())},
+                    workspace.width, workspace.height, building.tMediumToWorkspace)
         }
     }
 }

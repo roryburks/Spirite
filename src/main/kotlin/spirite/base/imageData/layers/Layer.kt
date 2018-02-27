@@ -14,4 +14,8 @@ abstract class Layer {
     abstract val imageDependencies : List<MediumHandle>
     abstract fun getDrawList() : List<TransformedHandle>
 
+
+    protected fun triggerChange() {
+
+    }
 }

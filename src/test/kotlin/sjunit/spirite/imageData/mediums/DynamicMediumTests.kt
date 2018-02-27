@@ -28,7 +28,7 @@ class DynamicMediumTests {
     }
 
     @test fun buildsDataAndDrawsToWSCorrectly() {
-        val dynamicMedium = DynamicMedium(DynamicImage(), mockWorkspace)
+        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
         val built = dynamicMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0)))
 
         built.doOnGC { gc ->
@@ -50,7 +50,7 @@ class DynamicMediumTests {
     }
 
     @test fun buildsTransformedDataCorrectly() {
-        val dynamicMedium = DynamicMedium(DynamicImage(), mockWorkspace)
+        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
         val tMediumToWorkspace = MutableTransform.TranslationMatrix(-10f, -10f)
         val built = dynamicMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 

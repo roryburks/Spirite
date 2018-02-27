@@ -1,6 +1,5 @@
 package spirite.base.imageData.groupTree
 
-import spirite.base.brains.IObservable
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
@@ -22,7 +21,7 @@ class PrimaryGroupTree(
 
     fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null) : LayerNode{
         val medium = when( type) {
-            DYNAMIC -> DynamicMedium(DynamicImage(),workspace)
+            DYNAMIC -> DynamicMedium(workspace, DynamicImage())
             FLAT -> FlatMedium( EngineLaunchpoint.createImage( width ?: workspace.width, height ?: workspace.height))
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }
