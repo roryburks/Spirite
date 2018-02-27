@@ -63,6 +63,8 @@ class ImageWorkspace(
         height: Int = 100) : IImageWorkspace
 {
 
+    // Note: while this technically leaks access, everything which should have limited access (i.e. virtually everything
+    //  outside of unit tests) should only have an IImageWorkspace, not an ImageWorkspace.
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
 

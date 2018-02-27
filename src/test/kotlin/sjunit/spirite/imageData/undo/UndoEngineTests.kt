@@ -154,4 +154,27 @@ class UndoEngineTests {
             this.to = (other as TestStackAction).to
         }
     }
+
+    @test fun TestRecursiveAggregate() {
+        val action1 = TestNullAction()
+        val action2 = TestNullAction()
+        val action3 = TestNullAction()
+        engine.doAsAggregateAction({
+            engine.doAsAggregateAction({
+                engine.doAsAggregateAction({
+                    engine.performAndStore(action1)
+                },"Inner")
+                engine.performAndStore(action2)
+            },"Middle")
+            engine.performAndStore(action3)
+        }, "Outer")
+
+        val history = engine.undoHistory
+        assertEquals(1, history.count())
+        val actions = (history[0].action as CompositeAction).actions
+        assertEquals(3, actions.count())
+        assertEquals(action1, actions[0])
+        assertEquals(action2, actions[1])
+        assertEquals(action3, actions[2])
+    }
 }

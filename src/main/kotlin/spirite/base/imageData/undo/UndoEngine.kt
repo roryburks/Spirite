@@ -183,9 +183,9 @@ class UndoEngine(
         activeStoreState = storeState
 
         runner.invoke()
-        storeState.removeAt( storeStack.lastIndex)
+        storeStack.removeAt( storeStack.lastIndex)
 
-        if( storeStack.isEmpty()) {
+        if( !storeStack.isEmpty()) {
             val topList = storeStack.last()
             topList.addAll( storeState)
             activeStoreState = topList
