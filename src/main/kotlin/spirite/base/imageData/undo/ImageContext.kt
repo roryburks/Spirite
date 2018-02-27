@@ -18,7 +18,8 @@ val MAX_TICKS_PER_KEY = 10
  */
 class ImageContext(
         override val medium: MediumHandle,
-        private val mediumRepo: MMediumRepository) : UndoContext<ImageAction> {
+        private val mediumRepo: MMediumRepository) : UndoContext<ImageAction>
+{
     private val workspace get() = medium.workspace
     private val actions = mutableListOf<ImageAction>()
     private var pointer = 0     // The poisition on the actionsList
@@ -26,6 +27,8 @@ class ImageContext(
     private var vstart = 0      // The first "valid" action.  As the tail is clipped,
                                 // this increments until it hits a Keyframe, then it removes
                                 // the old base keyframe and adjusts
+
+    override val lastAction: ImageAction get() = actions.last()
 
     val size get() = actions.size - 1 - vstart
     val effectivePointer get() = pointer - vstart

@@ -15,11 +15,13 @@ class CompositeContext(
         private val imageContexts: MutableList<ImageContext>,
         private val mediumRepo: MMediumRepository
 ) : UndoContext<CompositeAction> {
-
     override val medium: MediumHandle? = null
     private val actions = mutableListOf<CompositeAction>()
     var pointer = 0 ; private set
     val size get() = actions.size
+
+
+    override val lastAction: CompositeAction get() = actions.last()
 
     override fun addAction(action: CompositeAction) {
         action.actions.forEach { innerAction ->

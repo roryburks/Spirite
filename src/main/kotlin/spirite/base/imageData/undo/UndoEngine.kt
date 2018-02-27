@@ -103,8 +103,8 @@ class UndoEngine(
 
     private fun storeAction( action: UndoableAction) {
         // Delete all actions stored after the current iterator point
-        if( _queuePosition < undoQueue.size-1) {
-            undoQueue.subList(_queuePosition+1,undoQueue.size).clear()
+        if( _queuePosition < undoQueue.size) {
+            undoQueue.subList(_queuePosition,undoQueue.size).clear()
             contexts.forEach { it.clipHead() }
 
             if( undoQueue.size <= saveSpot)
@@ -114,8 +114,12 @@ class UndoEngine(
         // If the UndoAction is a StackableAction and a compatible entry
         //   is on the top of the stack, modify that entry instead of creating
         //   a new one.
-        if( undoQueue.size != 0 && _queuePosition == undoQueue.size-1) {
-            // TODO
+        if( undoQueue.size != 0 && _queuePosition == undoQueue.size) {
+            val lastAction = undoQueue[_queuePosition-1].lastAction
+            if( lastAction is StackableAction && lastAction.canStack(action)) {
+                lastAction.stackNewAction(action)
+                return
+            }
         }
 
         // Determine the workspace for the given Action and add it

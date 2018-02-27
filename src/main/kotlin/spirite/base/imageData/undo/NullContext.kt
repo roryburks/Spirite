@@ -20,6 +20,8 @@ class NullContext : UndoContext<NullAction> {
     var pointer = 0 ; private set
     val size get() = actions.size
 
+    override val lastAction: NullAction get() = actions.last()
+
     override fun addAction(action: NullAction) {
         actions.add(action)
         pointer = actions.size

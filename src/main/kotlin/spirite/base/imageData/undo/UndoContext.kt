@@ -13,6 +13,8 @@ interface UndoContext<T> where T : UndoableAction {
     fun undo()
     fun redo()
 
+    val lastAction : T
+
     /** Removes All points after the current pointer */
     fun clipHead()
 
