@@ -1,15 +1,22 @@
 package spirite.base.graphics
 
-data class RenderProperties(
-        val visible: Boolean = true,
-        val alpha: Float = 1.0f,
-        val method: RenderMethod = RenderMethod()
-)
 
+/** RenderProperties is carried by individual objects, like nodes, Sprite Parts, etc */
+data class RenderProperties(
+        var visible: Boolean = true,
+        var alpha: Float = 1.0f,
+        var method: RenderMethod = RenderMethod())
+{
+    val isVisible: Boolean = visible && alpha > 0f
+}
+
+/** RenderRhubric is what's conglomerated by TransformedHandles and passed to GC.renderImage */
+data class RenderRhubric(val methods : List<RenderMethod> = emptyList())
+
+/** RenderMethods is a MethodType along with a value (if applicable) */
 data class RenderMethod(
         val methodType: RenderMethodType = RenderMethodType.DEFAULT,
-        val renderValue: Int = 0
-)
+        val renderValue: Int = methodType.defaultValue)
 
 
 enum class RenderMethodType constructor(val description: String, val defaultValue: Int) {

@@ -23,6 +23,7 @@ class GLEngine(
     var width : Int = 1 ; private set
     var height : Int = 1 ; private set
 
+    val track = GLTrack()
 
     var target: IGLTexture? = null
         set(value) {
@@ -284,7 +285,9 @@ class GLEngine(
 
         // Construct flags
         val flags =
-                if( params.premultiplied) 1 else 0
+                if( params.premultiplied) 1 else 0 +
+                (if( params.texture1?.premultiplied == true) 1 else 0) shl 1
+
 
         internalParams.add(GLUniform1i("u_flags", flags))
 

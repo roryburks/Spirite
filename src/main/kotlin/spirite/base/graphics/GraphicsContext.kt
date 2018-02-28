@@ -78,7 +78,7 @@ abstract class GraphicsContext {
     abstract fun dispose()
 
 
-    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties = RenderProperties())
+    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric = RenderRhubric())
 
 
     private val transformStack = Stack<Transform>()

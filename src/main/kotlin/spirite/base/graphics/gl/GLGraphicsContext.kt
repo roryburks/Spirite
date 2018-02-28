@@ -203,10 +203,12 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun dispose() { if( gle.target == image?.tex) gle.target = null}
 
-    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties) {
+    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric) {
         val params = this.cachedParams.copy()
 
-        val renderAlgorithm = when (render.method.methodType) {
+        val method = render.methods.lastOrNull() ?: RenderMethod()
+
+        val renderAlgorithm = when (method.methodType) {
             COLOR_CHANGE_HUE -> {
                 setCompositeBlend(params, SRC_OVER)
                 RenderAlgorithm.AS_COLOR
@@ -250,7 +252,7 @@ class GLGraphicsContext : GraphicsContext {
         }
 
         params.texture1 = ImageConverter(gle).convert<GLImage>(rawImage)
-        applyPassProgram( RenderCall( alpha, render.method.renderValue, false, renderAlgorithm),
+        applyPassProgram( RenderCall( alpha, method.renderValue, false, renderAlgorithm),
                 params, transform, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
 

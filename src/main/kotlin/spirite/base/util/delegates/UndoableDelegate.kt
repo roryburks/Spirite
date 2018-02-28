@@ -16,7 +16,7 @@ class UndoableDelegate<T>(
 
     operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
         if( undoEngine == null) field = value
-        else {
+        else if( field != value) {
             val oldValue = field
             val newValue = value
             undoEngine.performAndStore( object : NullAction() {

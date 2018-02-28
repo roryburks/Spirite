@@ -1,9 +1,6 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.graphics.DynamicImage
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
-import spirite.base.graphics.RenderProperties
+import spirite.base.graphics.*
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
@@ -31,7 +28,7 @@ class DynamicMedium(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun draw(gc: GraphicsContext, render: RenderProperties) {
+    override fun draw(gc: GraphicsContext, render: RenderRhubric) {
         val img = image.base
         if( img != null) {
             gc.renderImage(img, image.xOffset, image.yOffset, render)

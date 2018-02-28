@@ -182,6 +182,8 @@ class JOGL(
     override fun uniformMatrix4fv(location: IGLUniformLocation?, data: IFloat32Source) =
         gl.glUniformMatrix4fv((location as JOGLUniformLocation).locId, 1, false, (data as JOGLFloat32Source).data)
 
+
+
     override fun getAttribLocation(program: IGLProgram, name: String): Int =
             gl.glGetAttribLocation((program as JOGLProgram).programId, name)
     // endregion

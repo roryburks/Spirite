@@ -3,7 +3,7 @@ package spirite.pc.graphics.awt
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.LineAttributes
-import spirite.base.graphics.RenderProperties
+import spirite.base.graphics.RenderRhubric
 import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 import java.awt.Graphics
@@ -122,7 +122,7 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderProperties) {
+    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

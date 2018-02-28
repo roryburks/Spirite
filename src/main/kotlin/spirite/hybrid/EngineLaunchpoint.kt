@@ -7,10 +7,10 @@ import spirite.base.graphics.gl.GLImage
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 
-object EngineLaunchpoint {
+object EngineLaunchpoint : IImageCreator{
     val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
 
-    fun createImage(width: Int, height: Int): RawImage {
+    override fun createImage(width: Int, height: Int): RawImage {
         return when {
             width <= 0 || height <= 0 -> NillImage()
             else -> GLImage(width, height, gle)

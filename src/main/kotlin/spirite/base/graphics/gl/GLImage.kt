@@ -33,6 +33,7 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
         gl.texImage2D( GLC.TEXTURE_2D, 0, GLC.RGBA8, GLC.RGBA, GLC.UNSIGNED_BYTE,
                 gl.createBlankTextureSource(width, height))
+        engine.track.registerImage(this)
     }
 
     constructor( toCopy: GLImage) {
@@ -75,6 +76,7 @@ class GLImage : RawImage {
                 engine.gl.deleteTexture(toDel)
             }
         }
+        engine.track.relinquishImage(this)
     }
 
     override fun deepCopy(): RawImage = GLImage(this)

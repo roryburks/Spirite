@@ -93,7 +93,7 @@ class SpriteLayer(
     override fun getDrawList(): List<TransformedHandle> {
         return parts
                 .filter { it.isVisible }
-                .map {TransformedHandle( it.handle, it.alpha, it.tPartToWhole, depth = it.depth)}
+                .map {TransformedHandle( it.handle, it.tPartToWhole, depth = it.depth, alpha = it.alpha)}
     }
 
 

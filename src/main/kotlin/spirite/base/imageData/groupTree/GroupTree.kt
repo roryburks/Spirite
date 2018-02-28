@@ -152,6 +152,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     inner class GroupNode(parent: GroupNode?, name: String) : Node(parent, name) {
 
         val children: List<Node> get() = _children
+        var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group Node Flattened")
+
         private val _children = mutableListOf<Node>()
 
         fun getAllAncestors() : List<Node>{

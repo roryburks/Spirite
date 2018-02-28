@@ -3,7 +3,7 @@ package spirite.base.imageData.mediums
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
-import spirite.base.graphics.RenderProperties
+import spirite.base.graphics.RenderRhubric
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer
@@ -26,7 +26,7 @@ class FlatMedium(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun draw(gc: GraphicsContext, render: RenderProperties) {
+    override fun draw(gc: GraphicsContext, render: RenderRhubric) {
         gc.renderImage(rawImage, 0, 0, render)
     }
 
