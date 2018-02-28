@@ -1,8 +1,9 @@
 package spirite.base.graphics.rendering
 
-import javafx.scene.canvas.GraphicsContext
+import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -21,10 +22,13 @@ class NodeRenderer(
                 .max() ?: 0
     }
 
+    var tick = 0    // increases to construct the subDepth
+
     val workspace get() = settings.renderSource.workspace
 
     val ratioW get() = settings.width / workspace.width
     val ratioH get() = settings.height / workspace.height
+
 
     fun render( gc: GraphicsContext) {
         try {
@@ -53,14 +57,18 @@ class NodeRenderer(
             return
         }
 
+
+
         // Go through the node's children (in reverse), drawing any visible group
         //	found recursively and drawing any Layer found plainly.
         node.children.asReversed()
-            .filter { it.render.isVisible }
+                // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
+                //  determined that there are no children  there (hence why the max_depth was set lower)
+            .filter { it.render.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
             .forEach {
                 when( it) {
                     is GroupNode -> {
-                        if( depth != buffer.size-1) {
+                        if( it.flatenned) {
 
                         }
                     }
@@ -68,6 +76,84 @@ class NodeRenderer(
             }
 
     }
+
+    private fun _getDrawList( node: GroupNode, depth: Int) : List<DrawThing>{
+        val drawList = mutableListOf<DrawThing>()
+
+        // Go through the node's children (in reverse), drawing any visible group
+        //	found recursively and drawing any Layer found plainly.
+        node.children.asReversed()
+                // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
+                //  determined that there are no children  there (hence why the max_depth was set lower)
+                .filter { it.render.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
+                .forEach {
+                    when( it) {
+                        is GroupNode -> {
+                            when {
+                                it.flatenned -> drawList.addAll( _getDrawList(it, depth+1))
+                                else -> drawList.add( GroupDrawThing(depth, it))
+                            }
+                        }
+                        is LayerNode -> {
+
+                        }
+                    }
+                }
+
+        return drawList
+    }
+
+    // region Composite Layer
+    var compositeHandle : MediumHandle? = null
+    // endregion
+
+    private abstract inner class DrawThing() {
+        val subDepth: Int = tick++
+        abstract val depth: Int
+        abstract fun draw( gc:GraphicsContext)
+    }
+
+    private inner class GroupDrawThing(
+            val n: Int,
+            val node: GroupNode,
+            override val depth: Int = 0)
+        : DrawThing()
+    {
+        override fun draw(gc: GraphicsContext) {
+            buffer[n+1].graphics.clear()
+
+            _renderRec(node, n+1)
+
+            gc.pushState()
+            gc.alpha = node.render.alpha
+            gc.preTranslate( node.x + 0f, node.y +0f)
+            gc.renderImage( buffer[n+1], 0, 0, node.render.method )
+            gc.popState()
+        }
+    }
+
+    private inner class TransformedDrawThing(
+            val node: Node,
+            val th : TransformedHandle)
+        : DrawThing()
+    {
+        override val depth: Int get() = th.depth
+
+        override fun draw(gc: GraphicsContext) {
+            gc.pushState()
+
+            when(th.medium) {
+                compositeHandle -> {}
+                else -> {
+
+                }
+            }
+
+            gc.popState()
+        }
+
+    }
+
 
 
 }

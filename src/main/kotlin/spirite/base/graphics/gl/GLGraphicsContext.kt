@@ -87,14 +87,14 @@ class GLGraphicsContext : GraphicsContext {
         set(value) {_trans = value.toMutable()}
     private var _trans : MutableTransform = MutableTransform.IdentityMatrix()
 
-    override fun preTranslate(offsetX: Double, offsetY: Double) = _trans.preTranslate(offsetX.toFloat(), offsetY.toFloat())
-    override fun translate(offsetX: Double, offsetY: Double) = _trans.translate(offsetX.toFloat(), offsetY.toFloat())
+    override fun preTranslate(offsetX: Float, offsetY: Float) = _trans.preTranslate(offsetX.toFloat(), offsetY.toFloat())
+    override fun translate(offsetX: Float, offsetY: Float) = _trans.translate(offsetX.toFloat(), offsetY.toFloat())
 
     override fun preTransform(trans: Transform) = _trans .preConcatenate(trans)
     override fun transform(trans: Transform) = _trans.concatenate(trans)
 
-    override fun preScale(sx: Double, sy: Double) = _trans.preScale(sx.toFloat(), sy.toFloat())
-    override fun scale(sx: Double, sy: Double) = _trans.scale(sx.toFloat(), sy.toFloat())
+    override fun preScale(sx: Float, sy: Float) = _trans.preScale(sx.toFloat(), sy.toFloat())
+    override fun scale(sx: Float, sy: Float) = _trans.scale(sx.toFloat(), sy.toFloat())
     // endregion
 
     // region Other Settings

@@ -52,11 +52,11 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun preTranslate(offsetX: Double, offsetY: Double) {
+    override fun preTranslate(offsetX: Float, offsetY: Float) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun translate(offsetX: Double, offsetY: Double) {
+    override fun translate(offsetX: Float, offsetY: Float) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -68,11 +68,11 @@ class AWTGraphicsContext : GraphicsContext {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun preScale(sx: Double, sy: Double) {
+    override fun preScale(sx: Float, sy: Float) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun scale(sx: Double, sy: Double) {
+    override fun scale(sx: Float, sy: Float) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
     override fun drawRect(x: Int, y: Int, w: Int, h: Int) {

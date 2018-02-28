@@ -1,6 +1,7 @@
 package spirite.base.graphics
 
 import spirite.base.util.Color
+import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import java.awt.Shape
@@ -30,12 +31,12 @@ abstract class GraphicsContext {
     abstract fun drawBounds(image: IImage, c: Int)
 
     abstract fun clear()
-    abstract fun preTranslate(offsetX: Double, offsetY: Double)
-    abstract fun translate(offsetX: Double, offsetY: Double)
+    abstract fun preTranslate(offsetX: Float, offsetY: Float)
+    abstract fun translate(offsetX: Float, offsetY: Float)
     abstract fun preTransform(trans: Transform)
     abstract fun transform(trans: Transform)
-    abstract fun preScale(sx: Double, sy: Double)
-    abstract fun scale(sx: Double, sy: Double)
+    abstract fun preScale(sx: Float, sy: Float)
+    abstract fun scale(sx: Float, sy: Float)
 
 
     enum class Composite {
@@ -76,6 +77,7 @@ abstract class GraphicsContext {
     abstract fun dispose()
 
 
+    fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderMethod) = renderImage(rawImage, x, y, RenderRhubric(SinglyList(render)))
     abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric = RenderRhubric())
 
 
