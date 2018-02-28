@@ -11,9 +11,12 @@ uniform int u_flags;
 
 out vec4 outputColor;
 
+bool targetPremultiplied() {return (u_flags & 1) == 1;}
+bool sourcePremultiplied() {return (u_flags & 2) == 1;}
+
 void main()
 {
-    vec3 color = ( (u_flags & 1) == 0) ? u_color : u_color * u_alpha;
+    vec3 color = targetPremultiplied() ? u_color * u_alpha : u_color;
 
    	outputColor = vec4( color, u_alpha);
 }

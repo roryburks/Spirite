@@ -56,6 +56,7 @@ abstract class Transform()
         return ImmutableTransform(im00, im01, im02, im10, im11, im12)
     }
 
+    // Not extremely necessary because Transform is taken/treated as a contract to not change it (by casting it).
     fun toImmutable() : ImmutableTransform {
         return ImmutableTransform(m00,m01,m02, m10,m11,m12)
     }
@@ -103,35 +104,35 @@ abstract class Transform()
 
 }
 
-class ImmutableTransform(
+data class ImmutableTransform(
         override val m00: Float = 1f, override val m01: Float = 0f, override val m02: Float = 0f,
         override val m10: Float = 0f, override val m11: Float = 1f, override val m12: Float = 0f
 ) :Transform()
 {
 }
 
-class MutableTransform(
-        m00:Float = 1f, m01:Float = 0f, m02:Float = 0f,
-        m10:Float = 0f, m11:Float = 1f, m12:Float = 0f
+data class MutableTransform(
+        private var _m00:Float = 1f, private var _m01:Float = 0f, private var _m02:Float = 0f,
+        private var _m10:Float = 0f, private var _m11:Float = 1f, private var _m12:Float = 0f
 ):Transform()
 {
     constructor():this( 1f,0f,0f,0f,1f,0f){}
 
-    override var m00: Float = m00; private set
-    override var m01: Float = m01; private set
-    override var m02: Float = m02; private set
-    override var m10: Float = m10; private set
-    override var m11: Float = m11; private set
-    override var m12: Float = m12; private set
+    override val m00: Float get() = _m00
+    override val m01: Float get() = _m01
+    override val m02: Float get() = _m02
+    override val m10: Float get() = _m10
+    override val m11: Float get() = _m11
+    override val m12: Float get() = _m12
 
     fun translate(ox: Float, oy: Float) {
-        m02 += ox * m00 + oy * m01
-        m12 += ox * m10 + oy * m11
+        _m02 += ox * m00 + oy * m01
+        _m12 += ox * m10 + oy * m11
     }
 
     fun preTranslate(ox: Float, oy: Float) {
-        m02 += ox
-        m12 += oy
+        _m02 += ox
+        _m12 += oy
     }
 
     // THIS = THIS * tx
@@ -142,12 +143,12 @@ class MutableTransform(
         val n10 = m10 * tx.m00 + m11 * tx.m10
         val n11 = m10 * tx.m01 + m11 * tx.m11
         val n12 = m10 * tx.m02 + m11 * tx.m12 + m12
-        m00 = n00
-        m01 = n01
-        m02 = n02
-        m10 = n10
-        m11 = n11
-        m12 = n12
+        _m00 = n00
+        _m01 = n01
+        _m02 = n02
+        _m10 = n10
+        _m11 = n11
+        _m12 = n12
     }
 
     // THIS = tx * THIS
@@ -158,21 +159,21 @@ class MutableTransform(
         val n10 = tx.m10 * m00 + tx.m11 * m10
         val n11 = tx.m10 * m01 + tx.m11 * m11
         val n12 = tx.m10 * m02 + tx.m11 * m12 + tx.m12
-        m00 = n00
-        m01 = n01
-        m02 = n02
-        m10 = n10
-        m11 = n11
-        m12 = n12
+        _m00 = n00
+        _m01 = n01
+        _m02 = n02
+        _m10 = n10
+        _m11 = n11
+        _m12 = n12
     }
 
     fun setToIdentity() {
-        m00 = 1f
-        m11 = 1f
-        m12 = 0f
-        m10 = 0f
-        m01 = 0f
-        m02 = 0f
+        _m00 = 1f
+        _m11 = 1f
+        _m12 = 0f
+        _m10 = 0f
+        _m01 = 0f
+        _m02 = 0f
     }
 
     fun rotate(theta: Float) {
@@ -182,10 +183,10 @@ class MutableTransform(
         val n01 = m00 * -s + m01 * c
         val n10 = m10 * c + m11 * s
         val n11 = m10 * -s + m11 * c
-        m00 = n00
-        m01 = n01
-        m10 = n10
-        m11 = n11
+        _m00 = n00
+        _m01 = n01
+        _m10 = n10
+        _m11 = n11
     }
 
     fun preRotate(theta: Float) {
@@ -197,37 +198,32 @@ class MutableTransform(
         val n10 = s * m00 + c * m10
         val n11 = s * m01 + c * m11
         val n12 = s * m02 + c * m12
-        m00 = n00
-        m01 = n01
-        m02 = n02
-        m10 = n10
-        m11 = n11
-        m12 = n12
+        _m00 = n00
+        _m01 = n01
+        _m02 = n02
+        _m10 = n10
+        _m11 = n11
+        _m12 = n12
     }
 
     fun scale(sx: Float, sy: Float) {
-        m00 *= sx
-        m01 *= sy
-        m10 *= sx
-        m11 *= sy
+        _m00 *= sx
+        _m01 *= sy
+        _m10 *= sx
+        _m11 *= sy
     }
 
     fun preScale(sx: Float, sy: Float) {
-        m00 *= sx
-        m01 *= sx
-        m02 *= sx
-        m10 *= sy
-        m11 *= sy
-        m12 *= sy
+        _m00 *= sx
+        _m01 *= sx
+        _m02 *= sx
+        _m10 *= sy
+        _m11 *= sy
+        _m12 *= sy
     }
 
-    fun getTranslateX(): Float {
-        return m02
-    }
-
-    fun getTranslateY(): Float {
-        return m12
-    }
+    fun getTranslateX() = m02
+    fun getTranslateY() = m12
 
     fun inverseTransform(from: Vec2): Vec2 {
         return invert().apply(from)
@@ -235,6 +231,8 @@ class MutableTransform(
 
     fun invertM(): MutableTransform {
         val det = determinant
+
+        if( det == 0f) throw NoninvertableException()
 
         val im00 = m11 / det
         val im10 = -m10 / det
@@ -246,7 +244,7 @@ class MutableTransform(
         return MutableTransform(im00, im01, im02, im10, im11, im12)
     }
 
-    class NoninvertableException private constructor(message: String) : Exception(message)
+    class NoninvertableException internal constructor() : Exception("Matrix is Not Invertable")
 
 
     companion object {
@@ -267,8 +265,6 @@ class MutableTransform(
                     c, -s, 0f,
                     s, c, 0f)
         }
-        fun IdentityMatrix() : MutableTransform {
-            return MutableTransform(1f, 0f, 0f, 0f, 1f, 0f)
-        }
+        fun IdentityMatrix() = MutableTransform(1f, 0f, 0f, 0f, 1f, 0f)
     }
 }

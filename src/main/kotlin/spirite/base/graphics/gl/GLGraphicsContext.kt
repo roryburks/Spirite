@@ -101,13 +101,9 @@ class GLGraphicsContext : GraphicsContext {
 
     override var color : Color = Colors.BLACK
 
-    override fun setComposite(composite: Composite, alpha: Float) {
-        this.alpha = alpha
-        this.composite = composite
-    }
-    override var alpha = 1f ; private set
+    override var alpha = 1f
     override var composite = SRC_OVER
-        private set(value) {
+        set(value) {
             setCompositeBlend(cachedParams, value)
             field = value
         }

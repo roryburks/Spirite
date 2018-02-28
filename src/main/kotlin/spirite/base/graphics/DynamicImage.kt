@@ -1,11 +1,12 @@
 package spirite.base.graphics
 
 import spirite.base.graphics.GraphicsContext.Composite
+import spirite.base.graphics.GraphicsContext.Composite.SRC
 import spirite.base.util.MUtil
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.ContentBoundsFinder
-import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 
 
 /**
@@ -45,7 +46,7 @@ class DynamicImage(
                     val compositionWidth : Int,
                     val compositionHeight : Int
     ){
-        val buffer = EngineLaunchpoint.createImage(compositionWidth, compositionHeight)
+        val buffer = Hybrid.imageCreator.createImage(compositionWidth, compositionHeight)
     }
 
     private fun checkoutRaw( compositionWidth: Int, compositionHeight: Int,tBaseToComposition: Transform) : CompositionContext {
@@ -68,7 +69,7 @@ class DynamicImage(
         val drawArea = MUtil.circumscribeTrans(Rect(0,0,w,h), tCompositionToBase)
                 .union(Rect(xOffset, yOffset, base?.width ?: 1, base?.height ?: 1))
 
-        val newBaseUncropped = EngineLaunchpoint.createImage( drawArea.width, drawArea.height)
+        val newBaseUncropped = Hybrid.imageCreator.createImage( drawArea.width, drawArea.height)
         val gc = newBaseUncropped.graphics
 
         // Draw the old image
@@ -77,12 +78,12 @@ class DynamicImage(
 
         // Clear the section of the old image that will be replaced by the new one
         gc.transform(context.tBaseToComposition)
-        gc.setComposite( Composite.SRC, 1.0f)
+        gc.composite = SRC
         gc.renderImage(context.buffer, 0, 0)
 
         val cropped = ContentBoundsFinder.findContentBounds(newBaseUncropped, 0, true)
 
-        val newBaseCropped = if(cropped.isEmpty) null else EngineLaunchpoint.createImage(cropped.width, cropped.height)
+        val newBaseCropped = if(cropped.isEmpty) null else Hybrid.imageCreator.createImage(cropped.width, cropped.height)
         newBaseCropped?.graphics?.renderImage(newBaseUncropped, -cropped.x, -cropped.y)
 
         xOffset = cropped.x - drawArea.x

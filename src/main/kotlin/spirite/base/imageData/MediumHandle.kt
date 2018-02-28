@@ -45,12 +45,13 @@ data class MediumHandle(
 
     fun drawLayer(
             gc: GraphicsContext, transform: Transform, composite: Composite, alpha: Float) {
-        val oldAlpha = gc.alpha
-        val oldComposite = gc.composite
+        gc.pushState()
 
-        gc.setComposite(composite, alpha * oldAlpha)
+        gc.composite = composite
+        gc.alpha = alpha
         drawLayer(gc, transform)
-        gc.setComposite(oldComposite, oldAlpha)
+
+        gc.pushState()
     }
 
 

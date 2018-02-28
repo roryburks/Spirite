@@ -110,8 +110,10 @@ class RenderCall(
         calls: List<Pair<RenderAlgorithm, Int>>)
     : ProgramCall()
 {
+    val MAX_CALLS = 10
+
     enum class RenderAlgorithm( val progId: Int) {
-        STRAIGHT_PASS(0),
+        //STRAIGHT_PASS(0), // Adding this would be redundant
         AS_COLOR(1),
         AS_COLOR_ALL(2),
         DISSOLVE(3)
@@ -119,8 +121,8 @@ class RenderCall(
 
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform1f("u_alpha", alpha),
-            GLUniform1iv("u_values", calls.map { it.second }.toIntArray()),
-            GLUniform1iv( "u_composites", calls.map { it.first.progId }.toIntArray())
+            GLUniform1iv("u_values", IntArray(MAX_CALLS, {calls.getOrNull(it)?.second ?: 0})),
+            GLUniform1iv( "u_composites", IntArray(MAX_CALLS, {calls.getOrNull(it)?.first?.progId ?: 0}))
     )
 
     override val programType: ProgramType get() = PASS_RENDER

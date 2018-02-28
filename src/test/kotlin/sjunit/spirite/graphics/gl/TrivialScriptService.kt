@@ -1,4 +1,4 @@
-package sjunit.spirite.graphics
+package sjunit.spirite.graphics.gl
 
 import spirite.base.resources.IScriptService
 

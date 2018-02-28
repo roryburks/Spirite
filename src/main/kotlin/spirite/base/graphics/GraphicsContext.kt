@@ -19,8 +19,8 @@ abstract class GraphicsContext {
 
     /** Setting to null produces undefined behavior.  */
     abstract var transform: Transform
-    abstract val alpha: Float
-    abstract val composite: Composite
+    abstract var alpha: Float
+    abstract var composite: Composite
     abstract var color: Color
 
     /** May return null if the underlying engine's Line Attributes aren't
@@ -43,8 +43,6 @@ abstract class GraphicsContext {
         DST, DST_IN, DST_OVER, DST_OUT, DST_ATOP,
         CLEAR, XOR
     }
-
-    abstract fun setComposite(composite: Composite, alpha: Float)
 
 
     abstract fun drawRect(x: Int, y: Int, w: Int, h: Int)
@@ -86,11 +84,13 @@ abstract class GraphicsContext {
     fun popTransform() {transform = transformStack.pop()}
 
     private val stateStack = Stack<GraphicalState>()
-    fun pushState() { stateStack.push( GraphicalState(transform, composite, alpha))}
+    fun pushState() { stateStack.push( GraphicalState(transform, composite, alpha, color))}
     fun popState() {
         val state = stateStack.pop()
         transform = state.trans
-        setComposite(state.composite, state.alpha)
+        composite = state.composite
+        alpha = state.alpha
+        color = state.color
     }
 
     open fun drawTransparencyBG(rect: Rect, i: Int) {}
@@ -115,5 +115,6 @@ class LineAttributes (
 data class GraphicalState(
         val trans: Transform,
         val composite: GraphicsContext.Composite,
-        val alpha: Float
+        val alpha: Float,
+        val color: Color
 ){}

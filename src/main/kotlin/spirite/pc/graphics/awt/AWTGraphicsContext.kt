@@ -12,6 +12,12 @@ import java.awt.Shape
 import java.awt.image.BufferedImage
 
 class AWTGraphicsContext : GraphicsContext {
+    override var alpha: Float
+        get() = TODO("not implemented")
+        set(value) {}
+    override var composite: Composite
+        get() = TODO("not implemented")
+        set(value) {}
     override var color: Color
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
@@ -34,10 +40,6 @@ class AWTGraphicsContext : GraphicsContext {
     override var transform: Transform
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
-    override val alpha: Float
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val composite: Composite
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override var lineAttributes: LineAttributes
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
         set(value) {}
@@ -73,11 +75,6 @@ class AWTGraphicsContext : GraphicsContext {
     override fun scale(sx: Double, sy: Double) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    override fun setComposite(composite: Composite, alpha: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun drawRect(x: Int, y: Int, w: Int, h: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

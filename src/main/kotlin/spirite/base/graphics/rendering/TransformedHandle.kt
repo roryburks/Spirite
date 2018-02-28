@@ -28,7 +28,7 @@ private constructor(
                 top.medium,
                 (top.transform*transform).toMutable(),
                 top.alpha * alpha,
-                RenderRhubric(top.renderRhubric.methods + renderRhubric.methods),
+                RenderRhubric(renderRhubric.methods + top.renderRhubric.methods),
                 top.depth)
     }
 }

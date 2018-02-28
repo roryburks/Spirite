@@ -1,4 +1,4 @@
-package sjunit.spirite.graphics
+package sjunit.spirite.graphics.gl
 
 
 import sjunit.TestConfig
@@ -107,6 +107,12 @@ class GLEngineTests {
 
         val params = GLParameters(500,500, texture1 = star)
 
+        // Call this one first to make sure the entire Uniform Arrays associated are properly reset
+        gle.applyPassProgram( RenderCall(0.5f,
+                listOf(
+                        Pair(DISSOLVE, 4),
+                        Pair(AS_COLOR, 0xff0000ff.toInt()))),
+                params, null, 200f, 50f, 250f, 100f)
         gle.applyPassProgram( SquareGradientCall(0.5f, GradientType.V),
                 params, null, 0f, 0f, 50f, 50f)
         gle.applyPassProgram( ChangeColorCall(Vec4(1f, 0f, 0f, 1f), Vec4( 0f, 1f, 0f, 1f), IGNORE_ALPHA),
@@ -127,11 +133,6 @@ class GLEngineTests {
                 params, null, 100f, 50f, 150f, 100f)
         gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(DISSOLVE, 4))),
                 params, null, 150f, 50f, 200f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f,
-                    listOf(
-                            Pair(DISSOLVE, 4),
-                            Pair(AS_COLOR, 0xff0000ff.toInt()))),
-                params, null, 200f, 50f, 250f, 100f)
 
 
         if( TestConfig.save)

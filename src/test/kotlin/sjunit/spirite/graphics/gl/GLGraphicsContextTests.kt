@@ -1,4 +1,4 @@
-package sjunit.spirite.graphics
+package sjunit.spirite.graphics.gl
 
 import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
@@ -42,7 +42,7 @@ class GLGraphicsContextTests {
 
         val toImage = GLImage(30,30, gle)
         val togc = toImage.graphics
-        togc.setComposite(SRC_OVER, 0.5f)
+        togc.alpha = 0.5f
         togc.renderImage( subImg, 5, 5)
 
         val color = toImage.getColor(19,19)

@@ -2,7 +2,7 @@ package spirite.base.imageData.selection
 
 import spirite.base.graphics.IImage
 import spirite.hybrid.ContentBoundsFinder
-import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 
 class SelectionMask {
     val mask: IImage
@@ -11,7 +11,7 @@ class SelectionMask {
     constructor( mask: IImage, ox: Int = 0, oy: Int = 0) {
         val cropped = ContentBoundsFinder.findContentBounds(mask, 1, true)
 
-        val maskBeingBuilt = EngineLaunchpoint.createImage( cropped.width, cropped.height)
+        val maskBeingBuilt = Hybrid.imageCreator.createImage( cropped.width, cropped.height)
         maskBeingBuilt.graphics.renderImage(mask, -cropped.x, -cropped.y)
 
         this.mask = maskBeingBuilt

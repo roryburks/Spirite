@@ -1,5 +1,6 @@
 #version 330
 
+#define MAX_CALLS 10
 
 in vec2 vUV;
 
@@ -15,20 +16,16 @@ uniform float u_alpha;
 uniform int u_flags;
 
 // Subvariable assosciated with Composite
-uniform int u_values[10];
+uniform int u_values[MAX_CALLS];
 
 // 0: StraightPass
 // 1: As Hue
 // 2: As Color (all
 // 3: Disolve
-uniform int u_composites[10];
+uniform int u_composites[MAX_CALLS];
 
-bool targetPremultiplied() {
-    return (u_flags % 1) == 1;
-}
-bool sourcePremultiplied() {
-    return (u_flags % 2) == 1;
-}
+bool targetPremultiplied() {return (u_flags & 1) == 1;}
+bool sourcePremultiplied() {return (u_flags & 2) == 1;}
 
 
 // ==== As Hue ====
@@ -94,7 +91,7 @@ void main()
 
 	oCol = texCol;  // Default as straight pass
 
-	for( int i = 0; i < u_composites.length(); ++i) {
+	for( int i = 0; i < MAX_CALLS; ++i) {
 	    switch( u_composites[i]) {
 	    case 0: break;
 	    case 1:
