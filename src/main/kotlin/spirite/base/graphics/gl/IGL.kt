@@ -58,6 +58,7 @@ interface IGL {
     fun uniform3i( location: IGLUniformLocation?, x: Int, y: Int, z: Int)
     fun uniform4i( location: IGLUniformLocation?, x: Int, y: Int, z: Int, w: Int)
     fun uniformMatrix4fv( location: IGLUniformLocation?, data: IFloat32Source)
+    fun uniform1iv( location: IGLUniformLocation?, data: IInt32Source)
 
     // Attribute Buffer Stuff
     fun getAttribLocation( program: IGLProgram, name: String) : Int

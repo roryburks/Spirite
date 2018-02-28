@@ -90,3 +90,7 @@ class GLUniformMatrix4fv(name: String, val mat4: Mat4) : GLUniform(name) {
     override fun apply(gl: IGL, program: IGLProgram)
     {gl.uniformMatrix4fv(getUniformLocation(gl,program) ?: return, mat4.toIFloat32Source(gl))}
 }
+
+class GLUniform1iv(name: String, val v: IntArray) : GLUniform(name) {
+    override fun apply(gl: IGL, program: IGLProgram) {gl.uniform1iv(getUniformLocation(gl, program) ?: return, gl.makeInt32Source(v))}
+}

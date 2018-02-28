@@ -119,14 +119,19 @@ class GLEngineTests {
                 params, null, 200f, 0f, 250f, 50f)
         gle.applyPassProgram( InvertCall(),
                 params, null, 250f, 0f, 300f, 50f)
-        gle.applyPassProgram( RenderCall(0.5f, 0, true, STRAIGHT_PASS),
+        gle.applyPassProgram( RenderCall(0.5f, emptyList()),
                 params, null, 0f, 50f, 50f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, 0xff0000ff.toInt(), true, AS_COLOR),
+        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(AS_COLOR, 0xff0000ff.toInt()))),
                 params, null, 50f, 50f, 100f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, 0xff00ffff.toInt(), true, AS_COLOR_ALL),
+        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(AS_COLOR_ALL,0xff00ffff.toInt()))),
                 params, null, 100f, 50f, 150f, 100f)
-        gle.applyPassProgram( RenderCall(0.5f, 4, true, DISOLVE),
+        gle.applyPassProgram( RenderCall(0.5f, listOf(Pair(DISSOLVE, 4))),
                 params, null, 150f, 50f, 200f, 100f)
+        gle.applyPassProgram( RenderCall(0.5f,
+                    listOf(
+                            Pair(DISSOLVE, 4),
+                            Pair(AS_COLOR, 0xff0000ff.toInt()))),
+                params, null, 200f, 50f, 250f, 100f)
 
 
         if( TestConfig.save)

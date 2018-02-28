@@ -4,6 +4,7 @@ import spirite.base.graphics.*
 import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
+import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.glu.GLC
@@ -203,56 +204,49 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun dispose() { if( gle.target == image?.tex) gle.target = null}
 
+    /**
+     * The way this constructs its call from the RenderRhubric is:
+     *  -performs all calls which require sharer algorithms in the order that they're entered
+     *  -uses the BlendMode of the LAST BlendMode-related
+     *
+     * Essentially it makes sense to draw something as "Color-changed to Red, Disolved, and Multiply the result to the
+     * screen", but it doesn't make a lot of sense (or rather the algorithms aren't in place) for it to "multiply and subtract
+     * the texture from the screen"
+     */
     override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric) {
         val params = this.cachedParams.copy()
 
-        val method = render.methods.lastOrNull() ?: RenderMethod()
+        val calls = mutableListOf<Pair<RenderAlgorithm,Int>>()
 
-        val renderAlgorithm = when (method.methodType) {
-            COLOR_CHANGE_HUE -> {
-                setCompositeBlend(params, SRC_OVER)
-                RenderAlgorithm.AS_COLOR
-            }
-            COLOR_CHANGE_FULL -> {
-                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
-                RenderAlgorithm.AS_COLOR_ALL
-            }
-            DISOLVE -> {
-                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
-                RenderAlgorithm.DISOLVE
-            }
-            LIGHTEN -> {
-                params.setBlendModeExt(
+        // Default Blend Mode (may be over-written)
+        setCompositeBlend(params, SRC_OVER)
+
+        // Construct Call Attributes from RenderRhubric
+        render.methods.forEach {
+            when(it.methodType) {
+                COLOR_CHANGE_HUE -> calls.add( Pair(AS_COLOR, it.renderValue))
+                COLOR_CHANGE_FULL -> calls.add( Pair(AS_COLOR_ALL, it.renderValue))
+                DISOLVE -> calls.add(Pair(DISSOLVE, it.renderValue))
+                LIGHTEN -> params.setBlendModeExt(
                         GLC.ONE, GLC.ONE, GLC.FUNC_ADD,
                         GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-                RenderAlgorithm.STRAIGHT_PASS
-            }
-            SUBTRACT -> {
-                params.setBlendModeExt(
+                SUBTRACT -> params.setBlendModeExt(
                         GLC.ZERO, GLC.ONE_MINUS_SRC_COLOR, GLC.FUNC_ADD,
                         GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-                RenderAlgorithm.STRAIGHT_PASS
-            }
-            MULTIPLY -> {
-                params.setBlendModeExt(GLC.DST_COLOR, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD,
+                MULTIPLY -> params.setBlendModeExt(
+                        GLC.DST_COLOR, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD,
                         GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-                RenderAlgorithm.STRAIGHT_PASS
-            }
-            SCREEN -> {
-                // C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
-                params.setBlendModeExt(GLC.ONE_MINUS_DST_COLOR, GLC.ONE, GLC.FUNC_ADD,
-                        GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-                RenderAlgorithm.STRAIGHT_PASS
-            }
-            OVERLAY -> RenderAlgorithm.DISOLVE
-            DEFAULT -> {
-                setCompositeBlend(params, GraphicsContext.Composite.SRC_OVER)
-                RenderAlgorithm.STRAIGHT_PASS
+                SCREEN ->
+                    // C = (1 - (1-DestC)*(1-SrcC) = SrcC*(1-DestC) + DestC
+                    params.setBlendModeExt(
+                            GLC.ONE_MINUS_DST_COLOR, GLC.ONE, GLC.FUNC_ADD,
+                            GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+                DEFAULT -> {}
             }
         }
 
         params.texture1 = ImageConverter(gle).convert<GLImage>(rawImage)
-        applyPassProgram( RenderCall( alpha, method.renderValue, false, renderAlgorithm),
+        applyPassProgram( RenderCall( alpha, calls),
                 params, transform, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
 

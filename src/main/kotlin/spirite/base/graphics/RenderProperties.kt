@@ -25,11 +25,11 @@ enum class RenderMethodType constructor(val description: String, val defaultValu
     COLOR_CHANGE_FULL("As Color (fully)", 0xFF0000),
 
     DISOLVE("Disolve", 57343),
-    //DISOLVE("Disolve", 0b01110010_00101111),
+    //DISSOLVE("Disolve", 0b01110010_00101111),
 
     LIGHTEN("Lighten", 0),
     SUBTRACT("Subtract", 0),
     MULTIPLY("Multiply", 0),
     SCREEN("Screen", 0),
-    OVERLAY("Overlay", 0)
+    //OVERLAY("Overlay", 0)
 }

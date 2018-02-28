@@ -42,8 +42,9 @@ sealed abstract class ProgramCall {
 
 class SquareGradientCall(
         fixedAmount: Float,
-        gradientType: GradientType
-): ProgramCall() {
+        gradientType: GradientType)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform1f("u_fixedAmmount", fixedAmount),
             GLUniform1i("u_typeCode", gradientType.ordinal))
@@ -56,8 +57,9 @@ class SquareGradientCall(
 class ChangeColorCall(
         fromColor: Vec4,
         toColor: Vec4,
-        changeMethod: ChangeMethod
-) : ProgramCall() {
+        changeMethod: ChangeMethod)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform4f("u_fromColor", fromColor),
             GLUniform4f("u_toColor", toColor),
@@ -75,8 +77,9 @@ class ChangeColorCall(
 class GridCall(
         color1: Vec3,
         color2: Vec3,
-        size: Int
-) : ProgramCall() {
+        size: Int)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f( "u_Color1", color1),
             GLUniform3f( "u_Color2", color2),
@@ -90,9 +93,9 @@ class BasicCall() : ProgramCall() {
     override val programType: ProgramType get() = PASS_BASIC
 }
 
-class BorderCall(
-        met : Int
-): ProgramCall() {
+class BorderCall(met : Int)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(GLUniform1i("u_cycle", met))
     override val programType: ProgramType get() = PASS_BORDER
 }
@@ -104,38 +107,28 @@ class InvertCall() : ProgramCall() {
 
 class RenderCall(
         alpha: Float,
-        subvariable: Int,
-        premultiplyTotal: Boolean,
-        algorithm : RenderAlgorithm
-) : ProgramCall() {
-    enum class RenderAlgorithm {
-        STRAIGHT_PASS,
-        AS_COLOR,
-        AS_COLOR_ALL,
-        DISOLVE
+        calls: List<Pair<RenderAlgorithm, Int>>)
+    : ProgramCall()
+{
+    enum class RenderAlgorithm( val progId: Int) {
+        STRAIGHT_PASS(0),
+        AS_COLOR(1),
+        AS_COLOR_ALL(2),
+        DISSOLVE(3)
     }
 
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform1f("u_alpha", alpha),
-            GLUniform1i("u_value", subvariable),
-            GLUniform1i( "u_composite",
-                    when( premultiplyTotal) {
-                        true -> 1
-                        false -> 0
-                    } or (when( algorithm) {
-                        STRAIGHT_PASS -> 0
-                        AS_COLOR -> 1
-                        AS_COLOR_ALL -> 2
-                        DISOLVE -> 3
-                    } shl 1))
+            GLUniform1iv("u_values", calls.map { it.second }.toIntArray()),
+            GLUniform1iv( "u_composites", calls.map { it.first.progId }.toIntArray())
     )
 
     override val programType: ProgramType get() = PASS_RENDER
 }
 
-class StrokeV2LinePass(
-        val color: Vec3
-) : ProgramCall(){
+class StrokeV2LinePass(val color: Vec3)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f("u_color", color))
 
@@ -144,8 +137,9 @@ class StrokeV2LinePass(
 
 class PolyRenderCall(
         color: Vec3,
-        alpha: Float
-):ProgramCall() {
+        alpha: Float)
+    :ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f( "u_color", color),
             GLUniform1f("u_alpha", alpha))
@@ -156,8 +150,9 @@ class LineRenderCall(
         joinMethod: JoinMethod,
         lineWidth: Float,
         color: Vec3,
-        alpha: Float
-) : ProgramCall() {
+        alpha: Float)
+    : ProgramCall()
+{
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform1i("u_join", when( joinMethod) {
                 BEVEL -> 1 // 2

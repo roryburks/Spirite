@@ -1,7 +1,5 @@
 package spirite.hybrid
 
-import sun.plugin2.util.SystemUtil
-
 
 interface IHybrid {
     val system : ISystemUtils

@@ -8,30 +8,30 @@ out vec4 outputColor;
 uniform sampler2D myTexture;
 //uniform sampler2D myTexture2;
 uniform float u_alpha;
-uniform int u_value;
 
-// 00000000 00000000 00000000 0000BBBA
-// A: how to combine the color and alpha
-//		0: multiply colors by the input alpha
-//		1: multiply colors by total alpha
-// B: which subroutine to use
-//		0: Straight Pass (usually for Porter-Duff SourceOver)
-//		1: As Color (defined by uValue)
-//		2: As Color (all)
-//		3: Disolve
-uniform int u_composite;
+// 00BA
+// A : Whether or not the target should be pre-multiplied
+// B : Whether or not the source of myTexture is pre-multiplied
+uniform int u_flags;
 
-vec4 disolve( vec4 tex)
-{
-	if( (u_value &
-			(1 << (   (int(gl_FragCoord.x) % 4) + 4*( int(gl_FragCoord.y) %  4)))) != 0)
-	{
+// Subvariable assosciated with Composite
+uniform int u_values[10];
 
-		return tex;
-	}
-	else return vec4(0,0,0,0);
+// 0: StraightPass
+// 1: As Hue
+// 2: As Color (all
+// 3: Disolve
+uniform int u_composites[10];
+
+bool targetPremultiplied() {
+    return (u_flags % 1) == 1;
+}
+bool sourcePremultiplied() {
+    return (u_flags % 2) == 1;
 }
 
+
+// ==== As Hue ====
 vec3 rgb2hsv(vec3 _color)
 {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -50,52 +50,66 @@ vec3 hsv2rgb(vec3 _color)
     return _color.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), _color.y);
 }
 
-vec4 changeColorHue(vec4 texCol) {
-	bool premult = false;
-	vec3 cTo = vec3(((u_value>>16)&0xFF)/255.0f, ((u_value>>8)&0xFF)/255.0f, ((u_value)&0xFF)/255.0f);
-	vec3 hsvFrom = premult ? rgb2hsv( texCol.rgb) / texCol.a : rgb2hsv( texCol.rgb);
+vec4 changeColorHue(vec4 texCol, int subValue) {
+	vec3 cTo = vec3(((subValue>>16)&0xFF)/255.0f, ((subValue>>8)&0xFF)/255.0f, ((subValue)&0xFF)/255.0f);
+	vec3 hsvFrom = rgb2hsv( texCol.rgb);
 	vec3 hsvTo = rgb2hsv( cTo.rgb);
 
-	return vec4(
-			(premult) ? hsv2rgb( vec3(hsvTo[0], hsvFrom[1], hsvFrom[2])) * texCol.a
-				:hsv2rgb( vec3(hsvTo[0], hsvFrom[1], hsvFrom[2]))
-			 ,  texCol.a);
+	return vec4(hsv2rgb( vec3(hsvTo[0], hsvFrom[1], hsvFrom[2])) , texCol.a);
 }
 
-vec4 changeColor(vec4 texCol) {
-	float r = ((u_value>>16)&0xFF)/255.0f;
-	float g = ((u_value>>8)&0xFF)/255.0f;
-	float b = ((u_value)&0xFF)/255.0f;
-	return vec4( r*texCol.a, g*texCol.a, b*texCol.a, texCol.a);
+// ==== Method 2: As Color ====
+vec4 changeColor(vec4 texCol, int subValue) {
+	float r = ((subValue>>16)&0xFF)/255.0f;
+	float g = ((subValue>>8)&0xFF)/255.0f;
+	float b = ((subValue)&0xFF)/255.0f;
+
+	return vec4( r, g, b, texCol.a);
 }
+
+// ==== Method 3: Disolbe ====
+vec4 disolve( vec4 tex, int subValue)
+{
+	if( (subValue &
+			(1 << (   (int(gl_FragCoord.x) % 4) + 4*( int(gl_FragCoord.y) %  4)))) != 0)
+	{
+		return tex;
+	}
+	else return vec4(0,0,0,0);
+}
+
+
 
 void main()
 {
 	vec4 texCol = texture(myTexture, vUV);
 	vec4 oCol;
-	
-	if( u_composite%2 != 0) {
-		// Premultiply incoming data
-		texCol.r *= texCol.a;
-		texCol.g *= texCol.a;
-		texCol.b *= texCol.a;
+
+	if( sourcePremultiplied()) {
+	    // De-multiply source so that we can work with standardized RGB values
+	    texCol.r /= texCol.a;
+	    texCol.g /= texCol.a;
+	    texCol.b /= texCol.a;
 	}
-	
-	switch( (u_composite >> 1) & 0x7) {
-	case 0: 
-		oCol = texCol;
-		break;
-	case 1:
-		oCol = changeColorHue( texCol);
-		break;
-	case 2:
-		oCol = changeColor( texCol);
-		break;
-	case 3:
-		oCol = disolve( texCol);
-		break;
+
+	oCol = texCol;  // Default as straight pass
+
+	for( int i = 0; i < u_composites.length(); ++i) {
+	    switch( u_composites[i]) {
+	    case 0: break;
+	    case 1:
+	        oCol = changeColorHue( oCol, u_values[i]);
+	        break;
+	    case 2:
+	        oCol = changeColor( oCol, u_values[i]);
+	        break;
+	    case 3:
+	        oCol = disolve(oCol, u_values[i]);
+	        break;
+	    }
 	}
-	
-	
-	outputColor = oCol*u_alpha;
+
+	outputColor = (targetPremultiplied())
+	    ? vec4(oCol.r * oCol.a, oCol.g * oCol.a, oCol.b * oCol.a, oCol.a) * u_alpha
+	    : vec4(oCol.r, oCol.g, oCol.b, oCol.a * u_alpha);
 }
