@@ -1,5 +1,8 @@
 package spirite.base.graphics
 
+import spirite.base.util.groupExtensions.SinglyList
+import spirite.base.util.linear.Transform
+
 
 /** RenderProperties is carried by individual objects, like nodes, Sprite Parts, etc */
 data class RenderProperties(
@@ -10,8 +13,29 @@ data class RenderProperties(
     val isVisible: Boolean = visible && alpha > 0f
 }
 
-/** RenderRhubric is what's conglomerated by TransformedHandles and passed to GC.renderImage */
-data class RenderRhubric(val methods : List<RenderMethod> = emptyList())
+
+@Suppress("DataClassPrivateConstructor")
+// There's nothing actually wrong with users accessing the default constructor; it just is a confusion to see a list when
+//  the user will only ever actually put in a single entry
+data class RenderRubric
+private constructor(
+        val transform: Transform,
+        val alpha: Float,
+        val methods: List<RenderMethod>)
+{
+    constructor(
+            transform: Transform = Transform.IdentityMatrix,
+            alpha: Float = 1f,
+            method: RenderMethod? = null)
+            : this(transform, alpha, if( method == null) emptyList() else SinglyList(method))
+
+    fun stack(top: RenderRubric) : RenderRubric {
+        return RenderRubric(
+                top.transform * transform,
+                top.alpha * alpha,
+                methods + top.methods)
+    }
+}
 
 /** RenderMethods is a MethodType along with a value (if applicable) */
 data class RenderMethod(

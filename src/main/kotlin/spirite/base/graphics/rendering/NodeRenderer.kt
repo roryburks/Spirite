@@ -2,8 +2,10 @@ package spirite.base.graphics.rendering
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
+import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -124,11 +126,8 @@ class NodeRenderer(
 
             _renderRec(node, n+1)
 
-            gc.pushState()
-            gc.alpha = node.render.alpha
-            gc.preTranslate( node.x + 0f, node.y +0f)
-            gc.renderImage( buffer[n+1], 0, 0, node.render.method )
-            gc.popState()
+            val rubric = RenderRubric( Companion.TranslationMatrix(node.x + 0f, node.y + 0f), node.render.alpha, node.render.method)
+            gc.renderImage( buffer[n+1], 0, 0, rubric)
         }
     }
 
@@ -137,12 +136,12 @@ class NodeRenderer(
             val th : TransformedHandle)
         : DrawThing()
     {
-        override val depth: Int get() = th.depth
+        override val depth: Int get() = th.drawDepth
 
         override fun draw(gc: GraphicsContext) {
             gc.pushState()
 
-            when(th.medium) {
+            when(th.handle) {
                 compositeHandle -> {}
                 else -> {
 

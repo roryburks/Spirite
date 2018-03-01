@@ -1,7 +1,6 @@
 package spirite.base.graphics
 
 import spirite.base.util.Color
-import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import java.awt.Shape
@@ -77,8 +76,7 @@ abstract class GraphicsContext {
     abstract fun dispose()
 
 
-    fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderMethod) = renderImage(rawImage, x, y, RenderRhubric(SinglyList(render)))
-    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric = RenderRhubric())
+    abstract fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRubric? = null)
 
 
     private val transformStack = Stack<Transform>()

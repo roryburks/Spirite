@@ -61,8 +61,8 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param right right vertical clipping plane
 //	 * @param bottom bottom horizontal clipping plane
 //	 * @param top top horizontal clipping plane
-//	 * @param nearVal distance to the near depth clipping plane (must be positive)
-//	 * @param farVal distance to the far depth clipping plane (must be positive)
+//	 * @param nearVal distance to the near drawDepth clipping plane (must be positive)
+//	 * @param farVal distance to the far drawDepth clipping plane (must be positive)
 //	 * @return
 //	 */
 //	public static final Mat4 frustum(final float left, final float right, final float bottom, final float top, final float nearVal, final float farVal) {
@@ -113,8 +113,8 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	 * @param right right vertical clipping plane
 //	 * @param bottom bottom horizontal clipping plane
 //	 * @param top top horizontal clipping plane
-//	 * @param zNear distance to nearer depth clipping plane (negative if the plane is to be behind the viewer)
-//	 * @param zFar distance to farther depth clipping plane (negative if the plane is to be behind the viewer)
+//	 * @param zNear distance to nearer drawDepth clipping plane (negative if the plane is to be behind the viewer)
+//	 * @param zFar distance to farther drawDepth clipping plane (negative if the plane is to be behind the viewer)
 //	 * @return
 //	 */
 //	public static final Mat4 ortho(final float left, final float right, final float bottom, final float top, final float zNear, final float zFar) {

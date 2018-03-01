@@ -201,7 +201,7 @@ class GLGraphicsContext : GraphicsContext {
     override fun dispose() { if( gle.target == image?.tex) gle.target = null}
 
     /**
-     * The way this constructs its call from the RenderRhubric is:
+     * The way this constructs its call from the RenderRubric is:
      *  -performs all calls which require sharer algorithms in the order that they're entered
      *  -uses the BlendMode of the LAST BlendMode-related
      *
@@ -209,7 +209,7 @@ class GLGraphicsContext : GraphicsContext {
      * screen", but it doesn't make a lot of sense (or rather the algorithms aren't in place) for it to "multiply and subtract
      * the texture from the screen"
      */
-    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRhubric) {
+    override fun renderImage(rawImage: IImage, x: Int, y: Int, render: RenderRubric?) {
         val params = this.cachedParams.copy()
 
         val calls = mutableListOf<Pair<RenderAlgorithm,Int>>()
@@ -217,8 +217,8 @@ class GLGraphicsContext : GraphicsContext {
         // Default Blend Mode (may be over-written)
         setCompositeBlend(params, SRC_OVER)
 
-        // Construct Call Attributes from RenderRhubric
-        render.methods.forEach {
+        // Construct Call Attributes from RenderRubric
+        render?.methods?.forEach {
             when(it.methodType) {
                 COLOR_CHANGE_HUE -> calls.add( Pair(AS_COLOR, it.renderValue))
                 COLOR_CHANGE_FULL -> calls.add( Pair(AS_COLOR_ALL, it.renderValue))
@@ -242,8 +242,14 @@ class GLGraphicsContext : GraphicsContext {
         }
 
         params.texture1 = ImageConverter(gle).convert<GLImage>(rawImage)
-        applyPassProgram( RenderCall( alpha, calls),
-                params, transform, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
+
+        val tDraw = when( render) {
+            null -> transform
+            else -> render.transform * transform
+        }
+
+        applyPassProgram( RenderCall( alpha * (render?.alpha ?: 1f), calls),
+                params, tDraw, x + 0f, y + 0f, x + rawImage.width + 0f, y +  rawImage.height + 0f)
     }
 
     // endregion

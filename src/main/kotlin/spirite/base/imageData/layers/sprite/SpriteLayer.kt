@@ -93,11 +93,11 @@ class SpriteLayer(
     override fun getDrawList(): List<TransformedHandle> {
         return parts
                 .filter { it.isVisible }
-                .map {TransformedHandle( it.handle, it.tPartToWhole, depth = it.depth, alpha = it.alpha)}
+                .map {TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)}
     }
 
 
-    /** Returns the first highest-depth part that is visible and has
+    /** Returns the first highest-drawDepth part that is visible and has
      * non-transparent data at x, y (in Layer-space)*/
     fun grabPart( x: Int, y: Int, select: Boolean) {
         _parts.asReversed().forEach {
@@ -128,7 +128,7 @@ class SpriteLayer(
             }
 
             override fun undoAction() {
-                // Note: Since _parts are automatically sorted by depth, no need to remember its old depth
+                // Note: Since _parts are automatically sorted by drawDepth, no need to remember its old drawDepth
                 _parts.add(toRemove)
                 _sort()
                 triggerChange()

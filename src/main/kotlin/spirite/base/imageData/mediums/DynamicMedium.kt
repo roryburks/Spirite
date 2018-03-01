@@ -28,7 +28,7 @@ class DynamicMedium(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun draw(gc: GraphicsContext, render: RenderRhubric) {
+    override fun draw(gc: GraphicsContext, render: RenderRubric) {
         val img = image.base
         if( img != null) {
             gc.renderImage(img, image.xOffset, image.yOffset, render)

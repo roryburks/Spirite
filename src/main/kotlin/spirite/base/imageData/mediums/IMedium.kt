@@ -2,8 +2,7 @@ package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
-import spirite.base.graphics.RenderProperties
-import spirite.base.graphics.RenderRhubric
+import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer
@@ -31,7 +30,7 @@ interface IMedium {
     fun build(building: BuildingMediumData): BuiltMediumData
     fun getImageDrawer(building: BuildingMediumData): IImageDrawer
 
-    fun draw( gc: GraphicsContext, render: RenderRhubric = RenderRhubric())
+    fun draw( gc: GraphicsContext, render: RenderRubric = RenderRubric())
 
     fun dupe(): IMedium
     fun flush()
@@ -66,13 +65,13 @@ interface IMedium {
 }
 
 abstract class IComplexMedium : IMedium {
-    override fun draw(gc: GraphicsContext, render: RenderRhubric) {
+    override fun draw(gc: GraphicsContext, render: RenderRubric) {
         drawBehindStroke(gc,render)
         drawInFrontOfStroke(gc, render)
     }
 
-    abstract fun drawBehindStroke( gc: GraphicsContext, render: RenderRhubric)
-    abstract fun drawInFrontOfStroke( gc: GraphicsContext, render: RenderRhubric)
+    abstract fun drawBehindStroke( gc: GraphicsContext, render: RenderRubric)
+    abstract fun drawInFrontOfStroke( gc: GraphicsContext, render: RenderRubric)
 }
 
 object NilMedium : IMedium {
@@ -85,7 +84,7 @@ object NilMedium : IMedium {
     override fun dupe() = this
     override fun flush() {}
     override fun getImageDrawer(building: BuildingMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
-    override fun draw(gc: GraphicsContext, render: RenderRhubric) {}
+    override fun draw(gc: GraphicsContext, render: RenderRubric) {}
 
     class NilBuiltMedium(building: BuildingMediumData) : BuiltMediumData(building) {
         override val width: Int get() = 1

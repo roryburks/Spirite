@@ -102,16 +102,24 @@ abstract class Transform()
         //    }
     }
 
+    override fun equals(other: Any?): Boolean {
+        return when( other) {
+            is Transform ->
+                ( m00 == other.m00 && m01 == other.m01 && m02 == other.m02 &&
+                    m10 == other.m10 && m11 == other.m11 && m12 == other.m12)
+            else -> false
+        }
+    }
 }
 
-data class ImmutableTransform(
+class ImmutableTransform(
         override val m00: Float = 1f, override val m01: Float = 0f, override val m02: Float = 0f,
         override val m10: Float = 0f, override val m11: Float = 1f, override val m12: Float = 0f
 ) :Transform()
 {
 }
 
-data class MutableTransform(
+class MutableTransform(
         private var _m00:Float = 1f, private var _m01:Float = 0f, private var _m02:Float = 0f,
         private var _m10:Float = 0f, private var _m11:Float = 1f, private var _m12:Float = 0f
 ):Transform()
