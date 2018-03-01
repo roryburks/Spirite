@@ -7,6 +7,8 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableDelegate
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import kotlin.reflect.KProperty
@@ -44,6 +46,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         var y : Int by UndoableDelegate(0, undoEngine,"Changed $treeDescription Node's Y offset")
         var expanded : Boolean by UndoableDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node")
         var name : String by UndoableDelegate( name, undoEngine,"Changed $treeDescription Node's Name")
+
+        val tNodeToContext get() = Transform.TranslationMatrix(x+0f, y+0f)
 
         // Structure
         var parent = parent ; internal set

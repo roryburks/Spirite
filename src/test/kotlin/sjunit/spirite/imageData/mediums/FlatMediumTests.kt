@@ -85,7 +85,7 @@ class FlatMediumTests {
 
         val gc = workspaceImage.graphics
         gc.transform = transform
-        flatMedium.draw(gc)
+        flatMedium.render(gc)
 
         if( TestConfig.save) {
             val imageBI = imageConverter.convert<ImageBI>(workspaceImage)

@@ -15,10 +15,13 @@ interface IRenderEngine {
     fun renderImage( settings: RenderSettings, gc: GraphicsContext, cache: Boolean)
 }
 
-data class RenderSettings(
+data class RenderTarget(
         val renderSource: RenderSource,
-        val width: Int = renderSource.defaultWidth,
-        val height: Int = renderSource.defaultHeight,
+        val renderSettings: RenderSettings = RenderSettings( renderSource.defaultWidth, renderSource.defaultHeight, true))
+
+data class RenderSettings(
+        val width: Int,
+        val height: Int,
         val drawSelection: Boolean = true)
 
 class CachedImage(  image: RawImage) {

@@ -37,7 +37,7 @@ class DynamicMediumTests {
         }
 
         val workspaceImage = EngineLaunchpoint.createImage(100,100)
-        dynamicMedium.draw(workspaceImage.graphics)
+        dynamicMedium.render(workspaceImage.graphics)
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(5,5))
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(14,14))
         assertEquals(0, workspaceImage.getARGB(4,4))
@@ -68,7 +68,7 @@ class DynamicMediumTests {
         }
 
         val workspaceImage = EngineLaunchpoint.createImage(100,100)
-        dynamicMedium.draw(workspaceImage.graphics)
+        dynamicMedium.render(workspaceImage.graphics)
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(0,0))
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(4,4))
         assertEquals(0, workspaceImage.getARGB(5,5))

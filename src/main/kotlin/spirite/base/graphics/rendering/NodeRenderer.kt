@@ -3,6 +3,7 @@ package spirite.base.graphics.rendering
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.linear.Transform.Companion
@@ -12,7 +13,8 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 class NodeRenderer(
         val root: GroupNode,
-        val settings: RenderSettings)
+        val workspace: IImageWorkspace,
+        val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true))
 {
     private lateinit var buffer : Array<RawImage>
     private val neededImages : Int by lazy {
@@ -24,12 +26,10 @@ class NodeRenderer(
                 .max() ?: 0
     }
 
-    var tick = 0    // increases to construct the subDepth
+    private var tick = 0    // increases to construct the subDepth
 
-    val workspace get() = settings.renderSource.workspace
-
-    val ratioW get() = settings.width / workspace.width
-    val ratioH get() = settings.height / workspace.height
+    private val ratioW get() = settings.width / workspace.width
+    private val ratioH get() = settings.height / workspace.height
 
 
     fun render( gc: GraphicsContext) {
@@ -44,42 +44,36 @@ class NodeRenderer(
 
             // Step 2: Recursively Draw the image
             _renderRec(root, 0)
+            gc.renderImage( buffer[0], 0, 0)
 
+            // Flush the data
+            buffer.forEach { it.flush() }
         }finally {
+
         }
     }
 
-    fun buildCompositeLayer() {
-
-    }
-
-    fun _renderRec(node: GroupNode, depth: Int) {
+    private fun _renderRec(node: GroupNode, depth: Int) {
+        // Note: though it doesn't seem recursive at first glance, _getDrawListUnsorted can either be recursive itself
+        //  or might add GroupDrawThing's which call _renderRec.
         if( depth < 0 || depth >= buffer.size) {
             MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layer count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return
         }
 
+        val gc = buffer[depth].graphics
 
-
-        // Go through the node's children (in reverse), drawing any visible group
-        //	found recursively and drawing any Layer found plainly.
-        node.children.asReversed()
-                // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
-                //  determined that there are no children  there (hence why the max_depth was set lower)
-            .filter { it.render.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
-            .forEach {
-                when( it) {
-                    is GroupNode -> {
-                        if( it.flatenned) {
-
-                        }
-                    }
-                }
-            }
-
+        _getDrawListUnsorted(node, depth)
+                .sortedWith(compareBy({it.depth}, {it.subDepth}))
+                .forEach { it.draw(gc) }
     }
 
-    private fun _getDrawList( node: GroupNode, depth: Int) : List<DrawThing>{
+    private fun _getDrawListUnsorted(node: GroupNode, depth: Int) : List<DrawThing>{
+        if( depth < 0 || depth >= buffer.size) {
+            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layer count.  Expected: [${0},${buffer.size}), Actual: $depth")
+            return emptyList()
+        }
+
         val drawList = mutableListOf<DrawThing>()
 
         // Go through the node's children (in reverse), drawing any visible group
@@ -88,17 +82,16 @@ class NodeRenderer(
                 // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
                 //  determined that there are no children  there (hence why the max_depth was set lower)
                 .filter { it.render.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
-                .forEach {
-                    when( it) {
+                .forEach { child ->
+                    when( child) {
                         is GroupNode -> {
                             when {
-                                it.flatenned -> drawList.addAll( _getDrawList(it, depth+1))
-                                else -> drawList.add( GroupDrawThing(depth, it))
+                                child.flatenned -> drawList.addAll( _getDrawListUnsorted(child, depth+1))
+                                else -> drawList.add( GroupDrawThing(depth, child))
                             }
                         }
-                        is LayerNode -> {
-
-                        }
+                        is LayerNode ->
+                            child.layer.getDrawList().forEach { drawList.add(TransformedDrawThing(child, it)) }
                     }
                 }
 
@@ -106,10 +99,14 @@ class NodeRenderer(
     }
 
     // region Composite Layer
-    var compositeHandle : MediumHandle? = null
+    private var compositeHandle : MediumHandle? = null
+
+    private fun buildCompositeLayer() {
+
+    }
     // endregion
 
-    private abstract inner class DrawThing() {
+    private abstract inner class DrawThing {
         val subDepth: Int = tick++
         abstract val depth: Int
         abstract fun draw( gc:GraphicsContext)
@@ -126,7 +123,7 @@ class NodeRenderer(
 
             _renderRec(node, n+1)
 
-            val rubric = RenderRubric( Companion.TranslationMatrix(node.x + 0f, node.y + 0f), node.render.alpha, node.render.method)
+            val rubric = RenderRubric( node.tNodeToContext, node.render.alpha, node.render.method)
             gc.renderImage( buffer[n+1], 0, 0, rubric)
         }
     }
@@ -139,20 +136,14 @@ class NodeRenderer(
         override val depth: Int get() = th.drawDepth
 
         override fun draw(gc: GraphicsContext) {
-            gc.pushState()
-
             when(th.handle) {
                 compositeHandle -> {}
                 else -> {
-
+                    val rubric = th.renderRubric.stack(
+                            RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))
+                    th.handle.medium.render(gc, rubric)
                 }
             }
-
-            gc.popState()
         }
-
     }
-
-
-
 }

@@ -26,7 +26,7 @@ class FlatMedium(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun draw(gc: GraphicsContext, render: RenderRubric) {
+    override fun render( gc: GraphicsContext, render: RenderRubric?) {
         gc.renderImage(rawImage, 0, 0, render)
     }
 
