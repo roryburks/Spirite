@@ -6,7 +6,7 @@ import sjunit.spirite.imageData.undo.NullContextTests.TestNullAction
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.undo.*
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -102,9 +102,9 @@ class UndoEngineTests {
     @test fun constructsProperHistory() {
         val actions = listOf(
                 TestNullAction(),
-                TestImageAction(BuildingMediumData(MediumHandle(_mockImageWorkspace, 1))),
+                TestImageAction(ArrangedMediumData(MediumHandle(_mockImageWorkspace, 1))),
                 CompositeAction(List(2,{TestNullAction()}), "description"),
-                TestImageAction(BuildingMediumData(MediumHandle(_mockImageWorkspace, 2))),
+                TestImageAction(ArrangedMediumData(MediumHandle(_mockImageWorkspace, 2))),
                 TestNullAction())
         actions.forEach { engine.performAndStore(it) }
 

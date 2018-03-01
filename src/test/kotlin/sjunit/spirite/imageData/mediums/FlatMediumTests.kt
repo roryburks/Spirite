@@ -4,7 +4,7 @@ import io.mockk.mockk
 import sjunit.TestConfig
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
@@ -17,12 +17,12 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class FlatMediumTests {
-    val mockWorkspace = mockk<IImageWorkspace>()
+    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     @test fun buildsDataCorrectly() {
         val flatMedium = FlatMedium( EngineLaunchpoint.createImage( 20, 20))
-        val built = flatMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0)))
+        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
         built.doOnGC { gc ->
             gc.color = Colors.RED
@@ -49,7 +49,7 @@ class FlatMediumTests {
         //  rather than counterclockwise
         transform.preRotate(-0.785398163f)
         transform.preTranslate(30f,30f)
-        val built = flatMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0), transform))
+        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 
         built.doOnGC { gc ->
             gc.color = Colors.RED
@@ -76,7 +76,7 @@ class FlatMediumTests {
         //  rather than counterclockwise
         transform.preRotate(-0.785398163f)
         transform.preTranslate(30f,30f)
-        val built = flatMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0), transform))
+        val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 
         built.doOnGC { gc ->
             gc.color = Colors.RED

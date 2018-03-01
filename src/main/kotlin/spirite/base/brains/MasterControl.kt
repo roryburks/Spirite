@@ -13,4 +13,5 @@ class MasterControl() {
 
     val paletteManager = PaletteManager()
     val workspaceSet = WorkspaceSet()
+    val centralObservatory = CentralObservatory(workspaceSet)
 }

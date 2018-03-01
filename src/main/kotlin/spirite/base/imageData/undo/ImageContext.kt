@@ -2,7 +2,7 @@ package spirite.base.imageData.undo
 
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.util.groupExtensions.SinglySet
 import spirite.hybrid.MDebug
@@ -73,10 +73,10 @@ class ImageContext(
         }
 
         // Refresh the Image to the current most recent keyframe
-        actions[pointer-met].building.doOnBuildData { actions[pointer-met].performImageAction(it) }
+        actions[pointer-met].arranged.doOnBuildData { actions[pointer-met].performImageAction(it) }
 
         for( index in (pointer-met+1)..pointer) {
-            actions[index].building.doOnBuildData { actions[index].performImageAction(it) }
+            actions[index].arranged.doOnBuildData { actions[index].performImageAction(it) }
         }
 
         // Construct ImageChangeEvent and send it
@@ -149,7 +149,7 @@ class ImageContext(
      * its logical components (if it has any).*/
     private inner class KeyframeAction(
             val underlyingAction: ImageAction?
-    ) : ImageAction(BuildingMediumData(medium, 0f, 0f)){
+    ) : ImageAction(ArrangedMediumData(medium, 0f, 0f)){
         override val description: String get() = "Keyframe Action (you probably shouldn't be able to see this)"
 
         override fun undoAction() {

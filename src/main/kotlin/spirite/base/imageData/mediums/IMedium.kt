@@ -27,8 +27,8 @@ interface IMedium {
     val width: Int
     val height: Int
     val type: MediumType
-    fun build(building: BuildingMediumData): BuiltMediumData
-    fun getImageDrawer(building: BuildingMediumData): IImageDrawer
+    fun build(arranged: ArrangedMediumData): BuiltMediumData
+    fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer
 
     fun render( gc: GraphicsContext, render: RenderRubric? = null)
 
@@ -79,14 +79,14 @@ object NilMedium : IMedium {
     override val height: Int get() = 1
     override val type: MediumType get() = FLAT
 
-    override fun build(building: BuildingMediumData) = NilBuiltMedium(building)
+    override fun build(arranged: ArrangedMediumData) = NilBuiltMedium(arranged)
 
     override fun dupe() = this
     override fun flush() {}
-    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
+    override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
 
-    class NilBuiltMedium(building: BuildingMediumData) : BuiltMediumData(building) {
+    class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
         override val width: Int get() = 1
         override val height: Int get() = 1
         override val tCompositeToWorkspace: Transform get() = Companion.IdentityMatrix

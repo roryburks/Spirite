@@ -86,7 +86,7 @@ class UndoEngine(
     // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
         if( action is ImageAction)
-            imageContexts.add(ImageContext(action.building.handle, mediumRepo))
+            imageContexts.add(ImageContext(action.arranged.handle, mediumRepo))
 
         when {
             activeStoreState != null -> activeStoreState!!.add(action)
@@ -98,7 +98,7 @@ class UndoEngine(
 
         // TODO: I don't like this being here
         if( action is ImageAction)
-            action.building.handle.refresh()
+            action.arranged.handle.refresh()
     }
 
     private fun storeAction( action: UndoableAction) {
@@ -133,10 +133,10 @@ class UndoEngine(
                 compositeContext
             }
             is ImageAction -> {
-                var imageContext = imageContexts.find { it.medium == action.building.handle }
+                var imageContext = imageContexts.find { it.medium == action.arranged.handle }
 
                 if( imageContext == null) {
-                    imageContext = ImageContext(action.building.handle,mediumRepo)
+                    imageContext = ImageContext(action.arranged.handle,mediumRepo)
                     imageContexts.add(imageContext)
                 }
                 imageContext.addAction(action)

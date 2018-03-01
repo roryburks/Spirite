@@ -22,7 +22,7 @@ class FlatMedium(
     override val type: MediumType get() = FLAT
 
 
-    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer {
+    override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -34,14 +34,14 @@ class FlatMedium(
 
     override fun flush() { rawImage.flush() }
 
-    override fun build(building: BuildingMediumData): BuiltMediumData = FlatBuiltMediumData(building)
+    override fun build(arranged: ArrangedMediumData): BuiltMediumData = FlatBuiltMediumData(arranged)
 
-    inner class FlatBuiltMediumData( building: BuildingMediumData) : BuiltMediumData(building) {
+    inner class FlatBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
         override val width: Int get() = image.width
         override val height: Int get() = image.height
-        override val tCompositeToWorkspace: Transform get() = building.tMediumToWorkspace
+        override val tCompositeToWorkspace: Transform get() = arranged.tMediumToWorkspace
 
-        val tWorkspaceToRaw : Transform by lazy { building.tMediumToWorkspace.invert() }
+        val tWorkspaceToRaw : Transform by lazy { arranged.tMediumToWorkspace.invert() }
 
         override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
             val gc = rawImage.graphics

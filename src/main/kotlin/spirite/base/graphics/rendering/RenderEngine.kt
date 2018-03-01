@@ -1,5 +1,7 @@
 package spirite.base.graphics.rendering
 
+import spirite.base.brains.CentralObservatory
+import spirite.base.brains.ICentralObservatory
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.WorkspaceSet
 import spirite.base.graphics.GraphicsContext
@@ -7,6 +9,8 @@ import spirite.base.graphics.IImage
 import spirite.base.graphics.IImageTracker
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.sources.RenderSource
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.hybrid.Hybrid
 
@@ -41,11 +45,12 @@ class CachedImage(  image: RawImage) {
 
 class RenderEngine(
         val imageTracker: IImageTracker,
-        val workspaceSet: WorkspaceSet) :
-        IRenderEngine, WorkspaceObserver {
+        val centralObservatory: ICentralObservatory) :
+        IRenderEngine, ImageObserver
+{
 
     init {
-        workspaceSet.workspaceObserver.addObserver(this)
+        centralObservatory.trackingImageObserver.addObserver(this)
     }
 
     override fun renderImage(target: RenderTarget, cache: Boolean) : IImage {
@@ -67,12 +72,16 @@ class RenderEngine(
 
     private val imageCache = mutableMapOf<RenderTarget,CachedImage>()
 
-
-    // region WorkspaceObserver
-    override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-    override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun imageChanged(evt: ImageChangeEvent) {
+        // TODO: Could sort these by handleId and madee into a binsearch if necessary
+        imageCache.entries.removeIf { entry ->
+            val target = entry.key
+            when {
+                evt.workspace != target.renderSource.workspace -> false
+                target.renderSource.imageDependencies.any {  evt.handlesChanged.contains(it) } -> true
+                target.renderSource.nodeDependencies.any {  evt.nodesChanged.contains(it) } -> true
+                else -> false
+            }
+        }
     }
-    override fun workspaceChanged(selectedWorkspace: IImageWorkspace, previousSelected: IImageWorkspace) {}
-    // endregion
 }

@@ -18,7 +18,7 @@ Steps for getting the project set up in a Java IDE:
         + BidiMap is the only one used, but it's easier to import the whole thing.
     + (b) JOGL, [https://jogamp.org/wiki/index.php/Downloading_and_installing_JOGL]
         + jogl-all
-        + jogl {natives for the platform(s) you're building for
+        + jogl {natives for the platform(s) you're arranged for
         + gluegen-rt
         + gluegen-rt {natives}
     + (_color) Java OpenGL Mathematics Library [https://github.com/jroyalty/jglm]

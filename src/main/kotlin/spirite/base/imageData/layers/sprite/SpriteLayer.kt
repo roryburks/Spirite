@@ -5,7 +5,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.drawer.IImageDrawer
@@ -79,12 +79,13 @@ class SpriteLayer(
         (ys.map { Math.floor(it.toDouble()).roundToInt() }.min() ?: 0)
     }
 
-    override val activeData: BuildingMediumData get() {
+    override val activeData: ArrangedMediumData
+        get() {
         val part = activePart ?: parts.first()
-        return BuildingMediumData( part.handle, part.tPartToWhole)
+        return ArrangedMediumData( part.handle, part.tPartToWhole)
     }
 
-    override fun getDrawer(building: BuildingMediumData, medium: IMedium): IImageDrawer {
+    override fun getDrawer(arranged: ArrangedMediumData, medium: IMedium): IImageDrawer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

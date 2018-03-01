@@ -22,9 +22,9 @@ class DynamicMedium(
     override val height: Int get() = image.height
     override val type: MediumType get() = DYNAMIC
 
-    override fun build(building: BuildingMediumData) = DynamicBuiltImageData(building)
+    override fun build(arranged: ArrangedMediumData) = DynamicBuiltImageData(arranged)
 
-    override fun getImageDrawer(building: BuildingMediumData): IImageDrawer {
+    override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -41,19 +41,19 @@ class DynamicMedium(
         image.flush()
     }
 
-    inner class DynamicBuiltImageData( building: BuildingMediumData) : BuiltMediumData(building) {
+    inner class DynamicBuiltImageData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height
         override val tCompositeToWorkspace: Transform get() = Transform.IdentityMatrix
 
         override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
             image.drawToImage( {raw -> doer.invoke(raw.graphics)},
-                    workspace.width, workspace.height, building.tMediumToWorkspace)
+                    workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
 
         override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            image.drawToImage( {raw -> doer.invoke(raw, building.tMediumToWorkspace.invert())},
-                    workspace.width, workspace.height, building.tMediumToWorkspace)
+            image.drawToImage( {raw -> doer.invoke(raw, arranged.tMediumToWorkspace.invert())},
+                    workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
     }
 }

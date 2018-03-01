@@ -1,7 +1,7 @@
 package spirite.base.imageData.undo
 
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 
 
@@ -14,11 +14,11 @@ sealed class  UndoableAction {
 }
 
 abstract class ImageAction(
-        val building: BuildingMediumData
+        val arranged: ArrangedMediumData
 ) : UndoableAction() {
     override fun performAction() {
         performNonimageAction()
-        building.doOnBuildData { performImageAction( it) }
+        arranged.doOnBuildData { performImageAction( it) }
     }
 
     override fun undoAction() {}    // Can have an logical undoAction associated with it (shouldn't effect the image, though)

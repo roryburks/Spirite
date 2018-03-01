@@ -6,7 +6,7 @@ import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.util.linear.Transform.Companion
+import spirite.base.imageData.mediums.IComplexMedium
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -99,9 +99,31 @@ class NodeRenderer(
     }
 
     // region Composite Layer
-    private var compositeHandle : MediumHandle? = null
+    private class BuiltComposite(
+            val handle: MediumHandle,
+            val compositeImage: RawImage)
+
+    private var builtComposite: BuiltComposite? = null
 
     private fun buildCompositeLayer() {
+        val compositeSource = workspace.compositor.compositeSource
+
+        if( compositeSource != null) {
+            val compositeImage = Hybrid.imageCreator.createImage(settings.width, settings.height)
+            val medium = compositeSource.handle.medium
+            val built = medium.build(compositeSource.arranged)
+            val gc = compositeImage.graphics
+            gc.preScale( ratioW, ratioH)
+
+            // Draw the base
+            if( medium is IComplexMedium) {
+                //medium.drawBehindStroke(gc, )
+            }
+
+            gc.preTransform(built.tCompositeToWorkspace)
+            compositeSource.drawer.invoke(gc)
+        }
+
 
     }
     // endregion
@@ -139,7 +161,7 @@ class NodeRenderer(
             gc.pushTransform()
             gc.scale(ratioW, ratioH)
             when(th.handle) {
-                compositeHandle -> {}
+                builtComposite?.handle -> {}
                 else -> {
                     val rubric = th.renderRubric.stack(
                             RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))

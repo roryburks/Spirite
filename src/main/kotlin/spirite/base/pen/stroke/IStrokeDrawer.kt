@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
 interface IStrokeDrawer {
-    fun startStroke()
+    fun startStroke( )
     fun stepStroke()
     fun endStroke()
     fun batchStroke()

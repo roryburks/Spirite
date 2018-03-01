@@ -6,7 +6,7 @@ import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
@@ -29,7 +29,7 @@ class DynamicMediumTests {
 
     @test fun buildsDataAndDrawsToWSCorrectly() {
         val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
-        val built = dynamicMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0)))
+        val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
         built.doOnGC { gc ->
             gc.color = Colors.RED
@@ -52,7 +52,7 @@ class DynamicMediumTests {
     @test fun buildsTransformedDataCorrectly() {
         val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
         val tMediumToWorkspace = MutableTransform.TranslationMatrix(-10f, -10f)
-        val built = dynamicMedium.build(BuildingMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
+        val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 
         built.doOnGC { gc ->
             gc.color = Colors.RED

@@ -4,9 +4,10 @@ import spirite.base.brains.Settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.imageData.groupTree.GroupTree
 import spirite.base.imageData.groupTree.PrimaryGroupTree
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.mediums.Compositor
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
@@ -42,17 +43,16 @@ interface IImageWorkspace {
     val settingsManager: ISettingsManager
     val paletteManager : IPaletteManager
 
-//    val rootNode: GroupTree.GroupNode
-    val images: List<MediumHandle>
-
     val activeDrawer: IImageDrawer
 //    fun getDrawerFromNode( node: Node) : IImageDrawer
-    fun getDrawerFromBMD( bmd: BuildingMediumData) : IImageDrawer
+    fun getDrawerFromBMD( bmd: ArrangedMediumData) : IImageDrawer
     fun getDrawerFromHandle( handle: MediumHandle) : IImageDrawer
 
-    fun buildActiveData() : BuildingMediumData
+    fun buildActiveData() : ArrangedMediumData
 
+    val imageObservatory: IImageObservatory
 
+    val compositor : Compositor
 }
 
 class ImageWorkspace(
@@ -63,10 +63,14 @@ class ImageWorkspace(
         height: Int = 100) : IImageWorkspace
 {
 
+
+
     // Note: while this technically leaks access, everything which should have limited access (i.e. virtually everything
     //  outside of unit tests) should only have an IImageWorkspace, not an ImageWorkspace.
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
+    override val imageObservatory: IImageObservatory = ImageObservatory()
+    override val compositor = Compositor()
 
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
     override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
@@ -93,12 +97,10 @@ class ImageWorkspace(
         get() = TODO("not implemented")
     override val paletteSet: PaletteSet
         get() = TODO("not implemented")
-    override val images: List<MediumHandle>
-        get() = TODO("not implemented")
     override val activeDrawer: IImageDrawer
         get() = TODO("not implemented")
 
-    override fun getDrawerFromBMD(bmd: BuildingMediumData): IImageDrawer {
+    override fun getDrawerFromBMD(bmd: ArrangedMediumData): IImageDrawer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -106,9 +108,10 @@ class ImageWorkspace(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun buildActiveData(): BuildingMediumData {
+    override fun buildActiveData(): ArrangedMediumData {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
 
 
 

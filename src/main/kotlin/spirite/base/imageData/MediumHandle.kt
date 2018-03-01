@@ -2,7 +2,9 @@ package spirite.base.imageData
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium
+import spirite.base.util.groupExtensions.SinglySet
 import spirite.base.util.linear.Transform
 
 
@@ -40,57 +42,11 @@ data class MediumHandle(
 
     val medium : IMedium get() = workspace.mediumRepository.getData(id)!!
 
-    /** Returns a null-workspace duplicate (just preserves the ID)  */
-    fun dupe() = MutableHandle(null, id)
-
-    fun drawLayer(
-            gc: GraphicsContext, transform: Transform, composite: Composite, alpha: Float) {
-        gc.pushState()
-
-        gc.composite = composite
-        gc.alpha = alpha
-        drawLayer(gc, transform)
-
-        gc.pushState()
-    }
-
-
-    fun drawLayer(gc: GraphicsContext, transform: Transform) {
-        var transform = transform
-        val ii = workspace.mediumRepository.getData(id) ?: return
-
-        //gc.drawHandle(this, ii.dynamicX, ii.dynamicY)
-    }
-
-    // !!! START BAD
-//    fun drawBehindStroke(gc: GraphicsContext) {
-//        if (workspace == null) {
-//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a workspace-less image.")
-//            return
-//        }
-//        val ii = workspace!!.getData(id)
-//        if (ii is PrismaticMedium) {
-//            ii.drawBehind(gc, workspace!!.paletteManager.getActiveColor(0))
-//        } else
-//            gc.drawHandle(this, 0, 0)
-//    }
-//
-//    fun drawInFrontOfStroke(gc: GraphicsContext) {
-//        if (workspace == null) {
-//            MDebug.handleWarning(WarningType.STRUCTURAL, null, "Tried to render a workspace-less image.")
-//            return
-//        }
-//        val ii = workspace!!.getData(id)
-//        (ii as? PrismaticMedium)?.drawFront(gc, workspace!!.paletteManager.getActiveColor(0))
-//    }
-//    // !!! END BAD
-//
     fun refresh() {
-        //TODO("Not implemented")
-        // Construct ImageChangeEvent and send it
-//        val evt = ImageChangeEvent()
-//        evt.workspace = workspace
-//        evt.dataChanged.add(this)
-//        workspace!!.triggerImageRefresh(evt)
+        workspace.imageObservatory.triggerRefresh(
+                ImageChangeEvent(
+                        SinglySet(this),
+                        emptySet(),
+                        workspace))
     }
 }

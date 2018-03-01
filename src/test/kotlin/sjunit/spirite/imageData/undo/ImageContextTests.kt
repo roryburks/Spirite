@@ -4,7 +4,7 @@ import io.mockk.mockk
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.mediums.BuildingMediumData
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.imageData.undo.ImageContext
@@ -18,9 +18,9 @@ class ImageContextTests {
     val contextUnderTest = ImageContext(mediumHandle, mockMediumRepo)
 
     @test fun doesUndoRedo3() {
-        val action1 = TestImageAction(BuildingMediumData(mediumHandle))
-        val action2 = TestImageAction(BuildingMediumData(mediumHandle))
-        val action3 = TestImageAction(BuildingMediumData(mediumHandle))
+        val action1 = TestImageAction(ArrangedMediumData(mediumHandle))
+        val action2 = TestImageAction(ArrangedMediumData(mediumHandle))
+        val action3 = TestImageAction(ArrangedMediumData(mediumHandle))
         contextUnderTest.addAction(action1)
         contextUnderTest.addAction(action2)
         contextUnderTest.addAction(action3)
@@ -39,7 +39,7 @@ class ImageContextTests {
     }
 
     @test fun doesUndoRedo30() {
-        val actions = List<ImageAction>(30, { TestImageAction(BuildingMediumData(mediumHandle))})
+        val actions = List<ImageAction>(30, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         actions.forEach { contextUnderTest.undo() }
         actions.forEach { contextUnderTest.redo() }
@@ -48,7 +48,7 @@ class ImageContextTests {
     }
 
     @test fun clipsHead() {
-        val actions = List<TestImageAction>(5, { TestImageAction(BuildingMediumData(mediumHandle))})
+        val actions = List<TestImageAction>(5, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()
         contextUnderTest.undo()
@@ -61,7 +61,7 @@ class ImageContextTests {
     }
 
     @test fun clipsTail() {
-        val actions = List<TestImageAction>(5, { TestImageAction(BuildingMediumData(mediumHandle))})
+        val actions = List<TestImageAction>(5, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()
         contextUnderTest.undo()
@@ -72,7 +72,7 @@ class ImageContextTests {
         assertEquals(4, contextUnderTest.size)
     }
     @test fun clipsTail15() {
-        val actions = List<TestImageAction>(15, { TestImageAction(BuildingMediumData(mediumHandle))})
+        val actions = List<TestImageAction>(15, { TestImageAction(ArrangedMediumData(mediumHandle))})
         actions.forEach { contextUnderTest.addAction(it)}
         contextUnderTest.undo()
         contextUnderTest.undo()
@@ -89,7 +89,7 @@ class ImageContextTests {
 
 
 
-    class TestImageAction(building : BuildingMediumData) : ImageAction(building) {
+    class TestImageAction(arranged: ArrangedMediumData) : ImageAction(arranged) {
         var performCount = 0
         var dispatched = false
         override val description: String get() = "TUIA"

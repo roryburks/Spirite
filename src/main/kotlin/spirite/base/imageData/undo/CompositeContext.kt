@@ -28,10 +28,10 @@ class CompositeContext(
             when( innerAction ) {
                 is NullAction -> nullContext.addAction(innerAction)
                 is ImageAction -> {
-                    var imageContext = imageContexts.find { it.medium == innerAction.building.handle }
+                    var imageContext = imageContexts.find { it.medium == innerAction.arranged.handle }
 
                     if( imageContext == null) {
-                        imageContext = ImageContext(innerAction.building.handle, mediumRepo)
+                        imageContext = ImageContext(innerAction.arranged.handle, mediumRepo)
                         imageContexts.add(imageContext)
                     }
 
@@ -96,7 +96,7 @@ class CompositeContext(
         composite.actions.forEach { action ->
             when( action) {
                 is NullAction -> nullContext.iterateNext()
-                is ImageAction -> imageContexts.find { action.building.handle == it.medium }?.iterateNext()
+                is ImageAction -> imageContexts.find { action.arranged.handle == it.medium }?.iterateNext()
                 else -> MDebug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${action::class}")
             }
         }
