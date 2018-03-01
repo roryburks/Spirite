@@ -6,8 +6,7 @@ import sjunit.TestConfig
 import spirite.base.brains.Settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.graphics.RenderMethod
-import spirite.base.graphics.RenderMethodType.COLOR_CHANGE_HUE
-import spirite.base.graphics.RenderMethodType.DISOLVE
+import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.TransformedHandle
@@ -15,7 +14,6 @@ import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.MutableTransform.Companion
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.JOGL.JOGLProvider
@@ -63,7 +61,7 @@ class TransformedHandleTests {
                 MediumHandle(workspace, 0),
                 MutableTransform.RotationMatrix(30f),
                 0.5f,
-                RenderMethod(COLOR_CHANGE_HUE, Colors.RED.argb))
+                RenderMethod(COLOR_CHANGE_FULL, Colors.RED.argb))
         val tf2 = TransformedHandle(
                 MediumHandle(workspace, 0),
                 MutableTransform.TranslationMatrix(-10f,-10f),
@@ -82,10 +80,27 @@ class TransformedHandleTests {
         toGC.alpha = tf3.alpha
         toGC.renderImage(square, 0, 0, tf3.renderRhubric)
 
+        // Assert
+        var reds = 0
+        var trans = 0
+        var other = 0
+        for( x in 25 until 75) {
+            for( y in 25 until 75) {
+                val c = renderedTo.getColor(x,y)
+                when {
+                    c.red == 1f && Math.abs(c.alpha - 0.25f) < 0.01f -> reds++
+                    c.alpha == 0f -> trans++
+                    else -> other++
+                }
+            }
+        }
+        assert( reds > 0)
+        assert( trans > 0)
+        assert( other == 0)
+
         if( TestConfig.save) {
             val imageBI = imageConverter.convert<ImageBI>(renderedTo)
             ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\transformedHandleRender.png"))
         }
     }
-
 }

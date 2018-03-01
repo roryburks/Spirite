@@ -1,5 +1,7 @@
 #version 330
 
+#GLOBAL
+
 in float fWeight;
 flat in float fX, fY, fM;
 

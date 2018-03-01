@@ -1,5 +1,7 @@
 #version 330
 
+#GLOBAL
+
 uniform vec3 uColor;
 
 out vec4 outputColor;

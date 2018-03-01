@@ -1,5 +1,7 @@
 #version 330
 
+#GLOBAL
+
 smooth in vec2 vUV;
 
 uniform vec3 u_Color1;

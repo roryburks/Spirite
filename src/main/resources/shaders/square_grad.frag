@@ -1,5 +1,7 @@
 #version 330
 
+#GLOBAL
+
 smooth in vec2 vUV;
 
 uniform float u_fixedAmmount;
@@ -10,6 +12,7 @@ uniform float u_fixedAmmount;
 uniform int u_typeCode;
 
 out vec4 outputColor;
+
 
 vec3 hsv2rgb(vec3 _color)
 {
@@ -62,4 +65,7 @@ void main()
 		
 		outputColor = vec4(hsv2rgb(hsv), 1);
 	}
+
+	if( targetPremultiplied())
+	    outputColor *= vec4(outputColor.a, outputColor.a, outputColor.a, 1);
 }

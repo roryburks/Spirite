@@ -1,12 +1,13 @@
 #version 130
 
+#GLOBAL
+
 #define thresh 0.005
 
 in vec2 vUV;
 
 out vec4 outputColor; 
 
-uniform sampler2D myTexture;
 uniform vec4 u_fromColor;
 uniform vec4 u_toColor;
 
@@ -38,7 +39,7 @@ vec3 hsv2rgb(vec3 _color)
 
 void main()
 {
-	vec4 texCol = texture(myTexture, vUV);
+	vec4 texCol = texture(u_texture, vUV);
 	vec3 checkCol = vec3(texCol.rgb);
 	
 	bool premult = bool((u_optionMask >> 2) & 1);

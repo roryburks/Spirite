@@ -2,18 +2,15 @@
 
 #define MAX_CALLS 10
 
+#GLOBAL
+
 in vec2 vUV;
 
 out vec4 outputColor;
 
-uniform sampler2D myTexture;
 //uniform sampler2D myTexture2;
 uniform float u_alpha;
 
-// 00BA
-// A : Whether or not the target should be pre-multiplied
-// B : Whether or not the source of myTexture is pre-multiplied
-uniform int u_flags;
 
 // Subvariable assosciated with Composite
 uniform int u_values[MAX_CALLS];
@@ -23,9 +20,6 @@ uniform int u_values[MAX_CALLS];
 // 2: As Color (all
 // 3: Disolve
 uniform int u_composites[MAX_CALLS];
-
-bool targetPremultiplied() {return (u_flags & 1) == 1;}
-bool sourcePremultiplied() {return (u_flags & 2) == 1;}
 
 
 // ==== As Hue ====
@@ -79,7 +73,7 @@ vec4 disolve( vec4 tex, int subValue)
 
 void main()
 {
-	vec4 texCol = texture(myTexture, vUV);
+	vec4 texCol = texture(u_texture, vUV);
 	vec4 oCol;
 
 	if( sourcePremultiplied()) {

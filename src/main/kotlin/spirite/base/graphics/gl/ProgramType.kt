@@ -21,7 +21,6 @@ internal enum class ProgramType(
     PASS_BORDER(DEST_OVER),
     PASS_INVERT(MAX),
     PASS_RENDER(SRC_OVER),
-    PASS_ESCALATE(SRC_OVER),
 
     STROKE_SPORE(MAX),
     STROKE_BASIC(SRC_OVER),

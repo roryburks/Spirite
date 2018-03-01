@@ -1,16 +1,17 @@
 #version 330
 
+#GLOBAL
+
 /*	brush_intensify.frag
  */
 in vec2 vUV;
-uniform sampler2D myTexture;
 uniform int uMode;
 
 out vec4 outputColor;
 
 void main()
 {
-	vec4 texCol = texture(myTexture, vUV);
+	vec4 texCol = texture(u_texture, vUV);
 	float alpha = texCol.a;
 
 	float newAlpha;
