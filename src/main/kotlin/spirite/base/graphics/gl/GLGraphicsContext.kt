@@ -245,7 +245,7 @@ class GLGraphicsContext : GraphicsContext {
 
         val tDraw = when( render) {
             null -> transform
-            else -> render.transform * transform
+            else -> transform * render.transform
         }
 
         applyPassProgram( RenderCall( alpha * (render?.alpha ?: 1f), calls),

@@ -28,8 +28,8 @@ class NodeRenderer(
 
     private var tick = 0    // increases to construct the subDepth
 
-    private val ratioW get() = settings.width / workspace.width
-    private val ratioH get() = settings.height / workspace.height
+    private val ratioW get() = settings.width.toFloat() / workspace.width.toFloat()
+    private val ratioH get() = settings.height.toFloat() / workspace.height.toFloat()
 
 
     fun render( gc: GraphicsContext) {
@@ -136,6 +136,8 @@ class NodeRenderer(
         override val depth: Int get() = th.drawDepth
 
         override fun draw(gc: GraphicsContext) {
+            gc.pushTransform()
+            gc.scale(ratioW, ratioH)
             when(th.handle) {
                 compositeHandle -> {}
                 else -> {
@@ -144,6 +146,9 @@ class NodeRenderer(
                     th.handle.medium.render(gc, rubric)
                 }
             }
+            gc.popTransform()
+
+
         }
     }
 }

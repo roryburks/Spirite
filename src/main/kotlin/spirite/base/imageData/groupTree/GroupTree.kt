@@ -3,6 +3,7 @@ package spirite.base.imageData.groupTree
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.graphics.RenderProperties
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
@@ -99,6 +100,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             return list
         }
 
+        abstract val imageDependencies : Collection<MediumHandle>
+
         /**
          * Gets ancestors of the current node such that a certain predicate is true.
          * @param checkChildren If Null, will always check children. */
@@ -154,6 +157,11 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     }
 
     inner class GroupNode(parent: GroupNode?, name: String) : Node(parent, name) {
+        override val imageDependencies : Collection<MediumHandle> get() {
+            val set = mutableSetOf<MediumHandle>()
+            children.forEach { set.addAll(it.imageDependencies) }
+            return set
+        }
 
         val children: List<Node> get() = _children
         var flatenned : Boolean by UndoableDelegate(false, undoEngine, "Toggled Group Node Flattened")
@@ -246,5 +254,9 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     inner class LayerNode(
             parent: GroupNode?,
             name: String,
-            val layer: Layer) : Node(parent, name)
+            val layer: Layer)
+        : Node(parent, name)
+    {
+        override val imageDependencies: Collection<MediumHandle> get() = layer.imageDependencies
+    }
 }
