@@ -29,7 +29,6 @@ import org.junit.Test as test
 
 class DynamicMediumTests {
     val mockWorkspace = mockk<IImageWorkspace>()
-    val workspace = TestHelper.makeShellWorkspace(100,100)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     init {
@@ -95,43 +94,5 @@ class DynamicMediumTests {
             val imageBI = imageConverter.convert<ImageBI>(dynamicMedium.image.base!!)
             ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\dynamicMediumTransformed.png"))
         }
-    }
-
-    @test fun compositesCorrectly() {
-        val layer1 = workspace.groupTree.addNewSimpleLayer(null, "Layer1", DYNAMIC)
-        layer1.x = 10
-        layer1.y = 10
-
-        val mediumHandle = (layer1.layer as SimpleLayer).medium
-        val dynamicImage = (mediumHandle.medium as DynamicMedium).image
-
-        dynamicImage.drawToImage({
-            it.graphics.fillRect(0,0,20,20)
-        }, 20, 20)
-
-
-        val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
-        workspace.compositor.compositeSource = CompositeSource(
-                ArrangedMediumData(mediumHandle, tMediumToWS),
-                {it.color = Colors.RED
-                    it.fillRect( 40,40, 10, 10)})
-
-
-        val wsImage = Hybrid.imageCreator.createImage(100,100)
-
-        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
-
-
-        if( TestConfig.save) {
-            val imageBI = imageConverter.convert<ImageBI>(wsImage)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\dynamicComposited.png"))
-        }
-
-        for( x in 10 until 30)
-            for( y in 10 until 30)
-                assertEquals(Colors.BLACK.argb, wsImage.getARGB(x, y))
-        for( x in 40 until 50)
-            for( y in 40 until 50)
-                assertEquals(Colors.RED.argb,wsImage.getARGB(x,y))
     }
 }

@@ -1,5 +1,6 @@
 package spirite.base.imageData.mediums.drawer
 
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenState
@@ -12,12 +13,16 @@ class DefaultImageDrawer(
     :IImageDrawer,
         IStrokeModule
 {
+    val workspace : IImageWorkspace get() = arranged.handle.workspace
 
-    override val strokeEngine: StrokeBuilder? = null
+
+    // region IStrokeModule
+    private var strokeBuilder : StrokeBuilder? = null
 
     override fun canDoStroke(method: Method) = true
 
     override fun startStroke(params: StrokeParams, ps: PenState): Boolean {
+        //strokeBuilder = StrokeBuilder()
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -28,5 +33,6 @@ class DefaultImageDrawer(
     override fun endStroke() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+    // endregion
 
 }

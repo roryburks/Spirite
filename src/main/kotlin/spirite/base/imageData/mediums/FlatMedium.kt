@@ -13,12 +13,10 @@ import spirite.base.util.linear.Transform
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.
  */
 class FlatMedium(
-        private val rawImage: RawImage
+        val image: RawImage
 ) : IMedium {
-    val image : IImage get() = rawImage
-
-    override val width: Int get() = rawImage.width
-    override val height: Int get() = rawImage.height
+    override val width: Int get() = image.width
+    override val height: Int get() = image.height
     override val type: MediumType get() = FLAT
 
 
@@ -27,12 +25,12 @@ class FlatMedium(
     }
 
     override fun render( gc: GraphicsContext, render: RenderRubric?) {
-        gc.renderImage(rawImage, 0, 0, render)
+        gc.renderImage(image, 0, 0, render)
     }
 
-    override fun dupe() = FlatMedium(rawImage.deepCopy())
+    override fun dupe() = FlatMedium(image.deepCopy())
 
-    override fun flush() { rawImage.flush() }
+    override fun flush() { image.flush() }
 
     override fun build(arranged: ArrangedMediumData): BuiltMediumData = FlatBuiltMediumData(arranged)
 
@@ -41,15 +39,15 @@ class FlatMedium(
         override val height: Int get() = image.height
 
         override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
-        val tWorkspaceToRaw : Transform by lazy { arranged.tMediumToWorkspace.invert() }
+        override val tWorkspaceToComposite: Transform by lazy { arranged.tMediumToWorkspace.invert() }
 
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
-            val gc = rawImage.graphics
-            gc.transform = tWorkspaceToRaw
+            val gc = image.graphics
+            gc.transform = tWorkspaceToComposite
             doer.invoke( gc)
         }
-        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            doer.invoke( rawImage, tWorkspaceToRaw)
+        override fun _rawAccessComposite(doer: (RawImage) -> Unit) {
+            doer.invoke( image)
         }
     }
 }

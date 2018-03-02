@@ -24,8 +24,8 @@ fun GLImage.toBufferedImage() : BufferedImage {
 
     val format = if( this.premultiplied) BufferedImage.TYPE_INT_ARGB_PRE else BufferedImage.TYPE_INT_ARGB
 
-    val bi = gle.surfaceToBufferedImage( HybridConfig.BI_FORMAT, this.width, this.height)
-    //gle.setTarget(null)
+    val bi = gle.surfaceToBufferedImage( format, this.width, this.height)
+    //gle.setTarget(null)   // Shouldn't be necessary
     return bi
 }
 

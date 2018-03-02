@@ -7,7 +7,7 @@ data class GLParameters(
         var heigth: Int,
         var flip: Boolean = false,
         var clipRect : Rect? = null,
-        var premultiplied: Boolean = false,
+        var premultiplied: Boolean = true,
 
         var texture1 : GLImage? = null,
         var texture2 : GLImage? = null,

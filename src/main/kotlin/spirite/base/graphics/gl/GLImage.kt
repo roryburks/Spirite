@@ -68,6 +68,8 @@ class GLImage : RawImage {
     override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)
     override val byteSize: Int get() = width*height*4
 
+    val glParams : GLParameters get() = GLParameters(width, height, premultiplied = premultiplied)
+
     override fun flush() {
         val toDel = tex
         if( toDel != null) {

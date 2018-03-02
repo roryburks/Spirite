@@ -73,10 +73,10 @@ class ImageContext(
         }
 
         // Refresh the Image to the current most recent keyframe
-        actions[pointer-met].arranged.doOnBuildData { actions[pointer-met].performImageAction(it) }
+        actions[pointer-met].performImageAction(actions[pointer-met].arranged.built)
 
         for( index in (pointer-met+1)..pointer) {
-            actions[index].arranged.doOnBuildData { actions[index].performImageAction(it) }
+            actions[index].performImageAction(actions[index].arranged.built)
         }
 
         // Construct ImageChangeEvent and send it

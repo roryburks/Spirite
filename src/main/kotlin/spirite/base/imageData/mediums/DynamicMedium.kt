@@ -46,14 +46,15 @@ class DynamicMedium(
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height
         override val tMediumToComposite: Transform get() = arranged.tMediumToWorkspace
+        override val tWorkspaceToComposite: Transform get() = Transform.IdentityMatrix
 
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
             image.drawToImage( {raw -> doer.invoke(raw.graphics)},
                     workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
 
-        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            image.drawToImage( {raw -> doer.invoke(raw, Transform.IdentityMatrix)},
+        override fun _rawAccessComposite(doer: (RawImage) -> Unit) {
+            image.drawToImage( {raw -> doer.invoke(raw)},
                     workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
     }

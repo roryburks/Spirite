@@ -10,14 +10,14 @@ object DrawPointsBuilder {
     // The Interpolator tick distance.  Lower means smoother but more rendering time (especially with Maglev layers)
     val DIFF = 1.0f
 
-    fun buildPoints(interpolator: Interpolator2D?, penStates: List<PenState>, dynamics: PenDynamics) : DrawPoints {
+    fun buildPoints(interpolator: Interpolator2D?, penStates: List<PenState>, dynamics: PenDynamics?) : DrawPoints {
         val num = penStates.size
 
         return when {
             interpolator == null -> {
                 val x_ = penStates.map { it.x }.toFloatArray()
                 val y_ = penStates.map { it.y }.toFloatArray()
-                val w_ = penStates.map { dynamics.getSize(it) }.toFloatArray()
+                val w_ = penStates.map { dynamics?.getSize(it) ?: it.pressure }.toFloatArray()
                 DrawPoints(x_, y_, w_)
             }
             num == 0 -> DrawPoints(FloatArray(0), FloatArray(0), FloatArray(0))
@@ -34,7 +34,7 @@ object DrawPointsBuilder {
                     val state = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcX.add(ip.x)
                     fcY.add(ip.y)
-                    fcW.add(dynamics.getSize(state))
+                    fcW.add(dynamics?.getSize(state) ?: state.pressure)
                 }
                 addPoint()
 
@@ -48,14 +48,14 @@ object DrawPointsBuilder {
         }
     }
 
-    fun buildIndexedPoints(interpolator: Interpolator2D?, penStates: List<PenState>, dynamics: PenDynamics): IndexedDrawPoints {
+    fun buildIndexedPoints(interpolator: Interpolator2D?, penStates: List<PenState>, dynamics: PenDynamics?): IndexedDrawPoints {
         val num = penStates.size
 
         return when {
             interpolator == null -> {
                 val x_ = penStates.map { it.x }.toFloatArray()
                 val y_ = penStates.map { it.y }.toFloatArray()
-                val w_ = penStates.map { dynamics.getSize(it) }.toFloatArray()
+                val w_ = penStates.map { dynamics?.getSize(it) ?: it.pressure }.toFloatArray()
                 val t_ = penStates.mapIndexed { it, _ -> it.toFloat()}.toFloatArray()
                 IndexedDrawPoints(x_, y_, w_, t_)
             }
@@ -74,7 +74,7 @@ object DrawPointsBuilder {
                     val state = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcX.add(ip.x)
                     fcY.add(ip.y)
-                    fcW.add(dynamics.getSize(state))
+                    fcW.add(dynamics?.getSize(state) ?: state.pressure)
                     fcT.add(ip.left + ip.lerp)
                 }
                 addPoint()

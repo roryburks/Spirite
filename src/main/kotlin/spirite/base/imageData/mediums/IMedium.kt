@@ -86,10 +86,11 @@ object NilMedium : IMedium {
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+        override val tWorkspaceToComposite: Transform get() = Transform.IdentityMatrix
         override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
         override val width: Int get() = 1
         override val height: Int get() = 1
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}
-        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {}
+        override fun _rawAccessComposite(doer: (RawImage) -> Unit) {}
     }
 }

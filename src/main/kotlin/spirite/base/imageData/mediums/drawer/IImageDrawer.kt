@@ -13,8 +13,6 @@ interface IImageDrawer {
     //	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't
     //	make sense for the data type).
     interface IStrokeModule {
-        val strokeEngine: StrokeBuilder?
-
         // EG: some Drawers might be able to erase, but not draw
         fun canDoStroke(method: StrokeParams.Method): Boolean
         fun startStroke(params: StrokeParams, ps: PenState): Boolean

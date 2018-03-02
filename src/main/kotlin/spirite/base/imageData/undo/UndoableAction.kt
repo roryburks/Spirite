@@ -18,7 +18,7 @@ abstract class ImageAction(
 ) : UndoableAction() {
     override fun performAction() {
         performNonimageAction()
-        arranged.doOnBuildData { performImageAction( it) }
+        performImageAction(arranged.built)
     }
 
     override fun undoAction() {}    // Can have an logical undoAction associated with it (shouldn't effect the image, though)

@@ -15,11 +15,8 @@ data class ArrangedMediumData(
         val tMediumToWorkspace: Transform = Transform.IdentityMatrix,
         val selectionMask: SelectionMask? = null)
 {
+    val built = handle.medium.build(this)
 
     constructor(handle: MediumHandle, ox: Float, oy: Float, selectionMask: SelectionMask? = null ) :
             this( handle, Transform.TranslationMatrix(ox, oy), selectionMask)
-
-    fun doOnBuildData( doer : (BuiltMediumData) -> Unit) {
-        doer.invoke( handle.medium.build(this))
-    }
 }

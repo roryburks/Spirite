@@ -7,6 +7,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
+import spirite.base.util.MathUtil
 import spirite.base.util.linear.Transform
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
@@ -111,9 +112,11 @@ class NodeRenderer(
         val compositeSource = workspace.compositor.compositeSource
 
         if( compositeSource != null) {
-            val compositeImage = Hybrid.imageCreator.createImage(settings.width, settings.height)
             val medium = compositeSource.arranged.handle.medium
             val built = medium.build(compositeSource.arranged)
+            val compositeImage = Hybrid.imageCreator.createImage(
+                    MathUtil.ceil(built.width*ratioW),
+                    MathUtil.ceil(built.height*ratioH))
             val gc = compositeImage.graphics
             val baseTransform = Transform.ScaleMatrix(ratioW, ratioH)
             gc.transform = baseTransform

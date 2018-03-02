@@ -20,7 +20,7 @@ class GLGraphicsContext : GraphicsContext {
 
     val image : GLImage?
     val premultiplied : Boolean
-    private val cachedParams = GLParameters(1, 1)
+    val cachedParams = GLParameters(1, 1)
 
     override var width: Int
         private set(value) {
