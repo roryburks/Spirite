@@ -26,6 +26,7 @@ internal enum class ProgramType(
     STROKE_PIXEL(SRC_OVER),
     STROKE_V2_LINE_PASS(SRC_OVER),
     STROKE_AFTERPASS_INTENSIFY(SOURCE),
+    STROKE_V2_APPLY(SOURCE),
 
     POLY_RENDER(SRC_OVER),
     LINE_RENDER(SRC_OVER),
@@ -164,4 +165,15 @@ class LineRenderCall(
             GLUniform1f("u_alpha", alpha))
 
     override val programType: ProgramType get() = LINE_RENDER
+}
+
+class StrokeV2ApplyCall(
+        color: Vec3,
+        alpha: Float)
+    :ProgramCall()
+{
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform3f( "u_color", color),
+            GLUniform1f("u_alpha", alpha))
+    override val programType: ProgramType get() = STROKE_V2_APPLY
 }

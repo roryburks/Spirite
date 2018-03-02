@@ -47,19 +47,6 @@ fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : Buffe
         else -> BufferedImage(1, 1, type)
     }
 
-    // Flip Vertically
-//    if( flip) {
-//        val raster = bi.raster
-//        var scanline1 : Any? = null
-//        var scanline2 : Any? = null
-//        for( i in 0 until bi.height/2) {
-//            scanline1 = raster.getDataElements( 0 , i, bi.width, 1, scanline1)
-//            scanline2 = raster.getDataElements( 0 , bi.height-i-1, bi.width, 1, scanline2)
-//            raster.setDataElements( 0, i, bi.width, 1, scanline2)
-//            raster.setDataElements( 0, bi.height-i-1, bi.width, 1, scanline1)
-//        }
-//    }
-
     return bi
 }
 

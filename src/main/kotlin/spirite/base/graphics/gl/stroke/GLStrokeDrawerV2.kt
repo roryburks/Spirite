@@ -1,10 +1,14 @@
 package spirite.base.graphics.gl.stroke
 
+import spirite.base.graphics.GraphicsContext
+import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.gl.*
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
+import spirite.base.pen.stroke.StrokeParams.Method.BASIC
+import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
@@ -50,15 +54,45 @@ class GLStrokeDrawerV2(
         context = null
     }
 
-    override fun batchDraw(drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int): GLImage {
+
+    override fun draw(gc: GraphicsContext) {
+        val ctx = context
+        if( ctx != null)
+            drawStrokeImageToGc(ctx.image, gc, ctx.builder.params)
+    }
+
+    override fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
         val batchImage = GLImage(width, height, gle, false)
         val glParams = batchImage.glParams
         drawStroke( batchImage, drawPoints, params.width, glParams)
-        return batchImage
+
+        drawStrokeImageToGc(batchImage, gc, params)
     }
 
 
-    fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, trans: Transform? = null) {
+//    override fun batchDraw( gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int): GLImage {
+//        val batchImage = GLImage(width, height, gle, false)
+//        val glParams = batchImage.glParams
+//        drawStroke( batchImage, drawPoints, params.width, glParams)
+//        return batchImage
+//    }
+
+    private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext, strokeParams: StrokeParams) {
+        val glgc = gc as? GLGraphicsContext ?: return
+
+        glgc.pushState()
+
+        when( strokeParams.method) {
+            ERASE -> {glgc.composite = DST_OUT}
+        }
+
+        glgc.applyPassProgram(StrokeV2ApplyCall(strokeParams.color.rgbComponent, strokeParams.alpha * gc.alpha), image)
+
+        glgc.popState()
+    }
+
+
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, trans: Transform? = null) {
         val vb = composeVBuffer( states, lineWidth)
 
         if( true /* 330 */ ) {

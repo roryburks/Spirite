@@ -3,6 +3,7 @@ package spirite.base.imageData
 import spirite.base.brains.Settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
+import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -11,6 +12,8 @@ import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
+import spirite.base.pen.stroke.IStrokeDrawer
+import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import java.io.File
 
@@ -41,6 +44,7 @@ interface IImageWorkspace {
     val renderEngine : IRenderEngine
     val settingsManager: ISettingsManager
     val paletteManager : IPaletteManager
+    val strokeProvider : IStrokeDrawerProvider
 
     val activeDrawer: IImageDrawer
 //    fun getDrawerFromNode( node: Node) : IImageDrawer
@@ -58,6 +62,7 @@ class ImageWorkspace(
         override val renderEngine : IRenderEngine,
         override val settingsManager: ISettingsManager,
         override val paletteManager : IPaletteManager,
+        override val strokeProvider: IStrokeDrawerProvider,
         width: Int = 100,
         height: Int = 100) : IImageWorkspace
 {
@@ -110,8 +115,4 @@ class ImageWorkspace(
     override fun buildActiveData(): ArrangedMediumData {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-
-
-
 }

@@ -53,6 +53,11 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
                 null,
                 "shaders/brushes/stroke_pixel.frag")
         array[ProgramType.STROKE_PIXEL.ordinal] = array[ProgramType.STROKE_V2_LINE_PASS.ordinal]
+        array[ProgramType.STROKE_V2_APPLY.ordinal] = loadProgram(scriptService,
+                "shaders/pass.vert",
+                null,
+                "shaders/brushes/stroke_v2_apply.frag")
+
         array[ProgramType.POLY_RENDER.ordinal] = loadProgram(scriptService,
                 "shaders/shapes/poly_render.vert",
                 null,

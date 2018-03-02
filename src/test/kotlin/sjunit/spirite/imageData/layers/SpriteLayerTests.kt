@@ -2,6 +2,7 @@ package sjunit.spirite.imageData.layers
 
 
 import io.mockk.mockk
+import sjunit.TestHelper
 import spirite.base.brains.Settings.IPreferences
 import spirite.base.brains.Settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
@@ -14,10 +15,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class SpriteLayerTests {
-    val renderEngine = mockk<IRenderEngine>()
-    val settingsManager = mockk<ISettingsManager>()
-    val paletteManager = mockk<IPaletteManager>()
-    val workspace = ImageWorkspace(renderEngine, settingsManager, paletteManager)
+    val workspace = TestHelper.makeShellWorkspace(100,100)
 
     @test fun makesSpriteLayer() {
         val spriteLayer = SpriteLayer(workspace, workspace.mediumRepository)

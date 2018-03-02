@@ -2,6 +2,7 @@ package sjunit.spirite.imageData.groupTree
 
 
 import io.mockk.mockk
+import sjunit.TestHelper
 import spirite.base.brains.Settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.graphics.rendering.IRenderEngine
@@ -14,10 +15,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 open class PrimaryGroupTreeTests {
-    val mockRenderEngine=  mockk<IRenderEngine>(relaxed = true)
-    val mockSettingsManager = mockk<ISettingsManager>(relaxed = true)
-    val mockPaletteManager = mockk<IPaletteManager>(relaxed = true)
-    val workspace = ImageWorkspace(mockRenderEngine, mockSettingsManager, mockPaletteManager)
+    val workspace = TestHelper.makeShellWorkspace(100,100)
     val tree = workspace.groupTree
 
     @test fun CreatesSimpleLayer() {

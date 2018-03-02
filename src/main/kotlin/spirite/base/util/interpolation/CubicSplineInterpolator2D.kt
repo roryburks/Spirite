@@ -37,7 +37,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
      * system)
      * !!!!CURRENTLY UNIMPLEMENTED!!!!
      */
-    constructor(points: List<Vec2>?, fast: Boolean) {
+    constructor(points: List<Vec2>? = null, fast: Boolean = false) {
         numPoints = points?.size ?: 0
 
         val l = Math.max(numPoints, 10)

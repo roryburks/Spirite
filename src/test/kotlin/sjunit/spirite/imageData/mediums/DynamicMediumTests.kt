@@ -28,7 +28,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class DynamicMediumTests {
-    val mockWorkspace = mockk<IImageWorkspace>()
+    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     init {
