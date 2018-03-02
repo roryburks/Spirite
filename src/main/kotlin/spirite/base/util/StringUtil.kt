@@ -1,7 +1,5 @@
 package spirite.base.util
 
-import java.awt.Container
-
 object StringUtil {
 
     val endNumRegex = """_([0-9]+)$""".toRegex()

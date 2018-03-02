@@ -1,12 +1,14 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.graphics.*
+import spirite.base.graphics.DynamicImage
+import spirite.base.graphics.GraphicsContext
+import spirite.base.graphics.RawImage
+import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 
 
 /***

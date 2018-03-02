@@ -9,10 +9,8 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
-import kotlin.reflect.KProperty
 
 /**
  * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical

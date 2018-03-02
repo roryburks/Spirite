@@ -1,7 +1,6 @@
 package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.mediums.IMedium.MediumType

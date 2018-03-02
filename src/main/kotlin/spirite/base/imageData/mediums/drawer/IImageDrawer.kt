@@ -1,7 +1,6 @@
 package spirite.base.imageData.mediums.drawer
 
 import spirite.base.pen.PenState
-import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 
 

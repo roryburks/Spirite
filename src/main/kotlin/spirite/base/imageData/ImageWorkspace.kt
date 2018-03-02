@@ -6,7 +6,6 @@ import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.CompositeSource
 import spirite.base.imageData.mediums.Compositor
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine

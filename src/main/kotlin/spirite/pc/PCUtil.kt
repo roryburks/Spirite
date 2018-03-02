@@ -5,7 +5,6 @@ import spirite.base.graphics.gl.GLImage
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
-import spirite.hybrid.HybridConfig
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
 import sun.awt.image.IntegerInterleavedRaster
 import java.awt.geom.AffineTransform

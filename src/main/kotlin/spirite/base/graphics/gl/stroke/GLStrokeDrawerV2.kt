@@ -1,11 +1,10 @@
 package spirite.base.graphics.gl.stroke
 
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.IImage
 import spirite.base.graphics.gl.*
-import spirite.base.pen.stroke.*
-import spirite.base.util.Color
-import spirite.base.util.Colors
+import spirite.base.pen.stroke.DrawPoints
+import spirite.base.pen.stroke.IStrokeDrawer
+import spirite.base.pen.stroke.StrokeBuilder
+import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3

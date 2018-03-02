@@ -1,17 +1,12 @@
 package spirite.base.graphics.rendering
 
-import spirite.base.brains.CentralObservatory
 import spirite.base.brains.ICentralObservatory
-import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.WorkspaceSet
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
 import spirite.base.graphics.IImageTracker
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.sources.RenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
-import spirite.base.imageData.IImageWorkspace
 import spirite.hybrid.Hybrid
 
 /**

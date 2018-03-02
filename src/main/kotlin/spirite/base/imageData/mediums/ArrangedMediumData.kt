@@ -2,7 +2,6 @@ package spirite.base.imageData.mediums
 
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.selection.SelectionMask
-import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 
 /***

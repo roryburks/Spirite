@@ -9,7 +9,9 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.drawer.IImageDrawer
-import spirite.base.imageData.undo.*
+import spirite.base.imageData.undo.NullAction
+import spirite.base.imageData.undo.StackableAction
+import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.MutableTransform

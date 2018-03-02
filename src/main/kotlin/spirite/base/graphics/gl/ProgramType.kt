@@ -6,7 +6,6 @@ import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.*
 import spirite.base.graphics.gl.GLEngine.BlendMethod
 import spirite.base.graphics.gl.GLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
-import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
 

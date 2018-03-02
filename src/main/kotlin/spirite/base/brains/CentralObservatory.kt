@@ -4,7 +4,6 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import java.lang.ref.WeakReference
-import kotlin.reflect.KProperty
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers

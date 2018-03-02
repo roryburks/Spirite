@@ -1,13 +1,6 @@
 package spirite.base.pen.stroke
 
-import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.IImage
-import spirite.base.graphics.RawImage
-import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.pen.PenState
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 interface IStrokeDrawer {
     /** The List passed should be a list which updates as the history gets constructed, not a baked snapshot.  */

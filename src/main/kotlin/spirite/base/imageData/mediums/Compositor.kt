@@ -1,7 +1,6 @@
 package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
-import spirite.base.imageData.MediumHandle
 
 
 data class CompositeSource(

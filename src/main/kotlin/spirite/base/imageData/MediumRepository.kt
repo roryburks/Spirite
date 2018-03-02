@@ -1,8 +1,6 @@
 package spirite.base.imageData
 
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.NilMedium
-import spirite.base.imageData.undo.IUndoEngine
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 

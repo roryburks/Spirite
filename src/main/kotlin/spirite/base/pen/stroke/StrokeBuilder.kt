@@ -1,7 +1,6 @@
 package spirite.base.pen.stroke
 
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.selection.SelectionMask
 import spirite.base.pen.PenState
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.Transform

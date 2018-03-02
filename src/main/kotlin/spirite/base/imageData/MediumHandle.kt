@@ -1,11 +1,8 @@
 package spirite.base.imageData
 
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.GraphicsContext.Composite
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.util.groupExtensions.SinglySet
-import spirite.base.util.linear.Transform
 
 
 /**
