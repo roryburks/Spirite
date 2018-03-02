@@ -39,16 +39,16 @@ class FlatMedium(
     inner class FlatBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
         override val width: Int get() = image.width
         override val height: Int get() = image.height
-        override val tCompositeToWorkspace: Transform get() = arranged.tMediumToWorkspace
 
+        override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
         val tWorkspaceToRaw : Transform by lazy { arranged.tMediumToWorkspace.invert() }
 
-        override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
+        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
             val gc = rawImage.graphics
             gc.transform = tWorkspaceToRaw
             doer.invoke( gc)
         }
-        override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
+        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
             doer.invoke( rawImage, tWorkspaceToRaw)
         }
     }

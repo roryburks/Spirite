@@ -3,14 +3,23 @@ package sjunit.spirite.imageData.mediums
 import io.mockk.every
 import io.mockk.mockk
 import sjunit.TestConfig
+import sjunit.TestHelper
+import sjunit.spirite.imageData.groupTree.PrimaryGroupTreeTests
 import spirite.base.graphics.DynamicImage
+import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.groupTree.PrimaryGroupTree
+import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.mediums.CompositeSource
 import spirite.base.imageData.mediums.DynamicMedium
+import spirite.base.imageData.mediums.FlatMedium
+import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
 import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI
 import java.io.File
@@ -20,6 +29,7 @@ import org.junit.Test as test
 
 class DynamicMediumTests {
     val mockWorkspace = mockk<IImageWorkspace>()
+    val workspace = TestHelper.makeShellWorkspace(100,100)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     init {
@@ -31,7 +41,7 @@ class DynamicMediumTests {
         val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
         val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(5,5,10,10)
         }
@@ -54,15 +64,15 @@ class DynamicMediumTests {
         val tMediumToWorkspace = MutableTransform.TranslationMatrix(-10f, -10f)
         val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(5,5,10,10)
         }
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(25,25,10,10)
         }
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(55,55,10,10)
         }
@@ -85,5 +95,43 @@ class DynamicMediumTests {
             val imageBI = imageConverter.convert<ImageBI>(dynamicMedium.image.base!!)
             ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\dynamicMediumTransformed.png"))
         }
+    }
+
+    @test fun compositesCorrectly() {
+        val layer1 = workspace.groupTree.addNewSimpleLayer(null, "Layer1", DYNAMIC)
+        layer1.x = 10
+        layer1.y = 10
+
+        val mediumHandle = (layer1.layer as SimpleLayer).medium
+        val dynamicImage = (mediumHandle.medium as DynamicMedium).image
+
+        dynamicImage.drawToImage({
+            it.graphics.fillRect(0,0,20,20)
+        }, 20, 20)
+
+
+        val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
+        workspace.compositor.compositeSource = CompositeSource(
+                ArrangedMediumData(mediumHandle, tMediumToWS),
+                {it.color = Colors.RED
+                    it.fillRect( 40,40, 10, 10)})
+
+
+        val wsImage = Hybrid.imageCreator.createImage(100,100)
+
+        NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
+
+
+        if( TestConfig.save) {
+            val imageBI = imageConverter.convert<ImageBI>(wsImage)
+            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\dynamicComposited.png"))
+        }
+
+        for( x in 10 until 30)
+            for( y in 10 until 30)
+                assertEquals(Colors.BLACK.argb, wsImage.getARGB(x, y))
+        for( x in 40 until 50)
+            for( y in 40 until 50)
+                assertEquals(Colors.RED.argb,wsImage.getARGB(x,y))
     }
 }

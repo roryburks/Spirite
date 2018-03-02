@@ -6,10 +6,9 @@ import spirite.base.imageData.MediumHandle
 
 data class CompositeSource(
         val arranged: ArrangedMediumData,
-        val drawer : (GraphicsContext) -> Unit,
-        val handle: MediumHandle)
+        val drawer : (GraphicsContext) -> Unit)
 
 
 class Compositor {
-    val compositeSource : CompositeSource? = null
+    var compositeSource : CompositeSource? = null
 }

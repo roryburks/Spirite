@@ -7,6 +7,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
+import spirite.base.util.linear.Transform
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
@@ -101,7 +102,8 @@ class NodeRenderer(
     // region Composite Layer
     private class BuiltComposite(
             val handle: MediumHandle,
-            val compositeImage: RawImage)
+            val compositeImage: RawImage,
+            val tCompositeToMedium : Transform)
 
     private var builtComposite: BuiltComposite? = null
 
@@ -110,21 +112,33 @@ class NodeRenderer(
 
         if( compositeSource != null) {
             val compositeImage = Hybrid.imageCreator.createImage(settings.width, settings.height)
-            val medium = compositeSource.handle.medium
+            val medium = compositeSource.arranged.handle.medium
             val built = medium.build(compositeSource.arranged)
             val gc = compositeImage.graphics
-            gc.preScale( ratioW, ratioH)
+            val baseTransform = Transform.ScaleMatrix(ratioW, ratioH)
+            gc.transform = baseTransform
+
 
             // Draw the base
-            if( medium is IComplexMedium) {
-                //medium.drawBehindStroke(gc, )
+            gc.preTransform( built.tMediumToComposite)
+            when( medium) {
+                is IComplexMedium -> medium.drawBehindComposite(gc)
+                else -> medium.render(gc)
             }
 
-            gc.preTransform(built.tCompositeToWorkspace)
+            // Draw the composite
+            gc.transform = baseTransform
             compositeSource.drawer.invoke(gc)
+
+            // Draw over the composite
+            if( medium is IComplexMedium)
+                medium.drawOverComposite(gc)
+
+            builtComposite = BuiltComposite(
+                    compositeSource.arranged.handle,
+                    compositeImage,
+                    built.tCompositeToMedium)
         }
-
-
     }
     // endregion
 
@@ -160,8 +174,16 @@ class NodeRenderer(
         override fun draw(gc: GraphicsContext) {
             gc.pushTransform()
             gc.scale(ratioW, ratioH)
+
+            val baseRubric = th.renderRubric.stack(
+                    RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))
+
             when(th.handle) {
-                builtComposite?.handle -> {}
+                builtComposite?.handle -> {
+                    val compositeRubric = baseRubric.stack(RenderRubric(transform = builtComposite!!.tCompositeToMedium))
+                    gc.renderImage( builtComposite!!.compositeImage, 0, 0, compositeRubric)
+
+                }
                 else -> {
                     val rubric = th.renderRubric.stack(
                             RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))

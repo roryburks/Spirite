@@ -27,7 +27,8 @@ object MDebug {
         //	not be very user-friendly.
         RESOURCE,
         // A Fatal Error can and should immediately terminate the program
-        FATAL
+        FATAL,
+        GL
     }
 
     enum class WarningType {

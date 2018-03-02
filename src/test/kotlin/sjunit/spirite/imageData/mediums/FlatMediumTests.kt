@@ -24,7 +24,7 @@ class FlatMediumTests {
         val flatMedium = FlatMedium( EngineLaunchpoint.createImage( 20, 20))
         val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(5,5,10,10)
         }
@@ -51,7 +51,7 @@ class FlatMediumTests {
         transform.preTranslate(30f,30f)
         val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(0,0,30,30)
         }
@@ -78,7 +78,7 @@ class FlatMediumTests {
         transform.preTranslate(30f,30f)
         val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), transform))
 
-        built.doOnGC { gc ->
+        built.drawOnComposite { gc ->
             gc.color = Colors.RED
             gc.fillRect(0,0,30,30)
         }

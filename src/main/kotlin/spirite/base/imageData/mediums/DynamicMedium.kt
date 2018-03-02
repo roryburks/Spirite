@@ -6,6 +6,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 
 
 /***
@@ -44,15 +45,15 @@ class DynamicMedium(
     inner class DynamicBuiltImageData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height
-        override val tCompositeToWorkspace: Transform get() = Transform.IdentityMatrix
+        override val tMediumToComposite: Transform get() = arranged.tMediumToWorkspace
 
-        override fun _doOnGC(doer: (GraphicsContext) -> Unit) {
+        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {
             image.drawToImage( {raw -> doer.invoke(raw.graphics)},
                     workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
 
-        override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
-            image.drawToImage( {raw -> doer.invoke(raw, arranged.tMediumToWorkspace.invert())},
+        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
+            image.drawToImage( {raw -> doer.invoke(raw, Transform.IdentityMatrix)},
                     workspace.width, workspace.height, arranged.tMediumToWorkspace)
         }
     }

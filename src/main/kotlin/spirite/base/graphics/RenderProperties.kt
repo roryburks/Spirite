@@ -14,11 +14,7 @@ data class RenderProperties(
 }
 
 
-@Suppress("DataClassPrivateConstructor")
-// There's nothing actually wrong with users accessing the default constructor; it just is a confusion to see a list when
-//  the user will only ever actually put in a single entry
-data class RenderRubric
-private constructor(
+data class RenderRubric constructor(
         val transform: Transform,
         val alpha: Float,
         val methods: List<RenderMethod>)

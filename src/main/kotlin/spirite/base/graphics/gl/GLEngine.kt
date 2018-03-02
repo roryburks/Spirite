@@ -10,6 +10,8 @@ import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.ErrorType
 
 class GLEngine(
         val gl: IGL,
@@ -51,6 +53,11 @@ class GLEngine(
                     // Attach Texture to FBO
                     gl.framebufferTexture2D( GLC.FRAMEBUFFER, GLC.COLOR_ATTACHMENT0, GLC.TEXTURE_2D, value, 0)
 
+                    val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
+                    when(status) {
+                        GLC.FRAMEBUFFER_COMPLETE -> {}
+                        else -> {MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $")}
+                    }
                 }
             }
         }

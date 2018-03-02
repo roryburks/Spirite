@@ -14,35 +14,36 @@ abstract class BuiltMediumData( val arranged: ArrangedMediumData) {
     /** height of the composited Image */
     abstract val height: Int
 
-    abstract val tCompositeToWorkspace: Transform
+    abstract val tMediumToComposite: Transform
+    val tCompositeToMedium: Transform by lazy { tMediumToComposite.invert() }
 
     // Note: Can be changed to return Boolean if we want to be able to differentiate between image-changing calls and
     //  non-image-changing calls (assuming there's ever a need for such a thing)
     private var doing = false
-    fun doOnGC( doer: (GraphicsContext) -> Unit) {
+    fun drawOnComposite(drawer: (GraphicsContext) -> Unit) {
         if( doing) {
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         doing = true
-        _doOnGC(doer)
+        _drawOnComposite(drawer)
         doing = false
         arranged.handle.refresh()
     }
 
-    fun doOnRaw( doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
+    fun rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {
         if( doing) {
             MDebug.handleError(STRUCTURAL, "Tried to recursively check-out Medium.")
             return
         }
         doing = true
-        _doOnRaw(doer)
+        _rawAccessComposite(doer)
         doing = false
 
         arranged.handle.refresh()
     }
 
-    protected abstract fun _doOnGC( doer: (GraphicsContext) -> Unit)
-    protected abstract fun _doOnRaw( doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit)
+    protected abstract fun _drawOnComposite(doer: (GraphicsContext) -> Unit)
+    protected abstract fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit)
 
 }

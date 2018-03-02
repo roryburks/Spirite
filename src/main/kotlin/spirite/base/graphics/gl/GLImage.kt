@@ -10,18 +10,19 @@ class GLImage : RawImage {
     override val width : Int
     override val height: Int
     val engine: GLEngine
-    val premultiplied: Boolean = true
+    val premultiplied: Boolean
     var tex : IGLTexture?
         get
         private set
 
     // region Constructors
-    constructor( width: Int, height: Int, glEngine: GLEngine) {
+    constructor( width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
         if( width <= 0 || height <= 0)
             throw InvalidImageDimensionsExeption("Invalid Image Dimensions")
         this.width = width
         this.height = height
         this.engine = glEngine
+        this.premultiplied = premultiplied
 
         val gl = glEngine.gl
 
@@ -40,6 +41,7 @@ class GLImage : RawImage {
         width = toCopy.width
         height = toCopy.height
         engine = toCopy.engine
+        premultiplied = toCopy.premultiplied
 
         val gl = engine.gl
 
@@ -54,11 +56,12 @@ class GLImage : RawImage {
         gl.copyTexImage2D(GLC.TEXTURE_2D, 0, GLC.RGBA8, 0, 0, width, height, 0)
     }
 
-    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine) {
+    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
         this.tex = tex
         this.width = width
         this.height = height
         this.engine = glEngine
+        this.premultiplied = premultiplied
     }
     // endregion
 
@@ -87,6 +90,7 @@ class GLImage : RawImage {
 
     override fun getARGB(x: Int, y: Int): Int {
         if (x < 0 || y < 0 || x >= width || y >= height) return 0
+        engine.setTarget(this)
         val gl = engine.gl
 
         val read = gl.makeInt32Source(1)

@@ -7,7 +7,6 @@ import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 
 
 /**
@@ -66,12 +65,12 @@ interface IMedium {
 
 abstract class IComplexMedium : IMedium {
     override fun render( gc: GraphicsContext, render: RenderRubric?) {
-        drawBehindStroke(gc,render)
-        drawInFrontOfStroke(gc, render)
+        drawBehindComposite(gc,render)
+        drawOverComposite(gc, render)
     }
 
-    abstract fun drawBehindStroke( gc: GraphicsContext, render: RenderRubric?)
-    abstract fun drawInFrontOfStroke( gc: GraphicsContext, render: RenderRubric?)
+    abstract fun drawBehindComposite(gc: GraphicsContext, render: RenderRubric? = null)
+    abstract fun drawOverComposite(gc: GraphicsContext, render: RenderRubric? = null)
 }
 
 object NilMedium : IMedium {
@@ -87,10 +86,10 @@ object NilMedium : IMedium {
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
 
     class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+        override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
         override val width: Int get() = 1
         override val height: Int get() = 1
-        override val tCompositeToWorkspace: Transform get() = Companion.IdentityMatrix
-        override fun _doOnGC(doer: (GraphicsContext) -> Unit) {}
-        override fun _doOnRaw(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {}
+        override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}
+        override fun _rawAccessComposite(doer: (RawImage, tWorkspaceToRaw: Transform) -> Unit) {}
     }
 }

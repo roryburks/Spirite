@@ -60,4 +60,27 @@ class GLImageTests {
         if( TestConfig.save)
             ImageIO.write(bi, "png", File("${TestConfig.saveLocation}\\testConversion.png"))
     }
+
+    @test fun SwitchesTargets() {
+        val img1 = GLImage( 25,25,gle, false)
+        val img2 = GLImage( 25, 25, gle, false)
+
+        val gc1 = img1.graphics
+        gc1.color = Colors.RED
+        gc1.fillRect(0,0,25,25)
+
+
+        val gc2 = img2.graphics
+        gc2.color = Colors.BLUE
+        gc2.fillRect(0,0,25,25)
+
+        val img3 = img2.deepCopy() as GLImage
+
+        assertEquals( Colors.RED.argb, img1.getARGB(10,10))
+        assertEquals( Colors.BLUE.argb, img2.getARGB(10,10))
+        if( TestConfig.save)
+            ImageIO.write(img1.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\testSwitches1.png"))
+        if( TestConfig.save)
+            ImageIO.write(img3.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\testSwitches2.png"))
+    }
 }
