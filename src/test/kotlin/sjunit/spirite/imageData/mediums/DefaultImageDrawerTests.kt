@@ -5,10 +5,8 @@ import io.mockk.mockk
 import org.junit.Test
 import sjunit.TestConfig
 import sjunit.TestHelper
-import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.NodeRenderer
-import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
@@ -20,15 +18,12 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
-import spirite.pc.graphics.ImageBI
-import java.io.File
-import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class DefaultImageDrawerTests {
-    val mockStrokeProvider = mockk<IStrokeDrawerProvider>()
-    val workspace = TestHelper.makeShellWorkspace( strokeProvider = mockStrokeProvider)
+    private val mockStrokeProvider = mockk<IStrokeDrawerProvider>()
+    private val workspace = TestHelper.makeShellWorkspace( strokeProvider = mockStrokeProvider)
 
     @Test fun compositeDraw() {
         // Arrange
@@ -50,10 +45,7 @@ class DefaultImageDrawerTests {
         NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
 
         // Save
-        if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(wsImage)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\defaultImageDrawer_compositeStroke.png"))
-        }
+        TestConfig.trySave(wsImage,"defaultImageDrawer_compositeStroke")
 
         // Assert
         assertNotEquals( 0, wsImage.getARGB(44, 20))
@@ -78,18 +70,16 @@ class DefaultImageDrawerTests {
         drawer.stepStroke(PenState(20f, 45f, 0.25f))
         drawer.endStroke()
 
-        // Assert
+        // Save
         val image = ((layer1.layer as SimpleLayer).medium.medium as FlatMedium).image
+        TestConfig.trySave( image, "defaultImageDrawer_draws")
+
+        // Assert
         assertNotEquals( 0, image.getARGB(24, 0))
         assertNotEquals( 0, image.getARGB(0, 24))
         assertEquals( 0, image.getARGB(0, 0))
 
 
-        // Save
-        if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(image)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\defaultImageDrawer_draws.png"))
-        }
     }
 
     @Test fun undoesAndRedoes() {
@@ -118,10 +108,8 @@ class DefaultImageDrawerTests {
 
         workspace.undoEngine.redo()
         image = ((layer1.layer as SimpleLayer).medium.medium as FlatMedium).image
-        if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(image)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\defaultImageDrawer_redo.png"))
-        }
+        TestConfig.trySave(image, "defaultImageDrawer_redo")
+
         assertNotEquals( 0, image.getARGB(24, 0))
         assertNotEquals( 0, image.getARGB(0, 24))
         assertEquals( 0, image.getARGB(0, 0))
@@ -147,10 +135,7 @@ class DefaultImageDrawerTests {
 
         // Save
         val image = ((layer1.layer as SimpleLayer).medium.medium as DynamicMedium).image.base!!
-        if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(image)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\defaultImageDrawer_dynamic.png"))
-        }
+        TestConfig.trySave(image, "defaultImageDrawer_dynamic")
     }
 
     @Test fun compositesCorrectlyOnDynamic() {
@@ -178,11 +163,9 @@ class DefaultImageDrawerTests {
         drawer.stepStroke(PenState(60f, 60f, 0.5f))
         drawer.stepStroke(PenState(50f, 70f, 0.5f))
 
+        // Save
         val wsImage = Hybrid.imageCreator.createImage(workspace.width,workspace.height)
         NodeRenderer(workspace.groupTree.root, workspace).render(wsImage.graphics)
-        if( TestConfig.save) {
-            val imageBI = Hybrid.imageConverter.convert<ImageBI>(wsImage)
-            ImageIO.write(imageBI.bi, "png", File("${TestConfig.saveLocation}\\defaultImageDrawer_dynamicComposite.png"))
-        }
+        TestConfig.trySave(wsImage, "defaultImageDrawer_dynamicComposite")
     }
 }
