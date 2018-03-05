@@ -12,7 +12,7 @@ class SimpleLayer(val medium: MediumHandle) : Layer() {
 
     override val activeData: ArrangedMediumData get() = ArrangedMediumData(medium)
 
-    override fun getDrawer(arranged: ArrangedMediumData, medium: IMedium) = medium.getImageDrawer(arranged)
+    override fun getDrawer(arranged: ArrangedMediumData) = arranged.handle.medium.getImageDrawer(arranged)
 
     override val imageDependencies: List<MediumHandle> get() = SinglyList(medium)
 

@@ -7,6 +7,7 @@ import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.mediums.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 
@@ -27,9 +28,7 @@ class DynamicMedium(
 
     override fun build(arranged: ArrangedMediumData) = DynamicBuiltImageData(arranged)
 
-    override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getImageDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
 
     override fun render( gc: GraphicsContext, render: RenderRubric?) {
         val img = image.base

@@ -5,6 +5,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.imageData.mediums.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 
@@ -19,9 +20,7 @@ class FlatMedium(
     override val type: MediumType get() = FLAT
 
 
-    override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getImageDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
 
     override fun render( gc: GraphicsContext, render: RenderRubric?) {
         gc.renderImage(image, 0, 0, render)
@@ -34,6 +33,7 @@ class FlatMedium(
     override fun build(arranged: ArrangedMediumData): BuiltMediumData = FlatBuiltMediumData(arranged)
 
     inner class FlatBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+        private val image = this@FlatMedium.image
         override val width: Int get() = image.width
         override val height: Int get() = image.height
 

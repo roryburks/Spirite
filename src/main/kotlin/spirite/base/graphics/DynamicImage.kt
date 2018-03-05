@@ -32,27 +32,27 @@ class DynamicImage(
 
     fun drawToImage(drawer: (RawImage) -> Unit,
                     compositionWidth: Int, compositionHeight: Int,
-                    tBaseToComposition: Transform = Transform.IdentityMatrix)
+                    tImageToComposition: Transform = Transform.IdentityMatrix)
     {
-        val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tBaseToComposition)
+        val checkoutContext = checkoutRaw(compositionWidth, compositionHeight, tImageToComposition)
         drawer.invoke(checkoutContext.buffer)
         checkin(checkoutContext)
     }
 
     // region Checkin/Checkout
     private inner class CompositionContext(
-                    val tBaseToComposition : Transform,
-                    val compositionWidth : Int,
-                    val compositionHeight : Int
-    ){
+            val tImageToComposite: Transform,
+            val compositionWidth : Int,
+            val compositionHeight : Int)
+    {
         val buffer = Hybrid.imageCreator.createImage(compositionWidth, compositionHeight)
     }
 
-    private fun checkoutRaw( compositionWidth: Int, compositionHeight: Int,tBaseToComposition: Transform) : CompositionContext {
-        val newContext = CompositionContext(tBaseToComposition, compositionWidth, compositionHeight)
+    private fun checkoutRaw(compositionWidth: Int, compositionHeight: Int, tImageToComposition: Transform) : CompositionContext {
+        val newContext = CompositionContext(tImageToComposition, compositionWidth, compositionHeight)
 
         val gc = newContext.buffer.graphics
-        gc.transform(tBaseToComposition)
+        gc.transform(tImageToComposition)
         val b = base
         if( b != null ) gc.renderImage(b, xOffset, yOffset)
 
@@ -60,39 +60,40 @@ class DynamicImage(
     }
 
     private fun checkin(context: CompositionContext) {
-        val w = context.compositionWidth
-        val h = context.compositionHeight
+        val tCompositeToImage = context.tImageToComposite.invert()
 
-        val tCompositionToBase = context.tBaseToComposition.invert()
 
-        val drawArea = MUtil.circumscribeTrans(Rect(0,0,w,h), tCompositionToBase)
-                .union(Rect(xOffset, yOffset, base?.width ?: 1, base?.height ?: 1))
+        // Step 1: Draw Composite and Base to the combining image
+        val combiningBounds = MUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
+                .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
+        val combiningImage = Hybrid.imageCreator.createImage( combiningBounds.width, combiningBounds.height)
 
-        val newBaseUncropped = Hybrid.imageCreator.createImage( drawArea.width, drawArea.height)
-        val gc = newBaseUncropped.graphics
+        val gc = combiningImage.graphics
 
-        // Draw the old image
         val b = base
-        if( b != null) gc.renderImage(b, xOffset - drawArea.x, yOffset - drawArea.y)
+        if( b != null) gc.renderImage(b, xOffset - combiningBounds.x, yOffset - combiningBounds.y)
 
-        // Clear the section of the old image that will be replaced by the new one
-        gc.transform(context.tBaseToComposition)
+        gc.transform = tCompositeToImage
+        gc.preTranslate(-combiningBounds.x + 0f, -combiningBounds.y + 0f)
         gc.composite = SRC
         gc.renderImage(context.buffer, 0, 0)
 
-        val cropped = ContentBoundsFinder.findContentBounds(newBaseUncropped, 0, true)
+        // Step 2: Crop the Combining Bounds
+        val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
+        val newBase = when {
+            contentBounds.isEmpty -> null
+            else -> Hybrid.imageCreator.createImage(contentBounds.width, contentBounds.height)
+        }
+        newBase?.graphics?.renderImage(combiningImage, -contentBounds.x, -contentBounds.y)
 
-        val newBaseCropped = if(cropped.isEmpty) null else Hybrid.imageCreator.createImage(cropped.width, cropped.height)
-        newBaseCropped?.graphics?.renderImage(newBaseUncropped, -cropped.x, -cropped.y)
-
-        xOffset = cropped.x - drawArea.x
-        yOffset = cropped.y - drawArea.y
+        xOffset = contentBounds.x + combiningBounds.x
+        yOffset = contentBounds.y + combiningBounds.y
 
         base?.flush()
-        base = newBaseCropped
+        base = newBase
 
         context.buffer.flush()
-        newBaseUncropped.flush()
+        combiningImage.flush()
     }
     // endregion
 

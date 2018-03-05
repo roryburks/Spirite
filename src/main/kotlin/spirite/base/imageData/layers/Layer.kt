@@ -10,7 +10,7 @@ abstract class Layer {
     abstract val width: Int
     abstract val height: Int
     abstract val activeData : ArrangedMediumData
-    abstract fun getDrawer(arranged: ArrangedMediumData, medium: IMedium) : IImageDrawer
+    abstract fun getDrawer(arranged: ArrangedMediumData) : IImageDrawer
     abstract val imageDependencies : List<MediumHandle>
     abstract fun getDrawList() : List<TransformedHandle>
 

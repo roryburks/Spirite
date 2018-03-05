@@ -2,6 +2,9 @@ package spirite.base.pen.stroke
 
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.pen.PenState
+import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.CUBIC_SPLINE
+import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
+import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.Interpolator2D
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
@@ -9,14 +12,17 @@ import spirite.base.util.linear.Vec2
 class StrokeBuilder(
         val strokeDrawer: IStrokeDrawer,
         val params: StrokeParams,
-        val arranged: ArrangedMediumData,
-        val dynamics: PenDynamics? = null,
-        val interpolator: Interpolator2D? = null
+        val arranged: ArrangedMediumData
 ) {
     private val tWorkspaceToComposite : Transform
     private val baseStates = mutableListOf<PenState>()
     private val width: Int
     private val height: Int
+
+    val interpolator : Interpolator2D? = when( params.interpolationMethod) {
+        NONE -> null
+        CUBIC_SPLINE -> CubicSplineInterpolator2D()
+    }
 
     init {
         val built = arranged.built
@@ -26,7 +32,7 @@ class StrokeBuilder(
     }
 
     val currentPoints : DrawPoints get() {
-        val current = _currentPoints ?: DrawPointsBuilder.buildPoints(interpolator, baseStates, dynamics)
+        val current = _currentPoints ?: DrawPointsBuilder.buildPoints(interpolator, baseStates, params.dynamics)
         _currentPoints = current
         return current
     }
@@ -36,6 +42,7 @@ class StrokeBuilder(
         val cps = convertPS(ps)
         baseStates.add(cps)
         interpolator?.addPoint(cps.x, cps.y)
+        _currentPoints = null
 
         return strokeDrawer.start(this, width, height)
     }
@@ -44,6 +51,7 @@ class StrokeBuilder(
         val cps = convertPS(ps)
         baseStates.add(cps)
         interpolator?.addPoint(cps.x, cps.y)
+        _currentPoints = null
 
         return strokeDrawer.step()
     }
@@ -54,7 +62,7 @@ class StrokeBuilder(
 
     private fun convertPS( ps : PenState) : PenState {
         val transformed = tWorkspaceToComposite.apply(Vec2(ps.x, ps.y))
-        val pressure = dynamics?.getSize(ps) ?: ps.pressure
+        val pressure = params.dynamics.getSize(ps)
         return PenState( transformed.x, transformed.y, pressure)
     }
 }

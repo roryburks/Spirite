@@ -5,10 +5,13 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.IRenderEngine
+import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
 import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.mediums.drawer.NillImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
@@ -46,12 +49,10 @@ interface IImageWorkspace {
     val paletteManager : IPaletteManager
     val strokeProvider : IStrokeDrawerProvider
 
-    val activeDrawer: IImageDrawer
-//    fun getDrawerFromNode( node: Node) : IImageDrawer
-    fun getDrawerFromBMD( bmd: ArrangedMediumData) : IImageDrawer
-    fun getDrawerFromHandle( handle: MediumHandle) : IImageDrawer
-
-    fun buildActiveData() : ArrangedMediumData
+    val activeData : ArrangedMediumData?
+    fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
+    val activeDrawer : IImageDrawer
+    fun getDrawerForNode( node: Node) : IImageDrawer
 
     val imageObservatory: IImageObservatory
 
@@ -66,8 +67,6 @@ class ImageWorkspace(
         width: Int = 100,
         height: Int = 100) : IImageWorkspace
 {
-
-
 
     // Note: while this technically leaks access, everything which should have limited access (i.e. virtually everything
     //  outside of unit tests) should only have an IImageWorkspace, not an ImageWorkspace.
@@ -101,18 +100,25 @@ class ImageWorkspace(
         get() = TODO("not implemented")
     override val paletteSet: PaletteSet
         get() = TODO("not implemented")
-    override val activeDrawer: IImageDrawer
-        get() = TODO("not implemented")
 
-    override fun getDrawerFromBMD(bmd: ArrangedMediumData): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override val activeData: ArrangedMediumData? get() {
+        val node = groupTree.selectedNode
+        return when( node) {
+            is LayerNode -> arrangeActiveDataForNode(node)
+            else -> null
+        }
+    }
+    override fun arrangeActiveDataForNode(node: LayerNode): ArrangedMediumData {
+        val layerData = node.layer.activeData
+        return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
-    override fun getDrawerFromHandle(handle: MediumHandle): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override val activeDrawer: IImageDrawer get() {return getDrawerForNode( groupTree.selectedNode ?: return NillImageDrawer)}
+
+    override fun getDrawerForNode(node: Node) = when( node) {
+            is LayerNode -> node.layer.getDrawer(arrangeActiveDataForNode(node))
+            else -> NillImageDrawer
     }
 
-    override fun buildActiveData(): ArrangedMediumData {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }

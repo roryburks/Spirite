@@ -87,7 +87,7 @@ class SpriteLayer(
         return ArrangedMediumData( part.handle, part.tPartToWhole)
     }
 
-    override fun getDrawer(arranged: ArrangedMediumData, medium: IMedium): IImageDrawer {
+    override fun getDrawer(arranged: ArrangedMediumData): IImageDrawer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

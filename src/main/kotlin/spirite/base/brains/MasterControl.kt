@@ -8,11 +8,13 @@ import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.pen.stroke.StrokeParams
+import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 
 class MasterControl() {
-    private val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
 
     val frameManager = FrameManager()

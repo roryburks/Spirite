@@ -55,7 +55,7 @@ object GLGeom {
             backward.insertIntoArray(raw, forward.size())
 
             val primitiveTypes = intArrayOf(primitiveType)
-            val primitiveLengths = intArrayOf(raw.size)
+            val primitiveLengths = intArrayOf(raw.size / attrLengths.sum())
 
             return GLPrimitive(raw, attrLengths, primitiveTypes, primitiveLengths)
         }
