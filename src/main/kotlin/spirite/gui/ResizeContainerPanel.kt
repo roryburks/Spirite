@@ -4,6 +4,8 @@ import spirite.base.util.MUtil
 import spirite.base.util.groupExtensions.then
 import spirite.gui.Basic.SButton
 import spirite.gui.Basic.SPanel
+import spirite.gui.Basic.SToggleButton
+import spirite.gui.Bindable.Bound
 import spirite.gui.ResizeContainerPanel.ContainerOrientation.HORIZONATAL
 import spirite.gui.ResizeContainerPanel.ContainerOrientation.VERTICAL
 import java.awt.Cursor
@@ -31,10 +33,13 @@ class ResizeContainerPanel(
     private val leadingBars = mutableListOf<ResizeBar>()
     private val trailingBars = mutableListOf<ResizeBar>()
 
+    init {
+    }
+
 
     fun getPanel( index: Int) : ResizeBar? = when {
-        index < 0 && -index < leadingBars.size -> leadingBars[-index]
-        index > 0 && index < trailingBars.size -> trailingBars[index]
+        index < 0 && -index <= leadingBars.size -> leadingBars[-index-1]
+        index > 0 && index <= trailingBars.size -> trailingBars[index-1]
         else -> null
     }
 
@@ -84,14 +89,14 @@ class ResizeContainerPanel(
             stretch.addComponent( bar, barSize, barSize,barSize)
             noStretch.addComponent(bar)
         }
-        stretch.addComponent(stretchComponent)
+        stretch.addComponent(stretchComponent, minStretch, minStretch, Short.MAX_VALUE.toInt())
         noStretch.addComponent(stretchComponent)
         trailingBars.forEach { bar ->
+            stretch.addComponent( bar, barSize, barSize,barSize)
             if( bar.componentVisible) {
                 stretch.addComponent(bar.component, bar.size, bar.size, bar.size)
                 noStretch.addComponent(bar.component)
             }
-            stretch.addComponent( bar, barSize, barSize,barSize)
             noStretch.addComponent(bar)
         }
 
@@ -116,18 +121,21 @@ class ResizeContainerPanel(
             val trailing: Boolean
     ) : SPanel() {
         var size : Int = defaultSize ; private set
-        var componentVisible by LayoutDelegate(true)
+
+        private var componentVisibleBindable = Bindable(true, {resetLayout()})
+        var componentVisible by Bound(componentVisibleBindable)
 
         init {
             val adapter = ResizeBarAdapter()
             addMouseListener(adapter)
             addMouseMotionListener(adapter)
 
-            val btnExpand = SButton()
+            val btnExpand = SToggleButton(true)
             btnExpand.isBorderPainted = false
             btnExpand.isContentAreaFilled = false
             btnExpand.isFocusPainted = false
             btnExpand.isOpaque = false
+            btnExpand.checkBindable.bind(componentVisibleBindable)
 
             val pullBar = object : SPanel() {
                 override fun paintComponent(g: Graphics) {
