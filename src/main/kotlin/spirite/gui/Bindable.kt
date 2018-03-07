@@ -3,7 +3,9 @@ package spirite.gui
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
-
+/***
+ * Bindable objects are essentially persistent interfaces to
+ */
 class Bindable<T>( defaultValue: T, val onChange: ((T)->Unit)? = null) {
     var field: T
         get() = underlying.field
@@ -39,7 +41,11 @@ class Bindable<T>( defaultValue: T, val onChange: ((T)->Unit)? = null) {
         private val bindings = mutableListOf<WeakReference<Bindable<T>>>(WeakReference(bindable))
 
         fun swallow( other: BindableUnderlying<T>) {
-            bindings.addAll( other.bindings.filter { it.get() != null })
+            val bindingsToImport = other.bindings.filter { it.get() != null }
+            // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
+            if( other.field != field)
+                bindingsToImport.forEach { it.get()?.onChange?.invoke(field) }
+            bindings.addAll( bindingsToImport)
         }
         fun detatch( toRemove: Bindable<T>) {
             bindings.removeIf { it.get() ?: toRemove == toRemove }
