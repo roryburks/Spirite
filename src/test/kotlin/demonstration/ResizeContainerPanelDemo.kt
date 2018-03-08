@@ -1,9 +1,9 @@
 package demonstration
 
+import spirite.gui.Basic.SButton
+import spirite.gui.IResizeContainerPanel.ContainerOrientation.HORIZONATAL
 import spirite.gui.ResizeContainerPanel
-import spirite.gui.ResizeContainerPanel.ContainerOrientation.HORIZONATAL
 import java.awt.GridLayout
-import javax.swing.JButton
 import javax.swing.JFrame
 
 fun main( args: Array<String>) {
@@ -14,16 +14,16 @@ class ResizeContainerPanelDemoFrame : JFrame() {
     init {
         layout = GridLayout()
 
-        val centerButton = JButton("Stretch")
+        val centerButton = SButton("Stretch")
         val resize = ResizeContainerPanel( centerButton, HORIZONATAL)
         resize.minStretch = 100
 
-        centerButton.addActionListener{(-4..4).forEach {resize.getPanel(it)?.componentVisible = false}}
+        centerButton.action = {(-4..4).forEach {resize.getPanel(it)?.componentVisible = false}}
 
-        resize.addPanel(JButton("1"), 100,100,-999)
-        resize.addPanel(JButton("2"), 100,100,-999)
-        resize.addPanel(JButton("3"), 100,100,999)
-        resize.addPanel(JButton("4"), 100,100,999)
+        resize.addPanel(SButton("1"), 100,100,-999)
+        resize.addPanel(SButton("2"), 100,100,-999)
+        resize.addPanel(SButton("3"), 100,100,999)
+        resize.addPanel(SButton("4"), 100,100,999)
 
         add( resize)
     }

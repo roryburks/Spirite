@@ -1,12 +1,13 @@
 package demonstration
 
 import spirite.base.util.InvertibleFunction
+import spirite.gui.Basic.IButton
+import spirite.gui.Basic.SButton
 import spirite.gui.Basic.SGradientSlider
+import spirite.gui.IResizeContainerPanel.ContainerOrientation.HORIZONATAL
 import spirite.gui.ResizeContainerPanel
-import spirite.gui.ResizeContainerPanel.ContainerOrientation.HORIZONATAL
 import java.awt.Color
 import java.awt.GridLayout
-import javax.swing.JButton
 import javax.swing.JFrame
 
 
@@ -20,8 +21,8 @@ class SGradientSliderDemo : JFrame() {
 
         val sliderThing = SGradientSlider(label = "Thing: ")
 
-        var buttonReset = JButton("SetThing")
-        buttonReset.addActionListener { sliderThing.value = 0.5f }
+        val buttonReset : IButton = SButton("SetThing")
+        buttonReset.action = { sliderThing.value = 0.5f }
 
 
         val sliderBound1 = SGradientSlider(label = "Bound 1 (x^2):")
@@ -37,8 +38,6 @@ class SGradientSliderDemo : JFrame() {
         val disabledSlider = SGradientSlider(label = "Disabled")
         disabledSlider.value = 0.4f
         disabledSlider.isEnabled = false
-
-
 
         val resize = ResizeContainerPanel( sliderThing, HORIZONATAL)
         resize.minStretch = 100

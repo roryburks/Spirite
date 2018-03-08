@@ -1,5 +1,5 @@
 package spirite.gui.Basic
 
-class SComponent {
-
+interface IComponent {
+    //val component : JComponent? get() = null
 }

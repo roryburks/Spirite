@@ -24,7 +24,7 @@ interface IGradientSliderNonUI {
     var maxValue: Float
 }
 
-interface IGradientSlider : IGradientSliderNonUI {
+interface IGradientSlider : IGradientSliderNonUI, IComponent {
     var bgGradLeft : Color
     var bgGradRight : Color
     var fgGradLeft : Color
@@ -41,7 +41,7 @@ internal interface IGradientSliderNonUIImpl : IGradientSliderNonUI {
     var underlyingMax :Float
 }
 
-class SGradientSliderNonUI(
+private class SGradientSliderNonUI(
         minValue : Float = 0f,
         maxValue : Float = 1f)
     : IGradientSliderNonUIImpl

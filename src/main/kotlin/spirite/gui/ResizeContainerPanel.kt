@@ -2,12 +2,14 @@ package spirite.gui
 
 import spirite.base.util.MUtil
 import spirite.base.util.groupExtensions.then
-import spirite.gui.Basic.SButton
+import spirite.gui.Basic.IComponent
 import spirite.gui.Basic.SPanel
 import spirite.gui.Basic.SToggleButton
 import spirite.gui.Bindable.Bound
-import spirite.gui.ResizeContainerPanel.ContainerOrientation.HORIZONATAL
-import spirite.gui.ResizeContainerPanel.ContainerOrientation.VERTICAL
+import spirite.gui.IResizeContainerPanel.ContainerOrientation
+import spirite.gui.IResizeContainerPanel.ContainerOrientation.HORIZONATAL
+import spirite.gui.IResizeContainerPanel.ContainerOrientation.VERTICAL
+import spirite.gui.IResizeContainerPanel.IResizeBar
 import java.awt.Cursor
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
@@ -16,19 +18,36 @@ import javax.swing.GroupLayout
 import javax.swing.GroupLayout.Alignment
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
-import kotlin.math.min
 import kotlin.reflect.KProperty
 
-class ResizeContainerPanel(
-        stretchComponent: JComponent,
-        orientation: ContainerOrientation
-) : SPanel() {
+interface IResizeContainerPanel : IComponent
+{
     enum class ContainerOrientation {HORIZONATAL, VERTICAL}
 
-    var minStretch: Int by LayoutDelegate(0)
-    var orientation by LayoutDelegate(orientation)
-    var barSize by LayoutDelegate(8)
-    var stretchComponent by LayoutDelegate(stretchComponent)
+    var minStretch : Int
+    var orientation : ContainerOrientation
+    var barSize : Int
+    var stretchComponent : IComponent
+
+    fun getPanel(index: Int) : IResizeBar?
+    fun addPanel( component : IComponent, minSize: Int, defaultSize: Int, position: Int = 0) : Int
+    fun removePanel( index: Int)
+
+    interface IResizeBar {
+        var minSize: Int
+        var component : IComponent
+    }
+}
+
+class ResizeContainerPanel(
+        stretchComponent: IComponent,
+        orientation: ContainerOrientation
+) : SPanel(), IResizeContainerPanel {
+
+    override var minStretch: Int by LayoutDelegate(0)
+    override var orientation by LayoutDelegate(orientation)
+    override var barSize by LayoutDelegate(8)
+    override var stretchComponent by LayoutDelegate(stretchComponent)
 
     private val leadingBars = mutableListOf<ResizeBar>()
     private val trailingBars = mutableListOf<ResizeBar>()
@@ -37,13 +56,13 @@ class ResizeContainerPanel(
     }
 
 
-    fun getPanel( index: Int) : ResizeBar? = when {
+    override fun getPanel( index: Int) : ResizeBar? = when {
         index < 0 && -index <= leadingBars.size -> leadingBars[-index-1]
         index > 0 && index <= trailingBars.size -> trailingBars[index-1]
         else -> null
     }
 
-    fun addPanel( component: JComponent, minSize: Int, defaultSize: Int, position: Int = 0) : Int{
+    override fun addPanel( component: IComponent, minSize: Int, defaultSize: Int, position: Int) : Int{
         val position = if( position == 0) Integer.MAX_VALUE else position;
 
         val ret = when {
@@ -69,7 +88,7 @@ class ResizeContainerPanel(
         return ret
     }
 
-    fun removePanel( index: Int) {
+    override fun removePanel( index: Int) {
         TODO()
     }
 
@@ -83,19 +102,19 @@ class ResizeContainerPanel(
 
         leadingBars.forEach { bar ->
             if( bar.componentVisible) {
-                stretch.addComponent(bar.component, bar.size, bar.size, bar.size)
-                noStretch.addComponent(bar.component)
+                stretch.addComponent(bar.jcomponent, bar.size, bar.size, bar.size)
+                noStretch.addComponent(bar.jcomponent)
             }
             stretch.addComponent( bar, barSize, barSize,barSize)
             noStretch.addComponent(bar)
         }
-        stretch.addComponent(stretchComponent, minStretch, minStretch, Short.MAX_VALUE.toInt())
-        noStretch.addComponent(stretchComponent)
+        stretch.addComponent(stretchComponent as JComponent, minStretch, minStretch, Short.MAX_VALUE.toInt())
+        noStretch.addComponent(stretchComponent as JComponent)
         trailingBars.forEach { bar ->
             stretch.addComponent( bar, barSize, barSize,barSize)
             if( bar.componentVisible) {
-                stretch.addComponent(bar.component, bar.size, bar.size, bar.size)
-                noStretch.addComponent(bar.component)
+                stretch.addComponent(bar.jcomponent, bar.size, bar.size, bar.size)
+                noStretch.addComponent(bar.jcomponent)
             }
             noStretch.addComponent(bar)
         }
@@ -116,11 +135,14 @@ class ResizeContainerPanel(
 
     inner class ResizeBar(
             defaultSize: Int,
-            val minSize: Int,
-            val component: JComponent,
-            val trailing: Boolean
-    ) : SPanel() {
+            minSize: Int,
+            component: IComponent,
+            private val trailing: Boolean
+    ) : SPanel(), IResizeBar {
         var size : Int = defaultSize ; private set
+        override var minSize by LayoutDelegate(minSize)
+        override var component by LayoutDelegate(component)
+        val jcomponent = (component as JComponent)
 
         private var componentVisibleBindable = Bindable(true, {resetLayout()})
         var componentVisible by Bound(componentVisibleBindable)
