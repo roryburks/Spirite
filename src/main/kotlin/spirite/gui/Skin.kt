@@ -68,4 +68,12 @@ object Skin {
         Text( Color(190,205,220)),
         TextDark( Color( 57, 62, 66))
     }
+    enum class GradientSlider( override val color: Color) : ColorMarker {
+        BgGradLeft(Color(64, 64, 64)),
+        BgGradRight(Color(128,128,128)),
+        FgGradLeft(Color(120,120,190)),
+        FgGradRight(Color(90,90,160)),
+        DisabledGradLeft(Color(120,120,120)),
+        DisabledGradRight(Color(160,160,160))
+    }
 }

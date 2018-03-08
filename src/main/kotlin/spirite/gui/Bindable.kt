@@ -3,19 +3,26 @@ package spirite.gui
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
+
 /***
- * Bindable objects are essentially persistent interfaces to
+ * Bindable objects can be bound to other Bindables of the same type so that they share the same underlying value.
+ * Bindables come with an optional onChange Lambda that will be invoked whenever any bound Bindable is changed (thus
+ * the underlying value is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
+ * underlying is different)
  */
-class Bindable<T>( defaultValue: T, val onChange: ((T)->Unit)? = null) {
+class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
     var field: T
         get() = underlying.field
         set(value) {underlying.field = value}
 
     private var underlying = BindableUnderlying(this,defaultValue)
 
+    /** Note: Calling b1.bind( b2) will result in both having b2's current underlying value. */
     fun bind( root: Bindable<T>) {
-        root.underlying.swallow(underlying)
-        underlying = root.underlying
+        if( root.underlying != underlying) {
+            root.underlying.swallow(underlying)
+            underlying = root.underlying
+        }
     }
 
     fun unbind() {
@@ -52,7 +59,7 @@ class Bindable<T>( defaultValue: T, val onChange: ((T)->Unit)? = null) {
         }
     }
 
-    class Bound<T>( val bindable: Bindable<T>) {
+    class Bound<T>(private val bindable: Bindable<T>) {
         operator fun getValue(thisRef: Any, prop: KProperty<*>): T = bindable.field
         operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {bindable.field = value}
     }
