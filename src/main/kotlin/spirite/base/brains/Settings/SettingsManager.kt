@@ -7,7 +7,9 @@ import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KProperty
 
-interface ISettingsManager
+interface ISettingsManager {
+
+}
 
 class SettingsManager (
         private val preferences: IPreferences
@@ -84,6 +86,8 @@ class SettingsManager (
     var allowsEdittingInvisible by PreferenceBooleanDelegate("InvisEditing", false)
 
     var thumbnailSize by PreferenceIntDelegate("thumbnailSize", 32)
+
+    var scrollBuffer by PreferenceIntDelegate("scrollBuffer", 100)
     // endregion
 
 

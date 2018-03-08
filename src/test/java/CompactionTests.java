@@ -1,4 +1,4 @@
-package sjunit.spirite.util;
+package sjunit.spirite.base.util;
 
 import org.junit.Test;
 import spirite.base.util.compaction.DoubleEndedFloatCompactor;
