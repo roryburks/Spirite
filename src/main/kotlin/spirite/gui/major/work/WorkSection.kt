@@ -124,7 +124,7 @@ class WorkSection : SPanel(), IComponent {
                 add(zoomPanel, width = barSize)
                 height = barSize
             }
-                    rows += {
+            rows += {
                 add(coordinateLabel)
                 addGap(0, 3, Int.MAX_VALUE)
                 add(messageLabel)
