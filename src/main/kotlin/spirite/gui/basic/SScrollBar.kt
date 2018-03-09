@@ -40,7 +40,9 @@ class SScrollBarNonUI(
     override var scroll: Int
         get() = scrollBind.field
         set(to) {
-            scrollBind.field = MUtil.clip(minScroll, to, maxScroll - scrollWidth)
+            val clip = MUtil.clip(minScroll, to, maxScroll - scrollWidth)
+            println("clip:$clip")
+            scrollBind.field = clip
         }
     override var minScroll
         get() = minScrollBind.field
@@ -96,11 +98,14 @@ private constructor(orientation: Orientation, context: IComponent, minScroll: In
         isOpaque = false
         setUI( ModernScrollBarUI(context as JComponent))
 
-        addAdjustmentListener { scroll = value }
         scrollBind.addListener { value = it }
         scrollWidthBind.addListener { visibleAmount = it }
         minScrollBind.addListener { minimum = it}
         maxScrollBind.addListener { maximum = it }
+        addAdjustmentListener {
+            println(value)
+            scroll = value
+        }
 
         this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
     }

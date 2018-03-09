@@ -102,27 +102,34 @@ class WorkSection : SPanel(), IComponent {
     fun initComponents() {
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
+
+        val glWorkArea = GLWorkArea(this)
+
+        hScroll.scrollBind.addListener { view.offsetX = it * scrollRatio }
+        vScroll.scrollBind.addListener { view.offsetY = it * scrollRatio }
+
         coordinateLabel.text = "Coordinate Label"
         messageLabel.text = "Message Label"
+
 
         val barSize = 16
         layout = CrossLayout.buildCrossLayout( this, {
             rows += {
-                add(workAreaContainer, flex = 200f)
+                add(glWorkArea, flex = 200f)
                 add(vScroll, width = barSize)
-            flex = 200f
-        }
-                rows += {
-            add(hScroll, flex = 200f)
-            add(zoomPanel, width = barSize)
-            height = barSize
-        }
-                rows += {
-            add(coordinateLabel)
-            addGap(0, 3, Int.MAX_VALUE)
-            add(messageLabel)
-            height = 24
-        }
+                flex = 200f
+            }
+                    rows += {
+                add(hScroll, flex = 200f)
+                add(zoomPanel, width = barSize)
+                height = barSize
+            }
+                    rows += {
+                add(coordinateLabel)
+                addGap(0, 3, Int.MAX_VALUE)
+                add(messageLabel)
+                height = 24
+            }
         })
         validate()
 

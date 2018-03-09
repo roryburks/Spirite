@@ -12,11 +12,9 @@ import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.Skin.ResizePanel.BarLineColor
+import spirite.gui.basic.IComponent.MouseEvent
 import java.awt.Cursor
 import java.awt.Graphics
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import javax.swing.SwingUtilities
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent
@@ -126,9 +124,9 @@ class ResizeContainerPanel(
         var componentVisible by Bound(componentVisibleBindable)
 
         init {
-            val adapter = ResizeBarAdapter()
-            addMouseListener(adapter)
-            addMouseMotionListener(adapter)
+            val tracker = ResizeBarTracker()
+            onMousePress = {tracker.onMousePress(it)}
+            onMouseDrag = {tracker.onMouseDrag(it)}
 
             val btnExpand = SToggleButton(true)
             btnExpand.isBorderPainted = false
@@ -170,13 +168,13 @@ class ResizeContainerPanel(
             pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
         }
 
-        internal inner class ResizeBarAdapter : MouseAdapter() {
+        internal inner class ResizeBarTracker() {
             var startPos : Int = 0
             var startSize : Int = 0
             var reserved : Int = 0
 
-            override fun mousePressed(e: MouseEvent) {
-                val p = SwingUtilities.convertPoint( e.component, e.point, this@ResizeContainerPanel)
+            fun onMousePress(e: MouseEvent) {
+                val p = e.point.convert(this@ResizeContainerPanel)
                 reserved = 0
 
                 leadingBars.then(trailingBars)
@@ -196,8 +194,8 @@ class ResizeContainerPanel(
                 startSize = size
             }
 
-            override fun mouseDragged(e: MouseEvent) {
-                val p = SwingUtilities.convertPoint( e.component, e.point, this@ResizeContainerPanel)
+            fun onMouseDrag(e: MouseEvent) {
+                val p = e.point.convert(this@ResizeContainerPanel)
 
                 when( orientation) {
                     HORIZONATAL -> {
@@ -217,7 +215,6 @@ class ResizeContainerPanel(
                 }
 
                 resetLayout()
-                super.mouseDragged(e)
             }
 
         }

@@ -1,15 +1,29 @@
 package spirite.gui.basic
 
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
+import spirite.gui.SUIPoint
+import spirite.gui.UIPoint
+import spirite.gui.basic.IComponent.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JPanel
 
 interface IComponent {
+    fun redraw()
+
     var onResize : (() -> Unit)?
     var onHidden : (() -> Unit)?
     var onShown : (() -> Unit)?
     var onMoved : (() -> Unit)?
+
+    data class MouseEvent(
+            val point: UIPoint)
+
+    var onMouseClick : ((MouseEvent) -> Unit)?
+    var onMousePress : ((MouseEvent) -> Unit)?
+    var onMouseRelease : ((MouseEvent) -> Unit)?
+    var onMouseEnter : ((MouseEvent) -> Unit)?
+    var onMouseExit : ((MouseEvent) -> Unit)?
+    var onMouseMove : ((MouseEvent) -> Unit)?
+    var onMouseDrag : ((MouseEvent) -> Unit)?
 }
 
 interface ISComponent : IComponent{
@@ -17,11 +31,17 @@ interface ISComponent : IComponent{
 }
 
 class Invokable<T>() {
+    constructor(invoker : () -> T) : this() {
+        this.invoker = invoker
+    }
     lateinit var invoker : ()-> T
 }
 
 class SComponent( cGetter : Invokable<JComponent>) : ISComponent {
     override val component: JComponent by lazy { cGetter.invoker.invoke() }
+    override fun redraw() {component.repaint()}
+
+    // region ComponentListener
     override var onResize: (() -> Unit)?
         get() = componentListener.onResize
         set(value) { componentListener.onResize = value}
@@ -39,14 +59,72 @@ class SComponent( cGetter : Invokable<JComponent>) : ISComponent {
             var onResize : (() -> Unit)? = null,
             var onHidden : (() -> Unit)? = null,
             var onShown : (() -> Unit)? = null,
-            var onMoved : (() -> Unit)? = null) : ComponentListener
+            var onMoved : (() -> Unit)? = null) : java.awt.event.ComponentListener
     {
-        override fun componentMoved(e: ComponentEvent?) {onMoved?.invoke()}
-        override fun componentResized(e: ComponentEvent?) {onResize?.invoke()}
-        override fun componentHidden(e: ComponentEvent?) {onHidden?.invoke()}
-        override fun componentShown(e: ComponentEvent?) {onShown?.invoke()}
+        override fun componentMoved(e: java.awt.event.ComponentEvent?) {onMoved?.invoke()}
+        override fun componentResized(e: java.awt.event.ComponentEvent?) {onResize?.invoke()}
+        override fun componentHidden(e: java.awt.event.ComponentEvent?) {onHidden?.invoke()}
+        override fun componentShown(e: java.awt.event.ComponentEvent?) {onShown?.invoke()}
     }
     private val componentListener by lazy {  JSComponentListener().apply { component.addComponentListener(this)}}
+    // endregion
+
+    // region MouseListener
+    override var onMouseClick: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseClick
+        set(value) {mouseListener.onMouseClick = value}
+    override var onMousePress: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMousePress
+        set(value) {mouseListener.onMousePress = value}
+    override var onMouseRelease: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseRelease
+        set(value) {mouseListener.onMouseRelease = value}
+    override var onMouseEnter: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseEnter
+        set(value) {mouseListener.onMouseEnter = value}
+    override var onMouseExit: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseExit
+        set(value) {mouseListener.onMouseExit = value}
+    override var onMouseMove: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseMove
+        set(value) {mouseListener.onMouseMove = value}
+    override var onMouseDrag: ((MouseEvent) -> Unit)?
+        get() = mouseListener.onMouseDrag
+        set(value) {mouseListener.onMouseDrag = value}
+
+    private val mouseListener by lazy {
+        JSMouseListener().apply {
+            component.addMouseListener(this)
+            component.addMouseMotionListener(this)
+        }
+    }
+    private class JSMouseListener(
+            var onMouseClick : ((MouseEvent) -> Unit)? = null,
+            var onMousePress : ((MouseEvent) -> Unit)? = null,
+            var onMouseRelease : ((MouseEvent) -> Unit)? = null,
+            var onMouseEnter : ((MouseEvent) -> Unit)? = null,
+            var onMouseExit : ((MouseEvent) -> Unit)? = null,
+            var onMouseMove : ((MouseEvent) -> Unit)? = null,
+            var onMouseDrag : ((MouseEvent) -> Unit)? = null)
+        :java.awt.event.MouseListener, java.awt.event.MouseMotionListener
+    {
+
+        fun convert( e: java.awt.event.MouseEvent) : MouseEvent {
+            val scomp = SComponent(Invokable {e.component as JComponent})
+            return MouseEvent( SUIPoint( e.x, e.y, scomp))
+        }
+
+        override fun mouseReleased(e: java.awt.event.MouseEvent) { onMouseRelease?.invoke( convert(e))}
+        override fun mouseEntered(e: java.awt.event.MouseEvent) { onMouseEnter?.invoke( convert(e))}
+        override fun mouseClicked(e: java.awt.event.MouseEvent) {onMouseClick?.invoke(convert(e))}
+        override fun mouseExited(e: java.awt.event.MouseEvent) {onMouseExit?.invoke(convert(e))}
+        override fun mousePressed(e: java.awt.event.MouseEvent) {onMousePress?.invoke(convert(e))}
+        override fun mouseMoved(e: java.awt.event.MouseEvent) {onMouseMove?.invoke(convert(e))}
+        override fun mouseDragged(e: java.awt.event.MouseEvent) { onMouseDrag?.invoke(convert(e))}
+    }
+
+    // endregion
+
 }
 
 class JJJ( private val invokable: Invokable<JComponent> = Invokable()) : JPanel(), ISComponent by SComponent( invokable) {

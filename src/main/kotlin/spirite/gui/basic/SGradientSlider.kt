@@ -89,7 +89,7 @@ private class SGradientSliderNonUI(
 }
 
 class SGradientSlider
-private constructor(minValue: Float, maxValue: Float, invokable: Invokable<JComponent>)
+private constructor(minValue: Float, maxValue: Float, label: String, invokable: Invokable<JComponent>)
     :JPanel(),
         IGradientSliderNonUIImpl by SGradientSliderNonUI(minValue, maxValue),
         IGradientSlider,
@@ -100,7 +100,7 @@ private constructor(minValue: Float, maxValue: Float, invokable: Invokable<JComp
     constructor(
         minValue : Float = 0f,
         maxValue : Float = 1f,
-        label: String = "") : this( minValue, maxValue, Invokable())
+        label: String = "") : this( minValue, maxValue, label, Invokable())
 
     override var bgGradLeft: Color by UI(Skin.GradientSlider.BgGradLeft.color)
     override var bgGradRight: Color by UI(Skin.GradientSlider.BgGradRight.color)

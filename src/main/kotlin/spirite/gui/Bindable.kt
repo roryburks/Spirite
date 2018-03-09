@@ -41,26 +41,19 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
             set(value) {
                 if( value != field) {
                     field = value
-                    bindings.removeIf { when( it.get()) {
-                        null -> true
-                        else -> {
-                            it.get()?.onChange?.invoke(value)
-                            false
-                        }
-                    } }
+                    bindings.forEach { it.onChange?.invoke(value) }
                 }
             }
-        private val bindings = mutableListOf<WeakReference<Bindable<T>>>(WeakReference(bindable))
+        private val bindings = mutableListOf<Bindable<T>>(bindable)
 
         fun swallow( other: BindableUnderlying<T>) {
-            val bindingsToImport = other.bindings.filter { it.get() != null }
             // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
             if( other.field != field)
-                bindingsToImport.forEach { it.get()?.onChange?.invoke(field) }
-            bindings.addAll( bindingsToImport)
+                other.bindings.forEach { it.onChange?.invoke(field) }
+            bindings.addAll( other.bindings)
         }
         fun detatch( toRemove: Bindable<T>) {
-            bindings.removeIf { it.get() ?: toRemove == toRemove }
+            bindings.remove(toRemove)
         }
     }
 

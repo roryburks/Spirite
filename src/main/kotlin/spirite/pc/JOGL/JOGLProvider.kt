@@ -11,6 +11,8 @@ object JOGLProvider {
         return JOGL( gl.gL2)
     }
 
+    val context : GLContext get() = drawable.context
+
     init {
         val profile = GLProfile.getDefault()
         val fact = GLDrawableFactory.getFactory(profile)
