@@ -14,13 +14,13 @@
 //class AWTGraphicsContext : GraphicsContext {
 //    override var alpha: Float
 //        get() = TODO("not implemented")
-//        set(value) {}
+//        set(scroll) {}
 //    override var composite: Composite
 //        get() = TODO("not implemented")
-//        set(value) {}
+//        set(scroll) {}
 //    override var color: Color
 //        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-//        set(value) {}
+//        set(scroll) {}
 //
 //    override val width: Int
 //    override val height: Int
@@ -39,10 +39,10 @@
 //
 //    override var transform: Transform
 //        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-//        set(value) {}
+//        set(scroll) {}
 //    override var lineAttributes: LineAttributes
 //        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-//        set(value) {}
+//        set(scroll) {}
 //
 //    override fun drawBounds(image: IImage, c: Int) {
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

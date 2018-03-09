@@ -94,8 +94,8 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	}
 //
 //	/**
-//	 * @return A new vector where every value of the original vector has
-//	 * been multiplied with the corresponding value of the given vector.
+//	 * @return A new vector where every scroll of the original vector has
+//	 * been multiplied with the corresponding scroll of the given vector.
 //	 */
 //	public Vec4 scale(final Vec4 vec) {
 //		return new Vec4(

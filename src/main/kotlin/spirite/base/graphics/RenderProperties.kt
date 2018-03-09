@@ -33,7 +33,7 @@ data class RenderRubric constructor(
     }
 }
 
-/** RenderMethods is a MethodType along with a value (if applicable) */
+/** RenderMethods is a MethodType along with a scroll (if applicable) */
 data class RenderMethod(
         val methodType: RenderMethodType = RenderMethodType.DEFAULT,
         val renderValue: Int = methodType.defaultValue)

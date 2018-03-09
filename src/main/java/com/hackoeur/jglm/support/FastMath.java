@@ -358,7 +358,7 @@ public class FastMath {
      * Get the high order bits from the mantissa.
      * Equivalent to adding and subtracting HEX_40000 but also works for very large numbers
      *
-     * @param d the value to split
+     * @param d the scroll to split
      * @return the high order part of the mantissa
      */
     private static double doubleHighPart(double d) {
@@ -851,7 +851,7 @@ public class FastMath {
      * Exponential function.
      *
      * Computes exp(x), function result is nearly rounded.   It will be correctly
-     * rounded to the theoretical value for 99.9% of input values, otherwise it will
+     * rounded to the theoretical scroll for 99.9% of input values, otherwise it will
      * have a 1 UPL error.
      *
      * Method:
@@ -948,7 +948,7 @@ public class FastMath {
         final double fracPartB = ExpFracTable.EXP_FRAC_TABLE_B[intFrac];
 
         /* epsilon is the difference in x from the nearest multiple of 2^-10.  It
-         * has a value in the range 0 <= epsilon < 2^-10.
+         * has a scroll in the range 0 <= epsilon < 2^-10.
          * Do the subtraction from x as the last step to avoid possible loss of percison.
          */
         final double epsilon = x - (intVal + intFrac / 1024.0);
@@ -1464,7 +1464,7 @@ public class FastMath {
      *
      * @param base Base of the logarithm, must be greater than 0.
      * @param x Argument, must be greater than 0.
-     * @return the value of the logarithm, i.e. the number {@code y} such that
+     * @return the scroll of the logarithm, i.e. the number {@code y} such that
      * <code>base<sup>y</sup> = x</code>.
      * @since 1.2 (previously in {@code MathUtils}, moved as of version 3.0)
      */
@@ -2268,7 +2268,7 @@ public class FastMath {
         double xa;
         double xb = 0.0;
 
-        /* Take absolute value of the input */
+        /* Take absolute scroll of the input */
         xa = x;
         if (x < 0) {
             negative = true;
@@ -2332,7 +2332,7 @@ public class FastMath {
     public static double cos(double x) {
         int quadrant = 0;
 
-        /* Take absolute value of the input */
+        /* Take absolute scroll of the input */
         double xa = x;
         if (x < 0) {
             xa = -xa;
@@ -2387,7 +2387,7 @@ public class FastMath {
         boolean negative = false;
         int quadrant = 0;
 
-        /* Take absolute value of the input */
+        /* Take absolute scroll of the input */
         double xa = x;
         if (x < 0) {
             negative = true;
@@ -2488,7 +2488,7 @@ public class FastMath {
             return (negate ^ leftPlane) ? (-Math.PI * F_1_2) : (Math.PI * F_1_2);
         }
 
-        /* Estimate the closest tabulated arctan value, compute eps = xa-tangentTable */
+        /* Estimate the closest tabulated arctan scroll, compute eps = xa-tangentTable */
         if (xa < 1) {
             idx = (int) (((-1.7168146928204136 * xa * xa + 8.0) * xa) + 0.5);
         } else {
@@ -2875,7 +2875,7 @@ public class FastMath {
 
       // Did r overflow?
       if (Double.isInfinite(r)) { // x is effectively zero
-          return Math.PI/2; // so return the appropriate value
+          return Math.PI/2; // so return the appropriate scroll
       }
 
       double ra = doubleHighPart(r);
@@ -3022,8 +3022,8 @@ public class FastMath {
     }
 
     /**
-     * Absolute value.
-     * @param x number from which absolute value is requested
+     * Absolute scroll.
+     * @param x number from which absolute scroll is requested
      * @return abs(x)
      */
     public static int abs(final int x) {
@@ -3031,8 +3031,8 @@ public class FastMath {
     }
 
     /**
-     * Absolute value.
-     * @param x number from which absolute value is requested
+     * Absolute scroll.
+     * @param x number from which absolute scroll is requested
      * @return abs(x)
      */
     public static long abs(final long x) {
@@ -3040,8 +3040,8 @@ public class FastMath {
     }
 
     /**
-     * Absolute value.
-     * @param x number from which absolute value is requested
+     * Absolute scroll.
+     * @param x number from which absolute scroll is requested
      * @return abs(x)
      */
     public static float abs(final float x) {
@@ -3049,8 +3049,8 @@ public class FastMath {
     }
 
     /**
-     * Absolute value.
-     * @param x number from which absolute value is requested
+     * Absolute scroll.
+     * @param x number from which absolute scroll is requested
      * @return abs(x)
      */
     public static double abs(double x) {
@@ -3453,8 +3453,8 @@ public class FastMath {
     }
 
     /** Compute the minimum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return a if a is lesser or equal to b, b otherwise
      */
     public static int min(final int a, final int b) {
@@ -3462,8 +3462,8 @@ public class FastMath {
     }
 
     /** Compute the minimum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return a if a is lesser or equal to b, b otherwise
      */
     public static long min(final long a, final long b) {
@@ -3471,8 +3471,8 @@ public class FastMath {
     }
 
     /** Compute the minimum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return a if a is lesser or equal to b, b otherwise
      */
     public static float min(final float a, final float b) {
@@ -3496,8 +3496,8 @@ public class FastMath {
     }
 
     /** Compute the minimum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return a if a is lesser or equal to b, b otherwise
      */
     public static double min(final double a, final double b) {
@@ -3521,8 +3521,8 @@ public class FastMath {
     }
 
     /** Compute the maximum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return b if a is lesser or equal to b, a otherwise
      */
     public static int max(final int a, final int b) {
@@ -3530,8 +3530,8 @@ public class FastMath {
     }
 
     /** Compute the maximum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return b if a is lesser or equal to b, a otherwise
      */
     public static long max(final long a, final long b) {
@@ -3539,8 +3539,8 @@ public class FastMath {
     }
 
     /** Compute the maximum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return b if a is lesser or equal to b, a otherwise
      */
     public static float max(final float a, final float b) {
@@ -3564,8 +3564,8 @@ public class FastMath {
     }
 
     /** Compute the maximum of two values
-     * @param a first value
-     * @param b second value
+     * @param a first scroll
+     * @param b second scroll
      * @return b if a is lesser or equal to b, a otherwise
      */
     public static double max(final double a, final double b) {
@@ -3598,8 +3598,8 @@ public class FastMath {
      * <li> else, if either argument is NaN then the result is NaN.</li>
      * </ul>
      *
-     * @param x a value
-     * @param y a value
+     * @param x a scroll
+     * @param y a scroll
      * @return sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      */
     public static double hypot(final double x, final double y) {
@@ -3639,8 +3639,8 @@ public class FastMath {
 
     /**
      * Computes the remainder as prescribed by the IEEE 754 standard.
-     * The remainder value is mathematically equal to {@code x - y*n}
-     * where {@code n} is the mathematical integer closest to the exact mathematical value
+     * The remainder scroll is mathematically equal to {@code x - y*n}
+     * where {@code n} is the mathematical integer closest to the exact mathematical scroll
      * of the quotient {@code x/y}.
      * If two mathematical integers are equally close to {@code x/y} then
      * {@code n} is the integer that is even.
@@ -3665,8 +3665,8 @@ public class FastMath {
      * Returns the first argument with the sign of the second argument.
      * A NaN {@code sign} argument is treated as positive.
      *
-     * @param magnitude the value to return
-     * @param sign the sign for the returned value
+     * @param magnitude the scroll to return
+     * @param sign the sign for the returned scroll
      * @return the magnitude with the same sign as the {@code sign} argument
      */
     public static double copySign(double magnitude, double sign){
@@ -3682,8 +3682,8 @@ public class FastMath {
      * Returns the first argument with the sign of the second argument.
      * A NaN {@code sign} argument is treated as positive.
      *
-     * @param magnitude the value to return
-     * @param sign the sign for the returned value
+     * @param magnitude the scroll to return
+     * @param sign the sign for the returned scroll
      * @return the magnitude with the same sign as the {@code sign} argument
      */
     public static float copySign(float magnitude, float sign){

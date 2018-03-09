@@ -96,9 +96,9 @@
 //class ToolsetManager : IToolsetManager {
 //    override var selectedTool : Tool
 //        get() = _selected[cursor.ordinal]
-//        set(value) {
-//            _selected[cursor.ordinal] = value
-//            triggerToolsetChanged(value)
+//        set(scroll) {
+//            _selected[cursor.ordinal] = scroll
+//            triggerToolsetChanged(scroll)
 //        }
 //
 //    private val _selected = Cursor.values().map {
@@ -108,8 +108,8 @@
 //
 //    override var cursor: Cursor = MOUSE
 //        get() = field
-//        set(value) {
-//            field = value
+//        set(scroll) {
+//            field = scroll
 //            triggerToolsetChanged(_selected[cursor.ordinal])
 //        }
 //
@@ -174,13 +174,13 @@
 //    ) {
 //        fun getProperty( id: String) = properties.find { it.id == id }
 //
-//        fun getValue( id: String) = properties.find{ it.id == id}?.value
-//        fun setValue(id: String, value: Any?) {
+//        fun getScroll( id: String) = properties.find{ it.id == id}?.scroll
+//        fun setScroll(id: String, scroll: Any?) {
 //            val property = properties.find{it.id == id}
 //            if( property == null)
 //                MDebug.handleWarning(REFERENCE, "Could not find property $id for tool $tool")
 //            else {
-//                property.value = value
+//                property.scroll = scroll
 //                triggerToolsetPropertyChanged(tool, property)
 //            }
 //        }
@@ -193,7 +193,7 @@
 //            val mask: Int = 0
 //    )
 //    {
-//        abstract var value: Any?
+//        abstract var scroll: Any?
 //    }
 //    // region Toolset Observer
 //    interface MToolsetObserver {

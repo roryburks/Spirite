@@ -40,7 +40,7 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
 
 private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     // The field is essentially a 2D int array the size of the resulting
-    //	strip.  Each value in the int array corresponds to how much free
+    //	strip.  Each scroll in the int array corresponds to how much free
     //	space is to the right of the position it represents (0 means the spot
     //	is currently occupied).
     // Because the height dynamically stretches whereas the width is fixed,

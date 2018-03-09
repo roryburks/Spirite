@@ -611,7 +611,7 @@ object GLC {
     val RGB5_A1 = 0x8057
     val RGB565 = 0x8D62
     // GL_STENCIL_INDEX does not appear in gl2.h or gl2ext.h, and there is no
-    // token with value 0x1901.
+    // token with scroll 0x1901.
     //
     @Deprecated("")
     val STENCIL_INDEX = 0x1901

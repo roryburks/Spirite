@@ -15,7 +15,7 @@ class WorkSectionDemo : JFrame() {
     init {
         layout = GridLayout()
 
-        val resize = ResizeContainerPanel(WorkSection(), HORIZONATAL)
+        val resize = ResizeContainerPanel(WorkSection(), HORIZONATAL, 200)
 
         resize.minStretch = 100
 

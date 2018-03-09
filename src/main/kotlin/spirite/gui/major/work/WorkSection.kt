@@ -2,9 +2,10 @@ package spirite.gui.major.work
 
 import spirite.base.pen.Penner
 import jspirite.gui.SScrollPane.ModernScrollBarUI
-import spirite.gui.basic.IComponent
-import spirite.gui.basic.SLabel
-import spirite.gui.basic.SPanel
+import spirite.gui.Bindable
+import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.VERTICAL
+import spirite.gui.basic.*
 import java.awt.Font
 import java.awt.Graphics
 import javax.swing.GroupLayout
@@ -60,55 +61,31 @@ class WorkSection : SPanel(), IComponent {
     }
 
     fun initComponents() {
-        val vScroll = JScrollBar()
-        vScroll.isOpaque = false
-        vScroll.ui = ModernScrollBarUI(this)
-        val hScroll = JScrollBar()
-        hScroll.isOpaque = false
-        hScroll.ui = ModernScrollBarUI(this)
-        hScroll.orientation = JScrollBar.HORIZONTAL
-
+        val vScroll = SScrollBar(VERTICAL, this)
+        val hScroll = SScrollBar(HORIZONATAL, this)
         coordinateLabel.text = "Coordinate Label"
         messageLabel.text = "Message Label"
 
-        val layout = GroupLayout(this)
-
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(workAreaContainer)
-                                        .addComponent(hScroll, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, java.lang.Short.MAX_VALUE.toInt()))
-                                .addGroup(layout.createParallelGroup()
-                                        .addComponent(vScroll)
-                                        // !!!! TODO: figure out why this is necessary to keep the layout working as expected and find a better way
-                                        .addComponent(zoomPanel, 0, 0, vScroll.getPreferredSize().width)
-                                        // !!!!
-                                )
-                        )
-                        .addGroup(layout.createSequentialGroup()
-                                // Bottom Bar
-                                .addComponent(coordinateLabel)
-                                .addGap(0, 3, java.lang.Short.MAX_VALUE.toInt())
-                                .addComponent(messageLabel)
-                        )
-        )
-        layout.setVerticalGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(vScroll, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, java.lang.Short.MAX_VALUE.toInt())
-                        .addComponent(workAreaContainer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, java.lang.Short.MAX_VALUE.toInt()))
-                .addGroup(layout.createParallelGroup()
-                        .addComponent(hScroll)
-                        .addComponent(zoomPanel, 0, 0, hScroll.getPreferredSize().height)
-                )
-                .addGroup(layout.createParallelGroup()
-                        // Bottom Bar
-                        .addComponent(coordinateLabel, 24, 24, 24)
-                        .addComponent(messageLabel, 24, 24, 24)
-                )
-        )
-        this.layout = layout
+        val barSize = 16
+        layout = CrossLayout.buildCrossLayout( this, {
+            rows += {
+                add(workAreaContainer, flex = 200f)
+                add(vScroll, width = barSize)
+            flex = 200f
+        }
+                rows += {
+            add(hScroll, flex = 200f)
+            add(zoomPanel, width = barSize)
+            height = barSize
+        }
+                rows += {
+            add(coordinateLabel)
+            addGap(0, 3, Int.MAX_VALUE)
+            add(messageLabel)
+            height = 24
+        }
+        })
+        validate()
 
     }
     // endregion

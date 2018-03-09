@@ -10,11 +10,11 @@
 //        private val changeDescription: String
 //)
 //{
-//    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+//    operator fun getScroll(thisRef: Any?, property: KProperty<*>): T {
 //        return getter()
 //    }
 //
-//    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: T) {
+//    operator fun setScroll(thisRef: Any?, property: KProperty<*>, newValue: T) {
 //        val oldValue = getter()
 //        if( oldValue == newValue) return
 //

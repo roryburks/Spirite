@@ -25,7 +25,7 @@ public final class Compare {
 	/** Offset to order signed double numbers lexicographically. */
     private static final int SGN_MASK_FLOAT = 0x80000000; // From Commons-Math.
     
-	/** Absolute epsilon value. */
+	/** Absolute epsilon scroll. */
 	public static final float ABS_EPSILON;
 	
 	/** Relative epsilon for vectors. */

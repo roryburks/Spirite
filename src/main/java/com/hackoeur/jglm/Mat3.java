@@ -51,7 +51,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	}
 //
 //	/**
-//	 * Creates a matrix with the given value along the diagonal.
+//	 * Creates a matrix with the given scroll along the diagonal.
 //	 *
 //	 * @param diagonalValue
 //	 */

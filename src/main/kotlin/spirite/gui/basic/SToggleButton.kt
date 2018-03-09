@@ -15,7 +15,7 @@ class SToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
 }
 
 class SToggleButton(startChecked: Boolean = false)
-    : JToggleButton(), IToggleButtonNonUI by SToggleButtonNonUI(startChecked)
+    : JToggleButton(), IToggleButtonNonUI by SToggleButtonNonUI(startChecked), IComponent
 {
     init {
         Bindable(false, {isSelected = it}).bind(checkBindable)

@@ -5,9 +5,9 @@ import kotlin.reflect.KProperty
 
 
 /***
- * Bindable objects can be bound to other Bindables of the same type so that they share the same underlying value.
+ * Bindable objects can be bound to other Bindables of the same type so that they share the same underlying scroll.
  * Bindables come with an optional onChange Lambda that will be invoked whenever any bound Bindable is changed (thus
- * the underlying value is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
+ * the underlying scroll is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
  * underlying is different)
  */
 class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
@@ -17,12 +17,17 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
 
     private var underlying = BindableUnderlying(this,defaultValue)
 
-    /** Note: Calling b1.bind( b2) will result in both having b2's current underlying value. */
+    /** Note: Calling b1.bind( b2) will result in both having b2's current underlying scroll. */
     fun bind( root: Bindable<T>) {
         if( root.underlying != underlying) {
             root.underlying.swallow(underlying)
             underlying = root.underlying
         }
+    }
+
+    fun addListener( listener: (T)->Unit) {
+        underlying.swallow( Bindable(field, listener).underlying)
+        listener.invoke(field)
     }
 
     fun unbind() {

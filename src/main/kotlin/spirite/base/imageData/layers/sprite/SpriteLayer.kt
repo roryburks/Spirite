@@ -195,7 +195,7 @@ class SpriteLayer(
             internal val id: Int)
     {
 
-        // region Parotting SpritePartStructure value with Undoable Wrapper
+        // region Parotting SpritePartStructure scroll with Undoable Wrapper
         var depth : Int
             get() = structure.depth
             set(value) { replaceStructure(structure.copy(depth = value))}

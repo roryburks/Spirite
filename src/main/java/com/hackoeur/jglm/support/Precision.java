@@ -29,7 +29,7 @@ public class Precision {
     /**
      * <p>
      * Largest double-precision floating-point number such that
-     * {@code 1 + EPSILON} is numerically equal to 1. This value is an upper
+     * {@code 1 + EPSILON} is numerically equal to 1. This scroll is an upper
      * bound on the relative error due to rounding real numbers to double
      * precision floating-point numbers.
      * </p>
@@ -106,8 +106,8 @@ public class Precision {
      * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">
      * Bruce Dawson</a>
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between {@code x} and {@code y}.
      * @return <ul><li>0 if  {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
@@ -127,8 +127,8 @@ public class Precision {
      * Returns true iff they are equal as defined by
      * {@link #equals(float,float,int) equals(x, y, 1)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @return {@code true} if the values are equal.
      */
     public static boolean equals(float x, float y) {
@@ -139,8 +139,8 @@ public class Precision {
      * Returns true if both arguments are NaN or neither is NaN and they are
      * equal as defined by {@link #equals(float,float) equals(x, y, 1)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @return {@code true} if the values are equal or both are NaN.
      * @since 2.2
      */
@@ -152,8 +152,8 @@ public class Precision {
      * Returns true if both arguments are equal or within the range of allowed
      * error (inclusive).
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param eps the amount of absolute error to allow.
      * @return {@code true} if the values are equal or within range of each other.
      * @since 2.2
@@ -166,8 +166,8 @@ public class Precision {
      * Returns true if both arguments are NaN or are equal or within the range
      * of allowed error (inclusive).
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param eps the amount of absolute error to allow.
      * @return {@code true} if the values are equal or within range of each other,
      * or both are NaN.
@@ -187,8 +187,8 @@ public class Precision {
      * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">
      * Bruce Dawson</a>
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between {@code x} and {@code y}.
      * @return {@code true} if there are fewer than {@code maxUlps} floating
@@ -216,8 +216,8 @@ public class Precision {
      * Returns true if both arguments are NaN or if they are equal as defined
      * by {@link #equals(float,float,int) equals(x, y, maxUlps)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between {@code x} and {@code y}.
      * @return {@code true} if both arguments are NaN or if there are less than
@@ -232,8 +232,8 @@ public class Precision {
      * Returns true iff they are equal as defined by
      * {@link #equals(double,double,int) equals(x, y, 1)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @return {@code true} if the values are equal.
      */
     public static boolean equals(double x, double y) {
@@ -244,8 +244,8 @@ public class Precision {
      * Returns true if both arguments are NaN or neither is NaN and they are
      * equal as defined by {@link #equals(double,double) equals(x, y, 1)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @return {@code true} if the values are equal or both are NaN.
      * @since 2.2
      */
@@ -254,12 +254,12 @@ public class Precision {
     }
 
     /**
-     * Returns {@code true} if there is no double value strictly between the
+     * Returns {@code true} if there is no double scroll strictly between the
      * arguments or the difference between them is within the range of allowed
      * error (inclusive).
      *
-     * @param x First value.
-     * @param y Second value.
+     * @param x First scroll.
+     * @param y Second scroll.
      * @param eps Amount of allowed absolute error.
      * @return {@code true} if the values are two adjacent floating point
      * numbers or they are within range of each other.
@@ -269,12 +269,12 @@ public class Precision {
     }
 
     /**
-     * Returns {@code true} if there is no double value strictly between the
+     * Returns {@code true} if there is no double scroll strictly between the
      * arguments or the reltaive difference between them is smaller or equal
      * to the given tolerance.
      *
-     * @param x First value.
-     * @param y Second value.
+     * @param x First scroll.
+     * @param y Second scroll.
      * @param eps Amount of allowed relative error.
      * @return {@code true} if the values are two adjacent floating point
      * numbers or they are within range of each other.
@@ -294,8 +294,8 @@ public class Precision {
     /**
      * Same as {@link #equalsWithRelativeTolerance(double, double, double)} but for floats.
      * 
-     * @param x First value.
-     * @param y Second value.
+     * @param x First scroll.
+     * @param y Second scroll.
      * @param eps Amount of allowed relative error.
      * @return {@code true} if the values are two adjacent floating point
      * numbers or they are within range of each other.
@@ -315,8 +315,8 @@ public class Precision {
      * Returns true if both arguments are NaN or are equal or within the range
      * of allowed error (inclusive).
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param eps the amount of absolute error to allow.
      * @return {@code true} if the values are equal or within range of each other,
      * or both are NaN.
@@ -336,8 +336,8 @@ public class Precision {
      * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">
      * Bruce Dawson</a>
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between {@code x} and {@code y}.
      * @return {@code true} if there are fewer than {@code maxUlps} floating
@@ -364,8 +364,8 @@ public class Precision {
      * Returns true if both arguments are NaN or if they are equal as defined
      * by {@link #equals(double,double,int) equals(x, y, maxUlps)}.
      *
-     * @param x first value
-     * @param y second value
+     * @param x first scroll
+     * @param y second scroll
      * @param maxUlps {@code (maxUlps - 1)} is the number of floating point
      * values between {@code x} and {@code y}.
      * @return {@code true} if both arguments are NaN or if there are less than
@@ -377,12 +377,12 @@ public class Precision {
     }
 
     /**
-     * Rounds the given value to the specified number of decimal places.
-     * The value is rounded using the {@link BigDecimal#ROUND_HALF_UP} method.
+     * Rounds the given scroll to the specified number of decimal places.
+     * The scroll is rounded using the {@link BigDecimal#ROUND_HALF_UP} method.
      *
      * @param x Value to round.
      * @param scale Number of digits to the right of the decimal point.
-     * @return the rounded value.
+     * @return the rounded scroll.
      * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
      */
     public static double round(double x, int scale) {
@@ -390,16 +390,16 @@ public class Precision {
     }
 
     /**
-     * Rounds the given value to the specified number of decimal places.
-     * The value is rounded using the given method which is any method defined
+     * Rounds the given scroll to the specified number of decimal places.
+     * The scroll is rounded using the given method which is any method defined
      * in {@link BigDecimal}.
-     * If {@code x} is infinite or {@code NaN}, then the value of {@code x} is
+     * If {@code x} is infinite or {@code NaN}, then the scroll of {@code x} is
      * returned unchanged, regardless of the other parameters.
      *
      * @param x Value to round.
      * @param scale Number of digits to the right of the decimal point.
      * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
-     * @return the rounded value.
+     * @return the rounded scroll.
      * @throws ArithmeticException if {@code roundingMethod == ROUND_UNNECESSARY}
      * and the specified scaling operation would require rounding.
      * @throws IllegalArgumentException if {@code roundingMethod} does not
@@ -422,12 +422,12 @@ public class Precision {
     }
 
     /**
-     * Rounds the given value to the specified number of decimal places.
-     * The value is rounded using the {@link BigDecimal#ROUND_HALF_UP} method.
+     * Rounds the given scroll to the specified number of decimal places.
+     * The scroll is rounded using the {@link BigDecimal#ROUND_HALF_UP} method.
      *
      * @param x Value to round.
      * @param scale Number of digits to the right of the decimal point.
-     * @return the rounded value.
+     * @return the rounded scroll.
      * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
      */
     public static float round(float x, int scale) {
@@ -435,14 +435,14 @@ public class Precision {
     }
 
     /**
-     * Rounds the given value to the specified number of decimal places.
-     * The value is rounded using the given method which is any method defined
+     * Rounds the given scroll to the specified number of decimal places.
+     * The scroll is rounded using the given method which is any method defined
      * in {@link BigDecimal}.
      *
      * @param x Value to round.
      * @param scale Number of digits to the right of the decimal point.
      * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
-     * @return the rounded value.
+     * @return the rounded scroll.
      * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
      * @throws MathArithmeticException if an exact operation is required but result is not exact
      * @throws MathIllegalArgumentException if {@code roundingMethod} is not a valid rounding method.
@@ -455,14 +455,14 @@ public class Precision {
     }
 
     /**
-     * Rounds the given non-negative value to the "nearest" integer. Nearest is
+     * Rounds the given non-negative scroll to the "nearest" integer. Nearest is
      * determined by the rounding method specified. Rounding methods are defined
      * in {@link BigDecimal}.
      *
      * @param unscaled Value to round.
-     * @param sign Sign of the original, scaled value.
+     * @param sign Sign of the original, scaled scroll.
      * @param roundingMethod Rounding method, as defined in {@link BigDecimal}.
-     * @return the rounded value.
+     * @return the rounded scroll.
      * @throws MathArithmeticException if an exact operation is required but result is not exact
      * @throws MathIllegalArgumentException if {@code roundingMethod} is not a valid rounding method.
      * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
@@ -551,7 +551,7 @@ public class Precision {
      * roundoff errors.
      *
      * @param x Value.
-     * @param originalDelta Offset value.
+     * @param originalDelta Offset scroll.
      * @return a number {@code delta} so that {@code x + delta} and {@code x}
      * differ by a representable floating number.
      */

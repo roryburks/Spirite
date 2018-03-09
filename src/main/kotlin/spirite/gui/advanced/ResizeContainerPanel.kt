@@ -16,9 +16,6 @@ import java.awt.Cursor
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.GroupLayout
-import javax.swing.GroupLayout.Alignment
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
 import kotlin.reflect.KProperty
 
@@ -42,7 +39,8 @@ interface IResizeContainerPanel : IComponent
 
 class ResizeContainerPanel(
         stretchComponent: IComponent,
-        orientation: Orientation
+        orientation: Orientation,
+        private val defaultSize: Int = 100
 ) : SPanel(), IResizeContainerPanel {
 
     override var minStretch: Int by LayoutDelegate(0)
@@ -96,41 +94,21 @@ class ResizeContainerPanel(
 
     private fun resetLayout() {
         this.removeAll()
-        val layout = GroupLayout(this)
 
-        val stretch = layout.createSequentialGroup()
-        val noStretch = layout.createParallelGroup(Alignment.LEADING)
-
-        leadingBars.forEach { bar ->
-            if( bar.componentVisible) {
-                stretch.addComponent(bar.jcomponent, bar.size, bar.size, bar.size)
-                noStretch.addComponent(bar.jcomponent)
+        layout = CrossLayout.buildCrossLayout(this, {
+            leadingBars.forEach { bar ->
+                if( bar.componentVisible)
+                    rows.add( bar.component, height = bar.size)
+                rows.add( bar, height = barSize)
             }
-            stretch.addComponent( bar, barSize, barSize,barSize)
-            noStretch.addComponent(bar)
-        }
-        stretch.addComponent(stretchComponent as JComponent, minStretch, minStretch, Short.MAX_VALUE.toInt())
-        noStretch.addComponent(stretchComponent as JComponent)
-        trailingBars.forEach { bar ->
-            stretch.addComponent( bar, barSize, barSize,barSize)
-            if( bar.componentVisible) {
-                stretch.addComponent(bar.jcomponent, bar.size, bar.size, bar.size)
-                noStretch.addComponent(bar.jcomponent)
+            rows.add( stretchComponent, height = minStretch, flex = defaultSize.toFloat())
+            trailingBars.forEach {bar ->
+                rows.add( bar, height = barSize)
+                if( bar.componentVisible)
+                    rows.add( bar.component, height = bar.size)
             }
-            noStretch.addComponent(bar)
-        }
-
-        when( orientation) {
-            HORIZONATAL -> {
-                layout.setHorizontalGroup(stretch)
-                layout.setVerticalGroup(noStretch)
-            }
-            VERTICAL -> {
-                layout.setHorizontalGroup(noStretch)
-                layout.setVerticalGroup(stretch)
-            }
-        }
-        setLayout(layout)
+            overwriteOrientation = orientation
+        })
         validate()
     }
 
@@ -143,7 +121,6 @@ class ResizeContainerPanel(
         var size : Int = defaultSize ; private set
         override var minSize by LayoutDelegate(minSize)
         override var component by LayoutDelegate(component)
-        val jcomponent = (component as JComponent)
 
         private var componentVisibleBindable = Bindable(true, { resetLayout() })
         var componentVisible by Bound(componentVisibleBindable)
@@ -184,32 +161,13 @@ class ResizeContainerPanel(
                 }
             }
 
-            val layout = GroupLayout(this)
-            when (orientation) {
-                HORIZONATAL -> {
-                    layout.setHorizontalGroup(layout.createParallelGroup()
-                            .addComponent(btnExpand, barSize, barSize, barSize)
-                            .addComponent(pullBar, barSize, barSize, barSize)
-                    )
-                    layout.setVerticalGroup(layout.createSequentialGroup()
-                            .addComponent(btnExpand, 12, 12, 12)
-                            .addComponent(pullBar)
-                    )
-                    pullBar.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
-                }
-                VERTICAL -> {
-                    layout.setVerticalGroup(layout.createParallelGroup()
-                            .addComponent(btnExpand, barSize, barSize, barSize)
-                            .addComponent(pullBar, barSize, barSize, barSize)
-                    )
-                    layout.setHorizontalGroup(layout.createSequentialGroup()
-                            .addComponent(btnExpand, 12, 12, 12)
-                            .addComponent(pullBar)
-                    )
-                    pullBar.cursor = Cursor(Cursor.N_RESIZE_CURSOR)
-                }
-            }
-            this.layout = layout
+            layout =  CrossLayout.buildCrossLayout(this, {
+                cols.add( btnExpand, width = 12)
+                cols.add( pullBar)
+                cols.height = barSize
+                overwriteOrientation = if(orientation == VERTICAL) HORIZONATAL else VERTICAL
+            })
+            pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
         }
 
         internal inner class ResizeBarAdapter : MouseAdapter() {
