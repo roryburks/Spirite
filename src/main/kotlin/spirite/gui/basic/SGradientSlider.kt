@@ -13,6 +13,7 @@ import java.awt.Graphics2D
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.text.DecimalFormat
+import javax.swing.JComponent
 import javax.swing.JPanel
 
 
@@ -87,12 +88,20 @@ private class SGradientSliderNonUI(
     override var underlyingMax = maxValue
 }
 
-class SGradientSlider(
+class SGradientSlider
+private constructor(minValue: Float, maxValue: Float, invokable: Invokable<JComponent>)
+    :JPanel(),
+        IGradientSliderNonUIImpl by SGradientSliderNonUI(minValue, maxValue),
+        IGradientSlider,
+        ISComponent by SComponent(invokable)
+{
+    init {invokable.invoker = {this}}
+
+    constructor(
         minValue : Float = 0f,
         maxValue : Float = 1f,
-        label: String = "")
-    :JPanel(), IGradientSliderNonUIImpl by SGradientSliderNonUI(minValue, maxValue), IGradientSlider
-{
+        label: String = "") : this( minValue, maxValue, Invokable())
+
     override var bgGradLeft: Color by UI(Skin.GradientSlider.BgGradLeft.color)
     override var bgGradRight: Color by UI(Skin.GradientSlider.BgGradRight.color)
     override var fgGradLeft: Color by UI(Skin.GradientSlider.FgGradLeft.color)

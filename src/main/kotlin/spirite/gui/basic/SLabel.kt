@@ -2,14 +2,22 @@ package spirite.gui.basic
 
 import spirite.gui.Skin
 import java.awt.Color
+import javax.swing.JComponent
 import javax.swing.JLabel
 
-interface ILabel {
+interface ILabel : IComponent {
     var label : String
     var textColor : Color
 }
 
-class SLabel( text : String = "") : JLabel(text), ILabel, IComponent{
+class SLabel
+private constructor( text : String, invokable: Invokable<JComponent>)
+    : JLabel(text), ILabel,
+        ISComponent by SComponent(invokable)
+{
+    init {invokable.invoker = {this}}
+    constructor( text: String = "") : this(text, Invokable())
+
     override var label: String
         get() = text
         set(value) {text = value}

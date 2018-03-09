@@ -6,7 +6,7 @@ smooth in vec2 vUV;
 
 uniform float u_fixedAmmount;
 
-// which component is fixed:
+// which resizeComponent is fixed:
 // 0: r, 1: g, 2: b
 // 3: h, 2: s, 3: v
 uniform int u_typeCode;

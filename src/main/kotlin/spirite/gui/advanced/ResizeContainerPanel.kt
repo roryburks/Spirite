@@ -33,7 +33,7 @@ interface IResizeContainerPanel : IComponent
 
     interface IResizeBar {
         var minSize: Int
-        var component : IComponent
+        var resizeComponent: IComponent
     }
 }
 
@@ -98,14 +98,14 @@ class ResizeContainerPanel(
         layout = CrossLayout.buildCrossLayout(this, {
             leadingBars.forEach { bar ->
                 if( bar.componentVisible)
-                    rows.add( bar.component, height = bar.size)
+                    rows.add( bar.resizeComponent, height = bar.size)
                 rows.add( bar, height = barSize)
             }
             rows.add( stretchComponent, height = minStretch, flex = defaultSize.toFloat())
             trailingBars.forEach {bar ->
                 rows.add( bar, height = barSize)
                 if( bar.componentVisible)
-                    rows.add( bar.component, height = bar.size)
+                    rows.add( bar.resizeComponent, height = bar.size)
             }
             overwriteOrientation = orientation
         })
@@ -120,7 +120,7 @@ class ResizeContainerPanel(
     ) : SPanel(), IResizeBar {
         var size : Int = defaultSize ; private set
         override var minSize by LayoutDelegate(minSize)
-        override var component by LayoutDelegate(component)
+        override var resizeComponent by LayoutDelegate(component)
 
         private var componentVisibleBindable = Bindable(true, { resetLayout() })
         var componentVisible by Bound(componentVisibleBindable)

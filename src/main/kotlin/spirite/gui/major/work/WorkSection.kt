@@ -2,6 +2,7 @@ package spirite.gui.major.work
 
 import spirite.base.pen.Penner
 import jspirite.gui.SScrollPane.ModernScrollBarUI
+import spirite.base.imageData.IImageWorkspace
 import spirite.gui.Bindable
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
@@ -36,11 +37,49 @@ interface IWorkSection {
 
 class WorkSection : SPanel(), IComponent {
     val view = WorkSectionView()
+    var currentWorkspace: IImageWorkspace? = null
+
+    private val scrollRatio = 10
+    private val scrollBuffer = 100
+
+    fun calibrateScrolls() {
+        val workspace = currentWorkspace
+        when(workspace) {
+            null -> {
+                vScroll.isEnabled = false
+                hScroll.isEnabled = false
+            }
+            else -> {
+                vScroll.isEnabled = true
+                hScroll.isEnabled = true
+
+                val width = workAreaContainer.width
+                val height = workAreaContainer.height
+                val hMin  = -width + scrollBuffer
+                val vMin = -height + scrollBuffer
+                val hMax = workspace.width * view.zoom - scrollBuffer
+                val vMax = workspace.height * view.zoom - scrollBuffer
+
+                val ratio = scrollRatio.toFloat()
+                hScroll.minScroll = Math.round(hMin / ratio)
+                vScroll.minScroll = Math.round(vMin / ratio)
+                hScroll.maxScroll = Math.round(hMax / ratio) + hScroll.scrollWidth
+                vScroll.maxScroll = Math.round(vMax / ratio) + vScroll.scrollWidth
+            }
+        }
+    }
+
+    /** Positions are in Image State*/
+    fun centerScrollAtPos( x: Int, y: Int){
+
+    }
 
     // Region UI
     private val workAreaContainer = SPanel()
     private val coordinateLabel = SLabel()
     private val messageLabel = SLabel()
+    private val vScroll = SScrollBar(VERTICAL, this)
+    private val hScroll = SScrollBar(HORIZONATAL, this)
     private val zoomPanel = object : SPanel() {
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -61,8 +100,8 @@ class WorkSection : SPanel(), IComponent {
     }
 
     fun initComponents() {
-        val vScroll = SScrollBar(VERTICAL, this)
-        val hScroll = SScrollBar(HORIZONATAL, this)
+        vScroll.scrollWidth = 50
+        hScroll.scrollWidth = 50
         coordinateLabel.text = "Coordinate Label"
         messageLabel.text = "Message Label"
 

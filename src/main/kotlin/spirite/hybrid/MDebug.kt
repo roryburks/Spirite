@@ -37,7 +37,7 @@ object MDebug {
         //	because it should not significantly effect the performance of the
         //	program it is just a warning.
         STRUCTURAL,
-        // An initialization error means that some component (probably a dynamically
+        // An initialization error means that some resizeComponent (probably a dynamically
         //	created one) could not be created for some reason.  This shouldn't
         //	interfere with the operation of the program, but may prevent a piece of
         //	it from being created.

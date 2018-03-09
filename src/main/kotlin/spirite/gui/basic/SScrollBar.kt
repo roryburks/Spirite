@@ -73,15 +73,22 @@ class SScrollBarNonUI(
         }
 }
 
-class SScrollBar(
-        orientation: Orientation,
-        context: IComponent,
-        minScroll: Int = 0,
-        maxScroll: Int = 100,
-        startScroll: Int = 0,
-        scrollWidth : Int = 10)
-    :JScrollBar(), IScrollBarNonUIImp by SScrollBarNonUI(minScroll, maxScroll, startScroll, scrollWidth), IScrollBar
+class SScrollBar
+private constructor(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int, invokable: Invokable<JComponent>)
+    :JScrollBar(), IScrollBar,
+        IScrollBarNonUIImp by SScrollBarNonUI(minScroll, maxScroll, startScroll, scrollWidth),
+        ISComponent by SComponent(invokable)
 {
+    init {invokable.invoker = {this}}
+    constructor(
+            orientation: Orientation,
+            context: IComponent,
+            minScroll: Int = 0,
+            maxScroll: Int = 100,
+            startScroll: Int = 0,
+            scrollWidth : Int = 10) : this( orientation, context, minScroll, maxScroll, startScroll, scrollWidth, Invokable())
+
+
     override val oorientation: Orientation
         get() = if( getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONATAL
 

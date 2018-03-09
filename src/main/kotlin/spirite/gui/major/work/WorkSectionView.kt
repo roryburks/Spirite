@@ -1,5 +1,6 @@
 package spirite.gui.major.work
 
+import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 
 /** The view describes which part of the image is currently being seen and
@@ -15,6 +16,7 @@ class WorkSectionView {
 
     var offsetX = 0
     var offsetY = 0
+    var rotation = 0f
 
     fun zoomIn() {
         zoomLevel = when {
@@ -31,6 +33,10 @@ class WorkSectionView {
         }
     }
 
-    val tWorkspaceToScreen get() =
-        Transform.TranslationMatrix(offsetX + 0f, offsetY + 0f) * Transform.ScaleMatrix( zoom, zoom)
+    val tWorkspaceToScreen : Transform get() {
+        val trans = MutableTransform.TranslationMatrix(-offsetX/2.0f, -offsetY/2.0f)
+        trans.preScale( zoom, zoom)
+        trans.preRotate( rotation)
+        return trans
+    }
 }
