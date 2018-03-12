@@ -37,7 +37,7 @@ class SGradientSliderDemo : JFrame() {
 
         val disabledSlider = SGradientSlider(label = "Disabled")
         disabledSlider.value = 0.4f
-        disabledSlider.isEnabled = false
+        //disabledSlider.imp.isEnabled = false
 
         val resize = ResizeContainerPanel(sliderThing, HORIZONATAL)
         resize.minStretch = 100
@@ -46,6 +46,6 @@ class SGradientSliderDemo : JFrame() {
         resize.addPanel(sliderBound1, 100,100,999)
         resize.addPanel(sliderBound2, 100,100,999)
 
-        add( resize)
+        add( resize.component)
     }
 }

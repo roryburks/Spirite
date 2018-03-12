@@ -19,13 +19,13 @@ class RootFrame(
         val resize = ResizeContainerPanel(centerButton, HORIZONATAL)
         resize.minStretch = 100
 
-        centerButton.addActionListener{(-4..4).forEach {resize.getPanel(it)?.componentVisible = false}}
+        centerButton.action = {(-4..4).forEach {resize.getPanel(it)?.componentVisible = false}}
 
         resize.addPanel(SButton("1"), 100,100,-999)
         resize.addPanel(SButton("2"), 100,100,-999)
         resize.addPanel(SButton("3"), 100,100,999)
         resize.addPanel(SButton("4"), 100,100,999)
 
-        add( resize)
+        add( resize.imp)
     }
 }

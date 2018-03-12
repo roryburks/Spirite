@@ -46,12 +46,12 @@ class WorkSection : SPanel(), IComponent {
         val workspace = currentWorkspace
         when(workspace) {
             null -> {
-                vScroll.isEnabled = false
-                hScroll.isEnabled = false
+//                vScroll.isEnabled = false
+//                hScroll.isEnabled = false
             }
             else -> {
-                vScroll.isEnabled = true
-                hScroll.isEnabled = true
+//                vScroll.isEnabled = true
+//                hScroll.isEnabled = true
 
                 val width = workAreaContainer.width
                 val height = workAreaContainer.height
@@ -108,8 +108,8 @@ class WorkSection : SPanel(), IComponent {
         hScroll.scrollBind.addListener { view.offsetX = it * scrollRatio }
         vScroll.scrollBind.addListener { view.offsetY = it * scrollRatio }
 
-        coordinateLabel.text = "Coordinate Label"
-        messageLabel.text = "Message Label"
+        coordinateLabel.label = "Coordinate Label"
+        messageLabel.label = "Message Label"
 
 
         val barSize = 16

@@ -11,21 +11,22 @@ interface ILabel : IComponent {
 }
 
 class SLabel
-private constructor( text : String, invokable: Invokable<JComponent>)
-    : JLabel(text), ILabel,
-        ISComponent by SComponent(invokable)
+private constructor( val imp : SLabelImp)
+    : ILabel,
+        ISComponent by SComponentDirect(imp)
 {
-    init {invokable.invoker = {this}}
-    constructor( text: String = "") : this(text, Invokable())
+    constructor( text: String = "") : this(SLabelImp(text))
 
     override var label: String
-        get() = text
-        set(value) {text = value}
+        get() = imp.text
+        set(value) {imp.text = value}
     override var textColor: Color
-        get() = foreground
-        set(value) {foreground = value}
+        get() = imp.foreground
+        set(value) {imp.foreground = value}
 
-    init {
-        foreground = Skin.Global.Text.color
+    private class SLabelImp( text: String) : JLabel(text) {
+        init {
+            foreground = Skin.Global.Text.color
+        }
     }
 }

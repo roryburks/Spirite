@@ -13,6 +13,7 @@ import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.Skin.ResizePanel.BarLineColor
 import spirite.gui.basic.IComponent.MouseEvent
+import spirite.gui.basic.SPanel2
 import java.awt.Cursor
 import java.awt.Graphics
 import kotlin.reflect.KProperty
@@ -39,7 +40,7 @@ class ResizeContainerPanel(
         stretchComponent: IComponent,
         orientation: Orientation,
         private val defaultSize: Int = 100
-) : SPanel(), IResizeContainerPanel {
+) : SPanel2(), IResizeContainerPanel {
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)
@@ -91,9 +92,7 @@ class ResizeContainerPanel(
 
 
     private fun resetLayout() {
-        this.removeAll()
-
-        layout = CrossLayout.buildCrossLayout(this, {
+        setLayout {
             leadingBars.forEach { bar ->
                 if( bar.componentVisible)
                     rows.add( bar.resizeComponent, height = bar.size)
@@ -106,8 +105,7 @@ class ResizeContainerPanel(
                     rows.add( bar.resizeComponent, height = bar.size)
             }
             overwriteOrientation = orientation
-        })
-        validate()
+        }
     }
 
     inner class ResizeBar(
@@ -135,29 +133,25 @@ class ResizeContainerPanel(
             btnExpand.isOpaque = false
             btnExpand.checkBindable.bind(componentVisibleBindable)
 
-            val pullBar = object : SPanel() {
-                override fun paintComponent(g: Graphics) {
-                    super.paintComponent(g)
-
-                    g.color = BarLineColor.color
-                    when( orientation) {
-                        HORIZONATAL -> {
-                            val depth = width
-                            val breadth = height
-                            g.drawLine( depth/2-2, 10, depth/2-2, breadth-10)
-                            g.drawLine( depth/2, 5, depth/2, breadth-5)
-                            g.drawLine( depth/2+2, 10, depth/2+2, breadth-10)
-                        }
-                        VERTICAL -> {
-                            val depth = height
-                            val breadth = width
-                            g.drawLine(10, depth / 2 - 2, breadth - 10, depth / 2 - 2)
-                            g.drawLine(5, depth / 2, breadth - 5, depth / 2)
-                            g.drawLine(10, depth / 2 + 2, breadth - 10, depth / 2 + 2)
-                        }
+            val pullBar = SPanel2( {g->
+                g.color = BarLineColor.color
+                when( orientation) {
+                    HORIZONATAL -> {
+                        val depth = width
+                        val breadth = height
+                        g.drawLine( depth/2-2, 10, depth/2-2, breadth-10)
+                        g.drawLine( depth/2, 5, depth/2, breadth-5)
+                        g.drawLine( depth/2+2, 10, depth/2+2, breadth-10)
+                    }
+                    VERTICAL -> {
+                        val depth = height
+                        val breadth = width
+                        g.drawLine(10, depth / 2 - 2, breadth - 10, depth / 2 - 2)
+                        g.drawLine(5, depth / 2, breadth - 5, depth / 2)
+                        g.drawLine(10, depth / 2 + 2, breadth - 10, depth / 2 + 2)
                     }
                 }
-            }
+            })
 
             layout =  CrossLayout.buildCrossLayout(this, {
                 cols.add( btnExpand, width = 12)
@@ -165,7 +159,7 @@ class ResizeContainerPanel(
                 cols.height = barSize
                 overwriteOrientation = if(orientation == VERTICAL) HORIZONATAL else VERTICAL
             })
-            pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
+            //pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
         }
 
         internal inner class ResizeBarTracker() {

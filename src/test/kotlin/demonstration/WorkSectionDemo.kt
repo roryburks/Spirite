@@ -19,11 +19,14 @@ class WorkSectionDemo : JFrame() {
 
         resize.minStretch = 100
 
-        resize.addPanel(SButton("1"), 100,100,-999)
+        val btn = SButton("1")
+        btn.action = { println("S")}
+
+        resize.addPanel(btn, 100,100,-999)
         resize.addPanel(SButton("2"), 100,100,-999)
         resize.addPanel(SButton("3"), 100,100,999)
         resize.addPanel(SButton("4"), 100,100,999)
 
-        add( resize)
+        add( resize.component)
     }
 }

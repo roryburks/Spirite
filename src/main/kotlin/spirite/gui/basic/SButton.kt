@@ -11,22 +11,26 @@ interface IButton : IComponent {
 }
 
 class SButton
-private constructor( val invokable: Invokable<JComponent>)
-    : JButton(), IButton, ISComponent by SComponent(invokable)
+private constructor( val imp: SButtonImp)
+    : IButton, ISComponent by SComponentDirect(imp)
 {
-    init {invokable.invoker = {this}}
+    constructor(str: String? = null) : this(SButtonImp(str))
 
-    constructor(str: String? = null) : this(Invokable()) {
-        text = str
-        background = Skin.Global.BgDark.color
-        foreground = Skin.Global.Text.color
-        border = BorderFactory.createBevelBorder(
-                BevelBorder.RAISED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
-    }
+    override var action: (() -> Unit)?
+        get() = imp.action
+        set(value) { imp.action = value}
 
-    override var action: (() -> Unit)? = null
+    private class SButtonImp( str: String? = null) : JButton() {
+        var action: (() -> Unit)? = null
 
-    init {
-        addActionListener { action?.invoke() }
+        init {
+            text = str
+            background = Skin.Global.BgDark.color
+            foreground = Skin.Global.Text.color
+            border = BorderFactory.createBevelBorder(
+                    BevelBorder.RAISED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
+
+            addActionListener { action?.invoke() }
+        }
     }
 }

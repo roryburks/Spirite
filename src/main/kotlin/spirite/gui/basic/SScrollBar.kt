@@ -5,6 +5,7 @@ import spirite.base.util.MUtil
 import spirite.gui.Bindable
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.VERTICAL
 import javax.swing.JComponent
 import javax.swing.JScrollBar
 
@@ -23,7 +24,7 @@ interface IScrollBarNonUIImp : IScrollBarNonUI{
 }
 
 interface IScrollBar  : IScrollBarNonUI, IComponent{
-    val oorientation : Orientation
+    var orientation : Orientation
 }
 
 class SScrollBarNonUI(
@@ -41,7 +42,6 @@ class SScrollBarNonUI(
         get() = scrollBind.field
         set(to) {
             val clip = MUtil.clip(minScroll, to, maxScroll - scrollWidth)
-            println("clip:$clip")
             scrollBind.field = clip
         }
     override var minScroll
@@ -76,37 +76,37 @@ class SScrollBarNonUI(
 }
 
 class SScrollBar
-private constructor(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int, invokable: Invokable<JComponent>)
-    :JScrollBar(), IScrollBar,
+private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int, val imp: SScrollBarImp)
+    :IScrollBar,
         IScrollBarNonUIImp by SScrollBarNonUI(minScroll, maxScroll, startScroll, scrollWidth),
-        ISComponent by SComponent(invokable)
+        ISComponent by SComponentDirect(imp)
 {
-    init {invokable.invoker = {this}}
     constructor(
             orientation: Orientation,
             context: IComponent,
             minScroll: Int = 0,
             maxScroll: Int = 100,
             startScroll: Int = 0,
-            scrollWidth : Int = 10) : this( orientation, context, minScroll, maxScroll, startScroll, scrollWidth, Invokable())
+            scrollWidth : Int = 10) : this( minScroll, maxScroll, startScroll, scrollWidth, SScrollBarImp(orientation, context))
 
 
-    override val oorientation: Orientation
-        get() = if( getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONATAL
+    override var orientation: Orientation
+        get() = if( imp.getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONATAL
+        set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
     init {
-        isOpaque = false
-        setUI( ModernScrollBarUI(context as JComponent))
+        scrollBind.addListener { imp.value = it }
+        scrollWidthBind.addListener { imp.visibleAmount = it }
+        minScrollBind.addListener { imp.minimum = it}
+        maxScrollBind.addListener { imp.maximum = it }
+        imp.addAdjustmentListener {scroll = imp.value}
+    }
 
-        scrollBind.addListener { value = it }
-        scrollWidthBind.addListener { visibleAmount = it }
-        minScrollBind.addListener { minimum = it}
-        maxScrollBind.addListener { maximum = it }
-        addAdjustmentListener {
-            println(value)
-            scroll = value
+    private class SScrollBarImp(orientation: Orientation, context: IComponent) : JScrollBar() {
+        init {
+            isOpaque = false
+            setUI( ModernScrollBarUI(context as JComponent))
+            this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
         }
-
-        this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
     }
 }

@@ -5,6 +5,7 @@ import spirite.gui.advanced.crossContainer.CSE_Gap
 import spirite.gui.advanced.crossContainer.CSE_Group
 import spirite.gui.advanced.crossContainer.CrossInitializer
 import spirite.gui.basic.ISComponent
+import spirite.gui.basic.SPanel2
 import java.awt.Container
 import javax.swing.GroupLayout
 import javax.swing.GroupLayout.ParallelGroup

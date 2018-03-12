@@ -47,6 +47,6 @@ class CrossContainerDemo : JFrame() {
         resize.addPanel(SButton("3"), 100,100,999)
         resize.addPanel(resize2, 100,100,999)
 
-        add( resize)
+        add( resize.component)
     }
 }

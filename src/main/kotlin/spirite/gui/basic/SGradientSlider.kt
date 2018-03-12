@@ -89,18 +89,20 @@ private class SGradientSliderNonUI(
 }
 
 class SGradientSlider
-private constructor(minValue: Float, maxValue: Float, label: String, invokable: Invokable<JComponent>)
-    :JPanel(),
+private constructor(minValue: Float, maxValue: Float, label: String, val imp : SGradientSliderImp)
+    :
         IGradientSliderNonUIImpl by SGradientSliderNonUI(minValue, maxValue),
         IGradientSlider,
-        ISComponent by SComponent(invokable)
+        ISComponent by SComponentDirect(imp)
 {
-    init {invokable.invoker = {this}}
+    init {
+        imp.context = this
+    }
 
     constructor(
         minValue : Float = 0f,
         maxValue : Float = 1f,
-        label: String = "") : this( minValue, maxValue, label, Invokable())
+        label: String = "") : this( minValue, maxValue, label, SGradientSliderImp())
 
     override var bgGradLeft: Color by UI(Skin.GradientSlider.BgGradLeft.color)
     override var bgGradRight: Color by UI(Skin.GradientSlider.BgGradRight.color)
@@ -110,23 +112,45 @@ private constructor(minValue: Float, maxValue: Float, label: String, invokable: 
     override var disabledGradRight: Color by UI(Skin.GradientSlider.DisabledGradRight.color)
     override var label : String by UI(label)
 
-    init {
-        Bindable(0f, {repaint()}).bind(valueBind)
+    private class SGradientSliderImp() : JPanel() {
+        var context : SGradientSlider? = null
 
-        val adapter = object: MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                if( isEnabled)
-                    underlying = MUtil.lerp(minValue, maxValue, e.x / width.toFloat())
-                super.mousePressed(e)
+        override fun paintComponent(g: Graphics) {
+            super.paintComponent(g)
+
+            val c = context
+            if( c == null) return
+
+            val g2 = g as Graphics2D
+
+            val oldP = g2.paint
+            g2.paint = GradientPaint( 0f, 0f, c.bgGradLeft, width + 0f, 0f, c.bgGradRight)
+            g2.fillRect( 0, 0, width, height)
+
+            g2.paint = when( isEnabled) {
+                true -> GradientPaint( 0f, 0f, c.fgGradLeft, 0f, height + 0f, c.fgGradRight)
+                else -> GradientPaint( 0f, 0f, c.disabledGradLeft, 0f, height + 0f, c.disabledGradRight)
             }
-            override fun mouseDragged(e: MouseEvent) {
-                if( isEnabled)
-                    underlying = MUtil.lerp(minValue, maxValue, e.x / width.toFloat())
-                super.mouseDragged(e)
-            }
+            g2.fillRect( 0, 0, Math.round(width * (c.underlying - c.underlyingMin + 0f) / (c.underlyingMax - c.underlyingMin + 0f)), height)
+            g2.color = Color(222,222,222)
+
+            UIUtil.drawStringCenter( g2, c.label + c.valAsStr, getBounds())
+
+            g2.paint = oldP
+            g2.color = Color.BLACK
+            g2.drawRect( 0, 0, width-1, height-1)
         }
-        addMouseListener(adapter)
-        addMouseMotionListener(adapter)
+    }
+
+    init {
+        valueBind.addListener { redraw()}
+
+        val trigger : ( IComponent.MouseEvent) -> Unit = {
+            if( imp.isEnabled)
+                underlying = MUtil.lerp(minValue, maxValue, it.point.x / imp.width.toFloat())
+        }
+        onMousePress = trigger
+        onMouseDrag = trigger
     }
 
     private val valAsStr : String
@@ -137,27 +161,6 @@ private constructor(minValue: Float, maxValue: Float, label: String, invokable: 
             return df.format(value)
         }
 
-    override fun paintComponent(g: Graphics) {
-        super.paintComponent(g)
-        val g2 = g as Graphics2D
 
-        val oldP = g2.paint
-        g2.paint = GradientPaint( 0f, 0f, bgGradLeft, width + 0f, 0f, bgGradRight)
-        g2.fillRect( 0, 0, width, height)
-
-        g2.paint = when( isEnabled) {
-            true -> GradientPaint( 0f, 0f, fgGradLeft, 0f, height + 0f, fgGradRight)
-            else -> GradientPaint( 0f, 0f, disabledGradLeft, 0f, height + 0f, disabledGradRight)
-        }
-        g2.fillRect( 0, 0, Math.round(width * (underlying - underlyingMin + 0f) / (underlyingMax - underlyingMin + 0f)), height)
-        g2.color = Color(222,222,222)
-
-        UIUtil.drawStringCenter( g2, label + valAsStr, getBounds())
-
-        g2.paint = oldP
-        g2.color = Color.BLACK
-        g2.drawRect( 0, 0, width-1, height-1)
-    }
-
-    private inner class UI<T>( defaultValue: T) : OnChangeDelegate<T>( defaultValue, {repaint()})
+    private inner class UI<T>( defaultValue: T) : OnChangeDelegate<T>( defaultValue, {redraw()})
 }

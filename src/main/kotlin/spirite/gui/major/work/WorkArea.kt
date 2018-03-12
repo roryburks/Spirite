@@ -9,7 +9,6 @@ abstract class WorkArea(
     abstract val scomponent: ISComponent
 
     fun drawWork( gc: GraphicsContext) {
-        println("${context.view.offsetX}, ${context.view.offsetY}")
         gc.clear()
         gc.color = Colors.RED
         gc.preTranslate( context.view.offsetX + 0f, context.view.offsetY + 0f)

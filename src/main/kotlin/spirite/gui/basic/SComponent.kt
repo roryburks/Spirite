@@ -1,44 +1,15 @@
 package spirite.gui.basic
 
 import spirite.gui.SUIPoint
-import spirite.gui.UIPoint
 import spirite.gui.basic.IComponent.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JPanel
-
-interface IComponent {
-    fun redraw()
-
-    var onResize : (() -> Unit)?
-    var onHidden : (() -> Unit)?
-    var onShown : (() -> Unit)?
-    var onMoved : (() -> Unit)?
-
-    data class MouseEvent(
-            val point: UIPoint)
-
-    var onMouseClick : ((MouseEvent) -> Unit)?
-    var onMousePress : ((MouseEvent) -> Unit)?
-    var onMouseRelease : ((MouseEvent) -> Unit)?
-    var onMouseEnter : ((MouseEvent) -> Unit)?
-    var onMouseExit : ((MouseEvent) -> Unit)?
-    var onMouseMove : ((MouseEvent) -> Unit)?
-    var onMouseDrag : ((MouseEvent) -> Unit)?
-}
 
 interface ISComponent : IComponent{
     val component : JComponent
 }
 
-class Invokable<T>() {
-    constructor(invoker : () -> T) : this() {
-        this.invoker = invoker
-    }
-    lateinit var invoker : ()-> T
-}
-
-class SComponent( cGetter : Invokable<JComponent>) : ISComponent {
-    override val component: JComponent by lazy { cGetter.invoker.invoke() }
+abstract class ASComponent : ISComponent {
     override fun redraw() {component.repaint()}
 
     // region ComponentListener
@@ -110,8 +81,8 @@ class SComponent( cGetter : Invokable<JComponent>) : ISComponent {
     {
 
         fun convert( e: java.awt.event.MouseEvent) : MouseEvent {
-            val scomp = SComponent(Invokable {e.component as JComponent})
-            return MouseEvent( SUIPoint( e.x, e.y, scomp))
+            val scomp = SComponentDirect( e.component as JComponent )
+            return MouseEvent(SUIPoint(e.x, e.y, scomp))
         }
 
         override fun mouseReleased(e: java.awt.event.MouseEvent) { onMouseRelease?.invoke( convert(e))}
@@ -124,9 +95,12 @@ class SComponent( cGetter : Invokable<JComponent>) : ISComponent {
     }
 
     // endregion
+}
+
+class SComponent( cGetter : Invokable<JComponent>) : ASComponent() {
+    override val component: JComponent by lazy { cGetter.invoker.invoke() }
 
 }
 
-class JJJ( private val invokable: Invokable<JComponent> = Invokable()) : JPanel(), ISComponent by SComponent( invokable) {
-    init {invokable.invoker = {this}}
-}
+class SComponentDirect( override val component: JComponent) : ASComponent()
+

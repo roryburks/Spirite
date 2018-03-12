@@ -6,26 +6,21 @@ import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.graphics.gl.GLGraphicsContext
-import spirite.base.util.Colors
 import spirite.gui.basic.ISComponent
 import spirite.gui.basic.Invokable
 import spirite.gui.basic.SComponent
+import spirite.gui.basic.SComponentDirect
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import javax.swing.JComponent
 
 class GLWorkArea
-private constructor(context: WorkSection, invokable: Invokable<JComponent>)
-    : WorkArea(context), ISComponent by SComponent(invokable)
+private constructor(context: WorkSection, val canvas: GLJPanel)
+    : WorkArea(context), ISComponent by SComponentDirect(canvas)
 {
-    init {invokable.invoker = {canvas}}
-    constructor( context: WorkSection) : this( context,Invokable())
-
+    constructor( context: WorkSection) : this( context,GLJPanel( GLCapabilities(GLProfile.getDefault())))
 
     override val scomponent: ISComponent get() = this
-
-
-    val canvas = GLJPanel( GLCapabilities(GLProfile.getDefault()))
 
     init {
         canvas.addGLEventListener(object : GLEventListener {
