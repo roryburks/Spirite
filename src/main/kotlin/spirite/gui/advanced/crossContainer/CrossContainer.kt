@@ -15,7 +15,7 @@ open class CrossContainer(constructor: CrossInitializer.()->Unit): SPanel()
         rootOrientation = scheme.baseOrientation
         rootGroup = scheme.rootGroup
 
-        layout = CrossLayout.buildCrossLayout(this, constructor)
+        setLayout( constructor)
     }
 }
 

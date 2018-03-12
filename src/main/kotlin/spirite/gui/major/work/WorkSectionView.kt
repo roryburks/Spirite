@@ -1,11 +1,16 @@
 package spirite.gui.major.work
 
+import spirite.base.imageData.IImageWorkspace
+import spirite.base.util.delegates.OnChangeDelegate
+import spirite.base.util.f
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
+import kotlin.reflect.KProperty
 
 /** The view describes which part of the image is currently being seen and
  * manages conversions between the screen space and the image space. */
-class WorkSectionView {
+class WorkSectionView(val workspace: IImageWorkspace) {
     /** zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
      *  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x .... */
     var zoomLevel = 0
@@ -33,10 +38,25 @@ class WorkSectionView {
         }
     }
 
-    val tWorkspaceToScreen : Transform get() {
-        val trans = MutableTransform.TranslationMatrix(-offsetX/2.0f, -offsetY/2.0f)
-        trans.preScale( zoom, zoom)
-        trans.preRotate( rotation)
-        return trans
+    val tWorkspaceToScreen : Transform
+        get() {
+            val old = _tWorkspaceToScreen
+            when( old) {
+                null -> {
+                    val new = Transform.TranslationMatrix(-offsetX.f, -offsetY.f) *
+                            Transform.RotationMatrix( rotation) *
+                            Companion.ScaleMatrix( zoom, zoom)
+                    _tWorkspaceToScreen = new
+                    return new
+                }
+                else -> return old
+            }
+        }
+    private var _tWorkspaceToScreen : Transform? =  null
+
+
+    private var trigger = {
+
     }
+    private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {trigger})
 }

@@ -50,3 +50,6 @@ local.properties
 .recommenders/
 
 miglayout15-swing.jar
+/build/
+gradle/wrapper/
+/out/

@@ -105,7 +105,7 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
     private class SScrollBarImp(orientation: Orientation, context: IComponent) : JScrollBar() {
         init {
             isOpaque = false
-            setUI( ModernScrollBarUI(context as JComponent))
+            setUI( ModernScrollBarUI((context as ISComponent).component))
             this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
         }
     }

@@ -8,9 +8,12 @@ import javax.swing.JToggleButton
 interface IToggleButtonNonUI {
     val checkBindable : Bindable<Boolean>
     var checked : Boolean
+
 }
 
-interface IToggleButton : IToggleButtonNonUI, IComponent
+interface IToggleButton : IToggleButtonNonUI, IComponent {
+    var plainStyle : Boolean
+}
 
 class SToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
     override val checkBindable = Bindable(startChecked)
@@ -18,16 +21,30 @@ class SToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
 }
 
 class SToggleButton
-private constructor(startChecked: Boolean, invokable: Invokable<JComponent> )
-    : JToggleButton(), IToggleButton,
+private constructor(startChecked: Boolean, private val imp: SToggleButtonImp )
+    : IToggleButton,
         IToggleButtonNonUI by SToggleButtonNonUI(startChecked), IComponent,
-        ISComponent by SComponent(invokable)
+        ISComponent by SComponentDirect(imp)
 {
-    init {invokable.invoker = {this}}
-    constructor(startChecked: Boolean = false) : this(startChecked, Invokable())
+    constructor(startChecked: Boolean = false) : this(startChecked, SToggleButtonImp())
+
+    override var plainStyle: Boolean = false
+        set(value) {
+            if( value != field) {
+                field = value
+                imp.isBorderPainted = !value
+                imp.isContentAreaFilled = !value
+                imp.isFocusPainted = !value
+                imp.isOpaque = !value
+            }
+        }
+
+
 
     init {
-        Bindable(false, {isSelected = it}).bind(checkBindable)
-        this.addItemListener {            checked = isSelected}
+        checkBindable.addListener { imp.isSelected = it }
+        imp.addItemListener{checked = imp.isSelected}
     }
+
+    private class SToggleButtonImp : JToggleButton()
 }

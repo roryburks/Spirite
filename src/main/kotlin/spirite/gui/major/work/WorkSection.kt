@@ -36,8 +36,18 @@ interface IWorkSection {
 }
 
 class WorkSection : SPanel(), IComponent {
-    val view = WorkSectionView()
+    init {
+        println("S"+this)
+    }
+
+    private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
+
     var currentWorkspace: IImageWorkspace? = null
+        set(value) {field = value; calibrateScrolls()}
+    val currentView : WorkSectionView? get() {
+        println(this)
+        return views[currentWorkspace ?: return null]
+    }
 
     private val scrollRatio = 10
     private val scrollBuffer = 100
@@ -46,12 +56,16 @@ class WorkSection : SPanel(), IComponent {
         val workspace = currentWorkspace
         when(workspace) {
             null -> {
-//                vScroll.isEnabled = false
-//                hScroll.isEnabled = false
+                vScroll.enabled = false
+                hScroll.enabled = false
             }
             else -> {
-//                vScroll.isEnabled = true
-//                hScroll.isEnabled = true
+                val view = currentView ?: WorkSectionView(workspace).apply {
+                    views.put(workspace, this)
+                }
+
+                vScroll.enabled = true
+                hScroll.enabled = true
 
                 val width = workAreaContainer.width
                 val height = workAreaContainer.height
@@ -80,21 +94,19 @@ class WorkSection : SPanel(), IComponent {
     private val messageLabel = SLabel()
     private val vScroll = SScrollBar(VERTICAL, this)
     private val hScroll = SScrollBar(HORIZONATAL, this)
-    private val zoomPanel = object : SPanel() {
-        override fun paintComponent(g: Graphics) {
-            super.paintComponent(g)
-
-            when {
-                view.zoomLevel >= 0 -> {
-                    g.font = Font("Tahoma", Font.PLAIN, 12)
-                    g.drawString(Integer.toString(view.zoomLevel + 1), width - if (view.zoomLevel > 8) 16 else 12, height - 5)
-                }
-                else -> {
-                    g.font = Font("Tahoma", Font.PLAIN, 8)
-                    g.drawString("1/", this.width - 15, this.height - 10)
-                    g.font = Font("Tahoma", Font.PLAIN, 10)
-                    g.drawString(Integer.toString(-view.zoomLevel + 1), width - if (view.zoomLevel < -8) 10 else 8, height - 4)
-                }
+    private val zoomPanel = SPanel {g ->
+        val view = currentView
+        when {
+            view == null -> {}
+            view.zoomLevel >= 0 -> {
+                g.font = Font("Tahoma", Font.PLAIN, 12)
+                g.drawString(Integer.toString(view.zoomLevel + 1), width - if (view.zoomLevel > 8) 16 else 12, height - 5)
+            }
+            else -> {
+                g.font = Font("Tahoma", Font.PLAIN, 8)
+                g.drawString("1/", this.width - 15, this.height - 10)
+                g.font = Font("Tahoma", Font.PLAIN, 10)
+                g.drawString(Integer.toString(-view.zoomLevel + 1), width - if (view.zoomLevel < -8) 10 else 8, height - 4)
             }
         }
     }
@@ -105,21 +117,21 @@ class WorkSection : SPanel(), IComponent {
 
         val glWorkArea = GLWorkArea(this)
 
-        hScroll.scrollBind.addListener { view.offsetX = it * scrollRatio }
-        vScroll.scrollBind.addListener { view.offsetY = it * scrollRatio }
+        hScroll.scrollBind.addListener { currentView?.offsetX = it * scrollRatio }
+        vScroll.scrollBind.addListener { currentView?.offsetY = it * scrollRatio }
 
         coordinateLabel.label = "Coordinate Label"
         messageLabel.label = "Message Label"
 
 
         val barSize = 16
-        layout = CrossLayout.buildCrossLayout( this, {
+        setLayout {
             rows += {
                 add(glWorkArea, flex = 200f)
                 add(vScroll, width = barSize)
                 flex = 200f
             }
-                    rows += {
+            rows += {
                 add(hScroll, flex = 200f)
                 add(zoomPanel, width = barSize)
                 height = barSize
@@ -130,9 +142,7 @@ class WorkSection : SPanel(), IComponent {
                 add(messageLabel)
                 height = 24
             }
-        })
-        validate()
-
+        }
     }
     // endregion
 

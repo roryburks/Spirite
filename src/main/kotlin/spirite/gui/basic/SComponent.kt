@@ -12,6 +12,12 @@ interface ISComponent : IComponent{
 abstract class ASComponent : ISComponent {
     override fun redraw() {component.repaint()}
 
+    override var enabled: Boolean
+        get() = component.isEnabled
+        set(value) {component.isEnabled = value}
+    override val height: Int get() = component.height
+    override val width: Int get() = component.width
+
     // region ComponentListener
     override var onResize: (() -> Unit)?
         get() = componentListener.onResize

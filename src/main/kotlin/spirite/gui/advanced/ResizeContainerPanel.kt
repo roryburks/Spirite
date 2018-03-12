@@ -13,9 +13,6 @@ import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.Skin.ResizePanel.BarLineColor
 import spirite.gui.basic.IComponent.MouseEvent
-import spirite.gui.basic.SPanel2
-import java.awt.Cursor
-import java.awt.Graphics
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent
@@ -40,7 +37,7 @@ class ResizeContainerPanel(
         stretchComponent: IComponent,
         orientation: Orientation,
         private val defaultSize: Int = 100
-) : SPanel2(), IResizeContainerPanel {
+) : SPanel(), IResizeContainerPanel {
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)
@@ -127,13 +124,10 @@ class ResizeContainerPanel(
             onMouseDrag = {tracker.onMouseDrag(it)}
 
             val btnExpand = SToggleButton(true)
-            btnExpand.isBorderPainted = false
-            btnExpand.isContentAreaFilled = false
-            btnExpand.isFocusPainted = false
-            btnExpand.isOpaque = false
+            btnExpand.plainStyle = true
             btnExpand.checkBindable.bind(componentVisibleBindable)
 
-            val pullBar = SPanel2( {g->
+            val pullBar = SPanel {g->
                 g.color = BarLineColor.color
                 when( orientation) {
                     HORIZONATAL -> {
@@ -151,14 +145,14 @@ class ResizeContainerPanel(
                         g.drawLine(10, depth / 2 + 2, breadth - 10, depth / 2 + 2)
                     }
                 }
-            })
+            }
 
-            layout =  CrossLayout.buildCrossLayout(this, {
+            setLayout {
                 cols.add( btnExpand, width = 12)
                 cols.add( pullBar)
                 cols.height = barSize
                 overwriteOrientation = if(orientation == VERTICAL) HORIZONATAL else VERTICAL
-            })
+            }
             //pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
         }
 

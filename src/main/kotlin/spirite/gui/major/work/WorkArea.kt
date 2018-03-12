@@ -2,6 +2,9 @@ package spirite.gui.major.work
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.util.Colors
+import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.gui.basic.ISComponent
 
 abstract class WorkArea(
@@ -11,8 +14,13 @@ abstract class WorkArea(
     fun drawWork( gc: GraphicsContext) {
         gc.clear()
         gc.color = Colors.RED
-        gc.preTranslate( context.view.offsetX + 0f, context.view.offsetY + 0f)
-        gc.fillRect( 10, 10, 20, 20)
+
+        val view = context.currentView
+
+        if( view != null) {
+            gc.transform = view.tWorkspaceToScreen
+            gc.fillRect(0, 0, 200, 200)
+        }
     }
 
 }

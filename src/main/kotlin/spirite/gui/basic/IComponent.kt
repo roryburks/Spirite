@@ -5,7 +5,9 @@ import javax.swing.JComponent
 
 interface IComponent {
     fun redraw()
-    //var enabled : Boolean
+    var enabled : Boolean
+    val width: Int
+    val height: Int
 
     var onResize : (() -> Unit)?
     var onHidden : (() -> Unit)?
