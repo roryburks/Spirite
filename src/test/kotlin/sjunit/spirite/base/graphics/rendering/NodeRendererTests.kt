@@ -22,7 +22,7 @@ import javax.imageio.ImageIO
 import org.junit.Test as test
 
 class NodeRendererTests {
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
     val imageConverter = ImageConverter(gle)
     val workspace = TestHelper.makeShellWorkspace(100,100)
 

@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 
 class CompositingTests {
 
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
     val imageConverter = ImageConverter(gle)
     val workspace = TestHelper.makeShellWorkspace(100,100)
 

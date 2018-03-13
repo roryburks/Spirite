@@ -9,6 +9,7 @@ import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.base.util.Colors
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
@@ -17,7 +18,7 @@ import javax.imageio.ImageIO
 import kotlin.math.abs
 
 class GLStrokeDrawerV2Tests {
-    val gle =  GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
     val drawer = GLStrokeDrawerV2(gle)
 
     @Test

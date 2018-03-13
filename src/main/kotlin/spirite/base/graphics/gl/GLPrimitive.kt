@@ -22,12 +22,12 @@ internal class PreparedPrimitive(
         val primative: GLPrimitive,
         val gle: GLEngine
 ) {
-    val gl = gle.gl
+    val gl = gle.getGl()
     val buffer = gl.createBuffer() ?: throw GLEException("Failed to create Buffer")
 
     init {
         gl.bindBuffer(GLC.ARRAY_BUFFER, buffer)
-        gl.bufferData(GLC.ARRAY_BUFFER, gle.gl.makeFloat32Source(primative.raw), GLC.STREAM_DRAW)
+        gl.bufferData(GLC.ARRAY_BUFFER, gl.makeFloat32Source(primative.raw), GLC.STREAM_DRAW)
         gl.bindBuffer(GLC.ARRAY_BUFFER, null)
     }
 

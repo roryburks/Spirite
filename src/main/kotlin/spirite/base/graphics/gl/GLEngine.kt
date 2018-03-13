@@ -10,18 +10,22 @@ import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
+import spirite.gui.Bindable
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 
 class GLEngine(
-        val gl: IGL,
+        private val glGetter: () -> IGL,
         scriptService: IScriptService
 ) {
 
     private val programs = initShaderPrograms(scriptService)
 
-    private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
+    private val dbo : IGLRenderbuffer by lazy { getGl().genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
+
+
+    fun getGl() = glGetter.invoke()
 
     var width : Int = 1 ; private set
     var height : Int = 1 ; private set
@@ -30,6 +34,7 @@ class GLEngine(
 
     var target: IGLTexture? = null
         set(value) {
+            val gl = getGl()
             if( field != value) {
                 // Delete old Framebuffer
                 if( field != null)
@@ -66,6 +71,7 @@ class GLEngine(
         if (img == null) {
             target = null
         } else {
+            val gl = getGl()
             target = img.tex
             gl.viewport(0, 0, img.width, img.height)
         }
@@ -123,6 +129,7 @@ class GLEngine(
             color: Vec3, alpha: Float,
             params: GLParameters, trans: Transform?)
     {
+        val gl = getGl()
         if( xPoints.size < 2) return
 
         val size = numPoints + if(loop) 3 else 2
@@ -212,6 +219,7 @@ class GLEngine(
             internalParams: List<GLUniform>,
             preparedPrimitive: PreparedPrimitive)
     {
+        val gl = getGl()
         val prim = preparedPrimitive.primative
         val w = params.width
         val h = params.heigth
@@ -343,7 +351,7 @@ class GLEngine(
     }
 
     private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {
-        return GL330ShaderLoader(gl, scriptService).initShaderPrograms()
+        return GL330ShaderLoader(getGl(), scriptService).initShaderPrograms()
     }
 
     // endregion

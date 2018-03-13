@@ -8,6 +8,7 @@ import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.Colors
 import spirite.base.util.linear.Vec2i
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
@@ -17,7 +18,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class GLGraphicsContextTests {
-    val gle =  GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
 
     @test fun drawBounds() {
         val img = GLImage(30, 30, gle)

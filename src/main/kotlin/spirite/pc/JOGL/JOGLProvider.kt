@@ -1,15 +1,23 @@
 package spirite.pc.JOGL
 
 import com.jogamp.opengl.*
+import spirite.base.graphics.gl.IGL
+import spirite.gui.Bindable
 
 object JOGLProvider {
     private val drawable: GLOffscreenAutoDrawable
-    private val gl : GL
+    private val _gl : GL
 
-    fun getGL() : JOGL{
-        this.gl.gl.context.makeCurrent()
-        return JOGL( gl.gL2)
+    var gl2 : GL2? = null
+
+    val gl : IGL get() {
+        val gl2 = gl2 ?: this._gl.gL2
+        if( !gl2.context.isCurrent)
+            gl2.context.makeCurrent()
+        return JOGL(gl2)
     }
+
+
 
     val context : GLContext get() = drawable.context
 
@@ -52,6 +60,8 @@ object JOGLProvider {
         if( exception!= null)
             throw Exception(exception)
 
-        this.gl = gl ?: throw NullPointerException("No GL Loaded")
+        this._gl = gl ?: throw NullPointerException("No GL Loaded")
+
+        this._gl.gl.context.makeCurrent()
     }
 }

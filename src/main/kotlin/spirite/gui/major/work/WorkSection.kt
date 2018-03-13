@@ -3,6 +3,11 @@ package spirite.gui.major.work
 import spirite.base.pen.Penner
 import jspirite.gui.SScrollPane.ModernScrollBarUI
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.util.f
+import spirite.base.util.floor
+import spirite.base.util.linear.Vec2
+import spirite.base.util.linear.Vec2i
+import spirite.base.util.round
 import spirite.gui.Bindable
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
@@ -11,6 +16,7 @@ import java.awt.Font
 import java.awt.Graphics
 import javax.swing.GroupLayout
 import javax.swing.JScrollBar
+import kotlin.math.roundToInt
 
 
 /**
@@ -36,16 +42,11 @@ interface IWorkSection {
 }
 
 class WorkSection : SPanel(), IComponent {
-    init {
-        println("S"+this)
-    }
-
     private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
 
     var currentWorkspace: IImageWorkspace? = null
         set(value) {field = value; calibrateScrolls()}
     val currentView : WorkSectionView? get() {
-        println(this)
         return views[currentWorkspace ?: return null]
     }
 
@@ -67,25 +68,34 @@ class WorkSection : SPanel(), IComponent {
                 vScroll.enabled = true
                 hScroll.enabled = true
 
-                val width = workAreaContainer.width
-                val height = workAreaContainer.height
-                val hMin  = -width + scrollBuffer
-                val vMin = -height + scrollBuffer
+                val viewWidth = workAreaContainer.width
+                val viewHeight = workAreaContainer.height
+                val hMin  = -viewWidth + scrollBuffer
+                val vMin = -viewHeight + scrollBuffer
                 val hMax = workspace.width * view.zoom - scrollBuffer
                 val vMax = workspace.height * view.zoom - scrollBuffer
 
-                val ratio = scrollRatio.toFloat()
+                val ratio = scrollRatio.f
+                val hs = hScroll.scroll
+                val vs = vScroll.scroll
                 hScroll.minScroll = Math.round(hMin / ratio)
                 vScroll.minScroll = Math.round(vMin / ratio)
                 hScroll.maxScroll = Math.round(hMax / ratio) + hScroll.scrollWidth
                 vScroll.maxScroll = Math.round(vMax / ratio) + vScroll.scrollWidth
+                hScroll.scroll = hs
+                vScroll.scroll = vs
             }
         }
     }
 
-    /** Positions are in Image State*/
-    fun centerScrollAtPos( x: Int, y: Int){
-
+    fun doPreservingMousePoint( point: Vec2, lambda: () -> Unit) {
+        val view = currentView
+        val pointInWorkspace = view?.tScreenToWorkspace?.apply(point) ?: Vec2.Zero
+        lambda.invoke()
+        if( view != null) {
+            hScroll.scroll = ((pointInWorkspace.x * view.zoom - point.x ) / scrollRatio).round
+            vScroll.scroll = ((pointInWorkspace.y * view.zoom - point.y ) / scrollRatio).round
+        }
     }
 
     // Region UI
@@ -116,18 +126,28 @@ class WorkSection : SPanel(), IComponent {
         hScroll.scrollWidth = 50
 
         val glWorkArea = GLWorkArea(this)
+        workAreaContainer.setLayout { rows.add(glWorkArea) }
 
-        hScroll.scrollBind.addListener { currentView?.offsetX = it * scrollRatio }
-        vScroll.scrollBind.addListener { currentView?.offsetY = it * scrollRatio }
+        hScroll.scrollBind.addListener {currentView?.offsetX = it * scrollRatio}
+        vScroll.scrollBind.addListener {currentView?.offsetY = it * scrollRatio}
+        workAreaContainer.onMouseWheelMoved = {
+            doPreservingMousePoint(Vec2(it.point.x.f, it.point.y.f), {
+                if( it.moveAmount > 0) currentView?.zoomOut()
+                if( it.moveAmount < 0) currentView?.zoomIn()
+                calibrateScrolls()
+            })
+        }
 
         coordinateLabel.label = "Coordinate Label"
         messageLabel.label = "Message Label"
+
+        this.onResize = {calibrateScrolls()}
 
 
         val barSize = 16
         setLayout {
             rows += {
-                add(glWorkArea, flex = 200f)
+                add(workAreaContainer, flex = 200f)
                 add(vScroll, width = barSize)
                 flex = 200f
             }

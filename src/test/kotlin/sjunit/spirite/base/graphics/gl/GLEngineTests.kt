@@ -15,6 +15,7 @@ import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
@@ -25,7 +26,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class GLEngineTests {
-    val gle =  GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
 
     @test fun StartsWithRealScripts() {
     }

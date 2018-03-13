@@ -51,7 +51,7 @@ object ContentBoundsFinder {
             }
         } else if (raw is GLImage) {
             val engine = raw.engine
-            val gl = engine.gl
+            val gl = engine.getGl()
             val w = raw.width
             val h = raw.height
 

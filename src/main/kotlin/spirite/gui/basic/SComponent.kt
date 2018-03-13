@@ -2,6 +2,8 @@ package spirite.gui.basic
 
 import spirite.gui.SUIPoint
 import spirite.gui.basic.IComponent.MouseEvent
+import spirite.gui.basic.IComponent.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -101,6 +103,19 @@ abstract class ASComponent : ISComponent {
     }
 
     // endregion
+
+    override var onMouseWheelMoved: ((MouseWheelEvent) -> Unit)?
+        get() = mouseWheelListener.onWheelMove
+        set(value) {mouseWheelListener.onWheelMove = value}
+    private val mouseWheelListener by lazy { JSMouseWheelListener().apply { component.addMouseWheelListener( this) }}
+    private class JSMouseWheelListener( var onWheelMove : ((IComponent.MouseWheelEvent)-> Unit)? = null) : MouseWheelListener {
+        fun convert( e: java.awt.event.MouseWheelEvent) : MouseWheelEvent {
+            val scomp = SComponentDirect( e.component as JComponent )
+            return MouseWheelEvent(SUIPoint(e.x, e.y, scomp), e.wheelRotation)
+        }
+
+        override fun mouseWheelMoved(e: java.awt.event.MouseWheelEvent) {onWheelMove?.invoke(convert(e))}
+    }
 }
 
 class SComponent( cGetter : Invokable<JComponent>) : ASComponent() {

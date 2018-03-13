@@ -4,6 +4,7 @@ package sjunit.spirite.base.graphics
 import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.gl.GLEngine
+import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
@@ -15,7 +16,7 @@ import kotlin.test.assertNull
 import org.junit.Test as test
 
 class DynamicImageTests {
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
     val imageConverter = ImageConverter(gle)
 
     @test fun testWorks() {

@@ -5,6 +5,7 @@ import sjunit.TestConfig
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.Colors
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
@@ -14,7 +15,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class GLImageTests {
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
 
     @test fun BasicGLFunctionality() {
         val glimage = GLImage(10,10,gle)

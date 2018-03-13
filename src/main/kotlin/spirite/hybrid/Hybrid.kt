@@ -16,7 +16,7 @@ interface IHybrid {
 
 object Hybrid : IHybrid {
     override val gle: GLEngine = EngineLaunchpoint.gle
-    override val gl: IGL get() = JOGLProvider.getGL()
+    override val gl: IGL get() = JOGLProvider.gl
     override val system: ISystemUtils get() = JSystemUtils
     override val imageCreator: IImageCreator get() = EngineLaunchpoint
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)

@@ -24,7 +24,7 @@ class GLImage : RawImage {
         this.engine = glEngine
         this.premultiplied = premultiplied
 
-        val gl = glEngine.gl
+        val gl = glEngine.getGl()
 
         tex = gl.createTexture() ?: throw GLResourcException("Failed to create Texture")
         gl.bindTexture( GLC.TEXTURE_2D, tex)
@@ -43,7 +43,7 @@ class GLImage : RawImage {
         engine = toCopy.engine
         premultiplied = toCopy.premultiplied
 
-        val gl = engine.gl
+        val gl = engine.getGl()
 
         // Set the GL Target as the other image's texture and copy the data
         engine.target =  toCopy.tex
@@ -71,6 +71,7 @@ class GLImage : RawImage {
     val glParams : GLParameters get() = GLParameters(width, height, premultiplied = premultiplied)
 
     override fun flush() {
+        val gl = engine.getGl()
         val toDel = tex
         if( toDel != null) {
             // Must be run on the AWT Thread to prevent JOGL-internal deadlocks
@@ -78,7 +79,7 @@ class GLImage : RawImage {
                 //engine.glImageUnloaded(this)  // TODO
                 if( engine.target == toDel)
                     engine.target = null
-                engine.gl.deleteTexture(toDel)
+                engine.getGl().deleteTexture(toDel)
             }
         }
         engine.track.relinquishImage(this)
@@ -93,7 +94,7 @@ class GLImage : RawImage {
     override fun getARGB(x: Int, y: Int): Int {
         if (x < 0 || y < 0 || x >= width || y >= height) return 0
         engine.setTarget(this)
-        val gl = engine.gl
+        val gl = engine.getGl()
 
         val read = gl.makeInt32Source(1)
         gl.readnPixels(x, y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )

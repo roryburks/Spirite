@@ -5,13 +5,14 @@ import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.hybrid.ContentBoundsFinder
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class ContentBoundsFinderTest {
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = Hybrid.gle
 
     @test fun testContentBounds() {
         val img = GLImage(20, 20, gle)

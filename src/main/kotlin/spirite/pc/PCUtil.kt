@@ -37,7 +37,7 @@ fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : Buffe
             val iir = bi.raster as IntegerInterleavedRaster
             val ib = IntBuffer.wrap( iir.dataStorage)
 
-            gl.readPixels( 0, 0, width, height,
+            getGl().readPixels( 0, 0, width, height,
                     GLC.BGRA,
                     GLC.UNSIGNED_INT_8_8_8_8_REV,
                     JOGLInt32Source(ib))

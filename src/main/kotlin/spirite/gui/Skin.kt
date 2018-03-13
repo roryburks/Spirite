@@ -1,5 +1,6 @@
 package spirite.gui
 
+import spirite.base.util.ColorARGB32Normal
 import java.awt.Color
 import javax.swing.ImageIcon
 
@@ -16,6 +17,7 @@ object Skin {
     //  values from settings instead of hard-coded.
     interface ColorMarker {
         val color : Color
+        val scolor : spirite.base.util.Color get() = ColorARGB32Normal(color.rgb + (color.alpha shl 24))
     }
     enum class DrawPanel(override val color: Color) : ColorMarker  {
         ImageBorder(Color(190, 190, 190)),

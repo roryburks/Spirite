@@ -29,7 +29,7 @@ abstract class GraphicsContext {
 
     abstract fun drawBounds(image: IImage, c: Int)
 
-    abstract fun clear()
+    abstract fun clear( color: Color? = null)
     abstract fun preTranslate(offsetX: Float, offsetY: Float)
     abstract fun translate(offsetX: Float, offsetY: Float)
     abstract fun preTransform(trans: Transform)
@@ -93,7 +93,7 @@ abstract class GraphicsContext {
         color = state.color
     }
 
-    open fun drawTransparencyBG(rect: Rect, i: Int) {}
+    open fun drawTransparencyBG( x: Int, y: Int, w: Int, h: Int, squareSize: Int) {}
 
 }
 

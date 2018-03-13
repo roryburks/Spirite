@@ -27,6 +27,10 @@ data class Vec2(
     override fun toString(): String {
         return "<$x,$y>"
     }
+
+    companion object {
+        val Zero = Vec2(0f,0f)
+    }
 }
 
 
@@ -40,4 +44,8 @@ data class Vec2i (
     operator fun plus(rhs: Vec2i) = Vec2i(x + rhs.x, y + rhs.y)
 
     infix fun dot(rhs: Vec2i) = this.x * rhs.x + this.y * rhs.y
+
+    companion object {
+        val Zero = Vec2i(0,0)
+    }
 }

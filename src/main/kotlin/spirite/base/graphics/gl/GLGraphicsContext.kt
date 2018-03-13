@@ -7,12 +7,14 @@ import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.util.Color
 import spirite.base.util.Colors
+import spirite.base.util.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.ImageConverter
+import spirite.pc.JOGL.JOGLProvider
 import java.awt.Shape
 
 
@@ -54,7 +56,9 @@ class GLGraphicsContext : GraphicsContext {
         cachedParams.premultiplied = this.premultiplied
     }
 
-    private fun reset() = gle.setTarget(image)
+    private fun reset() {
+        gle.setTarget(image)
+    }
 
 
 
@@ -75,10 +79,11 @@ class GLGraphicsContext : GraphicsContext {
         buffer.flush()
     }
 
-    override fun clear() {
+    override fun clear( color: Color?) {
         reset()
-        gle.gl.clearColor( 0f, 0f, 0f, 0f)
-        gle.gl.clear(GLC.COLOR)
+        val gl = gle.getGl()
+        gl.clearColor( color?.red ?: 0f, color?.green ?: 0f, color?.blue ?: 0f, color?.alpha ?: 0f)
+        gl.clear(GLC.COLOR)
     }
 
     // region Transforms
@@ -253,6 +258,11 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     // endregion
+
+    override fun drawTransparencyBG(x: Int, y: Int, w: Int, h: Int, squareSize: Int) {
+        applyPassProgram( GridCall( Colors.GRAY.rgbComponent, Colors.LIGHT_GRAY.rgbComponent, squareSize),
+                cachedParams, transform, x.f, y.f, w.f, h.f)
+    }
 
     // region Direct
     // Note: These exist mostly to make sure Reset is called

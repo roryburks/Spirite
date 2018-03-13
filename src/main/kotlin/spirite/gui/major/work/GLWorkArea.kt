@@ -36,10 +36,14 @@ private constructor(context: WorkSection, val canvas: GLJPanel)
                 val gle = Hybrid.gle
                 val glgc = GLGraphicsContext(w, h, true, gle)
 
+                JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)
-                gle.gl.viewport(0, 0, w, h)
+
+                val gl = gle.getGl()
+                gl.viewport(0, 0, w, h)
 
                 drawWork(glgc)
+                JOGLProvider.gl2 = null
             }
 
             override fun init(drawable: GLAutoDrawable) {

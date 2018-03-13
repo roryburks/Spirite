@@ -1,5 +1,6 @@
 package sjunit.pc.JOGL
 
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL.JOGLTexture
 import spirite.pc.JOGL.JOGLProvider
 import kotlin.test.assertEquals
@@ -9,7 +10,7 @@ import org.junit.Test as test
 class JOGLTests {
     @test fun StartsUp() {
         var x = false
-        val gl = JOGLProvider.getGL()
+        val gl = Hybrid.gl
 
         val tex = gl.createTexture()
 

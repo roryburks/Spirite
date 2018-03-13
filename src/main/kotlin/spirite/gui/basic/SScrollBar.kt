@@ -54,7 +54,8 @@ class SScrollBarNonUI(
                 scroll = maxScroll - scrollWidth
         }
 
-    override var maxScroll = max
+    override var maxScroll
+        get() = maxScrollBind.field
         set(to) {
             maxScrollBind.field = to
             if( minScroll > to - scrollWidth)

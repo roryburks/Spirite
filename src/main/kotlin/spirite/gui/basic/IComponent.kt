@@ -14,9 +14,7 @@ interface IComponent {
     var onShown : (() -> Unit)?
     var onMoved : (() -> Unit)?
 
-    data class MouseEvent(
-            val point: UIPoint)
-
+    data class MouseEvent(val point: UIPoint)
     var onMouseClick : ((MouseEvent) -> Unit)?
     var onMousePress : ((MouseEvent) -> Unit)?
     var onMouseRelease : ((MouseEvent) -> Unit)?
@@ -24,6 +22,11 @@ interface IComponent {
     var onMouseExit : ((MouseEvent) -> Unit)?
     var onMouseMove : ((MouseEvent) -> Unit)?
     var onMouseDrag : ((MouseEvent) -> Unit)?
+
+    data class MouseWheelEvent(
+            val point: UIPoint,
+            val moveAmount : Int)
+    var onMouseWheelMoved : ((MouseWheelEvent)->Unit)?
 }
 
 class Invokable<T>() {

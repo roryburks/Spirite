@@ -1,6 +1,7 @@
 package spirite.gui.major.work
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.util.f
 import spirite.base.util.linear.MutableTransform
@@ -13,15 +14,15 @@ import kotlin.reflect.KProperty
 class WorkSectionView(val workspace: IImageWorkspace) {
     /** zoom_level 0 = 1x, 1 = 2x, 2 = 3x, ...
      *  -1 = 1/2x, -2 = 1/3x, -3 = 1/4x .... */
-    var zoomLevel = 0
+    var zoomLevel by ViewChange(0)
     val zoom get() = when {
         zoomLevel >= 0 -> zoomLevel + 1f
         else -> 1f / (-zoomLevel + 1f)
     }
 
-    var offsetX = 0
-    var offsetY = 0
-    var rotation = 0f
+    var offsetX by ViewChange(0)
+    var offsetY by ViewChange(0)
+    var rotation by ViewChange(0f)
 
     fun zoomIn() {
         zoomLevel = when {
@@ -38,25 +39,23 @@ class WorkSectionView(val workspace: IImageWorkspace) {
         }
     }
 
-    val tWorkspaceToScreen : Transform
-        get() {
-            val old = _tWorkspaceToScreen
-            when( old) {
-                null -> {
-                    val new = Transform.TranslationMatrix(-offsetX.f, -offsetY.f) *
-                            Transform.RotationMatrix( rotation) *
-                            Companion.ScaleMatrix( zoom, zoom)
-                    _tWorkspaceToScreen = new
-                    return new
-                }
-                else -> return old
-            }
-        }
-    private var _tWorkspaceToScreen : Transform? =  null
-
-
-    private var trigger = {
-
+    private val tWorkspaceToScreenDerived = DerivedLazy{
+        Transform.TranslationMatrix(-offsetX.f, -offsetY.f) *
+                Transform.RotationMatrix(rotation) *
+                Transform.ScaleMatrix(zoom, zoom)
     }
-    private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {trigger})
+    val tWorkspaceToScreen : Transform by tWorkspaceToScreenDerived
+
+    private val tScreenToWorkspaceDerived = DerivedLazy{
+        Transform.ScaleMatrix(1/zoom, 1/zoom)*
+        Transform.RotationMatrix(-rotation) *
+        Transform.TranslationMatrix(offsetX.f, offsetY.f)
+    }
+    val tScreenToWorkspace : Transform by tScreenToWorkspaceDerived
+
+
+    private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {
+        tWorkspaceToScreenDerived.reset()
+        tScreenToWorkspaceDerived.reset()
+    })
 }

@@ -8,7 +8,7 @@ import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.resources.JClassScriptService
 
 object EngineLaunchpoint : IImageCreator{
-    val gle = GLEngine(JOGLProvider.getGL(), JClassScriptService())
+    val gle = GLEngine({JOGLProvider.gl}, JClassScriptService())
 
     override fun createImage(width: Int, height: Int): RawImage {
         return when {
