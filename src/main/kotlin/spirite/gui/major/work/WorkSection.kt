@@ -2,9 +2,15 @@ package spirite.gui.major.work
 
 import spirite.base.pen.Penner
 import jspirite.gui.SScrollPane.ModernScrollBarUI
+import spirite.base.brains.IObservable
+import spirite.base.brains.IWorkspaceSet
+import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
+import spirite.base.brains.MasterControl
+import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.f
 import spirite.base.util.floor
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec2i
 import spirite.base.util.round
@@ -12,10 +18,12 @@ import spirite.gui.Bindable
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.basic.*
+import spirite.hybrid.Hybrid
 import java.awt.Font
 import java.awt.Graphics
 import javax.swing.GroupLayout
 import javax.swing.JScrollBar
+import javax.swing.SwingUtilities
 import kotlin.math.roundToInt
 
 
@@ -41,11 +49,13 @@ interface IWorkSection {
     val penner: Penner
 }
 
-class WorkSection : SPanel(), IComponent {
+class WorkSection(workspaceSet: IWorkspaceSet)
+    : SPanel(), IComponent
+{
     private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
+    val penner = Penner(this)
 
-    var currentWorkspace: IImageWorkspace? = null
-        set(value) {field = value; calibrateScrolls()}
+    var currentWorkspace: IImageWorkspace? = null ; private set
     val currentView : WorkSectionView? get() {
         return views[currentWorkspace ?: return null]
     }
@@ -53,38 +63,26 @@ class WorkSection : SPanel(), IComponent {
     private val scrollRatio = 10
     private val scrollBuffer = 100
 
-    fun calibrateScrolls() {
+    fun calibrateScrolls(hs: Int = hScroll.scroll, vs: Int = vScroll.scroll) {
         val workspace = currentWorkspace
-        when(workspace) {
-            null -> {
-                vScroll.enabled = false
-                hScroll.enabled = false
-            }
-            else -> {
-                val view = currentView ?: WorkSectionView(workspace).apply {
-                    views.put(workspace, this)
-                }
+        if( workspace != null) {
+            val view = currentView
 
-                vScroll.enabled = true
-                hScroll.enabled = true
+            val viewWidth = workAreaContainer.width
+            val viewHeight = workAreaContainer.height
+            val hMin  = -viewWidth + scrollBuffer
+            val vMin = -viewHeight + scrollBuffer
+            val hMax = workspace.width * (view?.zoom ?: 1f) - scrollBuffer
+            val vMax = workspace.height * (view?.zoom ?: 1f) - scrollBuffer
 
-                val viewWidth = workAreaContainer.width
-                val viewHeight = workAreaContainer.height
-                val hMin  = -viewWidth + scrollBuffer
-                val vMin = -viewHeight + scrollBuffer
-                val hMax = workspace.width * view.zoom - scrollBuffer
-                val vMax = workspace.height * view.zoom - scrollBuffer
+            val ratio = scrollRatio.f
+            hScroll.minScroll = Math.round(hMin / ratio)
+            vScroll.minScroll = Math.round(vMin / ratio)
+            hScroll.maxScroll = Math.round(hMax / ratio) + hScroll.scrollWidth
+            vScroll.maxScroll = Math.round(vMax / ratio) + vScroll.scrollWidth
 
-                val ratio = scrollRatio.f
-                val hs = hScroll.scroll
-                val vs = vScroll.scroll
-                hScroll.minScroll = Math.round(hMin / ratio)
-                vScroll.minScroll = Math.round(vMin / ratio)
-                hScroll.maxScroll = Math.round(hMax / ratio) + hScroll.scrollWidth
-                vScroll.maxScroll = Math.round(vMax / ratio) + vScroll.scrollWidth
-                hScroll.scroll = hs
-                vScroll.scroll = vs
-            }
+            hScroll.scroll = hs
+            vScroll.scroll = vs
         }
     }
 
@@ -96,6 +94,14 @@ class WorkSection : SPanel(), IComponent {
             hScroll.scroll = ((pointInWorkspace.x * view.zoom - point.x ) / scrollRatio).round
             vScroll.scroll = ((pointInWorkspace.y * view.zoom - point.y ) / scrollRatio).round
         }
+    }
+
+    fun refreshCoordinates( x: Int, y: Int) {
+        val workspace = currentWorkspace
+        if( workspace != null && Rect(0,0,workspace.width, workspace.height).contains(x, y))
+            coordinateLabel.label = "$x,$y"
+        else coordinateLabel.label = ""
+
     }
 
     // Region UI
@@ -121,6 +127,7 @@ class WorkSection : SPanel(), IComponent {
         }
     }
 
+
     fun initComponents() {
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
@@ -138,10 +145,18 @@ class WorkSection : SPanel(), IComponent {
             })
         }
 
+        workAreaContainer.onMouseMove = {penner.rawUpdateX(it.point.x); penner.rawUpdateY(it.point.y)}
+        workAreaContainer.onMousePress = {penner.penDown()}
+        workAreaContainer.onMouseRelease = {penner.penUp()}
+        Hybrid.timing.createTimer({penner.step()}, 15, true)
+
         coordinateLabel.label = "Coordinate Label"
         messageLabel.label = "Message Label"
 
-        this.onResize = {calibrateScrolls()}
+        this.onResize = {
+            calibrateScrolls()
+            redraw()
+        }
 
 
         val barSize = 16
@@ -167,7 +182,45 @@ class WorkSection : SPanel(), IComponent {
     // endregion
 
 
+    val workspaceOvserver = object: WorkspaceObserver {
+        override fun workspaceCreated(newWorkspace: IImageWorkspace) {
+            val newView = WorkSectionView(newWorkspace)
+            views.put(newWorkspace, newView)
+
+            // By default centered
+            newView.offsetX = (newWorkspace.width/2 - workAreaContainer.width/2)
+            newView.offsetY = (newWorkspace.height/2 - workAreaContainer.height/2)
+        }
+
+        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
+            views.remove(removedWorkspace)
+        }
+
+        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+            _viewObservable.trigger { it.invoke() }
+            currentWorkspace = selectedWorkspace
+
+            when( selectedWorkspace) {
+                null -> {
+                    hScroll.enabled = false
+                    vScroll.enabled = false
+                }
+                else -> {
+                    hScroll.enabled = true
+                    vScroll.enabled = true
+                    val view = views.get(selectedWorkspace)!!
+                    calibrateScrolls( view.offsetX / scrollRatio, view.offsetY / scrollRatio)
+                }
+            }
+        }
+    }
+
     init {
         initComponents()
+
+        workspaceSet.workspaceObserver.addObserver(workspaceOvserver)
     }
+
+    val viewObservable : IObservable<()->Unit> get() = _viewObservable
+    private val _viewObservable = Observable<()->Unit>()
 }

@@ -1,5 +1,7 @@
 package spirite.gui.major.work
 
+import spirite.base.brains.IObservable
+import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
@@ -53,8 +55,11 @@ class WorkSectionView(val workspace: IImageWorkspace) {
     }
     val tScreenToWorkspace : Transform by tScreenToWorkspaceDerived
 
+    val viewObserver : IObservable<()->Unit> get() = _viewObserver
+    private val _viewObserver = Observable<()->Unit>()
 
     private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {
+        _viewObserver.trigger { it.invoke() }
         tWorkspaceToScreenDerived.reset()
         tScreenToWorkspaceDerived.reset()
     })

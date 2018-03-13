@@ -8,8 +8,7 @@ import java.nio.IntBuffer
  * management inherent in OpenGL, so should itself be wrapped in a Graphics Engine and shielded from the use sources.
  */
 interface IGL {
-    fun clearColor( red: Float, green: Float, blue: Float, alpha: Float)
-    fun clear( mask: Int )
+    fun clearColor(red: Float, green: Float, blue: Float, alpha: Float, mask: Int)
 
     fun viewport( x: Int, y: Int, w: Int, h: Int)
     fun enable( cap: Int)

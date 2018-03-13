@@ -82,8 +82,7 @@ class GLGraphicsContext : GraphicsContext {
     override fun clear( color: Color?) {
         reset()
         val gl = gle.getGl()
-        gl.clearColor( color?.red ?: 0f, color?.green ?: 0f, color?.blue ?: 0f, color?.alpha ?: 0f)
-        gl.clear(GLC.COLOR)
+        gl.clearColor( color?.red ?: 0f, color?.green ?: 0f, color?.blue ?: 0f, color?.alpha ?: 0f, GLC.COLOR)
     }
 
     // region Transforms

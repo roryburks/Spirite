@@ -16,13 +16,10 @@ class JOGL(
         val gl : GL2
 ) : IGL {
 
-    var color = FloatBuffer.wrap(floatArrayOf(0f, 0f, 0f, 0f))
-
-    override fun clearColor(red: Float, green: Float, blue: Float, alpha: Float) {
-        color = FloatBuffer.wrap(floatArrayOf(red, green, blue, alpha))
-    }
-    override fun clear(mask: Int) =
+    override fun clearColor(red: Float, green: Float, blue: Float, alpha: Float, mask: Int) {
+        val color = FloatBuffer.wrap(floatArrayOf(red, green, blue, alpha))
         gl.glClearBufferfv(GLC.COLOR, 0, color)
+    }
 
     override fun viewport(x: Int, y: Int, w: Int, h: Int) =
             gl.glViewport(x,y,w,h)

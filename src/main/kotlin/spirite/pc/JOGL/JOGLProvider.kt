@@ -10,6 +10,12 @@ object JOGLProvider {
 
     var gl2 : GL2? = null
 
+    // Essentially, the context needs to be changed at two key times:
+    //  1) When a JOGL Panel starts drawing (changed to use that panel's context)
+    //  2) The first draw done AFTER the JOGL Panel is out of context (changed to the offscreen Drawable's context)
+    // There is probably a more strategic process for this than wrapping the gl2 in JOGL every time something needs to
+    //  make a GL call, but really this wrapping process should be no larger than a normal variable getter as JOGL is
+    //  just a single variable and a ton of methods.
     val gl : IGL get() {
         val gl2 = gl2 ?: this._gl.gL2
         if( !gl2.context.isCurrent)
