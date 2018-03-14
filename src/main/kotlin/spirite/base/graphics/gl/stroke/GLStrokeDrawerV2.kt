@@ -96,6 +96,7 @@ class GLStrokeDrawerV2(
         val vb = composeVBuffer( states, lineWidth)
 
         if( true /* 330 */ ) {
+            target.graphics.clear()
             gle.setTarget(target)
 
             val primitives = GLGeom.strokeV2LinePassGeom(vb)

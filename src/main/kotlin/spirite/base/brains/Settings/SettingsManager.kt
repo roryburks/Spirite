@@ -13,7 +13,7 @@ interface ISettingsManager {
 
 class SettingsManager (
         private val preferences: IPreferences
-){
+): ISettingsManager{
     // ================
     // ==== Graphics Engine Management
 

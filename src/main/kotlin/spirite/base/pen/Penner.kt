@@ -123,7 +123,6 @@ class Penner(
 
             }
         }
-        println(behavior)
     }
 
     override fun penUp(button: MouseButton) {

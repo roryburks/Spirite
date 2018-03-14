@@ -49,11 +49,14 @@ class StrokeBuilder(
 
     fun step( ps: PenState) : Boolean{
         val cps = convertPS(ps)
-        baseStates.add(cps)
-        interpolator?.addPoint(cps.x, cps.y)
-        _currentPoints = null
 
-        return strokeDrawer.step()
+        if( cps.x != baseStates.lastOrNull()?.x || cps.y != baseStates.lastOrNull()?.y) {
+            baseStates.add(cps)
+            interpolator?.addPoint(cps.x, cps.y)
+            _currentPoints = null
+            return strokeDrawer.step()
+        }
+        return false
     }
 
     fun end() {

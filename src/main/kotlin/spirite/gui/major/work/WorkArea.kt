@@ -31,12 +31,6 @@ abstract class WorkArea(
             val img =
             workspace.renderEngine.renderImage(RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace)))
             gc.renderImage(img, 0, 0)
-
-            gc.fillRect( 10,10,20,20)
-            gc.fillRect( 60,20,20,20)
-            gc.fillRect( 20,70,20,20)
-            gc.fillRect( 40,40,20,20)
-            gc.fillRect( 70,60,20,20)
             //gc.fillRect(0, 0, 200, 200)
         }
     }

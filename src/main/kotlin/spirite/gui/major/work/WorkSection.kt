@@ -2,11 +2,8 @@ package spirite.gui.major.work
 
 import spirite.base.pen.Penner
 import jspirite.gui.SScrollPane.ModernScrollBarUI
-import spirite.base.brains.IObservable
-import spirite.base.brains.IWorkspaceSet
+import spirite.base.brains.*
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.MasterControl
-import spirite.base.brains.Observable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteManager
 import spirite.base.brains.toolset.IToolsetManager
@@ -57,16 +54,11 @@ interface IWorkSection {
     val penner: Penner
 }
 
-class WorkSection(
-        workspaceSet: IWorkspaceSet,
-        toolsetManager: IToolsetManager,
-        paletteManager: IPaletteManager,
-        renderEngine: IRenderEngine
-)
+class WorkSection(val master: IMasterControl)
     : SPanel(), IComponent
 {
     private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
-    val penner = Penner(this, toolsetManager, renderEngine, paletteManager)
+    val penner = Penner(this, master.toolsetManager, master.renderEngine, master.paletteManager)
 
     var currentWorkspace: IImageWorkspace? = null ; private set
     val currentView : WorkSectionView? get() {
@@ -165,6 +157,7 @@ class WorkSection(
             penner.rawUpdateX(it.point.x)
             penner.rawUpdateY(it.point.y)
         }
+        workAreaContainer.onMouseDrag = workAreaContainer.onMouseMove
         workAreaContainer.onMousePress = {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
@@ -234,9 +227,6 @@ class WorkSection(
             _viewObservable.trigger { it.invoke() }
             currentWorkspace = selectedWorkspace
 
-            previousSelected?.imageObservatory?.imageObservers?.removeObserver(imageObserver)
-            selectedWorkspace?.imageObservatory?.imageObservers?.addObserver(imageObserver)
-
             when( selectedWorkspace) {
                 null -> {
                     hScroll.enabled = false
@@ -255,7 +245,8 @@ class WorkSection(
     init {
         initComponents()
 
-        workspaceSet.workspaceObserver.addObserver(workspaceOvserver)
+        master.workspaceSet.workspaceObserver.addObserver(workspaceOvserver)
+        master.centralObservatory.trackingImageObserver.addObserver(imageObserver)
     }
 
     val viewObservable : IObservable<()->Unit> get() = _viewObservable

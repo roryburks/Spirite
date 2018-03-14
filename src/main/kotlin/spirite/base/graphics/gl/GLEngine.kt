@@ -284,6 +284,8 @@ class GLEngine(
         // Draw
         var start = 0
         for( i in 0 until prim.primitiveLengths.size) {
+            if( i >= prim.primitiveTypes.size || i >= prim.primitiveLengths.size)
+                println("break")
             gl.drawArrays(prim.primitiveTypes[i], start, prim.primitiveLengths[i])
             start += prim.primitiveLengths[i]
         }

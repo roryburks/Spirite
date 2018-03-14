@@ -2,7 +2,7 @@ package spirite.base.graphics.rendering
 
 import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IImage
-import spirite.base.graphics.IImageTracker
+import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.sources.GroupNodeSource
 import spirite.base.graphics.rendering.sources.RenderSource
@@ -43,7 +43,7 @@ class CachedImage(  image: RawImage) {
 }
 
 class RenderEngine(
-        val imageTracker: IImageTracker,
+        val resourceUseTracker: IResourceUseTracker,
         val centralObservatory: ICentralObservatory) :
         IRenderEngine, ImageObserver
 {

@@ -1,8 +1,8 @@
 package spirite.base.graphics.gl
 
-import spirite.base.graphics.IImageTracker
+import spirite.base.graphics.IResourceUseTracker
 
-class GLTrack() : IImageTracker{
+class GLTrack() : IResourceUseTracker {
     internal fun registerImage( image: GLImage) {
         _imagesLoaded.add(image)
     }
