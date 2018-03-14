@@ -32,7 +32,7 @@ interface IMasterControl {
     val hotkeyManager: IHotkeyManager
     val settingsManager : ISettingsManager
     val paletteManager : IPaletteManager
-    val workspaceSet : IWorkspaceSet
+    val workspaceSet : MWorkspaceSet
     val centralObservatory: ICentralObservatory
     val strokeDrawerProvider: IStrokeDrawerProvider
     val toolsetManager: IToolsetManager

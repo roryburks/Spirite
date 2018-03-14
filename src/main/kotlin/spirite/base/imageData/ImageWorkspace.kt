@@ -31,16 +31,17 @@ interface IImageWorkspace {
     val filename get() = file?.name ?: "Untitled Image"
     val hasChanged: Boolean
 
-    val groupTree: PrimaryGroupTree
 
 
 	// Sub-Components
-    val undoEngine : IUndoEngine
-    val animationManager : IAnimationManager
-    val selectionEngine : ISelectionEngine
-    val referenceManager : IReferenceManager
-    val paletteSet : PaletteSet
+    val groupTree: PrimaryGroupTree
     val mediumRepository : IMediumRepository
+    val animationManager : IAnimationManager
+    val referenceManager : IReferenceManager
+
+    val undoEngine : IUndoEngine
+    val selectionEngine : ISelectionEngine
+    val paletteSet : PaletteSet
 //	public StagingManager getStageManager() {return stagingManager;}
 
     // Super-Components
@@ -67,12 +68,15 @@ class ImageWorkspace(
         width: Int = 100,
         height: Int = 100) : IImageWorkspace
 {
-
-    // Note: while this technically leaks access, everything which should have limited access (i.e. virtually everything
-    //  outside of unit tests) should only have an IImageWorkspace, not an ImageWorkspace.
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)
     override val imageObservatory: IImageObservatory = ImageObservatory()
+    override val groupTree = PrimaryGroupTree(this, mediumRepository)
+    override val animationManager: IAnimationManager get() = TODO("not implemented")
+    override val selectionEngine: ISelectionEngine get() = TODO("not implemented")
+    override val referenceManager: ReferenceManager = ReferenceManager()
+    override val paletteSet: PaletteSet get() = TODO("not implemented")
+
     override val compositor = Compositor()
 
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
@@ -91,14 +95,6 @@ class ImageWorkspace(
     override val file: File?
         get() = TODO("not implemented")
     override var hasChanged: Boolean = false
-    override val groupTree = PrimaryGroupTree(this, mediumRepository)
-    override val animationManager: IAnimationManager
-        get() = TODO("not implemented")
-    override val selectionEngine: ISelectionEngine
-        get() = TODO("not implemented")
-    override val referenceManager: ReferenceManager = ReferenceManager()
-    override val paletteSet: PaletteSet
-        get() = TODO("not implemented")
 
 
     override val activeData: ArrangedMediumData? get() {
