@@ -57,6 +57,9 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         }
     }
 
+    operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
+    operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {field = value}
+
     class Bound<T>(private val bindable: Bindable<T>) {
         operator fun getValue(thisRef: Any, prop: KProperty<*>): T = bindable.field
         operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {bindable.field = value}

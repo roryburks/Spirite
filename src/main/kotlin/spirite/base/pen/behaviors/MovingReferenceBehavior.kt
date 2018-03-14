@@ -3,7 +3,7 @@ package spirite.base.pen.behaviors
 import spirite.base.pen.Penner
 import spirite.base.util.f
 
-class GlobalReferenceMoveBehavior( penner: Penner) : PennerBehavior(penner) {
+class MovingReferenceBehavior(penner: Penner) : PennerBehavior(penner) {
     override fun onStart() {}
     override fun onTock() {}
     override fun onMove() {

@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
-import spirite.base.brains.tools.ToolSchemes.PenDrawMode
-import spirite.base.brains.tools.ToolSchemes.PenDrawMode.NORMAL
+import spirite.base.brains.toolset.PenDrawMode
+import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.pen.stroke.StrokeParams.Method.BASIC
 import spirite.base.util.Color
 import spirite.base.util.Colors

@@ -19,7 +19,7 @@ class PrimaryGroupTree(
 ) : MovableGroupTree( workspace.undoEngine) {
     override val treeDescription: String get() = "Primary Group Tree"
 
-    fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null) : LayerNode{
+    fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
         val medium = when( type) {
             DYNAMIC -> DynamicMedium(workspace, DynamicImage())
             FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height))
@@ -31,6 +31,9 @@ class PrimaryGroupTree(
         val layerNode = LayerNode( null, getNonDuplicateName(name), layer)
 
         insertNode( contextNode, layerNode)
+
+        if( select)
+            selectedNode = layerNode
 
         return layerNode
     }

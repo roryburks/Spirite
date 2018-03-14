@@ -1,10 +1,10 @@
 package spirite.base.pen
 
 import spirite.base.brains.palette.IPaletteManager
-import spirite.base.brains.tools.IToolsetManager
-import spirite.base.brains.tools.Tool.PEN
+import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.brains.toolset.Pen
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.graphics.rendering.RenderEngine
+import spirite.base.imageData.mediums.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.behaviors.*
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f
@@ -69,7 +69,7 @@ class Penner(
 
     var pressure = 1.0f ; private set
 
-    private var behavior : PennerBehavior? = null
+    var behavior : PennerBehavior? = null
         set(new) {
             val old = field
             field = new
@@ -106,29 +106,33 @@ class Penner(
         when {
             behavior != null -> behavior?.onPenDown()
             context.currentWorkspace?.referenceManager?.editingReference ?: false -> when {
-                holdingCtrl -> behavior = ZoomingReferenceBehavior(this)
+                holdingCtrl ->  behavior = ZoomingReferenceBehavior(this)
                 holdingShift -> behavior = RotatingReferenceBehavior( this)
-                else -> behavior = GlobalReferenceMoveBehavior(this)
+                else ->         behavior = MovingReferenceBehavior(this)
             }
             drawer != null -> {
                 val tool = toolsetManager.selectedTool
+                val color = paletteManager.getActiveColor(if( button == LEFT) 0 else 1)
 
                 when( tool) {
-                    PEN -> when {
+                    is Pen -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
+                        drawer is IStrokeModule -> behavior = PenBehavior.Stroke(this, drawer, color)
                     }
                 }
 
             }
         }
+        println(behavior)
     }
 
     override fun penUp(button: MouseButton) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        behavior?.onPenUp()
     }
 
     override fun reset() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        behavior = null
+        context.redraw()
     }
 
     override fun rawUpdateX(rawX: Int) {
@@ -143,7 +147,7 @@ class Penner(
         yDerived.reset()
     }
 
-    override fun rawUpdatePressure(pressure: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun rawUpdatePressure(rawPressure: Float) {
+        pressure = rawPressure
     }
 }

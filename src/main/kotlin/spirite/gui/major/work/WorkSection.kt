@@ -7,6 +7,14 @@ import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
 import spirite.base.brains.Observable
+import spirite.base.brains.palette.IPaletteManager
+import spirite.base.brains.palette.PaletteManager
+import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.brains.toolset.ToolsetManager
+import spirite.base.graphics.rendering.IRenderEngine
+import spirite.base.graphics.rendering.RenderEngine
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.f
 import spirite.base.util.floor
@@ -49,11 +57,16 @@ interface IWorkSection {
     val penner: Penner
 }
 
-class WorkSection(workspaceSet: IWorkspaceSet)
+class WorkSection(
+        workspaceSet: IWorkspaceSet,
+        toolsetManager: IToolsetManager,
+        paletteManager: IPaletteManager,
+        renderEngine: IRenderEngine
+)
     : SPanel(), IComponent
 {
     private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
-    val penner = Penner(this)
+    val penner = Penner(this, toolsetManager, renderEngine, paletteManager)
 
     var currentWorkspace: IImageWorkspace? = null ; private set
     val currentView : WorkSectionView? get() {
@@ -197,6 +210,11 @@ class WorkSection(workspaceSet: IWorkspaceSet)
     }
     // endregion
 
+    val imageObserver : ImageObserver =  object: ImageObserver {
+        override fun imageChanged(evt: ImageChangeEvent) {
+            redraw()
+        }
+    }
 
     val workspaceOvserver = object: WorkspaceObserver {
         override fun workspaceCreated(newWorkspace: IImageWorkspace) {
@@ -215,6 +233,9 @@ class WorkSection(workspaceSet: IWorkspaceSet)
         override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
             _viewObservable.trigger { it.invoke() }
             currentWorkspace = selectedWorkspace
+
+            previousSelected?.imageObservatory?.imageObservers?.removeObserver(imageObserver)
+            selectedWorkspace?.imageObservatory?.imageObservers?.addObserver(imageObserver)
 
             when( selectedWorkspace) {
                 null -> {

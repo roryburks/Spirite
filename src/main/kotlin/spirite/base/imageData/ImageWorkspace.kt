@@ -96,8 +96,7 @@ class ImageWorkspace(
         get() = TODO("not implemented")
     override val selectionEngine: ISelectionEngine
         get() = TODO("not implemented")
-    override val referenceManager: ReferenceManager
-        get() = TODO("not implemented")
+    override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet
         get() = TODO("not implemented")
 

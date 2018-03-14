@@ -51,6 +51,7 @@ abstract class StrokeBehavior(penner: Penner, val drawer : IStrokeModule) : Penn
     }
 
     override fun onEnd() {drawer.endStroke()}
+    override fun onMove() {}
 
     abstract fun makeStroke(): StrokeParams
 }

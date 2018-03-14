@@ -20,7 +20,6 @@ abstract class PennerBehavior(
 
     fun end() {
         // This effectively ends the state behavior
-        onEnd()
         penner.behavior = null
     }
 }
