@@ -13,6 +13,8 @@ interface IHybrid {
 
     val gl : IGL
     val gle : GLEngine
+
+    fun beep()
 }
 
 object Hybrid : IHybrid {
@@ -23,5 +25,7 @@ object Hybrid : IHybrid {
     override val imageCreator: IImageCreator get() = EngineLaunchpoint
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
 
-
+    override fun beep() {
+        java.awt.Toolkit.getDefaultToolkit().beep()
+    }
 }

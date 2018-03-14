@@ -145,9 +145,25 @@ class WorkSection(workspaceSet: IWorkspaceSet)
             })
         }
 
-        workAreaContainer.onMouseMove = {penner.rawUpdateX(it.point.x); penner.rawUpdateY(it.point.y)}
-        workAreaContainer.onMousePress = {penner.penDown()}
-        workAreaContainer.onMouseRelease = {penner.penUp()}
+        workAreaContainer.onMouseMove = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.rawUpdateX(it.point.x)
+            penner.rawUpdateY(it.point.y)
+        }
+        workAreaContainer.onMousePress = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.penDown(it.button)
+        }
+        workAreaContainer.onMouseRelease = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.penUp(it.button)
+        }
         Hybrid.timing.createTimer({penner.step()}, 15, true)
 
         coordinateLabel.label = "Coordinate Label"

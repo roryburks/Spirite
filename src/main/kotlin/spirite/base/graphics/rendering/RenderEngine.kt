@@ -4,9 +4,11 @@ import spirite.base.brains.ICentralObservatory
 import spirite.base.graphics.IImage
 import spirite.base.graphics.IImageTracker
 import spirite.base.graphics.RawImage
+import spirite.base.graphics.rendering.sources.GroupNodeSource
 import spirite.base.graphics.rendering.sources.RenderSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
+import spirite.base.imageData.IImageWorkspace
 import spirite.hybrid.Hybrid
 
 /**
@@ -16,6 +18,8 @@ import spirite.hybrid.Hybrid
  */
 interface IRenderEngine {
     fun renderImage( target: RenderTarget, cache: Boolean = false) : IImage
+    fun renderWorkspace( workspace: IImageWorkspace) :IImage =
+            renderImage( RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace), RenderSettings(workspace.width, workspace.height)), false)
 }
 
 data class RenderTarget(

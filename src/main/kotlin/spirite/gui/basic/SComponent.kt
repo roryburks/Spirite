@@ -1,11 +1,13 @@
 package spirite.gui.basic
 
 import spirite.gui.SUIPoint
+import spirite.gui.basic.IComponent.MouseButton.*
 import spirite.gui.basic.IComponent.MouseEvent
 import spirite.gui.basic.IComponent.MouseWheelEvent
+import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
 import javax.swing.JComponent
-import javax.swing.JPanel
+import java.awt.event.MouseEvent as JMouseEvent
 
 interface ISComponent : IComponent{
     val component : JComponent
@@ -88,18 +90,31 @@ abstract class ASComponent : ISComponent {
         :java.awt.event.MouseListener, java.awt.event.MouseMotionListener
     {
 
-        fun convert( e: java.awt.event.MouseEvent) : MouseEvent {
+        fun convert( e: JMouseEvent) : MouseEvent {
             val scomp = SComponentDirect( e.component as JComponent )
-            return MouseEvent(SUIPoint(e.x, e.y, scomp))
+            val smask = e.modifiersEx
+            val mask = MouseEvent.toMask(
+                    (smask and SHIFT_DOWN_MASK) == SHIFT_DOWN_MASK,
+                    (smask and CTRL_DOWN_MASK) == CTRL_DOWN_MASK,
+                    (smask and ALT_DOWN_MASK) == ALT_DOWN_MASK)
+            return MouseEvent(
+                    SUIPoint(e.x, e.y, scomp),
+                    when( e.button) {
+                        JMouseEvent.BUTTON1 -> LEFT
+                        JMouseEvent.BUTTON2 -> CENTER
+                        JMouseEvent.BUTTON3 -> RIGHT
+                        else -> UNKNOWN
+                    },
+                    mask)
         }
 
-        override fun mouseReleased(e: java.awt.event.MouseEvent) { onMouseRelease?.invoke( convert(e))}
-        override fun mouseEntered(e: java.awt.event.MouseEvent) { onMouseEnter?.invoke( convert(e))}
-        override fun mouseClicked(e: java.awt.event.MouseEvent) {onMouseClick?.invoke(convert(e))}
-        override fun mouseExited(e: java.awt.event.MouseEvent) {onMouseExit?.invoke(convert(e))}
-        override fun mousePressed(e: java.awt.event.MouseEvent) {onMousePress?.invoke(convert(e))}
-        override fun mouseMoved(e: java.awt.event.MouseEvent) {onMouseMove?.invoke(convert(e))}
-        override fun mouseDragged(e: java.awt.event.MouseEvent) { onMouseDrag?.invoke(convert(e))}
+        override fun mouseReleased(e: JMouseEvent) { onMouseRelease?.invoke( convert(e))}
+        override fun mouseEntered(e: JMouseEvent) { onMouseEnter?.invoke( convert(e))}
+        override fun mouseClicked(e: JMouseEvent) {onMouseClick?.invoke(convert(e))}
+        override fun mouseExited(e: JMouseEvent) {onMouseExit?.invoke(convert(e))}
+        override fun mousePressed(e: JMouseEvent) {onMousePress?.invoke(convert(e))}
+        override fun mouseMoved(e: JMouseEvent) {onMouseMove?.invoke(convert(e))}
+        override fun mouseDragged(e: JMouseEvent) { onMouseDrag?.invoke(convert(e))}
     }
 
     // endregion

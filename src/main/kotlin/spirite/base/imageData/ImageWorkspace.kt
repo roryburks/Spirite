@@ -38,7 +38,7 @@ interface IImageWorkspace {
     val undoEngine : IUndoEngine
     val animationManager : IAnimationManager
     val selectionEngine : ISelectionEngine
-    val referenceManager : ReferenceManager
+    val referenceManager : IReferenceManager
     val paletteSet : PaletteSet
     val mediumRepository : IMediumRepository
 //	public StagingManager getStageManager() {return stagingManager;}
@@ -51,7 +51,7 @@ interface IImageWorkspace {
 
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
-    val activeDrawer : IImageDrawer
+    val activeDrawer : IImageDrawer?
     fun getDrawerForNode( node: Node) : IImageDrawer
 
     val imageObservatory: IImageObservatory
