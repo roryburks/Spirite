@@ -29,8 +29,8 @@ fun ApproximateBinarySearch(increasing:FloatArray, toFind:Float):Float {
 	}
 	
 	return when {
-		min >= length	-> (length-1).toFloat()
+		min >= length	-> length-1f
 		min == 0 		-> 0f
-		else  			-> (toFind - t[min - 1]) / (t[min] - t[min - 1]).toFloat() + (min-1)
+		else  			-> (toFind - t[min - 1]) / (t[min] - t[min - 1]) + (min-1)
 	}
 }

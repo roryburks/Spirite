@@ -1,11 +1,9 @@
 package spirite.gui.advanced.crossContainer
 
 import spirite.gui.Orientation
-import spirite.gui.basic.IComponent
-import spirite.gui.basic.SPanel
-import javax.swing.JPanel
+import spirite.pc.gui.basic.SwPanel
 
-open class CrossContainer(constructor: CrossInitializer.()->Unit): SPanel()
+open class CrossContainer(constructor: CrossInitializer.()->Unit): SwPanel()
 {
     val rootOrientation: Orientation
     internal val rootGroup : CSE_Group?

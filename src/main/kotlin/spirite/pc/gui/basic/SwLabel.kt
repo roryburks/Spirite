@@ -1,21 +1,17 @@
-package spirite.gui.basic
+package spirite.pc.gui.basic
 
 import spirite.gui.Skin
+import spirite.gui.basic.ILabel
 import java.awt.Color
-import javax.swing.JComponent
 import javax.swing.JLabel
 
-interface ILabel : IComponent {
-    var label : String
-    var textColor : Color
-}
 
-class SLabel
-private constructor( val imp : SLabelImp)
+class SwLabel
+private constructor( val imp : SwLabelImp)
     : ILabel,
-        ISComponent by SComponentDirect(imp)
+        ISwComponent by SwComponent(imp)
 {
-    constructor( text: String = "") : this(SLabelImp(text))
+    constructor( text: String = "") : this(SwLabelImp(text))
 
     override var label: String
         get() = imp.text
@@ -24,7 +20,7 @@ private constructor( val imp : SLabelImp)
         get() = imp.foreground
         set(value) {imp.foreground = value}
 
-    private class SLabelImp( text: String) : JLabel(text) {
+    private class SwLabelImp( text: String) : JLabel(text) {
         init {
             foreground = Skin.Global.Text.color
         }

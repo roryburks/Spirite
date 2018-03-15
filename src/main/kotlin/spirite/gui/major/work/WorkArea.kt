@@ -1,21 +1,13 @@
 package spirite.gui.major.work
 
 import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.rendering.RenderTarget
-import spirite.base.graphics.rendering.sources.GroupNodeSource
-import spirite.base.util.ColorARGB32
-import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
-import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.gui.Skin
-import spirite.gui.basic.ISComponent
+import spirite.pc.gui.basic.ISwComponent
 
 abstract class WorkArea(
         val context: WorkSection) {
-    abstract val scomponent: ISComponent
+    abstract val scomponent: ISwComponent
 
     fun drawWork( gc: GraphicsContext) {
         gc.clear( Skin.Global.Bg.scolor)
@@ -28,8 +20,7 @@ abstract class WorkArea(
             gc.transform = view.tWorkspaceToScreen
             gc.drawTransparencyBG(0, 0, 200, 200, 8)
 
-            val img =
-            workspace.renderEngine.renderImage(RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace)))
+            val img = workspace.renderEngine.renderWorkspace(workspace)
             gc.renderImage(img, 0, 0)
             //gc.fillRect(0, 0, 200, 200)
         }

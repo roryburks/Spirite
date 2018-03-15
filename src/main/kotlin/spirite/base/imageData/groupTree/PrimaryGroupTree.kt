@@ -10,7 +10,7 @@ import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.util.StringUtil
-import spirite.debug.SpiriteException
+import spirite.base.util.debug.SpiriteException
 import spirite.hybrid.Hybrid
 
 class PrimaryGroupTree(

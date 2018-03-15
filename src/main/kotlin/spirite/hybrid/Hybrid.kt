@@ -2,6 +2,8 @@ package spirite.hybrid
 
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.IGL
+import spirite.pc.gui.basic.IComponentProvider
+import spirite.pc.gui.basic.SwingComponentProvider
 import spirite.pc.JOGL.JOGLProvider
 
 
@@ -10,6 +12,7 @@ interface IHybrid {
     val imageCreator : IImageCreator
     val imageConverter : ImageConverter
     val timing : ITimerEngine
+    val ui : IComponentProvider
 
     val gl : IGL
     val gle : GLEngine
@@ -18,6 +21,7 @@ interface IHybrid {
 }
 
 object Hybrid : IHybrid {
+    override val ui: IComponentProvider get() = SwingComponentProvider
     override val timing: ITimerEngine get() = STimerEngine
     override val gle: GLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl

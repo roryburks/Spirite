@@ -1,19 +1,23 @@
-package spirite.gui.basic
+package spirite.pc.gui.basic
 
 import spirite.gui.SUIPoint
-import spirite.gui.basic.IComponent.MouseButton.*
-import spirite.gui.basic.IComponent.MouseEvent
-import spirite.gui.basic.IComponent.MouseWheelEvent
+import spirite.gui.basic.IComponent
+import spirite.gui.basic.IComponent.BasicCursor
+import spirite.gui.basic.events.MouseEvent.MouseButton.*
+import spirite.gui.basic.events.MouseEvent
+import spirite.gui.basic.events.MouseWheelEvent
+import spirite.gui.basic.Invokable
+import java.awt.Cursor
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
 import javax.swing.JComponent
 import java.awt.event.MouseEvent as JMouseEvent
 
-interface ISComponent : IComponent{
-    val component : JComponent
+interface ISwComponent : IComponent {
+    override val component : JComponent
 }
 
-abstract class ASComponent : ISComponent {
+abstract class ASwComponent : ISwComponent {
     override fun redraw() {component.repaint()}
 
     override var enabled: Boolean
@@ -21,6 +25,25 @@ abstract class ASComponent : ISComponent {
         set(value) {component.isEnabled = value}
     override val height: Int get() = component.height
     override val width: Int get() = component.width
+
+    override fun setBasicCursor(cursor: BasicCursor) {
+        component.cursor = Cursor.getPredefinedCursor(when( cursor) {
+            IComponent.BasicCursor.CROSSHAIR -> Cursor.CROSSHAIR_CURSOR
+            IComponent.BasicCursor.DEFAULT -> Cursor.DEFAULT_CURSOR
+            IComponent.BasicCursor.E_RESIZE -> Cursor.E_RESIZE_CURSOR
+            IComponent.BasicCursor.HAND -> Cursor.HAND_CURSOR
+            IComponent.BasicCursor.MOVE -> Cursor.MOVE_CURSOR
+            IComponent.BasicCursor.N_RESIZE -> Cursor.N_RESIZE_CURSOR
+            IComponent.BasicCursor.NE_RESIZE -> Cursor.NE_RESIZE_CURSOR
+            IComponent.BasicCursor.NW_RESIZE -> Cursor.NW_RESIZE_CURSOR
+            IComponent.BasicCursor.S_RESIZE -> Cursor.S_RESIZE_CURSOR
+            IComponent.BasicCursor.SE_RESIZE -> Cursor.SE_RESIZE_CURSOR
+            IComponent.BasicCursor.SW_RESIZE -> Cursor.SW_RESIZE_CURSOR
+            IComponent.BasicCursor.TEXT -> Cursor.TEXT_CURSOR
+            IComponent.BasicCursor.W_RESIZE -> Cursor.W_RESIZE_CURSOR
+            IComponent.BasicCursor.WAIT -> Cursor.WAIT_CURSOR
+        })
+    }
 
     // region ComponentListener
     override var onResize: (() -> Unit)?
@@ -91,7 +114,7 @@ abstract class ASComponent : ISComponent {
     {
 
         fun convert( e: JMouseEvent) : MouseEvent {
-            val scomp = SComponentDirect( e.component as JComponent )
+            val scomp = SwComponent(e.component as JComponent)
             val smask = e.modifiersEx
             val mask = MouseEvent.toMask(
                     (smask and SHIFT_DOWN_MASK) == SHIFT_DOWN_MASK,
@@ -99,7 +122,7 @@ abstract class ASComponent : ISComponent {
                     (smask and ALT_DOWN_MASK) == ALT_DOWN_MASK)
             return MouseEvent(
                     SUIPoint(e.x, e.y, scomp),
-                    when( e.button) {
+                    when (e.button) {
                         JMouseEvent.BUTTON1 -> LEFT
                         JMouseEvent.BUTTON2 -> CENTER
                         JMouseEvent.BUTTON3 -> RIGHT
@@ -123,9 +146,9 @@ abstract class ASComponent : ISComponent {
         get() = mouseWheelListener.onWheelMove
         set(value) {mouseWheelListener.onWheelMove = value}
     private val mouseWheelListener by lazy { JSMouseWheelListener().apply { component.addMouseWheelListener( this) }}
-    private class JSMouseWheelListener( var onWheelMove : ((IComponent.MouseWheelEvent)-> Unit)? = null) : MouseWheelListener {
+    private class JSMouseWheelListener( var onWheelMove : ((MouseWheelEvent)-> Unit)? = null) : MouseWheelListener {
         fun convert( e: java.awt.event.MouseWheelEvent) : MouseWheelEvent {
-            val scomp = SComponentDirect( e.component as JComponent )
+            val scomp = SwComponent(e.component as JComponent)
             return MouseWheelEvent(SUIPoint(e.x, e.y, scomp), e.wheelRotation)
         }
 
@@ -133,10 +156,10 @@ abstract class ASComponent : ISComponent {
     }
 }
 
-class SComponent( cGetter : Invokable<JComponent>) : ASComponent() {
+class SwComponentIndirect(cGetter : Invokable<JComponent>) : ASwComponent() {
     override val component: JComponent by lazy { cGetter.invoker.invoke() }
 
 }
 
-class SComponentDirect( override val component: JComponent) : ASComponent()
+class SwComponent(override val component: JComponent) : ASwComponent()
 

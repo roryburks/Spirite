@@ -4,15 +4,16 @@ import spirite.base.util.MUtil
 import spirite.base.util.groupExtensions.then
 import spirite.gui.advanced.IResizeContainerPanel.IResizeBar
 import spirite.gui.basic.IComponent
-import spirite.gui.basic.SPanel
-import spirite.gui.basic.SToggleButton
+import spirite.pc.gui.basic.SwPanel
 import spirite.gui.Bindable
 import spirite.gui.Bindable.Bound
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.Skin.ResizePanel.BarLineColor
-import spirite.gui.basic.IComponent.MouseEvent
+import spirite.gui.basic.events.MouseEvent
+import spirite.gui.basic.ICrossPanel
+import spirite.hybrid.Hybrid
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent
@@ -36,8 +37,9 @@ interface IResizeContainerPanel : IComponent
 class ResizeContainerPanel(
         stretchComponent: IComponent,
         orientation: Orientation,
-        private val defaultSize: Int = 100
-) : SPanel(), IResizeContainerPanel {
+        private val defaultSize: Int = 100,
+        private val panel : ICrossPanel = Hybrid.ui.CrossPanel()
+) : IComponent by panel, IResizeContainerPanel {
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)
@@ -46,10 +48,6 @@ class ResizeContainerPanel(
 
     private val leadingBars = mutableListOf<ResizeBar>()
     private val trailingBars = mutableListOf<ResizeBar>()
-
-    init {
-    }
-
 
     override fun getPanel( index: Int) : ResizeBar? = when {
         index < 0 && -index <= leadingBars.size -> leadingBars[-index-1]
@@ -89,7 +87,7 @@ class ResizeContainerPanel(
 
 
     private fun resetLayout() {
-        setLayout {
+        panel.setLayout {
             leadingBars.forEach { bar ->
                 if( bar.componentVisible)
                     rows.add( bar.resizeComponent, height = bar.size)
@@ -105,12 +103,15 @@ class ResizeContainerPanel(
         }
     }
 
-    inner class ResizeBar(
+    inner class ResizeBar
+    internal constructor(
             defaultSize: Int,
             minSize: Int,
             component: IComponent,
-            private val trailing: Boolean
-    ) : SPanel(), IResizeBar {
+            private val trailing: Boolean,
+            private val panel: ICrossPanel = Hybrid.ui.CrossPanel())
+        : IComponent by panel, IResizeBar
+    {
         var size : Int = defaultSize ; private set
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
@@ -123,19 +124,21 @@ class ResizeContainerPanel(
             onMousePress = {tracker.onMousePress(it)}
             onMouseDrag = {tracker.onMouseDrag(it)}
 
-            val btnExpand = SToggleButton(true)
+            val btnExpand =  Hybrid.ui.ToggleButton(true)
             btnExpand.plainStyle = true
             btnExpand.checkBindable.bind(componentVisibleBindable)
 
-            val pullBar = SPanel {g->
+            // TODO: Figure out the best way to decouple single-use components that require custom drawing/arrangement
+            // from any particular UI, even if it means that each UI implementation has to create them from scratch.
+            val pullBar = SwPanel { g ->
                 g.color = BarLineColor.color
-                when( orientation) {
+                when (orientation) {
                     HORIZONATAL -> {
                         val depth = width
                         val breadth = height
-                        g.drawLine( depth/2-2, 10, depth/2-2, breadth-10)
-                        g.drawLine( depth/2, 5, depth/2, breadth-5)
-                        g.drawLine( depth/2+2, 10, depth/2+2, breadth-10)
+                        g.drawLine(depth / 2 - 2, 10, depth / 2 - 2, breadth - 10)
+                        g.drawLine(depth / 2, 5, depth / 2, breadth - 5)
+                        g.drawLine(depth / 2 + 2, 10, depth / 2 + 2, breadth - 10)
                     }
                     VERTICAL -> {
                         val depth = height
@@ -147,7 +150,7 @@ class ResizeContainerPanel(
                 }
             }
 
-            setLayout {
+            panel.setLayout {
                 cols.add( btnExpand, width = 12)
                 cols.add( pullBar)
                 cols.height = barSize

@@ -1,7 +1,8 @@
 package spirite.gui
 
 import spirite.gui.basic.IComponent
-import spirite.gui.basic.ISComponent
+import spirite.pc.gui.basic.ISwComponent
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 abstract class UIPoint(
@@ -12,13 +13,13 @@ abstract class UIPoint(
     abstract fun convert( other: IComponent) : UIPoint
 }
 
-class SUIPoint( x:Int, y:Int, component: ISComponent) : UIPoint(x, y, component)
+class SUIPoint( x:Int, y:Int, component: ISwComponent) : UIPoint(x, y, component)
 {
     override fun convert(other: IComponent) = when( other) {
-        is ISComponent -> {
-            val converted = SwingUtilities.convertPoint( (component as ISComponent).component, x, y, other.component)
+        is ISwComponent -> {
+            val converted = SwingUtilities.convertPoint( component.component as JComponent, x, y, other.component)
             SUIPoint( converted.x, converted.y, other)
         }
-        else -> throw Exception("Tried to mix an SComponent with $component")
+        else -> throw Exception("Tried to mix an SwComponentIndirect with $component")
     }
 }

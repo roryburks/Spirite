@@ -2,8 +2,7 @@ package sjunit.spirite.gui
 
 import org.junit.Test
 import spirite.gui.advanced.crossContainer.CrossContainer
-import spirite.gui.basic.SButton
-import spirite.gui.basic.SLabel
+import spirite.hybrid.Hybrid
 
 class CrossContainerTests {
     @Test
@@ -13,19 +12,19 @@ class CrossContainerTests {
         }
         val x = CrossContainer {
             rows += {
-                add(SButton("wac"), flex = 1f)
-                add(SButton("vscroll"), width = 8)
+                add(Hybrid.ui.Button("wac"), flex = 1f)
+                add(Hybrid.ui.Button("vscroll"), width = 8)
                 flex = 1f
             }
             rows += {
-                add(SButton("hscroll"), flex = 1f)
-                add(SButton("zoom"), width = 8)
+                add(Hybrid.ui.Button("hscroll"), flex = 1f)
+                add(Hybrid.ui.Button("zoom"), width = 8)
                 height = 8
             }
             rows += {
-                add(SLabel("CoordinateLabel"))
+                add(Hybrid.ui.Label("CoordinateLabel"))
                 addGap(0, 3, Int.MAX_VALUE)
-                add(SLabel("MessageLabel"))
+                add(Hybrid.ui.Label("MessageLabel"))
                 height = 24
             }
         }

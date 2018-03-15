@@ -1,26 +1,23 @@
-package spirite.gui.basic
+package spirite.pc.gui.basic
 
 import spirite.gui.Skin
+import spirite.gui.basic.IButton
 import javax.swing.BorderFactory
 import javax.swing.JButton
-import javax.swing.JComponent
 import javax.swing.border.BevelBorder
 
-interface IButton : IComponent {
-    var action: (()->Unit)?
-}
 
-class SButton
-private constructor( val imp: SButtonImp)
-    : IButton, ISComponent by SComponentDirect(imp)
+class SwButton
+private constructor( val imp: SwButtonImp)
+    : IButton, ISwComponent by SwComponent(imp)
 {
-    constructor(str: String? = null) : this(SButtonImp(str))
+    constructor(str: String? = null) : this(SwButtonImp(str))
 
     override var action: (() -> Unit)?
         get() = imp.action
         set(value) { imp.action = value}
 
-    private class SButtonImp( str: String? = null) : JButton() {
+    private class SwButtonImp( str: String? = null) : JButton() {
         var action: (() -> Unit)? = null
 
         init {

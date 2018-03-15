@@ -3,9 +3,8 @@ package demonstration
 import spirite.base.util.InvertibleFunction
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.basic.IButton
-import spirite.gui.basic.SButton
-import spirite.gui.basic.SGradientSlider
 import spirite.gui.advanced.ResizeContainerPanel
+import spirite.hybrid.Hybrid
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame
@@ -19,14 +18,14 @@ class SGradientSliderDemo : JFrame() {
     init {
         layout = GridLayout()
 
-        val sliderThing = SGradientSlider(label = "Thing: ")
+        val sliderThing = Hybrid.ui.GradientSlider(label = "Thing: ")
 
-        val buttonReset : IButton = SButton("SetThing")
+        val buttonReset : IButton = Hybrid.ui.Button("SetThing")
         buttonReset.action = { sliderThing.value = 0.5f }
 
 
-        val sliderBound1 = SGradientSlider(label = "Bound 1 (x^2):")
-        val sliderBound2 = SGradientSlider(label = "Bound 2:")
+        val sliderBound1 = Hybrid.ui.GradientSlider(label = "Bound 1 (x^2):")
+        val sliderBound2 = Hybrid.ui.GradientSlider(label = "Bound 2:")
         sliderBound1.mutator = object: InvertibleFunction<Float> {
             override fun perform(x: Float): Float = Math.pow(x.toDouble(), 2.0).toFloat()
             override fun invert(x: Float): Float= Math.pow(x.toDouble(), 1.0/2.0).toFloat()
@@ -35,7 +34,7 @@ class SGradientSliderDemo : JFrame() {
         sliderBound1.fgGradLeft = Color(30, 160, 30)
         sliderBound1.fgGradRight = Color.BLACK
 
-        val disabledSlider = SGradientSlider(label = "Disabled")
+        val disabledSlider = Hybrid.ui.GradientSlider(label = "Disabled")
         disabledSlider.value = 0.4f
         //disabledSlider.imp.isEnabled = false
 

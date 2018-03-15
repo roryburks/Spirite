@@ -14,7 +14,6 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.Orientation.HORIZONATAL
-import spirite.gui.basic.SButton
 import spirite.gui.advanced.ResizeContainerPanel
 import spirite.gui.major.work.WorkSection
 import spirite.hybrid.Hybrid
@@ -47,7 +46,7 @@ class WorkSectionDemo : JFrame() {
 
         resize.minStretch = 100
 
-        val btn = SButton("New Workspace")
+        val btn = Hybrid.ui.Button("New Workspace")
         btn.action = {
             val mockWs = TestHelper.makeShellWorkspace(200,200, renderEngine = master.renderEngine, strokeProvider = master.strokeDrawerProvider)
             master.workspaceSet.addWorkspace(mockWs)
@@ -56,18 +55,18 @@ class WorkSectionDemo : JFrame() {
                     //mockWs.groupTree.addNewSimpleLayer(null, "Layer1", FLAT, 150,150)
 //            x.x = 25
 //            x.y = 25
-            val gc = (x.layer.activeData.handle.medium as FlatMedium).image.graphics
-            gc.fillRect( 25, 25, 75,75)
+            //val gc = (x.layer.activeData.handle.medium as FlatMedium).image.graphics
+            //gc.fillRect( 25, 25, 75,75)
         }
 
-        val btn2 = SButton("Goto First Workspace")
+        val btn2 = Hybrid.ui.Button("Goto First Workspace")
         btn2.action = {
             master.workspaceSet.currentWorkspace = master.workspaceSet.workspaces.firstOrNull()
         }
 
-        val btn3 = SButton("Undo")
+        val btn3 = Hybrid.ui.Button("Undo")
         btn3.action = {master.workspaceSet.currentWorkspace?.undoEngine?.undo()}
-        val btn4 = SButton("Redo")
+        val btn4 = Hybrid.ui.Button("Redo")
         btn4.action = {master.workspaceSet.currentWorkspace?.undoEngine?.redo()}
 
         resize.addPanel(btn, 100,100,-999)

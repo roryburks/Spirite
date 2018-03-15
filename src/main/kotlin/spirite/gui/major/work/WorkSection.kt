@@ -1,35 +1,21 @@
 package spirite.gui.major.work
 
 import spirite.base.pen.Penner
-import jspirite.gui.SScrollPane.ModernScrollBarUI
 import spirite.base.brains.*
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.palette.IPaletteManager
-import spirite.base.brains.palette.PaletteManager
-import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.brains.toolset.ToolsetManager
-import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.f
-import spirite.base.util.floor
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
-import spirite.base.util.linear.Vec2i
 import spirite.base.util.round
-import spirite.gui.Bindable
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.basic.*
+import spirite.pc.gui.basic.SwPanel
 import spirite.hybrid.Hybrid
 import java.awt.Font
-import java.awt.Graphics
-import javax.swing.GroupLayout
-import javax.swing.JScrollBar
-import javax.swing.SwingUtilities
-import kotlin.math.roundToInt
 
 
 /**
@@ -54,8 +40,8 @@ interface IWorkSection {
     val penner: Penner
 }
 
-class WorkSection(val master: IMasterControl)
-    : SPanel(), IComponent
+class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui.CrossPanel())
+    : IComponent by panel
 {
     private val views = mutableMapOf<IImageWorkspace, WorkSectionView>()
     val penner = Penner(this, master.toolsetManager, master.renderEngine, master.paletteManager)
@@ -110,15 +96,16 @@ class WorkSection(val master: IMasterControl)
     }
 
     // Region UI
-    private val workAreaContainer = SPanel()
-    private val coordinateLabel = SLabel()
-    private val messageLabel = SLabel()
-    private val vScroll = SScrollBar(VERTICAL, this)
-    private val hScroll = SScrollBar(HORIZONATAL, this)
-    private val zoomPanel = SPanel {g ->
+    private val workAreaContainer = Hybrid.ui.CrossPanel()
+    private val coordinateLabel = Hybrid.ui.Label()
+    private val messageLabel = Hybrid.ui.Label()
+    private val vScroll = Hybrid.ui.ScrollBar(VERTICAL, this)
+    private val hScroll = Hybrid.ui.ScrollBar(HORIZONATAL, this)
+    private val zoomPanel = SwPanel { g ->
         val view = currentView
         when {
-            view == null -> {}
+            view == null -> {
+            }
             view.zoomLevel >= 0 -> {
                 g.font = Font("Tahoma", Font.PLAIN, 12)
                 g.drawString(Integer.toString(view.zoomLevel + 1), width - if (view.zoomLevel > 8) 16 else 12, height - 5)
@@ -137,7 +124,7 @@ class WorkSection(val master: IMasterControl)
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
 
-        val glWorkArea = GLWorkArea(this)
+        val glWorkArea = JOGLWorkArea(this)
         workAreaContainer.setLayout { rows.add(glWorkArea) }
 
         hScroll.scrollBind.addListener {currentView?.offsetX = it * scrollRatio}
@@ -182,7 +169,7 @@ class WorkSection(val master: IMasterControl)
 
 
         val barSize = 16
-        setLayout {
+        panel.setLayout {
             rows += {
                 add(workAreaContainer, flex = 200f)
                 add(vScroll, width = barSize)
