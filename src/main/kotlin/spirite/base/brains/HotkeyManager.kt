@@ -1,6 +1,6 @@
 package spirite.base.brains
 
-import spirite.base.brains.Settings.IPreferences
+import spirite.base.brains.settings.IPreferences
 import spirite.base.util.dataContainers.MutableOneToManyMap
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent

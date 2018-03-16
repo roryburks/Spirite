@@ -2,7 +2,7 @@ package spirite.gui.components.major.work
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.util.Colors
-import spirite.gui.Skin
+import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 
 abstract class WorkArea(

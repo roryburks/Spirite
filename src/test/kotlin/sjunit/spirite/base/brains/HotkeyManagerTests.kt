@@ -3,7 +3,7 @@ package sjunit.spirite.base.brains
 
 import spirite.base.brains.Hotkey
 import spirite.base.brains.HotkeyManager
-import spirite.base.brains.Settings.JPreferences
+import spirite.base.brains.settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import org.junit.Test as test

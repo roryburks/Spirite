@@ -1,8 +1,7 @@
-package spirite.gui
+package spirite.gui.resources
 
 import spirite.base.util.ColorARGB32Normal
 import java.awt.Color
-import javax.swing.ImageIcon
 
 object Skin {
     private val baseDDD = Color(56, 72, 100)
@@ -19,7 +18,7 @@ object Skin {
         val color : Color
         val scolor : spirite.base.util.Color get() = ColorARGB32Normal(color.rgb + (color.alpha shl 24))
     }
-    enum class DrawPanel(override val color: Color) : ColorMarker  {
+    enum class DrawPanel(override val color: Color) : ColorMarker {
         ImageBorder(Color(190, 190, 190)),
         BidBorder(Color(16,16,16)),
         LayerBorder(Color(190,190,120))
@@ -36,9 +35,9 @@ object Skin {
         SelectedBackground(Color( 160,160,196)),
         Background(Color( 238,238,238))
     }
-    enum class AnimSchemePanel(override val color: Color) : ColorMarker  {
-        ActiveNodeBg( fgD),
-        TickBg( fg)
+    enum class AnimSchemePanel(override val color: Color) : ColorMarker {
+        ActiveNodeBg(fgD),
+        TickBg(fg)
     }
     enum class WorkArea(override val color: Color) : ColorMarker {
         NormalBg( Color(238,238,238)),
@@ -48,25 +47,25 @@ object Skin {
         BarLineColor(baseDDD)
     }
     enum class TextField(override val color: Color) : ColorMarker {
-        Background( fg)
+        Background(fg)
     }
     enum class TabbedPane(override val color: Color) : ColorMarker {
-        SelectedBg( fg),
-        UnselectedBg( base),
-        TabBorder( baseD),
+        SelectedBg(fg),
+        UnselectedBg(base),
+        TabBorder(baseD),
         TabText( Color(255,255,255))
     }
     enum class BevelBorder(override val color: Color) : ColorMarker {
-        Light( fgD),
-        Med( baseD),
+        Light(fgD),
+        Med(baseD),
         Dark(baseDD),
         Darker(baseDDD)
     }
     enum class Global(override val color: Color) : ColorMarker {
-        BgDark( baseDD),
-        Bg( base),
-        Fg( fg),
-        FgLight( fgL),
+        BgDark(baseDD),
+        Bg(base),
+        Fg(fg),
+        FgLight(fgL),
         Text( Color(190,205,220)),
         TextDark( Color( 57, 62, 66))
     }

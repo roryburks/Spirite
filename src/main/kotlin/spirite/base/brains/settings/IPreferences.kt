@@ -1,4 +1,4 @@
-package spirite.base.brains.Settings
+package spirite.base.brains.settings
 
 import java.util.prefs.Preferences
 

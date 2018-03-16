@@ -1,4 +1,4 @@
-package spirite.base.brains.Settings
+package spirite.base.brains.settings
 
 import spirite.base.util.delegates.MutableLazy
 import spirite.base.util.interpolation.CubicSplineInterpolator

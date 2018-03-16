@@ -9,7 +9,7 @@ import spirite.gui.Bindable.Bound
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.Skin.ResizePanel.BarLineColor
+import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.ICrossPanel

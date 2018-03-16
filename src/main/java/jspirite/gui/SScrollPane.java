@@ -1,6 +1,6 @@
 package jspirite.gui;
 
-import spirite.gui.Skin.Global;
+import spirite.gui.resources.Skin.Global;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicScrollBarUI;

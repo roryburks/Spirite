@@ -1,9 +1,8 @@
 package spirite.base.imageData
 
-import spirite.base.brains.Settings.ISettingsManager
+import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -15,7 +14,6 @@ import spirite.base.imageData.mediums.drawer.NillImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
-import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import java.io.File

@@ -1,25 +1,22 @@
 package spirite.base.brains
 
-import spirite.base.brains.Settings.ISettingsManager
-import spirite.base.brains.Settings.JPreferences
-import spirite.base.brains.Settings.SettingsManager
+import spirite.base.brains.commands.CentralCommandExecutor
+import spirite.base.brains.commands.ICentralCommandExecutor
+import spirite.base.brains.commands.ICommandExecuter
+import spirite.base.brains.settings.ISettingsManager
+import spirite.base.brains.settings.JPreferences
+import spirite.base.brains.settings.SettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteManager
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.ToolsetManager
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.ResourceUseTracker
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.base.pen.stroke.StrokeParams
-import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.resources.JClassScriptService
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective
  * you can think of it as the primary provider.
@@ -38,7 +35,7 @@ interface IMasterControl {
     val toolsetManager: IToolsetManager
     val renderEngine: IRenderEngine
     val resourceUseTracker : IResourceUseTracker
-
+    val commandExecuter : ICentralCommandExecutor
 }
 
 class MasterControl() : IMasterControl {
@@ -57,4 +54,5 @@ class MasterControl() : IMasterControl {
     override val toolsetManager = ToolsetManager()
     override val resourceUseTracker = ResourceUseTracker()
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
+    override val commandExecuter = CentralCommandExecutor(workspaceSet)
 }

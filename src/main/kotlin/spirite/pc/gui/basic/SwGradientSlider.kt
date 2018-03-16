@@ -2,7 +2,7 @@ package spirite.pc.gui.basic
 
 import spirite.base.util.MUtil
 import spirite.base.util.delegates.OnChangeDelegate
-import spirite.gui.Skin
+import spirite.gui.resources.Skin
 import spirite.gui.UIUtil
 import spirite.gui.components.basic.GradientSliderNonUI
 import spirite.gui.components.basic.IGradientSlider
