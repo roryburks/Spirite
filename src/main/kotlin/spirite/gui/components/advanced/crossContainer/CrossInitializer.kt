@@ -1,9 +1,9 @@
-package spirite.gui.advanced.crossContainer
+package spirite.gui.components.advanced.crossContainer
 
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.basic.IComponent
+import spirite.gui.components.basic.IComponent
 
 class CrossInitializer {
     val rows
@@ -35,9 +35,9 @@ class CrossInitializer {
     var overwriteOrientation : Orientation? = null
 
     internal val scheme get() = when {
-        _cols != null -> CrossScheme( overwriteOrientation ?: HORIZONATAL,
+        _cols != null -> CrossScheme(overwriteOrientation ?: HORIZONATAL,
                 CSE_Group(_cols!!.entities, _cols!!.height, _cols!!.flex, false))
-        _rows != null -> CrossScheme( overwriteOrientation ?: VERTICAL,
+        _rows != null -> CrossScheme(overwriteOrientation ?: VERTICAL,
                 CSE_Group(_rows!!.entities, _rows!!.width, _rows!!.flex, false))
         else -> CrossScheme(VERTICAL, null)
     }

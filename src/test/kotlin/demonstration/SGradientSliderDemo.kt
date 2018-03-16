@@ -2,9 +2,10 @@ package demonstration
 
 import spirite.base.util.InvertibleFunction
 import spirite.gui.Orientation.HORIZONATAL
-import spirite.gui.basic.IButton
-import spirite.gui.advanced.ResizeContainerPanel
+import spirite.gui.components.basic.IButton
+import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.jcomponent
 import java.awt.Color
 import java.awt.GridLayout
 import javax.swing.JFrame
@@ -45,6 +46,6 @@ class SGradientSliderDemo : JFrame() {
         resize.addPanel(sliderBound1, 100,100,999)
         resize.addPanel(sliderBound2, 100,100,999)
 
-        add( resize.component)
+        add( resize.jcomponent)
     }
 }

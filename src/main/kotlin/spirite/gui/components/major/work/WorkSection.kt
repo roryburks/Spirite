@@ -1,4 +1,4 @@
-package spirite.gui.major.work
+package spirite.gui.components.major.work
 
 import spirite.base.pen.Penner
 import spirite.base.brains.*
@@ -12,7 +12,7 @@ import spirite.base.util.linear.Vec2
 import spirite.base.util.round
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.basic.*
+import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.SwPanel
 import spirite.hybrid.Hybrid
 import java.awt.Font

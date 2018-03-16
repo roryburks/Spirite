@@ -3,7 +3,6 @@ package demonstration
 import spirite.base.brains.MasterControl
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
-import spirite.pc.gui.RootFrame
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager

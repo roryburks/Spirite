@@ -1,6 +1,6 @@
 package spirite.gui
 
-import spirite.gui.basic.IComponent
+import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.ISwComponent
 import javax.swing.JComponent
 import javax.swing.SwingUtilities

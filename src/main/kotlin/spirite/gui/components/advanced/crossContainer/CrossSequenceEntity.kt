@@ -1,6 +1,6 @@
-package spirite.gui.advanced.crossContainer
+package spirite.gui.components.advanced.crossContainer
 
-import spirite.gui.basic.IComponent
+import spirite.gui.components.basic.IComponent
 
 sealed class CrossSequenceEntity
 

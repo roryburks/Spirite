@@ -4,10 +4,10 @@ import spirite.base.util.MUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.Skin
 import spirite.gui.UIUtil
-import spirite.gui.basic.GradientSliderNonUI
-import spirite.gui.basic.IGradientSlider
-import spirite.gui.basic.IGradientSliderNonUIImpl
-import spirite.gui.basic.events.MouseEvent
+import spirite.gui.components.basic.GradientSliderNonUI
+import spirite.gui.components.basic.IGradientSlider
+import spirite.gui.components.basic.IGradientSliderNonUIImpl
+import spirite.gui.components.basic.events.MouseEvent
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics

@@ -1,9 +1,8 @@
-package spirite.gui.advanced
+package spirite.gui.components.advanced
 
 import spirite.base.util.MUtil
 import spirite.base.util.groupExtensions.then
-import spirite.gui.advanced.IResizeContainerPanel.IResizeBar
-import spirite.gui.basic.IComponent
+import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.SwPanel
 import spirite.gui.Bindable
 import spirite.gui.Bindable.Bound
@@ -11,8 +10,9 @@ import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.Skin.ResizePanel.BarLineColor
-import spirite.gui.basic.events.MouseEvent
-import spirite.gui.basic.ICrossPanel
+import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
 import kotlin.reflect.KProperty
 

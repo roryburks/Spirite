@@ -10,9 +10,9 @@ import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Vec2
-import spirite.gui.basic.events.MouseEvent.MouseButton
-import spirite.gui.basic.events.MouseEvent.MouseButton.LEFT
-import spirite.gui.major.work.WorkSection
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
+import spirite.gui.components.major.work.WorkSection
 
 interface IPenner {
 //    val holdingShift : Boolean

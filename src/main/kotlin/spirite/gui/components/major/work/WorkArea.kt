@@ -1,4 +1,4 @@
-package spirite.gui.major.work
+package spirite.gui.components.major.work
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.util.Colors

@@ -1,4 +1,4 @@
-package spirite.gui.major.work
+package spirite.gui.components.major.work
 
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable

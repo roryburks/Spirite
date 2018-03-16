@@ -1,4 +1,4 @@
-package spirite.gui.basic.events
+package spirite.gui.components.basic.events
 
 import spirite.gui.UIPoint
 

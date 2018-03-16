@@ -14,15 +14,17 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.Orientation.HORIZONATAL
-import spirite.gui.advanced.ResizeContainerPanel
-import spirite.gui.major.work.WorkSection
+import spirite.gui.components.advanced.ResizeContainerPanel
+import spirite.gui.components.major.work.WorkSection
+import spirite.gui.components.major.work.WorkTabPane
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.jcomponent
 import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
 lateinit var master: MasterControl
-lateinit var ws: WorkSection
+lateinit var ws: WorkTabPane
 
 fun main( args: Array<String>) {
 
@@ -41,7 +43,7 @@ class WorkSectionDemo : JFrame() {
         //SwingUtilities.invokeLater {
         //}
 
-        ws = WorkSection(master)
+        ws = WorkTabPane(master)
         val resize = ResizeContainerPanel(ws, HORIZONATAL, 200)
 
         resize.minStretch = 100
@@ -74,6 +76,6 @@ class WorkSectionDemo : JFrame() {
         resize.addPanel(btn3, 100,100,999)
         resize.addPanel(btn4, 100,100,999)
 
-        add( resize.component)
+        add( resize.jcomponent)
     }
 }

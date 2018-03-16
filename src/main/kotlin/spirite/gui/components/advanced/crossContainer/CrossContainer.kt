@@ -1,4 +1,4 @@
-package spirite.gui.advanced.crossContainer
+package spirite.gui.components.advanced.crossContainer
 
 import spirite.gui.Orientation
 import spirite.pc.gui.basic.SwPanel

@@ -1,12 +1,12 @@
 package spirite.pc.gui.basic
 
 import spirite.gui.SUIPoint
-import spirite.gui.basic.IComponent
-import spirite.gui.basic.IComponent.BasicCursor
-import spirite.gui.basic.events.MouseEvent.MouseButton.*
-import spirite.gui.basic.events.MouseEvent
-import spirite.gui.basic.events.MouseWheelEvent
-import spirite.gui.basic.Invokable
+import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicCursor
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseWheelEvent
+import spirite.gui.components.basic.Invokable
 import java.awt.Cursor
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
@@ -16,6 +16,8 @@ import java.awt.event.MouseEvent as JMouseEvent
 interface ISwComponent : IComponent {
     override val component : JComponent
 }
+
+val IComponent.jcomponent get() = this.component as JComponent
 
 abstract class ASwComponent : ISwComponent {
     override fun redraw() {component.repaint()}

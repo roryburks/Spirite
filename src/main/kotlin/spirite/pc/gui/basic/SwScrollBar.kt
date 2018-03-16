@@ -4,10 +4,10 @@ import jspirite.gui.SScrollPane.ModernScrollBarUI
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.basic.IComponent
-import spirite.gui.basic.IScrollBar
-import spirite.gui.basic.IScrollBarNonUIImp
-import spirite.gui.basic.ScrollBarNonUI
+import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IScrollBar
+import spirite.gui.components.basic.IScrollBarNonUIImp
+import spirite.gui.components.basic.ScrollBarNonUI
 import javax.swing.JComponent
 import javax.swing.JScrollBar
 

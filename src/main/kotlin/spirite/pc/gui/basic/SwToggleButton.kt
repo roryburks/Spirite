@@ -1,9 +1,9 @@
 package spirite.pc.gui.basic
 
-import spirite.gui.basic.IComponent
-import spirite.gui.basic.IToggleButton
-import spirite.gui.basic.IToggleButtonNonUI
-import spirite.gui.basic.ToggleButtonNonUI
+import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IToggleButton
+import spirite.gui.components.basic.IToggleButtonNonUI
+import spirite.gui.components.basic.ToggleButtonNonUI
 import javax.swing.JToggleButton
 
 

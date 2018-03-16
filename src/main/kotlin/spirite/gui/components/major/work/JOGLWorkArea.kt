@@ -1,4 +1,4 @@
-package spirite.gui.major.work
+package spirite.gui.components.major.work
 
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities

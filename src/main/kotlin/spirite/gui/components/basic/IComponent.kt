@@ -1,7 +1,7 @@
-package spirite.gui.basic
+package spirite.gui.components.basic
 
-import spirite.gui.basic.events.MouseEvent
-import spirite.gui.basic.events.MouseWheelEvent
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseWheelEvent
 
 interface IComponent {
     val component: Any  // This should be the internal root component for things that might need it

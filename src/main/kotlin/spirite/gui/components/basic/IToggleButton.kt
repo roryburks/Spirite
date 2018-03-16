@@ -1,4 +1,4 @@
-package spirite.gui.basic
+package spirite.gui.components.basic
 
 import spirite.gui.Bindable
 import spirite.gui.Bindable.Bound

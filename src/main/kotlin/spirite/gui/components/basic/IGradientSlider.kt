@@ -1,4 +1,4 @@
-package spirite.gui.basic
+package spirite.gui.components.basic
 
 import spirite.base.util.InvertibleFunction
 import spirite.base.util.MUtil

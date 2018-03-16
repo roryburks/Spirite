@@ -1,9 +1,9 @@
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.advanced.crossContainer.CSE_Component
-import spirite.gui.advanced.crossContainer.CSE_Gap
-import spirite.gui.advanced.crossContainer.CSE_Group
-import spirite.gui.advanced.crossContainer.CrossInitializer
+import spirite.gui.components.advanced.crossContainer.CSE_Component
+import spirite.gui.components.advanced.crossContainer.CSE_Gap
+import spirite.gui.components.advanced.crossContainer.CSE_Group
+import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import java.awt.Container
 import javax.swing.GroupLayout
 import javax.swing.GroupLayout.ParallelGroup

@@ -5,13 +5,13 @@ import java.awt.Color
 import javax.swing.ImageIcon
 
 object Skin {
-    private val baseDDD = Color(0, 72, 100)
-    private val baseDD = Color(0, 90, 125)
-    private val baseD = Color(0, 90, 125)
-    private val base = Color(0, 118, 155)
-    private val fgD = Color(0, 150, 203)
-    private val fg = Color(0, 168, 223)
-    private val fgL = Color(0, 190, 240)
+    private val baseDDD = Color(56, 72, 100)
+    private val baseDD = Color(56, 90, 125)
+    private val baseD = Color(56, 90, 125)
+    private val base = Color(56, 118, 155)
+    private val fgD = Color(56, 150, 203)
+    private val fg = Color(56, 168, 223)
+    private val fgL = Color(56, 190, 240)
 
     // This seems like a weird way to do it, but it could easily be replaced to read color
     //  values from settings instead of hard-coded.
