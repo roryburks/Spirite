@@ -34,12 +34,14 @@ interface IResizeContainerPanel : IComponent
     }
 }
 
-class ResizeContainerPanel(
+open class ResizeContainerPanel
+private constructor(
         stretchComponent: IComponent,
         orientation: Orientation,
-        private val defaultSize: Int = 100,
-        private val panel : ICrossPanel = Hybrid.ui.CrossPanel()
+        private val defaultSize: Int,
+        private val panel : ICrossPanel
 ) : IComponent by panel, IResizeContainerPanel {
+    constructor(stretchComponent: IComponent,orientation: Orientation, defaultSize: Int = 100) : this(stretchComponent, orientation, defaultSize, Hybrid.ui.CrossPanel())
 
     override var minStretch: Int by LayoutDelegate(0)
     override var orientation by LayoutDelegate(orientation)
@@ -56,24 +58,28 @@ class ResizeContainerPanel(
     }
 
     override fun addPanel( component: IComponent, minSize: Int, defaultSize: Int, position: Int) : Int{
-        val position = if( position == 0) Integer.MAX_VALUE else position;
+        val p = when(position) {
+            0, Int.MAX_VALUE -> leadingBars.size + 1
+            Int.MIN_VALUE ->  -trailingBars.size - 1    // -Int.MIN_VALUE = Int.MIN_VALUE.  tricky
+            else -> position
+        }
 
         val ret = when {
-            position < 0 && -position >= trailingBars.size -> {
+            p < 0 && -p >= trailingBars.size -> {
                 trailingBars.add(ResizeBar(defaultSize, minSize, component, true))
                 -trailingBars.size
             }
-            position < 0 -> {
-                trailingBars.add(-position-1,ResizeBar(defaultSize, minSize, component, true))
-                position
+            p < 0 -> {
+                trailingBars.add(-p-1,ResizeBar(defaultSize, minSize, component, true))
+                p
             }
-            position >= leadingBars.size -> {
+            p >= leadingBars.size -> {
                 leadingBars.add(ResizeBar(defaultSize,minSize, component, false))
                 leadingBars.size
             }
             else -> {
                 leadingBars.add(ResizeBar(defaultSize, minSize, component, false))
-                position
+                p
             }
         }
 

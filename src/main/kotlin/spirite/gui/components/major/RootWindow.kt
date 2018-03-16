@@ -2,10 +2,19 @@ package spirite.gui.components.major
 
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.gui.components.advanced.omniContainer.OmniContainer
+import spirite.gui.components.advanced.omniContainer.OmniSegment
+import spirite.gui.components.advanced.omniContainer.SubContainer
+import spirite.gui.components.major.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwMenuBar
+import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
+import java.awt.Dimension
+import java.awt.GridLayout
 import javax.swing.JFrame
+import javax.swing.SwingUtilities
 
 class RootWindow( val master: MasterControl) : JFrame() {
     init /* Menu */ {
@@ -65,4 +74,28 @@ class RootWindow( val master: MasterControl) : JFrame() {
         jMenuBar = bar
     }
 
+    init /* Layout */ {
+        this.layout = GridLayout()
+
+        this.title = "Spirite"
+
+        val omni = OmniContainer {
+            left += OmniSegment(Hybrid.ui.Label("GroupView"), 100, 150)
+            center = OmniSegment(WorkTabPane(master), 200)
+            right += SubContainer( {
+                top += OmniSegment(Hybrid.ui.Label("Tools"), 100, 200)
+                top += OmniSegment(Hybrid.ui.Label("Tool Options"), 100, 100)
+
+                center = OmniSegment( Hybrid.ui.Label("Palette"), 100)
+            }, 100, 120)
+            right += SubContainer( {
+                center = OmniSegment( Hybrid.ui.Label("Reference"), 100)
+                bottom += OmniSegment( Hybrid.ui.Label("LayerInfo"), 100)
+            }, 100, 120)
+        }
+
+        this.add( omni.jcomponent)
+
+        SwingUtilities.invokeLater {this.size = Dimension(800,600) }
+    }
 }
