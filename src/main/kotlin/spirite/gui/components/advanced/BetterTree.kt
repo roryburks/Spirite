@@ -4,6 +4,8 @@ import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.Bindable
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IToggleButton
+import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import java.awt.datatransfer.Transferable
@@ -15,10 +17,22 @@ private constructor(val imp : SwTreeViewImp<T>)
     : IComponent by SwComponent(imp)
 {
     constructor() : this(SwTreeViewImp())
+    private class SwTreeViewImp<T> : JPanel() {}
 
     var gapSize by OnChangeDelegate( 12, {rebuildTree()})
     var leftSize by OnChangeDelegate(0, {rebuildTree()})
     //fun nodeAtPoint( p: Vec2i)
+
+    // region UI
+    private fun makeToggleButton( checked: Boolean) : IToggleButton {
+        val btn = Hybrid.ui.ToggleButton(checked)
+        btn.plainStyle = true
+        btn.setOnIcon(SwIcons.SmallIcons.Expanded)
+        btn.setOnIconOver(SwIcons.SmallIcons.ExpandedHighlighted)
+        btn.setOffIcon(SwIcons.SmallIcons.Unexpanded)
+        btn.setOffIconOver(SwIcons.SmallIcons.UnexpandedHighlighted)
+        return btn
+    }
 
     fun rebuildTree() {
         compToNodeMap.clear()
@@ -40,7 +54,7 @@ private constructor(val imp : SwTreeViewImp<T>)
                 if( existingGap != 0) addGap(existingGap)
                 when {
                     node.children.any() -> {
-                        val toggleButton = Hybrid.ui.ToggleButton(node.expanded)
+                        val toggleButton = makeToggleButton(node.expanded)
                         toggleButton.checkBindable.bindWeakly(node.expandedBind)
                         add(toggleButton, width = gapSize)
                     }
@@ -57,10 +71,10 @@ private constructor(val imp : SwTreeViewImp<T>)
             _rootNodes.forEach { buildCrossForNode(it, 0, rows) }
         })
         imp.validate()
-
-
     }
+    // endregion
 
+    // region Root Manipulation
     fun addRoot( value: T, attributes: TreeNodeAttributes<T>) {
         _rootNodes.add(TreeNode(value, attributes))
         rebuildTree()
@@ -74,13 +88,15 @@ private constructor(val imp : SwTreeViewImp<T>)
         rebuildTree()
     }
 
-    val _rootNodes = mutableListOf<TreeNode<T>>()
+    val rootNodes : List<TreeNode<T>> get() = _rootNodes
+    private val _rootNodes = mutableListOf<TreeNode<T>>()
+    // endregion
 
-    private class SwTreeViewImp<T> : JPanel() {}
 
-    val lCompToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
-    val compToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
+    private val lCompToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
+    private val compToNodeMap = mutableMapOf<IComponent,TreeNode<T>>()
 
+    // region TreeNode
     inner class TreeNode<T>( defaultValue: T, val attributes: TreeNodeAttributes<T>)
     {
         val expandedBind = Bindable(true, {rebuildTree()})
@@ -124,5 +140,6 @@ private constructor(val imp : SwTreeViewImp<T>)
         fun canImport( trans: Transferable) : Boolean
         //fun import
     }
+    // endRegion
 
 }

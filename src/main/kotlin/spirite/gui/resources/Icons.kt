@@ -19,7 +19,7 @@ object SwIcons {
         val sharedRoot by lazy { loadIconSheet(resourceName)}
 
         fun build(ix: Int, iy: Int) : ImageIcon {
-            val img = BufferedImage( width, height, bi_format)
+            val img = BufferedImage( width-1, height-1, bi_format)
             img.graphics.drawImage(sharedRoot, - width * ix, - height*iy, null)
             return ImageIcon(img)
         }
@@ -84,7 +84,7 @@ object SwIcons {
         Expanded( 0, 2),
         ExpandedHighlighted( 1,2),
         Unexpanded(2,2),
-        UnexpandedHighlighed(3,2),
+        UnexpandedHighlighted(3,2),
 
         ArrowS(0,3),
         ArrowW(1,3),
