@@ -1,12 +1,14 @@
 package spirite.base.imageData.layers
 
 import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.util.groupExtensions.SinglyList
 
 class SimpleLayer(val medium: MediumHandle) : Layer() {
+
     override val width: Int get() = medium.width
     override val height: Int get() = medium.height
 
@@ -18,4 +20,8 @@ class SimpleLayer(val medium: MediumHandle) : Layer() {
 
     override fun getDrawList(): List<TransformedHandle> = SinglyList(TransformedHandle(medium))
 
+
+    override fun dupe(mediumRepo : MMediumRepository): Layer {
+        return SimpleLayer(mediumRepo.addMedium(medium.medium.dupe()))
+    }
 }

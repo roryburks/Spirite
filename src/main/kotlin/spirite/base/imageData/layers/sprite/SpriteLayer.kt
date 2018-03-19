@@ -28,6 +28,7 @@ class SpriteLayer(
         val mediumRepo: MMediumRepository,
         toImport: List<Pair<MediumHandle,SpritePartStructure>>? = null
 ) : Layer() {
+
     val undoEngine = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
@@ -97,6 +98,11 @@ class SpriteLayer(
         return parts
                 .filter { it.isVisible }
                 .map {TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)}
+    }
+
+
+    override fun dupe(mediumRepo: MMediumRepository): Layer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 

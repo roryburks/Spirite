@@ -323,4 +323,51 @@ open class PrimaryGroupTreeTests {
         assertEquals(null, layer2.nextNode)
         // endregion
     }
+
+    @test fun duplicateLayerNode() {
+        val layer1 = tree.addNewSimpleLayer(null, "Layer1",FLAT,30,30)
+
+        tree.duplicateNode(layer1)
+
+        assertEquals(2, tree.root.children.size)
+        assertEquals(layer1, tree.root.children.last())
+        workspace.undoEngine.undo()
+        assertEquals(1, tree.root.children.size)
+        assertEquals(layer1, tree.root.children.last())
+        workspace.undoEngine.redo()
+        assertEquals(2, tree.root.children.size)
+        assertEquals(layer1, tree.root.children.last())
+    }
+
+    @test fun duplicateGroupNode() {
+        // Layer0
+        // Group
+        // ---- Layer1
+        // ---- SubGroup
+        // -------- Layer2
+        // ---- Layer3
+        val layer0 = tree.addNewSimpleLayer(null, "Layer0",FLAT,30,30)
+        val group = tree.addGroupNode(null, "Group")
+        val layer1 = tree.addNewSimpleLayer(group, "Layer1",FLAT,30,30)
+        val subGroup = tree.addGroupNode(group, "Subgroup")
+        val layer2 = tree.addNewSimpleLayer(subGroup, "Layer2",FLAT,30,30)
+        val layer3 = tree.addNewSimpleLayer(group, "Layer3",FLAT,30,30)
+
+        tree.duplicateNode(group)
+
+        assertEquals(3, tree.root.children.size)
+        assertEquals(7, tree.root.getLayerNodes().count())
+        assertEquals( 6, tree.root.getAllAncestors().filter { it.depth == 2 }.count())
+        assertEquals( 2, tree.root.getAllAncestors().filter { it.depth == 3 }.count())
+        workspace.undoEngine.undo()
+        assertEquals(2, tree.root.children.size)
+        assertEquals(4, tree.root.getLayerNodes().count())
+        assertEquals( 3, tree.root.getAllAncestors().filter { it.depth == 2 }.count())
+        assertEquals( 1, tree.root.getAllAncestors().filter { it.depth == 3 }.count())
+        workspace.undoEngine.redo()
+        assertEquals(3, tree.root.children.size)
+        assertEquals(7, tree.root.getLayerNodes().count())
+        assertEquals( 6, tree.root.getAllAncestors().filter { it.depth == 2 }.count())
+        assertEquals( 2, tree.root.getAllAncestors().filter { it.depth == 3 }.count())
+    }
 }

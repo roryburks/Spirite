@@ -38,6 +38,36 @@ class PrimaryGroupTree(
         return layerNode
     }
 
+    fun duplicateNode( node: Node)  {
+        workspace.undoEngine.doAsAggregateAction({
+            when( node) {
+                is LayerNode ->
+                    LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(mediumRepo))
+                            .apply { insertNode(node, this) }
+                is GroupNode -> {
+                    data class NodeContext( val toDupe: Node, val parentInDuper: GroupNode)
+                    val dupeQueue = mutableListOf<NodeContext>()
+                    val dupeRoot = this.addGroupNode(node.parent, getNonDuplicateName(node.name))
+
+                    node.children.forEach { dupeQueue.add(NodeContext(it, dupeRoot))}
+
+                    while (dupeQueue.any()) {
+                        val next = dupeQueue.removeAt(0)
+
+                        val dupe : Node? = when (next.toDupe) {
+                            is GroupNode -> addGroupNode(next.parentInDuper, getNonDuplicateName(next.toDupe.name))
+                                    .apply { next.toDupe.children.forEach { dupeQueue.add( NodeContext( it, this )) } }
+                            is LayerNode -> LayerNode( null, getNonDuplicateName(next.toDupe.name), next.toDupe.layer.dupe(mediumRepo))
+                                    .apply { insertNode( next.parentInDuper, this) }
+                            else -> null
+                        }
+                    }
+                }
+            }
+        }, "Duplicate Node")
+
+    }
+
 
     private fun getNonDuplicateName( name: String) = StringUtil.getNonDuplicateName(root.getAllAncestors().map { it.name }.toList(), name)
 
