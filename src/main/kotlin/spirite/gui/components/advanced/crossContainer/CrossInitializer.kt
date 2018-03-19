@@ -36,9 +36,9 @@ class CrossInitializer {
 
     internal val scheme get() = when {
         _cols != null -> CrossScheme(overwriteOrientation ?: HORIZONATAL,
-                CSE_Group(_cols!!.entities, _cols!!.height, _cols!!.flex, false))
+                CSE_Group(_cols!!.entities, _cols!!.height, _cols!!.flex, false, _cols!!.padding))
         _rows != null -> CrossScheme(overwriteOrientation ?: VERTICAL,
-                CSE_Group(_rows!!.entities, _rows!!.width, _rows!!.flex, false))
+                CSE_Group(_rows!!.entities, _rows!!.width, _rows!!.flex, false, rows!!.padding))
         else -> CrossScheme(VERTICAL, null)
     }
 }
@@ -54,6 +54,7 @@ sealed class CrossSequenceInitializer {
     }
 
     var flex: Float? = null
+    var padding: Int? = null
 }
 
 class CrossRowInitializer : CrossSequenceInitializer() {
@@ -63,15 +64,15 @@ class CrossRowInitializer : CrossSequenceInitializer() {
         entities.add(CSE_Component(component, height, width, flex))
     }
 
-    operator fun plusAssign(constructor: CrossRowInitializer.() -> Unit) {
-        val initObj  = CrossRowInitializer()
+    operator fun plusAssign(constructor: CrossColInitializer.() -> Unit) {
+        val initObj  = CrossColInitializer()
         constructor.invoke(initObj)
-        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, false))
+        entities.add(CSE_Group(initObj.entities, initObj.width, initObj.flex, false, initObj.padding))
     }
-    fun addFlatFroup(constructor: CrossRowInitializer.() -> Unit) {
-        val initObj  = CrossRowInitializer()
+    fun addFlatFroup(constructor: CrossColInitializer.() -> Unit) {
+        val initObj  = CrossColInitializer()
         constructor.invoke(initObj)
-        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, true))
+        entities.add(CSE_Group(initObj.entities, initObj.width, initObj.flex, true, initObj.padding))
     }
 }
 
@@ -85,11 +86,11 @@ class CrossColInitializer : CrossSequenceInitializer() {
     operator fun plusAssign(constructor: CrossRowInitializer.() -> Unit) {
         val initObj  = CrossRowInitializer()
         constructor.invoke(initObj)
-        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, false))
+        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, false, initObj.padding))
     }
     fun addFlatFroup(constructor: CrossRowInitializer.() -> Unit) {
         val initObj  = CrossRowInitializer()
         constructor.invoke(initObj)
-        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, true))
+        entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, true, initObj.padding))
     }
 }

@@ -1,3 +1,4 @@
+import spirite.base.util.floor
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.crossContainer.CSE_Component
@@ -37,14 +38,29 @@ object CrossLayout {
                             when {
                                 it.overrideGroup != null -> pGroup.addComponent(comp, it.overrideGroup, it.overrideGroup, it.overrideGroup)
                                 group.fixed != null -> pGroup.addComponent(comp, group.fixed, group.fixed, group.fixed)
-                                else -> pGroup.addComponent(comp, 0, group.flex?.toInt() ?: 100, Int.MAX_VALUE)
+                                group.flex != null -> pGroup.addComponent(comp, 0, group.flex.floor, Int.MAX_VALUE)
+                                else -> pGroup.addComponent(comp)
                             }
                         }
                         is CSE_Group -> {
                             val npGroup = layout.createParallelGroup()
                             val nsGroup = layout.createSequentialGroup()
-                            pGroup.addGroup(nsGroup)
-                            sGroup.addGroup(npGroup)
+
+                            when( it.padding) {
+                                null -> {
+                                    pGroup.addGroup(nsGroup)
+                                    sGroup.addGroup(npGroup)
+                                }
+                                else -> {
+                                    pGroup.addGroup(layout.createSequentialGroup()
+                                            .addGap(it.padding)
+                                            .addGroup(nsGroup)
+                                            .addGap(it.padding))
+                                    sGroup.addGap(it.padding)
+                                            .addGroup(npGroup)
+                                            .addGap(it.padding)
+                                }
+                            }
                             rec(it, npGroup, nsGroup)
                         }
                     }
@@ -53,14 +69,34 @@ object CrossLayout {
 
             rec(scheme.rootGroup, pGroup, sGroup)
 
+            // Could be made somewhat cleaner and integrated into the other similar statement within the recursive fun
+            val rpGroup : GroupLayout.Group
+            val rsGroup : GroupLayout.Group
+            when( scheme.rootGroup.padding) {
+                null -> {
+                    rpGroup = pGroup
+                    rsGroup = sGroup
+                }
+                else -> {
+                    rpGroup = layout.createSequentialGroup()
+                    rpGroup.addGap(scheme.rootGroup.padding)
+                            .addGroup(pGroup)
+                            .addGap(scheme.rootGroup.padding)
+                    rsGroup = layout.createSequentialGroup()
+                    rsGroup.addGap(scheme.rootGroup.padding)
+                            .addGroup(sGroup)
+                            .addGap(scheme.rootGroup.padding)
+                }
+            }
+
             when( scheme.baseOrientation) {
                 VERTICAL -> {
-                    layout.setVerticalGroup(sGroup)
-                    layout.setHorizontalGroup(pGroup)
+                    layout.setVerticalGroup(rsGroup)
+                    layout.setHorizontalGroup(rpGroup)
                 }
                 HORIZONATAL -> {
-                    layout.setVerticalGroup(pGroup)
-                    layout.setHorizontalGroup(sGroup)
+                    layout.setVerticalGroup(rpGroup)
+                    layout.setHorizontalGroup(rsGroup)
                 }
             }
         }

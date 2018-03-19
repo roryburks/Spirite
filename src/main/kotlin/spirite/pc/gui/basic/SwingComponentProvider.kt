@@ -13,4 +13,5 @@ object SwingComponentProvider : IComponentProvider {
     override fun ToggleButton(startChecked: Boolean): IToggleButton = SwToggleButton(startChecked)
     override fun CrossPanel(): ICrossPanel = SwPanel()
     override fun TabbedPane(): ITabbedPane = SwTabbedPane()
+    override fun <T> ComboBox(things: Array<T>): IComboBox<T> = SwComboBox(things)
 }

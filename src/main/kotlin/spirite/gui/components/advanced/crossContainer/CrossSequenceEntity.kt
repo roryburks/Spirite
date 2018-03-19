@@ -19,4 +19,5 @@ class CSE_Group(
         val subComponents: List<CrossSequenceEntity>,
         val fixed: Int?,
         val flex: Float?,
-        val flat: Boolean) : CrossSequenceEntity()
+        val flat: Boolean,
+        val padding: Int?) : CrossSequenceEntity()

@@ -50,6 +50,8 @@ enum class RenderMethodType constructor(val description: String, val defaultValu
     LIGHTEN("Lighten", 0),
     SUBTRACT("Subtract", 0),
     MULTIPLY("Multiply", 0),
-    SCREEN("Screen", 0),
+    SCREEN("Screen", 0),;
     //OVERLAY("Overlay", 0)
+
+    override fun toString() = description
 }

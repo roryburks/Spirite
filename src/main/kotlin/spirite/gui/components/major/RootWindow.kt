@@ -5,6 +5,7 @@ import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.SubContainer
+import spirite.gui.components.major.groupView.GroupView
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.hybrid.Hybrid
@@ -80,7 +81,7 @@ class RootWindow( val master: MasterControl) : JFrame() {
         this.title = "Spirite"
 
         val omni = OmniContainer {
-            left += OmniSegment(Hybrid.ui.Label("GroupView"), 100, 150)
+            left += OmniSegment(GroupView(), 100, 150)
             center = OmniSegment(WorkTabPane(master), 200)
             right += SubContainer( {
                 top += OmniSegment(Hybrid.ui.Label("Tools"), 100, 200)
