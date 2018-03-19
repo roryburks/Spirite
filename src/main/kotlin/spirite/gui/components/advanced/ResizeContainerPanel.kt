@@ -145,7 +145,7 @@ private constructor(
                     btnExpand.setOffIcon( if( trailing) SwIcons.SmallIcons.ArrowE else SwIcons.SmallIcons.ArrowW)
                 }
             }
-            
+
             // TODO: Figure out the best way to decouple single-use components that require custom drawing/arrangement
             // from any particular UI, even if it means that each UI implementation has to create them from scratch.
             val pullBar = SwPanel { g ->

@@ -25,6 +25,14 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         }
     }
 
+    fun bindWeakly( root: Bindable<T>) {
+        if( root.underlying != underlying) {
+            root.underlying.swallowWeakly(underlying)
+            underlying = root.underlying
+        }
+
+    }
+
     fun addListener( listener: (T)->Unit) {
         underlying.swallow( Bindable(field, listener).underlying)
         listener.invoke(field)
@@ -42,18 +50,36 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
                 if( value != field) {
                     field = value
                     bindings.forEach { it.onChange?.invoke(value) }
+                    weakBindings.removeIf { it.get() == null }
+                    weakBindings.forEach { it.get()?.onChange?.invoke(value) }
                 }
             }
         private val bindings = mutableListOf<Bindable<T>>(bindable)
+        val weakBindings = mutableListOf<WeakReference<Bindable<T>>>()
 
         fun swallow( other: BindableUnderlying<T>) {
             // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
-            if( other.field != field)
+            if( other.field != field) {
                 other.bindings.forEach { it.onChange?.invoke(field) }
+                other.weakBindings.removeIf { it.get() == null }
+                other.weakBindings.forEach { it.get()?.onChange?.invoke(field) }
+            }
             bindings.addAll( other.bindings)
+            weakBindings.addAll(other.weakBindings)
+        }
+        fun swallowWeakly( other: BindableUnderlying<T>) {
+            // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
+            if( other.field != field) {
+                other.bindings.forEach { it.onChange?.invoke(field) }
+                other.weakBindings.removeIf { it.get() == null }
+                other.weakBindings.forEach { it.get()?.onChange?.invoke(field) }
+            }
+            weakBindings.addAll(other.weakBindings)
+            weakBindings.addAll( other.bindings.map { WeakReference(it) })
         }
         fun detatch( toRemove: Bindable<T>) {
             bindings.remove(toRemove)
+            weakBindings.removeIf { it.get() == null || it.get() == toRemove }
         }
     }
 

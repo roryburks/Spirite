@@ -120,7 +120,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     }
 
 
-    fun initComponents() {
+
+    init /* components */ {
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
 
@@ -230,8 +231,6 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     }
 
     init {
-        initComponents()
-
         master.workspaceSet.workspaceObserver.addObserver(workspaceOvserver)
         master.centralObservatory.trackingImageObserver.addObserver(imageObserver)
     }
