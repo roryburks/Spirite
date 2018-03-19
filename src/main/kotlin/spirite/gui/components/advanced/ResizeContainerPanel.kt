@@ -13,6 +13,7 @@ import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import kotlin.reflect.KProperty
 
@@ -134,6 +135,17 @@ private constructor(
             btnExpand.plainStyle = true
             btnExpand.checkBindable.bind(componentVisibleBindable)
 
+            when( orientation) {
+                VERTICAL -> {
+                    btnExpand.setOnIcon(SwIcons.SmallIcons.ArrowE)
+                    btnExpand.setOffIcon( if( trailing) SwIcons.SmallIcons.ArrowS else SwIcons.SmallIcons.ArrowN)
+                }
+                HORIZONATAL -> {
+                    btnExpand.setOnIcon(SwIcons.SmallIcons.ArrowS)
+                    btnExpand.setOffIcon( if( trailing) SwIcons.SmallIcons.ArrowE else SwIcons.SmallIcons.ArrowW)
+                }
+            }
+            
             // TODO: Figure out the best way to decouple single-use components that require custom drawing/arrangement
             // from any particular UI, even if it means that each UI implementation has to create them from scratch.
             val pullBar = SwPanel { g ->

@@ -18,6 +18,6 @@ interface IComponentProvider {
             scrollWidth : Int = 10) : IScrollBar
     fun ToggleButton(startChecked: Boolean = false) : IToggleButton
     fun CrossPanel() : ICrossPanel
-    fun TabbedPane(): ITabbedPane
+    fun TabbedPane( ): ITabbedPane
     fun <T> ComboBox( things: Array<T>) : IComboBox<T>
 }

@@ -4,6 +4,7 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
 import spirite.gui.components.basic.IToggleButtonNonUI
 import spirite.gui.components.basic.ToggleButtonNonUI
+import spirite.gui.resources.IIcon
 import javax.swing.JToggleButton
 
 
@@ -13,6 +14,12 @@ private constructor(startChecked: Boolean, private val imp: SwToggleButtonImp )
         IToggleButtonNonUI by ToggleButtonNonUI(startChecked), IComponent,
         ISwComponent by SwComponent(imp)
 {
+    override fun setOnIcon(icon: IIcon) {imp.selectedIcon = icon.icon}
+    override fun setOffIcon(icon: IIcon) {imp.icon = icon.icon}
+
+    override fun setOnIconOver(icon: IIcon) {imp.rolloverSelectedIcon = icon.icon}
+    override fun setOffIconOver(icon: IIcon) {imp.rolloverIcon = icon.icon }
+
     constructor(startChecked: Boolean = false) : this(startChecked, SwToggleButtonImp())
 
     override var plainStyle: Boolean = false
