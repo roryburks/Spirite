@@ -3,6 +3,7 @@ package spirite.base.brains
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
@@ -11,6 +12,7 @@ import java.lang.ref.WeakReference
 interface ICentralObservatory {
     val trackingImageObserver : IObservable<ImageObserver>
     val omniImageObserver : IObservable<ImageObserver>
+    val trackingPrimaryTreeObserver : IObservable<TreeObserver>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -21,6 +23,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
     override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
+    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObs }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
@@ -79,8 +82,14 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
         private val observers = mutableListOf<WeakReference<T>>()
 
-        override fun addObserver(toAdd: T) {observers.add( WeakReference(toAdd))}
+        override fun addObserver(toAdd: T) {
+            val workspace = workspaceSet.currentWorkspace
+            if( workspace != null) observerFinder.invoke(workspace).addObserver(toAdd)
+            observers.add( WeakReference(toAdd))
+        }
         override fun removeObserver(toRemove: T) {
+            val workspace = workspaceSet.currentWorkspace
+            if( workspace != null) observerFinder.invoke(workspace).removeObserver(toRemove)
             observers.removeIf {
                 val obs = it.get()
                 obs == null || obs == toRemove

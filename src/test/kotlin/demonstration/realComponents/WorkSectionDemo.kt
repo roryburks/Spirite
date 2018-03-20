@@ -1,21 +1,11 @@
-package demonstration
+package demonstration.realComponents
 
-import io.mockk.every
-import io.mockk.mockk
+import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
-import spirite.base.brains.WorkspaceSet
-import spirite.base.brains.palette.PaletteManager
-import spirite.base.brains.toolset.ToolsetManager
-import spirite.base.graphics.gl.stroke.GLStrokeDrawerV2
-import spirite.base.graphics.rendering.RenderEngine
-import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.Orientation.HORIZONATAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.major.work.WorkSection
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
@@ -23,8 +13,8 @@ import java.awt.GridLayout
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
-lateinit var master: MasterControl
-lateinit var ws: WorkTabPane
+private lateinit var master: MasterControl
+private lateinit var ws: WorkTabPane
 
 fun main( args: Array<String>) {
 
@@ -67,9 +57,9 @@ class WorkSectionDemo : JFrame() {
         }
 
         val btn3 = Hybrid.ui.Button("Undo")
-        btn3.action = {master.workspaceSet.currentWorkspace?.undoEngine?.undo()}
+        btn3.action = { master.workspaceSet.currentWorkspace?.undoEngine?.undo()}
         val btn4 = Hybrid.ui.Button("Redo")
-        btn4.action = {master.workspaceSet.currentWorkspace?.undoEngine?.redo()}
+        btn4.action = { master.workspaceSet.currentWorkspace?.undoEngine?.redo()}
 
         resize.addPanel(btn, 100,100,-999)
         resize.addPanel(btn2, 100,100,-999)

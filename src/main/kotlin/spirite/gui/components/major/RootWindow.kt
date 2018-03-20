@@ -81,7 +81,7 @@ class RootWindow( val master: MasterControl) : JFrame() {
         this.title = "Spirite"
 
         val omni = OmniContainer {
-            left += OmniSegment(GroupView(), 100, 150)
+            left += OmniSegment(GroupView(master), 100, 150)
             center = OmniSegment(WorkTabPane(master), 200)
             right += SubContainer( {
                 top += OmniSegment(Hybrid.ui.Label("Tools"), 100, 200)

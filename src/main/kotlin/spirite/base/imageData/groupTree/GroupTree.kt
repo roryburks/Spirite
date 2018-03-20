@@ -9,6 +9,7 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.linear.Transform
+import spirite.gui.Bindable
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 
@@ -21,21 +22,17 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     val root = GroupNode(null, "ROOT")
     open val treeDescription = "Abstract Group Tree"
 
-    // region Selection (observable)
-    var selectedNode : Node? = null
-        set(value) {
-            if( field != value) {
-                val old = field
-                field = value
-                _selectionObserver.trigger { it.selectionChanged(value, old)}
-            }
-        }
+    var selectedNodeBind = Bindable<Node?>(null)
+    var selectedNode by selectedNodeBind
 
-    interface NodeSelectionObserver {
-        fun selectionChanged( newSelection: Node?, oldSelection: Node?)
+    // region Tree Observer
+    interface TreeObserver {
+        fun treeStructureChanged()
     }
-    val selectionObserver: IObservable<NodeSelectionObserver> get() = _selectionObserver
-    val _selectionObserver = Observable<NodeSelectionObserver>()
+    val treeObs : IObservable<TreeObserver> get() = _treeObs
+    private val _treeObs = Observable<TreeObserver>()
+
+    protected fun triggerChange() {_treeObs.trigger { it.treeStructureChanged() }}
     // endregion
 
     abstract inner class Node( parent: GroupNode?, name: String) {
@@ -193,8 +190,9 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
         }
         private fun _move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
-            _remove( toMove)
-            newParent._add( toMove, newBefore)
+            _remove( toMove, false)
+            newParent._add( toMove, newBefore, false)
+            triggerChange()
         }
 
         internal fun add(toAdd: Node, before: Node?) {
@@ -213,7 +211,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 })
             }
         }
-        private fun _add(toAdd: Node, before: Node?) {
+        private fun _add(toAdd: Node, before: Node?, trigger: Boolean = true) {
             // if( toAdd.tree != this@GroupTree)
             // Todo
 
@@ -224,6 +222,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 else -> _children.add(index, toAdd)
             }
             toAdd.parent = this
+            if( trigger)triggerChange()
         }
 
 
@@ -244,8 +243,9 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 })
             }
         }
-        private fun _remove( toRemove: Node) {
+        private fun _remove( toRemove: Node, trigger: Boolean = true) {
             _children.remove( toRemove)
+            if( trigger)triggerChange()
         }
     }
 

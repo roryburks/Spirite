@@ -1,6 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.gui.Orientation
+import spirite.gui.components.advanced.ITreeView
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton
@@ -20,4 +21,5 @@ interface IComponentProvider {
     fun CrossPanel() : ICrossPanel
     fun TabbedPane( ): ITabbedPane
     fun <T> ComboBox( things: Array<T>) : IComboBox<T>
+    fun <T> TreeView() : ITreeView<T>
 }

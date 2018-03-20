@@ -1,7 +1,8 @@
 package demonstration
 
-import spirite.gui.components.advanced.ITreeView.DropDirection
-import spirite.gui.components.advanced.ITreeView.TreeNodeAttributes
+import spirite.gui.Orientation.VERTICAL
+import spirite.gui.components.advanced.ITreeView.*
+import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.advanced.SwTreeView
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.SwButton
@@ -42,7 +43,26 @@ class TreeDemo : JFrame() {
         tree.addRoot("9", STNAtt())
         tree.leftSize = 30
 
-        this.add(tree.jcomponent)
+        val tree2 = SwTreeView<String>()
+        tree2.constructTree {
+            Node("A", STNAtt())
+            Node("B", STNAtt())
+            Branch("C", STNAtt(), {
+                Node("D", STNAtt())
+                Node("E", STNAtt())
+                Branch("F", STNAtt(), {
+                    Node("G", STNAtt())
+                    Node("H", STNAtt())
+                    Node("I", STNAtt())
+                })
+            })
+            Node("J")
+        }
+
+        val resizeContainer = ResizeContainerPanel(tree, VERTICAL)
+        resizeContainer.addPanel(tree2, 100, 100)
+
+        this.add(resizeContainer.jcomponent)
     }
 
     class STNAtt() : TreeNodeAttributes<String> {
@@ -50,7 +70,7 @@ class TreeDemo : JFrame() {
         override fun makeComponent(t: String): IComponent = SwLabel(t)
 
         override fun canImport(trans: Transferable) = true
-        override fun interpretDrop(trans: Transferable, dropDirection: DropDirection) {
+        override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<String>, dropDirection: DropDirection) {
             println(trans.getTransferData(DataFlavor.stringFlavor))
         }
     }

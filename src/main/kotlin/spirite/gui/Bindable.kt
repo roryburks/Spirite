@@ -30,7 +30,6 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
             root.underlying.swallowWeakly(underlying)
             underlying = root.underlying
         }
-
     }
 
     fun addListener( listener: (T)->Unit) {
