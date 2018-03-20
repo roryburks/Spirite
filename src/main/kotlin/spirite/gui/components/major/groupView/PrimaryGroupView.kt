@@ -56,11 +56,12 @@ private constructor(
         override fun makeComponent(t: Node): IComponent  {
             val comp = Hybrid.ui.Label(t.name)
             val node = t
-            comp.onMouseClick = {
-                val ws = workspace
-                if( it.button == RIGHT && ws != null) {
-                    master.contextMenus.LaunchContextMenu(it.point, master.contextMenus.schemeForNode(ws, node), node)
-                }
+
+            comp.onMouseClick = { evt ->
+                if( evt.button == RIGHT )
+                    workspace?.apply {
+                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, node), node)
+                    }
             }
             return comp
         }

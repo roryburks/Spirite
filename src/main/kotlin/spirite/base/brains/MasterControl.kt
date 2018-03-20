@@ -16,6 +16,8 @@ import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
+import spirite.gui.components.dialogs.Dialog
+import spirite.gui.components.dialogs.IDialog
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.menus.SwContextMenus
@@ -40,6 +42,7 @@ interface IMasterControl {
 
     val frameManager: IFrameManager
     val contextMenus : ContextMenus
+    val dialog : IDialog
 }
 
 class MasterControl() : IMasterControl {
@@ -61,4 +64,5 @@ class MasterControl() : IMasterControl {
 
     override val frameManager = FrameManager()
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
+    override val dialog: IDialog = Dialog(this)
 }
