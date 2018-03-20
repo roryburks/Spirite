@@ -3,12 +3,14 @@ package spirite.gui.components.major.groupView
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.gui.SUIPoint
 import spirite.gui.components.advanced.ITreeElementConstructor
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.ITreeView.*
 import spirite.gui.components.advanced.ITreeView.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
 import java.awt.datatransfer.DataFlavor
@@ -21,9 +23,7 @@ private constructor(
     : IComponent by tree,
         TreeObserver
 {
-    override fun treeStructureChanged() {
-        rebuild()
-    }
+    override fun treeStructureChanged() {rebuild()}
     init {
         master.centralObservatory.trackingPrimaryTreeObserver.addObserver(this)
     }
@@ -45,14 +45,7 @@ private constructor(
             }
         }
 
-        tree.constructTree {
-            pTree.root.children.forEach {
-                when( it) {
-                    is GroupNode -> Branch( it, groupAttributes, makeConstructor(it))
-                    else -> Node(it, nongroupAttributes)
-                }
-            }
-        }
+        tree.constructTree (makeConstructor(pTree.root))
     }
 
     private val groupAttributes = NodeAttributes()
@@ -60,7 +53,17 @@ private constructor(
 
     private open inner class NodeAttributes : TreeNodeAttributes<Node> {
         override fun makeLeftComponent(t: Node): IComponent? = Hybrid.ui.Button(t.name)
-        override fun makeComponent(t: Node): IComponent = Hybrid.ui.Label(t.name)
+        override fun makeComponent(t: Node): IComponent  {
+            val comp = Hybrid.ui.Label(t.name)
+            val node = t
+            comp.onMouseClick = {
+                val ws = workspace
+                if( it.button == RIGHT && ws != null) {
+                    master.contextMenus.LaunchContextMenu(it.point, master.contextMenus.schemeForNode(ws, node), node)
+                }
+            }
+            return comp
+        }
 
         override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
 

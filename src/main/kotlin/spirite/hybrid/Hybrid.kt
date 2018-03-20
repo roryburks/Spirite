@@ -3,8 +3,10 @@ package spirite.hybrid
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.IGL
 import spirite.gui.components.basic.IComponentProvider
+import spirite.gui.menus.ContextMenus
 import spirite.pc.gui.basic.SwingComponentProvider
 import spirite.pc.JOGL.JOGLProvider
+import spirite.pc.gui.menus.SwContextMenus
 
 
 interface IHybrid {

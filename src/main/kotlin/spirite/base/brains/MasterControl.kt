@@ -16,7 +16,9 @@ import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
+import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.menus.SwContextMenus
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective
  * you can think of it as the primary provider.
@@ -25,7 +27,6 @@ import spirite.hybrid.Hybrid
  * getting them from MasterControl), but UI components will just be passed MasterControl semi-directly (in the off-chance
  * that you really wanted to selectively test UI components, you can mock IMasterControl instead of using a real one). */
 interface IMasterControl {
-    val frameManager: IFrameManager
     val hotkeyManager: IHotkeyManager
     val settingsManager : ISettingsManager
     val paletteManager : IPaletteManager
@@ -36,13 +37,15 @@ interface IMasterControl {
     val renderEngine: IRenderEngine
     val resourceUseTracker : IResourceUseTracker
     val commandExecuter : ICentralCommandExecutor
+
+    val frameManager: IFrameManager
+    val contextMenus : ContextMenus
 }
 
 class MasterControl() : IMasterControl {
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
 
-    override val frameManager = FrameManager()
     override val hotkeyManager = HotkeyManager(preferences)
     override val settingsManager = SettingsManager(preferences)
 
@@ -55,4 +58,7 @@ class MasterControl() : IMasterControl {
     override val resourceUseTracker = ResourceUseTracker()
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
     override val commandExecuter = CentralCommandExecutor(workspaceSet)
+
+    override val frameManager = FrameManager()
+    override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
 }

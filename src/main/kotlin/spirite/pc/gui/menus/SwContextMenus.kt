@@ -5,6 +5,7 @@ import spirite.gui.UIPoint
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
+import spirite.pc.gui.basic.jcomponent
 import javax.swing.*
 
 class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(commandExecuter) {
@@ -14,6 +15,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
         cmenu.removeAll()
 
         constructMenu(cmenu, scheme.toList(), extra)
+        cmenu.show( point.component.jcomponent, point.x, point.y)
     }
 
     fun constructMenu(root: JComponent, menuScheme: List<MenuItem>, extra: Any? = null) {
