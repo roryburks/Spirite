@@ -1,5 +1,6 @@
 package spirite.gui.components.basic
 
+import spirite.base.util.linear.Rect
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseWheelEvent
 
@@ -10,6 +11,9 @@ interface IComponent {
     var enabled : Boolean
     val width: Int
     val height: Int
+    val x: Int
+    val y: Int
+    val bounds: Rect get() = Rect(x, y, width, height)
 
 
     enum class BasicCursor {

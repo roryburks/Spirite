@@ -21,7 +21,7 @@ class ImageConverter(
 ) {
     val c = GLImage::class.java
 
-    inline fun <reified T> convert(from: IImage) : T {
+    inline fun <reified T> convertOrNull(from: IImage) : T? {
         // Ugly
         if( from is T)
             return from
@@ -45,9 +45,9 @@ class ImageConverter(
                     return ImageBI( from.toBufferedImage()) as T
             }
         }
-        MDebug.handleWarning(WarningType.UNSUPPORTED, "Unsupported Conversion (in ContentBoundsFinder).\nFrom:${from::class.java}\nTo:${T::class.java}")
-        return NillImage() as T
+        return null
     }
+    inline fun <reified T> convert(from: IImage) : T = convertOrNull<T>(from) ?: throw Exception("Unsupported Conversion")
 
     fun loadImageIntoGL( image: IImage, gl: IGL) {
         when( image) {

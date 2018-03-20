@@ -28,6 +28,9 @@ abstract class ASwComponent : ISwComponent {
     override val height: Int get() = component.height
     override val width: Int get() = component.width
 
+    override val x : Int get() = component.x
+    override val y : Int get() = component.y
+
     override fun setBasicCursor(cursor: BasicCursor) {
         component.cursor = Cursor.getPredefinedCursor(when( cursor) {
             IComponent.BasicCursor.CROSSHAIR -> Cursor.CROSSHAIR_CURSOR

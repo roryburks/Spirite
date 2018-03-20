@@ -14,7 +14,7 @@ interface RawImage : IImage {
     class InvalidImageDimensionsExeption(message: String) : Exception(message)
 }
 
-class NillImage: RawImage {
+object NillImage: RawImage {
     override val graphics: GraphicsContext get() = throw Exception("Can't draw to Nill Image")
     override val width: Int get() = 1
     override val height: Int get() = 1
