@@ -1,9 +1,10 @@
-package spirite.pc.gui.basic
+package spirite.pc.gui
 
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.SwTreeView
 import spirite.gui.components.basic.*
+import spirite.pc.gui.basic.*
 
 object SwingComponentProvider : IComponentProvider {
 
@@ -24,4 +25,5 @@ object SwingComponentProvider : IComponentProvider {
     override fun FloatField( min: Float, max: Float, allowsNegative: Boolean): IFloatField = SwFloatField(min, max, allowsNegative)
 
     override fun Separator(orientation: Orientation): ISeparator = SwSeparator(orientation)
+    override fun ColorSquare(color: SColor): IColorSquare = SwColorSquare(color)
 }

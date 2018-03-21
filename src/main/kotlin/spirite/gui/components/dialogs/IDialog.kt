@@ -14,7 +14,7 @@ interface IDialog {
 class Dialog(private val master: MasterControl) : IDialog
 {
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace): NewSimpleLayerReturn? {
-        val panel = NewSimpleLayerPanel()
+        val panel = NewSimpleLayerPanel(master,workspace)
 
         val result = JOptionPane.showConfirmDialog(
                 null,

@@ -37,10 +37,9 @@ class NodeContextCommand(
             NEW_GROUP.string -> workspace.groupTree.addGroupNode(node, "New Group")
             DELETE.string -> node?.delete()
             NEW_SIMPLE_LAYER.string -> {
-                val result = dialogs.invokeNewSimpleLayer(workspace)
-
-                println(result)
-
+                dialogs.invokeNewSimpleLayer(workspace)?.apply {
+                    workspace.groupTree.addNewSimpleLayer(node, name, mediumType, width, height, true)
+                }
             }
         }
 

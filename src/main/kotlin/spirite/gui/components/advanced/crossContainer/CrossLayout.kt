@@ -21,6 +21,7 @@ object CrossLayout {
             val sGroup = layout.createSequentialGroup()
 
             fun rec(group: CSE_Group, pGroup: ParallelGroup, sGroup: GroupLayout.Group) {
+                var sGroup = sGroup
                 group.subComponents.forEach {
                     when (it) {
                         is CSE_Gap -> {
@@ -46,12 +47,18 @@ object CrossLayout {
                             val npGroup = layout.createParallelGroup()
                             val nsGroup = layout.createSequentialGroup()
 
-                            when( it.padding) {
-                                null -> {
+                            when {
+                                it.flat -> {
+                                    sGroup = layout.createSequentialGroup().apply {
+                                        sGroup.addGroup(layout.createParallelGroup()
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addGap(it.pregap ?: 0)
+                                                        .addGroup(npGroup))
+                                                .addGroup(this))
+                                    }
                                     pGroup.addGroup(nsGroup)
-                                    sGroup.addGroup(npGroup)
                                 }
-                                else -> {
+                                it.padding != null -> {
                                     pGroup.addGroup(layout.createSequentialGroup()
                                             .addGap(it.padding)
                                             .addGroup(nsGroup)
@@ -59,6 +66,10 @@ object CrossLayout {
                                     sGroup.addGap(it.padding)
                                             .addGroup(npGroup)
                                             .addGap(it.padding)
+                                }
+                                else -> {
+                                    pGroup.addGroup(nsGroup)
+                                    sGroup.addGroup(npGroup)
                                 }
                             }
                             rec(it, npGroup, nsGroup)

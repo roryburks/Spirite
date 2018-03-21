@@ -36,6 +36,10 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         underlying.swallow( Bindable(field, listener).underlying)
         listener.invoke(field)
     }
+    fun injectListener( listener: (T)->Unit) {
+        underlying.swallow( Bindable(field, listener).underlying)
+        // Doesn't invoke
+    }
 
     fun unbind() {
         val value = field

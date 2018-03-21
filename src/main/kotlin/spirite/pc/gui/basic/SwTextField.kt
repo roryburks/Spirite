@@ -26,12 +26,13 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
     override var text by textBind
 
     init {
+        var locked = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {text = imp.text}
-            override fun insertUpdate(e: DocumentEvent?) {text = imp.text}
-            override fun removeUpdate(e: DocumentEvent?) {text = imp.text}
+            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
+            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
         })
-        //textBind.addListener { imp.text = it }
+        textBind.addListener { if(!locked)imp.text = it }
     }
 
     private class SwTextFieldImp() : JTextField()
@@ -76,11 +77,17 @@ private constructor(
 
     init {
         imp.document = SwNFDocument()
+
+        var locked = false
         imp.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {text = imp.text;checkIfOob()}
-            override fun insertUpdate(e: DocumentEvent?) {text = imp.text;checkIfOob()}
-            override fun removeUpdate(e: DocumentEvent?) {text = imp.text;checkIfOob()}
+            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
+            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
+            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false;checkIfOob()}
         })
+        textBind.addListener {
+            if(!locked)
+                imp.text = it
+        }
     }
 
     private class SwNumberFieldImp() : JTextField()
@@ -113,6 +120,7 @@ class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumber
 
     init {
         textBind.addListener { value = it.toIntOrNull(10) ?: 0 }
+        valueBind.addListener { text = it.toString() }
     }
 }
 
@@ -126,5 +134,6 @@ class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : Sw
 
     init {
         textBind.addListener { value = it.toFloatOrNull() ?: 0f }
+        valueBind.addListener { text = it.toString() }
     }
 }

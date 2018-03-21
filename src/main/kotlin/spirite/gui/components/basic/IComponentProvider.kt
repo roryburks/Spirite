@@ -1,5 +1,6 @@
 package spirite.gui.components.basic
 
+import spirite.base.util.Colors
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
 import kotlin.Int.Companion
@@ -28,4 +29,5 @@ interface IComponentProvider {
     fun FloatField(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, allowsNegative: Boolean = false) : IFloatField
 
     fun Separator( orientation: Orientation) : ISeparator
+    fun ColorSquare( color: SColor = Colors.BLACK) : IColorSquare
 }
