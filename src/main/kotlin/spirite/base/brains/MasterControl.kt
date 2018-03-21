@@ -48,6 +48,7 @@ interface IMasterControl {
 class MasterControl() : IMasterControl {
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
+    override val dialog: IDialog = Dialog(this)
 
     override val hotkeyManager = HotkeyManager(preferences)
     override val settingsManager = SettingsManager(preferences)
@@ -60,9 +61,8 @@ class MasterControl() : IMasterControl {
     override val toolsetManager = ToolsetManager()
     override val resourceUseTracker = ResourceUseTracker()
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
-    override val commandExecuter = CentralCommandExecutor(workspaceSet)
+    override val commandExecuter = CentralCommandExecutor(workspaceSet, dialog)
 
     override val frameManager = FrameManager()
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
-    override val dialog: IDialog = Dialog(this)
 }

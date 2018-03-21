@@ -3,12 +3,10 @@ package demonstration.realComponents
 import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.major.groupView.GroupView
-import spirite.gui.components.major.work.WorkTabPane
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
 import java.awt.GridLayout
@@ -38,7 +36,7 @@ class PrimaryGroupViewDemo : JFrame() {
         //}
 
         ws = GroupView(master)
-        val resize = ResizeContainerPanel(ws, HORIZONATAL, 200)
+        val resize = ResizeContainerPanel(ws, HORIZONTAL, 200)
 
         resize.minStretch = 100
 

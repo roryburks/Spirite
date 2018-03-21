@@ -1,7 +1,7 @@
 package demonstration
 
 import spirite.base.util.InvertibleFunction
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.basic.IButton
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.hybrid.Hybrid
@@ -39,7 +39,7 @@ class SGradientSliderDemo : JFrame() {
         disabledSlider.value = 0.4f
         //disabledSlider.imp.isEnabled = false
 
-        val resize = ResizeContainerPanel(sliderThing, HORIZONATAL)
+        val resize = ResizeContainerPanel(sliderThing, HORIZONTAL)
         resize.minStretch = 100
         resize.addPanel(buttonReset, 100,100,-999)
         resize.addPanel(disabledSlider, 100,100,-999)

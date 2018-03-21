@@ -45,7 +45,7 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
         val scheme = mutableListOf(
                 MenuItem("&New..."),
-                MenuItem(".New Simple &Layer", customAction = {TODO()}),
+                MenuItem(".New Simple &Layer", NodeCommand.NEW_SIMPLE_LAYER),
                 MenuItem(".New Layer &Group", NodeCommand.NEW_GROUP),
                 MenuItem(".New &Rig Layer", customAction = {TODO()}),
                 MenuItem(".New &Puppet Layer", customAction = {TODO()})

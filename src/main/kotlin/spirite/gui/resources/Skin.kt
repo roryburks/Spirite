@@ -47,7 +47,8 @@ object Skin {
         BarLineColor(baseDDD)
     }
     enum class TextField(override val color: Color) : ColorMarker {
-        Background(fg)
+        Background(fg),
+        InvalidBg(Color.RED)
     }
     enum class TabbedPane(override val color: Color) : ColorMarker {
         SelectedBg(fg),

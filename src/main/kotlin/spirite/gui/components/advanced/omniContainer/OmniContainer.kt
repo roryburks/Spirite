@@ -1,7 +1,7 @@
 package spirite.gui.components.advanced.omniContainer
 
 import spirite.gui.Orientation
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.basic.IComponent
@@ -59,7 +59,7 @@ class OmniInitializer {
     private val leading = mutableListOf<OmniThing>()
     val left : MutableList<OmniThing>
         get()  {
-            orientation = HORIZONATAL
+            orientation = HORIZONTAL
             return leading
         }
     val top : MutableList<OmniThing>
@@ -71,7 +71,7 @@ class OmniInitializer {
     private val trailing = mutableListOf<OmniThing>()
     val right : MutableList<OmniThing>
         get()  {
-            orientation = HORIZONATAL
+            orientation = HORIZONTAL
             return trailing
         }
     val bottom : MutableList<OmniThing>

@@ -1,5 +1,5 @@
 import spirite.base.util.floor
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.crossContainer.CSE_Component
 import spirite.gui.components.advanced.crossContainer.CSE_Gap
@@ -94,7 +94,7 @@ object CrossLayout {
                     layout.setVerticalGroup(rsGroup)
                     layout.setHorizontalGroup(rpGroup)
                 }
-                HORIZONATAL -> {
+                HORIZONTAL -> {
                     layout.setVerticalGroup(rpGroup)
                     layout.setHorizontalGroup(rsGroup)
                 }

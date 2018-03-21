@@ -1,4 +1,4 @@
 package spirite.gui
 
 
-enum class Orientation {HORIZONATAL, VERTICAL}
+enum class Orientation { HORIZONTAL, VERTICAL}

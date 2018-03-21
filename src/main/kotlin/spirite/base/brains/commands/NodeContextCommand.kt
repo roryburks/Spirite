@@ -3,6 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
 import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.gui.components.dialogs.IDialog
 
 interface ICommandExecuter {
     val validCommands: List<String>
@@ -10,13 +11,16 @@ interface ICommandExecuter {
     fun executeCommand( string: String, extra: Any?) : Boolean
 }
 
-class NodeContextCommand(val workspaceSet: IWorkspaceSet)
+class NodeContextCommand(
+        val workspaceSet: IWorkspaceSet,
+        val dialogs: IDialog)
     : ICommandExecuter
 {
 
     enum class NodeCommand(val string: String) : ICommand {
         NEW_GROUP( "newGroup"),
-        DELETE("delete")
+        DELETE("delete"),
+        NEW_SIMPLE_LAYER("newSimpleLayer")
         ;
 
         override val commandString: String get() = "node.$string"
@@ -32,6 +36,12 @@ class NodeContextCommand(val workspaceSet: IWorkspaceSet)
         when(string) {
             NEW_GROUP.string -> workspace.groupTree.addGroupNode(node, "New Group")
             DELETE.string -> node?.delete()
+            NEW_SIMPLE_LAYER.string -> {
+                val result = dialogs.invokeNewSimpleLayer(workspace)
+
+                println(result)
+
+            }
         }
 
         return true

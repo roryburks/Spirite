@@ -4,7 +4,7 @@ import demonstration.DemoLauncher
 import sjunit.TestHelper
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.hybrid.Hybrid
@@ -34,7 +34,7 @@ class WorkSectionDemo : JFrame() {
         //}
 
         ws = WorkTabPane(master)
-        val resize = ResizeContainerPanel(ws, HORIZONATAL, 200)
+        val resize = ResizeContainerPanel(ws, HORIZONTAL, 200)
 
         resize.minStretch = 100
 

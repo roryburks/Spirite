@@ -2,6 +2,7 @@ package spirite.gui.components.basic
 
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
+import kotlin.Int.Companion
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton
@@ -22,4 +23,9 @@ interface IComponentProvider {
     fun TabbedPane( ): ITabbedPane
     fun <T> ComboBox( things: Array<T>) : IComboBox<T>
     fun <T> TreeView() : ITreeView<T>
+    fun TextField() : ITextField
+    fun IntField(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, allowsNegative: Boolean = false) : IIntField
+    fun FloatField(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, allowsNegative: Boolean = false) : IFloatField
+
+    fun Separator( orientation: Orientation) : ISeparator
 }

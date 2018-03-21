@@ -4,8 +4,11 @@ import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.util.Color
 import spirite.base.util.Colors
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
+
+private val MAX_DIM = 16000
 
 class NewSimpleLayerPanel() : ICrossPanel by Hybrid.ui.CrossPanel()
 {
@@ -17,6 +20,9 @@ class NewSimpleLayerPanel() : ICrossPanel by Hybrid.ui.CrossPanel()
             val mediumType: MediumType)
 
     private val comboBox = Hybrid.ui.ComboBox( MediumType.creatableTypes)
+    private val widthField = Hybrid.ui.IntField(1, MAX_DIM, false)
+    private val heightField = Hybrid.ui.IntField(1, MAX_DIM, false)
+    private val nameField = Hybrid.ui.TextField()
 
     init {
         setLayout {
@@ -25,9 +31,38 @@ class NewSimpleLayerPanel() : ICrossPanel by Hybrid.ui.CrossPanel()
                 addGap(4)
                 add(comboBox)
             }
+            rows.addGap(2)
+            rows.add( Hybrid.ui.Separator(HORIZONTAL), width = 300)
+            rows.addGap(2)
+            rows += {
+                addGap(20)
+                add(Hybrid.ui.Label("Name:"), 120)
+                add(nameField, width = 120)
+            }
+            rows.addGap(2)
+            rows.add( Hybrid.ui.Separator(HORIZONTAL), width = 300)
+            rows.addGap(2)
+            rows += {
+                addGap(20)
+                add(Hybrid.ui.Label("Width:"), 120)
+                add(widthField, width = 120)
+            }
+            rows.addGap(2)
+            rows += {
+                addGap(20)
+                add(Hybrid.ui.Label("Height:"), 120)
+                add(heightField, width = 120)
+            }
+            rows.addGap(2)
+            rows.add( Hybrid.ui.Separator(HORIZONTAL), width = 300)
         }
     }
 
     val result : NewSimpleLayerReturn get() =
-        NewSimpleLayerReturn(0, 0, Colors.BLUE, "0", comboBox.selectedItem ?: FLAT)
+        NewSimpleLayerReturn(
+                widthField.width,
+                heightField.height,
+                Colors.BLUE,
+                nameField.text,
+                comboBox.selectedItem ?: FLAT)
 }

@@ -1,6 +1,6 @@
 package demonstration
 
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
@@ -16,7 +16,7 @@ class ResizeContainerPanelDemoFrame : JFrame() {
         layout = GridLayout()
 
         val centerButton = Hybrid.ui.Button("Click to Collapse All")
-        val resize = ResizeContainerPanel(centerButton, HORIZONATAL)
+        val resize = ResizeContainerPanel(centerButton, HORIZONTAL)
         resize.minStretch = 100
 
         centerButton.action = {(-4..4).forEach {resize.getPanel(it)?.componentVisible = false}}

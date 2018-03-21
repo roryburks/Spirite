@@ -1,6 +1,6 @@
 package demonstration
 
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.crossContainer.CrossContainer
 import spirite.gui.components.advanced.ResizeContainerPanel
@@ -35,7 +35,7 @@ class CrossContainerDemo : JFrame() {
                 height = 24
             }
         }
-        val resize = ResizeContainerPanel(x, HORIZONATAL)
+        val resize = ResizeContainerPanel(x, HORIZONTAL)
         resize.minStretch = 100
 
         val resize2 = ResizeContainerPanel(Hybrid.ui.Button("A"), VERTICAL)

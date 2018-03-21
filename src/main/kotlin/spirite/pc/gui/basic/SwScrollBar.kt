@@ -2,7 +2,7 @@ package spirite.pc.gui.basic
 
 import jspirite.gui.SScrollPane.ModernScrollBarUI
 import spirite.gui.Orientation
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IScrollBar
@@ -27,7 +27,7 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
 
 
     override var orientation: Orientation
-        get() = if( imp.getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONATAL
+        get() = if( imp.getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
         set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
     init {

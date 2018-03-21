@@ -7,7 +7,7 @@ import spirite.pc.gui.basic.SwPanel
 import spirite.gui.Bindable
 import spirite.gui.Bindable.Bound
 import spirite.gui.Orientation
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
@@ -140,7 +140,7 @@ private constructor(
                     btnExpand.setOnIcon(SwIcons.SmallIcons.ArrowE)
                     btnExpand.setOffIcon( if( trailing) SwIcons.SmallIcons.ArrowS else SwIcons.SmallIcons.ArrowN)
                 }
-                HORIZONATAL -> {
+                HORIZONTAL -> {
                     btnExpand.setOnIcon(SwIcons.SmallIcons.ArrowS)
                     btnExpand.setOffIcon( if( trailing) SwIcons.SmallIcons.ArrowE else SwIcons.SmallIcons.ArrowW)
                 }
@@ -151,7 +151,7 @@ private constructor(
             val pullBar = SwPanel { g ->
                 g.color = BarLineColor.color
                 when (orientation) {
-                    HORIZONATAL -> {
+                    HORIZONTAL -> {
                         val depth = width
                         val breadth = height
                         g.drawLine(depth / 2 - 2, 10, depth / 2 - 2, breadth - 10)
@@ -172,9 +172,9 @@ private constructor(
                 cols.add( btnExpand, width = 12)
                 cols.add( pullBar)
                 cols.height = barSize
-                overwriteOrientation = if(orientation == VERTICAL) HORIZONATAL else VERTICAL
+                overwriteOrientation = if(orientation == VERTICAL) HORIZONTAL else VERTICAL
             }
-            //pullBar.cursor = if( orientation == HORIZONATAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
+            //pullBar.cursor = if( orientation == HORIZONTAL) Cursor( Cursor.E_RESIZE_CURSOR) else Cursor( Cursor.N_RESIZE_CURSOR )
         }
 
         internal inner class ResizeBarTracker() {
@@ -190,13 +190,13 @@ private constructor(
                         .filter { it != this@ResizeBar }
                         .forEach {
                             reserved += it.size + when( orientation) {
-                                HORIZONATAL -> it.width
+                                HORIZONTAL -> it.width
                                 VERTICAL -> it.height
                             }
                         }
 
                 startPos = when( orientation) {
-                    HORIZONATAL -> p.x
+                    HORIZONTAL -> p.x
                     VERTICAL -> p.y
                 }
 
@@ -207,7 +207,7 @@ private constructor(
                 val p = e.point.convert(this@ResizeContainerPanel)
 
                 when( orientation) {
-                    HORIZONATAL -> {
+                    HORIZONTAL -> {
                         size = when( trailing) {
                             true -> startSize + (startPos - p.x)
                             false -> startSize - (startPos - p.x)

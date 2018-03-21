@@ -18,4 +18,10 @@ object SwingComponentProvider : IComponentProvider {
     override fun TabbedPane(): ITabbedPane = SwTabbedPane()
     override fun <T> ComboBox(things: Array<T>): IComboBox<T> = SwComboBox(things)
     override fun <T> TreeView(): ITreeView<T> = SwTreeView()
+
+    override fun TextField(): ITextField = SwTextField()
+    override fun IntField(min: Int, max: Int, allowsNegative: Boolean): IIntField = SwIntField(min, max, allowsNegative)
+    override fun FloatField( min: Float, max: Float, allowsNegative: Boolean): IFloatField = SwFloatField(min, max, allowsNegative)
+
+    override fun Separator(orientation: Orientation): ISeparator = SwSeparator(orientation)
 }

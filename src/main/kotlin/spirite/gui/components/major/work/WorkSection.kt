@@ -10,7 +10,7 @@ import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
 import spirite.base.util.round
-import spirite.gui.Orientation.HORIZONATAL
+import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.SwPanel
@@ -100,7 +100,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     private val coordinateLabel = Hybrid.ui.Label()
     private val messageLabel = Hybrid.ui.Label()
     private val vScroll = Hybrid.ui.ScrollBar(VERTICAL, this)
-    private val hScroll = Hybrid.ui.ScrollBar(HORIZONATAL, this)
+    private val hScroll = Hybrid.ui.ScrollBar(HORIZONTAL, this)
     private val zoomPanel = SwPanel { g ->
         val view = currentView
         when {
