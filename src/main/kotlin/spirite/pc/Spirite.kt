@@ -1,6 +1,7 @@
 package spirite.pc
 
 import spirite.base.brains.MasterControl
+import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.gui.components.major.RootWindow
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
@@ -22,10 +23,14 @@ fun main( args: Array<String>) {
             root.isLocationByPlatform = true
             root.isVisible = true
             root.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+
+
+            val ws = master.createWorkspace(640,480)
+            ws.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
+            master.workspaceSet.addWorkspace(ws)
         }
 
         SwingUtilities.invokeLater {
-            master.workspaceSet.addWorkspace(master.createWorkspace(600,400))
         }
     }catch (e : Exception) {
         MDebug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)

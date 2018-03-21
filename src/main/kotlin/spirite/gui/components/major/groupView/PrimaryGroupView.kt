@@ -1,7 +1,9 @@
 package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.gui.SUIPoint
 import spirite.gui.components.advanced.ITreeElementConstructor
@@ -23,6 +25,8 @@ private constructor(
     : IComponent by tree,
         TreeObserver
 {
+    constructor(master: MasterControl) : this(master, Hybrid.ui.TreeView<Node>())
+
     override fun treeStructureChanged() {rebuild()}
     init {
         master.centralObservatory.trackingPrimaryTreeObserver.addObserver(this)
@@ -92,5 +96,12 @@ private constructor(
         override val isLeaf get() = true
     }
 
-    constructor(master: MasterControl) : this(master, Hybrid.ui.TreeView<Node>())
+    private val wsl = object: WorkspaceObserver {
+        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
+        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
+        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
+            rebuild()
+        }
+
+    }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
 }
