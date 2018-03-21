@@ -12,6 +12,10 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.interpolation.CubicSplineInterpolator2D
 import spirite.base.util.interpolation.CubicSplineInterpolatorND
+import spirite.hybrid.Hybrid
+import spirite.pc.graphics.ImageBI
+import java.io.File
+import javax.imageio.ImageIO
 
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)

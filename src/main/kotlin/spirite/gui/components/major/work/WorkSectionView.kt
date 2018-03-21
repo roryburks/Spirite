@@ -49,9 +49,10 @@ class WorkSectionView(val workspace: IImageWorkspace) {
     val tWorkspaceToScreen : Transform by tWorkspaceToScreenDerived
 
     private val tScreenToWorkspaceDerived = DerivedLazy{
-        Transform.ScaleMatrix(1/zoom, 1/zoom)*
-        Transform.RotationMatrix(-rotation) *
-        Transform.TranslationMatrix(offsetX.f, offsetY.f)
+        tWorkspaceToScreen.invert()
+//        Transform.ScaleMatrix(1/zoom, 1/zoom)*
+//        Transform.RotationMatrix(-rotation) *
+//        Transform.TranslationMatrix(offsetX.f, offsetY.f)
     }
     val tScreenToWorkspace : Transform by tScreenToWorkspaceDerived
 

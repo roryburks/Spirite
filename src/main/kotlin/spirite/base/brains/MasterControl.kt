@@ -15,6 +15,8 @@ import spirite.base.graphics.ResourceUseTracker
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
+import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.ImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.components.dialogs.Dialog
 import spirite.gui.components.dialogs.IDialog
@@ -43,9 +45,12 @@ interface IMasterControl {
     val frameManager: IFrameManager
     val contextMenus : ContextMenus
     val dialog : IDialog
+
+    fun createWorkspace(width: Int, height: Int) : IImageWorkspace
 }
 
 class MasterControl() : IMasterControl {
+
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
     override val dialog: IDialog = Dialog(this)
@@ -65,4 +70,13 @@ class MasterControl() : IMasterControl {
 
     override val frameManager = FrameManager()
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
+
+
+    override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(
+            renderEngine,
+            settingsManager,
+            paletteManager,
+            strokeDrawerProvider,
+            width,
+            height)
 }

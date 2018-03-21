@@ -12,8 +12,12 @@ import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
+import spirite.pc.graphics.ImageBI
+import java.io.File
+import javax.imageio.ImageIO
 
 class GLStrokeDrawerV2(
         val gle: GLEngine

@@ -18,11 +18,10 @@ abstract class WorkArea(
 
         if( view != null && workspace != null) {
             gc.transform = view.tWorkspaceToScreen
-            gc.drawTransparencyBG(0, 0, 200, 200, 8)
+            gc.drawTransparencyBG(0, 0, workspace.width, workspace.height, 8)
 
             val img = workspace.renderEngine.renderWorkspace(workspace)
             gc.renderImage(img, 0, 0)
-            //gc.fillRect(0, 0, 200, 200)
         }
     }
 

@@ -1,6 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.gui.Bindable
+import spirite.pc.gui.SColor
 import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -9,11 +10,6 @@ import spirite.pc.gui.scolor
 import java.awt.Graphics
 import javax.swing.JPanel
 import javax.swing.JColorChooser
-
-
-
-typealias SColor = spirite.base.util.Color
-typealias JColor = java.awt.Color
 
 interface IColorSquareNonUI {
     val colorBind : Bindable<SColor>
@@ -47,7 +43,7 @@ private constructor(
         colorBind.addListener {imp.background = it.jcolor}
     }
 
-    private class SwColorSquareImp() : JPanel() {
+    private class SwColorSquareImp : JPanel() {
         var context :SwColorSquare? = null
 
         init {

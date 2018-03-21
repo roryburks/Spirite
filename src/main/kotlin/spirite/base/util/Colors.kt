@@ -90,23 +90,23 @@ object Colors {
     fun toColor(a: Int, r: Int, g: Int, b: Int): Color {
         return ColorARGB32Normal(a and 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF))
     }
-
-    fun toColor(r: Int, g: Int, b: Int): Int {
-        return 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF)
-    }
-
-    fun darken(color: java.awt.Color): java.awt.Color {
-        val hsv = FloatArray(3)
-        java.awt.Color.RGBtoHSB(color.red, color.green, color.blue, hsv)
-        hsv[2] = Math.max(0f, hsv[2] - 0.1f)
-        return java.awt.Color(java.awt.Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]))
-    }
-
-    fun colorDistance(color1: Int, color2: Int): Double {
-        val dr = getRed(color1) - getRed(color2)
-        val dg = getGreen(color1) - getGreen(color2)
-        val db = getBlue(color1) - getBlue(color2)
-        val da = getAlpha(color1) - getAlpha(color2)
-        return Math.sqrt((dr * dr + dg * dg + db * db + da * da).toDouble())
-    }
+//
+//    fun toColor(r: Int, g: Int, b: Int): Int {
+//        return 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF)
+//    }
+//
+//    fun darken(color: java.awt.Color): java.awt.Color {
+//        val hsv = FloatArray(3)
+//        java.awt.Color.RGBtoHSB(color.red, color.green, color.blue, hsv)
+//        hsv[2] = Math.max(0f, hsv[2] - 0.1f)
+//        return java.awt.Color(java.awt.Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]))
+//    }
+//
+//    fun colorDistance(color1: Int, color2: Int): Double {
+//        val dr = getRed(color1) - getRed(color2)
+//        val dg = getGreen(color1) - getGreen(color2)
+//        val db = getBlue(color1) - getBlue(color2)
+//        val da = getAlpha(color1) - getAlpha(color2)
+//        return Math.sqrt((dr * dr + dg * dg + db * db + da * da).toDouble())
+//    }
 }

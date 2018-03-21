@@ -26,9 +26,16 @@ private constructor(
     override fun treeStructureChanged() {rebuild()}
     init {
         master.centralObservatory.trackingPrimaryTreeObserver.addObserver(this)
+
+        tree.onMouseClick = { evt ->
+            if( evt.button == RIGHT )
+                workspace?.apply {
+                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, null), null)
+                }
+        }
     }
 
-    val workspace = master.workspaceSet.currentWorkspace
+    val workspace get() = master.workspaceSet.currentWorkspace
 
     private fun rebuild() {
         tree.clearRoots()
