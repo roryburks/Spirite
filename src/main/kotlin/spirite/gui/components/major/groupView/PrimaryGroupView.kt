@@ -5,12 +5,14 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.util.Colors
 import spirite.gui.components.advanced.ITreeElementConstructor
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
 import java.awt.datatransfer.Transferable
@@ -24,9 +26,13 @@ private constructor(
 {
     constructor(master: MasterControl) : this(master, Hybrid.ui.TreeView<Node>())
 
-    override fun treeStructureChanged() {rebuild()}
+    override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
+    override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
+
     init {
         master.centralObservatory.trackingPrimaryTreeObserver.addObserver(this)
+
+        tree.leftSize = 40
 
         tree.onMouseClick = { evt ->
             if( evt.button == RIGHT )
@@ -34,6 +40,11 @@ private constructor(
                     master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, null), null)
                 }
         }
+
+        // Note: this is only an abstract binding because workspace is changing, so that which it is "bound" to is constantly
+        //  changing.
+        tree.selectedBind.addListener { new, old ->  workspace?.groupTree?.selectedNode = new}
+        master.centralObservatory.selectedNode.addListener { new, old -> tree.selected = new }
     }
 
     val workspace get() = master.workspaceSet.currentWorkspace
@@ -60,7 +71,26 @@ private constructor(
     private val nongroupAttributes = NongroupAttributes()
 
     private open inner class NodeAttributes : TreeNodeAttributes<Node> {
-        override fun makeLeftComponent(t: Node): IComponent? = Hybrid.ui.Button(t.name)
+        override fun makeLeftComponent(t: Node) : IComponent{
+            val comp = Hybrid.ui.CrossPanel()
+            comp.background = Colors.TRANSPARENT
+            comp.opaque = false
+
+            val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
+            visibilityButton.checkBindable.addListener { new, old ->  t.visible = new}
+            visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
+            visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
+
+            comp.setLayout {
+                rows.addGap(4)
+                rows += {
+                    addGap(4)
+                    rows.add(visibilityButton, width = 24, height = 24)
+                }
+                rows.addGap(4)
+            }
+            return comp
+        }
         override fun makeComponent(t: Node): IComponent  {
             val comp = Hybrid.ui.Label(t.name)
             val node = t

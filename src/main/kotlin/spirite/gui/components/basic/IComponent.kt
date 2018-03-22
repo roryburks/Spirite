@@ -3,6 +3,7 @@ package spirite.gui.components.basic
 import spirite.base.util.linear.Rect
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseWheelEvent
+import spirite.pc.gui.SColor
 
 interface IComponent {
     val component: Any  // This should be the internal root component for things that might need it
@@ -14,6 +15,9 @@ interface IComponent {
     val x: Int
     val y: Int
     val bounds: Rect get() = Rect(x, y, width, height)
+
+    var background : SColor
+    var opaque : Boolean
 
 
     enum class BasicCursor {

@@ -4,14 +4,6 @@ import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.Transform
 
 
-/** RenderProperties is carried by individual objects, like nodes, Sprite Parts, etc */
-data class RenderProperties(
-        var visible: Boolean = true,
-        var alpha: Float = 1.0f,
-        var method: RenderMethod = RenderMethod())
-{
-    val isVisible: Boolean = visible && alpha > 0f
-}
 
 
 data class RenderRubric constructor(

@@ -7,6 +7,9 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.components.basic.Invokable
+import spirite.pc.gui.SColor
+import spirite.pc.gui.jcolor
+import spirite.pc.gui.scolor
 import java.awt.Cursor
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
@@ -30,6 +33,13 @@ abstract class ASwComponent : ISwComponent {
 
     override val x : Int get() = component.x
     override val y : Int get() = component.y
+
+    override var background: SColor
+        get() = component.background.scolor
+        set(value) {component.background = value.jcolor}
+    override var opaque: Boolean
+        get() = component.isOpaque
+        set(value) {component.isOpaque = value}
 
     override fun setBasicCursor(cursor: BasicCursor) {
         component.cursor = Cursor.getPredefinedCursor(when( cursor) {

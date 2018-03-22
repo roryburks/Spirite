@@ -30,6 +30,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+import kotlin.math.max
 
 interface ITreeViewNonUI<T>{
     var gapSize: Int
@@ -257,10 +258,12 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private val nodesAsList : List<TreeNode<T>> get()  {
         fun getNodesFor( node: TreeNode<T>) : List<TreeNode<T>> =node.children.fold(mutableListOf(), {
             agg, it ->
+            agg.add(it)
             agg.apply{addAll(getNodesFor(it))}
         })
         return _rootNodes.fold(mutableListOf(), {
             agg, it ->
+            agg.add(it)
             agg.apply { addAll(getNodesFor(it))}
         })
     }
@@ -467,7 +470,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
             }
             if( color != null) {
                 g2.color = color
-                g2.fillRect(0, it.key.y, width, it.key.height)
+                val h = max(it.key.height, it.value.lComponent?.height?:0)
+                g2.fillRect(0, it.key.y, width, h)
             }
         }
     }

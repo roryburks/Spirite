@@ -6,6 +6,7 @@ import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
@@ -17,6 +18,9 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
+import spirite.base.util.groupExtensions.SinglyList
+import spirite.base.util.groupExtensions.foldAppend
+import spirite.base.util.groupExtensions.mapAggregated
 import java.io.File
 
 interface IImageWorkspace {
@@ -124,4 +128,14 @@ class ImageWorkspace(
             activeDrawer = new?.run { getDrawerForNode(this) } ?: NillImageDrawer
         }
     }
+
+    private val treeListener = object : TreeObserver {
+        override fun treeStructureChanged(evt: TreeChangeEvent) {
+            imageObservatory.triggerRefresh(ImageChangeEvent(evt.changedNodes.mapAggregated { it.imageDependencies }, evt.changedNodes, this@ImageWorkspace))
+        }
+
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {
+            imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), SinglyList(node), this@ImageWorkspace))
+        }
+    }.apply { groupTree.treeObs.addObserver(this)}
 }

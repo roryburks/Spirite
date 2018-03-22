@@ -3,6 +3,7 @@ package spirite.base.brains
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.mediums.drawer.IImageDrawer
 import java.lang.ref.WeakReference
@@ -16,6 +17,7 @@ interface ICentralObservatory {
     val trackingPrimaryTreeObserver : IObservable<TreeObserver>
 
     val activeDrawerBind : IBindable<IImageDrawer?>
+    val selectedNode : IBindable<Node?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -29,6 +31,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObs }
 
     override val activeDrawerBind: IBindable<IImageDrawer?> = TrackingBinder { it.activeDrawerBind }
+    override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically

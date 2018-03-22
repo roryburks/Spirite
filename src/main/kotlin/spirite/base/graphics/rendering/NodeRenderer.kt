@@ -22,8 +22,8 @@ class NodeRenderer(
     private val neededImages : Int by lazy {
         root
                 .getAllNodesSuchThat(
-                    {it.render.isVisible && it !is GroupNode},
-                    {it.render.isVisible})
+                    {it.isVisible && it !is GroupNode},
+                    {it.isVisible})
                 .map { it.getDepthFrom(root) }
                 .max() ?: 0
     }
@@ -83,7 +83,7 @@ class NodeRenderer(
         node.children.asReversed()
                 // Note: The second half is needed to attempts to render children at max_depth+1 when it's already been
                 //  determined that there are no children  there (hence why the max_depth was set lower)
-                .filter { it.render.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
+                .filter { it.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
                 .forEach { child ->
                     when( child) {
                         is GroupNode -> {
@@ -162,7 +162,7 @@ class NodeRenderer(
 
             _renderRec(node, n+1)
 
-            val rubric = RenderRubric( node.tNodeToContext, node.render.alpha, node.render.method)
+            val rubric = RenderRubric( node.tNodeToContext, node.alpha, node.method)
             gc.renderImage( buffer[n+1], 0, 0, rubric)
         }
     }
@@ -179,7 +179,7 @@ class NodeRenderer(
             gc.scale(ratioW, ratioH)
 
             val baseRubric = th.renderRubric.stack(
-                    RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))
+                    RenderRubric(node.tNodeToContext, node.alpha, node.method))
 
             when(th.handle) {
                 builtComposite?.handle -> {
@@ -189,7 +189,7 @@ class NodeRenderer(
                 }
                 else -> {
                     val rubric = th.renderRubric.stack(
-                            RenderRubric(node.tNodeToContext, node.render.alpha, node.render.method))
+                            RenderRubric(node.tNodeToContext, node.alpha, node.method))
                     th.handle.medium.render(gc, rubric)
                 }
             }

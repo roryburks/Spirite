@@ -24,10 +24,13 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         })
         imp.content.addMouseListener(object: MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
-                imp.requestFocus()
-                val comp = imp.content.getComponentAt(e.point)
-                val index = _entries.indexOfFirst { it.component.component.jcomponent == comp }
-                selectedIndex = index
+                if( enabled) {
+                    imp.requestFocus()
+                    val comp = imp.content.getComponentAt(e.point)
+                    val index = _entries.indexOfFirst { it.component.component.jcomponent == comp }
+                    if( index != -1)
+                        selectedIndex = index
+                }
             }
         })
     }
@@ -35,29 +38,29 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         val actionMap = HashMap<KeyStroke, Action>(4)
 
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), SwUtil.buildAction {
-            if (selectedIndex != -1)
+            if (selectedIndex != -1 && enabled)
                 selectedIndex = max(0, selectedIndex - numPerRow)
         })
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), SwUtil.buildAction {
-            if (selectedIndex != -1)
+            if (selectedIndex != -1 && enabled)
                 selectedIndex = min(_entries.size - 1, selectedIndex + numPerRow)
         })
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), SwUtil.buildAction {
-            if (selectedIndex != -1)
+            if (selectedIndex != -1 && enabled)
                 selectedIndex = max(0, selectedIndex - 1)
         })
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), SwUtil.buildAction {
-            if (selectedIndex != -1)
+            if (selectedIndex != -1 && enabled)
                 selectedIndex = min(_entries.size - 1, selectedIndex + 1)
         })
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction {
-            if (selectedIndex != -1 && selectedIndex != 0) {
+            if (selectedIndex != -1 && selectedIndex != 0 && enabled) {
                 if (attemptMove(selectedIndex, selectedIndex - 1))
                     selectedIndex -= 1
             }
         })
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction {
-            if (selectedIndex != -1 && selectedIndex != _entries.size - 1) {
+            if (selectedIndex != -1 && selectedIndex != _entries.size - 1 && enabled) {
                 if (attemptMove(selectedIndex, selectedIndex + 1))
                     selectedIndex += 1
             }
@@ -65,7 +68,7 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction {
             val to = Math.max(0, selectedIndex - numPerRow)
 
-            if (selectedIndex != -1 && to != selectedIndex) {
+            if (selectedIndex != -1 && to != selectedIndex && enabled) {
                 if (attemptMove(selectedIndex, to))
                     selectedIndex = to
             }
@@ -73,7 +76,7 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction {
             val to = Math.min(_entries.size - 1, selectedIndex + numPerRow)
 
-            if (selectedIndex != -1 && to != selectedIndex) {
+            if (selectedIndex != -1 && to != selectedIndex && enabled) {
                 if (attemptMove(selectedIndex, to))
                     selectedIndex = to
             }

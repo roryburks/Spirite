@@ -15,7 +15,7 @@ interface IBoxList<T> : IComponent
 
     val selectedIndexBind : Bindable<Int>
     var selectedIndex: Int
-    val selected : T?
+    var selected : T?
 
     val numPerRow: Int
     var renderer : (T) -> IBoxComponent
@@ -58,7 +58,10 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
             selectedIndexBind.field = MUtil.clip(-1,value, _entries.size-1)
         }
 
-    override val selected: T? get() = _entries.getOrNull(selectedIndex)?.value
+    override var selected: T? get() = _entries.getOrNull(selectedIndex)?.value
+        set(value) {
+            selectedIndex = _entries.indexOfFirst { it.value == value }
+        }
 
     override val entries: List<T> get() = _entries.map { it.value }
 

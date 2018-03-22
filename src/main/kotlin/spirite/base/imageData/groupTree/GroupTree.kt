@@ -2,7 +2,6 @@ package spirite.base.imageData.groupTree
 
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
-import spirite.base.graphics.RenderProperties
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
@@ -10,8 +9,12 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.linear.Transform
 import spirite.base.brains.Bindable
+import spirite.base.graphics.RenderMethod
+import spirite.base.util.groupExtensions.SinglyList
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
+import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
+import kotlin.reflect.KProperty
 
 /**
  * The GroupTree is an abstract Container Structure used by several components to organize ImageData in a hierarchical
@@ -23,29 +26,80 @@ open class GroupTree( val undoEngine: IUndoEngine?)
     open val treeDescription = "Abstract Group Tree"
 
     var selectedNodeBind = Bindable<Node?>(null)
-    var selectedNode by selectedNodeBind
+    var selectedNode
+        get() = selectedNodeBind.field
+        set(value) {
+            when {
+                value == null -> selectedNodeBind.field = null
+                value.tree != this -> MDebug.handleError(STRUCTURAL, "Tried to splice a node into a new tree")
+                else -> selectedNodeBind.field = value
+            }
+        }
 
     // region Tree Observer
     interface TreeObserver {
-        fun treeStructureChanged()
+        fun treeStructureChanged(evt: TreeChangeEvent)
+        fun nodePropertiesChanged( node: Node, renderChanged: Boolean)
     }
+    class TreeChangeEvent( val changedNodes : List<Node>)
     val treeObs : IObservable<TreeObserver> get() = _treeObs
     private val _treeObs = Observable<TreeObserver>()
 
-    protected fun triggerChange() {_treeObs.trigger { it.treeStructureChanged() }}
+    protected fun triggerChange(evt : TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) }}
+    protected fun triggerNodeAttributeChanged( node:  Node, renderChanged: Boolean) {_treeObs.trigger { it.nodePropertiesChanged(node, renderChanged) }}
     // endregion
 
     abstract inner class Node( parent: GroupNode?, name: String) {
         // Properties
-        var render : RenderProperties by UndoableDelegate(RenderProperties(), undoEngine, "Changed $treeDescription Node's Render Settings")
-        var x : Int by UndoableDelegate(0, undoEngine,"Changed $treeDescription Node's X offset")
-        var y : Int by UndoableDelegate(0, undoEngine,"Changed $treeDescription Node's Y offset")
-        var expanded : Boolean by UndoableDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node")
-        var name : String by UndoableDelegate( name, undoEngine,"Changed $treeDescription Node's Name")
+        var visible by NodePropertyDelegate(true, undoEngine, "Changed $treeDescription Node's Visibility")
+        var alpha by NodePropertyDelegate(1.0f, undoEngine, "Changed $treeDescription Node's Alpha")
+        var method by NodePropertyDelegate(RenderMethod(), undoEngine, "Changed $treeDescription Node's Method")
+
+        var x : Int by NodePropertyDelegate(0, undoEngine,"Changed $treeDescription Node's X offset")
+        var y : Int by NodePropertyDelegate(0, undoEngine,"Changed $treeDescription Node's Y offset")
+        var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node", false)
+        var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription Node's Name", false)
+
+        val isVisible : Boolean get() = visible && alpha > 0f
 
         val tNodeToContext get() = Transform.TranslationMatrix(x+0f, y+0f)
 
-        // Structure
+
+        inner class NodePropertyDelegate<T>(
+                defaultValue : T,
+                val undoEngine: IUndoEngine?,
+                val changeDescription: String,
+                val isRenderPropert: Boolean = true)
+        {
+            var field = defaultValue
+                set(value) {
+                    field = value
+                    triggerNodeAttributeChanged(this@Node, isRenderPropert)
+                }
+
+            operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
+
+            operator fun setValue(thisRef: Any, prop: KProperty<*>, value: T) {
+                if (undoEngine == null) {
+                    field = value
+                } else if (field != value) {
+                    val oldValue = field
+                    val newValue = value
+                    undoEngine.performAndStore(object : NullAction() {
+                        override val description: String get() = changeDescription
+                        override fun performAction() {
+                            field = newValue
+                        }
+
+                        override fun undoAction() {
+                            field = oldValue
+                        }
+                    })
+                }
+            }
+        }
+
+        // region Structure
         var parent = parent ; internal set
 
         val depth : Int get() {
@@ -94,6 +148,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             sub(listOf(this))
             return list
         }
+        // endregion
 
         abstract val imageDependencies : Collection<MediumHandle>
 
@@ -192,7 +247,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         private fun _move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
             _remove( toMove, false)
             newParent._add( toMove, newBefore, false)
-            triggerChange()
+            triggerChange(TreeChangeEvent(SinglyList(toMove)))
         }
 
         internal fun add(toAdd: Node, before: Node?) {
@@ -222,7 +277,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 else -> _children.add(index, toAdd)
             }
             toAdd.parent = this
-            if( trigger)triggerChange()
+            if( trigger)
+                triggerChange(TreeChangeEvent(SinglyList(toAdd)))
         }
 
 
@@ -245,7 +301,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         }
         private fun _remove( toRemove: Node, trigger: Boolean = true) {
             _children.remove( toRemove)
-            if( trigger)triggerChange()
+            triggerChange(TreeChangeEvent(SinglyList(toRemove)))
         }
     }
 

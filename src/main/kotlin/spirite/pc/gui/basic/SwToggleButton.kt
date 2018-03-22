@@ -8,8 +8,8 @@ import spirite.gui.resources.IIcon
 import javax.swing.JToggleButton
 
 
-class SwToggleButton
-private constructor(startChecked: Boolean, private val imp: SwToggleButtonImp )
+open class SwToggleButton
+protected constructor(startChecked: Boolean, private val imp: JToggleButton )
     : IToggleButton,
         IToggleButtonNonUI by ToggleButtonNonUI(startChecked), IComponent,
         ISwComponent by SwComponent(imp)

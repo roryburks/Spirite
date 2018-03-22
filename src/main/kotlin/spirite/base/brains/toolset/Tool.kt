@@ -59,3 +59,63 @@ class Pen( toolset: Toolset) : Tool(toolset){
     var hard by scheme.Property(CheckBoxProperty(false, "Hard Edged"))
     var mode by scheme.Property(DropDownProperty(PenDrawMode.NORMAL, "Draw Mode"))
 }
+class Eraser( toolset: Toolset) : Tool(toolset){
+    override val iconX = 1
+    override val iconY = 0
+    override val description = "Eraser"
+}
+class Fill( toolset: Toolset) : Tool(toolset){
+    override val iconX = 2
+    override val iconY = 0
+    override val description = "Fill"
+}
+class ShapeSelection( toolset: Toolset) : Tool(toolset){
+    override val iconX = 3
+    override val iconY = 0
+    override val description = "Shape Selection"
+}
+class FreeSelection( toolset: Toolset) : Tool(toolset){
+    override val iconX = 0
+    override val iconY = 1
+    override val description = "Free Selection"
+}
+class Move( toolset: Toolset) : Tool(toolset){
+    override val iconX = 1
+    override val iconY = 1
+    override val description = "Move"
+}
+class Pixel( toolset: Toolset) : Tool(toolset){
+    override val iconX = 2
+    override val iconY = 1
+    override val description = "Pixel"
+}
+class Crop( toolset: Toolset) : Tool(toolset){
+    override val iconX = 3
+    override val iconY = 1
+    override val description = "Cropper"
+}
+class Rigger( toolset: Toolset) : Tool(toolset){
+    override val iconX = 0
+    override val iconY = 2
+    override val description = "Rig"
+}
+class Flip( toolset: Toolset) : Tool(toolset){
+    override val iconX = 1
+    override val iconY = 2
+    override val description = "Flipper"
+}
+class Resize( toolset: Toolset) : Tool(toolset){
+    override val iconX = 2
+    override val iconY = 2
+    override val description = "Resizer"
+}
+class ColorChanger( toolset: Toolset) : Tool(toolset){
+    override val iconX = 3
+    override val iconY = 2
+    override val description = "Color Changer"
+}
+class ColorPicker( toolset: Toolset) : Tool(toolset){
+    override val iconX = 0
+    override val iconY = 3
+    override val description = "Color Picker"
+}
