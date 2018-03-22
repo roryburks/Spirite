@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.pc.gui.SColor
 import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.ISwComponent

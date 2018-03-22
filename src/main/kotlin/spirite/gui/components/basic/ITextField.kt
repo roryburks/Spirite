@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.MUtil
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import java.awt.Color
 
 interface ITextFieldNonUI {

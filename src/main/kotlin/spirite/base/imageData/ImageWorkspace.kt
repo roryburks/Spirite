@@ -1,11 +1,12 @@
 package spirite.base.imageData
 
+import spirite.base.brains.Bindable
+import spirite.base.brains.IBindable
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
@@ -50,7 +51,9 @@ interface IImageWorkspace {
 
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
-    val activeDrawer : IImageDrawer?
+
+    val activeDrawerBind: IBindable<IImageDrawer>
+    val activeDrawer : IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
 
     val imageObservatory: IImageObservatory
@@ -80,6 +83,12 @@ class ImageWorkspace(
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
     override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
 
+    init {
+        groupTree.selectedNodeBind.addListener { new, old ->
+            activeDrawer = new?.run { getDrawerForNode(this) } ?: NillImageDrawer
+        }
+    }
+
     override fun finishBuilding() {
         undoEngine.reset()
         hasChanged = false
@@ -107,7 +116,8 @@ class ImageWorkspace(
         return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
-    override val activeDrawer: IImageDrawer get() {return getDrawerForNode( groupTree.selectedNode ?: return NillImageDrawer)}
+    override val activeDrawerBind = Bindable<IImageDrawer>(NillImageDrawer)
+    override var activeDrawer: IImageDrawer by activeDrawerBind ; private set
 
     override fun getDrawerForNode(node: Node) = when( node) {
             is LayerNode -> node.layer.getDrawer(arrangeActiveDataForNode(node))

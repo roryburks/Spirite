@@ -3,11 +3,10 @@ package spirite.gui.components.advanced
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.util.delegates.OnChangeDelegate
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.gui.components.advanced.ITreeElementConstructor.ITNode
 import spirite.gui.components.advanced.ITreeView.*
 import spirite.gui.components.advanced.ITreeView.DropDirection.*
-import spirite.gui.components.advanced.SwTreeView.TreeNode
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
@@ -224,10 +223,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>)
         :ITreeNode<T>
     {
-        override val expandedBind = Bindable(true, { new, old -> rebuildTree()})
+        override val expandedBind = Bindable(true, { new, old -> rebuildTree() })
         override var expanded by expandedBind
 
-        override val valueBind = Bindable(defaultValue, {new, old -> rebuildTree()})
+        override val valueBind = Bindable(defaultValue, { new, old -> rebuildTree() })
         override var value by valueBind
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()

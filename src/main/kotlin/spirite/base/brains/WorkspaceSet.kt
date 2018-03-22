@@ -13,6 +13,8 @@ interface IWorkspaceSet {
     }
     val workspaceObserver : IObservable<WorkspaceObserver>
     val workspaces: List<IImageWorkspace>
+
+    val currentWorkspaceBind : Bindable<IImageWorkspace?>
     var currentWorkspace : IImageWorkspace?
 }
 interface MWorkspaceSet : IWorkspaceSet {
@@ -38,12 +40,10 @@ class WorkspaceSet : MWorkspaceSet{
         }
     }
 
-    override var currentWorkspace: IImageWorkspace? = null
-        set(value) {
-            val previous = field
-            field = value
-            workspaceObserver.trigger { it.workspaceChanged(value, previous) }
-        }
+    override val currentWorkspaceBind = Bindable<IImageWorkspace?>(null, {new, old ->
+        workspaceObserver.trigger { it.workspaceChanged(new, old) }
+    })
+    override var currentWorkspace: IImageWorkspace? by currentWorkspaceBind
 
 
     override val workspaces = mutableListOf<IImageWorkspace>()

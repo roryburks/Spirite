@@ -2,7 +2,7 @@ package spirite.gui.components.basic
 
 import spirite.base.util.MUtil
 import spirite.base.util.delegates.OnChangeDelegate
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IBoxList.DefaultBoxComponent
 import spirite.gui.components.basic.IBoxList.IBoxComponent
@@ -48,7 +48,7 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     var boxWidth by OnChangeDelegate(boxWidth, {rebuild()})
     var boxHeight by OnChangeDelegate(boxHeight, {rebuild()})
 
-    override val selectedIndexBind = Bindable(0, {new, old ->
+    override val selectedIndexBind = Bindable(0, { new, old ->
         _entries.getOrNull(old)?.component?.setSelected(false)
         _entries.getOrNull(new)?.component?.setSelected(true)
     })

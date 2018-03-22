@@ -1,13 +1,12 @@
 package spirite.pc.gui.basic
 
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.gui.components.basic.*
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light
 import spirite.gui.resources.Skin.TextField.Background
 import spirite.gui.resources.Skin.TextField.InvalidBg
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SwNumberField.SwNumberFieldImp
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.JTextField

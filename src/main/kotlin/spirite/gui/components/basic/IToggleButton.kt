@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.gui.Bindable
-import spirite.gui.Bindable.Bound
+import spirite.base.brains.Bindable
+import spirite.base.brains.Bindable.Bound
 import spirite.gui.resources.IIcon
 
 interface IToggleButtonNonUI {

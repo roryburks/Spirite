@@ -9,7 +9,7 @@ import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.linear.Transform
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 

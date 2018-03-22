@@ -10,7 +10,6 @@ import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
-import spirite.gui.Bindable
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 

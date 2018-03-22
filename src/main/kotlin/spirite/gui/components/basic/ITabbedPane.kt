@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent

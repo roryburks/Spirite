@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.MUtil
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -21,8 +21,8 @@ interface IComboBox<T> : IComponent
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
     override val selectedItemBind = Bindable<T?>(null,
-            {new, old -> values.indexOf(new).apply { if( this != selectedIndex) selectedIndex = this }})
-    override val selectedIndexBind = Bindable(0, {new, old ->selectedItemBind.field = values[new]})
+            { new, old -> values.indexOf(new).apply { if (this != selectedIndex) selectedIndex = this } })
+    override val selectedIndexBind = Bindable(0, { new, old -> selectedItemBind.field = values[new] })
 
     override var selectedItem: T?
         get() = selectedItemBind.field

@@ -4,8 +4,8 @@ import spirite.base.util.MUtil
 import spirite.base.util.groupExtensions.then
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.SwPanel
-import spirite.gui.Bindable
-import spirite.gui.Bindable.Bound
+import spirite.base.brains.Bindable
+import spirite.base.brains.Bindable.Bound
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
@@ -123,7 +123,7 @@ private constructor(
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
 
-        private var componentVisibleBindable = Bindable(true, {new, old -> resetLayout() })
+        private var componentVisibleBindable = Bindable(true, { new, old -> resetLayout() })
         var componentVisible by Bound(componentVisibleBindable)
 
         init {

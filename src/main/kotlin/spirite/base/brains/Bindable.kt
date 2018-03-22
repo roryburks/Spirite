@@ -1,4 +1,4 @@
-package spirite.gui
+package spirite.base.brains
 
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
@@ -6,18 +6,30 @@ import kotlin.reflect.KProperty
 
 typealias OnChangeEvent<T> = (new: T, old:T)->Unit
 
+// IBindable<T> is essentially a read-only access of a Bindable, but it can be wrapped for various purposes (such as
+//  deciding which among many bindables the user needs at a given moment)
+interface IBindable<T> {
+    val field: T
+    fun addListener( listener: OnChangeEvent<T>) : IBoundListener<T>
+    fun addWeakListener( listener: OnChangeEvent<T>) : IBoundListener<T>
+}
+
+interface IBoundListener<T> {
+    fun unbind()
+}
+
 /***
  * Bindable objects can be bound to other Bindables of the same type so that they share the same underlying scroll.
  * Bindables come with an optional onChange Lambda that will be invoked whenever any bound Bindable is changed (thus
  * the underlying scroll is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
  * underlying is different)
  */
-class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) {
-    var field: T
+class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : IBindable<T>, IBoundListener<T>{
+    override var field: T
         get() = underlying.field
         set(value) {underlying.field = value}
 
-    private var underlying = BindableUnderlying(this,defaultValue)
+    private var underlying = BindableUnderlying(this, defaultValue)
 
     /** Note: Calling b1.bind( b2) will result in both having b2's current underlying scroll. */
     fun bind( root: Bindable<T>) {
@@ -34,22 +46,27 @@ class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) {
         }
     }
 
-    fun addListener( listener: OnChangeEvent<T>) {
-        underlying.swallow( Bindable(field, listener).underlying)
+    override fun addListener(listener: OnChangeEvent<T>) : IBoundListener<T> {
+        val bind = Bindable(field, listener)
+        underlying.swallow( bind.underlying)
         listener.invoke(field, field)
-    }
-    fun injectListener( listener: OnChangeEvent<T>) {
-        underlying.swallow( Bindable(field, listener).underlying)
-        // Doesn't invoke
+        return bind
     }
 
-    fun unbind() {
+    override fun addWeakListener(listener: OnChangeEvent<T>) : IBoundListener<T> {
+        val bind = Bindable(field, listener)
+        underlying.swallowWeakly( bind.underlying)
+        listener.invoke(field, field)
+        return bind
+    }
+
+    override fun unbind() {
         val value = field
         underlying.detatch(this)
-        underlying = BindableUnderlying(this,value)
+        underlying = BindableUnderlying(this, value)
     }
 
-    private class BindableUnderlying<T>( bindable: Bindable<T>, defaultValue: T) {
+    private class BindableUnderlying<T>(bindable: Bindable<T>, defaultValue: T) {
         var field : T = defaultValue
             set(value) {
                 val prev = field
@@ -97,4 +114,3 @@ class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) {
         operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {bindable.field = value}
     }
 }
-

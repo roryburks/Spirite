@@ -2,7 +2,6 @@ package spirite.pc.JOGL
 
 import com.jogamp.opengl.*
 import spirite.base.graphics.gl.IGL
-import spirite.gui.Bindable
 
 object JOGLProvider {
     private val drawable: GLOffscreenAutoDrawable

@@ -1,6 +1,6 @@
 package spirite.base.brains.toolset
 
-import spirite.gui.Bindable
+import spirite.base.brains.Bindable
 import kotlin.reflect.KProperty
 
 abstract class Tool(
