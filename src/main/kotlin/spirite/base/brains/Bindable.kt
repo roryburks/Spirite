@@ -14,6 +14,8 @@ interface IBindable<T> {
     fun addWeakListener( listener: OnChangeEvent<T>) : IBoundListener<T>
 }
 
+// When you create a Listener not bound to an existing Bindable, sometimes you'll want to remove that listener manually.
+//  That's what this interface is for.
 interface IBoundListener<T> {
     fun unbind()
 }

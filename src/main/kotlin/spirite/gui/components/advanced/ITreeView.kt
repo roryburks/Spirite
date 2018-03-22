@@ -4,9 +4,11 @@ import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.brains.Bindable
+import spirite.base.brains.IBindable
 import spirite.gui.components.advanced.ITreeElementConstructor.ITNode
 import spirite.gui.components.advanced.ITreeView.*
-import spirite.gui.components.advanced.ITreeView.DropDirection.*
+import spirite.gui.components.advanced.ITreeViewNonUI.*
+import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
@@ -14,20 +16,31 @@ import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
+import spirite.pc.gui.JColor
+import spirite.pc.gui.SColor
+import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-interface ITreeView<T> : IComponent{
+interface ITreeViewNonUI<T>{
     var gapSize: Int
     var leftSize: Int
     val rootNodes: List<ITreeNode<T>>
     var treeRootInterpreter : TreeDragInterpreter<T>?
+
+    val selectedNodeBind: IBindable<ITreeNode<T>?>
+    val selectedNode : ITreeNode<T>?
+    val selectedBind : IBindable<T?>
+    var selected : T?
 
     fun addRoot( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()) : ITreeNode<T>
     fun removeRoot( toRemove: ITreeNode<T>)
@@ -67,11 +80,19 @@ interface ITreeView<T> : IComponent{
         override fun canImport(trans: Transferable) : Boolean = false
         override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<T>, dropDirection: DropDirection) {}
 
+        fun getBackgroundColor( t: T, isSelected: Boolean) : Color? = null
+
         val isLeaf : Boolean get() = false
     }
 
 
     class BasicTreeNodeAttributes<T> : TreeNodeAttributes<T>
+}
+
+interface ITreeView<T> : ITreeViewNonUI<T>, IComponent
+{
+    var backgroundColor : JColor
+    var selectedColor : JColor
 }
 
 class ITreeElementConstructor<T> {
@@ -100,9 +121,27 @@ private constructor(private val imp : SwTreeViewImp<T>)
 {
     constructor() : this(SwTreeViewImp())
 
+    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.color, {imp.background = backgroundColor ; redraw()})
+    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.color, {redraw()})
+
     override var gapSize by OnChangeDelegate( 12, {rebuildTree()})
     override var leftSize by OnChangeDelegate(0, {rebuildTree()})
     //fun nodeAtPoint( p: Vec2i)
+
+    override val selectedBind = Bindable<T?>(null)
+    override var selected: T?
+        get() = selectedBind.field
+        set(value) {
+            val node = nodesAsList.find { it.value == value }
+            selectedBind.field = node?.value
+            selectedNode = node
+        }
+
+    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null, { new, old ->
+        selectedBind.field = new?.value
+        redraw()
+    })
+    override var selectedNode: ITreeNode<T>? by selectedNodeBind
 
     // region Tree Construction
     private fun makeToggleButton( checked: Boolean) : IToggleButton {
@@ -128,6 +167,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
             node.component = component
             node.lComponent = leftComponent
             dnd.addDropSource(component.jcomponent)
+            component.jcomponent.addMouseListener( SimpleMouseListener{
+                selectedNode = node
+            })
 
             initializer += {
                 if( leftSize != 0) {
@@ -211,6 +253,17 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
     override val rootNodes : List<TreeNode<T>> get() = _rootNodes
     private val _rootNodes = mutableListOf<TreeNode<T>>()
+
+    private val nodesAsList : List<TreeNode<T>> get()  {
+        fun getNodesFor( node: TreeNode<T>) : List<TreeNode<T>> =node.children.fold(mutableListOf(), {
+            agg, it ->
+            agg.apply{addAll(getNodesFor(it))}
+        })
+        return _rootNodes.fold(mutableListOf(), {
+            agg, it ->
+            agg.apply { addAll(getNodesFor(it))}
+        })
+    }
 
     // endregion
 
@@ -374,16 +427,24 @@ private constructor(private val imp : SwTreeViewImp<T>)
     // endregion
 
     // region Implementation (Drawing Mostly)
+
     private class SwTreeViewImp<T> : JPanel() {
         init {
-            background = Skin.Global.Bg.color
+            background = JColor(0,0,0,0)
+            addMouseListener( SimpleMouseListener { evt ->
+                context?.apply {
+                    selectedNode = getNodeFromY(evt.y) ?: selectedNode
+                }
+            })
         }
 
         var context : SwTreeView<T>? = null
 
         override fun paint(g: Graphics) {
+            g.color = context?.backgroundColor ?: Color.BLACK
+            g.fillRect(0,0,width, height)
+            context?.drawBg(g as Graphics2D)
             super.paint(g)
-
             context?.drawDrag(g as Graphics2D)
         }
     }
@@ -394,6 +455,20 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
         while (true) {
             node = node.children.lastOrNull() ?: return node
+        }
+    }
+
+    private fun drawBg( g2: Graphics2D) {
+        compToNodeMap.forEach {
+            val isSelected = selected == it.value.value
+            val color = it.value.attributes.getBackgroundColor(it.value.value, isSelected) ?: when {
+                isSelected -> selectedColor
+                else -> null
+            }
+            if( color != null) {
+                g2.color = color
+                g2.fillRect(0, it.key.y, width, it.key.height)
+            }
         }
     }
 

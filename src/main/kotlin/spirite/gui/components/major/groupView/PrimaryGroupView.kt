@@ -5,17 +5,14 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.gui.SUIPoint
 import spirite.gui.components.advanced.ITreeElementConstructor
 import spirite.gui.components.advanced.ITreeView
-import spirite.gui.components.advanced.ITreeView.*
-import spirite.gui.components.advanced.ITreeView.DropDirection.*
+import spirite.gui.components.advanced.ITreeViewNonUI.*
+import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
-import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 
 class PrimaryGroupView

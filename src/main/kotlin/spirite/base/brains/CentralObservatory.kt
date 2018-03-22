@@ -40,19 +40,11 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         trackingObservers.forEach { workspaceSet.workspaceObserver.addObserver(it) }
     }
 
-    inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>, WorkspaceObserver, OnChangeEvent<T>
+    inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
         private val listeners = mutableListOf<OnChangeEvent<T?>>()
         private val weakListeners = mutableListOf<WeakReference<OnChangeEvent<T?>>>()
-
-        override fun invoke(new: T, old: T) {
-            listeners.forEach { it.invoke(new, old) }
-            weakListeners.removeIf { it.get()?.invoke(new,old) == null }
-        }
-
         override val field: T? get() = workspaceSet.currentWorkspace?.run { finder.invoke(this).field }
-
-        private var currentBind : IBoundListener<T>? = null
 
         override fun addListener(listener: OnChangeEvent<T?>) : IBoundListener<T?> {
             return TrackingBound(listener.apply { listeners.add( this) })
@@ -62,15 +54,22 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             return TrackingBound(listener.apply { weakListeners.add( WeakReference(this)) })
         }
 
-        override fun workspaceCreated(newWorkspace: IImageWorkspace) {}
-        override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {}
-        override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
-            currentBind?.unbind()
-            currentBind = selectedWorkspace?.run { finder.invoke(this).addListener(this@TrackingBinder) }
+        init {
+            var currentBind : IBoundListener<T>? = null
+            val onChange : (T,T)->Unit = {new, old ->
+                listeners.forEach { it.invoke(new, old) }
+                weakListeners.removeIf { it.get()?.invoke(new,old) == null }
+            }
 
-            val new = selectedWorkspace?.run(finder)?.field
-            val old = previousSelected?.run(finder)?.field
-            listeners.forEach { it.invoke(new, old) }
+            workspaceSet.currentWorkspaceBind.addListener { selectedWS, previousSelected ->
+                currentBind?.unbind()
+                currentBind = selectedWS?.run { finder.invoke(this).addListener(onChange) }
+
+                val new = selectedWS?.run(finder)?.field
+                val old = previousSelected?.run(finder)?.field
+                listeners.forEach { it.invoke(new, old) }
+                weakListeners.removeIf { it.get()?.invoke(new, old) == null }
+            }
         }
 
         // Todo: this could potentially do weird things if someone binds the same oce multiple times
@@ -80,7 +79,6 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
                 weakListeners.removeIf { (it.get()?: oce) == oce }
             }
         }
-
     }
 
     inner class OmniObserver<T>(

@@ -83,11 +83,6 @@ class ImageWorkspace(
     override var width: Int by UndoableDelegate(width, undoEngine, "Changed Workspace Width")
     override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
 
-    init {
-        groupTree.selectedNodeBind.addListener { new, old ->
-            activeDrawer = new?.run { getDrawerForNode(this) } ?: NillImageDrawer
-        }
-    }
 
     override fun finishBuilding() {
         undoEngine.reset()
@@ -124,4 +119,9 @@ class ImageWorkspace(
             else -> NillImageDrawer
     }
 
+    init {
+        groupTree.selectedNodeBind.addListener { new, old ->
+            activeDrawer = new?.run { getDrawerForNode(this) } ?: NillImageDrawer
+        }
+    }
 }

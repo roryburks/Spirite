@@ -85,7 +85,7 @@ class OmniInitializer {
 
         if( minSize != null) rc.minStretch = minSize!!
 
-        leading.asReversed().forEach {rc.addPanel(it.component, it.minDim, it.prefDim, Int.MAX_VALUE)}
+        leading.forEach {rc.addPanel(it.component, it.minDim, it.prefDim, Int.MAX_VALUE)}
         trailing.forEach { rc.addPanel(it.component, it.minDim, it.prefDim, Int.MIN_VALUE) }
 
         return rc
