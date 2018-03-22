@@ -3,16 +3,11 @@ package spirite.gui.components.basic
 import spirite.base.util.MUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.Bindable
+import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IBoxList.DefaultBoxComponent
 import spirite.gui.components.basic.IBoxList.IBoxComponent
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.SwUtil
-import spirite.pc.gui.basic.*
-import java.awt.event.*
-import javax.swing.Action
-import javax.swing.KeyStroke
 import kotlin.math.max
-import kotlin.math.min
 
 interface IBoxList<T> : IComponent
 {
@@ -20,6 +15,7 @@ interface IBoxList<T> : IComponent
 
     val selectedIndexBind : Bindable<Int>
     var selectedIndex: Int
+    val selected : T?
 
     val numPerRow: Int
     var renderer : (T) -> IBoxComponent
@@ -27,6 +23,11 @@ interface IBoxList<T> : IComponent
     var movable: Boolean
 
     fun attemptMove( from: Int, to: Int) : Boolean
+    fun addEntry( t: T)
+    fun addEntry( ind: Int, t: T)
+    fun addAll( set: Collection<T>)
+    fun remove( t: T)
+    fun clear()
 
     interface IBoxComponent {
         val component: IComponent
@@ -41,12 +42,9 @@ interface IBoxList<T> : IComponent
     }
 }
 
-class SwBoxList<T>
-private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val imp: SwBoxListImp<T>)
-    :IBoxList<T>, ISwComponent by SwComponent(imp)
+abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val del: IBoxListImp)
+    :IBoxList<T>, IComponent by del.component
 {
-    constructor(boxWidth:Int, boxHeight: Int, entries: Collection<T>? = null) : this(boxWidth, boxHeight, entries, SwBoxListImp())
-
     var boxWidth by OnChangeDelegate(boxWidth, {rebuild()})
     var boxHeight by OnChangeDelegate(boxHeight, {rebuild()})
 
@@ -60,13 +58,14 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
             selectedIndexBind.field = MUtil.clip(-1,value, _entries.size-1)
         }
 
+    override val selected: T? get() = _entries.getOrNull(selectedIndex)?.value
+
     override val entries: List<T> get() = _entries.map { it.value }
 
-    private class BoxListEntry<T>(val value: T, var component: IBoxComponent) {
-    }
-    private val _entries = mutableListOf<BoxListEntry<T>>()
+    protected class BoxListEntry<T>(val value: T, var component: IBoxComponent)
+    protected val _entries = mutableListOf<BoxListEntry<T>>()
 
-    override var numPerRow: Int = 0 ; private set
+    override var numPerRow: Int = 0 ; protected set
 
     override var renderer: (T) -> IBoxComponent = {DefaultBoxComponent(it.toString())}
         set(value) {
@@ -83,88 +82,50 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
     override fun attemptMove(from: Int, to: Int) = when(movable) {
         true -> {
             _entries.add(to, _entries.removeAt(from))
+            rebuild()
             true
         }
         false -> false
     }
 
     init {
-        entries?.map { BoxListEntry(it, renderer.invoke(it)) }?.apply { _entries.addAll(this) }
-
-        imp.addComponentListener( object : ComponentAdapter(){
-            override fun componentResized(e: ComponentEvent?) {rebuild()}
-        })
-        imp.content.addMouseListener(object: MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                imp.requestFocus()
-                val comp = imp.content.getComponentAt(e.point)
-                val index = _entries.indexOfFirst { it.component.component.jcomponent == comp }
-                selectedIndex = index
-            }
-        })
-    }
-    init /*Map*/ {
-        val actionMap = HashMap<KeyStroke,Action>(4)
-
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), SwUtil.buildAction{
-            if (selectedIndex != -1)
-                selectedIndex = max(0, selectedIndex - numPerRow)
-        })
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), SwUtil.buildAction{
-            if (selectedIndex != -1)
-                selectedIndex = min(_entries.size - 1, selectedIndex + numPerRow)
-        })
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), SwUtil.buildAction({ e ->
-            if (selectedIndex != -1)
-                selectedIndex = max(0, selectedIndex - 1)
-        }))
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), SwUtil.buildAction({ e ->
-            if (selectedIndex != -1)
-                selectedIndex = min(_entries.size - 1, selectedIndex + 1)
-        }))
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction({ e ->
-            if (selectedIndex != -1 && selectedIndex != 0) {
-                if (attemptMove(selectedIndex, selectedIndex - 1))
-                    selectedIndex -= 1
-            }
-        }))
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction({ e ->
-            if (selectedIndex != -1 && selectedIndex != _entries.size - 1) {
-                if (attemptMove(selectedIndex, selectedIndex + 1))
-                    selectedIndex += 1
-            }
-        }))
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction({ e ->
-            val to = Math.max(0, selectedIndex - numPerRow)
-
-            if (selectedIndex != -1 && to != selectedIndex) {
-                if (attemptMove(selectedIndex, to))
-                    selectedIndex = to
-            }
-        }))
-        actionMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), SwUtil.buildAction{
-            val to = Math.min(_entries.size - 1, selectedIndex + numPerRow)
-
-            if (selectedIndex != -1 && to != selectedIndex) {
-                if (attemptMove(selectedIndex, to))
-                    selectedIndex = to
-            }
-        })
-
-        SwUtil.buildActionMap(imp, actionMap)
+        entries?.mapIndexed { ind,it->make(it,ind) }?.apply { _entries.addAll(this) }
     }
 
-    private fun rebuild(){
-        with( imp, {
-            content.removeAll()
+    override fun addEntry(t: T) {
+        _entries.add(make(t, _entries.size))
+        rebuild()
+    }
+    override fun addEntry( ind: Int, t: T) {
+        _entries.add(ind, make(t,ind))
+        rebuild()
+    }
+    override fun addAll( set: Collection<T>) {
+        _entries.addAll(set.mapIndexed { index, t ->  make(t, _entries.size + index) })
+        rebuild()
+    }
+    override fun remove( t: T) {
+        _entries.removeIf { it.value == t }
+        rebuild()
+    }
+    override fun clear() {
+        _entries.clear()
+        rebuild()
+    }
+
+    protected fun make( t: T, ind: Int) = BoxListEntry( t,renderer.invoke(t).apply {
+            setSelected(selectedIndex == ind)
+            setIndex( ind)
+        })
+
+    protected fun rebuild(){
+        with( del, {
             val w = width
 
             numPerRow = max( 1, w/boxWidth)
             val actualWidthPer = w / numPerRow
-            println(actualWidthPer)
 
-            layout = CrossLayout.buildCrossLayout(this, {
-
+            del.setLayout {
                 for( r in 0..(entries.size/numPerRow)) {
                     rows += {
                         for( c in 0 until numPerRow) {
@@ -177,18 +138,13 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
                         height = boxHeight
                     }
                 }
-            })
+            }
         })
     }
 
-    private class SwBoxListImp<T>()  : SJPanel()
-    {
-        val content get() = this//SJPanel()
-        //val scroll = SScrollPane(content)
-
-        init {
-            //layout = GridLayout()
-            //add(content)
-        }
+    interface IBoxListImp {
+        val component: IComponent
+        fun setLayout( constructor: CrossInitializer.()->Unit)
     }
 }
+

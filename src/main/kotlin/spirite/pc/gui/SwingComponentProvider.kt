@@ -7,6 +7,8 @@ import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.*
 
 object SwingComponentProvider : IComponentProvider {
+    override fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? ): IBoxList<T>
+        = SwBoxList(boxWidth, boxHeight, entries)
 
     override fun Button(str: String?) : IButton = SwButton(str)
     override fun GradientSlider(minValue: Float, maxValue: Float, label: String) : IGradientSlider = SwGradientSlider(minValue, maxValue, label)

@@ -31,4 +31,6 @@ interface IComponentProvider {
 
     fun Separator( orientation: Orientation) : ISeparator
     fun ColorSquare( color: SColor = Colors.BLACK) : IColorSquare
+
+    fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? = null) : IBoxList<T>
 }
