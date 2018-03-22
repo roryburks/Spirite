@@ -224,10 +224,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>)
         :ITreeNode<T>
     {
-        override val expandedBind = Bindable(true, {rebuildTree()})
+        override val expandedBind = Bindable(true, { new, old -> rebuildTree()})
         override var expanded by expandedBind
 
-        override val valueBind = Bindable(defaultValue, {rebuildTree()})
+        override val valueBind = Bindable(defaultValue, {new, old -> rebuildTree()})
         override var value by valueBind
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()
@@ -239,9 +239,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
             //   be called before lComponent and component are built (which happens on buildTree)
             SwingUtilities.invokeLater {
-                valueBind.addListener({
-                    val newLComp = attributes.makeLeftComponent(it)
-                    val newComp = attributes.makeComponent(it)
+                valueBind.addListener({ new, old ->
+                    val newLComp = attributes.makeLeftComponent(new)
+                    val newComp = attributes.makeComponent(new)
 
                     if (newLComp != lComponent || newComp != component)
                         rebuildTree()

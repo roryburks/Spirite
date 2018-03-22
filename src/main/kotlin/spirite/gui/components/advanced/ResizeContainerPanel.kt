@@ -123,7 +123,7 @@ private constructor(
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
 
-        private var componentVisibleBindable = Bindable(true, { resetLayout() })
+        private var componentVisibleBindable = Bindable(true, {new, old -> resetLayout() })
         var componentVisible by Bound(componentVisibleBindable)
 
         init {

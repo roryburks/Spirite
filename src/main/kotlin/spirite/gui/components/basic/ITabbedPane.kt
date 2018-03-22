@@ -52,7 +52,7 @@ private constructor(
     constructor() : this(SwTabbedPaneImp())
 
     init {
-        selectedIndexBind.addListener { imp.selectedIndex = it }
+        selectedIndexBind.addListener { new, old ->imp.selectedIndex = new }
         imp.addChangeListener { selectedIndex = imp.selectedIndex }
     }
 

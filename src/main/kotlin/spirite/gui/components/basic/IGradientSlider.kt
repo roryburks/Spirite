@@ -41,7 +41,7 @@ class GradientSliderNonUI(
             val to = MUtil.clip( minValue, to, maxValue)
             underlying = mutator?.invert(to) ?: to
         }
-    override val valueBind = Bindable( maxValue, {_underlying = mutator?.invert(it) ?: it})
+    override val valueBind = Bindable( maxValue, {new, old ->_underlying = mutator?.invert(new) ?: new})
     override var mutator : InvertibleFunction<Float>? = null
         set(to) {
             field = to

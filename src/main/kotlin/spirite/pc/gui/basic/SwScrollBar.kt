@@ -31,10 +31,10 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
         set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
     init {
-        scrollBind.addListener { imp.value = it }
-        scrollWidthBind.addListener { imp.visibleAmount = it }
-        minScrollBind.addListener { imp.minimum = it}
-        maxScrollBind.addListener { imp.maximum = it }
+        scrollBind.addListener { new, old ->imp.value = new }
+        scrollWidthBind.addListener { new, old ->imp.visibleAmount = new }
+        minScrollBind.addListener { new, old ->imp.minimum = new}
+        maxScrollBind.addListener { new, old ->imp.maximum = new }
         imp.addAdjustmentListener {scroll = imp.value}
     }
 

@@ -40,7 +40,7 @@ private constructor(
                         defaultColor.jcolor)?.scolor ?: this.color
             }
         })
-        colorBind.addListener {imp.background = it.jcolor}
+        colorBind.addListener {new, old -> imp.background = new.jcolor}
     }
 
     private class SwColorSquareImp : JPanel() {

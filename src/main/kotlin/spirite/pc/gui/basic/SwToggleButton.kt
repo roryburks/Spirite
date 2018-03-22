@@ -35,7 +35,7 @@ private constructor(startChecked: Boolean, private val imp: SwToggleButtonImp )
 
 
 
-    val checkBind = checkBindable.addListener { imp.isSelected = it }
+    val checkBind = checkBindable.addListener { new, old -> imp.isSelected = new }
     init {
         imp.addItemListener{checked = imp.isSelected}
     }

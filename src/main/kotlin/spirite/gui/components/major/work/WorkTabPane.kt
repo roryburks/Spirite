@@ -20,10 +20,10 @@ constructor(val master: MasterControl, private val tabPane: ITabbedPane)
     private val containers = mutableListOf<ICrossPanel>()
 
     init {
-        tabPane.selectedIndexBind.addListener {
-            master.workspaceSet.currentWorkspace = workspaces.getOrNull(it)
+        tabPane.selectedIndexBind.addListener {new, old ->
+            master.workspaceSet.currentWorkspace = workspaces.getOrNull(new)
             containers.forEach { it.clearLayout() }
-            containers.getOrNull(it)?.setLayout { rows.add( workSection) }
+            containers.getOrNull(new)?.setLayout { rows.add( workSection) }
         }
     }
 

@@ -4,13 +4,15 @@ import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
 
+typealias OnChangeEvent<T> = (new: T, old:T)->Unit
+
 /***
  * Bindable objects can be bound to other Bindables of the same type so that they share the same underlying scroll.
  * Bindables come with an optional onChange Lambda that will be invoked whenever any bound Bindable is changed (thus
  * the underlying scroll is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
  * underlying is different)
  */
-class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
+class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) {
     var field: T
         get() = underlying.field
         set(value) {underlying.field = value}
@@ -32,11 +34,11 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         }
     }
 
-    fun addListener( listener: (T)->Unit) {
+    fun addListener( listener: OnChangeEvent<T>) {
         underlying.swallow( Bindable(field, listener).underlying)
-        listener.invoke(field)
+        listener.invoke(field, field)
     }
-    fun injectListener( listener: (T)->Unit) {
+    fun injectListener( listener: OnChangeEvent<T>) {
         underlying.swallow( Bindable(field, listener).underlying)
         // Doesn't invoke
     }
@@ -50,11 +52,12 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
     private class BindableUnderlying<T>( bindable: Bindable<T>, defaultValue: T) {
         var field : T = defaultValue
             set(value) {
+                val prev = field
                 if( value != field) {
                     field = value
-                    bindings.forEach { it.onChange?.invoke(value) }
+                    bindings.forEach { it.onChange?.invoke(value, prev) }
                     weakBindings.removeIf { it.get() == null }
-                    weakBindings.forEach { it.get()?.onChange?.invoke(value) }
+                    weakBindings.forEach { it.get()?.onChange?.invoke(value, prev) }
                 }
             }
         private val bindings = mutableListOf<Bindable<T>>(bindable)
@@ -63,9 +66,9 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         fun swallow( other: BindableUnderlying<T>) {
             // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
             if( other.field != field) {
-                other.bindings.forEach { it.onChange?.invoke(field) }
+                other.bindings.forEach { it.onChange?.invoke(field, other.field) }
                 other.weakBindings.removeIf { it.get() == null }
-                other.weakBindings.forEach { it.get()?.onChange?.invoke(field) }
+                other.weakBindings.forEach { it.get()?.onChange?.invoke(field, other.field) }
             }
             bindings.addAll( other.bindings)
             weakBindings.addAll(other.weakBindings)
@@ -73,9 +76,9 @@ class Bindable<T>( defaultValue: T, var onChange: ((T)->Unit)? = null) {
         fun swallowWeakly( other: BindableUnderlying<T>) {
             // Note: since the new underlying's field might be different to the old one, an onChange trigger might be needed
             if( other.field != field) {
-                other.bindings.forEach { it.onChange?.invoke(field) }
+                other.bindings.forEach { it.onChange?.invoke(field, other.field) }
                 other.weakBindings.removeIf { it.get() == null }
-                other.weakBindings.forEach { it.get()?.onChange?.invoke(field) }
+                other.weakBindings.forEach { it.get()?.onChange?.invoke(field, other.field) }
             }
             weakBindings.addAll(other.weakBindings)
             weakBindings.addAll( other.bindings.map { WeakReference(it) })

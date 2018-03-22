@@ -128,8 +128,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         val glWorkArea = JOGLWorkArea(this)
         workAreaContainer.setLayout { rows.add(glWorkArea) }
 
-        hScroll.scrollBind.addListener {currentView?.offsetX = it * scrollRatio}
-        vScroll.scrollBind.addListener {currentView?.offsetY = it * scrollRatio}
+        hScroll.scrollBind.addListener {new, old ->currentView?.offsetX = new * scrollRatio}
+        vScroll.scrollBind.addListener {new, old ->currentView?.offsetY = new * scrollRatio}
         workAreaContainer.onMouseWheelMoved = {
             doPreservingMousePoint(Vec2(it.point.x.f, it.point.y.f), {
                 if( it.moveAmount > 0) currentView?.zoomOut()

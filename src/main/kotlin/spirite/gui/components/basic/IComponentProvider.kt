@@ -3,6 +3,7 @@ package spirite.gui.components.basic
 import spirite.base.util.Colors
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
+import spirite.pc.gui.SColor
 import kotlin.Int.Companion
 
 interface IComponentProvider {

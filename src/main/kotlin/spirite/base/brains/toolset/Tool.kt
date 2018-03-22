@@ -18,7 +18,7 @@ abstract class Tool(
 
         fun <T,R> Property( t: T) : ToolPropDelegate<R> where T : ToolProperty<R> {
             properties.add(t)
-            t.valueBind.addListener { toolset.manager.triggerToolsetChanged(this@Tool, t) }
+            t.valueBind.addListener { new, old -> toolset.manager.triggerToolsetChanged(this@Tool, t) }
             return ToolPropDelegate(t)
         }
 

@@ -21,8 +21,8 @@ interface IComboBox<T> : IComponent
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
     override val selectedItemBind = Bindable<T?>(null,
-            {values.indexOf(it).apply { if( this != selectedIndex) selectedIndex = this }})
-    override val selectedIndexBind = Bindable(0, {selectedItemBind.field = values[it]})
+            {new, old -> values.indexOf(new).apply { if( this != selectedIndex) selectedIndex = this }})
+    override val selectedIndexBind = Bindable(0, {new, old ->selectedItemBind.field = values[new]})
 
     override var selectedItem: T?
         get() = selectedItemBind.field
@@ -50,7 +50,7 @@ private constructor(
     constructor(things: Array<T>) : this( things, SwComboBoxImp<T>( things))
 
     init {
-        selectedIndexBind.addListener { imp.selectedIndex = it }
+        selectedIndexBind.addListener { new, old -> imp.selectedIndex = new }
         imp.addActionListener {selectedIndex = imp.selectedIndex}
     }
 

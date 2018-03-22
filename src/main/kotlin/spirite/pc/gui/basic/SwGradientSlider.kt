@@ -71,7 +71,7 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
     }
 
     init {
-        valueBind.addListener { redraw()}
+        valueBind.addListener { new, old -> redraw()}
 
         val trigger : (MouseEvent) -> Unit = {
             if( imp.isEnabled)
