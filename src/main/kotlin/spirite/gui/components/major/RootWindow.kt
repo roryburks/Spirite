@@ -7,6 +7,7 @@ import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.SubContainer
 import spirite.gui.components.major.groupView.GroupView
 import spirite.gui.components.major.tool.ToolSection
+import spirite.gui.components.major.tool.ToolSettingsSection
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.hybrid.Hybrid
@@ -86,7 +87,7 @@ class RootWindow( val master: MasterControl) : JFrame() {
             center = OmniSegment(WorkTabPane(master), 200)
             right += SubContainer( {
                 top += OmniSegment(ToolSection(master), 100, 200)
-                top += OmniSegment(Hybrid.ui.Label("Tool Options"), 100, 100)
+                top += OmniSegment(ToolSettingsSection(master), 100, 100)
 
                 center = OmniSegment( Hybrid.ui.Label("Palette"), 100)
             }, 100, 120)

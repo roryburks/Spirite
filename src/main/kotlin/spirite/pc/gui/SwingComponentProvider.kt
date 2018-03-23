@@ -3,6 +3,7 @@ package spirite.pc.gui
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.SwTreeView
+import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.*
 
@@ -17,7 +18,7 @@ object SwingComponentProvider : IComponentProvider {
         = SwScrollBar(orientation, context, minScroll, maxScroll, startScroll, scrollWidth)
 
     override fun ToggleButton(startChecked: Boolean): IToggleButton = SwToggleButton(startChecked)
-    override fun CrossPanel(): ICrossPanel = SwPanel()
+    override fun CrossPanel(constructor: (CrossInitializer.()->Unit)?): ICrossPanel = SwPanel().apply { constructor?.also { setLayout(it) } }
     override fun TabbedPane(): ITabbedPane = SwTabbedPane()
     override fun <T> ComboBox(things: Array<T>): IComboBox<T> = SwComboBox(things)
     override fun <T> TreeView(): ITreeView<T> = SwTreeView()

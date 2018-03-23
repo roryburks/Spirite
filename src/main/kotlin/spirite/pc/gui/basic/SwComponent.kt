@@ -2,18 +2,23 @@ package spirite.pc.gui.basic
 
 import spirite.gui.SUIPoint
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicBorder
+import spirite.gui.components.basic.IComponent.BasicBorder.*
 import spirite.gui.components.basic.IComponent.BasicCursor
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.components.basic.Invokable
+import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
 import java.awt.Cursor
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
+import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.border.BevelBorder
 import java.awt.event.MouseEvent as JMouseEvent
 
 interface ISwComponent : IComponent {
@@ -58,6 +63,15 @@ abstract class ASwComponent : ISwComponent {
             IComponent.BasicCursor.W_RESIZE -> Cursor.W_RESIZE_CURSOR
             IComponent.BasicCursor.WAIT -> Cursor.WAIT_CURSOR
         })
+    }
+
+    override fun setBasicBorder(border: BasicBorder?) {
+        component.border = when( border) {
+            null -> null
+            BASIC -> BorderFactory.createLineBorder( Skin.Global.BgDark.color)
+            BEVELED_LOWERED -> BorderFactory.createBevelBorder(BevelBorder.LOWERED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
+            BEVELED_RAISED -> BorderFactory.createBevelBorder(BevelBorder.RAISED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
+        }
     }
 
     // region ComponentListener

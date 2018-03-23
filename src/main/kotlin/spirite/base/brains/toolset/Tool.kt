@@ -29,17 +29,17 @@ abstract class Tool(
     }
 }
 
-abstract class ToolProperty<T>( default: T) {
+sealed class ToolProperty<T>( default: T) {
     abstract val hrName: String
 
     val valueBind = Bindable(default)
     var value by valueBind
 }
 
-class SliderProperty(default: Float, override val hrName: String) : ToolProperty<Float>(default) {}
-class SizeProperty( default: Float, override val hrName: String) : ToolProperty<Float>(default) {}
-class CheckBoxProperty( default: Boolean, override val hrName: String) : ToolProperty<Boolean>(default) {}
-class DropDownProperty<T>( default: T, override val hrName: String) : ToolProperty<T>(default) where T : Enum<T>{}
+class SliderProperty(override val hrName: String, default: Float, val min: Float, val max: Float) : ToolProperty<Float>(default) {}
+class SizeProperty( override val hrName: String, default: Float) : ToolProperty<Float>(default) {}
+class CheckBoxProperty( override val hrName: String, default: Boolean) : ToolProperty<Boolean>(default) {}
+class DropDownProperty<T>( override val hrName: String, default: T ) : ToolProperty<T>(default) where T : Enum<T>{}
 
 enum class PenDrawMode( val hrName: String) {
     NORMAL("Normal"),
@@ -54,10 +54,10 @@ class Pen( toolset: Toolset) : Tool(toolset){
     override val iconY = 0
     override val description = "Pen"
 
-    var alpha by scheme.Property(SliderProperty( 1.0f, "Opacity" ))
-    var width by scheme.Property(SizeProperty(5.0f, "Width"))
-    var hard by scheme.Property(CheckBoxProperty(false, "Hard Edged"))
-    var mode by scheme.Property(DropDownProperty(PenDrawMode.NORMAL, "Draw Mode"))
+    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var width by scheme.Property(SizeProperty("Width", 5.0f))
+    var hard by scheme.Property(CheckBoxProperty("Hard Edged",false))
+    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL))
 }
 class Eraser( toolset: Toolset) : Tool(toolset){
     override val iconX = 1

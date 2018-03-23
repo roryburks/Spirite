@@ -106,6 +106,7 @@ private constructor(
                 if( bar.componentVisible)
                     rows.add( bar.resizeComponent, height = bar.size)
             }
+            rows.flex = 100f
             overwriteOrientation = orientation
         }
     }

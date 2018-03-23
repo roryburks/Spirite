@@ -37,7 +37,8 @@ private constructor(
         tree.onMouseClick = { evt ->
             if( evt.button == RIGHT )
                 workspace?.apply {
-                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, null), null)
+                    val node = tree.getNodeFromY(evt.point.y)?.value
+                    master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, node), node)
                 }
         }
 

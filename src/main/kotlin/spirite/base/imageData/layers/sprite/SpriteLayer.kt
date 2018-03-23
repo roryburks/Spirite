@@ -13,6 +13,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
+import spirite.base.util.delegates.StackableUndoableDelegate
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
@@ -202,42 +203,18 @@ class SpriteLayer(
     {
 
         // region Parotting SpritePartStructure scroll with Undoable Wrapper
-        var depth : Int
-            get() = structure.depth
-            set(value) { replaceStructure(structure.copy(depth = value))}
-        internal var _depth : Int
-            get() = structure.depth
-            set(value) { replaceStructure(structure.copy(depth = value))}
-        var partName : String
-            get() = structure.partName
-            set(value) { replaceStructure(structure.copy(partName = value))}
-        var visible : Boolean
-            get() = structure.visible
-            set(value) { replaceStructure(structure.copy(visible = value))}
-        var alpha : Float
-            get() = structure.alpha
-            set(value) { replaceStructure(structure.copy(alpha = value))}
-        var transX : Float
-            get() = structure.transX
-            set(value) { replaceStructure(structure.copy(transX = value))}
-        var transY : Float
-            get() = structure.transY
-            set(value) { replaceStructure(structure.copy(transY = value))}
-        var scaleX : Float
-            get() = structure.scaleX
-            set(value) { replaceStructure(structure.copy(scaleX = value))}
-        var scaleY : Float
-            get() = structure.scaleY
-            set(value) { replaceStructure(structure.copy(transY = scaleY))}
-        var rot : Float
-            get() = structure.rot
-            set(value) { replaceStructure(structure.copy(transY = rot))}
-        var centerX : Int?
-            get() = structure.centerX
-            set(value) { replaceStructure(structure.copy(centerX = value))}
-        var centerY : Int?
-            get() = structure.centerY
-            set(value) { replaceStructure(structure.copy(centerY = value))}
+        var depth : Int by StackableUndoableDelegate(structure.depth, undoEngine, "Changed Sprite Part depth")
+        var visible : Boolean by StackableUndoableDelegate(structure.visible, undoEngine, "Changed Sprite Part visible")
+        var partName : String by StackableUndoableDelegate(structure.partName, undoEngine, "Changed Sprite Part Name")
+        var alpha : Float by StackableUndoableDelegate(structure.alpha, undoEngine, "Changed Sprite Part alpha")
+        var transX : Float by StackableUndoableDelegate(structure.transX, undoEngine, "Changed Sprite Part transX")
+        var transY : Float by StackableUndoableDelegate(structure.transY, undoEngine, "Changed Sprite Part transY")
+        var scaleX : Float by StackableUndoableDelegate(structure.scaleX, undoEngine, "Changed Sprite Part scaleX")
+        var scaleY : Float by StackableUndoableDelegate(structure.scaleY, undoEngine, "Changed Sprite Part scaleY")
+        var rot : Float by StackableUndoableDelegate(structure.rot, undoEngine, "Changed Sprite Part rot")
+        var centerX : Int by StackableUndoableDelegate(structure.centerX ?: 0, undoEngine, "Changed Sprite Part centerX")
+        var centerY : Int by StackableUndoableDelegate(structure.centerY ?: 0, undoEngine, "Changed Sprite Part centerY")
+
 
         private fun replaceStructure( newStructure: SpritePartStructure) {
             if( structure != newStructure)

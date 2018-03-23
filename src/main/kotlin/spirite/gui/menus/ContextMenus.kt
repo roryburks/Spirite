@@ -47,8 +47,8 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
                 MenuItem("&New..."),
                 MenuItem(".New Simple &Layer", NodeCommand.NEW_SIMPLE_LAYER),
                 MenuItem(".New Layer &Group", NodeCommand.NEW_GROUP),
-                MenuItem(".New &Rig Layer", customAction = {TODO()}),
-                MenuItem(".New &Puppet Layer", customAction = {TODO()})
+                MenuItem(".New &Sprite Layer", NodeCommand.NEW_SPRITE_LAYER),
+                MenuItem(".New &Puppet Layer", NodeCommand.NEW_PUPPET_LAYER)
         )
 
         if( node != null) {
@@ -59,22 +59,22 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
             }
 
             scheme.add(MenuItem("-"))
-            scheme.add(MenuItem("D&uplicate $descriptor", customAction = {TODO()}))
+            scheme.add(MenuItem("D&uplicate $descriptor", NodeCommand.DUPLICATE))
             scheme.add(MenuItem("&Delete $descriptor", NodeCommand.DELETE))
 
             when( node) {
                 is GroupNode -> {
                     scheme.add(MenuItem("-"))
-                    scheme.add(MenuItem("&Construct Simple Animation From Group", customAction = {TODO()}))
-                    scheme.add(MenuItem("&Add Group To Animation As New Layer", customAction = {TODO()}))
-                    scheme.add(MenuItem("Write Group To GIF Animation", customAction = {TODO()}))
+                    scheme.add(MenuItem("&Construct Simple Animation From Group", NodeCommand.ANIM_FROM_GROUP))
+                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION))
+                    scheme.add(MenuItem("Write Group To GIF Animation", NodeCommand.GIF_FROM_FROUP))
                 }
                 is LayerNode -> {
                     scheme.add(MenuItem("-"))
-                    scheme.add(MenuItem("&Merge Layer Down", customAction = {TODO()}))
+                    scheme.add(MenuItem("&Merge Layer Down", NodeCommand.MERGE_DOWN))
                     val layer = node.layer
                     when( layer) {
-                        is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", customAction = {TODO()}))
+                        is SpriteLayer -> scheme.add(MenuItem("Construct &Rig Animation From Sprite", NodeCommand.NEW_RIG_ANIMATION))
                         //is PuppetLayer -> scheme.add(MenuItem("Add &Derived Puppet Layer", customAction = {TODO()}))
                     }
 

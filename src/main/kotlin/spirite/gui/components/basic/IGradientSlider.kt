@@ -9,7 +9,7 @@ import java.awt.Color
 interface IGradientSliderNonUI {
     var value: Float
     val valueBind: Bindable<Float>
-    var mutator: InvertibleFunction<Float>?
+    var mutatorPositionToValue: InvertibleFunction<Float>?
     var minValue: Float
     var maxValue: Float
 }
@@ -39,10 +39,10 @@ class GradientSliderNonUI(
     override var value : Float get() = valueBind.field
         set(to) {
             val to = MUtil.clip( minValue, to, maxValue)
-            underlying = mutator?.invert(to) ?: to
+            underlying = mutatorPositionToValue?.invert(to) ?: to
         }
-    override val valueBind = Bindable(maxValue, { new, old -> _underlying = mutator?.invert(new) ?: new })
-    override var mutator : InvertibleFunction<Float>? = null
+    override val valueBind = Bindable(maxValue, { new, old -> _underlying = mutatorPositionToValue?.invert(new) ?: new })
+    override var mutatorPositionToValue: InvertibleFunction<Float>? = null
         set(to) {
             field = to
             underlying = to?.invert(value) ?: value
@@ -55,21 +55,21 @@ class GradientSliderNonUI(
             field = to
             if( value < to)
                 this.value = to
-            underlyingMin = mutator?.invert(to) ?: to
+            underlyingMin = mutatorPositionToValue?.invert(to) ?: to
         }
     override var maxValue = maxValue
         set(to) {
             field = to
             if( value > to)
                 this.value = to
-            underlyingMax = mutator?.invert(to) ?: to
+            underlyingMax = mutatorPositionToValue?.invert(to) ?: to
         }
 
     override var underlying
         get() = _underlying
         set(to) {
             val to = MUtil.clip(underlyingMin, to, underlyingMax)
-            valueBind.field = mutator?.perform(to) ?: to
+            valueBind.field = mutatorPositionToValue?.perform(to) ?: to
             _underlying = to
         }
     private var _underlying : Float = maxValue

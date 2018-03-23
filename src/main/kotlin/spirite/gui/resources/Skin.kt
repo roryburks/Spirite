@@ -1,6 +1,8 @@
 package spirite.gui.resources
 
 import spirite.base.util.ColorARGB32Normal
+import spirite.pc.gui.SColor
+import spirite.pc.gui.scolor
 import java.awt.Color
 
 object Skin {
@@ -16,7 +18,7 @@ object Skin {
     //  values from settings instead of hard-coded.
     interface ColorMarker {
         val color : Color
-        val scolor : spirite.base.util.Color get() = ColorARGB32Normal(color.rgb + (color.alpha shl 24))
+        val scolor : SColor get() = color.scolor
     }
     enum class DrawPanel(override val color: Color) : ColorMarker {
         ImageBorder(Color(190, 190, 190)),

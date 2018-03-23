@@ -25,6 +25,11 @@ interface IComponent {
     }
     fun setBasicCursor( cursor: BasicCursor)
 
+    enum class BasicBorder {
+        BEVELED_LOWERED, BEVELED_RAISED, BASIC
+    }
+    fun setBasicBorder( border: BasicBorder?)
+
     var onResize : (() -> Unit)?
     var onHidden : (() -> Unit)?
     var onShown : (() -> Unit)?

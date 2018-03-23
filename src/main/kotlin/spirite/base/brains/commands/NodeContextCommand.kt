@@ -20,7 +20,15 @@ class NodeContextCommand(
     enum class NodeCommand(val string: String) : ICommand {
         NEW_GROUP( "newGroup"),
         DELETE("delete"),
-        NEW_SIMPLE_LAYER("newSimpleLayer")
+        NEW_SIMPLE_LAYER("newSimpleLayer"),
+        DUPLICATE("duplicate"),
+        NEW_SPRITE_LAYER("newSpriteLayer"),
+        NEW_PUPPET_LAYER("newPuppetLayer"),
+        ANIM_FROM_GROUP("animationFromGroup"),
+        INSERT_GROUP_IN_ANIMATION("addGroupToAnim"),
+        GIF_FROM_FROUP("gifFromGroup"),
+        MERGE_DOWN("mergeDown"),
+        NEW_RIG_ANIMATION("newRigAnimation")
         ;
 
         override val commandString: String get() = "node.$string"
@@ -33,6 +41,7 @@ class NodeContextCommand(
     override fun executeCommand(string: String, extra: Any?) : Boolean{
         val workspace = currentWorskapce ?: return false
         val node = extra as? Node
+
         when(string) {
             NEW_GROUP.string -> workspace.groupTree.addGroupNode(node, "New Group")
             DELETE.string -> node?.delete()
@@ -41,6 +50,14 @@ class NodeContextCommand(
                     workspace.groupTree.addNewSimpleLayer(node, name, mediumType, width, height, true)
                 }
             }
+            DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
+            NEW_SPRITE_LAYER.string -> workspace.groupTree.addNewSpriteLayer(node, "sprite")
+            NEW_PUPPET_LAYER.string -> TODO()
+            ANIM_FROM_GROUP.string -> TODO()
+            INSERT_GROUP_IN_ANIMATION.string -> TODO()
+            GIF_FROM_FROUP.string -> TODO()
+            MERGE_DOWN.string -> TODO()
+            NEW_RIG_ANIMATION.string -> TODO()
         }
 
         return true

@@ -3,6 +3,7 @@ package spirite.gui.components.basic
 import spirite.base.util.Colors
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
+import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.pc.gui.SColor
 import kotlin.Int.Companion
 
@@ -21,7 +22,7 @@ interface IComponentProvider {
             startScroll: Int = 0,
             scrollWidth : Int = 10) : IScrollBar
     fun ToggleButton(startChecked: Boolean = false) : IToggleButton
-    fun CrossPanel() : ICrossPanel
+    fun CrossPanel(constructor: (CrossInitializer.()->Unit)? = null ) : ICrossPanel
     fun TabbedPane( ): ITabbedPane
     fun <T> ComboBox( things: Array<T>) : IComboBox<T>
     fun <T> TreeView() : ITreeView<T>

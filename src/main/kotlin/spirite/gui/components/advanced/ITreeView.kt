@@ -48,6 +48,8 @@ interface ITreeViewNonUI<T>{
     fun clearRoots()
     fun constructTree( constructor: ITreeElementConstructor<T>.()->Unit )
 
+    fun getNodeFromY( y: Int) : ITreeNode<T>?
+
     interface ITreeNode<T> {
         val children: List<ITreeNode<T>>
         var value : T
@@ -202,7 +204,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
     }
     // endregion
 
-    fun getNodeFromY( y: Int) : TreeNode<T>? {
+    override fun getNodeFromY(y: Int) : TreeNode<T>? {
         if( y < 0) return null
 
         val components = compToNodeMap.keys.sortedBy { it.y }

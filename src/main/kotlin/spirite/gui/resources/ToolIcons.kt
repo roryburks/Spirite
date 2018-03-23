@@ -10,6 +10,5 @@ object ToolIcons {
     fun drawToolIcon(g: Graphics, x: Int, y: Int, tool: Tool) {
         g.drawImage(toolSheet, x, y, x+24, y+24,
                 tool.iconX*25, tool.iconY*25, tool.iconX*25 + 24, tool.iconY*25 + 24, null)
-        println()
     }
 }
