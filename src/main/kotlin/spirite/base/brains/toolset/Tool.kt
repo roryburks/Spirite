@@ -1,6 +1,8 @@
 package spirite.base.brains.toolset
 
 import spirite.base.brains.Bindable
+import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
+import spirite.base.brains.commands.ICommand
 import kotlin.reflect.KProperty
 
 abstract class Tool(
@@ -39,13 +41,15 @@ sealed class ToolProperty<T>( default: T) {
 class SliderProperty(override val hrName: String, default: Float, val min: Float, val max: Float) : ToolProperty<Float>(default) {}
 class SizeProperty( override val hrName: String, default: Float) : ToolProperty<Float>(default) {}
 class CheckBoxProperty( override val hrName: String, default: Boolean) : ToolProperty<Boolean>(default) {}
-class DropDownProperty<T>( override val hrName: String, default: T ) : ToolProperty<T>(default) where T : Enum<T>{}
+class DropDownProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default) {}
+class RadioButtonProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default) {}
+class ButtonProperty(override val hrName: String, val command: ICommand) : ToolProperty<Any?>(null){}
 
 enum class PenDrawMode( val hrName: String) {
     NORMAL("Normal"),
     KEEP_ALPHA("Preserve Alpha"),
-    BEHIND("Behind");
-
+    BEHIND("Behind"),
+    ;
     override fun toString() = hrName
 }
 
@@ -57,22 +61,35 @@ class Pen( toolset: Toolset) : Tool(toolset){
     var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
     var width by scheme.Property(SizeProperty("Width", 5.0f))
     var hard by scheme.Property(CheckBoxProperty("Hard Edged",false))
-    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL))
+    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
 }
 class Eraser( toolset: Toolset) : Tool(toolset){
     override val iconX = 1
     override val iconY = 0
     override val description = "Eraser"
+
+    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var width by scheme.Property(SizeProperty("Width", 5.0f))
+    var hard by scheme.Property(CheckBoxProperty("Hard Edged",false))
 }
 class Fill( toolset: Toolset) : Tool(toolset){
     override val iconX = 2
     override val iconY = 0
     override val description = "Fill"
 }
+
+enum class BoxSelectionShape( val hrName : String) {
+    RECTANGLE("Rectangle"),
+    OVAL("Oval"),
+    ;
+    override fun toString() = hrName
+}
 class ShapeSelection( toolset: Toolset) : Tool(toolset){
     override val iconX = 3
     override val iconY = 0
     override val description = "Shape Selection"
+
+    var shape by scheme.Property(DropDownProperty("Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.values()))
 }
 class FreeSelection( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
@@ -88,21 +105,38 @@ class Pixel( toolset: Toolset) : Tool(toolset){
     override val iconX = 2
     override val iconY = 1
     override val description = "Pixel"
+
+    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
 }
 class Crop( toolset: Toolset) : Tool(toolset){
     override val iconX = 3
     override val iconY = 1
     override val description = "Cropper"
+
+    var button by scheme.Property(ButtonProperty("Crop Selection", DrawCommand.CROP_SELECTION))
+    var quickCrop by scheme.Property(CheckBoxProperty("Crop on Finish", false))
+    var shrinkOnly by scheme.Property(CheckBoxProperty("Shrink-only Crop", false))
 }
 class Rigger( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
     override val iconY = 2
     override val description = "Rig"
 }
+
+enum class FlipMode( val hrName : String) {
+    HORIZONTAL("Horizontal Flipping"),
+    VERTICAL("Vertical Flipping"),
+    BY_MOVEMENT("Determine from Movement"),
+    ;
+    override fun toString() = hrName
+}
 class Flip( toolset: Toolset) : Tool(toolset){
     override val iconX = 1
     override val iconY = 2
     override val description = "Flipper"
+
+    var flipMode by scheme.Property(RadioButtonProperty("Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.values()))
 }
 class Resize( toolset: Toolset) : Tool(toolset){
     override val iconX = 2

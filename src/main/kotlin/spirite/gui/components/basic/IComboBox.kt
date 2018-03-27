@@ -9,8 +9,8 @@ import javax.swing.JComboBox
 
 interface IComboBox<T> : IComponent
 {
-    var selectedItem : T?
-    val selectedItemBind : Bindable<T?>
+    var selectedItem : T
+    val selectedItemBind : Bindable<T>
 
     var selectedIndex: Int
     val selectedIndexBind: Bindable<Int>
@@ -20,11 +20,11 @@ interface IComboBox<T> : IComponent
 
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
-    override val selectedItemBind = Bindable<T?>(null,
+    override val selectedItemBind = Bindable<T>(initialValues.first(),
             { new, old -> values.indexOf(new).apply { if (this != selectedIndex) selectedIndex = this } })
     override val selectedIndexBind = Bindable(0, { new, old -> selectedItemBind.field = values[new] })
 
-    override var selectedItem: T?
+    override var selectedItem: T
         get() = selectedItemBind.field
         set(value) {
             val index = values.indexOf( value)
@@ -33,7 +33,7 @@ abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
     override var selectedIndex: Int
         get() = selectedIndexBind.field
         set(value) {
-            val to = MUtil.clip(-1, value, values.size-1)
+            val to = MUtil.clip(0, value, values.size-1)
             selectedIndexBind.field = to
         }
 

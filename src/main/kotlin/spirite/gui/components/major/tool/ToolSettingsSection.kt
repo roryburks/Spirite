@@ -1,24 +1,45 @@
 package spirite.gui.components.major.tool
 
+import spirite.base.brains.Bindable
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.toolset.SizeProperty
-import spirite.base.brains.toolset.SliderProperty
-import spirite.base.brains.toolset.Tool
-import spirite.base.brains.toolset.ToolProperty
+import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
 import spirite.base.util.InvertibleFunction
+import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 
-fun componentFromToolProperty( toolProperty: ToolProperty<*>) = when( toolProperty) {
+
+fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
+    rows.add(Hybrid.ui.Label("$hrName: "))
+    rows.add(Hybrid.ui.ComboBox(values).apply {
+        selectedItemBind.bindWeakly(valueBind)
+    }, height = 24)
+}
+
+
+
+fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
+    val cluster = RadioButtonCluster(value, values.asList())
+    cluster.valueBind.bindWeakly(valueBind)
+
+    return Hybrid.ui.CrossPanel {
+        cluster.radioButtons.forEach {
+            rows.add(it)
+        }
+    }
+}
+
+fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
     is SliderProperty -> Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(toolProperty.min, toolProperty.max, toolProperty.hrName).apply {
             valueBind.bindWeakly(toolProperty.valueBind)
-        })
+        }, height = 24)
     }
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
@@ -38,9 +59,21 @@ fun componentFromToolProperty( toolProperty: ToolProperty<*>) = when( toolProper
                     else        -> 0.75f + 0.25f * (x - 500f) / 500f
                 }
             }
-        })
+        }, height = 24)
     }
-    else -> Hybrid.ui.CrossPanel()
+    is CheckBoxProperty -> Hybrid.ui.CrossPanel {
+        rows += {
+            add(Hybrid.ui.Label(toolProperty.hrName + ": "))
+            add(Hybrid.ui.CheckBox().apply {
+                checkBind.bindWeakly(toolProperty.valueBind)
+            })
+        }
+    }
+    is DropDownProperty -> toolProperty.getComponent()
+    is ButtonProperty -> Hybrid.ui.Button(toolProperty.hrName).apply {
+        action = {master.commandExecuter.executeCommand(toolProperty.command.commandString, toolProperty.value)}
+    }
+    is RadioButtonProperty -> toolProperty.getComponent()
 }
 
 class ToolSettingsSection
@@ -75,7 +108,7 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
     fun constructFromTool( tool: Tool) {
         toolPanel.setLayout {
             tool.properties.forEach {
-                rows.add(componentFromToolProperty(it))
+                rows.add(componentFromToolProperty(master, it))
             }
         }
     }

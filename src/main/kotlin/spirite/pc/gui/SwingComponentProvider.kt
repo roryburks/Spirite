@@ -12,6 +12,8 @@ object SwingComponentProvider : IComponentProvider {
         = SwBoxList(boxWidth, boxHeight, entries)
 
     override fun Button(str: String?) : IButton = SwButton(str)
+    override fun CheckBox(): ICheckBox = SwCheckBox()
+    override fun RadioButton(label: String, selected: Boolean): IRadioButton = SwRadioButton(label, selected)
     override fun GradientSlider(minValue: Float, maxValue: Float, label: String) : IGradientSlider = SwGradientSlider(minValue, maxValue, label)
     override fun Label(text: String): ILabel = SwLabel(text)
     override fun ScrollBar(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int) : IScrollBar

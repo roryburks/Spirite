@@ -9,6 +9,8 @@ import kotlin.Int.Companion
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton
+    fun CheckBox() : ICheckBox
+    fun RadioButton(label: String = "", selected: Boolean = false) : IRadioButton
     fun GradientSlider(
             minValue : Float = 0f,
             maxValue : Float = 1f,

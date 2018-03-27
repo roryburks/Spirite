@@ -9,7 +9,8 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
 
     enum class DrawCommand(val string: String) : ICommand {
         UNDO( "undo"),
-        REDO("redo")
+        REDO("redo"),
+        CROP_SELECTION("cropSelection")
         ;
 
         override val commandString: String get() = "draw.$string"
@@ -25,6 +26,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
         when(string) {
             UNDO.string -> workspace.undoEngine.undo()
             REDO.string -> workspace.undoEngine.redo()
+            CROP_SELECTION.string -> TODO()
         }
 
         return true

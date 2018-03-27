@@ -46,8 +46,7 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
 
-            val c = context
-            if( c == null) return
+            val c = context ?: return
 
             val g2 = g as Graphics2D
 
@@ -75,7 +74,7 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
 
         val trigger : (MouseEvent) -> Unit = {
             if( imp.isEnabled)
-                underlying = MUtil.lerp(minValue, maxValue, it.point.x / imp.width.toFloat())
+                underlying = MUtil.lerp(underlyingMin, underlyingMax, it.point.x / imp.width.toFloat())
         }
         onMousePress = trigger
         onMouseDrag = trigger
