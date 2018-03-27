@@ -5,6 +5,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
 import spirite.base.util.InvertibleFunction
+import spirite.base.util.linear.Vec2
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
@@ -33,6 +34,17 @@ fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
             rows.add(it)
         }
     }
+}
+
+class DualFloatBindind( default: Vec2) {
+    val vecBind = Bindable(default, {new,old-> x = new.x; y = new.y})
+    var vec by vecBind
+
+    val xBind = Bindable(default.x, {new,old-> })
+    var x by xBind
+
+    val yBind = Bindable(default.x)
+    var y by yBind
 }
 
 fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
@@ -74,6 +86,27 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         action = {master.commandExecuter.executeCommand(toolProperty.command.commandString, toolProperty.value)}
     }
     is RadioButtonProperty -> toolProperty.getComponent()
+    is FloatBoxProperty -> Hybrid.ui.CrossPanel{
+        rows += {
+            add(Hybrid.ui.Label(toolProperty.hrName + ": "))
+            add(Hybrid.ui.FloatField().apply {
+                valueBind.bindWeakly(toolProperty.valueBind)
+            }, height = 24)
+        }
+    }
+    is DualFloatBoxProperty -> Hybrid.ui.CrossPanel{
+        val bind = DualFloatBindind(toolProperty.value)
+        bind.vecBind.bindWeakly(toolProperty.valueBind)
+
+        rows.add(Hybrid.ui.Label(toolProperty.hrName + ": "))
+        rows += {
+            add(Hybrid.ui.Label(toolProperty.label1))
+            add(Hybrid.ui.FloatField().apply { valueBind.bind(bind.xBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.Label(toolProperty.label2))
+            add(Hybrid.ui.FloatField().apply { valueBind.bind(bind.yBind) }, height = 24, flex = 50f)
+        }
+    }
+
 }
 
 class ToolSettingsSection

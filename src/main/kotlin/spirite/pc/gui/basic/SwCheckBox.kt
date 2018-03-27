@@ -4,6 +4,7 @@ import spirite.base.brains.Bindable
 import spirite.gui.components.basic.ICheckBox
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IRadioButton
+import spirite.gui.resources.Skin
 import javax.swing.JCheckBox
 import javax.swing.JRadioButton
 
@@ -21,7 +22,11 @@ private constructor(val imp : SwCheckBoxImp)
         checkBind.addListener { new, old ->  imp.isSelected = new }
     }
 
-    private class SwCheckBoxImp() : JCheckBox() {}
+    private class SwCheckBoxImp() : JCheckBox() {
+        init {
+            background = Skin.Global.Bg.color
+        }
+    }
 }
 
 class SwRadioButton
@@ -41,5 +46,9 @@ private constructor(val imp : SwRadioButtonImp)
         checkBind.addListener { new, old ->  imp.isSelected = new }
     }
 
-    private class SwRadioButtonImp(label: String , selected: Boolean) : JRadioButton(label, selected) {}
+    private class SwRadioButtonImp(label: String , selected: Boolean) : JRadioButton(label, selected) {
+        init {
+            background = Skin.Global.Bg.color
+        }
+    }
 }

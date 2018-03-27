@@ -3,6 +3,7 @@ package spirite.base.brains.toolset
 import spirite.base.brains.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
+import spirite.base.util.linear.Vec2
 import kotlin.reflect.KProperty
 
 abstract class Tool(
@@ -38,12 +39,14 @@ sealed class ToolProperty<T>( default: T) {
     var value by valueBind
 }
 
-class SliderProperty(override val hrName: String, default: Float, val min: Float, val max: Float) : ToolProperty<Float>(default) {}
-class SizeProperty( override val hrName: String, default: Float) : ToolProperty<Float>(default) {}
-class CheckBoxProperty( override val hrName: String, default: Boolean) : ToolProperty<Boolean>(default) {}
-class DropDownProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default) {}
-class RadioButtonProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default) {}
-class ButtonProperty(override val hrName: String, val command: ICommand) : ToolProperty<Any?>(null){}
+class SliderProperty(override val hrName: String, default: Float, val min: Float, val max: Float) : ToolProperty<Float>(default)
+class SizeProperty( override val hrName: String, default: Float) : ToolProperty<Float>(default)
+class CheckBoxProperty( override val hrName: String, default: Boolean) : ToolProperty<Boolean>(default)
+class DropDownProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default)
+class RadioButtonProperty<T>( override val hrName: String, default: T, val values: Array<T>) : ToolProperty<T>(default)
+class ButtonProperty(override val hrName: String, val command: ICommand) : ToolProperty<Any?>(null)
+class FloatBoxProperty(override val hrName: String, default: Float) : ToolProperty<Float>(default)
+class DualFloatBoxProperty(override val hrName: String, val label1: String, val label2: String, default: Vec2) : ToolProperty<Vec2>(default)
 
 enum class PenDrawMode( val hrName: String) {
     NORMAL("Normal"),
@@ -138,15 +141,39 @@ class Flip( toolset: Toolset) : Tool(toolset){
 
     var flipMode by scheme.Property(RadioButtonProperty("Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.values()))
 }
-class Resize( toolset: Toolset) : Tool(toolset){
+class Reshaper(toolset: Toolset) : Tool(toolset){
     override val iconX = 2
     override val iconY = 2
-    override val description = "Resizer"
+    override val description = "Reshaper"
+
+    var applyTransform by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
+    var scale : Vec2 by scheme.Property(DualFloatBoxProperty("Scale", "x","y", Vec2(1f,1f)))
+    var translation : Vec2 by scheme.Property(DualFloatBoxProperty("Translation", "x","y", Vec2(1f,1f)))
+    var rotation by scheme.Property(FloatBoxProperty("Rotation", 0f))
+
+}
+
+enum class ColorChangeScopes( val hrName: String) {
+    LOCAL("Local"),
+    GROUP("Entire Layer/Group"),
+    PROJECT("Entire Project")
+    ;
+    override fun toString() = hrName
+}
+enum class ColorChangeMode( val hrName: String) {
+    CHECK_ALL("Check Alpha"),
+    IGNORE_ALPHA("Ignore Alpha"),
+    AUTO("Change All")
+    ;
+    override fun toString() = hrName
 }
 class ColorChanger( toolset: Toolset) : Tool(toolset){
     override val iconX = 3
     override val iconY = 2
     override val description = "Color Changer"
+
+    var scope by scheme.Property(DropDownProperty("Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.values()))
+    var mode by scheme.Property(RadioButtonProperty("Apply Mode", ColorChangeMode.CHECK_ALL, ColorChangeMode.values()))
 }
 class ColorPicker( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
