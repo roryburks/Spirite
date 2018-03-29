@@ -11,6 +11,7 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 /** Read-only Access to the Medium Repository */
 interface IMediumRepository {
     fun getData( i: Int) : IMedium?
+    //fun floatData(i: Int) : IFloatingMedium
 }
 
 /** Read-Write Access to the Medium Repository */
@@ -23,22 +24,25 @@ interface MMediumRepository : IMediumRepository {
     fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
 }
 
+private class MediumRepoEntry(val medium: IMedium) {
+    val floating = false
+}
+
 class MediumRepository(
         private val imageWorkspace: IImageWorkspace
 ) : MMediumRepository{
-    val mediumData = mutableMapOf<Int,IMedium>()
-    var workingId = 0
+    private val mediumData = mutableMapOf<Int,MediumRepoEntry>()
+    private var workingId = 0
 
     /** Locks the cache from being cleared. */
     var locked : Boolean = true
 
     // region IMedium
-    override fun getData(i: Int) = mediumData[i]
+    override fun getData(i: Int) = mediumData[i]?.medium
     // endregion
 
 
     // region MMedium
-
     override fun clearUnusedCache( externalDataUsed : Set<MediumHandle>) {
         if( locked) return
 
@@ -60,20 +64,20 @@ class MediumRepository(
 
         // Remove Unused Entries
         unused.forEach {
-            mediumData[it]?.flush()
+            mediumData[it]?.medium?.flush()
             mediumData.remove(it)
         }
     }
 
     override fun addMedium(medium: IMedium) : MediumHandle{
-        mediumData[workingId] = medium
+        mediumData[workingId] = MediumRepoEntry(medium)
         return MediumHandle(imageWorkspace, workingId++)
     }
 
     override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {
         val oldMedium = mediumData[handle.id]
-        mediumData.put( handle.id, newMedium)
-        oldMedium?.flush()
+        mediumData.put( handle.id, MediumRepoEntry(newMedium))
+        oldMedium?.medium?.flush()
     }
 
     // endregion

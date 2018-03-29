@@ -46,4 +46,9 @@ data class MediumHandle(
                         emptySet(),
                         workspace))
     }
+
+    // !! === Should only be called by ImageAction
+    fun markChanging() {
+
+    }
 }

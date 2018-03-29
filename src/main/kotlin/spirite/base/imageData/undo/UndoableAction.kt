@@ -18,6 +18,7 @@ abstract class ImageAction(
 ) : UndoableAction() {
     override fun performAction() {
         performNonimageAction()
+        arranged.handle
         performImageAction(arranged.built)
     }
 
