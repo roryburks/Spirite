@@ -5,6 +5,7 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.drawer.DefaultImageDrawer
@@ -20,7 +21,8 @@ import spirite.base.util.linear.Transform
  */
 class DynamicMedium(
         val workspace: IImageWorkspace,
-        val image: DynamicImage = DynamicImage()) : IMedium
+        val image: DynamicImage = DynamicImage(),
+        val mediumRepo: MMediumRepository) : IMedium
 {
     override val width: Int get() = image.width
     override val height: Int get() = image.height
@@ -37,13 +39,13 @@ class DynamicMedium(
         }
     }
 
-    override fun dupe() = DynamicMedium(workspace, image.deepCopy())
+    override fun dupe() = DynamicMedium(workspace, image.deepCopy(), mediumRepo)
 
     override fun flush() {
         image.flush()
     }
 
-    inner class DynamicBuiltImageData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+    inner class DynamicBuiltImageData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo) {
         override val width: Int get() = workspace.width
         override val height: Int get() = workspace.height
         override val tMediumToComposite: Transform get() = arranged.tMediumToWorkspace

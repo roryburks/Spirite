@@ -22,8 +22,8 @@ class PrimaryGroupTree(
 
     fun addNewSimpleLayer( contextNode: Node?, name: String, type: MediumType, width: Int? = null, height: Int? = null, select: Boolean = true) : LayerNode{
         val medium = when( type) {
-            DYNAMIC -> DynamicMedium(workspace, DynamicImage())
-            FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height))
+            DYNAMIC -> DynamicMedium(workspace, DynamicImage(), mediumRepo)
+            FLAT -> FlatMedium( Hybrid.imageCreator.createImage( width ?: workspace.width, height ?: workspace.height), mediumRepo)
             else -> throw SpiriteException("Attempted to create unsupported MediumType: $type")
         }
 

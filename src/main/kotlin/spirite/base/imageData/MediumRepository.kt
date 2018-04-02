@@ -6,12 +6,21 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 /**
  *  The MediumRepository is responsible for storing the direct medium data.
+ *
+ *  TODO: Add with(Lock) to mediums (when condensing data, on changeMedium, and on
  */
 
 /** Read-only Access to the Medium Repository */
 interface IMediumRepository {
     fun getData( i: Int) : IMedium?
-    //fun floatData(i: Int) : IFloatingMedium
+
+    val dataList : List<Int>
+    fun <T> floatData( i: Int, condenser: (IMedium)->T) : IFloatingMedium<T>?
+}
+
+interface IFloatingMedium<T> {
+    fun flush()
+    val condensed : T
 }
 
 /** Read-Write Access to the Medium Repository */
@@ -22,10 +31,12 @@ interface MMediumRepository : IMediumRepository {
 
     fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
     fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
+    fun changeMedium( i: Int, runner: (IMedium)->Unit)
 }
 
+
 private class MediumRepoEntry(val medium: IMedium) {
-    val floating = false
+    var floating = false
 }
 
 class MediumRepository(
@@ -37,8 +48,28 @@ class MediumRepository(
     /** Locks the cache from being cleared. */
     var locked : Boolean = true
 
+
     // region IMedium
     override fun getData(i: Int) = mediumData[i]?.medium
+
+    override val dataList: List<Int> get() = mediumData.map { it.key }
+
+    val floatingData = mutableListOf<FloatingMedium<*>>()
+    override fun <T> floatData( i: Int, condenser: (IMedium)->T) : IFloatingMedium<T>? {
+        return if( mediumData[i] == null) null
+            else FloatingMedium(i, condenser)
+    }
+
+    inner class FloatingMedium<T>
+    internal constructor(
+            val id: Int,
+            val condenser: (IMedium)->T)
+        : IFloatingMedium<T>
+    {
+        init {floatingData.add(this)}
+        override fun flush() {floatingData.remove(this)}
+        override val condensed: T by lazy { condenser.invoke( mediumData[id]!!.medium) }
+    }
     // endregion
 
 
@@ -63,9 +94,11 @@ class MediumRepository(
             MDebug.handleError(STRUCTURAL, "Untracked Image Data found from UndoEngine")
 
         // Remove Unused Entries
-        unused.forEach {
-            mediumData[it]?.medium?.flush()
-            mediumData.remove(it)
+        unused.forEach {unusedIndex ->
+            // Invoke so that they get copied
+            floatingData.filter { it.id == unusedIndex }.forEach { it.condensed }
+            mediumData[unusedIndex]?.medium?.flush()
+            mediumData.remove(unusedIndex)
         }
     }
 
@@ -78,6 +111,13 @@ class MediumRepository(
         val oldMedium = mediumData[handle.id]
         mediumData.put( handle.id, MediumRepoEntry(newMedium))
         oldMedium?.medium?.flush()
+    }
+
+
+    override fun changeMedium( i: Int, runner: (IMedium)->Unit) {
+        // Invoke so that they get copied
+        floatingData.filter { it.id == i }.forEach { it.condensed }
+        runner.invoke(mediumData[i]!!.medium)
     }
 
     // endregion

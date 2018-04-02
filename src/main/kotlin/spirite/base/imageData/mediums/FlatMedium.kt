@@ -3,17 +3,18 @@ package spirite.base.imageData.mediums
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.DefaultImageDrawer
-import spirite.base.imageData.mediums.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 
 /***
  * A FlatMedium is a thin wrapper for a RawImage, exposing its functionality to the program.
  */
 class FlatMedium(
-        val image: RawImage
+        val image: RawImage,
+        val mediumRepo: MMediumRepository
 ) : IMedium {
     override val width: Int get() = image.width
     override val height: Int get() = image.height
@@ -26,13 +27,13 @@ class FlatMedium(
         gc.renderImage(image, 0, 0, render)
     }
 
-    override fun dupe() = FlatMedium(image.deepCopy())
+    override fun dupe() = FlatMedium(image.deepCopy(),mediumRepo)
 
     override fun flush() { image.flush() }
 
     override fun build(arranged: ArrangedMediumData): BuiltMediumData = FlatBuiltMediumData(arranged)
 
-    inner class FlatBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+    inner class FlatBuiltMediumData(arranged: ArrangedMediumData) : BuiltMediumData(arranged, mediumRepo) {
         private val image = this@FlatMedium.image
         override val width: Int get() = image.width
         override val height: Int get() = image.height
