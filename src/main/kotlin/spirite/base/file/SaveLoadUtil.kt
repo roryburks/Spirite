@@ -17,6 +17,12 @@ object SaveLoadUtil {
     val NODE_REFERENCE_LAYER = 0x03
     val NODE_PUPPET_LAYER = 0x04
 
+    // :::: MediumType
+    val MEDIUM_PLAIN = 0x00
+    val MEDIUM_DYNAMIC = 0x01
+    val MEDIUM_PRISMATIC = 0x02
+    val MEDIUM_MAGLEV = 0x03
+
     // Node Attribute Masks
     val VISIBLE_MASK = 0x01
     val EXPANDED_MASK = 0x02

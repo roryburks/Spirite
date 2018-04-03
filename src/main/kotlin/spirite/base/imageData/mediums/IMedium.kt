@@ -3,6 +3,9 @@ package spirite.base.imageData.mediums
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
+import spirite.base.imageData.IFloatingMedium
+import spirite.base.imageData.MMediumRepository
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.base.imageData.mediums.drawer.IImageDrawer
@@ -85,7 +88,7 @@ object NilMedium : IMedium {
     override fun getImageDrawer(arranged: ArrangedMediumData): IImageDrawer  = throw Exception("Tried to Get Drawer for NilMedium")
     override fun render( gc: GraphicsContext, render: RenderRubric?) {}
 
-    class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged) {
+    class NilBuiltMedium(arranged: ArrangedMediumData) : BuiltMediumData(arranged, NilMMediumRepo) {
         override val tWorkspaceToComposite: Transform get() = Transform.IdentityMatrix
         override val tMediumToComposite: Transform get() = Transform.IdentityMatrix
         override val width: Int get() = 1
@@ -93,4 +96,20 @@ object NilMedium : IMedium {
         override fun _drawOnComposite(doer: (GraphicsContext) -> Unit) {}
         override fun _rawAccessComposite(doer: (RawImage) -> Unit) {}
     }
+}
+
+object NilMMediumRepo : MMediumRepository {
+    override fun getData(i: Int): IMedium? = null
+    override val dataList: List<Int> get() = listOf()
+    override fun <T> floatData(i: Int, condenser: (IMedium) -> T): IFloatingMedium<T>? = null
+    override fun addMedium(medium: IMedium): MediumHandle {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+    override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+    override fun clearUnusedCache(externalDataUsed: Set<MediumHandle>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+    override fun changeMedium(i: Int, runner: (IMedium) -> Unit) {}
 }

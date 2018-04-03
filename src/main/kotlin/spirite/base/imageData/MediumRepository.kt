@@ -1,6 +1,7 @@
 package spirite.base.imageData
 
 import spirite.base.imageData.mediums.IMedium
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
@@ -21,6 +22,7 @@ interface IMediumRepository {
 interface IFloatingMedium<T> {
     fun flush()
     val condensed : T
+    val id: Int
 }
 
 /** Read-Write Access to the Medium Repository */
@@ -62,7 +64,7 @@ class MediumRepository(
 
     inner class FloatingMedium<T>
     internal constructor(
-            val id: Int,
+            override val id: Int,
             val condenser: (IMedium)->T)
         : IFloatingMedium<T>
     {
@@ -95,10 +97,12 @@ class MediumRepository(
 
         // Remove Unused Entries
         unused.forEach {unusedIndex ->
-            // Invoke so that they get copied
-            floatingData.filter { it.id == unusedIndex }.forEach { it.condensed }
-            mediumData[unusedIndex]?.medium?.flush()
-            mediumData.remove(unusedIndex)
+            mediumData[unusedIndex]?.also { mediumDatum ->
+                // Invoke so that they get copied
+                floatingData.filter { it.id == unusedIndex }.forEach { it.condensed }
+                mediumDatum.medium.flush()
+                mediumData.remove(unusedIndex)
+            }
         }
     }
 
@@ -115,9 +119,12 @@ class MediumRepository(
 
 
     override fun changeMedium( i: Int, runner: (IMedium)->Unit) {
-        // Invoke so that they get copied
-        floatingData.filter { it.id == i }.forEach { it.condensed }
-        runner.invoke(mediumData[i]!!.medium)
+        val mediumDatum = mediumData[i] ?: return
+        Hybrid.LockFrom(mediumDatum).withLock {
+            // Invoke so that they get copied
+            floatingData.filter { it.id == i }.forEach { it.condensed }
+            runner.invoke(mediumDatum.medium)
+        }
     }
 
     // endregion

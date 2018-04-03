@@ -7,9 +7,11 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -52,16 +54,9 @@ class SaveContext(
     val nodeMap = mutableMapOf<Node, Int>()
     val root = workspace.groupTree.root
     val floatingData = workspace.mediumRepository.dataList
-            .map { workspace.mediumRepository.floatData(it, {condense(it)}) }
+            .map { workspace.mediumRepository.floatData(it, {MediumPreparer.prepare(it)}) }
+            .filterNotNull()
 
-    fun condense( medium: IMedium) : Boolean{
-        when( medium) {
-            is FlatMedium -> {}
-            is DynamicMedium -> {}
-        }
-
-        return true
-    }
 
     fun writeChunk( tag: String, writer : (RandomAccessFile)->Unit) {
         if( tag.length != 4) {
@@ -101,11 +96,12 @@ private object Current {
         val context = SaveContext(workspace, ra)
 
         saveHeader(context)
+        saveGroupTree(context)
+        saveImageData(context)
+        //saveAnimationData(context)
+        //savePaletteData(context)
 
         ra.close()
-
-
-
     }
 
     fun saveHeader( context: SaveContext) {
@@ -209,7 +205,30 @@ private object Current {
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
     fun saveImageData( context: SaveContext) {
         context.writeChunk("IMGD", {ra->
+            context.floatingData.forEach {
+                // [4] : Medium Handle Id
+                ra.write( it.id)
 
+                val prepared = it.condensed
+                when( prepared) {
+                    is PreparedFlatMedium -> {
+                        ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
+
+                        val byteArray = Hybrid.imageSaver.writePNG(prepared.image)
+                        ra.writeInt( byteArray.size)    // [4] : Size of Image Data
+                        ra.write(byteArray)             // [n] : Image Data
+                    }
+                    is PreparedDynamicMedium -> {
+                        ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
+                        ra.writeShort( prepared.offsetX)        // [2] : Dynamic X Offset
+                        ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
+
+                        val byteArray = prepared.image?.run { Hybrid.imageSaver.writePNG(this)}
+                        ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
+                        byteArray?.run { ra.write(this)}    // [n] : Image Data
+                    }
+                }
+            }
         })
 
     }

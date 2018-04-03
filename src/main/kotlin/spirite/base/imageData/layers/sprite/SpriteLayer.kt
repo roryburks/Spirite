@@ -1,5 +1,6 @@
 package spirite.base.imageData.layers.sprite
 
+import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
@@ -37,7 +38,7 @@ class SpriteLayer(
 
     init {
         when( toImport) {
-            null -> _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace)), workingId++))
+            null -> _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
             else -> {
                 toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
                 _sort()
@@ -116,7 +117,7 @@ class SpriteLayer(
     }
 
     fun addPart( partName : String) {
-        val handle = mediumRepo.addMedium( DynamicMedium(workspace))
+        val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
         val depth = when {
             _parts.isEmpty() -> 0
             activePartIndex == -1 -> _parts.last().depth + 1
