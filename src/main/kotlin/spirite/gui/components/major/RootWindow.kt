@@ -27,7 +27,7 @@ class RootWindow( val master: MasterControl) : JFrame() {
                 MenuItem(".-"),
                 MenuItem(".&Open"),
                 MenuItem(".-"),
-                MenuItem(".&Save Workspace"),
+                MenuItem(".&Save Workspace", GlobalCommand.SAVE_WORKSPACE),
                 MenuItem(".Save Workspace &As..."),
                 MenuItem(".-"),
                 MenuItem(".Export Image"),

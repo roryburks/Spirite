@@ -15,38 +15,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 
-interface ISaveEngine {
-    fun triggerAutosave( workspace: IImageWorkspace, interval: Int, undoCount: Int)
-    fun untriggerAutosave( workspace: IImageWorkspace)
-    fun removeAutosavedBackups( workspace: IImageWorkspace)
-
-    val isLocked : Boolean
-    fun saveWorkspace( workspace: IImageWorkspace, file: File, track: Boolean = true)
-
-}
-
-class SaveEngine : ISaveEngine {
-    override fun triggerAutosave(workspace: IImageWorkspace, interval: Int, undoCount: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun untriggerAutosave(workspace: IImageWorkspace) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removeAutosavedBackups(workspace: IImageWorkspace) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    private var lockCount = 0
-    override val isLocked: Boolean get() = lockCount > 0
-
-}
-
 class SaveContext(
         val workspace: IImageWorkspace,
         val ra: RandomAccessFile)
@@ -82,7 +50,7 @@ class SaveContext(
     }
 }
 
-private object Current {
+object SaveEngine {
 
     fun saveWorkspace( file : File, workspace: IImageWorkspace) {
         val overwrite = file.exists()

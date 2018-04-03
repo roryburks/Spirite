@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug
@@ -11,6 +12,7 @@ interface ICentralCommandExecutor {
 }
 
 class CentralCommandExecutor(
+        val master: IMasterControl,
         val workspaceSet: IWorkspaceSet,
         val dialog: IDialog)
     : ICentralCommandExecutor
@@ -18,7 +20,7 @@ class CentralCommandExecutor(
     val commandExecuters : List<ICommandExecuter> = listOf(
             NodeContextCommand(workspaceSet, dialog),
             DrawCommandExecutor(workspaceSet),
-            GlobalCommandExecuter()
+            GlobalCommandExecuter(master)
     )
 
 

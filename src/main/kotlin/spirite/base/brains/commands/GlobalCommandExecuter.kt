@@ -1,10 +1,13 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
+import java.io.File
 
-class GlobalCommandExecuter : ICommandExecuter {
+class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {
         PING( "ping"),
+        SAVE_WORKSPACE("saveWorkspace")
         ;
 
         override val commandString: String get() = "global.$string"
@@ -16,6 +19,12 @@ class GlobalCommandExecuter : ICommandExecuter {
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when( string) {
             PING.string -> println("PING")
+            SAVE_WORKSPACE.string -> {
+                master.workspaceSet.currentWorkspace?.apply {
+                    master.fileManager.saveWorkspace(this, File("C:/Bucket/1.sif"))
+                }
+
+            }
             else -> return false
         }
         return true
