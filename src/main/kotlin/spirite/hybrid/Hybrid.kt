@@ -13,7 +13,7 @@ interface IHybrid {
     val imageConverter : ImageConverter
     val timing : ITimerEngine
     val ui : IComponentProvider
-    val imageSaver : IImageSaver
+    val imageIO : IImageIO
 
     val gl : IGL
     val gle : GLEngine
@@ -31,7 +31,7 @@ object Hybrid : IHybrid {
     override val system: ISystemUtils get() = JSystemUtils
     override val imageCreator: IImageCreator get() = EngineLaunchpoint
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
-    override val imageSaver: IImageSaver get() = JImageSaver
+    override val imageIO: IImageIO get() = JImageIO
 
     override fun LockFrom(o: Any): ILock = JLock(o)
     override fun beep() {

@@ -65,13 +65,18 @@ interface IImageWorkspace {
     val compositor : Compositor
 }
 
+interface MImageWorkspace : IImageWorkspace
+{
+    override val mediumRepository : MMediumRepository
+}
+
 class ImageWorkspace(
         override val renderEngine : IRenderEngine,
         override val settingsManager: ISettingsManager,
         override val paletteManager : IPaletteManager,
         override val strokeProvider: IStrokeDrawerProvider,
         width: Int = 100,
-        height: Int = 100) : IImageWorkspace
+        height: Int = 100) : MImageWorkspace
 {
     override val mediumRepository = MediumRepository( this)
     override val undoEngine = UndoEngine(this, mediumRepository)

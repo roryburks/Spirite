@@ -4,14 +4,10 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.mediums.DynamicMedium
-import spirite.base.imageData.mediums.FlatMedium
-import spirite.base.imageData.mediums.IMedium
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -182,7 +178,7 @@ object SaveEngine {
                     is PreparedFlatMedium -> {
                         ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
 
-                        val byteArray = Hybrid.imageSaver.writePNG(prepared.image)
+                        val byteArray = Hybrid.imageIO.writePNG(prepared.image)
                         ra.writeInt( byteArray.size)    // [4] : Size of Image Data
                         ra.write(byteArray)             // [n] : Image Data
                     }
@@ -191,7 +187,7 @@ object SaveEngine {
                         ra.writeShort( prepared.offsetX)        // [2] : Dynamic X Offset
                         ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
 
-                        val byteArray = prepared.image?.run { Hybrid.imageSaver.writePNG(this)}
+                        val byteArray = prepared.image?.run { Hybrid.imageIO.writePNG(this)}
                         ra.writeInt( byteArray?.size ?: 0)  // [4] : Size of Image Data (note: May be 0)
                         byteArray?.run { ra.write(this)}    // [n] : Image Data
                     }

@@ -19,6 +19,7 @@ import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.ImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.gui.components.dialogs.Dialog
 import spirite.gui.components.dialogs.IDialog
@@ -49,7 +50,7 @@ interface IMasterControl {
     val contextMenus : ContextMenus
     val dialog : IDialog
 
-    fun createWorkspace(width: Int, height: Int) : IImageWorkspace
+    fun createWorkspace(width: Int, height: Int) : MImageWorkspace
 }
 
 class MasterControl() : IMasterControl {
