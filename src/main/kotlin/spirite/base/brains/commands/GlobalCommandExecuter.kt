@@ -11,7 +11,9 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
         PING( "ping"),
         SAVE_WORKSPACE("saveWorkspace"),
         SAVE_WORKSPACE_AS("saveWorkspaceAs"),
-        OPEN("open")
+        OPEN("open"),
+        EXPORT("export"),
+        EXPORT_AS("export_as")
         ;
 
         override val commandString: String get() = "global.$string"
@@ -40,10 +42,10 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 val file = master.dialog.pickFile(SAVE_SIF) ?: return true
                 master.fileManager.saveWorkspace(workspace, file)
             }
-            OPEN.string -> {
-                val file = master.dialog.pickFile(FilePickType.OPEN) ?: return true
-                master.fileManager.openFile(file)
-            }
+            OPEN.string -> master.fileManager.openFile(master.dialog.pickFile(FilePickType.OPEN) ?: return true)
+            EXPORT.string, EXPORT_AS.string -> master.fileManager.exportToImage(
+                    master.workspaceSet.currentWorkspace ?: return true,
+                    master.dialog.pickFile(FilePickType.EXPORT) ?: return true)
             else -> return false
         }
         return true

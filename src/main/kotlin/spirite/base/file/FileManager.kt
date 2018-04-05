@@ -6,7 +6,11 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
+import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import java.awt.Color
 import java.io.File
 import java.io.IOException
 
@@ -18,6 +22,7 @@ interface IFileManager {
     val isLocked : Boolean
 
     fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean = true)
+    fun exportToImage( workspace: IImageWorkspace, file: File)
 
     fun openFile( file: File)
 }
@@ -45,6 +50,29 @@ class FileManager( val master: IMasterControl)  : IFileManager{
         SaveEngine.saveWorkspace(file, workspace)
         workspace.fileSaved(file)
         locks.remove(lock)
+    }
+
+    override fun exportToImage(workspace: IImageWorkspace, file: File) {
+        val ext = file.name.substring( file.name.lastIndexOf('.')+1).toLowerCase()
+        val wsImage  = master.renderEngine.renderWorkspace(workspace)
+
+        val imageToSave : IImage
+        if( ext == "jpg" || ext == "jpeg") {
+            // Remove Alpha Layer of JPG so that it works correctly with encoding
+            val img2 = Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)
+            val gc = img2.graphics
+            gc.clear( Colors.WHITE)
+            gc.renderImage(wsImage, 0, 0)
+
+            imageToSave = img2
+        }
+        else imageToSave = wsImage
+
+        try {
+            Hybrid.imageIO.saveImage( imageToSave, file)
+        }catch (e: Exception) {
+            MDebug.handleWarning(STRUCTURAL, "Failed to Export file: ${e.message}", e);
+        }
     }
 
     override fun openFile(file: File) {
