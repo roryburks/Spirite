@@ -60,7 +60,7 @@ class GLEngine(
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
                         GLC.FRAMEBUFFER_COMPLETE -> {}
-                        else -> {MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $")}
+                        else -> {MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status")}
                     }
                 }
             }

@@ -1,7 +1,14 @@
 package spirite.base.file
 
+import spirite.base.brains.IMasterControl
+import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.layers.SimpleLayer
+import spirite.base.imageData.mediums.FlatMedium
+import spirite.hybrid.Hybrid
 import java.io.File
+import java.io.IOException
 
 interface IFileManager {
     fun triggerAutosave( workspace: IImageWorkspace, interval: Int, undoCount: Int)
@@ -11,9 +18,12 @@ interface IFileManager {
     val isLocked : Boolean
 
     fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean = true)
+
+    fun openFile( file: File)
 }
 
-class FileManager  : IFileManager{
+class FileManager( val master: IMasterControl)  : IFileManager{
+
     override fun triggerAutosave(workspace: IImageWorkspace, interval: Int, undoCount: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -26,15 +36,52 @@ class FileManager  : IFileManager{
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override val isLocked: Boolean
-        get() = TODO("not implemented")
+    override val isLocked: Boolean get() = locks.isNotEmpty()
 
     class FileLock
     val locks = mutableListOf<FileLock>()
     override fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean) {
         val lock = FileLock().apply { locks.add(this) }
         SaveEngine.saveWorkspace(file, workspace)
+        workspace.fileSaved(file)
         locks.remove(lock)
     }
 
+    override fun openFile(file: File) {
+        val ext = file.name.substring( file.name.lastIndexOf('.')+1).toLowerCase()
+
+        var attempted = false
+        if( ext == "png" || ext == "bmp" || ext == "jpg" || ext == "jpeg") {
+            // First try to load the file as if it's a standard file format
+            try {
+                val img = Hybrid.imageIO.loadImage(file.readBytes())
+                workspaceFromImage(img)
+                return
+            } catch( e: IOException) {
+                attempted = true
+            }
+        }
+        try {
+            // Try to load it as an SIF (either if the extention isn't recognized or if ImageIO failed)
+            val workspace = LoadEngine.loadWorkspace(file, master)
+            master.workspaceSet.addWorkspace(workspace, true)
+            // TODO: Trigger autosave
+            return
+        } catch (e: BadSifFileException){}
+        if( !attempted) {
+            try {
+                val img = Hybrid.imageIO.loadImage(file.readBytes())
+                workspaceFromImage(img)
+            }catch (e: Exception){}
+        }
+    }
+
+    fun workspaceFromImage(img: IImage) {
+        val workspace = master.createWorkspace(img.width,img.height)
+        val medium = FlatMedium(Hybrid.imageConverter.convertToInternal(img), workspace.mediumRepository)
+        val layer = SimpleLayer( workspace.mediumRepository.addMedium(medium))
+        workspace.groupTree.importLayer(null, "base", layer)
+        workspace.finishBuilding()
+        master.workspaceSet.addWorkspace(workspace)
+    }
 }

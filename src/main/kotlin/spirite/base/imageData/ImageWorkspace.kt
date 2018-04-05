@@ -100,11 +100,11 @@ class ImageWorkspace(
     }
 
     override fun fileSaved(newFile: File) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        file = newFile
+        hasChanged = false
     }
 
-    override val file: File?
-        get() = TODO("not implemented")
+    override var file: File? = null
     override var hasChanged: Boolean = false
 
 

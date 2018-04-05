@@ -51,6 +51,8 @@ class ImageConverter(
     }
     inline fun <reified T> convert(from: IImage) : T = convertOrNull<T>(from) ?: throw Exception("Unsupported Conversion")
 
+    fun convertToInternal( from: IImage) = convert<GLImage>(from)
+
     fun loadImageIntoGL( image: IImage, gl: IGL) {
         when( image) {
             is ImageBI -> {

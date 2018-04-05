@@ -8,7 +8,17 @@ import java.nio.ByteBuffer
 import kotlin.reflect.KProperty
 
 interface ISettingsManager {
+    val paletteList : List<String>
+    fun getRawPalette( name: String) : ByteArray?
+    fun saveRawPalette( name: String, raw: ByteArray)
 
+    var lastUsedWorkspace : Boolean
+    var workspaceFilePath : File
+    var imageFilePath : File
+    var aafFilePath : File
+    val openFilePath : File
+
+    //fun get
 }
 
 class SettingsManager (
@@ -24,15 +34,15 @@ class SettingsManager (
     // ==== Palettes:
     // region Palettes
 
-    val paletteList : List<String> get() = _paletteList
+    override val paletteList : List<String> get() = _paletteList
     private val _paletteList: MutableList<String> by lazy {
         (preferences.getString("PaletteList") ?: "")
                 .split("${0.toChar()}")
                 .toMutableList()
     }
 
-    fun getRawPalette( name: String) = preferences.getByteArray( "palette.$name")
-    fun saveRawPalette( name: String, raw: ByteArray) {
+    override fun getRawPalette(name: String) = preferences.getByteArray( "palette.$name")
+    override fun saveRawPalette( name: String, raw: ByteArray) {
         if( !_paletteList.contains(name)) {
             _paletteList.add( name)
             preferences.putString("PaletteList", _paletteList.joinToString("${0.toChar()}"))
@@ -43,14 +53,11 @@ class SettingsManager (
 
     // endregion
 
-    // ====================
-    // ==== Recent-Used FilePath
     // region Recent-Used File Paths
 
-    // TODO: Make less dependent on Java System stuff
-    var lastUsedWorkspace = true
+    override var lastUsedWorkspace = true
 
-    var workspaceFilePath : File
+    override var workspaceFilePath : File
         get() = File(_workspaceFilePath)
         set(value) {
             _workspaceFilePath = value.path
@@ -58,7 +65,7 @@ class SettingsManager (
         }
     private var _workspaceFilePath by PreferenceStringDelegate("wsPath", System.getProperty("user.dir"))
 
-    var imageFilePath : File
+    override var imageFilePath : File
         get() = File(_imageFilePath)
         set(value) {
             _imageFilePath = value.path
@@ -66,12 +73,12 @@ class SettingsManager (
         }
     private var _imageFilePath by PreferenceStringDelegate( "imgPath", System.getProperty("user.dir"))
 
-    var aafFilePath : File
+    override var aafFilePath : File
         get() = File(_aafFilePath)
         set(value) { _aafFilePath = value.path}
     private var _aafFilePath : String by PreferenceStringDelegate("aafPath", System.getProperty("user.dir"))
 
-    val openFilePath get() = if( lastUsedWorkspace) workspaceFilePath else imageFilePath
+    override val openFilePath get() = if( lastUsedWorkspace) workspaceFilePath else imageFilePath
 
     // endregion
 

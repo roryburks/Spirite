@@ -2,7 +2,6 @@ package spirite.base.brains
 
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
-import spirite.base.brains.commands.ICommandExecuter
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.settings.JPreferences
 import spirite.base.brains.settings.SettingsManager
@@ -17,11 +16,10 @@ import spirite.base.graphics.ResourceUseTracker
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.gui.components.dialogs.Dialog
+import spirite.gui.components.dialogs.JDialog
 import spirite.gui.components.dialogs.IDialog
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
@@ -57,7 +55,7 @@ class MasterControl() : IMasterControl {
 
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
-    override val dialog: IDialog = Dialog(this)
+    override val dialog: IDialog = JDialog(this)
 
     override val hotkeyManager = HotkeyManager(preferences)
     override val settingsManager = SettingsManager(preferences)
@@ -74,7 +72,7 @@ class MasterControl() : IMasterControl {
 
     override val frameManager = FrameManager()
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
-    override val fileManager = FileManager()
+    override val fileManager = FileManager(this)
 
 
     override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(

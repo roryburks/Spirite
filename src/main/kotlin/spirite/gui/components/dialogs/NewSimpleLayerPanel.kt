@@ -1,5 +1,6 @@
 package spirite.gui.components.dialogs
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.IMedium.MediumType
@@ -14,7 +15,7 @@ import spirite.hybrid.Hybrid
 private val MAX_DIM = 16000
 
 class NewSimpleLayerPanel(
-        master: MasterControl,
+        master: IMasterControl,
         workspace: IImageWorkspace) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
     data class NewSimpleLayerReturn(
