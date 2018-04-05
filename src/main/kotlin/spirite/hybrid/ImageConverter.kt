@@ -16,6 +16,8 @@ import sun.awt.image.IntegerInterleavedRaster
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
+
+
 class ImageConverter(
         val gle: GLEngine? = null
 ) {
@@ -38,7 +40,7 @@ class ImageConverter(
                 gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
 
                 loadImageIntoGL(from, gl)
-                return GLImage( tex, from.width, from.height, gle) as T
+                return GLImage(tex, from.width, from.height, gle) as T
             }
             ImageBI::class.java -> {
                 if( from is GLImage)

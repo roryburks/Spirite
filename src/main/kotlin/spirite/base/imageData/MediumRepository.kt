@@ -30,6 +30,11 @@ interface MMediumRepository : IMediumRepository {
     /** Adds a medium to the repository and returns a MediumHandle that references it. */
     fun addMedium( medium: IMedium) : MediumHandle
 
+    /** Imports all of the IMediums into the repository and returns a map from the
+     * medium's index in the old map to its index in the repository
+     */
+    fun importMap( map: Map<Int,IMedium>) : Map<Int,Int>
+
 
     fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)
     fun clearUnusedCache(externalDataUsed : Set<MediumHandle>)
@@ -41,9 +46,9 @@ private class MediumRepoEntry(val medium: IMedium) {
     var floating = false
 }
 
-class MediumRepository(
-        private val imageWorkspace: IImageWorkspace
-) : MMediumRepository{
+class MediumRepository(private val imageWorkspace: IImageWorkspace)
+    : MMediumRepository
+{
     private val mediumData = mutableMapOf<Int,MediumRepoEntry>()
     private var workingId = 0
 
@@ -109,6 +114,17 @@ class MediumRepository(
     override fun addMedium(medium: IMedium) : MediumHandle{
         mediumData[workingId] = MediumRepoEntry(medium)
         return MediumHandle(imageWorkspace, workingId++)
+    }
+
+    override fun importMap(map: Map<Int, IMedium>): Map<Int, Int> {
+        val indexMap = mutableMapOf<Int,Int>()
+
+        map.forEach { key, value ->
+            mediumData[workingId] = MediumRepoEntry(value)
+            indexMap.put(key,workingId++)
+        }
+
+        return indexMap
     }
 
     override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {

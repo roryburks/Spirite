@@ -171,7 +171,7 @@ object SaveEngine {
         context.writeChunk("IMGD", {ra->
             context.floatingData.forEach {
                 // [4] : Medium Handle Id
-                ra.write( it.id)
+                ra.writeInt( it.id)
 
                 val prepared = it.condensed
                 when( prepared) {
@@ -183,7 +183,7 @@ object SaveEngine {
                         ra.write(byteArray)             // [n] : Image Data
                     }
                     is PreparedDynamicMedium -> {
-                        ra.writeByte(SaveLoadUtil.MEDIUM_PLAIN) // [1] : Medium Type
+                        ra.writeByte(SaveLoadUtil.MEDIUM_DYNAMIC) // [1] : Medium Type
                         ra.writeShort( prepared.offsetX)        // [2] : Dynamic X Offset
                         ra.writeShort( prepared.offsetY)        // [2] : Dynamic Y Offset
 

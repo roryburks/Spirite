@@ -1,20 +1,27 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.MasterControl
 import spirite.base.graphics.DynamicImage
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
+import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.*
+import spirite.base.util.i
 import spirite.hybrid.Hybrid
+
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.charset.Charset
+
+/**
+ *
+ * TODO: Wrap Java IO functionality with generic stream readin functionality
+ */
 
 internal class LoadContext(
         val ra: RandomAccessFile,
@@ -22,6 +29,10 @@ internal class LoadContext(
 {
     var version: Int = 0
     val chunkInfo = mutableListOf<ChunkInfo>()
+    val nodes = mutableSetOf<Node>()
+    lateinit var reindexingMap : Map<Int,Int>
+
+    fun reindex( index : Int) = reindexingMap[index] ?: throw BadSifFileException("Medium Id $index does not correspond to any Medium Data")
 }
 
 
@@ -34,7 +45,7 @@ object LoadEngine {
 
 
 
-    fun loadWorkspace( file: File, master: IMasterControl) {
+    fun loadWorkspace( file: File, master: IMasterControl) : MImageWorkspace{
         try {
             if( !file.exists())
                 throw BadSifFileException("File does not exist.")
@@ -52,28 +63,54 @@ object LoadEngine {
 
             context.version = ra.readInt()
 
-            val width : Int
-            val height: Int
+            var width = 0
+            var height = 0
             if( context.version >= 1) {
                 width = ra.readShort().toInt()
                 height = ra.readShort().toInt()
             }
-            else {
-                width = -1
-                height = -1
-            }
 
             parseChunks(context)
 
-            // First Load the Image Data (Required)
-            val imgChunk = context.chunkInfo.single { it.header == "IMGD" }
-            ra.seek(imgChunk.startPointer)
-            val imageMap = parseImageDataSection(context, imgChunk.size)
+            // Medium Data (Required)
+            context.chunkInfo.single { it.header == "IMGD" }.apply {
+                ra.seek(startPointer)
+                parseImageDataSection(context, size)
+            }
 
-            // Next load the Group Data (Required), Dependent on Image Data
-            val grpChunk = context.chunkInfo.single { it.header == "GRPT" }
-            ra.seek(grpChunk.startPointer)
+            // Group Data (Required), Dependent on Image Data
+            context.chunkInfo.single { it.header == "GRPT" }.apply {
+                ra.seek(startPointer)
+                parseGroupTreeSection(context, size)
+            }
 
+            // Animation Data (optional), dependent on Group Data and Image Data
+            context.chunkInfo.singleOrNull { it.header == "ANIM" }?.apply {
+                ra.seek(startPointer)
+                parseAnimationData(context, size)
+            }
+
+            // Palette Data (optional)
+            context.chunkInfo.singleOrNull { it.header == "PLTT" }?.apply {
+                ra.seek(startPointer)
+                parsePaletteData(context,size)
+            }
+
+            if( context.version <= 2) {
+                width = workspace.mediumRepository.dataList
+                        .map { workspace.mediumRepository.getData(it)?.width ?: 0}
+                        .max() ?: 100
+                height = workspace.mediumRepository.dataList
+                        .map { workspace.mediumRepository.getData(it)?.height ?: 0}
+                        .max() ?: 100
+            }
+
+            workspace.width = width
+            workspace.height = height
+
+            workspace.finishBuilding()
+
+            return workspace
         }catch( e: IOException) {
             throw BadSifFileException("Error Reading File: " + e.getStackTrace());
         }
@@ -92,7 +129,7 @@ object LoadEngine {
         }
     }
 
-    private fun parseImageDataSection( context: LoadContext, size: Int) : Map<Int,IMedium>{
+    private fun parseImageDataSection( context: LoadContext, size: Int) {
         val dataMap = mutableMapOf<Int,IMedium>()
         val ra = context.ra
         val endPointer = ra.filePointer + size
@@ -112,17 +149,21 @@ object LoadEngine {
             when( type) {
                 FLAT -> {
                     val imgSize = ra.readInt()
-                    val img = Hybrid.imageIO.loadImage(ByteArray(imgSize).apply { ra.read(this) })
+                    val imgData = ByteArray(imgSize).apply { ra.read( this) }
 
-                    dataMap.put(id, FlatMedium(img, context.workspace.mediumRepository))
+                    File("C:/Bucket/.dump").writeBytes(imgData)
+
+                    val img = Hybrid.imageIO.loadImage(imgData)
+                    dataMap[id] = FlatMedium(img, context.workspace.mediumRepository)
                 }
                 DYNAMIC -> {
-                    val ox = ra.readShort().toInt()
-                    val oy = ra.readShort().toInt()
+                    val ox = ra.readShort().i
+                    val oy = ra.readShort().i
                     val imgSize = ra.readInt()
-                    val img = Hybrid.imageIO.loadImage(ByteArray(imgSize).apply { ra.read(this) })
+                    val imgData = ByteArray(imgSize).apply { ra.read( this) }
 
-                    dataMap.put(id, DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository))
+                    val img = Hybrid.imageIO.loadImage(imgData)
+                    dataMap[id] = DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
                 }
                 PRISMATIC -> TODO()
                 MAGLEV -> TODO()
@@ -130,7 +171,87 @@ object LoadEngine {
             }
         }
 
-        return dataMap
+        context.reindexingMap = context.workspace.mediumRepository.importMap(dataMap)
+    }
+
+    private fun parseGroupTreeSection(context: LoadContext, chunkSize: Int) {
+        if( context.version <= 1) TODO()
+
+        val ra = context.ra
+        val workspace = context.workspace
+        val endPointer = ra.filePointer + chunkSize
+
+        // Create an array that keeps track of the active layers of group nodes
+        //  (all the nested nodes leading up to the current node)
+        val nodeLayer = Array<GroupNode?>(256, {null})
+
+        nodeLayer[0] = workspace.groupTree.root
+        context.nodes.add(workspace.groupTree.root)
+        val referencesToMap = mutableMapOf<LayerNode, Int>()
+
+        while( ra.filePointer < endPointer) {
+            var alpha = 1.0f
+            var x = 0
+            var y = 0
+            var bitmask = 0x1 + 0x2
+
+            val depth = ra.readUnsignedByte()
+
+            if( context.version >= 1) {
+                alpha = ra.readFloat()
+                x = ra.readShort().i
+                y = ra.readShort().i
+                bitmask = ra.readUnsignedByte()
+            }
+
+            val name = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
+            val type = ra.readUnsignedByte()
+
+
+            // !!!! Kind of hack-y that it's even saved, but only the root node should be
+            //	depth 0 and there should only be one (and it's already created)
+            if( depth == 0)
+                continue
+
+            val node = when( type) {
+                SaveLoadUtil.NODE_GROUP -> {
+                    workspace.groupTree.addGroupNode(nodeLayer[depth - 1], name)
+                            .apply { nodeLayer[depth] = this }
+                }
+                SaveLoadUtil.NODE_SIMPLE_LAYER -> {
+                    val mediumId = ra.readInt()
+
+                    val layer = SimpleLayer(MediumHandle(workspace, context.reindex(mediumId)))
+                    workspace.groupTree.importLayer( nodeLayer[depth-1], name, layer, true)
+                }
+                SaveLoadUtil.NODE_RIG_LAYER -> TODO()
+                SaveLoadUtil.NODE_REFERENCE_LAYER -> TODO()
+                SaveLoadUtil.NODE_PUPPET_LAYER -> TODO()
+                else -> throw BadSifFileException("Unrecognized Node Type ID: $type (version mismatch or corrupt file?)")
+            }
+
+            context.nodes.add(node)
+            node.alpha = alpha
+            node.expanded = bitmask and SaveLoadUtil.EXPANDED_MASK != 0
+            node.visible = bitmask and SaveLoadUtil.VISIBLE_MASK != 0
+            node.x = x
+            node.y = y
+        }
+
+
+        // Link the reference nodes (needs to be done afterwards because it might link to a node yet
+        //	added to the node map since nodeIDs are based on depth-first Group Tree order,
+        //	not creation order) (TODO once ReferenceLayers are in)
+    }
+
+    private fun parseAnimationData( context: LoadContext, chunkSize: Int)
+    {
+        //TODO()
+    }
+
+    private fun parsePaletteData( context: LoadContext, chunkSize: Int)
+    {
+        //TODO()
     }
 }
 

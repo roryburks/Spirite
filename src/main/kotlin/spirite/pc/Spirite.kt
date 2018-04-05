@@ -1,10 +1,13 @@
 package spirite.pc
 
 import spirite.base.brains.MasterControl
+import spirite.base.file.LoadEngine
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.gui.components.major.RootWindow
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
+import java.io.File
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.WindowConstants
@@ -25,14 +28,21 @@ fun main( args: Array<String>) {
             root.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
 
 
-            val ws = master.createWorkspace(640,480)
-            ws.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
-            master.workspaceSet.addWorkspace(ws)
+
+            val ws1 = master.createWorkspace(640,480)
+            ws1.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
+            master.workspaceSet.addWorkspace(ws1)
+            ws1.finishBuilding()
         }
 
         SwingUtilities.invokeLater {
+            val ws = LoadEngine.loadWorkspace(File("C:/Bucket/1.sif"), master)
+            //ws.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
+            master.workspaceSet.addWorkspace(ws)
+            ws.imageObservatory.triggerRefresh(ImageChangeEvent(setOf(), setOf(),ws))
         }
     }catch (e : Exception) {
+        e.printStackTrace()
         MDebug.handleError(FATAL, e.message ?: "Root-level exception caught.", e)
     }
 }

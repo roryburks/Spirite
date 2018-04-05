@@ -102,14 +102,9 @@ object NilMMediumRepo : MMediumRepository {
     override fun getData(i: Int): IMedium? = null
     override val dataList: List<Int> get() = listOf()
     override fun <T> floatData(i: Int, condenser: (IMedium) -> T): IFloatingMedium<T>? = null
-    override fun addMedium(medium: IMedium): MediumHandle {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-    override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-    override fun clearUnusedCache(externalDataUsed: Set<MediumHandle>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun addMedium(medium: IMedium) = throw NotImplementedError()
+    override fun replaceMediumDirect(handle: MediumHandle, newMedium: IMedium)= throw NotImplementedError()
+    override fun clearUnusedCache(externalDataUsed: Set<MediumHandle>) = throw NotImplementedError()
     override fun changeMedium(i: Int, runner: (IMedium) -> Unit) {}
+    override fun importMap(map: Map<Int, IMedium>): Map<Int, Int> = throw NotImplementedError()
 }

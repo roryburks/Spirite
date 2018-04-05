@@ -1,5 +1,8 @@
 package spirite.base.file
 
+import spirite.base.util.i
+import java.io.ByteArrayOutputStream
+import java.io.RandomAccessFile
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
@@ -39,5 +42,17 @@ object SaveLoadUtil {
         }
 
         return b
+    }
+
+    fun readNullTerminatedStringUTF9( ra: RandomAccessFile) : String
+    {
+        val bos = ByteArrayOutputStream()
+        var b = ra.readByte()
+        while( b != 0x00.toByte()) {
+            bos.write(b.i)
+            b = ra.readByte()
+        }
+
+        return bos.toString("UTF-8")
     }
 }
