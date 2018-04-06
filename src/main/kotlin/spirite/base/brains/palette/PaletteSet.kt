@@ -7,7 +7,7 @@ abstract class PaletteSet {
     abstract val onChangeTrigger: (PaletteSet) -> Unit
 
     val palettes : List<Palette> get() = _palettes
-    private val _palettes = mutableListOf<Palette>()
+    private val _palettes = mutableListOf<Palette>(PSPalette("default"))
 
     var selectedPalette : Int
         get() = _selectedPalette

@@ -1,18 +1,21 @@
 package spirite.base.brains.palette
 
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
+import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.MUtil.cycle
 
 interface IPaletteManager {
+    fun getColorBind( i: Int) : Bindable<Color>
     fun getActiveColor( i : Int) : Color
     fun setActiveColor( i: Int, color: Color)
     fun cycleActiveColors( amount: Int)
 
     fun makePaletteSet() : PaletteSet
+
+    val currentPaletteBind : Bindable<Palette>
+    val currentPalette: Palette
 
     interface MPaletteObserver {
         fun colorChanged()
@@ -21,17 +24,25 @@ interface IPaletteManager {
 }
 
 class PaletteManager : IPaletteManager {
-    val activeColors = mutableListOf<Color>(Colors.BLACK, Colors.WHITE, Colors.RED, Colors.BLACK)
+//    val activeColors = mutableListOf<Color>(Colors.BLACK, Colors.WHITE, Colors.RED, Colors.BLACK)
 
-    override fun getActiveColor(i: Int): Color = activeColors[ cycle(0, activeColors.size, i)]
+    val activeColorBinds = mutableListOf(
+            Bindable<Color>(Colors.BLACK),
+            Bindable<Color>(Colors.WHITE),
+            Bindable<Color>(Colors.RED),
+            Bindable<Color>(Colors.BLACK))
+
+    override fun getColorBind(i: Int): Bindable<Color> = activeColorBinds[i]
+
+    override fun getActiveColor(i: Int): Color = activeColorBinds[ cycle(0, activeColorBinds.size, i)].field
 
     override fun setActiveColor(i: Int, color: Color) {
-        activeColors[ cycle(0, activeColors.size, i)] = color
+        activeColorBinds[ cycle(0, activeColorBinds.size, i)].field = color
     }
 
     override fun cycleActiveColors(amount: Int) {
-        val new = (0 until activeColors.size).map { activeColors[cycle(0,activeColors.size,it + amount)] }
-        (0 until activeColors.size).forEach {activeColors[it] = new[it]}
+        val new = (0 until activeColorBinds.size).map { activeColorBinds[cycle(0,activeColorBinds.size,it + amount)].field }
+        (0 until activeColorBinds.size).forEach {activeColorBinds[it].field = new[it]}
     }
 
     override fun makePaletteSet(): PaletteSet = PMPaletteSet()
@@ -45,5 +56,10 @@ class PaletteManager : IPaletteManager {
     private fun triggerPaletteChange() {
         _paletteObs.trigger { obs -> obs.colorChanged() }
     }
+
+    val globalPaletteSet : PaletteSet = PMPaletteSet()
+
+    override val currentPaletteBind = Bindable(globalPaletteSet.currentPalette)
+    override val currentPalette: Palette by currentPaletteBind
 }
 

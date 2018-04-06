@@ -14,6 +14,12 @@ interface IBindable<T> {
     fun addWeakListener( listener: OnChangeEvent<T>) : IBoundListener<T>
 }
 
+interface MBindable<T> : IBindable<T>{
+    override var field: T
+    fun bind( root: Bindable<T>)
+    fun bindWeakly( root: Bindable<T>)
+}
+
 // When you create a Listener not bound to an existing Bindable, sometimes you'll want to remove that listener manually.
 //  That's what this interface is for.
 interface IBoundListener<T> {
@@ -26,7 +32,7 @@ interface IBoundListener<T> {
  * the underlying scroll is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
  * underlying is different)
  */
-class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : IBindable<T>, IBoundListener<T>{
+class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : MBindable<T>, IBoundListener<T>{
     override var field: T
         get() = underlying.field
         set(value) {underlying.field = value}
@@ -34,14 +40,14 @@ class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : IB
     private var underlying = BindableUnderlying(this, defaultValue)
 
     /** Note: Calling b1.bind( b2) will result in both having b2's current underlying scroll. */
-    fun bind( root: Bindable<T>) {
+    override fun bind( root: Bindable<T>) {
         if( root.underlying != underlying) {
             root.underlying.swallow(underlying)
             underlying = root.underlying
         }
     }
 
-    fun bindWeakly( root: Bindable<T>) {
+    override fun bindWeakly( root: Bindable<T>) {
         if( root.underlying != underlying) {
             root.underlying.swallowWeakly(underlying)
             underlying = root.underlying
