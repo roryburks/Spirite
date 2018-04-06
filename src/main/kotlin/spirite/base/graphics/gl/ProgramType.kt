@@ -177,3 +177,11 @@ class StrokeV2ApplyCall(
             GLUniform1f("u_alpha", alpha))
     override val programType: ProgramType get() = STROKE_V2_APPLY
 }
+
+class StrokePixelCall( color: Vec3)
+    :ProgramCall()
+{
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform3f( "u_color", color))
+    override val programType: ProgramType get() = STROKE_PIXEL
+}

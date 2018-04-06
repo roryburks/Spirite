@@ -11,7 +11,9 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
         UNDO( "undo"),
         REDO("redo"),
         CROP_SELECTION("cropSelection"),
-        APPLY_TRANFORM("applyTranform")
+        APPLY_TRANFORM("applyTranform"),
+        AUTO_CROP("autoCrop"),
+        LAYER_TO_IMAGE_SIZE("layerToImageSize")
         ;
 
         override val commandString: String get() = "draw.$string"
@@ -29,6 +31,8 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
             REDO.string -> workspace.undoEngine.redo()
             CROP_SELECTION.string -> TODO()
             APPLY_TRANFORM.string -> TODO()
+            AUTO_CROP.string -> TODO()
+            LAYER_TO_IMAGE_SIZE.string -> TODO()
         }
 
         return true

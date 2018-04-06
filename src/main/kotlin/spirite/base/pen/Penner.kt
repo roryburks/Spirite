@@ -1,9 +1,9 @@
 package spirite.base.pen
 
 import spirite.base.brains.palette.IPaletteManager
-import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.brains.toolset.Pen
+import spirite.base.brains.toolset.*
 import spirite.base.graphics.rendering.IRenderEngine
+import spirite.base.imageData.mediums.drawer.IImageDrawer.IFillModule
 import spirite.base.imageData.mediums.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.behaviors.*
 import spirite.base.util.delegates.DerivedLazy
@@ -13,6 +13,7 @@ import spirite.base.util.linear.Vec2
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.major.work.WorkSection
+import spirite.hybrid.Hybrid
 
 interface IPenner {
 //    val holdingShift : Boolean
@@ -102,7 +103,10 @@ class Penner(
     override fun penDown(button: MouseButton) {
         if( button == MouseButton.UNKNOWN) return
 
-        val drawer = workspace?.activeDrawer
+        // There really shouldn't be any reason to do penDown behavior when workspace is null
+        val workspace = workspace ?: return
+        val drawer = workspace.activeDrawer
+
         when {
             behavior != null -> behavior?.onPenDown()
             context.currentWorkspace?.referenceManager?.editingReference ?: false -> when {
@@ -110,7 +114,7 @@ class Penner(
                 holdingShift -> behavior = RotatingReferenceBehavior( this)
                 else ->         behavior = MovingReferenceBehavior(this)
             }
-            drawer != null -> {
+            else -> {
                 val tool = toolsetManager.selectedTool
                 val color = paletteManager.getActiveColor(if( button == LEFT) 0 else 1)
 
@@ -118,7 +122,24 @@ class Penner(
                     is Pen -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
                         drawer is IStrokeModule -> behavior = PenBehavior.Stroke(this, drawer, color)
+                        else -> Hybrid.beep()
                     }
+                    is Pixel -> when {
+                        holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
+                        drawer is IStrokeModule -> behavior = PixelBehavior.Stroke( this, drawer, color)
+                        else -> Hybrid.beep()
+                    }
+                    is Eraser ->
+                        if( drawer is IStrokeModule) behavior = EraserBehavior.Stroke( this, drawer, color)
+                        else Hybrid.beep()
+                    is Fill ->
+                        if( drawer is IFillModule) TODO()
+                        else Hybrid.beep()
+                    is Move -> when {
+                        //workspace.selectionEngine.selection != null  -> TODO()
+                        workspace.groupTree.selectedNode != null -> behavior = MovingNodeBehavior(this, workspace.groupTree.selectedNode!!)
+                    }
+
                 }
 
             }

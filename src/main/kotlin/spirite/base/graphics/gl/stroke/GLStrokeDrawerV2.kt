@@ -19,9 +19,9 @@ import spirite.pc.graphics.ImageBI
 import java.io.File
 import javax.imageio.ImageIO
 
-class GLStrokeDrawerV2(
-        val gle: GLEngine
-) : IStrokeDrawer {
+class GLStrokeDrawerV2(val gle: GLEngine)
+    : IStrokeDrawer
+{
     private class DrawerContext (
             val builder: StrokeBuilder,
             val image: GLImage,

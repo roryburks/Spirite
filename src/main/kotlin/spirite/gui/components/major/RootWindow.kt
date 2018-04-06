@@ -1,6 +1,7 @@
 package spirite.gui.components.major
 
 import spirite.base.brains.MasterControl
+import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
@@ -34,12 +35,12 @@ class RootWindow( val master: MasterControl) : JFrame() {
                 MenuItem(".Export Image As...", GlobalCommand.EXPORT_AS),
 
                 MenuItem("&Edit"),
-                MenuItem(".&Undo"),
-                MenuItem(".&Redo"),
+                MenuItem(".&Undo", DrawCommand.UNDO),
+                MenuItem(".&Redo", DrawCommand.REDO),
 
 
                 MenuItem("&Layer"),
-                MenuItem(".Auto&crop Layer"),
+                MenuItem(".Auto&crop Layer", DrawCommand.AUTO_CROP),
                 MenuItem(".Layer to &Image Size"),
 
                 MenuItem("&Select"),

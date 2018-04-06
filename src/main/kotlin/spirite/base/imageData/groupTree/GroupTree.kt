@@ -10,6 +10,9 @@ import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.linear.Transform
 import spirite.base.brains.Bindable
 import spirite.base.graphics.RenderMethod
+import spirite.base.imageData.groupTree.GroupTree.Node.NodePosition.NodePositionChangeAction
+import spirite.base.imageData.undo.StackableAction
+import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -55,8 +58,13 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         var alpha by NodePropertyDelegate(1.0f, undoEngine, "Changed $treeDescription Node's Alpha")
         var method by NodePropertyDelegate(RenderMethod(), undoEngine, "Changed $treeDescription Node's Method")
 
-        var x : Int by NodePropertyDelegate(0, undoEngine,"Changed $treeDescription Node's X offset")
-        var y : Int by NodePropertyDelegate(0, undoEngine,"Changed $treeDescription Node's Y offset")
+        private val pos = NodePosition()
+        var x
+            get() = pos.x
+            set(value) {pos.changeX(value)}
+        var y
+            get() = pos.y
+            set(value) {pos.changeY(value)}
         var expanded : Boolean by NodePropertyDelegate( true, undoEngine,"Expanded/Contracted $treeDescription Node", false)
         var name : String by NodePropertyDelegate( name, undoEngine,"Changed $treeDescription Node's Name", false)
 
@@ -64,6 +72,49 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
         val tNodeToContext get() = Transform.TranslationMatrix(x+0f, y+0f)
 
+        // region Delegates
+        private inner class NodePosition {
+            var x = 0
+                private set(value) {
+                    field = value
+                    triggerNodeAttributeChanged( this@Node, true)
+                }
+            var y = 0 ; private set
+
+            fun changeX( new: Int) {
+                if( undoEngine == null) x = new
+                else if( new != x) undoEngine.performAndStore(NodePositionChangeAction(x,y,new,y))
+            }
+            fun changeY( new: Int) {
+                if( undoEngine == null) y = new
+                else if( new != y) undoEngine.performAndStore(NodePositionChangeAction(x,y,x,new))
+            }
+
+
+            inner class NodePositionChangeAction(val oldX: Int, val oldY: Int, var newX: Int, var newY: Int)
+                : NullAction(), StackableAction
+            {
+                override val description: String get() = "Changed ${treeDescription} Node's Position"
+                val context : Node get() = this@Node
+
+                override fun performAction() {
+                    x = newX
+                    y = newY
+                }
+
+                override fun undoAction() {
+                    x = oldX
+                    y = oldY
+                }
+
+                override fun canStack(other: UndoableAction) = other is NodePositionChangeAction && other.context == context
+                override fun stackNewAction(other: UndoableAction) {
+                    val other = other as NodePositionChangeAction
+                    newX = other.newX
+                    newY = other.newY
+                }
+            }
+        }
 
         inner class NodePropertyDelegate<T>(
                 defaultValue : T,
@@ -98,6 +149,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
                 }
             }
         }
+        // endregion
 
         // region Structure
         var parent = parent ; internal set

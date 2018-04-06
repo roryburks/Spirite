@@ -1,5 +1,6 @@
 package spirite.base.imageData.mediums.drawer
 
+import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 
@@ -23,9 +24,9 @@ interface IImageDrawer {
 //        fun clear()
 //    }
 //
-//    interface IFillModule {
-//        fun fill(x: Int, y: Int, color: Int, _data: ArrangedMediumData): Boolean
-//    }
+    interface IFillModule {
+        fun fill(x: Int, y: Int, color: Int, _data: ArrangedMediumData): Boolean
+    }
 //
 //    interface IFlipModule {
 //        fun flip(horizontal: Boolean)
