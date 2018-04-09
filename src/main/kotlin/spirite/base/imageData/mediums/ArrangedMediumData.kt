@@ -1,7 +1,7 @@
 package spirite.base.imageData.mediums
 
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.selection.SelectionMask
+import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Transform
 
 /***
@@ -12,10 +12,10 @@ import spirite.base.util.linear.Transform
 data class ArrangedMediumData(
         val handle: MediumHandle,
         val tMediumToWorkspace: Transform = Transform.IdentityMatrix,
-        val selectionMask: SelectionMask? = null)
+        val selection: Selection? = null)
 {
     val built  get() = handle.medium.build(this)
 
-    constructor(handle: MediumHandle, ox: Float, oy: Float, selectionMask: SelectionMask? = null ) :
-            this( handle, Transform.TranslationMatrix(ox, oy), selectionMask)
+    constructor(handle: MediumHandle, ox: Float, oy: Float, selection: Selection? = null ) :
+            this( handle, Transform.TranslationMatrix(ox, oy), selection)
 }

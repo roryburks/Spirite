@@ -35,7 +35,8 @@ abstract class NullAction() : UndoableAction() {
     open fun getDependencies(): Collection<MediumHandle>? = null
 }
 
-class CompositeAction(
+// Maybe this should be sealed?
+open class CompositeAction(
         actions: Iterable<UndoableAction>,
         override val description: String
 ) : UndoableAction() {
@@ -64,4 +65,19 @@ class CompositeAction(
     override fun undoAction() {
         actions.asReversed().forEach { it.undoAction() }
     }
+}
+
+class StackableCompositeAction(
+        actions: Iterable<UndoableAction>,
+        description: String)
+    : CompositeAction(actions, description),
+        StackableAction
+{
+    override fun canStack(other: UndoableAction) =
+        (actions.lastOrNull() as? StackableAction)?.canStack(other) ?: false
+
+    override fun stackNewAction(other: UndoableAction) {
+        (actions.lastOrNull() as? StackableAction)?.stackNewAction(other)
+    }
+
 }

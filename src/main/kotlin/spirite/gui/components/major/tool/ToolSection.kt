@@ -2,15 +2,13 @@ package spirite.gui.components.major.tool
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
-import spirite.base.imageData.mediums.drawer.NillImageDrawer
+import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.util.Colors
 import spirite.gui.components.basic.*
 import spirite.gui.components.basic.IBoxList.IBoxComponent
 import spirite.gui.resources.Skin
 import spirite.gui.resources.ToolIcons
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.ISwComponent
-import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.SwToggleButton
 import java.awt.Color
 import java.awt.GradientPaint
@@ -19,7 +17,6 @@ import java.awt.Graphics2D
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.geom.RoundRectangle2D
-import javax.swing.JButton
 import javax.swing.JToggleButton
 
 private val BUTTON_WIDTH = 24
@@ -32,7 +29,7 @@ class ToolSection (
     val currentTool get() = master.toolsetManager.selectedTool
     val toolset get() = master.toolsetManager.toolset
     init {
-        master.centralObservatory.activeDrawerBind.addListener { new, old ->
+        master.centralObservatory.activeDrawerObserver.addListener { new, old ->
             imp.clear()
             imp.addAll(toolset.toolsForDrawer(new ?: NillImageDrawer))
             imp.selected = currentTool

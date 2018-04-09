@@ -80,6 +80,7 @@ abstract class GraphicsContext {
 
 
     private val transformStack = Stack<Transform>()
+
     fun pushTransform() {transformStack.push(transform.toMutable())}
     fun popTransform() {transform = transformStack.pop()}
 

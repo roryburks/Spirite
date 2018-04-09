@@ -1,6 +1,5 @@
 package spirite.base.imageData.layers.sprite
 
-import spirite.base.graphics.DynamicImage
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
@@ -8,8 +7,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
-import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction

@@ -110,10 +110,12 @@ class NodeRenderer(
 
     private fun buildCompositeLayer() {
         val compositeSource = workspace.compositor.compositeSource
+        val lifted = workspace.selectionEngine.liftedData
 
-        if( compositeSource != null) {
-            val medium = compositeSource.arranged.handle.medium
-            val built = medium.build(compositeSource.arranged)
+        if( compositeSource != null || lifted != null) {
+            val active = compositeSource?.arranged ?: workspace.activeData ?: return
+            val medium = active.handle.medium
+            val built = medium.build(active)
             val compositeImage = Hybrid.imageCreator.createImage(
                     MathUtil.ceil(built.width*ratioW),
                     MathUtil.ceil(built.height*ratioH))
@@ -129,16 +131,30 @@ class NodeRenderer(
                 else -> medium.render(gc)
             }
 
+            gc.pushTransform()
+
+
+            // Draw the lifted image
+            if( lifted != null) {
+                gc.transform = built.tWorkspaceToComposite
+                workspace.selectionEngine.selectionTransform?.apply { gc.preTransform(this)}
+                lifted.draw(gc)
+            }
+
             // Draw the composite
-            gc.transform = baseTransform
-            compositeSource.drawer.invoke(gc)
+            if( compositeSource != null) {
+                gc.transform = baseTransform
+                compositeSource.drawer.invoke(gc)
+            }
+
+            gc.popTransform()
 
             // Draw over the composite
             if( medium is IComplexMedium)
                 medium.drawOverComposite(gc)
 
             builtComposite = BuiltComposite(
-                    compositeSource.arranged.handle,
+                    active.handle,
                     compositeImage,
                     built.tCompositeToMedium)
         }

@@ -8,7 +8,7 @@ import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.util.linear.Transform
 
 

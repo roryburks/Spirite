@@ -3,8 +3,8 @@ package spirite.base.pen
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.imageData.mediums.drawer.IImageDrawer.IFillModule
-import spirite.base.imageData.mediums.drawer.IImageDrawer.IStrokeModule
+import spirite.base.imageData.drawer.IImageDrawer.IFillModule
+import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.behaviors.*
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f

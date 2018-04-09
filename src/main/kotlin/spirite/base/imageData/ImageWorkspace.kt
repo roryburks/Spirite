@@ -2,6 +2,7 @@ package spirite.base.imageData
 
 import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
+import spirite.base.brains.IObservable
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
@@ -11,15 +12,15 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
-import spirite.base.imageData.mediums.drawer.IImageDrawer
-import spirite.base.imageData.mediums.drawer.NillImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
+import spirite.base.imageData.selection.SelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
 import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.groupExtensions.SinglyList
-import spirite.base.util.groupExtensions.foldAppend
 import spirite.base.util.groupExtensions.mapAggregated
 import java.io.File
 
@@ -56,7 +57,7 @@ interface IImageWorkspace {
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
-    val activeDrawerBind: IBindable<IImageDrawer>
+    val activeDrawerBind: IObservable<()->Any?>
     val activeDrawer : IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
 
@@ -83,7 +84,7 @@ class ImageWorkspace(
     override val imageObservatory: IImageObservatory = ImageObservatory()
     override val groupTree = PrimaryGroupTree(this, mediumRepository)
     override val animationManager: IAnimationManager get() = TODO("not implemented")
-    override val selectionEngine: ISelectionEngine get() = TODO("not implemented")
+    override val selectionEngine: ISelectionEngine get() = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet get() = TODO("not implemented")
 

@@ -1,7 +1,7 @@
 package spirite.base.brains.toolset
 
-import spirite.base.imageData.mediums.drawer.IImageDrawer
-import spirite.base.imageData.mediums.drawer.NillImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.NillImageDrawer
 
 /** A Toolset is a complete set of every tool */
 class Toolset( internal val manager: ToolsetManager) {

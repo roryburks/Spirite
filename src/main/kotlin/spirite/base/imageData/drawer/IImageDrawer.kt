@@ -1,13 +1,16 @@
-package spirite.base.imageData.mediums.drawer
+package spirite.base.imageData.drawer
 
 import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.selection.ILiftedData
+import spirite.base.imageData.selection.Selection
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
+import spirite.base.util.linear.Transform
 
 
 interface IImageDrawer {
 
-//    abstract class MaskedImageAction protected constructor(data: ArrangedMediumData, protected val mask: SelectionMask) : ImageAction(data)
+//    abstract class MaskedImageAction protected constructor(data: ArrangedMediumData, protected val mask: Selection) : ImageAction(data)
 
     // Modules, an Image Drawer may implement these or they may not.  Not implementing them means
     //	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't
@@ -58,15 +61,15 @@ interface IImageDrawer {
 //        fun anchorPoints(x: Float, y: Float, r: Float, locked: Boolean, relooping: Boolean)
 //        fun erasePoints(x: Float, y: Float, r: Float)
 //    }
-//
-//    interface ILiftSelectionModule {
-//        fun liftSelection(selection: SelectionMask): ALiftedData
-//    }
-//
-//    interface IAnchorLiftModule {
-//        fun acceptsLifted(lifted: ALiftedData): Boolean
-//        fun anchorLifted(lifted: ALiftedData, trans: Transform)
-//    }
+
+    interface ILiftSelectionModule {
+        fun liftSelection(selection: Selection): ILiftedData
+    }
+
+    interface IAnchorLiftModule {
+        fun acceptsLifted(lifted: ILiftedData): Boolean
+        fun anchorLifted(lifted: ILiftedData, trans: Transform?)
+    }
 //
 //    interface IBoneDrawer {
 //        fun contort(bone: BaseBone, to: Interpolator2D)

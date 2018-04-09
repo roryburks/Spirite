@@ -5,7 +5,7 @@ import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
-import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
@@ -16,7 +16,7 @@ interface ICentralObservatory {
     val omniImageObserver : IObservable<ImageObserver>
     val trackingPrimaryTreeObserver : IObservable<TreeObserver>
 
-    val activeDrawerBind : IBindable<IImageDrawer?>
+    val activeDrawerObserver : IObservable<()->Any?>
     val selectedNode : IBindable<Node?>
 }
 
@@ -29,8 +29,8 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
     override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObs }
+    override val activeDrawerObserver = TrackingObserver { it.activeDrawerBind }
 
-    override val activeDrawerBind: IBindable<IImageDrawer?> = TrackingBinder { it.activeDrawerBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
 
     init {

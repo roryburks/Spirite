@@ -7,7 +7,7 @@ import kotlin.math.sin
 /**
  *
  * NOTE: When a MutableTransform is passed as a plain Transform it is essentially immutable.  Naughty coders can violate
- * this by manually casting the Transform as a MutableTransform, but calling toImmutable will create a new MutableTransform
+ * this by manually casting the Transform as a MutableTransform, but calling copyToImmutable will create a new MutableTransform
  * even if the base is Mutable.  This allows a contract-based conversion from Mutable to Immutable without having to
  * push data.
  *
@@ -57,7 +57,7 @@ abstract class Transform()
     }
 
     // Not extremely necessary because Transform is taken/treated as a contract to not change it (by casting it).
-    fun toImmutable() : ImmutableTransform {
+    fun copyToImmutable() : ImmutableTransform {
         return ImmutableTransform(m00,m01,m02, m10,m11,m12)
     }
     fun toMutable() : MutableTransform {

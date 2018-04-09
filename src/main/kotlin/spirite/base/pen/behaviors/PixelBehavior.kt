@@ -1,11 +1,10 @@
 package spirite.base.pen.behaviors
 
 import spirite.base.brains.toolset.IToolsetManager
-import spirite.base.imageData.mediums.drawer.IImageDrawer.IStrokeModule
+import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.InterpolationMethod.NONE
-import spirite.base.pen.stroke.StrokeParams.Method.BASIC
 import spirite.base.pen.stroke.StrokeParams.Method.PIXEL
 import spirite.base.util.Color
 

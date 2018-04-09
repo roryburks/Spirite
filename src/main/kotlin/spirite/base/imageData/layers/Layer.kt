@@ -4,8 +4,7 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.drawer.IImageDrawer
+import spirite.base.imageData.drawer.IImageDrawer
 
 abstract class Layer {
     abstract val width: Int
