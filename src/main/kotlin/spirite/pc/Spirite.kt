@@ -20,12 +20,8 @@ fun main( args: Array<String>) {
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
             master = MasterControl()
+            master.frameManager.initUi()
 
-            val root = RootWindow(master)
-            root.pack()
-            root.isLocationByPlatform = true
-            root.isVisible = true
-            root.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         }
 
         SwingUtilities.invokeLater {

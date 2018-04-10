@@ -1,5 +1,6 @@
 package spirite.gui.components.major.work
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
@@ -10,10 +11,10 @@ import spirite.hybrid.Hybrid
 
 
 class WorkTabPane
-constructor(val master: MasterControl, private val tabPane: ITabbedPane)
+constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
     : IComponent by tabPane
 {
-    constructor(master: MasterControl) : this( master, Hybrid.ui.TabbedPane())
+    constructor(master: IMasterControl) : this( master, Hybrid.ui.TabbedPane())
 
     val workSection = WorkSection(master)
     private val workspaces = mutableListOf<IImageWorkspace>()

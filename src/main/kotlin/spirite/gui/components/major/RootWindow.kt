@@ -1,5 +1,7 @@
 package spirite.gui.components.major
 
+import spirite.base.brains.Hotkey
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
@@ -18,10 +20,16 @@ import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout
+import java.awt.KeyEventDispatcher
+import java.awt.KeyboardFocusManager
+import java.awt.event.KeyEvent
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
-class RootWindow( val master: MasterControl) : JFrame() {
+class RootWindow( val master: IMasterControl) : JFrame() {
+    val view get() = workTabPane.workSection.currentView
+    private val workTabPane =  WorkTabPane(master)
+
     init /* Menu */ {
         val scheme = listOf(
                 MenuItem("&File"),
@@ -86,7 +94,7 @@ class RootWindow( val master: MasterControl) : JFrame() {
 
         val omni = OmniContainer {
             left += OmniSegment(GroupView(master), 100, 150)
-            center = OmniSegment(WorkTabPane(master), 200)
+            center = OmniSegment( workTabPane, 200)
             right += SubContainer( {
                 top += OmniSegment(ToolSection(master), 100, 200)
                 top += OmniSegment(ToolSettingsSection(master), 100, 100)
@@ -102,5 +110,20 @@ class RootWindow( val master: MasterControl) : JFrame() {
         this.add( omni.jcomponent)
 
         SwingUtilities.invokeLater {this.size = Dimension(800,600) }
+    }
+
+    init /* Bindings */ {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher { evt ->
+            if( evt.id == KeyEvent.KEY_PRESSED) {
+                val key = evt.keyCode
+                val modifier = evt.modifiersEx
+
+                val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
+
+                command?.apply { master.commandExecuter.executeCommand(this, null) }
+            }
+
+            false
+        }
     }
 }

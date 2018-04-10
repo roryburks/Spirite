@@ -70,7 +70,7 @@ class MasterControl() : IMasterControl {
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
     override val commandExecuter = CentralCommandExecutor(this, workspaceSet, dialog)
 
-    override val frameManager = FrameManager()
+    override val frameManager = JFrameManager(this)
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
     override val fileManager = FileManager(this)
 

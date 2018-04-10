@@ -24,7 +24,7 @@ private constructor(
     : IComponent by tree,
         TreeObserver
 {
-    constructor(master: MasterControl) : this(master, Hybrid.ui.TreeView<Node>())
+    constructor(master: IMasterControl) : this(master, Hybrid.ui.TreeView<Node>())
 
     override fun treeStructureChanged(evt : TreeChangeEvent) {rebuild()}
     override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}

@@ -46,6 +46,7 @@ abstract class WorkArea(
             val selection = workspace.selectionEngine.selection
             if( selection != null) {
                 gc.pushTransform()
+                // Why is this transform instead of preTransform?  Doesn't quite seem right.
                 selection.transform?.let { gc.transform(it) }
                 gc.drawBounds(selection.mask, ++i)
 

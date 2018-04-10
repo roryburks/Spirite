@@ -1,5 +1,9 @@
 package spirite.base.brains
 
+import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
+import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
+import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand
 import spirite.base.brains.settings.IPreferences
 import spirite.base.util.dataContainers.MutableOneToManyMap
 import java.awt.event.InputEvent
@@ -19,27 +23,27 @@ interface IHotkeyManager {
 }
 
 private val defaultHotkeys = mapOf(
-        "workspace.zoom_in" to (Hotkey( KeyEvent.VK_ADD, 0)),
-        "workspace.zoom_out" to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
-        "workspace.zoom_in_slow" to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
-        "workspace.zoom_out_slow" to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
-        "workspace.zoom_0" to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
+        ViewCommand.ZOOM_IN.commandString to (Hotkey( KeyEvent.VK_ADD, 0)),
+        ViewCommand.ZOOM_OUT.commandString to (Hotkey( KeyEvent.VK_SUBTRACT, 0)),
+        ViewCommand.ZOOM_IN_SLOW.commandString to (Hotkey( KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK)),
+        ViewCommand.ZOOM_OUT_SLOW.commandString to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
+        ViewCommand.ZOOM_0.commandString to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
 
-        "toolset.PEN" to (Hotkey( KeyEvent.VK_P, 0)),
-        "toolset.ERASER" to (Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK)),
-        "toolset.FILL" to (Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK)),
-        "toolset.BOX_SELECTION" to (Hotkey( KeyEvent.VK_R, 0)),
-        "toolset.MOVE" to (Hotkey( KeyEvent.VK_M, 0)),
-        "toolset.COLOR_PICKER" to (Hotkey( KeyEvent.VK_O, 0)),
-        "toolset.PIXEL" to (Hotkey( KeyEvent.VK_A, 0)),
-        "toolset.COMPOSER" to (Hotkey( KeyEvent.VK_CAPS_LOCK, 0)),
+        ToolCommand.Pen.commandString to (Hotkey( KeyEvent.VK_P, 0)),
+        ToolCommand.Eraser.commandString to (Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.Fill.commandString to (Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.ShapeSelection.commandString to (Hotkey( KeyEvent.VK_R, 0)),
+        ToolCommand.Move.commandString to (Hotkey( KeyEvent.VK_M, 0)),
+        ToolCommand.ColorPicker.commandString to (Hotkey( KeyEvent.VK_O, 0)),
+        ToolCommand.Pixel.commandString to (Hotkey( KeyEvent.VK_A, 0)),
+        ToolCommand.Rigger.commandString to (Hotkey( KeyEvent.VK_CAPS_LOCK, 0)),
 
         "palette.swap" to (Hotkey( KeyEvent.VK_X, 0)),
         "palette.swapBack" to (Hotkey( KeyEvent.VK_Z, 0)),
 
         "draw.newLayerQuick" to (Hotkey( KeyEvent.VK_INSERT, 0)),
-        "draw.undo" to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
-        "draw.redo" to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        DrawCommand.UNDO.commandString to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
+        DrawCommand.REDO.commandString to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         "draw.clearLayer" to (Hotkey( KeyEvent.VK_DELETE, 0)),
         "draw.invert" to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK )),
         "draw.toggle_reference" to (Hotkey( KeyEvent.VK_BACK_QUOTE, 0)),
@@ -54,7 +58,7 @@ private val defaultHotkeys = mapOf(
         "select.none" to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         "select.invert" to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
-        "global.save_image" to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.SAVE_WORKSPACE.commandString to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
         "global.copy" to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
         "global.copyVisible" to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         "global.paste" to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),

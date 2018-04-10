@@ -1,5 +1,6 @@
 package spirite.gui.components.major.groupView
 
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
@@ -7,11 +8,11 @@ import spirite.hybrid.Hybrid
 
 class GroupView
 private constructor(
-        master: MasterControl,
+        master: IMasterControl,
         val panel : ICrossPanel)
     : IComponent by panel
 {
-    constructor(master: MasterControl) : this(master, panel = Hybrid.ui.CrossPanel())
+    constructor(master: IMasterControl) : this(master, panel = Hybrid.ui.CrossPanel())
 
 
     init {
