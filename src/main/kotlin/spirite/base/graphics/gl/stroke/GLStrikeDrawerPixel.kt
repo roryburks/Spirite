@@ -112,7 +112,7 @@ class GLStrikeDrawerPixel(val gle: GLEngine)
             val STRIDE = 2
 
             val num = states.length
-            val raw = FloatArray(STRIDE * num + 1)
+            val raw = FloatArray(STRIDE * (num + 1))
 
             for (i in 0 until states.length) {
                 // x y z w

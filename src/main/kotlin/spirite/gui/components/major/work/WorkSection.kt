@@ -191,11 +191,11 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     }
     // endregion
 
-    val imageObserver : ImageObserver =  object: ImageObserver {
-        override fun imageChanged(evt: ImageChangeEvent) {
-            redraw()
-        }
-    }
+//    val imageObserver : ImageObserver =  object: ImageObserver {
+//        override fun imageChanged(evt: ImageChangeEvent) {
+//            redraw()
+//        }
+//    }.apply { master.centralObservatory.trackingImageObserver.addObserver(this) }
 
     val workspaceOvserver = object: WorkspaceObserver {
         override fun workspaceCreated(newWorkspace: IImageWorkspace) {
@@ -228,13 +228,12 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
                 }
             }
         }
-    }
-
-    init {
-        master.workspaceSet.workspaceObserver.addObserver(workspaceOvserver)
-        master.centralObservatory.trackingImageObserver.addObserver(imageObserver)
-    }
+    }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
 
     val viewObservable : IObservable<()->Unit> get() = _viewObservable
     private val _viewObservable = Observable<()->Unit>()
+
+    init {
+        Hybrid.timing.createTimer({redraw()}, 50, true)
+    }
 }

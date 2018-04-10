@@ -12,6 +12,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.DerivedLazy
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.Hybrid
@@ -59,7 +60,6 @@ class SelectionEngine(
             selectionDerived.reset()
         }
 
-
     override fun setSelection(newSelection: Selection?) {
         val liftedData = liftedData
         if( liftedData == null) {
@@ -67,19 +67,22 @@ class SelectionEngine(
         }
         else {
             val drawer = workspace.activeDrawer
-            if( drawer !is IAnchorLiftModule || drawer.acceptsLifted(liftedData))
-                Hybrid.beep()
-            else {
-                workspace.undoEngine.doAsAggregateAction({
-                    val proposingTransform = proposingTransform
-                    val anchorTransform = when( proposingTransform ) {
-                        null -> selectionTransform
-                        else -> proposingTransform * (selectionTransform ?: Transform.IdentityMatrix)
-                    }
-                    drawer.anchorLifted(liftedData, anchorTransform)
-                    workspace.undoEngine.performAndStore(ChangeSelectionAction(selection, newSelection))
-                }, "Change Selection")
-            }
+            workspace.undoEngine.doAsAggregateAction({
+                val proposingTransform = proposingTransform
+                val anchorTransform = when( proposingTransform ) {
+                    null -> selectionTransform
+                    else -> proposingTransform * (selectionTransform ?: Transform.IdentityMatrix)
+                }
+                (drawer as? IAnchorLiftModule)?.apply { if( acceptsLifted(liftedData)) anchorLifted(liftedData, anchorTransform)}
+
+                workspace.undoEngine.performAndStore(object: NullAction() {
+                    override val description: String get() = ""
+                    override fun performAction() {this@SelectionEngine.liftedData = null}
+                    override fun undoAction() {this@SelectionEngine.liftedData = liftedData}
+                })
+
+                workspace.undoEngine.performAndStore(ChangeSelectionAction(selection, newSelection))
+            }, "Change Selection")
         }
     }
 
@@ -113,10 +116,14 @@ class SelectionEngine(
     }
 
     override fun transformSelection(transform: Transform, liftIfEmpty: Boolean) {
+        if( selectionMask == null) return
+
         val liftedData = liftedData
-        if( !liftIfEmpty || liftedData == null)
+        val drawer = workspace.activeDrawer
+        if( !liftIfEmpty || liftedData != null || drawer !is ILiftSelectionModule)
             workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
         else {
+            TODO()
 
         }
     }
@@ -128,16 +135,22 @@ class SelectionEngine(
 
         override val description: String get() = "Moved Selection"
 
-        override fun performAction() {selectionTransform = transform * (originalTransform ?: Transform.IdentityMatrix)}
-        override fun undoAction() {selectionTransform = originalTransform}
+        override fun performAction() {
+            selectionTransform = transform * (originalTransform ?: Transform.IdentityMatrix)
+        }
+        override fun undoAction() {
+            selectionTransform = originalTransform
+        }
 
         override fun canStack(other: UndoableAction) = other is TransformSelectionAction
-        override fun stackNewAction(other: UndoableAction) {transform = (other as TransformSelectionAction).transform * transform}
+        override fun stackNewAction(other: UndoableAction) {
+            transform = (other as TransformSelectionAction).transform * transform
+        }
 
     }
     // endregion
 
-    override var liftedData: ILiftedData? = LiftedImageData(Hybrid.imageCreator.createImage(10,10).apply {graphics.fillRect(0,0,10,10) })
+    override var liftedData: ILiftedData? = null
         private set
     override fun anchorLifted() {
         val liftedData = liftedData ?: return
@@ -181,9 +194,7 @@ class SelectionEngine(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override var proposingTransform: Transform?
-        get() = TODO("not implemented")
-        set(value) {}
+    override var proposingTransform: Transform? = null
 
     override fun applyProposingTranform() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -192,4 +203,12 @@ class SelectionEngine(
 
 
     override val selectionChangeObserver = Observable<()->Any?>()
+
+
+    init {
+        // DEBUG
+        setSelection(Selection.RectangleSelection(Rect(100,100)))
+        liftedData = LiftedImageData(Hybrid.imageCreator.createImage(10,10).apply {graphics.fillRect(0,0,10,10) })
+    }
+
 }

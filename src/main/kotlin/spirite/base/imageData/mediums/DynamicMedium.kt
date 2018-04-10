@@ -25,6 +25,8 @@ class DynamicMedium(
 {
     override val width: Int get() = image.width
     override val height: Int get() = image.height
+    override val x: Int get() = image.xOffset
+    override val y: Int get() = image.yOffset
     override val type: MediumType get() = DYNAMIC
 
     override fun build(arranged: ArrangedMediumData) = DynamicBuiltImageData(arranged)

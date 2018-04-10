@@ -26,6 +26,8 @@ import spirite.base.util.linear.Transform
  * @author Rory Burks
  */
 interface IMedium {
+    val x: Int
+    val y: Int
     val width: Int
     val height: Int
     val type: MediumType
@@ -77,6 +79,8 @@ abstract class IComplexMedium : IMedium {
 }
 
 object NilMedium : IMedium {
+    override val x: Int get() = 0
+    override val y: Int get() = 0
     override val width: Int get() = 1
     override val height: Int get() = 1
     override val type: MediumType get() = FLAT

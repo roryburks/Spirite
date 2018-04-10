@@ -9,6 +9,8 @@ import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion
+import spirite.base.util.linear.Vec2
+import spirite.base.util.round
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
 
@@ -85,6 +87,16 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
         val retTransform = Transform.TranslationMatrix(area.x.f, area.y.f) * (transform?: Transform.IdentityMatrix)
         return Selection(image, retTransform)
+    }
+
+    fun contains(x: Int, y: Int): Boolean {
+        val transformed = transform?.invert()?.apply(Vec2(x.f,y.f)) ?: Vec2(x.f,y.f)
+        val x = transformed.x.round
+        val y = transformed.y.round
+
+        if( x < 0 || y < 0 || x >= width || y >= width) return false
+
+        return mask.getColor(x,y).alpha > 0f
     }
 //
 //    fun invert(width: Int, height: Int) : Selection {

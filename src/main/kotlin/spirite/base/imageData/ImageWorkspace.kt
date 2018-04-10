@@ -54,10 +54,10 @@ interface IImageWorkspace {
     val paletteManager : IPaletteManager
     val strokeProvider : IStrokeDrawerProvider
 
+    val activeMediumBind : IBindable<MediumHandle?>
     val activeData : ArrangedMediumData?
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
-    val activeDrawerBind: IObservable<()->Any?>
     val activeDrawer : IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
 
@@ -84,7 +84,7 @@ class ImageWorkspace(
     override val imageObservatory: IImageObservatory = ImageObservatory()
     override val groupTree = PrimaryGroupTree(this, mediumRepository)
     override val animationManager: IAnimationManager get() = TODO("not implemented")
-    override val selectionEngine: ISelectionEngine get() = SelectionEngine(this)
+    override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet get() = TODO("not implemented")
 
@@ -108,21 +108,18 @@ class ImageWorkspace(
     override var file: File? = null
     override var hasChanged: Boolean = false
 
+    private val currentNode get() = groupTree.selectedNode
 
-    override val activeData: ArrangedMediumData? get() {
-        val node = groupTree.selectedNode
-        return when( node) {
-            is LayerNode -> arrangeActiveDataForNode(node)
-            else -> null
-        }
-    }
+
+    override val activeMediumBind = Bindable<MediumHandle?>(null)
+    override val activeData: ArrangedMediumData? get() = (currentNode as? LayerNode)?.let { arrangeActiveDataForNode(it) }
     override fun arrangeActiveDataForNode(node: LayerNode): ArrangedMediumData {
         val layerData = node.layer.activeData
         return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
-    override val activeDrawerBind = Bindable<IImageDrawer>(NillImageDrawer)
-    override var activeDrawer: IImageDrawer by activeDrawerBind ; private set
+    override val activeDrawer: IImageDrawer get() =
+        (currentNode as? LayerNode)?.let { it.layer.getDrawer(arrangeActiveDataForNode(it)) } ?: NillImageDrawer
 
     override fun getDrawerForNode(node: Node) = when( node) {
             is LayerNode -> node.layer.getDrawer(arrangeActiveDataForNode(node))
@@ -131,7 +128,7 @@ class ImageWorkspace(
 
     init {
         groupTree.selectedNodeBind.addListener { new, old ->
-            activeDrawer = new?.run { getDrawerForNode(this) } ?: NillImageDrawer
+            activeMediumBind.field = (new as? LayerNode)?.run { layer.activeData.handle }
         }
     }
 

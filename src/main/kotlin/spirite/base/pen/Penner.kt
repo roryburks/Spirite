@@ -2,9 +2,12 @@ package spirite.base.pen
 
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
+import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.IFillModule
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
+import spirite.base.imageData.selection.ISelectionEngine.BuildMode
+import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f
@@ -28,6 +31,9 @@ interface IPenner {
     fun rawUpdateX(rawX: Int)
     fun rawUpdateY(rawY: Int)
     fun rawUpdatePressure(pressure: Float)
+
+    val drawsOverlay : Boolean
+    fun drawOverlay(gc: GraphicsContext)
 
 }
 
@@ -136,8 +142,25 @@ class Penner(
                         if( drawer is IFillModule) TODO()
                         else Hybrid.beep()
                     is Move -> when {
-                        //workspace.selectionEngine.selection != null  -> TODO()
+                        workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)
                         workspace.groupTree.selectedNode != null -> behavior = MovingNodeBehavior(this, workspace.groupTree.selectedNode!!)
+                    }
+                    is ShapeSelection,
+                    is FreeSelection-> {
+                        if(!holdingShift && !holdingCtrl && workspace.selectionEngine.selection?.contains(x,y) ?: false) {
+                            behavior = MovingSelectionBehavior(this)
+                        }
+                        else {
+                            val mode = when {
+                                holdingCtrl && holdingCtrl -> INTERSECTION
+                                holdingShift -> ADD
+                                holdingCtrl -> SUBTRACT
+                                else -> DEFAULT
+                            }
+                            when(tool) {
+                                is ShapeSelection -> behavior = FormingSelectionBehavior(this, toolsetManager.toolset.ShapeSelection.shape, mode)
+                            }
+                        }
                     }
 
                 }
@@ -170,4 +193,7 @@ class Penner(
     override fun rawUpdatePressure(rawPressure: Float) {
         pressure = rawPressure
     }
+
+    override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
+    override fun drawOverlay(gc: GraphicsContext) {(behavior as? DrawnPennerBehavior)?.paintOverlay(gc)}
 }

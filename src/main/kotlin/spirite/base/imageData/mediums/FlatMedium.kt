@@ -16,6 +16,8 @@ class FlatMedium(
         val image: RawImage,
         val mediumRepo: MMediumRepository
 ) : IMedium {
+    override val x: Int get() = 0
+    override val y: Int get() = 0
     override val width: Int get() = image.width
     override val height: Int get() = image.height
     override val type: MediumType get() = FLAT

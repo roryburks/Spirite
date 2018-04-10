@@ -28,10 +28,12 @@ class ToolSection (
 {
     val currentTool get() = master.toolsetManager.selectedTool
     val toolset get() = master.toolsetManager.toolset
+    val workspace get() = master.workspaceSet.currentWorkspace
+
     init {
-        master.centralObservatory.activeDrawerObserver.addListener { new, old ->
+        master.centralObservatory.activeDataBind.addListener { new, old ->
             imp.clear()
-            imp.addAll(toolset.toolsForDrawer(new ?: NillImageDrawer))
+            imp.addAll(toolset.toolsForDrawer(workspace?.run { activeDrawer } ?: NillImageDrawer))
             imp.selected = currentTool
         }
 

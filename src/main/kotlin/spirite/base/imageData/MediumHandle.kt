@@ -34,6 +34,8 @@ data class MediumHandle(
         val workspace: IImageWorkspace,
         val id: Int)
 {
+    val x: Int get() = medium.x
+    val y: Int get() = medium.y
     val width: Int get() = medium.width
     val height: Int get() = medium.height
 

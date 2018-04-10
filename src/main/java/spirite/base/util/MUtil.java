@@ -124,6 +124,7 @@ public class MUtil {
 		return new Rect( Math.min(x1, x2), Math.min(y1, y2),
 				Math.abs(x1-x2), Math.abs(y1-y2));
 	}
+
 	/** Creates the smallest rectangle that contains all given points. */
 	public static Rect rectFromPoints(List<Vec2> points) {
 		if( points == null || points.size() == 0) return new Rect(0,0,0,0);
@@ -222,12 +223,9 @@ public class MUtil {
 	
 	public static boolean coordInImage( int x, int y, IImage image) {
 		if( image == null) return false;
-		
-		if( x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight()) 
-			return false;
-		
-		return true;
-	}
+
+        return x >= 0 && y >= 0 && x < image.getWidth() && y < image.getHeight();
+    }
 	
 	
 	/** Fills the supplied FloatCompactors with points representing the path 
