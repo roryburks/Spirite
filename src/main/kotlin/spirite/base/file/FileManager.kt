@@ -54,25 +54,27 @@ class FileManager( val master: IMasterControl)  : IFileManager{
 
     override fun exportToImage(workspace: IImageWorkspace, file: File) {
         val ext = file.name.substring( file.name.lastIndexOf('.')+1).toLowerCase()
-        val wsImage  = master.renderEngine.renderWorkspace(workspace)
 
         val imageToSave : IImage
         if( ext == "jpg" || ext == "jpeg") {
             // Remove Alpha Layer of JPG so that it works correctly with encoding
+            val wsImage = master.renderEngine.renderWorkspace(workspace)
             val img2 = Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)
             val gc = img2.graphics
             gc.clear( Colors.WHITE)
             gc.renderImage(wsImage, 0, 0)
 
             imageToSave = img2
+            wsImage.flush()
         }
-        else imageToSave = wsImage
+        else imageToSave = master.renderEngine.renderWorkspace(workspace)
 
         try {
             Hybrid.imageIO.saveImage( imageToSave, file)
         }catch (e: Exception) {
             MDebug.handleWarning(STRUCTURAL, "Failed to Export file: ${e.message}", e);
         }
+        imageToSave.flush()
     }
 
     override fun openFile(file: File) {

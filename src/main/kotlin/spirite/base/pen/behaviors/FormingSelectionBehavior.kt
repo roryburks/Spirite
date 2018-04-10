@@ -4,9 +4,9 @@ import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.brains.toolset.BoxSelectionShape.OVAL
 import spirite.base.brains.toolset.BoxSelectionShape.RECTANGLE
 import spirite.base.graphics.GraphicsContext
-import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
+import spirite.base.pen.selectionBuilders.OvalSelectionBuilder
 import spirite.base.pen.selectionBuilders.RectSelectionBuilder
 import spirite.base.pen.selectionBuilders.SelectionBuilder
 import spirite.base.util.Colors
@@ -21,7 +21,7 @@ class FormingSelectionBehavior(
 
     val builder : SelectionBuilder = when(shape) {
         RECTANGLE -> RectSelectionBuilder(penner.workspace!!)
-        OVAL -> TODO()
+        OVAL -> OvalSelectionBuilder(penner.workspace!!)
     }
 
     override fun onStart() {

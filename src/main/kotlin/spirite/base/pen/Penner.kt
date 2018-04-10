@@ -159,10 +159,10 @@ class Penner(
                             }
                             when(tool) {
                                 is ShapeSelection -> behavior = FormingSelectionBehavior(this, toolsetManager.toolset.ShapeSelection.shape, mode)
+                                is FreeSelection -> behavior = FreeformSelectionBehavior(this, mode)
                             }
                         }
                     }
-
                 }
 
             }

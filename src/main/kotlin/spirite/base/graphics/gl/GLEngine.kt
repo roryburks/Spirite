@@ -12,6 +12,7 @@ import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
+import javax.swing.SwingUtilities
 
 class GLEngine(
         private val glGetter: () -> IGL,
@@ -77,7 +78,7 @@ class GLEngine(
     }
 
     fun runOnGLThread( run: () -> Unit) {
-
+        SwingUtilities.invokeLater(run)
     }
 
     // region Exposed Rendering Methods

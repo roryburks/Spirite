@@ -34,7 +34,6 @@ abstract class WorkArea(
             val active = workspace.activeData
             if( active != null) {
                 gc.pushTransform()
-                gc.preTransform(active.tMediumToWorkspace)
 
                 gc.alpha = 0.3f
                 gc.color = Skin.DrawPanel.LayerBorder.scolor
@@ -47,7 +46,7 @@ abstract class WorkArea(
             val selection = workspace.selectionEngine.selection
             if( selection != null) {
                 gc.pushTransform()
-                selection.transform?.let { gc.preTransform(it) }
+                selection.transform?.let { gc.transform(it) }
                 gc.drawBounds(selection.mask, ++i)
 
                 gc.popTransform()

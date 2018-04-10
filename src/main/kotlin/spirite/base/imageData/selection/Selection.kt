@@ -17,6 +17,11 @@ import spirite.hybrid.Hybrid
 /**
  * Selection is essentially just an IImage and a transform.  It represents the area which is being selected and
  * not any actual data being selected.
+ *
+ * TODO: Selections have IImages and they need to be properly flushed when no longer used, but it can be difficult
+ * to determine when a Selection no longer needs to be used (as UndoableActions will often store in them).  Figure if
+ * it's worth adding a more generic ImageDependency for Actions (not just Medium Dependencies) or maybe just a specific
+ * one for selections.
  */
 class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = false){
     val mask: IImage

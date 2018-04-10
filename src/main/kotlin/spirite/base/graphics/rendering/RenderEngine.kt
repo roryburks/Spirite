@@ -75,12 +75,16 @@ class RenderEngine(
         // TODO: Could sort these by handleId and madee into a binsearch if necessary
         imageCache.entries.removeIf { entry ->
             val target = entry.key
-            when {
+            val remove = when {
                 evt.workspace != target.renderSource.workspace -> false
                 target.renderSource.imageDependencies.any {  evt.handlesChanged.contains(it) } -> true
                 target.renderSource.nodeDependencies.any {  evt.nodesChanged.contains(it) } -> true
                 else -> false
             }
+            if( remove)
+                entry.value.flush()
+
+            remove
         }
     }
 }

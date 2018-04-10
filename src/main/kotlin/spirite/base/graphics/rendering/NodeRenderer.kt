@@ -51,7 +51,7 @@ class NodeRenderer(
             // Flush the data
             buffer.forEach { it.flush() }
         }finally {
-
+            builtComposite?.compositeImage?.flush()
         }
     }
 
