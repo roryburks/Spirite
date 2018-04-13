@@ -116,6 +116,30 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         return Selection(image, null, false)
     }
 
+
+    // region Lifting
+    fun lift( image: RawImage, tBaseToImage: Transform? = null) : RawImage {
+        val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
+        val tImageToSel = tSelToImage.invert()
+        val lifted = Hybrid.imageCreator.createImage(mask.width, mask.height)
+
+
+        lifted.graphics.apply {
+            renderImage(mask, 0, 0)
+            transform = tImageToSel
+            composite = SRC_IN
+            renderImage( image, 0, 0)
+        }
+
+        image.graphics.apply {
+            transform = tSelToImage
+            composite = DST_OUT
+            renderImage(mask, 0, 0)
+        }
+
+        return lifted
+    }
+
     /**
      * @param tBaseToImage in most cases this should be a transform from Workspace Space to Image space, but in general
      *      it's a transform on top of the selection's transform that it will use to draw the selection in Image Space
@@ -181,8 +205,6 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             compositingImage.flush()
         }
     }
-
-    // region Lifting
 
     // TODO
 

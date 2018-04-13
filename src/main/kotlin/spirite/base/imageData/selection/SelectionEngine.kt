@@ -12,9 +12,7 @@ import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.delegates.DerivedLazy
-import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.Hybrid
 
 interface ISelectionEngine {
@@ -116,16 +114,14 @@ class SelectionEngine(
     }
 
     override fun transformSelection(transform: Transform, liftIfEmpty: Boolean) {
-        if( selectionMask == null) return
+        val selection = selection ?: return
 
         val liftedData = liftedData
         val drawer = workspace.activeDrawer
         if( !liftIfEmpty || liftedData != null || drawer !is ILiftSelectionModule)
             workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
-        else {
-            TODO()
-
-        }
+        else
+            liftData(drawer, selection)
     }
 
     inner class TransformSelectionAction(
@@ -182,12 +178,31 @@ class SelectionEngine(
 
     override fun attemptLiftData(drawer: IImageDrawer) {
         val selection = selection ?: return
-        if( drawer is ILiftSelectionModule) {
-            val newLifted = drawer.liftSelection(selection)
-            TODO()
-        }
+        if( drawer is ILiftSelectionModule)
+            liftData(drawer, selection)
         else
             Hybrid.beep()
+    }
+
+    private fun liftData( drawer: ILiftSelectionModule, selection: Selection) {
+        workspace.undoEngine.doAsAggregateAction({
+            workspace.undoEngine.performAndStore(ChangeLiftedDataAction(drawer.liftSelection(selection)))
+        },"Lifted Data")
+    }
+
+    inner class ChangeLiftedDataAction(val new: ILiftedData?) : NullAction() {
+        val old = liftedData
+        override val description: String get() = "Changed Lifted Data"
+
+        override fun performAction() {
+            liftedData = new
+            selectionChangeObserver.trigger { it() }
+        }
+
+        override fun undoAction() {
+            liftedData = old
+            selectionChangeObserver.trigger { it() }
+        }
     }
 
     override fun imageToSelection(image: IImage, transform: Transform?) {

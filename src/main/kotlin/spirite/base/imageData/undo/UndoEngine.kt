@@ -26,7 +26,7 @@ interface IUndoEngine {
     val undoHistory: List<UndoIndex>
 
     fun performAndStore( action: UndoableAction)
-    fun doAsAggregateAction( runner: () -> Unit, description: String)
+    fun doAsAggregateAction( runner: () -> Unit, description: String, stackable: Boolean = false)
 
     fun undo() : Boolean
     fun redo() : Boolean
@@ -88,13 +88,8 @@ class UndoEngine(
         if( action is ImageAction)
             imageContexts.add(ImageContext(action.arranged.handle, mediumRepo))
 
-        when {
-            activeStoreState != null -> activeStoreState!!.add(action)
-            else -> {
-                action.performAction()
-                storeAction( action)
-            }
-        }
+        action.performAction()
+        activeStoreState?.add(action) ?: storeAction(action)
 
         // TODO: I don't like this being here
         if( action is ImageAction)
@@ -177,7 +172,7 @@ class UndoEngine(
     private val storeStack = mutableListOf<MutableList<UndoableAction>>()
     private var activeStoreState : MutableList<UndoableAction>? = null
 
-    override fun doAsAggregateAction(runner: () -> Unit, description: String) {
+    override fun doAsAggregateAction(runner: () -> Unit, description: String, stackable: Boolean) {
         val storeState = mutableListOf<UndoableAction>()
         storeStack.add( storeState)
         activeStoreState = storeState
@@ -192,7 +187,10 @@ class UndoEngine(
         }
         else {
             activeStoreState = null
-            performAndStore( CompositeAction(storeState, description))
+            storeAction( when( stackable) {
+                false -> CompositeAction(storeState, description)
+                true -> StackableCompositeAction(storeState, description)
+            })
         }
     }
     // endregion

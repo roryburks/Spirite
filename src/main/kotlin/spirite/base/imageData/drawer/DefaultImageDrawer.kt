@@ -1,10 +1,14 @@
 package spirite.base.imageData.drawer
 
+import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.selection.ILiftedData
+import spirite.base.imageData.selection.LiftedImageData
+import spirite.base.imageData.selection.Selection
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
@@ -16,7 +20,8 @@ class DefaultImageDrawer(
     :IImageDrawer,
         IStrokeModule,
         IInvertModule,
-        IClearModule
+        IClearModule,
+        ILiftSelectionModule
 {
     val workspace : IImageWorkspace get() = arranged.handle.workspace
     val mask get() = workspace.selectionEngine.selection
@@ -90,6 +95,20 @@ class DefaultImageDrawer(
                 else -> built.rawAccessComposite { mask.doMasked(it, { it.graphics.clear() }, built.tWorkspaceToComposite) }
             }
         })
+    }
+    // endregion
+
+    // region ILiftSelectionModule
+    override fun liftSelection(selection: Selection): ILiftedData {
+        var lifted : RawImage? = null   // ugly "kind of stateful but not really" solution, but meh
+
+        workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null, {built, mask ->
+            built.rawAccessComposite {
+                lifted = selection.lift(it, built.tWorkspaceToComposite)
+            }
+        })
+
+        return LiftedImageData(lifted!!)
     }
     // endregion
 
