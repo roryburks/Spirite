@@ -1,10 +1,10 @@
 package spirite.base.imageData.drawer
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.CompositeSource
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
@@ -14,9 +14,12 @@ import spirite.base.pen.stroke.StrokeParams.Method
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)
     :IImageDrawer,
-        IStrokeModule
+        IStrokeModule,
+        IInvertModule,
+        IClearModule
 {
     val workspace : IImageWorkspace get() = arranged.handle.workspace
+    val mask get() = workspace.selectionEngine.selection
 
     // region IStrokeModule
     private var strokeBuilder : StrokeBuilder? = null
@@ -63,6 +66,30 @@ class DefaultImageDrawer(
 
         sb.end()
         workspace.compositor.compositeSource = null
+    }
+    // endregion
+
+
+    // region IInvertModule
+    override fun invert() {
+        workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
+            when( mask) {
+                null -> built.rawAccessComposite { it.drawer.invert() }
+                else -> built.rawAccessComposite { mask.doMasked(it, {it.drawer.invert()}, built.tWorkspaceToComposite) }
+            }
+        })
+    }
+    // endregion
+
+
+    // region ISelectionModule
+    override fun clear() {
+        workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
+            when (mask) {
+                null -> built.rawAccessComposite { it.graphics.clear() }
+                else -> built.rawAccessComposite { mask.doMasked(it, { it.graphics.clear() }, built.tWorkspaceToComposite) }
+            }
+        })
     }
     // endregion
 

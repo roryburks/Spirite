@@ -5,7 +5,7 @@ import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.IGNORE_ALPHA
+import spirite.base.graphics.gl.ChangeColorCall.ColorChangeMethod.IGNORE_ALPHA
 import spirite.base.graphics.gl.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
@@ -16,8 +16,6 @@ import spirite.base.util.Colors
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGLProvider
-import spirite.pc.resources.JClassScriptService
 import spirite.pc.toBufferedImage
 import java.io.File
 import javax.imageio.ImageIO

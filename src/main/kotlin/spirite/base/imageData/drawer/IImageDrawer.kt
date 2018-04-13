@@ -1,12 +1,29 @@
 package spirite.base.imageData.drawer
 
+import spirite.base.brains.toolset.ColorChangeMode
+import spirite.base.brains.toolset.ColorChangeScopes
 import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.selection.ILiftedData
 import spirite.base.imageData.selection.Selection
+import spirite.base.imageData.undo.IUndoEngine
+import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
+import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 
+
+fun IUndoEngine.performMaskedImageAction(description: String, arranged: ArrangedMediumData, mask: Selection?, action: (BuiltMediumData, Selection?)->Any? )
+{
+    performAndStore(object: ImageAction(arranged) {
+        override val description: String get() = description
+
+        override fun performImageAction(built: BuiltMediumData) {
+            action(built, mask)
+        }
+    })
+}
 
 interface IImageDrawer {
 
@@ -22,11 +39,11 @@ interface IImageDrawer {
         fun stepStroke(ps: PenState)
         fun endStroke()
     }
-//
-//    interface IClearModule {
-//        fun clear()
-//    }
-//
+
+    interface IClearModule {
+        fun clear()
+    }
+
     interface IFillModule {
         fun fill(x: Int, y: Int, color: Int, _data: ArrangedMediumData): Boolean
     }
@@ -35,13 +52,13 @@ interface IImageDrawer {
 //        fun flip(horizontal: Boolean)
 //    }
 //
-//    interface IColorChangeModule {
-//        fun changeColor(from: Int, to: Int, scope: ToolSchemes.ColorChangeScopes, mode: ToolSchemes.ColorChangeMode)
-//    }
-//
-//    interface IInvertModule {
-//        fun invert()
-//    }
+    interface IColorChangeModule {
+        fun changeColor(from: Color, to: Color, mode: ColorChangeMode)
+    }
+
+    interface IInvertModule {
+        fun invert()
+    }
 //
 //    interface ITransformModule {
 //        fun transform(trans: Transform)

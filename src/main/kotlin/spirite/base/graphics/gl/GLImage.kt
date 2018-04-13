@@ -1,5 +1,7 @@
 package spirite.base.graphics.gl
 
+import spirite.base.graphics.GLDrawer
+import spirite.base.graphics.IDrawer
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
 import spirite.base.util.ColorARGB32Normal
@@ -66,6 +68,7 @@ class GLImage : RawImage {
     // endregion
 
     override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)
+    override val drawer: IDrawer get() = GLDrawer(this)
     override val byteSize: Int get() = width*height*4
 
     val glParams : GLParameters get() = GLParameters(width, height, premultiplied = premultiplied)

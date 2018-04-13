@@ -204,11 +204,4 @@ class SelectionEngine(
 
     override val selectionChangeObserver = Observable<()->Any?>()
 
-
-    init {
-        // DEBUG
-        setSelection(Selection.RectangleSelection(Rect(100,100)))
-        liftedData = LiftedImageData(Hybrid.imageCreator.createImage(10,10).apply {graphics.fillRect(0,0,10,10) })
-    }
-
 }

@@ -2,7 +2,11 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
+import spirite.base.imageData.drawer.IImageDrawer.IClearModule
+import spirite.base.imageData.drawer.IImageDrawer.IInvertModule
 import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.hybrid.Hybrid
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
 {
@@ -10,10 +14,14 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
     enum class DrawCommand(val string: String) : ICommand {
         UNDO( "undo"),
         REDO("redo"),
+        QUICK_NEW_LAYER("quickNewLayer"),
         CROP_SELECTION("cropSelection"),
         APPLY_TRANFORM("applyTranform"),
         AUTO_CROP("autoCrop"),
-        LAYER_TO_IMAGE_SIZE("layerToImageSize")
+        LAYER_TO_IMAGE_SIZE("layerToImageSize"),
+        INVERT("invert"),
+        CLEAR("clear"),
+
         ;
 
         override val commandString: String get() = "draw.$string"
@@ -29,10 +37,13 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
         when(string) {
             UNDO.string -> workspace.undoEngine.undo()
             REDO.string -> workspace.undoEngine.redo()
+            QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             CROP_SELECTION.string -> TODO()
             APPLY_TRANFORM.string -> TODO()
             AUTO_CROP.string -> TODO()
             LAYER_TO_IMAGE_SIZE.string -> TODO()
+            INVERT.string -> (workspace.activeDrawer as? IInvertModule)?.invert() ?: Hybrid.beep()
+            CLEAR.string ->  (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
         }
 
         return true

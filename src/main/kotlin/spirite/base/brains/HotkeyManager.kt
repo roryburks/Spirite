@@ -2,6 +2,8 @@ package spirite.base.brains
 
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
+import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand
 import spirite.base.brains.settings.IPreferences
@@ -38,14 +40,14 @@ private val defaultHotkeys = mapOf(
         ToolCommand.Pixel.commandString to (Hotkey( KeyEvent.VK_A, 0)),
         ToolCommand.Rigger.commandString to (Hotkey( KeyEvent.VK_CAPS_LOCK, 0)),
 
-        "palette.swap" to (Hotkey( KeyEvent.VK_X, 0)),
-        "palette.swapBack" to (Hotkey( KeyEvent.VK_Z, 0)),
+        PaletteCommand.SWAP.commandString to (Hotkey( KeyEvent.VK_X, 0)),
+        PaletteCommand.SWAP_BACK.commandString to (Hotkey( KeyEvent.VK_Z, 0)),
 
-        "draw.newLayerQuick" to (Hotkey( KeyEvent.VK_INSERT, 0)),
+        DrawCommand.QUICK_NEW_LAYER.commandString to (Hotkey( KeyEvent.VK_INSERT, 0)),
         DrawCommand.UNDO.commandString to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
         DrawCommand.REDO.commandString to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        "draw.clearLayer" to (Hotkey( KeyEvent.VK_DELETE, 0)),
-        "draw.invert" to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK )),
+        DrawCommand.CLEAR.commandString to (Hotkey( KeyEvent.VK_DELETE, 0)),
+        DrawCommand.INVERT.commandString to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK )),
         "draw.toggle_reference" to (Hotkey( KeyEvent.VK_BACK_QUOTE, 0)),
         "draw.lift_to_reference" to (Hotkey( KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
@@ -54,9 +56,9 @@ private val defaultHotkeys = mapOf(
         "draw.shiftDown" to (Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
         "draw.shiftUp" to (Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
 
-        "select.all" to (Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
-        "select.none" to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        "select.invert" to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        SelectCommand.ALL.commandString to (Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
+        SelectCommand.NONE.commandString to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        SelectCommand.INVERT.commandString to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
         GlobalCommand.SAVE_WORKSPACE.commandString to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
         "global.copy" to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),

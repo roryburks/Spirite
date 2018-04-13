@@ -1,8 +1,9 @@
 package spirite.base.graphics.gl
 
+import spirite.base.brains.toolset.ColorChangeMode
+import spirite.base.brains.toolset.ColorChangeMode.*
 import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.JoinMethod.*
-import spirite.base.graphics.gl.ChangeColorCall.ChangeMethod.*
 import spirite.base.graphics.gl.GLEngine.BlendMethod
 import spirite.base.graphics.gl.GLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
@@ -56,19 +57,17 @@ class SquareGradientCall(
 class ChangeColorCall(
         fromColor: Vec4,
         toColor: Vec4,
-        changeMethod: ChangeMethod)
+        changeMethod: ColorChangeMode)
     : ProgramCall()
 {
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform4f("u_fromColor", fromColor),
             GLUniform4f("u_toColor", toColor),
             GLUniform1i("u_optionMask", when( changeMethod) {
-                EXACT -> 0
+                CHECK_ALL -> 0
                 IGNORE_ALPHA -> 1
-                CHANGE_ALL -> 2
+                AUTO -> 2
             }))
-
-    enum class ChangeMethod { EXACT, IGNORE_ALPHA, CHANGE_ALL}
 
     override val programType: ProgramType = CHANGE_COLOR
 }

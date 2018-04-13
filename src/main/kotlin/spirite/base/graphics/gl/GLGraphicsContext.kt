@@ -219,7 +219,7 @@ class GLGraphicsContext : GraphicsContext {
         val calls = mutableListOf<Pair<RenderAlgorithm,Int>>()
 
         // Default Blend Mode (may be over-written)
-        setCompositeBlend(params, SRC_OVER)
+        setCompositeBlend(params, composite)
 
         // Construct Call Attributes from RenderRubric
         render?.methods?.forEach {

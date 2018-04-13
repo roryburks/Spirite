@@ -1,6 +1,7 @@
 package spirite.pc.graphics
 
 import spirite.base.graphics.GraphicsContext
+import spirite.base.graphics.IDrawer
 import spirite.base.graphics.RawImage
 import spirite.base.util.Color
 import spirite.base.util.ColorARGB32Normal
@@ -20,7 +21,9 @@ class ImageBI(
     }
 
     override val graphics: GraphicsContext
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = TODO("not implemented")
+    override val drawer: IDrawer
+        get() = TODO("not implemented")
 
     override val width: Int get() = bi.width
     override val height: Int get() = bi.height
@@ -29,6 +32,6 @@ class ImageBI(
     override fun flush() = bi.flush()
 
     override fun deepCopy(): RawImage {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 }

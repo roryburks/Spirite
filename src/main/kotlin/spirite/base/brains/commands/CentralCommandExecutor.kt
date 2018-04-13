@@ -22,7 +22,9 @@ class CentralCommandExecutor(
             DrawCommandExecutor(master.workspaceSet),
             GlobalCommandExecuter(master),
             WorkspaceCommandExecuter(master),
-            ToolsetCommandExecuter(master.toolsetManager)
+            ToolsetCommandExecuter(master.toolsetManager),
+            PaletteCommandExecuter(master.paletteManager),
+            SelectionCommandExecuter(master.workspaceSet)
     )
 
 
