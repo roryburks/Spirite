@@ -44,8 +44,8 @@ class CachedImage(  image: RawImage) {
 
 class RenderEngine(
         val resourceUseTracker: IResourceUseTracker,
-        val centralObservatory: ICentralObservatory) :
-        IRenderEngine, ImageObserver
+        val centralObservatory: ICentralObservatory)
+    : IRenderEngine, ImageObserver
 {
 
     init {

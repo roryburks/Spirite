@@ -19,3 +19,4 @@ data class GroupNodeSource( val group: GroupNode, override val workspace: IImage
         NodeRenderer( group, workspace, settings).render(gc)
     }
 }
+

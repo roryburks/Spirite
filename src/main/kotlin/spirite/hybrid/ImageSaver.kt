@@ -3,7 +3,10 @@ package spirite.hybrid
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.gl.GLImage
+import spirite.base.util.ColorARGB32Normal
+import spirite.hybrid.Transferables.TransferableImage
 import spirite.pc.graphics.ImageBI
+import java.awt.Toolkit
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -17,6 +20,7 @@ interface IImageIO {
     fun writePNG(image: IImage) : ByteArray
     fun saveImage( image: IImage, file: File)
     fun loadImage( byteArray: ByteArray) : RawImage
+    fun imageToClipboard(image: IImage)
 }
 
 object JImageIO : IImageIO {
@@ -40,6 +44,11 @@ object JImageIO : IImageIO {
         return img
     }
 
+    override fun imageToClipboard(image: IImage) {
+        val transfer = TransferableImage( Hybrid.imageConverter.convert<ImageBI>(image).bi)
+
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(transfer, null)
+    }
 }
 
 val File.ext : String get() {

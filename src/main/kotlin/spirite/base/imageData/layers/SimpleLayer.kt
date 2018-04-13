@@ -7,8 +7,9 @@ import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.util.groupExtensions.SinglyList
 
-class SimpleLayer(val medium: MediumHandle) : Layer() {
-
+class SimpleLayer(val medium: MediumHandle) : Layer {
+    override val x: Int get() = medium.x
+    override val y: Int get() = medium.y
     override val width: Int get() = medium.width
     override val height: Int get() = medium.height
 

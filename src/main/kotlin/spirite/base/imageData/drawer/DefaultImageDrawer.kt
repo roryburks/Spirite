@@ -1,5 +1,6 @@
 package spirite.base.imageData.drawer
 
+import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
@@ -14,6 +15,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
+import spirite.base.util.linear.Transform
 
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)
@@ -105,6 +107,13 @@ class DefaultImageDrawer(
         workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null, {built, mask ->
             built.rawAccessComposite {
                 lifted = selection.lift(it, built.tWorkspaceToComposite)
+
+                it.graphics.apply {
+                    val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform ?: Transform.IdentityMatrix)
+                    transform = tSelToImage
+                    composite = DST_OUT
+                    renderImage(selection.mask, 0, 0)
+                }
             }
         })
 

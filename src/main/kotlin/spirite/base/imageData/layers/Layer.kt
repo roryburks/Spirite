@@ -6,17 +6,18 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.drawer.IImageDrawer
 
-abstract class Layer {
-    abstract val width: Int
-    abstract val height: Int
-    abstract val activeData : ArrangedMediumData
-    abstract fun getDrawer(arranged: ArrangedMediumData) : IImageDrawer
-    abstract val imageDependencies : List<MediumHandle>
-    abstract fun getDrawList() : List<TransformedHandle>
-    abstract fun dupe( mediumRepo : MMediumRepository) : Layer
+interface Layer {
+    val x: Int
+    val y: Int
+    val width: Int
+    val height: Int
+    val activeData: ArrangedMediumData
+    fun getDrawer( arranged: ArrangedMediumData): IImageDrawer
+    val imageDependencies: List<MediumHandle>
+    fun getDrawList() : List<TransformedHandle>
+    fun dupe( mediumRepo: MMediumRepository) : Layer
 
-
-    protected fun triggerChange() {
+    fun triggerChange() {
 
     }
 }

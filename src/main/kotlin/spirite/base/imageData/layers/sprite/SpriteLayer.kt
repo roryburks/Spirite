@@ -27,7 +27,7 @@ class SpriteLayer(
         val workspace: IImageWorkspace,
         val mediumRepo: MMediumRepository,
         toImport: List<Pair<MediumHandle,SpritePartStructure>>? = null
-) : Layer() {
+) : Layer {
 
     val undoEngine = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
@@ -55,7 +55,10 @@ class SpriteLayer(
     var activePartIndex: Int = -1 ; private set
 
 
-
+    override val x: Int
+        get() = 0
+    override val y: Int
+        get() = 0
 
     override val width: Int get() {
         val xs = mutableListOf<Float>()
