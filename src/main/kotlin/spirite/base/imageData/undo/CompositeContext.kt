@@ -24,9 +24,13 @@ class CompositeContext(
     override val lastAction: CompositeAction get() = actions.last()
 
     override fun addAction(action: CompositeAction) {
+        val contexts = mutableListOf<UndoContext<*>>()
         action.actions.forEach { innerAction ->
             when( innerAction ) {
-                is NullAction -> nullContext.addAction(innerAction)
+                is NullAction -> {
+                    contexts.add(nullContext)
+                    nullContext.addAction(innerAction)
+                }
                 is ImageAction -> {
                     var imageContext = imageContexts.find { it.medium == innerAction.arranged.handle }
 
@@ -35,11 +39,13 @@ class CompositeContext(
                         imageContexts.add(imageContext)
                     }
 
+                    contexts.add(imageContext)
                     imageContext.addAction( innerAction)
                 }
                 else -> MDebug.handleError(STRUCTURAL_MINOR, "Other type got mixed into compositeAction: ${innerAction::class}")
             }
         }
+        action.contexts = contexts
         actions.add(action)
         pointer = actions.size
     }
@@ -49,14 +55,14 @@ class CompositeContext(
         if( pointer == 0) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to undo Null Context before beginning")
         else {
             pointer--
-            actions[pointer].undoAction()
+            actions[pointer].contexts.forEach { it.undo() }
         }
     }
 
     override fun redo() {
         if( pointer == actions.size) MDebug.handleError(STRUCTURAL_MINOR, "Undo Queue Desync: tried to redo Null Context after end")
         else {
-            actions[pointer].performAction()
+            actions[pointer].contexts.forEach { it.redo() }
             pointer++
         }
     }

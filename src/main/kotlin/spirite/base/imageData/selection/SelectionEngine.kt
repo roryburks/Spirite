@@ -120,8 +120,12 @@ class SelectionEngine(
         val drawer = workspace.activeDrawer
         if( !liftIfEmpty || liftedData != null || drawer !is ILiftSelectionModule)
             workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
-        else
-            liftData(drawer, selection)
+        else {
+            workspace.undoEngine.doAsAggregateAction({
+                liftData(drawer, selection)
+                workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
+            }, "Transform", true)
+        }
     }
 
     inner class TransformSelectionAction(

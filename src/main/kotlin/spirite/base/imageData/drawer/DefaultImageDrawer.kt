@@ -23,7 +23,8 @@ class DefaultImageDrawer(
         IStrokeModule,
         IInvertModule,
         IClearModule,
-        ILiftSelectionModule
+        ILiftSelectionModule,
+        IAnchorLiftModule
 {
     val workspace : IImageWorkspace get() = arranged.handle.workspace
     val mask get() = workspace.selectionEngine.selection
@@ -101,24 +102,44 @@ class DefaultImageDrawer(
     // endregion
 
     // region ILiftSelectionModule
-    override fun liftSelection(selection: Selection): ILiftedData {
+
+
+    override fun liftSelection(selection: Selection,  clearLifted: Boolean): ILiftedData {
         var lifted : RawImage? = null   // ugly "kind of stateful but not really" solution, but meh
+        val built = arranged.built
+        built.rawAccessComposite { lifted = selection.lift(it, built.tWorkspaceToComposite) }
 
-        workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null, {built, mask ->
-            built.rawAccessComposite {
-                lifted = selection.lift(it, built.tWorkspaceToComposite)
-
-                it.graphics.apply {
-                    val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform ?: Transform.IdentityMatrix)
-                    transform = tSelToImage
-                    composite = DST_OUT
-                    renderImage(selection.mask, 0, 0)
+        if( clearLifted) {
+            workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null, { built, mask ->
+                built.rawAccessComposite {
+                    it.graphics.apply {
+                        val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
+                                ?: Transform.IdentityMatrix)
+                        transform = tSelToImage
+                        composite = DST_OUT
+                        renderImage(selection.mask, 0, 0)
+                    }
                 }
-            }
-        })
+            })
+        }
 
         return LiftedImageData(lifted!!)
     }
     // endregion
 
+    // region IAnchorLiftModule
+
+    override fun acceptsLifted(lifted: ILiftedData) = true
+
+    override fun anchorLifted(lifted: ILiftedData, trans: Transform?) {
+        workspace.undoEngine.performMaskedImageAction("Anchor Lifted", arranged, null, { built, mask ->
+            built.drawOnComposite { gc->
+                if(trans != null)
+                    gc.preTransform(trans)
+                lifted.draw(gc)
+            }
+        })
+    }
+
+    // endregion
 }

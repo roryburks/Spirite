@@ -80,7 +80,7 @@ interface IImageDrawer {
 //    }
 
     interface ILiftSelectionModule {
-        fun liftSelection(selection: Selection): ILiftedData
+        fun liftSelection(selection: Selection, clearLifted: Boolean = true): ILiftedData
     }
 
     interface IAnchorLiftModule {

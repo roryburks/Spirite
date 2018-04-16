@@ -42,6 +42,7 @@ open class CompositeAction(
 ) : UndoableAction() {
 
     internal val actions : List<UndoableAction>
+    internal lateinit var contexts: List<UndoContext<*>>
     init {
         // Clear all CompositeActions from the list and replace them with
         //	their list of action.
@@ -63,7 +64,7 @@ open class CompositeAction(
     }
 
     override fun undoAction() {
-        actions.asReversed().forEach { it.undoAction() }
+        throw UnsupportedOperationException("Can't undo a Composite Action directly")
     }
 }
 
@@ -79,5 +80,4 @@ class StackableCompositeAction(
     override fun stackNewAction(other: UndoableAction) {
         (actions.lastOrNull() as? StackableAction)?.stackNewAction(other)
     }
-
 }

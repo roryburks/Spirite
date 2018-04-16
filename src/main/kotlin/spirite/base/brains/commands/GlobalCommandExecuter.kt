@@ -2,10 +2,16 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
+import spirite.base.graphics.GraphicsContext.Composite.DST_IN
+import spirite.base.graphics.GraphicsContext.Composite.SRC_IN
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
+import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.util.f
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
@@ -69,7 +75,33 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                             else -> {
                                 val liftedData = selectionEngine.liftedData
                                 when( liftedData) {
-                                    null -> {Hybrid.beep();return false}
+                                    null -> {
+                                        // TODO: Copy to multiple data Flavors: an image one based on the renderer (what
+                                        //  it is now) and a Spirite one based on the ILiftedData
+                                        val source = getRenderSourceForNode(node, workspace)
+                                        val x : Int
+                                        val y: Int
+                                        if( source is LayerSource) {
+                                            x = source.layer.x
+                                            y = source.layer.y
+                                        }
+                                        else {
+                                            x = 0
+                                            y = 0
+                                        }
+
+                                        val img = master.renderEngine.renderImage(RenderTarget(source), false)
+                                        Hybrid.imageIO.imageToClipboard(img)
+
+                                        val img2 = selection.mask.deepCopy()
+                                        val gc = img2.graphics
+                                        gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+                                        gc.composite = DST_IN
+                                        gc.renderImage(img, 0, 0)
+
+                                        img.flush()
+                                        img2
+                                    }
                                     else -> Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
                                                 .also{ liftedData.draw(it.graphics)}
                                 }
@@ -79,7 +111,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                     }
                 }
                 Hybrid.imageIO.imageToClipboard(image)
-
+                image.flush()
             }
             COPY_VISIBLE.string -> {
                 val workspace = master.workspaceSet.currentWorkspace ?: return true
