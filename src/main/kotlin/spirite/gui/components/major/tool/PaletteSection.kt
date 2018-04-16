@@ -9,6 +9,7 @@ import spirite.gui.components.basic.IColorSquare
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
@@ -36,6 +37,9 @@ class PaletteSection(
         primaryColorSquare.enabled = false
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         secondaryColorSquare.enabled = false
+
+        primaryColorSquare.colorBind.addListener { new, old -> paletteView.redraw() }
+        secondaryColorSquare.colorBind.addListener { new, old -> paletteView.redraw() }
 
         imp.setLayout {
             rows += {
@@ -65,6 +69,19 @@ class PaletteSection(
     }
 
 
+    init {
+        paletteView.onMousePress = { evt ->
+            if( evt.point.x / 12 <= paletteView.w) {
+
+                val index = (evt.point.x / 12) + (evt.point.y / 12 * paletteView.w)
+                val color = paletteView.palette.colors[index]
+
+                if( color != null) master.paletteManager.setActiveColor(if( evt.button == RIGHT) 1 else 0, color)
+            }
+        }
+    }
+
+
 
 }
 
@@ -83,6 +100,8 @@ private constructor(
             field = value
             imp.repaint()
         }
+
+    val w get() = Math.max(width/12,1)
 
     private class PaletteViewImp() : JPanel() {
         var context: PaletteView? = null

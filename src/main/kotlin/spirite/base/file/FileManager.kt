@@ -1,6 +1,7 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.MasterControl
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
@@ -13,6 +14,16 @@ import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import java.awt.Color
 import java.io.File
 import java.io.IOException
+
+
+fun IMasterControl.workspaceFromImage(img: IImage) {
+    val workspace = createWorkspace(img.width,img.height)
+    val medium = FlatMedium(Hybrid.imageConverter.convertToInternal(img), workspace.mediumRepository)
+    val layer = SimpleLayer( workspace.mediumRepository.addMedium(medium))
+    workspace.groupTree.importLayer(null, "base", layer)
+    workspace.finishBuilding()
+    workspaceSet.addWorkspace(workspace)
+}
 
 interface IFileManager {
     fun triggerAutosave( workspace: IImageWorkspace, interval: Int, undoCount: Int)
@@ -85,7 +96,7 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             // First try to load the file as if it's a standard file format
             try {
                 val img = Hybrid.imageIO.loadImage(file.readBytes())
-                workspaceFromImage(img)
+                master.workspaceFromImage(img)
                 return
             } catch( e: IOException) {
                 attempted = true
@@ -101,17 +112,8 @@ class FileManager( val master: IMasterControl)  : IFileManager{
         if( !attempted) {
             try {
                 val img = Hybrid.imageIO.loadImage(file.readBytes())
-                workspaceFromImage(img)
+                master.workspaceFromImage(img)
             }catch (e: Exception){}
         }
-    }
-
-    fun workspaceFromImage(img: IImage) {
-        val workspace = master.createWorkspace(img.width,img.height)
-        val medium = FlatMedium(Hybrid.imageConverter.convertToInternal(img), workspace.mediumRepository)
-        val layer = SimpleLayer( workspace.mediumRepository.addMedium(medium))
-        workspace.groupTree.importLayer(null, "base", layer)
-        workspace.finishBuilding()
-        master.workspaceSet.addWorkspace(workspace)
     }
 }

@@ -27,6 +27,7 @@ interface ISelectionEngine {
     fun anchorLifted()
     fun clearLifted()
     fun attemptLiftData( drawer: IImageDrawer)
+    fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData)
     fun imageToSelection( image: IImage, transform: Transform?)
 
     var proposingTransform: Transform?
@@ -162,21 +163,17 @@ class SelectionEngine(
             drawer.anchorLifted(liftedData, selectionTransform)
     }
 
+    override fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData) {
+        workspace.undoEngine.doAsAggregateAction({
+            setSelection(newSelection)
+            workspace.undoEngine.performAndStore(ChangeLiftedDataAction(lifted))
+        }, "Set Lifted Selection")
+    }
+
     override fun clearLifted() {
         val oldLifted = liftedData
         if( oldLifted != null) {
-            workspace.undoEngine.performAndStore( object: NullAction() {
-                override val description: String get() = "Clear lifted Data"
-
-                override fun performAction() {
-                    liftedData = null
-                    selectionChangeObserver.trigger { it() }
-                }
-                override fun undoAction() {
-                    liftedData = oldLifted
-                    selectionChangeObserver.trigger { it() }
-                }
-            })
+            workspace.undoEngine.performAndStore( ChangeLiftedDataAction(null))
         }
     }
 

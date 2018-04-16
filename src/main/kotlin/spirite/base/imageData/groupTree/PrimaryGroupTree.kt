@@ -1,6 +1,7 @@
 package spirite.base.imageData.groupTree
 
 import spirite.base.graphics.DynamicImage
+import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.layers.Layer
@@ -33,6 +34,11 @@ class PrimaryGroupTree(
         return importLayer(contextNode, name, SimpleLayer(handle), select)
     }
 
+    fun addSimpleLayerFromImage( contextNode: Node?, name: String, image: IImage, select: Boolean = true) : LayerNode {
+        val med = FlatMedium(image.deepCopy(), mediumRepo)
+        val handle = mediumRepo.addMedium(med)
+        return importLayer(contextNode, name, SimpleLayer(handle), select)
+    }
     fun addNewSpriteLayer( contextNode: Node?, name: String, select: Boolean = true) : LayerNode {
         return importLayer(contextNode, name, SpriteLayer(workspace, mediumRepo), select)
     }

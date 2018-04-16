@@ -61,11 +61,11 @@ private val defaultHotkeys = mapOf(
         SelectCommand.INVERT.commandString to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
         GlobalCommand.SAVE_WORKSPACE.commandString to (Hotkey( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
-        "global.copy" to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
-        "global.copyVisible" to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        "global.paste" to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),
-        "global.pasteAsLayer" to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
-        "global.cut" to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.COPY.commandString to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.COPY_VISIBLE.commandString to (Hotkey( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        GlobalCommand.PASTE.commandString to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.PASTE_AS_LAYER.commandString to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+        GlobalCommand.CUT.commandString to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
 
         // TODO: This should really be anim., but that might require restructuring/rethinking of
         //	command execution system.

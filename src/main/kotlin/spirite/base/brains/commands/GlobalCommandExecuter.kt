@@ -1,15 +1,25 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
+import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.GraphicsContext.Composite.DST_IN
 import spirite.base.graphics.GraphicsContext.Composite.SRC_IN
+import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.drawer.IImageDrawer.IClearModule
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.layers.SimpleLayer
+import spirite.base.imageData.selection.LiftedImageData
+import spirite.base.imageData.selection.Selection
+import spirite.base.util.MUtil
 import spirite.base.util.f
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion
 import spirite.gui.components.dialogs.IDialog.FilePickType
@@ -27,6 +37,9 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
         EXPORT_AS("export_as"),
         COPY("copy"),
         COPY_VISIBLE("copyVisible"),
+        CUT("cut"),
+        PASTE("paste"),
+        PASTE_AS_LAYER("pasteAsLayer"),
         ;
 
         override val commandString: String get() = "global.$string"
@@ -62,60 +75,42 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                     master.dialog.pickFile(FilePickType.EXPORT) ?: return true)
             COPY.string -> {
                 val workspace = master.workspaceSet.currentWorkspace?: return true
-                val selectionEngine = workspace.selectionEngine
-
-                val node = workspace.groupTree.selectedNode
-
-                val image = when( node) {
-                    null -> copyVisible(workspace)
-                    else -> {
-                        val selection = selectionEngine.selection
-                        when( selection) {
-                            null -> master.renderEngine.renderImage(RenderTarget(getRenderSourceForNode(node,workspace)))
-                            else -> {
-                                val liftedData = selectionEngine.liftedData
-                                when( liftedData) {
-                                    null -> {
-                                        // TODO: Copy to multiple data Flavors: an image one based on the renderer (what
-                                        //  it is now) and a Spirite one based on the ILiftedData
-                                        val source = getRenderSourceForNode(node, workspace)
-                                        val x : Int
-                                        val y: Int
-                                        if( source is LayerSource) {
-                                            x = source.layer.x
-                                            y = source.layer.y
-                                        }
-                                        else {
-                                            x = 0
-                                            y = 0
-                                        }
-
-                                        val img = master.renderEngine.renderImage(RenderTarget(source), false)
-                                        Hybrid.imageIO.imageToClipboard(img)
-
-                                        val img2 = selection.mask.deepCopy()
-                                        val gc = img2.graphics
-                                        gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
-                                        gc.composite = DST_IN
-                                        gc.renderImage(img, 0, 0)
-
-                                        img.flush()
-                                        img2
-                                    }
-                                    else -> Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
-                                                .also{ liftedData.draw(it.graphics)}
-                                }
-                            }
-                        }
-
-                    }
-                }
-                Hybrid.imageIO.imageToClipboard(image)
-                image.flush()
+                copy(workspace, false)
             }
             COPY_VISIBLE.string -> {
                 val workspace = master.workspaceSet.currentWorkspace ?: return true
                 Hybrid.imageIO.imageToClipboard(copyVisible(workspace))
+            }
+            CUT.string -> {
+                val workspace = master.workspaceSet.currentWorkspace ?: return true
+                copy(workspace, true)
+            }
+            PASTE.string -> {
+                val image = Hybrid.imageIO.imageFromClipboard() ?: return true
+                val workspace = master.workspaceSet.currentWorkspace
+                if( workspace == null)
+                    master.workspaceFromImage(image)
+                else {
+                    val selected = workspace.groupTree.selectedNode
+                    when( selected) {
+                        null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
+                        else -> {
+                            val x = MUtil.clip(0, master.frameManager.workView!!.offsetX, workspace.width - image.width)
+                            val y = MUtil.clip(0, master.frameManager.workView!!.offsetY, workspace.height - image.height)
+                            workspace.selectionEngine.setSelectionWithLifted(
+                                    Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
+                                    LiftedImageData(image))
+                        }
+                    }
+                }
+            }
+            PASTE_AS_LAYER.string -> {
+                val image = Hybrid.imageIO.imageFromClipboard() ?: return true
+                val workspace = master.workspaceSet.currentWorkspace
+                if( workspace == null)
+                    master.workspaceFromImage(image)
+                else
+                    workspace.groupTree.addSimpleLayerFromImage(workspace.groupTree.selectedNode, "Pasted", image)
             }
             else -> return false
         }
@@ -128,4 +123,75 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
         return workspace.selectionEngine.selection?.lift(workspaceImage, null) ?: workspaceImage.deepCopy()
     }
 
+    private fun layerFromImage( workspace: IImageWorkspace, context: GroupNode?, image: IImage) {
+
+    }
+
+    private fun copy(workspace: IImageWorkspace, cut: Boolean)  {
+
+        val selectionEngine = workspace.selectionEngine
+
+        val node = workspace.groupTree.selectedNode
+
+        val image = when( node) {
+            null -> copyVisible(workspace)
+            else -> {
+                val selection = selectionEngine.selection
+                when( selection) {
+                    null -> {
+                        val img = master.renderEngine.renderImage(RenderTarget(getRenderSourceForNode(node,workspace)))
+                        if( cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
+                        img
+                    }
+                    else -> {
+                        val liftedData = selectionEngine.liftedData
+                        when( liftedData) {
+                            null -> {
+                                // TODO: Copy to multiple data Flavors: an image one based on the renderer (what
+                                //  it is now) and a Spirite one based on the ILiftedData
+                                val source = getRenderSourceForNode(node, workspace)
+                                val x : Int
+                                val y: Int
+                                if( source is LayerSource) {
+                                    x = source.layer.x
+                                    y = source.layer.y
+                                }
+                                else {
+                                    x = 0
+                                    y = 0
+                                }
+
+                                val img = master.renderEngine.renderImage(RenderTarget(source), false)
+                                Hybrid.imageIO.imageToClipboard(img)
+
+                                val img2 = selection.mask.deepCopy()
+                                val gc = img2.graphics
+                                gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+                                gc.composite = SRC_IN
+                                gc.renderImage(img, 0, 0)
+
+                                img.flush()
+
+                                if( cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
+
+                                img2
+                            }
+                            else -> {
+                                val img = Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
+                                        .also{ liftedData.draw(it.graphics)}
+
+                                if( cut)
+                                    selectionEngine.clearLifted()
+
+                                img
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        Hybrid.imageIO.imageToClipboard(image)
+        image.flush()
+    }
 }
