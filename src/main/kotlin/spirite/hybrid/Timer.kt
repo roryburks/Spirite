@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities
 
 interface ITimerEngine {
     fun createTimer( action: ()-> Unit, waitMilli : Int, repeat : Boolean = false) : ITimer
+    val currentMilli : Long
 }
 
 interface ITimer {
@@ -24,4 +25,6 @@ object STimerEngine : ITimerEngine {
         timer.start()
         return STimer(timer)
     }
+
+    override val currentMilli: Long get() = System.currentTimeMillis()
 }

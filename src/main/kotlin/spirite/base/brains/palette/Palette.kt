@@ -57,8 +57,11 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
     }
     // endregion
 
-    fun setPaletteColor( i: Int, color: Color) {
-        _colors[i] = color
+    fun setPaletteColor( i: Int, color: Color?) {
+        when( color) {
+            null -> _colors.remove(i)
+            else -> _colors[i] = color
+        }
         onChangeTrigger.invoke(this)
     }
 

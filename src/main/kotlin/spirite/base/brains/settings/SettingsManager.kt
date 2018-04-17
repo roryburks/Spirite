@@ -18,6 +18,9 @@ interface ISettingsManager {
     var aafFilePath : File
     val openFilePath : File
 
+    var paletteDoubleclickTime: Int
+    var paletteDragMinTime: Int
+
     //fun get
 }
 
@@ -29,6 +32,9 @@ class SettingsManager (
 
     // TODO
 
+
+    override var paletteDoubleclickTime by PreferenceIntDelegate("PaletteDoubleclickTime", 500)
+    override var paletteDragMinTime by PreferenceIntDelegate("PaletteDragMinTime", 100)
 
     // ==============
     // ==== Palettes:

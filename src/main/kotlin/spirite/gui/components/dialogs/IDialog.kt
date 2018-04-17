@@ -7,8 +7,12 @@ import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
 import spirite.gui.resources.Skin.Global
 import spirite.gui.resources.SwIcons
+import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.jcomponent
+import spirite.pc.gui.jcolor
+import spirite.pc.gui.scolor
 import java.io.File
+import javax.swing.JColorChooser
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.UIManager
@@ -24,6 +28,7 @@ interface IDialog {
         AAF
     }
     fun pickFile( type: FilePickType) : File?
+    fun pickColor( defaultColor: SColor) : SColor?
 }
 
 class JDialog(private val master: IMasterControl) : IDialog
@@ -110,5 +115,12 @@ class JDialog(private val master: IMasterControl) : IDialog
         }
 
         return null
+    }
+
+    override fun pickColor(defaultColor: SColor): SColor? {
+        return JColorChooser.showDialog(
+                null,
+                "Choose Background Color",
+                defaultColor.jcolor)?.scolor
     }
 }

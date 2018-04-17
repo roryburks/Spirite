@@ -1,17 +1,14 @@
 package spirite.gui.components.major.tool
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.brains.palette.Palette
-import spirite.base.brains.palette.default_palette
-import spirite.base.util.Colors
-import spirite.gui.components.basic.IBoxList.IBoxComponent
 import spirite.gui.components.basic.IColorSquare
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.BasicStroke
@@ -26,9 +23,17 @@ class PaletteSection(
         val imp : ICrossPanel = Hybrid.ui.CrossPanel())
     : IComponent by imp
 {
+    private val __ASDF134 = object : MPaletteObserver {
+        override fun colorChanged() {
+            paletteView.redraw()
+        }
+    }.also {paletteManager.paletteObservable.addObserver( it) }
+
     private val primaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
     private val secondaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
     private val paletteView = PaletteView(master, master.paletteManager.currentPalette)
+
+    private val paletteManager get() = master.paletteManager
 
     init {
         primaryColorSquare.colorBind.bindWeakly( master.paletteManager.getColorBind(0))
@@ -68,18 +73,76 @@ class PaletteSection(
 
     }
 
+    // region Palette Moving
+    var pressingIndex : Int? = null
+    var pressingStart: Long = 0
+    var lastPressIndex : Int = 0
+    var lastPressStart: Long = 0
 
     init {
+        primaryColorSquare.onMousePress = {evt ->
+            pressingIndex = -1
+            pressingStart = Hybrid.timing.currentMilli
+        }
+        secondaryColorSquare.onMousePress = {evt ->
+            pressingIndex = -2
+            pressingStart = Hybrid.timing.currentMilli
+        }
+
+        paletteView.onMouseRelease = {evt ->
+            val pressing = pressingIndex
+
+            if( pressing != null) {
+                if(Hybrid.timing.currentMilli - pressingStart > master.settingsManager.paletteDragMinTime) {
+                    val point = evt.point.convert(paletteView)
+                    if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < height) {
+                        val index = (point.x / 12) + (point.y / 12 * paletteView.w)
+                        val color = when {
+                            pressing < 0 -> paletteManager.getActiveColor(-pressing - 1)
+                            else -> paletteView.palette.colors[pressing]
+                        }
+                        color?.also { paletteView.palette.setPaletteColor(index, it) }
+                    }
+                    else if( pressing >= 0) {
+                        paletteView.palette.setPaletteColor(pressing, null)
+                    }
+                }
+
+                lastPressIndex = pressing
+                lastPressStart = pressingStart
+                pressingIndex = null
+            }
+        }
+        primaryColorSquare.onMouseRelease = paletteView.onMouseRelease
+        secondaryColorSquare.onMouseRelease = paletteView.onMouseRelease
+
         paletteView.onMousePress = { evt ->
-            if( evt.point.x / 12 <= paletteView.w) {
+            if( evt.point.x / 12 <= paletteView.w && evt.point.x >= 0 && evt.point.y >= 0) {
 
                 val index = (evt.point.x / 12) + (evt.point.y / 12 * paletteView.w)
                 val color = paletteView.palette.colors[index]
+                val acId = if( evt.button == RIGHT) 1 else 0
 
-                if( color != null) master.paletteManager.setActiveColor(if( evt.button == RIGHT) 1 else 0, color)
+                if( color != null) master.paletteManager.setActiveColor( acId, color)
+
+                val time = Hybrid.timing.currentMilli
+
+                pressingIndex = index
+                pressingStart = time
+
+                if( pressingIndex == lastPressIndex && time - lastPressStart < master.settingsManager.paletteDoubleclickTime)
+                {
+                    master.dialog.pickColor( color ?: master.paletteManager.getActiveColor(acId))
+                            ?.also {
+                                paletteView.palette.setPaletteColor(index, it)
+                                master.paletteManager.setActiveColor(acId, it)
+                            }
+                }
             }
         }
     }
+
+    // endregion
 
 
 
@@ -115,7 +178,7 @@ private constructor(
 
             val w = Math.max(width / 12, 1)
             val activeColor1 = context.master.paletteManager.getActiveColor(0).argb32
-            val activeColor2 = context.master.paletteManager.getActiveColor(0).argb32
+            val activeColor2 = context.master.paletteManager.getActiveColor(1).argb32
 
             context.palette.colors.forEach { key, color ->
                 g2.color = color.jcolor
