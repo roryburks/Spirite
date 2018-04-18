@@ -13,9 +13,7 @@ class GLImage : RawImage {
     override val height: Int
     val engine: GLEngine
     val premultiplied: Boolean
-    var tex : IGLTexture?
-        get
-        private set
+    var tex : IGLTexture? ; private set
 
     // region Constructors
     constructor( width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
@@ -36,7 +34,6 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
         gl.texImage2D( GLC.TEXTURE_2D, 0, GLC.RGBA8, GLC.RGBA, GLC.UNSIGNED_BYTE,
                 gl.createBlankTextureSource(width, height))
-        engine.track.registerImage(this)
     }
 
     constructor( toCopy: GLImage) {
@@ -65,6 +62,10 @@ class GLImage : RawImage {
         this.engine = glEngine
         this.premultiplied = premultiplied
     }
+
+    init {
+        GLImageTracker.glImageLoaded(this)
+    }
     // endregion
 
     override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)
@@ -77,15 +78,17 @@ class GLImage : RawImage {
         val gl = engine.getGl()
         val toDel = tex
         if( toDel != null) {
+            tex = null
             // Must be run on the AWT Thread to prevent JOGL-internal deadlocks
             engine.runOnGLThread {
+                GLImageTracker.glImageUnloaded(this)
+
                 //engine.glImageUnloaded(this)  // TODO
                 if( engine.target == toDel)
                     engine.target = null
                 engine.getGl().deleteTexture(toDel)
             }
         }
-        engine.track.relinquishImage(this)
     }
 
     override fun deepCopy(): RawImage = GLImage(this)

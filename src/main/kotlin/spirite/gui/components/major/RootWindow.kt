@@ -4,6 +4,7 @@ import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
+import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
@@ -69,7 +70,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("..&Tools"),
                 MenuItem("..-"),
                 MenuItem("..Animation &Scheme"),
-                MenuItem("..Undo &History"),
+                MenuItem("..Undo &History", FrameCommand.UNDO_HISTORY),
                 MenuItem("..&Reference Scheme"),
 
                 MenuItem(".&Animation View"),
@@ -77,7 +78,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("&Settings"),
                 MenuItem(".Manage &Hotkeys"),
                 MenuItem(".&Tablet Settings"),
-                MenuItem(".&Debug Stats"),
+                MenuItem(".&Debug Stats", FrameCommand.DEBUG),
                 MenuItem(".Toggle &GL Mode"),
                 MenuItem(".Toggle GL Panel"),
                 MenuItem(".&__DB_GL")

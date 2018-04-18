@@ -12,6 +12,11 @@ import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
+import spirite.pc.JOGL.JOGL
+import spirite.pc.JOGL.JOGL.JOGLRenderbuffer
+import spirite.pc.JOGL.JOGL.JOGLTexture
+import spirite.pc.JOGL.JOGLProvider
+import java.nio.FloatBuffer
 import javax.swing.SwingUtilities
 
 class GLEngine(
@@ -29,8 +34,6 @@ class GLEngine(
 
     var width : Int = 1 ; private set
     var height : Int = 1 ; private set
-
-    val track = GLTrack()
 
     var target: IGLTexture? = null
         set(value) {
@@ -58,10 +61,28 @@ class GLEngine(
                     // Attach Texture to FBO
                     gl.framebufferTexture2D( GLC.FRAMEBUFFER, GLC.COLOR_ATTACHMENT0, GLC.TEXTURE_2D, value, 0)
 
+
+
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
                         GLC.FRAMEBUFFER_COMPLETE -> {}
-                        else -> {MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status")}
+                        else -> {
+                            println(gl.getError())
+
+
+
+                            val gl2 = (gl as JOGL).gl
+
+                            val fb = FloatBuffer.allocate(1)
+                            gl2.glGetTexLevelParameterfv(GLC.TEXTURE_2D, 0, 0x1000, fb)
+                            val width = fb[0]
+                            gl2.glGetTexLevelParameterfv(GLC.TEXTURE_2D, 0, 0x1001, fb)
+                            val height = fb[0]
+
+                            println("$width x $height")
+                            println("${gl2.glIsRenderbuffer((dbo as JOGLRenderbuffer).dboId)} , ${gl2.glIsTexture((value as JOGLTexture).texId)} ")
+//                            MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status")
+                        }
                     }
                 }
             }
@@ -283,7 +304,7 @@ class GLEngine(
 
         // Draw
         var start = 0
-        for( i in 0 until prim.primitiveLengths.size) {
+        for( i in 0 until Math.min(prim.primitiveLengths.size, prim.primitiveTypes.size)) {
             gl.drawArrays(prim.primitiveTypes[i], start, prim.primitiveLengths[i])
             start += prim.primitiveLengths[i]
         }

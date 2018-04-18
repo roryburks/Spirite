@@ -29,6 +29,8 @@ object SwingComponentProvider : IComponentProvider {
     override fun IntField(min: Int, max: Int, allowsNegative: Boolean): IIntField = SwIntField(min, max, allowsNegative)
     override fun FloatField( min: Float, max: Float, allowsNegative: Boolean): IFloatField = SwFloatField(min, max, allowsNegative)
 
+    override fun TextArea(): ITextArea = SwTextArea()
+
     override fun Separator(orientation: Orientation): ISeparator = SwSeparator(orientation)
     override fun ColorSquare(color: SColor): IColorSquare = SwColorSquare(color)
 }

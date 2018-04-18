@@ -19,7 +19,7 @@ import spirite.hybrid.Hybrid
 interface IRenderEngine {
     fun renderImage( target: RenderTarget, cache: Boolean = false) : IImage
     fun renderWorkspace( workspace: IImageWorkspace) :IImage =
-            renderImage( RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace), RenderSettings(workspace.width, workspace.height)), false)
+            renderImage( RenderTarget(GroupNodeSource(workspace.groupTree.root, workspace), RenderSettings(workspace.width, workspace.height)), true)
 }
 
 data class RenderTarget(
@@ -81,8 +81,10 @@ class RenderEngine(
                 target.renderSource.nodeDependencies.any {  evt.nodesChanged.contains(it) } -> true
                 else -> false
             }
-            if( remove)
+            if( remove) {
+                println("flush")
                 entry.value.flush()
+            }
 
             remove
         }

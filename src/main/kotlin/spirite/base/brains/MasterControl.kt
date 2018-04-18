@@ -11,6 +11,8 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.ToolsetManager
 import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
+import spirite.base.graphics.DetailedResourceUseTracker
+import spirite.base.graphics.IDetailedResourceUseTracker
 import spirite.base.graphics.IResourceUseTracker
 import spirite.base.graphics.ResourceUseTracker
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
@@ -40,7 +42,7 @@ interface IMasterControl {
     val strokeDrawerProvider: IStrokeDrawerProvider
     val toolsetManager: IToolsetManager
     val renderEngine: IRenderEngine
-    val resourceUseTracker : IResourceUseTracker
+    val resourceUseTracker : IDetailedResourceUseTracker
     val commandExecuter : ICentralCommandExecutor
     val fileManager: IFileManager
 
@@ -66,13 +68,15 @@ class MasterControl() : IMasterControl {
 
     override val strokeDrawerProvider = GLStrokeDrawerProvider(gle)
     override val toolsetManager = ToolsetManager()
-    override val resourceUseTracker = ResourceUseTracker()
+    override val resourceUseTracker = DetailedResourceUseTracker()
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
-    override val commandExecuter = CentralCommandExecutor(this, workspaceSet, dialog)
 
     override val frameManager = JFrameManager(this)
-    override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
     override val fileManager = FileManager(this)
+
+    override val commandExecuter = CentralCommandExecutor(this, workspaceSet, dialog)
+
+    override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
 
 
     override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(

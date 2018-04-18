@@ -18,13 +18,14 @@ class CentralCommandExecutor(
     : ICentralCommandExecutor
 {
     val commandExecuters : List<ICommandExecuter> = listOf(
-            NodeContextCommand(master.workspaceSet, master.dialog),
-            DrawCommandExecutor(master.workspaceSet),
+            NodeContextCommand(workspaceSet, dialog),
+            DrawCommandExecutor(workspaceSet),
             GlobalCommandExecuter(master),
             WorkspaceCommandExecuter(master),
             ToolsetCommandExecuter(master.toolsetManager),
             PaletteCommandExecuter(master.paletteManager),
-            SelectionCommandExecuter(master.workspaceSet)
+            SelectionCommandExecuter(workspaceSet),
+            FrameCommandExecuter(master.frameManager)
     )
 
 

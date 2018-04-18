@@ -32,6 +32,8 @@ interface IComponentProvider {
     fun IntField(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, allowsNegative: Boolean = false) : IIntField
     fun FloatField(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE, allowsNegative: Boolean = false) : IFloatField
 
+    fun TextArea() : ITextArea
+
     fun Separator( orientation: Orientation) : ISeparator
     fun ColorSquare( color: SColor = Colors.BLACK) : IColorSquare
 
