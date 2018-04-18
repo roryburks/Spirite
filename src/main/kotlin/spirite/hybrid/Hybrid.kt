@@ -6,9 +6,10 @@ import spirite.gui.components.basic.IComponentProvider
 import spirite.pc.gui.SwingComponentProvider
 import spirite.pc.JOGL.JOGLProvider
 
-
+/** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
+ * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.
+ */
 interface IHybrid {
-    val system : ISystemUtils
     val imageCreator : IImageCreator
     val imageConverter : ImageConverter
     val timing : ITimerEngine
@@ -22,14 +23,15 @@ interface IHybrid {
     fun beep()
 }
 
-object Hybrid : IHybrid {
+val Hybrid : IHybrid get() = SwHybrid
+
+object SwHybrid : IHybrid {
 
     override val ui: IComponentProvider get() = SwingComponentProvider
-    override val timing: ITimerEngine get() = STimerEngine
+    override val timing: ITimerEngine get() = SwTimerEngine
     override val gle: GLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
-    override val system: ISystemUtils get() = JSystemUtils
-    override val imageCreator: IImageCreator get() = EngineLaunchpoint
+    override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
     override val imageIO: IImageIO get() = JImageIO
 

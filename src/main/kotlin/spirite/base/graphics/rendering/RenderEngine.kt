@@ -39,17 +39,17 @@ data class RenderSettings(
 class CachedImage(  image: RawImage) : IFlushable {
     val image = image
         get() {
-            lastUsed = Hybrid.system.currentMilliseconds
+            lastUsed = Hybrid.timing.currentMilli
             return field
         }
-    var lastUsed = Hybrid.system.currentMilliseconds
+    var lastUsed = Hybrid.timing.currentMilli
 
     override fun flush() { image.flush() }
 }
 
 class RenderEngine(
         val resourceUseTracker: IResourceUseTracker,
-        val centralObservatory: ICentralObservatory)
+        centralObservatory: ICentralObservatory)
     : IRenderEngine, ImageObserver
 {
 

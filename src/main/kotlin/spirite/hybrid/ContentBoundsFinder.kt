@@ -242,6 +242,4 @@ object ContentBoundsFinder {
             bgcolor = pixels[i]
         }
     }
-
-
 }
