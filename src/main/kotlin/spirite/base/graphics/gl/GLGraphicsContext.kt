@@ -63,20 +63,18 @@ class GLGraphicsContext : GraphicsContext {
 
 
     override fun drawBounds(image: IImage, c: Int) {
-        val buffer = GLImage(width, height, gle)
+        using(GLImage(width, height, gle)) {buffer ->
+            val gc = buffer.graphics
+            gc.clear()
 
-        val gc = buffer.graphics
-        gc.clear()
+            val texture = ImageConverter(gle).convert<GLImage>(image)
+            val bufferParams = cachedParams.copy( texture1 = texture)
+            gc.applyPassProgram( BasicCall(),
+                    bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
 
-        val texture = ImageConverter(gle).convert<GLImage>(image)
-        val bufferParams = cachedParams.copy( texture1 = texture)
-        gc.applyPassProgram( BasicCall(),
-                bufferParams, transform, 0f, 0f, image.width + 0f, image.height + 0f)
-
-        bufferParams.texture1 = buffer
-        applyPassProgram( BorderCall(c), bufferParams, null)
-
-        buffer.flush()
+            bufferParams.texture1 = buffer
+            applyPassProgram( BorderCall(c), bufferParams, null)
+        }
     }
 
     override fun clear( color: Color?) {

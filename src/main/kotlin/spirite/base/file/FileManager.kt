@@ -3,6 +3,7 @@ package spirite.base.file
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
 import spirite.base.graphics.IImage
+import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
@@ -66,26 +67,20 @@ class FileManager( val master: IMasterControl)  : IFileManager{
     override fun exportToImage(workspace: IImageWorkspace, file: File) {
         val ext = file.name.substring( file.name.lastIndexOf('.')+1).toLowerCase()
 
-        val imageToSave : IImage
-        if( ext == "jpg" || ext == "jpeg") {
-            // Remove Alpha Layer of JPG so that it works correctly with encoding
-            val wsImage = master.renderEngine.renderWorkspace(workspace)
-            val img2 = Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)
-            val gc = img2.graphics
-            gc.clear( Colors.WHITE)
-            gc.renderImage(wsImage, 0, 0)
+        when( ext) {
+            "jpg", "jpeg" -> {
+                // Remove Alpha Layer of JPG so that it works correctly with encoding
+                val wsImage = master.renderEngine.renderWorkspace(workspace)
+                using(Hybrid.imageCreator.createImage(wsImage.width, wsImage.height)) { img->
+                    val gc = img.graphics
+                    gc.clear( Colors.WHITE)
+                    gc.renderImage(wsImage, 0, 0)
 
-            imageToSave = img2
-            wsImage.flush()
+                    Hybrid.imageIO.saveImage( img, file)
+                }
+            }
+            else -> Hybrid.imageIO.saveImage( master.renderEngine.renderWorkspace(workspace), file)
         }
-        else imageToSave = master.renderEngine.renderWorkspace(workspace)
-
-        try {
-            Hybrid.imageIO.saveImage( imageToSave, file)
-        }catch (e: Exception) {
-            MDebug.handleWarning(STRUCTURAL, "Failed to Export file: ${e.message}", e);
-        }
-        imageToSave.flush()
     }
 
     override fun openFile(file: File) {

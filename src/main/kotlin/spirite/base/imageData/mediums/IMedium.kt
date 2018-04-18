@@ -1,6 +1,7 @@
 package spirite.base.imageData.mediums
 
 import spirite.base.graphics.GraphicsContext
+import spirite.base.graphics.IFlushable
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IFloatingMedium
@@ -25,7 +26,7 @@ import spirite.base.util.linear.Transform
  *
  * @author Rory Burks
  */
-interface IMedium {
+interface IMedium : IFlushable {
     val x: Int
     val y: Int
     val width: Int
@@ -37,7 +38,7 @@ interface IMedium {
     fun render( gc: GraphicsContext, render: RenderRubric? = null)
 
     fun dupe(): IMedium
-    fun flush()
+    override fun flush()
 
     enum class MediumType constructor(
             // This way, these values can be used in saving and loading without failing when

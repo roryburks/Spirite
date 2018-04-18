@@ -13,7 +13,14 @@ class GLImage : RawImage {
     override val height: Int
     val engine: GLEngine
     val premultiplied: Boolean
-    var tex : IGLTexture? ; private set
+
+    val tex: IGLTexture?
+        get() {
+            return if( flushed) null else _tex
+        }
+    internal val _tex : IGLTexture
+
+    var flushed : Boolean = false
 
     // region Constructors
     constructor( width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
@@ -26,8 +33,8 @@ class GLImage : RawImage {
 
         val gl = glEngine.getGl()
 
-        tex = gl.createTexture() ?: throw GLResourcException("Failed to create Texture")
-        gl.bindTexture( GLC.TEXTURE_2D, tex)
+        _tex = gl.createTexture() ?: throw GLResourcException("Failed to create Texture")
+        gl.bindTexture( GLC.TEXTURE_2D, _tex)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MIN_FILTER, GLC.NEAREST)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MAG_FILTER, GLC.NEAREST)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
@@ -46,8 +53,8 @@ class GLImage : RawImage {
 
         // Set the GL Target as the other image's texture and copy the data
         engine.target =  toCopy.tex
-        tex = gl.createTexture() ?: throw GLResourcException("Failed to create Texture")
-        gl.bindTexture(GLC.TEXTURE_2D, tex)
+        _tex = gl.createTexture() ?: throw GLResourcException("Failed to create Texture")
+        gl.bindTexture(GLC.TEXTURE_2D, _tex)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MIN_FILTER, GLC.NEAREST)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_MAG_FILTER, GLC.NEAREST)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
@@ -56,7 +63,7 @@ class GLImage : RawImage {
     }
 
     constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
-        this.tex = tex
+        this._tex = tex
         this.width = width
         this.height = height
         this.engine = glEngine
@@ -76,17 +83,17 @@ class GLImage : RawImage {
 
     override fun flush() {
         val gl = engine.getGl()
-        val toDel = tex
-        if( toDel != null) {
-            tex = null
+
+        if( !flushed) {
+            flushed = true
             // Must be run on the AWT Thread to prevent JOGL-internal deadlocks
             engine.runOnGLThread {
                 GLImageTracker.glImageUnloaded(this)
 
                 //engine.glImageUnloaded(this)  // TODO
-                if( engine.target == toDel)
+                if( engine.target == _tex)
                     engine.target = null
-                engine.getGl().deleteTexture(toDel)
+                engine.getGl().deleteTexture(_tex)
             }
         }
     }
@@ -105,9 +112,5 @@ class GLImage : RawImage {
         val read = gl.makeInt32Source(1)
         gl.readnPixels(x, y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
         return  read[0]
-    }
-
-    protected fun finalize() {
-        flush()
     }
 }

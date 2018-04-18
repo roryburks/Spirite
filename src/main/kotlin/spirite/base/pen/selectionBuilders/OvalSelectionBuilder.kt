@@ -26,6 +26,7 @@ class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
     }
 
     override fun build(): Selection {
+        // Lifecycle tied to the selection
         val img = Hybrid.imageCreator.createImage(workspace.width, workspace.height)
         img.graphics.fillOval(
                 Math.min(startX, currentX), Math.min(startY, currentY),

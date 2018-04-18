@@ -22,14 +22,6 @@ interface IImage {
      * approximate memory usage for memory management/UI feedback. */
     val byteSize: Int
 
-    /** Flushes the image, marking it as no longer being used, allowing it to
-     * free up underlying resources.
-     *
-     * NOTE: it is not guaranteed that flush will ever be called, so if the
-     * image is using native resources that need to be de-allocated, be sure
-     * to override finalize.
-     */
-    fun flush()
 
     /** Creates a duplicate of this image that can be modified without altering
      * the original.

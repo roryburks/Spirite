@@ -3,6 +3,7 @@ package spirite.base.graphics.gl.stroke
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.gl.*
+import spirite.base.graphics.using
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
 import spirite.base.pen.stroke.StrokeBuilder
@@ -61,11 +62,12 @@ class GLStrikeDrawerPixel(val gle: GLEngine)
     }
 
     override fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
-        val batchImage = GLImage(width, height, gle, false)
-        val glParams = batchImage.glParams
-        drawStroke( gle, batchImage, drawPoints, glParams)
+        using( GLImage(width, height, gle, false) ) { batchImage ->
+            val glParams = batchImage.glParams
+            drawStroke( gle, batchImage, drawPoints, glParams)
 
-        drawStrokeImageToGc(batchImage, gc, params)
+            drawStrokeImageToGc(batchImage, gc, params)
+        }
     }
 
     private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext, strokeParams: StrokeParams) {

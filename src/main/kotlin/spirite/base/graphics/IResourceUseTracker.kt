@@ -14,11 +14,11 @@ class ResourceUseTracker : IResourceUseTracker {
 }
 
 interface IDetailedResourceUseTracker : IResourceUseTracker{
-    val glImages: Set<GLImage>
+    val glImages: Collection<GLImage>
 
 }
 class DetailedResourceUseTracker : IDetailedResourceUseTracker {
     override val bytesUsed: Long get() = GLImageTracker.bytesUsed
 
-    override val glImages: Set<GLImage> get() = GLImageTracker.images
+    override val glImages: Collection<GLImage> get() = GLImageTracker.images
 }

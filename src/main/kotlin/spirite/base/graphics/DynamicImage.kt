@@ -21,6 +21,7 @@ class DynamicImage(
         raw: RawImage? = null,
         xOffset: Int = 0,
         yOffset: Int = 0)
+    :IFlushable
 {
     var xOffset = xOffset ; private set
     var yOffset = yOffset ; private set
@@ -66,38 +67,38 @@ class DynamicImage(
         // Step 1: Draw Composite and Base to the combining image
         val combiningBounds = MUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
                 .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
-        val combiningImage = Hybrid.imageCreator.createImage( combiningBounds.width, combiningBounds.height)
 
-        val gc = combiningImage.graphics
+        using(Hybrid.imageCreator.createImage( combiningBounds.width, combiningBounds.height)) { combiningImage ->
+            val gc = combiningImage.graphics
 
-        val b = base
-        if( b != null) gc.renderImage(b, xOffset - combiningBounds.x, yOffset - combiningBounds.y)
+            base?.with {
+                gc.renderImage(it, xOffset - combiningBounds.x, yOffset - combiningBounds.y)
+            }
 
-        gc.transform = tCompositeToImage
-        gc.preTranslate(-combiningBounds.x + 0f, -combiningBounds.y + 0f)
-        gc.composite = SRC
-        gc.renderImage(context.buffer, 0, 0)
+            using(context.buffer) { buffer ->
+                gc.transform = tCompositeToImage
+                gc.preTranslate(-combiningBounds.x + 0f, -combiningBounds.y + 0f)
+                gc.composite = SRC
+                gc.renderImage(buffer, 0, 0)
 
-        // Step 2: Crop the Combining Bounds
-        val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
-        val newBase = when {
-            contentBounds.isEmpty -> null
-            else -> Hybrid.imageCreator.createImage(contentBounds.width, contentBounds.height)
+                // Step 2: Crop the Combining Bounds
+                val contentBounds = ContentBoundsFinder.findContentBounds(combiningImage, 0, true)
+                val newBase = when {
+                    contentBounds.isEmpty -> null
+                    else -> Hybrid.imageCreator.createImage(contentBounds.width, contentBounds.height)
+                }
+                newBase?.graphics?.renderImage(combiningImage, -contentBounds.x, -contentBounds.y)
+
+                xOffset = contentBounds.x + combiningBounds.x
+                yOffset = contentBounds.y + combiningBounds.y
+
+                base = newBase
+            }
         }
-        newBase?.graphics?.renderImage(combiningImage, -contentBounds.x, -contentBounds.y)
-
-        xOffset = contentBounds.x + combiningBounds.x
-        yOffset = contentBounds.y + combiningBounds.y
-
-        base?.flush()
-        base = newBase
-
-        context.buffer.flush()
-        combiningImage.flush()
     }
     // endregion
 
-    fun flush() {
+    override fun flush() {
         base?.flush()
         base = null
     }

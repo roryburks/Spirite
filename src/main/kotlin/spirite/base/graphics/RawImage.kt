@@ -7,9 +7,18 @@ import spirite.base.util.Colors
  * RawImage is a wrapper for multiple different types of more-native image formats.
  */
 
-interface RawImage : IImage {
+interface RawImage : IImage, IFlushable {
     /** Gets the GraphicsContext for writing to the image.  */
     val graphics: GraphicsContext
+
+    /** Flushes the image, marking it as no longer being used, allowing it to
+     * free up underlying resources.
+     *
+     * NOTE: it is not guaranteed that flush will ever be called, so if the
+     * image is using native resources that need to be de-allocated, be sure
+     * to override finalize.
+     */
+    override fun flush()
 
     val drawer: IDrawer
 

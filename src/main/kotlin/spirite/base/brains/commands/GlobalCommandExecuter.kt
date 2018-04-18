@@ -11,6 +11,7 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget
 import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
+import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
@@ -139,9 +140,8 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 val selection = selectionEngine.selection
                 when( selection) {
                     null -> {
-                        val img = master.renderEngine.renderImage(RenderTarget(getRenderSourceForNode(node,workspace)))
                         if( cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
-                        img
+                        master.renderEngine.pullImage(RenderTarget(getRenderSourceForNode(node,workspace)))
                     }
                     else -> {
                         val liftedData = selectionEngine.liftedData
@@ -161,22 +161,26 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                                     y = 0
                                 }
 
-                                val img = master.renderEngine.renderImage(RenderTarget(source), false)
-                                Hybrid.imageIO.imageToClipboard(img)
+                                // Flushed by the end of the function
+                                val img2 = using( master.renderEngine.pullImage(RenderTarget(source))) {img->
+                                    Hybrid.imageIO.imageToClipboard(img)
 
-                                val img2 = selection.mask.deepCopy()
-                                val gc = img2.graphics
-                                gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
-                                gc.composite = SRC_IN
-                                gc.renderImage(img, 0, 0)
+                                    // Flushed by the end of the function
+                                    val img2 = selection.mask.deepCopy()
+                                    val gc = img2.graphics
+                                    gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+                                    gc.composite = SRC_IN
+                                    gc.renderImage(img, 0, 0)
 
-                                img.flush()
+                                    img2
+                                }
 
                                 if( cut) (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
 
                                 img2
                             }
                             else -> {
+                                // Flushed by the end of the function
                                 val img = Hybrid.imageCreator.createImage(liftedData.width, liftedData.height)
                                         .also{ liftedData.draw(it.graphics)}
 
@@ -191,7 +195,9 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
 
             }
         }
-        Hybrid.imageIO.imageToClipboard(image)
-        image.flush()
+
+        using(image) {
+            Hybrid.imageIO.imageToClipboard(image)
+        }
     }
 }

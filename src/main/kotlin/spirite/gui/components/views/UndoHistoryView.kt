@@ -27,7 +27,7 @@ private constructor( val imp : ICrossPanel)
         }
 
         Hybrid.timing.createTimer({
-            glArea.text = "a"//${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}"
+            glArea.text = "${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}"
         }, 100, true)
     }
 }

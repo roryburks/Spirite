@@ -38,6 +38,8 @@ object JImageIO : IImageIO {
 
     override fun loadImage(byteArray: ByteArray): RawImage {
         val bi = ImageIO.read(ByteArrayInputStream(byteArray))
+
+        // Lifecycle passed to whatever called the function
         val img = Hybrid.imageCreator.createImage(bi.width, bi.height)
         val gc = img.graphics
         gc.clear()

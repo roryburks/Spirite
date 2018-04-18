@@ -42,7 +42,6 @@ class NodeRenderer(
             if( neededImages == 0) return
 
             buffer = Array(neededImages, {Hybrid.imageCreator.createImage(settings.width, settings.height)})
-            buffer.forEach { it.graphics.clear() }
 
             // Step 2: Recursively Draw the image
             _renderRec(root, 0)
@@ -51,6 +50,7 @@ class NodeRenderer(
             // Flush the data
             buffer.forEach { it.flush() }
         }finally {
+            buffer.forEach { it.graphics.clear() }
             builtComposite?.compositeImage?.flush()
         }
     }
@@ -116,6 +116,8 @@ class NodeRenderer(
             val active = compositeSource?.arranged ?: workspace.activeData ?: return
             val medium = active.handle.medium
             val built = medium.build(active)
+
+            // Should be killed by NodeRenderer at the end of render
             val compositeImage = Hybrid.imageCreator.createImage(
                     MathUtil.ceil(built.width*ratioW),
                     MathUtil.ceil(built.height*ratioH))
