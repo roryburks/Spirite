@@ -85,7 +85,7 @@ class UndoEngine(
 
     // region Core Functionality
     override fun performAndStore(action: UndoableAction) {
-        if( action is ImageAction)
+        if( action is ImageAction && !imageContexts.any{it.medium == action.arranged.handle})
             imageContexts.add(ImageContext(action.arranged.handle, mediumRepo))
 
         action.performAction()

@@ -66,24 +66,7 @@ class GLEngine(
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
                         GLC.FRAMEBUFFER_COMPLETE -> {}
-                        else -> {
-                            println(gl.getError())
-
-
-
-                            val gl2 = (gl as JOGL).gl
-
-                            val fb = FloatBuffer.allocate(1)
-                            gl2.glGetTexLevelParameterfv(GLC.TEXTURE_2D, 0, 0x1000, fb)
-                            val width = fb[0]
-                            gl2.glGetTexLevelParameterfv(GLC.TEXTURE_2D, 0, 0x1001, fb)
-                            val height = fb[0]
-
-                            println("$width x $height")
-                            println("${gl2.glIsRenderbuffer((dbo as JOGLRenderbuffer).dboId)} , ${gl2.glIsTexture((value as JOGLTexture).texId)} ")
-//                            MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status")
-                        }
-                    }
+                        else -> MDebug.handleError(ErrorType.GL, "Failed to bind Framebuffer: $status") }
                 }
             }
         }

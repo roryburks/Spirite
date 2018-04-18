@@ -42,15 +42,14 @@ class NodeRenderer(
             if( neededImages == 0) return
 
             buffer = Array(neededImages, {Hybrid.imageCreator.createImage(settings.width, settings.height)})
+            buffer.forEach { it.graphics.clear() }
 
             // Step 2: Recursively Draw the image
             _renderRec(root, 0)
             gc.renderImage( buffer[0], 0, 0)
-
+        }finally {
             // Flush the data
             buffer.forEach { it.flush() }
-        }finally {
-            buffer.forEach { it.graphics.clear() }
             builtComposite?.compositeImage?.flush()
         }
     }
