@@ -10,4 +10,8 @@ data class CompositeSource(
 
 class Compositor {
     var compositeSource : CompositeSource? = null
+
+    fun triggerCompositeChanged() {
+        compositeSource?.arranged?.handle?.refresh()
+    }
 }

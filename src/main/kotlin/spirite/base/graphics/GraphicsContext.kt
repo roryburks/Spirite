@@ -1,9 +1,8 @@
 package spirite.base.graphics
 
+import spirite.base.graphics.shapes.IShape
 import spirite.base.util.Color
-import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import java.awt.Shape
 import java.util.*
 
 /**
@@ -60,10 +59,11 @@ abstract class GraphicsContext {
 
     abstract fun drawLine(x1: Float, y1: Float, x2: Float, y2: Float)
     abstract fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int)
-    abstract fun draw(shape: Shape)
+    abstract fun draw(shape: IShape)
 
     abstract fun fillRect(x: Int, y: Int, w: Int, h: Int)
     abstract fun fillOval(x: Int, y: Int, w: Int, h: Int)
+    abstract fun fill( shape: IShape)
 
     abstract fun fillPolygon(x: List<Float>, y: List<Float>, length: Int)
 

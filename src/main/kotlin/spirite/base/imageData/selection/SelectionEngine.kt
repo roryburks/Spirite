@@ -138,9 +138,11 @@ class SelectionEngine(
 
         override fun performAction() {
             selectionTransform = transform * (originalTransform ?: Transform.IdentityMatrix)
+            workspace.activeData?.handle?.refresh()
         }
         override fun undoAction() {
             selectionTransform = originalTransform
+            workspace.activeData?.handle?.refresh()
         }
 
         override fun canStack(other: UndoableAction) = other is TransformSelectionAction

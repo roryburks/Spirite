@@ -5,6 +5,7 @@ import spirite.base.file.LoadEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.gui.components.major.RootWindow
+import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
 import java.io.File
@@ -19,6 +20,7 @@ fun main( args: Array<String>) {
     try {
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
+            EngineLaunchpoint.gle
             master = MasterControl()
             master.frameManager.initUi()
 

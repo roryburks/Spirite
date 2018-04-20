@@ -50,7 +50,7 @@ class DefaultImageDrawer(
 
     override fun stepStroke(ps: PenState) {
         if(strokeBuilder?.step(ps) == true)
-            arranged.handle.refresh()
+            workspace.compositor.triggerCompositeChanged()
     }
 
     override fun endStroke() {

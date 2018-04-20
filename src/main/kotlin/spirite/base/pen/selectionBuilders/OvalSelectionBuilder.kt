@@ -35,7 +35,7 @@ class OvalSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder( work
     }
 
     override fun drawBuilding(gc: GraphicsContext) {
-        gc.fillOval(
+        gc.drawOval(
                 Math.min(startX, currentX), Math.min(startY, currentY),
                 Math.abs(startX - currentX), Math.abs(startY - currentY))
     }

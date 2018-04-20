@@ -12,11 +12,6 @@ import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
-import spirite.pc.JOGL.JOGL
-import spirite.pc.JOGL.JOGL.JOGLRenderbuffer
-import spirite.pc.JOGL.JOGL.JOGLTexture
-import spirite.pc.JOGL.JOGLProvider
-import java.nio.FloatBuffer
 import javax.swing.SwingUtilities
 
 class GLEngine(

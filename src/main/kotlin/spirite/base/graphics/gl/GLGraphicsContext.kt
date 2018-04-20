@@ -5,6 +5,8 @@ import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
+import spirite.base.graphics.shapes.IShape
+import spirite.base.graphics.shapes.Oval
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.f
@@ -14,8 +16,6 @@ import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.ImageConverter
-import spirite.pc.JOGL.JOGLProvider
-import java.awt.Shape
 
 
 class GLGraphicsContext : GraphicsContext {
@@ -153,7 +153,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun drawOval(x: Int, y: Int, w: Int, h: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        draw( Oval(x + w/2.0f, y + h/2.0f, w/2.0f, h/2.0f))
     }
 
     override fun drawPolyLine(x: IntArray, y: IntArray, count: Int) {
@@ -171,8 +171,13 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int) = drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
 
-    override fun draw(shape: Shape) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun draw(shape: IShape) {
+        reset()
+
+        val x_y = shape.buildPath(0.5f)
+
+        gle.applyComplexLineProgram( x_y.first.asList(), x_y.second.asList(), x_y.first.size, lineAttributes.cap, lineAttributes.join,
+                true, lineAttributes.width, color.rgbComponent, alpha, cachedParams, _trans)
     }
     // endregion
 
@@ -188,7 +193,14 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun fillOval(x: Int, y: Int, w: Int, h: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        fill( Oval(x + w/2.0f, y + h/2.0f, w/2.0f, h/2.0f))
+    }
+
+    override fun fill(shape: IShape) {
+        reset()
+        val x_y = shape.buildPath(0.5f)
+        gle.applyPolyProgram( PolyRenderCall(color.rgbComponent, alpha), x_y.first.asList(), x_y.second.asList(), x_y.first.size,
+                PolyType.FAN, cachedParams, _trans)
     }
 
     override fun fillPolygon(x: List<Float>, y: List<Float>, length: Int) {
