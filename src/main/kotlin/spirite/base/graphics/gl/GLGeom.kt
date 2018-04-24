@@ -50,9 +50,9 @@ object GLGeom {
         }
 
         fun build() : GLPrimitive {
-            val raw = FloatArray( forward.size() + backward.size())
+            val raw = FloatArray( forward.size + backward.size)
             forward.insertIntoArray(raw, 0)
-            backward.insertIntoArray(raw, forward.size())
+            backward.insertIntoArray(raw, forward.size)
 
             val primitiveTypes = intArrayOf(primitiveType)
             val primitiveLengths = intArrayOf(raw.size / attrLengths.sum())

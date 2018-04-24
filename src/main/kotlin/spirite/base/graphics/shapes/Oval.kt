@@ -23,7 +23,7 @@ data class Oval(
             packer(x.f,y.f,compactor)
         })
 
-        return GLPrimitive(compactor.toArray(), attrLengths, GLC.TRIANGLE_FAN, intArrayOf(compactor.size()))
+        return GLPrimitive(compactor.toArray(), attrLengths, GLC.TRIANGLE_FAN, intArrayOf(compactor.size))
     }
 
     override fun doAlongPath(maxError: Float, lambda: (x: Double, y: Double) -> Unit) {

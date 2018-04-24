@@ -240,8 +240,8 @@ public class MUtil {
 		PathIterator pi = shape.getPathIterator(null, 1);
 		float coords[] = new float[6];
 		
-		int startx = x_.size();
-		int starty = y_.size();
+		int startx = x_.getSize();
+		int starty = y_.getSize();
 		
 		while( !pi.isDone()) {
 			int res = pi.currentSegment(coords);

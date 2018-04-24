@@ -29,7 +29,7 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
         val img = Hybrid.imageCreator.createImage(workspace.width, workspace.height)
         val gc = img.graphics
         gc.color = Colors.WHITE
-        gc.fillPolygon( xCompactor.toArray().map { it.f },  yCompactor.toArray().map { it.f }, xCompactor.size())
+        gc.fillPolygon( xCompactor.toArray().map { it.f },  yCompactor.toArray().map { it.f }, xCompactor.size)
         return Selection(img, null, true)
     }
 
@@ -40,6 +40,6 @@ class FreeformSelectionBuilder( workspace: IImageWorkspace) : SelectionBuilder(w
     }
 
     val start get() = Vec2i( xCompactor[0], yCompactor[0])
-    val end get() = Vec2i( xCompactor[xCompactor.size()-1], yCompactor[yCompactor.size()-1])
+    val end get() = Vec2i( xCompactor[xCompactor.size-1], yCompactor[yCompactor.size-1])
 
 }
