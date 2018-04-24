@@ -1,6 +1,6 @@
 package spirite.base.util.interpolation
 
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.linear.Vec2
 
 /**
@@ -58,7 +58,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         for (i in 1 until numPoints) {
             x_[i] = points!![i].x
             y_[i] = points[i].y
-            t_[i] = distance + MUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
+            t_[i] = distance + MathUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
             distance = t_[i]
         }
 
@@ -91,7 +91,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         for (i in 1 until numPoints) {
             x_[i] = xs!![i]
             y_[i] = ys!![i]
-            t_[i] = distance + MUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
+            t_[i] = distance + MathUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
             distance = t_[i]
         }
 
@@ -123,7 +123,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         when (numPoints) {
             0 -> t_[0] = 0f
             1 -> {
-                t_[1] = MUtil.distance(x_[0], y_[0], x_[1], y_[1])
+                t_[1] = MathUtil.distance(x_[0], y_[0], x_[1], y_[1])
                 val dt = t_[1] - t_[0]
                 kx[1] = 0.25f * (x_[1] - x_[0]) / dt
                 ky[1] = 0.25f * (y_[1] - y_[0]) / dt
@@ -133,7 +133,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
             else -> {
                 x_[numPoints] = x
                 y_[numPoints] = y
-                t_[numPoints] = t_[numPoints - 1] + MUtil.distance(x_[numPoints - 1], y_[numPoints - 1], x_[numPoints], y_[numPoints])
+                t_[numPoints] = t_[numPoints - 1] + MathUtil.distance(x_[numPoints - 1], y_[numPoints - 1], x_[numPoints], y_[numPoints])
 
                 val dt1 = t_[numPoints] - t_[numPoints - 1]
                 val dt2 = t_[numPoints - 1] - t_[numPoints - 2]
@@ -219,7 +219,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
         if (i == 0) {
             val p1 = _eval(0.075f, 0, 1)
 
-            val dt = MUtil.distance(p1.x, p1.y, x_[0], y_[0])
+            val dt = MathUtil.distance(p1.x, p1.y, x_[0], y_[0])
             val d = t / dt
 
             return Vec2(x_[0] + d * (p1.x - x_[0]), y_[0] + d * (p1.y - y_[0]))
@@ -228,7 +228,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
 
             val p1 = _eval(0.925f, numPoints - 2, numPoints - 1)
 
-            val dt = MUtil.distance(p1.x, p1.y, x_[numPoints - 1], y_[numPoints - 1])
+            val dt = MathUtil.distance(p1.x, p1.y, x_[numPoints - 1], y_[numPoints - 1])
             val d = (t - distance) / dt + 1
 
             return Vec2(x_[numPoints - 1] + d * (x_[numPoints - 1] - p1.x), y_[numPoints - 1] + d * (y_[numPoints - 1] - p1.y))

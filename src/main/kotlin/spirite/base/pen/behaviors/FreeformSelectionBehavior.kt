@@ -6,7 +6,7 @@ import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner
 import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
 import spirite.base.util.Colors
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.f
 
 class FreeformSelectionBehavior(
@@ -47,7 +47,7 @@ class FreeformSelectionBehavior(
 
     private fun testFinish() : Boolean{
         val start = builder.start
-        if( MUtil.distance(start.x.f, start.y.f, penner.x.f, penner.y.f) <= 5) {
+        if( MathUtil.distance(start.x.f, start.y.f, penner.x.f, penner.y.f) <= 5) {
             penner.workspace?.selectionEngine?.mergeSelection(builder.build(), mode)
             end()
             return true

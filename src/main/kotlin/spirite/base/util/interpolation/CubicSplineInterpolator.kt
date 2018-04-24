@@ -1,6 +1,6 @@
 package spirite.base.util.interpolation
 
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.linear.Vec2
 import java.util.*
 
@@ -64,8 +64,8 @@ class CubicSplineInterpolator
         var i = 1
         while (i < k.size - 1) {
             if (spatial) {
-                val d1 = MUtil.distance(x_[i], y_[i], x_[i + 1], y_[i + 1])
-                val d2 = MUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
+                val d1 = MathUtil.distance(x_[i], y_[i], x_[i + 1], y_[i + 1])
+                val d2 = MathUtil.distance(x_[i - 1], y_[i - 1], x_[i], y_[i])
 
                 k[i] = ((y_[i + 1] - y_[i]) / d1 + (y_[i] - y_[i - 1]) / d2) / ((x_[i + 1] - x_[i]) / d1 + (x_[i] - x_[i - 1]) / d2)
             } else {

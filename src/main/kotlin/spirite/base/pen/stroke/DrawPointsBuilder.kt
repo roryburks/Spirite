@@ -1,7 +1,7 @@
 package spirite.base.pen.stroke
 
 import spirite.base.pen.PenState
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.interpolation.Interpolator2D
 
@@ -31,7 +31,7 @@ object DrawPointsBuilder {
 
                 fun addPoint() {
                     val ip = interpolator.evalExt(interpos)
-                    val state = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
+                    val state = PenState(ip.x, ip.y, MathUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcX.add(ip.x)
                     fcY.add(ip.y)
                     fcW.add(dynamics?.getSize(state) ?: state.pressure)
@@ -71,7 +71,7 @@ object DrawPointsBuilder {
 
                 fun addPoint() {
                     val ip = interpolator.evalExt(interpos)
-                    val state = PenState(ip.x, ip.y, MUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
+                    val state = PenState(ip.x, ip.y, MathUtil.lerp(penStates[ip.left].pressure, penStates[ip.right].pressure, ip.lerp))
                     fcX.add(ip.x)
                     fcY.add(ip.y)
                     fcW.add(dynamics?.getSize(state) ?: state.pressure)

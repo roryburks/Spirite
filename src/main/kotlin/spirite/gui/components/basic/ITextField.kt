@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.brains.Bindable
 import java.awt.Color
 
@@ -35,7 +35,7 @@ class IntFieldNonUI( min: Int, max: Int) : IIntFieldNonUI {
     override var value: Int
         get() = valueBind.field
         set(new) {
-            val to = MUtil.clip(min, new, max)
+            val to = MathUtil.clip(min, new, max)
             valueBind.field = to
         }
 
@@ -67,7 +67,7 @@ class FloatFieldNonUI( min: Float, max: Float) : IFloatFieldNonUI {
     override var value: Float
         get() = valueBind.field
         set(new) {
-            val to = MUtil.clip(min, new, max)
+            val to = MathUtil.clip(min, new, max)
             valueBind.field = to
         }
 

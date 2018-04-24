@@ -1,7 +1,7 @@
 package spirite.base.graphics
 
 import spirite.base.graphics.GraphicsContext.Composite.SRC
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.hybrid.ContentBoundsFinder
@@ -65,7 +65,7 @@ class DynamicImage(
 
 
         // Step 1: Draw Composite and Base to the combining image
-        val combiningBounds = MUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
+        val combiningBounds = MathUtil.circumscribeTrans(Rect(0,0, context.compositionWidth, context.compositionHeight), tCompositeToImage)
                 .union( Rect(xOffset, yOffset, base?.width ?: 0, base?.height ?: 0))
 
         using(Hybrid.imageCreator.createImage( combiningBounds.width, combiningBounds.height)) { combiningImage ->

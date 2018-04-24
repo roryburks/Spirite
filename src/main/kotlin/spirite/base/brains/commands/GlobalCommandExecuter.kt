@@ -18,7 +18,7 @@ import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
@@ -96,8 +96,8 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                     when( selected) {
                         null, is GroupNode -> workspace.groupTree.addSimpleLayerFromImage(selected, "Pasted", image)
                         else -> {
-                            val x = MUtil.clip(0, master.frameManager.workView!!.offsetX, workspace.width - image.width)
-                            val y = MUtil.clip(0, master.frameManager.workView!!.offsetY, workspace.height - image.height)
+                            val x = MathUtil.clip(0, master.frameManager.workView!!.offsetX, workspace.width - image.width)
+                            val y = MathUtil.clip(0, master.frameManager.workView!!.offsetY, workspace.height - image.height)
                             workspace.selectionEngine.setSelectionWithLifted(
                                     Selection.RectangleSelection(Rect(x, y, image.width, image.height)),
                                     LiftedImageData(image))

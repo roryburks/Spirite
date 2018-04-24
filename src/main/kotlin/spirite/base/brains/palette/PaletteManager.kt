@@ -4,7 +4,7 @@ import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.util.Color
 import spirite.base.util.Colors
-import spirite.base.util.MUtil.cycle
+import spirite.base.util.MathUtil
 
 interface IPaletteManager {
     fun getColorBind( i: Int) : Bindable<Color>
@@ -34,14 +34,14 @@ class PaletteManager : IPaletteManager {
 
     override fun getColorBind(i: Int): Bindable<Color> = activeColorBinds[i]
 
-    override fun getActiveColor(i: Int): Color = activeColorBinds[ cycle(0, activeColorBinds.size, i)].field
+    override fun getActiveColor(i: Int): Color = activeColorBinds[ MathUtil.cycle(0, activeColorBinds.size, i)].field
 
     override fun setActiveColor(i: Int, color: Color) {
-        activeColorBinds[ cycle(0, activeColorBinds.size, i)].field = color
+        activeColorBinds[ MathUtil.cycle(0, activeColorBinds.size, i)].field = color
     }
 
     override fun cycleActiveColors(amount: Int) {
-        val new = (0 until activeColorBinds.size).map { activeColorBinds[cycle(0,activeColorBinds.size,it + amount)].field }
+        val new = (0 until activeColorBinds.size).map { activeColorBinds[MathUtil.cycle(0,activeColorBinds.size,it + amount)].field }
         (0 until activeColorBinds.size).forEach {activeColorBinds[it].field = new[it]}
     }
 

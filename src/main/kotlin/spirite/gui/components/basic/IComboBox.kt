@@ -1,7 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.MUtil
 import spirite.base.brains.Bindable
+import spirite.base.util.MathUtil
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -33,7 +33,7 @@ abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
     override var selectedIndex: Int
         get() = selectedIndexBind.field
         set(value) {
-            val to = MUtil.clip(0, value, values.size-1)
+            val to = MathUtil.clip(0, value, values.size-1)
             selectedIndexBind.field = to
         }
 

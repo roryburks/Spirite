@@ -44,8 +44,8 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
 
     operator fun plus( other : Selection) : Selection {
-        val area = transform?.let { MUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height) union
-            other.transform?.let { MUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height)
+        val area = transform?.let { MathUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height) union
+            other.transform?.let { MathUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height)
 
         val image = Hybrid.imageCreator.createImage(width, height)
         val gc = image.graphics
@@ -76,7 +76,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
     infix fun intersection( other: Selection) : Selection? {
         val tOtherToThis = (other.transform ?: Transform.IdentityMatrix) * (transform?.invert() ?: Transform.IdentityMatrix)
-        val area = Rect(width, height) intersection MUtil.circumscribeTrans(Rect(other.width, other.height), tOtherToThis)
+        val area = Rect(width, height) intersection MathUtil.circumscribeTrans(Rect(other.width, other.height), tOtherToThis)
 
         if( area.isEmpty) return null
 
@@ -144,7 +144,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
     fun doMasked( image: RawImage, lambda: (RawImage)->Any?, tBaseToImage: Transform? = null, backgroundColor: Color? = null) : Boolean{
         val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
 
-        val floatingArea = MUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
+        val floatingArea = MathUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
         if( floatingArea.isEmpty)
             return false
 

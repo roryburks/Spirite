@@ -1,5 +1,7 @@
 package spirite.base.util
 
+import kotlin.experimental.and
+
 object StringUtil {
 
     val endNumRegex = """_([0-9]+)$""".toRegex()

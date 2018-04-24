@@ -1,8 +1,8 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.MUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.brains.Bindable
+import spirite.base.util.MathUtil
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IBoxList.DefaultBoxComponent
 import spirite.gui.components.basic.IBoxList.IBoxComponent
@@ -55,7 +55,7 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     override var selectedIndex: Int
         get() = selectedIndexBind.field
         set(value) {
-            selectedIndexBind.field = MUtil.clip(-1,value, _entries.size-1)
+            selectedIndexBind.field = MathUtil.clip(-1,value, _entries.size-1)
         }
 
     override var selected: T? get() = _entries.getOrNull(selectedIndex)?.value

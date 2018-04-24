@@ -3,8 +3,6 @@ package spirite.hybrid
 import com.jogamp.opengl.GL2
 import spirite.base.graphics.IImage
 import spirite.base.graphics.gl.GLImage
-import spirite.base.util.ArrayInterpretation.IntCounter
-import spirite.base.util.ArrayInterpretation.InterpretedIntArray
 import spirite.base.util.linear.Rect
 import spirite.pc.graphics.ImageBI
 import java.awt.image.BufferedImage
@@ -90,13 +88,13 @@ object ContentBoundsFinder {
             return Rect(0, 0, data.w, data.h)
 
         val leftRet = AtomicReference<Int>(null)
-        val left = Thread { leftRet.set(data.findFirstEmptyLine(IntCounter(0, data.w - 1), false)) }
+        val left = Thread { leftRet.set(data.findFirstEmptyLine((0 until data.w).toList(), false)) }
         val rightRet = AtomicReference<Int>(null)
-        val right = Thread { rightRet.set(data.findFirstEmptyLine(IntCounter(data.w - 1, 0), false)) }
+        val right = Thread { rightRet.set(data.findFirstEmptyLine( (data.w-1 downTo 0).toList(), false)) }
         val topRet = AtomicReference<Int>(null)
-        val top = Thread { topRet.set(data.findFirstEmptyLine(IntCounter(0, data.h - 1), true)) }
+        val top = Thread { topRet.set(data.findFirstEmptyLine((0 until data.h).toList(), true)) }
         val bottomRet = AtomicReference<Int>(null)
-        val bottom = Thread { bottomRet.set(data.findFirstEmptyLine(IntCounter(data.h - 1, 0), true)) }
+        val bottom = Thread { bottomRet.set(data.findFirstEmptyLine((data.h - 1 downTo 0).toList(), true)) }
 
         left.start()
         right.start()
@@ -177,8 +175,8 @@ object ContentBoundsFinder {
             return lineIsEmpty(colnum, false)
         }
 
-        internal fun findFirstEmptyLine(data: InterpretedIntArray, row: Boolean): Int {
-            val size = data.length()
+        internal fun findFirstEmptyLine(data: List<Int>, row: Boolean): Int {
+            val size = data.size
             if (size == 0) return -1
 
             for (i in 0 until size) {

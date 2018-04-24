@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.resources.Skin
 import spirite.gui.UIUtil
@@ -74,7 +74,7 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
 
         val trigger : (MouseEvent) -> Unit = {
             if( imp.isEnabled)
-                underlying = MUtil.lerp(underlyingMin, underlyingMax, it.point.x / imp.width.toFloat())
+                underlying = MathUtil.lerp(underlyingMin, underlyingMax, it.point.x / imp.width.toFloat())
         }
         onMousePress = trigger
         onMouseDrag = trigger

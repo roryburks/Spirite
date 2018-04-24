@@ -1,8 +1,8 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.InvertibleFunction
-import spirite.base.util.MUtil
 import spirite.base.brains.Bindable
+import spirite.base.util.MathUtil
 import java.awt.Color
 
 
@@ -38,7 +38,7 @@ class GradientSliderNonUI(
 {
     override var value : Float get() = valueBind.field
         set(to) {
-            val to = MUtil.clip( minValue, to, maxValue)
+            val to = MathUtil.clip( minValue, to, maxValue)
             underlying = mutatorPositionToValue?.invert(to) ?: to
         }
     override val valueBind = Bindable(maxValue, { new, old -> _underlying = mutatorPositionToValue?.invert(new) ?: new })
@@ -68,7 +68,7 @@ class GradientSliderNonUI(
     override var underlying
         get() = _underlying
         set(to) {
-            val to = MUtil.clip(underlyingMin, to, underlyingMax)
+            val to = MathUtil.clip(underlyingMin, to, underlyingMax)
             valueBind.field = mutatorPositionToValue?.perform(to) ?: to
             _underlying = to
         }

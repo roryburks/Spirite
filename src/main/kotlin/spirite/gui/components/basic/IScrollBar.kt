@@ -1,6 +1,6 @@
 package spirite.gui.components.basic
 
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.brains.Bindable
 import spirite.gui.Orientation
 
@@ -36,7 +36,7 @@ class ScrollBarNonUI(
     override var scroll: Int
         get() = scrollBind.field
         set(to) {
-            val clip = MUtil.clip(minScroll, to, maxScroll - scrollWidth)
+            val clip = MathUtil.clip(minScroll, to, maxScroll - scrollWidth)
             scrollBind.field = clip
         }
     override var minScroll

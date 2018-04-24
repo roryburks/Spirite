@@ -2,7 +2,7 @@ package spirite.base.graphics.shapes
 
 import com.hackoeur.jglm.support.FastMath
 import spirite.base.graphics.gl.GLPrimitive
-import spirite.base.util.MUtil
+import spirite.base.util.MathUtil
 import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
@@ -45,7 +45,7 @@ data class Oval(
     }
 
     override fun contains(x: Float, y: Float): Boolean {
-        return MUtil.distance(0.0, 0.0, (x - this.x) / r_h + 0.0, (y - this.y) / r_v + 0.0) <= 1
+        return MathUtil.distance(0.0, 0.0, (x - this.x) / r_h + 0.0, (y - this.y) / r_v + 0.0) <= 1
     }
 
 }
