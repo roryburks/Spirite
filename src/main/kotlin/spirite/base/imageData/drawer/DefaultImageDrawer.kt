@@ -1,5 +1,6 @@
 package spirite.base.imageData.drawer
 
+import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
@@ -15,6 +16,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
+import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 
 class DefaultImageDrawer(
@@ -24,8 +26,10 @@ class DefaultImageDrawer(
         IInvertModule,
         IClearModule,
         ILiftSelectionModule,
-        IAnchorLiftModule
+        IAnchorLiftModule,
+        IColorChangeModule
 {
+
     val workspace : IImageWorkspace get() = arranged.handle.workspace
     val mask get() = workspace.selectionEngine.selection
 
@@ -137,6 +141,20 @@ class DefaultImageDrawer(
                 if(trans != null)
                     gc.preTransform(trans)
                 lifted.draw(gc)
+            }
+        })
+    }
+
+    // endregion
+
+    // region IColorChangeModuke
+
+    override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
+        println("cc")
+        workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
+            when (mask) {
+                null -> built.rawAccessComposite { it.drawer.changeColor(from, to, mode) }
+                else -> built.rawAccessComposite { mask.doMasked(it, { it.drawer.changeColor(from, to, mode) }, built.tWorkspaceToComposite) }
             }
         })
     }

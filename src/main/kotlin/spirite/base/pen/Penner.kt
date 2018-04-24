@@ -4,8 +4,7 @@ import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.imageData.drawer.IImageDrawer.IFillModule
-import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
+import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
@@ -123,6 +122,7 @@ class Penner(
             else -> {
                 val tool = toolsetManager.selectedTool
                 val color = paletteManager.getActiveColor(if( button == LEFT) 0 else 1)
+                val offColor = paletteManager.getActiveColor(if( button == LEFT) 1 else 0)
 
                 when( tool) {
                     is Pen -> when {
@@ -147,7 +147,7 @@ class Penner(
                     }
                     is ShapeSelection,
                     is FreeSelection-> {
-                        if(!holdingShift && !holdingCtrl && workspace.selectionEngine.selection?.contains(x,y) ?: false) {
+                        if(!holdingShift && !holdingCtrl && workspace.selectionEngine.selection?.contains(x,y) == true) {
                             behavior = MovingSelectionBehavior(this)
                         }
                         else {
@@ -163,6 +163,9 @@ class Penner(
                             }
                         }
                     }
+                    is ColorChanger ->
+                        if( drawer is IColorChangeModule) drawer.changeColor( color, offColor, toolsetManager.toolset.ColorChanger.mode)
+                        else Hybrid.beep()
                 }
 
             }

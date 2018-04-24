@@ -7,10 +7,15 @@ import spirite.base.graphics.gl.GLParameters
 import spirite.base.graphics.gl.InvertCall
 import spirite.base.util.Color
 import spirite.base.util.f
+import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
 
 class GLDrawer( val image: GLImage) : IDrawer {
-    val params by lazy { GLParameters(image.width, image.height) }
+    val params by lazy {
+        val p = GLParameters(image.width, image.height)
+        p.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
+        p
+    }
 
     override fun invert() {
         image.engine.applyPassProgram(InvertCall(),
@@ -18,6 +23,8 @@ class GLDrawer( val image: GLImage) : IDrawer {
     }
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
+        println("${from.rgbaComponent} -> ${to.rgbaComponent}")
+        image.engine.setTarget(image)
         image.engine.applyPassProgram(ChangeColorCall(from.rgbaComponent, to.rgbaComponent, mode),
                 params,null, 0f, 0f, image.width.f, image.height.f)
     }

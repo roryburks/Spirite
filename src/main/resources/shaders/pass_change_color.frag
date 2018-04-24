@@ -15,7 +15,6 @@ uniform vec4 u_toColor;
 //	AA : 0 - Exact Match
 //		 1 - Ignore Alpha
 //		 2 - Change All
-//  B (premult) : whether or not data is isPremultiplied
 //  C (hueOnly) : whether to change all color data or just the hue
 uniform int u_optionMask;
 
@@ -42,7 +41,7 @@ void main()
 	vec4 texCol = texture(u_texture, vUV);
 	vec3 checkCol = vec3(texCol.rgb);
 	
-	bool premult = bool((u_optionMask >> 2) & 1);
+	bool premult = targetPremultiplied();
 	bool hueOnly = bool((u_optionMask >> 3) & 1);
 	
 	if( premult)
