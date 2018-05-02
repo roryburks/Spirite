@@ -2,6 +2,7 @@ package demonstration
 
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.advanced.ITreeView.*
+import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.advanced.SwTreeView
 import spirite.gui.components.basic.IComponent

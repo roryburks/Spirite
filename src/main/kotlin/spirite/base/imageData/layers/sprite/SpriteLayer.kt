@@ -8,12 +8,18 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
+import spirite.base.util.ceil
+import spirite.base.util.delegates.DerivedLazy
+import spirite.base.util.delegates.MutableLazy
 import spirite.base.util.delegates.StackableUndoableDelegate
+import spirite.base.util.floor
 import spirite.base.util.groupExtensions.SinglyList
+import spirite.base.util.groupExtensions.mapAggregated
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
@@ -21,7 +27,7 @@ import spirite.hybrid.MDebug.WarningType
 import kotlin.math.roundToInt
 
 /**
- *  A SpriteLayer is a collection of Dynamic
+ *  A SpriteLayer is a collection of Dynamic Mediums with various offsets, transforms, and
  */
 class SpriteLayer(
         val workspace: IImageWorkspace,
@@ -55,34 +61,22 @@ class SpriteLayer(
     var activePartIndex: Int = -1 ; private set
 
 
-    override val x: Int
-        get() = 0
-    override val y: Int
-        get() = 0
+//    private val _keyPointsDerived = DerivedLazy{ etc }
+    private val _keyPoints get() = parts.mapAggregated {
+            val tPartToWhole = it.tPartToWhole
+            listOf(Vec2(0f,0f), Vec2(0f, it.handle.height+0f), Vec2( it.handle.width+0f,0f), Vec2(it.handle.width+0f, it.handle.height+0f))
+                    .map { tPartToWhole.apply(it)}}
+
+    override val x: Int get() = _keyPoints.map { it.x.floor }.min() ?: 0
+    override val y: Int get() = _keyPoints.map { it.y.floor }.min() ?: 0
 
     override val width: Int get() {
-        val xs = mutableListOf<Float>()
-        parts.forEach {
-            val tPartToWhole = it.tPartToWhole
-            xs.add( tPartToWhole.apply(Vec2(0f,0f)).x)
-            xs.add( tPartToWhole.apply(Vec2(0f,it.handle.height+0f)).x)
-            xs.add( tPartToWhole.apply(Vec2(it.handle.width+0f,0f)).x)
-            xs.add( tPartToWhole.apply(Vec2(it.handle.width+0f,it.handle.height+0f)).x)
-        }
-        return xs.map { Math.ceil(it.toDouble()).roundToInt() }.max() ?: 0 -
-                (xs.map {Math.floor( it.toDouble()).roundToInt()}.min() ?: 0)
+        val xs = _keyPoints.map { it.x.ceil }
+        return (xs.max() ?: 0) - (xs.min() ?: 0)
     }
     override val height: Int get() {
-        val ys = mutableListOf<Float>()
-        parts.forEach {
-            val tPartToWhole = it.tPartToWhole
-            ys.add(tPartToWhole.apply(Vec2(0f, 0f)).y)
-            ys.add(tPartToWhole.apply(Vec2(0f, it.handle.height + 0f)).y)
-            ys.add(tPartToWhole.apply(Vec2(it.handle.width + 0f, 0f)).y)
-            ys.add(tPartToWhole.apply(Vec2(it.handle.width + 0f, it.handle.height + 0f)).y)
-        }
-        return ys.map { Math.ceil(it.toDouble()).roundToInt() }.max() ?: 0-
-        (ys.map { Math.floor(it.toDouble()).roundToInt() }.min() ?: 0)
+        val ys = _keyPoints.map { it.y.ceil }
+        return (ys.max() ?: 0) - (ys.min() ?: 0)
     }
 
     override val activeData: ArrangedMediumData
@@ -105,7 +99,9 @@ class SpriteLayer(
 
 
     override fun dupe(mediumRepo: MMediumRepository): Layer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val newMediumStructure =
+                parts.map {Pair(mediumRepo.addMedium(it.handle.medium.dupe()), SpritePartStructure(it))}
+        return SpriteLayer(workspace, mediumRepo, newMediumStructure)
     }
 
 
@@ -265,3 +261,7 @@ data class SpritePartStructure(
         val rot: Float = 0f,
         val centerX: Int? = null,
         val centerY: Int? = null)
+{
+    constructor(part : SpritePart) :
+            this(part.depth, part.partName, part.visible, part.alpha, part.transX, part.transY, part.scaleX, part.scaleY, part.rot, part.centerX, part.centerY)
+}

@@ -98,8 +98,8 @@ class RootWindow( val master: IMasterControl) : JFrame() {
             left += OmniSegment(GroupView(master), 100, 150)
             center = OmniSegment( workTabPane, 200)
             right += SubContainer( {
-                top += OmniSegment(ToolSection(master), 100, 200)
-                top += OmniSegment(ToolSettingsSection(master), 100, 100)
+                top += OmniSegment(ToolSection(master), 64, 100)
+                top += OmniSegment(ToolSettingsSection(master), 200, 200)
 
                 center = OmniSegment( PaletteSection(master), 100)
             }, 100, 120)

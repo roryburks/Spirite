@@ -5,6 +5,7 @@ import io.mockk.mockk
 import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
@@ -12,6 +13,7 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
 import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI
 import java.io.File
@@ -20,7 +22,7 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class DynamicMediumTests {
-    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
+    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     init {
@@ -30,7 +32,7 @@ class DynamicMediumTests {
 
     @test fun buildsDataAndDrawsToWSCorrectly() {
 
-        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
+        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(), mockWorkspace.mediumRepository)
         val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
         built.drawOnComposite { gc ->
@@ -45,7 +47,7 @@ class DynamicMediumTests {
         }
 
         // Assert
-        val workspaceImage = EngineLaunchpoint.createImage(100,100)
+        val workspaceImage = Hybrid.imageCreator.createImage(100,100)
         dynamicMedium.render(workspaceImage.graphics)
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(5,5))
         assertEquals(Colors.RED.argb, workspaceImage.getARGB(14,14))
@@ -54,7 +56,7 @@ class DynamicMediumTests {
     }
 
     @test fun buildsTransformedDataCorrectly() {
-        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage())
+        val dynamicMedium = DynamicMedium(mockWorkspace, DynamicImage(),mockWorkspace.mediumRepository)
         val tMediumToWorkspace = MutableTransform.TranslationMatrix(-10f, -10f)
         val built = dynamicMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0), tMediumToWorkspace))
 
@@ -75,7 +77,7 @@ class DynamicMediumTests {
         }
 
         // Save
-        val workspaceImage = EngineLaunchpoint.createImage(100,100)
+        val workspaceImage = Hybrid.imageCreator.createImage(100,100)
         dynamicMedium.render(workspaceImage.graphics)
 
         if( TestConfig.save) {

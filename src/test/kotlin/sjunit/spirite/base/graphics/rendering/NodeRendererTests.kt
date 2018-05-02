@@ -76,7 +76,7 @@ class NodeRendererTests {
         simpleLayer2.x = 40
         simpleLayer2.y = 40
 
-        groupInner.render.method = RenderMethod(MULTIPLY)
+        groupInner.method = RenderMethod(MULTIPLY)
 
         var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.DARK_GRAY
@@ -121,7 +121,7 @@ class NodeRendererTests {
         simpleLayer2.x = 40
         simpleLayer2.y = 40
 
-        groupInner.render.method = RenderMethod(MULTIPLY)
+        groupInner.method = RenderMethod(MULTIPLY)
 
         var gc = (((simpleLayer1.layer as SimpleLayer).medium.medium as FlatMedium).image as RawImage).graphics
         gc.color = Colors.DARK_GRAY

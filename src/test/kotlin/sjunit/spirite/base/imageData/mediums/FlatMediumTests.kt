@@ -3,12 +3,14 @@ package sjunit.spirite.base.imageData.mediums
 import io.mockk.mockk
 import sjunit.TestConfig
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
 import spirite.base.util.linear.MutableTransform
 import spirite.hybrid.EngineLaunchpoint
+import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.graphics.ImageBI
 import java.io.File
@@ -17,11 +19,11 @@ import kotlin.test.assertEquals
 import org.junit.Test as test
 
 class FlatMediumTests {
-    val mockWorkspace = mockk<IImageWorkspace>(relaxed = true)
+    val mockWorkspace = mockk<MImageWorkspace>(relaxed = true)
     val imageConverter = ImageConverter(EngineLaunchpoint.gle)
 
     @test fun buildsDataCorrectly() {
-        val flatMedium = FlatMedium( EngineLaunchpoint.createImage( 20, 20))
+        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20), mockWorkspace.mediumRepository)
         val built = flatMedium.build(ArrangedMediumData(MediumHandle(mockWorkspace, 0)))
 
         built.drawOnComposite { gc ->
@@ -41,7 +43,7 @@ class FlatMediumTests {
     }
 
     @test fun buildsTransformedDataCorrectly() {
-        val flatMedium = FlatMedium( EngineLaunchpoint.createImage( 20, 20))
+        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
         val transform = MutableTransform.TranslationMatrix(-10f,-10f)
 
         // Note: because we are using a non-standard coordinate setup (y down) and we aren't using helper functions that
@@ -67,8 +69,8 @@ class FlatMediumTests {
         }
     }
     @test fun buildsTransformedDataCorrectlyThenDisplaysCorrectly() {
-        val workspaceImage = EngineLaunchpoint.createImage( 50, 50)
-        val flatMedium = FlatMedium( EngineLaunchpoint.createImage( 20, 20))
+        val workspaceImage = Hybrid.imageCreator.createImage( 50, 50)
+        val flatMedium = FlatMedium( Hybrid.imageCreator.createImage( 20, 20),mockWorkspace.mediumRepository)
         val transform = MutableTransform.TranslationMatrix(-10f,-10f)
 
         // Note: because we are using a non-standard coordinate setup (y down) and we aren't using helper functions that

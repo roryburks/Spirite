@@ -31,7 +31,7 @@ private constructor(context: WorkSection, val canvas: GLJPanel)
                 val h = drawable.surfaceHeight
 
                 val gle = Hybrid.gle
-                val glgc = GLGraphicsContext(w, h, true, gle)
+                val glgc = GLGraphicsContext(w, h, true, gle, false)
 
                 JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)

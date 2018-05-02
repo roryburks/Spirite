@@ -19,70 +19,19 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 // TODO: It really shouldn't be hard to make pixel behavior behave as expected.
-class GLStrikeDrawerPixel(val gle: GLEngine)
-    : IStrokeDrawer
+class GLStrikeDrawerPixel(gle: GLEngine)
+    : GLStrokeDrawer(gle)
 {
-    private class DrawerContext(
-            val builder: StrokeBuilder,
-            val image: GLImage,
-            val glParams: GLParameters)
-    private var context : DrawerContext? = null
-
-    override fun start(builder: StrokeBuilder, width: Int, height: Int): Boolean {
-        val image = GLImage(width, height, gle, false)
-        val glParams = GLParameters(width, height, premultiplied = false)
-
-        gle.setTarget(image)
-        context = DrawerContext( builder, image, glParams)
-        drawPoint( gle, image, builder.currentPoints.x[0].round, builder.currentPoints.y[0].round, glParams)
-        return true
+    override fun doStart(context: DrawerContext) {
+        drawPoint(gle, context.image, context.builder.currentPoints.x[0].round, context.builder.currentPoints.y[0].round, context.glParams)
     }
 
-    override fun step(): Boolean {
-        val ctx = context
-        when( ctx) {
-            null -> {
-                MDebug.handleError(STRUCTURAL, "Tried to continue Stroke that isn't started.")
-                return false
-            }
-            else -> {
-                drawStroke( gle, ctx.image, ctx.builder.currentPoints, ctx.glParams)
-                return true
-            }
-        }
+    override fun doStep(context: DrawerContext) {
+        drawStroke( gle, context.image, context.builder.currentPoints, context.glParams)
     }
 
-    override fun draw(gc: GraphicsContext) {
-        context?.apply { drawStrokeImageToGc(image, gc, this.builder.params) }
-    }
-
-    override fun end() {
-        context?.image?.flush()
-        context = null
-    }
-
-    override fun batchDraw(gc: GraphicsContext, drawPoints: DrawPoints, params: StrokeParams, width: Int, height: Int) {
-        using( GLImage(width, height, gle, false) ) { batchImage ->
-            val glParams = batchImage.glParams
-            drawStroke( gle, batchImage, drawPoints, glParams)
-
-            drawStrokeImageToGc(batchImage, gc, params)
-        }
-    }
-
-    private fun drawStrokeImageToGc(image: GLImage, gc: GraphicsContext, strokeParams: StrokeParams) {
-        val glgc = gc as? GLGraphicsContext ?: return
-
-        glgc.pushState()
-
-        when( strokeParams.method) {
-            ERASE -> {glgc.composite = DST_OUT
-            }
-        }
-
-        glgc.applyPassProgram(StrokeV2ApplyCall(strokeParams.color.rgbComponent, strokeParams.alpha * gc.alpha), image)
-
-        glgc.popState()
+    override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
+        drawStroke( gle, image, drawPoints, glParams)
     }
 
     companion object {

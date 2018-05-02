@@ -37,12 +37,12 @@ class GLGraphicsContext : GraphicsContext {
 
     val gle: GLEngine
 
-    constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine)  {
+    constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine, premultiplied: Boolean = false)  {
         this.width = width
         this.height = height
         this.image = null
         this.gle = gle
-        this.premultiplied = false
+        this.premultiplied = premultiplied
 
         cachedParams.premultiplied = this.premultiplied
     }
