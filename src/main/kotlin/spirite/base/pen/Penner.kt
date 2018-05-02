@@ -152,7 +152,7 @@ class Penner(
                         }
                         else {
                             val mode = when {
-                                holdingCtrl && holdingCtrl -> INTERSECTION
+                                holdingCtrl && holdingShift -> INTERSECTION
                                 holdingShift -> ADD
                                 holdingCtrl -> SUBTRACT
                                 else -> DEFAULT

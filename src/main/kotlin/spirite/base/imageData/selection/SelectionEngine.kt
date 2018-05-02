@@ -60,6 +60,7 @@ class SelectionEngine(
         }
 
     override fun setSelection(newSelection: Selection?) {
+        val newSelection = if( newSelection?.empty == true) null else newSelection
         val liftedData = liftedData
         if( liftedData == null) {
             workspace.undoEngine.performAndStore(ChangeSelectionAction(selection, newSelection))
@@ -106,6 +107,7 @@ class SelectionEngine(
     }
 
     override fun mergeSelection(newSelection: Selection, mode: BuildMode) {
+        if( newSelection.empty) return
         when( mode) {
             ISelectionEngine.BuildMode.DEFAULT -> setSelection(newSelection)
             ISelectionEngine.BuildMode.ADD -> setSelection(selection?.let { it + newSelection} ?: newSelection)

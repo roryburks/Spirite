@@ -10,6 +10,7 @@ import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
+import kotlin.math.max
 
 /**
  * Selection is essentially just an IImage and a transform.  It represents the area which is being selected and
@@ -25,16 +26,19 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
     val transform: Transform?
     val width get() = mask.width
     val height get() = mask.height
+    val empty: Boolean
 
     init {
         if( !crop) {
             this.transform = transform
             this.mask = mask
+            empty = false
         }
         else {
             val cropped = ContentBoundsFinder.findContentBounds(mask, 1, true)
 
-            val maskBeingBuilt = Hybrid.imageCreator.createImage(cropped.width, cropped.height)
+            empty = cropped.isEmpty
+            val maskBeingBuilt = Hybrid.imageCreator.createImage(max(1,cropped.width), max(1,cropped.height))
             maskBeingBuilt.graphics.renderImage(mask, -cropped.x, -cropped.y)
 
             this.mask = maskBeingBuilt
@@ -44,10 +48,10 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
 
     operator fun plus( other : Selection) : Selection {
-        val area = transform?.let { MathUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height) union
-            other.transform?.let { MathUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height)
+        val area = (transform?.let { MathUtil.circumscribeTrans(Rect(width, height), it)} ?: Rect(width, height)) union
+                (other.transform?.let { MathUtil.circumscribeTrans(Rect(other.width, other.height), it)} ?: Rect(other.width, other.height))
 
-        val image = Hybrid.imageCreator.createImage(width, height)
+        val image = Hybrid.imageCreator.createImage(area.width, area.height)
         val gc = image.graphics
         gc.preTranslate(-area.x.f, -area.y.f)
         gc.pushTransform()

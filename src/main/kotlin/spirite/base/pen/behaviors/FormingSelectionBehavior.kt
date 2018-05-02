@@ -18,7 +18,6 @@ class FormingSelectionBehavior(
         val mode: BuildMode)
     : DrawnPennerBehavior(penner)
 {
-
     val builder : SelectionBuilder = when(shape) {
         RECTANGLE -> RectSelectionBuilder(penner.workspace!!)
         OVAL -> OvalSelectionBuilder(penner.workspace!!)
