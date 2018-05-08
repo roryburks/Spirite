@@ -37,6 +37,7 @@ abstract class WorkArea(
 
                 gc.alpha = 0.3f
                 gc.color = Skin.DrawPanel.LayerBorder.scolor
+                gc.transform( active.tMediumToWorkspace)
                 gc.drawRect(active.handle.x, active.handle.y, active.handle.width, active.handle.height)
 
                 gc.popTransform()

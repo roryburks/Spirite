@@ -7,6 +7,7 @@ import spirite.base.graphics.RawImage.InvalidImageDimensionsExeption
 import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.ColorARGB32Premultiplied
 import spirite.base.util.glu.GLC
+import spirite.base.util.linear.Rect
 
 class GLImage : RawImage {
     override val width : Int
@@ -112,5 +113,20 @@ class GLImage : RawImage {
         val read = gl.makeInt32Source(1)
         gl.readnPixels(x, y, 1, 1, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4, read )
         return  read[0]
+    }
+
+    fun toIntArray( rect: Rect? = null) : IntArray?{
+        val rect = rect ?: Rect(width, height)
+        engine.setTarget(this)
+
+        if( rect.isEmpty)
+            return null
+
+        val gl = engine.getGl()
+        val data = IntArray(rect.width * rect.height)
+        val read = gl.makeInt32Source(data)
+        gl.readnPixels(rect.x, rect.y, rect.width, rect.height, GLC.BGRA, GLC.UNSIGNED_INT_8_8_8_8_REV, 4*data.size, read )
+
+        return data
     }
 }

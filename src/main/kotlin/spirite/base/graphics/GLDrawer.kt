@@ -30,6 +30,7 @@ class GLDrawer( val image: GLImage) : IDrawer {
     }
 
     override fun fill(x: Int, y: Int, color: Color, mask: IImage?, maskTransform: Transform?) {
+
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

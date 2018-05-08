@@ -67,6 +67,6 @@ void main()
 			outputColor.a = texCol.a;
 		}
 	}
-	else 
+	else
 		outputColor = texCol;
 }
