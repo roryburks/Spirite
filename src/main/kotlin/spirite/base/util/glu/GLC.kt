@@ -851,4 +851,30 @@ object GLC {
     val RGBA8 = 32856
     val COLOR = 6144
     val MAX = 32776
+
+    val R32UI = 0x8236
+    val RED_INTEGER = 0x8D94
+    val LEFT = 0x0406
+    val RIGHT = 0x0407
+    val FRONT_LEFT = 0x0400
+    val FRONT_RIGHT = 0x0401
+    val BACK_LEFT = 0x0402
+    val BACK_RIGHT = 0x0403
+    val AUX0 = 0x0409
+    val AUX1 = 0x040A
+    val AUX2 = 0x040B
+    val AUX3 = 0x040C
+    val COLOR_INDEX = 0x1900
+    val RED = 0x1903
+    val GREEN = 0x1904
+    val BLUE = 0x1905
+    val INDEX_BITS = 0x0D51
+    val AUX_BUFFERS = 0x0C00
+    val READ_BUFFER = 0x0C02
+    val DRAW_BUFFER = 0x0C01
+    val DOUBLEBUFFER = 0x0C32
+    val STEREO = 0x0C33
+    val BITMAP = 0x1A00
+    val DEPTH = 0x1801
+    val STENCIL = 0x1802
 }

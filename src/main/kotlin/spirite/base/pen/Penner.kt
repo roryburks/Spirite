@@ -139,7 +139,7 @@ class Penner(
                         if( drawer is IStrokeModule) behavior = EraserBehavior.Stroke( this, drawer, color)
                         else Hybrid.beep()
                     is Fill ->
-                        if( drawer is IFillModule) TODO()
+                        if( drawer is IFillModule) drawer.fill(x, y, color)
                         else Hybrid.beep()
                     is Move -> when {
                         workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)

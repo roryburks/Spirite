@@ -17,7 +17,10 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
+import spirite.base.util.f
+import spirite.base.util.floor
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Vec2
 
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)
@@ -27,7 +30,8 @@ class DefaultImageDrawer(
         IClearModule,
         ILiftSelectionModule,
         IAnchorLiftModule,
-        IColorChangeModule
+        IColorChangeModule,
+        IFillModule
 {
 
     val workspace : IImageWorkspace get() = arranged.handle.workspace
@@ -150,7 +154,6 @@ class DefaultImageDrawer(
     // region IColorChangeModuke
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        println("cc")
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.drawer.changeColor(from, to, mode) }
@@ -160,4 +163,14 @@ class DefaultImageDrawer(
     }
 
     // endregion
+
+    override fun fill(x: Int, y: Int, color: Color): Boolean {
+        workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
+            built.rawAccessComposite {
+                val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))
+                it.drawer.fill(p.x.floor, p.y.floor, color, mask?.mask, mask?.transform)
+            }
+        })
+        return true
+    }
 }

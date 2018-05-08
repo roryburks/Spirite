@@ -1,8 +1,8 @@
 package sjunit.spirite.base.graphics.fill
 
+import spirite.base.graphics.fill.V0FillArrayAlgorithm
 import spirite.base.graphics.fill.V1FillArrayAlgorithm
 import spirite.base.graphics.gl.GLImage
-import spirite.base.graphics.gl.fill.GLFillV1
 import spirite.base.util.Colors
 import spirite.hybrid.EngineLaunchpoint
 import kotlin.experimental.and
@@ -31,12 +31,19 @@ class FillV1Tests {
         image.graphics.drawLine( 0, 0, w,h)
 
         lateinit var iii: IntArray
+//        println(measureTimeMillis {
+//            iii = //GLFillV1.fill(image, 3, 2, Colors.BLACK) ?: throw Exception("bad")
+//
+//                    V1FillArrayAlgorithm.fill(
+//                            image.toIntArray() ?: throw Exception(),
+//                            image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
+//        })
+
         println(measureTimeMillis {
             iii = //GLFillV1.fill(image, 3, 2, Colors.BLACK) ?: throw Exception("bad")
-
-                    V1FillArrayAlgorithm.fill(
-                    image.toIntArray() ?: throw Exception(),
-                    image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
+                    V0FillArrayAlgorithm.fill(
+                            image.toIntArray() ?: throw Exception(),
+                            image.width, image.height, 3, 2, Colors.BLACK.argb32) ?: throw Exception("bad")
         })
 
         val faW = (w-1) / 8 + 1
@@ -48,6 +55,7 @@ class FillV1Tests {
                 else assert( y >= x)
             }
         }
+        println("really")
     }
 
 }

@@ -45,7 +45,7 @@ interface IImageDrawer {
     }
 
     interface IFillModule {
-        fun fill(x: Int, y: Int, color: Int, _data: ArrangedMediumData): Boolean
+        fun fill(x: Int, y: Int, color: Color): Boolean
     }
 //
 //    interface IFlipModule {

@@ -31,6 +31,8 @@ internal enum class ProgramType(
 
     POLY_RENDER(SRC_OVER),
     LINE_RENDER(SRC_OVER),
+
+    FILL_AFTERPASS(SRC_OVER),
 }
 
 sealed abstract class ProgramCall {
@@ -183,4 +185,14 @@ class StrokePixelCall( color: Vec3)
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f( "u_color", color))
     override val programType: ProgramType get() = STROKE_PIXEL
+}
+
+class FillAfterpassCall( color: Vec4, width: Int, height: Int)
+    :ProgramCall()
+{
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform4f( "u_color", color),
+            GLUniform1i("u_width", width),
+            GLUniform1i("u_height", height))
+    override val programType: ProgramType get() = FILL_AFTERPASS
 }

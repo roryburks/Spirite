@@ -115,12 +115,12 @@ class GLImage : RawImage {
         return  read[0]
     }
 
-    fun toIntArray( rect: Rect? = null) : IntArray?{
+    fun toIntArray( rect: Rect? = null) : IntArray{
         val rect = rect ?: Rect(width, height)
         engine.setTarget(this)
 
         if( rect.isEmpty)
-            return null
+            return IntArray(0)
 
         val gl = engine.getGl()
         val data = IntArray(rect.width * rect.height)

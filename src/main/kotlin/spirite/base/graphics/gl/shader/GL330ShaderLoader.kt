@@ -70,6 +70,10 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
                 "shaders/pass.vert",
                 null,
                 "shaders/brushes/brush_intensify.frag")
+        array[ProgramType.FILL_AFTERPASS.ordinal] = loadProgram(scriptService,
+                "shaders/pass.vert",
+                null,
+                "shaders/pass_fill.frag")
 
         return Array(ProgramType.values().size, {
             when (array[it]){
