@@ -14,7 +14,7 @@ import spirite.base.util.linear.Transform
 
 class GLDrawer( val image: GLImage) : IDrawer {
     val params by lazy {
-        val p = GLParameters(image.width, image.height)
+        val p = GLParameters(image.width, image.height, texture1 = image)
         p.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
         p
     }

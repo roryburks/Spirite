@@ -10,6 +10,7 @@ import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
+import java.io.File
 import kotlin.math.max
 
 /**
@@ -164,9 +165,11 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             val gc = floatingImage.graphics
             gc.transform = tSelToFloating
             gc.renderImage(mask,0,0)
-            gc.composite = DST_IN
+            gc.composite = SRC_IN
             gc.transform = tImageToFloating
             gc.renderImage(image, 0, 0)
+
+            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float.png"))
 
             if( backgroundColor != null) {
                 gc.composite = DST_OVER
@@ -177,13 +180,15 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
             // Step 2: execute on the lifted image
             lambda(floatingImage)
+            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float_after.png"))
 
             // Step 3: Lift the Selection Mask out of the drawn image (since the draw action might have gone out of the lines)
             val cgc = compositingImage.graphics
             cgc.transform = tSelToFloating
             cgc.renderImage(mask,0,0)
-            cgc.composite = DST_IN
+            cgc.composite = SRC_IN
             cgc.renderImage(floatingImage, 0, 0)
+            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float_compositing.png"))
 
             // Step 4: Stencil the selection mask out of the image
             val igc = image.graphics
