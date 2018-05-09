@@ -10,8 +10,6 @@ object V0FillArrayAlgorithm : IFillArrayAlgorithm{
         val from = data[x + y*w]
         if( color == from) return null
 
-        println(from)
-
         val queue = LinkedList<Int>()
         queue.offer(MathUtil.packInt(x,y))
 

@@ -20,6 +20,7 @@ import spirite.base.util.Color
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 
 class DefaultImageDrawer(
@@ -91,7 +92,7 @@ class DefaultImageDrawer(
         workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
             when( mask) {
                 null -> built.rawAccessComposite { it.drawer.invert() }
-                else -> built.rawAccessComposite { mask.doMasked(it, {it.drawer.invert()}, built.tWorkspaceToComposite) }
+                else -> built.rawAccessComposite { mask.doMasked(it, built.tWorkspaceToComposite) {it.drawer.invert()} }
             }
         })
     }
@@ -103,7 +104,7 @@ class DefaultImageDrawer(
         workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.graphics.clear() }
-                else -> built.rawAccessComposite { mask.doMasked(it, { it.graphics.clear() }, built.tWorkspaceToComposite) }
+                else -> built.rawAccessComposite { mask.doMasked(it, built.tWorkspaceToComposite) { it.graphics.clear() } }
             }
         })
     }
@@ -157,7 +158,9 @@ class DefaultImageDrawer(
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.drawer.changeColor(from, to, mode) }
-                else -> built.rawAccessComposite { mask.doMasked(it, { it.drawer.changeColor(from, to, mode) }, built.tWorkspaceToComposite) }
+                else -> built.rawAccessComposite {
+                    mask.doMasked(it, built.tWorkspaceToComposite) { it.drawer.changeColor(from, to, mode) }
+                }
             }
         })
     }
@@ -166,9 +169,19 @@ class DefaultImageDrawer(
 
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
-            built.rawAccessComposite {
-                val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))
-                it.drawer.fill(p.x.floor, p.y.floor, color, mask?.mask, mask?.transform)
+            when( mask) {
+                null -> built.rawAccessComposite {
+                    val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))
+                    it.drawer.fill(p.x.floor, p.y.floor, color)
+                }
+                else -> built.rawAccessComposite {
+                    mask.doMaskedRequiringTransform(it, built.tWorkspaceToComposite) { it, tImageToFloating ->
+                        val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2(x.f,y.f)))
+
+                        it.drawer.fill(p.x.floor,p.y.floor, color)
+
+                    }
+                }
             }
         })
         return true

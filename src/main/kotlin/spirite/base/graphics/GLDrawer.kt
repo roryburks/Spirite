@@ -30,7 +30,7 @@ class GLDrawer( val image: GLImage) : IDrawer {
                 params,null, 0f, 0f, image.width.f, image.height.f)
     }
 
-    override fun fill(x: Int, y: Int, color: Color, mask: IImage?, maskTransform: Transform?) {
+    override fun fill(x: Int, y: Int, color: Color) {
         GLFill(V0FillArrayAlgorithm).fill(image, x, y, color)
     }
 }

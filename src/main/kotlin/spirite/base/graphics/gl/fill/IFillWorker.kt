@@ -6,8 +6,10 @@ import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
+import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.gui.SColor
+import java.io.File
 import java.nio.IntBuffer
 
 interface IFillWorker {

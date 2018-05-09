@@ -98,12 +98,12 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
     fun contains(x: Int, y: Int): Boolean {
         val transformed = transform?.invert()?.apply(Vec2(x.f,y.f)) ?: Vec2(x.f,y.f)
-        val x = transformed.x.round
-        val y = transformed.y.round
+        val tx = transformed.x.round
+        val ty = transformed.y.round
 
-        if( x < 0 || y < 0 || x >= width || y >= width) return false
+        if( tx < 0 || ty < 0 || tx >= width || ty >= width) return false
 
-        return mask.getColor(x,y).alpha > 0f
+        return mask.getColor(tx,ty).alpha > 0f
     }
 
     fun invert(width: Int, height: Int) : Selection {
@@ -138,15 +138,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         return lifted
     }
 
-    /**
-     * @param tBaseToImage in most cases this should be a transform from Workspace Space to Image space, but in general
-     *      it's a transform on top of the selection's transform that it will use to draw the selection in Image Space
-     * @param backgroundColor For some reasons (specifically when doing flood fills), you might want the area that is not
-     *     being selected to be a color other than transparent.  Even though this region will not be drawn to the end
-     *     product, the lambda still has access to it.
-     * @return doMasked may not execute the Lambda at all (if the selection doesn't intersect the image) in which case it returns false
-     */
-    fun doMasked( image: RawImage, lambda: (RawImage)->Any?, tBaseToImage: Transform? = null, backgroundColor: Color? = null) : Boolean{
+    fun doMaskedRequiringTransform( image: RawImage, tBaseToImage: Transform? = null, backgroundColor: Color? = null, lambda: (RawImage, Transform)->Any?) : Boolean{
         val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
 
         val floatingArea = MathUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
@@ -160,6 +152,69 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         try {
             val tSelToFloating = tImageToFloating * tSelToImage
 
+            // Step 1: Lift the Selection Mask out of the image
+            val gc = floatingImage.graphics
+
+            gc.transform = Transform.IdentityMatrix
+            gc.color = backgroundColor ?: Colors.RED
+            gc.fillRect(0,0, floatingArea.width, floatingArea.height)
+            gc.composite = DST_OUT
+            gc.transform = tSelToFloating
+            gc.renderImage(mask,0,0)
+            gc.composite = SRC_OVER
+            gc.transform = tImageToFloating
+            gc.renderImage(image, 0, 0)
+
+
+            // Step 2: execute on the lifted image
+            lambda(floatingImage, tImageToFloating)
+
+            // Step 3: Lift the Selection Mask out of the drawn image (since the draw action might have gone out of the lines)
+            val cgc = compositingImage.graphics
+            cgc.transform = tSelToFloating
+            cgc.renderImage(mask,0,0)
+            cgc.composite = SRC_IN
+            cgc.renderImage(floatingImage, 0, 0)
+
+            // Step 4: Stencil the selection mask out of the image
+            val igc = image.graphics
+            igc.transform = tSelToImage
+            igc.composite = DST_OUT
+            igc.renderImage(mask, 0, 0)
+
+            // Step 5: Fill in the empty spot with the image from step 3
+            igc.transform = Transform.IdentityMatrix
+            igc.composite = SRC_OVER
+            igc.renderImage(compositingImage, floatingArea.x, floatingArea.y)
+
+            return true
+        } finally {
+            floatingImage.flush()
+            compositingImage.flush()
+        }
+    }
+
+    /**
+     * @param tBaseToImage in most cases this should be a transform from Workspace Space to Image space, but in general
+     *      it's a transform on top of the selection's transform that it will use to draw the selection in Image Space
+     * @param backgroundColor For some reasons (specifically when doing flood fills), you might want the area that is not
+     *     being selected to be a color other than transparent.  Even though this region will not be drawn to the end
+     *     product, the lambda still has access to it.
+     * @return doMasked may not execute the Lambda at all (if the selection doesn't intersect the image) in which case it returns false
+     */
+    fun doMasked( image: RawImage, tBaseToImage: Transform? = null, backgroundColor: Color? = null, lambda: (RawImage)->Any?) : Boolean{
+        val tSelToImage = (tBaseToImage ?: Transform.IdentityMatrix) * (transform ?: Transform.IdentityMatrix)
+
+        val floatingArea = MathUtil.circumscribeTrans( Rect(mask.width, mask.height), tSelToImage) intersection Rect(image.width, image.height)
+        if( floatingArea.isEmpty)
+            return false
+
+        val tImageToFloating = Transform.TranslationMatrix(-floatingArea.x.f, -floatingArea.y.f)
+        val floatingImage = Hybrid.imageCreator.createImage(floatingArea.width, floatingArea.height)
+        val compositingImage = Hybrid.imageCreator.createImage(floatingArea.width, floatingArea.height)
+
+        try {
+            val tSelToFloating = tImageToFloating * tSelToImage
 
             // Step 1: Lift the Selection Mask out of the image
             val gc = floatingImage.graphics

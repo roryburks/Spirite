@@ -12,5 +12,5 @@ import spirite.base.util.linear.Transform
 interface IDrawer {
     fun invert()
     fun changeColor(from: Color, to: Color, mode: ColorChangeMode)
-    fun fill( x: Int, y: Int, color: Color, mask: IImage? = null, maskTransform : Transform? = null)
+    fun fill( x: Int, y: Int, color: Color)
 }

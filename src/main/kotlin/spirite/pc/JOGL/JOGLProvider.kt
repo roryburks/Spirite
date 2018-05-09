@@ -17,10 +17,7 @@ object JOGLProvider {
     //  just a single variable and a ton of methods.
     val gl : IGL get() {
         val gl2 = gl2 ?: this._gl.gL2
-        //if( !gl2.context.isCurrent) {
-        //    println("Switch context")
-        //    gl2.context.makeCurrent()
-        //}
+
         return JOGL(gl2)
     }
 

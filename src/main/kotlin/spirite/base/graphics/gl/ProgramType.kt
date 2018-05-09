@@ -7,6 +7,7 @@ import spirite.base.graphics.JoinMethod.*
 import spirite.base.graphics.gl.GLEngine.BlendMethod
 import spirite.base.graphics.gl.GLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
+import spirite.base.util.f
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
 
@@ -193,6 +194,8 @@ class FillAfterpassCall( color: Vec4, width: Int, height: Int)
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform4f( "u_color", color),
             GLUniform1i("u_width", width),
-            GLUniform1i("u_height", height))
+            GLUniform1i("u_height", height),
+            GLUniform1f("u_wratio", width / (((width-1)/8+1)*8).f),
+            GLUniform1f("u_hratio", height / (((height-1)/4+1)*4).f))
     override val programType: ProgramType get() = FILL_AFTERPASS
 }

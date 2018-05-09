@@ -17,6 +17,8 @@ in vec2 vUV;
 out vec4 outputColor;
 
 uniform vec4 u_color;
+uniform float u_wratio;
+uniform float u_hratio;
 uniform int u_width;
 uniform int u_height;
 
@@ -24,7 +26,8 @@ uniform int u_height;
 void main() {
     int x = int(floor( vUV.x * u_width));
     int y = int(floor( vUV.y * u_height));
-    uint sector = texture(u_texture, vUV).r;
+    vec2 uv = vec2( vUV.x * u_wratio, vUV.y * u_hratio);
+    uint sector = texture(u_texture, uv).r;
 
     uint mask = 1 << ((x % 8) + (y%4)*8);
     if( (sector & mask) != 0)
