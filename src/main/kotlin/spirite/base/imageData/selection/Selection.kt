@@ -169,8 +169,6 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             gc.transform = tImageToFloating
             gc.renderImage(image, 0, 0)
 
-            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float.png"))
-
             if( backgroundColor != null) {
                 gc.composite = DST_OVER
                 gc.transform = Transform.IdentityMatrix
@@ -180,7 +178,6 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
 
             // Step 2: execute on the lifted image
             lambda(floatingImage)
-            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float_after.png"))
 
             // Step 3: Lift the Selection Mask out of the drawn image (since the draw action might have gone out of the lines)
             val cgc = compositingImage.graphics
@@ -188,7 +185,6 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             cgc.renderImage(mask,0,0)
             cgc.composite = SRC_IN
             cgc.renderImage(floatingImage, 0, 0)
-            Hybrid.imageIO.saveImage(floatingImage, File("C:/Bucket/float_compositing.png"))
 
             // Step 4: Stencil the selection mask out of the image
             val igc = image.graphics
