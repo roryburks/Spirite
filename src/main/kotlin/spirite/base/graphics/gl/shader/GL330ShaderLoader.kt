@@ -4,76 +4,89 @@ import spirite.base.graphics.gl.*
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
 
+private val root = "shaders/330"
+
 class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {
-    val globalFrag : String by lazy { scriptService.loadScript("shaders/global.frag") }
+    val globalFrag : String by lazy { scriptService.loadScript("${root}/global.frag") }
     val GLOBAL = "#GLOBAL"
 
     override fun initShaderPrograms(): Array<IGLProgram> {
 
         val array = Array<IGLProgram?>(ProgramType.values().size,{null})
 
-        array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/square_grad.frag")
+        // Brushes
         array[ProgramType.STROKE_BASIC.ordinal] = loadProgram(scriptService,
-                "shaders/brushes/stroke_basic.vert",
-                "shaders/brushes/stroke_basic.geom",
-                "shaders/brushes/stroke_basic.frag")
-        array[ProgramType.CHANGE_COLOR.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/pass_change_color.frag")
-        array[ProgramType.PASS_BORDER.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/pass_border.frag")
-        array[ProgramType.PASS_INVERT.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/pass_invert.frag")
-        array[ProgramType.PASS_RENDER.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/pass_render.frag")
+                "${root}/brushes/stroke_basic.vert",
+                "${root}/brushes/stroke_basic.geom",
+                "${root}/brushes/stroke_basic.frag")
         array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(scriptService,
-                "shaders/brushes/brush_spore.vert",
-                "shaders/brushes/brush_spore.geom",
-                "shaders/brushes/brush_spore.frag")
-        array[ProgramType.PASS_BASIC.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/pass_basic.frag")
-        array[ProgramType.GRID.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
-                null,
-                "shaders/etc/pass_grid.frag")
+                "${root}/brushes/brush_spore.vert",
+                "${root}/brushes/brush_spore.geom",
+                "${root}/brushes/brush_spore.frag")
         array[ProgramType.STROKE_V2_LINE_PASS.ordinal] = loadProgram(scriptService,
-                "shaders/brushes/stroke_pixel.vert",
+                "${root}/brushes/stroke_pixel.vert",
                 null,
-                "shaders/brushes/stroke_pixel.frag")
+                "${root}/brushes/stroke_pixel.frag")
         array[ProgramType.STROKE_PIXEL.ordinal] = array[ProgramType.STROKE_V2_LINE_PASS.ordinal]
         array[ProgramType.STROKE_V2_APPLY.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
+                "${root}/pass.vert",
                 null,
-                "shaders/brushes/stroke_v2_apply.frag")
-
-        array[ProgramType.POLY_RENDER.ordinal] = loadProgram(scriptService,
-                "shaders/shapes/poly_render.vert",
-                null,
-                "shaders/shapes/shape_render.frag")
-        array[ProgramType.LINE_RENDER.ordinal] = loadProgram(scriptService,
-                "shaders/shapes/line_render.vert",
-                "shaders/shapes/line_render.geom",
-                "shaders/shapes/shape_render.frag")
+                "${root}/brushes/stroke_v2_apply.frag")
         array[ProgramType.STROKE_AFTERPASS_INTENSIFY.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
+                "${root}/pass.vert",
                 null,
-                "shaders/brushes/brush_intensify.frag")
+                "${root}/brushes/brush_intensify.frag")
+
+        // Constructions
+        array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/constructions/square_grad.frag")
+        array[ProgramType.GRID.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/constructions/pass_grid.frag")
+
+        // Shapes
+        array[ProgramType.POLY_RENDER.ordinal] = loadProgram(scriptService,
+                "${root}/shapes/poly_render.vert",
+                null,
+                "${root}/shapes/shape_render.frag")
+        array[ProgramType.LINE_RENDER.ordinal] = loadProgram(scriptService,
+                "${root}/shapes/line_render.vert",
+                "${root}/shapes/line_render.geom",
+                "${root}/shapes/shape_render.frag")
+
+        // Filters
+        array[ProgramType.CHANGE_COLOR.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/filters/pass_change_color.frag")
+        array[ProgramType.PASS_INVERT.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/filters/pass_invert.frag")
+
+        // Special
         array[ProgramType.FILL_AFTERPASS.ordinal] = loadProgram(scriptService,
-                "shaders/pass.vert",
+                "${root}/pass.vert",
                 null,
-                "shaders/pass_fill.frag")
+                "${root}/special/pass_fill.frag")
+        array[ProgramType.PASS_BORDER.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/special/pass_border.frag")
+
+        // Render
+        array[ProgramType.PASS_RENDER.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/render/pass_render.frag")
+        array[ProgramType.PASS_BASIC.ordinal] = loadProgram(scriptService,
+                "${root}/pass.vert",
+                null,
+                "${root}/render/pass_basic.frag")
+
 
         return Array(ProgramType.values().size, {
             when (array[it]){

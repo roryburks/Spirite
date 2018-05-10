@@ -2,7 +2,7 @@
 
 #define A 1664525
 #define C 1013904223
-#define IMAX2 65535
+#define IMAX2 65535u
 
 layout(points) in;
 layout(points, max_vertices = 10) out;
@@ -32,10 +32,10 @@ void main()
 		rand = prng(seed + 666*i);
 	    gl_Position = perspectiveMatrix*
 	    	(gl_in[0].gl_Position + 
-	    	vec4(-5.0+10.0*float(rand & 255)/255.0f,-5.0+10.0*float((rand>>8) & 255)/255.0f,0,0));
+	    	vec4(-5.0+10.0*float(rand & 255u)/255.0f,-5.0+10.0*float((rand>>8) & 255u)/255.0f,0,0));
 	    gl_PointSize = 1.0f;
 	    
-		fWeight = 0.1 +  0.1*float((rand>>16) & 255)/255.0f;
+		fWeight = 0.1 +  0.1*float((rand>>16) & 255u)/255.0f;
 	    EmitVertex();
 	    EndPrimitive();
     }
