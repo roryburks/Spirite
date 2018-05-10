@@ -8,6 +8,7 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
+import spirite.base.util.Colors
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f
 import spirite.base.util.floor
@@ -139,7 +140,7 @@ class Penner(
                         if( drawer is IStrokeModule) behavior = EraserBehavior.Stroke( this, drawer, color)
                         else Hybrid.beep()
                     is Fill ->
-                        if( drawer is IFillModule) drawer.fill(x, y, color)
+                        if( drawer is IFillModule) drawer.fill(x, y, if(holdingCtrl) Colors.TRANSPARENT else color)
                         else Hybrid.beep()
                     is Move -> when {
                         workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)

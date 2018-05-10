@@ -27,7 +27,6 @@ internal enum class ProgramType(
     STROKE_BASIC(SRC_OVER),
     STROKE_PIXEL(SRC_OVER),
     STROKE_V2_LINE_PASS(SRC_OVER),
-    STROKE_AFTERPASS_INTENSIFY(SOURCE),
     STROKE_V2_APPLY(SRC_OVER),
 
     POLY_RENDER(SRC_OVER),
@@ -129,14 +128,34 @@ class RenderCall(
     override val programType: ProgramType get() = PASS_RENDER
 }
 
-class StrokeV2LinePass(val color: Vec3)
+class StrokeV2LinePass(color: Vec3)
     : ProgramCall()
 {
+
     override val uniforms: List<GLUniform>? = listOf(
             GLUniform3f("u_color", color))
 
     override val programType: ProgramType get() = STROKE_V2_LINE_PASS
 }
+
+class StrokeV2ApplyCall(
+        color: Vec3,
+        alpha: Float,
+        intensifyMethod: IntensifyMethod)
+    :ProgramCall()
+{
+
+    enum class IntensifyMethod(val code: Int) {
+        DEFAULT(0),
+        HARD_EDGED(1),
+    }
+    override val uniforms: List<GLUniform>? = listOf(
+            GLUniform3f( "u_color", color),
+            GLUniform1f("u_alpha", alpha),
+            GLUniform1i("u_intensifyMode", intensifyMethod.code))
+    override val programType: ProgramType get() = STROKE_V2_APPLY
+}
+
 
 class PolyRenderCall(
         color: Vec3,
@@ -169,16 +188,6 @@ class LineRenderCall(
     override val programType: ProgramType get() = LINE_RENDER
 }
 
-class StrokeV2ApplyCall(
-        color: Vec3,
-        alpha: Float)
-    :ProgramCall()
-{
-    override val uniforms: List<GLUniform>? = listOf(
-            GLUniform3f( "u_color", color),
-            GLUniform1f("u_alpha", alpha))
-    override val programType: ProgramType get() = STROKE_V2_APPLY
-}
 
 class StrokePixelCall( color: Vec3)
     :ProgramCall()

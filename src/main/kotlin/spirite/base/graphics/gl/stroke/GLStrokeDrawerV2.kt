@@ -1,27 +1,36 @@
 package spirite.base.graphics.gl.stroke
 
 import spirite.base.graphics.gl.*
+import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
+import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
+import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
 
-class GLStrokeDrawerV2(gle: GLEngine) : GLStrokeDrawer(gle)
+class GLStrokeDrawerV2(
+        gle: GLEngine) : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
-        drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams)
+        drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)
     }
 
     override fun doStep(context: DrawerContext) {
-        drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams)
+        drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)
     }
 
     override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
-        drawStroke( image, drawPoints, params.width, glParams)
+        drawStroke( image, drawPoints, params.width, glParams, params)
     }
 
-    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, trans: Transform? = null) {
+    override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod = when {
+        params.hard -> HARD_EDGED
+        else -> DEFAULT
+    }
+
+    private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: Transform? = null) {
         val vb = composeVBuffer( states, lineWidth)
 
         if( true /* 330 */ ) {

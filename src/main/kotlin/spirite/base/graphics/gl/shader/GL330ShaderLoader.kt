@@ -32,10 +32,6 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
                 "${root}/pass.vert",
                 null,
                 "${root}/brushes/stroke_v2_apply.frag")
-        array[ProgramType.STROKE_AFTERPASS_INTENSIFY.ordinal] = loadProgram(scriptService,
-                "${root}/pass.vert",
-                null,
-                "${root}/brushes/brush_intensify.frag")
 
         // Constructions
         array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(scriptService,

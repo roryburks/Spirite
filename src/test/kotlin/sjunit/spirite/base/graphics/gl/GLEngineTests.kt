@@ -9,9 +9,7 @@ import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.PolyType.STRIP
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
 import spirite.base.graphics.gl.SquareGradientCall.GradientType
-import spirite.base.graphics.gl.stroke.V2PenDrawer
 import spirite.base.pen.stroke.DrawPoints
-import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.base.util.linear.Vec3
 import spirite.base.util.linear.Vec4
@@ -147,7 +145,8 @@ class GLEngineTests {
                 FloatArray(100, { it.toFloat() }),
                 FloatArray(100, { 1f - abs(50 - it) / 50f })
         )
-        V2PenDrawer.drawStroke(drawPoints, 5f, gle, ColorARGB32Normal(0xffff0000.toInt()), GLParameters(image.width, image.height), null)
+
+        // TODO
 
         if( TestConfig.save)
             ImageIO.write(image.toBufferedImage(), "png", File("${TestConfig.saveLocation}\\stroke.png"))

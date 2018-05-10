@@ -158,6 +158,7 @@ class ImageContext(
 
         override fun performImageAction(built: BuiltMediumData) {
             mediumRepo.replaceMediumDirect( medium, frame.dupe())
+            medium.refresh()
         }
 
         private val frame = medium.medium.dupe()

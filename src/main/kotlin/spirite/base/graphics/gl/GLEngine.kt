@@ -346,6 +346,7 @@ class GLEngine(
         SOURCE(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
         MAX( GLC.ONE, GLC.ONE, GLC.MAX),
         DEST_OVER( GLC.SRC_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
+        SRC (GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
     }
 
     private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {

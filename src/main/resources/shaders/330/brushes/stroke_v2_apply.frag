@@ -10,9 +10,15 @@ out vec4 outputColor;
 
 uniform vec3 u_color;
 uniform float u_alpha;
+uniform int u_intensifyMode;
 
 float alphaIntensify( float alpha) {
-    return (alpha > 0.5)?pow(alpha,0.3):pow(alpha,1.5);
+    switch(u_intensifyMode) {
+    case 0: return (alpha > 0.5)?pow(alpha,0.3):pow(alpha,1.5);
+    case 1: return (alpha > 0.5)?1:0;
+    }
+
+    return alpha;
 }
 
 void main() {

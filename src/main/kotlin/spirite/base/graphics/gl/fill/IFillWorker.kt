@@ -1,23 +1,20 @@
 package spirite.base.graphics.gl.fill
 
+import spirite.base.graphics.GraphicsContext.Composite.*
 import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.GLParameters
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
-import spirite.hybrid.Hybrid
+import spirite.base.util.linear.Vec4
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.gui.SColor
-import java.io.File
 import java.nio.IntBuffer
 
-interface IFillWorker {
-    fun fill(glImage: GLImage, x: Int, y: Int, color: SColor)
-}
 
-class GLFill(val filler: IFillArrayAlgorithm) : IFillWorker {
-    override fun fill(glImage: GLImage, x: Int, y: Int, color: SColor) {
+class GLFill(val filler: IFillArrayAlgorithm)  {
+    fun fill(glImage: GLImage, x: Int, y: Int, color: SColor) {
         val gle = glImage.engine
         val gl = gle.getGl()
         val w = glImage.width
@@ -45,8 +42,19 @@ class GLFill(val filler: IFillArrayAlgorithm) : IFillWorker {
         val img2 = GLImage(_tex,  faW, faH, gle)
 
         glImage.engine.setTarget(glImage)
-        gle.applyPassProgram( FillAfterpassCall(color.rgbaComponent, w, h),
-                GLParameters(w, h, texture1 = img2), null, 0f, 0f, w.f, h.f)
+
+        // Pass 1: clear the filled pixels
+        if( color.alpha != 1.0f) {
+            val params = GLParameters(w, h, texture1 = img2)
+            params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            gle.applyPassProgram(FillAfterpassCall(Vec4(1f,1f,1f,1f), w, h),
+                    params, null, 0f, 0f, w.f, h.f)
+        }
+        // Pass 2: add the fill pixels
+        if (color.alpha != 0.0f){
+            gle.applyPassProgram(FillAfterpassCall(color.rgbaComponent, w, h),
+                    GLParameters(w, h, texture1 = img2), null, 0f, 0f, w.f, h.f)
+        }
 
         img2.flush()
     }

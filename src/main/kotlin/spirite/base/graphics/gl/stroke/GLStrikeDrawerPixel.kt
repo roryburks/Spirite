@@ -3,6 +3,8 @@ package spirite.base.graphics.gl.stroke
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.gl.*
+import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
+import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
 import spirite.base.graphics.using
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.IStrokeDrawer
@@ -33,6 +35,8 @@ class GLStrikeDrawerPixel(gle: GLEngine)
     override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
         drawStroke( gle, image, drawPoints, glParams)
     }
+
+    override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod  = DEFAULT
 
     companion object {
         fun drawPoint( gle: GLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
