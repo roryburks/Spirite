@@ -2,7 +2,6 @@ package spirite.base.imageData
 
 import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
-import spirite.base.brains.IObservable
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
@@ -15,6 +14,7 @@ import spirite.base.imageData.mediums.Compositor
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
+import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.selection.SelectionEngine
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.UndoEngine
@@ -59,6 +59,7 @@ interface IImageWorkspace {
     fun arrangeActiveDataForNode( node: LayerNode) : ArrangedMediumData
 
     val activeDrawer : IImageDrawer
+    val anchorDrawer: IImageDrawer
     fun getDrawerForNode( node: Node) : IImageDrawer
 
     val imageObservatory: IImageObservatory
@@ -118,14 +119,23 @@ class ImageWorkspace(
         return layerData.copy(tMediumToWorkspace =  node.tNodeToContext * layerData.tMediumToWorkspace)
     }
 
-    override val activeDrawer: IImageDrawer get() =
-        (currentNode as? LayerNode)?.let { it.layer.getDrawer(arrangeActiveDataForNode(it)) } ?: NillImageDrawer
+    override val activeDrawer: IImageDrawer get() {
+        selectionEngine.liftedData?.also { return it.getImageDrawer(this) }
+        (currentNode as? LayerNode)?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
+        return NillImageDrawer
+    }
+    override val anchorDrawer: IImageDrawer get() {
+        (currentNode as? LayerNode)?.also { return it.layer.getDrawer(arrangeActiveDataForNode(it)) }
+        return NillImageDrawer
+    }
 
     override fun getDrawerForNode(node: Node) = when( node) {
             is LayerNode -> node.layer.getDrawer(arrangeActiveDataForNode(node))
             else -> NillImageDrawer
     }
 
+
+    // Add internal component-to-component event triggers
     init {
         groupTree.selectedNodeBind.addListener { new, old ->
             activeMediumBind.field = (new as? LayerNode)?.run { layer.activeData.handle }
@@ -141,4 +151,8 @@ class ImageWorkspace(
             imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), SinglyList(node), this@ImageWorkspace))
         }
     }.apply { groupTree.treeObs.addObserver(this)}
+
+    private val selectionListener : (SelectionChangeEvent)->Unit = { it : SelectionChangeEvent ->
+        imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
+    }.also { obs -> selectionEngine.selectionChangeObserver.addObserver(obs) }
 }

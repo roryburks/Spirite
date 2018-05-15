@@ -8,6 +8,7 @@ import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.IAnchorLiftModule
 import spirite.base.imageData.drawer.IImageDrawer.ILiftSelectionModule
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
+import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
@@ -16,12 +17,13 @@ import spirite.base.util.linear.Transform
 import spirite.hybrid.Hybrid
 
 interface ISelectionEngine {
-    val selectionChangeObserver: IObservable<()->Any?>
+    val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
     val selection : Selection?
     val selectionTransform: Transform?
     fun setSelection(newSelection: Selection?)
     fun mergeSelection(newSelection: Selection, mode: BuildMode)
     fun transformSelection( transform: Transform, liftIfEmpty: Boolean = false)
+    fun bakeTranslationIntoLifted()
 
     val liftedData: ILiftedData?
     fun anchorLifted()
@@ -31,8 +33,11 @@ interface ISelectionEngine {
     fun imageToSelection( image: IImage, transform: Transform?)
 
     var proposingTransform: Transform?
-    fun applyProposingTranform()
+    fun applyProposingTransform()
 
+    class SelectionChangeEvent(
+            val isLiftedChange: Boolean = false
+    )
 
     enum class BuildMode {
         DEFAULT, ADD, SUBTRACT, INTERSECTION
@@ -96,13 +101,13 @@ class SelectionEngine(
         override fun performAction() {
             selectionMask = newSelection?.mask
             selectionTransform = newSelection?.transform
-            selectionChangeObserver.trigger { it() }
+            selectionChangeObserver.trigger { it(SelectionChangeEvent()) }
         }
 
         override fun undoAction() {
             selectionMask = oldSelection?.mask
             selectionTransform = oldSelection?.transform
-            selectionChangeObserver.trigger { it() }
+            selectionChangeObserver.trigger { it(SelectionChangeEvent()) }
         }
     }
 
@@ -153,6 +158,10 @@ class SelectionEngine(
         }
 
     }
+
+    override fun bakeTranslationIntoLifted() {
+
+    }
     // endregion
 
     override var liftedData: ILiftedData? = null
@@ -201,12 +210,12 @@ class SelectionEngine(
 
         override fun performAction() {
             liftedData = new
-            selectionChangeObserver.trigger { it() }
+            selectionChangeObserver.trigger { it(SelectionChangeEvent(true)) }
         }
 
         override fun undoAction() {
             liftedData = old
-            selectionChangeObserver.trigger { it() }
+            selectionChangeObserver.trigger { it(SelectionChangeEvent(true)) }
         }
     }
 
@@ -216,12 +225,12 @@ class SelectionEngine(
 
     override var proposingTransform: Transform? = null
 
-    override fun applyProposingTranform() {
+    override fun applyProposingTransform() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 
 
-    override val selectionChangeObserver = Observable<()->Any?>()
+    override val selectionChangeObserver = Observable<(SelectionChangeEvent)->Any?>()
 
 }

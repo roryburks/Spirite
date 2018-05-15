@@ -26,12 +26,10 @@ fun IUndoEngine.performMaskedImageAction(description: String, arranged: Arranged
 }
 
 interface IImageDrawer {
-
-//    abstract class MaskedImageAction protected constructor(data: ArrangedMediumData, protected val mask: Selection) : ImageAction(data)
-
-    // Modules, an Image Drawer may implement these or they may not.  Not implementing them means
+    // Modules: an Image Drawer may implement these or they may not.  Not implementing them means
     //	that the Drawer is incapable of performing these draw actions (e.g. because it doesn't
     //	make sense for the data type).
+
     interface IStrokeModule {
         // EG: some Drawers might be able to erase, but not draw
         fun canDoStroke(method: StrokeParams.Method): Boolean
@@ -47,11 +45,11 @@ interface IImageDrawer {
     interface IFillModule {
         fun fill(x: Int, y: Int, color: Color): Boolean
     }
-//
-//    interface IFlipModule {
-//        fun flip(horizontal: Boolean)
-//    }
-//
+
+    interface IFlipModule {
+        fun flip(horizontal: Boolean)
+    }
+
     interface IColorChangeModule {
         fun changeColor(from: Color, to: Color, mode: ColorChangeMode)
     }
@@ -59,11 +57,11 @@ interface IImageDrawer {
     interface IInvertModule {
         fun invert()
     }
-//
-//    interface ITransformModule {
-//        fun transform(trans: Transform)
-//    }
-//
+
+    interface ITransformModule {
+        fun transform(trans: Transform)
+    }
+
 //    interface IWeightEraserModule {
 //        fun startWeightErase(precise: Boolean)
 //        fun endWeightErase()

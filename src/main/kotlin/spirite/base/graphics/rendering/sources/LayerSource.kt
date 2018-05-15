@@ -13,6 +13,7 @@ data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace
     override val defaultHeight: Int get() = layer.height
     override val imageDependencies: Collection<MediumHandle> get() = layer.imageDependencies
     override val nodeDependencies: Collection<Node> get() = emptySet()
+    override val rendersLifted: Boolean get() = false
 
     override fun render(settings: RenderSettings, gc: GraphicsContext) {
         gc.pushState()

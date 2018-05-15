@@ -14,6 +14,7 @@ data class GroupNodeSource( val group: GroupNode, override val workspace: IImage
     override val defaultHeight: Int get() = workspace.width
     override val imageDependencies: Collection<MediumHandle> get() = group.imageDependencies
     override val nodeDependencies: Collection<Node> get() = SinglyList(group) + group.getAllAncestors()
+    override val rendersLifted: Boolean get() = true
 
     override fun render(settings: RenderSettings, gc: GraphicsContext) {
         NodeRenderer( group, workspace, settings).render(gc)

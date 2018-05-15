@@ -21,6 +21,7 @@ interface RenderSource {
     val defaultHeight: Int
     val imageDependencies: Collection<MediumHandle>
     val nodeDependencies: Collection<Node>
+    val rendersLifted: Boolean
 
     fun render( settings: RenderSettings, gc: GraphicsContext)
 }

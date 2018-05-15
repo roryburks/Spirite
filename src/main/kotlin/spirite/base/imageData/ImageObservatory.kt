@@ -10,7 +10,8 @@ interface IImageObservatory {
     class ImageChangeEvent(
             val handlesChanged: Collection<MediumHandle>,
             val nodesChanged: Collection<Node>,
-            val workspace: IImageWorkspace) {}
+            val workspace: IImageWorkspace,
+            val liftedChange: Boolean = false) {}
 
     interface ImageObserver {
         fun imageChanged( evt: ImageChangeEvent)

@@ -98,6 +98,7 @@ class RenderEngine(
             val target = entry.key
             val remove = when {
                 evt.workspace != target.renderSource.workspace -> false
+                target.renderSource.rendersLifted && evt.liftedChange -> true
                 target.renderSource.imageDependencies.any {  evt.handlesChanged.contains(it) } -> true
                 target.renderSource.nodeDependencies.any {  evt.nodesChanged.contains(it) } -> true
                 else -> false

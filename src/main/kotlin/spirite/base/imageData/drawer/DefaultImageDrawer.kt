@@ -20,7 +20,6 @@ import spirite.base.util.Color
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 
 class DefaultImageDrawer(
@@ -32,7 +31,8 @@ class DefaultImageDrawer(
         ILiftSelectionModule,
         IAnchorLiftModule,
         IColorChangeModule,
-        IFillModule
+        IFillModule,
+        ITransformModule
 {
 
     val workspace : IImageWorkspace get() = arranged.handle.workspace
@@ -101,7 +101,7 @@ class DefaultImageDrawer(
 
     // region ISelectionModule
     override fun clear() {
-        workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Clear", arranged, mask, { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.graphics.clear() }
                 else -> built.rawAccessComposite { mask.doMasked(it, built.tWorkspaceToComposite) { it.graphics.clear() } }
@@ -152,7 +152,7 @@ class DefaultImageDrawer(
 
     // endregion
 
-    // region IColorChangeModuke
+    // region IColorChangeModule
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
@@ -167,6 +167,7 @@ class DefaultImageDrawer(
 
     // endregion
 
+    // region IFillModule
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
             when( mask) {
@@ -175,9 +176,8 @@ class DefaultImageDrawer(
                     it.drawer.fill(p.x.floor, p.y.floor, color)
                 }
                 else -> built.rawAccessComposite {
-                    mask.doMaskedRequiringTransform(it, built.tWorkspaceToComposite) { it, tImageToFloating ->
+                    mask.doMaskedRequiringTransform(it, built.tWorkspaceToComposite, color) { it, tImageToFloating ->
                         val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2(x.f,y.f)))
-
                         it.drawer.fill(p.x.floor,p.y.floor, color)
 
                     }
@@ -186,4 +186,19 @@ class DefaultImageDrawer(
         })
         return true
     }
+    // endregion
+
+    // region ITransformModule
+    override fun transform(trans: Transform) {
+        val selectionEngine = workspace.selectionEngine
+        val liftedData = selectionEngine.liftedData
+        val selection = selectionEngine.selection
+
+        when {
+            liftedData != null -> {
+                //selectionEngine.transformSelection()
+            }
+        }
+    }
+    //endregion
 }
