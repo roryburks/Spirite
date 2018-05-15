@@ -78,9 +78,6 @@ class ImageContext(
         for( index in (pointer-met+1)..pointer) {
             actions[index].performImageAction(actions[index].arranged.built)
         }
-
-        // Construct ImageChangeEvent and send it
-        // TODO
     }
 
     override fun redo() {
@@ -93,9 +90,6 @@ class ImageContext(
         if(actions[pointer] is KeyframeAction)
             met = 0
         actions[pointer].performAction()
-
-        // Construct ImageChangeEvent and send it
-        // TODO
     }
 
     override fun clipHead() {
@@ -124,8 +118,7 @@ class ImageContext(
         actions.forEach { it.onDispatch() }
     }
 
-    override fun getImageDependencies(): Set<MediumHandle> {return SinglySet(medium)
-    }
+    override fun getImageDependencies(): Set<MediumHandle> = SinglySet(medium)
 
     // region Iteration
     private var iterMet = 0

@@ -48,7 +48,7 @@ void main()
 		checkCol /= texCol.a;
 	
 	int _mode = u_optionMask & 3;
-	
+
 	if( _mode == 2 ||
 		(distance(u_fromColor.r , checkCol.r) < thresh &&
 		distance(u_fromColor.g , checkCol.g) < thresh &&

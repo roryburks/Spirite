@@ -4,11 +4,12 @@ import spirite.base.graphics.gl.*
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
 
-private val root = "shaders/330"
 
 class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLShaderLoader {
+    private val root = "shaders/330"
+    private val GLOBAL = "#GLOBAL"
+
     val globalFrag : String by lazy { scriptService.loadScript("${root}/global.frag") }
-    val GLOBAL = "#GLOBAL"
 
     override fun initShaderPrograms(): Array<IGLProgram> {
 
