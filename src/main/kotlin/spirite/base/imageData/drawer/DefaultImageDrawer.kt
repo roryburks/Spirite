@@ -2,6 +2,7 @@ package spirite.base.imageData.drawer
 
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
+import spirite.base.graphics.GraphicsContext.Composite.SRC
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
@@ -19,8 +20,10 @@ import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
 import spirite.base.util.f
 import spirite.base.util.floor
+import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
+import spirite.hybrid.Hybrid
 
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)
@@ -32,7 +35,8 @@ class DefaultImageDrawer(
         IAnchorLiftModule,
         IColorChangeModule,
         IFillModule,
-        ITransformModule
+        ITransformModule,
+        IFlipModule
 {
 
     val workspace : IImageWorkspace get() = arranged.handle.workspace
@@ -190,15 +194,46 @@ class DefaultImageDrawer(
 
     // region ITransformModule
     override fun transform(trans: Transform) {
-        val selectionEngine = workspace.selectionEngine
-        val liftedData = selectionEngine.liftedData
-        val selection = selectionEngine.selection
+        val mask = mask
+        if( mask == null) {
+            workspace.undoEngine.performAndStore(object: ImageAction(arranged) {
+                override val description: String get() = "Transform"
 
-        when {
-            liftedData != null -> {
-                //selectionEngine.transformSelection()
+                override fun performImageAction(built: BuiltMediumData) {
+                    built.rawAccessComposite {
+                        val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
+                        val bgc = buffer.graphics
+                        bgc.transform(trans)
+                        bgc.renderImage(it,0,0)
+
+                        val igc = it.graphics
+                        igc.composite = SRC
+                        igc.renderImage(buffer,0,0)
+                        buffer.flush()
+                    }
+                }
+            })
+        }
+        else {
+            // Note: the fact that the DefaultImageDrawer is being used rather than some LiftedDrawer means that
+            //  selectionEngine.liftedData should be null
+            workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
+                workspace.selectionEngine.transformSelection(trans, true)
+                workspace.selectionEngine.bakeTranslationIntoLifted()
             }
         }
+    }
+
+    override fun flip(horizontal: Boolean) {
+        val w = arranged.handle.width / 2f
+        val h = arranged.handle.height / 2f
+        val trans = MutableTransform.TranslationMatrix(-w, -h)
+        when( horizontal) {
+            true -> trans.preScale(-1f,1f)
+            false -> trans.preScale(1f, -1f)
+        }
+        trans.preTranslate(w,h)
+        transform(trans)
     }
     //endregion
 }

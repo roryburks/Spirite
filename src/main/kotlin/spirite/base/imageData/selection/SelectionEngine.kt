@@ -68,11 +68,11 @@ class SelectionEngine(
         val newSelection = if( newSelection?.empty == true) null else newSelection
         val liftedData = liftedData
         if( liftedData == null) {
-            workspace.undoEngine.performAndStore(ChangeSelectionAction(selection, newSelection))
+            workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
         }
         else {
             val drawer = workspace.activeDrawer
-            workspace.undoEngine.doAsAggregateAction({
+            workspace.undoEngine.doAsAggregateAction("Change Selection") {
                 val proposingTransform = proposingTransform
                 val anchorTransform = when( proposingTransform ) {
                     null -> selectionTransform
@@ -86,16 +86,15 @@ class SelectionEngine(
                     override fun undoAction() {this@SelectionEngine.liftedData = liftedData}
                 })
 
-                workspace.undoEngine.performAndStore(ChangeSelectionAction(selection, newSelection))
-            }, "Change Selection")
+                workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
+            }
         }
     }
 
-    inner class ChangeSelectionAction(
-            val oldSelection: Selection?,
-            val newSelection: Selection?)
+    inner class ChangeSelectionAction(val newSelection: Selection?)
         : NullAction()
     {
+        val oldSelection: Selection? = selection
         override val description: String get() = "Change Selection"
 
         override fun performAction() {
@@ -129,10 +128,10 @@ class SelectionEngine(
         if( !liftIfEmpty || liftedData != null || drawer !is ILiftSelectionModule)
             workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
         else {
-            workspace.undoEngine.doAsAggregateAction({
+            workspace.undoEngine.doAsAggregateAction("Transform", true){
                 liftData(drawer, selection)
                 workspace.undoEngine.performAndStore(TransformSelectionAction(transform))
-            }, "Transform", true)
+            }
         }
     }
 
@@ -160,7 +159,18 @@ class SelectionEngine(
     }
 
     override fun bakeTranslationIntoLifted() {
+        val selection = selection ?: return
+        val liftedData = liftedData ?: return
+        val selectionMask = selectionMask ?: return
 
+        val pair = liftedData.bake(selection.transform ?: return)
+
+        val newSelection = Selection(selectionMask, pair.second, false)
+
+        workspace.undoEngine.doAsAggregateAction("Bake Lifted") {
+            workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
+            workspace.undoEngine.performAndStore(ChangeLiftedDataAction(pair.first))
+        }
     }
     // endregion
 
@@ -177,10 +187,10 @@ class SelectionEngine(
     }
 
     override fun setSelectionWithLifted(newSelection: Selection, lifted: ILiftedData) {
-        workspace.undoEngine.doAsAggregateAction({
+        workspace.undoEngine.doAsAggregateAction("Set Lifted Selection"){
             setSelection(newSelection)
             workspace.undoEngine.performAndStore(ChangeLiftedDataAction(lifted))
-        }, "Set Lifted Selection")
+        }
     }
 
     override fun clearLifted() {
@@ -199,9 +209,9 @@ class SelectionEngine(
     }
 
     private fun liftData( drawer: ILiftSelectionModule, selection: Selection) {
-        workspace.undoEngine.doAsAggregateAction({
+        workspace.undoEngine.doAsAggregateAction("Lifted Data") {
             workspace.undoEngine.performAndStore(ChangeLiftedDataAction(drawer.liftSelection(selection)))
-        },"Lifted Data")
+        }
     }
 
     inner class ChangeLiftedDataAction(val new: ILiftedData?) : NullAction() {

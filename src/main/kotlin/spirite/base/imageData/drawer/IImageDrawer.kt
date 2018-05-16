@@ -11,6 +11,7 @@ import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Color
+import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 
 

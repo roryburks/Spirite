@@ -159,15 +159,15 @@ class UndoEngineTests {
         val action1 = TestNullAction()
         val action2 = TestNullAction()
         val action3 = TestNullAction()
-        engine.doAsAggregateAction({
-            engine.doAsAggregateAction({
-                engine.doAsAggregateAction({
+        engine.doAsAggregateAction("Outer"){
+            engine.doAsAggregateAction("Middle"){
+                engine.doAsAggregateAction("Inner"){
                     engine.performAndStore(action1)
-                },"Inner")
+                }
                 engine.performAndStore(action2)
-            },"Middle")
+            }
             engine.performAndStore(action3)
-        }, "Outer")
+        }
 
         val history = engine.undoHistory
         assertEquals(1, history.count())

@@ -147,11 +147,11 @@ class SpriteLayer(
 
     }
     fun movePart( fromIndex: Int, toIndex: Int) {
-        undoEngine.doAsAggregateAction({
+        undoEngine.doAsAggregateAction("Moved Sprite Part"){
             val toMove = _parts.get(fromIndex)
             removePart(_parts.get(fromIndex))
             _addPart(toMove.structure, toMove.handle, toIndex)  // TODO: I don't really like this as it doesn't preserve Part references
-        }, "Moved Sprite Part")
+        }
     }
 
     private fun _addPart( structure: SpritePartStructure, handle: MediumHandle, index: Int) {
@@ -161,7 +161,7 @@ class SpriteLayer(
             return
         }
 
-        undoEngine.doAsAggregateAction({
+        undoEngine.doAsAggregateAction("Added New Part") {
             // Note: Because of how doAsAggregateAction prevents action until it's completed,
             //	the logic in this method is counter-intuitively valid, as all of the checks
             //	are done before the new part gets added, even though it's done using
@@ -187,7 +187,7 @@ class SpriteLayer(
                 override fun getDependencies() = SinglyList(toAdd.handle)
             })
 
-        }, "Added New Part")
+        }
     }
     private fun _sort() {
         _parts.sortWith(compareBy({it.depth}, {it.id}))

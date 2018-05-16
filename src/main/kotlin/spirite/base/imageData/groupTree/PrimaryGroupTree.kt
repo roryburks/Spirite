@@ -54,7 +54,7 @@ class PrimaryGroupTree(
     }
 
     fun duplicateNode( node: Node)  {
-        workspace.undoEngine.doAsAggregateAction({
+        workspace.undoEngine.doAsAggregateAction("Duplicate Node"){
             when( node) {
                 is LayerNode ->
                     LayerNode(null, getNonDuplicateName(node.name), node.layer.dupe(mediumRepo))
@@ -79,8 +79,7 @@ class PrimaryGroupTree(
                     }
                 }
             }
-        }, "Duplicate Node")
-
+        }
     }
 
 

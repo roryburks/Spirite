@@ -2,6 +2,7 @@ package spirite.base.pen
 
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
+import spirite.base.brains.toolset.FlipMode.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
@@ -167,6 +168,12 @@ class Penner(
                     is ColorChanger ->
                         if( drawer is IColorChangeModule) drawer.changeColor( color, offColor, toolsetManager.toolset.ColorChanger.mode)
                         else Hybrid.beep()
+                    is Flip -> when {
+                        drawer !is IFlipModule -> Hybrid.beep()
+                        tool.flipMode == HORIZONTAL -> drawer.flip(true)
+                        tool.flipMode == VERTICAL -> drawer.flip(false)
+                        tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
+                    }
                 }
 
             }

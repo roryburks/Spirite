@@ -26,7 +26,7 @@ interface IUndoEngine {
     val undoHistory: List<UndoIndex>
 
     fun performAndStore( action: UndoableAction)
-    fun doAsAggregateAction( runner: () -> Unit, description: String, stackable: Boolean = false)
+    fun doAsAggregateAction( description: String, stackable: Boolean = false, runner: () -> Unit)
 
     fun undo() : Boolean
     fun redo() : Boolean
@@ -172,7 +172,7 @@ class UndoEngine(
     private val storeStack = mutableListOf<MutableList<UndoableAction>>()
     private var activeStoreState : MutableList<UndoableAction>? = null
 
-    override fun doAsAggregateAction(runner: () -> Unit, description: String, stackable: Boolean) {
+    override fun doAsAggregateAction( description: String, stackable: Boolean, runner: () -> Unit) {
         val storeState = mutableListOf<UndoableAction>()
         storeStack.add( storeState)
         activeStoreState = storeState

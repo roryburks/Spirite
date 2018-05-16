@@ -1,10 +1,10 @@
 package spirite.base.imageData.drawer
 
 import spirite.base.brains.toolset.ColorChangeMode
+import spirite.base.graphics.GraphicsContext.Composite.DST_IN
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
-import spirite.base.imageData.selection.ILiftedData
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.Color
 import spirite.base.util.f
@@ -39,19 +39,32 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         return true
     }
 
-
+    // Replaces the Lifted Image with one that is (presumably) modified by the lambda
     private inline fun doToUnderlying(lambda: (RawImage)->Any?) {
         val selection = workspace.selectionEngine.selection ?: return
         val lifted = workspace.selectionEngine.liftedData as? LiftedImageData ?: return
-        val newLifted = LiftedImageData(lifted.image.deepCopy().apply { lambda.invoke(this) })
+        val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
+            lambda.invoke(this)
+            this.graphics.also { gc ->
+                gc.composite = DST_IN
+                gc.renderImage(selection.mask, 0, 0)
+            }
+        })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)
     }
 
+    // Replaces the Lifted Image with one that is (presumably) modified by the lambda
     private inline fun doToUnderlyingWithTrans(lambda: (RawImage, Transform?)->Any?) {
         val selection = workspace.selectionEngine.selection ?: return
         val lifted = workspace.selectionEngine.liftedData as? LiftedImageData ?: return
 
-        val newLifted = LiftedImageData(lifted.image.deepCopy().apply { lambda.invoke(this, selection?.transform) })
+        val newLifted = LiftedImageData(lifted.image.deepCopy().apply {
+            lambda.invoke(this, selection.transform)
+            this.graphics.also { gc ->
+                gc.composite = DST_IN
+                gc.renderImage(selection.mask, 0, 0)
+            }
+        })
         workspace.selectionEngine.setSelectionWithLifted(selection,newLifted)
     }
 }
