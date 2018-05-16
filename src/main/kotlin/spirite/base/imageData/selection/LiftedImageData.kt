@@ -9,23 +9,27 @@ import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Vec2i
 import spirite.hybrid.Hybrid
+import java.io.File
 
 class LiftedImageData(val image: IImage): ILiftedData {
     override fun draw(gc: GraphicsContext) {
         gc.renderImage(image, 0, 0)
     }
 
-    override fun bake(transform: Transform): Pair<ILiftedData, Transform> {
+    override fun bake(transform: Transform): ILiftedData {
         // Bakes the rotation and scale, spits out the translation
         val bakedArea = MathUtil.circumscribeTrans(Rect(image.width, image.height),transform)
-        val newTrans = Transform.TranslationMatrix(bakedArea.x.f, bakedArea.y.f)
         val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
         val gc = newImage.graphics
         gc.transform = transform
+        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(image, 0, 0)
+        Hybrid.imageIO.saveImage(image, File("C:/Bucket/t1.png"))
+        Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
 
-        return Pair(LiftedImageData(newImage),newTrans)
+        return LiftedImageData(newImage)
     }
 
     override fun getImageDrawer(workspace: IImageWorkspace) : IImageDrawer = LiftedImageDrawer(workspace)

@@ -18,9 +18,11 @@ import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method
 import spirite.base.util.Color
+import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.Hybrid
@@ -215,8 +217,6 @@ class DefaultImageDrawer(
             })
         }
         else {
-            // Note: the fact that the DefaultImageDrawer is being used rather than some LiftedDrawer means that
-            //  selectionEngine.liftedData should be null
             workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
                 workspace.selectionEngine.transformSelection(trans, true)
                 workspace.selectionEngine.bakeTranslationIntoLifted()
@@ -225,14 +225,22 @@ class DefaultImageDrawer(
     }
 
     override fun flip(horizontal: Boolean) {
-        val w = arranged.handle.width / 2f
-        val h = arranged.handle.height / 2f
-        val trans = MutableTransform.TranslationMatrix(-w, -h)
+        val mask = mask
+        val rect = when {
+            mask == null -> Rect(arranged.handle.width, arranged.handle.height)
+            mask.transform == null -> Rect(mask.width, mask.height)
+            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
+        }
+
+        val cx = rect.x + rect.width /2f
+        val cy = rect.y + rect.height /2f
+
+        val trans = MutableTransform.TranslationMatrix(-cx, -cy)
         when( horizontal) {
             true -> trans.preScale(-1f,1f)
             false -> trans.preScale(1f, -1f)
         }
-        trans.preTranslate(w,h)
+        trans.preTranslate(cx,cy)
         transform(trans)
     }
     //endregion

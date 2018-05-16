@@ -1,12 +1,12 @@
 package spirite.base.pen
 
+import spirite.base.brains.Bindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
 import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.drawer.IImageDrawer.*
-import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
@@ -18,6 +18,7 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.major.work.WorkSection
 import spirite.hybrid.Hybrid
+import spirite.pc.master
 
 interface IPenner {
 //    val holdingShift : Boolean
@@ -122,7 +123,7 @@ class Penner(
                 else ->         behavior = MovingReferenceBehavior(this)
             }
             else -> {
-                val tool = toolsetManager.selectedTool
+                val tool = tool
                 val color = paletteManager.getActiveColor(if( button == LEFT) 0 else 1)
                 val offColor = paletteManager.getActiveColor(if( button == LEFT) 1 else 0)
 
@@ -207,4 +208,9 @@ class Penner(
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
     override fun drawOverlay(gc: GraphicsContext) {(behavior as? DrawnPennerBehavior)?.paintOverlay(gc)}
+
+    private val toolBinding = Bindable(master.toolsetManager.selectedTool) { new, old ->
+        behavior = null
+    }.also { it.bind(master.toolsetManager.selectedToolBinding) }
+    private val tool by toolBinding
 }

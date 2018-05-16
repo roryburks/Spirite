@@ -7,8 +7,11 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.util.Color
+import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
+import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 
@@ -16,7 +19,9 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IClearModule,
         IInvertModule,
         IColorChangeModule,
-        IFillModule
+        IFillModule,
+        ITransformModule,
+        IFlipModule
 {
     override fun clear() {
         workspace.selectionEngine.clearLifted()
@@ -37,6 +42,32 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         }
 
         return true
+    }
+
+    override fun transform(trans: Transform) {
+        workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
+            workspace.selectionEngine.transformSelection(trans, true)
+            workspace.selectionEngine.bakeTranslationIntoLifted()
+        }
+    }
+
+    override fun flip(horizontal: Boolean) {
+        val mask = workspace.selectionEngine.selection ?: return
+        val rect = when {
+            mask.transform == null -> Rect(mask.width, mask.height)
+            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
+        }
+
+        val cx = rect.x + rect.width /2f
+        val cy = rect.y + rect.height /2f
+
+        val trans = MutableTransform.TranslationMatrix(-cx, -cy)
+        when( horizontal) {
+            true -> trans.preScale(-1f,1f)
+            false -> trans.preScale(1f, -1f)
+        }
+        trans.preTranslate(cx,cy)
+        transform(trans)
     }
 
     // Replaces the Lifted Image with one that is (presumably) modified by the lambda

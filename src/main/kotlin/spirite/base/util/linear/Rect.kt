@@ -1,5 +1,8 @@
 package spirite.base.util.linear
 
+import kotlin.math.max
+import kotlin.math.min
+
 data class Rect(
         var x: Int,
         var y: Int,
@@ -48,13 +51,17 @@ data class Rect(
     }
 
     infix fun union(rect: Rect?): Rect {
-        if (rect == null || rect.isEmpty) return Rect(this)
-        return if (isEmpty) Rect(rect) else Rect(
-                Math.min(x, rect.x),
-                Math.min(y, rect.y),
-                Math.max(x + width, rect.x + rect.width),
-                Math.max(y + height, rect.y + rect.height))
-
+        return when {
+            rect == null || rect.isEmpty -> Rect(this)
+            isEmpty -> Rect(rect)
+            else -> {
+                val rx1 = min(x,rect.x)
+                val ry1 = min(y,rect.y)
+                val rx2 = max(x + width, rect.x + rect.width)
+                val ry2 = max(y + height, rect.y + rect.height)
+                Rect( rx1, ry1, rx2-rx1, ry2-ry1)
+            }
+        }
     }
 
     fun union(x: Int, y: Int, w: Int, h: Int): Rect {

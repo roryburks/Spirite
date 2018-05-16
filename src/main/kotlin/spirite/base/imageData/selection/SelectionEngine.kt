@@ -12,9 +12,14 @@ import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
+import spirite.base.util.MathUtil
 import spirite.base.util.delegates.DerivedLazy
+import spirite.base.util.f
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.Hybrid
+import java.io.File
 
 interface ISelectionEngine {
     val selectionChangeObserver: IObservable<(SelectionChangeEvent)->Any?>
@@ -71,7 +76,7 @@ class SelectionEngine(
             workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
         }
         else {
-            val drawer = workspace.activeDrawer
+            val drawer = workspace.anchorDrawer
             workspace.undoEngine.doAsAggregateAction("Change Selection") {
                 val proposingTransform = proposingTransform
                 val anchorTransform = when( proposingTransform ) {
@@ -162,14 +167,23 @@ class SelectionEngine(
         val selection = selection ?: return
         val liftedData = liftedData ?: return
         val selectionMask = selectionMask ?: return
+        val transform = selection.transform ?: return
 
-        val pair = liftedData.bake(selection.transform ?: return)
+        val baked = liftedData.bake(transform)
 
-        val newSelection = Selection(selectionMask, pair.second, false)
+        val bakedArea = MathUtil.circumscribeTrans(Rect(selectionMask.width, selectionMask.height),transform)
+        val newImage = Hybrid.imageCreator.createImage(bakedArea.width, bakedArea.height)
+        val gc = newImage.graphics
+        gc.transform = transform
+        gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
+        gc.renderImage(selectionMask, 0, 0)
+        Hybrid.imageIO.saveImage(selectionMask, File("C:/Bucket/t1.png"))
+        Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
+        val newSelection = Selection(newImage, Transform.TranslationMatrix(bakedArea.x.f, bakedArea.y.f) , false)
 
         workspace.undoEngine.doAsAggregateAction("Bake Lifted") {
             workspace.undoEngine.performAndStore(ChangeSelectionAction(newSelection))
-            workspace.undoEngine.performAndStore(ChangeLiftedDataAction(pair.first))
+            workspace.undoEngine.performAndStore(ChangeLiftedDataAction(baked))
         }
     }
     // endregion
@@ -178,7 +192,7 @@ class SelectionEngine(
         private set
     override fun anchorLifted() {
         val liftedData = liftedData ?: return
-        val drawer = workspace.activeDrawer
+        val drawer = workspace.anchorDrawer
 
         if( drawer !is IAnchorLiftModule || drawer.acceptsLifted(liftedData))
             Hybrid.beep()
