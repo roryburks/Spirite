@@ -8,6 +8,7 @@ import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
 import spirite.base.util.Colors
 import spirite.base.util.MathUtil
 import spirite.base.util.f
+import spirite.gui.components.major.work.WorkSectionView
 
 class FreeformSelectionBehavior(
         penner: Penner,
@@ -39,7 +40,7 @@ class FreeformSelectionBehavior(
             builder.update(penner.x, penner.y)
     }
 
-    override fun paintOverlay(gc: GraphicsContext) {
+    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
         gc.pushTransform()
         gc.color = Colors.BLACK
         builder.drawBuilding(gc)

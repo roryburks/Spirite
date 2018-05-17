@@ -2,13 +2,14 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
-import spirite.base.imageData.drawer.IImageDrawer.IClearModule
-import spirite.base.imageData.drawer.IImageDrawer.IInvertModule
+import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.util.linear.Vec2
 import spirite.hybrid.Hybrid
 
-class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
+class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter
 {
 
     enum class DrawCommand(val string: String) : ICommand {
@@ -39,7 +40,14 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet) : ICommandExecuter
             REDO.string -> workspace.undoEngine.redo()
             QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             CROP_SELECTION.string -> TODO()
-            APPLY_TRANFORM.string -> TODO()
+            APPLY_TRANFORM.string -> {
+                val reshape = toolsetManager.toolset.Reshape
+                val transform = reshape.transform
+                (workspace.activeDrawer as? ITransformModule)?.transform( transform)
+                reshape.translation = Vec2(0f,0f)
+                reshape.scale = Vec2(1f,1f)
+                reshape.rotation = 0f
+            }
             AUTO_CROP.string -> TODO()
             LAYER_TO_IMAGE_SIZE.string -> TODO()
             INVERT.string -> (workspace.activeDrawer as? IInvertModule)?.invert() ?: Hybrid.beep()

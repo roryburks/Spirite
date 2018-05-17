@@ -129,9 +129,11 @@ class NodeRenderer(
 
             // Draw the base
             gc.preTransform( built.tMediumToComposite)
-            when( medium) {
-                is IComplexMedium -> medium.drawBehindComposite(gc)
-                else -> medium.render(gc)
+            if(compositeSource?.drawsSource != false) {
+                when (medium) {
+                    is IComplexMedium -> medium.drawBehindComposite(gc)
+                    else -> medium.render(gc)
+                }
             }
 
             gc.pushTransform()
@@ -140,7 +142,15 @@ class NodeRenderer(
             // Draw the lifted image
             if( lifted != null) {
                 gc.transform = built.tWorkspaceToComposite
-                workspace.selectionEngine.selectionTransform?.apply { gc.preTransform(this)}
+
+                val selectionTransform =  workspace.selectionEngine.selectionTransform
+                val proposingTransform =  workspace.selectionEngine.proposingTransform
+                val toTrans = when {
+                    proposingTransform == null -> selectionTransform
+                    selectionTransform == null -> proposingTransform
+                    else -> proposingTransform * selectionTransform
+                }
+                toTrans?.apply { gc.preTransform(this)}
                 lifted.draw(gc)
             }
 
@@ -153,7 +163,7 @@ class NodeRenderer(
             gc.popTransform()
 
             // Draw over the composite
-            if( medium is IComplexMedium)
+            if(compositeSource?.drawsSource != false && medium is IComplexMedium)
                 medium.drawOverComposite(gc)
 
             builtComposite = BuiltComposite(

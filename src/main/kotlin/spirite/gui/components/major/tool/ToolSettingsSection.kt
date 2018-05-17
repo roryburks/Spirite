@@ -12,7 +12,6 @@ import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
-import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 
 
@@ -36,15 +35,35 @@ fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
     }
 }
 
-class DualFloatBindind( default: Vec2) {
-    val vecBind = Bindable(default, {new,old-> x = new.x; y = new.y})
+class DualFloatBinding(default: Vec2) {
+    private var writing = false
+
+    val vecBind = Bindable(default) {new,old->
+        if( !writing) {
+            writing = true
+            x = new.x; y = new.y
+            writing = false
+        }
+    }
     var vec by vecBind
 
-    val xBind = Bindable(default.x, {new,old-> })
-    var x by xBind
+    val xBind = Bindable(default.x) {new,old->
+        if( !writing) {
+            writing = true
+            vec = Vec2(x,y)
+            writing = false
+        }
+    }
+    var x : Float by xBind
 
-    val yBind = Bindable(default.x)
-    var y by yBind
+    val yBind = Bindable(default.x) {new,old->
+        if( !writing) {
+            writing = true
+            vec = Vec2(x,y)
+            writing = false
+        }
+    }
+    var y : Float by yBind
 }
 
 fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
@@ -95,15 +114,15 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         }
     }
     is DualFloatBoxProperty -> Hybrid.ui.CrossPanel{
-        val bind = DualFloatBindind(toolProperty.value)
+        val bind = DualFloatBinding(toolProperty.value)
         bind.vecBind.bindWeakly(toolProperty.valueBind)
 
         rows.add(Hybrid.ui.Label(toolProperty.hrName + ": "))
         rows += {
             add(Hybrid.ui.Label(toolProperty.label1))
-            add(Hybrid.ui.FloatField().apply { valueBind.bind(bind.xBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().apply { valueBind.bindWeakly(bind.xBind) }, height = 24, flex = 50f)
             add(Hybrid.ui.Label(toolProperty.label2))
-            add(Hybrid.ui.FloatField().apply { valueBind.bind(bind.yBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().apply { valueBind.bindWeakly(bind.yBind) }, height = 24, flex = 50f)
         }
     }
 

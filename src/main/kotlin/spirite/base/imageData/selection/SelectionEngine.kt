@@ -2,6 +2,7 @@ package spirite.base.imageData.selection
 
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
+import spirite.base.brains.toolset.Reshaper
 import spirite.base.graphics.IImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer
@@ -19,6 +20,7 @@ import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Transform.Companion
 import spirite.hybrid.Hybrid
+import spirite.pc.master
 import java.io.File
 
 interface ISelectionEngine {
@@ -248,13 +250,21 @@ class SelectionEngine(
     }
 
     override var proposingTransform: Transform? = null
+        set(value) {
+            field = value
+            selectionDerived.reset()
+            selectionChangeObserver.trigger { it(SelectionChangeEvent(true)) }
+        }
 
     override fun applyProposingTransform() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Note: As of now it will bake any exisiting selection transform in addition to the proposing transform
+        selectionMask ?: return
+        val proposingTransform = proposingTransform ?: return
+        val selectionTransform = selectionTransform
+        val newTransform = if( selectionTransform == null) proposingTransform else proposingTransform * selectionTransform
+        this.selectionTransform = newTransform
+        bakeTranslationIntoLifted()
     }
 
-
-
     override val selectionChangeObserver = Observable<(SelectionChangeEvent)->Any?>()
-
 }

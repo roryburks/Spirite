@@ -127,7 +127,7 @@ class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : Sw
         IFloatField, IFloatFieldNonUI by FloatFieldNonUI(min, max)
 {
     override fun isOob(str: String): Boolean {
-        val num = str.toIntOrNull(10) ?: 0
+        val num = str.toFloatOrNull() ?: 0f
         return num < min || num > max
     }
 

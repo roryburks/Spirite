@@ -192,6 +192,7 @@ val Int.d get() = this.toDouble()
 val Float.floor get() = kotlin.math.floor(this).toInt()
 val Float.round get() = this.roundToInt()
 val Float.ceil get() = kotlin.math.ceil(this).toInt()
+val Float.d get() = this.toDouble()
 
 val Double.f get() = this.toFloat()
 val Double.floor get() = kotlin.math.floor(this).toInt()

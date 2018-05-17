@@ -10,6 +10,7 @@ import spirite.base.pen.selectionBuilders.OvalSelectionBuilder
 import spirite.base.pen.selectionBuilders.RectSelectionBuilder
 import spirite.base.pen.selectionBuilders.SelectionBuilder
 import spirite.base.util.Colors
+import spirite.gui.components.major.work.WorkSectionView
 
 
 class FormingSelectionBehavior(
@@ -38,7 +39,7 @@ class FormingSelectionBehavior(
         super.onPenUp()
     }
 
-    override fun paintOverlay(gc: GraphicsContext) {
+    override fun paintOverlay(gc: GraphicsContext, view: WorkSectionView) {
         gc.pushTransform()
         gc.color = Colors.BLACK
         builder.drawBuilding(gc)

@@ -1,4 +1,4 @@
-package spirite.base.graphics.shapes
+package spirite.base.util.shapes
 
 import com.hackoeur.jglm.support.FastMath
 import spirite.base.graphics.gl.GLPrimitive

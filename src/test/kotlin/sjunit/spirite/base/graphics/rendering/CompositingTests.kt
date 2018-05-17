@@ -44,9 +44,9 @@ class CompositingTests {
 
         val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
         workspace.compositor.compositeSource = CompositeSource(
-                ArrangedMediumData(mediumHandle, tMediumToWS),
+                ArrangedMediumData(mediumHandle, tMediumToWS))
                 {it.color = Colors.RED
-                    it.fillRect( 10,10, 20, 20)})
+                    it.fillRect( 10,10, 20, 20)}
 
 
         val wsImage = Hybrid.imageCreator.createImage(100,100)
@@ -87,9 +87,9 @@ class CompositingTests {
 
         val tMediumToWS = MutableTransform.TranslationMatrix(10f,10f)
         workspace.compositor.compositeSource = CompositeSource(
-                ArrangedMediumData(mediumHandle, tMediumToWS),
+                ArrangedMediumData(mediumHandle, tMediumToWS))
                 {it.color = Colors.RED
-                    it.fillRect( 40,40, 10, 10)})
+                    it.fillRect( 40,40, 10, 10)}
 
 
         val wsImage = Hybrid.imageCreator.createImage(100,100)

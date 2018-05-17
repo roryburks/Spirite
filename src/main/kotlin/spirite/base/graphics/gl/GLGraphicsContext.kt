@@ -5,8 +5,8 @@ import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
-import spirite.base.graphics.shapes.IShape
-import spirite.base.graphics.shapes.Oval
+import spirite.base.util.shapes.IShape
+import spirite.base.util.shapes.Oval
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.f
@@ -153,7 +153,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun drawOval(x: Int, y: Int, w: Int, h: Int) {
-        draw( Oval(x + w/2.0f, y + h/2.0f, w/2.0f, h/2.0f))
+        draw(Oval(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
     }
 
     override fun drawPolyLine(x: IntArray, y: IntArray, count: Int) {
@@ -193,7 +193,7 @@ class GLGraphicsContext : GraphicsContext {
     }
 
     override fun fillOval(x: Int, y: Int, w: Int, h: Int) {
-        fill( Oval(x + w/2.0f, y + h/2.0f, w/2.0f, h/2.0f))
+        fill(Oval(x + w / 2.0f, y + h / 2.0f, w / 2.0f, h / 2.0f))
     }
 
     override fun fill(shape: IShape) {

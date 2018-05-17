@@ -19,7 +19,7 @@ class CentralCommandExecutor(
 {
     val commandExecuters : List<ICommandExecuter> = listOf(
             NodeContextCommand(workspaceSet, dialog),
-            DrawCommandExecutor(workspaceSet),
+            DrawCommandExecutor(workspaceSet, master.toolsetManager),
             GlobalCommandExecuter(master),
             WorkspaceCommandExecuter(master),
             ToolsetCommandExecuter(master.toolsetManager),

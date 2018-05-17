@@ -1,6 +1,6 @@
 package spirite.base.graphics
 
-import spirite.base.graphics.shapes.IShape
+import spirite.base.util.shapes.IShape
 import spirite.base.util.Color
 import spirite.base.util.linear.Transform
 import java.util.*

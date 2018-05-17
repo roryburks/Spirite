@@ -55,7 +55,7 @@ abstract class WorkArea(
             }
 
             if( context.penner.drawsOverlay)
-                context.penner.drawOverlay(gc)
+                context.penner.drawOverlay(gc, view)
         }
     }
 

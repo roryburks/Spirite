@@ -2,6 +2,7 @@ package spirite.base.pen.behaviors
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.pen.Penner
+import spirite.gui.components.major.work.WorkSectionView
 
 
 // By design, PennerBehaviors has and should make use of all variables local to penner
@@ -31,5 +32,5 @@ abstract class DrawnPennerBehavior(penner: Penner) : PennerBehavior(penner) {
         this.penner.context.redraw()
     }
 
-    abstract fun paintOverlay(gc: GraphicsContext)
+    abstract fun paintOverlay(gc: GraphicsContext, view: WorkSectionView)
 }

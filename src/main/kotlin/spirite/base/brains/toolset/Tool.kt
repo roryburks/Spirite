@@ -3,6 +3,8 @@ package spirite.base.brains.toolset
 import spirite.base.brains.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
+import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import kotlin.reflect.KProperty
 
@@ -26,8 +28,7 @@ abstract class Tool(
         }
 
         inner class ToolPropDelegate<T> internal constructor(val toolProperty: ToolProperty<T>) {
-            operator fun getValue(thisRef: Any, prop: KProperty<*>) = toolProperty.value
-            operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {toolProperty.value = value}
+            operator fun getValue(thisRef: Any, prop: KProperty<*>) = toolProperty.valueBind
         }
     }
 }
@@ -61,19 +62,26 @@ class Pen( toolset: Toolset) : Tool(toolset){
     override val iconY = 0
     override val description = "Pen"
 
-    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
-    var width by scheme.Property(SizeProperty("Width", 5.0f))
-    var hard by scheme.Property(CheckBoxProperty("Hard Edged",false))
-    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
+    val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var alpha by alphaBind
+    val widthBind by scheme.Property(SizeProperty("Width", 5.0f))
+    var width by widthBind
+    val hardBind by scheme.Property(CheckBoxProperty("Hard Edged",false))
+    var hard by hardBind
+    val modeBind  by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
+    var mode by modeBind
 }
 class Eraser( toolset: Toolset) : Tool(toolset){
     override val iconX = 1
     override val iconY = 0
     override val description = "Eraser"
 
-    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
-    var width by scheme.Property(SizeProperty("Width", 5.0f))
-    var hard by scheme.Property(CheckBoxProperty("Hard Edged",false))
+    val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var alpha by alphaBind
+    val widthBind by scheme.Property(SizeProperty("Width", 5.0f))
+    var width by widthBind
+    val hardBind by scheme.Property(CheckBoxProperty("Hard Edged",false))
+    var hard by hardBind
 }
 class Fill( toolset: Toolset) : Tool(toolset){
     override val iconX = 2
@@ -92,7 +100,8 @@ class ShapeSelection( toolset: Toolset) : Tool(toolset){
     override val iconY = 0
     override val description = "Shape Selection"
 
-    var shape by scheme.Property(DropDownProperty("Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.values()))
+    val shapeBind by scheme.Property(DropDownProperty("Shape", BoxSelectionShape.RECTANGLE, BoxSelectionShape.values()))
+    var shape by shapeBind
 }
 class FreeSelection( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
@@ -109,17 +118,22 @@ class Pixel( toolset: Toolset) : Tool(toolset){
     override val iconY = 1
     override val description = "Pixel"
 
-    var alpha by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
-    var mode by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
+    val alphaBind by scheme.Property(SliderProperty( "Opacity", 1.0f, 0f, 1f ))
+    var alpha by alphaBind
+    val modeBind by scheme.Property(DropDownProperty("Draw Mode", PenDrawMode.NORMAL, PenDrawMode.values()))
+    var mode by modeBind
 }
 class Crop( toolset: Toolset) : Tool(toolset){
     override val iconX = 3
     override val iconY = 1
     override val description = "Cropper"
 
-    var button by scheme.Property(ButtonProperty("Crop Selection", DrawCommand.CROP_SELECTION))
-    var quickCrop by scheme.Property(CheckBoxProperty("Crop on Finish", false))
-    var shrinkOnly by scheme.Property(CheckBoxProperty("Shrink-only Crop", false))
+    val buttonBind by scheme.Property(ButtonProperty("Crop Selection", DrawCommand.CROP_SELECTION))
+    var button by buttonBind
+    val quickCropBind by scheme.Property(CheckBoxProperty("Crop on Finish", false))
+    var quickCrop by quickCropBind
+    val shrinkOnlyBind by scheme.Property(CheckBoxProperty("Shrink-only Crop", false))
+    var shrinkOnly by shrinkOnlyBind
 }
 class Rigger( toolset: Toolset) : Tool(toolset){
     override val iconX = 0
@@ -139,17 +153,32 @@ class Flip( toolset: Toolset) : Tool(toolset){
     override val iconY = 2
     override val description = "Flipper"
 
-    var flipMode by scheme.Property(RadioButtonProperty("Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.values()))
+    val flipModeBind by scheme.Property(RadioButtonProperty("Flip Mode", FlipMode.BY_MOVEMENT, FlipMode.values()))
+    var flipMode by flipModeBind
 }
 class Reshaper(toolset: Toolset) : Tool(toolset){
     override val iconX = 2
     override val iconY = 2
     override val description = "Reshaper"
 
-    var applyTransform by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
-    var scale : Vec2 by scheme.Property(DualFloatBoxProperty("Scale", "x","y", Vec2(1f,1f)))
-    var translation : Vec2 by scheme.Property(DualFloatBoxProperty("Translation", "x","y", Vec2(1f,1f)))
-    var rotation by scheme.Property(FloatBoxProperty("Rotation", 0f))
+    val transform : MutableTransform get() {
+        val t = MutableTransform.RotationMatrix(rotation)
+
+        println(scale.x)
+        t.preScale(scale.x, scale.y)
+        t.preTranslate(translation.x, translation.y)
+        return t
+
+    }
+
+    val applyTransformBind by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))
+    var applyTransform by applyTransformBind
+    val scaleBind by scheme.Property(DualFloatBoxProperty("Scale", "x","y", Vec2(1f,1f)))
+    var scale by scaleBind
+    val translationBind by scheme.Property(DualFloatBoxProperty("Translation", "x","y", Vec2(0f,0f)))
+    var translation by translationBind
+    val rotationBind by scheme.Property(FloatBoxProperty("Rotation", 0f))
+    var rotation by rotationBind
 
 }
 
@@ -172,8 +201,10 @@ class ColorChanger( toolset: Toolset) : Tool(toolset){
     override val iconY = 2
     override val description = "Color Changer"
 
-    var scope by scheme.Property(DropDownProperty("Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.values()))
-    var mode by scheme.Property(RadioButtonProperty("Apply Mode", ColorChangeMode.CHECK_ALL, ColorChangeMode.values()))
+    val scopeBind by scheme.Property(DropDownProperty("Scope", ColorChangeScopes.LOCAL, ColorChangeScopes.values()))
+    var scope by scopeBind
+    val modeBind by scheme.Property(RadioButtonProperty("Apply Mode", ColorChangeMode.CHECK_ALL, ColorChangeMode.values()))
+    var mode by modeBind
 }
 class ColorPicker( toolset: Toolset) : Tool(toolset){
     override val iconX = 0

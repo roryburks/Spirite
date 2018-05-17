@@ -1,4 +1,4 @@
-package spirite.base.graphics.shapes
+package spirite.base.util.shapes
 
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor

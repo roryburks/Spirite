@@ -20,8 +20,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         IInvertModule,
         IColorChangeModule,
         IFillModule,
-        ITransformModule,
-        IFlipModule
+        ITransformModule
 {
     override fun clear() {
         workspace.selectionEngine.clearLifted()
@@ -45,13 +44,6 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     }
 
     override fun transform(trans: Transform) {
-        workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
-            workspace.selectionEngine.transformSelection(trans, true)
-            workspace.selectionEngine.bakeTranslationIntoLifted()
-        }
-    }
-
-    override fun flip(horizontal: Boolean) {
         val mask = workspace.selectionEngine.selection ?: return
         val rect = when {
             mask.transform == null -> Rect(mask.width, mask.height)
@@ -61,13 +53,12 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
         val cx = rect.x + rect.width /2f
         val cy = rect.y + rect.height /2f
 
-        val trans = MutableTransform.TranslationMatrix(-cx, -cy)
-        when( horizontal) {
-            true -> trans.preScale(-1f,1f)
-            false -> trans.preScale(1f, -1f)
+        val effectiveTrans = Transform.TranslationMatrix(cx,cy) * trans * Transform.TranslationMatrix(-cx,-cy)
+
+        workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
+            workspace.selectionEngine.transformSelection(effectiveTrans, true)
+            workspace.selectionEngine.bakeTranslationIntoLifted()
         }
-        trans.preTranslate(cx,cy)
-        transform(trans)
     }
 
     // Replaces the Lifted Image with one that is (presumably) modified by the lambda

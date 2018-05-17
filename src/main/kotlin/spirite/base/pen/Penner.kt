@@ -17,6 +17,7 @@ import spirite.base.util.linear.Vec2
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.major.work.WorkSection
+import spirite.gui.components.major.work.WorkSectionView
 import spirite.hybrid.Hybrid
 import spirite.pc.master
 
@@ -35,7 +36,7 @@ interface IPenner {
     fun rawUpdatePressure(pressure: Float)
 
     val drawsOverlay : Boolean
-    fun drawOverlay(gc: GraphicsContext)
+    fun drawOverlay(gc: GraphicsContext, view: WorkSectionView)
 
 }
 
@@ -175,6 +176,10 @@ class Penner(
                         tool.flipMode == VERTICAL -> drawer.flip(false)
                         tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
                     }
+                    is Reshaper -> {
+                        if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
+                        else Hybrid.beep()
+                    }
                 }
 
             }
@@ -207,7 +212,9 @@ class Penner(
     }
 
     override val drawsOverlay: Boolean get() = behavior is DrawnPennerBehavior
-    override fun drawOverlay(gc: GraphicsContext) {(behavior as? DrawnPennerBehavior)?.paintOverlay(gc)}
+    override fun drawOverlay(gc: GraphicsContext, view: WorkSectionView) {
+        (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
+    }
 
     private val toolBinding = Bindable(master.toolsetManager.selectedTool) { new, old ->
         behavior = null

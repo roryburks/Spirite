@@ -48,7 +48,18 @@ interface IImageDrawer {
     }
 
     interface IFlipModule {
+        // Note: Theoretically, a Drawer could implement Flipping without having to implement full matrix transformation
         fun flip(horizontal: Boolean)
+    }
+    interface ITransformModule : IFlipModule {
+        fun transform(trans: Transform)
+
+        override fun flip(horizontal: Boolean) {
+            transform(when( horizontal) {
+                true -> Transform.ScaleMatrix(-1f,1f)
+                false -> Transform.ScaleMatrix(1f, -1f)
+            })
+        }
     }
 
     interface IColorChangeModule {
@@ -59,9 +70,6 @@ interface IImageDrawer {
         fun invert()
     }
 
-    interface ITransformModule {
-        fun transform(trans: Transform)
-    }
 
 //    interface IWeightEraserModule {
 //        fun startWeightErase(precise: Boolean)

@@ -37,8 +37,7 @@ class DefaultImageDrawer(
         IAnchorLiftModule,
         IColorChangeModule,
         IFillModule,
-        ITransformModule,
-        IFlipModule
+        ITransformModule
 {
 
     val workspace : IImageWorkspace get() = arranged.handle.workspace
@@ -53,9 +52,7 @@ class DefaultImageDrawer(
         val strokeDrawer = workspace.strokeProvider.getStrokeDrawer(params)
         strokeBuilder = StrokeBuilder(strokeDrawer, params, arranged)
 
-        workspace.compositor.compositeSource = CompositeSource(
-                arranged,
-                {strokeDrawer.draw(it)})
+        workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
 
         if(strokeBuilder!!.start(ps))
             arranged.handle.refresh()
@@ -197,6 +194,18 @@ class DefaultImageDrawer(
     // region ITransformModule
     override fun transform(trans: Transform) {
         val mask = mask
+
+        val rect = when {
+            mask == null -> Rect(arranged.handle.width, arranged.handle.height)
+            mask.transform == null -> Rect(mask.width, mask.height)
+            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
+        }
+
+        val cx = rect.x + rect.width /2f
+        val cy = rect.y + rect.height /2f
+
+        val effectiveTrans = Transform.TranslationMatrix(cx,cy) * trans * Transform.TranslationMatrix(-cx,-cy)
+
         if( mask == null) {
             workspace.undoEngine.performAndStore(object: ImageAction(arranged) {
                 override val description: String get() = "Transform"
@@ -205,7 +214,7 @@ class DefaultImageDrawer(
                     built.rawAccessComposite {
                         val buffer = Hybrid.imageCreator.createImage(it.width, it.height)
                         val bgc = buffer.graphics
-                        bgc.transform(trans)
+                        bgc.transform(effectiveTrans)
                         bgc.renderImage(it,0,0)
 
                         val igc = it.graphics
@@ -218,30 +227,17 @@ class DefaultImageDrawer(
         }
         else {
             workspace.undoEngine.doAsAggregateAction("Lift and Transform") {
-                workspace.selectionEngine.transformSelection(trans, true)
+                workspace.selectionEngine.transformSelection(effectiveTrans, true)
                 workspace.selectionEngine.bakeTranslationIntoLifted()
             }
         }
     }
 
     override fun flip(horizontal: Boolean) {
-        val mask = mask
-        val rect = when {
-            mask == null -> Rect(arranged.handle.width, arranged.handle.height)
-            mask.transform == null -> Rect(mask.width, mask.height)
-            else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
-        }
-
-        val cx = rect.x + rect.width /2f
-        val cy = rect.y + rect.height /2f
-
-        val trans = MutableTransform.TranslationMatrix(-cx, -cy)
-        when( horizontal) {
-            true -> trans.preScale(-1f,1f)
-            false -> trans.preScale(1f, -1f)
-        }
-        trans.preTranslate(cx,cy)
-        transform(trans)
+        transform(when( horizontal) {
+            true -> Transform.ScaleMatrix(-1f,1f)
+            false -> Transform.ScaleMatrix(1f, -1f)
+        })
     }
     //endregion
 }
