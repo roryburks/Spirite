@@ -190,6 +190,12 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
 
     val tool = penner.toolsetManager.toolset.Reshape
 
+    init {
+        scaleBind.bindWeakly(tool.scaleBind)
+        translationBind.bindWeakly(tool.translationBind)
+        rotationBind.bindWeakly(tool.rotationBind)
+    }
+
     private val linker1 = {_: Vec2, _: Vec2 -> onChange()}.apply {
         tool.scaleBind.addWeakListener(this)
         tool.translationBind.addWeakListener(this)
@@ -204,8 +210,6 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
     private fun onChange() {
         penner.workspace?.compositor?.triggerCompositeChanged()
     }
-
-    var oldSelectionTransform: Transform? = null
 
     override fun onStart() {
         val workspace = penner.workspace?: return
@@ -244,21 +248,27 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
 
             region = MathUtil.circumscribeTrans(Rect(arranged.handle.width, arranged.handle.height), arranged.tMediumToWorkspace)
         }
-
-        oldSelectionTransform = selectionEngine.selection?.transform
     }
 
     override fun onEnd() {
+        scale = Vec2(1f,1f)
+        translation = Vec2(0f,0f)
+        rotation = 0f
 
         super.onEnd()
     }
 
-    override fun onTock() {
-    }
-
-    override fun onMove() {
-    }
-
+    override fun onTock() {}
     override fun onPenUp() {
+        state = READY
+    }
+
+    override fun onPenDown() {
+        state = when( overlap) {
+            in 0..7 -> RESIZE
+            in 8..0xB -> ROTATE
+            0xC -> MOVING
+            else -> state
+        }
     }
 }
