@@ -191,17 +191,18 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
     val tool = penner.toolsetManager.toolset.Reshape
 
     init {
-        scaleBind.bindWeakly(tool.scaleBind)
-        translationBind.bindWeakly(tool.translationBind)
-        rotationBind.bindWeakly(tool.rotationBind)
+        tool.scaleBind.bindWeakly(scaleBind)
+        tool.translationBind.bindWeakly(translationBind)
+        tool.rotationBind.bindWeakly(rotationBind)
     }
 
-    private val linker1 = {_: Vec2, _: Vec2 -> onChange()}.apply {
-        tool.scaleBind.addWeakListener(this)
-        tool.translationBind.addWeakListener(this)
-    }
+    private val link1 = tool.scaleBind.addListener{_, _ -> onChange()}
+    private val link2 = tool.translationBind.addListener{_, _ -> onChange()}
+    private val link3 = tool.rotationBind.addListener{_, _ -> onChange()}
+
+
     private val linker2 = {_: Float, _: Float -> onChange()}.apply {
-        tool.rotationBind.addWeakListener(this)
+        tool.rotationBind.addListener(this)
     }
 
 
@@ -251,6 +252,10 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
     }
 
     override fun onEnd() {
+        link1.unbind()
+        link2.unbind()
+        link3.unbind()
+
         scale = Vec2(1f,1f)
         translation = Vec2(0f,0f)
         rotation = 0f

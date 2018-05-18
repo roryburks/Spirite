@@ -218,6 +218,6 @@ class Penner(
 
     private val toolBinding = Bindable(master.toolsetManager.selectedTool) { new, old ->
         behavior = null
-    }.also { it.bind(master.toolsetManager.selectedToolBinding) }
+    }.also { master.toolsetManager.selectedToolBinding.bind(it) }
     private val tool by toolBinding
 }

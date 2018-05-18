@@ -163,12 +163,9 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
 
     val transform : MutableTransform get() {
         val t = MutableTransform.RotationMatrix(rotation)
-
-        println(scale.x)
         t.preScale(scale.x, scale.y)
         t.preTranslate(translation.x, translation.y)
         return t
-
     }
 
     val applyTransformBind by scheme.Property(ButtonProperty("Apply Transform", DrawCommand.APPLY_TRANFORM))

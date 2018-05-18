@@ -185,7 +185,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 when {
                     node.children.any() -> {
                         val toggleButton = makeToggleButton(node.expanded)
-                        toggleButton.checkBindable.bindWeakly(node.expandedBind)
+                        node.expandedBind.bindWeakly(toggleButton.checkBindable)
                         add(toggleButton, width = gapSize)
                     }
                     else ->addGap(gapSize)

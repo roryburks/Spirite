@@ -31,7 +31,7 @@ class SGradientSliderDemo : JFrame() {
             override fun perform(x: Float): Float = Math.pow(x.toDouble(), 2.0).toFloat()
             override fun invert(x: Float): Float= Math.pow(x.toDouble(), 1.0/2.0).toFloat()
         }
-        sliderBound2.valueBind.bind(sliderBound1.valueBind)
+        sliderBound1.valueBind.bind(sliderBound2.valueBind)
         sliderBound1.fgGradLeft = Color(30, 160, 30)
         sliderBound1.fgGradRight = Color.BLACK
 

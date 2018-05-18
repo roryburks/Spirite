@@ -16,6 +16,7 @@ import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.SwPanel
 import spirite.hybrid.Hybrid
 import java.awt.Font
+import javax.swing.SwingUtilities
 
 
 /**
@@ -158,7 +159,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             penner.holdingShift = it.holdingShift
             penner.penUp(it.button)
         }
-        Hybrid.timing.createTimer({penner.step()}, 15, true)
+        Hybrid.timing.createTimer({SwingUtilities.invokeLater{penner.step()}}, 15, true)
 
         coordinateLabel.label = "Coordinate Label"
         messageLabel.label = "Message Label"

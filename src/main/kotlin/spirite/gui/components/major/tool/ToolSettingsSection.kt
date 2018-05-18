@@ -1,10 +1,11 @@
 package spirite.gui.components.major.tool
 
-import spirite.base.brains.Bindable
-import spirite.base.brains.IMasterControl
+import spirite.base.brains.*
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
 import spirite.base.util.InvertibleFunction
+import spirite.base.util.binding.xBind
+import spirite.base.util.binding.yBind
 import spirite.base.util.linear.Vec2
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.basic.IComponent
@@ -26,7 +27,7 @@ fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
 
 fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
     val cluster = RadioButtonCluster(value, values.asList())
-    cluster.valueBind.bindWeakly(valueBind)
+    valueBind.bindWeakly(cluster.valueBind)
 
     return Hybrid.ui.CrossPanel {
         cluster.radioButtons.forEach {
@@ -35,46 +36,15 @@ fun <T> RadioButtonProperty<T>.getComponent() :IComponent {
     }
 }
 
-class DualFloatBinding(default: Vec2) {
-    private var writing = false
-
-    val vecBind = Bindable(default) {new,old->
-        if( !writing) {
-            writing = true
-            x = new.x; y = new.y
-            writing = false
-        }
-    }
-    var vec by vecBind
-
-    val xBind = Bindable(default.x) {new,old->
-        if( !writing) {
-            writing = true
-            vec = Vec2(x,y)
-            writing = false
-        }
-    }
-    var x : Float by xBind
-
-    val yBind = Bindable(default.x) {new,old->
-        if( !writing) {
-            writing = true
-            vec = Vec2(x,y)
-            writing = false
-        }
-    }
-    var y : Float by yBind
-}
-
 fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolProperty<*>) = when( toolProperty) {
     is SliderProperty -> Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(toolProperty.min, toolProperty.max, toolProperty.hrName).apply {
-            valueBind.bindWeakly(toolProperty.valueBind)
+            toolProperty.valueBind.bindWeakly(valueBind)
         }, height = 24)
     }
     is SizeProperty ->  Hybrid.ui.CrossPanel {
         rows.add(Hybrid.ui.GradientSlider(0f, 1000f, toolProperty.hrName).apply {
-            valueBind.bindWeakly(toolProperty.valueBind)
+            toolProperty.valueBind.bindWeakly(valueBind)
             mutatorPositionToValue = object : InvertibleFunction<Float>{
                 override fun perform(x: Float): Float = when {
                     x < 0.25f   -> x * 10f * 4f
@@ -96,7 +66,7 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.CheckBox().apply {
-                checkBind.bindWeakly(toolProperty.valueBind)
+                toolProperty.valueBind.bindWeakly(checkBind)
             })
         }
     }
@@ -109,20 +79,17 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
         rows += {
             add(Hybrid.ui.Label(toolProperty.hrName + ": "))
             add(Hybrid.ui.FloatField().apply {
-                valueBind.bindWeakly(toolProperty.valueBind)
+                toolProperty.valueBind.bindWeakly(valueBind)
             }, height = 24)
         }
     }
     is DualFloatBoxProperty -> Hybrid.ui.CrossPanel{
-        val bind = DualFloatBinding(toolProperty.value)
-        bind.vecBind.bindWeakly(toolProperty.valueBind)
-
         rows.add(Hybrid.ui.Label(toolProperty.hrName + ": "))
         rows += {
             add(Hybrid.ui.Label(toolProperty.label1))
-            add(Hybrid.ui.FloatField().apply { valueBind.bindWeakly(bind.xBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.xBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
             add(Hybrid.ui.Label(toolProperty.label2))
-            add(Hybrid.ui.FloatField().apply { valueBind.bindWeakly(bind.yBind) }, height = 24, flex = 50f)
+            add(Hybrid.ui.FloatField().apply { toolProperty.valueBind.yBind.bindWeakly( valueBind) }, height = 24, flex = 50f)
         }
     }
 

@@ -20,17 +20,35 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
     constructor() : this(SwTextAreaImp())
 
     override val textBind = Bindable("")
-    override var text by textBind
+    override var text
+            get() = textBind.field
+            set(value) {
+                if( textToBeSetToDocument == null) {
+                    textToBeSetToDocument = value
+                    textBind.field = value
+                }
+            }
+
+    private var textToBeSetToDocument : String? = null
+    val lock = object {}
+
+    fun update() {
+        synchronized(lock) {
+            text = imp.textArea.text
+        }
+    }
 
     init {
-        var locked = false
         imp.textArea.document.addDocumentListener(object: DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {locked = true; text = imp.textArea.text; locked = false}
-            override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.textArea.text; locked = false}
-            override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.textArea.text; locked = false}
+            override fun changedUpdate(e: DocumentEvent?) {update()}
+            override fun insertUpdate(e: DocumentEvent?) {update()}
+            override fun removeUpdate(e: DocumentEvent?) {update()}
         })
-        textBind.addListener { new, old -> if(!locked)imp.textArea.text = new }
+        textBind.addListener { new, old ->
+            imp.textArea.text = new
+        }
     }
+
 
     private class SwTextAreaImp(val textArea :JTextArea = JTextArea()) : JScrollPane(textArea)
     {

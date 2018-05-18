@@ -36,7 +36,6 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     override fun fill(x: Int, y: Int, color: Color): Boolean {
         doToUnderlyingWithTrans { rawImage, transform ->
             val p = transform?.invert()?.apply(Vec2(x.f,y.f)) ?: Vec2(x.f,y.f)
-            println("${p.x.floor},${p.y.floor}")
             rawImage.drawer.fill(p.x.floor, p.y.floor, color)
         }
 

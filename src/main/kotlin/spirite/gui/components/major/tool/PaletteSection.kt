@@ -36,8 +36,8 @@ class PaletteSection(
     private val paletteManager get() = master.paletteManager
 
     init {
-        primaryColorSquare.colorBind.bindWeakly( master.paletteManager.getColorBind(0))
-        secondaryColorSquare.colorBind.bindWeakly( master.paletteManager.getColorBind(1))
+        master.paletteManager.getColorBind(0).bindWeakly(primaryColorSquare.colorBind)
+        master.paletteManager.getColorBind(1).bindWeakly(secondaryColorSquare.colorBind)
         primaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         primaryColorSquare.enabled = false
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
