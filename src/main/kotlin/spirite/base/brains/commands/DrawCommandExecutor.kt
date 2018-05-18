@@ -47,6 +47,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
                 reshape.translation = Vec2(0f,0f)
                 reshape.scale = Vec2(1f,1f)
                 reshape.rotation = 0f
+                workspace.selectionEngine.proposingTransform = null
             }
             AUTO_CROP.string -> TODO()
             LAYER_TO_IMAGE_SIZE.string -> TODO()

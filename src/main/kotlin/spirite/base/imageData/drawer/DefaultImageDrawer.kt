@@ -30,7 +30,7 @@ import spirite.hybrid.Hybrid
 class DefaultImageDrawer(
         val arranged: ArrangedMediumData)
     :IImageDrawer,
-        IStrokeModule,
+        IStrokeModule by DefaultImageDrawer.StrokeModule(arranged),
         IInvertModule,
         IClearModule,
         ILiftSelectionModule,
@@ -39,55 +39,57 @@ class DefaultImageDrawer(
         IFillModule,
         ITransformModule
 {
-
     val workspace : IImageWorkspace get() = arranged.handle.workspace
     val mask get() = workspace.selectionEngine.selection
 
-    // region IStrokeModule
-    private var strokeBuilder : StrokeBuilder? = null
+    class StrokeModule(val arranged: ArrangedMediumData) : IStrokeModule {
+        val workspace : IImageWorkspace get() = arranged.handle.workspace
+        val mask get() = workspace.selectionEngine.selection
 
-    override fun canDoStroke(method: Method) = true
+        private var strokeBuilder : StrokeBuilder? = null
 
-    override fun startStroke(params: StrokeParams, ps: PenState): Boolean {
-        val strokeDrawer = workspace.strokeProvider.getStrokeDrawer(params)
-        strokeBuilder = StrokeBuilder(strokeDrawer, params, arranged)
+        override fun canDoStroke(method: Method) = true
 
-        workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
+        override fun startStroke(params: StrokeParams, ps: PenState): Boolean {
+            val strokeDrawer = workspace.strokeProvider.getStrokeDrawer(params)
+            strokeBuilder = StrokeBuilder(strokeDrawer, params, arranged)
 
-        if(strokeBuilder!!.start(ps))
-            arranged.handle.refresh()
+            workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
 
-        return true
-    }
+            if(strokeBuilder!!.start(ps))
+                arranged.handle.refresh()
 
-    override fun stepStroke(ps: PenState) {
-        if(strokeBuilder?.step(ps) == true)
-            workspace.compositor.triggerCompositeChanged()
-    }
+            return true
+        }
 
-    override fun endStroke() {
-        val sb = strokeBuilder ?: return
+        override fun stepStroke(ps: PenState) {
+            if(strokeBuilder?.step(ps) == true)
+                workspace.compositor.triggerCompositeChanged()
+        }
 
-        // NOTE: Storing the bakedDrawPoints rather than the baseStates, this means two things:
-        //  1: Far more points are stored than is necessary, but don't need to be recalculated every time (both minimal)
-        //  2: You need to use rawAccessComposite rather than drawToComposite as the points are already transformed
-        val bakedDrawPoints = sb.currentPoints
-        val params = sb.params
-        workspace.undoEngine.performAndStore( object : ImageAction(arranged) {
-            override val description: String get() = "Pen Stroke"
+        override fun endStroke() {
+            val sb = strokeBuilder ?: return
 
-            override fun performImageAction(built: BuiltMediumData) {
-                val drawer = built.arranged.handle.workspace.strokeProvider.getStrokeDrawer(params)
-                built.rawAccessComposite {
-                    drawer.batchDraw(it.graphics, bakedDrawPoints, params, built.width, built.height)
+            // NOTE: Storing the bakedDrawPoints rather than the baseStates, this means two things:
+            //  1: Far more points are stored than is necessary, but don't need to be recalculated every time (both minimal)
+            //  2: You need to use rawAccessComposite rather than drawToComposite as the points are already transformed
+            val bakedDrawPoints = sb.currentPoints
+            val params = sb.params
+            workspace.undoEngine.performAndStore( object : ImageAction(arranged) {
+                override val description: String get() = "Pen Stroke"
+
+                override fun performImageAction(built: BuiltMediumData) {
+                    val drawer = built.arranged.handle.workspace.strokeProvider.getStrokeDrawer(params)
+                    built.rawAccessComposite {
+                        drawer.batchDraw(it.graphics, bakedDrawPoints, params, built.width, built.height)
+                    }
                 }
-            }
-        })
+            })
 
-        sb.end()
-        workspace.compositor.compositeSource = null
+            sb.end()
+            workspace.compositor.compositeSource = null
+        }
     }
-    // endregion
 
 
     // region IInvertModule
@@ -191,7 +193,6 @@ class DefaultImageDrawer(
     }
     // endregion
 
-    // region ITransformModule
     override fun transform(trans: Transform) {
         val mask = mask
 
@@ -233,11 +234,38 @@ class DefaultImageDrawer(
         }
     }
 
-    override fun flip(horizontal: Boolean) {
-        transform(when( horizontal) {
-            true -> Transform.ScaleMatrix(-1f,1f)
-            false -> Transform.ScaleMatrix(1f, -1f)
-        })
+    override fun startManipulatingTransform(): Rect? {
+        val tool = workspace.toolset.Reshape
+        val selected = workspace.selectionEngine.selection
+        val lifted = workspace.selectionEngine.liftedData
+
+        if( selected != null && lifted == null) {
+            liftSelection(selected)
+            return null
+        }
+        if( selected != null)
+            workspace.selectionEngine.setSelection(null)
+
+        workspace.compositor.compositeSource = CompositeSource(arranged, false ) { gc ->
+            val medium = arranged.handle.medium
+            val cx = medium.width / 2f
+            val cy = medium.height / 2f
+
+            val effectiveTrans = Transform.TranslationMatrix(cx,cy) * tool.transform * Transform.TranslationMatrix(-cx,-cy)
+
+            gc.transform = effectiveTrans
+            arranged.handle.medium.render(gc)
+        }
+
+        return MathUtil.circumscribeTrans(Rect(arranged.handle.width, arranged.handle.height), arranged.tMediumToWorkspace)
     }
+
+    override fun stepManipulatingTransform() {
+        workspace.compositor.triggerCompositeChanged()
+    }
+    override fun endManipulatingTransform() {
+        workspace.compositor.compositeSource = null
+    }
+
     //endregion
 }

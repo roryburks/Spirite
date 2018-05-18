@@ -5,6 +5,7 @@ import spirite.base.brains.IBindable
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
+import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -22,6 +23,7 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.mapAggregated
+import spirite.pc.master
 import java.io.File
 
 interface IImageWorkspace {
@@ -53,6 +55,7 @@ interface IImageWorkspace {
     val settingsManager: ISettingsManager
     val paletteManager : IPaletteManager
     val strokeProvider : IStrokeDrawerProvider
+    val toolset : Toolset
 
     val activeMediumBind : IBindable<MediumHandle?>
     val activeData : ArrangedMediumData?
@@ -88,6 +91,7 @@ class ImageWorkspace(
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet get() = TODO("not implemented")
+    override val toolset: Toolset get() = master.toolsetManager.toolset
 
     override val compositor = Compositor()
 

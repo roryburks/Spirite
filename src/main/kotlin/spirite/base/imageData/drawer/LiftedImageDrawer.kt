@@ -13,6 +13,7 @@ import spirite.base.util.floor
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 
 class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
@@ -58,6 +59,31 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
             workspace.selectionEngine.transformSelection(effectiveTrans, true)
             workspace.selectionEngine.bakeTranslationIntoLifted()
         }
+    }
+
+    override fun startManipulatingTransform(): Rect? {
+        workspace.selectionEngine.proposingTransform = workspace.toolset.Reshape.transform
+
+        val selected = workspace.selectionEngine.selection ?: return null
+        val lifted = workspace.selectionEngine.liftedData ?: return null
+
+        return when(selected.transform) {
+            null -> Rect(lifted.width, lifted.height)
+            else -> MathUtil.circumscribeTrans(Rect(lifted.width,lifted.height), selected.transform)
+        }
+    }
+
+    override fun stepManipulatingTransform() {
+        val lifted = workspace.selectionEngine.liftedData ?: return
+        val cx = lifted.width / 2f
+        val cy = lifted.width / 2f
+
+        workspace.selectionEngine.proposingTransform = Transform.TranslationMatrix(cx,cy) *
+                workspace.toolset.Reshape.transform * Transform.TranslationMatrix(-cx,-cy)
+    }
+
+    override fun endManipulatingTransform() {
+        workspace.selectionEngine.proposingTransform = null
     }
 
     // Replaces the Lifted Image with one that is (presumably) modified by the lambda

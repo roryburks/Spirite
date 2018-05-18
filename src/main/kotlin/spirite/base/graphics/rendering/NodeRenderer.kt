@@ -148,7 +148,7 @@ class NodeRenderer(
                 val toTrans = when {
                     proposingTransform == null -> selectionTransform
                     selectionTransform == null -> proposingTransform
-                    else -> proposingTransform * selectionTransform
+                    else -> selectionTransform * proposingTransform
                 }
                 toTrans?.apply { gc.preTransform(this)}
                 lifted.draw(gc)

@@ -12,6 +12,7 @@ import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Color
 import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 
 
@@ -53,6 +54,10 @@ interface IImageDrawer {
     }
     interface ITransformModule : IFlipModule {
         fun transform(trans: Transform)
+
+        fun startManipulatingTransform() : Rect?
+        fun stepManipulatingTransform()
+        fun endManipulatingTransform()
 
         override fun flip(horizontal: Boolean) {
             transform(when( horizontal) {

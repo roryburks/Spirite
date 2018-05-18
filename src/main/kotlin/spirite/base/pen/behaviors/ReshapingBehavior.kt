@@ -5,7 +5,9 @@ import spirite.base.brains.Bindable
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.IImageDrawer.ILiftSelectionModule
+import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.mediums.CompositeSource
+import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
@@ -27,9 +29,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         READY, ROTATE, RESIZE, MOVING, INACTIVE
     }
 
-    // The Calculation Transform is a version of the Locked Transform which has
-    //	all the relevent offsets built-in so that calculation changes in mouse
-    //	movement with respect to the selection's center can be easily performed.
+    // The Calculation Transform is a snapshot of the transformation from the effective working transform 
     private var calcTrans: Transform = Transform.IdentityMatrix
 
     var state = TransformStates.READY
@@ -185,10 +185,11 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     }
 }
 
-class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBehavior(penner)
+class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : TransformBehavior(penner)
 {
 
     val tool = penner.toolsetManager.toolset.Reshape
+    val workspace = penner.workspace
 
     init {
         tool.scaleBind.bindWeakly(scaleBind)
@@ -199,66 +200,46 @@ class ReshapingBehavior(penner: Penner, var drawer: IImageDrawer) : TransformBeh
     private val link1 = tool.scaleBind.addListener{_, _ -> onChange()}
     private val link2 = tool.translationBind.addListener{_, _ -> onChange()}
     private val link3 = tool.rotationBind.addListener{_, _ -> onChange()}
-
-
-    private val linker2 = {_: Float, _: Float -> onChange()}.apply {
-        tool.rotationBind.addListener(this)
-    }
-
-
+    private val link4 = {it : SelectionChangeEvent ->
+        end()
+    }.apply { penner.workspace?.selectionEngine?.selectionChangeObserver?.addObserver { this }}
 
 
     private fun onChange() {
-        penner.workspace?.compositor?.triggerCompositeChanged()
+        drawer.stepManipulatingTransform()
     }
 
     override fun onStart() {
-        val workspace = penner.workspace?: return
+        if(!tryStart())
+            end()
+    }
+
+    private fun tryStart() : Boolean {
+        val workspace = workspace?: return false
         val selectionEngine = workspace.selectionEngine
         val selected = selectionEngine.selection
         val lifted = selectionEngine.liftedData
 
-        if( selected != null && lifted == null && drawer is ILiftSelectionModule) {
-            selectionEngine.attemptLiftData(drawer)
-            drawer = workspace.activeDrawer
-            val nSelected = selectionEngine.selection
-            val nLifted = selectionEngine.liftedData
-
-            if( nLifted != null && nSelected != null) {
-                val liftedRect = Rect(nLifted.width, nLifted.height)
-                region = if( nSelected.transform == null) liftedRect
-                         else MathUtil.circumscribeTrans(Rect(nLifted.width, nLifted.height), nSelected.transform)
-            }
+        region = drawer.startManipulatingTransform() ?: kotlin.run {
+            drawer = workspace.activeDrawer as? ITransformModule ?: return false
+            drawer.startManipulatingTransform() ?: return false
         }
-        else {
-            if( selected != null && lifted == null )
-                selectionEngine.setSelection(null)
-            val arranged = workspace.activeData ?: return
 
-            workspace.compositor.compositeSource = CompositeSource(arranged,false) {gc ->
-                val medium = arranged.handle.medium
-
-                val cx = medium.width /2f
-                val cy = medium.height /2f
-
-                val effectiveTrans = Transform.TranslationMatrix(cx,cy) * tool.transform * Transform.TranslationMatrix(-cx,-cy)
-
-                gc.transform = effectiveTrans
-                arranged.handle.medium.render(gc)
-            }
-
-            region = MathUtil.circumscribeTrans(Rect(arranged.handle.width, arranged.handle.height), arranged.tMediumToWorkspace)
-        }
+        return true
     }
 
     override fun onEnd() {
         link1.unbind()
         link2.unbind()
         link3.unbind()
+        workspace?.selectionEngine?.selectionChangeObserver?.removeObserver(link4)
 
         scale = Vec2(1f,1f)
         translation = Vec2(0f,0f)
         rotation = 0f
+
+        drawer.endManipulatingTransform()
+
 
         super.onEnd()
     }
