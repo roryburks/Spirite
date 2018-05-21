@@ -3,9 +3,18 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
 import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.mediums.ArrangedMediumData
+import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.imageData.undo.ImageAction
+import spirite.base.imageData.undo.StackableAction
+import spirite.base.imageData.undo.UndoableAction
+import spirite.base.util.f
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.Hybrid
 
@@ -22,7 +31,10 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
         LAYER_TO_IMAGE_SIZE("layerToImageSize"),
         INVERT("invert"),
         CLEAR("clear"),
-
+        SHIFT_UP("shiftUp"),
+        SHIFT_DOWN("shiftDown"),
+        SHIFT_LEFT("shiftLeft"),
+        SHIFT_RIGHT("shiftRight"),
         ;
 
         override val commandString: String get() = "draw.$string"
@@ -53,8 +65,18 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             LAYER_TO_IMAGE_SIZE.string -> TODO()
             INVERT.string -> (workspace.activeDrawer as? IInvertModule)?.invert() ?: Hybrid.beep()
             CLEAR.string ->  (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
+            SHIFT_UP.string -> if( !shift(0,-1, workspace)) Hybrid.beep()
+            SHIFT_DOWN.string -> if( !shift(0,1, workspace)) Hybrid.beep()
+            SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) Hybrid.beep()
+            SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) Hybrid.beep()
         }
 
+        return true
+    }
+
+    fun shift( ox: Int, oy: Int, workspace: IImageWorkspace) : Boolean {
+        val active = workspace.activeDrawer as? ITransformModule ?: return false
+        active.transform(Transform.TranslationMatrix(ox.f, oy.f))
         return true
     }
 

@@ -30,7 +30,7 @@ interface IComponentProvider {
     fun <T> TreeView() : ITreeView<T>
     fun TextField() : ITextField
     fun IntField(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE, allowsNegative: Boolean = false) : IIntField
-    fun FloatField(min: Float = Float.NEGATIVE_INFINITY, max: Float = Float.POSITIVE_INFINITY, allowsNegative: Boolean = false) : IFloatField
+    fun FloatField(min: Float = Float.NEGATIVE_INFINITY, max: Float = Float.POSITIVE_INFINITY, allowsNegative: Boolean = true) : IFloatField
 
     fun TextArea() : ITextArea
 

@@ -1,13 +1,20 @@
 package spirite.base.imageData.layers.sprite
 
+import spirite.base.brains.Bindable
+import spirite.base.brains.IBindable
+import spirite.base.brains.IObservable
+import spirite.base.brains.Observable
 import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
@@ -16,6 +23,7 @@ import spirite.base.util.StringUtil
 import spirite.base.util.ceil
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.MutableLazy
+import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.util.delegates.StackableUndoableDelegate
 import spirite.base.util.floor
 import spirite.base.util.groupExtensions.SinglyList
@@ -24,6 +32,7 @@ import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
+import java.rmi.activation.ActivationDesc
 import kotlin.math.roundToInt
 
 /**
@@ -50,16 +59,24 @@ class SpriteLayer(
         }
     }
 
-    var activePart : SpritePart?
-        get() = _parts.elementAtOrNull(activePartIndex)
-        set(value) {
-            when( value) {
-                null -> activePartIndex = -1
-                else -> _parts.indexOf(value)
-            }
-        }
-    var activePartIndex: Int = -1 ; private set
+    var activePartBind =  Bindable<SpritePart?>(null)
+    var activePart by activePartBind
 
+    private var _partChangeObserver = Observable<()->Any?>()
+    val partChangeObserver : IObservable<()->Any?> get() = _partChangeObserver
+    fun triggerPartChange() {
+        _partChangeObserver.trigger { it() }
+        workspace.imageObservatory.triggerRefresh(
+                ImageChangeEvent(
+                        emptyList(),
+                        workspace.groupTree.root.getAllNodesSuchThat({(it as? LayerNode)?.layer == this}),
+                        workspace)
+        )
+    }
+
+
+
+    // region ILayer methods
 
 //    private val _keyPointsDerived = DerivedLazy{ etc }
     private val _keyPoints get() = parts.mapAggregated {
@@ -85,24 +102,15 @@ class SpriteLayer(
         return ArrangedMediumData( part.handle, part.tPartToWhole)
     }
 
-    override fun getDrawer(arranged: ArrangedMediumData): IImageDrawer {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+    override fun getDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
-
-    override fun getDrawList(): List<TransformedHandle> {
-        return parts
+    override fun getDrawList() = parts
                 .filter { it.isVisible }
                 .map {TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)}
-    }
 
-
-    override fun dupe(mediumRepo: MMediumRepository): Layer {
-        val newMediumStructure =
-                parts.map {Pair(mediumRepo.addMedium(it.handle.medium.dupe()), SpritePartStructure(it))}
-        return SpriteLayer(workspace, mediumRepo, newMediumStructure)
-    }
+    override fun dupe(mediumRepo: MMediumRepository) =
+            SpriteLayer( workspace, mediumRepo, parts.map { Pair(mediumRepo.addMedium(it.handle.medium.dupe()), SpritePartStructure(it)) })
+    // endregion
 
 
     /** Returns the first highest-drawDepth part that is visible and has
@@ -117,10 +125,10 @@ class SpriteLayer(
         val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
         val depth = when {
             _parts.isEmpty() -> 0
-            activePartIndex == -1 -> _parts.last().depth + 1
+            activePart == null -> _parts.last().depth + 1
             else -> activePart!!.depth
         }
-        _addPart( SpritePartStructure( depth, partName), handle, if( activePartIndex == -1) _parts.size else activePart!!.depth + 1)
+        _addPart( SpritePartStructure( depth, partName), handle, if( activePart == null) _parts.size else activePart!!.depth + 1)
     }
     fun removePart( toRemove: SpritePart) {
         if( !_parts.contains(toRemove)) return
@@ -130,7 +138,7 @@ class SpriteLayer(
 
             override fun performAction() {
                 if( activePart == toRemove)
-                    activePartIndex = -1
+                    activePart = null
                 _parts.remove(toRemove)
                 triggerChange()
             }
@@ -193,41 +201,53 @@ class SpriteLayer(
         _parts.sortWith(compareBy({it.depth}, {it.id}))
     }
 
-
     inner class SpritePart(
-            internal var structure: SpritePartStructure,
+            _structure: SpritePartStructure,
             val handle: MediumHandle,
             internal val id: Int)
     {
+        var structure = _structure ; private set
 
-        // region Parotting SpritePartStructure scroll with Undoable Wrapper
-        var depth : Int by StackableUndoableDelegate(structure.depth, undoEngine, "Changed Sprite Part depth")
-        var visible : Boolean by StackableUndoableDelegate(structure.visible, undoEngine, "Changed Sprite Part visible")
-        var partName : String by StackableUndoableDelegate(structure.partName, undoEngine, "Changed Sprite Part Name")
-        var alpha : Float by StackableUndoableDelegate(structure.alpha, undoEngine, "Changed Sprite Part alpha")
-        var transX : Float by StackableUndoableDelegate(structure.transX, undoEngine, "Changed Sprite Part transX")
-        var transY : Float by StackableUndoableDelegate(structure.transY, undoEngine, "Changed Sprite Part transY")
-        var scaleX : Float by StackableUndoableDelegate(structure.scaleX, undoEngine, "Changed Sprite Part scaleX")
-        var scaleY : Float by StackableUndoableDelegate(structure.scaleY, undoEngine, "Changed Sprite Part scaleY")
-        var rot : Float by StackableUndoableDelegate(structure.rot, undoEngine, "Changed Sprite Part rot")
-        var centerX : Int by StackableUndoableDelegate(structure.centerX ?: 0, undoEngine, "Changed Sprite Part centerX")
-        var centerY : Int by StackableUndoableDelegate(structure.centerY ?: 0, undoEngine, "Changed Sprite Part centerY")
+        // region Shadowing SpritePartStructure scroll with Undoable Wrapper
+        var depth get() = structure.depth ; set(value) { if( value != structure.depth) replaceStructure(structure.copy(depth = value), 0)}
+
+        var visible get() = structure.visible ; set(value) { if( value != structure.visible) replaceStructure(structure.copy(visible = value), 1)}
+        var partName get() = structure.partName ; set(value) { if( value != structure.partName) replaceStructure(structure.copy(partName = value), 2)}
+        var alpha get() = structure.alpha ; set(value) { if( value != structure.alpha) replaceStructure(structure.copy(alpha = value), 3)}
+        var transX get() = structure.transX ; set(value) { if( value != structure.transX) replaceStructure(structure.copy(transX = value), 4)}
+        var transY get() = structure.transY ; set(value) { if( value != structure.transY) replaceStructure(structure.copy(transY = value), 5)}
+        var scaleX get() = structure.scaleX ; set(value) { if( value != structure.scaleX) replaceStructure(structure.copy(scaleX = value), 6)}
+        var scaleY get() = structure.scaleY ; set(value) { if( value != structure.scaleY) replaceStructure(structure.copy(scaleY = value), 7)}
+        var rot get() = structure.rot ; set(value) { if( value != structure.rot) replaceStructure(structure.copy(rot = value), 8)}
+        var centerX get() = structure.centerX ; set(value) { if( value != structure.centerX) replaceStructure(structure.copy(centerX = value), 9)}
+        var centerY get() = structure.centerY ; set(value) { if( value != structure.centerY) replaceStructure(structure.copy(centerY = value), 10)}
 
 
-        private fun replaceStructure( newStructure: SpritePartStructure) {
+
+        private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
             if( structure != newStructure)
-                undoEngine.performAndStore(SpriteStructureAction(newStructure))
+                undoEngine.performAndStore(SpriteStructureAction(newStructure, structureCode))
         }
 
         inner class SpriteStructureAction(
-                var newStructure: SpritePartStructure
+                var newStructure: SpritePartStructure,
+                val structureCode: Int
         ) : NullAction(), StackableAction {
             val oldStructure: SpritePartStructure = structure
             override val description: String get() = "Change Part Structure"
-            override fun performAction() {structure = newStructure ; _sort()}
-            override fun undoAction() {structure = oldStructure ; _sort()}
+            override fun performAction() {
+                structure = newStructure
+                _sort()
+                triggerPartChange()
+            }
+            override fun undoAction() {
+                structure = oldStructure
+                _sort()
+                triggerPartChange()
+            }
 
-            override fun canStack(other: UndoableAction) = (other as? SpriteStructureAction)?._context == this._context
+            override fun canStack(other: UndoableAction) =
+                    (other is SpriteStructureAction) && other._context == _context && other.structureCode == structureCode
             override fun stackNewAction(other: UndoableAction) {newStructure = (other as SpriteStructureAction).newStructure}
             private val _context: SpriteLayer get() = this@SpriteLayer
         }

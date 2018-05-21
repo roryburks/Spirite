@@ -1,10 +1,12 @@
 package spirite.pc.gui.basic
 
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
 import spirite.gui.components.basic.IToggleButton
 import spirite.gui.components.basic.IToggleButtonNonUI
 import spirite.gui.components.basic.ToggleButtonNonUI
 import spirite.gui.resources.IIcon
+import spirite.gui.resources.Skin
 import javax.swing.JToggleButton
 
 
@@ -38,6 +40,8 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
     val checkBind = checkBindable.addListener { new, old -> imp.isSelected = new }
     init {
         imp.addItemListener{checked = imp.isSelected}
+        setBasicBorder(BEVELED_RAISED)
+        background = Skin.Global.BgDark.scolor
     }
 
     private class SwToggleButtonImp : JToggleButton()

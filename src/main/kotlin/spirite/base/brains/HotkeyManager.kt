@@ -52,10 +52,10 @@ private val defaultHotkeys = mapOf(
         "draw.toggle_reference" to (Hotkey( KeyEvent.VK_BACK_QUOTE, 0)),
         "draw.lift_to_reference" to (Hotkey( KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
-        "draw.shiftLeft" to (Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
-        "draw.shiftRight" to (Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
-        "draw.shiftDown" to (Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
-        "draw.shiftUp" to (Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
+        DrawCommand.SHIFT_LEFT.commandString to (Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
+        DrawCommand.SHIFT_RIGHT.commandString to (Hotkey( KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
+        DrawCommand.SHIFT_DOWN.commandString to (Hotkey( KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
+        DrawCommand.SHIFT_UP.commandString to (Hotkey( KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),
 
         SelectCommand.ALL.commandString to (Hotkey( KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
         SelectCommand.NONE.commandString to (Hotkey( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
