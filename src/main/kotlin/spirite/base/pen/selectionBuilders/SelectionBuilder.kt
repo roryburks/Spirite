@@ -7,6 +7,6 @@ import spirite.base.imageData.selection.Selection
 abstract class SelectionBuilder( val workspace: IImageWorkspace) {
     abstract fun start( x: Int, y: Int)
     abstract fun update( x: Int, y: Int)
-    abstract fun build() : Selection
+    abstract fun build() : Selection?
     abstract fun drawBuilding(gc: GraphicsContext)
 }

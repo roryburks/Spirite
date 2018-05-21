@@ -139,6 +139,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             })
         }
 
+        workAreaContainer.onResize = {calibrateScrolls()}
         workAreaContainer.onMouseMove = {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
@@ -206,6 +207,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             // By default centered
             newView.offsetX = (newWorkspace.width/2 - workAreaContainer.width/2)
             newView.offsetY = (newWorkspace.height/2 - workAreaContainer.height/2)
+
+            println("${newView.offsetX},${newView.offsetY}")
         }
 
         override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {
@@ -216,16 +219,18 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             _viewObservable.trigger { it.invoke() }
             currentWorkspace = selectedWorkspace
 
-            when( selectedWorkspace) {
-                null -> {
-                    hScroll.enabled = false
-                    vScroll.enabled = false
-                }
-                else -> {
-                    hScroll.enabled = true
-                    vScroll.enabled = true
-                    val view = views.get(selectedWorkspace)!!
-                    calibrateScrolls( view.offsetX / scrollRatio, view.offsetY / scrollRatio)
+            SwingUtilities.invokeLater {    // TODO: Bad.  There should be a better solution.
+                when (selectedWorkspace) {
+                    null -> {
+                        hScroll.enabled = false
+                        vScroll.enabled = false
+                    }
+                    else -> {
+                        hScroll.enabled = true
+                        vScroll.enabled = true
+                        val view = views.get(selectedWorkspace)!!
+                        calibrateScrolls(view.offsetX / scrollRatio, view.offsetY / scrollRatio)
+                    }
                 }
             }
         }

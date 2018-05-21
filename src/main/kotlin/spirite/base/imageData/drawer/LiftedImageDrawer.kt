@@ -76,7 +76,7 @@ class LiftedImageDrawer(val workspace: IImageWorkspace) : IImageDrawer,
     override fun stepManipulatingTransform() {
         val lifted = workspace.selectionEngine.liftedData ?: return
         val cx = lifted.width / 2f
-        val cy = lifted.width / 2f
+        val cy = lifted.height / 2f
 
         workspace.selectionEngine.proposingTransform = Transform.TranslationMatrix(cx,cy) *
                 workspace.toolset.Reshape.transform * Transform.TranslationMatrix(-cx,-cy)

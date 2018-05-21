@@ -6,14 +6,15 @@ layout(lines_adjacency) in;
 layout(triangle_strip, max_vertices = 17) out;
 
 uniform mat4 perspectiveMatrix;
+uniform mat4 worldMatrix;
 uniform int u_join;	// 0 : none, 1: miter, 2: bevel
 uniform float u_width;
 
 in float vSize[];
 
 void doFlat() {
-	vec2 p1 = vec2(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y);
-	vec2 p2 = vec2(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y);
+	vec2 p1 = (worldMatrix*vec4(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y,0,1)).xy;
+	vec2 p2 = (worldMatrix*vec4(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y,0,1)).xy;
 	vec2 normal = normalize( p2 - p1);
 	vec2 nl = vec2( -normal.y, normal.x);
 	vec2 nr = vec2( normal.y, -normal.x);
@@ -30,10 +31,10 @@ void doFlat() {
 }
 
 void doMiter() {
-	vec2 p0 = vec2(gl_in[0].gl_Position.x,gl_in[0].gl_Position.y);
-	vec2 p1 = vec2(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y);
-	vec2 p2 = vec2(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y);
-	vec2 p3 = vec2(gl_in[3].gl_Position.x,gl_in[3].gl_Position.y);
+	vec2 p0 = (worldMatrix*vec4(gl_in[0].gl_Position.x,gl_in[0].gl_Position.y, 0, 1)).xy;
+	vec2 p1 = (worldMatrix*vec4(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y,0,1)).xy;
+	vec2 p2 = (worldMatrix*vec4(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y,0,1)).xy;
+	vec2 p3 = (worldMatrix*vec4(gl_in[3].gl_Position.x,gl_in[3].gl_Position.y,0,1)).xy;
 	vec2 normal = normalize( p2 - p1);
 	
 	if( p0 == p1) {
@@ -80,9 +81,9 @@ void doMiter() {
 
 
 void doBevel() {
-	vec2 p1 = vec2(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y);
-	vec2 p2 = vec2(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y);
-	vec2 p3 = vec2(gl_in[3].gl_Position.x,gl_in[3].gl_Position.y);
+	vec2 p1 = (worldMatrix*vec4(gl_in[1].gl_Position.x,gl_in[1].gl_Position.y,0,1)).xy;
+	vec2 p2 = (worldMatrix*vec4(gl_in[2].gl_Position.x,gl_in[2].gl_Position.y,0,1)).xy;
+	vec2 p3 = (worldMatrix*vec4(gl_in[3].gl_Position.x,gl_in[3].gl_Position.y,0,1)).xy;
 	vec2 normal = normalize( p2 - p1);
 	vec2 nl = vec2( -normal.y, normal.x);
 	vec2 nr = vec2( normal.y, -normal.x);

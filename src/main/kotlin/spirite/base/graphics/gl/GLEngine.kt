@@ -9,6 +9,7 @@ import spirite.base.util.linear.Mat4
 import spirite.base.util.linear.MatrixBuilder.orthagonalProjectionMatrix
 import spirite.base.util.linear.MatrixBuilder.wrapTransformAs4x4
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec3
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -154,7 +155,7 @@ class GLEngine(
         }
 
         val iParams = mutableListOf<GLUniform>()
-        loadUniversalUniforms(params, iParams, trans)
+        loadUniversalUniforms(params, iParams, trans, true)
 
         if( true /* Shaderversion 330 */) {
             val prim = PreparedPrimitive( GLPrimitive(
@@ -296,8 +297,12 @@ class GLEngine(
         preparedPrimitive.unuse()
     }
 
-    private fun loadUniversalUniforms(params: GLParameters, internalParams: MutableList<GLUniform>, trans: Transform?) {
-
+    private fun loadUniversalUniforms(
+            params: GLParameters,
+            internalParams: MutableList<GLUniform>,
+            trans: Transform?,
+            separateWorldTransfom: Boolean = false)
+    {
         // Construct flags
         val flags =
                 (if( params.premultiplied) 1 else 0) +
@@ -323,16 +328,21 @@ class GLEngine(
             y2 = clipRect.y + clipRect.height + 0f
         }
 
-        var matrix = Mat4(orthagonalProjectionMatrix(
+        var perspective = Mat4(orthagonalProjectionMatrix(
                 x1, x2, if (params.flip) y2 else y1, if (params.flip) y1 else y2, -1f, 1f))
 
-        if (trans != null) {
-            val matrix2 = Mat4(wrapTransformAs4x4(trans))
-            matrix = matrix2 * matrix
+
+        if( !separateWorldTransfom) {
+            trans?.apply { perspective = Mat4(wrapTransformAs4x4(this)) * perspective }
+            perspective = perspective.transpose()
+            internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective))
+        }
+        else {
+            internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective.transpose()))
+            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4(wrapTransformAs4x4(trans ?: Transform.IdentityMatrix)).transpose()))
         }
 
-        matrix = matrix.transpose()
-        internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", matrix))
+
     }
 
     // endregion

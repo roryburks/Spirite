@@ -50,9 +50,6 @@ class WorkSectionView(val workspace: IImageWorkspace) {
 
     private val tScreenToWorkspaceDerived = DerivedLazy{
         tWorkspaceToScreen.invert()
-//        Transform.ScaleMatrix(1/zoom, 1/zoom)*
-//        Transform.RotationMatrix(-rotation) *
-//        Transform.TranslationMatrix(offsetX.f, offsetY.f)
     }
     val tScreenToWorkspace : Transform by tScreenToWorkspaceDerived
 
@@ -60,8 +57,8 @@ class WorkSectionView(val workspace: IImageWorkspace) {
     private val _viewObserver = Observable<()->Unit>()
 
     private inner class ViewChange<T>(defaultValue : T) : OnChangeDelegate<T>(defaultValue, {
-        _viewObserver.trigger { it.invoke() }
         tWorkspaceToScreenDerived.reset()
         tScreenToWorkspaceDerived.reset()
+        _viewObserver.trigger { it.invoke() }
     })
 }

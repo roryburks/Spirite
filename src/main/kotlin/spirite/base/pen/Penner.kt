@@ -180,8 +180,8 @@ class Penner(
                         if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
                         else Hybrid.beep()
                     }
+                    is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
                 }
-
             }
         }
     }

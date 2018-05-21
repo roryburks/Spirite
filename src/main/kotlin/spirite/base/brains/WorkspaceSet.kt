@@ -25,10 +25,11 @@ interface MWorkspaceSet : IWorkspaceSet {
 class WorkspaceSet : MWorkspaceSet{
     override fun addWorkspace(workspace: IImageWorkspace, select: Boolean) {
         workspaces.add(workspace)
-        workspaceObserver.trigger { it.workspaceCreated(workspace) }
+        workspaceObserver.trigger { it.workspaceCreated(workspace)}
 
-        if(select || currentWorkspace == null)
+        if(select || currentWorkspace == null) {
             currentWorkspace = workspace
+        }
     }
 
     override fun removeWorkspace(workspace: IImageWorkspace) {

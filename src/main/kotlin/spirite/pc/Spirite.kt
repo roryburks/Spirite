@@ -31,11 +31,6 @@ fun main( args: Array<String>) {
             ws1.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
             master.workspaceSet.addWorkspace(ws1)
             ws1.finishBuilding()
-
-//            val ws = LoadEngine.loadWorkspace(File("C:/Bucket/1.sif"), master)
-//            //ws.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
-//            master.workspaceSet.addWorkspace(ws)
-//            ws.imageObservatory.triggerRefresh(ImageChangeEvent(setOf(), setOf(),ws))
         }
     }catch (e : Exception) {
         e.printStackTrace()

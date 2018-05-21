@@ -8,6 +8,7 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.ITabbedPane
 import spirite.hybrid.Hybrid
+import javax.swing.SwingUtilities
 
 
 class WorkTabPane
@@ -22,9 +23,11 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
 
     init {
         tabPane.selectedIndexBind.addListener {new, old ->
-            master.workspaceSet.currentWorkspace = workspaces.getOrNull(new)
+            if( old != -1) {
+                master.workspaceSet.currentWorkspace = workspaces.getOrNull(new)
+            }
             containers.forEach { it.clearLayout() }
-            containers.getOrNull(new)?.setLayout { rows.add( workSection) }
+            containers.getOrNull(new)?.setLayout { rows.add(workSection) }
         }
     }
 

@@ -162,8 +162,8 @@ class Reshaper(toolset: Toolset) : Tool(toolset){
     override val description = "Reshaper"
 
     val transform : MutableTransform get() {
-        val t = MutableTransform.RotationMatrix(rotation)
-        t.preScale(scale.x, scale.y)
+        val t = MutableTransform.ScaleMatrix(scale.x, scale.y)
+        t.preRotate(rotation)
         t.preTranslate(translation.x, translation.y)
         return t
     }

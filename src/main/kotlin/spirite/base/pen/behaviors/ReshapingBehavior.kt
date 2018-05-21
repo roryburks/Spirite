@@ -123,7 +123,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         val sh = h*0.3f // Height "
         val x2 = w * 0.7f // Offset of right Rect
         val y2 = h * 0.7f // " bottom
-        val di = max(0.2f, 10f)/2f  // Radius of circle
+        val di = max(0.2f, 10f)  // Radius of circle
         val of = h*0.25f*0.2f
 
         val b = 1/zoom
@@ -193,7 +193,6 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
 class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : TransformBehavior(penner)
 {
-
     val tool = penner.toolsetManager.toolset.Reshape
     val workspace = penner.workspace
 
@@ -237,6 +236,7 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
         link2.unbind()
         link3.unbind()
         workspace?.selectionEngine?.selectionChangeObserver?.removeObserver(link4)
+        link5.unbind()
 
         scale = Vec2(1f,1f)
         translation = Vec2(0f,0f)

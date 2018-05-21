@@ -35,7 +35,13 @@ class FormingSelectionBehavior(
     }
 
     override fun onPenUp() {
-        penner.workspace?.selectionEngine?.mergeSelection(builder.build(), mode)
+        val built = builder.build()
+
+        when(built) {
+            null -> penner.workspace?.selectionEngine?.setSelection(null)
+            else -> penner.workspace?.selectionEngine?.mergeSelection(built, mode)
+        }
+
         super.onPenUp()
     }
 
