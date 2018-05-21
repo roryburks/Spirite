@@ -197,7 +197,7 @@ class DefaultImageDrawer(
         val mask = mask
 
         val rect = when {
-            mask == null -> Rect(arranged.handle.width, arranged.handle.height)
+            mask == null -> arranged.handle.run { Rect(x,y,width, height) }
             mask.transform == null -> Rect(mask.width, mask.height)
             else -> MathUtil.circumscribeTrans(Rect(mask.width, mask.height), mask.transform)
         }
@@ -207,6 +207,20 @@ class DefaultImageDrawer(
 
         val effectiveTrans = Transform.TranslationMatrix(cx,cy) * trans * Transform.TranslationMatrix(-cx,-cy)
 
+        doTransformStraight(effectiveTrans)
+    }
+    override fun flip(horizontal: Boolean) {
+        val built = arranged.built
+        val cx = built.width /2f
+        val cy = built.height /2f
+
+        doTransformStraight(when( horizontal) {
+            true -> Transform.TranslationMatrix(cx,cy) * Transform.ScaleMatrix(-1f,1f) * Transform.TranslationMatrix(-cx,-cy)
+            false -> Transform.TranslationMatrix(cx,cy) * Transform.ScaleMatrix(1f, -1f) * Transform.TranslationMatrix(-cx,-cy)
+        })
+    }
+
+    private fun doTransformStraight( effectiveTrans: Transform) {
         if( mask == null) {
             workspace.undoEngine.performAndStore(object: ImageAction(arranged) {
                 override val description: String get() = "Transform"
@@ -234,6 +248,8 @@ class DefaultImageDrawer(
         }
     }
 
+
+
     override fun startManipulatingTransform(): Rect? {
         val tool = workspace.toolset.Reshape
         val selected = workspace.selectionEngine.selection
@@ -251,8 +267,8 @@ class DefaultImageDrawer(
 
         workspace.compositor.compositeSource = CompositeSource(arranged, false ) { gc ->
             val medium = arranged.handle.medium
-            val cx = medium.width / 2f
-            val cy = medium.height / 2f
+            val cx = medium.width / 2f + medium.x
+            val cy = medium.height / 2f + medium.y
 
             val effectiveTrans = Transform.TranslationMatrix(cx,cy) * tool.transform * Transform.TranslationMatrix(-cx,-cy)
 
@@ -260,7 +276,8 @@ class DefaultImageDrawer(
             arranged.handle.medium.render(gc)
         }
 
-        return MathUtil.circumscribeTrans(Rect(arranged.handle.width, arranged.handle.height), arranged.tMediumToWorkspace)
+        val m = arranged.handle
+        return MathUtil.circumscribeTrans(Rect(m.x, m.y, m.width, m.height), arranged.tMediumToWorkspace)
     }
 
     override fun stepManipulatingTransform() {

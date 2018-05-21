@@ -11,8 +11,7 @@ import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
-
-private val MAX_DIM = 16000
+import spirite.pc.master
 
 class NewSimpleLayerPanel(
         master: IMasterControl,
@@ -24,6 +23,8 @@ class NewSimpleLayerPanel(
             val color: Color,
             val name: String,
             val mediumType: MediumType)
+
+    private val MAX_DIM get() = master.settingsManager.MaxDimension
 
     private val comboBox = Hybrid.ui.ComboBox( MediumType.creatableTypes)
     private val widthField = Hybrid.ui.IntField(1, MAX_DIM, false)

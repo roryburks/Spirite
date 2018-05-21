@@ -3,6 +3,7 @@ package spirite.pc
 import spirite.base.brains.MasterControl
 import spirite.base.file.LoadEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.gui.components.major.RootWindow
 import spirite.hybrid.EngineLaunchpoint
@@ -28,7 +29,7 @@ fun main( args: Array<String>) {
 
         SwingUtilities.invokeLater {
             val ws1 = master.createWorkspace(640,480)
-            ws1.groupTree.addNewSimpleLayer(null, "Background", FLAT, 640, 480)
+            ws1.groupTree.addNewSimpleLayer(null, "Background", DYNAMIC)
             master.workspaceSet.addWorkspace(ws1)
             ws1.finishBuilding()
         }

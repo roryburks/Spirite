@@ -1,6 +1,7 @@
 package spirite.base.brains.settings
 
 import spirite.base.util.delegates.MutableLazy
+import spirite.base.util.i
 import spirite.base.util.interpolation.CubicSplineInterpolator
 import spirite.base.util.linear.Vec2
 import java.io.File
@@ -11,6 +12,10 @@ interface ISettingsManager {
     val paletteList : List<String>
     fun getRawPalette( name: String) : ByteArray?
     fun saveRawPalette( name: String, raw: ByteArray)
+
+    val MaxDimension : Int
+    var defaultWidth : Int
+    var defaultHeight : Int
 
     var lastUsedWorkspace : Boolean
     var workspaceFilePath : File
@@ -35,6 +40,13 @@ class SettingsManager (
 
     override var paletteDoubleclickTime by PreferenceIntDelegate("PaletteDoubleclickTime", 500)
     override var paletteDragMinTime by PreferenceIntDelegate("PaletteDragMinTime", 100)
+
+    // region
+    override val MaxDimension: Int get() = Short.MAX_VALUE.i
+    override var defaultWidth: Int by PreferenceIntDelegate("DefaultWidth", 640)
+    override var defaultHeight: Int by PreferenceIntDelegate("DefaultHeight", 480)
+
+    // endregion
 
     // ==============
     // ==== Palettes:

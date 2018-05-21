@@ -62,7 +62,6 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     // Step 1: for each Rect of width greater then half the strip width,
     //	stack them on top of each other
     rects.removeIf {
-        System.out.println("${it.x} , ${width/2}")
         if( it.x >= width/2) {
             val row = IntArray(width)
             for( x in it.x until width)

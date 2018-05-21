@@ -207,8 +207,6 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             // By default centered
             newView.offsetX = (newWorkspace.width/2 - workAreaContainer.width/2)
             newView.offsetY = (newWorkspace.height/2 - workAreaContainer.height/2)
-
-            println("${newView.offsetX},${newView.offsetY}")
         }
 
         override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {

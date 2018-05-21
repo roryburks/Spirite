@@ -35,7 +35,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
     init /* Menu */ {
         val scheme = listOf(
                 MenuItem("&File"),
-                MenuItem(".&New Image", GlobalCommand.PING),
+                MenuItem(".&New Image", GlobalCommand.NEW_WORKSPACE),
                 MenuItem(".-"),
                 MenuItem(".&Open", GlobalCommand.OPEN),
                 MenuItem(".-"),

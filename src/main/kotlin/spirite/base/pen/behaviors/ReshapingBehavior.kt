@@ -16,6 +16,10 @@ import spirite.base.util.shapes.Rectangle
 import spirite.gui.components.major.work.WorkSectionView
 import kotlin.math.atan2
 
+/***
+ * TransformBehavior is an abstract Behavior that encapsulates the drawing and manipulation of the GridUI based on a
+ * region (manipulated, presumably, by the derived).
+ */
 abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) {
     enum class TransformStates {
         READY, ROTATE, RESIZE, MOVING, INACTIVE
@@ -191,6 +195,11 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     }
 }
 
+/***
+ * ReshapingBehavior derives from TransformBehavior, which handles all the transforming/drawing logic, whereas
+ * ReshapingBehavior binds the transform being manipulated to the ReshapingTool's transform stats and triggers a
+ * ITranformModule drawer.
+ */
 class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : TransformBehavior(penner)
 {
     val tool = penner.toolsetManager.toolset.Reshape

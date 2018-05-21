@@ -13,9 +13,11 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.layers.SimpleLayer
+import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.MathUtil
@@ -31,6 +33,7 @@ import java.io.File
 class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {
         PING( "ping"),
+        NEW_WORKSPACE("newWorkspace"),
         SAVE_WORKSPACE("saveWorkspace"),
         SAVE_WORKSPACE_AS("saveWorkspaceAs"),
         OPEN("open"),
@@ -52,6 +55,13 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when( string) {
             PING.string -> println("PING")
+            NEW_WORKSPACE.string -> {
+                val result = master.dialog.invokeNewWorkspace() ?: return true
+                val newWorkspace = master.createWorkspace(result.width, result.height)
+                newWorkspace.groupTree.addNewSimpleLayer(null, "Background", DYNAMIC)
+                newWorkspace.finishBuilding()
+                master.workspaceSet.addWorkspace(newWorkspace)
+            }
             SAVE_WORKSPACE.string -> {
                 val workspace = master.workspaceSet.currentWorkspace ?: return true
                 val wsfile = workspace.file

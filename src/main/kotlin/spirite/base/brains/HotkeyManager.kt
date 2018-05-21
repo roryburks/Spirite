@@ -10,6 +10,7 @@ import spirite.base.brains.settings.IPreferences
 import spirite.base.util.dataContainers.MutableOneToManyMap
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import kotlin.Int.Companion
 
 data class Hotkey(
         val key: Int,
@@ -66,6 +67,8 @@ private val defaultHotkeys = mapOf(
         GlobalCommand.PASTE.commandString to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK)),
         GlobalCommand.PASTE_AS_LAYER.commandString to (Hotkey( KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         GlobalCommand.CUT.commandString to (Hotkey( KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.OPEN.commandString to (Hotkey( KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)),
+        GlobalCommand.NEW_WORKSPACE.commandString to (Hotkey( KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK)),
 
         // TODO: This should really be anim., but that might require restructuring/rethinking of
         //	command execution system.
