@@ -240,7 +240,10 @@ class DefaultImageDrawer(
         val lifted = workspace.selectionEngine.liftedData
 
         if( selected != null && lifted == null) {
-            liftSelection(selected)
+            workspace.undoEngine.doAsAggregateAction("Auto-lift") {
+                val nLifted = liftSelection(selected)
+                workspace.selectionEngine.setSelectionWithLifted(selected, nLifted)
+            }
             return null
         }
         if( selected != null)

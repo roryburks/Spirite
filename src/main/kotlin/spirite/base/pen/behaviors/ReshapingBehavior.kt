@@ -3,21 +3,13 @@ package spirite.base.pen.behaviors
 import com.hackoeur.jglm.support.FastMath.max
 import spirite.base.brains.Bindable
 import spirite.base.graphics.GraphicsContext
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.IImageDrawer.ILiftSelectionModule
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
-import spirite.base.imageData.mediums.CompositeSource
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
-import spirite.base.util.MathUtil
 import spirite.base.util.f
-import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Rect
-import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
-import spirite.base.util.linear.Vec2
+import spirite.base.util.linear.*
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
@@ -29,8 +21,21 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         READY, ROTATE, RESIZE, MOVING, INACTIVE
     }
 
-    // The Calculation Transform is a snapshot of the transformation from the effective working transform 
+    // The Calculation Transform is a snapshot, taken when switching states:
+    // The snapshot is of the transformation from image space to a space where -1,-1 is the lower-left corner of the
+    //  transformed [region] Rect using the workingTransform and 1,1 is the upper-right
     private var calcTrans: Transform = Transform.IdentityMatrix
+    private fun updateCalcTrans() {
+        val region = region ?: return
+        val trans = MutableTransform.TranslationMatrix(-region.width/2f, -region.height/2f)
+        trans.preConcatenate(workingTransform)
+        trans.preTranslate(region.width/2f + region.x, region.height/2f + region.y)
+        val trans2 = trans.invertM()
+        trans2.preScale(1/region.width.f, 1f / region.height.f)
+        trans2.preTranslate(-0.5f,-0.5f)
+        trans2.preScale(2f,2f)
+        calcTrans = trans2
+    }
 
     var state = TransformStates.READY
         set(value) {
@@ -38,14 +43,14 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
                 RESIZE -> {
                     startX = penner.x
                     startY = penner.y
-                    calcTrans = workingTransform.invert()
+                    updateCalcTrans()
                     oldScaleX = scale.x
                     oldScaleY = scale.y
                 }
                 ROTATE -> {
                     startX = penner.x
                     startY = penner.y
-                    calcTrans = workingTransform.invert()
+                    updateCalcTrans()
                     oldRot = rotation
                 }
                 else -> {}
@@ -53,14 +58,14 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
             field = value
         }
 
-    var startX = 0
-    var startY = 0
-    var oldScaleX = 0f
-    var oldScaleY = 0f
-    var oldRot = 0f
+    private var startX = 0
+    private var startY = 0
+    private var oldScaleX = 0f
+    private var oldScaleY = 0f
+    private var oldRot = 0f
 
-    val scaleBind = Bindable(Vec2(1f,1f))
-    var scale by scaleBind
+    protected val scaleBind = Bindable(Vec2(1f,1f))
+    protected var scale by scaleBind
 
     val translationBind = Bindable(Vec2(0f,0f))
     var translation by translationBind
@@ -87,6 +92,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
         trans.preTranslate(orig.x, orig.y)
         return trans
     }
+
 
     var overlap = -1
 
@@ -203,6 +209,7 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
     private val link4 = {it : SelectionChangeEvent ->
         end()
     }.apply { penner.workspace?.selectionEngine?.selectionChangeObserver?.addObserver { this }}
+    private val link5 = tool.applyTransformBind.addListener{ _,_ -> tryStart()}
 
 
     private fun onChange() {
@@ -216,9 +223,6 @@ class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : Transfor
 
     private fun tryStart() : Boolean {
         val workspace = workspace?: return false
-        val selectionEngine = workspace.selectionEngine
-        val selected = selectionEngine.selection
-        val lifted = selectionEngine.liftedData
 
         region = drawer.startManipulatingTransform() ?: kotlin.run {
             drawer = workspace.activeDrawer as? ITransformModule ?: return false

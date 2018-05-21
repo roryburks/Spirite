@@ -72,7 +72,10 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
     }
     is DropDownProperty -> toolProperty.getComponent()
     is ButtonProperty -> Hybrid.ui.Button(toolProperty.hrName).apply {
-        action = {master.commandExecuter.executeCommand(toolProperty.command.commandString, toolProperty.value)}
+        action = {
+            master.commandExecuter.executeCommand(toolProperty.command.commandString, toolProperty.value)
+            toolProperty.value = !toolProperty.value
+        }
     }
     is RadioButtonProperty -> toolProperty.getComponent()
     is FloatBoxProperty -> Hybrid.ui.CrossPanel{
