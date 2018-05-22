@@ -16,46 +16,47 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         set(value) {
             val old = field
             if( value != old) {
-                old?.partChangeObserver?.removeObserver(onPartChange)
+                field = value
+                old?.layerChangeObserver?.removeObserver(onPartChange)
                 activePartBind.unbind()
-                activePart = null
-                boxList.clear()
+
+                tfType.textBind.unbind()
+                tfDepth.valueBind.unbind()
 
                 if( value != null) {
                     value.activePartBind.bindWeakly(activePartBind)
-                    boxList.addAll( value.parts)
-                    value.partChangeObserver.addObserver(onPartChange)
+                    boxList.resetAllWithSelected(value.parts, value.activePart)
+                    value.layerChangeObserver.addObserver(onPartChange)
+
+                    value.cPartNameBind.bindWeakly(tfType.textBind)
+                    value.cDepthBind.bindWeakly(tfDepth.valueBind)
+                }
+                else {
+                    boxList.clear()
                 }
             }
         }
 
     val onPartChange = {
-        doLocked {
-            val part = activePart
-            tfTransX.value = part?.transX ?: 0f
-            tfTransY.value = part?.transY ?: 0f
-            tfScaleX.value = part?.scaleX ?: 1f
-            tfScaleY.value = part?.scaleY ?: 1f
-            tfRot.value = part?.rot ?: 0f
-            println(part?.rot)
+        val linked = linkedSprite
+        when(linked) {
+            null -> boxList.clear()
+            else -> boxList.resetAllWithSelected(linked.parts, linked.activePart)
         }
     }
-    private fun update
 
     val activePartBind = Bindable<SpritePart?>(null) { new, old ->
-        println("do : $new")
-        this.onPartChange.invoke()
     }
     var activePart: SpritePart? by activePartBind
 
     val boxList = Hybrid.ui.BoxList<SpritePart>(24, 24)
-    val tfTransX = Hybrid.ui.FloatField().also { it.valueBind.addListener { new, old ->  doLocked { activePart?.transX = new}} }
-    val tfTransY = Hybrid.ui.FloatField().also { it.valueBind.addListener { new, old ->  doLocked { activePart?.transY = new}} }
-    val tfScaleX =  Hybrid.ui.FloatField().also { it.valueBind.addListener { new, old ->  doLocked { activePart?.scaleX = new}} }
-    val tfScaleY = Hybrid.ui.FloatField().also { it.valueBind.addListener { new, old ->  doLocked { activePart?.scaleY = new} }}
-    val tfRot = Hybrid.ui.FloatField().also { it.valueBind.addListener { new, old ->  doLocked { activePart?.rot = new} }}
-    val tfDepth = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addListener { new, old ->  doLocked { activePart?.depth = new} }}
-    val tfType = Hybrid.ui.TextField().also { it.textBind.addListener { new, old ->  doLocked { activePart?.partName = new} }}
+    val tfTransX = Hybrid.ui.FloatField()
+    val tfTransY = Hybrid.ui.FloatField()
+    val tfScaleX =  Hybrid.ui.FloatField()
+    val tfScaleY = Hybrid.ui.FloatField()
+    val tfRot = Hybrid.ui.FloatField()
+    val tfDepth = Hybrid.ui.IntField(allowsNegative = true)
+    val tfType = Hybrid.ui.TextField()
 
     var lock = false
     inline fun <T> T.doLocked(block: (T) -> Unit): T {
@@ -69,16 +70,31 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
 
     val btnNewPart = Hybrid.ui.Button()
-    val btnRemovePart = Hybrid.ui.Button()
-    val btnVisibility = Hybrid.ui.ToggleButton()
+    val btnRemovePart = Hybrid.ui.Button().also { it.action = {activePart?.also {  linkedSprite?.removePart( it)} }}
+    val btnVisibility = Hybrid.ui.ToggleButton().also { it.checkBindable.addListener { new, old ->  doLocked { activePart?.visible = new }} }
 
     val opacitySlider = Hybrid.ui.GradientSlider(0f,1f, "Opacity")
 
     init {
+        btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
+        btnVisibility.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
+        btnNewPart.setIcon(SwIcons.SmallIcons.Rig_New)
+        btnRemovePart.setIcon(SwIcons.SmallIcons.Rig_Remove)
+
+        btnNewPart.action = {
+            linkedSprite?.addPart("new")
+        }
+
+
+
         boxList.renderer = {part ->
             object : IBoxComponent {
                 override val component: IComponent
-                    get() = Hybrid.ui.Label(part.partName)
+                    get() = Hybrid.ui.Button(part.partName).also {
+                        it.action ={
+                            doLocked { boxList.selected = part}
+                        }
+                    }
 
                 override fun setSelected(selected: Boolean) {
                     if( selected)
@@ -87,8 +103,6 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
-        btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
-        btnVisibility.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
 
         setLayout {
             rows += {

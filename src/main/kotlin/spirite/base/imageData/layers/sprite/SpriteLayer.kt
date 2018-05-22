@@ -1,7 +1,6 @@
 package spirite.base.imageData.layers.sprite
 
 import spirite.base.brains.Bindable
-import spirite.base.brains.IBindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.graphics.rendering.TransformedHandle
@@ -13,7 +12,6 @@ import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
-import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.imageData.undo.NullAction
@@ -21,10 +19,6 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
 import spirite.base.util.ceil
-import spirite.base.util.delegates.DerivedLazy
-import spirite.base.util.delegates.MutableLazy
-import spirite.base.util.delegates.OnChangeDelegate
-import spirite.base.util.delegates.StackableUndoableDelegate
 import spirite.base.util.floor
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.mapAggregated
@@ -32,8 +26,6 @@ import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
-import java.rmi.activation.ActivationDesc
-import kotlin.math.roundToInt
 
 /**
  *  A SpriteLayer is a collection of Dynamic Mediums with various offsets, transforms, and
@@ -59,19 +51,30 @@ class SpriteLayer(
         }
     }
 
-    var activePartBind =  Bindable<SpritePart?>(null)
-    var activePart by activePartBind
+    var activePartBind =  Bindable<SpritePart?>(null) { new, old ->
+        cAlphaBind.field = new?.alpha ?: 1f
+        cDepthBind.field = new?.depth ?: 0
+        cVisibleBind.field = new?.visible ?: true
+        cPartNameBind.field = new?.partName ?: ""
+        cTransXBind.field = new?.transX ?: 0f
+        cTransYBind.field = new?.transY ?: 0f
+        cScaleXBind.field = new?.scaleX ?: 1f
+        cScaleYBind.field = new?.scaleY ?: 1f
+        cRotBind.field = new?.rot ?: 0f
+    }
+    var activePart : SpritePart? by activePartBind
 
-    private var _partChangeObserver = Observable<()->Any?>()
-    val partChangeObserver : IObservable<()->Any?> get() = _partChangeObserver
-    fun triggerPartChange() {
-        _partChangeObserver.trigger { it() }
+    private var _layerChangeObserver = Observable<()->Any?>()
+    val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
+    override fun triggerChange() {
+        _layerChangeObserver.trigger { it() }
         workspace.imageObservatory.triggerRefresh(
                 ImageChangeEvent(
                         emptyList(),
                         workspace.groupTree.root.getAllNodesSuchThat({(it as? LayerNode)?.layer == this}),
                         workspace)
         )
+        super.triggerChange()
     }
 
 
@@ -198,8 +201,23 @@ class SpriteLayer(
         }
     }
     private fun _sort() {
+        println("b")
+        println(_parts.map { it.partName }.joinToString(", ") )
         _parts.sortWith(compareBy({it.depth}, {it.id}))
+        println(_parts.map { it.partName }.joinToString(", ") )
     }
+
+    val cDepthBind = Bindable(0) {new, old ->  activePart?.depth = new}
+    val cVisibleBind = Bindable(true) {new, old ->  activePart?.visible = new}
+    val cPartNameBind = Bindable("") {new, old ->  activePart?.partName = new}
+    val cAlphaBind = Bindable(1f) {new, old ->  activePart?.alpha = new}
+    val cTransXBind = Bindable(0f) {new, old ->  activePart?.transX = new}
+    val cTransYBind = Bindable(0f) {new, old ->  activePart?.transY = new}
+    val cScaleXBind = Bindable(1f) {new, old ->  activePart?.scaleX = new}
+    val cScaleYBind = Bindable(1f) {new, old ->  activePart?.scaleY = new}
+    val cRotBind = Bindable(0f) {new, old ->  activePart?.rot = new}
+
+
 
     inner class SpritePart(
             _structure: SpritePartStructure,
@@ -222,8 +240,6 @@ class SpriteLayer(
         var centerX get() = structure.centerX ; set(value) { if( value != structure.centerX) replaceStructure(structure.copy(centerX = value), 9)}
         var centerY get() = structure.centerY ; set(value) { if( value != structure.centerY) replaceStructure(structure.copy(centerY = value), 10)}
 
-
-
         private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
             if( structure != newStructure)
                 undoEngine.performAndStore(SpriteStructureAction(newStructure, structureCode))
@@ -238,12 +254,13 @@ class SpriteLayer(
             override fun performAction() {
                 structure = newStructure
                 _sort()
-                triggerPartChange()
+                println("change action: ${structure.partName}")
+                triggerChange()
             }
             override fun undoAction() {
                 structure = oldStructure
                 _sort()
-                triggerPartChange()
+                triggerChange()
             }
 
             override fun canStack(other: UndoableAction) =

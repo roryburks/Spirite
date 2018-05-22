@@ -39,6 +39,16 @@ class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : MB
 
     private var underlying = BindableUnderlying(this, defaultValue)
 
+    /** Root listeners do not disappear when you call this.unbind()*/
+    fun addRootListener(listener: OnChangeEvent<T>) {
+        val oldOnChange = onChange
+        when( oldOnChange) {
+            null -> onChange = listener
+            else -> onChange = {new,old-> oldOnChange.invoke(new, old) ; listener.invoke(new,old)}
+        }
+        listener.invoke(field, field)
+    }
+
     /** Note: Calling b1.bind( b2) will result in both having b2's current underlying scroll. */
     override fun bind( derived: Bindable<T>) {
         if( derived.underlying != underlying) {
@@ -51,6 +61,7 @@ class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : MB
         if( derived.underlying != underlying) {
             underlying.swallowWeakly(derived.underlying)
             derived.underlying = underlying
+
         }
     }
 

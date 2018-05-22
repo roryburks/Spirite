@@ -31,7 +31,7 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
             override fun insertUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
             override fun removeUpdate(e: DocumentEvent?) {locked = true; text = imp.text; locked = false}
         })
-        textBind.addListener { new, old -> if(!locked)imp.text = new }
+        textBind.addRootListener { new, old -> if(!locked)imp.text = new }
     }
 
     private class SwTextFieldImp() : JTextField()
@@ -118,8 +118,8 @@ class SwIntField(min: Int, max: Int, allowsNegatives: Boolean = true) : SwNumber
     }
 
     init {
-        textBind.addListener { new, old ->value = new.toIntOrNull(10) ?: 0 }
-        valueBind.addListener {new, old -> text = new.toString() }
+        textBind.addRootListener { new, old ->value = new.toIntOrNull(10) ?: 0 }
+        valueBind.addRootListener {new, old -> text = new.toString() }
     }
 }
 
@@ -132,7 +132,7 @@ class SwFloatField(min: Float, max: Float, allowsNegatives: Boolean = true) : Sw
     }
 
     init {
-        textBind.addListener { new, old -> value = new.toFloatOrNull() ?: 0f }
-        valueBind.addListener { new, old -> text = new.toString() }
+        textBind.addRootListener { new, old -> value = new.toFloatOrNull() ?: 0f }
+        valueBind.addRootListener { new, old -> text = new.toString() }
     }
 }

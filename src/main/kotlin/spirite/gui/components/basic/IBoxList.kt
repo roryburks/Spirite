@@ -26,6 +26,7 @@ interface IBoxList<T> : IComponent
     fun addEntry( t: T)
     fun addEntry( ind: Int, t: T)
     fun addAll( set: Collection<T>)
+    fun resetAllWithSelected( set: Collection<T>, selected: T?)
     fun remove( t: T)
     fun clear()
 
@@ -107,6 +108,14 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
         _entries.addAll(set.mapIndexed { index, t ->  make(t, _entries.size + index) })
         rebuild()
     }
+
+    override fun resetAllWithSelected(set: Collection<T>, selected: T?) {
+        _entries.clear()
+        _entries.addAll(set.mapIndexed { index, t ->  make2(t, _entries.size + index) })
+        this.selected = selected
+        rebuild()
+    }
+
     override fun remove( t: T) {
         _entries.removeIf { it.value == t }
         rebuild()
@@ -117,9 +126,12 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     }
 
     protected fun make( t: T, ind: Int) = BoxListEntry( t,renderer.invoke(t).apply {
-            setSelected(selectedIndex == ind)
-            setIndex( ind)
-        })
+        setSelected(selectedIndex == ind)
+        setIndex( ind)
+    })
+    protected fun make2( t: T, ind: Int) = BoxListEntry( t,renderer.invoke(t).apply {
+        setIndex( ind)
+    })
 
     protected fun rebuild(){
         with( del, {
