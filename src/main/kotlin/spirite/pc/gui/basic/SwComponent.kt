@@ -1,5 +1,7 @@
 package spirite.pc.gui.basic
 
+import spirite.base.util.MathUtil
+import spirite.base.util.f
 import spirite.gui.SUIPoint
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder
@@ -141,6 +143,8 @@ abstract class ASwComponent : ISwComponent {
             var onMouseDrag : ((MouseEvent) -> Unit)? = null)
         :java.awt.event.MouseListener, java.awt.event.MouseMotionListener
     {
+        var startX = 0
+        var startY = 0
 
         fun convert( e: JMouseEvent) : MouseEvent {
             val scomp = SwComponent(e.component as JComponent)
@@ -160,11 +164,19 @@ abstract class ASwComponent : ISwComponent {
                     mask)
         }
 
-        override fun mouseReleased(e: JMouseEvent) { onMouseRelease?.invoke( convert(e))}
+        override fun mouseReleased(e: JMouseEvent) {
+            onMouseRelease?.invoke( convert(e))
+            if( e.component.bounds.contains(e.point) && MathUtil.distance(startX.f, startY.f, e.x.f, e.y.f) < 4)
+                onMouseClick?.invoke(convert(e))
+        }
         override fun mouseEntered(e: JMouseEvent) { onMouseEnter?.invoke( convert(e))}
-        override fun mouseClicked(e: JMouseEvent) {onMouseClick?.invoke(convert(e))}
+        override fun mouseClicked(e: JMouseEvent) {}
         override fun mouseExited(e: JMouseEvent) {onMouseExit?.invoke(convert(e))}
-        override fun mousePressed(e: JMouseEvent) {onMousePress?.invoke(convert(e))}
+        override fun mousePressed(e: JMouseEvent) {
+            startX = e.x
+            startY = e.y
+            onMousePress?.invoke(convert(e))
+        }
         override fun mouseMoved(e: JMouseEvent) {onMouseMove?.invoke(convert(e))}
         override fun mouseDragged(e: JMouseEvent) { onMouseDrag?.invoke(convert(e))}
     }

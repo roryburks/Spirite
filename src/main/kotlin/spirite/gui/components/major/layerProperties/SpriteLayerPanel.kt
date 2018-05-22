@@ -37,10 +37,13 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             tfScaleX.value = part?.scaleX ?: 1f
             tfScaleY.value = part?.scaleY ?: 1f
             tfRot.value = part?.rot ?: 0f
-            println(part?.transX)
+            println(part?.rot)
         }
     }
+    private fun update
+
     val activePartBind = Bindable<SpritePart?>(null) { new, old ->
+        println("do : $new")
         this.onPartChange.invoke()
     }
     var activePart: SpritePart? by activePartBind
