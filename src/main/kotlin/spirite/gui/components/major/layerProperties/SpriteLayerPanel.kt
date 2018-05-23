@@ -22,6 +22,13 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                 tfType.textBind.unbind()
                 tfDepth.valueBind.unbind()
+                tfTransX.valueBind.unbind()
+                tfTransY.valueBind.unbind()
+                tfScaleX.valueBind.unbind()
+                tfScaleY.valueBind.unbind()
+                tfRot.valueBind.unbind()
+                opacitySlider.valueBind.unbind()
+                btnVisibility.checkBind.unbind()
 
                 if( value != null) {
                     value.activePartBind.bindWeakly(activePartBind)
@@ -30,10 +37,15 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
                     value.cPartNameBind.bindWeakly(tfType.textBind)
                     value.cDepthBind.bindWeakly(tfDepth.valueBind)
+                    value.cAlphaBind.bindWeakly(opacitySlider.valueBind)
+                    value.cTransXBind.bindWeakly(tfTransX.valueBind)
+                    value.cTransYBind.bindWeakly(tfTransY.valueBind)
+                    value.cScaleXBind.bindWeakly(tfScaleX.valueBind)
+                    value.cScaleYBind.bindWeakly(tfScaleY.valueBind)
+                    value.cRotBind.bindWeakly(tfRot.valueBind)
+                    value.cVisibleBind.bindWeakly(btnVisibility.checkBind)
                 }
-                else {
-                    boxList.clear()
-                }
+                else boxList.clear()
             }
         }
 
@@ -57,6 +69,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     val tfRot = Hybrid.ui.FloatField()
     val tfDepth = Hybrid.ui.IntField(allowsNegative = true)
     val tfType = Hybrid.ui.TextField()
+    val opacitySlider = Hybrid.ui.GradientSlider(0f,1f, "Opacity")
 
     var lock = false
     inline fun <T> T.doLocked(block: (T) -> Unit): T {
@@ -71,9 +84,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
 
     val btnNewPart = Hybrid.ui.Button()
     val btnRemovePart = Hybrid.ui.Button().also { it.action = {activePart?.also {  linkedSprite?.removePart( it)} }}
-    val btnVisibility = Hybrid.ui.ToggleButton().also { it.checkBindable.addListener { new, old ->  doLocked { activePart?.visible = new }} }
-
-    val opacitySlider = Hybrid.ui.GradientSlider(0f,1f, "Opacity")
+    val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
         btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
@@ -91,9 +102,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             object : IBoxComponent {
                 override val component: IComponent
                     get() = Hybrid.ui.Button(part.partName).also {
-                        it.action ={
-                            doLocked { boxList.selected = part}
-                        }
+                        it.action ={ boxList.selected = part}
                     }
 
                 override fun setSelected(selected: Boolean) {

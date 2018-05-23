@@ -2,7 +2,6 @@ package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.Colors
@@ -78,7 +77,7 @@ private constructor(
             comp.opaque = false
 
             val visibilityButton = Hybrid.ui.ToggleButton( t.visible)
-            visibilityButton.checkBindable.addListener { new, old ->  t.visible = new}
+            visibilityButton.checkBind.addListener { new, old ->  t.visible = new}
             visibilityButton.setOnIcon( SwIcons.BigIcons.VisibleOn)
             visibilityButton.setOffIcon( SwIcons.BigIcons.VisibleOff)
 

@@ -5,7 +5,7 @@ import spirite.base.brains.Bindable.Bound
 import spirite.gui.resources.IIcon
 
 interface IToggleButtonNonUI {
-    val checkBindable : Bindable<Boolean>
+    val checkBind : Bindable<Boolean>
     var checked : Boolean
 
 }
@@ -21,6 +21,6 @@ interface IToggleButton : IToggleButtonNonUI, IComponent {
 }
 
 class ToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
-    override val checkBindable = Bindable(startChecked)
-    override var checked by Bound(checkBindable)
+    override val checkBind = Bindable(startChecked)
+    override var checked by Bound(checkBind)
 }

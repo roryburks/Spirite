@@ -16,7 +16,6 @@ class TransferableImage(image: IImage) : Transferable {
     val bImage = Hybrid.imageConverter.convert<ImageBI>(this.image).bi
 
     override fun getTransferData(flavor: DataFlavor?): Any {
-        println("get ${flavor?.humanPresentableName}")
         return when( flavor) {
             DataFlavor.imageFlavor -> bImage
             IImageDataFlavor -> image

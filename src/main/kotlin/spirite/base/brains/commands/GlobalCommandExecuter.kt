@@ -32,7 +32,6 @@ import java.io.File
 
 class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {
-        PING( "ping"),
         NEW_WORKSPACE("newWorkspace"),
         SAVE_WORKSPACE("saveWorkspace"),
         SAVE_WORKSPACE_AS("saveWorkspaceAs"),
@@ -54,7 +53,6 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when( string) {
-            PING.string -> println("PING")
             NEW_WORKSPACE.string -> {
                 val result = master.dialog.invokeNewWorkspace() ?: return true
                 val newWorkspace = master.createWorkspace(result.width, result.height)

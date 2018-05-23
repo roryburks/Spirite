@@ -4,6 +4,8 @@ import com.jogamp.opengl.glu.GLU
 import com.jogamp.opengl.glu.GLUtessellatorCallback
 import spirite.base.graphics.gl.GLPrimitive
 import spirite.base.util.compaction.FloatCompactor
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.ErrorType.FATAL
 
 object PolygonTesselater {
     fun tesselatePolygon( x: List<Float>, y: List<Float>, count: Int) : GLPrimitive {
@@ -57,8 +59,7 @@ object PolygonTesselater {
             val estring: String
 
             estring = GLU().gluErrorString(errnum)
-            System.err.println("Tessellation Error: " + estring)
-            System.exit(0)
+            MDebug.handleError(FATAL, "Tessellation Error: $estring")
         }
 
         override fun vertex(arg0: Any) {

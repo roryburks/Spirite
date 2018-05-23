@@ -134,7 +134,7 @@ private constructor(
 
             val btnExpand =  Hybrid.ui.ToggleButton(true)
             btnExpand.plainStyle = true
-            componentVisibleBindable.bind(btnExpand.checkBindable)
+            componentVisibleBindable.bind(btnExpand.checkBind)
 
             when( orientation) {
                 VERTICAL -> {

@@ -6,7 +6,6 @@ import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
 import spirite.gui.components.advanced.ITreeElementConstructor.ITNode
-import spirite.gui.components.advanced.ITreeView.*
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
@@ -17,7 +16,6 @@ import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
-import spirite.pc.gui.SColor
 import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
@@ -25,9 +23,6 @@ import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import kotlin.math.max
@@ -185,7 +180,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 when {
                     node.children.any() -> {
                         val toggleButton = makeToggleButton(node.expanded)
-                        node.expandedBind.bindWeakly(toggleButton.checkBindable)
+                        node.expandedBind.bindWeakly(toggleButton.checkBind)
                         add(toggleButton, width = gapSize)
                     }
                     else ->addGap(gapSize)

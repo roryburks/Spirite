@@ -37,8 +37,8 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
 
 
 
-    val checkBind = checkBindable.addListener { new, old -> imp.isSelected = new }
     init {
+        checkBind.addRootListener { new, old -> imp.isSelected = new }
         imp.addItemListener{checked = imp.isSelected}
         setBasicBorder(BEVELED_RAISED)
         background = Skin.Global.BgDark.scolor

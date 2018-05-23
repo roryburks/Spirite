@@ -131,7 +131,7 @@ class SpriteLayer(
             activePart == null -> _parts.last().depth + 1
             else -> activePart!!.depth
         }
-        _addPart( SpritePartStructure( depth, partName), handle, if( activePart == null) _parts.size else activePart!!.depth + 1)
+        _addPart( SpritePartStructure( depth, partName), handle)
     }
     fun removePart( toRemove: SpritePart) {
         if( !_parts.contains(toRemove)) return
@@ -161,11 +161,11 @@ class SpriteLayer(
         undoEngine.doAsAggregateAction("Moved Sprite Part"){
             val toMove = _parts.get(fromIndex)
             removePart(_parts.get(fromIndex))
-            _addPart(toMove.structure, toMove.handle, toIndex)  // TODO: I don't really like this as it doesn't preserve Part references
+            _addPart(toMove.structure, toMove.handle)  // TODO: I don't really like this as it doesn't preserve Part references
         }
     }
 
-    private fun _addPart( structure: SpritePartStructure, handle: MediumHandle, index: Int) {
+    private fun _addPart( structure: SpritePartStructure, handle: MediumHandle) {
         if( _parts.size >= 255) {
             // Primarily for save/load simplicity
             MDebug.handleWarning(WarningType.UNSUPPORTED, "Only 255 parts per rig currently supported.")
@@ -185,7 +185,7 @@ class SpriteLayer(
             undoEngine.performAndStore( object: NullAction() {
                 override val description: String get() = ""
                 override fun performAction() {
-                    _parts.add( index, toAdd)
+                    _parts.add(toAdd)
                     _sort()
                     triggerChange()
                 }
@@ -201,10 +201,7 @@ class SpriteLayer(
         }
     }
     private fun _sort() {
-        println("b")
-        println(_parts.map { it.partName }.joinToString(", ") )
         _parts.sortWith(compareBy({it.depth}, {it.id}))
-        println(_parts.map { it.partName }.joinToString(", ") )
     }
 
     val cDepthBind = Bindable(0) {new, old ->  activePart?.depth = new}
@@ -254,7 +251,6 @@ class SpriteLayer(
             override fun performAction() {
                 structure = newStructure
                 _sort()
-                println("change action: ${structure.partName}")
                 triggerChange()
             }
             override fun undoAction() {
