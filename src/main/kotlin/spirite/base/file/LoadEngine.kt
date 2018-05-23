@@ -6,11 +6,14 @@ import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
+import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.*
 import spirite.base.util.i
+import spirite.gui.components.major.layerProperties.SpriteLayerPanel
 import spirite.hybrid.Hybrid
 
 import java.io.File
@@ -224,7 +227,24 @@ object LoadEngine {
                     val layer = SimpleLayer(MediumHandle(workspace, context.reindex(mediumId)))
                     workspace.groupTree.importLayer( nodeLayer[depth-1], name, layer, true)
                 }
-                SaveLoadUtil.NODE_RIG_LAYER -> TODO()
+                SaveLoadUtil.NODE_SPRITE_LAYER -> {
+                    val partSize = ra.readUnsignedByte()
+                    val parts = List<Pair<MediumHandle,SpritePartStructure>>(partSize, {
+                        val partName = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
+                        val transX = ra.readFloat()
+                        val transY = ra.readFloat()
+                        val scaleX = ra.readFloat()
+                        val scaleY = ra.readFloat()
+                        val rot = ra.readFloat()
+                        val drawDepth = ra.readInt()
+                        val medium = MediumHandle(workspace,context.reindex(ra.readInt()))
+                        Pair(medium, SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot))
+                    })
+
+                    val sprite = SpriteLayer(workspace, workspace.mediumRepository, parts)
+
+                    workspace.groupTree.importLayer(nodeLayer[depth-1], name, sprite, true)
+                }
                 SaveLoadUtil.NODE_REFERENCE_LAYER -> TODO()
                 SaveLoadUtil.NODE_PUPPET_LAYER -> TODO()
                 else -> throw BadSifFileException("Unrecognized Node Type ID: $type (version mismatch or corrupt file?)")

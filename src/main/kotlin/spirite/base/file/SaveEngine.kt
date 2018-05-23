@@ -137,7 +137,25 @@ object SaveEngine {
                                 ra.writeInt( layer.medium.id)
                             }
                             is SpriteLayer -> {
-                                TODO()
+                                // [1] : NodeTypeId
+                                ra.writeByte(SaveLoadUtil.NODE_SPRITE_LAYER)
+
+                                val parts = layer.parts.toList()
+
+                                // [1] : Number of parts
+                                ra.writeByte( parts.size)
+
+                                parts.forEach { part ->
+                                    // Per Part:
+                                    ra.write(SaveLoadUtil.strToByteArrayUTF8( part.partName)) // n : PartTypeName
+                                    ra.writeFloat(part.transX)  // 4 : TranslationX
+                                    ra.writeFloat(part.transY)  // 4 : TranslationY
+                                    ra.writeFloat(part.scaleX)  // 4 : ScaleX
+                                    ra.writeFloat(part.scaleY)  // 4 : ScaleY
+                                    ra.writeFloat(part.rot)     // 4 : rotation
+                                    ra.writeInt(part.depth)     // 4 : draw depth
+                                    ra.writeInt(part.handle.id) // 4 : MediumId
+                                }
                             }
                             //is ReferenceLayer -> {}
                             //is PuppetLayer -> {}

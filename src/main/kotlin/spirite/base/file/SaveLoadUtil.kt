@@ -16,7 +16,7 @@ object SaveLoadUtil {
     // :::: Node Type Identifiers for the SIFF GroupTree Section
     val NODE_GROUP = 0x00
     val NODE_SIMPLE_LAYER = 0x01
-    val NODE_RIG_LAYER = 0x02
+    val NODE_SPRITE_LAYER = 0x02
     val NODE_REFERENCE_LAYER = 0x03
     val NODE_PUPPET_LAYER = 0x04
 
