@@ -113,7 +113,7 @@ class JDialog(private val master: IMasterControl) : IDialog
             var saveFile = fc.selectedFile
 
             if( type == SAVE_SIF && saveFile.name.indexOf('.') == -1)
-                if( File(saveFile.absolutePath + ".sif").exists() &&
+                if( !File(saveFile.absolutePath + ".sif").exists() ||
                         JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Overwrite Existing ${saveFile.name}.sif?","", JOptionPane.YES_NO_OPTION))
                     saveFile = File(saveFile.absolutePath + ".sif")
 
