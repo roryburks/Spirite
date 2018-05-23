@@ -13,7 +13,6 @@ import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
-import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.imageData.undo.NullAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
@@ -39,7 +38,7 @@ class SpriteLayer(
     val undoEngine = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
-    var workingId = 0
+    private var workingId = 0
 
     init {
         when( toImport) {
@@ -51,7 +50,7 @@ class SpriteLayer(
         }
     }
 
-    var activePartBind =  Bindable<SpritePart?>(null) { new, old ->
+    var activePartBind =  Bindable<SpritePart?>(null) { new, _ ->
         cAlphaBind.field = new?.alpha ?: 1f
         cDepthBind.field = new?.depth ?: 0
         cVisibleBind.field = new?.visible ?: true
@@ -126,12 +125,16 @@ class SpriteLayer(
 
     fun addPart( partName : String) {
         val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
+
         val depth = when {
             _parts.isEmpty() -> 0
             activePart == null -> _parts.last().depth + 1
             else -> activePart!!.depth
         }
-        _addPart( SpritePartStructure( depth, partName), handle)
+
+        undoEngine.doAsAggregateAction("Add Sprite Part") {
+            _addPart( SpritePartStructure( depth, partName), handle)
+        }
     }
     fun removePart( toRemove: SpritePart) {
         if( !_parts.contains(toRemove)) return
@@ -172,33 +175,26 @@ class SpriteLayer(
             return
         }
 
-        undoEngine.doAsAggregateAction("Added New Part") {
-            // Note: Because of how doAsAggregateAction prevents action until it's completed,
-            //	the logic in this method is counter-intuitively valid, as all of the checks
-            //	are done before the new part gets added, even though it's done using
-            //	a performAndStore that happens before them.  Probably bad design.
-            val name = StringUtil.getNonDuplicateName( _parts.map { it.partName }, structure.partName)
-            val newStructure = structure.copy(partName =  name)
+        val name = StringUtil.getNonDuplicateName( _parts.map { it.partName }, structure.partName)
+        val newStructure = structure.copy(partName =  name)
+        val toAdd = SpritePart(newStructure, handle, workingId++)
 
-            val toAdd = SpritePart(newStructure, handle, workingId++)
 
-            undoEngine.performAndStore( object: NullAction() {
-                override val description: String get() = ""
-                override fun performAction() {
-                    _parts.add(toAdd)
-                    _sort()
-                    triggerChange()
-                }
+        undoEngine.performAndStore( object: NullAction() {
+            override val description: String get() = ""
+            override fun performAction() {
+                _parts.add(toAdd)
+                _sort()
+                triggerChange()
+            }
 
-                override fun undoAction() {
-                    _parts.remove(toAdd)
-                    triggerChange()
-                }
+            override fun undoAction() {
+                _parts.remove(toAdd)
+                triggerChange()
+            }
 
-                override fun getDependencies() = SinglyList(toAdd.handle)
-            })
-
-        }
+            override fun getDependencies() = SinglyList(toAdd.handle)
+        })
     }
     private fun _sort() {
         _parts.sortWith(compareBy({it.depth}, {it.id}))
@@ -282,19 +278,3 @@ class SpriteLayer(
     }
 }
 
-data class SpritePartStructure(
-        val depth: Int,
-        val partName: String,
-        val visible: Boolean = true,
-        val alpha: Float = 1f,
-        val transX: Float = 0f,
-        val transY: Float = 0f,
-        val scaleX: Float = 1f,
-        val scaleY: Float = 1f,
-        val rot: Float = 0f,
-        val centerX: Int? = null,
-        val centerY: Int? = null)
-{
-    constructor(part : SpritePart) :
-            this(part.depth, part.partName, part.visible, part.alpha, part.transX, part.transY, part.scaleX, part.scaleY, part.rot, part.centerX, part.centerY)
-}

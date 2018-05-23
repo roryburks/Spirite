@@ -208,8 +208,7 @@ object LoadEngine {
             }
 
             val name = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
-            val type = ra.readUnsignedByte()
-
+            val type =  if(context.version < 0x0001_0000) ra.readInt() else ra.readUnsignedByte()
 
             // !!!! Kind of hack-y that it's even saved, but only the root node should be
             //	depth 0 and there should only be one (and it's already created)

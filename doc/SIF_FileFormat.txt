@@ -26,8 +26,8 @@ Header
  [1, byte] : Node Type ID:
     0x00 : Group Node
     0x01 : Simple Layer
-        [4, int] : ID of linked ImageData
-    0x02 : Rig Layer
+        [4, int] : ID of linked MediumData
+    0x02 : Sprite Layer
         [1, byte] : Number of Parts
         Per Part:
             [n, UTF8 str] : Part Type name
@@ -37,7 +37,7 @@ Header
             [4, float] : scaleY
             [4, float] : rotation
             [4, int] : draw depth
-            [4, int] : ImageID
+            [4, int] : MediumId
 	0x03 : Reference Layer
 		[4, int] : Node ID of node referred to
 	0x04 : Puppet Layer
@@ -47,13 +47,13 @@ Header
 			[2, ushort] : Number of Parts
 			Per Part:
 				[2, ushort] parent (0 for root, 1 for 1st part in the list, etc)
-				[4, int] : ImageID
+				[4, int] : MediumId
 				[4 4 4 4 (16), float] : bone x1, y1, x2, y2 in that order
 				[4, int] : draw depth
 
- ---- IMGD - Image Data Chunk ----
- Per Iamge:
- [4, int] : Image ID
+ ---- IMGD - Medium Data Chunk ----
+ Per Medium:
+ [4, int] : MediumId
  [1, byte] : Type
      SWITCH:
      CASE 0 (Plain) :

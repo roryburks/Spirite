@@ -11,6 +11,6 @@
 000D: Added PLTT Chunk
 000E: Changed Indexing in MagLevFills in MagLev Mediums
 
-1_0001:
+0x0001_0000:
     -NodeTypeID changed from Int (which it incorrectly was) to byte
     -Size of ImageData for Dynamic Images may be 0 indicating a null image
