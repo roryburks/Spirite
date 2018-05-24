@@ -19,7 +19,7 @@ import java.awt.event.MouseEvent
 import java.awt.geom.RoundRectangle2D
 import javax.swing.JToggleButton
 
-private val BUTTON_WIDTH = 24
+private const val BUTTON_WIDTH = 24
 
 class ToolSection (
         private val master: IMasterControl,

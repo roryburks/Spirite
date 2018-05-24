@@ -200,15 +200,15 @@ class SpriteLayer(
         _parts.sortWith(compareBy({it.depth}, {it.id}))
     }
 
-    val cDepthBind = Bindable(0) {new, old ->  activePart?.depth = new}
-    val cVisibleBind = Bindable(true) {new, old ->  activePart?.visible = new}
-    val cPartNameBind = Bindable("") {new, old ->  activePart?.partName = new}
-    val cAlphaBind = Bindable(1f) {new, old ->  activePart?.alpha = new}
-    val cTransXBind = Bindable(0f) {new, old ->  activePart?.transX = new}
-    val cTransYBind = Bindable(0f) {new, old ->  activePart?.transY = new}
-    val cScaleXBind = Bindable(1f) {new, old ->  activePart?.scaleX = new}
-    val cScaleYBind = Bindable(1f) {new, old ->  activePart?.scaleY = new}
-    val cRotBind = Bindable(0f) {new, old ->  activePart?.rot = new}
+    val cDepthBind = Bindable(0) {new, _ ->  activePart?.depth = new}
+    val cVisibleBind = Bindable(true) {new, _ ->  activePart?.visible = new}
+    val cPartNameBind = Bindable("") {new, _ ->  activePart?.partName = new}
+    val cAlphaBind = Bindable(1f) {new, _ ->  activePart?.alpha = new}
+    val cTransXBind = Bindable(0f) {new, _ ->  activePart?.transX = new}
+    val cTransYBind = Bindable(0f) {new, _ ->  activePart?.transY = new}
+    val cScaleXBind = Bindable(1f) {new, _ ->  activePart?.scaleX = new}
+    val cScaleYBind = Bindable(1f) {new, _ ->  activePart?.scaleY = new}
+    val cRotBind = Bindable(0f) {new, _ ->  activePart?.rot = new}
 
 
 
@@ -239,10 +239,10 @@ class SpriteLayer(
         }
 
         inner class SpriteStructureAction(
-                var newStructure: SpritePartStructure,
-                val structureCode: Int
+                private var newStructure: SpritePartStructure,
+                private val structureCode: Int
         ) : NullAction(), StackableAction {
-            val oldStructure: SpritePartStructure = structure
+            private val oldStructure: SpritePartStructure = structure
             override val description: String get() = "Change Part Structure"
             override fun performAction() {
                 structure = newStructure

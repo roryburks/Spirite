@@ -115,7 +115,7 @@ object LoadEngine {
 
             return workspace
         }catch( e: IOException) {
-            throw BadSifFileException("Error Reading File: " + e.getStackTrace());
+            throw BadSifFileException("Error Reading File: " + e.stackTrace)
         }
     }
 
@@ -190,7 +190,6 @@ object LoadEngine {
 
         nodeLayer[0] = workspace.groupTree.root
         context.nodes.add(workspace.groupTree.root)
-        val referencesToMap = mutableMapOf<LayerNode, Int>()
 
         while( ra.filePointer < endPointer) {
             var alpha = 1.0f
@@ -228,7 +227,7 @@ object LoadEngine {
                 }
                 SaveLoadUtil.NODE_SPRITE_LAYER -> {
                     val partSize = ra.readUnsignedByte()
-                    val parts = List<Pair<MediumHandle,SpritePartStructure>>(partSize, {
+                    val parts = List(partSize, {
                         val partName = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
                         val transX = ra.readFloat()
                         val transY = ra.readFloat()

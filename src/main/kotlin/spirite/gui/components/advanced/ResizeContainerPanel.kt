@@ -4,7 +4,6 @@ import spirite.base.util.groupExtensions.then
 import spirite.gui.components.basic.IComponent
 import spirite.pc.gui.basic.SwPanel
 import spirite.base.brains.Bindable
-import spirite.base.brains.Bindable.Bound
 import spirite.base.util.MathUtil
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
@@ -125,7 +124,7 @@ private constructor(
         override var resizeComponent by LayoutDelegate(component)
 
         private var componentVisibleBindable = Bindable(true, { new, old -> resetLayout() })
-        var componentVisible by Bound(componentVisibleBindable)
+        var componentVisible by componentVisibleBindable
 
         init {
             val tracker = ResizeBarTracker()

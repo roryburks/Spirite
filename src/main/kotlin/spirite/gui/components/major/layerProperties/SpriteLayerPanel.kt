@@ -12,7 +12,7 @@ import spirite.hybrid.Hybrid
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
-    var linkedSprite : SpriteLayer? = null
+    private var linkedSprite : SpriteLayer? = null
         set(value) {
             val old = field
             if( value != old) {
@@ -49,7 +49,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             }
         }
 
-    val onPartChange = {
+    private val onPartChange = {
         val linked = linkedSprite
         when(linked) {
             null -> boxList.clear()
@@ -57,34 +57,23 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         }
     }
 
-    val activePartBind = Bindable<SpritePart?>(null) { new, old ->
-    }
-    var activePart: SpritePart? by activePartBind
+    private val activePartBind = Bindable<SpritePart?>(null)
+    private var activePart: SpritePart? by activePartBind
 
-    val boxList = Hybrid.ui.BoxList<SpritePart>(24, 24)
-    val tfTransX = Hybrid.ui.FloatField()
-    val tfTransY = Hybrid.ui.FloatField()
-    val tfScaleX =  Hybrid.ui.FloatField()
-    val tfScaleY = Hybrid.ui.FloatField()
-    val tfRot = Hybrid.ui.FloatField()
-    val tfDepth = Hybrid.ui.IntField(allowsNegative = true)
-    val tfType = Hybrid.ui.TextField()
-    val opacitySlider = Hybrid.ui.GradientSlider(0f,1f, "Opacity")
-
-    var lock = false
-    inline fun <T> T.doLocked(block: (T) -> Unit): T {
-        if(!lock) {
-            lock = true
-            block(this)
-            lock = false
-        }
-        return this
-    }
+    private val boxList = Hybrid.ui.BoxList<SpritePart>(24, 24)
+    private val tfTransX = Hybrid.ui.FloatField()
+    private val tfTransY = Hybrid.ui.FloatField()
+    private val tfScaleX =  Hybrid.ui.FloatField()
+    private val tfScaleY = Hybrid.ui.FloatField()
+    private val tfRot = Hybrid.ui.FloatField()
+    private val tfDepth = Hybrid.ui.IntField(allowsNegative = true)
+    private val tfType = Hybrid.ui.TextField()
+    private val opacitySlider = Hybrid.ui.GradientSlider(0f,1f, "Opacity")
 
 
-    val btnNewPart = Hybrid.ui.Button()
-    val btnRemovePart = Hybrid.ui.Button().also { it.action = {activePart?.also {  linkedSprite?.removePart( it)} }}
-    val btnVisibility = Hybrid.ui.ToggleButton()
+    private val btnNewPart = Hybrid.ui.Button()
+    private val btnRemovePart = Hybrid.ui.Button().also { it.action = {activePart?.also {  linkedSprite?.removePart( it)} }}
+    private val btnVisibility = Hybrid.ui.ToggleButton()
 
     init {
         btnVisibility.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)

@@ -8,6 +8,7 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
@@ -33,6 +34,10 @@ class PaletteSection(
     private val secondaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
     private val paletteView = PaletteView(master, master.paletteManager.currentPalette)
 
+    private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_NewColor) }
+    private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Save) }
+    private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Load) }
+
     private val paletteManager get() = master.paletteManager
 
     init {
@@ -43,8 +48,8 @@ class PaletteSection(
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         secondaryColorSquare.enabled = false
 
-        primaryColorSquare.colorBind.addRootListener { new, old -> paletteView.redraw() }
-        secondaryColorSquare.colorBind.addRootListener { new, old -> paletteView.redraw() }
+        primaryColorSquare.colorBind.addRootListener { _, _ -> paletteView.redraw() }
+        secondaryColorSquare.colorBind.addRootListener { _, _ -> paletteView.redraw() }
 
         imp.setLayout {
             rows += {
@@ -65,26 +70,25 @@ class PaletteSection(
                 flex = 100f
             }
             rows += {
-                add(Hybrid.ui.Button("1"))
-                add(Hybrid.ui.Button("2"))
-                add(Hybrid.ui.Button("3"))
+                add(btnNewPalette)
+                add(btnSavePalette)
+                add(btnLoadPalette)
             }
         }
-
     }
 
     // region Palette Moving
-    var pressingIndex : Int? = null
-    var pressingStart: Long = 0
-    var lastPressIndex : Int = 0
-    var lastPressStart: Long = 0
+    private var pressingIndex : Int? = null
+    private var pressingStart: Long = 0
+    private var lastPressIndex : Int = 0
+    private var lastPressStart: Long = 0
 
     init {
-        primaryColorSquare.onMousePress = {evt ->
+        primaryColorSquare.onMousePress = {
             pressingIndex = -1
             pressingStart = Hybrid.timing.currentMilli
         }
-        secondaryColorSquare.onMousePress = {evt ->
+        secondaryColorSquare.onMousePress = {
             pressingIndex = -2
             pressingStart = Hybrid.timing.currentMilli
         }
@@ -143,9 +147,6 @@ class PaletteSection(
     }
 
     // endregion
-
-
-
 }
 
 private class PaletteView
@@ -166,7 +167,7 @@ private constructor(
 
     val w get() = Math.max(width/12,1)
 
-    private class PaletteViewImp() : JPanel() {
+    private class PaletteViewImp : JPanel() {
         var context: PaletteView? = null
 
         override fun paintComponent(g: Graphics) {

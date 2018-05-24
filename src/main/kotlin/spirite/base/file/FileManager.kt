@@ -56,7 +56,7 @@ class FileManager( val master: IMasterControl)  : IFileManager{
     override val isLocked: Boolean get() = locks.isNotEmpty()
 
     class FileLock
-    val locks = mutableListOf<FileLock>()
+    private val locks = mutableListOf<FileLock>()
     override fun saveWorkspace(workspace: IImageWorkspace, file: File, track: Boolean) {
         val lock = FileLock().apply { locks.add(this) }
         SaveEngine.saveWorkspace(file, workspace)
