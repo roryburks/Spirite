@@ -36,15 +36,15 @@ class PaletteSection(
     private val paletteManager get() = master.paletteManager
 
     init {
-        master.paletteManager.getColorBind(0).bindWeakly(primaryColorSquare.colorBind)
-        master.paletteManager.getColorBind(1).bindWeakly(secondaryColorSquare.colorBind)
+        master.paletteManager.getColorBind(0).bind(primaryColorSquare.colorBind)
+        master.paletteManager.getColorBind(1).bind(secondaryColorSquare.colorBind)
         primaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         primaryColorSquare.enabled = false
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         secondaryColorSquare.enabled = false
 
-        primaryColorSquare.colorBind.addListener { new, old -> paletteView.redraw() }
-        secondaryColorSquare.colorBind.addListener { new, old -> paletteView.redraw() }
+        primaryColorSquare.colorBind.addRootListener { new, old -> paletteView.redraw() }
+        secondaryColorSquare.colorBind.addRootListener { new, old -> paletteView.redraw() }
 
         imp.setLayout {
             rows += {

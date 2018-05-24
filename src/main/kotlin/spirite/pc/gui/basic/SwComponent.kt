@@ -170,7 +170,7 @@ abstract class ASwComponent : ISwComponent {
                 onMouseClick?.invoke(convert(e))
         }
         override fun mouseEntered(e: JMouseEvent) { onMouseEnter?.invoke( convert(e))}
-        override fun mouseClicked(e: JMouseEvent) {}
+        override fun mouseClicked(e: JMouseEvent) {onMouseClick?.invoke(convert(e))}
         override fun mouseExited(e: JMouseEvent) {onMouseExit?.invoke(convert(e))}
         override fun mousePressed(e: JMouseEvent) {
             startX = e.x

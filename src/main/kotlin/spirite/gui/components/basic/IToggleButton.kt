@@ -22,5 +22,5 @@ interface IToggleButton : IToggleButtonNonUI, IComponent {
 
 class ToggleButtonNonUI( startChecked: Boolean = false) : IToggleButtonNonUI{
     override val checkBind = Bindable(startChecked)
-    override var checked by Bound(checkBind)
+    override var checked by checkBind
 }
