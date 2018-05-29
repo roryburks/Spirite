@@ -8,18 +8,14 @@ interface IAnimation {
     var name : String
     var workspace : IImageWorkspace
 
-    val start : Float
-    val end : Float
+    val startFrame : Float
+    val endFrame : Float
 
     fun getDrawList( t: Float) : List<TransformedHandle>
 }
 
 fun IAnimation.drawFrame( gc: GraphicsContext, t: Float) {
-    gc.pushState()
-
     getDrawList(t)
-            
-            .forEach {
-
-    }
+            .sortedBy { -it.drawDepth }
+            .forEach {it.draw(gc)}
 }

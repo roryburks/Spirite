@@ -44,7 +44,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         fun treeStructureChanged(evt: TreeChangeEvent)
         fun nodePropertiesChanged( node: Node, renderChanged: Boolean)
     }
-    class TreeChangeEvent( val changedNodes : List<Node>)
+    class TreeChangeEvent( val changedNodes : Set<Node>)
     val treeObs : IObservable<TreeObserver> get() = _treeObs
     private val _treeObs = Observable<TreeObserver>()
 
@@ -222,6 +222,16 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             return list
         }
 
+        val ancestors : List<Node> get() {
+            val list = mutableListOf<Node>()
+            var p = this.parent
+            while( p != null) {
+                list.add(p)
+                p = p.parent
+            }
+            return list
+        }
+
         val nextNode: Node? get() {
             val children = parent?.children ?: return null
             val i = children.indexOf( this)
@@ -297,9 +307,10 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
         }
         private fun _move( toMove: Node, newParent: GroupNode, newBefore: Node?) {
+            val oldParent = toMove.parent
             _remove( toMove, false)
             newParent._add( toMove, newBefore, false)
-            triggerChange(TreeChangeEvent(SinglyList(toMove)))
+            triggerChange(TreeChangeEvent(setOf(toMove, newParent, oldParent ?: toMove)))
         }
 
         internal fun add(toAdd: Node, before: Node?) {
@@ -330,7 +341,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             }
             toAdd.parent = this
             if( trigger)
-                triggerChange(TreeChangeEvent(SinglyList(toAdd)))
+                triggerChange(TreeChangeEvent(setOf(toAdd, this)))
         }
 
 
@@ -352,8 +363,9 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             }
         }
         private fun _remove( toRemove: Node, trigger: Boolean = true) {
+            val parent = toRemove.parent
             _children.remove( toRemove)
-            triggerChange(TreeChangeEvent(SinglyList(toRemove)))
+            triggerChange(TreeChangeEvent(setOf(toRemove, parent ?: toRemove)))
         }
     }
 

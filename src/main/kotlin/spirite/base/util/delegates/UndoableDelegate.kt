@@ -30,6 +30,36 @@ class UndoableDelegate<T>(
     }
 }
 
+class UndoableChangeDelegate<T>(
+        defaultValue : T,
+        val undoEngine: IUndoEngine?,
+        val changeDescription: String,
+        val onChange: (T)->Any?)
+{
+    var field = defaultValue
+        set(value) {
+            if( value != field) {
+                field = value
+                onChange(value)
+            }
+        }
+
+    operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
+
+    operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
+        if( undoEngine == null) field = value
+        else if( field != value) {
+            val oldValue = field
+            val newValue = value
+            undoEngine.performAndStore( object : NullAction() {
+                override val description: String get() = changeDescription
+                override fun performAction() {field = newValue}
+                override fun undoAction() {field = oldValue}
+            })
+        }
+    }
+}
+
 class StackableUndoableDelegate<T>(
         defaultValue : T,
         val undoEngine: IUndoEngine?,
