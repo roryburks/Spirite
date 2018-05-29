@@ -1,8 +1,11 @@
 package spirite.base.imageData.undo
 
+import spirite.base.brains.IObservable
+import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.then
 
@@ -31,6 +34,12 @@ interface IUndoEngine {
     fun undo() : Boolean
     fun redo() : Boolean
     fun cleanup()
+
+    class UndoHistoryChangeEvent(
+            val history: List<UndoIndex>?,  // Null if not a History Change Event
+            val undoEngine: IUndoEngine,
+            val position: UndoIndex)
+    val undoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
 }
 
 class UndoIndex(
@@ -52,6 +61,7 @@ class UndoEngine(
     private val undoQueue = mutableListOf<UndoContext<*>>()
     private var _queuePosition = 0
     private var saveSpot = 0
+
 
     override fun reset() {
         contexts.forEach { it.flush() }
@@ -205,9 +215,11 @@ class UndoEngine(
     }
 
     private fun triggerHistoryChanged() {
-
+        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(undoHistory, this, undoHistory[_queuePosition]))}
     }
     private fun triggerUndo() {
-
+        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(null, this, undoHistory[_queuePosition]))}
     }
+
+    override val undoHistoryObserver = Observable<(UndoHistoryChangeEvent)->Any?>()
 }

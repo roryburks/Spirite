@@ -71,7 +71,7 @@ interface ITreeViewNonUI<T>{
         }
 
         fun makeLeftComponent( t: T) : IComponent? = null
-        fun canDrag() : Boolean = true
+        fun canDrag() : Boolean = false
         fun makeCursor( t: T) : IImage = NillImage
         fun makeTransferable( t: T) : Transferable = StringSelection(toString())
         fun dragOut() {}

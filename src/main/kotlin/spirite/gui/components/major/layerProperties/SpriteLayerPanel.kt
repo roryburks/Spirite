@@ -12,7 +12,7 @@ import spirite.hybrid.Hybrid
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
-    private var linkedSprite : SpriteLayer? = null
+    var linkedSprite : SpriteLayer? = null
         set(value) {
             val old = field
             if( value != old) {

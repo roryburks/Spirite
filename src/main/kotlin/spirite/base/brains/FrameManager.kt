@@ -4,6 +4,7 @@ import spirite.base.brains.IFrameManager.Views
 import spirite.base.brains.IFrameManager.Views.DEBUG_VIEW
 import spirite.base.brains.IFrameManager.Views.UNDO_HISTORY_VIEW
 import spirite.gui.components.major.RootWindow
+import spirite.gui.components.major.info.UndoHistoryPanel
 import spirite.gui.components.major.work.WorkSectionView
 import spirite.gui.components.views.UndoHistoryView
 import spirite.pc.gui.basic.jcomponent
@@ -47,8 +48,11 @@ class JFrameManager(val master: IMasterControl): IFrameManager {
                 val launching = JDialog()
 
                 when( view) {
-                    DEBUG_VIEW, UNDO_HISTORY_VIEW -> {
+                    DEBUG_VIEW -> {
                         launching.add(UndoHistoryView().jcomponent)
+                    }
+                    UNDO_HISTORY_VIEW -> {
+                        launching.add(UndoHistoryPanel(master).component.jcomponent)
                     }
                 }
                 launching.modalityType = MODELESS

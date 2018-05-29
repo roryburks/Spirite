@@ -7,12 +7,14 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers
  * as the currentWorkspace is changed.*/
 interface ICentralObservatory {
+    val trackingUndoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
     val trackingImageObserver : IObservable<ImageObserver>
     val omniImageObserver : IObservable<ImageObserver>
     val trackingPrimaryTreeObserver : IObservable<TreeObserver>
@@ -27,6 +29,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     private val trackingObservers  = mutableListOf<TrackingObserver<*>>()
     private val omniObserver  = mutableListOf<OmniObserver<*>>()
 
+    override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
     override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObs }
