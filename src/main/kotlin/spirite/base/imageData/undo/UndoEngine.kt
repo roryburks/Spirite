@@ -215,10 +215,10 @@ class UndoEngine(
     }
 
     private fun triggerHistoryChanged() {
-        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(undoHistory, this, undoHistory[_queuePosition]))}
+        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(undoHistory, this, undoHistory[_queuePosition-1]))}
     }
     private fun triggerUndo() {
-        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(null, this, undoHistory[_queuePosition]))}
+        undoHistoryObserver.trigger { it.invoke(UndoHistoryChangeEvent(null, this, undoHistory[_queuePosition-1]))}
     }
 
     override val undoHistoryObserver = Observable<(UndoHistoryChangeEvent)->Any?>()

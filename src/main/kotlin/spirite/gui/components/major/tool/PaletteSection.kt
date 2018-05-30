@@ -3,11 +3,13 @@ package spirite.gui.components.major.tool
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.brains.palette.Palette
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IColorSquare
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
@@ -22,8 +24,11 @@ import javax.swing.JPanel
 class PaletteSection(
         private val master: IMasterControl,
         val imp : ICrossPanel = Hybrid.ui.CrossPanel())
-    : IComponent by imp
+    : IOmniComponent
 {
+    override val component: IComponent get() = imp
+    override val icon: IIcon? get() = null
+
     private val __ASDF134 = object : MPaletteObserver {
         override fun colorChanged() {
             paletteView.redraw()
@@ -99,7 +104,7 @@ class PaletteSection(
             if( pressing != null) {
                 if(Hybrid.timing.currentMilli - pressingStart > master.settingsManager.paletteDragMinTime) {
                     val point = evt.point.convert(paletteView)
-                    if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < height) {
+                    if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < imp.height) {
                         val index = (point.x / 12) + (point.y / 12 * paletteView.w)
                         val color = when {
                             pressing < 0 -> paletteManager.getActiveColor(-pressing - 1)

@@ -52,11 +52,12 @@ class DefaultImageDrawer(
 
         override fun startStroke(params: StrokeParams, ps: PenState): Boolean {
             val strokeDrawer = workspace.strokeProvider.getStrokeDrawer(params)
-            strokeBuilder = StrokeBuilder(strokeDrawer, params, arranged)
+            val sb = StrokeBuilder(strokeDrawer, params, arranged)
+            strokeBuilder = sb
 
             workspace.compositor.compositeSource = CompositeSource(arranged) {strokeDrawer.draw(it)}
 
-            if(strokeBuilder!!.start(ps))
+            if(sb.start(ps))
                 arranged.handle.refresh()
 
             return true
@@ -137,7 +138,7 @@ class DefaultImageDrawer(
             })
         }
 
-        return LiftedImageData(lifted!!)
+        return LiftedImageData(lifted ?: Hybrid.imageCreator.createImage(1,1))
     }
     // endregion
 
@@ -174,7 +175,7 @@ class DefaultImageDrawer(
 
     // region IFillModule
     override fun fill(x: Int, y: Int, color: Color): Boolean {
-        workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Fill Color", arranged, mask, { built, mask ->
             when( mask) {
                 null -> built.rawAccessComposite {
                     val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))

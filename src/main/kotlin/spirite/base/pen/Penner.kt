@@ -145,10 +145,14 @@ class Penner(
                     is Fill ->
                         if( drawer is IFillModule) drawer.fill(x, y, if(holdingCtrl) Colors.TRANSPARENT else color)
                         else Hybrid.beep()
-                    is Move -> when {
-                        workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)
-                        workspace.groupTree.selectedNode != null -> behavior = MovingNodeBehavior(this, workspace.groupTree.selectedNode!!)
+                    is Move -> {
+                        val selected = workspace.groupTree.selectedNode
+                        when {
+                            workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)
+                           selected != null -> behavior = MovingNodeBehavior(this, selected)
+                        }
                     }
+
                     is ShapeSelection,
                     is FreeSelection-> {
                         if(!holdingShift && !holdingCtrl && workspace.selectionEngine.selection?.contains(x,y) == true) {

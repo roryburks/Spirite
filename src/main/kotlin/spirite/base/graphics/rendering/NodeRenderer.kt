@@ -210,10 +210,11 @@ class NodeRenderer(
             val baseRubric = th.renderRubric.stack(
                     RenderRubric(node.tNodeToContext, node.alpha, node.method))
 
+            val builtComposite = builtComposite
             when(th.handle) {
                 builtComposite?.handle -> {
-                    val compositeRubric = baseRubric.stack(RenderRubric(transform = builtComposite!!.tCompositeToMedium))
-                    gc.renderImage( builtComposite!!.compositeImage, 0, 0, compositeRubric)
+                    val compositeRubric = baseRubric.stack(RenderRubric(transform = builtComposite.tCompositeToMedium))
+                    gc.renderImage( builtComposite.compositeImage, 0, 0, compositeRubric)
 
                 }
                 else -> {

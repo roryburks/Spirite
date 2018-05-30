@@ -8,9 +8,11 @@ import spirite.base.util.binding.xBind
 import spirite.base.util.binding.yBind
 import spirite.base.util.linear.Vec2
 import spirite.gui.components.advanced.RadioButtonCluster
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.jcolor
@@ -100,8 +102,11 @@ fun componentFromToolProperty( master: IMasterControl, toolProperty: ToolPropert
 
 class ToolSettingsSection
 private constructor(val master : IMasterControl, val imp : ICrossPanel)
-    :IComponent by imp
+    : IOmniComponent
 {
+    override val component: IComponent get() = imp
+    override val icon: IIcon? get() = null
+
     constructor(master: IMasterControl) : this(master, Hybrid.ui.CrossPanel())
 
     val toolLabel = Hybrid.ui.Label().apply { textColor = Colors.BLACK.jcolor }

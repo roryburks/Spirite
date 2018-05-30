@@ -13,8 +13,6 @@ import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
-import spirite.base.graphics.IResourceUseTracker
-import spirite.base.graphics.ResourceUseTracker
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.graphics.rendering.RenderEngine
@@ -71,7 +69,7 @@ class MasterControl() : IMasterControl {
     override val resourceUseTracker = DetailedResourceUseTracker()
     override val renderEngine = RenderEngine(resourceUseTracker, centralObservatory)
 
-    override val frameManager = JFrameManager(this)
+    override val frameManager = SwFrameManager(this)
     override val fileManager = FileManager(this)
 
     override val commandExecuter = CentralCommandExecutor(this, workspaceSet, dialog)

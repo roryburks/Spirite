@@ -38,9 +38,12 @@ sealed class OmniThing{
 }
 
 data class OmniSegment(
-        override val component: IComponent,
+        val omniComponent: IOmniComponent,
         override val minDim : Int,
         override val prefDim: Int = minDim) : OmniThing()
+{
+    override val component get() = omniComponent.component
+}
 
 data class SubContainer(
         val init: OmniInitializer.()->Unit,
@@ -83,7 +86,7 @@ class OmniInitializer {
     internal fun makeComponent() : IComponent {
         val rc = OmniResizeContainer(center.component, orientation, defaultSize?:100)
 
-        if( minSize != null) rc.minStretch = minSize!!
+        minSize?.also { rc.minStretch = it }
 
         leading.forEach {rc.addPanel(it.component, it.minDim, it.prefDim, Int.MAX_VALUE)}
         trailing.forEach { rc.addPanel(it.component, it.minDim, it.prefDim, Int.MIN_VALUE) }

@@ -4,17 +4,22 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.ITabbedPane
+import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 import javax.swing.SwingUtilities
 
 
 class WorkTabPane
 constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
-    : IComponent by tabPane
+    : IOmniComponent
 {
+    override val component: IComponent get() = tabPane
+    override val icon: IIcon? get() = null
+
     constructor(master: IMasterControl) : this( master, Hybrid.ui.TabbedPane())
 
     val workSection = WorkSection(master)

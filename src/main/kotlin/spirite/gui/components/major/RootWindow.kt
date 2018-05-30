@@ -11,6 +11,7 @@ import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.SubContainer
 import spirite.gui.components.major.groupView.GroupView
+import spirite.gui.components.major.groupView.ReferenceView
 import spirite.gui.components.major.layerProperties.LayerPropertiesPanel
 import spirite.gui.components.major.tool.PaletteSection
 import spirite.gui.components.major.tool.ToolSection
@@ -105,7 +106,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 center = OmniSegment( PaletteSection(master), 100)
             }, 100, 120)
             right += SubContainer( {
-                center = OmniSegment( Hybrid.ui.Label("Reference"), 100)
+                center = OmniSegment( ReferenceView(), 100)
                 bottom += OmniSegment( LayerPropertiesPanel(master), 200)
             }, 100, 120)
         }

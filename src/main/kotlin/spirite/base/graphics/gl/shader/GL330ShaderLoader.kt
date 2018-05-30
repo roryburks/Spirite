@@ -16,10 +16,11 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         val array = Array<IGLProgram?>(ProgramType.values().size,{null})
 
         // Brushes
-        array[ProgramType.STROKE_BASIC.ordinal] = loadProgram(scriptService,
+        val default = loadProgram(scriptService,
                 "${root}/brushes/stroke_basic.vert",
                 "${root}/brushes/stroke_basic.geom",
                 "${root}/brushes/stroke_basic.frag")
+        array[ProgramType.STROKE_BASIC.ordinal] = default
         array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(scriptService,
                 "${root}/brushes/brush_spore.vert",
                 "${root}/brushes/brush_spore.geom",
@@ -85,12 +86,7 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
                 "${root}/render/pass_basic.frag")
 
 
-        return Array(ProgramType.values().size, {
-            when (array[it]){
-                null -> array[ProgramType.PASS_BASIC.ordinal]!!
-                else -> array[it]!!
-            }
-        })
+        return Array(ProgramType.values().size, {array.getOrNull(it) ?: default})
     }
 
     private fun loadProgram(scriptService: IScriptService, vert: String?, geom: String?, frag: String?) : IGLProgram{

@@ -336,18 +336,19 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private inner class BTDnDManager : DropTarget(), DragGestureListener, DragSourceListener
     {
 
-        val dragSource = DragSource.getDefaultDragSource()!!
+        val dragSource = DragSource.getDefaultDragSource()
 
         fun addDropSource(component: Component) {
             dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, this)
         }
 
         override fun drop(evt: DropTargetDropEvent) {
+            val draggingRelativeTo = draggingRelativeTo
             if( draggingRelativeTo == dragging && dragging != null) return
 
-            val interpreter = (if(draggingRelativeTo == null)  treeRootInterpreter else draggingRelativeTo?.attributes) ?: return
-            if( interpreter.canImport(evt.transferable))
-                interpreter.interpretDrop(evt.transferable, draggingRelativeTo!!, draggingDirection)
+            val interpreter = (if(draggingRelativeTo == null)  treeRootInterpreter else draggingRelativeTo.attributes) ?: return
+            if( interpreter.canImport(evt.transferable) && draggingRelativeTo != null)
+                interpreter.interpretDrop(evt.transferable, draggingRelativeTo, draggingDirection)
         }
 
         override fun dragOver(evt: DropTargetDragEvent) {

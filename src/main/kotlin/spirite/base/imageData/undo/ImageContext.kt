@@ -127,7 +127,7 @@ class ImageContext(
     }
 
     override fun iterateNext(): UndoableAction {
-        val action = actions[iterMet]
+        val action = actions[iterMet++]
         return when( action) {
             is KeyframeAction -> action.underlyingAction ?: action
             else -> action

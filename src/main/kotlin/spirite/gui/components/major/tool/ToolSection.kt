@@ -4,8 +4,10 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.util.Colors
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.*
 import spirite.gui.components.basic.IBoxList.IBoxComponent
+import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
 import spirite.gui.resources.ToolIcons
 import spirite.hybrid.Hybrid
@@ -24,8 +26,11 @@ private const val BUTTON_WIDTH = 24
 class ToolSection (
         private val master: IMasterControl,
         val imp : IBoxList<Tool> = Hybrid.ui.BoxList(BUTTON_WIDTH, BUTTON_WIDTH, null))
-    :IComponent by imp
+    :IOmniComponent
 {
+    override val component: IComponent get() = imp
+    override val icon: IIcon? get() = null
+
     val currentTool get() = master.toolsetManager.selectedTool
     val toolset get() = master.toolsetManager.toolset
     val workspace get() = master.workspaceSet.currentWorkspace

@@ -2,16 +2,21 @@ package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.MasterControl
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 
 class GroupView
 private constructor(
         master: IMasterControl,
         val panel : ICrossPanel)
-    : IComponent by panel
+    : IOmniComponent
 {
+    override val component: IComponent get() = panel
+    override val icon: IIcon? get() = null
+
     constructor(master: IMasterControl) : this(master, panel = Hybrid.ui.CrossPanel())
 
 

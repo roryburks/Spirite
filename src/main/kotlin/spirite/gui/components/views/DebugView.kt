@@ -1,15 +1,20 @@
 package spirite.gui.components.views
 
 import spirite.base.graphics.gl.GLImageTracker
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.ITextArea
+import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 
-class UndoHistoryView
+class DebugView
 private constructor( val imp : ICrossPanel)
-    :IComponent by imp
+    :IOmniComponent
 {
+    override val component: IComponent get() = imp
+    override val icon: IIcon? get() = null
+
     constructor() : this( Hybrid.ui.CrossPanel())
 
     val glArea : ITextArea = Hybrid.ui.TextArea()

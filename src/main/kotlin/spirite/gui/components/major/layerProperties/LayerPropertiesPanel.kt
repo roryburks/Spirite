@@ -5,18 +5,27 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
 import javax.swing.JLabel
 
-class LayerPropertiesPanel( val master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
+class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
 {
+    override val component: IComponent get() = imp
+    override val icon: IIcon? get() = null
+
+    val imp = Hybrid.ui.CrossPanel()
+
+
     val spriteProperties by lazy { SpriteLayerPanel(master) }
 
     val listener = { new : Node?, old : Node? ->
         spriteProperties.linkedSprite = null
 
-        setLayout {
+        imp.setLayout {
             rows.add(when(new){
                 null-> Hybrid.ui.Label("Null")
                 is LayerNode -> when( new.layer) {
