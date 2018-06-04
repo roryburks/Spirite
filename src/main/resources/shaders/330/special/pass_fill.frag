@@ -1,7 +1,7 @@
 #version 330
 
 // PassFill is takes a 1-bit texture packed into 8x4 chunks through ints and translate them into a straight
-//  pass of a given color.  It is designed to transcribe the result of a sequentially-calculated fill algorithm
+//  pass of a given jcolor.  It is designed to transcribe the result of a sequentially-calculated fill algorithm
 //  onto a texture quickly and efficiently.
 //
 //  Note: Because the int array is interpretted as a UnsignedInt texture (filled entirely into red), usampler2D is needed,

@@ -6,6 +6,6 @@ import javax.swing.JPanel
 open class SJPanel : JPanel() {
 
     init {
-        background = Bg.color;
+        background = Bg.jcolor;
     }
 }

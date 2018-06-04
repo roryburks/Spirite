@@ -32,7 +32,7 @@ interface IImage {
      * Gets the Color data at the given point in nonGL, top-to-bottom format
      * (point 0,0 would be the top left).
      *
-     * Note: Though you could use getColor().argb, this can often be more efficient
+     * Note: Though you could use getJcolor().argb, this can often be more efficient
      *
      * @param x X coordinate
      * @param y Y coordinate (top-to-bottom format)

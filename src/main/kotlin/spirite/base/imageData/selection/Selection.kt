@@ -115,7 +115,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
         val image = Hybrid.imageCreator.createImage(area.width+2, area.height+2)
 
         val gc = image.graphics
-        //gc.color = Colors.WHITE
+        //gc.jcolor = Colors.WHITE
         gc.fillRect(1,1,width,height)
         gc.composite = DST_OUT
         transform?.apply { gc.transform = this }
@@ -145,7 +145,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
      * @param tBaseToImage in most cases this should be a transform from Workspace Space to Image space, but in general
      *      it's a transform on top of the selection's transform that it will use to draw the selection in Image Space
      * @param backgroundColor For some reasons (specifically when doing flood fills), you might want the area that is not
-     *     being selected to be a color other than transparent.  Even though this region will not be drawn to the end
+     *     being selected to be a jcolor other than transparent.  Even though this region will not be drawn to the end
      *     product, the lambda still has access to it.
      *
      *     Lambda will be passed a tSelToImage, a transformation from the Selection space to the Image space.
@@ -167,7 +167,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
             val tSelToFloating = tImageToFloating * tSelToImage
 
             // Step 1: Lift the Selection Mask out of the image (two different ways depending on if you want the out-of
-            //  bounds area to have a certain color, such as when filling)
+            //  bounds area to have a certain jcolor, such as when filling)
             val gc = floatingImage.graphics
 
             if( backgroundColor != null) {
@@ -221,7 +221,7 @@ class Selection(mask: IImage, transform: Transform? = null, crop: Boolean = fals
      * @param tBaseToImage in most cases this should be a transform from Workspace Space to Image space, but in general
      *      it's a transform on top of the selection's transform that it will use to draw the selection in Image Space
      * @param backgroundColor For some reasons (specifically when doing flood fills), you might want the area that is not
-     *     being selected to be a color other than transparent.  Even though this region will not be drawn to the end
+     *     being selected to be a jcolor other than transparent.  Even though this region will not be drawn to the end
      *     product, the lambda still has access to it.
      * @return doMasked may not execute the Lambda at all (if the selection doesn't intersect the image) in which case it returns false
      */

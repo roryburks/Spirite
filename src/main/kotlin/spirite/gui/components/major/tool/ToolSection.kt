@@ -88,7 +88,7 @@ class ToolButton( val tool: Tool) : SwToggleButton(false, SwToolButtonImp(tool))
 
 
             if (isSelected) {
-                g.color = Skin.Toolbutton.SelectedBackground.color
+                g.color = Skin.Toolbutton.SelectedBackground.jcolor
                 g.fillRect(0, 0, w, h)
             }
 

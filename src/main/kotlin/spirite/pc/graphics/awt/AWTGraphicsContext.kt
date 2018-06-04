@@ -18,7 +18,7 @@
 //    override var composite: Composite
 //        get() = TODO("not implemented")
 //        set(scroll) {}
-//    override var color: Color
+//    override var jcolor: Color
 //        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 //        set(scroll) {}
 //

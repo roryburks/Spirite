@@ -25,10 +25,10 @@ private constructor( val imp: SwButtonImp)
 
         init {
             text = str
-            background = Skin.Global.BgDark.color
-            foreground = Skin.Global.Text.color
+            background = Skin.Global.BgDark.jcolor
+            foreground = Skin.Global.Text.jcolor
             border = BorderFactory.createBevelBorder(
-                    BevelBorder.RAISED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
+                    BevelBorder.RAISED, Skin.BevelBorder.Med.jcolor, Skin.BevelBorder.Dark.jcolor)
 
             addActionListener { action?.invoke() }
         }

@@ -11,7 +11,7 @@ uniform float uAlpha;
 uniform int uValue;
 
 // 00000000 00000000 00000000 0000BBBA
-// A: how to combine the color and alpha
+// A: how to combine the jcolor and alpha
 //		0: multiply colors by the input alpha
 //		1: multiply colors by total alpha
 // B: which subroutine to use

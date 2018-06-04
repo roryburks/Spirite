@@ -32,8 +32,8 @@ public class SScrollPane extends JScrollPane {
     }
 
     public SScrollPane(Component view, int vsbPolicy, int hsbPolicy) {
-        this.setBackground( Global.Bg.getColor());
-        this.getViewport().setBackground(Global.Bg.getColor());
+        this.setBackground( Global.Bg.getJcolor());
+        this.getViewport().setBackground(Global.Bg.getJcolor());
         setBorder(null);
 
         // Set ScrollBar UI

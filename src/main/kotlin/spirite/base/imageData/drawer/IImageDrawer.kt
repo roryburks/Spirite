@@ -86,7 +86,7 @@ interface IImageDrawer {
 //        val magFillXs: FloatArray
 //        val magFillYs: FloatArray
 //        fun startMagneticFill()
-//        fun endMagneticFill(color: Int, mode: MagneticFillMode)
+//        fun endMagneticFill(jcolor: Int, mode: MagneticFillMode)
 //        fun anchorPoints(x: Float, y: Float, r: Float, locked: Boolean, relooping: Boolean)
 //        fun erasePoints(x: Float, y: Float, r: Float)
 //    }

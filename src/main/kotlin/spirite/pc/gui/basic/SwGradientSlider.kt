@@ -32,12 +32,12 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
             maxValue : Float = 1f,
             label: String = "") : this( minValue, maxValue, label, SwGradientSliderImp())
 
-    override var bgGradLeft: Color by UI(Skin.GradientSlider.BgGradLeft.color)
-    override var bgGradRight: Color by UI(Skin.GradientSlider.BgGradRight.color)
-    override var fgGradLeft: Color by UI(Skin.GradientSlider.FgGradLeft.color)
-    override var fgGradRight: Color by UI(Skin.GradientSlider.FgGradRight.color)
-    override var disabledGradLeft: Color by UI(Skin.GradientSlider.DisabledGradLeft.color)
-    override var disabledGradRight: Color by UI(Skin.GradientSlider.DisabledGradRight.color)
+    override var bgGradLeft: Color by UI(Skin.GradientSlider.BgGradLeft.jcolor)
+    override var bgGradRight: Color by UI(Skin.GradientSlider.BgGradRight.jcolor)
+    override var fgGradLeft: Color by UI(Skin.GradientSlider.FgGradLeft.jcolor)
+    override var fgGradRight: Color by UI(Skin.GradientSlider.FgGradRight.jcolor)
+    override var disabledGradLeft: Color by UI(Skin.GradientSlider.DisabledGradLeft.jcolor)
+    override var disabledGradRight: Color by UI(Skin.GradientSlider.DisabledGradRight.jcolor)
     override var label : String by UI(label)
 
     private class SwGradientSliderImp() : JPanel() {

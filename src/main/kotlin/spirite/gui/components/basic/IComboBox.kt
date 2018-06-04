@@ -57,8 +57,8 @@ private constructor(
     class SwComboBoxImp<T>(things: Array<T>) : JComboBox<T>(things)
     {
         init {
-            background = Skin.Global.Fg.color
-            foreground = Skin.Global.TextDark.color
+            background = Skin.Global.Fg.jcolor
+            foreground = Skin.Global.TextDark.jcolor
         }
     }
 }

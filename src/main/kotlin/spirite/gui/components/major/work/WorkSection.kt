@@ -160,7 +160,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             penner.holdingShift = it.holdingShift
             penner.penUp(it.button)
         }
-        Hybrid.timing.createTimer({SwingUtilities.invokeLater{penner.step()}}, 15, true)
+        Hybrid.timing.createTimer(15, true) {SwingUtilities.invokeLater{penner.step()}}
 
         coordinateLabel.label = "Coordinate Label"
         messageLabel.label = "Message Label"
@@ -238,6 +238,6 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     private val _viewObservable = Observable<()->Unit>()
 
     init {
-        Hybrid.timing.createTimer({redraw()}, 50, true)
+        Hybrid.timing.createTimer(50, true){redraw()}
     }
 }

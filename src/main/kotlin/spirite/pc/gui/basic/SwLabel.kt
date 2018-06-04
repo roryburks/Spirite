@@ -34,7 +34,7 @@ private constructor( val imp : SwLabelImp)
 
     private class SwLabelImp( text: String) : JLabel(text) {
         init {
-            foreground = Skin.Global.Text.color
+            foreground = Skin.Global.Text.jcolor
         }
     }
 }

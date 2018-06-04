@@ -6,7 +6,8 @@ import spirite.base.imageData.IImageWorkspace
 
 abstract class Animation(
         var name : String,
-        var workspace : IImageWorkspace )
+        var workspace : IImageWorkspace,
+        val state: AnimationState)
 {
     abstract val startFrame : Float
     abstract val endFrame : Float
@@ -14,8 +15,8 @@ abstract class Animation(
     abstract fun drawFrame( gc: GraphicsContext, t: Float)
 }
 
-abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace)
-    : Animation(name, workspace)
+abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace, state: AnimationState = AnimationState())
+    : Animation(name, workspace, state)
 {
 
     abstract fun getDrawList( t: Float) : List<TransformedHandle>

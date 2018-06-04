@@ -119,8 +119,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
 {
     constructor() : this(SwTreeViewImp())
 
-    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.color, {imp.background = backgroundColor ; redraw()})
-    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.color, {redraw()})
+    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.jcolor, {imp.background = backgroundColor ; redraw()})
+    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.jcolor, {redraw()})
 
     override var gapSize by OnChangeDelegate( 12, {rebuildTree()})
     override var leftSize by OnChangeDelegate(0, {rebuildTree()})

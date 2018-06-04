@@ -17,7 +17,7 @@ object ContentBoundsFinder {
     /**
      * Returns a rectangle that represents the sub-section of the original image
      * such that as large full rectangular regions on the outside of a single
-     * color are removed without touching non-background data.
+     * jcolor are removed without touching non-background data.
      *
      * @param image
      * The image to crop.
@@ -26,7 +26,7 @@ object ContentBoundsFinder {
      * content to preserve on each side of the image.
      * @param transparentOnly
      * If true, it only crops if the background is transparent, if
-     * false it will crop any background color.
+     * false it will crop any background jcolor.
      * @return
      * The Rectangle of the image as it should be cropped.
      * @throws
@@ -45,7 +45,7 @@ object ContentBoundsFinder {
             when (type) {
                 BufferedImage.TYPE_4BYTE_ABGR, BufferedImage.TYPE_4BYTE_ABGR_PRE -> data = _ImageCropHelperByte(image)
                 BufferedImage.TYPE_INT_ARGB, BufferedImage.TYPE_INT_ARGB_PRE -> data = _ImageCropHelperInt(image)
-                else -> throw UnsupportedImageTypeException("Only programmed to deal with 4-byte color data.")
+                else -> throw UnsupportedImageTypeException("Only programmed to deal with 4-byte jcolor data.")
             }
         } else if (raw is GLImage) {
             val engine = raw.engine
@@ -75,7 +75,7 @@ object ContentBoundsFinder {
 
         data.setBG(0, 0)
 
-        // Usually the background color will be the top-left pixel, but
+        // Usually the background jcolor will be the top-left pixel, but
         //	sometimes it'll be the bottom-right pixel.
         // (Note all pixels in the edges share either a row or a column
         //	with one of these two pixels, so it'll be one of the two).

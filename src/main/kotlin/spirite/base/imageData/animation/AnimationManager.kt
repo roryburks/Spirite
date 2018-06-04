@@ -17,7 +17,7 @@ class AnimationManager(workspace : MImageWorkspace) : IAnimationManager{
     private val _animations = mutableListOf<Animation>()
     override val animations: List<Animation> get() = _animations
 
-    override val currentAnimationBind = Bindable<Animation?>(null)
+    override val currentAnimationBind = Bindable<Animation?>(FakeAnimation(workspace))
     override var currentAnimation by currentAnimationBind
 
 }

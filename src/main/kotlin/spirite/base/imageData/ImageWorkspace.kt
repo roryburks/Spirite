@@ -8,6 +8,7 @@ import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.animation.AnimationManager
 import spirite.base.imageData.animation.IAnimationManager
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
@@ -88,7 +89,7 @@ class ImageWorkspace(
     override val undoEngine = UndoEngine(this, mediumRepository)
     override val imageObservatory: IImageObservatory = ImageObservatory()
     override val groupTree = PrimaryGroupTree(this, mediumRepository)
-    override val animationManager: IAnimationManager get() = TODO("not implemented")
+    override val animationManager: IAnimationManager get() = AnimationManager(this)
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet get() = TODO("not implemented")

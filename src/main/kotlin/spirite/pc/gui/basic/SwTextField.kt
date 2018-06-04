@@ -37,8 +37,8 @@ private constructor(val imp : SwTextFieldImp) : ITextField, ISwComponent by SwCo
     private class SwTextFieldImp() : JTextField()
     {
         init {
-            background = Background.color
-            border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.color, Dark.color)
+            background = Background.jcolor
+            border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
         }
     }
 }
@@ -50,12 +50,12 @@ private constructor(
         val imp : SwNumberFieldImp)
     : ISwComponent by SwComponent(imp), INumberFieldUI
 {
-    override var validBg: Color = Background.color
+    override var validBg: Color = Background.jcolor
         set(value) {
             field = value
             checkIfOob()
         }
-    override var invalidBg: Color = InvalidBg.color
+    override var invalidBg: Color = InvalidBg.jcolor
         set(value) {
             field = value
             checkIfOob()
@@ -92,8 +92,8 @@ private constructor(
     private class SwNumberFieldImp() : JTextField()
     {
         init {
-            background = Background.color
-            border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.color, Dark.color)
+            background = Background.jcolor
+            border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
         }
     }
 

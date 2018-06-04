@@ -44,6 +44,9 @@ abstract class ASwComponent : ISwComponent {
     override var background: SColor
         get() = component.background.scolor
         set(value) {component.background = value.jcolor}
+    override var foreground: SColor
+        get() = component.foreground.scolor
+        set(value) {component.foreground = value.jcolor}
     override var opaque: Boolean
         get() = component.isOpaque
         set(value) {component.isOpaque = value}
@@ -70,9 +73,9 @@ abstract class ASwComponent : ISwComponent {
     override fun setBasicBorder(border: BasicBorder?) {
         component.border = when( border) {
             null -> null
-            BASIC -> BorderFactory.createLineBorder( Skin.Global.BgDark.color)
-            BEVELED_LOWERED -> BorderFactory.createBevelBorder(BevelBorder.LOWERED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
-            BEVELED_RAISED -> BorderFactory.createBevelBorder(BevelBorder.RAISED, Skin.BevelBorder.Med.color, Skin.BevelBorder.Dark.color)
+            BASIC -> BorderFactory.createLineBorder( Skin.Global.BgDark.jcolor)
+            BEVELED_LOWERED -> BorderFactory.createBevelBorder(BevelBorder.LOWERED, Skin.BevelBorder.Med.jcolor, Skin.BevelBorder.Dark.jcolor)
+            BEVELED_RAISED -> BorderFactory.createBevelBorder(BevelBorder.RAISED, Skin.BevelBorder.Med.jcolor, Skin.BevelBorder.Dark.jcolor)
         }
     }
 

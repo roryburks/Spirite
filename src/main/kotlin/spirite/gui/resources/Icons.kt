@@ -31,7 +31,7 @@ object SwIcons {
         val converted = BufferedImage(native.width, native.height, bi_format)
         converted.graphics.drawImage(native, 0, 0, null)
 
-        // Turns all pixels the same color as the top-left pixel into transparent
+        // Turns all pixels the same jcolor as the top-left pixel into transparent
         //  pixels
         val base = converted.getRGB(0, 0)
 

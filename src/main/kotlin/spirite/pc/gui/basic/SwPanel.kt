@@ -30,7 +30,7 @@ private constructor(val imp: SPanelImp)
         }
 
         init {
-            background = Bg.color;
+            background = Bg.jcolor;
         }
     }
 }

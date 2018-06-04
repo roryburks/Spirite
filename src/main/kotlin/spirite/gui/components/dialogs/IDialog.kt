@@ -37,8 +37,8 @@ class JDialog(private val master: IMasterControl) : IDialog
 {
 
     init {
-        UIManager.put("OptionPane.background", Global.Bg.color)
-        UIManager.put("Panel.background", Global.Bg.color)
+        UIManager.put("OptionPane.background", Global.Bg.jcolor)
+        UIManager.put("Panel.background", Global.Bg.jcolor)
     }
 
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace): NewSimpleLayerReturn? {

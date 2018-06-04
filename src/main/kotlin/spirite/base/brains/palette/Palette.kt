@@ -81,12 +81,12 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
 
     fun compress() : ByteArray {
         // For the most part Palettes are stored as an array of 4 bytes per
-        //	color in RGBA format/order.  But to preserve dimensionality of
+        //	jcolor in RGBA format/order.  But to preserve dimensionality of
         //	the palette while avoiding excessive "whitespace" bytes, the following
         // 	format is used:
 
-        // [1] First byte corresponds to number of consecutive color datas
-        // [4*n] n*4 bytes representing the color data, in RGBA form
+        // [1] First byte corresponds to number of consecutive jcolor datas
+        // [4*n] n*4 bytes representing the jcolor data, in RGBA form
         //		(if first byte was 0x00),
         //		[1] next byte represents consecutive empty datas
         val stream = ByteArrayOutputStream()

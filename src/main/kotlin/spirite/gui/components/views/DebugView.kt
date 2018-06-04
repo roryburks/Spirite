@@ -31,7 +31,7 @@ private constructor( val imp : ICrossPanel)
             rows.padding = 4
         }
 
-        Hybrid.timing.createTimer({
+        Hybrid.timing.createTimer(100, true) {
             val sb = StringBuilder()
 
             sb.appendln("${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}")
@@ -40,6 +40,6 @@ private constructor( val imp : ICrossPanel)
             }
 
             glArea.text = sb.toString()
-        }, 100, true)
+        }
     }
 }

@@ -24,7 +24,7 @@ private constructor(val imp : SwCheckBoxImp)
 
     private class SwCheckBoxImp() : JCheckBox() {
         init {
-            background = Skin.Global.Bg.color
+            background = Skin.Global.Bg.jcolor
         }
     }
 }
@@ -48,7 +48,7 @@ private constructor(val imp : SwRadioButtonImp)
 
     private class SwRadioButtonImp(label: String , selected: Boolean) : JRadioButton(label, selected) {
         init {
-            background = Skin.Global.Bg.color
+            background = Skin.Global.Bg.jcolor
         }
     }
 }

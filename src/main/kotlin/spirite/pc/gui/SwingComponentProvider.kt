@@ -33,4 +33,6 @@ object SwingComponentProvider : IComponentProvider {
 
     override fun Separator(orientation: Orientation): ISeparator = SwSeparator(orientation)
     override fun ColorSquare(color: SColor): IColorSquare = SwColorSquare(color)
+
+    override fun Slider(min: Int, max: Int, value: Int): ISlider = SwSlider(min, max, value)
 }

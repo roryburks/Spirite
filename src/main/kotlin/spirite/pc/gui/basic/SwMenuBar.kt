@@ -11,15 +11,15 @@ import javax.swing.JMenuBar
 
 class SwMenuBar : JMenuBar() {
     init {
-        background = Fg.color
-        foreground = TextDark.color
-        border = BorderFactory.createMatteBorder(0, 0, 1, 0, Dark.color)
+        background = Fg.jcolor
+        foreground = TextDark.jcolor
+        border = BorderFactory.createMatteBorder(0, 0, 1, 0, Dark.jcolor)
         isOpaque = false
     }
 
     override fun paintComponent(g: Graphics) {
-        val highlight = FgLight.color
-        val bg = Fg.color
+        val highlight = FgLight.jcolor
+        val bg = Fg.jcolor
 
         val w = width
         val h = height

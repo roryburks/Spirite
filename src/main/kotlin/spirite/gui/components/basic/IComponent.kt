@@ -17,6 +17,7 @@ interface IComponent {
     val bounds: Rect get() = Rect(x, y, width, height)
 
     var background : SColor
+    var foreground : SColor
     var opaque : Boolean
 
 

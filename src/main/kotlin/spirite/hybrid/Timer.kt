@@ -1,7 +1,7 @@
 package spirite.hybrid
 
 interface ITimerEngine {
-    fun createTimer( action: ()-> Unit, waitMilli : Int, repeat : Boolean = false) : ITimer
+    fun createTimer(waitMilli : Int, repeat : Boolean = false,  action: ()-> Unit) : ITimer
     val currentMilli : Long
 }
 
@@ -16,7 +16,7 @@ class SwTimer(val jtimer : javax.swing.Timer) : ITimer{
 }
 
 object SwTimerEngine : ITimerEngine {
-    override fun createTimer(action: () -> Unit, waitMilli: Int, repeat: Boolean) : ITimer{
+    override fun createTimer(waitMilli: Int, repeat: Boolean, action: () -> Unit) : ITimer{
         val timer = javax.swing.Timer( waitMilli, {action.invoke()})
         if( repeat)
             timer.isRepeats = true

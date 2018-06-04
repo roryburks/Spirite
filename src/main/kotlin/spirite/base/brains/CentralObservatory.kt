@@ -4,6 +4,7 @@ import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.drawer.IImageDrawer
@@ -21,6 +22,7 @@ interface ICentralObservatory {
 
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
+    val currentAnimationBind : IBindable<Animation?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -36,6 +38,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
+    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
@@ -47,6 +50,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         trackingObservers.forEach { workspaceSet.workspaceObserver.addObserver(it) }
     }
 
+    // region Implementation
     inner class TrackingBinder<T>(val finder: (IImageWorkspace) -> IBindable<T>) : IBindable<T?>
     {
         private val listeners = mutableListOf<OnChangeEvent<T?>>()
@@ -146,4 +150,5 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             }
         }
     }
+    // endregion
 }

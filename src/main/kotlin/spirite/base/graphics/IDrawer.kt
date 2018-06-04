@@ -7,7 +7,7 @@ import spirite.base.util.linear.Transform
 /***
  * You can think of IDrawer as somewhat of an extension to GraphicsContent as it takes a base surface/image and applies
  * certain graphical functions on them, but it doesn't have the same degree of parameters and settings.  Instead it
- * has very simple and straightfoward actions like "Invert image", "Change color", etc.
+ * has very simple and straightfoward actions like "Invert image", "Change jcolor", etc.
  */
 interface IDrawer {
     fun invert()

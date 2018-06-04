@@ -87,7 +87,7 @@ private constructor(
                 val title = getTitleAt(tabIndex)
                 val g2 = g.create() as Graphics2D
 
-                g2.color = if( selectedIndex == tabIndex) Skin.TabbedPane.SelectedBg.color else Skin.TabbedPane.UnselectedBg.color
+                g2.color = if( selectedIndex == tabIndex) Skin.TabbedPane.SelectedBg.jcolor else Skin.TabbedPane.UnselectedBg.jcolor
 
                 val x1 = rects[tabIndex].x
                 val y1 = rects[tabIndex].y
@@ -97,10 +97,10 @@ private constructor(
                 val y = intArrayOf(y2, y1 + 5, y1, y1, y2)
                 g2.fillPolygon(x, y, 5)
 
-                g2.color = Skin.TabbedPane.TabBorder.color
+                g2.color = Skin.TabbedPane.TabBorder.jcolor
                 g2.drawPolyline(x, y, 5)
 
-                g2.color = Skin.TabbedPane.TabText.color
+                g2.color = Skin.TabbedPane.TabText.jcolor
                 g2.drawString(title, x1 + 5, y2 - 5)
 
                 g2.dispose()
@@ -110,22 +110,22 @@ private constructor(
 
             override fun paintContentBorderBottomEdge(g: Graphics, tabPlacement: Int, selectedIndex: Int, x: Int, y: Int,
                                                       w: Int, h: Int) {
-                g.color = Skin.BevelBorder.Med.color
+                g.color = Skin.BevelBorder.Med.jcolor
                 g.fillRect(x, y, w, 2)
                 g.fillRect(x, y, 2, h)
 
-                g.color = Skin.BevelBorder.Dark.color
+                g.color = Skin.BevelBorder.Dark.jcolor
                 g.fillRect(x + w - 4, y, 4, h)
                 g.fillRect(x, y + h - 4, w, 4)
 
 
-                g.color = Skin.BevelBorder.Light.color
+                g.color = Skin.BevelBorder.Light.jcolor
                 g.drawLine(x + 1, y + 1, x + w - 2, y + 1)
                 g.drawLine(x + 1, y + 1, x + 1, y + h - 2)
                 g.drawLine(x + 1, y + h - 2, x + w - 2, y + h - 2)
                 g.drawLine(x + w - 2, y + 1, x + w - 2, y + h - 2)
 
-                g.color = Skin.BevelBorder.Darker.color
+                g.color = Skin.BevelBorder.Darker.jcolor
                 g.drawLine(x, y + h - 1, x + w - 1, y + h - 1)
                 g.drawLine(x + w - 1, y, x + w - 1, y + h - 1)
             }

@@ -149,7 +149,7 @@ private constructor(
             // TODO: Figure out the best way to decouple single-use components that require custom drawing/arrangement
             // from any particular UI, even if it means that each UI implementation has to create them from scratch.
             val pullBar = SwPanel { g ->
-                g.color = BarLineColor.color
+                g.color = BarLineColor.jcolor
                 when (orientation) {
                     HORIZONTAL -> {
                         val depth = width

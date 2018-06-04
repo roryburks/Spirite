@@ -15,7 +15,7 @@ uniform vec4 u_toColor;
 //	AA : 0 - Exact Match
 //		 1 - Ignore Alpha
 //		 2 - Change All
-//  C (hueOnly) : whether to change all color data or just the hue
+//  C (hueOnly) : whether to change all jcolor data or just the hue
 uniform int u_optionMask;
 
 vec3 rgb2hsv(vec3 _color)

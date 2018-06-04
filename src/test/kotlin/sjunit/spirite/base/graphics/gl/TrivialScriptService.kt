@@ -20,14 +20,14 @@ void main()
             return """#version 330
 
 layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
+layout (location = 1) in vec4 jcolor;
 
 flat out vec4 theColor;
 
 void main()
 {
     gl_Position = position;
-    theColor = color;
+    theColor = jcolor;
 }"""
 
         return ""

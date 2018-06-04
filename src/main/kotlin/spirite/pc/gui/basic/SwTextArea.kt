@@ -1,6 +1,5 @@
 package spirite.pc.gui.basic
 
-import jspirite.gui.SScrollPane
 import spirite.base.brains.Bindable
 import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
@@ -54,8 +53,8 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
     {
 
         init {
-            textArea.background = Background.color
-            textArea.border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.color, Dark.color)
+            textArea.background = Background.jcolor
+            textArea.border = BorderFactory.createBevelBorder(BevelBorder.LOWERED, Light.jcolor, Dark.jcolor)
 
         }
     }

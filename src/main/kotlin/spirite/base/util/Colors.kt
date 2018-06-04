@@ -95,9 +95,9 @@ object Colors {
 //        return 0xFF shl 24 or (r and 0xFF shl 16) or (g and 0xFF shl 8) or (b and 0xFF)
 //    }
 //
-//    fun darken(color: java.awt.Color): java.awt.Color {
+//    fun darken(jcolor: java.awt.Color): java.awt.Color {
 //        val hsv = FloatArray(3)
-//        java.awt.Color.RGBtoHSB(color.red, color.green, color.blue, hsv)
+//        java.awt.Color.RGBtoHSB(jcolor.red, jcolor.green, jcolor.blue, hsv)
 //        hsv[2] = Math.max(0f, hsv[2] - 0.1f)
 //        return java.awt.Color(java.awt.Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]))
 //    }
