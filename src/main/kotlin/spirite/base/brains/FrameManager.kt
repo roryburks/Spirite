@@ -1,27 +1,22 @@
 package spirite.base.brains
 
 import spirite.base.brains.IFrameManager.Views
-import spirite.base.brains.IFrameManager.Views.DEBUG_VIEW
-import spirite.base.brains.IFrameManager.Views.UNDO_HISTORY_VIEW
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.advanced.omniContainer.SwOmniDialog
-import spirite.gui.components.basic.IComponent
 import spirite.gui.components.major.RootWindow
+import spirite.gui.components.major.animation.AnimationView
 import spirite.gui.components.major.info.UndoHistoryView
 import spirite.gui.components.major.work.WorkSectionView
 import spirite.gui.components.views.DebugView
-import spirite.pc.gui.basic.jcomponent
-import java.awt.Dialog.ModalityType.MODELESS
-import java.awt.event.WindowEvent
-import java.awt.event.WindowListener
-import javax.swing.JDialog
 import javax.swing.WindowConstants
 
 interface  IFrameManager
 {
     enum class Views ( val componentConstructor: (IMasterControl)->IOmniComponent){
         DEBUG_VIEW ({DebugView()}),
-        UNDO_HISTORY_VIEW({UndoHistoryView(it)})
+        UNDO_HISTORY_VIEW({UndoHistoryView(it)}),
+        ANIMATION_VIEW({ AnimationView(it) })
+
     }
 
     fun launchView( view: Views)

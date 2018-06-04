@@ -8,6 +8,7 @@ import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
+import spirite.base.imageData.animation.IAnimationManager
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData

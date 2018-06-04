@@ -75,7 +75,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("..Undo &History", FrameCommand.UNDO_HISTORY),
                 MenuItem("..&Reference Scheme"),
 
-                MenuItem(".&Animation View"),
+                MenuItem(".&Animation View", FrameCommand.ANIMATION),
 
                 MenuItem("&Settings"),
                 MenuItem(".Manage &Hotkeys"),

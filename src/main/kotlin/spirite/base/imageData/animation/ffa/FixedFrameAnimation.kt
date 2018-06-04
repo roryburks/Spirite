@@ -2,13 +2,15 @@ package spirite.base.imageData.animation.ffa
 
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.animation.IAnimation
+import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.util.f
 import spirite.base.util.groupExtensions.mapAggregated
 
-class FixedFrameAnimation(override var name: String, override var workspace: IImageWorkspace) : IAnimation {
+class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
+    : MediumBasedAnimation(name, workspace)
+{
     var start : Int = 0 ; private set
     var end : Int = 0 ; private set
 
