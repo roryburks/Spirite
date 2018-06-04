@@ -13,7 +13,7 @@ class AnimationState(
 
     val zoomBind = Bindable(zoom)
     var zoom by zoomBind
-    val zoomF : Float = if( zoom > 0) zoom.f else 1 / (1+zoom.f)
+    val zoomF : Float get() = if( zoom > 0) zoom.f else 1.f / (2.f-zoom.f)
 
     val speedBind = Bindable(speed)
     var speed by speedBind

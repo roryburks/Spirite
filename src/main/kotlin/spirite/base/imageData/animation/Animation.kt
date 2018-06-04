@@ -13,6 +13,10 @@ abstract class Animation(
     abstract val endFrame : Float
 
     abstract fun drawFrame( gc: GraphicsContext, t: Float)
+
+    protected fun triggerStructureChange() {
+        workspace.animationManager.triggerStructureChange(this)
+    }
 }
 
 abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace, state: AnimationState = AnimationState())

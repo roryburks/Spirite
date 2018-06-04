@@ -1,5 +1,7 @@
 package spirite.base.graphics
 
+import spirite.base.graphics.CapMethod.NONE
+import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.util.shapes.IShape
 import spirite.base.util.Color
 import spirite.base.util.linear.Transform
@@ -108,8 +110,8 @@ enum class CapMethod {
 
 class LineAttributes (
         val width: Float,
-        val cap: CapMethod,
-        val join: JoinMethod,
+        val cap: CapMethod = NONE,
+        val join: JoinMethod = MITER,
         val dashes: FloatArray? = null
 ) {}
 

@@ -41,6 +41,9 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private val ffFps = Hybrid.ui.FloatField()
     private val sliderMet = Hybrid.ui.Slider(0,100,0)
     private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
+    private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addRootListener { new, old -> viewPanel.redraw()} }
+    private val zoomP = Hybrid.ui.Button("+").also { it.action = {++ifZoom.value} }
+    private val zoomM = Hybrid.ui.Button("-").also { it.action = {--ifZoom.value} }
 
     val bgColor by bgColorBox.colorBind
 
@@ -61,6 +64,13 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
             add(Hybrid.ui.Label("FPS"))
             addGap(3)
             add(bgColorBox, width = 24, height = 24)
+            addGap(10)
+            add(Hybrid.ui.Label("Zoom:"))
+            add(ifZoom, height = 24, width = 28)
+            this += {
+                add(zoomP, width = 12, height =  12)
+                add(zoomM, width = 12, height =  12)
+            }
         }
         rows += {
             add(sliderMet, width = 184)
@@ -81,15 +91,20 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private fun buildFromAnim( anim: Animation?) {
         animation = anim
 
-        ffFps.valueBind.unbind()
-        metBind.unbind()
-
+        unbind()
         updateSlider()
 
         if( anim != null) {
             anim.state.speedBind.bind(ffFps.valueBind)
             anim.state.metBind.bind(metBind)
+            anim.state.zoomBind.bind(ifZoom.valueBind)
         }
+    }
+
+    private fun unbind() {
+        ffFps.valueBind.unbind()
+        metBind.unbind()
+        ifZoom.valueBind.unbind()
     }
 
     private fun updateSlider() {
@@ -126,8 +141,8 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     }
 
     override fun close() {
+        unbind()
         _curAnimBind.unbind()
-        ffFps.valueBind.unbind()
     }
 }
 
@@ -151,6 +166,9 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
 
             val bi = Hybrid.imageConverter.convert<ImageBI>(image)
             g.drawImage(bi.bi, 0, 0, null)
+
+            image.flush()
+            bi.bi.flush()
         }
     }
 }

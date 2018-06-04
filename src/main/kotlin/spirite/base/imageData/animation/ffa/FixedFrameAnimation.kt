@@ -14,6 +14,13 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     var start : Int = 0 ; private set
     var end : Int = 0 ; private set
 
+    constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
+
+    }
+    constructor(name: String, workspace: IImageWorkspace, layers: List<FFALayer>) : this(name, workspace){
+
+    }
+
     override val startFrame: Float get() = start.f
     override val endFrame: Float get() = end.f
 
@@ -32,7 +39,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
     internal fun triggerFFAChange( layer: FFALayer?) {
-        TODO()
+        triggerStructureChange()
     }
 
     fun addLinkedLayer( group: GroupNode, includeSubtrees: Boolean, frameMap: Map<Node, FFAFrameStructure>? = null)
