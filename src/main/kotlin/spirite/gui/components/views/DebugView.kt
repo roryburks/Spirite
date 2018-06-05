@@ -31,7 +31,7 @@ private constructor( val imp : ICrossPanel)
             rows.padding = 4
         }
 
-        Hybrid.timing.createTimer(100, true) {
+        Hybrid.timing.createTimer(100, true){
             val sb = StringBuilder()
 
             sb.appendln("${GLImageTracker.images.size} : ${GLImageTracker.bytesUsed}")
