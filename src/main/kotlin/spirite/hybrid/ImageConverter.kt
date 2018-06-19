@@ -1,18 +1,15 @@
 package spirite.hybrid
 
+import jspirite.rasters.RasterHelper
 import spirite.base.graphics.IImage
-import spirite.base.graphics.NillImage
 import spirite.base.graphics.gl.GLEException
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.IGL
 import spirite.base.util.glu.GLC
-import spirite.hybrid.MDebug.WarningType
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.graphics.ImageBI
 import spirite.pc.toBufferedImage
-import sun.awt.image.ByteInterleavedRaster
-import sun.awt.image.IntegerInterleavedRaster
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
@@ -56,27 +53,28 @@ class ImageConverter(
     fun loadImageIntoGL( image: IImage, gl: IGL) {
         when( image) {
             is ImageBI -> {
-                val raster = image.bi.raster
+                val storage = RasterHelper.GetDataStorageFromBi(image.bi)
 
-                when( raster) {
-                    is ByteInterleavedRaster -> {
+                when( storage) {
+                    is ByteArray -> {
                         gl.texImage2D(
                                 GLC.TEXTURE_2D,
                                 0,
                                 GLC.RGBA,
                                 GLC.RGBA,
                                 GLC.UNSIGNED_INT_8_8_8_8,
-                                JOGLTextureSource( image.bi.width, image.bi.height, ByteBuffer.wrap(raster.dataStorage)))
+                                JOGLTextureSource(image.bi.width, image.bi.height, ByteBuffer.wrap(storage)))
                     }
-                    is IntegerInterleavedRaster -> {
+                    is IntArray -> {
                         gl.texImage2D(
                                 GLC.TEXTURE_2D,
                                 0,
                                 GLC.RGBA,
                                 GLC.BGRA,
                                 GLC.UNSIGNED_INT_8_8_8_8_REV,
-                                JOGLTextureSource( image.bi.width, image.bi.height, IntBuffer.wrap(raster.dataStorage)))
+                                JOGLTextureSource( image.bi.width, image.bi.height, IntBuffer.wrap(storage)))
                     }
+
                 }
             }
         }
