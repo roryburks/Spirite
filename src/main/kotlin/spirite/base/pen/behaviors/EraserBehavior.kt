@@ -1,6 +1,7 @@
 package spirite.base.pen.behaviors
 
 import spirite.base.brains.toolset.IToolsetManager
+import spirite.base.brains.toolset.PenDrawMode.NORMAL
 import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
@@ -15,12 +16,12 @@ object EraserBehavior {
 
 
     private fun _makeStroke(toolsetManager: IToolsetManager, color: Color) : StrokeParams {
-        val settings = toolsetManager.toolset.Pen
+        val settings = toolsetManager.toolset.Eraser
 
         return StrokeParams(
                 color,
                 ERASE,
-                settings.mode,
+                NORMAL,
                 settings.width,
                 settings.alpha,
                 hard = settings.hard)
