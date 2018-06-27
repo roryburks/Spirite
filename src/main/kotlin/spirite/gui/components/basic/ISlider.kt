@@ -4,12 +4,8 @@ import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
-import spirite.hybrid.ITimer
-import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
-import spirite.pc.gui.jcolor
-import spirite.pc.gui.scolor
 import java.awt.*
 import java.util.*
 import javax.swing.JComponent

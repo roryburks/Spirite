@@ -1,7 +1,6 @@
 package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.MasterControl
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel

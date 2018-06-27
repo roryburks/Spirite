@@ -1,18 +1,13 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.MasterControl
 import spirite.base.graphics.IImage
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import java.awt.Color
 import java.io.File
 import java.io.IOException
 

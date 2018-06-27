@@ -5,7 +5,6 @@ import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.pc.gui.SColor
-import kotlin.Int.Companion
 
 interface IComponentProvider {
     fun Button(str: String? = null) : IButton

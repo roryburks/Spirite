@@ -4,7 +4,6 @@ import spirite.base.imageData.groupTree.GroupTree.Node
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
-import java.io.IOException
 
 object Transferables {
     class NodeTransferable(val node: Node) : Transferable {

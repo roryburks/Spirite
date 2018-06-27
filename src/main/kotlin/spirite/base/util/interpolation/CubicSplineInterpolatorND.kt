@@ -1,8 +1,6 @@
 package spirite.base.util.interpolation
 
 import kotlin.math.max
-import kotlin.math.sign
-import kotlin.system.measureTimeMillis
 
 private val SIZE_PER = 10
 

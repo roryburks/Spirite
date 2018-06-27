@@ -3,7 +3,6 @@ package spirite.base.file
 import spirite.base.util.i
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
-import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 
 object SaveLoadUtil {

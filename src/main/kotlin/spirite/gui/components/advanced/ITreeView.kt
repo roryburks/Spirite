@@ -1,10 +1,11 @@
 package spirite.gui.components.advanced
 
+import CrossLayout
+import spirite.base.brains.Bindable
+import spirite.base.brains.IBindable
 import spirite.base.graphics.IImage
 import spirite.base.graphics.NillImage
 import spirite.base.util.delegates.OnChangeDelegate
-import spirite.base.brains.Bindable
-import spirite.base.brains.IBindable
 import spirite.gui.components.advanced.ITreeElementConstructor.ITNode
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*

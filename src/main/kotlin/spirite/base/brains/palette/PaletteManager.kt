@@ -1,6 +1,8 @@
 package spirite.base.brains.palette
 
-import spirite.base.brains.*
+import spirite.base.brains.Bindable
+import spirite.base.brains.IObservable
+import spirite.base.brains.Observable
 import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
 import spirite.base.util.Color
 import spirite.base.util.Colors

@@ -1,8 +1,9 @@
 package spirite.pc.gui.basic
 
-import spirite.gui.resources.Skin.Global.Bg
+import CrossLayout
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.resources.Skin.Global.Bg
 import java.awt.Graphics
 import javax.swing.JPanel
 

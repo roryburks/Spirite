@@ -3,7 +3,6 @@ package spirite.base.graphics.fill
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
-import spirite.base.graphics.fill.V1FillArrayAlgorithm.V1FillContext
 import spirite.base.util.MathUtil
 import spirite.base.util.linear.Vec2i
 import java.util.concurrent.ConcurrentLinkedQueue

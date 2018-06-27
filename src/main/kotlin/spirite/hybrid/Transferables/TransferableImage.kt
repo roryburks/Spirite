@@ -3,7 +3,6 @@ package spirite.hybrid.Transferables
 import spirite.base.graphics.IImage
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
-import java.awt.Image
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException

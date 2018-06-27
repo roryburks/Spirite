@@ -1,7 +1,7 @@
 package spirite.pc.gui.basic
 
-import spirite.gui.resources.Skin
 import spirite.gui.components.basic.ILabel
+import spirite.gui.resources.Skin
 import java.awt.Color
 import java.awt.Font
 import javax.swing.JLabel

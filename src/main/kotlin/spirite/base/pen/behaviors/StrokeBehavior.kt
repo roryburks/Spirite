@@ -4,7 +4,6 @@ import spirite.base.imageData.drawer.IImageDrawer.IStrokeModule
 import spirite.base.pen.PenState
 import spirite.base.pen.Penner
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.util.f
 import spirite.hybrid.Hybrid
 import kotlin.math.abs
 

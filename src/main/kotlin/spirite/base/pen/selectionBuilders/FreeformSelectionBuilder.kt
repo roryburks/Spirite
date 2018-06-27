@@ -4,7 +4,6 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.Colors
-import spirite.base.util.compaction.FloatCompactor
 import spirite.base.util.compaction.IntCompactor
 import spirite.base.util.f
 import spirite.base.util.linear.Vec2i

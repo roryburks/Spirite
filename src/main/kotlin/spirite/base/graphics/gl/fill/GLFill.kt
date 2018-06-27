@@ -1,6 +1,5 @@
 package spirite.base.graphics.gl.fill
 
-import spirite.base.graphics.GraphicsContext.Composite.*
 import spirite.base.graphics.fill.IFillArrayAlgorithm
 import spirite.base.graphics.gl.FillAfterpassCall
 import spirite.base.graphics.gl.GLImage

@@ -1,8 +1,8 @@
 package spirite.pc.gui.basic
 
-import spirite.gui.resources.Skin
 import spirite.gui.components.basic.IButton
 import spirite.gui.resources.IIcon
+import spirite.gui.resources.Skin
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.border.BevelBorder

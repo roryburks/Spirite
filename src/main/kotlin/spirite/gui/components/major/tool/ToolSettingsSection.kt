@@ -1,12 +1,11 @@
 package spirite.gui.components.major.tool
 
-import spirite.base.brains.*
+import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
 import spirite.base.util.InvertibleFunction
 import spirite.base.util.binding.xBind
 import spirite.base.util.binding.yBind
-import spirite.base.util.linear.Vec2
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent

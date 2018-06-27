@@ -2,7 +2,6 @@ package spirite.gui.components.major.work
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
@@ -10,7 +9,6 @@ import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.ITabbedPane
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
-import javax.swing.SwingUtilities
 
 
 class WorkTabPane

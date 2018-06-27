@@ -3,7 +3,6 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand.*
 import spirite.base.imageData.selection.Selection
-import spirite.base.imageData.selection.Selection.Companion
 import spirite.base.util.linear.Rect
 
 class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecuter

@@ -1,19 +1,19 @@
 package spirite.gui.components.advanced
 
-import spirite.base.util.groupExtensions.then
-import spirite.gui.components.basic.IComponent
-import spirite.pc.gui.basic.SwPanel
 import spirite.base.brains.Bindable
 import spirite.base.util.MathUtil
+import spirite.base.util.groupExtensions.then
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.components.advanced.IResizeContainerPanel.IResizeBar
-import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.resources.Skin.ResizePanel.BarLineColor
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.SwPanel
 import kotlin.reflect.KProperty
 
 interface IResizeContainerPanel : IComponent

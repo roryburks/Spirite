@@ -4,7 +4,6 @@ import spirite.base.brains.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import spirite.base.util.linear.MutableTransform
-import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import kotlin.reflect.KProperty
 

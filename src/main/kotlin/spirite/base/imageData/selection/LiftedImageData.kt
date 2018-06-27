@@ -9,7 +9,6 @@ import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Vec2i
 import spirite.hybrid.Hybrid
 import java.io.File
 

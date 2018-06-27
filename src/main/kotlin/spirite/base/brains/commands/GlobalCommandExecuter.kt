@@ -1,10 +1,8 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
-import spirite.base.graphics.GraphicsContext.Composite.DST_IN
 import spirite.base.graphics.GraphicsContext.Composite.SRC_IN
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
@@ -13,10 +11,8 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.graphics.rendering.sources.getRenderSourceForNode
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.IClearModule
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
@@ -24,11 +20,9 @@ import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
-import java.io.File
 
 class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {

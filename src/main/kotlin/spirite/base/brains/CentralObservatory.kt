@@ -7,7 +7,6 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
-import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import java.lang.ref.WeakReference
 

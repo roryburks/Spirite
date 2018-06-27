@@ -6,11 +6,9 @@ import spirite.base.graphics.RawImage
 import spirite.base.util.*
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.ContentBoundsFinder
 import spirite.hybrid.Hybrid
-import java.io.File
 import kotlin.math.max
 
 /**

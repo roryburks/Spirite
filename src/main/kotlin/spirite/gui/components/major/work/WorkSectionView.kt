@@ -6,10 +6,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.base.util.f
-import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
-import kotlin.reflect.KProperty
 
 /** The view describes which part of the image is currently being seen and
  * manages conversions between the screen space and the image space. */

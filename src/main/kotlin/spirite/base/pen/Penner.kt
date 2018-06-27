@@ -10,7 +10,6 @@ import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode.*
 import spirite.base.pen.behaviors.*
 import spirite.base.util.Colors
-import spirite.base.util.delegates.DerivedLazy
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.linear.Vec2

@@ -3,8 +3,8 @@ package spirite.hybrid
 import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.IGL
 import spirite.gui.components.basic.IComponentProvider
-import spirite.pc.gui.SwingComponentProvider
 import spirite.pc.JOGL.JOGLProvider
+import spirite.pc.gui.SwingComponentProvider
 
 /** Hybrid is a collection of components and interfaces that are platform-specific (things like Timers, GUI libraries,
  * OpenGL implementations, etc).  It wraps them such that they can code can be as portable as possible.

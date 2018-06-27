@@ -1,7 +1,6 @@
 package spirite.gui.components.dialogs
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.MasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT

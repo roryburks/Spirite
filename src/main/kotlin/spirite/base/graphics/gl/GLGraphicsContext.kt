@@ -5,8 +5,6 @@ import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
-import spirite.base.util.shapes.IShape
-import spirite.base.util.shapes.Oval
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.f
@@ -15,6 +13,8 @@ import spirite.base.util.glu.PolygonTesselater
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
+import spirite.base.util.shapes.IShape
+import spirite.base.util.shapes.Oval
 import spirite.hybrid.ImageConverter
 
 

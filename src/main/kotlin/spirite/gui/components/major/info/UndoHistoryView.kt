@@ -1,18 +1,14 @@
 package spirite.gui.components.major.info
 
 import spirite.base.brains.IMasterControl
-import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
 import spirite.base.imageData.undo.UndoIndex
-import spirite.base.imageData.undo.UndoableAction
 import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
-import javax.swing.JLabel
 
 class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = Hybrid.ui.CrossPanel {

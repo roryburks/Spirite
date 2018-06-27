@@ -21,7 +21,6 @@ import spirite.base.util.Color
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
-import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2

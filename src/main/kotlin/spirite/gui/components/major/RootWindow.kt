@@ -2,7 +2,6 @@ package spirite.gui.components.major
 
 import spirite.base.brains.Hotkey
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.MasterControl
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
@@ -18,13 +17,11 @@ import spirite.gui.components.major.tool.ToolSection
 import spirite.gui.components.major.tool.ToolSettingsSection
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
-import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
 import javax.swing.JFrame

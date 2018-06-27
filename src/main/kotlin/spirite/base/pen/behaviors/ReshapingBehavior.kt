@@ -9,7 +9,10 @@ import spirite.base.pen.Penner
 import spirite.base.pen.behaviors.TransformBehavior.TransformStates.*
 import spirite.base.util.Colors
 import spirite.base.util.f
-import spirite.base.util.linear.*
+import spirite.base.util.linear.MutableTransform
+import spirite.base.util.linear.Rect
+import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Vec2
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle

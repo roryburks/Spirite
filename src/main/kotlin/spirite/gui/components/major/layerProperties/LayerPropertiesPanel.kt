@@ -7,10 +7,8 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.IIcon
 import spirite.hybrid.Hybrid
-import javax.swing.JLabel
 
 class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
 {

@@ -2,20 +2,20 @@ package spirite.base.imageData
 
 import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
-import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
+import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.toolset.Toolset
 import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.animation.AnimationManager
 import spirite.base.imageData.animation.IAnimationManager
+import spirite.base.imageData.drawer.IImageDrawer
+import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.PrimaryGroupTree
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.Compositor
-import spirite.base.imageData.drawer.IImageDrawer
-import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.selection.ISelectionEngine
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
 import spirite.base.imageData.selection.SelectionEngine

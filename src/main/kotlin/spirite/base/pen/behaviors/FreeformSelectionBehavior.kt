@@ -1,6 +1,5 @@
 package spirite.base.pen.behaviors
 
-import spirite.base.brains.toolset.BoxSelectionShape
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.selection.ISelectionEngine.BuildMode
 import spirite.base.pen.Penner

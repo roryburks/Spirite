@@ -1,11 +1,9 @@
 package spirite.base.brains.commands
 
-import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
+import spirite.base.brains.toolset.IToolsetManager
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.roundToInt
 
 class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExecuter
 {

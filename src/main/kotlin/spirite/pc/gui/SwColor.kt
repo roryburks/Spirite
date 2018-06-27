@@ -1,6 +1,5 @@
 package spirite.pc.gui
 
-import spirite.base.util.ColorARGB32
 import spirite.base.util.ColorARGB32Normal
 
 typealias SColor = spirite.base.util.Color

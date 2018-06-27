@@ -2,7 +2,6 @@ package spirite.base.graphics
 
 import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.util.Color
-import spirite.base.util.linear.Transform
 
 /***
  * You can think of IDrawer as somewhat of an extension to GraphicsContent as it takes a base surface/image and applies

@@ -1,15 +1,12 @@
 package spirite.gui.components.major.animation
 
-import com.jogamp.opengl.GLAutoDrawable
-import com.jogamp.opengl.GLEventListener
-import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.brains.Bindable
 import spirite.base.brains.IMasterControl
-import spirite.base.graphics.gl.GLGraphicsContext
-import spirite.base.graphics.gl.GLImage
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.util.*
+import spirite.base.util.MathUtil
+import spirite.base.util.ceil
+import spirite.base.util.floor
+import spirite.base.util.round
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
@@ -18,12 +15,9 @@ import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
-import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.SwComponent
-import spirite.pc.gui.basic.SwPanel
 import spirite.pc.gui.jcolor
-import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JPanel
 import kotlin.math.max

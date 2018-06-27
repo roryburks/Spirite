@@ -5,8 +5,9 @@ import spirite.base.brains.toolset.Tool
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.util.Colors
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
-import spirite.gui.components.basic.*
+import spirite.gui.components.basic.IBoxList
 import spirite.gui.components.basic.IBoxList.IBoxComponent
+import spirite.gui.components.basic.IComponent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
 import spirite.gui.resources.ToolIcons

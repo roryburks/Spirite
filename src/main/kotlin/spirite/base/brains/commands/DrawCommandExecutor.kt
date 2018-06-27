@@ -6,15 +6,9 @@ import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*
 import spirite.base.imageData.groupTree.GroupTree.Node
-import spirite.base.imageData.mediums.ArrangedMediumData
-import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.imageData.undo.ImageAction
-import spirite.base.imageData.undo.StackableAction
-import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.f
 import spirite.base.util.linear.Transform
-import spirite.base.util.linear.Transform.Companion
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.Hybrid
 

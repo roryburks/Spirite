@@ -7,10 +7,10 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder
 import spirite.gui.components.basic.IComponent.BasicBorder.*
 import spirite.gui.components.basic.IComponent.BasicCursor
-import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
-import spirite.gui.components.basic.events.MouseEvent
-import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.components.basic.Invokable
+import spirite.gui.components.basic.events.MouseEvent
+import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
+import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
 import spirite.pc.gui.jcolor

@@ -1,5 +1,6 @@
 package spirite.pc.gui.basic
 
+import CrossLayout
 import jspirite.gui.SScrollPane
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.BoxList

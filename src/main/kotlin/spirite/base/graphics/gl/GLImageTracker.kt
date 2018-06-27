@@ -1,7 +1,5 @@
 package spirite.base.graphics.gl
 
-import java.lang.ref.PhantomReference
-import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 
 object GLImageTracker {

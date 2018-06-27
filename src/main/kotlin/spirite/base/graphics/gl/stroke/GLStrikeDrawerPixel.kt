@@ -1,27 +1,15 @@
 package spirite.base.graphics.gl.stroke
 
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
 import spirite.base.graphics.gl.*
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
 import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
-import spirite.base.graphics.using
 import spirite.base.pen.stroke.DrawPoints
-import spirite.base.pen.stroke.IStrokeDrawer
-import spirite.base.pen.stroke.StrokeBuilder
 import spirite.base.pen.stroke.StrokeParams
-import spirite.base.pen.stroke.StrokeParams.Method.ERASE
-import spirite.base.util.ceil
-import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
-import spirite.base.util.round
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
-// TODO: It really shouldn't be hard to make pixel behavior behave as expected.
 class GLStrikeDrawerPixel(gle: GLEngine)
     : GLStrokeDrawer(gle)
 {

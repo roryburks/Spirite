@@ -1,20 +1,21 @@
 package spirite.gui.components.major.work
 
-import spirite.base.pen.Penner
-import spirite.base.brains.*
+import spirite.base.brains.IMasterControl
+import spirite.base.brains.IObservable
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
-import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.IImageObservatory.ImageObserver
+import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.pen.Penner
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Vec2
 import spirite.base.util.round
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
-import spirite.gui.components.basic.*
-import spirite.pc.gui.basic.SwPanel
+import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.SwPanel
 import java.awt.Font
 import javax.swing.SwingUtilities
 

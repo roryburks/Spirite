@@ -2,7 +2,6 @@ package spirite.gui.resources
 
 import spirite.base.brains.toolset.Tool
 import java.awt.Graphics
-import javax.swing.ImageIcon
 
 object ToolIcons {
     val toolSheet by lazy { SwIcons.loadIconSheet("tool_icons.png") }

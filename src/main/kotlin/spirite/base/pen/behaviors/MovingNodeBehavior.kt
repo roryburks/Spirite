@@ -2,7 +2,6 @@ package spirite.base.pen.behaviors
 
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.pen.Penner
-import spirite.base.util.f
 
 
 class MovingNodeBehavior(

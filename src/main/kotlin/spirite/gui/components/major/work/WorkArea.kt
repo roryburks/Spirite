@@ -4,7 +4,6 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.util.Colors
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
-import spirite.pc.master
 
 abstract class WorkArea(
         val context: WorkSection) {

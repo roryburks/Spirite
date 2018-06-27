@@ -4,9 +4,9 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MMediumRepository
+import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.util.linear.Transform
 
 /***

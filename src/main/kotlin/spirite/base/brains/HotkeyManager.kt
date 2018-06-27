@@ -10,7 +10,6 @@ import spirite.base.brains.settings.IPreferences
 import spirite.base.util.dataContainers.MutableOneToManyMap
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
-import kotlin.Int.Companion
 
 data class Hotkey(
         val key: Int,

@@ -4,7 +4,8 @@ import spirite.base.brains.IMasterControl
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -13,9 +14,7 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.*
 import spirite.base.util.i
-import spirite.gui.components.major.layerProperties.SpriteLayerPanel
 import spirite.hybrid.Hybrid
-
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile

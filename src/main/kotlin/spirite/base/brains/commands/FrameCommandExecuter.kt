@@ -3,10 +3,6 @@ package spirite.base.brains.commands
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
 import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand.*
-import spirite.base.imageData.drawer.IImageDrawer.IClearModule
-import spirite.base.imageData.drawer.IImageDrawer.IInvertModule
-import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.hybrid.Hybrid
 
 
 class FrameCommandExecuter(val frameManager: IFrameManager) : ICommandExecuter

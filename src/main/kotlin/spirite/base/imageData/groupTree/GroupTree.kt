@@ -1,19 +1,17 @@
 package spirite.base.imageData.groupTree
 
+import spirite.base.brains.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
+import spirite.base.graphics.RenderMethod
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
 import spirite.base.imageData.undo.NullAction
-import spirite.base.util.delegates.UndoableDelegate
-import spirite.base.util.linear.Transform
-import spirite.base.brains.Bindable
-import spirite.base.graphics.RenderMethod
-import spirite.base.imageData.groupTree.GroupTree.Node.NodePosition.NodePositionChangeAction
 import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
-import spirite.base.util.groupExtensions.SinglyList
+import spirite.base.util.delegates.UndoableDelegate
+import spirite.base.util.linear.Transform
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.ErrorType.STRUCTURAL

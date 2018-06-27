@@ -2,11 +2,11 @@ package spirite.base.brains
 
 import spirite.base.brains.commands.CentralCommandExecutor
 import spirite.base.brains.commands.ICentralCommandExecutor
+import spirite.base.brains.palette.IPaletteManager
+import spirite.base.brains.palette.PaletteManager
 import spirite.base.brains.settings.ISettingsManager
 import spirite.base.brains.settings.JPreferences
 import spirite.base.brains.settings.SettingsManager
-import spirite.base.brains.palette.IPaletteManager
-import spirite.base.brains.palette.PaletteManager
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.toolset.ToolsetManager
 import spirite.base.file.FileManager
@@ -19,8 +19,8 @@ import spirite.base.graphics.rendering.RenderEngine
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
-import spirite.gui.components.dialogs.JDialog
 import spirite.gui.components.dialogs.IDialog
+import spirite.gui.components.dialogs.JDialog
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.menus.SwContextMenus

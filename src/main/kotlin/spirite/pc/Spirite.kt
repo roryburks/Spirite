@@ -1,18 +1,12 @@
 package spirite.pc
 
 import spirite.base.brains.MasterControl
-import spirite.base.file.LoadEngine
-import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
-import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
-import spirite.gui.components.major.RootWindow
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
-import java.io.File
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
-import javax.swing.WindowConstants
 
 lateinit var master: MasterControl
 

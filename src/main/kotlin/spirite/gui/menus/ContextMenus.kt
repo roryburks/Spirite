@@ -2,7 +2,6 @@ package spirite.gui.menus
 
 import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.commands.ICommand
-import spirite.base.brains.commands.ICommandExecuter
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*

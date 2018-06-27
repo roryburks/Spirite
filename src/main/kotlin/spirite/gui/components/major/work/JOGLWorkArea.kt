@@ -6,10 +6,10 @@ import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.graphics.gl.GLGraphicsContext
-import spirite.pc.gui.basic.ISwComponent
-import spirite.pc.gui.basic.SwComponent
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGLProvider
+import spirite.pc.gui.basic.ISwComponent
+import spirite.pc.gui.basic.SwComponent
 
 class JOGLWorkArea
 private constructor(context: WorkSection, val canvas: GLJPanel)

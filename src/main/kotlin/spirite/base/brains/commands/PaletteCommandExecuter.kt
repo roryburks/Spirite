@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
-import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.*
+import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP
+import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP_BACK
 import spirite.base.brains.palette.IPaletteManager
 
 class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExecuter

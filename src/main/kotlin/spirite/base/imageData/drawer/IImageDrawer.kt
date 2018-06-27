@@ -1,7 +1,6 @@
 package spirite.base.imageData.drawer
 
 import spirite.base.brains.toolset.ColorChangeMode
-import spirite.base.brains.toolset.ColorChangeScopes
 import spirite.base.imageData.mediums.ArrangedMediumData
 import spirite.base.imageData.mediums.BuiltMediumData
 import spirite.base.imageData.selection.ILiftedData
@@ -11,7 +10,6 @@ import spirite.base.imageData.undo.ImageAction
 import spirite.base.pen.PenState
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.Color
-import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
 

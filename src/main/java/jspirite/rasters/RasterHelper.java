@@ -4,10 +4,7 @@ import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.nio.Buffer;
-import java.nio.IntBuffer;
 
 public class RasterHelper {
     public static Object GetDataStorageFromBi(BufferedImage bi) {

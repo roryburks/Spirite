@@ -1,16 +1,13 @@
 package spirite.base.imageData.animation
 
-import kotlinx.coroutines.experimental.withTimeoutOrNull
 import spirite.base.brains.Bindable
 import spirite.base.brains.IBindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
-import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.undo.NullAction
-import spirite.base.imageData.undo.UndoableAction
 
 
 interface IAnimationManager {
