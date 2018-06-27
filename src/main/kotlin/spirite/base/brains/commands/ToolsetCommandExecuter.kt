@@ -2,6 +2,10 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExecuter
 {
@@ -19,6 +23,9 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
         Reshape( "Reshape"),
         Rigger("Rigger"),
         ShapeSelection("ShapeSelection"),
+
+        DecreasePenSize("decreaseSize"),
+        IncreasePenSize("increaseSize"),
         ;
 
         override val commandString: String get() = "tool.$string"
@@ -41,6 +48,42 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
             Reshape.string -> toolsetManager.selectedTool = toolsetManager.toolset.Reshape
             Rigger.string -> toolsetManager.selectedTool = toolsetManager.toolset.Rigger
             ShapeSelection.string -> toolsetManager.selectedTool = toolsetManager.toolset.ShapeSelection
+
+            DecreasePenSize.string -> {
+                val selected = toolsetManager.selectedTool
+
+                fun decrease( f: Float) : Float
+                {
+                    return when{
+                        f < 1 -> 1f
+                        f <= 20 -> ceil(f-1f)
+                        else -> ceil(f-2f)
+                    }
+                }
+
+                when( selected)
+                {
+                    is spirite.base.brains.toolset.Pen -> selected.width = decrease(selected.width)
+                    is spirite.base.brains.toolset.Eraser -> selected.width = decrease(selected.width)
+                }
+            }
+            IncreasePenSize.string -> {
+                val selected = toolsetManager.selectedTool
+
+                fun increase(f : Float) : Float
+                {
+                    return when{
+                        f < 20 -> floor(f+1f)
+                        else -> floor(f + 2f)
+                    }
+                }
+
+                when( selected)
+                {
+                    is spirite.base.brains.toolset.Pen -> selected.width = increase(selected.width)
+                    is spirite.base.brains.toolset.Eraser -> selected.width = increase(selected.width)
+                }
+            }
             else -> return false
         }
         return true

@@ -56,23 +56,16 @@ class Penner(
     val workspace get() = context.currentWorkspace
 
 
-    var rawX = 0 ; private set
+    var rawX = 0 ; private  set
     var rawY = 0 ; private set
     var oldRawX = 0 ; private set
     var oldRawY = 0 ; private set
 
-    private val xDerived : DerivedLazy<Int> = DerivedLazy {
-        val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
-        yDerived.field = p?.y?.floor ?: rawY
-        p?.x?.floor ?: rawX
-    }
-    private val yDerived : DerivedLazy<Int> = DerivedLazy {
-        val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
-        xDerived.field = p?.x?.floor ?: rawX
-        p?.y?.floor ?: rawY
-    }
-    val x by xDerived
-    var y by yDerived
+    var x = 0; private set
+    var y = 0; private set
+    var xf = 0f; private set
+    var yf = 0f; private set
+
     var oldX = 0 ; private set
     var oldY = 0 ; private set
 
@@ -200,15 +193,29 @@ class Penner(
     }
 
     override fun rawUpdateX(rawX: Int) {
-        this.rawX = rawX
-        xDerived.reset()
-        yDerived.reset()
+        if( this.rawX != rawX) {
+            this.rawX = rawX
+            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
+            if( p != null) {
+                xf = p.x
+                yf = p.y
+                x = p.x.floor
+                y = p.y.floor
+            }
+        }
     }
 
     override fun rawUpdateY(rawY: Int) {
-        this.rawY = rawY
-        xDerived.reset()
-        yDerived.reset()
+        if( this.rawY != rawY) {
+            this.rawY = rawY
+            val p = context.currentView?.tScreenToWorkspace?.apply(Vec2(rawX.f, rawY.f))
+            if( p != null) {
+                xf = p.x
+                yf = p.y
+                x = p.x.floor
+                y = p.y.floor
+            }
+        }
     }
 
     override fun rawUpdatePressure(rawPressure: Float) {

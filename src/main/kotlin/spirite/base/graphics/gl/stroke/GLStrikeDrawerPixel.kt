@@ -13,6 +13,7 @@ import spirite.base.pen.stroke.StrokeParams
 import spirite.base.pen.stroke.StrokeParams.Method.ERASE
 import spirite.base.util.ceil
 import spirite.base.util.f
+import spirite.base.util.floor
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
@@ -25,29 +26,39 @@ class GLStrikeDrawerPixel(gle: GLEngine)
     : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
-        drawPoint(gle, context.image, context.builder.currentPoints.x[0].round, context.builder.currentPoints.y[0].round, context.glParams)
+
+        println(context.builder.currentPoints.x[0].toString() + "," + context.builder.currentPoints.y[0].toString())
+        drawPoint(gle, context.image, context.builder.currentPoints.x[0].floor, context.builder.currentPoints.y[0].floor, context.glParams)
     }
 
     override fun doStep(context: DrawerContext) {
+
         drawStroke( gle, context.image, context.builder.currentPoints, context.glParams)
+        (0..context.builder.currentPoints.length-1).forEach {
+            drawPoint(gle, context.image, context.builder.currentPoints.x[it].floor, context.builder.currentPoints.y[it].floor, context.glParams)
+        }
     }
 
     override fun doBatch(image: GLImage, drawPoints: DrawPoints, params: StrokeParams, glParams: GLParameters) {
         drawStroke( gle, image, drawPoints, glParams)
+        (0..drawPoints.length-1).forEach {
+            drawPoint(gle, image, drawPoints.x[it].floor, drawPoints.y[it].floor, glParams)
+        }
     }
 
     override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod  = DEFAULT
 
     companion object {
         fun drawPoint( gle: GLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
-//            val data = floatArrayOf(
-//                    x-0.5f, y-0.5f,
-//                    x+0.5f, y-0.5f,
-//                    x-0.5f, y+0.5f,
-//                    x+0.5f, y+0.5f)
-//            val prim = GLPrimitive(data, intArrayOf(2), intArrayOf(GLC.TRIANGLE_STRIP), intArrayOf(4))
-//            gle.applyPrimitiveProgram(PolyRenderCall(Vec3(1f,1f,1f), 1f),
-//                    prim, params, null)
+            gle.setTarget(image)
+            val data = floatArrayOf(
+                    x+0f, y+0f,
+                    x+1f, y+0f,
+                    x+0f, y+1f,
+                    x+1f, y+1f)
+            val prim = GLPrimitive(data, intArrayOf(2), intArrayOf(GLC.TRIANGLE_STRIP), intArrayOf(4))
+            gle.applyPrimitiveProgram(PolyRenderCall(Vec3(1f,1f,1f), 1f),
+                    prim, params, null)
         }
 
         fun drawStroke( gle: GLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {

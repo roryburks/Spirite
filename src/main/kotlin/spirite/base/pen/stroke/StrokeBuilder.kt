@@ -39,6 +39,7 @@ class StrokeBuilder(
     private var _currentPoints : DrawPoints? = null
 
     fun start( ps: PenState) : Boolean{
+
         val cps = convertPS(ps)
         baseStates.add(cps)
         interpolator?.addPoint(cps.x, cps.y)

@@ -41,6 +41,9 @@ private val defaultHotkeys = mapOf(
         ToolCommand.Pixel.commandString to (Hotkey( KeyEvent.VK_A, 0)),
         ToolCommand.Rigger.commandString to (Hotkey( KeyEvent.VK_CAPS_LOCK, 0)),
 
+        ToolCommand.DecreasePenSize.commandString to (Hotkey( KeyEvent.VK_OPEN_BRACKET, 0)),
+        ToolCommand.IncreasePenSize.commandString to (Hotkey( KeyEvent.VK_CLOSE_BRACKET, 0)),
+
         PaletteCommand.SWAP.commandString to (Hotkey( KeyEvent.VK_X, 0)),
         PaletteCommand.SWAP_BACK.commandString to (Hotkey( KeyEvent.VK_Z, 0)),
 
