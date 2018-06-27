@@ -26,8 +26,6 @@ class GLStrikeDrawerPixel(gle: GLEngine)
     : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
-
-        println(context.builder.currentPoints.x[0].toString() + "," + context.builder.currentPoints.y[0].toString())
         drawPoint(gle, context.image, context.builder.currentPoints.x[0].floor, context.builder.currentPoints.y[0].floor, context.glParams)
     }
 
@@ -70,8 +68,6 @@ class GLStrikeDrawerPixel(gle: GLEngine)
             val prim = GLPrimitive(vb, intArrayOf(2), intArrayOf(GLC.LINE_STRIP), intArrayOf(points.length + 1))
             gle.applyPrimitiveProgram(StrokePixelCall(Vec3(1f,1f,1f)),
                     prim, params, null)
-
-            //drawPoint(gle, image, points.x.last().ceil+1, points.y.last().ceil, params)
         }
 
         private fun composeVBuffer( states: DrawPoints) : FloatArray {
