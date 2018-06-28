@@ -8,6 +8,7 @@ import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.groupExtensions.mapAggregated
+import kotlin.math.floor
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)

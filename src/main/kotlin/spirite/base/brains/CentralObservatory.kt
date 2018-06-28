@@ -37,7 +37,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
-    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind }
+    override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically

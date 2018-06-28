@@ -20,7 +20,9 @@ import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
 import java.awt.Graphics
 import javax.swing.JPanel
+import kotlin.math.floor
 import kotlin.math.max
+import kotlin.math.round
 
 class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
@@ -33,7 +35,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SwIcons.BigIcons.Anim_Play) }
     private val btnNext = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepF) }
     private val ffFps = Hybrid.ui.FloatField()
-    private val sliderMet = Hybrid.ui.Slider(0,100,0)
+    private val sliderMet = Hybrid.ui.Slider(0,100,0).also { it.snapsToTick = false }
     private val bgColorBox = Hybrid.ui.ColorSquare(Skin.Global.Bg.scolor).also { it.setBasicBorder(BEVELED_RAISED) }
     private val ifZoom = Hybrid.ui.IntField(allowsNegative = true).also { it.valueBind.addRootListener { new, old -> viewPanel.redraw()} }
     private val zoomP = Hybrid.ui.Button("+").also { it.action = {++ifZoom.value} }
@@ -80,9 +82,12 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private val metBind = Bindable(0f) { new, _ -> sliderMet.value = (new * 100).floor ; viewPanel.redraw()}
     init {
         sliderMet.valueBind.addListener { new, _ ->  metBind.field = new / 100f }
+        sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
+        btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
     }
 
     private fun buildFromAnim( anim: Animation?) {
+        println("$anim !!!!")
         animation = anim
 
         unbind()

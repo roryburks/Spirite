@@ -3,6 +3,8 @@ package spirite.base.brains.commands
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.gui.components.dialogs.IDialog
 
@@ -55,11 +57,16 @@ class NodeContextCommand(
             DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
             NEW_SPRITE_LAYER.string -> workspace.groupTree.addNewSpriteLayer(node, "sprite")
             NEW_PUPPET_LAYER.string -> TODO()
-            ANIM_FROM_GROUP.string -> TODO()
+            ANIM_FROM_GROUP.string -> {
+                val groupNode = node as? GroupNode ?: return true
+                val animation = FixedFrameAnimation("New Animation", workspace, groupNode)
+                workspace.animationManager.addAnimation(animation, true)
+            }
             INSERT_GROUP_IN_ANIMATION.string -> TODO()
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()
             NEW_RIG_ANIMATION.string -> TODO()
+            else -> return false
         }
 
         return true

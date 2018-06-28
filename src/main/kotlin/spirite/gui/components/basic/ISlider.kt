@@ -7,6 +7,10 @@ import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
 import java.util.*
 import javax.swing.JComponent
 import javax.swing.JSlider
@@ -75,6 +79,17 @@ private constructor(private val imp : SwSliderImp)
         }
 
         private inner class UI(context : JSlider) : BasicSliderUI( context) {
+            override fun scrollDueToClickInTrack(dir: Int) {
+                var value = slider.value
+
+                if (slider.orientation == JSlider.HORIZONTAL) {
+                    value = this.valueForXPosition(slider.mousePosition.x)
+                } else if (slider.orientation == JSlider.VERTICAL) {
+                    value = this.valueForYPosition(slider.mousePosition.y)
+                }
+                slider.value = value
+            }
+
             override fun paintTrack(g: Graphics) {
                 val yc = trackRect.y + trackRect.height / 2
 

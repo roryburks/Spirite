@@ -89,7 +89,7 @@ class ImageWorkspace(
     override val undoEngine = UndoEngine(this, mediumRepository)
     override val imageObservatory: IImageObservatory = ImageObservatory()
     override val groupTree = PrimaryGroupTree(this, mediumRepository)
-    override val animationManager: IAnimationManager get() = AnimationManager(this)
+    override val animationManager: IAnimationManager = AnimationManager(this)
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet get() = TODO("not implemented")
