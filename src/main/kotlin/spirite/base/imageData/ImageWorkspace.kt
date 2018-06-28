@@ -156,7 +156,7 @@ class ImageWorkspace(
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {
             imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), SinglyList(node), this@ImageWorkspace))
         }
-    }.apply { groupTree.treeObs.addObserver(this)}
+    }.apply { groupTree.treeObservable.addObserver(this)}
 
     private val selectionListener : (SelectionChangeEvent)->Unit = { it : SelectionChangeEvent ->
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))

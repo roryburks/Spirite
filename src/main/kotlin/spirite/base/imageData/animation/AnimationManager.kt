@@ -7,7 +7,10 @@ import spirite.base.brains.Observable
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.undo.NullAction
+import spirite.base.util.groupExtensions.mapAggregated
 
 
 interface IAnimationManager {
@@ -23,12 +26,12 @@ interface IAnimationManager {
         fun animationCreated( animation: Animation)
         fun animationRemoved( animation: Animation)
     }
-    val animationObserver : IObservable<AnimationObserver>
+    val animationObservable : IObservable<AnimationObserver>
 
     interface AnimationStructureChangeObserver {
         fun animationStructureChanged( animation: Animation)
     }
-    val animationStructureChangeObserver : IObservable<AnimationStructureChangeObserver>
+    val animationStructureChangeObservable : IObservable<AnimationStructureChangeObserver>
     fun triggerStructureChange(animation: Animation)
 }
 
@@ -64,7 +67,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         if( select || currentAnimation == null)
             currentAnimation = animation
 
-        animationObserver.trigger { it.animationCreated(animation) }
+        animationObservable.trigger { it.animationCreated(animation) }
     }
 
     private fun _removeAnimation( animation: Animation) {
@@ -72,15 +75,32 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         if( currentAnimation == animation)
             currentAnimation = null
 
-        animationObserver.trigger { it.animationRemoved(animation) }
+        animationObservable.trigger { it.animationRemoved(animation) }
     }
     // endregion
 
-    override val animationObserver = Observable<AnimationObserver>()
-    override val animationStructureChangeObserver = Observable<AnimationStructureChangeObserver>()
+    override val animationObservable = Observable<AnimationObserver>()
+    override val animationStructureChangeObservable = Observable<AnimationStructureChangeObserver>()
 
     override fun triggerStructureChange(animation: Animation) {
-        animationStructureChangeObserver.trigger { it.animationStructureChanged(animation)}
+        animationStructureChangeObservable.trigger { it.animationStructureChanged(animation)}
     }
 
+    private val treeObserver = object : TreeObserver {
+        override fun treeStructureChanged(evt: TreeChangeEvent) {
+            val fixedFrameAnimations = _animations.filterIsInstance<FixedFrameAnimation>()
+
+            if(!fixedFrameAnimations.any())
+                return;
+
+            val changedWithAncestors = mutableSetOf<Node>()
+            val allAncestors = evt.changedNodes.mapAggregated { it.ancestors }
+            changedWithAncestors.addAll(evt.changedNodes)
+            changedWithAncestors.addAll(allAncestors)
+
+            fixedFrameAnimations.forEach { it.treeChanged(changedWithAncestors) }
+        }
+
+        override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
+    }.also { workspace.groupTree.treeObservable.addObserver(it) }
 }

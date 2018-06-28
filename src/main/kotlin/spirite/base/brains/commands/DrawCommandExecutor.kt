@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand.*
 import spirite.base.brains.toolset.IToolsetManager
 import spirite.base.imageData.IImageWorkspace
@@ -32,6 +33,7 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
         ;
 
         override val commandString: String get() = "draw.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 
     override val validCommands: List<String> get() = DrawCommand.values().map {  it.string }

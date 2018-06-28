@@ -44,7 +44,7 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         fun nodePropertiesChanged( node: Node, renderChanged: Boolean)
     }
     class TreeChangeEvent( val changedNodes : Set<Node>)
-    val treeObs : IObservable<TreeObserver> get() = _treeObs
+    val treeObservable : IObservable<TreeObserver> get() = _treeObs
     private val _treeObs = Observable<TreeObserver>()
 
     protected fun triggerChange(evt : TreeChangeEvent) {_treeObs.trigger { it.treeStructureChanged(evt) }}

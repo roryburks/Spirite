@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand.*
 
 class WorkspaceCommandExecuter(val master: IMasterControl) : ICommandExecuter
@@ -17,6 +18,7 @@ class WorkspaceCommandExecuter(val master: IMasterControl) : ICommandExecuter
         ;
 
         override val commandString: String get() = "view.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
     override val validCommands: List<String> get() = ViewCommand.values().map { it.string }
     override val domain: String get() = "view"

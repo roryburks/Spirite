@@ -13,10 +13,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
 {
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
-
+        addLinkedLayer(node, false)
     }
     constructor(name: String, workspace: IImageWorkspace, layers: List<FFALayer>) : this(name, workspace){
-
+        _layers.addAll(layers)
     }
 
     private val _layers = mutableListOf<FFALayer>()

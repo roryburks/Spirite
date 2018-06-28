@@ -120,8 +120,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 val modifier = evt.modifiersEx
 
                 val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
-
-                command?.apply { master.commandExecuter.executeCommand(this, null) }
+                command?.apply { master.commandExecuter.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
             }
 
             false

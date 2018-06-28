@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
 import spirite.base.brains.toolset.IToolsetManager
 import kotlin.math.ceil
@@ -27,6 +28,7 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
         ;
 
         override val commandString: String get() = "tool.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
     override val validCommands: List<String> get() = ToolCommand.values().map { it.string }
     override val domain: String get() = "tool"

@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
 import spirite.base.graphics.GraphicsContext.Composite.SRC_IN
@@ -40,6 +41,7 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
         ;
 
         override val commandString: String get() = "global.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 
     override val validCommands: List<String> = GlobalCommand.values().map { it.string }

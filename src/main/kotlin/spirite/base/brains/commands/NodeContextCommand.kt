@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.gui.components.dialogs.IDialog
@@ -32,6 +33,7 @@ class NodeContextCommand(
         ;
 
         override val commandString: String get() = "node.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.groupTree?.selectedNode}
     }
 
     override val validCommands: List<String> get() = NodeCommand.values().map {  it.string }
@@ -43,7 +45,7 @@ class NodeContextCommand(
         val node = extra as? Node
 
         when(string) {
-            NEW_GROUP.string -> workspace.groupTree.addGroupNode(node, "New Group")
+            NEW_GROUP.string -> workspace.groupTree.addGroupNode( node, "New Group")
             DELETE.string -> node?.delete()
             NEW_SIMPLE_LAYER.string -> {
                 dialogs.invokeNewSimpleLayer(workspace)?.apply {

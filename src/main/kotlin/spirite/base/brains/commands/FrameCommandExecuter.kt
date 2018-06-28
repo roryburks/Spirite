@@ -2,6 +2,7 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IFrameManager
 import spirite.base.brains.IFrameManager.Views.*
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.FrameCommandExecuter.FrameCommand.*
 
 
@@ -16,6 +17,7 @@ class FrameCommandExecuter(val frameManager: IFrameManager) : ICommandExecuter
         ;
 
         override val commandString: String get() = "frame.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 
     override val validCommands: List<String> get() = FrameCommand.values().map {  it.string }

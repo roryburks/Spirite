@@ -33,7 +33,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
     override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
-    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObs }
+    override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }

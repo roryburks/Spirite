@@ -1,5 +1,6 @@
 package spirite.base.brains.commands
 
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP_BACK
 import spirite.base.brains.palette.IPaletteManager
@@ -12,6 +13,7 @@ class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExec
         ;
 
         override val commandString: String get() = "palette.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 
     override val validCommands: List<String> get() = PaletteCommand.values().map { it.string }

@@ -1,6 +1,7 @@
 package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand.*
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
@@ -16,6 +17,7 @@ class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecu
         ;
 
         override val commandString: String get() = "select.$string"
+        override val keyCommand: KeyCommand get() = KeyCommand(commandString)
     }
 
     override val validCommands: List<String> get() = SelectCommand.values().map { it.string }
