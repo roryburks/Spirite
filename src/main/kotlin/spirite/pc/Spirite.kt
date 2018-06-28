@@ -11,7 +11,6 @@ import javax.swing.UIManager
 lateinit var master: MasterControl
 
 fun main( args: Array<String>) {
-
     try {
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {

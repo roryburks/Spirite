@@ -15,7 +15,7 @@ import spirite.hybrid.Hybrid
  *	Although DynamicImage is essentially a medium (DynamicMedium is a thin wrapper for a DynamicImage), other Mediums and
  *  drawing sources use this dynamically-resizing behavior so it's easiest to abstract it into its own class.
  *
- * Note: There are many ways to do compositing from the composition layer to the base layer.  Can play with them later.
+ * Note: There are many ways to do compositing from the composition layers to the base layers.  Can play with them later.
  */
 class DynamicImage(
         raw: RawImage? = null,

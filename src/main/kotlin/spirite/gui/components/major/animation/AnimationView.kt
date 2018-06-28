@@ -28,7 +28,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
 
-    var timer : ITimer = Hybrid.timing.createTimer(100, true) {tick()}
+    var timer : ITimer = Hybrid.timing.createTimer(15, true) {tick()}
 
     private val viewPanel = AnimationViewPanel()
     private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepB) }
@@ -125,7 +125,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private fun tick() {
         if( !btnPlay.checked) return
         val anim = animation ?: return
-        anim.state.met = MathUtil.cycle(anim.startFrame, anim.endFrame, anim.state.met + anim.state.speed)
+        anim.state.met = MathUtil.cycle(anim.startFrame, anim.endFrame, anim.state.met + anim.state.speed/66.666f)
     }
 
 
@@ -142,6 +142,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     override fun close() {
         unbind()
         _curAnimBind.unbind()
+        timer.stop()
     }
 }
 

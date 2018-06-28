@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 private val DELAY = 10L
 
 /***
- * The V1 Fill Algoritm separates the image into 9x9 chunks, consisting of a 1-pixel outer layer (32 pixels, tracked
- * using an Int bitmask) and a 7x7 inner layer (49 pixels, tracked using a Long bitmask).  Can add bitmasks to be run
- * only through the outer layer (though the inner chunk can ignore them if it's been done before).
+ * The V1 Fill Algoritm separates the image into 9x9 chunks, consisting of a 1-pixel outer layers (32 pixels, tracked
+ * using an Int bitmask) and a 7x7 inner layers (49 pixels, tracked using a Long bitmask).  Can add bitmasks to be run
+ * only through the outer layers (though the inner chunk can ignore them if it's been done before).
  */
 object V1FillArrayAlgorithm : IFillArrayAlgorithm {
     override fun fill(data: IntArray, w: Int, h: Int, x: Int, y: Int, color: Int): IntArray? {

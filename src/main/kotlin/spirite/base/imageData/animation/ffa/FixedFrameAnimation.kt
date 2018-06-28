@@ -21,7 +21,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 
     private val _layers = mutableListOf<FFALayer>()
-    val layer : List<FFALayer> get() = _layers
+    val layers : List<FFALayer> get() = _layers
 
     val start : Int get() = _layers.map { it.start }.min() ?: 0
     val end : Int get() = _layers.map { it.end }.max() ?: 0

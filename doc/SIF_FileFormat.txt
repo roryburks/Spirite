@@ -7,12 +7,12 @@ Header
  [4, int] Version number
  [2, short] Image Width
  [2, short] Image Height
- 
+
  Per Group:
  [4, UTF8 str] 4-character chunk identifier
  [4, int] n: size of chunk
  [n, RAW] chunk data
- 
+
  ---- GRPT - Group Tree Chunk ----
  Per Group:
  [1, byte]: Depth of the GroupTree
@@ -60,7 +60,7 @@ Header
         [4, int] : Size of Image Data
         [n, RAW] : PNG-saved Image File
      CASE 1 (Dynamic) :
-        [2, short] : Dynamic offsetX 
+        [2, short] : Dynamic offsetX
         [2, short] : Dynamic offsetY
         [4, int] : Size of Image Data
         [n, RAW] : PNG-saved Image File
@@ -95,7 +95,7 @@ Header
 					[2, ushort] : reference to stroke
 					[4, float] : start point of stroke
 					[4, float] : end point of stroke
-		Per Stroke : 
+		Per Stroke :
 
 ---- ANIM - Animation Data Chunk
 Per Animation:
@@ -105,11 +105,10 @@ Per Animation:
         [2, ushort] : Number of Layers
         Per Layer:
             [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
-			[1, byte] : 0 bit: whether or not subgroups are linked
+            [1, byte] : 0 bit: whether or not subgroups are linked
             [2, ushort] : Number of Frames that have information
             Per Frame:
-                [4, byte] : NodeID 
-					(note, if it's a LayerNode it's a FrameFrame.  if it's a GroupNode it's a Start_of_loop frame)
+                [4, byte] : NodeID  (note, if it's a LayerNode it's a FrameFrame.  if it's a GroupNode it's a Start_of_loop frame)
                 [2, ushort] : Length
 				[2, ushort] : Gap Before
 				[2, ushort] : Gap After
@@ -135,7 +134,7 @@ Per Palette:
 [n, bytes] Palette Data
 	// [1] First byte corresponds to number of consecutive color datas
 	// [4*n] n*4 bytes representing the color data, in RGBA form
-	//		(if first byte was 0x00), 
+	//		(if first byte was 0x00),
 	//		[1] next byte represents consecutive empty datas
 	// ex: 00 FF 00 0A 3 [4] [4] [4], 258 whitespaces then 3 color data
 

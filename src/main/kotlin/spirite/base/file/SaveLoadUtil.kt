@@ -25,6 +25,10 @@ object SaveLoadUtil {
     val MEDIUM_PRISMATIC = 0x02
     val MEDIUM_MAGLEV = 0x03
 
+    // :::: AnimationType
+    val ANIM_FFA = 0x01
+    val ANIM_RIG = 0x02
+
     // Node Attribute Masks
     val VISIBLE_MASK = 0x01
     val EXPANDED_MASK = 0x02

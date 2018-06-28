@@ -188,6 +188,7 @@ object MathUtil {
 }
 val Int.f get() = this.toFloat()
 val Int.d get() = this.toDouble()
+val Int.s get() = this.toShort()
 
 val Float.floor get() = kotlin.math.floor(this).toInt()
 val Float.round get() = this.roundToInt()

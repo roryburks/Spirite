@@ -47,7 +47,7 @@ class WorkSectionDemo : JFrame() {
                     //mockWs.groupTree.addNewSimpleLayer(null, "Layer1", FLAT, 150,150)
 //            x.x = 25
 //            x.y = 25
-            //val gc = (x.layer.activeData.handle.medium as FlatMedium).image.graphics
+            //val gc = (x.layers.activeData.handle.medium as FlatMedium).image.graphics
             //gc.fillRect( 25, 25, 75,75)
         }
 

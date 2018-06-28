@@ -60,7 +60,7 @@ class NodeRenderer(
         // Note: though it doesn't seem recursive at first glance, _getDrawListUnsorted can either be recursive itself
         //  or might add GroupDrawThing's which call _renderRec.
         if( depth < 0 || depth >= buffer.size) {
-            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layer count.  Expected: [${0},${buffer.size}), Actual: $depth")
+            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return
         }
 
@@ -73,7 +73,7 @@ class NodeRenderer(
 
     private fun _getDrawListUnsorted(node: GroupNode, depth: Int) : List<DrawThing>{
         if( depth < 0 || depth >= buffer.size) {
-            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layer count.  Expected: [${0},${buffer.size}), Actual: $depth")
+            MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return emptyList()
         }
 

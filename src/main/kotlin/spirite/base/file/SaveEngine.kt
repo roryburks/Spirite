@@ -1,13 +1,18 @@
 package spirite.base.file
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.util.i
+import spirite.base.util.s
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -62,7 +67,8 @@ object SaveEngine {
         saveHeader(context)
         saveGroupTree(context)
         saveImageData(context)
-        //saveAnimationData(context)
+        if( workspace.animationManager.animations.any())
+            saveAnimationData(context)
         //savePaletteData(context)
 
         ra.close()
@@ -85,7 +91,7 @@ object SaveEngine {
     /** GRPT chunk saving the structure of the PrimaryGroupTree and all Nodes/Layers within it */
     fun saveGroupTree( context: SaveContext)
     {
-        context.writeChunk("GRPT", {ra->
+        context.writeChunk("GRPT") {ra->
             val depth = 0
             var met = 0
 
@@ -167,12 +173,12 @@ object SaveEngine {
 
             buildReferences(context.workspace.groupTree.root, depth)
             writeNode(context.root, 0)
-        })
+        }
     }
 
     /** PLTT chunk containing the Palettes saved in the workspace */
     fun savePaletteData( context: SaveContext) {
-        context.writeChunk("PLTT", {ra ->
+        context.writeChunk("PLTT") {ra ->
             context.workspace.paletteSet.palettes.forEach {
                 // [n], UTF8 : Palette Name
                 ra.write( SaveLoadUtil.strToByteArrayUTF8(it.name))
@@ -181,12 +187,12 @@ object SaveEngine {
                 ra.writeShort(raw.size) // [2] Palette Data Size
                 ra.write(raw)           // [n] Compressed Palette Data
             }
-        })
+        }
     }
 
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
     fun saveImageData( context: SaveContext) {
-        context.writeChunk("IMGD", {ra->
+        context.writeChunk("IMGD") {ra->
             context.floatingData.forEach {
                 // [4] : Medium Handle Id
                 ra.writeInt( it.id)
@@ -211,7 +217,46 @@ object SaveEngine {
                     }
                 }
             }
-        })
+        }
+    }
+
+    /** ANIM chunk containing all Animation Data */
+    fun saveAnimationData( context: SaveContext) {
+        context.writeChunk("ANIM") {ra ->
+            context.workspace.animationManager.animations.forEach { anim ->
+                when( anim) {
+                    is FixedFrameAnimation -> {
+                        ra.writeByte(SaveLoadUtil.ANIM_FFA) // [1] : Anim TypeId
+
+                        val validLayers = anim.layers.filterIsInstance<FFALayerGroupLinked>()
+                        if( validLayers.size > Short.MAX_VALUE) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: ${Short.MAX_VALUE}), taking only the first N")
+
+                        val layersToWrite = validLayers.take(Short.MAX_VALUE.i)
+                        ra.writeShort( layersToWrite.size)  // [2] : Number of layers
+                        for (layer in layersToWrite){
+                            ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
+                            ra.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
+
+                            if( layer.frames.size > Short.MAX_VALUE) {
+                                MDebug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}), writing an empty frame")
+                                ra.writeShort(0)
+                            }
+                            else {
+                                ra.writeShort(layer.frames.size) // [2] : Number of Frames
+                                for( frame in layer.frames) {
+                                    ra.writeInt(context.nodeMap[frame.node] ?: -1 ) // [4] : NodeId
+                                    ra.writeShort(frame.innerLength)    // [2]: Length
+                                    ra.writeShort(frame.gapBefore)    // [2]: Gap Before
+                                    ra.writeShort(frame.gapAfter)    // [2]: Gap After
+                                }
+                            }
+
+                        }
+                    }
+                    else -> MDebug.handleWarning(UNSUPPORTED, "Do not know how to save Animation: $anim.  Skipping it")
+                }
+            }
+        }
 
     }
 }
