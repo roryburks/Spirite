@@ -16,8 +16,13 @@ class FFALayerGroupLinked(
     var includeSubtrees by UndoableChangeDelegate(
             includeSubtrees,
             context.workspace.undoEngine,
-            "Change Animation Layer's IncludeSubtrees Structure",
-            {groupLinkUpdated()})
+            "Change Animation Layer's IncludeSubtrees Structure")
+            {groupLinkUpdated()}
+
+    init {
+        frameMap?.forEach {nodeLinks[it.key] = FFAFrame(it.value)}
+        groupLinkUpdated()
+    }
 
     override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
         val tree = context.workspace.groupTree
@@ -28,7 +33,6 @@ class FFALayerGroupLinked(
             else -> frameRelativeTo.node?.also { tree.moveBelow( nodeToMove, it)}
         }
     }
-
 
     internal fun groupLinkUpdated() {
         val oldMap = nodeLinks

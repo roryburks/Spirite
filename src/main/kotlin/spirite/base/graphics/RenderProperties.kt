@@ -17,12 +17,15 @@ data class RenderRubric constructor(
             method: RenderMethod? = null)
             : this(transform, alpha, if( method == null) emptyList() else SinglyList(method))
 
-    fun stack(top: RenderRubric) : RenderRubric {
-        return RenderRubric(
+    fun stack(top: RenderRubric) = RenderRubric(
                 top.transform * transform,
                 top.alpha * alpha,
                 methods + top.methods)
-    }
+
+    fun stack( transform: Transform) = RenderRubric(
+                transform * this.transform,
+                alpha,
+                methods)
 }
 
 /** RenderMethods is a MethodType along with a scroll (if applicable) */

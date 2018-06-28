@@ -4,6 +4,7 @@ import spirite.base.brains.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.graphics.RenderMethod
+import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
 import spirite.base.imageData.undo.IUndoEngine
@@ -374,5 +375,10 @@ open class GroupTree( val undoEngine: IUndoEngine?)
         : Node(parent, name)
     {
         override val imageDependencies: Collection<MediumHandle> get() = layer.imageDependencies
+
+        fun getDrawList() : List<TransformedHandle> {
+            val transform = tNodeToContext
+            return layer.getDrawList().map { it.stack(transform) }
+        }
     }
 }

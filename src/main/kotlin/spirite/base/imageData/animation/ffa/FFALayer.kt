@@ -1,8 +1,11 @@
 package spirite.base.imageData.animation.ffa
 
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.END_LOCAL_LOOP
-import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.START_LOCAL_LOOP
+import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.undo.NullAction
+import spirite.base.imageData.undo.UndoEngine
+import spirite.base.util.delegates.UndoableChangeDelegate
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
 abstract class FFALayer( internal val context : FixedFrameAnimation) {
     private val undoEngine get() = context.workspace.undoEngine
@@ -22,8 +25,46 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         return caret
     }
 
+    var asynchronous by UndoableChangeDelegate(false, context.workspace.undoEngine,
+            "Toggled Frame Layer Asynchronousness", {context.triggerFFAChange(this)})
+
     protected val _frames = mutableListOf<FFAFrame>()
     val frames : List<FFAFrame> get() = _frames
+
+    fun getFramFromLocalMet( met: Int, loop: Boolean = true) : FFAFrame? {
+        if( !_frames.any())
+            return null
+
+        fun _sub( start: Int, offset: Int) : FFAFrame?{
+            var index = start
+            var caret = 0
+            var loopLen = 0
+
+            while (true){
+                val frame = _frames[index++]
+                loopLen += frame.length
+                if( offset - caret < frame.length) {
+                    return when( frame.marker) {
+                        START_LOCAL_LOOP -> _sub(index, offset - caret)
+                        FRAME -> if( frame.isInGap(offset-caret)) null else frame
+                        END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 1)"); null}
+                    }
+                }
+                if( frame.marker == START_LOCAL_LOOP)
+                    while (_frames[++index].marker != END_LOCAL_LOOP);
+
+                if( index == _frames.size) {
+                    if( !loop || loopLen == 0)
+                        return null
+                    index = 0
+                }
+
+                caret += frame.length
+            }
+        }
+
+        return  _sub(0, met)
+    }
 
     inner class FFAFrame(structure: FFAFrameStructure)
     {
