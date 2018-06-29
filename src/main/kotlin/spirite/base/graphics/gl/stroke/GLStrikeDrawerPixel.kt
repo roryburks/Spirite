@@ -10,7 +10,7 @@ import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
 
-class GLStrikeDrawerPixel(gle: GLEngine)
+class GLStrikeDrawerPixel(gle: IGLEngine)
     : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
@@ -35,7 +35,7 @@ class GLStrikeDrawerPixel(gle: GLEngine)
     override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod  = DEFAULT
 
     companion object {
-        fun drawPoint( gle: GLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
+        fun drawPoint( gle: IGLEngine, image: GLImage, x:Int, y:Int, params: GLParameters) {
             gle.setTarget(image)
             val data = floatArrayOf(
                     x+0f, y+0f,
@@ -47,7 +47,7 @@ class GLStrikeDrawerPixel(gle: GLEngine)
                     prim, params, null)
         }
 
-        fun drawStroke( gle: GLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {
+        fun drawStroke( gle: IGLEngine, image: GLImage, points: DrawPoints, params: GLParameters) {
             val vb = composeVBuffer(points)
 
             image.graphics.clear()

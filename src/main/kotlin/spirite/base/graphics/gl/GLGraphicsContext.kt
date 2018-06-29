@@ -35,9 +35,9 @@ class GLGraphicsContext : GraphicsContext {
             field = value
         }
 
-    val gle: GLEngine
+    val gle: IGLEngine
 
-    constructor( width: Int, height: Int, flip: Boolean, gle:GLEngine, premultiplied: Boolean = false)  {
+    constructor( width: Int, height: Int, flip: Boolean, gle:IGLEngine, premultiplied: Boolean = false)  {
         this.width = width
         this.height = height
         this.image = null

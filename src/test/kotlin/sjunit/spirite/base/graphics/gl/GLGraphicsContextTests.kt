@@ -4,7 +4,6 @@ import sjunit.TestConfig
 import spirite.base.graphics.CapMethod.NONE
 import spirite.base.graphics.JoinMethod.MITER
 import spirite.base.graphics.LineAttributes
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.Colors
 import spirite.base.util.linear.Vec2i

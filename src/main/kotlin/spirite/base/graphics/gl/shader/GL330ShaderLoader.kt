@@ -16,71 +16,71 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         val array = Array<IGLProgram?>(ProgramType.values().size,{null})
 
         // Brushes
-        val default = loadProgram(scriptService,
+        val default = loadProgram(
                 "${root}/brushes/stroke_basic.vert",
                 "${root}/brushes/stroke_basic.geom",
                 "${root}/brushes/stroke_basic.frag")
         array[ProgramType.STROKE_BASIC.ordinal] = default
-        array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(scriptService,
+        array[ProgramType.STROKE_SPORE.ordinal] = loadProgram(
                 "${root}/brushes/brush_spore.vert",
                 "${root}/brushes/brush_spore.geom",
                 "${root}/brushes/brush_spore.frag")
-        array[ProgramType.STROKE_V2_LINE_PASS.ordinal] = loadProgram(scriptService,
+        array[ProgramType.STROKE_V2_LINE_PASS.ordinal] = loadProgram(
                 "${root}/brushes/stroke_pixel.vert",
                 null,
                 "${root}/brushes/stroke_pixel.frag")
         array[ProgramType.STROKE_PIXEL.ordinal] = array[ProgramType.STROKE_V2_LINE_PASS.ordinal]
-        array[ProgramType.STROKE_V2_APPLY.ordinal] = loadProgram(scriptService,
+        array[ProgramType.STROKE_V2_APPLY.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/brushes/stroke_v2_apply.frag")
 
         // Constructions
-        array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(scriptService,
+        array[ProgramType.SQARE_GRADIENT.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/constructions/square_grad.frag")
-        array[ProgramType.GRID.ordinal] = loadProgram(scriptService,
+        array[ProgramType.GRID.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/constructions/pass_grid.frag")
 
         // Shapes
-        array[ProgramType.POLY_RENDER.ordinal] = loadProgram(scriptService,
+        array[ProgramType.POLY_RENDER.ordinal] = loadProgram(
                 "${root}/shapes/poly_render.vert",
                 null,
                 "${root}/shapes/shape_render.frag")
-        array[ProgramType.LINE_RENDER.ordinal] = loadProgram(scriptService,
+        array[ProgramType.LINE_RENDER.ordinal] = loadProgram(
                 "${root}/shapes/line_render.vert",
                 "${root}/shapes/line_render.geom",
                 "${root}/shapes/shape_render.frag")
 
         // Filters
-        array[ProgramType.CHANGE_COLOR.ordinal] = loadProgram(scriptService,
+        array[ProgramType.CHANGE_COLOR.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/filters/pass_change_color.frag")
-        array[ProgramType.PASS_INVERT.ordinal] = loadProgram(scriptService,
+        array[ProgramType.PASS_INVERT.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/filters/pass_invert.frag")
 
         // Special
-        array[ProgramType.FILL_AFTERPASS.ordinal] = loadProgram(scriptService,
+        array[ProgramType.FILL_AFTERPASS.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/special/pass_fill.frag")
-        array[ProgramType.PASS_BORDER.ordinal] = loadProgram(scriptService,
+        array[ProgramType.PASS_BORDER.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/special/pass_border.frag")
 
         // Render
-        array[ProgramType.PASS_RENDER.ordinal] = loadProgram(scriptService,
+        array[ProgramType.PASS_RENDER.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/render/pass_render.frag")
-        array[ProgramType.PASS_BASIC.ordinal] = loadProgram(scriptService,
+        array[ProgramType.PASS_BASIC.ordinal] = loadProgram(
                 "${root}/pass.vert",
                 null,
                 "${root}/render/pass_basic.frag")
@@ -89,7 +89,7 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         return Array(ProgramType.values().size, {array.getOrNull(it) ?: default})
     }
 
-    private fun loadProgram(scriptService: IScriptService, vert: String?, geom: String?, frag: String?) : IGLProgram{
+    fun loadProgram(vert: String?, geom: String?, frag: String?) : IGLProgram{
         val shaders = mutableListOf<IGLShader>()
 
         if( vert != null) {

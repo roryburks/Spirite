@@ -4,8 +4,8 @@ import spirite.base.brains.toolset.ColorChangeMode
 import spirite.base.brains.toolset.ColorChangeMode.*
 import spirite.base.graphics.JoinMethod
 import spirite.base.graphics.JoinMethod.*
-import spirite.base.graphics.gl.GLEngine.BlendMethod
-import spirite.base.graphics.gl.GLEngine.BlendMethod.*
+import spirite.base.graphics.gl.IGLEngine.BlendMethod
+import spirite.base.graphics.gl.IGLEngine.BlendMethod.*
 import spirite.base.graphics.gl.ProgramType.*
 import spirite.base.util.f
 import spirite.base.util.linear.Vec3

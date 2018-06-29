@@ -1,7 +1,7 @@
 #version 330
 
-#define A 1664525
-#define C 1013904223
+#define A 1664525u
+#define C 1013904223u
 #define IMAX2 65535u
 
 layout(points) in;
@@ -28,8 +28,8 @@ void main()
 		|((uint(gl_in[0].gl_Position.y * 9999)) & IMAX2 << 16);
 		
 	    
-	for( int i=0; i < 10; ++i) {
-		rand = prng(seed + 666*i);
+	for( uint i=0u; i < 10u; ++i) {
+		rand = prng(seed + 666u*i);
 	    gl_Position = perspectiveMatrix*
 	    	(gl_in[0].gl_Position + 
 	    	vec4(-5.0+10.0*float(rand & 255u)/255.0f,-5.0+10.0*float((rand>>8) & 255u)/255.0f,0,0));

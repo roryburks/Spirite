@@ -34,7 +34,7 @@ class WorkSectionDemo : JFrame() {
         //}
 
         ws = WorkTabPane(master)
-        val resize = ResizeContainerPanel(ws, HORIZONTAL, 200)
+        val resize = ResizeContainerPanel(ws.component, HORIZONTAL, 200)
 
         resize.minStretch = 100
 

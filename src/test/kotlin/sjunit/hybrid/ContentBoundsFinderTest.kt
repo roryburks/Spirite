@@ -1,7 +1,6 @@
 package sjunit.hybrid
 
 
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.linear.Rect
 import spirite.hybrid.ContentBoundsFinder

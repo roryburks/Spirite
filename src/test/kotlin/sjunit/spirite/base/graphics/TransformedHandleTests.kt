@@ -6,7 +6,6 @@ import sjunit.TestHelper
 import spirite.base.graphics.RenderMethod
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.RenderRubric
-import spirite.base.graphics.gl.GLEngine
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.MediumHandle
 import spirite.base.util.Colors

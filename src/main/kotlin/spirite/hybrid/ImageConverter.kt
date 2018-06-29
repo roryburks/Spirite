@@ -3,7 +3,7 @@ package spirite.hybrid
 import jspirite.rasters.RasterHelper
 import spirite.base.graphics.IImage
 import spirite.base.graphics.gl.GLEException
-import spirite.base.graphics.gl.GLEngine
+import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.graphics.gl.IGL
 import spirite.base.util.glu.GLC
@@ -16,7 +16,7 @@ import java.nio.IntBuffer
 
 
 class ImageConverter(
-        val gle: GLEngine? = null
+        val gle: IGLEngine? = null
 ) {
     val c = GLImage::class.java
 

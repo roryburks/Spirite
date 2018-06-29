@@ -136,7 +136,7 @@ void main()
 		// Elbo joint
 	    gl_Position = perspectiveMatrix*vec4(tc,0,1);
 	    fWeight = 1;
-	    gl_FrontColor = gl_FrontColorIn[1];
+	    //gl_FrontColor = gl_FrontColorIn[1];
 	    EmitVertex();
 	    
 	    gl_Position = perspectiveMatrix*vec4(te,0,1);

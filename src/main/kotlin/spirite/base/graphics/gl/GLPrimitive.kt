@@ -20,9 +20,8 @@ data class GLPrimitive(
 
 internal class PreparedPrimitive(
         val primative: GLPrimitive,
-        val gle: GLEngine
+        val gl: IGL
 ) {
-    val gl = gle.getGl()
     val buffer = gl.createBuffer() ?: throw GLEException("Failed to create Buffer")
 
     init {
@@ -42,6 +41,14 @@ internal class PreparedPrimitive(
         for( i in 0 until lengths.size) {
             gl.vertexAttribPointer(i, lengths[i], GLC.FLOAT, false, 4*totalLength, 4*offset)
             offset += lengths[i]
+        }
+    }
+
+    fun draw() {
+        var start = 0
+        for( i in 0 until Math.min(primative.primitiveLengths.size, primative.primitiveTypes.size)) {
+            gl.drawArrays(primative.primitiveTypes[i], start, primative.primitiveLengths[i])
+            start += primative.primitiveLengths[i]
         }
     }
 

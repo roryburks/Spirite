@@ -12,7 +12,7 @@ import spirite.base.util.linear.Rect
 class GLImage : RawImage {
     override val width : Int
     override val height: Int
-    val engine: GLEngine
+    val engine: IGLEngine
     val premultiplied: Boolean
 
     val tex: IGLTexture?
@@ -24,7 +24,7 @@ class GLImage : RawImage {
     var flushed : Boolean = false
 
     // region Constructors
-    constructor( width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
+    constructor( width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
         if( width <= 0 || height <= 0)
             throw InvalidImageDimensionsExeption("Invalid Image Dimensions")
         this.width = width
@@ -63,7 +63,7 @@ class GLImage : RawImage {
         gl.copyTexImage2D(GLC.TEXTURE_2D, 0, GLC.RGBA8, 0, 0, width, height, 0)
     }
 
-    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: GLEngine, premultiplied: Boolean = true) {
+    constructor( tex: IGLTexture, width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
         this._tex = tex
         this.width = width
         this.height = height

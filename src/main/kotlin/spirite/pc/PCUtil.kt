@@ -1,7 +1,7 @@
 package spirite.pc
 
 import jspirite.rasters.RasterHelper
-import spirite.base.graphics.gl.GLEngine
+import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.MutableTransform
@@ -28,7 +28,7 @@ fun GLImage.toBufferedImage() : BufferedImage {
     return bi
 }
 
-fun GLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : BufferedImage{
+fun IGLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : BufferedImage{
     val bi = when( type) {
         BufferedImage.TYPE_INT_ARGB,
         BufferedImage.TYPE_INT_ARGB_PRE -> {

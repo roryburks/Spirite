@@ -11,7 +11,7 @@ import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
 
 class GLStrokeDrawerV2(
-        gle: GLEngine) : GLStrokeDrawer(gle)
+        gle: IGLEngine) : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
         drawStroke(context.image, context.builder.currentPoints, context.builder.params.width, context.glParams, context.builder.params)

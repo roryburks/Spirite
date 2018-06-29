@@ -17,7 +17,7 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 
 
 
-abstract class GLStrokeDrawer(val gle: GLEngine)
+abstract class GLStrokeDrawer(val gle: IGLEngine)
     :IStrokeDrawer
 {
     protected class DrawerContext (

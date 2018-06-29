@@ -1,8 +1,8 @@
 package sjunit.spirite.base.brains
 
-
 import spirite.base.brains.Hotkey
 import spirite.base.brains.HotkeyManager
+import spirite.base.brains.KeyCommand
 import spirite.base.brains.settings.JPreferences
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
@@ -13,11 +13,11 @@ class HotkeyManagerTests {
     val hotketManager = HotkeyManager(preferences)
 
     @test fun verifyDefaults() {
-        assertEquals("workspace.zoom_in", hotketManager.getCommand(Hotkey(KeyEvent.VK_ADD, 0)))
+        assertEquals("view.zoomIn", hotketManager.getCommand(Hotkey(KeyEvent.VK_ADD, 0))?.commandString)
     }
     @test fun do1() {
-        hotketManager.setCommand(Hotkey(KeyEvent.VK_A,0), "global.paste")
-        // Can see its entry in the Registry
+        hotketManager.setCommand(Hotkey(KeyEvent.VK_A,0), KeyCommand("global.paste"))
+        //        // Can see its entry in the Registry
     }
 
     // TODO: Mocked tests

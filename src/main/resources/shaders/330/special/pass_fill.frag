@@ -24,13 +24,13 @@ uniform int u_height;
 
 
 void main() {
-    int x = int(floor( vUV.x * u_width));
-    int y = int(floor( vUV.y * u_height));
+    uint x = uint(floor( vUV.x * u_width));
+    uint y = uint(floor( vUV.y * u_height));
     vec2 uv = vec2( vUV.x * u_wratio, vUV.y * u_hratio);
     uint sector = texture(u_texture, uv).r;
 
-    uint mask = 1 << ((x % 8) + (y%4)*8);
-    if( (sector & mask) != 0)
+    uint mask = 1u << ((x % 8u) + (y%4u)*8u);
+    if( (sector & mask) != 0u)
         outputColor = (targetPremultiplied())
             ? vec4(u_color.r*u_color.a,u_color.g*u_color.a,u_color.b*u_color.a,u_color.a)
             : u_color;

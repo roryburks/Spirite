@@ -14,23 +14,75 @@ import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
 import javax.swing.SwingUtilities
 
+interface IGLEngine
+{
+    val width : Int
+    val height : Int
+
+    var target: IGLTexture?
+    fun setTarget( img: GLImage?)
+
+    fun getGl() : IGL
+    fun runOnGLThread( run: ()->Unit)
+
+
+    fun applyPassProgram(
+            programCall: ProgramCall,
+            params: GLParameters,
+            trans: Transform?,
+            x1: Float, y1: Float, x2: Float, y2: Float)
+
+    fun applyComplexLineProgram(
+            xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
+            cap: CapMethod, join: JoinMethod, loop: Boolean, lineWidth: Float,
+            color: Vec3, alpha: Float,
+            params: GLParameters, trans: Transform?)
+
+    fun applyPolyProgram(
+            programCall: ProgramCall,
+            xPoints: List<Float>,
+            yPoints: List<Float>,
+            numPoints: Int,
+            polyType: PolyType,
+            params: GLParameters,
+            trans : Transform?)
+    fun applyPrimitiveProgram(
+            programCall: ProgramCall,
+            primitive: GLPrimitive,
+            params: GLParameters,
+            trans: Transform?)
+
+
+    enum class BlendMethod(
+            internal val sourceFactor: Int,
+            internal val destFactor: Int,
+            internal val formula: Int) {
+        SRC_OVER(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
+        SOURCE(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
+        MAX(GLC.ONE, GLC.ONE, GLC.MAX),
+        DEST_OVER(GLC.SRC_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
+        SRC (GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
+    }
+
+}
+
 class GLEngine(
         private val glGetter: () -> IGL,
         scriptService: IScriptService
-) {
+) : IGLEngine
+{
 
     private val programs = initShaderPrograms(scriptService)
 
     private val dbo : IGLRenderbuffer by lazy { getGl().genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
 
+    override fun getGl() = glGetter.invoke()
 
-    fun getGl() = glGetter.invoke()
+    override var width : Int = 1 ; private set
+    override var height : Int = 1 ; private set
 
-    var width : Int = 1 ; private set
-    var height : Int = 1 ; private set
-
-    var target: IGLTexture? = null
+    override var target: IGLTexture? = null
         set(value) {
             val gl = getGl()
             if( field != value) {
@@ -66,7 +118,7 @@ class GLEngine(
             }
         }
 
-    fun setTarget(img: GLImage?) {
+    override fun setTarget(img: GLImage?) {
         if (img == null) {
             target = null
         } else {
@@ -76,13 +128,13 @@ class GLEngine(
         }
     }
 
-    fun runOnGLThread( run: () -> Unit) {
+    override fun runOnGLThread( run: () -> Unit) {
         SwingUtilities.invokeLater(run)
     }
 
     // region Exposed Rendering Methods
 
-    fun applyPassProgram(
+    override fun applyPassProgram(
             programCall: ProgramCall,
             params: GLParameters,
             trans: Transform?,
@@ -99,7 +151,7 @@ class GLEngine(
                         x1, y2, 0.0f, 1.0f,
                         x2, y2, 1.0f, 1.0f
                 ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
-                , this)
+                , getGl())
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
     }
@@ -122,7 +174,7 @@ class GLEngine(
      * @param params	GLParameters describing the GL Attributes to use
      * @param trans		Transform to apply to the rendering.
      */
-    fun applyComplexLineProgram(
+    override fun applyComplexLineProgram(
             xPoints: List<Float>, yPoints: List<Float>, numPoints: Int,
             cap: CapMethod, join: JoinMethod, loop: Boolean, lineWidth: Float,
             color: Vec3, alpha: Float,
@@ -162,7 +214,7 @@ class GLEngine(
                     intArrayOf(2),
                     GLC.LINE_STRIP_ADJACENCY,
                     intArrayOf(size)),
-                    this)
+                    gl)
 
             gl.enable(GLC.MULTISAMPLE)
             applyProgram(LineRenderCall( join, lineWidth, color, alpha), params, iParams, prim)
@@ -174,28 +226,28 @@ class GLEngine(
         }
     }
 
-    fun applyPolyProgram(
+    override fun applyPolyProgram(
             programCall: ProgramCall,
             xPoints: List<Float>,
             yPoints: List<Float>,
             numPoints: Int,
             polyType: PolyType,
             params: GLParameters,
-            trans : Transform?
-    ) {
+            trans : Transform?)
+    {
         val iParams = mutableListOf<GLUniform>()
         loadUniversalUniforms( params, iParams, trans)
 
         val data = FloatArray(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
         yPoints.forEachIndexed { i, y -> data[i*2+1] = y }
-        val prim = PreparedPrimitive(GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)), this)
+        val prim = PreparedPrimitive(GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)), getGl())
 
         applyProgram( programCall, params, iParams, prim)
         prim.flush()
     }
 
-    fun applyPrimitiveProgram(
+    override fun applyPrimitiveProgram(
             programCall: ProgramCall,
             primitive: GLPrimitive,
             params: GLParameters,
@@ -203,7 +255,7 @@ class GLEngine(
     ) {
         val iParams = mutableListOf<GLUniform>()
         loadUniversalUniforms( params, iParams, trans)
-        val preparedPrimitive = PreparedPrimitive(primitive, this)
+        val preparedPrimitive = PreparedPrimitive(primitive, getGl())
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
     }
@@ -281,11 +333,7 @@ class GLEngine(
         }
 
         // Draw
-        var start = 0
-        for( i in 0 until Math.min(prim.primitiveLengths.size, prim.primitiveTypes.size)) {
-            gl.drawArrays(prim.primitiveTypes[i], start, prim.primitiveLengths[i])
-            start += prim.primitiveLengths[i]
-        }
+        preparedPrimitive.draw()
 
         // Cleanup
         gl.disable(GLC.BLEND)
@@ -346,23 +394,9 @@ class GLEngine(
 
     // endregion
 
-    // region Shader Programs
-    enum class BlendMethod(
-            internal val sourceFactor: Int,
-            internal val destFactor: Int,
-            internal val formula: Int) {
-        SRC_OVER( GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
-        SOURCE(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
-        MAX( GLC.ONE, GLC.ONE, GLC.MAX),
-        DEST_OVER( GLC.SRC_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
-        SRC (GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
-    }
-
     private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {
         return GL330ShaderLoader(getGl(), scriptService).initShaderPrograms()
     }
-
-    // endregion
 }
 
 

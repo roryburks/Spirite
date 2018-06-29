@@ -3,7 +3,6 @@ package sjunit.spirite.base.graphics
 
 import sjunit.TestConfig
 import spirite.base.graphics.DynamicImage
-import spirite.base.graphics.gl.GLEngine
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ImageConverter
 import spirite.pc.JOGL.JOGLProvider

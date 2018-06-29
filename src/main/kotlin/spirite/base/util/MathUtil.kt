@@ -190,6 +190,9 @@ val Int.f get() = this.toFloat()
 val Int.d get() = this.toDouble()
 val Int.s get() = this.toShort()
 
+val Long.i : Int get() = this.toInt()
+val Long.f : Float get() = this.toFloat()
+
 val Float.floor get() = kotlin.math.floor(this).toInt()
 val Float.round get() = this.roundToInt()
 val Float.ceil get() = kotlin.math.ceil(this).toInt()

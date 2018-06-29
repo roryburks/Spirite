@@ -1,7 +1,7 @@
 package demonstration
 
 import spirite.base.brains.MasterControl
-import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.PING
+import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.menus.SwContextMenus
@@ -15,7 +15,7 @@ class BlankFrameWithMenuFrame(val master: MasterControl) : JFrame() {
     init /* Menu */ {
         val scheme = listOf(
                 MenuItem("&File"),
-                MenuItem(".&Ping", PING),
+                MenuItem(".&Ping", SAVE_WORKSPACE),
                 MenuItem(".P&ong", customAction = { println("Pong")})
         )
 

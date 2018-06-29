@@ -1,6 +1,6 @@
 package spirite.hybrid
 
-import spirite.base.graphics.gl.GLEngine
+import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.IGL
 import spirite.gui.components.basic.IComponentProvider
 import spirite.pc.JOGL.JOGLProvider
@@ -17,7 +17,7 @@ interface IHybrid {
     val imageIO : IImageIO
 
     val gl : IGL
-    val gle : GLEngine
+    val gle : IGLEngine
 
     fun LockFrom( o: Any) : ILock
     fun beep()
@@ -29,7 +29,7 @@ object SwHybrid : IHybrid {
 
     override val ui: IComponentProvider get() = SwingComponentProvider
     override val timing: ITimerEngine get() = SwTimerEngine
-    override val gle: GLEngine = EngineLaunchpoint.gle
+    override val gle: IGLEngine = EngineLaunchpoint.gle
     override val gl: IGL get() = JOGLProvider.gl
     override val imageCreator: IImageCreator get() = SwImageCreator
     override val imageConverter: ImageConverter get() = ImageConverter(EngineLaunchpoint.gle)
