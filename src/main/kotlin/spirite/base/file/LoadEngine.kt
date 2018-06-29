@@ -4,8 +4,11 @@ import spirite.base.brains.IMasterControl
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.animation.ffa.FFAFrameStructure
+import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.FRAME
+import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.START_LOCAL_LOOP
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
@@ -15,6 +18,9 @@ import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.*
 import spirite.base.util.i
 import spirite.hybrid.Hybrid
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -31,7 +37,7 @@ internal class LoadContext(
 {
     var version: Int = 0
     val chunkInfo = mutableListOf<ChunkInfo>()
-    val nodes = mutableSetOf<Node>()
+    val nodes = mutableListOf<Node>()
     lateinit var reindexingMap : Map<Int,Int>
 
     fun reindex( index : Int) = reindexingMap[index] ?: throw BadSifFileException("Medium Id $index does not correspond to any Medium Data")
@@ -131,10 +137,10 @@ object LoadEngine {
         }
     }
 
-    private fun parseImageDataSection( context: LoadContext, size: Int) {
+    private fun parseImageDataSection(context: LoadContext, chunkSize: Int) {
         val dataMap = mutableMapOf<Int,IMedium>()
         val ra = context.ra
-        val endPointer = ra.filePointer + size
+        val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
             val id = ra.readInt()
@@ -167,9 +173,48 @@ object LoadEngine {
                     val img = Hybrid.imageIO.loadImage(imgData)
                     dataMap[id] = DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
                 }
-                PRISMATIC -> TODO()
-                MAGLEV -> TODO()
-                DERIVED_MAGLEV -> TODO()
+                PRISMATIC -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Prismatic Mediums are currently not supported by Spirite v2, ignoring.")
+                    val numlayers = ra.readUnsignedShort()
+                    repeat(numlayers) {
+                        ra.readInt()
+                        ra.readShort()
+                        ra.readShort()
+                        val imgSize = ra.readInt()
+                        ra.skipBytes(imgSize)
+                    }
+                }
+                MAGLEV -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Maglev Mediums are currently not supported by Spirite v2, ignoring.")
+                    val numThings = ra.readUnsignedShort()
+                    repeat(numThings) {
+                        val thingType = ra.readByte()
+                        when( thingType.i) {
+                            0 -> { // stroke
+                                ra.readInt()
+                                ra.readByte()
+                                ra.readFloat()
+                                val numVertices = ra.readUnsignedShort()
+                                repeat(numVertices) {
+                                    ra.readFloat()
+                                    ra.readFloat()
+                                    ra.readFloat()
+                                }
+                            }
+                            1 -> { // fill
+                                ra.readInt()
+                                ra.readByte()
+                                val numReferences = ra.readUnsignedShort()
+                                repeat(numReferences) {
+                                    ra.readUnsignedShort()
+                                    ra.readFloat()
+                                    ra.readFloat()
+                                }
+                            }
+                        }
+                    }
+                }
+                DERIVED_MAGLEV -> {}
             }
         }
 
@@ -205,7 +250,7 @@ object LoadEngine {
                 bitmask = ra.readUnsignedByte()
             }
 
-            val name = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
+            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val type =  if(context.version < 0x0001_0000) ra.readInt() else ra.readUnsignedByte()
 
             // !!!! Kind of hack-y that it's even saved, but only the root node should be
@@ -226,8 +271,8 @@ object LoadEngine {
                 }
                 SaveLoadUtil.NODE_SPRITE_LAYER -> {
                     val partSize = ra.readUnsignedByte()
-                    val parts = List(partSize, {
-                        val partName = SaveLoadUtil.readNullTerminatedStringUTF9(ra)
+                    val parts = List(partSize) {
+                        val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
                         val transX = ra.readFloat()
                         val transY = ra.readFloat()
                         val scaleX = ra.readFloat()
@@ -236,23 +281,47 @@ object LoadEngine {
                         val drawDepth = ra.readInt()
                         val medium = MediumHandle(workspace,context.reindex(ra.readInt()))
                         Pair(medium, SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot))
-                    })
+                    }
 
                     val sprite = SpriteLayer(workspace, workspace.mediumRepository, parts)
 
                     workspace.groupTree.importLayer(nodeLayer[depth-1], name, sprite, true)
                 }
-                SaveLoadUtil.NODE_REFERENCE_LAYER -> TODO()
-                SaveLoadUtil.NODE_PUPPET_LAYER -> TODO()
+                SaveLoadUtil.NODE_REFERENCE_LAYER -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Reference Layers are currently not supported by Spirite v2, ignoring Refernce Layer")
+                    ra.readInt()    // [4] : NodeID
+                    null
+                }
+                SaveLoadUtil.NODE_PUPPET_LAYER -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Puppet Layers are currently not supported by Spirite v2, ignoring Puppet Layer")
+                    val byte = ra.readByte()   // [1] : Whether or not is derived
+                    if( byte.i == 0) {
+                        val numParts = ra.readUnsignedShort() // [2] : Number of parts
+                        for( i in 0 until numParts) {
+                            ra.readShort()  // [2] : Parent
+                            ra.readInt()    // [4] : MediumId
+                            ra.readFloat()  // [16] : Bone x1, y1, x2, y2
+                            ra.readFloat()
+                            ra.readFloat()
+                            ra.readFloat()
+                            ra.readInt()    // [4]: DrawDepth
+                        }
+
+                    }
+                    else throw BadSifFileException("Do not know how to handle derived puppet types")
+                    null
+                }
                 else -> throw BadSifFileException("Unrecognized Node Type ID: $type (version mismatch or corrupt file?)")
             }
 
-            context.nodes.add(node)
-            node.alpha = alpha
-            node.expanded = bitmask and SaveLoadUtil.EXPANDED_MASK != 0
-            node.visible = bitmask and SaveLoadUtil.VISIBLE_MASK != 0
-            node.x = x
-            node.y = y
+            if( node != null) {
+                context.nodes.add(node)
+                node.alpha = alpha
+                node.expanded = bitmask and SaveLoadUtil.EXPANDED_MASK != 0
+                node.visible = bitmask and SaveLoadUtil.VISIBLE_MASK != 0
+                node.x = x
+                node.y = y
+            }
         }
 
 
@@ -263,7 +332,75 @@ object LoadEngine {
 
     private fun parseAnimationData( context: LoadContext, chunkSize: Int)
     {
-        //TODO()
+        val nodes = context.nodes
+        val ra = context.ra
+        val endPointer = ra.filePointer + chunkSize
+
+        while( ra.filePointer < endPointer) {
+            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val type = ra.readByte().i
+            val animation = when( type) {
+                SaveLoadUtil.ANIM_FFA -> {
+                    val ffa = FixedFrameAnimation(name, context.workspace)
+
+                    val numLayers = ra.readUnsignedShort()
+                    repeat(numLayers){
+                        val node = nodes[ra.readInt()]
+                        val includeSubtrees = (ra.readByte().i == 0)
+
+                        val numFrames = ra.readUnsignedShort()
+                        val frameMap = (0 until numFrames)
+                                .map {
+                                    val frameNode = nodes.getOrNull(ra.readInt())
+                                    val innerLength = ra.readUnsignedShort()
+                                    val gapBefore = ra.readUnsignedShort()
+                                    val gapAfter = ra.readUnsignedShort()
+
+                                    when( frameNode) {
+                                        is LayerNode -> Pair(frameNode, FFAFrameStructure(frameNode, FRAME, innerLength, gapBefore, gapAfter))
+                                        is GroupNode -> Pair(frameNode, FFAFrameStructure(frameNode, START_LOCAL_LOOP, innerLength, gapBefore, gapAfter))
+                                        else -> null
+                                    }
+                                }
+                                .filterNotNull()
+                                .toMap()
+
+                        val groupNode = node as? GroupNode
+                        when( groupNode) {
+                            null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group Node marked as its Link")
+                            else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap)
+                        }
+                    }
+                    ffa
+                }
+                SaveLoadUtil.ANIM_RIG -> {
+                    MDebug.handleWarning(UNSUPPORTED, "Rig Animations are currently not supported by Spirite v2, ignoring.")
+                    val numSprites = ra.readUnsignedShort()
+                    repeat(numSprites) {
+                        val nodeId = ra.readInt()
+                        val numParts = ra.readUnsignedShort()
+                        repeat(numParts) {
+                            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+                            val numKeyframes = ra.readUnsignedShort()
+                            repeat(numKeyframes) {
+                                val t = ra.readFloat()
+                                val tx = ra.readFloat()
+                                val ty = ra.readFloat()
+                                val sx = ra.readFloat()
+                                val sy = ra.readFloat()
+                                val rot = ra.readFloat()
+                            }
+                        }
+                    }
+
+                    null
+                }
+                else -> throw BadSifFileException("Unrecognized Animation Type ID: $type (version mismatch or corrupt file?)")
+            }
+
+            if( animation != null)
+                context.workspace.animationManager.addAnimation(animation)
+        }
     }
 
     private fun parsePaletteData( context: LoadContext, chunkSize: Int)

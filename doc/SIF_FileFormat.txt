@@ -16,12 +16,12 @@ Header
  ---- GRPT - Group Tree Chunk ----
  Per Group:
  [1, byte]: Depth of the GroupTree
- [1, byte] : various single-bit settings
-    1st bit: Visibility
-    2nd bit: Expanded
  [4, float] : alpha
  [2, short] : X offset
  [2, short] : Y offset
+ [1, byte] : various single-bit settings
+    1st bit: Visibility
+    2nd bit: Expanded
  [n, UTF8 str] : Node name
  [1, byte] : Node Type ID:
     0x00 : Group Node

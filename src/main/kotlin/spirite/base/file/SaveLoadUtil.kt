@@ -47,7 +47,7 @@ object SaveLoadUtil {
         return b
     }
 
-    fun readNullTerminatedStringUTF9( ra: RandomAccessFile) : String
+    fun readNullTerminatedStringUTF8(ra: RandomAccessFile) : String
     {
         val bos = ByteArrayOutputStream()
         var b = ra.readByte()
