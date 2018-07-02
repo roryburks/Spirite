@@ -1,6 +1,7 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.palette.Palette
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
@@ -405,7 +406,15 @@ object LoadEngine {
 
     private fun parsePaletteData( context: LoadContext, chunkSize: Int)
     {
-        //TODO()
+        val ra = context.ra
+        val endPointer = ra.filePointer + chunkSize
+
+        while( ra.filePointer < endPointer) {
+            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val size = ra.readUnsignedShort()
+            val data = ByteArray(size).also { ra.read(it) }
+            context.workspace.paletteSet.addPalette(name, false, data)
+        }
     }
 }
 

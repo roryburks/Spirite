@@ -25,7 +25,6 @@ import spirite.base.pen.stroke.IStrokeDrawerProvider
 import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.mapAggregated
-import spirite.pc.master
 import java.io.File
 
 interface IImageWorkspace {
@@ -82,6 +81,7 @@ class ImageWorkspace(
         override val settingsManager: ISettingsManager,
         override val paletteManager : IPaletteManager,
         override val strokeProvider: IStrokeDrawerProvider,
+        override val toolset: Toolset,
         width: Int = 100,
         height: Int = 100) : MImageWorkspace
 {
@@ -92,8 +92,7 @@ class ImageWorkspace(
     override val animationManager: IAnimationManager = AnimationManager(this)
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
-    override val paletteSet: PaletteSet get() = TODO("not implemented")
-    override val toolset: Toolset get() = master.toolsetManager.toolset
+    override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
 
     override val compositor = Compositor()
 

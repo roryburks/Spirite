@@ -8,7 +8,7 @@ import spirite.hybrid.MDebug.ErrorType.FATAL
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
-lateinit var master: MasterControl
+private lateinit var master: MasterControl
 
 fun main( args: Array<String>) {
     try {

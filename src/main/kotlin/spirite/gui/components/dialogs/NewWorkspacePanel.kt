@@ -3,10 +3,9 @@ package spirite.gui.components.dialogs
 import spirite.base.brains.IMasterControl
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
-import spirite.pc.master
 
 class NewWorkspacePanel(
-        master: IMasterControl
+        private val master: IMasterControl
  ) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
     val settings get() = master.settingsManager

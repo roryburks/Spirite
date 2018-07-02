@@ -21,8 +21,8 @@ class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExec
 
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when( string) {
-            SWAP.string -> paletteManager.cycleActiveColors(1)
-            SWAP_BACK.string -> paletteManager.cycleActiveColors(-1)
+            SWAP.string -> paletteManager.activeBelt.cycleColors(1)
+            SWAP_BACK.string -> paletteManager.activeBelt.cycleColors(-1)
             else -> return false
         }
         return true

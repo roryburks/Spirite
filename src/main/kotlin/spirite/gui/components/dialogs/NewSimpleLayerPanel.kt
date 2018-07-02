@@ -10,10 +10,9 @@ import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
-import spirite.pc.master
 
 class NewSimpleLayerPanel(
-        master: IMasterControl,
+        private val master: IMasterControl,
         workspace: IImageWorkspace) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
     data class NewSimpleLayerReturn(
@@ -32,8 +31,8 @@ class NewSimpleLayerPanel(
 
     private var activeColorField = 1
     private val cfields = arrayOf(
-            Hybrid.ui.ColorSquare(master.paletteManager.getActiveColor(0)),
-            Hybrid.ui.ColorSquare(master.paletteManager.getActiveColor(1)),
+            Hybrid.ui.ColorSquare(master.paletteManager.activeBelt.getColor(0)),
+            Hybrid.ui.ColorSquare(master.paletteManager.activeBelt.getColor(1)),
             Hybrid.ui.ColorSquare(Colors.TRANSPARENT),
             Hybrid.ui.ColorSquare(Colors.BLACK))
 

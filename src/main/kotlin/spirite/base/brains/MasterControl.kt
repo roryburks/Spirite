@@ -60,8 +60,8 @@ class MasterControl() : IMasterControl {
     override val hotkeyManager = HotkeyManager(preferences)
     override val settingsManager = SettingsManager(preferences)
 
-    override val paletteManager = PaletteManager()
     override val workspaceSet = WorkspaceSet()
+    override val paletteManager = PaletteManager(workspaceSet)
     override val centralObservatory = CentralObservatory(workspaceSet)
 
     override val strokeDrawerProvider = GLStrokeDrawerProvider(gle)
@@ -82,6 +82,7 @@ class MasterControl() : IMasterControl {
             settingsManager,
             paletteManager,
             strokeDrawerProvider,
+            toolsetManager.toolset,
             width,
             height)
 }

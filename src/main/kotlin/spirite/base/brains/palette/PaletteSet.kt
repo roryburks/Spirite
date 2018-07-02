@@ -1,46 +1,43 @@
 package spirite.base.brains.palette
 
+import spirite.base.brains.Bindable
+import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
+import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
 abstract class PaletteSet {
-    abstract val onChangeTrigger: (PaletteSet) -> Unit
+    abstract val onPaletteSetChangeTrigger: (PaletteSetChangeEvent) -> Unit
+    abstract val onPaletteChangeTrigger: (PaletteChangeEvent) -> Unit
 
     val palettes : List<Palette> get() = _palettes
     private val _palettes = mutableListOf<Palette>(PSPalette("default"))
 
-    var selectedPalette : Int
-        get() = _selectedPalette
+    val currentPaletteBind = Bindable<Palette?>(null)
+    var currentPalette
+        get() = currentPaletteBind.field
         set(value) {
-            _selectedPalette = value
-            onChangeTrigger.invoke(this)
+            when {
+                value == null || _palettes.contains(value) -> currentPaletteBind.field = value
+                else -> TODO("Tried to select palette outside of tis set.  Add proper error handling.")
+            }
         }
-    private var _selectedPalette = 0
-
-    val currentPalette : Palette get() =  _palettes[_selectedPalette]
 
     fun resetPalettes( newPalette: Collection<Palette>) {
         _palettes.clear()
         _palettes.addAll( newPalette)
-        onChangeTrigger.invoke(this)
+        onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))
     }
 
     fun addPalette( name: String, select: Boolean, raw: ByteArray? = null) : Palette {
         val palette = PSPalette(name, raw)
         _palettes.add(palette)
         if( select)
-            _selectedPalette = _palettes.size - 1
-        onChangeTrigger.invoke(this)
+            currentPalette = palette
+        onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))
 
         return palette
     }
-//
-//    fun addPalette(palette: Palette, select: Boolean) {
-//        _palettes.add( palette)
-//        if(select)
-//            _selectedPalette = _palettes.size - 1
-//        onChangeTrigger.invoke(this)
-//    }
 
     fun removePalette( index: Int) {
         if( index < 0 || index >= _palettes.size) {
@@ -48,17 +45,22 @@ abstract class PaletteSet {
             return
         }
 
-        _palettes.removeAt(index)
-        if( _selectedPalette >= index)
-            _selectedPalette--
-        if( _palettes.size == 0) {
-            _palettes.add( PSPalette("Default"))
-            _selectedPalette = 0
+        val removed = _palettes.removeAt(index)
+        if( currentPalette == removed) {
+            currentPalette = when {
+                index == 0 -> _palettes.firstOrNull()
+                else -> _palettes.getOrNull(index-1)
+            }
         }
-        onChangeTrigger.invoke(this)
+        if( _palettes.size == 0) {
+            val defPalette = PSPalette("Default")
+            _palettes.add(defPalette )
+            currentPalette = defPalette
+        }
+        onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))
     }
 
     inner class PSPalette( string: String, raw: ByteArray? = null) : Palette(string, raw) {
-        override var onChangeTrigger: (Palette) -> Unit = { this@PaletteSet.onChangeTrigger.invoke(this@PaletteSet)}
+        override var onChangeTrigger: (Palette) -> Unit = { onPaletteChangeTrigger.invoke(PaletteChangeEvent(it))}
     }
 }

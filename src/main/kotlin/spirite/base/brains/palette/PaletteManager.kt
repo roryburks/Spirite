@@ -1,67 +1,61 @@
 package spirite.base.brains.palette
 
-import spirite.base.brains.Bindable
-import spirite.base.brains.IObservable
-import spirite.base.brains.Observable
-import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
-import spirite.base.util.Color
-import spirite.base.util.Colors
-import spirite.base.util.MathUtil
+import spirite.base.brains.*
+import spirite.base.brains.palette.IPaletteManager.*
 
 interface IPaletteManager {
-    fun getColorBind( i: Int) : Bindable<Color>
-    fun getActiveColor( i : Int) : Color
-    fun setActiveColor( i: Int, color: Color)
-    fun cycleActiveColors( amount: Int)
+    val activeBelt : PaletteBelt
 
     fun makePaletteSet() : PaletteSet
 
-    val currentPaletteBind : Bindable<Palette>
+    val currentPaletteBind : IBindable<Palette>
     val currentPalette: Palette
 
-    interface MPaletteObserver {
-        fun colorChanged()
+    interface PaletteObserver {
+        fun paletteChanged( evt: PaletteChangeEvent)
+        fun paletteSetChanged( evt: PaletteSetChangeEvent)
     }
-    val paletteObservable : IObservable<MPaletteObserver>
+    data class PaletteChangeEvent(val palette: Palette)
+    data class PaletteSetChangeEvent(val paletteSet: PaletteSet)
+
+    val paletteObservable : IObservable<PaletteObserver>
 }
 
-class PaletteManager : IPaletteManager {
-//    val activeColors = mutableListOf<Color>(Colors.BLACK, Colors.WHITE, Colors.RED, Colors.BLACK)
+class PaletteManager(private val workspaceSet: IWorkspaceSet) : IPaletteManager {
+    override val activeBelt: PaletteBelt = PaletteBelt()
 
-    val activeColorBinds = mutableListOf(
-            Bindable<Color>(Colors.BLACK),
-            Bindable<Color>(Colors.WHITE),
-            Bindable<Color>(Colors.RED),
-            Bindable<Color>(Colors.BLACK))
+    override fun makePaletteSet(): PaletteSet {
+        val newPaletteSet = object : PaletteSet() {
+            override val onPaletteSetChangeTrigger: (PaletteSetChangeEvent) -> Unit = { triggerPaletteSetChange(it) }
+            override val onPaletteChangeTrigger: (PaletteChangeEvent) -> Unit = { triggerPaletteChange(it) }
+        }
 
-    override fun getColorBind(i: Int): Bindable<Color> = activeColorBinds[i]
+        // DuckTape way of getting PaletteManager.currentPalette to track CurrentWorkspace.PaletteSet.CurrentPalette
+        newPaletteSet.currentPaletteBind.addListener { new, old ->
+            if( workspaceSet.currentWorkspace?.paletteSet == newPaletteSet)
+                currentPaletteBind.field = new ?: globalPalette
+        }
 
-    override fun getActiveColor(i: Int): Color = activeColorBinds[ MathUtil.cycle(0, activeColorBinds.size, i)].field
-
-    override fun setActiveColor(i: Int, color: Color) {
-        activeColorBinds[ MathUtil.cycle(0, activeColorBinds.size, i)].field = color
+        return newPaletteSet
     }
 
-    override fun cycleActiveColors(amount: Int) {
-        val new = (0 until activeColorBinds.size).map { activeColorBinds[MathUtil.cycle(0,activeColorBinds.size,it + amount)].field }
-        (0 until activeColorBinds.size).forEach {activeColorBinds[it].field = new[it]}
+    override val paletteObservable = Observable<PaletteObserver>()
+
+    val globalPalette = object : Palette("Global") {
+        override val onChangeTrigger: (Palette) -> Unit = {triggerPaletteChange(PaletteChangeEvent(this))}
     }
 
-    override fun makePaletteSet(): PaletteSet = PMPaletteSet()
-    private inner class PMPaletteSet : PaletteSet() {
-        override val onChangeTrigger: (PaletteSet) -> Unit = {triggerPaletteChange()}
-    }
-
-    override val paletteObservable: IObservable<MPaletteObserver> get() = _paletteObs
-    private val _paletteObs = Observable<MPaletteObserver>()
-
-    private fun triggerPaletteChange() {
-        _paletteObs.trigger { obs -> obs.colorChanged() }
-    }
-
-    val globalPaletteSet : PaletteSet = PMPaletteSet()
-
-    override val currentPaletteBind = Bindable(globalPaletteSet.currentPalette)
+    override val currentPaletteBind = Bindable(globalPalette)
     override val currentPalette: Palette by currentPaletteBind
+
+    private val wsObs = workspaceSet.currentWorkspaceBind.addListener { new, _ ->
+        currentPaletteBind.field = new?.paletteSet?.currentPalette ?: globalPalette
+    }
+
+
+    private fun triggerPaletteChange(evt: PaletteChangeEvent)
+            = paletteObservable.trigger { obs -> obs.paletteChanged(evt) }
+    private fun triggerPaletteSetChange(evt: PaletteSetChangeEvent)
+            = paletteObservable.trigger { obs -> obs.paletteSetChanged(evt) }
 }
 

@@ -18,7 +18,6 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
 import spirite.gui.components.major.work.WorkSection
 import spirite.gui.components.major.work.WorkSectionView
 import spirite.hybrid.Hybrid
-import spirite.pc.master
 
 interface IPenner {
 //    val holdingShift : Boolean
@@ -117,8 +116,8 @@ class Penner(
             }
             else -> {
                 val tool = tool
-                val color = paletteManager.getActiveColor(if( button == LEFT) 0 else 1)
-                val offColor = paletteManager.getActiveColor(if( button == LEFT) 1 else 0)
+                val color = paletteManager.activeBelt.getColor(if( button == LEFT) 0 else 1)
+                val offColor = paletteManager.activeBelt.getColor(if( button == LEFT) 1 else 0)
 
                 when( tool) {
                     is Pen -> when {
@@ -226,8 +225,8 @@ class Penner(
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 
-    private val toolBinding = Bindable(master.toolsetManager.selectedTool) { new, old ->
+    private val toolBinding = Bindable(toolsetManager.selectedTool) { new, old ->
         behavior = null
-    }.also { master.toolsetManager.selectedToolBinding.bind(it) }
+    }.also { toolsetManager.selectedToolBinding.bind(it) }
     private val tool by toolBinding
 }

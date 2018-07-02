@@ -1,7 +1,7 @@
 package spirite.gui.components.major.tool
 
 import spirite.base.brains.IMasterControl
-import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
+import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IColorSquare
@@ -29,8 +29,11 @@ class PaletteSection(
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
 
-    private val __ASDF134 = object : MPaletteObserver {
-        override fun colorChanged() {
+    private val __ASDF134 = object : PaletteObserver {
+        override fun paletteChanged(evt: PaletteChangeEvent) {
+            paletteView.redraw()
+        }
+        override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
             paletteView.redraw()
         }
     }.also {paletteManager.paletteObservable.addObserver( it) }
@@ -46,8 +49,8 @@ class PaletteSection(
     private val paletteManager get() = master.paletteManager
 
     init {
-        master.paletteManager.getColorBind(0).bind(primaryColorSquare.colorBind)
-        master.paletteManager.getColorBind(1).bind(secondaryColorSquare.colorBind)
+        master.paletteManager.activeBelt.getColorBind(0).bind(primaryColorSquare.colorBind)
+        master.paletteManager.activeBelt.getColorBind(1).bind(secondaryColorSquare.colorBind)
         primaryColorSquare.setBasicBorder(BEVELED_LOWERED)
         primaryColorSquare.enabled = false
         secondaryColorSquare.setBasicBorder(BEVELED_LOWERED)
@@ -107,7 +110,7 @@ class PaletteSection(
                     if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < imp.height) {
                         val index = (point.x / 12) + (point.y / 12 * paletteView.w)
                         val color = when {
-                            pressing < 0 -> paletteManager.getActiveColor(-pressing - 1)
+                            pressing < 0 -> paletteManager.activeBelt.getColor(-pressing - 1)
                             else -> paletteView.palette.colors[pressing]
                         }
                         color?.also { paletteView.palette.setPaletteColor(index, it) }
@@ -132,7 +135,7 @@ class PaletteSection(
                 val color = paletteView.palette.colors[index]
                 val acId = if( evt.button == RIGHT) 1 else 0
 
-                if( color != null) master.paletteManager.setActiveColor( acId, color)
+                if( color != null) master.paletteManager.activeBelt.setColor( acId, color)
 
                 val time = Hybrid.timing.currentMilli
 
@@ -141,10 +144,10 @@ class PaletteSection(
 
                 if( pressingIndex == lastPressIndex && time - lastPressStart < master.settingsManager.paletteDoubleclickTime)
                 {
-                    master.dialog.pickColor( color ?: master.paletteManager.getActiveColor(acId))
+                    master.dialog.pickColor( color ?: master.paletteManager.activeBelt.getColor(acId))
                             ?.also {
                                 paletteView.palette.setPaletteColor(index, it)
-                                master.paletteManager.setActiveColor(acId, it)
+                                master.paletteManager.activeBelt.setColor(acId, it)
                             }
                 }
             }
@@ -183,8 +186,8 @@ private constructor(
             val context = context ?: return
 
             val w = Math.max(width / 12, 1)
-            val activeColor1 = context.master.paletteManager.getActiveColor(0).argb32
-            val activeColor2 = context.master.paletteManager.getActiveColor(1).argb32
+            val activeColor1 = context.master.paletteManager.activeBelt.getColor(0).argb32
+            val activeColor2 = context.master.paletteManager.activeBelt.getColor(1).argb32
 
             context.palette.colors.forEach { key, color ->
                 g2.color = color.jcolor

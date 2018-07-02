@@ -8,7 +8,7 @@ class PickBehavior(penner: Penner, val leftClock: Boolean) : PennerBehavior(penn
     fun pick() {
         val img = penner.renderEngine.renderWorkspace(penner.workspace ?: return)
         if( ImageUtil.coordsInImage( penner.x, penner.y, img))
-            penner.paletteManager.setActiveColor( if( leftClock) 0 else 1, img.getColor(penner.x, penner.y))
+            penner.paletteManager.activeBelt.setColor( if( leftClock) 0 else 1, img.getColor(penner.x, penner.y))
     }
 
     override fun onStart() {pick()}

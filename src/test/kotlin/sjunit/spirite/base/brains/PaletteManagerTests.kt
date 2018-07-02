@@ -1,6 +1,6 @@
 //package sjunit.spirite.base.brains
 //
-//import spirite.base.brains.palette.IPaletteManager.MPaletteObserver
+//import spirite.base.brains.palette.IPaletteManager.PaletteObserver
 //import spirite.base.brains.palette.PaletteManager
 //import kotlin.test.assertEquals
 //import org.junit.Test as test
@@ -44,8 +44,8 @@
 //    @test fun Triggers() {
 //        // Arrange
 //        var triggered = false
-//        paletteManager.paletteObservable.addObserver( object : MPaletteObserver {
-//            override fun colorChanged() {
+//        paletteManager.paletteObservable.addObserver( object : PaletteObserver {
+//            override fun paletteChanged() {
 //                triggered = true
 //            }
 //        })

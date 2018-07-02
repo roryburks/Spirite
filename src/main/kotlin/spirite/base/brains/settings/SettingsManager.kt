@@ -26,6 +26,8 @@ interface ISettingsManager {
     var paletteDoubleclickTime: Int
     var paletteDragMinTime: Int
 
+    var defaultImageWidth: Int
+    var defaultImageHeight: Int
     //fun get
 }
 
@@ -103,8 +105,8 @@ class SettingsManager (
     // ===============
     // ==== Simple Settings
     // region Simple Settings
-    var defaultImageWidth: Int by PreferenceIntDelegate( "defaultImageWidth", 640)
-    var defaultImageHeight: Int by PreferenceIntDelegate( "defaultImageHeight", 480)
+    override var defaultImageWidth: Int by PreferenceIntDelegate( "defaultImageWidth", 640)
+    override var defaultImageHeight: Int by PreferenceIntDelegate( "defaultImageHeight", 480)
 
     var promptOnGroupCrop : Boolean by PreferenceBooleanDelegate( "promptOnGroupCrop", true)
     var DEBUG : Boolean by PreferenceBooleanDelegate("DEBUG", false)
