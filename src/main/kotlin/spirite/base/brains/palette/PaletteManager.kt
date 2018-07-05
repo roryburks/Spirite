@@ -10,6 +10,7 @@ interface IPaletteManager {
 
     val currentPaletteBind : IBindable<Palette>
     val currentPalette: Palette
+    val globalPalette: Palette
 
     interface PaletteObserver {
         fun paletteChanged( evt: PaletteChangeEvent)
@@ -41,7 +42,7 @@ class PaletteManager(private val workspaceSet: IWorkspaceSet) : IPaletteManager 
 
     override val paletteObservable = Observable<PaletteObserver>()
 
-    val globalPalette = object : Palette("Global") {
+    override val globalPalette = object : Palette("Global") {
         override val onChangeTrigger: (Palette) -> Unit = {triggerPaletteChange(PaletteChangeEvent(this))}
     }
 

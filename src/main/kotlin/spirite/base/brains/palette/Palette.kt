@@ -134,4 +134,6 @@ abstract class Palette( name: String, raw: ByteArray? = null) {
 
         return stream.toByteArray()
     }
+
+    override fun toString() = name
 }

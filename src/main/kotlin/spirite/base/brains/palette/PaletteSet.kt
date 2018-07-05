@@ -13,7 +13,7 @@ abstract class PaletteSet {
     val palettes : List<Palette> get() = _palettes
     private val _palettes = mutableListOf<Palette>(PSPalette("default"))
 
-    val currentPaletteBind = Bindable<Palette?>(null)
+    val currentPaletteBind = Bindable<Palette?>(_palettes.first())
     var currentPalette
         get() = currentPaletteBind.field
         set(value) {
@@ -32,9 +32,11 @@ abstract class PaletteSet {
     fun addPalette( name: String, select: Boolean, raw: ByteArray? = null) : Palette {
         val palette = PSPalette(name, raw)
         _palettes.add(palette)
+
+        onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))
+
         if( select)
             currentPalette = palette
-        onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))
 
         return palette
     }

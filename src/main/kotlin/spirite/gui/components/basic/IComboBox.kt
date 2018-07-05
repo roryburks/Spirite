@@ -5,7 +5,12 @@ import spirite.base.util.MathUtil
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
+import spirite.pc.gui.basic.jcomponent
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import javax.swing.JComboBox
+import javax.swing.JList
+import javax.swing.ListCellRenderer
 
 interface IComboBox<T> : IComponent
 {
@@ -13,32 +18,34 @@ interface IComboBox<T> : IComponent
     val selectedItemBind : Bindable<T>
 
     var selectedIndex: Int
-    val selectedIndexBind: Bindable<Int>
 
     val values : List<T>
+    fun setValues( newValues: List<T>, select: T? = null)
+
+    var renderer :((value: T, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)?
 }
 
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
-    override val selectedItemBind = Bindable<T>(initialValues.first(),
-            { new, old -> values.indexOf(new).apply { if (this != selectedIndex) selectedIndex = this } })
-    override val selectedIndexBind = Bindable(0, { new, old -> selectedItemBind.field = values[new] })
+    override val selectedItemBind = Bindable<T>(initialValues.first())
 
     override var selectedItem: T
         get() = selectedItemBind.field
         set(value) {
             val index = values.indexOf( value)
-            selectedIndexBind.field = index
+            if( index > -1) {
+                selectedItemBind.field = value
+            }
         }
     override var selectedIndex: Int
-        get() = selectedIndexBind.field
+        get() = values.indexOf(selectedItem)
         set(value) {
             val to = MathUtil.clip(0, value, values.size-1)
-            selectedIndexBind.field = to
+            selectedItem = values[to]
         }
 
     override val values : List<T> get() = _values
-    val _values = initialValues.toMutableList()
+    protected var _values = initialValues.toList()
 }
 
 class SwComboBox<T>
@@ -47,18 +54,50 @@ private constructor(
         private val imp: SwComboBoxImp<T>)
     : ComboBox<T>(things.toList()), ISwComponent by SwComponent(imp)
 {
+    override var renderer: ((value: T, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)? = null
+        set(value) {
+            if( field != value) {
+                field = value
+                when(value) {
+                    null -> {imp.renderer = imp.defaultRenderer}
+                    else -> imp.renderer = ListCellRenderer { list, _value, index, isSelected, cellHasFocus ->
+                        value(_value, index, isSelected, cellHasFocus).jcomponent
+                    }
+                }
+            }
+        }
+
+    private val _listener = ActionListener { selectedIndex = imp.selectedIndex }
+
+    override fun setValues(newValues: List<T>, select: T?) {
+        // Easiest way to prevent Swing-side listens and Spirite-side listeners from conflicting with each other
+        // is to just disable the swing-side ones for the duration of the transition so that hear the chatter of Swing
+        // messages auto-selecting as the combo box gets de-populated and re-populated.
+        imp.removeActionListener(_listener)
+        imp.removeAllItems()
+        newValues.forEach { imp.addItem(it) }
+
+        _values = newValues.toList()
+        selectedItem = select ?: newValues.first()
+        imp.selectedIndex = newValues.indexOf(selectedItem)
+        imp.addActionListener(_listener)
+    }
+
     constructor(things: Array<T>) : this( things, SwComboBoxImp<T>( things))
 
     init {
-        selectedIndexBind.addListener { new, old -> imp.selectedIndex = new }
-        imp.addActionListener {selectedIndex = imp.selectedIndex}
+        selectedItemBind.addListener { new, old ->  imp.selectedIndex = selectedIndex}
+        imp.addActionListener(_listener)
     }
 
     class SwComboBoxImp<T>(things: Array<T>) : JComboBox<T>(things)
     {
+        val defaultRenderer = renderer
+
         init {
             background = Skin.Global.Fg.jcolor
             foreground = Skin.Global.TextDark.jcolor
         }
     }
+
 }

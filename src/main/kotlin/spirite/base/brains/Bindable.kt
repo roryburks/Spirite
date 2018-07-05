@@ -1,5 +1,6 @@
 package spirite.base.brains
 
+import com.sun.xml.internal.fastinfoset.util.StringArray
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 

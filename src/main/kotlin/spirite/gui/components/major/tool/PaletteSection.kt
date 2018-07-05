@@ -40,11 +40,9 @@ class PaletteSection(
 
     private val primaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
     private val secondaryColorSquare : IColorSquare = Hybrid.ui.ColorSquare()
-    private val paletteView = PaletteView(master, master.paletteManager.currentPalette)
+    private val paletteView = PaletteView(master)
+    private val paletteChooserView = PaletteChooserView(master)
 
-    private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_NewColor) }
-    private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Save) }
-    private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Load) }
 
     private val paletteManager get() = master.paletteManager
 
@@ -78,9 +76,7 @@ class PaletteSection(
                 flex = 100f
             }
             rows += {
-                add(btnNewPalette)
-                add(btnSavePalette)
-                add(btnLoadPalette)
+                add(paletteChooserView)
             }
         }
     }
@@ -101,30 +97,6 @@ class PaletteSection(
             pressingStart = Hybrid.timing.currentMilli
         }
 
-        paletteView.onMouseRelease = {evt ->
-            val pressing = pressingIndex
-
-            if( pressing != null) {
-                if(Hybrid.timing.currentMilli - pressingStart > master.settingsManager.paletteDragMinTime) {
-                    val point = evt.point.convert(paletteView)
-                    if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < imp.height) {
-                        val index = (point.x / 12) + (point.y / 12 * paletteView.w)
-                        val color = when {
-                            pressing < 0 -> paletteManager.activeBelt.getColor(-pressing - 1)
-                            else -> paletteView.palette.colors[pressing]
-                        }
-                        color?.also { paletteView.palette.setPaletteColor(index, it) }
-                    }
-                    else if( pressing >= 0) {
-                        paletteView.palette.setPaletteColor(pressing, null)
-                    }
-                }
-
-                lastPressIndex = pressing
-                lastPressStart = pressingStart
-                pressingIndex = null
-            }
-        }
         primaryColorSquare.onMouseRelease = paletteView.onMouseRelease
         secondaryColorSquare.onMouseRelease = paletteView.onMouseRelease
 
@@ -152,29 +124,138 @@ class PaletteSection(
                 }
             }
         }
+
+        paletteView.onMouseRelease = {evt ->
+            val pressing = pressingIndex
+
+            if( pressing != null) {
+                if(Hybrid.timing.currentMilli - pressingStart > master.settingsManager.paletteDragMinTime) {
+                    val point = evt.point.convert(paletteView)
+                    if( point.x / 12 <= paletteView.w && point.x >= 0 && point.y >= 0 && point.y < imp.height) {
+                        val index = (point.x / 12) + (point.y / 12 * paletteView.w)
+                        val color = when {
+                            pressing < 0 -> paletteManager.activeBelt.getColor(-pressing - 1)
+                            else -> paletteView.palette.colors[pressing]
+                        }
+                        color?.also { paletteView.palette.setPaletteColor(index, it) }
+                    }
+                    else if( pressing >= 0) {
+                        paletteView.palette.setPaletteColor(pressing, null)
+                    }
+                }
+
+                lastPressIndex = pressing
+                lastPressStart = pressingStart
+                pressingIndex = null
+            }
+        }
     }
 
     // endregion
+
+
+    private val _paletteBind = master.paletteManager.currentPaletteBind.addWeakListener { _, _ -> paletteView.redraw()}
+
+    override fun close() {
+        paletteView.onClose()
+        paletteChooserView.onClose()
+    }
+}
+
+private class PaletteChooserView
+constructor(
+        val master: IMasterControl,
+        val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+    :IComponent by imp
+{
+    private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_NewColor) }
+    private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Save) }
+    private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Load) }
+
+    private val cbPaletteSelector = Hybrid.ui.ComboBox<Palette?>(arrayOf(null))
+
+    init { // Layout
+        imp.setLayout {
+            rows.add(cbPaletteSelector, height = 20)
+            rows.addGap(2)
+            rows += {
+                addGap(2)
+                add(btnNewPalette)
+                addGap(1)
+                add(btnSavePalette)
+                addGap(1)
+                add(btnLoadPalette)
+                addGap(2)
+                height = 16
+            }
+            rows.addGap(2)
+        }
+        rebuild()
+    }
+
+    init { // Bindings
+        cbPaletteSelector.selectedItemBind.addRootListener { new, old ->
+            if( new != null) {
+                master.workspaceSet.currentWorkspace?.paletteSet?.currentPalette = when( new) {
+                    master.paletteManager.globalPalette -> null
+                    else -> new
+                }
+            }
+        }
+
+        btnNewPalette.action = {
+            master.workspaceSet.currentWorkspace?.paletteSet?.addPalette("Test", true)
+        }
+    }
+
+
+    private fun rebuild() {
+        val workspace = master.workspaceSet.currentWorkspace
+
+        val items : List<Palette?> = when(workspace) {
+            null -> listOf(master.paletteManager.globalPalette)
+            else -> {
+                val list = mutableListOf<Palette?>()
+
+                list.addAll(workspace.paletteSet.palettes)
+                list.add(null)
+                list.add(master.paletteManager.globalPalette)
+
+                list
+            }
+        }
+
+        cbPaletteSelector.setValues(items, master.paletteManager.currentPalette)
+
+    }
+
+    private val _workspaceListener = master.workspaceSet.currentWorkspaceBind.addListener { new, old ->
+        rebuild()
+    }
+    fun onClose() {
+        _workspaceListener.unbind()
+    }
 }
 
 private class PaletteView
 private constructor(
         val master: IMasterControl,
-        palette: Palette,
         val imp: PaletteViewImp )
     :IComponent by SwComponent(imp)
 {
-    init {imp.context = this}
-    constructor(master: IMasterControl, palette: Palette) : this(master, palette, PaletteViewImp())
-
-    var palette : Palette = palette
-        set(value) {
-            field = value
-            imp.repaint()
-        }
+    constructor(master: IMasterControl) : this(master, PaletteViewImp())
 
     val w get() = Math.max(width/12,1)
+    val palette get() = master.paletteManager.currentPalette
 
+    private val _paletteListener = master.paletteManager.currentPaletteBind.addListener { _, _ ->  imp.repaint() }
+
+    fun onClose() {
+        _paletteListener.unbind()
+    }
+
+    // region Imp
+    init {imp.context = this}
     private class PaletteViewImp : JPanel() {
         var context: PaletteView? = null
 
@@ -205,4 +286,5 @@ private constructor(
             }
         }
     }
+    // endregion
 }
