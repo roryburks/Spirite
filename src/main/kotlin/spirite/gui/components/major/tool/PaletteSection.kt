@@ -1,5 +1,6 @@
 package spirite.gui.components.major.tool
 
+import javafx.scene.input.KeyCode
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.palette.IPaletteManager.*
 import spirite.base.brains.palette.Palette
@@ -9,15 +10,14 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
+import java.awt.event.KeyEvent
 import javax.swing.JPanel
 
 
@@ -168,7 +168,11 @@ constructor(
         val imp: ICrossPanel = Hybrid.ui.CrossPanel())
     :IComponent by imp
 {
+    private val currentWorkspace get() = master.workspaceSet.currentWorkspace
+    private val paletteManager get() = master.paletteManager
+
     private val btnNewPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_NewColor) }
+    private val btnRemovePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_Remove) }
     private val btnSavePalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Save) }
     private val btnLoadPalette = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Palette_Load) }
 
@@ -181,6 +185,8 @@ constructor(
             rows += {
                 addGap(2)
                 add(btnNewPalette)
+                addGap(1)
+                add(btnRemovePalette)
                 addGap(1)
                 add(btnSavePalette)
                 addGap(1)
@@ -196,15 +202,47 @@ constructor(
     init { // Bindings
         cbPaletteSelector.selectedItemBind.addRootListener { new, old ->
             if( new != null) {
-                master.workspaceSet.currentWorkspace?.paletteSet?.currentPalette = when( new) {
+                currentWorkspace?.paletteSet?.currentPalette = when( new) {
                     master.paletteManager.globalPalette -> null
                     else -> new
                 }
             }
         }
 
+        cbPaletteSelector.addEventOnKeypress(KeyEvent.VK_F2, 0) {
+            val cwPalette = currentWorkspace?.paletteSet?.currentPalette
+            if( cwPalette != null) {
+                val name = master.dialog.promptForString("Rename Palette:", cwPalette.name)
+                if( name != null) {
+                    cwPalette.name = name
+                }
+            }
+        }
+
+
         btnNewPalette.action = {
-            master.workspaceSet.currentWorkspace?.paletteSet?.addPalette("Test", true)
+            val name = master.dialog.promptForString("Enter name for the new Palette:", "New Palette")
+            if( name != null) {
+                master.workspaceSet.currentWorkspace?.paletteSet?.addPalette(name, true)
+            }
+        }
+        btnRemovePalette.action = {
+            val index = currentWorkspace?.paletteSet?.palettes?.indexOf(master.paletteManager.currentPalette)
+            if( index != null && index >= 0) {
+                currentWorkspace?.paletteSet?.removePalette(index)
+            }
+        }
+        btnSavePalette.action = {
+            val name = master.dialog.promptForString("Enter name to save the palette as:", master.paletteManager.currentPalette.name)
+            if( name != null)
+                master.paletteManager.savePaletteInPrefs(name, master.paletteManager.currentPalette)
+        }
+        btnLoadPalette.action = {
+            val scheme = master.settingsManager.paletteList.map { MenuItem(it, customAction = {
+                val data = master.settingsManager.getRawPalette(it)
+                currentWorkspace?.paletteSet?.addPalette(it, true, data)
+            })}
+            master.contextMenus.LaunchContextMenu(btnLoadPalette.topLeft, scheme)
         }
     }
 
@@ -229,12 +267,20 @@ constructor(
 
     }
 
+    // region Observers
     private val _workspaceListener = master.workspaceSet.currentWorkspaceBind.addListener { new, old ->
         rebuild()
     }
+    private val _paletteManaager = object : PaletteObserver {
+        override fun paletteChanged(evt: PaletteChangeEvent) {}
+        override fun paletteSetChanged(evt: PaletteSetChangeEvent) {
+            rebuild()
+        }
+    }.also { master.paletteManager.paletteObservable.addObserver(it)}
     fun onClose() {
         _workspaceListener.unbind()
     }
+    //endregion
 }
 
 private class PaletteView

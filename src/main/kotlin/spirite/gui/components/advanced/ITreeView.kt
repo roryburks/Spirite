@@ -136,10 +136,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
             selectedNode = node
         }
 
-    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null, { new, old ->
+    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null) { new, old ->
         selectedBind.field = new?.value
         redraw()
-    })
+    }
     override var selectedNode: ITreeNode<T>? by selectedNodeBind
 
     // region Tree Construction
@@ -166,9 +166,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
             node.component = component
             node.lComponent = leftComponent
             dnd.addDropSource(component.jcomponent)
-            component.jcomponent.addMouseListener( SimpleMouseListener{
+            component.onMouseClick = {
                 selectedNode = node
-            })
+                requestFocus()
+            }
 
             initializer += {
                 if( leftSize != 0) {
@@ -193,9 +194,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
         }
 
         imp.removeAll()
-        imp.layout = CrossLayout.buildCrossLayout(imp, {
+        imp.layout = CrossLayout.buildCrossLayout(imp) {
             _rootNodes.forEach { buildCrossForNode(it, 0, rows) }
-        })
+        }
         imp.validate()
     }
     // endregion
@@ -254,16 +255,16 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private val _rootNodes = mutableListOf<TreeNode<T>>()
 
     private val nodesAsList : List<TreeNode<T>> get()  {
-        fun getNodesFor( node: TreeNode<T>) : List<TreeNode<T>> =node.children.fold(mutableListOf(), {
+        fun getNodesFor( node: TreeNode<T>) : List<TreeNode<T>> =node.children.fold(mutableListOf()) {
             agg, it ->
             agg.add(it)
             agg.apply{addAll(getNodesFor(it))}
-        })
-        return _rootNodes.fold(mutableListOf(), {
+        }
+        return _rootNodes.fold(mutableListOf()) {
             agg, it ->
             agg.add(it)
             agg.apply { addAll(getNodesFor(it))}
-        })
+        }
     }
 
     // endregion
@@ -292,7 +293,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
             //   be called before lComponent and component are built (which happens on buildTree)
             SwingUtilities.invokeLater {
-                valueBind.addListener({ new, old ->
+                valueBind.addListener { new, old ->
                     val newLComp = attributes.makeLeftComponent(new)
                     val newComp = attributes.makeComponent(new)
 
@@ -302,7 +303,12 @@ private constructor(private val imp : SwTreeViewImp<T>)
                         newLComp?.redraw()
                         newComp.redraw()
                     }
-                })
+                }
+            }
+
+            onMousePress = {
+                getNodeFromY(it.point.y)?.also { selectedNode = it }
+                requestFocus()
             }
         }
 

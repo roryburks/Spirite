@@ -3,6 +3,7 @@ package spirite.base.brains.palette
 import spirite.base.brains.Bindable
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
+import spirite.base.util.StringUtil
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
@@ -11,7 +12,7 @@ abstract class PaletteSet {
     abstract val onPaletteChangeTrigger: (PaletteChangeEvent) -> Unit
 
     val palettes : List<Palette> get() = _palettes
-    private val _palettes = mutableListOf<Palette>(PSPalette("default"))
+    private val _palettes = mutableListOf<Palette>(PSPalette("Default"))
 
     val currentPaletteBind = Bindable<Palette?>(_palettes.first())
     var currentPalette
@@ -30,7 +31,8 @@ abstract class PaletteSet {
     }
 
     fun addPalette( name: String, select: Boolean, raw: ByteArray? = null) : Palette {
-        val palette = PSPalette(name, raw)
+        val nondupeName = StringUtil.getNonDuplicateName(_palettes.map { it.name }, name)
+        val palette = PSPalette(nondupeName, raw)
         _palettes.add(palette)
 
         onPaletteSetChangeTrigger(PaletteSetChangeEvent(this))

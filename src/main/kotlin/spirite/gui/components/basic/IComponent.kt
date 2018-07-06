@@ -1,6 +1,7 @@
 package spirite.gui.components.basic
 
 import spirite.base.util.linear.Rect
+import spirite.gui.UIPoint
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseWheelEvent
 import spirite.pc.gui.SColor
@@ -15,6 +16,8 @@ interface IComponent {
     val x: Int
     val y: Int
     val bounds: Rect get() = Rect(x, y, width, height)
+    val topLeft : UIPoint
+    val bottomRight: UIPoint
 
     var background : SColor
     var foreground : SColor
@@ -45,6 +48,9 @@ interface IComponent {
     var onMouseDrag : ((MouseEvent) -> Unit)?
 
     var onMouseWheelMoved : ((MouseWheelEvent)->Unit)?
+
+    fun addEventOnKeypress( keycode: Int,  modifiers: Int, action: () -> Unit)
+    fun requestFocus()
 }
 
 class Invokable<T>() {

@@ -3,6 +3,7 @@ package spirite.pc.gui.basic
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.gui.SUIPoint
+import spirite.gui.UIPoint
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder
 import spirite.gui.components.basic.IComponent.BasicBorder.*
@@ -16,10 +17,13 @@ import spirite.pc.gui.SColor
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
 import java.awt.Cursor
+import java.awt.event.ActionEvent
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
+import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.KeyStroke
 import javax.swing.border.BevelBorder
 import java.awt.event.MouseEvent as JMouseEvent
 
@@ -40,6 +44,9 @@ abstract class ASwComponent : ISwComponent {
 
     override val x : Int get() = component.x
     override val y : Int get() = component.y
+
+    override val topLeft: UIPoint get() = SUIPoint(x, y, this)
+    override val bottomRight: UIPoint get() = SUIPoint(x+width, y+height, this)
 
     override var background: SColor
         get() = component.background.scolor
@@ -197,6 +204,19 @@ abstract class ASwComponent : ISwComponent {
         }
 
         override fun mouseWheelMoved(e: java.awt.event.MouseWheelEvent) {onWheelMove?.invoke(convert(e))}
+    }
+
+    override fun addEventOnKeypress(keycode: Int, modifiers: Int, action: () -> Unit) {
+        component.actionMap.put(action, object : javax.swing.AbstractAction() {
+            override fun actionPerformed(e: ActionEvent?) {
+                action()
+            }
+        })
+        component.inputMap.put(KeyStroke.getKeyStroke(keycode, modifiers), action)
+    }
+
+    override fun requestFocus() {
+        component.requestFocus()
     }
 }
 

@@ -23,6 +23,9 @@ interface IDialog {
     fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
     fun invokeNewWorkspace(): NewWorkspaceReturn?
 
+    fun promptForString( message: String, default: String = "") : String?
+    fun promptVerify(message: String) : Boolean
+
     enum class FilePickType {
         OPEN,
         SAVE_SIF,
@@ -39,6 +42,19 @@ class JDialog(private val master: IMasterControl) : IDialog
     init {
         UIManager.put("OptionPane.background", Global.Bg.jcolor)
         UIManager.put("Panel.background", Global.Bg.jcolor)
+    }
+
+
+    override fun promptForString(message: String, default: String): String? {
+        val result: String?  = JOptionPane.showInputDialog(null, message, default)
+        return result
+    }
+
+    override fun promptVerify(message: String): Boolean {
+        return when( JOptionPane.showConfirmDialog(null, message,"",JOptionPane.OK_CANCEL_OPTION)){
+            JOptionPane.OK_OPTION -> true
+            else -> false
+        }
     }
 
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace): NewSimpleLayerReturn? {
