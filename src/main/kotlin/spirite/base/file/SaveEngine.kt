@@ -69,7 +69,7 @@ object SaveEngine {
         saveImageData(context)
         if( workspace.animationManager.animations.any())
             saveAnimationData(context)
-        //savePaletteData(context)
+        savePaletteData(context)
 
         ra.close()
     }

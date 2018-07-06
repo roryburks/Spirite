@@ -169,9 +169,13 @@ object LoadEngine {
                     val ox = ra.readShort().i
                     val oy = ra.readShort().i
                     val imgSize = ra.readInt()
-                    val imgData = ByteArray(imgSize).apply { ra.read( this) }
-
-                    val img = Hybrid.imageIO.loadImage(imgData)
+                    val img = when( imgSize) {
+                        0 -> null
+                        else -> {
+                            val imgData = ByteArray(imgSize).apply { ra.read( this) }
+                            Hybrid.imageIO.loadImage(imgData)
+                        }
+                    }
                     dataMap[id] = DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
                 }
                 PRISMATIC -> {
@@ -414,6 +418,7 @@ object LoadEngine {
             val size = ra.readUnsignedShort()
             val data = ByteArray(size).also { ra.read(it) }
             context.workspace.paletteSet.addPalette(name, false, data)
+            context.workspace.paletteSet.removePalette(0)
         }
     }
 }

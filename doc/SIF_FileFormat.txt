@@ -127,7 +127,7 @@ Per Animation:
 		            [4, float] : scaleX
 		            [4, float] : scaleY
 		            [4, float] : rotation
----- PLTT - Palatte Data Chunk
+---- PLTT - Palette Data Chunk
 Per Palette:
 [n, UTF8 str] : Palette Name
 [2, ushort] Palette Data Size

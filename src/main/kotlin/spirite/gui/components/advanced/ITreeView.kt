@@ -127,6 +127,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
     override var leftSize by OnChangeDelegate(0, {rebuildTree()})
     //fun nodeAtPoint( p: Vec2i)
 
+    init {
+        onMousePress = {
+            getNodeFromY(it.point.y)?.also { selectedNode = it }
+            requestFocus()
+        }
+    }
+
     override val selectedBind = Bindable<T?>(null)
     override var selected: T?
         get() = selectedBind.field
@@ -204,13 +211,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
     override fun getNodeFromY(y: Int) : TreeNode<T>? {
         if( y < 0) return null
 
-        val components = compToNodeMap.keys.sortedBy { it.y }
-        var componentToReturn = components.firstOrNull() ?: return null
-        components.forEach {
-            if( y < it.y) return compToNodeMap[componentToReturn]
-            componentToReturn = it
-            if( y < it.y + it.height)return compToNodeMap[componentToReturn]
-        }
+        compToNodeMap.values
+                .sortedBy { it.component.y }
+                .forEach {
+                    if( y < it.component.y) return it
+                    if( y < max(it.component.y + it.component.height, (it.lComponent?.y ?: 0) + (it.lComponent?.height ?: 0)))
+                        return it
+                }
 
         return null
     }
@@ -304,11 +311,6 @@ private constructor(private val imp : SwTreeViewImp<T>)
                         newComp.redraw()
                     }
                 }
-            }
-
-            onMousePress = {
-                getNodeFromY(it.point.y)?.also { selectedNode = it }
-                requestFocus()
             }
         }
 

@@ -1,6 +1,7 @@
 package spirite.pc.JOGL
 
 import com.jogamp.opengl.*
+import com.jogamp.opengl.Threading.isSingleThreaded
 import spirite.base.graphics.gl.IGL
 
 object JOGLProvider {
@@ -26,6 +27,7 @@ object JOGLProvider {
     val context : GLContext get() = drawable.context
 
     init {
+
         val profile = GLProfile.getDefault()
         val fact = GLDrawableFactory.getFactory(profile)
         val caps = GLCapabilities(profile)
