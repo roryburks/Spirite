@@ -23,6 +23,7 @@ class UndoHistoryView(val master: IMasterControl) : IOmniComponent {
     }
 
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_UndoHistory
+    override val name: String get() = "Undo History"
 
 
     private val tree = Hybrid.ui.TreeView<UndoIndex>()

@@ -136,7 +136,7 @@ Per Palette:
 	// [4*n] n*4 bytes representing the color data, in RGBA form
 	//		(if first byte was 0x00),
 	//		[1] next byte represents consecutive empty datas
-	// ex: 00 FF 00 0A 3 [4] [4] [4], 258 whitespaces then 3 color data
+	// ex: 00 FF 00 0A 3 [4] [4] [4], 265 whitespaces then 3 color data
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
 

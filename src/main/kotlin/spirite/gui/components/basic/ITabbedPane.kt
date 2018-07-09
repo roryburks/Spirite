@@ -5,11 +5,9 @@ import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Insets
-import java.awt.Rectangle
+import java.awt.*
 import javax.swing.JTabbedPane
+import javax.swing.SwingUtilities
 import javax.swing.plaf.basic.BasicTabbedPaneUI
 
 interface ITabbedPane : IComponent
@@ -78,9 +76,21 @@ private constructor(
             ui = sui
             sui.installUI(this)
             border = null
+            font = Font("Tahoma", Font.PLAIN, 10)
         }
 
         private inner class StpUi : BasicTabbedPaneUI() {
+
+            override fun createLayoutManager(): LayoutManager {
+                return object : BasicTabbedPaneUI.TabbedPaneLayout() {
+                    override fun calculateTabRects(tabPlacement: Int, tabCount: Int) {
+                        super.calculateTabRects(tabPlacement, tabCount)
+
+                        rects.forEachIndexed { i, rect ->  rect.width -= 10 ; rect.x -= 10*i}
+                    }
+                }
+            }
+
 
             override fun paintTab(g: Graphics, tabPlacement: Int, rects: Array<Rectangle>, tabIndex: Int, iconRect: Rectangle,
                                   textRect: Rectangle) {

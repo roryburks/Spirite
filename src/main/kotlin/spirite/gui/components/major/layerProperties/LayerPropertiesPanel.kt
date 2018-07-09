@@ -14,6 +14,7 @@ class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
 {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
+    override val name: String get() = "Layer Properties"
 
     val imp = Hybrid.ui.CrossPanel()
 

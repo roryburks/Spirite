@@ -27,6 +27,7 @@ import kotlin.math.round
 class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
+    override val name: String get() = "Animation Preview"
 
     var timer : ITimer = Hybrid.timing.createTimer(15, true) {tick()}
 

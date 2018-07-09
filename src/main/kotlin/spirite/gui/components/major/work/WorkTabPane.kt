@@ -17,6 +17,7 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
 {
     override val component: IComponent get() = tabPane
     override val icon: IIcon? get() = null
+    override val name: String get() = "Work Area"
 
     constructor(master: IMasterControl) : this( master, Hybrid.ui.TabbedPane())
 

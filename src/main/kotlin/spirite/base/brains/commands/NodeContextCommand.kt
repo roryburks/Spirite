@@ -7,6 +7,7 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.gui.components.dialogs.IDialog
+import spirite.hybrid.MDebug
 
 interface ICommandExecuter {
     val validCommands: List<String>
@@ -66,7 +67,8 @@ class NodeContextCommand(
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()
             NEW_RIG_ANIMATION.string -> TODO()
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")
         }
 
         return true

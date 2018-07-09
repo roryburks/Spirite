@@ -3,6 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.ToolsetCommandExecuter.ToolCommand.*
 import spirite.base.brains.toolset.IToolsetManager
+import spirite.hybrid.MDebug
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -84,7 +85,8 @@ class ToolsetCommandExecuter(val toolsetManager: IToolsetManager) : ICommandExec
                     is spirite.base.brains.toolset.Eraser -> selected.width = increase(selected.width)
                 }
             }
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: tool.$string")
         }
         return true
     }

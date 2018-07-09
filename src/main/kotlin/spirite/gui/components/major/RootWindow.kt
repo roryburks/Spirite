@@ -8,7 +8,9 @@ import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
 import spirite.gui.components.advanced.omniContainer.OmniContainer
 import spirite.gui.components.advanced.omniContainer.OmniSegment
+import spirite.gui.components.advanced.omniContainer.OmniTab
 import spirite.gui.components.advanced.omniContainer.SubContainer
+import spirite.gui.components.major.animation.AnimationSchemeView
 import spirite.gui.components.major.groupView.GroupView
 import spirite.gui.components.major.groupView.ReferenceView
 import spirite.gui.components.major.layerProperties.LayerPropertiesPanel
@@ -103,7 +105,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 center = OmniSegment( PaletteSection(master), 100)
             }, 100, 120)
             right += SubContainer( {
-                center = OmniSegment( ReferenceView(), 100)
+                center = OmniTab(listOf(ReferenceView(), AnimationSchemeView(master)), 100)
                 bottom += OmniSegment( LayerPropertiesPanel(master), 200)
             }, 100, 120)
         }

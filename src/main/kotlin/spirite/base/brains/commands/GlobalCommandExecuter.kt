@@ -24,6 +24,7 @@ import spirite.base.util.linear.Transform
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
+import spirite.hybrid.MDebug
 
 class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     enum class GlobalCommand(val string: String) : ICommand {
@@ -50,14 +51,14 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
     override fun executeCommand(string: String, extra: Any?): Boolean {
         when( string) {
             NEW_WORKSPACE.string -> {
-                val result = master.dialog.invokeNewWorkspace() ?: return true
+                val result = master.dialog.invokeNewWorkspace() ?: return false
                 val newWorkspace = master.createWorkspace(result.width, result.height)
                 newWorkspace.groupTree.addNewSimpleLayer(null, "Background", DYNAMIC)
                 newWorkspace.finishBuilding()
                 master.workspaceSet.addWorkspace(newWorkspace)
             }
             SAVE_WORKSPACE.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return true
+                val workspace = master.workspaceSet.currentWorkspace ?: return false
                 val wsfile = workspace.file
 
                 when {
@@ -69,29 +70,29 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 }
             }
             SAVE_WORKSPACE_AS.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return true
+                val workspace = master.workspaceSet.currentWorkspace ?: return false
                 val file = master.dialog.pickFile(SAVE_SIF) ?: return true
                 master.fileManager.saveWorkspace(workspace, file)
             }
-            OPEN.string -> master.fileManager.openFile(master.dialog.pickFile(FilePickType.OPEN) ?: return true)
+            OPEN.string -> master.fileManager.openFile(master.dialog.pickFile(FilePickType.OPEN) ?: return false)
             EXPORT.string,
             EXPORT_AS.string -> master.fileManager.exportToImage(
                     master.workspaceSet.currentWorkspace ?: return true,
                     master.dialog.pickFile(FilePickType.EXPORT) ?: return true)
             COPY.string -> {
-                val workspace = master.workspaceSet.currentWorkspace?: return true
+                val workspace = master.workspaceSet.currentWorkspace?: return false
                 copy(workspace, false)
             }
             COPY_VISIBLE.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return true
+                val workspace = master.workspaceSet.currentWorkspace ?: return false
                 Hybrid.imageIO.imageToClipboard(copyVisible(workspace))
             }
             CUT.string -> {
-                val workspace = master.workspaceSet.currentWorkspace ?: return true
+                val workspace = master.workspaceSet.currentWorkspace ?: return false
                 copy(workspace, true)
             }
             PASTE.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return true
+                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
                 val workspace = master.workspaceSet.currentWorkspace
                 if( workspace == null)
                     master.workspaceFromImage(image)
@@ -110,14 +111,15 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                 }
             }
             PASTE_AS_LAYER.string -> {
-                val image = Hybrid.imageIO.imageFromClipboard() ?: return true
+                val image = Hybrid.imageIO.imageFromClipboard() ?: return false
                 val workspace = master.workspaceSet.currentWorkspace
                 if( workspace == null)
                     master.workspaceFromImage(image)
                 else
                     workspace.groupTree.addSimpleLayerFromImage(workspace.groupTree.selectedNode, "Pasted", image)
             }
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: global.$string")
         }
         return true
     }

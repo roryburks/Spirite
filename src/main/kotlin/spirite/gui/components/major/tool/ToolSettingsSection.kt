@@ -105,6 +105,7 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
 {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
+    override val name: String get() = "Tool Settings"
 
     constructor(master: IMasterControl) : this(master, Hybrid.ui.CrossPanel())
 

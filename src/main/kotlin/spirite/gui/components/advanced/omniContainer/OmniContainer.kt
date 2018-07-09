@@ -32,7 +32,7 @@ class OmniResizeContainer(
 }
 
 sealed class OmniThing{
-    abstract internal val component: IComponent
+    internal abstract val component: IComponent
     abstract val minDim: Int
     abstract val prefDim: Int
 }
@@ -43,6 +43,16 @@ data class OmniSegment(
         override val prefDim: Int = minDim) : OmniThing()
 {
     override val component get() = omniComponent.component
+}
+
+class OmniTab(
+        val components: List<IOmniComponent>,
+        override val minDim : Int,
+        override val prefDim: Int = minDim) : OmniThing()
+{
+    override val component: IComponent
+        get() = Hybrid.ui.TabbedPane()
+                .also { tp -> components.forEach { tp.addTab(it.name, it.component) }  }
 }
 
 data class SubContainer(

@@ -4,6 +4,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand.SWAP_BACK
 import spirite.base.brains.palette.IPaletteManager
+import spirite.hybrid.MDebug
 
 class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExecuter
 {
@@ -23,7 +24,8 @@ class PaletteCommandExecuter(val paletteManager: IPaletteManager) : ICommandExec
         when( string) {
             SWAP.string -> paletteManager.activeBelt.cycleColors(1)
             SWAP_BACK.string -> paletteManager.activeBelt.cycleColors(-1)
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: palette.$string")
         }
         return true
     }

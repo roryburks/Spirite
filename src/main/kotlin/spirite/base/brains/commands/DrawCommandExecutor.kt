@@ -12,6 +12,7 @@ import spirite.base.util.f
 import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec2
 import spirite.hybrid.Hybrid
+import spirite.hybrid.MDebug
 
 class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: IToolsetManager) : ICommandExecuter
 {
@@ -59,12 +60,14 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
             }
             AUTO_CROP.string -> TODO()
             LAYER_TO_IMAGE_SIZE.string -> TODO()
-            INVERT.string -> (workspace.activeDrawer as? IInvertModule)?.invert() ?: Hybrid.beep()
-            CLEAR.string ->  (workspace.activeDrawer as? IClearModule)?.clear() ?: Hybrid.beep()
-            SHIFT_UP.string -> if( !shift(0,-1, workspace)) Hybrid.beep()
-            SHIFT_DOWN.string -> if( !shift(0,1, workspace)) Hybrid.beep()
-            SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) Hybrid.beep()
-            SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) Hybrid.beep()
+            INVERT.string -> (workspace.activeDrawer as? IInvertModule)?.invert() ?: return false
+            CLEAR.string ->  (workspace.activeDrawer as? IClearModule)?.clear() ?: return false
+            SHIFT_UP.string -> if( !shift(0,-1, workspace)) return false
+            SHIFT_DOWN.string -> if( !shift(0,1, workspace)) return false
+            SHIFT_LEFT.string -> if( !shift(-1,0, workspace)) return false
+            SHIFT_RIGHT.string -> if( !shift(1,0, workspace)) return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: draw.$string")
         }
 
         return true

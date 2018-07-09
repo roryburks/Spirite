@@ -5,6 +5,7 @@ import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand.*
 import spirite.base.imageData.selection.Selection
 import spirite.base.util.linear.Rect
+import spirite.hybrid.MDebug
 
 class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecuter
 {
@@ -33,7 +34,8 @@ class SelectionCommandExecuter( val workspaceSet: IWorkspaceSet) : ICommandExecu
             INVERT.string -> selectionEngine.setSelection(
                     selectionEngine.selection?.invert(workspace.width, workspace.height)
                             ?: Selection.RectangleSelection(Rect(workspace.width, workspace.height)))
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: select.$string")
         }
         return true
     }

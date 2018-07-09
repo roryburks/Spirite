@@ -28,6 +28,7 @@ class PaletteSection(
 {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
+    override val name: String get() = "Palette"
 
     private val __ASDF134 = object : PaletteObserver {
         override fun paletteChanged(evt: PaletteChangeEvent) {

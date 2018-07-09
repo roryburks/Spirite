@@ -3,6 +3,7 @@ package spirite.base.brains.commands
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.WorkspaceCommandExecuter.ViewCommand.*
+import spirite.hybrid.MDebug
 
 class WorkspaceCommandExecuter(val master: IMasterControl) : ICommandExecuter
 {
@@ -30,7 +31,8 @@ class WorkspaceCommandExecuter(val master: IMasterControl) : ICommandExecuter
             ZOOM_IN_SLOW.string -> view?.zoomLevel = (view?.zoomLevel ?: 0) + 1
             ZOOM_OUT_SLOW.string -> view?.zoomLevel = (view?.zoomLevel ?: 0) - 1
             ZOOM_0.string -> view?.zoomLevel = 0
-            else -> return false
+
+            else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: view.$string")
         }
         return true
     }

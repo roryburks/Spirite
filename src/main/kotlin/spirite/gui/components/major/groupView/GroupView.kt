@@ -15,6 +15,7 @@ private constructor(
 {
     override val component: IComponent get() = panel
     override val icon: IIcon? get() = null
+    override val name: String get() = "Group Tree"
 
     constructor(master: IMasterControl) : this(master, panel = Hybrid.ui.CrossPanel())
 

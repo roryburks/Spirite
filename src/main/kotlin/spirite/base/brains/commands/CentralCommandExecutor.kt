@@ -8,7 +8,7 @@ import spirite.hybrid.MDebug
 interface ICentralCommandExecutor {
     val commandDomains : List<String>
     val validCommands: List<String>
-    fun executeCommand( command: String, extra: Any?)
+    fun executeCommand( command: String, extra: Any?) : Boolean
 }
 
 class CentralCommandExecutor(
@@ -30,12 +30,12 @@ class CentralCommandExecutor(
 
 
     override val commandDomains: List<String> get() = commandExecuters.map { it.domain }
-    override val validCommands: List<String> get() = commandExecuters.fold(mutableListOf(), {agg, executer ->
-        agg.addAll(executer.validCommands)
+    override val validCommands: List<String> get() = commandExecuters.fold(mutableListOf()) { agg, executor ->
+        agg.addAll(executor.validCommands)
         agg
-    })
+    }
 
-    override fun executeCommand(command: String, extra: Any?) {
+    override fun executeCommand(command: String, extra: Any?) : Boolean {
         val space = command.substring(0, command.indexOf("."))
         val subCommand = command.substring(space.length+1)
 
@@ -51,11 +51,10 @@ class CentralCommandExecutor(
                         executed = true
                 }
 
-        if (!executed) {
-            if (attempted)
-                MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: $command")
-            else
-                MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
+        if (!attempted) {
+            MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command domain: $space")
         }
+
+        return executed
     }
 }

@@ -31,6 +31,7 @@ class ToolSection (
 {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
+    override val name: String get() = "Tools"
 
     val currentTool get() = master.toolsetManager.selectedTool
     val toolset get() = master.toolsetManager.toolset
