@@ -57,7 +57,7 @@ private constructor(
             return {
                 group.children.forEach {
                     when(it) {
-                        is GroupNode -> Branch(it, groupAttributes, makeConstructor(it))
+                        is GroupNode -> Branch(it, groupAttributes, it.expanded, makeConstructor(it))
                         else -> Node(it, nongroupAttributes)
                     }
                 }

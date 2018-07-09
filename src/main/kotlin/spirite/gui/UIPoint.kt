@@ -16,7 +16,7 @@ abstract class UIPoint(
 class SUIPoint( x:Int, y:Int, component: IComponent) : UIPoint(x, y, component)
 {
     override fun convert(other: IComponent) : SUIPoint {
-        val converted = SwingUtilities.convertPoint( component.component as JComponent, x, y, other.jcomponent)
+        val converted = SwingUtilities.convertPoint( component.jcomponent, x, y, other.jcomponent)
         return  SUIPoint( converted.x, converted.y, other)
     }
 }

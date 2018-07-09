@@ -9,6 +9,7 @@ import spirite.base.util.MathUtil
 class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
         AnimationState(11.1f, 3, 5.53f))
 {
+
     override val startFrame: Float
         get() = 0f
     override val endFrame: Float
@@ -22,4 +23,5 @@ class FakeAnimation(workspace: IImageWorkspace) : Animation("Fake", workspace,
         gc.drawLine(100f - t, 0f, t, 100f)
     }
 
+    override fun dupe()= FakeAnimation(workspace)
 }

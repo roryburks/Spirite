@@ -17,6 +17,8 @@ abstract class Animation(
     protected fun triggerStructureChange() {
         workspace.animationManager.triggerStructureChange(this)
     }
+
+    abstract fun dupe(): Animation
 }
 
 abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace, state: AnimationState = AnimationState())

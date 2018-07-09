@@ -26,6 +26,7 @@ import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+import kotlin.math.exp
 import kotlin.math.max
 
 interface ITreeViewNonUI<T>{
@@ -53,7 +54,7 @@ interface ITreeViewNonUI<T>{
         var expanded : Boolean
         val expandedBind : Bindable<Boolean>
 
-        fun addChild( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()): ITreeNode<T>
+        fun addChild( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), expanded: Boolean = true): ITreeNode<T>
         fun removeChild( toRemove: ITreeNode<T>)
         fun clearChildren()
     }
@@ -98,17 +99,19 @@ class ITreeElementConstructor<T> {
     fun Node(value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()) {
         _elements.add( ITNode( value, attributes))
     }
-    fun Branch( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), initializer: ITreeElementConstructor<T>.()->Unit) {
+    fun Branch( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), expanded: Boolean = true, initializer: ITreeElementConstructor<T>.()->Unit) {
         _elements.add( ITNode(
                 value,
                 attributes,
-                ITreeElementConstructor<T>().apply { initializer.invoke(this) }.elements))
+                ITreeElementConstructor<T>().apply { initializer.invoke(this) }.elements,
+                expanded))
     }
 
     internal class ITNode<T>(
             val value:T,
             val attributes: TreeNodeAttributes<T>,
-            val children: List<ITNode<T>>? = null)
+            val children: List<ITNode<T>>? = null,
+            val expanded: Boolean = true)
     internal val elements : List<ITNode<T>> get() = _elements
     private val _elements  = mutableListOf<ITNode<T>>()
 }
@@ -212,11 +215,15 @@ private constructor(private val imp : SwTreeViewImp<T>)
         if( y < 0) return null
 
         compToNodeMap.values
-                .sortedBy { it.component.y }
+                .sortedBy { it.component?.y ?: Int.MAX_VALUE }
                 .forEach {
-                    if( y < it.component.y) return it
-                    if( y < max(it.component.y + it.component.height, (it.lComponent?.y ?: 0) + (it.lComponent?.height ?: 0)))
-                        return it
+                    val y1 = it.component?.y ?: Int.MIN_VALUE
+                    val y2 = max(
+                            it.component?.run { this.y + this.height } ?: Int.MIN_VALUE,
+                            it.lComponent ?.run { this.y + this.height} ?: Int.MIN_VALUE
+                    )
+                    if( y < y1) return it
+                    if( y < y2) return it
                 }
 
         return null
@@ -243,12 +250,12 @@ private constructor(private val imp : SwTreeViewImp<T>)
         val roots = ITreeElementConstructor<T>().apply { constructor.invoke(this) }.elements
 
         fun addNode( context: TreeNode<T>, node: ITNode<T>) {
-            context.addChild( node.value, node.attributes )
+            context.addChild( node.value, node.attributes, node.expanded )
                     .apply { node.children?.forEach { addNode(this, it) }}
         }
 
         roots.forEach { root ->
-            TreeNode(root.value, root.attributes).apply {
+            TreeNode(root.value, root.attributes, root.expanded).apply {
                 _rootNodes.add(this)
                 root.children?.forEach {addNode(this, it) }
             }
@@ -282,10 +289,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
     // region TreeNode
     inner class TreeNode<T>
-    internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>)
+    internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>, expanded: Boolean = true)
         :ITreeNode<T>
     {
-        override val expandedBind = Bindable(true, { new, old -> rebuildTree() })
+        override val expandedBind = Bindable(expanded, { new, old -> rebuildTree() })
         override var expanded by expandedBind
 
         override val valueBind = Bindable(defaultValue, { new, old -> rebuildTree() })
@@ -294,7 +301,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
         private val _children = mutableListOf<TreeNode<T>>()
 
         internal var lComponent : IComponent? = null
-        internal lateinit var component : IComponent
+        internal var component : IComponent? = null
 
         init {
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
@@ -314,8 +321,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
             }
         }
 
-        override fun addChild(value: T, attributes: TreeNodeAttributes<T>) : TreeNode<T>{
-            val newNode = TreeNode(value, attributes)
+        override fun addChild(value: T, attributes: TreeNodeAttributes<T>, expanded: Boolean) : TreeNode<T>{
+            val newNode = TreeNode(value, attributes, expanded)
             _children.add(newNode)
             rebuildTree()
             return newNode
@@ -371,8 +378,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 node == null && e_y < 0 -> ABOVE
                 node == null -> BELOW
                 else -> {
-                    val n_y = node.component.y
-                    val n_h = node.component.height
+                    val n_y = node.component?.y ?: return
+                    val n_h = node.component?.height ?: return
                     when {
                         !node.attributes.isLeaf &&
                                 e_y > n_y + n_h/4 &&
@@ -499,7 +506,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
                         val lowest = lowestChild
                         when( lowest) {
                             null -> 0
-                            else -> lowest.component.y + lowest.component.height
+                            else -> lowest.component?.run { y + height } ?: return
                         }
                     }
                 }
@@ -507,7 +514,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             }
             dragging -> {}
             else -> {
-                val comp = draggingRelativeTo.component
+                val comp = draggingRelativeTo.component ?: return
                 when( draggingDirection) {
                     ABOVE -> {
                         val dy = comp.y

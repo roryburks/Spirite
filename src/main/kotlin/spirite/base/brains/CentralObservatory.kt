@@ -5,6 +5,7 @@ import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
@@ -14,9 +15,11 @@ import java.lang.ref.WeakReference
  * regardless of which Workspace is active should get their Observables from.  It automatically adds and removes ovservers
  * as the currentWorkspace is changed.*/
 interface ICentralObservatory {
+    val omniAnimationObservable : IObservable<AnimationObserver>
+    val omniImageObserver : IObservable<ImageObserver>
+
     val trackingUndoHistoryObserver : IObservable<(UndoHistoryChangeEvent)->Any?>
     val trackingImageObserver : IObservable<ImageObserver>
-    val omniImageObserver : IObservable<ImageObserver>
     val trackingPrimaryTreeObserver : IObservable<TreeObserver>
 
     val activeDataBind : IBindable<MediumHandle?>
@@ -30,9 +33,11 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     private val trackingObservers  = mutableListOf<TrackingObserver<*>>()
     private val omniObserver  = mutableListOf<OmniObserver<*>>()
 
+    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
+    override val omniAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
+
     override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
     override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
-    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }

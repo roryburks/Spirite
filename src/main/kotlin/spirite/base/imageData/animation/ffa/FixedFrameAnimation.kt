@@ -2,6 +2,7 @@ package spirite.base.imageData.animation.ffa
 
 import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.MathUtil
@@ -61,6 +62,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         val layer = FFALayerGroupLinked(this, group, includeSubtrees, frameMap)
         _layers.add(layer)
         triggerFFAChange(layer)
+    }
+
+    override fun dupe(): Animation {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
