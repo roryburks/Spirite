@@ -20,6 +20,14 @@ private constructor( init: OmniInitializer.()->Unit, val root: ICrossPanel) : IC
         }
     }
 
+    fun <T> contains() : Boolean {
+        TODO()
+    }
+
+    fun <T> componentFor() : OmniPart? {
+        TODO()
+    }
+
 }
 
 class OmniResizeContainer(
@@ -35,12 +43,14 @@ sealed class OmniThing{
     internal abstract val component: IComponent
     abstract val minDim: Int
     abstract val prefDim: Int
+    abstract val visible: Boolean
 }
 
 data class OmniSegment(
         val omniComponent: IOmniComponent,
         override val minDim : Int,
-        override val prefDim: Int = minDim) : OmniThing()
+        override val prefDim: Int = minDim,
+        override val visible: Boolean = true) : OmniThing()
 {
     override val component get() = omniComponent.component
 }
@@ -48,7 +58,8 @@ data class OmniSegment(
 class OmniTab(
         val components: List<IOmniComponent>,
         override val minDim : Int,
-        override val prefDim: Int = minDim) : OmniThing()
+        override val prefDim: Int = minDim,
+        override val visible: Boolean = true) : OmniThing()
 {
     override val component: IComponent
         get() = Hybrid.ui.TabbedPane()
@@ -56,12 +67,14 @@ class OmniTab(
 }
 
 data class SubContainer(
-        val init: OmniInitializer.()->Unit,
         override val minDim: Int,
-        override val prefDim: Int = minDim) : OmniThing()
+        override val prefDim: Int = minDim,
+        override val visible: Boolean = true,
+        val init: OmniInitializer.()->Unit) : OmniThing()
 {
     override val component: IComponent get() = OmniInitializer().apply(init).makeComponent()
 }
+
 
 class OmniInitializer {
     lateinit var orientation: Orientation ; private set
@@ -98,8 +111,8 @@ class OmniInitializer {
 
         minSize?.also { rc.minStretch = it }
 
-        leading.forEach {rc.addPanel(it.component, it.minDim, it.prefDim, Int.MAX_VALUE)}
-        trailing.forEach { rc.addPanel(it.component, it.minDim, it.prefDim, Int.MIN_VALUE) }
+        leading.forEach {rc.addPanel(it.component, it.minDim, it.prefDim, Int.MAX_VALUE, it.visible)}
+        trailing.forEach { rc.addPanel(it.component, it.minDim, it.prefDim, Int.MIN_VALUE, it.visible) }
 
         return rc
     }

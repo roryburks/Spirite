@@ -8,6 +8,7 @@ import spirite.gui.components.basic.*
 import spirite.pc.gui.basic.*
 
 object SwingComponentProvider : IComponentProvider {
+
     override fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? ): IBoxList<T>
         = SwBoxList(boxWidth, boxHeight, entries)
 
@@ -18,6 +19,7 @@ object SwingComponentProvider : IComponentProvider {
     override fun Label(text: String): ILabel = SwLabel(text)
     override fun ScrollBar(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int) : IScrollBar
         = SwScrollBar(orientation, context, minScroll, maxScroll, startScroll, scrollWidth)
+    override fun ScrollContainer(component: IComponent) = SwScrollContainer(component)
 
     override fun ToggleButton(startChecked: Boolean): IToggleButton = SwToggleButton(startChecked)
     override fun CrossPanel(constructor: (CrossInitializer.()->Unit)?): ICrossPanel = SwPanel().apply { constructor?.also { setLayout(it) } }

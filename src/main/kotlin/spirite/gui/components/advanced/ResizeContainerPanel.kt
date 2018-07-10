@@ -25,7 +25,7 @@ interface IResizeContainerPanel : IComponent
     var stretchComponent : IComponent
 
     fun getPanel(index: Int) : IResizeBar?
-    fun addPanel( component : IComponent, minSize: Int, defaultSize: Int, position: Int = 0) : Int
+    fun addPanel( component : IComponent, minSize: Int, defaultSize: Int, position: Int = 0, visible: Boolean = true) : Int
     fun removePanel( index: Int)
 
     interface IResizeBar {
@@ -57,7 +57,7 @@ private constructor(
         else -> null
     }
 
-    override fun addPanel( component: IComponent, minSize: Int, defaultSize: Int, position: Int) : Int{
+    override fun addPanel( component: IComponent, minSize: Int, defaultSize: Int, position: Int, visible: Boolean) : Int{
         val p = when(position) {
             0, Int.MAX_VALUE -> leadingBars.size + 1
             Int.MIN_VALUE ->  -trailingBars.size - 1    // -Int.MIN_VALUE = Int.MIN_VALUE.  tricky
@@ -66,19 +66,19 @@ private constructor(
 
         val ret = when {
             p < 0 && -p >= trailingBars.size -> {
-                trailingBars.add(ResizeBar(defaultSize, minSize, component, true))
+                trailingBars.add(ResizeBar(defaultSize, minSize, component, true, visible))
                 -trailingBars.size
             }
             p < 0 -> {
-                trailingBars.add(-p-1,ResizeBar(defaultSize, minSize, component, true))
+                trailingBars.add(-p-1,ResizeBar(defaultSize, minSize, component, true, visible))
                 p
             }
             p >= leadingBars.size -> {
-                leadingBars.add(ResizeBar(defaultSize,minSize, component, false))
+                leadingBars.add(ResizeBar(defaultSize,minSize, component, false, visible))
                 leadingBars.size
             }
             else -> {
-                leadingBars.add(ResizeBar(defaultSize, minSize, component, false))
+                leadingBars.add(ResizeBar(defaultSize, minSize, component, false, visible))
                 p
             }
         }
@@ -116,6 +116,7 @@ private constructor(
             minSize: Int,
             component: IComponent,
             private val trailing: Boolean,
+            visible : Boolean,
             private val panel: ICrossPanel = Hybrid.ui.CrossPanel())
         : IComponent by panel, IResizeBar
     {
@@ -123,7 +124,7 @@ private constructor(
         override var minSize by LayoutDelegate(minSize)
         override var resizeComponent by LayoutDelegate(component)
 
-        private var componentVisibleBindable = Bindable(true, { new, old -> resetLayout() })
+        private var componentVisibleBindable = Bindable(visible) { _, _ -> resetLayout() }
         var componentVisible by componentVisibleBindable
 
         init {

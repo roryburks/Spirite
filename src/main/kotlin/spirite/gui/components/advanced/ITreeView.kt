@@ -12,6 +12,7 @@ import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
+import spirite.gui.components.basic.SwScrollContainer
 import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid

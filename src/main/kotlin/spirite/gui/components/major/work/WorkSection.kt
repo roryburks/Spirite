@@ -92,8 +92,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     fun refreshCoordinates( x: Int, y: Int) {
         val workspace = currentWorkspace
         if( workspace != null && Rect(0,0,workspace.width, workspace.height).contains(x, y))
-            coordinateLabel.label = "$x,$y"
-        else coordinateLabel.label = ""
+            coordinateLabel.text = "$x,$y"
+        else coordinateLabel.text = ""
 
     }
 
@@ -163,8 +163,8 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         }
         Hybrid.timing.createTimer(15, true) {SwingUtilities.invokeLater{penner.step()}}
 
-        coordinateLabel.label = "Coordinate Label"
-        messageLabel.label = "Message Label"
+        coordinateLabel.text = "Coordinate Label"
+        messageLabel.text = "Message Label"
 
         this.onResize = {
             calibrateScrolls()

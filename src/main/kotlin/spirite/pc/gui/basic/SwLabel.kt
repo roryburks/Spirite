@@ -14,7 +14,7 @@ private constructor( val imp : SwLabelImp)
 {
     constructor( text: String = "") : this(SwLabelImp(text))
 
-    override var label: String
+    override var text: String
         get() = imp.text
         set(value) {imp.text = value}
     override var textColor: Color

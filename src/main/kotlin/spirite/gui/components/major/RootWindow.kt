@@ -11,6 +11,7 @@ import spirite.gui.components.advanced.omniContainer.OmniSegment
 import spirite.gui.components.advanced.omniContainer.OmniTab
 import spirite.gui.components.advanced.omniContainer.SubContainer
 import spirite.gui.components.major.animation.AnimationSchemeView
+import spirite.gui.components.major.animation.AnimationStructureView
 import spirite.gui.components.major.groupView.GroupView
 import spirite.gui.components.major.groupView.ReferenceView
 import spirite.gui.components.major.layerProperties.LayerPropertiesPanel
@@ -90,25 +91,28 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         jMenuBar = bar
     }
 
+    private val omni = OmniContainer {
+        left += OmniSegment(GroupView(master), 100, 150)
+        center = SubContainer(200,200) {
+            center = OmniSegment(workTabPane, 200)
+            bottom += OmniSegment(AnimationStructureView(master), 100, 200, false)
+        }
+        right += SubContainer(100, 120) {
+            top += OmniSegment(ToolSection(master), 64, 100)
+            top += OmniSegment(ToolSettingsSection(master), 200, 200)
+
+            center = OmniSegment( PaletteSection(master), 100)
+        }
+        right += SubContainer(100,120) {
+            center = OmniTab(listOf(ReferenceView(), AnimationSchemeView(master)), 100)
+            bottom += OmniSegment( LayerPropertiesPanel(master), 200)
+        }
+    }
+
     init /* Layout */ {
         this.layout = GridLayout()
 
         this.title = "Spirite"
-
-        val omni = OmniContainer {
-            left += OmniSegment(GroupView(master), 100, 150)
-            center = OmniSegment( workTabPane, 200)
-            right += SubContainer( {
-                top += OmniSegment(ToolSection(master), 64, 100)
-                top += OmniSegment(ToolSettingsSection(master), 200, 200)
-
-                center = OmniSegment( PaletteSection(master), 100)
-            }, 100, 120)
-            right += SubContainer( {
-                center = OmniTab(listOf(ReferenceView(), AnimationSchemeView(master)), 100)
-                bottom += OmniSegment( LayerPropertiesPanel(master), 200)
-            }, 100, 120)
-        }
 
         this.add( omni.jcomponent)
 
@@ -126,6 +130,13 @@ class RootWindow( val master: IMasterControl) : JFrame() {
             }
 
             false
+        }
+
+        master.centralObservatory.currentAnimationBind.addListener { new, old ->
+            if( new == null && old != null) {
+                omni
+            }
+
         }
     }
 }

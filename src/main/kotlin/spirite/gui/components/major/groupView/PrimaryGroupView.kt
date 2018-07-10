@@ -20,7 +20,7 @@ class PrimaryGroupView
 private constructor(
         private val master: IMasterControl,
         val tree : ITreeView<Node>)
-    : IComponent by tree,
+    : IComponent by Hybrid.ui.ScrollContainer(tree),
         TreeObserver
 {
     constructor(master: IMasterControl) : this(master, Hybrid.ui.TreeView<Node>())

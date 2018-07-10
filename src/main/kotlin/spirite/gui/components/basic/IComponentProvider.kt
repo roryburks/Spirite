@@ -22,6 +22,7 @@ interface IComponentProvider {
             maxScroll: Int = 100,
             startScroll: Int = 0,
             scrollWidth : Int = 10) : IScrollBar
+    fun ScrollContainer( component: IComponent) : IScrollContainer
     fun ToggleButton(startChecked: Boolean = false) : IToggleButton
     fun CrossPanel(constructor: (CrossInitializer.()->Unit)? = null ) : ICrossPanel
     fun TabbedPane( ): ITabbedPane

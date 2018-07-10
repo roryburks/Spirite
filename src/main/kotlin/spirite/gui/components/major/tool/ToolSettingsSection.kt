@@ -141,7 +141,7 @@ private constructor(val master : IMasterControl, val imp : ICrossPanel)
     }
 
     private val ashdksja = master.toolsetManager.selectedToolBinding.addWeakListener { new, old ->
-        toolLabel.label = new.description
+        toolLabel.text = new.description
         constructFromTool(new)
     }
 }
