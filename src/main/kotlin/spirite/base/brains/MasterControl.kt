@@ -14,8 +14,7 @@ import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
-import spirite.base.graphics.rendering.IRenderEngine
-import spirite.base.graphics.rendering.RenderEngine
+import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.pen.stroke.IStrokeDrawerProvider
@@ -48,6 +47,10 @@ interface IMasterControl {
     val contextMenus : ContextMenus
     val dialog : IDialog
 
+    val thumbnailStore: IThumbnailStore
+
+    val thumbBi : IThumbnailStoreBi
+
     fun createWorkspace(width: Int, height: Int) : MImageWorkspace
 }
 
@@ -76,6 +79,8 @@ class MasterControl() : IMasterControl {
 
     override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
 
+    override val thumbnailStore: IThumbnailStore = ThumbnailStore(settingsManager, centralObservatory)
+    override val thumbBi: IThumbnailStoreBi = ThumbnailStoreBi(settingsManager, centralObservatory, thumbnailStore) // Fairly debug
 
     override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(
             renderEngine,

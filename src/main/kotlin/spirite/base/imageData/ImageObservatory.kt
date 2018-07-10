@@ -17,16 +17,16 @@ interface IImageObservatory {
         fun imageChanged( evt: ImageChangeEvent)
     }
 
-    val imageObservers : IObservable<ImageObserver>
+    val imageObservable : IObservable<ImageObserver>
 
     fun triggerRefresh( evt: ImageChangeEvent)
 }
 
 class ImageObservatory : IImageObservatory {
-    override val imageObservers = Observable<ImageObserver>()
+    override val imageObservable = Observable<ImageObserver>()
 
     override fun triggerRefresh(evt: ImageChangeEvent) {
-        imageObservers.trigger { it.imageChanged(evt) }
+        imageObservable.trigger { it.imageChanged(evt) }
     }
 
 }

@@ -91,7 +91,7 @@ private constructor(boxWidth: Int, boxHeight: Int, entries: Collection<T>?, val 
         override val component: IComponent = SwComponent(this)
         override fun setLayout(constructor: CrossInitializer.() -> Unit) {
             content.removeAll()
-            content.layout = CrossLayout.buildCrossLayout(content, constructor)
+            content.layout = CrossLayout.buildCrossLayout(content, constructor= constructor)
         }
 
         val content = SJPanel()

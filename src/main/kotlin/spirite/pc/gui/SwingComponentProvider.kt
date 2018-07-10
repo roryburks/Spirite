@@ -1,5 +1,6 @@
 package spirite.pc.gui
 
+import spirite.base.graphics.IImage
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.SwTreeView
@@ -37,4 +38,6 @@ object SwingComponentProvider : IComponentProvider {
     override fun ColorSquare(color: SColor): IColorSquare = SwColorSquare(color)
 
     override fun Slider(min: Int, max: Int, value: Int): ISlider = SwSlider(min, max, value)
+
+    override fun ImageBox(img: IImage): IImageBox = SwImageBox(img)
 }

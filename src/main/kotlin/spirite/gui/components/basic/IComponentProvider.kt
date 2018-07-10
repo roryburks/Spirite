@@ -1,5 +1,6 @@
 package spirite.gui.components.basic
 
+import spirite.base.graphics.IImage
 import spirite.base.util.Colors
 import spirite.gui.Orientation
 import spirite.gui.components.advanced.ITreeView
@@ -40,4 +41,6 @@ interface IComponentProvider {
     fun <T> BoxList(boxWidth: Int, boxHeight: Int, entries: Collection<T>? = null) : IBoxList<T>
 
     fun Slider(min: Int = 0, max:Int = 100, value: Int = 0) : ISlider
+
+    fun ImageBox( img: IImage) : IImageBox
 }

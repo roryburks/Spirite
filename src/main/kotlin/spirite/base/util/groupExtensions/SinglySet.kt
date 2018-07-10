@@ -1,8 +1,7 @@
 package spirite.base.util.groupExtensions
 
 class SinglySet<T>(val singly : T) : Set<T> {
-    override val size: Int
-        get() = TODO("not implemented")
+    override val size: Int get() = 1
 
     override fun contains(element: T) = (element == singly)
     override fun containsAll(elements: Collection<T>) = elements.all { it == singly }

@@ -28,6 +28,9 @@ interface ISettingsManager {
 
     var defaultImageWidth: Int
     var defaultImageHeight: Int
+
+    var thumbnailCacheCheckFrequency : Int
+    var thumbnailLifespan : Int
     //fun get
 }
 
@@ -49,6 +52,9 @@ class SettingsManager (
     override var defaultHeight: Int by PreferenceIntDelegate("DefaultHeight", 480)
 
     // endregion
+
+    override var thumbnailCacheCheckFrequency: Int by PreferenceIntDelegate("ThumbnailCacheCheckFrequency", 10000)
+    override var thumbnailLifespan: Int by PreferenceIntDelegate("ThumbnailLifespan", 5000)
 
     // ==============
     // ==== Palettes:

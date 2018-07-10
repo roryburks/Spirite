@@ -30,13 +30,16 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
         rows.addGap(2)
     }
 
+    private var currentPanel : IComponent? = null
+
     private val _animationBind = master.centralObservatory.currentAnimationBind.addListener { new, old ->
         when(new){
             old -> {}
             is FixedFrameAnimation -> {
                 label.text = new.name
                 subContainer.setLayout {
-                    rows.add(AnimFFAStructPanel(new), flex = 100f)
+                    currentPanel = AnimFFAStructPanel(master, new)
+                    rows.add(currentPanel!!, flex = 100f)
                     rows.flex = 100f
                 }
             }

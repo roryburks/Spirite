@@ -7,6 +7,7 @@ import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.hybrid.Hybrid
+import spirite.pc.JOGL.JOGL
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -41,6 +42,8 @@ private constructor(context: WorkSection, val canvas: GLJPanel)
 
                 drawWork(glgc)
                 JOGLProvider.gl2 = null
+
+                drawable.context.release()
             }
 
             override fun init(drawable: GLAutoDrawable) {

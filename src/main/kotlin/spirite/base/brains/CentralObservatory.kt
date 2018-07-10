@@ -33,11 +33,11 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     private val trackingObservers  = mutableListOf<TrackingObserver<*>>()
     private val omniObserver  = mutableListOf<OmniObserver<*>>()
 
-    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservers }
+    override val omniImageObserver: IObservable<ImageObserver> = OmniObserver { it.imageObservatory.imageObservable }
     override val omniAnimationObservable: IObservable<AnimationObserver> = TrackingObserver { it.animationManager.animationObservable }
 
     override val trackingUndoHistoryObserver: IObservable<(UndoHistoryChangeEvent) -> Any?> = TrackingObserver { it.undoEngine.undoHistoryObserver }
-    override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservers}
+    override val trackingImageObserver = TrackingObserver {it.imageObservatory.imageObservable}
     override val trackingPrimaryTreeObserver: IObservable<TreeObserver> = TrackingObserver { it.groupTree.treeObservable }
 
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }

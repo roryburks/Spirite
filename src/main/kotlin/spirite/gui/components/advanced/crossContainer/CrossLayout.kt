@@ -5,13 +5,14 @@ import spirite.gui.components.advanced.crossContainer.CSE_Component
 import spirite.gui.components.advanced.crossContainer.CSE_Gap
 import spirite.gui.components.advanced.crossContainer.CSE_Group
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
+import spirite.gui.components.basic.IComponent
 import java.awt.Container
 import javax.swing.GroupLayout
 import javax.swing.GroupLayout.ParallelGroup
 import javax.swing.JComponent
 
 object CrossLayout {
-    fun buildCrossLayout(container: Container, constructor: CrossInitializer.()->Unit) : GroupLayout {
+    fun buildCrossLayout(container: Container, componentRecord: MutableList<IComponent>? = null, constructor: CrossInitializer.()->Unit) : GroupLayout {
         val scheme= CrossInitializer().apply { constructor.invoke(this) }.scheme
 
         val layout = GroupLayout( container)
@@ -28,6 +29,7 @@ object CrossLayout {
                             sGroup.addGap(it.minWidth, it.defaultWidth, it.maxWidth)
                         }
                         is CSE_Component -> {
+                            componentRecord?.add(it.component)
                             val comp = it.component.component as JComponent
                             when {
                                 it.fixed != null && it.flex != null -> sGroup.addComponent( comp, it.fixed, it.flex.toInt(), Int.MAX_VALUE)
