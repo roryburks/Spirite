@@ -16,6 +16,7 @@ interface IComponentProvider {
             maxValue : Float = 1f,
             label: String = "") : IGradientSlider
     fun Label( text: String = "") : ILabel
+    fun EditableLabel( text: String = "") : IEditableLabel
     fun ScrollBar(
             orientation: Orientation,
             context: IComponent,

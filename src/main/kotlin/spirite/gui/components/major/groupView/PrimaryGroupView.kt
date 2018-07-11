@@ -92,10 +92,12 @@ private constructor(
             return comp
         }
         override fun makeComponent(t: Node): IComponent  {
-            val comp = Hybrid.ui.Label(t.name)
+            val comp = Hybrid.ui.EditableLabel(t.name)
             val node = t
 
-            comp.onMouseClick = { evt ->
+            comp.textBind.addListener { new, _ ->  t.name = new}
+
+            comp.onMouseRelease = { evt ->
                 if( evt.button == RIGHT )
                     workspace?.apply {
                         master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, node), node)

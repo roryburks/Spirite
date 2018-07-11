@@ -20,7 +20,9 @@ import spirite.hybrid.Hybrid
 import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SwComponent
 import java.awt.Graphics
+import java.awt.event.KeyEvent
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 class AnimFFAStructPanel(
         val master: IMasterControl,
@@ -80,13 +82,7 @@ class AnimFFAStructPanel(
     {
         init {
             imp.setBasicBorder(BEVELED_LOWERED)
-            imp.background = Skin.Global.BgDark.scolor
-
-            imp.setLayout {
-                rows.add(Hybrid.ui.Label("layer"))
-            }
-
-            imp.onMouseRelease = { print("click")}
+            imp.setLayout { rows.add(Hybrid.ui.EditableLabel("layer")) }
         }
     }
 

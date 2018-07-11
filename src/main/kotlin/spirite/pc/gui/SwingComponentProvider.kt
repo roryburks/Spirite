@@ -18,6 +18,7 @@ object SwingComponentProvider : IComponentProvider {
     override fun RadioButton(label: String, selected: Boolean): IRadioButton = SwRadioButton(label, selected)
     override fun GradientSlider(minValue: Float, maxValue: Float, label: String) : IGradientSlider = SwGradientSlider(minValue, maxValue, label)
     override fun Label(text: String): ILabel = SwLabel(text)
+    override fun EditableLabel(text: String): IEditableLabel = SwEditableLabel(text)
     override fun ScrollBar(orientation: Orientation, context: IComponent, minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int) : IScrollBar
         = SwScrollBar(orientation, context, minScroll, maxScroll, startScroll, scrollWidth)
     override fun ScrollContainer(component: IComponent) = SwScrollContainer(component)

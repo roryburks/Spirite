@@ -18,6 +18,7 @@ data class LayerSource(val layer: Layer, override val workspace: IImageWorkspace
     override fun render(settings: RenderSettings, gc: GraphicsContext) {
         gc.pushState()
         gc.preTranslate( -layer.x.f, -layer.y.f)
+        gc.preScale(settings.width.f / layer.width.f, settings.height.f/layer.height.f)
         layer.getDrawList()
                 .sortedBy { it.drawDepth }
                 .forEach { it.handle.medium.render(gc, it.renderRubric) }

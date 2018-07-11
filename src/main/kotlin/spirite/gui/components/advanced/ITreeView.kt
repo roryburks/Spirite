@@ -179,7 +179,6 @@ private constructor(private val imp : SwTreeViewImp<T>)
             dnd.addDropSource(component.jcomponent)
             component.onMouseClick = {
                 selectedNode = node
-                requestFocus()
             }
 
             initializer += {
@@ -453,6 +452,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
                 context?.apply {
                     selectedNode = getNodeFromY(evt.y) ?: selectedNode
                 }
+
+                requestFocus()
             })
         }
 

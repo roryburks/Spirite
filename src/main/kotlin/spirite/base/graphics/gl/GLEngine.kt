@@ -101,14 +101,13 @@ class GLEngine(
                     gl.bindFrameBuffer(GLC.FRAMEBUFFER, fbo)
 
                     field = value
-                    gl.bindRenderbuffer(GLC.RENDERBUFFER, dbo)
-                    gl.renderbufferStorage(GLC.RENDERBUFFER, GLC.DEPTH_COMPONENT16, 1, 1)
-                    gl.framebufferRenderbuffer(GLC.FRAMEBUFFER, GLC.DEPTH_ATTACHMENT, GLC.RENDERBUFFER, dbo)
+                    // I don't remember where I picked this up but I don't think it's working
+//                    gl.bindRenderbuffer(GLC.RENDERBUFFER, dbo)
+//                    gl.renderbufferStorage(GLC.RENDERBUFFER, GLC.DEPTH_COMPONENT16, 1, 1)
+//                    gl.framebufferRenderbuffer(GLC.FRAMEBUFFER, GLC.DEPTH_ATTACHMENT, GLC.RENDERBUFFER, dbo)
 
                     // Attach Texture to FBO
                     gl.framebufferTexture2D( GLC.FRAMEBUFFER, GLC.COLOR_ATTACHMENT0, GLC.TEXTURE_2D, value, 0)
-
-
 
                     val status = gl.checkFramebufferStatus(GLC.FRAMEBUFFER)
                     when(status) {
