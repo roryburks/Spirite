@@ -12,9 +12,12 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.util.round
 import spirite.gui.Direction
 import spirite.gui.Direction.*
+import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
+import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.JColor
@@ -24,12 +27,15 @@ import java.awt.event.KeyEvent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class AnimFFAStructPanel(
+class AnimFFAStructPanel
+private constructor(
         val master: IMasterControl,
         val anim: FixedFrameAnimation,
-        private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-    : IComponent by imp
+        private val imp: Imp)
+    : IComponent by SwComponent(imp)
 {
+    constructor(master: IMasterControl, anim: FixedFrameAnimation) : this(master, anim, Imp())
+    init {imp.context = this}
 
     private var nameWidth = 60
     private var layerHeight = 24
@@ -50,19 +56,25 @@ class AnimFFAStructPanel(
                 rows += {
                     add(NamePanel(layer), width = nameWidth )
 
+                    var len = 0
                     layer.frames.forEach {
+                        len += it.length
                         when( it.marker) {
                             FRAME -> {
                                 if (it.gapBefore > 0)
-                                    add(GapPanel(), width = tickWidth * it.gapBefore)
+                                    add(GapPanel(it, true), width = tickWidth * it.gapBefore)
                                 if (it.innerLength > 0)
                                     add( FramePanel(it).also {frameLinks.add(it) }, width = tickWidth * it.innerLength)
                                 if (it.gapAfter > 0)
-                                    add(GapPanel(), width = tickWidth * it.gapAfter)
+                                    add(GapPanel(it, false), width = tickWidth * it.gapAfter)
                             }
                             START_LOCAL_LOOP -> {}
                             END_LOCAL_LOOP -> {}
                         }
+                    }
+
+                    if( len < end) {
+                        add(BlankPanel(), width = (end - len) * tickWidth)
                     }
 
                     height = layerHeight
@@ -82,7 +94,9 @@ class AnimFFAStructPanel(
     {
         init {
             imp.setBasicBorder(BEVELED_LOWERED)
-            imp.setLayout { rows.add(Hybrid.ui.EditableLabel("layer")) }
+            val label = Hybrid.ui.EditableLabel("layer")
+            imp.setLayout { rows.add(label) }
+            imp.onMouseRelease = {label.requestFocus()}
         }
     }
 
@@ -96,7 +110,14 @@ class AnimFFAStructPanel(
         }
     }
 
-    private inner class GapPanel() : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Fg.jcolor))
+    private inner class GapPanel(val frame: FFAFrame, before: Boolean) : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Fg.jcolor))
+    {
+        init {
+        }
+    }
+
+    private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Bg.jcolor))
+
 
     private inner class FramePanel(
             val frame: FFAFrame,private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
@@ -108,15 +129,39 @@ class AnimFFAStructPanel(
                 cols.add(imageBox , width = tickWidth)
 
                 if( frame.innerLength > 1) {
-                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.Global.FgLight.jcolor, RIGHT)), width = tickWidth * (frame.innerLength-1))
+                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.innerLength-1))
                 }
 
                 cols.height = layerHeight
+            }
+
+            imp.onMouseRelease = {evt ->
+                if( evt.button == MouseButton.RIGHT) {
+                    master.contextMenus.LaunchContextMenu(
+                            bottomRight,
+                            listOf(
+                                    MenuItem("Add Gap &Before", customAction = {frame.gapBefore+=1}),
+                                    MenuItem("Add Gap &After", customAction = {frame.gapAfter+=1}),
+                                    MenuItem("Increase &Length", customAction = {frame.innerLength+=1}) )
+                    )
+                }
             }
         }
 
         fun refreshThumbnail() {
             imageBox.setImage( master.thumbBi.accessThumbnail(frame.node!!, anim.workspace))
+        }
+    }
+
+    private class Imp : JPanel() {
+        lateinit var context : AnimFFAStructPanel
+
+        fun setLayout( constructor: CrossInitializer.()->Unit) {
+            removeAll()
+            val list = mutableListOf<IComponent>()
+            layout = CrossLayout.buildCrossLayout(this, list, constructor)
+            validate()
+            CrossLayout.buildCrossLayout(this, null, constructor)
         }
     }
 
@@ -136,7 +181,7 @@ class AnimFFAStructPanel(
     // endregion
 
     init {
-        imp.background = Skin.Global.BgDark.scolor
+        imp.background = Skin.Global.BgDark.jcolor
         rebuild()
     }
 }
@@ -163,8 +208,8 @@ private class ArrowPanel(val bgcol: JColor, val fgcol: JColor, val dir: Directio
         val w = width
         val h = height
 
-        val logical_x = listOf( 0.05, 0.75, 0.75, 0.95, 0.75, 0.75, 0.05)
-        val logical_y = listOf( 0.3, 0.3, 0.15, 0.5, 0.85, 0.7, 0.7)
+        val logical_x = listOf( 0.05, 0.7, 0.7, 0.95, 0.7, 0.7, 0.05)
+        val logical_y = listOf( 0.35, 0.35, 0.15, 0.5, 0.85, 0.65, 0.65)
 
         when( dir) {
             UP -> g.fillPolygon(
@@ -177,12 +222,8 @@ private class ArrowPanel(val bgcol: JColor, val fgcol: JColor, val dir: Directio
                     logical_x.map { w - (w * it).round }.toIntArray(),
                     logical_y.map { h - (h* it).round }.toIntArray(), 7)
             RIGHT -> g.fillPolygon(
-                    logical_x.map { w - (w * it).round }.toIntArray(),
-                    logical_y.map { h - (h* it).round }.toIntArray(), 7)
+                    logical_x.map { (w * it).round }.toIntArray(),
+                    logical_y.map { (h* it).round }.toIntArray(), 7)
         }
-
-        (0.. (width + height)/4)
-                .forEach { g.drawLine(0, it*4, it*4, 0)}
-
     }
 }

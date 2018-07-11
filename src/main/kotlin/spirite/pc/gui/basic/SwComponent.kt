@@ -46,8 +46,8 @@ abstract class ASwComponent : ISwComponent {
     override val x : Int get() = component.x
     override val y : Int get() = component.y
 
-    override val topLeft: UIPoint get() = SUIPoint(x, y, this)
-    override val bottomRight: UIPoint get() = SUIPoint(x+width, y+height, this)
+    override val topLeft: UIPoint get() = SUIPoint(x, y, this.component.parent)
+    override val bottomRight: UIPoint get() = SUIPoint(x+width, y+height, this.component.parent)
 
     override var background: SColor
         get() = component.background.scolor
@@ -165,7 +165,7 @@ abstract class ASwComponent : ISwComponent {
                     (smask and CTRL_DOWN_MASK) == CTRL_DOWN_MASK,
                     (smask and ALT_DOWN_MASK) == ALT_DOWN_MASK)
             return MouseEvent(
-                    SUIPoint(e.x, e.y, scomp),
+                    SUIPoint(e.x, e.y, scomp.component),
                     when (e.button) {
                         JMouseEvent.BUTTON1 -> LEFT
                         JMouseEvent.BUTTON2 -> CENTER
@@ -201,7 +201,7 @@ abstract class ASwComponent : ISwComponent {
     private class JSMouseWheelListener( var onWheelMove : ((MouseWheelEvent)-> Unit)? = null) : MouseWheelListener {
         fun convert( e: java.awt.event.MouseWheelEvent) : MouseWheelEvent {
             val scomp = SwComponent(e.component as JComponent)
-            return MouseWheelEvent(SUIPoint(e.x, e.y, scomp), e.wheelRotation)
+            return MouseWheelEvent(SUIPoint(e.x, e.y, scomp.component), e.wheelRotation)
         }
 
         override fun mouseWheelMoved(e: java.awt.event.MouseWheelEvent) {onWheelMove?.invoke(convert(e))}

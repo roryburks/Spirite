@@ -12,7 +12,6 @@ class FFALayerGroupLinked(
         frameMap : Map<Node,FFAFrameStructure>? = null)
     : FFALayer(context)
 {
-    private var nodeLinks = HashMap<Node, FFAFrame>()
     var includeSubtrees by UndoableChangeDelegate(
             includeSubtrees,
             context.workspace.undoEngine,
@@ -20,8 +19,7 @@ class FFALayerGroupLinked(
             {groupLinkUpdated()}
 
     init {
-        frameMap?.forEach {nodeLinks[it.key] = FFAFrame(it.value)}
-        groupLinkUpdated()
+        groupLinkUpdated(frameMap)
     }
 
     override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
@@ -34,8 +32,17 @@ class FFALayerGroupLinked(
         }
     }
 
-    internal fun groupLinkUpdated() {
-        val oldMap = nodeLinks
+    private fun constructFrameMap() : Map<Node,FFAFrameStructure> =
+        frames.mapNotNull {
+            val node = it.node
+            when(node) {
+                null -> null
+                else -> Pair(node, it.structure)
+            }
+        }.toMap()
+
+    internal fun groupLinkUpdated( links: Map<Node,FFAFrameStructure>? = null) {
+        val oldMap = links ?: constructFrameMap()
         val newMap = HashMap<Node, FFAFrame>()
         _frames.clear()
 
@@ -44,8 +51,7 @@ class FFALayerGroupLinked(
             node.children.asReversed().forEach {
                 when {
                     it is GroupNode && includeSubtrees -> {
-                        val solFrame = oldMap.get(it) ?:
-                            FFAFrame(FFAFrameStructure(it, START_LOCAL_LOOP, 0))
+                        val solFrame = FFAFrame(oldMap[it] ?: FFAFrameStructure(it, START_LOCAL_LOOP, 0))
 
                         _frames.add(solFrame)
                         val subLen = gluRec(it)
@@ -54,14 +60,12 @@ class FFALayerGroupLinked(
                         _frames.add( FFAFrame(FFAFrameStructure(null, END_LOCAL_LOOP, 0)))
 
                         len += solFrame.length
-                        newMap[it] = solFrame
                     }
                     it is LayerNode -> {
-                        val newFrame = oldMap[it] ?: FFAFrame(FFAFrameStructure(it, FRAME, 1))
+                        val newFrame =  FFAFrame(oldMap[it] ?:FFAFrameStructure(it, FRAME, 1))
                         _frames.add(newFrame)
 
                         len += newFrame.length
-                        newMap[it] = newFrame
                     }
                 }
             }

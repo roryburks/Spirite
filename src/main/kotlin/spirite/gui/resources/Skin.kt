@@ -44,6 +44,9 @@ object Skin {
         NormalBg( Color(238,238,238)),
         ReferenceBg(Color( 210,210,242) )
     }
+    enum class FFAAnimation(override val jcolor: Color) : ColorMarker {
+        Arrow( Color(238,30,30)),
+    }
     enum class ResizePanel(override val jcolor: Color) : ColorMarker {
         BarLineColor(baseDDD)
     }
