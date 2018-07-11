@@ -48,7 +48,7 @@ class NodeContextCommand(
         val node = extra as? Node
 
         when(string) {
-            NEW_GROUP.string -> workspace.groupTree.addGroupNode( node, "New Group")
+            NEW_GROUP.string -> workspace.groupTree.selectedNode = workspace.groupTree.addGroupNode( node, "New Group")
             DELETE.string -> node?.delete()
             NEW_SIMPLE_LAYER.string -> {
                 dialogs.invokeNewSimpleLayer(workspace)?.apply {
@@ -59,11 +59,14 @@ class NodeContextCommand(
             NEW_SPRITE_LAYER.string -> workspace.groupTree.addNewSpriteLayer(node, "sprite")
             NEW_PUPPET_LAYER.string -> TODO()
             ANIM_FROM_GROUP.string -> {
-                val groupNode = node as? GroupNode ?: return true
+                val groupNode = node as? GroupNode ?: return false
                 val animation = FixedFrameAnimation("New Animation", workspace, groupNode)
                 workspace.animationManager.addAnimation(animation, true)
             }
-            INSERT_GROUP_IN_ANIMATION.string -> TODO()
+            INSERT_GROUP_IN_ANIMATION.string -> {
+                val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
+                animation.addLinkedLayer( node as? GroupNode ?: return false, false)
+            }
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()
             NEW_RIG_ANIMATION.string -> TODO()

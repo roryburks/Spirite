@@ -34,6 +34,10 @@ private constructor(img: IImage, private val imp : SwImageBoxImp)
     private class SwImageBoxImp() : JPanel() {
         lateinit var context : SwImageBox
 
+        init {
+            isOpaque = false
+        }
+
         override fun paintComponent(g: Graphics) {
             when(context.stretch) {
                 true -> g.drawImage( context.img, 0, 0, width, height, null)

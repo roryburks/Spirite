@@ -100,7 +100,9 @@ class ThumbnailStore(settings: ISettingsManager, centralObservatory: ICentralObs
                 existing.image.flush()
                 store.remove(key)
             }
-            else return existing.image
+            else {
+                return existing.image
+            }
         }
 
         val source = when( node) {

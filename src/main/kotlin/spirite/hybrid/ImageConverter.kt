@@ -53,6 +53,7 @@ class ImageConverter(
     fun loadImageIntoGL( image: IImage, gl: IGL) {
         when( image) {
             is ImageBI -> {
+
                 val storage = RasterHelper.GetDataStorageFromBi(image.bi)
 
                 when( storage) {

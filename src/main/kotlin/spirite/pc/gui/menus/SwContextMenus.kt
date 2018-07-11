@@ -59,8 +59,8 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
                 //	or a plain MenuItem (which doesn't)
                 val node = when {
                     (depth != 0 || !isMenuBar) && (index+1 == menuScheme.size || _imCountLevel(menuScheme[index+1].lexicon) <= depth)
-                        -> JMenuItem(lexiocon)
-                    else -> JMenu(lexiocon)
+                        -> JMenuItem(lexiocon).also { it.isEnabled = item.enabled }
+                    else -> JMenu(lexiocon).also { it.isEnabled = item.enabled }
                 }
                 if( mnemonic != 0.toChar())
                     node.setMnemonic(mnemonic)

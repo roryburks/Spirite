@@ -125,14 +125,14 @@ class AnimFFAStructPanel(
     }
 
     // region Listener/Observer Bindings
-    private val _x = object : AnimationStructureChangeObserver {
+    private val _animationStructureObserver = object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
             if( animation == anim)
                 rebuild()
         }
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
 
-    private val _y = object : ImageObserver {
+    private val _imageObserver = object : ImageObserver {
         override fun imageChanged(evt: ImageChangeEvent) {
             frameLinks.forEach { it.refreshThumbnail() }
         }

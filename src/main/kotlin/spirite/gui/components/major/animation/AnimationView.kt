@@ -88,7 +88,6 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     }
 
     private fun buildFromAnim( anim: Animation?) {
-        println("$anim !!!!")
         animation = anim
 
         unbind()

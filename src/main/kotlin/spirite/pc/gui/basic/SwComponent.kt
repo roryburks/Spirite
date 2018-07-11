@@ -16,11 +16,12 @@ import spirite.gui.resources.Skin
 import spirite.pc.gui.SColor
 import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
+import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.ActionEvent
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
-import javax.swing.Action
+import java.lang.ref.WeakReference
 import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.KeyStroke
@@ -226,4 +227,38 @@ class SwComponentIndirect(cGetter : Invokable<JComponent>) : ASwComponent() {
 }
 
 class SwComponent(override val component: JComponent) : ASwComponent()
+{
+//    init {
+//        SwCompMap.addMapping(component,this)
+//        SwCompMap.ageOutMappings()
+//    }
+}
 
+
+private object SwCompMap {
+    val mapFromJCompHashCode = mutableMapOf<Int,MutableList<Pair<WeakReference<Component>,WeakReference<IComponent>>>>()
+
+    fun addMapping( jComponent: Component, sComponent: IComponent) {
+        val hash = jComponent.hashCode()
+        val collision = mapFromJCompHashCode[jComponent.hashCode()]
+        when( collision) {
+            null -> mapFromJCompHashCode[hash] = mutableListOf(Pair(WeakReference(jComponent), WeakReference(sComponent)))
+            else -> collision.add(Pair(WeakReference(jComponent), WeakReference(sComponent)))
+        }
+    }
+
+    fun ageOutMappings() {
+        mapFromJCompHashCode.entries
+                .removeIf { entry ->
+                    entry.value.removeIf { it.first.get() == null || it.second.get() == null}
+                    entry.value.isEmpty()
+                }
+    }
+
+    fun getMappingFrom( jComponent: Component) : IComponent?
+    {
+        val hash = jComponent.hashCode()
+        return mapFromJCompHashCode[hash]?.firstOrNull{it.first.get() == jComponent}?.second?.get()
+    }
+
+}

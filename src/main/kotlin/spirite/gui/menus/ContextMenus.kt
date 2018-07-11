@@ -4,6 +4,7 @@ import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.base.brains.commands.ICommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.gui.UIPoint
@@ -35,7 +36,8 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
            val lexicon : String,
            val command: ICommand? = null,
            val icon: IIcon? = null,
-           val customAction :(()->Unit)? = null)
+           val customAction :(()->Unit)? = null,
+           val enabled: Boolean = true)
 
 
     abstract fun LaunchContextMenu( point: UIPoint, scheme: List<MenuItem>, obj: Any? = null)
@@ -63,9 +65,11 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
             when( node) {
                 is GroupNode -> {
+                    val addAnimationEnabled = workspace.animationManager.currentAnimation is FixedFrameAnimation
+
                     scheme.add(MenuItem("-"))
                     scheme.add(MenuItem("&Construct Simple Animation From Group", NodeCommand.ANIM_FROM_GROUP))
-                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION))
+                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION, enabled = addAnimationEnabled))
                     scheme.add(MenuItem("Write Group To GIF Animation", NodeCommand.GIF_FROM_FROUP))
                 }
                 is LayerNode -> {
