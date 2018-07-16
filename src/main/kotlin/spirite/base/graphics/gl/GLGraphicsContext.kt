@@ -45,6 +45,7 @@ class GLGraphicsContext : GraphicsContext {
         this.premultiplied = premultiplied
 
         cachedParams.premultiplied = this.premultiplied
+        cachedParams.flip = flip
     }
     constructor( glImage: GLImage)  {
         this.width = glImage.width

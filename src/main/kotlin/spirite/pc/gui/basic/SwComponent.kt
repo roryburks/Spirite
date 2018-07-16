@@ -29,10 +29,10 @@ import javax.swing.border.BevelBorder
 import java.awt.event.MouseEvent as JMouseEvent
 
 interface ISwComponent : IComponent {
-    override val component : JComponent
+    override val component : Component
 }
 
-val IComponent.jcomponent get() = this.component as JComponent
+val IComponent.jcomponent get() = this.component as Component
 
 abstract class ASwComponent : ISwComponent {
     override fun redraw() {component.repaint()}
@@ -57,7 +57,7 @@ abstract class ASwComponent : ISwComponent {
         set(value) {component.foreground = value.jcolor}
     override var opaque: Boolean
         get() = component.isOpaque
-        set(value) {component.isOpaque = value}
+        set(value) {(component as? JComponent)?.isOpaque = value}
 
     override fun setBasicCursor(cursor: BasicCursor) {
         component.cursor = Cursor.getPredefinedCursor(when( cursor) {
@@ -79,7 +79,7 @@ abstract class ASwComponent : ISwComponent {
     }
 
     override fun setBasicBorder(border: BasicBorder?) {
-        component.border = when( border) {
+        (component as? JComponent)?.border = when( border) {
             null -> null
             BASIC -> BorderFactory.createLineBorder( Skin.Global.BgDark.jcolor)
             BEVELED_LOWERED -> BorderFactory.createBevelBorder(BevelBorder.LOWERED, Skin.BevelBorder.Med.jcolor, Skin.BevelBorder.Dark.jcolor)
@@ -158,7 +158,7 @@ abstract class ASwComponent : ISwComponent {
         var startY = 0
 
         fun convert( e: JMouseEvent) : MouseEvent {
-            val scomp = SwComponent(e.component as JComponent)
+            val scomp = SwComponent(e.component as Component)
             val smask = e.modifiersEx
             val mask = MouseEvent.toMask(
                     (smask and SHIFT_DOWN_MASK) == SHIFT_DOWN_MASK,
@@ -208,12 +208,12 @@ abstract class ASwComponent : ISwComponent {
     }
 
     override fun addEventOnKeypress(keycode: Int, modifiers: Int, action: () -> Unit) {
-        component.actionMap.put(action, object : javax.swing.AbstractAction() {
+        (component as? JComponent)?.actionMap?.put(action, object : javax.swing.AbstractAction() {
             override fun actionPerformed(e: ActionEvent?) {
                 action()
             }
         })
-        component.inputMap.put(KeyStroke.getKeyStroke(keycode, modifiers), action)
+        (component as? JComponent)?.inputMap?.put(KeyStroke.getKeyStroke(keycode, modifiers), action)
     }
 
     override fun requestFocus() {
@@ -221,12 +221,12 @@ abstract class ASwComponent : ISwComponent {
     }
 }
 
-class SwComponentIndirect(cGetter : Invokable<JComponent>) : ASwComponent() {
-    override val component: JComponent by lazy { cGetter.invoker.invoke() }
+class SwComponentIndirect(cGetter : Invokable<Component>) : ASwComponent() {
+    override val component: Component by lazy { cGetter.invoker.invoke() }
 
 }
 
-class SwComponent(override val component: JComponent) : ASwComponent()
+class SwComponent(override val component: Component) : ASwComponent()
 {
 //    init {
 //        SwCompMap.addMapping(component,this)

@@ -127,40 +127,20 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
 
-        val glWorkArea = JOGLWorkArea(this)
+        val glWorkArea = JOGLWorkArea(this, penner)
         workAreaContainer.setLayout { rows.add(glWorkArea) }
 
         hScroll.scrollBind.addListener {new, old ->currentView?.offsetX = new * scrollRatio}
         vScroll.scrollBind.addListener {new, old ->currentView?.offsetY = new * scrollRatio}
         workAreaContainer.onMouseWheelMoved = {
-            doPreservingMousePoint(Vec2(it.point.x.f, it.point.y.f), {
+            doPreservingMousePoint(Vec2(it.point.x.f, it.point.y.f)) {
                 if( it.moveAmount > 0) currentView?.zoomOut()
                 if( it.moveAmount < 0) currentView?.zoomIn()
                 calibrateScrolls()
-            })
+            }
         }
 
         workAreaContainer.onResize = {calibrateScrolls()}
-        workAreaContainer.onMouseMove = {
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-            penner.rawUpdateX(it.point.x)
-            penner.rawUpdateY(it.point.y)
-        }
-        workAreaContainer.onMouseDrag = workAreaContainer.onMouseMove
-        workAreaContainer.onMousePress = {
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-            penner.penDown(it.button)
-        }
-        workAreaContainer.onMouseRelease = {
-            penner.holdingAlt = it.holdingAlt
-            penner.holdingCtrl = it.holdingCtrl
-            penner.holdingShift = it.holdingShift
-            penner.penUp(it.button)
-        }
         Hybrid.timing.createTimer(15, true) {SwingUtilities.invokeLater{penner.step()}}
 
         coordinateLabel.text = "Coordinate Label"
@@ -239,6 +219,5 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     private val _viewObservable = Observable<()->Unit>()
 
     init {
-        Hybrid.timing.createTimer(50, true){redraw()}
     }
 }

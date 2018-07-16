@@ -378,17 +378,15 @@ class GLEngine(
                 x1, x2, if (params.flip) y2 else y1, if (params.flip) y1 else y2, -1f, 1f))
 
 
-        if( !separateWorldTransfom) {
+        if( separateWorldTransfom) {
+            internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective.transpose()))
+            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4(wrapTransformAs4x4(trans ?: Transform.IdentityMatrix)).transpose()))
+        }
+        else {
             trans?.apply { perspective = Mat4(wrapTransformAs4x4(this)) * perspective }
             perspective = perspective.transpose()
             internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective))
         }
-        else {
-            internalParams.add(GLUniformMatrix4fv("perspectiveMatrix", perspective.transpose()))
-            internalParams.add(GLUniformMatrix4fv("worldMatrix", Mat4(wrapTransformAs4x4(trans ?: Transform.IdentityMatrix)).transpose()))
-        }
-
-
     }
 
     // endregion

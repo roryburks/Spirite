@@ -160,11 +160,11 @@ class SettingsManager (
         val buff = ByteBuffer.wrap( raw)
         val num = buff.getShort()
 
-        val points = List( num.toInt(), {
-            val x = buff.getFloat()
-            val y = buff.getFloat()
+        val points = List( num.toInt()) {
+            val x = buff.float
+            val y = buff.float
             Vec2( x, y)
-        })
+        }
 
         return CubicSplineInterpolator( points, true, true)
     }

@@ -6,6 +6,7 @@ import spirite.gui.components.advanced.crossContainer.CSE_Gap
 import spirite.gui.components.advanced.crossContainer.CSE_Group
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.basic.IComponent
+import java.awt.Component
 import java.awt.Container
 import javax.swing.GroupLayout
 import javax.swing.GroupLayout.ParallelGroup
@@ -30,7 +31,7 @@ object CrossLayout {
                         }
                         is CSE_Component -> {
                             componentRecord?.add(it.component)
-                            val comp = it.component.component as JComponent
+                            val comp = it.component.component as Component
                             when {
                                 it.fixed != null && it.flex != null -> sGroup.addComponent( comp, it.fixed, it.flex.toInt(), Int.MAX_VALUE)
                                 it.fixed != null -> sGroup.addComponent(comp, it.fixed, it.fixed, it.fixed)

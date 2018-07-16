@@ -4,8 +4,10 @@ import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
+import com.jogamp.opengl.awt.GLCanvas
 import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.graphics.gl.GLGraphicsContext
+import spirite.base.pen.Penner
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL
 import spirite.pc.JOGL.JOGLProvider
@@ -13,19 +15,46 @@ import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
 
 class JOGLWorkArea
-private constructor(context: WorkSection, val canvas: GLJPanel)
+private constructor(
+        context: WorkSection,
+        private val penner: Penner,
+        val canvas: GLCanvas)
     : WorkArea(context), ISwComponent by SwComponent(canvas)
 {
-    constructor( context: WorkSection) : this( context,GLJPanel( GLCapabilities(GLProfile.getDefault())))
+    constructor( context: WorkSection, penner: Penner) : this( context, penner, GLCanvas( GLCapabilities(GLProfile.getDefault())))
 
     override val scomponent: ISwComponent get() = this
 
     init {
+        Hybrid.timing.createTimer(50, true){redraw()}
+
+        onMouseMove = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.rawUpdateX(it.point.x)
+            penner.rawUpdateY(it.point.y)
+        }
+        onMouseDrag = onMouseMove
+        onMousePress = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.penDown(it.button)
+        }
+        onMouseRelease = {
+            penner.holdingAlt = it.holdingAlt
+            penner.holdingCtrl = it.holdingCtrl
+            penner.holdingShift = it.holdingShift
+            penner.penUp(it.button)
+        }
+
         canvas.addGLEventListener(object : GLEventListener {
             override fun reshape(drawable: GLAutoDrawable?, x: Int, y: Int, width: Int, height: Int) {}
             override fun dispose(drawable: GLAutoDrawable?) {}
 
             override fun display(drawable: GLAutoDrawable) {
+
                 drawable.context.makeCurrent()
 
                 val w = drawable.surfaceWidth

@@ -52,7 +52,7 @@ private constructor(private val imp : SwSliderImp)
         set(value) {imp.majorTickSpacing = value}
 
     override fun setLabels(labels: Map<Int, String>) {
-        val dictionary = Hashtable<Int,JComponent>(labels.count())
+        val dictionary = Hashtable<Int,Component>(labels.count())
         labels.forEach { key, value -> dictionary[key] = Hybrid.ui.Label(value).jcomponent }
         imp.labelTable = dictionary
     }
