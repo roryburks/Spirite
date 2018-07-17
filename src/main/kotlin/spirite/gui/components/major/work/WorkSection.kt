@@ -127,7 +127,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         vScroll.scrollWidth = 50
         hScroll.scrollWidth = 50
 
-        val glWorkArea = JOGLWorkArea(this, penner)
+        val glWorkArea = JOGLWorkAreaPanel(this, penner)
         workAreaContainer.setLayout { rows.add(glWorkArea) }
 
         hScroll.scrollBind.addListener {new, old ->currentView?.offsetX = new * scrollRatio}
