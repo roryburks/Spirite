@@ -49,10 +49,10 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     var boxWidth by OnChangeDelegate(boxWidth, {rebuild()})
     var boxHeight by OnChangeDelegate(boxHeight, {rebuild()})
 
-    override val selectedIndexBind = Bindable(0, { new, old ->
+    override val selectedIndexBind = Bindable(0) { new, old ->
         _entries.getOrNull(old)?.component?.setSelected(false)
         _entries.getOrNull(new)?.component?.setSelected(true)
-    })
+    }
     override var selectedIndex: Int
         get() = selectedIndexBind.field
         set(value) {
@@ -134,7 +134,7 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
     })
 
     protected fun rebuild(){
-        with( del, {
+        with( del) {
             val w = width
 
             numPerRow = max( 1, w/boxWidth)
@@ -154,7 +154,7 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
                     }
                 }
             }
-        })
+        }
     }
 
     interface IBoxListImp {

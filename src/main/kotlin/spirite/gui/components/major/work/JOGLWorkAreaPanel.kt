@@ -6,13 +6,20 @@ import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
 import com.jogamp.opengl.awt.GLJPanel
+import jpen.*
+import jpen.PButton.Type.*
+import jpen.event.PenListener
+import jpen.owner.multiAwt.AwtPenToolkit
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
+import spirite.base.util.round
+import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
+import javax.swing.SwingUtilities
 
 class JOGLWorkAreaPanel
 private constructor(
@@ -30,27 +37,80 @@ private constructor(
     override val scomponent: ISwComponent get() = this
 
     init {
+        canvas.skipGLOrientationVerticalFlip = true
         Hybrid.timing.createTimer(50, true){redraw()}
+
+        fun MButtonFromPButton( pbutton: PButton) = when(pbutton.type) {
+            LEFT -> MouseButton.LEFT
+            RIGHT -> MouseButton.RIGHT
+            CENTER -> MouseButton.CENTER
+            else -> null
+        }
+
+        AwtPenToolkit.addPenListener(canvas, object: PenListener {
+            override fun penKindEvent(evt: PKindEvent) {
+                SwingUtilities.invokeLater {
+                    // TODO: Switch between active sets
+                    when (evt.kind.type) {
+                        PKind.Type.CURSOR -> {
+                        }
+                        PKind.Type.STYLUS -> {
+                        }
+                        PKind.Type.ERASER -> {
+                        }
+                        else -> {
+                        }
+                    }
+                }
+            }
+
+            override fun penButtonEvent(evt: PButtonEvent) {
+                val button = MButtonFromPButton(evt.button) ?: return
+
+                SwingUtilities.invokeLater {
+                    when (evt.button.value) {
+                        true -> penner.penDown(button)
+                        false -> penner.penUp(button)
+                    }
+                }
+            }
+
+            override fun penTock(p0: Long) {}
+
+            override fun penLevelEvent(evt: PLevelEvent) {
+                evt.levels.forEach { level ->
+                    when( level.type ) {
+                        PLevel.Type.X -> penner.rawUpdateX(level.value.round)
+                        PLevel.Type.Y -> penner.rawUpdateY(level.value.round)
+                        PLevel.Type.PRESSURE -> penner.rawUpdatePressure(level.value)
+                        else -> {}
+                    }
+                }
+            }
+
+            override fun penScrollEvent(p0: PScrollEvent) {}
+
+        })
 
         onMouseMove = {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
-            penner.rawUpdateX(it.point.x)
-            penner.rawUpdateY(it.point.y)
+            //penner.rawUpdateX(it.point.x)
+            //penner.rawUpdateY(it.point.y)
         }
         onMouseDrag = onMouseMove
         onMousePress = {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
-            penner.penDown(it.button)
+           // penner.penDown(it.button)
         }
         onMouseRelease = {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
-            penner.penUp(it.button)
+            //penner.penUp(it.button)
         }
 
         canvas.addGLEventListener(object : GLEventListener {
@@ -63,7 +123,7 @@ private constructor(
                 val h = drawable.surfaceHeight
 
                 val gle = Hybrid.gle
-                val glgc = GLGraphicsContext(w, h, true, gle, false)
+                val glgc = GLGraphicsContext(w, h, false, gle, false)
 
                 JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)

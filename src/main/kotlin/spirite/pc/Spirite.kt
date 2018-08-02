@@ -14,6 +14,7 @@ fun main( args: Array<String>) {
     try {
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
+
             EngineLaunchpoint.gle
             master = MasterControl()
             master.frameManager.initUi()

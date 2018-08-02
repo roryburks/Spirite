@@ -59,10 +59,11 @@ class ToolSection (
         }
 
     }
-    private val wl = master.toolsetManager.selectedToolBinding.addWeakListener { new, old ->
-        imp.selected = new
-    }
+    private val wl = master.toolsetManager.selectedToolBinding.addListener { new, old -> imp.selected = new }
 
+    override fun close() {
+        wl.unbind()
+    }
 }
 
 class ToolButton( val tool: Tool) : SwToggleButton(false, SwToolButtonImp(tool))
