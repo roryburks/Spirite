@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/../../../J/_S/Spirite" />
+        <option name="gradleHome" value="C:/ProgramData/chocolatey/lib/gradle/tools/gradle-4.6" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
