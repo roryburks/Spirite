@@ -5,6 +5,8 @@ import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.hybrid.EngineLaunchpoint
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType.FATAL
+import spirite.pc.util.RasterHelper
+import java.awt.image.BufferedImage
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
@@ -14,6 +16,8 @@ fun main( args: Array<String>) {
     try {
         UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName())
         SwingUtilities.invokeAndWait {
+            val bi = BufferedImage(10,10,BufferedImage.TYPE_4BYTE_ABGR)
+            RasterHelper.getDataStorageFromBi(bi)
 
             EngineLaunchpoint.gle
             master = MasterControl()

@@ -3,6 +3,8 @@ package spirite.pc.gui.basic
 import spirite.gui.components.basic.IButton
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.border.BevelBorder
@@ -24,6 +26,17 @@ private constructor( val imp: SwButtonImp)
         var action: (() -> Unit)? = null
 
         init {
+            println(mouseListeners.size)
+
+            addMouseListener(object : MouseListener{
+                override fun mouseReleased(e: MouseEvent?) {}
+                override fun mouseEntered(e: MouseEvent?) {}
+                override fun mouseClicked(e: MouseEvent?) {}
+                override fun mouseExited(e: MouseEvent?) {}
+                override fun mousePressed(e: MouseEvent?) {}
+
+            })
+
             text = str
             background = Skin.Global.BgDark.jcolor
             foreground = Skin.Global.Text.jcolor

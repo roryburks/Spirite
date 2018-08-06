@@ -1,6 +1,5 @@
 package spirite.hybrid
 
-import jspirite.rasters.RasterHelper
 import spirite.base.graphics.IImage
 import spirite.base.graphics.gl.GLEException
 import spirite.base.graphics.gl.IGLEngine
@@ -10,6 +9,7 @@ import spirite.base.util.glu.GLC
 import spirite.pc.JOGL.JOGL.JOGLTextureSource
 import spirite.pc.graphics.ImageBI
 import spirite.pc.toBufferedImage
+import spirite.pc.util.RasterHelper
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
@@ -54,7 +54,7 @@ class ImageConverter(
         when( image) {
             is ImageBI -> {
 
-                val storage = RasterHelper.GetDataStorageFromBi(image.bi)
+                val storage = RasterHelper.getDataStorageFromBi(image.bi)
 
                 when( storage) {
                     is ByteArray -> {

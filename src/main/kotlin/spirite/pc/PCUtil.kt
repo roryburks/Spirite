@@ -1,12 +1,12 @@
 package spirite.pc
 
-import jspirite.rasters.RasterHelper
 import spirite.base.graphics.gl.IGLEngine
 import spirite.base.graphics.gl.GLImage
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.MutableTransform
 import spirite.base.util.linear.Transform
 import spirite.pc.JOGL.JOGL.JOGLInt32Source
+import spirite.pc.util.RasterHelper
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.nio.IntBuffer
@@ -34,7 +34,7 @@ fun IGLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : Buff
         BufferedImage.TYPE_INT_ARGB_PRE -> {
             val bi = BufferedImage(width, height, type)
 
-            val internalStorage = RasterHelper.GetDataStorageFromBi(bi) as IntArray
+            val internalStorage = RasterHelper.getDataStorageFromBi(bi) as IntArray
             val ib = IntBuffer.wrap( internalStorage)
 
             getGl().readPixels( 0, 0, width, height,

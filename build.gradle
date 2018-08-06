@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.60'
 
     repositories {
         mavenCentral()
@@ -14,6 +14,10 @@ version '0.2.0'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
+
+//compileJava {
+//    options.compilerArgs << '--add-exports java.desktop/sun.awt.image=ALL-UNNAMED'
+//}
 
 sourceCompatibility = 1.8
 
