@@ -7,6 +7,8 @@ import spirite.gui.components.basic.IToggleButtonNonUI
 import spirite.gui.components.basic.ToggleButtonNonUI
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import javax.swing.JToggleButton
 
 
@@ -39,10 +41,23 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
 
     init {
         checkBind.addRootListener { new, old -> imp.isSelected = new }
-        imp.addItemListener{checked = imp.isSelected}
         setBasicBorder(BEVELED_RAISED)
         background = Skin.Global.BgDark.scolor
+
+
+        imp.addMouseListener(object : MouseListener {
+            override fun mouseReleased(e: MouseEvent?) { if( enabled) checked = !checked }
+            override fun mouseEntered(e: MouseEvent?) {}
+            override fun mouseClicked(e: MouseEvent?) {}
+            override fun mouseExited(e: MouseEvent?) {}
+            override fun mousePressed(e: MouseEvent?) {}
+        })
     }
 
     private class SwToggleButtonImp : JToggleButton()
+    {
+        init {
+            mouseListeners.forEach { removeMouseListener(it)}
+        }
+    }
 }

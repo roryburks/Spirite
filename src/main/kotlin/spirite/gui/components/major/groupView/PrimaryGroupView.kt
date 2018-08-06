@@ -108,11 +108,14 @@ private constructor(
 
         override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
 
+        override fun canDrag(): Boolean = true
         override fun canImport(trans: Transferable) = trans.isDataFlavorSupported(NodeTransferable.FLAVOR)
         override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
-            val node = trans.getTransferData(NodeTransferable.FLAVOR) as Node
+            val node = trans.getTransferData(NodeTransferable.FLAVOR) as? Node ?: return
             val relativeTo = dropInto.value
             val groupTree = workspace?.groupTree ?: return
+
+            if( node == relativeTo) return
 
             when( dropDirection) {
                 ABOVE -> {groupTree.moveAbove(node, relativeTo)}
@@ -131,6 +134,5 @@ private constructor(
         override fun workspaceChanged(selectedWorkspace: IImageWorkspace?, previousSelected: IImageWorkspace?) {
             rebuild()
         }
-
     }.apply { master.workspaceSet.workspaceObserver.addObserver(this) }
 }

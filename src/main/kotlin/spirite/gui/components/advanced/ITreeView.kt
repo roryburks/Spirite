@@ -25,6 +25,7 @@ import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
+import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import kotlin.math.exp
@@ -176,7 +177,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
             compToNodeMap.put(component, node)
             node.component = component
             node.lComponent = leftComponent
+
             dnd.addDropSource(component.jcomponent)
+
             component.onMouseClick = {
                 selectedNode = node
             }
@@ -349,13 +352,13 @@ private constructor(private val imp : SwTreeViewImp<T>)
     private var draggingDirection : DropDirection = ABOVE
 
 
-    private inner class BTDnDManager : DropTarget(), DragGestureListener, DragSourceListener
+    private inner class BTDnDManager : DropTarget(), DragSourceListener
     {
 
         val dragSource = DragSource.getDefaultDragSource()
 
-        fun addDropSource(component: Component) {
-            dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, this)
+        fun addDropSource(component: Component, root: Boolean = false) {
+            dragSource.createDefaultDragGestureRecognizer(component, DnDConstants.ACTION_COPY_OR_MOVE, if(root) rootDragListener else componentBasedDragListener)
         }
 
         override fun drop(evt: DropTargetDropEvent) {
@@ -421,10 +424,25 @@ private constructor(private val imp : SwTreeViewImp<T>)
         // endregion
 
         // region DragGestureListener
-        override fun dragGestureRecognized(evt: DragGestureEvent) {
-            if( dragging != null) return
+        val componentBasedDragListener : DragGestureListener = object : DragGestureListener {
+            override fun dragGestureRecognized(evt: DragGestureEvent) {
+                if( dragging != null) return
 
-            val node = compToNodeMap.entries.firstOrNull { it.key.jcomponent == evt.component}?.value ?: return
+                val node = compToNodeMap.entries.firstOrNull { it.key.jcomponent == evt.component}?.value ?: return
+                recognized(evt, node)
+            }
+        }
+
+        val rootDragListener = object : DragGestureListener {
+            override fun dragGestureRecognized(evt: DragGestureEvent) {
+                if( dragging != null) return
+
+                val node = getNodeFromY(evt.dragOrigin.y) ?: return
+                recognized(evt, node)
+            }
+        }
+
+        private fun recognized( evt: DragGestureEvent, node: TreeNode<T>) {
             if( node.attributes.canDrag()) {
                 dragging = node
 
@@ -471,6 +489,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
     private val lowestChild: TreeNode<T>? get() {
         var node = rootNodes.lastOrNull() ?: return null
+
 
         while (true) {
             node = node.children.lastOrNull() ?: return node
@@ -535,4 +554,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
     }
 
     //endregion
+
+    init {
+        dnd.addDropSource(this.jcomponent, true)
+    }
 }

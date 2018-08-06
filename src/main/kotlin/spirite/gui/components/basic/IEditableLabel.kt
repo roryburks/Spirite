@@ -112,6 +112,19 @@ private constructor(
                 override fun mouseExited(e: MouseEvent?) = parent.dispatchEvent(e)
                 override fun mousePressed(e: MouseEvent?) {parent.dispatchEvent(e)}
             })
+
+
+            addMouseMotionListener( object : MouseMotionListener {
+                override fun mouseMoved(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseDragged(e: MouseEvent?) = parent.dispatchEvent(e)
+            })
+            addMouseListener( object : MouseListener {
+                override fun mouseReleased(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseEntered(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseClicked(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseExited(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mousePressed(e: MouseEvent?) = parent.dispatchEvent(e)
+            })
         }
     }
     private inner class SwETextArea(text: String) : JTextArea(text) {
@@ -121,10 +134,16 @@ private constructor(
             background = null
             isOpaque = false
 
-
-            addFocusListener( object : FocusListener {
-                override fun focusLost(e: FocusEvent?) = doneEditing()
-                override fun focusGained(e: FocusEvent?) {}
+            addMouseMotionListener( object : MouseMotionListener {
+                override fun mouseMoved(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseDragged(e: MouseEvent?) = parent.dispatchEvent(e)
+            })
+            addMouseListener( object : MouseListener {
+                override fun mouseReleased(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseEntered(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseClicked(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mouseExited(e: MouseEvent?) = parent.dispatchEvent(e)
+                override fun mousePressed(e: MouseEvent?) = parent.dispatchEvent(e)
             })
 
             inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter")

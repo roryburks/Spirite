@@ -177,11 +177,10 @@ abstract class ASwComponent : ISwComponent {
 
         override fun mouseReleased(e: JMouseEvent) {
             onMouseRelease?.invoke( convert(e))
-            if( e.component.bounds.contains(e.point) && MathUtil.distance(startX.f, startY.f, e.x.f, e.y.f) < 4)
-                onMouseClick?.invoke(convert(e))
+            onMouseClick?.invoke(convert(e))
         }
         override fun mouseEntered(e: JMouseEvent) { onMouseEnter?.invoke( convert(e))}
-        override fun mouseClicked(e: JMouseEvent) {onMouseClick?.invoke(convert(e))}
+        override fun mouseClicked(e: JMouseEvent) {/*onMouseClick?.invoke(convert(e))*/}
         override fun mouseExited(e: JMouseEvent) {onMouseExit?.invoke(convert(e))}
         override fun mousePressed(e: JMouseEvent) {
             startX = e.x

@@ -26,15 +26,14 @@ private constructor( val imp: SwButtonImp)
         var action: (() -> Unit)? = null
 
         init {
-            println(mouseListeners.size)
+            mouseListeners.forEach { removeMouseListener(it)}
 
             addMouseListener(object : MouseListener{
-                override fun mouseReleased(e: MouseEvent?) {}
+                override fun mouseReleased(e: MouseEvent?) { if( isEnabled) action?.invoke() }
                 override fun mouseEntered(e: MouseEvent?) {}
                 override fun mouseClicked(e: MouseEvent?) {}
                 override fun mouseExited(e: MouseEvent?) {}
                 override fun mousePressed(e: MouseEvent?) {}
-
             })
 
             text = str
@@ -42,8 +41,6 @@ private constructor( val imp: SwButtonImp)
             foreground = Skin.Global.Text.jcolor
             border = BorderFactory.createBevelBorder(
                     BevelBorder.RAISED, Skin.BevelBorder.Med.jcolor, Skin.BevelBorder.Dark.jcolor)
-
-            addActionListener { action?.invoke() }
         }
     }
 }
