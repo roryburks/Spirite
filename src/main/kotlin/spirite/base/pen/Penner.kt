@@ -46,7 +46,7 @@ class Penner(
         val paletteManager: IPaletteManager)
     : IPenner
 {
-
+    var holdingSpace = false
     var holdingShift = false
     var holdingAlt = false
     var holdingCtrl = false
@@ -119,24 +119,25 @@ class Penner(
                 val color = paletteManager.activeBelt.getColor(if( button == LEFT) 0 else 1)
                 val offColor = paletteManager.activeBelt.getColor(if( button == LEFT) 1 else 0)
 
-                when( tool) {
-                    is Pen -> when {
+                when {
+                    holdingSpace -> context.currentView?.also { behavior =  MovingViewBehavior(this,it )}
+                    tool is Pen -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
                         drawer is IStrokeModule -> behavior = PenBehavior.Stroke(this, drawer, color)
                         else -> Hybrid.beep()
                     }
-                    is Pixel -> when {
+                    tool is Pixel -> when {
                         holdingCtrl -> behavior = PickBehavior( this, button == LEFT)
                         drawer is IStrokeModule -> behavior = PixelBehavior.Stroke( this, drawer, color)
                         else -> Hybrid.beep()
                     }
-                    is Eraser ->
+                    tool is Eraser ->
                         if( drawer is IStrokeModule) behavior = EraserBehavior.Stroke( this, drawer, color)
                         else Hybrid.beep()
-                    is Fill ->
+                    tool is Fill ->
                         if( drawer is IFillModule) drawer.fill(x, y, if(holdingCtrl) Colors.TRANSPARENT else color)
                         else Hybrid.beep()
-                    is Move -> {
+                    tool is Move -> {
                         val selected = workspace.groupTree.selectedNode
                         when {
                             workspace.selectionEngine.selection != null  -> behavior = MovingSelectionBehavior(this)
@@ -144,8 +145,8 @@ class Penner(
                         }
                     }
 
-                    is ShapeSelection,
-                    is FreeSelection-> {
+                    tool is ShapeSelection ||
+                    tool is FreeSelection-> {
                         if(!holdingShift && !holdingCtrl && workspace.selectionEngine.selection?.contains(x,y) == true) {
                             behavior = MovingSelectionBehavior(this)
                         }
@@ -162,20 +163,20 @@ class Penner(
                             }
                         }
                     }
-                    is ColorChanger ->
+                    tool is ColorChanger ->
                         if( drawer is IColorChangeModule) drawer.changeColor( color, offColor, toolsetManager.toolset.ColorChanger.mode)
                         else Hybrid.beep()
-                    is Flip -> when {
+                    tool is Flip -> when {
                         drawer !is IFlipModule -> Hybrid.beep()
                         tool.flipMode == HORIZONTAL -> drawer.flip(true)
                         tool.flipMode == VERTICAL -> drawer.flip(false)
                         tool.flipMode == BY_MOVEMENT -> behavior = FlippingBehavior(this, drawer)
                     }
-                    is Reshaper -> {
+                    tool is Reshaper -> {
                         if( drawer is ITransformModule) behavior = ReshapingBehavior(this, drawer)
                         else Hybrid.beep()
                     }
-                    is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
+                    tool is ColorPicker -> behavior = PickBehavior( this, button == LEFT)
                 }
             }
         }
