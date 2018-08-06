@@ -1,6 +1,7 @@
 package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
+import spirite.base.imageData.groupTree.GroupTree
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
@@ -23,7 +24,7 @@ private constructor(
     init {
         panel.setLayout {
             rows.padding = 2
-            rows.add( NodeProperties())
+            rows.add( NodeProperties(master))
             rows.addGap(2)
             val tabPane = Hybrid.ui.TabbedPane()
             tabPane.addTab("Primary", PrimaryGroupView(master))
@@ -43,12 +44,18 @@ private constructor(
 }
 
 class NodeProperties
-private constructor( val panel : ICrossPanel)
+private constructor(
+        val master: IMasterControl,
+        val panel : ICrossPanel)
     : IComponent by panel
 {
-    constructor() : this( panel = Hybrid.ui.CrossPanel())
+    constructor(master: IMasterControl) : this(master,  panel = Hybrid.ui.CrossPanel())
 
     init {
+        val slider = Hybrid.ui.GradientSlider()
+        slider.valueBind.addRootListener { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
+        master.centralObservatory.selectedNode.addWeakListener { new, _ ->  if( new != null) slider.value = new.alpha}
+
         panel.setLayout {
             rows.padding = 2
             rows += {
@@ -56,7 +63,7 @@ private constructor( val panel : ICrossPanel)
                 this.add( Hybrid.ui.ComboBox(spirite.base.graphics.RenderMethodType.values()), height = 16, flex = 100f)
             }
             rows.addGap(2)
-            rows.add( Hybrid.ui.GradientSlider(), height = 24)
+            rows.add( slider, height = 24)
         }
     }
 }

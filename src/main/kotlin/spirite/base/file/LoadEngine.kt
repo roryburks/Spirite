@@ -256,7 +256,7 @@ object LoadEngine {
             }
 
             val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
-            val type =  if(context.version < 0x0001_0000) ra.readInt() else ra.readUnsignedByte()
+            val type =  ra.readUnsignedByte()
 
             // !!!! Kind of hack-y that it's even saved, but only the root node should be
             //	depth 0 and there should only be one (and it's already created)
@@ -342,7 +342,7 @@ object LoadEngine {
         val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
-            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
+            val name = if( context.version == 0x1_0000) "animation" else SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val type = ra.readByte().i
             val animation = when( type) {
                 SaveLoadUtil.ANIM_FFA -> {
