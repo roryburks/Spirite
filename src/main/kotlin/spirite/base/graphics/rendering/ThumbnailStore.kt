@@ -14,6 +14,7 @@ import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
+import java.awt.image.BufferedImage
 
 interface IThumbnailStore
 {
@@ -26,7 +27,12 @@ interface IThumbnailStoreBi
 }
 class ThumbnailStoreBi(settings: ISettingsManager, centralObservatory: ICentralObservatory, private val originalStore: IThumbnailStore): IThumbnailStoreBi
 {
+    private val useOnlyBi = true
+    private val onlyBi = ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR))
+
     override fun accessThumbnail(node: Node, workspace: IImageWorkspace) : ImageBI {
+        if( useOnlyBi) return onlyBi
+
         val key = Pair(workspace, node)
 
         val now = Hybrid.timing.currentMilli
