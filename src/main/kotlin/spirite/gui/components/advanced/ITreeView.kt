@@ -30,6 +30,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import kotlin.math.exp
 import kotlin.math.max
+import kotlin.math.min
 
 interface ITreeViewNonUI<T>{
     var gapSize: Int
@@ -78,7 +79,7 @@ interface ITreeViewNonUI<T>{
         fun canDrag() : Boolean = false
         fun makeCursor( t: T) : IImage = NillImage
         fun makeTransferable( t: T) : Transferable = StringSelection(toString())
-        fun dragOut() {}
+        fun dragOut(t:T, up: Boolean, inArea: Boolean) {}
         override fun canImport(trans: Transferable) : Boolean = false
         override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<T>, dropDirection: DropDirection) {}
 
@@ -306,6 +307,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
         internal var lComponent : IComponent? = null
         internal var component : IComponent? = null
 
+        internal val y get() = listOfNotNull(lComponent?.y, component?.y).min()?: 0
+        internal val height get() = listOfNotNull(lComponent?.run { height }, component?.run { height }).max() ?: 0
+
         init {
             // I never love InvokeLaters.  This exists so that the batch Construct can exist without forcing this to
             //   be called before lComponent and component are built (which happens on buildTree)
@@ -362,12 +366,17 @@ private constructor(private val imp : SwTreeViewImp<T>)
         }
 
         override fun drop(evt: DropTargetDropEvent) {
-            val draggingRelativeTo = draggingRelativeTo
-            if( draggingRelativeTo == dragging && dragging != null) return
+            try {
+                val draggingRelativeTo = draggingRelativeTo
+                if (draggingRelativeTo == dragging && dragging != null) return
 
-            val interpreter = (if(draggingRelativeTo == null)  treeRootInterpreter else draggingRelativeTo.attributes) ?: return
-            if( interpreter.canImport(evt.transferable) && draggingRelativeTo != null)
-                interpreter.interpretDrop(evt.transferable, draggingRelativeTo, draggingDirection)
+                val interpreter = (if (draggingRelativeTo == null) treeRootInterpreter else draggingRelativeTo.attributes)
+                        ?: return
+                if (interpreter.canImport(evt.transferable) && draggingRelativeTo != null)
+                    interpreter.interpretDrop(evt.transferable, draggingRelativeTo, draggingDirection)
+            }finally {
+                dragging = null
+            }
         }
 
         override fun dragOver(evt: DropTargetDragEvent) {
@@ -415,8 +424,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
             val p = evt.location
             SwingUtilities.convertPointFromScreen(evt.location, imp)
 
-            if( bounds.contains(p.x, p.y))
-                dragging?.attributes?.dragOut()
+            val inArea = bounds.contains(p.x, p.y)
+            val up = p.y < compToNodeMap.keys.map { it.y }.max() ?: 0
+            val t = dragging?.value
+            if( t != null) dragging?.attributes?.dragOut(t, up, inArea)
 
             dragging = null
             redraw()
@@ -527,7 +538,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
                         val lowest = lowestChild
                         when( lowest) {
                             null -> 0
-                            else -> lowest.component?.run { y + height } ?: return
+                            else -> lowest.height
                         }
                     }
                 }
@@ -535,7 +546,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             }
             dragging -> {}
             else -> {
-                val comp = draggingRelativeTo.component ?: return
+                val comp = draggingRelativeTo
                 when( draggingDirection) {
                     ABOVE -> {
                         val dy = comp.y

@@ -24,6 +24,8 @@ open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
     }
 
     fun moveAbove( nodeToMove: Node, nodeAbove: Node) {
+        if( nodeToMove.nextNode == nodeAbove) return
+
         val newParent = nodeAbove.parent
         if( newParent == null ) {
             MDebug.handleWarning(STRUCTURAL, "Attempted to move a node after a root or detatched node")
@@ -33,6 +35,8 @@ open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
     }
 
     fun moveBelow( nodeToMove: Node, nodeUnder: Node) {
+        if( nodeToMove.previousNode == nodeUnder) return
+
         val newParent = nodeUnder.parent
         if( newParent == null) {
             MDebug.handleWarning(STRUCTURAL, "Attempted to move a node before a root or detatched node")
