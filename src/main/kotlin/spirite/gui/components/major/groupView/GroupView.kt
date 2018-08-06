@@ -1,7 +1,9 @@
 package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
+import spirite.base.graphics.RenderMethod
 import spirite.base.imageData.groupTree.GroupTree
+import spirite.base.util.ColorARGB32Normal
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
@@ -51,19 +53,46 @@ private constructor(
 {
     constructor(master: IMasterControl) : this(master,  panel = Hybrid.ui.CrossPanel())
 
+    val slider = Hybrid.ui.GradientSlider()
+    val comboBox = Hybrid.ui.ComboBox(spirite.base.graphics.RenderMethodType.values())
+    val colorBox = Hybrid.ui.ColorSquare()
+
     init {
-        val slider = Hybrid.ui.GradientSlider()
         slider.valueBind.addRootListener { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
-        master.centralObservatory.selectedNode.addWeakListener { new, _ ->  if( new != null) slider.value = new.alpha}
+
+        comboBox.selectedItemBind.addRootListener { new, old ->
+            val node =  master.centralObservatory.selectedNode.field
+            if( node != null) {
+                node.method = node.method.copy(methodType = new)
+            }
+        }
+
+        colorBox.colorBind.addRootListener { new, old ->
+            val node =  master.centralObservatory.selectedNode.field
+            if( node != null) {
+                node.method = node.method.copy(renderValue = new.argb32)
+            }
+        }
+
+
 
         panel.setLayout {
             rows.padding = 2
             rows += {
                 this.add( Hybrid.ui.Label("Mode: "))
-                this.add( Hybrid.ui.ComboBox(spirite.base.graphics.RenderMethodType.values()), height = 16, flex = 100f)
+                this.add( comboBox, height = 16, flex = 100f)
+                this.add(colorBox, 16, 16)
             }
             rows.addGap(2)
             rows.add( slider, height = 24)
+        }
+    }
+
+    val listener = master.centralObservatory.selectedNode.addWeakListener { new, _ ->
+        if( new != null) {
+            slider.value = new.alpha
+            comboBox.selectedItem = new.method.methodType
+            colorBox.color = ColorARGB32Normal(new.method.renderValue)
         }
     }
 }
