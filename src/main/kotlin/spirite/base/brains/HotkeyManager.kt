@@ -68,6 +68,8 @@ private val defaultHotkeys = mapOf(
         PaletteCommand.SWAP_BACK.keyCommand to (Hotkey( KeyEvent.VK_Z, 0)),
 
         NodeCommand.NEW_GROUP.keyCommand to (Hotkey(KeyEvent.VK_INSERT, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommand.MOVE_DOWN.keyCommand to (Hotkey(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommand.MOVE_UP.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
 
         DrawCommand.QUICK_NEW_LAYER.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
         DrawCommand.UNDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),

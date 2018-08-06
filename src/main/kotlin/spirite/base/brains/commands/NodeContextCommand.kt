@@ -6,6 +6,7 @@ import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug
 
@@ -32,7 +33,9 @@ class NodeContextCommand(
         INSERT_GROUP_IN_ANIMATION("addGroupToAnim"),
         GIF_FROM_FROUP("gifFromGroup"),
         MERGE_DOWN("mergeDown"),
-        NEW_RIG_ANIMATION("newRigAnimation")
+        NEW_RIG_ANIMATION("newRigAnimation"),
+        MOVE_UP("moveUp"),
+        MOVE_DOWN("moveDown"),
         ;
 
         override val commandString: String get() = "node.$string"
@@ -70,6 +73,44 @@ class NodeContextCommand(
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()
             NEW_RIG_ANIMATION.string -> TODO()
+            MOVE_UP.string -> {
+                node ?: return false
+
+                val tree : MovableGroupTree = when {
+                    node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
+                    else -> return false
+                }
+
+                val previousNode = node.previousNode
+                when(previousNode) {
+                    null -> {
+                        val parent = node.parent ?: return false
+                        parent.parent ?: return false
+                        tree.moveAbove( node, parent)
+                    }
+                    is GroupNode -> tree.moveInto(node, previousNode, false)
+                    else -> tree.moveAbove(node, previousNode)
+                }
+            }
+            MOVE_DOWN.string -> {
+                node ?: return false
+
+                val tree : MovableGroupTree = when {
+                    node.isChildOf(workspace.groupTree.root) -> workspace.groupTree
+                    else -> return false
+                }
+
+                val nextNode = node.nextNode
+                when(nextNode) {
+                    null -> {
+                        val parent = node.parent ?: return false
+                        parent.parent ?: return false
+                        tree.moveBelow( node, parent)
+                    }
+                    is GroupNode -> tree.moveInto(node, nextNode, true)
+                    else -> tree.moveBelow(node, nextNode)
+                }
+            }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")
         }

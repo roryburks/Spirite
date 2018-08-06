@@ -57,7 +57,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
             addGap(2)
             add(btnNext, width = 24, height = 24)
             addGap(5)
-            add(ffFps, width = 128)
+            add(ffFps, width = 128, height = 24)
             add(Hybrid.ui.Label("FPS"))
             addGap(3)
             add(bgColorBox, width = 24, height = 24)
@@ -82,7 +82,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
     private val metBind = Bindable(0f) { new, _ -> sliderMet.value = (new * 100).floor ; viewPanel.redraw()}
     init {
-        sliderMet.valueBind.addListener { new, _ ->  metBind.field = new / 100f }
+        sliderMet.onMouseDrag = {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
     }
