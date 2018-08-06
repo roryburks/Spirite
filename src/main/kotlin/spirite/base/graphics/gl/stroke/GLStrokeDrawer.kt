@@ -85,7 +85,7 @@ abstract class GLStrokeDrawer(val gle: IGLEngine)
             strokeParams.mode == KEEP_ALPHA -> glgc.composite = SRC_ATOP
         }
 
-        glgc.applyPassProgram(StrokeV2ApplyCall(strokeParams.color.rgbComponent, strokeParams.alpha * gc.alpha, getIntensifyMethod(strokeParams)), image)
+        glgc.applyPassProgram(StrokeApplyCall(strokeParams.color.rgbComponent, strokeParams.alpha * gc.alpha), image)
 
         glgc.popState()
     }

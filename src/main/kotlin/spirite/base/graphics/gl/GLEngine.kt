@@ -2,6 +2,8 @@ package spirite.base.graphics.gl
 
 import spirite.base.graphics.CapMethod
 import spirite.base.graphics.JoinMethod
+import spirite.base.graphics.gl.ProgramType.STROKE_V2_LINE_PASS
+import spirite.base.graphics.gl.ProgramType.STROKE_V3_LINE_PASS
 import spirite.base.graphics.gl.shader.GL330ShaderLoader
 import spirite.base.resources.IScriptService
 import spirite.base.util.glu.GLC
@@ -324,11 +326,14 @@ class GLEngine(
             }
         }
 
-        if( programCall.programType == ProgramType.STROKE_V2_LINE_PASS) {
-            gl.enable(GLC.LINE_SMOOTH)
-            gl.enable(GLC.BLEND)
-            gl.depthMask(false)
-            gl.lineWidth(1f)
+        when( programCall.programType) {
+            STROKE_V2_LINE_PASS,
+            STROKE_V3_LINE_PASS -> {
+                gl.enable(GLC.LINE_SMOOTH)
+                gl.enable(GLC.BLEND)
+                gl.depthMask(false)
+                gl.lineWidth(1f)
+            }
         }
 
         // Draw
@@ -352,7 +357,7 @@ class GLEngine(
         // Construct flags
         val flags =
                 (if( params.premultiplied) 1 else 0) +
-                ((if( params.texture1?.premultiplied == true) 1 else 0) shl 1)
+                        ((if( params.texture1?.premultiplied == true) 1 else 0) shl 1)
 
         internalParams.add(GLUniform1i("u_flags", flags))
 

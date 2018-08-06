@@ -52,8 +52,8 @@ private val defaultHotkeys = mapOf(
         ViewCommand.ZOOM_OUT_SLOW.keyCommand to (Hotkey( KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK)),
         ViewCommand.ZOOM_0.keyCommand to (Hotkey( KeyEvent.VK_NUMPAD0, InputEvent.CTRL_DOWN_MASK)),
 
-        ToolCommand.Pen.keyCommand to (Hotkey( KeyEvent.VK_P, 0)),
-        ToolCommand.Eraser.keyCommand to (Hotkey( KeyEvent.VK_E, InputEvent.SHIFT_DOWN_MASK)),
+        ToolCommand.Pen.keyCommand to (Hotkey( KeyEvent.VK_B, 0)),
+        ToolCommand.Eraser.keyCommand to (Hotkey( KeyEvent.VK_E, 0)),
         ToolCommand.Fill.keyCommand to (Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK)),
         ToolCommand.ShapeSelection.keyCommand to (Hotkey( KeyEvent.VK_R, 0)),
         ToolCommand.Move.keyCommand to (Hotkey( KeyEvent.VK_M, 0)),
