@@ -29,26 +29,50 @@ import spirite.hybrid.MDebug.WarningType
 /**
  *  A SpriteLayer is a collection of Dynamic Mediums with various offsets, transforms, and
  */
-class SpriteLayer(
-        val workspace: IImageWorkspace,
-        val mediumRepo: MMediumRepository,
-        toImport: List<Pair<MediumHandle,SpritePartStructure>>? = null
-) : Layer {
+class SpriteLayer : Layer {
 
-    val undoEngine = workspace.undoEngine
+    constructor(
+            workspace: IImageWorkspace,
+            mediumRepo: MMediumRepository)
+    {
+        this.workspace = workspace
+        this.mediumRepo = mediumRepo
+        _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
+        activePart = _parts.firstOrNull()
+    }
+
+    constructor(
+            workspace: IImageWorkspace,
+            mediumRepo: MMediumRepository,
+            toImport: List<Pair<MediumHandle,SpritePartStructure>>)
+    {
+        this.workspace = workspace
+        this.mediumRepo = mediumRepo
+        toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
+        _sort()
+        activePart = _parts.firstOrNull()
+    }
+
+    constructor(
+            toImport : List<SpritePartStructure>,
+            workspace: IImageWorkspace,
+            mediumRepo: MMediumRepository)
+    {
+        this.workspace = workspace
+        this.mediumRepo = mediumRepo
+        toImport.forEach {
+            _parts.add(SpritePart(it, mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
+        }
+        _sort()
+        activePart = _parts.firstOrNull()
+    }
+
+    val workspace: IImageWorkspace
+    val mediumRepo: MMediumRepository
+    val undoEngine get() = workspace.undoEngine
     val parts : List<SpritePart> get() = _parts
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
-
-    init {
-        when( toImport) {
-            null -> _parts.add(SpritePart(SpritePartStructure(0, "base"), mediumRepo.addMedium(DynamicMedium(workspace, mediumRepo = mediumRepo)), workingId++))
-            else -> {
-                toImport.forEach {_parts.add(SpritePart(it.second, it.first, workingId++))}
-                _sort()
-            }
-        }
-    }
 
     var activePartBind =  Bindable<SpritePart?>(null) { new, _ ->
         cAlphaBind.field = new?.alpha ?: 1f
@@ -81,10 +105,15 @@ class SpriteLayer(
     // region ILayer methods
 
 //    private val _keyPointsDerived = DerivedLazy{ etc }
-    private val _keyPoints get() = parts.mapAggregated {
-            val tPartToWhole = it.tPartToWhole
-            listOf(Vec2(0f,0f), Vec2(0f, it.handle.height+0f), Vec2( it.handle.width+0f,0f), Vec2(it.handle.width+0f, it.handle.height+0f))
-                    .map { tPartToWhole.apply(it)}}
+    private val _keyPoints get() = parts.mapAggregated { part ->
+        val tPartToWhole = part.tPartToWhole
+                listOf(
+                        Vec2(0f,0f),
+                        Vec2(0f, part.handle.height+0f),
+                        Vec2( part.handle.width+0f,0f),
+                        Vec2(part.handle.width+0f, part.handle.height+0f))
+                        .map { tPartToWhole.apply(it)}
+    }
 
     override val x: Int get() = _keyPoints.map { it.x.floor }.min() ?: 0
     override val y: Int get() = _keyPoints.map { it.y.floor }.min() ?: 0

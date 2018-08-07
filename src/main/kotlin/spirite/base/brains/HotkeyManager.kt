@@ -67,11 +67,12 @@ private val defaultHotkeys = mapOf(
         PaletteCommand.SWAP.keyCommand to (Hotkey( KeyEvent.VK_X, 0)),
         PaletteCommand.SWAP_BACK.keyCommand to (Hotkey( KeyEvent.VK_Z, 0)),
 
+        NodeCommand.QUICK_NEW_LAYER.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
+        NodeCommand.NEW_SPRITE_LAYER.keyCommand to Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK),
         NodeCommand.NEW_GROUP.keyCommand to (Hotkey(KeyEvent.VK_INSERT, InputEvent.CTRL_DOWN_MASK)),
         NodeCommand.MOVE_DOWN.keyCommand to (Hotkey(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK)),
         NodeCommand.MOVE_UP.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
 
-        DrawCommand.QUICK_NEW_LAYER.keyCommand to (Hotkey( KeyEvent.VK_INSERT, 0)),
         DrawCommand.UNDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
         DrawCommand.REDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         DrawCommand.CLEAR.keyCommand to (Hotkey( KeyEvent.VK_DELETE, 0)),
@@ -99,7 +100,6 @@ private val defaultHotkeys = mapOf(
 
         // TODO: This should really be anim., but that might require restructuring/rethinking of
         //	command execution system.
-        KeyCommand("draw.addGapQuick") to Hotkey( KeyEvent.VK_INSERT, InputEvent.SHIFT_DOWN_MASK),
 
         KeyCommand("global.debug1") to (Hotkey( KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 

@@ -2,6 +2,7 @@ package spirite.base.brains
 
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import kotlin.math.max
 
 interface IWorkspaceSet {
@@ -18,12 +19,13 @@ interface IWorkspaceSet {
     var currentWorkspace : IImageWorkspace?
 }
 interface MWorkspaceSet : IWorkspaceSet {
-    fun addWorkspace( workspace: IImageWorkspace, select: Boolean = true)
+    val currentMWorkspace : MImageWorkspace?
+    fun addWorkspace(workspace: MImageWorkspace, select: Boolean = true)
     fun removeWorkspace( workspace: IImageWorkspace)
 }
 
 class WorkspaceSet : MWorkspaceSet{
-    override fun addWorkspace(workspace: IImageWorkspace, select: Boolean) {
+    override fun addWorkspace(workspace: MImageWorkspace, select: Boolean) {
         workspaces.add(workspace)
         workspaceObserver.trigger { it.workspaceCreated(workspace)}
 
@@ -41,13 +43,14 @@ class WorkspaceSet : MWorkspaceSet{
         }
     }
 
-    override val currentWorkspaceBind = Bindable<IImageWorkspace?>(null, {new, old ->
+    override val currentWorkspaceBind = Bindable<IImageWorkspace?>(null) { new, old ->
         workspaceObserver.trigger { it.workspaceChanged(new, old) }
-    })
+    }
     override var currentWorkspace: IImageWorkspace? by currentWorkspaceBind
 
+    override val currentMWorkspace: MImageWorkspace? get() = currentWorkspaceBind.field as? MImageWorkspace // Badish
 
-    override val workspaces = mutableListOf<IImageWorkspace>()
+    override val workspaces = mutableListOf<MImageWorkspace>()
 
     override val workspaceObserver = Observable<WorkspaceObserver>()
 }

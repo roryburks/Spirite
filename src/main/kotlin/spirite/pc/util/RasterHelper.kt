@@ -1,7 +1,7 @@
 package spirite.pc.util
 
-//import sun.awt.image.ByteInterleavedRaster
-//import sun.awt.image.IntegerInterleavedRaster
+import sun.awt.image.ByteInterleavedRaster
+import sun.awt.image.IntegerInterleavedRaster
 import java.awt.image.BufferedImage
 
 object RasterHelper
@@ -17,8 +17,8 @@ object RasterHelper
 
         val raster = bi.raster
         return when( raster) {
-//            is ByteInterleavedRaster -> {raster.dataStorage}
-//            is IntegerInterleavedRaster -> {raster.dataStorage}
+            is ByteInterleavedRaster -> {raster.dataStorage}
+            is IntegerInterleavedRaster -> {raster.dataStorage}
             else -> null
         }
     }

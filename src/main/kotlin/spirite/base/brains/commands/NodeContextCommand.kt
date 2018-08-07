@@ -2,11 +2,15 @@ package spirite.base.brains.commands
 
 import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
+import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
+import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.groupTree.GroupTree.GroupNode
-import spirite.base.imageData.groupTree.GroupTree.Node
+import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
+import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpritePartStructure
+import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug
 
@@ -17,18 +21,20 @@ interface ICommandExecuter {
 }
 
 class NodeContextCommand(
-        val workspaceSet: IWorkspaceSet,
+        val workspaceSet: MWorkspaceSet,
         val dialogs: IDialog)
     : ICommandExecuter
 {
 
     enum class NodeCommand(val string: String) : ICommand {
         NEW_GROUP( "newGroup"),
-        DELETE("delete"),
         NEW_SIMPLE_LAYER("newSimpleLayer"),
-        DUPLICATE("duplicate"),
         NEW_SPRITE_LAYER("newSpriteLayer"),
         NEW_PUPPET_LAYER("newPuppetLayer"),
+        QUICK_NEW_LAYER("newLayer"),
+        DUPLICATE("duplicate"),
+        DELETE("delete"),
+
         ANIM_FROM_GROUP("animationFromGroup"),
         INSERT_GROUP_IN_ANIMATION("addGroupToAnim"),
         GIF_FROM_FROUP("gifFromGroup"),
@@ -44,7 +50,7 @@ class NodeContextCommand(
 
     override val validCommands: List<String> get() = NodeCommand.values().map {  it.string }
     override val domain: String get() = "node"
-    val currentWorskapce get() = workspaceSet.currentWorkspace
+    val currentWorskapce get() = workspaceSet.currentMWorkspace
 
     override fun executeCommand(string: String, extra: Any?) : Boolean{
         val workspace = currentWorskapce ?: return false
@@ -58,8 +64,8 @@ class NodeContextCommand(
                     workspace.groupTree.addNewSimpleLayer(node, name, mediumType, width, height, true)
                 }
             }
+            QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             DUPLICATE.string -> node?.also { workspace.groupTree.duplicateNode(it) }
-            NEW_SPRITE_LAYER.string -> workspace.groupTree.addNewSpriteLayer(node, "sprite")
             NEW_PUPPET_LAYER.string -> TODO()
             ANIM_FROM_GROUP.string -> {
                 val groupNode = node as? GroupNode ?: return false
@@ -110,6 +116,14 @@ class NodeContextCommand(
                     is GroupNode -> tree.moveInto(node, nextNode, true)
                     else -> tree.moveBelow(node, nextNode)
                 }
+            }
+            NEW_SPRITE_LAYER.string -> {
+                if( node is LayerNode && node.layer is SpriteLayer) {
+                    val structure = node.layer.parts.map { SpritePartStructure(it.depth, it.partName) }
+                    val layer = SpriteLayer(structure, workspace, workspace.mediumRepository)
+                    workspace.groupTree.importLayer(node, node.name, layer)
+                }
+                else workspace.groupTree.addNewSpriteLayer(node, "Sprite Layer", true)
             }
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: node.$string")

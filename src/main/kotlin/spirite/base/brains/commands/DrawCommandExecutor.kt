@@ -20,7 +20,6 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
     enum class DrawCommand(val string: String) : ICommand {
         UNDO( "undo"),
         REDO("redo"),
-        QUICK_NEW_LAYER("quickNewLayer"),
         CROP_SELECTION("cropSelection"),
         APPLY_TRANFORM("applyTranform"),
         AUTO_CROP("autoCrop"),
@@ -47,7 +46,6 @@ class DrawCommandExecutor(val workspaceSet: IWorkspaceSet, val toolsetManager: I
         when(string) {
             UNDO.string -> workspace.undoEngine.undo()
             REDO.string -> workspace.undoEngine.redo()
-            QUICK_NEW_LAYER.string -> workspace.groupTree.addNewSimpleLayer(workspace.groupTree.selectedNode, "New Layer", DYNAMIC)
             CROP_SELECTION.string -> TODO()
             APPLY_TRANFORM.string -> {
                 val reshape = toolsetManager.toolset.Reshape
