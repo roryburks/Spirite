@@ -90,18 +90,18 @@ class NewSimpleLayerPanel(
                     addGap(2)
                     add(Hybrid.ui.Label("Palette Colors:"), 120)
                     addGap(2)
-                    addFlatGroup ({
+                    addFlatGroup (20) {
                         addGap(20)
                         add(cfields[2], width = 20, height =  20)
-                    },20)
-                    addFlatGroup ({
+                    }
+                    addFlatGroup (10) {
                         addGap(10)
                         add(cfields[1], width = 20, height =  20)
-                    },10)
-                    addFlatGroup ({
+                    }
+                    addFlatGroup {
                         addGap(0)
                         add(cfields[0], width = 20, height =  20)
-                    },0)
+                    }
                     flex = 150f
                 }
                 add(Hybrid.ui.Separator(VERTICAL))

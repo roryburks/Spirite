@@ -62,15 +62,15 @@ class PaletteSection(
             rows += {
                 this += {
                     addGap(10)
-                    addFlatGroup( {
+                    addFlatGroup {
                         addGap(10)
                         add(primaryColorSquare, 24,24)
-                    })
+                    }
                     addGap(10)
-                    addFlatGroup( {
+                    addFlatGroup {
                         addGap(20)
                         add(secondaryColorSquare, 24,24)
-                    })
+                    }
                     width = 36
                 }
                 add(paletteView)

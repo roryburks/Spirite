@@ -9,6 +9,8 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
+import spirite.pc.graphics.ImageBI
+import java.awt.image.BufferedImage
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
 {
@@ -60,7 +62,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
     private val activePartBind = Bindable<SpritePart?>(null)
     private var activePart: SpritePart? by activePartBind
 
-    private val boxList = Hybrid.ui.BoxList<SpritePart>(24, 24)
+    private val boxList = Hybrid.ui.BoxList<SpritePart>(32, 32)
     private val tfTransX = Hybrid.ui.FloatField()
     private val tfTransY = Hybrid.ui.FloatField()
     private val tfScaleX =  Hybrid.ui.FloatField()
@@ -90,9 +92,15 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         boxList.renderer = {part ->
             object : IBoxComponent {
                 override val component: IComponent
-                    get() = Hybrid.ui.Button(part.partName).also {
-                        it.action ={ boxList.selected = part}
-                    }
+                    get() = Hybrid.ui.CrossPanel {
+                        rows += {
+                            add(Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR))))
+                            height = 32-6
+                        }
+                        rows.add(Hybrid.ui.Label(part.partName).also {
+                            it.textSize = 8
+                        }, height = 6)
+                    }.also {it.onMouseClick ={ boxList.selected = part} }
 
                 override fun setSelected(selected: Boolean) {
                     if( selected)

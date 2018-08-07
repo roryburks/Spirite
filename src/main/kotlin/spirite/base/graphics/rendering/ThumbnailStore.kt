@@ -27,7 +27,7 @@ interface IThumbnailStoreBi
 }
 class ThumbnailStoreBi(settings: ISettingsManager, centralObservatory: ICentralObservatory, private val originalStore: IThumbnailStore): IThumbnailStoreBi
 {
-    private val useOnlyBi = true
+    private val useOnlyBi = false
     private val onlyBi = ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR))
 
     override fun accessThumbnail(node: Node, workspace: IImageWorkspace) : ImageBI {

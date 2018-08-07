@@ -89,7 +89,7 @@ class CrossColInitializer : CrossSequenceInitializer() {
         constructor.invoke(initObj)
         entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, false, initObj.padding,null))
     }
-    fun addFlatGroup(constructor: CrossRowInitializer.() -> Unit, pregap : Int? = null) {
+    fun addFlatGroup(pregap : Int? = null, constructor: CrossRowInitializer.() -> Unit) {
         val initObj  = CrossRowInitializer()
         constructor.invoke(initObj)
         entities.add(CSE_Group(initObj.entities, initObj.height, initObj.flex, true, initObj.padding, pregap))
