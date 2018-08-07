@@ -91,8 +91,10 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         jMenuBar = bar
     }
 
+    val groupView = GroupView(master)
+
     private val omni = OmniContainer {
-        left += OmniSegment(GroupView(master), 100, 150)
+        left += OmniSegment(groupView, 100, 150)
         center = SubContainer(200,200) {
             center = OmniSegment(workTabPane, 200)
             bottom += OmniSegment(AnimationStructureView(master), 100, 200, false)
@@ -117,6 +119,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         this.add( omni.jcomponent)
 
         SwingUtilities.invokeLater {this.size = Dimension(800,600) }
+        SwingUtilities.invokeLater {groupView.component.jcomponent.requestFocus() }
     }
 
     init /* Bindings */ {

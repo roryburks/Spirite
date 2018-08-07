@@ -247,6 +247,7 @@ class SpriteLayer : Layer {
             internal val id: Int)
     {
         var structure = _structure ; private set
+        val context get() = this@SpriteLayer
 
         // region Shadowing SpritePartStructure scroll with Undoable Wrapper
         var depth get() = structure.depth ; set(value) { if( value != structure.depth) replaceStructure(structure.copy(depth = value), 0)}

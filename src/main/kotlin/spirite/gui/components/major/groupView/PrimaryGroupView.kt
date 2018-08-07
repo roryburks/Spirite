@@ -4,16 +4,19 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.util.Colors
 import spirite.gui.components.advanced.ITreeElementConstructor
 import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
+import spirite.pc.gui.basic.ISwComponent
 import java.awt.datatransfer.Transferable
 
 class PrimaryGroupView
@@ -56,8 +59,9 @@ private constructor(
         fun makeConstructor(group: GroupNode) : ITreeElementConstructor<Node>.()->Unit  {
             return {
                 group.children.forEach {
-                    when(it) {
-                        is GroupNode -> Branch(it, groupAttributes, it.expanded, makeConstructor(it))
+                    when {
+                        it is GroupNode -> Branch(it, groupAttributes, it.expanded, makeConstructor(it))
+                        it is LayerNode && it.layer is SpriteLayer -> Node(it, spriteLayerAttributes)
                         else -> Node(it, nongroupAttributes)
                     }
                 }
@@ -67,10 +71,11 @@ private constructor(
         tree.constructTree (makeConstructor(pTree.root))
     }
 
-    private val groupAttributes = NodeAttributes()
-    private val nongroupAttributes = NongroupAttributes()
+    private val groupAttributes = BaseNodeAttributes()
+    private val nongroupAttributes = NormalLaterNodeAttributes()
+    private val spriteLayerAttributes = SpriteLayerNodeAttributes()
 
-    private open inner class NodeAttributes : TreeNodeAttributes<Node> {
+    private open inner class BaseNodeAttributes : TreeNodeAttributes<Node> {
         override fun makeLeftComponent(t: Node) : IComponent{
             val comp = Hybrid.ui.CrossPanel()
             comp.background = Colors.TRANSPARENT
@@ -91,6 +96,7 @@ private constructor(
             }
             return comp
         }
+
         override fun makeComponent(t: Node): IComponent  {
             val comp = Hybrid.ui.EditableLabel(t.name)
             val node = t
@@ -128,8 +134,44 @@ private constructor(
             }
         }
     }
-    private inner class NongroupAttributes : NodeAttributes() {
+    private inner class NormalLaterNodeAttributes : BaseNodeAttributes() {
         override val isLeaf get() = true
+    }
+
+    private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
+        override fun makeComponent(t: Node): IComponent {
+            return SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer)
+        }
+    }
+
+    class SpriteLayerNodePanel
+    private constructor(
+            val node: Node,
+            val sprite: SpriteLayer,
+            private val imp: ICrossPanel) : IComponent by imp
+    {
+        constructor(node: Node, sprite: SpriteLayer) : this(node, sprite, Hybrid.ui.CrossPanel())
+
+        init {
+            val toggleButton = Hybrid.ui.ToggleButton(false)
+            toggleButton.plainStyle = true
+            toggleButton.setOffIcon(SwIcons.SmallIcons.Rig_New);
+            toggleButton.setOnIcon(SwIcons.SmallIcons.Rig_Remove);
+
+            val editableLabel = Hybrid.ui.EditableLabel(node.name)
+            editableLabel.opaque = false
+            editableLabel.textBind.addRootListener { new, old -> node.name = new }
+
+            imp.setLayout {
+                rows.addFlatGroup { add(toggleButton) }
+                rows += {
+                    add(Hybrid.ui.ColorSquare(), 32, 32)
+                    addGap(2)
+                    add(editableLabel)
+                    height = 32
+                }
+            }
+        }
     }
 
     private val wsl = object: WorkspaceObserver {

@@ -11,7 +11,10 @@ import spirite.base.graphics.rendering.sources.LayerSource
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.layers.Layer
+import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import java.awt.image.BufferedImage
@@ -19,6 +22,23 @@ import java.awt.image.BufferedImage
 interface IThumbnailStore
 {
     fun accessThumbnail( node: Node, workspace: IImageWorkspace) : IImage
+}
+
+interface IThumbnailStore_v2
+{
+    // TODO
+    interface IThumbnailAccessContract
+    {
+        fun release()
+    }
+
+    fun accessThumbnail( node: Node, workspace: IImageWorkspace) : IImage
+    fun accessThumbnail(layer: Layer, workspace: IImageWorkspace) : IImage
+    fun accessThumbnail(part :SpritePart, workspace: IImageWorkspace ): IImage
+
+    fun continuousAccessThumbnail( node: Node, workspace: IImageWorkspace, onBuilt: (IImage)->Unit) : IThumbnailAccessContract
+    fun continuousAccessThumbnail(layer: Layer, workspace: IImageWorkspace, onBuilt: (IImage)->Unit) : IThumbnailAccessContract
+    fun continuousAccessThumbnail(part :SpritePart, workspace: IImageWorkspace, onBuilt: (IImage)->Unit ): IThumbnailAccessContract
 }
 
 interface IThumbnailStoreBi
