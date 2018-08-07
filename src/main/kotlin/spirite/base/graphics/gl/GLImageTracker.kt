@@ -1,11 +1,15 @@
 package spirite.base.graphics.gl
 
+import spirite.hybrid.Hybrid
 import java.lang.ref.WeakReference
 
 object GLImageTracker {
+    private data class ImageData(
+            val w: Int, val h: Int, val tex: IGLTexture)
+
     val images get() = _images.map { it.first.get() }.filterNotNull()
 
-    private val _images = mutableListOf<Pair<WeakReference<GLImage>,IGLTexture>>()
+    private val _images = mutableListOf<Pair<WeakReference<GLImage>,ImageData>>()
 
 
 
@@ -13,7 +17,7 @@ object GLImageTracker {
     val bytesUsed get() = images.fold(0L, {acc, it -> acc + it.width*it.height*4L})
 
     internal fun glImageLoaded(image: GLImage) {
-        _images.add(Pair(WeakReference(image),image._tex))
+        _images.add(Pair(WeakReference(image),ImageData(image.width, image.height,image._tex)))
         _checkStatus()
     }
 
@@ -25,8 +29,10 @@ object GLImageTracker {
     private fun _checkStatus() {
         _images.removeIf {
             (it.first.get() == null).also { removed ->
-                if( removed)
-                    println("TODO: Make this hard flush")
+                if( removed) {
+                    println("Deleting tex of size: ${it.second.w}x${it.second.h}")
+                    Hybrid.gl.deleteTexture(it.second.tex)
+                }
             }
         }
     }

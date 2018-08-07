@@ -2,6 +2,7 @@ package spirite.hybrid
 
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
+import spirite.base.graphics.gl.GLImage
 import spirite.hybrid.Transferables.IImageDataFlavor
 import spirite.hybrid.Transferables.TransferableImage
 import spirite.pc.graphics.ImageBI
@@ -38,19 +39,11 @@ object JImageIO : IImageIO {
 
     override fun loadImage(byteArray: ByteArray): RawImage {
         val bi = ImageIO.read(ByteArrayInputStream(byteArray))
-
-        // Lifecycle passed to whatever called the function
-        val img = Hybrid.imageCreator.createImage(bi.width, bi.height)
-        val gc = img.graphics
-        gc.clear()
-        gc.renderImage(ImageBI(bi), 0, 0)
-        gc.dispose()
-        return img
+        return Hybrid.imageConverter.convert<GLImage>(ImageBI(bi))
     }
 
     override fun imageToClipboard(image: IImage) {
         val transfer = TransferableImage( image)
-
         Toolkit.getDefaultToolkit().systemClipboard.setContents(transfer, null)
     }
 

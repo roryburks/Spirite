@@ -8,6 +8,8 @@ import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.ColorARGB32Premultiplied
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Rect
+import spirite.pc.JOGL.JOGL
+import spirite.pc.JOGL.JOGL.JOGLTexture
 
 class GLImage : RawImage {
     override val width : Int
@@ -42,6 +44,12 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
         gl.texImage2D( GLC.TEXTURE_2D, 0, GLC.RGBA8, GLC.RGBA, GLC.UNSIGNED_BYTE,
                 gl.createBlankTextureSource(width, height))
+
+        if( ! (gl as JOGL).gl.glIsTexture((_tex as JOGLTexture).texId))
+        {
+            println("bad")
+        }
+        GLImageTracker.glImageLoaded(this)
     }
 
     constructor( toCopy: GLImage) {
@@ -61,6 +69,7 @@ class GLImage : RawImage {
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_S, GLC.CLAMP_TO_EDGE)
         gl.texParameteri(GLC.TEXTURE_2D, GLC.TEXTURE_WRAP_T, GLC.CLAMP_TO_EDGE)
         gl.copyTexImage2D(GLC.TEXTURE_2D, 0, GLC.RGBA8, 0, 0, width, height, 0)
+        GLImageTracker.glImageLoaded(this)
     }
 
     constructor( tex: IGLTexture, width: Int, height: Int, glEngine: IGLEngine, premultiplied: Boolean = true) {
@@ -69,11 +78,9 @@ class GLImage : RawImage {
         this.height = height
         this.engine = glEngine
         this.premultiplied = premultiplied
-    }
-
-    init {
         GLImageTracker.glImageLoaded(this)
     }
+
     // endregion
 
     override val graphics: GLGraphicsContext get() = GLGraphicsContext(this)

@@ -118,6 +118,10 @@ class JOGL(
     override fun createTexture(): IGLTexture? {
         val result = IntArray(1)
         gl.glGenTextures(1, result, 0)
+        if( result[0] == 0){
+            JOGLProvider.context.makeCurrent()
+            gl.glGenTextures(1, result, 0)
+        }
         return JOGLTexture(result[0])
     }
 

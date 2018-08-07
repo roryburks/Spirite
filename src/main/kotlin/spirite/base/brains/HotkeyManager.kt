@@ -72,6 +72,7 @@ private val defaultHotkeys = mapOf(
         NodeCommand.NEW_GROUP.keyCommand to (Hotkey(KeyEvent.VK_INSERT, InputEvent.CTRL_DOWN_MASK)),
         NodeCommand.MOVE_DOWN.keyCommand to (Hotkey(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK)),
         NodeCommand.MOVE_UP.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
+        NodeCommand.DUPLICATE.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
         DrawCommand.UNDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
         DrawCommand.REDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),

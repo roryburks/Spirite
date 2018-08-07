@@ -160,8 +160,6 @@ object LoadEngine {
                     val imgSize = ra.readInt()
                     val imgData = ByteArray(imgSize).apply { ra.read( this) }
 
-                    File("C:/Bucket/.dump").writeBytes(imgData)
-
                     val img = Hybrid.imageIO.loadImage(imgData)
                     dataMap[id] = FlatMedium(img, context.workspace.mediumRepository)
                 }
