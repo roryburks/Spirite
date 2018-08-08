@@ -61,6 +61,7 @@ interface IComponent {
     var onMouseExit : ((MouseEvent) -> Unit)?
     var onMouseMove : ((MouseEvent) -> Unit)?
     var onMouseDrag : ((MouseEvent) -> Unit)?
+    fun markAsPassThrough()
 
     var onMouseWheelMoved : ((MouseWheelEvent)->Unit)?
 

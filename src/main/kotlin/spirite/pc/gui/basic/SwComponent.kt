@@ -18,11 +18,8 @@ import spirite.pc.gui.jcolor
 import spirite.pc.gui.scolor
 import java.awt.Component
 import java.awt.Cursor
-import java.awt.event.ActionEvent
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
+import java.awt.event.*
 import java.awt.event.InputEvent.*
-import java.awt.event.MouseWheelListener
 import java.lang.ref.WeakReference
 import javax.swing.BorderFactory
 import javax.swing.JComponent
@@ -192,6 +189,20 @@ abstract class ASwComponent : ISwComponent {
         }
         override fun mouseMoved(e: JMouseEvent) {onMouseMove?.invoke(convert(e))}
         override fun mouseDragged(e: JMouseEvent) { onMouseDrag?.invoke(convert(e))}
+    }
+
+    override fun markAsPassThrough() {
+        component.addMouseMotionListener( object : MouseMotionListener {
+            override fun mouseMoved(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+            override fun mouseDragged(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+        })
+        component.addMouseListener( object : MouseListener {
+            override fun mouseReleased(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+            override fun mouseEntered(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+            override fun mouseClicked(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+            override fun mouseExited(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+            override fun mousePressed(e: java.awt.event.MouseEvent?) = component.parent.dispatchEvent(e)
+        })
     }
 
     // endregion

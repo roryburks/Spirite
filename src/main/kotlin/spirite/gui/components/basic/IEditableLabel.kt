@@ -133,18 +133,11 @@ private constructor(
             border = null
             background = null
             isOpaque = false
+            requestFocus()
 
-            addMouseMotionListener( object : MouseMotionListener {
-                override fun mouseMoved(e: MouseEvent?) = parent.dispatchEvent(e)
-                override fun mouseDragged(e: MouseEvent?) = parent.dispatchEvent(e)
-            })
-            addMouseListener( object : MouseListener {
-                override fun mouseReleased(e: MouseEvent?) = parent.dispatchEvent(e)
-                override fun mouseEntered(e: MouseEvent?) = parent.dispatchEvent(e)
-                override fun mouseClicked(e: MouseEvent?) = parent.dispatchEvent(e)
-                override fun mouseExited(e: MouseEvent?) = parent.dispatchEvent(e)
-                override fun mousePressed(e: MouseEvent?) = parent.dispatchEvent(e)
-            })
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener {
+                if( it.oldValue == this && it.newValue != this) doneEditing()
+            }
 
             inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter")
             actionMap.put("enter", object : AbstractAction(){

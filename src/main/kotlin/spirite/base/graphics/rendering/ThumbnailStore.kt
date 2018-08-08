@@ -38,6 +38,10 @@ interface IThumbnailStore<T>
 class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore)
     : IThumbnailStore<NativeImage>
 {
+    // Note: we kind of just drop off BufferedImages without giving any care to resource recovery, assuming
+    //  (a) they aren't that big anyway (32x32)
+    //  (b) BufferedImages handle themselves properly
+
     private val cache = mutableMapOf<ReferenceObject,NativeImage>()
     private val contracts = mutableMapOf<ReferenceObject,ContractSet>()
 
@@ -82,8 +86,7 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
         return contract
     }
 
-    private fun buildLambda( ref: ReferenceObject, onBuilt: (NativeImage) -> Unit) : (IImage)->Unit
-    {
+    private fun buildLambda( ref: ReferenceObject, onBuilt: (NativeImage) -> Unit) : (IImage)->Unit {
         return {img ->
             val contractSet = contracts[ref]
             if( contractSet != null)
