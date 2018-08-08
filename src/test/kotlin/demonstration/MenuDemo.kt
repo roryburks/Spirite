@@ -20,7 +20,7 @@ class BlankFrameWithMenuFrame(val master: MasterControl) : JFrame() {
         )
 
         val bar = SwMenuBar()
-        SwContextMenus(master.commandExecuter).constructMenu(bar, scheme)
+        SwContextMenus(master.commandExecutor).constructMenu(bar, scheme)
         jMenuBar = bar
     }
 }

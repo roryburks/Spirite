@@ -1,8 +1,6 @@
 package spirite.gui.components.major.animation.structureView
 
 import spirite.base.brains.IMasterControl
-import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.IImageObservatory.ImageObserver
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
@@ -20,12 +18,12 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
+import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SwComponent
 import java.awt.Graphics
-import java.awt.event.KeyEvent
+import java.awt.image.BufferedImage
 import javax.swing.JPanel
-import javax.swing.SwingUtilities
 
 class AnimFFAStructPanel
 private constructor(
@@ -123,8 +121,9 @@ private constructor(
             val frame: FFAFrame,private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         : IComponent by imp
     {
-        val imageBox = Hybrid.ui.ImageBox(master.thumbBi.accessThumbnail(frame.node!!, anim.workspace))
+        val imageBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
         init {
+            imp.ref = this
             imp.setLayout {
                 cols.add(imageBox , width = tickWidth)
 
@@ -148,8 +147,8 @@ private constructor(
             }
         }
 
-        fun refreshThumbnail() {
-            imageBox.setImage( master.thumbBi.accessThumbnail(frame.node!!, anim.workspace))
+        val xyz = master.nativeThumbnailStore.contractThumbnail(frame.node!!, anim.workspace) {
+            imageBox.setImage(it)
         }
     }
 
@@ -172,12 +171,6 @@ private constructor(
                 rebuild()
         }
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
-
-    private val _imageObserver = object : ImageObserver {
-        override fun imageChanged(evt: ImageChangeEvent) {
-            frameLinks.forEach { it.refreshThumbnail() }
-        }
-    }.also { anim.workspace.imageObservatory.imageObservable.addObserver(it) }
     // endregion
 
     init {

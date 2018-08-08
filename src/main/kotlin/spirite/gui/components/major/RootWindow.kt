@@ -87,7 +87,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
         )
 
         val bar = SwMenuBar()
-        SwContextMenus(master.commandExecuter).constructMenu(bar, scheme)
+        SwContextMenus(master.commandExecutor).constructMenu(bar, scheme)
         jMenuBar = bar
     }
 
@@ -131,7 +131,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                     val modifier = evt.modifiersEx
 
                     val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
-                    command?.apply { master.commandExecuter.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
+                    command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
                 }
                 KeyEvent.KEY_RELEASED -> {
                     if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false

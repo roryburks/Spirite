@@ -13,6 +13,7 @@ import spirite.base.file.FileManager
 import spirite.base.file.IFileManager
 import spirite.base.graphics.DetailedResourceUseTracker
 import spirite.base.graphics.IDetailedResourceUseTracker
+import spirite.base.graphics.IImage
 import spirite.base.graphics.gl.stroke.GLStrokeDrawerProvider
 import spirite.base.graphics.rendering.*
 import spirite.base.imageData.ImageWorkspace
@@ -22,6 +23,7 @@ import spirite.gui.components.dialogs.IDialog
 import spirite.gui.components.dialogs.JDialog
 import spirite.gui.menus.ContextMenus
 import spirite.hybrid.Hybrid
+import spirite.hybrid.NativeImage
 import spirite.pc.gui.menus.SwContextMenus
 
 /** MasterControl is a top-level container for all the global-level components.  From a dependency-injection perspective
@@ -40,21 +42,20 @@ interface IMasterControl {
     val toolsetManager: IToolsetManager
     val renderEngine: IRenderEngine
     val resourceUseTracker : IDetailedResourceUseTracker
-    val commandExecuter : ICentralCommandExecutor
+    val commandExecutor : ICentralCommandExecutor
     val fileManager: IFileManager
 
     val frameManager: IFrameManager
     val contextMenus : ContextMenus
     val dialog : IDialog
 
-    val thumbnailStore: IThumbnailStore
-
-    val thumbBi : IThumbnailStoreBi
+    val thumbnailStore: IThumbnailStore<IImage>
+    val nativeThumbnailStore : IThumbnailStore<NativeImage>
 
     fun createWorkspace(width: Int, height: Int) : MImageWorkspace
 }
 
-class MasterControl() : IMasterControl {
+class MasterControl : IMasterControl {
 
     private val gle = Hybrid.gle
     private val preferences = JPreferences(MasterControl::class.java)
@@ -75,12 +76,18 @@ class MasterControl() : IMasterControl {
     override val frameManager = SwFrameManager(this)
     override val fileManager = FileManager(this)
 
-    override val commandExecuter = CentralCommandExecutor(this, workspaceSet, dialog)
+    override val commandExecutor = CentralCommandExecutor(this, workspaceSet, dialog)
 
-    override val contextMenus: ContextMenus = SwContextMenus(commandExecuter)
+    override val contextMenus: ContextMenus = SwContextMenus(commandExecutor)
 
-    override val thumbnailStore: IThumbnailStore = ThumbnailStore(settingsManager, centralObservatory)
-    override val thumbBi: IThumbnailStoreBi = ThumbnailStoreBi(settingsManager, centralObservatory, thumbnailStore) // Fairly debug
+    override val thumbnailStore: IThumbnailStore<IImage>
+    override val nativeThumbnailStore: IThumbnailStore<NativeImage>
+
+    init {
+        val _thumbnailStore = ThumbnailStore(settingsManager, centralObservatory,workspaceSet)
+        thumbnailStore = _thumbnailStore
+        nativeThumbnailStore = DerivedNativeThumbnailStore(_thumbnailStore)
+    }
 
     override fun createWorkspace(width: Int, height: Int) = ImageWorkspace(
             renderEngine,
