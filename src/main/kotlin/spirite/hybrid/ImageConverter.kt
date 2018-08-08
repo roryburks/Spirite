@@ -13,7 +13,8 @@ import spirite.pc.util.RasterHelper
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
-
+typealias NativeImage = ImageBI
+typealias InternalImage = GLImage
 
 class ImageConverter(
         val gle: IGLEngine? = null
@@ -48,7 +49,7 @@ class ImageConverter(
     }
     inline fun <reified T> convert(from: IImage) : T = convertOrNull<T>(from) ?: throw Exception("Unsupported Conversion")
 
-    fun convertToInternal( from: IImage) = convert<GLImage>(from)
+    fun convertToInternal( from: IImage) = convert<InternalImage>(from)
 
     fun loadImageIntoGL( image: IImage, gl: IGL) {
         when( image) {

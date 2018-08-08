@@ -19,6 +19,8 @@ import spirite.pc.gui.scolor
 import java.awt.Component
 import java.awt.Cursor
 import java.awt.event.ActionEvent
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
 import java.awt.event.InputEvent.*
 import java.awt.event.MouseWheelListener
 import java.lang.ref.WeakReference
@@ -35,6 +37,7 @@ interface ISwComponent : IComponent {
 val IComponent.jcomponent get() = this.component as Component
 
 abstract class ASwComponent : ISwComponent {
+    override var ref: Any? = null
     override fun redraw() {component.repaint()}
 
     override var enabled: Boolean
@@ -218,6 +221,7 @@ abstract class ASwComponent : ISwComponent {
     override fun requestFocus() {
         component.requestFocus()
     }
+
 }
 
 class SwComponentIndirect(cGetter : Invokable<Component>) : ASwComponent() {

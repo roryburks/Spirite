@@ -38,7 +38,7 @@ class CrossInitializer {
         _cols != null -> CrossScheme(overwriteOrientation ?: HORIZONTAL,
                 CSE_Group(_cols!!.entities, _cols!!.height, _cols!!.flex, false, _cols!!.padding, null))
         _rows != null -> CrossScheme(overwriteOrientation ?: VERTICAL,
-                CSE_Group(_rows!!.entities, _rows!!.width, _rows!!.flex, false, rows!!.padding, null))
+                CSE_Group(_rows!!.entities, _rows!!.width, _rows!!.flex, false, _rows!!.padding, null))
         else -> CrossScheme(VERTICAL, null)
     }
 }

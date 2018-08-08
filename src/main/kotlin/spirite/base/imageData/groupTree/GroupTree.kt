@@ -203,6 +203,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
 
         abstract val imageDependencies : Collection<MediumHandle>
 
+        val descendants get() = getAllNodesSuchThat ({true})
+
         /**
          * Gets ancestors of the current node such that a certain predicate is true.
          * @param checkChildren If Null, will always check children. */

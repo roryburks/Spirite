@@ -103,6 +103,7 @@ class ToolSettingsSection
 private constructor(val master : IMasterControl, val imp : ICrossPanel)
     : IOmniComponent
 {
+    init { imp.ref = this}
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = null
     override val name: String get() = "Tool Settings"
