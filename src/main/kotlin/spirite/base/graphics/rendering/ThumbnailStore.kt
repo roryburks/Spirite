@@ -92,6 +92,7 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
             if( contractSet != null)
             {
                 contractSet.externalContracts.removeIf {it.get() == null }
+
                 if( !contractSet.externalContracts.any()) {
                     contracts.remove(ref)
                     contractSet.internalContract.release()
@@ -99,7 +100,10 @@ class DerivedNativeThumbnailStore(private val rootThumbnailStore: ThumbnailStore
                 else {
                     val native = Hybrid.imageConverter.convert<NativeImage>(img)
                     cache[ref] = native
-                    contractSet.externalContracts.forEach { onBuilt.invoke(native)}
+                    contractSet.externalContracts.forEach {
+                        val contract = it.get()
+                        contract?.also { it.onBuilt.invoke(native)}
+                    }
                 }
             }
         }
@@ -260,7 +264,7 @@ class ThumbnailStore(
 
         val thumbnail = when( existing) {
             null -> Thumbnail(Hybrid.imageCreator.createImage(32,32)).also { thumbnailCache[ref] = it }
-            else -> existing.also { it.made = Hybrid.timing.currentMilli }
+            else -> existing.also { it.made = Hybrid.timing.currentMilli; it.changed = false }
         }
 
         val gc= thumbnail.image.graphics

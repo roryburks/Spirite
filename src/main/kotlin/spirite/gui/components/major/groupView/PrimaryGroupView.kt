@@ -2,6 +2,7 @@ package spirite.gui.components.major.groupView
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
+import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
@@ -16,8 +17,10 @@ import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
+import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.ISwComponent
 import java.awt.datatransfer.Transferable
+import java.awt.image.BufferedImage
 
 class PrimaryGroupView
 private constructor(
@@ -98,15 +101,11 @@ private constructor(
         }
 
         override fun makeComponent(t: Node): IComponent  {
-            val comp = Hybrid.ui.EditableLabel(t.name)
-            val node = t
-
-            comp.textBind.addListener { new, _ ->  t.name = new}
-
+            val comp = NodeLayerPanel(t,master)
             comp.onMouseRelease = { evt ->
                 if( evt.button == RIGHT )
                     workspace?.apply {
-                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, node), node)
+                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
                     }
             }
             return comp
@@ -140,7 +139,51 @@ private constructor(
 
     private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
         override fun makeComponent(t: Node): IComponent {
-            return SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer)
+            val comp = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
+            comp.onMouseRelease = { evt ->
+                if( evt.button == RIGHT )
+                    workspace?.apply {
+                        master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
+                    }
+            }
+            return comp
+        }
+    }
+
+    class NodeLayerPanel
+    private constructor(
+            val node: Node,
+            master: IMasterControl,
+            private val imp: ICrossPanel) : IComponent by imp
+    {
+        constructor(node: Node, master: IMasterControl)
+                : this(node,  master, Hybrid.ui.CrossPanel())
+
+        private val thumbnail = Hybrid.ui.ImageBox()
+        private val thumbnailContract : IThumbnailAccessContract?
+
+        init {
+            thumbnailContract =  master.workspaceSet.currentWorkspace?.run {
+                master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
+            }
+
+            imp.ref = this
+            opaque = false
+            background = Colors.TRANSPARENT
+
+            val editableLabel = Hybrid.ui.EditableLabel(node.name)
+            //editableLabel.opaque = false
+            editableLabel.textBind.addRootListener { new, old -> node.name = new }
+
+
+            imp.setLayout {
+                rows += {
+                    add(thumbnail, 32, 32)
+                    addGap(2)
+                    add(editableLabel, height = 16)
+                    height = 32
+                }
+            }
         }
     }
 
@@ -148,29 +191,43 @@ private constructor(
     private constructor(
             val node: Node,
             val sprite: SpriteLayer,
+            master: IMasterControl,
             private val imp: ICrossPanel) : IComponent by imp
     {
-        constructor(node: Node, sprite: SpriteLayer) : this(node, sprite, Hybrid.ui.CrossPanel())
+        constructor(node: Node, sprite: SpriteLayer, master: IMasterControl)
+                : this(node, sprite, master,  Hybrid.ui.CrossPanel())
+
+        val thumbnail = Hybrid.ui.ImageBox()
+        val thumbnailContract = master.workspaceSet.currentWorkspace?.run {
+            master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
+        }
 
         init {
+            imp.ref = this
+            opaque = false
+            background = Colors.TRANSPARENT
+
             val toggleButton = Hybrid.ui.ToggleButton(false)
             toggleButton.plainStyle = true
             toggleButton.setOffIcon(SwIcons.SmallIcons.Rig_New);
             toggleButton.setOnIcon(SwIcons.SmallIcons.Rig_Remove);
 
             val editableLabel = Hybrid.ui.EditableLabel(node.name)
-            editableLabel.opaque = false
+            //editableLabel.opaque = false
             editableLabel.textBind.addRootListener { new, old -> node.name = new }
+
 
             imp.setLayout {
                 rows.addFlatGroup { add(toggleButton) }
                 rows += {
-                    add(Hybrid.ui.ColorSquare(), 32, 32)
+                    add(thumbnail, 32, 32)
                     addGap(2)
-                    add(editableLabel)
+                    add(editableLabel, height = 16)
                     height = 32
                 }
             }
+
+            //markAsPassThrough()
         }
     }
 

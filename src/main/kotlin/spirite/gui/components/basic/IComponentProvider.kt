@@ -43,5 +43,5 @@ interface IComponentProvider {
 
     fun Slider(min: Int = 0, max:Int = 100, value: Int = 0) : ISlider
 
-    fun ImageBox( img: IImage) : IImageBox
+    fun ImageBox( img: IImage? = null) : IImageBox
 }

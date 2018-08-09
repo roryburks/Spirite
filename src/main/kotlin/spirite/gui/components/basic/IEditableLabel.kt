@@ -8,6 +8,7 @@ import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.SwPanel
 import spirite.pc.gui.jcolor
+import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.KeyboardFocusManager
 import java.awt.event.*
@@ -77,7 +78,8 @@ private constructor(
 
 
     init {
-        label = SwELabel(defaultText)
+        val _label = SwELabel(defaultText)
+        label = _label
 
         imp.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "rename")
         imp.actionMap.put("rename", object : AbstractAction(){

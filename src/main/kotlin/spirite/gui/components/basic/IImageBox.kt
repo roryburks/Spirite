@@ -26,7 +26,7 @@ private constructor(img: IImage, private val imp : SwImageBoxImp)
 
     override fun setImage(img: IImage) {
         this.img = Hybrid.imageConverter.convert<ImageBI>(img).bi
-        redraw()
+        imp.repaint()
     }
 
     override var stretch by OnChangeDelegate(true ) {redraw()}

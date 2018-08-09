@@ -126,11 +126,11 @@ private constructor(private val imp : SwTreeViewImp<T>)
 {
     constructor() : this(SwTreeViewImp())
 
-    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.jcolor, {imp.background = backgroundColor ; redraw()})
-    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.jcolor, {redraw()})
+    override var backgroundColor : Color by OnChangeDelegate(Skin.ContentTree.Background.jcolor) {imp.background = backgroundColor ; redraw()}
+    override var selectedColor : Color by OnChangeDelegate(Skin.ContentTree.SelectedBackground.jcolor) {redraw()}
 
-    override var gapSize by OnChangeDelegate( 12, {rebuildTree()})
-    override var leftSize by OnChangeDelegate(0, {rebuildTree()})
+    override var gapSize by OnChangeDelegate( 12) {rebuildTree()}
+    override var leftSize by OnChangeDelegate(0) {rebuildTree()}
     //fun nodeAtPoint( p: Vec2i)
 
     init {
@@ -149,7 +149,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
             selectedNode = node
         }
 
-    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null) { new, old ->
+    override val selectedNodeBind = Bindable<ITreeNode<T>?>(null) { new, _ ->
         selectedBind.field = new?.value
         redraw()
     }
@@ -174,8 +174,8 @@ private constructor(private val imp : SwTreeViewImp<T>)
         {
             val leftComponent = node.attributes.makeLeftComponent(node.value)
             val component = node.attributes.makeComponent(node.value)
-            if( leftComponent!= null) lCompToNodeMap.put(leftComponent, node)
-            compToNodeMap.put(component, node)
+            if( leftComponent!= null) lCompToNodeMap[leftComponent] = node
+            compToNodeMap[component] = node
             node.component = component
             node.lComponent = leftComponent
 
