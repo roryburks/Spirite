@@ -31,8 +31,6 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
 
-    var timer : ITimer = Hybrid.timing.createTimer(15, true) {tick()}
-
     private val viewPanel = AnimationViewPanel()
     private val btnPrev = Hybrid.ui.Button().also { it.setIcon(SwIcons.BigIcons.Anim_StepB) }
     private val btnPlay = Hybrid.ui.ToggleButton().also { it.setOffIcon(SwIcons.BigIcons.Anim_Play) }
@@ -46,7 +44,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
     val bgColor by bgColorBox.colorBind
 
-    val imp = Hybrid.ui.CrossPanel {
+    private val imp = Hybrid.ui.CrossPanel {
         rows += {
             add( viewPanel, flex = 300f)
             flex = 300f
@@ -78,6 +76,14 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
     }
 
+    private val timer : ITimer = Hybrid.timing.createTimer(15, true) {tick()}
+
+    private fun tick() {
+        if( !btnPlay.checked) return
+        val anim = animation ?: return
+        anim.state.met = MathUtil.cycle(anim.startFrame, anim.endFrame, anim.state.met + anim.state.speed/66.666f)
+    }
+
 
     // region Bindings
     private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new)}
@@ -96,6 +102,19 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
     }
+
+    private fun unbind() {
+        ffFps.valueBind.unbind()
+        metBind.unbind()
+        ifZoom.valueBind.unbind()
+    }
+
+    private fun rebind(anim: Animation)
+    {
+        anim.state.speedBind.bind(ffFps.valueBind)
+        anim.state.metBind.bind(metBind)
+        anim.state.zoomBind.bind(ifZoom.valueBind)
+    }
     // endregion
 
     private fun buildFromAnim( anim: Animation?) {
@@ -104,19 +123,9 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
         unbind()
         updateSlider()
-
-        if( anim != null) {
-            anim.state.speedBind.bind(ffFps.valueBind)
-            anim.state.metBind.bind(metBind)
-            anim.state.zoomBind.bind(ifZoom.valueBind)
-        }
+        if( anim != null) rebind(anim)
     }
 
-    private fun unbind() {
-        ffFps.valueBind.unbind()
-        metBind.unbind()
-        ifZoom.valueBind.unbind()
-    }
 
     private fun updateSlider() {
         val anim = animation
@@ -134,11 +143,6 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         }
     }
 
-    private fun tick() {
-        if( !btnPlay.checked) return
-        val anim = animation ?: return
-        anim.state.met = MathUtil.cycle(anim.startFrame, anim.endFrame, anim.state.met + anim.state.speed/66.666f)
-    }
 
 
     init {
@@ -147,10 +151,8 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         buildFromAnim(masterControl.workspaceSet.currentWorkspace?.animationManager?.currentAnimation)
 
         bgColorBox.colorBind.addRootListener { new, old -> viewPanel.redraw() }
-        btnNext.action = {
-            println(animation?.state?.met)
-            animation?.state?.met = 50f}
-
+        btnNext.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met + 1f)  }}
+        btnPrev.action = {animation?.also {it.state.met = MathUtil.cycle(it.startFrame, it.endFrame, it.state.met - 1f)  }}
     }
 
     override fun close() {
