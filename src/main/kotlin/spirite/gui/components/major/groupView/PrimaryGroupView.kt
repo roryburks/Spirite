@@ -22,6 +22,7 @@ import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.ISwComponent
+import spirite.pc.gui.jcolor
 import java.awt.datatransfer.Transferable
 import java.awt.image.BufferedImage
 
@@ -254,16 +255,18 @@ private constructor(
                             addGap(20)
                         }
                     }
-                    rows.addFlatGroup(24) {
+                    rows.addFlatGroup(22) {
                         sprite.parts.forEach {part ->
                             val label = Hybrid.ui.Label(part.partName)
-                            label.textSize = 8
+                            label.textSize = 10
+                            label.textColor = Colors.BLACK.jcolor
                             add(label,32,8)
                         }
                     }
                     rows += {
                         partContracts = sprite.parts.mapNotNull { part ->
                             val partThumb = Hybrid.ui.ImageBox()
+                            partThumb.checkeredBackground = true
                             add(partThumb, 32, 32)
                             master.workspaceSet.currentWorkspace?.run {
                                 master.nativeThumbnailStore.contractThumbnail(part, this) {
