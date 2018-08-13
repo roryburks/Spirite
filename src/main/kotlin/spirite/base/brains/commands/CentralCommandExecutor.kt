@@ -26,7 +26,8 @@ class CentralCommandExecutor(
             ToolsetCommandExecuter(master.toolsetManager),
             PaletteCommandExecuter(master.paletteManager),
             SelectionCommandExecuter(workspaceSet),
-            FrameCommandExecuter(master.frameManager)
+            FrameCommandExecuter(master.frameManager),
+            IsolationCommandExecuter(workspaceSet)
     )
 
 

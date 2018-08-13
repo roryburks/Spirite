@@ -1,10 +1,8 @@
 package spirite.base.brains.commands
 
-import spirite.base.brains.IWorkspaceSet
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.MWorkspaceSet
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand.*
-import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.groupTree.MovableGroupTree
@@ -50,10 +48,10 @@ class NodeContextCommand(
 
     override val validCommands: List<String> get() = NodeCommand.values().map {  it.string }
     override val domain: String get() = "node"
-    val currentWorskapce get() = workspaceSet.currentMWorkspace
+    val currentWorkspace get() = workspaceSet.currentMWorkspace
 
     override fun executeCommand(string: String, extra: Any?) : Boolean{
-        val workspace = currentWorskapce ?: return false
+        val workspace = currentWorkspace ?: return false
         val node = extra as? Node
 
         when(string) {

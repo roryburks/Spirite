@@ -1,7 +1,9 @@
 package spirite.base.brains
 
+import jdk.internal.util.xml.impl.Input
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
+import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
 import spirite.base.brains.commands.NodeContextCommand.NodeCommand
 import spirite.base.brains.commands.PaletteCommandExecuter.PaletteCommand
 import spirite.base.brains.commands.SelectionCommandExecuter.SelectCommand
@@ -74,11 +76,15 @@ private val defaultHotkeys = mapOf(
         NodeCommand.MOVE_UP.keyCommand to (Hotkey(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK)),
         NodeCommand.DUPLICATE.keyCommand to (Hotkey(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK)),
 
+        IsolationCommand.TOGGLE_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, 0)),
+        IsolationCommand.ISOLATE_LAYER.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK)),
+        IsolationCommand.CLEAR_ALL_ISOLATION.keyCommand to (Hotkey(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
+
         DrawCommand.UNDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK)),
         DrawCommand.REDO.keyCommand to (Hotkey( KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
         DrawCommand.CLEAR.keyCommand to (Hotkey( KeyEvent.VK_DELETE, 0)),
         DrawCommand.INVERT.keyCommand to (Hotkey( KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK )),
-        KeyCommand("draw.toggle_reference") to (Hotkey( KeyEvent.VK_BACK_QUOTE, 0)),
+        //KeyCommand("draw.toggle_reference") to (Hotkey( KeyEvent.VK_BACK_QUOTE, 0)),
         KeyCommand("draw.lift_to_reference") to (Hotkey( KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),
 
         DrawCommand.SHIFT_LEFT.keyCommand to (Hotkey( KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK or InputEvent.CTRL_DOWN_MASK)),

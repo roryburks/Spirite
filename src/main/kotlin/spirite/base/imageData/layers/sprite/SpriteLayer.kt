@@ -4,10 +4,8 @@ import spirite.base.brains.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.graphics.rendering.TransformedHandle
+import spirite.base.imageData.*
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
-import spirite.base.imageData.IImageWorkspace
-import spirite.base.imageData.MMediumRepository
-import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.drawer.DefaultImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.layers.Layer
@@ -135,9 +133,22 @@ class SpriteLayer : Layer {
 
     override fun getDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
-    override fun getDrawList() = parts
+    override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> = when(isolator) {
+        is ISpriteLayerIsolator -> parts
+                .filter { it.isVisible }
+                .mapNotNull {
+                    val subIsolator = isolator.getIsolationForPart(it)
+                    val rubric = subIsolator.rubric
+                    when {
+                        !subIsolator.isDrawn -> null
+                        rubric == null -> TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)
+                        else -> TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha).stack(rubric)
+                    }
+                }
+        else -> parts
                 .filter { it.isVisible }
                 .map {TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)}
+    }
 
     override fun dupe(mediumRepo: MMediumRepository) =
             SpriteLayer( workspace, mediumRepo, parts.map { Pair(mediumRepo.addMedium(it.handle.medium.dupe()), SpritePartStructure(it)) })

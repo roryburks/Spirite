@@ -45,6 +45,7 @@ interface IImageWorkspace {
     val mediumRepository : IMediumRepository
     val animationManager : IAnimationManager
     val referenceManager : IReferenceManager
+    val isolationManager: IIsolationManager
 
     val undoEngine : IUndoEngine
     val selectionEngine : ISelectionEngine
@@ -93,6 +94,7 @@ class ImageWorkspace(
     override val selectionEngine: ISelectionEngine = SelectionEngine(this)
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
+    override val isolationManager: IIsolationManager = IsolationManager(this)
 
     override val compositor = Compositor()
 

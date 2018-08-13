@@ -4,12 +4,15 @@ import spirite.base.brains.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.base.util.Colors
 import spirite.gui.components.basic.IBoxList.IBoxComponent
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
+import spirite.pc.gui.jcolor
 import java.awt.image.BufferedImage
 
 class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossPanel()
@@ -93,14 +96,27 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             object : IBoxComponent {
                 override val component: IComponent
                     get() = Hybrid.ui.CrossPanel {
-                        rows += {
-                            add(Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR))))
-                            height = 32-6
+                        cols += {
+                            width = 32
+                            addFlatGroup(22) {
+                                add(Hybrid.ui.Label(part.partName).also {it.textSize = 10;it.textColor= Colors.BLACK.jcolor}, height = 8)
+                            }
+                            this += {
+                                val thumbnail = Hybrid.ui.ImageBox()
+                                thumbnail.checkeredBackground = true
+                                thumbnail.ref = master.workspaceSet.currentWorkspace?.run {
+                                    master.nativeThumbnailStore.contractThumbnail(part, this) {
+                                        thumbnail.setImage(it)
+                                    }
+                                }
+                                add( thumbnail)
+                                height = 32
+                            }
                         }
-                        rows.add(Hybrid.ui.Label(part.partName).also {
-                            it.textSize = 8
-                        }, height = 6)
-                    }.also {it.onMouseClick ={ boxList.selected = part} }
+                    }.also {
+                        it.onMouseClick ={ boxList.selected = part}
+                        if( boxList.selected == part) it.setBasicBorder(BEVELED_RAISED)
+                    }
 
                 override fun setSelected(selected: Boolean) {
                     if( selected)

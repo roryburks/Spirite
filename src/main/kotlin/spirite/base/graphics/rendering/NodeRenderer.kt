@@ -4,6 +4,7 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.IIsolator
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.mediums.IComplexMedium
@@ -16,7 +17,8 @@ import spirite.hybrid.MDebug.ErrorType.STRUCTURAL
 class NodeRenderer(
         val root: GroupNode,
         val workspace: IImageWorkspace,
-        val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true))
+        val settings: RenderSettings = RenderSettings(workspace.width, workspace.height, true),
+        val rootIsolator: IIsolator? = null)
 {
     private lateinit var buffer : Array<RawImage>
     private val neededImages : Int by lazy {
@@ -42,11 +44,11 @@ class NodeRenderer(
             if( neededImages == 0) return
 
             try {
-                buffer = Array(neededImages, { Hybrid.imageCreator.createImage(settings.width, settings.height) })
+                buffer = Array(neededImages) { Hybrid.imageCreator.createImage(settings.width, settings.height) }
                 buffer.forEach { it.graphics.clear() }
 
                 // Step 2: Recursively Draw the image
-                _renderRec(root, 0)
+                _renderRec(root, 0, rootIsolator)
                 gc.renderImage(buffer[0], 0, 0)
             }finally {
                 buffer.forEach { it.flush() }
@@ -56,7 +58,7 @@ class NodeRenderer(
         }
     }
 
-    private fun _renderRec(node: GroupNode, depth: Int) {
+    private fun _renderRec(node: GroupNode, depth: Int, isolator: IIsolator?) {
         // Note: though it doesn't seem recursive at first glance, _getDrawListUnsorted can either be recursive itself
         //  or might add GroupDrawThing's which call _renderRec.
         if( depth < 0 || depth >= buffer.size) {
@@ -66,12 +68,12 @@ class NodeRenderer(
 
         val gc = buffer[depth].graphics
 
-        _getDrawListUnsorted(node, depth)
+        _getDrawListUnsorted(node, depth, isolator)
                 .sortedWith(compareBy({it.depth}, {it.subDepth}))
                 .forEach { it.draw(gc) }
     }
 
-    private fun _getDrawListUnsorted(node: GroupNode, depth: Int) : List<DrawThing>{
+    private fun _getDrawListUnsorted(node: GroupNode, depth: Int, isolator: IIsolator? ) : List<DrawThing>{
         if( depth < 0 || depth >= buffer.size) {
             MDebug.handleError(STRUCTURAL, "NodeRenderer out of expected layers count.  Expected: [${0},${buffer.size}), Actual: $depth")
             return emptyList()
@@ -86,15 +88,18 @@ class NodeRenderer(
                 //  determined that there are no children  there (hence why the max_depth was set lower)
                 .filter { it.isVisible && !(depth == buffer.size-1 && it is GroupNode) }
                 .forEach { child ->
-                    when( child) {
-                        is GroupNode -> {
-                            when {
-                                child.flatenned -> drawList.addAll( _getDrawListUnsorted(child, depth+1))
-                                else -> drawList.add( GroupDrawThing(depth, child))
+                    val subIsolator = isolator?.getIsolatorForNode(child)
+                    if(subIsolator?.isDrawn != false) {
+                        when (child) {
+                            is GroupNode -> {
+                                when {
+                                    child.flatenned -> drawList.addAll(_getDrawListUnsorted(child, depth + 1, subIsolator))
+                                    else -> drawList.add(GroupDrawThing(depth, child, subIsolator))
+                                }
                             }
+                            is LayerNode ->
+                                child.layer.getDrawList(isolator).forEach { drawList.add(TransformedDrawThing(child, it, isolator)) }
                         }
-                        is LayerNode ->
-                            child.layer.getDrawList().forEach { drawList.add(TransformedDrawThing(child, it)) }
                     }
                 }
 
@@ -183,13 +188,14 @@ class NodeRenderer(
     private inner class GroupDrawThing(
             val n: Int,
             val node: GroupNode,
+            val isolator: IIsolator?,
             override val depth: Int = 0)
         : DrawThing()
     {
         override fun draw(gc: GraphicsContext) {
             buffer[n+1].graphics.clear()
 
-            _renderRec(node, n+1)
+            _renderRec(node, n+1, isolator)
 
             val rubric = RenderRubric( node.tNodeToContext, node.alpha, node.method)
             gc.renderImage( buffer[n+1], 0, 0, rubric)
@@ -198,7 +204,8 @@ class NodeRenderer(
 
     private inner class TransformedDrawThing(
             val node: Node,
-            val th : TransformedHandle)
+            val th : TransformedHandle,
+            val isolator: IIsolator?)
         : DrawThing()
     {
         override val depth: Int get() = th.drawDepth
@@ -207,8 +214,9 @@ class NodeRenderer(
             gc.pushTransform()
             gc.scale(ratioW, ratioH)
 
-            val baseRubric = th.renderRubric.stack(
-                    RenderRubric(node.tNodeToContext, node.alpha, node.method))
+            val nodeTransformedRubric = th.renderRubric.stack(RenderRubric(node.tNodeToContext, node.alpha, node.method))
+            val isolatorRubric = isolator?.rubric
+            val baseRubric = if( isolatorRubric == null) nodeTransformedRubric else nodeTransformedRubric.stack(isolatorRubric)
 
             val builtComposite = builtComposite
             when(th.handle) {

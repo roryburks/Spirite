@@ -12,8 +12,11 @@ import spirite.gui.components.advanced.ITreeView
 import spirite.gui.components.advanced.ITreeViewNonUI.*
 import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.basic.IComponent
+import spirite.gui.components.basic.IComponent.BasicBorder.BASIC
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.IImageBox
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
+import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.gui.resources.Transferables.NodeTransferable
 import spirite.hybrid.Hybrid
@@ -191,13 +194,15 @@ private constructor(
     private constructor(
             val node: Node,
             val sprite: SpriteLayer,
-            master: IMasterControl,
+            val master: IMasterControl,
             private val imp: ICrossPanel) : IComponent by imp
     {
         constructor(node: Node, sprite: SpriteLayer, master: IMasterControl)
                 : this(node, sprite, master,  Hybrid.ui.CrossPanel())
 
         val thumbnail = Hybrid.ui.ImageBox()
+        val toggleButton = Hybrid.ui.ToggleButton(false)
+        val editableLabel = Hybrid.ui.EditableLabel(node.name)
         val thumbnailContract = master.workspaceSet.currentWorkspace?.run {
             master.nativeThumbnailStore.contractThumbnail(node, this) {img ->thumbnail.setImage(img)}
         }
@@ -207,15 +212,25 @@ private constructor(
             opaque = false
             background = Colors.TRANSPARENT
 
-            val toggleButton = Hybrid.ui.ToggleButton(false)
             toggleButton.plainStyle = true
             toggleButton.setOffIcon(SwIcons.SmallIcons.Rig_New);
             toggleButton.setOnIcon(SwIcons.SmallIcons.Rig_Remove);
+            toggleButton.checkBind.addRootListener { new, old ->  setLayout()}
 
-            val editableLabel = Hybrid.ui.EditableLabel(node.name)
             //editableLabel.opaque = false
             editableLabel.textBind.addRootListener { new, old -> node.name = new }
 
+            setLayout()
+
+            //markAsPassThrough()
+        }
+
+        var partContracts: List<IThumbnailAccessContract>? = null
+
+        fun setLayout()
+        {
+            partContracts?.forEach { it.release() }
+            partContracts = null
 
             imp.setLayout {
                 rows.addFlatGroup { add(toggleButton) }
@@ -225,9 +240,40 @@ private constructor(
                     add(editableLabel, height = 16)
                     height = 32
                 }
-            }
 
-            //markAsPassThrough()
+                if (toggleButton.checked) {
+                    rows.addFlatGroup {
+                        sprite.parts.forEach {part ->
+                            val btn = Hybrid.ui.ToggleButton(true)
+                            //btn.plainStyle = true
+                            btn.background = Skin.AnimSchemePanel.ActiveNodeBg.scolor
+                            btn.setBasicBorder(BASIC)
+                            btn.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
+                            btn.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
+                            add(btn,12,12)
+                            addGap(20)
+                        }
+                    }
+                    rows.addFlatGroup(24) {
+                        sprite.parts.forEach {part ->
+                            val label = Hybrid.ui.Label(part.partName)
+                            label.textSize = 8
+                            add(label,32,8)
+                        }
+                    }
+                    rows += {
+                        partContracts = sprite.parts.mapNotNull { part ->
+                            val partThumb = Hybrid.ui.ImageBox()
+                            add(partThumb, 32, 32)
+                            master.workspaceSet.currentWorkspace?.run {
+                                master.nativeThumbnailStore.contractThumbnail(part, this) {
+                                    partThumb.setImage(it)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

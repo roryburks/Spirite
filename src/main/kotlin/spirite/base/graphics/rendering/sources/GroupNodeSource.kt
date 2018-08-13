@@ -4,6 +4,8 @@ import spirite.base.graphics.GraphicsContext
 import spirite.base.graphics.rendering.NodeRenderer
 import spirite.base.graphics.rendering.RenderSettings
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.IIsolator
+import spirite.base.imageData.ISpriteLayerIsolator
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -17,7 +19,7 @@ data class GroupNodeSource( val group: GroupNode, override val workspace: IImage
     override val rendersLifted: Boolean get() = true
 
     override fun render(settings: RenderSettings, gc: GraphicsContext) {
-        NodeRenderer( group, workspace, settings).render(gc)
+        NodeRenderer( group, workspace, settings, workspace.isolationManager.currentIsolator).render(gc)
     }
 }
 
