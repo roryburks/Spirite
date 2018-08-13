@@ -108,10 +108,9 @@ Per Animation:
             [1, byte] : 0 bit: whether or not subgroups are linked
             [2, ushort] : Number of Frames that have information
             Per Frame:
-                [4, byte] : NodeID  (note, if it's a LayerNode it's a FrameFrame.  if it's a GroupNode it's a Start_of_loop frame)
+                [1, byte] : FrameType
+                [4, int] : NodeID  (can be -1, should match FrameType)
                 [2, ushort] : Length
-				[2, ushort] : Gap Before
-				[2, ushort] : Gap After
     0x02 : RigAnimation
         [2, ushort] : Number of Sprites
         Per Sprite:

@@ -11,6 +11,7 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
     private val undoEngine get() = context.workspace.undoEngine
 
     abstract fun moveFrame( frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean)
+    abstract fun addGapFrameAfter( frameBefore: FFAFrame?, gapLength: Int = 1)
 
     val start = 0
     val end : Int get() {
@@ -45,8 +46,9 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
                 loopLen += frame.length
                 if( offset - caret < frame.length) {
                     return when( frame.marker) {
+                        GAP -> null
                         START_LOCAL_LOOP -> _sub(index, offset - caret)
-                        FRAME -> if( frame.isInGap(offset-caret)) null else frame
+                        FRAME -> frame
                         END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 1)"); null}
                     }
                 }
@@ -69,6 +71,8 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
     inner class FFAFrame(structure: FFAFrameStructure)
     {
         // region Calculations
+        val layer get() = this@FFALayer
+
         val start: Int get() {
             val carets = mutableListOf(0)
             _frames.forEach {
@@ -99,8 +103,8 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         }
 
         val next: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) + 1)
+        val previous: FFAFrame? get() = _frames.getOrNull(_frames.indexOf(this) - 1)
 
-        internal fun isInGap( internalMet: Int) = (internalMet < gapBefore) || ((length-1) - internalMet < gapAfter)
         // endregion
 
         // region Structure
@@ -108,15 +112,8 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
 
         val node get() = structure.node
         val marker get() = structure.marker
-        var gapBefore get() = structure.gapBefore
-            set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(gapBefore = value),"Changed Frame Gap Before"))}
-        var gapAfter get() = structure.gapAfter
-            set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(gapAfter = value),"Changed Frame Gap After"))}
-        var innerLength get() = structure.length
-            set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Inner Length"))}
-
-        var length get() = innerLength + gapBefore + gapAfter
-            set(value) {innerLength = value - gapBefore - gapAfter}
+        var length get() = structure.length
+            set(value) { undoEngine.performAndStore(FFAStructureChangeAction(structure.copy(length = value),"Changed Frame Length"))}
 
         private inner class FFAStructureChangeAction(
                 val newStructure: FFAFrameStructure,

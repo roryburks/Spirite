@@ -15,3 +15,6 @@
     -NodeTypeID changed from Int (which it incorrectly was) to byte
     -Size of ImageData for Dynamic Images may be 0 indicating a null image
     -Per-node bitmask was previously marked as written before alpha/offset, when it's actually after.  This is not a I/O change, just an error in documentation
+0x0001_0001:
+    -Re-added Animation Name to Animations
+    -Updated FFA Animations to have gaps separate Frames

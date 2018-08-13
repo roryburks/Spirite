@@ -9,29 +9,34 @@ object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    val version = 0x0001_0000
+    const val version = 0x0001_0001
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section
-    val NODE_GROUP = 0x00
-    val NODE_SIMPLE_LAYER = 0x01
-    val NODE_SPRITE_LAYER = 0x02
-    val NODE_REFERENCE_LAYER = 0x03
-    val NODE_PUPPET_LAYER = 0x04
+    const val NODE_GROUP = 0x00
+    const val NODE_SIMPLE_LAYER = 0x01
+    const val NODE_SPRITE_LAYER = 0x02
+    const val NODE_REFERENCE_LAYER = 0x03
+    const val NODE_PUPPET_LAYER = 0x04
 
     // :::: MediumType
-    val MEDIUM_PLAIN = 0x00
-    val MEDIUM_DYNAMIC = 0x01
-    val MEDIUM_PRISMATIC = 0x02
-    val MEDIUM_MAGLEV = 0x03
+    const val MEDIUM_PLAIN = 0x00
+    const val MEDIUM_DYNAMIC = 0x01
+    const val MEDIUM_PRISMATIC = 0x02
+    const val MEDIUM_MAGLEV = 0x03
 
     // :::: AnimationType
-    val ANIM_FFA = 0x01
-    val ANIM_RIG = 0x02
+    const val ANIM_FFA = 0x01
+    const val ANIM_RIG = 0x02
+
+    // :::: FFAFrameType
+    const val FFAFRAME_FRAME = 0x01
+    const val FFAFRAME_STARTOFLOOP = 0x02
+    const val FFAFRAME_GAP = 0x03
 
     // Node Attribute Masks
-    val VISIBLE_MASK = 0x01
-    val EXPANDED_MASK = 0x02
+    const val VISIBLE_MASK = 0x01
+    const val EXPANDED_MASK = 0x02
 
     fun strToByteArrayUTF8( str: String) : ByteArray
     {

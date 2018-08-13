@@ -9,7 +9,8 @@ class FFALayerGroupLinked(
         context: FixedFrameAnimation,
         val groupLink : GroupNode,
         includeSubtrees: Boolean,
-        frameMap : Map<Node,FFAFrameStructure>? = null)
+        frameMap : Map<Node,FFAFrameStructure>? = null,
+        unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     : FFALayer(context)
 {
     var includeSubtrees by UndoableChangeDelegate(
@@ -19,7 +20,7 @@ class FFALayerGroupLinked(
             {groupLinkUpdated()}
 
     init {
-        groupLinkUpdated(frameMap)
+        groupLinkImported(frameMap, unlinkedClusters)
     }
 
     override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {
@@ -32,6 +33,12 @@ class FFALayerGroupLinked(
         }
     }
 
+    override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {
+        val index = if( frameBefore == null) 0 else (_frames.indexOf(frameBefore) + 1)
+        _frames.add(index, FFAFrame(FFAFrameStructure(null, GAP,gapLength)))
+        context.triggerFFAChange(this)
+    }
+
     private fun constructFrameMap() : Map<Node,FFAFrameStructure> =
         frames.mapNotNull {
             val node = it.node
@@ -41,20 +48,105 @@ class FFALayerGroupLinked(
             }
         }.toMap()
 
-    internal fun groupLinkUpdated( links: Map<Node,FFAFrameStructure>? = null) {
-        val oldMap = links ?: constructFrameMap()
-        val newMap = HashMap<Node, FFAFrame>()
-        _frames.clear()
+    data class UnlinkedFrameCluster(
+            val nodeBefore: Node?,
+            val unlinkedFrames: List<FFAFrameStructure>)
 
-        fun gluRec( node: GroupNode) : Int {
+    private data class UnlinkedFrameClusterDetailed(
+            val nodeBefore: Node?,
+            val nodeAfter: Node?,
+            val parentNode: Node?,
+            val unlinkedFrames: List<FFAFrameStructure>)
+
+    private fun getUnlinkedNodeClusters() : List<UnlinkedFrameClusterDetailed> {
+        val clusters = mutableListOf<UnlinkedFrameClusterDetailed>()
+        var currentNode: Node? = null
+        var activeCluster: MutableList<FFAFrameStructure>? = null
+        var currentParent: Node? = null
+
+        // Update this as needed
+        fun frameIsUnlinked(frame : FFAFrame) = frame.marker == GAP
+
+        for( frame in frames) {
+            if(frameIsUnlinked(frame)) {
+                activeCluster = activeCluster ?: mutableListOf()
+                activeCluster.add(frame.structure)
+            }
+            else {
+                if( activeCluster != null) {
+                    clusters.add( UnlinkedFrameClusterDetailed(currentNode, frame.node, currentParent, activeCluster))
+                    activeCluster = null
+                }
+                currentNode = when(frame.marker) {
+                    START_LOCAL_LOOP -> {
+                        currentParent = frame.node
+                        null
+                    }
+                    else -> frame.node
+                }
+            }
+        }
+        if( activeCluster != null) {
+            clusters.add(UnlinkedFrameClusterDetailed(currentNode, null, null, activeCluster))
+        }
+        return clusters
+    }
+
+    private fun groupLinkImported(
+            links: Map<Node,FFAFrameStructure>? = null,
+            clusters: List<UnlinkedFrameCluster>? = null)
+    {
+        buildFramesFromGroupTree(links ?: mapOf())
+
+        clusters?.forEach { cluster ->
+            val index = if( cluster.nodeBefore == null) 0
+                else (_frames.indexOfFirst { it.node == cluster.nodeBefore } + 1)
+            _frames.addAll(index, cluster.unlinkedFrames.map { FFAFrame(it) })
+        }
+    }
+
+    internal fun groupLinkUpdated( )
+    {
+        val oldUnlinkedFrameClusters = getUnlinkedNodeClusters()
+
+        buildFramesFromGroupTree(constructFrameMap())
+
+        // Not very Big-O efficient, but hopefully the data sets we're working on is sufficiently slow
+        //  Can create a hash map from node->index if necessary
+        for( cluster in oldUnlinkedFrameClusters) {
+            val position = when {
+                cluster.nodeBefore == null -> when( cluster.parentNode) {
+                    null -> 0
+                    else -> _frames.indexOfFirst { it.node == cluster.parentNode }
+                }
+                cluster.nodeAfter != null -> {
+                    val beforeIndex = _frames.indexOfFirst { it.node == cluster.nodeBefore }
+                    val afterIndex = _frames.indexOfFirst { it.node == cluster.nodeAfter }
+                    when {
+                        afterIndex == beforeIndex+1 -> afterIndex
+                        cluster.parentNode != null -> _frames.indexOfFirst { it.node == cluster.parentNode }
+                        else -> beforeIndex + 1
+                    }
+                }
+                else -> _frames.lastIndex
+            }
+            _frames.addAll(position, cluster.unlinkedFrames.map { FFAFrame(it) })
+        }
+
+        context.triggerFFAChange(this)
+    }
+
+    private fun buildFramesFromGroupTree(map: Map<Node,FFAFrameStructure>) {
+        _frames.clear()
+        fun bffgtRec(node: GroupNode) : Int {
             var len = 0
             node.children.asReversed().forEach {
                 when {
                     it is GroupNode && includeSubtrees -> {
-                        val solFrame = FFAFrame(oldMap[it] ?: FFAFrameStructure(it, START_LOCAL_LOOP, 0))
+                        val solFrame = FFAFrame(map[it] ?: FFAFrameStructure(it, START_LOCAL_LOOP, 0))
 
                         _frames.add(solFrame)
-                        val subLen = gluRec(it)
+                        val subLen = bffgtRec(it)
                         if( solFrame.length < subLen)
                             solFrame.structure = solFrame.structure.copy(length =  subLen)
                         _frames.add( FFAFrame(FFAFrameStructure(null, END_LOCAL_LOOP, 0)))
@@ -62,7 +154,7 @@ class FFALayerGroupLinked(
                         len += solFrame.length
                     }
                     it is LayerNode -> {
-                        val newFrame =  FFAFrame(oldMap[it] ?:FFAFrameStructure(it, FRAME, 1))
+                        val newFrame =  FFAFrame(map[it] ?:FFAFrameStructure(it, FRAME, 1))
                         _frames.add(newFrame)
 
                         len += newFrame.length
@@ -71,9 +163,7 @@ class FFALayerGroupLinked(
             }
             return len
         }
-
-        gluRec( groupLink)
-        context.triggerFFAChange(this)
+        bffgtRec( groupLink)
     }
 
 }

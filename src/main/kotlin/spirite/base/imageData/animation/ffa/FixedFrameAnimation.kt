@@ -4,12 +4,12 @@ import spirite.base.graphics.rendering.TransformedHandle
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
+import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
 import spirite.base.util.groupExtensions.mapAggregated
-import kotlin.math.floor
 
 class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
@@ -57,9 +57,13 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         triggerStructureChange()
     }
 
-    fun addLinkedLayer( group: GroupNode, includeSubtrees: Boolean, frameMap: Map<Node, FFAFrameStructure>? = null)
+    fun addLinkedLayer(
+            group: GroupNode,
+            includeSubtrees: Boolean,
+            frameMap: Map<Node, FFAFrameStructure>? = null,
+            unlinkedClusters: List<UnlinkedFrameCluster>? = null)
     {
-        val layer = FFALayerGroupLinked(this, group, includeSubtrees, frameMap)
+        val layer = FFALayerGroupLinked(this, group, includeSubtrees, frameMap, unlinkedClusters)
         _layers.add(layer)
         triggerFFAChange(layer)
     }

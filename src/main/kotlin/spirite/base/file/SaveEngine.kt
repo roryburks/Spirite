@@ -1,6 +1,7 @@
 package spirite.base.file
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -226,6 +227,7 @@ object SaveEngine {
             context.workspace.animationManager.animations.forEach { anim ->
                 when( anim) {
                     is FixedFrameAnimation -> {
+                        ra.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name
                         ra.writeByte(SaveLoadUtil.ANIM_FFA) // [1] : Anim TypeId
 
                         val validLayers = anim.layers.filterIsInstance<FFALayerGroupLinked>()
@@ -243,11 +245,16 @@ object SaveEngine {
                             }
                             else {
                                 ra.writeShort(layer.frames.size) // [2] : Number of Frames
-                                for( frame in layer.frames) {
+                                loop@ for( frame in layer.frames) {
+                                    // [1] : Type
+                                    ra.writeByte(when(frame.marker) {
+                                        GAP -> SaveLoadUtil.FFAFRAME_GAP
+                                        START_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_STARTOFLOOP
+                                        FRAME -> SaveLoadUtil.FFAFRAME_FRAME
+                                        END_LOCAL_LOOP -> continue@loop
+                                    })
                                     ra.writeInt(context.nodeMap[frame.node] ?: -1 ) // [4] : NodeId
-                                    ra.writeShort(frame.innerLength)    // [2]: Length
-                                    ra.writeShort(frame.gapBefore)    // [2]: Gap Before
-                                    ra.writeShort(frame.gapAfter)    // [2]: Gap After
+                                    ra.writeShort(frame.length)    // [2]: Length
                                 }
                             }
 

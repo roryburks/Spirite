@@ -59,12 +59,11 @@ private constructor(
                         len += it.length
                         when( it.marker) {
                             FRAME -> {
-                                if (it.gapBefore > 0)
-                                    add(GapPanel(it, true), width = tickWidth * it.gapBefore)
-                                if (it.innerLength > 0)
-                                    add( FramePanel(it).also {frameLinks.add(it) }, width = tickWidth * it.innerLength)
-                                if (it.gapAfter > 0)
-                                    add(GapPanel(it, false), width = tickWidth * it.gapAfter)
+                                if (it.length > 0)
+                                    add( FramePanel(it).also {frameLinks.add(it) }, width = tickWidth * it.length)
+                            }
+                            GAP -> {
+                                add(GapPanel(it, false), width = tickWidth * it.length)
                             }
                             START_LOCAL_LOOP -> {}
                             END_LOCAL_LOOP -> {}
@@ -127,8 +126,8 @@ private constructor(
             imp.setLayout {
                 cols.add(imageBox , width = tickWidth)
 
-                if( frame.innerLength > 1) {
-                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.innerLength-1))
+                if( frame.length > 1) {
+                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
                 }
 
                 cols.height = layerHeight
@@ -139,9 +138,9 @@ private constructor(
                     master.contextMenus.LaunchContextMenu(
                             bottomRight,
                             listOf(
-                                    MenuItem("Add Gap &Before", customAction = {frame.gapBefore+=1}),
-                                    MenuItem("Add Gap &After", customAction = {frame.gapAfter+=1}),
-                                    MenuItem("Increase &Length", customAction = {frame.innerLength+=1}) )
+                                    MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
+                                    MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
+                                    MenuItem("Increase &Length", customAction = {frame.length += 1}) )
                     )
                 }
             }
