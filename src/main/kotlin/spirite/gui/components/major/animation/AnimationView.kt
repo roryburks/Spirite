@@ -3,6 +3,8 @@ package spirite.gui.components.major.animation
 import spirite.base.brains.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
+import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.util.MathUtil
 import spirite.base.util.ceil
 import spirite.base.util.floor
@@ -77,7 +79,15 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     }
 
 
+    // region Bindings
     private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new)}
+    private val _animstructureObs = object : AnimationStructureChangeObserver {
+        override fun animationStructureChanged(animation: Animation) {
+            if( animation == this@AnimationView.animation) {
+                updateSlider()
+            }
+        }
+    }.also { masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(it) }
     var animation : Animation? = null
 
     private val metBind = Bindable(0f) { new, _ -> sliderMet.value = (new * 100).floor ; viewPanel.redraw()}
@@ -86,9 +96,11 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
     }
+    // endregion
 
     private fun buildFromAnim( anim: Animation?) {
         animation = anim
+
 
         unbind()
         updateSlider()
@@ -130,6 +142,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     init {
+        imp.ref = this
         viewPanel.imp.context = this
         buildFromAnim(masterControl.workspaceSet.currentWorkspace?.animationManager?.currentAnimation)
 
@@ -137,6 +150,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         btnNext.action = {
             println(animation?.state?.met)
             animation?.state?.met = 50f}
+
     }
 
     override fun close() {

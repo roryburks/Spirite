@@ -2,7 +2,6 @@ package spirite.gui.components.major.animation
 
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.FakeAnimation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
@@ -12,7 +11,6 @@ import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
-import java.awt.event.MouseEvent
 
 class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
@@ -66,12 +64,12 @@ class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
     private val _animObs = object : AnimationObserver {
         override fun animationCreated(animation: Animation) = rebuild()
         override fun animationRemoved(animation: Animation) = rebuild()
-    }.also { master.centralObservatory.omniAnimationObservable.addObserver(it)}
+    }.also { master.centralObservatory.trackingAnimationObservable.addObserver(it)}
 
     private val _wsObs = master.workspaceSet.currentWorkspaceBind.addListener { _, _ ->  rebuild()}
 
     override fun close() {
-        master.centralObservatory.omniAnimationObservable.removeObserver(_animObs)
+        master.centralObservatory.trackingAnimationObservable.removeObserver(_animObs)
         _wsObs.unbind()
     }
 
