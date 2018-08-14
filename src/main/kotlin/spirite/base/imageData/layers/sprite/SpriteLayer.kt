@@ -16,6 +16,7 @@ import spirite.base.imageData.undo.StackableAction
 import spirite.base.imageData.undo.UndoableAction
 import spirite.base.util.StringUtil
 import spirite.base.util.ceil
+import spirite.base.util.delegates.UndoableDelegate
 import spirite.base.util.floor
 import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.groupExtensions.mapAggregated
@@ -133,21 +134,23 @@ class SpriteLayer : Layer {
 
     override fun getDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
     override val imageDependencies: List<MediumHandle> get() = parts.map { it.handle }
-    override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> = when(isolator) {
-        is ISpriteLayerIsolator -> parts
-                .filter { it.isVisible }
-                .mapNotNull {
-                    val subIsolator = isolator.getIsolationForPart(it)
-                    val rubric = subIsolator.rubric
-                    when {
-                        !subIsolator.isDrawn -> null
-                        rubric == null -> TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)
-                        else -> TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha).stack(rubric)
+    override fun getDrawList(isolator: IIsolator?): List<TransformedHandle> {
+        return when (isolator) {
+            is ISpriteLayerIsolator -> parts
+                    .filter { it.isVisible }
+                    .mapNotNull {
+                        val subIsolator = isolator.getIsolationForPart(it)
+                        val rubric = subIsolator.rubric
+                        when {
+                            !subIsolator.isDrawn -> null
+                            rubric == null -> TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha)
+                            else -> TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha).stack(rubric)
+                        }
                     }
-                }
-        else -> parts
-                .filter { it.isVisible }
-                .map {TransformedHandle( it.handle, it.depth, it.tPartToWhole, it.alpha)}
+            else -> parts
+                    .filter { it.isVisible }
+                    .map { TransformedHandle(it.handle, it.depth, it.tPartToWhole, it.alpha) }
+        }
     }
 
     override fun dupe(mediumRepo: MMediumRepository) =
@@ -166,13 +169,18 @@ class SpriteLayer : Layer {
     fun addPart( partName : String) {
         val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
 
+        val aPart = activePart
         val depth = when {
-            _parts.isEmpty() -> 0
-            activePart == null -> _parts.last().depth + 1
-            else -> activePart!!.depth
+            !_parts.any() -> 0
+            aPart == null -> _parts.last().depth + 1
+            else -> aPart.depth+1
         }
 
         undoEngine.doAsAggregateAction("Add Sprite Part") {
+
+            val indexOfAPart = if( aPart == null) -1 else _parts.indexOf(aPart)
+            if(indexOfAPart != -1)
+                _bubbleUpDepth(indexOfAPart+1, depth)
             _addPart( SpritePartStructure( depth, partName), handle)
         }
     }
@@ -201,10 +209,49 @@ class SpriteLayer : Layer {
 
     }
     fun movePart( fromIndex: Int, toIndex: Int) {
+        if( fromIndex == toIndex) return
         undoEngine.doAsAggregateAction("Moved Sprite Part"){
-            val toMove = _parts.get(fromIndex)
-            removePart(_parts.get(fromIndex))
-            _addPart(toMove.structure, toMove.handle)  // TODO: I don't really like this as it doesn't preserve Part references
+            val toMove = _parts[fromIndex]
+            val leftIndex = if( toIndex > fromIndex) toIndex else toIndex-1
+            val rightIndex = if( toIndex < fromIndex) toIndex else toIndex+1
+            val left = _parts.getOrNull(leftIndex)
+            val right = _parts.getOrNull(rightIndex)
+
+            when {
+                left == null -> when {
+                    _parts.first().depth == toMove.depth -> toMove.subdepth = _parts.first().subdepth-1
+                    else -> toMove.depth = _parts.first().depth - 1
+                }
+                right == null -> when {
+                    _parts.last().depth == toMove.depth -> toMove.subdepth = _parts.last().subdepth+1
+                    else -> toMove.depth = _parts.last().depth + 1
+                }
+                left.depth == right.depth -> {
+                    toMove.depth = left.depth
+                    toMove.subdepth = left.subdepth+1
+                    right.subdepth = left.subdepth+2
+                }
+                toMove.depth == left.depth -> toMove.subdepth = left.subdepth+1
+                toMove.depth == right.depth -> toMove.subdepth = right.subdepth-1
+                left.depth == right.depth-1 -> {
+                    _bubbleUpDepth(toIndex+1, left.depth+2)
+                    toMove.depth = left.depth+1
+                }
+                else -> toMove.depth = left.depth + 1
+            }
+        }
+    }
+
+    private fun _bubbleUpDepth( startIndex: Int, startDepth:Int) {
+        var currentPart = _parts.getOrNull(startIndex)?:return
+        var currentDepth = startDepth
+        var currentIndex = startIndex
+        while (currentPart.depth <= currentDepth) {
+            when {
+                currentPart.depth < currentDepth -> currentPart.depth = currentDepth
+                else -> currentPart.depth = ++currentDepth
+            }
+            currentPart = _parts.getOrNull(++currentIndex) ?: return
         }
     }
 
@@ -237,7 +284,7 @@ class SpriteLayer : Layer {
         })
     }
     private fun _sort() {
-        _parts.sortWith(compareBy({it.depth}, {it.id}))
+        _parts.sortWith(compareBy({it.depth}, {it.subdepth}))
     }
 
     val cDepthBind = Bindable(0) {new, _ ->  activePart?.depth = new}
@@ -255,10 +302,12 @@ class SpriteLayer : Layer {
     inner class SpritePart(
             _structure: SpritePartStructure,
             val handle: MediumHandle,
-            internal val id: Int)
+            subdepth: Int)
     {
         var structure = _structure ; private set
         val context get() = this@SpriteLayer
+
+        var subdepth by UndoableDelegate(subdepth, workspace.undoEngine,"Internal Change (should not see this).")
 
         // region Shadowing SpritePartStructure scroll with Undoable Wrapper
         var depth get() = structure.depth ; set(value) { if( value != structure.depth) replaceStructure(structure.copy(depth = value), 0)}

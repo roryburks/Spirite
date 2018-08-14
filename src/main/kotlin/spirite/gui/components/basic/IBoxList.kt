@@ -4,14 +4,20 @@ import spirite.base.brains.Bindable
 import spirite.base.util.MathUtil
 import spirite.base.util.delegates.OnChangeDelegate
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
-import spirite.gui.components.basic.IBoxList.DefaultBoxComponent
-import spirite.gui.components.basic.IBoxList.IBoxComponent
+import spirite.gui.components.basic.IBoxList.*
 import spirite.hybrid.Hybrid
 import kotlin.math.max
 
 interface IBoxList<T> : IComponent
 {
+    interface IMovementContract
+    {
+        fun canMove(from: Int, to:Int) : Boolean
+        fun doMove(from: Int, to: Int)
+    }
+
     val entries : List<T>
+    var movementContract : IMovementContract?
 
     val selectedIndexBind : Bindable<Int>
     var selectedIndex: Int
@@ -82,14 +88,19 @@ abstract class BoxList<T> constructor(boxWidth: Int, boxHeight: Int, entries: Co
             }
         }
 
+    override var movementContract: IMovementContract? = null
     override var movable: Boolean = true
-    override fun attemptMove(from: Int, to: Int) = when(movable) {
-        true -> {
-            _entries.add(to, _entries.removeAt(from))
-            rebuild()
-            true
+    override fun attemptMove(from: Int, to: Int) : Boolean{
+        if(!movable) return false
+
+        val contract = movementContract
+        if( contract != null) {
+            if( !contract.canMove(from, to)) return false
+            contract.doMove(from, to)
         }
-        false -> false
+        _entries.add(to, _entries.removeAt(from))
+        rebuild()
+        return true
     }
 
     init {

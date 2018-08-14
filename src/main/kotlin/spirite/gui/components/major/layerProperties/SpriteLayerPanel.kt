@@ -6,6 +6,7 @@ import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.Colors
 import spirite.gui.components.basic.IBoxList.IBoxComponent
+import spirite.gui.components.basic.IBoxList.IMovementContract
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_RAISED
 import spirite.gui.components.basic.ICrossPanel
@@ -90,7 +91,12 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
             linkedSprite?.addPart("new")
         }
 
-
+        boxList.movementContract = object : IMovementContract {
+            override fun canMove(from: Int, to: Int): Boolean = true
+            override fun doMove(from: Int, to: Int) {
+                linkedSprite?.movePart(from, to)
+            }
+        }
 
         boxList.renderer = {part ->
             object : IBoxComponent {
@@ -114,13 +120,17 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.also {
-                        it.onMouseClick ={ boxList.selected = part}
+                        it.onMouseClick ={ boxList.selected = part ; boxList.requestFocus()}
                         if( boxList.selected == part) it.setBasicBorder(BEVELED_RAISED)
                     }
 
                 override fun setSelected(selected: Boolean) {
                     if( selected)
                         activePart = part
+                }
+
+                override fun setIndex(index: Int) {
+                    println("index is set: $index")
                 }
             }
         }
