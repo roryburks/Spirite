@@ -8,6 +8,7 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import java.security.acl.Group
 
 interface IFFAAnimationLoader {
     fun loadAnimation(context: LoadContext, name: String) : FixedFrameAnimation
@@ -15,12 +16,44 @@ interface IFFAAnimationLoader {
 
 object FFALoaderFactory {
     fun getLoaderFromVersion( version: Int) : IFFAAnimationLoader = when( version) {
-        in 0..0x1_0000 -> LegacyFFALoader_X_TO_1_0000()
+        in 0..7 -> LegacyFFALoader_X_To_7()
+        in 8..0x1_0000 -> LegacyFFALoader_8_TO_1_0000()
         else -> FFALoader()
     }
 }
 
-class LegacyFFALoader_X_TO_1_0000 : IFFAAnimationLoader {
+class LegacyFFALoader_X_To_7 : IFFAAnimationLoader {
+    override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
+        val ra = context.ra
+        val layerCount = ra.readUnsignedShort()
+        val ffa = FixedFrameAnimation(name, context.workspace)
+
+        repeat(layerCount) {
+            val groupNodeId = ra.readInt()
+            val framecount = ra.readUnsignedShort()
+
+            val groupNode = if( groupNodeId == 0) null else context.nodes.getOrNull(groupNodeId)
+            val nodeMap = mutableMapOf<Node, FFAFrameStructure>()
+
+            repeat(framecount) {
+                val marker = ra.readByte().i
+                val length = ra.readShort()
+                val nodeLink = if( marker == 0) ra.readInt() else 0
+                if( nodeLink > 0) {
+                    val node = context.nodes[nodeLink]
+                    nodeMap[node] = FFAFrameStructure(node, FRAME, length.i)
+                }
+            }
+
+            (groupNode as? GroupNode)?.also { t-> ffa.addLinkedLayer(t, false, nodeMap) }
+        }
+
+        return  ffa
+    }
+
+}
+
+class LegacyFFALoader_8_TO_1_0000 : IFFAAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
         val ra = context.ra
         val nodes = context.nodes

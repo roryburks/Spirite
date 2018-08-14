@@ -270,14 +270,27 @@ object LoadEngine {
                     val partSize = ra.readUnsignedByte()
                     val parts = List(partSize) {
                         val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
-                        val transX = ra.readFloat()
-                        val transY = ra.readFloat()
-                        val scaleX = ra.readFloat()
-                        val scaleY = ra.readFloat()
-                        val rot = ra.readFloat()
-                        val drawDepth = ra.readInt()
+
+                        val spritePartStructure = when {
+                            context.version <= 4 -> {
+                                val transX = ra.readShort().toFloat()
+                                val transY = ra.readShort().toFloat()
+                                val drawDepth = -ra.readInt()
+                                SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, 1f, 1f, 0f)
+                            }
+                            else -> {
+                                val transX = ra.readFloat()
+                                val transY = ra.readFloat()
+                                val scaleX = ra.readFloat()
+                                val scaleY = ra.readFloat()
+                                val rot = ra.readFloat()
+                                val drawDepth = -ra.readInt()
+                                SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot)
+
+                            }
+                        }
                         val medium = MediumHandle(workspace,context.reindex(ra.readInt()))
-                        Pair(medium, SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot))
+                        Pair(medium, spritePartStructure)
                     }
 
                     val sprite = SpriteLayer(workspace, workspace.mediumRepository, parts)
