@@ -46,7 +46,7 @@ protected constructor(startChecked: Boolean, private val imp: JToggleButton )
 
 
         imp.addMouseListener(object : MouseListener {
-            override fun mouseReleased(e: MouseEvent?) { if( enabled) checked = !checked }
+            override fun mouseReleased(e: MouseEvent?) { if( enabled && e?.button == MouseEvent.BUTTON1) checked = !checked }
             override fun mouseEntered(e: MouseEvent?) {}
             override fun mouseClicked(e: MouseEvent?) {}
             override fun mouseExited(e: MouseEvent?) {}

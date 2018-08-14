@@ -1,10 +1,10 @@
 package spirite.base.util.groupExtensions
 
 private class ThenIterable<T>
-    constructor(
-            val first: Iterable<T>,
-            val second: Iterable<T>
-    ): Iterable<T> {
+constructor(
+        val first: Iterable<T>,
+        val second: Iterable<T>
+): Iterable<T> {
     override fun iterator(): Iterator<T> = ThenIterator()
 
     inner class ThenIterator: Iterator<T> {
@@ -35,7 +35,38 @@ private class ThenIterable<T>
         }
     }
 }
+private class PlusOneIterable<T>
+constructor(
+        val first: Iterable<T>,
+        val then: T
+): Iterable<T> {
+    override fun iterator(): Iterator<T> = ThenIterator()
+
+    inner class ThenIterator: Iterator<T> {
+        var iterator = first.iterator()
+        var doneThen = false
+
+        override fun hasNext(): Boolean {
+            return when {
+                doneThen -> false
+                else -> true
+            }
+        }
+
+        override fun next(): T {
+            return when {
+                doneThen -> throw IndexOutOfBoundsException()
+                iterator.hasNext() -> iterator.next()
+                else -> {
+                    doneThen = true
+                    then
+                }
+            }
+        }
+    }
+}
 
 
 
 fun <T> Iterable<T>.then( after: Iterable<T>) : Iterable<T> = ThenIterable(this, after)
+fun <T> Iterable<T>.then( t: T) : Iterable<T> = PlusOneIterable(this, t)

@@ -4,8 +4,10 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.graphics.rendering.IThumbnailStore.IThumbnailAccessContract
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.IIsolationManager.IsolationState
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.sprite.SpriteLayer
+import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.Colors
 import spirite.gui.components.advanced.ITreeElementConstructor
 import spirite.gui.components.advanced.ITreeView
@@ -15,6 +17,7 @@ import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BASIC
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IImageBox
+import spirite.gui.components.basic.IToggleButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.RIGHT
 import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
@@ -245,13 +248,7 @@ private constructor(
                 if (toggleButton.checked) {
                     rows.addFlatGroup {
                         sprite.parts.forEach {part ->
-                            val btn = Hybrid.ui.ToggleButton(true)
-                            //btn.plainStyle = true
-                            btn.background = Skin.AnimSchemePanel.ActiveNodeBg.scolor
-                            btn.setBasicBorder(BASIC)
-                            btn.setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
-                            btn.setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
-                            add(btn,12,12)
+                            add(SpriteLayerDisplayButton(part, master),12,12)
                             addGap(20)
                         }
                     }
@@ -272,6 +269,33 @@ private constructor(
                                 master.nativeThumbnailStore.contractThumbnail(part, this) {
                                     partThumb.setImage(it)
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        class SpriteLayerDisplayButton(
+                val part: SpritePart,
+                val master: IMasterControl) : IToggleButton by Hybrid.ui.ToggleButton(true)
+        {
+            init {
+                //btn.plainStyle = true
+                background = Skin.AnimSchemePanel.ActiveNodeBg.scolor
+                setBasicBorder(BASIC)
+                setOnIcon(SwIcons.SmallIcons.Rig_VisibileOn)
+                setOffIcon(SwIcons.SmallIcons.Rig_VisibleOff)
+                onMouseClick = {evt->
+                    if( evt.button == RIGHT) {
+                        val res = master.dialog.invokeDisplayOptions("Display for all Parts of kind [${part.partName}] in group.")
+                        if( res != null) {
+                            val workspace = part.context.workspace
+                            val layer = part.context
+                            val node = workspace.groupTree.root.getAllNodesSuchThat({(it as? LayerNode)?.layer == layer}).firstOrNull()
+                            val parent = node?.parent
+                            if( parent != null) {
+                                part.context.workspace.isolationManager.setIsolationStateForSpritePartKind(parent, part.partName, true, IsolationState(res.isVisible,res.alpha))
                             }
                         }
                     }

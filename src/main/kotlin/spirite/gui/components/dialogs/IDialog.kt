@@ -2,6 +2,7 @@ package spirite.gui.components.dialogs
 
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
+import spirite.gui.components.dialogs.DisplayOptionsPanel.DisplayOptions
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.*
 import spirite.gui.components.dialogs.NewSimpleLayerPanel.NewSimpleLayerReturn
@@ -22,6 +23,8 @@ import javax.swing.filechooser.FileNameExtensionFilter
 interface IDialog {
     fun invokeNewSimpleLayer( workspace: IImageWorkspace) : NewSimpleLayerReturn?
     fun invokeNewWorkspace(): NewWorkspaceReturn?
+
+    fun invokeDisplayOptions(title: String = "Display Options", default: DisplayOptions? = null) : DisplayOptions?
 
     fun promptForString( message: String, default: String = "") : String?
     fun promptVerify(message: String) : Boolean
@@ -91,6 +94,21 @@ class JDialog(private val master: IMasterControl) : IDialog
         }
     }
 
+    override fun invokeDisplayOptions(title: String, default: DisplayOptions?): DisplayOptions? {
+        val panel= DisplayOptionsPanel(default)
+        val result =JOptionPane.showConfirmDialog(
+                null,
+                panel.jcomponent,
+                title,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                SwIcons.BigIcons.VisibleOn.icon)
+
+        return when(result) {
+            JOptionPane.OK_OPTION -> panel.result
+            else -> null
+        }
+    }
 
     override fun pickFile(type: FilePickType): File? {
         val fc = JFileChooser()
@@ -125,7 +143,12 @@ class JDialog(private val master: IMasterControl) : IDialog
         fc.currentDirectory = defaultFile
         fc.selectedFile = defaultFile
 
-        if( fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        val result = when( type) {
+            OPEN -> fc.showOpenDialog(null)
+            else -> fc.showSaveDialog(null)
+        }
+
+        if( result == JFileChooser.APPROVE_OPTION) {
             var saveFile = fc.selectedFile
 
             if( type == SAVE_SIF && saveFile.name.indexOf('.') == -1)

@@ -223,8 +223,8 @@ open class GroupTree( val undoEngine: IUndoEngine?)
             return list
         }
 
-        val ancestors : List<Node> get() {
-            val list = mutableListOf<Node>()
+        val ancestors : List<GroupNode> get() {
+            val list = mutableListOf<GroupNode>()
             var p = this.parent
             while( p != null) {
                 list.add(p)

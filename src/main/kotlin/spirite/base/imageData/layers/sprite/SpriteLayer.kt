@@ -206,7 +206,6 @@ class SpriteLayer : Layer {
 
             override fun getDependencies() = SinglyList(toRemove.handle)
         })
-
     }
     fun movePart( fromIndex: Int, toIndex: Int) {
         if( fromIndex == toIndex) return

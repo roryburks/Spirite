@@ -119,18 +119,14 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                                 height = 32
                             }
                         }
-                    }.also {
-                        it.onMouseClick ={ boxList.selected = part ; boxList.requestFocus()}
-                        if( boxList.selected == part) it.setBasicBorder(BEVELED_RAISED)
+                    }.apply {
+                        onMouseClick ={ boxList.selected = part ; boxList.requestFocus()}
+                        if( boxList.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 
                 override fun setSelected(selected: Boolean) {
                     if( selected)
                         activePart = part
-                }
-
-                override fun setIndex(index: Int) {
-                    println("index is set: $index")
                 }
             }
         }
