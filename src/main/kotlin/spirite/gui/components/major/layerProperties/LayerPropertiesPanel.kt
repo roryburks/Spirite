@@ -17,7 +17,7 @@ class LayerPropertiesPanel( val master: IMasterControl) : IOmniComponent
     override val name: String get() = "Layer Properties"
 
     val imp = Hybrid.ui.CrossPanel()
-
+    init {imp.ref = this}
 
     val spriteProperties by lazy { SpriteLayerPanel(master) }
 

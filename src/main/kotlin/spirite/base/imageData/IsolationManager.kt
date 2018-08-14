@@ -25,9 +25,7 @@ interface IIsolationManager
 
     fun getIsolationStateForSpritePartKind(root: GroupNode, partName: String) : IsolationState
     fun setIsolationStateForSpritePartKind(root: GroupNode, partName: String, includeSubtree: Boolean, state: IsolationState)
-//    fun resetIsolationForSprites(root: GroupNode)
-//    fun setIsolationStateForSpritePartKind(root: GroupNode, partName: String, includeSubtrees: Boolean, isDrawn: Boolean, renderRubric: RenderRubric)
-//    fun setDefaultIsolationStateForSprite(root: GroupNode, includeSubtrees: Boolean, isDrawn: Boolean, renderRubric: RenderRubric)
+    fun setIsolationStateForAllSpriteKindsBut(root: GroupNode, partName: String, includeSubtree: Boolean, state: IsolationState)
 }
 
 interface IIsolator
@@ -96,15 +94,22 @@ class IsolationManager(
             val partName: String,
             val isDrawn: Boolean,
             val alpha: Float,
-            val includeSubtree: Boolean)
-    private  val _spriteIsolations  = mutableMapOf<Pair<GroupNode,String>,SpriteIsolationStruct>()
+            val includeSubtree: Boolean,
+            val inverted: Boolean)
+    private  val _spriteIsolations  = mutableMapOf<Pair<GroupNode,String?>,SpriteIsolationStruct>()
 
     override fun getIsolationStateForSpritePartKind(root: GroupNode, partName: String): IsolationState {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun setIsolationStateForSpritePartKind(root: GroupNode, partName: String, includeSubtree: Boolean, state: IsolationState) {
-        _spriteIsolations[Pair(root,partName)] = SpriteIsolationStruct(root, partName, state.isDrawn, state.alpha, includeSubtree)
+        _spriteIsolations[Pair(root,partName)] = SpriteIsolationStruct(root, partName, state.isDrawn, state.alpha, includeSubtree, false)
+        isolationIsActive = true
+        triggerIsolationChange()
+    }
+
+    override fun setIsolationStateForAllSpriteKindsBut(root: GroupNode, partName: String, includeSubtree: Boolean, state: IsolationState) {
+        _spriteIsolations[Pair(root,null)] = SpriteIsolationStruct(root, partName, state.isDrawn, state.alpha, includeSubtree, true)
         isolationIsActive = true
         triggerIsolationChange()
     }
@@ -112,7 +117,7 @@ class IsolationManager(
 }
 
 internal class SpriteIsolator(
-        private val map: HashMap<Pair<GroupNode,String>, SpriteIsolationStruct>,
+        private val map: HashMap<Pair<GroupNode,String?>, SpriteIsolationStruct>,
         val node: Node) : ISpriteLayerIsolator
 {
     override fun getIsolatorForNode(node: Node): IIsolator {
@@ -125,12 +130,25 @@ internal class SpriteIsolator(
         var alpha = 1f
         for (ancestor in ancestors) {
             val isolation = map[Pair(ancestor,part.partName)]
+
             if( isolation != null && (isolation.includeSubtree || ancestor == node.parent)) {
                 if( !isolation.isDrawn) {
                     isDrawn = false
                     break
                 }
                 alpha *= isolation.alpha
+            }
+
+            val invertIsolation = map[Pair(ancestor,null)]
+            if( invertIsolation != null &&
+                    (invertIsolation.includeSubtree || ancestor == node.parent) &&
+                    (invertIsolation.partName != part.partName))
+            {
+                if( !invertIsolation.isDrawn) {
+                    isDrawn = false
+                    break
+                }
+                alpha *= invertIsolation.alpha
             }
         }
 
