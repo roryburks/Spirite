@@ -99,22 +99,30 @@ interface ITreeView<T> : ITreeViewNonUI<T>, IComponent
 }
 
 class ITreeElementConstructor<T> {
-    fun Node(value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes()) {
-        _elements.add( ITNode( value, attributes))
+    fun Node(value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), onNodeCreated: ((ITreeNode<T>)->Unit)? = null) {
+        _elements.add( ITNode( value, attributes,onNodeCreated = onNodeCreated))
     }
-    fun Branch( value: T, attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(), expanded: Boolean = true, initializer: ITreeElementConstructor<T>.()->Unit) {
+    fun Branch(
+            value: T,
+            attributes: TreeNodeAttributes<T> = BasicTreeNodeAttributes(),
+            expanded: Boolean = true,
+            onNodeCreated: ((ITreeNode<T>)->Unit)? = null,
+            initializer: ITreeElementConstructor<T>.()->Unit)
+    {
         _elements.add( ITNode(
                 value,
                 attributes,
                 ITreeElementConstructor<T>().apply { initializer.invoke(this) }.elements,
-                expanded))
+                expanded,
+                onNodeCreated))
     }
 
     internal class ITNode<T>(
             val value:T,
             val attributes: TreeNodeAttributes<T>,
             val children: List<ITNode<T>>? = null,
-            val expanded: Boolean = true)
+            val expanded: Boolean = true,
+            val onNodeCreated: ((ITreeNode<T>)->Unit)? = null)
     internal val elements : List<ITNode<T>> get() = _elements
     private val _elements  = mutableListOf<ITNode<T>>()
 }
@@ -254,15 +262,16 @@ private constructor(private val imp : SwTreeViewImp<T>)
         val roots = ITreeElementConstructor<T>().apply { constructor.invoke(this) }.elements
 
         fun addNode( context: TreeNode<T>, node: ITNode<T>) {
-            context.addChild( node.value, node.attributes, node.expanded )
-                    .apply { node.children?.forEach { addNode(this, it) }}
+            val treeNode = context.addChild( node.value, node.attributes, node.expanded )
+            node.children?.forEach { addNode(treeNode, it) }
+            node.onNodeCreated?.invoke(treeNode)
         }
 
-        roots.forEach { root ->
-            TreeNode(root.value, root.attributes, root.expanded).apply {
-                _rootNodes.add(this)
-                root.children?.forEach {addNode(this, it) }
-            }
+        for (root in roots) {
+            val treeNode = TreeNode(root.value, root.attributes, root.expanded)
+            _rootNodes.add(treeNode)
+            root.children?.forEach { addNode(treeNode, it) }
+            root.onNodeCreated?.invoke(treeNode)
         }
         rebuildTree()
     }
@@ -296,10 +305,10 @@ private constructor(private val imp : SwTreeViewImp<T>)
     internal constructor( defaultValue: T, val attributes: TreeNodeAttributes<T>, expanded: Boolean = true)
         :ITreeNode<T>
     {
-        override val expandedBind = Bindable(expanded, { new, old -> rebuildTree() })
+        override val expandedBind = Bindable(expanded) { new, old -> rebuildTree() }
         override var expanded by expandedBind
 
-        override val valueBind = Bindable(defaultValue, { new, old -> rebuildTree() })
+        override val valueBind = Bindable(defaultValue) { new, old -> rebuildTree() }
         override var value by valueBind
         override val children: List<TreeNode<T>> get() = _children
         private val _children = mutableListOf<TreeNode<T>>()

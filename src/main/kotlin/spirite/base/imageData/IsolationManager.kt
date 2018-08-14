@@ -115,7 +115,6 @@ internal class SpriteIsolator(
         private val map: HashMap<Pair<GroupNode,String>, SpriteIsolationStruct>,
         val node: Node) : ISpriteLayerIsolator
 {
-    // Note: this class is bad.  Might need to rethink later how to pass this structural data and how the isolation scheme should work
     override fun getIsolatorForNode(node: Node): IIsolator {
         return SpriteIsolator(map, node)
     }

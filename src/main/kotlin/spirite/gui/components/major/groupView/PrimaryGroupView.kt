@@ -68,11 +68,16 @@ private constructor(
 
         fun makeConstructor(group: GroupNode) : ITreeElementConstructor<Node>.()->Unit  {
             return {
-                group.children.forEach {
+                group.children.forEach {node ->
                     when {
-                        it is GroupNode -> Branch(it, groupAttributes, it.expanded, makeConstructor(it))
-                        it is LayerNode && it.layer is SpriteLayer -> Node(it, spriteLayerAttributes)
-                        else -> Node(it, nongroupAttributes)
+                        node is GroupNode -> Branch(
+                                node,
+                                groupAttributes,
+                                node.expanded,
+                                {tree -> tree.expandedBind.addListener { new, _ -> node.expanded = new }},
+                                makeConstructor(node))
+                        node is LayerNode && node.layer is SpriteLayer -> Node(node, spriteLayerAttributes)
+                        else -> Node(node, nongroupAttributes)
                     }
                 }
             }
