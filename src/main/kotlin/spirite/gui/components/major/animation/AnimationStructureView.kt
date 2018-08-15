@@ -16,14 +16,13 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
 
     private val label = Hybrid.ui.Label(" ")
     private val subContainer = Hybrid.ui.CrossPanel()
-    private val scrollContainer = Hybrid.ui.ScrollContainer(subContainer)
 
     private val imp = Hybrid.ui.CrossPanel {
         rows.add(label)
         rows.addGap(2)
         rows += {
             addGap(2)
-            add(scrollContainer, flex = 100f)
+            add(subContainer, flex = 100f)
             addGap(2)
             flex = 100f
         }
@@ -38,8 +37,7 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
             is FixedFrameAnimation -> {
                 label.text = new.name
                 subContainer.setLayout {
-                    currentPanel = AnimFFAStructPanel(master, new)
-                    rows.add(currentPanel!!, flex = 100f)
+                    rows.add(Hybrid.ui.ScrollContainer(AnimFFAStructPanel(master, new)), flex = 100f)
                     rows.flex = 100f
                 }
             }

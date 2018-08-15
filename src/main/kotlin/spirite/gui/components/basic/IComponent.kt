@@ -48,6 +48,7 @@ interface IComponent {
         BEVELED_LOWERED, BEVELED_RAISED, BASIC
     }
     fun setBasicBorder( border: BasicBorder?)
+    fun setColoredBorder( color: SColor, width: Int = 1)
 
     val onResize : EventStack<Unit>
     val onHidden : EventStack<Unit>

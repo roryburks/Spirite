@@ -86,6 +86,10 @@ abstract class ASwComponent : ISwComponent {
         }
     }
 
+    override fun setColoredBorder(color: SColor, width: Int) {
+        (component as? JComponent)?.border = BorderFactory.createLineBorder( color.jcolor, width)
+    }
+
     // region ComponentListener
     private inner class ComponentMultiStack : ComponentListener {
         val resizeStack= EventStack<Unit>()
@@ -114,8 +118,10 @@ abstract class ASwComponent : ISwComponent {
     // region MouseListener
     private inner class MouseMultiStack : java.awt.event.MouseListener, java.awt.event.MouseMotionListener
     {
-        var startX = 0
-        var startY = 0
+        init {
+            component.addMouseListener(this)
+            component.addMouseMotionListener(this)
+        }
 
         fun convert( e: JMouseEvent) : MouseEvent {
             val scomp = SwComponent(e.component as Component)

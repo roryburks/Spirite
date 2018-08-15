@@ -32,14 +32,14 @@ private constructor(
     constructor(defaultColor: SColor) : this(defaultColor, SwColorSquareImp())
     init {
         imp.context = this
-        imp.addMouseListener(SimpleMouseListener{
+        onMouseClick += {
             if( active) {
                 this.color = JColorChooser.showDialog(
                         imp,
                         "Choose Background Color",
                         defaultColor.jcolor)?.scolor ?: this.color
             }
-        })
+        }
         colorBind.addListener {new, old -> imp.background = new.jcolor}
     }
 

@@ -1,6 +1,8 @@
 package spirite.gui.components.major.animation.structureView
 
+import spirite.base.brains.IBoundListener
 import spirite.base.brains.IMasterControl
+import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
@@ -8,9 +10,12 @@ import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
+import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
 import spirite.base.util.Colors
+import spirite.base.util.groupExtensions.append
+import spirite.base.util.groupExtensions.lookup
 import spirite.base.util.groupExtensions.mapAggregated
 import spirite.base.util.round
 import spirite.gui.Direction
@@ -31,11 +36,15 @@ import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SwComponent
+import spirite.pc.gui.basic.jcomponent
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
+import kotlin.math.max
 
 private object RememberedStates {
     // Not sure if this is how I want to do this, but I'm fine with it for now.
@@ -76,10 +85,12 @@ private constructor(
     var tickWidth = 32
     var tickHeight = 16
 
-    private val frameLinks = mutableListOf<FramePanel>()
+    private val frameLinks = mutableMapOf<Node,MutableList<IComponent>>()
+    private val partLinks = mutableMapOf<SpritePart,MutableList<IComponent>>()
 
     private fun rebuild() {
         frameLinks.clear()
+        partLinks.clear()
 
         imp.setLayout {
             val start = anim.start
@@ -92,8 +103,14 @@ private constructor(
                 (start until end).forEach { add(TickPanel(it), width = tickWidth) }
                 height = tickHeight
             }
+            rows += {
+                addGap(stretchWidth)
+            }
         }
     }
+
+    var stretchWidth = 0
+        set(value) {field = max(value,1); rebuild()}
 
     private fun buildLayerInfo(layer: FFALayer) : CrossRowInitializer.() -> Unit{
         val state = RememberedStates.getState(layer)
@@ -104,7 +121,6 @@ private constructor(
 
         fun defaultBuild(layer: FFALayer) : CrossRowInitializer.() -> Unit = {
             if(expandable)addFlatGroup(nameWidth-12) {
-                addGap(layerHeight-12)
                 val expandButton = Hybrid.ui.Button()
                 expandButton.background = Colors.TRANSPARENT
                 expandButton.opaque = false
@@ -123,11 +139,16 @@ private constructor(
                 len += frame.length
                 when( frame.marker) {
                     FRAME -> {
-                        if (frame.length > 0)
-                            add( FramePanel(frame).also {frameLinks.add(it) }, width = tickWidth * frame.length)
+                        if (frame.length > 0) {
+                            val component = FramePanel(frame)
+                            frame.node?.also { frameLinks.append(it, component)}
+                            add(component, width = tickWidth * frame.length)
+                        }
                     }
                     GAP -> {
-                        add(GapPanel(frame), width = tickWidth * frame.length)
+                        val component = GapPanel(frame)
+                        frame.node?.also { frameLinks.append(it, component)}
+                        add(component, width = tickWidth * frame.length)
                     }
                     START_LOCAL_LOOP -> {}
                     END_LOCAL_LOOP -> {}
@@ -173,7 +194,10 @@ private constructor(
                     FRAME -> {
                         if (frame.length > 0) {
                             this += {
-                                add( FramePanel(frame).also {frameLinks.add(it) }, height = squishedNameHeight)
+                                val topBar = FramePanel(frame)
+                                frame.node?.also { frameLinks.append(it, topBar)}
+                                add( topBar, height = squishedNameHeight)
+
                                 val lnLayer = (frame.node as? LayerNode)?.layer
                                 distinctNames.forEach {name ->
                                     add( when(lnLayer) {
@@ -182,11 +206,19 @@ private constructor(
                                             val part = lnLayer.parts.firstOrNull() { it.partName == name }
                                             when( part) {
                                                 null -> BlankPanel()
-                                                else -> SpritePartPanel(part, frame)
+                                                else -> {
+                                                    val comp = SpritePartPanel(part, frame)
+                                                    partLinks.append(part, comp)
+                                                    comp
+                                                }
                                             }
                                         }
                                         else -> when( name) {
-                                            null -> FramePanel(frame)
+                                            null -> {
+                                                val comp = FramePanel(frame)
+                                                frame.node?.also { frameLinks.append(it, comp)}
+                                                comp
+                                            }
                                             else -> BlankPanel()
                                         }
                                     }, height = layerHeight)
@@ -219,6 +251,7 @@ private constructor(
             else -> expandedBuild(layer)
         }
     }
+
 
     private open inner class FrameResizeable(
             private val _imp: IComponent,
@@ -268,15 +301,15 @@ private constructor(
 
     private inner class GapPanel(
             val frame: FFAFrame,
-            private val imp : IComponent = SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Fg.jcolor)))
+            private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Fg.jcolor)))
         : FrameResizeable(imp,frame),IComponent by imp
     {
     }
 
-    private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Bg.jcolor))
+    private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor))
     private inner class PseudoBlankPanel(
             val frame: FFAFrame,
-            private val imp : IComponent = SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Bg.jcolor)))
+            private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor)))
         : FrameResizeable(imp,frame), IComponent by imp
 
 
@@ -288,11 +321,12 @@ private constructor(
         val imageBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
         init {
             imp.ref = this
+            imp.opaque = false
             imp.setLayout {
                 cols.add(imageBox , width = tickWidth)
 
                 if( frame.length > 1) {
-                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
+                    cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
                 }
 
                 cols.flex = 1f
@@ -330,12 +364,13 @@ private constructor(
     {
         val imageBox = Hybrid.ui.ImageBox()
         init {
+            imp.opaque = false
             imp.ref = this
             imp.setLayout {
                 cols.add(imageBox , width = tickWidth)
 
                 if( frame.length > 1) {
-                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
+                    cols.add(SwComponent(ArrowPanel(null, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
                 }
 
                 cols.flex = 1f
@@ -375,6 +410,26 @@ private constructor(
                 rebuild()
         }
     }.also {anim.workspace.animationManager.animationStructureChangeObservable.addObserver( it)}
+
+    private  var apb : IBoundListener<SpriteLayer.SpritePart?>? = null
+    val listener = master.centralObservatory.selectedNode.addWeakListener { new, old ->
+        apb?.unbind()
+        if( old != null) {
+            frameLinks.lookup(old).forEach { it.setBasicBorder(null) }
+            partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
+        }
+        if( new != null) {
+            frameLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
+            val spriteLayer = ((new as? LayerNode)?.layer as? SpriteLayer)
+            if( spriteLayer != null) {
+                apb = spriteLayer.activePartBind.addWeakListener { new, old ->
+                    partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
+                    if( new != null)
+                        partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
+                }
+            }
+        }
+    }
     // endregion
 
     init {
@@ -385,12 +440,17 @@ private constructor(
 
 private class AnimDragStateManager
 {
-    enum class State {
-        NORMAL,
-        DRAGGING_FRAME
+    interface IAnimStateBehavior {
+        fun move(x: Int, y: Int)
+        fun release(x: Int, y: Int)
+        fun draw( gc: Graphics2D)   // TODO: This really should be GraphicsContext, but right now we haven't re-implemented AWTGraphicsContext
     }
 
+
+    //class ResizingFrame
 }
+
+data class C(val x: Int)
 
 private class AnimFFAStructPanelImp : JPanel() {
     lateinit var context : AnimFFAStructPanel
@@ -399,7 +459,6 @@ private class AnimFFAStructPanelImp : JPanel() {
         removeAll()
         val list = mutableListOf<IComponent>()
         layout = CrossLayout.buildCrossLayout(this, list, constructor)
-        validate()
         CrossLayout.buildCrossLayout(this, null, constructor)
     }
 
@@ -409,14 +468,26 @@ private class AnimFFAStructPanelImp : JPanel() {
     override fun paint(g: Graphics) {
         g.color = background
         g.fillRect(0,0,width,height)
+        drawBackground(g as Graphics2D)
         super.paintChildren(g)
+    }
+
+    private fun drawBackground(g: Graphics2D) {
+
     }
 }
 
-private class DashedOutPanel(val bgcol: JColor, val fgcol: JColor) : JPanel() {
+private class DashedOutPanel(val bgcol: JColor?, val fgcol: JColor) : JPanel() {
+    init {
+        background = null
+        isOpaque = false
+    }
+
     override fun paintComponent(g: Graphics) {
-        g.color = bgcol
-        g.fillRect(0,0,width, height)
+        if( bgcol != null) {
+            g.color = bgcol
+            g.fillRect(0, 0, width, height)
+        }
 
         g.color = fgcol
         (0.. (width + height)/4)
@@ -424,11 +495,16 @@ private class DashedOutPanel(val bgcol: JColor, val fgcol: JColor) : JPanel() {
 
     }
 }
-private class ArrowPanel(val bgcol: JColor, val fgcol: JColor, val dir: Direction) : JPanel() {
+private class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Direction) : JPanel() {
+    init {
+        background = null
+        isOpaque = false
+    }
     override fun paintComponent(g: Graphics) {
-
-        g.color = bgcol
-        g.fillRect(0,0,width, height)
+        if( bgcol != null) {
+            g.color = bgcol
+            g.fillRect(0, 0, width, height)
+        }
 
         g.color = fgcol
 

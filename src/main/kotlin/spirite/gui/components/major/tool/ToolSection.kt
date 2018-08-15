@@ -48,6 +48,7 @@ class ToolSection (
         imp.renderer = { tool ->
             object : IBoxComponent {
                 override val component = ToolButton(tool).apply {
+                    onMouseClick += {evt -> master.toolsetManager.selectedTool = tool}
                 }
 
                 override fun setSelected(selected: Boolean) {
@@ -71,9 +72,6 @@ class ToolButton( val tool: Tool) : SwToggleButton(false, SwToolButtonImp(tool))
         plainStyle = true
         background = Colors.TRANSPARENT
         opaque = false
-
-        onMousePress += {println("press")}
-        onMouseClick += {evt -> println("click")}
     }
 
     private class SwToolButtonImp(val tool: Tool) : JToggleButton() {
