@@ -142,7 +142,7 @@ class ImageWorkspace(
     }
 
 
-    // Add internal component-to-component event triggers
+    // Add internal component-to-component event _triggers
     init {
         groupTree.selectedNodeBind.addListener { new, old ->
             activeMediumBind.field = (new as? LayerNode)?.run { layer.activeData.handle }

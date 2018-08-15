@@ -5,9 +5,8 @@ import spirite.base.util.f
 import spirite.gui.SUIPoint
 import spirite.gui.UIPoint
 import spirite.gui.components.basic.IComponent
-import spirite.gui.components.basic.IComponent.BasicBorder
+import spirite.gui.components.basic.IComponent.*
 import spirite.gui.components.basic.IComponent.BasicBorder.*
-import spirite.gui.components.basic.IComponent.BasicCursor
 import spirite.gui.components.basic.Invokable
 import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.*
@@ -88,71 +87,32 @@ abstract class ASwComponent : ISwComponent {
     }
 
     // region ComponentListener
-    override var onResize: (() -> Unit)?
-        get() = componentListener.onResize
-        set(value) { componentListener.onResize = value}
-    override var onHidden: (() -> Unit)?
-        get() = componentListener.onHidden
-        set(value) { componentListener.onHidden = value}
-    override var onShown: (() -> Unit)?
-        get() = componentListener.onShown
-        set(value) { componentListener.onShown = value}
-    override var onMoved: (() -> Unit)?
-        get() = componentListener.onMoved
-        set(value) { componentListener.onMoved = value}
+    private inner class ComponentMultiStack : ComponentListener {
+        val resizeStack= EventStack<Unit>()
+        val hiddenStack = EventStack<Unit>()
+        val shownStack= EventStack<Unit>()
+        val movedStack = EventStack<Unit>()
 
-    private class JSComponentListener(
-            var onResize : (() -> Unit)? = null,
-            var onHidden : (() -> Unit)? = null,
-            var onShown : (() -> Unit)? = null,
-            var onMoved : (() -> Unit)? = null) : java.awt.event.ComponentListener
-    {
-        override fun componentMoved(e: java.awt.event.ComponentEvent?) {onMoved?.invoke()}
-        override fun componentResized(e: java.awt.event.ComponentEvent?) {onResize?.invoke()}
-        override fun componentHidden(e: java.awt.event.ComponentEvent?) {onHidden?.invoke()}
-        override fun componentShown(e: java.awt.event.ComponentEvent?) {onShown?.invoke()}
+        init {
+            component.addComponentListener(this)
+        }
+
+        override fun componentMoved(e: ComponentEvent?) {movedStack.triggers.forEach { it(Unit) }}
+        override fun componentResized(e: ComponentEvent?) {resizeStack.triggers.forEach { it(Unit) }}
+        override fun componentHidden(e: ComponentEvent?) {hiddenStack.triggers.forEach { it(Unit) }}
+        override fun componentShown(e: ComponentEvent?) {shownStack.triggers.forEach { it(Unit) }}
     }
-    private val componentListener by lazy {  JSComponentListener().apply { component.addComponentListener(this)}}
+
+    private val componentMultiStack by lazy { ComponentMultiStack() }
+
+    override val onResize get() = componentMultiStack.resizeStack
+    override val onHidden get() = componentMultiStack.hiddenStack
+    override val onShown get() = componentMultiStack.shownStack
+    override val onMoved get() = componentMultiStack.movedStack
     // endregion
 
     // region MouseListener
-    override var onMouseClick: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseClick
-        set(value) {mouseListener.onMouseClick = value}
-    override var onMousePress: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMousePress
-        set(value) {mouseListener.onMousePress = value}
-    override var onMouseRelease: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseRelease
-        set(value) {mouseListener.onMouseRelease = value}
-    override var onMouseEnter: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseEnter
-        set(value) {mouseListener.onMouseEnter = value}
-    override var onMouseExit: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseExit
-        set(value) {mouseListener.onMouseExit = value}
-    override var onMouseMove: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseMove
-        set(value) {mouseListener.onMouseMove = value}
-    override var onMouseDrag: ((MouseEvent) -> Unit)?
-        get() = mouseListener.onMouseDrag
-        set(value) {mouseListener.onMouseDrag = value}
-
-    private val mouseListener by lazy {
-        JSMouseListener().apply {
-            component.addMouseListener(this)
-            component.addMouseMotionListener(this)
-        }
-    }
-    private class JSMouseListener(
-            var onMouseClick : ((MouseEvent) -> Unit)? = null,
-            var onMousePress : ((MouseEvent) -> Unit)? = null,
-            var onMouseRelease : ((MouseEvent) -> Unit)? = null,
-            var onMouseEnter : ((MouseEvent) -> Unit)? = null,
-            var onMouseExit : ((MouseEvent) -> Unit)? = null,
-            var onMouseMove : ((MouseEvent) -> Unit)? = null,
-            var onMouseDrag : ((MouseEvent) -> Unit)? = null)
-        :java.awt.event.MouseListener, java.awt.event.MouseMotionListener
+    private inner class MouseMultiStack : java.awt.event.MouseListener, java.awt.event.MouseMotionListener
     {
         var startX = 0
         var startY = 0
@@ -175,21 +135,51 @@ abstract class ASwComponent : ISwComponent {
                     mask)
         }
 
+        val releaseStack = EventStack<MouseEvent>()
+        val enterStack = EventStack<MouseEvent>()
+        val clickStack = EventStack<MouseEvent>()
+        val exitStack = EventStack<MouseEvent>()
+        val pressStack = EventStack<MouseEvent>()
+        val moveStack = EventStack<MouseEvent>()
+        val dragStack = EventStack<MouseEvent>()
+
         override fun mouseReleased(e: JMouseEvent) {
-            onMouseRelease?.invoke( convert(e))
-            onMouseClick?.invoke(convert(e))
+            val evt = convert(e)
+            releaseStack.triggers.forEach { it(evt) }
+            clickStack.triggers.forEach { it(evt) }
         }
-        override fun mouseEntered(e: JMouseEvent) { onMouseEnter?.invoke( convert(e))}
+        override fun mouseEntered(e: JMouseEvent) {
+            val evt = convert(e)
+            enterStack.triggers.forEach { it(evt) }
+        }
         override fun mouseClicked(e: JMouseEvent) {/*onMouseClick?.invoke(convert(e))*/}
-        override fun mouseExited(e: JMouseEvent) {onMouseExit?.invoke(convert(e))}
-        override fun mousePressed(e: JMouseEvent) {
-            startX = e.x
-            startY = e.y
-            onMousePress?.invoke(convert(e))
+        override fun mouseExited(e: JMouseEvent) {
+            val evt = convert(e)
+            exitStack.triggers.forEach { it(evt) }
         }
-        override fun mouseMoved(e: JMouseEvent) {onMouseMove?.invoke(convert(e))}
-        override fun mouseDragged(e: JMouseEvent) { onMouseDrag?.invoke(convert(e))}
+        override fun mousePressed(e: JMouseEvent) {
+            val evt = convert(e)
+            pressStack.triggers.forEach { it(evt) }
+        }
+        override fun mouseMoved(e: JMouseEvent) {
+            val evt = convert(e)
+            moveStack.triggers.forEach { it(evt) }
+        }
+        override fun mouseDragged(e: JMouseEvent) {
+            val evt = convert(e)
+            dragStack.triggers.forEach { it(evt) }
+        }
     }
+
+    private val mouseMultiStack get() = MouseMultiStack()
+
+    override val onMouseClick get() = mouseMultiStack.clickStack
+    override val onMousePress get() = mouseMultiStack.pressStack
+    override val onMouseRelease get() = mouseMultiStack.releaseStack
+    override val onMouseEnter get() = mouseMultiStack.enterStack
+    override val onMouseExit get() = mouseMultiStack.exitStack
+    override val onMouseMove get() = mouseMultiStack.moveStack
+    override val onMouseDrag get() = mouseMultiStack.dragStack
 
     override fun markAsPassThrough() {
         component.addMouseMotionListener( object : MouseMotionListener {

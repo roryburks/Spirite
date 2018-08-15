@@ -129,8 +129,8 @@ private constructor(
 
         init {
             val tracker = ResizeBarTracker()
-            onMousePress = {tracker.onMousePress(it)}
-            onMouseDrag = {tracker.onMouseDrag(it)}
+            onMousePress += {tracker.onMousePress(it)}
+            onMouseDrag += {tracker.onMouseDrag(it)}
 
             val btnExpand =  Hybrid.ui.ToggleButton(true)
             btnExpand.plainStyle = true

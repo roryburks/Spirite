@@ -110,7 +110,7 @@ private constructor(
             setBasicBorder(BASIC)
             setOnIcon(Rig_VisibileOn)
             setOffIcon(Rig_VisibleOff)
-            onMouseClick = {evt->
+            onMouseClick += {evt->
                 if( evt.button == RIGHT) {
                     val res = master.dialog.invokeDisplayOptions("Display for all Parts of kind [${part.partName}] in group.")
                     if( res != null) {

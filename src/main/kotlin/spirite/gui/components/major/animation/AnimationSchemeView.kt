@@ -28,7 +28,7 @@ class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
 
     private val attributes = object : TreeNodeAttributes<Animation> {
         override fun makeComponent(t: Animation): IComponent {
-            return Hybrid.ui.Label(t.name).also {it.onMouseRelease = rightclick}
+            return Hybrid.ui.Label(t.name).also {it.onMouseRelease += rightclick}
         }
     }
     private val detailAttributes = object : TreeNodeAttributes<Animation> {
@@ -79,6 +79,6 @@ class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
         master.centralObservatory.currentAnimationBind.addWeakListener { new, old ->  list.selected = new}
         list.selectedBind.addListener { new, old ->  workspace?.animationManager?.currentAnimation = new }
 
-        list.onMouseRelease = rightclick
+        list.onMouseRelease += rightclick
     }
 }

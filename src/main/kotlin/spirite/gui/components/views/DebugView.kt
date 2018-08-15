@@ -18,8 +18,8 @@ private constructor( val imp : ICrossPanel)
 
     constructor() : this( Hybrid.ui.CrossPanel())
 
-    val glArea : ITextArea = Hybrid.ui.TextArea()
-    val dbArea : ITextArea = Hybrid.ui.TextArea()
+    private val glArea : ITextArea = Hybrid.ui.TextArea()
+    private val dbArea : ITextArea = Hybrid.ui.TextArea()
 
     init {
         glArea.enabled = false

@@ -299,8 +299,8 @@ class ThumbnailStore(
                 if( workspace == ref.workspace && !thumbnail.changed) {
                     when {
                         (ref is SpritePartReference && mediums.contains(ref.part.handle)) ||
-                                (ref is LayerReference && ref.layer.imageDependencies.any { mediums.contains(it) }) ||
-                                (ref is NodeReference && (ref.node.descendants.any{nodes.contains(it)} || ref.node.imageDependencies.any { mediums.contains(it) }))
+                        (ref is LayerReference && ref.layer.imageDependencies.any { mediums.contains(it) }) ||
+                        (ref is NodeReference && (ref.node.descendants.any{nodes.contains(it)} || ref.node.imageDependencies.any { mediums.contains(it) }))
                         ->
                         {
                             thumbnail.changed = true

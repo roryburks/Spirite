@@ -200,7 +200,7 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
 
 /***
  * ReshapingBehavior derives from TransformBehavior, which handles all the transforming/drawing logic, whereas
- * ReshapingBehavior binds the transform being manipulated to the ReshapingTool's transform stats and triggers a
+ * ReshapingBehavior binds the transform being manipulated to the ReshapingTool's transform stats and _triggers a
  * ITranformModule drawer.
  */
 class ReshapingBehavior(penner: Penner, var drawer: ITransformModule) : TransformBehavior(penner)

@@ -76,8 +76,8 @@ private constructor(minValue: Float, maxValue: Float, label: String, val imp : S
             if( imp.isEnabled)
                 underlying = MathUtil.lerp(underlyingMin, underlyingMax, it.point.x / imp.width.toFloat())
         }
-        onMousePress = trigger
-        onMouseDrag = trigger
+        onMousePress += trigger
+        onMouseDrag += trigger
     }
 
     private val valAsStr : String

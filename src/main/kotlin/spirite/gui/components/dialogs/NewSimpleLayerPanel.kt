@@ -49,7 +49,7 @@ class NewSimpleLayerPanel(
         nameField.text = "Layer"
 
         cfields.forEach { it.active = false }
-        cfields.forEachIndexed { ind, cfiedl -> cfiedl.onMouseClick = {repaintColors(ind)} }
+        cfields.forEachIndexed { ind, cfiedl -> cfiedl.onMouseClick += {repaintColors(ind)} }
         cfields[3].active = true
 
         setLayout {

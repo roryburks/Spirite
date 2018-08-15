@@ -102,8 +102,8 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
         viewPanel.redraw()
     }
     init {
-        sliderMet.onMouseDrag = {  metBind.field = sliderMet.value / 100f }
-        sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
+        sliderMet.onMouseDrag += {  metBind.field = sliderMet.value / 100f }
+        sliderMet.onMouseRelease +=  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
         btnPlay.checkBind.addRootListener { new, _ -> if(!new) metBind.field = floor(metBind.field) }
     }
 

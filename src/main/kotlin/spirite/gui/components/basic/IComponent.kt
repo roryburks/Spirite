@@ -49,18 +49,31 @@ interface IComponent {
     }
     fun setBasicBorder( border: BasicBorder?)
 
-    var onResize : (() -> Unit)?
-    var onHidden : (() -> Unit)?
-    var onShown : (() -> Unit)?
-    var onMoved : (() -> Unit)?
+    val onResize : EventStack<Unit>
+    val onHidden : EventStack<Unit>
+    val onShown : EventStack<Unit>
+    val onMoved : EventStack<Unit>
 
-    var onMouseClick : ((MouseEvent) -> Unit)?
-    var onMousePress : ((MouseEvent) -> Unit)?
-    var onMouseRelease : ((MouseEvent) -> Unit)?
-    var onMouseEnter : ((MouseEvent) -> Unit)?
-    var onMouseExit : ((MouseEvent) -> Unit)?
-    var onMouseMove : ((MouseEvent) -> Unit)?
-    var onMouseDrag : ((MouseEvent) -> Unit)?
+    val onMouseClick : EventStack<MouseEvent>
+    val onMousePress : EventStack<MouseEvent>
+    val onMouseRelease : EventStack<MouseEvent>
+    val onMouseEnter : EventStack<MouseEvent>
+    val onMouseExit : EventStack<MouseEvent>
+    val onMouseMove : EventStack<MouseEvent>
+    val onMouseDrag : EventStack<MouseEvent>
+
+    open class EventStack<Event> {
+        val triggers : List<(Event)->Unit> get() = _triggers ?: emptyList()
+        private var _triggers : MutableList<(Event)->Unit>? = null ; private set
+
+        operator fun plusAssign( onEvent: (Event)->Unit) {
+            if( _triggers == null) _triggers = mutableListOf()
+            _triggers!!.add(onEvent)
+        }
+        fun clear() = _triggers?.clear()
+        fun remove( onEvent: (Event) -> Unit) = _triggers?.remove(onEvent)
+    }
+
     fun markAsPassThrough()
 
     var onMouseWheelMoved : ((MouseWheelEvent)->Unit)?

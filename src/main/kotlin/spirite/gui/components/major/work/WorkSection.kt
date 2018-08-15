@@ -107,8 +107,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
     private val zoomPanel = SwPanel { g ->
         val view = currentView
         when {
-            view == null -> {
-            }
+            view == null -> {}
             view.zoomLevel >= 0 -> {
                 g.font = Font("Tahoma", Font.PLAIN, 12)
                 g.drawString(Integer.toString(view.zoomLevel + 1), width - if (view.zoomLevel > 8) 16 else 12, height - 5)
@@ -141,13 +140,13 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
             }
         }
 
-        workAreaContainer.onResize = {calibrateScrolls()}
+        workAreaContainer.onResize += {calibrateScrolls()}
         Hybrid.timing.createTimer(15, true) {Hybrid.gle.runInGLContext { penner.step() }}
 
         coordinateLabel.text = "Coordinate Label"
         messageLabel.text = "Message Label"
 
-        this.onResize = {
+        this.onResize += {
             calibrateScrolls()
             redraw()
         }
@@ -181,7 +180,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
 //        }
 //    }.apply { master.centralObservatory.trackingImageObserver.addObserver(this) }
 
-    val workspaceOvserver = object: WorkspaceObserver {
+    val workspaceObserver = object: WorkspaceObserver {
         override fun workspaceCreated(newWorkspace: IImageWorkspace) {
             val newView = WorkSectionView(newWorkspace)
             views.put(newWorkspace, newView)

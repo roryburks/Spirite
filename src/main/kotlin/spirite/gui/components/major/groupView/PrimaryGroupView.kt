@@ -36,7 +36,7 @@ private constructor(
 
         tree.leftSize = 40
 
-        tree.onMouseClick = { evt ->
+        tree.onMouseClick += { evt ->
             if( evt.button == RIGHT )
                 workspace?.apply {
                     val node = tree.getNodeFromY(evt.point.y)?.value
@@ -104,7 +104,7 @@ private constructor(
 
         override fun makeComponent(t: Node): IComponent  {
             val comp = NodeLayerPanel(t,master)
-            comp.onMouseRelease = { evt ->
+            comp.onMouseRelease += { evt ->
                 if( evt.button == RIGHT )
                     workspace?.apply {
                         master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)
@@ -142,7 +142,7 @@ private constructor(
     private inner class SpriteLayerNodeAttributes: BaseNodeAttributes() {
         override fun makeComponent(t: Node): IComponent {
             val comp = SpriteLayerNodePanel(t, (t as LayerNode).layer as SpriteLayer, master)
-            comp.onMouseRelease = { evt ->
+            comp.onMouseRelease += { evt ->
                 if( evt.button == RIGHT )
                     workspace?.apply {
                         master.contextMenus.LaunchContextMenu(evt.point, master.contextMenus.schemeForNode(this, t), t)

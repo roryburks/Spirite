@@ -13,6 +13,7 @@ import jpen.owner.multiAwt.AwtPenToolkit
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
 import spirite.base.util.round
+import spirite.gui.components.basic.events.MouseEvent
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.hybrid.Hybrid
 import spirite.pc.JOGL.JOGL
@@ -94,21 +95,22 @@ private constructor(
 
         })
 
-        onMouseMove = {
+        val moveEvent = {it: MouseEvent ->
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
             //penner.rawUpdateX(it.point.x)
             //penner.rawUpdateY(it.point.y)
         }
-        onMouseDrag = onMouseMove
-        onMousePress = {
+        onMouseMove += moveEvent
+        onMouseDrag += moveEvent
+        onMousePress += {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
            // penner.penDown(it.button)
         }
-        onMouseRelease = {
+        onMouseRelease += {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift

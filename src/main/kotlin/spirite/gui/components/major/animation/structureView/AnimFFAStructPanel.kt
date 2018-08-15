@@ -19,6 +19,8 @@ import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
+import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
+import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.major.animation.structureView.RememberedStates.RememberedState
@@ -36,6 +38,7 @@ import java.lang.ref.WeakReference
 import javax.swing.JPanel
 
 private object RememberedStates {
+    // Not sure if this is how I want to do this, but I'm fine with it for now.
     data class RememberedState(val expanded: Boolean = false)
 
     private val map = mutableMapOf<Int,Pair<WeakReference<FFALayer>,RememberedState>>()
@@ -66,16 +69,16 @@ private constructor(
     init {imp.context = this}
 
     var nameWidth = 60
-    var layerHeight = 24
+    var layerHeight = 32
 
     var squishedNameHeight = 12
 
-    var tickWidth = 24
+    var tickWidth = 32
     var tickHeight = 16
 
     private val frameLinks = mutableListOf<FramePanel>()
 
-    fun rebuild() {
+    private fun rebuild() {
         frameLinks.clear()
 
         imp.setLayout {
@@ -92,13 +95,12 @@ private constructor(
         }
     }
 
-    fun buildLayerInfo(layer: FFALayer) : CrossRowInitializer.() -> Unit{
+    private fun buildLayerInfo(layer: FFALayer) : CrossRowInitializer.() -> Unit{
         val state = RememberedStates.getState(layer)
         val distinctNames = layer.frames.mapAggregated {frame ->
             ((frame.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
         }.distinct()
         val expandable = distinctNames.count() > 1
-
 
         fun defaultBuild(layer: FFALayer) : CrossRowInitializer.() -> Unit = {
             if(expandable)addFlatGroup(nameWidth-12) {
@@ -107,7 +109,7 @@ private constructor(
                 expandButton.background = Colors.TRANSPARENT
                 expandButton.opaque = false
                 expandButton.setBasicBorder(null)
-                expandButton.setIcon(SwIcons.SmallIcons.Rig_Remove)
+                expandButton.setIcon(SwIcons.SmallIcons.Rig_New)
                 expandButton.action = {
                     RememberedStates.setState(layer, RememberedState(true))
                     rebuild()
@@ -146,7 +148,7 @@ private constructor(
                 expandButton.background = Colors.TRANSPARENT
                 expandButton.opaque = false
                 expandButton.setBasicBorder(null)
-                expandButton.setIcon(SwIcons.SmallIcons.Rig_New)
+                expandButton.setIcon(SwIcons.SmallIcons.Rig_Remove)
                 expandButton.action = {
                     RememberedStates.setState(layer, RememberedState(false))
                     rebuild()
@@ -212,16 +214,27 @@ private constructor(
             }
         }
 
-        // BEGIN YGGDRASIL
         return when {
-            state == null || !state.expanded -> defaultBuild(layer)
-            else -> {
-                if( !expandable) defaultBuild(layer)
-                else expandedBuild(layer)
+            state == null || !state.expanded || !expandable -> defaultBuild(layer)
+            else -> expandedBuild(layer)
+        }
+    }
+
+    private open inner class FrameResizeable(
+            private val _imp: IComponent,
+            private val _frame: FFAFrame)
+    {
+        init {
+            _imp.onMouseMove += { evt ->
+                if (evt.point.x > _imp.width - 3)
+                    _imp.setBasicCursor(E_RESIZE)
+                else
+                    _imp.setBasicCursor(DEFAULT)
             }
         }
     }
 
+    // region SubPanels
     private inner class NamePanel(val layer: FFALayer, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         : IComponent by imp
     {
@@ -229,7 +242,7 @@ private constructor(
             imp.setBasicBorder(BEVELED_LOWERED)
             val label = Hybrid.ui.EditableLabel("layer")
             imp.setLayout { rows.add(label) }
-            imp.onMouseRelease = {label.requestFocus()}
+            imp.onMouseRelease += {label.requestFocus()}
         }
     }
     private inner class SubNamePanel(val title: String, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
@@ -239,7 +252,7 @@ private constructor(
             imp.setBasicBorder(BEVELED_LOWERED)
             val label = Hybrid.ui.EditableLabel(title)
             imp.setLayout { rows.add(label) }
-            imp.onMouseRelease = {label.requestFocus()}
+            imp.onMouseRelease += {label.requestFocus()}
         }
     }
 
@@ -253,16 +266,24 @@ private constructor(
         }
     }
 
-    private inner class GapPanel(val frame: FFAFrame) : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Fg.jcolor))
+    private inner class GapPanel(
+            val frame: FFAFrame,
+            private val imp : IComponent = SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Fg.jcolor)))
+        : FrameResizeable(imp,frame),IComponent by imp
     {
     }
 
     private inner class BlankPanel() : IComponent by SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Bg.jcolor))
+    private inner class PseudoBlankPanel(
+            val frame: FFAFrame,
+            private val imp : IComponent = SwComponent(DashedOutPanel(Skin.Global.BgDark.jcolor, Skin.Global.Bg.jcolor)))
+        : FrameResizeable(imp,frame), IComponent by imp
 
 
     private inner class FramePanel(
-            val frame: FFAFrame,private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        : IComponent by imp
+            val frame: FFAFrame,
+            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        : FrameResizeable(imp,frame), IComponent by imp
     {
         val imageBox = Hybrid.ui.ImageBox(ImageBI(BufferedImage(1,1,BufferedImage.TYPE_4BYTE_ABGR)))
         init {
@@ -274,18 +295,24 @@ private constructor(
                     cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
                 }
 
-                cols.height = layerHeight
+                cols.flex = 1f
             }
 
-            imp.onMouseRelease = {evt ->
-                if( evt.button == MouseButton.RIGHT) {
-                    master.contextMenus.LaunchContextMenu(
-                            bottomRight,
-                            listOf(
-                                    MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
-                                    MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
-                                    MenuItem("Increase &Length", customAction = {frame.length += 1}) )
-                    )
+            imp.onMouseRelease += {evt ->
+                when(evt.button) {
+                    MouseButton.RIGHT -> {
+                        master.contextMenus.LaunchContextMenu(
+                                bottomRight,
+                                listOf(
+                                        MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
+                                        MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
+                                        MenuItem("Increase &Length", customAction = {frame.length += 1}) )
+                        )
+                    }
+                    MouseButton.LEFT -> {
+                        val tree = frame.layer.context.workspace.groupTree
+                        frame.node?.also { tree.selectedNode = it}
+                    }
                 }
             }
         }
@@ -296,10 +323,10 @@ private constructor(
     }
 
     private inner class SpritePartPanel(
-        val part: SpritePart,
-        val frame: FFAFrame,
-        private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
-        :IComponent by imp
+            val part: SpritePart,
+            val frame: FFAFrame,
+            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        :FrameResizeable(imp,frame), IComponent by imp
     {
         val imageBox = Hybrid.ui.ImageBox()
         init {
@@ -311,18 +338,26 @@ private constructor(
                     cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
                 }
 
-                cols.height = layerHeight
+                cols.flex = 1f
             }
 
-            imp.onMouseRelease = {evt ->
-                if( evt.button == MouseButton.RIGHT) {
-                    master.contextMenus.LaunchContextMenu(
-                            bottomRight,
-                            listOf(
-                                    MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
-                                    MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
-                                    MenuItem("Increase &Length", customAction = {frame.length += 1}) )
-                    )
+            imp.onMouseRelease += {evt ->
+                when( evt.button) {
+                    MouseButton.RIGHT -> {
+                        master.contextMenus.LaunchContextMenu(
+                                bottomRight,
+                                listOf(
+                                        MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
+                                        MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
+                                        MenuItem("Increase &Length", customAction = {frame.length += 1}) )
+                        )
+                    }
+                    MouseButton.LEFT -> {
+                        part.context.activePart = part
+                        val tree = part.context.workspace.groupTree
+                        frame.node?.also { tree.selectedNode = it}
+                    }
+                    else ->{}
                 }
             }
         }
@@ -331,6 +366,7 @@ private constructor(
             imageBox.setImage(it)
         }
     }
+    // endregion
 
     // region Listener/Observer Bindings
     private val _animationStructureObserver = object : AnimationStructureChangeObserver {
@@ -345,6 +381,15 @@ private constructor(
         imp.background = Skin.Global.BgDark.jcolor
         rebuild()
     }
+}
+
+private class AnimDragStateManager
+{
+    enum class State {
+        NORMAL,
+        DRAGGING_FRAME
+    }
+
 }
 
 private class AnimFFAStructPanelImp : JPanel() {

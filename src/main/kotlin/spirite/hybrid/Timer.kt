@@ -1,7 +1,6 @@
 package spirite.hybrid
 
-import spirite.pc.JOGL.JOGLProvider
-import javax.swing.SwingUtilities
+import javax.swing.Timer
 
 interface ITimerEngine {
     fun createTimer(waitMilli : Int, repeat : Boolean = false,  action: ()-> Unit) : ITimer
@@ -12,7 +11,7 @@ interface ITimer {
     fun stop()
 }
 
-class SwTimer(val jtimer : javax.swing.Timer) : ITimer{
+class SwTimer(val jtimer : Timer) : ITimer{
     override fun stop() {
         jtimer.stop()
     }
@@ -20,7 +19,7 @@ class SwTimer(val jtimer : javax.swing.Timer) : ITimer{
 
 object SwTimerEngine : ITimerEngine {
     override fun createTimer(waitMilli: Int, repeat: Boolean, action: () -> Unit) : ITimer{
-        val timer = javax.swing.Timer( waitMilli) {action.invoke()}
+        val timer = Timer( waitMilli) {action.invoke()}
         if( repeat)
             timer.isRepeats = true
         timer.start()

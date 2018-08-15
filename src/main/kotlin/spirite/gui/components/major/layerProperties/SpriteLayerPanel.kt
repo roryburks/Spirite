@@ -120,7 +120,7 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
                             }
                         }
                     }.apply {
-                        onMouseClick ={ boxList.selected = part ; boxList.requestFocus()}
+                        onMouseClick +={ boxList.selected = part ; boxList.requestFocus()}
                         if( boxList.selected == part) setBasicBorder(BEVELED_RAISED)
                     }
 

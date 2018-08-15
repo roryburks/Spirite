@@ -89,19 +89,19 @@ class PaletteSection(
     private var lastPressStart: Long = 0
 
     init {
-        primaryColorSquare.onMousePress = {
+        primaryColorSquare.onMousePress += {
             pressingIndex = -1
             pressingStart = Hybrid.timing.currentMilli
         }
-        secondaryColorSquare.onMousePress = {
+        secondaryColorSquare.onMousePress += {
             pressingIndex = -2
             pressingStart = Hybrid.timing.currentMilli
         }
 
-        primaryColorSquare.onMouseRelease = paletteView.onMouseRelease
-        secondaryColorSquare.onMouseRelease = paletteView.onMouseRelease
+        primaryColorSquare.onMouseRelease += {evt ->paletteView.onMouseRelease.triggers.forEach { it(evt) }}
+        secondaryColorSquare.onMouseRelease += {evt ->paletteView.onMouseRelease.triggers.forEach { it(evt) }}
 
-        paletteView.onMousePress = { evt ->
+        paletteView.onMousePress += { evt ->
             if( evt.point.x / 12 <= paletteView.w && evt.point.x >= 0 && evt.point.y >= 0) {
 
                 val index = (evt.point.x / 12) + (evt.point.y / 12 * paletteView.w)
@@ -126,7 +126,7 @@ class PaletteSection(
             }
         }
 
-        paletteView.onMouseRelease = {evt ->
+        paletteView.onMouseRelease += {evt ->
             val pressing = pressingIndex
 
             if( pressing != null) {

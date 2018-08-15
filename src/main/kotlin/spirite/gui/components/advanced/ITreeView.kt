@@ -142,7 +142,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
     //fun nodeAtPoint( p: Vec2i)
 
     init {
-        onMousePress = {
+        onMousePress += {
             getNodeFromY(it.point.y)?.also { selectedNode = it }
             requestFocus()
         }
@@ -189,7 +189,7 @@ private constructor(private val imp : SwTreeViewImp<T>)
 
             dnd.addDropSource(component.jcomponent)
 
-            component.onMouseClick = {
+            component.onMouseClick += {
                 selectedNode = node
             }
 

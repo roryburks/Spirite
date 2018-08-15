@@ -5,11 +5,10 @@ import com.jogamp.opengl.GLCapabilities
 import com.jogamp.opengl.GLEventListener
 import com.jogamp.opengl.GLProfile
 import com.jogamp.opengl.awt.GLCanvas
-import com.jogamp.opengl.awt.GLJPanel
 import spirite.base.graphics.gl.GLGraphicsContext
 import spirite.base.pen.Penner
+import spirite.gui.components.basic.events.MouseEvent
 import spirite.hybrid.Hybrid
-import spirite.pc.JOGL.JOGL
 import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
@@ -28,21 +27,22 @@ private constructor(
     init {
         Hybrid.timing.createTimer(50, true){redraw()}
 
-        onMouseMove = {
+        val moveEvent = { it: MouseEvent ->
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
             penner.rawUpdateX(it.point.x)
             penner.rawUpdateY(it.point.y)
         }
-        onMouseDrag = onMouseMove
-        onMousePress = {
+        onMouseMove += moveEvent
+        onMouseDrag += moveEvent
+        onMousePress += {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
             penner.penDown(it.button)
         }
-        onMouseRelease = {
+        onMouseRelease += {
             penner.holdingAlt = it.holdingAlt
             penner.holdingCtrl = it.holdingCtrl
             penner.holdingShift = it.holdingShift
