@@ -117,15 +117,15 @@ private constructor(
             add(NamePanel(layer), width = nameWidth )
 
             var len = 0
-            layer.frames.forEach {
-                len += it.length
-                when( it.marker) {
+            for( frame in layer.frames) {
+                len += frame.length
+                when( frame.marker) {
                     FRAME -> {
-                        if (it.length > 0)
-                            add( FramePanel(it).also {frameLinks.add(it) }, width = tickWidth * it.length)
+                        if (frame.length > 0)
+                            add( FramePanel(frame).also {frameLinks.add(it) }, width = tickWidth * frame.length)
                     }
                     GAP -> {
-                        add(GapPanel(it), width = tickWidth * it.length)
+                        add(GapPanel(frame), width = tickWidth * frame.length)
                     }
                     START_LOCAL_LOOP -> {}
                     END_LOCAL_LOOP -> {}
@@ -140,78 +140,84 @@ private constructor(
             height = layerHeight
         }
 
+        fun expandedBuild(layer: FFALayer) : CrossRowInitializer.()-> Unit = {
+            this.addFlatGroup(nameWidth-12) {
+                val expandButton = Hybrid.ui.Button()
+                expandButton.background = Colors.TRANSPARENT
+                expandButton.opaque = false
+                expandButton.setBasicBorder(null)
+                expandButton.setIcon(SwIcons.SmallIcons.Rig_New)
+                expandButton.action = {
+                    RememberedStates.setState(layer, RememberedState(false))
+                    rebuild()
+                }
+                add(expandButton,12,12)
+            }
+
+            // Labels
+            this += {
+                add(NamePanel(layer), width = nameWidth, height = squishedNameHeight)
+                distinctNames.forEach {
+                    add(SubNamePanel(it?:"<base>"), width = nameWidth, height = layerHeight)
+                }
+                width = nameWidth
+            }
+            var len = 0
+
+            // Frame Content
+            for( frame in layer.frames) {
+                len += frame.length
+                when( frame.marker) {
+                    FRAME -> {
+                        if (frame.length > 0) {
+                            this += {
+                                add( FramePanel(frame).also {frameLinks.add(it) }, height = squishedNameHeight)
+                                val lnLayer = (frame.node as? LayerNode)?.layer
+                                distinctNames.forEach {name ->
+                                    add( when(lnLayer) {
+                                        null -> BlankPanel()
+                                        is SpriteLayer -> {
+                                            val part = lnLayer.parts.firstOrNull() { it.partName == name }
+                                            when( part) {
+                                                null -> BlankPanel()
+                                                else -> SpritePartPanel(part, frame)
+                                            }
+                                        }
+                                        else -> when( name) {
+                                            null -> FramePanel(frame)
+                                            else -> BlankPanel()
+                                        }
+                                    }, height = layerHeight)
+                                }
+
+                                width = tickWidth * frame.length
+                            }
+                        }
+                    }
+                    GAP -> {
+                        this += {
+                            add(GapPanel(frame), height = squishedNameHeight)
+                            distinctNames.forEach { add(GapPanel(frame), height = layerHeight) }
+                            width = tickWidth * frame.length
+                        }
+                    }
+                    START_LOCAL_LOOP -> {}
+                    END_LOCAL_LOOP -> {}
+                }
+            }
+
+            val end = anim.end
+            if( len < end) {
+                add(BlankPanel(), width = (end - len) * tickWidth)
+            }
+        }
+
         // BEGIN YGGDRASIL
         return when {
             state == null || !state.expanded -> defaultBuild(layer)
             else -> {
                 if( !expandable) defaultBuild(layer)
-                else {{
-                    this.addFlatGroup(nameWidth-12) {
-                        val expandButton = Hybrid.ui.Button()
-                        expandButton.background = Colors.TRANSPARENT
-                        expandButton.opaque = false
-                        expandButton.setBasicBorder(null)
-                        expandButton.setIcon(SwIcons.SmallIcons.Rig_New)
-                        expandButton.action = {
-                            RememberedStates.setState(layer, RememberedState(false))
-                            rebuild()
-                        }
-                        add(expandButton,12,12)
-                    }
-                    this += {
-                        add(NamePanel(layer), width = nameWidth, height = squishedNameHeight)
-                        distinctNames.forEach {
-                            add(SubNamePanel(it?:"<base>"), width = nameWidth, height = layerHeight)
-                        }
-                        width = nameWidth
-                    }
-                    var len = 0
-                    layer.frames.forEach {frame ->
-                        len += frame.length
-                        when( frame.marker) {
-                            FRAME -> {
-                                if (frame.length > 0) {
-                                    this += {
-                                        add( FramePanel(frame).also {frameLinks.add(it) }, height = squishedNameHeight)
-                                        val lnLayer = (frame.node as? LayerNode)?.layer
-                                        distinctNames.forEach {name ->
-                                            add( when(lnLayer) {
-                                                null -> BlankPanel()
-                                                is SpriteLayer -> {
-                                                    val part = lnLayer.parts.firstOrNull() { it.partName == name }
-                                                    when( part) {
-                                                        null -> BlankPanel()
-                                                        else -> SpritePartPanel(part)
-                                                    }
-                                                }
-                                                else -> when( name) {
-                                                    null -> FramePanel(frame)
-                                                    else -> BlankPanel()
-                                                }
-                                            }, height = layerHeight)
-                                        }
-
-                                        width = tickWidth * frame.length
-                                    }
-                                }
-                            }
-                            GAP -> {
-                                this += {
-                                    add(GapPanel(frame), height = squishedNameHeight)
-                                    distinctNames.forEach { add(GapPanel(frame), height = layerHeight) }
-                                    width = tickWidth * frame.length
-                                }
-                            }
-                            START_LOCAL_LOOP -> {}
-                            END_LOCAL_LOOP -> {}
-                        }
-                    }
-
-                    val end = anim.end
-                    if( len < end) {
-                        add(BlankPanel(), width = (end - len) * tickWidth)
-                    }
-                }}
+                else expandedBuild(layer)
             }
         }
     }
@@ -290,10 +296,40 @@ private constructor(
     }
 
     private inner class SpritePartPanel(
-        val part: SpritePart,private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        val part: SpritePart,
+        val frame: FFAFrame,
+        private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         :IComponent by imp
     {
+        val imageBox = Hybrid.ui.ImageBox()
+        init {
+            imp.ref = this
+            imp.setLayout {
+                cols.add(imageBox , width = tickWidth)
 
+                if( frame.length > 1) {
+                    cols.add(SwComponent(ArrowPanel(Skin.Global.BgDark.jcolor, Skin.FFAAnimation.Arrow.jcolor, RIGHT)), width = tickWidth * (frame.length-1))
+                }
+
+                cols.height = layerHeight
+            }
+
+            imp.onMouseRelease = {evt ->
+                if( evt.button == MouseButton.RIGHT) {
+                    master.contextMenus.LaunchContextMenu(
+                            bottomRight,
+                            listOf(
+                                    MenuItem("Add Gap &Before", customAction = {frame.layer.addGapFrameAfter(frame.previous)}),
+                                    MenuItem("Add Gap &After", customAction = {frame.layer.addGapFrameAfter(frame)}),
+                                    MenuItem("Increase &Length", customAction = {frame.length += 1}) )
+                    )
+                }
+            }
+        }
+
+        val xyz = master.nativeThumbnailStore.contractThumbnail(part, anim.workspace) {
+            imageBox.setImage(it)
+        }
     }
 
     // region Listener/Observer Bindings

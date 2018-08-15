@@ -77,7 +77,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
     }
 
-    private val timer : ITimer = Hybrid.timing.createTimer(15, true) {tick()}
+    private val timer : ITimer = Hybrid.timing.createTimer(15, true) {Hybrid.gle.runInGLContext { tick()}}
 
     private fun tick() {
         if( !btnPlay.checked) return
@@ -177,19 +177,18 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
             g.color = context.bgColor.jcolor
             g.fillRect(0,0,width, height)
 
-            JOGLProvider.context.makeCurrent()
+            Hybrid.gle.runInGLContext {
+                val image = Hybrid.imageCreator.createImage(width, height)
+                val gc = image.graphics
+                gc.preScale(anim.state.zoomF, anim.state.zoomF)
 
-            val image = Hybrid.imageCreator.createImage(width, height)
-            val gc = image.graphics
-            gc.preScale(anim.state.zoomF, anim.state.zoomF)
+                anim.drawFrame(gc,anim.state.met)
 
-            anim.drawFrame(gc,anim.state.met)
-
-            val bi = Hybrid.imageConverter.convert<ImageBI>(image)
-            image.flush()
-            g.drawImage(bi.bi, 0, 0, null)
-            bi.flush()
-            JOGLProvider.context.release()
+                val bi = Hybrid.imageConverter.convert<ImageBI>(image)
+                image.flush()
+                g.drawImage(bi.bi, 0, 0, null)
+                bi.flush()
+            }
         }
     }
 }

@@ -20,11 +20,7 @@ class SwTimer(val jtimer : javax.swing.Timer) : ITimer{
 
 object SwTimerEngine : ITimerEngine {
     override fun createTimer(waitMilli: Int, repeat: Boolean, action: () -> Unit) : ITimer{
-        val timer = javax.swing.Timer( waitMilli) {
-            JOGLProvider.context.makeCurrent()
-            action.invoke()
-            JOGLProvider.context.release()
-        }
+        val timer = javax.swing.Timer( waitMilli) {action.invoke()}
         if( repeat)
             timer.isRepeats = true
         timer.start()

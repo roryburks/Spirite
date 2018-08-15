@@ -15,6 +15,7 @@ import spirite.gui.Orientation.VERTICAL
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.hybrid.Hybrid
+import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.gui.basic.SwPanel
 import java.awt.Font
 import javax.swing.SwingUtilities
@@ -141,7 +142,7 @@ class WorkSection(val master: IMasterControl, val panel: ICrossPanel = Hybrid.ui
         }
 
         workAreaContainer.onResize = {calibrateScrolls()}
-        Hybrid.timing.createTimer(15, true) {SwingUtilities.invokeLater{penner.step()}}
+        Hybrid.timing.createTimer(15, true) {Hybrid.gle.runInGLContext { penner.step() }}
 
         coordinateLabel.text = "Coordinate Label"
         messageLabel.text = "Message Label"

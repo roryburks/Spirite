@@ -18,7 +18,7 @@ data class GLPrimitive(
             this(raw, attrLengths, IntArray(primitiveLengths.size, {primitiveType}), primitiveLengths)
 }
 
-internal class PreparedPrimitive(
+class PreparedPrimitive(
         val primative: GLPrimitive,
         val gl: IGL
 ) {

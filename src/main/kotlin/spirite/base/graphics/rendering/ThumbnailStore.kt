@@ -279,8 +279,10 @@ class ThumbnailStore(
 
     init {
         Hybrid.timing.createTimer(1000, true) {
-            removeUnused()
-            cycleContracts()
+            Hybrid.gle.runInGLContext {
+                removeUnused()
+                cycleContracts()
+            }
         }
     }
     // endregion

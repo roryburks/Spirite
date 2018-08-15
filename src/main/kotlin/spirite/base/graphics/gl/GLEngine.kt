@@ -14,6 +14,7 @@ import spirite.base.util.linear.Transform
 import spirite.base.util.linear.Vec3
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
+import spirite.pc.JOGL.JOGLProvider
 import javax.swing.SwingUtilities
 
 interface IGLEngine
@@ -26,6 +27,7 @@ interface IGLEngine
 
     fun getGl() : IGL
     fun runOnGLThread( run: ()->Unit)
+    fun runInGLContext(run: ()->Unit)
 
 
     fun applyPassProgram(
@@ -130,7 +132,17 @@ class GLEngine(
     }
 
     override fun runOnGLThread( run: () -> Unit) {
-        SwingUtilities.invokeLater(run)
+        SwingUtilities.invokeLater{
+            JOGLProvider.context.makeCurrent()
+            run()
+            JOGLProvider.context.release()
+        }
+    }
+
+    override fun runInGLContext(run: () -> Unit) {
+        JOGLProvider.context.makeCurrent()
+        run()
+        JOGLProvider.context.release()
     }
 
     // region Exposed Rendering Methods
