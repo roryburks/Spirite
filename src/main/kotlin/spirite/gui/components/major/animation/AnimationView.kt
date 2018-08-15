@@ -17,6 +17,7 @@ import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 import spirite.hybrid.ITimer
+import spirite.pc.JOGL.JOGLProvider
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor
@@ -86,7 +87,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 
 
     // region Bindings
-    private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new)}
+    private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new); viewPanel.redraw()}
     private val _animstructureObs = object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
             if( animation == this@AnimationView.animation) {
@@ -96,7 +97,10 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     }.also { masterControl.centralObservatory.trackingAnimationStateObserver.addObserver(it) }
     var animation : Animation? = null
 
-    private val metBind = Bindable(0f) { new, _ -> sliderMet.value = (new * 100).floor ; viewPanel.redraw()}
+    private val metBind = Bindable(0f) { new, _ ->
+        sliderMet.value = (new * 100).floor
+        viewPanel.redraw()
+    }
     init {
         sliderMet.onMouseDrag = {  metBind.field = sliderMet.value / 100f }
         sliderMet.onMouseRelease =  {it -> if( !btnPlay.checked)metBind.field = round(metBind.field) }
@@ -173,6 +177,7 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
             g.color = context.bgColor.jcolor
             g.fillRect(0,0,width, height)
 
+            JOGLProvider.context.makeCurrent()
 
             val image = Hybrid.imageCreator.createImage(width, height)
             val gc = image.graphics
@@ -181,10 +186,10 @@ private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationView
             anim.drawFrame(gc,anim.state.met)
 
             val bi = Hybrid.imageConverter.convert<ImageBI>(image)
-            g.drawImage(bi.bi, 0, 0, null)
-
             image.flush()
-            bi.bi.flush()
+            g.drawImage(bi.bi, 0, 0, null)
+            bi.flush()
+            JOGLProvider.context.release()
         }
     }
 }

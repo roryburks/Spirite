@@ -68,10 +68,12 @@ private constructor(
                 val button = MButtonFromPButton(evt.button) ?: return
 
                 SwingUtilities.invokeLater {
+                    JOGLProvider.context.makeCurrent()
                     when (evt.button.value) {
                         true -> penner.penDown(button)
                         false -> penner.penUp(button)
                     }
+                    JOGLProvider.context.release()
                 }
             }
 
@@ -127,6 +129,7 @@ private constructor(
 
                 JOGLProvider.gl2 = drawable.gl.gL2
                 gle.setTarget(null)
+                glgc.clear()
 
                 val gl = gle.getGl()
                 gl.viewport(0, 0, w, h)

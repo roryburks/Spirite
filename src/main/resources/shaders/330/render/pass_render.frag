@@ -100,7 +100,7 @@ void main()
 	    }
 	}
 
-	outputColor = (targetPremultiplied())
+	outputColor = (true)
 	    ? vec4(oCol.r * oCol.a, oCol.g * oCol.a, oCol.b * oCol.a, oCol.a) * u_alpha
 	    : vec4(oCol.r, oCol.g, oCol.b, oCol.a * u_alpha);
 }

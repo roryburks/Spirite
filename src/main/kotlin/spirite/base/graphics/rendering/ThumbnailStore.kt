@@ -229,19 +229,22 @@ class ThumbnailStore(
         //  -removing the weak references that disappeared
         //  -creating a new thumbnail and triggering the onBuilt for contracts that have either aged out or don't exist
         val now = Hybrid.timing.currentMilli
-        contracts.removeIf {
-            val contract = it.get()
-            when( contract) {
-                null -> true
-                else -> {
-                    val thumbnail = thumbnailCache[contract.ref]
-                    if(thumbnail == null || (thumbnail.changed && now - thumbnail.made > lifespan)) {
-                        val updatedThumbnail = createOrUpdateThumbnail(contract.ref)
-                        contract.onBuilt.invoke(updatedThumbnail.image)
+        try {
+            contracts.removeIf {
+                val contract = it.get()
+                when (contract) {
+                    null -> true
+                    else -> {
+                        val thumbnail = thumbnailCache[contract.ref]
+                        if (thumbnail == null || (thumbnail.changed && now - thumbnail.made > lifespan)) {
+                            val updatedThumbnail = createOrUpdateThumbnail(contract.ref)
+                            contract.onBuilt.invoke(updatedThumbnail.image)
+                        }
+                        false
                     }
-                    false
                 }
             }
+        }catch (e: Exception) {
         }
     }
 

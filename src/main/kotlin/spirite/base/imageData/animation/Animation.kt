@@ -29,7 +29,7 @@ abstract class MediumBasedAnimation(name : String,workspace : IImageWorkspace, s
 
     override fun drawFrame( gc: GraphicsContext, t: Float) {
         getDrawList(t)
-                .sortedBy { -it.drawDepth }
+                .sortedBy {  it.drawDepth }
                 .forEach {it.draw(gc)}
     }
 }

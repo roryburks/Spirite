@@ -275,7 +275,7 @@ object LoadEngine {
                             context.version <= 4 -> {
                                 val transX = ra.readShort().toFloat()
                                 val transY = ra.readShort().toFloat()
-                                val drawDepth = -ra.readInt()
+                                val drawDepth = ra.readInt()
                                 SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, 1f, 1f, 0f)
                             }
                             else -> {
@@ -284,7 +284,7 @@ object LoadEngine {
                                 val scaleX = ra.readFloat()
                                 val scaleY = ra.readFloat()
                                 val rot = ra.readFloat()
-                                val drawDepth = -ra.readInt()
+                                val drawDepth = ra.readInt()
                                 SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot)
 
                             }
