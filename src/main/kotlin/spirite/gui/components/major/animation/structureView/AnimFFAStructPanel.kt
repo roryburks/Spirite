@@ -1,8 +1,8 @@
 package spirite.gui.components.major.animation.structureView
 
+import kotlinx.coroutines.experimental.newSingleThreadContext
 import spirite.base.brains.IBoundListener
 import spirite.base.brains.IMasterControl
-import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
@@ -27,7 +27,9 @@ import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
+import spirite.gui.components.basic.IScrollBar
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
+import spirite.gui.components.major.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
 import spirite.gui.components.major.animation.structureView.RememberedStates.RememberedState
 import spirite.gui.menus.ContextMenus.MenuItem
 import spirite.gui.resources.Skin
@@ -36,11 +38,7 @@ import spirite.hybrid.Hybrid
 import spirite.pc.graphics.ImageBI
 import spirite.pc.gui.JColor
 import spirite.pc.gui.basic.SwComponent
-import spirite.pc.gui.basic.jcomponent
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
 import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
@@ -71,10 +69,11 @@ class AnimFFAStructPanel
 private constructor(
         val master: IMasterControl,
         val anim: FixedFrameAnimation,
+        val scrollContext : IScrollBar,
         private val imp: AnimFFAStructPanelImp)
     : IComponent by SwComponent(imp)
 {
-    constructor(master: IMasterControl, anim: FixedFrameAnimation) : this(master, anim, AnimFFAStructPanelImp())
+    constructor(master: IMasterControl, anim: FixedFrameAnimation,scrollContext : IScrollBar) : this(master, anim, scrollContext, AnimFFAStructPanelImp())
     init {imp.context = this}
 
     var nameWidth = 60
@@ -85,6 +84,13 @@ private constructor(
     var tickWidth = 32
     var tickHeight = 16
 
+    var viewspace = FFAStructPanelViewspace(
+            nameWidth,
+            0,
+            tickWidth,
+            emptyMap(),
+            nameWidth)
+
     private val frameLinks = mutableMapOf<Node,MutableList<IComponent>>()
     private val partLinks = mutableMapOf<SpritePart,MutableList<IComponent>>()
 
@@ -92,12 +98,21 @@ private constructor(
         frameLinks.clear()
         partLinks.clear()
 
+        val viewMap = mutableMapOf<FFALayer,IntRange>()
+        var wy = 0
+
         imp.setLayout {
             val start = anim.start
             val end = anim.end
 
-            anim.layers.forEach {layer -> rows += buildLayerInfo(layer) }
+            anim.layers.forEach {layer ->
+                val built = buildLayerInfo(layer)
+                rows += buildLayerInfo(layer).second
+                viewMap[layer] = IntRange(wy, wy+built.first)
+                wy += built.first
+            }
 
+            // Bottom Justification
             rows += {
                 addGap(nameWidth)
                 (start until end).forEach { add(TickPanel(it), width = tickWidth) }
@@ -107,17 +122,21 @@ private constructor(
                 addGap(stretchWidth)
             }
         }
+
+        viewspace = FFAStructPanelViewspace(nameWidth, 0, tickWidth, HashMap(viewMap), nameWidth + tickWidth * anim.end)
+        anim.workspace.groupTree.selectedNode?.also {setBordersForNode(it) }
     }
 
     var stretchWidth = 0
         set(value) {field = max(value,1); rebuild()}
 
-    private fun buildLayerInfo(layer: FFALayer) : CrossRowInitializer.() -> Unit{
+    private fun buildLayerInfo(layer: FFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
         val state = RememberedStates.getState(layer)
         val distinctNames = layer.frames.mapAggregated {frame ->
             ((frame.node as? LayerNode)?.layer as? SpriteLayer)?.parts?.map { it.partName } ?: listOf<String?>(null)
         }.distinct()
-        val expandable = distinctNames.count() > 1
+        val distinctCount = distinctNames.count()
+        val expandable = distinctCount > 1
 
         fun defaultBuild(layer: FFALayer) : CrossRowInitializer.() -> Unit = {
             if(expandable)addFlatGroup(nameWidth-12) {
@@ -246,9 +265,10 @@ private constructor(
             }
         }
 
+
         return when {
-            state == null || !state.expanded || !expandable -> defaultBuild(layer)
-            else -> expandedBuild(layer)
+            state == null || !state.expanded || !expandable -> Pair(layerHeight, defaultBuild(layer))
+            else -> Pair(squishedNameHeight + layerHeight * distinctCount, expandedBuild(layer))
         }
     }
 
@@ -258,11 +278,18 @@ private constructor(
             private val _frame: FFAFrame)
     {
         init {
+            _imp.markAsPassThrough()
             _imp.onMouseMove += { evt ->
                 if (evt.point.x > _imp.width - 3)
                     _imp.setBasicCursor(E_RESIZE)
                 else
                     _imp.setBasicCursor(DEFAULT)
+            }
+            _imp.onMousePress += {evt ->
+                if (evt.point.x > _imp.width - 3) {
+                    dragStateManager.behavior = ResizingFrameBehavior(_frame, dragStateManager, viewspace)
+                    redraw()
+                }
             }
         }
     }
@@ -332,7 +359,7 @@ private constructor(
                 cols.flex = 1f
             }
 
-            imp.onMouseRelease += {evt ->
+            imp.onMousePress += {evt ->
                 when(evt.button) {
                     MouseButton.RIGHT -> {
                         master.contextMenus.LaunchContextMenu(
@@ -418,28 +445,53 @@ private constructor(
             frameLinks.lookup(old).forEach { it.setBasicBorder(null) }
             partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
         }
-        if( new != null) {
-            frameLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
-            val spriteLayer = ((new as? LayerNode)?.layer as? SpriteLayer)
-            if( spriteLayer != null) {
-                apb = spriteLayer.activePartBind.addWeakListener { new, old ->
-                    partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
-                    if( new != null)
-                        partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
-                }
+        if( new != null)
+            setBordersForNode(new)
+    }
+
+    private fun setBordersForNode( node: Node){
+        frameLinks.lookup(node).forEach { it.setColoredBorder(Colors.BLACK, 2) }
+        val spriteLayer = ((node as? LayerNode)?.layer as? SpriteLayer)
+        if( spriteLayer != null) {
+            apb = spriteLayer.activePartBind.addWeakListener { new, old ->
+                partLinks.values.mapAggregated { it }.forEach { it.setBasicBorder(null) }
+                if( new != null)
+                    partLinks.lookup(new).forEach { it.setColoredBorder(Colors.BLACK, 2) }
             }
         }
     }
+
     // endregion
 
     init {
         imp.background = Skin.Global.BgDark.jcolor
         rebuild()
+
+        onMouseRelease += {
+            val pt = it.point.convert(this)
+            dragStateManager.behavior?.release(pt.x, pt.y)
+        }
+        onMouseDrag += {
+            val pt = it.point.convert(this)
+            dragStateManager.behavior?.move(pt.x, pt.y)
+        }
     }
+
+    internal val dragStateManager = AnimDragStateManager(this)
 }
 
-private class AnimDragStateManager
+data class FFAStructPanelViewspace(
+        val leftJustification: Int,
+        val topJustification: Int,
+        val tickWidth: Int,
+        val layerHeights: Map<FFALayer,IntRange>,
+        val naturalWidth: Int)
+
+internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 {
+    var behavior: IAnimStateBehavior? = null
+        set(value) {field = value; context.redraw()}
+
     interface IAnimStateBehavior {
         fun move(x: Int, y: Int)
         fun release(x: Int, y: Int)
@@ -447,10 +499,33 @@ private class AnimDragStateManager
     }
 
 
-    //class ResizingFrame
-}
+    class ResizingFrameBehavior(
+            val frame: FFAFrame,
+            val context: AnimDragStateManager,
+            val viewspace: FFAStructPanelViewspace)
+        : IAnimStateBehavior
+    {
+        val start = frame.start
+        var len = frame.length
 
-data class C(val x: Int)
+        override fun move(x: Int, y: Int) {
+            len = max(0, (x - viewspace.leftJustification + viewspace.tickWidth/2) / viewspace.tickWidth - start)
+            context.context.redraw()
+        }
+
+        override fun release(x: Int, y: Int) {
+            context.behavior = null
+        }
+
+        override fun draw(gc: Graphics2D) {
+            val range = viewspace.layerHeights[frame.layer]?: return
+            val x = (start + len)* viewspace.tickWidth + viewspace.leftJustification
+            gc.stroke = BasicStroke(2f)
+            gc.color = Color.BLACK
+            gc.drawLine(x, range.first, x, range.last)
+        }
+    }
+}
 
 private class AnimFFAStructPanelImp : JPanel() {
     lateinit var context : AnimFFAStructPanel
@@ -459,21 +534,26 @@ private class AnimFFAStructPanelImp : JPanel() {
         removeAll()
         val list = mutableListOf<IComponent>()
         layout = CrossLayout.buildCrossLayout(this, list, constructor)
-        CrossLayout.buildCrossLayout(this, null, constructor)
     }
 
     init {
     }
 
     override fun paint(g: Graphics) {
-        g.color = background
-        g.fillRect(0,0,width,height)
-        drawBackground(g as Graphics2D)
-        super.paintChildren(g)
+        val g2 = (g as Graphics2D)
+        g2.color = background
+        g2.fillRect(0,0,width,height)
+        drawBackground(g2)
+        super.paintChildren(g2)
+        drawForeground(g2)
     }
 
     private fun drawBackground(g: Graphics2D) {
 
+    }
+
+    private fun drawForeground( g: Graphics2D) {
+        context.dragStateManager.behavior?.draw(g)
     }
 }
 
