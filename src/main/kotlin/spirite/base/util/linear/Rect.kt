@@ -9,6 +9,8 @@ data class Rect(
         var width: Int,
         var height: Int
 ) {
+    val x2 get() = x + width
+    val y2 get() = y + height
 
     val isEmpty: Boolean get() = width <= 0 || height <= 0
 

@@ -42,6 +42,7 @@ class ScrollBarNonUI(
     override var minScroll
         get() = minScrollBind.field
         set(to) {
+            if( minScrollBind.field == to) return
             minScrollBind.field = to
             if( maxScroll < to + scrollWidth)
                 maxScroll = to + scrollWidth
@@ -52,6 +53,7 @@ class ScrollBarNonUI(
     override var maxScroll
         get() = maxScrollBind.field
         set(to) {
+            if( maxScrollBind.field == to) return
             maxScrollBind.field = to
             if( minScroll > to - scrollWidth)
                 minScroll = to - scrollWidth
@@ -63,6 +65,7 @@ class ScrollBarNonUI(
     override var scrollWidth: Int
         get() = scrollWidthBind.field
         set(to) {
+            if( scrollWidthBind.field == to) return
             scrollWidthBind.field = to
             if( maxScroll < minScroll + to)
                 maxScroll = minScroll + to

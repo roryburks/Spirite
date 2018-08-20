@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import jspirite.gui.SScrollPane.ModernScrollBarUI
+import spirite.pc.gui.basic.SScrollPane.ModernScrollBarUI
 import spirite.gui.Orientation
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.Orientation.VERTICAL
@@ -12,7 +12,7 @@ import javax.swing.JComponent
 import javax.swing.JScrollBar
 
 class SwScrollBar
-private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int, val imp: SwScrollBarImp)
+private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidth: Int, val imp: JScrollBar)
     : IScrollBar,
         IScrollBarNonUIImp by ScrollBarNonUI(minScroll, maxScroll, startScroll, scrollWidth),
         ISwComponent by SwComponent(imp)
@@ -25,9 +25,13 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
             startScroll: Int = 0,
             scrollWidth : Int = 10) : this( minScroll, maxScroll, startScroll, scrollWidth, SwScrollBarImp(orientation, context))
 
+    constructor(imp: JScrollBar) : this( imp.minimum, imp.maximum, imp.value, imp.visibleAmount, imp)
+
+
+
 
     override var orientation: Orientation
-        get() = if( imp.getOrientation() == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
+        get() = map(imp.orientation)
         set(value) { imp.orientation = if( value == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL}
 
     init {
@@ -44,5 +48,10 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
             setUI( ModernScrollBarUI(context.component as JComponent))
             this.setOrientation(if( orientation == Orientation.VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL)
         }
+    }
+
+    companion object {
+        fun map(jOrientation: Int) =  if( jOrientation == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
+        fun map(sOrientation: Orientation) =  if( sOrientation == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL
     }
 }

@@ -17,6 +17,7 @@ import spirite.base.util.Colors
 import spirite.base.util.groupExtensions.append
 import spirite.base.util.groupExtensions.lookup
 import spirite.base.util.groupExtensions.mapAggregated
+import spirite.base.util.linear.Rect
 import spirite.base.util.round
 import spirite.gui.Direction
 import spirite.gui.Direction.*
@@ -28,6 +29,7 @@ import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.components.basic.IScrollBar
+import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.major.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
 import spirite.gui.components.major.animation.structureView.RememberedStates.RememberedState
@@ -69,13 +71,14 @@ class AnimFFAStructPanel
 private constructor(
         val master: IMasterControl,
         val anim: FixedFrameAnimation,
-        val scrollContext : IScrollBar,
         private val imp: AnimFFAStructPanelImp)
     : IComponent by SwComponent(imp)
 {
-    constructor(master: IMasterControl, anim: FixedFrameAnimation,scrollContext : IScrollBar) : this(master, anim, scrollContext, AnimFFAStructPanelImp())
+    constructor(master: IMasterControl, anim: FixedFrameAnimation) : this(master, anim, AnimFFAStructPanelImp())
     init {imp.context = this}
 
+
+    lateinit var scrollContext : IScrollContainer
     var nameWidth = 60
     var layerHeight = 32
 
@@ -486,6 +489,15 @@ data class FFAStructPanelViewspace(
         val tickWidth: Int,
         val layerHeights: Map<FFALayer,IntRange>,
         val naturalWidth: Int)
+{
+    fun rectForRangeInLayer( layer: FFALayer, range: IntRange) : Rect
+    {
+        val heightRange = layerHeights[layer]
+        return Rect(
+                leftJustification + tickWidth*range.first, heightRange?.first?:0,
+                tickWidth*(range.last-range.first), heightRange?.run { last-first } ?:0)
+    }
+}
 
 internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 {
@@ -510,6 +522,7 @@ internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 
         override fun move(x: Int, y: Int) {
             len = max(0, (x - viewspace.leftJustification + viewspace.tickWidth/2) / viewspace.tickWidth - start)
+            context.context.scrollContext.makeAreaVisible(viewspace.rectForRangeInLayer(frame.layer, IntRange(start+len-1, start+len)))
             context.context.redraw()
         }
 

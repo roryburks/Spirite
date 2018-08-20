@@ -37,7 +37,11 @@ class AnimationStructureView(val master: IMasterControl) : IOmniComponent {
             is FixedFrameAnimation -> {
                 label.text = new.name
                 subContainer.setLayout {
-                    rows.add(Hybrid.ui.ScrollContainer(AnimFFAStructPanel(master, new)), flex = 100f)
+                    val ffapanel = AnimFFAStructPanel(master, new)
+                    val scroll = Hybrid.ui.ScrollContainer(ffapanel)
+                    ffapanel.scrollContext = scroll
+
+                    rows.add(scroll, flex = 100f)
                     rows.flex = 100f
                 }
             }
