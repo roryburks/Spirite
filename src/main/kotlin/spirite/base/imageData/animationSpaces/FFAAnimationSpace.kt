@@ -5,10 +5,11 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 
-class FFAAnimationSpace(val workspace: IImageWorkspace) : IAnimationSpace
+class FFAAnimationSpace(override val workspace: IImageWorkspace) : IAnimationSpace
 {
     val animations : List<FixedFrameAnimation> get() = _animations
     val links : List<SpacialLink> get() = _links
+    val stateView = FFASpaceViewState(this)
 
     private val _animations = mutableListOf<FixedFrameAnimation>()
     private val _links = mutableListOf<SpacialLink>()
@@ -23,11 +24,13 @@ class FFAAnimationSpace(val workspace: IImageWorkspace) : IAnimationSpace
     {
         _animations.remove(animation)
         _links.removeIf { it.origin == animation || it.destination == animation }
+        stateView.triggerAnimationRemoved(animation)
     }
 
     fun addAnimation( animation: FixedFrameAnimation)
     {
         _animations.add(animation)
+        stateView.triggerAnimationAdded(animation)
     }
 
     fun addLink( link: SpacialLink)

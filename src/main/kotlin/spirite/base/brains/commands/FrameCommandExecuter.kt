@@ -13,7 +13,8 @@ class FrameCommandExecuter(val frameManager: IFrameManager) : ICommandExecuter
     enum class FrameCommand(val string: String) : ICommand {
         UNDO_HISTORY("undoHistoryView"),
         DEBUG("debugView"),
-        ANIMATION("animationView")
+        ANIMATION("animationView"),
+        ANIMATION_STATE("animationStateView"),
 
         ;
 
@@ -29,6 +30,7 @@ class FrameCommandExecuter(val frameManager: IFrameManager) : ICommandExecuter
             UNDO_HISTORY.string -> frameManager.launchView(UNDO_HISTORY_VIEW)
             DEBUG.string -> frameManager.launchView(DEBUG_VIEW)
             ANIMATION.string -> frameManager.launchView(ANIMATION_VIEW)
+            ANIMATION_STATE.string -> frameManager.launchView(ANIMATION_SPACE_VIEW)
 
             else -> MDebug.handleWarning(MDebug.WarningType.REFERENCE, "Unrecognized command: frame.$string")
         }

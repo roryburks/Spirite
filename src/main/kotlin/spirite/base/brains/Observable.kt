@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
  * and other internal functionality.
  */
 interface IObservable<T> {
-    fun addObserver( toAdd: T)
+    fun addObserver( toAdd: T) : T
     fun removeObserver( toRemove: T)
 }
 
@@ -15,8 +15,9 @@ class Observable<T> : IObservable<T>
 {
     private val observers = mutableListOf<WeakReference<T>>()
 
-    override fun addObserver(toAdd: T) {
+    override fun addObserver(toAdd: T) : T{
         observers.add( WeakReference(toAdd))
+        return toAdd
     }
 
     override fun removeObserver(toRemove: T) {

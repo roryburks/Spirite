@@ -15,6 +15,7 @@ class SwOmniDialog(
 {
     init {
         add(component.component.jcomponent)
+        setSize(300,300)
         modalityType = MODELESS
         pack()
         isVisible = true

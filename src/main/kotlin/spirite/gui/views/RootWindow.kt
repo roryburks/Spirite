@@ -76,6 +76,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                 MenuItem("..&Reference Scheme"),
 
                 MenuItem(".&Animation View", FrameCommand.ANIMATION),
+                MenuItem(".Animation &State View", FrameCommand.ANIMATION_STATE),
 
                 MenuItem("&Settings"),
                 MenuItem(".Manage &Hotkeys"),
