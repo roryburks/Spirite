@@ -54,7 +54,7 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
                         GAP -> null
                         START_LOCAL_LOOP -> _sub(index, offset - caret)
                         FRAME -> frame
-                        END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 1)"); null}
+                        END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 0)"); null}
                     }
                 }
                 if( frame.marker == START_LOCAL_LOOP) {

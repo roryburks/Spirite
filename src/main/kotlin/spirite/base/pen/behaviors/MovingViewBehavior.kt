@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import spirite.base.pen.Penner
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSectionView
 
 
 class MovingViewBehavior(

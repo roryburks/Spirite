@@ -15,8 +15,8 @@ import spirite.base.util.floor
 import spirite.base.util.linear.Vec2
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.basic.events.MouseEvent.MouseButton.LEFT
-import spirite.gui.components.major.work.WorkSection
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSection
+import spirite.gui.views.work.WorkSectionView
 import spirite.hybrid.Hybrid
 
 interface IPenner {

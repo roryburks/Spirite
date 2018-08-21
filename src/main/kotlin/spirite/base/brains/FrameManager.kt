@@ -3,10 +3,10 @@ package spirite.base.brains
 import spirite.base.brains.IFrameManager.Views
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.advanced.omniContainer.SwOmniDialog
-import spirite.gui.components.major.RootWindow
-import spirite.gui.components.major.animation.AnimationView
-import spirite.gui.components.major.info.UndoHistoryView
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.RootWindow
+import spirite.gui.views.animation.AnimationView
+import spirite.gui.views.info.UndoHistoryView
+import spirite.gui.views.work.WorkSectionView
 import spirite.gui.components.views.DebugView
 import javax.swing.WindowConstants
 

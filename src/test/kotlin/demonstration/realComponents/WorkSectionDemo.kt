@@ -6,7 +6,7 @@ import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.major.work.WorkTabPane
+import spirite.gui.views.work.WorkTabPane
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
 import java.awt.GridLayout
