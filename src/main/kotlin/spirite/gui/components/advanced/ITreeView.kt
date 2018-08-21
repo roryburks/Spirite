@@ -12,7 +12,6 @@ import spirite.gui.components.advanced.ITreeViewNonUI.DropDirection.*
 import spirite.gui.components.advanced.crossContainer.CrossColInitializer
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IToggleButton
-import spirite.gui.components.basic.SwScrollContainer
 import spirite.gui.resources.Skin
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
@@ -25,12 +24,9 @@ import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.*
-import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
-import kotlin.math.exp
 import kotlin.math.max
-import kotlin.math.min
 
 interface ITreeViewNonUI<T>{
     var gapSize: Int

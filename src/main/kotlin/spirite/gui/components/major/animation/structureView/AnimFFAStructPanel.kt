@@ -1,6 +1,5 @@
 package spirite.gui.components.major.animation.structureView
 
-import kotlinx.coroutines.experimental.newSingleThreadContext
 import spirite.base.brains.IBoundListener
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
@@ -13,10 +12,12 @@ import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart
+import spirite.base.util.ColorARGB32Normal
 import spirite.base.util.Colors
 import spirite.base.util.groupExtensions.append
 import spirite.base.util.groupExtensions.lookup
 import spirite.base.util.groupExtensions.mapAggregated
+import spirite.base.util.i
 import spirite.base.util.linear.Rect
 import spirite.base.util.round
 import spirite.gui.Direction
@@ -28,7 +29,6 @@ import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
 import spirite.gui.components.basic.IComponent.BasicCursor.E_RESIZE
 import spirite.gui.components.basic.ICrossPanel
-import spirite.gui.components.basic.IScrollBar
 import spirite.gui.components.basic.IScrollContainer
 import spirite.gui.components.basic.events.MouseEvent.MouseButton
 import spirite.gui.components.major.animation.structureView.AnimDragStateManager.ResizingFrameBehavior
@@ -45,6 +45,7 @@ import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
 import kotlin.math.max
+import kotlin.math.min
 
 private object RememberedStates {
     // Not sure if this is how I want to do this, but I'm fine with it for now.
@@ -121,9 +122,6 @@ private constructor(
                 (start until end).forEach { add(TickPanel(it), width = tickWidth) }
                 height = tickHeight
             }
-            rows += {
-                addGap(stretchWidth)
-            }
         }
 
         viewspace = FFAStructPanelViewspace(nameWidth, 0, tickWidth, HashMap(viewMap), nameWidth + tickWidth * anim.end)
@@ -131,7 +129,6 @@ private constructor(
     }
 
     var stretchWidth = 0
-        set(value) {field = max(value,1); rebuild()}
 
     private fun buildLayerInfo(layer: FFALayer) : Pair<Int,CrossRowInitializer.() -> Unit>{
         val state = RememberedStates.getState(layer)
@@ -141,7 +138,14 @@ private constructor(
         val distinctCount = distinctNames.count()
         val expandable = distinctCount > 1
 
+        val maxSubLoopDepth = layer.frames
+                .filter { it.marker == START_LOCAL_LOOP && it.length > 0 }
+                .map { it.loopDepth }
+                .max() ?: 0
+
         fun defaultBuild(layer: FFALayer) : CrossRowInitializer.() -> Unit = {
+
+            // Label
             if(expandable)addFlatGroup(nameWidth-12) {
                 val expandButton = Hybrid.ui.Button()
                 expandButton.background = Colors.TRANSPARENT
@@ -156,33 +160,71 @@ private constructor(
             }
             add(NamePanel(layer), width = nameWidth )
 
-            var len = 0
-            for( frame in layer.frames) {
-                len += frame.length
-                when( frame.marker) {
-                    FRAME -> {
-                        if (frame.length > 0) {
-                            val component = FramePanel(frame)
+            // Frames
+            val frames = layer.frames.toList()
+            fun subBuildFrame( start: Int, length: Int, context: CrossRowInitializer) : Int
+            {
+                var index = start
+                var caret = 0
+                var localLength = 0
+
+                while (index < frames.size) {
+                    val frame = frames[index++]
+                    val effectiveLen = min(frame.length, length-caret)
+                    caret += frame.length
+                    localLength += frame.length
+
+
+                    when( frame.marker) {
+                        FRAME -> {
+                            if (frame.length > 0) {
+                                val component = FramePanel(frame)
+                                frame.node?.also { frameLinks.append(it, component)}
+                                context.add(component, width = tickWidth * effectiveLen, height = layerHeight)
+                            }
+                        }
+                        GAP -> {
+                            val component = GapPanel(frame)
                             frame.node?.also { frameLinks.append(it, component)}
-                            add(component, width = tickWidth * frame.length)
+                            context.add(component, width = tickWidth * effectiveLen, height = layerHeight)
+                        }
+                        START_LOCAL_LOOP -> {
+                            context.add(Hybrid.ui.CrossPanel {
+                                rows.add(LocalLoopPanel(frame), width = tickWidth*effectiveLen, height = squishedNameHeight)
+
+                                rows += {
+                                    if (frame.length != 0)
+                                        subBuildFrame(index, effectiveLen, this)
+                                    height = layerHeight + squishedNameHeight * (maxSubLoopDepth - frame.loopDepth)
+                                }
+                            }.also { it.markAsPassThrough() })
+                            var inll = 1
+                            while( inll > 0) when(frames[index++].marker) {
+                                END_LOCAL_LOOP -> inll--
+                                START_LOCAL_LOOP -> inll++
+                            }
+                        }
+                        END_LOCAL_LOOP -> {
+                            return caret
+                            //if( localLength == 0) return caret
+                            //index = start
                         }
                     }
-                    GAP -> {
-                        val component = GapPanel(frame)
-                        frame.node?.also { frameLinks.append(it, component)}
-                        add(component, width = tickWidth * frame.length)
-                    }
-                    START_LOCAL_LOOP -> {}
-                    END_LOCAL_LOOP -> {}
+
+                    if( caret == length) return caret
                 }
+
+                return caret
             }
+
 
             val end = anim.end
-            if( len < end) {
-                add(BlankPanel(), width = (end - len) * tickWidth)
+            val caret = subBuildFrame(0, end, this)
+            if( caret < end - 1) {
+                add(BlankPanel(), width = (end - caret) * tickWidth)
             }
 
-            height = layerHeight
+            height = layerHeight + squishedNameHeight*(maxSubLoopDepth)
         }
 
         fun expandedBuild(layer: FFALayer) : CrossRowInitializer.()-> Unit = {
@@ -342,6 +384,22 @@ private constructor(
             private val imp : IComponent = SwComponent(DashedOutPanel(null, Skin.Global.Bg.jcolor)))
         : FrameResizeable(imp,frame), IComponent by imp
 
+    private inner class LocalLoopPanel(
+            val frame: FFAFrame,
+            private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
+        : FrameResizeable(imp,frame), IComponent by imp
+    {
+        init {
+            background = when(frame.loopDepth % 4) {
+                0 -> ColorARGB32Normal(0xffab93f2.i)
+                1 -> ColorARGB32Normal(0xff92c7f1.i)
+                2 ->ColorARGB32Normal(0xfff0c491.i)
+                else -> ColorARGB32Normal(0xffc1f2ab.i)
+            }
+
+            imp.setLayout { rows.add(Hybrid.ui.Label(frame.node?.name ?: "")) }
+        }
+    }
 
     private inner class FramePanel(
             val frame: FFAFrame,
@@ -522,11 +580,14 @@ internal class AnimDragStateManager(val context: AnimFFAStructPanel)
 
         override fun move(x: Int, y: Int) {
             len = max(0, (x - viewspace.leftJustification + viewspace.tickWidth/2) / viewspace.tickWidth - start)
-            context.context.scrollContext.makeAreaVisible(viewspace.rectForRangeInLayer(frame.layer, IntRange(start+len-1, start+len)))
+            val endBox = viewspace.rectForRangeInLayer(frame.layer, IntRange(start+len-1, start+len))
+            context.context.stretchWidth = endBox.x2
+            context.context.scrollContext.makeAreaVisible(endBox)
             context.context.redraw()
         }
 
         override fun release(x: Int, y: Int) {
+            frame.length = len
             context.behavior = null
         }
 

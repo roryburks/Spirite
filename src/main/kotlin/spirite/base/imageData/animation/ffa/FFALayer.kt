@@ -19,8 +19,13 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
         var i=0
         while( i < _frames.size) {
             caret += _frames[i].length
-            if( _frames[i].marker == START_LOCAL_LOOP)
-                while( _frames[++i].marker != END_LOCAL_LOOP);
+            if( _frames[i].marker == START_LOCAL_LOOP) {
+                var inll = 1
+                while(inll > 0)when(_frames[++i].marker) {
+                    END_LOCAL_LOOP -> inll--
+                    START_LOCAL_LOOP -> inll++
+                }
+            }
             ++i
         }
         return caret
@@ -52,13 +57,16 @@ abstract class FFALayer( internal val context : FixedFrameAnimation) {
                         END_LOCAL_LOOP -> {MDebug.handleWarning(STRUCTURAL, "Malformed Animation (END_LOCAL_LOOP with length > 1)"); null}
                     }
                 }
-                if( frame.marker == START_LOCAL_LOOP)
-                    while (_frames[++index].marker != END_LOCAL_LOOP);
+                if( frame.marker == START_LOCAL_LOOP) {
+                    var inll = 1
+                    while (inll > 1)
+                        if(_frames[++index].marker != END_LOCAL_LOOP)inll++
+                }
 
-                if( index == _frames.size) {
+                if( index == _frames.size || frame.marker == END_LOCAL_LOOP) {
                     if( !loop || loopLen == 0)
                         return null
-                    index = 0
+                    index = start
                 }
 
                 caret += frame.length
