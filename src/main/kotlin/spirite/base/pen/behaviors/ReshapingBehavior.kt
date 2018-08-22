@@ -16,7 +16,7 @@ import spirite.base.util.linear.Vec2
 import spirite.base.util.shapes.IShape
 import spirite.base.util.shapes.Oval
 import spirite.base.util.shapes.Rectangle
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSectionView
 import kotlin.math.atan2
 
 /***

@@ -10,7 +10,7 @@ import spirite.base.pen.selectionBuilders.OvalSelectionBuilder
 import spirite.base.pen.selectionBuilders.RectSelectionBuilder
 import spirite.base.pen.selectionBuilders.SelectionBuilder
 import spirite.base.util.Colors
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSectionView
 
 
 class FormingSelectionBehavior(

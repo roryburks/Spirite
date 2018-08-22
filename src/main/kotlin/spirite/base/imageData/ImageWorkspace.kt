@@ -10,6 +10,8 @@ import spirite.base.graphics.rendering.IRenderEngine
 import spirite.base.imageData.IImageObservatory.ImageChangeEvent
 import spirite.base.imageData.animation.AnimationManager
 import spirite.base.imageData.animation.IAnimationManager
+import spirite.base.imageData.animationSpaces.AnimationSpaceManager
+import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
 import spirite.base.imageData.drawer.IImageDrawer
 import spirite.base.imageData.drawer.NillImageDrawer
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -46,6 +48,7 @@ interface IImageWorkspace {
     val animationManager : IAnimationManager
     val referenceManager : IReferenceManager
     val isolationManager: IIsolationManager
+    val animationSpaceManager : IAnimationSpaceManager
 
     val undoEngine : IUndoEngine
     val selectionEngine : ISelectionEngine
@@ -95,6 +98,7 @@ class ImageWorkspace(
     override val referenceManager: ReferenceManager = ReferenceManager()
     override val paletteSet: PaletteSet = paletteManager.makePaletteSet()
     override val isolationManager: IIsolationManager = IsolationManager(this)
+    override val animationSpaceManager: IAnimationSpaceManager = AnimationSpaceManager(this)
 
     override val compositor = Compositor()
 

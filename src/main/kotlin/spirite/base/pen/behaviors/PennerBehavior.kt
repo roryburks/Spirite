@@ -2,7 +2,7 @@ package spirite.base.pen.behaviors
 
 import spirite.base.graphics.GraphicsContext
 import spirite.base.pen.Penner
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSectionView
 
 
 // By design, PennerBehaviors has and should make use of all variables local to penner

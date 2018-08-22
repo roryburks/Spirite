@@ -7,7 +7,7 @@ import spirite.base.pen.selectionBuilders.FreeformSelectionBuilder
 import spirite.base.util.Colors
 import spirite.base.util.MathUtil
 import spirite.base.util.f
-import spirite.gui.components.major.work.WorkSectionView
+import spirite.gui.views.work.WorkSectionView
 
 class FreeformSelectionBehavior(
         penner: Penner,

@@ -15,7 +15,7 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     : MediumBasedAnimation(name, workspace)
 {
     constructor(name: String, workspace: IImageWorkspace, node : GroupNode) : this(name, workspace){
-        addLinkedLayer(node, false)
+        addLinkedLayer(node, true)
     }
     constructor(name: String, workspace: IImageWorkspace, layers: List<FFALayer>) : this(name, workspace){
         _layers.addAll(layers)

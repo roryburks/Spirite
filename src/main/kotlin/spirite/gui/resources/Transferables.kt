@@ -1,5 +1,6 @@
 package spirite.gui.resources
 
+import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.groupTree.GroupTree.Node
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -21,4 +22,18 @@ object Transferables {
         }
     }
 
+    class AnimationTransferable(val anim: Animation) : Transferable {
+        override fun getTransferData(flavor: DataFlavor) =  when(flavor) {
+            FLAVOR -> anim
+            else -> throw UnsupportedFlavorException(flavor)
+        }
+
+        override fun getTransferDataFlavors() = flavors
+        override fun isDataFlavorSupported(flavor: DataFlavor) = flavor.equals(FLAVOR)
+
+        companion object {
+            val FLAVOR = DataFlavor(AnimationTransferable::class.java, "Spirite Animation")
+            val flavors = arrayOf(FLAVOR)
+        }
+    }
 }

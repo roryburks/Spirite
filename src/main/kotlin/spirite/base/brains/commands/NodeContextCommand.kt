@@ -72,7 +72,7 @@ class NodeContextCommand(
             }
             INSERT_GROUP_IN_ANIMATION.string -> {
                 val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
-                animation.addLinkedLayer( node as? GroupNode ?: return false, false)
+                animation.addLinkedLayer( node as? GroupNode ?: return false, true)
             }
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()

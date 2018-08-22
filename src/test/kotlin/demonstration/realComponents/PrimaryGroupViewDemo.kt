@@ -6,7 +6,7 @@ import spirite.base.brains.MasterControl
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
 import spirite.gui.Orientation.HORIZONTAL
 import spirite.gui.components.advanced.ResizeContainerPanel
-import spirite.gui.components.major.groupView.GroupView
+import spirite.gui.views.groupView.GroupView
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.jcomponent
 import java.awt.GridLayout

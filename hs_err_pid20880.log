@@ -44,7 +44,7 @@ j  spirite.base.imageData.drawer.DefaultImageDrawer.startStroke(Lspirite/base/pe
 j  spirite.base.pen.behaviors.StrokeBehavior.onStart()V+54
 j  spirite.base.pen.Penner.setBehavior(Lspirite/base/pen/behaviors/PennerBehavior;)V+23
 j  spirite.base.pen.Penner.penDown(Lspirite/gui/components/basic/events/MouseEvent$MouseButton;)V+293
-j  spirite.gui.components.major.work.JOGLWorkAreaPanel$3.penButtonEvent(Ljpen/PButtonEvent;)V+59
+j  spirite.gui.major.work.JOGLWorkAreaPanel$3.penButtonEvent(Ljpen/PButtonEvent;)V+59
 j  jpen.owner.multiAwt.MultiAwtPenOwner$1.penButtonEvent(Ljpen/PButtonEvent;)V+34
 j  jpen.PButtonEvent.dispatch()V+26
 j  jpen.Pen$MyThread.run()V+114

@@ -7,6 +7,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
+import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
@@ -27,6 +28,7 @@ interface ICentralObservatory {
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
     val currentAnimationBind : IBindable<Animation?>
+    val currentAnimationSpaceBind : IBindable<AnimationSpace?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -46,6 +48,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
+    override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically
@@ -108,7 +111,10 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
         private val observers = mutableListOf<WeakReference<T>>()
 
-        override fun addObserver(toAdd: T) {observers.add( WeakReference(toAdd))}
+        override fun addObserver(toAdd: T) : T {
+            observers.add( WeakReference(toAdd))
+            return toAdd
+        }
         override fun removeObserver(toRemove: T) {
             observers.removeIf { (it.get() ?: toRemove) == toRemove}
         }
@@ -133,10 +139,11 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
         }
         private val observers = mutableListOf<WeakReference<T>>()
 
-        override fun addObserver(toAdd: T) {
+        override fun addObserver(toAdd: T) : T{
             val workspace = workspaceSet.currentWorkspace
             if( workspace != null) observerFinder.invoke(workspace).addObserver(toAdd)
             observers.add( WeakReference(toAdd))
+            return toAdd
         }
         override fun removeObserver(toRemove: T) {
             val workspace = workspaceSet.currentWorkspace
