@@ -48,7 +48,8 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
         imp.ref = this
         imp.setLayout {
             rows += {
-                add(subPanel, 300, 300)
+                add(subPanel, flex=300f)
+                flex = 300f
             }
             rows += {
                 add(spaceDropdown, height = 20, flex = 100f)
