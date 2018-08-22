@@ -3,6 +3,7 @@ package spirite.base.imageData.animationSpaces
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
+import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 
 class FFAAnimationSpace(
@@ -12,7 +13,7 @@ class FFAAnimationSpace(
 {
     val animations : List<FixedFrameAnimation> get() = _animations
     val links : List<SpacialLink> get() = _links
-    val stateView = FFASpaceViewState(this)
+    override val stateView = FFASpaceViewState(this)
 
     private val _animations = mutableListOf<FixedFrameAnimation>()
     private val _links = mutableListOf<SpacialLink>()
@@ -52,4 +53,13 @@ class FFAAnimationSpace(
             removeAnimation(animation)
         }
     }.also { workspace.animationManager.animationObservable.addObserver(it)}
+
+    private val __animationStrucuteObserver = workspace.animationManager.animationStructureChangeObservable.addObserver( object : AnimationStructureChangeObserver {
+        override fun animationStructureChanged(animation: Animation) {
+            if( _animations.contains(animation))
+            {
+
+            }
+        }
+    })
 }

@@ -1,10 +1,13 @@
 package spirite.gui.views.animation.animationSpaceView
 
 import spirite.base.brains.IMasterControl
+import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.AnimationSpace
+import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
+import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.resources.IIcon
@@ -32,6 +35,15 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
 
     val currentWorkspace get() = master.workspaceSet.currentWorkspace
 
+    init /*Visuals*/ {
+        spaceDropdown.renderer = {value: AnimationSpace?, index: Int, isSelected: Boolean, hasFocus: Boolean ->
+            when(value) {
+                null -> Hybrid.ui.Label("---")
+                else -> Hybrid.ui.EditableLabel(value.name).also { value.nameBind.bindWeakly(it.textBind) }
+            }
+        }
+    }
+
     init /*Layout*/ {
         imp.ref = this
         imp.setLayout {
@@ -57,19 +69,41 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
                         rows.flex = 100f
                     }
                 }
+                else -> {subPanel.setLayout {  }}
             }
         }
     }
 
-    val __worspaceListener = master.workspaceSet.currentWorkspaceBind.addWeakListener { new, _ ->
-        when( new) {
+    fun rebuildDropDown(workspace : IImageWorkspace?)
+    {
+        when( workspace) {
             null -> spaceDropdown.setValues(emptyList())
-            else -> spaceDropdown.setValues(new.animationSpaceManager.animationSpaces, new.animationSpaceManager.currentAnimationSpace)
+            else -> spaceDropdown.setValues(workspace.animationSpaceManager.animationSpaces, workspace.animationSpaceManager.currentAnimationSpace)
         }
+    }
+
+    // region Observers
+    val animationSpaceObserver = object : AnimationSpaceObserver {
+        override fun spaceAdded(space: AnimationSpace) {
+            if( space.workspace == currentWorkspace)
+            rebuildDropDown(currentWorkspace)
+        }
+
+        override fun spaceRemoved(space: AnimationSpace) {
+            if( space.workspace == currentWorkspace)
+            rebuildDropDown(currentWorkspace)
+        }
+
+    }
+    val __worspaceListener = master.workspaceSet.currentWorkspaceBind.addWeakListener { new, old ->
+        old?.animationSpaceManager?.animationSpaceObservable?.removeObserver(animationSpaceObserver)
+        new?.animationSpaceManager?.animationSpaceObservable?.addObserver(animationSpaceObserver)
+        rebuildDropDown(new)
     }
     val __animBindListener = master.centralObservatory.currentAnimationSpaceBind.addWeakListener { new, _ ->
         new?.also { spaceDropdown.selectedItem = it}
     }
+    //endregion
 
     // region Dnd
     init {
@@ -95,7 +129,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
                         when( selected) {
                             is FFAAnimationSpace -> selected.addAnimation(droppedAnimation)
                             else -> {
-                                val newSpace = FFAAnimationSpace("$droppedAnimation space", workspace)
+                                val newSpace = FFAAnimationSpace("${droppedAnimation.name} space", workspace)
                                 newSpace.addAnimation(droppedAnimation)
                                 workspace.animationSpaceManager.addAnimationSpace(newSpace, true)
                             }
@@ -113,9 +147,4 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     }
     // endregion
 
-    init /*Visuals*/ {
-//        spaceDropdown.renderer = {value: AnimationSpace, index: Int, isSelected: Boolean, hasFocus: Boolean ->
-//            Hybrid.ui.Label(value.name)
-//        }
-    }
 }

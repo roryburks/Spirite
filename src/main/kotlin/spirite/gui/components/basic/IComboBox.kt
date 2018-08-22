@@ -22,7 +22,7 @@ interface IComboBox<T> : IComponent
     val values : List<T>
     fun setValues( newValues: List<T>, select: T? = null)
 
-    var renderer :((value: T, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)?
+    var renderer :((value: T?, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)?
 }
 
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
@@ -52,7 +52,7 @@ private constructor(
         private val imp: SwComboBoxImp<T>)
     : ComboBox<T>(things.toList()), ISwComponent by SwComponent(imp)
 {
-    override var renderer: ((value: T, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)? = null
+    override var renderer: ((value: T?, index: Int, isSelected: Boolean, hasFocus: Boolean) -> IComponent)? = null
         set(value) {
             if( field != value) {
                 field = value

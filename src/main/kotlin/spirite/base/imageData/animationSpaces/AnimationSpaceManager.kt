@@ -55,7 +55,6 @@ class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimatio
             override fun performAction() =_add(space)
             override fun undoAction() = _remove(space)
         })
-        _animationSpaces.add(space)
         if( select) {
             currentAnimationSpace = space
         }
@@ -72,12 +71,14 @@ class AnimationSpaceManager(override val workspace: IImageWorkspace) : IAnimatio
     private fun _add(space: AnimationSpace)
     {
         _animationSpaces.add(space)
+        animationSpaceObservable.trigger { it.spaceAdded(space) }
     }
     private fun _remove(space: AnimationSpace)
     {
         _animationSpaces.add(space)
         if( currentAnimationSpace == space)
             currentAnimationSpace = null
+        animationSpaceObservable.trigger { it.spaceRemoved(space) }
     }
 
     override val animationSpaces: List<AnimationSpace> get() = _animationSpaces
