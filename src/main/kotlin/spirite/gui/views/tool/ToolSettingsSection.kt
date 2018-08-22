@@ -1,5 +1,6 @@
 package spirite.gui.views.tool
 
+import spirite.base.brains.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors
@@ -8,6 +9,7 @@ import spirite.base.util.binding.xBind
 import spirite.base.util.binding.yBind
 import spirite.gui.components.advanced.RadioButtonCluster
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
+import spirite.gui.components.basic.IComboBox
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.ICrossPanel
@@ -19,10 +21,18 @@ import spirite.pc.gui.jcolor
 
 fun <T> DropDownProperty<T>.getComponent() = Hybrid.ui.CrossPanel {
     rows.add(Hybrid.ui.Label("$hrName: "))
-    rows.add(Hybrid.ui.ComboBox(values).apply {
-        selectedItemBind.bindWeakly(valueBind)
-    }, height = 24)
+    rows.add( DDPAdapter(values, valueBind), height = 24)
 }
+private class DDPAdapter<T>(values: Array<T>, bind: Bindable<T>, imp : IComboBox<T> = Hybrid.ui.ComboBox(values))
+    :IComponent by imp
+{
+    init {
+        imp.ref = this
+        imp.selectedItemBind.addRootListener { new, _ -> if(new != null) bind.field = new }
+    }
+    val __listener = bind.addWeakListener { new, _ -> imp.selectedItem = new }
+}
+
 
 
 

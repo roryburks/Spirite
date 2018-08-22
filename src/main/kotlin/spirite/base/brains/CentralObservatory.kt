@@ -7,7 +7,7 @@ import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChangeObserver
-import spirite.base.imageData.animationSpaces.IAnimationSpace
+import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
@@ -28,7 +28,7 @@ interface ICentralObservatory {
     val activeDataBind : IBindable<MediumHandle?>
     val selectedNode : IBindable<Node?>
     val currentAnimationBind : IBindable<Animation?>
-    val currentAnimationSpaceBind : IBindable<IAnimationSpace?>
+    val currentAnimationSpaceBind : IBindable<AnimationSpace?>
 }
 
 class CentralObservatory(private val workspaceSet : IWorkspaceSet)
@@ -48,7 +48,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
     override val activeDataBind: IBindable<MediumHandle?> = TrackingBinder { it.activeMediumBind }
     override val selectedNode : IBindable<Node?> = TrackingBinder { it.groupTree.selectedNodeBind }
     override val currentAnimationBind : IBindable<Animation?> = TrackingBinder { it.animationManager.currentAnimationBind}
-    override val currentAnimationSpaceBind: IBindable<IAnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
+    override val currentAnimationSpaceBind: IBindable<AnimationSpace?> = TrackingBinder { it.animationSpaceManager.currentAnimationSpaceBind }
 
     init {
         // Note: In order to cut down on code which could easily be forgotten/broken, TrackingObservers automatically

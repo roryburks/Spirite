@@ -25,9 +25,6 @@ class FFAAnimationSpaceView(
     fun rebuild()
     {
         imp.setLayout {
-            rows += {
-                add(Hybrid.ui.CrossPanel(), 300,300)
-            }
 
             animationSpace.animations.forEach {ffa->
                 val location = animationSpace.stateView.logicalSpace[ffa] ?: Vec2i.Zero
@@ -35,6 +32,9 @@ class FFAAnimationSpaceView(
                     addGap(location.x)
                     add(FFABlock(ffa))
                 }
+            }
+            rows += {
+                add(Hybrid.ui.CrossPanel())
             }
         }
     }

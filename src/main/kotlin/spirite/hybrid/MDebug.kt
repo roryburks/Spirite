@@ -55,6 +55,7 @@ object MDebug {
     }
 
     fun handleWarning( priority: WarningType, message: String, origin: Exception? = null) {
+        Hybrid.beep()
         println("Warning: $message")
         pushLog("Warning: $message")
     }

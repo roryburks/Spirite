@@ -14,8 +14,8 @@ import javax.swing.ListCellRenderer
 
 interface IComboBox<T> : IComponent
 {
-    var selectedItem : T
-    val selectedItemBind : Bindable<T>
+    var selectedItem : T?
+    val selectedItemBind : Bindable<T?>
 
     var selectedIndex: Int
 
@@ -27,21 +27,19 @@ interface IComboBox<T> : IComponent
 
 abstract class ComboBox<T>(initialValues: List<T>)  :IComboBox<T>
 {
-    override val selectedItemBind = Bindable<T>(initialValues.first())
+    override val selectedItemBind = Bindable<T?>(initialValues.firstOrNull())
 
-    override var selectedItem: T
+    override var selectedItem: T?
         get() = selectedItemBind.field
         set(value) {
             val index = values.indexOf( value)
-            if( index > -1) {
-                selectedItemBind.field = value
-            }
+            selectedItemBind.field = value
         }
     override var selectedIndex: Int
         get() = values.indexOf(selectedItem)
         set(value) {
             val to = MathUtil.clip(0, value, values.size-1)
-            selectedItem = values[to]
+            selectedItem = values.getOrNull(to)
         }
 
     override val values : List<T> get() = _values
@@ -78,7 +76,7 @@ private constructor(
         newValues.forEach { imp.addItem(it) }
 
         _values = newValues.toList()
-        selectedItem = select ?: newValues.first()
+        selectedItem = select
         imp.selectedIndex = newValues.indexOf(selectedItem)
         imp.addActionListener(_listener)
     }

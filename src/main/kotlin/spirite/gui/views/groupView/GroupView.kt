@@ -59,6 +59,7 @@ private constructor(
         slider.valueBind.addRootListener { new, _ ->  master.centralObservatory.selectedNode.field?.alpha = new}
 
         comboBox.selectedItemBind.addRootListener { new, old ->
+            new ?: return@addRootListener
             val node =  master.centralObservatory.selectedNode.field
             if( node != null) {
                 node.method = node.method.copy(methodType = new)
