@@ -20,6 +20,7 @@ import spirite.gui.components.major.tool.ToolSection
 import spirite.gui.components.major.tool.ToolSettingsSection
 import spirite.gui.components.major.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
@@ -124,17 +125,19 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
     init /* Bindings */ {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher { evt ->
-            when(evt.id) {
-                KeyEvent.KEY_PRESSED -> {
-                    if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = true
-                    val key = evt.keyCode
-                    val modifier = evt.modifiersEx
+            Hybrid.gle.runInGLContext {
+                when (evt.id) {
+                    KeyEvent.KEY_PRESSED -> {
+                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = true
+                        val key = evt.keyCode
+                        val modifier = evt.modifiersEx
 
-                    val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
-                    command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
-                }
-                KeyEvent.KEY_RELEASED -> {
-                    if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false
+                        val command = master.hotkeyManager.getCommand(Hotkey(key, modifier))
+                        command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
+                    }
+                    KeyEvent.KEY_RELEASED -> {
+                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false
+                    }
                 }
             }
 

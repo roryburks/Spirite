@@ -4,6 +4,7 @@ import spirite.base.brains.commands.ICentralCommandExecutor
 import spirite.gui.SUIPoint
 import spirite.gui.UIPoint
 import spirite.gui.menus.ContextMenus
+import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType
 import spirite.pc.gui.basic.jcomponent
@@ -67,7 +68,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
                     node.setMnemonic(mnemonic)
 
                 if( item.command != null)
-                    node.addActionListener { commandExecuter.executeCommand(item.command.commandString, extra) }
+                    node.addActionListener { Hybrid.gle.runInGLContext { commandExecuter.executeCommand(item.command.commandString, extra)} }
                 if( item.customAction != null)
                     node.addActionListener { item.customAction.invoke() }
 
