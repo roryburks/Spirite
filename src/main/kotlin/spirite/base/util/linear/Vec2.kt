@@ -1,6 +1,8 @@
 package spirite.base.util.linear
 
 import com.hackoeur.jglm.support.FastMath
+import spirite.base.util.d
+import spirite.base.util.f
 
 /**
  * Created by Rory Burks on 4/28/2017.
@@ -22,6 +24,13 @@ data class Vec2(
     fun normalize(): Vec2 {
         val isr = FastMath.invSqrtFast(x * x + y * y)
         return Vec2(this.x * isr, this.y * isr)
+    }
+
+    fun rotate(theta: Float):Vec2 {
+        val cs = FastMath.cos(theta.d).f
+        val sn = FastMath.sin(theta.d).f
+
+        return Vec2(x*cs - y*sn, x*sn + y*cs)
     }
 
     override fun toString(): String {

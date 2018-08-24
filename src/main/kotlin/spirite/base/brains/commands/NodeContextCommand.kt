@@ -9,6 +9,7 @@ import spirite.base.imageData.groupTree.MovableGroupTree
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.util.StringUtil
 import spirite.gui.components.dialogs.IDialog
 import spirite.hybrid.MDebug
 
@@ -67,7 +68,8 @@ class NodeContextCommand(
             NEW_PUPPET_LAYER.string -> TODO()
             ANIM_FROM_GROUP.string -> {
                 val groupNode = node as? GroupNode ?: return false
-                val animation = FixedFrameAnimation("New Animation", workspace, groupNode)
+                val name = StringUtil.getNonDuplicateName(workspace.animationManager.animations.map { it.name },"New Animation")
+                val animation = FixedFrameAnimation(name, workspace, groupNode)
                 workspace.animationManager.addAnimation(animation, true)
             }
             INSERT_GROUP_IN_ANIMATION.string -> {

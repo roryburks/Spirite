@@ -4,10 +4,11 @@ import spirite.base.brains.IMasterControl
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.animationSpaces.FFAAnimationSpace
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.AnimationSpace
-import spirite.base.imageData.animationSpaces.IAnimationSpaceManager
 import spirite.base.imageData.animationSpaces.IAnimationSpaceManager.AnimationSpaceObserver
+import spirite.gui.Orientation.HORIZONTAL
+import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
 import spirite.gui.resources.IIcon
@@ -27,8 +28,11 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     override val icon: IIcon? get() = null
     override val name: String get() = "Animation Space View"
 
+    private val rightImp = Hybrid.ui.CrossPanel()
+    private val leftImp = Hybrid.ui.CrossPanel()
+    private val split = ResizeContainerPanel(rightImp, HORIZONTAL, 300)
     private val imp = Hybrid.ui.CrossPanel()
-    private val subPanel = Hybrid.ui.CrossPanel()
+    private val subRightPanel = Hybrid.ui.CrossPanel()
     private val spaceDropdown = Hybrid.ui.ComboBox<AnimationSpace>(emptyArray())
     private val removeButton = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_Remove) }
     private val newButton = Hybrid.ui.Button().also { it.setIcon(SwIcons.SmallIcons.Rig_New) }
@@ -45,10 +49,17 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
     }
 
     init /*Layout*/ {
-        imp.ref = this
         imp.setLayout {
+            cols.add(split, flex = 600f)
+            cols.flex = 300f
+        }
+
+        split.addPanel(leftImp, 100, 300, 1)
+
+        rightImp.ref = this
+        rightImp.setLayout {
             rows += {
-                add(subPanel, flex=300f)
+                add(subRightPanel, flex=300f)
                 flex = 300f
             }
             rows += {
@@ -65,12 +76,15 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
         spaceDropdown.selectedItemBind.addRootListener { new, _ ->
             when( new) {
                 is FFAAnimationSpace -> {
-                    subPanel.setLayout {
+                    subRightPanel.setLayout {
                         rows.add(Hybrid.ui.ScrollContainer(FFAAnimationSpaceView(new)), flex = 100f)
                         rows.flex = 100f
                     }
+                    leftImp.setLayout {
+                        rows.add(FFAPlayView(new))
+                    }
                 }
-                else -> {subPanel.setLayout {  }}
+                else -> {subRightPanel.setLayout {  }}
             }
         }
     }
@@ -108,7 +122,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
 
     // region Dnd
     init {
-        imp.jcomponent.dropTarget = DndManager()
+        rightImp.jcomponent.dropTarget = DndManager()
     }
     private inner class DndManager : DropTarget() {
 
