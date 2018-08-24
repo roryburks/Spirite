@@ -1,12 +1,16 @@
 package spirite.gui.views.animation.animationSpaceView
 
+import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
+import spirite.gui.Orientation.VERTICAL
+import spirite.gui.components.advanced.ResizeContainerPanel
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.ICrossPanel
 import spirite.gui.resources.SwIcons
 import spirite.hybrid.Hybrid
 
 class  FFAPlayView(
+        val master: IMasterControl,
         val space: FFAAnimationSpace,
         private val imp : ICrossPanel= Hybrid.ui.CrossPanel())
     : IComponent by imp
@@ -15,8 +19,23 @@ class  FFAPlayView(
     val btnPlayPause = Hybrid.ui.ToggleButton(false)
     val tfFPS = Hybrid.ui.FloatField()
 
+    val innerImpTop = Hybrid.ui.CrossPanel()
+    val innerImpBottom = Hybrid.ui.CrossPanel()
+    val resize = ResizeContainerPanel(innerImpTop,VERTICAL, 300)
+
     init {
         imp.setLayout {
+            rows.add(resize, flex = 100f)
+            rows.flex = 100f
+        }
+
+        resize.addPanel(innerImpBottom, 20,50,-1,false)
+
+        innerImpBottom.setLayout {
+            rows.add(Hybrid.ui.ScrollContainer(FFALexicalStagingView(master.dialog,space)))
+        }
+
+        innerImpTop.setLayout {
             rows.add(drawView, flex = 100f)
             rows+= {
                 addGap(2)
@@ -32,10 +51,6 @@ class  FFAPlayView(
         space.stateView.fpsBind.bindWeakly(tfFPS.valueBind)
         btnPlayPause.setOnIcon(SwIcons.BigIcons.Anim_Play)
         btnPlayPause.setOffIcon(SwIcons.BigIcons.Anim_Play)
-
-        //1000 / 50 = ticks per second
-        // fps = frames per second
-        // frames per tick = (frames per second) / (ticks per second)
 
         Hybrid.timing.createTimer(50, true) {
             if( btnPlayPause.checked) {

@@ -81,7 +81,7 @@ class AnimationSpaceView(private val master: IMasterControl) : IOmniComponent {
                         rows.flex = 100f
                     }
                     leftImp.setLayout {
-                        rows.add(FFAPlayView(new))
+                        rows.add(FFAPlayView(master, new))
                     }
                 }
                 else -> {subRightPanel.setLayout {  }}
