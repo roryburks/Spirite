@@ -57,12 +57,10 @@ open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
 
     protected fun moveNode( nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
         val parent = nodeToMove.parent
+        if( newParent == nodeToMove) return
+        if( newParent.ancestors.contains(nodeToMove)) return
         if( parent == null) {
             MDebug.handleWarning(STRUCTURAL, "Attempted to move a node that isn't in the tree")
-            return
-        }
-        if( parent.isChildOf( nodeToMove)){
-            MDebug.handleWarning(STRUCTURAL, "Attempted to move a Node into its child.")
             return
         }
 
