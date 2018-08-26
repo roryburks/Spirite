@@ -16,25 +16,16 @@ import javax.swing.event.DocumentListener
 class SwTextArea
 private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComponent(imp)
 {
+    // TODO: Re-implement TextBind -> UI binding
     constructor() : this(SwTextAreaImp())
 
     override val textBind = Bindable("")
-    override var text
-            get() = textBind.field
-            set(value) {
-                if( textToBeSetToDocument == null) {
-                    textToBeSetToDocument = value
-                    textBind.field = value
-                }
-            }
+    override var text by textBind
 
     private var textToBeSetToDocument : String? = null
-    val lock = object {}
 
     fun update() {
-        synchronized(lock) {
-            text = imp.textArea.text
-        }
+        text = imp.textArea.text
     }
 
     init {
@@ -44,7 +35,7 @@ private constructor(val imp : SwTextAreaImp) : ITextArea, ISwComponent by SwComp
             override fun removeUpdate(e: DocumentEvent?) {update()}
         })
         textBind.addListener { new, old ->
-            imp.textArea.text = new
+                //imp.textArea.text = new
         }
     }
 

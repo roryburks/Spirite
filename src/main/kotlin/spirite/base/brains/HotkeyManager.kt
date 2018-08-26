@@ -105,7 +105,7 @@ private val defaultHotkeys = mapOf(
         GlobalCommand.OPEN.keyCommand to (Hotkey( KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)),
         GlobalCommand.NEW_WORKSPACE.keyCommand to (Hotkey( KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK)),
 
-        // TODO: This should really be anim., but that might require restructuring/rethinking of
+        // TODO: This should really be animation., but that might require restructuring/rethinking of
         //	command execution system.
 
         KeyCommand("global.debug1") to (Hotkey( KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)),

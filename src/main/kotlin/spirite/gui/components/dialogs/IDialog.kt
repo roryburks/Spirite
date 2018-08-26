@@ -28,6 +28,7 @@ interface IDialog {
 
     fun promptForString( message: String, default: String = "") : String?
     fun promptVerify(message: String) : Boolean
+    fun promptMessage(message: String)
 
     enum class FilePickType {
         OPEN,
@@ -58,6 +59,9 @@ class JDialog(private val master: IMasterControl) : IDialog
             JOptionPane.OK_OPTION -> true
             else -> false
         }
+    }
+    override fun promptMessage(message: String) {
+        JOptionPane.showConfirmDialog(null, message,"",JOptionPane.OK_OPTION)
     }
 
     override fun invokeNewSimpleLayer(workspace: IImageWorkspace): NewSimpleLayerReturn? {
