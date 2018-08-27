@@ -27,10 +27,12 @@ class FFALexicalStagingView(
         btnSetLexicon.action = {
             val lexicon = FFALexicalPlayback(tfLexicon.text, space)
 
+
             val validationErrors = lexicon.validate()
-            if( validationErrors != null){
+            if( validationErrors != null)
                 dialog.promptMessage(validationErrors)
-            }
+            else
+                space.stateView.playback = lexicon
         }
     }
 }

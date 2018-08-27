@@ -138,7 +138,25 @@ Per Palette:
 	// ex: 00 FF 00 0A 3 [4] [4] [4], 265 whitespaces then 3 color data
 
 NodeID: NodeIDs are IDs per node that only exist when saving and loading.  The number of the ID corresponds to the order in which it appears in the file
-
+---ANSP - Animation Space Data
+Per State:
+[n, UT8 str] : Space Name
+[1, byte] : Space Type
+    0x01 : FFA Space
+        [2, ushort] Number of Animations
+        Per Animation:
+            [4, int] AnimationId (AnimationId constructed in same way as NodeId)
+            [4, int] AnimationId? or on-end link (-1 if null)
+            if( not null)
+                [4, int] on-end Frame
+            [2, ushort] Logical X
+            [2, ushort] Logical Y
+        [2, ushort] Number of Links
+        Per Link:
+            [4, int] AnimationId of origin
+            [4, int] Frame of origin
+            [4, int] AnimationId of destination
+            [4, int] Frame of destination
 
 
 ===== Impossed sanity things that could be warned in-program: ====

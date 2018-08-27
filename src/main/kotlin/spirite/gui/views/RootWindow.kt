@@ -20,6 +20,7 @@ import spirite.gui.views.tool.ToolSection
 import spirite.gui.views.tool.ToolSettingsSection
 import spirite.gui.views.work.WorkTabPane
 import spirite.gui.menus.ContextMenus.MenuItem
+import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwMenuBar
 import spirite.pc.gui.basic.jcomponent
 import spirite.pc.gui.menus.SwContextMenus
@@ -132,7 +133,7 @@ class RootWindow( val master: IMasterControl) : JFrame() {
                     val modifier = evt.modifiersEx
 
                     val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
-                    command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
+                    command?.apply { Hybrid.gle.runInGLContext { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }}
                 }
                 KeyEvent.KEY_RELEASED -> {
                     if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false

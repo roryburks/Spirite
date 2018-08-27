@@ -1,14 +1,16 @@
 package spirite.base.file
 
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.util.i
-import spirite.base.util.s
+import spirite.base.util.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.ErrorType
@@ -22,13 +24,15 @@ class SaveContext(
         val ra: RandomAccessFile)
 {
     val nodeMap = mutableMapOf<Node, Int>()
+    val animationMap = mutableMapOf<Animation,Int>()
+
     val root = workspace.groupTree.root
     val floatingData = workspace.mediumRepository.dataList
             .map { workspace.mediumRepository.floatData(it, {MediumPreparer.prepare(it)}) }
             .filterNotNull()
 
 
-    fun writeChunk( tag: String, writer : (RandomAccessFile)->Unit) {
+    inline fun writeChunk( tag: String, writer : (RandomAccessFile)->Unit) {
         if( tag.length != 4) {
             // Perhaps overkill, but this really should be a hard truth
             MDebug.handleError(ErrorType.FATAL, "Chunk types must be 4-length")
@@ -70,6 +74,8 @@ object SaveEngine {
         saveImageData(context)
         if( workspace.animationManager.animations.any())
             saveAnimationData(context)
+        if( workspace.animationSpaceManager.animationSpaces.any())
+            saveAnimationSpaceChunk(context)
         savePaletteData(context)
 
         ra.close()
@@ -221,10 +227,61 @@ object SaveEngine {
         }
     }
 
+    fun saveAnimationSpaceChunk(context: SaveContext) {
+        val animMap = context.animationMap
+
+        context.writeChunk("ANSP") {ra ->
+            context.workspace.animationSpaceManager.animationSpaces.forEach { space ->
+                ra.writeUFT8NT(space.name)
+
+                when( space) {
+                    is FFAAnimationSpace -> {
+                        ra.writeByte(SaveLoadUtil.ANIMSPACE_FFA) // [1] : Type
+
+                        val animations = space.animationStructs.toList()
+                        val links = space.links.toList()
+
+                        ra.writeShort(animations.size)  // [2] : Number of Animations
+                        animations.forEach { struct ->
+                            val anim = struct.animation
+                            ra.writeInt(animMap[anim] ?: -1)    // 4: AnimationId
+                            val onEnd = struct.onEndLink
+                            val onEndLink =  if( onEnd == null) -1 else animMap[onEnd.first] ?: -1
+
+                            ra.writeInt(onEndLink) // 4: AnimationId of on-end link
+                            if(onEndLink != -1)
+                                ra.writeInt(onEnd!!.second)    // 4: on-end Frame
+
+                            val logSpace = space.stateView.logicalSpace[anim] ?: Vec2i.Zero
+                            ra.writeShort(logSpace.x)    // 2: Logical X
+                            ra.writeShort(logSpace.y)    // 2: Logical Y
+                        }
+
+                        ra.writeShort(links.size)   // [2] : Number of Links
+                        links.forEach {
+                            ra.writeInt(animMap[it.origin] ?: -1)
+                            ra.writeInt(it.originFrame)
+                            ra.writeInt(animMap[it.destination] ?: -1)
+                            ra.writeInt(it.destinationFrame)
+                        }
+                    }
+                    else -> {
+                        ra.writeByte(0)
+                        MDebug.handleWarning(UNSUPPORTED, "Do not know how to save Animation Space: $space.  Skipping it")
+                    }
+                }
+            }
+        }
+    }
+
     /** ANIM chunk containing all Animation Data */
     fun saveAnimationData( context: SaveContext) {
         context.writeChunk("ANIM") {ra ->
+            var met = 0
+
             context.workspace.animationManager.animations.forEach { anim ->
+                context.animationMap[anim] = met++
+
                 when( anim) {
                     is FixedFrameAnimation -> {
                         ra.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name

@@ -1,6 +1,7 @@
 package spirite.pc.gui.basic
 
 import spirite.gui.components.basic.IButton
+import spirite.gui.components.basic.IButton.ButtonActionEvent
 import spirite.gui.resources.IIcon
 import spirite.gui.resources.Skin
 import java.awt.Font
@@ -20,18 +21,21 @@ private constructor( val imp: SwButtonImp)
 
     override fun setIcon(icon: IIcon) {imp.icon = icon.icon}
 
-    override var action: (() -> Unit)?
+    override var action: ((ButtonActionEvent) -> Unit)?
         get() = imp.action
         set(value) { imp.action = value}
 
     private class SwButtonImp( str: String? = null) : JButton() {
-        var action: (() -> Unit)? = null
+        var action: ((ButtonActionEvent) -> Unit)? = null
 
         init {
             mouseListeners.forEach { removeMouseListener(it)}
 
             addMouseListener(object : MouseListener{
-                override fun mouseReleased(e: MouseEvent?) { if( isEnabled) action?.invoke() }
+                override fun mouseReleased(e: MouseEvent) {
+                    val evt = ButtonActionEvent(e.isShiftDown, e.isAltDown, e.isControlDown)
+                    if( isEnabled) action?.invoke(evt)
+                }
                 override fun mouseEntered(e: MouseEvent?) {}
                 override fun mouseClicked(e: MouseEvent?) {}
                 override fun mouseExited(e: MouseEvent?) {}
