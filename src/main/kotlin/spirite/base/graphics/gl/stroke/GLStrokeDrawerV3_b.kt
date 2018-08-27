@@ -2,20 +2,18 @@ package spirite.base.graphics.gl.stroke
 
 import com.hackoeur.jglm.support.FastMath
 import spirite.base.graphics.gl.*
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.DEFAULT
-import spirite.base.graphics.gl.StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
 import spirite.base.pen.stroke.DrawPoints
 import spirite.base.pen.stroke.StrokeParams
 import spirite.base.util.d
 import spirite.base.util.f
 import spirite.base.util.glu.GLC
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Vec2
 import spirite.base.util.linear.Vec3
 import kotlin.math.PI
 
 // Dot
-class GLStrokeDrawerV3(
+class GLStrokeDrawerV3_b(
         gle: IGLEngine) : GLStrokeDrawer(gle)
 {
     override fun doStart(context: DrawerContext) {
@@ -30,9 +28,9 @@ class GLStrokeDrawerV3(
         drawStroke( image, drawPoints, params.width, glParams, params)
     }
 
-    override fun getIntensifyMethod(params: StrokeParams): IntensifyMethod  = when {
-        params.hard -> HARD_EDGED
-        else -> DEFAULT
+    override fun getIntensifyMethod(params: StrokeParams): StrokeV2ApplyCall.IntensifyMethod = when {
+        params.hard -> StrokeV2ApplyCall.IntensifyMethod.HARD_EDGED
+        else -> StrokeV2ApplyCall.IntensifyMethod.DEFAULT
     }
 
     private fun drawStroke(target: GLImage, states: DrawPoints, lineWidth: Float, params: GLParameters, strokeParams: StrokeParams, trans: Transform? = null) {
@@ -54,10 +52,12 @@ class GLStrokeDrawerV3(
             val rgb = Vec3(1f, 1f, 1f)
             val dot = linePassGeom(states, lineWidth)
 
-            gle.applyPrimitiveProgram(PolyRenderCall(rgb, 1f), dot.circles, params, trans)
+//            gle.applyPrimitiveProgram(PolyRenderCall(rgb, 1f), dot.circles, params, trans)
             gle.applyPrimitiveProgram(StrokeV2LinePass(rgb),dot.lines, params, trans)
             // Outer Edge Pass
             gle.applyPrimitiveProgram(StrokeV3LinePass(),dot.smallLines, params, trans)
+
+            gle.applyPrimitiveProgram(PolyRenderCall(rgb,1f), dot.circles, params, trans)
 //
 //            val primitives = linePassGeom(states, lineWidth)
 //
@@ -80,7 +80,7 @@ class GLStrokeDrawerV3(
         val MAX_ERROR = 0.2f
 
 
-        fun linePassGeom( states: DrawPoints, width: Float) : DotPrimitive {
+        fun linePassGeom(states: DrawPoints, width: Float) : DotPrimitive {
             val smallLineBuilder = PrimitiveBuilder(intArrayOf(2,1), GLC.LINE_STRIP)
             val circleBuilder = PrimitiveBuilder(intArrayOf(2), GLC.TRIANGLE_FAN)
             val lineBuilder = PrimitiveBuilder(intArrayOf(2), GLC.LINE_STRIP)
@@ -88,12 +88,32 @@ class GLStrokeDrawerV3(
 
             var inSmall = false
 
+            val f2 = FloatArray(2)
+            val f3 = FloatArray(3)
+
             for( i in (0 until states.length)) {
                 val w = width * states.w[i]
 
                 if( w < 1) {
                     if( i == 0) continue
-                    smallLineBuilder.emitVertex(floatArrayOf(states.x[i], states.y[i], w))
+                    f3[0] = states.x[i] ; f3[1] = states.y[i] ; f3[2] = w
+                    smallLineBuilder.emitVertex(f3)
+
+                    if(!inSmall && i > 2) {
+                        val r0 = (width * states.w[i-1]-1f)/2
+                        val p0 = Vec2(states.x[i-1], states.y[i-1])
+                        val p1 = Vec2(states.x[i], states.y[i])
+                        val dif = (p1-p0).normalize()*r0
+
+
+                        f2[0] = p0.x - dif.y ; f2[1] = p0.y - dif.x
+                        lineBuilder.emitVertex(f2)
+                        f2[0] = p1.x ; f2[1] = p1.y
+                        lineBuilder.emitVertex(f2)
+                        f2[0] = p0.x + dif.y ; f2[1] = p0.y - dif.x
+                        lineBuilder.emitVertex(f2)
+                        lineBuilder.emitPrimitive()
+                    }
                     inSmall = true
                 }
                 else {
@@ -101,10 +121,10 @@ class GLStrokeDrawerV3(
                         smallLineBuilder.emitPrimitive()
                     }
 
-                    val r = (w)/2
+                    val r = (w-1f)/2
                     val c = 1 - Math.abs(MAX_ERROR) / r
                     val theta_d = when {
-                        c<0 -> PI/2.0
+                        c<0 -> PI /2.0
                         else -> FastMath.acos(c.d)
                     }
 
@@ -113,10 +133,9 @@ class GLStrokeDrawerV3(
                     circleBuilder.emitVertex(floatArrayOf(cx, cy))
 
                     var theta = 0.0
-                    val f2 = FloatArray(2)
-                    while (theta < 2*PI) {
-                        f2[0]  = (cx + r*FastMath.cos(theta)).f
-                        f2[1] =  (cy + r*FastMath.sin(theta)).f
+                    while (theta < 2* PI) {
+                        f2[0]  = (cx + r* FastMath.cos(theta)).f
+                        f2[1] =  (cy + r* FastMath.sin(theta)).f
                         circleBuilder.emitVertex(f2)
                         lineBuilder.emitVertex(f2)
 
@@ -126,8 +145,43 @@ class GLStrokeDrawerV3(
                     f2[1] = cy
                     circleBuilder.emitVertex(f2)
                     lineBuilder.emitVertex(f2)
-                    circleBuilder.emitPrimitive()
                     lineBuilder.emitPrimitive()
+                    circleBuilder.emitPrimitive()
+
+                    if( i != 0) {
+
+                        if (inSmall) {
+                            val p0 = Vec2(states.x[i-1], states.y[i-1])
+                            val p1 = Vec2(states.x[i], states.y[i])
+                            val dif = (p1-p0).normalize()
+
+
+                            f2[0] = p1.x - dif.y*r ; f2[1] = p1.y - dif.x*r
+                            lineBuilder.emitVertex(f2)
+                            f2[0] = p0.x ; f2[1] = p0.y
+                            lineBuilder.emitVertex(f2)
+                            f2[0] = p1.x + dif.y*r ; f2[1] = p1.y - dif.x*r
+                            lineBuilder.emitVertex(f2)
+                            lineBuilder.emitPrimitive()
+                        } else {
+                            val r0 = (width * states.w[i-1]-1f)/2
+                            val p0 = Vec2(states.x[i-1], states.y[i-1])
+                            val p1 = Vec2(states.x[i], states.y[i])
+                            val dif = (p1-p0).normalize()
+
+                            f2[0] = p0.x - dif.y*r0 ; f2[1] = p0.y - dif.x*r0
+                            lineBuilder.emitVertex(f2)
+                            f2[0] = p1.x - dif.y*r ; f2[1] = p1.y - dif.x*r
+                            lineBuilder.emitVertex(f2)
+                            lineBuilder.emitPrimitive()
+
+                            f2[0] = p0.x + dif.y*r0 ; f2[1] = p0.y - dif.x*r0
+                            lineBuilder.emitVertex(f2)
+                            f2[0] = p1.x + dif.y*r ; f2[1] = p1.y - dif.x*r
+                            lineBuilder.emitVertex(f2)
+                            lineBuilder.emitPrimitive()
+                        }
+                    }
 
                     inSmall = false
                 }

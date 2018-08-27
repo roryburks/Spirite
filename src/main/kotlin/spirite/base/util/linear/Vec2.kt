@@ -16,6 +16,7 @@ data class Vec2(
 
     operator fun minus( rhs: Vec2) = Vec2(x - rhs.x, y-rhs.y)
     operator fun plus( rhs: Vec2) = Vec2( x + rhs.x, y + rhs.y)
+    operator fun times( rhs: Float) = Vec2(x*rhs, y*rhs)
 
     infix fun dot(rhs: Vec2) = this.x * rhs.x + this.y * rhs.y
     infix fun cross(rhs: Vec2) = x * rhs.y - y * rhs.x

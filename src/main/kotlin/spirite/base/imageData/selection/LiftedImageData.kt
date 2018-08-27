@@ -25,9 +25,6 @@ class LiftedImageData(val image: IImage): ILiftedData {
         gc.transform = transform
         gc.preTranslate(-bakedArea.x.f, -bakedArea.y.f)
         gc.renderImage(image, 0, 0)
-        Hybrid.imageIO.saveImage(image, File("C:/Bucket/t1.png"))
-        Hybrid.imageIO.saveImage(newImage, File("C:/Bucket/t2.png"))
-
         return LiftedImageData(newImage)
     }
 
