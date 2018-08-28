@@ -45,6 +45,11 @@ constructor(val master: IMasterControl, private val tabPane: ITabbedPane)
             val newContainer = Hybrid.ui.CrossPanel()
             containers.add(newContainer)
             tabPane.addTab(title, newContainer)
+
+            newWorkspace.displayedFilenameBind.addListener { new, _ ->
+                val ind = tabPane.components.indexOf(newContainer)
+                tabPane.setTitleAt(ind, new)
+            }
         }
 
         override fun workspaceRemoved(removedWorkspace: IImageWorkspace) {

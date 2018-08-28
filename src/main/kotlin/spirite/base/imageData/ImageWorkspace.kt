@@ -39,6 +39,7 @@ interface IImageWorkspace {
     val file: File?
     val filename get() = file?.name ?: "Untitled Image"
     val hasChanged: Boolean
+    val displayedFilenameBind : IBindable<String>
 
 
 
@@ -78,6 +79,7 @@ interface IImageWorkspace {
 interface MImageWorkspace : IImageWorkspace
 {
     override val mediumRepository : MMediumRepository
+    override var hasChanged: Boolean
 }
 
 class ImageWorkspace(
@@ -106,6 +108,7 @@ class ImageWorkspace(
     override var height: Int by UndoableDelegate(height, undoEngine, "Changed Workspace Height")
 
 
+    // region File-Related
     override fun finishBuilding() {
         undoEngine.reset()
         hasChanged = false
@@ -118,7 +121,27 @@ class ImageWorkspace(
     }
 
     override var file: File? = null
+        set(value) {
+            field = value
+            updateDisplayedFilename()
+        }
     override var hasChanged: Boolean = false
+        set(value) {
+            field = value
+            updateDisplayedFilename()
+        }
+    private fun updateDisplayedFilename() {
+        if( hasChanged)
+            displayedFilenameBind.field = (file?.name ?: "<New Worspace>") + "*"
+        else
+            displayedFilenameBind.field = (file?.name ?: "<New Worspace>")
+    }
+    override val displayedFilenameBind = Bindable("<New Worspace>")
+
+    // endregion
+
+
+    // region Active Stuff
 
     private val currentNode get() = groupTree.selectedNode
 
@@ -145,8 +168,10 @@ class ImageWorkspace(
             else -> NillImageDrawer
     }
 
+    // endregion
 
-    // Add internal component-to-component event _triggers
+
+    // region Internal Cross-Component Listeners
     init {
         groupTree.selectedNodeBind.addListener { new, old ->
             activeMediumBind.field = (new as? LayerNode)?.run { layer.activeData.handle }
@@ -166,4 +191,5 @@ class ImageWorkspace(
     private val selectionListener : (SelectionChangeEvent)->Unit = { it : SelectionChangeEvent ->
         imageObservatory.triggerRefresh(ImageChangeEvent(emptySet(), emptySet(), this@ImageWorkspace, liftedChange = it.isLiftedChange))
     }.also { obs -> selectionEngine.selectionChangeObserver.addObserver(obs) }
+    // endregion
 }

@@ -21,6 +21,7 @@ interface ITabbedPane : IComponent
 
     fun addTab( title : String, component: IComponent?)
     fun setComponentAt( index: Int, newComponent: IComponent?)
+    fun setTitleAt(index: Int, newTitle: String)
     fun removeTabAt( index: Int)
 }
 
@@ -62,6 +63,11 @@ private constructor(
     override fun setComponentAt(index: Int, newComponent: IComponent?) {
         tabs.getOrNull(index)?.component = newComponent
         imp.setComponentAt(index, newComponent?.jcomponent)
+    }
+
+    override fun setTitleAt(index: Int, newTitle: String) {
+        tabs.getOrNull(index)?.title = newTitle
+        imp.setTitleAt(index, newTitle)
     }
 
     override fun removeTabAt(index: Int) {

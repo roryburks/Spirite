@@ -3,6 +3,7 @@ package spirite.base.imageData.undo
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.imageData.IImageWorkspace
+import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
@@ -48,7 +49,7 @@ class UndoIndex(
 
 
 class UndoEngine(
-        val workspace: IImageWorkspace,
+        val workspace: MImageWorkspace,
         val mediumRepo: MMediumRepository
 ) : IUndoEngine {
 
@@ -154,6 +155,7 @@ class UndoEngine(
         _queuePosition++
         triggerHistoryChanged()
         cull()
+        workspace.hasChanged = true
     }
 
     override fun undo() : Boolean {
@@ -163,6 +165,7 @@ class UndoEngine(
             --_queuePosition
             undoQueue[_queuePosition].undo()
             triggerUndo()
+            workspace.hasChanged = _queuePosition != saveSpot
             return true
         }
     }
@@ -173,6 +176,7 @@ class UndoEngine(
         else {
             undoQueue[_queuePosition].redo()
             ++_queuePosition
+            workspace.hasChanged = _queuePosition != saveSpot
             return true
         }
     }

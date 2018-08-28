@@ -4,6 +4,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.file.load.AnimationLoaderFactory
 import spirite.base.file.load.AnimationSpaceLoaderFactory
 import spirite.base.file.load.LayerLoaderFactory
+import spirite.base.file.load.MediumLoaderFactory
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
@@ -151,78 +152,12 @@ object LoadEngine {
             val id = ra.readInt()
             val typeId = if( context.version<4) 0 else ra.readByte().toInt()
 
-            val type = when( typeId) {
-                SaveLoadUtil.MEDIUM_PLAIN -> FLAT
-                SaveLoadUtil.MEDIUM_DYNAMIC -> DYNAMIC
-                SaveLoadUtil.MEDIUM_PRISMATIC -> PRISMATIC
-                SaveLoadUtil.MEDIUM_MAGLEV -> MAGLEV
-                else -> throw BadSifFileException("Unrecognized Medium Type Id: $typeId.  Trying to load a newer SIF version in an older program version or corrupt file.")
-            }
+            val medium = MediumLoaderFactory
+                    .getMediumLoader(context.version, typeId)
+                    .loadMedium(context)
 
-            when( type) {
-                FLAT -> {
-                    val imgSize = ra.readInt()
-                    val imgData = ByteArray(imgSize).apply { ra.read( this) }
-
-                    val img = Hybrid.imageIO.loadImage(imgData)
-                    dataMap[id] = FlatMedium(img, context.workspace.mediumRepository)
-                }
-                DYNAMIC -> {
-                    val ox = ra.readShort().i
-                    val oy = ra.readShort().i
-                    val imgSize = ra.readInt()
-                    val img = when( imgSize) {
-                        0 -> null
-                        else -> {
-                            val imgData = ByteArray(imgSize).apply { ra.read( this) }
-                            Hybrid.imageIO.loadImage(imgData)
-                        }
-                    }
-                    dataMap[id] = DynamicMedium(context.workspace, DynamicImage(img, ox, oy), context.workspace.mediumRepository)
-                }
-                PRISMATIC -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Prismatic Mediums are currently not supported by Spirite v2, ignoring.")
-                    val numlayers = ra.readUnsignedShort()
-                    repeat(numlayers) {
-                        ra.readInt()
-                        ra.readShort()
-                        ra.readShort()
-                        val imgSize = ra.readInt()
-                        ra.skipBytes(imgSize)
-                    }
-                }
-                MAGLEV -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Maglev Mediums are currently not supported by Spirite v2, ignoring.")
-                    val numThings = ra.readUnsignedShort()
-                    repeat(numThings) {
-                        val thingType = ra.readByte()
-                        when( thingType.i) {
-                            0 -> { // stroke
-                                ra.readInt()
-                                ra.readByte()
-                                ra.readFloat()
-                                val numVertices = ra.readUnsignedShort()
-                                repeat(numVertices) {
-                                    ra.readFloat()
-                                    ra.readFloat()
-                                    ra.readFloat()
-                                }
-                            }
-                            1 -> { // fill
-                                ra.readInt()
-                                ra.readByte()
-                                val numReferences = ra.readUnsignedShort()
-                                repeat(numReferences) {
-                                    ra.readUnsignedShort()
-                                    ra.readFloat()
-                                    ra.readFloat()
-                                }
-                            }
-                        }
-                    }
-                }
-                DERIVED_MAGLEV -> {}
-            }
+            if( medium != null)
+                dataMap[id] = medium
         }
 
         context.reindexingMap = context.workspace.mediumRepository.importMap(dataMap)
