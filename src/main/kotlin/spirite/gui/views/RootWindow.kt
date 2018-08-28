@@ -126,17 +126,19 @@ class RootWindow( val master: IMasterControl) : JFrame() {
 
     init /* Bindings */ {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher { evt ->
-            when(evt.id) {
-                KeyEvent.KEY_PRESSED -> {
-                    if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = true
-                    val key = evt.keyCode
-                    val modifier = evt.modifiersEx
+            Hybrid.gle.runInGLContext {
+                when (evt.id) {
+                    KeyEvent.KEY_PRESSED -> {
+                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = true
+                        val key = evt.keyCode
+                        val modifier = evt.modifiersEx
 
-                    val command = master.hotkeyManager.getCommand(Hotkey(key,modifier))
-                    command?.apply { Hybrid.gle.runInGLContext { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }}
-                }
-                KeyEvent.KEY_RELEASED -> {
-                    if( evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false
+                        val command = master.hotkeyManager.getCommand(Hotkey(key, modifier))
+                        command?.apply { master.commandExecutor.executeCommand(this.commandString, this.objectCreator?.invoke(master)) }
+                    }
+                    KeyEvent.KEY_RELEASED -> {
+                        if (evt.keyCode == KeyEvent.VK_SPACE) workTabPane.workSection.penner.holdingSpace = false
+                    }
                 }
             }
 
