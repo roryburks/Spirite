@@ -9,7 +9,7 @@ object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_0001
+    const val version = 0x0001_0002
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section
@@ -28,6 +28,9 @@ object SaveLoadUtil {
     // :::: AnimationType
     const val ANIM_FFA = 0x01
     const val ANIM_RIG = 0x02
+
+    // :::: AnimationSpaceType
+    const val ANIMSPACE_FFA = 0x01
 
     // :::: FFAFrameType
     const val FFAFRAME_FRAME = 0x01
@@ -64,3 +67,10 @@ object SaveLoadUtil {
         return bos.toString("UTF-8")
     }
 }
+
+fun RandomAccessFile.writeUFT8NT(str: String) {
+    val bytes = SaveLoadUtil.strToByteArrayUTF8(str)
+    write(bytes)
+}
+
+fun RandomAccessFile.readNullTerminatedStringUTF8() = SaveLoadUtil.readNullTerminatedStringUTF8(this)

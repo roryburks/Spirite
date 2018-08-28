@@ -18,3 +18,5 @@
 0x0001_0001:
     -Re-added Animation Name to Animations
     -Updated FFA Animations to have gaps separate Frames
+0x0001_0002:
+    -Added ANSP Chunk and FFAAnimSpace save stuff (no breaking changes)

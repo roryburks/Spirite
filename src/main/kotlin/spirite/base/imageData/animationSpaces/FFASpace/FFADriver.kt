@@ -38,7 +38,6 @@ class FFALexicalPlayback(
         val space: FFAAnimationSpace) : IFFAPlayback
 {
     val state get() = space.stateView
-    var pos: Int? = null
 
     fun validate() : String?
     {
@@ -75,16 +74,16 @@ class FFALexicalPlayback(
         return null
     }
 
+    var caret: Int? = null
     var falloverPoint = 0
     var nextBreakpointAfter = 0
-    var moveToPoint = 0
-    lateinit var moveToAnim :FixedFrameAnimation
-    var caret = 0
+    var moveToFrame = 0
+    var moveToAnim :FixedFrameAnimation? = null
 
     override fun advance(miliseconds: Float){
 
-        if( pos == null) {
-            pos = 0
+        if( caret == null) {
+            caret = 0
             val char = lexicon.getOrNull(0) ?: return
             val animation= state.charbinds.entries.firstOrNull { it.value == char }?.key ?: return
             state.animation = animation
@@ -95,12 +94,20 @@ class FFALexicalPlayback(
             val anim = state.animation ?: return
             val nextF = state.met + state.fps / (1000.0f / miliseconds)
             val currentMet = state.met.floor
-            val nextMet = MathUtil.cycle(anim.start,anim.end, nextF.floor)
+            val nextMet = nextF.floor
 
-            if( nextMet != currentMet) {
-                if( currentMet == nextBreakpointAfter) {
-
+            if( nextMet != currentMet && currentMet == nextBreakpointAfter) {
+                if( moveToAnim == null) {
+                    caret = null
                 }
+                else {
+                    state.animation = moveToAnim
+                    state.met = nextF - nextMet + moveToFrame
+                    determineNextBreakpoint()
+                }
+            }
+            else {
+                state.met = MathUtil.cycle(anim.start.f, anim.end.f, nextF)
             }
         }
     }
@@ -109,34 +116,36 @@ class FFALexicalPlayback(
     {
         falloverPoint = state.met.floor
 
-        val char1 = lexicon[caret]
-        val char2 = lexicon.getOrNull(caret+1)
-        caret += 1
+        val ccaret = caret ?: return
+        val char1 = lexicon[ccaret]
+        val char2 = lexicon.getOrNull(ccaret+1)
+        caret = ccaret + 1
         if( char2 == null) {
-            nextBreakpointAfter = state.animation?.end ?: 0
+            nextBreakpointAfter = state.animation?.run{end-1} ?: 0
+            moveToAnim = null
         }
 
         val anim1 = state.charbinds.entries.firstOrNull{it.value == char1}?.key ?: return
         val anim2 = state.charbinds.entries.firstOrNull{it.value == char2}?.key ?: return
 
         if( anim1 == anim2) {
-            nextBreakpointAfter = anim1.end
-            moveToPoint = 0
+            nextBreakpointAfter = anim1.end-1
+            moveToFrame = 0
             moveToAnim = anim1
             return
         }
 
         val endLink = space.animationStructs.firstOrNull { it.animation == anim1 } ?: return
         if( endLink.onEndLink?.first == anim2) {
-            nextBreakpointAfter = anim1.end
-            moveToPoint = endLink.onEndLink?.second ?: 0
+            nextBreakpointAfter = anim1.end-1
+            moveToFrame = endLink.onEndLink?.second ?: 0
             moveToAnim = anim2
             return
         }
         else {
             val relevantLink = space.links.firstOrNull { it.origin == anim1 && it.destination == anim2 } ?: return
             nextBreakpointAfter = relevantLink.originFrame
-            moveToPoint = relevantLink.destinationFrame
+            moveToFrame = relevantLink.destinationFrame
             moveToAnim = relevantLink.destination
             return
         }

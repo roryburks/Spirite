@@ -4,6 +4,10 @@ import spirite.base.brains.IMasterControl
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.MediumHandle
+import spirite.base.imageData.animation.Animation
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
+import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer
@@ -13,6 +17,7 @@ import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
 import spirite.base.imageData.mediums.IMedium.MediumType.*
 import spirite.base.util.i
+import spirite.base.util.linear.Vec2i
 import spirite.hybrid.Hybrid
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
@@ -33,6 +38,7 @@ class LoadContext(
     var version: Int = 0
     val chunkInfo = mutableListOf<ChunkInfo>()
     val nodes = mutableListOf<Node>()
+    val animations = mutableListOf<Animation>()
     lateinit var reindexingMap : Map<Int,Int>
 
     fun reindex( index : Int) = reindexingMap[index] ?: throw BadSifFileException("Medium Id $index does not correspond to any Medium Data")
@@ -91,6 +97,11 @@ object LoadEngine {
             context.chunkInfo.singleOrNull { it.header == "ANIM" }?.apply {
                 ra.seek(startPointer)
                 parseAnimationData(context, size)
+            }
+            // Animation Space Data (optional)
+            context.chunkInfo.singleOrNull { it.header == "ANSP" }?.apply {
+                ra.seek(startPointer)
+                parseAnimationSpaceData(context,size)
             }
 
             // Palette Data (optional)
@@ -376,8 +387,10 @@ object LoadEngine {
                 else -> throw BadSifFileException("Unrecognized Animation Type ID: $type (version mismatch or corrupt file?)")
             }
 
-            if( animation != null)
+            if( animation != null) {
+                context.animations.add(animation)
                 context.workspace.animationManager.addAnimation(animation)
+            }
         }
     }
 
@@ -392,6 +405,61 @@ object LoadEngine {
             val data = ByteArray(size).also { ra.read(it) }
             context.workspace.paletteSet.addPalette(name, false, data)
             context.workspace.paletteSet.removePalette(0)
+        }
+    }
+
+    private fun parseAnimationSpaceData( context: LoadContext, chunkSize: Int)
+    {
+        val ra = context.ra
+        val endPointer = ra.filePointer + chunkSize
+        val anims = context.animations
+
+        while( ra.filePointer < endPointer) {
+            val name = ra.readNullTerminatedStringUTF8()
+            val type = ra.readByte().i
+            val space = when(type) {
+                0 -> null
+                SaveLoadUtil.ANIMSPACE_FFA -> {
+                    val space = FFAAnimationSpace(name, context.workspace)
+
+                    val numAnimations = ra.readUnsignedShort()
+                    repeat(numAnimations) {
+                        val animation = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
+
+                        val endLinkAnimId = ra.readInt()
+                        val endLinkFrame = if( endLinkAnimId != -1) ra.readInt() else 0
+
+                        val logX = ra.readUnsignedShort()
+                        val logY = ra.readUnsignedShort()
+
+                        if( animation != null) {
+                            space.addAnimation(animation)
+
+                            val endLinkAnim = anims.getOrNull(endLinkAnimId) as? FixedFrameAnimation
+                            if( endLinkAnim != null)
+                                space.setOnEndBehavior(animation, Pair(endLinkAnim, endLinkFrame))
+
+                            space.stateView.setLogicalSpace(animation, Vec2i(logX,logY))
+                        }
+                    }
+
+                    val numLinks = ra.readUnsignedShort()
+                    repeat(numLinks) {
+                        val origin = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
+                        val originFrame = ra.readInt()
+                        val destination = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
+                        val destinationFrame = ra.readInt()
+                        if( origin != null && destination != null)
+                            space.addLink(SpacialLink(origin, originFrame, destination, destinationFrame))
+                    }
+
+                    space
+                }
+                else -> throw BadSifFileException("Unrecognized AnimationSpace Type ID: $type (version mismatch or corrupt file?)")
+            }
+
+            if( space != null)
+                context.workspace.animationSpaceManager.addAnimationSpace(space, true)
         }
     }
 }

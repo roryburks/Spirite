@@ -70,7 +70,7 @@ class SwContextMenus(commandExecuter: ICentralCommandExecutor) : ContextMenus(co
                 if( item.command != null)
                     node.addActionListener { Hybrid.gle.runInGLContext { commandExecuter.executeCommand(item.command.commandString, extra)} }
                 if( item.customAction != null)
-                    node.addActionListener { item.customAction.invoke() }
+                    node.addActionListener { Hybrid.gle.runInGLContext { item.customAction.invoke()} }
 
                 if( item.icon != null)
                     TODO()

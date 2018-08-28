@@ -166,11 +166,28 @@ class SpriteLayer : Layer {
         }
     }
 
-    fun addPart( partName : String) {
+    fun addPartLinked(partName: String, depth: Int? = null)
+    {
+        val linked = getAllLinkedLayers()
+        val names = linked.mapAggregated { it.parts.map { it.partName } }.distinct()
+        val realName = StringUtil.getNonDuplicateName(names, partName)
+
+        val aPart = activePart
+        val realDepth = depth ?: when {
+            !_parts.any() -> 0
+            aPart == null -> _parts.last().depth + 1
+            else -> aPart.depth+1
+        }
+
+        undoEngine.doAsAggregateAction("Add Sprite Part (Linked)") {
+            linked.forEach {addPart(realName, realDepth)}
+        }
+    }
+    fun addPart( partName : String, depth: Int? = null) {
         val handle = mediumRepo.addMedium( DynamicMedium(workspace, mediumRepo = mediumRepo))
 
         val aPart = activePart
-        val depth = when {
+        val realDepth = depth ?: when {
             !_parts.any() -> 0
             aPart == null -> _parts.last().depth + 1
             else -> aPart.depth+1
@@ -180,8 +197,8 @@ class SpriteLayer : Layer {
 
             val indexOfAPart = if( aPart == null) -1 else _parts.indexOf(aPart)
             if(indexOfAPart != -1)
-                _bubbleUpDepth(indexOfAPart+1, depth)
-            _addPart( SpritePartStructure( depth, partName), handle)
+                _bubbleUpDepth(indexOfAPart+1, realDepth)
+            _addPart( SpritePartStructure( realDepth, partName), handle)
         }
     }
     fun removePart( toRemove: SpritePart) {
@@ -297,6 +314,13 @@ class SpriteLayer : Layer {
     val cRotBind = Bindable(0f) {new, _ ->  activePart?.rot = new}
 
 
+    fun getAllLinkedLayers() : List<SpriteLayer> {
+        return workspace.groupTree.root
+                .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
+                ?.parent?.children
+                ?.mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
+                ?: SinglyList(this)
+    }
 
     inner class SpritePart(
             _structure: SpritePartStructure,
@@ -322,9 +346,45 @@ class SpriteLayer : Layer {
         var centerX get() = structure.centerX ; set(value) { if( value != structure.centerX) replaceStructure(structure.copy(centerX = value), 9)}
         var centerY get() = structure.centerY ; set(value) { if( value != structure.centerY) replaceStructure(structure.copy(centerY = value), 10)}
 
+
+        fun getAllLinkedParts() : List<SpritePart> {
+            val parent = workspace.groupTree.root
+                    .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
+                    ?.parent
+                    ?: return SinglyList(this)
+            return parent.children
+                    .mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
+                    .mapNotNull { it.parts.firstOrNull{it.partName == partName} }
+        }
+
         private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
-            if( structure != newStructure)
-                undoEngine.performAndStore(SpriteStructureAction(newStructure, structureCode))
+            if( structure != newStructure) {
+                val linked = getAllLinkedParts()
+
+                undoEngine.doAsAggregateAction("Change Sprite Part Structure") {
+                    linked.forEach { it._replaceStructure(newStructure, structureCode) }
+                }
+            }
+        }
+
+        private fun _replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
+            undoEngine.performAndStore(SpriteStructureAction(newStructure, structureCode))
+        }
+
+        private fun refreshC()
+        {
+            if( activePart == this) {
+                cAlphaBind.field = alpha
+                cDepthBind.field = depth
+                cVisibleBind.field = visible
+                cPartNameBind.field = partName
+                cAlphaBind.field = alpha
+                cTransXBind.field = transX
+                cTransYBind.field =transY
+                cScaleXBind.field =scaleX
+                cScaleYBind.field = scaleY
+                cRotBind.field = rot
+            }
         }
 
         inner class SpriteStructureAction(
@@ -336,11 +396,13 @@ class SpriteLayer : Layer {
             override fun performAction() {
                 structure = newStructure
                 _sort()
+                refreshC()
                 triggerChange()
             }
             override fun undoAction() {
                 structure = oldStructure
                 _sort()
+                refreshC()
                 triggerChange()
             }
 

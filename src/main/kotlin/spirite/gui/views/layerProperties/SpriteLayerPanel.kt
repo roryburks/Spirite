@@ -85,8 +85,11 @@ class SpriteLayerPanel(master: IMasterControl) : ICrossPanel by Hybrid.ui.CrossP
         btnNewPart.setIcon(SwIcons.SmallIcons.Rig_New)
         btnRemovePart.setIcon(SwIcons.SmallIcons.Rig_Remove)
 
-        btnNewPart.action = {
-            linkedSprite?.addPart("new")
+        btnNewPart.action = {evt ->
+            if( evt.pressingShift)
+                linkedSprite?.addPartLinked("new")
+            else
+                linkedSprite?.addPart("new")
         }
 
         boxList.movementContract = object : IMovementContract {
