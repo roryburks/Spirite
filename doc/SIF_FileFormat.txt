@@ -47,9 +47,10 @@ Header
 			[2, ushort] : Number of Parts
 			Per Part:
 				[2, ushort] parent (0 for root, 1 for 1st part in the list, etc)
-				[4, int] : MediumId
 				[4 4 4 4 (16), float] : bone x1, y1, x2, y2 in that order
 				[4, int] : draw depth
+				[4, int] : MediumId
+		        [4, float] : alpha
 
  ---- IMGD - Medium Data Chunk ----
  Per Medium:

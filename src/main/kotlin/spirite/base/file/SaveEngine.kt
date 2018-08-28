@@ -168,6 +168,7 @@ object SaveEngine {
                                     ra.writeFloat(part.rot)     // 4 : rotation
                                     ra.writeInt(part.depth)     // 4 : draw depth
                                     ra.writeInt(part.handle.id) // 4 : MediumId
+                                    ra.writeFloat(part.alpha)   // 4 : Alpha
                                 }
                             }
                             //is ReferenceLayer -> {}

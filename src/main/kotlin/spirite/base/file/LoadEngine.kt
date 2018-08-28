@@ -1,17 +1,16 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
+import spirite.base.file.load.AnimationLoaderFactory
+import spirite.base.file.load.AnimationSpaceLoaderFactory
+import spirite.base.file.load.LayerLoaderFactory
 import spirite.base.graphics.DynamicImage
 import spirite.base.imageData.MImageWorkspace
-import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.imageData.layers.SimpleLayer
-import spirite.base.imageData.layers.sprite.SpriteLayer
-import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
@@ -271,68 +270,14 @@ object LoadEngine {
                     workspace.groupTree.addGroupNode(nodeLayer[depth - 1], name)
                             .apply { nodeLayer[depth] = this }
                 }
-                SaveLoadUtil.NODE_SIMPLE_LAYER -> {
-                    val mediumId = ra.readInt()
-
-                    val layer = SimpleLayer(MediumHandle(workspace, context.reindex(mediumId)))
-                    workspace.groupTree.importLayer( nodeLayer[depth-1], name, layer, true)
+                else -> {
+                    val layer = LayerLoaderFactory.getLayerLoader(context.version, type)
+                            .loadLayer(context, name)
+                    if( layer != null)
+                        workspace.groupTree.importLayer(nodeLayer[depth-1], name, layer, true)
+                    else
+                        null
                 }
-                SaveLoadUtil.NODE_SPRITE_LAYER -> {
-                    val partSize = ra.readUnsignedByte()
-                    val parts = List(partSize) {
-                        val partName = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
-
-                        val spritePartStructure = when {
-                            context.version <= 4 -> {
-                                val transX = ra.readShort().toFloat()
-                                val transY = ra.readShort().toFloat()
-                                val drawDepth = ra.readInt()
-                                SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, 1f, 1f, 0f)
-                            }
-                            else -> {
-                                val transX = ra.readFloat()
-                                val transY = ra.readFloat()
-                                val scaleX = ra.readFloat()
-                                val scaleY = ra.readFloat()
-                                val rot = ra.readFloat()
-                                val drawDepth = ra.readInt()
-                                SpritePartStructure(drawDepth, partName, true, 1f, transX, transY, scaleX, scaleY, rot)
-
-                            }
-                        }
-                        val medium = MediumHandle(workspace,context.reindex(ra.readInt()))
-                        Pair(medium, spritePartStructure)
-                    }
-
-                    val sprite = SpriteLayer(workspace, workspace.mediumRepository, parts)
-
-                    workspace.groupTree.importLayer(nodeLayer[depth-1], name, sprite, true)
-                }
-                SaveLoadUtil.NODE_REFERENCE_LAYER -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Reference Layers are currently not supported by Spirite v2, ignoring Refernce Layer")
-                    ra.readInt()    // [4] : NodeID
-                    null
-                }
-                SaveLoadUtil.NODE_PUPPET_LAYER -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Puppet Layers are currently not supported by Spirite v2, ignoring Puppet Layer")
-                    val byte = ra.readByte()   // [1] : Whether or not is derived
-                    if( byte.i == 0) {
-                        val numParts = ra.readUnsignedShort() // [2] : Number of parts
-                        for( i in 0 until numParts) {
-                            ra.readShort()  // [2] : Parent
-                            ra.readInt()    // [4] : MediumId
-                            ra.readFloat()  // [16] : Bone x1, y1, x2, y2
-                            ra.readFloat()
-                            ra.readFloat()
-                            ra.readFloat()
-                            ra.readInt()    // [4]: DrawDepth
-                        }
-
-                    }
-                    else throw BadSifFileException("Do not know how to handle derived puppet types")
-                    null
-                }
-                else -> throw BadSifFileException("Unrecognized Node Type ID: $type (version mismatch or corrupt file?)")
             }
 
             if( node != null) {
@@ -353,39 +298,16 @@ object LoadEngine {
 
     private fun parseAnimationData( context: LoadContext, chunkSize: Int)
     {
-        val nodes = context.nodes
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
 
         while( ra.filePointer < endPointer) {
             val name = if( context.version == 0x1_0000) "animation" else SaveLoadUtil.readNullTerminatedStringUTF8(ra)
             val type = ra.readByte().i
-            val animation = when( type) {
-                SaveLoadUtil.ANIM_FFA -> FFALoaderFactory.getLoaderFromVersion(context.version).loadAnimation(context, name)
-                SaveLoadUtil.ANIM_RIG -> {
-                    MDebug.handleWarning(UNSUPPORTED, "Rig Animations are currently not supported by Spirite v2, ignoring.")
-                    val numSprites = ra.readUnsignedShort()
-                    repeat(numSprites) {
-                        val nodeId = ra.readInt()
-                        val numParts = ra.readUnsignedShort()
-                        repeat(numParts) {
-                            val name = SaveLoadUtil.readNullTerminatedStringUTF8(ra)
-                            val numKeyframes = ra.readUnsignedShort()
-                            repeat(numKeyframes) {
-                                val t = ra.readFloat()
-                                val tx = ra.readFloat()
-                                val ty = ra.readFloat()
-                                val sx = ra.readFloat()
-                                val sy = ra.readFloat()
-                                val rot = ra.readFloat()
-                            }
-                        }
-                    }
 
-                    null
-                }
-                else -> throw BadSifFileException("Unrecognized Animation Type ID: $type (version mismatch or corrupt file?)")
-            }
+            val animation = AnimationLoaderFactory
+                    .getAnimationLoader(context.version, type)
+                    .loadAnimation(context, name)
 
             if( animation != null) {
                 context.animations.add(animation)
@@ -412,51 +334,14 @@ object LoadEngine {
     {
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
-        val anims = context.animations
 
         while( ra.filePointer < endPointer) {
             val name = ra.readNullTerminatedStringUTF8()
             val type = ra.readByte().i
-            val space = when(type) {
-                0 -> null
-                SaveLoadUtil.ANIMSPACE_FFA -> {
-                    val space = FFAAnimationSpace(name, context.workspace)
 
-                    val numAnimations = ra.readUnsignedShort()
-                    repeat(numAnimations) {
-                        val animation = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
-
-                        val endLinkAnimId = ra.readInt()
-                        val endLinkFrame = if( endLinkAnimId != -1) ra.readInt() else 0
-
-                        val logX = ra.readUnsignedShort()
-                        val logY = ra.readUnsignedShort()
-
-                        if( animation != null) {
-                            space.addAnimation(animation)
-
-                            val endLinkAnim = anims.getOrNull(endLinkAnimId) as? FixedFrameAnimation
-                            if( endLinkAnim != null)
-                                space.setOnEndBehavior(animation, Pair(endLinkAnim, endLinkFrame))
-
-                            space.stateView.setLogicalSpace(animation, Vec2i(logX,logY))
-                        }
-                    }
-
-                    val numLinks = ra.readUnsignedShort()
-                    repeat(numLinks) {
-                        val origin = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
-                        val originFrame = ra.readInt()
-                        val destination = anims.getOrNull(ra.readInt()) as? FixedFrameAnimation
-                        val destinationFrame = ra.readInt()
-                        if( origin != null && destination != null)
-                            space.addLink(SpacialLink(origin, originFrame, destination, destinationFrame))
-                    }
-
-                    space
-                }
-                else -> throw BadSifFileException("Unrecognized AnimationSpace Type ID: $type (version mismatch or corrupt file?)")
-            }
+            val space = AnimationSpaceLoaderFactory
+                    .getAnimationSpaceLoader(context.version, type)
+                    .loadAnimationSpace(context, name)
 
             if( space != null)
                 context.workspace.animationSpaceManager.addAnimationSpace(space, true)

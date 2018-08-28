@@ -1,5 +1,7 @@
-package spirite.base.file
+package spirite.base.file.load
 
+import spirite.base.file.LoadContext
+import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.animation.ffa.FFAFrameStructure
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
@@ -8,21 +10,8 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
-import java.security.acl.Group
 
-interface IFFAAnimationLoader {
-    fun loadAnimation(context: LoadContext, name: String) : FixedFrameAnimation
-}
-
-object FFALoaderFactory {
-    fun getLoaderFromVersion( version: Int) : IFFAAnimationLoader = when( version) {
-        in 0..7 -> LegacyFFALoader_X_To_7()
-        in 8..0x1_0000 -> LegacyFFALoader_8_TO_1_0000()
-        else -> FFALoader()
-    }
-}
-
-class LegacyFFALoader_X_To_7 : IFFAAnimationLoader {
+object LegacyFFALoader_X_To_7 : IAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
         val ra = context.ra
         val layerCount = ra.readUnsignedShort()
@@ -53,7 +42,7 @@ class LegacyFFALoader_X_To_7 : IFFAAnimationLoader {
 
 }
 
-class LegacyFFALoader_8_TO_1_0000 : IFFAAnimationLoader {
+object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
         val ra = context.ra
         val nodes = context.nodes
@@ -106,7 +95,7 @@ class LegacyFFALoader_8_TO_1_0000 : IFFAAnimationLoader {
     }
 }
 
-class FFALoader : IFFAAnimationLoader {
+object FFALoader : IAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
         val ra = context.ra
         val nodes = context.nodes

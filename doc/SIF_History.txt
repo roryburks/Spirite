@@ -20,3 +20,5 @@
     -Updated FFA Animations to have gaps separate Frames
 0x0001_0002:
     -Added ANSP Chunk and FFAAnimSpace save stuff (no breaking changes)
+0x0001_0003:
+    -Added Alpha to SpriteLayer Part

@@ -180,7 +180,7 @@ class SpriteLayer : Layer {
         }
 
         undoEngine.doAsAggregateAction("Add Sprite Part (Linked)") {
-            linked.forEach {addPart(realName, realDepth)}
+            linked.forEach {it.addPart(realName, realDepth)}
         }
     }
     fun addPart( partName : String, depth: Int? = null) {
