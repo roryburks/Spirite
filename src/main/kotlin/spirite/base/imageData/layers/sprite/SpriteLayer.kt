@@ -88,7 +88,7 @@ class SpriteLayer : Layer {
 
     private var _layerChangeObserver = Observable<()->Any?>()
     val layerChangeObserver : IObservable<()->Any?> get() = _layerChangeObserver
-    override fun triggerChange() {
+    private fun triggerChange() {
         _layerChangeObserver.trigger { it() }
         workspace.imageObservatory.triggerRefresh(
                 ImageChangeEvent(
@@ -96,7 +96,6 @@ class SpriteLayer : Layer {
                         workspace.groupTree.root.getAllNodesSuchThat({(it as? LayerNode)?.layer == this}),
                         workspace)
         )
-        super.triggerChange()
     }
 
 
@@ -158,14 +157,7 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    /** Returns the first highest-drawDepth part that is visible and has
-     * non-transparent data at x, y (in Layer-space)*/
-    fun grabPart( x: Int, y: Int, select: Boolean) {
-        _parts.asReversed().forEach {
-            // TODO
-        }
-    }
-
+    // region Part Add/Move/Remove
     fun addPartLinked(partName: String, depth: Int? = null)
     {
         val linked = getAllLinkedLayers()
@@ -302,6 +294,8 @@ class SpriteLayer : Layer {
     private fun _sort() {
         _parts.sortWith(compareBy({it.depth}, {it.subdepth}))
     }
+    // endregion
+
 
     val cDepthBind = Bindable(0) {new, _ ->  activePart?.depth = new}
     val cVisibleBind = Bindable(true) {new, _ ->  activePart?.visible = new}
@@ -313,6 +307,14 @@ class SpriteLayer : Layer {
     val cScaleYBind = Bindable(1f) {new, _ ->  activePart?.scaleY = new}
     val cRotBind = Bindable(0f) {new, _ ->  activePart?.rot = new}
 
+
+    /** Returns the first highest-drawDepth part that is visible and has
+     * non-transparent data at x, y (in Layer-space)*/
+    fun grabPart( x: Int, y: Int, select: Boolean) {
+        _parts.asReversed().forEach {
+            // TODO
+        }
+    }
 
     fun getAllLinkedLayers() : List<SpriteLayer> {
         return workspace.groupTree.root
@@ -327,7 +329,7 @@ class SpriteLayer : Layer {
             val handle: MediumHandle,
             subdepth: Int)
     {
-        var structure = _structure ; private set
+        private var structure = _structure
         val context get() = this@SpriteLayer
 
         var subdepth by UndoableDelegate(subdepth, workspace.undoEngine,"Internal Change (should not see this).")
@@ -347,31 +349,23 @@ class SpriteLayer : Layer {
         var centerY get() = structure.centerY ; set(value) { if( value != structure.centerY) replaceStructure(structure.copy(centerY = value), 10)}
 
 
-        fun getAllLinkedParts() : List<SpritePart> {
-            val parent = workspace.groupTree.root
-                    .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
-                    ?.parent
-                    ?: return SinglyList(this)
-            return parent.children
-                    .mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
-                    .mapNotNull { it.parts.firstOrNull{it.partName == partName} }
-        }
-
         private fun replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
             if( structure != newStructure) {
-                val linked = getAllLinkedParts()
+                val parent = workspace.groupTree.root
+                        .getAllNodesSuchThat({ (it as? LayerNode)?.layer == this@SpriteLayer}).firstOrNull()
+                        ?.parent
+                val linked = parent?.children
+                        ?.mapNotNull { ((it as? LayerNode)?.layer as? SpriteLayer) }
+                        ?.mapNotNull { sprite -> sprite.parts.firstOrNull{it.partName == partName} }
+                        ?: SinglyList(this)
 
                 undoEngine.doAsAggregateAction("Change Sprite Part Structure") {
-                    linked.forEach { it._replaceStructure(newStructure, structureCode) }
+                    linked.forEach { undoEngine.performAndStore(it.SpriteStructureAction(newStructure, structureCode)) }
                 }
             }
         }
 
-        private fun _replaceStructure( newStructure: SpritePartStructure, structureCode: Int) {
-            undoEngine.performAndStore(SpriteStructureAction(newStructure, structureCode))
-        }
-
-        private fun refreshC()
+        private fun refreshBinds()
         {
             if( activePart == this) {
                 cAlphaBind.field = alpha
@@ -389,20 +383,21 @@ class SpriteLayer : Layer {
 
         inner class SpriteStructureAction(
                 private var newStructure: SpritePartStructure,
-                private val structureCode: Int
-        ) : NullAction(), StackableAction {
+                private val structureCode: Int)
+            : NullAction(), StackableAction
+        {
             private val oldStructure: SpritePartStructure = structure
             override val description: String get() = "Change Part Structure"
             override fun performAction() {
                 structure = newStructure
                 _sort()
-                refreshC()
+                refreshBinds()
                 triggerChange()
             }
             override fun undoAction() {
                 structure = oldStructure
                 _sort()
-                refreshC()
+                refreshBinds()
                 triggerChange()
             }
 

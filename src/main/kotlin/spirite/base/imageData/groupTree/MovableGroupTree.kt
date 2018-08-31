@@ -6,13 +6,13 @@ import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
 open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
 
-    fun parentOfContext( context: Node?) = when(context) {
+    fun parentFromContext(context: Node?) = when(context) {
         null -> root
         is GroupNode -> context
         else -> context.parent ?: root
     }
 
-    fun beforeContext( context: Node?) = when(context) {
+    fun beforeFromContext(context: Node?) = when(context) {
         null, is GroupNode -> null
         else -> context
     }
@@ -50,13 +50,14 @@ open class MovableGroupTree(undoEngine: IUndoEngine?) : GroupTree(undoEngine) {
     }
 
     protected fun insertNode(contextNode: Node?, nodeToInsert: Node) {
-        val parent = parentOfContext(contextNode)
-        val before = beforeContext(contextNode)
+        val parent = parentFromContext(contextNode)
+        val before = beforeFromContext(contextNode)
         parent.add(nodeToInsert, before)
     }
 
     protected fun moveNode( nodeToMove: Node, newParent: GroupNode, newBefore: Node?) {
         val parent = nodeToMove.parent
+
         if( newParent == nodeToMove) return
         if( newParent.ancestors.contains(nodeToMove)) return
         if( parent == null) {

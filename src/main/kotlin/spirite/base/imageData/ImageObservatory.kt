@@ -28,5 +28,4 @@ class ImageObservatory : IImageObservatory {
     override fun triggerRefresh(evt: ImageChangeEvent) {
         imageObservable.trigger { it.imageChanged(evt) }
     }
-
 }

@@ -172,7 +172,7 @@ object LoadEngine {
 
         // Create an array that keeps track of the active layers of group nodes
         //  (all the nested nodes leading up to the current node)
-        val nodeLayer = Array<GroupNode?>(256, {null})
+        val nodeLayer = Array<GroupNode?>(256) {null}
 
         nodeLayer[0] = workspace.groupTree.root
         context.nodes.add(workspace.groupTree.root)

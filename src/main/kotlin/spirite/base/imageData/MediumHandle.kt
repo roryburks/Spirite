@@ -25,11 +25,6 @@ import spirite.base.util.groupExtensions.SinglySet
 //	CachedImage and doing so might lead to unnecessary bugs.
  */
 
-class MutableHandle(
-    var context: IImageWorkspace?,
-    var id: Int
-)
-
 data class MediumHandle(
         val workspace: IImageWorkspace,
         val id: Int)

@@ -8,6 +8,8 @@ import spirite.base.imageData.layers.SimpleLayer
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.util.Colors
 import spirite.hybrid.Hybrid
+import spirite.hybrid.MDebug
+import spirite.hybrid.MDebug.ErrorType.FILE
 import java.io.File
 import java.io.IOException
 
@@ -93,12 +95,15 @@ class FileManager( val master: IMasterControl)  : IFileManager{
             }
         }
         try {
-            // Try to load it as an SIF (either if the extention isn't recognized or if ImageIO failed)
+            // Try to load it as an SIF (either if the extension isn't recognized or if ImageIO failed)
             val workspace = LoadEngine.loadWorkspace(file, master)
+            workspace.fileSaved(file)
             master.workspaceSet.addWorkspace(workspace, true)
             // TODO: Trigger autosave
             return
-        } catch (e: BadSifFileException){}
+        } catch (e: BadSifFileException){
+            MDebug.handleError(FILE, e.message ?: "Failed to Load SIF")
+        }
         if( !attempted) {
             try {
                 val img = Hybrid.imageIO.loadImage(file.readBytes())

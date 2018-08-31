@@ -116,6 +116,7 @@ class ImageWorkspace(
     }
 
     override fun fileSaved(newFile: File) {
+        undoEngine.setSaveSpot()
         file = newFile
         hasChanged = false
     }

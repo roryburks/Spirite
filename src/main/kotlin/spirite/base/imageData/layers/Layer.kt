@@ -17,8 +17,4 @@ interface Layer {
     val imageDependencies: List<MediumHandle>
     fun getDrawList(isolator: IIsolator? = null) : List<TransformedHandle>
     fun dupe( mediumRepo: MMediumRepository) : Layer
-
-    fun triggerChange() {
-
-    }
 }

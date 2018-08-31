@@ -28,8 +28,7 @@ class SaveContext(
 
     val root = workspace.groupTree.root
     val floatingData = workspace.mediumRepository.dataList
-            .map { workspace.mediumRepository.floatData(it, {MediumPreparer.prepare(it)}) }
-            .filterNotNull()
+            .mapNotNull { workspace.mediumRepository.floatData(it) { medium -> MediumPreparer.prepare(medium)} }
 
 
     inline fun writeChunk( tag: String, writer : (RandomAccessFile)->Unit) {
@@ -81,7 +80,7 @@ object SaveEngine {
         ra.close()
     }
 
-    fun saveHeader( context: SaveContext) {
+    private fun saveHeader(context: SaveContext) {
         val ra = context.ra
         val workspace = context.workspace
 
@@ -96,7 +95,7 @@ object SaveEngine {
     }
 
     /** GRPT chunk saving the structure of the PrimaryGroupTree and all Nodes/Layers within it */
-    fun saveGroupTree( context: SaveContext)
+    private fun saveGroupTree( context: SaveContext)
     {
         context.writeChunk("GRPT") {ra->
             val depth = 0
@@ -106,8 +105,7 @@ object SaveEngine {
                 // Fills out a map from nodes to an int identifier (constructed here) for use in any nodes that
                 //  reference other nodes (such as ReferenceLayers)
                 context.nodeMap.put( node, met++)
-                if( node is GroupNode)
-                    node.children.forEach { buildReferences(it, depth+1) }
+                (node as? GroupNode)?.children?.forEach { buildReferences(it, depth+1) }
             }
             fun writeNode( node: Node, depth: Int) {
                 // [1] : Depth of Node in GroupTree
@@ -185,7 +183,7 @@ object SaveEngine {
     }
 
     /** PLTT chunk containing the Palettes saved in the workspace */
-    fun savePaletteData( context: SaveContext) {
+    private fun savePaletteData( context: SaveContext) {
         context.writeChunk("PLTT") {ra ->
             context.workspace.paletteSet.palettes.forEach {
                 // [n], UTF8 : Palette Name
@@ -199,7 +197,7 @@ object SaveEngine {
     }
 
     /** IMGD chunk containing all Medium Data, with images saved in PNG Format*/
-    fun saveImageData( context: SaveContext) {
+    private fun saveImageData( context: SaveContext) {
         context.writeChunk("IMGD") {ra->
             context.floatingData.forEach {
                 // [4] : Medium Handle Id
@@ -228,7 +226,7 @@ object SaveEngine {
         }
     }
 
-    fun saveAnimationSpaceChunk(context: SaveContext) {
+    private fun saveAnimationSpaceChunk(context: SaveContext) {
         val animMap = context.animationMap
 
         context.writeChunk("ANSP") {ra ->
@@ -276,7 +274,7 @@ object SaveEngine {
     }
 
     /** ANIM chunk containing all Animation Data */
-    fun saveAnimationData( context: SaveContext) {
+    private fun saveAnimationData( context: SaveContext) {
         context.writeChunk("ANIM") {ra ->
             var met = 0
 

@@ -94,24 +94,24 @@ class DefaultImageDrawer(
 
     // region IInvertModule
     override fun invert() {
-        workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Invert", arranged, mask) { built, mask ->
             when( mask) {
                 null -> built.rawAccessComposite { it.drawer.invert() }
-                else -> built.rawAccessComposite { mask.doMasked(it, built.tWorkspaceToComposite) {it.drawer.invert()} }
+                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) {it.drawer.invert()} }
             }
-        })
+        }
     }
     // endregion
 
 
     // region ISelectionModule
     override fun clear() {
-        workspace.undoEngine.performMaskedImageAction("Clear", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Clear", arranged, mask) { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.graphics.clear() }
-                else -> built.rawAccessComposite { mask.doMasked(it, built.tWorkspaceToComposite) { it.graphics.clear() } }
+                else -> built.rawAccessComposite { raw -> mask.doMasked(raw, built.tWorkspaceToComposite) { it.graphics.clear() } }
             }
-        })
+        }
     }
     // endregion
 
@@ -120,11 +120,11 @@ class DefaultImageDrawer(
 
     override fun liftSelection(selection: Selection,  clearLifted: Boolean): ILiftedData {
         var lifted : RawImage? = null   // ugly "kind of stateful but not really" solution, but meh
-        val built = arranged.built
-        built.rawAccessComposite { lifted = selection.lift(it, built.tWorkspaceToComposite) }
+        val tbuilt = arranged.built
+        tbuilt.rawAccessComposite { lifted = selection.lift(it, tbuilt.tWorkspaceToComposite) }
 
         if( clearLifted) {
-            workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null, { built, mask ->
+            workspace.undoEngine.performMaskedImageAction("lift-inner", arranged, null) { built, mask ->
                 built.rawAccessComposite {
                     it.graphics.apply {
                         val tSelToImage = (built.tWorkspaceToComposite) * (selection.transform
@@ -134,7 +134,7 @@ class DefaultImageDrawer(
                         renderImage(selection.mask, 0, 0)
                     }
                 }
-            })
+            }
         }
 
         return LiftedImageData(lifted ?: Hybrid.imageCreator.createImage(1,1))
@@ -146,13 +146,13 @@ class DefaultImageDrawer(
     override fun acceptsLifted(lifted: ILiftedData) = true
 
     override fun anchorLifted(lifted: ILiftedData, trans: Transform?) {
-        workspace.undoEngine.performMaskedImageAction("Anchor Lifted", arranged, null, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Anchor Lifted", arranged, null) { built, mask ->
             built.drawOnComposite { gc->
                 if(trans != null)
                     gc.preTransform(trans)
                 lifted.draw(gc)
             }
-        })
+        }
     }
 
     // endregion
@@ -160,35 +160,35 @@ class DefaultImageDrawer(
     // region IColorChangeModule
 
     override fun changeColor(from: Color, to: Color, mode: ColorChangeMode) {
-        workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("ChangeColor", arranged, mask) { built, mask ->
             when (mask) {
                 null -> built.rawAccessComposite { it.drawer.changeColor(from, to, mode) }
-                else -> built.rawAccessComposite {
-                    mask.doMasked(it, built.tWorkspaceToComposite) { it.drawer.changeColor(from, to, mode) }
+                else -> built.rawAccessComposite {raw ->
+                    mask.doMasked(raw, built.tWorkspaceToComposite) { it.drawer.changeColor(from, to, mode) }
                 }
             }
-        })
+        }
     }
 
     // endregion
 
     // region IFillModule
     override fun fill(x: Int, y: Int, color: Color): Boolean {
-        workspace.undoEngine.performMaskedImageAction("Fill Color", arranged, mask, { built, mask ->
+        workspace.undoEngine.performMaskedImageAction("Fill Color", arranged, mask) { built, mask ->
             when( mask) {
                 null -> built.rawAccessComposite {
                     val p = built.tWorkspaceToComposite.apply(Vec2(x.f,y.f))
                     it.drawer.fill(p.x.floor, p.y.floor, color)
                 }
-                else -> built.rawAccessComposite {
-                    mask.doMaskedRequiringTransform(it, built.tWorkspaceToComposite, color) { it, tImageToFloating ->
+                else -> built.rawAccessComposite {raw ->
+                    mask.doMaskedRequiringTransform(raw, built.tWorkspaceToComposite, color) { maskedRaw, tImageToFloating ->
                         val p =  tImageToFloating.apply(built.tWorkspaceToComposite.apply(Vec2(x.f,y.f)))
-                        it.drawer.fill(p.x.floor,p.y.floor, color)
+                        maskedRaw.drawer.fill(p.x.floor,p.y.floor, color)
 
                     }
                 }
             }
-        })
+        }
         return true
     }
     // endregion

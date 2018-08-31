@@ -86,7 +86,7 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         animationStructureChangeObservable.trigger { it.animationStructureChanged(animation)}
     }
 
-    private val treeObserver = object : TreeObserver {
+    private val __treeObserver = workspace.groupTree.treeObservable.addObserver(object : TreeObserver {
         override fun treeStructureChanged(evt: TreeChangeEvent) {
             val fixedFrameAnimations = _animations.filterIsInstance<FixedFrameAnimation>()
 
@@ -102,5 +102,5 @@ class AnimationManager(val workspace : MImageWorkspace) : IAnimationManager {
         }
 
         override fun nodePropertiesChanged(node: Node, renderChanged: Boolean) {}
-    }.also { workspace.groupTree.treeObservable.addObserver(it) }
+    })
 }
