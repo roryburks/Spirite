@@ -2,7 +2,7 @@ package spirite.base.util.interpolation
 
 import kotlin.math.max
 
-private val SIZE_PER = 10
+private const val SIZE_PER = 10
 
 class CubicSplineInterpolatorND(
         points: Array<FloatArray>,
@@ -18,8 +18,8 @@ class CubicSplineInterpolatorND(
     init {
         val l = max(SIZE_PER, length)
 
-        dx = Array(N,{ FloatArray(l) })
-        x_ = Array(N,{ FloatArray(l) })
+        dx = Array(N) { FloatArray(l) }
+        x_ = Array(N) { FloatArray(l) }
         t_ = FloatArray(l)
 
         (0 until length).forEach { w->

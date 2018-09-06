@@ -1,7 +1,7 @@
 package spirite.base.imageData
 
-import spirite.base.brains.Bindable
-import spirite.base.brains.IBindable
+import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.IBindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.palette.PaletteSet
 import spirite.base.brains.settings.ISettingsManager

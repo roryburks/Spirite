@@ -1,6 +1,6 @@
 package spirite.base.brains.toolset
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.brains.toolset.IToolsetManager.ToolsetPropertyObserver

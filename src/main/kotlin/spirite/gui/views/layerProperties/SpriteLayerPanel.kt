@@ -1,6 +1,6 @@
 package spirite.gui.views.layerProperties
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.layers.sprite.SpriteLayer
 import spirite.base.imageData.layers.sprite.SpriteLayer.SpritePart

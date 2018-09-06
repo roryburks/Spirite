@@ -1,6 +1,6 @@
 package spirite.base.imageData.animationSpaces
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation

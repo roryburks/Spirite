@@ -1,6 +1,6 @@
 package spirite.base.pen.stroke
 
-import spirite.base.util.ApproximateBinarySearch
+import spirite.base.util.nearestBinarySearch
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 
@@ -26,6 +26,6 @@ class IndexedDrawPoints(x: FloatArray, y: FloatArray, w: FloatArray, val t: Floa
      * Math.floor/Math.ceil can be used for a left or right bound
      */
     fun getNearIndex(met: Float): Float {
-        return ApproximateBinarySearch(t, met)
+        return nearestBinarySearch(t, met)
     }
 }

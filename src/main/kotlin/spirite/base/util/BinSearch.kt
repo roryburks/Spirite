@@ -7,7 +7,7 @@ package spirite.base.util
 * @return Will be in [0,increasing.length-1]. Math.round(ret) will be the closest match.
 * Math.floor/Math.ceil can be used to find left/right nearest.
 */
-fun ApproximateBinarySearch(increasing:FloatArray, toFind:Float):Float {
+fun nearestBinarySearch(increasing:FloatArray, toFind:Float):Float {
 	val t = increasing
 	val length = t.size
 	

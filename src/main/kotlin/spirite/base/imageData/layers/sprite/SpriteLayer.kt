@@ -1,6 +1,6 @@
 package spirite.base.imageData.layers.sprite
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.graphics.rendering.TransformedHandle
@@ -73,7 +73,7 @@ class SpriteLayer : Layer {
     private val _parts = mutableListOf<SpritePart>()
     private var workingId = 0
 
-    var activePartBind =  Bindable<SpritePart?>(null) { new, _ ->
+    var activePartBind = Bindable<SpritePart?>(null) { new, _ ->
         cAlphaBind.field = new?.alpha ?: 1f
         cDepthBind.field = new?.depth ?: 0
         cVisibleBind.field = new?.visible ?: true
@@ -297,15 +297,15 @@ class SpriteLayer : Layer {
     // endregion
 
 
-    val cDepthBind = Bindable(0) {new, _ ->  activePart?.depth = new}
-    val cVisibleBind = Bindable(true) {new, _ ->  activePart?.visible = new}
-    val cPartNameBind = Bindable("") {new, _ ->  activePart?.partName = new}
-    val cAlphaBind = Bindable(1f) {new, _ ->  activePart?.alpha = new}
-    val cTransXBind = Bindable(0f) {new, _ ->  activePart?.transX = new}
-    val cTransYBind = Bindable(0f) {new, _ ->  activePart?.transY = new}
-    val cScaleXBind = Bindable(1f) {new, _ ->  activePart?.scaleX = new}
-    val cScaleYBind = Bindable(1f) {new, _ ->  activePart?.scaleY = new}
-    val cRotBind = Bindable(0f) {new, _ ->  activePart?.rot = new}
+    val cDepthBind = Bindable(0) { new, _ -> activePart?.depth = new }
+    val cVisibleBind = Bindable(true) { new, _ -> activePart?.visible = new }
+    val cPartNameBind = Bindable("") { new, _ -> activePart?.partName = new }
+    val cAlphaBind = Bindable(1f) { new, _ -> activePart?.alpha = new }
+    val cTransXBind = Bindable(0f) { new, _ -> activePart?.transX = new }
+    val cTransYBind = Bindable(0f) { new, _ -> activePart?.transY = new }
+    val cScaleXBind = Bindable(1f) { new, _ -> activePart?.scaleX = new }
+    val cScaleYBind = Bindable(1f) { new, _ -> activePart?.scaleY = new }
+    val cRotBind = Bindable(0f) { new, _ -> activePart?.rot = new }
 
 
     /** Returns the first highest-drawDepth part that is visible and has

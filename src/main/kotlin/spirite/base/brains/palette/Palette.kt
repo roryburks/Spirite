@@ -5,7 +5,7 @@ import spirite.base.util.Colors
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
-public val default_palette = arrayOf(
+val default_palette = arrayOf(
         Colors.BLACK, Colors.DARK_GRAY, Colors.GRAY, Colors.LIGHT_GRAY, Colors.WHITE,
         Colors.RED, Colors.BLUE, Colors.GREEN, Colors.CYAN, Colors.MAGENTA, Colors.YELLOW,
         Colors.ORANGE, Colors.PINK)

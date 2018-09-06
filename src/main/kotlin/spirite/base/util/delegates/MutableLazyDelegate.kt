@@ -2,7 +2,7 @@ package spirite.base.util.delegates
 
 import kotlin.reflect.KProperty
 
-class MutableLazy<T>(val delegate : () -> T) {
+class MutableLazy<T>(private val delegate : () -> T) {
     var field : T? = null
 
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T {

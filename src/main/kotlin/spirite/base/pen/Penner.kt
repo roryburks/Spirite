@@ -1,6 +1,6 @@
 package spirite.base.pen
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.palette.IPaletteManager
 import spirite.base.brains.toolset.*
 import spirite.base.brains.toolset.FlipMode.*
@@ -31,7 +31,7 @@ interface IPenner {
 
     fun rawUpdateX(rawX: Int)
     fun rawUpdateY(rawY: Int)
-    fun rawUpdatePressure(pressure: Float)
+    fun rawUpdatePressure(rawPressure: Float)
 
     val drawsOverlay : Boolean
     fun drawOverlay(gc: GraphicsContext, view: WorkSectionView)
@@ -107,15 +107,17 @@ class Penner(
         val workspace = workspace ?: return
         val drawer = workspace.activeDrawer
 
+        
+
         when {
             behavior != null -> behavior?.onPenDown()
-            context.currentWorkspace?.referenceManager?.editingReference ?: false -> when {
-                holdingCtrl ->  behavior = ZoomingReferenceBehavior(this)
-                holdingShift -> behavior = RotatingReferenceBehavior( this)
-                else ->         behavior = MovingReferenceBehavior(this)
+            context.currentWorkspace?.referenceManager?.editingReference ?: false -> behavior = when {
+                holdingCtrl     -> ZoomingReferenceBehavior(this)
+                holdingShift    -> RotatingReferenceBehavior( this)
+                else            -> MovingReferenceBehavior(this)
             }
             else -> {
-                val tool = tool
+                val tool = toolsetManager.selectedTool
                 val color = paletteManager.activeBelt.getColor(if( button == LEFT) 0 else 1)
                 val offColor = paletteManager.activeBelt.getColor(if( button == LEFT) 1 else 0)
 
@@ -226,8 +228,5 @@ class Penner(
         (behavior as? DrawnPennerBehavior)?.paintOverlay(gc,view)
     }
 
-    private val toolBinding = Bindable(toolsetManager.selectedTool) { new, old ->
-        behavior = null
-    }.also { toolsetManager.selectedToolBinding.bind(it) }
-    private val tool by toolBinding
+    val __toolBinding = toolsetManager.selectedToolBinding.addListener { _, _ -> behavior = null }
 }

@@ -1,6 +1,6 @@
 package spirite.base.imageData.animationSpaces.FFASpace
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IObservable
 import spirite.base.brains.Observable
 import spirite.base.imageData.animation.Animation
@@ -9,9 +9,6 @@ import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationPlayObserver
 import spirite.base.imageData.animationSpaces.IAnimationSpaceView.InternalAnimationSpaceObserver
-import spirite.base.util.MathUtil
-import spirite.base.util.f
-import spirite.base.util.floor
 import spirite.base.util.linear.Vec2i
 
 class FFASpaceViewState(val space: FFAAnimationSpace)

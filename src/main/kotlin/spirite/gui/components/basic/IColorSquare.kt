@@ -1,8 +1,7 @@
 package spirite.gui.components.basic
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.pc.gui.SColor
-import spirite.pc.gui.SimpleMouseListener
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.jcolor

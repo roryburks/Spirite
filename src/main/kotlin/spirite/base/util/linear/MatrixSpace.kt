@@ -54,7 +54,7 @@ class MatrixSpace(
                 if( map.containsKey(key)) {
                     val trans = map[key]!! * entry.transform
                     if( iTo == to) {
-                        map.put(Pair(from,to), trans)
+                        map[Pair(from,to)] = trans
                         return trans
                     }
                     recurseQueue.add(MapNavigationState(
@@ -67,7 +67,7 @@ class MatrixSpace(
                 if( map.containsKey(inverseKey)) {
                     val trans = map[inverseKey]!!.invert() * entry.transform
                     if( iTo == to) {
-                        map.put(Pair(from,to), trans)
+                        map[Pair(from,to)] = trans
                         return trans
                     }
                     recurseQueue.add(MapNavigationState(
@@ -85,5 +85,5 @@ class MatrixSpace(
             val current : String,
             val remaining : MutableList<String>,
             val transform : Transform = Transform.IdentityMatrix
-    ){}
+    )
 }

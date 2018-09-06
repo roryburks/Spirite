@@ -1,6 +1,6 @@
 package spirite.pc.gui.basic
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.gui.components.basic.ITextArea
 import spirite.gui.resources.Skin.BevelBorder.Dark
 import spirite.gui.resources.Skin.BevelBorder.Light

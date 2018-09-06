@@ -40,14 +40,14 @@ data class Rect(
         if (X2 < rect.x) {
             if (x2 >= x || X2 > x2) return false
         } else {
-            if (x2 >= x && X2 > x2) return false
+            if (x2 in x..(X2 - 1)) return false
         }
         val y2 = y + height
         val Y2 = rect.y + rect.height
         if (Y2 < rect.y) {
             if (y2 >= y || Y2 > y2) return false
         } else {
-            if (y2 >= y && Y2 > y2) return false
+            if (y2 in y..(Y2 - 1)) return false
         }
         return true
     }

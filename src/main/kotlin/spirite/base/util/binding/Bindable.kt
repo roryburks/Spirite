@@ -1,4 +1,4 @@
-package spirite.base.brains
+package spirite.base.util.binding
 
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
@@ -14,7 +14,7 @@ interface IBindable<T> {
     fun addWeakListener( listener: OnChangeEvent<T>) : IBoundListener<T>
 }
 
-interface MBindable<T> : IBindable<T>{
+interface MBindable<T> : IBindable<T> {
     override var field: T
     fun bind( derived: Bindable<T>)
     fun bindWeakly( derived: Bindable<T>)
@@ -32,7 +32,7 @@ interface IBoundListener<T> {
  * the underlying scroll is changed).  It will also trigger when a Bindable is bound to another Bindable (so long as their
  * underlying is different)
  */
-class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : MBindable<T>, IBoundListener<T>{
+class Bindable<T>( defaultValue: T, var onChange: OnChangeEvent<T>? = null) : MBindable<T>, IBoundListener<T> {
     override var field: T
         get() = underlying.field
         set(value) {underlying.field = value}

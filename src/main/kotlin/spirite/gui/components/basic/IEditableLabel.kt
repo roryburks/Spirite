@@ -1,15 +1,10 @@
 package spirite.gui.components.basic
 
-import spirite.base.brains.Bindable
-import spirite.gui.components.advanced.crossContainer.CrossContainer
+import spirite.base.util.binding.Bindable
 import spirite.gui.resources.Skin
-import spirite.gui.resources.Skin.Global.Bg
 import spirite.pc.gui.SColor
 import spirite.pc.gui.basic.SwComponent
-import spirite.pc.gui.basic.SwPanel
 import spirite.pc.gui.jcolor
-import java.awt.Dimension
-import java.awt.GridLayout
 import java.awt.KeyboardFocusManager
 import java.awt.event.*
 import javax.swing.*

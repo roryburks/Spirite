@@ -1,7 +1,5 @@
 package spirite.base.util.binding
 
-import spirite.base.brains.Bindable
-import spirite.base.brains.MBindable
 import spirite.base.util.linear.Vec2
 
 

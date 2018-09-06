@@ -1,13 +1,12 @@
 package spirite.gui.components.basic
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.*
 import javax.swing.JTabbedPane
-import javax.swing.SwingUtilities
 import javax.swing.plaf.basic.BasicTabbedPaneUI
 
 interface ITabbedPane : IComponent

@@ -134,10 +134,8 @@ class HotkeyManager(
         }
     }
 
-    override fun getCommand(key: Hotkey): KeyCommand?
-            = hotkeyMap.getOne(key)
-    override fun getHotkeysForCommand(command: String): List<Hotkey>?
-            = hotkeyMap.getMany(KeyCommand(command))
+    override fun getCommand(key: Hotkey): KeyCommand? = hotkeyMap.getOne(key)
+    override fun getHotkeysForCommand(command: String): List<Hotkey>? = hotkeyMap.getMany(KeyCommand(command))
     override fun setCommand(key: Hotkey, command: KeyCommand) {
         val oldCommand = hotkeyMap.getOne(key)
 

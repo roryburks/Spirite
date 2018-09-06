@@ -3,6 +3,7 @@ package spirite.base.brains
 import spirite.base.brains.IWorkspaceSet.WorkspaceObserver
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MImageWorkspace
+import spirite.base.util.binding.Bindable
 import kotlin.math.max
 
 interface IWorkspaceSet {

@@ -1,6 +1,6 @@
 package spirite.gui.components.advanced
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.hybrid.Hybrid
 
 
@@ -10,7 +10,7 @@ class RadioButtonCluster<T>(
 {
     val valueBind = Bindable(defaultValue, { new, old ->
         val selectedIndex = values.indexOf(new)
-        if( selectedIndex != -1) {
+        if (selectedIndex != -1) {
             radioButtons.forEachIndexed { index, it ->
                 it.check = index == selectedIndex
             }

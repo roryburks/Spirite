@@ -251,7 +251,7 @@ class CubicSplineInterpolator2D : Interpolator2D {
     }
 
     override fun evalExt(t: Float): Interpolator2D.InterpolatedPoint {
-        if (kx.size == 0) return Interpolator2D.InterpolatedPoint(0f, 0f, 0f, 0, 0)
+        if (kx.isEmpty()) return Interpolator2D.InterpolatedPoint(0f, 0f, 0f, 0, 0)
 
         if (t <= 0) return Interpolator2D.InterpolatedPoint(x_[0], y_[0], 0f, 0, 1)
         if (t >= distance) return Interpolator2D.InterpolatedPoint(x_[kx.size - 1], y_[kx.size - 1], 1f, kx.size - 2, kx.size - 1)

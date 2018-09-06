@@ -1,6 +1,6 @@
 package spirite.base.brains.palette
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.util.Color
 import spirite.base.util.Colors
 import spirite.base.util.MathUtil

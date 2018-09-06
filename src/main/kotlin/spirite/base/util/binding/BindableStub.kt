@@ -1,6 +1,5 @@
 package spirite.base.util.binding
 
-import spirite.base.brains.*
 import java.lang.ref.WeakReference
 
 abstract class BindableStub<T> : IBindable<T> {

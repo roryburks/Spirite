@@ -1,6 +1,6 @@
 package spirite.base.brains.palette
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.palette.IPaletteManager.PaletteChangeEvent
 import spirite.base.brains.palette.IPaletteManager.PaletteSetChangeEvent
 import spirite.base.util.StringUtil

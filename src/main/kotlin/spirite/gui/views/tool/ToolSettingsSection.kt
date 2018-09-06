@@ -1,6 +1,6 @@
 package spirite.gui.views.tool
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.toolset.*
 import spirite.base.util.Colors

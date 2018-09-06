@@ -32,12 +32,10 @@ class CubicSplineInterpolator
         // Sorts the points by X
         val points = ArrayList(points_)
 
-        Collections.sort(
-                points
-        ) { o1, o2 ->
+        points.sortWith(Comparator { o1, o2 ->
             val d = o1.x - o2.x
             Math.signum(d).toInt()
-        }
+        })
 
         k = FloatArray(points.size)
         x_ = FloatArray(points.size)
@@ -86,7 +84,7 @@ class CubicSplineInterpolator
     }
 
     override fun eval(t: Float): Float {
-        if (k.size == 0) return 0f
+        if (k.isEmpty()) return 0f
 
 
         if (t <= x_[0]) return y_[0]

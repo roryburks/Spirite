@@ -1,6 +1,6 @@
 package spirite.base.brains.toolset
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.ICommand
 import spirite.base.util.linear.MutableTransform

@@ -2,8 +2,9 @@ package spirite.base.brains.palette
 
 import spirite.base.brains.*
 import spirite.base.brains.palette.IPaletteManager.*
-import spirite.base.brains.settings.IPreferences
 import spirite.base.brains.settings.ISettingsManager
+import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.IBindable
 import spirite.gui.components.dialogs.IDialog
 
 interface IPaletteManager {

@@ -1,7 +1,7 @@
 package spirite.base.pen.behaviors
 
 import com.hackoeur.jglm.support.FastMath.max
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.graphics.GraphicsContext
 import spirite.base.imageData.drawer.IImageDrawer.ITransformModule
 import spirite.base.imageData.selection.ISelectionEngine.SelectionChangeEvent
@@ -71,10 +71,10 @@ abstract class TransformBehavior( penner: Penner) : DrawnPennerBehavior(penner) 
     private var oldScaleY = 0f
     private var oldRot = 0f
 
-    protected val scaleBind = Bindable(Vec2(1f,1f))
+    protected val scaleBind = Bindable(Vec2(1f, 1f))
     protected var scale by scaleBind
 
-    val translationBind = Bindable(Vec2(0f,0f))
+    val translationBind = Bindable(Vec2(0f, 0f))
     var translation by translationBind
 
     val rotationBind = Bindable(0f)

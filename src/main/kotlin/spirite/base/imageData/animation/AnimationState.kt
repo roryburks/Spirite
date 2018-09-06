@@ -1,6 +1,6 @@
 package spirite.base.imageData.animation
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.util.f
 
 class AnimationState(

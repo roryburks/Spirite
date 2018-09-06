@@ -56,9 +56,8 @@ object PolygonTesselater {
         }
 
         override fun error(errnum: Int) {
-            val estring: String
+            val estring: String = GLU().gluErrorString(errnum)
 
-            estring = GLU().gluErrorString(errnum)
             MDebug.handleError(FATAL, "Tessellation Error: $estring")
         }
 

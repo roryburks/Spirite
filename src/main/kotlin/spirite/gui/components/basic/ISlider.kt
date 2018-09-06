@@ -1,18 +1,13 @@
 package spirite.gui.components.basic
 
-import spirite.base.brains.Bindable
-import spirite.base.brains.IBindable
+import spirite.base.util.binding.Bindable
+import spirite.base.util.binding.IBindable
 import spirite.gui.resources.Skin
 import spirite.hybrid.Hybrid
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
 import java.awt.*
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
 import java.util.*
-import javax.swing.JComponent
 import javax.swing.JSlider
 import javax.swing.plaf.basic.BasicSliderUI
 
@@ -43,7 +38,11 @@ private constructor(private val imp : SwSliderImp)
     override var max: Int
         get() = imp.maximum
         set(value) {imp.maximum = value}
-    override val valueBind = Bindable(imp.value) {new, _ -> if(!locked){locked = true; imp.value = new; locked = false}}
+    override val valueBind = Bindable(imp.value) { new, _ ->
+        if (!locked) {
+            locked = true; imp.value = new; locked = false
+        }
+    }
     override var value by valueBind
 
     // region UI Piping

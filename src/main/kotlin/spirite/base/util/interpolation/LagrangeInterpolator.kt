@@ -10,7 +10,7 @@ import spirite.base.util.linear.Vec2
  * extremely smooth), but creates a curve which can have a lot of hills
  * and valleys, resulting in a very erratic-looking curve.  */
 class LagrangeInterpolator(points: List<Vec2>) : Interpolator {
-    internal var coef: FloatArray
+    private var coef: FloatArray
 
     init {
         val N = points.size

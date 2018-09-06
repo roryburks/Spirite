@@ -11,6 +11,9 @@ import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.Node
 import spirite.base.imageData.groupTree.GroupTree.TreeObserver
 import spirite.base.imageData.undo.IUndoEngine.UndoHistoryChangeEvent
+import spirite.base.util.binding.IBindable
+import spirite.base.util.binding.IBoundListener
+import spirite.base.util.binding.OnChangeEvent
 import java.lang.ref.WeakReference
 
 /** The CentralObservatory is a place where things (primarily GUI components) which need to watch for certain changes
@@ -71,7 +74,7 @@ class CentralObservatory(private val workspaceSet : IWorkspaceSet)
             return TrackingBound(listener.apply { listeners.add( this) })
         }
 
-        override fun addWeakListener(listener: OnChangeEvent<T?>) : IBoundListener<T?>  {
+        override fun addWeakListener(listener: OnChangeEvent<T?>) : IBoundListener<T?> {
             return TrackingBound(listener.apply { weakListeners.add( WeakReference(this)) })
         }
 

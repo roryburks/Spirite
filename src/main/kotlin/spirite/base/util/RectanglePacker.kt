@@ -35,7 +35,7 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     // Go through a set amount of widths to test and use the algorithm to
     //	pack the Rects, testing to see if the result is smaller in
     //	volume than the previous results.
-    return (minWidth..maxWidth step inc).map { msaSub(cropped, it) }.minBy { it.width * it.height } ?: PackedRectangle( ArrayList<Rect>(0))
+    return (minWidth..maxWidth step inc).map { msaSub(cropped, it) }.minBy { it.width * it.height } ?: PackedRectangle( ArrayList(0))
 }
 
 private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
@@ -79,8 +79,6 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
         return@removeIf false
     }
 
-    System.out.println(rects.size)
-
     // Step 2 Sort by non-increasing height for reasons
     rects.sortBy { it.y }
 
@@ -92,8 +90,8 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     var y=0
     while( rects.any()) {
         if( field.size <= y)
-            field.add(_newRow(width))
-        val row = field.get(y)
+            field.add(newRow(width))
+        val row = field[y]
 
         var x = 0
         while( x < width) {
@@ -109,7 +107,7 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
                     packed.add(newRect)
                     rects.remove(rect)
 
-                    _addRect(newRect, field, width)
+                    addRect(newRect, field, width)
                     break
                 }
                 x += space
@@ -121,14 +119,14 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     return PackedRectangle(packed)
 }
 
-private fun _newRow( width: Int) : IntArray {
+private fun newRow(width: Int) : IntArray {
     val ret = IntArray(width)
     for( i in 0 until width)
         ret[i] = width-i
     return ret
 }
 
-private fun _addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
+private fun addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
     var buildRow : IntArray? = null
 
     for( y in rect.y until rect.height + rect.y) {
@@ -143,7 +141,7 @@ private fun _addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
             }
             field.size  -> {
                 if( buildRow == null) {
-                    buildRow = _newRow(width)
+                    buildRow = newRow(width)
 
                     for( x in 0 until rect.x)
                         buildRow[x] = rect.x-x

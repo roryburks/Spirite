@@ -1,15 +1,13 @@
 package spirite.gui.components.basic
 
-import spirite.base.brains.Bindable
+import spirite.base.util.binding.Bindable
 import spirite.base.util.MathUtil
 import spirite.gui.resources.Skin
 import spirite.pc.gui.basic.ISwComponent
 import spirite.pc.gui.basic.SwComponent
 import spirite.pc.gui.basic.jcomponent
-import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JComboBox
-import javax.swing.JList
 import javax.swing.ListCellRenderer
 
 interface IComboBox<T> : IComponent

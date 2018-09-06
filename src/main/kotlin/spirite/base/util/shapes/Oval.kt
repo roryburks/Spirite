@@ -19,9 +19,9 @@ data class Oval(
         val compactor = FloatCompactor()
 
         packer(x,y,compactor)
-        doAlongPath(maxError, {x, y ->
+        doAlongPath(maxError) { x, y ->
             packer(x.f,y.f,compactor)
-        })
+        }
 
         return GLPrimitive(compactor.toArray(), attrLengths, GLC.TRIANGLE_FAN, intArrayOf(compactor.size))
     }
