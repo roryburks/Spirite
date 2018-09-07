@@ -50,8 +50,7 @@ private constructor(minScroll: Int, maxScroll: Int, startScroll: Int, scrollWidt
         }
     }
 
-    companion object {
-        fun map(jOrientation: Int) =  if( jOrientation == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
-        fun map(sOrientation: Orientation) =  if( sOrientation == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL
-    }
+
+    private fun map(jOrientation: Int) =  if( jOrientation == JScrollBar.VERTICAL) Orientation.VERTICAL else HORIZONTAL
+    private fun map(sOrientation: Orientation) =  if( sOrientation == VERTICAL) JScrollBar.VERTICAL else JScrollBar.HORIZONTAL
 }
