@@ -25,7 +25,7 @@ interface IGLEngine
     var target: IGLTexture?
     fun setTarget( img: GLImage?)
 
-    fun getGl() : IGL
+    val gl : IGL
     fun runOnGLThread( run: ()->Unit)
     fun runInGLContext(run: ()->Unit)
 
@@ -52,7 +52,7 @@ interface IGLEngine
             trans : Transform?)
     fun applyPrimitiveProgram(
             programCall: ProgramCall,
-            primitive: GLPrimitive,
+            primitive: IGLPrimitive,
             params: GLParameters,
             trans: Transform?)
 
@@ -67,7 +67,6 @@ interface IGLEngine
         DEST_OVER(GLC.SRC_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD),
         SRC (GLC.ONE, GLC.ZERO, GLC.FUNC_ADD),
     }
-
 }
 
 class GLEngine(
@@ -78,17 +77,17 @@ class GLEngine(
 
     private val programs = initShaderPrograms(scriptService)
 
-    private val dbo : IGLRenderbuffer by lazy { getGl().genRenderbuffer() }
+    //private val dbo : IGLRenderbuffer by lazy { gl.genRenderbuffer() }
     private lateinit var fbo : IGLFramebuffer
 
-    override fun getGl() = glGetter.invoke()
+    override val gl get() = glGetter.invoke()
 
     override var width : Int = 1 ; private set
     override var height : Int = 1 ; private set
 
     override var target: IGLTexture? = null
         set(value) {
-            val gl = getGl()
+            
             if( field != value) {
                 // Delete old Framebuffer
                 if( field != null)
@@ -125,7 +124,7 @@ class GLEngine(
         if (img == null) {
             target = null
         } else {
-            val gl = getGl()
+            
             target = img.tex
             gl.viewport(0, 0, img.width, img.height)
         }
@@ -156,15 +155,14 @@ class GLEngine(
         val iParams = mutableListOf<GLUniform>()
         loadUniversalUniforms(params, iParams, trans)
 
-        val preparedPrimitive = PreparedPrimitive( GLPrimitive(
+        val preparedPrimitive = GLPrimitive(
                 floatArrayOf(
                         // x  y   u   v
                         x1, y1, 0.0f, 0.0f,
                         x2, y1, 1.0f, 0.0f,
                         x1, y2, 0.0f, 1.0f,
                         x2, y2, 1.0f, 1.0f
-                ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4))
-                , getGl())
+                ), intArrayOf(2, 2), GLC.TRIANGLE_STRIP, intArrayOf(4)).prepare(gl)
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
     }
@@ -193,7 +191,7 @@ class GLEngine(
             color: Vec3, alpha: Float,
             params: GLParameters, trans: Transform?)
     {
-        val gl = getGl()
+        
         if( xPoints.size < 2) return
 
         val size = numPoints + if(loop) 3 else 2
@@ -222,12 +220,11 @@ class GLEngine(
         loadUniversalUniforms(params, iParams, trans, true)
 
         if( true /* Shaderversion 330 */) {
-            val prim = PreparedPrimitive( GLPrimitive(
+            val prim = GLPrimitive(
                     data,
                     intArrayOf(2),
                     GLC.LINE_STRIP_ADJACENCY,
-                    intArrayOf(size)),
-                    gl)
+                    intArrayOf(size)).prepare(gl)
 
             gl.enable(GLC.MULTISAMPLE)
             applyProgram(LineRenderCall( join, lineWidth, color, alpha), params, iParams, prim)
@@ -254,7 +251,7 @@ class GLEngine(
         val data = FloatArray(2*numPoints)
         xPoints.forEachIndexed { i, x -> data[i*2] = x }
         yPoints.forEachIndexed { i, y -> data[i*2+1] = y }
-        val prim = PreparedPrimitive(GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)), getGl())
+        val prim = GLPrimitive( data, intArrayOf(2), polyType.glConst, intArrayOf(numPoints)).prepare(gl)
 
         applyProgram( programCall, params, iParams, prim)
         prim.flush()
@@ -262,13 +259,13 @@ class GLEngine(
 
     override fun applyPrimitiveProgram(
             programCall: ProgramCall,
-            primitive: GLPrimitive,
+            primitive: IGLPrimitive,
             params: GLParameters,
             trans: Transform?
     ) {
         val iParams = mutableListOf<GLUniform>()
         loadUniversalUniforms( params, iParams, trans)
-        val preparedPrimitive = PreparedPrimitive(primitive, getGl())
+        val preparedPrimitive = primitive.prepare(gl)
         applyProgram( programCall, params, iParams, preparedPrimitive)
         preparedPrimitive.flush()
     }
@@ -281,10 +278,9 @@ class GLEngine(
             programCall: ProgramCall,
             params: GLParameters,
             internalParams: List<GLUniform>,
-            preparedPrimitive: PreparedPrimitive)
+            preparedPrimitive: IPreparedPrimitive)
     {
-        val gl = getGl()
-        val prim = preparedPrimitive.primative
+        
         val w = params.width
         val h = params.heigth
 
@@ -409,7 +405,7 @@ class GLEngine(
     // endregion
 
     private fun initShaderPrograms(scriptService: IScriptService) : Array<IGLProgram> {
-        return GL330ShaderLoader(getGl(), scriptService).initShaderPrograms()
+        return GL330ShaderLoader(gl, scriptService).initShaderPrograms()
     }
 }
 

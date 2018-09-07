@@ -1,6 +1,6 @@
 package spirite.base.graphics
 
-import spirite.base.graphics.GraphicsContext.Composite.SRC
+import spirite.base.graphics.Composite.SRC
 import spirite.base.util.MathUtil
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform

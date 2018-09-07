@@ -131,7 +131,7 @@ private constructor(
                 gle.setTarget(null)
                 glgc.clear()
 
-                val gl = gle.getGl()
+                val gl = gle.gl
                 gl.viewport(0, 0, w, h)
 
                 drawWork(glgc)

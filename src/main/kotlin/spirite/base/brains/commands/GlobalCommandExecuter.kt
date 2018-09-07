@@ -4,7 +4,7 @@ import spirite.base.brains.IMasterControl
 import spirite.base.brains.KeyCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand.*
 import spirite.base.file.workspaceFromImage
-import spirite.base.graphics.GraphicsContext.Composite.SRC_IN
+import spirite.base.graphics.Composite.SRC_IN
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.graphics.rendering.RenderTarget

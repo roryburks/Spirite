@@ -28,7 +28,7 @@ class ImageConverter(
 
         when(T::class.java) {
             GLImage::class.java -> {
-                val gl = gle!!.getGl()
+                val gl = gle!!.gl
 
                 val tex = gl.createTexture() ?: throw GLEException("Failed to create texture.")
                 gl.bindTexture(GLC.TEXTURE_2D, tex)

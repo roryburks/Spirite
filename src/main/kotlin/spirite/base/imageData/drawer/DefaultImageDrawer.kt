@@ -1,8 +1,8 @@
 package spirite.base.imageData.drawer
 
 import spirite.base.brains.toolset.ColorChangeMode
-import spirite.base.graphics.GraphicsContext.Composite.DST_OUT
-import spirite.base.graphics.GraphicsContext.Composite.SRC
+import spirite.base.graphics.Composite.DST_OUT
+import spirite.base.graphics.Composite.SRC
 import spirite.base.graphics.RawImage
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.drawer.IImageDrawer.*

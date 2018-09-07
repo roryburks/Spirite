@@ -17,9 +17,9 @@ sealed class Color {
     abstract val alpha: Float
 }
 
-abstract class ColorARGB32(
-        val argb: Int
-) : Color(){
+abstract class ColorARGB32(val argb: Int)
+    : Color()
+{
     override val argb32: Int get() = argb
 
     val a: Int get() = argb ushr 24
@@ -28,18 +28,20 @@ abstract class ColorARGB32(
     val b: Int get() = argb and 0xff
 }
 
-class ColorARGB32Normal(
-        argb: Int
-) : ColorARGB32(argb) {
+class ColorARGB32Normal(argb: Int)
+    : ColorARGB32(argb)
+{
     override val red: Float get() = (r / 255.0f)
     override val green: Float get() = (g / 255.0f)
     override val blue: Float get() = (b / 255.0f)
     override val alpha: Float get() = (a / 255.0f)
 }
+fun Int.toColor() = ColorARGB32Normal(this)
+fun Int.toColorPremultiplied() = ColorARGB32Premultiplied(this)
 
-class ColorARGB32Premultiplied(
-        argb: Int
-) : ColorARGB32(argb){
+class ColorARGB32Premultiplied(argb: Int)
+    : ColorARGB32(argb)
+{
     override val red: Float get() = (r/255.0f) / alpha
     override val green: Float get() = (g/255.0f) / alpha
     override val blue: Float get() = (b/255.0f) / alpha

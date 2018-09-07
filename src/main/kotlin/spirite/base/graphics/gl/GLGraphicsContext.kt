@@ -1,7 +1,7 @@
 package spirite.base.graphics.gl
 
 import spirite.base.graphics.*
-import spirite.base.graphics.GraphicsContext.Composite.SRC_OVER
+import spirite.base.graphics.Composite.SRC_OVER
 import spirite.base.graphics.RenderMethodType.*
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm
 import spirite.base.graphics.gl.RenderCall.RenderAlgorithm.*
@@ -80,8 +80,7 @@ class GLGraphicsContext : GraphicsContext {
 
     override fun clear( color: Color?) {
         reset()
-        val gl = gle.getGl()
-        gl.clearColor( color?.red ?: 0f, color?.green ?: 0f, color?.blue ?: 0f, color?.alpha ?: 0f, GLC.COLOR)
+        gle.gl.clearColor( color?.red ?: 0f, color?.green ?: 0f, color?.blue ?: 0f, color?.alpha ?: 0f, GLC.COLOR)
     }
 
     // region Transforms
@@ -112,20 +111,20 @@ class GLGraphicsContext : GraphicsContext {
         }
     private fun setCompositeBlend( params: GLParameters, composite: Composite) {
         when (composite) {
-            GraphicsContext.Composite.SRC -> params.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
-            GraphicsContext.Composite.SRC_OVER -> params.setBlendMode(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-            GraphicsContext.Composite.SRC_IN -> params.setBlendMode(GLC.DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
-            GraphicsContext.Composite.SRC_ATOP -> params.setBlendMode(GLC.DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-            GraphicsContext.Composite.SRC_OUT -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
+            Composite.SRC -> params.setBlendMode(GLC.ONE, GLC.ZERO, GLC.FUNC_ADD)
+            Composite.SRC_OVER -> params.setBlendMode(GLC.ONE, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.SRC_IN -> params.setBlendMode(GLC.DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
+            Composite.SRC_ATOP -> params.setBlendMode(GLC.DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.SRC_OUT -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ZERO, GLC.FUNC_ADD)
 
-            GraphicsContext.Composite.DST -> params.setBlendMode(GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
-            GraphicsContext.Composite.DST_OVER -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE, GLC.FUNC_ADD)
-            GraphicsContext.Composite.DST_IN -> params.setBlendMode(GLC.ZERO, GLC.SRC_ALPHA, GLC.FUNC_ADD)
-            GraphicsContext.Composite.DST_ATOP -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.SRC_ALPHA, GLC.FUNC_ADD)
-            GraphicsContext.Composite.DST_OUT -> params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.DST -> params.setBlendMode(GLC.ZERO, GLC.ONE, GLC.FUNC_ADD)
+            Composite.DST_OVER -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE, GLC.FUNC_ADD)
+            Composite.DST_IN -> params.setBlendMode(GLC.ZERO, GLC.SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.DST_ATOP -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.DST_OUT -> params.setBlendMode(GLC.ZERO, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
 
-            GraphicsContext.Composite.XOR -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
-            GraphicsContext.Composite.CLEAR -> params.setBlendMode(GLC.ZERO, GLC.ZERO, GLC.FUNC_ADD)
+            Composite.XOR -> params.setBlendMode(GLC.ONE_MINUS_DST_ALPHA, GLC.ONE_MINUS_SRC_ALPHA, GLC.FUNC_ADD)
+            Composite.CLEAR -> params.setBlendMode(GLC.ZERO, GLC.ZERO, GLC.FUNC_ADD)
         }
     }
 

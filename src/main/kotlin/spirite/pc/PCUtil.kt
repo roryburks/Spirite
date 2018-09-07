@@ -37,7 +37,7 @@ fun IGLEngine.surfaceToBufferedImage( type: Int, width: Int, height: Int) : Buff
             val internalStorage = RasterHelper.getDataStorageFromBi(bi) as IntArray
             val ib = IntBuffer.wrap( internalStorage)
 
-            getGl().readPixels( 0, 0, width, height,
+            gl.readPixels( 0, 0, width, height,
                     GLC.BGRA,
                     GLC.UNSIGNED_INT_8_8_8_8_REV,
                     JOGLInt32Source(ib))

@@ -39,13 +39,6 @@ abstract class GraphicsContext {
     abstract fun scale(sx: Float, sy: Float)
 
 
-    enum class Composite {
-        SRC, SRC_IN, SRC_OVER, SRC_OUT, SRC_ATOP,
-        DST, DST_IN, DST_OVER, DST_OUT, DST_ATOP,
-        CLEAR, XOR
-    }
-
-
     abstract fun drawRect(x: Int, y: Int, w: Int, h: Int)
     abstract fun drawOval(x: Int, y: Int, w: Int, h: Int)
     abstract fun drawPolyLine(x: IntArray, y: IntArray, count: Int)
@@ -100,24 +93,25 @@ abstract class GraphicsContext {
 
 }
 
-enum class JoinMethod {
-    MITER, ROUNDED, BEVEL
+
+enum class Composite {
+    SRC, SRC_IN, SRC_OVER, SRC_OUT, SRC_ATOP,
+    DST, DST_IN, DST_OVER, DST_OUT, DST_ATOP,
+    CLEAR, XOR
 }
 
-enum class CapMethod {
-    NONE, ROUND, SQUARE
-}
+enum class JoinMethod {MITER, ROUNDED, BEVEL}
+
+enum class CapMethod {NONE, ROUND, SQUARE}
 
 class LineAttributes (
         val width: Float,
         val cap: CapMethod = NONE,
         val join: JoinMethod = MITER,
-        val dashes: FloatArray? = null
-) {}
+        val dashes: FloatArray? = null)
 
 data class GraphicalState(
         val trans: Transform,
-        val composite: GraphicsContext.Composite,
+        val composite: Composite,
         val alpha: Float,
-        val color: Color
-){}
+        val color: Color)

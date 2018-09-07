@@ -15,7 +15,7 @@ import java.nio.IntBuffer
 class GLFill(val filler: IFillArrayAlgorithm)  {
     fun fill(glImage: GLImage, x: Int, y: Int, color: SColor) {
         val gle = glImage.engine
-        val gl = gle.getGl()
+        val gl = gle.gl
         val w = glImage.width
         val h = glImage.height
 

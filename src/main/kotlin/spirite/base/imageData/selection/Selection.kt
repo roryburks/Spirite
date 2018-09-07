@@ -1,6 +1,6 @@
 package spirite.base.imageData.selection
 
-import spirite.base.graphics.GraphicsContext.Composite.*
+import spirite.base.graphics.Composite.*
 import spirite.base.graphics.IImage
 import spirite.base.graphics.RawImage
 import spirite.base.util.*

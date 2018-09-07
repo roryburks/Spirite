@@ -1,6 +1,7 @@
 package spirite.base.graphics.gl
 
 import spirite.base.util.glu.GLC
+import kotlin.math.min
 
 enum class PolyType( val glConst: Int) {
     STRIP( GLC.TRIANGLE_STRIP),
@@ -8,20 +9,36 @@ enum class PolyType( val glConst: Int) {
     LIST(GLC.TRIANGLE_STRIP)
 }
 
+interface IGLPrimitive
+{
+    fun prepare( gl: IGL) : IPreparedPrimitive
+}
+interface IPreparedPrimitive
+{
+    fun use()
+    fun draw()
+    fun unuse()
+    fun flush()
+}
+
 data class GLPrimitive(
         val raw: FloatArray,
         val attrLengths: IntArray,
         val primitiveTypes: IntArray,
-        val primitiveLengths: IntArray
-) {
+        val primitiveLengths: IntArray)
+    :IGLPrimitive
+{
     constructor( raw: FloatArray, attrLengths: IntArray, primitiveType: Int, primitiveLengths: IntArray) :
-            this(raw, attrLengths, IntArray(primitiveLengths.size, {primitiveType}), primitiveLengths)
+            this(raw, attrLengths, IntArray(primitiveLengths.size) {primitiveType}, primitiveLengths)
+
+    override fun prepare(gl: IGL) = PreparedPrimitive(this, gl)
 }
 
 class PreparedPrimitive(
         val primative: GLPrimitive,
-        val gl: IGL
-) {
+        val gl: IGL)
+    :IPreparedPrimitive
+{
     val buffer = gl.createBuffer() ?: throw GLEException("Failed to create Buffer")
 
     init {
@@ -30,34 +47,34 @@ class PreparedPrimitive(
         gl.bindBuffer(GLC.ARRAY_BUFFER, null)
     }
 
-    fun use() {
+    override fun use() {
         gl.bindBuffer(GLC.ARRAY_BUFFER, buffer)
 
         val lengths = primative.attrLengths
         val totalLength = lengths.sum()
-        for( i in 0 until primative.attrLengths.size)
+        for (i in 0 until primative.attrLengths.size)
             gl.enableVertexAttribArray(i)
         var offset = 0
-        for( i in 0 until lengths.size) {
-            gl.vertexAttribPointer(i, lengths[i], GLC.FLOAT, false, 4*totalLength, 4*offset)
+        for (i in 0 until lengths.size) {
+            gl.vertexAttribPointer(i, lengths[i], GLC.FLOAT, false, 4 * totalLength, 4 * offset)
             offset += lengths[i]
         }
     }
 
-    fun draw() {
+    override fun draw() {
         var start = 0
-        for( i in 0 until Math.min(primative.primitiveLengths.size, primative.primitiveTypes.size)) {
+        for (i in 0 until min(primative.primitiveLengths.size, primative.primitiveTypes.size)) {
             gl.drawArrays(primative.primitiveTypes[i], start, primative.primitiveLengths[i])
             start += primative.primitiveLengths[i]
         }
     }
 
-    fun unuse() {
-        for( i in 0 until primative.attrLengths.size)
+    override fun unuse() {
+        for (i in 0 until primative.attrLengths.size)
             gl.disableVertexAttribArray(i)
     }
 
-    fun flush() {
+    override fun flush() {
         buffer.delete()
     }
 }
