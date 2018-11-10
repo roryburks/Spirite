@@ -78,9 +78,10 @@ object SpriteLayerLoader : ILayerLoader
             val scaleY = ra.readFloat()
             val rot = ra.readFloat()
             val drawDepth = ra.readInt()
+            val handleId = ra.readInt()
             val alpha = if( context.version >= 0x1_0003) ra.readFloat() else 1f
 
-            Pair( MediumHandle(workspace,context.reindex(ra.readInt())),
+            Pair( MediumHandle(workspace,context.reindex(handleId)),
                     SpritePartStructure(drawDepth, partName, true, alpha, transX, transY, scaleX, scaleY, rot))
         }
         return SpriteLayer(workspace, workspace.mediumRepository, parts)
