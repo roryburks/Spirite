@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities
 import kotlin.math.max
 
 interface ITreeViewNonUI<T>{
+    var buildingPaused : Boolean
     var gapSize: Int
     var leftSize: Int
     val rootNodes: List<ITreeNode<T>>
@@ -170,7 +171,9 @@ private constructor(private val imp : SwTreeViewImp<T>)
         return btn
     }
 
+    override var buildingPaused = false
     private fun rebuildTree() {
+        if( buildingPaused) return
         compToNodeMap.clear()
         lCompToNodeMap.clear()
 
@@ -320,14 +323,18 @@ private constructor(private val imp : SwTreeViewImp<T>)
             //   be called before lComponent and component are built (which happens on buildTree)
             SwingUtilities.invokeLater {
                 valueBind.addListener { new, old ->
-                    val newLComp = attributes.makeLeftComponent(new)
-                    val newComp = attributes.makeComponent(new)
+                    // Note: this prevents this Listener and thus the rebuildTree called N times when
+                    if( old != new) {
 
-                    if (newLComp != lComponent || newComp != component)
-                        rebuildTree()
-                    else {
-                        newLComp?.redraw()
-                        newComp.redraw()
+                        val newLComp = attributes.makeLeftComponent(new)
+                        val newComp = attributes.makeComponent(new)
+
+                        if (newLComp != lComponent || newComp != component)
+                            rebuildTree()
+                        else {
+                            newLComp?.redraw()
+                            newComp.redraw()
+                        }
                     }
                 }
             }
@@ -336,17 +343,17 @@ private constructor(private val imp : SwTreeViewImp<T>)
         override fun addChild(value: T, attributes: TreeNodeAttributes<T>, expanded: Boolean) : TreeNode<T>{
             val newNode = TreeNode(value, attributes, expanded)
             _children.add(newNode)
-            rebuildTree()
+            //rebuildTree()
             return newNode
         }
 
         override fun removeChild(toRemove: ITreeNode<T>) {
             _children.remove(toRemove)
-            rebuildTree()
+            //rebuildTree()
         }
         override fun clearChildren() {
             _children.clear()
-            rebuildTree()
+            //rebuildTree()
         }
     }
     // endRegion

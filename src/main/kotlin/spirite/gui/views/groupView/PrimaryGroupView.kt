@@ -53,6 +53,7 @@ private constructor(
     val workspace get() = master.workspaceSet.currentWorkspace
 
     private fun rebuild() {
+        tree.buildingPaused = true
         tree.clearRoots()
         val pTree = workspace?.groupTree ?: return
 
@@ -73,7 +74,9 @@ private constructor(
             }
         }
 
-        tree.constructTree (makeConstructor(pTree.root))
+        tree.buildingPaused = false
+        val constructor = makeConstructor(pTree.root)
+        tree.constructTree (constructor)
     }
 
     private val groupAttributes = BaseNodeAttributes()

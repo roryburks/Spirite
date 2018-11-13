@@ -40,11 +40,11 @@ open class SScrollPane constructor(
         // Set ScrollBar UI
         val verticalScrollBar = getVerticalScrollBar()
         verticalScrollBar.isOpaque = false
-        verticalScrollBar.ui = ModernScrollBarUI(this)
+        verticalScrollBar.setUI(ModernScrollBarUI(this))
 
         val horizontalScrollBar = getHorizontalScrollBar()
         horizontalScrollBar.isOpaque = false
-        horizontalScrollBar.ui = ModernScrollBarUI(this)
+        horizontalScrollBar.setUI(ModernScrollBarUI(this))
 
         layout = object : ScrollPaneLayout() {
             override fun layoutContainer(parent: Container) {

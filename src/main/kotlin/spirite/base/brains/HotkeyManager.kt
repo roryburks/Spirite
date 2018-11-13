@@ -1,6 +1,5 @@
 package spirite.base.brains
 
-import jdk.internal.util.xml.impl.Input
 import spirite.base.brains.commands.DrawCommandExecutor.DrawCommand
 import spirite.base.brains.commands.GlobalCommandExecuter.GlobalCommand
 import spirite.base.brains.commands.IsolationCommandExecuter.IsolationCommand
