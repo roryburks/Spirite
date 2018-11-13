@@ -9,7 +9,9 @@ open class OnChangeDelegate<T>(defaultValue : T, val onChange: (T) -> Unit) {
     operator fun getValue(thisRef: Any, prop: KProperty<*>): T = field
 
     operator fun setValue(thisRef:Any, prop: KProperty<*>, value: T) {
-        field = value
-        onChange.invoke(value)
+        if( field != value) {
+            field = value
+            onChange.invoke(value)
+        }
     }
 }
