@@ -6,6 +6,7 @@ import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.MediumBasedAnimation
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
 import spirite.base.imageData.groupTree.GroupTree.*
+import spirite.base.imageData.undo.NullAction
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.floor
@@ -50,6 +51,18 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         val ancestors by lazy {changedNodes.mapAggregated { it.ancestors}.union(changedNodes)}
     }
     fun treeChanged( changedNodes : Set<Node>) {
+        // Remove All Layers referencing nonexistent Groups
+        val toRemove = _layers.asSequence()
+                .mapNotNull { Pair(when(it) {
+                    is FFALayerLexical -> it.groupLink
+                    is FFALayerGroupLinked -> it.groupLink
+                    else -> return@mapNotNull null
+                }, it) }
+                .map { it.second }
+        _layers.removeAll(toRemove)
+        toRemove.forEach { triggerFFAChange(it) }
+
+
         val contract = FFAUpdateContract(changedNodes)
 
         _layers.asSequence()
@@ -60,6 +73,10 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
 
     internal fun triggerFFAChange( layer: FFALayer?) {
         triggerStructureChange()
+    }
+
+    fun removeLayer( layer: FFALayer) {
+        _layers.remove(layer)
     }
 
     fun addLinkedLayer(
@@ -90,3 +107,6 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
 }
 
+object FFALayerCache {
+
+}

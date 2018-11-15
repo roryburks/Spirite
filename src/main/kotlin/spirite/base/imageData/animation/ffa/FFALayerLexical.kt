@@ -59,21 +59,21 @@ class FFALayerLexical(
         lexicalMap.clear()
 
         // Remap as best we can
-        val alphaBetSansExplicit = (0..25)
+        val alphabetSansExplicit = (0..25)
                 .asSequence()
                 .map { 'A' + it }
                 .filter { !sharedExplicitMap.containsKey(it) }
 
         groupLink.children.asReversed().asSequence()
                 .filterIsInstance<LayerNode>()
-                .zip(alphaBetSansExplicit)
+                .zip(alphabetSansExplicit)
                 .forEach { lexicalMap[it.second] = it.first }
         sharedExplicitMap.forEach { t, u -> lexicalMap[t] = u }
 
         // Remove any references to no-longer-extant layers
         val remainingNodes = groupLink.children.toHashSet()
         val removedAny = _frames.removeIf { it.node?.run { !remainingNodes.contains(this) } ?: false }
-        sharedExplicitMap.values.removeIf { !remainingNodes.contains(it) }
+        sharedExplicitMap.values.removeIf { !remainingNodes.contains(it) } // Note: doesn't behave super elegantly with Undo
 
         if( removedAny)
             context.triggerFFAChange(this)
@@ -101,6 +101,7 @@ class FFALayerLexical(
 
 
     // region FFALayer
+    // (no need to implement these as the lexicon will just reconstruct itself dynamically in the get)
     override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {}
     override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {}
     // endregion

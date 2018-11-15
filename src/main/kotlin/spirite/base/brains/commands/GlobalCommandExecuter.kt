@@ -17,10 +17,12 @@ import spirite.base.imageData.groupTree.GroupTree.GroupNode
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
 import spirite.base.imageData.selection.LiftedImageData
 import spirite.base.imageData.selection.Selection
+import spirite.base.util.Colors
 import spirite.base.util.MathUtil
 import spirite.base.util.f
 import spirite.base.util.linear.Rect
 import spirite.base.util.linear.Transform
+import spirite.base.util.linear.Transform.Companion
 import spirite.gui.components.dialogs.IDialog.FilePickType
 import spirite.gui.components.dialogs.IDialog.FilePickType.SAVE_SIF
 import spirite.hybrid.Hybrid
@@ -159,8 +161,8 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
                                 val x : Int
                                 val y: Int
                                 if( source is LayerSource) {
-                                    x = source.layer.x
-                                    y = source.layer.y
+                                    x = -source.layer.x
+                                    y = -source.layer.y
                                 }
                                 else {
                                     x = 0
@@ -169,12 +171,20 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
 
                                 // Flushed by the end of the function
                                 val img2 = using( master.renderEngine.pullImage(RenderTarget(source))) {img->
-                                    Hybrid.imageIO.imageToClipboard(img)
-
                                     // Flushed by the end of the function
-                                    val img2 = selection.mask.deepCopy()
+                                    // NOTE: Might cause faint edges with rotated.  Not sure how rasterizer
+                                    val transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+
+                                    val img2 = Hybrid.imageCreator.createImage(selection.mask.width, selection.mask.height)
                                     val gc = img2.graphics
-                                    gc.transform = Transform.TranslationMatrix(-x.f,-y.f) * (selection.transform?.invert() ?: Transform.IdentityMatrix)
+                                    gc.color = Colors.WHITE
+                                    gc.transform = transform
+                                    gc.fillRect(0, 0, img.width, img.height)
+                                    gc.composite = SRC_IN
+                                    gc.transform = Transform.IdentityMatrix
+                                    gc.renderImage(selection.mask, 0, 0)
+
+                                    gc.transform = transform
                                     gc.composite = SRC_IN
                                     gc.renderImage(img, 0, 0)
 
