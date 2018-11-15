@@ -549,7 +549,7 @@ private constructor(
 
     // endregion
 
-    init {
+    init /* Bindings */ {
         imp.background = Skin.Global.BgDark.jcolor
         rebuild()
 
