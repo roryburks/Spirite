@@ -25,7 +25,7 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.round
 
-class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
+class AnimationPreviewView(val masterControl: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Animation Preview"
@@ -88,7 +88,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
     private val _curAnimBind = masterControl.centralObservatory.currentAnimationBind.addListener { new, old ->buildFromAnim(new); viewPanel.redraw()}
     private val _animstructureObs = object : AnimationStructureChangeObserver {
         override fun animationStructureChanged(animation: Animation) {
-            if( animation == this@AnimationView.animation) {
+            if( animation == this@AnimationPreviewView.animation) {
                 updateSlider()
             }
         }
@@ -167,7 +167,7 @@ class AnimationView(val masterControl: IMasterControl) : IOmniComponent {
 private class AnimationViewPanel(val imp : AnimationViewPanelImp = AnimationViewPanelImp()) : IComponent by SwComponent(imp) {
 
     class AnimationViewPanelImp : JPanel() {
-        var context : AnimationView? = null
+        var context : AnimationPreviewView? = null
 
         override fun paintComponent(g: Graphics) {
             val context = context ?: return

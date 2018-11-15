@@ -226,7 +226,7 @@ object LoadEngine {
         }
 
 
-        // Link the reference nodes (needs to be done afterwards because it might link to a node yet
+        // Link the reference nodes (needs to be done afterwards because it might groupLink to a node yet
         //	added to the node map since nodeIDs are based on depth-first Group Tree order,
         //	not creation order) (TODO once ReferenceLayers are in)
     }

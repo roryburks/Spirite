@@ -247,7 +247,7 @@ object SaveEngine {
                             val onEnd = struct.onEndLink
                             val onEndLink =  if( onEnd == null) -1 else animMap[onEnd.first] ?: -1
 
-                            ra.writeInt(onEndLink) // 4: AnimationId of on-end link
+                            ra.writeInt(onEndLink) // 4: AnimationId of on-end groupLink
                             if(onEndLink != -1)
                                 ra.writeInt(onEnd!!.second)    // 4: on-end Frame
 

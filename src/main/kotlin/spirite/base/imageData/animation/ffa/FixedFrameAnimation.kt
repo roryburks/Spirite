@@ -45,11 +45,16 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         return drawList
     }
 
-    fun treeChanged( changedNodes : Set<Node>) {
+    class FFAUpdateContract(val changedNodes: Set<Node>)
+    {
         val ancestors by lazy {changedNodes.mapAggregated { it.ancestors}.union(changedNodes)}
+    }
+    fun treeChanged( changedNodes : Set<Node>) {
+        val contract = FFAUpdateContract(changedNodes)
 
-        _layers.filterIsInstance<FFALayerGroupLinked>()
-                .filter { changedNodes.contains(it.groupLink) || (it.includeSubtrees && ancestors.contains(it.groupLink)) }
+        _layers.asSequence()
+                .filterIsInstance<IFFALayerLinked>()
+                .filter { it.shouldUpdate(contract) }
                 .forEach { it.groupLinkUpdated() }
     }
 
