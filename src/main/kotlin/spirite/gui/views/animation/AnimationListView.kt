@@ -21,7 +21,7 @@ import java.awt.dnd.*
 class AnimationListView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
-    override val name: String get() = "Anim0s"
+    override val name: String get() = "Anims"
 
     private val workspace get() = master.workspaceSet.currentWorkspace
 

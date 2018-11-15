@@ -73,6 +73,13 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         triggerFFAChange(layer)
     }
 
+    fun addLexicalLayer(group: GroupNode)
+    {
+        val layer = FFALayerLexical(this, group, "")
+        _layers.add(layer)
+        triggerFFAChange(layer)
+    }
+
     override fun dupe(): Animation {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

@@ -7,11 +7,11 @@ import spirite.base.imageData.groupTree.GroupTree.*
 
 class FFALayerLexical(
         context: FixedFrameAnimation,
-        val group: FixedFrameAnimation,
         val groupLink: GroupNode,
         lexicon: String)
     : FFALayer(context), IFFALayerLinked
 {
+    private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
     var lexicon: String = lexicon
         set(value) {
             if( field != value) {
@@ -20,22 +20,25 @@ class FFALayerLexical(
             }
         }
 
+    init {
+        groupLinkUpdated()
+    }
+
+
     // region IFFALayerLinked
     override fun shouldUpdate(contract: FFAUpdateContract): Boolean = contract.changedNodes.contains(groupLink)
     override fun groupLinkUpdated() {
         lexicalMap.clear()
-        var i = 0
-        for ( node in groupLink.children.asSequence().filterIsInstance<LayerNode>()) {
-            if( i++ >= 26)
-                break
-            lexicalMap['A'+i] = node
-        }
+
+        groupLink.children.asReversed().asSequence()
+                .filterIsInstance<LayerNode>()
+                .take(26)
+                .forEachIndexed { index, layerNode -> lexicalMap['A' + index] = layerNode }
 
         buildLexicon(lexicon)
     }
     // endregion
 
-    private val lexicalMap : MutableMap<Char, Node> = mutableMapOf()
 
     private fun buildLexicon(lexicon: String) {
         _frames.clear()
@@ -56,7 +59,8 @@ class FFALayerLexical(
     }
 
 
+    // region FFALayer
     override fun moveFrame(frameToMove: FFAFrame, frameRelativeTo: FFAFrame?, above: Boolean) {}
     override fun addGapFrameAfter(frameBefore: FFAFrame?, gapLength: Int) {}
-
+    // endregion
 }

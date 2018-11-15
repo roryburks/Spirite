@@ -36,6 +36,7 @@ class NodeContextCommand(
 
         ANIM_FROM_GROUP("animationFromGroup"),
         INSERT_GROUP_IN_ANIMATION("addGroupToAnim"),
+        INSERT_GROUP_IN_ANIMATION_LEXICAL("addGroupToAnim_lexical"),
         GIF_FROM_FROUP("gifFromGroup"),
         MERGE_DOWN("mergeDown"),
         NEW_RIG_ANIMATION("newRigAnimation"),
@@ -75,6 +76,11 @@ class NodeContextCommand(
             INSERT_GROUP_IN_ANIMATION.string -> {
                 val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
                 animation.addLinkedLayer( node as? GroupNode ?: return false, true)
+            }
+            INSERT_GROUP_IN_ANIMATION_LEXICAL.string -> {
+                val animation = workspace.animationManager.currentAnimation as? FixedFrameAnimation ?: return false
+                val group = node as? GroupNode ?: return false
+                animation.addLexicalLayer(group)
             }
             GIF_FROM_FROUP.string -> TODO()
             MERGE_DOWN.string -> TODO()
