@@ -22,3 +22,5 @@
     -Added ANSP Chunk and FFAAnimSpace save stuff (no breaking changes)
 0x0001_0003:
     -Added Alpha to SpriteLayer Part
+0x0001_0004:
+    -Added Lexical FFA Layer Type (breaking on FFA Layer)

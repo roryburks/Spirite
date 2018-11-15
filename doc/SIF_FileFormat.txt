@@ -1,4 +1,4 @@
-Version 000E
+Version 0x0001_0004
 
 ** UTF8  means null-terminated UTF8 encoded string ***
 
@@ -105,13 +105,22 @@ Per Animation:
     0x01 : FixedFrameAnimation
         [2, ushort] : Number of Layers
         Per Layer:
-            [4, int] : NodeID of GroupNode Bound to (see Bellow), can be -1 for unbounded
-            [1, byte] : 0 bit: whether or not subgroups are linked
-            [2, ushort] : Number of Frames that have information
-            Per Frame:
-                [1, byte] : FrameType
-                [4, int] : NodeID  (can be -1, should match FrameType)
-                [2, ushort] : Length
+            [1, byte] : Type of FFA Layer
+                0x01 : Group Linked Layer
+                    [4, int] : NodeId of GroupNode Bound
+                    [1, byte] : 0 bit: whether or not subgroups are linked
+                    [2, ushort] : Number of Frames that have information
+                    Per Frame:
+                        [1, byte] : FrameType
+                        [4, int] : NodeID  (can be -1, should match FrameType)
+                        [2, ushort] : Length
+                0x02 : Lexical Layer
+                    [4, int] : NodeId of GroupNode Bound
+                    [n, UTF8 str] : Lexicon
+                    [1, ubyte] : Number of Explicit Mappings (note only saved for the first)
+                    Per Explicit Mapping:
+                        [1, char] : Char Map
+                        [4, int] : NodeId of Mapping
     0x02 : RigAnimation
         [2, ushort] : Number of Sprites
         Per Sprite:

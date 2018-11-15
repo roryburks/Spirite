@@ -1,9 +1,12 @@
 package spirite.base.file
 
+import spirite.base.file.SaveLoadUtil.FFALAYER_GROUPLINKED
+import spirite.base.file.SaveLoadUtil.FFALAYER_LEXICAL
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked
+import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
 import spirite.base.imageData.groupTree.GroupTree.*
@@ -18,6 +21,7 @@ import spirite.hybrid.MDebug.WarningType.STRUCTURAL
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.RandomAccessFile
+import kotlin.math.min
 
 class SaveContext(
         val workspace: IImageWorkspace,
@@ -273,6 +277,9 @@ object SaveEngine {
         }
     }
 
+    private const val MaxFFALayers = Short.MAX_VALUE.toInt()
+    private const val MaxFFALayerFrames = Short.MAX_VALUE.toInt()
+
     /** ANIM chunk containing all Animation Data */
     private fun saveAnimationData( context: SaveContext) {
         context.writeChunk("ANIM") {ra ->
@@ -284,33 +291,52 @@ object SaveEngine {
                 when( anim) {
                     is FixedFrameAnimation -> {
                         ra.write(SaveLoadUtil.strToByteArrayUTF8(anim.name))    // [n] Anim name
-                        ra.writeByte(SaveLoadUtil.ANIM_FFA) // [1] : Anim TypeId
+                        ra.writeByte(SaveLoadUtil.ANIM_FFA)                     // [1] : Anim TypeId
 
-                        val validLayers = anim.layers.filterIsInstance<FFALayerGroupLinked>()
-                        if( validLayers.size > Short.MAX_VALUE) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: ${Short.MAX_VALUE}), taking only the first N")
+                        if(anim.layers.size > MaxFFALayers) MDebug.handleWarning(UNSUPPORTED, "Too many Animation layers (num: ${anim.layers.size} max: ${MaxFFALayers}), taking only the first N")
 
-                        val layersToWrite = validLayers.take(Short.MAX_VALUE.i)
-                        ra.writeShort( layersToWrite.size)  // [2] : Number of layers
-                        for (layer in layersToWrite){
-                            ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
-                            ra.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
+                        val writtenExplicits = hashSetOf<Node>()
 
-                            if( layer.frames.size > Short.MAX_VALUE) {
-                                MDebug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}), writing an empty frame")
-                                ra.writeShort(0)
-                            }
-                            else {
-                                ra.writeShort(layer.frames.size) // [2] : Number of Frames
-                                loop@ for( frame in layer.frames) {
-                                    // [1] : Type
-                                    ra.writeByte(when(frame.marker) {
-                                        GAP -> SaveLoadUtil.FFAFRAME_GAP
-                                        START_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_STARTOFLOOP
-                                        FRAME -> SaveLoadUtil.FFAFRAME_FRAME
-                                        END_LOCAL_LOOP -> continue@loop
-                                    })
-                                    ra.writeInt(context.nodeMap[frame.node] ?: -1 ) // [4] : NodeId
-                                    ra.writeShort(frame.length)    // [2]: Length
+                        ra.writeShort( min(anim.layers.size, MaxFFALayers))  // [2] : Number of layers
+                        for (layer in anim.layers.asSequence().take(MaxFFALayers)){
+                            when(layer) {
+                                is FFALayerGroupLinked -> {
+                                    ra.writeByte(FFALAYER_GROUPLINKED)  // [1] : Layer TypeId
+
+                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1)    // [4] : NodeId of GroupNode Bount
+                                    ra.writeByte(if(layer.includeSubtrees) 1 else 0)    // [1] : 0 bit : whether or not subgroups are linked
+
+                                    if( layer.frames.size > MaxFFALayerFrames) MDebug.handleWarning(UNSUPPORTED, "Too many Frames in a layer (max: ${Short.MAX_VALUE}, only writing first N)")
+
+                                    ra.writeShort(min(layer.frames.size, MaxFFALayerFrames)) // [2] : Number of Frames
+                                    for( frame in layer.frames.asSequence().take(MaxFFALayerFrames)) {
+                                        val type = when(frame.marker) {
+                                            GAP -> SaveLoadUtil.FFAFRAME_GAP
+                                            START_LOCAL_LOOP -> SaveLoadUtil.FFAFRAME_STARTOFLOOP
+                                            FRAME -> SaveLoadUtil.FFAFRAME_FRAME
+                                            END_LOCAL_LOOP -> null
+                                        } ?: continue
+                                        ra.writeByte(type)
+                                        ra.writeInt(context.nodeMap[frame.node] ?: -1 ) // [4] : NodeId
+                                        ra.writeShort(frame.length)    // [2]: Length
+                                    }
+                                }
+                                is FFALayerLexical -> {
+                                    ra.writeByte(FFALAYER_LEXICAL)  // [1] : Layer TypeId
+                                    ra.writeInt(context.nodeMap[layer.groupLink] ?: -1) // [4] NodeIf of GroupNode
+                                    ra.writeUFT8NT(layer.lexicon)   // [n] : Lexicon
+
+                                    if( writtenExplicits.contains(layer.groupLink)) {
+                                        ra.writeByte(0) // [1] : No Explicits to write
+                                    }
+                                    else {
+                                        ra.writeByte(min(255, layer.sharedExplicitMap.size))   // [1] : Num Explicits
+                                        for( explicit in layer.sharedExplicitMap.asSequence().take(255)) {
+                                            ra.writeByte(explicit.key.toByte().toInt()) // [1] : Char mapping
+                                            ra.writeInt(context.nodeMap[explicit.value] ?: -1) // [4] : NodeId
+                                        }
+                                    }
+
                                 }
                             }
 

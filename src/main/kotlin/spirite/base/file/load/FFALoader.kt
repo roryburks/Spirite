@@ -2,6 +2,7 @@ package spirite.base.file.load
 
 import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
+import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.animation.ffa.FFAFrameStructure
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayerGroupLinked.UnlinkedFrameCluster
@@ -10,6 +11,108 @@ import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.STRUCTURAL
+import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
+
+
+object FFALoader : IAnimationLoader {
+    override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
+        val ra = context.ra
+        val nodes = context.nodes
+        val ffa = FixedFrameAnimation(name, context.workspace)
+
+        val numLayers = ra.readUnsignedShort()
+        repeat(numLayers){_->
+            val layerType =
+                    if( context.version <= 0x1_0003) SaveLoadUtil.FFALAYER_GROUPLINKED
+                    else ra.readUnsignedByte()
+
+            val layerLoader = when(layerType) {
+                SaveLoadUtil.FFALAYER_GROUPLINKED -> FFAFixedGroupLayerLoader
+                SaveLoadUtil.FFALAYER_LEXICAL -> FFALexicalLayerLoader
+                else -> null
+            }
+            layerLoader?.load(context, ffa) ?:MDebug.handleWarning( UNSUPPORTED,"Unknown FFA Layer Type: $layerType.  Attempting to skip, but likely Corrupting")
+        }
+        return ffa
+    }
+}
+
+interface IFFALayerLoader {
+    fun load( context: LoadContext, ffa: FixedFrameAnimation)
+
+}
+
+object FFALexicalLayerLoader : IFFALayerLoader {
+    override fun load(context: LoadContext, ffa: FixedFrameAnimation) {
+        val ra = context.ra
+        val nodes = context.nodes
+
+        val group = nodes[ra.readInt()] as GroupNode
+        val lexicon = ra.readNullTerminatedStringUTF8()
+
+        val explicitCount = ra.readUnsignedByte()
+        val map =
+                if( explicitCount == 0) null
+                else (0..explicitCount).asSequence()
+                        .map { Pair(ra.readByte().toChar(), nodes[ra.readInt()]) }
+                        .toMap()
+
+        ffa.addLexicalLayer(group, lexicon, map)
+    }
+}
+
+object FFAFixedGroupLayerLoader : IFFALayerLoader {
+    override fun load(context: LoadContext, ffa: FixedFrameAnimation) {
+        val ra = context.ra
+        val nodes = context.nodes
+        val node = nodes[ra.readInt()]
+        val includeSubtrees = (ra.readByte().i == 0)
+
+        val numFrames = ra.readUnsignedShort()
+
+        val frameMap = mutableMapOf<Node, FFAFrameStructure>()
+        val unlinkedFrameClusters = mutableListOf<UnlinkedFrameCluster>()
+
+        var workingNode : Node? = null
+        var workingUnlinkedFrames = mutableListOf<FFAFrameStructure>()
+
+        repeat(numFrames) {_->
+            val frameType =  ra.readByte().i
+            val frameNode = nodes.getOrNull(ra.readInt())
+            val length = ra.readUnsignedShort()
+
+            val marker = when(frameType) {
+                SaveLoadUtil.FFAFRAME_STARTOFLOOP -> START_LOCAL_LOOP
+                SaveLoadUtil.FFAFRAME_FRAME -> FRAME
+                SaveLoadUtil.FFAFRAME_GAP -> GAP
+                else -> {
+                    MDebug.handleWarning(STRUCTURAL, "Unrecognized FFAFrame Type: $frameType")
+                    GAP
+                }
+            }
+
+            if( frameNode == null) {
+                workingUnlinkedFrames.add(FFAFrameStructure(null, marker, length))
+            }
+            else {
+                frameMap[frameNode] = FFAFrameStructure(frameNode, marker, length)
+                if (workingUnlinkedFrames.any()) unlinkedFrameClusters.add(UnlinkedFrameCluster(workingNode, workingUnlinkedFrames))
+                workingUnlinkedFrames = mutableListOf()
+                workingNode = frameNode
+            }
+        }
+
+
+        val groupNode = node as? GroupNode
+        when( groupNode) {
+            null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group Node marked as its Link")
+            else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap, unlinkedFrameClusters)
+        }
+    }
+
+}
+
+// region Legacy Loaders
 
 object LegacyFFALoader_X_To_7 : IAnimationLoader {
     override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
@@ -94,59 +197,4 @@ object LegacyFFALoader_8_TO_1_0000 : IAnimationLoader {
         return ffa
     }
 }
-
-object FFALoader : IAnimationLoader {
-    override fun loadAnimation(context: LoadContext, name: String): FixedFrameAnimation {
-        val ra = context.ra
-        val nodes = context.nodes
-        val ffa = FixedFrameAnimation(name, context.workspace)
-
-        val numLayers = ra.readUnsignedShort()
-        repeat(numLayers){_->
-            val node = nodes[ra.readInt()]
-            val includeSubtrees = (ra.readByte().i == 0)
-
-            val numFrames = ra.readUnsignedShort()
-
-            val frameMap = mutableMapOf<Node, FFAFrameStructure>()
-            val unlinkedFrameClusters = mutableListOf<UnlinkedFrameCluster>()
-
-            var workingNode : Node? = null
-            var workingUnlinkedFrames = mutableListOf<FFAFrameStructure>()
-
-            repeat(numFrames) {_->
-                val frameType =  ra.readByte().i
-                val frameNode = nodes.getOrNull(ra.readInt())
-                val length = ra.readUnsignedShort()
-
-                val marker = when(frameType) {
-                    SaveLoadUtil.FFAFRAME_STARTOFLOOP -> START_LOCAL_LOOP
-                    SaveLoadUtil.FFAFRAME_FRAME -> FRAME
-                    SaveLoadUtil.FFAFRAME_GAP -> GAP
-                    else -> {
-                        MDebug.handleWarning(STRUCTURAL, "Unrecognized FFAFrame Type: $frameType")
-                        GAP
-                    }
-                }
-
-                if( frameNode == null) {
-                    workingUnlinkedFrames.add(FFAFrameStructure(null, marker, length))
-                }
-                else {
-                    frameMap[frameNode] = FFAFrameStructure(frameNode, marker, length)
-                    if (workingUnlinkedFrames.any()) unlinkedFrameClusters.add(UnlinkedFrameCluster(workingNode, workingUnlinkedFrames))
-                    workingUnlinkedFrames = mutableListOf()
-                    workingNode = frameNode
-                }
-            }
-
-
-            val groupNode = node as? GroupNode
-            when( groupNode) {
-                null -> MDebug.handleWarning(STRUCTURAL, "FFA Layer has a non-Group Node marked as its Link")
-                else -> ffa.addLinkedLayer(groupNode, includeSubtrees, frameMap, unlinkedFrameClusters)
-            }
-        }
-        return ffa
-    }
-}
+// endregion

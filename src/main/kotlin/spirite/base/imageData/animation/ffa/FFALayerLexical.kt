@@ -49,6 +49,7 @@ class FFALayerLexical(
 
     init {
         groupLinkUpdated()
+        buildLexicon(lexicon)
     }
 
 

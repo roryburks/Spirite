@@ -73,13 +73,14 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
         triggerFFAChange(layer)
     }
 
-    fun addLexicalLayer(group: GroupNode)
+    fun addLexicalLayer(group: GroupNode, lexicon: String = "", map: Map<Char,Node>? = null)
     {
         val existingMap = _layers.asSequence()
                 .filterIsInstance<FFALayerLexical>()
                 .filter { it.groupLink == group }
                 .firstOrNull()?.sharedExplicitMap
-        val layer = FFALayerLexical(this, group, sharedExplicitMap = existingMap ?: mutableMapOf())
+        val mapToUse = existingMap ?: (map?.toMutableMap()) ?: mutableMapOf()
+        val layer = FFALayerLexical(this, group, lexicon, mapToUse)
         _layers.add(layer)
         triggerFFAChange(layer)
     }

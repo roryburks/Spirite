@@ -9,7 +9,7 @@ object SaveLoadUtil {
     val header : ByteArray get() =ByteArray(4).apply {
         System.arraycopy("SIFF".toByteArray(charset("UTF-8")), 0, this, 0, 4)
     }
-    const val version = 0x0001_0003
+    const val version = 0x0001_0004
 
 
     // :::: Node Type Identifiers for the SIFF GroupTree Section
@@ -36,6 +36,10 @@ object SaveLoadUtil {
     const val FFAFRAME_FRAME = 0x01
     const val FFAFRAME_STARTOFLOOP = 0x02
     const val FFAFRAME_GAP = 0x03
+
+    // :::: FFALayerType
+    const val FFALAYER_GROUPLINKED = 0x01
+    const val FFALAYER_LEXICAL = 0x02
 
     // Node Attribute Masks
     const val VISIBLE_MASK = 0x01
