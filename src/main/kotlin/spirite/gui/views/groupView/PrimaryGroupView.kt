@@ -119,10 +119,7 @@ private constructor(
         override fun makeTransferable(t: Node): Transferable {return NodeTransferable(t)}
 
         override fun canDrag(): Boolean = true
-        override fun dragOut( t: Node, up: Boolean, inArea: Boolean) {
-            val groupTree = workspace?.groupTree ?: return
-            groupTree.moveInto(t, groupTree.root, up)
-        }
+        override fun dragOut( t: Node, up: Boolean, inArea: Boolean) {}
         override fun canImport(trans: Transferable) = trans.isDataFlavorSupported(NodeTransferable.FLAVOR)
         override fun interpretDrop(trans: Transferable, dropInto: ITreeNode<Node>, dropDirection: DropDirection) {
             val node = trans.getTransferData(NodeTransferable.FLAVOR) as? Node ?: return
