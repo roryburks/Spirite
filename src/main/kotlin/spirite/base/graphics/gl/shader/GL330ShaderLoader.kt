@@ -140,7 +140,7 @@ class GL330ShaderLoader( val gl: IGL, val scriptService: IScriptService) : IGLSh
         gl.linkProgram( program)
 
         if( !gl.programLinkedSuccessfully( program))
-            throw GLEException("Failed to link shader: ${gl.getProgramInfoLog(program)}\n")
+            throw GLEException("Failed to groupLink shader: ${gl.getProgramInfoLog(program)}\n")
 
         shaders.forEach { gl.detatchShader(program, it) }
         return program

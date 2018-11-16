@@ -3,6 +3,7 @@ package spirite.gui.views.animation
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.gui.components.advanced.ITreeViewNonUI.TreeNodeAttributes
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.basic.IComponent
@@ -17,7 +18,7 @@ import spirite.pc.gui.basic.jcomponent
 import java.awt.Point
 import java.awt.dnd.*
 
-class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
+class AnimationListView(val master: IMasterControl) : IOmniComponent {
     override val component: IComponent get() = imp
     override val icon: IIcon? get() = SwIcons.BigIcons.Frame_AnimationScheme
     override val name: String get() = "Anims"
@@ -62,12 +63,17 @@ class AnimationSchemeView(val master: IMasterControl) : IOmniComponent {
         if( evt.button == RIGHT )
             workspace?.apply {
                 val animation = list.getNodeFromY(evt.point.y)?.value
+
+                val menuItems = mutableListOf(
+                        MenuItem("Create New Fixed Frame Animation", customAction = {animationManager.addAnimation(FixedFrameAnimation("FixedFrameAnimation", this))})
+                )
+
                 if( animation != null) {
-                    master.contextMenus.LaunchContextMenu(evt.point, listOf(
-                            MenuItem("Duplicate Animation", customAction = {animationManager.addAnimation(animation.dupe())}),
-                            MenuItem("Delete Animation", customAction = {animationManager.removeAnimation(animation)})
-                    ))
+                    menuItems.add(MenuItem("Duplicate Animation", customAction = {animationManager.addAnimation(animation.dupe())}))
+                    menuItems.add(MenuItem("Delete Animation", customAction = {animationManager.removeAnimation(animation)}))
                 }
+
+                master.contextMenus.LaunchContextMenu(evt.point, menuItems)
             }
     }
 

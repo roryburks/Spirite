@@ -7,6 +7,7 @@ import spirite.base.imageData.animation.IAnimationManager.AnimationStructureChan
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
 import spirite.base.imageData.animation.ffa.FFALayer
 import spirite.base.imageData.animation.ffa.FFALayer.FFAFrame
+import spirite.base.imageData.animation.ffa.FFALayerLexical
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.groupTree.GroupTree.LayerNode
 import spirite.base.imageData.groupTree.GroupTree.Node
@@ -24,6 +25,7 @@ import spirite.gui.Direction
 import spirite.gui.Direction.*
 import spirite.gui.components.advanced.crossContainer.CrossInitializer
 import spirite.gui.components.advanced.crossContainer.CrossRowInitializer
+import spirite.gui.components.basic.IButton
 import spirite.gui.components.basic.IComponent
 import spirite.gui.components.basic.IComponent.BasicBorder.BEVELED_LOWERED
 import spirite.gui.components.basic.IComponent.BasicCursor.DEFAULT
@@ -345,11 +347,34 @@ private constructor(
     {
         init {
             imp.setBasicBorder(BEVELED_LOWERED)
+
             val label = Hybrid.ui.EditableLabel("layer")
-            imp.setLayout { rows.add(label) }
-            imp.onMouseRelease += {label.requestFocus()}
+            if( layer is FFALayerLexical) {
+                imp.setLayout {
+                    rows.add(label)
+                    rows.add(LexiconButton(layer))
+                }
+            }
+            else {
+                imp.setLayout { rows.add(label) }
+            }
+            imp.onMouseRelease += { label.requestFocus() }
+        }
+
+    }
+    private inner class LexiconButton(val layer: FFALayerLexical, private val imp: IButton = Hybrid.ui.Button("Lexicon"))
+        : IComponent by imp
+    {
+        init {
+            imp.onMouseClick += {redoLexicon()}
+        }
+
+        fun redoLexicon() {
+            val lexicon = master.dialog.promptForString("Enter new Lexicon:",layer.lexicon) ?: return
+            layer.lexicon = lexicon
         }
     }
+
     private inner class SubNamePanel(val title: String, private val imp: ICrossPanel = Hybrid.ui.CrossPanel())
         : IComponent by imp
     {
@@ -524,7 +549,7 @@ private constructor(
 
     // endregion
 
-    init {
+    init /* Bindings */ {
         imp.background = Skin.Global.BgDark.jcolor
         rebuild()
 
@@ -601,6 +626,7 @@ internal class AnimDragStateManager(val context: AnimFFAStructPanel)
     }
 }
 
+// region Custom Panels
 private class AnimFFAStructPanelImp : JPanel() {
     lateinit var context : AnimFFAStructPanel
 
@@ -684,3 +710,4 @@ private class ArrowPanel(val bgcol: JColor?, val fgcol: JColor, val dir: Directi
         }
     }
 }
+// endregion

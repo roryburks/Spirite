@@ -341,7 +341,7 @@ package com.hackoeur.jglm;///* Copyright (C) 2013 James L. Royalty
 //	/**
 //	 * This is the equivalent of <strong>this * vector</strong> (if we had operator
 //	 * overloading).  If you want <strong>vector * this</strong> then
-//	 * see {@link Vec3#multiply(Mat3)}.
+//	 * see {@groupLink Vec3#multiply(Mat3)}.
 //	 *
 //	 * @param vec
 //	 * @return

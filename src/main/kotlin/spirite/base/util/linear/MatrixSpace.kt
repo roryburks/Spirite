@@ -26,7 +26,7 @@ class MatrixSpace(
     }
 
     fun convertSpace( from: String, to: String):Transform {
-        // Note: could cache all the transforms from A to B during the attempt to find a link
+        // Note: could cache all the transforms from A to B during the attempt to find a groupLink
         if( from == to)
             return Transform.IdentityMatrix
 
@@ -40,7 +40,7 @@ class MatrixSpace(
             return inv
         }
 
-        // Bredth-first search for a link
+        // Bredth-first search for a groupLink
         val remaining = keys.filter { it != from }
         val recurseQueue = LinkedList<MapNavigationState>()
         recurseQueue.add(

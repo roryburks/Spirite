@@ -57,7 +57,7 @@ private val defaultHotkeys = mapOf(
         ToolCommand.Eraser.keyCommand to (Hotkey( KeyEvent.VK_E, 0)),
         ToolCommand.Fill.keyCommand to (Hotkey( KeyEvent.VK_B, InputEvent.SHIFT_DOWN_MASK)),
         ToolCommand.ShapeSelection.keyCommand to (Hotkey( KeyEvent.VK_R, 0)),
-        ToolCommand.Move.keyCommand to (Hotkey( KeyEvent.VK_M, 0)),
+        ToolCommand.Move.keyCommand to (Hotkey( KeyEvent.VK_T, 0)),
         ToolCommand.ColorPicker.keyCommand to (Hotkey( KeyEvent.VK_O, 0)),
         ToolCommand.Pixel.keyCommand to (Hotkey( KeyEvent.VK_A, 0)),
         ToolCommand.Rigger.keyCommand to (Hotkey( KeyEvent.VK_CAPS_LOCK, 0)),

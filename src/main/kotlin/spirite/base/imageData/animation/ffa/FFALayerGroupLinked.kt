@@ -1,6 +1,7 @@
 package spirite.base.imageData.animation.ffa
 
 import spirite.base.imageData.animation.ffa.FFAFrameStructure.Marker.*
+import spirite.base.imageData.animation.ffa.FixedFrameAnimation.FFAUpdateContract
 import spirite.base.imageData.groupTree.GroupTree.*
 import spirite.base.util.delegates.UndoableChangeDelegate
 
@@ -11,8 +12,12 @@ class FFALayerGroupLinked(
         includeSubtrees: Boolean,
         frameMap : Map<Node,FFAFrameStructure>? = null,
         unlinkedClusters: List<UnlinkedFrameCluster>? = null)
-    : FFALayer(context)
+    : FFALayer(context), IFFALayerLinked
 {
+    override fun shouldUpdate(contract: FFAUpdateContract): Boolean {
+        return contract.changedNodes.contains(groupLink) || (includeSubtrees && contract.ancestors.contains(groupLink))
+    }
+
     var includeSubtrees by UndoableChangeDelegate(
             includeSubtrees,
             context.workspace.undoEngine,
@@ -105,7 +110,7 @@ class FFALayerGroupLinked(
         }
     }
 
-    internal fun groupLinkUpdated( )
+    override fun groupLinkUpdated( )
     {
         val oldUnlinkedFrameClusters = getUnlinkedNodeClusters()
 

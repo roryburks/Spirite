@@ -65,11 +65,13 @@ abstract class ContextMenus( val commandExecuter: ICentralCommandExecutor) {
 
             when( node) {
                 is GroupNode -> {
-                    val addAnimationEnabled = workspace.animationManager.currentAnimation is FixedFrameAnimation
+                    val ffaEnabled = workspace.animationManager.currentAnimation is FixedFrameAnimation
 
                     scheme.add(MenuItem("-"))
                     scheme.add(MenuItem("&Construct Simple Animation From Group", NodeCommand.ANIM_FROM_GROUP))
-                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION, enabled = addAnimationEnabled))
+                    scheme.add(MenuItem("&Add Group To Animation As New Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION, enabled = ffaEnabled))
+                    if( ffaEnabled)
+                        scheme.add(MenuItem("&Add Group To Animation As New Lexical Layer", NodeCommand.INSERT_GROUP_IN_ANIMATION_LEXICAL))
                     scheme.add(MenuItem("Write Group To GIF Animation", NodeCommand.GIF_FROM_FROUP))
                 }
                 is LayerNode -> {

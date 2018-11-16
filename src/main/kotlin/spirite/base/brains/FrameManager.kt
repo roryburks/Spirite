@@ -4,7 +4,7 @@ import spirite.base.brains.IFrameManager.Views
 import spirite.gui.components.advanced.omniContainer.IOmniComponent
 import spirite.gui.components.advanced.omniContainer.SwOmniDialog
 import spirite.gui.views.RootWindow
-import spirite.gui.views.animation.AnimationView
+import spirite.gui.views.animation.AnimationPreviewView
 import spirite.gui.views.info.UndoHistoryView
 import spirite.gui.views.work.WorkSectionView
 import spirite.gui.components.views.DebugView
@@ -16,7 +16,7 @@ interface  IFrameManager
     enum class Views ( val componentConstructor: (IMasterControl)->IOmniComponent){
         DEBUG_VIEW ({DebugView()}),
         UNDO_HISTORY_VIEW({UndoHistoryView(it)}),
-        ANIMATION_VIEW({ AnimationView(it) }),
+        ANIMATION_VIEW({ AnimationPreviewView(it) }),
         ANIMATION_SPACE_VIEW({ AnimationSpaceView(it) }),
 
     }

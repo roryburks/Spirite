@@ -1,4 +1,4 @@
-package spirite.gui.views.animation
+package spirite.gui.views.animation.structureView
 
 import spirite.base.brains.IMasterControl
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
