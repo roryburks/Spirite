@@ -48,7 +48,7 @@ private constructor(val imp: Imp) : IComponent by SwComponent(imp)
                 val gc = image.graphics
                 gc.preScale(anim.state.zoomF, anim.state.zoomF)
 
-                anim.drawFrame(gc,anim.state.met)
+                anim.drawFrame(gc,context.frame)
 
                 val bi = Hybrid.imageConverter.convert<ImageBI>(image)
                 image.flush()
