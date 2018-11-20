@@ -1,10 +1,7 @@
 package spirite.base.file.load
 
-import spirite.base.file.BadSifFileException
-import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
 import spirite.base.graphics.DynamicImage
-import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.mediums.DynamicMedium
 import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium

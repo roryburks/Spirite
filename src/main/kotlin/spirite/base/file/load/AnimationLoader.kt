@@ -1,10 +1,7 @@
 package spirite.base.file.load
 
-import spirite.base.file.BadSifFileException
-import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.layers.Layer
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 

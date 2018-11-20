@@ -1,9 +1,6 @@
 package spirite.base.file.load
 
-import spirite.base.file.BadSifFileException
-import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
-import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
 import spirite.base.imageData.animationSpaces.AnimationSpace
 import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace

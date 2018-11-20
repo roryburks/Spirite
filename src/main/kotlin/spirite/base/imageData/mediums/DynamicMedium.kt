@@ -1,14 +1,13 @@
 package spirite.base.imageData.mediums
 
-import spirite.base.graphics.DynamicImage
-import spirite.base.graphics.GraphicsContext
-import spirite.base.graphics.RawImage
-import spirite.base.graphics.RenderRubric
+import spirite.base.graphics.*
 import spirite.base.imageData.IImageWorkspace
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.DYNAMIC
+import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.Transform
 
 
@@ -21,7 +20,8 @@ import spirite.base.util.linear.Transform
 class DynamicMedium(
         val workspace: IImageWorkspace,
         val image: DynamicImage = DynamicImage(),
-        val mediumRepo: MMediumRepository) : IMedium
+        val mediumRepo: MMediumRepository)
+    : IImageMedium
 {
     override val width: Int get() = image.width
     override val height: Int get() = image.height
@@ -33,11 +33,10 @@ class DynamicMedium(
 
     override fun getImageDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
 
-    override fun render( gc: GraphicsContext, render: RenderRubric?) {
+    override fun getImages() : List<ShiftedImage> {
         val img = image.base
-        if( img != null) {
-            gc.renderImage(img, image.xOffset, image.yOffset, render)
-        }
+        if( img == null) return emptyList()
+        else return SinglyList(ShiftedImage(img))
     }
 
     override fun dupe() = DynamicMedium(workspace, image.deepCopy(), mediumRepo)

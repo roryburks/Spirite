@@ -132,10 +132,6 @@ class GlobalCommandExecuter(val master: IMasterControl) : ICommandExecuter {
         return workspace.selectionEngine.selection?.lift(workspaceImage, null) ?: workspaceImage.deepCopy()
     }
 
-    private fun layerFromImage( workspace: IImageWorkspace, context: GroupNode?, image: IImage) {
-
-    }
-
     private fun copy(workspace: IImageWorkspace, cut: Boolean)  {
 
         val selectionEngine = workspace.selectionEngine

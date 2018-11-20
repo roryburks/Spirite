@@ -1,7 +1,5 @@
 package spirite.base.file.load
 
-import spirite.base.file.BadSifFileException
-import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
 import spirite.base.imageData.MediumHandle
 import spirite.base.imageData.layers.Layer
@@ -11,7 +9,6 @@ import spirite.base.imageData.layers.sprite.SpritePartStructure
 import spirite.base.util.i
 import spirite.hybrid.MDebug
 import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
-import java.io.RandomAccessFile
 
 interface ILayerLoader
 {

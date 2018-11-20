@@ -5,8 +5,10 @@ import spirite.base.graphics.RawImage
 import spirite.base.graphics.RenderRubric
 import spirite.base.imageData.MMediumRepository
 import spirite.base.imageData.drawer.DefaultImageDrawer
+import spirite.base.imageData.mediums.IImageMedium.ShiftedImage
 import spirite.base.imageData.mediums.IMedium.MediumType
 import spirite.base.imageData.mediums.IMedium.MediumType.FLAT
+import spirite.base.util.groupExtensions.SinglyList
 import spirite.base.util.linear.Transform
 
 /***
@@ -15,7 +17,7 @@ import spirite.base.util.linear.Transform
 class FlatMedium(
         val image: RawImage,
         val mediumRepo: MMediumRepository
-) : IMedium {
+) : IImageMedium {
     override val x: Int get() = 0
     override val y: Int get() = 0
     override val width: Int get() = image.width
@@ -25,9 +27,7 @@ class FlatMedium(
 
     override fun getImageDrawer(arranged: ArrangedMediumData) = DefaultImageDrawer(arranged)
 
-    override fun render( gc: GraphicsContext, render: RenderRubric?) {
-        gc.renderImage(image, 0, 0, render)
-    }
+    override fun getImages() = SinglyList(ShiftedImage(image))
 
     override fun dupe() = FlatMedium(image.deepCopy(),mediumRepo)
 

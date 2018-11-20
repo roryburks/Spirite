@@ -1,6 +1,8 @@
 package spirite.base.file
 
 import spirite.base.brains.IMasterControl
+import spirite.base.file.load.BadSifFileException
+import spirite.base.file.load.LoadEngine
 import spirite.base.graphics.IImage
 import spirite.base.graphics.using
 import spirite.base.imageData.IImageWorkspace

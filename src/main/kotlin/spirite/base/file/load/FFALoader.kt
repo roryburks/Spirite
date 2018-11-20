@@ -1,6 +1,5 @@
 package spirite.base.file.load
 
-import spirite.base.file.LoadContext
 import spirite.base.file.SaveLoadUtil
 import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.animation.ffa.FFAFrameStructure
@@ -38,7 +37,7 @@ object FFALoader : IAnimationLoader {
 }
 
 interface IFFALayerLoader {
-    fun load( context: LoadContext, ffa: FixedFrameAnimation)
+    fun load(context: LoadContext, ffa: FixedFrameAnimation)
 
 }
 

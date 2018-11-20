@@ -1,26 +1,13 @@
-package spirite.base.file
+package spirite.base.file.load
 
 import spirite.base.brains.IMasterControl
-import spirite.base.file.load.AnimationLoaderFactory
-import spirite.base.file.load.AnimationSpaceLoaderFactory
-import spirite.base.file.load.LayerLoaderFactory
-import spirite.base.file.load.MediumLoaderFactory
-import spirite.base.graphics.DynamicImage
+import spirite.base.file.SaveLoadUtil
+import spirite.base.file.readNullTerminatedStringUTF8
 import spirite.base.imageData.MImageWorkspace
 import spirite.base.imageData.animation.Animation
-import spirite.base.imageData.animation.ffa.FixedFrameAnimation
-import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace
-import spirite.base.imageData.animationSpaces.FFASpace.FFAAnimationSpace.SpacialLink
 import spirite.base.imageData.groupTree.GroupTree.*
-import spirite.base.imageData.mediums.DynamicMedium
-import spirite.base.imageData.mediums.FlatMedium
 import spirite.base.imageData.mediums.IMedium
-import spirite.base.imageData.mediums.IMedium.MediumType.*
 import spirite.base.util.i
-import spirite.base.util.linear.Vec2i
-import spirite.hybrid.Hybrid
-import spirite.hybrid.MDebug
-import spirite.hybrid.MDebug.WarningType.UNSUPPORTED
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -67,7 +54,7 @@ object LoadEngine {
             ra.seek(0)
             val header = ByteArray(4).apply { ra.read(this)}
 
-            if( ! header.contentEquals( SaveLoadUtil.header))
+            if( ! header.contentEquals(SaveLoadUtil.header))
                 throw BadSifFileException("Bad Fileheader (not an SIF File or corrupt)")
 
             context.version = ra.readInt()
@@ -101,13 +88,13 @@ object LoadEngine {
             // Animation Space Data (optional)
             context.chunkInfo.singleOrNull { it.header == "ANSP" }?.apply {
                 ra.seek(startPointer)
-                parseAnimationSpaceData(context,size)
+                parseAnimationSpaceData(context, size)
             }
 
             // Palette Data (optional)
             context.chunkInfo.singleOrNull { it.header == "PLTT" }?.apply {
                 ra.seek(startPointer)
-                parsePaletteData(context,size)
+                parsePaletteData(context, size)
             }
 
             if( context.version <= 2) {
@@ -231,7 +218,7 @@ object LoadEngine {
         //	not creation order) (TODO once ReferenceLayers are in)
     }
 
-    private fun parseAnimationData( context: LoadContext, chunkSize: Int)
+    private fun parseAnimationData(context: LoadContext, chunkSize: Int)
     {
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
@@ -251,7 +238,7 @@ object LoadEngine {
         }
     }
 
-    private fun parsePaletteData( context: LoadContext, chunkSize: Int)
+    private fun parsePaletteData(context: LoadContext, chunkSize: Int)
     {
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize
@@ -265,7 +252,7 @@ object LoadEngine {
         }
     }
 
-    private fun parseAnimationSpaceData( context: LoadContext, chunkSize: Int)
+    private fun parseAnimationSpaceData(context: LoadContext, chunkSize: Int)
     {
         val ra = context.ra
         val endPointer = ra.filePointer + chunkSize

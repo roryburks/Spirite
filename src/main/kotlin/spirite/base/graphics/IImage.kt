@@ -22,7 +22,6 @@ interface IImage {
      * approximate memory usage for memory management/UI feedback. */
     val byteSize: Int
 
-
     /** Creates a duplicate of this image that can be modified without altering
      * the original.
      */
@@ -44,4 +43,47 @@ interface IImage {
      */
     fun getARGB(x: Int, y: Int): Int
     fun getColor(x: Int, y: Int): Color
+
+
+
+    val byteStream: Sequence<Byte> get() = ByteWalker(this)
+
+
+}
+private class ByteWalker( val image: IImage) : Sequence<Byte> {
+    override fun iterator(): Iterator<Byte>  = Iter()
+
+    private inner class Iter : Iterator<Byte> {
+        var x = 0
+        var y = 0
+        var rgba = 0
+        var color : Int = 0
+
+        override fun hasNext() = y >= image.height
+
+        override fun next(): Byte {
+            if( rgba == 0) {
+                color = image.getARGB(x,y)
+            }
+
+            val toReturn = when(rgba) {
+                0 -> color
+                1 -> color shr 8
+                2 -> color shr 16
+                3 -> color shr 24
+                else -> 0
+            }.toByte()
+
+            if(++rgba == 4) {
+                rgba = 0
+                if( ++x == image.width) {
+                    x = 0
+                    ++y
+                }
+            }
+            return toReturn
+        }
+
+    }
+
 }
