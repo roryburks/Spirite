@@ -52,15 +52,15 @@ class FixedFrameAnimation(name: String, workspace: IImageWorkspace)
     }
     fun treeChanged( changedNodes : Set<Node>) {
         // Remove All Layers referencing nonexistent Groups
-        val toRemove = _layers.asSequence()
-                .mapNotNull { Pair(when(it) {
-                    is FFALayerLexical -> it.groupLink
-                    is FFALayerGroupLinked -> it.groupLink
-                    else -> return@mapNotNull null
-                }, it) }
-                .map { it.second }
-        _layers.removeAll(toRemove)
-        toRemove.forEach { triggerFFAChange(it) }
+//        val toRemove = _layers.asSequence()
+//                .mapNotNull { Pair(when(it) {
+//                    is FFALayerLexical -> it.groupLink
+//                    is FFALayerGroupLinked -> it.groupLink
+//                    else -> return@mapNotNull null
+//                }, it) }
+//                .map { it.second }
+//        _layers.removeAll(toRemove)
+//        toRemove.forEach { triggerFFAChange(it) }
 
 
         val contract = FFAUpdateContract(changedNodes)
