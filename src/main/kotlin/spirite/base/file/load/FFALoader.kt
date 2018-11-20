@@ -65,7 +65,7 @@ object FFAFixedGroupLayerLoader : IFFALayerLoader {
     override fun load(context: LoadContext, ffa: FixedFrameAnimation) {
         val ra = context.ra
         val nodes = context.nodes
-        val node = nodes[ra.readInt()]
+        val node = nodes.getOrNull(ra.readInt())
         val includeSubtrees = (ra.readByte().i == 0)
 
         val numFrames = ra.readUnsignedShort()
