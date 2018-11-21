@@ -20,7 +20,7 @@ class AnimationCommandExecutor (val master: IMasterControl)
         val workspace = master.workspaceSet.currentMWorkspace ?: return false
         val animation = workspace.animationManager.currentAnimation
         return executers.asSequence()
-                .filter { it.commandString == string }
+                .filter { it.name == string }
                 .any { it.execute(master, workspace, animation) }
     }
 

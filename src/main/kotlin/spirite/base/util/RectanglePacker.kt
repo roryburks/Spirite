@@ -20,7 +20,7 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     // Remove bad Rects
     cropped.removeIf {it.x <= 0 || it.y <= 0}
 
-    val minWidth = toPack.maxBy { it.x }!!.x
+    val minWidth = toPack.maxBy { it.x }?.x ?: return PackedRectangle(emptyList())
 
     // maxWidth and inc can be modified to effect the time spent finding
     //	the optimal Strip size (larget maxWidth and smaller inc mean more
@@ -35,7 +35,12 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     // Go through a set amount of widths to test and use the algorithm to
     //	pack the Rects, testing to see if the result is smaller in
     //	volume than the previous results.
-    return (minWidth..maxWidth step inc).map { msaSub(cropped, it) }.minBy { it.width * it.height } ?: PackedRectangle( ArrayList(0))
+    val packed = (minWidth..maxWidth step inc).asSequence()
+            .map { msaSub(toPack, it) }
+            .minBy { it.width * it.height } ?: PackedRectangle(emptyList())
+
+    println("Pack Good: ${testBad(packed)}")
+    return packed
 }
 
 private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
@@ -46,18 +51,18 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
     // Because the height dynamically stretches whereas the width is fixed,
     //	the vertical is the position of the outer Vector whereas the horizontal
     //	is the position of the inner Array
-    val field = ArrayList<IntArray>()
+    val field = mutableListOf<IntArray>()
 
     // Since we'll be doing a lot of arbitrary-index removing and the memory
     //	overhead is tiny compared to that of the field's memory consumption,
     //	LinkedList will probably be better
-    val rects = LinkedList<Vec2i>( toPack)
+    val rects = toPack.toMutableList()
 
     // Step 0: Sort by non-increasing width
     var wy = 0
-    rects.sortBy { it.x }
+    rects.sortBy { -it.x }
 
-    val packed = ArrayList<Rect>()
+    val packed = mutableListOf<Rect>()
 
     // Step 1: for each Rect of width greater then half the strip width,
     //	stack them on top of each other
@@ -75,12 +80,11 @@ private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {
             wy += it.y
             return@removeIf true
         }
-
-        return@removeIf false
+        false
     }
 
     // Step 2 Sort by non-increasing height for reasons
-    rects.sortBy { it.y }
+    rects.sortBy { -it.y }
 
     // Step 3: go row-by-row trying to fit anything that can into the empty
     //	spaces.
@@ -126,7 +130,7 @@ private fun newRow(width: Int) : IntArray {
     return ret
 }
 
-private fun addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
+private fun addRect(rect:Rect, field: MutableList<IntArray>, width: Int) {
     var buildRow : IntArray? = null
 
     for( y in rect.y until rect.height + rect.y) {
@@ -161,21 +165,21 @@ private fun addRect(rect:Rect, field: ArrayList<IntArray>, width: Int) {
 /** Tests to see if the PackedRectagle is poorly-described (either it has
  * intersections or has Rects that go outside of the packing bounds)
  */
-//fun testBad(pr: PackedRectangle): Boolean {
-//    for (r1 in pr.packedRects) {
-//        if (r1.x < 0 || r1.y < 0 || r1.x + r1.width > pr.width
-//                || r1.y + r1.height > pr.height) {
-//            return true
-//        }
-//
-//        for (r2 in pr.packedRects) {
-//            if (r1 !== r2) {
-//                if (Rect(r1.x, r1.y, r1.width, r1.height).intersects(
-//                        Rect(r2.x, r2.y, r2.width, r2.height))) {
-//                    return true
-//                }
-//            }
-//        }
-//    }
-//    return false
-//}
+fun testBad(pr: PackedRectangle): Boolean {
+    for (r1 in pr.packedRects) {
+        if (r1.x < 0 || r1.y < 0 || r1.x + r1.width > pr.width
+                || r1.y + r1.height > pr.height) {
+            return true
+        }
+
+        for (r2 in pr.packedRects) {
+            if (r1 !== r2) {
+                if (Rect(r1.x, r1.y, r1.width, r1.height).intersects(
+                        Rect(r2.x, r2.y, r2.width, r2.height))) {
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}

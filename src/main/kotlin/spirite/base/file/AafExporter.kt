@@ -78,12 +78,19 @@ class AafExporter(
         }
     }
 
-    fun getAllImages(animation: FixedFrameAnimation) : Sequence<ShiftedImage> = animation.layers.asSequence()
+    fun getAllImages(animation: FixedFrameAnimation) : Sequence<ShiftedImage> {
+        val list1 = animation.layers.flatMap { it.frames.map { it.node }.filterIsInstance<LayerNode>() }
+        val list2 = list1.flatMap { it.getDrawList() }
+        val list3 = list2.map { it.handle.medium }
+        val list4 = list3.filterIsInstance<IImageMedium>()
+        val list5 = list4.flatMap { it.getImages() }
+        return list5.asSequence()
+    } /*animation.layers.asSequence()
             .flatMap { it.frames.asSequence().filterIsInstance<LayerNode>() }
             .flatMap { it.getDrawList().asSequence() }
             .map { it.handle.medium }
             .filterIsInstance<IImageMedium>()
-            .flatMap { it.getImages().asSequence() }
+            .flatMap { it.getImages().asSequence() }*/
 
     fun deDuplicateImages(images: Sequence<ShiftedImage>) : Map<Vec2i,MutableList<ShiftedImage>>
     {
@@ -104,6 +111,7 @@ class AafExporter(
             return true
         }
         for( e in imagesByDimension) {
+            if( e.value.size <= 1) continue
             val toRemove = mutableListOf<ShiftedImage>()
             val byHash = e.value
                     .toLookup { hasher.getHash(it.image.byteStream) }
