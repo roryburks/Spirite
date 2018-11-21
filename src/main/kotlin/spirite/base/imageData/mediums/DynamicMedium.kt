@@ -36,7 +36,7 @@ class DynamicMedium(
     override fun getImages() : List<ShiftedImage> {
         val img = image.base
         if( img == null) return emptyList()
-        else return SinglyList(ShiftedImage(img))
+        else return SinglyList(ShiftedImage(img, x, y))
     }
 
     override fun dupe() = DynamicMedium(workspace, image.deepCopy(), mediumRepo)
