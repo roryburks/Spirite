@@ -1,6 +1,7 @@
 package spirite.gui.views.animation
 
 import spirite.base.brains.IMasterControl
+import spirite.base.brains.commands.ExportAafCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -68,12 +69,16 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
                         MenuItem("Create New Fixed Frame Animation", customAction = {animationManager.addAnimation(FixedFrameAnimation("FixedFrameAnimation", this))})
                 )
 
+
                 if( animation != null) {
                     menuItems.add(MenuItem("Duplicate Animation", customAction = {animationManager.addAnimation(animation.dupe())}))
                     menuItems.add(MenuItem("Delete Animation", customAction = {animationManager.removeAnimation(animation)}))
                 }
+                if( animation is FixedFrameAnimation) {
+                    menuItems.add(MenuItem("Export Animation To Aaf", ExportAafCommand))
+                }
 
-                master.contextMenus.LaunchContextMenu(evt.point, menuItems)
+                master.contextMenus.LaunchContextMenu(evt.point, menuItems, animation)
             }
     }
 
