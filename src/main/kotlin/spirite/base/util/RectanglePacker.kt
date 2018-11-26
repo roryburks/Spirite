@@ -35,12 +35,9 @@ fun modifiedSleatorAlgorithm(  toPack : List<Vec2i>) : PackedRectangle {
     // Go through a set amount of widths to test and use the algorithm to
     //	pack the Rects, testing to see if the result is smaller in
     //	volume than the previous results.
-    val packed = (minWidth..maxWidth step inc).asSequence()
+    return (minWidth..maxWidth step inc).asSequence()
             .map { msaSub(toPack, it) }
             .minBy { it.width * it.height } ?: PackedRectangle(emptyList())
-
-    println("Pack Good: ${testBad(packed)}")
-    return packed
 }
 
 private fun msaSub(toPack : List<Vec2i>, width: Int) : PackedRectangle {

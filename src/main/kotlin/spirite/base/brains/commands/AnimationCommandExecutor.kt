@@ -38,15 +38,32 @@ interface IAnimationCommand : ICommand
         get() = KeyCommand(commandString) {it.workspaceSet.currentWorkspace?.animationManager?.currentAnimation}
 }
 
-object ExportAafCommand : IAnimationCommand
+abstract class X : IAnimationCommand
 {
     init {executers.add(this)}
+}
+
+object ExportAafCommand : X()
+{
+    //init {executers.add(this)}
     override val name: String get() = "exportAsAaf"
     override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
         animation as? FixedFrameAnimation ?: return false
         val file = master.dialog.pickFile(AAF) ?: return false
 
         defaultAafExporter.export(animation, file.absolutePath)
+        return true
+    }
+}
+
+object RenameAnimationCommand : X()
+{
+    //init {executers.add(this)}
+    override val name: String get() = "renameAnimation"
+    override fun execute(master: IMasterControl, workspace: IImageWorkspace, animation: Animation?): Boolean {
+        animation ?: return false
+        val newName = master.dialog.promptForString("Enter New Animation Name:", animation.name) ?: return true
+        animation.name = newName
         return true
     }
 }

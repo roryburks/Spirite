@@ -2,6 +2,7 @@ package spirite.gui.views.animation
 
 import spirite.base.brains.IMasterControl
 import spirite.base.brains.commands.ExportAafCommand
+import spirite.base.brains.commands.RenameAnimationCommand
 import spirite.base.imageData.animation.Animation
 import spirite.base.imageData.animation.IAnimationManager.AnimationObserver
 import spirite.base.imageData.animation.ffa.FixedFrameAnimation
@@ -36,6 +37,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
     private val attributes = object : TreeNodeAttributes<Animation> {
         override fun makeComponent(t: Animation): IComponent {
             return Hybrid.ui.Label(t.name).also {
+                t.nameBind.addWeakListener { new, old -> it.text = new }
                 it.onMouseRelease += rightclick
                 dnd.addListener(it, t)
             }
@@ -71,6 +73,7 @@ class AnimationListView(val master: IMasterControl) : IOmniComponent {
 
 
                 if( animation != null) {
+                    menuItems.add(MenuItem("Rename Animation", RenameAnimationCommand))
                     menuItems.add(MenuItem("Duplicate Animation", customAction = {animationManager.addAnimation(animation.dupe())}))
                     menuItems.add(MenuItem("Delete Animation", customAction = {animationManager.removeAnimation(animation)}))
                 }
